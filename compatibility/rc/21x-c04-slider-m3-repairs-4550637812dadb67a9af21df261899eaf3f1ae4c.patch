@@ -1,0 +1,160 @@
+diff --git a/src/material-experimental/theming/_custom-tokens.scss b/src/material-experimental/theming/_custom-tokens.scss
+index bbaa42a01d1a90bfc6197aeab93f28683a4279b1..4ccbaf85d54f55ca0f114177a4fa26a5bb1920d0 100644
+--- a/src/material-experimental/theming/_custom-tokens.scss
++++ b/src/material-experimental/theming/_custom-tokens.scss
+@@ -510,6 +510,14 @@
+ @function slider($systems, $exclude-hardcoded) {
+   @return (
+     value-indicator-opacity: _hardcode(1, $exclude-hardcoded),
++    value-indicator-padding: _hardcode(0, $exclude-hardcoded),
++    value-indicator-width: _hardcode(28px, $exclude-hardcoded),
++    value-indicator-height: _hardcode(28px, $exclude-hardcoded),
++    value-indicator-caret-display: _hardcode(none, $exclude-hardcoded),
++    value-indicator-border-radius: _hardcode(50% 50% 50% 0, $exclude-hardcoded),
++    value-indicator-text-transform: _hardcode(rotate(45deg), $exclude-hardcoded),
++    value-indicator-container-transform:
++      _hardcode(translateX(-50%) rotate(-45deg), $exclude-hardcoded)
+   );
+ }
+ 
+diff --git a/src/material/core/tokens/m2/mat/_slider.scss b/src/material/core/tokens/m2/mat/_slider.scss
+index e74aa342deff97b1236b023e33ba1abda51c106d..879626ddd80e6a9a7228753888edeeab351fbde9 100644
+--- a/src/material/core/tokens/m2/mat/_slider.scss
++++ b/src/material/core/tokens/m2/mat/_slider.scss
+@@ -8,7 +8,15 @@ $prefix: (mat, slider);
+ // Tokens that can't be configured through Angular Material's current theming API,
+ // but may be in a future version of the theming API.
+ @function get-unthemable-tokens() {
+-  @return ();
++  @return (
++    value-indicator-width: auto,
++    value-indicator-height: 32px,
++    value-indicator-caret-display: block,
++    value-indicator-border-radius: 4px,
++    value-indicator-padding: 0 12px,
++    value-indicator-text-transform: none,
++    value-indicator-container-transform: translateX(-50%)
++  );
+ }
+ 
+ // Tokens that can be configured through Angular Material's color theming API.
+@@ -17,14 +25,14 @@ $prefix: (mat, slider);
+ 
+   @return (
+     // Opacity of value indicator text container
+-    value-indicator-opacity: if($is-dark, 0.9, 0.6),
++    value-indicator-opacity: if($is-dark, 0.9, 0.6)
+   );
+ }
+ 
+ // Tokens that can be configured through Angular Material's typography theming API.
+ @function get-typography-tokens($theme) {
+   @return ();
+- }
++}
+ 
+ // Tokens that can be configured through Angular Material's density theming API.
+ @function get-density-tokens($theme) {
+@@ -35,9 +43,9 @@ $prefix: (mat, slider);
+ // This is used to create token slots.
+ @function get-token-slots() {
+   @return sass-utils.deep-merge-all(
+-          get-unthemable-tokens(),
+-          get-color-tokens(token-utils.$placeholder-color-config),
+-          get-typography-tokens(token-utils.$placeholder-typography-config),
+-          get-density-tokens(token-utils.$placeholder-density-config)
++    get-unthemable-tokens(),
++    get-color-tokens(token-utils.$placeholder-color-config),
++    get-typography-tokens(token-utils.$placeholder-typography-config),
++    get-density-tokens(token-utils.$placeholder-density-config)
+   );
+ }
+diff --git a/src/material/slider/_slider-theme.scss b/src/material/slider/_slider-theme.scss
+index 5c046404de13c62a59bf94e65de5a4521cb93595..bc1b735e832032dc7b649770b07b242d4c336058 100644
+--- a/src/material/slider/_slider-theme.scss
++++ b/src/material/slider/_slider-theme.scss
+@@ -15,6 +15,8 @@
+   @else {
+     // Add default values for tokens not related to color, typography, or density.
+     @include sass-utils.current-selector-or-root() {
++      $mat-tokens: tokens-mat-slider.get-unthemable-tokens();
++      @include token-utils.create-token-values(tokens-mat-slider.$prefix, $mat-tokens);
+       @include mdc-slider-theme.theme(tokens-mdc-slider.get-unthemable-tokens());
+     }
+   }
+diff --git a/src/material/slider/slider.scss b/src/material/slider/slider.scss
+index b5ab1f8a29e6d5d0416ddcba361d0f362ca298a9..f7708d41800e10cddea5e0b221357928f927b43b 100644
+--- a/src/material/slider/slider.scss
++++ b/src/material/slider/slider.scss
+@@ -94,13 +94,26 @@ $mat-slider-horizontal-margin: 8px !default;
+     }
+ 
+     // Add slots for custom Angular Material slider tokens.
+-    @include token-utils.use-tokens(
+-      m2-mat-slider.$prefix,
+-      m2-mat-slider.get-token-slots()
+-    ) {
++    @include token-utils.use-tokens(m2-mat-slider.$prefix, m2-mat-slider.get-token-slots()) {
++      .mdc-slider__value-indicator-container {
++        @include token-utils.create-token-slot(transform, value-indicator-container-transform);
++      }
++
+       .mdc-slider__value-indicator {
+-        // There's no token to control this opacity so we have to do it ourselves.
++        @include token-utils.create-token-slot(width, value-indicator-width);
++        @include token-utils.create-token-slot(height, value-indicator-height);
++        @include token-utils.create-token-slot(padding, value-indicator-padding);
+         @include token-utils.create-token-slot(opacity, value-indicator-opacity);
++        @include token-utils.create-token-slot(border-radius, value-indicator-border-radius);
++
++        &::before {
++          @include token-utils.create-token-slot(display, value-indicator-caret-display);
++        }
++      }
++
++      .mdc-slider__value-indicator-text {
++        @include token-utils.create-token-slot(width, value-indicator-width);
++        @include token-utils.create-token-slot(transform, value-indicator-text-transform);
+       }
+     }
+ 
+@@ -141,6 +154,10 @@ $mat-slider-horizontal-margin: 8px !default;
+     .mdc-slider__value-indicator {
+       word-break: normal;
+     }
++
++    .mdc-slider__value-indicator-text {
++      text-align: center;
++    }
+   }
+   // In the MDC slider the focus indicator is inside the thumb.
+   .mdc-slider__thumb--focused .mat-mdc-focus-indicator::before {
+diff --git a/yarn.lock b/yarn.lock
+index 570d1013e50fa5f6e625b654dbc45c6ca1d44ba0..56334fff5cb5b75155c9152e7bb42b5621be18d4 100644
+--- a/yarn.lock
++++ b/yarn.lock
+@@ -6895,20 +6895,10 @@ camelcase@^6.2.0:
+   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-6.3.0.tgz#5685b95eb209ac9c0c177467778c9c84df58ba9a"
+   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
+ 
+-caniuse-lite@^1.0.30001317, caniuse-lite@^1.0.30001370, caniuse-lite@^1.0.30001449:
+-  version "1.0.30001495"
+-  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001495.tgz"
+-  integrity sha512-F6x5IEuigtUfU5ZMQK2jsy5JqUUlEFRVZq8bO2a+ysq5K7jD6PPc9YXZj78xDNS3uNchesp1Jw47YXEqr+Viyg==
+-
+-caniuse-lite@^1.0.30001517:
+-  version "1.0.30001519"
+-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001519.tgz#3e7b8b8a7077e78b0eb054d69e6edf5c7df35601"
+-  integrity sha512-0QHgqR+Jv4bxHMp8kZ1Kn8CH55OikjKJ6JmKkZYP1F3D7w+lnFXF70nG5eNfsZS89jadi5Ywy5UCSKLAglIRkg==
+-
+-caniuse-lite@^1.0.30001538, caniuse-lite@^1.0.30001541:
+-  version "1.0.30001551"
+-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001551.tgz#1f2cfa8820bd97c971a57349d7fd8f6e08664a3e"
+-  integrity sha512-vtBAez47BoGMMzlbYhfXrMV1kvRF2WP/lqiMuDu1Sb4EE4LKEgjopFDSRtZfdVnslNRpOqV/woE+Xgrwj6VQlg==
++caniuse-lite@^1.0.30001317, caniuse-lite@^1.0.30001370, caniuse-lite@^1.0.30001449, caniuse-lite@^1.0.30001517, caniuse-lite@^1.0.30001538, caniuse-lite@^1.0.30001541:
++  version "1.0.30001570"
++  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001570.tgz"
++  integrity sha512-+3e0ASu4sw1SWaoCtvPeyXp+5PsjigkSt8OXZbF9StH5pQWbxEjLAZE3n8Aup5udop1uRiKA7a4utUk/uoSpUw==
+ 
+ canonical-path@^1.0.0:
+   version "1.0.0"

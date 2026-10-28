@@ -96,6 +96,11 @@ def derive_title_successor(root=ROOT):
             assert before_text[slice(*before_ranges[i])] == after_text[slice(*after_ranges[i])]
     for member in packet['source_members'] + [packet['root_checker']]:
         value = (root / member['path']).read_bytes()
+        if member['path'] == 'scripts/upstream-source-contract-registry.mjs' and HASH(value) == '4661b7a4ef78998ba1d9c8e5f199a544524a5873fa6ee4e6824f2e8faed46537':
+            from slider_m3_repairs_canonical_ledger_patch import verify_slider_m3_repairs_registry_successor
+            slider_before, slider_after = verify_slider_m3_repairs_registry_successor(root)
+            assert value == slider_after
+            value = slider_before
         if member['path'] == 'scripts/upstream-source-contract-registry.mjs' and HASH(value) == '856dffd6cd50d5ced52e9ea978761b18dbd13079cda15d01c25bbea6ad1764d8':
             from surface_m3_theme_canonical_ledger_patch import verify_surface_m3_theme_registry_successor
             surface_before, surface_after = verify_surface_m3_theme_registry_successor(root)
@@ -137,6 +142,12 @@ def derive_title_successor(root=ROOT):
 def verify_title_successor(root=ROOT, candidate=None):
     before, after = derive_title_successor(root)
     observed = Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()
+    slider_m3_repairs_applied = False
+    if HASH(observed) == '1fcc5dba5bb89f9dc9b811cbee7f7a55da2328ee7277a660a0d2a81342d58532':
+        from slider_m3_repairs_canonical_ledger_patch import derive_slider_m3_repairs_successor
+        slider_before, slider_after = derive_slider_m3_repairs_successor(root)
+        assert observed == slider_after
+        observed, slider_m3_repairs_applied = slider_before, True
     surface_m3_theme_applied = False
     if HASH(observed) == '3f229d913d93503ace3270b04d268ec8132e63cd97019a05a08c62ac4a0e67fa':
         from surface_m3_theme_canonical_ledger_patch import derive_surface_m3_theme_successor
@@ -177,5 +188,5 @@ def verify_title_successor(root=ROOT, candidate=None):
     return dict(individual_decisions=1, metadata_tokens=14, summary_scalar_tokens=2,
         unselected_entry_bytes_preserved=1682, population=1697, closed_dispositions=377,
         pending_dispositions=1320, pending_security_reviews=1, before_sha256=HASH(before),
-        after_sha256=HASH(after), exact_theming_successor_verified=theming_applied, exact_inspection_successor_verified=inspection_applied, exact_selector_density_successor_verified=selector_density_applied, exact_button_tokenization_successor_verified=button_tokenization_applied, exact_button_token_repairs_successor_verified=button_token_repairs_applied, exact_surface_m3_theme_successor_verified=surface_m3_theme_applied,
+        after_sha256=HASH(after), exact_theming_successor_verified=theming_applied, exact_inspection_successor_verified=inspection_applied, exact_selector_density_successor_verified=selector_density_applied, exact_button_tokenization_successor_verified=button_tokenization_applied, exact_button_token_repairs_successor_verified=button_token_repairs_applied, exact_surface_m3_theme_successor_verified=surface_m3_theme_applied, exact_slider_m3_repairs_successor_verified=slider_m3_repairs_applied,
         actual_native_artifact_browser_floor_or_full_audit_qualified=False, g11_claim='not-passed')

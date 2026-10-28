@@ -13,6 +13,7 @@ import {join,basename} from 'node:path';
 import {tmpdir} from 'node:os';
 import admission from '../scripts/upstream-surface-m3-theme-admission.cjs';
 import {applySurfaceM3ThemeCanonicalStage,surfaceM3ThemeRegistrySuccessor} from '../scripts/surface-m3-theme-canonical-stage.mjs';
+import {sliderM3RepairsRegistrySuccessor} from '../scripts/slider-m3-repairs-canonical-stage.mjs';
 import {qualifyCanonicalToolReference} from '../scripts/packed-upstream-ledger-epoch.mjs';
 import {requiresRegisteredSourceReview} from '../scripts/upstream-registered-source-review.mjs';
 import {sourceContractDefinitions} from '../scripts/upstream-source-contract-registry.mjs';
@@ -24,8 +25,8 @@ for(const key of Object.keys(env))if(key.startsWith('RC_')||['GIT_DIR','GIT_WORK
 const before=execFileSync('git',['--no-replace-objects','show',packet.source_parent+':'+ledger],{cwd:root,env,maxBuffer:8*1024*1024});
 const stage=applySurfaceM3ThemeCanonicalStage({before,body});assert.equal(hash(stage.after),packet.after.sha256);
 const registryBefore=execFileSync('git',['--no-replace-objects','show',packet.source_parent+':'+packet.registry_before.path],{cwd:root,env});
-assert.equal(read(packet.registry_after.path).equals(surfaceM3ThemeRegistrySuccessor(registryBefore)),true);assert.equal(sourceContractDefinitions.length,38);
-const qualified=qualifyCanonicalToolReference({root,read,prior:packet.registry_before});assert.deepEqual(qualified.reference,packet.registry_after);
+assert.equal(read(packet.registry_after.path).equals(sliderM3RepairsRegistrySuccessor(surfaceM3ThemeRegistrySuccessor(registryBefore))),true);assert.equal(sourceContractDefinitions.length,40);
+const qualified=qualifyCanonicalToolReference({root,read,prior:packet.registry_before});assert.deepEqual(qualified.reference,JSON.parse(read('compatibility/rc/21x-c04-slider-m3-repairs-canonical-transition.json')).registry_after);
 let metadataCases=0,metadataRejections=0,sourceRejections=0;const rejected=[];
 for(const row of body.reviews){
  let patchChanged=false;const patchPath=row.patch_file;
@@ -119,7 +120,7 @@ try{
  const bypass=inspect(stage.entries,{inject:true,checker:'scripts/'+basename(mutant)});assert.equal(bypass.evidence_failures.length,0);assert.deepEqual(bypass.insufficient_review_sha_ids.sensitive,[]);mutantDetected=true;rejected.push('root/missing-source-requirement-mutant');
 }finally{fs.rmSync(mutant,{force:true});fs.rmSync(directory,{recursive:true,force:true});}
 const report={schema_version:1,result:'pass',pure_metadata_cases:metadataCases,metadata_rejections:metadataRejections,source_rejections:sourceRejections,
- registered_source_contracts:38,prior_registry_records_preserved:35,current_registry_tool_bindings:qualified.bound.length,real_root_positive_rows:rootPositive,real_root_rejected_rows:rootNegative,missing_source_requirement_mutant_detected:mutantDetected,
+ registered_source_contracts:40,prior_registry_records_preserved:35,current_registry_tool_bindings:qualified.bound.length,real_root_positive_rows:rootPositive,real_root_rejected_rows:rootNegative,missing_source_requirement_mutant_detected:mutantDetected,
  late_original_patch_in_tool_role_rejected:true,canonical_whole_body_fresh_source_checked:true,canonical_bound_members:641,canonical_metadata_rejections:8,canonical_late_source_rejections:14,canonical_cache_or_guard_mutants_rejected:2,
  after_sha256:hash(stage.after),individual_decisions:3,summary_scalar_tokens:2,unselected_entries_preserved:1694,rejected,canonical_ledger_applied:false,
  actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};

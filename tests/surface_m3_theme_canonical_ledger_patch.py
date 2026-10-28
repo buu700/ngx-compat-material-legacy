@@ -39,7 +39,13 @@ def verify_surface_m3_theme_registry_successor(root=ROOT):
                         "    scope_key:'surface_m3_theme_source_scope',module:'upstream-surface-m3-theme-admission.cjs'},\n" for sha in SHAS)
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == '856dffd6cd50d5ced52e9ea978761b18dbd13079cda15d01c25bbea6ad1764d8'
-    assert (root / REGISTRY).read_bytes() == after
+    current = (root / REGISTRY).read_bytes()
+    if digest(current) == '4661b7a4ef78998ba1d9c8e5f199a544524a5873fa6ee4e6824f2e8faed46537':
+        from slider_m3_repairs_canonical_ledger_patch import verify_slider_m3_repairs_registry_successor
+        slider_before, slider_after = verify_slider_m3_repairs_registry_successor(root)
+        assert current == slider_after
+        current = slider_before
+    assert current == after
     return before, after
 
 

@@ -82,4 +82,8 @@ export const sourceContractDefinitions = [
     scope_key:'surface_m3_theme_source_scope',module:'upstream-surface-m3-theme-admission.cjs'},
   {sha:'fbc7bdda93b7c261705da81cec6720bbf607c5ce',proof_kind:'individual-historical-surface-m3-theme-source-review',
     scope_key:'surface_m3_theme_source_scope',module:'upstream-surface-m3-theme-admission.cjs'},
+  {sha:'4550637812dadb67a9af21df261899eaf3f1ae4c',proof_kind:'individual-historical-slider-m3-repairs-source-review',
+    scope_key:'slider_m3_repairs_source_scope',module:'upstream-slider-m3-repairs-admission.cjs'},
+  {sha:'90b37e5652bad1044dff3c4702aa4b73b715117a',proof_kind:'individual-historical-slider-m3-repairs-source-review',
+    scope_key:'slider_m3_repairs_source_scope',module:'upstream-slider-m3-repairs-admission.cjs'},
 ];

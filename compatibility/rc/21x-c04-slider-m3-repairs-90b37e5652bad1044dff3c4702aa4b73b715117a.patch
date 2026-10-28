@@ -1,0 +1,152 @@
+diff --git a/src/material-experimental/theming/_custom-tokens.scss b/src/material-experimental/theming/_custom-tokens.scss
+index 4ccbaf85d54f55ca0f114177a4fa26a5bb1920d0..612bd2b98d213904ba2665c51d2bbe96811c0e92 100644
+--- a/src/material-experimental/theming/_custom-tokens.scss
++++ b/src/material-experimental/theming/_custom-tokens.scss
+@@ -508,7 +508,14 @@
+ /// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
+ /// @return {Map} A set of custom tokens for the mat-slider
+ @function slider($systems, $exclude-hardcoded) {
++  $ripple-color: map.get($systems, md-sys-color, primary);
++  $hover-ripple-color: if($ripple-color == null, null, #{rgba($ripple-color, 0.05)});
++  $focus-ripple-color: if($ripple-color == null, null, #{rgba($ripple-color, 0.2)});
++
+   @return (
++    ripple-color: $ripple-color,
++    hover-state-layer-color: $hover-ripple-color,
++    focus-state-layer-color: $focus-ripple-color,
+     value-indicator-opacity: _hardcode(1, $exclude-hardcoded),
+     value-indicator-padding: _hardcode(0, $exclude-hardcoded),
+     value-indicator-width: _hardcode(28px, $exclude-hardcoded),
+diff --git a/src/material/core/tokens/m2/mat/_slider.scss b/src/material/core/tokens/m2/mat/_slider.scss
+index 879626ddd80e6a9a7228753888edeeab351fbde9..5041fcf3ea74383cd8e1b99d2d52d7128ca7da20 100644
+--- a/src/material/core/tokens/m2/mat/_slider.scss
++++ b/src/material/core/tokens/m2/mat/_slider.scss
+@@ -1,3 +1,4 @@
++@use 'sass:map';
+ @use '../../token-utils';
+ @use '../../../style/sass-utils';
+ @use '../../../theming/inspection';
+@@ -21,11 +22,28 @@ $prefix: (mat, slider);
+ 
+ // Tokens that can be configured through Angular Material's color theming API.
+ @function get-color-tokens($theme) {
++  $theme-color-tokens: private-get-color-palette-color-tokens($theme, primary);
+   $is-dark: inspection.get-theme-type($theme) == dark;
+ 
++  @return map.merge(
++    $theme-color-tokens,
++    (
++      // Opacity of value indicator text container
++      value-indicator-opacity: if($is-dark, 0.9, 0.6)
++    ),
++  );
++}
++
++// Generates tokens for the slider properties that change based on the theme.
++@function private-get-color-palette-color-tokens($theme, $palette-name) {
++  $ripple-color: inspection.get-theme-color($theme, $palette-name);
++  $hover-ripple-color: if($ripple-color == null, null, #{rgba($ripple-color, 0.05)});
++  $focus-ripple-color: if($ripple-color == null, null, #{rgba($ripple-color, 0.2)});
++
+   @return (
+-    // Opacity of value indicator text container
+-    value-indicator-opacity: if($is-dark, 0.9, 0.6)
++    ripple-color: $ripple-color,
++    hover-state-layer-color: $hover-ripple-color,
++    focus-state-layer-color: $focus-ripple-color
+   );
+ }
+ 
+diff --git a/src/material/slider/_slider-theme.scss b/src/material/slider/_slider-theme.scss
+index bc1b735e832032dc7b649770b07b242d4c336058..e0b45a6bffd5c610542b28630fa92e396accdf35 100644
+--- a/src/material/slider/_slider-theme.scss
++++ b/src/material/slider/_slider-theme.scss
+@@ -40,22 +40,27 @@
+   // Add values for MDC slider tokens.
+   @include sass-utils.current-selector-or-root() {
+     @include mdc-slider-theme.theme($mdc-color-tokens);
+-    @include _slider-ripple-color($theme, primary);
+     @include token-utils.create-token-values(
+       tokens-mat-slider.$prefix,
+       $mat-slider-color-tokens
+     );
+ 
+     .mat-accent {
++      @include token-utils.create-token-values(
++        tokens-mat-slider.$prefix,
++        tokens-mat-slider.private-get-color-palette-color-tokens($theme, accent),
++      );
+       @include mdc-slider-theme.theme(
+         tokens-mdc-slider.private-get-color-palette-color-tokens($theme, accent));
+-      @include _slider-ripple-color($theme, accent);
+     }
+ 
+       .mat-warn {
++        @include token-utils.create-token-values(
++          tokens-mat-slider.$prefix,
++          tokens-mat-slider.private-get-color-palette-color-tokens($theme, warn),
++        );
+         @include mdc-slider-theme.theme(
+             tokens-mdc-slider.private-get-color-palette-color-tokens($theme, warn));
+-        @include _slider-ripple-color($theme, warn);
+       }
+     }
+   }
+@@ -105,15 +110,6 @@
+   }
+ }
+ 
+-// Generated MDC ripple color tokens are not being calculated so needs to be set
+-@mixin _slider-ripple-color($theme, $palette-name) {
+-  $color: inspection.get-theme-color($theme, $palette-name);
+-
+-  --mat-mdc-slider-ripple-color: #{$color};
+-  --mat-mdc-slider-hover-ripple-color: #{rgba($color, 0.05)};
+-  --mat-mdc-slider-focus-ripple-color: #{rgba($color, 0.2)};
+-}
+-
+ @mixin _theme-from-tokens($tokens) {
+   @if ($tokens != ()) {
+     @include mdc-slider-theme.theme(map.get($tokens, tokens-mdc-slider.$prefix));
+diff --git a/src/material/slider/slider.scss b/src/material/slider/slider.scss
+index f7708d41800e10cddea5e0b221357928f927b43b..f72e358985aecc4f06ee8f38d8607ea8929e2e18 100644
+--- a/src/material/slider/slider.scss
++++ b/src/material/slider/slider.scss
+@@ -115,23 +115,23 @@ $mat-slider-horizontal-margin: 8px !default;
+         @include token-utils.create-token-slot(width, value-indicator-width);
+         @include token-utils.create-token-slot(transform, value-indicator-text-transform);
+       }
+-    }
+ 
+-    // The `.mat-ripple` wrapper here is redundant, but we need it to
+-    // increase the specificity due to how some styles are setup in g3.
+-    .mat-ripple {
+-      // These ripple colors are custom so we have to introduce our own tokens.
+-      .mat-ripple-element {
+-        background-color: var(--mat-mdc-slider-ripple-color, transparent);
+-      }
++      // The `.mat-ripple` wrapper here is redundant, but we need it to
++      // increase the specificity due to how some styles are setup in g3.
++      .mat-ripple {
++        // These ripple colors are custom so we have to introduce our own tokens.
++        .mat-ripple-element {
++          @include token-utils.create-token-slot(background-color, ripple-color);
++        }
+ 
+-      .mat-mdc-slider-hover-ripple {
+-        background-color: var(--mat-mdc-slider-hover-ripple-color, transparent);
+-      }
++        .mat-mdc-slider-hover-ripple {
++          @include token-utils.create-token-slot(background-color, hover-state-layer-color);
++        }
+ 
+-      .mat-mdc-slider-focus-ripple,
+-      .mat-mdc-slider-active-ripple {
+-        background-color: var(--mat-mdc-slider-focus-ripple-color, transparent);
++        .mat-mdc-slider-focus-ripple,
++        .mat-mdc-slider-active-ripple {
++          @include token-utils.create-token-slot(background-color, focus-state-layer-color);
++        }
+       }
+     }
+ 
