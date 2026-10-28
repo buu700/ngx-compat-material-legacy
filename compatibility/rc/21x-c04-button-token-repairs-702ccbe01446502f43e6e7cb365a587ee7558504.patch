@@ -1,0 +1,601 @@
+diff --git a/src/material/button/_button-theme.scss b/src/material/button/_button-theme.scss
+index d4d248161890fd39bca4d2149f8958a44d8190ca..f9a5cb7bc7ae8c2babf7badbb893d3d08e4b96cb 100644
+--- a/src/material/button/_button-theme.scss
++++ b/src/material/button/_button-theme.scss
+@@ -12,8 +12,8 @@
+ @use '../core/theming/theming';
+ @use '../core/theming/inspection';
+ @use '../core/typography/typography';
+-@use '../core/tokens/m2/mdc/button-filled' as tokens-mdc-button-filled;
+-@use '../core/tokens/m2/mdc/button-protected' as tokens-mdc-button-protected;
++@use '../core/tokens/m2/mdc/filled-button' as tokens-mdc-filled-button;
++@use '../core/tokens/m2/mdc/protected-button' as tokens-mdc-protected-button;
+ 
+ @function _on-color($theme, $palette) {
+   $is-dark: inspection.get-theme-type($theme) == dark;
+@@ -131,10 +131,10 @@
+   $on-error: _on-color($theme, $error);
+ 
+   .mat-mdc-unelevated-button {
+-    $default-color-tokens: tokens-mdc-button-filled.get-color-tokens($theme, $surface, $on-surface);
+-    $primary-color-tokens: tokens-mdc-button-filled.get-color-tokens($theme, $primary, $on-primary);
+-    $accent-color-tokens: tokens-mdc-button-filled.get-color-tokens($theme, $accent, $on-accent);
+-    $warn-color-tokens: tokens-mdc-button-filled.get-color-tokens($theme, $error, $on-error);
++    $default-color-tokens: tokens-mdc-filled-button.get-color-tokens($theme, $surface, $on-surface);
++    $primary-color-tokens: tokens-mdc-filled-button.get-color-tokens($theme, $primary, $on-primary);
++    $accent-color-tokens: tokens-mdc-filled-button.get-color-tokens($theme, $accent, $on-accent);
++    $warn-color-tokens: tokens-mdc-filled-button.get-color-tokens($theme, $error, $on-error);
+ 
+     &.mat-unthemed {
+       @include mdc-button-filled-theme.theme($default-color-tokens);
+@@ -154,18 +154,18 @@
+   }
+ 
+   .mat-mdc-raised-button {
+-    $default-color-tokens: tokens-mdc-button-protected.get-color-tokens(
++    $default-color-tokens: tokens-mdc-protected-button.get-color-tokens(
+       $theme,
+       $surface,
+       $on-surface
+     );
+-    $primary-color-tokens: tokens-mdc-button-protected.get-color-tokens(
++    $primary-color-tokens: tokens-mdc-protected-button.get-color-tokens(
+       $theme,
+       $primary,
+       $on-primary
+     );
+-    $accent-color-tokens: tokens-mdc-button-protected.get-color-tokens($theme, $accent, $on-accent);
+-    $warn-color-tokens: tokens-mdc-button-protected.get-color-tokens($theme, $error, $on-error);
++    $accent-color-tokens: tokens-mdc-protected-button.get-color-tokens($theme, $accent, $on-accent);
++    $warn-color-tokens: tokens-mdc-protected-button.get-color-tokens($theme, $error, $on-error);
+ 
+     &.mat-unthemed {
+       @include mdc-button-protected-theme.theme($default-color-tokens);
+@@ -235,13 +235,13 @@
+   $density-scale: theming.clamp-density(inspection.get-theme-density($theme), -3);
+ 
+   .mat-mdc-raised-button {
+-    $density-tokens: tokens-mdc-button-protected.get-density-tokens($theme);
++    $density-tokens: tokens-mdc-protected-button.get-density-tokens($theme);
+     @include mdc-button-protected-theme.theme($density-tokens);
+     @include button-theme-private.touch-target-density($density-scale);
+   }
+ 
+   .mat-mdc-unelevated-button {
+-    $density-tokens: tokens-mdc-button-filled.get-density-tokens($theme);
++    $density-tokens: tokens-mdc-filled-button.get-density-tokens($theme);
+     @include mdc-button-filled-theme.theme($density-tokens);
+     @include button-theme-private.touch-target-density($density-scale);
+   }
+diff --git a/src/material/button/button.scss b/src/material/button/button.scss
+index f86050e9d34d750bd76ef1bd0e7b5aa9fc573cda..12ce5664f813c1ef8651a4e6175b2ead94d88403 100644
+--- a/src/material/button/button.scss
++++ b/src/material/button/button.scss
+@@ -12,8 +12,8 @@
+ @use '../core/mdc-helpers/mdc-helpers';
+ @use '../core/style/private' as style-private;
+ @use '../core/focus-indicators/private' as focus-indicators-private;
+-@use '../core/tokens/m2/mdc/button-filled' as tokens-mdc-button-filled;
+-@use '../core/tokens/m2/mdc/button-protected' as tokens-mdc-button-protected;
++@use '../core/tokens/m2/mdc/filled-button' as tokens-mdc-filled-button;
++@use '../core/tokens/m2/mdc/protected-button' as tokens-mdc-protected-button;
+ 
+ @include mdc-helpers.disable-mdc-fallback-declarations {
+   @include mdc-button.static-styles-without-ripple($query: mdc-helpers.$mdc-base-styles-query);
+@@ -46,25 +46,25 @@
+   // Note that we don't include a feature query, because this mixins declare
+   // all the "slots" for CSS variables that will be defined in the theme.
+   .mat-mdc-unelevated-button {
+-    $mdc-button-filled-slots: tokens-mdc-button-filled.get-token-slots();
++    $mdc-filled-button-slots: tokens-mdc-filled-button.get-token-slots();
+ 
+     // Add the slots for MDC text button.
+-    @include mdc-button-filled-theme.theme-styles($mdc-button-filled-slots);
++    @include mdc-button-filled-theme.theme-styles($mdc-filled-button-slots);
+ 
+     // Add default values for MDC text button tokens that aren't outputted by the theming API.
+-    @include mdc-button-filled-theme.theme(tokens-mdc-button-filled.get-unthemable-tokens());
++    @include mdc-button-filled-theme.theme(tokens-mdc-filled-button.get-unthemable-tokens());
+   }
+ 
+   // Note that we don't include a feature query, because this mixins declare
+   // all the "slots" for CSS variables that will be defined in the theme.
+   .mat-mdc-raised-button {
+-    $mdc-button-protected-slots: tokens-mdc-button-protected.get-token-slots();
++    $mdc-button-protected-slots: tokens-mdc-protected-button.get-token-slots();
+ 
+     // Add the slots for MDC text button.
+     @include mdc-button-protected-theme.theme-styles($mdc-button-protected-slots);
+ 
+     // Add default values for MDC text button tokens that aren't outputted by the theming API.
+-    @include mdc-button-protected-theme.theme(tokens-mdc-button-protected.get-unthemable-tokens());
++    @include mdc-button-protected-theme.theme(tokens-mdc-protected-button.get-unthemable-tokens());
+   }
+ }
+ 
+diff --git a/src/material/core/tokens/m2/mdc/_button-filled.scss b/src/material/core/tokens/m2/mdc/_button-filled.scss
+deleted file mode 100644
+index b9d7780c1fa3cb80a216955442d447588283e50d..0000000000000000000000000000000000000000
+--- a/src/material/core/tokens/m2/mdc/_button-filled.scss
++++ /dev/null
+@@ -1,108 +0,0 @@
+-@use 'sass:map';
+-@use '../../token-utils';
+-@use '../../../mdc-helpers/mdc-helpers';
+-@use '../../../style/sass-utils';
+-@use '../../../theming/inspection';
+-@use '../../../theming/theming';
+-
+-// The prefix used to generate the fully qualified name for tokens in this file.
+-$prefix: (mdc, button-filled);
+-
+-// Tokens that can't be configured through Angular Material's current theming API,
+-// but may be in a future version of the theming API.
+-//
+-// Tokens that are available in MDC, but not used in Angular Material should be mapped to `null`.
+-// `null` indicates that we are intentionally choosing not to emit a slot or value for the token in
+-// our CSS.
+-@function get-unthemable-tokens() {
+-  @return (
+-    container-shape: 4px,
+-    container-elevation: 0,
+-    disabled-container-elevation: 0,
+-    focus-container-elevation: 0,
+-    hover-container-elevation: 0,
+-    keep-touch-target: false,
+-    pressed-container-elevation: 0,
+-
+-    focus-ring-color: null,
+-    focus-ring-offset: null,
+-    focus-state-layer-opacity: null,
+-    hover-state-layer-opacity: null,
+-    pressed-state-layer-opacity: null,
+-    container-shadow-color: null,
+-    focus-label-text-color: null,
+-    hover-label-text-color: null,
+-    label-text-font: null,
+-    label-text-size: null,
+-    label-text-tracking: null,
+-    label-text-transform: null,
+-    label-text-weight: null,
+-    pressed-label-text-color: null,
+-    with-icon-disabled-icon-color: null,
+-    with-icon-focus-icon-color: null,
+-    with-icon-hover-icon-color: null,
+-    with-icon-icon-color: null,
+-    with-icon-icon-size: null,
+-    with-icon-pressed-icon-color: null
+-  );
+-}
+-
+-@function _on-color($theme, $palette) {
+-  @if ($palette) {
+-    $is-dark: inspection.get-theme-type($theme) == dark;
+-    @return if(mdc-helpers.variable-safe-contrast-tone($palette, $is-dark) == 'dark', #000, #fff);
+-  }
+-}
+-
+-// Tokens that can be configured through Angular Material's color theming API.
+-@function get-color-tokens($theme, $color: null, $on-color: null) {
+-  $is-dark: inspection.get-theme-type($theme) == dark;
+-  $primary: inspection.get-theme-color($theme, primary);
+-  $surface: inspection.get-theme-color($theme, background, card);
+-  $on-primary: _on-color($theme, $primary);
+-  $on-surface: _on-color($theme, $surface);
+-
+-  @return (
+-    container-color: if($color, $color, transparent),
+-    disabled-container-color: rgba($on-surface, 0.12),
+-    disabled-label-text-color: rgba($on-surface, if($is-dark, 0.5, 0.38)),
+-    focus-state-layer-color: $on-primary,
+-    hover-state-layer-color: $on-primary,
+-    label-text-color: if($on-color, $on-color, inherit),
+-    pressed-state-layer-color: $on-primary
+-  );
+-}
+-
+-// Tokens that can be configured through Angular Material's typography theming API.
+-@function get-typography-tokens($theme) {
+-  @return ();
+-}
+-
+-// Tokens that can be configured through Angular Material's density theming API.
+-@function get-density-tokens($theme) {
+-  $scale: theming.clamp-density(inspection.get-theme-density($theme), -3);
+-
+-  @return (
+-    container-height:
+-      map.get(
+-        (
+-          0: 36px,
+-          -1: 32px,
+-          -2: 28px,
+-          -3: 24px,
+-        ),
+-        $scale
+-      )
+-  );
+-}
+-
+-// Combines the tokens generated by the above functions into a single map with placeholder values.
+-// This is used to create token slots.
+-@function get-token-slots() {
+-  @return sass-utils.deep-merge-all(
+-    get-unthemable-tokens(),
+-    get-color-tokens(token-utils.$placeholder-color-config),
+-    get-typography-tokens(token-utils.$placeholder-typography-config),
+-    get-density-tokens(token-utils.$placeholder-density-config)
+-  );
+-}
+diff --git a/src/material/core/tokens/m2/mdc/_button-protected.scss b/src/material/core/tokens/m2/mdc/_button-protected.scss
+deleted file mode 100644
+index 46363de7c1242f02df919ee15a4869489dbf74d6..0000000000000000000000000000000000000000
+--- a/src/material/core/tokens/m2/mdc/_button-protected.scss
++++ /dev/null
+@@ -1,107 +0,0 @@
+-@use 'sass:map';
+-@use '../../token-utils';
+-@use '../../../mdc-helpers/mdc-helpers';
+-@use '../../../style/sass-utils';
+-@use '../../../theming/inspection';
+-@use '../../../theming/theming';
+-
+-// The prefix used to generate the fully qualified name for tokens in this file.
+-$prefix: (mdc, button-protected);
+-
+-// Tokens that can't be configured through Angular Material's current theming API,
+-// but may be in a future version of the theming API.
+-//
+-// Tokens that are available in MDC, but not used in Angular Material should be mapped to `null`.
+-// `null` indicates that we are intentionally choosing not to emit a slot or value for the token in
+-// our CSS.
+-@function get-unthemable-tokens() {
+-  @return (
+-    container-shape: 4px,
+-    keep-touch-target: false,
+-
+-    focus-ring-color: null,
+-    focus-ring-offset: null,
+-    focus-state-layer-opacity: null,
+-    hover-state-layer-opacity: null,
+-    pressed-state-layer-opacity: null,
+-    container-shadow-color: null,
+-    container-elevation: null,
+-    hover-container-elevation: null,
+-    disabled-container-elevation: null,
+-    focus-container-elevation: null,
+-    pressed-container-elevation: null,
+-    label-text-font: null,
+-    label-text-size: null,
+-    label-text-tracking: null,
+-    label-text-transform: null,
+-    label-text-weight: null,
+-    with-icon-icon-size: null,
+-    focus-label-text-color: null,
+-    hover-label-text-color: null,
+-    pressed-label-text-color: null,
+-    with-icon-disabled-icon-color: null,
+-    with-icon-focus-icon-color: null,
+-    with-icon-hover-icon-color: null,
+-    with-icon-icon-color: null,
+-    with-icon-pressed-icon-color: null
+-  );
+-}
+-
+-@function _on-color($theme, $palette) {
+-  @if ($palette) {
+-    $is-dark: inspection.get-theme-type($theme) == dark;
+-    @return if(mdc-helpers.variable-safe-contrast-tone($palette, $is-dark) == 'dark', #000, #fff);
+-  }
+-}
+-
+-// Tokens that can be configured through Angular Material's color theming API.
+-@function get-color-tokens($theme, $color: null, $on-color: null) {
+-  $is-dark: inspection.get-theme-type($theme) == dark;
+-  $primary: inspection.get-theme-color($theme, primary);
+-  $surface: inspection.get-theme-color($theme, background, card);
+-  $on-primary: _on-color($theme, $primary);
+-  $on-surface: _on-color($theme, $surface);
+-
+-  @return (
+-    container-color: if($color, $color, transparent),
+-    focus-state-layer-color: $on-primary,
+-    hover-state-layer-color: $on-primary,
+-    pressed-state-layer-color: $on-primary,
+-    label-text-color: if($on-color, $on-color, inherit),
+-    disabled-container-color: rgba($on-surface, 0.12),
+-    disabled-label-text-color: rgba($on-surface, if($is-dark, 0.5, 0.38))
+-  );
+-}
+-
+-// Tokens that can be configured through Angular Material's typography theming API.
+-@function get-typography-tokens($theme) {
+-  @return ();
+-}
+-
+-// Tokens that can be configured through Angular Material's density theming API.
+-@function get-density-tokens($theme) {
+-  $scale: theming.clamp-density(inspection.get-theme-density($theme), -3);
+-  @return (
+-    container-height:
+-      map.get(
+-        (
+-          0: 36px,
+-          -1: 32px,
+-          -2: 28px,
+-          -3: 24px,
+-        ),
+-        $scale
+-      )
+-  );
+-}
+-
+-// Combines the tokens generated by the above functions into a single map with placeholder values.
+-// This is used to create token slots.
+-@function get-token-slots() {
+-  @return sass-utils.deep-merge-all(
+-    get-unthemable-tokens(),
+-    get-color-tokens(token-utils.$placeholder-color-config),
+-    get-typography-tokens(token-utils.$placeholder-typography-config),
+-    get-density-tokens(token-utils.$placeholder-density-config)
+-  );
+-}
+diff --git a/src/material/core/tokens/m2/mdc/_filled-button.scss b/src/material/core/tokens/m2/mdc/_filled-button.scss
+new file mode 100644
+index 0000000000000000000000000000000000000000..548f95b0ef4b5a2bb0ac4010eb1d61992ae8f5ab
+--- /dev/null
++++ b/src/material/core/tokens/m2/mdc/_filled-button.scss
+@@ -0,0 +1,108 @@
++@use 'sass:map';
++@use '../../token-utils';
++@use '../../../mdc-helpers/mdc-helpers';
++@use '../../../style/sass-utils';
++@use '../../../theming/inspection';
++@use '../../../theming/theming';
++
++// The prefix used to generate the fully qualified name for tokens in this file.
++$prefix: (mdc, filled-button);
++
++// Tokens that can't be configured through Angular Material's current theming API,
++// but may be in a future version of the theming API.
++//
++// Tokens that are available in MDC, but not used in Angular Material should be mapped to `null`.
++// `null` indicates that we are intentionally choosing not to emit a slot or value for the token in
++// our CSS.
++@function get-unthemable-tokens() {
++  @return (
++    container-shape: 4px,
++    container-elevation: 0,
++    disabled-container-elevation: 0,
++    focus-container-elevation: 0,
++    hover-container-elevation: 0,
++    keep-touch-target: false,
++    pressed-container-elevation: 0,
++
++    focus-ring-color: null,
++    focus-ring-offset: null,
++    focus-state-layer-opacity: null,
++    hover-state-layer-opacity: null,
++    pressed-state-layer-opacity: null,
++    container-shadow-color: null,
++    focus-label-text-color: null,
++    hover-label-text-color: null,
++    label-text-font: null,
++    label-text-size: null,
++    label-text-tracking: null,
++    label-text-transform: null,
++    label-text-weight: null,
++    pressed-label-text-color: null,
++    with-icon-disabled-icon-color: null,
++    with-icon-focus-icon-color: null,
++    with-icon-hover-icon-color: null,
++    with-icon-icon-color: null,
++    with-icon-icon-size: null,
++    with-icon-pressed-icon-color: null
++  );
++}
++
++@function _on-color($theme, $palette) {
++  @if ($palette) {
++    $is-dark: inspection.get-theme-type($theme) == dark;
++    @return if(mdc-helpers.variable-safe-contrast-tone($palette, $is-dark) == 'dark', #000, #fff);
++  }
++}
++
++// Tokens that can be configured through Angular Material's color theming API.
++@function get-color-tokens($theme, $color: null, $on-color: null) {
++  $is-dark: inspection.get-theme-type($theme) == dark;
++  $primary: inspection.get-theme-color($theme, primary);
++  $surface: inspection.get-theme-color($theme, background, card);
++  $on-primary: _on-color($theme, $primary);
++  $on-surface: _on-color($theme, $surface);
++
++  @return (
++    container-color: if($color, $color, transparent),
++    disabled-container-color: rgba($on-surface, 0.12),
++    disabled-label-text-color: rgba($on-surface, if($is-dark, 0.5, 0.38)),
++    focus-state-layer-color: $on-primary,
++    hover-state-layer-color: $on-primary,
++    label-text-color: if($on-color, $on-color, inherit),
++    pressed-state-layer-color: $on-primary
++  );
++}
++
++// Tokens that can be configured through Angular Material's typography theming API.
++@function get-typography-tokens($theme) {
++  @return ();
++}
++
++// Tokens that can be configured through Angular Material's density theming API.
++@function get-density-tokens($theme) {
++  $scale: theming.clamp-density(inspection.get-theme-density($theme), -3);
++
++  @return (
++    container-height:
++      map.get(
++        (
++          0: 36px,
++          -1: 32px,
++          -2: 28px,
++          -3: 24px,
++        ),
++        $scale
++      )
++  );
++}
++
++// Combines the tokens generated by the above functions into a single map with placeholder values.
++// This is used to create token slots.
++@function get-token-slots() {
++  @return sass-utils.deep-merge-all(
++    get-unthemable-tokens(),
++    get-color-tokens(token-utils.$placeholder-color-config),
++    get-typography-tokens(token-utils.$placeholder-typography-config),
++    get-density-tokens(token-utils.$placeholder-density-config)
++  );
++}
+diff --git a/src/material/core/tokens/m2/mdc/_protected-button.scss b/src/material/core/tokens/m2/mdc/_protected-button.scss
+new file mode 100644
+index 0000000000000000000000000000000000000000..9e456b0e5b03082ee1bc8b414ddb3e660d0e2fa2
+--- /dev/null
++++ b/src/material/core/tokens/m2/mdc/_protected-button.scss
+@@ -0,0 +1,107 @@
++@use 'sass:map';
++@use '../../token-utils';
++@use '../../../mdc-helpers/mdc-helpers';
++@use '../../../style/sass-utils';
++@use '../../../theming/inspection';
++@use '../../../theming/theming';
++
++// The prefix used to generate the fully qualified name for tokens in this file.
++$prefix: (mdc, protected-button);
++
++// Tokens that can't be configured through Angular Material's current theming API,
++// but may be in a future version of the theming API.
++//
++// Tokens that are available in MDC, but not used in Angular Material should be mapped to `null`.
++// `null` indicates that we are intentionally choosing not to emit a slot or value for the token in
++// our CSS.
++@function get-unthemable-tokens() {
++  @return (
++    container-shape: 4px,
++    keep-touch-target: false,
++
++    focus-ring-color: null,
++    focus-ring-offset: null,
++    focus-state-layer-opacity: null,
++    hover-state-layer-opacity: null,
++    pressed-state-layer-opacity: null,
++    container-shadow-color: null,
++    container-elevation: null,
++    hover-container-elevation: null,
++    disabled-container-elevation: null,
++    focus-container-elevation: null,
++    pressed-container-elevation: null,
++    label-text-font: null,
++    label-text-size: null,
++    label-text-tracking: null,
++    label-text-transform: null,
++    label-text-weight: null,
++    with-icon-icon-size: null,
++    focus-label-text-color: null,
++    hover-label-text-color: null,
++    pressed-label-text-color: null,
++    with-icon-disabled-icon-color: null,
++    with-icon-focus-icon-color: null,
++    with-icon-hover-icon-color: null,
++    with-icon-icon-color: null,
++    with-icon-pressed-icon-color: null
++  );
++}
++
++@function _on-color($theme, $palette) {
++  @if ($palette) {
++    $is-dark: inspection.get-theme-type($theme) == dark;
++    @return if(mdc-helpers.variable-safe-contrast-tone($palette, $is-dark) == 'dark', #000, #fff);
++  }
++}
++
++// Tokens that can be configured through Angular Material's color theming API.
++@function get-color-tokens($theme, $color: null, $on-color: null) {
++  $is-dark: inspection.get-theme-type($theme) == dark;
++  $primary: inspection.get-theme-color($theme, primary);
++  $surface: inspection.get-theme-color($theme, background, card);
++  $on-primary: _on-color($theme, $primary);
++  $on-surface: _on-color($theme, $surface);
++
++  @return (
++    container-color: if($color, $color, transparent),
++    focus-state-layer-color: $on-primary,
++    hover-state-layer-color: $on-primary,
++    pressed-state-layer-color: $on-primary,
++    label-text-color: if($on-color, $on-color, inherit),
++    disabled-container-color: rgba($on-surface, 0.12),
++    disabled-label-text-color: rgba($on-surface, if($is-dark, 0.5, 0.38))
++  );
++}
++
++// Tokens that can be configured through Angular Material's typography theming API.
++@function get-typography-tokens($theme) {
++  @return ();
++}
++
++// Tokens that can be configured through Angular Material's density theming API.
++@function get-density-tokens($theme) {
++  $scale: theming.clamp-density(inspection.get-theme-density($theme), -3);
++  @return (
++    container-height:
++      map.get(
++        (
++          0: 36px,
++          -1: 32px,
++          -2: 28px,
++          -3: 24px,
++        ),
++        $scale
++      )
++  );
++}
++
++// Combines the tokens generated by the above functions into a single map with placeholder values.
++// This is used to create token slots.
++@function get-token-slots() {
++  @return sass-utils.deep-merge-all(
++    get-unthemable-tokens(),
++    get-color-tokens(token-utils.$placeholder-color-config),
++    get-typography-tokens(token-utils.$placeholder-typography-config),
++    get-density-tokens(token-utils.$placeholder-density-config)
++  );
++}
+diff --git a/src/material/core/tokens/tests/test-validate-tokens.scss b/src/material/core/tokens/tests/test-validate-tokens.scss
+index 9e630d2ad40ecfdfdf743c6e287293e3040a64bb..cb9db8937092328b784f3788f4800af2eae0265c 100644
+--- a/src/material/core/tokens/tests/test-validate-tokens.scss
++++ b/src/material/core/tokens/tests/test-validate-tokens.scss
+@@ -25,8 +25,8 @@
+ @use '@material/textfield/outlined-text-field-theme' as mdc-outlined-text-field-theme;
+ @use '@material/theme/validate' as mdc-validate;
+ 
+-@use '../m2/mdc/button-protected' as tokens-mdc-button-protected;
+-@use '../m2/mdc/button-filled' as tokens-mdc-button-filled;
++@use '../m2/mdc/protected-button' as tokens-mdc-protected-button;
++@use '../m2/mdc/filled-button' as tokens-mdc-filled-button;
+ @use '../m2/mdc/circular-progress' as tokens-mdc-circular-progress;
+ @use '../m2/mdc/linear-progress' as tokens-mdc-linear-progress;
+ @use '../m2/mdc/elevated-card' as tokens-mdc-elevated-card;
+@@ -161,12 +161,12 @@
+   $reference: mdc-outlined-text-field-theme.$light-theme
+ );
+ @include validate-slots(
+-  $component: 'm2.mdc.button-filled',
+-  $slots: tokens-mdc-button-filled.get-token-slots(),
++  $component: 'm2.mdc.filled-button',
++  $slots: tokens-mdc-filled-button.get-token-slots(),
+   $reference: mdc-button-filled-theme.$light-theme
+ );
+ @include validate-slots(
+-  $component: 'm2.mdc.button-protected',
+-  $slots: tokens-mdc-button-protected.get-token-slots(),
++  $component: 'm2.mdc.protected-button',
++  $slots: tokens-mdc-protected-button.get-token-slots(),
+   $reference: mdc-button-protected-theme.$light-theme
+ );

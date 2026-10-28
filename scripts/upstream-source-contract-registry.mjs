@@ -72,4 +72,8 @@ export const sourceContractDefinitions = [
     scope_key:'button_tokenization_source_scope',module:'upstream-button-tokenization-admission.cjs'},
   {sha:'592307261faf09f9603310a9fb97d1d18bc40f6e',proof_kind:'individual-historical-button-tokenization-source-review',
     scope_key:'button_tokenization_source_scope',module:'upstream-button-tokenization-admission.cjs'},
+  {sha:'1de6a3aa37118e4153fb995a8c8f4daecdf6d0b5',proof_kind:'individual-historical-button-token-repairs-source-review',
+    scope_key:'button_token_repairs_source_scope',module:'upstream-button-token-repairs-admission.cjs'},
+  {sha:'702ccbe01446502f43e6e7cb365a587ee7558504',proof_kind:'individual-historical-button-token-repairs-source-review',
+    scope_key:'button_token_repairs_source_scope',module:'upstream-button-token-repairs-admission.cjs'},
 ];

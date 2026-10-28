@@ -39,6 +39,11 @@ def verify_inspection_registry_successor(root=ROOT):
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == 'c01bd5192355a497485fc9f85cdda04760af0ac0287a4f2d01b93df34ab83ffc'
     current = (root / REGISTRY).read_bytes()
+    if digest(current) == '5fc40f097b86949ce52285987d0fbbcc32841007f5f879dca066cb43ecb675af':
+        from button_token_repairs_canonical_ledger_patch import verify_button_token_repairs_registry_successor
+        repair_before, repair_after = verify_button_token_repairs_registry_successor(root)
+        assert current == repair_after
+        current = repair_before
     if digest(current) == 'e2cd8a53b9c35020d1484ac553e7f69917658f55f5ade75dd0c6bf12f2e6634e':
         from button_tokenization_canonical_ledger_patch import verify_button_tokenization_registry_successor
         button_before, button_after = verify_button_tokenization_registry_successor(root)
@@ -129,6 +134,12 @@ def derive_inspection_successor(root=ROOT):
 def verify_inspection_successor(candidate, root=ROOT):
     before, after = derive_inspection_successor(root)
     observed = Path(candidate).read_bytes()
+    button_token_repairs_applied = False
+    if digest(observed) == 'ac34fb7cbf4c19dc0f06460a57d1ed26906471b08d10d5e5b25279c2a58d5111':
+        from button_token_repairs_canonical_ledger_patch import derive_button_token_repairs_successor
+        repair_before, repair_after = derive_button_token_repairs_successor(root)
+        assert observed == repair_after
+        observed, button_token_repairs_applied = repair_before, True
     button_tokenization_applied = False
     if digest(observed) == '485ff845dec1d5e57e16a26cc064b4070ea3e5fe020e9858fab02120fadcb6f7':
         from button_tokenization_canonical_ledger_patch import derive_button_tokenization_successor

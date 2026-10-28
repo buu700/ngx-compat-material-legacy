@@ -93,6 +93,18 @@ export function retainedTitleOwnerReference({root,read}){
  assert.equal(buttonSmoke.candidate_view_only,true);assert.equal(buttonSmoke.actual_native_artifact_browser_floor_or_full_audit_qualified,false);
  for(const edit of button.literal_edits){assert.equal(current.split(edit.before).length,2);current=current.replace(edit.before,edit.after);}
  assert.deepEqual(button.after,{sha256:hash(current),bytes:Buffer.byteLength(current)});
+ const repairRaw=read('compatibility/rc/21x-c04-button-token-repairs-owner-successor.json');
+ assert.equal(hash(repairRaw),'aafc55afe61a1ca7c3b104e088ac6e14159e2679f1d652c70da53dc1c958d91d');
+ const repair=JSON.parse(repairRaw);assert.equal(repair.path,path);assert.equal(repair.line,'21.x');
+ assert.equal(repair.source_parent,'2103cdde255ea68b82b51f94f42e6c9b95824ea0');
+ assert.deepEqual(repair.before,{sha256:hash(current),bytes:Buffer.byteLength(current)});
+ assert.equal(repair.literal_edits.length,15);assert.equal(repair.tagged_golden_changes,0);assert.equal(repair.original_assertions_or_rejection_controls_dropped,0);
+ for(const ref of [repair.canonical_transition,repair.candidate_owner_execution,repair.source_handler_controls]){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}
+ const repairSmoke=JSON.parse(read(repair.candidate_owner_execution.path));assert.equal(repairSmoke.result,'pass');
+ assert.equal(repairSmoke.prior_source_admissions_preserved,54);assert.equal(repairSmoke.current_source_admissions,56);assert.equal(repairSmoke.button_token_repairs_source_decisions,2);
+ assert.equal(repairSmoke.candidate_view_only,true);assert.equal(repairSmoke.actual_native_artifact_browser_floor_or_full_audit_qualified,false);
+ for(const edit of repair.literal_edits){assert.equal(current.split(edit.before).length,2);current=current.replace(edit.before,edit.after);}
+ assert.deepEqual(repair.after,{sha256:hash(current),bytes:Buffer.byteLength(current)});
  const expected=Buffer.from(current);assert.equal(read(path).equals(expected),true,'unreviewed owner change outside exact retained-verifier successor');
  return {path,sha256:hash(expected),bytes:expected.length};
 }

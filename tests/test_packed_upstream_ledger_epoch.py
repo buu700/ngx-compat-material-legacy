@@ -51,7 +51,7 @@ class PackedUpstreamLedgerEpochTests(unittest.TestCase):
         report = json.loads(result.stdout)
         self.assertEqual(len(report['cases']), 14 if report['line'] == '21.x' else 13)
         self.assertEqual(len(report['rejected']), 62 if report['line'] == '21.x' else 56)
-        self.assertEqual(report['original_dispositions_changed'], 54 if report['line'] == '21.x' else 13)
+        self.assertEqual(report['original_dispositions_changed'], 56 if report['line'] == '21.x' else 13)
         self.assertEqual(report['selection_source_decisions'], 3)
         self.assertEqual(report['selection_registry_digest_updates'], 11)
         if report['line'] == '21.x':
@@ -62,6 +62,7 @@ class PackedUpstreamLedgerEpochTests(unittest.TestCase):
             self.assertEqual(report['inspection_source_decisions'],4)
             self.assertEqual(report['selector_density_source_decisions'],2)
             self.assertEqual(report['button_tokenization_source_decisions'],5)
+            self.assertEqual(report['button_token_repairs_source_decisions'],2)
         self.assertEqual(report['canonical_entries'], 1697)
         self.assertEqual(report['changed_scalar_tokens'], 179)
         self.assertFalse(report['current_native_packed_or_floor_or_g11_credit'])

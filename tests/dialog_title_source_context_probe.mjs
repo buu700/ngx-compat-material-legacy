@@ -64,10 +64,15 @@ const buttonPacketPath='compatibility/rc/21x-c04-button-tokenization-canonical-t
 const buttonPacket=JSON.parse(disk(buttonPacketPath)),buttonBody=JSON.parse(disk(buttonPacket.review.path));
 const buttonAddedToolPaths=[buttonPacketPath,...buttonPacket.source_members.map(ref=>ref.path),buttonPacket.review.path,...buttonBody.reviews.map(row=>row.patch_file)];
 assert.equal(new Set(buttonAddedToolPaths).size,12);
-const addedToolPaths=[...inspectionAddedToolPaths,...selectorAddedToolPaths,...buttonAddedToolPaths];
-assert.equal(new Set(addedToolPaths).size,32);assert.equal(readers.bound.length,32+11+9+12);
-assert.equal(readers.bound.filter(ref=>!buttonAddedToolPaths.includes(ref.path)).length,32+11+9);
-assert.equal(readers.bound.filter(ref=>!selectorAddedToolPaths.includes(ref.path)&&!buttonAddedToolPaths.includes(ref.path)).length,32+11);
+const repairPacketPath='compatibility/rc/21x-c04-button-token-repairs-canonical-transition.json';
+const repairPacket=JSON.parse(disk(repairPacketPath)),repairBody=JSON.parse(disk(repairPacket.review.path));
+const repairAddedToolPaths=[repairPacketPath,...repairPacket.source_members.map(ref=>ref.path),repairPacket.review.path,...repairBody.reviews.map(row=>row.patch_file)];
+assert.equal(new Set(repairAddedToolPaths).size,9);
+const addedToolPaths=[...inspectionAddedToolPaths,...selectorAddedToolPaths,...buttonAddedToolPaths,...repairAddedToolPaths];
+assert.equal(new Set(addedToolPaths).size,41);assert.equal(readers.bound.length,32+11+9+12+9);
+assert.equal(readers.bound.filter(ref=>!repairAddedToolPaths.includes(ref.path)).length,32+11+9+12);
+assert.equal(readers.bound.filter(ref=>!buttonAddedToolPaths.includes(ref.path)&&!repairAddedToolPaths.includes(ref.path)).length,32+11+9);
+assert.equal(readers.bound.filter(ref=>!selectorAddedToolPaths.includes(ref.path)&&!buttonAddedToolPaths.includes(ref.path)&&!repairAddedToolPaths.includes(ref.path)).length,32+11);
 assert.ok(addedToolPaths.every(path=>readers.bound.some(ref=>ref.path===path)));
 assert.equal(readers.bound.filter(ref=>!addedToolPaths.includes(ref.path)).length,32);
 
@@ -137,7 +142,7 @@ const testing=ledger.entries.find(row=>row.sha===testingBody.reviews[0].sha);ass
 const productPaths=()=>JSON.parse(disk('compatibility/rc/packed-upstream-source-build.json')).candidate_context.product_members.map(ref=>ref.path).filter(path=>/\.(ts|scss|css|html)$/.test(path));
 assert.equal(testingApi21xEntryEvidenceOk({entry:testing,body:testingBody,read,productPaths,line:'21.x'}),true);
 late=DIALOG_TITLE_SOURCE_IMAGES[1].path;assert.equal(testingApi21xEntryEvidenceOk({entry:testing,body:testingBody,read,productPaths,line:'21.x'}),false);late=null;
-assert.equal(hash(disk('compatibility/f10/disposition-ledger/ledger.json')),'485ff845dec1d5e57e16a26cc064b4070ea3e5fe020e9858fab02120fadcb6f7');
+assert.equal(hash(disk('compatibility/f10/disposition-ledger/ledger.json')),'ac34fb7cbf4c19dc0f06460a57d1ed26906471b08d10d5e5b25279c2a58d5111');
 assert.equal(rejections,108+2*addedToolPaths.length);assert.equal(historicalToolFaults,32+addedToolPaths.length);
-const report={schema_version:1,prior_reader_members_preserved:32,prior_rejection_baseline:108,inspection_binding_members_preserved:11,selector_density_binding_members_added:9,button_tokenization_binding_members_added:12,additional_bound_tool_paths:addedToolPaths,additional_rejection_checks:2*addedToolPaths.length,product_lines:lines,source_reader_line:'21.x',main_source_reader_port_qualified:true,metadata_cases:metadataCases,rejections,actual_fresh_build_source_positive:true,actual_testing_source_positive:true,both_real_source_checkers_reject_post_success_product_faults:true,raw_current_readers_expose_old_product_or_tool_bytes:false,historical_tool_metadata_images:packet.code_subjects.length,historical_tool_metadata_faults_rejected:historicalToolFaults,declared_peer_link_reads:peerPositive,source_traversal_or_nested_or_other_peer_links_rejected:peerRejected,canonical_ledger_unchanged:true,reader_hooks:packet.code_subjects.length,general_source_qualification_passed_21x:true,current_raw_dialog_graph_members:49,historical_title_metadata_unwrapped_for_current_admission:true,fake_current_before_frames_rejected:fakeBeforeRejected,general_source_product_faults_rejected:generalSourceFaults,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+const report={schema_version:1,prior_reader_members_preserved:32,prior_rejection_baseline:108,inspection_binding_members_preserved:11,selector_density_binding_members_added:9,button_tokenization_binding_members_added:12,button_token_repairs_binding_members_added:9,additional_bound_tool_paths:addedToolPaths,additional_rejection_checks:2*addedToolPaths.length,product_lines:lines,source_reader_line:'21.x',main_source_reader_port_qualified:true,metadata_cases:metadataCases,rejections,actual_fresh_build_source_positive:true,actual_testing_source_positive:true,both_real_source_checkers_reject_post_success_product_faults:true,raw_current_readers_expose_old_product_or_tool_bytes:false,historical_tool_metadata_images:packet.code_subjects.length,historical_tool_metadata_faults_rejected:historicalToolFaults,declared_peer_link_reads:peerPositive,source_traversal_or_nested_or_other_peer_links_rejected:peerRejected,canonical_ledger_unchanged:true,reader_hooks:packet.code_subjects.length,general_source_qualification_passed_21x:true,current_raw_dialog_graph_members:49,historical_title_metadata_unwrapped_for_current_admission:true,fake_current_before_frames_rejected:fakeBeforeRejected,general_source_product_faults_rejected:generalSourceFaults,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));

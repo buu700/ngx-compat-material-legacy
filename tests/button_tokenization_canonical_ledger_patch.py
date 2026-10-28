@@ -38,7 +38,13 @@ def verify_button_tokenization_registry_successor(root=ROOT):
                         "    scope_key:'button_tokenization_source_scope',module:'upstream-button-tokenization-admission.cjs'},\n" for sha in SHAS)
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == 'e2cd8a53b9c35020d1484ac553e7f69917658f55f5ade75dd0c6bf12f2e6634e'
-    assert (root / REGISTRY).read_bytes() == after
+    current = (root / REGISTRY).read_bytes()
+    if digest(current) == '5fc40f097b86949ce52285987d0fbbcc32841007f5f879dca066cb43ecb675af':
+        from button_token_repairs_canonical_ledger_patch import verify_button_token_repairs_registry_successor
+        repair_before, repair_after = verify_button_token_repairs_registry_successor(root)
+        assert current == repair_after
+        current = repair_before
+    assert current == after
     return before, after
 
 
@@ -118,7 +124,14 @@ def derive_button_tokenization_successor(root=ROOT):
 
 def verify_button_tokenization_successor(candidate, root=ROOT):
     before, after = derive_button_tokenization_successor(root)
-    assert Path(candidate).read_bytes() == after, 'unqualified button tokenization canonical successor'
+    observed = Path(candidate).read_bytes()
+    button_token_repairs_applied = False
+    if digest(observed) == 'ac34fb7cbf4c19dc0f06460a57d1ed26906471b08d10d5e5b25279c2a58d5111':
+        from button_token_repairs_canonical_ledger_patch import derive_button_token_repairs_successor
+        repair_before, repair_after = derive_button_token_repairs_successor(root)
+        assert observed == repair_after
+        observed, button_token_repairs_applied = repair_before, True
+    assert observed == after, 'unqualified button tokenization canonical successor'
     return {'before_sha256': digest(before), 'after_sha256': digest(after), 'individual_decisions': 5,
             'summary_scalar_tokens': 2, 'unselected_entry_bytes_preserved': 1692,
             'security_reviews_unchanged': 1, 'canonical_entries': 1697, 'actual_native_artifact_browser_floor_or_full_audit_qualified': False}

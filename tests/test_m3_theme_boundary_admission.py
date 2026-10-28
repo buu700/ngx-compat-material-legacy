@@ -23,6 +23,7 @@ class M3ThemeBoundaryAdmissionTests(unittest.TestCase):
         self.assertTrue(report['exact_inspection_successor_verified'])
         self.assertTrue(report['exact_selector_density_successor_verified'])
         self.assertTrue(report['exact_button_tokenization_successor_verified'])
+        self.assertTrue(report['exact_button_token_repairs_successor_verified'])
         self.assertEqual(report['unselected_entry_bytes_preserved'], 1692)
         self.assertEqual(report['pending_security_reviews'], 1)
         original = json.loads((ROOT / LEDGER).read_bytes())
@@ -51,7 +52,7 @@ class M3ThemeBoundaryAdmissionTests(unittest.TestCase):
         child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=180)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-7000:])
         report = json.loads(child.stdout)
-        for key, expected in [('current_source_admissions',54),('previous_source_admissions',35),('pure_metadata_cases',5),
+        for key, expected in [('current_source_admissions',56),('previous_source_admissions',35),('pure_metadata_cases',5),
                               ('metadata_rejections',35),('source_rejections',6),('real_root_checker_positive_rows',5),
                               ('real_root_checker_rejected_rows',11),('rejection_controls',10)]:
             self.assertEqual(report[key], expected, key)

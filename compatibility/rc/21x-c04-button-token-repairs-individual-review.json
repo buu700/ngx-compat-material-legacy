@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Two individual historical button token color/prefix source decisions",
+  "status": "reviewed",
+  "source_review_complete": true,
+  "reviews": [
+    {
+      "sha": "1de6a3aa37118e4153fb995a8c8f4daecdf6d0b5",
+      "diff_sha256": "3d64bbeb9cb7f65c9f8c7d8b3ee460795678a078ffcd07cbe06234d33b121415",
+      "complete_original_paths": [
+        "src/material/button/_button-theme.scss",
+        "src/material/core/tokens/m2/mdc/_button-protected.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/button/_button-theme.scss",
+        "src/material/core/tokens/m2/mdc/_button-protected.scss"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 0,
+          "header": "@@ -155,9 +155,13 @@",
+          "sha256": "e8a593885d7df03434a8ded6e1160570a4ba2c87bb065d87df9048257b946eb7",
+          "technical_judgment": "Corrects all three raised primary/accent/warn maps from filled to protected tokens. This is a real post16 tokenization defect, not an irrelevant modern filename. The owned tagged16 raised variant already emits protected-theme colors through its original palette path; retain it and measure its actual output rather than porting private token inspection."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_button-protected.scss",
+          "index": 0,
+          "header": "@@ -69,7 +69,7 @@ $prefix: (mdc, button-protected);",
+          "sha256": "452ca80d3666a74c9306df9fdd82b755ca24f0eca07b9f199722ae9bc430a067",
+          "technical_judgment": "Restores dark disabled-label opacity0.5 while retaining light0.38 in the protected token map. The owned tagged color mixin already computes this exact dark/light ink rule and applies it to raised disabled styles. The dark theme CSS case and a dark-only opacity mutation test cover that historical contract without executing this upstream token module."
+        }
+      ],
+      "source_review_complete": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "affected_branches": [
+        "21.x"
+      ],
+      "review_depth": "individual-compatibility",
+      "canonical_disposition_applied": false,
+      "status": "reviewed",
+      "decision": "Do not adopt the raised-button token repair into the independently owned tagged16 model. Both complete original files and both hunks were individually reviewed: three primary/accent/warn calls incorrectly use filled tokens and the protected token module hardcodes dark disabled-label opacity0.38. The owned historical raised variant already calls the protected-theme producer and computes dark0.5/light0.38 disabled ink. Fourteen exact untouched-tag CSS comparisons preserve those real exported Sass contracts; targeted raised-producer and dark-only opacity mutations change the CSS and are detected. Preserve tagged palette/disabled behavior and consumer namespaces without introducing post16 private token inspection or a modern component fork. Full native, packed and consumer-floor qualification remains open.",
+      "patch_file": "compatibility/rc/21x-c04-button-token-repairs-1de6a3aa37118e4153fb995a8c8f4daecdf6d0b5.patch",
+      "source_scope_only": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    },
+    {
+      "sha": "702ccbe01446502f43e6e7cb365a587ee7558504",
+      "diff_sha256": "4874b274861e134e506402a41163219e02a3a673967479bc0655e4ec15d2df0b",
+      "complete_original_paths": [
+        "src/material/button/_button-theme.scss",
+        "src/material/button/button.scss",
+        "src/material/core/tokens/m2/mdc/_button-filled.scss",
+        "src/material/core/tokens/m2/mdc/_button-protected.scss",
+        "src/material/core/tokens/m2/mdc/_filled-button.scss",
+        "src/material/core/tokens/m2/mdc/_protected-button.scss",
+        "src/material/core/tokens/tests/test-validate-tokens.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/button/_button-theme.scss",
+        "src/material/button/button.scss",
+        "src/material/core/tokens/m2/mdc/_filled-button.scss",
+        "src/material/core/tokens/m2/mdc/_protected-button.scss",
+        "src/material/core/tokens/tests/test-validate-tokens.scss"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 0,
+          "header": "@@ -12,8 +12,8 @@",
+          "sha256": "c2c5fd4d0bf77acab43a6ffd178479df623b6122a21ecef70af8a39cd4352ccc",
+          "technical_judgment": "Renames both new token module sources and their local aliases from button-filled/button-protected to filled-button/protected-button. These imports belong to the post16 model, while the owned finite facade retains its tagged imports and historical consumer namespaces."
+        },
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 1,
+          "header": "@@ -131,10 +131,10 @@",
+          "sha256": "5c3b7ffba29f4169f04b34662497826705ad83f065a932a9f681668639fe57ba",
+          "technical_judgment": "Updates all four unelevated default/primary/accent/warn color-map calls to the renamed filled module. Preserve the live tagged palette and disabled color behavior, not a new token API or consumer helper spelling."
+        },
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 2,
+          "header": "@@ -154,18 +154,18 @@",
+          "sha256": "b2c3998096f188867e2dcad2f1cb9f5654a05d7f1f6ec38f84e91aeb043a2b47",
+          "technical_judgment": "Updates all four raised color-map calls to the protected module alias, including the previously repaired primary/accent/warn calls. The tagged raised producer is already protected-theme, measured independently from its filled counterpart."
+        },
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 3,
+          "header": "@@ -235,13 +235,13 @@",
+          "sha256": "30b86dffd4ed3499732f7d82089d0cc2c6f8a2a28fcb9a0429c4f5ea700a6afa",
+          "technical_judgment": "Updates raised and unelevated density-map calls to the new aliases. Retain the original scoped density/touch-target contract and fourteen exact tagged/owned CSS cases, without adding a token producer."
+        },
+        {
+          "path": "src/material/button/button.scss",
+          "index": 0,
+          "header": "@@ -12,8 +12,8 @@",
+          "sha256": "af6653f10876cbfc5069194d9036eb6b8e511a5be2f5159657e9d3d8eb26667c",
+          "technical_judgment": "Changes both token import sources and aliases in the modern structural stylesheet. The legacy add-on exports its separate legacy component resource; no modern structural component is added or forked."
+        },
+        {
+          "path": "src/material/button/button.scss",
+          "index": 1,
+          "header": "@@ -46,25 +46,25 @@",
+          "sha256": "af68e37645092fa97aade0515e5cc95041354b78963935b49e7686e5936cc324",
+          "technical_judgment": "Renames the filled slots local variable and all its uses, changes the protected token calls while preserving the existing protected slots local binding, and updates untintable defaults. Every source, alias and variable use is reviewed; there is no inferred wholesale variable rename or legacy CSS port."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_button-filled.scss",
+          "index": 0,
+          "header": "@@ -1,108 +0,0 @@",
+          "sha256": "e22236ad55099138deb6cadc1eb3a298668ed03fecb75e35d0a15144b2b7ab29",
+          "technical_judgment": "Deletes the entire108-line old-name filled token module. Its replacement differs only in the declared token prefix; all original color, typography, density and slot functions are retained upstream. This deletion is part of the complete patch even though absent from the frozen five-path seed."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_button-protected.scss",
+          "index": 0,
+          "header": "@@ -1,107 +0,0 @@",
+          "sha256": "6605382a4c271dd64f7847ae8a5b1fad912352b69a7b275979ff9386dbd0738f",
+          "technical_judgment": "Deletes the entire107-line old-name protected token module, including the dark-opacity repair. Its replacement differs only in the declared prefix. Review the whole deleted behavior, not merely the added file or rename title; keep the independently owned tagged model."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_filled-button.scss",
+          "index": 0,
+          "header": "@@ -0,0 +1,108 @@",
+          "sha256": "4670ed56c23f1ec35737de1ac89574c24a656dee69ec16ea8e51ec965b58c8a3",
+          "technical_judgment": "Adds the complete108-line renamed filled module and changes its prefix to(mdc,filled-button). Exact before/after module comparison proves that prefix is its only body change. The owned historical MDC vendor already declares filled-button, and actual tagged CSS emits the corresponding custom properties."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_protected-button.scss",
+          "index": 0,
+          "header": "@@ -0,0 +1,107 @@",
+          "sha256": "4c39302f3b328f01da2bf1e64a5079ca140fcc4111144662f57acbd67e519501",
+          "technical_judgment": "Adds the complete107-line renamed protected module and changes its prefix to(mdc,protected-button). Exact comparison preserves all other body bytes, including dark0.5/light0.38 opacity. The owned tagged vendor already declares protected-button; prefix mutations must alter the measured CSS."
+        },
+        {
+          "path": "src/material/core/tokens/tests/test-validate-tokens.scss",
+          "index": 0,
+          "header": "@@ -25,8 +25,8 @@",
+          "sha256": "37fa43f01a516ba205cb5b2a466106646a9e60a7484a5531ee11bcbe7feefdbd",
+          "technical_judgment": "Updates both test module paths and aliases to match the renamed token files. The upstream test program is reviewed as data and is not installed or executed."
+        },
+        {
+          "path": "src/material/core/tokens/tests/test-validate-tokens.scss",
+          "index": 1,
+          "header": "@@ -161,12 +161,12 @@",
+          "sha256": "26e6faab371ae526c6d2a17c206c14f9360f5adccc9173df58d54873781fcfce",
+          "technical_judgment": "Updates filled/protected component names and slot calls while retaining their paired MDC light-theme references. This validates the new upstream naming model; tagged16 CSS remains the owned oracle and no golden or public facade binding is changed."
+        }
+      ],
+      "source_review_complete": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "affected_branches": [
+        "21.x"
+      ],
+      "review_depth": "individual-compatibility",
+      "canonical_disposition_applied": false,
+      "status": "reviewed",
+      "decision": "Do not adopt the post16 token module/prefix rename. All seven complete original file occurrences and twelve hunks were individually reviewed, including both whole deleted modules omitted by the frozen five-path seed. Four authenticated absent tree members and exact before/after comparisons prove each renamed module differs only in its prefix; all theme/structural/test import aliases, slots and calls were reviewed. The owned tagged MDC vendor already declares filled-button/protected-button and emits the corresponding custom properties, while the distinct legacy resource and historical consumer namespaces stay intact. Fourteen exact tagged/owned CSS comparisons plus both prefix mutations support retaining this finite historical model. No new token API, product Sass change, inherited upstream test execution or full product qualification is introduced.",
+      "patch_file": "compatibility/rc/21x-c04-button-token-repairs-702ccbe01446502f43e6e7cb365a587ee7558504.patch",
+      "source_scope_only": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  ],
+  "original_file_occurrences": 9,
+  "original_hunks": 14,
+  "source_qualification": {
+    "path": "compatibility/rc/21x-c04-button-token-repairs-source-qualification.json",
+    "sha256": "7c6719c97a31001ba91af1305d73dba2665ba2f188de6c0cefe06b96b7366209",
+    "bytes": 4523
+  },
+  "source_review": {
+    "path": "compatibility/rc/21x-c04-button-token-repairs-source-review.json",
+    "sha256": "cf2ec51ab6fd7cf98e718909940cb75ca6aaad2687bcc0544bd544dadc9ce38f",
+    "bytes": 853841
+  },
+  "fresh_bounded_sass_compiler_execution": true,
+  "tagged_reference_sass_executed": true,
+  "upstream_post16_sass_or_typescript_tests_or_workflows_executed": false,
+  "package_install_or_javascript_runtime_execution": false,
+  "full_sass_gate_executed": false,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

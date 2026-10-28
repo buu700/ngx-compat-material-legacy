@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Exact owned-tool edit transport for retained reference tests; not a tagged source/style golden or an admission pass",
+  "path": "scripts/packed-upstream-ledger-epoch.mjs",
+  "source_parent": "2103cdde255ea68b82b51f94f42e6c9b95824ea0",
+  "before": {
+    "sha256": "1e8c282ed4257f390fa78f88412e40b4ce26cd30c1f9a6c4c93957deeb957050",
+    "bytes": 29040
+  },
+  "after": {
+    "sha256": "4f93d241fee195be6c9d052473af37f1e19ba9394c8de444a9dd154452f14ebc",
+    "bytes": 33317
+  },
+  "literal_edits": [
+    {
+      "before": "import {reviewButtonTokenizationSource} from './upstream-button-tokenization-source-review.mjs';",
+      "after": "import {reviewButtonTokenizationSource} from './upstream-button-tokenization-source-review.mjs';\nimport buttonTokenRepairs from './upstream-button-token-repairs-admission.cjs';\nimport {applyButtonTokenRepairsCanonicalStage,buttonTokenRepairsRegistrySuccessor} from './button-token-repairs-canonical-stage.mjs';"
+    },
+    {
+      "before": "const BUTTON_TOKENIZATION_PACKET_HASH='8f9a3016332c8448db94dfea173d023640db1984f7a499c49c0f6b79030c3853';",
+      "after": "const BUTTON_TOKENIZATION_PACKET_HASH='8f9a3016332c8448db94dfea173d023640db1984f7a499c49c0f6b79030c3853';\nconst BUTTON_TOKEN_REPAIRS_PACKET='compatibility/rc/21x-c04-button-token-repairs-canonical-transition.json';\nconst BUTTON_TOKEN_REPAIRS_PACKET_HASH='34aa5b3bb4ada73ff77f58d3e692af1bfcd88bd92586de313867fcf7f243a201';"
+    },
+    {
+      "before": "function buttonTokenizationTools(root,read){",
+      "after": "function buttonTokenRepairsTools(root,read){\n const raw=read(BUTTON_TOKEN_REPAIRS_PACKET);assert.equal(hash(raw),BUTTON_TOKEN_REPAIRS_PACKET_HASH,'changed button token repairs canonical packet');const packet=JSON.parse(raw);\n assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'2103cdde255ea68b82b51f94f42e6c9b95824ea0');\n assert.equal(packet.individual_decisions,2);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,2);\n assert.equal(packet.unselected_entry_bytes_to_preserve,1695);assert.equal(packet.actual_native_artifact_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');\n const registryBefore=original(root,THEMING_REGISTRY,packet.source_parent),registryAfter=buttonTokenRepairsRegistrySuccessor(registryBefore);\n assert.deepEqual(packet.registry_before,{path:THEMING_REGISTRY,sha256:hash(registryBefore),bytes:registryBefore.length});\n assert.deepEqual(packet.registry_after,{path:THEMING_REGISTRY,sha256:hash(registryAfter),bytes:registryAfter.length});\n const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);\n const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-button-token-repairs-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});\n const bound=[{path:BUTTON_TOKEN_REPAIRS_PACKET,sha256:BUTTON_TOKEN_REPAIRS_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,packet.registry_after,...patches];\n const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed button token repairs tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};\n assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body};\n}\nfunction buttonTokenizationTools(root,read){\n const successor=buttonTokenRepairsTools(root,read);"
+    },
+    {
+      "before": " const bound=[{path:BUTTON_TOKENIZATION_PACKET,sha256:BUTTON_TOKENIZATION_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,packet.registry_after,...patches];",
+      "after": " assert.equal(registryAfter.equals(successor.registryBefore),true,'button token-repairs registry does not succeed exact button-tokenization registry');\n const bound=[{path:BUTTON_TOKENIZATION_PACKET,sha256:BUTTON_TOKENIZATION_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];"
+    },
+    {
+      "before": " assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body};\n}\nfunction selectorDensityTools",
+      "after": " assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body,successor};\n}\nfunction selectorDensityTools"
+    },
+    {
+      "before": "currentReference:ref=>ref.path===THEMING_REGISTRY?successor.successor.successor.packet.registry_after:ref",
+      "after": "currentReference:ref=>ref.path===THEMING_REGISTRY?successor.successor.successor.successor.packet.registry_after:ref"
+    },
+    {
+      "before": "[...frames.frames,tools.packet.after,tools.successor.packet.after,tools.successor.successor.packet.after,tools.successor.successor.successor.packet.after]",
+      "after": "[...frames.frames,tools.packet.after,tools.successor.packet.after,tools.successor.successor.packet.after,tools.successor.successor.successor.packet.after,tools.successor.successor.successor.successor.packet.after]"
+    },
+    {
+      "before": " assert.deepEqual(tools.successor.successor.successor.packet.after,{path:LEDGER,sha256:hash(buttonTokenizationStage.after),bytes:buttonTokenizationStage.after.length});",
+      "after": " assert.deepEqual(tools.successor.successor.successor.packet.after,{path:LEDGER,sha256:hash(buttonTokenizationStage.after),bytes:buttonTokenizationStage.after.length});\n assert.deepEqual(tools.successor.successor.successor.successor.packet.before,tools.successor.successor.successor.packet.after);\n const buttonTokenRepairsStage=applyButtonTokenRepairsCanonicalStage({before:buttonTokenizationStage.after,body:tools.successor.successor.successor.successor.body});\n assert.deepEqual(tools.successor.successor.successor.successor.packet.after,{path:LEDGER,sha256:hash(buttonTokenRepairsStage.after),bytes:buttonTokenRepairsStage.after.length});"
+    },
+    {
+      "before": "if(path===LEDGER&&[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256].includes(currentHash))",
+      "after": "if(path===LEDGER&&[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash))"
+    },
+    {
+      "before": " const buttonTokenizationSource=reviewButtonTokenizationSource({root,read});\n const assertCurrent=()=>{assertTools();assertLedger();source.assertCurrent();themingSource.assertCurrent();inspectionSource.assertCurrent();selectorDensitySource.assertCurrent();buttonTokenizationSource.assertCurrent();};\n assertCurrent();return {packet,stage,themingStage,inspectionStage,selectorDensityStage,buttonTokenizationStage,metadataRead,assertCurrent,bound:[...bound,...source.bound,...themingSource.bound,...inspectionSource.bound,...selectorDensitySource.bound,...buttonTokenizationSource.bound],\n  titleApplied:[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256].includes(currentHash),themingApplied:[tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256].includes(currentHash),inspectionApplied:[tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256].includes(currentHash),selectorDensityApplied:[tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenizationApplied:currentHash===tools.successor.successor.successor.packet.after.sha256,currentHash};",
+      "after": " const buttonTokenizationSource=reviewButtonTokenizationSource({root,read});\n const buttonTokenRepairsSource=buttonTokenRepairs.inspectCanonicalSource({root,read,entries:buttonTokenRepairsStage.entries,body:tools.successor.successor.successor.successor.body});\n const assertCurrent=()=>{assertTools();assertLedger();source.assertCurrent();themingSource.assertCurrent();inspectionSource.assertCurrent();selectorDensitySource.assertCurrent();buttonTokenizationSource.assertCurrent();buttonTokenRepairsSource.assertCurrent();};\n assertCurrent();return {packet,stage,themingStage,inspectionStage,selectorDensityStage,buttonTokenizationStage,buttonTokenRepairsStage,metadataRead,assertCurrent,bound:[...bound,...source.bound,...themingSource.bound,...inspectionSource.bound,...selectorDensitySource.bound,...buttonTokenizationSource.bound,...buttonTokenRepairsSource.bound],\n  titleApplied:[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),themingApplied:[tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),inspectionApplied:[tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),selectorDensityApplied:[tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenizationApplied:[tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenRepairsApplied:currentHash===tools.successor.successor.successor.successor.packet.after.sha256,currentHash};"
+    },
+    {
+      "before": "canonical_after:ctx.buttonTokenizationStage.after",
+      "after": "canonical_after:ctx.buttonTokenRepairsStage.after"
+    },
+    {
+      "before": "  prior_metadata_assert_current:",
+      "after": "  button_token_repairs_stage:{...ctx.buttonTokenRepairsStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},\n  prior_metadata_assert_current:"
+    },
+    {
+      "before": "+(ctx.buttonTokenizationApplied?5:0),",
+      "after": "+(ctx.buttonTokenizationApplied?5:0)+(ctx.buttonTokenRepairsApplied?2:0),"
+    },
+    {
+      "before": "button_tokenization_source_decisions_applied:ctx.buttonTokenizationApplied?5:0,",
+      "after": "button_tokenization_source_decisions_applied:ctx.buttonTokenizationApplied?5:0,button_token_repairs_source_decisions_applied:ctx.buttonTokenRepairsApplied?2:0,"
+    },
+    {
+      "before": "[tools.registryBefore,tools.successor.registryBefore,tools.successor.successor.registryBefore,tools.successor.successor.successor.registryBefore].find",
+      "after": "[tools.registryBefore,tools.successor.registryBefore,tools.successor.successor.registryBefore,tools.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.registryBefore].find"
+    }
+  ],
+  "canonical_transition": {
+    "path": "compatibility/rc/21x-c04-button-token-repairs-canonical-transition.json",
+    "sha256": "34aa5b3bb4ada73ff77f58d3e692af1bfcd88bd92586de313867fcf7f243a201",
+    "bytes": 2553
+  },
+  "candidate_owner_execution": {
+    "path": "compatibility/rc/21x-c04-button-token-repairs-canonical-owner-candidate-smoke.json",
+    "sha256": "cc8be3f5bf3defea9676e4b2d66ff4adfee03657efd2689166845b5c99ca863b",
+    "bytes": 1920
+  },
+  "source_handler_controls": {
+    "path": "compatibility/rc/21x-c04-button-token-repairs-admission-controls.json",
+    "sha256": "61a8442bb28d6ffca9d8320aab80a888af2ace5193c14e80e0692e33a4fc7a8b",
+    "bytes": 8144
+  },
+  "tagged_golden_changes": 0,
+  "original_assertions_or_rejection_controls_dropped": 0,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}
