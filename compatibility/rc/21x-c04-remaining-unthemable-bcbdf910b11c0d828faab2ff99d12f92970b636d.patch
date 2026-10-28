@@ -1,0 +1,85 @@
+diff --git a/src/material/_index.scss b/src/material/_index.scss
+index 90e989a0d0f566278c207490fda22863ed1a360f..85c62a2076d9de09b396a8f4ddcfb1634bc238fd 100644
+--- a/src/material/_index.scss
++++ b/src/material/_index.scss
+@@ -77,7 +77,7 @@
+ @forward './button/icon-button-theme' as icon-button-* show icon-button-color,
+   icon-button-typography, icon-button-density, icon-button-theme;
+ @forward './button-toggle/button-toggle-theme' as button-toggle-* show button-toggle-theme,
+-  button-toggle-color, button-toggle-typography, button-toggle-density;
++  button-toggle-color, button-toggle-typography, button-toggle-density, button-toggle-base;
+ @forward './card/card-theme' as card-* show card-theme, card-color, card-typography, card-density,
+   card-base;
+ @forward './checkbox/checkbox-theme' as checkbox-* show checkbox-theme, checkbox-color,
+diff --git a/src/material/button-toggle/_button-toggle-theme.scss b/src/material/button-toggle/_button-toggle-theme.scss
+index d0db197e966d5ef57bb63a7661520e970b7937cd..d8e5d56585370a74bf6d2ccc4ede0074edad51a3 100644
+--- a/src/material/button-toggle/_button-toggle-theme.scss
++++ b/src/material/button-toggle/_button-toggle-theme.scss
+@@ -6,6 +6,19 @@
+ @use '../core/tokens/token-utils';
+ @use '../core/style/sass-utils';
+ 
++@mixin base($theme) {
++  @include sass-utils.current-selector-or-root() {
++    @include token-utils.create-token-values(
++        tokens-mat-legacy-button-toggle.$prefix,
++        tokens-mat-legacy-button-toggle.get-unthemable-tokens()
++    );
++    @include token-utils.create-token-values(
++        tokens-mat-standard-button-toggle.$prefix,
++        tokens-mat-standard-button-toggle.get-unthemable-tokens()
++    );
++  }
++}
++
+ @mixin color($theme) {
+   @include sass-utils.current-selector-or-root() {
+     @include token-utils.create-token-values(tokens-mat-legacy-button-toggle.$prefix,
+@@ -35,6 +48,7 @@
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-button-toggle') {
++    @include base($theme);
+     @if inspection.theme-has($theme, color) {
+       @include color($theme);
+     }
+diff --git a/src/material/button-toggle/button-toggle.scss b/src/material/button-toggle/button-toggle.scss
+index bd61a83688265676427cf9171cfcefbc887281cb..e12094d2c5d5e27f0b15f763592bf16840005d8a 100644
+--- a/src/material/button-toggle/button-toggle.scss
++++ b/src/material/button-toggle/button-toggle.scss
+@@ -27,11 +27,6 @@ $_standard-tokens: (
+ 
+ .mat-button-toggle-standalone,
+ .mat-button-toggle-group {
+-  @include token-utils.create-token-values(
+-    tokens-mat-legacy-button-toggle.$prefix,
+-    tokens-mat-legacy-button-toggle.get-unthemable-tokens()
+-  );
+-
+   @include elevation.overridable-elevation(2);
+   position: relative;
+   display: inline-flex;
+@@ -54,11 +49,6 @@ $_standard-tokens: (
+ 
+ .mat-button-toggle-standalone.mat-button-toggle-appearance-standard,
+ .mat-button-toggle-group-appearance-standard {
+-  @include token-utils.create-token-values(
+-    tokens-mat-standard-button-toggle.$prefix,
+-    tokens-mat-standard-button-toggle.get-unthemable-tokens()
+-  );
+-
+   @include token-utils.use-tokens($_standard-tokens...) {
+     @include token-utils.create-token-slot(border-radius, shape);
+     border: solid 1px var(#{token-utils.get-token-variable(divider-color)});
+@@ -122,11 +112,6 @@ $_standard-tokens: (
+ }
+ 
+ .mat-button-toggle-appearance-standard {
+-  @include token-utils.create-token-values(
+-    tokens-mat-standard-button-toggle.$prefix,
+-    tokens-mat-standard-button-toggle.get-unthemable-tokens()
+-  );
+-
+   @include token-utils.use-tokens($_standard-tokens...) {
+     $divider-color: var(#{token-utils.get-token-variable(divider-color)});
+     @include token-utils.create-token-slot(color, text-color);

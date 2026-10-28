@@ -1,0 +1,52 @@
+diff --git a/src/material/_index.scss b/src/material/_index.scss
+index cad8b0c12aa9199986bf0333b371e880f13e8e86..fe747d3c6bd443bfa0ff85d3bd2f273eed94be55 100644
+--- a/src/material/_index.scss
++++ b/src/material/_index.scss
+@@ -103,7 +103,7 @@
+   input-density, input-base;
+ @forward './list/list-theme' as list-* show list-theme, list-color, list-typography,
+ list-density, list-base;
+-@forward './menu/menu-theme' as menu-* show menu-theme, menu-color, menu-typography, menu-density;
++@forward './menu/menu-theme' as menu-* show menu-theme, menu-color, menu-typography, menu-density, menu-base;
+ @forward './paginator/paginator-theme' as paginator-* show paginator-theme, paginator-color,
+   paginator-typography, paginator-density, paginator-base;
+ @forward './progress-bar/progress-bar-theme' as progress-bar-* show
+diff --git a/src/material/menu/_menu-theme.scss b/src/material/menu/_menu-theme.scss
+index 7d1213f1e4dc3f7b044140bc68a2def1a5635e8c..653d98230772f5da826d9b1b18e77ce4a3083a3e 100644
+--- a/src/material/menu/_menu-theme.scss
++++ b/src/material/menu/_menu-theme.scss
+@@ -5,6 +5,13 @@
+ @use '../core/theming/inspection';
+ @use '../core/typography/typography';
+ 
++@mixin base($theme) {
++  @include sass-utils.current-selector-or-root() {
++    @include token-utils.create-token-values(tokens-mat-menu.$prefix,
++      tokens-mat-menu.get-unthemable-tokens());
++  }
++}
++
+ @mixin color($theme) {
+   @include sass-utils.current-selector-or-root() {
+     @include token-utils.create-token-values(tokens-mat-menu.$prefix,
+@@ -23,6 +30,7 @@
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-menu') {
++    @include base($theme);
+     @if inspection.theme-has($theme, color) {
+       @include color($theme);
+     }
+diff --git a/src/material/menu/menu.scss b/src/material/menu/menu.scss
+index 5a6e2da18395b52f80f7a7b738c6ab3cb4226587..bd608743bee1ed8f5e4bd8cf0fa6c462d2ed4faa 100644
+--- a/src/material/menu/menu.scss
++++ b/src/material/menu/menu.scss
+@@ -33,8 +33,6 @@ mat-menu {
+ }
+ 
+ .mat-mdc-menu-panel {
+-  @include token-utils.create-token-values(tokens-mat-menu.$prefix,
+-    tokens-mat-menu.get-unthemable-tokens());
+   @include menu-common.base;
+   box-sizing: border-box;
+   outline: 0;

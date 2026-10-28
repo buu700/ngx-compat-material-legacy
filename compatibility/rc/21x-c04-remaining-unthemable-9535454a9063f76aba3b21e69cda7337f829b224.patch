@@ -1,0 +1,34 @@
+diff --git a/src/material/divider/_divider-theme.scss b/src/material/divider/_divider-theme.scss
+index f32c85b0a728f99edfc2f5a13a61b45254f4bc00..a05ce9b853ba87653f15c8abf52a92b019864e95 100644
+--- a/src/material/divider/_divider-theme.scss
++++ b/src/material/divider/_divider-theme.scss
+@@ -5,7 +5,10 @@
+ @use '../core/tokens/m2/mat/divider' as tokens-mat-divider;
+ 
+ @mixin base($theme) {
+-  // TODO(mmalerba): Move divider base tokens here
++  @include sass-utils.current-selector-or-root() {
++    @include token-utils.create-token-values(
++        tokens-mat-divider.$prefix, tokens-mat-divider.get-unthemable-tokens());
++  }
+ }
+ 
+ @mixin color($theme) {
+diff --git a/src/material/divider/divider.scss b/src/material/divider/divider.scss
+index 3b0b66f252b5e3ba3ba4f1c784c245de7c51eed0..e23890740e9ce746c3aa8da6369e520659bb2758 100644
+--- a/src/material/divider/divider.scss
++++ b/src/material/divider/divider.scss
+@@ -1,13 +1,9 @@
+ @use '../core/tokens/token-utils';
+ @use '../core/tokens/m2/mat/divider' as tokens-mat-divider;
+ 
+-
+ $inset-margin: 80px;
+ 
+ .mat-divider {
+-  @include token-utils.create-token-values(
+-    tokens-mat-divider.$prefix, tokens-mat-divider.get-unthemable-tokens());
+-
+   display: block;
+   margin: 0;
+   border-top-style: solid;

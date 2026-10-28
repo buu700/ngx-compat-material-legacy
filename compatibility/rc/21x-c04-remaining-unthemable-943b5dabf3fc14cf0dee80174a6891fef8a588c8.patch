@@ -1,0 +1,54 @@
+diff --git a/src/material/_index.scss b/src/material/_index.scss
+index 2a76a109d0a3351456ff15a2497225c6136f929b..67f5981b2bd7ea0605dfde3ba15537b97003ba23 100644
+--- a/src/material/_index.scss
++++ b/src/material/_index.scss
+@@ -112,7 +112,7 @@ list-density, list-base;
+   progress-spinner-theme, progress-spinner-color, progress-spinner-typography,
+   progress-spinner-density, progress-spinner-base;
+ @forward './radio/radio-theme' as radio-* show radio-theme, radio-color, radio-typography,
+-  radio-density;
++  radio-density, radio-base;
+ @forward './select/select-theme' as select-* show select-theme, select-color, select-typography,
+   select-density;
+ @forward './sidenav/sidenav-theme' as sidenav-* show sidenav-theme, sidenav-color,
+diff --git a/src/material/radio/_radio-theme.scss b/src/material/radio/_radio-theme.scss
+index 36a16110a8713e8f90bea16cba93909c7730c0cd..53cac04002e4d08ed925264706e57ffa6a2a8917 100644
+--- a/src/material/radio/_radio-theme.scss
++++ b/src/material/radio/_radio-theme.scss
+@@ -9,6 +9,14 @@
+ @use '../core/tokens/m2/mdc/radio' as tokens-mdc-radio;
+ @use '../core/tokens/m2/mat/radio' as tokens-mat-radio;
+ 
++@mixin base($theme) {
++  .mat-mdc-radio-button {
++    @include mdc-radio-theme.theme(tokens-mdc-radio.get-unthemable-tokens());
++    @include token-utils.create-token-values(
++        tokens-mat-radio.$prefix, tokens-mat-radio.get-unthemable-tokens());
++  }
++}
++
+ @mixin color($theme) {
+   @include mdc-helpers.using-mdc-theme($theme) {
+     .mat-mdc-radio-button {
+@@ -62,6 +70,7 @@
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-radio') {
++    @include base($theme);
+     @if inspection.theme-has($theme, color) {
+       @include color($theme);
+     }
+diff --git a/src/material/radio/radio.scss b/src/material/radio/radio.scss
+index 45ddfd680a1a0f8d4b247dc22ac1ff4f62f744db..454cde988bef70e8344c917bee6ded609dc3a297 100644
+--- a/src/material/radio/radio.scss
++++ b/src/material/radio/radio.scss
+@@ -17,9 +17,6 @@
+   @include mdc-form-field.core-styles($query: mdc-helpers.$mdc-base-styles-query);
+ 
+   .mat-mdc-radio-button {
+-    @include token-utils.create-token-values(
+-      tokens-mat-radio.$prefix, tokens-mat-radio.get-unthemable-tokens());
+-    @include mdc-radio-theme.theme(tokens-mdc-radio.get-unthemable-tokens());
+     -webkit-tap-highlight-color: transparent;
+ 
+     .mdc-radio {

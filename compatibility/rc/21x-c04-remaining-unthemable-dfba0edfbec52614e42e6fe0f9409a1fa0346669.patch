@@ -1,0 +1,57 @@
+diff --git a/src/material/_index.scss b/src/material/_index.scss
+index 87603bb9fe9f1d9a531bff10d66abe6b06b069d6..ee2748149dcb1ed3bfbab13ed3c26b165866c064 100644
+--- a/src/material/_index.scss
++++ b/src/material/_index.scss
+@@ -88,7 +88,7 @@
+ @forward './datepicker/datepicker-theme' as datepicker-* show datepicker-theme, datepicker-color,
+   datepicker-typography, datepicker-date-range-colors, datepicker-density;
+ @forward './dialog/dialog-theme' as dialog-* show dialog-theme, dialog-color, dialog-typography,
+-  dialog-density;
++  dialog-density, dialog-base;
+ @forward './dialog/dialog-legacy-padding' as dialog-* show dialog-legacy-padding;
+ @forward './divider/divider-theme' as divider-* show divider-theme, divider-color,
+   divider-typography, divider-density;
+diff --git a/src/material/dialog/_dialog-theme.scss b/src/material/dialog/_dialog-theme.scss
+index 26b2dbcf742da71ea3532645d4c4288118b69f50..586097721f223f8abf5968ad8938e7a52bdb9a6e 100644
+--- a/src/material/dialog/_dialog-theme.scss
++++ b/src/material/dialog/_dialog-theme.scss
+@@ -1,8 +1,17 @@
+ @use '@material/dialog/dialog-theme' as mdc-dialog-theme;
++@use '../core/style/sass-utils';
+ @use '../core/tokens/m2/mdc/dialog' as tokens-mdc-dialog;
+ @use '../core/theming/theming';
+ @use '../core/typography/typography';
+ 
++
++@mixin base($config-or-theme) {
++  // Add default values for tokens not related to color, typography, or density.
++  @include sass-utils.current-selector-or-root() {
++    @include mdc-dialog-theme.theme(tokens-mdc-dialog.get-unthemable-tokens());
++  }
++}
++
+ @mixin color($config-or-theme) {
+   $config: theming.get-color-config($config-or-theme);
+ 
+@@ -31,6 +40,7 @@
+     $density: theming.get-density-config($theme);
+     $typography: theming.get-typography-config($theme);
+ 
++    @include base($theme);
+     @if $color != null {
+       @include color($color);
+     }
+diff --git a/src/material/dialog/dialog.scss b/src/material/dialog/dialog.scss
+index 6a61c9838fff0279f6ad59f053d4d48e991bda09..1544cbc1512ce36647a6ffcc77a35e52adc10ec9 100644
+--- a/src/material/dialog/dialog.scss
++++ b/src/material/dialog/dialog.scss
+@@ -20,9 +20,6 @@ $mat-dialog-button-horizontal-margin: 8px !default;
+     $mat-dialog-content-max-height);
+ 
+   .mat-mdc-dialog-container {
+-    // Add default values for MDC dialog tokens that aren't outputted by the theming API.
+-    @include mdc-dialog-theme.theme(tokens-mdc-dialog.get-unthemable-tokens());
+-
+     // Apply the theming slots to the container using an initial set of
+     // values that will be overridden in the theme styles.
+     @include mdc-dialog-theme.theme-styles(tokens-mdc-dialog.get-token-slots());

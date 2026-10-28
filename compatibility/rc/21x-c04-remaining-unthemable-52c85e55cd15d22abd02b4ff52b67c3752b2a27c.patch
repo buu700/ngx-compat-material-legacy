@@ -1,0 +1,29 @@
+diff --git a/src/material/expansion/_expansion-theme.scss b/src/material/expansion/_expansion-theme.scss
+index ee3a6981cf89014bcb6a3c46be6664904220fb5a..c2d3abba1f975d0cf5166d3bfb7bfb5aa3a13496 100644
+--- a/src/material/expansion/_expansion-theme.scss
++++ b/src/material/expansion/_expansion-theme.scss
+@@ -6,7 +6,10 @@
+ @use '../core/tokens/m2/mat/expansion' as tokens-mat-expansion;
+ 
+ @mixin base($theme) {
+-  // TODO(mmalerba): Move expansion panel base tokens here
++  @include sass-utils.current-selector-or-root() {
++    @include token-utils.create-token-values(
++        tokens-mat-expansion.$prefix, tokens-mat-expansion.get-unthemable-tokens());
++  }
+ }
+ 
+ @mixin color($theme) {
+diff --git a/src/material/expansion/expansion-panel.scss b/src/material/expansion/expansion-panel.scss
+index ce870070b051f601c62d4757ae4bcdf24f6ac6d3..0995142c76ac4e35855860d7d54b49dbf4c11e30 100644
+--- a/src/material/expansion/expansion-panel.scss
++++ b/src/material/expansion/expansion-panel.scss
+@@ -6,8 +6,6 @@
+ @use '../core/style/elevation';
+ 
+ .mat-expansion-panel {
+-  @include token-utils.create-token-values(
+-    tokens-mat-expansion.$prefix, tokens-mat-expansion.get-unthemable-tokens());
+   @include elevation.overridable-elevation(2);
+   box-sizing: content-box;
+   display: block;

@@ -1,0 +1,53 @@
+diff --git a/src/material/_index.scss b/src/material/_index.scss
+index 85c62a2076d9de09b396a8f4ddcfb1634bc238fd..d58ed5b23e8093e4389adff2208e80f088020ee2 100644
+--- a/src/material/_index.scss
++++ b/src/material/_index.scss
+@@ -120,7 +120,8 @@ menu-base;
+ @forward './sidenav/sidenav-theme' as sidenav-* show sidenav-theme, sidenav-color,
+   sidenav-typography, sidenav-density, sidenav-base;
+ @forward './slide-toggle/slide-toggle-theme' as slide-toggle-* show
+-  slide-toggle-theme, slide-toggle-color, slide-toggle-typography, slide-toggle-density;
++  slide-toggle-theme, slide-toggle-color, slide-toggle-typography, slide-toggle-density,
++  slide-toggle-base;
+ @forward './slider/slider-theme' as slider-* show slider-theme, slider-color, slider-typography,
+   slider-density, slider-base;
+ @forward './snack-bar/snack-bar-theme' as snack-bar-* show snack-bar-theme, snack-bar-color,
+diff --git a/src/material/slide-toggle/_slide-toggle-theme.scss b/src/material/slide-toggle/_slide-toggle-theme.scss
+index 5386667261e10f29cac8b226ef298844d49b6105..579954f38420fdd12f583dcd7b9844620a3ad130 100644
+--- a/src/material/slide-toggle/_slide-toggle-theme.scss
++++ b/src/material/slide-toggle/_slide-toggle-theme.scss
+@@ -8,6 +8,12 @@
+ @use '../core/tokens/m2/mat/slide-toggle' as m2-mat-slide-toggle;
+ @use '../core/tokens/token-utils';
+ 
++@mixin base($theme) {
++  .mdc-switch {
++    @include mdc-switch-theme.theme(m2-mdc-switch.get-unthemable-tokens());
++  }
++}
++
+ @mixin color($theme) {
+   $is-dark: inspection.get-theme-type($theme) == dark;
+   $mdc-switch-color-tokens: m2-mdc-switch.get-color-tokens($theme);
+@@ -62,6 +68,7 @@
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-slide-toggle') {
++    @include base($theme);
+     @if inspection.theme-has($theme, color) {
+       @include color($theme);
+     }
+diff --git a/src/material/slide-toggle/slide-toggle.scss b/src/material/slide-toggle/slide-toggle.scss
+index 40f6e967f1c05b71ee164f6510aeb7b2da84b932..a0d1898591ecaf954bb3fccbfd9bb69e384d3f6a 100644
+--- a/src/material/slide-toggle/slide-toggle.scss
++++ b/src/material/slide-toggle/slide-toggle.scss
+@@ -38,9 +38,6 @@
+     &:disabled .mdc-switch__shadow {
+       box-shadow: var(--mdc-switch-disabled-handle-elevation-shadow);
+     }
+-
+-    // Add default values for MDC switch tokens that aren't outputted by the theming API
+-    @include mdc-switch-theme.theme(m2-mdc-switch.get-unthemable-tokens());
+   }
+ 
+ 

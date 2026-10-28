@@ -1,0 +1,60 @@
+diff --git a/src/material/form-field/_form-field-theme.scss b/src/material/form-field/_form-field-theme.scss
+index 624297f86a713ed0fb23a2c5b8314976c02421c4..38312361346c4d8e6f9ed436ecdb963c39b20f17 100644
+--- a/src/material/form-field/_form-field-theme.scss
++++ b/src/material/form-field/_form-field-theme.scss
+@@ -12,7 +12,17 @@
+ @use './form-field-density';
+ 
+ @mixin base($theme) {
+-  // TODO(mmalerba): Move form field base tokens here
++  @include sass-utils.current-selector-or-root() {
++    @include token-utils.create-token-values(
++        tokens-mdc-filled-text-field.$prefix,
++        tokens-mdc-filled-text-field.get-unthemable-tokens());
++    @include token-utils.create-token-values(
++        tokens-mdc-outlined-text-field.$prefix,
++        tokens-mdc-outlined-text-field.get-unthemable-tokens());
++    @include token-utils.create-token-values(
++        tokens-mat-form-field.$prefix,
++        tokens-mat-form-field.get-unthemable-tokens());
++  }
+ }
+ 
+ @mixin color($theme) {
+diff --git a/src/material/form-field/form-field.scss b/src/material/form-field/form-field.scss
+index e09cf5c67cc3f047f2530f19558294c5e3948065..d4171f351946ada5a23f18696fb288c2447bd515 100644
+--- a/src/material/form-field/form-field.scss
++++ b/src/material/form-field/form-field.scss
+@@ -15,7 +15,6 @@
+ @use '../core/tokens/m2/mat/form-field' as tokens-mat-form-field;
+ @use '../core/tokens/m2/mdc/filled-text-field' as tokens-mdc-filled-text-field;
+ @use '../core/tokens/m2/mdc/outlined-text-field' as tokens-mdc-outlined-text-field;
+-@use '../core/style/sass-utils';
+ @use './form-field-sizing';
+ @use './form-field-subscript';
+ @use './form-field-focus-overlay';
+@@ -44,24 +43,12 @@
+ @include mdc-custom-properties.configure(
+   $emit-fallback-values: false, $emit-fallback-vars: false) {
+ 
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(
+-      tokens-mat-form-field.$prefix,
+-      tokens-mat-form-field.get-unthemable-tokens());
+-  }
+-
+   .mdc-text-field--filled {
+-    @include token-utils.create-token-values(
+-      tokens-mdc-filled-text-field.$prefix,
+-      tokens-mdc-filled-text-field.get-unthemable-tokens());
+     @include mdc-filled-text-field-theme.theme-styles(
+       tokens-mdc-filled-text-field.get-token-slots());
+   }
+ 
+   .mdc-text-field--outlined {
+-    @include token-utils.create-token-values(
+-      tokens-mdc-outlined-text-field.$prefix,
+-      tokens-mdc-outlined-text-field.get-unthemable-tokens());
+     @include mdc-outlined-text-field-theme.theme-styles(
+       tokens-mdc-outlined-text-field.get-token-slots());
+   }

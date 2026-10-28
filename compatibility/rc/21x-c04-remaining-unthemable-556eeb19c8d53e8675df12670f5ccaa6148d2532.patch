@@ -1,0 +1,38 @@
+diff --git a/src/material/button/_icon-button-theme.scss b/src/material/button/_icon-button-theme.scss
+index 1b4c835c1d4e1ed024497a110184a0464e1416e1..ed9032a66b9e7ac866d3034e0c356848ad2a0e46 100644
+--- a/src/material/button/_icon-button-theme.scss
++++ b/src/material/button/_icon-button-theme.scss
+@@ -2,6 +2,7 @@
+ @use '@material/density/functions' as mdc-density-functions;
+ @use '@material/icon-button/icon-button-theme' as mdc-icon-button-theme;
+ @use '@material/theme/theme-color' as mdc-theme-color;
++@use '../core/style/sass-utils';
+ @use '../core/tokens/m2/mdc/icon-button' as tokens-mdc-icon-button;
+ 
+ @use './button-theme-private';
+@@ -24,7 +25,10 @@ $_icon-size: 24px;
+ }
+ 
+ @mixin base($theme) {
+-  // TODO(mmalerba): Move icon button base tokens here
++  // Add default values for tokens not related to color, typography, or density.
++  @include sass-utils.current-selector-or-root() {
++    @include mdc-icon-button-theme.theme(tokens-mdc-icon-button.get-unthemable-tokens());
++  }
+ }
+ 
+ @mixin color($theme) {
+diff --git a/src/material/button/icon-button.scss b/src/material/button/icon-button.scss
+index 95a40ba69d249da02ee967e1d2e7fc19cc8f5bae..5cff811c9e28c5a7d723766088ffe2161d78d241 100644
+--- a/src/material/button/icon-button.scss
++++ b/src/material/button/icon-button.scss
+@@ -17,9 +17,6 @@
+   .mat-mdc-icon-button {
+     // Add the official slots for the MDC component.
+     @include mdc-icon-button-theme.theme-styles($token-slots);
+-
+-    // Add default values for tokens that aren't outputted by the theming API.
+-    @include mdc-icon-button-theme.theme(m2-mdc-icon-button.get-unthemable-tokens());
+   }
+ }
+ 

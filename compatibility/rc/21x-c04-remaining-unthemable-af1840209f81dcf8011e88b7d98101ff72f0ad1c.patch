@@ -1,0 +1,82 @@
+diff --git a/src/material/_index.scss b/src/material/_index.scss
+index 84dbbd7cd60e68d6018b415ac7b61c8cbd9f6ecd..71696858e3d6ad9cefbcbc23e8c90681cba25247 100644
+--- a/src/material/_index.scss
++++ b/src/material/_index.scss
+@@ -128,7 +128,7 @@ list-density, list-base;
+ @forward './stepper/stepper-theme' as stepper-* show stepper-theme, stepper-color,
+   stepper-typography, stepper-density, stepper-base;
+ @forward './table/table-theme' as table-* show table-theme, table-color, table-typography,
+-  table-density;
++  table-density, table-base;
+ @forward './tabs/tabs-theme' as tabs-* show tabs-theme, tabs-color, tabs-typography, tabs-density;
+ @forward './toolbar/toolbar-theme' as toolbar-* show toolbar-theme, toolbar-color,
+   toolbar-typography, toolbar-density, toolbar-base;
+diff --git a/src/material/table/_table-theme.scss b/src/material/table/_table-theme.scss
+index f3b7e609e212694937637c220b95e918a9973451..961ce45c953dbfc4128dca3afd7e59930d7dac78 100644
+--- a/src/material/table/_table-theme.scss
++++ b/src/material/table/_table-theme.scss
+@@ -3,34 +3,31 @@
+ @use '../core/theming/inspection';
+ @use '../core/typography/typography';
+ @use '../core/tokens/token-utils';
++@use '../core/style/sass-utils';
+ 
+-@mixin _output-tokens {
+-  @if (&) {
+-    @content;
+-  }
+-  @else {
+-    html {
+-      @content;
+-    }
++@mixin base($theme) {
++  @include sass-utils.current-selector-or-root() {
++    @include token-utils.create-token-values(
++        tokens-mat-table.$prefix, tokens-mat-table.get-unthemable-tokens());
+   }
+ }
+ 
+ @mixin color($theme) {
+-  @include _output-tokens {
++  @include sass-utils.current-selector-or-root() {
+     @include token-utils.create-token-values(tokens-mat-table.$prefix,
+       tokens-mat-table.get-color-tokens($theme));
+   }
+ }
+ 
+ @mixin typography($theme) {
+-  @include _output-tokens {
++  @include sass-utils.current-selector-or-root() {
+     @include token-utils.create-token-values(tokens-mat-table.$prefix,
+       tokens-mat-table.get-typography-tokens($theme));
+   }
+ }
+ 
+ @mixin density($theme) {
+-  @include _output-tokens {
++  @include sass-utils.current-selector-or-root() {
+     @include token-utils.create-token-values(tokens-mat-table.$prefix,
+       tokens-mat-table.get-density-tokens($theme));
+   }
+@@ -38,6 +35,7 @@
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-table') {
++    @include base($theme);
+     @if inspection.theme-has($theme, color) {
+       @include color($theme);
+     }
+diff --git a/src/material/table/table.scss b/src/material/table/table.scss
+index 44a852dcba791484d6418c0ba1f495b6800e9a7d..e45134a8dae3df31671aa3c786c1ff9e31985773 100644
+--- a/src/material/table/table.scss
++++ b/src/material/table/table.scss
+@@ -32,9 +32,6 @@
+ @include table-flex-styles.private-table-flex-styles();
+ 
+ .mat-mdc-table {
+-  @include token-utils.create-token-values(
+-    tokens-mat-table.$prefix, tokens-mat-table.get-unthemable-tokens());
+-
+   // MDC Table applies `table-layout: fixed`, but this is a backwards incompatible
+   // change since the table did not previously apply it.
+   // TODO: Add a mixin to MDC to set the layout instead of including this override,

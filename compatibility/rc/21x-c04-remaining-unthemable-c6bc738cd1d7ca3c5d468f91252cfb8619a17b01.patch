@@ -1,0 +1,52 @@
+diff --git a/src/material/_index.scss b/src/material/_index.scss
+index 42ef68ac206445dd53292b9843696f26a5dfa421..b60ee7383b2fab5c5ebf5155628cfcfd8183fb1d 100644
+--- a/src/material/_index.scss
++++ b/src/material/_index.scss
+@@ -69,7 +69,7 @@
+ @forward './badge/badge-theme' as badge-* show badge-theme, badge-color, badge-typography,
+   badge-density, badge-base;
+ @forward './bottom-sheet/bottom-sheet-theme' as bottom-sheet-* show bottom-sheet-theme,
+-  bottom-sheet-color, bottom-sheet-typography, bottom-sheet-density;
++  bottom-sheet-color, bottom-sheet-typography, bottom-sheet-density, bottom-sheet-base;
+ @forward './button/button-theme' as button-* show button-theme, button-color, button-typography,
+   button-density;
+ @forward './button/fab-theme' as fab-* show fab-color, fab-typography,
+diff --git a/src/material/bottom-sheet/_bottom-sheet-theme.scss b/src/material/bottom-sheet/_bottom-sheet-theme.scss
+index bfb5a8cde56ea3aaeec8bf0cbc5d3ff9728dd4e0..f6f8f751aa4185b958b6b4f43447ce00ea585111 100644
+--- a/src/material/bottom-sheet/_bottom-sheet-theme.scss
++++ b/src/material/bottom-sheet/_bottom-sheet-theme.scss
+@@ -5,6 +5,13 @@
+ @use '../core/tokens/token-utils';
+ @use '../core/tokens/m2/mat/bottom-sheet' as tokens-mat-bottom-sheet;
+ 
++@mixin base($theme) {
++  @include sass-utils.current-selector-or-root() {
++    @include token-utils.create-token-values(
++        tokens-mat-bottom-sheet.$prefix, tokens-mat-bottom-sheet.get-unthemable-tokens());
++  }
++}
++
+ @mixin color($theme) {
+   @include sass-utils.current-selector-or-root() {
+     @include token-utils.create-token-values(tokens-mat-bottom-sheet.$prefix,
+@@ -23,6 +30,7 @@
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-bottom-sheet') {
++    @include base($theme);
+     @if inspection.theme-has($theme, color) {
+       @include color($theme);
+     }
+diff --git a/src/material/bottom-sheet/bottom-sheet-container.scss b/src/material/bottom-sheet/bottom-sheet-container.scss
+index d1f77c951b79c158f79d0479b7cbd7bb58eff370..2b623d1b1b30fac65ef7c2c700620a0ff36f4697 100644
+--- a/src/material/bottom-sheet/bottom-sheet-container.scss
++++ b/src/material/bottom-sheet/bottom-sheet-container.scss
+@@ -11,8 +11,6 @@ $container-vertical-padding: 8px !default;
+ $container-horizontal-padding: 16px !default;
+ 
+ .mat-bottom-sheet-container {
+-  @include token-utils.create-token-values(
+-    tokens-mat-bottom-sheet.$prefix, tokens-mat-bottom-sheet.get-unthemable-tokens());
+   @include elevation.elevation(16);
+   padding: $container-vertical-padding
+            $container-horizontal-padding;
