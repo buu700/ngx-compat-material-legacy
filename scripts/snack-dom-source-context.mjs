@@ -7,11 +7,12 @@
  */
 /** Raw current snack ownership qualification; historical reads are explicit. */
 import assert from 'node:assert/strict';
-import {readFileSync,lstatSync} from 'node:fs';
+import {readFileSync,lstatSync,realpathSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
 import {join} from 'node:path';
+import {DIALOG_TITLE_SOURCE_IMAGES,dialogTitleProductSubject} from './dialog-title-source-context.mjs';
 import {dialogPortalPrior,reviewDialogPortalSource,DIALOG_PORTAL_SOURCE} from './dialog-portal-failure-recovery.mjs';
 import {qualifiedTooltipScrollClipping} from './tooltip-scroll-clipping-evidence.mjs';
 import {qualifiedMenuContentTypeBoundary,MENU_CONTENT_PANEL_SOURCE} from './menu-panel-content-boundary.mjs';
@@ -29,8 +30,30 @@ export const SNACK_SOURCE_CONTEXT_INPUTS='compatibility/rc/snack-dom-source-cont
 export const SNACK_SOURCE='projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts';
 export const TOOLTIP_SOURCE='projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts';
 const pins={"main":"ed200be4fe777b10a42d5af73ce4e9818fb0584989aa887a635d5750e636260d","21.x":"1f65a5b4a9cdaa950df1d5556f1210c214c4b6299e1dd2833f9345f7222499ab"},hash=b=>createHash('sha256').update(b).digest('hex'),authenticated=new Set(),decoded=new Map(),authenticatedPriors=new Set(),branded=new WeakMap(),packedCurrentEpochs=new WeakMap();
-const rawRead=root=>p=>{let path=root;for(const part of p.split('/')){assert.ok(part&&part!=='.'&&part!=='..');path=join(path,part);assert.equal(lstatSync(path).isSymbolicLink(),false);}assert.ok(lstatSync(path).isFile());return readFileSync(path);};
+const rawRead=root=>p=>{
+ const parts=p.split('/');assert.ok(parts.every(part=>part&&part!=='.'&&part!=='..'));
+ const peer=p.match(/^node_modules\/@angular\/(material|cdk)\/(.+)$/);
+ let path=peer?realpathSync(join(root,'node_modules/@angular',peer[1])):root;
+ const tail=peer?peer[2].split('/'):parts;
+ // Only the declared peer package root can be linked. Source paths and every
+ // descendant of the resolved peer root keep their original no-link checks.
+ for(const part of tail){path=join(path,part);assert.equal(lstatSync(path).isSymbolicLink(),false);}
+ assert.ok(lstatSync(path).isFile());return readFileSync(path);
+};
 function currentRaw(root,read){for(;;){read=packedUpstreamLedgerRawRead({root,read});if(!branded.has(read))return read;const previous=branded.get(read);assert.equal(previous.root,root);read=previous.raw;}}
+
+/** Authenticated before-title metadata only; currentRaw unwraps this for raw admission. */
+export function dialogTitlePriorMetadataRead({root=process.cwd(),read=rawRead(root)}={}){
+ const metadataRead=read;read=currentRaw(root,read);const title=dialogTitleProductSubject({root,read}),before=new Map();
+ for(const image of DIALOG_TITLE_SOURCE_IMAGES){
+  let text=read(image.path).toString();
+  for(const [from,to]of [...image.edits].reverse()){assert.equal(text.split(to).length,2);text=text.replace(to,from);}
+  assert.equal(hash(text),image.before);assert.equal(Buffer.byteLength(text),image.before_bytes);before.set(image.path,Buffer.from(text));
+ }
+ const metadata=path=>{title.assertCurrent();return before.has(path)?Buffer.from(before.get(path)):metadataRead(path);};
+ branded.set(metadata,{root,raw:read});return metadata;
+}
+
 export function snackDomRawCurrentRead({root=process.cwd(),read=rawRead(root)}={}){return currentRaw(root,read);}
 function freeze(v){if(v&&typeof v==='object'){for(const x of Object.values(v))freeze(x);Object.freeze(v);}return v;}
 function original(root,commit,m){const key=JSON.stringify([root,commit,m.path,m.sha256]);if(authenticated.has(key))return;const raw=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',commit+':'+m.path],{cwd:root,maxBuffer:24*1024*1024,env:{...process.env,GIT_NO_LAZY_FETCH:'1'}});assert.equal(hash(raw),m.sha256,'unauthenticated snack context member '+m.path);authenticated.add(key);}
@@ -45,12 +68,12 @@ export function qualifyIndependentSnackProductDelta({root=process.cwd(),read=raw
  const {data,line,ref}=productRegistry(root,read),delta=data.delta,nativeSpec=autocompleteSelectionReaderSubject({root,read,line});assert.equal(delta.path,SNACK_SOURCE);assert.equal(delta.before_sha256,'d9ddfcf0a2f5a27a17670b9c4f382b2739c9a4f9ff5baffaef542cd866ecddab');assert.equal(delta.sha256,'1b673f43bacbcf47ea0e504ff3f191d84289e7c7337b20b93e8b5b98e833eb08');assert.equal(hash(read(delta.path)),delta.sha256,'changed independently qualified snack source');assert.equal(read(delta.path).length,delta.bytes);original(root,data.qualification.source_parent,delta);
  const bytes=read(data.qualification.path);assert.equal(hash(bytes),data.qualification.sha256);original(root,data.qualification.source_parent,data.qualification);const proof=JSON.parse(bytes);assert.equal(proof.line,line);assert.equal(proof.source.current_sha256,delta.sha256);assert.equal(proof.source.before_sha256,delta.before_sha256);assert.equal(proof.source.unchanged_class_members,31);assert.equal(proof.source.other_product_resource_members_preserved,1141);assert.equal(proof.source.consumer_HTML_CSS_SCSS_changes,0);assert.equal(proof.type_subjects.length,3);assert.ok(proof.type_subjects.every(s=>s.strict&&s.skipLibCheck===false&&s.diagnostics===0&&s.callback_API_preserved));assert.equal(proof.runtime_subjects.length,10);assert.equal(proof.case_count,115);assert.equal(proof.rejected_behavior_faults,40);assert.equal(proof.runtime_subjects.reduce((n,s)=>n+s.cases.length,0),115);assert.equal(proof.runtime_subjects.reduce((n,s)=>n+s.behavior_faults_rejected.length,0),40);assert.equal(proof.actual_legacy_component_native_packed_or_floor_qualified,false);
  const dialog=qualifyIndependentDialogProductDelta({root,read}),tooltip=qualifyIndependentTooltipProductDelta({root,read}),menu=qualifyIndependentMenuContentTypeDelta({root,read});
- const owned=inspectSnackCurrentDialogContracts({root,read}),service=owned.defaults,config=service.configuration;assert.deepEqual(data.owned_contracts.targets,owned.targets);assert.deepEqual(data.owned_contracts.qualification,owned.ref);assert.deepEqual(data.dialog_config.targets,config.targets);assert.deepEqual(data.dialog_config.qualification,config.qualification);const declarationCode=packedCvaMetadataToolingEpoch({root,read}).read;for(const m of data.dialog_config.current_code_members)assert.equal(hash(declarationCode(m.path)),m.sha256,'changed current dialog admission code');assert.deepEqual(data.service_defaults.targets,service.targets);assert.deepEqual(data.service_defaults.qualification,service.ref);const exportBridge=data.service_defaults.role_inspector_export;assert.equal(exportBridge.path,'scripts/dialog-caller-config-source-rebinding.mjs');original(root,exportBridge.source_parent,{path:exportBridge.path,sha256:exportBridge.before_sha256});const originalRole=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','show',exportBridge.source_parent+':'+exportBridge.path],{cwd:root,encoding:'utf8',env:{...process.env,GIT_NO_LAZY_FETCH:'1'}});assert.equal(originalRole.split('function sourceRole(').length,2);assert.equal(read(exportBridge.path).toString(),originalRole.replace('function sourceRole(','export function sourceRole('));assert.equal(hash(read(exportBridge.path)),exportBridge.sha256);
+ const owned=inspectSnackCurrentDialogContracts({root,read}),service=owned.defaults,config=service.configuration;assert.deepEqual(data.owned_contracts.targets,owned.historical_targets);assert.deepEqual(data.owned_contracts.qualification,owned.ref);assert.deepEqual(data.dialog_config.targets,config.targets);assert.deepEqual(data.dialog_config.qualification,config.qualification);const declarationCode=packedCvaMetadataToolingEpoch({root,read}).read;for(const m of data.dialog_config.current_code_members)assert.equal(hash(declarationCode(m.path)),m.sha256,'changed current dialog admission code');assert.deepEqual(data.service_defaults.targets,service.targets);assert.deepEqual(data.service_defaults.qualification,service.ref);const exportBridge=data.service_defaults.role_inspector_export;assert.equal(exportBridge.path,'scripts/dialog-caller-config-source-rebinding.mjs');original(root,exportBridge.source_parent,{path:exportBridge.path,sha256:exportBridge.before_sha256});const originalRole=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','show',exportBridge.source_parent+':'+exportBridge.path],{cwd:root,encoding:'utf8',env:{...process.env,GIT_NO_LAZY_FETCH:'1'}});assert.equal(originalRole.split('function sourceRole(').length,2);assert.equal(read(exportBridge.path).toString(),originalRole.replace('function sourceRole(','export function sourceRole('));assert.equal(hash(read(exportBridge.path)),exportBridge.sha256);
  for(const m of data.current_code_members){if(m.path==='scripts/chip-focus-contract.mjs')assertCurrentFocusInspector(root,read,m);else if(m.path==='scripts/upstream-test-consolidation-evidence.mjs')qualifyPackedUpstreamConsolidationInspector({root,read,member:m});else assert.equal(hash(read(m.path)),(nativeSpec.qualify(m)??m).sha256,'changed snack qualification code '+m.path);}
  const tabPath='compatibility/rc/tab-adapter-product-inventory-inputs.json',tabBytes=read(tabPath);original(root,data.qualification.source_parent,{path:tabPath,sha256:hash(tabBytes)});const tab=JSON.parse(tabBytes);assert.equal(hash(read(tab.focus_inputs.path)),tab.focus_inputs.sha256,'changed authenticated previous focus inputs');
- const focus=read(data.focus_inputs.path);assert.equal(hash(focus),data.focus_inputs.sha256);const focusData=JSON.parse(focus);assert.equal(focusData.line,line);assert.deepEqual(focusData.independent_snack_dom_delta,delta);assert.deepEqual(focusData.independent_dialog_portal_delta,dialog.delta);assert.deepEqual(focusData.independent_dialog_portal_qualification,dialog.qualification);assert.deepEqual(focusData.independent_tooltip_clipping_delta,tooltip.delta);assert.deepEqual(focusData.independent_tooltip_clipping_qualification,tooltip.qualification);assert.deepEqual(focusData.independent_menu_content_type_delta,menu.delta);assert.deepEqual(focusData.independent_menu_content_type_qualification,menu.qualification);assert.deepEqual(focusData.independent_dialog_service_default_targets,service.targets);assert.deepEqual(focusData.independent_dialog_service_default_qualification,service.ref);assert.deepEqual(focusData.independent_dialog_owned_contract_targets,owned.targets);assert.deepEqual(focusData.independent_dialog_owned_contract_qualification,owned.ref);assertCurrentFocusInspector(root,read,focusData.current_raw_contract_source);assert.equal(focusData.source_before_reader_used_by_runtime_or_native_admission,false);assert.equal(focusData.actual_native_packed_or_floor_qualified,false);assert.equal(focusData.g11_claim,'not-passed');
+ const focus=read(data.focus_inputs.path);assert.equal(hash(focus),data.focus_inputs.sha256);const focusData=JSON.parse(focus);assert.equal(focusData.line,line);assert.deepEqual(focusData.independent_snack_dom_delta,delta);assert.deepEqual(focusData.independent_dialog_portal_delta,dialog.delta);assert.deepEqual(focusData.independent_dialog_portal_qualification,dialog.qualification);assert.deepEqual(focusData.independent_tooltip_clipping_delta,tooltip.delta);assert.deepEqual(focusData.independent_tooltip_clipping_qualification,tooltip.qualification);assert.deepEqual(focusData.independent_menu_content_type_delta,menu.delta);assert.deepEqual(focusData.independent_menu_content_type_qualification,menu.qualification);assert.deepEqual(focusData.independent_dialog_service_default_targets,service.targets);assert.deepEqual(focusData.independent_dialog_service_default_qualification,service.ref);assert.deepEqual(focusData.independent_dialog_owned_contract_targets,owned.historical_targets);assert.deepEqual(focusData.independent_dialog_owned_contract_qualification,owned.ref);assertCurrentFocusInspector(root,read,focusData.current_raw_contract_source);assert.equal(focusData.source_before_reader_used_by_runtime_or_native_admission,false);assert.equal(focusData.actual_native_packed_or_floor_qualified,false);assert.equal(focusData.g11_claim,'not-passed');
  nativeSpec.assertCurrent();
- return {line,delta,dialog,tooltip,menu,owned:{targets:owned.targets,qualification:owned.ref,source_scope_only:true,actual_native_packed_or_floor_qualified:false},service:{targets:service.targets,qualification:service.ref,source_scope_only:true,actual_native_packed_or_floor_qualified:false},inputs:ref,qualification:data.qualification,source_scope_only:true,actual_native_packed_or_floor_qualified:false};
+ return {line,delta,dialog,tooltip,menu,owned:{targets:owned.targets,historical_targets:owned.historical_targets,title_source_requalification:owned.title_source_requalification,qualification:owned.ref,source_scope_only:true,actual_native_packed_or_floor_qualified:false},service:{targets:service.targets,qualification:service.ref,source_scope_only:true,actual_native_packed_or_floor_qualified:false},inputs:ref,qualification:data.qualification,source_scope_only:true,actual_native_packed_or_floor_qualified:false};
 }
 /** Replay one frozen type-metadata input; every product/graph read remains current. */
 export function inspectSnackCurrentDialogContracts({root=process.cwd(),read=rawRead(root)}={}){
@@ -69,8 +92,9 @@ export function inspectSnackCurrentOverlayContracts({root=process.cwd(),read=raw
  const packed=internal?.qualification??packedRepairEpoch(root,metadata.read);
  const types=path=>path===metadata.path?metadata.read(path):packed.preimages.has(path)?packed.read(path):actual(path);
  const owned=inspectSnackCurrentDialogContracts({root,read:actual}),service=owned.defaults,config=service.configuration;
+ const titleMetadata=dialogTitlePriorMetadataRead({root,read:types});
  const comparison=path=>service.preimages.has(path)?Buffer.from(service.preimages.get(path)):
-  owned.preimages.has(path)?Buffer.from(owned.preimages.get(path)):types(path);
+  owned.preimages.has(path)?Buffer.from(owned.preimages.get(path)):titleMetadata(path);
  // These records retain their original source/type epoch. They never stand in
  // for the actual source graph below or certify a current native component.
  const historical=dialogConfigOverlayBridge({root,read:comparison});
@@ -81,7 +105,7 @@ export function inspectSnackCurrentOverlayContracts({root=process.cwd(),read=raw
   original_row:{file:path.slice('projects/ngx-material-legacy/'.length)},
  }))});
  assert.deepEqual([...graph.sources.keys()].sort(),capture.sources.map(m=>m.path).sort(),'changed current raw overlay population');
- const targets=[...packed.targets,...owned.targets,...service.targets,...config.targets,data.menu_type.delta];
+ const targets=[...packed.targets,...owned.targets,...service.targets,...config.targets,data.menu_type.delta,...owned.title_source_requalification.current_sources];
  const deltas=[];
  for(const member of capture.sources){
   const current=actual(member.path),digest=hash(current),target=targets.find(t=>t.path===member.path);
@@ -149,7 +173,7 @@ export function qualifyIndependentDialogProductDelta({root=process.cwd(),read=ra
  const bytes=read(qualification.path);assert.equal(hash(bytes),qualification.sha256);original(root,qualification.source_parent,qualification);const proof=JSON.parse(bytes),source=reviewDialogPortalSource(root,tooltipPriorCallerRead({root,read}));const {independently_qualified_native_test_source:qualifiedTest,...historicalSource}=source;
  assert.deepEqual(qualifiedTest,{path:nativeSpec.spec.path,before:nativeSpec.spec.before,after:nativeSpec.spec.after,qualification:nativeSpec.spec.bound[0]});
  assert.equal(source.other_product_resource_members_unchanged,1140);
- // Only reconstruct the immutable old report metadata; every source read above was current.
+ // Reconstruct the original report from explicit historical metadata; raw current title and overlay graphs are qualified separately.
  historicalSource.other_product_resource_members_unchanged=1141;assert.deepEqual(proof.source,historicalSource);assert.equal(proof.line,line);assert.equal(proof.source.before_sha256,delta.before_sha256);assert.equal(proof.source.current_sha256,delta.sha256);assert.equal(proof.source.other_class_members_unchanged,30);assert.equal(proof.source.other_product_resource_members_unchanged,1141);assert.equal(proof.source.consumer_HTML_CSS_SCSS_changes,0);assert.equal(proof.type_subjects.length,3);assert.ok(proof.type_subjects.every(s=>s.strict&&s.skipLibCheck===false&&s.diagnostics===0&&s.callback_signatures_preserved));assert.equal(proof.runtime_subjects.length,10);assert.equal(proof.case_count,160);assert.equal(proof.rejected_behavior_faults,65);assert.equal(proof.runtime_subjects.reduce((n,s)=>n+s.cases.length,0),160);assert.equal(proof.runtime_subjects.reduce((n,s)=>n+s.behavior_faults_rejected.length,0),65);assert.equal(proof.actual_full_dialog_focus_component_native_packed_or_floor_qualified,false);assert.equal(proof.g11_claim,'not-passed');
  nativeSpec.assertCurrent();
  return {line,delta,qualification,native_spec_source_successor:qualifiedTest,source_scope_only:true,actual_native_packed_or_floor_qualified:false};
@@ -165,7 +189,7 @@ export function qualifyIndependentMenuContentTypeDelta({root=process.cwd(),read=
 }
 /** Old reports retain exact epochs; current qualification and native readers use raw. */
 export function tooltipPriorCallerRead({root=process.cwd(),read=rawRead(root),currentTooltip=false,currentMenu=false}={}){
- read=currentRaw(root,read);qualifyIndependentTooltipProductDelta({root,read});const menu=qualifyIndependentMenuContentTypeDelta({root,read}),q=qualifiedTooltipScrollClipping({root,read,allowApplied:true}),before=Buffer.from(q.candidate.source),owned=inspectSnackCurrentDialogContracts({root,read}),service=owned.defaults,config=service.configuration,packedTypes=packedRepairTypeEvidenceRead({root,read});const reader=p=>service.preimages.has(p)?Buffer.from(service.preimages.get(p)):config.preimages.has(p)?Buffer.from(config.preimages.get(p)):owned.preimages.has(p)?Buffer.from(owned.preimages.get(p)):!currentTooltip&&p===TOOLTIP_SOURCE?Buffer.from(before):!currentMenu&&p===MENU_CONTENT_PANEL_SOURCE?Buffer.from(menu.before):packedTypes(p);branded.set(reader,{root,raw:read});return reader;
+ read=currentRaw(root,read);qualifyIndependentTooltipProductDelta({root,read});const menu=qualifyIndependentMenuContentTypeDelta({root,read}),q=qualifiedTooltipScrollClipping({root,read,allowApplied:true}),before=Buffer.from(q.candidate.source),owned=inspectSnackCurrentDialogContracts({root,read}),service=owned.defaults,config=service.configuration,packedTypes=packedRepairTypeEvidenceRead({root,read}),titleMetadata=dialogTitlePriorMetadataRead({root,read:packedTypes});const reader=p=>service.preimages.has(p)?Buffer.from(service.preimages.get(p)):config.preimages.has(p)?Buffer.from(config.preimages.get(p)):owned.preimages.has(p)?Buffer.from(owned.preimages.get(p)):!currentTooltip&&p===TOOLTIP_SOURCE?Buffer.from(before):!currentMenu&&p===MENU_CONTENT_PANEL_SOURCE?Buffer.from(menu.before):titleMetadata(p);branded.set(reader,{root,raw:read});return reader;
 }
 export function tooltipSourceContextPrior({root=process.cwd(),read=rawRead(root)}={}){
  const {data,line}=productRegistry(root,read),ref=data.tooltip.context_prior,bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256);const prior=capsule(bytes,ref.sha256);assert.equal(prior.line,line);assert.equal(prior.selected.length,36);assert.equal(prior.reviews.length,23);for(const m of [...prior.ledgers,...prior.reviews]){assert.equal(hash(m.text),m.sha256);original(root,prior.source_parent,m);}return prior;

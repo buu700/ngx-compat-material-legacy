@@ -6,12 +6,14 @@
  */
 /** Exact title transition, raw-reader integrity and real pre/post-cache failures. */
 import assert from 'node:assert/strict';
-import {readFileSync,writeFileSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdtempSync,mkdirSync,symlinkSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {join,dirname,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {DIALOG_TITLE_SOURCE_IMAGES,dialogTitleProductSubject,dialogTitleReaderSubject} from '../scripts/dialog-title-source-context.mjs';
+import {snackDomRawCurrentRead,dialogTitlePriorMetadataRead,inspectSnackCurrentDialogContracts,qualifyIndependentSnackProductDelta} from '../scripts/snack-dom-source-context.mjs';
 import {autocompleteSelectionReaderSubject} from '../scripts/autocomplete-selection-spec-subject.mjs';
 import {RULES_JS_BUILD_REPORT,RULES_JS_BUILD_SHAS,rulesJsBuildEntryEvidenceOk} from '../scripts/upstream-rules-js-build-admission.mjs';
 import {testingApi21xEntryEvidenceOk} from '../scripts/upstream-testing-api-21x-admission.mjs';
@@ -46,7 +48,7 @@ for(const [line,directory]of [['21.x',root],['main',main]]){
 }
 const disk=path=>readFileSync(join(root,path));let late=null;const read=path=>path===late?Buffer.concat([disk(path),Buffer.from('\n')]):disk(path);
 const readers=dialogTitleReaderSubject({root,read,line:'21.x'}),packet=JSON.parse(disk('compatibility/rc/dialog-title-current-source-reader-successors.json'));
-assert.equal(packet.code_subjects.length,5);
+assert.equal(packet.code_subjects.length,8);
 for(const row of packet.code_subjects){
  const before=original(root,packet.source_parent,row.path);assert.equal(hash(before),row.before.sha256);
  assert.deepEqual(readers.qualify({path:row.path,...row.before}),{path:row.path,...row.after});
@@ -57,9 +59,43 @@ for(const member of readers.bound){
  late=member.path;assert.throws(()=>readers.assertCurrent(),undefined,member.path);rejections++;
 }late=null;readers.assertCurrent();
 assert.throws(()=>dialogTitleReaderSubject({root:main,read:path=>readFileSync(join(main,path)),line:'main'}));rejections++;
+readers.withHistoricalToolMetadata(metadata=>{
+ for(const row of packet.code_subjects)assert.equal(hash(metadata(row.path)),row.before.sha256);
+ for(const image of DIALOG_TITLE_SOURCE_IMAGES)assert.equal(hash(metadata(image.path)),image.after,'tool metadata projected product source');
+});
+let historicalToolFaults=0;
+for(const member of readers.bound){late=member.path;assert.throws(()=>readers.withHistoricalToolMetadata(metadata=>metadata(packet.code_subjects[0].path)));historicalToolFaults++;}late=null;
+const temporary=mkdtempSync(join(tmpdir(),'ngx-title-peer-reader-'));let peerPositive=0,peerRejected=0;
+try{
+ const fixtureRoot=join(temporary,'root'),store=join(temporary,'store');mkdirSync(fixtureRoot);mkdirSync(join(store,'@angular'),{recursive:true});
+ symlinkSync(store,join(fixtureRoot,'node_modules'),'dir');
+ for(const name of ['material','cdk']){
+  const peer=join(temporary,name);mkdirSync(join(peer,'tokens'),{recursive:true});writeFileSync(join(peer,'tokens','_index.scss'),name);
+  symlinkSync(peer,join(store,'@angular',name),'dir');
+ }
+ symlinkSync(join(temporary,'material'),join(store,'@angular','core'),'dir');
+ symlinkSync(join(temporary,'material','tokens','_index.scss'),join(temporary,'material','tokens','_linked.scss'));
+ writeFileSync(join(fixtureRoot,'source.ts'),'owned source');symlinkSync(join(fixtureRoot,'source.ts'),join(fixtureRoot,'source-link.ts'));
+ const readPeer=snackDomRawCurrentRead({root:fixtureRoot});assert.equal(readPeer('source.ts').toString(),'owned source');
+ for(const name of ['material','cdk']){assert.equal(readPeer('node_modules/@angular/'+name+'/tokens/_index.scss').toString(),name);peerPositive++;}
+ for(const path of ['/source.ts','../root/source.ts','node_modules/@angular/material/tokens/../../source.ts','source-link.ts','node_modules/@angular/material/tokens/_linked.scss','node_modules/@angular/core/tokens/_index.scss']){assert.throws(()=>readPeer(path));peerRejected++;}
+}finally{rmSync(temporary,{recursive:true,force:true});}
+
 const shared=autocompleteSelectionReaderSubject({root,read,line:'21.x'});shared.assertCurrent();
 for(const image of DIALOG_TITLE_SOURCE_IMAGES)assert.equal(shared.qualify({path:image.path,sha256:image.before}).sha256,image.after);
 for(const row of packet.code_subjects)assert.equal(shared.qualify({path:row.path,...row.before}).sha256,row.after.sha256);
+const historical=dialogTitlePriorMetadataRead({root,read});
+for(const image of DIALOG_TITLE_SOURCE_IMAGES)assert.equal(hash(historical(image.path)),image.before);
+const current=inspectSnackCurrentDialogContracts({root,read:historical});
+assert.equal(current.proposed_sources.size,49);
+for(const image of DIALOG_TITLE_SOURCE_IMAGES)assert.equal(hash(current.proposed_sources.get(image.path)),image.after,'historical title reader was used as current source');
+let fakeBeforeRejected=0;
+for(const image of DIALOG_TITLE_SOURCE_IMAGES){
+ assert.throws(()=>inspectSnackCurrentDialogContracts({root,read:path=>path===image.path?historical(path):read(path)}));fakeBeforeRejected++;
+}
+assert.equal(qualifyIndependentSnackProductDelta({root,read}).source_scope_only,true);
+let generalSourceFaults=0;
+for(const image of DIALOG_TITLE_SOURCE_IMAGES){late=image.path;assert.throws(()=>qualifyIndependentSnackProductDelta({root,read}));generalSourceFaults++;}late=null;
 const ledger=JSON.parse(disk('compatibility/f10/disposition-ledger/ledger.json')),buildBody=JSON.parse(disk(RULES_JS_BUILD_REPORT));
 const build=ledger.entries.find(row=>row.sha===RULES_JS_BUILD_SHAS[0]);assert.ok(build);
 assert.equal(rulesJsBuildEntryEvidenceOk({root,read,line:'21.x',entry:build,body:buildBody}),true,'fresh build-source facts reject the exact admitted title delta');
@@ -70,5 +106,5 @@ const productPaths=()=>JSON.parse(disk('compatibility/rc/packed-upstream-source-
 assert.equal(testingApi21xEntryEvidenceOk({entry:testing,body:testingBody,read,productPaths,line:'21.x'}),true);
 late=DIALOG_TITLE_SOURCE_IMAGES[1].path;assert.equal(testingApi21xEntryEvidenceOk({entry:testing,body:testingBody,read,productPaths,line:'21.x'}),false);late=null;
 assert.equal(hash(disk('compatibility/f10/disposition-ledger/ledger.json')),'22f775835030f175795d8865e9b30920b0b7fea5b908cbd6a9dca7775a71d779');
-const report={schema_version:1,product_lines:lines,source_reader_line:'21.x',main_source_reader_port_qualified:false,metadata_cases:metadataCases,rejections,actual_fresh_build_source_positive:true,actual_testing_source_positive:true,both_real_source_checkers_reject_post_success_product_faults:true,old_product_or_tool_bytes_exposed:false,canonical_ledger_unchanged:true,reader_hooks:packet.code_subjects.length,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+const report={schema_version:1,product_lines:lines,source_reader_line:'21.x',main_source_reader_port_qualified:false,metadata_cases:metadataCases,rejections,actual_fresh_build_source_positive:true,actual_testing_source_positive:true,both_real_source_checkers_reject_post_success_product_faults:true,raw_current_readers_expose_old_product_or_tool_bytes:false,historical_tool_metadata_images:packet.code_subjects.length,historical_tool_metadata_faults_rejected:historicalToolFaults,declared_peer_link_reads:peerPositive,source_traversal_or_nested_or_other_peer_links_rejected:peerRejected,canonical_ledger_unchanged:true,reader_hooks:packet.code_subjects.length,general_source_qualification_passed_21x:true,current_raw_dialog_graph_members:49,historical_title_metadata_unwrapped_for_current_admission:true,fake_current_before_frames_rejected:fakeBeforeRejected,general_source_product_faults_rejected:generalSourceFaults,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));

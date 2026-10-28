@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "scope": "Narrow follow-up to the complete read-only CVA impact diagnosis; no review-count changes or qualification",
+  "remaining": [
+    {
+      "reviewed": 38,
+      "insufficient": 1,
+      "failures": [
+        {
+          "file": "legacy-chips/chip.ts",
+          "module": "@angular/core",
+          "symbol": "NgZone",
+          "stale_source": false,
+          "expected_source_sha256": "73aea18bc4f77958bc69229ea4954a688d92913bbc59fb52e28f342c2d42a5ae",
+          "source_sha256": "73aea18bc4f77958bc69229ea4954a688d92913bbc59fb52e28f342c2d42a5ae",
+          "changed_independent_evidence": [
+            {
+              "path": "scripts/chip-focus-contract.mjs",
+              "before_sha256": "24874ee0cee938314bb0ec3bb6bd60fe9f776c37d4499436ac06f1c0c40e60e0",
+              "sha256": "1a0be3ead213828fd659082aa72d474814b9ce89862567f78f494116dd650ad7"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "reviewed": 33,
+      "insufficient": 0,
+      "failures": []
+    }
+  ],
+  "canonical_records_changed": 0,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "reproducer": {
+    "role": "Retained read-only diagnostic source;not execution authority",
+    "sha256": "7ed7d1c4c47885af3b74d39831258a30bf73aeabc3dcef2111e946b6e1b52575",
+    "text": "import assert from 'node:assert/strict';\nimport {readFileSync,writeFileSync} from 'node:fs';\nimport {execFileSync} from 'node:child_process';\nimport {createHash} from 'node:crypto';\nimport {gunzipSync} from 'node:zlib';\nimport {join} from 'node:path';\nconst root=process.cwd(),hash=raw=>createHash('sha256').update(raw).digest('hex'),read=path=>readFileSync(join(root,path));\nconst {qualifyPackedProductSourceRepairs}=await import('file://'+root+'/scripts/packed-product-source-recovery.mjs');\nconst {dialogTitleReaderSubject}=await import('file://'+root+'/scripts/dialog-title-source-context.mjs');\nconst {dialogTitlePriorMetadataRead}=await import('file://'+root+'/scripts/snack-dom-source-context.mjs');\nconst {authoredUseReviewEvidence}=await import('file://'+root+'/scripts/authored-use-inventory.mjs');\nconst inputPath='compatibility/rc/packed-cva-source-review-inputs.json',inputRaw=read(inputPath);assert.equal(hash(inputRaw),'73b61b0ff8c7a3288d079207ffc30bd910b7cadae177c3c2b8a402cf59b7e59b');\nconst inputs=JSON.parse(inputRaw),productInputs=JSON.parse(read('compatibility/rc/snack-dom-source-context-product-inputs.json')),sourceInputs=JSON.parse(read('compatibility/rc/snack-dom-source-context-inputs.json'));\nconst historyRaw=read(sourceInputs.history_product.path);assert.equal(hash(historyRaw),sourceInputs.history_product.sha256);const history=JSON.parse(gunzipSync(historyRaw));\nconst packed=qualifyPackedProductSourceRepairs({root,read,line:'21.x',data:productInputs.packed_repairs,registry:productInputs,history});\nconst before=new Map(),env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};\nfor(const k of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete env[k];\nfor(const member of [...inputs.prior_ledgers,...inputs.prior_reviews]){\n const bytes=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',inputs.source_checkpoint+':'+member.path],{cwd:root,env,maxBuffer:8*1024*1024});assert.equal(hash(bytes),member.sha256);assert.equal(bytes.length,member.bytes);before.set(member.path,bytes);\n}\nconst oldRead=path=>before.get(path)??packed.read(path),documents=inputs.prior_ledgers.map(ref=>JSON.parse(before.get(ref.path)));\nfunction explain(document,reader){\n const result=authoredUseReviewEvidence(document,'21.x',reader,hash);\n const failures=result.insufficient_uses.map(key=>{\n  const row=document.symbol_uses.find(row=>row.file===key.file&&row.module===key.module&&row.symbol===key.symbol),body=JSON.parse(reader(row.source_review.path));\n  const review=body.reviews.find(row=>row.file===key.file&&row.module===key.module&&row.symbol===key.symbol);\n  const source='projects/ngx-material-legacy/'+row.file,sourceHash=hash(reader(source));\n  const changedEvidence=review.independent_evidence.filter(ref=>hash(reader(ref.path))!==ref.sha256).map(ref=>({path:ref.path,before_sha256:ref.sha256,sha256:hash(reader(ref.path))}));\n  return {...key,stale_source:sourceHash!==review.candidate_source_sha256,expected_source_sha256:review.candidate_source_sha256,source_sha256:sourceHash,changed_independent_evidence:changedEvidence};\n });return {reviewed:result.reviewed,insufficient:result.insufficient,failures};\n}\nconst previous=JSON.parse(readFileSync('/tmp/ngx-title-cva-impact.json'));\nconst subsets=documents.map((doc,index)=>({...doc,symbol_uses:doc.symbol_uses.filter(row=>previous.plain[index].failures.some(other=>other.file===row.file&&other.module===row.module&&other.symbol===row.symbol))}));\nconst titleRead=dialogTitlePriorMetadataRead({root,read:oldRead}),titleTools=dialogTitleReaderSubject({root,read:titleRead,line:'21.x'});\nconst remaining=titleTools.withHistoricalToolMetadata(metadata=>subsets.map(doc=>explain(doc,metadata)));\nconst report={schema_version:1,scope:'Narrow follow-up to the complete read-only CVA impact diagnosis; no review-count changes or qualification',remaining,canonical_records_changed:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false};\nwriteFileSync('/tmp/ngx-title-cva-impact-narrow.json',JSON.stringify(report,null,2)+'\\n');console.log(JSON.stringify(report));\n"
+  }
+}

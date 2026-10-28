@@ -693,7 +693,7 @@ function prepareHistoricalWrapperMetadataStage({root,read,line,before,bound}){
   assert.equal(packet.original_dispositions_or_hunk_judgments_changed,0);assert.equal(packet.unrelated_entry_or_byte_changes,0);
   assert.equal(packet.actual_native_artifact_floor_or_G11_qualified,false);assert.equal(packet.g11_claim,'not-passed');
   assert.equal(packet.code_subject.path,'scripts/historical-chip-wrapper-metadata.mjs');selectionMember({root,read,line,ref:packet.code_subject,bound});
-  const source=historicalChipWrapperMetadata({root,read,line});assert.equal(source.before.equals(before),true);
+  const source=selectionReaders(root,read,line).titleReaders.withHistoricalToolMetadata(metadata=>historicalChipWrapperMetadata({root,read:metadata,line}));assert.equal(source.before.equals(before),true);
   assert.deepEqual(packet.qualification_members,source.bound);assert.deepEqual(packet.entries,source.entries);
   for(const ref of source.bound)selectionMember({root,read,line,ref,bound});
   for(const report of source.reports)assert.equal(selectionMember({root,read,line,ref:report.ref,bound}).equals(report.raw),true);
@@ -719,7 +719,7 @@ function prepareHistoricalConsumerWrapperMetadataStage({root,read,line,before,bo
   assert.equal(packet.original_dispositions_or_hunk_judgments_changed,0);assert.equal(packet.unrelated_entry_or_byte_changes,0);assert.equal(packet.new_upstream_SHA_decisions,0);
   assert.equal(packet.actual_native_artifact_floor_or_G11_qualified,false);assert.equal(packet.g11_claim,'not-passed');
   assert.equal(packet.code_subject.path,'scripts/historical-consumer-wrapper-metadata.mjs');selectionMember({root,read,line,ref:packet.code_subject,bound});
-  const source=historicalConsumerWrapperMetadata({root,read,line});assert.equal(source.before.equals(before),true);
+  const source=selectionReaders(root,read,line).titleReaders.withHistoricalToolMetadata(metadata=>historicalConsumerWrapperMetadata({root,read:metadata,line}));assert.equal(source.before.equals(before),true);
   assert.deepEqual(packet.qualification_members,source.bound);assert.deepEqual(packet.entries,source.entries);
   for(const ref of source.bound)selectionMember({root,read,line,ref,bound});
   for(const report of source.reports)assert.equal(selectionMember({root,read,line,ref:report.ref,bound}).equals(report.raw),true);

@@ -126,8 +126,8 @@
         "bytes": 109448
       },
       "after": {
-        "sha256": "ced965a0a1b8b35d6a29502268f74beadec0aa0a53e718c3fa6f9a393cfbd14c",
-        "bytes": 109478
+        "sha256": "ee74d3c46ae056f4ffd16cc1d38d60820ca449d96158c776319a2bfcbc6fc715",
+        "bytes": 109664
       },
       "literal_edits": [
         {
@@ -137,6 +137,14 @@
         {
           "before": "  assert.equal(hash(read(path)),digest,'changed checker reference metadata owner');bound.set(path,digest);",
           "after": "  const current=selectionReaders(root,read,line).qualify({path,sha256:digest})??{path,sha256:digest};\n  assert.equal(hash(read(path)),current.sha256,'changed checker reference metadata owner');bound.set(path,current.sha256);"
+        },
+        {
+          "before": "const source=historicalChipWrapperMetadata({root,read,line});",
+          "after": "const source=selectionReaders(root,read,line).titleReaders.withHistoricalToolMetadata(metadata=>historicalChipWrapperMetadata({root,read:metadata,line}));"
+        },
+        {
+          "before": "const source=historicalConsumerWrapperMetadata({root,read,line});",
+          "after": "const source=selectionReaders(root,read,line).titleReaders.withHistoricalToolMetadata(metadata=>historicalConsumerWrapperMetadata({root,read:metadata,line}));"
         }
       ]
     },
@@ -162,6 +170,129 @@
         {
           "before": "  const assertCurrent=()=>{for(const ref of bound.values())",
           "after": "  const assertCurrent=()=>{readers.assertCurrent();for(const ref of bound.values())"
+        }
+      ]
+    },
+    {
+      "path": "scripts/packed-product-source-recovery.mjs",
+      "before": {
+        "sha256": "1dc5ad8c196d411f21b7b8efbede7cfd6f0870d58afe52cf52fe03691008f9b8",
+        "bytes": 12722
+      },
+      "after": {
+        "sha256": "b19fb69b955cc738674448c94a02e86a36a9fd71336b239363ac9ee6100982ec",
+        "bytes": 12809
+      },
+      "literal_edits": [
+        {
+          "before": "  let expected=currentTargets.find(t=>t.path===member.path)?.sha256??member.sha256;",
+          "after": "  const target=currentTargets.find(t=>t.path===member.path),qualified=nativeSpec.qualify(target??member);\n  let expected=qualified?.sha256??target?.sha256??member.sha256;"
+        }
+      ]
+    },
+    {
+      "path": "scripts/dialog-caller-owned-contract-boundary.mjs",
+      "before": {
+        "sha256": "a3d6f7194c94bf6fcf6ce74c3be18da9fb567245a2f749c52745488d80e8f238",
+        "bytes": 13601
+      },
+      "after": {
+        "sha256": "29d24b5c308b53d3fbad703f0f99159a23b752f21add052d8c99ed87d3fd4b12",
+        "bytes": 14749
+      },
+      "literal_edits": [
+        {
+          "before": "import {inspectDialogServiceDefaults}",
+          "after": "import {DIALOG_TITLE_SOURCE_IMAGES,dialogTitleProductSubject} from './dialog-title-source-context.mjs';\nimport {inspectDialogServiceDefaults}"
+        },
+        {
+          "before": "  assert.ok(line, 'changed owned dialog contract proposal');\n  const proposal",
+          "after": "  assert.ok(line, 'changed owned dialog contract proposal');\n  const actualRead=read,title=dialogTitleProductSubject({root,read:actualRead,line});\n  // Private before-title metadata only. Historical strict/runtime receipts keep\n  // their exact original graphs; current roles and every raw caller use actualRead.\n  const titleMetadata=new Map();\n  for(const image of DIALOG_TITLE_SOURCE_IMAGES){\n    let before=actualRead(image.path).toString();\n    for(const [from,to]of [...image.edits].reverse()){assert.equal(before.split(to).length,2);before=before.replace(to,from);}\n    assert.equal(hash(before),image.before);assert.equal(Buffer.byteLength(before),image.before_bytes);titleMetadata.set(image.path,Buffer.from(before));\n  }\n  read=path=>titleMetadata.has(path)?Buffer.from(titleMetadata.get(path)):actualRead(path);\n  const proposal"
+        },
+        {
+          "before": "  return {line, raw_product_applied: applied, targets: proposal.members.map(member => ({path: member.path,\n    before_sha256: member.before.sha256, sha256: member.after.sha256, bytes: member.after.bytes})), preimages,\n    proposed_sources: graph.sources, routes: graph.routes, edges: graph.edges, defaults, proof, ref, sdkDeclarations,",
+          "after": "  const currentGraph=componentConfigGraph({root,read:actualRead,selected:defaults.configuration.source.prior.selected});\n  assert.deepEqual(snapshot(currentGraph.sources),snapshot(graph.sources).map(member=>title.qualify(member)??member));\n  assert.deepEqual([...currentGraph.routes],[...graph.routes]);\n  const historicalTargets=proposal.members.map(member=>({path:member.path,before_sha256:member.before.sha256,sha256:member.after.sha256,bytes:member.after.bytes}));\n  title.assertCurrent();\n  return {line, raw_product_applied: applied, targets:historicalTargets.map(member=>title.qualify(member)??member),historical_targets:historicalTargets,preimages,\n    proposed_sources:currentGraph.sources,routes:currentGraph.routes,edges:currentGraph.edges,defaults,proof,ref,sdkDeclarations,\n    title_source_requalification:{current_sources:title.bound.filter(member=>member.path.startsWith(prefix)),historical_receipts_remain_before_title:true,current_raw_graph_members:currentGraph.sources.size,current_native_or_packed_or_full_source_qualified:false},\n    defaults_are_historical_for_title_sources:true,"
+        },
+        {
+          "before": "import {DIALOG_TITLE_SOURCE_IMAGES,dialogTitleProductSubject} from './dialog-title-source-context.mjs';",
+          "after": "import {dialogTitleProductSubject} from './dialog-title-source-context.mjs';\nimport {dialogTitlePriorMetadataRead} from './snack-dom-source-context.mjs';"
+        },
+        {
+          "before": "  // Private before-title metadata only. Historical strict/runtime receipts keep\n  // their exact original graphs; current roles and every raw caller use actualRead.\n  const titleMetadata=new Map();\n  for(const image of DIALOG_TITLE_SOURCE_IMAGES){\n    let before=actualRead(image.path).toString();\n    for(const [from,to]of [...image.edits].reverse()){assert.equal(before.split(to).length,2);before=before.replace(to,from);}\n    assert.equal(hash(before),image.before);assert.equal(Buffer.byteLength(before),image.before_bytes);titleMetadata.set(image.path,Buffer.from(before));\n  }\n  read=path=>titleMetadata.has(path)?Buffer.from(titleMetadata.get(path)):actualRead(path);\n",
+          "after": "  // Private historical comparisons remain owned by the canonical source owner.\n  read=dialogTitlePriorMetadataRead({root,read:actualRead});\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/snack-dom-source-context.mjs",
+      "before": {
+        "sha256": "90f153554f101c610d1a477b2143f9e26df8d0f1951ac0ee6988a6176146d8a5",
+        "bytes": 42431
+      },
+      "after": {
+        "sha256": "475ab8864d0d6b0965a9aa397bc525a9b141c4aee979c922f20cba539a5c9466",
+        "bytes": 44131
+      },
+      "literal_edits": [
+        {
+          "before": "assert.deepEqual(data.owned_contracts.targets,owned.targets);",
+          "after": "assert.deepEqual(data.owned_contracts.targets,owned.historical_targets);"
+        },
+        {
+          "before": "assert.deepEqual(focusData.independent_dialog_owned_contract_targets,owned.targets);",
+          "after": "assert.deepEqual(focusData.independent_dialog_owned_contract_targets,owned.historical_targets);"
+        },
+        {
+          "before": "owned:{targets:owned.targets,qualification:owned.ref,source_scope_only:true,",
+          "after": "owned:{targets:owned.targets,historical_targets:owned.historical_targets,title_source_requalification:owned.title_source_requalification,qualification:owned.ref,source_scope_only:true,"
+        },
+        {
+          "before": "import {dialogPortalPrior,",
+          "after": "import {DIALOG_TITLE_SOURCE_IMAGES,dialogTitleProductSubject} from './dialog-title-source-context.mjs';\nimport {dialogPortalPrior,"
+        },
+        {
+          "before": "function currentRaw(root,read){for(;;){read=packedUpstreamLedgerRawRead({root,read});if(!branded.has(read))return read;const previous=branded.get(read);assert.equal(previous.root,root);read=previous.raw;}}",
+          "after": "function currentRaw(root,read){for(;;){read=packedUpstreamLedgerRawRead({root,read});if(!branded.has(read))return read;const previous=branded.get(read);assert.equal(previous.root,root);read=previous.raw;}}\n\n/** Authenticated before-title metadata only; currentRaw unwraps this for raw admission. */\nexport function dialogTitlePriorMetadataRead({root=process.cwd(),read=rawRead(root)}={}){\n read=currentRaw(root,read);const title=dialogTitleProductSubject({root,read}),before=new Map();\n for(const image of DIALOG_TITLE_SOURCE_IMAGES){\n  let text=read(image.path).toString();\n  for(const [from,to]of [...image.edits].reverse()){assert.equal(text.split(to).length,2);text=text.replace(to,from);}\n  assert.equal(hash(text),image.before);assert.equal(Buffer.byteLength(text),image.before_bytes);before.set(image.path,Buffer.from(text));\n }\n const metadata=path=>{title.assertCurrent();return before.has(path)?Buffer.from(before.get(path)):read(path);};\n branded.set(metadata,{root,raw:read});return metadata;\n}\n"
+        },
+        {
+          "before": " const comparison=path=>service.preimages.has(path)?",
+          "after": " const titleMetadata=dialogTitlePriorMetadataRead({root,read:types});\n const comparison=path=>service.preimages.has(path)?"
+        },
+        {
+          "before": "owned.preimages.has(path)?Buffer.from(owned.preimages.get(path)):types(path);",
+          "after": "owned.preimages.has(path)?Buffer.from(owned.preimages.get(path)):titleMetadata(path);"
+        },
+        {
+          "before": "const targets=[...packed.targets,...owned.targets,...service.targets,...config.targets,data.menu_type.delta];",
+          "after": "const targets=[...packed.targets,...owned.targets,...service.targets,...config.targets,data.menu_type.delta,...owned.title_source_requalification.current_sources];"
+        },
+        {
+          "before": "config=service.configuration,packedTypes=packedRepairTypeEvidenceRead({root,read});const reader=",
+          "after": "config=service.configuration,packedTypes=packedRepairTypeEvidenceRead({root,read}),titleMetadata=dialogTitlePriorMetadataRead({root,read:packedTypes});const reader="
+        },
+        {
+          "before": "?Buffer.from(menu.before):packedTypes(p);branded.set(reader,",
+          "after": "?Buffer.from(menu.before):titleMetadata(p);branded.set(reader,"
+        },
+        {
+          "before": " read=currentRaw(root,read);const title=dialogTitleProductSubject({root,read}),before=new Map();",
+          "after": " const metadataRead=read;read=currentRaw(root,read);const title=dialogTitleProductSubject({root,read}),before=new Map();"
+        },
+        {
+          "before": "return before.has(path)?Buffer.from(before.get(path)):read(path);",
+          "after": "return before.has(path)?Buffer.from(before.get(path)):metadataRead(path);"
+        },
+        {
+          "before": "// Only reconstruct the immutable old report metadata; every source read above was current.",
+          "after": "// Reconstruct the original report from explicit historical metadata; raw current title and overlay graphs are qualified separately."
+        },
+        {
+          "before": "import {readFileSync,lstatSync} from 'node:fs';",
+          "after": "import {readFileSync,lstatSync,realpathSync} from 'node:fs';"
+        },
+        {
+          "before": "const rawRead=root=>p=>{let path=root;for(const part of p.split('/')){assert.ok(part&&part!=='.'&&part!=='..');path=join(path,part);assert.equal(lstatSync(path).isSymbolicLink(),false);}assert.ok(lstatSync(path).isFile());return readFileSync(path);};",
+          "after": "const rawRead=root=>p=>{\n const parts=p.split('/');assert.ok(parts.every(part=>part&&part!=='.'&&part!=='..'));\n const peer=p.match(/^node_modules\\/@angular\\/(material|cdk)\\/(.+)$/);\n let path=peer?realpathSync(join(root,'node_modules/@angular',peer[1])):root;\n const tail=peer?peer[2].split('/'):parts;\n // Only the declared peer package root can be linked. Source paths and every\n // descendant of the resolved peer root keep their original no-link checks.\n for(const part of tail){path=join(path,part);assert.equal(lstatSync(path).isSymbolicLink(),false);}\n assert.ok(lstatSync(path).isFile());return readFileSync(path);\n};"
         }
       ]
     }

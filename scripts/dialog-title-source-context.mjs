@@ -61,8 +61,8 @@ export function dialogTitleProductSubject({root=process.cwd(),read=path=>readFil
 }
 
 const readerPath='compatibility/rc/dialog-title-current-source-reader-successors.json';
-const readerPins={'21.x':'8c1fad69e49885672014f7e885e6f8e864316ecea272b15ebf3b8c8a308faace'};
-const readerCode=['scripts/upstream-rules-js-build-admission.mjs','scripts/upstream-testing-api-21x-admission.mjs','scripts/autocomplete-selection-spec-subject.mjs','scripts/packed-upstream-ledger-epoch.mjs','scripts/checker-reference-metadata.mjs'];
+const readerPins={'21.x':'681290a39d9f693de7c522600179d32e18808909760e52db9a991549e707bb10'};
+const readerCode=['scripts/upstream-rules-js-build-admission.mjs','scripts/upstream-testing-api-21x-admission.mjs','scripts/autocomplete-selection-spec-subject.mjs','scripts/packed-upstream-ledger-epoch.mjs','scripts/checker-reference-metadata.mjs','scripts/packed-product-source-recovery.mjs','scripts/dialog-caller-owned-contract-boundary.mjs','scripts/snack-dom-source-context.mjs'];
 /** Tool before-images authenticate literal edits only; they are never executed. */
 export function dialogTitleReaderSubject({root=process.cwd(),read=path=>readFileSync(join(root,path)),line}={}){
  const actual=JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main';line??=actual;assert.equal(line,actual);
@@ -72,16 +72,22 @@ export function dialogTitleReaderSubject({root=process.cwd(),read=path=>readFile
  assert.deepEqual(data.code_subjects.map(row=>row.path),readerCode);assert.equal(data.old_product_bytes_exposed,false);assert.equal(data.canonical_decisions_changed,0);assert.equal(data.native_or_full_qualification,false);
  const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
  for(const name of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete env[name];
- const bound=[{path:readerPath,sha256:hash(raw),bytes:raw.length}],images=[];
+ const bound=[{path:readerPath,sha256:hash(raw),bytes:raw.length}],images=[],beforeCode=new Map();
  for(const row of data.code_subjects){
   const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',data.source_parent+':'+row.path],{cwd:root,env,maxBuffer:1024*1024});
-  assert.equal(hash(before),row.before.sha256);assert.equal(before.length,row.before.bytes);
+  assert.equal(hash(before),row.before.sha256);assert.equal(before.length,row.before.bytes);beforeCode.set(row.path,Buffer.from(before));
   let expected=before.toString();for(const edit of row.literal_edits){assert.equal(expected.split(edit.before).length,2,'title source-reader hook is not exact');expected=expected.replace(edit.before,edit.after);}
   assert.equal(hash(expected),row.after.sha256);assert.equal(Buffer.byteLength(expected),row.after.bytes);
   assert.equal(read(row.path).toString(),expected,'changed current title source-reader '+row.path);
   bound.push({path:row.path,...row.after});images.push({path:row.path,before:row.before.sha256,before_bytes:row.before.bytes,after:row.after.sha256,after_bytes:row.after.bytes});
  }
  const assertCurrent=()=>{for(const member of bound){const current=read(member.path);assert.equal(hash(current),member.sha256,'late title reader change '+member.path);assert.equal(current.length,member.bytes);}};
- assertCurrent();return {line,bound,assertCurrent,qualify:member=>qualify(images,member,'after'),historicalReference:member=>qualify(images,member,'before'),
-  old_product_bytes_exposed:false,old_tool_bytes_exposed:false,canonical_decisions_changed:0,current_native_or_packed_or_full_source_qualified:false};
+ // Used only to reconstruct authenticated old tool-reference metadata. No tool
+ // before-image is executed, and product reads pass through without projection.
+ const withHistoricalToolMetadata=action=>{
+  const metadata=path=>{assertCurrent();return beforeCode.has(path)?Buffer.from(beforeCode.get(path)):read(path);};
+  return action(metadata);
+ };
+ assertCurrent();return {line,bound,assertCurrent,qualify:member=>qualify(images,member,'after'),historicalReference:member=>qualify(images,member,'before'),withHistoricalToolMetadata,
+  old_product_bytes_exposed:false,old_tool_bytes_exposed_as_current:false,historical_tool_metadata_only:true,canonical_decisions_changed:0,current_native_or_packed_or_full_source_qualified:false};
 }

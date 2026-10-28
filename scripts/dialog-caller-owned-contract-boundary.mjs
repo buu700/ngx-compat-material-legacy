@@ -12,6 +12,8 @@ import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {gunzipSync} from 'node:zlib';
 import {join} from 'node:path';
+import {dialogTitleProductSubject} from './dialog-title-source-context.mjs';
+import {dialogTitlePriorMetadataRead} from './snack-dom-source-context.mjs';
 import {inspectDialogServiceDefaults} from './dialog-caller-service-default-boundary.mjs';
 import {componentConfigGraph} from './component-config-caller-contracts.mjs';
 const ts = createRequire(import.meta.url)('typescript');
@@ -54,6 +56,9 @@ export function inspectDialogOwnedContracts({root = process.cwd(), read = path =
   requireApplied = false} = {}) {
   const bytes = read(proposalPath), line = Object.keys(pins).find(key => hash(bytes) === pins[key].proposal);
   assert.ok(line, 'changed owned dialog contract proposal');
+  const actualRead=read,title=dialogTitleProductSubject({root,read:actualRead,line});
+  // Private historical comparisons remain owned by the canonical source owner.
+  read=dialogTitlePriorMetadataRead({root,read:actualRead});
   const proposal = JSON.parse(bytes); assert.equal(proposal.line, line);
   assert.deepEqual(proposal.members.map(member => member.path), paths);
   const preimages = new Map(), proposed = new Map(), phases = new Set();
@@ -170,9 +175,15 @@ export function inspectDialogOwnedContracts({root = process.cwd(), read = path =
     assert.equal(fault.before_sha256, hash(proposed.get(fault.path))); assert.notEqual(fault.mutant_sha256, fault.before_sha256);
     assert.equal(fault.semantic_source_files, 49); assert.equal(fault.diagnostics, 0); assert.equal(fault.rejected, true); assert.equal(fault.exit_status, 1);
   }
-  return {line, raw_product_applied: applied, targets: proposal.members.map(member => ({path: member.path,
-    before_sha256: member.before.sha256, sha256: member.after.sha256, bytes: member.after.bytes})), preimages,
-    proposed_sources: graph.sources, routes: graph.routes, edges: graph.edges, defaults, proof, ref, sdkDeclarations,
+  const currentGraph=componentConfigGraph({root,read:actualRead,selected:defaults.configuration.source.prior.selected});
+  assert.deepEqual(snapshot(currentGraph.sources),snapshot(graph.sources).map(member=>title.qualify(member)??member));
+  assert.deepEqual([...currentGraph.routes],[...graph.routes]);
+  const historicalTargets=proposal.members.map(member=>({path:member.path,before_sha256:member.before.sha256,sha256:member.after.sha256,bytes:member.after.bytes}));
+  title.assertCurrent();
+  return {line, raw_product_applied: applied, targets:historicalTargets.map(member=>title.qualify(member)??member),historical_targets:historicalTargets,preimages,
+    proposed_sources:currentGraph.sources,routes:currentGraph.routes,edges:currentGraph.edges,defaults,proof,ref,sdkDeclarations,
+    title_source_requalification:{current_sources:title.bound.filter(member=>member.path.startsWith(prefix)),historical_receipts_remain_before_title:true,current_raw_graph_members:currentGraph.sources.size,current_native_or_packed_or_full_source_qualified:false},
+    defaults_are_historical_for_title_sources:true,
     class_signatures_unchanged_except_componentRef: true, source_closures: 0,
     actual_native_packed_AOT_or_full_floor_qualified: false};
 }
