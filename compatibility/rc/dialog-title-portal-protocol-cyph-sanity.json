@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-28T04:17:00.073410+00:00",
+  "scope": "Read-only Cyph dialog source sanity; no build, runtime or packaged qualification",
+  "consumer_HEAD": "fea86b9717fa3f7943a7fd8eb6bb03ef09592f6b",
+  "dialog_import_scan": {
+    "command": [
+      "rg",
+      "-l",
+      "@angular/(material|cdk)/(legacy-)?dialog|Mat(Legacy)?DialogContainer",
+      "/home/parallels/cyph",
+      "-g",
+      "*.ts",
+      "-g",
+      "!node_modules/**",
+      "-g",
+      "!vendor/**",
+      "-g",
+      "!third_party/**"
+    ],
+    "exit_code": 0,
+    "files": [
+      {
+        "path": "shared/js/cyph/modules/cyph-shared.module.ts",
+        "sha256": "f3b2c3a0724431d1c90ca01452593cc3fc84d6ed6cead902b18a3fdafe4eb56a",
+        "bytes": 5618
+      },
+      {
+        "path": "shared/js/cyph/services/material-dialog.service.ts",
+        "sha256": "d11742c45d78e36da36fcba72e9869571c28768fe8827208e066f87f98ecb9b1",
+        "bytes": 14208
+      },
+      {
+        "path": "shared/js/cyph/components/dialog-media/dialog-media.component.ts",
+        "sha256": "43a4ff2190fd195ac2d4991a036c09294952f05cb00b20a1532cb22a155c8221",
+        "bytes": 5371
+      },
+      {
+        "path": "shared/js/cyph/components/link-connection-email/link-connection-email.component.ts",
+        "sha256": "1829c1bffe0c36675ff8c012ee9fdb0727dacc748a2da2f2b7dd300f2a08d3f0",
+        "bytes": 3496
+      },
+      {
+        "path": "shared/js/cyph/components/dialog-confirm/dialog-confirm.component.ts",
+        "sha256": "d8deee89a810ab7c3c7a16ca63524faa166db139ecffa22ebd857aed859204ca",
+        "bytes": 3463
+      }
+    ]
+  },
+  "direct_container_or_portal_calls": {
+    "command": [
+      "rg",
+      "-n",
+      "Mat(Legacy)?DialogContainer|_containerInstance|\\.attachDomPortal|\\.attachComponentPortal|\\.attachTemplatePortal",
+      "/home/parallels/cyph/shared/js",
+      "-g",
+      "*.ts",
+      "-g",
+      "!node_modules/**"
+    ],
+    "exit_code": 1,
+    "matches": 0
+  },
+  "observed_use": "Dialog service open/close, DialogRef componentInstance and lifecycle observables; no direct container or typed portal entry point found in the scanned TS source.",
+  "consumer_written": false,
+  "consumer_build_executed": false
+}

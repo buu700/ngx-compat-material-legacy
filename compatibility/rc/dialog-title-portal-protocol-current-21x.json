@@ -1,0 +1,504 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Actual current public outlet and authenticated tagged protocol comparison; source runtime only",
+  "node": "v24.21.0",
+  "framework": "21.2.23",
+  "original_program": {
+    "path": "tests/dialog_container_public_runtime_probe.mjs",
+    "sha256": "3cd1ac4204ce8539cf4cc90671583a9104c7c14ca2d5bbe705d0a2a134e56264",
+    "bytes": 22455
+  },
+  "original_observation_ids": [
+    "actual-owned-service-scopes-public-and-legacy-config-to-same-object",
+    "manual-eight-arguments-outside-injection-context",
+    "supplied-arguments-override-different-ambient-di-values",
+    "borrowed-services-survive-container-destruction",
+    "initial-aria-label-and-onpush-title-queue",
+    "historical-title-queue-mock-needs-no-current-container-methods",
+    "destroyed-title-owner-never-mutates-or-marks-its-old-queue",
+    "public-generic-component-portal-and-result-identity",
+    "public-generic-template-portal-and-result-identity",
+    "public-generic-dom-portal-and-result-identity",
+    "direct-attachment-duplicate-does-not-replace-content",
+    "failed-portal-dispatch-does-not-start-focus-or-backdrop",
+    "detach-and-dispose-delegate-without-destroying-borrowed-services",
+    "attachment-after-destruction-is-rejected",
+    "manual-overlay-backdrop-recaptures-only-when-disabled",
+    "real-public-dialogref-backdrop-recaptures-exactly-once",
+    "different-public-dialogref-does-not-steal-supplied-overlay",
+    "previous-focus-and-close-origin-restored-through-supplied-monitor",
+    "omitted-eighth-monitor-uses-target-focus-without-di",
+    "selector-target-uses-exact-supplied-document",
+    "disabled-restoration-preserves-current-focus",
+    "outside-consumer-focus-is-never-overridden",
+    "open-shadow-contained-focus-allows-restoration",
+    "restoration-failure-still-destroys-persistent-trap-and-subscription",
+    "persistent-trap-failure-still-releases-selector-state-and-notifications",
+    "ssr-restoration-selector-does-not-query-document",
+    "ssr-content-does-not-create-persistent-trap",
+    "manual-server-without-global-document-never-touches-dom"
+  ],
+  "original_observations_passed": 28,
+  "original_mutations_rejected": 8,
+  "original_assertion_calls_preserved": 109,
+  "fixture_and_protocol_literal_edits": [
+    {
+      "before": "import {fixture, load} from './dialog_initial_focus_runtime_probe.mjs';",
+      "after": "import {fixture, load} from \"file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/dialog_initial_focus_runtime_probe.mjs\";\nimport {currentOutlet,portalDom} from \"file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/dialog_portal_protocol_subject.mjs\";",
+      "occurrences": 1
+    },
+    {
+      "before": "const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');",
+      "after": "const root = \"/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy\";",
+      "occurrences": 1
+    },
+    {
+      "before": "const require = createRequire(import.meta.url), ts = require('typescript');",
+      "after": "const require = createRequire(root+'/package.json'), ts = require('typescript');",
+      "occurrences": 1
+    },
+    {
+      "before": "const {BasePortalOutlet, ComponentPortal, TemplatePortal, DomPortal}",
+      "after": "const {BasePortalOutlet, CdkPortalOutlet, ComponentPortal, TemplatePortal, DomPortal}",
+      "occurrences": 1
+    },
+    {
+      "before": "function recordingOutlet() {\n  const log = [], component = {}, template = {};\n  class Outlet extends BasePortalOutlet {\n    attachComponentPortal(portal) {log.push({kind: 'component', portal}); return component;}\n    attachTemplatePortal(portal) {log.push({kind: 'template', portal}); return template;}\n    attachDomPortal = portal => {log.push({kind: 'dom', portal});};\n    detach() {log.push({kind: 'detach'}); super.detach();}\n    dispose() {log.push({kind: 'dispose'}); super.dispose();}\n  }\n  return {outlet: new Outlet(), log, component, template};\n}\n",
+      "after": "const outletFixtures=new Set();\nfunction recordingOutlet(f) {\n  const dom=portalDom();\n  for(const name of ['appendChild','removeChild','insertBefore','replaceChild'])f.host[name]=dom.target[name];\n  f.host.ELEMENT_NODE=1;dom.target=f.host;\n  f.document.createComment=dom.document.createComment;dom.document=f.document;\n  const actual=currentOutlet({CdkPortalOutlet},core,dom);outletFixtures.add(actual);return actual;\n}\n",
+      "occurrences": 1
+    },
+    {
+      "before": "recordingOutlet()",
+      "after": "recordingOutlet(f)",
+      "occurrences": 5
+    },
+    {
+      "before": "new DomPortal(f.first)",
+      "after": "new DomPortal(o.dom.element)",
+      "occurrences": 1
+    },
+    {
+      "before": "assert.throws(() => f.instance.attachComponentPortal(new ComponentPortal(class Later {})), /disposed/);",
+      "after": "assert.throws(() => f.instance.attach(new ComponentPortal(class Later {})), /disposed/);",
+      "occurrences": 1
+    },
+    {
+      "before": "  return cases;",
+      "after": "  for(const actual of outletFixtures)actual.destroy();outletFixtures.clear();\n  return cases;",
+      "occurrences": 1
+    },
+    {
+      "before": "const args = process.argv.slice(2);",
+      "after": "const args = [];",
+      "occurrences": 1
+    }
+  ],
+  "tagged_oracle": [
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/provenance.json",
+      "sha256": "243c8f552f0e6938f7bd3c423bed9e6e163a3b726b48920fffa3be0baff08231",
+      "bytes": 2664
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/portal.mjs",
+      "sha256": "13506d8a9c9d5f1bb9967fc6846459405fd2c53f66df19406e3260d4b74777d1",
+      "bytes": 27595
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/dialog.mjs",
+      "sha256": "03306f25c7f5ab1fde85e0f020cccfaa751b67a90faca8509b6ae205d5c8014e",
+      "bytes": 37479
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/cdk-package.json",
+      "sha256": "b7794ad784818253dec6b2aeea7d0b3b5ac7fa6ac0f8d2e440bf9e581fc2bf15",
+      "bytes": 7557
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/portal.ts",
+      "sha256": "67aa03290716d493ecfbbc599f42b9a1c9465fb16554d5ec0ab61a4055d1606e",
+      "bytes": 8594
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/portal-errors.ts",
+      "sha256": "b22c9a6537f3ce0a6f036eef793f84c77fc2af9bb1d3154b2c08280ed8348747",
+      "bytes": 1614
+    },
+    {
+      "path": "reference/material-16.2.14/error-helper-sources/portal-directives.ts",
+      "sha256": "c8a1dc75b41cea08c49de38981ba7ec98b91831c074efa0d26f60f2c64b078bd",
+      "bytes": 8357
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-focus-sources/cdk-dialog-container.ts",
+      "sha256": "571d6c3017e773229880a6da96b6e5c322c462b20e2c9784c85a291a96d12545",
+      "bytes": 11999
+    }
+  ],
+  "tagged_declarations": [
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/portal.mjs",
+      "name": "throwNullPortalError",
+      "complete_declaration_sha256": "94e86e80d9162216459ff9aff997a01562ce6f6a7c6a124133189f3212b76997",
+      "instance_and_constructor_bytes_unchanged": true,
+      "adapted_declaration_sha256": "94e86e80d9162216459ff9aff997a01562ce6f6a7c6a124133189f3212b76997"
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/portal.mjs",
+      "name": "throwPortalAlreadyAttachedError",
+      "complete_declaration_sha256": "18f4c0a29dc361bb324ae958efcc82e2c6223475ae0a75dc954705fb6af8bdb9",
+      "instance_and_constructor_bytes_unchanged": true,
+      "adapted_declaration_sha256": "18f4c0a29dc361bb324ae958efcc82e2c6223475ae0a75dc954705fb6af8bdb9"
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/portal.mjs",
+      "name": "throwPortalOutletAlreadyDisposedError",
+      "complete_declaration_sha256": "cfc5abd50629901056f100cf8980ab0d7e44b563d7ed6e415ff211bc551ce16f",
+      "instance_and_constructor_bytes_unchanged": true,
+      "adapted_declaration_sha256": "cfc5abd50629901056f100cf8980ab0d7e44b563d7ed6e415ff211bc551ce16f"
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/portal.mjs",
+      "name": "throwUnknownPortalTypeError",
+      "complete_declaration_sha256": "5aeccf837a63ab202f5eebffc98f93acfd5f54123b0d09cbd2d65f8d03325458",
+      "instance_and_constructor_bytes_unchanged": true,
+      "adapted_declaration_sha256": "5aeccf837a63ab202f5eebffc98f93acfd5f54123b0d09cbd2d65f8d03325458"
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/portal.mjs",
+      "name": "throwNullPortalOutletError",
+      "complete_declaration_sha256": "031eff0653e348589edd01d1f7c826f4528af302ad7ac5af46d7ab61662626dd",
+      "instance_and_constructor_bytes_unchanged": true,
+      "adapted_declaration_sha256": "031eff0653e348589edd01d1f7c826f4528af302ad7ac5af46d7ab61662626dd"
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/portal.mjs",
+      "name": "throwNoPortalAttachedError",
+      "complete_declaration_sha256": "91667807804d7fbd29faa0076c04b3f7203c54d280976cbf5a3a4d33eb15e755",
+      "instance_and_constructor_bytes_unchanged": true,
+      "adapted_declaration_sha256": "91667807804d7fbd29faa0076c04b3f7203c54d280976cbf5a3a4d33eb15e755"
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/portal.mjs",
+      "name": "Portal",
+      "complete_declaration_sha256": "3888e49e49ee24812c0e4eb9477ad0d67132cd8ecc9a6c14658710e284f7dfbe",
+      "instance_and_constructor_bytes_unchanged": true,
+      "adapted_declaration_sha256": "3888e49e49ee24812c0e4eb9477ad0d67132cd8ecc9a6c14658710e284f7dfbe"
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/portal.mjs",
+      "name": "ComponentPortal",
+      "complete_declaration_sha256": "35e8b6ec96d99573d8e81fda7cf05e09cb6e480ca15b526cfbcda1f401c748ea",
+      "instance_and_constructor_bytes_unchanged": true,
+      "adapted_declaration_sha256": "35e8b6ec96d99573d8e81fda7cf05e09cb6e480ca15b526cfbcda1f401c748ea"
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/portal.mjs",
+      "name": "TemplatePortal",
+      "complete_declaration_sha256": "7ef51e7c20fdfd45f81b1154775e2b45e5c39a2748c26628e254f5076b833a1c",
+      "instance_and_constructor_bytes_unchanged": true,
+      "adapted_declaration_sha256": "7ef51e7c20fdfd45f81b1154775e2b45e5c39a2748c26628e254f5076b833a1c"
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/portal.mjs",
+      "name": "DomPortal",
+      "complete_declaration_sha256": "cab03e923452d70a17de17010f13545c2c34562de6b0423915e20308a1fcaca6",
+      "instance_and_constructor_bytes_unchanged": true,
+      "adapted_declaration_sha256": "cab03e923452d70a17de17010f13545c2c34562de6b0423915e20308a1fcaca6"
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/portal.mjs",
+      "name": "BasePortalOutlet",
+      "complete_declaration_sha256": "1f5b731c24181a344c01f1c4694f7de12ee3782489a5a80dbb9da5bc9e7c234f",
+      "instance_and_constructor_bytes_unchanged": true,
+      "adapted_declaration_sha256": "1f5b731c24181a344c01f1c4694f7de12ee3782489a5a80dbb9da5bc9e7c234f"
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/portal.mjs",
+      "name": "CdkPortalOutlet",
+      "complete_declaration_sha256": "ed8f1595410cdd582351b7cc02226623b25b85cdafab9cca63a91178e48fa6d0",
+      "instance_and_constructor_bytes_unchanged": true,
+      "adapted_declaration_sha256": "d0214ec5333cfa9472fd50a5dd74cc11271555f568b922e0384ae808b31e4110"
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/dialog.mjs",
+      "name": "throwDialogContentAlreadyAttachedError",
+      "complete_declaration_sha256": "1dab039f016d52dd512db921bc0a41fc8594fe796e83ab33cf55e49dd213c703",
+      "instance_and_constructor_bytes_unchanged": true,
+      "adapted_declaration_sha256": "1dab039f016d52dd512db921bc0a41fc8594fe796e83ab33cf55e49dd213c703"
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-portal-protocol/dialog.mjs",
+      "name": "CdkDialogContainer",
+      "complete_declaration_sha256": "86f2648760f244b2c127b6aab2e48e933bd504d11026da4683b612d321eb8537",
+      "instance_and_constructor_bytes_unchanged": true,
+      "adapted_declaration_sha256": "c611b98de509504c0512fd6a42a0c02736e26e610414741c99e10988906784a5"
+    }
+  ],
+  "Angular_metadata_blocks_excluded": [
+    {
+      "class": "CdkPortalOutlet",
+      "sha256": "2d726e9d93d6be67240118afa00d5460b084c8e753ad3a0122c07786b110db24"
+    },
+    {
+      "class": "CdkPortalOutlet",
+      "sha256": "385cbf67c8ab8565fc13e7a56e4316ece48090dc5f6cad15b38034d835e0e9c0"
+    },
+    {
+      "class": "CdkDialogContainer",
+      "sha256": "38b18e293783a8e43c931c993efcb6a9dab50978305f65e93526ae937f830e40"
+    },
+    {
+      "class": "CdkDialogContainer",
+      "sha256": "dabe30ab438423b5b35567d402fdd3d4eace1483f56330a010dc1a2310467197"
+    }
+  ],
+  "portal_checks": [
+    "tagged16/typed/component/identity-state-duplicate-detach-dispose",
+    "tagged16/typed/template/identity-state-duplicate-detach-dispose",
+    "tagged16/typed/dom/identity-state-duplicate-detach-dispose",
+    "tagged16/generic/component/identity-state-duplicate-detach-dispose",
+    "tagged16/generic/template/identity-state-duplicate-detach-dispose",
+    "tagged16/generic/dom/identity-state-duplicate-detach-dispose",
+    "current-public/typed/component/identity-state-duplicate-detach-dispose",
+    "current-public/typed/template/identity-state-duplicate-detach-dispose",
+    "current-public/typed/dom/identity-state-duplicate-detach-dispose",
+    "current-public/generic/component/identity-state-duplicate-detach-dispose",
+    "current-public/generic/template/identity-state-duplicate-detach-dispose",
+    "current-public/generic/dom/identity-state-duplicate-detach-dispose",
+    "tagged16/parentless-dom-rejected",
+    "current-public/parentless-dom-rejected"
+  ],
+  "disposal_observations": [
+    {
+      "epoch": "tagged16-outlet",
+      "dispatch": "typed",
+      "kind": "component",
+      "after_empty_dispose": {
+        "attaches": true
+      }
+    },
+    {
+      "epoch": "tagged16-outlet",
+      "dispatch": "typed",
+      "kind": "template",
+      "after_empty_dispose": {
+        "attaches": true
+      }
+    },
+    {
+      "epoch": "tagged16-outlet",
+      "dispatch": "typed",
+      "kind": "dom",
+      "after_empty_dispose": {
+        "attaches": true
+      }
+    },
+    {
+      "epoch": "tagged16-outlet",
+      "dispatch": "generic",
+      "kind": "component",
+      "after_empty_dispose": {
+        "throws": "This PortalOutlet has already been disposed"
+      }
+    },
+    {
+      "epoch": "tagged16-outlet",
+      "dispatch": "generic",
+      "kind": "template",
+      "after_empty_dispose": {
+        "throws": "This PortalOutlet has already been disposed"
+      }
+    },
+    {
+      "epoch": "tagged16-outlet",
+      "dispatch": "generic",
+      "kind": "dom",
+      "after_empty_dispose": {
+        "throws": "This PortalOutlet has already been disposed"
+      }
+    },
+    {
+      "epoch": "tagged16-container",
+      "dispatch": "typed",
+      "kind": "component",
+      "after_empty_dispose": {
+        "attaches": true
+      }
+    },
+    {
+      "epoch": "tagged16-container",
+      "dispatch": "typed",
+      "kind": "template",
+      "after_empty_dispose": {
+        "attaches": true
+      }
+    },
+    {
+      "epoch": "tagged16-container",
+      "dispatch": "typed",
+      "kind": "dom",
+      "after_empty_dispose": {
+        "attaches": true
+      }
+    },
+    {
+      "epoch": "tagged16-container",
+      "dispatch": "generic",
+      "kind": "component",
+      "after_empty_dispose": {
+        "throws": "This PortalOutlet has already been disposed"
+      }
+    },
+    {
+      "epoch": "tagged16-container",
+      "dispatch": "generic",
+      "kind": "template",
+      "after_empty_dispose": {
+        "throws": "This PortalOutlet has already been disposed"
+      }
+    },
+    {
+      "epoch": "tagged16-container",
+      "dispatch": "generic",
+      "kind": "dom",
+      "after_empty_dispose": {
+        "throws": "This PortalOutlet has already been disposed"
+      }
+    },
+    {
+      "epoch": "current-public",
+      "dispatch": "typed",
+      "kind": "component",
+      "after_empty_dispose": {
+        "attaches": true
+      }
+    },
+    {
+      "epoch": "current-public",
+      "dispatch": "typed",
+      "kind": "template",
+      "after_empty_dispose": {
+        "attaches": true
+      }
+    },
+    {
+      "epoch": "current-public",
+      "dispatch": "typed",
+      "kind": "dom",
+      "after_empty_dispose": {
+        "attaches": true
+      }
+    },
+    {
+      "epoch": "current-public",
+      "dispatch": "generic",
+      "kind": "component",
+      "after_empty_dispose": {
+        "throws": "This PortalOutlet has already been disposed"
+      }
+    },
+    {
+      "epoch": "current-public",
+      "dispatch": "generic",
+      "kind": "template",
+      "after_empty_dispose": {
+        "throws": "This PortalOutlet has already been disposed"
+      }
+    },
+    {
+      "epoch": "current-public",
+      "dispatch": "generic",
+      "kind": "dom",
+      "after_empty_dispose": {
+        "throws": "This PortalOutlet has already been disposed"
+      }
+    },
+    {
+      "epoch": "current-owned",
+      "dispatch": "typed",
+      "kind": "component",
+      "after_empty_dispose": {
+        "attaches": true
+      }
+    },
+    {
+      "epoch": "current-owned",
+      "dispatch": "typed",
+      "kind": "template",
+      "after_empty_dispose": {
+        "attaches": true
+      }
+    },
+    {
+      "epoch": "current-owned",
+      "dispatch": "typed",
+      "kind": "dom",
+      "after_empty_dispose": {
+        "throws": "This PortalOutlet has already been disposed"
+      }
+    },
+    {
+      "epoch": "current-owned",
+      "dispatch": "generic",
+      "kind": "component",
+      "after_empty_dispose": {
+        "throws": "This PortalOutlet has already been disposed"
+      }
+    },
+    {
+      "epoch": "current-owned",
+      "dispatch": "generic",
+      "kind": "template",
+      "after_empty_dispose": {
+        "throws": "This PortalOutlet has already been disposed"
+      }
+    },
+    {
+      "epoch": "current-owned",
+      "dispatch": "generic",
+      "kind": "dom",
+      "after_empty_dispose": {
+        "throws": "This PortalOutlet has already been disposed"
+      }
+    }
+  ],
+  "oracle_byte_faults_rejected": 8,
+  "late_oracle_byte_faults_rejected": 8,
+  "original_program_byte_fault_rejected": true,
+  "generic_disposal_bypass_mutant_rejected": true,
+  "known_lifetime_difference": {
+    "case": {
+      "epoch": "current-owned",
+      "dispatch": "typed",
+      "kind": "dom",
+      "after_empty_dispose": {
+        "throws": "This PortalOutlet has already been disposed"
+      }
+    },
+    "scope": "Typed DOM attachment after explicit disposal delegates to the stable public generic outlet operation; the tagged typed method bypassed its generic disposal guard.",
+    "status": "Outside the documented supported lifetime after explicit permanent disposal; exact observed difference retained for the complete audit."
+  },
+  "current_product_changes": 0,
+  "consumer_HTML_CSS_SCSS_changes": 0,
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+      "sha256": "fb30039e5c9ed9f906de8a734eeeb27c1e5f2a797ed3663225f6e405f737be04",
+      "bytes": 11196
+    },
+    {
+      "path": "tests/dialog_portal_protocol_subject.mjs",
+      "sha256": "6c7c8ebc38a3f0eb2dc9757309f0789c5a2498f924cbd816a2d5f2c7d81e73a4",
+      "bytes": 10868
+    },
+    {
+      "path": "tests/dialog_portal_current_protocol_probe.mjs",
+      "sha256": "13489ae47cf017bb66c964d39228c2c0a37b6f444d28aa70750910d4e73b53db",
+      "bytes": 9024
+    }
+  ],
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}
