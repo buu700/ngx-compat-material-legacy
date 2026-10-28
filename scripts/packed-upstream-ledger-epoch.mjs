@@ -20,6 +20,8 @@ const OWNER='scripts/packed-upstream-ledger-epoch.mjs',BASE='scripts/packed-upst
 const LEDGER='compatibility/f10/disposition-ledger/ledger.json';
 const PACKET='compatibility/rc/21x-c04-dialog-title-replacement-canonical-admitted-transition.json';
 const PACKET_HASH='87ac44ebc3d8c8fcf082803ecf4f6deac68b62ef349ce0d95c037dbb85e9cbea';
+const FRAMES='compatibility/rc/21x-c04-dialog-title-replacement-retained-ledger-frames.json';
+const FRAMES_HASH='1818801b7b603d2707fe7f2571dd5819edb7de12e259934bc71b24354c8fd456';
 const AFTER='80123c4e8c4f7f43330553ffca84e51fea98e70f545234cf5359c11128e548d7';
 const AUTHORITY='33e11b2965c9ff559865bc81298e6766653672be';
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
@@ -41,8 +43,9 @@ function unwrap(root,read){
  return base.packedUpstreamLedgerRawRead({root,read});
 }
 /** A cross-checkout caller uses that checkout's actual current owner. */
-function foreign(root,read){
- const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version;
+function foreign(root,read,allowMissing=false){
+ let raw;try{raw=read('projects/ngx-material-legacy/package.json');}catch(error){if(allowMissing&&error.code==='ENOENT')return null;throw error;}
+ const version=JSON.parse(raw).version;
  if(version.startsWith('21.'))return null;
  assert.ok(version.startsWith('22.'),'unsupported canonical owner line');
  const path=resolve(root,OWNER);assert.notEqual(path,resolve(ROOT,OWNER),'foreign line supplied to21.x owner');
@@ -50,6 +53,11 @@ function foreign(root,read){
 }
 function context(root,read){
  assert.equal(resolve(root),ROOT,'wrong21.x canonical owner checkout');
+ const frameRaw=read(FRAMES);assert.equal(hash(frameRaw),FRAMES_HASH,'changed accepted ledger-frame catalog');
+ const frames=JSON.parse(frameRaw);assert.equal(frames.schema_version,1);assert.equal(frames.line,'21.x');
+ assert.equal(frames.frames.length,21);assert.equal(new Set(frames.frames.map(frame=>frame.sha256)).size,21);
+ const ledgerRaw=read(LEDGER),currentHash=hash(ledgerRaw);
+ assert.ok(frames.frames.some(frame=>frame.sha256===currentHash&&frame.bytes===ledgerRaw.length),'not an accepted complete ledger frame');
  const raw=read(PACKET);assert.equal(hash(raw),PACKET_HASH,'changed title canonical packet');const packet=JSON.parse(raw);
  assert.equal(packet.source_parent,AUTHORITY);assert.equal(packet.line,'21.x');assert.equal(packet.individual_decisions,1);
  assert.equal(packet.metadata_tokens,14);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.unselected_judgments_changed,0);
@@ -68,12 +76,12 @@ function context(root,read){
    "export function validateHistoricalBehavior({root, entry, proof, request}) {\n  if (entry?.sha === '642d886ef117721a34c98055391c9055fde29607') return validateDialogTitleNative({root, entry, proof, request});\n  try {"],
  ]){assert.equal(nativeExpected.split(from).length,2);nativeExpected=nativeExpected.replace(from,to);}
  assert.equal(hash(nativeExpected),TITLE_NATIVE_AFTER);assert.equal(read(TITLE_NATIVE_REGISTRY).toString(),nativeExpected);
- const currentHash=hash(read(LEDGER)),body=JSON.parse(read(title.TITLE_REVIEW));
+ const body=JSON.parse(read(title.TITLE_REVIEW));
  const stage=applyDialogTitleCanonicalStage({before,body,selected:packet.metadata_selection});
  assert.equal(hash(stage.after),AFTER);assert.deepEqual(packet.after,{path:LEDGER,sha256:AFTER,bytes:stage.after.length});
  assert.equal(hash(stage.metadataAfter),packet.metadata_ledger_sha256);
  const own={path:OWNER,sha256:hash(image),bytes:image.length};
- const bound=[own,{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},...packet.source_members,packet.root_checker];
+ const bound=[own,{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members,packet.root_checker];
  const assertTools=()=>{
   for(const member of bound){const value=read(member.path);assert.equal(hash(value),member.sha256,'changed title owner binding '+member.path);if(member.bytes!==undefined)assert.equal(value.length,member.bytes);}
  };
@@ -84,9 +92,11 @@ function context(root,read){
  // fallback programs, and no product source is projected.
  const metadataRead=path=>{
   if(path===METADATA_ROLE)return metadataToken;
-  if(path===OWNER){assertTools();return Buffer.from(baseImage);}
-  if(path===TITLE_NATIVE_REGISTRY){assertTools();return Buffer.from(nativeBefore);}
-  if(path==='scripts/autocomplete-selection-native-subject.mjs'){assertTools();return original(root,path);}
+  if(path===OWNER){assert.equal(hash(read(path)),own.sha256,'changed current owner metadata source');return Buffer.from(baseImage);}
+  if(path===TITLE_NATIVE_REGISTRY){assert.equal(hash(read(path)),TITLE_NATIVE_AFTER,'changed current native metadata source');return Buffer.from(nativeBefore);}
+  if(path==='scripts/autocomplete-selection-native-subject.mjs'){
+   assert.equal(hash(read(path)),bound.find(member=>member.path===path).sha256,'changed current native-subject metadata source');return original(root,path);
+  }
   if(path===LEDGER&&currentHash===AFTER){assertTools();return Buffer.from(before);}
   return read(path);
  };
@@ -101,7 +111,7 @@ function actualBound(prior,ctx){
  return bound;
 }
 export function packedUpstreamLedgerRawRead({root=process.cwd(),read=disk(root)}={}){
- read=unwrap(root,read);const remote=foreign(root,read);return remote?remote.packedUpstreamLedgerRawRead({root,read}):read;
+ read=unwrap(root,read);const remote=foreign(root,read,true);return remote?remote.packedUpstreamLedgerRawRead({root,read}):read;
 }
 export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});
@@ -138,7 +148,8 @@ export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root
  const before=original(root,prior.path);assert.equal(hash(before),prior.sha256,'unqualified canonical tool prior');
  if(prior.bytes!==undefined)assert.equal(before.length,prior.bytes);
  const raw=read(PACKET);assert.equal(hash(raw),PACKET_HASH);const packet=JSON.parse(raw);
- const bound=[{path:OWNER,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},...packet.source_members,packet.root_checker].map(member=>({...member,bytes:member.bytes??read(member.path).length}));
+ const frameRaw=read(FRAMES);assert.equal(hash(frameRaw),FRAMES_HASH,'changed accepted ledger-frame catalog');
+ const bound=[{path:OWNER,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members,packet.root_checker].map(member=>({...member,bytes:member.bytes??read(member.path).length}));
  const assertCurrent=()=>{for(const member of bound){const value=read(member.path);assert.equal(hash(value),member.sha256,'changed current canonical tool '+member.path);if(member.bytes!==undefined)assert.equal(value.length,member.bytes);}};
  assertCurrent();const value=read(prior.path),reference={path:prior.path,sha256:hash(value),bytes:value.length};
  return {reference,bound:structuredClone(bound),assertCurrent,individual_source_decisions:1,metadata_tokens:14,old_tool_bytes_exposed:false,current_native_or_packed_qualified:false};

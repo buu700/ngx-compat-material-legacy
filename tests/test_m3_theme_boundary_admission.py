@@ -18,6 +18,7 @@ class M3ThemeBoundaryAdmissionTests(unittest.TestCase):
         from m3_theme_boundary_ledger_patch import verify_boundary_successor, LEDGER, SHAS
         report = verify_boundary_successor()
         self.assertEqual(report['individual_decisions'], 5)
+        self.assertTrue(report['exact_title_successor_verified'])
         self.assertEqual(report['unselected_entry_bytes_preserved'], 1692)
         self.assertEqual(report['pending_security_reviews'], 1)
         original = json.loads((ROOT / LEDGER).read_bytes())
@@ -46,10 +47,12 @@ class M3ThemeBoundaryAdmissionTests(unittest.TestCase):
         child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=180)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-7000:])
         report = json.loads(child.stdout)
-        for key, expected in [('current_source_admissions',40),('previous_source_admissions',35),('pure_metadata_cases',5),
+        for key, expected in [('current_source_admissions',41),('previous_source_admissions',35),('pure_metadata_cases',5),
                               ('metadata_rejections',35),('source_rejections',6),('real_root_checker_positive_rows',5),
                               ('real_root_checker_rejected_rows',11),('rejection_controls',10)]:
             self.assertEqual(report[key], expected, key)
+        self.assertEqual(report['title_source_admissions'], 1)
+        self.assertEqual(report['title_native_metadata_tokens'], 14)
         self.assertTrue(report['pure_metadata_without_filesystem_or_compiler_bindings'])
         self.assertTrue(report['five_declined_decisions_individually_enforced'])
         self.assertTrue(report['declined_source_fault_cannot_bypass'])

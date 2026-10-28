@@ -30,6 +30,18 @@ assert.equal(prepared.entries_changed, 85); assert.equal(prepared.scalar_tokens_
 assert.equal(read(ledgerPath).equals(prepared.canonical_after), true);
 assert.equal(JSON.parse(read(ledgerPath)).entries.length, 1697);
 cases.push('actual-canonical-ledger-is-exact-qualified-successor-after-image');
+const framePath='compatibility/rc/21x-c04-dialog-title-replacement-retained-ledger-frames.json';
+let frameCount=0;
+if(input.line==='21.x'){
+ const catalog=JSON.parse(read(framePath));
+ const stageNames=['testing_api_stage','sass_stage','rules_js_stage','summary_stage','autocomplete_landscape_stage','native_spec_metadata_stage','selection_native_stage','historical_wrapper_metadata_stage','historical_consumer_wrapper_metadata_stage','legacy_sass_entrypoint_stage','checker_reference_metadata_stage','token_build_stage','unthemable_stage','registered_checker_metadata_stage','modern_control_base_stage','theme_token_root_stage','form_field_tokenization_stage','m3_theme_boundary_stage','title_stage'];
+ const frames=[{role:'before',raw:prepared.before},{role:'initial-metadata',raw:prepared.after},...stageNames.map(role=>({role,raw:prepared[role].after}))].map(({role,raw})=>({role,sha256:hash(raw),bytes:raw.length}));
+ assert.deepEqual(catalog.frames,frames);assert.equal(new Set(frames.map(frame=>frame.sha256)).size,21);
+ assert.equal(catalog.prior_owner.sha256,hash(read(catalog.prior_owner.path)));
+ assert.equal(catalog.title_transition.sha256,hash(read(catalog.title_transition.path)));
+ assert.equal(catalog.new_dispositions,0);assert.equal(catalog.actual_native_artifact_browser_floor_or_full_audit_qualified,false);
+ frameCount=frames.length;cases.push('finite-frame-catalog-equals-every-independently-prepared-complete-stage');
+}
 const epoch = packedUpstreamLedgerEpoch({root, read}); assert.equal(epoch.applied, true);
 assert.equal(epoch.raw, read); assert.equal(epoch.read(ledgerPath).equals(prepared.before), true);
 assert.deepEqual(epoch.projected_metadata_paths, [ledgerPath]);
@@ -50,6 +62,16 @@ cases.push('public-metadata-cannot-change-private-reader-state-or-projection-sco
 
 function rejects(id, corrupt) {
   assert.throws(() => packedUpstreamLedgerEpoch({root, read: corrupt}), undefined, id); rejected.push(id);
+}
+if(input.line==='21.x'){
+ const touched=new Set();
+ assert.throws(()=>packedUpstreamLedgerEpoch({root,read:path=>{touched.add(path);return path===ledgerPath?Buffer.concat([read(path),Buffer.from(' ')]):read(path);}}),/not an accepted complete ledger frame/);
+ assert.equal(touched.has('scripts/packed-upstream-ledger-base.mjs'),false);
+ assert.equal(touched.has('compatibility/rc/21x-c04-dialog-title-replacement-canonical-qualified-owner-source-measurement.json'),false);
+ rejected.push('unknown-ledger-frame-rejected-before-expensive-source-preparation');
+ rejects('changed-complete-ledger-frame-catalog',path=>path===framePath?Buffer.concat([read(path),Buffer.from(' ')]):read(path));
+ let late=false;const live=packedUpstreamLedgerEpoch({root,read:path=>late&&path===framePath?Buffer.concat([read(path),Buffer.from(' ')]):read(path)});
+ late=true;assert.throws(()=>live.read(ledgerPath));rejected.push('late-complete-ledger-frame-catalog-change');
 }
 rejects('changed-qualified-inputs', path => path === inputPath ? Buffer.concat([read(path), Buffer.from(' ')]) : read(path));
 const wrongLine = {...input, line: input.line === 'main' ? '21.x' : 'main'};
@@ -104,7 +126,11 @@ assert.equal(snackDomRawCurrentRead({root, read: context.read})(ledgerPath).equa
 cases.push('complete-existing-historical-context-and-native-unwrapping-use-correct-ledger-epochs');
 assert.equal(epoch.testing_api_decisions_applied,input.line==='21.x'?7:0);
 assert.equal(epoch.sass_decisions_applied,6);
-assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?27:13);
+assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?41:13);
+if(input.line==='21.x'){
+ assert.equal(epoch.title_source_decisions_applied,1);
+ assert.equal(epoch.title_native_registry_metadata_tokens_applied,14);
+}
 assert.equal(epoch.token_build_decisions_applied,input.line==='21.x'?1:0);
 assert.equal(epoch.unthemable_source_decisions_applied,input.line==='21.x'?5:0);
 assert.equal(epoch.registered_checker_metadata_tokens_applied,input.line==='21.x'?14:0);
@@ -266,6 +292,7 @@ console.log(JSON.stringify({line: input.line, result: 'pass', cases, rejected,
   canonical_entries: 1697, qualified_source_entries: 85, changed_scalar_tokens: 179,
   source_context_members: 20, packed_epoch_members: 16, original_dispositions_changed: epoch.individual_decisions_applied,
   selection_source_decisions:epoch.selection_native_decisions_applied,selection_registry_digest_updates:epoch.selection_native_registry_digests_applied,
+  complete_ledger_frames:frameCount,title_source_decisions:epoch.title_source_decisions_applied??0,title_registry_metadata_tokens:epoch.title_native_registry_metadata_tokens_applied??0,
   analysis_python_version: prepared.analysis_python_version,
   actual_current_canonical_after_sha256: hash(read(ledgerPath)), historical_before_sha256: hash(prepared.before),
   source_owner_sha256: hash(read(owner)), producer_sha256: hash(read('tests/packed_upstream_ledger_epoch_probe.mjs')),

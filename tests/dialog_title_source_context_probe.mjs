@@ -17,6 +17,7 @@ import {snackDomRawCurrentRead,dialogTitlePriorMetadataRead,inspectSnackCurrentD
 import {autocompleteSelectionReaderSubject} from '../scripts/autocomplete-selection-spec-subject.mjs';
 import {RULES_JS_BUILD_REPORT,RULES_JS_BUILD_SHAS,rulesJsBuildEntryEvidenceOk} from '../scripts/upstream-rules-js-build-admission.mjs';
 import {testingApi21xEntryEvidenceOk} from '../scripts/upstream-testing-api-21x-admission.mjs';
+import {retainedTitleOwnerReference} from './dialog_title_retained_subjects.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),main=resolve(root,'../../codex-closeout-main/ngx-compat-material-legacy');
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const impact=JSON.parse(readFileSync(join(root,'compatibility/rc/dialog-title-current-source-impact.json')));
@@ -48,10 +49,12 @@ for(const [line,directory]of [['21.x',root],['main',main]]){
 }
 const disk=path=>readFileSync(join(root,path));let late=null;const read=path=>path===late?Buffer.concat([disk(path),Buffer.from('\n')]):disk(path);
 const readers=dialogTitleReaderSubject({root,read,line:'21.x'}),packet=JSON.parse(disk('compatibility/rc/dialog-title-current-source-reader-successors.json'));
+const currentOwner=retainedTitleOwnerReference({root,read});
+const currentReaderRef=row=>row.path===currentOwner.path?currentOwner:{path:row.path,...row.after};
 assert.equal(packet.code_subjects.length,9);
 for(const row of packet.code_subjects){
  const before=original(root,packet.source_parent,row.path);assert.equal(hash(before),row.before.sha256);
- assert.deepEqual(readers.qualify({path:row.path,...row.before}),{path:row.path,...row.after});
+ assert.deepEqual(readers.qualify({path:row.path,...row.before}),currentReaderRef(row));
  assert.deepEqual(readers.historicalReference({path:row.path,...row.after}),{path:row.path,...row.before});metadataCases++;
 }
 for(const member of readers.bound){
@@ -91,7 +94,7 @@ try{
 
 const shared=autocompleteSelectionReaderSubject({root,read,line:'21.x'});shared.assertCurrent();
 for(const image of DIALOG_TITLE_SOURCE_IMAGES)assert.equal(shared.qualify({path:image.path,sha256:image.before}).sha256,image.after);
-for(const row of packet.code_subjects)assert.equal(shared.qualify({path:row.path,...row.before}).sha256,row.after.sha256);
+for(const row of packet.code_subjects)assert.equal(shared.qualify({path:row.path,...row.before}).sha256,currentReaderRef(row).sha256);
 const historical=dialogTitlePriorMetadataRead({root,read});
 for(const image of DIALOG_TITLE_SOURCE_IMAGES)assert.equal(hash(historical(image.path)),image.before);
 const current=inspectSnackCurrentDialogContracts({root,read:historical});
@@ -113,6 +116,6 @@ const testing=ledger.entries.find(row=>row.sha===testingBody.reviews[0].sha);ass
 const productPaths=()=>JSON.parse(disk('compatibility/rc/packed-upstream-source-build.json')).candidate_context.product_members.map(ref=>ref.path).filter(path=>/\.(ts|scss|css|html)$/.test(path));
 assert.equal(testingApi21xEntryEvidenceOk({entry:testing,body:testingBody,read,productPaths,line:'21.x'}),true);
 late=DIALOG_TITLE_SOURCE_IMAGES[1].path;assert.equal(testingApi21xEntryEvidenceOk({entry:testing,body:testingBody,read,productPaths,line:'21.x'}),false);late=null;
-assert.equal(hash(disk('compatibility/f10/disposition-ledger/ledger.json')),'22f775835030f175795d8865e9b30920b0b7fea5b908cbd6a9dca7775a71d779');
+assert.equal(hash(disk('compatibility/f10/disposition-ledger/ledger.json')),'80123c4e8c4f7f43330553ffca84e51fea98e70f545234cf5359c11128e548d7');
 const report={schema_version:1,product_lines:lines,source_reader_line:'21.x',main_source_reader_port_qualified:true,metadata_cases:metadataCases,rejections,actual_fresh_build_source_positive:true,actual_testing_source_positive:true,both_real_source_checkers_reject_post_success_product_faults:true,raw_current_readers_expose_old_product_or_tool_bytes:false,historical_tool_metadata_images:packet.code_subjects.length,historical_tool_metadata_faults_rejected:historicalToolFaults,declared_peer_link_reads:peerPositive,source_traversal_or_nested_or_other_peer_links_rejected:peerRejected,canonical_ledger_unchanged:true,reader_hooks:packet.code_subjects.length,general_source_qualification_passed_21x:true,current_raw_dialog_graph_members:49,historical_title_metadata_unwrapped_for_current_admission:true,fake_current_before_frames_rejected:fakeBeforeRejected,general_source_product_faults_rejected:generalSourceFaults,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));
