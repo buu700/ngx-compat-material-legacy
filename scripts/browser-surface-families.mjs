@@ -12,6 +12,7 @@
  *   node scripts/browser-surface-families.mjs --tarball <path> --zoneless
  */
 import {npmToolingOptions} from './npm-tooling-options.mjs';
+import {browserPeerVersions,browserLibraryLine,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions} from './browser-peer-versions.mjs';
 import {createHash} from 'node:crypto';
 import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 import {observeLegacyCoreHighContrast,legacyCoreHighContrastOkay} from './legacy-core-high-contrast-contract.mjs';
@@ -49,9 +50,11 @@ function fail(code, message) {
 }
 
 let tarball = null;
+let describeInstall = false;
 let zoneless = false;
 let explicitReport = false;
 for (let i = 2; i < process.argv.length; i += 1) {
+  if (process.argv[i] === '--describe-install') {describeInstall = true;continue;}
   if (process.argv[i] === '--zoneless') {
     zoneless = true;
     if (!explicitReport) reportPath = join(root, 'compatibility/rc/reports/browser-surface-families-zoneless.json');
@@ -75,6 +78,12 @@ for (let i = 2; i < process.argv.length; i += 1) {
   fail(2, `Unknown argument: ${process.argv[i]}`);
 }
 if (!tarball) fail(2, '--tarball is required');
+const expectedLine = browserLibraryLine(JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')));
+const versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current', expectedLine});
+if (describeInstall) {
+  console.log(JSON.stringify({versions, dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${tarball}`}), compilerOptions: browserCompilerOptions(versions)}));
+  process.exit(0);
+}
 
 function resolveChromeBin() {
   if (process.env.CHROME_BIN && existsSync(process.env.CHROME_BIN)) return process.env.CHROME_BIN;
@@ -97,23 +106,7 @@ writeFileSync(installTarball, readFileSync(tarball));
 writeFileSync(join(consumer, 'package.json'), JSON.stringify({
   name: 'ngx-compat-surface-families-browser',
   private: true,
-  dependencies: {
-    '@angular/animations': '21.2.23',
-    '@angular/cdk': '21.2.14',
-    '@angular/common': '21.2.23',
-    '@angular/compiler': '21.2.23',
-    '@angular/compiler-cli': '21.2.23',
-    '@angular/core': '21.2.23',
-    '@angular/forms': '21.2.23',
-    '@angular/material': '21.2.14',
-    '@angular/platform-browser': '21.2.23',
-    '@angular/platform-browser-dynamic': '21.2.23',
-    '@ngx-compat/material-legacy': `file:${installTarball}`,
-    rxjs: '7.8.2',
-    tslib: '2.8.1',
-    typescript: '5.9.2',
-    ...(zoneless ? {} : {'zone.js': '0.15.1'}),
-  },
+  dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${installTarball}`}),
 }, null, 2));
 writeFileSync(join(consumer, '.npmrc'), 'install-links=true\nfund=false\naudit=false\n');
 const env = {...process.env, NODE_OPTIONS: ''};
@@ -327,18 +320,7 @@ platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicat
 });
 `);
 writeFileSync(join(consumer, 'tsconfig.json'), JSON.stringify({
-  compilerOptions: {
-    target: 'ES2022',
-    module: 'ES2022',
-    moduleResolution: 'bundler',
-    experimentalDecorators: true,
-    strict: true,
-    skipLibCheck: true,
-    lib: ['ES2022', 'DOM'],
-    rootDir: 'src',
-    outDir: 'out',
-    types: [],
-  },
+  compilerOptions: browserCompilerOptions(versions),
   files: ['src/main.ts'],
   angularCompilerOptions: {compilationMode: 'full', strictTemplates: true},
 }, null, 2));

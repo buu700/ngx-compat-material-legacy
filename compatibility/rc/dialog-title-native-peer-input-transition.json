@@ -1,0 +1,434 @@
+{
+  "schema_version": 1,
+  "role": "Exact fixture input transport; not execution or native qualification",
+  "records": [
+    {
+      "line": "21.x",
+      "path": "scripts/browser-dialog-escape.mjs",
+      "before_sha256": "71d6be5191fbb2e5ad58939a36cd516c38416c9093dba909459c0ba429645cae",
+      "after_sha256": "7fd8534b32cffb9d67cb31f3082edceb8cd711c8984854c6f1b333d531497038",
+      "literal_edits": [
+        {
+          "before": "import {npmToolingOptions} from './npm-tooling-options.mjs';",
+          "after": "import {npmToolingOptions} from './npm-tooling-options.mjs';\nimport {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions} from './browser-peer-versions.mjs';"
+        },
+        {
+          "before": "let tarball = null;",
+          "after": "let tarball = null;\nlet describeInstall = false;"
+        },
+        {
+          "before": "for (let i = 2; i < process.argv.length; i += 1) {",
+          "after": "for (let i = 2; i < process.argv.length; i += 1) {\n  if (process.argv[i] === '--describe-install') {describeInstall = true;continue;}"
+        },
+        {
+          "before": "if (!tarball) fail(2, '--tarball is required');",
+          "after": "if (!tarball) fail(2, '--tarball is required');\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});\nif (describeInstall) {\n  console.log(JSON.stringify({versions, dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${tarball}`}), compilerOptions: browserCompilerOptions(versions)}));\n  process.exit(0);\n}"
+        },
+        {
+          "before": "  dependencies: {\n    '@angular/cdk': '22.1.7',\n    '@angular/common': '22.1.7',\n    '@angular/compiler': '22.1.7',\n    '@angular/compiler': '22.1.7',\n    '@angular/compiler-cli': '22.1.7',\n    '@angular/core': '22.1.7',\n    '@angular/forms': '22.1.7',\n    '@angular/material': '22.1.7',\n    '@angular/platform-browser': '22.1.7',\n    '@angular/platform-browser-dynamic': '22.1.7',\n    '@ngx-compat/material-legacy': `file:${installTarball}`,\n    rxjs: '7.8.2',\n    tslib: '2.8.1',\n    typescript: '6.0.3',\n    ...(zoneless ? {} : {'zone.js': '0.16.3'}),\n  }",
+          "after": "  dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${installTarball}`})"
+        },
+        {
+          "before": "  compilerOptions: {\n    target: 'ES2022',\n    module: 'ES2022',\n    moduleResolution: 'bundler',\n    experimentalDecorators: true,\n    strict: true,\n    skipLibCheck: true,\n    lib: ['ES2022', 'DOM'],\n    rootDir: 'src',\n    outDir: 'out',\n    types: [],\n  }",
+          "after": "  compilerOptions: browserCompilerOptions(versions)"
+        },
+        {
+          "before": "import {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}",
+          "after": "import {browserPeerVersions,browserLibraryLine,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}"
+        },
+        {
+          "before": "const versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});",
+          "after": "const expectedLine = browserLibraryLine(JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')));\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current', expectedLine});"
+        }
+      ],
+      "source_parent": "30bbb22b45b0d28ecf307fe1f9754aa955777516"
+    },
+    {
+      "line": "21.x",
+      "path": "scripts/browser-overlay-families.mjs",
+      "before_sha256": "56149a8035b50ae8dd22c62fb944a0278868a5020cb627da2da41227506b0596",
+      "after_sha256": "fe795ab1fa627aa32d68d7c480923b8445cea0ea651598429a248b1c84c69f35",
+      "literal_edits": [
+        {
+          "before": "import {npmToolingOptions} from './npm-tooling-options.mjs';",
+          "after": "import {npmToolingOptions} from './npm-tooling-options.mjs';\nimport {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions} from './browser-peer-versions.mjs';"
+        },
+        {
+          "before": "let tarball = null;",
+          "after": "let tarball = null;\nlet describeInstall = false;"
+        },
+        {
+          "before": "for (let i = 2; i < process.argv.length; i += 1) {",
+          "after": "for (let i = 2; i < process.argv.length; i += 1) {\n  if (process.argv[i] === '--describe-install') {describeInstall = true;continue;}"
+        },
+        {
+          "before": "if (!tarball) fail(2, '--tarball is required');",
+          "after": "if (!tarball) fail(2, '--tarball is required');\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});\nif (describeInstall) {\n  console.log(JSON.stringify({versions, dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${tarball}`}), compilerOptions: browserCompilerOptions(versions)}));\n  process.exit(0);\n}"
+        },
+        {
+          "before": "  dependencies: {\n    '@angular/animations': '22.1.7',\n    '@angular/cdk': '22.1.7',\n    '@angular/common': '22.1.7',\n    '@angular/compiler': '22.1.7',\n    '@angular/compiler-cli': '22.1.7',\n    '@angular/core': '22.1.7',\n    '@angular/forms': '22.1.7',\n    '@angular/material': '22.1.7',\n    '@angular/platform-browser': '22.1.7',\n    '@angular/platform-browser-dynamic': '22.1.7',\n    '@ngx-compat/material-legacy': `file:${installTarball}`,\n    rxjs: '7.8.2',\n    tslib: '2.8.1',\n    typescript: '6.0.3',\n    ...(zoneless ? {} : {'zone.js': '0.16.3'}),\n  }",
+          "after": "  dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${installTarball}`})"
+        },
+        {
+          "before": "  compilerOptions: {\n    target: 'ES2022',\n    module: 'ES2022',\n    moduleResolution: 'bundler',\n    experimentalDecorators: true,\n    strict: true,\n    skipLibCheck: true,\n    lib: ['ES2022', 'DOM'],\n    rootDir: 'src',\n    outDir: 'out',\n    types: [],\n  }",
+          "after": "  compilerOptions: browserCompilerOptions(versions)"
+        },
+        {
+          "before": "import {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}",
+          "after": "import {browserPeerVersions,browserLibraryLine,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}"
+        },
+        {
+          "before": "const versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});",
+          "after": "const expectedLine = browserLibraryLine(JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')));\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current', expectedLine});"
+        }
+      ],
+      "source_parent": "30bbb22b45b0d28ecf307fe1f9754aa955777516"
+    },
+    {
+      "line": "21.x",
+      "path": "scripts/browser-form-families.mjs",
+      "before_sha256": "f7e2529c2563068d12ae8055ddf70d43edfacd1a49aba90693e2c5511227e5cf",
+      "after_sha256": "be36cfbe1d51dbee6edd4e9a9a0dc6c3bf2b4567a3e7b6fae75c050cc51653ba",
+      "literal_edits": [
+        {
+          "before": "import {npmToolingOptions} from './npm-tooling-options.mjs';",
+          "after": "import {npmToolingOptions} from './npm-tooling-options.mjs';\nimport {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions} from './browser-peer-versions.mjs';"
+        },
+        {
+          "before": "let tarball = null;",
+          "after": "let tarball = null;\nlet describeInstall = false;"
+        },
+        {
+          "before": "for (let i = 2; i < process.argv.length; i += 1) {",
+          "after": "for (let i = 2; i < process.argv.length; i += 1) {\n  if (process.argv[i] === '--describe-install') {describeInstall = true;continue;}"
+        },
+        {
+          "before": "if (!tarball) fail(2, '--tarball is required');",
+          "after": "if (!tarball) fail(2, '--tarball is required');\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});\nif (describeInstall) {\n  console.log(JSON.stringify({versions, dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${tarball}`}), compilerOptions: browserCompilerOptions(versions)}));\n  process.exit(0);\n}"
+        },
+        {
+          "before": "  dependencies: {\n    '@angular/animations': '22.1.7',\n    '@angular/cdk': '22.1.7',\n    '@angular/common': '22.1.7',\n    '@angular/compiler': '22.1.7',\n    '@angular/compiler-cli': '22.1.7',\n    '@angular/core': '22.1.7',\n    '@angular/forms': '22.1.7',\n    '@angular/material': '22.1.7',\n    '@angular/platform-browser': '22.1.7',\n    '@angular/platform-browser-dynamic': '22.1.7',\n    '@ngx-compat/material-legacy': `file:${installTarball}`,\n    rxjs: '7.8.2',\n    tslib: '2.8.1',\n    typescript: '6.0.3',\n    ...(zoneless ? {} : {'zone.js': '0.16.3'}),\n  }",
+          "after": "  dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${installTarball}`})"
+        },
+        {
+          "before": "  compilerOptions: {\n    target: 'ES2022',\n    module: 'ES2022',\n    moduleResolution: 'bundler',\n    experimentalDecorators: true,\n    strict: true,\n    skipLibCheck: true,\n    lib: ['ES2022', 'DOM'],\n    rootDir: 'src',\n    outDir: 'out',\n    types: [],\n  }",
+          "after": "  compilerOptions: browserCompilerOptions(versions)"
+        },
+        {
+          "before": "import {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}",
+          "after": "import {browserPeerVersions,browserLibraryLine,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}"
+        },
+        {
+          "before": "const versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});",
+          "after": "const expectedLine = browserLibraryLine(JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')));\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current', expectedLine});"
+        }
+      ],
+      "source_parent": "30bbb22b45b0d28ecf307fe1f9754aa955777516"
+    },
+    {
+      "line": "21.x",
+      "path": "scripts/browser-control-families.mjs",
+      "before_sha256": "6971b715c3797c2eec509379a89050f73aa13e9aef6b4a1b6ed1647f880a8f08",
+      "after_sha256": "e6cb4fa2b086b6ee9e437e8f7501fc4ba274fe547a95676cbedc18ed15eb7cc3",
+      "literal_edits": [
+        {
+          "before": "import {npmToolingOptions} from './npm-tooling-options.mjs';",
+          "after": "import {npmToolingOptions} from './npm-tooling-options.mjs';\nimport {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions} from './browser-peer-versions.mjs';"
+        },
+        {
+          "before": "let tarball = null;",
+          "after": "let tarball = null;\nlet describeInstall = false;"
+        },
+        {
+          "before": "for (let i = 2; i < process.argv.length; i += 1) {",
+          "after": "for (let i = 2; i < process.argv.length; i += 1) {\n  if (process.argv[i] === '--describe-install') {describeInstall = true;continue;}"
+        },
+        {
+          "before": "if (!tarball) fail(2, '--tarball is required');",
+          "after": "if (!tarball) fail(2, '--tarball is required');\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});\nif (describeInstall) {\n  console.log(JSON.stringify({versions, dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${tarball}`}), compilerOptions: browserCompilerOptions(versions)}));\n  process.exit(0);\n}"
+        },
+        {
+          "before": "  dependencies: {\n    '@angular/animations': '22.1.7',\n    '@angular/cdk': '22.1.7',\n    '@angular/common': '22.1.7',\n    '@angular/compiler': '22.1.7',\n    '@angular/compiler-cli': '22.1.7',\n    '@angular/core': '22.1.7',\n    '@angular/forms': '22.1.7',\n    '@angular/material': '22.1.7',\n    '@angular/platform-browser': '22.1.7',\n    '@angular/platform-browser-dynamic': '22.1.7',\n    '@ngx-compat/material-legacy': `file:${installTarball}`,\n    rxjs: '7.8.2',\n    tslib: '2.8.1',\n    typescript: '6.0.3',\n    ...(zoneless ? {} : {'zone.js': '0.16.3'}),\n  }",
+          "after": "  dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${installTarball}`})"
+        },
+        {
+          "before": "  compilerOptions: {\n    target: 'ES2022',\n    module: 'ES2022',\n    moduleResolution: 'bundler',\n    experimentalDecorators: true,\n    strict: true,\n    skipLibCheck: true,\n    lib: ['ES2022', 'DOM'],\n    rootDir: 'src',\n    outDir: 'out',\n    types: [],\n  }",
+          "after": "  compilerOptions: browserCompilerOptions(versions)"
+        },
+        {
+          "before": "import {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}",
+          "after": "import {browserPeerVersions,browserLibraryLine,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}"
+        },
+        {
+          "before": "const versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});",
+          "after": "const expectedLine = browserLibraryLine(JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')));\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current', expectedLine});"
+        }
+      ],
+      "source_parent": "30bbb22b45b0d28ecf307fe1f9754aa955777516"
+    },
+    {
+      "line": "21.x",
+      "path": "scripts/browser-surface-families.mjs",
+      "before_sha256": "e7f9794c2919de9394ac0926dcd695fa7f1c46b457b3b1b67a303fd030748ae2",
+      "after_sha256": "eb1174d483d0204ea7aa984d345427a331705a1e132beb9b5b1dec9a2c63827e",
+      "literal_edits": [
+        {
+          "before": "import {npmToolingOptions} from './npm-tooling-options.mjs';",
+          "after": "import {npmToolingOptions} from './npm-tooling-options.mjs';\nimport {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions} from './browser-peer-versions.mjs';"
+        },
+        {
+          "before": "let tarball = null;",
+          "after": "let tarball = null;\nlet describeInstall = false;"
+        },
+        {
+          "before": "for (let i = 2; i < process.argv.length; i += 1) {",
+          "after": "for (let i = 2; i < process.argv.length; i += 1) {\n  if (process.argv[i] === '--describe-install') {describeInstall = true;continue;}"
+        },
+        {
+          "before": "if (!tarball) fail(2, '--tarball is required');",
+          "after": "if (!tarball) fail(2, '--tarball is required');\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});\nif (describeInstall) {\n  console.log(JSON.stringify({versions, dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${tarball}`}), compilerOptions: browserCompilerOptions(versions)}));\n  process.exit(0);\n}"
+        },
+        {
+          "before": "  dependencies: {\n    '@angular/animations': '21.2.23',\n    '@angular/cdk': '21.2.14',\n    '@angular/common': '21.2.23',\n    '@angular/compiler': '21.2.23',\n    '@angular/compiler-cli': '21.2.23',\n    '@angular/core': '21.2.23',\n    '@angular/forms': '21.2.23',\n    '@angular/material': '21.2.14',\n    '@angular/platform-browser': '21.2.23',\n    '@angular/platform-browser-dynamic': '21.2.23',\n    '@ngx-compat/material-legacy': `file:${installTarball}`,\n    rxjs: '7.8.2',\n    tslib: '2.8.1',\n    typescript: '5.9.2',\n    ...(zoneless ? {} : {'zone.js': '0.15.1'}),\n  }",
+          "after": "  dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${installTarball}`})"
+        },
+        {
+          "before": "  compilerOptions: {\n    target: 'ES2022',\n    module: 'ES2022',\n    moduleResolution: 'bundler',\n    experimentalDecorators: true,\n    strict: true,\n    skipLibCheck: true,\n    lib: ['ES2022', 'DOM'],\n    rootDir: 'src',\n    outDir: 'out',\n    types: [],\n  }",
+          "after": "  compilerOptions: browserCompilerOptions(versions)"
+        },
+        {
+          "before": "import {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}",
+          "after": "import {browserPeerVersions,browserLibraryLine,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}"
+        },
+        {
+          "before": "const versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});",
+          "after": "const expectedLine = browserLibraryLine(JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')));\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current', expectedLine});"
+        }
+      ],
+      "source_parent": "30bbb22b45b0d28ecf307fe1f9754aa955777516"
+    },
+    {
+      "line": "21.x",
+      "path": "scripts/browser-required-cells.mjs",
+      "before_sha256": "b0de8ab6022afd7be62d8154f389d9954fa75878c11a3c2f586aea50b5a28d38",
+      "after_sha256": "b20d02256e9f560efcfa5a93ca5512c2a859209486d16d4fd7714f1ca548a127",
+      "scope": "Only shared peer/dependency/compiler input ownership; all lab sources, probes, cells and predicates retain their existing bodies.",
+      "source_parent": "30bbb22b45b0d28ecf307fe1f9754aa955777516"
+    },
+    {
+      "line": "main",
+      "path": "scripts/browser-dialog-escape.mjs",
+      "before_sha256": "11aa625f8303abc34bfd6c6b8a2ff3c1f2416e1dc47f92c70e8f00eb6306762a",
+      "after_sha256": "7fd8534b32cffb9d67cb31f3082edceb8cd711c8984854c6f1b333d531497038",
+      "literal_edits": [
+        {
+          "before": "import {npmToolingOptions} from './npm-tooling-options.mjs';",
+          "after": "import {npmToolingOptions} from './npm-tooling-options.mjs';\nimport {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions} from './browser-peer-versions.mjs';"
+        },
+        {
+          "before": "let tarball = null;",
+          "after": "let tarball = null;\nlet describeInstall = false;"
+        },
+        {
+          "before": "for (let i = 2; i < process.argv.length; i += 1) {",
+          "after": "for (let i = 2; i < process.argv.length; i += 1) {\n  if (process.argv[i] === '--describe-install') {describeInstall = true;continue;}"
+        },
+        {
+          "before": "if (!tarball) fail(2, '--tarball is required');",
+          "after": "if (!tarball) fail(2, '--tarball is required');\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});\nif (describeInstall) {\n  console.log(JSON.stringify({versions, dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${tarball}`}), compilerOptions: browserCompilerOptions(versions)}));\n  process.exit(0);\n}"
+        },
+        {
+          "before": "  dependencies: {\n    '@angular/cdk': '22.1.7',\n    '@angular/common': '22.1.7',\n    '@angular/compiler': '22.1.7',\n    '@angular/compiler': '22.1.7',\n    '@angular/compiler-cli': '22.1.7',\n    '@angular/core': '22.1.7',\n    '@angular/forms': '22.1.7',\n    '@angular/material': '22.1.7',\n    '@angular/platform-browser': '22.1.7',\n    '@angular/platform-browser-dynamic': '22.1.7',\n    '@ngx-compat/material-legacy': `file:${installTarball}`,\n    rxjs: '7.8.2',\n    tslib: '2.8.1',\n    typescript: '6.0.3',\n    ...(zoneless ? {} : {'zone.js': '0.16.3'}),\n  }",
+          "after": "  dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${installTarball}`})"
+        },
+        {
+          "before": "  compilerOptions: {\n    target: 'ES2022',\n    module: 'ES2022',\n    moduleResolution: 'bundler',\n    experimentalDecorators: true,\n    strict: true,\n    skipLibCheck: true,\n    lib: ['ES2022', 'DOM'],\n    rootDir: 'src',\n    outDir: 'out',\n    types: [],\n    ignoreDeprecations: '6.0',\n  }",
+          "after": "  compilerOptions: browserCompilerOptions(versions)"
+        },
+        {
+          "before": "import {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}",
+          "after": "import {browserPeerVersions,browserLibraryLine,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}"
+        },
+        {
+          "before": "const versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});",
+          "after": "const expectedLine = browserLibraryLine(JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')));\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current', expectedLine});"
+        }
+      ],
+      "source_parent": "af68021d1d51597d4e74e8849d6074286d604ad4"
+    },
+    {
+      "line": "main",
+      "path": "scripts/browser-overlay-families.mjs",
+      "before_sha256": "6b2f97f5455e268bee5560253e65fe069c93ba70138e165de0fe1f1af6e0c25f",
+      "after_sha256": "fe795ab1fa627aa32d68d7c480923b8445cea0ea651598429a248b1c84c69f35",
+      "literal_edits": [
+        {
+          "before": "import {npmToolingOptions} from './npm-tooling-options.mjs';",
+          "after": "import {npmToolingOptions} from './npm-tooling-options.mjs';\nimport {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions} from './browser-peer-versions.mjs';"
+        },
+        {
+          "before": "let tarball = null;",
+          "after": "let tarball = null;\nlet describeInstall = false;"
+        },
+        {
+          "before": "for (let i = 2; i < process.argv.length; i += 1) {",
+          "after": "for (let i = 2; i < process.argv.length; i += 1) {\n  if (process.argv[i] === '--describe-install') {describeInstall = true;continue;}"
+        },
+        {
+          "before": "if (!tarball) fail(2, '--tarball is required');",
+          "after": "if (!tarball) fail(2, '--tarball is required');\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});\nif (describeInstall) {\n  console.log(JSON.stringify({versions, dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${tarball}`}), compilerOptions: browserCompilerOptions(versions)}));\n  process.exit(0);\n}"
+        },
+        {
+          "before": "  dependencies: {\n    '@angular/animations': '22.1.7',\n    '@angular/cdk': '22.1.7',\n    '@angular/common': '22.1.7',\n    '@angular/compiler': '22.1.7',\n    '@angular/compiler-cli': '22.1.7',\n    '@angular/core': '22.1.7',\n    '@angular/forms': '22.1.7',\n    '@angular/material': '22.1.7',\n    '@angular/platform-browser': '22.1.7',\n    '@angular/platform-browser-dynamic': '22.1.7',\n    '@ngx-compat/material-legacy': `file:${installTarball}`,\n    rxjs: '7.8.2',\n    tslib: '2.8.1',\n    typescript: '6.0.3',\n    ...(zoneless ? {} : {'zone.js': '0.16.3'}),\n  }",
+          "after": "  dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${installTarball}`})"
+        },
+        {
+          "before": "  compilerOptions: {\n    target: 'ES2022',\n    module: 'ES2022',\n    moduleResolution: 'bundler',\n    experimentalDecorators: true,\n    strict: true,\n    skipLibCheck: true,\n    lib: ['ES2022', 'DOM'],\n    rootDir: 'src',\n    outDir: 'out',\n    types: [],\n    ignoreDeprecations: '6.0',\n  }",
+          "after": "  compilerOptions: browserCompilerOptions(versions)"
+        },
+        {
+          "before": "import {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}",
+          "after": "import {browserPeerVersions,browserLibraryLine,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}"
+        },
+        {
+          "before": "const versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});",
+          "after": "const expectedLine = browserLibraryLine(JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')));\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current', expectedLine});"
+        }
+      ],
+      "source_parent": "af68021d1d51597d4e74e8849d6074286d604ad4"
+    },
+    {
+      "line": "main",
+      "path": "scripts/browser-form-families.mjs",
+      "before_sha256": "51a2ec8be6da0fa2e9080fb19ec7fc5522dc7a3e52fd29ac42aaa38ef3569af4",
+      "after_sha256": "be36cfbe1d51dbee6edd4e9a9a0dc6c3bf2b4567a3e7b6fae75c050cc51653ba",
+      "literal_edits": [
+        {
+          "before": "import {npmToolingOptions} from './npm-tooling-options.mjs';",
+          "after": "import {npmToolingOptions} from './npm-tooling-options.mjs';\nimport {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions} from './browser-peer-versions.mjs';"
+        },
+        {
+          "before": "let tarball = null;",
+          "after": "let tarball = null;\nlet describeInstall = false;"
+        },
+        {
+          "before": "for (let i = 2; i < process.argv.length; i += 1) {",
+          "after": "for (let i = 2; i < process.argv.length; i += 1) {\n  if (process.argv[i] === '--describe-install') {describeInstall = true;continue;}"
+        },
+        {
+          "before": "if (!tarball) fail(2, '--tarball is required');",
+          "after": "if (!tarball) fail(2, '--tarball is required');\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});\nif (describeInstall) {\n  console.log(JSON.stringify({versions, dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${tarball}`}), compilerOptions: browserCompilerOptions(versions)}));\n  process.exit(0);\n}"
+        },
+        {
+          "before": "  dependencies: {\n    '@angular/animations': '22.1.7',\n    '@angular/cdk': '22.1.7',\n    '@angular/common': '22.1.7',\n    '@angular/compiler': '22.1.7',\n    '@angular/compiler-cli': '22.1.7',\n    '@angular/core': '22.1.7',\n    '@angular/forms': '22.1.7',\n    '@angular/material': '22.1.7',\n    '@angular/platform-browser': '22.1.7',\n    '@angular/platform-browser-dynamic': '22.1.7',\n    '@ngx-compat/material-legacy': `file:${installTarball}`,\n    rxjs: '7.8.2',\n    tslib: '2.8.1',\n    typescript: '6.0.3',\n    ...(zoneless ? {} : {'zone.js': '0.16.3'}),\n  }",
+          "after": "  dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${installTarball}`})"
+        },
+        {
+          "before": "  compilerOptions: {\n    target: 'ES2022',\n    module: 'ES2022',\n    moduleResolution: 'bundler',\n    experimentalDecorators: true,\n    strict: true,\n    skipLibCheck: true,\n    lib: ['ES2022', 'DOM'],\n    rootDir: 'src',\n    outDir: 'out',\n    types: [],\n    ignoreDeprecations: '6.0',\n  }",
+          "after": "  compilerOptions: browserCompilerOptions(versions)"
+        },
+        {
+          "before": "import {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}",
+          "after": "import {browserPeerVersions,browserLibraryLine,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}"
+        },
+        {
+          "before": "const versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});",
+          "after": "const expectedLine = browserLibraryLine(JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')));\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current', expectedLine});"
+        }
+      ],
+      "source_parent": "af68021d1d51597d4e74e8849d6074286d604ad4"
+    },
+    {
+      "line": "main",
+      "path": "scripts/browser-control-families.mjs",
+      "before_sha256": "e4480efedaa030bbb06a339c354b9348874c4e17e1cfc9d395a7b29fd8094d70",
+      "after_sha256": "e6cb4fa2b086b6ee9e437e8f7501fc4ba274fe547a95676cbedc18ed15eb7cc3",
+      "literal_edits": [
+        {
+          "before": "import {npmToolingOptions} from './npm-tooling-options.mjs';",
+          "after": "import {npmToolingOptions} from './npm-tooling-options.mjs';\nimport {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions} from './browser-peer-versions.mjs';"
+        },
+        {
+          "before": "let tarball = null;",
+          "after": "let tarball = null;\nlet describeInstall = false;"
+        },
+        {
+          "before": "for (let i = 2; i < process.argv.length; i += 1) {",
+          "after": "for (let i = 2; i < process.argv.length; i += 1) {\n  if (process.argv[i] === '--describe-install') {describeInstall = true;continue;}"
+        },
+        {
+          "before": "if (!tarball) fail(2, '--tarball is required');",
+          "after": "if (!tarball) fail(2, '--tarball is required');\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});\nif (describeInstall) {\n  console.log(JSON.stringify({versions, dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${tarball}`}), compilerOptions: browserCompilerOptions(versions)}));\n  process.exit(0);\n}"
+        },
+        {
+          "before": "  dependencies: {\n    '@angular/animations': '22.1.7',\n    '@angular/cdk': '22.1.7',\n    '@angular/common': '22.1.7',\n    '@angular/compiler': '22.1.7',\n    '@angular/compiler-cli': '22.1.7',\n    '@angular/core': '22.1.7',\n    '@angular/forms': '22.1.7',\n    '@angular/material': '22.1.7',\n    '@angular/platform-browser': '22.1.7',\n    '@angular/platform-browser-dynamic': '22.1.7',\n    '@ngx-compat/material-legacy': `file:${installTarball}`,\n    rxjs: '7.8.2',\n    tslib: '2.8.1',\n    typescript: '6.0.3',\n    ...(zoneless ? {} : {'zone.js': '0.16.3'}),\n  }",
+          "after": "  dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${installTarball}`})"
+        },
+        {
+          "before": "  compilerOptions: {\n    target: 'ES2022',\n    module: 'ES2022',\n    moduleResolution: 'bundler',\n    experimentalDecorators: true,\n    strict: true,\n    skipLibCheck: true,\n    lib: ['ES2022', 'DOM'],\n    rootDir: 'src',\n    outDir: 'out',\n    types: [],\n    ignoreDeprecations: '6.0',\n  }",
+          "after": "  compilerOptions: browserCompilerOptions(versions)"
+        },
+        {
+          "before": "import {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}",
+          "after": "import {browserPeerVersions,browserLibraryLine,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}"
+        },
+        {
+          "before": "const versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});",
+          "after": "const expectedLine = browserLibraryLine(JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')));\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current', expectedLine});"
+        }
+      ],
+      "source_parent": "af68021d1d51597d4e74e8849d6074286d604ad4"
+    },
+    {
+      "line": "main",
+      "path": "scripts/browser-surface-families.mjs",
+      "before_sha256": "cd90c75dd8c5dcc5c5f0af05d3a61a4c355ec73ee380a30f652cbe2ee0001cbd",
+      "after_sha256": "eb1174d483d0204ea7aa984d345427a331705a1e132beb9b5b1dec9a2c63827e",
+      "literal_edits": [
+        {
+          "before": "import {npmToolingOptions} from './npm-tooling-options.mjs';",
+          "after": "import {npmToolingOptions} from './npm-tooling-options.mjs';\nimport {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions} from './browser-peer-versions.mjs';"
+        },
+        {
+          "before": "let tarball = null;",
+          "after": "let tarball = null;\nlet describeInstall = false;"
+        },
+        {
+          "before": "for (let i = 2; i < process.argv.length; i += 1) {",
+          "after": "for (let i = 2; i < process.argv.length; i += 1) {\n  if (process.argv[i] === '--describe-install') {describeInstall = true;continue;}"
+        },
+        {
+          "before": "if (!tarball) fail(2, '--tarball is required');",
+          "after": "if (!tarball) fail(2, '--tarball is required');\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});\nif (describeInstall) {\n  console.log(JSON.stringify({versions, dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${tarball}`}), compilerOptions: browserCompilerOptions(versions)}));\n  process.exit(0);\n}"
+        },
+        {
+          "before": "  dependencies: {\n    '@angular/animations': '22.1.7',\n    '@angular/cdk': '22.1.7',\n    '@angular/common': '22.1.7',\n    '@angular/compiler': '22.1.7',\n    '@angular/compiler-cli': '22.1.7',\n    '@angular/core': '22.1.7',\n    '@angular/forms': '22.1.7',\n    '@angular/material': '22.1.7',\n    '@angular/platform-browser': '22.1.7',\n    '@angular/platform-browser-dynamic': '22.1.7',\n    '@ngx-compat/material-legacy': `file:${installTarball}`,\n    rxjs: '7.8.2',\n    tslib: '2.8.1',\n    typescript: '6.0.3',\n    ...(zoneless ? {} : {'zone.js': '0.16.3'}),\n  }",
+          "after": "  dependencies: browserConsumerDependencies(versions, {zoneless, librarySpec: `file:${installTarball}`})"
+        },
+        {
+          "before": "  compilerOptions: {\n    target: 'ES2022',\n    module: 'ES2022',\n    moduleResolution: 'bundler',\n    experimentalDecorators: true,\n    strict: true,\n    skipLibCheck: true,\n    lib: ['ES2022', 'DOM'],\n    rootDir: 'src',\n    outDir: 'out',\n    types: [],\n    ignoreDeprecations: '6.0',\n  }",
+          "after": "  compilerOptions: browserCompilerOptions(versions)"
+        },
+        {
+          "before": "import {browserPeerVersions,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}",
+          "after": "import {browserPeerVersions,browserLibraryLine,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions}"
+        },
+        {
+          "before": "const versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current'});",
+          "after": "const expectedLine = browserLibraryLine(JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')));\nconst versions = browserPeerVersions(readBrowserPackedPackage(tarball), {rxjsProfile: 'current', expectedLine});"
+        }
+      ],
+      "source_parent": "af68021d1d51597d4e74e8849d6074286d604ad4"
+    },
+    {
+      "line": "main",
+      "path": "scripts/browser-required-cells.mjs",
+      "before_sha256": "d9f43e2f5dff6cdeea1d7db6fec9f4a22a3fba596e325715f80c58e85256d94a",
+      "after_sha256": "b2c05123c5b604f4548b354c75feed41b9e6589907f7320dbca2843a9ae8c919",
+      "scope": "Only shared peer/dependency/compiler input ownership; all lab sources, probes, cells and predicates retain their existing bodies.",
+      "source_parent": "af68021d1d51597d4e74e8849d6074286d604ad4"
+    }
+  ],
+  "product_changes": 0,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false
+}

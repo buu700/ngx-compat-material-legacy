@@ -11,6 +11,7 @@
  * SSR has no declared cell ids. Pass --ssr to also run scripts/ssr-dialog.mjs for main.
  */
 import {npmToolingOptions} from './npm-tooling-options.mjs';
+import {browserPeerVersions as versionsFor,readBrowserPackedPackage as readPackedPackage,browserConsumerDependencies,browserCompilerOptions} from './browser-peer-versions.mjs';
 import {createHash} from 'node:crypto';
 import {dialogTitleLifetimeFixture, legacyDialogTitleLifetimeNativeOkay} from './dialog-title-lifetime-fixture.mjs';
 import {snackMotionFixture} from './snack-motion-fixture.mjs';
@@ -103,33 +104,6 @@ export function summarizeCells(requiredIds, outcomes) {
     missing_cell_ids: missing,
     unknown_cell_ids: unknown,
     ok: failed.length === 0 && missing.length === 0 && unknown.length === 0 && executed.length === requiredIds.length,
-  };
-}
-
-function exactVersion(spec, fallback) {
-  const match = String(spec || '').match(/(\d+\.\d+\.\d+)/);
-  return match ? match[1] : fallback;
-}
-
-function readPackedPackage(tarball) {
-  const result = spawnSync('tar', ['-xOzf', tarball, 'package/package.json'], {encoding: 'utf8'});
-  if (result.status !== 0) throw new Error((result.stderr || 'unable to read packed package.json').slice(-500));
-  return JSON.parse(result.stdout);
-}
-
-function versionsFor(pkg) {
-  const peers = pkg.peerDependencies || {};
-  const core = exactVersion(peers['@angular/core'], '22.1.7');
-  const major = Number(core.split('.')[0]);
-  return {
-    core,
-    cdk: exactVersion(peers['@angular/cdk'], major >= 22 ? '22.1.7' : '21.2.14'),
-    material: exactVersion(peers['@angular/material'], major >= 22 ? '22.1.7' : '21.2.14'),
-    rxjs: exactVersion(peers.rxjs, '7.8.2'),
-    typescript: major >= 22 ? '6.0.3' : '5.9.2',
-    zone: major >= 22 ? '0.16.3' : '0.15.1',
-    tslib: '2.8.1',
-    sass: '1.104.1',
   };
 }
 
@@ -557,39 +531,12 @@ function parseArgs(argv) {
 
 /** Install inputs buildConsumer writes. Qualification reads this object, not a parallel copy. */
 export function candidateInstallSpec(versions, zoneless) {
-  const dependencies = {
-    '@angular/cdk': versions.cdk,
-    '@angular/common': versions.core,
-    '@angular/compiler': versions.core,
-    '@angular/compiler-cli': versions.core,
-    '@angular/core': versions.core,
-    '@angular/forms': versions.core,
-    '@angular/material': versions.material,
-    '@angular/platform-browser': versions.core,
-    '@angular/platform-browser-dynamic': versions.core,
-    rxjs: versions.rxjs,
-    sass: versions.sass,
-    tslib: versions.tslib,
-    typescript: versions.typescript,
-  };
-  if (!zoneless) dependencies['zone.js'] = versions.zone;
+  const dependencies = browserConsumerDependencies(versions, {zoneless, sass: true});
   const tsconfig = {
-    compilerOptions: {
-      target: 'ES2022',
-      module: 'ES2022',
-      moduleResolution: 'bundler',
-      experimentalDecorators: true,
-      strict: true,
-      skipLibCheck: false,
-      lib: ['ES2022', 'DOM'],
-      rootDir: 'src',
-      outDir: 'out',
-      types: [],
-    },
+    compilerOptions: browserCompilerOptions(versions),
     files: ['src/main.ts'],
     angularCompilerOptions: {compilationMode: 'full', strictTemplates: true},
   };
-  if (Number(String(versions.typescript).split('.')[0]) >= 6) tsconfig.compilerOptions.ignoreDeprecations = '6.0';
   return {
     dependencies,
     npmrc: 'install-links=true\nfund=false\naudit=false\n',
@@ -623,7 +570,7 @@ export function candidateQualificationDefects(spec) {
 }
 
 export function fixtureQualificationDefects(pkg) {
-  const versions = versionsFor(pkg || {peerDependencies: {}});
+  const versions = versionsFor(pkg ?? JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')));
   const defects = [];
   for (const zoneless of [false, true]) {
     for (const defect of candidateQualificationDefects(candidateInstallSpec(versions, zoneless))) {
