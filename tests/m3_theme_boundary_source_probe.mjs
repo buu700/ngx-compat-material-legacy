@@ -13,7 +13,7 @@ import {measureM3ThemeBoundary,inspectM3ThemeBoundary,compileWarningModel,compil
 import {themePrelude,parseStyleRules} from '../scripts/check-m3-inclusion-order.mjs';
 const root=resolve(process.env.M3_BOUNDARY_SOURCE_ROOT??process.cwd()),read=path=>readFileSync(join(root,path));
 const line=JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21x':'main';
-const recorded=JSON.parse(readFileSync(new URL('../compatibility/rc/21x-c04-m3-theme-boundary-measurement-'+line+'.json',import.meta.url)));
+const recorded=JSON.parse(readFileSync(new URL('../compatibility/rc/21x-c04-m3-theme-boundary-measurement-portable-'+line+'.json',import.meta.url)));
 const measured=measureM3ThemeBoundary({root});assert.deepEqual(measured,recorded);
 const scope=inspectM3ThemeBoundary({root});
 const condition='not $theme-ignore-duplication-warnings {',changedWarning=scope.model.replace(condition,'false {');assert.notEqual(changedWarning,scope.model);

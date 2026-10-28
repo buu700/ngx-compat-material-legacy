@@ -957,7 +957,7 @@ function prepareFieldTokenStage({root,read,before,bound}){
 function prepareBoundaryStage({root,read,before,bound}){
   assert.equal(hash(before),'ad496e9e699918951057987997121de26e0e66a2c92940316658ae01a49df49a');
   assert.equal(before.equals(gitBytes(root,'6e54c9a1c3dad72f65b048f8f19cb7faa18729dc',ledgerPath)),true);
-  const helper='scripts/upstream-m3-theme-boundary-admission.cjs',digest='0f849a2c0230e7ebeb496fad34cbd9ecd5c4cb6d15ead8cdbff6181223221e27';
+  const helper='scripts/upstream-m3-theme-boundary-admission.cjs',digest='280dc73f2d7b0bf2331f8bef414ebbe2023a8177f36fe54ee7b35dfcfed50aa0';
   assert.equal(hash(read(helper)),digest);bound.set(helper,digest);
   for(const sha of boundaryAdmission.BOUNDARY_SHAS)assert.deepEqual(sourceContractDefinitions.find(row=>row.sha===sha),{
     sha,proof_kind:'individual-historical-m3-theme-boundary-source-review',scope_key:'m3_theme_boundary_source_scope',module:'upstream-m3-theme-boundary-admission.cjs'});

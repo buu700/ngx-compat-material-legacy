@@ -11,6 +11,7 @@ const {readFileSync,lstatSync,realpathSync}=require('node:fs');
 const {join,resolve,relative,isAbsolute}=require('node:path');
 const {gunzipSync}=require('node:zlib');
 const {isDeepStrictEqual}=require('node:util');
+const {m3MeasurementSourceEpoch,historicalM3MeasurementView,M3_PORTABLE_WITNESSES,M3_TRANSPORT_CODE}=require('./m3-measurement-transport.mjs');
 const ROOT=resolve(__dirname,'..'),PREFIX='compatibility/rc/21x-c04-m3-theme-boundary-';
 const REVIEW=PREFIX+'individual-review.json',REVIEW_HASH='1471cf3de35c1bf86d13e993c9f55f0cef6849dab20ffdd7b4fcc62f74ec044a';
 const QUALIFICATION=PREFIX+'source-qualification.json',QUALIFICATION_HASH='37d3b1eaa7a4468b48c90435e4d50b5d08053914ff3cb9f6ee2f57505c52ec17';
@@ -52,8 +53,13 @@ function metadataOk({entry,body,review,proof}={}){
  }catch{return false;}
 }
 function inspectBoundarySource({root=ROOT,read=root===ROOT?defaultRead:path=>regular(root,path)}={}){
+ const transportPath='scripts/m3-measurement-transport.mjs',transportHash='7bcb7a2d1cef12433240575596b991f0f82c0bdbdbe8f39e2a047fb877bf7fba';
+ assert.equal(hash(read(transportPath)),transportHash);const epoch=m3MeasurementSourceEpoch({read});
  const bound=new Map();
- const member=ref=>{const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed M3-theme-boundary input '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;};
+ const member=ref=>{const previous=M3_TRANSPORT_CODE.find(value=>value.path===ref.path&&value.before===ref.sha256);
+  const raw=previous?epoch.beforeRead(ref.path):read(ref.path);assert.equal(hash(raw),ref.sha256,'changed M3-theme-boundary input '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);
+  bound.set(ref.path,previous?{path:previous.path,sha256:previous.after,bytes:previous.after_bytes}:{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;};
+ member({path:transportPath,sha256:transportHash});
  const body=JSON.parse(member({path:REVIEW,sha256:REVIEW_HASH})),qualification=JSON.parse(member({path:QUALIFICATION,sha256:QUALIFICATION_HASH}));
  assert.equal(qualification.individual_review.sha256,REVIEW_HASH);assert.equal(qualification.original_commits,5);assert.equal(qualification.original_hunks,42);
  for(const ref of [...qualification.source_code,qualification.actual_test_execution,...Object.values(qualification.actual_line_controls)])member(ref);
@@ -81,8 +87,11 @@ function inspectBoundarySource({root=ROOT,read=root===ROOT?defaultRead:path=>reg
  assert.equal(scope.historical_default_CSS_cases.length,16);assert.equal(scope.historical_warning_and_density_cases.length,6);assert.equal(scope.original_inspection_cases.length,8);assert.equal(scope.selected_card_checkbox_M2_M3_source_compile_cases.length,4);
  assert.equal(scope.historical_private_token_exports_retained.length,2);assert.equal(scope.all_four_orders_preserve_exact_original_rule_sequences,true);
  for(const ref of [...scope.input_members,...scope.loaded_sources,...scope.measurement_tools_from_review_worktree,scope.producer])member(ref);
- const assertCurrent=()=>{for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late M3-theme-boundary input '+ref.path);assert.equal(raw.length,ref.bytes);}};
- assertCurrent();return {body,scope,scopeHash:hash(scopeRaw),bound:[...bound.values()],assertCurrent};
+ const portableRaw=member(M3_PORTABLE_WITNESSES['21.x']),portableScope=JSON.parse(portableRaw);member(M3_PORTABLE_WITNESSES.main);
+ for(const ref of [...portableScope.input_members,...portableScope.loaded_sources,...portableScope.measurement_tools_from_review_worktree,portableScope.producer])member(ref);
+ historicalM3MeasurementView({portable:portableScope,historical:scope});
+ const assertCurrent=()=>{epoch.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late M3-theme-boundary input '+ref.path);assert.equal(raw.length,ref.bytes);}};
+ assertCurrent();return {body,scope,portableScope,scopeHash:hash(scopeRaw)+':'+hash(portableRaw),bound:[...bound.values()],assertCurrent};
 }
 function sourceOk(args={}){
  try{
@@ -90,7 +99,8 @@ function sourceOk(args={}){
   const inspected=inspectBoundarySource({root,read});assert.deepEqual(args.body,inspected.body);const rootId=realpathSync(root),previous=measurements.get(read);
   if(!previous||previous.root!==rootId||previous.scopeHash!==inspected.scopeHash){
    const {measureM3ThemeBoundary}=require('./measure-m3-theme-boundary-contracts.mjs');
-   assert.deepEqual(measureM3ThemeBoundary({root:rootId}),inspected.scope,'fresh M3-theme-boundary contract differs');measurements.set(read,{root:rootId,scopeHash:inspected.scopeHash});
+   const actual=measureM3ThemeBoundary({root:rootId});assert.deepEqual(actual,inspected.portableScope,'fresh portable M3-theme-boundary contract differs');
+   historicalM3MeasurementView({portable:actual,historical:inspected.scope});measurements.set(read,{root:rootId,scopeHash:inspected.scopeHash});
   }
   inspected.assertCurrent();return true;
  }catch{return false;}
