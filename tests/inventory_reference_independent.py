@@ -14,6 +14,7 @@ parent,before_sha,count=PINS[line];env=dict(os.environ,GIT_NO_LAZY_FETCH='1',GIT
 for key in ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES']:env.pop(key,None)
 before=subprocess.check_output(['git','--no-replace-objects','show',parent+':'+ledger_path],cwd=ROOT,env=env);assert sha(before)==before_sha
 module=importlib.util.spec_from_file_location('independent_inventory_auth',ROOT/'scripts/historical_inventory_rebinding.py');owner=importlib.util.module_from_spec(module);module.loader.exec_module(owner);source=owner.verify_inventory_successor(ROOT)
+live_canonical_before=(ROOT/ledger_path).read_bytes()
 old_inventory=source['before_inventory_sha256'];new_inventory=sha((ROOT/inventory_path).read_bytes());assert source['current_inventory_sha256']==new_inventory
 expected=json.loads(before);updates={};old_refs=[]
 for row in expected['entries']:
@@ -32,7 +33,8 @@ for index,marker in enumerate(markers):
   pieces.extend([text[last:marker.start()],entry.replace(needle,'"sha256": "'+new_inventory+'"')]);last=end
 pieces.append(text[last:]);after=''.join(pieces).encode();assert json.loads(after)==expected and len(after)==len(before)
 proposal=gzip.decompress((ROOT/'compatibility/rc/c04-inventory-reference-proposal-after.json.gz').read_bytes());assert proposal==after
+assert live_canonical_before in [before,after], 'current ledger is not a complete authenticated before/after image'
 packet=json.loads((ROOT/'compatibility/rc/c04-inventory-reference-proposal.json').read_bytes());assert packet['after_ledger']['sha256']==sha(after)
 unchanged=sum(before[a.start():(markers[i+1].start()if i+1<len(markers)else end_of_entries)]==after[a.start():(markers[i+1].start()if i+1<len(markers)else end_of_entries)]for i,a in enumerate(markers))
 assert unchanged==1697-count
-print(json.dumps({'schema_version':1,'line':line,'independent_after_sha256':sha(after),'independent_after_bytes':len(after),'hash_scalar_replacements':count,'unselected_entry_bytes_preserved':unchanged,'canonical_ledger_unchanged':sha((ROOT/ledger_path).read_bytes())==before_sha,'canonical_owner_integration_complete':False,'actual_native_packed_browser_floor_or_full_audit_qualified':False,'g11_claim':'not-passed'}))
+print(json.dumps({'schema_version':1,'line':line,'independent_after_sha256':sha(after),'independent_after_bytes':len(after),'hash_scalar_replacements':count,'unselected_entry_bytes_preserved':unchanged,'canonical_ledger_unchanged':(ROOT/ledger_path).read_bytes()==live_canonical_before,'canonical_owner_integration_complete':False,'actual_native_packed_browser_floor_or_full_audit_qualified':False,'g11_claim':'not-passed'}))

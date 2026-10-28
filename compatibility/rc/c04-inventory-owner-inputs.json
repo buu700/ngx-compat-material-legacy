@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "role": "Exact inventory metadata owner integration;no new judgments or native execution",
+  "line": "main",
+  "source_parent": "fac017a4659437a3de25b7cb3c7a9861764a51bc",
+  "before_owner": {
+    "path": "scripts/packed-upstream-ledger-epoch.mjs",
+    "sha256": "c1796a82462b977885659b23e25406861c02c40252477ee17f3b5014747ddcaa",
+    "bytes": 77433
+  },
+  "after_owner": {
+    "path": "scripts/packed-upstream-ledger-epoch.mjs",
+    "sha256": "a86be06d36ef009f29e8ca7c87c272a413f4a8d942de4b9cf736daac88532e2b",
+    "bytes": 78890
+  },
+  "owner_literal_edits": [
+    {
+      "before": "import assert from 'node:assert/strict';",
+      "after": "import assert from 'node:assert/strict';\nimport {inventoryReferenceOwnerContext} from './inventory-reference-owner.mjs';"
+    },
+    {
+      "before": "export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(root)} = {}) {",
+      "after": "function prepareBeforeInventoryReferenceLedger({root = process.cwd(), read = disk(root)} = {}) {"
+    },
+    {
+      "before": "export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(root)} = {}) {",
+      "after": "function epochBeforeInventoryReferenceLedger({root = process.cwd(), read = disk(root)} = {}) {"
+    },
+    {
+      "before": "  const prepared = preparePackedUpstreamLedger({root, read});",
+      "after": "  const prepared = prepareBeforeInventoryReferenceLedger({root, read});"
+    },
+    {
+      "before": "canonicalHash?65:0,\n    current_native_packed_or_floor_or_g11_credit: false};\n}\n",
+      "after": "canonicalHash?65:0,\n    current_native_packed_or_floor_or_g11_credit: false};\n}\n\n/** Exact terminal inventory metadata successor; all prior source stages still execute. */\nexport function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){\n read=packedUpstreamLedgerRawRead({root,read});\n const inventory=inventoryReferenceOwnerContext({root,read});\n const prior=prepareBeforeInventoryReferenceLedger({root,read:inventory.metadataRead});\n return inventory.wrapPrepared(prior);\n}\nexport function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={}){\n read=packedUpstreamLedgerRawRead({root,read});\n const inventory=inventoryReferenceOwnerContext({root,read});\n const prior=epochBeforeInventoryReferenceLedger({root,read:inventory.metadataRead});\n const assertCurrent=()=>{inventory.assertCurrent();prior.assertCurrent();inventory.assertCurrent();};\n const historical=path=>{if(path!==ledgerPath)return read(path);assertCurrent();const value=prior.read(path);assertCurrent();return value;};\n readers.set(historical,{root:root,raw:read});assertCurrent();\n return {...prior,read:historical,raw:read,assertCurrent,\n  inventory_reference_metadata_applied:inventory.applied,\n  inventory_reference_metadata_entries:inventory.applied?inventory.metadata_entries:0,\n  inventory_reference_metadata_source_references:inventory.applied?inventory.metadata_entries:0,\n  current_native_packed_or_floor_or_g11_credit:false};\n}\n"
+    }
+  ],
+  "proposal": {
+    "path": "compatibility/rc/c04-inventory-reference-proposal.json",
+    "sha256": "15d53cbe6433fd675cb2650f91767c84b75751e35b285580aa4aba61d066e521",
+    "bytes": 27914
+  },
+  "before_ledger": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "121fa2c930784575a0ead888fb6d5caa03a4511aa5b90f7d88e69450df5a6da0",
+    "bytes": 4457029
+  },
+  "after_ledger": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "e8c57b7630bfec15b3730214c03c41cf37e6654ce236743dff3d644ff43e813e",
+    "bytes": 4457029
+  },
+  "current_inventory": {
+    "path": "testing/legacy-runner/historical-inventory.json",
+    "sha256": "baecc3ac539fe5ade1796c8647089588daa23d43d426358bd17038cc3933561c",
+    "bytes": 101143
+  },
+  "prior_inventory_sha256": "89e7770f51357cd8544c7df10a3ba9c538bcc66f3040e3d45434634308616832",
+  "metadata_entries": 20,
+  "old_functions_executed_as_current_compiled_code": true,
+  "old_program_execution": false,
+  "source_admissions_changed": 0,
+  "canonical_dispositions_changed": 0,
+  "product_changes": 0,
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed",
+  "source_members": [
+    {
+      "path": "scripts/inventory-reference-proposal.mjs",
+      "sha256": "058f2e671cfb7fddd48a68a588991aae74e685376e16ab9c50e33fd4b96ffefa",
+      "bytes": 11760
+    },
+    {
+      "path": "scripts/historical_inventory_rebinding.py",
+      "sha256": "0c5b37759c25026df64da4ce33ae08c15bbf38a6ab0b004cf8a186d993d9b44d",
+      "bytes": 10051
+    },
+    {
+      "path": "compatibility/rc/c04-inventory-reference-proposal.json",
+      "sha256": "15d53cbe6433fd675cb2650f91767c84b75751e35b285580aa4aba61d066e521",
+      "bytes": 27914
+    },
+    {
+      "path": "compatibility/rc/c04-inventory-reference-qualification.json",
+      "sha256": "4ccb903bb2efaf22d0d0d0fdb813a4e5ed29f50f0a96be50d830d00d0e7eb635",
+      "bytes": 7299
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "be5217ddbfb6da0b4f74cf9878790ea93515f2099db1f82bfbd63e968f346385",
+      "bytes": 18106
+    },
+    {
+      "path": "scripts/helper_ci.py",
+      "sha256": "0add0382c70055f954802237762d1dbd55503baf8216a7f492b3893b88b8df16",
+      "bytes": 17978
+    },
+    {
+      "path": "tests/test_helper_ci.py",
+      "sha256": "d5d0897eb0f9733a6f796660858409e5451c89601bdb80a2291b33be6a197535",
+      "bytes": 17476
+    },
+    {
+      "path": "compatibility/rc/c04-helper-ci-distribution-qualification.json",
+      "sha256": "ecd2849bca6986e7bc7584c7f16ac2d1e632d7c1059cbfdc436aad3754bdcc23",
+      "bytes": 10892
+    },
+    {
+      "path": "scripts/rc-verify-lite.py",
+      "sha256": "90c2c418accbebd3ad287c664b6ba3d7914669f47c6063f6c07dedc5e87f78c2",
+      "bytes": 15859
+    },
+    {
+      "path": "tests/test_packed_upstream_ledger_epoch.py",
+      "sha256": "b0a27939dfa722f68228b38d40083f91c59b36894a434d98f9a19cbca76ab920",
+      "bytes": 16778
+    },
+    {
+      "path": "compatibility/rc/c04-retained-ledger-phases-stage-population.json",
+      "sha256": "60195e8197c5e07328b16f0336023326d0ffdb5b6e6cc8597de4f0d3d6004fa1",
+      "bytes": 2611
+    },
+    {
+      "path": "scripts/rc_acceptance.py",
+      "sha256": "cedf06b6a777808d8ad566e91e410d3a3ffd6942ed5470111e9be71808b18890",
+      "bytes": 30369
+    }
+  ],
+  "historical_workflow_metadata": {
+    "path": ".github/workflows/ci.yml",
+    "before_parent": "14d79197c54b5d0fa14e6c06ecd611a564281c8d",
+    "after_commit": "a16fdb9397c652cac36c581fb51a89cbb134a311",
+    "before": {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "f58f1bc17995a00041a0e35272e8fb3d86527bcbee20b030069237ace131cfdb",
+      "bytes": 11816
+    },
+    "after": {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "be5217ddbfb6da0b4f74cf9878790ea93515f2099db1f82bfbd63e968f346385",
+      "bytes": 18106
+    },
+    "qualified_transition": {
+      "path": "compatibility/rc/c04-helper-ci-distribution-qualification.json",
+      "sha256": "ecd2849bca6986e7bc7584c7f16ac2d1e632d7c1059cbfdc436aad3754bdcc23",
+      "bytes": 10892
+    },
+    "role": "Exact historical workflow image for old source-report comparisons only;current workflow never executed or exposed through this view",
+    "fresh_current_orchestration_test_methods": 14,
+    "full_Actions_execution_qualified": false
+  },
+  "historical_handler_metadata": []
+}

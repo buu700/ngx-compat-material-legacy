@@ -15,7 +15,7 @@ import {prepareInventoryReferenceMetadata,INVENTORY_REFERENCE_LEDGER,INVENTORY_R
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),raw=path=>readFileSync(resolve(root,path)),hash=b=>createHash('sha256').update(b).digest('hex');
 const beforeLive=raw(INVENTORY_REFERENCE_LEDGER),subject=prepareInventoryReferenceMetadata({root});
 const after=Buffer.from(subject.after),data=JSON.parse(after),packet=JSON.parse(raw(INVENTORY_REFERENCE_PACKET));
-assert.equal(subject.current_canonical_state,'before');assert.equal(subject.canonical_owner_integration_complete,false);
+assert.equal(subject.current_canonical_state,beforeLive.equals(subject.before)?'before':'after');assert.equal(subject.canonical_owner_integration_complete,false);
 assert.ok(after.equals(gunzipSync(raw('compatibility/rc/c04-inventory-reference-proposal-after.json.gz'))));
 assert.equal(subject.verifyAfter(after).native_or_full_audit_credit,false);
 const at=(entry,pointer)=>pointer.split('/').filter(Boolean).reduce((value,key)=>value[Array.isArray(value)?Number(key):key],entry);

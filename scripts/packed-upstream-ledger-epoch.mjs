@@ -7,6 +7,7 @@
  */
 /** Qualified source and finite individual-decision epochs; no native gate credit. */
 import assert from 'node:assert/strict';
+import {inventoryReferenceOwnerContext} from './inventory-reference-owner.mjs';
 import {readFileSync,realpathSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
@@ -720,7 +721,7 @@ function prepareHistoricalConsumerWrapperMetadataStage({root,read,line,before,bo
   source.assertCurrent();return source;
 }
 
-export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(root)} = {}) {
+function prepareBeforeInventoryReferenceLedger({root = process.cwd(), read = disk(root)} = {}) {
   read = packedUpstreamLedgerRawRead({root, read});
   const input = read(inputPath), line = Object.keys(subjects).find(name => subjects[name].sha256 === hash(input));
   assert.ok(line, 'changed qualified upstream inputs');
@@ -825,9 +826,9 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
 }
 
 /** A before-image is available only for this exact, continuously checked ledger. */
-export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(root)} = {}) {
+function epochBeforeInventoryReferenceLedger({root = process.cwd(), read = disk(root)} = {}) {
   read = packedUpstreamLedgerRawRead({root, read});
-  const prepared = preparePackedUpstreamLedger({root, read});
+  const prepared = prepareBeforeInventoryReferenceLedger({root, read});
   const current = hash(read(ledgerPath)), beforeHash = hash(prepared.before), afterHash = hash(prepared.after);
   const canonicalHash=hash(prepared.canonical_after),nativeSelectionHash=hash(prepared.selection_native_stage.after);
   const noticeMetadataHash=prepared.sass_notice_metadata_stage?hash(prepared.sass_notice_metadata_stage.after):null;
@@ -884,4 +885,25 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
     historical_consumer_wrapper_metadata_entries_applied:current===canonicalHash?65:0,
     historical_consumer_wrapper_metadata_references_applied:current===canonicalHash?65:0,
     current_native_packed_or_floor_or_g11_credit: false};
+}
+
+/** Exact terminal inventory metadata successor; all prior source stages still execute. */
+export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){
+ read=packedUpstreamLedgerRawRead({root,read});
+ const inventory=inventoryReferenceOwnerContext({root,read});
+ const prior=prepareBeforeInventoryReferenceLedger({root,read:inventory.metadataRead});
+ return inventory.wrapPrepared(prior);
+}
+export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={}){
+ read=packedUpstreamLedgerRawRead({root,read});
+ const inventory=inventoryReferenceOwnerContext({root,read});
+ const prior=epochBeforeInventoryReferenceLedger({root,read:inventory.metadataRead});
+ const assertCurrent=()=>{inventory.assertCurrent();prior.assertCurrent();inventory.assertCurrent();};
+ const historical=path=>{if(path!==ledgerPath)return read(path);assertCurrent();const value=prior.read(path);assertCurrent();return value;};
+ readers.set(historical,{root:root,raw:read});assertCurrent();
+ return {...prior,read:historical,raw:read,assertCurrent,
+  inventory_reference_metadata_applied:inventory.applied,
+  inventory_reference_metadata_entries:inventory.applied?inventory.metadata_entries:0,
+  inventory_reference_metadata_source_references:inventory.applied?inventory.metadata_entries:0,
+  current_native_packed_or_floor_or_g11_credit:false};
 }
