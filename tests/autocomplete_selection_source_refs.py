@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+from dialog_title_reader_refs import title_prior_tool_bytes, qualified_title_reader_reference
 
 SPEC = 'projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts'
 CODE = ('scripts/upstream-rules-js-build-admission.mjs', 'scripts/autocomplete-landscape-source-judgment.mjs',
@@ -60,7 +61,7 @@ def qualified_reference(root, ref):
             assert ref['bytes'] == packet[side]['bytes']
         return dict(ref, **packet['after'])
     if ref['path'] not in CODE:
-        return ref
+        return qualified_title_reader_reference(root, ref) or ref
     raw = (root / 'compatibility/rc/autocomplete-selection-source-reader-successors.json').read_bytes()
     line = _line(root)
     assert sha(raw) == {'main': 'bf806c5628500798e6045d40858b0523b6744656cf582ee1d263847d4f1cdcf3',
@@ -68,7 +69,7 @@ def qualified_reference(root, ref):
     packet = json.loads(raw)
     assert packet['line'] == line and tuple(row['path'] for row in packet['code_subjects']) == CODE
     row = next(row for row in packet['code_subjects'] if row['path'] == ref['path'])
-    current = (root / ref['path']).read_bytes()
+    current = title_prior_tool_bytes(root, ref['path'])
     assert sha(current) == row['after']['sha256'] and len(current) == row['after']['bytes']
     reduced = current.decode()
     for edit in reversed(row['literal_edits']):
@@ -76,11 +77,16 @@ def qualified_reference(root, ref):
         reduced = reduced.replace(edit['after'], edit['before'])
     assert reduced.encode() == _git(root, packet['source_parent'], ref['path'])
     assert sha(reduced.encode()) == row['before']['sha256']
+    successor = qualified_title_reader_reference(root, dict(path=row['path'], **row['after']))
+    if successor and ref['sha256'] == successor['sha256']:
+        if 'bytes' in ref:
+            assert ref['bytes'] == successor['bytes']
+        return dict(ref, **{key: successor[key] for key in ('sha256', 'bytes')})
     assert ref['sha256'] in (row['before']['sha256'], row['after']['sha256'])
     side = 'before' if ref['sha256'] == row['before']['sha256'] else 'after'
     if 'bytes' in ref:
         assert ref['bytes'] == row[side]['bytes']
-    return dict(ref, **row['after'])
+    return qualified_title_reader_reference(root, dict(ref, **row['after'])) or dict(ref, **row['after'])
 
 
 if __name__ == '__main__':
@@ -88,6 +94,6 @@ if __name__ == '__main__':
     packet = json.loads((root / 'compatibility/rc/autocomplete-selection-source-reader-successors.json').read_bytes())
     assert tuple(row['path'] for row in packet['code_subjects']) == CODE
     for row in packet['code_subjects']:
-        assert qualified_reference(root, dict(path=row['path'], **row['before'])) == dict(path=row['path'], **row['after'])
+        assert qualified_reference(root, dict(path=row['path'], **row['before'])) == (qualified_title_reader_reference(root, dict(path=row['path'], **row['after'])) or dict(path=row['path'], **row['after']))
     print(json.dumps(dict(line=_line(root), independently_reversed_code_hooks=len(CODE),
                           authenticated_git_originals_recovered=True, native_or_G11_qualified=False)))

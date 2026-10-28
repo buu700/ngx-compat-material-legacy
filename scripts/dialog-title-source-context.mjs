@@ -61,15 +61,15 @@ export function dialogTitleProductSubject({root=process.cwd(),read=path=>readFil
 }
 
 const readerPath='compatibility/rc/dialog-title-current-source-reader-successors.json';
-const readerPins={'21.x':'c189a19263d4862df74b47f590c1cb21875932406e150b9dc35141c448a86369'};
-const readerCode=['scripts/upstream-rules-js-build-admission.mjs','scripts/upstream-testing-api-21x-admission.mjs','scripts/autocomplete-selection-spec-subject.mjs','scripts/packed-upstream-ledger-epoch.mjs','scripts/checker-reference-metadata.mjs','scripts/packed-product-source-recovery.mjs','scripts/dialog-caller-owned-contract-boundary.mjs','scripts/snack-dom-source-context.mjs','scripts/packed-cva-source-requalification.mjs'];
+const readerPins={'21.x':'c189a19263d4862df74b47f590c1cb21875932406e150b9dc35141c448a86369',main:'8ec37f431f8da2aee653a62fb4676cd86e67f3fea233b530cf440e15cbf44d71'};
+const readerCode={"21.x":["scripts/upstream-rules-js-build-admission.mjs","scripts/upstream-testing-api-21x-admission.mjs","scripts/autocomplete-selection-spec-subject.mjs","scripts/packed-upstream-ledger-epoch.mjs","scripts/checker-reference-metadata.mjs","scripts/packed-product-source-recovery.mjs","scripts/dialog-caller-owned-contract-boundary.mjs","scripts/snack-dom-source-context.mjs","scripts/packed-cva-source-requalification.mjs"],"main":["scripts/upstream-testing-api-21x-admission.mjs","scripts/autocomplete-selection-spec-subject.mjs","scripts/packed-upstream-ledger-epoch.mjs","scripts/packed-product-source-recovery.mjs","scripts/dialog-caller-owned-contract-boundary.mjs","scripts/snack-dom-source-context.mjs","scripts/packed-cva-source-requalification.mjs","scripts/sass-wrapper-notice-subject.mjs","scripts/dialog-portal-failure-recovery.mjs"]};
 /** Tool before-images authenticate literal edits only; they are never executed. */
 export function dialogTitleReaderSubject({root=process.cwd(),read=path=>readFileSync(join(root,path)),line}={}){
  const actual=JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main';line??=actual;assert.equal(line,actual);
  assert.ok(Object.hasOwn(readerPins,line),'title source-reader port not yet qualified for '+line);
  const raw=read(readerPath);assert.equal(hash(raw),readerPins[line],'changed title reader transition');const data=JSON.parse(raw);
  assert.equal(data.schema_version,1);assert.equal(data.line,line);assert.match(data.source_parent,/^[0-9a-f]{40}$/);
- assert.deepEqual(data.code_subjects.map(row=>row.path),readerCode);assert.equal(data.old_product_bytes_exposed,false);assert.equal(data.canonical_decisions_changed,0);assert.equal(data.native_or_full_qualification,false);
+ assert.deepEqual(data.code_subjects.map(row=>row.path),readerCode[line]);assert.equal(data.old_product_bytes_exposed,false);assert.equal(data.canonical_decisions_changed,0);assert.equal(data.native_or_full_qualification,false);
  const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
  for(const name of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete env[name];
  const bound=[{path:readerPath,sha256:hash(raw),bytes:raw.length}],images=[],beforeCode=new Map();

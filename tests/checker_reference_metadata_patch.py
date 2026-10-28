@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 import sys
 from autocomplete_selection_source_refs import _git
+from dialog_title_reader_refs import title_prior_tool_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = 'compatibility/f10/disposition-ledger/ledger.json'
@@ -36,7 +37,7 @@ def derive_checker_reference_successor(root=ROOT, expected_before=None):
         checker = qualified_checker_before(root)
     assert HASH(checker) == CURRENT == review['checker']['current_sha256']
     for ref in review['guard_modules']:
-        current = (root / ref['path']).read_bytes()
+        current = title_prior_tool_bytes(root, ref['path'])
         assert HASH(current) == ref['sha256'] and len(current) == ref['bytes']
     original = json.loads(before)
     expected = copy.deepcopy(original)
