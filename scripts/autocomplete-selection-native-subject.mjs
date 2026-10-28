@@ -13,6 +13,7 @@ import {gunzipSync} from 'node:zlib';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {autocompleteSelectionSpecSubject} from './autocomplete-selection-spec-subject.mjs';
 import {autocompleteSelectionHistoricalScopes} from './autocomplete-selection-native-scopes.mjs';
+import {qualifyCanonicalToolReference} from './canonical-tool-source-role.mjs';
 
 export const SELECTION_NATIVE_PACKET='compatibility/rc/autocomplete-selection-native-contract-proposal.json';
 export const SELECTION_NATIVE_REGISTRY='scripts/upstream-historical-behavior-evidence.mjs';
@@ -33,9 +34,15 @@ const nativeCase=(p,index,full_name)=>({case_id:'historical-legacy-artifact/orig
 export function autocompleteSelectionNativeSubject({root,read=p=>readEvidenceMember(root,p),line}={}){
   const spec=autocompleteSelectionSpecSubject({root,read,line});line=spec.line;
   const bound=new Map(spec.bound.map(ref=>[ref.path,{...ref}]));
+  let titleNative=null;
   function member(ref){
     readEvidenceMember(root,ref.path);
-    const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed selection native subject '+ref.path);
+    const raw=read(ref.path);
+    if(ref.path===SELECTION_NATIVE_REGISTRY){
+      const successor=qualifyCanonicalToolReference({root,read,prior:ref});
+      if(successor){titleNative=successor;for(const member of titleNative.bound)bound.set(member.path,{...member});ref=titleNative.reference;}
+    }
+    assert.equal(hash(raw),ref.sha256,'changed selection native subject '+ref.path);
     if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);
     bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return raw;
   }
@@ -117,12 +124,13 @@ export function autocompleteSelectionNativeSubject({root,read=p=>readEvidenceMem
   }
   const qualify=ref=>{
     if(ref.path!==SELECTION_NATIVE_REGISTRY)return null;
-    assert.ok([registryBefore.sha256,registryAfter.sha256].includes(ref.sha256),'unqualified earlier native registry reference');
-    if(ref.bytes!==undefined)assert.equal(ref.bytes,ref.sha256===registryBefore.sha256?registryBefore.bytes:registryAfter.bytes);
-    return {path:ref.path,...registryAfter};
+    const current=titleNative?.reference??registryAfter;
+    assert.ok([registryBefore.sha256,registryAfter.sha256,current.sha256].includes(ref.sha256),'unqualified earlier native registry reference');
+    if(ref.bytes!==undefined)assert.equal(ref.bytes,ref.sha256===registryBefore.sha256?registryBefore.bytes:ref.sha256===registryAfter.sha256?registryAfter.bytes:current.bytes);
+    return {path:ref.path,...current};
   };
   const assertCurrent=()=>{spec.assertCurrent();for(const ref of bound.values()){const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'late selection native subject '+ref.path);assert.equal(bytes.length,ref.bytes);}};
-  assertCurrent();return {line,packet:structuredClone(packet),before:{...registryBefore},after:{...registryAfter},
+  assertCurrent();return {line,packet:structuredClone(packet),before:{...registryBefore},after:{...(titleNative?.reference??registryAfter)},
     requirements:structuredClone(requirements),proposals:structuredClone(proposals),originals:structuredClone(originals),
     bound:structuredClone([...bound.values()]),qualify,assertCurrent,native_artifact_floor_or_G11_credit:false};
 }

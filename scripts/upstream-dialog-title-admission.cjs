@@ -15,8 +15,8 @@ const ROOT=resolve(__dirname,'..'),PREFIX='compatibility/rc/21x-c04-dialog-title
 const TITLE_SHA='642d886ef117721a34c98055391c9055fde29607';
 const TITLE_DIFF='13c81abcdf9b4b4e80e864db636af1eeb31bb1ca44110d0358e43763e5bce2b6';
 const TITLE_REVIEW=PREFIX+'individual-review.json',REVIEW_HASH='794ffdc1bdfc7d2d234ee2ff46a591f74c471b38dee40343a551d9354f9cb4c3';
-const TITLE_SOURCE_REPORT=PREFIX+'canonical-source-measurement.json';
-const TITLE_SOURCE_HASH='cb2f882e1bbc2cc185766d3953a02bbe592a22c6098d77d66a8053707f11e8fd';
+const TITLE_SOURCE_REPORT=PREFIX+'canonical-qualified-owner-source-measurement.json';
+const TITLE_SOURCE_HASH='5911c0c1d0b72c3990a1be798132f970f65bd37aa480da5b00ab93c804d47985';
 const TITLE_KIND='individual-owned-dialog-title-lifetime';
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 function titleNativeRequirements(){return {kind:'owned-dialog-title-lifetime',required:true,
@@ -56,7 +56,20 @@ function inspectTitleSource({root=ROOT,read=path=>titleRead(root,path)}={}){
  assert.equal(scope.line,'21.x');assert.equal(scope.result,'pass');assert.equal(scope.fresh_lifecycle_executed,true);
  assert.equal(scope.graph.source_members.length,49);assert.equal(scope.original.exact_patch_replays,9);assert.equal(scope.original.original_hunks,21);
  assert.equal(scope.actual_native_artifact_browser_floor_or_full_audit_qualified,false);assert.equal(scope.g11_claim,'not-passed');
- const bound=[{path:TITLE_SOURCE_REPORT,sha256:TITLE_SOURCE_HASH,bytes:raw.length},...scope.input_members];
+ const typeRefs=[
+  {path:PREFIX+'focused-qualification.json',sha256:'6de1d76e0a0629647964d15d8aa70d8efe7aca57db168bd17afcfa007fecfd8e'},
+  {path:PREFIX+'helper-types-21x.json',sha256:'ec3f6ccae420832153dd54bd5733aeace0cf61d311ae5a5d4b6815ada84060cd'},
+  {path:PREFIX+'helper-types-main.json',sha256:'e9f5f5aae203fa3363d283f7939683e4c80c6e80c53599bd02c7eb334b68c2fa'},
+ ];
+ const types=typeRefs.map(ref=>{const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed minimum helper type receipt');return {ref:{...ref,bytes:value.length},body:JSON.parse(value)};});
+ assert.deepEqual(types[0].body.strict_helper_only_type_checks,{'21.x':types[1].ref,main:types[2].ref});
+ for(const [i,version,core]of [[1,'5.9.2','21.2.23'],[2,'6.0.3','22.1.7']]){
+  const proof=types[i].body;assert.equal(proof.typescript,version);assert.equal(proof.peer_core,core);
+  assert.equal(proof.source,'projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-state.ts');
+  assert.equal(proof.strict,true);assert.equal(proof.skipLibCheck,false);assert.deepEqual(proof.diagnostics,[]);assert.equal(proof.result,'pass');
+  assert.equal(proof.full_source_AOT_or_native_qualification,false);
+ }
+ const bound=[{path:TITLE_SOURCE_REPORT,sha256:TITLE_SOURCE_HASH,bytes:raw.length},...scope.input_members,...types.map(row=>row.ref)];
  assert.equal(new Set(bound.map(row=>row.path)).size,bound.length,'duplicate title source binding');
  const assertCurrent=()=>{for(const member of bound){const value=read(member.path);assert.equal(hash(value),member.sha256,'changed title source input '+member.path);assert.equal(value.length,member.bytes);}};
  assertCurrent();

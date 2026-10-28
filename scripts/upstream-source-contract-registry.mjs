@@ -44,4 +44,6 @@ export const sourceContractDefinitions = [
     scope_key:'m3_theme_boundary_source_scope',module:'upstream-m3-theme-boundary-admission.cjs'},
   {sha:'32981cc4500a8c0065574bfb1357d2d8a78494de',proof_kind:'individual-historical-m3-theme-boundary-source-review',
     scope_key:'m3_theme_boundary_source_scope',module:'upstream-m3-theme-boundary-admission.cjs'},
+  {sha:'642d886ef117721a34c98055391c9055fde29607',proof_kind:'individual-owned-dialog-title-lifetime',
+    scope_key:'dialog_title_source_scope',module:'upstream-dialog-title-admission.cjs'},
 ];

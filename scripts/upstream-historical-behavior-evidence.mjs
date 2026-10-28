@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {createHash} from 'node:crypto';
+import {validateDialogTitleNative} from './upstream-dialog-title-native-evidence.mjs';
 import {autocompleteSelectionHistoricalScopes} from './autocomplete-selection-native-scopes.mjs';
 import {isDeepStrictEqual} from 'node:util';
 import {readEvidenceMember, validatePackedConsumerRun} from './upstream-packed-run-evidence.mjs';
@@ -185,7 +186,7 @@ export function historicalBehaviorRequirements(sha) {
 }
 
 export function requiresHistoricalBehavior(entry, proof) {
-  return scopes.has(entry?.sha) || proof?.proof_kind === HISTORICAL_BEHAVIOR_KIND
+  return entry?.sha === '642d886ef117721a34c98055391c9055fde29607' || scopes.has(entry?.sha) || proof?.proof_kind === HISTORICAL_BEHAVIOR_KIND
     || (object(proof) && Object.hasOwn(proof, 'historical_behavior'));
 }
 
@@ -193,6 +194,7 @@ export function requiresHistoricalBehavior(entry, proof) {
  * not qualify these subjects. The coordinator and final seal own authenticity.
  */
 export function validateHistoricalBehavior({root, entry, proof, request}) {
+  if (entry?.sha === '642d886ef117721a34c98055391c9055fde29607') return validateDialogTitleNative({root, entry, proof, request});
   try {
     const registered = scopes.get(entry?.sha);
     demand(registered && proof?.proof_kind === HISTORICAL_BEHAVIOR_KIND

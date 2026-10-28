@@ -20,6 +20,7 @@ const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const SOURCE_TOOLS=[
  'scripts/dialog-title-original-subject.mjs','scripts/component-config-caller-contracts.mjs',
  'scripts/dialog-title-replacement-contract.mjs','scripts/dialog-title-source-context.mjs',
+ 'scripts/canonical-tool-source-role.mjs',
  'scripts/upstream-dialog-title-native-evidence.mjs',
  'scripts/upstream-browser-run-evidence.mjs','scripts/upstream-packed-run-evidence.mjs',
  'scripts/dialog-title-lifetime-fixture.mjs','scripts/browser-required-cells.mjs',
