@@ -12,6 +12,7 @@
  */
 import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {createHash} from 'node:crypto';
+import {dialogTitleLifetimeFixture, legacyDialogTitleLifetimeNativeOkay} from './dialog-title-lifetime-fixture.mjs';
 import {snackMotionFixture} from './snack-motion-fixture.mjs';
 import {snackAnnouncementLifetimeFixture, legacySnackAnnouncementLifetimeNativeOkay} from './snack-announcement-lifetime-fixture.mjs';
 import {legacySnackMotionNativeOkay, trackLegacySnackMotionNative, readLegacySnackMotionEnterNative, readLegacySnackMotionExitNative} from './legacy-snack-motion-native-contract.mjs';
@@ -70,7 +71,7 @@ export function requiredProbeSource() {
     legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative, legacyFormFieldOutlineBoundaryNativeOkay, readLegacyFormFieldOutlineBoundaryNative, legacyFormFieldNoLabelNativeOkay, readLegacyFormFieldNoLabelNative,
     legacyFormFieldDirectionLifetimeNativeOkay, legacyCheckboxTimerLifetimeNativeOkay, legacyRippleDelegationLifetimeNativeOkay,
     tabPaginationNativeOkay, readTabPaginationNative, legacySnackMotionNativeOkay,
-    legacySnackAnnouncementLifetimeNativeOkay,
+    legacySnackAnnouncementLifetimeNativeOkay, legacyDialogTitleLifetimeNativeOkay,
     trackLegacySnackMotionNative, readLegacySnackMotionEnterNative, readLegacySnackMotionExitNative]
     .map(contract => contract.toString()).join('\n') + '\n' + readFileSync(probePath, 'utf8');
 }
@@ -165,7 +166,7 @@ function labHtml() {
     '<mat-chip-list disabled><mat-chip>Off</mat-chip></mat-chip-list>',
     '</div>',
     '<div id="wrap-core" *ngIf="!cspOnly"><mat-pseudo-checkbox id="p-core" state="checked"></mat-pseudo-checkbox><lab-ripple-frame></lab-ripple-frame></div>',
-    '<div id="wrap-dialog"><button id="p-dialog-open" type="button" (click)="openDialog()">Open dialog</button></div>',
+    '<div id="wrap-dialog"><button id="p-dialog-open" type="button" (click)="openDialog()">Open dialog</button><lab-dialog-title-lifetime></lab-dialog-title-lifetime></div>',
     '<div id="wrap-field" *ngIf="!cspOnly">',
     '<mat-form-field id="p-field"><mat-label>Name</mat-label><input id="p-field-input" data-chip-focus-outside matInput [errorStateMatcher]="matcher"><mat-hint id="p-hint">Hint text</mat-hint></mat-form-field>',
     '<mat-form-field id="p-field-disabled" floatLabel="always"><input matInput disabled value="off"></mat-form-field>',
@@ -246,7 +247,7 @@ function labSource(zoneless) {
   const zoneImport = zoneless ? '' : "import 'zone.js';\n";
   const zoneNamed = zoneless ? ', provideZonelessChangeDetection' : '';
   const zoneProvider = zoneless ? 'provideZonelessChangeDetection(), ' : '';
-  return `${zoneImport}import {CSP_NONCE, ChangeDetectorRef, Component, ElementRef, NgZone, Directive, Injector, Input, NgModule, QueryList, TemplateRef, ViewChild, ViewChildren, ViewContainerRef, afterNextRender, forwardRef, inject, signal${zoneNamed}} from '@angular/core';
+  return `${zoneImport}import {CSP_NONCE, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, NgZone, Directive, Injector, Input, NgModule, QueryList, TemplateRef, ViewChild, ViewChildren, ViewContainerRef, afterNextRender, forwardRef, inject, signal${zoneNamed}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {BidiModule, Dir, Directionality} from '@angular/cdk/bidi';
 import {Platform} from '@angular/cdk/platform';
@@ -263,7 +264,7 @@ import {MatLegacyCardModule} from '@ngx-compat/material-legacy/legacy-card';
 import {MatLegacyCheckbox, MatLegacyCheckboxModule} from '@ngx-compat/material-legacy/legacy-checkbox';
 import {MatLegacyChip, MatLegacyChipList, MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
 import {MatLegacyPseudoCheckboxModule} from '@ngx-compat/material-legacy/legacy-core';
-import {MatLegacyDialog, MatLegacyDialogModule} from '@ngx-compat/material-legacy/legacy-dialog';
+import {MAT_LEGACY_DIALOG_DATA, MatLegacyDialog, MatLegacyDialogModule} from '@ngx-compat/material-legacy/legacy-dialog';
 import {MatLegacyFormField, MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
 import {MatLegacyInput, MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';
 import {MatLegacyListModule} from '@ngx-compat/material-legacy/legacy-list';
@@ -285,6 +286,7 @@ ${formFieldDirectionLifetimeFixture}
 ${checkboxTimerLifetimeFixture}
 ${rippleDelegationLifetimeFixture}
 ${snackMotionFixture}
+${dialogTitleLifetimeFixture}
 ${snackAnnouncementLifetimeFixture}
 
 @Directive({
@@ -339,6 +341,7 @@ ${chipFocusLifecycleFixtureMembers()}
   @ViewChild('tip') tip!: any;
   @ViewChild('tipOff') tipOff!: any;
   @ViewChild('chipList') chipList?: MatLegacyChipList;
+  @ViewChild(DialogTitleLifetimeLab) titleLifetimeLab?: DialogTitleLifetimeLab;
   @ViewChild(TooltipAriaLifetimeLab) ariaLifetimeLab?: TooltipAriaLifetimeLab;
   @ViewChild(RippleDelegationLab) rippleDelegationLab?: RippleDelegationLab;
   @ViewChild(RippleDelegationFrameLab) rippleFrameLab?: RippleDelegationFrameLab;
@@ -382,6 +385,10 @@ ${chipFocusLifecycleFixtureMembers()}
       },
       runChipFocusLifecycle() { return lab.runChipFocusLifecycle(); },
       openDialog() { lab.openDialog(); },
+      runDialogTitleLifetime() {
+        if (!lab.titleLifetimeLab) return Promise.reject(new Error('dialog title fixture missing'));
+        return lab.titleLifetimeLab.run();
+      },
       openMenu() { lab.openMenu(); },
       openSnack() { lab.openSnack(); },
       runTooltipAriaLifetime() {
@@ -468,7 +475,7 @@ ${chipFocusLifecycleFixtureMembers()}
     MatLegacyTabsModule,
     MatLegacyTooltipModule,
   ],
-  declarations: [RippleDelegationLab, RippleDelegationFrameLab, CheckboxTimerLifetimeLab, CaptureCheckboxTimerLifetime, LabRoot, DialogBody, LabForceInvalid, SnackMotionLab, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime, FormFieldDirectionLifetimeLab, CaptureFieldDirectionLifetime, SnackAnnouncementLifetimeLab, CaptureSnackAnnouncementLifetime],
+  declarations: [DialogTitleLifetimeLab, DialogTitleLifetimeBody, RippleDelegationLab, RippleDelegationFrameLab, CheckboxTimerLifetimeLab, CaptureCheckboxTimerLifetime, LabRoot, DialogBody, LabForceInvalid, SnackMotionLab, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime, FormFieldDirectionLifetimeLab, CaptureFieldDirectionLifetime, SnackAnnouncementLifetimeLab, CaptureSnackAnnouncementLifetime],
   bootstrap: [LabRoot],
   providers: [
     ...((window as unknown as {__cspNonce?: string}).__cspNonce ? [{provide: CSP_NONCE, useValue: (window as unknown as {__cspNonce: string}).__cspNonce}] : []),

@@ -4,6 +4,7 @@
  *
  *   node scripts/browser-dialog-escape.mjs --tarball <path>
  */
+import {dialogTitleLifetimeFixture, legacyDialogTitleLifetimeNativeOkay} from './dialog-title-lifetime-fixture.mjs';
 import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {createHash} from 'node:crypto';
 import {legacySelectFontNativeOkay, observeLegacySelectFontNative} from './legacy-select-font-native-contract.mjs';
@@ -117,12 +118,14 @@ if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Libra
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
 writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js';
-`}import {CSP_NONCE, Component, NgModule, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
+`}import {CSP_NONCE, ChangeDetectionStrategy, Component, NgModule, TemplateRef, ViewChild, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
-import {MatLegacyDialog, MatLegacyDialogModule} from '@ngx-compat/material-legacy/legacy-dialog';
+import {MAT_LEGACY_DIALOG_DATA, MatLegacyDialog, MatLegacyDialogModule} from '@ngx-compat/material-legacy/legacy-dialog';
 import {MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';
+
+${dialogTitleLifetimeFixture}
 
 @Component({
   standalone: false,
@@ -134,16 +137,20 @@ export class DialogBody {}
 @Component({
   standalone: false,
   selector: 'lab-root',
-  template: '<button id="open" type="button" (click)="open()">Open</button><mat-select id="choice" style="font-size:20px"><mat-option id="option-a" value="a">A</mat-option></mat-select>',
+  template: '<button id="open" type="button" (click)="open()">Open</button><lab-dialog-title-lifetime></lab-dialog-title-lifetime><mat-select id="choice" style="font-size:20px"><mat-option id="option-a" value="a">A</mat-option></mat-select>',
 })
 export class LabRoot {
   private dialog = inject(MatLegacyDialog);
   open() { this.dialog.open(DialogBody); }
+  @ViewChild(DialogTitleLifetimeLab) titleLifetime!: DialogTitleLifetimeLab;
+  ngAfterViewInit() {
+    (window as unknown as {__dialogTitleLifetime: () => Promise<unknown>}).__dialogTitleLifetime = () => this.titleLifetime.run();
+  }
 }
 
 @NgModule({
   imports: [BrowserModule, MatLegacyDialogModule, MatLegacySelectModule],
-  declarations: [LabRoot, DialogBody],
+  declarations: [LabRoot, DialogBody, DialogTitleLifetimeLab, DialogTitleLifetimeBody],
   bootstrap: [LabRoot],
   providers: [...((window as unknown as {__cspNonce?: string}).__cspNonce ? [{provide: CSP_NONCE, useValue: (window as unknown as {__cspNonce: string}).__cspNonce}] : []), ${zoneless ? 'provideZonelessChangeDetection(), ' : ''}{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: false}}],
 })
@@ -374,6 +381,8 @@ let selectOpened = false;
 let selectClosed = false;
 let selectFontGeometry = null;
 let dialogMotion = null;
+let dialogTitleLifetime = null;
+let dialogTitleLifetimeError = null;
 let zoneGlobal = null;
 let error = null;
 let diagnostic = null;
@@ -453,6 +462,16 @@ try {
   await send('Input.dispatchKeyEvent', {type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27});
   for (let i = 0; i < 50 && await evaluate('!!document.querySelector(".cdk-overlay-pane .mat-select-panel")'); i += 1) await sleep(100);
   selectClosed = !(await evaluate('!!document.querySelector(".cdk-overlay-pane .mat-select-panel")'));
+  await evaluate(`(() => {
+    window.__dialogTitleLifetimeResult = null; window.__dialogTitleLifetimeError = null;
+    Promise.resolve().then(() => window.__dialogTitleLifetime()).then(
+      value => {window.__dialogTitleLifetimeResult = value;},
+      error => {window.__dialogTitleLifetimeError = String(error);});
+    return true;
+  })()`);
+  for (let i = 0; i < 240 && !(await evaluate('!!window.__dialogTitleLifetimeResult || !!window.__dialogTitleLifetimeError')); i += 1) await sleep(50);
+  dialogTitleLifetime = await evaluate('window.__dialogTitleLifetimeResult');
+  dialogTitleLifetimeError = await evaluate('window.__dialogTitleLifetimeError');
 } catch (err) {
   error = String(err);
 } finally {
@@ -481,6 +500,9 @@ const report = {
   select_font_geometry: selectFontGeometry,
   select_font_geometry_ok: legacySelectFontNativeOkay(selectFontGeometry),
   dialog_motion: dialogMotion,
+  dialog_title_lifetime: dialogTitleLifetime,
+  dialog_title_lifetime_error: dialogTitleLifetimeError,
+  dialog_title_lifetime_ok: legacyDialogTitleLifetimeNativeOkay(dialogTitleLifetime),
   dialog_transition_on_container: transitionOnContainer,
   dialog_noop_under_reduced_motion: reducedMotion ? reducedNoop : null,
   zone_global: zoneGlobal,
@@ -511,9 +533,10 @@ console.log(JSON.stringify({
   select_panel_opened: report.select_panel_opened,
   select_panel_closed_by_escape: report.select_panel_closed_by_escape,
   dialog_transition_on_container: report.dialog_transition_on_container,
+  dialog_title_lifetime_ok: report.dialog_title_lifetime_ok,
   dialog_noop_under_reduced_motion: report.dialog_noop_under_reduced_motion,
   zone_global: report.zone_global,
 }, null, 2));
 const motionOk = reducedMotion ? report.dialog_noop_under_reduced_motion : report.dialog_transition_on_container;
 const zoneOk = zoneless ? zoneGlobal === 'undefined' && bundleHasZone === false : true;
-if (!report.closed_by_escape || !report.focus_restored_to_open_button || !report.closed_by_backdrop_click || !report.select_panel_closed_by_escape || !report.select_font_geometry_ok || !motionOk || !zoneOk) process.exit(1);
+if (!report.dialog_title_lifetime_ok || !report.closed_by_escape || !report.focus_restored_to_open_button || !report.closed_by_backdrop_click || !report.select_panel_closed_by_escape || !report.select_font_geometry_ok || !motionOk || !zoneOk) process.exit(1);
