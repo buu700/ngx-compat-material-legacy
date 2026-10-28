@@ -22,6 +22,7 @@ class DialogTitleCanonicalOwnerTests(unittest.TestCase):
         self.assertEqual(report['individual_decisions'], 1)
         self.assertTrue(report['exact_theming_successor_verified'])
         self.assertTrue(report['exact_inspection_successor_verified'])
+        self.assertTrue(report['exact_selector_density_successor_verified'])
         self.assertEqual(report['metadata_tokens'], 14)
         self.assertEqual(report['unselected_entry_bytes_preserved'], 1682)
         from unthemable_ledger_patch import spans
@@ -82,7 +83,7 @@ class DialogTitleCanonicalOwnerTests(unittest.TestCase):
         child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=120)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-6500:])
         report = json.loads(child.stdout)
-        self.assertEqual(report['registered_source_contracts'], 26)
+        self.assertEqual(report['registered_source_contracts'], 28)
         self.assertEqual(report['unmarked_historical_tool_readers_rejected'], 6)
         self.assertEqual(report['actual_root_checker_cases'], 2)
         self.assertEqual(report['forged_metadata_capabilities_rejected'], 2)

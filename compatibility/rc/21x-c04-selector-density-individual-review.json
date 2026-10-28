@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Two individual historical selector/density source decisions",
+  "status": "reviewed",
+  "source_review_complete": true,
+  "reviews": [
+    {
+      "sha": "999029aa5a23e9577503775c1ea4513e5c3cb4f9",
+      "diff_sha256": "249c9cc504ffdd33543602ea6736e3d064bb6bb7df3d994d4d41494455fadc5e",
+      "complete_original_paths": [
+        "src/material/core/style/_sass-utils.scss",
+        "src/material/core/theming/tests/theming-mixin-api.spec.ts"
+      ],
+      "frozen_seed_paths": [
+        "src/material/core/style/_sass-utils.scss",
+        "src/material/core/theming/tests/theming-mixin-api.spec.ts"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/core/style/_sass-utils.scss",
+          "index": 0,
+          "header": "@@ -10,9 +10,14 @@",
+          "sha256": "0527bf424cd2a11a3b5e01ad411af60bc39036bf940272be836f99ab69dc8e7d",
+          "technical_judgment": "Replaces at-root/interpolated parent selection with an if-parent/content branch and a nested default root. The original commit documents reversed declaration order on its historical compiler. The owned helper is the exact Material16 blob; bounded pinned-Sass tests compare it with the untouched tag and the reviewed replacement, including the original red-then-green example. Preserve tagged emitted rule grouping; no older-compiler or full consumer-floor clearance is claimed."
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-mixin-api.spec.ts",
+          "index": 0,
+          "header": "@@ -125,7 +125,20 @@ describe('theming api', () => {",
+          "sha256": "ce55d31eef20d09c61fc752608f2d8c59e977f2ccb0fd44cff53bb77256e90ad",
+          "technical_judgment": "Disables the dark-theme density assertion and records that root inclusion and inclusion inside html differ. The whole regression-test hunk was reviewed; it adds no replacement active assertion. Do not disable or broaden an owned legacy density check to admit a source change. Actual tagged/owned root, scoped, duplicate and flag-reset behavior is measured separately."
+        }
+      ],
+      "source_review_complete": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "affected_branches": [
+        "21.x"
+      ],
+      "review_depth": "individual-compatibility",
+      "canonical_disposition_applied": false,
+      "status": "reviewed",
+      "decision": "Do not adopt the post16 selector-helper replacement or disable the accompanying dark-theme density assertion. Both complete original files and hunks were reviewed, including the commit-documented historical declaration-order reversal. The owned helper and original before-mixin match the untouched Material16 tag. Twelve bounded pinned-Sass1.104.1 cases preserve the tagged output; the original red-then-green example ends green, while the replacement changes emitted CSS in four cases. Preserve the historical helper, rule grouping and consumer namespace contract. This source decision grants no older-compiler, Cyph-build or full consumer-floor clearance.",
+      "patch_file": "compatibility/rc/21x-c04-selector-density-999029aa5a23e9577503775c1ea4513e5c3cb4f9.patch",
+      "source_scope_only": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    },
+    {
+      "sha": "4395cdf55a4b08d76aecd2e0378f3079289ce9c0",
+      "diff_sha256": "a46ce23442183185d6483e3747f9080c4d80b6251db87aa559126a8dbdd75c6b",
+      "complete_original_paths": [
+        "src/material/core/density/private/_compatibility.scss",
+        "src/material/core/theming/_theming.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/core/density/private/_compatibility.scss",
+        "src/material/core/theming/_theming.scss"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/core/density/private/_compatibility.scss",
+          "index": 0,
+          "header": "@@ -1,74 +0,0 @@",
+          "sha256": "fe508c7cdbe01877915b02a442c5b7ae95a597e1c83bedea50616f60edb4ef0d",
+          "technical_judgment": "Deletes the complete74-line density helper, exactly the untouched Material16 blob. This file is live in the owned legacy paginator and tree paths and controls root placement, duplicate suppression, density scaling and errors. Keep the local historical helper; an upstream unused label cannot remove this owned contract."
+        },
+        {
+          "path": "src/material/core/theming/_theming.scss",
+          "index": 0,
+          "header": "@@ -3,7 +3,6 @@",
+          "sha256": "71b99bf8db046925013a73bcf997a3bfc4ec90485735b913b034b462a5bab194",
+          "technical_judgment": "Removes the compatibility module import. The owned Material16 theming mixin still sets that module state around real legacy density callers; deleting the import would sever a live dependency."
+        },
+        {
+          "path": "src/material/core/theming/_theming.scss",
+          "index": 1,
+          "header": "@@ -481,20 +480,7 @@ $_internals: _mat-theming-internals-do-not-access;",
+          "sha256": "2f844d38966a77e66ff5b404e3141aa0898a72cfab5defa48010575aee7643bf",
+          "technical_judgment": "Removes root-generation and duplicate-suppression setup/reset around content. The owned mixin remains exact to the tagged function, and bounded tagged/owned tests require first legacy density at root, repeat suppression, independent component IDs, valid min/max bounds and restoration of both flags. Preserve this behavior and the existing warning policy."
+        }
+      ],
+      "source_review_complete": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "affected_branches": [
+        "21.x"
+      ],
+      "review_depth": "individual-compatibility",
+      "canonical_disposition_applied": false,
+      "status": "reviewed",
+      "decision": "Do not adopt deletion of the live Material16 density compatibility helper, its import or its setup/reset around theme content. All original files and three hunks were reviewed; the deleted74-line module is exactly the tagged helper and remains called by owned legacy paginator/tree paths. Eight tagged/owned density cases require first legacy density once at root, modern scoped density, independent component IDs, valid40px/56px limits, disabled generation and restoration of both flags. Retain the independently owned helper and state contract with no consumer selector, namespace, map, geometry or Sass source changes. No full product/native/packed qualification is claimed.",
+      "patch_file": "compatibility/rc/21x-c04-selector-density-4395cdf55a4b08d76aecd2e0378f3079289ce9c0.patch",
+      "source_scope_only": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  ],
+  "original_file_occurrences": 4,
+  "original_hunks": 5,
+  "source_qualification": {
+    "path": "compatibility/rc/21x-c04-selector-density-source-qualification.json",
+    "sha256": "78665c894ecc8e77991c0515aa75bbb64a1a0d13536be29a6ef0eadc1c1373da",
+    "bytes": 3627
+  },
+  "source_review": {
+    "path": "compatibility/rc/21x-c04-selector-density-source-review.json",
+    "sha256": "a14eb5cd3a75a1a8ce6de86c6b8988f55112c33766813a259174a73b4d037df1",
+    "bytes": 165835
+  },
+  "fresh_bounded_sass_compiler_execution": true,
+  "tagged_reference_sass_executed": true,
+  "reviewed_after_selector_mixin_sass_executed": true,
+  "upstream_typescript_tests_or_workflows_executed": false,
+  "full_sass_gate_executed": false,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

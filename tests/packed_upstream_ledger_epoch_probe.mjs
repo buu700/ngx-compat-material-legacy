@@ -126,7 +126,7 @@ assert.equal(snackDomRawCurrentRead({root, read: context.read})(ledgerPath).equa
 cases.push('complete-existing-historical-context-and-native-unwrapping-use-correct-ledger-epochs');
 assert.equal(epoch.testing_api_decisions_applied,input.line==='21.x'?7:0);
 assert.equal(epoch.sass_decisions_applied,6);
-assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?47:13);
+assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?49:13);
 if(input.line==='21.x'){
  assert.equal(epoch.title_source_decisions_applied,1);
  assert.equal(epoch.title_native_registry_metadata_tokens_applied,14);
@@ -138,6 +138,10 @@ if(input.line==='21.x'){
  assert.equal(prepared.inspection_stage.before.equals(prepared.theming_stage.after),true);
  assert.equal(prepared.inspection_stage.individual_decisions,4);
  assert.equal(prepared.inspection_stage.unselected_entries_preserved,1693);
+ assert.equal(epoch.selector_density_source_decisions_applied,2);
+ assert.equal(prepared.selector_density_stage.before.equals(prepared.inspection_stage.after),true);
+ assert.equal(prepared.selector_density_stage.individual_decisions,2);
+ assert.equal(prepared.selector_density_stage.unselected_entries_preserved,1695);
 }
 assert.equal(epoch.token_build_decisions_applied,input.line==='21.x'?1:0);
 assert.equal(epoch.unthemable_source_decisions_applied,input.line==='21.x'?5:0);
@@ -303,6 +307,7 @@ console.log(JSON.stringify({line: input.line, result: 'pass', cases, rejected,
   complete_ledger_frames:frameCount,title_source_decisions:epoch.title_source_decisions_applied??0,title_registry_metadata_tokens:epoch.title_native_registry_metadata_tokens_applied??0,
   theming_source_decisions:epoch.theming_source_decisions_applied??0,
   inspection_source_decisions:epoch.inspection_source_decisions_applied??0,
+  selector_density_source_decisions:epoch.selector_density_source_decisions_applied??0,
   analysis_python_version: prepared.analysis_python_version,
   actual_current_canonical_after_sha256: hash(read(ledgerPath)), historical_before_sha256: hash(prepared.before),
   source_owner_sha256: hash(read(owner)), producer_sha256: hash(read('tests/packed_upstream_ledger_epoch_probe.mjs')),

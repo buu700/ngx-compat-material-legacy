@@ -42,7 +42,13 @@ def verify_theming_registry_successor(root=ROOT):
     if current != after:
         from inspection_compatibility_canonical_ledger_patch import verify_inspection_registry_successor
         successor_before, successor_after = verify_inspection_registry_successor(root)
-        assert successor_before == after and current == successor_after
+        assert successor_before == after
+        if current != successor_after:
+            from selector_density_canonical_ledger_patch import verify_selector_density_registry_successor
+            selector_before, selector_after = verify_selector_density_registry_successor(root)
+            assert selector_before == successor_after and current == selector_after
+        else:
+            assert current == successor_after
     else:
         assert current == after
     return before, after
@@ -122,6 +128,12 @@ def derive_theming_successor(root=ROOT):
 def verify_theming_successor(candidate, root=ROOT):
     before, after = derive_theming_successor(root)
     observed = Path(candidate).read_bytes()
+    selector_density_applied = False
+    if digest(observed) == 'ce4735ac290b280cb23c5a96b9d5b7d057afd7540505bc73ca6c80eae21694a2':
+        from selector_density_canonical_ledger_patch import derive_selector_density_successor
+        selector_before, selector_after = derive_selector_density_successor(root)
+        assert observed == selector_after
+        observed, selector_density_applied = selector_before, True
     if digest(observed) == '84ea529d6f2f72925507300e88f9f825d48ae83ea1733191136663d1c8034c17':
         from inspection_compatibility_canonical_ledger_patch import derive_inspection_successor
         inspection_before, inspection_after = derive_inspection_successor(root)

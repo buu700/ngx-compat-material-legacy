@@ -38,7 +38,13 @@ def verify_inspection_registry_successor(root=ROOT):
                         "    scope_key:'inspection_compatibility_source_scope',module:'upstream-inspection-compatibility-admission.cjs'},\n" for sha in SHAS)
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == 'c01bd5192355a497485fc9f85cdda04760af0ac0287a4f2d01b93df34ab83ffc'
-    assert (root / REGISTRY).read_bytes() == after
+    current = (root / REGISTRY).read_bytes()
+    if current != after:
+        from selector_density_canonical_ledger_patch import verify_selector_density_registry_successor
+        successor_before, successor_after = verify_selector_density_registry_successor(root)
+        assert successor_before == after and current == successor_after
+    else:
+        assert current == after
     return before, after
 
 
@@ -117,7 +123,13 @@ def derive_inspection_successor(root=ROOT):
 
 def verify_inspection_successor(candidate, root=ROOT):
     before, after = derive_inspection_successor(root)
-    assert Path(candidate).read_bytes() == after, 'unqualified inspection canonical successor'
+    observed = Path(candidate).read_bytes()
+    if digest(observed) == 'ce4735ac290b280cb23c5a96b9d5b7d057afd7540505bc73ca6c80eae21694a2':
+        from selector_density_canonical_ledger_patch import derive_selector_density_successor
+        selector_before, selector_after = derive_selector_density_successor(root)
+        assert observed == selector_after and selector_before == after
+        observed = selector_before
+    assert observed == after, 'unqualified inspection canonical successor'
     return {'before_sha256': digest(before), 'after_sha256': digest(after), 'individual_decisions': 4,
             'summary_scalar_tokens': 2, 'unselected_entry_bytes_preserved': 1693,
             'security_reviews_unchanged': 1, 'canonical_entries': 1697, 'actual_native_artifact_browser_floor_or_full_audit_qualified': False}

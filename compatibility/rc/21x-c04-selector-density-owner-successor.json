@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Exact owned-tool edit transport for retained reference tests; not a tagged source/style golden or an admission pass",
+  "path": "scripts/packed-upstream-ledger-epoch.mjs",
+  "source_parent": "f5638de44628fa48df56644f5cccf53720fb8401",
+  "before": {
+    "sha256": "038319882f5bf403c7136911ae82399c5fd3c52048f325abdf6f0b957d4dfbae",
+    "bytes": 20560
+  },
+  "after": {
+    "sha256": "9805c653c7e608e62ef587d90674d34f029608fa504fb84ff18ca489f2971919",
+    "bytes": 24644
+  },
+  "literal_edits": [
+    {
+      "before": "import {reviewInspectionCompatibilitySource} from './upstream-inspection-compatibility-source-review.mjs';",
+      "after": "import {reviewInspectionCompatibilitySource} from './upstream-inspection-compatibility-source-review.mjs';\nimport selectorDensity from './upstream-selector-density-admission.cjs';\nimport {applySelectorDensityCanonicalStage,selectorDensityRegistrySuccessor} from './selector-density-canonical-stage.mjs';\nimport {reviewSelectorDensitySource} from './upstream-selector-density-source-review.mjs';"
+    },
+    {
+      "before": "const INSPECTION_PACKET_HASH='6194ddd826ea4469d49aa96d58db67ad4576bb74a31f9ccbe4ceae9c9334db9f';",
+      "after": "const INSPECTION_PACKET_HASH='6194ddd826ea4469d49aa96d58db67ad4576bb74a31f9ccbe4ceae9c9334db9f';\nconst SELECTOR_DENSITY_PACKET='compatibility/rc/21x-c04-selector-density-canonical-transition.json';\nconst SELECTOR_DENSITY_PACKET_HASH='e128bc43e5626db26727f35b0550374f5c1dccf21e2149d5232d4eabbabec997';"
+    },
+    {
+      "before": "function inspectionTools(root,read){",
+      "after": "function selectorDensityTools(root,read){\n const raw=read(SELECTOR_DENSITY_PACKET);assert.equal(hash(raw),SELECTOR_DENSITY_PACKET_HASH,'changed selector/density canonical packet');const packet=JSON.parse(raw);\n assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'f5638de44628fa48df56644f5cccf53720fb8401');\n assert.equal(packet.individual_decisions,2);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,2);\n assert.equal(packet.unselected_entry_bytes_to_preserve,1695);assert.equal(packet.actual_native_artifact_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');\n const registryBefore=original(root,THEMING_REGISTRY,packet.source_parent),registryAfter=selectorDensityRegistrySuccessor(registryBefore);\n assert.deepEqual(packet.registry_before,{path:THEMING_REGISTRY,sha256:hash(registryBefore),bytes:registryBefore.length});\n assert.deepEqual(packet.registry_after,{path:THEMING_REGISTRY,sha256:hash(registryAfter),bytes:registryAfter.length});\n const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);\n const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-selector-density-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});\n const bound=[{path:SELECTOR_DENSITY_PACKET,sha256:SELECTOR_DENSITY_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,packet.registry_after,...patches];\n const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed selector/density tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};\n assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body};\n}\nfunction inspectionTools(root,read){\n const successor=selectorDensityTools(root,read);"
+    },
+    {
+      "before": " const bound=[{path:INSPECTION_PACKET,sha256:INSPECTION_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,packet.registry_after,...patches];",
+      "after": " assert.equal(registryAfter.equals(successor.registryBefore),true,'selector/density registry does not succeed exact inspection registry');\n const bound=[{path:INSPECTION_PACKET,sha256:INSPECTION_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];"
+    },
+    {
+      "before": " assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body};\n}\nfunction themingTools",
+      "after": " assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body,successor};\n}\nfunction themingTools"
+    },
+    {
+      "before": "currentReference:ref=>ref.path===THEMING_REGISTRY?successor.packet.registry_after:ref",
+      "after": "currentReference:ref=>ref.path===THEMING_REGISTRY?successor.successor.packet.registry_after:ref"
+    },
+    {
+      "before": "[...frames.frames,tools.packet.after,tools.successor.packet.after]",
+      "after": "[...frames.frames,tools.packet.after,tools.successor.packet.after,tools.successor.successor.packet.after]"
+    },
+    {
+      "before": " assert.deepEqual(tools.successor.packet.after,{path:LEDGER,sha256:hash(inspectionStage.after),bytes:inspectionStage.after.length});",
+      "after": " assert.deepEqual(tools.successor.packet.after,{path:LEDGER,sha256:hash(inspectionStage.after),bytes:inspectionStage.after.length});\n assert.deepEqual(tools.successor.successor.packet.before,tools.successor.packet.after);\n const selectorDensityStage=applySelectorDensityCanonicalStage({before:inspectionStage.after,body:tools.successor.successor.body});\n assert.deepEqual(tools.successor.successor.packet.after,{path:LEDGER,sha256:hash(selectorDensityStage.after),bytes:selectorDensityStage.after.length});"
+    },
+    {
+      "before": "if(path===LEDGER&&[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256].includes(currentHash))",
+      "after": "if(path===LEDGER&&[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256].includes(currentHash))"
+    },
+    {
+      "before": " const inspectionSource=reviewInspectionCompatibilitySource({root,read});\n const assertCurrent=()=>{assertTools();assertLedger();source.assertCurrent();themingSource.assertCurrent();inspectionSource.assertCurrent();};\n assertCurrent();return {packet,stage,themingStage,inspectionStage,metadataRead,assertCurrent,bound:[...bound,...source.bound,...themingSource.bound,...inspectionSource.bound],\n  titleApplied:[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256].includes(currentHash),themingApplied:[tools.packet.after.sha256,tools.successor.packet.after.sha256].includes(currentHash),inspectionApplied:currentHash===tools.successor.packet.after.sha256,currentHash};",
+      "after": " const inspectionSource=reviewInspectionCompatibilitySource({root,read});\n for(const entry of selectorDensityStage.entries)assert.equal(selectorDensity.sourceOk({root,read,entry,body:tools.successor.successor.body,review:tools.successor.successor.body.reviews.find(row=>row.sha===entry.sha),proof:entry.individual_proof}),true,'fresh selector/density source admission failed');\n const selectorDensitySource=reviewSelectorDensitySource({root,read});\n const assertCurrent=()=>{assertTools();assertLedger();source.assertCurrent();themingSource.assertCurrent();inspectionSource.assertCurrent();selectorDensitySource.assertCurrent();};\n assertCurrent();return {packet,stage,themingStage,inspectionStage,selectorDensityStage,metadataRead,assertCurrent,bound:[...bound,...source.bound,...themingSource.bound,...inspectionSource.bound,...selectorDensitySource.bound],\n  titleApplied:[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256].includes(currentHash),themingApplied:[tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256].includes(currentHash),inspectionApplied:[tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256].includes(currentHash),selectorDensityApplied:currentHash===tools.successor.successor.packet.after.sha256,currentHash};"
+    },
+    {
+      "before": "canonical_after:ctx.inspectionStage.after",
+      "after": "canonical_after:ctx.selectorDensityStage.after"
+    },
+    {
+      "before": "  prior_metadata_assert_current:",
+      "after": "  selector_density_stage:{...ctx.selectorDensityStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},\n  prior_metadata_assert_current:"
+    },
+    {
+      "before": "+(ctx.inspectionApplied?4:0),",
+      "after": "+(ctx.inspectionApplied?4:0)+(ctx.selectorDensityApplied?2:0),"
+    },
+    {
+      "before": "inspection_source_decisions_applied:ctx.inspectionApplied?4:0,",
+      "after": "inspection_source_decisions_applied:ctx.inspectionApplied?4:0,selector_density_source_decisions_applied:ctx.selectorDensityApplied?2:0,"
+    },
+    {
+      "before": "[tools.registryBefore,tools.successor.registryBefore].find",
+      "after": "[tools.registryBefore,tools.successor.registryBefore,tools.successor.successor.registryBefore].find"
+    }
+  ],
+  "canonical_transition": {
+    "path": "compatibility/rc/21x-c04-selector-density-canonical-transition.json",
+    "sha256": "e128bc43e5626db26727f35b0550374f5c1dccf21e2149d5232d4eabbabec997",
+    "bytes": 2519
+  },
+  "candidate_owner_execution": {
+    "path": "compatibility/rc/21x-c04-selector-density-canonical-owner-candidate-smoke.json",
+    "sha256": "80ff8ea91b8849c661414d4d5465890cd3c9fe428eec21295483465b5cfe5e8a",
+    "bytes": 1816
+  },
+  "source_handler_controls": {
+    "path": "compatibility/rc/21x-c04-selector-density-admission-controls.json",
+    "sha256": "79d8ba999d2667abc02af0dcbeedc9385b2e0a20d7a478eb517c6130de1d0636",
+    "bytes": 5726
+  },
+  "tagged_golden_changes": 0,
+  "original_assertions_or_rejection_controls_dropped": 0,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

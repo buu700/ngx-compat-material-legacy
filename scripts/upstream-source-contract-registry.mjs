@@ -58,4 +58,8 @@ export const sourceContractDefinitions = [
     scope_key:'inspection_compatibility_source_scope',module:'upstream-inspection-compatibility-admission.cjs'},
   {sha:'456741a61a8e85e597e82503941ccab97777bc97',proof_kind:'individual-historical-inspection-compatibility-source-review',
     scope_key:'inspection_compatibility_source_scope',module:'upstream-inspection-compatibility-admission.cjs'},
+  {sha:'999029aa5a23e9577503775c1ea4513e5c3cb4f9',proof_kind:'individual-historical-selector-density-source-review',
+    scope_key:'selector_density_source_scope',module:'upstream-selector-density-admission.cjs'},
+  {sha:'4395cdf55a4b08d76aecd2e0378f3079289ce9c0',proof_kind:'individual-historical-selector-density-source-review',
+    scope_key:'selector_density_source_scope',module:'upstream-selector-density-admission.cjs'},
 ];

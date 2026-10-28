@@ -102,7 +102,13 @@ def derive_title_successor(root=ROOT):
             if value != registry_after:
                 from inspection_compatibility_canonical_ledger_patch import verify_inspection_registry_successor
                 inspection_before, inspection_after = verify_inspection_registry_successor(root)
-                assert registry_after == inspection_before and value == inspection_after
+                assert registry_after == inspection_before
+                if value != inspection_after:
+                    from selector_density_canonical_ledger_patch import verify_selector_density_registry_successor
+                    selector_before, selector_after = verify_selector_density_registry_successor(root)
+                    assert selector_before == inspection_after and value == selector_after
+                else:
+                    assert value == inspection_after
             else:
                 assert value == registry_after
             value = registry_before  # Exact historical metadata after authenticating current bytes.
@@ -116,6 +122,12 @@ def derive_title_successor(root=ROOT):
 def verify_title_successor(root=ROOT, candidate=None):
     before, after = derive_title_successor(root)
     observed = Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()
+    selector_density_applied = False
+    if HASH(observed) == 'ce4735ac290b280cb23c5a96b9d5b7d057afd7540505bc73ca6c80eae21694a2':
+        from selector_density_canonical_ledger_patch import derive_selector_density_successor
+        selector_before, selector_after = derive_selector_density_successor(root)
+        assert observed == selector_after
+        observed, selector_density_applied = selector_before, True
     inspection_applied = False
     if HASH(observed) == '84ea529d6f2f72925507300e88f9f825d48ae83ea1733191136663d1c8034c17':
         from inspection_compatibility_canonical_ledger_patch import derive_inspection_successor
@@ -132,5 +144,5 @@ def verify_title_successor(root=ROOT, candidate=None):
     return dict(individual_decisions=1, metadata_tokens=14, summary_scalar_tokens=2,
         unselected_entry_bytes_preserved=1682, population=1697, closed_dispositions=377,
         pending_dispositions=1320, pending_security_reviews=1, before_sha256=HASH(before),
-        after_sha256=HASH(after), exact_theming_successor_verified=theming_applied, exact_inspection_successor_verified=inspection_applied,
+        after_sha256=HASH(after), exact_theming_successor_verified=theming_applied, exact_inspection_successor_verified=inspection_applied, exact_selector_density_successor_verified=selector_density_applied,
         actual_native_artifact_browser_floor_or_full_audit_qualified=False, g11_claim='not-passed')
