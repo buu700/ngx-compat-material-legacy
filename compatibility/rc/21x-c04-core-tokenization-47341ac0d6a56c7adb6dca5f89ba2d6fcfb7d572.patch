@@ -1,0 +1,168 @@
+diff --git a/src/material/core/_core-theme.scss b/src/material/core/_core-theme.scss
+index 814c245ab8c68578a12b40b79dafa765cdf66dff..cf6d1f82bd86b145abdb218b0c55929c19fbee61 100644
+--- a/src/material/core/_core-theme.scss
++++ b/src/material/core/_core-theme.scss
+@@ -54,16 +54,16 @@
+   @include option-theme.typography($theme);
+   @include optgroup-theme.typography($theme);
+   @include pseudo-checkbox-theme.typography($theme);
+-  // TODO(mmalerba): add typography mixin for this.
+-  // @include ripple-theme.typography($config);
++  @include ripple-theme.typography($theme);
+ }
+ 
+ @mixin density($theme) {
+   @include option-theme.density($theme);
+   @include optgroup-theme.density($theme);
++  @include ripple-theme.density($theme);
++
+   // TODO(mmalerba): add density mixins for these.
+-  // @include ripple-theme.density($density-scale);
+-  // @include pseudo-checkbox-theme.density($density-scale);
++  // @include pseudo-checkbox-theme.density($theme);
+ }
+ 
+ // Mixin that renders all of the core styles that depend on the theme.
+diff --git a/src/material/core/ripple/_ripple-theme.scss b/src/material/core/ripple/_ripple-theme.scss
+index 6d2589a218a5703f88ab898d2ca75c31ce25c9e3..86aa6b53f197fe6cfb3f41efeed78624f0f13eeb 100644
+--- a/src/material/core/ripple/_ripple-theme.scss
++++ b/src/material/core/ripple/_ripple-theme.scss
+@@ -1,26 +1,30 @@
+-@use 'sass:meta';
++@use '../tokens/m2/mat/ripple' as tokens-mat-ripple;
++@use '../tokens/token-utils';
++@use '../style/sass-utils';
++
+ @use '../theming/theming';
+ @use '../theming/inspection';
+ 
+-@mixin base($theme) {
+-  // TODO(mmalerba): Move ripple base tokens here
+-}
++@mixin base($theme) {}
+ 
+-// Colors for the ripple elements.
+ @mixin color($theme) {
+-  $foreground-base: inspection.get-theme-color($theme, foreground, base);
+-  $color-opacity: 0.1;
++  @include sass-utils.current-selector-or-root() {
++    @include token-utils.create-token-values(tokens-mat-ripple.$prefix,
++      tokens-mat-ripple.get-color-tokens($theme));
++  }
++}
+ 
+-  .mat-ripple-element {
+-    // If the ripple color is resolves to a color *type*, we can use it directly, otherwise
+-    // (e.g. it resolves to a CSS variable) we fall back to using the color and setting an opacity.
+-    @if (meta.type-of($foreground-base) == color) {
+-      background-color: rgba($foreground-base, $color-opacity);
+-    }
+-    @else {
+-      background-color: $foreground-base;
+-      opacity: $color-opacity;
+-    }
++@mixin typography($theme) {
++  @include sass-utils.current-selector-or-root() {
++    @include token-utils.create-token-values(tokens-mat-ripple.$prefix,
++      tokens-mat-ripple.get-typography-tokens($theme));
++  }
++}
++
++@mixin density($theme) {
++  @include sass-utils.current-selector-or-root() {
++    @include token-utils.create-token-values(tokens-mat-ripple.$prefix,
++      tokens-mat-ripple.get-density-tokens($theme));
+   }
+ }
+ 
+@@ -30,5 +34,11 @@
+     @if inspection.theme-has($theme, color) {
+       @include color($theme);
+     }
++    @if inspection.theme-has($theme, density) {
++      @include density($theme);
++    }
++    @if inspection.theme-has($theme, typography) {
++      @include typography($theme);
++    }
+   }
+ }
+diff --git a/src/material/core/ripple/_ripple.scss b/src/material/core/ripple/_ripple.scss
+index ca5b93f709dc81859ae7c501ed02f6dd2360ade6..e958e7b6f0e06e2c731d12963ba8f4ec9bc70327 100644
+--- a/src/material/core/ripple/_ripple.scss
++++ b/src/material/core/ripple/_ripple.scss
+@@ -1,4 +1,6 @@
+ @use '@angular/cdk';
++@use '../tokens/m2/mat/ripple' as tokens-mat-ripple;
++@use '../tokens/token-utils';
+ 
+ @mixin ripple() {
+   // The host element of an mat-ripple directive should always have a position of "absolute" or
+@@ -35,6 +37,12 @@
+     // the ripples aren't clipped when inside the shadow DOM (see #24028).
+     transform: scale3d(0, 0, 0);
+ 
++    @include token-utils.use-tokens(
++      tokens-mat-ripple.$prefix, tokens-mat-ripple.get-token-slots()) {
++      // We have to emit a fallback value here, because some internal builds depend on it.
++      background-color: var(#{token-utils.get-token-variable(color)}, rgba(#000, 0.1));
++    }
++
+     // In high contrast mode the ripple is opaque, causing it to obstruct the content.
+     @include cdk.high-contrast(active, off) {
+       display: none;
+diff --git a/src/material/core/tokens/m2/mat/_ripple.scss b/src/material/core/tokens/m2/mat/_ripple.scss
+new file mode 100644
+index 0000000000000000000000000000000000000000..fdb31a365a4bab1e2d3c4aaf81bad7f9dee0fcb1
+--- /dev/null
++++ b/src/material/core/tokens/m2/mat/_ripple.scss
+@@ -0,0 +1,49 @@
++@use 'sass:meta';
++@use '../../token-utils';
++@use '../../../theming/inspection';
++@use '../../../style/sass-utils';
++
++// The prefix used to generate the fully qualified name for tokens in this file.
++$prefix: (mat, ripple);
++
++// Tokens that can't be configured through Angular Material's current theming API,
++// but may be in a future version of the theming API.
++@function get-unthemable-tokens() {
++  @return ();
++}
++
++// Tokens that can be configured through Angular Material's color theming API.
++@function get-color-tokens($theme) {
++  $is-dark: inspection.get-theme-type($theme) == dark;
++  $base: inspection.get-theme-color($theme, foreground, base);
++
++  // If the base is a color *type* we can use it directly in the `rgba` call below.
++  // If it's anything else (e.g. a CSS variable) we fall back to using static colors
++  // since we don't have a way of adjusting the opacity.
++  $color: if(meta.type-of($base) == color, $base, if($is-dark, #fff, #000));
++
++  @return (
++    color: rgba($color, 0.1),
++  );
++}
++
++// Tokens that can be configured through Angular Material's typography theming API.
++@function get-typography-tokens($theme) {
++  @return ();
++}
++
++// Tokens that can be configured through Angular Material's density theming API.
++@function get-density-tokens($theme) {
++  @return ();
++}
++
++// Combines the tokens generated by the above functions into a single map with placeholder values.
++// This is used to create token slots.
++@function get-token-slots() {
++  @return sass-utils.deep-merge-all(
++      get-unthemable-tokens(),
++      get-color-tokens(token-utils.$placeholder-color-config),
++      get-typography-tokens(token-utils.$placeholder-typography-config),
++      get-density-tokens(token-utils.$placeholder-density-config)
++  );
++}
