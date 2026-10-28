@@ -20,6 +20,7 @@ import {buttonTokenRepairsRegistrySuccessor} from '../scripts/button-token-repai
 import {surfaceM3ThemeRegistrySuccessor} from '../scripts/surface-m3-theme-canonical-stage.mjs';
 import {sliderM3RepairsRegistrySuccessor} from '../scripts/slider-m3-repairs-canonical-stage.mjs';
 import {controlM3ThemeRegistrySuccessor} from '../scripts/control-m3-theme-canonical-stage.mjs';
+import {foundationM3ThemeRegistrySuccessor} from '../scripts/foundation-m3-theme-canonical-stage.mjs';
 import {qualifyCanonicalToolReference} from '../scripts/packed-upstream-ledger-epoch.mjs';
 import {requiresRegisteredSourceReview} from '../scripts/upstream-registered-source-review.mjs';
 import {sourceContractDefinitions} from '../scripts/upstream-source-contract-registry.mjs';
@@ -31,8 +32,8 @@ for(const key of Object.keys(env))if(key.startsWith('RC_')||['GIT_DIR','GIT_WORK
 const before=execFileSync('git',['--no-replace-objects','show',packet.source_parent+':'+ledger],{cwd:root,env,maxBuffer:8*1024*1024});
 const stage=applyThemingInspectionCanonicalStage({before,body});assert.equal(hash(stage.after),packet.after.sha256);
 const registryBefore=execFileSync('git',['--no-replace-objects','show',packet.source_parent+':'+packet.registry_before.path],{cwd:root,env});
-assert.equal(read(packet.registry_after.path).equals(controlM3ThemeRegistrySuccessor(sliderM3RepairsRegistrySuccessor(surfaceM3ThemeRegistrySuccessor(buttonTokenRepairsRegistrySuccessor(buttonTokenizationRegistrySuccessor(selectorDensityRegistrySuccessor(inspectionRegistrySuccessor(themingRegistrySuccessor(registryBefore))))))))),true);assert.equal(sourceContractDefinitions.length,44);
-const qualified=qualifyCanonicalToolReference({root,read,prior:packet.registry_before});assert.deepEqual(qualified.reference,JSON.parse(read('compatibility/rc/21x-c04-control-m3-theme-canonical-transition.json')).registry_after);
+assert.equal(read(packet.registry_after.path).equals(foundationM3ThemeRegistrySuccessor(controlM3ThemeRegistrySuccessor(sliderM3RepairsRegistrySuccessor(surfaceM3ThemeRegistrySuccessor(buttonTokenRepairsRegistrySuccessor(buttonTokenizationRegistrySuccessor(selectorDensityRegistrySuccessor(inspectionRegistrySuccessor(themingRegistrySuccessor(registryBefore)))))))))),true);assert.equal(sourceContractDefinitions.length,50);
+const qualified=qualifyCanonicalToolReference({root,read,prior:packet.registry_before});assert.deepEqual(qualified.reference,JSON.parse(read('compatibility/rc/21x-c04-foundation-m3-theme-canonical-transition.json')).registry_after);
 let metadataCases=0,metadataRejections=0,sourceRejections=0;const rejected=[];
 let patchChanged=false;const patchPath=body.reviews[0].patch_file;
 const patchScope=qualifyCanonicalToolReference({root,read:path=>patchChanged&&path===patchPath?Buffer.concat([read(path),Buffer.from('\n')]):read(path),prior:packet.registry_before});
@@ -95,7 +96,7 @@ try{
  const bypass=inspect(stage.entries,{inject:true,checker:'scripts/'+basename(mutant)});assert.equal(bypass.evidence_failures.length,0);assert.deepEqual(bypass.insufficient_review_sha_ids.sensitive,[]);mutantDetected=true;rejected.push('root/missing-source-requirement-mutant');
 }finally{fs.rmSync(mutant,{force:true});fs.rmSync(directory,{recursive:true,force:true});}
 const report={schema_version:1,result:'pass',pure_metadata_cases:metadataCases,metadata_rejections:metadataRejections,source_rejections:sourceRejections,
- registered_source_contracts:44,prior_registry_records_preserved:20,current_registry_tool_bindings:qualified.bound.length,real_root_positive_rows:rootPositive,real_root_rejected_rows:rootNegative,missing_source_requirement_mutant_detected:mutantDetected,
+ registered_source_contracts:50,prior_registry_records_preserved:20,current_registry_tool_bindings:qualified.bound.length,real_root_positive_rows:rootPositive,real_root_rejected_rows:rootNegative,missing_source_requirement_mutant_detected:mutantDetected,
  late_original_patch_in_tool_role_rejected:true,
  after_sha256:hash(stage.after),individual_decisions:2,summary_scalar_tokens:2,unselected_entries_preserved:1695,rejected,canonical_ledger_applied:false,
  actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};

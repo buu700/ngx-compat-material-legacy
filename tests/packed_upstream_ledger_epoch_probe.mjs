@@ -126,7 +126,7 @@ assert.equal(snackDomRawCurrentRead({root, read: context.read})(ledgerPath).equa
 cases.push('complete-existing-historical-context-and-native-unwrapping-use-correct-ledger-epochs');
 assert.equal(epoch.testing_api_decisions_applied,input.line==='21.x'?7:0);
 assert.equal(epoch.sass_decisions_applied,6);
-assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?65:13);
+assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?71:13);
 if(input.line==='21.x'){
  assert.equal(epoch.title_source_decisions_applied,1);
  assert.equal(epoch.title_native_registry_metadata_tokens_applied,14);
@@ -327,6 +327,7 @@ console.log(JSON.stringify({line: input.line, result: 'pass', cases, rejected,
   surface_m3_theme_source_decisions:epoch.surface_m3_theme_source_decisions_applied??0,
   slider_m3_repairs_source_decisions:epoch.slider_m3_repairs_source_decisions_applied??0,
   control_m3_theme_source_decisions:epoch.control_m3_theme_source_decisions_applied??0,
+  foundation_m3_theme_source_decisions:epoch.foundation_m3_theme_source_decisions_applied??0,
   analysis_python_version: prepared.analysis_python_version,
   actual_current_canonical_after_sha256: hash(read(ledgerPath)), historical_before_sha256: hash(prepared.before),
   source_owner_sha256: hash(read(owner)), producer_sha256: hash(read('tests/packed_upstream_ledger_epoch_probe.mjs')),

@@ -39,7 +39,13 @@ def verify_control_m3_theme_registry_successor(root=ROOT):
                         "    scope_key:'control_m3_theme_source_scope',module:'upstream-control-m3-theme-admission.cjs'},\n" for sha in SHAS)
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == 'ae4d9e85741a782bdd2f9be8e7686bab3b3d4cb0e645224eab8207fb0e376340'
-    assert (root / REGISTRY).read_bytes() == after
+    current = (root / REGISTRY).read_bytes()
+    if digest(current) == '99236700a066edfa8ab5dd2fbc08c92de86334839bad161467e246e4a91a3895':
+        from foundation_m3_theme_canonical_ledger_patch import verify_foundation_m3_theme_registry_successor
+        foundation_before, foundation_after = verify_foundation_m3_theme_registry_successor(root)
+        assert current == foundation_after and foundation_before == after
+        current = foundation_before
+    assert current == after
     return before, after
 
 

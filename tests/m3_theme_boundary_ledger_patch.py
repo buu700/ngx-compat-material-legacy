@@ -65,6 +65,12 @@ def derive_boundary_successor(root=ROOT, expected_before=None):
 def verify_boundary_successor(root=ROOT, expected_before=None, candidate=None):
     before, after = derive_boundary_successor(root=root, expected_before=expected_before)
     observed = Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()
+    foundation_m3_theme_applied = False
+    if HASH(observed) == 'd7d3eab23b0f89f6d366d8e6df1ee7ff659cb26c77edbb517e99b30f757302b0':
+        from foundation_m3_theme_canonical_ledger_patch import derive_foundation_m3_theme_successor
+        foundation_before, foundation_after = derive_foundation_m3_theme_successor(root)
+        assert observed == foundation_after
+        observed, foundation_m3_theme_applied = foundation_before, True
     control_m3_theme_applied = False
     if HASH(observed) == '5e4badf5f49969c776d83d6d04d658f8f2082150c29358f88d3f445b216c6a27':
         from control_m3_theme_canonical_ledger_patch import derive_control_m3_theme_successor
@@ -119,7 +125,7 @@ def verify_boundary_successor(root=ROOT, expected_before=None, candidate=None):
         assert observed == title_after and title_before == after
         observed, title_applied = title_before, True
     assert observed == after
-    return dict(line='21.x', exact_title_successor_verified=title_applied, exact_theming_successor_verified=theming_applied, exact_inspection_successor_verified=inspection_applied, exact_selector_density_successor_verified=selector_density_applied, exact_button_tokenization_successor_verified=button_tokenization_applied, exact_button_token_repairs_successor_verified=button_token_repairs_applied, exact_surface_m3_theme_successor_verified=surface_m3_theme_applied, exact_slider_m3_repairs_successor_verified=slider_m3_repairs_applied, exact_control_m3_theme_successor_verified=control_m3_theme_applied, individual_decisions=5, unselected_entry_bytes_preserved=1692,
+    return dict(line='21.x', exact_title_successor_verified=title_applied, exact_theming_successor_verified=theming_applied, exact_inspection_successor_verified=inspection_applied, exact_selector_density_successor_verified=selector_density_applied, exact_button_tokenization_successor_verified=button_tokenization_applied, exact_button_token_repairs_successor_verified=button_token_repairs_applied, exact_surface_m3_theme_successor_verified=surface_m3_theme_applied, exact_slider_m3_repairs_successor_verified=slider_m3_repairs_applied, exact_control_m3_theme_successor_verified=control_m3_theme_applied, exact_foundation_m3_theme_successor_verified=foundation_m3_theme_applied, individual_decisions=5, unselected_entry_bytes_preserved=1692,
         before_sha256=HASH(before), after_sha256=HASH(after), after_bytes=len(after),
         closed_dispositions=376, pending_dispositions=1321, pending_security_reviews=1,
         actual_native_artifact_browser_floor_or_full_audit_qualified=False, g11_claim='not-passed', g13_claim='not-passed')
