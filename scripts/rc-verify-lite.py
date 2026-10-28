@@ -285,9 +285,7 @@ def check_current_binding(row: dict, *, root: Path = ROOT) -> None:
         fail(f"{row.get('candidate')}: {error}")
 
 
-def main() -> None:
-    if len(sys.argv) != 1:
-        fail(f"unknown arguments: {sys.argv[1:]}")
+def check_coherence() -> None:
     inventory = json.loads((ROOT / "testing/legacy-runner/historical-inventory.json").read_text())
     specs = json.loads((ROOT / "testing/legacy-runner/historical-specs.json").read_text())
     manifest = json.loads((ROOT / "compatibility/f08/port-manifest.json").read_text())
@@ -312,6 +310,12 @@ def main() -> None:
     families = inventory_families(inventory["rows"])
     check_family_reports(inventory_candidates, families)
     check_full_verify_refuses_subsets()
+
+
+def main() -> None:
+    if len(sys.argv) != 1:
+        fail(f"unknown arguments: {sys.argv[1:]}")
+    check_coherence()
     run_checks()
     print("verify-lite: coherence checks passed")
     print("verify-lite: full product gates omitted:")
