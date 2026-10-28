@@ -38,7 +38,13 @@ def verify_button_token_repairs_registry_successor(root=ROOT):
                         "    scope_key:'button_token_repairs_source_scope',module:'upstream-button-token-repairs-admission.cjs'},\n" for sha in SHAS)
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == '5fc40f097b86949ce52285987d0fbbcc32841007f5f879dca066cb43ecb675af'
-    assert (root / REGISTRY).read_bytes() == after
+    current = (root / REGISTRY).read_bytes()
+    if digest(current) == '856dffd6cd50d5ced52e9ea978761b18dbd13079cda15d01c25bbea6ad1764d8':
+        from surface_m3_theme_canonical_ledger_patch import verify_surface_m3_theme_registry_successor
+        surface_before, surface_after = verify_surface_m3_theme_registry_successor(root)
+        assert current == surface_after
+        current = surface_before
+    assert current == after
     return before, after
 
 

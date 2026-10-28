@@ -76,4 +76,10 @@ export const sourceContractDefinitions = [
     scope_key:'button_token_repairs_source_scope',module:'upstream-button-token-repairs-admission.cjs'},
   {sha:'702ccbe01446502f43e6e7cb365a587ee7558504',proof_kind:'individual-historical-button-token-repairs-source-review',
     scope_key:'button_token_repairs_source_scope',module:'upstream-button-token-repairs-admission.cjs'},
+  {sha:'545db61b41957df26c5e3c95a2959ca6c83a9190',proof_kind:'individual-historical-surface-m3-theme-source-review',
+    scope_key:'surface_m3_theme_source_scope',module:'upstream-surface-m3-theme-admission.cjs'},
+  {sha:'1930b1dacf07826750ffc72dbce551fe6653fd4f',proof_kind:'individual-historical-surface-m3-theme-source-review',
+    scope_key:'surface_m3_theme_source_scope',module:'upstream-surface-m3-theme-admission.cjs'},
+  {sha:'fbc7bdda93b7c261705da81cec6720bbf607c5ce',proof_kind:'individual-historical-surface-m3-theme-source-review',
+    scope_key:'surface_m3_theme_source_scope',module:'upstream-surface-m3-theme-admission.cjs'},
 ];

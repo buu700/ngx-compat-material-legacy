@@ -1,0 +1,232 @@
+diff --git a/src/dev-app/theme-token-api.scss b/src/dev-app/theme-token-api.scss
+index 4bb5a196bc5245e007e978d10424a8efd59278a8..58d53fe7a095ff6ecfe549bae60f36e133f04778 100644
+--- a/src/dev-app/theme-token-api.scss
++++ b/src/dev-app/theme-token-api.scss
+@@ -26,9 +26,6 @@ $m3-base-config: (
+   color: (
+     primary: matx.$m3-green-palette
+   ),
+-  typography: (
+-    brand-family: 'monospace'
+-  )
+ );
+ 
+ // Our M3 light theme.
+@@ -41,6 +38,7 @@ $dark-theme: matx.define-theme(map.set($m3-base-config, color, theme-type, dark)
+ html {
+   @include mat.checkbox-theme($light-theme);
+   @include mat.card-theme($light-theme);
++  @include mat.toolbar-theme($light-theme);
+ }
+ 
+ // Emit dark theme styles.
+@@ -51,6 +49,7 @@ html {
+ 
+   @include mat.checkbox-color($dark-theme);
+   @include mat.card-color($dark-theme);
++  @include mat.toolbar-color($dark-theme);
+ }
+ 
+ // Emit density styles for each scale.
+@@ -60,5 +59,6 @@ html {
+   .demo-density-#{$scale} {
+     @include mat.checkbox-density($scale-theme);
+     @include mat.card-density($scale-theme);
++    @include mat.toolbar-density($scale-theme);
+   }
+ }
+diff --git a/src/material-experimental/theming/_custom-tokens.scss b/src/material-experimental/theming/_custom-tokens.scss
+index ea8058ef463a2a2b0117f79449a342b07ad484e0..9c714417d0a247859108ddd290814adb4ea57808 100644
+--- a/src/material-experimental/theming/_custom-tokens.scss
++++ b/src/material-experimental/theming/_custom-tokens.scss
+@@ -25,7 +25,21 @@
+       _generate-typography-tokens($systems, title-text, title-large),
+       _generate-typography-tokens($systems, subtitle-text, title-medium),
+       (
+-        subtitle-text-color: map.get($systems, md-ref-color, on-surface)
++        subtitle-text-color: map.get($systems, md-sys-color, on-surface)
++      )
++  );
++}
++
++/// Generates custom tokens for the mat-toolbar.
++/// @param {Map} $systems The MDC system tokens
++/// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
++/// @return {Map} A set of custom tokens for the mat-toolbar
++@function toolbar($systems, $exclude-hardcoded) {
++  @return mat.private-merge-all(
++      _generate-typography-tokens($systems, title-text, title-large),
++      (
++        container-background-color: map.get($systems, md-sys-color, surface),
++        container-text-color: map.get($systems, md-sys-color, on-surface),
+       )
+   );
+ }
+diff --git a/src/material-experimental/theming/_m3-density.scss b/src/material-experimental/theming/_m3-density.scss
+index f9ea732c87bdee5c465ea0291851aad51c146e56..3fa381f0384da70d3d9cf245d3bf18e0b00bdab8 100644
+--- a/src/material-experimental/theming/_m3-density.scss
++++ b/src/material-experimental/theming/_m3-density.scss
+@@ -21,6 +21,10 @@ $_density-tokens: (
+     (mdc, elevated-card): (),
+     (mdc, outlined-card): (),
+     (mat, card): (),
++    (mat, toolbar): (
++    standard-height: (64px, 60px, 56px, 52px),
++    mobile-height: (56px, 52px, 48px, 44px),
++  )
+ );
+ 
+ /// Gets the value for the given density scale from the given set of density values.
+diff --git a/src/material-experimental/theming/_m3-tokens.scss b/src/material-experimental/theming/_m3-tokens.scss
+index 374e21bffb6593e7a6a9be923e283b13134ce3f3..abeb1f0f6a07fee5b641d06178f4bdebec970a0b 100644
+--- a/src/material-experimental/theming/_m3-tokens.scss
++++ b/src/material-experimental/theming/_m3-tokens.scss
+@@ -195,6 +195,11 @@
+           custom-tokens.card($systems, $exclude-hardcoded),
+           $token-slots
+       ),
++      _namespace-tokens(
++            (mat, toolbar),
++          custom-tokens.toolbar($systems, $exclude-hardcoded),
++         $token-slots,
++      )
+   );
+ 
+   // Strip out tokens that are systemized by our made up density system.
+diff --git a/src/material/core/tokens/m2/_index.scss b/src/material/core/tokens/m2/_index.scss
+index da279eb223b38ab2a43211678810d19426773c06..7a0e9c88ddc1d54783bd79e02bbb8e644428901c 100644
+--- a/src/material/core/tokens/m2/_index.scss
++++ b/src/material/core/tokens/m2/_index.scss
+@@ -3,6 +3,7 @@
+ @use '../../style/sass-utils';
+ 
+ @use './mat/card' as tokens-mat-card;
++@use './mat/toolbar' as tokens-mat-toolbar;
+ @use './mat/radio' as tokens-mat-radio;
+ @use './mat/snack-bar' as tokens-mat-snack-bar;
+ @use './mat/tab-header' as tokens-mat-tab-header;
+@@ -68,6 +69,7 @@
+       _get-tokens-for-module($theme, tokens-mat-snack-bar),
+       _get-tokens-for-module($theme, tokens-mat-tab-header),
+       _get-tokens-for-module($theme, tokens-mat-tab-header-with-background),
++      _get-tokens-for-module($theme, tokens-mat-toolbar),
+       _get-tokens-for-module($theme, tokens-mdc-checkbox),
+       _get-tokens-for-module($theme, tokens-mdc-circular-progress),
+       _get-tokens-for-module($theme, tokens-mdc-dialog),
+diff --git a/src/material/toolbar/_toolbar-theme.scss b/src/material/toolbar/_toolbar-theme.scss
+index 4d1006e7b16f401189432e0c3fb180bee4bf066f..fd820b8c90d4b3d918cf5ee7229f41c25bfc3920 100644
+--- a/src/material/toolbar/_toolbar-theme.scss
++++ b/src/material/toolbar/_toolbar-theme.scss
+@@ -1,3 +1,4 @@
++@use 'sass:map';
+ @use '../core/theming/theming';
+ @use '../core/theming/inspection';
+ @use '../core/typography/typography';
+@@ -16,53 +17,80 @@
+ }
+ 
+ @mixin color($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-toolbar.$prefix,
+-      tokens-mat-toolbar.get-color-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
+   }
+-
+-  .mat-toolbar {
+-    &.mat-primary {
+-      @include _palette-styles($theme, primary);
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-toolbar.$prefix,
++        tokens-mat-toolbar.get-color-tokens($theme));
+     }
+ 
+-    &.mat-accent {
+-      @include _palette-styles($theme, accent);
+-    }
++    .mat-toolbar {
++      &.mat-primary {
++        @include _palette-styles($theme, primary);
++      }
++
++      &.mat-accent {
++        @include _palette-styles($theme, accent);
++      }
+ 
+-    &.mat-warn {
+-      @include _palette-styles($theme, warn);
++      &.mat-warn {
++        @include _palette-styles($theme, warn);
++      }
+     }
+   }
+ }
+ 
+ @mixin typography($theme) {
+-  // TODO(mmalerba): Stop calling this and resolve resulting screen diffs.
+-  $theme: inspection.private-get-typography-back-compat-theme($theme);
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, typography));
++  }
++  @else {
++    // TODO(mmalerba): Stop calling this and resolve resulting screen diffs.
++    $theme: inspection.private-get-typography-back-compat-theme($theme);
+ 
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-toolbar.$prefix,
+-      tokens-mat-toolbar.get-typography-tokens($theme));
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-toolbar.$prefix,
++        tokens-mat-toolbar.get-typography-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin density($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-toolbar.$prefix,
+-      tokens-mat-toolbar.get-density-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, density));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-toolbar.$prefix,
++        tokens-mat-toolbar.get-density-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-toolbar') {
+-    @if inspection.theme-has($theme, color) {
+-      @include color($theme);
++    @if inspection.get-theme-version($theme) == 1 {
++      @include _theme-from-tokens(inspection.get-theme-tokens($theme));
+     }
+-    @if inspection.theme-has($theme, density) {
+-      @include density($theme);
+-    }
+-    @if inspection.theme-has($theme, typography) {
+-      @include typography($theme);
++    @else {
++      @if inspection.theme-has($theme, color) {
++        @include color($theme);
++      }
++      @if inspection.theme-has($theme, density) {
++        @include density($theme);
++      }
++      @if inspection.theme-has($theme, typography) {
++        @include typography($theme);
++      }
+     }
+   }
+ }
++
++@mixin _theme-from-tokens($tokens) {
++  @if ($tokens != ()) {
++    @include token-utils.create-token-values(tokens-mat-toolbar.$prefix,
++      map.get($tokens, tokens-mat-toolbar.$prefix));
++  }
++}

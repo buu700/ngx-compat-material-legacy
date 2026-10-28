@@ -116,6 +116,18 @@ export function retainedTitleOwnerReference({root,read}){
  const transactionControls=JSON.parse(read(transaction.source_transaction_controls.path));assert.equal(transactionControls.result,'pass');assert.equal(transactionControls.rejected.length,100);assert.equal(transactionControls.individual_metadata_rows,13);assert.equal(transactionControls.fresh_whole_body_reviews,4);assert.equal(transactionControls.compiler_cases,34);
  for(const edit of transaction.literal_edits){assert.equal(current.split(edit.before).length,2);current=current.replace(edit.before,edit.after);}
  assert.deepEqual(transaction.after,{sha256:hash(current),bytes:Buffer.byteLength(current)});
+ const surfaceRaw=read('compatibility/rc/21x-c04-surface-m3-theme-owner-successor.json');
+ assert.equal(hash(surfaceRaw),'05ed10ff8882b6cfe0e337d459c816611192c710e32ba8921c947e2561e952c9');
+ const surface=JSON.parse(surfaceRaw);assert.equal(surface.path,path);assert.equal(surface.line,'21.x');
+ assert.equal(surface.source_parent,'368363eaf44760e4aea73c5a0811c739777582e3');
+ assert.deepEqual(surface.before,{sha256:hash(current),bytes:Buffer.byteLength(current)});
+ assert.equal(surface.literal_edits.length,15);assert.equal(surface.tagged_golden_changes,0);assert.equal(surface.original_assertions_or_rejection_controls_dropped,0);
+ for(const ref of [surface.canonical_transition,surface.candidate_owner_execution,surface.source_handler_controls]){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}
+ const surfaceSmoke=JSON.parse(read(surface.candidate_owner_execution.path));assert.equal(surfaceSmoke.result,'pass');assert.equal(surfaceSmoke.prior_source_admissions_preserved,56);assert.equal(surfaceSmoke.current_source_admissions,59);assert.equal(surfaceSmoke.surface_m3_theme_source_decisions,3);
+ assert.equal(surfaceSmoke.owner.sha256,surface.after.sha256);assert.equal(surfaceSmoke.actual_native_artifact_browser_floor_or_full_audit_qualified,false);
+ const surfaceControls=JSON.parse(read(surface.source_handler_controls.path));assert.equal(surfaceControls.result,'pass');assert.equal(surfaceControls.rejected.length,125);assert.equal(surfaceControls.pure_metadata_cases,3);assert.equal(surfaceControls.real_root_positive_rows,3);assert.equal(surfaceControls.real_root_rejected_rows,12);assert.equal(surfaceControls.missing_source_requirement_mutant_detected,true);
+ for(const edit of surface.literal_edits){assert.equal(current.split(edit.before).length,2);current=current.replace(edit.before,edit.after);}
+ assert.deepEqual(surface.after,{sha256:hash(current),bytes:Buffer.byteLength(current)});
  const expected=Buffer.from(current);assert.equal(read(path).equals(expected),true,'unreviewed owner change outside exact retained-verifier successor');
  return {path,sha256:hash(expected),bytes:expected.length};
 }

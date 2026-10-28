@@ -29,6 +29,8 @@ import {applyButtonTokenizationCanonicalStage,buttonTokenizationRegistrySuccesso
 import {reviewButtonTokenizationSource} from './upstream-button-tokenization-source-review.mjs';
 import buttonTokenRepairs from './upstream-button-token-repairs-admission.cjs';
 import {applyButtonTokenRepairsCanonicalStage,buttonTokenRepairsRegistrySuccessor} from './button-token-repairs-canonical-stage.mjs';
+import surfaceM3Theme from './upstream-surface-m3-theme-admission.cjs';
+import {applySurfaceM3ThemeCanonicalStage,surfaceM3ThemeRegistrySuccessor} from './surface-m3-theme-canonical-stage.mjs';
 import {inspectCanonicalSourceTransaction,canonicalSourceTransactionReference} from './canonical-source-transaction.mjs';
 const ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..'),require=createRequire(import.meta.url);
 const OWNER='scripts/packed-upstream-ledger-epoch.mjs',BASE='scripts/packed-upstream-ledger-base.mjs';
@@ -47,6 +49,8 @@ const BUTTON_TOKENIZATION_PACKET='compatibility/rc/21x-c04-button-tokenization-c
 const BUTTON_TOKENIZATION_PACKET_HASH='8f9a3016332c8448db94dfea173d023640db1984f7a499c49c0f6b79030c3853';
 const BUTTON_TOKEN_REPAIRS_PACKET='compatibility/rc/21x-c04-button-token-repairs-canonical-transition.json';
 const BUTTON_TOKEN_REPAIRS_PACKET_HASH='34aa5b3bb4ada73ff77f58d3e692af1bfcd88bd92586de313867fcf7f243a201';
+const SURFACE_M3_THEME_PACKET='compatibility/rc/21x-c04-surface-m3-theme-canonical-transition.json';
+const SURFACE_M3_THEME_PACKET_HASH='c4fc827f5fcd6f5494ce34090a8b6d51b34d451ca82bd9db1d2abec3e1c8a6b1';
 const SOURCE_TRANSACTION='compatibility/rc/21x-c04-owner-source-transaction-inputs.json';
 const SOURCE_TRANSACTION_HASH='96f4322243e31e55558ea0a36c363c883086b618e5f0049c4c48ad7fd7dea887';
 const AFTER='80123c4e8c4f7f43330553ffca84e51fea98e70f545234cf5359c11128e548d7';
@@ -89,7 +93,22 @@ function sourceTransactionTools(root,read){
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed source transaction tool '+ref.path);assert.equal(value.length,ref.bytes);}};
  assertCurrent();return {bound,assertCurrent};
 }
+function surfaceM3ThemeTools(root,read){
+ const raw=read(SURFACE_M3_THEME_PACKET);assert.equal(hash(raw),SURFACE_M3_THEME_PACKET_HASH,'changed surface M3 theme canonical packet');const packet=JSON.parse(raw);
+ assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'368363eaf44760e4aea73c5a0811c739777582e3');
+ assert.equal(packet.individual_decisions,3);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,3);
+ assert.equal(packet.unselected_entry_bytes_to_preserve,1694);assert.equal(packet.actual_native_artifact_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');
+ const registryBefore=original(root,THEMING_REGISTRY,packet.source_parent),registryAfter=surfaceM3ThemeRegistrySuccessor(registryBefore);
+ assert.deepEqual(packet.registry_before,{path:THEMING_REGISTRY,sha256:hash(registryBefore),bytes:registryBefore.length});
+ assert.deepEqual(packet.registry_after,{path:THEMING_REGISTRY,sha256:hash(registryAfter),bytes:registryAfter.length});
+ const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);
+ const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-surface-m3-theme-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});
+ const bound=[{path:SURFACE_M3_THEME_PACKET,sha256:SURFACE_M3_THEME_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,packet.registry_after,...patches];
+ const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed surface M3 theme tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
+ assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body};
+}
 function buttonTokenRepairsTools(root,read){
+ const successor=surfaceM3ThemeTools(root,read);
  const raw=read(BUTTON_TOKEN_REPAIRS_PACKET);assert.equal(hash(raw),BUTTON_TOKEN_REPAIRS_PACKET_HASH,'changed button token repairs canonical packet');const packet=JSON.parse(raw);
  assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'2103cdde255ea68b82b51f94f42e6c9b95824ea0');
  assert.equal(packet.individual_decisions,2);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,2);
@@ -99,9 +118,10 @@ function buttonTokenRepairsTools(root,read){
  assert.deepEqual(packet.registry_after,{path:THEMING_REGISTRY,sha256:hash(registryAfter),bytes:registryAfter.length});
  const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);
  const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-button-token-repairs-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});
- const bound=[{path:BUTTON_TOKEN_REPAIRS_PACKET,sha256:BUTTON_TOKEN_REPAIRS_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,packet.registry_after,...patches];
+ assert.equal(registryAfter.equals(successor.registryBefore),true,'surface M3 theme registry does not succeed exact button token-repairs registry');
+ const bound=[{path:BUTTON_TOKEN_REPAIRS_PACKET,sha256:BUTTON_TOKEN_REPAIRS_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed button token repairs tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
- assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body};
+ assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body,successor};
 }
 function buttonTokenizationTools(root,read){
  const successor=buttonTokenRepairsTools(root,read);
@@ -166,7 +186,7 @@ function themingTools(root,read){
  const bound=[{path:THEMING_PACKET,sha256:THEMING_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed theming tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
  assertCurrent();return {packet,registryBefore,bound,assertCurrent,body,successor,
-  currentReference:ref=>ref.path===THEMING_REGISTRY?successor.successor.successor.successor.packet.registry_after:ref};
+  currentReference:ref=>ref.path===THEMING_REGISTRY?successor.successor.successor.successor.successor.packet.registry_after:ref};
 }
 function context(root,read){
  assert.equal(resolve(root),ROOT,'wrong21.x canonical owner checkout');
@@ -176,7 +196,7 @@ function context(root,read){
  const frames=JSON.parse(frameRaw);assert.equal(frames.schema_version,1);assert.equal(frames.line,'21.x');
  assert.equal(frames.frames.length,21);assert.equal(new Set(frames.frames.map(frame=>frame.sha256)).size,21);
  const ledgerRaw=read(LEDGER),currentHash=hash(ledgerRaw);
- assert.ok([...frames.frames,tools.packet.after,tools.successor.packet.after,tools.successor.successor.packet.after,tools.successor.successor.successor.packet.after,tools.successor.successor.successor.successor.packet.after].some(frame=>frame.sha256===currentHash&&frame.bytes===ledgerRaw.length),'not an accepted complete ledger frame');
+ assert.ok([...frames.frames,tools.packet.after,tools.successor.packet.after,tools.successor.successor.packet.after,tools.successor.successor.successor.packet.after,tools.successor.successor.successor.successor.packet.after,tools.successor.successor.successor.successor.successor.packet.after].some(frame=>frame.sha256===currentHash&&frame.bytes===ledgerRaw.length),'not an accepted complete ledger frame');
  const raw=read(PACKET);assert.equal(hash(raw),PACKET_HASH,'changed title canonical packet');const packet=JSON.parse(raw);
  assert.equal(packet.source_parent,AUTHORITY);assert.equal(packet.line,'21.x');assert.equal(packet.individual_decisions,1);
  assert.equal(packet.metadata_tokens,14);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.unselected_judgments_changed,0);
@@ -214,6 +234,9 @@ function context(root,read){
  assert.deepEqual(tools.successor.successor.successor.successor.packet.before,tools.successor.successor.successor.packet.after);
  const buttonTokenRepairsStage=applyButtonTokenRepairsCanonicalStage({before:buttonTokenizationStage.after,body:tools.successor.successor.successor.successor.body});
  assert.deepEqual(tools.successor.successor.successor.successor.packet.after,{path:LEDGER,sha256:hash(buttonTokenRepairsStage.after),bytes:buttonTokenRepairsStage.after.length});
+ assert.deepEqual(tools.successor.successor.successor.successor.successor.packet.before,tools.successor.successor.successor.successor.packet.after);
+ const surfaceM3ThemeStage=applySurfaceM3ThemeCanonicalStage({before:buttonTokenRepairsStage.after,body:tools.successor.successor.successor.successor.successor.body});
+ assert.deepEqual(tools.successor.successor.successor.successor.successor.packet.after,{path:LEDGER,sha256:hash(surfaceM3ThemeStage.after),bytes:surfaceM3ThemeStage.after.length});
  const own={path:OWNER,sha256:hash(image),bytes:image.length};
  const bound=[...new Map([own,{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound].map(ref=>[ref.path,ref])).values()];
  const assertTools=()=>{
@@ -231,7 +254,7 @@ function context(root,read){
   if(path==='scripts/autocomplete-selection-native-subject.mjs'){
    assert.equal(hash(read(path)),bound.find(member=>member.path===path).sha256,'changed current native-subject metadata source');return original(root,path);
   }
-  if(path===LEDGER&&[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash)){assertTools();return Buffer.from(before);}
+  if(path===LEDGER&&[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash)){assertTools();return Buffer.from(before);}
   return read(path);
  };
  const source=title.inspectTitleSource({root,read});
@@ -245,9 +268,10 @@ function context(root,read){
  const buttonTokenizationSource=inspectCanonicalSourceTransaction({root,read,family:'button-tokenization',entries:buttonTokenizationStage.entries,body:tools.successor.successor.successor.body});
  assert.equal(buttonTokenizationSource.individual_metadata_cases,buttonTokenizationStage.entries.length,'every individual source row must be verified');
  const buttonTokenRepairsSource=buttonTokenRepairs.inspectCanonicalSource({root,read,entries:buttonTokenRepairsStage.entries,body:tools.successor.successor.successor.successor.body});
- const assertCurrent=()=>{assertTools();assertLedger();source.assertCurrent();themingSource.assertCurrent();inspectionSource.assertCurrent();selectorDensitySource.assertCurrent();buttonTokenizationSource.assertCurrent();buttonTokenRepairsSource.assertCurrent();};
- assertCurrent();return {packet,stage,themingStage,inspectionStage,selectorDensityStage,buttonTokenizationStage,buttonTokenRepairsStage,metadataRead,assertCurrent,bound:[...bound,...source.bound,...themingSource.bound,...inspectionSource.bound,...selectorDensitySource.bound,...buttonTokenizationSource.bound,...buttonTokenRepairsSource.bound],
-  titleApplied:[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),themingApplied:[tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),inspectionApplied:[tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),selectorDensityApplied:[tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenizationApplied:[tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenRepairsApplied:currentHash===tools.successor.successor.successor.successor.packet.after.sha256,currentHash};
+ const surfaceM3ThemeSource=surfaceM3Theme.inspectCanonicalSource({root,read,entries:surfaceM3ThemeStage.entries,body:tools.successor.successor.successor.successor.successor.body});
+ const assertCurrent=()=>{assertTools();assertLedger();source.assertCurrent();themingSource.assertCurrent();inspectionSource.assertCurrent();selectorDensitySource.assertCurrent();buttonTokenizationSource.assertCurrent();buttonTokenRepairsSource.assertCurrent();surfaceM3ThemeSource.assertCurrent();};
+ assertCurrent();return {packet,stage,themingStage,inspectionStage,selectorDensityStage,buttonTokenizationStage,buttonTokenRepairsStage,surfaceM3ThemeStage,metadataRead,assertCurrent,bound:[...bound,...source.bound,...themingSource.bound,...inspectionSource.bound,...selectorDensitySource.bound,...buttonTokenizationSource.bound,...buttonTokenRepairsSource.bound,...surfaceM3ThemeSource.bound],
+  titleApplied:[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),themingApplied:[tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),inspectionApplied:[tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),selectorDensityApplied:[tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenizationApplied:[tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenRepairsApplied:[tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),surfaceM3ThemeApplied:currentHash===tools.successor.successor.successor.successor.successor.packet.after.sha256,currentHash};
 }
 function actualBound(prior,ctx){
  const bound=new Map(prior);
@@ -265,7 +289,7 @@ export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}
  const nativeBound=native.bound.map(member=>({...member,sha256:current.get(member.path)??member.sha256,bytes:read(member.path).length}));
  // The old bound set was measured through private metadata. Its public form
  // records actual current tools; the preserved stage checks remain separate.
- return {...prior,canonical_after:ctx.buttonTokenRepairsStage.after,bound:current,
+ return {...prior,canonical_after:ctx.surfaceM3ThemeStage.after,bound:current,
   native_spec_source:{...native,bound:nativeBound,assertCurrent:()=>{ctx.assertCurrent();native.assertCurrent();ctx.assertCurrent();}},
   title_stage:{...ctx.stage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},
   theming_stage:{...ctx.themingStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},
@@ -273,6 +297,7 @@ export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}
   selector_density_stage:{...ctx.selectorDensityStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},
   button_tokenization_stage:{...ctx.buttonTokenizationStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},
   button_token_repairs_stage:{...ctx.buttonTokenRepairsStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},
+  surface_m3_theme_stage:{...ctx.surfaceM3ThemeStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},
   prior_metadata_assert_current:()=>{ctx.assertCurrent();for(const [path,digest]of prior.bound)assert.equal(hash(ctx.metadataRead(path)),digest);},
   assertCurrent:ctx.assertCurrent};
 }
@@ -283,9 +308,9 @@ export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={
  const historical=path=>{if(path!==LEDGER)return read(path);ctx.assertCurrent();const value=prior.read(path);ctx.assertCurrent();return value;};
  readers.set(historical,{root:resolve(root),raw:read});assertCurrent();
  return {...prior,read:historical,raw:read,assertCurrent,
-  individual_decisions_applied:prior.individual_decisions_applied+(ctx.titleApplied?1:0)+(ctx.themingApplied?2:0)+(ctx.inspectionApplied?4:0)+(ctx.selectorDensityApplied?2:0)+(ctx.buttonTokenizationApplied?5:0)+(ctx.buttonTokenRepairsApplied?2:0),
+  individual_decisions_applied:prior.individual_decisions_applied+(ctx.titleApplied?1:0)+(ctx.themingApplied?2:0)+(ctx.inspectionApplied?4:0)+(ctx.selectorDensityApplied?2:0)+(ctx.buttonTokenizationApplied?5:0)+(ctx.buttonTokenRepairsApplied?2:0)+(ctx.surfaceM3ThemeApplied?3:0),
   title_source_decisions_applied:ctx.titleApplied?1:0,title_native_registry_metadata_tokens_applied:ctx.titleApplied?14:0,
-  theming_source_decisions_applied:ctx.themingApplied?2:0,inspection_source_decisions_applied:ctx.inspectionApplied?4:0,selector_density_source_decisions_applied:ctx.selectorDensityApplied?2:0,button_tokenization_source_decisions_applied:ctx.buttonTokenizationApplied?5:0,button_token_repairs_source_decisions_applied:ctx.buttonTokenRepairsApplied?2:0,
+  theming_source_decisions_applied:ctx.themingApplied?2:0,inspection_source_decisions_applied:ctx.inspectionApplied?4:0,selector_density_source_decisions_applied:ctx.selectorDensityApplied?2:0,button_tokenization_source_decisions_applied:ctx.buttonTokenizationApplied?5:0,button_token_repairs_source_decisions_applied:ctx.buttonTokenRepairsApplied?2:0,surface_m3_theme_source_decisions_applied:ctx.surfaceM3ThemeApplied?3:0,
   current_tool_bytes_exposed_without_projection:true,old_product_bytes_exposed:false,
   current_native_packed_or_floor_or_g11_credit:false};
 }
@@ -297,7 +322,7 @@ export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root
  if(role===metadataToken){assert.equal(hash(read(prior.path)),prior.sha256);return null;}
  const transaction=sourceTransactionTools(root,read);
  const tools=themingTools(root,read);
- const before=prior.path===THEMING_REGISTRY?[tools.registryBefore,tools.successor.registryBefore,tools.successor.successor.registryBefore,tools.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.registryBefore].find(raw=>hash(raw)===prior.sha256):original(root,prior.path);assert.ok(before,'unqualified canonical registry prior');assert.equal(hash(before),prior.sha256,'unqualified canonical tool prior');
+ const before=prior.path===THEMING_REGISTRY?[tools.registryBefore,tools.successor.registryBefore,tools.successor.successor.registryBefore,tools.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.registryBefore].find(raw=>hash(raw)===prior.sha256):original(root,prior.path);assert.ok(before,'unqualified canonical registry prior');assert.equal(hash(before),prior.sha256,'unqualified canonical tool prior');
  if(prior.bytes!==undefined)assert.equal(before.length,prior.bytes);
  const raw=read(PACKET);assert.equal(hash(raw),PACKET_HASH);const packet=JSON.parse(raw);
  const frameRaw=read(FRAMES);assert.equal(hash(frameRaw),FRAMES_HASH,'changed accepted ledger-frame catalog');

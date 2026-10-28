@@ -1,0 +1,297 @@
+diff --git a/src/dev-app/theme-token-api.scss b/src/dev-app/theme-token-api.scss
+index 7265429eba3d446430a706bdd76dbe1b9fce5881..ba43f0b68b93643b6a9daac97a46fad47ad0c8bb 100644
+--- a/src/dev-app/theme-token-api.scss
++++ b/src/dev-app/theme-token-api.scss
+@@ -40,6 +40,7 @@ html {
+   @include mat.card-theme($light-theme);
+   @include mat.tooltip-theme($light-theme);
+   @include mat.toolbar-theme($light-theme);
++  @include mat.slider-theme($light-theme);
+   @include mat.snack-bar-theme($light-theme);
+ }
+ 
+@@ -53,6 +54,7 @@ html {
+   @include mat.card-color($dark-theme);
+   @include mat.tooltip-color($dark-theme);
+   @include mat.toolbar-color($dark-theme);
++  @include mat.slider-color($dark-theme);
+   @include mat.snack-bar-color($dark-theme);
+ }
+ 
+@@ -65,6 +67,7 @@ html {
+     @include mat.card-density($scale-theme);
+     @include mat.tooltip-density($scale-theme);
+     @include mat.toolbar-density($scale-theme);
++    @include mat.slider-density($scale-theme);
+     @include mat.snack-bar-density($scale-theme);
+   }
+ }
+diff --git a/src/material-experimental/theming/_custom-tokens.scss b/src/material-experimental/theming/_custom-tokens.scss
+index f5703e3d24784b5f17544e8e1c29fe59bd6cd473..47d1007669513ddf36a21426b0b9f1fb96f5e6a1 100644
+--- a/src/material-experimental/theming/_custom-tokens.scss
++++ b/src/material-experimental/theming/_custom-tokens.scss
+@@ -44,6 +44,16 @@
+   );
+ }
+ 
++/// Generates custom tokens for the mat-slider.
++/// @param {Map} $systems The MDC system tokens
++/// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
++/// @return {Map} A set of custom tokens for the mat-slider
++@function slider($systems, $exclude-hardcoded) {
++  @return (
++    value-indicator-opacity: 1,
++  );
++}
++
+ /// Generates custom tokens for the mat-snack-bar.
+ /// @param {Map} $systems The MDC system tokens
+ /// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
+diff --git a/src/material-experimental/theming/_m3-density.scss b/src/material-experimental/theming/_m3-density.scss
+index b142eec001a82cf187d07824f6532035c5dfcf02..7759ccc413b7139ee409b9d3681171c87c5777bd 100644
+--- a/src/material-experimental/theming/_m3-density.scss
++++ b/src/material-experimental/theming/_m3-density.scss
+@@ -20,12 +20,14 @@ $_density-tokens: (
+   ),
+     (mdc, elevated-card): (),
+     (mdc, outlined-card): (),
++    (mdc, slider): (),
+     (mat, card): (),
+     (mdc, plain-tooltip): (),
+     (mat, toolbar): (
+     standard-height: (64px, 60px, 56px, 52px),
+     mobile-height: (56px, 52px, 48px, 44px),
+-  )
++  ),
++    (mat, slider): (),
+ );
+ 
+ /// Gets the value for the given density scale from the given set of density values.
+diff --git a/src/material-experimental/theming/_m3-tokens.scss b/src/material-experimental/theming/_m3-tokens.scss
+index 9bee6d194a40cdf08d23157b5f0a09abbd0a26ae..846fd09949c41c79deb3e499ac96c746393bfc58 100644
+--- a/src/material-experimental/theming/_m3-tokens.scss
++++ b/src/material-experimental/theming/_m3-tokens.scss
+@@ -188,6 +188,11 @@
+           mdc-tokens.md-comp-outlined-card-values($systems, $exclude-hardcoded),
+           $token-slots
+       ),
++      _namespace-tokens(
++            (mdc, slider),
++          mdc-tokens.md-comp-slider-values($systems, $exclude-hardcoded),
++          $token-slots
++      ),
+       _namespace-tokens(
+             (mdc, snackbar),
+           mdc-tokens.md-comp-snackbar-values($systems, $exclude-hardcoded),
+@@ -210,6 +215,11 @@
+           custom-tokens.toolbar($systems, $exclude-hardcoded),
+           $token-slots,
+       ),
++      _namespace-tokens(
++            (mat, slider),
++          custom-tokens.slider($systems, $exclude-hardcoded),
++          $token-slots
++      ),
+       _namespace-tokens(
+             (mat, snack-bar),
+           custom-tokens.snack-bar($systems, $exclude-hardcoded),
+diff --git a/src/material/core/tokens/m2/_index.scss b/src/material/core/tokens/m2/_index.scss
+index 5a9e929681cf598ae1efebd998998815f9302548..c7082735822d8dcde18c1a59da0cfbb0f46cd594 100644
+--- a/src/material/core/tokens/m2/_index.scss
++++ b/src/material/core/tokens/m2/_index.scss
+@@ -8,6 +8,7 @@
+ @use './mat/snack-bar' as tokens-mat-snack-bar;
+ @use './mat/tab-header' as tokens-mat-tab-header;
+ @use './mat/tab-header-with-background' as tokens-mat-tab-header-with-background;
++@use './mat/slider' as tokens-mat-slider;
+ @use './mdc/checkbox' as tokens-mdc-checkbox;
+ @use './mdc/circular-progress' as tokens-mdc-circular-progress;
+ @use './mdc/dialog' as tokens-mdc-dialog;
+@@ -20,6 +21,7 @@
+ @use './mdc/snack-bar' as tokens-mdc-snack-bar;
+ @use './mdc/tab' as tokens-mdc-tab;
+ @use './mdc/tab-indicator' as tokens-mdc-tab-indicator;
++@use './mdc/slider' as tokens-mdc-slider;
+ @use './mdc/plain-tooltip' as tokens-mdc-plain-tooltip;
+ 
+ /// Gets the tokens for the given theme, m2 tokens module, and theming system.
+@@ -71,6 +73,7 @@
+       _get-tokens-for-module($theme, tokens-mat-tab-header),
+       _get-tokens-for-module($theme, tokens-mat-tab-header-with-background),
+       _get-tokens-for-module($theme, tokens-mat-toolbar),
++      _get-tokens-for-module($theme, tokens-mat-slider),
+       _get-tokens-for-module($theme, tokens-mdc-checkbox),
+       _get-tokens-for-module($theme, tokens-mdc-circular-progress),
+       _get-tokens-for-module($theme, tokens-mdc-dialog),
+@@ -83,6 +86,7 @@
+       _get-tokens-for-module($theme, tokens-mdc-snack-bar),
+       _get-tokens-for-module($theme, tokens-mdc-tab),
+       _get-tokens-for-module($theme, tokens-mdc-tab-indicator),
++      _get-tokens-for-module($theme, tokens-mdc-slider),
+       _get-tokens-for-module($theme, tokens-mdc-plain-tooltip),
+   );
+ }
+diff --git a/src/material/slider/_slider-theme.scss b/src/material/slider/_slider-theme.scss
+index 889df1e6e45b22cf9c07b88c6b901b6924ceb62e..1cd5defc2e2d4d53554cac053c8e43227d252e54 100644
+--- a/src/material/slider/_slider-theme.scss
++++ b/src/material/slider/_slider-theme.scss
+@@ -1,78 +1,104 @@
++@use 'sass:map';
+ @use '@material/slider/slider-theme' as mdc-slider-theme;
+ @use '../core/theming/theming';
+ @use '../core/theming/inspection';
+ @use '../core/typography/typography';
+ @use '../core/style/sass-utils';
+ @use '../core/tokens/token-utils';
+-@use '../core/tokens/m2/mat/slider' as m2-mat-slider;
+-@use '../core/tokens/m2/mdc/slider' as m2-mdc-slider;
++@use '../core/tokens/m2/mat/slider' as tokens-mat-slider;
++@use '../core/tokens/m2/mdc/slider' as tokens-mdc-slider;
+ 
+ @mixin base($theme) {
+-  // Add default values for tokens not related to color, typography, or density.
+-  @include sass-utils.current-selector-or-root() {
+-    @include mdc-slider-theme.theme(m2-mdc-slider.get-unthemable-tokens());
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, base));
++  }
++  @else {
++    // Add default values for tokens not related to color, typography, or density.
++    @include sass-utils.current-selector-or-root() {
++      @include mdc-slider-theme.theme(tokens-mdc-slider.get-unthemable-tokens());
++    }
+   }
+ }
+ 
+ @mixin color($theme) {
+-  $is-dark: inspection.get-theme-type($theme) == dark;
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
++  }
++  @else {
++    $is-dark: inspection.get-theme-type($theme) == dark;
+ 
+-  $mdc-color-tokens: token-utils.resolve-elevation(
+-    m2-mdc-slider.get-color-tokens($theme),
+-    handle-elevation,
+-    handle-shadow-color
+-  );
++    $mdc-color-tokens: token-utils.resolve-elevation(
++        tokens-mdc-slider.get-color-tokens($theme),
++        handle-elevation,
++        handle-shadow-color
++    );
+ 
+-  $mat-slider-color-tokens: m2-mat-slider.get-color-tokens($theme);
++    $mat-slider-color-tokens: tokens-mat-slider.get-color-tokens($theme);
+ 
+-  // Add values for MDC slider tokens.
+-  .mat-mdc-slider {
+-    @include mdc-slider-theme.theme($mdc-color-tokens);
+-    @include _slider-ripple-color($theme, primary);
+-    @include token-utils.create-token-values(
+-      m2-mat-slider.$prefix,
+-      $mat-slider-color-tokens
+-    );
++    // Add values for MDC slider tokens.
++    .mat-mdc-slider {
++      @include mdc-slider-theme.theme($mdc-color-tokens);
++      @include _slider-ripple-color($theme, primary);
++      @include token-utils.create-token-values(
++          tokens-mat-slider.$prefix,
++          $mat-slider-color-tokens
++      );
+ 
+-    &.mat-accent {
+-      @include mdc-slider-theme.theme(
+-          m2-mdc-slider.private-get-color-palette-color-tokens($theme, accent));
+-      @include _slider-ripple-color($theme, accent);
+-    }
++      &.mat-accent {
++        @include mdc-slider-theme.theme(
++            tokens-mdc-slider.private-get-color-palette-color-tokens($theme, accent));
++        @include _slider-ripple-color($theme, accent);
++      }
+ 
+-    &.mat-warn {
+-      @include mdc-slider-theme.theme(
+-          m2-mdc-slider.private-get-color-palette-color-tokens($theme, warn));
+-      @include _slider-ripple-color($theme, warn);
++      &.mat-warn {
++        @include mdc-slider-theme.theme(
++            tokens-mdc-slider.private-get-color-palette-color-tokens($theme, warn));
++        @include _slider-ripple-color($theme, warn);
++      }
+     }
+   }
+ }
+ 
+ @mixin typography($theme) {
+-  // Add values for MDC slider tokens.
+-  .mat-mdc-slider {
+-    @include mdc-slider-theme.theme(m2-mdc-slider.get-typography-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, typography));
++  }
++  @else {
++    // Add values for MDC slider tokens.
++    .mat-mdc-slider {
++      @include mdc-slider-theme.theme(tokens-mdc-slider.get-typography-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin density($theme) {
+-  // Add values for MDC slider tokens.
+-  .mat-mdc-slider {
+-    @include mdc-slider-theme.theme(m2-mdc-slider.get-density-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, density));
++  }
++  @else {
++    // Add values for MDC slider tokens.
++    .mat-mdc-slider {
++      @include mdc-slider-theme.theme(tokens-mdc-slider.get-density-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-slider') {
+-    @include base($theme);
+-    @if inspection.theme-has($theme, color) {
+-      @include color($theme);
+-    }
+-    @if inspection.theme-has($theme, density) {
+-      @include density($theme);
++    @if inspection.get-theme-version($theme) == 1 {
++      @include _theme-from-tokens(inspection.get-theme-tokens($theme));
+     }
+-    @if inspection.theme-has($theme, typography) {
+-      @include typography($theme);
++    @else {
++      @include base($theme);
++      @if inspection.theme-has($theme, color) {
++        @include color($theme);
++      }
++      @if inspection.theme-has($theme, density) {
++        @include density($theme);
++      }
++      @if inspection.theme-has($theme, typography) {
++        @include typography($theme);
++      }
+     }
+   }
+ }
+@@ -85,3 +111,11 @@
+   --mat-mdc-slider-hover-ripple-color: #{rgba($color, 0.05)};
+   --mat-mdc-slider-focus-ripple-color: #{rgba($color, 0.2)};
+ }
++
++@mixin _theme-from-tokens($tokens) {
++  @if ($tokens != ()) {
++    @include mdc-slider-theme.theme(map.get($tokens, tokens-mdc-slider.$prefix));
++    @include token-utils.create-token-values(
++        tokens-mat-slider.$prefix, map.get($tokens, tokens-mat-slider.$prefix));
++  }
++}

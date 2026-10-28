@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "path": "scripts/packed-upstream-ledger-epoch.mjs",
+  "source_parent": "368363eaf44760e4aea73c5a0811c739777582e3",
+  "before": {
+    "sha256": "c12cac183553984c007b5c8f8c48ad39fc2ef16960845221660b03ad1ee65750",
+    "bytes": 34928
+  },
+  "after": {
+    "sha256": "c2fc8a48d90ea678a6566c50712c4e29d4ac39a763d7a87c81378ebb04bd06a3",
+    "bytes": 39278
+  },
+  "canonical_transition": {
+    "path": "compatibility/rc/21x-c04-surface-m3-theme-canonical-transition.json",
+    "sha256": "c4fc827f5fcd6f5494ce34090a8b6d51b34d451ca82bd9db1d2abec3e1c8a6b1",
+    "bytes": 2571
+  },
+  "literal_edits": [
+    {
+      "before": "import {inspectCanonicalSourceTransaction,canonicalSourceTransactionReference} from './canonical-source-transaction.mjs';",
+      "after": "import surfaceM3Theme from './upstream-surface-m3-theme-admission.cjs';\nimport {applySurfaceM3ThemeCanonicalStage,surfaceM3ThemeRegistrySuccessor} from './surface-m3-theme-canonical-stage.mjs';\nimport {inspectCanonicalSourceTransaction,canonicalSourceTransactionReference} from './canonical-source-transaction.mjs';"
+    },
+    {
+      "before": "const BUTTON_TOKEN_REPAIRS_PACKET_HASH='34aa5b3bb4ada73ff77f58d3e692af1bfcd88bd92586de313867fcf7f243a201';",
+      "after": "const BUTTON_TOKEN_REPAIRS_PACKET_HASH='34aa5b3bb4ada73ff77f58d3e692af1bfcd88bd92586de313867fcf7f243a201';\nconst SURFACE_M3_THEME_PACKET='compatibility/rc/21x-c04-surface-m3-theme-canonical-transition.json';\nconst SURFACE_M3_THEME_PACKET_HASH='c4fc827f5fcd6f5494ce34090a8b6d51b34d451ca82bd9db1d2abec3e1c8a6b1';"
+    },
+    {
+      "before": "function buttonTokenRepairsTools(root,read){\n const raw=read(BUTTON_TOKEN_REPAIRS_PACKET);assert.equal(hash(raw),BUTTON_TOKEN_REPAIRS_PACKET_HASH,'changed button token repairs canonical packet');const packet=JSON.parse(raw);\n assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'2103cdde255ea68b82b51f94f42e6c9b95824ea0');\n assert.equal(packet.individual_decisions,2);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,2);\n assert.equal(packet.unselected_entry_bytes_to_preserve,1695);assert.equal(packet.actual_native_artifact_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');\n const registryBefore=original(root,THEMING_REGISTRY,packet.source_parent),registryAfter=buttonTokenRepairsRegistrySuccessor(registryBefore);\n assert.deepEqual(packet.registry_before,{path:THEMING_REGISTRY,sha256:hash(registryBefore),bytes:registryBefore.length});\n assert.deepEqual(packet.registry_after,{path:THEMING_REGISTRY,sha256:hash(registryAfter),bytes:registryAfter.length});\n const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);\n const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-button-token-repairs-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});\n const bound=[{path:BUTTON_TOKEN_REPAIRS_PACKET,sha256:BUTTON_TOKEN_REPAIRS_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,packet.registry_after,...patches];\n const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed button token repairs tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};\n assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body};\n}",
+      "after": "function surfaceM3ThemeTools(root,read){\n const raw=read(SURFACE_M3_THEME_PACKET);assert.equal(hash(raw),SURFACE_M3_THEME_PACKET_HASH,'changed surface M3 theme canonical packet');const packet=JSON.parse(raw);\n assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'368363eaf44760e4aea73c5a0811c739777582e3');\n assert.equal(packet.individual_decisions,3);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,3);\n assert.equal(packet.unselected_entry_bytes_to_preserve,1694);assert.equal(packet.actual_native_artifact_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');\n const registryBefore=original(root,THEMING_REGISTRY,packet.source_parent),registryAfter=surfaceM3ThemeRegistrySuccessor(registryBefore);\n assert.deepEqual(packet.registry_before,{path:THEMING_REGISTRY,sha256:hash(registryBefore),bytes:registryBefore.length});\n assert.deepEqual(packet.registry_after,{path:THEMING_REGISTRY,sha256:hash(registryAfter),bytes:registryAfter.length});\n const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);\n const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-surface-m3-theme-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});\n const bound=[{path:SURFACE_M3_THEME_PACKET,sha256:SURFACE_M3_THEME_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,packet.registry_after,...patches];\n const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed surface M3 theme tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};\n assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body};\n}\nfunction buttonTokenRepairsTools(root,read){\n const successor=surfaceM3ThemeTools(root,read);\n const raw=read(BUTTON_TOKEN_REPAIRS_PACKET);assert.equal(hash(raw),BUTTON_TOKEN_REPAIRS_PACKET_HASH,'changed button token repairs canonical packet');const packet=JSON.parse(raw);\n assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'2103cdde255ea68b82b51f94f42e6c9b95824ea0');\n assert.equal(packet.individual_decisions,2);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,2);\n assert.equal(packet.unselected_entry_bytes_to_preserve,1695);assert.equal(packet.actual_native_artifact_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');\n const registryBefore=original(root,THEMING_REGISTRY,packet.source_parent),registryAfter=buttonTokenRepairsRegistrySuccessor(registryBefore);\n assert.deepEqual(packet.registry_before,{path:THEMING_REGISTRY,sha256:hash(registryBefore),bytes:registryBefore.length});\n assert.deepEqual(packet.registry_after,{path:THEMING_REGISTRY,sha256:hash(registryAfter),bytes:registryAfter.length});\n const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);\n const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-button-token-repairs-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});\n assert.equal(registryAfter.equals(successor.registryBefore),true,'surface M3 theme registry does not succeed exact button token-repairs registry');\n const bound=[{path:BUTTON_TOKEN_REPAIRS_PACKET,sha256:BUTTON_TOKEN_REPAIRS_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];\n const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed button token repairs tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};\n assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body,successor};\n}"
+    },
+    {
+      "before": "currentReference:ref=>ref.path===THEMING_REGISTRY?successor.successor.successor.successor.packet.registry_after:ref",
+      "after": "currentReference:ref=>ref.path===THEMING_REGISTRY?successor.successor.successor.successor.successor.packet.registry_after:ref"
+    },
+    {
+      "before": " assert.ok([...frames.frames,tools.packet.after,tools.successor.packet.after,tools.successor.successor.packet.after,tools.successor.successor.successor.packet.after,tools.successor.successor.successor.successor.packet.after].some(frame=>frame.sha256===currentHash&&frame.bytes===ledgerRaw.length),'not an accepted complete ledger frame');",
+      "after": " assert.ok([...frames.frames,tools.packet.after,tools.successor.packet.after,tools.successor.successor.packet.after,tools.successor.successor.successor.packet.after,tools.successor.successor.successor.successor.packet.after,tools.successor.successor.successor.successor.successor.packet.after].some(frame=>frame.sha256===currentHash&&frame.bytes===ledgerRaw.length),'not an accepted complete ledger frame');"
+    },
+    {
+      "before": "  if(path===LEDGER&&[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash)){assertTools();return Buffer.from(before);}",
+      "after": "  if(path===LEDGER&&[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash)){assertTools();return Buffer.from(before);}"
+    },
+    {
+      "before": "  titleApplied:[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),themingApplied:[tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),inspectionApplied:[tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),selectorDensityApplied:[tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenizationApplied:[tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenRepairsApplied:currentHash===tools.successor.successor.successor.successor.packet.after.sha256,currentHash};",
+      "after": "  titleApplied:[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),themingApplied:[tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),inspectionApplied:[tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),selectorDensityApplied:[tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenizationApplied:[tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenRepairsApplied:[tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),surfaceM3ThemeApplied:currentHash===tools.successor.successor.successor.successor.successor.packet.after.sha256,currentHash};"
+    },
+    {
+      "before": " assert.deepEqual(tools.successor.successor.successor.successor.packet.after,{path:LEDGER,sha256:hash(buttonTokenRepairsStage.after),bytes:buttonTokenRepairsStage.after.length});",
+      "after": " assert.deepEqual(tools.successor.successor.successor.successor.packet.after,{path:LEDGER,sha256:hash(buttonTokenRepairsStage.after),bytes:buttonTokenRepairsStage.after.length});\n assert.deepEqual(tools.successor.successor.successor.successor.successor.packet.before,tools.successor.successor.successor.successor.packet.after);\n const surfaceM3ThemeStage=applySurfaceM3ThemeCanonicalStage({before:buttonTokenRepairsStage.after,body:tools.successor.successor.successor.successor.successor.body});\n assert.deepEqual(tools.successor.successor.successor.successor.successor.packet.after,{path:LEDGER,sha256:hash(surfaceM3ThemeStage.after),bytes:surfaceM3ThemeStage.after.length});"
+    },
+    {
+      "before": " const assertCurrent=()=>{assertTools();assertLedger();source.assertCurrent();themingSource.assertCurrent();inspectionSource.assertCurrent();selectorDensitySource.assertCurrent();buttonTokenizationSource.assertCurrent();buttonTokenRepairsSource.assertCurrent();};",
+      "after": " const surfaceM3ThemeSource=surfaceM3Theme.inspectCanonicalSource({root,read,entries:surfaceM3ThemeStage.entries,body:tools.successor.successor.successor.successor.successor.body});\n const assertCurrent=()=>{assertTools();assertLedger();source.assertCurrent();themingSource.assertCurrent();inspectionSource.assertCurrent();selectorDensitySource.assertCurrent();buttonTokenizationSource.assertCurrent();buttonTokenRepairsSource.assertCurrent();surfaceM3ThemeSource.assertCurrent();};"
+    },
+    {
+      "before": " assertCurrent();return {packet,stage,themingStage,inspectionStage,selectorDensityStage,buttonTokenizationStage,buttonTokenRepairsStage,metadataRead,assertCurrent,bound:[...bound,...source.bound,...themingSource.bound,...inspectionSource.bound,...selectorDensitySource.bound,...buttonTokenizationSource.bound,...buttonTokenRepairsSource.bound],",
+      "after": " assertCurrent();return {packet,stage,themingStage,inspectionStage,selectorDensityStage,buttonTokenizationStage,buttonTokenRepairsStage,surfaceM3ThemeStage,metadataRead,assertCurrent,bound:[...bound,...source.bound,...themingSource.bound,...inspectionSource.bound,...selectorDensitySource.bound,...buttonTokenizationSource.bound,...buttonTokenRepairsSource.bound,...surfaceM3ThemeSource.bound],"
+    },
+    {
+      "before": "return {...prior,canonical_after:ctx.buttonTokenRepairsStage.after,bound:current,",
+      "after": "return {...prior,canonical_after:ctx.surfaceM3ThemeStage.after,bound:current,"
+    },
+    {
+      "before": "  button_token_repairs_stage:{...ctx.buttonTokenRepairsStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},",
+      "after": "  button_token_repairs_stage:{...ctx.buttonTokenRepairsStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},\n  surface_m3_theme_stage:{...ctx.surfaceM3ThemeStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},"
+    },
+    {
+      "before": "+(ctx.buttonTokenRepairsApplied?2:0),",
+      "after": "+(ctx.buttonTokenRepairsApplied?2:0)+(ctx.surfaceM3ThemeApplied?3:0),"
+    },
+    {
+      "before": "button_token_repairs_source_decisions_applied:ctx.buttonTokenRepairsApplied?2:0,",
+      "after": "button_token_repairs_source_decisions_applied:ctx.buttonTokenRepairsApplied?2:0,surface_m3_theme_source_decisions_applied:ctx.surfaceM3ThemeApplied?3:0,"
+    },
+    {
+      "before": "[tools.registryBefore,tools.successor.registryBefore,tools.successor.successor.registryBefore,tools.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.registryBefore]",
+      "after": "[tools.registryBefore,tools.successor.registryBefore,tools.successor.successor.registryBefore,tools.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.registryBefore]"
+    }
+  ],
+  "tagged_golden_changes": 0,
+  "original_assertions_or_rejection_controls_dropped": 0,
+  "new_individual_decisions": 3,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "candidate_owner_execution": {
+    "path": "compatibility/rc/21x-c04-surface-m3-theme-canonical-owner-smoke.json",
+    "sha256": "72faf3ed87268dcdc8cf3a2234cf57299e2f0f0d6a7e47c36f6c004e94ee251d",
+    "bytes": 775
+  },
+  "source_handler_controls": {
+    "path": "compatibility/rc/21x-c04-surface-m3-theme-admission-controls.json",
+    "sha256": "3ec96ca0f78e26c993092e43b0fa55c1ef10b73df06125d1cc3600047f55adb5",
+    "bytes": 10905
+  }
+}

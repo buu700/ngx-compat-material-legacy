@@ -39,6 +39,11 @@ def verify_inspection_registry_successor(root=ROOT):
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == 'c01bd5192355a497485fc9f85cdda04760af0ac0287a4f2d01b93df34ab83ffc'
     current = (root / REGISTRY).read_bytes()
+    if digest(current) == '856dffd6cd50d5ced52e9ea978761b18dbd13079cda15d01c25bbea6ad1764d8':
+        from surface_m3_theme_canonical_ledger_patch import verify_surface_m3_theme_registry_successor
+        surface_before, surface_after = verify_surface_m3_theme_registry_successor(root)
+        assert current == surface_after
+        current = surface_before
     if digest(current) == '5fc40f097b86949ce52285987d0fbbcc32841007f5f879dca066cb43ecb675af':
         from button_token_repairs_canonical_ledger_patch import verify_button_token_repairs_registry_successor
         repair_before, repair_after = verify_button_token_repairs_registry_successor(root)

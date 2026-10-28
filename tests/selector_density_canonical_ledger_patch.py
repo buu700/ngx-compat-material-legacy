@@ -39,6 +39,11 @@ def verify_selector_density_registry_successor(root=ROOT):
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == 'c441c65203b4ee240f1c259bc7460a9eb51ef395f619fe3cc5234305120fff38'
     current = (root / REGISTRY).read_bytes()
+    if digest(current) == '856dffd6cd50d5ced52e9ea978761b18dbd13079cda15d01c25bbea6ad1764d8':
+        from surface_m3_theme_canonical_ledger_patch import verify_surface_m3_theme_registry_successor
+        surface_before, surface_after = verify_surface_m3_theme_registry_successor(root)
+        assert current == surface_after
+        current = surface_before
     if digest(current) == '5fc40f097b86949ce52285987d0fbbcc32841007f5f879dca066cb43ecb675af':
         from button_token_repairs_canonical_ledger_patch import verify_button_token_repairs_registry_successor
         repair_before, repair_after = verify_button_token_repairs_registry_successor(root)
