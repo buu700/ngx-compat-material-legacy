@@ -46,4 +46,8 @@ export const sourceContractDefinitions = [
     scope_key:'m3_theme_boundary_source_scope',module:'upstream-m3-theme-boundary-admission.cjs'},
   {sha:'642d886ef117721a34c98055391c9055fde29607',proof_kind:'individual-owned-dialog-title-lifetime',
     scope_key:'dialog_title_source_scope',module:'upstream-dialog-title-admission.cjs'},
+  {sha:'a7dbf08148467ce7b2f132eba32f9517e39e336f',proof_kind:'individual-historical-theming-inspection-source-exclusion',
+    scope_key:'theming_inspection_source_scope',module:'upstream-theming-inspection-admission.cjs'},
+  {sha:'b6e50c631b8f8131f494d57b0b806777da8d4efd',proof_kind:'individual-historical-theming-inspection-source-exclusion',
+    scope_key:'theming_inspection_source_scope',module:'upstream-theming-inspection-admission.cjs'},
 ];

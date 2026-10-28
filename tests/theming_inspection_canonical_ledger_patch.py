@@ -1,0 +1,121 @@
+# @license
+# Copyright Google LLC All Rights Reserved.
+# Copyright (c) 2026 Ryan Lester.
+# Use of this source code is governed by the MIT license in LICENSE.
+"""Independent exact two-entry canonical reconstruction; no Node patch helper."""
+import copy
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+
+ROOT = Path(__file__).resolve().parents[1]
+LEDGER = 'compatibility/f10/disposition-ledger/ledger.json'
+PREFIX = 'compatibility/rc/21x-c04-theming-inspection-'
+REVIEW = PREFIX + 'individual-review.json'
+REVIEW_HASH = '6511bbe44548be85398ffb0e2f86885a79fc714d17ad3aeb2cdb605963410bd4'
+PACKET = PREFIX + 'canonical-transition.json'
+PACKET_HASH = '3f93068912fbfbdc305366cc553d9981c787868d19792359f7cb0b303bc8370d'
+BEFORE = '80123c4e8c4f7f43330553ffca84e51fea98e70f545234cf5359c11128e548d7'
+AFTER = '9810524e12e3096e7d971ea80a1424614dedecc4818f80c8e31adf86f2aeec37'
+SHAS = ['a7dbf08148467ce7b2f132eba32f9517e39e336f', 'b6e50c631b8f8131f494d57b0b806777da8d4efd']
+PATCHES = ['9ec928921c615a0e24cba91977d1c9107f28f43a55d6cde7624e2da4d2437f93', '826acc540b82cce67fe5e5d6a76865198997e512a354535ffb2fbe2f78a80667']
+REGISTRY = 'scripts/upstream-source-contract-registry.mjs'
+
+
+def digest(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def verify_theming_registry_successor(root=ROOT):
+    from autocomplete_selection_source_refs import _git
+    before = _git(root, '1fcb9a09a4d989a58f403db8237a281cab6cfa0d', REGISTRY)
+    assert digest(before) == 'd63a79ffe4aa63a6fb839e5f08abf1c6311832e2e73d73cbdfd55d6722098493'
+    text = before.decode()
+    assert text.count('];\n') == 1
+    additions = ''.join("  {sha:'" + sha + "',proof_kind:'individual-historical-theming-inspection-source-exclusion',\n"
+                        "    scope_key:'theming_inspection_source_scope',module:'upstream-theming-inspection-admission.cjs'},\n" for sha in SHAS)
+    after = text.replace('];\n', additions + '];\n').encode()
+    assert digest(after) == 'bdb3e27464f61f790f1428dca1e1bd3476acdda6c24bf0301929b059686084be'
+    assert (root / REGISTRY).read_bytes() == after
+    return before, after
+
+
+def derive_theming_successor(root=ROOT):
+    from unthemable_ledger_patch import spans
+    env = dict(os.environ, GIT_NO_LAZY_FETCH='1', GIT_NO_REPLACE_OBJECTS='1')
+    for key in ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES']:
+        env.pop(key, None)
+    packet_raw = (root / PACKET).read_bytes()
+    assert digest(packet_raw) == PACKET_HASH
+    packet = json.loads(packet_raw)
+    registry_before, registry_after = verify_theming_registry_successor(root)
+    assert packet['registry_before'] == {'path': REGISTRY, 'sha256': digest(registry_before), 'bytes': len(registry_before)}
+    assert packet['registry_after'] == {'path': REGISTRY, 'sha256': digest(registry_after), 'bytes': len(registry_after)}
+    assert packet['source_parent'] == '1fcb9a09a4d989a58f403db8237a281cab6cfa0d'
+    before = subprocess.check_output(['git', '--no-replace-objects', 'show', packet['source_parent'] + ':' + LEDGER], cwd=root, env=env)
+    assert digest(before) == BEFORE
+    assert packet['before'] == {'path': LEDGER, 'sha256': BEFORE, 'bytes': len(before)}
+    review_raw = (root / REVIEW).read_bytes()
+    assert digest(review_raw) == REVIEW_HASH
+    body = json.loads(review_raw)
+    assert [row['sha'] for row in body['reviews']] == SHAS
+    handler = next(ref for ref in packet['source_members'] if ref['path'] == 'scripts/upstream-theming-inspection-admission.cjs')
+    for ref in packet['source_members']:
+        raw = (root / ref['path']).read_bytes()
+        assert digest(raw) == ref['sha256'] and len(raw) == ref['bytes']
+    expected = json.loads(before)
+    assert len(expected['entries']) == len({row['sha'] for row in expected['entries']}) == 1697
+    assert expected['closed_dispositions'] == 377 and expected['open_or_deferred'] == 1320
+    text, _, ranges = spans(before)
+    replacements = []
+    for row, patch in zip(body['reviews'], PATCHES):
+        i = next(i for i, entry in enumerate(expected['entries']) if entry['sha'] == row['sha'])
+        prior = expected['entries'][i]
+        assert prior['final_disposition'] == 'needs-individual-review' and prior['evidence_report'] is None
+        assert prior['files'] == row['frozen_seed_paths'] and prior['affected_branches'] == ['21.x']
+        proof = {'proof_kind': 'individual-historical-theming-inspection-source-exclusion', 'diff_sha256': patch,
+                 'review_depth': 'individual-compatibility', 'affected_branches': ['21.x'], 'decision': row['decision'],
+                 'theming_inspection_source_scope': {'sha': row['sha'], 'review': {'path': REVIEW, 'sha256': REVIEW_HASH},
+                     'source_qualification': copy.deepcopy(body['source_qualification']),
+                     'source_review': copy.deepcopy(body['source_review']), 'handler': copy.deepcopy(handler),
+                     'source_scope_only': True, 'actual_native_artifact_browser_floor_or_full_audit_qualified': False}}
+        entry = {**prior, 'final_disposition': 'do-not-adopt', 'reason': row['decision'],
+                 'review_depth': 'individual-compatibility', 'evidence_report': REVIEW, 'individual_proof': proof}
+        expected['entries'][i] = entry
+        start, end = ranges[i]
+        replacements.append((start, end, json.dumps(entry, indent=2).replace('\n', '\n    ')))
+    after_text = text
+    for start, end, value in sorted(replacements, reverse=True):
+        after_text = after_text[:start] + value + after_text[end:]
+    split = after_text.index('"entries": [')
+    header = after_text[:split]
+    for key, old, new in [('closed_dispositions', 377, 379), ('open_or_deferred', 1320, 1318)]:
+        old_token, new_token = f'  "{key}": {old},', f'  "{key}": {new},'
+        assert header.count(old_token) == 1
+        header = header.replace(old_token, new_token)
+        expected[key] = new
+    after = (header + after_text[split:]).encode()
+    assert digest(after) == AFTER and json.loads(after) == expected
+    assert packet['after'] == {'path': LEDGER, 'sha256': AFTER, 'bytes': len(after)}
+    after_text, _, after_ranges = spans(after)
+    preserved = 0
+    for old, new, entry in zip(ranges, after_ranges, expected['entries']):
+        if entry['sha'] not in SHAS:
+            assert text[old[0]:old[1]] == after_text[new[0]:new[1]]
+            preserved += 1
+    assert preserved == 1695
+    original_security = [entry for entry in json.loads(before)['entries'] if entry['final_disposition'] == 'security-review']
+    assert len(original_security) == 1
+    assert [entry for entry in expected['entries'] if entry['final_disposition'] == 'security-review'] == original_security
+    assert expected['g11_claim'] == 'not-passed'
+    return before, after
+
+
+def verify_theming_successor(candidate, root=ROOT):
+    before, after = derive_theming_successor(root)
+    assert Path(candidate).read_bytes() == after, 'unqualified theming canonical successor'
+    return {'before_sha256': digest(before), 'after_sha256': digest(after), 'individual_decisions': 2,
+            'summary_scalar_tokens': 2, 'unselected_entry_bytes_preserved': 1695,
+            'security_reviews_unchanged': 1, 'canonical_entries': 1697, 'actual_native_artifact_browser_floor_or_full_audit_qualified': False}

@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Individual historical theming inspection and validation source exclusions",
+  "status": "reviewed",
+  "source_review_complete": true,
+  "reviews": [
+    {
+      "sha": "a7dbf08148467ce7b2f132eba32f9517e39e336f",
+      "diff_sha256": "9ec928921c615a0e24cba91977d1c9107f28f43a55d6cde7624e2da4d2437f93",
+      "complete_original_paths": [
+        "src/material/_index.scss",
+        "src/material/core/theming/tests/BUILD.bazel",
+        "src/material/core/theming/tests/theming-api.spec.ts",
+        "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+        "src/material/core/theming/tests/theming-mixin-api.spec.ts"
+      ],
+      "frozen_seed_paths": [
+        "src/material/core/theming/tests/BUILD.bazel",
+        "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+        "src/material/core/theming/tests/theming-mixin-api.spec.ts"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/_index.scss",
+          "index": 0,
+          "header": "@@ -142,3 +142,6 @@ list-density, list-base;",
+          "sha256": "7d4333be5a00411c8551a5ea198a294034b1f05d652260f1a9d8cb5057312763",
+          "technical_judgment": "Adds an explicitly private, in-development theme-version inspection export. The owned facade preserves the tagged25-function surface and does not expose or call this private API; adding it would expand the historical contract."
+        },
+        {
+          "path": "src/material/core/theming/tests/BUILD.bazel",
+          "index": 0,
+          "header": "@@ -56,7 +56,8 @@ ts_library(",
+          "sha256": "f98bc7048e9f8db47d075622cadaa54e27d9e7b57b8819c61342a7ee4504b6ee",
+          "technical_judgment": "Reorganizes the upstream Bazel test source roster. This add-on owns its test/tooling graph; the complete old mixin test is authenticated as an unchanged relocation, and no production Sass behavior is supplied by this build-list edit."
+        },
+        {
+          "path": "src/material/core/theming/tests/BUILD.bazel",
+          "index": 1,
+          "header": "@@ -74,6 +75,9 @@ ts_library(",
+          "sha256": "5d1300b7df6783489a05162010145e06260eaa08e00a328f80325a1a1faf456a",
+          "technical_judgment": "Adds the experimental Material Sass package as upstream test data for the new mixed M2/M3 inspection suite. The add-on does not inherit upstream Bazel automation or experimental theme construction APIs."
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-api.spec.ts",
+          "index": 0,
+          "header": "@@ -1,287 +0,0 @@",
+          "sha256": "92d12e01410b4db8c703a68e9acaf80200cb552928d7968fa74f618a75f87e82",
+          "technical_judgment": "Deletes the old test pathname only. Its287-line body is byte-identical to the newly added mixin test, so no historical mixin assertion is removed by the whole upstream patch; this is not a reason to drop owned legacy Sass tests."
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "index": 0,
+          "header": "@@ -0,0 +1,150 @@",
+          "sha256": "8374a7955d9de49b39c56c030bb56ca3f1267a159d871c3fffd9a1e8f589b519",
+          "technical_judgment": "Adds M2/M3 fixtures that call the newly private theme-version getter and expect versions0/1. The legacy facade owns an M2 model and its original function map, not the experimental M3 model or private version getter. Those new APIs remain absent while mixed-peer coexistence remains required."
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-mixin-api.spec.ts",
+          "index": 0,
+          "header": "@@ -0,0 +1,287 @@",
+          "sha256": "f2f1d23f2f8b29ff02e3469709728473f81a626d2ec1dbd4a6f1b914d72ac7a3",
+          "technical_judgment": "Adds the old mixin suite under a new name with the exact same Git blob. Duplication warnings, direct historical color-map overrides and density scoping assertions are unchanged; the add-on keeps its independently owned tests and tagged oracles."
+        }
+      ],
+      "source_review_complete": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "affected_branches": [
+        "21.x"
+      ],
+      "review_depth": "individual-compatibility",
+      "canonical_disposition_applied": false,
+      "status": "reviewed",
+      "decision": "Do not adopt the private in-development theme-version export or experimental M3 inspection test contract. The complete patch has five changed files and six hunks, including an unchanged287-line test relocation omitted by the frozen seed. The owned Material16 M2 facade retains its independently authenticated25-function surface; its409owned Sass members make no private inspection or experimental-constructor calls, and direct peer use is limited to four public override boundaries. Preserve the historical consumer namespace, M2 map model and independent tests.",
+      "source_scope_only": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed",
+      "patch_file": "compatibility/rc/21x-c04-theming-inspection-a7dbf08148467ce7b2f132eba32f9517e39e336f.patch"
+    },
+    {
+      "sha": "b6e50c631b8f8131f494d57b0b806777da8d4efd",
+      "diff_sha256": "826acc540b82cce67fe5e5d6a76865198997e512a354535ffb2fbe2f78a80667",
+      "complete_original_paths": [
+        "src/material-experimental/theming/_config-validation.scss",
+        "src/material-experimental/theming/_definition.scss",
+        "src/material-experimental/theming/_m3-palettes.scss",
+        "src/material/core/style/_validation.scss",
+        "src/material/core/theming/tests/BUILD.bazel",
+        "src/material/core/theming/tests/theming-definition-api.spec.ts"
+      ],
+      "frozen_seed_paths": [
+        "src/material/core/style/_validation.scss",
+        "src/material/core/theming/tests/BUILD.bazel",
+        "src/material/core/theming/tests/theming-definition-api.spec.ts"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material-experimental/theming/_config-validation.scss",
+          "index": 0,
+          "header": "@@ -1,6 +1,50 @@",
+          "sha256": "a935414acd7382a3ddb6811a375b3dac17094c62c11d6f44b5caf1b49958396f",
+          "technical_judgment": "Introduces recursive error-path rewriting and an M3 palette-shape validator that calls private Material validation helpers. The owned M2 facade imports neither this experimental module nor these private helpers; its public peer calls remain finite override mixins."
+        },
+        {
+          "path": "src/material-experimental/theming/_config-validation.scss",
+          "index": 1,
+          "header": "@@ -8,23 +52,29 @@",
+          "sha256": "0b39b222be846f3ee9781bdbc5b2f5c97e4211570b5f821103b7111055a4269a",
+          "technical_judgment": "Changes experimental theme-map diagnostic text and routes nested color/typography/density errors through the new path rewriter. This does not define the historical M2 primary/accent/warn map contract, whose owned implementation and exports remain unchanged."
+        },
+        {
+          "path": "src/material-experimental/theming/_config-validation.scss",
+          "index": 2,
+          "header": "@@ -35,12 +85,35 @@",
+          "sha256": "82e698c6dfe41d151cc98f59bab145fa79223bd8a995c0fc14f7029968758b35",
+          "technical_judgment": "Validates experimental light/dark theme type and primary/secondary/tertiary M3 palettes including neutral-variant keys. Historical M2 palettes use numbered hues and contrast maps; importing the new rules would change accepted legacy consumer maps."
+        },
+        {
+          "path": "src/material-experimental/theming/_config-validation.scss",
+          "index": 3,
+          "header": "@@ -51,13 +124,17 @@",
+          "sha256": "dbf596d00dcf564ece51e602b3a13d36571cb2e56ebd16fef10a42908a936368",
+          "technical_judgment": "Changes experimental brand/plain family and weight-key diagnostics. The owned historical typography constructors, level names and consumer namespace bindings are separate and are not replaced with this M3 validation surface."
+        },
+        {
+          "path": "src/material-experimental/theming/_config-validation.scss",
+          "index": 4,
+          "header": "@@ -68,11 +145,20 @@",
+          "sha256": "a0c592a7e1acf5b579cc105d9d63d94cd2bf761f91051a454fe0ddbbaf97cbee",
+          "technical_judgment": "Adds experimental density.scale enumeration and diagnostics. Historical M2 density configuration remains owned; this change is not adopted or used to narrow accepted consumer maps. The literal upstream list is preserved as source evidence, not executed or silently corrected."
+        },
+        {
+          "path": "src/material-experimental/theming/_definition.scss",
+          "index": 0,
+          "header": "@@ -69,7 +69,7 @@ $theme-version: 1;",
+          "sha256": "36f495fb8c05e19a02ae4d4c462c9a322560a1bb2d7bed21b40767849af99604",
+          "technical_judgment": "Parenthesizes the experimental M3 plain-family fallback list. That constructor is not exported or called by the owned M2 facade. The tagged historical typography defaults are retained rather than mirroring a modern theme constructor."
+        },
+        {
+          "path": "src/material-experimental/theming/_m3-palettes.scss",
+          "index": 0,
+          "header": "@@ -90,6 +90,7 @@ $yellow-palette: (",
+          "sha256": "4232b9ad0c3627b1448fc50d2339981f4654dc62b54b364cc9c490e2a61e5781",
+          "technical_judgment": "Adds tone100 to the yellow M3 neutral-variant map. The owned Material16 palette model has distinct M2 hue/contrast maps; no M3 palette is copied into or substituted for a consumer legacy palette."
+        },
+        {
+          "path": "src/material/core/style/_validation.scss",
+          "index": 0,
+          "header": "@@ -27,3 +27,17 @@",
+          "sha256": "6f7902b635df364acc3ff7865b03e4d9c5aac47ea4a08f56b7214165a17e801d",
+          "technical_judgment": "Adds validate-required-values to support experimental M3 palette-shape checks. The owned facade neither forwards this helper nor calls it, and all direct Material calls are authenticated public override mixins. No private helper dependency or new legacy validation rule is introduced."
+        },
+        {
+          "path": "src/material/core/theming/tests/BUILD.bazel",
+          "index": 0,
+          "header": "@@ -56,6 +56,7 @@ ts_library(",
+          "sha256": "34d2c84de742cfc6f01b8cbf20c1d923d51f998ed506487a6ef634c64a4d455a",
+          "technical_judgment": "Registers the new experimental M3 theme-definition test alongside the existing inspection and mixin suites. It changes the upstream test graph only; the add-on retains its own legacy Sass tests and does not inherit experimental theme APIs or Bazel test automation."
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-definition-api.spec.ts",
+          "index": 0,
+          "header": "@@ -0,0 +1,303 @@",
+          "sha256": "1eeb441d223320a0f53684bbf4a70df0b7c5056f54142a146d1e48debfbf7e5b",
+          "technical_judgment": "Adds303 lines of experimental theme construction/default/token/error tests, including internal M3 storage, typography families, density and invalid palette checks. The add-on does not implement that experimental constructor or internal token map; its Material16 model and native-M3 non-goal are preserved."
+        }
+      ],
+      "source_review_complete": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "affected_branches": [
+        "21.x"
+      ],
+      "review_depth": "individual-compatibility",
+      "canonical_disposition_applied": false,
+      "status": "reviewed",
+      "decision": "Do not adopt the experimental M3 validation, palette-shape, typography-fallback or neutral-variant tone changes. The complete six-file,ten-hunk patch includes three experimental production modules omitted by the frozen seed, a new private validation helper and303lines of M3 constructor tests. The independently owned Material16 M2 palettes, typography and density model neither export nor call these APIs. Importing those rules would narrow legacy consumer maps or introduce a modern constructor/private-helper dependency; retain the finite historical facade and current public override boundaries.",
+      "source_scope_only": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed",
+      "patch_file": "compatibility/rc/21x-c04-theming-inspection-b6e50c631b8f8131f494d57b0b806777da8d4efd.patch"
+    }
+  ],
+  "source_qualification": {
+    "path": "compatibility/rc/21x-c04-theming-inspection-source-qualification.json",
+    "sha256": "2f795b64d9fbf9d399af724e7702a6174225395f990db7cd06461d6fedb1c4b5",
+    "bytes": 2560
+  },
+  "source_review": {
+    "path": "compatibility/rc/21x-c04-theming-inspection-source-review.json",
+    "sha256": "55d2533ffe204f9e589cc82fd78d66dd286d31f89769573d71cbb1d8425687d2",
+    "bytes": 133530
+  },
+  "original_file_occurrences": 11,
+  "original_hunks": 16,
+  "present_original_blobs": 18,
+  "tagged_blobs": 4,
+  "exact_patch_replays": 11,
+  "byte_identical_test_relocations": 1,
+  "current_source_bindings": 605,
+  "historical_exported_functions": 25,
+  "owned_scss_members": 409,
+  "public_override_boundaries": 4,
+  "fresh_compiler_execution_this_review": false,
+  "canonical_dispositions_changed": 0,
+  "canonical_guard_or_owner_stage_integrated": false,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

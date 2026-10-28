@@ -95,7 +95,13 @@ def derive_title_successor(root=ROOT):
         if entry['sha'] not in selected_ids:
             assert before_text[slice(*before_ranges[i])] == after_text[slice(*after_ranges[i])]
     for member in packet['source_members'] + [packet['root_checker']]:
-        value = (root / member['path']).read_bytes(); assert HASH(value) == member['sha256']
+        value = (root / member['path']).read_bytes()
+        if member['path'] == 'scripts/upstream-source-contract-registry.mjs' and HASH(value) != member['sha256']:
+            from theming_inspection_canonical_ledger_patch import verify_theming_registry_successor
+            registry_before, registry_after = verify_theming_registry_successor(root)
+            assert value == registry_after
+            value = registry_before  # Exact historical metadata after authenticating current bytes.
+        assert HASH(value) == member['sha256']
         if 'bytes' in member: assert len(value) == member['bytes']
     assert (root / 'scripts/packed-upstream-ledger-base.mjs').read_bytes() == _git(root,PARENT,'scripts/packed-upstream-ledger-epoch.mjs')
     assert (root / 'scripts/check-upstream-audit-disposition.mjs').read_bytes() == _git(root,PARENT,'scripts/check-upstream-audit-disposition.mjs')
@@ -104,8 +110,16 @@ def derive_title_successor(root=ROOT):
 
 def verify_title_successor(root=ROOT, candidate=None):
     before, after = derive_title_successor(root)
-    assert (Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()) == after
+    observed = Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()
+    theming_applied = False
+    if HASH(observed) == '9810524e12e3096e7d971ea80a1424614dedecc4818f80c8e31adf86f2aeec37':
+        from theming_inspection_canonical_ledger_patch import derive_theming_successor
+        theming_before, theming_after = derive_theming_successor(root)
+        assert observed == theming_after and theming_before == after
+        observed, theming_applied = theming_before, True
+    assert observed == after
     return dict(individual_decisions=1, metadata_tokens=14, summary_scalar_tokens=2,
         unselected_entry_bytes_preserved=1682, population=1697, closed_dispositions=377,
         pending_dispositions=1320, pending_security_reviews=1, before_sha256=HASH(before),
-        after_sha256=HASH(after), actual_native_artifact_browser_floor_or_full_audit_qualified=False, g11_claim='not-passed')
+        after_sha256=HASH(after), exact_theming_successor_verified=theming_applied,
+        actual_native_artifact_browser_floor_or_full_audit_qualified=False, g11_claim='not-passed')

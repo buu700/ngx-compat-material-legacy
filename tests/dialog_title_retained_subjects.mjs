@@ -36,6 +36,20 @@ export function retainedTitleOwnerReference({root,read}){
   [" const bound=[{path:OWNER,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},...packet.source_members,packet.root_checker].map(member=>({...member,bytes:member.bytes??read(member.path).length}));",
    " const frameRaw=read(FRAMES);assert.equal(hash(frameRaw),FRAMES_HASH,'changed accepted ledger-frame catalog');\n const bound=[{path:OWNER,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members,packet.root_checker].map(member=>({...member,bytes:member.bytes??read(member.path).length}));"],
  ]){assert.equal(current.split(a).length,2);current=current.replace(a,b);}
+ const transportRaw=read('compatibility/rc/21x-c04-theming-inspection-owner-successor.json');
+ assert.equal(hash(transportRaw),'696c902c7df53e1297131cc03f7b269f919ab65544b617c21d35ee6c4cf1f578');
+ const transport=JSON.parse(transportRaw);assert.equal(transport.line,'21.x');assert.equal(transport.path,path);
+ assert.equal(transport.source_parent,'1fcb9a09a4d989a58f403db8237a281cab6cfa0d');
+ assert.deepEqual(transport.before,{sha256:hash(current),bytes:Buffer.byteLength(current)});
+ assert.equal(transport.tagged_golden_changes,0);assert.equal(transport.original_assertions_or_rejection_controls_dropped,0);
+ assert.equal(transport.literal_edits.length,8);
+ for(const ref of [transport.canonical_transition,transport.candidate_owner_execution,transport.source_handler_controls]){
+  const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);
+ }
+ const smoke=JSON.parse(read(transport.candidate_owner_execution.path));assert.equal(smoke.result,'pass');
+ assert.equal(smoke.prior_source_admissions_preserved,41);assert.equal(smoke.current_source_admissions,43);
+ for(const edit of transport.literal_edits){assert.equal(current.split(edit.before).length,2);current=current.replace(edit.before,edit.after);}
+ assert.deepEqual(transport.after,{sha256:hash(current),bytes:Buffer.byteLength(current)});
  const expected=Buffer.from(current);assert.equal(read(path).equals(expected),true,'unreviewed owner change outside exact retained-verifier successor');
  return {path,sha256:hash(expected),bytes:expected.length};
 }
