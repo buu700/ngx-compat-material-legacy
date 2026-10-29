@@ -1,0 +1,1683 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "55f9618b687fc0da4743a3cf27e113ceb837e151",
+  "node": "v24.21.0",
+  "typescript": "5.9.2",
+  "versions": {
+    "@angular/core": "21.2.23",
+    "@angular/compiler": "21.2.23",
+    "@angular/cdk": "21.2.14",
+    "@angular/material": "21.2.14",
+    "rxjs": "7.8.2"
+  },
+  "options": {
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "experimentalDecorators": true,
+    "skipLibCheck": false,
+    "noEmit": true,
+    "types": [],
+    "target": 9,
+    "module": 99,
+    "moduleResolution": 100,
+    "lib": [
+      "lib.es2022.d.ts",
+      "lib.dom.d.ts"
+    ],
+    "noErrorTruncation": true
+  },
+  "cells": [
+    {
+      "id": "owned-historical-construction",
+      "expected_result": "pass",
+      "seconds": 2.284576001,
+      "virtual_consumer": "import {OverlayRef} from '@angular/cdk/overlay';\nimport {MatSnackBarRef as PeerRef} from '@angular/material/snack-bar';\nimport {MatSnackBarRef as OwnedRef} from '../../projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-ref';\nimport {_MatSnackBarContainerBase as OwnedContainer} from '../../projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base';\ninterface Content {message: string}\ndeclare const container: OwnedContainer;\ndeclare const overlay: OverlayRef;\ndeclare const owned: OwnedRef<Content>;\nconst ref: OwnedRef<Content> = new OwnedRef<Content>(container, overlay);",
+      "consumer_sha256": "d5a9745a323e8e6816b63682523d62269f013760f216bdface41d72fa22ce3fb",
+      "diagnostics": []
+    },
+    {
+      "id": "historical-reference-operation-surface",
+      "expected_result": "pass",
+      "seconds": 1.6187943759999999,
+      "virtual_consumer": "import {OverlayRef} from '@angular/cdk/overlay';\nimport {MatSnackBarRef as PeerRef} from '@angular/material/snack-bar';\nimport {MatSnackBarRef as OwnedRef} from '../../projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-ref';\nimport {_MatSnackBarContainerBase as OwnedContainer} from '../../projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base';\ninterface Content {message: string}\ndeclare const container: OwnedContainer;\ndeclare const overlay: OverlayRef;\ndeclare const owned: OwnedRef<Content>;\ntype Surface = Pick<PeerRef<Content>,\n    'instance'|'dismiss'|'dismissWithAction'|'closeWithAction'|'afterDismissed'|'afterOpened'|'onAction'>;\n    const reference: Surface = owned;",
+      "consumer_sha256": "6bbfac956639056c45b0ea5ad14644cba6d4a2de19a25522e760a9145dcc1c7c",
+      "diagnostics": []
+    },
+    {
+      "id": "modern-constructor-rejects-owned-container",
+      "expected_result": "nominal-incompatibility",
+      "seconds": 1.323076126,
+      "virtual_consumer": "import {OverlayRef} from '@angular/cdk/overlay';\nimport {MatSnackBarRef as PeerRef} from '@angular/material/snack-bar';\nimport {MatSnackBarRef as OwnedRef} from '../../projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-ref';\nimport {_MatSnackBarContainerBase as OwnedContainer} from '../../projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base';\ninterface Content {message: string}\ndeclare const container: OwnedContainer;\ndeclare const overlay: OverlayRef;\ndeclare const owned: OwnedRef<Content>;\nnew PeerRef<Content>(container, overlay);",
+      "consumer_sha256": "c9a3b6899b2cb77a0572035e66c5991e13453c0f7c510e1fd71bedf4e532ca11",
+      "diagnostics": [
+        {
+          "code": 2345,
+          "file": "compatibility/rc/21x-base-class-removal-source-virtual-snack-modern-constructor-rejects-owned-container.ts",
+          "message": "Argument of type '_MatSnackBarContainerBase' is not assignable to parameter of type 'MatSnackBarContainer'.\n  Type '_MatSnackBarContainerBase' is missing the following properties from type 'MatSnackBarContainer': _animationsDisabled, _enterFallback, _exitFallback, _injector, _label"
+        }
+      ]
+    },
+    {
+      "id": "owned-reference-is-not-modern-nominal-subtype",
+      "expected_result": "nominal-incompatibility",
+      "seconds": 0.9438478339999993,
+      "virtual_consumer": "import {OverlayRef} from '@angular/cdk/overlay';\nimport {MatSnackBarRef as PeerRef} from '@angular/material/snack-bar';\nimport {MatSnackBarRef as OwnedRef} from '../../projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-ref';\nimport {_MatSnackBarContainerBase as OwnedContainer} from '../../projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base';\ninterface Content {message: string}\ndeclare const container: OwnedContainer;\ndeclare const overlay: OverlayRef;\ndeclare const owned: OwnedRef<Content>;\nconst reference: PeerRef<Content> = owned;",
+      "consumer_sha256": "5f9f9ed1fc23876e02313d1891b9b18c71e725b2000b1b59df85dc40fb7e5eb5",
+      "diagnostics": [
+        {
+          "code": 2322,
+          "file": "compatibility/rc/21x-base-class-removal-source-virtual-snack-owned-reference-is-not-modern-nominal-subtype.ts",
+          "message": "Type 'import(\"/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-ref\").MatSnackBarRef<Content>' is not assignable to type 'import(\"/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/node_modules/.pnpm/@angular+material@21.2.14_2accc8ca36ac823889e623ca448b580e/node_modules/@angular/material/types/snack-bar\").MatSnackBarRef<Content>'.\n  Types have separate declarations of a private property '_overlayRef'."
+        }
+      ]
+    }
+  ],
+  "positive_compiler_cells": 2,
+  "expected_nominal_incompatibility_cells": 2,
+  "scope": "Actual owned reference and abstract container-base sources compiled against actual public minimum declarations;only consumer files are virtual. Strict property initialization follows existing workspace policy;skipLibCheck is false. No Angular template/AOT compilation,generated factory,node DI,native style/motion,packed or consumer build.",
+  "decision": "Keep the historical owned reference/container and its original operation surface. Deliberately accept loss of modern reference nominal/subtype assignment:using the modern constructor with the actual owned container is rejected by its own public types. Preserve historical content DI token lookup separately through the proposed local public-token provider bridge.",
+  "product_changes": 0,
+  "canonical_dispositions_changed": 0,
+  "exceptions_changed": 0,
+  "whole_SHA_substantive_review_complete": false,
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed",
+  "source_bindings": [
+    {
+      "path": "compatibility/rc/21x-base-class-removal-source-snack-reference-types.mjs",
+      "sha256": "fd3663d4a47cb77b0c012f47288f158d27ebf999736b7d56a9f84f92aff7e23f",
+      "bytes": 6719
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/typescript.js",
+      "sha256": "e5f1f6b3e82228a89873cc7b941b2465185e839c0692860f83e3e63e53f94c2b",
+      "bytes": 9111680
+    },
+    {
+      "path": "compatibility/rc/21x-base-class-removal-source-snack-reference-qualified.json",
+      "sha256": "3f8f2fb19447c6c5b67df15a77b9bee938457a65e33e2a63c8a51226599b345b",
+      "bytes": 10039
+    },
+    {
+      "path": "compatibility/rc/21x-base-class-removal-source-snack-reference-probe.mjs",
+      "sha256": "47a20e2fa58cf5d0c512912dde19e89bacf5f94df4ada74cae46dd3e888d0984",
+      "bytes": 13617
+    },
+    {
+      "path": "node_modules/@angular/core/package.json",
+      "sha256": "138e466e558dfb07101223dd71e46db11e5ae49c29a8906bd7dae49b9ce34970",
+      "bytes": 2508
+    },
+    {
+      "path": "node_modules/@angular/compiler/package.json",
+      "sha256": "c709f61e560072dc56d543a6fd113aa8cd0adc1cada18bd60605722aeb30c8dd",
+      "bytes": 1250
+    },
+    {
+      "path": "node_modules/@angular/cdk/package.json",
+      "sha256": "10c398ae1ae4854e4c98b3715f8e0f225e34b7773fa3c582f11d67852a003ea9",
+      "bytes": 5041
+    },
+    {
+      "path": "node_modules/@angular/material/package.json",
+      "sha256": "26af34e77987b55564689c8eb7b5352db661d6a737fdec2160417ae42114f355",
+      "bytes": 11422
+    },
+    {
+      "path": "node_modules/rxjs/package.json",
+      "sha256": "2399f5d968d1d693ecd206e7972fd26cb7e3daa45931ecc12202b3a924be38b7",
+      "bytes": 8116
+    },
+    {
+      "path": "compatibility/rc/21x-base-class-removal-source-originals.json.gz",
+      "sha256": "3cb87a97a4365dd9959ec4c5fd4a5a2e1f0d5c3656e91e7e1aef65181955f49a",
+      "bytes": 613636
+    },
+    {
+      "path": "compatibility/rc/21x-base-class-removal-source-worksheet.json",
+      "sha256": "a7459210660b5eea641d1239ef0a2c8fb329df8a4c2ef8c8a89a123353b1dace",
+      "bytes": 8419
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/ledger.json",
+      "sha256": "e9ef5c0bf543977809134c3367cf9a33bdda62233ab6b944dc3c4e4ac101585e",
+      "bytes": 4191043
+    },
+    {
+      "path": "scripts/upstream-source-contract-registry.mjs",
+      "sha256": "be50b37d181b43960361860dd7cb3bb24d0f2d1b0a2ecfaa5a85a791e4869399",
+      "bytes": 15548
+    },
+    {
+      "path": "compatibility/rc/21x-remaining-disposition-worksheet.json",
+      "sha256": "0459559a90a64ee02fafce8421c1108b112f67a697932ec51128c9f40c4601f8",
+      "bytes": 269780
+    },
+    {
+      "path": "compatibility/rc/21x-table-local-compilation-admission-canonical-qualified.json",
+      "sha256": "9059e63c281def52cd77ef8a40ea876ba2bc93a7ac4e0c51073385416895d0a4",
+      "bytes": 10889
+    },
+    {
+      "path": "compatibility/rc/21x-base-class-removal-source-tagged-alias-supplement.json",
+      "sha256": "98906ac4377fba4132cb404ba6953f302ccc7730d1585e3dac589f6360b316c0",
+      "bytes": 5467
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-ref.ts",
+      "sha256": "de41a41cb3c2fdd192d3548f62206cf1da625603bb26f35b2479d5f9fe8236de",
+      "bytes": 4129
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+      "sha256": "1faece639aa44d426b249e15a3a3cca82ae6291371102ce88d8e3ef02baef38c",
+      "bytes": 10948
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/public-api.ts",
+      "sha256": "b9bae79b1440bfd2bfc1f713b7e16057af43ab06099083ecec49d4a47b35b421",
+      "bytes": 1502
+    },
+    {
+      "path": "node_modules/@angular/material/types/snack-bar.d.ts",
+      "sha256": "7117a2a5ac866f0ee8863f136bddf1ca8715118af410cb108ed4dcc57b3bb6bd",
+      "bytes": 15057
+    },
+    {
+      "path": "../../../../cyph/shared/js/cyph/services/material-dialog.service.ts",
+      "sha256": "d11742c45d78e36da36fcba72e9869571c28768fe8827208e066f87f98ecb9b1",
+      "bytes": 14208
+    },
+    {
+      "path": "../../../../cyph/shared/js/cyph/modules/cyph-web.module.ts",
+      "sha256": "edc9a64ad271ba3f697a98d1a4a30c43e58d720426088c762949593d4b11b8c0",
+      "bytes": 8388
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+compiler@21.2.23/node_modules/@angular/compiler/fesm2022/compiler.mjs",
+      "sha256": "8854dfbb775394f1ab188ee7872a6acfc7ecd9efe17bb99b22f0f12d0f451030",
+      "bytes": 1035496
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1/node_modules/@angular/core/fesm2022/core.mjs",
+      "sha256": "20749b4e23941479caf068878eb3ce7828609ec6c0734b6020b182dd632c2ab7",
+      "bytes": 117738
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+material@21.2.14_2accc8ca36ac823889e623ca448b580e/node_modules/@angular/material/fesm2022/snack-bar.mjs",
+      "sha256": "2c5d78a32e101a37d3f99592409e436f45fe99a964fd349038be8223a931ee60",
+      "bytes": 34086
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/cjs/index.js",
+      "sha256": "bde56ab43879fcb76c9be9176daeb7abf1a775deed1606d0e88d0ac3012f4886",
+      "bytes": 35131
+    },
+    {
+      "path": "tsconfig.json",
+      "sha256": "bce3ae1393dfd7d51a9b2b9e411e9cad0d48238ca1e54161216fbfb0f5030aa4",
+      "bytes": 1174
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es5.d.ts",
+      "sha256": "c430d44666289dae81f30fa7b2edebf186ecc91a2d4c71266ea6ae76388792e1",
+      "bytes": 218439
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2015.d.ts",
+      "sha256": "45b7ab580deca34ae9729e97c13cfd999df04416a79116c3bfb483804f85ded4",
+      "bytes": 1241
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2016.d.ts",
+      "sha256": "3facaf05f0c5fc569c5649dd359892c98a85557e3e0c847964caeb67076f4d75",
+      "bytes": 965
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2017.d.ts",
+      "sha256": "e44bb8bbac7f10ecc786703fe0a6a4b952189f908707980ba8f3c8975a760962",
+      "bytes": 1162
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2018.d.ts",
+      "sha256": "5e1c4c362065a6b95ff952c0eab010f04dcd2c3494e813b493ecfd4fcb9fc0d8",
+      "bytes": 1088
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2019.d.ts",
+      "sha256": "68d73b4a11549f9c0b7d352d10e91e5dca8faa3322bfb77b661839c42b1ddec7",
+      "bytes": 1071
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2020.d.ts",
+      "sha256": "5efce4fc3c29ea84e8928f97adec086e3dc876365e0982cc8479a07954a3efd4",
+      "bytes": 1201
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2021.d.ts",
+      "sha256": "feecb1be483ed332fad555aff858affd90a48ab19ba7272ee084704eb7167569",
+      "bytes": 1036
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2022.d.ts",
+      "sha256": "ee7bad0c15b58988daa84371e0b89d313b762ab83cb5b31b8a2d1162e8eb41c2",
+      "bytes": 1108
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.dom.d.ts",
+      "sha256": "080941d9f9ff9307f7e27a83bcd888b7c8270716c39af943532438932ec1d0b9",
+      "bytes": 1874901
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2015.core.d.ts",
+      "sha256": "c57796738e7f83dbc4b8e65132f11a377649c00dd3eee333f672b8f0a6bea671",
+      "bytes": 22866
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2015.collection.d.ts",
+      "sha256": "dc2df20b1bcdc8c2d34af4926e2c3ab15ffe1160a63e58b7e09833f616efff44",
+      "bytes": 5229
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2015.generator.d.ts",
+      "sha256": "515d0b7b9bea2e31ea4ec968e9edd2c39d3eebf4a2d5cbd04e88639819ae3b71",
+      "bytes": 2557
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2015.iterable.d.ts",
+      "sha256": "0559b1f683ac7505ae451f9a96ce4c3c92bdc71411651ca6ddb0e88baaaad6a3",
+      "bytes": 18200
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2015.promise.d.ts",
+      "sha256": "0dc1e7ceda9b8b9b455c3a2d67b0412feab00bd2f66656cd8850e8831b08b537",
+      "bytes": 3200
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2015.proxy.d.ts",
+      "sha256": "ce691fb9e5c64efb9547083e4a34091bcbe5bdb41027e310ebba8f7d96a98671",
+      "bytes": 5251
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2015.reflect.d.ts",
+      "sha256": "8d697a2a929a5fcb38b7a65594020fcef05ec1630804a33748829c5ff53640d0",
+      "bytes": 6493
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2015.symbol.d.ts",
+      "sha256": "4ff2a353abf8a80ee399af572debb8faab2d33ad38c4b4474cff7f26e7653b8d",
+      "bytes": 1649
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts",
+      "sha256": "fb0f136d372979348d59b3f5020b4cdb81b5504192b1cacff5d1fbba29378aa1",
+      "bytes": 11010
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2016.array.include.d.ts",
+      "sha256": "d15bea3d62cbbdb9797079416b8ac375ae99162a7fba5de2c6c505446486ac0a",
+      "bytes": 5204
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2016.intl.d.ts",
+      "sha256": "68d18b664c9d32a7336a70235958b8997ebc1c3b8505f4f1ae2b7e7753b87618",
+      "bytes": 1484
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2017.arraybuffer.d.ts",
+      "sha256": "eb3d66c8327153d8fa7dd03f9c58d351107fe824c79e9b56b462935176cdf12a",
+      "bytes": 915
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2017.date.d.ts",
+      "sha256": "38f0219c9e23c915ef9790ab1d680440d95419ad264816fa15009a8851e79119",
+      "bytes": 1916
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2017.object.d.ts",
+      "sha256": "69ab18c3b76cd9b1be3d188eaf8bba06112ebbe2f47f6c322b5105a6fbc45a2e",
+      "bytes": 2473
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2017.sharedmemory.d.ts",
+      "sha256": "a680117f487a4d2f30ea46f1b4b7f58bef1480456e18ba53ee85c2746eeca012",
+      "bytes": 7209
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2017.string.d.ts",
+      "sha256": "2f11ff796926e0832f9ae148008138ad583bd181899ab7dd768a2666700b1893",
+      "bytes": 2378
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2017.intl.d.ts",
+      "sha256": "4de680d5bb41c17f7f68e0419412ca23c98d5749dcaaea1896172f06435891fc",
+      "bytes": 1449
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2017.typedarrays.d.ts",
+      "sha256": "954296b30da6d508a104a3a0b5d96b76495c709785c1d11610908e63481ee667",
+      "bytes": 1542
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2018.asyncgenerator.d.ts",
+      "sha256": "ac9538681b19688c8eae65811b329d3744af679e0bdfa5d842d0e32524c73e1c",
+      "bytes": 2692
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2018.asynciterable.d.ts",
+      "sha256": "0a969edff4bd52585473d24995c5ef223f6652d6ef46193309b3921d65dd4376",
+      "bytes": 2257
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2018.intl.d.ts",
+      "sha256": "9e9fbd7030c440b33d021da145d3232984c8bb7916f277e8ffd3dc2e3eae2bdb",
+      "bytes": 3021
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2018.promise.d.ts",
+      "sha256": "811ec78f7fefcabbda4bfa93b3eb67d9ae166ef95f9bff989d964061cbf81a0c",
+      "bytes": 1353
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2018.regexp.d.ts",
+      "sha256": "717937616a17072082152a2ef351cb51f98802fb4b2fdabd32399843875974ca",
+      "bytes": 1232
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2019.array.d.ts",
+      "sha256": "d7e7d9b7b50e5f22c915b525acc5a49a7a6584cf8f62d0569e557c5cfc4b2ac2",
+      "bytes": 3163
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2019.object.d.ts",
+      "sha256": "71c37f4c9543f31dfced6c7840e068c5a5aacb7b89111a4364b1d5276b852557",
+      "bytes": 1473
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2019.string.d.ts",
+      "sha256": "576711e016cf4f1804676043e6a0a5414252560eb57de9faceee34d79798c850",
+      "bytes": 1528
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2019.symbol.d.ts",
+      "sha256": "89c1b1281ba7b8a96efc676b11b264de7a8374c5ea1e6617f11880a13fc56dc6",
+      "bytes": 1006
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2019.intl.d.ts",
+      "sha256": "74f7fa2d027d5b33eb0471c8e82a6c87216223181ec31247c357a3e8e2fddc5b",
+      "bytes": 958
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2020.bigint.d.ts",
+      "sha256": "d6d7ae4d1f1f3772e2a3cde568ed08991a8ae34a080ff1151af28b7f798e22ca",
+      "bytes": 38185
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2020.date.d.ts",
+      "sha256": "063600664504610fe3e99b717a1223f8b1900087fab0b4cad1496a114744f8df",
+      "bytes": 2956
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2020.promise.d.ts",
+      "sha256": "934019d7e3c81950f9a8426d093458b65d5aff2c7c1511233c0fd5b941e608ab",
+      "bytes": 1803
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2020.sharedmemory.d.ts",
+      "sha256": "52ada8e0b6e0482b728070b7639ee42e83a9b1c22d205992756fe020fd9f4a47",
+      "bytes": 5128
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2020.string.d.ts",
+      "sha256": "3bdefe1bfd4d6dee0e26f928f93ccc128f1b64d5d501ff4a8cf3c6371200e5e6",
+      "bytes": 2556
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2020.symbol.wellknown.d.ts",
+      "sha256": "59fb2c069260b4ba00b5643b907ef5d5341b167e7d1dbf58dfd895658bda2867",
+      "bytes": 1606
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2020.intl.d.ts",
+      "sha256": "639e512c0dfc3fad96a84caad71b8834d66329a1f28dc95e3946c9b58176c73a",
+      "bytes": 22438
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2020.number.d.ts",
+      "sha256": "368af93f74c9c932edd84c58883e736c9e3d53cec1fe24c0b0ff451f529ceab1",
+      "bytes": 1587
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2021.promise.d.ts",
+      "sha256": "af3dd424cf267428f30ccfc376f47a2c0114546b55c44d8c0f1d57d841e28d74",
+      "bytes": 2262
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2021.string.d.ts",
+      "sha256": "995c005ab91a498455ea8dfb63aa9f83fa2ea793c3d8aa344be4a1678d06d399",
+      "bytes": 1592
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2021.weakref.d.ts",
+      "sha256": "959d36cddf5e7d572a65045b876f2956c973a586da58e5d26cde519184fd9b8a",
+      "bytes": 3171
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2021.intl.d.ts",
+      "sha256": "965f36eae237dd74e6cca203a43e9ca801ce38824ead814728a2807b1910117d",
+      "bytes": 8245
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2022.array.d.ts",
+      "sha256": "3925a6c820dcb1a06506c90b1577db1fdbf7705d65b62b99dce4be75c637e26b",
+      "bytes": 4676
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2022.error.d.ts",
+      "sha256": "0a3d63ef2b853447ec4f749d3f368ce642264246e02911fcb1590d8c161b8005",
+      "bytes": 2379
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2022.intl.d.ts",
+      "sha256": "8cdf8847677ac7d20486e54dd3fcf09eda95812ac8ace44b4418da1bbbab6eb8",
+      "bytes": 7692
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2022.object.d.ts",
+      "sha256": "8444af78980e3b20b49324f4a16ba35024fef3ee069a0eb67616ea6ca821c47a",
+      "bytes": 1085
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2022.string.d.ts",
+      "sha256": "3287d9d085fbd618c3971944b65b4be57859f5415f495b33a6adc994edd2f004",
+      "bytes": 1155
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.es2022.regexp.d.ts",
+      "sha256": "b4b67b1a91182421f5df999988c690f14d813b9850b40acd06ed44691f6727ad",
+      "bytes": 1331
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.decorators.d.ts",
+      "sha256": "8e7f8264d0fb4c5339605a15daadb037bf238c10b654bb3eee14208f860a32ea",
+      "bytes": 13192
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.decorators.legacy.d.ts",
+      "sha256": "782dec38049b92d4e85c1585fbea5474a219c6984a35b004963b00beb1aab538",
+      "bytes": 1326
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1/node_modules/@angular/core/types/_formatter-chunk.d.ts",
+      "sha256": "f78276e340ff759b80eeca703c8585fc07ea449bdd5cb90fb2a367caf176c7b1",
+      "bytes": 8750
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1/node_modules/@angular/core/types/_event_dispatcher-chunk.d.ts",
+      "sha256": "856f988afc02ef9eca840b4c861deed4215afcd4f3d4db7f38e853383f85faa6",
+      "bytes": 14011
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1/node_modules/@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+      "sha256": "3cb3136229287079f3debe572c0370c9eb734b12a9296d6d34c8f3f1e34d8e5a",
+      "bytes": 28997
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/Subscription.d.ts",
+      "sha256": "5c7d5b50366ad358850cb764d54517a02e4c6a535ad63339341b919a01d25fae",
+      "bytes": 4351
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/Subscriber.d.ts",
+      "sha256": "004f3c14f064b567224f8d0bee55016099f60b286b26f7e45ea2398640425090",
+      "bytes": 3444
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/Operator.d.ts",
+      "sha256": "dd8331d0a5190a4735ce6c152e420230188c4966067a756673c36dd7ba72b10e",
+      "bytes": 329
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/Observable.d.ts",
+      "sha256": "d87f383e3e2146c5fa07f9db97108695a291049d1758a05d9c474bcca847d119",
+      "bytes": 7724
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/types.d.ts",
+      "sha256": "288182a3032203d20a0cb426b35c2b5e53725e06b2505a0b0b33c56d02560bb4",
+      "bytes": 11639
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/audit.d.ts",
+      "sha256": "0f882d4ae58f431454030289154feb0132e1b00ca5c3197c6b749bd098aed73a",
+      "bytes": 2015
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/auditTime.d.ts",
+      "sha256": "412a285b5215287476bb954c160ced85718b34958f6d4eabd8a74541be17d8df",
+      "bytes": 2198
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/buffer.d.ts",
+      "sha256": "1e352dc6863536f881c894f17c46b5040db7c9423a18957a8fbc001dfe579b78",
+      "bytes": 1451
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/bufferCount.d.ts",
+      "sha256": "814a65fd55b6f21484b699acb5faa9dd858a7577e304fb05c9155f4a82a4c3d9",
+      "bytes": 1949
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/bufferTime.d.ts",
+      "sha256": "4d59c6a10b6c79a0927c79efa89b3c9f71d174ec14ec2792076cfd2330d0cf8e",
+      "bytes": 573
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/bufferToggle.d.ts",
+      "sha256": "a496f51933422872de22729b7a0233589325a1a1707cccd05cd914098944a202",
+      "bytes": 1841
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/bufferWhen.d.ts",
+      "sha256": "c27066bdab263d8ea4799e97296fdc5e62c69b45e9ad908f4b8edefcca20f265",
+      "bytes": 1545
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/catchError.d.ts",
+      "sha256": "06a38095ad4368314366bc08f7cbc0fe274ef7321ec611005d0bdd9c6565e4d5",
+      "bytes": 329
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/combineLatestAll.d.ts",
+      "sha256": "4599793db9aed9b84677f0ca1cf7ef3c69bb91cda4fe4329cbab778ca4d80a58",
+      "bytes": 504
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/combineAll.d.ts",
+      "sha256": "ad0028f96921778931fb8419d8de33b10908314fa99699de1702020f69235da1",
+      "bytes": 236
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/combineLatest.d.ts",
+      "sha256": "ccd2a35321c0786bd3808042dc43b960cac13f2cc660ac37a0087e12bc97d2fc",
+      "bytes": 1093
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/combineLatestWith.d.ts",
+      "sha256": "df524ed01de4f19efb44bded628dbba9f840148be4b6cfe096e29d4b01589de3",
+      "bytes": 1812
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/concat.d.ts",
+      "sha256": "2e3981b9cee48174ff85ae15019fd72933f7023a4ed05094740f7e6f7775623c",
+      "bytes": 583
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/concatAll.d.ts",
+      "sha256": "836ebdc3b9e4c006acc4f405b7e558e56d47830e05c40d991b1e27fe8bc91157",
+      "bytes": 2149
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/concatMap.d.ts",
+      "sha256": "2cc6b617c6120ba64b5778ccd4b74c951adc3a3941bb6b39f47d48701c44af39",
+      "bytes": 1007
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/concatMapTo.d.ts",
+      "sha256": "eca02b99615a8f1652e21399d832618e38bf166c0747c9247349bc901a2f7741",
+      "bytes": 1054
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/concatWith.d.ts",
+      "sha256": "7f7d6d42e5780e86f5b860a6f95179fae06a368b3af28c1c4230397c47021a59",
+      "bytes": 1403
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/connect.d.ts",
+      "sha256": "4740a7d11ab3b381be0f269f1903fb3ff226a2fba55a01756b2997e67cd853f2",
+      "bytes": 3461
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/count.d.ts",
+      "sha256": "863dbc4e77f0353e6f9d6bc0e2b4622d5c07ff6f099ff66cafd7924b2ff4dd3f",
+      "bytes": 2205
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/debounce.d.ts",
+      "sha256": "bf034a18ed7e2a058f9e48c4c2480a124138fbd3586a80c77736a9ec079d12a8",
+      "bytes": 2862
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/debounceTime.d.ts",
+      "sha256": "1c23e5522e794b2cfcb234a09406f44bf988e899a83458d43effa0d896188621",
+      "bytes": 2788
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/defaultIfEmpty.d.ts",
+      "sha256": "c249e9ae33bfcad97deec3c73c9ed2656e112fbdf22deace0b39724be6a5dcf0",
+      "bytes": 1410
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/delay.d.ts",
+      "sha256": "5f16a149d633c7354cc6d9828fd6d443eb6090ed3dbfbf5cc72ac2b10447208e",
+      "bytes": 2101
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/delayWhen.d.ts",
+      "sha256": "c6f72b9a53b7819f056268c221d7eeb14c26e2582aa1547b0f6922d65bcfde72",
+      "bytes": 547
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/dematerialize.d.ts",
+      "sha256": "feddabf6ab0eb191e721f0126f3db8688db97c77a1234968bde7a2d70c4ae513",
+      "bytes": 1963
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/distinct.d.ts",
+      "sha256": "a968efe0db090c2ed75ee8c77162534f7ffde3dfa9d9ee9f79c47784c43df96e",
+      "bytes": 2355
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/distinctUntilChanged.d.ts",
+      "sha256": "cde0568b836865a24f4ee5859462004a326dfb76d514e6f56c8e78feedebed58",
+      "bytes": 393
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/distinctUntilKeyChanged.d.ts",
+      "sha256": "7f5cb3a03588ed46d52a6c2138315d930cd6ffb5c2134247cd07bc23cbea0b5a",
+      "bytes": 349
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/elementAt.d.ts",
+      "sha256": "9eb225532dc87924b92933cfd48845558f230df315ba9c0e5254180affd906e4",
+      "bytes": 1883
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/endWith.d.ts",
+      "sha256": "f39fb20b83c3f9853c13d4ac95533760979d3023c0a5affe2c0a62d91ab3afd8",
+      "bytes": 822
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/every.d.ts",
+      "sha256": "e4fca08aed8afb32bb8643d7469810bc8681115fe398e56a028df9e73b2d867f",
+      "bytes": 941
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/exhaustAll.d.ts",
+      "sha256": "8a59503e8c995d688174ab27cd32c3ab6afed7c41cb5282aee1e964f7d7b863d",
+      "bytes": 1911
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/exhaust.d.ts",
+      "sha256": "078966067552650f44ca96c68eddbb8539f30ee48a9ab3f24abdcf0a4037b535",
+      "bytes": 206
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/exhaustMap.d.ts",
+      "sha256": "2cd6250c43dba360377481c98d48db6ab1532a7527339edb0deffddc28ba66b1",
+      "bytes": 982
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/expand.d.ts",
+      "sha256": "7a9d600990fbe263a23daebed9ba1bbc5761e45679a7e2b2774a42756ef077a2",
+      "bytes": 846
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/filter.d.ts",
+      "sha256": "66bc155515fbea8c31a4efccbbac44de7c037b01f3aa00b76312cf7252725d30",
+      "bytes": 975
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/finalize.d.ts",
+      "sha256": "9fdd988a57c29bb94c3fd946457e031415fac3c88b681ae7403cc51efad949dd",
+      "bytes": 1910
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/find.d.ts",
+      "sha256": "0dfd353f0c16dd5107a7e0713dc52d0a2538293b0a0eac6000a017f9c0a60b56",
+      "bytes": 1367
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/findIndex.d.ts",
+      "sha256": "9cd683a4663ef4d9c6486f1b8a34c73bdbc344d69490931bfe2fbcada12ab35b",
+      "bytes": 919
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/first.d.ts",
+      "sha256": "42f6a409bad5259ece69df25d2b8ace2ff2ade45fe6386ee45203bdd9329f971",
+      "bytes": 969
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/Subject.d.ts",
+      "sha256": "fb486aa15606ee3738eccc1f344d895588fc50b9956a8b50cedac7a3ac1d03c4",
+      "bytes": 2500
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/groupBy.d.ts",
+      "sha256": "2eb162efd6dba5972b9f8f85141d900d09da4fba23864f287f98f9890a05e95f",
+      "bytes": 5076
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/ignoreElements.d.ts",
+      "sha256": "3f878fb5be9ebe8bd0ac5c22515d42b8b72d3745ef7617e73e9b2548ccbdf54b",
+      "bytes": 1355
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/isEmpty.d.ts",
+      "sha256": "e9ed562b7599c8c8c01595891480a30f9945a93a46456d22ee67ebf346b7538a",
+      "bytes": 1779
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/last.d.ts",
+      "sha256": "e7bf975a98cecefe2e8902fb7da9314675ecdce553aea722aaec97327668e18b",
+      "bytes": 793
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/map.d.ts",
+      "sha256": "3d36f93648518338c875d9f77a8eab52905365483dbb3afe43ed68f1b712b67c",
+      "bytes": 415
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/mapTo.d.ts",
+      "sha256": "4fa54df9184d291bd78b36f5063372042cd995460e906cb14014e40d1442a326",
+      "bytes": 544
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/Notification.d.ts",
+      "sha256": "40c96d03a1fdc7223379b68fc28a885475269f61606258e311176cad8e398cf4",
+      "bytes": 8878
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/materialize.d.ts",
+      "sha256": "f6bd1aa152ca2b5064e06282ee3137842ae6825b6b09aa89a2ff063b976a56f3",
+      "bytes": 2193
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/max.d.ts",
+      "sha256": "72fff5572fbfd9ba6cc32b135b2df773fbcb062cdbfbf3599b0e4c0c0b9304f8",
+      "bytes": 1242
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/merge.d.ts",
+      "sha256": "fbdc8d7cc7daf4101bf567512c67fb990d8fe300e0ba7f213171192177f44aa0",
+      "bytes": 1083
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/mergeAll.d.ts",
+      "sha256": "540e6ae4ddea7fc6ce1abf41ecc1351ab5ad0a945f9450a83d5d1cdbd4b32c73",
+      "bytes": 2305
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/mergeMap.d.ts",
+      "sha256": "3b6457fb3866562d279377f923cf3758c80ed7bfcc19414b72a24d0a98188e0c",
+      "bytes": 1066
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/flatMap.d.ts",
+      "sha256": "4fb5d7efb3520b92c1b767ce18968057c5e70886d7fb3416c487231df9275af9",
+      "bytes": 198
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/mergeMapTo.d.ts",
+      "sha256": "df2303a61eb57b2717d17123e82bc0f3fd60f6e4673cb5506192dfe23c9480bf",
+      "bytes": 791
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/mergeScan.d.ts",
+      "sha256": "1c03bb7c4a812bff9cf39601c9f1172b4dbbada100970e2402f136a767fa2544",
+      "bytes": 2818
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/mergeWith.d.ts",
+      "sha256": "a35ca245eb852b70b20300546443abb1fcbac6e5066e4baaa092af4ea614d9b5",
+      "bytes": 1538
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/min.d.ts",
+      "sha256": "82fe707c2c25376601868e9eb7d3da6ecab4e1ec3919369f6357a79ae4dee6a9",
+      "bytes": 1243
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/ConnectableObservable.d.ts",
+      "sha256": "1a39e51e3362aec7d4edec9b317ff83916fe0471f86ddf2d3ef3af5952e87d9e",
+      "bytes": 1992
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/multicast.d.ts",
+      "sha256": "4b3f36b96f129a8e125c91d41a05f711e73b3285f80bceb3a1aecb13c97c4502",
+      "bytes": 3996
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/observeOn.d.ts",
+      "sha256": "852779920fc4220bc42ec6d3c9b6164e23ea9371a788531b48b4005fe0cb4392",
+      "bytes": 3335
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/onErrorResumeNextWith.d.ts",
+      "sha256": "6863aa26d38fb3c96d7b04547d677967d83ebe421a093e4dede6fd48ad23890d",
+      "bytes": 599
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/pairwise.d.ts",
+      "sha256": "515b97cede17d91c9669cc1c7fb7a8a5f0a5f2d8999f925a5f70b4ebea93723e",
+      "bytes": 1557
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/partition.d.ts",
+      "sha256": "3a873d9c7fff0fc99f7994f8a49c126242a9a52947d8a6c2b9882aee7b476aba",
+      "bytes": 2587
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/pluck.d.ts",
+      "sha256": "944af466f063d4bd090ab9d988c620b90a014e919d5f78963f6074a136ea225e",
+      "bytes": 2688
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/publish.d.ts",
+      "sha256": "644addd4811636da491c9546654bc005ba8599f23df6d731d91eba86f3137fc2",
+      "bytes": 1803
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/publishBehavior.d.ts",
+      "sha256": "a9249493114b181814728cbfeb7234738193a4169b654ec4705d48d7a4d25222",
+      "bytes": 1269
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/publishLast.d.ts",
+      "sha256": "aad6f20d6eb01192ae02294361faa6e1f320d72447b56f433db853bbe80b15ca",
+      "bytes": 2721
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/publishReplay.d.ts",
+      "sha256": "876fbedec2f494eb6f834ce8636b07d581c657d205d81a3ba894eff0facc6b84",
+      "bytes": 4184
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/race.d.ts",
+      "sha256": "58527aa45f11c9b259a6a9d78b397f35020bfbb104f4d3bb177039b5c18146bd",
+      "bytes": 538
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/raceWith.d.ts",
+      "sha256": "91b8b61d45b5d22f3458a4ac82e03b464a0926bab795a920fe0eca805ec476eb",
+      "bytes": 1088
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/reduce.d.ts",
+      "sha256": "2744532f8fb960eb78497ac660db719f503a10c801f87131d26fd9cbef75dcef",
+      "bytes": 467
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/repeat.d.ts",
+      "sha256": "6fd4019d704fe42eecd8bbb6e37e19b3dc8fc8e8d74bc62a237539387ca4a710",
+      "bytes": 3649
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/repeatWhen.d.ts",
+      "sha256": "d4733ddb92eccfba6947052161cb2ba04cd158bcb41ded178a3a46d984cf746c",
+      "bytes": 1618
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/retry.d.ts",
+      "sha256": "cb46657d3237f80742d5701ebcced8f6e5cf8938442354387d6c77d7048dfae6",
+      "bytes": 1278
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/retryWhen.d.ts",
+      "sha256": "5c5e91212eb0c3f301f741b9c4a8c316dfd0641392ef8792909ec5797bf7dc5d",
+      "bytes": 2152
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/refCount.d.ts",
+      "sha256": "661f322e45545a554e4ffc38db6c4068a66e1323baf66acb0d8a9fa28195a669",
+      "bytes": 2533
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/sample.d.ts",
+      "sha256": "9d787416f04d0867e8a46c317056f6ad365e328074c73fa3a1612285fa24465d",
+      "bytes": 1562
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/sampleTime.d.ts",
+      "sha256": "e9977eb2676f4d622229fb0f21f4e3b849adbb643de91307e5233b301e10411f",
+      "bytes": 1747
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/scan.d.ts",
+      "sha256": "f2d3567210ca4d559d8297d6c4402599c93e3bc7485054192d38db5e132fbc0a",
+      "bytes": 455
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/sequenceEqual.d.ts",
+      "sha256": "50d22a2dfdbf2dda7b333edf980566feb3f61813695c8f3b52fc866c8d969404",
+      "bytes": 2511
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/share.d.ts",
+      "sha256": "bdb95f4b6e845ec1c0ae95eb448c55a68a2752473e1d2107348abe40421cc202",
+      "bytes": 3278
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/shareReplay.d.ts",
+      "sha256": "ea546a7ed9eaa71ba78d4d392509dadea4bafed283269dd6c4b09e7d8824e986",
+      "bytes": 486
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/single.d.ts",
+      "sha256": "4ec0f2a141a9ae7d3557b8efe630ac2021bc3a9ac61238b59293f4cf2f196e82",
+      "bytes": 408
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/skip.d.ts",
+      "sha256": "e062b1c4e638a95c2e2701973e6613fb848abb1f7673d4b54e6f729a87428606",
+      "bytes": 1165
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/skipLast.d.ts",
+      "sha256": "0863a5876c85fbaffbb8ec8aeda8b5042deb6932616139706d2b82cde9d3f7c7",
+      "bytes": 1611
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/skipUntil.d.ts",
+      "sha256": "12f8b72e3c3a333814f4fa87d5b9a7ef1ece703f3b7ec7919ad2ffb58c48c1db",
+      "bytes": 2155
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/skipWhile.d.ts",
+      "sha256": "ba9c46725e2a0bd9df59d3a1e801cc60f90db3ef7817131c53945dce2b8c0c56",
+      "bytes": 480
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/startWith.d.ts",
+      "sha256": "281d373eeabf80c4851f8de991e6abe4d385c30379d80897bbc3df3dcac99cee",
+      "bytes": 744
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/subscribeOn.d.ts",
+      "sha256": "624c5dce95672d9dcca40d9d9d82ef855f5f902292f43aa265cc8fd963c6ce84",
+      "bytes": 1923
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/switchAll.d.ts",
+      "sha256": "8a48d9c6184992d1c3ed5daa55f83d708c37582916926a5555a900608f804b60",
+      "bytes": 2050
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/switchMap.d.ts",
+      "sha256": "605dd288c636cf9b5317fe76dec75d3c7fb855fdcd3ee8cb4fea7d7091ca6fb4",
+      "bytes": 1007
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/switchMapTo.d.ts",
+      "sha256": "95addea67857d4e568a02e429b15458cec203876b2ea5f5ea18ccfeeb91b8ce0",
+      "bytes": 1054
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/switchScan.d.ts",
+      "sha256": "b5a615b0ad865ffa562980a10bda162ac1744fd363b4edc2cfc664222071cbcf",
+      "bytes": 948
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/take.d.ts",
+      "sha256": "bbccd721363897950a55ce09529503f25a69522e5c91a22679b66e941e5f8654",
+      "bytes": 1355
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/takeLast.d.ts",
+      "sha256": "d3a1e70795c38d7851b6e4f3b441c5ffdae171d6e2576a2204b7d79059aeea66",
+      "bytes": 1555
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/takeUntil.d.ts",
+      "sha256": "94c9ac65af8048cd33c05c16d40c0ef3534a12805277b7f998078ef1d431755d",
+      "bytes": 1561
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/takeWhile.d.ts",
+      "sha256": "063fe3004728b8516a4d799ee16f9a71801ba24e0443dd98638cef1bd4353a7c",
+      "bytes": 883
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/tap.d.ts",
+      "sha256": "0267341e780d4967cbd069ea57db7aa4e1fdfe74702ab0366a7a4c1da0ca332b",
+      "bytes": 3214
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/throttle.d.ts",
+      "sha256": "ec5a0291f1bcbd2662640e7a6ae0a632ce8f0fd55c02236bb43203f38436ca36",
+      "bytes": 3221
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/throttleTime.d.ts",
+      "sha256": "7ffd42ac60bedb9b97e7c35b48af9f71b0a2289f3324f414826eeaea937d144b",
+      "bytes": 2254
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/throwIfEmpty.d.ts",
+      "sha256": "b20bc124abd8ee572d0d756713ff987b116cdae908a6fcbc40e80d4b999f56b4",
+      "bytes": 1242
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/timeInterval.d.ts",
+      "sha256": "1b42aac0e117a5a04d4314130a44e532253d48e00ec315ab2b75c72c1a23d4ee",
+      "bytes": 1753
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/timeout.d.ts",
+      "sha256": "a9cc62c0a1a6a88bae9ad7adcb40a722a0b197505fa26276aff0e830a29ab04c",
+      "bytes": 10909
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/timeoutWith.d.ts",
+      "sha256": "f068ff5b7fb3bdc5380e0c677e21de829bd25cdac63a9b083fdc220fcb225280",
+      "bytes": 824
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/timestamp.d.ts",
+      "sha256": "09d2fdca6ea6c135897a26976ad3c0db724adaf23ef4e38ad852b1d8efef1ae6",
+      "bytes": 1469
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/toArray.d.ts",
+      "sha256": "15de5b7739bf7e40213a200853bf78455ee5958af08eda786605a54a7f25ade6",
+      "bytes": 973
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/window.d.ts",
+      "sha256": "aa31b69fc0094a66e771e189d387ffed138b53b211903f96ca3737792f69abdf",
+      "bytes": 1862
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/windowCount.d.ts",
+      "sha256": "975367362aaccf979ac4f35cc402b948981c870b03e8b8d28810db1555837a68",
+      "bytes": 2506
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/windowTime.d.ts",
+      "sha256": "89e253db2c2cc9a510c521f14dd2b1aae4de2556ee5159ad8d118d3587e3a880",
+      "bytes": 623
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/windowToggle.d.ts",
+      "sha256": "b580028098f87431266599cbd870b472e88715e29885fa97c2d816b38cad9c26",
+      "bytes": 1933
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/windowWhen.d.ts",
+      "sha256": "fa3e9cbc292087a73527497237c523145ab943c435a92dc254fd250a001e8e21",
+      "bytes": 2006
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/withLatestFrom.d.ts",
+      "sha256": "6fdc88b1287c276b55b7f7c4c7b49587813c763eea9751ce0baf0a7e61cd5d89",
+      "bytes": 408
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/zip.d.ts",
+      "sha256": "6a02443704052768bd021f24783aa104b02ae4444e9b735317bf13c6b857a11e",
+      "bytes": 1033
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/zipAll.d.ts",
+      "sha256": "37987b0fe9800cf25473c882ce07bccdab2763c5681c1a2d16816aead46aa8d1",
+      "bytes": 691
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/operators/zipWith.d.ts",
+      "sha256": "c84c03c721154068e1a60d83e9e85819bd3ef70b824ac2edc498aa31c06e5781",
+      "bytes": 1557
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/operators/index.d.ts",
+      "sha256": "f4e5b4def2ccccfe43c0905074695c349230505faf6ae74a28b0c1090acfda7d",
+      "bytes": 7057
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/scheduler/Action.d.ts",
+      "sha256": "94cf36780aadc31958dc2047723e58acf8b20f1b2ddf4cda68ad51d8237b1918",
+      "bytes": 1352
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/Scheduler.d.ts",
+      "sha256": "b54b2b8caa5e36c039d40a2eb9612c28aa033b4aa792f80bb4fbdd6f13b46e25",
+      "bytes": 2288
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/testing/TestMessage.d.ts",
+      "sha256": "06bc0b9cc7bf0b92534f1517fe5adde1f23f60cc6cc5c59f8e1c65db48a40067",
+      "bytes": 214
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/testing/SubscriptionLog.d.ts",
+      "sha256": "919a753b0cbb12ccc606c62e2d34884d75a48ba19b1dda497c72621b11dac088",
+      "bytes": 216
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/testing/SubscriptionLoggable.d.ts",
+      "sha256": "2c27e33ee0bf722988da00abd582cc9b806ce3fd9153a864800a339ad13f3fcf",
+      "bytes": 336
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/testing/ColdObservable.d.ts",
+      "sha256": "92d7b3a5aa5dc872e54cbad2a7094b3ea4f72c7901de1d07b4c334ff658297f0",
+      "bytes": 735
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/testing/HotObservable.d.ts",
+      "sha256": "7a52922b38e9686d5bdc6e75774929eec6688d26c1dfe4a03ddec77ede468e87",
+      "bytes": 642
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/scheduler/AsyncScheduler.d.ts",
+      "sha256": "aa5efca2833d89b55248f1889a6433dab1b1f41768e9a75f8ce35f9bf56c5ec4",
+      "bytes": 374
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/scheduler/timerHandle.d.ts",
+      "sha256": "f3cb934699bea498259de69c44a4f93b461f079d72cddb041587afd9312efb6e",
+      "bytes": 115
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/scheduler/AsyncAction.d.ts",
+      "sha256": "4ade28b8e7ff47d5cbce4d30ebf6e05ced32d6ea23930b897c377d23f9f2f114",
+      "bytes": 1117
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/scheduler/VirtualTimeScheduler.d.ts",
+      "sha256": "f25ffc20baaea5269b5bcc4f96a4d2628328daa36051fbd031b27c8cf8baa344",
+      "bytes": 2428
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/testing/TestScheduler.d.ts",
+      "sha256": "36927eafdf230172dbf968749804e6186082eb960ed1bb4e36e1536c6c4a5fd3",
+      "bytes": 4250
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/testing/index.d.ts",
+      "sha256": "1218398da7c8dc4add10bdb3aa2856aad54b123d847eaf574d1d694ac269bfb5",
+      "bytes": 114
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/symbol/observable.d.ts",
+      "sha256": "07886b8104556bcc9314b90cd2043f2286e54c1f6ba2ebbc953e1e43232e12be",
+      "bytes": 367
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/dom/animationFrames.d.ts",
+      "sha256": "b637cd92688a6cdf4f8f184ff529dc2bc7f15692828e2c0c66a60e6972f400c7",
+      "bytes": 2723
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/BehaviorSubject.d.ts",
+      "sha256": "8131bbadfeef07b067a4fe3fd9bb2b983c2ad631efc15123445324f9cb05e447",
+      "bytes": 382
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/ReplaySubject.d.ts",
+      "sha256": "e9acc77854461c6072dfe6c0ba7150d304c1e61eabbf00131c921f61a6b04cb1",
+      "bytes": 2509
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/AsyncSubject.d.ts",
+      "sha256": "3fc077734e1ff23401f5fdde3de0f372880393b6e253f3c43f576ba11e23393e",
+      "bytes": 399
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/scheduler/AsapScheduler.d.ts",
+      "sha256": "50614c808e099a1d4413786f3783d9eeaaa74b267f2c87fcf8a893287e91c301",
+      "bytes": 245
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/scheduler/asap.d.ts",
+      "sha256": "f4cb6530f248e87cefa74ef623206fec805f6252f885f8e14ef3d1a5872cef2d",
+      "bytes": 1718
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/scheduler/async.d.ts",
+      "sha256": "38c332caadd8391566552395d592076470a5e7423f70964620eabf05c02907cd",
+      "bytes": 1546
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/scheduler/QueueScheduler.d.ts",
+      "sha256": "eb17b5bf1fc763a644c21d76572c0e41e351c3f6dfcde649428d5d829f7294d2",
+      "bytes": 158
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/scheduler/queue.d.ts",
+      "sha256": "cb124162c87b29ff5121e3ee5bb29c782f101e0135d6c2644ab1b31d530a435e",
+      "bytes": 2083
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/scheduler/AnimationFrameScheduler.d.ts",
+      "sha256": "406d6f5d3707c488362fb40d1c1f8a7b0a42b70554b427160185d93e430228f5",
+      "bytes": 265
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/scheduler/animationFrame.d.ts",
+      "sha256": "2e9776410c5bc290d9432a9215c67398a273e514a79b9e15f32ecddfde8a03be",
+      "bytes": 1375
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/util/identity.d.ts",
+      "sha256": "313ff8df074b81d3e4f088ff3a3a06df3d9b0d0c7f55469ccc2ac887ecb6b867",
+      "bytes": 1080
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/util/pipe.d.ts",
+      "sha256": "c718475bca06806cc243e77777641cb67ba68f2c57321a4773ebb47760a3bcf2",
+      "bytes": 2311
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/util/noop.d.ts",
+      "sha256": "96e6bf811343caab5112b68880905c5d20d9257054afac6c18e718a4c549ed27",
+      "bytes": 72
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/util/isObservable.d.ts",
+      "sha256": "a2793bc73ba63ca7d259cb0f0b61d0023820170d08a1f9715006c8042d060165",
+      "bytes": 279
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/lastValueFrom.d.ts",
+      "sha256": "d5011b38165771fdf75a9a06d6d379a1fc7edd7eb695ebdc52319fb6e3c6d81f",
+      "bytes": 344
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/firstValueFrom.d.ts",
+      "sha256": "88417fb19d339304e9616a38ea513251047c9e300c81f9467fc317df8a582e71",
+      "bytes": 349
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/util/ArgumentOutOfRangeError.d.ts",
+      "sha256": "c6411797a81e3f64f8c2b4fb7575e5b49c2e8a9376d31c2361e8c8df73488ddb",
+      "bytes": 682
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/util/EmptyError.d.ts",
+      "sha256": "88ab362442cd50cfe62e99c81b10c7d2cceecec31f9fe4d75fc6673f9f37e414",
+      "bytes": 605
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/util/NotFoundError.d.ts",
+      "sha256": "cb155e69fa97f811e48cbd84cbc1c608a6585ee8ba2a152c0835981b8add7ab7",
+      "bytes": 542
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/util/ObjectUnsubscribedError.d.ts",
+      "sha256": "019f4f1cbc781cc15c6173f8be5ef907405722194ab297127b3c3426e5368339",
+      "bytes": 651
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/util/SequenceError.d.ts",
+      "sha256": "3cd95a72058dbf36275e0ab3cf6ae9711dd2aed11cd0e8a2a6ac8ac3d8b9ebb1",
+      "bytes": 558
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/util/UnsubscriptionError.d.ts",
+      "sha256": "c79f1c8b51d8475dde8d2973f740f43ca34b1f0a95d93649cd76c1ee20abba19",
+      "bytes": 594
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/bindCallback.d.ts",
+      "sha256": "35f0d2bd2c5c05c0cb19095bf5b7c44365b1c88efe6285370855b90417277a64",
+      "bytes": 579
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/bindNodeCallback.d.ts",
+      "sha256": "8264b129f4c4eb4799703f8e5ee2223a184d1cdbfc782158b1f40a88a4435a1f",
+      "bytes": 601
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/AnyCatcher.d.ts",
+      "sha256": "527ddda6f8be1279f3294714534c49d6e90f238cea325519882ebf88d7ec5bd2",
+      "bytes": 476
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/combineLatest.d.ts",
+      "sha256": "b23877792e8bd00271d0ec5d401b68e4228540a4316de3d9dfb697b955c161a4",
+      "bytes": 3351
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/concat.d.ts",
+      "sha256": "35b2eb1de01633db90d41abe93730b29984856fcc840b4c2801bfd3761a2097b",
+      "bytes": 423
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/connectable.d.ts",
+      "sha256": "95f0c9127b879c2fc7e31f8e09ff45bb4aae302e60f4b9ceaf4d9ee6bc51ec66",
+      "bytes": 1334
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/defer.d.ts",
+      "sha256": "62ad07fac36aa0a7cb5d537c52a902f31a6160ab59cbfe365e4313a9beaceed8",
+      "bytes": 2150
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/empty.d.ts",
+      "sha256": "6e3d29fdc96ebbb2ac672d2dae710c689c1ea0d0e9469e0847616f3c38fd085f",
+      "bytes": 2040
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/forkJoin.d.ts",
+      "sha256": "d505055b8fadd42da235c85947911d8d198ad70c5f5775991e7821d4f89c90f5",
+      "bytes": 1784
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/from.d.ts",
+      "sha256": "8b5a5852099dca7d7e7a7cef6d681dc1586aafacdb963ca180fe5cabbfa3a24b",
+      "bytes": 543
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/fromEvent.d.ts",
+      "sha256": "0d1aa3341d1ad2064adada71c5d01a2f572e4aac09410e5616d90894105a0eb9",
+      "bytes": 3746
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/fromEventPattern.d.ts",
+      "sha256": "52494ca5a884da3bf11b8165ab31429715f0970d9c6383240c5666f4bd713e01",
+      "bytes": 528
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/generate.d.ts",
+      "sha256": "2d1f9fed2116cc79bfc97765bf8f5259f39b9bf213eb2a73608fcef6d400da56",
+      "bytes": 9989
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/iif.d.ts",
+      "sha256": "b4b9b51ee6f6309cda2e539245235a8caeca2b1d6bf12b5e5c162d17333c450f",
+      "bytes": 2481
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/interval.d.ts",
+      "sha256": "28d9cd978e05d58f2153924254766cf59fb155639335239949f21066f90937c7",
+      "bytes": 1640
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/merge.d.ts",
+      "sha256": "c76053984b39150d00ade365b096a8bc21a4a7f2ee9e0a926711b00f8e7bf701",
+      "bytes": 1065
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/never.d.ts",
+      "sha256": "956b510767e3d6f362ea5800510635197723737af5d19ae07ee987ea4a90bfa5",
+      "bytes": 1192
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/of.d.ts",
+      "sha256": "cd1a8ff61f5063d7e6e2094e25d35c90b499961b63911f2f4ae0ff5555c2b4d7",
+      "bytes": 1151
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/onErrorResumeNext.d.ts",
+      "sha256": "1cf09b5945779e9bc75c4dcd805fb149c28fc90da3335186ef620647a3c540e1",
+      "bytes": 413
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/pairs.d.ts",
+      "sha256": "9cdc0b9a313090ec45b34ea1eb02fbace433f509e753634b043e9b83038261e6",
+      "bytes": 972
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/partition.d.ts",
+      "sha256": "c93474cff0088351a65d3cad24037874a26a5371a48528563e56efe31cb3d8bb",
+      "bytes": 1045
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/race.d.ts",
+      "sha256": "b4580df8ea7f62d7b06588001952bf69426e6b03cf3d2569f5f608e45f29ba08",
+      "bytes": 687
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/range.d.ts",
+      "sha256": "de27f7bb9be9d8a2b4557ec6503b8a315f74d598ce9a0ab81b5ed5610e1a8e81",
+      "bytes": 523
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/throwError.d.ts",
+      "sha256": "fe3c378dcefa7ed8b21bd6822f5d7838b1119836da75ae1e1fb485d27b8ffb62",
+      "bytes": 4033
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/timer.d.ts",
+      "sha256": "7365bf3333d4277b6fe374ed055624e5ec080dbb919e2d78f1cb75a3f1a4b4f6",
+      "bytes": 5162
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/using.d.ts",
+      "sha256": "339a76a138b3e22a4c4386cc5abdeef64bd778fb0c35dc2fd9cb58c51fa17dc1",
+      "bytes": 2360
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/observable/zip.d.ts",
+      "sha256": "0923e4ac8c894ad507bd2daee0df66b699de88467201381ece011ba5a080e1ff",
+      "bytes": 665
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/scheduled/scheduled.d.ts",
+      "sha256": "e4f6626f827ea509255647e1b6db82145a2eb1a6b46202655e7d9bb19145c33b",
+      "bytes": 657
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/internal/config.d.ts",
+      "sha256": "26e23972c40f378f0301d8d7025ea895557c2865a1a31c8ea9c3fff0dbc27075",
+      "bytes": 4048
+    },
+    {
+      "path": "node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/dist/types/index.d.ts",
+      "sha256": "818469e2f1c49f6cf6f220a81df013daf6e4dc4af7f9c0890ca63ce06d7d7299",
+      "bytes": 10521
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1/node_modules/@angular/core/types/_effect-chunk.d.ts",
+      "sha256": "40c3d843286f49ec0a09f318040f405daa491544393663c805e7effdef43cb8a",
+      "bytes": 1681
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1/node_modules/@angular/core/types/primitives-di.d.ts",
+      "sha256": "14532a95a43809fe2037c732130afed278735e25700a9043a16b614fd5271bf9",
+      "bytes": 4080
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1/node_modules/@angular/core/types/_discovery-chunk.d.ts",
+      "sha256": "779438592d99f241f4f0c961f3973595d4473883630b81c5b19b5d1b79329211",
+      "bytes": 290135
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1/node_modules/@angular/core/types/_api-chunk.d.ts",
+      "sha256": "5b5e6f430f3c30dae2c79590c282037a5d1833c40e7da4e6b872867f2d023c72",
+      "bytes": 9898
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1/node_modules/@angular/core/types/_weak_ref-chunk.d.ts",
+      "sha256": "f29c704e83c816f2609a1dadb2d3ffb30c1c715851dad5ec6a6124e1a53f6eef",
+      "bytes": 204
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1/node_modules/@angular/core/types/core.d.ts",
+      "sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df",
+      "bytes": 369830
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/_bidi-module-chunk.d.ts",
+      "sha256": "3a9323fd680c0d3d8d8fe14f8f951c1e1e1b762fea0a8de48d876f0d435e406d",
+      "bytes": 2311
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/_portal-directives-chunk.d.ts",
+      "sha256": "8bf59f01d49417cba2bb4b8eba6ba9a03f33976950bc369865070d17be684cb7",
+      "bytes": 8958
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/_data-source-chunk.d.ts",
+      "sha256": "581228c64dea7a741cd82cc867dbc74aaf333f00a415a542c94f32904ca40737",
+      "bytes": 1751
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/_number-property-chunk.d.ts",
+      "sha256": "dc18d006527854eccef7394cfef826eb78bf2d98952401df0b94da286f7b11c6",
+      "bytes": 555
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/_scrolling-module-chunk.d.ts",
+      "sha256": "e4aeb44b011913d186f8ebfe4bdfe20880ae4125d0628991e973d2d6ea29c506",
+      "bytes": 27982
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1__rxjs@7.8.2/node_modules/@angular/common/types/_platform_location-chunk.d.ts",
+      "sha256": "9b482c16f4216edc39a6b05da721f0a89ac4ee248f0350c33bd8160bbc6b459e",
+      "bytes": 4116
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1__rxjs@7.8.2/node_modules/@angular/common/types/_common_module-chunk.d.ts",
+      "sha256": "bb0dd2569eddacff22fda2080461539488ba111acfd864ac7b4733873b231067",
+      "bytes": 91168
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1__rxjs@7.8.2/node_modules/@angular/common/types/_xhr-chunk.d.ts",
+      "sha256": "eefb5a4dfd331979cb301b9d8908033fa88e05d155b0ffa207ee0071c84091bf",
+      "bytes": 283
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1__rxjs@7.8.2/node_modules/@angular/common/types/common.d.ts",
+      "sha256": "d6680b33c3ca62ac828fae356ba2c16df07f5fac2d6d3a47406fc56bfd9d170c",
+      "bytes": 52887
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/scrolling.d.ts",
+      "sha256": "3c1a2af7d34c2d2cd6760d8d4b574fa4ecc40bab8c6e10bc0e804287259ed340",
+      "bytes": 2768
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/_platform-chunk.d.ts",
+      "sha256": "91d9de4d3888ec1767f406307b333103aeb33469f81a8f8743ece26549f8f856",
+      "bytes": 1171
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/_style-loader-chunk.d.ts",
+      "sha256": "184aeb5eaa3d273414cec3371de4bf250e9a0118f7f993a3b7073367d7f04d2b",
+      "bytes": 657
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/_overlay-module-chunk.d.ts",
+      "sha256": "7d89742d60a006d1ccf044a451c774f6baf4f54f41b61c7f309346b9ce84f6cf",
+      "bytes": 45193
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/overlay.d.ts",
+      "sha256": "e15e46ec3d671453aa3be897938cf04b0c29dbdd20480def6d57ebfae53c2499",
+      "bytes": 14625
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/_list-key-manager-chunk.d.ts",
+      "sha256": "bae7d4bb0100dd7aa986242ad0c0d4fccd47ced046d8247619ec5addf1ccac46",
+      "bytes": 7310
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/_activedescendant-key-manager-chunk.d.ts",
+      "sha256": "e8e8c7a5e36a47fa23bf5d9cf0779f639428bb4f44c7cea2c4200d5723126f4d",
+      "bytes": 1554
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/_focus-monitor-chunk.d.ts",
+      "sha256": "2c6d64e38b140134b741efc821f05c10410fcb09098c0e374c93e1db0b64d1e6",
+      "bytes": 9561
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/_focus-key-manager-chunk.d.ts",
+      "sha256": "9c000ba6e7fb29e1c239b9d0fa9fd1fc4debfb1cb2a4c9f9920b60ad80b040db",
+      "bytes": 1446
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/_tree-key-manager-strategy-chunk.d.ts",
+      "sha256": "68865626693619204e5c4939bd162e4d83793af5875f2ccaa040fa9d520245f3",
+      "bytes": 4473
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/observers.d.ts",
+      "sha256": "d342fefc7d087e22258016a304daa4f5aa9321d0425d3699665c4c0d3a94bcc3",
+      "bytes": 3687
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+platform-browser@21.2.23_@angular+animations@21.2.23_@angular+core@21.2.23_@an_8efd291bce95da278cc3f060bbfb5223/node_modules/@angular/platform-browser/types/_browser-chunk.d.ts",
+      "sha256": "cb4d2b08907e9795c95305a9e8e059bad737e5e19a6f925d84658419e2ceb420",
+      "bytes": 5304
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1__rxjs@7.8.2/node_modules/@angular/common/types/_module-chunk.d.ts",
+      "sha256": "baff2af46f163ecdfce5888b7a120f947c91e5b6c157c4bf9aa116a9cea46e9a",
+      "bytes": 37433
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1__rxjs@7.8.2/node_modules/@angular/common/types/http.d.ts",
+      "sha256": "c86606500cf593fd9dd5e13d2c9b9de44ef7156305e23bd4c0037fc08c43a47a",
+      "bytes": 177609
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+platform-browser@21.2.23_@angular+animations@21.2.23_@angular+core@21.2.23_@an_8efd291bce95da278cc3f060bbfb5223/node_modules/@angular/platform-browser/types/platform-browser.d.ts",
+      "sha256": "62a127264597c37b6cd7e8ceee26c690a05c88c632669f566a18fb3b23eb6ea1",
+      "bytes": 35840
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/_a11y-module-chunk.d.ts",
+      "sha256": "f3d9fbabc0d75cb1bb95e2424f1b2724fb7fcf63655b10f742d2e752ebf4b21c",
+      "bytes": 14029
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/a11y.d.ts",
+      "sha256": "c7cb507235c6a481ec46b581092a0855986e1c817b798221e7da56eb2e25ce16",
+      "bytes": 23372
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/portal.d.ts",
+      "sha256": "17f59b700249a0ee761c3ac50d34415c7118eba48e26b8928e87d530fc4a4a64",
+      "bytes": 2269
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/bidi.d.ts",
+      "sha256": "769187ce194c8dc07761a9e7d3576475e8ace31b42cbc2e2935e3a74f3e4a9b5",
+      "bytes": 789
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+material@21.2.14_2accc8ca36ac823889e623ca448b580e/node_modules/@angular/material/types/_palette-chunk.d.ts",
+      "sha256": "9b81bb792ae111bfe0e15bea0c137743ab5aca49ebb60575690e2dbc8c6142a9",
+      "bytes": 132
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+material@21.2.14_2accc8ca36ac823889e623ca448b580e/node_modules/@angular/material/types/_ripple-loader-chunk.d.ts",
+      "sha256": "414cf5a4a3eb68a9de5d25cd65fab2dec3518d002d5e5ed283ab45dbb90213b1",
+      "bytes": 1669
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/types/platform.d.ts",
+      "sha256": "43070746987eb03aada20e6c9999c0155e4649b7e7a317b318226d0107051496",
+      "bytes": 2988
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+material@21.2.14_2accc8ca36ac823889e623ca448b580e/node_modules/@angular/material/types/_ripple-chunk.d.ts",
+      "sha256": "52a81cf0861109277d49c155326565114a31400764e11085b7a26c130b8cf979",
+      "bytes": 11090
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+material@21.2.14_2accc8ca36ac823889e623ca448b580e/node_modules/@angular/material/types/_ripple-module-chunk.d.ts",
+      "sha256": "fa7a8705570edce45f7274ba1ed7f4bec8b93389007a8cf923ce9b93443f0210",
+      "bytes": 454
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+material@21.2.14_2accc8ca36ac823889e623ca448b580e/node_modules/@angular/material/types/button.d.ts",
+      "sha256": "d34e1c365ca24b628fb9f183d49fe220a41241cd1cf0f5746bf9b44b3327ca67",
+      "bytes": 11705
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+material@21.2.14_2accc8ca36ac823889e623ca448b580e/node_modules/@angular/material/types/snack-bar.d.ts",
+      "sha256": "7117a2a5ac866f0ee8863f136bddf1ca8715118af410cb108ed4dcc57b3bb6bd",
+      "bytes": 15057
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+      "sha256": "1b673f43bacbcf47ea0e504ff3f191d84289e7c7337b20b93e8b5b98e833eb08",
+      "bytes": 13945
+    }
+  ]
+}
