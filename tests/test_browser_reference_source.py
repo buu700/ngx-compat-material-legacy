@@ -20,14 +20,20 @@ class BrowserReferenceSourceTests(unittest.TestCase):
         self.assertEqual(report['title_contract_negative_controls'],47)
         self.assertEqual(report['cold_source_faults_rejected'],report['bound_current_paths'])
         self.assertEqual(report['late_source_faults_rejected'],report['bound_current_paths'])
-        self.assertTrue(report['current_ledger_equals_reviewed_cohort'])
+        packet=json.loads((ROOT/'compatibility/rc/c04-browser-reference-source-inputs.json').read_bytes())
+        cohort=subprocess.check_output(['git','--no-replace-objects','show',packet['source_parent']+':'+packet['protected_ledger']['path']],cwd=ROOT)
+        self.assertTrue(hashlib.sha256(cohort).hexdigest()==packet['protected_ledger']['sha256'])
+        live=(ROOT/packet['protected_ledger']['path']).read_bytes()
+        self.assertEqual(report['current_ledger_equals_reviewed_cohort'],live==cohort)
+        self.assertEqual(report['current_physical_ledger_sha256'],hashlib.sha256(live).hexdigest())
         self.assertFalse(report['canonical_frame_admission_granted'])
         self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified'])
 
     def test_protected_ledger_and_browser_helpers_remain_exact(self):
         packet=json.loads((ROOT/'compatibility/rc/c04-browser-reference-source-inputs.json').read_bytes())
         for ref in [packet['protected_ledger'],*[row['after']for row in packet['transitions']]]:
-            raw=(ROOT/ref['path']).read_bytes()
+            raw=(subprocess.check_output(['git','--no-replace-objects','show',packet['source_parent']+':'+ref['path']],cwd=ROOT)
+                 if ref['path']==packet['protected_ledger']['path']else(ROOT/ref['path']).read_bytes())
             self.assertEqual(hashlib.sha256(raw).hexdigest(),ref['sha256'])
             self.assertEqual(len(raw),ref['bytes'])
         self.assertFalse(packet['canonical_frame_admission_granted'])

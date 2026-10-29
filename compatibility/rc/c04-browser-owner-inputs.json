@@ -1,0 +1,326 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Finite exact current tool-code successors and browser-reference owner stage;historical program text is comparison data only",
+  "source_parent": "a760bd6b5e2793a61f3500a8e62c0e0ddc13a39a",
+  "before_ledger": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "8f311ad001bf2daa3152b878414bd010a621d31b76c118d19f4184e5bed0ef17",
+    "bytes": 4183477
+  },
+  "after_ledger": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "f0aa2808e6bf022e9901b6edc249e1b08e7be9b7af06af4f154131e4a54c9cee",
+    "bytes": 4183477
+  },
+  "code_transitions": [
+    {
+      "before": {
+        "path": "scripts/inventory-reference-owner.mjs",
+        "sha256": "55d6ae5009b1617c213e6159214764256629f01ed8e498b1e7df8307849decb2",
+        "bytes": 17613
+      },
+      "after": {
+        "path": "scripts/inventory-reference-owner.mjs",
+        "sha256": "9bed66e11f5f20d1fd4bb9691441b799b81d4bafcfba1ede6f5659f49e90f1ac",
+        "bytes": 17928
+      },
+      "literal_edits": [
+        {
+          "before": "import {checkerReferenceOwnerContext} from './checker-reference-owner.mjs';",
+          "after": "import {checkerReferenceOwnerContext} from './checker-reference-owner.mjs';\nimport {browserReferenceOwnerContext} from './browser-reference-owner.mjs';"
+        },
+        {
+          "before": " for(const ref of checker.bound)bound.set(ref.path,{...ref});\n const currentLedger=member(LEDGER),applied=currentLedger.equals(source.after)||checker.applied;",
+          "after": " for(const ref of checker.bound)bound.set(ref.path,{...ref});\n const browser=browserReferenceOwnerContext({root,read});assert.ok(browser.before.equals(checker.after));\n for(const ref of browser.bound)bound.set(ref.path,{...ref});\n const currentLedger=member(LEDGER),applied=currentLedger.equals(source.after)||checker.applied||browser.applied;"
+        },
+        {
+          "before": "source.assertCurrent();checker.assertCurrent();assertPhysicalCI();",
+          "after": "source.assertCurrent();checker.assertCurrent();browser.assertCurrent();assertPhysicalCI();"
+        },
+        {
+          "before": "assertPrior();return checker.wrapPrepared({...prior,canonical_after:Buffer.from(source.after),bound:currentBound,",
+          "after": "assertPrior();return browser.wrapPrepared(checker.wrapPrepared({...prior,canonical_after:Buffer.from(source.after),bound:currentBound,"
+        },
+        {
+          "before": "prior_metadata_assert_current:assertPrior,assertCurrent:assertPrior});",
+          "after": "prior_metadata_assert_current:assertPrior,assertCurrent:assertPrior}));"
+        },
+        {
+          "before": "return {line,metadataRead,wrapPrepared,assertCurrent,applied,checker,metadata_entries:",
+          "after": "return {line,metadataRead,wrapPrepared,assertCurrent,applied,checker,browser,metadata_entries:"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "scripts/checker-owner-source.mjs",
+        "sha256": "2cfbaba9d72f1da15073621b37982433d409cdfebe293f039b633369f86f5be5",
+        "bytes": 4736
+      },
+      "after": {
+        "path": "scripts/checker-owner-source.mjs",
+        "sha256": "0788290595d4c776ae958ebf8e0c110b281c3840f349d1be93b7e5b988a3567c",
+        "bytes": 5220
+      },
+      "literal_edits": [
+        {
+          "before": "import assert from 'node:assert/strict';",
+          "after": "import assert from 'node:assert/strict';\nimport {browserOwnerSourceSubject} from './browser-owner-source.mjs';"
+        },
+        {
+          "before": " const bound=new Map(),member=(ref)=>{",
+          "after": " const tools=browserOwnerSourceSubject({root,read});\n const bound=new Map(tools.bound.map(ref=>[ref.path,{...ref}])),member=(ref)=>{\n  ref=tools.qualifyReference(ref);"
+        },
+        {
+          "before": "assert.equal(member(row.after).toString(),expected);",
+          "after": "assert.equal(tools.comparisonBytes(row.after).toString(),expected);"
+        },
+        {
+          "before": "const row=transitions.get(ref.path);if(!row)return {...ref};",
+          "after": "const row=transitions.get(ref.path);if(!row)return tools.qualifyReference(ref);\n  const current=tools.qualifyReference(row.after);if(ref.sha256===current.sha256){if(ref.bytes!==undefined)assert.equal(ref.bytes,current.bytes);return {...ref,sha256:current.sha256,bytes:current.bytes};}"
+        },
+        {
+          "before": "return {...ref,sha256:row.after.sha256,bytes:row.after.bytes};",
+          "after": "return tools.qualifyReference({...ref,sha256:row.after.sha256,bytes:row.after.bytes});"
+        },
+        {
+          "before": "const assertCurrent=()=>{for(const ref of bound.values()){",
+          "after": "const assertCurrent=()=>{tools.assertCurrent();for(const ref of bound.values()){"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "scripts/browser-reference-source.mjs",
+        "sha256": "e8c82ed2f12113c2b086f67c15e056a89770e120507dc1a12bef3fa0c2146164",
+        "bytes": 10222
+      },
+      "after": {
+        "path": "scripts/browser-reference-source.mjs",
+        "sha256": "59f2ac538149e0d9b2176c231a97147862881fb19b46768a5a4e450d66f9fe38",
+        "bytes": 10443
+      },
+      "literal_edits": [
+        {
+          "before": "import assert from 'node:assert/strict';",
+          "after": "import assert from 'node:assert/strict';\nimport {browserOwnerSourceSubject} from './browser-owner-source.mjs';"
+        },
+        {
+          "before": " const bound=new Map(),member=ref=>{",
+          "after": " const tools=browserOwnerSourceSubject({root,read});\n const bound=new Map(tools.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{\n  ref=tools.qualifyReference(ref);"
+        },
+        {
+          "before": "const assertCurrent=()=>{for(const ref of bound.values()){",
+          "after": "const assertCurrent=()=>{tools.assertCurrent();for(const ref of bound.values()){"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "scripts/browser-reference-proposal.mjs",
+        "sha256": "217fb0885b707c21088d1464583a9cfa4c845f5c76b35a26d40939d0598a3fb6",
+        "bytes": 13320
+      },
+      "after": {
+        "path": "scripts/browser-reference-proposal.mjs",
+        "sha256": "600a430a33955755561f018f46288acd4beed4b9ad4ca6b4daf8aa7cb5bf1d50",
+        "bytes": 13492
+      },
+      "literal_edits": [
+        {
+          "before": "import assert from 'node:assert/strict';",
+          "after": "import assert from 'node:assert/strict';\nimport {browserOwnerSourceSubject} from './browser-owner-source.mjs';"
+        },
+        {
+          "before": " const source=inspectBrowserReferenceSource({root,read}),line=source.report.line,pin=PINS[line];assert.ok(pin);",
+          "after": " const tools=browserOwnerSourceSubject({root,read}),source=inspectBrowserReferenceSource({root,read}),line=source.report.line,pin=PINS[line];assert.ok(pin);"
+        },
+        {
+          "before": " const bound=new Map(source.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{",
+          "after": " const bound=new Map(source.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{\n  ref=tools.qualifyReference(ref);"
+        },
+        {
+          "before": "const assertCurrent=()=>{source.assertCurrent();assert.ok(readCheckerOwnerMember",
+          "after": "const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();assert.ok(readCheckerOwnerMember"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "tests/test_browser_reference_source.py",
+        "sha256": "dffaa374f94a19adfa1e0af9c0dc44a44534c7a42911b2157a1140e83e744fcd",
+        "bytes": 2204
+      },
+      "after": {
+        "path": "tests/test_browser_reference_source.py",
+        "sha256": "e5fadb22854af2a821b0a7b21a296eb2cb3c133054e515716ebfa5594747b677",
+        "bytes": 2926
+      },
+      "literal_edits": [
+        {
+          "before": "        self.assertTrue(report['current_ledger_equals_reviewed_cohort'])",
+          "after": "        packet=json.loads((ROOT/'compatibility/rc/c04-browser-reference-source-inputs.json').read_bytes())\n        cohort=subprocess.check_output(['git','--no-replace-objects','show',packet['source_parent']+':'+packet['protected_ledger']['path']],cwd=ROOT)\n        self.assertTrue(hashlib.sha256(cohort).hexdigest()==packet['protected_ledger']['sha256'])\n        live=(ROOT/packet['protected_ledger']['path']).read_bytes()\n        self.assertEqual(report['current_ledger_equals_reviewed_cohort'],live==cohort)\n        self.assertEqual(report['current_physical_ledger_sha256'],hashlib.sha256(live).hexdigest())"
+        },
+        {
+          "before": "            raw=(ROOT/ref['path']).read_bytes()",
+          "after": "            raw=(subprocess.check_output(['git','--no-replace-objects','show',packet['source_parent']+':'+ref['path']],cwd=ROOT)\n                 if ref['path']==packet['protected_ledger']['path']else(ROOT/ref['path']).read_bytes())"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "tests/checker_reference_owner_probe.mjs",
+        "sha256": "58b0a29868ea2fa62e17adf931a5eaf7ebf3204fdfb9b3ffdd66eaf8e7382017",
+        "bytes": 9857
+      },
+      "after": {
+        "path": "tests/checker_reference_owner_probe.mjs",
+        "sha256": "8fdd88ae987cbecccf28f28382d6e480246ddd8b8c821cfdce7d0f5244f91ad7",
+        "bytes": 9896
+      },
+      "literal_edits": [
+        {
+          "before": "assert.equal(hash(prepared.canonical_after),input.after_ledger.sha256);",
+          "after": "assert.equal(hash(prepared.checker_reference_stage.after),input.after_ledger.sha256);"
+        },
+        {
+          "before": "assert.equal(context.checker.applied,true);",
+          "after": "assert.equal(context.checker.applied||context.browser.applied,true);"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "tests/checker_reference_proposal_probe.mjs",
+        "sha256": "9483faecdb79ff26cf12caeeaf33763f6a64201be172d90a2bff21cebd561717",
+        "bytes": 6045
+      },
+      "after": {
+        "path": "tests/checker_reference_proposal_probe.mjs",
+        "sha256": "15102188659c89600752976b21e55dc17492c751fa97fcb7f82e1d22b5388fd3",
+        "bytes": 6246
+      },
+      "literal_edits": [
+        {
+          "before": "const beforeLive=disk(LEDGER),subject=prepareCheckerReferenceMetadata({root}),packet=JSON.parse(disk(PACKET));",
+          "after": "const beforeLive=disk(LEDGER),stageLedger=gunzipSync(disk('compatibility/rc/c04-checker-reference-proposal-after.json.gz'));\nconst stageRead=path=>path===LEDGER?Buffer.from(stageLedger):disk(path);\nconst subject=prepareCheckerReferenceMetadata({root,read:stageRead}),packet=JSON.parse(disk(PACKET));"
+        },
+        {
+          "before": "beforeLive.equals(subject.before)?",
+          "after": "stageRead(LEDGER).equals(subject.before)?"
+        },
+        {
+          "before": "let tamper=null;const read=path=>{const raw=disk(path);",
+          "after": "let tamper=null;const read=path=>{const raw=stageRead(path);"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "tests/checker_reference_independent.py",
+        "sha256": "6081d68f2290acfe854a82ed122148836f2ffd1f3a5fd2d82583a7a17aaa951f",
+        "bytes": 5236
+      },
+      "after": {
+        "path": "tests/checker_reference_independent.py",
+        "sha256": "2ce1963a88a0afb9d7426eddebd5c84c6696c42b212d045bf6bab4d1448146bf",
+        "bytes": 5411
+      },
+      "literal_edits": [
+        {
+          "before": "assert live_before in[before,after];assert(ROOT/LEDGER).read_bytes()==live_before",
+          "after": "stage_live=gzip.decompress((ROOT/'compatibility/rc/c04-checker-reference-proposal-after.json.gz').read_bytes())\nassert stage_live in[before,after];assert source['current_ledger_sha256']==hash_bytes(live_before);assert(ROOT/LEDGER).read_bytes()==live_before"
+        }
+      ]
+    }
+  ],
+  "source_members": [
+    {
+      "path": "scripts/browser-reference-owner.mjs",
+      "sha256": "7f0ae434273c4d19aa1b533bfbe3a61d8ffd4e4d9eb9959ab40f31d441db28e5",
+      "bytes": 3026
+    },
+    {
+      "path": "scripts/packed-upstream-ledger-epoch.mjs",
+      "sha256": "11d59797b69ea0097a58838b3d0e19cc16d851d75ba0085f1c3bd4550df7d2ef",
+      "bytes": 67941
+    },
+    {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "sha256": "4a6002153caabe102887bcd8847128818c2f7025a3d1257d97cd446f34fbf106",
+      "bytes": 46960
+    },
+    {
+      "path": "tests/browser_reference_owner_probe.mjs",
+      "sha256": "eca206ffd1dce24fdf97336e4875664875dfb23b4c9d4f02e7429f7511064678",
+      "bytes": 9814
+    },
+    {
+      "path": "tests/test_browser_reference_owner.py",
+      "sha256": "2b90713970544046686e71e5a51891b0fb41cd12bfd1e09bd6b369793e8381d8",
+      "bytes": 3527
+    },
+    {
+      "path": "compatibility/rc/c04-browser-reference-proposal.json",
+      "sha256": "52d231aca902638226f5065c6622a6f857745990cdd23ee9df211aaf5e5ee56e",
+      "bytes": 18691
+    },
+    {
+      "path": "compatibility/rc/c04-browser-reference-proposal-after.json.gz",
+      "sha256": "6f030adc5ece639527020e0134f572de010ac2ad41b46cc6b439c3aac8ea8e2d",
+      "bytes": 604378
+    },
+    {
+      "path": "compatibility/rc/c04-browser-reference-proposal-qualification.json",
+      "sha256": "7497930f6f2a89a9533762ab1dd4e1058be3bea4ce3abd67b62128b14f1c228d",
+      "bytes": 9819
+    },
+    {
+      "path": "compatibility/rc/c04-browser-reference-source-inputs.json",
+      "sha256": "5a8bd910e0d9a64a73558b5da0f48abdf8546b455d8db0fcb921678a0ee0a5ae",
+      "bytes": 115478
+    },
+    {
+      "path": "compatibility/rc/c04-browser-reference-source-qualification.json",
+      "sha256": "89091ed75beb5b4090342b8b2ac7c123fdc8c819fbef1c33e07237d6cd523487",
+      "bytes": 10606
+    },
+    {
+      "path": "compatibility/rc/c04-checker-owner-inputs.json",
+      "sha256": "3ae63a5b436eab901a7ff22cb8ecc9043a5aea8d2fb89ebd9e7f396ea3105bf3",
+      "bytes": 12073
+    },
+    {
+      "path": "compatibility/rc/c04-inventory-owner-inputs.json",
+      "sha256": "0d9dfac3813a6dc60644a090a2173ce56eaed1bcbdb32c2be29ce53f32413cdc",
+      "bytes": 12144
+    },
+    {
+      "path": "compatibility/rc/c04-checker-reference-proposal.json",
+      "sha256": "58af70dec579e45bd47862065ec2bb8cfcfd7cbeb9081303930508f6d07c2d7f",
+      "bytes": 13538
+    },
+    {
+      "path": "compatibility/rc/c04-checker-reference-proposal-qualification.json",
+      "sha256": "5029d432f9104d523f01371a59837279f43068d4f12ce74fd7391263992b2cbe",
+      "bytes": 6314
+    },
+    {
+      "path": "compatibility/rc/c04-checker-reference-source-inputs.json",
+      "sha256": "f3baffebad455da6add898ca103f2994b61a99c049099b4d23bbfe913334179d",
+      "bytes": 33815
+    },
+    {
+      "path": "compatibility/rc/c04-checker-reference-source-qualification.json",
+      "sha256": "19172cfa48231a84aea3096afe52f5e31b89e5dd530229a1ce5dec53d6dd3097",
+      "bytes": 8523
+    }
+  ],
+  "canonical_frame_admission_granted": false,
+  "canonical_dispositions_changed": 0,
+  "source_admissions_changed": 0,
+  "product_changes": 0,
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

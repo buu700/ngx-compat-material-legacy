@@ -6,6 +6,7 @@
  */
 /** Authenticate finite browser-tool transitions; this grants no frame admission. */
 import assert from 'node:assert/strict';
+import {browserOwnerSourceSubject} from './browser-owner-source.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
@@ -23,7 +24,9 @@ function original(root,commit,path){
 }
 export function inspectBrowserReferenceSource({root,read=path=>readCheckerOwnerMember(root,path)}={}){
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
- const bound=new Map(),member=ref=>{
+ const tools=browserOwnerSourceSubject({root,read});
+ const bound=new Map(tools.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{
+  ref=tools.qualifyReference(ref);
   const raw=read(ref.path),physical=readCheckerOwnerMember(root,ref.path);assert.ok(Buffer.isBuffer(raw));assert.ok(raw.equals(physical),'noncurrent browser source '+ref.path);
   if(ref.sha256)assert.equal(hash(raw),ref.sha256,'changed browser source '+ref.path);
   if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);
@@ -84,7 +87,7 @@ export function inspectBrowserReferenceSource({root,read=path=>readCheckerOwnerM
  const census=JSON.parse(member(packet.raw_source_census));
  assert.deepEqual(derived.sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b))),census.rows.slice().sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b))));
  assert.equal(derived.length,line==='main'?18:16);assert.equal(totalHunks,23);
- const assertCurrent=()=>{for(const ref of bound.values()){
+ const assertCurrent=()=>{tools.assertCurrent();for(const ref of bound.values()){
   const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late browser source '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readCheckerOwnerMember(root,ref.path)),'late physical browser source '+ref.path);
  }};
  assertCurrent();return {bound:structuredClone([...bound.values()]),assertCurrent,report:{schema_version:1,line,result:'pass',analysis_node:process.version,analysis_typescript:ts.version,complete_source_transitions:4,individually_reviewed_hunks:totalHunks,selected_references:derived.length,transitions:summaries,current_physical_ledger_sha256:hash(currentLedger),current_physical_ledger_bytes:currentLedger.length,current_ledger_equals_reviewed_cohort:currentLedger.equals(priorLedger),canonical_frame_admission_granted:false,old_programs_executed:false,canonical_dispositions_changed:0,product_changes:0,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};
