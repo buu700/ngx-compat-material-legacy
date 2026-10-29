@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "path": "scripts/canonical-tool-source-role.mjs",
+  "before": {
+    "sha256": "a1adb7c250ff17b732568df8aaebcb22475f6173f781459d77ebe3f0a42891b1",
+    "bytes": 1039
+  },
+  "after": {
+    "sha256": "a419794f15cc4fd68a7ce25a2caced2755fda2cd623165f529140a4c2fe9680a",
+    "bytes": 5636
+  },
+  "literal_edits": [
+    {
+      "before": "import {createRequire} from 'node:module';",
+      "after": "import {createRequire} from 'node:module';\nimport {createHash} from 'node:crypto';\nimport {execFileSync} from 'node:child_process';\nimport {readFileSync,lstatSync} from 'node:fs';"
+    },
+    {
+      "before": "import {fileURLToPath} from 'node:url';",
+      "after": "import {fileURLToPath} from 'node:url';\nconst ROLE='scripts/canonical-tool-source-role.mjs',OWNER='scripts/packed-upstream-ledger-epoch.mjs';\nconst INVENTORY='compatibility/rc/c04-inventory-owner-inputs.json';\nconst INVENTORY_MAIN='97db675e4fda1c6dd4a7f056159bd47e2aa963dddb9dff3da1af537ae062d15a';\nconst hash=raw=>createHash('sha256').update(raw).digest('hex');\nconst roleImage=readFileSync(fileURLToPath(import.meta.url));\nfunction physical(root,path){\n let cursor=root;assert.ok(lstatSync(root).isDirectory()&&!lstatSync(root).isSymbolicLink());\n for(const part of path.split('/')){assert.ok(part&&part!=='.'&&part!=='..');cursor=join(cursor,part);assert.equal(lstatSync(cursor).isSymbolicLink(),false);}\n assert.ok(lstatSync(cursor).isFile());return readFileSync(cursor);\n}\n/** Qualify only the recorded main inventory tool transition, never its ledger. */\nexport function qualifyMainInventoryToolReference({root,read,prior}={}){\n root=resolve(root);if(prior?.path!==OWNER)return null;\n const supplied=read(OWNER);assert.ok(Buffer.isBuffer(supplied));\n // The existing exact literal comparisons include authenticated historical\n // metadata readers. Their unchanged comparison remains the caller's job.\n if(hash(supplied)===prior.sha256){if(prior.bytes!==undefined)assert.equal(supplied.length,prior.bytes);return null;}\n const bound=[];\n const member=path=>{const actual=physical(root,path),provided=read(path);assert.ok(Buffer.isBuffer(provided));assert.ok(provided.equals(actual),'nonphysical main inventory tool input '+path);bound.push({path,sha256:hash(actual),bytes:actual.length});return actual;};\n const manifest=JSON.parse(member('projects/ngx-material-legacy/package.json'));assert.match(manifest.version,/^22\\./);\n const raw=member(INVENTORY);assert.equal(hash(raw),INVENTORY_MAIN,'changed main inventory tool packet');const packet=JSON.parse(raw);\n assert.equal(packet.schema_version,1);assert.equal(packet.line,'main');assert.equal(packet.old_program_execution,false);\n for(const name of ['source_admissions_changed','canonical_dispositions_changed','product_changes'])assert.equal(packet[name],0);\n assert.equal(packet.actual_native_packed_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');\n assert.equal(packet.before_owner.path,OWNER);assert.equal(packet.after_owner.path,OWNER);assert.equal(prior.sha256,packet.before_owner.sha256,'unknown main inventory tool reference');\n if(prior.bytes!==undefined)assert.equal(prior.bytes,packet.before_owner.bytes);\n assert.match(packet.source_parent,/^[0-9a-f]{40}$/);\n const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};\n for(const key of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete env[key];\n const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet.source_parent+':'+OWNER],{cwd:root,env,maxBuffer:1024*1024});\n assert.equal(hash(before),packet.before_owner.sha256);assert.equal(before.length,packet.before_owner.bytes);\n let expected=before.toString();assert.ok(packet.owner_literal_edits.length>0);\n for(const edit of packet.owner_literal_edits){assert.equal(expected.split(edit.before).length,2,'ambiguous main inventory tool edit');expected=expected.replace(edit.before,edit.after);}\n assert.equal(hash(expected),packet.after_owner.sha256);assert.equal(Buffer.byteLength(expected),packet.after_owner.bytes);\n const actual=member(OWNER);assert.equal(actual.toString(),expected,'unqualified main inventory tool successor');\n assert.ok(member(ROLE).equals(roleImage),'loaded and actual main tool-reference helper differ');\n const assertCurrent=()=>{for(const ref of bound){const actual=physical(root,ref.path),provided=read(ref.path);assert.ok(Buffer.isBuffer(provided)&&provided.equals(actual),'nonphysical or late main inventory tool input '+ref.path);assert.equal(hash(actual),ref.sha256,'late main inventory tool change '+ref.path);assert.equal(actual.length,ref.bytes);}};\n assertCurrent();return {reference:{path:OWNER,sha256:packet.after_owner.sha256,bytes:packet.after_owner.bytes},bound,assertCurrent,\n  literal_tool_transition_only:true,historical_code_executed:false,old_tool_bytes_exposed:false,old_product_bytes_exposed:false,\n  canonical_metadata_admission_granted:false,canonical_dispositions_changed:0,current_native_or_packed_qualified:false,g11_claim:'not-passed'};\n}\n"
+    },
+    {
+      "before": " return null;\n}",
+      "after": " return qualifyMainInventoryToolReference({...args,root});\n}"
+    }
+  ],
+  "canonical_owner_modules_changed": false,
+  "old_programs_executed": false,
+  "canonical_dispositions_changed": 0,
+  "g11_claim": "not-passed"
+}
