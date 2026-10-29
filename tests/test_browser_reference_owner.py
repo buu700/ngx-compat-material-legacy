@@ -25,9 +25,9 @@ class BrowserReferenceOwnerTests(unittest.TestCase):
     def test_actual_prepare_epoch_raw_reads_and_all_metadata_stages(self):
         child=subprocess.run(['node','tests/browser_reference_owner_probe.mjs','--runtime'],cwd=ROOT,capture_output=True,text=True,timeout=1800)
         self.assertEqual(child.returncode,0,(child.stdout+child.stderr)[-10000:]);report=json.loads(child.stdout)
-        self.assertTrue(report['actual_prepare_and_epoch_called']);self.assertEqual(report['preserved_source_admissions'],88 if report['line']=='21.x'else 13);self.assertEqual(report['source_admissions'],89);self.assertEqual(report['legacy_removal_source_admissions'],1)
+        self.assertTrue(report['actual_prepare_and_epoch_called']);self.assertEqual(report['preserved_source_admissions'],88 if report['line']=='21.x'else 13);self.assertEqual(report['source_admissions']-report['table_local_compilation_source_admissions'],89);self.assertEqual(report['table_local_compilation_source_admissions'],1);self.assertEqual(report['legacy_removal_source_admissions'],1)
         self.assertEqual(report['browser_metadata_entries'],18 if report['line']=='main'else 16);self.assertEqual(report['selected_entries'],9 if report['line']=='main'else 8)
         self.assertEqual(report['preserved_checker_metadata_entries'],13 if report['line']=='main'else 5);self.assertEqual(report['preserved_inventory_metadata_entries'],20 if report['line']=='main'else 19)
-        self.assertEqual(report['public_current_paths'],report['current_context_bound_sources']-1);self.assertEqual(report['preserved_epoch_late_controls_rejected'],12);self.assertEqual(report['actual_epoch_late_controls_rejected'],20)
+        self.assertEqual(report['public_current_paths'],report['current_context_bound_sources']-1);self.assertEqual(report['preserved_epoch_late_controls_rejected'],12);self.assertEqual(report['actual_epoch_late_controls_rejected']-report['table_epoch_late_controls_rejected'],20);self.assertEqual(report['table_epoch_late_controls_rejected'],6)
         self.assertEqual(report['public_historical_projection_paths'],['compatibility/f10/disposition-ledger/ledger.json']);self.assertFalse(report['full_retained_roster_executed']);self.assertFalse(report['current_native_packed_or_floor_or_g11_credit'])
 if __name__=='__main__':unittest.main()

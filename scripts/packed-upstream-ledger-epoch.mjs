@@ -8,6 +8,7 @@
 import assert from 'node:assert/strict';
 import {inventoryReferenceOwnerContext} from './inventory-reference-owner.mjs';
 import {legacyRemovalOwnerContext} from './legacy-removal-canonical-stage.mjs';
+import {tableLocalCompilationOwnerContext} from './table-local-compilation-canonical-stage.mjs';
 import {legacyRemovalOwnerSourceSubject} from './legacy-removal-owner-source.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
@@ -510,13 +511,13 @@ function qualifyBeforeLegacyRemovalToolReference({root=process.cwd(),read=disk(r
 }
 
 /** The complete prior owner runs first; only the exact new source stage follows. */
-export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){
+function prepareBeforeTableLocalCompilationLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});
  const legacy=legacyRemovalOwnerContext({root,read});
  const prior=prepareBeforeLegacyRemovalLedger({root,read:legacy.metadataRead});
  return legacy.wrapPrepared(prior);
 }
-export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={}){
+function epochBeforeTableLocalCompilationLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});
  const legacy=legacyRemovalOwnerContext({root,read});
  const prior=epochBeforeLegacyRemovalLedger({root,read:legacy.metadataRead});
@@ -528,7 +529,7 @@ export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={
   legacy_removal_source_decisions_applied:legacy.applied?1:0,
   current_tool_bytes_exposed_without_projection:true,current_native_packed_or_floor_or_g11_credit:false};
 }
-export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root),prior}={}){
+function qualifyBeforeTableLocalCompilationToolReference({root=process.cwd(),read=disk(root),prior}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.qualifyCanonicalToolReference({root,read,prior});
  let role;try{role=read(METADATA_ROLE);}catch{/* A public reader has no private comparison capability. */}
  if(role===metadataToken)return qualifyBeforeLegacyRemovalToolReference({root,read,prior});
@@ -539,4 +540,30 @@ export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root
  const current=read(result.reference.path),reference={...result.reference,sha256:hash(current),bytes:current.length};
  const assertCurrent=()=>{legacy.assertCurrent();result.assertCurrent();legacy.assertCurrent();};
  assertCurrent();return {...result,reference,bound:[...bound.values()],assertCurrent,legacy_removal_source_scope:true};
+}
+
+
+/** Exact terminal table source decision; every prior current source stage runs. */
+export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){
+ read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});
+ const table=tableLocalCompilationOwnerContext({root,read});
+ const prior=prepareBeforeTableLocalCompilationLedger({root,read:table.metadataRead});return table.wrapPrepared(prior);
+}
+export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={}){
+ read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});
+ const table=tableLocalCompilationOwnerContext({root,read}),prior=epochBeforeTableLocalCompilationLedger({root,read:table.metadataRead});
+ const assertCurrent=()=>{table.assertCurrent();prior.assertCurrent();table.assertCurrent();};
+ const historical=path=>{if(path!==LEDGER)return read(path);assertCurrent();const raw=prior.read(path);assertCurrent();return raw;};
+ readers.set(historical,{root:resolve(root),raw:read});assertCurrent();
+ return {...prior,read:historical,raw:read,assertCurrent,individual_decisions_applied:prior.individual_decisions_applied+(table.applied?1:0),table_local_compilation_source_decisions_applied:table.applied?1:0,current_tool_bytes_exposed_without_projection:true,current_native_packed_or_floor_or_g11_credit:false};
+}
+export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root),prior}={}){
+ read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.qualifyCanonicalToolReference({root,read,prior});
+ let role;try{role=read(METADATA_ROLE);}catch{/* Public readers have no comparison capability. */}
+ if(role===metadataToken)return qualifyBeforeTableLocalCompilationToolReference({root,read,prior});
+ const table=tableLocalCompilationOwnerContext({root,read}),result=qualifyBeforeTableLocalCompilationToolReference({root,read:table.metadataRead,prior});if(!result)return result;
+ const bound=new Map(result.bound.map(ref=>[ref.path,{...ref}]));for(const ref of table.bound)bound.set(ref.path,{...ref});
+ const raw=read(result.reference.path),reference={...result.reference,sha256:hash(raw),bytes:raw.length};
+ const assertCurrent=()=>{table.assertCurrent();result.assertCurrent();table.assertCurrent();};assertCurrent();
+ return {...result,reference,bound:[...bound.values()],assertCurrent,table_local_compilation_source_scope:true};
 }

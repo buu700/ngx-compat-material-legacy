@@ -10,10 +10,11 @@ import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {gunzipSync} from 'node:zlib';
+import {tableLocalCompilationOwnerSourceSubject} from '../scripts/table-local-compilation-owner-source.mjs';
 import {TABLE_LOCAL_COMPILATION_PREFIX as PREFIX,reviewTableLocalCompilationSource,verifyTableLocalCompilationOriginal,verifyTableLocalCompilationCompiler,inspectTableLocalCompilationOwnedSource} from '../scripts/upstream-table-local-compilation-source.mjs';
 
-const root=process.cwd(),cache=new Map(),read=path=>{
-  if(!cache.has(path))cache.set(path,readFileSync(join(root,path)));return cache.get(path);
+const root=process.cwd(),tableTools=tableLocalCompilationOwnerSourceSubject({root}),cache=new Map(),read=path=>{
+  if(!cache.has(path))cache.set(path,readFileSync(join(root,path)));return tableTools.predecessorData(path,cache.get(path));
 };
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const original=JSON.parse(gunzipSync(read(PREFIX+'originals.json.gz')));
@@ -65,7 +66,7 @@ for(const [a,b,c]of [
   [row,table,moduleBody.replace('imports: [CdkTableModule, MatCommonModule]','imports: [MatCommonModule]')],
 ]){assert.ok(a!==row||b!==table||c!==moduleBody,'metadata control changed no bytes');reject(()=>inspectTableLocalCompilationOwnedSource(a,b,c,tagged));metadataFaults++;}
 
-const qualified=reviewTableLocalCompilationSource({root,read});qualified.assertCurrent();
+const qualified=reviewTableLocalCompilationSource({root,read});qualified.assertCurrent();tableTools.assertCurrent();
 assert.equal(qualified.report.proposed_final_disposition,'do-not-adopt');assert.equal(qualified.report.canonical_dispositions_changed,0);assert.equal(qualified.report.product_changes,0);
 for(const path of [
   'scripts/upstream-table-local-compilation-source.mjs',PREFIX+'originals.json.gz',PREFIX+'current.json',PREFIX+'compiler.json',PREFIX+'compiler-controls.json',

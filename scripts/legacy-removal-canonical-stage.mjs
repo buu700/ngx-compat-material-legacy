@@ -59,8 +59,9 @@ export function legacyRemovalOwnerContext({root,read=path=>readFileSync(join(roo
  assert.ok(gunzipSync(member(packet.ledger_after_image)).equals(stage.after));assert.ok(gunzipSync(member(packet.registry_after_image)).equals(registryAfter));
  const actualLedger=read(LEGACY_REMOVAL_LEDGER),actualRegistry=read(LEGACY_REMOVAL_REGISTRY);
  assert.ok(actualRegistry.equals(readEvidenceMember(root,LEGACY_REMOVAL_REGISTRY)),'nonphysical legacy source registry');
- assert.ok(actualRegistry.equals(registryBefore)||actualRegistry.equals(registryAfter),'unqualified legacy source registry');
- const applied=actualLedger.equals(stage.after),registryApplied=actualRegistry.equals(registryAfter);if(applied)assert.ok(registryApplied,'legacy ledger successor requires its exact source registry successor');
+ const comparisonRegistry=tools.predecessorData(LEGACY_REMOVAL_REGISTRY,actualRegistry);
+ assert.ok(comparisonRegistry.equals(registryBefore)||comparisonRegistry.equals(registryAfter),'unqualified legacy source registry');
+ const applied=actualLedger.equals(stage.after),registryApplied=comparisonRegistry.equals(registryAfter);if(applied)assert.ok(registryApplied,'legacy ledger successor requires its exact source registry successor');
  for(const[path,raw]of [[LEGACY_REMOVAL_LEDGER,actualLedger],[LEGACY_REMOVAL_REGISTRY,actualRegistry]])bound.set(path,{path,sha256:hash(raw),bytes:raw.length});
  const source=admission.inspectCanonicalSource({root,read,entries:stage.entries,body});for(const ref of source.bound)bound.set(ref.path,{...ref,bytes:ref.bytes??read(ref.path).length});
  const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late legacy canonical input '+ref.path);assert.equal(raw.length,ref.bytes);}};

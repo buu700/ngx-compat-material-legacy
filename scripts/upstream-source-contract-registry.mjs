@@ -142,4 +142,6 @@ export const sourceContractDefinitions = [
     scope_key:'remaining_unthemable_source_scope',module:'upstream-remaining-unthemable-admission.cjs'},
   {sha:'f7e3ae3bd1b86d5987df57bb06d350001c592931',proof_kind:'individual-historical-legacy-removal-source-exclusion',
     scope_key:'legacy_removal_source_scope',module:'upstream-legacy-removal-admission.cjs'},
+  {sha:'3f35b12290ea4dbee4a9d82845c0964b2b4df50d',proof_kind:'individual-historical-table-local-compilation-source-review',
+    scope_key:'table_local_compilation_source_scope',module:'upstream-table-local-compilation-admission.cjs'},
 ];

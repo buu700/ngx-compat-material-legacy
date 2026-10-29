@@ -22,7 +22,7 @@ for(const key of Object.keys(env))if(key.startsWith('RC_')||['GIT_DIR','GIT_WORK
 const original=path=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','show',worksheet.source_parent+':'+path],{cwd:root,env,maxBuffer:8*1024*1024});
 const before=original(LEDGER),registryBefore=original(REGISTRY),stage=applyLegacyRemovalCanonicalStage({before,body}),registryAfter=legacyRemovalRegistrySuccessor(registryBefore),entry=stage.entries[0],args={root,entry,body,review:body,proof:entry.individual_proof};
 const iterationTools=legacyRemovalOwnerSourceSubject({root,read});
-const iterationLedger=before,physicalLedger=read(LEDGER),physicalRegistry=read(REGISTRY);
+const iterationLedger=before,currentLedger=read(LEDGER),currentRegistry=read(REGISTRY),physicalLedger=iterationTools.predecessorData(LEDGER,currentLedger),physicalRegistry=iterationTools.predecessorData(REGISTRY,currentRegistry);
 assert.ok(physicalLedger.equals(before)||physicalLedger.equals(stage.after),'unknown current iteration ledger');
 assert.ok(physicalRegistry.equals(registryBefore)||physicalRegistry.equals(registryAfter),'unknown current iteration registry');
 if(physicalLedger.equals(stage.after))assert.ok(physicalRegistry.equals(registryAfter));
@@ -84,12 +84,12 @@ if(phase==='contract'){
  for(const value of [Buffer.concat([before,Buffer.from('\n')]),stage.after,Buffer.from('{}')])assert.throws(()=>applyLegacyRemovalCanonicalStage({before:value,body}));
  for(const value of [Buffer.concat([registryBefore,Buffer.from('\n')]),registryAfter])assert.throws(()=>legacyRemovalRegistrySuccessor(value));
  assert.equal(iterationLedger.equals(before),true);assert.equal(gunzipSync(read(prefix+'registry-before.mjs.gz')).equals(registryBefore),true);
- iterationTools.assertCurrent();assert.ok(read(LEDGER).equals(physicalLedger));assert.ok(read(REGISTRY).equals(physicalRegistry));
+ iterationTools.assertCurrent();assert.ok(read(LEDGER).equals(currentLedger));assert.ok(read(REGISTRY).equals(currentRegistry));
 }else{
  // Run only while the exact proposed registry is installed by the bounded
  // reversible driver. Root checker and every source read remain real.
- assert.equal(read(REGISTRY).equals(registryAfter),true);
- const {sourceContractDefinitions}=await import('../scripts/upstream-source-contract-registry.mjs');assert.equal(sourceContractDefinitions.length,68);
+ assert.equal(iterationTools.predecessorData(REGISTRY,read(REGISTRY)).equals(registryAfter),true);
+ const {sourceContractDefinitions}=await import('../scripts/upstream-source-contract-registry.mjs');assert.equal(sourceContractDefinitions.length-(sourceContractDefinitions.some(row=>row.sha==='3f35b12290ea4dbee4a9d82845c0964b2b4df50d')?1:0),68);
  const {requiresRegisteredSourceReview}=await import('../scripts/upstream-registered-source-review.mjs');assert.equal(requiresRegisteredSourceReview(entry),true);
  const {reviewMetadataComplete,individualReviewScopeOk}=await import('../scripts/upstream-individual-evidence-scope.mjs');assert.equal(reviewMetadataComplete(args),true);assert.equal(individualReviewScopeOk({...args,requiresIndividual:true,claimsBehavior:false}),true);
  const directory=fs.mkdtempSync(join(tmpdir(),'ngx-legacy-removal-root-')),mutant=join(root,'scripts','.legacy-removal-source-mutant-'+process.pid+'.mjs');
@@ -113,7 +113,7 @@ if(phase==='contract'){
   fs.writeFileSync(mutant,checker.replace(needle,''),{flag:'wx'});
   const bypass=inspect(entry,{inject:true,checker:'scripts/'+mutant.split('/').at(-1)});assert.equal(bypass.evidence_failures.length,0);assert.deepEqual(bypass.insufficient_review_sha_ids.sensitive,[]);mutantDetected=true;
  }finally{fs.rmSync(mutant,{force:true});fs.rmSync(directory,{recursive:true,force:true});}
- assert.equal(iterationLedger.equals(before),true);assert.ok(read(LEDGER).equals(physicalLedger));
+ assert.equal(iterationLedger.equals(before),true);assert.ok(read(LEDGER).equals(currentLedger));
 }
 const report={schema_version:1,result:'pass',line:'21.x',phase,metadata_positive_cases:phase==='contract'?1:0,metadata_rejections:metadataRejections,cold_source_rejections:coldRejections,late_source_rejections:lateRejections,real_root_positive_rows:rootPositive,real_root_rejected_rows:rootNegative,missing_source_requirement_mutant_detected:mutantDetected,after_sha256:hash(stage.after),registry_after_sha256:hash(registryAfter),individual_decisions_proposed:1,summary_scalar_tokens:2,unselected_entries_preserved:1696,canonical_ledger_applied:physicalLedger.equals(stage.after),full_owner_integration_qualified:false,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])fs.writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));

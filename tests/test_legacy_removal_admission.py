@@ -4,6 +4,7 @@
 """Contract controls and independent complete-image proposal reconstruction."""
 from pathlib import Path
 import gzip,hashlib,json,os,re,subprocess,unittest
+from table_local_compilation_owner_source import table_predecessor_data,qualify_table_owner_reference
 ROOT=Path(__file__).resolve().parents[1]
 PREFIX='compatibility/rc/21x-legacy-removal-admission-'
 def digest(raw):return hashlib.sha256(raw).hexdigest()
@@ -25,7 +26,7 @@ class LegacyRemovalAdmissionTests(unittest.TestCase):
         self.assertEqual(report['cold_source_rejections'],13);self.assertEqual(report['late_source_rejections'],12)
         self.assertEqual(report['unselected_entries_preserved'],1696)
         historical_report=json.loads((ROOT/(PREFIX+'contract-controls.json')).read_bytes());self.assertFalse(historical_report['canonical_ledger_applied'])
-        packet=json.loads((ROOT/(PREFIX+'canonical-proposal.json')).read_bytes());current=digest((ROOT/packet['before']['path']).read_bytes())
+        packet=json.loads((ROOT/(PREFIX+'canonical-proposal.json')).read_bytes());current=digest(table_predecessor_data(packet['before']['path'],(ROOT/packet['before']['path']).read_bytes()))
         self.assertIn(current,[packet['before']['sha256'],packet['after']['sha256']]);self.assertEqual(report['canonical_ledger_applied'],current==packet['after']['sha256']);self.assertFalse(report['full_owner_integration_qualified']);self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified'])
     def test_independent_exact_entry_and_scalar_projection(self):
         packet=json.loads((ROOT/(PREFIX+'canonical-proposal.json')).read_bytes());sha=packet['selected_sha_ids'][0]
@@ -60,9 +61,10 @@ class LegacyRemovalAdmissionTests(unittest.TestCase):
                 raw=subprocess.check_output(['git','--no-replace-objects','show',worksheet['source_parent']+':'+ref['path']],cwd=ROOT)
             else:raw=(ROOT/ref['path']).read_bytes()
             self.assertEqual(digest(raw),ref['sha256']);self.assertEqual(len(raw),ref['bytes'])
-        live_ledger=digest((ROOT/packet['before']['path']).read_bytes());live_registry=digest((ROOT/packet['registry_before']['path']).read_bytes())
+        live_ledger=digest(table_predecessor_data(packet['before']['path'],(ROOT/packet['before']['path']).read_bytes()));live_registry=digest(table_predecessor_data(packet['registry_before']['path'],(ROOT/packet['registry_before']['path']).read_bytes()))
         self.assertIn(live_ledger,[packet['before']['sha256'],packet['after']['sha256']]);self.assertIn(live_registry,[packet['registry_before']['sha256'],packet['registry_after']['sha256']])
         if live_ledger==packet['after']['sha256']:self.assertEqual(live_registry,packet['registry_after']['sha256'])
         tools=json.loads((ROOT/(PREFIX+'owner-inputs.json')).read_bytes());current_owner=next(row['after']for row in tools['code_transitions']if row['after']['path']==worksheet['before_owner']['path'])
+        current_owner=qualify_table_owner_reference(current_owner)
         self.assertEqual(digest((ROOT/current_owner['path']).read_bytes()),current_owner['sha256'])
 if __name__=='__main__':unittest.main()
