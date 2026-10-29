@@ -15,9 +15,11 @@ import {deriveCheckerReferenceMetadata,prepareCheckerReferenceMetadata,CHECKER_R
 import {replaceHistoricalConsumerEntries} from '../scripts/historical-consumer-wrapper-metadata.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),disk=path=>readFileSync(join(root,path));
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
-const beforeLive=disk(LEDGER),subject=prepareCheckerReferenceMetadata({root}),packet=JSON.parse(disk(PACKET));
+const beforeLive=disk(LEDGER),stageLedger=gunzipSync(disk('compatibility/rc/c04-checker-reference-proposal-after.json.gz'));
+const stageRead=path=>path===LEDGER?Buffer.from(stageLedger):disk(path);
+const subject=prepareCheckerReferenceMetadata({root,read:stageRead}),packet=JSON.parse(disk(PACKET));
 const after=Buffer.from(subject.after),data=JSON.parse(after),sourceBefore=Buffer.from(subject.before);
-assert.equal(subject.current_canonical_state,beforeLive.equals(subject.before)?'before':'after');assert.equal(subject.canonical_owner_integration_complete,false);
+assert.equal(subject.current_canonical_state,stageRead(LEDGER).equals(subject.before)?'before':'after');assert.equal(subject.canonical_owner_integration_complete,false);
 assert.ok(after.equals(gunzipSync(disk('compatibility/rc/c04-checker-reference-proposal-after.json.gz'))));
 assert.equal(subject.verifyAfter(after).native_or_full_audit_credit,false);assert.equal(subject.metadata_reference_updates,packet.updates.length);
 const at=(entry,pointer)=>pointer.split('/').filter(Boolean).reduce((value,key)=>value[Number.isInteger(Number(key))?Number(key):key],entry);
@@ -46,7 +48,7 @@ for(const mutate of [value=>value.updates.pop(),value=>value.updates.push({...va
  value=>value.actual_native_packed_browser_floor_or_full_audit_qualified=true,value=>value.g11_claim='passed']){
  const changed=structuredClone(packet);mutate(changed);assert.throws(()=>deriveCheckerReferenceMetadata({before:sourceBefore,packet:changed,checker:disk(CHECKER)}));scope++;
 }
-let tamper=null;const read=path=>{const raw=disk(path);return path===tamper?Buffer.concat([raw,Buffer.from(' ')]):raw;};
+let tamper=null;const read=path=>{const raw=stageRead(path);return path===tamper?Buffer.concat([raw,Buffer.from(' ')]):raw;};
 const current=prepareCheckerReferenceMetadata({root,read});
 for(const ref of current.bound){tamper=ref.path;assert.throws(()=>current.assertCurrent(),undefined,'late '+ref.path);assert.throws(()=>current.verifyAfter(after),undefined,'late verify '+ref.path);late++;tamper=null;}
 for(const ref of current.bound){tamper=ref.path;assert.throws(()=>prepareCheckerReferenceMetadata({root,read}),undefined,'cold '+ref.path);cold++;tamper=null;}

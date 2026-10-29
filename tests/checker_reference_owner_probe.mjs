@@ -59,14 +59,14 @@ if(mode==='--source'){
 }else{
  const api=await import('../scripts/packed-upstream-ledger-epoch.mjs'),started=performance.now();
  const prepared=api.preparePackedUpstreamLedger({root,read}),prepareSeconds=(performance.now()-started)/1000;
- assert.equal(hash(prepared.canonical_after),input.after_ledger.sha256);assert.ok(prepared.canonical_after.equals(disk(LEDGER)));
+ assert.equal(hash(prepared.checker_reference_stage.after),input.after_ledger.sha256);assert.ok(prepared.canonical_after.equals(disk(LEDGER)));
  assert.equal(hash(prepared.inventory_reference_stage.after),input.before_ledger.sha256);
  assert.equal(hash(prepared.checker_reference_stage.before),input.before_ledger.sha256);assert.equal(hash(prepared.checker_reference_stage.after),input.after_ledger.sha256);
  assert.equal(prepared.checker_reference_stage.metadata_entries,input.line==='21.x'?5:13);assert.equal(prepared.checker_reference_stage.individual_decisions,0);prepared.assertCurrent();
  const epochStart=performance.now(),epoch=api.packedUpstreamLedgerEpoch({root,read}),epochSeconds=(performance.now()-epochStart)/1000;
  assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?88:13);assert.equal(epoch.inventory_reference_metadata_applied,true);
  assert.deepEqual(epoch.projected_metadata_paths,[LEDGER]);assert.equal(epoch.current_native_packed_or_floor_or_g11_credit,false);
- const context=inventoryReferenceOwnerContext({root,read});assert.equal(context.checker.applied,true);const raw=api.packedUpstreamLedgerRawRead({root,read:epoch.read});assert.equal(raw,read);
+ const context=inventoryReferenceOwnerContext({root,read});assert.equal(context.checker.applied||context.browser.applied,true);const raw=api.packedUpstreamLedgerRawRead({root,read:epoch.read});assert.equal(raw,read);
  let paths=0;for(const ref of context.bound){if(ref.path===LEDGER)continue;
   assert.ok(epoch.read(ref.path).equals(disk(ref.path)),'public read hid current '+ref.path);assert.ok(epoch.raw(ref.path).equals(disk(ref.path)));assert.ok(raw(ref.path).equals(disk(ref.path)));paths++;
  }

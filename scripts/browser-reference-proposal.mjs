@@ -6,6 +6,7 @@
  */
 /** Finite source-reference metadata only; the canonical owner still owns admission. */
 import assert from 'node:assert/strict';
+import {browserOwnerSourceSubject} from './browser-owner-source.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
@@ -87,8 +88,9 @@ export function deriveBrowserReferenceMetadata({before,packet,sources}={}){
 }
 /** Source proof is independent of the actual owner's historical-frame gates. */
 export function prepareBrowserReferenceSourceMetadata({root,read=path=>readCheckerOwnerMember(root,path)}={}){
- const source=inspectBrowserReferenceSource({root,read}),line=source.report.line,pin=PINS[line];assert.ok(pin);
+ const tools=browserOwnerSourceSubject({root,read}),source=inspectBrowserReferenceSource({root,read}),line=source.report.line,pin=PINS[line];assert.ok(pin);
  const bound=new Map(source.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{
+  ref=tools.qualifyReference(ref);
   const raw=read(ref.path),physical=readCheckerOwnerMember(root,ref.path);assert.ok(Buffer.isBuffer(raw));assert.ok(raw.equals(physical),'noncurrent browser proposal source '+ref.path);
   assert.equal(hash(raw),ref.sha256,'changed browser proposal source '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);
   bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return raw;
@@ -110,7 +112,7 @@ export function prepareBrowserReferenceSourceMetadata({root,read=path=>readCheck
  assert.equal(verifier.cold_source_faults_rejected,verifier.bound_current_paths);assert.equal(verifier.late_source_faults_rejected,verifier.bound_current_paths);assert.equal(verifier.title_contract_negative_controls,47);assert.equal(verifier.whole_current_dialog_probe_collaborator_runs.length,8);
  for(const key of ['canonical_frame_admission_granted','old_programs_executed','actual_native_packed_browser_floor_or_full_audit_qualified','actual_angular_DOM_browser_or_packed_execution'])assert.equal(verifier[key],false);
  assert.equal(verifier.g11_claim,'not-passed');
- const assertCurrent=()=>{source.assertCurrent();assert.ok(readCheckerOwnerMember(root,BROWSER_REFERENCE_LEDGER).equals(physicalLedger),'late physical canonical ledger');for(const ref of bound.values()){
+ const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();assert.ok(readCheckerOwnerMember(root,BROWSER_REFERENCE_LEDGER).equals(physicalLedger),'late physical canonical ledger');for(const ref of bound.values()){
   const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late browser proposal source '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readCheckerOwnerMember(root,ref.path)),'late physical browser proposal source '+ref.path);
  }};
  const verifyAfter=candidate=>{assertCurrent();assert.ok(Buffer.isBuffer(candidate)&&candidate.equals(result.after),'not the exact browser-reference after-image');assertCurrent();return {metadata_only:true,canonical_frame_admission_granted:false,native_or_full_audit_credit:false};};

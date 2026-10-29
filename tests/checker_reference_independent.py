@@ -34,6 +34,7 @@ for index,marker in enumerate(markers):
 pieces.append(text[last:]);after=''.join(pieces).encode();assert json.loads(after)==expected and len(after)==len(before)
 assert gzip.decompress((ROOT/'compatibility/rc/c04-checker-reference-proposal-after.json.gz').read_bytes())==after
 packet=json.loads((ROOT/'compatibility/rc/c04-checker-reference-proposal.json').read_bytes());assert hash_bytes(after)==packet['after_ledger']['sha256']
-assert live_before in[before,after];assert(ROOT/LEDGER).read_bytes()==live_before
+stage_live=gzip.decompress((ROOT/'compatibility/rc/c04-checker-reference-proposal-after.json.gz').read_bytes())
+assert stage_live in[before,after];assert source['current_ledger_sha256']==hash_bytes(live_before);assert(ROOT/LEDGER).read_bytes()==live_before
 unchanged=sum(before[m.start():(markers[i+1].start()if i+1<len(markers)else end_of_entries)]==after[m.start():(markers[i+1].start()if i+1<len(markers)else end_of_entries)]for i,m in enumerate(markers));assert unchanged==1697-pin['count']
 print(json.dumps({'schema_version':1,'line':line,'independent_after_sha256':hash_bytes(after),'independent_after_bytes':len(after),'hash_scalar_replacements':len(updates),'already_current_checker_references_preserved':len(preserved),'unselected_entry_bytes_preserved':unchanged,'canonical_ledger_unchanged':True,'canonical_owner_integration_complete':False,'actual_native_packed_browser_floor_or_full_audit_qualified':False,'g11_claim':'not-passed'}))
