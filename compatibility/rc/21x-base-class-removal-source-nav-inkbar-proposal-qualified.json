@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "55f9618b687fc0da4743a3cf27e113ceb837e151",
+  "node": "v24.21.0",
+  "typescript": "5.9.2",
+  "scope": "Exact owned updateActiveLink and ink-bar hide methods replayed;receiver/query/style/CDR fields are protocols. Untouched tagged method is parsed for exact token identity and never executed. No real Angular view,layout,native frame or packed behavior is qualified.",
+  "finding": "When no nav link is active,the owned method sets selectedIndex=-1 but leaves the existing ink bar visible until a later header content check. Tagged16 calls hide synchronously in the method.",
+  "decision": "Restore the exact tagged method token body through one owned finite hide() call;the existing required ownership notices remain. Preserve later header alignment and all active-link behavior. Carry this unapplied proposal to a separately bounded repair after whole source assessment.",
+  "actual_owned_finite_hide_port_verified": true,
+  "proposed_method_tokens_equal_untouched_tag": true,
+  "observations": [
+    {
+      "id": "inactive-links",
+      "current": {
+        "selected_index": -1,
+        "visibility": "visible",
+        "panel_active_id": null,
+        "change_notifications": 0
+      },
+      "proposed": {
+        "selected_index": -1,
+        "visibility": "hidden",
+        "panel_active_id": null,
+        "change_notifications": 0
+      }
+    },
+    {
+      "id": "empty-links",
+      "current": {
+        "selected_index": -1,
+        "visibility": "visible",
+        "panel_active_id": null,
+        "change_notifications": 0
+      },
+      "proposed": {
+        "selected_index": -1,
+        "visibility": "hidden",
+        "panel_active_id": null,
+        "change_notifications": 0
+      }
+    },
+    {
+      "id": "active-link",
+      "current": {
+        "selected_index": 1,
+        "visibility": "visible",
+        "panel_active_id": "b",
+        "change_notifications": 1
+      },
+      "proposed": {
+        "selected_index": 1,
+        "visibility": "visible",
+        "panel_active_id": "b",
+        "change_notifications": 1
+      }
+    },
+    {
+      "id": "missing-query",
+      "current": {
+        "selected_index": 0,
+        "visibility": "visible",
+        "panel_active_id": null,
+        "change_notifications": 0
+      },
+      "proposed": {
+        "selected_index": 0,
+        "visibility": "visible",
+        "panel_active_id": null,
+        "change_notifications": 0
+      }
+    }
+  ],
+  "noninvoking_control_rejected": true,
+  "patch": {
+    "path": "compatibility/rc/21x-base-class-removal-source-nav-inkbar-proposed.patch",
+    "sha256": "91382d5d1190e00bd44fa9c555b18607c8658abb5ec9bccfa23811c19bcc5564",
+    "bytes": 275
+  },
+  "proposed_source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n *\n * Owned Material-16 tab-nav bases.\n */\nimport {\n  ANIMATION_MODULE_TYPE,\n  AfterContentChecked,\n  AfterContentInit,\n  AfterViewInit,\n  Attribute,\n  ChangeDetectorRef,\n  ContentChildren,\n  Directive,\n  ElementRef,\n  forwardRef,\n  Inject,\n  Input,\n  NgZone,\n  OnDestroy,\n  Optional,\n  QueryList,\n  ViewChild,\n} from '@angular/core';\nimport {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions, ThemePalette} from '@angular/material/core';\nimport {\n  LegacyRippleConfig as RippleConfig,\n  LegacyRippleTarget as RippleTarget,\n} from '@ngx-compat/material-legacy/legacy-core';\nimport {CanDisable, CanDisableRipple, HasTabIndex, mixinDisabled, mixinDisableRipple, mixinTabIndex} from './common-behaviors';\nimport {FocusableOption, FocusMonitor} from '@angular/cdk/a11y';\nimport {Directionality} from '@angular/cdk/bidi';\nimport {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';\nimport {Platform} from '@angular/cdk/platform';\nimport {MatInkBar, MatInkBarItem, mixinInkBarItem} from './ink-bar-shared';\nimport {coerceBooleanProperty} from '@angular/cdk/coercion';\ntype BooleanInput = string | boolean | null | undefined;\ntype NumberInput = string | number | null | undefined;\nimport {BehaviorSubject, Subject} from 'rxjs';\nimport {startWith, takeUntil} from 'rxjs/operators';\nimport {ENTER, SPACE} from '@angular/cdk/keycodes';\nimport {MAT_TABS_CONFIG, MatTabsConfig} from '@angular/material/tabs';\nimport {MatPaginatedTabHeader, MatPaginatedTabHeaderItem} from './paginated-tab-header';\n\n// Increasing integer for generating unique ids for tab nav components.\nlet nextUniqueId = 0;\n\n/**\n * Base class with all of the `MatTabNav` functionality.\n * @docs-private\n */\n@Directive({standalone: false})\nexport abstract class _MatTabNavBase\n  extends MatPaginatedTabHeader\n  implements AfterContentChecked, AfterContentInit, OnDestroy\n{\n  /** Query list of all tab links of the tab navigation. */\n  abstract override _items: QueryList<MatPaginatedTabHeaderItem & {active: boolean; id: string}>;\n\n  /** Background color of the tab nav. */\n  @Input()\n  get backgroundColor(): ThemePalette {\n    return this._backgroundColor;\n  }\n\n  set backgroundColor(value: ThemePalette) {\n    const classList = this._elementRef.nativeElement.classList;\n    classList.remove('mat-tabs-with-background', `mat-background-${this.backgroundColor}`);\n\n    if (value) {\n      classList.add('mat-tabs-with-background', `mat-background-${value}`);\n    }\n\n    this._backgroundColor = value;\n  }\n\n  private _backgroundColor: ThemePalette;\n\n  /** Whether the ripple effect is disabled or not. */\n  @Input()\n  get disableRipple(): boolean {\n    return this._disableRipple;\n  }\n\n  set disableRipple(value: BooleanInput) {\n    this._disableRipple = coerceBooleanProperty(value);\n  }\n\n  private _disableRipple: boolean = false;\n\n  /** Theme color of the nav bar. */\n  @Input() color: ThemePalette = 'primary';\n\n  /**\n   * Associated tab panel controlled by the nav bar. If not provided, then the nav bar\n   * follows the ARIA link / navigation landmark pattern. If provided, it follows the\n   * ARIA tabs design pattern.\n   */\n  @Input() tabPanel?: MatTabNavPanel;\n\n  constructor(\n    elementRef: ElementRef,\n    @Optional() dir: Directionality,\n    ngZone: NgZone,\n    changeDetectorRef: ChangeDetectorRef,\n    viewportRuler: ViewportRuler,\n    platform: Platform,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n  ) {\n    super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);\n  }\n\n  protected _itemSelected() {\n    // noop\n  }\n\n  override ngAfterContentInit() {\n    // We need this to run before the `changes` subscription in parent to ensure that the\n    // selectedIndex is up-to-date by the time the super class starts looking for it.\n    this._items.changes.pipe(startWith(null), takeUntil(this._destroyed)).subscribe(() => {\n      this.updateActiveLink();\n    });\n\n    super.ngAfterContentInit();\n  }\n\n  /** Notifies the component that the active link has been changed. */\n  updateActiveLink() {\n    if (!this._items) {\n      return;\n    }\n\n    const items = this._items.toArray();\n\n    for (let i = 0; i < items.length; i++) {\n      if (items[i].active) {\n        this.selectedIndex = i;\n        this._changeDetectorRef.markForCheck();\n\n        if (this.tabPanel) {\n          this.tabPanel._activeTabId = items[i].id;\n        }\n\n        return;\n      }\n    }\n\n    this.selectedIndex = -1;\n    this._inkBar.hide();\n  }\n\n  _getRole(): string | null {\n    return this.tabPanel ? 'tablist' : this._elementRef.nativeElement.getAttribute('role');\n  }\n}\n\n// Boilerplate for applying mixins to MatTabLink.\nconst _MatTabLinkMixinBase = mixinTabIndex(mixinDisableRipple(mixinDisabled(class {})));\n\n/** Base class with all of the `MatTabLink` functionality. */\n@Directive({standalone: false})\nexport class _MatTabLinkBase\n  extends _MatTabLinkMixinBase\n  implements\n    AfterViewInit,\n    OnDestroy,\n    CanDisable,\n    CanDisableRipple,\n    HasTabIndex,\n    RippleTarget,\n    FocusableOption\n{\n  /** Whether the tab link is active or not. */\n  protected _isActive: boolean = false;\n\n  /** Whether the link is active. */\n  @Input()\n  get active(): boolean {\n    return this._isActive;\n  }\n\n  set active(value: BooleanInput) {\n    const newValue = coerceBooleanProperty(value);\n\n    if (newValue !== this._isActive) {\n      this._isActive = newValue;\n      this._tabNavBar.updateActiveLink();\n    }\n  }\n\n  /**\n   * Ripple configuration for ripples that are launched on pointer down. The ripple config\n   * is set to the global ripple options since we don't have any configurable options for\n   * the tab link ripples.\n   * @docs-private\n   */\n  rippleConfig: RippleConfig & RippleGlobalOptions;\n\n  /**\n   * Whether ripples are disabled on interaction.\n   * @docs-private\n   */\n  get rippleDisabled(): boolean {\n    return (\n      this.disabled ||\n      this.disableRipple ||\n      this._tabNavBar.disableRipple ||\n      !!this.rippleConfig.disabled\n    );\n  }\n\n  /** Unique id for the tab. */\n  @Input() id = `mat-tab-link-${nextUniqueId++}-legacy`;\n\n  constructor(\n    private _tabNavBar: _MatTabNavBase,\n    /** @docs-private */ public elementRef: ElementRef,\n    @Optional() @Inject(MAT_RIPPLE_GLOBAL_OPTIONS) globalRippleOptions: RippleGlobalOptions | null,\n    @Attribute('tabindex') tabIndex: string,\n    private _focusMonitor: FocusMonitor,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n  ) {\n    super();\n\n    this.rippleConfig = globalRippleOptions || {};\n    this.tabIndex = parseInt(tabIndex) || 0;\n\n    if (animationMode === 'NoopAnimations') {\n      this.rippleConfig.animation = {enterDuration: 0, exitDuration: 0};\n    }\n  }\n\n  /** Focuses the tab link. */\n  focus() {\n    this.elementRef.nativeElement.focus();\n  }\n\n  ngAfterViewInit() {\n    this._focusMonitor.monitor(this.elementRef);\n  }\n\n  ngOnDestroy() {\n    this._focusMonitor.stopMonitoring(this.elementRef);\n  }\n\n  _handleFocus() {\n    // Since we allow navigation through tabbing in the nav bar, we\n    // have to update the focused index whenever the link receives focus.\n    this._tabNavBar.focusIndex = this._tabNavBar._items.toArray().indexOf(this);\n  }\n\n  _handleKeydown(event: KeyboardEvent) {\n    if (event.keyCode === SPACE || event.keyCode === ENTER) {\n      if (this.disabled) {\n        event.preventDefault();\n      } else if (this._tabNavBar.tabPanel) {\n        // Only prevent the default action on space since it can scroll the page.\n        // Don't prevent enter since it can break link navigation.\n        if (event.keyCode === SPACE) {\n          event.preventDefault();\n        }\n\n        this.elementRef.nativeElement.click();\n      }\n    }\n  }\n\n  _getAriaControls(): string | null {\n    return this._tabNavBar.tabPanel\n      ? this._tabNavBar.tabPanel?.id\n      : this.elementRef.nativeElement.getAttribute('aria-controls');\n  }\n\n  _getAriaSelected(): string | null {\n    if (this._tabNavBar.tabPanel) {\n      return this.active ? 'true' : 'false';\n    } else {\n      return this.elementRef.nativeElement.getAttribute('aria-selected');\n    }\n  }\n\n  _getAriaCurrent(): string | null {\n    return this.active && !this._tabNavBar.tabPanel ? 'page' : null;\n  }\n\n  _getRole(): string | null {\n    return this._tabNavBar.tabPanel ? 'tab' : this.elementRef.nativeElement.getAttribute('role');\n  }\n\n  _getTabIndex(): number {\n    if (this._tabNavBar.tabPanel) {\n      return this._isActive && !this.disabled ? 0 : -1;\n    } else {\n      return this.tabIndex;\n    }\n  }\n}\n\nconst _MatTabLinkBaseWithInkBarItem = mixinInkBarItem(_MatTabLinkBase);\n\n/**\n * Navigation component matching the styles of the tab group header.\n * Provides anchored navigation with animated ink bar.\n */\n\nexport interface MatTabNavPanel {\n  id: string;\n  _activeTabId?: string;\n}\n",
+  "git_apply_check": {
+    "executed": true,
+    "exit_code": 0,
+    "applied": false
+  },
+  "source_bindings": [
+    {
+      "path": "compatibility/rc/21x-base-class-removal-source-nav-inkbar-proposal.mjs",
+      "sha256": "1bc96863f06f978b7b3a100b30a7a1312629b7f41eb5a0d576d2d3c8ad111062",
+      "bytes": 9694
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/typescript.js",
+      "sha256": "e5f1f6b3e82228a89873cc7b941b2465185e839c0692860f83e3e63e53f94c2b",
+      "bytes": 9111680
+    },
+    {
+      "path": "compatibility/rc/21x-base-class-removal-source-originals.json.gz",
+      "sha256": "3cb87a97a4365dd9959ec4c5fd4a5a2e1f0d5c3656e91e7e1aef65181955f49a",
+      "bytes": 613636
+    },
+    {
+      "path": "compatibility/rc/21x-base-class-removal-source-worksheet.json",
+      "sha256": "a7459210660b5eea641d1239ef0a2c8fb329df8a4c2ef8c8a89a123353b1dace",
+      "bytes": 8419
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/ledger.json",
+      "sha256": "e9ef5c0bf543977809134c3367cf9a33bdda62233ab6b944dc3c4e4ac101585e",
+      "bytes": 4191043
+    },
+    {
+      "path": "scripts/upstream-source-contract-registry.mjs",
+      "sha256": "be50b37d181b43960361860dd7cb3bb24d0f2d1b0a2ecfaa5a85a791e4869399",
+      "bytes": 15548
+    },
+    {
+      "path": "compatibility/rc/21x-remaining-disposition-worksheet.json",
+      "sha256": "0459559a90a64ee02fafce8421c1108b112f67a697932ec51128c9f40c4601f8",
+      "bytes": 269780
+    },
+    {
+      "path": "compatibility/rc/21x-table-local-compilation-admission-canonical-qualified.json",
+      "sha256": "9059e63c281def52cd77ef8a40ea876ba2bc93a7ac4e0c51073385416895d0a4",
+      "bytes": 10889
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+      "sha256": "dd193a5f4cdef0ee0be3c993474efa482229854d33b4853c6d5dd519d21a6fd0",
+      "bytes": 9016
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts",
+      "sha256": "a738ff2ac3d901f5c2e9614130dddbcb19ce306376a662279a6df7d385148225",
+      "bytes": 27084
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/ink-bar.ts",
+      "sha256": "739dd3b4acb9c0d9eba8039d47c0d8e7f07d045c6880cfecda4df5168ec28ff3",
+      "bytes": 2296
+    }
+  ],
+  "product_changes": 0,
+  "canonical_dispositions_changed": 0,
+  "exceptions_changed": 0,
+  "whole_SHA_substantive_review_complete": false,
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

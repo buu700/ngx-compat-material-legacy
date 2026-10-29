@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "55f9618b687fc0da4743a3cf27e113ceb837e151",
+  "node": "v24.21.0",
+  "typescript": "5.9.2",
+  "versions": {
+    "@angular/core": "21.2.23",
+    "@angular/cdk": "21.2.14"
+  },
+  "scope": "Exact owned method replay with genuine current public keycode constants/helper. Receiver,key-manager,closed emitter and event are protocols. Tagged method is parsed for token identity and never executed. Owned template and current dispatcher source inspected;no real DOM propagation,Angular view,overlay stack,native keyboard,packed or floor claim.",
+  "finding": "Current handled Escape/Left/Right paths omit the tagged stopPropagation call,while default delegated keys still return early. The public dispatcher selects one overlay without stopping DOM propagation,so it does not supply the removed method side effect.",
+  "decision": "Restore the exact tagged method body with one stopPropagation call after handled branches. Leave template/event transport,default key-manager delegation,closing outputs and positioning unchanged. Carry this unapplied proposal into a separately bounded repair after whole source assessment.",
+  "observations": [
+    {
+      "id": "escape",
+      "current": [
+        [
+          "prevent-default"
+        ],
+        [
+          "closed",
+          "keydown"
+        ]
+      ],
+      "proposed": [
+        [
+          "prevent-default"
+        ],
+        [
+          "closed",
+          "keydown"
+        ],
+        [
+          "stop"
+        ]
+      ]
+    },
+    {
+      "id": "modified-escape",
+      "current": [],
+      "proposed": [
+        [
+          "stop"
+        ]
+      ]
+    },
+    {
+      "id": "nested-ltr-left",
+      "current": [
+        [
+          "closed",
+          "keydown"
+        ]
+      ],
+      "proposed": [
+        [
+          "closed",
+          "keydown"
+        ],
+        [
+          "stop"
+        ]
+      ]
+    },
+    {
+      "id": "nested-rtl-right",
+      "current": [
+        [
+          "closed",
+          "keydown"
+        ]
+      ],
+      "proposed": [
+        [
+          "closed",
+          "keydown"
+        ],
+        [
+          "stop"
+        ]
+      ]
+    },
+    {
+      "id": "root-left",
+      "current": [],
+      "proposed": [
+        [
+          "stop"
+        ]
+      ]
+    },
+    {
+      "id": "down-delegates",
+      "current": [
+        [
+          "origin",
+          "keyboard"
+        ],
+        [
+          "manager-key",
+          40
+        ]
+      ],
+      "proposed": [
+        [
+          "origin",
+          "keyboard"
+        ],
+        [
+          "manager-key",
+          40
+        ]
+      ]
+    }
+  ],
+  "method_tokens_equal_untouched_tag": true,
+  "noninvoking_control_rejected": true,
+  "required_notice_added": false,
+  "proposed_source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n *\n * Owned Material-16 `_MatMenuBase` (removed from Angular Material 22).\n */\n\nimport {_LegacyMenuItemBase as MatMenuItem} from './menu-item-base';\nimport {\n  AfterContentInit,\n  ChangeDetectionStrategy,\n  Component,\n  ContentChild,\n  ContentChildren,\n  Directive,\n  ElementRef,\n  EventEmitter,\n  Inject,\n  InjectionToken,\n  Input,\n  NgZone,\n  OnDestroy,\n  Output,\n  TemplateRef,\n  QueryList,\n  ViewChild,\n  ViewEncapsulation,\n  OnInit,\n  ChangeDetectorRef,\n} from '@angular/core';\nimport {\n  legacyAnimationsDisabled,\n  legacyHostMotionEvent,\n  legacyNextMotionCompletion,\n} from '@ngx-compat/material-legacy/legacy-core';\n\n/** Minimal shape emitted when CSS panel motion completes (replaces Angular AnimationEvent). */\nexport interface LegacyMenuAnimationEvent {\n  toState: 'void' | 'enter' | string;\n  fromState?: string;\n}\n\nconst ENTER_ANIMATION = 'mat-legacy-menu-enter';\nconst EXIT_ANIMATION = 'mat-legacy-menu-exit';\nimport {FocusKeyManager, FocusOrigin} from '@angular/cdk/a11y';\nimport {Direction} from '@angular/cdk/bidi';\nimport {coerceBooleanProperty} from '@angular/cdk/coercion';\ntype BooleanInput = string | boolean | null | undefined;\nimport {\n  ESCAPE,\n  LEFT_ARROW,\n  RIGHT_ARROW,\n  DOWN_ARROW,\n  UP_ARROW,\n  hasModifierKey,\n} from '@angular/cdk/keycodes';\nimport {merge, Observable, Subject, Subscription} from 'rxjs';\nimport {startWith, switchMap, take} from 'rxjs/operators';\n\nimport {\n  MAT_MENU_CONTENT,\n  MAT_MENU_DEFAULT_OPTIONS,\n  MatMenuItem as PeerMatMenuItem,\n  MatMenuDefaultOptions,\n  MenuCloseReason,\n  MenuPositionX,\n  MenuPositionY,\n} from '@angular/material/menu';\nimport {throwMatMenuInvalidPositionX, throwMatMenuInvalidPositionY} from './menu-errors';\nimport {_MatMenuContentBase} from './menu-content-base';\nimport type {MatMenuPanel} from './menu-panel';\n\nlet menuPanelUid = 0;\n\n/** Base class with all of the `MatMenu` functionality. */\n@Directive({standalone: false})\nexport class _MatMenuBase\n  implements AfterContentInit, MatMenuPanel<MatMenuItem>, OnInit, OnDestroy\n{\n  private _keyManager: FocusKeyManager<MatMenuItem>;\n  private _xPosition: MenuPositionX;\n  private _yPosition: MenuPositionY;\n  private _firstItemFocusSubscription?: Subscription;\n  /** Item whose focus() ran. Detach moves document.activeElement to body before QueryList.changes. */\n  private _focusCarryItem: MatMenuItem | null = null;\n  private _previousElevation: string;\n  protected _elevationPrefix: string;\n  protected _baseElevation: number;\n\n  /** All items inside the menu. Includes items nested inside another menu. */\n  @ContentChildren(PeerMatMenuItem, {descendants: true}) _allItems: QueryList<MatMenuItem>;\n\n  /** Only the direct descendant menu items. */\n  _directDescendantItems = new QueryList<MatMenuItem>();\n\n  /** Config object to be passed into the menu's ngClass */\n  _classList: {[key: string]: boolean} = {};\n\n  /** Current state of the panel animation. */\n  _panelAnimationState: 'void' | 'enter' = 'void';\n\n  /** Captured in injection context for MATERIAL_ANIMATIONS / NoopAnimations. */\n  private readonly _legacyAnimationsDisabled = legacyAnimationsDisabled();\n  readonly _animationsEnabled = !this._legacyAnimationsDisabled;\n\n  private _exitFallbackTimeout: ReturnType<typeof setTimeout> | undefined;\n  private _completedAnimation: string | undefined;\n  private _motionSequence = 0;\n  private _motionDestroyed = false;\n\n  /** Emits whenever an animation on the menu completes. */\n  readonly _animationDone = new Subject<LegacyMenuAnimationEvent>();\n\n  /** Whether the menu is animating. */\n  _isAnimating = false;\n\n  /** Parent menu of the current menu panel. */\n  parentMenu: MatMenuPanel | undefined;\n\n  /** Layout direction of the menu. */\n  direction: Direction;\n\n  /** Class or list of classes to be added to the overlay panel. */\n  overlayPanelClass: string | string[];\n\n  /** Class to be added to the backdrop element. */\n  @Input() backdropClass: string;\n\n  /** aria-label for the menu panel. */\n  @Input('aria-label') ariaLabel: string;\n\n  /** aria-labelledby for the menu panel. */\n  @Input('aria-labelledby') ariaLabelledby: string;\n\n  /** aria-describedby for the menu panel. */\n  @Input('aria-describedby') ariaDescribedby: string;\n\n  /** Position of the menu in the X axis. */\n  @Input()\n  get xPosition(): MenuPositionX {\n    return this._xPosition;\n  }\n  set xPosition(value: MenuPositionX) {\n    if (\n      value !== 'before' &&\n      value !== 'after' &&\n      (typeof ngDevMode === 'undefined' || ngDevMode)\n    ) {\n      throwMatMenuInvalidPositionX();\n    }\n    this._xPosition = value;\n    this.setPositionClasses();\n  }\n\n  /** Position of the menu in the Y axis. */\n  @Input()\n  get yPosition(): MenuPositionY {\n    return this._yPosition;\n  }\n  set yPosition(value: MenuPositionY) {\n    if (value !== 'above' && value !== 'below' && (typeof ngDevMode === 'undefined' || ngDevMode)) {\n      throwMatMenuInvalidPositionY();\n    }\n    this._yPosition = value;\n    this.setPositionClasses();\n  }\n\n  /** @docs-private */\n  @ViewChild(TemplateRef) templateRef: TemplateRef<any>;\n\n  /**\n   * List of the items inside of a menu.\n   * @deprecated\n   * @breaking-change 8.0.0\n   */\n  @ContentChildren(PeerMatMenuItem, {descendants: false}) items: QueryList<MatMenuItem>;\n\n  /**\n   * Menu content that will be rendered lazily.\n   * @docs-private\n   */\n  @ContentChild(MAT_MENU_CONTENT) lazyContent: any;\n\n  /** Whether the menu should overlap its trigger. */\n  @Input()\n  get overlapTrigger(): boolean {\n    return this._overlapTrigger;\n  }\n  set overlapTrigger(value: BooleanInput) {\n    this._overlapTrigger = coerceBooleanProperty(value);\n  }\n  private _overlapTrigger: boolean;\n\n  /** Whether the menu has a backdrop. */\n  @Input()\n  get hasBackdrop(): boolean | undefined {\n    return this._hasBackdrop;\n  }\n  set hasBackdrop(value: BooleanInput) {\n    this._hasBackdrop = coerceBooleanProperty(value);\n  }\n  private _hasBackdrop: boolean | undefined;\n\n  /**\n   * This method takes classes set on the host mat-menu element and applies them on the\n   * menu template that displays in the overlay container.  Otherwise, it's difficult\n   * to style the containing menu from outside the component.\n   * @param classes list of class names\n   */\n  @Input('class')\n  set panelClass(classes: string) {\n    const previousPanelClass = this._previousPanelClass;\n\n    if (previousPanelClass && previousPanelClass.length) {\n      previousPanelClass.split(' ').forEach((className: string) => {\n        this._classList[className] = false;\n      });\n    }\n\n    this._previousPanelClass = classes;\n\n    if (classes && classes.length) {\n      classes.split(' ').forEach((className: string) => {\n        this._classList[className] = true;\n      });\n\n      this._elementRef.nativeElement.className = '';\n    }\n  }\n  private _previousPanelClass: string;\n\n  /**\n   * This method takes classes set on the host mat-menu element and applies them on the\n   * menu template that displays in the overlay container.  Otherwise, it's difficult\n   * to style the containing menu from outside the component.\n   * @deprecated Use `panelClass` instead.\n   * @breaking-change 8.0.0\n   */\n  @Input()\n  get classList(): string {\n    return this.panelClass;\n  }\n  set classList(classes: string) {\n    this.panelClass = classes;\n  }\n\n  /** Event emitted when the menu is closed. */\n  @Output() readonly closed: EventEmitter<MenuCloseReason> = new EventEmitter<MenuCloseReason>();\n\n  /**\n   * Event emitted when the menu is closed.\n   * @deprecated Switch to `closed` instead\n   * @breaking-change 8.0.0\n   */\n  @Output() readonly close: EventEmitter<MenuCloseReason> = this.closed;\n\n  readonly panelId = `mat-menu-panel-${menuPanelUid++}-legacy`;\n\n  constructor(\n    elementRef: ElementRef<HTMLElement>,\n    ngZone: NgZone,\n    defaultOptions: MatMenuDefaultOptions,\n    changeDetectorRef: ChangeDetectorRef,\n  );\n\n  /**\n   * @deprecated `_changeDetectorRef` to become a required parameter.\n   * @breaking-change 15.0.0\n   */\n  constructor(\n    elementRef: ElementRef<HTMLElement>,\n    ngZone: NgZone,\n    defaultOptions: MatMenuDefaultOptions,\n    changeDetectorRef?: ChangeDetectorRef,\n  );\n\n  constructor(\n    private _elementRef: ElementRef<HTMLElement>,\n    private _ngZone: NgZone,\n    @Inject(MAT_MENU_DEFAULT_OPTIONS) defaultOptions: MatMenuDefaultOptions,\n    // @breaking-change 15.0.0 `_changeDetectorRef` to become a required parameter.\n    private _changeDetectorRef?: ChangeDetectorRef,\n  ) {\n    this.overlayPanelClass = defaultOptions.overlayPanelClass || '';\n    this._xPosition = defaultOptions.xPosition;\n    this._yPosition = defaultOptions.yPosition;\n    this.backdropClass = defaultOptions.backdropClass;\n    this._overlapTrigger = defaultOptions.overlapTrigger;\n    this._hasBackdrop = defaultOptions.hasBackdrop;\n  }\n\n  ngOnInit() {\n    this.setPositionClasses();\n  }\n\n  ngAfterContentInit() {\n    this._updateDirectDescendants();\n    this._keyManager = new FocusKeyManager(this._directDescendantItems)\n      .withWrap()\n      .withTypeAhead()\n      .withHomeAndEnd();\n    this._keyManager.tabOut.subscribe(() => this.closed.emit('tab'));\n\n    // If a user manually (programmatically) focuses a menu item, we need to reflect that focus\n    // change back to the key manager. Note that we don't need to unsubscribe here because _focused\n    // is internal and we know that it gets completed on destroy.\n    this._directDescendantItems.changes\n      .pipe(\n        startWith(this._directDescendantItems),\n        switchMap(items => merge(...items.map((item: MatMenuItem) => item._focused))),\n      )\n      .subscribe(focusedItem => {\n        const item = focusedItem as MatMenuItem;\n        this._keyManager.updateActiveItem(item);\n        this._focusCarryItem = item;\n      });\n\n    this._directDescendantItems.changes.subscribe((itemsList: QueryList<MatMenuItem>) => {\n      // Move focus to another item, if the active item is removed from the list.\n      // We need to debounce the callback, because multiple items might be removed\n      // in quick succession.\n      const manager = this._keyManager;\n      const items = itemsList.toArray();\n      const carried = this._focusCarryItem;\n      const carriedRemoved = !!carried && !items.includes(carried);\n      const activeElement = typeof document === 'undefined' ? null : document.activeElement;\n      // Removing the focused node blurs it before this callback, so _hasFocus() is already false.\n      const focusFellToBody =\n        carriedRemoved &&\n        (activeElement == null ||\n          activeElement === document.body ||\n          activeElement === document.documentElement);\n      if (this._panelAnimationState === 'enter' && (manager.activeItem?._hasFocus() || focusFellToBody)) {\n        const index = Math.max(0, Math.min(items.length - 1, manager.activeItemIndex || 0));\n\n        if (items[index] && !items[index].disabled) {\n          manager.setActiveItem(index);\n        } else {\n          manager.setNextItemActive();\n        }\n        this._focusCarryItem = manager.activeItem;\n      } else if (carriedRemoved) {\n        this._focusCarryItem = null;\n      }\n    });\n  }\n\n  ngOnDestroy() {\n    if (this._motionDestroyed) {\n      return;\n    }\n    this._motionDestroyed = true;\n    this._motionSequence++;\n    this._clearExitFallback();\n    this._isAnimating = false;\n    this._animationDone.complete();\n    // A public key-manager change observer may destroy the menu before focus() resumes.\n    this._keyManager?.updateActiveItem(-1);\n    this._keyManager?.destroy();\n    this._directDescendantItems.destroy();\n    this.closed.complete();\n    this._firstItemFocusSubscription?.unsubscribe();\n  }\n\n  /** Stream that emits whenever the hovered menu item changes. */\n  _hovered(): Observable<MatMenuItem> {\n    // Coerce the `changes` property because Angular types it as `Observable<any>`\n    const itemChanges = this._directDescendantItems.changes as Observable<QueryList<MatMenuItem>>;\n    return itemChanges.pipe(\n      startWith(this._directDescendantItems),\n      switchMap(items => merge(...items.map((item: MatMenuItem) => item._hovered))),\n    ) as Observable<MatMenuItem>;\n  }\n\n  /*\n   * Registers a menu item with the menu.\n   * @docs-private\n   * @deprecated No longer being used. To be removed.\n   * @breaking-change 9.0.0\n   */\n  addItem(_item: MatMenuItem) {}\n\n  /**\n   * Removes an item from the menu.\n   * @docs-private\n   * @deprecated No longer being used. To be removed.\n   * @breaking-change 9.0.0\n   */\n  removeItem(_item: MatMenuItem) {}\n\n  /** Handle a keyboard event from the menu, delegating to the appropriate action. */\n  _handleKeydown(event: KeyboardEvent) {\n    const keyCode = event.keyCode;\n    const manager = this._keyManager;\n\n    switch (keyCode) {\n      case ESCAPE:\n        if (!hasModifierKey(event)) {\n          event.preventDefault();\n          this.closed.emit('keydown');\n        }\n        break;\n      case LEFT_ARROW:\n        if (this.parentMenu && this.direction === 'ltr') {\n          this.closed.emit('keydown');\n        }\n        break;\n      case RIGHT_ARROW:\n        if (this.parentMenu && this.direction === 'rtl') {\n          this.closed.emit('keydown');\n        }\n        break;\n      default:\n        if (keyCode === UP_ARROW || keyCode === DOWN_ARROW) {\n          manager.setFocusOrigin('keyboard');\n        }\n\n        manager.onKeydown(event);\n        return;\n    }\n    event.stopPropagation();\n  }\n\n  /**\n   * Focus the first item in the menu.\n   * @param origin Action from which the focus originated. Used to set the correct styling.\n   */\n  focusFirstItem(origin: FocusOrigin = 'program'): void {\n    if (this._motionDestroyed) return;\n    // Wait for `onStable` to ensure iOS VoiceOver screen reader focuses the first item (#24735).\n    // An already-stable zone never emits onStable. Noop token providers do not schedule an\n    // animation task, so a click-open would otherwise leave focus on document.body.\n    this._firstItemFocusSubscription?.unsubscribe();\n    const request = new Subscription();\n    this._firstItemFocusSubscription = request;\n    const apply = () => {\n      if (request.closed || this._motionDestroyed) {\n        return;\n      }\n      request.unsubscribe();\n      this._applyFirstItemFocus(origin);\n    };\n    request.add(this._ngZone.onStable.pipe(take(1)).subscribe(apply));\n    if (this._ngZone.isStable) {\n      Promise.resolve().then(apply);\n    }\n  }\n\n  private _applyFirstItemFocus(origin: FocusOrigin): void {\n    let menuPanel: HTMLElement | null = null;\n\n    if (this._directDescendantItems.length) {\n      // Because the `mat-menuPanel` is at the DOM insertion point, not inside the overlay, we don't\n      // have a nice way of getting a hold of the menuPanel panel. We can't use a `ViewChild` either\n      // because the panel is inside an `ng-template`. We work around it by starting from one of\n      // the items and walking up the DOM.\n      menuPanel = this._directDescendantItems.first!._getHostElement().closest('[role=\"menu\"]');\n    }\n\n    // If an item in the menuPanel is already focused, avoid overriding the focus.\n    if (!menuPanel || !menuPanel.contains(document.activeElement)) {\n      const manager = this._keyManager;\n      manager.setFocusOrigin(origin).setFirstItemActive();\n      if (this._motionDestroyed) return;\n\n      // If there's no active item at this point, it means that all the items are disabled.\n      // Move focus to the menuPanel panel so keyboard events like Escape still work. Also this will\n      // give _some_ feedback to screen readers.\n      if (!manager.activeItem && menuPanel) {\n        menuPanel.focus();\n      }\n    }\n  }\n\n  /**\n   * Resets the active item in the menu. This is used when the menu is opened, allowing\n   * the user to start from the first option when pressing the down arrow.\n   */\n  resetActiveItem() {\n    this._keyManager.setActiveItem(-1);\n  }\n\n  /**\n   * Sets the menu panel elevation.\n   * @param depth Number of parent menus that come before the menu.\n   */\n  setElevation(depth: number): void {\n    // The elevation starts at the base and increases by one for each level.\n    // Capped at 24 because that's the maximum elevation defined in the Material design spec.\n    const elevation = Math.min(this._baseElevation + depth, 24);\n    const newElevation = `${this._elevationPrefix}${elevation}`;\n    const customElevation = Object.keys(this._classList).find(className => {\n      return className.startsWith(this._elevationPrefix);\n    });\n\n    if (!customElevation || customElevation === this._previousElevation) {\n      if (this._previousElevation) {\n        this._classList[this._previousElevation] = false;\n      }\n\n      this._classList[newElevation] = true;\n      this._previousElevation = newElevation;\n    }\n  }\n\n  /**\n   * Adds classes to the menu panel based on its position. Can be used by\n   * consumers to add specific styling based on the position.\n   * @param posX Position of the menu along the x axis.\n   * @param posY Position of the menu along the y axis.\n   * @docs-private\n   */\n  setPositionClasses(posX: MenuPositionX = this.xPosition, posY: MenuPositionY = this.yPosition) {\n    const classes = this._classList;\n    classes['mat-menu-before'] = posX === 'before';\n    classes['mat-menu-after'] = posX === 'after';\n    classes['mat-menu-above'] = posY === 'above';\n    classes['mat-menu-below'] = posY === 'below';\n\n    // @breaking-change 15.0.0 Remove null check for `_changeDetectorRef`.\n    this._changeDetectorRef?.markForCheck();\n  }\n\n\n  /** Starts the enter animation (CSS keyframes). */\n  _startAnimation() {\n    if (this._motionDestroyed) {\n      return;\n    }\n    const sequence = ++this._motionSequence;\n    this._clearExitFallback();\n    this._completedAnimation = undefined;\n    this._panelAnimationState = 'enter';\n    if (!this._animationsEnabled) {\n      // Microtask so listeners subscribed after open still observe completion.\n      Promise.resolve().then(() => this._completeAnimation(ENTER_ANIMATION, sequence));\n    }\n    this._changeDetectorRef?.markForCheck();\n  }\n\n  /** Resets the panel animation to its initial (exit) state. */\n  _resetAnimation() {\n    if (this._motionDestroyed) {\n      return;\n    }\n    this._firstItemFocusSubscription?.unsubscribe();\n    const sequence = ++this._motionSequence;\n    this._clearExitFallback();\n    this._completedAnimation = undefined;\n    this._panelAnimationState = 'void';\n    if (!this._animationsEnabled) {\n      Promise.resolve().then(() => this._completeAnimation(EXIT_ANIMATION, sequence));\n    } else {\n      this._exitFallbackTimeout = setTimeout(\n        () => this._completeAnimation(EXIT_ANIMATION, sequence),\n        200,\n      );\n    }\n    this._changeDetectorRef?.markForCheck();\n  }\n\n  _onCssAnimationStart(animationNameOrEvent: string | Event) {\n    if (typeof animationNameOrEvent !== 'string' && !legacyHostMotionEvent(animationNameOrEvent)) {\n      return;\n    }\n    const animationName =\n      typeof animationNameOrEvent === 'string'\n        ? animationNameOrEvent\n        : (animationNameOrEvent as AnimationEvent).animationName;\n    if (!this._motionDestroyed && this._completedAnimation !== animationName &&\n        animationName === (this._panelAnimationState === 'enter' ? ENTER_ANIMATION : EXIT_ANIMATION)) {\n      this._isAnimating = true;\n      if (animationName === ENTER_ANIMATION && this._keyManager?.activeItemIndex === 0) {\n        if (this._directDescendantItems?.length) {\n          const menuPanel = this._directDescendantItems.first\n            ._getHostElement()\n            .closest('[role=\"menu\"]') as HTMLElement | null;\n          if (menuPanel) {\n            menuPanel.scrollTop = 0;\n          }\n        }\n      }\n    }\n  }\n\n  _onCssAnimationDone(animationNameOrEvent: string | Event) {\n    if (typeof animationNameOrEvent !== 'string' && !legacyHostMotionEvent(animationNameOrEvent)) {\n      return;\n    }\n    const animationName =\n      typeof animationNameOrEvent === 'string'\n        ? animationNameOrEvent\n        : (animationNameOrEvent as AnimationEvent).animationName;\n    this._completeAnimation(animationName, this._motionSequence);\n  }\n\n  private _clearExitFallback() {\n    if (this._exitFallbackTimeout !== undefined) {\n      clearTimeout(this._exitFallbackTimeout);\n      this._exitFallbackTimeout = undefined;\n    }\n  }\n\n  private _completeAnimation(animationName: string, sequence: number) {\n    const isExit = animationName === EXIT_ANIMATION;\n    if (this._motionDestroyed || sequence !== this._motionSequence ||\n        animationName !== (this._panelAnimationState === 'enter' ? ENTER_ANIMATION : EXIT_ANIMATION)) {\n      return;\n    }\n    const completion = legacyNextMotionCompletion(this._completedAnimation, animationName);\n    if (!completion) {\n      return;\n    }\n    this._completedAnimation = completion;\n    if (isExit) {\n      this._clearExitFallback();\n    }\n    this._isAnimating = false;\n    this._animationDone.next({toState: isExit ? 'void' : 'enter'});\n  }\n\n  /**\n   * Sets up a stream that will keep track of any newly-added menu items and will update the list\n   * of direct descendants. We collect the descendants this way, because `_allItems` can include\n   * items that are part of child menus, and using a custom way of registering items is unreliable\n   * when it comes to maintaining the item order.\n   */\n  private _updateDirectDescendants() {\n    this._allItems.changes\n      .pipe(startWith(this._allItems))\n      .subscribe((items: QueryList<MatMenuItem>) => {\n        this._directDescendantItems.reset(items.filter(item => item._parentMenu === (this as MatMenuPanel<MatMenuItem>)));\n        this._directDescendantItems.notifyOnChanges();\n      });\n  }\n}\n",
+  "patch": {
+    "path": "compatibility/rc/21x-base-class-removal-source-menu-keyboard-proposed.patch",
+    "sha256": "f4d28e86850d326d7ad81528fcc5cc43f3f9647b90ba618a719baaa3a877675d",
+    "bytes": 261
+  },
+  "git_apply_check": {
+    "executed": true,
+    "exit_code": 0,
+    "applied": false
+  },
+  "source_bindings": [
+    {
+      "path": "compatibility/rc/21x-base-class-removal-source-menu-keyboard-proposal.mjs",
+      "sha256": "02c0fa8cdecabe9f43b414abbb0fff6a72eb97e10b31defe11373a6943965177",
+      "bytes": 9487
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/typescript.js",
+      "sha256": "e5f1f6b3e82228a89873cc7b941b2465185e839c0692860f83e3e63e53f94c2b",
+      "bytes": 9111680
+    },
+    {
+      "path": "compatibility/rc/21x-base-class-removal-source-originals.json.gz",
+      "sha256": "3cb87a97a4365dd9959ec4c5fd4a5a2e1f0d5c3656e91e7e1aef65181955f49a",
+      "bytes": 613636
+    },
+    {
+      "path": "compatibility/rc/21x-base-class-removal-source-worksheet.json",
+      "sha256": "a7459210660b5eea641d1239ef0a2c8fb329df8a4c2ef8c8a89a123353b1dace",
+      "bytes": 8419
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/ledger.json",
+      "sha256": "e9ef5c0bf543977809134c3367cf9a33bdda62233ab6b944dc3c4e4ac101585e",
+      "bytes": 4191043
+    },
+    {
+      "path": "scripts/upstream-source-contract-registry.mjs",
+      "sha256": "be50b37d181b43960361860dd7cb3bb24d0f2d1b0a2ecfaa5a85a791e4869399",
+      "bytes": 15548
+    },
+    {
+      "path": "compatibility/rc/21x-remaining-disposition-worksheet.json",
+      "sha256": "0459559a90a64ee02fafce8421c1108b112f67a697932ec51128c9f40c4601f8",
+      "bytes": 269780
+    },
+    {
+      "path": "compatibility/rc/21x-table-local-compilation-admission-canonical-qualified.json",
+      "sha256": "9059e63c281def52cd77ef8a40ea876ba2bc93a7ac4e0c51073385416895d0a4",
+      "bytes": 10889
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+      "sha256": "65b80d7af11475bc2db5a5bc842845c005f8512f96a15d44b0cc1d330d1dcf08",
+      "bytes": 21829
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+      "sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47",
+      "bytes": 710
+    },
+    {
+      "path": "node_modules/@angular/cdk/fesm2022/_overlay-module-chunk.mjs",
+      "sha256": "16d7e3baa590f2ed9c355b7cc3e87882ee517716cba3a7ea6a95eb0c88231627",
+      "bytes": 92570
+    },
+    {
+      "path": "node_modules/@angular/core/package.json",
+      "sha256": "138e466e558dfb07101223dd71e46db11e5ae49c29a8906bd7dae49b9ce34970",
+      "bytes": 2508
+    },
+    {
+      "path": "node_modules/@angular/cdk/package.json",
+      "sha256": "10c398ae1ae4854e4c98b3715f8e0f225e34b7773fa3c582f11d67852a003ea9",
+      "bytes": 5041
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/fesm2022/keycodes.mjs",
+      "sha256": "f64ba3991b14005735e51dd63e780d5eccd10ea1ae42542dbd6d24dc0189f13c",
+      "bytes": 1304
+    }
+  ],
+  "product_changes": 0,
+  "canonical_dispositions_changed": 0,
+  "exceptions_changed": 0,
+  "whole_SHA_substantive_review_complete": false,
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}
