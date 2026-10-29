@@ -1,0 +1,28 @@
+diff --git a/projects/ngx-material-legacy/legacy-form-field/testing/error-harness.ts b/projects/ngx-material-legacy/legacy-form-field/testing/error-harness.ts
+--- a/projects/ngx-material-legacy/legacy-form-field/testing/error-harness.ts
++++ b/projects/ngx-material-legacy/legacy-form-field/testing/error-harness.ts
+@@ -12,7 +12,7 @@
+   ComponentHarnessConstructor,
+   HarnessPredicate,
+ } from '@angular/cdk/testing';
+-import {ErrorHarnessFilters} from '@angular/material/form-field/testing';
++import {ErrorHarnessFilters, type MatErrorHarness} from '@angular/material/form-field/testing';
+ 
+ /**
+  * Harness for interacting with a legacy `mat-error` in tests.
+@@ -24,7 +24,14 @@
+     this: ComponentHarnessConstructor<T>,
+     options: ErrorHarnessFilters = {},
+   ): HarnessPredicate<T> {
+-    return new HarnessPredicate(this, options).addOption('text', options.text, (harness, text) =>
++    return MatLegacyErrorHarness._getErrorPredicate(this, options);
++  }
++
++  protected static _getErrorPredicate<T extends MatErrorHarness>(
++    type: ComponentHarnessConstructor<T>,
++    options: ErrorHarnessFilters,
++  ): HarnessPredicate<T> {
++    return new HarnessPredicate(type, options).addOption('text', options.text, (harness, text) =>
+       HarnessPredicate.stringMatches(harness.getText(), text),
+     );
+   }
