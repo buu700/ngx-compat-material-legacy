@@ -151,6 +151,7 @@ export abstract class _MatTabNavBase
     }
 
     this.selectedIndex = -1;
+    this._inkBar.hide();
   }
 
   _getRole(): string | null {
