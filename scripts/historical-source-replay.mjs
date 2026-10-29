@@ -35,7 +35,7 @@ const policyFrames={
  '21.x':{commit:'ec3899a44639ff5f5453c1e7efb5acfd3d24be79',tree:'ad6d74ddf912e4af46bcb6db4797dd5ffdd0cb3a',tree_listing_sha256:'e665da55d9487188c57c2bb6c61f788099ed88c4217143dfd600f0c7708a593d',members:9212},
 };
 const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..');
-const pins={main:'c39f164e0786e54fb6b207185c1eb04f3503f4e61d5dcdb675f10c191b9ae31d','21.x':'cc1567490ba321226b816850ad4410259bc0c6b08db5a28211098a4d3eddf2e5'};
+const pins={main:'78862c484d048bc4248c3db6dbe3e8ae2fe18be36638887c865cb512567e466f','21.x':'d7a96e9be36b6af597837791525f01190e8dc2b1a8291f7661d83fd9afb41632'};
 const ids=['historical-menu-import','historical-menu-import-admission','menu-exit-context','selection-comparator-source','native-admission-source','tab-lifecycle-source',
  'native-individual-source','native-individual-admission','spec-fixture-context',
  'small-spec-source','followup-spec-source','peer-spec-source','control-case-context',
