@@ -1,0 +1,80 @@
+diff --git a/src/material/table/row.ts b/src/material/table/row.ts
+index c96b99a64de67049f01cef612e85a8439e10afa4..2dae045f486ed519f112d3a5a568248ebfe21eba 100644
+--- a/src/material/table/row.ts
++++ b/src/material/table/row.ts
+@@ -7,7 +7,6 @@
+  */
+ 
+ import {
+-  CDK_ROW_TEMPLATE,
+   CdkFooterRow,
+   CdkFooterRowDef,
+   CdkHeaderRow,
+@@ -18,6 +17,9 @@ import {
+ } from '@angular/cdk/table';
+ import {ChangeDetectionStrategy, Component, Directive, ViewEncapsulation} from '@angular/core';
+ 
++// We can't reuse `CDK_ROW_TEMPLATE` because it's incompatible with local compilation mode.
++const ROW_TEMPLATE = `<ng-container cdkCellOutlet></ng-container>`;
++
+ /**
+  * Header row definition for the mat-table.
+  * Captures the header row's template and other header properties such as the columns to display.
+@@ -55,7 +57,7 @@ export class MatRowDef<T> extends CdkRowDef<T> {}
+ /** Header template container that contains the cell outlet. Adds the right class and role. */
+ @Component({
+   selector: 'mat-header-row, tr[mat-header-row]',
+-  template: CDK_ROW_TEMPLATE,
++  template: ROW_TEMPLATE,
+   host: {
+     'class': 'mat-mdc-header-row mdc-data-table__header-row',
+     'role': 'row',
+@@ -72,7 +74,7 @@ export class MatHeaderRow extends CdkHeaderRow {}
+ /** Footer template container that contains the cell outlet. Adds the right class and role. */
+ @Component({
+   selector: 'mat-footer-row, tr[mat-footer-row]',
+-  template: CDK_ROW_TEMPLATE,
++  template: ROW_TEMPLATE,
+   host: {
+     'class': 'mat-mdc-footer-row mdc-data-table__row',
+     'role': 'row',
+@@ -89,7 +91,7 @@ export class MatFooterRow extends CdkFooterRow {}
+ /** Data row template container that contains the cell outlet. Adds the right class and role. */
+ @Component({
+   selector: 'mat-row, tr[mat-row]',
+-  template: CDK_ROW_TEMPLATE,
++  template: ROW_TEMPLATE,
+   host: {
+     'class': 'mat-mdc-row mdc-data-table__row',
+     'role': 'row',
+diff --git a/src/material/table/table.ts b/src/material/table/table.ts
+index 688bdb4756a7d8b55d3c1a4540e8ca551da154f6..19e906855615d75ac4e7f06b8e5cefbccb016399 100644
+--- a/src/material/table/table.ts
++++ b/src/material/table/table.ts
+@@ -14,7 +14,6 @@ import {
+   ViewEncapsulation,
+ } from '@angular/core';
+ import {
+-  CDK_TABLE_TEMPLATE,
+   CdkTable,
+   _CoalescedStyleScheduler,
+   _COALESCED_STYLE_SCHEDULER,
+@@ -40,7 +39,17 @@ export class MatRecycleRows {}
+ @Component({
+   selector: 'mat-table, table[mat-table]',
+   exportAs: 'matTable',
+-  template: CDK_TABLE_TEMPLATE,
++  // Note that according to MDN, the `caption` element has to be projected as the **first**
++  // element in the table. See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/caption
++  // We can't reuse `CDK_TABLE_TEMPLATE` because it's incompatible with local compilation mode.
++  template: `
++    <ng-content select="caption"></ng-content>
++    <ng-content select="colgroup, col"></ng-content>
++    <ng-container headerRowOutlet></ng-container>
++    <ng-container rowOutlet></ng-container>
++    <ng-container noDataRowOutlet></ng-container>
++    <ng-container footerRowOutlet></ng-container>
++  `,
+   styleUrls: ['table.css'],
+   host: {
+     'class': 'mat-mdc-table mdc-data-table__table',

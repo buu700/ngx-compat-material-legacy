@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "3f35b12290ea4dbee4a9d82845c0964b2b4df50d",
+  "status": "reviewed",
+  "review_depth": "individual-compatibility",
+  "source_review_complete": true,
+  "proposed_final_disposition": "do-not-adopt",
+  "read_note_disposition": "owned-retained",
+  "decision": "The original fix changes ordinary current Material source template resolution. The retained legacy table already owns its inline table template and outlet protocols; the unchanged legacy rows at the actual supported21.x minimum compile with strict templates in both partial and experimental-local modes. Same-file and cross-file literal variants emit identical component definitions and public declarations. Preserve the already reviewed public peer template binding and historical markup; no product repair is justified by this change.",
+  "diff_sha256": "1e71aa817057896402ff67e9b11b7878983f0f7709cd056a47b81a219871ad81",
+  "patch_file": "compatibility/rc/21x-table-local-compilation-admission-original-complete.diff",
+  "frozen_seed_paths": [
+    "src/material/table/row.ts",
+    "src/material/table/table.ts"
+  ],
+  "complete_original_paths": [
+    "src/material/table/row.ts",
+    "src/material/table/table.ts"
+  ],
+  "original_files": 2,
+  "original_hunks": 7,
+  "whole_original_hunk_reviews": [
+    {
+      "path": "src/material/table/row.ts",
+      "index": 1,
+      "header": "@@ -7,7 +7,6 @@",
+      "sha256": "ae171d6a0c9dd506a128d1ee6f00b0039d7f66128b0bfc3a09e458bea44b0810",
+      "technical_judgment": "Removes only the ordinary current Material row import of the CDK template constant. The retained legacy rows still use the public peer constant; the actual installed21.2.14 declaration contains the exact historical literal and its previously reviewed public boundary remains unchanged."
+    },
+    {
+      "path": "src/material/table/row.ts",
+      "index": 2,
+      "header": "@@ -18,6 +17,9 @@ import {",
+      "sha256": "66de723c2c92fcb0a0d1e2960397d26800d9e3d5a9d44fb73ac02055fa62981a",
+      "technical_judgment": "Introduces a same-file constant with the byte-identical historical cell outlet. This is a compiler source-location adaptation, not permission to copy current row classes, MDC hosts or a private cell-outlet implementation."
+    },
+    {
+      "path": "src/material/table/row.ts",
+      "index": 3,
+      "header": "@@ -55,7 +57,7 @@ export class MatRowDef<T> extends CdkRowDef<T> {}",
+      "sha256": "aaef46fed9aa01dafefe13b8062fe28aac14626177f838ba971085ab3b07595f",
+      "technical_judgment": "Changes only the current header-row template reference. The owned legacy header selector,mat-header-row host class,role,provider,exportAs and encapsulation match the tagged legacy component; its existing imported template compiles in both measured modes."
+    },
+    {
+      "path": "src/material/table/row.ts",
+      "index": 4,
+      "header": "@@ -72,7 +74,7 @@ export class MatHeaderRow extends CdkHeaderRow {}",
+      "sha256": "4771218f73c35c1a4361137cb941c4a21567b2c8c1f11e3854af87ea27247e19",
+      "technical_judgment": "Changes only the current footer-row template reference. Preserve the distinct legacy footer class/provider/exportAs; the measured current imported and same-file template variants emit identical component definitions."
+    },
+    {
+      "path": "src/material/table/row.ts",
+      "index": 5,
+      "header": "@@ -89,7 +91,7 @@ export class MatFooterRow extends CdkFooterRow {}",
+      "sha256": "6ff21865b8f8b446172495277f71372144d5868975ac822483fa597214104fb8",
+      "technical_judgment": "Changes only the current data-row template reference. Preserve the legacy mat-row class,public CdkRow parent and provider. Both measured variants compile and have identical generated public declarations; no source/API/style repair is justified by this hunk."
+    },
+    {
+      "path": "src/material/table/table.ts",
+      "index": 1,
+      "header": "@@ -14,7 +14,6 @@ import {",
+      "sha256": "b6aedf8f75a9c85d3437d6faa8a00f6fa2504ca1b87e3fd22ea46dea6ff284f3",
+      "technical_judgment": "Removes CDK_TABLE_TEMPLATE from the ordinary current Material table import. The owned legacy table already has no such import and uses a source-local template; historical removed scheduler/repeater providers are not restored."
+    },
+    {
+      "path": "src/material/table/table.ts",
+      "index": 2,
+      "header": "@@ -40,7 +39,17 @@ export class MatRecycleRows {}",
+      "sha256": "54d371690d11e2580fae7220b7e281b8060f171ad30838ee0e88f2ba4074e1b2",
+      "technical_judgment": "Inlines the historical caption/column-group/four-outlet template for the ordinary MDC table. The retained table already inlines caption-first projection and separately owned native/flex outlets. Copying this six-outlet markup would discard the reviewed native row groups and owned outlet protocol; retain the existing table template and providers."
+    }
+  ],
+  "source_qualification": {
+    "path": "compatibility/rc/21x-table-local-compilation-source-qualification.json",
+    "sha256": "477be6136404b7c19b4ed62923ad8c9b198c652550f20b90df685a83a524fd09",
+    "bytes": 7600
+  },
+  "source_review": {
+    "path": "compatibility/rc/21x-table-local-compilation-source-review.json",
+    "sha256": "4e2a280124b2d4281b0e513381c7d0a01382fa8149dde5d2a1a3b47842ef41a0",
+    "bytes": 45602
+  },
+  "source_inputs": {
+    "path": "compatibility/rc/21x-table-local-compilation-source-current.json",
+    "sha256": "e6746247cfbc087ca360e78ee950f9770f3f5ea444f9ec455c3c6fceb56ab0cb",
+    "bytes": 18106
+  },
+  "source_verifier": {
+    "path": "scripts/upstream-table-local-compilation-source.mjs",
+    "sha256": "c974a2f88021e8d6c8e238978b677061494565f2d084e2f2a859fb39b7be5772",
+    "bytes": 27348
+  },
+  "compiler_receipts": [
+    {
+      "path": "compatibility/rc/21x-table-local-compilation-source-compiler.json",
+      "sha256": "e2d915d5596015ade4ac95f83bf7071549dd9a3364db8315d2c3d17c518393eb",
+      "bytes": 50827
+    },
+    {
+      "path": "compatibility/rc/21x-table-local-compilation-source-compiler-controls.json",
+      "sha256": "f141692ed853a4def772a2ab2549e2709d5ee039837339dcadde2fa977b66364",
+      "bytes": 28045
+    }
+  ],
+  "actual_extracted_row_compiler_cells": 6,
+  "generated_component_definitions_compared": 18,
+  "original_failure_reproduced_at_minimum": false,
+  "full_owned_table_module_AOT_or_rendering_qualified": false,
+  "source_scope_only": true,
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}
