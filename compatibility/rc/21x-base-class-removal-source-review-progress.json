@@ -1,0 +1,796 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "55f9618b687fc0da4743a3cf27e113ceb837e151",
+  "status": "in-progress:complete original data authenticated;first9members47hunks read;substantive whole-SHA review incomplete",
+  "complete_original_files": 72,
+  "complete_original_hunks": 329,
+  "original_members_read": 9,
+  "original_hunks_read": 47,
+  "original_members_remaining": 63,
+  "original_hunks_remaining": 282,
+  "initial_member_reviews": [
+    {
+      "path": "src/material/autocomplete/autocomplete-origin.ts",
+      "patch_sha256": "ea6f4774f56b2b828555bb3c30e7b4c40009e4182df452b9c2e7f90bd46360e0",
+      "status": "original-hunks-read;owned/minimum/family validation incomplete",
+      "hunks": [
+        {
+          "index": 1,
+          "header": "@@ -8,15 +8,6 @@",
+          "sha256": "b4a25ccbcc3996377a5f8aa113c36e0b45f6c78635fe1ca0cd12e21912f6eca4",
+          "initial_technical_review": "Removes the shared origin base and its ElementRef constructor. The retained legacy origin still has its own historical base; a current concrete-class refolding is not a reason to remove that owned constructor contract.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 2,
+          "header": "@@ -25,4 +16,9 @@ export abstract class _MatAutocompleteOriginBase {",
+          "sha256": "71a4e042725963439216e41b4b6bec04e25520dec4e88f7eca2b0d5cb8eb49d0",
+          "initial_technical_review": "Moves the same ElementRef parameter property into the ordinary current origin. Validate the actual owned origin signature and prior constructor evidence before any family-level conclusion;no new legacy API change is proposed.",
+          "final_applicability_qualified": false
+        }
+      ]
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "patch_sha256": "effe9b75fc3ca32dad0fafd543f6c89a70a21e0816771e886bc569b42bfcb73e",
+      "status": "original-hunks-read;owned/minimum/family validation incomplete",
+      "hunks": [
+        {
+          "index": 1,
+          "header": "@@ -45,16 +45,16 @@ import {",
+          "sha256": "cc561c517c2c88e07142704a8561e9dd827db16f6746f644d0fd9991239fa4d6",
+          "initial_technical_review": "Replaces shared option/panel/origin base imports with ordinary current Material classes. Legacy-owned option,panel and origin types are distinct and must not be narrowed merely to follow these names.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 2,
+          "header": "@@ -97,8 +97,29 @@ export const MAT_AUTOCOMPLETE_SCROLL_STRATEGY_FACTORY_PROVIDER = {",
+          "sha256": "c123108a75baac8a106f340ca7a7aa871951614cca04e9217db548a8a57776ac",
+          "initial_technical_review": "Moves the MDC directive host,ARIA-controls and current value-accessor metadata onto the merged trigger. The retained trigger uses the tagged mat-autocomplete-trigger class,aria-owns and its own legacy value-accessor token. Existing event typing casts require their prior source context;they do not justify changing host structure.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 3,
+          "header": "@@ -141,7 +162,7 @@ export abstract class _MatAutocompleteTriggerBase",
+          "sha256": "2735c1fa02b529adf8a761adc333808f1d26030e46d8b9c424e444c624cabf9a",
+          "initial_technical_review": "Narrowing the pending-autoselection field to MatOption is a current class identity change. Preserve the retained generic legacy option relationship;this is not a new selection-state algorithm.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 4,
+          "header": "@@ -165,7 +186,7 @@ export abstract class _MatAutocompleteTriggerBase",
+          "sha256": "e22cbca0174dfe40773d3d3abdd18febef6718679d446c8cfac90d189881c44d",
+          "initial_technical_review": "Narrowing the autocomplete input to current MatAutocomplete would exclude the retained legacy panel/query contract. The existing owned trigger base remains the relevant boundary.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 5,
+          "header": "@@ -180,7 +201,7 @@ export abstract class _MatAutocompleteTriggerBase",
+          "sha256": "0401a85ca2942fca05a55dbed2d40a09d4a4b411305544e4894728924c372c26",
+          "initial_technical_review": "Narrowing connectedTo to current MatAutocompleteOrigin changes the accepted type boundary. The owned historical origin and its construction contract require separate comparison,not a name-only substitution.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 6,
+          "header": "@@ -219,7 +240,7 @@ export abstract class _MatAutocompleteTriggerBase",
+          "sha256": "601997eb6e989c3284d10afca8537e305db730e47fa254c363eeddca70a7c711",
+          "initial_technical_review": "Changes the overridable above-panel class to a private hardcoded MDC class. The retained trigger has mat-autocomplete-panel-above;adopting this line would violate the historical selector/style contract.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 7,
+          "header": "@@ -353,7 +374,7 @@ export abstract class _MatAutocompleteTriggerBase",
+          "sha256": "a9febca40ad00e0dcbbe752800aa06616d36ae527a0379688e7c5949ad582e80",
+          "initial_technical_review": "Changes the activeOption return type to current MatOption. Do not infer legacy option or harness interchangeability from the unchanged method body.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 8,
+          "header": "@@ -668,7 +689,7 @@ export abstract class _MatAutocompleteTriggerBase",
+          "sha256": "a2981f32f023a9080c76271eac2765bbca773acabb5722400ee8a480b08de3bf",
+          "initial_technical_review": "Changes the clear-previous-selection helper argument to current MatOption. Retained legacy option identity and selection events stay in scope;no new runtime selection fix is shown by this hunk alone.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 9,
+          "header": "@@ -984,29 +1005,3 @@ export abstract class _MatAutocompleteTriggerBase",
+          "sha256": "18d4e6aa2528c15c33b1ab76f28cfde34bb3766bc868f8bdcfb4a4ba9fac843f",
+          "initial_technical_review": "Deletes the old thin current trigger wrapper after relocating its decorator and class constant. The owned legacy wrapper remains needed for its different host metadata and above-panel class.",
+          "final_applicability_qualified": false
+        }
+      ]
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.ts",
+      "patch_sha256": "762c40c464606716609b47a197e76b939bdd03f9005612bb37a0b00b3baae0f6",
+      "status": "original-hunks-read;owned/minimum/family validation incomplete",
+      "hunks": [
+        {
+          "index": 1,
+          "header": "@@ -12,7 +12,6 @@ import {",
+          "sha256": "77ee3f222acd7b936aa799cca56523d5e2fdbad7f84d66b34423882b6b2683ee",
+          "initial_technical_review": "Removes Directive from the ordinary component import after the shared base is removed. This does not remove the owned historical directive/base boundary.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 2,
+          "header": "@@ -33,8 +32,6 @@ import {",
+          "sha256": "efd87615b6513265e450270d80ff70c4e94185ef5ba8df571ecec3c90d6992cb",
+          "initial_technical_review": "Removes shared option/optgroup base types from imports. The retained panel still queries MatLegacyOption and the distinct legacy group token;new current class types are not interchangeable by spelling.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 3,
+          "header": "@@ -53,19 +50,19 @@ let _uniqueAutocompleteIdCounter = 0;",
+          "sha256": "ab191d0a76ee1ba084d2851449ddf058cfc194ef5057eb0211fb889862857a0e",
+          "initial_technical_review": "Changes selected/activated event source and option types to current concrete classes. Preserve the retained event/type boundary;complete signature compatibility is not established by this original-source observation.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 4,
+          "header": "@@ -112,25 +109,39 @@ export function MAT_AUTOCOMPLETE_DEFAULT_OPTIONS_FACTORY(): MatAutocompleteDefau",
+          "sha256": "6ccb7a9cdb7152e0372c36aaf832b15da4cd00483be60566fbcf7380397614bb",
+          "initial_technical_review": "Folds current Component metadata into the old base and makes visible/hidden classes private MDC constants,creates an animation emitter,and narrows its key manager. The actual legacy panel retains tagged classes and a null animation stream;this hunk cannot be copied wholesale.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 5,
+          "header": "@@ -160,10 +171,10 @@ export abstract class _MatAutocompleteBase",
+          "sha256": "57de2e14fce6f247fb95cd60d483845f87aa9ae36f4d3c2a75b01bad2f36fc77",
+          "initial_technical_review": "Moves concrete current ContentChildren queries into the merged class. The retained panel uses MatLegacyOption and MAT_LEGACY_OPTGROUP;query token identity and legacy coexistence matter.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 6,
+          "header": "@@ -253,6 +264,27 @@ export abstract class _MatAutocompleteBase",
+          "sha256": "e557c67fc376f6e189cbf59391d84453026a6b949ffb62a7f5381249d079626d",
+          "initial_technical_review": "Moves current-only hide-single-selection-indicator inputs and option change-detector propagation into the merged body. This is relocation from the existing current subclass,not authorization to add modern inputs to the legacy API.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 7,
+          "header": "@@ -281,7 +313,7 @@ export abstract class _MatAutocompleteBase",
+          "sha256": "7ce836915b31770c384dff4a89b56828e872dab2f476296c110678df269273c7",
+          "initial_technical_review": "Changes the key-manager generic type from the shared base to current MatOption. Keep the owned legacy option model and its separately reviewed public key-manager use.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 8,
+          "header": "@@ -297,6 +329,7 @@ export abstract class _MatAutocompleteBase",
+          "sha256": "2af9337cdda76e1afdc56b9fd1417442c9cf58e0c00329677d33f6a9017d5591",
+          "initial_technical_review": "Moves animation-emitter completion into the merged ngOnDestroy. The legacy panel explicitly has _animationDone=null;copying unconditional completion would be invalid. Lifecycle evidence remains required for any proposed motion change.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 9,
+          "header": "@@ -322,7 +355,7 @@ export abstract class _MatAutocompleteBase",
+          "sha256": "70dbbe8b389e8425276fe0bad56b6ce7113f8103db3296acac9614c1769c01a8",
+          "initial_technical_review": "Narrowing _emitSelectEvent to current MatOption affects the public event/type boundary. Retain the legacy event source and option relationship pending complete contract review.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 10,
+          "header": "@@ -350,61 +383,6 @@ export abstract class _MatAutocompleteBase",
+          "sha256": "7c58aaba9c5a80bb43f2347b04fba325ac324e576c65d1e666938ad075b8fc45",
+          "initial_technical_review": "Deletes the generic disabled-option skip predicate and the old current wrapper after moving metadata,queries,indicator inputs and destruction. The legacy base still skips disabled options,so this is a substantive applicability boundary rather than a harmless class rename.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 11,
+          "header": "@@ -419,7 +397,7 @@ export class MatAutocomplete extends _MatAutocompleteBase implements OnDestroy {",
+          "sha256": "ff0f207452513e9acdd91280d7328128b36076ca72a8c30a98c4e94f01c06a0d",
+          "initial_technical_review": "Keeps the current concrete skip predicate returning false while dropping its unused argument. That concrete current behavior differs from the retained historical legacy default;do not adopt it by inheritance or a type rename.",
+          "final_applicability_qualified": false
+        }
+      ]
+    },
+    {
+      "path": "src/material/autocomplete/testing/autocomplete-harness.ts",
+      "patch_sha256": "70b6c3305a586f532055961ea04f92e1446b223923e6be3a6f5b43aa0db92e68",
+      "status": "original-hunks-read;owned/minimum/family validation incomplete",
+      "hunks": [
+        {
+          "index": 1,
+          "header": "@@ -8,7 +8,6 @@",
+          "sha256": "1ca26816e1ce655f28de9914d50f673688bd481f6d49f7641a4171a7f840e182",
+          "initial_technical_review": "Removes BaseHarnessFilters after eliminating generic harness parameters. The owned legacy harness still needs generic legacy option and group/filter contracts.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 2,
+          "header": "@@ -22,22 +21,30 @@ import {",
+          "sha256": "12e441e66b0bff975bd6f8a8175aae23576301fbf0f05b4f24f6c82a7e912bf0",
+          "initial_technical_review": "Folds the current harness into ComponentHarness with hardcoded MDC host/prefix and current option/group harness classes. The owned legacy harness retains mat and MatLegacyOptionHarness/MatLegacyOptgroupHarness.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 3,
+          "header": "@@ -76,21 +83,23 @@ export abstract class _MatAutocompleteHarnessBase<",
+          "sha256": "d6ffa7d3352bbf30f54376be0b85cc9c610e2bf7a48bde44d7ad7cc87d15df9f",
+          "initial_technical_review": "Narrows getOptions/getOptionGroups and their locators to current harness classes. Preserve the legacy concrete return/filter boundary;this does not prove current and legacy harness behavior equal.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 4,
+          "header": "@@ -98,15 +107,15 @@ export abstract class _MatAutocompleteHarnessBase<",
+          "sha256": "7be1a93d08586661d5b4b8f560065f4ba3217667228c0a546249f1449fc4cea5",
+          "initial_technical_review": "Changes selectOption filter type to current OptionHarnessFilters. The retained legacy generic/filter type must remain aligned with its own option harness.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 5,
+          "header": "@@ -118,7 +127,7 @@ export abstract class _MatAutocompleteHarnessBase<",
+          "sha256": "e0687c79df38eeb1ab4c58ba6f2c176b684a243753c4bdc51a274d3a54b79711",
+          "initial_technical_review": "Replaces the generic visible-class prefix with mat-mdc-autocomplete-visible. The retained panel and harness use mat-autocomplete-visible;copying would break legacy detection.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 6,
+          "header": "@@ -130,47 +139,6 @@ export abstract class _MatAutocompleteHarnessBase<",
+          "sha256": "b0c11d868b156166d510bc04878d0d8e6aa778b9fe560cf139dcede2aabc116c",
+          "initial_technical_review": "Removes generic and current wrapper panel-selector methods while retaining aria-controls for current Material. Tagged legacy and actual owned code use aria-owns,which is a required lookup distinction.",
+          "final_applicability_qualified": false
+        }
+      ]
+    },
+    {
+      "path": "src/material/core/option/optgroup.ts",
+      "patch_sha256": "e25d6bf974fb22e0b6803a788b5d2a1892fbce5dfb628f84cdacc241ffa7394a",
+      "status": "original-hunks-read;owned/minimum/family validation incomplete",
+      "hunks": [
+        {
+          "index": 1,
+          "header": "@@ -14,7 +14,6 @@ import {",
+          "sha256": "f88e5be91078e563b81835efcd5b8d9d03e851f0b77b648edf2114e746167312",
+          "initial_technical_review": "Removes the ordinary Directive import after base/component collapse. The retained legacy option group still has a locally owned historical base.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 2,
+          "header": "@@ -46,23 +45,6 @@ const _MatOptgroupMixinBase = mixinDisabled(class {});",
+          "sha256": "01e43c4f25a00dfa4ad51372456252360e52d66c1a9e26f9054b83eea5648aff",
+          "initial_technical_review": "Deletes the shared label,ID,inert-state and optional-parent constructor body from its old location. The owned base retains those responsibilities;its previously qualified legacy ID namespace is a separate existing change,not part of this upstream adoption.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 3,
+          "header": "@@ -89,4 +71,18 @@ export const MAT_OPTGROUP = new InjectionToken<MatOptgroup>('MatOptgroup');",
+          "sha256": "17c4e408db1cc656674ae3ee4ed30126fdd0b8772d75bf52e112c8631b473231",
+          "initial_technical_review": "Moves those same fields and constructor into the current component/mixin. Retain the legacy host classes and distinct provider/token boundary rather than replacing the owned group with current MatOptgroup.",
+          "final_applicability_qualified": false
+        }
+      ]
+    },
+    {
+      "path": "src/material/core/option/option.ts",
+      "patch_sha256": "81e13c569bd71f088541d753d649245c5f59b1aed0d0f776c81a463ae747fa84",
+      "status": "original-hunks-read;owned/minimum/family validation incomplete",
+      "hunks": [
+        {
+          "index": 1,
+          "header": "@@ -17,7 +17,6 @@ import {",
+          "sha256": "24a38e7212b81e13ae876f97ba8725ed6cc48a9b2d7cdd17601cc784cf70a0c0",
+          "initial_technical_review": "Removes the shared Directive import. This is ordinary current class consolidation,not a request to remove the legacy owned base.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 2,
+          "header": "@@ -27,7 +26,7 @@ import {",
+          "sha256": "be4918882e8920b20252d8f02b1cdb2c1b69f258d4360f391910b634a5969ecc",
+          "initial_technical_review": "Replaces shared optgroup type import with current MatOptgroup. Retained legacy group identity and local token forwarding remain relevant.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 3,
+          "header": "@@ -40,14 +39,46 @@ let _uniqueIdCounter = 0;",
+          "sha256": "ece85a834839a2dc292ce240a8d79e81259fa32c9ef16093cc1039365f362dd5",
+          "initial_technical_review": "Narrows option-selection source type and merges the current MDC Component metadata into the old base. The actual legacy host/classes/template and event source must remain historical;no modern option markup is adopted.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 4,
+          "header": "@@ -101,8 +132,8 @@ export class _MatOptionBase<T = any> implements FocusableOption, AfterViewChecke",
+          "sha256": "45a5f21f6117cb013d35a77b2708a6f690e0b911353fb7d2ebc1125e6249a595",
+          "initial_technical_review": "Moves optional injected parent/group parameters into the merged current constructor and makes group mutable/current-typed. The legacy wrapper still forwards explicit historical arguments and local tokens;constructor/provider/signature proof remains separate.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 5,
+          "header": "@@ -252,50 +283,6 @@ export class _MatOptionBase<T = any> implements FocusableOption, AfterViewChecke",
+          "sha256": "6ece670063bb75c8b3223fbd8a85936ba98d0e28af937cc410050afe70539581",
+          "initial_technical_review": "Deletes the thin current MatOption wrapper and its super forwarding after consolidation. This does not justify deleting the owned legacy wrapper or changing its historical constructor forwarding.",
+          "final_applicability_qualified": false
+        }
+      ]
+    },
+    {
+      "path": "tools/public_api_guard/material/autocomplete-testing.md",
+      "patch_sha256": "5f9ed1ce08eb2c6817f824c92afc33f2ff7bfca39366028914b9871c74b459d8",
+      "status": "original-hunks-read;owned/minimum/family validation incomplete",
+      "hunks": [
+        {
+          "index": 1,
+          "header": "@@ -19,45 +19,22 @@ export interface AutocompleteHarnessFilters extends BaseHarnessFilters {",
+          "sha256": "f3146ca8ba4bf7ea93f03cd4806c6a04775803c7f6ddfb470099ff5c31c9d47c",
+          "initial_technical_review": "The original generated API records loss of the generic base and current-only concrete option/group/filter returns and protected selector surface. This is evidence of a current contract change,not an expectation to regenerate a legacy golden or narrow legacy harness types.",
+          "final_applicability_qualified": false
+        }
+      ]
+    },
+    {
+      "path": "tools/public_api_guard/material/autocomplete.md",
+      "patch_sha256": "8e240bc1884f343b615bffad60c01c6b18659464bfc340a419e52f32f1095cfa",
+      "status": "original-hunks-read;owned/minimum/family validation incomplete",
+      "hunks": [
+        {
+          "index": 1,
+          "header": "@@ -25,9 +25,7 @@ import * as i7 from '@angular/cdk/scrolling';",
+          "sha256": "2fcfe2cd58777a6822ae88877e99e0650802f5610d8b62ac691a452d8c009e84",
+          "initial_technical_review": "Removes shared option/group type imports from the current generated declaration. Legacy type identities remain independently owned.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 2,
+          "header": "@@ -68,39 +66,10 @@ export const MAT_AUTOCOMPLETE_SCROLL_STRATEGY_FACTORY_PROVIDER: {",
+          "sha256": "71f64888330cfc70276f8c5c973ca3f5aa8b49dff7ed3cca6911e0d6aa231049",
+          "initial_technical_review": "Replaces the current subclass plus exported base with one concrete class and non-null animation emitter. Constructor and inheritance contracts must be assessed against the untouched legacy declaration;name accounting alone is insufficient.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 3,
+          "header": "@@ -116,24 +85,25 @@ export abstract class _MatAutocompleteBase extends _MatAutocompleteMixinBase imp",
+          "sha256": "8514c3feefed49767e12449b5cfa2ee16e0568773eed679f14948809d5660a15",
+          "initial_technical_review": "Records current option types,hide-indicator accessors and concrete query properties while removing protected class-extension points. Those changes are not a legacy API target.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 4,
+          "header": "@@ -144,13 +114,19 @@ export abstract class _MatAutocompleteBase extends _MatAutocompleteMixinBase imp",
+          "sha256": "4d9b548ac2ad10f4c796d377a6a8dfe9d742dfc913fd6acb9a2fce37f13d233a",
+          "initial_technical_review": "Records zero-argument current skip predicate and folded Ivy Component/factory metadata. Do not treat generated metadata relocation as proof of legacy factory or query-scope identity.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 5,
+          "header": "@@ -173,54 +149,35 @@ export class MatAutocompleteModule {",
+          "sha256": "483af29f5682b676e7f8546f5001e2209e643469cf6febb99211eabfea92ffdc",
+          "initial_technical_review": "Records origin constructor relocation,event-source type narrowing and trigger/base collapse. Retained legacy constructors/events stay in scope;this reference does not grant API/runtime acceptance.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 6,
+          "header": "@@ -252,9 +209,9 @@ export abstract class _MatAutocompleteTriggerBase implements ControlValueAccesso",
+          "sha256": "3a9be4fd8cb5d320e6391a069cfdde6156a51a48fcc5cdf95bf68a72cc1b9bb8",
+          "initial_technical_review": "Records current trigger Ivy directive/factory metadata after moving inherited inputs to the concrete class. Actual owned metadata and both minimums still require their proper evidence;no candidate golden is changed.",
+          "final_applicability_qualified": false
+        }
+      ]
+    },
+    {
+      "path": "tools/public_api_guard/material/core.md",
+      "patch_sha256": "6a74e11de37bc2e083f5d1dad74a426c6cb8efcbfe45f2c20d03b0a074acaff5",
+      "status": "original-hunks-read;owned/minimum/family validation incomplete",
+      "hunks": [
+        {
+          "index": 1,
+          "header": "@@ -240,37 +240,20 @@ export class MatNativeDateModule {",
+          "sha256": "6270bc71427820557a7e715724af30bff3a6d971fe5175cb4df746d8e84d4555",
+          "initial_technical_review": "Records optgroup base removal and merged label/input/factory metadata. The optional parent and provider identities need legacy-specific review;the current concrete declaration is not a replacement golden.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 2,
+          "header": "@@ -283,7 +266,7 @@ export class _MatOptionBase<T = any> implements FocusableOption, AfterViewChecke",
+          "sha256": "3187368b9367de37e36789ef20ae70d0ce251027bc47b953fadb6d0f71182787",
+          "initial_technical_review": "Records option/base collapse and group changing from readonly shared-base type to mutable current MatOptgroup. This is an explicit TS contract distinction even where runtime bodies are moved.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 3,
+          "header": "@@ -303,9 +286,9 @@ export class _MatOptionBase<T = any> implements FocusableOption, AfterViewChecke",
+          "sha256": "0fad49954fb88f948e14120adb1a7c4da209c698b02cecf6abe7122d5386e2de",
+          "initial_technical_review": "Records merged current option Ivy Component and optional constructor-factory metadata. Full owned legacy AOT/construction identity is not proved by this generated current declaration.",
+          "final_applicability_qualified": false
+        },
+        {
+          "index": 4,
+          "header": "@@ -333,10 +316,10 @@ export interface MatOptionParentComponent {",
+          "sha256": "071571d8f440487ea4731ab880b53da0ce595db6593d11d6df50a32fd6dcc3f4",
+          "initial_technical_review": "Records current MatOptionSelectionChange source narrowing. Preserve the legacy-owned option/event relationship and assess signatures separately.",
+          "final_applicability_qualified": false
+        }
+      ]
+    }
+  ],
+  "current_source_leads": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+      "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+      "bytes": 1596,
+      "read_scope": "Relevant classes,queries,host metadata,harness bindings and selected base members;not a full-family/API/native qualification."
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete-trigger.ts",
+      "sha256": "6b9c00dbf365e6b6ea9b2b65eb7e67911775322c78848b996d3590f8fded3d58",
+      "bytes": 1975,
+      "read_scope": "Relevant classes,queries,host metadata,harness bindings and selected base members;not a full-family/API/native qualification."
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+      "sha256": "a35c9828093141136e677671aefb92409813dc313e9e247d431841aafc36045d",
+      "bytes": 11315,
+      "read_scope": "Relevant classes,queries,host metadata,harness bindings and selected base members;not a full-family/API/native qualification."
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1",
+      "bytes": 40967,
+      "read_scope": "Relevant classes,queries,host metadata,harness bindings and selected base members;not a full-family/API/native qualification."
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/testing/autocomplete-harness.ts",
+      "sha256": "98795774c2cc999c0bf1d59cb9c858440077502121a5d938e9e7179c505e3936",
+      "bytes": 2023,
+      "read_scope": "Relevant classes,queries,host metadata,harness bindings and selected base members;not a full-family/API/native qualification."
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/testing/autocomplete-harness-base.ts",
+      "sha256": "070ca29a92c0c6548d00421fac640868b676602ac9976c9e917fd536193fa020",
+      "bytes": 4479,
+      "read_scope": "Relevant classes,queries,host metadata,harness bindings and selected base members;not a full-family/API/native qualification."
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option.ts",
+      "sha256": "fc4bb9db4bbfb5ede0680b572cab060ad23b6f91d84791f69c09706dfd57db31",
+      "bytes": 1783,
+      "read_scope": "Relevant classes,queries,host metadata,harness bindings and selected base members;not a full-family/API/native qualification."
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/optgroup.ts",
+      "sha256": "f9a203ff1766b9ef0e4f67a68e3cd7c92d55b980066e0aab761d1de590f72727",
+      "bytes": 1125,
+      "read_scope": "Relevant classes,queries,host metadata,harness bindings and selected base members;not a full-family/API/native qualification."
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/optgroup-base.ts",
+      "sha256": "5a4e965749ff544dfa856e9d20569f653ce51082ab3d831fae5f5359ae7d98b9",
+      "bytes": 3120,
+      "read_scope": "Relevant classes,queries,host metadata,harness bindings and selected base members;not a full-family/API/native qualification."
+    }
+  ],
+  "remaining_original_members": [
+    {
+      "path": "src/material/checkbox/checkbox.ts",
+      "hunks": 7,
+      "patch_sha256": "d709e240e8c8b057bfe0bdcd46408cc71995037b8972efb7d5c471044bb86098"
+    },
+    {
+      "path": "src/material/checkbox/testing/checkbox-harness.ts",
+      "hunks": 3,
+      "patch_sha256": "6700ea1a7b16418bd8bfdf3b4b36cd59207e52f520be41fd5466da6d2c20faee"
+    },
+    {
+      "path": "src/material/dialog/dialog-container.ts",
+      "hunks": 6,
+      "patch_sha256": "42024d8ed8c4a2600fbbf55db2cdf6d43cac87fd78f034f61df970cd745d0ae9"
+    },
+    {
+      "path": "src/material/dialog/dialog-ref.ts",
+      "hunks": 2,
+      "patch_sha256": "9b5bebd1cf0655af59bab261cb08f0e46748ce9f65d33298e85d5e8ba04dd844"
+    },
+    {
+      "path": "src/material/dialog/dialog.ts",
+      "hunks": 5,
+      "patch_sha256": "d7a17ca3e94c2f993473e652373fa9a44fcb0c0ea0daa0824fcb739c345257d9"
+    },
+    {
+      "path": "src/material/dialog/public-api.ts",
+      "hunks": 1,
+      "patch_sha256": "d34f768718cc0815e23af3b09343078715a386f00cfc089825db02d517bcdb8e"
+    },
+    {
+      "path": "src/material/dialog/testing/dialog-harness.ts",
+      "hunks": 2,
+      "patch_sha256": "d178d6caeb340a538cb09f0acb4668ca1cc511c0ee62a38ad6294b44f1f30ddf"
+    },
+    {
+      "path": "src/material/dialog/testing/dialog-opener.ts",
+      "hunks": 3,
+      "patch_sha256": "5cd6e8a0158ffb86997e1cfbe3ed2a0e5cb56895ba6c165d7d77cc2e5f463876"
+    },
+    {
+      "path": "src/material/dialog/testing/index.ts",
+      "hunks": 1,
+      "patch_sha256": "23482a59c92bcc3ccc8c254b2db1e7b47b53127569deabd05871ff8ea122b00c"
+    },
+    {
+      "path": "src/material/form-field/testing/error-harness.ts",
+      "hunks": 2,
+      "patch_sha256": "1ff03479055f2cefb04b26df8bde14a4580e2375546ad5edf591c898d3471a0a"
+    },
+    {
+      "path": "src/material/form-field/testing/form-field-harness.ts",
+      "hunks": 4,
+      "patch_sha256": "03fe83238f98b7b8af58f02a1fae6087e117dcf695309aef450a12c48c578412"
+    },
+    {
+      "path": "src/material/menu/menu-content.ts",
+      "hunks": 2,
+      "patch_sha256": "fdffcfae6789ebbf0d6b5e644ded8fb1e7dc14867425b9c86c593d9a1d7ab16f"
+    },
+    {
+      "path": "src/material/menu/menu-trigger.ts",
+      "hunks": 9,
+      "patch_sha256": "a4a43bdec15c4a062fea757b6e706724cc54b132c14e0b423adbbf6bfb73d1d2"
+    },
+    {
+      "path": "src/material/menu/menu.ts",
+      "hunks": 3,
+      "patch_sha256": "7f549d3f33aab46e91b05a5a6a63ae95ac32dc8062bcf10e41963c48a754d9ec"
+    },
+    {
+      "path": "src/material/menu/public-api.ts",
+      "hunks": 1,
+      "patch_sha256": "73b4dbd7860b667f5a46db9b1413a93daacfa21e00e954a045b22f6f306eb6c8"
+    },
+    {
+      "path": "src/material/menu/testing/menu-harness.ts",
+      "hunks": 7,
+      "patch_sha256": "955f99e8eb097471b65febebcca3fa4bc8ef83b72926e1079b67ab386128b62b"
+    },
+    {
+      "path": "src/material/paginator/paginator.ts",
+      "hunks": 6,
+      "patch_sha256": "f9370d92963b6590f06ef87625e5bdc439383608d915ae8f3f437db191fec1b2"
+    },
+    {
+      "path": "src/material/paginator/testing/paginator-harness.ts",
+      "hunks": 2,
+      "patch_sha256": "e2c5d18d6fda71f07eba0dbc3f2d2c74f53045b7254e7af8f692ba9b85df1143"
+    },
+    {
+      "path": "src/material/radio/radio.ts",
+      "hunks": 10,
+      "patch_sha256": "fe47096657315928ae3ca1a5cb7d15a016a1e71d71ecbc328abf1bac43a8d63a"
+    },
+    {
+      "path": "src/material/radio/testing/radio-harness.ts",
+      "hunks": 7,
+      "patch_sha256": "95a62c5b1899476f34c2338cc0ec64cf1ab547fba6c70d7db0bd5d53c9ba6fec"
+    },
+    {
+      "path": "src/material/select/select.ts",
+      "hunks": 15,
+      "patch_sha256": "1d00ffa36343bf1fbde850bcb752b9510b60ae04db2f130f3e93eb9075346cc7"
+    },
+    {
+      "path": "src/material/select/testing/select-harness.ts",
+      "hunks": 5,
+      "patch_sha256": "d3ec1337340867f1aef89681f67dc867c036074c5aeed1198ebc837051620814"
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.ts",
+      "hunks": 8,
+      "patch_sha256": "2f867e86a5f3c25eba93b9992faf08c872925243185b7e5a46e977b4160948c3"
+    },
+    {
+      "path": "src/material/slide-toggle/testing/slide-toggle-harness.ts",
+      "hunks": 3,
+      "patch_sha256": "f272844532ad3fb7e7bd6d092ed792ec49fffe373dd9cb9e044f3acf425e0b2a"
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar-container.ts",
+      "hunks": 7,
+      "patch_sha256": "3eff7d8c96352d531c8577ba5a45d8aa1f5c835659c55019bb8413c92ccb916c"
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar-ref.ts",
+      "hunks": 3,
+      "patch_sha256": "b90f1966bd511412a3dd97be7badf5a06c1bebbce129ecefbb4d6a38a121a530"
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.ts",
+      "hunks": 7,
+      "patch_sha256": "e503b0a6b57166d15ab23f7bee33f3d4c1d00130e999dd1bec698fee180a6488"
+    },
+    {
+      "path": "src/material/snack-bar/testing/snack-bar-harness.ts",
+      "hunks": 5,
+      "patch_sha256": "d396d377958f3698c9ab13de76d199b972796f62bc4f28d21dfcd8bc6d9f4658"
+    },
+    {
+      "path": "src/material/table/table-data-source.ts",
+      "hunks": 4,
+      "patch_sha256": "eb49d03f826eec66bf2a32181fee8b9b8ae25a914dcc9c04b302e911c9b887cd"
+    },
+    {
+      "path": "src/material/table/testing/cell-harness.ts",
+      "hunks": 3,
+      "patch_sha256": "b2828327d16b8f07a8ecd6e3d48639c40e783f11f6eb9805d9323b258d985086"
+    },
+    {
+      "path": "src/material/table/testing/row-harness.ts",
+      "hunks": 3,
+      "patch_sha256": "22c2f4fa40631d1190aeb7d08f53987c3352cbac8148dd26ae7031981769d163"
+    },
+    {
+      "path": "src/material/table/testing/table-harness.ts",
+      "hunks": 3,
+      "patch_sha256": "bce3e5c2cd1d52f34a22008d4228d585e567bc0d4852676e69887ca5fbe58df5"
+    },
+    {
+      "path": "src/material/tabs/public-api.ts",
+      "hunks": 1,
+      "patch_sha256": "50e8e671b83c7f38d30f0d750cef3ed3276230656020ca695226a7fbd362f0c9"
+    },
+    {
+      "path": "src/material/tabs/tab-body.ts",
+      "hunks": 3,
+      "patch_sha256": "d72e3c2e72228f8271536b0215fb5d7fa5726837af4d490a688c299b2302f1b7"
+    },
+    {
+      "path": "src/material/tabs/tab-group.ts",
+      "hunks": 7,
+      "patch_sha256": "11a68c4e3c2c862d3a84943e18984f08e72ed164395a4e44b3a5af852d151382"
+    },
+    {
+      "path": "src/material/tabs/tab-header.ts",
+      "hunks": 5,
+      "patch_sha256": "d6cbcef5aa85892eb72d11bca06a66149ba7dc760324d1a861100927028ac6b0"
+    },
+    {
+      "path": "src/material/tabs/tab-label-wrapper.ts",
+      "hunks": 2,
+      "patch_sha256": "14da155b9762cc7507c7fdd18daeb7d5b93e9c82a9ae3eb57db669f217bcc500"
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.ts",
+      "hunks": 12,
+      "patch_sha256": "697473c0214696d67ec49d04423738fd93070496b910872e73f9e6f06d6de8cb"
+    },
+    {
+      "path": "src/material/tabs/tab.ts",
+      "hunks": 4,
+      "patch_sha256": "281b7f57e52f804cfd69d54f4eb0772cd854c1d402fc358672e5efae9d6c1903"
+    },
+    {
+      "path": "src/material/tooltip/testing/tooltip-harness.ts",
+      "hunks": 2,
+      "patch_sha256": "6c47edde350ae338a7860237aa4fb6efd17cae28fb9fbd6c9b45e3c56fe6bf47"
+    },
+    {
+      "path": "src/material/tooltip/tooltip.ts",
+      "hunks": 11,
+      "patch_sha256": "df4447ac40c9ef3b222dadc0ea727b2b2b7e5650e0190a9821d14bf8d4495f28"
+    },
+    {
+      "path": "tools/public_api_guard/material/checkbox-testing.md",
+      "hunks": 2,
+      "patch_sha256": "1d72b21d47e4f4e7d222b54ef80fefe9b8ab495098ee5ae6c2f1dacbcc99e395"
+    },
+    {
+      "path": "tools/public_api_guard/material/checkbox.md",
+      "hunks": 5,
+      "patch_sha256": "8c3606bb5afc6928cf79d22152d177da74369d0b85491cb532b55ea92ca2e535"
+    },
+    {
+      "path": "tools/public_api_guard/material/dialog-testing.md",
+      "hunks": 4,
+      "patch_sha256": "007ce1a212de32f80fa5b6fb5c91b8e3bebc3304e44805e44bab552ccb955954"
+    },
+    {
+      "path": "tools/public_api_guard/material/dialog.md",
+      "hunks": 8,
+      "patch_sha256": "f7d3aabd57158b317f2675d439b053f739571ea103c66b1dff9ad01dacf8214e"
+    },
+    {
+      "path": "tools/public_api_guard/material/form-field-testing.md",
+      "hunks": 4,
+      "patch_sha256": "c44426de363759d4a0e31bce8d85f2104cfa506488142310191f9605deb912e9"
+    },
+    {
+      "path": "tools/public_api_guard/material/menu-testing.md",
+      "hunks": 1,
+      "patch_sha256": "2668c49fbd1189cddc79da2852a73b1be656a1ff87dbbc1c209c602f122aee59"
+    },
+    {
+      "path": "tools/public_api_guard/material/menu.md",
+      "hunks": 7,
+      "patch_sha256": "92c24c81a715a016a8e5d27a690d289128918bae865facb7ccb7c6aa7078b4c2"
+    },
+    {
+      "path": "tools/public_api_guard/material/paginator-testing.md",
+      "hunks": 1,
+      "patch_sha256": "153726fc11bb4d1c270c794c4de083b40f35fb5ec96f2937f26f7746b2989d90"
+    },
+    {
+      "path": "tools/public_api_guard/material/paginator.md",
+      "hunks": 3,
+      "patch_sha256": "f295de8adf1efa18ddd8e6539c56301c29c7c839802b8f0e75704069464f7f2a"
+    },
+    {
+      "path": "tools/public_api_guard/material/radio-testing.md",
+      "hunks": 1,
+      "patch_sha256": "66fe976a9e7781288be9db501a4927728370dc2c1aa4d0e7e676795e8952c1a5"
+    },
+    {
+      "path": "tools/public_api_guard/material/radio.md",
+      "hunks": 4,
+      "patch_sha256": "74ec672d9c39ef4c2cb32980699d2b675629402cfba983a1135e093e82b2ffc8"
+    },
+    {
+      "path": "tools/public_api_guard/material/select-testing.md",
+      "hunks": 3,
+      "patch_sha256": "3d58c4f58bca0fc3300fcef5c72a9495f705cb8938031b79f91472d79a68692b"
+    },
+    {
+      "path": "tools/public_api_guard/material/select.md",
+      "hunks": 7,
+      "patch_sha256": "e69ecd175a0e88ff16b0a0a121da563494deee2a8aa6190c6eeaad80acf45f05"
+    },
+    {
+      "path": "tools/public_api_guard/material/slide-toggle-testing.md",
+      "hunks": 2,
+      "patch_sha256": "7cc6b3e1fdab01a729e4cecf330d2c1bc25ed1c3429ce51bea082050af6e430d"
+    },
+    {
+      "path": "tools/public_api_guard/material/slide-toggle.md",
+      "hunks": 3,
+      "patch_sha256": "36db8dd076fdd8fcbb3cc3e0d97633f8b704f6b526a667f4c757eb656ec100dd"
+    },
+    {
+      "path": "tools/public_api_guard/material/snack-bar-testing.md",
+      "hunks": 2,
+      "patch_sha256": "96855205fa9c3d9a011ddf01b94660ed37e7566f92a328930c59449c93d16aee"
+    },
+    {
+      "path": "tools/public_api_guard/material/snack-bar.md",
+      "hunks": 6,
+      "patch_sha256": "00b057975b106bf2d9bfa2f1d15ae7a24927ac4f6e87acd538512625016a7059"
+    },
+    {
+      "path": "tools/public_api_guard/material/table-testing.md",
+      "hunks": 1,
+      "patch_sha256": "36cbadf681658f0ecbfa6e82970d46552fd893ce28a7746c2ca914fb46a78ca7"
+    },
+    {
+      "path": "tools/public_api_guard/material/table.md",
+      "hunks": 3,
+      "patch_sha256": "1c2c00105533666cb024f1f300b76203f4663895768f6754b4864bb131d8c23d"
+    },
+    {
+      "path": "tools/public_api_guard/material/tabs.md",
+      "hunks": 13,
+      "patch_sha256": "e1ee2ade0e599bb06e3e64ffab0b2da3805e76f9d931f8218ead668755630def"
+    },
+    {
+      "path": "tools/public_api_guard/material/tooltip-testing.md",
+      "hunks": 1,
+      "patch_sha256": "cc8df08bb0c737561fd467524314a872a05b4943028a30f05aec990eba1462f3"
+    },
+    {
+      "path": "tools/public_api_guard/material/tooltip.md",
+      "hunks": 5,
+      "patch_sha256": "4a0bca46c1b802d6fdbf3c78efea3abab4f40b44c77819e209fdcb8c25a48bdf"
+    }
+  ],
+  "tagged_alias_followup": "There is no tagged legacy-snack-bar/snack-bar-ref.ts. Resolve its historical public-barrel alias using authenticated supplemental tagged sources before assessing the snack-bar ref hunk.",
+  "maintenance_leads": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/testing/autocomplete-harness-base.ts",
+      "observation": "Existing header lacks the Ryan2026notice and describes removal at22although this original removal is17-era. This is a later bounded license/comment maintenance lead;no file was changed in this source-only step."
+    }
+  ],
+  "substantive_whole_SHA_review_complete": false,
+  "current_owned_family_or_minimum_contract_qualified": false,
+  "proposed_final_disposition": null,
+  "canonical_dispositions_changed": 0,
+  "source_admissions_changed": 0,
+  "product_changes": 0,
+  "cyph_modified": false,
+  "consumer_build_executed": false,
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}
