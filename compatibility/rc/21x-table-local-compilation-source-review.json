@@ -1,0 +1,863 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "3f35b12290ea4dbee4a9d82845c0964b2b4df50d",
+  "role": "One complete original source review and six small actual compiler cells; proposal only",
+  "originals": {
+    "path": "compatibility/rc/21x-table-local-compilation-source-originals.json.gz",
+    "sha256": "014157272208f6bf74e690f0d32684328b7efded3141d653037c7ac2a65ef137"
+  },
+  "source_census": {
+    "path": "compatibility/rc/upstream-complete-patch-census.json.gz",
+    "sha256": "806433925a6216b52b26a98b3b91eb7129a506ab0363573b7cc21063c1366e97"
+  },
+  "current_inputs": {
+    "path": "compatibility/rc/21x-table-local-compilation-source-current.json",
+    "sha256": "e6746247cfbc087ca360e78ee950f9770f3f5ea444f9ec455c3c6fceb56ab0cb"
+  },
+  "compiler": {
+    "path": "compatibility/rc/21x-table-local-compilation-source-compiler.json",
+    "sha256": "e2d915d5596015ade4ac95f83bf7071549dd9a3364db8315d2c3d17c518393eb"
+  },
+  "compiler_controls": {
+    "path": "compatibility/rc/21x-table-local-compilation-source-compiler-controls.json",
+    "sha256": "f141692ed853a4def772a2ab2549e2709d5ee039837339dcadde2fa977b66364"
+  },
+  "original_files": 2,
+  "original_hunks": 7,
+  "exact_patch_replays": 2,
+  "tagged_members": 11,
+  "authenticated_tree_objects": 17,
+  "historical_row_template": "<ng-container cdkCellOutlet></ng-container>",
+  "hunk_reviews": [
+    {
+      "path": "src/material/table/row.ts",
+      "index": 1,
+      "header": "@@ -7,7 +7,6 @@",
+      "sha256": "ae171d6a0c9dd506a128d1ee6f00b0039d7f66128b0bfc3a09e458bea44b0810",
+      "technical_judgment": "Removes only the ordinary current Material row import of the CDK template constant. The retained legacy rows still use the public peer constant; the actual installed21.2.14 declaration contains the exact historical literal and its previously reviewed public boundary remains unchanged."
+    },
+    {
+      "path": "src/material/table/row.ts",
+      "index": 2,
+      "header": "@@ -18,6 +17,9 @@ import {",
+      "sha256": "66de723c2c92fcb0a0d1e2960397d26800d9e3d5a9d44fb73ac02055fa62981a",
+      "technical_judgment": "Introduces a same-file constant with the byte-identical historical cell outlet. This is a compiler source-location adaptation, not permission to copy current row classes, MDC hosts or a private cell-outlet implementation."
+    },
+    {
+      "path": "src/material/table/row.ts",
+      "index": 3,
+      "header": "@@ -55,7 +57,7 @@ export class MatRowDef<T> extends CdkRowDef<T> {}",
+      "sha256": "aaef46fed9aa01dafefe13b8062fe28aac14626177f838ba971085ab3b07595f",
+      "technical_judgment": "Changes only the current header-row template reference. The owned legacy header selector,mat-header-row host class,role,provider,exportAs and encapsulation match the tagged legacy component; its existing imported template compiles in both measured modes."
+    },
+    {
+      "path": "src/material/table/row.ts",
+      "index": 4,
+      "header": "@@ -72,7 +74,7 @@ export class MatHeaderRow extends CdkHeaderRow {}",
+      "sha256": "4771218f73c35c1a4361137cb941c4a21567b2c8c1f11e3854af87ea27247e19",
+      "technical_judgment": "Changes only the current footer-row template reference. Preserve the distinct legacy footer class/provider/exportAs; the measured current imported and same-file template variants emit identical component definitions."
+    },
+    {
+      "path": "src/material/table/row.ts",
+      "index": 5,
+      "header": "@@ -89,7 +91,7 @@ export class MatFooterRow extends CdkFooterRow {}",
+      "sha256": "6ff21865b8f8b446172495277f71372144d5868975ac822483fa597214104fb8",
+      "technical_judgment": "Changes only the current data-row template reference. Preserve the legacy mat-row class,public CdkRow parent and provider. Both measured variants compile and have identical generated public declarations; no source/API/style repair is justified by this hunk."
+    },
+    {
+      "path": "src/material/table/table.ts",
+      "index": 1,
+      "header": "@@ -14,7 +14,6 @@ import {",
+      "sha256": "b6aedf8f75a9c85d3437d6faa8a00f6fa2504ca1b87e3fd22ea46dea6ff284f3",
+      "technical_judgment": "Removes CDK_TABLE_TEMPLATE from the ordinary current Material table import. The owned legacy table already has no such import and uses a source-local template; historical removed scheduler/repeater providers are not restored."
+    },
+    {
+      "path": "src/material/table/table.ts",
+      "index": 2,
+      "header": "@@ -40,7 +39,17 @@ export class MatRecycleRows {}",
+      "sha256": "54d371690d11e2580fae7220b7e281b8060f171ad30838ee0e88f2ba4074e1b2",
+      "technical_judgment": "Inlines the historical caption/column-group/four-outlet template for the ordinary MDC table. The retained table already inlines caption-first projection and separately owned native/flex outlets. Copying this six-outlet markup would discard the reviewed native row groups and owned outlet protocol; retain the existing table template and providers."
+    }
+  ],
+  "complete_row_contracts": [
+    {
+      "name": "MatLegacyHeaderRow",
+      "selector": "mat-header-row, tr[mat-header-row]",
+      "template": {
+        "expression": "CDK_ROW_TEMPLATE"
+      },
+      "host": {
+        "class": "mat-header-row",
+        "role": "row"
+      },
+      "encapsulation": {
+        "expression": "ViewEncapsulation.None"
+      },
+      "exportAs": "matHeaderRow",
+      "providers": [
+        {
+          "provide": {
+            "expression": "CdkHeaderRow"
+          },
+          "useExisting": {
+            "expression": "MatLegacyHeaderRow"
+          }
+        }
+      ]
+    },
+    {
+      "name": "MatLegacyFooterRow",
+      "selector": "mat-footer-row, tr[mat-footer-row]",
+      "template": {
+        "expression": "CDK_ROW_TEMPLATE"
+      },
+      "host": {
+        "class": "mat-footer-row",
+        "role": "row"
+      },
+      "encapsulation": {
+        "expression": "ViewEncapsulation.None"
+      },
+      "exportAs": "matFooterRow",
+      "providers": [
+        {
+          "provide": {
+            "expression": "CdkFooterRow"
+          },
+          "useExisting": {
+            "expression": "MatLegacyFooterRow"
+          }
+        }
+      ]
+    },
+    {
+      "name": "MatLegacyRow",
+      "selector": "mat-row, tr[mat-row]",
+      "template": {
+        "expression": "CDK_ROW_TEMPLATE"
+      },
+      "host": {
+        "class": "mat-row",
+        "role": "row"
+      },
+      "encapsulation": {
+        "expression": "ViewEncapsulation.None"
+      },
+      "exportAs": "matRow",
+      "providers": [
+        {
+          "provide": {
+            "expression": "CdkRow"
+          },
+          "useExisting": {
+            "expression": "MatLegacyRow"
+          }
+        }
+      ]
+    }
+  ],
+  "legacy_row_metadata_compared_to_tagged16": true,
+  "source_local_table_template_retained": true,
+  "owned_table_outlets": 8,
+  "native_row_groups_retained": 3,
+  "public_CdkTableModule_template_scope_retained": true,
+  "constructor_definition_owner_and_provider_protocols_unchanged": true,
+  "actual_small_compiler_cells": 6,
+  "compilation_modes": [
+    "partial",
+    "experimental-local"
+  ],
+  "strict_template_cells": 6,
+  "exact_extracted_components_per_cell": 3,
+  "generated_component_definitions_compared": 18,
+  "identical_before_after_and_cross_file_component_definitions": true,
+  "identical_public_row_declarations_within_each_mode": true,
+  "cross_file_source_control_also_compiles": true,
+  "original_failure_reproduced_at_minimum": false,
+  "definitions": [
+    {
+      "mode": "partial",
+      "variant": "before",
+      "declaration_sha256": "9e5e803e119b111c58feaf372a6b2f521f758b3d47cbee192b6a1db844ce64c6",
+      "components": [
+        {
+          "name": "MatLegacyHeaderRow",
+          "initializer": "i0.ɵɵngDeclareComponent({ minVersion: \"14.0.0\", version: \"21.2.23\", type: MatLegacyHeaderRow, isStandalone: false, selector: \"mat-header-row, tr[mat-header-row]\", host: { attributes: { \"role\": \"row\" }, classAttribute: \"mat-header-row\" }, providers: [{ provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow }], exportAs: [\"matHeaderRow\"], usesInheritance: true, ngImport: i0, template: \"<ng-container cdkCellOutlet></ng-container>\", isInline: true, dependencies: [{ kind: \"directive\", type: i1.CdkCellOutlet, selector: \"[cdkCellOutlet]\" }], changeDetection: i0.ChangeDetectionStrategy.Eager, encapsulation: i0.ViewEncapsulation.None })",
+          "sha256": "b484007eb0d638ab4acb5d5dcec10854c570e3bbf6bf61ad252fa25f7fe218fe"
+        },
+        {
+          "name": "MatLegacyFooterRow",
+          "initializer": "i0.ɵɵngDeclareComponent({ minVersion: \"14.0.0\", version: \"21.2.23\", type: MatLegacyFooterRow, isStandalone: false, selector: \"mat-footer-row, tr[mat-footer-row]\", host: { attributes: { \"role\": \"row\" }, classAttribute: \"mat-footer-row\" }, providers: [{ provide: CdkFooterRow, useExisting: MatLegacyFooterRow }], exportAs: [\"matFooterRow\"], usesInheritance: true, ngImport: i0, template: \"<ng-container cdkCellOutlet></ng-container>\", isInline: true, dependencies: [{ kind: \"directive\", type: i1.CdkCellOutlet, selector: \"[cdkCellOutlet]\" }], changeDetection: i0.ChangeDetectionStrategy.Eager, encapsulation: i0.ViewEncapsulation.None })",
+          "sha256": "cabe00c2bdc991157860d87ed38260af3b6106c58d314aa2bf910dc139cbfe8a"
+        },
+        {
+          "name": "MatLegacyRow",
+          "initializer": "i0.ɵɵngDeclareComponent({ minVersion: \"14.0.0\", version: \"21.2.23\", type: MatLegacyRow, isStandalone: false, selector: \"mat-row, tr[mat-row]\", host: { attributes: { \"role\": \"row\" }, classAttribute: \"mat-row\" }, providers: [{ provide: CdkRow, useExisting: MatLegacyRow }], exportAs: [\"matRow\"], usesInheritance: true, ngImport: i0, template: \"<ng-container cdkCellOutlet></ng-container>\", isInline: true, dependencies: [{ kind: \"directive\", type: i1.CdkCellOutlet, selector: \"[cdkCellOutlet]\" }], changeDetection: i0.ChangeDetectionStrategy.Eager, encapsulation: i0.ViewEncapsulation.None })",
+          "sha256": "c86a7be3a550a69d82b2574464c88d664bfa4820c339ca43e440b951e5e5446b"
+        }
+      ]
+    },
+    {
+      "mode": "partial",
+      "variant": "after",
+      "declaration_sha256": "9e5e803e119b111c58feaf372a6b2f521f758b3d47cbee192b6a1db844ce64c6",
+      "components": [
+        {
+          "name": "MatLegacyHeaderRow",
+          "initializer": "i0.ɵɵngDeclareComponent({ minVersion: \"14.0.0\", version: \"21.2.23\", type: MatLegacyHeaderRow, isStandalone: false, selector: \"mat-header-row, tr[mat-header-row]\", host: { attributes: { \"role\": \"row\" }, classAttribute: \"mat-header-row\" }, providers: [{ provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow }], exportAs: [\"matHeaderRow\"], usesInheritance: true, ngImport: i0, template: \"<ng-container cdkCellOutlet></ng-container>\", isInline: true, dependencies: [{ kind: \"directive\", type: i1.CdkCellOutlet, selector: \"[cdkCellOutlet]\" }], changeDetection: i0.ChangeDetectionStrategy.Eager, encapsulation: i0.ViewEncapsulation.None })",
+          "sha256": "b484007eb0d638ab4acb5d5dcec10854c570e3bbf6bf61ad252fa25f7fe218fe"
+        },
+        {
+          "name": "MatLegacyFooterRow",
+          "initializer": "i0.ɵɵngDeclareComponent({ minVersion: \"14.0.0\", version: \"21.2.23\", type: MatLegacyFooterRow, isStandalone: false, selector: \"mat-footer-row, tr[mat-footer-row]\", host: { attributes: { \"role\": \"row\" }, classAttribute: \"mat-footer-row\" }, providers: [{ provide: CdkFooterRow, useExisting: MatLegacyFooterRow }], exportAs: [\"matFooterRow\"], usesInheritance: true, ngImport: i0, template: \"<ng-container cdkCellOutlet></ng-container>\", isInline: true, dependencies: [{ kind: \"directive\", type: i1.CdkCellOutlet, selector: \"[cdkCellOutlet]\" }], changeDetection: i0.ChangeDetectionStrategy.Eager, encapsulation: i0.ViewEncapsulation.None })",
+          "sha256": "cabe00c2bdc991157860d87ed38260af3b6106c58d314aa2bf910dc139cbfe8a"
+        },
+        {
+          "name": "MatLegacyRow",
+          "initializer": "i0.ɵɵngDeclareComponent({ minVersion: \"14.0.0\", version: \"21.2.23\", type: MatLegacyRow, isStandalone: false, selector: \"mat-row, tr[mat-row]\", host: { attributes: { \"role\": \"row\" }, classAttribute: \"mat-row\" }, providers: [{ provide: CdkRow, useExisting: MatLegacyRow }], exportAs: [\"matRow\"], usesInheritance: true, ngImport: i0, template: \"<ng-container cdkCellOutlet></ng-container>\", isInline: true, dependencies: [{ kind: \"directive\", type: i1.CdkCellOutlet, selector: \"[cdkCellOutlet]\" }], changeDetection: i0.ChangeDetectionStrategy.Eager, encapsulation: i0.ViewEncapsulation.None })",
+          "sha256": "c86a7be3a550a69d82b2574464c88d664bfa4820c339ca43e440b951e5e5446b"
+        }
+      ]
+    },
+    {
+      "mode": "experimental-local",
+      "variant": "before",
+      "declaration_sha256": "027c2cc56ac8933201623edf3018a75d9a81736d56d2d108516fca45caec8f12",
+      "components": [
+        {
+          "name": "MatLegacyHeaderRow",
+          "initializer": "i0.ɵɵdefineComponent({ type: MatLegacyHeaderRow, selectors: [[\"mat-header-row\"], [\"tr\", \"mat-header-row\", \"\"]], hostAttrs: [\"role\", \"row\", 1, \"mat-header-row\"], exportAs: [\"matHeaderRow\"], standalone: false, features: [i0.ɵɵProvidersFeature([{ provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow }]), i0.ɵɵInheritDefinitionFeature], decls: 1, vars: 0, consts: [[\"cdkCellOutlet\", \"\"]], template: function MatLegacyHeaderRow_Template(rf, ctx) { if (rf & 1) {\n            i0.ɵɵelementContainer(0, 0);\n        } }, dependencies: i0.ɵɵgetComponentDepsFactory(MatLegacyHeaderRow), encapsulation: 2, changeDetection: ChangeDetectionStrategy.Eager })",
+          "sha256": "615c5bfdde1a3eb55451d17c5d5dd925e560d1b668b608d5896bfea4e4ca25b8"
+        },
+        {
+          "name": "MatLegacyFooterRow",
+          "initializer": "i0.ɵɵdefineComponent({ type: MatLegacyFooterRow, selectors: [[\"mat-footer-row\"], [\"tr\", \"mat-footer-row\", \"\"]], hostAttrs: [\"role\", \"row\", 1, \"mat-footer-row\"], exportAs: [\"matFooterRow\"], standalone: false, features: [i0.ɵɵProvidersFeature([{ provide: CdkFooterRow, useExisting: MatLegacyFooterRow }]), i0.ɵɵInheritDefinitionFeature], decls: 1, vars: 0, consts: [[\"cdkCellOutlet\", \"\"]], template: function MatLegacyFooterRow_Template(rf, ctx) { if (rf & 1) {\n            i0.ɵɵelementContainer(0, 0);\n        } }, dependencies: i0.ɵɵgetComponentDepsFactory(MatLegacyFooterRow), encapsulation: 2, changeDetection: ChangeDetectionStrategy.Eager })",
+          "sha256": "c0507f7a47a0525cdcac63f017be5ee68e586cf624041b220e1ab5d51cd65a64"
+        },
+        {
+          "name": "MatLegacyRow",
+          "initializer": "i0.ɵɵdefineComponent({ type: MatLegacyRow, selectors: [[\"mat-row\"], [\"tr\", \"mat-row\", \"\"]], hostAttrs: [\"role\", \"row\", 1, \"mat-row\"], exportAs: [\"matRow\"], standalone: false, features: [i0.ɵɵProvidersFeature([{ provide: CdkRow, useExisting: MatLegacyRow }]), i0.ɵɵInheritDefinitionFeature], decls: 1, vars: 0, consts: [[\"cdkCellOutlet\", \"\"]], template: function MatLegacyRow_Template(rf, ctx) { if (rf & 1) {\n            i0.ɵɵelementContainer(0, 0);\n        } }, dependencies: i0.ɵɵgetComponentDepsFactory(MatLegacyRow), encapsulation: 2, changeDetection: ChangeDetectionStrategy.Eager })",
+          "sha256": "99ca4cac23587ffcb09a640174489e2a823d530821ea056d967874c3ebbea9a8"
+        }
+      ]
+    },
+    {
+      "mode": "experimental-local",
+      "variant": "after",
+      "declaration_sha256": "027c2cc56ac8933201623edf3018a75d9a81736d56d2d108516fca45caec8f12",
+      "components": [
+        {
+          "name": "MatLegacyHeaderRow",
+          "initializer": "i0.ɵɵdefineComponent({ type: MatLegacyHeaderRow, selectors: [[\"mat-header-row\"], [\"tr\", \"mat-header-row\", \"\"]], hostAttrs: [\"role\", \"row\", 1, \"mat-header-row\"], exportAs: [\"matHeaderRow\"], standalone: false, features: [i0.ɵɵProvidersFeature([{ provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow }]), i0.ɵɵInheritDefinitionFeature], decls: 1, vars: 0, consts: [[\"cdkCellOutlet\", \"\"]], template: function MatLegacyHeaderRow_Template(rf, ctx) { if (rf & 1) {\n            i0.ɵɵelementContainer(0, 0);\n        } }, dependencies: i0.ɵɵgetComponentDepsFactory(MatLegacyHeaderRow), encapsulation: 2, changeDetection: ChangeDetectionStrategy.Eager })",
+          "sha256": "615c5bfdde1a3eb55451d17c5d5dd925e560d1b668b608d5896bfea4e4ca25b8"
+        },
+        {
+          "name": "MatLegacyFooterRow",
+          "initializer": "i0.ɵɵdefineComponent({ type: MatLegacyFooterRow, selectors: [[\"mat-footer-row\"], [\"tr\", \"mat-footer-row\", \"\"]], hostAttrs: [\"role\", \"row\", 1, \"mat-footer-row\"], exportAs: [\"matFooterRow\"], standalone: false, features: [i0.ɵɵProvidersFeature([{ provide: CdkFooterRow, useExisting: MatLegacyFooterRow }]), i0.ɵɵInheritDefinitionFeature], decls: 1, vars: 0, consts: [[\"cdkCellOutlet\", \"\"]], template: function MatLegacyFooterRow_Template(rf, ctx) { if (rf & 1) {\n            i0.ɵɵelementContainer(0, 0);\n        } }, dependencies: i0.ɵɵgetComponentDepsFactory(MatLegacyFooterRow), encapsulation: 2, changeDetection: ChangeDetectionStrategy.Eager })",
+          "sha256": "c0507f7a47a0525cdcac63f017be5ee68e586cf624041b220e1ab5d51cd65a64"
+        },
+        {
+          "name": "MatLegacyRow",
+          "initializer": "i0.ɵɵdefineComponent({ type: MatLegacyRow, selectors: [[\"mat-row\"], [\"tr\", \"mat-row\", \"\"]], hostAttrs: [\"role\", \"row\", 1, \"mat-row\"], exportAs: [\"matRow\"], standalone: false, features: [i0.ɵɵProvidersFeature([{ provide: CdkRow, useExisting: MatLegacyRow }]), i0.ɵɵInheritDefinitionFeature], decls: 1, vars: 0, consts: [[\"cdkCellOutlet\", \"\"]], template: function MatLegacyRow_Template(rf, ctx) { if (rf & 1) {\n            i0.ɵɵelementContainer(0, 0);\n        } }, dependencies: i0.ɵɵgetComponentDepsFactory(MatLegacyRow), encapsulation: 2, changeDetection: ChangeDetectionStrategy.Eager })",
+          "sha256": "99ca4cac23587ffcb09a640174489e2a823d530821ea056d967874c3ebbea9a8"
+        }
+      ]
+    },
+    {
+      "mode": "partial",
+      "variant": "cross-file-source-control",
+      "declaration_sha256": "9e5e803e119b111c58feaf372a6b2f521f758b3d47cbee192b6a1db844ce64c6",
+      "components": [
+        {
+          "name": "MatLegacyHeaderRow",
+          "initializer": "i0.ɵɵngDeclareComponent({ minVersion: \"14.0.0\", version: \"21.2.23\", type: MatLegacyHeaderRow, isStandalone: false, selector: \"mat-header-row, tr[mat-header-row]\", host: { attributes: { \"role\": \"row\" }, classAttribute: \"mat-header-row\" }, providers: [{ provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow }], exportAs: [\"matHeaderRow\"], usesInheritance: true, ngImport: i0, template: \"<ng-container cdkCellOutlet></ng-container>\", isInline: true, dependencies: [{ kind: \"directive\", type: i1.CdkCellOutlet, selector: \"[cdkCellOutlet]\" }], changeDetection: i0.ChangeDetectionStrategy.Eager, encapsulation: i0.ViewEncapsulation.None })",
+          "sha256": "b484007eb0d638ab4acb5d5dcec10854c570e3bbf6bf61ad252fa25f7fe218fe"
+        },
+        {
+          "name": "MatLegacyFooterRow",
+          "initializer": "i0.ɵɵngDeclareComponent({ minVersion: \"14.0.0\", version: \"21.2.23\", type: MatLegacyFooterRow, isStandalone: false, selector: \"mat-footer-row, tr[mat-footer-row]\", host: { attributes: { \"role\": \"row\" }, classAttribute: \"mat-footer-row\" }, providers: [{ provide: CdkFooterRow, useExisting: MatLegacyFooterRow }], exportAs: [\"matFooterRow\"], usesInheritance: true, ngImport: i0, template: \"<ng-container cdkCellOutlet></ng-container>\", isInline: true, dependencies: [{ kind: \"directive\", type: i1.CdkCellOutlet, selector: \"[cdkCellOutlet]\" }], changeDetection: i0.ChangeDetectionStrategy.Eager, encapsulation: i0.ViewEncapsulation.None })",
+          "sha256": "cabe00c2bdc991157860d87ed38260af3b6106c58d314aa2bf910dc139cbfe8a"
+        },
+        {
+          "name": "MatLegacyRow",
+          "initializer": "i0.ɵɵngDeclareComponent({ minVersion: \"14.0.0\", version: \"21.2.23\", type: MatLegacyRow, isStandalone: false, selector: \"mat-row, tr[mat-row]\", host: { attributes: { \"role\": \"row\" }, classAttribute: \"mat-row\" }, providers: [{ provide: CdkRow, useExisting: MatLegacyRow }], exportAs: [\"matRow\"], usesInheritance: true, ngImport: i0, template: \"<ng-container cdkCellOutlet></ng-container>\", isInline: true, dependencies: [{ kind: \"directive\", type: i1.CdkCellOutlet, selector: \"[cdkCellOutlet]\" }], changeDetection: i0.ChangeDetectionStrategy.Eager, encapsulation: i0.ViewEncapsulation.None })",
+          "sha256": "c86a7be3a550a69d82b2574464c88d664bfa4820c339ca43e440b951e5e5446b"
+        }
+      ]
+    },
+    {
+      "mode": "experimental-local",
+      "variant": "cross-file-source-control",
+      "declaration_sha256": "027c2cc56ac8933201623edf3018a75d9a81736d56d2d108516fca45caec8f12",
+      "components": [
+        {
+          "name": "MatLegacyHeaderRow",
+          "initializer": "i0.ɵɵdefineComponent({ type: MatLegacyHeaderRow, selectors: [[\"mat-header-row\"], [\"tr\", \"mat-header-row\", \"\"]], hostAttrs: [\"role\", \"row\", 1, \"mat-header-row\"], exportAs: [\"matHeaderRow\"], standalone: false, features: [i0.ɵɵProvidersFeature([{ provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow }]), i0.ɵɵInheritDefinitionFeature], decls: 1, vars: 0, consts: [[\"cdkCellOutlet\", \"\"]], template: function MatLegacyHeaderRow_Template(rf, ctx) { if (rf & 1) {\n            i0.ɵɵelementContainer(0, 0);\n        } }, dependencies: i0.ɵɵgetComponentDepsFactory(MatLegacyHeaderRow), encapsulation: 2, changeDetection: ChangeDetectionStrategy.Eager })",
+          "sha256": "615c5bfdde1a3eb55451d17c5d5dd925e560d1b668b608d5896bfea4e4ca25b8"
+        },
+        {
+          "name": "MatLegacyFooterRow",
+          "initializer": "i0.ɵɵdefineComponent({ type: MatLegacyFooterRow, selectors: [[\"mat-footer-row\"], [\"tr\", \"mat-footer-row\", \"\"]], hostAttrs: [\"role\", \"row\", 1, \"mat-footer-row\"], exportAs: [\"matFooterRow\"], standalone: false, features: [i0.ɵɵProvidersFeature([{ provide: CdkFooterRow, useExisting: MatLegacyFooterRow }]), i0.ɵɵInheritDefinitionFeature], decls: 1, vars: 0, consts: [[\"cdkCellOutlet\", \"\"]], template: function MatLegacyFooterRow_Template(rf, ctx) { if (rf & 1) {\n            i0.ɵɵelementContainer(0, 0);\n        } }, dependencies: i0.ɵɵgetComponentDepsFactory(MatLegacyFooterRow), encapsulation: 2, changeDetection: ChangeDetectionStrategy.Eager })",
+          "sha256": "c0507f7a47a0525cdcac63f017be5ee68e586cf624041b220e1ab5d51cd65a64"
+        },
+        {
+          "name": "MatLegacyRow",
+          "initializer": "i0.ɵɵdefineComponent({ type: MatLegacyRow, selectors: [[\"mat-row\"], [\"tr\", \"mat-row\", \"\"]], hostAttrs: [\"role\", \"row\", 1, \"mat-row\"], exportAs: [\"matRow\"], standalone: false, features: [i0.ɵɵProvidersFeature([{ provide: CdkRow, useExisting: MatLegacyRow }]), i0.ɵɵInheritDefinitionFeature], decls: 1, vars: 0, consts: [[\"cdkCellOutlet\", \"\"]], template: function MatLegacyRow_Template(rf, ctx) { if (rf & 1) {\n            i0.ɵɵelementContainer(0, 0);\n        } }, dependencies: i0.ɵɵgetComponentDepsFactory(MatLegacyRow), encapsulation: 2, changeDetection: ChangeDetectionStrategy.Eager })",
+          "sha256": "99ca4cac23587ffcb09a640174489e2a823d530821ea056d967874c3ebbea9a8"
+        }
+      ]
+    }
+  ],
+  "source_review_complete": true,
+  "proposed_final_disposition": "do-not-adopt",
+  "proposed_reason": "The original fix changes ordinary current Material source template resolution. The retained legacy table already owns its inline table template and outlet protocols; the unchanged legacy rows at the actual supported21.x minimum compile with strict templates in both partial and experimental-local modes. Same-file and cross-file literal variants emit identical component definitions and public declarations. Preserve the already reviewed public peer template binding and historical markup; no product repair is justified by this change.",
+  "upstream_current_components_copied": 0,
+  "source_bindings": [
+    {
+      "path": "scripts/upstream-table-local-compilation-source.mjs",
+      "sha256": "c974a2f88021e8d6c8e238978b677061494565f2d084e2f2a859fb39b7be5772",
+      "bytes": 27348
+    },
+    {
+      "path": "compatibility/rc/21x-table-local-compilation-source-originals.json.gz",
+      "sha256": "014157272208f6bf74e690f0d32684328b7efded3141d653037c7ac2a65ef137",
+      "bytes": 40498
+    },
+    {
+      "path": "compatibility/rc/upstream-complete-patch-census.json.gz",
+      "sha256": "806433925a6216b52b26a98b3b91eb7129a506ab0363573b7cc21063c1366e97",
+      "bytes": 2172936
+    },
+    {
+      "path": "compatibility/rc/21x-table-local-compilation-source-current.json",
+      "sha256": "e6746247cfbc087ca360e78ee950f9770f3f5ea444f9ec455c3c6fceb56ab0cb",
+      "bytes": 18106
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/_table-legacy-index.scss",
+      "sha256": "eb6fb4789f3bc652cccb73a989b09fc54aa6799742658ba147fcf2e9b54bd8eb",
+      "bytes": 178
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/_table-theme.import.scss",
+      "sha256": "cad851af3ec90604d9010eeb817624289e79762706ee95a8206671a88c25449b",
+      "bytes": 367
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/_table-theme.scss",
+      "sha256": "aedf3dd8efef2e070a12d1feb78b4cd9559a496a0a536b70f64d859cf0113160",
+      "bytes": 2560
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/cell.ts",
+      "sha256": "28359f7f5b9f4145e809340e8b0b441507d7c08323cea13cde6dea86b3dd1dbb",
+      "bytes": 6510
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/index.ts",
+      "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+      "bytes": 233
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/column-classes.ts",
+      "sha256": "58ad7e5915fd944328fa3442ad0a5c02f09623694219dbdb04fa1b11907d5f64",
+      "bytes": 1370
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/common-behaviors/color.ts",
+      "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+      "bytes": 1888
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/common-behaviors/constructor.ts",
+      "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+      "bytes": 450
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/common-behaviors/disable-ripple.ts",
+      "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+      "bytes": 1211
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/common-behaviors/disabled.ts",
+      "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+      "bytes": 1073
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/common-behaviors/error-state.ts",
+      "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+      "bytes": 2623
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/common-behaviors/index.ts",
+      "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+      "bytes": 625
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/common-behaviors/initialized.ts",
+      "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+      "bytes": 3061
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/common-behaviors/tabindex.ts",
+      "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+      "bytes": 1503
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/common-module.ts",
+      "sha256": "a36d4381d828eccbf40815dcac053048a054b3fa6ce90f6fb41b58b04183c8ee",
+      "bytes": 374
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/definition-owner.ts",
+      "sha256": "6a115eb4ae6c5d50814d1460fd4ba7c2a6cab2eab6d213af5964ab1e3aa6b5dc",
+      "bytes": 1422
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+      "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+      "bytes": 1410
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts",
+      "sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "bytes": 1816
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+      "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374",
+      "bytes": 16475
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/table-outlet.ts",
+      "sha256": "522c2133fd03d68e669c521a029e060754d1c2de92cf1a500b33993f7cd31a8e",
+      "bytes": 1216
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/ng-package.json",
+      "sha256": "7e9ac727fee783de8aa9c29f31937d13f49465f4a9b7a23a648d8176d29270e7",
+      "bytes": 38
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/public-api.ts",
+      "sha256": "ff9e95bd86923239f7072a38b3a47c00e490410f54490df1f3075c1329ef9efb",
+      "bytes": 1386
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/row.ts",
+      "sha256": "b57c2be6361b4caf802e9e13759f3bdebab413cd0a903f37ebf6e6443cf4f37d",
+      "bytes": 6940
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table-data-source.ts",
+      "sha256": "b8c35487e4234549a48563b64665b9d38e0ac0f90310d3957b7f31e8084f7904",
+      "bytes": 1231
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table-module.ts",
+      "sha256": "be102d89a290d5028da2e1f2a6a19dd8a1d543a68e57861fb22b35ff4c8e2818",
+      "bytes": 1871
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.scss",
+      "sha256": "b44bf2db4265779e8f39ce8f2a1a61d8d527da2343655ba32af4b84bf7061b76",
+      "bytes": 1499
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+      "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+      "bytes": 3818
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/testing/cell-harness.ts",
+      "sha256": "5b60ba3ce6a7b814fdf26334bd8791dccaccf9499cb0b206f9fc9a3a3207658f",
+      "bytes": 1553
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/testing/index.ts",
+      "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+      "bytes": 233
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/testing/internal/cell-harness-base.ts",
+      "sha256": "5f6807930e82603f8b777a4c3f36c1bb58d4bf9207060806dd66c033df1aa77e",
+      "bytes": 1766
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/testing/internal/row-harness-base.ts",
+      "sha256": "23451db2fc2ef6923faddd709c85fcc66993f887de2aeec494927fa2f7c18592",
+      "bytes": 1960
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/testing/ng-package.json",
+      "sha256": "7e9ac727fee783de8aa9c29f31937d13f49465f4a9b7a23a648d8176d29270e7",
+      "bytes": 38
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/testing/public-api.ts",
+      "sha256": "19954de13259512097c3cafabc26aa47a4967ed6ad68101083404d13ccfcadf1",
+      "bytes": 1080
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/testing/row-harness.ts",
+      "sha256": "9a3a71945411443c023d33f46ee0ee7a228e2c1308be0f5940d9bcc107e17b0f",
+      "bytes": 1992
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/testing/table-harness-base.ts",
+      "sha256": "537d249e950c6e44d4becf3e62df9e31e0c21dba6c5616ac0cb5ce7b66ee960c",
+      "bytes": 3988
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/testing/table-harness.ts",
+      "sha256": "29f2989e2256f19e4652d5eaebb03c7b537cc923ce82d66bed7684555525e303",
+      "bytes": 1531
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/text-column.ts",
+      "sha256": "157c01cc18f67ff7e499442e6f16a7a23ec08284d069b2318a5d8bae11dc4431",
+      "bytes": 2578
+    },
+    {
+      "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+      "sha256": "14d0d2ebb8c3f78a04b1c93becd6ce4b79400381af97d0ccfe7df93cfc228030",
+      "bytes": 1552
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d",
+      "bytes": 1397
+    },
+    {
+      "path": "toolchain-lock.json",
+      "sha256": "5e20f11d3a06b03fb5194af421e4ba11aafa2609fa4d0a34793b39097b65278b",
+      "bytes": 2142
+    },
+    {
+      "path": ".node-version",
+      "sha256": "73fb1b615e2043a933be1c0895cde4358036acc28d785692509b822aa53c761f",
+      "bytes": 8
+    },
+    {
+      "path": ".npm-version",
+      "sha256": "005206ab803f8881d8227540b7980b37e723b69a8849edb31734a90b7e7964e2",
+      "bytes": 8
+    },
+    {
+      "path": "package.json",
+      "sha256": "a3a268beffc3620d3fdeeadc1269c9e9676adbf3e40f55d45cd9683c85e4a060",
+      "bytes": 1647
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "e8b2cd00e56fd38e40f547bcacd2b38088b71548f40b3e15137fb91a1bef87a2",
+      "bytes": 188697
+    },
+    {
+      "path": "compatibility/f10/authored-use-reviews/table-callers.json",
+      "sha256": "f5be9ec76bb6a01dd232bb8ab701dfdda1f23d58089b012dec1c6bc49f250164",
+      "bytes": 114544
+    },
+    {
+      "path": "compatibility/rc/table-caller-roles-public-21.json",
+      "sha256": "71056479eb45ddfee634d7a51cd23d8af44a38620f0fe5db844c930172c6c7f9",
+      "bytes": 176900
+    },
+    {
+      "path": "scripts/table-caller-roles.mjs",
+      "sha256": "02dd73f59378bbc92bd4a09feb67058fa20960827e8be5034cc930a2ea899581",
+      "bytes": 26015
+    },
+    {
+      "path": "scripts/table-caller-public-subjects.mjs",
+      "sha256": "b913900d35aa5b9ce6a0d3e0b366d273a91420adab526313e7091de663bbcce8",
+      "bytes": 6205
+    },
+    {
+      "path": "compatibility/rc/table-caller-public-subjects.json",
+      "sha256": "57d7ae63d7887c9c596bce3c40b88a3c13319672b575b6715990aae73c362942",
+      "bytes": 250501
+    },
+    {
+      "path": "node_modules/@angular/cdk/package.json",
+      "sha256": "10c398ae1ae4854e4c98b3715f8e0f225e34b7773fa3c582f11d67852a003ea9",
+      "bytes": 5041
+    },
+    {
+      "path": "node_modules/@angular/cdk/types/table.d.ts",
+      "sha256": "87da6f6b6bc01549d46dbd5333921b58b4ad160b1f209047f6c79dc510cb1d12",
+      "bytes": 48348
+    },
+    {
+      "path": "node_modules/@angular/cdk/fesm2022/table.mjs",
+      "sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11",
+      "bytes": 77766
+    },
+    {
+      "path": "node_modules/@angular/core/package.json",
+      "sha256": "138e466e558dfb07101223dd71e46db11e5ae49c29a8906bd7dae49b9ce34970",
+      "bytes": 2508
+    },
+    {
+      "path": "node_modules/@angular/compiler/package.json",
+      "sha256": "c709f61e560072dc56d543a6fd113aa8cd0adc1cada18bd60605722aeb30c8dd",
+      "bytes": 1250
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/package.json",
+      "sha256": "9eca79a77976aa1248075243c95ae245e1ec4c276758c3c9966d217d80c4b435",
+      "bytes": 2226
+    },
+    {
+      "path": "node_modules/typescript/package.json",
+      "sha256": "5a0bb7f286c4b3f1413a42c05f902311b161f70e5f52d9da10490443bfd595a3",
+      "bytes": 3620
+    },
+    {
+      "path": "node_modules/typescript/lib/typescript.js",
+      "sha256": "e5f1f6b3e82228a89873cc7b941b2465185e839c0692860f83e3e63e53f94c2b",
+      "bytes": 9111680
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/chunk-FGO3CGWV.js",
+      "sha256": "7d8777bc88f618874412ecf725364d89ef88fd2f343e8a880a2858159592da0c",
+      "bytes": 13645
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/chunk-HVJBZFLS.js",
+      "sha256": "20187aa7ce95af4d8ed84fe1bfd9c581d43699f8f9869337159b20a2a8d3450e",
+      "bytes": 51188
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/chunk-IEBNHER4.js",
+      "sha256": "539883fd8a57fe8319bef9224afc6623b39c87c6593555d8554393ad42553bab",
+      "bytes": 568
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/chunk-KWAGEHJJ.js",
+      "sha256": "1c92f32c8c2c76760438a3832bffd37f5a5bc1f0b800c31b1fe9381277b462b4",
+      "bytes": 3214
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/chunk-PMBD6IFV.js",
+      "sha256": "fdfa42fb523c6d74b3edca0d99c17970878beaf5359001f9b9b787eb1e76e165",
+      "bytes": 221379
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/chunk-SEJGUMO2.js",
+      "sha256": "da1c9f5496a1e833eac1f0371bb6876d87db28b213037065abe67bec417203df",
+      "bytes": 1471
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/chunk-SOKUOCYN.js",
+      "sha256": "41edc7e049bef4dedf50b953b857c2c8e246f4a0d80da57978e4518b873453fc",
+      "bytes": 15101
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/chunk-UTWH365F.js",
+      "sha256": "c53ded5e71175a8272892bee7041dbd3115f8a4fd682b0c9fcdff8e4adb6e03c",
+      "bytes": 10545
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/chunk-XMX6JBER.js",
+      "sha256": "26ca9ce26111e3feecd5589a43a4c590f6b285e0a9b1200b0ecf4a0b338455e8",
+      "bytes": 922363
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/chunk-Y5V7YWTG.js",
+      "sha256": "ef3d2e62aa5f86d8769c69df071d531bb67ced90a1af889a13f8da2c34abfa31",
+      "bytes": 19893
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/chunk-ZQDF64UO.js",
+      "sha256": "0a6e9d0fb2683658b6b49feb536a3167a7cd2370f5759d3700c29c63aefde081",
+      "bytes": 23137
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/index.js",
+      "sha256": "4731905e64aab3520b1847b107eae1a960657aad9b13f50cb1b0d6159bf0863a",
+      "bytes": 6269
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/linker/babel/index.js",
+      "sha256": "00b749e4065a6437ee70860df5f50ea6e13bf3575ed9095d6336996b810cdec5",
+      "bytes": 19449
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/linker/index.js",
+      "sha256": "4e59211196cad602e02def1da6df52333c84b4d607457535cca5c37bbd3cac27",
+      "bytes": 769
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/private/localize.js",
+      "sha256": "c97e4accaf315fd384fb1ee1181634761ee6f8e5a41b7c25fde0708be8b449d5",
+      "bytes": 1449
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/private/migrations.js",
+      "sha256": "44a0094caaad37931bb3eb80f6ef8435a22abdb7cc6adf47faf56229737d531e",
+      "bytes": 1884
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/private/testing.js",
+      "sha256": "3c657032f63066ea8c91c280337ac42f77c28c5671cd021c55fc7a1c04f1d48c",
+      "bytes": 16133
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/private/tooling.js",
+      "sha256": "137cc015e08f2ceecd0f085fc31eefd09e3d7ca5a7a862fd7a12f16dfcb8a9dc",
+      "bytes": 1037
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/src/bin/ng_xi18n.js",
+      "sha256": "e7a171beaa20e16d5ce00122cfbde7b5ffdda716c3052f6e576a78b8da73ac0c",
+      "bytes": 1982
+    },
+    {
+      "path": "node_modules/@angular/compiler-cli/bundles/src/bin/ngc.js",
+      "sha256": "7c65a0087c8f20eb1e9f8a68c5b42281f245b83f59909f9fd8b30001e768fe84",
+      "bytes": 1105
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/ledger.json",
+      "sha256": "4fd46af746fb9e2b0a27b0cd4b1341ed3b06cda873a6432eb4e6e35dbeb56ad9",
+      "bytes": 4187291
+    },
+    {
+      "path": "compatibility/rc/21x-remaining-disposition-worksheet.json",
+      "sha256": "d63dada985bfe970a679b6a47572a4135c579e5e981ddea074628679c48c77b1",
+      "bytes": 268594
+    },
+    {
+      "path": "scripts/upstream-source-contract-registry.mjs",
+      "sha256": "d8435c9ff6582547a8ef3b367a9b37573a57f7bc102370c237425e3c0648d59a",
+      "bytes": 15313
+    },
+    {
+      "path": "compatibility/rc/21x-legacy-removal-admission-canonical-qualified.json",
+      "sha256": "85c28d4ca38ffe83c6ebaeb1d5e2929c4d59b473e48af8e35b0279f27ed8d852",
+      "bytes": 11151
+    },
+    {
+      "path": "compatibility/rc/21x-table-local-compilation-source-compiler.json",
+      "sha256": "e2d915d5596015ade4ac95f83bf7071549dd9a3364db8315d2c3d17c518393eb",
+      "bytes": 50827
+    },
+    {
+      "path": "compatibility/rc/21x-table-local-compilation-source-compiler-controls.json",
+      "sha256": "f141692ed853a4def772a2ab2549e2709d5ee039837339dcadde2fa977b66364",
+      "bytes": 28045
+    },
+    {
+      "path": "compatibility/rc/21x-table-local-compilation-source-compiler-probe.mjs",
+      "sha256": "4aaf076fc4968a40c3f4344abeef072b1eb2d2ce935550c76c04d8d5707cb57d",
+      "bytes": 6687
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+compiler-cli@21.2.23_@angular+compiler@21.2.23_typescript@5.9.2/node_modules/@angular/compiler-cli/bundles/src/bin/ngc.js",
+      "sha256": "7c65a0087c8f20eb1e9f8a68c5b42281f245b83f59909f9fd8b30001e768fe84",
+      "bytes": 1105
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+compiler-cli@21.2.23_@angular+compiler@21.2.23_typescript@5.9.2/node_modules/@angular/compiler-cli/package.json",
+      "sha256": "9eca79a77976aa1248075243c95ae245e1ec4c276758c3c9966d217d80c4b435",
+      "bytes": 2226
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+compiler@21.2.23/node_modules/@angular/compiler/package.json",
+      "sha256": "c709f61e560072dc56d543a6fd113aa8cd0adc1cada18bd60605722aeb30c8dd",
+      "bytes": 1250
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1/node_modules/@angular/core/package.json",
+      "sha256": "138e466e558dfb07101223dd71e46db11e5ae49c29a8906bd7dae49b9ce34970",
+      "bytes": 2508
+    },
+    {
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/package.json",
+      "sha256": "10c398ae1ae4854e4c98b3715f8e0f225e34b7773fa3c582f11d67852a003ea9",
+      "bytes": 5041
+    },
+    {
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/package.json",
+      "sha256": "5a0bb7f286c4b3f1413a42c05f902311b161f70e5f52d9da10490443bfd595a3",
+      "bytes": 3620
+    },
+    {
+      "path": "compatibility/rc/21x-table-local-compilation-source-compiler-controls.mjs",
+      "sha256": "ec78652e5f4d9db42d68173ec784a64ec8814de38631fc2721487dbf8523f4e5",
+      "bytes": 3800
+    }
+  ],
+  "family_members": 37,
+  "cyph_sanity": {
+    "root": "~/cyph",
+    "read_only": true,
+    "members": [
+      {
+        "path": "shared/css/cyph.base.scss",
+        "sha256": "44db9a3820a38154df9c2fa68163f5df91510f1f343214703068663eaf003267",
+        "bytes": 11498,
+        "observed_contracts": [
+          "mat-row.clickable"
+        ]
+      },
+      {
+        "path": "shared/js/cyph/modules/cyph-web.module.ts",
+        "sha256": "edc9a64ad271ba3f697a98d1a4a30c43e58d720426088c762949593d4b11b8c0",
+        "bytes": 8388,
+        "observed_contracts": [
+          "MatLegacyTableModule",
+          "@angular/material/legacy-table"
+        ]
+      },
+      {
+        "path": "shared/js/cyph/components/account-wallets/account-wallets.component.html",
+        "sha256": "bc6a59569b3f5e3045b601f7b296af7a7aae1f302f94391434c10d49d7b1683d",
+        "bytes": 11115,
+        "observed_contracts": [
+          "<mat-table",
+          "<mat-header-row",
+          "<mat-row"
+        ]
+      },
+      {
+        "path": "shared/js/cyph/components/account-base-file-list/account-base-file-list.component.html",
+        "sha256": "d073c06cd34eff7b8cef3b14f23f188814b47caf38a998e8d24546ff8d8f6c14",
+        "bytes": 27369,
+        "observed_contracts": [
+          "<mat-table",
+          "<mat-header-row",
+          "<mat-row",
+          "[class.clickable]"
+        ]
+      },
+      {
+        "path": "shared/js/cyph/components/account-base-file-list/account-base-file-list.component.ts",
+        "sha256": "0e3764b5e631d968cb590228f1703a4a9e6b0e0d82a878be69e28ea9c261d6c3",
+        "bytes": 15295,
+        "observed_contracts": [
+          "MatLegacyTableDataSource"
+        ]
+      }
+    ],
+    "consumer_source_changed": false,
+    "consumer_build_executed": false,
+    "scope": "Source usage and selectors only;no HTML/CSS/SCSS/API changes are proposed by this task."
+  },
+  "canonical_dispositions_changed": 0,
+  "source_admissions_changed": 0,
+  "product_changes": 0,
+  "protected_canonical_files_unchanged": true,
+  "prior_counts": {
+    "closed": 425,
+    "pending": 1272,
+    "source_admissions": 89,
+    "registry_records": 68,
+    "security_review": 1
+  },
+  "scope_limit": "Only complete original source applicability,three exact extracted row declarations and existing source protocols. Experimental local compilation is a diagnostic,not a published requirement. No complete owned-module AOT,consumer build,native rendering,CSS geometry,packed artifact,full floor or independent audit acceptance.",
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

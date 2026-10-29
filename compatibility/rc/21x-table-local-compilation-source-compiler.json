@@ -1,0 +1,283 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Small extracted-row actual pinned compiler experiment; no whole owned-module or consumer acceptance",
+  "node": "v24.21.0",
+  "producer": {
+    "path": "compatibility/rc/21x-table-local-compilation-source-compiler-probe.mjs",
+    "sha256": "4aaf076fc4968a40c3f4344abeef072b1eb2d2ce935550c76c04d8d5707cb57d"
+  },
+  "owned_row_source": {
+    "path": "projects/ngx-material-legacy/legacy-table/row.ts",
+    "sha256": "b57c2be6361b4caf802e9e13759f3bdebab413cd0a903f37ebf6e6443cf4f37d",
+    "bytes": 6940
+  },
+  "originals": {
+    "path": "compatibility/rc/21x-table-local-compilation-source-originals.json.gz",
+    "sha256": "014157272208f6bf74e690f0d32684328b7efded3141d653037c7ac2a65ef137",
+    "bytes": 40498
+  },
+  "packages": [
+    {
+      "name": "@angular/compiler-cli",
+      "path": "node_modules/.pnpm/@angular+compiler-cli@21.2.23_@angular+compiler@21.2.23_typescript@5.9.2/node_modules/@angular/compiler-cli/package.json",
+      "sha256": "9eca79a77976aa1248075243c95ae245e1ec4c276758c3c9966d217d80c4b435",
+      "bytes": 2226,
+      "version": "21.2.23"
+    },
+    {
+      "name": "@angular/compiler",
+      "path": "node_modules/.pnpm/@angular+compiler@21.2.23/node_modules/@angular/compiler/package.json",
+      "sha256": "c709f61e560072dc56d543a6fd113aa8cd0adc1cada18bd60605722aeb30c8dd",
+      "bytes": 1250,
+      "version": "21.2.23"
+    },
+    {
+      "name": "@angular/core",
+      "path": "node_modules/.pnpm/@angular+core@21.2.23_@angular+compiler@21.2.23_rxjs@7.8.2_zone.js@0.15.1/node_modules/@angular/core/package.json",
+      "sha256": "138e466e558dfb07101223dd71e46db11e5ae49c29a8906bd7dae49b9ce34970",
+      "bytes": 2508,
+      "version": "21.2.23"
+    },
+    {
+      "name": "@angular/cdk",
+      "path": "node_modules/.pnpm/@angular+cdk@21.2.14_@angular+common@21.2.23_@angular+core@21.2.23_@angular+compiler@21_40bcd6f6cf4e1eed9fbbef53c517e6ef/node_modules/@angular/cdk/package.json",
+      "sha256": "10c398ae1ae4854e4c98b3715f8e0f225e34b7773fa3c582f11d67852a003ea9",
+      "bytes": 5041,
+      "version": "21.2.14"
+    },
+    {
+      "name": "typescript",
+      "path": "node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/package.json",
+      "sha256": "5a0bb7f286c4b3f1413a42c05f902311b161f70e5f52d9da10490443bfd595a3",
+      "bytes": 3620,
+      "version": "5.9.2"
+    }
+  ],
+  "compiler_entry": {
+    "path": "node_modules/.pnpm/@angular+compiler-cli@21.2.23_@angular+compiler@21.2.23_typescript@5.9.2/node_modules/@angular/compiler-cli/bundles/src/bin/ngc.js",
+    "sha256": "7c65a0087c8f20eb1e9f8a68c5b42281f245b83f59909f9fd8b30001e768fe84"
+  },
+  "actual_command": [
+    "/nix/store/w8jijs92barihdb0z54dsgq5szj2wd47-nodejs-24.21.0/bin/node",
+    "node_modules/.pnpm/@angular+compiler-cli@21.2.23_@angular+compiler@21.2.23_typescript@5.9.2/node_modules/@angular/compiler-cli/bundles/src/bin/ngc.js",
+    "-p",
+    "<temporary-cell>/tsconfig.json",
+    "--pretty",
+    "false"
+  ],
+  "exact_extracted_classes": [
+    "MatLegacyHeaderRow",
+    "MatLegacyFooterRow",
+    "MatLegacyRow"
+  ],
+  "row_template": "<ng-container cdkCellOutlet></ng-container>",
+  "row_template_matches_untouched16": true,
+  "cells": [
+    {
+      "mode": "partial",
+      "variant": "before",
+      "strictTemplates": true,
+      "fixture": "import {Component,ChangeDetectionStrategy,ViewEncapsulation,NgModule} from '@angular/core';\nimport {CDK_ROW_TEMPLATE,CdkHeaderRow,CdkFooterRow,CdkRow,CdkTableModule} from '@angular/cdk/table';\n\n@Component({\n  standalone: false,\n  selector: 'mat-header-row, tr[mat-header-row]',\n  template: CDK_ROW_TEMPLATE,\n  host: {\n    'class': 'mat-header-row',\n    'role': 'row',\n  },\n  // See note on CdkTable for explanation on why this uses the default change detection strategy.\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Eager,\n  encapsulation: ViewEncapsulation.None,\n  exportAs: 'matHeaderRow',\n  providers: [{provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow}],\n})\nexport class MatLegacyHeaderRow extends CdkHeaderRow {}\n\n@Component({\n  standalone: false,\n  selector: 'mat-footer-row, tr[mat-footer-row]',\n  template: CDK_ROW_TEMPLATE,\n  host: {\n    'class': 'mat-footer-row',\n    'role': 'row',\n  },\n  // See note on CdkTable for explanation on why this uses the default change detection strategy.\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Eager,\n  encapsulation: ViewEncapsulation.None,\n  exportAs: 'matFooterRow',\n  providers: [{provide: CdkFooterRow, useExisting: MatLegacyFooterRow}],\n})\nexport class MatLegacyFooterRow extends CdkFooterRow {}\n\n@Component({\n  standalone: false,\n  selector: 'mat-row, tr[mat-row]',\n  template: CDK_ROW_TEMPLATE,\n  host: {\n    'class': 'mat-row',\n    'role': 'row',\n  },\n  // See note on CdkTable for explanation on why this uses the default change detection strategy.\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Eager,\n  encapsulation: ViewEncapsulation.None,\n  exportAs: 'matRow',\n  providers: [{provide: CdkRow, useExisting: MatLegacyRow}],\n})\nexport class MatLegacyRow extends CdkRow {}\n@NgModule({imports:[CdkTableModule],declarations:[MatLegacyHeaderRow,MatLegacyFooterRow,MatLegacyRow],exports:[MatLegacyHeaderRow,MatLegacyFooterRow,MatLegacyRow]})\nexport class ExtractedLegacyRowModule {}\n",
+      "fixture_sha256": "75fed1bd5e1b4ee599f67bac152d8a45c7147704cc4cedf27139453900609f0b",
+      "config": {
+        "compilerOptions": {
+          "target": "es2022",
+          "module": "es2022",
+          "moduleResolution": "bundler",
+          "experimentalDecorators": true,
+          "strict": true,
+          "skipLibCheck": false,
+          "types": [],
+          "lib": [
+            "es2022",
+            "dom"
+          ],
+          "declaration": true,
+          "noEmitOnError": true,
+          "outDir": "out"
+        },
+        "angularCompilerOptions": {
+          "compilationMode": "partial",
+          "strictTemplates": true
+        },
+        "files": [
+          "rows.ts"
+        ]
+      },
+      "exit_code": 0,
+      "seconds": 2.117867,
+      "stdout": "",
+      "stderr": "",
+      "outputs": [
+        {
+          "path": "out/rows.d.ts",
+          "sha256": "9e5e803e119b111c58feaf372a6b2f521f758b3d47cbee192b6a1db844ce64c6",
+          "bytes": 1450,
+          "body": "import { CdkHeaderRow, CdkFooterRow, CdkRow } from '@angular/cdk/table';\nimport * as i0 from \"@angular/core\";\nimport * as i1 from \"@angular/cdk/table\";\nexport declare class MatLegacyHeaderRow extends CdkHeaderRow {\n    static ɵfac: i0.ɵɵFactoryDeclaration<MatLegacyHeaderRow, never>;\n    static ɵcmp: i0.ɵɵComponentDeclaration<MatLegacyHeaderRow, \"mat-header-row, tr[mat-header-row]\", [\"matHeaderRow\"], {}, {}, never, never, false, never>;\n}\nexport declare class MatLegacyFooterRow extends CdkFooterRow {\n    static ɵfac: i0.ɵɵFactoryDeclaration<MatLegacyFooterRow, never>;\n    static ɵcmp: i0.ɵɵComponentDeclaration<MatLegacyFooterRow, \"mat-footer-row, tr[mat-footer-row]\", [\"matFooterRow\"], {}, {}, never, never, false, never>;\n}\nexport declare class MatLegacyRow extends CdkRow {\n    static ɵfac: i0.ɵɵFactoryDeclaration<MatLegacyRow, never>;\n    static ɵcmp: i0.ɵɵComponentDeclaration<MatLegacyRow, \"mat-row, tr[mat-row]\", [\"matRow\"], {}, {}, never, never, false, never>;\n}\nexport declare class ExtractedLegacyRowModule {\n    static ɵfac: i0.ɵɵFactoryDeclaration<ExtractedLegacyRowModule, never>;\n    static ɵmod: i0.ɵɵNgModuleDeclaration<ExtractedLegacyRowModule, [typeof MatLegacyHeaderRow, typeof MatLegacyFooterRow, typeof MatLegacyRow], [typeof i1.CdkTableModule], [typeof MatLegacyHeaderRow, typeof MatLegacyFooterRow, typeof MatLegacyRow]>;\n    static ɵinj: i0.ɵɵInjectorDeclaration<ExtractedLegacyRowModule>;\n}\n"
+        },
+        {
+          "path": "out/rows.js",
+          "sha256": "21758bf0f06823dfd927aca4f15f73fd434fbcd4b202fcf451fe3923d2012ee6",
+          "bytes": 6796,
+          "body": "import { Component, ChangeDetectionStrategy, ViewEncapsulation, NgModule } from '@angular/core';\nimport { CDK_ROW_TEMPLATE, CdkHeaderRow, CdkFooterRow, CdkRow, CdkTableModule } from '@angular/cdk/table';\nimport * as i0 from \"@angular/core\";\nimport * as i1 from \"@angular/cdk/table\";\nexport class MatLegacyHeaderRow extends CdkHeaderRow {\n    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: MatLegacyHeaderRow, deps: null, target: i0.ɵɵFactoryTarget.Component });\n    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: \"14.0.0\", version: \"21.2.23\", type: MatLegacyHeaderRow, isStandalone: false, selector: \"mat-header-row, tr[mat-header-row]\", host: { attributes: { \"role\": \"row\" }, classAttribute: \"mat-header-row\" }, providers: [{ provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow }], exportAs: [\"matHeaderRow\"], usesInheritance: true, ngImport: i0, template: \"<ng-container cdkCellOutlet></ng-container>\", isInline: true, dependencies: [{ kind: \"directive\", type: i1.CdkCellOutlet, selector: \"[cdkCellOutlet]\" }], changeDetection: i0.ChangeDetectionStrategy.Eager, encapsulation: i0.ViewEncapsulation.None });\n}\ni0.ɵɵngDeclareClassMetadata({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: MatLegacyHeaderRow, decorators: [{\n            type: Component,\n            args: [{\n                    standalone: false,\n                    selector: 'mat-header-row, tr[mat-header-row]',\n                    template: CDK_ROW_TEMPLATE,\n                    host: {\n                        'class': 'mat-header-row',\n                        'role': 'row',\n                    },\n                    // See note on CdkTable for explanation on why this uses the default change detection strategy.\n                    // tslint:disable-next-line:validate-decorators\n                    changeDetection: ChangeDetectionStrategy.Eager,\n                    encapsulation: ViewEncapsulation.None,\n                    exportAs: 'matHeaderRow',\n                    providers: [{ provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow }],\n                }]\n        }] });\nexport class MatLegacyFooterRow extends CdkFooterRow {\n    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: MatLegacyFooterRow, deps: null, target: i0.ɵɵFactoryTarget.Component });\n    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: \"14.0.0\", version: \"21.2.23\", type: MatLegacyFooterRow, isStandalone: false, selector: \"mat-footer-row, tr[mat-footer-row]\", host: { attributes: { \"role\": \"row\" }, classAttribute: \"mat-footer-row\" }, providers: [{ provide: CdkFooterRow, useExisting: MatLegacyFooterRow }], exportAs: [\"matFooterRow\"], usesInheritance: true, ngImport: i0, template: \"<ng-container cdkCellOutlet></ng-container>\", isInline: true, dependencies: [{ kind: \"directive\", type: i1.CdkCellOutlet, selector: \"[cdkCellOutlet]\" }], changeDetection: i0.ChangeDetectionStrategy.Eager, encapsulation: i0.ViewEncapsulation.None });\n}\ni0.ɵɵngDeclareClassMetadata({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: MatLegacyFooterRow, decorators: [{\n            type: Component,\n            args: [{\n                    standalone: false,\n                    selector: 'mat-footer-row, tr[mat-footer-row]',\n                    template: CDK_ROW_TEMPLATE,\n                    host: {\n                        'class': 'mat-footer-row',\n                        'role': 'row',\n                    },\n                    // See note on CdkTable for explanation on why this uses the default change detection strategy.\n                    // tslint:disable-next-line:validate-decorators\n                    changeDetection: ChangeDetectionStrategy.Eager,\n                    encapsulation: ViewEncapsulation.None,\n                    exportAs: 'matFooterRow',\n                    providers: [{ provide: CdkFooterRow, useExisting: MatLegacyFooterRow }],\n                }]\n        }] });\nexport class MatLegacyRow extends CdkRow {\n    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: MatLegacyRow, deps: null, target: i0.ɵɵFactoryTarget.Component });\n    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: \"14.0.0\", version: \"21.2.23\", type: MatLegacyRow, isStandalone: false, selector: \"mat-row, tr[mat-row]\", host: { attributes: { \"role\": \"row\" }, classAttribute: \"mat-row\" }, providers: [{ provide: CdkRow, useExisting: MatLegacyRow }], exportAs: [\"matRow\"], usesInheritance: true, ngImport: i0, template: \"<ng-container cdkCellOutlet></ng-container>\", isInline: true, dependencies: [{ kind: \"directive\", type: i1.CdkCellOutlet, selector: \"[cdkCellOutlet]\" }], changeDetection: i0.ChangeDetectionStrategy.Eager, encapsulation: i0.ViewEncapsulation.None });\n}\ni0.ɵɵngDeclareClassMetadata({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: MatLegacyRow, decorators: [{\n            type: Component,\n            args: [{\n                    standalone: false,\n                    selector: 'mat-row, tr[mat-row]',\n                    template: CDK_ROW_TEMPLATE,\n                    host: {\n                        'class': 'mat-row',\n                        'role': 'row',\n                    },\n                    // See note on CdkTable for explanation on why this uses the default change detection strategy.\n                    // tslint:disable-next-line:validate-decorators\n                    changeDetection: ChangeDetectionStrategy.Eager,\n                    encapsulation: ViewEncapsulation.None,\n                    exportAs: 'matRow',\n                    providers: [{ provide: CdkRow, useExisting: MatLegacyRow }],\n                }]\n        }] });\nexport class ExtractedLegacyRowModule {\n    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: ExtractedLegacyRowModule, deps: [], target: i0.ɵɵFactoryTarget.NgModule });\n    static ɵmod = i0.ɵɵngDeclareNgModule({ minVersion: \"14.0.0\", version: \"21.2.23\", ngImport: i0, type: ExtractedLegacyRowModule, declarations: [MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow], imports: [CdkTableModule], exports: [MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow] });\n    static ɵinj = i0.ɵɵngDeclareInjector({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: ExtractedLegacyRowModule, imports: [CdkTableModule] });\n}\ni0.ɵɵngDeclareClassMetadata({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: ExtractedLegacyRowModule, decorators: [{\n            type: NgModule,\n            args: [{ imports: [CdkTableModule], declarations: [MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow], exports: [MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow] }]\n        }] });\n"
+        }
+      ]
+    },
+    {
+      "mode": "partial",
+      "variant": "after",
+      "strictTemplates": true,
+      "fixture": "import {Component,ChangeDetectionStrategy,ViewEncapsulation,NgModule} from '@angular/core';\nimport {CdkHeaderRow,CdkFooterRow,CdkRow,CdkTableModule} from '@angular/cdk/table';\n\nconst ROW_TEMPLATE = \"<ng-container cdkCellOutlet></ng-container>\";\n\n@Component({\n  standalone: false,\n  selector: 'mat-header-row, tr[mat-header-row]',\n  template: ROW_TEMPLATE,\n  host: {\n    'class': 'mat-header-row',\n    'role': 'row',\n  },\n  // See note on CdkTable for explanation on why this uses the default change detection strategy.\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Eager,\n  encapsulation: ViewEncapsulation.None,\n  exportAs: 'matHeaderRow',\n  providers: [{provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow}],\n})\nexport class MatLegacyHeaderRow extends CdkHeaderRow {}\n\n@Component({\n  standalone: false,\n  selector: 'mat-footer-row, tr[mat-footer-row]',\n  template: ROW_TEMPLATE,\n  host: {\n    'class': 'mat-footer-row',\n    'role': 'row',\n  },\n  // See note on CdkTable for explanation on why this uses the default change detection strategy.\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Eager,\n  encapsulation: ViewEncapsulation.None,\n  exportAs: 'matFooterRow',\n  providers: [{provide: CdkFooterRow, useExisting: MatLegacyFooterRow}],\n})\nexport class MatLegacyFooterRow extends CdkFooterRow {}\n\n@Component({\n  standalone: false,\n  selector: 'mat-row, tr[mat-row]',\n  template: ROW_TEMPLATE,\n  host: {\n    'class': 'mat-row',\n    'role': 'row',\n  },\n  // See note on CdkTable for explanation on why this uses the default change detection strategy.\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Eager,\n  encapsulation: ViewEncapsulation.None,\n  exportAs: 'matRow',\n  providers: [{provide: CdkRow, useExisting: MatLegacyRow}],\n})\nexport class MatLegacyRow extends CdkRow {}\n@NgModule({imports:[CdkTableModule],declarations:[MatLegacyHeaderRow,MatLegacyFooterRow,MatLegacyRow],exports:[MatLegacyHeaderRow,MatLegacyFooterRow,MatLegacyRow]})\nexport class ExtractedLegacyRowModule {}\n",
+      "fixture_sha256": "ba4ceefb945b1da7aac82e18924bf995bbf4f41a83377c027fc2852db8f81ea8",
+      "config": {
+        "compilerOptions": {
+          "target": "es2022",
+          "module": "es2022",
+          "moduleResolution": "bundler",
+          "experimentalDecorators": true,
+          "strict": true,
+          "skipLibCheck": false,
+          "types": [],
+          "lib": [
+            "es2022",
+            "dom"
+          ],
+          "declaration": true,
+          "noEmitOnError": true,
+          "outDir": "out"
+        },
+        "angularCompilerOptions": {
+          "compilationMode": "partial",
+          "strictTemplates": true
+        },
+        "files": [
+          "rows.ts"
+        ]
+      },
+      "exit_code": 0,
+      "seconds": 1.412295,
+      "stdout": "",
+      "stderr": "",
+      "outputs": [
+        {
+          "path": "out/rows.d.ts",
+          "sha256": "9e5e803e119b111c58feaf372a6b2f521f758b3d47cbee192b6a1db844ce64c6",
+          "bytes": 1450,
+          "body": "import { CdkHeaderRow, CdkFooterRow, CdkRow } from '@angular/cdk/table';\nimport * as i0 from \"@angular/core\";\nimport * as i1 from \"@angular/cdk/table\";\nexport declare class MatLegacyHeaderRow extends CdkHeaderRow {\n    static ɵfac: i0.ɵɵFactoryDeclaration<MatLegacyHeaderRow, never>;\n    static ɵcmp: i0.ɵɵComponentDeclaration<MatLegacyHeaderRow, \"mat-header-row, tr[mat-header-row]\", [\"matHeaderRow\"], {}, {}, never, never, false, never>;\n}\nexport declare class MatLegacyFooterRow extends CdkFooterRow {\n    static ɵfac: i0.ɵɵFactoryDeclaration<MatLegacyFooterRow, never>;\n    static ɵcmp: i0.ɵɵComponentDeclaration<MatLegacyFooterRow, \"mat-footer-row, tr[mat-footer-row]\", [\"matFooterRow\"], {}, {}, never, never, false, never>;\n}\nexport declare class MatLegacyRow extends CdkRow {\n    static ɵfac: i0.ɵɵFactoryDeclaration<MatLegacyRow, never>;\n    static ɵcmp: i0.ɵɵComponentDeclaration<MatLegacyRow, \"mat-row, tr[mat-row]\", [\"matRow\"], {}, {}, never, never, false, never>;\n}\nexport declare class ExtractedLegacyRowModule {\n    static ɵfac: i0.ɵɵFactoryDeclaration<ExtractedLegacyRowModule, never>;\n    static ɵmod: i0.ɵɵNgModuleDeclaration<ExtractedLegacyRowModule, [typeof MatLegacyHeaderRow, typeof MatLegacyFooterRow, typeof MatLegacyRow], [typeof i1.CdkTableModule], [typeof MatLegacyHeaderRow, typeof MatLegacyFooterRow, typeof MatLegacyRow]>;\n    static ɵinj: i0.ɵɵInjectorDeclaration<ExtractedLegacyRowModule>;\n}\n"
+        },
+        {
+          "path": "out/rows.js",
+          "sha256": "9c875baa6b00b993fb0097a8881ea53377873a1bc8d8b00adaed6ea97c1ad0ec",
+          "bytes": 6834,
+          "body": "import { Component, ChangeDetectionStrategy, ViewEncapsulation, NgModule } from '@angular/core';\nimport { CdkHeaderRow, CdkFooterRow, CdkRow, CdkTableModule } from '@angular/cdk/table';\nimport * as i0 from \"@angular/core\";\nimport * as i1 from \"@angular/cdk/table\";\nconst ROW_TEMPLATE = \"<ng-container cdkCellOutlet></ng-container>\";\nexport class MatLegacyHeaderRow extends CdkHeaderRow {\n    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: MatLegacyHeaderRow, deps: null, target: i0.ɵɵFactoryTarget.Component });\n    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: \"14.0.0\", version: \"21.2.23\", type: MatLegacyHeaderRow, isStandalone: false, selector: \"mat-header-row, tr[mat-header-row]\", host: { attributes: { \"role\": \"row\" }, classAttribute: \"mat-header-row\" }, providers: [{ provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow }], exportAs: [\"matHeaderRow\"], usesInheritance: true, ngImport: i0, template: \"<ng-container cdkCellOutlet></ng-container>\", isInline: true, dependencies: [{ kind: \"directive\", type: i1.CdkCellOutlet, selector: \"[cdkCellOutlet]\" }], changeDetection: i0.ChangeDetectionStrategy.Eager, encapsulation: i0.ViewEncapsulation.None });\n}\ni0.ɵɵngDeclareClassMetadata({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: MatLegacyHeaderRow, decorators: [{\n            type: Component,\n            args: [{\n                    standalone: false,\n                    selector: 'mat-header-row, tr[mat-header-row]',\n                    template: ROW_TEMPLATE,\n                    host: {\n                        'class': 'mat-header-row',\n                        'role': 'row',\n                    },\n                    // See note on CdkTable for explanation on why this uses the default change detection strategy.\n                    // tslint:disable-next-line:validate-decorators\n                    changeDetection: ChangeDetectionStrategy.Eager,\n                    encapsulation: ViewEncapsulation.None,\n                    exportAs: 'matHeaderRow',\n                    providers: [{ provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow }],\n                }]\n        }] });\nexport class MatLegacyFooterRow extends CdkFooterRow {\n    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: MatLegacyFooterRow, deps: null, target: i0.ɵɵFactoryTarget.Component });\n    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: \"14.0.0\", version: \"21.2.23\", type: MatLegacyFooterRow, isStandalone: false, selector: \"mat-footer-row, tr[mat-footer-row]\", host: { attributes: { \"role\": \"row\" }, classAttribute: \"mat-footer-row\" }, providers: [{ provide: CdkFooterRow, useExisting: MatLegacyFooterRow }], exportAs: [\"matFooterRow\"], usesInheritance: true, ngImport: i0, template: \"<ng-container cdkCellOutlet></ng-container>\", isInline: true, dependencies: [{ kind: \"directive\", type: i1.CdkCellOutlet, selector: \"[cdkCellOutlet]\" }], changeDetection: i0.ChangeDetectionStrategy.Eager, encapsulation: i0.ViewEncapsulation.None });\n}\ni0.ɵɵngDeclareClassMetadata({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: MatLegacyFooterRow, decorators: [{\n            type: Component,\n            args: [{\n                    standalone: false,\n                    selector: 'mat-footer-row, tr[mat-footer-row]',\n                    template: ROW_TEMPLATE,\n                    host: {\n                        'class': 'mat-footer-row',\n                        'role': 'row',\n                    },\n                    // See note on CdkTable for explanation on why this uses the default change detection strategy.\n                    // tslint:disable-next-line:validate-decorators\n                    changeDetection: ChangeDetectionStrategy.Eager,\n                    encapsulation: ViewEncapsulation.None,\n                    exportAs: 'matFooterRow',\n                    providers: [{ provide: CdkFooterRow, useExisting: MatLegacyFooterRow }],\n                }]\n        }] });\nexport class MatLegacyRow extends CdkRow {\n    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: MatLegacyRow, deps: null, target: i0.ɵɵFactoryTarget.Component });\n    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: \"14.0.0\", version: \"21.2.23\", type: MatLegacyRow, isStandalone: false, selector: \"mat-row, tr[mat-row]\", host: { attributes: { \"role\": \"row\" }, classAttribute: \"mat-row\" }, providers: [{ provide: CdkRow, useExisting: MatLegacyRow }], exportAs: [\"matRow\"], usesInheritance: true, ngImport: i0, template: \"<ng-container cdkCellOutlet></ng-container>\", isInline: true, dependencies: [{ kind: \"directive\", type: i1.CdkCellOutlet, selector: \"[cdkCellOutlet]\" }], changeDetection: i0.ChangeDetectionStrategy.Eager, encapsulation: i0.ViewEncapsulation.None });\n}\ni0.ɵɵngDeclareClassMetadata({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: MatLegacyRow, decorators: [{\n            type: Component,\n            args: [{\n                    standalone: false,\n                    selector: 'mat-row, tr[mat-row]',\n                    template: ROW_TEMPLATE,\n                    host: {\n                        'class': 'mat-row',\n                        'role': 'row',\n                    },\n                    // See note on CdkTable for explanation on why this uses the default change detection strategy.\n                    // tslint:disable-next-line:validate-decorators\n                    changeDetection: ChangeDetectionStrategy.Eager,\n                    encapsulation: ViewEncapsulation.None,\n                    exportAs: 'matRow',\n                    providers: [{ provide: CdkRow, useExisting: MatLegacyRow }],\n                }]\n        }] });\nexport class ExtractedLegacyRowModule {\n    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: ExtractedLegacyRowModule, deps: [], target: i0.ɵɵFactoryTarget.NgModule });\n    static ɵmod = i0.ɵɵngDeclareNgModule({ minVersion: \"14.0.0\", version: \"21.2.23\", ngImport: i0, type: ExtractedLegacyRowModule, declarations: [MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow], imports: [CdkTableModule], exports: [MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow] });\n    static ɵinj = i0.ɵɵngDeclareInjector({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: ExtractedLegacyRowModule, imports: [CdkTableModule] });\n}\ni0.ɵɵngDeclareClassMetadata({ minVersion: \"12.0.0\", version: \"21.2.23\", ngImport: i0, type: ExtractedLegacyRowModule, decorators: [{\n            type: NgModule,\n            args: [{ imports: [CdkTableModule], declarations: [MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow], exports: [MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow] }]\n        }] });\n"
+        }
+      ]
+    },
+    {
+      "mode": "experimental-local",
+      "variant": "before",
+      "strictTemplates": true,
+      "fixture": "import {Component,ChangeDetectionStrategy,ViewEncapsulation,NgModule} from '@angular/core';\nimport {CDK_ROW_TEMPLATE,CdkHeaderRow,CdkFooterRow,CdkRow,CdkTableModule} from '@angular/cdk/table';\n\n@Component({\n  standalone: false,\n  selector: 'mat-header-row, tr[mat-header-row]',\n  template: CDK_ROW_TEMPLATE,\n  host: {\n    'class': 'mat-header-row',\n    'role': 'row',\n  },\n  // See note on CdkTable for explanation on why this uses the default change detection strategy.\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Eager,\n  encapsulation: ViewEncapsulation.None,\n  exportAs: 'matHeaderRow',\n  providers: [{provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow}],\n})\nexport class MatLegacyHeaderRow extends CdkHeaderRow {}\n\n@Component({\n  standalone: false,\n  selector: 'mat-footer-row, tr[mat-footer-row]',\n  template: CDK_ROW_TEMPLATE,\n  host: {\n    'class': 'mat-footer-row',\n    'role': 'row',\n  },\n  // See note on CdkTable for explanation on why this uses the default change detection strategy.\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Eager,\n  encapsulation: ViewEncapsulation.None,\n  exportAs: 'matFooterRow',\n  providers: [{provide: CdkFooterRow, useExisting: MatLegacyFooterRow}],\n})\nexport class MatLegacyFooterRow extends CdkFooterRow {}\n\n@Component({\n  standalone: false,\n  selector: 'mat-row, tr[mat-row]',\n  template: CDK_ROW_TEMPLATE,\n  host: {\n    'class': 'mat-row',\n    'role': 'row',\n  },\n  // See note on CdkTable for explanation on why this uses the default change detection strategy.\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Eager,\n  encapsulation: ViewEncapsulation.None,\n  exportAs: 'matRow',\n  providers: [{provide: CdkRow, useExisting: MatLegacyRow}],\n})\nexport class MatLegacyRow extends CdkRow {}\n@NgModule({imports:[CdkTableModule],declarations:[MatLegacyHeaderRow,MatLegacyFooterRow,MatLegacyRow],exports:[MatLegacyHeaderRow,MatLegacyFooterRow,MatLegacyRow]})\nexport class ExtractedLegacyRowModule {}\n",
+      "fixture_sha256": "75fed1bd5e1b4ee599f67bac152d8a45c7147704cc4cedf27139453900609f0b",
+      "config": {
+        "compilerOptions": {
+          "target": "es2022",
+          "module": "es2022",
+          "moduleResolution": "bundler",
+          "experimentalDecorators": true,
+          "strict": true,
+          "skipLibCheck": false,
+          "types": [],
+          "lib": [
+            "es2022",
+            "dom"
+          ],
+          "declaration": true,
+          "noEmitOnError": true,
+          "outDir": "out"
+        },
+        "angularCompilerOptions": {
+          "compilationMode": "experimental-local",
+          "strictTemplates": true
+        },
+        "files": [
+          "rows.ts"
+        ]
+      },
+      "exit_code": 0,
+      "seconds": 1.10217,
+      "stdout": "",
+      "stderr": "",
+      "outputs": [
+        {
+          "path": "out/rows.d.ts",
+          "sha256": "027c2cc56ac8933201623edf3018a75d9a81736d56d2d108516fca45caec8f12",
+          "bytes": 306,
+          "body": "import { CdkHeaderRow, CdkFooterRow, CdkRow } from '@angular/cdk/table';\nexport declare class MatLegacyHeaderRow extends CdkHeaderRow {\n}\nexport declare class MatLegacyFooterRow extends CdkFooterRow {\n}\nexport declare class MatLegacyRow extends CdkRow {\n}\nexport declare class ExtractedLegacyRowModule {\n}\n"
+        },
+        {
+          "path": "out/rows.js",
+          "sha256": "023c39d47d3edb904df8330a424ea1f2485d84a670b1ef48b9e599ac4594b546",
+          "bytes": 7724,
+          "body": "import { Component, ChangeDetectionStrategy, ViewEncapsulation, NgModule } from '@angular/core';\nimport { CDK_ROW_TEMPLATE, CdkHeaderRow, CdkFooterRow, CdkRow, CdkTableModule } from '@angular/cdk/table';\nimport * as i0 from \"@angular/core\";\nexport class MatLegacyHeaderRow extends CdkHeaderRow {\n    static ɵfac = /*@__PURE__*/ (() => { let ɵMatLegacyHeaderRow_BaseFactory; return function MatLegacyHeaderRow_Factory(__ngFactoryType__) { return (ɵMatLegacyHeaderRow_BaseFactory || (ɵMatLegacyHeaderRow_BaseFactory = i0.ɵɵgetInheritedFactory(MatLegacyHeaderRow)))(__ngFactoryType__ || MatLegacyHeaderRow); }; })();\n    static ɵcmp = /*@__PURE__*/ i0.ɵɵdefineComponent({ type: MatLegacyHeaderRow, selectors: [[\"mat-header-row\"], [\"tr\", \"mat-header-row\", \"\"]], hostAttrs: [\"role\", \"row\", 1, \"mat-header-row\"], exportAs: [\"matHeaderRow\"], standalone: false, features: [i0.ɵɵProvidersFeature([{ provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow }]), i0.ɵɵInheritDefinitionFeature], decls: 1, vars: 0, consts: [[\"cdkCellOutlet\", \"\"]], template: function MatLegacyHeaderRow_Template(rf, ctx) { if (rf & 1) {\n            i0.ɵɵelementContainer(0, 0);\n        } }, dependencies: i0.ɵɵgetComponentDepsFactory(MatLegacyHeaderRow), encapsulation: 2, changeDetection: ChangeDetectionStrategy.Eager });\n}\n(() => { (typeof ngDevMode === \"undefined\" || ngDevMode) && i0.ɵsetClassMetadata(MatLegacyHeaderRow, [{\n        type: Component,\n        args: [{\n                standalone: false,\n                selector: 'mat-header-row, tr[mat-header-row]',\n                template: CDK_ROW_TEMPLATE,\n                host: {\n                    'class': 'mat-header-row',\n                    'role': 'row',\n                },\n                // See note on CdkTable for explanation on why this uses the default change detection strategy.\n                // tslint:disable-next-line:validate-decorators\n                changeDetection: ChangeDetectionStrategy.Eager,\n                encapsulation: ViewEncapsulation.None,\n                exportAs: 'matHeaderRow',\n                providers: [{ provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow }],\n            }]\n    }], null, null); })();\n(() => { (typeof ngDevMode === \"undefined\" || ngDevMode) && i0.ɵsetClassDebugInfo(MatLegacyHeaderRow, { className: \"MatLegacyHeaderRow\", filePath: \".cache/table-local-source-ubCpCD/experimental-local-before/rows.ts\", lineNumber: 19 }); })();\nexport class MatLegacyFooterRow extends CdkFooterRow {\n    static ɵfac = /*@__PURE__*/ (() => { let ɵMatLegacyFooterRow_BaseFactory; return function MatLegacyFooterRow_Factory(__ngFactoryType__) { return (ɵMatLegacyFooterRow_BaseFactory || (ɵMatLegacyFooterRow_BaseFactory = i0.ɵɵgetInheritedFactory(MatLegacyFooterRow)))(__ngFactoryType__ || MatLegacyFooterRow); }; })();\n    static ɵcmp = /*@__PURE__*/ i0.ɵɵdefineComponent({ type: MatLegacyFooterRow, selectors: [[\"mat-footer-row\"], [\"tr\", \"mat-footer-row\", \"\"]], hostAttrs: [\"role\", \"row\", 1, \"mat-footer-row\"], exportAs: [\"matFooterRow\"], standalone: false, features: [i0.ɵɵProvidersFeature([{ provide: CdkFooterRow, useExisting: MatLegacyFooterRow }]), i0.ɵɵInheritDefinitionFeature], decls: 1, vars: 0, consts: [[\"cdkCellOutlet\", \"\"]], template: function MatLegacyFooterRow_Template(rf, ctx) { if (rf & 1) {\n            i0.ɵɵelementContainer(0, 0);\n        } }, dependencies: i0.ɵɵgetComponentDepsFactory(MatLegacyFooterRow), encapsulation: 2, changeDetection: ChangeDetectionStrategy.Eager });\n}\n(() => { (typeof ngDevMode === \"undefined\" || ngDevMode) && i0.ɵsetClassMetadata(MatLegacyFooterRow, [{\n        type: Component,\n        args: [{\n                standalone: false,\n                selector: 'mat-footer-row, tr[mat-footer-row]',\n                template: CDK_ROW_TEMPLATE,\n                host: {\n                    'class': 'mat-footer-row',\n                    'role': 'row',\n                },\n                // See note on CdkTable for explanation on why this uses the default change detection strategy.\n                // tslint:disable-next-line:validate-decorators\n                changeDetection: ChangeDetectionStrategy.Eager,\n                encapsulation: ViewEncapsulation.None,\n                exportAs: 'matFooterRow',\n                providers: [{ provide: CdkFooterRow, useExisting: MatLegacyFooterRow }],\n            }]\n    }], null, null); })();\n(() => { (typeof ngDevMode === \"undefined\" || ngDevMode) && i0.ɵsetClassDebugInfo(MatLegacyFooterRow, { className: \"MatLegacyFooterRow\", filePath: \".cache/table-local-source-ubCpCD/experimental-local-before/rows.ts\", lineNumber: 36 }); })();\nexport class MatLegacyRow extends CdkRow {\n    static ɵfac = /*@__PURE__*/ (() => { let ɵMatLegacyRow_BaseFactory; return function MatLegacyRow_Factory(__ngFactoryType__) { return (ɵMatLegacyRow_BaseFactory || (ɵMatLegacyRow_BaseFactory = i0.ɵɵgetInheritedFactory(MatLegacyRow)))(__ngFactoryType__ || MatLegacyRow); }; })();\n    static ɵcmp = /*@__PURE__*/ i0.ɵɵdefineComponent({ type: MatLegacyRow, selectors: [[\"mat-row\"], [\"tr\", \"mat-row\", \"\"]], hostAttrs: [\"role\", \"row\", 1, \"mat-row\"], exportAs: [\"matRow\"], standalone: false, features: [i0.ɵɵProvidersFeature([{ provide: CdkRow, useExisting: MatLegacyRow }]), i0.ɵɵInheritDefinitionFeature], decls: 1, vars: 0, consts: [[\"cdkCellOutlet\", \"\"]], template: function MatLegacyRow_Template(rf, ctx) { if (rf & 1) {\n            i0.ɵɵelementContainer(0, 0);\n        } }, dependencies: i0.ɵɵgetComponentDepsFactory(MatLegacyRow), encapsulation: 2, changeDetection: ChangeDetectionStrategy.Eager });\n}\n(() => { (typeof ngDevMode === \"undefined\" || ngDevMode) && i0.ɵsetClassMetadata(MatLegacyRow, [{\n        type: Component,\n        args: [{\n                standalone: false,\n                selector: 'mat-row, tr[mat-row]',\n                template: CDK_ROW_TEMPLATE,\n                host: {\n                    'class': 'mat-row',\n                    'role': 'row',\n                },\n                // See note on CdkTable for explanation on why this uses the default change detection strategy.\n                // tslint:disable-next-line:validate-decorators\n                changeDetection: ChangeDetectionStrategy.Eager,\n                encapsulation: ViewEncapsulation.None,\n                exportAs: 'matRow',\n                providers: [{ provide: CdkRow, useExisting: MatLegacyRow }],\n            }]\n    }], null, null); })();\n(() => { (typeof ngDevMode === \"undefined\" || ngDevMode) && i0.ɵsetClassDebugInfo(MatLegacyRow, { className: \"MatLegacyRow\", filePath: \".cache/table-local-source-ubCpCD/experimental-local-before/rows.ts\", lineNumber: 53 }); })();\nexport class ExtractedLegacyRowModule {\n    static ɵfac = function ExtractedLegacyRowModule_Factory(__ngFactoryType__) { return new (__ngFactoryType__ || ExtractedLegacyRowModule)(); };\n    static ɵmod = /*@__PURE__*/ i0.ɵɵdefineNgModule({ type: ExtractedLegacyRowModule });\n    static ɵinj = /*@__PURE__*/ i0.ɵɵdefineInjector({ imports: [CdkTableModule, MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow] });\n}\n(() => { (typeof ngDevMode === \"undefined\" || ngDevMode) && i0.ɵsetClassMetadata(ExtractedLegacyRowModule, [{\n        type: NgModule,\n        args: [{ imports: [CdkTableModule], declarations: [MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow], exports: [MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow] }]\n    }], null, null); })();\n(function () { (typeof ngJitMode === \"undefined\" || ngJitMode) && i0.ɵɵsetNgModuleScope(ExtractedLegacyRowModule, { declarations: [MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow], imports: [CdkTableModule], exports: [MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow] }); })();\n"
+        }
+      ]
+    },
+    {
+      "mode": "experimental-local",
+      "variant": "after",
+      "strictTemplates": true,
+      "fixture": "import {Component,ChangeDetectionStrategy,ViewEncapsulation,NgModule} from '@angular/core';\nimport {CdkHeaderRow,CdkFooterRow,CdkRow,CdkTableModule} from '@angular/cdk/table';\n\nconst ROW_TEMPLATE = \"<ng-container cdkCellOutlet></ng-container>\";\n\n@Component({\n  standalone: false,\n  selector: 'mat-header-row, tr[mat-header-row]',\n  template: ROW_TEMPLATE,\n  host: {\n    'class': 'mat-header-row',\n    'role': 'row',\n  },\n  // See note on CdkTable for explanation on why this uses the default change detection strategy.\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Eager,\n  encapsulation: ViewEncapsulation.None,\n  exportAs: 'matHeaderRow',\n  providers: [{provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow}],\n})\nexport class MatLegacyHeaderRow extends CdkHeaderRow {}\n\n@Component({\n  standalone: false,\n  selector: 'mat-footer-row, tr[mat-footer-row]',\n  template: ROW_TEMPLATE,\n  host: {\n    'class': 'mat-footer-row',\n    'role': 'row',\n  },\n  // See note on CdkTable for explanation on why this uses the default change detection strategy.\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Eager,\n  encapsulation: ViewEncapsulation.None,\n  exportAs: 'matFooterRow',\n  providers: [{provide: CdkFooterRow, useExisting: MatLegacyFooterRow}],\n})\nexport class MatLegacyFooterRow extends CdkFooterRow {}\n\n@Component({\n  standalone: false,\n  selector: 'mat-row, tr[mat-row]',\n  template: ROW_TEMPLATE,\n  host: {\n    'class': 'mat-row',\n    'role': 'row',\n  },\n  // See note on CdkTable for explanation on why this uses the default change detection strategy.\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Eager,\n  encapsulation: ViewEncapsulation.None,\n  exportAs: 'matRow',\n  providers: [{provide: CdkRow, useExisting: MatLegacyRow}],\n})\nexport class MatLegacyRow extends CdkRow {}\n@NgModule({imports:[CdkTableModule],declarations:[MatLegacyHeaderRow,MatLegacyFooterRow,MatLegacyRow],exports:[MatLegacyHeaderRow,MatLegacyFooterRow,MatLegacyRow]})\nexport class ExtractedLegacyRowModule {}\n",
+      "fixture_sha256": "ba4ceefb945b1da7aac82e18924bf995bbf4f41a83377c027fc2852db8f81ea8",
+      "config": {
+        "compilerOptions": {
+          "target": "es2022",
+          "module": "es2022",
+          "moduleResolution": "bundler",
+          "experimentalDecorators": true,
+          "strict": true,
+          "skipLibCheck": false,
+          "types": [],
+          "lib": [
+            "es2022",
+            "dom"
+          ],
+          "declaration": true,
+          "noEmitOnError": true,
+          "outDir": "out"
+        },
+        "angularCompilerOptions": {
+          "compilationMode": "experimental-local",
+          "strictTemplates": true
+        },
+        "files": [
+          "rows.ts"
+        ]
+      },
+      "exit_code": 0,
+      "seconds": 1.324835,
+      "stdout": "",
+      "stderr": "",
+      "outputs": [
+        {
+          "path": "out/rows.d.ts",
+          "sha256": "027c2cc56ac8933201623edf3018a75d9a81736d56d2d108516fca45caec8f12",
+          "bytes": 306,
+          "body": "import { CdkHeaderRow, CdkFooterRow, CdkRow } from '@angular/cdk/table';\nexport declare class MatLegacyHeaderRow extends CdkHeaderRow {\n}\nexport declare class MatLegacyFooterRow extends CdkFooterRow {\n}\nexport declare class MatLegacyRow extends CdkRow {\n}\nexport declare class ExtractedLegacyRowModule {\n}\n"
+        },
+        {
+          "path": "out/rows.js",
+          "sha256": "bd00b7f7c1390149b6fc6c5dc21b16f955844d37d43555a260733ba5c67767c5",
+          "bytes": 7759,
+          "body": "import { Component, ChangeDetectionStrategy, ViewEncapsulation, NgModule } from '@angular/core';\nimport { CdkHeaderRow, CdkFooterRow, CdkRow, CdkTableModule } from '@angular/cdk/table';\nimport * as i0 from \"@angular/core\";\nconst ROW_TEMPLATE = \"<ng-container cdkCellOutlet></ng-container>\";\nexport class MatLegacyHeaderRow extends CdkHeaderRow {\n    static ɵfac = /*@__PURE__*/ (() => { let ɵMatLegacyHeaderRow_BaseFactory; return function MatLegacyHeaderRow_Factory(__ngFactoryType__) { return (ɵMatLegacyHeaderRow_BaseFactory || (ɵMatLegacyHeaderRow_BaseFactory = i0.ɵɵgetInheritedFactory(MatLegacyHeaderRow)))(__ngFactoryType__ || MatLegacyHeaderRow); }; })();\n    static ɵcmp = /*@__PURE__*/ i0.ɵɵdefineComponent({ type: MatLegacyHeaderRow, selectors: [[\"mat-header-row\"], [\"tr\", \"mat-header-row\", \"\"]], hostAttrs: [\"role\", \"row\", 1, \"mat-header-row\"], exportAs: [\"matHeaderRow\"], standalone: false, features: [i0.ɵɵProvidersFeature([{ provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow }]), i0.ɵɵInheritDefinitionFeature], decls: 1, vars: 0, consts: [[\"cdkCellOutlet\", \"\"]], template: function MatLegacyHeaderRow_Template(rf, ctx) { if (rf & 1) {\n            i0.ɵɵelementContainer(0, 0);\n        } }, dependencies: i0.ɵɵgetComponentDepsFactory(MatLegacyHeaderRow), encapsulation: 2, changeDetection: ChangeDetectionStrategy.Eager });\n}\n(() => { (typeof ngDevMode === \"undefined\" || ngDevMode) && i0.ɵsetClassMetadata(MatLegacyHeaderRow, [{\n        type: Component,\n        args: [{\n                standalone: false,\n                selector: 'mat-header-row, tr[mat-header-row]',\n                template: ROW_TEMPLATE,\n                host: {\n                    'class': 'mat-header-row',\n                    'role': 'row',\n                },\n                // See note on CdkTable for explanation on why this uses the default change detection strategy.\n                // tslint:disable-next-line:validate-decorators\n                changeDetection: ChangeDetectionStrategy.Eager,\n                encapsulation: ViewEncapsulation.None,\n                exportAs: 'matHeaderRow',\n                providers: [{ provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow }],\n            }]\n    }], null, null); })();\n(() => { (typeof ngDevMode === \"undefined\" || ngDevMode) && i0.ɵsetClassDebugInfo(MatLegacyHeaderRow, { className: \"MatLegacyHeaderRow\", filePath: \".cache/table-local-source-ubCpCD/experimental-local-after/rows.ts\", lineNumber: 21 }); })();\nexport class MatLegacyFooterRow extends CdkFooterRow {\n    static ɵfac = /*@__PURE__*/ (() => { let ɵMatLegacyFooterRow_BaseFactory; return function MatLegacyFooterRow_Factory(__ngFactoryType__) { return (ɵMatLegacyFooterRow_BaseFactory || (ɵMatLegacyFooterRow_BaseFactory = i0.ɵɵgetInheritedFactory(MatLegacyFooterRow)))(__ngFactoryType__ || MatLegacyFooterRow); }; })();\n    static ɵcmp = /*@__PURE__*/ i0.ɵɵdefineComponent({ type: MatLegacyFooterRow, selectors: [[\"mat-footer-row\"], [\"tr\", \"mat-footer-row\", \"\"]], hostAttrs: [\"role\", \"row\", 1, \"mat-footer-row\"], exportAs: [\"matFooterRow\"], standalone: false, features: [i0.ɵɵProvidersFeature([{ provide: CdkFooterRow, useExisting: MatLegacyFooterRow }]), i0.ɵɵInheritDefinitionFeature], decls: 1, vars: 0, consts: [[\"cdkCellOutlet\", \"\"]], template: function MatLegacyFooterRow_Template(rf, ctx) { if (rf & 1) {\n            i0.ɵɵelementContainer(0, 0);\n        } }, dependencies: i0.ɵɵgetComponentDepsFactory(MatLegacyFooterRow), encapsulation: 2, changeDetection: ChangeDetectionStrategy.Eager });\n}\n(() => { (typeof ngDevMode === \"undefined\" || ngDevMode) && i0.ɵsetClassMetadata(MatLegacyFooterRow, [{\n        type: Component,\n        args: [{\n                standalone: false,\n                selector: 'mat-footer-row, tr[mat-footer-row]',\n                template: ROW_TEMPLATE,\n                host: {\n                    'class': 'mat-footer-row',\n                    'role': 'row',\n                },\n                // See note on CdkTable for explanation on why this uses the default change detection strategy.\n                // tslint:disable-next-line:validate-decorators\n                changeDetection: ChangeDetectionStrategy.Eager,\n                encapsulation: ViewEncapsulation.None,\n                exportAs: 'matFooterRow',\n                providers: [{ provide: CdkFooterRow, useExisting: MatLegacyFooterRow }],\n            }]\n    }], null, null); })();\n(() => { (typeof ngDevMode === \"undefined\" || ngDevMode) && i0.ɵsetClassDebugInfo(MatLegacyFooterRow, { className: \"MatLegacyFooterRow\", filePath: \".cache/table-local-source-ubCpCD/experimental-local-after/rows.ts\", lineNumber: 38 }); })();\nexport class MatLegacyRow extends CdkRow {\n    static ɵfac = /*@__PURE__*/ (() => { let ɵMatLegacyRow_BaseFactory; return function MatLegacyRow_Factory(__ngFactoryType__) { return (ɵMatLegacyRow_BaseFactory || (ɵMatLegacyRow_BaseFactory = i0.ɵɵgetInheritedFactory(MatLegacyRow)))(__ngFactoryType__ || MatLegacyRow); }; })();\n    static ɵcmp = /*@__PURE__*/ i0.ɵɵdefineComponent({ type: MatLegacyRow, selectors: [[\"mat-row\"], [\"tr\", \"mat-row\", \"\"]], hostAttrs: [\"role\", \"row\", 1, \"mat-row\"], exportAs: [\"matRow\"], standalone: false, features: [i0.ɵɵProvidersFeature([{ provide: CdkRow, useExisting: MatLegacyRow }]), i0.ɵɵInheritDefinitionFeature], decls: 1, vars: 0, consts: [[\"cdkCellOutlet\", \"\"]], template: function MatLegacyRow_Template(rf, ctx) { if (rf & 1) {\n            i0.ɵɵelementContainer(0, 0);\n        } }, dependencies: i0.ɵɵgetComponentDepsFactory(MatLegacyRow), encapsulation: 2, changeDetection: ChangeDetectionStrategy.Eager });\n}\n(() => { (typeof ngDevMode === \"undefined\" || ngDevMode) && i0.ɵsetClassMetadata(MatLegacyRow, [{\n        type: Component,\n        args: [{\n                standalone: false,\n                selector: 'mat-row, tr[mat-row]',\n                template: ROW_TEMPLATE,\n                host: {\n                    'class': 'mat-row',\n                    'role': 'row',\n                },\n                // See note on CdkTable for explanation on why this uses the default change detection strategy.\n                // tslint:disable-next-line:validate-decorators\n                changeDetection: ChangeDetectionStrategy.Eager,\n                encapsulation: ViewEncapsulation.None,\n                exportAs: 'matRow',\n                providers: [{ provide: CdkRow, useExisting: MatLegacyRow }],\n            }]\n    }], null, null); })();\n(() => { (typeof ngDevMode === \"undefined\" || ngDevMode) && i0.ɵsetClassDebugInfo(MatLegacyRow, { className: \"MatLegacyRow\", filePath: \".cache/table-local-source-ubCpCD/experimental-local-after/rows.ts\", lineNumber: 55 }); })();\nexport class ExtractedLegacyRowModule {\n    static ɵfac = function ExtractedLegacyRowModule_Factory(__ngFactoryType__) { return new (__ngFactoryType__ || ExtractedLegacyRowModule)(); };\n    static ɵmod = /*@__PURE__*/ i0.ɵɵdefineNgModule({ type: ExtractedLegacyRowModule });\n    static ɵinj = /*@__PURE__*/ i0.ɵɵdefineInjector({ imports: [CdkTableModule, MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow] });\n}\n(() => { (typeof ngDevMode === \"undefined\" || ngDevMode) && i0.ɵsetClassMetadata(ExtractedLegacyRowModule, [{\n        type: NgModule,\n        args: [{ imports: [CdkTableModule], declarations: [MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow], exports: [MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow] }]\n    }], null, null); })();\n(function () { (typeof ngJitMode === \"undefined\" || ngJitMode) && i0.ɵɵsetNgModuleScope(ExtractedLegacyRowModule, { declarations: [MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow], imports: [CdkTableModule], exports: [MatLegacyHeaderRow, MatLegacyFooterRow, MatLegacyRow] }); })();\n"
+        }
+      ]
+    }
+  ],
+  "product_changes": 0,
+  "workspace_build_executed": false,
+  "consumer_build_executed": false,
+  "native_or_packed_or_full_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
