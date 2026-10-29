@@ -1,0 +1,252 @@
+test_protected_ledger_and_browser_helpers_remain_exact (test_browser_reference_source.BrowserReferenceSourceTests.test_protected_ledger_and_browser_helpers_remain_exact) ... ok
+test_reviewed_source_and_current_callback_controls (test_browser_reference_source.BrowserReferenceSourceTests.test_reviewed_source_and_current_callback_controls) ... FAIL
+test_invalid_or_unreviewed_artifact_minima_are_rejected (test_browser_peer_versions.BrowserPeerVersionsTests.test_invalid_or_unreviewed_artifact_minima_are_rejected) ... ok
+test_real_cli_describes_both_artifact_lines_and_zones_without_spawning (test_browser_peer_versions.BrowserPeerVersionsTests.test_real_cli_describes_both_artifact_lines_and_zones_without_spawning) ... ok
+test_runtime_assertions_lab_sources_and_required_predicates_are_unchanged (test_browser_peer_versions.BrowserPeerVersionsTests.test_runtime_assertions_lab_sources_and_required_predicates_are_unchanged) ... ok
+test_intact_rows_match_the_required_ids (test_browser_required_cells.BrowserRequiredCellCreditTests.test_intact_rows_match_the_required_ids) ... ok
+test_missing_duplicate_and_empty_evidence_are_not_a_pass (test_browser_required_cells.BrowserRequiredCellCreditTests.test_missing_duplicate_and_empty_evidence_are_not_a_pass) ... ok
+test_absent_owned_parent_is_created_without_touching_shared_tmp (test_browser_required_cells.LauncherParentTests.test_absent_owned_parent_is_created_without_touching_shared_tmp) ... ok
+test_parent_collision_fails_without_spawning (test_browser_required_cells.LauncherParentTests.test_parent_collision_fails_without_spawning) ... ok
+
+======================================================================
+FAIL: test_reviewed_source_and_current_callback_controls (test_browser_reference_source.BrowserReferenceSourceTests.test_reviewed_source_and_current_callback_controls)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/tests/test_browser_reference_source.py", line 15, in test_reviewed_source_and_current_callback_controls
+    self.assertEqual(child.returncode,0,child.stdout+child.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: changed browser predicate labHtml
++ actual - expected
+... Skipped lines
+
+  'function labHtml() {\n' +
+    '  return [\n' +
+    `    '<ng-container *ngIf="!rippleOnly">',\n` +
+    `    '<div id="surface" class="lab-light mat-app-background" dir="ltr">',\n` +
+    `    '<div id="wrap-button" *ngIf="!cspOnly">',\n` +
+...
+    `    '<div id="wrap-core" *ngIf="!cspOnly"><mat-pseudo-checkbox id="p-core" state="checked"></mat-pseudo-checkbox><lab-ripple-frame></lab-ripple-frame></div>',\n` +
++   `    '<div id="wrap-dialog"><button id="p-dialog-open" type="button" (click)="openDialog()">Open dialog</button><lab-dialog-title-lifetime></lab-dialog-title-lifetime></div>',\n` +
+-   `    '<div id="wrap-dialog"><button id="p-dialog-open" type="button" (click)="openDialog()">Open dialog</button></div>',\n` +
+    `    '<div id="wrap-field" *ngIf="!cspOnly">',\n` +
+    `    '<mat-form-field id="p-field"><mat-label>Name</mat-label><input id="p-field-input" data-chip-focus-outside matInput [errorStateMatcher]="matcher"><mat-hint id="p-hint">Hint text</mat-hint></mat-form-field>',\n` +
+    `    '<mat-form-field id="p-field-disabled" floatLabel="always"><input matInput disabled value="off"></mat-form-field>',\n` +
+    "    '<lab-field-direction-lifetime></lab-field-direction-lifetime>',\n" +
+    `    '<div id="p-outline-wrapper" [style.display]="outlineVisible() ? \\'\\' : \\'none\\'" [dir]="outlineDirection()">',\n` +
+
+    at inspectBrowserReferenceSource (file:///home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/browser-reference-source.mjs:63:101)
+    at file:///home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/tests/browser_reference_source_probe.mjs:23:79
+    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+    at async node:internal/modules/esm/loader:647:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 'function labHtml() {\n' +
+    '  return [\n' +
+    `    '<ng-container *ngIf="!rippleOnly">',\n` +
+    `    '<div id="surface" class="lab-light mat-app-background" dir="ltr">',\n` +
+    `    '<div id="wrap-button" *ngIf="!cspOnly">',\n` +
+    `    '<button id="p-button" mat-button type="button">Default</button>',\n` +
+    `    '<button id="p-button-disabled" mat-button type="button" disabled>Off</button>',\n` +
+    `    '<button id="p-button-focus" mat-raised-button type="button">Focus</button>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-card" *ngIf="!cspOnly"><mat-card id="p-card"><mat-card-title>Title</mat-card-title><mat-card-content>Body</mat-card-content></mat-card></div>',\n` +
+    `    '<div id="wrap-checkbox" *ngIf="!cspOnly">',\n` +
+    `    '<mat-checkbox id="p-checkbox">Check</mat-checkbox><lab-checkbox-timer-lifetime></lab-checkbox-timer-lifetime>',\n` +
+    `    '<mat-checkbox id="p-checkbox-disabled" disabled>Off</mat-checkbox>',\n` +
+    `    '<mat-checkbox id="p-checkbox-invalid" required>Req</mat-checkbox>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-chips" *ngIf="!cspOnly">',\n` +
+    `    '<button id="p-mark-invalid" type="button" (click)="markInvalid()">Mark invalid</button>',\n` +
+    `    '<mat-chip-list id="p-chip-list" #chipList="matChipList" [formControl]="chipControl" [errorStateMatcher]="matcher"><mat-chip #focusLifecycleChip="matChip" data-chip-focus-lifecycle>One</mat-chip></mat-chip-list>',\n` +
+    "    '<mat-chip-list disabled><mat-chip>Off</mat-chip></mat-chip-list>',\n" +
+    "    '</div>',\n" +
+    `    '<div id="wrap-core" *ngIf="!cspOnly"><mat-pseudo-checkbox id="p-core" state="checked"></mat-pseudo-checkbox><lab-ripple-frame></lab-ripple-frame></div>',\n` +
+    `    '<div id="wrap-dialog"><button id="p-dialog-open" type="button" (click)="openDialog()">Open dialog</button><lab-dialog-title-lifetime></lab-dialog-title-lifetime></div>',\n` +
+    `    '<div id="wrap-field" *ngIf="!cspOnly">',\n` +
+    `    '<mat-form-field id="p-field"><mat-label>Name</mat-label><input id="p-field-input" data-chip-focus-outside matInput [errorStateMatcher]="matcher"><mat-hint id="p-hint">Hint text</mat-hint></mat-form-field>',\n` +
+    `    '<mat-form-field id="p-field-disabled" floatLabel="always"><input matInput disabled value="off"></mat-form-field>',\n` +
+    "    '<lab-field-direction-lifetime></lab-field-direction-lifetime>',\n" +
+    `    '<div id="p-outline-wrapper" [style.display]="outlineVisible() ? \\'\\' : \\'none\\'" [dir]="outlineDirection()">',\n` +
+    `    '<mat-form-field id="p-outline" appearance="outline" floatLabel="always"><mat-label>Outline</mat-label>',\n` +
+    `    '<span matPrefix *ngIf="outlinePrefix()">USD&nbsp;</span><input matInput value="Value"></mat-form-field>',\n` +
+    "    '</div>',\n" +
+    `    '<mat-form-field id="p-outline-boundary" appearance="outline" floatLabel="always" style="position:fixed;top:10px;right:10px;width:200px"><mat-label><span style="display:inline-block;width:640px">Long floating label</span></mat-label><span matPrefix>USD&nbsp;</span><input matInput value="Value"><span matSuffix>suffix</span></mat-form-field>',\n` +
+    `    '<button id="p-outline-prefix" type="button" (click)="outlinePrefix.set(true)">Add prefix</button>',\n` +
+    `    '<button id="p-outline-hide" type="button" (click)="outlineVisible.set(false); outlinePrefix.set(false)">Hide and remove prefix</button>',\n` +
+    `    '<button id="p-outline-show" type="button" (click)="outlineVisible.set(true)">Show</button>',\n` +
+    `    '<button id="p-outline-rtl" type="button" (click)="outlineDirection.set(\\'rtl\\')">RTL</button>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-input" *ngIf="!cspOnly">',\n` +
+    `    '<mat-form-field id="p-input-field"><input id="p-input" matInput [errorStateMatcher]="matcher" value="typed"></mat-form-field>',\n` +
+    `    '<mat-form-field id="p-input-disabled-field"><input matInput disabled value="off"></mat-form-field>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-autocomplete" *ngIf="!cspOnly">',\n` +
+    `    '<mat-form-field id="p-auto-field"><input id="p-auto" matInput #autoTrigger="matAutocompleteTrigger" [matAutocomplete]="labAuto" [errorStateMatcher]="matcher"><mat-autocomplete #labAuto="matAutocomplete" (optionSelected)="autoSelection.set($event.option.value)"><mat-option value="a">Alpha</mat-option></mat-autocomplete></mat-form-field>',\n` +
+    `    '<input id="p-auto-disabled" matInput disabled [matAutocomplete]="labAutoOff">',\n` +
+    `    '<mat-autocomplete #labAutoOff="matAutocomplete"><mat-option value="b">Beta</mat-option></mat-autocomplete>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-list" *ngIf="!cspOnly">',\n` +
+    `    '<mat-list id="p-list"><mat-list-item>Item</mat-list-item></mat-list>',\n` +
+    `    '<mat-list><button mat-list-item id="p-list-focus" type="button">Focus</button><button mat-list-item id="p-list-disabled" type="button" disabled>Off</button></mat-list>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-menu" *ngIf="!cspOnly">',\n` +
+    `    '<button id="p-menu-trigger" type="button" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="labMenu">Menu</button>',\n` +
+    `    '<mat-menu #labMenu="matMenu"><button mat-menu-item id="p-menu-item" type="button">Item</button></mat-menu>',\n` +
+    `    '<button mat-menu-item id="p-menu-disabled" type="button" [disabled]="true">Off</button>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-paginator" *ngIf="!cspOnly">',\n` +
+    `    '<mat-paginator [length]="50" [pageSize]="10"></mat-paginator>',\n` +
+    `    '<mat-paginator id="p-paginator-disabled" [length]="50" [pageSize]="10" disabled></mat-paginator>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-bar" *ngIf="!cspOnly"><mat-progress-bar id="p-bar" mode="determinate" [value]="40"></mat-progress-bar></div>',\n` +
+    `    '<div id="wrap-spinner" *ngIf="!cspOnly"><mat-progress-spinner id="p-spin" mode="determinate" [value]="55" diameter="48"></mat-progress-spinner></div>',\n` +
+    `    '<div id="wrap-radio" *ngIf="!cspOnly">',\n` +
+    `    '<mat-radio-group><mat-radio-button id="p-radio" value="a">A</mat-radio-button></mat-radio-group>',\n` +
+    `    '<mat-radio-button id="p-radio-disabled" disabled>Off</mat-radio-button>',\n` +
+    `    '<mat-radio-button id="p-radio-invalid" name="lab-req" required value="req">Req</mat-radio-button>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-select" *ngIf="!cspOnly">',\n` +
+    `    '<mat-form-field><mat-select id="p-select" style="font-size:20px" [errorStateMatcher]="matcher"><mat-option value="a">A</mat-option></mat-select></mat-form-field>',\n` +
+    `    '<mat-form-field><mat-select id="p-select-disabled" disabled><mat-option value="b">B</mat-option></mat-select></mat-form-field>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-toggle" *ngIf="!cspOnly">',\n` +
+    `    '<mat-slide-toggle id="p-toggle">Toggle</mat-slide-toggle>',\n` +
+    `    '<mat-slide-toggle id="p-toggle-disabled" disabled>Off</mat-slide-toggle>',\n` +
+    `    '<mat-slide-toggle id="p-toggle-invalid" required>Req</mat-slide-toggle>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-slider" *ngIf="!cspOnly">',\n` +
+    `    '<button id="p-slider-invalidate" type="button" (click)="forceSliderInvalid = true">Invalidate</button>',\n` +
+    `    '<mat-slider id="p-slider" #sl="ngModel" name="slider" [labForceInvalid]="forceSliderInvalid" [(ngModel)]="sliderValue" min="0" max="100"></mat-slider>',\n` +
+    `    '<span id="slider-invalid">{{sl.invalid}}</span>',\n` +
+    `    '<mat-slider id="p-slider-disabled" disabled [value]="10"></mat-slider>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-snack" *ngIf="!cspOnly"><button id="p-snack" type="button" (click)="openSnack()">Snack</button><lab-snack-motion></lab-snack-motion><lab-snack-announcement-lifetime></lab-snack-announcement-lifetime></div>',\n` +
+    `    '<div id="wrap-table" *ngIf="!cspOnly">',\n` +
+    `    '<table mat-table id="p-table" [dataSource]="rows">',\n` +
+    `    '<ng-container matColumnDef="name"><th mat-header-cell *matHeaderCellDef>Name</th><td mat-cell *matCellDef="let row"><button id="p-table-focus" type="button">{{row.name}}</button></td></ng-container>',\n` +
+    `    '<tr mat-header-row *matHeaderRowDef="cols"></tr><tr mat-row *matRowDef="let row; columns: cols"></tr>',\n` +
+    "    '</table></div>',\n" +
+    `    '<div id="wrap-tabs" *ngIf="!cspOnly"><mat-tab-group id="p-tabs"><mat-tab label="One">One</mat-tab><mat-tab label="Two">Two</mat-tab><mat-tab label="Off" disabled>Off</mat-tab></mat-tab-group><mat-tab-group *ngFor="let instance of [paginationEpoch()]" id="p-pagination-tabs" style="width:220px"><mat-tab *ngFor="let label of paginationLabels" [label]="label">Narrow tab</mat-tab></mat-tab-group></div>',\n` +
+    `    '<div id="wrap-tooltip" *ngIf="!cspOnly">',\n` +
+    `    '<button id="p-tooltip" type="button" #tip="matTooltip" [matTooltip]="tipMessage()">Tip</button>',\n` +
+    `    '<button id="p-tooltip-off" type="button" #tipOff="matTooltip" matTooltip="Nope" matTooltipDisabled>Off</button>',\n` +
+    `    '<button id="p-tooltip-change" type="button" (click)="tipMessage.set(\\'A longer tooltip message for repositioning\\')">Change tooltip</button>',\n` +
+    "    '<lab-tooltip-aria-lifetime></lab-tooltip-aria-lifetime>',\n" +
+    "    '</div>',\n" +
+    "    '</div>',\n" +
+    `    '</ng-container><div *ngIf="rippleOnly" id="surface" class="lab-light mat-app-background"><lab-ripple-delegation></lab-ripple-delegation></div>',\n` +
+    "  ].join('');\n" +
+    '}',
+  expected: 'function labHtml() {\n' +
+    '  return [\n' +
+    `    '<ng-container *ngIf="!rippleOnly">',\n` +
+    `    '<div id="surface" class="lab-light mat-app-background" dir="ltr">',\n` +
+    `    '<div id="wrap-button" *ngIf="!cspOnly">',\n` +
+    `    '<button id="p-button" mat-button type="button">Default</button>',\n` +
+    `    '<button id="p-button-disabled" mat-button type="button" disabled>Off</button>',\n` +
+    `    '<button id="p-button-focus" mat-raised-button type="button">Focus</button>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-card" *ngIf="!cspOnly"><mat-card id="p-card"><mat-card-title>Title</mat-card-title><mat-card-content>Body</mat-card-content></mat-card></div>',\n` +
+    `    '<div id="wrap-checkbox" *ngIf="!cspOnly">',\n` +
+    `    '<mat-checkbox id="p-checkbox">Check</mat-checkbox><lab-checkbox-timer-lifetime></lab-checkbox-timer-lifetime>',\n` +
+    `    '<mat-checkbox id="p-checkbox-disabled" disabled>Off</mat-checkbox>',\n` +
+    `    '<mat-checkbox id="p-checkbox-invalid" required>Req</mat-checkbox>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-chips" *ngIf="!cspOnly">',\n` +
+    `    '<button id="p-mark-invalid" type="button" (click)="markInvalid()">Mark invalid</button>',\n` +
+    `    '<mat-chip-list id="p-chip-list" #chipList="matChipList" [formControl]="chipControl" [errorStateMatcher]="matcher"><mat-chip #focusLifecycleChip="matChip" data-chip-focus-lifecycle>One</mat-chip></mat-chip-list>',\n` +
+    "    '<mat-chip-list disabled><mat-chip>Off</mat-chip></mat-chip-list>',\n" +
+    "    '</div>',\n" +
+    `    '<div id="wrap-core" *ngIf="!cspOnly"><mat-pseudo-checkbox id="p-core" state="checked"></mat-pseudo-checkbox><lab-ripple-frame></lab-ripple-frame></div>',\n` +
+    `    '<div id="wrap-dialog"><button id="p-dialog-open" type="button" (click)="openDialog()">Open dialog</button></div>',\n` +
+    `    '<div id="wrap-field" *ngIf="!cspOnly">',\n` +
+    `    '<mat-form-field id="p-field"><mat-label>Name</mat-label><input id="p-field-input" data-chip-focus-outside matInput [errorStateMatcher]="matcher"><mat-hint id="p-hint">Hint text</mat-hint></mat-form-field>',\n` +
+    `    '<mat-form-field id="p-field-disabled" floatLabel="always"><input matInput disabled value="off"></mat-form-field>',\n` +
+    "    '<lab-field-direction-lifetime></lab-field-direction-lifetime>',\n" +
+    `    '<div id="p-outline-wrapper" [style.display]="outlineVisible() ? \\'\\' : \\'none\\'" [dir]="outlineDirection()">',\n` +
+    `    '<mat-form-field id="p-outline" appearance="outline" floatLabel="always"><mat-label>Outline</mat-label>',\n` +
+    `    '<span matPrefix *ngIf="outlinePrefix()">USD&nbsp;</span><input matInput value="Value"></mat-form-field>',\n` +
+    "    '</div>',\n" +
+    `    '<mat-form-field id="p-outline-boundary" appearance="outline" floatLabel="always" style="position:fixed;top:10px;right:10px;width:200px"><mat-label><span style="display:inline-block;width:640px">Long floating label</span></mat-label><span matPrefix>USD&nbsp;</span><input matInput value="Value"><span matSuffix>suffix</span></mat-form-field>',\n` +
+    `    '<button id="p-outline-prefix" type="button" (click)="outlinePrefix.set(true)">Add prefix</button>',\n` +
+    `    '<button id="p-outline-hide" type="button" (click)="outlineVisible.set(false); outlinePrefix.set(false)">Hide and remove prefix</button>',\n` +
+    `    '<button id="p-outline-show" type="button" (click)="outlineVisible.set(true)">Show</button>',\n` +
+    `    '<button id="p-outline-rtl" type="button" (click)="outlineDirection.set(\\'rtl\\')">RTL</button>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-input" *ngIf="!cspOnly">',\n` +
+    `    '<mat-form-field id="p-input-field"><input id="p-input" matInput [errorStateMatcher]="matcher" value="typed"></mat-form-field>',\n` +
+    `    '<mat-form-field id="p-input-disabled-field"><input matInput disabled value="off"></mat-form-field>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-autocomplete" *ngIf="!cspOnly">',\n` +
+    `    '<mat-form-field id="p-auto-field"><input id="p-auto" matInput #autoTrigger="matAutocompleteTrigger" [matAutocomplete]="labAuto" [errorStateMatcher]="matcher"><mat-autocomplete #labAuto="matAutocomplete" (optionSelected)="autoSelection.set($event.option.value)"><mat-option value="a">Alpha</mat-option></mat-autocomplete></mat-form-field>',\n` +
+    `    '<input id="p-auto-disabled" matInput disabled [matAutocomplete]="labAutoOff">',\n` +
+    `    '<mat-autocomplete #labAutoOff="matAutocomplete"><mat-option value="b">Beta</mat-option></mat-autocomplete>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-list" *ngIf="!cspOnly">',\n` +
+    `    '<mat-list id="p-list"><mat-list-item>Item</mat-list-item></mat-list>',\n` +
+    `    '<mat-list><button mat-list-item id="p-list-focus" type="button">Focus</button><button mat-list-item id="p-list-disabled" type="button" disabled>Off</button></mat-list>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-menu" *ngIf="!cspOnly">',\n` +
+    `    '<button id="p-menu-trigger" type="button" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="labMenu">Menu</button>',\n` +
+    `    '<mat-menu #labMenu="matMenu"><button mat-menu-item id="p-menu-item" type="button">Item</button></mat-menu>',\n` +
+    `    '<button mat-menu-item id="p-menu-disabled" type="button" [disabled]="true">Off</button>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-paginator" *ngIf="!cspOnly">',\n` +
+    `    '<mat-paginator [length]="50" [pageSize]="10"></mat-paginator>',\n` +
+    `    '<mat-paginator id="p-paginator-disabled" [length]="50" [pageSize]="10" disabled></mat-paginator>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-bar" *ngIf="!cspOnly"><mat-progress-bar id="p-bar" mode="determinate" [value]="40"></mat-progress-bar></div>',\n` +
+    `    '<div id="wrap-spinner" *ngIf="!cspOnly"><mat-progress-spinner id="p-spin" mode="determinate" [value]="55" diameter="48"></mat-progress-spinner></div>',\n` +
+    `    '<div id="wrap-radio" *ngIf="!cspOnly">',\n` +
+    `    '<mat-radio-group><mat-radio-button id="p-radio" value="a">A</mat-radio-button></mat-radio-group>',\n` +
+    `    '<mat-radio-button id="p-radio-disabled" disabled>Off</mat-radio-button>',\n` +
+    `    '<mat-radio-button id="p-radio-invalid" name="lab-req" required value="req">Req</mat-radio-button>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-select" *ngIf="!cspOnly">',\n` +
+    `    '<mat-form-field><mat-select id="p-select" style="font-size:20px" [errorStateMatcher]="matcher"><mat-option value="a">A</mat-option></mat-select></mat-form-field>',\n` +
+    `    '<mat-form-field><mat-select id="p-select-disabled" disabled><mat-option value="b">B</mat-option></mat-select></mat-form-field>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-toggle" *ngIf="!cspOnly">',\n` +
+    `    '<mat-slide-toggle id="p-toggle">Toggle</mat-slide-toggle>',\n` +
+    `    '<mat-slide-toggle id="p-toggle-disabled" disabled>Off</mat-slide-toggle>',\n` +
+    `    '<mat-slide-toggle id="p-toggle-invalid" required>Req</mat-slide-toggle>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-slider" *ngIf="!cspOnly">',\n` +
+    `    '<button id="p-slider-invalidate" type="button" (click)="forceSliderInvalid = true">Invalidate</button>',\n` +
+    `    '<mat-slider id="p-slider" #sl="ngModel" name="slider" [labForceInvalid]="forceSliderInvalid" [(ngModel)]="sliderValue" min="0" max="100"></mat-slider>',\n` +
+    `    '<span id="slider-invalid">{{sl.invalid}}</span>',\n` +
+    `    '<mat-slider id="p-slider-disabled" disabled [value]="10"></mat-slider>',\n` +
+    "    '</div>',\n" +
+    `    '<div id="wrap-snack" *ngIf="!cspOnly"><button id="p-snack" type="button" (click)="openSnack()">Snack</button><lab-snack-motion></lab-snack-motion><lab-snack-announcement-lifetime></lab-snack-announcement-lifetime></div>',\n` +
+    `    '<div id="wrap-table" *ngIf="!cspOnly">',\n` +
+    `    '<table mat-table id="p-table" [dataSource]="rows">',\n` +
+    `    '<ng-container matColumnDef="name"><th mat-header-cell *matHeaderCellDef>Name</th><td mat-cell *matCellDef="let row"><button id="p-table-focus" type="button">{{row.name}}</button></td></ng-container>',\n` +
+    `    '<tr mat-header-row *matHeaderRowDef="cols"></tr><tr mat-row *matRowDef="let row; columns: cols"></tr>',\n` +
+    "    '</table></div>',\n" +
+    `    '<div id="wrap-tabs" *ngIf="!cspOnly"><mat-tab-group id="p-tabs"><mat-tab label="One">One</mat-tab><mat-tab label="Two">Two</mat-tab><mat-tab label="Off" disabled>Off</mat-tab></mat-tab-group><mat-tab-group *ngFor="let instance of [paginationEpoch()]" id="p-pagination-tabs" style="width:220px"><mat-tab *ngFor="let label of paginationLabels" [label]="label">Narrow tab</mat-tab></mat-tab-group></div>',\n` +
+    `    '<div id="wrap-tooltip" *ngIf="!cspOnly">',\n` +
+    `    '<button id="p-tooltip" type="button" #tip="matTooltip" [matTooltip]="tipMessage()">Tip</button>',\n` +
+    `    '<button id="p-tooltip-off" type="button" #tipOff="matTooltip" matTooltip="Nope" matTooltipDisabled>Off</button>',\n` +
+    `    '<button id="p-tooltip-change" type="button" (click)="tipMessage.set(\\'A longer tooltip message for repositioning\\')">Change tooltip</button>',\n` +
+    "    '<lab-tooltip-aria-lifetime></lab-tooltip-aria-lifetime>',\n" +
+    "    '</div>',\n" +
+    "    '</div>',\n" +
+    `    '</ng-container><div *ngIf="rippleOnly" id="surface" class="lab-light mat-app-background"><lab-ripple-delegation></lab-ripple-delegation></div>',\n` +
+    "  ].join('');\n" +
+    '}',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.21.0
+
+
+----------------------------------------------------------------------
+Ran 9 tests in 3.969s
+
+FAILED (failures=1)
