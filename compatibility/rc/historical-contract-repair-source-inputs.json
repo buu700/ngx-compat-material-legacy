@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "c44772b4e5419262170ab35dec2951949291ee96",
+  "repair_baseline_commit": "53e1fefdbf0f49a7191e35d80fa49d5a994a4383",
+  "images": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/testing/error-harness.ts",
+      "before": {
+        "sha256": "7d259447752aea972328fcc9f5c3c126893720ffab84bc4ea755b38cd4c0848f",
+        "bytes": 1007
+      },
+      "after": {
+        "sha256": "0df6fc9bad1331a8ceb0ace31f1c4d1318d830b096e9911b3bc57cf59cb9e14d",
+        "bytes": 1271
+      },
+      "literal_edits": [
+        {
+          "before": "import {ErrorHarnessFilters} from '@angular/material/form-field/testing';",
+          "after": "import {ErrorHarnessFilters, type MatErrorHarness} from '@angular/material/form-field/testing';"
+        },
+        {
+          "before": "    return new HarnessPredicate(this, options).addOption('text', options.text, (harness, text) =>\n      HarnessPredicate.stringMatches(harness.getText(), text),\n    );",
+          "after": "    return MatLegacyErrorHarness._getErrorPredicate(this, options);\n  }\n\n  protected static _getErrorPredicate<T extends MatErrorHarness>(\n    type: ComponentHarnessConstructor<T>,\n    options: ErrorHarnessFilters,\n  ): HarnessPredicate<T> {\n    return new HarnessPredicate(type, options).addOption('text', options.text, (harness, text) =>\n      HarnessPredicate.stringMatches(harness.getText(), text),\n    );"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+      "before": {
+        "sha256": "1faece639aa44d426b249e15a3a3cca82ae6291371102ce88d8e3ef02baef38c",
+        "bytes": 10948
+      },
+      "after": {
+        "sha256": "293baf9806cc7bc0c53ab5a68c745536d79e40e3e2a82928b9515361dbdf302f",
+        "bytes": 11168
+      },
+      "literal_edits": [
+        {
+          "before": " * Copyright Google LLC All Rights Reserved.\n",
+          "after": " * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n"
+        },
+        {
+          "before": "import {MAT_SNACK_BAR_DATA, MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBarConfig} from '@angular/material/snack-bar';",
+          "after": "import {MAT_SNACK_BAR_DATA, MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBarConfig, MatSnackBarRef as PeerMatSnackBarRef} from '@angular/material/snack-bar';"
+        },
+        {
+          "before": "        {provide: MatSnackBarRef, useValue: snackBarRef},\n",
+          "after": "        {provide: MatSnackBarRef, useValue: snackBarRef},\n        // Material 16 exposed this same reference through both public entry points.\n        {provide: PeerMatSnackBarRef, useValue: snackBarRef},\n"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+      "before": {
+        "sha256": "dd193a5f4cdef0ee0be3c993474efa482229854d33b4853c6d5dd519d21a6fd0",
+        "bytes": 9016
+      },
+      "after": {
+        "sha256": "9205bb2a5b3573e8f21161b03baa04e4b3e868e72d70e06c5dcdf96d2439af36",
+        "bytes": 9041
+      },
+      "literal_edits": [
+        {
+          "before": "    this.selectedIndex = -1;\n  }",
+          "after": "    this.selectedIndex = -1;\n    this._inkBar.hide();\n  }"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+      "before": {
+        "sha256": "65b80d7af11475bc2db5a5bc842845c005f8512f96a15d44b0cc1d330d1dcf08",
+        "bytes": 21829
+      },
+      "after": {
+        "sha256": "a498fd55553577bc81f285f36cf2822866d17b9bed8bb572c14bf78df21eed0d",
+        "bytes": 21858
+      },
+      "literal_edits": [
+        {
+          "before": "        manager.onKeydown(event);\n        return;\n    }\n  }",
+          "after": "        manager.onKeydown(event);\n        return;\n    }\n    event.stopPropagation();\n  }"
+        }
+      ]
+    },
+    {
+      "path": "compatibility/rc/api/signature-differences.json",
+      "before": {
+        "sha256": "9310d659ef08aa0cec549627ec056c4a3d7da10f350bea34dc64c1c6b1e15fa7",
+        "bytes": 50327
+      },
+      "after": {
+        "sha256": "ab78e5d35b56a8ce552054ac36ed35aa6e136d3b58bff9534474a5020fd698d0",
+        "bytes": 49850
+      },
+      "literal_edits": [],
+      "removed_api_exception": {
+        "symbol_id": "legacy-form-field/testing/MatLegacyErrorHarness",
+        "classification": "intentional-legacy-difference",
+        "historical_signature": "protected static method _getErrorPredicate<TextendsMatErrorHarness>(ComponentHarnessConstructor<T>,ErrorHarnessFilters):HarnessPredicate<T>",
+        "owned_signature": null,
+        "rationale": "Owned declaration text differs from the 16.2.14 signature. Only this exact pair is accepted; it is not a match."
+      }
+    }
+  ],
+  "implementation": {
+    "path": "compatibility/rc/21x-base-class-removal-repair-qualified.json",
+    "sha256": "62c53b84d7deb972e3ad65f80f5655aa60efd0de85a708b218cef4c086ee3705",
+    "bytes": 168020
+  },
+  "current_use_qualification": {
+    "path": "compatibility/rc/base-class-removal-current-use-qualified.json",
+    "sha256": "2cdf076c140e43ef53698ae387ad82daf537cbef12c8421bbc5b63dc1e20a440",
+    "bytes": 4055
+  },
+  "current_use_source_proof": {
+    "path": "compatibility/rc/base-class-removal-current-use-source-proof.json",
+    "sha256": "e364856c234577ad2bcccaea175fbe0f281fcc8ee4249f83ff983811268b5bc0",
+    "bytes": 343867
+  },
+  "current_use_review": {
+    "path": "compatibility/f10/authored-use-reviews/base-class-removal-current-uses.json",
+    "sha256": "ac5f721593ab69cbebabc0867637702ae7e0eac71752f1c9d34527c93f1c8dfb",
+    "bytes": 263555
+  },
+  "historical_roster_context": {
+    "source_parent": "c9ea86329677aa31c0f10af7f0f69937cefb34a8",
+    "members": [
+      {
+        "path": "compatibility/f10/authored-dependency-dispositions.json",
+        "sha256": "65abc960b85779991c325df9ae3951cc64c16c83bc78bc88bd224e6dc3a86bb3",
+        "bytes": 2336777
+      },
+      {
+        "path": "compatibility/f10/authored-dependency-current-dispositions.json",
+        "sha256": "a95b8f087e74a472e5c9a87eb0666da4a8da4e18dd0103297a5772ff9bd6698a",
+        "bytes": 338337
+      }
+    ]
+  },
+  "canonical_decisions_changed": 0,
+  "source_scope_only": true,
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}
