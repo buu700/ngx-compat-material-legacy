@@ -1,0 +1,53 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by the MIT license in LICENSE.
+ */
+/** One complete original legacy-removal source exclusion; no runtime acceptance. */
+'use strict';
+const assert=require('node:assert/strict');
+const {createHash}=require('node:crypto');
+const {readFileSync}=require('node:fs');
+const {join,resolve}=require('node:path');
+const ROOT=resolve(__dirname,'..'),HANDLER='scripts/upstream-legacy-removal-admission.cjs';
+const SHA='f7e3ae3bd1b86d5987df57bb06d350001c592931';
+const REVIEW="compatibility/rc/21x-legacy-removal-admission-individual-review.json",REVIEW_HASH="0463edeb805c14023d197271aa290536f0d23d1fbed3f1f31948668506b2e4b1",DIFF="d1477575b2278fe7848fbc158df11dfcc142698ec496a34c0c340f6e3b37826c";
+const QUALIFICATION={"path":"compatibility/rc/21x-legacy-removal-source-qualification.json","sha256":"94072e0defad3ef1359882397251634de228a2f67e128e44512cc5efe022e2e1","bytes":7229},SOURCE_REVIEW={"path":"compatibility/rc/21x-legacy-removal-source-review.json","sha256":"9193f477e02e8f5e3444c962f6ceaf372080582e7d485c3a9950058d7827fa65","bytes":542133},BOUNDARY={"path":"compatibility/rc/21x-legacy-removal-source-boundary-reviewed.json","sha256":"ded2ca527aab48999037dd9fb3728d71b46031721663d8c530fc0f280d33e68e","bytes":315786},VERIFIER={"path":"scripts/upstream-legacy-removal-source.mjs","sha256":"c1570fbdae80e1e4ef1cf9da8120c948c003d9ee5fcf0d804b109e3e45fac38d","bytes":28313},SUCCESSOR={"path":"compatibility/rc/21x-legacy-removal-admission-source-successor.json","sha256":"d0d8210968ead5eec6ec8a7e9952f7f770422f6e383230c312360d3f8d2ab523","bytes":1877};
+const KIND='individual-historical-legacy-removal-source-exclusion',SCOPE='legacy_removal_source_scope';
+const hash=raw=>createHash('sha256').update(raw).digest('hex'),image=readFileSync(__filename),handlerRef={path:HANDLER,sha256:hash(image),bytes:image.length};
+function legacyRemovalProof(row){
+ assert.equal(row?.sha,SHA);
+ return {proof_kind:KIND,diff_sha256:DIFF,review_depth:'individual-compatibility',affected_branches:['21.x'],decision:row.decision,
+  [SCOPE]:{sha:SHA,review:{path:REVIEW,sha256:REVIEW_HASH},source_qualification:{...QUALIFICATION},source_review:{...SOURCE_REVIEW},source_boundary:{...BOUNDARY},source_verifier:{...VERIFIER},source_successor:{...SUCCESSOR},handler:{...handlerRef},complete_original_files:746,original_text_hunks:797,individual_nondeletion_hunks:97,deleted_paths_complete_membership:702,source_scope_only:true,actual_native_packed_browser_floor_or_full_audit_qualified:false}};
+}
+/** Pure complete metadata comparison; never reads files or a source result. */
+function metadataOk({entry,body,review,proof=entry?.individual_proof}){
+ try{
+  assert.equal(hash(JSON.stringify(body,null,2)+'\n'),REVIEW_HASH);assert.deepEqual(body,review);
+  assert.equal(body.line,'21.x');assert.equal(body.sha,SHA);assert.equal(body.status,'reviewed');assert.equal(body.source_review_complete,true);
+  assert.equal(body.proposed_final_disposition,'not-applicable');assert.equal(body.source_scope_only,true);assert.equal(body.g11_claim,'not-passed');assert.equal(body.actual_native_packed_browser_floor_or_full_audit_qualified,false);
+  assert.equal(body.original_file_occurrences,746);assert.equal(body.original_hunks,797);assert.equal(body.individual_modification_hunks,97);assert.equal(body.complete_deleted_paths,702);
+  assert.equal(body.complete_original_paths.length,746);assert.equal(new Set(body.complete_original_paths).size,746);assert.equal(body.diff_sha256,DIFF);
+  assert.deepEqual(body.source_qualification,QUALIFICATION);assert.deepEqual(body.source_review,SOURCE_REVIEW);assert.deepEqual(body.source_boundary,BOUNDARY);assert.deepEqual(body.current_source_verifier,VERIFIER);assert.deepEqual(body.current_source_successor,SUCCESSOR);
+  assert.equal(entry.sha,SHA);assert.equal(entry.final_disposition,'not-applicable');assert.equal(entry.read_note_disposition,'owned-retained');assert.equal(entry.reason,body.decision);assert.ok(entry.reason.length>80);
+  assert.equal(entry.review_depth,'individual-compatibility');assert.deepEqual(entry.affected_branches,['21.x']);assert.deepEqual(entry.files,body.frozen_seed_paths);assert.equal(entry.evidence_report,REVIEW);assert.equal(entry.g11_claim,'not-passed');
+  assert.deepEqual(proof,legacyRemovalProof(body));assert.deepEqual(entry.individual_proof,proof);return true;
+ }catch{return false;}
+}
+/** Fresh object, hunk, API, Sass, test and complete current-source verification. */
+function inspectSource({entry,body,review,proof,root=ROOT,read=path=>readFileSync(join(root,path))}){
+ assert.equal(resolve(root),ROOT);assert.equal(metadataOk({entry,body,review,proof}),true);
+ const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,BOUNDARY,VERIFIER,SUCCESSOR,handlerRef,{path:body.patch_file,sha256:DIFF}].map(ref=>({...ref}));
+ const assertBound=()=>{for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed legacy removal admission source '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}};
+ assertBound();assert.deepEqual(JSON.parse(read(REVIEW)),body);
+ const source=require('./upstream-legacy-removal-source.mjs').inspectLegacyRemovalSourceReview({root,read});
+ assert.deepEqual(source.review,JSON.parse(read(SOURCE_REVIEW.path)));assert.deepEqual(source.report,JSON.parse(read(BOUNDARY.path)));
+ const assertCurrent=()=>{assertBound();source.assertCurrent();assertBound();};assertCurrent();return {bound:[...bound,...source.bound],assertCurrent,facts:source.facts};
+}
+function sourceOk(args){try{const source=inspectSource(args);source.assertCurrent();return true;}catch{return false;}}
+function inspectCanonicalSource({entries,body,...args}){
+ assert.deepEqual(entries.map(row=>row.sha),[SHA]);const source=inspectSource({...args,entry:entries[0],body,review:body,proof:entries[0].individual_proof});
+ return {...source,individual_metadata_cases:1,fresh_whole_body_source_reviews:1,source_scope_only:true,current_native_packed_floor_or_G11_credit:false};
+}
+module.exports={LEGACY_REMOVAL_SHA:SHA,LEGACY_REMOVAL_REVIEW:REVIEW,LEGACY_REMOVAL_REVIEW_HASH:REVIEW_HASH,LEGACY_REMOVAL_PROOF_KIND:KIND,LEGACY_REMOVAL_SCOPE_KEY:SCOPE,legacyRemovalProof,metadataOk,sourceOk,inspectSource,inspectCanonicalSource};

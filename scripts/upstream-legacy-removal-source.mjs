@@ -11,6 +11,9 @@ import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {gunzipSync,inflateSync} from 'node:zlib';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
+import {createRequire} from 'node:module';
+import {dirname,join,resolve,relative,sep} from 'node:path';
+import {lstatSync,readdirSync,realpathSync} from 'node:fs';
 const SHA='f7e3ae3bd1b86d5987df57bb06d350001c592931',TAG='df60e733c60e572ba538f6ad0ceff3e63e527b53';
 const SOURCE={path:'compatibility/rc/21x-legacy-removal-source-originals.json.gz',sha256:'2d7f5c44b2343e64267b8881714e98c2fe14b31e61dd39609b20c7e0ee5ccd85'};
 const CENSUS={path:'compatibility/rc/upstream-complete-patch-census.json.gz',sha256:'806433925a6216b52b26a98b3b91eb7129a506ab0363573b7cc21063c1366e97'};
@@ -105,4 +108,142 @@ export function inspectLegacyRemovalOriginals({root,read=path=>readEvidenceMembe
  const original=JSON.parse(gunzipSync(raw,{maxOutputLength:64*1024*1024})),census=JSON.parse(gunzipSync(censusRaw,{maxOutputLength:64*1024*1024})),facts=authenticateLegacyRemovalOriginals(original,census);
  const assertCurrent=()=>{for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late original source '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}};
  assertCurrent();return {bound:structuredClone([...bound.values()]),facts:structuredClone(facts),assertCurrent};
+}
+
+/** Finite branch-native source review; no CLI, old program, compiler callback or success cache. */
+const LEGACY_REVIEW='compatibility/rc/21x-legacy-removal-source-review.json';
+const LEGACY_REVIEW_SHA='9193f477e02e8f5e3444c962f6ceaf372080582e7d485c3a9950058d7827fa65';
+const LEGACY_BOUNDARY='compatibility/rc/21x-legacy-removal-source-boundary-reviewed.json';
+const LEGACY_BOUNDARY_SHA='ded2ca527aab48999037dd9fb3728d71b46031721663d8c530fc0f280d33e68e';
+const LEGACY_QUALIFICATION='compatibility/rc/21x-legacy-removal-source-qualification.json';
+const LEGACY_QUALIFICATION_SHA='94072e0defad3ef1359882397251634de228a2f67e128e44512cc5efe022e2e1';
+const LEGACY_COMPILER=[{"path":"node_modules/typescript/lib/typescript.js","sha256":"e5f1f6b3e82228a89873cc7b941b2465185e839c0692860f83e3e63e53f94c2b","bytes":9111680},{"path":"node_modules/typescript/package.json","sha256":"5a0bb7f286c4b3f1413a42c05f902311b161f70e5f52d9da10490443bfd595a3","bytes":3620}];
+function legacyRemovalPhysical(root,path){
+ if(LEGACY_COMPILER.some(row=>row.path===path)){
+  const base=realpathSync(join(root,'node_modules/typescript')),file=realpathSync(join(base,path.slice('node_modules/typescript/'.length)));
+  assert.ok(file.startsWith(base+sep));return readFileSync(file);
+ }
+ return readEvidenceMember(root,path);
+}
+function legacyRemovalProductPopulation(root){
+ const paths=[];
+ const walk=path=>{for(const name of readdirSync(join(root,path)).sort()){
+  if(name==='node_modules')continue;const next=path+'/'+name,stat=lstatSync(join(root,next));assert.ok(!stat.isSymbolicLink(),'symlink in legacy source boundary');
+  if(stat.isDirectory())walk(next);else{assert.ok(stat.isFile());paths.push(next);}
+ }};
+ walk('projects/ngx-material-legacy');return paths.sort();
+}
+export function inspectLegacyRemovalSourceReview({root,read:providedRead=path=>legacyRemovalPhysical(root,path)}={}){
+ assert.equal(resolve(root),resolve(dirname(fileURLToPath(import.meta.url)),'..'));
+ const bound=new Map(),readCurrent=path=>{
+  const raw=providedRead(path);assert.ok(Buffer.isBuffer(raw));assert.ok(raw.equals(legacyRemovalPhysical(root,path)),'nonphysical legacy review source '+path);
+  const prior=bound.get(path);if(prior){assert.equal(hash(raw),prior.sha256);assert.equal(raw.length,prior.bytes);}else bound.set(path,{path,sha256:hash(raw),bytes:raw.length});return raw;
+ };
+ const pinned=(path,digest)=>{const raw=readCurrent(path);assert.equal(hash(raw),digest,'changed qualified legacy review '+path);return raw;};
+ const review=JSON.parse(pinned(LEGACY_REVIEW,LEGACY_REVIEW_SHA)),expected=JSON.parse(pinned(LEGACY_BOUNDARY,LEGACY_BOUNDARY_SHA));
+ const qualification=JSON.parse(pinned(LEGACY_QUALIFICATION,LEGACY_QUALIFICATION_SHA));
+ assert.equal(qualification.result,'source-review-qualified;canonical-admission-pending');assert.equal(qualification.proposed_disposition,'not-applicable');
+ for(const ref of LEGACY_COMPILER){const raw=readCurrent(ref.path);assert.equal(hash(raw),ref.sha256,'changed legacy source parser');assert.equal(raw.length,ref.bytes);}
+ assert.equal(process.version,'v'+JSON.parse(readCurrent('toolchain-lock.json')).repository.node);
+ const ts=createRequire(join(root,'package.json'))('typescript');assert.equal(ts.version,'5.9.2');
+ const original=inspectLegacyRemovalOriginals({root,read:readCurrent});
+ const capsule=JSON.parse(gunzipSync(readCurrent(SOURCE.path)));
+ const base='projects/ngx-material-legacy/',members=new Map(),expectedMembers=new Map(expected.current_members.map(row=>[row.path,row]));
+ const read=path=>{const raw=readCurrent(path),ref=expectedMembers.get(path);assert.ok(ref,'unknown legacy boundary input '+path);assert.equal(hash(raw),ref.sha256,'changed owned legacy boundary '+path);assert.equal(raw.length,ref.bytes);members.set(path,{...ref});return raw;};
+ read(SOURCE.path);
+const tag=new Map(capsule.tagged_reference.members.map(row=>[row.path,row]));
+const product=legacyRemovalProductPopulation(root);
+assert.deepEqual(product,expected.current_members.filter(row=>row.path.startsWith(base)).map(row=>row.path).sort());
+for(const path of product)read(path);
+const source=(path,body)=>ts.createSourceFile(path,body,ts.ScriptTarget.Latest,true,ts.ScriptKind.TS);
+const exportModifier=node=>node.modifiers?.some(m=>m.kind===ts.SyntaxKind.ExportKeyword);
+function exportsOf(path,body,seen=new Set()){
+ assert.ok(!seen.has(path),'cycle in static export traversal '+path);seen=new Set([...seen,path]);
+ const file=source(path,body);assert.equal(file.parseDiagnostics.length,0,'unparsed current or tagged API '+path);const names=new Set();
+ for(const node of file.statements){
+  if(ts.isExportDeclaration(node)){
+   if(node.exportClause&&ts.isNamedExports(node.exportClause)){for(const item of node.exportClause.elements)names.add(item.name.text);}
+   else if(node.exportClause&&ts.isNamespaceExport(node.exportClause))names.add(node.exportClause.name.text);
+   else if(node.moduleSpecifier){
+    const spec=node.moduleSpecifier.text;assert.ok(spec.startsWith('.'),'unbounded external star export '+path);
+    const stem=resolve(root,dirname(path),spec),target=[stem+'.ts',stem+'/index.ts',stem+'/public-api.ts'].find(candidate=>product.includes(relative(root,candidate)));
+    assert.ok(target,'unresolved owned star export '+path+' '+spec);for(const name of exportsOf(relative(root,target),read(relative(root,target)).toString(),seen))names.add(name);
+   }
+  }else if(exportModifier(node)){
+   if(node.name&&ts.isIdentifier(node.name))names.add(node.name.text);
+   else if(ts.isVariableStatement(node))for(const declaration of node.declarationList.declarations){assert.ok(ts.isIdentifier(declaration.name));names.add(declaration.name.text);}
+  }
+ }
+ return [...names].sort();
+}
+const api=[];
+for(const member of tag.values()){
+ if(!member.path.endsWith('/public-api.ts'))continue;
+ const path=base+member.path.slice('src/material/'.length),rel=path.slice(base.length).replace('/public-api.ts','').replace('/testing','-testing');
+ const golden=tag.get('tools/public_api_guard/material/'+rel+'.md');assert.ok(golden);
+ const block=golden.body.match(/```ts\n([\s\S]*?)\n```/);assert.ok(block);
+ const historical=exportsOf(golden.path,block[1]),current=exportsOf(path,read(path).toString());
+ const config=base+member.path.slice('src/material/'.length).replace('public-api.ts','ng-package.json');assert.equal(JSON.parse(read(config)).lib.entryFile,'public-api.ts');
+ api.push({historical_barrel:member.path,historical_barrel_blob:member.blob,historical_golden:golden.path,historical_golden_blob:golden.blob,current_path:path,entry_config:config,historical_names:historical,current_names:current,missing:historical.filter(name=>!current.includes(name)),additional:current.filter(name=>!historical.includes(name))});
+}
+assert.equal(api.length,44);
+const exceptions=JSON.parse(read('compatibility/compatibility-exceptions.json'));
+read('compatibility/handoff/codex-closeout/reference/animation-contract.csv');
+read('compatibility/handoff/codex-closeout/reference/PRODUCT-CONTRACT.md');
+const recipeNames={
+ 'legacy-dialog':[['matLegacyDialogAnimations','matDialogAnimations']],
+ 'legacy-form-field':[['matLegacyFormFieldAnimations','matFormFieldAnimations']],
+ 'legacy-menu':[['fadeInLegacyItems','fadeInItems'],['matLegacyMenuAnimations','matMenuAnimations'],['transformLegacyMenu','transformMenu']],
+ 'legacy-select':[['matLegacySelectAnimations','matLegacySelectAnimations']],
+ 'legacy-snack-bar':[['matLegacySnackBarAnimations','matSnackBarAnimations']],
+ 'legacy-tabs':[['matLegacyTabsAnimations','matTabsAnimations']],
+ 'legacy-tooltip':[['matLegacyTooltipAnimations','matLegacyTooltipAnimations']],
+};
+const recipeAliases=[];
+for(const[family,pairs]of Object.entries(recipeNames)){
+ const member=tag.get('src/material/'+family+'/public-api.ts'),file=source(member.path,member.body);
+ const exception=exceptions.exceptions.find(row=>row.id==='F04-recipe-'+family);assert.ok(exception);assert.equal(exception.disposition,'removed-with-native-migration');
+ for(const[name,upstreamName]of pairs){
+  const declarations=file.statements.filter(ts.isExportDeclaration);
+  const declaration=declarations.find(node=>node.exportClause&&ts.isNamedExports(node.exportClause)&&node.exportClause.elements.some(item=>item.name.text===name&&(item.propertyName?.text??item.name.text)===upstreamName));
+  assert.ok(declaration,'unauthenticated original recipe alias '+name);assert.ok(exception.symbol_or_selector.split(' / ').includes(upstreamName));
+  const actual=api.find(row=>row.current_path===base+family+'/public-api.ts');assert.ok(actual.missing.includes(name));
+  recipeAliases.push({family,name,original_name:upstreamName,original_module:declaration.moduleSpecifier.text,tagged_barrel_blob:member.blob,existing_exception:exception.id});
+ }
+}
+assert.equal(recipeAliases.length,9);assert.deepEqual(api.flatMap(row=>row.missing).sort(),recipeAliases.map(row=>row.name).sort());
+function forwards(text){return [...text.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/[^\n]*/g,'').matchAll(/@forward\s+['"]([^'"]+)['"]([^;]*);/g)].map(m=>({source:m[1],binding:m[2].replace(/\s+/g,' ').trim()}));}
+const oldForwards=forwards(tag.get('src/material/_index.scss').body).filter(row=>row.source.startsWith('./legacy-'));
+const currentForwards=forwards(read(base+'_index.scss').toString());
+const facade=oldForwards.map(row=>{const current={source:'./styles/'+row.source.slice(2),binding:row.binding};assert.ok(currentForwards.some(item=>item.source===current.source&&item.binding===current.binding),'missing unchanged legacy forward '+row.source);return{tagged:row,current};});
+assert.ok(currentForwards.every(row=>row.source.startsWith('./styles/')));
+const density=read(base+'styles/core/density/private/_compatibility.scss');
+const deletedCompatibility=capsule.sections.find(row=>row.path==='src/material/legacy-core/density/private/_compatibility.scss');assert.ok(density.equals(Buffer.from(deletedCompatibility.before.body)));
+const inventory=JSON.parse(read('testing/legacy-runner/historical-inventory.json'));assert.equal(inventory.rows.length,57);
+const tests=capsule.sections.filter(row=>row.status==='D'&&row.path.startsWith('src/material/')&&row.path.includes('.spec.'));
+assert.equal(tests.length,57);assert.deepEqual(tests.map(row=>row.path).sort(),inventory.rows.map(row=>row.historical_path).sort());
+for(const row of inventory.rows){assert.ok(members.has(row.candidate));assert.equal(hash(read(row.candidate)),row.candidate_sha256);}
+const packageJson=JSON.parse(read(base+'package.json')),packager=JSON.parse(read(base+'ng-package.json'));
+assert.ok(Object.keys(packageJson.exports).every(path=>!path.includes('prebuilt')));
+const experimentalImports=[];
+for(const path of product.filter(path=>path.endsWith('.ts'))){const file=source(path,read(path).toString());for(const node of file.statements)if((ts.isImportDeclaration(node)||ts.isExportDeclaration(node))&&node.moduleSpecifier&&/material-experimental|(?:column-resize|popover-edit|selection)\//.test(node.moduleSpecifier.text))experimentalImports.push({path,specifier:node.moduleSpecifier.text});}
+original.assertCurrent();
+const report={schema_version:1,line:'21.x',role:'current owned source boundary only; not full API/behavior/native qualification',original_source:original.facts,analysis_runtime:{node:process.version,typescript:ts.version},product_population:product.length,current_members:[...members.values()].sort((a,b)=>a.path.localeCompare(b.path)),api_name_inventory:api,existing_recipe_alias_removals:recipeAliases,legacy_forward_bindings:facade,legacy_density_compatibility_exact_relocation:{before:deletedCompatibility.path,current:base+'styles/core/density/private/_compatibility.scss',sha256:hash(density)},historical_suite:{rows:57,complete_deleted_spec_membership:true,current_candidate_hashes_match:true,execution_credit:false},package_boundary:{peerDependencies:packageJson.peerDependencies,exports:packageJson.exports,packaged_assets:packager.assets,original_prebuilt_CSS_exports_are_not_advertised_by_owned_manifest:true},experimental_imports:experimentalImports,canonical_decisions_changed:0,product_changes:0,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+ assert.deepEqual(report,expected,'fresh legacy boundary facts differ from qualified review');
+ assert.equal(review.sha,SHA);assert.equal(review.proposed_final_disposition,'not-applicable');assert.equal(review.canonical_decisions_changed,0);assert.equal(review.source_admissions_changed,0);assert.equal(review.product_changes,0);assert.equal(review.actual_native_packed_browser_floor_or_full_audit_qualified,false);
+ const modified=capsule.sections.filter(row=>row.status==='M'),deleted=capsule.sections.filter(row=>row.status==='D');
+ assert.deepEqual(review.nondeletion_file_reviews.map(row=>row.path),modified.map(row=>row.path));
+ for(const[index,row]of modified.entries()){
+  const note=review.nondeletion_file_reviews[index];for(const key of ['before_blob','after_blob','patch_sha256'])assert.equal(note[key],row[key]);
+  assert.equal(note.hunks.length,row.hunks.length);for(const[i,hunk]of row.hunks.entries()){for(const key of ['index','header','sha256'])assert.equal(note.hunks[i][key],hunk[key]);assert.equal(note.hunks[i].source_decision,'do-not-adopt-upstream-removal-or-MDC-migration');assert.ok(note.hunks[i].review.length>60);}
+ }
+ assert.deepEqual(review.complete_deleted_path_membership.map(row=>row.path),deleted.map(row=>row.path));
+ const counts={};for(const[index,row]of deleted.entries()){
+  const note=review.complete_deleted_path_membership[index];assert.equal(note.before_blob,row.before_blob);assert.equal(note.before_sha256,row.before.sha256);assert.equal(note.patch_sha256,row.patch_sha256);assert.deepEqual(note.hunks,row.hunks.map(h=>({index:h.index,sha256:h.sha256})));assert.ok(Object.hasOwn(review.deletion_group_reviews,note.group));counts[note.group]=(counts[note.group]??0)+1;
+  for(const ref of note.current_targets)assert.deepEqual(ref,expectedMembers.get(ref.path));if(note.group.startsWith('owned-'))assert.ok(note.current_targets.length);
+ }
+ assert.deepEqual(counts,review.deletion_group_counts);assert.equal(modified.length,44);assert.equal(deleted.length,702);assert.equal(modified.reduce((total,row)=>total+row.hunks.length,0),97);
+ const productPaths=[...product];
+ const assertCurrent=()=>{original.assertCurrent();assert.deepEqual(legacyRemovalProductPopulation(root),productPaths,'changed complete legacy product population');for(const ref of bound.values()){const raw=readCurrent(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}};
+ assertCurrent();return {bound:structuredClone([...bound.values()]),assertCurrent,review:structuredClone(review),report:structuredClone(report),facts:{line:'21.x',sha:SHA,complete_original_files:746,original_text_hunks:797,nondeletion_hunks_individually_reviewed:97,deleted_paths_complete_membership:702,fresh_original_and_owned_boundary_review:true,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};
 }

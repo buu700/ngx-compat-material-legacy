@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "before_source": {
+    "path": "scripts/upstream-legacy-removal-source.mjs",
+    "sha256": "a22cfda1faea856c3843c91c5fc7788c46a6cddcae580f1279f18ed0b20699a2",
+    "bytes": 13085
+  },
+  "after_source": {
+    "path": "scripts/upstream-legacy-removal-source.mjs",
+    "sha256": "c1570fbdae80e1e4ef1cf9da8120c948c003d9ee5fcf0d804b109e3e45fac38d",
+    "bytes": 28313
+  },
+  "original_authenticator_body_preserved": true,
+  "qualified_diagnostic_body": {
+    "path": "compatibility/rc/21x-legacy-removal-source-boundary-inspect.mjs",
+    "sha256": "de7eebb520ce0ba8c20974b9887b705250fa84e7d47f89158ec9498a7bacdfd6",
+    "selected_body_sha256": "6311b46e53696d5fac2aa22d1ed3b4e7fa51f529b1b2119a8971b65947bfbcf8"
+  },
+  "finite_body_edits": [
+    {
+      "before": "const product=execFileSync('git',['ls-files','-z','--',base],{cwd:root,encoding:'utf8'}).split('\\0').filter(Boolean).sort();\nassert.equal(new Set(product).size,product.length);for(const path of product){assert.ok(!lstatSync(resolve(root,path)).isSymbolicLink());read(path);}",
+      "after": "const product=legacyRemovalProductPopulation(root);\nassert.deepEqual(product,expected.current_members.filter(row=>row.path.startsWith(base)).map(row=>row.path).sort());\nfor(const path of product)read(path);"
+    }
+  ],
+  "current_module_body_sha256": "0f3b16148c4493210f2b4a7944b1252be1cdac87e458f650f97747c0e38b2961",
+  "compiler_sources": [
+    {
+      "path": "node_modules/typescript/lib/typescript.js",
+      "sha256": "e5f1f6b3e82228a89873cc7b941b2465185e839c0692860f83e3e63e53f94c2b",
+      "bytes": 9111680
+    },
+    {
+      "path": "node_modules/typescript/package.json",
+      "sha256": "5a0bb7f286c4b3f1413a42c05f902311b161f70e5f52d9da10490443bfd595a3",
+      "bytes": 3620
+    }
+  ],
+  "CLI_imported_or_executed": false,
+  "canonical_decisions_changed": 0,
+  "product_changes": 0
+}
