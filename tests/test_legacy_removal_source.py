@@ -94,11 +94,18 @@ class LegacyRemovalSourceTests(unittest.TestCase):
         self.assertFalse(report['substantive_hunk_or_ownership_review_completed']);self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified'])
     def test_source_review_has_not_changed_the_canonical_subject(self):
         worksheet=json.loads((ROOT/'compatibility/rc/21x-legacy-removal-source-worksheet.json').read_bytes())
-        before=worksheet['protected_ledger'];raw=(ROOT/before['path']).read_bytes()
+        # The source-only stage remains exact data after a separately qualified admission.
+        before=worksheet['protected_ledger'];raw=gzip.decompress((ROOT/'compatibility/rc/21x-legacy-removal-admission-ledger-before.json.gz').read_bytes())
         self.assertEqual(hashlib.sha256(raw).hexdigest(),before['sha256']);self.assertEqual(len(raw),before['bytes'])
         ledger=json.loads(raw);entry=next(row for row in ledger['entries']if row['sha']==worksheet['sha'])
         self.assertEqual(entry,worksheet['before_entry']);self.assertEqual(ledger['closed_dispositions'],424);self.assertEqual(ledger['open_or_deferred'],1273)
         self.assertEqual(sum(row['final_disposition']=='security-review'for row in ledger['entries']),1)
+        proposal=json.loads((ROOT/'compatibility/rc/21x-legacy-removal-admission-canonical-proposal.json').read_bytes());current=(ROOT/before['path']).read_bytes()
+        self.assertIn(hashlib.sha256(current).hexdigest(),[proposal['before']['sha256'],proposal['after']['sha256']])
+        after=gzip.decompress((ROOT/'compatibility/rc/21x-legacy-removal-admission-ledger-after.json.gz').read_bytes());self.assertEqual(hashlib.sha256(after).hexdigest(),proposal['after']['sha256'])
+        selected=worksheet['sha'];candidate=json.loads(after)
+        self.assertEqual([row for row in candidate['entries']if row['sha']!=selected],[row for row in ledger['entries']if row['sha']!=selected])
+        self.assertEqual(candidate['closed_dispositions'],425);self.assertEqual(candidate['open_or_deferred'],1272)
     def test_complete_review_against_independent_export_and_scope_checks(self):
         original=json.loads(gzip.decompress((ROOT/(PREFIX+'originals.json.gz')).read_bytes()))
         review=json.loads((ROOT/(PREFIX+'review.json')).read_bytes());boundary=json.loads((ROOT/(PREFIX+'boundary-reviewed.json')).read_bytes())

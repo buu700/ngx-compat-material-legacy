@@ -7,6 +7,8 @@
 /** Current canonical owner: preserved prior stages plus one explicit title stage. */
 import assert from 'node:assert/strict';
 import {inventoryReferenceOwnerContext} from './inventory-reference-owner.mjs';
+import {legacyRemovalOwnerContext} from './legacy-removal-canonical-stage.mjs';
+import {legacyRemovalOwnerSourceSubject} from './legacy-removal-owner-source.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {createRequire} from 'node:module';
@@ -289,10 +291,23 @@ function themingTools(root,read){
  assertCurrent();return {packet,registryBefore,bound,assertCurrent,body,successor,
   currentReference:ref=>ref.path===THEMING_REGISTRY?successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.registry_after:ref};
 }
+function currentThemingTools(root,read){
+ const legacy=legacyRemovalOwnerSourceSubject({root,read});
+ const comparisonRead=path=>path===THEMING_REGISTRY?legacy.registryComparisonBytes():read(path);
+ const prior=themingTools(root,comparisonRead);
+ const currentReference=ref=>{const previous=prior.currentReference(ref);return previous.path===THEMING_REGISTRY?legacy.qualifyReference(previous):previous;};
+ const bound=prior.bound.map(currentReference),assertCurrent=()=>{legacy.assertCurrent();prior.assertCurrent();for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}};
+ assertCurrent();return {...prior,bound,currentReference,assertCurrent};
+}
+function legacyRegistryMetadataReference(root,read,prior){
+ const legacy=legacyRemovalOwnerSourceSubject({root}),reference=legacy.qualifyReference(prior);
+ const assertCurrent=()=>{legacy.assertCurrent();assert.equal(hash(read(prior.path)),reference.sha256);};
+ assertCurrent();return {reference,bound:[...legacy.bound,reference],assertCurrent,individual_source_decisions:0,metadata_tokens:0,old_tool_bytes_exposed:false,current_native_or_packed_qualified:false};
+}
 function context(root,read){
  assert.equal(resolve(root),ROOT,'wrong21.x canonical owner checkout');
  const transaction=sourceTransactionTools(root,read);
- const tools=themingTools(root,read);
+ const tools=currentThemingTools(root,read);
  const frameRaw=read(FRAMES);assert.equal(hash(frameRaw),FRAMES_HASH,'changed accepted ledger-frame catalog');
  const frames=JSON.parse(frameRaw);assert.equal(frames.schema_version,1);assert.equal(frames.line,'21.x');
  assert.equal(frames.frames.length,21);assert.equal(new Set(frames.frames.map(frame=>frame.sha256)).size,21);
@@ -445,9 +460,9 @@ function epochBeforeInventoryReferenceLedger({root=process.cwd(),read=disk(root)
 function qualifyBeforeInventoryReferenceToolReference({root=process.cwd(),read=disk(root),prior}={}){
  assert.equal(resolve(root),ROOT);assert.ok([OWNER,TITLE_NATIVE_REGISTRY,'scripts/autocomplete-selection-native-subject.mjs',THEMING_REGISTRY].includes(prior?.path));
  let role;try{role=read(METADATA_ROLE);}catch{/* A physical current reader has no private metadata capability. */}
- if(role===metadataToken){assert.equal(hash(read(prior.path)),prior.sha256);return null;}
+ if(role===metadataToken){if(prior.path===THEMING_REGISTRY&&hash(read(prior.path))!==prior.sha256)return legacyRegistryMetadataReference(root,read,prior);assert.equal(hash(read(prior.path)),prior.sha256);return null;}
  const transaction=sourceTransactionTools(root,read);
- const tools=themingTools(root,read);
+ const tools=currentThemingTools(root,read);
  const before=prior.path===THEMING_REGISTRY?[tools.registryBefore,tools.successor.registryBefore,tools.successor.successor.registryBefore,tools.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.registryBefore].find(raw=>hash(raw)===prior.sha256):original(root,prior.path);assert.ok(before,'unqualified canonical registry prior');assert.equal(hash(before),prior.sha256,'unqualified canonical tool prior');
  if(prior.bytes!==undefined)assert.equal(before.length,prior.bytes);
  const raw=read(PACKET);assert.equal(hash(raw),PACKET_HASH);const packet=JSON.parse(raw);
@@ -459,13 +474,13 @@ function qualifyBeforeInventoryReferenceToolReference({root=process.cwd(),read=d
 }
 
 /** Exact terminal inventory metadata successor; all prior source stages still execute. */
-export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){
+function prepareBeforeLegacyRemovalLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});
  const inventory=inventoryReferenceOwnerContext({root,read});
  const prior=prepareBeforeInventoryReferenceLedger({root,read:inventory.metadataRead});
  return inventory.wrapPrepared(prior);
 }
-export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={}){
+function epochBeforeLegacyRemovalLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});
  const inventory=inventoryReferenceOwnerContext({root,read});
  const prior=epochBeforeInventoryReferenceLedger({root,read:inventory.metadataRead});
@@ -480,7 +495,7 @@ export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={
 }
 
 /** Public tool references retain current bytes and every preserved binding check. */
-export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root),prior}={}){
+function qualifyBeforeLegacyRemovalToolReference({root=process.cwd(),read=disk(root),prior}={}){
  let role;try{role=read(METADATA_ROLE);}catch{/* Raw readers have no metadata capability. */}
  if(role===metadataToken)return qualifyBeforeInventoryReferenceToolReference({root,read,prior});
  const inventory=inventoryReferenceOwnerContext({root,read});
@@ -492,4 +507,36 @@ export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root
  const current=read(result.reference.path);
  const reference={...result.reference,sha256:hash(current),bytes:current.length};
  assertCurrent();return {...result,reference,bound:[...bound.values()],assertCurrent};
+}
+
+/** The complete prior owner runs first; only the exact new source stage follows. */
+export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){
+ read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});
+ const legacy=legacyRemovalOwnerContext({root,read});
+ const prior=prepareBeforeLegacyRemovalLedger({root,read:legacy.metadataRead});
+ return legacy.wrapPrepared(prior);
+}
+export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={}){
+ read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});
+ const legacy=legacyRemovalOwnerContext({root,read});
+ const prior=epochBeforeLegacyRemovalLedger({root,read:legacy.metadataRead});
+ const assertCurrent=()=>{legacy.assertCurrent();prior.assertCurrent();legacy.assertCurrent();};
+ const historical=path=>{if(path!==LEDGER)return read(path);assertCurrent();const raw=prior.read(path);assertCurrent();return raw;};
+ readers.set(historical,{root:resolve(root),raw:read});assertCurrent();
+ return {...prior,read:historical,raw:read,assertCurrent,
+  individual_decisions_applied:prior.individual_decisions_applied+(legacy.applied?1:0),
+  legacy_removal_source_decisions_applied:legacy.applied?1:0,
+  current_tool_bytes_exposed_without_projection:true,current_native_packed_or_floor_or_g11_credit:false};
+}
+export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root),prior}={}){
+ read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.qualifyCanonicalToolReference({root,read,prior});
+ let role;try{role=read(METADATA_ROLE);}catch{/* A public reader has no private comparison capability. */}
+ if(role===metadataToken)return qualifyBeforeLegacyRemovalToolReference({root,read,prior});
+ const legacy=legacyRemovalOwnerContext({root,read});
+ const result=qualifyBeforeLegacyRemovalToolReference({root,read:legacy.metadataRead,prior});
+ if(!result)return result;
+ const bound=new Map(result.bound.map(ref=>[ref.path,{...ref}]));for(const ref of legacy.bound)bound.set(ref.path,{...ref});
+ const current=read(result.reference.path),reference={...result.reference,sha256:hash(current),bytes:current.length};
+ const assertCurrent=()=>{legacy.assertCurrent();result.assertCurrent();legacy.assertCurrent();};
+ assertCurrent();return {...result,reference,bound:[...bound.values()],assertCurrent,legacy_removal_source_scope:true};
 }

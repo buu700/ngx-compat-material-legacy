@@ -7,6 +7,7 @@
 /** Exact terminal metadata integration. Historical tool images are compared as data, never executed. */
 import assert from 'node:assert/strict';
 import {checkerReferenceOwnerContext} from './checker-reference-owner.mjs';
+import {legacyRemovalOwnerSourceSubject} from './legacy-removal-owner-source.mjs';
 import {browserReferenceOwnerContext} from './browser-reference-owner.mjs';
 import {readCheckerOwnerMember} from './checker-owner-source.mjs';
 import {createHash} from 'node:crypto';
@@ -114,8 +115,10 @@ if report['result']!='pass':sys.stderr.write(log.getvalue());sys.exit(1)
 export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwnerMember(root,path)}={}){
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version;
  const line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
- const bound=new Map();
+ const legacyTools=legacyRemovalOwnerSourceSubject({root,read});
+ const bound=new Map(legacyTools.bound.map(ref=>[ref.path,{...ref}]));
  const member=(path,expected)=>{
+  if(expected)expected=legacyTools.qualifyReference({path,sha256:expected}).sha256;
   readEvidenceMember(root,path);const raw=read(path);assert.ok(Buffer.isBuffer(raw));
   if(expected)assert.equal(hash(raw),expected,'changed inventory owner input '+path);
   bound.set(path,{path,sha256:hash(raw),bytes:raw.length});return raw;
@@ -129,8 +132,9 @@ export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwner
  let ownerExpected=oldOwner.toString();
  for(const edit of packet.owner_literal_edits){assert.equal(ownerExpected.split(edit.before).length,2,'ambiguous owner edit');ownerExpected=ownerExpected.replace(edit.before,edit.after);}
  assert.equal(hash(ownerExpected),packet.after_owner.sha256);assert.equal(Buffer.byteLength(ownerExpected),packet.after_owner.bytes);
- const owner=member(OWNER,packet.after_owner.sha256);assert.equal(owner.toString(),ownerExpected);
- assert.equal(hash(readEvidenceMember(root,OWNER)),packet.after_owner.sha256,'actual loaded owner path differs from qualified code');
+ const owner=member(OWNER,packet.after_owner.sha256);assert.equal(legacyTools.comparisonBytes(packet.after_owner).toString(),ownerExpected);
+ assert.equal(hash(owner),legacyTools.qualifyReference(packet.after_owner).sha256);
+ assert.equal(hash(readEvidenceMember(root,OWNER)),legacyTools.qualifyReference(packet.after_owner).sha256,'actual loaded owner path differs from qualified code');
  for(const ref of packet.source_members){const raw=member(ref.path,ref.sha256);assert.equal(raw.length,ref.bytes);}
  const historicalHandlers=new Map();
  for(const transition of packet.historical_handler_metadata){
@@ -180,7 +184,7 @@ export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwner
  // The original owner validates all old complete frames. Only this exact
  // independently derived after-image maps to its qualified predecessor.
  const assertCurrent=()=>{
-  source.assertCurrent();checker.assertCurrent();browser.assertCurrent();assertPhysicalCI();
+  legacyTools.assertCurrent();source.assertCurrent();checker.assertCurrent();browser.assertCurrent();assertPhysicalCI();
   for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late inventory owner input '+ref.path);assert.equal(raw.length,ref.bytes);}
  };
  const metadataRead=path=>{

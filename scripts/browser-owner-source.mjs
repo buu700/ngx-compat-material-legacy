@@ -6,6 +6,7 @@
  */
 /** Finite current tool successors. Historical bytes are comparison data only. */
 import assert from 'node:assert/strict';
+import {legacyRemovalOwnerSourceSubject} from './legacy-removal-owner-source.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {readFileSync,realpathSync} from 'node:fs';
@@ -29,7 +30,9 @@ function original(root,commit,path){
 }
 export function browserOwnerSourceSubject({root,read=path=>readBrowserOwnerMember(root,path)}={}){
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
- const bound=new Map(),member=ref=>{
+ const legacyTools=legacyRemovalOwnerSourceSubject({root,read});
+ const bound=new Map(legacyTools.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{
+  ref=legacyTools.qualifyReference(ref);
   const raw=read(ref.path),physical=readBrowserOwnerMember(root,ref.path);assert.ok(Buffer.isBuffer(raw));assert.equal(hash(raw),ref.sha256,'changed browser owner tool '+ref.path);
   if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(physical),'noncurrent browser owner tool '+ref.path);
   bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;
@@ -43,23 +46,26 @@ export function browserOwnerSourceSubject({root,read=path=>readBrowserOwnerMembe
   assert.equal(row.before.path,row.after.path);assert.ok(!transitions.has(row.after.path));
   const before=original(root,packet.source_parent,row.before.path);assert.equal(hash(before),row.before.sha256);assert.equal(before.length,row.before.bytes);
   let expected=before.toString();for(const edit of row.literal_edits){assert.equal(expected.split(edit.before).length,2,'ambiguous browser owner edit '+row.after.path);expected=expected.replace(edit.before,edit.after);}
-  assert.equal(hash(expected),row.after.sha256);assert.equal(Buffer.byteLength(expected),row.after.bytes);const after=member(row.after);assert.equal(after.toString(),expected);
-  transitions.set(row.after.path,{before:{...row.before},after:{...row.after},beforeBytes:before,afterBytes:after});
+  assert.equal(hash(expected),row.after.sha256);assert.equal(Buffer.byteLength(expected),row.after.bytes);const after=member(row.after);assert.equal(legacyTools.comparisonBytes(row.after).toString(),expected);
+  transitions.set(row.after.path,{before:{...row.before},after:{...row.after},beforeBytes:before,afterBytes:Buffer.from(expected)});
  }
  assert.equal(transitions.size,8);for(const ref of packet.source_members)member(ref);
  const qualifyReference=ref=>{
-  const row=transitions.get(ref.path);if(!row)return {...ref};
+  const row=transitions.get(ref.path);if(!row)return legacyTools.qualifyReference(ref);
+  const current=legacyTools.qualifyReference(row.after);if(ref.sha256===current.sha256){if(ref.bytes!==undefined)assert.equal(ref.bytes,current.bytes);return {...ref,sha256:current.sha256,bytes:current.bytes};}
   const previous=ref.sha256===row.before.sha256?row.before:ref.sha256===row.after.sha256?row.after:null;
   assert.ok(previous,'unqualified browser owner reference '+ref.path);if(ref.bytes!==undefined)assert.equal(ref.bytes,previous.bytes);
-  return {...ref,sha256:row.after.sha256,bytes:row.after.bytes};
+  return legacyTools.qualifyReference({...ref,sha256:row.after.sha256,bytes:row.after.bytes});
  };
  // This is not a reader adapter. Only an exact captured predecessor is returned
  // for a caller's literal source comparison; no old program is ever evaluated.
  const comparisonBytes=ref=>{
-  const row=transitions.get(ref.path);if(!row)return Buffer.from(member(ref));
-  qualifyReference(ref);return Buffer.from(ref.sha256===row.before.sha256?row.beforeBytes:row.afterBytes);
+  const row=transitions.get(ref.path);if(!row)return legacyTools.comparisonBytes(ref);
+  qualifyReference(ref);const current=legacyTools.qualifyReference(row.after);
+  if(ref.sha256===current.sha256&&ref.sha256!==row.after.sha256)return legacyTools.comparisonBytes(ref);
+  return Buffer.from(ref.sha256===row.before.sha256?row.beforeBytes:row.afterBytes);
  };
- const assertCurrent=()=>{for(const ref of bound.values()){
+ const assertCurrent=()=>{legacyTools.assertCurrent();for(const ref of bound.values()){
   const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late browser owner tool '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readBrowserOwnerMember(root,ref.path)));
  }};
  assertCurrent();return {line,packet:structuredClone(packet),bound:structuredClone([...bound.values()]),qualifyReference,comparisonBytes,assertCurrent,canonical_frame_admission_granted:false,old_program_executed:false,current_native_or_full_audit_credit:false};

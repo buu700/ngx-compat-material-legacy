@@ -79,7 +79,14 @@ export async function inspectCheckerSourceMetadata({read=disk}={}){
   const program=parse('testing.mjs',read('scripts/upstream-testing-api-21x-admission.mjs'));
   const patch=program.statements.filter(ts.isVariableStatement).flatMap(node=>node.declarationList.declarations).find(node=>node.name.getText(program)==='patches');assert.ok(ts.isObjectLiteralExpression(patch.initializer));assert.equal(patch.initializer.properties.length,7);
   for(const property of patch.initializer.properties){const sha=property.name.text;assert.equal(testing.requiresTestingApi21xEntry({sha},line,read),true);positive.push('testing:'+sha);}
-  assert.equal(registry.sourceContractDefinitions.length,67);
+  const registryPath='scripts/upstream-source-contract-registry.mjs',beforeRegistry=original(packet.source_parent,registryPath),registryAst=parse('registry-data.mjs',beforeRegistry);
+  const definition=registryAst.statements.filter(ts.isVariableStatement).flatMap(node=>node.declarationList.declarations).find(node=>node.name.getText(registryAst)==='sourceContractDefinitions');assert.ok(ts.isArrayLiteralExpression(definition.initializer));
+  const beforeDefinitions=definition.initializer.elements.map(node=>{assert.ok(ts.isObjectLiteralExpression(node));return Object.fromEntries(node.properties.map(property=>{assert.ok(ts.isPropertyAssignment(property)&&ts.isStringLiteral(property.initializer));return [property.name.getText(registryAst),property.initializer.text];}));});
+  assert.equal(beforeDefinitions.length,67);
+  const added=registry.sourceContractDefinitions.filter(row=>!beforeDefinitions.some(prior=>prior.sha===row.sha));assert.deepEqual(registry.sourceContractDefinitions.filter(row=>!added.includes(row)),beforeDefinitions);
+  const currentRegistry=read(registryPath),qualifiedRegistry=tools.qualifyReference({path:registryPath,sha256:hash(beforeRegistry),bytes:beforeRegistry.length});assert.equal(hash(currentRegistry),qualifiedRegistry.sha256);
+  assert.equal(added.length,hash(currentRegistry)===hash(beforeRegistry)?0:1);
+  if(added.length)assert.deepEqual(added,[{sha:'f7e3ae3bd1b86d5987df57bb06d350001c592931',proof_kind:'individual-historical-legacy-removal-source-exclusion',scope_key:'legacy_removal_source_scope',module:'upstream-legacy-removal-admission.cjs'}]);
   for(const row of registry.sourceContractDefinitions){
    for(const entry of [{sha:row.sha},{sha:'0'.repeat(40),individual_proof:{proof_kind:row.proof_kind}},{sha:'0'.repeat(40),individual_proof:{[row.scope_key]:{}}}]){assert.equal(registered.requiresRegisteredSourceReview(entry),true);positive.push('registered:'+row.sha);}
   }

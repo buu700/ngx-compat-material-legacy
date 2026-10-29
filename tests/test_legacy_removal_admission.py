@@ -24,7 +24,9 @@ class LegacyRemovalAdmissionTests(unittest.TestCase):
         self.assertEqual(report['result'],'pass');self.assertEqual(report['metadata_rejections'],20)
         self.assertEqual(report['cold_source_rejections'],13);self.assertEqual(report['late_source_rejections'],12)
         self.assertEqual(report['unselected_entries_preserved'],1696)
-        self.assertFalse(report['canonical_ledger_applied']);self.assertFalse(report['full_owner_integration_qualified']);self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified'])
+        historical_report=json.loads((ROOT/(PREFIX+'contract-controls.json')).read_bytes());self.assertFalse(historical_report['canonical_ledger_applied'])
+        packet=json.loads((ROOT/(PREFIX+'canonical-proposal.json')).read_bytes());current=digest((ROOT/packet['before']['path']).read_bytes())
+        self.assertIn(current,[packet['before']['sha256'],packet['after']['sha256']]);self.assertEqual(report['canonical_ledger_applied'],current==packet['after']['sha256']);self.assertFalse(report['full_owner_integration_qualified']);self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified'])
     def test_independent_exact_entry_and_scalar_projection(self):
         packet=json.loads((ROOT/(PREFIX+'canonical-proposal.json')).read_bytes());sha=packet['selected_sha_ids'][0]
         before=gzip.decompress((ROOT/(PREFIX+'ledger-before.json.gz')).read_bytes());after=gzip.decompress((ROOT/(PREFIX+'ledger-after.json.gz')).read_bytes())
@@ -46,11 +48,21 @@ class LegacyRemovalAdmissionTests(unittest.TestCase):
         self.assertEqual(body['complete_original_paths'],[row['path']for row in original['sections']]);self.assertEqual((ROOT/body['patch_file']).read_text(),original['diff'])
         self.assertEqual(digest((ROOT/body['patch_file']).read_bytes()),new['individual_proof']['diff_sha256'])
         handler=new['individual_proof']['legacy_removal_source_scope']['handler'];self.assertEqual(digest((ROOT/handler['path']).read_bytes()),handler['sha256'])
-        registry=(ROOT/'scripts/upstream-source-contract-registry.mjs').read_bytes();proposed=gzip.decompress((ROOT/(PREFIX+'registry-after.mjs.gz')).read_bytes());self.assertEqual(digest(registry),packet['registry_before']['sha256']);self.assertEqual(digest(proposed),packet['registry_after']['sha256'])
+        registry=gzip.decompress((ROOT/(PREFIX+'registry-before.mjs.gz')).read_bytes());proposed=gzip.decompress((ROOT/(PREFIX+'registry-after.mjs.gz')).read_bytes());self.assertEqual(digest(registry),packet['registry_before']['sha256']);self.assertEqual(digest(proposed),packet['registry_after']['sha256'])
         record=(f"  {{sha:'{sha}',proof_kind:'individual-historical-legacy-removal-source-exclusion',\n    scope_key:'legacy_removal_source_scope',module:'upstream-legacy-removal-admission.cjs'}},\n").encode()
         self.assertEqual(registry.count(b'];\n'),1);self.assertEqual(registry.replace(b'];\n',record+b'];\n'),proposed)
         self.assertEqual(len(re.findall(rb"\{sha:'[0-9a-f]{40}'",registry)),67);self.assertEqual(len(re.findall(rb"\{sha:'[0-9a-f]{40}'",proposed)),68)
         worksheet=json.loads((ROOT/(PREFIX+'worksheet.json')).read_bytes())
         for ref in [worksheet['before_ledger'],worksheet['before_registry'],worksheet['before_owner'],worksheet['protected_root_checker']]:
-            raw=(ROOT/ref['path']).read_bytes();self.assertEqual(digest(raw),ref['sha256']);self.assertEqual(len(raw),ref['bytes'])
+            if ref['path']in [worksheet['before_ledger']['path'],worksheet['before_registry']['path']]:
+                image='ledger-before.json.gz'if ref['path']==worksheet['before_ledger']['path']else'registry-before.mjs.gz';raw=gzip.decompress((ROOT/(PREFIX+image)).read_bytes())
+            elif ref['path']==worksheet['before_owner']['path']:
+                raw=subprocess.check_output(['git','--no-replace-objects','show',worksheet['source_parent']+':'+ref['path']],cwd=ROOT)
+            else:raw=(ROOT/ref['path']).read_bytes()
+            self.assertEqual(digest(raw),ref['sha256']);self.assertEqual(len(raw),ref['bytes'])
+        live_ledger=digest((ROOT/packet['before']['path']).read_bytes());live_registry=digest((ROOT/packet['registry_before']['path']).read_bytes())
+        self.assertIn(live_ledger,[packet['before']['sha256'],packet['after']['sha256']]);self.assertIn(live_registry,[packet['registry_before']['sha256'],packet['registry_after']['sha256']])
+        if live_ledger==packet['after']['sha256']:self.assertEqual(live_registry,packet['registry_after']['sha256'])
+        tools=json.loads((ROOT/(PREFIX+'owner-inputs.json')).read_bytes());current_owner=next(row['after']for row in tools['code_transitions']if row['after']['path']==worksheet['before_owner']['path'])
+        self.assertEqual(digest((ROOT/current_owner['path']).read_bytes()),current_owner['sha256'])
 if __name__=='__main__':unittest.main()

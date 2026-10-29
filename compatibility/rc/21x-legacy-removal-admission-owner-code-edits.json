@@ -1,0 +1,378 @@
+{
+  "schema_version": 1,
+  "source_parent": "24365f67b82cc9fe26cd5089384c5d27ce7f4ab2",
+  "code_transitions": [
+    {
+      "before": {
+        "path": "scripts/packed-upstream-ledger-epoch.mjs",
+        "sha256": "11d59797b69ea0097a58838b3d0e19cc16d851d75ba0085f1c3bd4550df7d2ef",
+        "bytes": 67941
+      },
+      "after": {
+        "path": "scripts/packed-upstream-ledger-epoch.mjs",
+        "sha256": "3a57a3abdfa56abb3fbd5a414a0ede3e8f1be6a5c2ea3a44e7feddfbf78dce46",
+        "bytes": 71931
+      },
+      "literal_edits": [
+        {
+          "before": "import {inventoryReferenceOwnerContext} from './inventory-reference-owner.mjs';",
+          "after": "import {inventoryReferenceOwnerContext} from './inventory-reference-owner.mjs';\nimport {legacyRemovalOwnerContext} from './legacy-removal-canonical-stage.mjs';"
+        },
+        {
+          "before": "export function preparePackedUpstreamLedger({",
+          "after": "function prepareBeforeLegacyRemovalLedger({"
+        },
+        {
+          "before": "export function packedUpstreamLedgerEpoch({",
+          "after": "function epochBeforeLegacyRemovalLedger({"
+        },
+        {
+          "before": "export function qualifyCanonicalToolReference({",
+          "after": "function qualifyBeforeLegacyRemovalToolReference({"
+        },
+        {
+          "before": " assertCurrent();return {...result,reference,bound:[...bound.values()],assertCurrent};\n}\n",
+          "after": " assertCurrent();return {...result,reference,bound:[...bound.values()],assertCurrent};\n}\n\n/** The complete prior owner runs first; only the exact new source stage follows. */\nexport function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){\n read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});\n const legacy=legacyRemovalOwnerContext({root,read});\n const prior=prepareBeforeLegacyRemovalLedger({root,read:legacy.metadataRead});\n return legacy.wrapPrepared(prior);\n}\nexport function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={}){\n read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});\n const legacy=legacyRemovalOwnerContext({root,read});\n const prior=epochBeforeLegacyRemovalLedger({root,read:legacy.metadataRead});\n const assertCurrent=()=>{legacy.assertCurrent();prior.assertCurrent();legacy.assertCurrent();};\n const historical=path=>{if(path!==LEDGER)return read(path);assertCurrent();const raw=prior.read(path);assertCurrent();return raw;};\n readers.set(historical,{root:resolve(root),raw:read});assertCurrent();\n return {...prior,read:historical,raw:read,assertCurrent,\n  individual_decisions_applied:prior.individual_decisions_applied+(legacy.applied?1:0),\n  legacy_removal_source_decisions_applied:legacy.applied?1:0,\n  current_tool_bytes_exposed_without_projection:true,current_native_packed_or_floor_or_g11_credit:false};\n}\nexport function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root),prior}={}){\n read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.qualifyCanonicalToolReference({root,read,prior});\n let role;try{role=read(METADATA_ROLE);}catch{/* A public reader has no private comparison capability. */}\n if(role===metadataToken)return qualifyBeforeLegacyRemovalToolReference({root,read,prior});\n const legacy=legacyRemovalOwnerContext({root,read});\n const result=qualifyBeforeLegacyRemovalToolReference({root,read:legacy.metadataRead,prior});\n if(!result)return result;\n const bound=new Map(result.bound.map(ref=>[ref.path,{...ref}]));for(const ref of legacy.bound)bound.set(ref.path,{...ref});\n const current=read(result.reference.path),reference={...result.reference,sha256:hash(current),bytes:current.length};\n const assertCurrent=()=>{legacy.assertCurrent();result.assertCurrent();legacy.assertCurrent();};\n assertCurrent();return {...result,reference,bound:[...bound.values()],assertCurrent,legacy_removal_source_scope:true};\n}\n"
+        },
+        {
+          "before": "import {legacyRemovalOwnerContext} from './legacy-removal-canonical-stage.mjs';",
+          "after": "import {legacyRemovalOwnerContext} from './legacy-removal-canonical-stage.mjs';\nimport {legacyRemovalOwnerSourceSubject} from './legacy-removal-owner-source.mjs';"
+        },
+        {
+          "before": "function context(root,read){",
+          "after": "function currentThemingTools(root,read){\n const legacy=legacyRemovalOwnerSourceSubject({root,read});\n const comparisonRead=path=>path===THEMING_REGISTRY?legacy.registryComparisonBytes():read(path);\n const prior=themingTools(root,comparisonRead);\n const currentReference=ref=>{const previous=prior.currentReference(ref);return previous.path===THEMING_REGISTRY?legacy.qualifyReference(previous):previous;};\n const bound=prior.bound.map(currentReference),assertCurrent=()=>{legacy.assertCurrent();prior.assertCurrent();for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}};\n assertCurrent();return {...prior,bound,currentReference,assertCurrent};\n}\nfunction legacyRegistryMetadataReference(root,read,prior){\n const legacy=legacyRemovalOwnerSourceSubject({root}),reference=legacy.qualifyReference(prior);\n const assertCurrent=()=>{legacy.assertCurrent();assert.equal(hash(read(prior.path)),reference.sha256);};\n assertCurrent();return {reference,bound:[...legacy.bound,reference],assertCurrent,individual_source_decisions:0,metadata_tokens:0,old_tool_bytes_exposed:false,current_native_or_packed_qualified:false};\n}\nfunction context(root,read){"
+        },
+        {
+          "before": " const tools=themingTools(root,read);\n const frameRaw=read(FRAMES);",
+          "after": " const tools=currentThemingTools(root,read);\n const frameRaw=read(FRAMES);"
+        },
+        {
+          "before": " const tools=themingTools(root,read);\n const before=prior.path===THEMING_REGISTRY?",
+          "after": " const tools=currentThemingTools(root,read);\n const before=prior.path===THEMING_REGISTRY?"
+        },
+        {
+          "before": " if(role===metadataToken){assert.equal(hash(read(prior.path)),prior.sha256);return null;}",
+          "after": " if(role===metadataToken){if(prior.path===THEMING_REGISTRY&&hash(read(prior.path))!==prior.sha256)return legacyRegistryMetadataReference(root,read,prior);assert.equal(hash(read(prior.path)),prior.sha256);return null;}"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "scripts/inventory-reference-owner.mjs",
+        "sha256": "9bed66e11f5f20d1fd4bb9691441b799b81d4bafcfba1ede6f5659f49e90f1ac",
+        "bytes": 17928
+      },
+      "after": {
+        "path": "scripts/inventory-reference-owner.mjs",
+        "sha256": "3bd8c41055cf574087d0596ea577e2faa07abb2682ac3112a0aab4224fe1ad23",
+        "bytes": 18391
+      },
+      "literal_edits": [
+        {
+          "before": "import {checkerReferenceOwnerContext} from './checker-reference-owner.mjs';",
+          "after": "import {checkerReferenceOwnerContext} from './checker-reference-owner.mjs';\nimport {legacyRemovalOwnerSourceSubject} from './legacy-removal-owner-source.mjs';"
+        },
+        {
+          "before": " const bound=new Map();\n const member=(path,expected)=>{",
+          "after": " const legacyTools=legacyRemovalOwnerSourceSubject({root,read});\n const bound=new Map(legacyTools.bound.map(ref=>[ref.path,{...ref}]));\n const member=(path,expected)=>{\n  if(expected)expected=legacyTools.qualifyReference({path,sha256:expected}).sha256;"
+        },
+        {
+          "before": " const owner=member(OWNER,packet.after_owner.sha256);assert.equal(owner.toString(),ownerExpected);\n assert.equal(hash(readEvidenceMember(root,OWNER)),packet.after_owner.sha256,'actual loaded owner path differs from qualified code');",
+          "after": " const owner=member(OWNER,packet.after_owner.sha256);assert.equal(legacyTools.comparisonBytes(packet.after_owner).toString(),ownerExpected);\n assert.equal(hash(owner),legacyTools.qualifyReference(packet.after_owner).sha256);\n assert.equal(hash(readEvidenceMember(root,OWNER)),legacyTools.qualifyReference(packet.after_owner).sha256,'actual loaded owner path differs from qualified code');"
+        },
+        {
+          "before": "  source.assertCurrent();checker.assertCurrent();browser.assertCurrent();assertPhysicalCI();",
+          "after": "  legacyTools.assertCurrent();source.assertCurrent();checker.assertCurrent();browser.assertCurrent();assertPhysicalCI();"
+        },
+        {
+          "before": "  if(path===LEDGER){const raw=read(path);assert.equal(hash(raw),hash(currentLedger),'late canonical metadata image change');return applied?Buffer.from(source.before):raw;}",
+          "after": "  if(path==='scripts/upstream-source-contract-registry.mjs')return legacyTools.registryComparisonBytes();\n  if(path===LEDGER){const raw=read(path);assert.equal(hash(raw),hash(currentLedger),'late canonical metadata image change');return applied?Buffer.from(source.before):raw;}"
+        },
+        {
+          "before": "  if(path==='scripts/upstream-source-contract-registry.mjs')return legacyTools.registryComparisonBytes();\n",
+          "after": ""
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "scripts/browser-owner-source.mjs",
+        "sha256": "d3f7ccd3d491e22b23c6faae008d81463265e6d241c20b2094890e7d877cc76e",
+        "bytes": 5270
+      },
+      "after": {
+        "path": "scripts/browser-owner-source.mjs",
+        "sha256": "f3eed08c7bc7d385a53ba2cabfeb35e4656e7f41871fab08b685104b1f0f84ad",
+        "bytes": 6019
+      },
+      "literal_edits": [
+        {
+          "before": "import assert from 'node:assert/strict';",
+          "after": "import assert from 'node:assert/strict';\nimport {legacyRemovalOwnerSourceSubject} from './legacy-removal-owner-source.mjs';"
+        },
+        {
+          "before": " const bound=new Map(),member=ref=>{",
+          "after": " const legacyTools=legacyRemovalOwnerSourceSubject({root,read});\n const bound=new Map(legacyTools.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{\n  ref=legacyTools.qualifyReference(ref);"
+        },
+        {
+          "before": "assert.equal(Buffer.byteLength(expected),row.after.bytes);const after=member(row.after);assert.equal(after.toString(),expected);\n  transitions.set(row.after.path,{before:{...row.before},after:{...row.after},beforeBytes:before,afterBytes:after});",
+          "after": "assert.equal(Buffer.byteLength(expected),row.after.bytes);const after=member(row.after);assert.equal(legacyTools.comparisonBytes(row.after).toString(),expected);\n  transitions.set(row.after.path,{before:{...row.before},after:{...row.after},beforeBytes:before,afterBytes:Buffer.from(expected)});"
+        },
+        {
+          "before": "  const row=transitions.get(ref.path);if(!row)return {...ref};",
+          "after": "  const row=transitions.get(ref.path);if(!row)return legacyTools.qualifyReference(ref);\n  const current=legacyTools.qualifyReference(row.after);if(ref.sha256===current.sha256){if(ref.bytes!==undefined)assert.equal(ref.bytes,current.bytes);return {...ref,sha256:current.sha256,bytes:current.bytes};}"
+        },
+        {
+          "before": "  return {...ref,sha256:row.after.sha256,bytes:row.after.bytes};",
+          "after": "  return legacyTools.qualifyReference({...ref,sha256:row.after.sha256,bytes:row.after.bytes});"
+        },
+        {
+          "before": " const assertCurrent=()=>{for(const ref of bound.values()){",
+          "after": " const assertCurrent=()=>{legacyTools.assertCurrent();for(const ref of bound.values()){"
+        },
+        {
+          "before": "  qualifyReference(ref);return Buffer.from(ref.sha256===row.before.sha256?row.beforeBytes:row.afterBytes);",
+          "after": "  qualifyReference(ref);const current=legacyTools.qualifyReference(row.after);\n  if(ref.sha256===current.sha256&&ref.sha256!==row.after.sha256)return legacyTools.comparisonBytes(ref);\n  return Buffer.from(ref.sha256===row.before.sha256?row.beforeBytes:row.afterBytes);"
+        },
+        {
+          "before": "  const row=transitions.get(ref.path);if(!row)return Buffer.from(member(ref));",
+          "after": "  const row=transitions.get(ref.path);if(!row)return legacyTools.comparisonBytes(ref);"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "scripts/legacy-removal-canonical-stage.mjs",
+        "sha256": "52929c690249b10263e3ebb1ea43c22603a7186e1c9bd14e8efd898443a5ce57",
+        "bytes": 3832
+      },
+      "after": {
+        "path": "scripts/legacy-removal-canonical-stage.mjs",
+        "sha256": "0fe2964002dae285220a4e716c30ddd66c4b21c243ced98ab8dce1fa7e8dffc4",
+        "bytes": 8311
+      },
+      "literal_edits": [
+        {
+          "before": "import admission from './upstream-legacy-removal-admission.cjs';",
+          "after": "import admission from './upstream-legacy-removal-admission.cjs';\nimport {legacyRemovalOwnerSourceSubject} from './legacy-removal-owner-source.mjs';\nimport {readFileSync} from 'node:fs';\nimport {join} from 'node:path';\nimport {gunzipSync} from 'node:zlib';\nimport {readEvidenceMember} from './upstream-packed-run-evidence.mjs';"
+        },
+        {
+          "before": " return {before:Buffer.from(before),after,entries:[structuredClone(entry)],individual_decisions:1,summary_scalar_tokens:2,unselected_entries_preserved:1696,canonical_admission_granted:false,current_native_packed_browser_floor_or_full_audit_qualified:false};\n}\n",
+          "after": " return {before:Buffer.from(before),after,entries:[structuredClone(entry)],individual_decisions:1,summary_scalar_tokens:2,unselected_entries_preserved:1696,canonical_admission_granted:false,current_native_packed_browser_floor_or_full_audit_qualified:false};\n}\n\n/** Real terminal source stage; prior complete-frame gates still own admission. */\nexport function legacyRemovalOwnerContext({root,read=path=>readFileSync(join(root,path))}={}){\n const tools=legacyRemovalOwnerSourceSubject({root,read}),packet=tools.packet;\n const bound=new Map(tools.bound.map(ref=>[ref.path,{...ref}]));\n const member=ref=>{const raw=read(ref.path);assert.ok(Buffer.isBuffer(raw));assert.equal(hash(raw),ref.sha256,'changed legacy owner input '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return raw;};\n const proposal=JSON.parse(member(packet.proposal)),body=JSON.parse(member(proposal.review));\n const before=gunzipSync(member(packet.ledger_before_image)),registryBefore=gunzipSync(member(packet.registry_before_image));\n const stage=applyLegacyRemovalCanonicalStage({before,body}),registryAfter=legacyRemovalRegistrySuccessor(registryBefore);\n assert.equal(hash(stage.before),proposal.before.sha256);assert.equal(hash(stage.after),proposal.after.sha256);assert.equal(hash(registryAfter),proposal.registry_after.sha256);\n assert.ok(gunzipSync(member(packet.ledger_after_image)).equals(stage.after));assert.ok(gunzipSync(member(packet.registry_after_image)).equals(registryAfter));\n const actualLedger=read(LEGACY_REMOVAL_LEDGER),actualRegistry=read(LEGACY_REMOVAL_REGISTRY);\n assert.ok(actualRegistry.equals(readEvidenceMember(root,LEGACY_REMOVAL_REGISTRY)),'nonphysical legacy source registry');\n assert.ok(actualRegistry.equals(registryBefore)||actualRegistry.equals(registryAfter),'unqualified legacy source registry');\n const applied=actualLedger.equals(stage.after),registryApplied=actualRegistry.equals(registryAfter);if(applied)assert.ok(registryApplied,'legacy ledger successor requires its exact source registry successor');\n for(const[path,raw]of [[LEGACY_REMOVAL_LEDGER,actualLedger],[LEGACY_REMOVAL_REGISTRY,actualRegistry]])bound.set(path,{path,sha256:hash(raw),bytes:raw.length});\n const source=admission.inspectCanonicalSource({root,read,entries:stage.entries,body});for(const ref of source.bound)bound.set(ref.path,{...ref,bytes:ref.bytes??read(ref.path).length});\n const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late legacy canonical input '+ref.path);assert.equal(raw.length,ref.bytes);}};\n // This private metadata view only maps the two independently derived exact\n // successors. The old actual compiled functions still reject unknown frames.\n const metadataRead=path=>{\n  if(path===LEGACY_REMOVAL_LEDGER){const raw=read(path);assert.ok(raw.equals(actualLedger),'late legacy ledger');return applied?Buffer.from(before):raw;}\n  if(path===LEGACY_REMOVAL_REGISTRY){const raw=read(path);assert.ok(raw.equals(actualRegistry),'late legacy registry');return registryApplied?Buffer.from(registryBefore):raw;}\n  return read(path);\n };\n const wrapPrepared=prior=>{\n  assertCurrent();assert.ok(prior.canonical_after.equals(before),'legacy stage does not succeed the complete browser metadata after-image');\n  const currentBound=new Map(prior.bound);for(const ref of bound.values())currentBound.set(ref.path,ref.sha256);\n  const assertPrior=()=>{assertCurrent();prior.assertCurrent?.();prior.prior_metadata_assert_current?.();assertCurrent();};\n  const native=prior.native_spec_source,nativeBound=native.bound.map(ref=>({...ref,sha256:currentBound.get(ref.path)??ref.sha256,bytes:read(ref.path).length}));\n  assertPrior();return {...prior,canonical_after:Buffer.from(stage.after),bound:currentBound,\n   legacy_removal_stage:{...stage,assertCurrent:assertPrior,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},\n   native_spec_source:{...native,bound:nativeBound,assertCurrent:()=>{assertCurrent();native.assertCurrent();assertCurrent();}},\n   assertCurrent:assertPrior,prior_metadata_assert_current:assertPrior};\n };\n assertCurrent();return {applied,registryApplied,before:Buffer.from(before),after:Buffer.from(stage.after),registryBefore:Buffer.from(registryBefore),registryAfter:Buffer.from(registryAfter),metadataRead,wrapPrepared,bound:structuredClone([...bound.values()]),assertCurrent,source_facts:structuredClone(source.facts),source_scope_only:true,current_native_packed_browser_floor_or_full_audit_qualified:false};\n}\n"
+        },
+        {
+          "before": "  if(path===LEGACY_REMOVAL_REGISTRY){const raw=read(path);assert.ok(raw.equals(actualRegistry),'late legacy registry');return registryApplied?Buffer.from(registryBefore):raw;}\n",
+          "after": ""
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "tests/legacy_removal_admission_probe.mjs",
+        "sha256": "80947ac01aec3696c9436d8d90f2026421be9a842e9e8b624a09c8397136debb",
+        "bytes": 13170
+      },
+      "after": {
+        "path": "tests/legacy_removal_admission_probe.mjs",
+        "sha256": "035ef9aade78b58fb025ef38c41c858d638c70926d9596a80973e93265d0c62f",
+        "bytes": 13998
+      },
+      "literal_edits": [
+        {
+          "before": "import {gunzipSync} from 'node:zlib';",
+          "after": "import {gunzipSync} from 'node:zlib';\nimport {legacyRemovalOwnerSourceSubject} from '../scripts/legacy-removal-owner-source.mjs';"
+        },
+        {
+          "before": "const phase=process.argv[3]??'contract';assert.ok(['contract','root'].includes(phase));",
+          "after": "const iterationTools=legacyRemovalOwnerSourceSubject({root,read});\nconst iterationLedger=before,physicalLedger=read(LEDGER),physicalRegistry=read(REGISTRY);\nassert.ok(physicalLedger.equals(before)||physicalLedger.equals(stage.after),'unknown current iteration ledger');\nassert.ok(physicalRegistry.equals(registryBefore)||physicalRegistry.equals(registryAfter),'unknown current iteration registry');\nif(physicalLedger.equals(stage.after))assert.ok(physicalRegistry.equals(registryAfter));\nconst phase=process.argv[3]??'contract';assert.ok(['contract','root'].includes(phase));"
+        },
+        {
+          "before": " assert.equal(read(LEDGER).equals(before),true);assert.equal(read(REGISTRY).equals(registryBefore),true);",
+          "after": " assert.equal(iterationLedger.equals(before),true);assert.equal(gunzipSync(read(prefix+'registry-before.mjs.gz')).equals(registryBefore),true);\n iterationTools.assertCurrent();assert.ok(read(LEDGER).equals(physicalLedger));assert.ok(read(REGISTRY).equals(physicalRegistry));"
+        },
+        {
+          "before": " assert.equal(read(LEDGER).equals(before),true);\n}",
+          "after": " assert.equal(iterationLedger.equals(before),true);assert.ok(read(LEDGER).equals(physicalLedger));\n}"
+        },
+        {
+          "before": "canonical_ledger_applied:false,full_owner_integration_qualified:false",
+          "after": "canonical_ledger_applied:physicalLedger.equals(stage.after),full_owner_integration_qualified:false"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "tests/test_legacy_removal_admission.py",
+        "sha256": "93a1a61b5963b00fd3a28e23b5914e580007c0d329babb31b7f65f885b7d3d9e",
+        "bytes": 5463
+      },
+      "after": {
+        "path": "tests/test_legacy_removal_admission.py",
+        "sha256": "a55eb34c8c108dc34463b1acd5d70ce700bf2ac70759af947a9ecf9939480a71",
+        "bytes": 7139
+      },
+      "literal_edits": [
+        {
+          "before": "        self.assertFalse(report['canonical_ledger_applied']);self.assertFalse(report['full_owner_integration_qualified']);self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified'])",
+          "after": "        packet=json.loads((ROOT/(PREFIX+'canonical-proposal.json')).read_bytes());current=digest((ROOT/packet['before']['path']).read_bytes())\n        self.assertIn(current,[packet['before']['sha256'],packet['after']['sha256']]);self.assertEqual(report['canonical_ledger_applied'],current==packet['after']['sha256']);self.assertFalse(report['full_owner_integration_qualified']);self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified'])"
+        },
+        {
+          "before": "        registry=(ROOT/'scripts/upstream-source-contract-registry.mjs').read_bytes();proposed=",
+          "after": "        registry=gzip.decompress((ROOT/(PREFIX+'registry-before.mjs.gz')).read_bytes());proposed="
+        },
+        {
+          "before": "            raw=(ROOT/ref['path']).read_bytes();self.assertEqual(digest(raw),ref['sha256']);self.assertEqual(len(raw),ref['bytes'])",
+          "after": "            if ref['path']in [worksheet['before_ledger']['path'],worksheet['before_registry']['path']]:\n                image='ledger-before.json.gz'if ref['path']==worksheet['before_ledger']['path']else'registry-before.mjs.gz';raw=gzip.decompress((ROOT/(PREFIX+image)).read_bytes())\n            elif ref['path']==worksheet['before_owner']['path']:\n                raw=subprocess.check_output(['git','--no-replace-objects','show',worksheet['source_parent']+':'+ref['path']],cwd=ROOT)\n            else:raw=(ROOT/ref['path']).read_bytes()\n            self.assertEqual(digest(raw),ref['sha256']);self.assertEqual(len(raw),ref['bytes'])\n        live_ledger=digest((ROOT/packet['before']['path']).read_bytes());live_registry=digest((ROOT/packet['registry_before']['path']).read_bytes())\n        self.assertIn(live_ledger,[packet['before']['sha256'],packet['after']['sha256']]);self.assertIn(live_registry,[packet['registry_before']['sha256'],packet['registry_after']['sha256']])\n        if live_ledger==packet['after']['sha256']:self.assertEqual(live_registry,packet['registry_after']['sha256'])\n        tools=json.loads((ROOT/(PREFIX+'owner-inputs.json')).read_bytes());current_owner=next(row['after']for row in tools['code_transitions']if row['after']['path']==worksheet['before_owner']['path'])\n        self.assertEqual(digest((ROOT/current_owner['path']).read_bytes()),current_owner['sha256'])"
+        },
+        {
+          "before": "        packet=json.loads((ROOT/(PREFIX+'canonical-proposal.json')).read_bytes());current=digest((ROOT/packet['before']['path']).read_bytes())",
+          "after": "        historical_report=json.loads((ROOT/(PREFIX+'contract-controls.json')).read_bytes());self.assertFalse(historical_report['canonical_ledger_applied'])\n        packet=json.loads((ROOT/(PREFIX+'canonical-proposal.json')).read_bytes());current=digest((ROOT/packet['before']['path']).read_bytes())"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "tests/test_legacy_removal_source.py",
+        "sha256": "f2a987b1c0cebc79f8b999cda039244e5097d793494d0086b5468dbfe80d6eb6",
+        "bytes": 10259
+      },
+      "after": {
+        "path": "tests/test_legacy_removal_source.py",
+        "sha256": "dc799838932937126fa3150231e4c4e52eba7cb0db27c13534a4a20e15c6731b",
+        "bytes": 11227
+      },
+      "literal_edits": [
+        {
+          "before": "        before=worksheet['protected_ledger'];raw=(ROOT/before['path']).read_bytes()",
+          "after": "        # The source-only stage remains exact data after a separately qualified admission.\n        before=worksheet['protected_ledger'];raw=gzip.decompress((ROOT/'compatibility/rc/21x-legacy-removal-admission-ledger-before.json.gz').read_bytes())"
+        },
+        {
+          "before": "        self.assertEqual(sum(row['final_disposition']=='security-review'for row in ledger['entries']),1)",
+          "after": "        self.assertEqual(sum(row['final_disposition']=='security-review'for row in ledger['entries']),1)\n        proposal=json.loads((ROOT/'compatibility/rc/21x-legacy-removal-admission-canonical-proposal.json').read_bytes());current=(ROOT/before['path']).read_bytes()\n        self.assertIn(hashlib.sha256(current).hexdigest(),[proposal['before']['sha256'],proposal['after']['sha256']])\n        after=gzip.decompress((ROOT/'compatibility/rc/21x-legacy-removal-admission-ledger-after.json.gz').read_bytes());self.assertEqual(hashlib.sha256(after).hexdigest(),proposal['after']['sha256'])\n        selected=worksheet['sha'];candidate=json.loads(after)\n        self.assertEqual([row for row in candidate['entries']if row['sha']!=selected],[row for row in ledger['entries']if row['sha']!=selected])\n        self.assertEqual(candidate['closed_dispositions'],425);self.assertEqual(candidate['open_or_deferred'],1272)"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "tests/browser_reference_owner_probe.mjs",
+        "sha256": "eca206ffd1dce24fdf97336e4875664875dfb23b4c9d4f02e7429f7511064678",
+        "bytes": 9814
+      },
+      "after": {
+        "path": "tests/browser_reference_owner_probe.mjs",
+        "sha256": "b9cc34f6fe40cfce82c98bb4a1c61ee16b9083f7a6958aa1a1d2c39b03e1ff27",
+        "bytes": 12134
+      },
+      "literal_edits": [
+        {
+          "before": "import {browserOwnerSourceSubject} from '../scripts/browser-owner-source.mjs';",
+          "after": "import {browserOwnerSourceSubject} from '../scripts/browser-owner-source.mjs';\nimport {legacyRemovalOwnerSourceSubject} from '../scripts/legacy-removal-owner-source.mjs';\nimport {legacyRemovalOwnerContext} from '../scripts/legacy-removal-canonical-stage.mjs';"
+        },
+        {
+          "before": "const original=path=>execFileSync('git',['--no-replace-objects','show',input.source_parent+':'+path],{cwd:root,maxBuffer:8*1024*1024});",
+          "after": "const original=path=>execFileSync('git',['--no-replace-objects','show',input.source_parent+':'+path],{cwd:root,maxBuffer:8*1024*1024});\nconst legacyTools=legacyRemovalOwnerSourceSubject({root,read}),legacy=legacyRemovalOwnerContext({root,read});\nconst stageRead=path=>path===LEDGER?legacy.metadataRead(path):read(path);"
+        },
+        {
+          "before": " assert.ok(original(OWNER).equals(disk(OWNER)),'public owner code changed');",
+          "after": " const ownerBefore={path:OWNER,sha256:hash(original(OWNER)),bytes:original(OWNER).length};\n assert.ok(original(OWNER).equals(legacyTools.comparisonBytes(ownerBefore)),'public owner before-image changed');\n assert.equal(hash(disk(OWNER)),legacyTools.qualifyReference(ownerBefore).sha256);"
+        },
+        {
+          "before": "  key=key.replace('tools.comparisonBytes(row.after)','member(row.after)');",
+          "after": "  key=key.replace('tools.comparisonBytes(row.after)','member(row.after)');\n  key=key.replace('legacyTools.comparisonBytes(row.after)','member(row.after)');\n  key=key.replace('legacyTools.comparisonBytes(packet.after_owner).toString()','owner.toString()');\n  key=key.replace('legacyTools.qualifyReference(packet.after_owner).sha256','packet.after_owner.sha256');"
+        },
+        {
+          "before": "const tools=browserOwnerSourceSubject({root,read}),context=inventoryReferenceOwnerContext({root,read});",
+          "after": "const tools=browserOwnerSourceSubject({root,read}),context=inventoryReferenceOwnerContext({root,read:stageRead});"
+        },
+        {
+          "before": "assert.equal(context.browser.applied,beforeLive.equals(context.browser.after));",
+          "after": "assert.equal(context.browser.applied,stageRead(LEDGER).equals(context.browser.after));"
+        },
+        {
+          "before": "actual_owner_byte_identical:true,code_transitions:8",
+          "after": "actual_owner_byte_identical:false,before_owner_byte_identical:true,current_owner_successor_authenticated:true,code_transitions:8"
+        },
+        {
+          "before": " assert.equal(hash(prepared.canonical_after),input.after_ledger.sha256);assert.ok(prepared.canonical_after.equals(disk(LEDGER)));",
+          "after": " assert.equal(hash(prepared.browser_reference_stage.after),input.after_ledger.sha256);assert.ok(prepared.canonical_after.equals(disk(LEDGER)));\n assert.ok(prepared.legacy_removal_stage.after.equals(legacy.after));assert.equal(prepared.legacy_removal_stage.individual_decisions,1);"
+        },
+        {
+          "before": " assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?88:13);",
+          "after": " assert.equal(epoch.individual_decisions_applied-epoch.legacy_removal_source_decisions_applied,input.line==='21.x'?88:13);assert.equal(epoch.legacy_removal_source_decisions_applied,1);"
+        },
+        {
+          "before": "source_admissions:epoch.individual_decisions_applied,browser_metadata_entries:",
+          "after": "source_admissions:epoch.individual_decisions_applied,preserved_source_admissions:epoch.individual_decisions_applied-epoch.legacy_removal_source_decisions_applied,legacy_removal_source_admissions:epoch.legacy_removal_source_decisions_applied,browser_metadata_entries:"
+        },
+        {
+          "before": " const context=inventoryReferenceOwnerContext({root,read});assert.equal(context.browser.applied,true);",
+          "after": " const context=inventoryReferenceOwnerContext({root,read:stageRead});assert.equal(context.browser.applied,true);"
+        },
+        {
+          "before": " epoch.assertCurrent();prepared.assertCurrent();assert.ok(disk(LEDGER).equals(beforeLive));",
+          "after": " const priorControls=controls;assert.equal(priorControls,12);\n for(const path of ['scripts/upstream-source-contract-registry.mjs','scripts/legacy-removal-canonical-stage.mjs','scripts/legacy-removal-owner-source.mjs','scripts/upstream-legacy-removal-source.mjs','scripts/upstream-legacy-removal-admission.cjs','compatibility/rc/21x-legacy-removal-admission-original-complete.diff','compatibility/rc/21x-legacy-removal-admission-owner-inputs.json','compatibility/rc/21x-legacy-removal-source-originals.json.gz']){tamper=path;assert.throws(()=>epoch.assertCurrent(),undefined,'new real late '+path);controls++;tamper=null;}\n epoch.assertCurrent();prepared.assertCurrent();assert.ok(disk(LEDGER).equals(beforeLive));"
+        },
+        {
+          "before": "actual_epoch_late_controls_rejected:controls,canonical_ledger_unchanged_during_probe:",
+          "after": "actual_epoch_late_controls_rejected:controls,preserved_epoch_late_controls_rejected:priorControls,canonical_ledger_unchanged_during_probe:"
+        },
+        {
+          "before": " const api=await import('../scripts/packed-upstream-ledger-epoch.mjs'),start=performance.now(),prepared=api.preparePackedUpstreamLedger",
+          "after": " const api=await import('../scripts/packed-upstream-ledger-epoch.mjs');process.stderr.write('complete owner prepare started\\n');const start=performance.now(),prepared=api.preparePackedUpstreamLedger"
+        },
+        {
+          "before": " const started=performance.now(),epoch=api.packedUpstreamLedgerEpoch",
+          "after": " process.stderr.write('complete owner prepare passed;epoch started\\n');\n const started=performance.now(),epoch=api.packedUpstreamLedgerEpoch"
+        },
+        {
+          "before": " const context=inventoryReferenceOwnerContext({root,read:stageRead});assert.equal(context.browser.applied,true);",
+          "after": " process.stderr.write('complete owner epoch passed;public routes and late controls started\\n');\n const context=inventoryReferenceOwnerContext({root,read:stageRead});assert.equal(context.browser.applied,true);"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "tests/test_browser_reference_owner.py",
+        "sha256": "2b90713970544046686e71e5a51891b0fb41cd12bfd1e09bd6b369793e8381d8",
+        "bytes": 3527
+      },
+      "after": {
+        "path": "tests/test_browser_reference_owner.py",
+        "sha256": "71f9531be9037a81f434b5454e9fb59dab89a8b421c370f163681c7b890e5ff5",
+        "bytes": 3840
+      },
+      "literal_edits": [
+        {
+          "before": "        self.assertTrue(report['actual_owner_byte_identical']);self.assertEqual(report['code_transitions'],8);",
+          "after": "        self.assertTrue(report['before_owner_byte_identical']);self.assertFalse(report['actual_owner_byte_identical']);self.assertTrue(report['current_owner_successor_authenticated']);self.assertEqual(report['code_transitions'],8);"
+        },
+        {
+          "before": "self.assertEqual(report['source_admissions'],88 if report['line']=='21.x'else 13)",
+          "after": "self.assertEqual(report['preserved_source_admissions'],88 if report['line']=='21.x'else 13);self.assertEqual(report['source_admissions'],89);self.assertEqual(report['legacy_removal_source_admissions'],1)"
+        },
+        {
+          "before": "self.assertEqual(report['actual_epoch_late_controls_rejected'],12)",
+          "after": "self.assertEqual(report['preserved_epoch_late_controls_rejected'],12);self.assertEqual(report['actual_epoch_late_controls_rejected'],20)"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "tests/checker_reference_source_probe.mjs",
+        "sha256": "0c1158d9c1dcbe5a33f6d8f7660e8ad0435b031020a9610f76655f4648f211a8",
+        "bytes": 15116
+      },
+      "after": {
+        "path": "tests/checker_reference_source_probe.mjs",
+        "sha256": "4a8c603ea1467e97c44aba8b2451763dd03454908cafed6704cb0c67646080a0",
+        "bytes": 16648
+      },
+      "literal_edits": [
+        {
+          "before": "  assert.equal(registry.sourceContractDefinitions.length,67);",
+          "after": "  const registryPath='scripts/upstream-source-contract-registry.mjs',beforeRegistry=original(packet.source_parent,registryPath),registryAst=parse('registry-data.mjs',beforeRegistry);\n  const definition=registryAst.statements.filter(ts.isVariableStatement).flatMap(node=>node.declarationList.declarations).find(node=>node.name.getText(registryAst)==='sourceContractDefinitions');assert.ok(ts.isArrayLiteralExpression(definition.initializer));\n  const beforeDefinitions=definition.initializer.elements.map(node=>{assert.ok(ts.isObjectLiteralExpression(node));return Object.fromEntries(node.properties.map(property=>{assert.ok(ts.isPropertyAssignment(property)&&ts.isStringLiteral(property.initializer));return [property.name.getText(registryAst),property.initializer.text];}));});\n  assert.equal(beforeDefinitions.length,67);\n  const added=registry.sourceContractDefinitions.filter(row=>!beforeDefinitions.some(prior=>prior.sha===row.sha));assert.deepEqual(registry.sourceContractDefinitions.filter(row=>!added.includes(row)),beforeDefinitions);\n  const currentRegistry=read(registryPath),qualifiedRegistry=tools.qualifyReference({path:registryPath,sha256:hash(beforeRegistry),bytes:beforeRegistry.length});assert.equal(hash(currentRegistry),qualifiedRegistry.sha256);\n  assert.equal(added.length,hash(currentRegistry)===hash(beforeRegistry)?0:1);\n  if(added.length)assert.deepEqual(added,[{sha:'f7e3ae3bd1b86d5987df57bb06d350001c592931',proof_kind:'individual-historical-legacy-removal-source-exclusion',scope_key:'legacy_removal_source_scope',module:'upstream-legacy-removal-admission.cjs'}]);"
+        }
+      ]
+    }
+  ]
+}
