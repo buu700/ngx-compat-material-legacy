@@ -15,6 +15,7 @@ import {packedValueAccessorCases} from './value-accessor-packed-contract.mjs';
 import {packedMenuLazyCase} from './chip-menu-tooltip-packed-contract.mjs';
 import {packedTableOnPushCase} from './table-onpush-packed-contract.mjs';
 import {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';
+import {historicalContractRepairSourceSubject} from './historical-contract-repair-source.mjs';
 export const PACKED_REPAIR_PRODUCT_PATHS=Object.freeze([
  'projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts',
  'projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts',
@@ -54,7 +55,8 @@ export function qualifyPackedProductSourceRepairs({root,read,line,data,history,r
  assert.deepEqual(data.targets.map(t=>t.path),PACKED_REPAIR_PRODUCT_PATHS);
  assert.deepEqual(data.tooling.map(t=>t.path),PACKED_REPAIR_TOOL_PATHS);
  assert.deepEqual(data.members.map(m=>m.path),['scripts/packed-product-source-recovery.mjs']);
- const nativeSpec=autocompleteSelectionReaderSubject({root,read,line});
+ const contract=historicalContractRepairSourceSubject({root}),nativeSpec=autocompleteSelectionReaderSubject({root,read,line});
+ assert.equal(contract.line,line);
  for(const member of data.members){const current=nativeSpec.qualify(member)??member;assert.equal(hash(read(member.path)),current.sha256,'changed packed repair implementation');}
  // Reject unrelated resource edits before running the larger source review graph.
  // The original full check below its semantic qualifications remains mandatory.
@@ -100,19 +102,22 @@ export function qualifyPackedProductSourceRepairs({root,read,line,data,history,r
  assert.equal(menuCases.line,line);assert.equal(menuCases.cases.length,18);assert.deepEqual(menuCases.failures,[]);assert.equal(menuCases.mutations.length,14);
  const tabCases=record(tab.reports[line==='main'?'main-lifecycle-pass':'branch-lifecycle-pass'],true);
  assert.equal(tabCases.passed,47);assert.equal(tabCases.failed,0);assert.equal(tabCases.mutants.length,22);
- const preimages=new Map(),current=new Map(),historyByPath=new Map(history.product_members.map(m=>[m.path,m]));assert.equal(historyByPath.size,1142);
+ const preimages=new Map(),current=new Map(),packedSource=new Map(),contractPreimages=new Map(),contractCurrent=new Map(),historyByPath=new Map(history.product_members.map(m=>[m.path,m]));assert.equal(historyByPath.size,1142);
+ const contractInputPath='compatibility/rc/historical-contract-repair-source-inputs.json',contractInput=read(contractInputPath);
+ assert.equal(hash(contractInput),contract.bound.find(ref=>ref.path===contractInputPath).sha256);const contractData=JSON.parse(contractInput);
+ for(const image of contract.images){const before=git(root,['show',contractData.repair_baseline_commit+':'+image.path]);assert.equal(hash(before),image.before.sha256);assert.equal(before.length,image.before.bytes);contractPreimages.set(image.path,Buffer.from(before));contractCurrent.set(image.path,image.after.sha256);}
  for(const target of [...data.targets,...data.tooling]){
-  const bytes=read(target.path);assert.equal(hash(bytes),target.sha256,'changed current packed repair input '+target.path);assert.equal(bytes.length,target.bytes);
-  assert.equal(hash(git(root,['show',subject.source.commit+':'+target.path])),target.sha256,'packed source does not own current repair input');
+  const expected=contract.qualify(target)??target,bytes=read(target.path);assert.equal(hash(bytes),expected.sha256,'changed current packed repair input '+target.path);assert.equal(bytes.length,expected.bytes);
+  const originalPacked=git(root,['show',subject.source.commit+':'+target.path]);assert.equal(hash(originalPacked),target.sha256,'packed source does not own historical repair input');assert.equal(originalPacked.length,target.bytes);
   const before=git(root,['show',subject.source_before_packed_repairs+':'+target.path]);assert.equal(hash(before),target.before_sha256,'changed packed repair preimage');
   let proposed=before.toString();
   if(PACKED_REPAIR_PRODUCT_PATHS.includes(target.path)){
    assert.equal(historyByPath.get(target.path)?.sha256,target.before_sha256,'packed repair does not extend immutable product preimage');proposed=productRepair(target.path,proposed);
   }else{assert.ok(target.edits.length>0);assert.equal(typeof target.reason,'string');assert.ok(target.reason.length>30);for(const edit of target.edits)proposed=change(proposed,edit.before,edit.after);}
-  assert.equal(proposed,bytes.toString(),'packed repair exceeds the reviewed exact delta '+target.path);preimages.set(target.path,Buffer.from(before));current.set(target.path,target.sha256);
+  assert.equal(proposed,originalPacked.toString(),'historical packed repair exceeds the reviewed exact delta '+target.path);preimages.set(target.path,Buffer.from(before));packedSource.set(target.path,target.sha256);current.set(target.path,expected.sha256);
  }
  const menuPath=PACKED_REPAIR_PRODUCT_PATHS[0],tabPath=PACKED_REPAIR_PRODUCT_PATHS[3];
- assert.equal(menuCases.source_members.find(m=>m.path===menuPath)?.sha256,current.get(menuPath));assert.equal(tabCases.source_sha256,current.get(tabPath));
+ assert.equal(menuCases.source_members.find(m=>m.path===menuPath)?.sha256,packedSource.get(menuPath));assert.equal(tabCases.source_sha256,packedSource.get(tabPath));
  assert.equal(menuCases.producer_sha256,current.get('tests/menu_overlay_exit_probe.mjs'));assert.equal(tab.test_source_sha256,current.get('tests/tab_body_motion_runtime_probe.mjs'));
  const beforeApi=JSON.parse(preimages.get(PACKED_REPAIR_TOOL_PATHS[0])),afterApi=JSON.parse(read(PACKED_REPAIR_TOOL_PATHS[0]));
  const extra=afterApi.extras.filter(row=>row.name==='ɵLegacyTableColumnClasses');assert.equal(extra.length,1);assert.equal(extra[0].category,'owned-private-helper');assert.deepEqual(extra[0].entries,['legacy-table/primary']);
@@ -120,8 +125,10 @@ export function qualifyPackedProductSourceRepairs({root,read,line,data,history,r
  assert.equal(preimages.size,16);
  // Every projected read rechecks the actual file, including after qualification.
  const nativeBound=new Map(nativeSpec.bound.map(ref=>[ref.path,ref.sha256]));
- const assertCurrent=path=>{if(current.has(path))assert.equal(hash(read(path)),current.get(path),'late current packed repair mutation '+path);
+ const assertCurrent=path=>{if(path===undefined){contract.assertCurrent();for(const key of new Set([...current.keys(),...contractCurrent.keys()]))assertCurrent(key);nativeSpec.assertCurrent();return;}
+  if(contractCurrent.has(path))assert.equal(hash(read(path)),contractCurrent.get(path),'late current historical contract repair mutation '+path);
+  if(current.has(path))assert.equal(hash(read(path)),current.get(path),'late current packed repair mutation '+path);
   if(nativeBound.has(path))assert.equal(hash(read(path)),nativeBound.get(path),'late current native spec input '+path);};
- const priorRead=path=>{assertCurrent(path);return preimages.has(path)?Buffer.from(preimages.get(path)):read(path);};
- return {line,read:priorRead,raw:read,assertCurrent,targets:data.targets,preimages,product_changes:4,tooling_changes:12,source:subject.source,artifact:subject.artifact,source_scope_only:true,current_coordinator_native_or_floor_qualified:false};
+ const priorRead=path=>{assertCurrent(path);return preimages.has(path)?Buffer.from(preimages.get(path)):contractPreimages.has(path)?Buffer.from(contractPreimages.get(path)):read(path);};
+ return {line,read:priorRead,raw:read,assertCurrent,targets:data.targets.map(ref=>contract.qualify(ref)??ref),historical_packed_targets:data.targets,historical_contract_source_targets:contract.images.filter(row=>row.path.startsWith('projects/')).map(row=>({path:row.path,...row.after})),preimages,contract_preimages:contractPreimages,product_changes:4,tooling_changes:12,source:subject.source,artifact:subject.artifact,packed_execution_evidence_scope:'historical-only',current_artifact_execution_qualified:false,source_scope_only:true,current_coordinator_native_or_floor_qualified:false};
 }

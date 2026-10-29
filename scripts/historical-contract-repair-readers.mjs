@@ -14,7 +14,7 @@ import {fileURLToPath} from 'node:url';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {readHistoricalContractRepairMember} from './historical-contract-repair-source.mjs';
 const SELF='scripts/historical-contract-repair-readers.mjs',INPUTS='compatibility/rc/historical-contract-repair-reader-inputs.json';
-const PINS={'21.x':'5f16af47a5361829e3689a384ac503aaec1ab07118e74a1dc873f88361905b38',main:'dcb191270119f875a2d58e77a333839f4368658a41c0e39f8f3a1c58f9c1657c'};
+const PINS={'21.x':'f2945811d450e8a927ab5a1c19240e35e9086503982503ebbb58197705cf11f3',main:'ccdbd74d5297b2737dc6308e4554017e97f808bae4cf0c1fa6c94da492c673e5'};
 const image=readFileSync(fileURLToPath(import.meta.url)),hash=b=>createHash('sha256').update(b).digest('hex'),originals=new Map();
 /** This extra installed tooling root is required by the pinned table source checker. */
 export function readHistoricalContractRepairOwnerMember(root,path){
@@ -46,12 +46,12 @@ export function historicalContractRepairReaderSubject({root=process.cwd(),read=p
  assert.equal(data.canonical_dispositions_changed,0);assert.equal(data.product_changes,0);assert.equal(data.old_programs_executed,false);assert.equal(data.actual_native_packed_browser_floor_or_full_audit_qualified,false);assert.equal(data.g11_claim,'not-passed');
  member(SELF,{sha256:hash(image),bytes:image.length});member(data.unchanged_source_subject.path,data.unchanged_source_subject);
  if(data.prior_reader_registry){
-  assert.equal(line,'21.x');const priorRef=data.prior_reader_registry;assert.equal(priorRef.path,INPUTS);
+  const packed=data.extension_kind==='packed-source';if(!packed)assert.equal(line,'21.x');const priorRef=data.prior_reader_registry;assert.equal(priorRef.path,INPUTS);
   const priorBytes=original(root,priorRef.source_parent,priorRef.path);assert.equal(hash(priorBytes),priorRef.sha256);assert.equal(priorBytes.length,priorRef.bytes);
-  const prior=JSON.parse(priorBytes);assert.equal(prior.line,line);assert.equal(prior.source_parent,data.source_parent);assert.equal(prior.tool_transitions.length,9);
-  const oldPaths=new Set(prior.tool_transitions.map(row=>row.path));assert.deepEqual(data.tool_transitions.filter(row=>!oldPaths.has(row.path)).map(row=>row.path),['scripts/packed-upstream-ledger-epoch.mjs','scripts/canonical-tool-source-role.mjs']);
+  const prior=JSON.parse(priorBytes);assert.equal(prior.line,line);assert.equal(prior.source_parent,data.source_parent);assert.equal(prior.tool_transitions.length,packed?(line==='21.x'?11:2):9);
+  const oldPaths=new Set(prior.tool_transitions.map(row=>row.path));assert.deepEqual(data.tool_transitions.filter(row=>!oldPaths.has(row.path)).map(row=>row.path),packed?['scripts/packed-product-source-recovery.mjs']:['scripts/packed-upstream-ledger-epoch.mjs','scripts/canonical-tool-source-role.mjs']);
   for(const row of prior.tool_transitions){const next=data.tool_transitions.find(item=>item.path===row.path);assert.ok(next);assert.deepEqual(next.before,row.before);
-   if(row.path==='tests/table_local_compilation_owner_source.py')assert.deepEqual(next.literal_edits.slice(0,row.literal_edits.length),row.literal_edits);
+   if(row.path===(packed?'scripts/snack-dom-source-context.mjs':'tests/table_local_compilation_owner_source.py'))assert.deepEqual(next.literal_edits.slice(0,row.literal_edits.length),row.literal_edits);
    else assert.deepEqual(next,row,'unrelated earlier reader transition changed');
   }
  }
@@ -63,7 +63,7 @@ export function historicalContractRepairReaderSubject({root=process.cwd(),read=p
   assert.equal(hash(expected),row.after.sha256);assert.equal(Buffer.byteLength(expected),row.after.bytes);const after=member(row.path,row.after);assert.equal(after.toString(),expected);
   transitions.set(row.path,{before:{...row.before},after:{...row.after},beforeBytes:Buffer.from(before),afterBytes:Buffer.from(after)});
  }
- assert.equal(transitions.size,line==='21.x'?11:2);
+ assert.equal(transitions.size,line==='21.x'?12:3);
  const ownsReference=ref=>{const row=transitions.get(ref.path);return Boolean(row&&[row.before.sha256,row.after.sha256].includes(ref.sha256));};
  const side=(ref,target)=>{
   const row=transitions.get(ref.path);if(!row)return null;
