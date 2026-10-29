@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "d18640f93c17e45ad480ed1f30759fc48bbfc035",
+  "prior_registry": {
+    "path": "compatibility/rc/historical-contract-repair-reader-inputs.json",
+    "sha256": "f2945811d450e8a927ab5a1c19240e35e9086503982503ebbb58197705cf11f3",
+    "bytes": 36908,
+    "source_parent": "d18640f93c17e45ad480ed1f30759fc48bbfc035"
+  },
+  "current_registry": {
+    "path": "compatibility/rc/historical-contract-repair-reader-inputs.json",
+    "sha256": "556752516a34de735237a2603061a7febb1e314cd735dc52bcef270357d645e4",
+    "bytes": 37950
+  },
+  "transition": {
+    "path": "scripts/inventory-reference-owner.mjs",
+    "source_parent": "d18640f93c17e45ad480ed1f30759fc48bbfc035",
+    "before": {
+      "sha256": "3bd8c41055cf574087d0596ea577e2faa07abb2682ac3112a0aab4224fe1ad23",
+      "bytes": 18391
+    },
+    "after": {
+      "sha256": "1bb1099ae7d42f8e7e5af52dd767285b8fa9400628d364e8a90dfad944a9e847",
+      "bytes": 18399
+    },
+    "literal_edits": [
+      {
+        "before": "  if(path===OWNER&&line==='main'){assert.equal(hash(read(path)),packet.after_owner.sha256,'changed current owner code');return Buffer.from(oldOwner);}",
+        "after": "  // Checker references stay current; only historical metadata data is projected."
+      },
+      {
+        "before": "  // Checker references stay current; only historical metadata data is projected.",
+        "after": "  if(path===OWNER&&line==='main'){const current=read(path);assert.equal(hash(current),packet.after_owner.sha256,'changed current owner code');return current;}"
+      }
+    ]
+  },
+  "source_scope_only": true,
+  "canonical_dispositions_changed": 0,
+  "current_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

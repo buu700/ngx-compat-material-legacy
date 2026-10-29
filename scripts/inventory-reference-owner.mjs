@@ -191,7 +191,7 @@ export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwner
   const handler=historicalHandlers.get(path);if(handler){assert.equal(hash(read(path)),handler.after.sha256,'changed current title handler');return Buffer.from(handler.before);}
   if(path===INVENTORY){assert.equal(hash(read(path)),packet.current_inventory.sha256,'changed current inventory metadata');return Buffer.from(oldInventory);}
   if(path===workflow.path){assert.equal(hash(read(path)),workflow.after.sha256,'changed current workflow');return Buffer.from(oldWorkflow);}
-  if(path===OWNER&&line==='main'){assert.equal(hash(read(path)),packet.after_owner.sha256,'changed current owner code');return Buffer.from(oldOwner);}
+  if(path===OWNER&&line==='main'){const current=read(path);assert.equal(hash(current),packet.after_owner.sha256,'changed current owner code');return current;}
   if(path===LEDGER){const raw=read(path);assert.equal(hash(raw),hash(currentLedger),'late canonical metadata image change');return applied?Buffer.from(source.before):raw;}
   return read(path);
  };
