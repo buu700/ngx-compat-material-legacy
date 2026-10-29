@@ -6,6 +6,7 @@
  */
 /** Complete source transition proof only;never executes the historical checker. */
 import assert from 'node:assert/strict';
+import {checkerOwnerSourceSubject} from '../scripts/checker-owner-source.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {readFileSync,writeFileSync,mkdtempSync,mkdirSync,symlinkSync,rmSync,lstatSync} from 'node:fs';
@@ -25,9 +26,11 @@ function original(parent,path){
  for(const key of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete env[key];
  return execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',parent+':'+path],{cwd:ROOT,env,maxBuffer:8*1024*1024});
 }
-export async function inspectCheckerSource({read=disk}={}){
+export async function inspectCheckerSourceMetadata({read=disk}={}){
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
- const bound=new Map(),member=(path,digest,bytes)=>{
+ const tools=checkerOwnerSourceSubject({root:ROOT,read});
+ const bound=new Map(tools.bound.map(ref=>[ref.path,{...ref}])),member=(path,digest,bytes)=>{
+  const qualified=tools.qualifyReference({path,sha256:digest,...(bytes===undefined?{}:{bytes})});digest=qualified.sha256;bytes=qualified.bytes;
   const raw=read(path);assert.ok(Buffer.isBuffer(raw));if(digest)assert.equal(hash(raw),digest,'changed source input '+path);if(bytes!==undefined)assert.equal(raw.length,bytes);
   bound.set(path,{path,sha256:hash(raw),bytes:raw.length});return raw;
  };
@@ -37,8 +40,9 @@ export async function inspectCheckerSource({read=disk}={}){
  assert.equal(packet.g11_claim,'not-passed');member(SELF,hash(image));
  for(const ref of packet.source_members)member(ref.path,ref.sha256,ref.bytes);
  const current=member(CHECKER,packet.current_checker.sha256,packet.current_checker.bytes);
- const ledgerRaw=member(LEDGER,packet.protected_ledger.sha256,packet.protected_ledger.bytes),ledger=JSON.parse(ledgerRaw);
- const assertCurrent=()=>{for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late checker source input '+ref.path);assert.equal(raw.length,ref.bytes);assert.equal(hash(disk(ref.path)),ref.sha256,'late physical source '+ref.path);}};
+ const cohortRaw=original(packet.source_parent,LEDGER);assert.equal(hash(cohortRaw),packet.protected_ledger.sha256);assert.equal(cohortRaw.length,packet.protected_ledger.bytes);
+ const cohort=JSON.parse(cohortRaw),ledgerRaw=member(LEDGER),ledger=JSON.parse(ledgerRaw);
+ const assertCurrent=()=>{tools.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late checker source input '+ref.path);assert.equal(raw.length,ref.bytes);assert.equal(hash(disk(ref.path)),ref.sha256,'late physical source '+ref.path);}};
  // Imported current code must be the physical source just authenticated above.
  for(const ref of bound.values())assert.equal(hash(disk(ref.path)),ref.sha256,'physical source differs '+ref.path);
  const old=original(packet.old_checker.commit,CHECKER);assert.equal(hash(old),packet.old_checker.sha256);assert.equal(old.length,packet.old_checker.bytes);
@@ -60,7 +64,7 @@ export async function inspectCheckerSource({read=disk}={}){
  const policies=ast=>ast.statements.filter(ts.isVariableStatement).flatMap(node=>node.declarationList.declarations).filter(node=>['ALLOWED_FINAL','PENDING','INHERITED','BEHAVIOR','REVIEW_DEPTHS'].includes(node.name.getText(ast))).map(node=>node.getText(ast));
  assert.equal(policies(before).length,5);assert.deepEqual(policies(before),policies(after));
  const kinds=['historical_behavior','progress_csp_behavior','media_matcher_behavior','form_field_hover_behavior','content_observer_behavior','ripple_replay_behavior'];
- const derived=ledger.entries.flatMap(entry=>kinds.flatMap(kind=>(entry.individual_proof?.[kind]?.source_members??[]).filter(ref=>ref.path===CHECKER&&ref.sha256===packet.old_checker.sha256).map(ref=>({sha:entry.sha,proof_kind:kind,reference:ref,current_raw:packet.current_checker,requires_separate_qualification:true}))));
+ const derived=cohort.entries.flatMap(entry=>kinds.flatMap(kind=>(entry.individual_proof?.[kind]?.source_members??[]).filter(ref=>ref.path===CHECKER&&ref.sha256===packet.old_checker.sha256).map(ref=>({sha:entry.sha,proof_kind:kind,reference:ref,current_raw:packet.current_checker,requires_separate_qualification:true}))));
  assert.equal(ledger.entries.length,1697);assert.equal(ledger.g11_claim,'not-passed');assert.deepEqual(derived,packet.selected_references);assert.equal(derived.length,line==='21.x'?5:13);
  const build=await import('../scripts/upstream-rules-js-build-admission.mjs'),sass=await import('../scripts/upstream-sass-inspection-admission.mjs');
  const predicates=[['requiresRulesJsBuild',build.requiresRulesJsBuild],['requiresSassInspectionScope',sass.requiresSassInspectionScope]];
@@ -106,17 +110,26 @@ export async function inspectCheckerSource({read=disk}={}){
   assert.throws(()=>reader('folder'),error=>error.message==='source member is not a regular file');readerCases++;
  }finally{rmSync(fixture,{recursive:true,force:true});}
  assertCurrent();assert.ok(disk(LEDGER).equals(ledgerRaw));
- return {bound:structuredClone([...bound.values()]),assertCurrent,report:{schema_version:1,line,result:'pass',analysis_node:process.version,analysis_typescript:ts.version,old_checker_sha256:packet.old_checker.sha256,current_checker_sha256:packet.current_checker.sha256,
+ return {bound:structuredClone([...bound.values()]),assertCurrent,protected_canonical_before:{...packet.protected_ledger},report:{schema_version:1,line,result:'pass',canonical_frame_admission_granted:false,current_ledger_sha256:hash(ledgerRaw),current_ledger_bytes:ledgerRaw.length,analysis_node:process.version,analysis_typescript:ts.version,old_checker_sha256:packet.old_checker.sha256,current_checker_sha256:packet.current_checker.sha256,
   complete_hunks:packet.hunk_reviews.length,original_functions_preserved:oldFns.size-2,changed_original_functions:changed,new_functions:['readRegularRepoBytes'],structural_policy_sets_preserved:5,
   selected_references:derived.length,per_row_guard_exclusions:exclusions,actual_guard_exclusion_checks:derived.length*predicates.length,positive_scope_routing_checks:positive.length,actual_current_reader_cases:readerCases,
   fixture_roots_removed:true,canonical_ledger_unchanged:true,root_checker_unchanged:true,old_checker_executed:false,canonical_decisions_changed:0,
   actual_complete_checker_admission_or_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};
 }
+// Preserve the original strict before-image source API. It is never used as
+// the canonical owner's complete historical-frame admission gate.
+export async function inspectCheckerSource({read=disk}={}){
+ const source=await inspectCheckerSourceMetadata({read});
+ const raw=read(LEDGER);assert.equal(hash(raw),source.protected_canonical_before.sha256,'unregistered strict source image');
+ source.assertCurrent();return source;
+}
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
+ const args=process.argv.slice(2),metadata=args[0]==='--metadata';if(metadata)args.shift();assert.ok(args.length<=1);
+ const inspect=metadata?inspectCheckerSourceMetadata:inspectCheckerSource;
  const before=disk(LEDGER);let tamper=null;const read=path=>{const raw=disk(path);return path===tamper?Buffer.concat([raw,Buffer.from(' ')]):raw;};
- const subject=await inspectCheckerSource({read});let cold=0,late=0;
+ const subject=await inspect({read});let cold=0,late=0;
  for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+tamper);late++;tamper=null;}
- for(const ref of subject.bound){tamper=ref.path;await assert.rejects(inspectCheckerSource({read}),undefined,'cold '+tamper);cold++;tamper=null;}
+ for(const ref of subject.bound){tamper=ref.path;await assert.rejects(inspect({read}),undefined,'cold '+tamper);cold++;tamper=null;}
  subject.assertCurrent();assert.ok(before.equals(disk(LEDGER)));const report={...subject.report,cold_source_faults_rejected:cold,late_source_faults_rejected:late,bound_current_paths:subject.bound.length};
- if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));
+ if(args[0])writeFileSync(args[0],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));
 }

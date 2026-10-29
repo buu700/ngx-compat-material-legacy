@@ -14,7 +14,7 @@ for key in ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJ
 before=subprocess.check_output(['git','--no-replace-objects','show',pin['parent']+':'+LEDGER],cwd=ROOT,env=env);assert hash_bytes(before)==pin['before']
 checker=(ROOT/CHECKER).read_bytes();assert hash_bytes(checker)==pin['checker'];live_before=(ROOT/LEDGER).read_bytes()
 # This is the real owned source verifier,not a returned or cached success value.
-source=json.loads(subprocess.check_output(['node','tests/checker_reference_source_probe.mjs'],cwd=ROOT,env=env));assert source['result']=='pass'and source['current_checker_sha256']==pin['checker']
+source=json.loads(subprocess.check_output(['node','tests/checker_reference_source_probe.mjs','--metadata'],cwd=ROOT,env=env));assert source['result']=='pass'and source['current_checker_sha256']==pin['checker']
 assert source['old_checker_executed']is False and source['actual_complete_checker_admission_or_native_packed_browser_floor_or_full_audit_qualified']is False
 expected=json.loads(before);updates={};preserved=[]
 for entry in expected['entries']:

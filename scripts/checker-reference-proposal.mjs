@@ -6,6 +6,7 @@
  */
 /** Exact checker-reference proposal;canonical integration grants no native credit. */
 import assert from 'node:assert/strict';
+import {checkerOwnerSourceSubject} from './checker-owner-source.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {readFileSync,realpathSync} from 'node:fs';
@@ -101,8 +102,9 @@ export function deriveCheckerReferenceMetadata({before,packet,checker}={}){
 /** Fresh fixed source verification;no verifier/compiler/result callback or cache. */
 export function prepareCheckerReferenceSourceMetadata({root,read=path=>currentFile(root,path)}={}){
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version;
- const line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);const pin=pins[line],bound=new Map();
+ const line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);const pin=pins[line],tools=checkerOwnerSourceSubject({root,read}),bound=new Map(tools.bound.map(ref=>[ref.path,{...ref}]));
  const member=(path,digest,bytes)=>{
+  const qualified=tools.qualifyReference({path,sha256:digest,...(bytes===undefined?{}:{bytes})});digest=qualified.sha256;bytes=qualified.bytes;
   const physical=currentFile(root,path),raw=read(path);assert.ok(Buffer.isBuffer(raw));
   if(digest)assert.equal(hash(raw),digest,'changed checker proposal input '+path);if(bytes!==undefined)assert.equal(raw.length,bytes);
   assert.equal(hash(raw),hash(physical),'noncurrent source supplied '+path);bound.set(path,{path,sha256:hash(raw),bytes:raw.length});return raw;
@@ -115,13 +117,15 @@ export function prepareCheckerReferenceSourceMetadata({root,read=path=>currentFi
  const sourceInputs=JSON.parse(read(packet.qualified_source_inputs.path));
  assert.deepEqual(result.updates.map(row=>row.sha),sourceInputs.selected_references.map(row=>row.sha));
  const artifact=member(packet.after_image.path,packet.after_image.sha256,packet.after_image.bytes);assert.ok(gunzipSync(artifact).equals(result.after),'proposal artifact differs from derivation');
- const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024,timeout:120000}));
+ const physicalLedger=currentFile(root,CHECKER_REFERENCE_LEDGER);
+ const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER,'--metadata'],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024,timeout:120000}));
+ assert.equal(verifier.canonical_frame_admission_granted,false);assert.equal(verifier.current_ledger_sha256,hash(physicalLedger));assert.equal(verifier.current_ledger_bytes,physicalLedger.length);
  assert.equal(verifier.result,'pass');assert.equal(verifier.line,line);assert.equal(verifier.current_checker_sha256,pin.checker);
  assert.equal(verifier.selected_references,pin.count);assert.equal(verifier.actual_guard_exclusion_checks,line==='21.x'?25:26);
  assert.equal(verifier.analysis_node,process.version);assert.equal(verifier.analysis_typescript,JSON.parse(read('package.json')).devDependencies.typescript);
  assert.equal(verifier.complete_hunks,line==='21.x'?7:6);assert.equal(verifier.root_checker_unchanged,true);assert.equal(verifier.canonical_ledger_unchanged,true);
  assert.equal(verifier.old_checker_executed,false);assert.equal(verifier.actual_complete_checker_admission_or_native_packed_browser_floor_or_full_audit_qualified,false);assert.equal(verifier.g11_claim,'not-passed');
- const assertCurrent=()=>{for(const ref of bound.values()){
+ const assertCurrent=()=>{tools.assertCurrent();assert.equal(hash(currentFile(root,CHECKER_REFERENCE_LEDGER)),hash(physicalLedger),'late physical canonical source image');for(const ref of bound.values()){
   const raw=read(ref.path),physical=currentFile(root,ref.path);assert.equal(hash(raw),ref.sha256,'late proposal input '+ref.path);assert.equal(raw.length,ref.bytes);assert.equal(hash(physical),ref.sha256,'late physical proposal input '+ref.path);
  }};
  const verifyAfter=candidate=>{assertCurrent();assert.ok(Buffer.isBuffer(candidate)&&candidate.equals(result.after),'not the exact checker-reference after-image');assertCurrent();return {metadata_only:true,native_or_full_audit_credit:false};};

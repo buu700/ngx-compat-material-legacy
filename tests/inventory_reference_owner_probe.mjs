@@ -105,7 +105,7 @@ if(mode==='--source'){
  const api=await import('../scripts/packed-upstream-ledger-epoch.mjs');
  const started=performance.now();
  const prepared=api.preparePackedUpstreamLedger({root,read:liveRead});const prepareSeconds=(performance.now()-started)/1000;
- assert.equal(hash(prepared.canonical_after),packet.after_ledger.sha256);assert.ok(prepared.canonical_after.equals(read(ledger)));
+ assert.equal(hash(prepared.inventory_reference_stage.after),packet.after_ledger.sha256);assert.ok(prepared.canonical_after.equals(read(ledger)));
  assert.equal(prepared.inventory_reference_stage.metadata_entries,packet.metadata_entries);
  assert.equal(prepared.inventory_reference_stage.source_reference_updates,packet.metadata_entries);
  assert.equal(prepared.inventory_reference_stage.individual_decisions,0);prepared.assertCurrent();

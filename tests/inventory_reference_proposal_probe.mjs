@@ -13,9 +13,13 @@ import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {prepareInventoryReferenceMetadata,INVENTORY_REFERENCE_LEDGER,INVENTORY_REFERENCE_PACKET} from '../scripts/inventory-reference-proposal.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),raw=path=>readFileSync(resolve(root,path)),hash=b=>createHash('sha256').update(b).digest('hex');
-const beforeLive=raw(INVENTORY_REFERENCE_LEDGER),subject=prepareInventoryReferenceMetadata({root});
+const beforeLive=raw(INVENTORY_REFERENCE_LEDGER),stageAfter=gunzipSync(raw('compatibility/rc/c04-inventory-reference-proposal-after.json.gz'));
+// Validate this preserved stage on its authenticated snapshot;the terminal
+// checker image belongs to the complete owner,not this narrower proposal API.
+const stageRead=path=>path===INVENTORY_REFERENCE_LEDGER?Buffer.from(stageAfter):raw(path);
+const subject=prepareInventoryReferenceMetadata({root,read:stageRead});
 const after=Buffer.from(subject.after),data=JSON.parse(after),packet=JSON.parse(raw(INVENTORY_REFERENCE_PACKET));
-assert.equal(subject.current_canonical_state,beforeLive.equals(subject.before)?'before':'after');assert.equal(subject.canonical_owner_integration_complete,false);
+assert.equal(subject.current_canonical_state,stageRead(INVENTORY_REFERENCE_LEDGER).equals(subject.before)?'before':'after');assert.equal(subject.canonical_owner_integration_complete,false);
 assert.ok(after.equals(gunzipSync(raw('compatibility/rc/c04-inventory-reference-proposal-after.json.gz'))));
 assert.equal(subject.verifyAfter(after).native_or_full_audit_credit,false);
 const at=(entry,pointer)=>pointer.split('/').filter(Boolean).reduce((value,key)=>value[Array.isArray(value)?Number(key):key],entry);
@@ -46,7 +50,7 @@ for(const fault of ['disposition','reason','proof','summary','G11','other-refere
  assert.throws(()=>subject.verifyAfter(bytes));other++;
 }
 let tamper=null;
-const read=path=>{const value=raw(path);return path===tamper?Buffer.concat([value,Buffer.from(' ')]):value;};
+const read=path=>{const value=stageRead(path);return path===tamper?Buffer.concat([value,Buffer.from(' ')]):value;};
 const live=prepareInventoryReferenceMetadata({root,read});let late=0,cold=0;
 for(const ref of live.bound){tamper=ref.path;assert.throws(()=>live.assertCurrent(),undefined,'late '+tamper);late++;tamper=null;live.assertCurrent();}
 for(const ref of live.bound){tamper=ref.path;assert.throws(()=>prepareInventoryReferenceMetadata({root,read}),undefined,'cold '+tamper);cold++;tamper=null;}
