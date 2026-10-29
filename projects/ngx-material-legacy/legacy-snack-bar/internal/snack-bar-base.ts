@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -24,7 +25,7 @@ import {
   TemplateRef,
   Type,
 } from '@angular/core';
-import {MAT_SNACK_BAR_DATA, MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBarConfig} from '@angular/material/snack-bar';
+import {MAT_SNACK_BAR_DATA, MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBarConfig, MatSnackBarRef as PeerMatSnackBarRef} from '@angular/material/snack-bar';
 import {MatLegacySnackBarConfig} from '../snack-bar-config';
 import {LegacyTextOnlySnackBar} from '../simple-snack-bar';
 import {Observable} from 'rxjs';
@@ -300,6 +301,8 @@ export abstract class _MatSnackBarBase implements OnDestroy {
       parent: userInjector || this._injector,
       providers: [
         {provide: MatSnackBarRef, useValue: snackBarRef},
+        // Material 16 exposed this same reference through both public entry points.
+        {provide: PeerMatSnackBarRef, useValue: snackBarRef},
         {provide: MAT_SNACK_BAR_DATA, useValue: config.data},
       ],
     });

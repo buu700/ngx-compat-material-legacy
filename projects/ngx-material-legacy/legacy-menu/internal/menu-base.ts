@@ -422,6 +422,7 @@ export class _MatMenuBase
         manager.onKeydown(event);
         return;
     }
+    event.stopPropagation();
   }
 
   /**

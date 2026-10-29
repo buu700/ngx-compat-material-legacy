@@ -12,7 +12,7 @@ import {
   ComponentHarnessConstructor,
   HarnessPredicate,
 } from '@angular/cdk/testing';
-import {ErrorHarnessFilters} from '@angular/material/form-field/testing';
+import {ErrorHarnessFilters, type MatErrorHarness} from '@angular/material/form-field/testing';
 
 /**
  * Harness for interacting with a legacy `mat-error` in tests.
@@ -24,7 +24,14 @@ export class MatLegacyErrorHarness extends ComponentHarness {
     this: ComponentHarnessConstructor<T>,
     options: ErrorHarnessFilters = {},
   ): HarnessPredicate<T> {
-    return new HarnessPredicate(this, options).addOption('text', options.text, (harness, text) =>
+    return MatLegacyErrorHarness._getErrorPredicate(this, options);
+  }
+
+  protected static _getErrorPredicate<T extends MatErrorHarness>(
+    type: ComponentHarnessConstructor<T>,
+    options: ErrorHarnessFilters,
+  ): HarnessPredicate<T> {
+    return new HarnessPredicate(type, options).addOption('text', options.text, (harness, text) =>
       HarnessPredicate.stringMatches(harness.getText(), text),
     );
   }
