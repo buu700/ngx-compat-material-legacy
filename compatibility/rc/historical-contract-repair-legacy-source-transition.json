@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "c44772b4e5419262170ab35dec2951949291ee96",
+  "path": "scripts/upstream-legacy-removal-source.mjs",
+  "before": {
+    "sha256": "c1570fbdae80e1e4ef1cf9da8120c948c003d9ee5fcf0d804b109e3e45fac38d",
+    "bytes": 28313
+  },
+  "after": {
+    "sha256": "91a107647a2e823c9e73eb45255df65b7bee8185ae16f25106baa673358528ef",
+    "bytes": 28603
+  },
+  "literal_edits": [
+    {
+      "before": "import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';",
+      "after": "import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';\nimport {historicalContractRepairSourceSubject,readHistoricalContractRepairMember} from './historical-contract-repair-source.mjs';"
+    },
+    {
+      "before": "function legacyRemovalPhysical(root,path){\n if(LEGACY_COMPILER.some(row=>row.path===path)){\n  const base=realpathSync(join(root,'node_modules/typescript')),file=realpathSync(join(base,path.slice('node_modules/typescript/'.length)));\n  assert.ok(file.startsWith(base+sep));return readFileSync(file);\n }\n return readEvidenceMember(root,path);\n}",
+      "after": "function legacyRemovalPhysical(root,path){\n return readHistoricalContractRepairMember(root,path);\n}"
+    },
+    {
+      "before": " const pinned=(path,digest)=>{const raw=readCurrent(path);assert.equal(hash(raw),digest,'changed qualified legacy review '+path);return raw;};",
+      "after": " const repairs=historicalContractRepairSourceSubject({root,read:readCurrent});\n const pinned=(path,digest)=>{const raw=readCurrent(path);assert.equal(hash(raw),digest,'changed qualified legacy review '+path);return raw;};"
+    },
+    {
+      "before": "const read=path=>{const raw=readCurrent(path),ref=expectedMembers.get(path);assert.ok(ref,'unknown legacy boundary input '+path);assert.equal(hash(raw),ref.sha256,'changed owned legacy boundary '+path);assert.equal(raw.length,ref.bytes);members.set(path,{...ref});return raw;};",
+      "after": "const read=path=>{const raw=readCurrent(path),prior=expectedMembers.get(path);assert.ok(prior,'unknown legacy boundary input '+path);const ref=repairs.qualify(prior)??prior;assert.equal(hash(raw),ref.sha256,'changed owned legacy boundary '+path);assert.equal(raw.length,ref.bytes);members.set(path,{...ref});return raw;};"
+    },
+    {
+      "before": " assert.deepEqual(report,expected,'fresh legacy boundary facts differ from qualified review');",
+      "after": " const sourceComparison=repairs.compareSourceReport(report,expected);\n assert.deepEqual(sourceComparison.historical_comparison,expected,'original legacy metadata comparison changed');"
+    },
+    {
+      "before": "const assertCurrent=()=>{original.assertCurrent();assert.deepEqual(legacyRemovalProductPopulation(root),productPaths,'changed complete legacy product population');",
+      "after": "const assertCurrent=()=>{repairs.assertCurrent();original.assertCurrent();assert.deepEqual(legacyRemovalProductPopulation(root),productPaths,'changed complete legacy product population');"
+    },
+    {
+      "before": "review:structuredClone(review),report:structuredClone(report),facts:",
+      "after": "review:structuredClone(review),report:structuredClone(report),historical_comparison_report:structuredClone(sourceComparison.historical_comparison),qualified_product_reference_successors:sourceComparison.changed_source_references,facts:"
+    }
+  ],
+  "scope": "Legacy-removal source verifier consumes exact repaired-product references and retains immutable original report metadata comparison. CJS admission/tool reference integration is still pending.",
+  "original_reports_or_goldens_changed": false,
+  "canonical_dispositions_changed": 0,
+  "g11_claim": "not-passed"
+}
