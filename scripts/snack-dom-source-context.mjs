@@ -9,6 +9,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync,lstatSync,realpathSync} from 'node:fs';
 import {readHistoricalContractRepairOwnerMember} from './historical-contract-repair-readers.mjs';
+import {historicalContractRepairSourceSubject} from './historical-contract-repair-source.mjs';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
@@ -81,8 +82,8 @@ export function inspectSnackCurrentOverlayContracts({root=process.cwd(),read=raw
  const internal=packedCurrentEpochs.get(read);
  if(internal)assert.equal(internal.root,root);
  const actual=internal?.actual??read,metadata=packedCvaMetadataToolingEpoch({root,read:actual});
- const packed=internal?.qualification??packedRepairEpoch(root,metadata.read);
- const types=path=>path===metadata.path?metadata.read(path):packed.preimages.has(path)?packed.read(path):actual(path);
+ const packed=internal?.qualification??packedRepairEpoch(root,actual);
+ const types=path=>path===metadata.path?metadata.read(path):(packed.preimages.has(path)||packed.contract_preimages.has(path))?packed.read(path):actual(path);
  const owned=inspectSnackCurrentDialogContracts({root,read:actual}),service=owned.defaults,config=service.configuration;
  const titleMetadata=dialogTitlePriorMetadataRead({root,read:types});
  const comparison=path=>service.preimages.has(path)?Buffer.from(service.preimages.get(path)):
@@ -97,7 +98,7 @@ export function inspectSnackCurrentOverlayContracts({root=process.cwd(),read=raw
   original_row:{file:path.slice('projects/ngx-material-legacy/'.length)},
  }))});
  assert.deepEqual([...graph.sources.keys()].sort(),capture.sources.map(m=>m.path).sort(),'changed current raw overlay population');
- const targets=[...packed.targets,...owned.targets,...service.targets,...config.targets,data.menu_type.delta,...owned.title_source_requalification.current_sources];
+ const targets=[...packed.historical_contract_source_targets,...packed.targets,...owned.targets,...service.targets,...config.targets,data.menu_type.delta,...owned.title_source_requalification.current_sources];
  const deltas=[];
  for(const member of capture.sources){
   const current=actual(member.path),digest=hash(current),target=targets.find(t=>t.path===member.path);
@@ -208,12 +209,12 @@ export function packedRepairTypeEvidenceRead({root=process.cwd(),read=rawRead(ro
  const product=productRegistry(root,metadata.read),target=product.data.packed_repairs.targets.find(m=>m.path==='projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts');
  const digest=hash(actual(target.path));
  if(digest===target.before_sha256)return metadata.read;
- assert.equal(digest,target.sha256,'unqualified current menu type-proof source');
- const projected=packedRepairEpoch(root,metadata.read).read;branded.set(projected,{root,raw:actual});return projected;
+ const contract=historicalContractRepairSourceSubject({root});assert.equal(digest,(contract.qualify(target)??target).sha256,'unqualified current menu type-proof source');
+ const projected=packedRepairEpoch(root,actual).read;branded.set(projected,{root,raw:actual});return projected;
 }
 export function inspectPackedProductSourceRepairs({root=process.cwd(),read=rawRead(root)}={}){
  const c=packedRepairEpoch(root,currentRaw(root,read));
- return {line:c.line,product_changes:c.product_changes,tooling_changes:c.tooling_changes,targets:c.targets,source:c.source,artifact:c.artifact,source_scope_only:true,current_coordinator_native_or_floor_qualified:false};
+ return {line:c.line,product_changes:c.product_changes,tooling_changes:c.tooling_changes,targets:c.targets,historical_packed_targets:c.historical_packed_targets,historical_contract_source_targets:c.historical_contract_source_targets,source:c.source,artifact:c.artifact,packed_execution_evidence_scope:c.packed_execution_evidence_scope,current_artifact_execution_qualified:false,source_scope_only:true,current_coordinator_native_or_floor_qualified:false};
 }
 /** Finite old task subjects only, after every current successor is rechecked. */
 export function snackDomSourceContext({root=process.cwd(),read=rawRead(root)}={}){

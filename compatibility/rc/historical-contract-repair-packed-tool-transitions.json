@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_parent": "35dd7f350cff065d85f54eb9d67659c969379ce0",
+  "prior_reader_registry": {
+    "source_parent": "35dd7f350cff065d85f54eb9d67659c969379ce0",
+    "path": "compatibility/rc/historical-contract-repair-reader-inputs.json",
+    "sha256": "dcb191270119f875a2d58e77a333839f4368658a41c0e39f8f3a1c58f9c1657c",
+    "bytes": 5667
+  },
+  "current_reader_registry": {
+    "path": "compatibility/rc/historical-contract-repair-reader-inputs.json",
+    "sha256": "ccdbd74d5297b2737dc6308e4554017e97f808bae4cf0c1fa6c94da492c673e5",
+    "bytes": 14562
+  },
+  "changes": [
+    {
+      "path": "scripts/packed-product-source-recovery.mjs",
+      "before_sha256": "abc3c659e9451d2ccf9ec65bd45ed94672342d2fa42dea0f89b2c561bb72c9d1",
+      "after_sha256": "16faa534723e57d2df11dc4497f41a9355c0774c91f33167ecd986b201ae2c37",
+      "literal_edits": [
+        {
+          "before": "import {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';",
+          "after": "import {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';\nimport {historicalContractRepairSourceSubject} from './historical-contract-repair-source.mjs';"
+        },
+        {
+          "before": " const nativeSpec=autocompleteSelectionReaderSubject({root,read,line});",
+          "after": " const contract=historicalContractRepairSourceSubject({root}),nativeSpec=autocompleteSelectionReaderSubject({root,read,line});\n assert.equal(contract.line,line);"
+        },
+        {
+          "before": "if(qualified&&target)assert.ok(nativeSpec.titleSource.qualify(target),'only exact title targets may compose with an earlier product repair');",
+          "after": "if(qualified&&target)assert.ok(nativeSpec.titleSource.qualify(target)||contract.qualify(target),'only exact independently qualified title/contract targets may compose with an earlier product repair');"
+        },
+        {
+          "before": " const preimages=new Map(),current=new Map(),historyByPath=new Map(history.product_members.map(m=>[m.path,m]));assert.equal(historyByPath.size,1142);",
+          "after": " const preimages=new Map(),current=new Map(),packedSource=new Map(),contractPreimages=new Map(),contractCurrent=new Map(),historyByPath=new Map(history.product_members.map(m=>[m.path,m]));assert.equal(historyByPath.size,1142);\n const contractInputPath='compatibility/rc/historical-contract-repair-source-inputs.json',contractInput=read(contractInputPath);\n assert.equal(hash(contractInput),contract.bound.find(ref=>ref.path===contractInputPath).sha256);const contractData=JSON.parse(contractInput);\n for(const image of contract.images){const before=git(root,['show',contractData.repair_baseline_commit+':'+image.path]);assert.equal(hash(before),image.before.sha256);assert.equal(before.length,image.before.bytes);contractPreimages.set(image.path,Buffer.from(before));contractCurrent.set(image.path,image.after.sha256);}"
+        },
+        {
+          "before": "  const bytes=read(target.path);assert.equal(hash(bytes),target.sha256,'changed current packed repair input '+target.path);assert.equal(bytes.length,target.bytes);\n  assert.equal(hash(git(root,['show',subject.source.commit+':'+target.path])),target.sha256,'packed source does not own current repair input');",
+          "after": "  const expected=contract.qualify(target)??target,bytes=read(target.path);assert.equal(hash(bytes),expected.sha256,'changed current packed repair input '+target.path);assert.equal(bytes.length,expected.bytes);\n  const originalPacked=git(root,['show',subject.source.commit+':'+target.path]);assert.equal(hash(originalPacked),target.sha256,'packed source does not own historical repair input');assert.equal(originalPacked.length,target.bytes);"
+        },
+        {
+          "before": "  assert.equal(proposed,bytes.toString(),'packed repair exceeds the reviewed exact delta '+target.path);preimages.set(target.path,Buffer.from(before));current.set(target.path,target.sha256);",
+          "after": "  assert.equal(proposed,originalPacked.toString(),'historical packed repair exceeds the reviewed exact delta '+target.path);preimages.set(target.path,Buffer.from(before));packedSource.set(target.path,target.sha256);current.set(target.path,expected.sha256);"
+        },
+        {
+          "before": "assert.equal(menuCases.source_members.find(m=>m.path===menuPath)?.sha256,current.get(menuPath));assert.equal(tabCases.source_sha256,current.get(tabPath));",
+          "after": "assert.equal(menuCases.source_members.find(m=>m.path===menuPath)?.sha256,packedSource.get(menuPath));assert.equal(tabCases.source_sha256,packedSource.get(tabPath));"
+        },
+        {
+          "before": " const assertCurrent=path=>{if(current.has(path))assert.equal(hash(read(path)),current.get(path),'late current packed repair mutation '+path);",
+          "after": " const assertCurrent=path=>{if(path===undefined){contract.assertCurrent();for(const key of current.keys())assertCurrent(key);nativeSpec.assertCurrent();return;}\n  if(contractCurrent.has(path))assert.equal(hash(read(path)),contractCurrent.get(path),'late current historical contract repair mutation '+path);\n  if(current.has(path))assert.equal(hash(read(path)),current.get(path),'late current packed repair mutation '+path);"
+        },
+        {
+          "before": " const priorRead=path=>{assertCurrent(path);return preimages.has(path)?Buffer.from(preimages.get(path)):read(path);};",
+          "after": " const priorRead=path=>{assertCurrent(path);return preimages.has(path)?Buffer.from(preimages.get(path)):contractPreimages.has(path)?Buffer.from(contractPreimages.get(path)):read(path);};"
+        },
+        {
+          "before": "targets:data.targets,preimages,product_changes:4,tooling_changes:12,source:subject.source,artifact:subject.artifact,source_scope_only:true,current_coordinator_native_or_floor_qualified:false",
+          "after": "targets:data.targets.map(ref=>contract.qualify(ref)??ref),historical_packed_targets:data.targets,historical_contract_source_targets:contract.images.filter(row=>row.path.startsWith('projects/')).map(row=>({path:row.path,...row.after})),preimages,contract_preimages:contractPreimages,product_changes:4,tooling_changes:12,source:subject.source,artifact:subject.artifact,packed_execution_evidence_scope:'historical-only',current_artifact_execution_qualified:false,source_scope_only:true,current_coordinator_native_or_floor_qualified:false"
+        },
+        {
+          "before": "contract.assertCurrent();for(const key of current.keys())assertCurrent(key);nativeSpec.assertCurrent();return;",
+          "after": "contract.assertCurrent();for(const key of new Set([...current.keys(),...contractCurrent.keys()]))assertCurrent(key);nativeSpec.assertCurrent();return;"
+        }
+      ]
+    },
+    {
+      "path": "scripts/snack-dom-source-context.mjs",
+      "before_sha256": "f745c1e24390a60649acbe309849ce6372688e43b5e9306fbdf0af198edf9cd8",
+      "after_sha256": "ac9b0ef8f95dbc88fead9b8d65c9817e665f7060c250ee36971d928dea48f62a",
+      "literal_edits": [
+        {
+          "before": "import {readHistoricalContractRepairOwnerMember} from './historical-contract-repair-readers.mjs';",
+          "after": "import {readHistoricalContractRepairOwnerMember} from './historical-contract-repair-readers.mjs';\nimport {historicalContractRepairSourceSubject} from './historical-contract-repair-source.mjs';"
+        },
+        {
+          "before": "packed.preimages.has(path)?packed.read(path):actual(path);",
+          "after": "(packed.preimages.has(path)||packed.contract_preimages.has(path))?packed.read(path):actual(path);"
+        },
+        {
+          "before": " const targets=[...packed.targets,...owned.targets,...service.targets,...config.targets,data.menu_type.delta,...owned.title_source_requalification.current_sources];",
+          "after": " const targets=[...packed.historical_contract_source_targets,...packed.targets,...owned.targets,...service.targets,...config.targets,data.menu_type.delta,...owned.title_source_requalification.current_sources];"
+        },
+        {
+          "before": " assert.equal(digest,target.sha256,'unqualified current menu type-proof source');",
+          "after": " const contract=historicalContractRepairSourceSubject({root});assert.equal(digest,(contract.qualify(target)??target).sha256,'unqualified current menu type-proof source');"
+        },
+        {
+          "before": "targets:c.targets,source:c.source,artifact:c.artifact,source_scope_only:true,current_coordinator_native_or_floor_qualified:false",
+          "after": "targets:c.targets,historical_packed_targets:c.historical_packed_targets,historical_contract_source_targets:c.historical_contract_source_targets,source:c.source,artifact:c.artifact,packed_execution_evidence_scope:c.packed_execution_evidence_scope,current_artifact_execution_qualified:false,source_scope_only:true,current_coordinator_native_or_floor_qualified:false"
+        },
+        {
+          "before": "packed=internal?.qualification??packedRepairEpoch(root,metadata.read);",
+          "after": "packed=internal?.qualification??packedRepairEpoch(root,actual);"
+        },
+        {
+          "before": "const projected=packedRepairEpoch(root,metadata.read).read;",
+          "after": "const projected=packedRepairEpoch(root,actual).read;"
+        }
+      ]
+    }
+  ],
+  "canonical_dispositions_changed": 0,
+  "g11_claim": "not-passed"
+}
