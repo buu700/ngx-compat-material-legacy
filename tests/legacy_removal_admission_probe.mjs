@@ -14,6 +14,7 @@ import {tmpdir} from 'node:os';
 import {gunzipSync} from 'node:zlib';
 import {legacyRemovalOwnerSourceSubject} from '../scripts/legacy-removal-owner-source.mjs';
 import admission from '../scripts/upstream-legacy-removal-admission.cjs';
+import {historicalContractRepairReaderSubject} from '../scripts/historical-contract-repair-readers.mjs';
 import {applyLegacyRemovalCanonicalStage,legacyRemovalRegistrySuccessor,LEGACY_REMOVAL_LEDGER as LEDGER,LEGACY_REMOVAL_REGISTRY as REGISTRY} from '../scripts/legacy-removal-canonical-stage.mjs';
 const root=process.cwd(),read=path=>fs.readFileSync(join(root,path)),hash=raw=>createHash('sha256').update(raw).digest('hex');
 const prefix='compatibility/rc/21x-legacy-removal-admission-',worksheet=JSON.parse(read(prefix+'worksheet.json')),body=JSON.parse(read(admission.LEGACY_REMOVAL_REVIEW));
@@ -29,7 +30,10 @@ if(physicalLedger.equals(stage.after))assert.ok(physicalRegistry.equals(registry
 const phase=process.argv[3]??'contract';assert.ok(['contract','root'].includes(phase));
 let metadataRejections=0,coldRejections=0,lateRejections=0,rootPositive=0,rootNegative=0,mutantDetected=false;
 if(phase==='contract'){
- const current=read('scripts/upstream-legacy-removal-source.mjs').toString(),prior=gunzipSync(read(prefix+'source-before.mjs.gz')).toString();
+ const executable=read('scripts/upstream-legacy-removal-source.mjs').toString(),toolSubject=historicalContractRepairReaderSubject({root,read});
+ // Retain the original static-body assertions as explicit historical metadata.
+ const current=toolSubject.comparisonBytes(body.current_source_verifier).toString(),prior=gunzipSync(read(prefix+'source-before.mjs.gz')).toString();
+ toolSubject.assertCurrent();
  const imports="import {createRequire} from 'node:module';\nimport {dirname,join,resolve,relative,sep} from 'node:path';\nimport {lstatSync,readdirSync,realpathSync} from 'node:fs';\n";
  assert.equal(current.split(imports).length,2);assert.ok(current.replace(imports,'').startsWith(prior),'prior original authenticator changed');
  const successor=JSON.parse(read(prefix+'source-successor.json'));
@@ -42,7 +46,7 @@ if(phase==='contract'){
  assert.equal(hash(boundaryBody),successor.current_module_body_sha256);assert.equal(current.split(boundaryBody).length,2,'qualified static boundary logic changed');
  const qualification=JSON.parse(read(body.source_qualification.path));assert.deepEqual(qualification.immutable_inputs.find(row=>row.path===successor.before_source.path),successor.before_source);
  assert.ok(!current.includes("from '../../scripts/upstream-legacy-removal-source.mjs'"));
- const sourceFunction=current.slice(current.indexOf('export function inspectLegacyRemovalSourceReview'));
+ const sourceFunction=executable.slice(executable.indexOf('export function inspectLegacyRemovalSourceReview'));
  assert.ok(!sourceFunction.includes('writeFileSync'));assert.ok(!sourceFunction.includes('execFileSync'));assert.ok(!sourceFunction.includes('process.argv'));
  const saved=fs.readFileSync;fs.readFileSync=()=>{throw Error('metadata file read');};syncBuiltinESMExports();
  try{assert.equal(admission.metadataOk(args),true);}finally{fs.readFileSync=saved;syncBuiltinESMExports();}

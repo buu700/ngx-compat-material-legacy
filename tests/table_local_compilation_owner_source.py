@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
+from historical_contract_repair_source import tool_comparison_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 PREFIX = 'compatibility/rc/21x-table-local-compilation-admission-'
@@ -39,13 +40,13 @@ def table_owner_source_data(root=ROOT):
         for edit in row['literal_edits']:
             assert expected.count(edit['before']) == 1
             expected = expected.replace(edit['before'], edit['after'])
-        after = (root / path).read_bytes()
+        after = tool_comparison_bytes(row['after'], root)
         assert after == expected.encode()
         assert digest(after) == row['after']['sha256'] and len(after) == row['after']['bytes']
         transitions[path] = row
     assert len(transitions) == packet['code_transition_count']
     for ref in packet['source_members']:
-        value = (root / ref['path']).read_bytes()
+        value = tool_comparison_bytes(ref, root)
         assert digest(value) == ref['sha256'] and len(value) == ref['bytes']
     return packet, transitions
 

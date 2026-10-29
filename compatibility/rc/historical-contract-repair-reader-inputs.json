@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "c44772b4e5419262170ab35dec2951949291ee96",
+  "tool_transitions": [
+    {
+      "path": "scripts/upstream-legacy-removal-source.mjs",
+      "before": {
+        "sha256": "c1570fbdae80e1e4ef1cf9da8120c948c003d9ee5fcf0d804b109e3e45fac38d",
+        "bytes": 28313
+      },
+      "after": {
+        "sha256": "91a107647a2e823c9e73eb45255df65b7bee8185ae16f25106baa673358528ef",
+        "bytes": 28603
+      },
+      "literal_edits": [
+        {
+          "before": "import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';",
+          "after": "import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';\nimport {historicalContractRepairSourceSubject,readHistoricalContractRepairMember} from './historical-contract-repair-source.mjs';"
+        },
+        {
+          "before": "function legacyRemovalPhysical(root,path){\n if(LEGACY_COMPILER.some(row=>row.path===path)){\n  const base=realpathSync(join(root,'node_modules/typescript')),file=realpathSync(join(base,path.slice('node_modules/typescript/'.length)));\n  assert.ok(file.startsWith(base+sep));return readFileSync(file);\n }\n return readEvidenceMember(root,path);\n}",
+          "after": "function legacyRemovalPhysical(root,path){\n return readHistoricalContractRepairMember(root,path);\n}"
+        },
+        {
+          "before": " const pinned=(path,digest)=>{const raw=readCurrent(path);assert.equal(hash(raw),digest,'changed qualified legacy review '+path);return raw;};",
+          "after": " const repairs=historicalContractRepairSourceSubject({root,read:readCurrent});\n const pinned=(path,digest)=>{const raw=readCurrent(path);assert.equal(hash(raw),digest,'changed qualified legacy review '+path);return raw;};"
+        },
+        {
+          "before": "const read=path=>{const raw=readCurrent(path),ref=expectedMembers.get(path);assert.ok(ref,'unknown legacy boundary input '+path);assert.equal(hash(raw),ref.sha256,'changed owned legacy boundary '+path);assert.equal(raw.length,ref.bytes);members.set(path,{...ref});return raw;};",
+          "after": "const read=path=>{const raw=readCurrent(path),prior=expectedMembers.get(path);assert.ok(prior,'unknown legacy boundary input '+path);const ref=repairs.qualify(prior)??prior;assert.equal(hash(raw),ref.sha256,'changed owned legacy boundary '+path);assert.equal(raw.length,ref.bytes);members.set(path,{...ref});return raw;};"
+        },
+        {
+          "before": " assert.deepEqual(report,expected,'fresh legacy boundary facts differ from qualified review');",
+          "after": " const sourceComparison=repairs.compareSourceReport(report,expected);\n assert.deepEqual(sourceComparison.historical_comparison,expected,'original legacy metadata comparison changed');"
+        },
+        {
+          "before": "const assertCurrent=()=>{original.assertCurrent();assert.deepEqual(legacyRemovalProductPopulation(root),productPaths,'changed complete legacy product population');",
+          "after": "const assertCurrent=()=>{repairs.assertCurrent();original.assertCurrent();assert.deepEqual(legacyRemovalProductPopulation(root),productPaths,'changed complete legacy product population');"
+        },
+        {
+          "before": "review:structuredClone(review),report:structuredClone(report),facts:",
+          "after": "review:structuredClone(review),report:structuredClone(report),historical_comparison_report:structuredClone(sourceComparison.historical_comparison),qualified_product_reference_successors:sourceComparison.changed_source_references,facts:"
+        }
+      ]
+    },
+    {
+      "path": "scripts/upstream-legacy-removal-admission.cjs",
+      "before": {
+        "sha256": "d9b41716669129ee6c9754ecbb3d5fbf75083ca067aaa65b0e4a1fc3ff65137a",
+        "bytes": 6358
+      },
+      "after": {
+        "sha256": "190a2d5449771ec354221c89f076c0bf196b3f363f6804d202d2db0c16fda483",
+        "bytes": 6945
+      },
+      "literal_edits": [
+        {
+          "before": "const hash=raw=>createHash('sha256').update(raw).digest('hex'),image=readFileSync(__filename),handlerRef={path:HANDLER,sha256:hash(image),bytes:image.length};",
+          "after": "const hash=raw=>createHash('sha256').update(raw).digest('hex'),image=readFileSync(__filename),handlerRef={path:HANDLER,sha256:hash(image),bytes:image.length};\nconst {historicalContractRepairReaderSubject}=require('./historical-contract-repair-readers.mjs');\n// The immutable review records its original checker; actual code is bound below.\nconst originalHandlerRef={\"path\":\"scripts/upstream-legacy-removal-admission.cjs\",\"sha256\":\"d9b41716669129ee6c9754ecbb3d5fbf75083ca067aaa65b0e4a1fc3ff65137a\",\"bytes\":6358};"
+        },
+        {
+          "before": "handler:{...handlerRef},complete_original_files",
+          "after": "handler:{...originalHandlerRef},complete_original_files"
+        },
+        {
+          "before": " const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,BOUNDARY,VERIFIER,SUCCESSOR,handlerRef,{path:body.patch_file,sha256:DIFF}].map(ref=>({...ref}));",
+          "after": " const tools=historicalContractRepairReaderSubject({root,read});\n const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,BOUNDARY,VERIFIER,SUCCESSOR,handlerRef,{path:body.patch_file,sha256:DIFF}].map(ref=>tools.qualify(ref)??{...ref});\n for(const ref of tools.bound)if(!bound.some(member=>member.path===ref.path))bound.push({...ref});"
+        },
+        {
+          "before": "assert.deepEqual(source.report,JSON.parse(read(BOUNDARY.path)));",
+          "after": "assert.deepEqual(source.historical_comparison_report,JSON.parse(read(BOUNDARY.path)));"
+        },
+        {
+          "before": "const assertCurrent=()=>{assertBound();source.assertCurrent();assertBound();};",
+          "after": "const assertCurrent=()=>{tools.assertCurrent();assertBound();source.assertCurrent();assertBound();};"
+        }
+      ]
+    },
+    {
+      "path": "scripts/table-local-compilation-owner-source.mjs",
+      "before": {
+        "sha256": "7cad584bf237ab417ed02e0124bb47f8bddfeb2c3b691bcc2e5a91b70f2eda11",
+        "bytes": 7254
+      },
+      "after": {
+        "sha256": "bcf8438d4366926f7c476d287319a7ae5d2a92d1a8313e632b4d066f6a3f4d90",
+        "bytes": 7977
+      },
+      "literal_edits": [
+        {
+          "before": "import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';",
+          "after": "import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';\nimport {historicalContractRepairReaderSubject} from './historical-contract-repair-readers.mjs';"
+        },
+        {
+          "before": " const bound=new Map(),member=ref=>{const raw=read(ref.path);assert.ok(Buffer.isBuffer(raw));assert.equal(hash(raw),ref.sha256,'changed table owner input '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)),'nonphysical table owner source '+ref.path);bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return raw;};",
+          "after": " const repairs=historicalContractRepairReaderSubject({root,read});\n const bound=new Map(repairs.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{const raw=read(ref.path),qualified=repairs.qualify(ref)??ref,comparison=repairs.ownsReference(ref)?repairs.comparisonBytes(ref):raw;assert.ok(Buffer.isBuffer(raw));assert.equal(hash(comparison),ref.sha256,'changed table owner input '+ref.path);if(ref.bytes!==undefined)assert.equal(comparison.length,ref.bytes);assert.equal(hash(raw),qualified.sha256,'changed actual table owner successor '+ref.path);assert.ok(raw.equals(readEvidenceMember(root,ref.path)),'nonphysical table owner source '+ref.path);bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return comparison;};"
+        },
+        {
+          "before": "const ownsReference=ref=>{const row=transitions.get(ref.path);return Boolean(row&&",
+          "after": "const ownsReference=ref=>{const row=transitions.get(ref.path);return repairs.ownsReference(ref)||Boolean(row&&"
+        },
+        {
+          "before": "const predecessorReference=ref=>{\n  const row=transitions.get(ref.path);",
+          "after": "const predecessorReference=value=>{\n  const ref=repairs.predecessorReference(value)??value;\n  const row=transitions.get(ref.path);"
+        },
+        {
+          "before": "const qualifyReference=ref=>{\n  const row=transitions.get(ref.path);",
+          "after": "const qualifyReference=value=>{\n  const ref=repairs.predecessorReference(value)??value;\n  const row=transitions.get(ref.path);"
+        },
+        {
+          "before": "return {...ref,...row.after};}",
+          "after": "return repairs.qualify({...ref,...row.after})??{...ref,...row.after};}"
+        },
+        {
+          "before": "return {...ref,...registrySubject().reference};}return {...ref};",
+          "after": "return {...ref,...registrySubject().reference};}return repairs.qualify(ref)??{...ref};"
+        },
+        {
+          "before": " const comparisonBytes=ref=>{\n  const row=transitions.get(ref.path);",
+          "after": " const comparisonBytes=ref=>{\n  if(repairs.ownsReference(ref))return repairs.comparisonBytes(ref);\n  const row=transitions.get(ref.path);"
+        },
+        {
+          "before": "const assertCurrent=()=>{for(const ref of bound.values())",
+          "after": "const assertCurrent=()=>{repairs.assertCurrent();for(const ref of bound.values())"
+        }
+      ]
+    },
+    {
+      "path": "scripts/dialog-title-source-context.mjs",
+      "before": {
+        "sha256": "c099a023155608853aba98582331b4cec27eb75bfb09d5d32839f5b323a96d02",
+        "bytes": 10472
+      },
+      "after": {
+        "sha256": "bf660733ac0567ef9a83e4e68924657d46edc745bf5caa151063a44bd2d753c6",
+        "bytes": 11253
+      },
+      "literal_edits": [
+        {
+          "before": "import {qualifyCanonicalToolReference} from './canonical-tool-source-role.mjs';",
+          "after": "import {qualifyCanonicalToolReference} from './canonical-tool-source-role.mjs';\nimport {historicalContractRepairReaderSubject} from './historical-contract-repair-readers.mjs';\nimport {historicalContractRepairSourceSubject} from './historical-contract-repair-source.mjs';"
+        },
+        {
+          "before": " const raw=read(readerPath);assert.equal(hash(raw),readerPins[line]",
+          "after": " const repairTools=historicalContractRepairReaderSubject({root,read}),repairSources=historicalContractRepairSourceSubject({root});\n const raw=read(readerPath);assert.equal(hash(raw),readerPins[line]"
+        },
+        {
+          "before": "const bound=[{path:readerPath,sha256:hash(raw),bytes:raw.length}],images=[]",
+          "after": "const bound=[...repairTools.bound,...repairSources.bound,{path:readerPath,sha256:hash(raw),bytes:raw.length}],images=[]"
+        },
+        {
+          "before": "  }else assert.equal(read(row.path).toString(),expected,'changed current title source-reader '+row.path);",
+          "after": "  }else{const successor=repairTools.qualify({path:row.path,...row.after});if(successor)current=successor;else assert.equal(read(row.path).toString(),expected,'changed current title source-reader '+row.path);}"
+        },
+        {
+          "before": "const assertCurrent=()=>{for(const member of bound){const current=read(member.path);assert.equal(hash(current),member.sha256,'late title reader change '+member.path);",
+          "after": "const assertCurrent=()=>{repairTools.assertCurrent();repairSources.assertCurrent();for(const member of bound){const current=read(member.path);assert.equal(hash(current),member.sha256,'late title reader change '+member.path);"
+        },
+        {
+          "before": " const currentReference=(member,side)=>{\n  const image=images.find",
+          "after": " const currentReference=(member,side)=>{\n  const product=side==='after'?repairSources.qualify(member):repairSources.historicalReference(member);if(product)return product;\n  const tool=side==='after'?repairTools.qualify(member):repairTools.predecessorReference(member);if(tool)member=tool;\n  const image=images.find"
+        },
+        {
+          "before": "  return qualify(images,member,side);",
+          "after": "  return qualify(images,member,side)??tool;"
+        }
+      ]
+    },
+    {
+      "path": "tests/table_local_compilation_owner_source.py",
+      "before": {
+        "sha256": "496731923fb40dfd1e822cd88d71964a20a25bc34b33b366eef5c2e4a932e11a",
+        "bytes": 3551
+      },
+      "after": {
+        "sha256": "2c53fe4b235f4b89a0a646b2cbb580fdcc2ac499618a3346c7821d8814514fec",
+        "bytes": 3633
+      },
+      "literal_edits": [
+        {
+          "before": "import subprocess\n",
+          "after": "import subprocess\nfrom historical_contract_repair_source import tool_comparison_bytes\n"
+        },
+        {
+          "before": "        after = (root / path).read_bytes()",
+          "after": "        after = tool_comparison_bytes(row['after'], root)"
+        },
+        {
+          "before": "        value = (root / ref['path']).read_bytes()",
+          "after": "        value = tool_comparison_bytes(ref, root)"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_legacy_removal_source.py",
+      "before": {
+        "sha256": "4f6812343726b88a291842c1f3a3fc091241fd501107d53a6d2da6aa624314cf",
+        "bytes": 11338
+      },
+      "after": {
+        "sha256": "b603892320cefb7cc6d56f5f58d61b762b19021f5427f84212cbd73d47a085ec",
+        "bytes": 11465
+      },
+      "literal_edits": [
+        {
+          "before": "from table_local_compilation_owner_source import table_predecessor_data\n",
+          "after": "from table_local_compilation_owner_source import table_predecessor_data\nfrom historical_contract_repair_source import qualify_source_reference\n"
+        },
+        {
+          "before": "        raw=(ROOT/member['path']).read_bytes();assert sha(raw)==member['sha256'];assert len(raw)==member['bytes']",
+          "after": "        current=qualify_source_reference(member,ROOT)\n        raw=(ROOT/member['path']).read_bytes();assert sha(raw)==current['sha256'];assert len(raw)==current['bytes']"
+        }
+      ]
+    },
+    {
+      "path": "scripts/snack-dom-source-context.mjs",
+      "before": {
+        "sha256": "330a20972d42336ee37adca60fb2243310724caf263cb7bfa783b7a7eac934de",
+        "bytes": 44559
+      },
+      "after": {
+        "sha256": "2f82e6957ec7a4d3d655853af57dfdc28b701238e697dfa1be73f3c5bea379a4",
+        "bytes": 44102
+      },
+      "literal_edits": [
+        {
+          "before": "import {readFileSync,lstatSync,realpathSync} from 'node:fs';",
+          "after": "import {readFileSync,lstatSync,realpathSync} from 'node:fs';\nimport {readHistoricalContractRepairOwnerMember} from './historical-contract-repair-readers.mjs';"
+        },
+        {
+          "before": "const rawRead=root=>p=>{\n const parts=p.split('/');assert.ok(parts.every(part=>part&&part!=='.'&&part!=='..'));\n const peer=p.match(/^node_modules\\/@angular\\/(material|cdk)\\/(.+)$/);\n let path=peer?realpathSync(join(root,'node_modules/@angular',peer[1])):root;\n const tail=peer?peer[2].split('/'):parts;\n // Only the declared peer package root can be linked. Source paths and every\n // descendant of the resolved peer root keep their original no-link checks.\n for(const part of tail){path=join(path,part);assert.equal(lstatSync(path).isSymbolicLink(),false);}\n assert.ok(lstatSync(path).isFile());return readFileSync(path);\n};",
+          "after": "const rawRead=root=>p=>readHistoricalContractRepairOwnerMember(root,p);"
+        }
+      ]
+    },
+    {
+      "path": "tests/legacy_removal_admission_probe.mjs",
+      "before": {
+        "sha256": "9852c3ec5d78d9a1f33be01dd01b93c4cec8010c21945adac5e52d513bf79381",
+        "bytes": 14272
+      },
+      "after": {
+        "sha256": "fc2436da1bb2458bab3b82408f3f4386507dacd50241993eabcda30acc1817a9",
+        "bytes": 14644
+      },
+      "literal_edits": [
+        {
+          "before": "import admission from '../scripts/upstream-legacy-removal-admission.cjs';",
+          "after": "import admission from '../scripts/upstream-legacy-removal-admission.cjs';\nimport {historicalContractRepairReaderSubject} from '../scripts/historical-contract-repair-readers.mjs';"
+        },
+        {
+          "before": " const current=read('scripts/upstream-legacy-removal-source.mjs').toString(),prior=gunzipSync(read(prefix+'source-before.mjs.gz')).toString();",
+          "after": " const executable=read('scripts/upstream-legacy-removal-source.mjs').toString(),toolSubject=historicalContractRepairReaderSubject({root,read});\n // Retain the original static-body assertions as explicit historical metadata.\n const current=toolSubject.comparisonBytes(body.current_source_verifier).toString(),prior=gunzipSync(read(prefix+'source-before.mjs.gz')).toString();\n toolSubject.assertCurrent();"
+        },
+        {
+          "before": "const sourceFunction=current.slice(current.indexOf('export function inspectLegacyRemovalSourceReview'));",
+          "after": "const sourceFunction=executable.slice(executable.indexOf('export function inspectLegacyRemovalSourceReview'));"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_legacy_removal_admission.py",
+      "before": {
+        "sha256": "f2231fc19cbc606d9eb15644971f604194756730f3731aae2985f4dac431630d",
+        "bytes": 7464
+      },
+      "after": {
+        "sha256": "e9c68df9d137254a57c296b374fa2eefbd15f1cd75c77117b199d6eb86010713",
+        "bytes": 7704
+      },
+      "literal_edits": [
+        {
+          "before": "from table_local_compilation_owner_source import table_predecessor_data,qualify_table_owner_reference\n",
+          "after": "from table_local_compilation_owner_source import table_predecessor_data,qualify_table_owner_reference\nfrom historical_contract_repair_source import qualify_tool_reference,tool_comparison_bytes\n"
+        },
+        {
+          "before": "handler=new['individual_proof']['legacy_removal_source_scope']['handler'];self.assertEqual(digest((ROOT/handler['path']).read_bytes()),handler['sha256'])",
+          "after": "handler=new['individual_proof']['legacy_removal_source_scope']['handler'];current_handler=qualify_tool_reference(handler,ROOT)\n        self.assertEqual(digest((ROOT/handler['path']).read_bytes()),current_handler['sha256']);self.assertEqual(digest(tool_comparison_bytes(handler,ROOT)),handler['sha256'])"
+        }
+      ]
+    }
+  ],
+  "unchanged_source_subject": {
+    "path": "scripts/historical-contract-repair-source.mjs",
+    "sha256": "d4870c2cc12609da71b03c1745996693dd26444b2dfd848260cfda1ac3514da5",
+    "bytes": 13052
+  },
+  "canonical_dispositions_changed": 0,
+  "product_changes": 0,
+  "old_programs_executed": false,
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

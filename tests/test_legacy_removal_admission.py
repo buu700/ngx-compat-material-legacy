@@ -5,6 +5,7 @@
 from pathlib import Path
 import gzip,hashlib,json,os,re,subprocess,unittest
 from table_local_compilation_owner_source import table_predecessor_data,qualify_table_owner_reference
+from historical_contract_repair_source import qualify_tool_reference,tool_comparison_bytes
 ROOT=Path(__file__).resolve().parents[1]
 PREFIX='compatibility/rc/21x-legacy-removal-admission-'
 def digest(raw):return hashlib.sha256(raw).hexdigest()
@@ -48,7 +49,8 @@ class LegacyRemovalAdmissionTests(unittest.TestCase):
         original=json.loads(gzip.decompress((ROOT/'compatibility/rc/21x-legacy-removal-source-originals.json.gz').read_bytes()))
         self.assertEqual(body['complete_original_paths'],[row['path']for row in original['sections']]);self.assertEqual((ROOT/body['patch_file']).read_text(),original['diff'])
         self.assertEqual(digest((ROOT/body['patch_file']).read_bytes()),new['individual_proof']['diff_sha256'])
-        handler=new['individual_proof']['legacy_removal_source_scope']['handler'];self.assertEqual(digest((ROOT/handler['path']).read_bytes()),handler['sha256'])
+        handler=new['individual_proof']['legacy_removal_source_scope']['handler'];current_handler=qualify_tool_reference(handler,ROOT)
+        self.assertEqual(digest((ROOT/handler['path']).read_bytes()),current_handler['sha256']);self.assertEqual(digest(tool_comparison_bytes(handler,ROOT)),handler['sha256'])
         registry=gzip.decompress((ROOT/(PREFIX+'registry-before.mjs.gz')).read_bytes());proposed=gzip.decompress((ROOT/(PREFIX+'registry-after.mjs.gz')).read_bytes());self.assertEqual(digest(registry),packet['registry_before']['sha256']);self.assertEqual(digest(proposed),packet['registry_after']['sha256'])
         record=(f"  {{sha:'{sha}',proof_kind:'individual-historical-legacy-removal-source-exclusion',\n    scope_key:'legacy_removal_source_scope',module:'upstream-legacy-removal-admission.cjs'}},\n").encode()
         self.assertEqual(registry.count(b'];\n'),1);self.assertEqual(registry.replace(b'];\n',record+b'];\n'),proposed)

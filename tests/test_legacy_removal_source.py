@@ -5,6 +5,7 @@
 from pathlib import Path
 import collections,copy,gzip,hashlib,json,os,re,subprocess,unittest
 from table_local_compilation_owner_source import table_predecessor_data
+from historical_contract_repair_source import qualify_source_reference
 ROOT=Path(__file__).resolve().parents[1]
 PREFIX='compatibility/rc/21x-legacy-removal-source-'
 def sha(raw):return hashlib.sha256(raw).hexdigest()
@@ -45,7 +46,8 @@ def check_review(original,review,boundary):
     members={row['path']:row for row in boundary['current_members']}
     assert len(members)==len(boundary['current_members'])
     for member in members.values():
-        raw=(ROOT/member['path']).read_bytes();assert sha(raw)==member['sha256'];assert len(raw)==member['bytes']
+        current=qualify_source_reference(member,ROOT)
+        raw=(ROOT/member['path']).read_bytes();assert sha(raw)==current['sha256'];assert len(raw)==current['bytes']
     for actual,expected in zip(rows,deleted):
         assert actual['before_blob']==expected['before_blob'];assert actual['before_sha256']==expected['before']['sha256'];assert actual['patch_sha256']==expected['patch_sha256']
         assert actual['hunks']==[{k:h[k]for k in ['index','sha256']}for h in expected['hunks']]
