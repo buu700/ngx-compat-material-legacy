@@ -1,0 +1,122 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by the MIT license in LICENSE.
+ */
+/** Complete source transition proof only;never executes the historical checker. */
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+import {readFileSync,writeFileSync,mkdtempSync,mkdirSync,symlinkSync,rmSync,lstatSync} from 'node:fs';
+import {createRequire} from 'node:module';
+import {tmpdir} from 'node:os';
+import {dirname,join,resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {runInNewContext} from 'node:vm';
+const ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..'),SELF='tests/checker_reference_source_probe.mjs';
+const PACKET='compatibility/rc/c04-checker-reference-source-inputs.json',LEDGER='compatibility/f10/disposition-ledger/ledger.json';
+const CHECKER='scripts/check-upstream-audit-disposition.mjs';
+const PINS={"main":"5ed5add16c5c6e547ec3005c6d3d4c627464ec6be2fb2512050354217fe962b5","21.x":"f3baffebad455da6add898ca103f2994b61a99c049099b4d23bbfe913334179d"};
+const image=readFileSync(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex');
+const disk=path=>readFileSync(join(ROOT,path));
+function original(parent,path){
+ const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
+ for(const key of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete env[key];
+ return execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',parent+':'+path],{cwd:ROOT,env,maxBuffer:8*1024*1024});
+}
+export async function inspectCheckerSource({read=disk}={}){
+ const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
+ const bound=new Map(),member=(path,digest,bytes)=>{
+  const raw=read(path);assert.ok(Buffer.isBuffer(raw));if(digest)assert.equal(hash(raw),digest,'changed source input '+path);if(bytes!==undefined)assert.equal(raw.length,bytes);
+  bound.set(path,{path,sha256:hash(raw),bytes:raw.length});return raw;
+ };
+ const packet=JSON.parse(member(PACKET,PINS[line]));assert.equal(packet.line,line);assert.equal(packet.schema_version,1);
+ for(const key of ['canonical_decisions_changed'])assert.equal(packet[key],0);
+ for(const key of ['canonical_ledger_changed','root_checker_changed','old_checker_executed','actual_native_packed_browser_floor_or_full_audit_qualified'])assert.equal(packet[key],false);
+ assert.equal(packet.g11_claim,'not-passed');member(SELF,hash(image));
+ for(const ref of packet.source_members)member(ref.path,ref.sha256,ref.bytes);
+ const current=member(CHECKER,packet.current_checker.sha256,packet.current_checker.bytes);
+ const ledgerRaw=member(LEDGER,packet.protected_ledger.sha256,packet.protected_ledger.bytes),ledger=JSON.parse(ledgerRaw);
+ const assertCurrent=()=>{for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late checker source input '+ref.path);assert.equal(raw.length,ref.bytes);assert.equal(hash(disk(ref.path)),ref.sha256,'late physical source '+ref.path);}};
+ // Imported current code must be the physical source just authenticated above.
+ for(const ref of bound.values())assert.equal(hash(disk(ref.path)),ref.sha256,'physical source differs '+ref.path);
+ const old=original(packet.old_checker.commit,CHECKER);assert.equal(hash(old),packet.old_checker.sha256);assert.equal(old.length,packet.old_checker.bytes);
+ const worksheet=original(packet.source_parent,packet.worksheet_at_source_parent.path);assert.equal(hash(worksheet),packet.worksheet_at_source_parent.sha256);
+ const priorWorksheet=JSON.parse(worksheet);assert.deepEqual(packet.selected_references,priorWorksheet.selected_references);assert.deepEqual(packet.current_checker,priorWorksheet.current_checker);
+ let expected=old.toString();
+ for(const edit of packet.literal_edits){assert.equal(expected.split(edit.before).length,2,'ambiguous source edit');assert.ok(edit.decision.length>100);expected=expected.replace(edit.before,edit.after);}
+ assert.equal(current.toString(),expected,'unreviewed checker source transition');
+ assert.equal(hash(packet.complete_diff),packet.complete_diff_sha256);assert.equal(packet.hunk_reviews.length,line==='21.x'?7:6);
+ assert.equal(packet.complete_diff.split(/(?=^@@ )/m).slice(1).join(''),packet.hunk_reviews.map(row=>row.text).join(''));
+ for(const[index,row]of packet.hunk_reviews.entries()){assert.equal(row.index,index+1);assert.equal(hash(row.text),row.sha256);assert.equal(row.header,row.text.split('\n')[0]);assert.ok(row.decision.length>100);assert.equal(row.native_or_security_acceptance_qualified,false);}
+ const ts=createRequire(import.meta.url)('typescript');assert.equal(ts.version,JSON.parse(read('package.json')).devDependencies.typescript);
+ const parse=(name,raw)=>{const sf=ts.createSourceFile(name,raw.toString(),ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);assert.equal(sf.parseDiagnostics.length,0);return sf;};
+ const before=parse('old-data.mjs',old),after=parse('current.mjs',current);
+ const functions=ast=>new Map(ast.statements.filter(ts.isFunctionDeclaration).map(node=>[node.name.text,node.getText(ast)]));
+ const oldFns=functions(before),newFns=functions(after),changed=[];
+ for(const[name,text]of oldFns){assert.ok(newFns.has(name));if(newFns.get(name)!==text)changed.push(name);}
+ assert.deepEqual(changed,['evidenceClass','individualPatchBound']);assert.deepEqual([...newFns.keys()].filter(name=>!oldFns.has(name)),['readRegularRepoBytes']);
+ const policies=ast=>ast.statements.filter(ts.isVariableStatement).flatMap(node=>node.declarationList.declarations).filter(node=>['ALLOWED_FINAL','PENDING','INHERITED','BEHAVIOR','REVIEW_DEPTHS'].includes(node.name.getText(ast))).map(node=>node.getText(ast));
+ assert.equal(policies(before).length,5);assert.deepEqual(policies(before),policies(after));
+ const kinds=['historical_behavior','progress_csp_behavior','media_matcher_behavior','form_field_hover_behavior','content_observer_behavior','ripple_replay_behavior'];
+ const derived=ledger.entries.flatMap(entry=>kinds.flatMap(kind=>(entry.individual_proof?.[kind]?.source_members??[]).filter(ref=>ref.path===CHECKER&&ref.sha256===packet.old_checker.sha256).map(ref=>({sha:entry.sha,proof_kind:kind,reference:ref,current_raw:packet.current_checker,requires_separate_qualification:true}))));
+ assert.equal(ledger.entries.length,1697);assert.equal(ledger.g11_claim,'not-passed');assert.deepEqual(derived,packet.selected_references);assert.equal(derived.length,line==='21.x'?5:13);
+ const build=await import('../scripts/upstream-rules-js-build-admission.mjs'),sass=await import('../scripts/upstream-sass-inspection-admission.mjs');
+ const predicates=[['requiresRulesJsBuild',build.requiresRulesJsBuild],['requiresSassInspectionScope',sass.requiresSassInspectionScope]];
+ const positive=[];
+ for(const sha of build.RULES_JS_BUILD_SHAS){assert.equal(build.requiresRulesJsBuild({sha}),true);positive.push('build:'+sha);}
+ for(const sha of sass.SASS_INSPECTION_SHAS){assert.equal(sass.requiresSassInspectionScope({sha}),true);positive.push('sass:'+sha);}
+ if(line==='21.x'){
+  const legacy=await import('../scripts/upstream-legacy-sass-entrypoint-admission.mjs'),testing=await import('../scripts/upstream-testing-api-21x-admission.mjs');
+  const registered=await import('../scripts/upstream-registered-source-review.mjs'),registry=await import('../scripts/upstream-source-contract-registry.mjs');
+  predicates.push(['requiresLegacySassEntrypointScope',legacy.requiresLegacySassEntrypointScope],['requiresTestingApi21xEntry',entry=>testing.requiresTestingApi21xEntry(entry,line,read)],['requiresRegisteredSourceReview',entry=>registered.requiresRegisteredSourceReview(entry,entry?.individual_proof)]);
+  assert.equal(legacy.requiresLegacySassEntrypointScope({sha:legacy.LEGACY_SASS_ENTRYPOINT_SHA}),true);positive.push('legacy:'+legacy.LEGACY_SASS_ENTRYPOINT_SHA);
+  const program=parse('testing.mjs',read('scripts/upstream-testing-api-21x-admission.mjs'));
+  const patch=program.statements.filter(ts.isVariableStatement).flatMap(node=>node.declarationList.declarations).find(node=>node.name.getText(program)==='patches');assert.ok(ts.isObjectLiteralExpression(patch.initializer));assert.equal(patch.initializer.properties.length,7);
+  for(const property of patch.initializer.properties){const sha=property.name.text;assert.equal(testing.requiresTestingApi21xEntry({sha},line,read),true);positive.push('testing:'+sha);}
+  assert.equal(registry.sourceContractDefinitions.length,67);
+  for(const row of registry.sourceContractDefinitions){
+   for(const entry of [{sha:row.sha},{sha:'0'.repeat(40),individual_proof:{proof_kind:row.proof_kind}},{sha:'0'.repeat(40),individual_proof:{[row.scope_key]:{}}}]){assert.equal(registered.requiresRegisteredSourceReview(entry),true);positive.push('registered:'+row.sha);}
+  }
+ }
+ const exclusions=[];
+ for(const ref of derived){const entry=ledger.entries.find(entry=>entry.sha===ref.sha),results={};
+  for(const[name,predicate]of predicates){assert.equal(predicate(entry),false,'selected row enters new guard '+name+' '+entry.sha);results[name]=false;}
+  exclusions.push({sha:entry.sha,native_kind:ref.proof_kind,final_disposition:entry.final_disposition,source_predicates:results});
+ }
+ for(const[,predicate]of predicates){assert.equal(predicate({sha:'0'.repeat(40)}),false);assert.equal(predicate(null),false);}
+ const markers=[['rules_js_build_source_scope',build.requiresRulesJsBuild],['sass_inspection',sass.requiresSassInspectionScope]];
+ if(line==='21.x'){
+  const legacy=await import('../scripts/upstream-legacy-sass-entrypoint-admission.mjs'),testing=await import('../scripts/upstream-testing-api-21x-admission.mjs');
+  markers.push(['legacy_sass_entrypoint_scope',legacy.requiresLegacySassEntrypointScope],['testing_api_21x',entry=>testing.requiresTestingApi21xEntry(entry,line,read)]);
+ }
+ for(const ref of derived)for(const[key,predicate]of markers){const entry=structuredClone(ledger.entries.find(entry=>entry.sha===ref.sha));entry.individual_proof[key]={};assert.equal(predicate(entry),true,'scope marker may not be ignored');positive.push('marker:'+ref.sha+':'+key);}
+ // Execute only the exact current helper,with real filesystem calls and a
+ // disposable root. No historical program or complete checker is evaluated.
+ const fixture=mkdtempSync(join(tmpdir(),'ngx-current-checker-reader-'));let readerCases=0;
+ try{
+  writeFileSync(join(fixture,'value.txt'),'current bytes\n');mkdirSync(join(fixture,'folder'));writeFileSync(join(fixture,'folder','child.txt'),'nested\n');
+  symlinkSync(join(fixture,'value.txt'),join(fixture,'link'));symlinkSync(join(fixture,'folder'),join(fixture,'linked-parent'));
+  const reader=runInNewContext(newFns.get('readRegularRepoBytes')+'\nreadRegularRepoBytes;',{root:fixture,join,lstatSync,readFileSync});
+  assert.equal(reader('value.txt').toString(),'current bytes\n');readerCases++;assert.equal(reader('folder/child.txt').toString(),'nested\n');readerCases++;
+  for(const path of ['missing.txt','missing-parent/value']){assert.throws(()=>reader(path),error=>error.code==='ENOENT');readerCases++;}
+  for(const path of ['',null,0,{},'../value.txt','/value.txt','./value.txt','folder/../value.txt','folder//child.txt','folder\\child.txt']){assert.throws(()=>reader(path),error=>error.message==='unsafe source member');readerCases++;}
+  for(const path of ['link','linked-parent/child.txt']){assert.throws(()=>reader(path),error=>error.message==='symlink in source member');readerCases++;}
+  assert.throws(()=>reader('folder'),error=>error.message==='source member is not a regular file');readerCases++;
+ }finally{rmSync(fixture,{recursive:true,force:true});}
+ assertCurrent();assert.ok(disk(LEDGER).equals(ledgerRaw));
+ return {bound:structuredClone([...bound.values()]),assertCurrent,report:{schema_version:1,line,result:'pass',analysis_node:process.version,analysis_typescript:ts.version,old_checker_sha256:packet.old_checker.sha256,current_checker_sha256:packet.current_checker.sha256,
+  complete_hunks:packet.hunk_reviews.length,original_functions_preserved:oldFns.size-2,changed_original_functions:changed,new_functions:['readRegularRepoBytes'],structural_policy_sets_preserved:5,
+  selected_references:derived.length,per_row_guard_exclusions:exclusions,actual_guard_exclusion_checks:derived.length*predicates.length,positive_scope_routing_checks:positive.length,actual_current_reader_cases:readerCases,
+  fixture_roots_removed:true,canonical_ledger_unchanged:true,root_checker_unchanged:true,old_checker_executed:false,canonical_decisions_changed:0,
+  actual_complete_checker_admission_or_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};
+}
+if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
+ const before=disk(LEDGER);let tamper=null;const read=path=>{const raw=disk(path);return path===tamper?Buffer.concat([raw,Buffer.from(' ')]):raw;};
+ const subject=await inspectCheckerSource({read});let cold=0,late=0;
+ for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+tamper);late++;tamper=null;}
+ for(const ref of subject.bound){tamper=ref.path;await assert.rejects(inspectCheckerSource({read}),undefined,'cold '+tamper);cold++;tamper=null;}
+ subject.assertCurrent();assert.ok(before.equals(disk(LEDGER)));const report={...subject.report,cold_source_faults_rejected:cold,late_source_faults_rejected:late,bound_current_paths:subject.bound.length};
+ if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));
+}

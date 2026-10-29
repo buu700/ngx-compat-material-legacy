@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Complete checker source transition and individually enumerated native reference cohort;no canonical proposal or native execution",
+  "source_parent": "f7e91f9fd00fa1754bc7cfc44a60a9b8f6a8b90a",
+  "old_checker": {
+    "path": "scripts/check-upstream-audit-disposition.mjs",
+    "commit": "8161f18973de97e033abb70a0a0f894104823040",
+    "sha256": "db1ad9e6d7a069eaeae9ce026912bd520d3a13630678f76e37f965fc25960377",
+    "bytes": 44099
+  },
+  "current_checker": {
+    "path": "scripts/check-upstream-audit-disposition.mjs",
+    "sha256": "4a6002153caabe102887bcd8847128818c2f7025a3d1257d97cd446f34fbf106",
+    "bytes": 46960
+  },
+  "protected_ledger": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "558b6891e575422cdfcdaff2f59fa7611cf53246130da3afeec68571d1c77a1b",
+    "bytes": 4183477
+  },
+  "selected_references": [
+    {
+      "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+      "proof_kind": "form_field_hover_behavior",
+      "reference": {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "sha256": "db1ad9e6d7a069eaeae9ce026912bd520d3a13630678f76e37f965fc25960377"
+      },
+      "current_raw": {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "sha256": "4a6002153caabe102887bcd8847128818c2f7025a3d1257d97cd446f34fbf106",
+        "bytes": 46960
+      },
+      "requires_separate_qualification": true
+    },
+    {
+      "sha": "d8a6c3edd8d406b3f1b1c26805612eac8856b745",
+      "proof_kind": "content_observer_behavior",
+      "reference": {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "sha256": "db1ad9e6d7a069eaeae9ce026912bd520d3a13630678f76e37f965fc25960377"
+      },
+      "current_raw": {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "sha256": "4a6002153caabe102887bcd8847128818c2f7025a3d1257d97cd446f34fbf106",
+        "bytes": 46960
+      },
+      "requires_separate_qualification": true
+    },
+    {
+      "sha": "cf3506adf1af1556d705dbb651e7e96a7141b81d",
+      "proof_kind": "progress_csp_behavior",
+      "reference": {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "sha256": "db1ad9e6d7a069eaeae9ce026912bd520d3a13630678f76e37f965fc25960377"
+      },
+      "current_raw": {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "sha256": "4a6002153caabe102887bcd8847128818c2f7025a3d1257d97cd446f34fbf106",
+        "bytes": 46960
+      },
+      "requires_separate_qualification": true
+    },
+    {
+      "sha": "878700d10ab042b6a62c6f86f4fcc24d5a0ae685",
+      "proof_kind": "progress_csp_behavior",
+      "reference": {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "sha256": "db1ad9e6d7a069eaeae9ce026912bd520d3a13630678f76e37f965fc25960377"
+      },
+      "current_raw": {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "sha256": "4a6002153caabe102887bcd8847128818c2f7025a3d1257d97cd446f34fbf106",
+        "bytes": 46960
+      },
+      "requires_separate_qualification": true
+    },
+    {
+      "sha": "10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb",
+      "proof_kind": "ripple_replay_behavior",
+      "reference": {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "sha256": "db1ad9e6d7a069eaeae9ce026912bd520d3a13630678f76e37f965fc25960377"
+      },
+      "current_raw": {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "sha256": "4a6002153caabe102887bcd8847128818c2f7025a3d1257d97cd446f34fbf106",
+        "bytes": 46960
+      },
+      "requires_separate_qualification": true
+    }
+  ],
+  "literal_edits": [
+    {
+      "before": "import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';",
+      "after": "import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';\nimport {requiresLegacySassEntrypointScope,legacySassEntrypointEntryEvidenceOk} from './upstream-legacy-sass-entrypoint-admission.mjs';\nimport {requiresRulesJsBuild,rulesJsBuildEntryEvidenceOk,rulesJsBuildOriginalPatch} from './upstream-rules-js-build-admission.mjs';\nimport {requiresSassInspectionScope,sassInspectionEntryEvidenceOk} from './upstream-sass-inspection-admission.mjs';\nimport {requiresTestingApi21xEntry,testingApi21xEntryEvidenceOk} from './upstream-testing-api-21x-admission.mjs';",
+      "decision": "Add only finite source-review guard imports;all old imports and native validators remain. No runtime or inherited behavior moves to these new source-exclusion paths."
+    },
+    {
+      "before": "import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';",
+      "after": "import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';\nimport {requiresRegisteredSourceReview} from './upstream-registered-source-review.mjs';",
+      "decision": "Register the finite mandatory-source sensitivity predicate. This adds a review requirement independently of final disposition;none of the old sensitivity predicates is removed."
+    },
+    {
+      "before": "  if (typeof rel !== 'string' || !rel.trim()) return 'missing';",
+      "after": "  if (typeof rel !== 'string' || !rel.trim()) return 'missing';\n  const legacySassEntrypointScope = requiresLegacySassEntrypointScope(entry);\n  if (legacySassEntrypointScope && !rel.endsWith('.json')) return 'invalid-legacy-sass-entrypoint-scope';\n  const rulesJsBuildScope = requiresRulesJsBuild(entry);\n  if (rulesJsBuildScope && !rel.endsWith('.json')) return 'invalid-rules-js-build-scope';\n  const sassInspectionScope = requiresSassInspectionScope(entry);\n  if (sassInspectionScope && !rel.endsWith('.json')) return 'invalid-sass-inspection-scope';\n  const testingApi21xScope = requiresTestingApi21xEntry(entry,line,readRegularRepoBytes);\n  if (testingApi21xScope && !rel.endsWith('.json')) return 'invalid-testing-api-21x-scope';",
+      "decision": "Every new format check is guarded by its finite actual predicate. Verify exclusion for each selected SHA/proof separately;false predicates preserve the original format and evidence paths."
+    },
+    {
+      "before": "    if (!body || typeof body !== 'object' || Array.isArray(body)) return 'unreadable';",
+      "after": "    if (!body || typeof body !== 'object' || Array.isArray(body)) return 'unreadable';\n    if (legacySassEntrypointScope && !legacySassEntrypointEntryEvidenceOk({root,read:readRegularRepoBytes,entry,body,\n      line:line||body.line})) return 'invalid-legacy-sass-entrypoint-scope';\n    if (rulesJsBuildScope && !rulesJsBuildEntryEvidenceOk({root,read:readRegularRepoBytes,entry,body,\n      line:line||body.line})) return 'invalid-rules-js-build-scope';\n    if (sassInspectionScope && !sassInspectionEntryEvidenceOk({root,read:readRegularRepoBytes,entry,body,\n      line:line||body.line})) return 'invalid-sass-inspection-scope';\n    if (testingApi21xScope && !testingApi21xEntryEvidenceOk({entry,body,read:readRegularRepoBytes,\n      productPaths:()=>candidateProductSourcePaths(root),line:line||body.line})) return 'invalid-testing-api-21x-scope';",
+      "decision": "After the original JSON parse/shape checks,execute new source validators only for their finite scopes. Preserve all original historical,chip,native and inherited evidence guards in order."
+    },
+    {
+      "before": "function individualPatchBound(entry, proof) {",
+      "after": "// Dependency graph resolvers distinguish an absent candidate (ENOENT) from an\n// unreadable or unsafe source. Preserve that filesystem contract for raw reads.\nfunction readRegularRepoBytes(rel) {\n  if (typeof rel !== 'string' || rel.includes('\\\\')) throw new Error('unsafe source member');\n  const parts = rel.split('/');\n  if (parts.some(part => !part || part === '.' || part === '..')) throw new Error('unsafe source member');\n  let file = root, stat;\n  for (const part of parts) {\n    file = join(file, part); stat = lstatSync(file);\n    if (stat.isSymbolicLink()) throw new Error('symlink in source member');\n  }\n  if (!stat.isFile()) throw new Error('source member is not a regular file');\n  return readFileSync(file);\n}\n\nfunction individualPatchBound(entry, proof) {",
+      "decision": "Add the regular-file raw reader. It rejects unsafe paths,symlinks and directories and preserves ENOENT instead of silently returning null;only the current implementation is executed in disposable fixture roots."
+    },
+    {
+      "before": "  if (typeof review.diff === 'string' && review.diff.startsWith('diff --git ')) {",
+      "after": "  if (requiresRulesJsBuild(entry)) {\n    bytes = rulesJsBuildOriginalPatch(readRegularRepoBytes,entry.sha);\n  } else if (typeof review.diff === 'string' && review.diff.startsWith('diff --git ')) {",
+      "decision": "Select authenticated original patch bytes only for the finite rules_js build scope. Every selected native row must exclude that scope,so its original diff/patch hashing route remains unchanged."
+    },
+    {
+      "before": "  readMember: rel => {const file = regularRepoMember(rel); return file ? readFileSync(file) : null;}});",
+      "after": "  readMember: readRegularRepoBytes});",
+      "decision": "The separate mandatory authored-use admission receives the regular-file reader,repairing absent-candidate resolution. Keep currentAuthoredUseAdmission and all final readiness conjunctions unchanged;no authored-use or native obligation is waived."
+    },
+    {
+      "before": "  const sensitive = sensitiveClass(entry) ||",
+      "after": "  const sensitive = requiresRegisteredSourceReview(entry, entry.individual_proof) || sensitiveClass(entry) ||",
+      "decision": "Add a mandatory sensitivity OR term for registered source contracts. Retain every original term and needsIndividual gate;verify actual selected-row predicate results and positive controls for all registry identities/kinds/markers."
+    }
+  ],
+  "complete_diff": "--- historical-checker\n+++ current-checker\n@@ -33,8 +33,13 @@\n import {SLIDER_RANGE_SHAS,SLIDER_RANGE_ROLE,sliderRangeEvidenceOk} from './upstream-slider-range-followups.mjs';\n import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';\n import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';\n+import {requiresRegisteredSourceReview} from './upstream-registered-source-review.mjs';\n import {requiresArtifactBehavior,validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';\n import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';\n+import {requiresLegacySassEntrypointScope,legacySassEntrypointEntryEvidenceOk} from './upstream-legacy-sass-entrypoint-admission.mjs';\n+import {requiresRulesJsBuild,rulesJsBuildEntryEvidenceOk,rulesJsBuildOriginalPatch} from './upstream-rules-js-build-admission.mjs';\n+import {requiresSassInspectionScope,sassInspectionEntryEvidenceOk} from './upstream-sass-inspection-admission.mjs';\n+import {requiresTestingApi21xEntry,testingApi21xEntryEvidenceOk} from './upstream-testing-api-21x-admission.mjs';\n import {requiresHistoricalBehavior,validateHistoricalBehavior,historicalBehaviorRequirements} from './upstream-historical-behavior-evidence.mjs';\n import {CHIP_LIFECYCLE_SCOPE_ROLE,requiresChipLifecycleScope,chipLifecycleScopeEvidenceOk} from './upstream-chip-lifecycle-admission.mjs';\n import {requiresProgressCsp,validateProgressCsp} from './upstream-progress-csp-evidence.mjs';\n@@ -166,6 +171,14 @@\n function evidenceClass(entry) {\n   const rel = entry.evidence_report;\n   if (typeof rel !== 'string' || !rel.trim()) return 'missing';\n+  const legacySassEntrypointScope = requiresLegacySassEntrypointScope(entry);\n+  if (legacySassEntrypointScope && !rel.endsWith('.json')) return 'invalid-legacy-sass-entrypoint-scope';\n+  const rulesJsBuildScope = requiresRulesJsBuild(entry);\n+  if (rulesJsBuildScope && !rel.endsWith('.json')) return 'invalid-rules-js-build-scope';\n+  const sassInspectionScope = requiresSassInspectionScope(entry);\n+  if (sassInspectionScope && !rel.endsWith('.json')) return 'invalid-sass-inspection-scope';\n+  const testingApi21xScope = requiresTestingApi21xEntry(entry,line,readRegularRepoBytes);\n+  if (testingApi21xScope && !rel.endsWith('.json')) return 'invalid-testing-api-21x-scope';\n   if (requiresModernChipScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-modern-chip-source-scope';\n   if (requiresChipEditScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-edit-source-scope';\n   if (requiresChipInputApiScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-input-api-source-scope';\n@@ -187,6 +200,14 @@\n   if (rel.endsWith('.json')) {\n     const body = evidenceJson(file);\n     if (!body || typeof body !== 'object' || Array.isArray(body)) return 'unreadable';\n+    if (legacySassEntrypointScope && !legacySassEntrypointEntryEvidenceOk({root,read:readRegularRepoBytes,entry,body,\n+      line:line||body.line})) return 'invalid-legacy-sass-entrypoint-scope';\n+    if (rulesJsBuildScope && !rulesJsBuildEntryEvidenceOk({root,read:readRegularRepoBytes,entry,body,\n+      line:line||body.line})) return 'invalid-rules-js-build-scope';\n+    if (sassInspectionScope && !sassInspectionEntryEvidenceOk({root,read:readRegularRepoBytes,entry,body,\n+      line:line||body.line})) return 'invalid-sass-inspection-scope';\n+    if (testingApi21xScope && !testingApi21xEntryEvidenceOk({entry,body,read:readRegularRepoBytes,\n+      productPaths:()=>candidateProductSourcePaths(root),line:line||body.line})) return 'invalid-testing-api-21x-scope';\n     if (requiresChipLifecycleScope(entry,entry.individual_proof) || body.role === CHIP_LIFECYCLE_SCOPE_ROLE) {\n       const readMember = rel => {const member=regularRepoMember(rel);return member?readFileSync(member):null;};\n       if (!chipLifecycleScopeEvidenceOk(body,entry,readMember,root,line || body.line,historicalBehaviorRequirements)) return 'invalid-chip-lifecycle-source-scope';\n@@ -266,6 +287,21 @@\n     }\n     return lstatSync(file).isFile() ? file : null;\n   } catch { return null; }\n+}\n+\n+// Dependency graph resolvers distinguish an absent candidate (ENOENT) from an\n+// unreadable or unsafe source. Preserve that filesystem contract for raw reads.\n+function readRegularRepoBytes(rel) {\n+  if (typeof rel !== 'string' || rel.includes('\\\\')) throw new Error('unsafe source member');\n+  const parts = rel.split('/');\n+  if (parts.some(part => !part || part === '.' || part === '..')) throw new Error('unsafe source member');\n+  let file = root, stat;\n+  for (const part of parts) {\n+    file = join(file, part); stat = lstatSync(file);\n+    if (stat.isSymbolicLink()) throw new Error('symlink in source member');\n+  }\n+  if (!stat.isFile()) throw new Error('source member is not a regular file');\n+  return readFileSync(file);\n }\n \n function individualPatchBound(entry, proof) {\n@@ -279,7 +315,9 @@\n     requiresIndividual:Boolean(sensitiveClass(entry))||requiresChipLifecycleScope(entry,proof)||requiresChipModernizationScope(entry,proof)||requiresChipInputApiScope(entry,proof)||requiresChipEditScope(entry,proof)||requiresHistoricalBehavior(entry,proof)||requiresArtifactBehavior(entry,proof)||requiresOwnedStyle(entry,proof)||INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition),\n     claimsBehavior:INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition)}))return false;\n   let bytes;\n-  if (typeof review.diff === 'string' && review.diff.startsWith('diff --git ')) {\n+  if (requiresRulesJsBuild(entry)) {\n+    bytes = rulesJsBuildOriginalPatch(readRegularRepoBytes,entry.sha);\n+  } else if (typeof review.diff === 'string' && review.diff.startsWith('diff --git ')) {\n     bytes = Buffer.from(review.diff, 'utf8');\n   } else {\n     const file = regularRepoMember(review.patch_file);\n@@ -420,7 +458,7 @@\n     missingEvidence.push(entry.sha);\n     evidenceFailures.push({sha: entry.sha, reason: evidence, evidence_report: entry.evidence_report ?? null});\n   }\n-  const sensitive = sensitiveClass(entry) || requiresHistoricalBehavior(entry, entry.individual_proof) || requiresArtifactBehavior(entry, entry.individual_proof) || requiresOwnedStyle(entry, entry.individual_proof) || requiresNativeDate(entry, entry.individual_proof) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)\n+  const sensitive = requiresRegisteredSourceReview(entry, entry.individual_proof) || sensitiveClass(entry) || requiresHistoricalBehavior(entry, entry.individual_proof) || requiresArtifactBehavior(entry, entry.individual_proof) || requiresOwnedStyle(entry, entry.individual_proof) || requiresNativeDate(entry, entry.individual_proof) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)\n     || requiresFormFieldHover(entry, entry.individual_proof) || requiresTabCompletion(entry, entry.individual_proof) || requiresRippleReplay(entry, entry.individual_proof) || requiresContentObserver(entry, entry.individual_proof) || requiresMediaMatcher(entry, entry.individual_proof) || requiresChipEditScope(entry, entry.individual_proof) || requiresChipInputApiScope(entry, entry.individual_proof) || requiresChipModernizationScope(entry, entry.individual_proof) || requiresChipLifecycleScope(entry, entry.individual_proof);\n   const needsIndividual = Boolean(sensitive) || INHERITED.has(disposition) || BEHAVIOR.has(disposition);\n   if (needsIndividual && !individualProofOk(entry)) {\n@@ -465,7 +503,7 @@\n try { currentSymbols = JSON.parse(readFileSync(currentSymbolsPath, 'utf8')); } catch { /* Missing/unreadable is incomplete. */ }\n const currentSymbolAdmission = currentAuthoredUseAdmission({current: currentAuthoredSource,\n   frozen: authoredReference.symbol_uses, candidate: currentSymbols, line: reviewLine,\n-  readMember: rel => {const file = regularRepoMember(rel); return file ? readFileSync(file) : null;}});\n+  readMember: readRegularRepoBytes});\n \n const structuralOk = missing.length === 0 && unresolved.length === 0 && conflicts.length === 0\n   && outside.length === 0 && securityDocsOnly.length === 0 && unknown.length === 0\n",
+  "complete_diff_sha256": "6ec786dd11ac0130bcbd18be854e3a3462814a4319546fb4dca70edb015cbfb0",
+  "hunk_reviews": [
+    {
+      "index": 1,
+      "header": "@@ -33,8 +33,13 @@",
+      "text": "@@ -33,8 +33,13 @@\n import {SLIDER_RANGE_SHAS,SLIDER_RANGE_ROLE,sliderRangeEvidenceOk} from './upstream-slider-range-followups.mjs';\n import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';\n import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';\n+import {requiresRegisteredSourceReview} from './upstream-registered-source-review.mjs';\n import {requiresArtifactBehavior,validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';\n import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';\n+import {requiresLegacySassEntrypointScope,legacySassEntrypointEntryEvidenceOk} from './upstream-legacy-sass-entrypoint-admission.mjs';\n+import {requiresRulesJsBuild,rulesJsBuildEntryEvidenceOk,rulesJsBuildOriginalPatch} from './upstream-rules-js-build-admission.mjs';\n+import {requiresSassInspectionScope,sassInspectionEntryEvidenceOk} from './upstream-sass-inspection-admission.mjs';\n+import {requiresTestingApi21xEntry,testingApi21xEntryEvidenceOk} from './upstream-testing-api-21x-admission.mjs';\n import {requiresHistoricalBehavior,validateHistoricalBehavior,historicalBehaviorRequirements} from './upstream-historical-behavior-evidence.mjs';\n import {CHIP_LIFECYCLE_SCOPE_ROLE,requiresChipLifecycleScope,chipLifecycleScopeEvidenceOk} from './upstream-chip-lifecycle-admission.mjs';\n import {requiresProgressCsp,validateProgressCsp} from './upstream-progress-csp-evidence.mjs';\n",
+      "sha256": "945ff28bc806b7d6e068cacb9a918bff7707473a55014262eb9a23d82dd80521",
+      "decision": "Imports add finite guards and preserve every original source/native validator. Importing a new predicate is not evidence that any selected row is exempt;execute all applicable predicates on each selected current entry and proof.",
+      "native_or_security_acceptance_qualified": false
+    },
+    {
+      "index": 2,
+      "header": "@@ -166,6 +171,14 @@",
+      "text": "@@ -166,6 +171,14 @@\n function evidenceClass(entry) {\n   const rel = entry.evidence_report;\n   if (typeof rel !== 'string' || !rel.trim()) return 'missing';\n+  const legacySassEntrypointScope = requiresLegacySassEntrypointScope(entry);\n+  if (legacySassEntrypointScope && !rel.endsWith('.json')) return 'invalid-legacy-sass-entrypoint-scope';\n+  const rulesJsBuildScope = requiresRulesJsBuild(entry);\n+  if (rulesJsBuildScope && !rel.endsWith('.json')) return 'invalid-rules-js-build-scope';\n+  const sassInspectionScope = requiresSassInspectionScope(entry);\n+  if (sassInspectionScope && !rel.endsWith('.json')) return 'invalid-sass-inspection-scope';\n+  const testingApi21xScope = requiresTestingApi21xEntry(entry,line,readRegularRepoBytes);\n+  if (testingApi21xScope && !rel.endsWith('.json')) return 'invalid-testing-api-21x-scope';\n   if (requiresModernChipScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-modern-chip-source-scope';\n   if (requiresChipEditScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-edit-source-scope';\n   if (requiresChipInputApiScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-input-api-source-scope';\n",
+      "sha256": "8464665d461680e31f5a25496fe83eb7298653a30bafa96c6b053de8e648aebf",
+      "decision": "Finite format guards only add rejection conditions after the existing missing-evidence check. They do not authorize alternate evidence for the selected native rows;each new predicate must remain false for those rows.",
+      "native_or_security_acceptance_qualified": false
+    },
+    {
+      "index": 3,
+      "header": "@@ -187,6 +200,14 @@",
+      "text": "@@ -187,6 +200,14 @@\n   if (rel.endsWith('.json')) {\n     const body = evidenceJson(file);\n     if (!body || typeof body !== 'object' || Array.isArray(body)) return 'unreadable';\n+    if (legacySassEntrypointScope && !legacySassEntrypointEntryEvidenceOk({root,read:readRegularRepoBytes,entry,body,\n+      line:line||body.line})) return 'invalid-legacy-sass-entrypoint-scope';\n+    if (rulesJsBuildScope && !rulesJsBuildEntryEvidenceOk({root,read:readRegularRepoBytes,entry,body,\n+      line:line||body.line})) return 'invalid-rules-js-build-scope';\n+    if (sassInspectionScope && !sassInspectionEntryEvidenceOk({root,read:readRegularRepoBytes,entry,body,\n+      line:line||body.line})) return 'invalid-sass-inspection-scope';\n+    if (testingApi21xScope && !testingApi21xEntryEvidenceOk({entry,body,read:readRegularRepoBytes,\n+      productPaths:()=>candidateProductSourcePaths(root),line:line||body.line})) return 'invalid-testing-api-21x-scope';\n     if (requiresChipLifecycleScope(entry,entry.individual_proof) || body.role === CHIP_LIFECYCLE_SCOPE_ROLE) {\n       const readMember = rel => {const member=regularRepoMember(rel);return member?readFileSync(member):null;};\n       if (!chipLifecycleScopeEvidenceOk(body,entry,readMember,root,line || body.line,historicalBehaviorRequirements)) return 'invalid-chip-lifecycle-source-scope';\n",
+      "sha256": "bc553b34e36ab191e2a85631f04b00f64907c36740ae3d70ae79f0e62821ca38",
+      "decision": "Additional JSON validators run only behind the finite scope predicates,after the old parse/shape guards. All pre-existing historical,native,artifact,chip and inherited validators remain unchanged and ordered.",
+      "native_or_security_acceptance_qualified": false
+    },
+    {
+      "index": 4,
+      "header": "@@ -266,6 +287,21 @@",
+      "text": "@@ -266,6 +287,21 @@\n     }\n     return lstatSync(file).isFile() ? file : null;\n   } catch { return null; }\n+}\n+\n+// Dependency graph resolvers distinguish an absent candidate (ENOENT) from an\n+// unreadable or unsafe source. Preserve that filesystem contract for raw reads.\n+function readRegularRepoBytes(rel) {\n+  if (typeof rel !== 'string' || rel.includes('\\\\')) throw new Error('unsafe source member');\n+  const parts = rel.split('/');\n+  if (parts.some(part => !part || part === '.' || part === '..')) throw new Error('unsafe source member');\n+  let file = root, stat;\n+  for (const part of parts) {\n+    file = join(file, part); stat = lstatSync(file);\n+    if (stat.isSymbolicLink()) throw new Error('symlink in source member');\n+  }\n+  if (!stat.isFile()) throw new Error('source member is not a regular file');\n+  return readFileSync(file);\n }\n \n function individualPatchBound(entry, proof) {\n",
+      "sha256": "7ca807ec31c1d9b5875760ac85caacde92139cbf358ce7f7b4df0b189c59e56e",
+      "decision": "The raw reader is a separate contract repair for resolution. Test real current code on regular files,missing candidates,unsafe paths,directories and linked routes. Do not execute or substitute the obsolete implementation.",
+      "native_or_security_acceptance_qualified": false
+    },
+    {
+      "index": 5,
+      "header": "@@ -279,7 +315,9 @@",
+      "text": "@@ -279,7 +315,9 @@\n     requiresIndividual:Boolean(sensitiveClass(entry))||requiresChipLifecycleScope(entry,proof)||requiresChipModernizationScope(entry,proof)||requiresChipInputApiScope(entry,proof)||requiresChipEditScope(entry,proof)||requiresHistoricalBehavior(entry,proof)||requiresArtifactBehavior(entry,proof)||requiresOwnedStyle(entry,proof)||INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition),\n     claimsBehavior:INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition)}))return false;\n   let bytes;\n-  if (typeof review.diff === 'string' && review.diff.startsWith('diff --git ')) {\n+  if (requiresRulesJsBuild(entry)) {\n+    bytes = rulesJsBuildOriginalPatch(readRegularRepoBytes,entry.sha);\n+  } else if (typeof review.diff === 'string' && review.diff.startsWith('diff --git ')) {\n     bytes = Buffer.from(review.diff, 'utf8');\n   } else {\n     const file = regularRepoMember(review.patch_file);\n",
+      "sha256": "d9b2a404e51f5dc5c92ecf04e92b2ddab40d2ac2009178432d5296d62ff59a99",
+      "decision": "The new patch-byte route is guarded by requiresRulesJsBuild. Individually demonstrate it is false on every selected row,keeping those rows on the original review.diff or patch-file hash path.",
+      "native_or_security_acceptance_qualified": false
+    },
+    {
+      "index": 6,
+      "header": "@@ -420,7 +458,7 @@",
+      "text": "@@ -420,7 +458,7 @@\n     missingEvidence.push(entry.sha);\n     evidenceFailures.push({sha: entry.sha, reason: evidence, evidence_report: entry.evidence_report ?? null});\n   }\n-  const sensitive = sensitiveClass(entry) || requiresHistoricalBehavior(entry, entry.individual_proof) || requiresArtifactBehavior(entry, entry.individual_proof) || requiresOwnedStyle(entry, entry.individual_proof) || requiresNativeDate(entry, entry.individual_proof) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)\n+  const sensitive = requiresRegisteredSourceReview(entry, entry.individual_proof) || sensitiveClass(entry) || requiresHistoricalBehavior(entry, entry.individual_proof) || requiresArtifactBehavior(entry, entry.individual_proof) || requiresOwnedStyle(entry, entry.individual_proof) || requiresNativeDate(entry, entry.individual_proof) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)\n     || requiresFormFieldHover(entry, entry.individual_proof) || requiresTabCompletion(entry, entry.individual_proof) || requiresRippleReplay(entry, entry.individual_proof) || requiresContentObserver(entry, entry.individual_proof) || requiresMediaMatcher(entry, entry.individual_proof) || requiresChipEditScope(entry, entry.individual_proof) || requiresChipInputApiScope(entry, entry.individual_proof) || requiresChipModernizationScope(entry, entry.individual_proof) || requiresChipLifecycleScope(entry, entry.individual_proof);\n   const needsIndividual = Boolean(sensitive) || INHERITED.has(disposition) || BEHAVIOR.has(disposition);\n   if (needsIndividual && !individualProofOk(entry)) {\n",
+      "sha256": "dd50e0a9f993446794d55b42566800643c8f8f9a86338a70ddcb6c55a3b7aacd",
+      "decision": "Registered source review adds one sensitivity disjunct without removing any old predicate. A registered SHA,proof kind or scope marker requires individual review even under a permissive final label. Verify selected exclusions and all positive routing records;this is no security clearance.",
+      "native_or_security_acceptance_qualified": false
+    },
+    {
+      "index": 7,
+      "header": "@@ -465,7 +503,7 @@",
+      "text": "@@ -465,7 +503,7 @@\n try { currentSymbols = JSON.parse(readFileSync(currentSymbolsPath, 'utf8')); } catch { /* Missing/unreadable is incomplete. */ }\n const currentSymbolAdmission = currentAuthoredUseAdmission({current: currentAuthoredSource,\n   frozen: authoredReference.symbol_uses, candidate: currentSymbols, line: reviewLine,\n-  readMember: rel => {const file = regularRepoMember(rel); return file ? readFileSync(file) : null;}});\n+  readMember: readRegularRepoBytes});\n \n const structuralOk = missing.length === 0 && unresolved.length === 0 && conflicts.length === 0\n   && outside.length === 0 && securityDocsOnly.length === 0 && unknown.length === 0\n",
+      "sha256": "c3162d95cf4d61b97d6d992e8045c2014a7cfe26ebb00a8ba3e540a7eedc7abc",
+      "decision": "Authored-use admission changes only its raw read callback. Its actual function import,parameters outside readMember,structural conjunction and source-review readiness predicates remain byte-exact. Full authored-use admission remains mandatory and unqualified.",
+      "native_or_security_acceptance_qualified": false
+    }
+  ],
+  "source_members": [
+    {
+      "path": "scripts/upstream-rules-js-build-admission.mjs",
+      "sha256": "9495b070b43b13770d6a8e66cb85df68a56d2110660bdd2f15b52522476d179d",
+      "bytes": 9815
+    },
+    {
+      "path": "scripts/upstream-sass-inspection-admission.mjs",
+      "sha256": "29291c30c7469cd3e0517574fddbcbf6a1cbf49f0a750d974f4736fd1ea22345",
+      "bytes": 8760
+    },
+    {
+      "path": "scripts/upstream-legacy-sass-entrypoint-admission.mjs",
+      "sha256": "1e3e277e3d40976dc970c6adfc0c03be43300239d7e37b14efed3415cd2e8ede",
+      "bytes": 9712
+    },
+    {
+      "path": "scripts/upstream-testing-api-21x-admission.mjs",
+      "sha256": "c6dacbfc140f1fef7489dd330bc30f099fafa24cf4e851c09bcd070bbf88596c",
+      "bytes": 11785
+    },
+    {
+      "path": "scripts/upstream-registered-source-review.mjs",
+      "sha256": "524b9dc06153cac660f42c64039f13c7d388306ea6dfbab3bbcef168c92bfe61",
+      "bytes": 603
+    },
+    {
+      "path": "scripts/upstream-source-contract-registry.mjs",
+      "sha256": "03a18cd09e4183f4307f1ec2c17d0797eea72db0440e23530e4d015ea0dae6a8",
+      "bytes": 15102
+    },
+    {
+      "path": "scripts/authored-current-use-inventory.mjs",
+      "sha256": "41d662ab92853a6ca25a2d487d0301f7aa986edfb80c919a7beafc08a252f7a9",
+      "bytes": 9780
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d",
+      "bytes": 1397
+    },
+    {
+      "path": "package.json",
+      "sha256": "a3a268beffc3620d3fdeeadc1269c9e9676adbf3e40f55d45cd9683c85e4a060",
+      "bytes": 1647
+    },
+    {
+      "path": "toolchain-lock.json",
+      "sha256": "5e20f11d3a06b03fb5194af421e4ba11aafa2609fa4d0a34793b39097b65278b",
+      "bytes": 2142
+    },
+    {
+      "path": ".node-version",
+      "sha256": "73fb1b615e2043a933be1c0895cde4358036acc28d785692509b822aa53c761f",
+      "bytes": 8
+    },
+    {
+      "path": ".npm-version",
+      "sha256": "005206ab803f8881d8227540b7980b37e723b69a8849edb31734a90b7e7964e2",
+      "bytes": 8
+    },
+    {
+      "path": "node_modules/typescript/lib/typescript.js",
+      "sha256": "e5f1f6b3e82228a89873cc7b941b2465185e839c0692860f83e3e63e53f94c2b",
+      "bytes": 9111680
+    },
+    {
+      "path": "node_modules/typescript/package.json",
+      "sha256": "5a0bb7f286c4b3f1413a42c05f902311b161f70e5f52d9da10490443bfd595a3",
+      "bytes": 3620
+    },
+    {
+      "path": "tests/test_checker_reference_source.py",
+      "sha256": "d33438aea0c5cfdfde75229c8ca699f7f1f3f48aa31e99e61a10fbd714959a03",
+      "bytes": 4460
+    }
+  ],
+  "canonical_decisions_changed": 0,
+  "canonical_ledger_changed": false,
+  "root_checker_changed": false,
+  "old_checker_executed": false,
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed",
+  "worksheet_at_source_parent": {
+    "path": "compatibility/rc/c04-checker-reference-source-worksheet.json",
+    "sha256": "bcf4907812512ddd1d5271c36c6d83083dc8008975671442ac57ceb2bccbdfe1",
+    "bytes": 5513
+  }
+}
