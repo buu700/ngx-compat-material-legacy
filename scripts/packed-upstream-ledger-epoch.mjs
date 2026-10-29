@@ -7,6 +7,7 @@
 /** Current canonical owner: preserved prior stages plus one explicit title stage. */
 import assert from 'node:assert/strict';
 import {inventoryReferenceOwnerContext} from './inventory-reference-owner.mjs';
+import {historicalContractRepairReaderSubject} from './historical-contract-repair-readers.mjs';
 import {legacyRemovalOwnerContext} from './legacy-removal-canonical-stage.mjs';
 import {tableLocalCompilationOwnerContext} from './table-local-compilation-canonical-stage.mjs';
 import {legacyRemovalOwnerSourceSubject} from './legacy-removal-owner-source.mjs';
@@ -370,8 +371,10 @@ function context(root,read){
  const remainingUnthemableStage=applyRemainingUnthemableCanonicalStage({before:coreTokenizationStage.after,body:tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.body});
  assert.deepEqual(tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after,{path:LEDGER,sha256:hash(remainingUnthemableStage.after),bytes:remainingUnthemableStage.after.length});
  const own={path:OWNER,sha256:hash(image),bytes:image.length};
- const bound=[...new Map([own,{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound].map(ref=>[ref.path,ref])).values()];
+ const repairs=historicalContractRepairReaderSubject({root,read});
+ const bound=[...new Map([own,{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound,...repairs.bound].map(ref=>repairs.qualify(ref)??ref).map(ref=>[ref.path,ref])).values()];
  const assertTools=()=>{
+  repairs.assertCurrent();
   for(const member of bound){const value=read(member.path);assert.equal(hash(value),member.sha256,'changed title owner binding '+member.path);if(member.bytes!==undefined)assert.equal(value.length,member.bytes);}
  };
  const assertLedger=()=>assert.equal(hash(read(LEDGER)),currentHash,'late title canonical ledger change');
@@ -468,8 +471,9 @@ function qualifyBeforeInventoryReferenceToolReference({root=process.cwd(),read=d
  if(prior.bytes!==undefined)assert.equal(before.length,prior.bytes);
  const raw=read(PACKET);assert.equal(hash(raw),PACKET_HASH);const packet=JSON.parse(raw);
  const frameRaw=read(FRAMES);assert.equal(hash(frameRaw),FRAMES_HASH,'changed accepted ledger-frame catalog');
- const bound=[...new Map([{path:OWNER,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound].map(ref=>[ref.path,ref])).values()].map(member=>({...member,bytes:member.bytes??read(member.path).length}));
- const assertCurrent=()=>{for(const member of bound){const value=read(member.path);assert.equal(hash(value),member.sha256,'changed current canonical tool '+member.path);if(member.bytes!==undefined)assert.equal(value.length,member.bytes);}};
+ const repairs=historicalContractRepairReaderSubject({root,read});
+ const bound=[...new Map([{path:OWNER,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound,...repairs.bound].map(ref=>repairs.qualify(ref)??ref).map(ref=>[ref.path,ref])).values()].map(member=>({...member,bytes:member.bytes??read(member.path).length}));
+ const assertCurrent=()=>{repairs.assertCurrent();for(const member of bound){const value=read(member.path);assert.equal(hash(value),member.sha256,'changed current canonical tool '+member.path);if(member.bytes!==undefined)assert.equal(value.length,member.bytes);}};
  assertCurrent();const value=read(prior.path),reference={path:prior.path,sha256:hash(value),bytes:value.length};
  return {reference,bound:structuredClone(bound),assertCurrent,individual_source_decisions:1,metadata_tokens:14,old_tool_bytes_exposed:false,current_native_or_packed_qualified:false};
 }

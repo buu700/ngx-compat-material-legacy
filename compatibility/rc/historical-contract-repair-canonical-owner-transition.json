@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "c44772b4e5419262170ab35dec2951949291ee96",
+  "canonical_owner_transition": {
+    "path": "scripts/packed-upstream-ledger-epoch.mjs",
+    "before": {
+      "sha256": "ba9f1b2aa7ad67cbdd157857099bea42cc64f6503531d742118be4b01b37e106",
+      "bytes": 74543
+    },
+    "after": {
+      "sha256": "34a8c062367debddf81a5112be37e4aa603e4a3c6b9c8e5c7c34144995d62669",
+      "bytes": 74930
+    },
+    "literal_edits": [
+      {
+        "before": "import {inventoryReferenceOwnerContext} from './inventory-reference-owner.mjs';",
+        "after": "import {inventoryReferenceOwnerContext} from './inventory-reference-owner.mjs';\nimport {historicalContractRepairReaderSubject} from './historical-contract-repair-readers.mjs';"
+      },
+      {
+        "before": " const bound=[...new Map([own,{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound].map(ref=>[ref.path,ref])).values()];",
+        "after": " const repairs=historicalContractRepairReaderSubject({root,read});\n const bound=[...new Map([own,{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound,...repairs.bound].map(ref=>repairs.qualify(ref)??ref).map(ref=>[ref.path,ref])).values()];"
+      },
+      {
+        "before": " const assertTools=()=>{\n  for(const member of bound)",
+        "after": " const assertTools=()=>{\n  repairs.assertCurrent();\n  for(const member of bound)"
+      },
+      {
+        "before": " const bound=[...new Map([{path:OWNER,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound].map(ref=>[ref.path,ref])).values()].map(member=>({...member,bytes:member.bytes??read(member.path).length}));",
+        "after": " const repairs=historicalContractRepairReaderSubject({root,read});\n const bound=[...new Map([{path:OWNER,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound,...repairs.bound].map(ref=>repairs.qualify(ref)??ref).map(ref=>[ref.path,ref])).values()].map(member=>({...member,bytes:member.bytes??read(member.path).length}));"
+      },
+      {
+        "before": "const assertCurrent=()=>{for(const member of bound){const value=read(member.path);assert.equal(hash(value),member.sha256,'changed current canonical tool '",
+        "after": "const assertCurrent=()=>{repairs.assertCurrent();for(const member of bound){const value=read(member.path);assert.equal(hash(value),member.sha256,'changed current canonical tool '"
+      }
+    ]
+  },
+  "prior_reader_registry": {
+    "source_parent": "e33d5dcf58256d74d83f3275adeeff917bc744be",
+    "path": "compatibility/rc/historical-contract-repair-reader-inputs.json",
+    "sha256": "076e4161b01dd12d4c8e3f36b49e84ce9004c7323c9b36cd3ec7a3ec47271254",
+    "bytes": 18880
+  },
+  "current_reader_registry": {
+    "path": "compatibility/rc/historical-contract-repair-reader-inputs.json",
+    "sha256": "2c870a2ca91785b40850d4ed939a9867319a78bafcb742ade664c5758942d7bc",
+    "bytes": 23017
+  },
+  "canonical_dispositions_changed": 0,
+  "g11_claim": "not-passed"
+}

@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
-from historical_contract_repair_source import tool_comparison_bytes
+from historical_contract_repair_source import tool_comparison_bytes, qualify_tool_reference
 
 ROOT = Path(__file__).resolve().parents[1]
 PREFIX = 'compatibility/rc/21x-table-local-compilation-admission-'
@@ -54,13 +54,14 @@ def table_owner_source_data(root=ROOT):
 def qualify_table_owner_reference(ref, root=ROOT):
     _, transitions = table_owner_source_data(root)
     if ref['path'] not in transitions:
-        return dict(ref)
+        return qualify_tool_reference(ref, root)
     row = transitions[ref['path']]
     prior = next((value for value in [row['before'], row['after']] if value['sha256'] == ref['sha256']), None)
-    assert prior is not None
+    if prior is None:
+        return qualify_tool_reference(ref, root)
     if 'bytes' in ref:
         assert ref['bytes'] == prior['bytes']
-    return {**ref, **row['after']}
+    return qualify_tool_reference({**ref, **row['after']}, root)
 
 
 def table_predecessor_data(path, raw, root=ROOT):
