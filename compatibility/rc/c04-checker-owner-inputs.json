@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_parent": "c2926563b1c64ca6ad93d27fa964d3a4d00684b7",
+  "role": "Exact checker metadata stage and source/cohort separation;all prior owner and source checks preserved",
+  "before_ledger": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "e8c57b7630bfec15b3730214c03c41cf37e6654ce236743dff3d644ff43e813e",
+    "bytes": 4457029
+  },
+  "after_ledger": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "0f3ffb5a86e4838a3fd29d7e47e10a30bc7feb39f23d79dde9706473f6337443",
+    "bytes": 4457029
+  },
+  "unchanged_owner": {
+    "path": "scripts/packed-upstream-ledger-epoch.mjs",
+    "sha256": "a86be06d36ef009f29e8ca7c87c272a413f4a8d942de4b9cf736daac88532e2b",
+    "bytes": 78890
+  },
+  "code_transitions": [
+    {
+      "before": {
+        "path": "tests/checker_reference_source_probe.mjs",
+        "sha256": "17fcdad5994f720ccff749a379239d99787e035ae7f0295b064e279e1a2f24d6",
+        "bytes": 13867
+      },
+      "after": {
+        "path": "tests/checker_reference_source_probe.mjs",
+        "sha256": "0c1158d9c1dcbe5a33f6d8f7660e8ad0435b031020a9610f76655f4648f211a8",
+        "bytes": 15116
+      },
+      "literal_edits": [
+        {
+          "before": "import assert from 'node:assert/strict';",
+          "after": "import assert from 'node:assert/strict';\nimport {checkerOwnerSourceSubject} from '../scripts/checker-owner-source.mjs';"
+        },
+        {
+          "before": "export async function inspectCheckerSource({read=disk}={}){",
+          "after": "export async function inspectCheckerSourceMetadata({read=disk}={}){"
+        },
+        {
+          "before": " const bound=new Map(),member=(path,digest,bytes)=>{",
+          "after": " const tools=checkerOwnerSourceSubject({root:ROOT,read});\n const bound=new Map(tools.bound.map(ref=>[ref.path,{...ref}])),member=(path,digest,bytes)=>{\n  const qualified=tools.qualifyReference({path,sha256:digest,...(bytes===undefined?{}:{bytes})});digest=qualified.sha256;bytes=qualified.bytes;"
+        },
+        {
+          "before": " const ledgerRaw=member(LEDGER,packet.protected_ledger.sha256,packet.protected_ledger.bytes),ledger=JSON.parse(ledgerRaw);",
+          "after": " const cohortRaw=original(packet.source_parent,LEDGER);assert.equal(hash(cohortRaw),packet.protected_ledger.sha256);assert.equal(cohortRaw.length,packet.protected_ledger.bytes);\n const cohort=JSON.parse(cohortRaw),ledgerRaw=member(LEDGER),ledger=JSON.parse(ledgerRaw);"
+        },
+        {
+          "before": " const assertCurrent=()=>{for(const ref of bound.values())",
+          "after": " const assertCurrent=()=>{tools.assertCurrent();for(const ref of bound.values())"
+        },
+        {
+          "before": " const derived=ledger.entries.flatMap(entry=>kinds.flatMap",
+          "after": " const derived=cohort.entries.flatMap(entry=>kinds.flatMap"
+        },
+        {
+          "before": "return {bound:structuredClone([...bound.values()]),assertCurrent,report:{schema_version:1,line,result:'pass',",
+          "after": "return {bound:structuredClone([...bound.values()]),assertCurrent,protected_canonical_before:{...packet.protected_ledger},report:{schema_version:1,line,result:'pass',canonical_frame_admission_granted:false,current_ledger_sha256:hash(ledgerRaw),current_ledger_bytes:ledgerRaw.length,"
+        },
+        {
+          "before": "if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){",
+          "after": "// Preserve the original strict before-image source API. It is never used as\n// the canonical owner's complete historical-frame admission gate.\nexport async function inspectCheckerSource({read=disk}={}){\n const source=await inspectCheckerSourceMetadata({read});\n const raw=read(LEDGER);assert.equal(hash(raw),source.protected_canonical_before.sha256,'unregistered strict source image');\n source.assertCurrent();return source;\n}\nif(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){\n const args=process.argv.slice(2),metadata=args[0]==='--metadata';if(metadata)args.shift();assert.ok(args.length<=1);\n const inspect=metadata?inspectCheckerSourceMetadata:inspectCheckerSource;"
+        },
+        {
+          "before": " const subject=await inspectCheckerSource({read});let cold=0,late=0;",
+          "after": " const subject=await inspect({read});let cold=0,late=0;"
+        },
+        {
+          "before": "await assert.rejects(inspectCheckerSource({read}),undefined",
+          "after": "await assert.rejects(inspect({read}),undefined"
+        },
+        {
+          "before": " if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\\n'",
+          "after": " if(args[0])writeFileSync(args[0],JSON.stringify(report,null,2)+'\\n'"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "tests/test_checker_reference_source.py",
+        "sha256": "d33438aea0c5cfdfde75229c8ca699f7f1f3f48aa31e99e61a10fbd714959a03",
+        "bytes": 4460
+      },
+      "after": {
+        "path": "tests/test_checker_reference_source.py",
+        "sha256": "96a98e5f871d6c2bc586938a08fbcd11205df6b10df9ce14395b38f73ed8c23c",
+        "bytes": 4657
+      },
+      "literal_edits": [
+        {
+          "before": "  self.assertEqual(digest((ROOT/'compatibility/f10/disposition-ledger/ledger.json').read_bytes()),packet['protected_ledger']['sha256'])",
+          "after": "  original_ledger=subprocess.check_output(['git','--no-replace-objects','show',packet['source_parent']+':compatibility/f10/disposition-ledger/ledger.json'],cwd=ROOT,env=environment)\n  self.assertEqual(digest(original_ledger),packet['protected_ledger']['sha256'])"
+        },
+        {
+          "before": "  command=['node','tests/checker_reference_source_probe.mjs']",
+          "after": "  command=['node','tests/checker_reference_source_probe.mjs','--metadata']"
+        },
+        {
+          "before": "self.assertEqual(r['result'],'pass')",
+          "after": "self.assertEqual(r['result'],'pass');self.assertFalse(r['canonical_frame_admission_granted'])"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "scripts/checker-reference-proposal.mjs",
+        "sha256": "3faaadb595945b55ea265c5028fe5f7bbb5614df3df150f7b3a253cec0b15f24",
+        "bytes": 12374
+      },
+      "after": {
+        "path": "scripts/checker-reference-proposal.mjs",
+        "sha256": "22c49ba434ee0b1253ad2815b77510adb8259cc3f307005f6b66b73e522502ac",
+        "bytes": 13095
+      },
+      "literal_edits": [
+        {
+          "before": "import assert from 'node:assert/strict';",
+          "after": "import assert from 'node:assert/strict';\nimport {checkerOwnerSourceSubject} from './checker-owner-source.mjs';"
+        },
+        {
+          "before": "const pin=pins[line],bound=new Map();",
+          "after": "const pin=pins[line],tools=checkerOwnerSourceSubject({root,read}),bound=new Map(tools.bound.map(ref=>[ref.path,{...ref}]));"
+        },
+        {
+          "before": " const member=(path,digest,bytes)=>{",
+          "after": " const member=(path,digest,bytes)=>{\n  const qualified=tools.qualifyReference({path,sha256:digest,...(bytes===undefined?{}:{bytes})});digest=qualified.sha256;bytes=qualified.bytes;"
+        },
+        {
+          "before": " const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER],",
+          "after": " const physicalLedger=currentFile(root,CHECKER_REFERENCE_LEDGER);\n const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER,'--metadata'],"
+        },
+        {
+          "before": " assert.equal(verifier.result,'pass');",
+          "after": " assert.equal(verifier.canonical_frame_admission_granted,false);assert.equal(verifier.current_ledger_sha256,hash(physicalLedger));assert.equal(verifier.current_ledger_bytes,physicalLedger.length);\n assert.equal(verifier.result,'pass');"
+        },
+        {
+          "before": " const assertCurrent=()=>{for(const ref of bound.values()){",
+          "after": " const assertCurrent=()=>{tools.assertCurrent();assert.equal(hash(currentFile(root,CHECKER_REFERENCE_LEDGER)),hash(physicalLedger),'late physical canonical source image');for(const ref of bound.values()){"
+        }
+      ]
+    },
+    {
+      "before": {
+        "path": "scripts/inventory-reference-owner.mjs",
+        "sha256": "bf1b73c769f554bb64834ddaa99dfe2cabe0baffb6c1e1e6a10880c361d4b33b",
+        "bytes": 17228
+      },
+      "after": {
+        "path": "scripts/inventory-reference-owner.mjs",
+        "sha256": "55d6ae5009b1617c213e6159214764256629f01ed8e498b1e7df8307849decb2",
+        "bytes": 17613
+      },
+      "literal_edits": [
+        {
+          "before": "import assert from 'node:assert/strict';",
+          "after": "import assert from 'node:assert/strict';\nimport {checkerReferenceOwnerContext} from './checker-reference-owner.mjs';\nimport {readCheckerOwnerMember} from './checker-owner-source.mjs';"
+        },
+        {
+          "before": "export function inventoryReferenceOwnerContext({root,read=path=>readEvidenceMember(root,path)}={}){",
+          "after": "export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwnerMember(root,path)}={}){"
+        },
+        {
+          "before": " const currentLedger=member(LEDGER),applied=currentLedger.equals(source.after);",
+          "after": " const checker=checkerReferenceOwnerContext({root,read});assert.ok(checker.before.equals(source.after));\n for(const ref of checker.bound)bound.set(ref.path,{...ref});\n const currentLedger=member(LEDGER),applied=currentLedger.equals(source.after)||checker.applied;"
+        },
+        {
+          "before": "  source.assertCurrent();assertPhysicalCI();",
+          "after": "  source.assertCurrent();checker.assertCurrent();assertPhysicalCI();"
+        },
+        {
+          "before": "  assertPrior();return {...prior,canonical_after:Buffer.from(source.after),bound:currentBound,",
+          "after": "  assertPrior();return checker.wrapPrepared({...prior,canonical_after:Buffer.from(source.after),bound:currentBound,"
+        },
+        {
+          "before": "   prior_metadata_assert_current:assertPrior,assertCurrent:assertPrior};",
+          "after": "   prior_metadata_assert_current:assertPrior,assertCurrent:assertPrior});"
+        },
+        {
+          "before": " return {line,metadataRead,wrapPrepared,assertCurrent,applied,metadata_entries:",
+          "after": " return {line,metadataRead,wrapPrepared,assertCurrent,applied,checker,metadata_entries:"
+        }
+      ]
+    }
+  ],
+  "source_members": [
+    {
+      "path": "scripts/checker-reference-owner.mjs",
+      "sha256": "ea36612e6a0fe731a88b0ee5d35d8324ab6e4e4a70e7a970db042267de34800e",
+      "bytes": 2712
+    },
+    {
+      "path": "scripts/packed-upstream-ledger-epoch.mjs",
+      "sha256": "a86be06d36ef009f29e8ca7c87c272a413f4a8d942de4b9cf736daac88532e2b",
+      "bytes": 78890
+    },
+    {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "sha256": "c47294c9947448ee832abfd98a44083ea0dcdae6ea9d20559c9282799c248488",
+      "bytes": 45777
+    },
+    {
+      "path": "compatibility/rc/c04-checker-reference-proposal.json",
+      "sha256": "fe1a877f6d427b0eb598391ee11502b49c65d0242c55956f25bd5284314d71db",
+      "bytes": 16215
+    },
+    {
+      "path": "compatibility/rc/c04-checker-reference-proposal-qualification.json",
+      "sha256": "ee4207708e26dc1e5d47f7bf9d63c47adcab2a22fcfc7f300648cec6d518813e",
+      "bytes": 5956
+    },
+    {
+      "path": "compatibility/rc/c04-checker-reference-source-inputs.json",
+      "sha256": "5ed5add16c5c6e547ec3005c6d3d4c627464ec6be2fb2512050354217fe962b5",
+      "bytes": 28239
+    },
+    {
+      "path": "compatibility/rc/c04-checker-reference-source-qualification.json",
+      "sha256": "a04fea13b0bd321d1739a789b7957833176fd25e8f5d94ea74510b41e5162907",
+      "bytes": 9300
+    }
+  ],
+  "canonical_dispositions_changed": 0,
+  "source_admissions_changed": 0,
+  "product_changes": 0,
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

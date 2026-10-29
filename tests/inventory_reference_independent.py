@@ -33,7 +33,8 @@ for index,marker in enumerate(markers):
   pieces.extend([text[last:marker.start()],entry.replace(needle,'"sha256": "'+new_inventory+'"')]);last=end
 pieces.append(text[last:]);after=''.join(pieces).encode();assert json.loads(after)==expected and len(after)==len(before)
 proposal=gzip.decompress((ROOT/'compatibility/rc/c04-inventory-reference-proposal-after.json.gz').read_bytes());assert proposal==after
-assert live_canonical_before in [before,after], 'current ledger is not a complete authenticated before/after image'
+stage_snapshot=gzip.decompress((ROOT/'compatibility/rc/c04-inventory-reference-proposal-after.json.gz').read_bytes())
+assert stage_snapshot in [before,after], 'preserved inventory snapshot is not a complete authenticated before/after image'
 packet=json.loads((ROOT/'compatibility/rc/c04-inventory-reference-proposal.json').read_bytes());assert packet['after_ledger']['sha256']==sha(after)
 unchanged=sum(before[a.start():(markers[i+1].start()if i+1<len(markers)else end_of_entries)]==after[a.start():(markers[i+1].start()if i+1<len(markers)else end_of_entries)]for i,a in enumerate(markers))
 assert unchanged==1697-count

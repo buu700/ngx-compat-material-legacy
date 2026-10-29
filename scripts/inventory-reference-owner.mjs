@@ -6,6 +6,8 @@
  */
 /** Exact terminal metadata integration. Historical tool images are compared as data, never executed. */
 import assert from 'node:assert/strict';
+import {checkerReferenceOwnerContext} from './checker-reference-owner.mjs';
+import {readCheckerOwnerMember} from './checker-owner-source.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
@@ -108,7 +110,7 @@ if report['result']!='pass':sys.stderr.write(log.getvalue());sys.exit(1)
  assert.equal(new Set(result.test_ids).size,14);assert.equal(result.skipped,0);assert.equal(result.full_Actions_execution_qualified,false);
  return result;
 }
-export function inventoryReferenceOwnerContext({root,read=path=>readEvidenceMember(root,path)}={}){
+export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwnerMember(root,path)}={}){
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version;
  const line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
  const bound=new Map();
@@ -169,11 +171,13 @@ export function inventoryReferenceOwnerContext({root,read=path=>readEvidenceMemb
  if(line==='main')requiredCI.push('scripts/rc_acceptance.py','scripts/historical_inventory_source.py');
  const ciRefs=requiredCI.map(path=>{const ref=bound.get(path)??packet.source_members.find(row=>row.path===path);assert.ok(ref,'missing current CI source '+path);return ref;});
  const assertPhysicalCI=()=>{for(const ref of ciRefs){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'actual current CI source changed '+ref.path);assert.equal(raw.length,ref.bytes);}};
- const currentLedger=member(LEDGER),applied=currentLedger.equals(source.after);
+ const checker=checkerReferenceOwnerContext({root,read});assert.ok(checker.before.equals(source.after));
+ for(const ref of checker.bound)bound.set(ref.path,{...ref});
+ const currentLedger=member(LEDGER),applied=currentLedger.equals(source.after)||checker.applied;
  // The original owner validates all old complete frames. Only this exact
  // independently derived after-image maps to its qualified predecessor.
  const assertCurrent=()=>{
-  source.assertCurrent();assertPhysicalCI();
+  source.assertCurrent();checker.assertCurrent();assertPhysicalCI();
   for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late inventory owner input '+ref.path);assert.equal(raw.length,ref.bytes);}
  };
  const metadataRead=path=>{
@@ -199,13 +203,13 @@ export function inventoryReferenceOwnerContext({root,read=path=>readEvidenceMemb
   const stage={before:Buffer.from(source.before),after:Buffer.from(source.after),metadata_entries:packet.metadata_entries,
    source_reference_updates:packet.metadata_entries,individual_decisions:0,assertCurrent,
    source_scope_only:true,current_native_or_packed_or_floor_qualified:false};
-  assertPrior();return {...prior,canonical_after:Buffer.from(source.after),bound:currentBound,
+  assertPrior();return checker.wrapPrepared({...prior,canonical_after:Buffer.from(source.after),bound:currentBound,
    inventory_reference_stage:stage,native_spec_source:{...native,bound:nativeBound,assertCurrent:()=>{assertCurrent();native.assertCurrent();assertCurrent();}},
-   prior_metadata_assert_current:assertPrior,assertCurrent:assertPrior};
+   prior_metadata_assert_current:assertPrior,assertCurrent:assertPrior});
  }
  assertCurrent();const currentWorkflowTests=verifyCurrentWorkflow(root);assertCurrent();
  historicalMetadataReaders.add(metadataRead);
- return {line,metadataRead,wrapPrepared,assertCurrent,applied,metadata_entries:packet.metadata_entries,current_workflow_tests:structuredClone(currentWorkflowTests),
+ return {line,metadataRead,wrapPrepared,assertCurrent,applied,checker,metadata_entries:packet.metadata_entries,current_workflow_tests:structuredClone(currentWorkflowTests),
   before:Buffer.from(source.before),after:Buffer.from(source.after),bound:structuredClone([...bound.values()]),
   canonical_dispositions_changed:0,current_native_packed_or_floor_or_g11_credit:false};
 }
