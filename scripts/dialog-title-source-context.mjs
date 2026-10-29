@@ -12,6 +12,8 @@ import {execFileSync} from 'node:child_process';
 import {dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {qualifyCanonicalToolReference} from './canonical-tool-source-role.mjs';
+import {historicalContractRepairReaderSubject} from './historical-contract-repair-readers.mjs';
+import {historicalContractRepairSourceSubject} from './historical-contract-repair-source.mjs';
 const SOURCE=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const ownPath='scripts/dialog-title-source-context.mjs';
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
@@ -68,12 +70,13 @@ const readerCode={"21.x":["scripts/upstream-rules-js-build-admission.mjs","scrip
 export function dialogTitleReaderSubject({root=process.cwd(),read=path=>readFileSync(join(root,path)),line}={}){
  const actual=JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main';line??=actual;assert.equal(line,actual);
  assert.ok(Object.hasOwn(readerPins,line),'title source-reader port not yet qualified for '+line);
+ const repairTools=historicalContractRepairReaderSubject({root,read}),repairSources=historicalContractRepairSourceSubject({root});
  const raw=read(readerPath);assert.equal(hash(raw),readerPins[line],'changed title reader transition');const data=JSON.parse(raw);
  assert.equal(data.schema_version,1);assert.equal(data.line,line);assert.match(data.source_parent,/^[0-9a-f]{40}$/);
  assert.deepEqual(data.code_subjects.map(row=>row.path),readerCode[line]);assert.equal(data.old_product_bytes_exposed,false);assert.equal(data.canonical_decisions_changed,0);assert.equal(data.native_or_full_qualification,false);
  const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
  for(const name of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete env[name];
- const bound=[{path:readerPath,sha256:hash(raw),bytes:raw.length}],images=[],beforeCode=new Map();
+ const bound=[...repairTools.bound,...repairSources.bound,{path:readerPath,sha256:hash(raw),bytes:raw.length}],images=[],beforeCode=new Map();
  for(const row of data.code_subjects){
   const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',data.source_parent+':'+row.path],{cwd:root,env,maxBuffer:1024*1024});
   assert.equal(hash(before),row.before.sha256);assert.equal(before.length,row.before.bytes);beforeCode.set(row.path,Buffer.from(before));
@@ -84,10 +87,10 @@ export function dialogTitleReaderSubject({root=process.cwd(),read=path=>readFile
    const successor=qualifyCanonicalToolReference({root,read,prior:{path:row.path,...row.after}});
    if(successor){current=successor.reference;for(const ref of successor.bound)bound.push(ref);}
    else assert.equal(read(row.path).toString(),expected,'changed current title source-reader '+row.path);
-  }else assert.equal(read(row.path).toString(),expected,'changed current title source-reader '+row.path);
+  }else{const successor=repairTools.qualify({path:row.path,...row.after});if(successor)current=successor;else assert.equal(read(row.path).toString(),expected,'changed current title source-reader '+row.path);}
   bound.push({path:row.path,...current});images.push({path:row.path,before:row.before.sha256,before_bytes:row.before.bytes,after:current.sha256,after_bytes:current.bytes,middle:row.after});
  }
- const assertCurrent=()=>{for(const member of bound){const current=read(member.path);assert.equal(hash(current),member.sha256,'late title reader change '+member.path);assert.equal(current.length,member.bytes);}};
+ const assertCurrent=()=>{repairTools.assertCurrent();repairSources.assertCurrent();for(const member of bound){const current=read(member.path);assert.equal(hash(current),member.sha256,'late title reader change '+member.path);assert.equal(current.length,member.bytes);}};
  // Used only to reconstruct authenticated old tool-reference metadata. No tool
  // before-image is executed, and product reads pass through without projection.
  const withHistoricalToolMetadata=action=>{
@@ -95,9 +98,11 @@ export function dialogTitleReaderSubject({root=process.cwd(),read=path=>readFile
   return action(metadata);
  };
  const currentReference=(member,side)=>{
+  const product=side==='after'?repairSources.qualify(member):repairSources.historicalReference(member);if(product)return product;
+  const tool=side==='after'?repairTools.qualify(member):repairTools.predecessorReference(member);if(tool)member=tool;
   const image=images.find(row=>row.path===member.path);
   if(image&&member.sha256===image.middle.sha256){if(member.bytes!==undefined)assert.equal(member.bytes,image.middle.bytes);member={...member,sha256:image.after,...(member.bytes===undefined?{}:{bytes:image.after_bytes})};}
-  return qualify(images,member,side);
+  return qualify(images,member,side)??tool;
  };
  assertCurrent();return {line,bound,assertCurrent,qualify:member=>currentReference(member,'after'),historicalReference:member=>currentReference(member,'before'),withHistoricalToolMetadata,
   old_product_bytes_exposed:false,old_tool_bytes_exposed_as_current:false,historical_tool_metadata_only:true,canonical_decisions_changed:0,current_native_or_packed_or_full_source_qualified:false};

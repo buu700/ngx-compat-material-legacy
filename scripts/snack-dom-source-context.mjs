@@ -8,6 +8,7 @@
 /** Raw current snack ownership qualification; historical reads are explicit. */
 import assert from 'node:assert/strict';
 import {readFileSync,lstatSync,realpathSync} from 'node:fs';
+import {readHistoricalContractRepairOwnerMember} from './historical-contract-repair-readers.mjs';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
@@ -30,27 +31,7 @@ export const SNACK_SOURCE_CONTEXT_INPUTS='compatibility/rc/snack-dom-source-cont
 export const SNACK_SOURCE='projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts';
 export const TOOLTIP_SOURCE='projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts';
 const pins={"main":"ed200be4fe777b10a42d5af73ce4e9818fb0584989aa887a635d5750e636260d","21.x":"1f65a5b4a9cdaa950df1d5556f1210c214c4b6299e1dd2833f9345f7222499ab"},hash=b=>createHash('sha256').update(b).digest('hex'),authenticated=new Set(),decoded=new Map(),authenticatedPriors=new Set(),branded=new WeakMap(),packedCurrentEpochs=new WeakMap();
-const rawRead=root=>p=>{
- const parts=p.split('/');assert.ok(parts.every(part=>part&&part!=='.'&&part!=='..'));
- const peer=p.match(/^(projects\/ngx-material-legacy\/)?node_modules\/@angular\/(material|cdk)\/(.+)$/);
- // The source resolver also reads these five workspace peer manifests.
- // This grants no access to their other files or to an alternative package.
- const metadata=p.match(/^projects\/ngx-material-legacy\/node_modules\/(@angular\/(?:core|common|forms)|rxjs)\/(package\.json|operators\/package\.json)$/);
- if(metadata)assert.ok(metadata[2]==='package.json'||metadata[1]==='rxjs');
- const packageName=peer?'@angular/'+peer[2]:metadata?.[1];
- let path=root;
- if(packageName){
-  const prefix=peer?peer[1]??'':'projects/ngx-material-legacy/';
-  path=realpathSync(join(root,prefix,'node_modules',packageName));
-  assert.equal(path,realpathSync(join(root,'node_modules',packageName)),'workspace peer differs from the declared root peer');
-  if(metadata)assert.equal(JSON.parse(readFileSync(join(path,'package.json'))).name,packageName,'wrong workspace peer manifest identity');
- }
- const tail=peer?peer[3].split('/'):metadata?metadata[2].split('/'):parts;
- // Only the declared peer package root can be linked. Source paths and every
- // descendant of the resolved peer root keep their original no-link checks.
- for(const part of tail){path=join(path,part);assert.equal(lstatSync(path).isSymbolicLink(),false);}
- assert.ok(lstatSync(path).isFile());return readFileSync(path);
-};
+const rawRead=root=>p=>readHistoricalContractRepairOwnerMember(root,p);
 function currentRaw(root,read){for(;;){read=packedUpstreamLedgerRawRead({root,read});if(!branded.has(read))return read;const previous=branded.get(read);assert.equal(previous.root,root);read=previous.raw;}}
 
 /** Authenticated before-title metadata only; currentRaw unwraps this for raw admission. */

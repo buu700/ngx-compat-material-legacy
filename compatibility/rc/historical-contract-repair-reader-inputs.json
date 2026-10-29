@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_parent": "682b9d84d7451ee8a127a1f209537fc89555b978",
+  "tool_transitions": [
+    {
+      "path": "scripts/dialog-title-source-context.mjs",
+      "before": {
+        "sha256": "c099a023155608853aba98582331b4cec27eb75bfb09d5d32839f5b323a96d02",
+        "bytes": 10472
+      },
+      "after": {
+        "sha256": "bf660733ac0567ef9a83e4e68924657d46edc745bf5caa151063a44bd2d753c6",
+        "bytes": 11253
+      },
+      "literal_edits": [
+        {
+          "before": "import {qualifyCanonicalToolReference} from './canonical-tool-source-role.mjs';",
+          "after": "import {qualifyCanonicalToolReference} from './canonical-tool-source-role.mjs';\nimport {historicalContractRepairReaderSubject} from './historical-contract-repair-readers.mjs';\nimport {historicalContractRepairSourceSubject} from './historical-contract-repair-source.mjs';"
+        },
+        {
+          "before": " const raw=read(readerPath);assert.equal(hash(raw),readerPins[line]",
+          "after": " const repairTools=historicalContractRepairReaderSubject({root,read}),repairSources=historicalContractRepairSourceSubject({root});\n const raw=read(readerPath);assert.equal(hash(raw),readerPins[line]"
+        },
+        {
+          "before": "const bound=[{path:readerPath,sha256:hash(raw),bytes:raw.length}],images=[]",
+          "after": "const bound=[...repairTools.bound,...repairSources.bound,{path:readerPath,sha256:hash(raw),bytes:raw.length}],images=[]"
+        },
+        {
+          "before": "  }else assert.equal(read(row.path).toString(),expected,'changed current title source-reader '+row.path);",
+          "after": "  }else{const successor=repairTools.qualify({path:row.path,...row.after});if(successor)current=successor;else assert.equal(read(row.path).toString(),expected,'changed current title source-reader '+row.path);}"
+        },
+        {
+          "before": "const assertCurrent=()=>{for(const member of bound){const current=read(member.path);assert.equal(hash(current),member.sha256,'late title reader change '+member.path);",
+          "after": "const assertCurrent=()=>{repairTools.assertCurrent();repairSources.assertCurrent();for(const member of bound){const current=read(member.path);assert.equal(hash(current),member.sha256,'late title reader change '+member.path);"
+        },
+        {
+          "before": " const currentReference=(member,side)=>{\n  const image=images.find",
+          "after": " const currentReference=(member,side)=>{\n  const product=side==='after'?repairSources.qualify(member):repairSources.historicalReference(member);if(product)return product;\n  const tool=side==='after'?repairTools.qualify(member):repairTools.predecessorReference(member);if(tool)member=tool;\n  const image=images.find"
+        },
+        {
+          "before": "  return qualify(images,member,side);",
+          "after": "  return qualify(images,member,side)??tool;"
+        }
+      ]
+    },
+    {
+      "path": "scripts/snack-dom-source-context.mjs",
+      "before": {
+        "sha256": "6f6bb9ca5fdb1494449be0e74aa2ab62d90c9ec402927b6e46b7a8f36533e189",
+        "bytes": 45576
+      },
+      "after": {
+        "sha256": "f745c1e24390a60649acbe309849ce6372688e43b5e9306fbdf0af198edf9cd8",
+        "bytes": 44256
+      },
+      "literal_edits": [
+        {
+          "before": "import {readFileSync,lstatSync,realpathSync} from 'node:fs';",
+          "after": "import {readFileSync,lstatSync,realpathSync} from 'node:fs';\nimport {readHistoricalContractRepairOwnerMember} from './historical-contract-repair-readers.mjs';"
+        },
+        {
+          "before": "const rawRead=root=>p=>{\n const parts=p.split('/');assert.ok(parts.every(part=>part&&part!=='.'&&part!=='..'));\n const peer=p.match(/^(projects\\/ngx-material-legacy\\/)?node_modules\\/@angular\\/(material|cdk)\\/(.+)$/);\n // The source resolver also reads these five workspace peer manifests.\n // This grants no access to their other files or to an alternative package.\n const metadata=p.match(/^projects\\/ngx-material-legacy\\/node_modules\\/(@angular\\/(?:core|common|forms)|rxjs)\\/(package\\.json|operators\\/package\\.json)$/);\n if(metadata)assert.ok(metadata[2]==='package.json'||metadata[1]==='rxjs');\n const packageName=peer?'@angular/'+peer[2]:metadata?.[1];\n let path=root;\n if(packageName){\n  const prefix=peer?peer[1]??'':'projects/ngx-material-legacy/';\n  path=realpathSync(join(root,prefix,'node_modules',packageName));\n  assert.equal(path,realpathSync(join(root,'node_modules',packageName)),'workspace peer differs from the declared root peer');\n  if(metadata)assert.equal(JSON.parse(readFileSync(join(path,'package.json'))).name,packageName,'wrong workspace peer manifest identity');\n }\n const tail=peer?peer[3].split('/'):metadata?metadata[2].split('/'):parts;\n // Only the declared peer package root can be linked. Source paths and every\n // descendant of the resolved peer root keep their original no-link checks.\n for(const part of tail){path=join(path,part);assert.equal(lstatSync(path).isSymbolicLink(),false);}\n assert.ok(lstatSync(path).isFile());return readFileSync(path);\n};",
+          "after": "const rawRead=root=>p=>readHistoricalContractRepairOwnerMember(root,p);"
+        }
+      ]
+    }
+  ],
+  "unchanged_source_subject": {
+    "path": "scripts/historical-contract-repair-source.mjs",
+    "sha256": "d4870c2cc12609da71b03c1745996693dd26444b2dfd848260cfda1ac3514da5",
+    "bytes": 13052
+  },
+  "canonical_dispositions_changed": 0,
+  "product_changes": 0,
+  "old_programs_executed": false,
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

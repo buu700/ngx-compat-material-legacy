@@ -86,14 +86,23 @@ export function historicalContractRepairSourceSubject({root=process.cwd(),read:p
   assert.ok(['compatibility/f10/authored-dependency-dispositions.json','compatibility/f10/authored-dependency-current-dispositions.json'].includes(ref.path));
   const before=original(root,data.historical_roster_context.source_parent,ref.path);assert.equal(hash(before),ref.sha256);assert.equal(before.length,ref.bytes);historicalMetadata.set(ref.path,{...ref});
  }
- assert.ok(implementation.source_bindings.length>300);for(const ref of implementation.source_bindings)member(ref);
- let currentBindings=0,historicalBindings=0;
+ // Three acquisition-time audit snapshots describe the recorded review state.
+ // The canonical owner validates current state; these are not runtime inputs.
+ const canonicalPaths=['compatibility/f10/disposition-ledger/ledger.json','scripts/upstream-source-contract-registry.mjs','compatibility/rc/21x-remaining-disposition-worksheet.json'],canonicalHistory=new Map();
+ assert.ok(implementation.source_bindings.length>300);
+ for(const ref of implementation.source_bindings){
+  if(!canonicalPaths.includes(ref.path)){member(ref);continue;}
+  const before=original(root,data.source_parent,ref.path);assert.equal(hash(before),ref.sha256);assert.equal(before.length,ref.bytes);canonicalHistory.set(ref.path,{...ref});
+ }
+ assert.equal(canonicalHistory.size,line==='21.x'?3:1);
+ let currentBindings=0,historicalBindings=0,historicalCanonicalBindings=0;
  for(const ref of useProof.source_bindings){
   const prior=historicalMetadata.get(ref.path);
   if(prior){assert.deepEqual(ref,prior);historicalBindings++;}
+  else if(canonicalHistory.has(ref.path)){assert.deepEqual(ref,canonicalHistory.get(ref.path));historicalCanonicalBindings++;}
   else{member(ref);currentBindings++;}
  }
- assert.equal(historicalBindings,2);assert.equal(currentBindings,line==='21.x'?1105:725);
+ assert.equal(historicalBindings,2);assert.equal(historicalCanonicalBindings,line==='21.x'?3:1);assert.equal(currentBindings,line==='21.x'?1102:724);
  const known=new Set();
  for(const row of review.reviews){assert.equal(known.has(key(row)),false);known.add(key(row));const source=images.get('projects/ngx-material-legacy/'+row.file);assert.ok(source);assert.equal(row.candidate_source_sha256,source.after.sha256);}
  const reviewed=authoredUseReviewEvidence({symbol_uses:review.reviews.map(row=>({file:row.file,module:row.module,symbol:row.symbol,status:'reviewed',disposition:'closed',source_review:data.current_use_review}))},line,read,hash);
@@ -116,7 +125,7 @@ export function historicalContractRepairSourceSubject({root=process.cwd(),read:p
  };
  const assertCurrent=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);if(providedRead)assert.ok(Buffer.from(providedRead(ref.path)).equals(actual),'late nonphysical historical-repair input '+ref.path);}};
  assertCurrent();return {line,images:structuredClone([...images.values()]),bound:structuredClone([...bound.values()]),qualify,historicalReference,compareSourceReport,assertCurrent,
-  current_use_reviews:95,current_use_current_input_bindings:currentBindings,current_use_historical_roster_metadata_inputs:historicalBindings,
+  current_use_reviews:95,current_use_current_input_bindings:currentBindings,current_use_historical_roster_metadata_inputs:historicalBindings,current_use_historical_canonical_context_inputs:historicalCanonicalBindings,canonical_context_admission_granted:false,
   old_product_bytes_exposed:false,current_read_route_returned:false,canonical_rosters_or_dispositions_changed:false,
   current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 }
