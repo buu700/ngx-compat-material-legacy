@@ -149,6 +149,74 @@
           "after": "contract.assertCurrent();for(const key of new Set([...current.keys(),...contractCurrent.keys()]))assertCurrent(key);nativeSpec.assertCurrent();return;"
         }
       ]
+    },
+    {
+      "path": "scripts/inventory-reference-owner.mjs",
+      "source_parent": "a5e82765e683cf99fd063eb9a8e000da666353bb",
+      "before": {
+        "sha256": "9bed66e11f5f20d1fd4bb9691441b799b81d4bafcfba1ede6f5659f49e90f1ac",
+        "bytes": 17928
+      },
+      "after": {
+        "sha256": "e8ef9df6c84531775328226d798bf83414da187669e088fdcb1c2976a45e1820",
+        "bytes": 17936
+      },
+      "literal_edits": [
+        {
+          "before": "  if(path===OWNER&&line==='main'){assert.equal(hash(read(path)),packet.after_owner.sha256,'changed current owner code');return Buffer.from(oldOwner);}",
+          "after": "  // Checker references stay current; only historical metadata data is projected."
+        },
+        {
+          "before": "  // Checker references stay current; only historical metadata data is projected.",
+          "after": "  if(path===OWNER&&line==='main'){const current=read(path);assert.equal(hash(current),packet.after_owner.sha256,'changed current owner code');return current;}"
+        }
+      ]
+    },
+    {
+      "path": "scripts/browser-owner-source.mjs",
+      "source_parent": "a5e82765e683cf99fd063eb9a8e000da666353bb",
+      "before": {
+        "sha256": "d3f7ccd3d491e22b23c6faae008d81463265e6d241c20b2094890e7d877cc76e",
+        "bytes": 5270
+      },
+      "after": {
+        "sha256": "4b5ea8c09c47a080d25ec9f98c8a3e417fe1bce005bce9e12e9e1eee8be4ad8e",
+        "bytes": 6135
+      },
+      "literal_edits": [
+        {
+          "before": "import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';",
+          "after": "import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';\nimport {historicalContractRepairReaderSubject} from './historical-contract-repair-readers.mjs';"
+        },
+        {
+          "before": " const bound=new Map(),member=ref=>{",
+          "after": " const repairs=historicalContractRepairReaderSubject({root,read});\n const bound=new Map(repairs.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{\n  ref=repairs.qualify(ref)??ref;"
+        },
+        {
+          "before": "const after=member(row.after);assert.equal(after.toString(),expected);",
+          "after": "const after=member(row.after);assert.equal((repairs.ownsReference(row.after)?repairs.comparisonBytes(row.after):after).toString(),expected);"
+        },
+        {
+          "before": "beforeBytes:before,afterBytes:after",
+          "after": "beforeBytes:before,afterBytes:Buffer.from(expected)"
+        },
+        {
+          "before": "  const row=transitions.get(ref.path);if(!row)return {...ref};",
+          "after": "  const row=transitions.get(ref.path);if(!row)return repairs.qualify(ref)??{...ref};\n  const current=repairs.qualify(row.after)??row.after;if(ref.sha256===current.sha256){if(ref.bytes!==undefined)assert.equal(ref.bytes,current.bytes);return {...ref,sha256:current.sha256,bytes:current.bytes};}"
+        },
+        {
+          "before": "  return {...ref,sha256:row.after.sha256,bytes:row.after.bytes};",
+          "after": "  return repairs.qualify({...ref,sha256:row.after.sha256,bytes:row.after.bytes})??{...ref,sha256:row.after.sha256,bytes:row.after.bytes};"
+        },
+        {
+          "before": "  const row=transitions.get(ref.path);if(!row)return Buffer.from(member(ref));\n  qualifyReference(ref);return Buffer.from(ref.sha256===row.before.sha256?row.beforeBytes:row.afterBytes);",
+          "after": "  const row=transitions.get(ref.path);if(!row)return repairs.ownsReference(ref)?repairs.comparisonBytes(ref):Buffer.from(member(ref));\n  qualifyReference(ref);const current=repairs.qualify(row.after)??row.after;\n  if(ref.sha256===current.sha256&&ref.sha256!==row.after.sha256)return repairs.comparisonBytes(ref);\n  return Buffer.from(ref.sha256===row.before.sha256?row.beforeBytes:row.afterBytes);"
+        },
+        {
+          "before": " const assertCurrent=()=>{for(const ref of bound.values())",
+          "after": " const assertCurrent=()=>{repairs.assertCurrent();for(const ref of bound.values())"
+        }
+      ]
     }
   ],
   "unchanged_source_subject": {
@@ -162,10 +230,10 @@
   "actual_native_packed_browser_floor_or_full_audit_qualified": false,
   "g11_claim": "not-passed",
   "prior_reader_registry": {
-    "source_parent": "35dd7f350cff065d85f54eb9d67659c969379ce0",
     "path": "compatibility/rc/historical-contract-repair-reader-inputs.json",
-    "sha256": "dcb191270119f875a2d58e77a333839f4368658a41c0e39f8f3a1c58f9c1657c",
-    "bytes": 5667
+    "sha256": "ccdbd74d5297b2737dc6308e4554017e97f808bae4cf0c1fa6c94da492c673e5",
+    "bytes": 14562,
+    "source_parent": "a5e82765e683cf99fd063eb9a8e000da666353bb"
   },
-  "extension_kind": "packed-source"
+  "extension_kind": "ledger-reader"
 }
