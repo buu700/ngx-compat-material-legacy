@@ -15,8 +15,8 @@ SOURCE = 'compatibility/rc/historical-contract-repair-source-inputs.json'
 READERS = 'compatibility/rc/historical-contract-repair-reader-inputs.json'
 SOURCE_PINS = {'21.x': 'c1d7a8762cad7913a5d4ad60863afb506c56c61d27a78c17a3f5372c51cc9303',
                'main': 'cee92383ce1cb2c82b135e2e3b8be0131a46b114d60a521f7e11e4d0bb017191'}
-READER_PINS = {'21.x': '556752516a34de735237a2603061a7febb1e314cd735dc52bcef270357d645e4',
-               'main': '68817acad7b8b5f6fed52f4f419f34482d09d279296c17967b731d8dec32e26b'}
+READER_PINS = {'21.x': '1c3ef83adac1d3e9de8951fbc34dff0596fe4a3c353193bbc28f52e3a48de191',
+               'main': 'da67535bdc3f8184ecc6217078db003e304f7bc88d98b0e7e77cb3c362f67d9c'}
 
 
 def digest(raw):

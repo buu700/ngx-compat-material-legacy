@@ -14,7 +14,7 @@ import {fileURLToPath} from 'node:url';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {readHistoricalContractRepairMember} from './historical-contract-repair-source.mjs';
 const SELF='scripts/historical-contract-repair-readers.mjs',INPUTS='compatibility/rc/historical-contract-repair-reader-inputs.json';
-const PINS={'21.x':'556752516a34de735237a2603061a7febb1e314cd735dc52bcef270357d645e4',main:'68817acad7b8b5f6fed52f4f419f34482d09d279296c17967b731d8dec32e26b'};
+const PINS={'21.x':'1c3ef83adac1d3e9de8951fbc34dff0596fe4a3c353193bbc28f52e3a48de191',main:'da67535bdc3f8184ecc6217078db003e304f7bc88d98b0e7e77cb3c362f67d9c'};
 const image=readFileSync(fileURLToPath(import.meta.url)),hash=b=>createHash('sha256').update(b).digest('hex'),originals=new Map();
 /** This extra installed tooling root is required by the pinned table source checker. */
 export function readHistoricalContractRepairOwnerMember(root,path){
@@ -46,12 +46,12 @@ export function historicalContractRepairReaderSubject({root=process.cwd(),read=p
  assert.equal(data.canonical_dispositions_changed,0);assert.equal(data.product_changes,0);assert.equal(data.old_programs_executed,false);assert.equal(data.actual_native_packed_browser_floor_or_full_audit_qualified,false);assert.equal(data.g11_claim,'not-passed');
  member(SELF,{sha256:hash(image),bytes:image.length});member(data.unchanged_source_subject.path,data.unchanged_source_subject);
  if(data.prior_reader_registry){
-  const packed=data.extension_kind==='packed-source',ledger=data.extension_kind==='ledger-reader';if(!packed&&!ledger)assert.equal(line,'21.x');const priorRef=data.prior_reader_registry;assert.equal(priorRef.path,INPUTS);
+  const packed=data.extension_kind==='packed-source',ledger=data.extension_kind==='ledger-reader',roster=data.extension_kind==='roster-reader';if(!packed&&!ledger&&!roster)assert.equal(line,'21.x');const priorRef=data.prior_reader_registry;assert.equal(priorRef.path,INPUTS);
   const priorBytes=original(root,priorRef.source_parent,priorRef.path);assert.equal(hash(priorBytes),priorRef.sha256);assert.equal(priorBytes.length,priorRef.bytes);
-  const prior=JSON.parse(priorBytes);assert.equal(prior.line,line);assert.equal(prior.source_parent,data.source_parent);assert.equal(prior.tool_transitions.length,ledger?(line==='21.x'?12:3):packed?(line==='21.x'?11:2):9);
-  const oldPaths=new Set(prior.tool_transitions.map(row=>row.path));assert.deepEqual(data.tool_transitions.filter(row=>!oldPaths.has(row.path)).map(row=>row.path),ledger?(line==='main'?['scripts/inventory-reference-owner.mjs','scripts/browser-owner-source.mjs']:['scripts/inventory-reference-owner.mjs']):packed?['scripts/packed-product-source-recovery.mjs']:['scripts/packed-upstream-ledger-epoch.mjs','scripts/canonical-tool-source-role.mjs']);
+  const prior=JSON.parse(priorBytes);assert.equal(prior.line,line);assert.equal(prior.source_parent,data.source_parent);assert.equal(prior.tool_transitions.length,roster?(line==='21.x'?13:5):ledger?(line==='21.x'?12:3):packed?(line==='21.x'?11:2):9);
+  const oldPaths=new Set(prior.tool_transitions.map(row=>row.path));assert.deepEqual(data.tool_transitions.filter(row=>!oldPaths.has(row.path)).map(row=>row.path),roster?[]:ledger?(line==='main'?['scripts/inventory-reference-owner.mjs','scripts/browser-owner-source.mjs']:['scripts/inventory-reference-owner.mjs']):packed?['scripts/packed-product-source-recovery.mjs']:['scripts/packed-upstream-ledger-epoch.mjs','scripts/canonical-tool-source-role.mjs']);
   for(const row of prior.tool_transitions){const next=data.tool_transitions.find(item=>item.path===row.path);assert.ok(next);assert.deepEqual(next.before,row.before);
-   if(!ledger&&row.path===(packed?'scripts/snack-dom-source-context.mjs':'tests/table_local_compilation_owner_source.py'))assert.deepEqual(next.literal_edits.slice(0,row.literal_edits.length),row.literal_edits);
+   if(!ledger&&row.path===((packed||roster)?'scripts/snack-dom-source-context.mjs':'tests/table_local_compilation_owner_source.py'))assert.deepEqual(next.literal_edits.slice(0,row.literal_edits.length),row.literal_edits);
    else assert.deepEqual(next,row,'unrelated earlier reader transition changed');
   }
  }
