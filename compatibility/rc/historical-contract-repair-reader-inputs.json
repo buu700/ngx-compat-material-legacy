@@ -51,8 +51,8 @@
         "bytes": 45576
       },
       "after": {
-        "sha256": "ac9b0ef8f95dbc88fead9b8d65c9817e665f7060c250ee36971d928dea48f62a",
-        "bytes": 44745
+        "sha256": "5f3a80cda5e04545ee8e29b4f2fd3d0ce5fb91ce9f6bea8b2b052cd91d30dcd3",
+        "bytes": 45079
       },
       "literal_edits": [
         {
@@ -90,6 +90,22 @@
         {
           "before": "const projected=packedRepairEpoch(root,metadata.read).read;",
           "after": "const projected=packedRepairEpoch(root,actual).read;"
+        },
+        {
+          "before": "import {historicalContractRepairSourceSubject} from './historical-contract-repair-source.mjs';",
+          "after": "import {historicalContractRepairSourceSubject} from './historical-contract-repair-source.mjs';\nimport {currentAuthoredRosterSourceSubject,currentAuthoredRosterRawRead} from './current-authored-roster-source.mjs';"
+        },
+        {
+          "before": "function currentRaw(root,read){for(;;){read=packedUpstreamLedgerRawRead({root,read});if(!branded.has(read))return read;const previous=branded.get(read);assert.equal(previous.root,root);read=previous.raw;}}",
+          "after": "function currentRaw(root,read){for(;;){const before=read;read=packedUpstreamLedgerRawRead({root,read});read=currentAuthoredRosterRawRead({root,read});if(branded.has(read)){const previous=branded.get(read);assert.equal(previous.root,root);read=previous.raw;continue;}if(read===before)return read;}}"
+        },
+        {
+          "before": "const rawCurrent=read,nativeSpec=autocompleteSelectionReaderSubject({root,read:rawCurrent}),upstreamEpoch=packedUpstreamLedgerEpoch({root,read}),",
+          "after": "const rawCurrent=read,rosterEpoch=currentAuthoredRosterSourceSubject({root,read:rawCurrent}),nativeSpec=autocompleteSelectionReaderSubject({root,read:rawCurrent}),upstreamEpoch=packedUpstreamLedgerEpoch({root,read:rosterEpoch.metadataRead}),"
+        },
+        {
+          "before": "assert.equal(members.size,20);nativeSpec.assertCurrent();const reader=",
+          "after": "assert.equal(members.size,20);nativeSpec.assertCurrent();rosterEpoch.assertCurrent();const reader="
         }
       ]
     },
@@ -231,9 +247,9 @@
   "g11_claim": "not-passed",
   "prior_reader_registry": {
     "path": "compatibility/rc/historical-contract-repair-reader-inputs.json",
-    "sha256": "ccdbd74d5297b2737dc6308e4554017e97f808bae4cf0c1fa6c94da492c673e5",
-    "bytes": 14562,
-    "source_parent": "a5e82765e683cf99fd063eb9a8e000da666353bb"
+    "sha256": "68817acad7b8b5f6fed52f4f419f34482d09d279296c17967b731d8dec32e26b",
+    "bytes": 18605,
+    "source_parent": "94f392ae21802ae8de57aecfd538c2624c1f4a3d"
   },
-  "extension_kind": "ledger-reader"
+  "extension_kind": "roster-reader"
 }
