@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "1cc7981ea42bdf2bf4c2da792b045e15fcbca559",
+  "recorded_at_utc": "2026-10-30T00:36:11.366688+00:00",
+  "task": "C04:current title checker with explicit historical CVA comparison readers",
+  "owned_paths": [
+    "scripts/packed-cva-source-requalification.mjs",
+    "scripts/dialog-title-source-context.mjs",
+    "scripts/historical-contract-repair-readers.mjs",
+    "compatibility/rc/historical-contract-repair-reader-inputs.json",
+    "tests/historical_contract_repair_source.py",
+    "compatibility/rc/cva-current-reader-repair-*",
+    "scripts/historical-source-replay.mjs",
+    "compatibility/rc/historical-source-replay-inputs.json",
+    "compatibility/rc/session-handoff.json",
+    "compatibility/rc/remaining-native-admission-worksheet.json"
+  ],
+  "prior_reader_registry": {
+    "path": "compatibility/rc/historical-contract-repair-reader-inputs.json",
+    "sha256": "1c3ef83adac1d3e9de8951fbc34dff0596fe4a3c353193bbc28f52e3a48de191",
+    "bytes": 39581
+  },
+  "protected_inputs": [
+    {
+      "path": "compatibility/f10/disposition-ledger/ledger.json",
+      "sha256": "e9ef5c0bf543977809134c3367cf9a33bdda62233ab6b944dc3c4e4ac101585e",
+      "bytes": 4191043
+    },
+    {
+      "path": "compatibility/rc/api/signature-differences.json",
+      "sha256": "ab78e5d35b56a8ce552054ac36ed35aa6e136d3b58bff9534474a5020fd698d0",
+      "bytes": 49850
+    },
+    {
+      "path": "compatibility/f10/authored-dependency-dispositions.json",
+      "sha256": "433a07284f70124fddb682eda9fc9175114f8dda400707b6f1d1764a32b0c47c",
+      "bytes": 2501714
+    },
+    {
+      "path": "compatibility/f10/authored-dependency-current-dispositions.json",
+      "sha256": "5c3c7bfbd593bef816dd4d621317af7b3a6d75741bdff0ce6dc2183c032042c9",
+      "bytes": 380539
+    },
+    {
+      "path": "compatibility/f10/authored-use-reviews/current-repaired-source-integration-v2.json",
+      "sha256": "2aab9cb18ef2a4b113ef09cdbfc3aba0e4bb22646823f8b0ae1f4bf87d085c17",
+      "bytes": 2075637
+    }
+  ],
+  "requirements": [
+    "Current tool subjects must be constructed against actual current source,never a historical source projection. Retain their full physical binding guards.",
+    "Historical tool metadata may use an explicit comparison fallback. Check all current bindings at phase boundaries and on every projected historical tool read;unprojected comparison reads retain their own exact source guards.",
+    "Current historical CVA side uses exact contract preimages before overlapping packed preimages;prior side keeps original packed precedence. Preserve prior315admission and runtime receipts as historical only.",
+    "Authenticate the committed13/5reader registry as predecessor. Append edits only to the existing title-reader row and add exactly the CVA reader. Do not alter other rows or protected inputs.",
+    "No product,style,golden,exception,peer or canonical changes. No full source/native/packed/browser/floor admission claim. Focused checks serial,nice19,pinned tools;no pushes or Actions."
+  ],
+  "shared_contract_owner": "Codex primary implementer",
+  "status": "bounded before implementation",
+  "g11_claim": "not-passed"
+}

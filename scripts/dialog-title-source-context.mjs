@@ -93,9 +93,13 @@ export function dialogTitleReaderSubject({root=process.cwd(),read=path=>readFile
  const assertCurrent=()=>{repairTools.assertCurrent();repairSources.assertCurrent();for(const member of bound){const current=read(member.path);assert.equal(hash(current),member.sha256,'late title reader change '+member.path);assert.equal(current.length,member.bytes);}};
  // Used only to reconstruct authenticated old tool-reference metadata. No tool
  // before-image is executed, and product reads pass through without projection.
- const withHistoricalToolMetadata=action=>{
-  const metadata=path=>{assertCurrent();return beforeCode.has(path)?Buffer.from(beforeCode.get(path)):read(path);};
-  return action(metadata);
+ const withHistoricalToolMetadata=(action,{comparisonRead=read}={})=>{
+  assert.equal(typeof comparisonRead,'function');assertCurrent();
+  const metadata=path=>{
+   if(beforeCode.has(path)){assertCurrent();return Buffer.from(beforeCode.get(path));}
+   return comparisonRead(path);
+  };
+  const result=action(metadata);assertCurrent();return result;
  };
  const currentReference=(member,side)=>{
   const product=side==='after'?repairSources.qualify(member):repairSources.historicalReference(member);if(product)return product;

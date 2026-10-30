@@ -133,8 +133,8 @@
         "bytes": 10472
       },
       "after": {
-        "sha256": "bf660733ac0567ef9a83e4e68924657d46edc745bf5caa151063a44bd2d753c6",
-        "bytes": 11253
+        "sha256": "5586ab7c886f8a4ff91c1788144e6f8c099f587cc2586bc53855b2dee7328439",
+        "bytes": 11415
       },
       "literal_edits": [
         {
@@ -164,6 +164,10 @@
         {
           "before": "  return qualify(images,member,side);",
           "after": "  return qualify(images,member,side)??tool;"
+        },
+        {
+          "before": " const withHistoricalToolMetadata=action=>{\n  const metadata=path=>{assertCurrent();return beforeCode.has(path)?Buffer.from(beforeCode.get(path)):read(path);};\n  return action(metadata);\n };",
+          "after": " const withHistoricalToolMetadata=(action,{comparisonRead=read}={})=>{\n  assert.equal(typeof comparisonRead,'function');assertCurrent();\n  const metadata=path=>{\n   if(beforeCode.has(path)){assertCurrent();return Buffer.from(beforeCode.get(path));}\n   return comparisonRead(path);\n  };\n  const result=action(metadata);assertCurrent();return result;\n };"
         }
       ]
     },
@@ -477,6 +481,28 @@
           "after": "  if(path===OWNER&&line==='main'){const current=read(path);assert.equal(hash(current),packet.after_owner.sha256,'changed current owner code');return current;}"
         }
       ]
+    },
+    {
+      "path": "scripts/packed-cva-source-requalification.mjs",
+      "source_parent": "1cc7981ea42bdf2bf4c2da792b045e15fcbca559",
+      "before": {
+        "sha256": "0028bd78cbdda3237c3866baf62cc4c0f4fcbea1b67691d0425072facf77ed5c",
+        "bytes": 27199
+      },
+      "literal_edits": [
+        {
+          "before": "import {dialogTitleReaderSubject} from './dialog-title-source-context.mjs';\n",
+          "after": ""
+        },
+        {
+          "before": "    const titleCurrent=dialogTitlePriorMetadataRead({root,read});\n    const titlePrior=dialogTitlePriorMetadataRead({root,read:packed.read});\n    const currentTools=dialogTitleReaderSubject({root,read:titleCurrent,line});\n    const priorTools=dialogTitleReaderSubject({root,read:titlePrior,line});\n    const metadataCurrent=currentTools.withHistoricalToolMetadata(metadata=>metadata);\n    priorRead=priorTools.withHistoricalToolMetadata(metadata=>metadata);",
+          "after": "    // The current checker above retains actual source bindings. Historical\n    // comparisons use separate callbacks and never construct a current checker.\n    const titleCurrent=dialogTitlePriorMetadataRead({root,read,metadataOverlay:path=>{\n      if(packed.contract_preimages.has(path)){\n        packed.assertCurrent(path);return Buffer.from(packed.contract_preimages.get(path));\n      }\n      return actualCurrent(path);\n    }});\n    const titlePrior=dialogTitlePriorMetadataRead({root,read:packed.read});\n    const metadataCurrent=nativeSpec.titleReaders.withHistoricalToolMetadata(metadata=>metadata,{comparisonRead:titleCurrent});\n    priorRead=nativeSpec.titleReaders.withHistoricalToolMetadata(metadata=>metadata,{comparisonRead:titlePrior});"
+        }
+      ],
+      "after": {
+        "sha256": "be8c26049e58848d0b7b0ac1e1dba78151d3d8e867ec49b9dc523f28cb304e33",
+        "bytes": 27417
+      }
     }
   ],
   "unchanged_source_subject": {
@@ -491,9 +517,9 @@
   "g11_claim": "not-passed",
   "prior_reader_registry": {
     "path": "compatibility/rc/historical-contract-repair-reader-inputs.json",
-    "sha256": "556752516a34de735237a2603061a7febb1e314cd735dc52bcef270357d645e4",
-    "bytes": 37950,
-    "source_parent": "eaa50b10e9b2352df3f7528539a3b8ebce2547ef"
+    "sha256": "1c3ef83adac1d3e9de8951fbc34dff0596fe4a3c353193bbc28f52e3a48de191",
+    "bytes": 39581,
+    "source_parent": "1cc7981ea42bdf2bf4c2da792b045e15fcbca559"
   },
-  "extension_kind": "roster-reader"
+  "extension_kind": "cva-reader"
 }

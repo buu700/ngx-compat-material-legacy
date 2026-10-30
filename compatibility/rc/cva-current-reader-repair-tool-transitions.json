@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "1cc7981ea42bdf2bf4c2da792b045e15fcbca559",
+  "changes": [
+    {
+      "path": "scripts/dialog-title-source-context.mjs",
+      "before": {
+        "sha256": "bf660733ac0567ef9a83e4e68924657d46edc745bf5caa151063a44bd2d753c6",
+        "bytes": 11253
+      },
+      "new_literal_edits": [
+        {
+          "before": " const withHistoricalToolMetadata=action=>{\n  const metadata=path=>{assertCurrent();return beforeCode.has(path)?Buffer.from(beforeCode.get(path)):read(path);};\n  return action(metadata);\n };",
+          "after": " const withHistoricalToolMetadata=(action,{comparisonRead=read}={})=>{\n  assert.equal(typeof comparisonRead,'function');assertCurrent();\n  const metadata=path=>{\n   if(beforeCode.has(path)){assertCurrent();return Buffer.from(beforeCode.get(path));}\n   return comparisonRead(path);\n  };\n  const result=action(metadata);assertCurrent();return result;\n };"
+        }
+      ],
+      "after": {
+        "sha256": "5586ab7c886f8a4ff91c1788144e6f8c099f587cc2586bc53855b2dee7328439",
+        "bytes": 11415
+      }
+    },
+    {
+      "path": "scripts/packed-cva-source-requalification.mjs",
+      "before": {
+        "sha256": "0028bd78cbdda3237c3866baf62cc4c0f4fcbea1b67691d0425072facf77ed5c",
+        "bytes": 27199
+      },
+      "new_literal_edits": [
+        {
+          "before": "import {dialogTitleReaderSubject} from './dialog-title-source-context.mjs';\n",
+          "after": ""
+        },
+        {
+          "before": "    const titleCurrent=dialogTitlePriorMetadataRead({root,read});\n    const titlePrior=dialogTitlePriorMetadataRead({root,read:packed.read});\n    const currentTools=dialogTitleReaderSubject({root,read:titleCurrent,line});\n    const priorTools=dialogTitleReaderSubject({root,read:titlePrior,line});\n    const metadataCurrent=currentTools.withHistoricalToolMetadata(metadata=>metadata);\n    priorRead=priorTools.withHistoricalToolMetadata(metadata=>metadata);",
+          "after": "    // The current checker above retains actual source bindings. Historical\n    // comparisons use separate callbacks and never construct a current checker.\n    const titleCurrent=dialogTitlePriorMetadataRead({root,read,metadataOverlay:path=>{\n      if(packed.contract_preimages.has(path)){\n        packed.assertCurrent(path);return Buffer.from(packed.contract_preimages.get(path));\n      }\n      return actualCurrent(path);\n    }});\n    const titlePrior=dialogTitlePriorMetadataRead({root,read:packed.read});\n    const metadataCurrent=nativeSpec.titleReaders.withHistoricalToolMetadata(metadata=>metadata,{comparisonRead:titleCurrent});\n    priorRead=nativeSpec.titleReaders.withHistoricalToolMetadata(metadata=>metadata,{comparisonRead:titlePrior});"
+        }
+      ],
+      "after": {
+        "sha256": "be8c26049e58848d0b7b0ac1e1dba78151d3d8e867ec49b9dc523f28cb304e33",
+        "bytes": 27417
+      }
+    }
+  ],
+  "canonical_or_product_changes": 0,
+  "g11_claim": "not-passed"
+}
