@@ -13,7 +13,6 @@ import {readFileSync} from 'node:fs';
 import {createRequire} from 'node:module';
 import {join} from 'node:path';
 import {gunzipSync} from 'node:zlib';
-import {dialogTitleReaderSubject} from './dialog-title-source-context.mjs';
 import {dialogTitlePriorMetadataRead} from './snack-dom-source-context.mjs';
 import {qualifyPackedProductSourceRepairs} from './packed-product-source-recovery.mjs';
 import {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';
@@ -193,12 +192,17 @@ export function preparePackedCvaSourceRequalification({root = process.cwd(), rea
   if(historicalTitleMetadata){
     // Reconstruct this producer's original source-review epoch only. Raw title
     // admission above and the returned reader's product reads remain current.
-    const titleCurrent=dialogTitlePriorMetadataRead({root,read});
+    // The current checker above retains actual source bindings. Historical
+    // comparisons use separate callbacks and never construct a current checker.
+    const titleCurrent=dialogTitlePriorMetadataRead({root,read,metadataOverlay:path=>{
+      if(packed.contract_preimages.has(path)){
+        packed.assertCurrent(path);return Buffer.from(packed.contract_preimages.get(path));
+      }
+      return actualCurrent(path);
+    }});
     const titlePrior=dialogTitlePriorMetadataRead({root,read:packed.read});
-    const currentTools=dialogTitleReaderSubject({root,read:titleCurrent,line});
-    const priorTools=dialogTitleReaderSubject({root,read:titlePrior,line});
-    const metadataCurrent=currentTools.withHistoricalToolMetadata(metadata=>metadata);
-    priorRead=priorTools.withHistoricalToolMetadata(metadata=>metadata);
+    const metadataCurrent=nativeSpec.titleReaders.withHistoricalToolMetadata(metadata=>metadata,{comparisonRead:titleCurrent});
+    priorRead=nativeSpec.titleReaders.withHistoricalToolMetadata(metadata=>metadata,{comparisonRead:titlePrior});
     const historicalCache=new Map();current=dialogTitlePriorMetadataRead({root,read,metadataOverlay:path=>{
       if(!historicalCache.has(path))historicalCache.set(path,metadataCurrent(path));return historicalCache.get(path);
     }});
