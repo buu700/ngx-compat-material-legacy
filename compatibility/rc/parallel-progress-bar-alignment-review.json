@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "kind": "independent-individual-upstream-source-review-recommendation",
+  "reviewer": "Codex progress_bar_review subagent",
+  "status": "complete for bounded source review; canonical admission belongs to parent",
+  "upstream_sha": "43dbbe2e5eec4fc4e76950a29edc3efd94027ff9",
+  "subject": "fix(material/progress-bar): alignment affected by parent text-align (#27646)",
+  "complete_original_patch": {
+    "parent": "bbc807a1c97df747064c7056a8831f87fd4a81f9",
+    "tree": "abf3be900d97fe5761812533124191a64b305634",
+    "changed_paths": ["src/material/progress-bar/progress-bar.scss"],
+    "before_blob": "d95748e39404822bee9e0f1a35da2fd2a0868da3",
+    "after_blob": "d884ae69d17435a78ae571f71ee56e38c53a9398",
+    "whole_context_patch": "compatibility/rc/parallel-progress-bar-alignment-whole-original.patch",
+    "source_authentication": "compatibility/rc/parallel-progress-bar-alignment-source-identities.json",
+    "tree_chain_authentication": "compatibility/rc/parallel-progress-bar-alignment-diagnostic.json",
+    "authentication_method": "Recomputed Git SHA1 for complete original commit, parent, tagged16.2.14 commit, each traversed tree object and seven complete blobs. Complete diff-tree membership matches the 1697-SHA census. Recomputed exact before/after change: seven added lines in the one stylesheet, no other change.",
+    "missing_cache_object": "After blob was absent in the partial cache. Anonymous authoritative raw.githubusercontent.com retrieval used the immutable original SHA/path and verified the exact expected Git blob; no shared cache mutation or credential use.",
+    "hunk_review": "Read the entire before/after stylesheet and unchanged contemporary MDC template. The sole addition resets .mat-mdc-progress-bar text-align to left and then to right under an ancestor [dir='rtl']. Existing display:block, query scaleX(-1), animation-disable rules, transition timing and motion constants are unchanged. No original TS, template, test or legacy-progress-bar path is modified."
+  },
+  "recommendation": {
+    "owned_legacy_disposition": "irrelevant",
+    "both_lines": true,
+    "reason": "The original structural fix targets the current MDC component host, which is supplied by the public Material peer on both maintained lines. The owned historical component uses the tagged16.2.14 SVG/pseudo-element/absolute-div geometry and a distinct .mat-progress-bar host. Both actual minimum peers already reset their .mat-mdc-progress-bar host with text-align:start. Preserve the owned historical source and use the peer's existing direction-aware reset for the modern companion.",
+    "required_owned_source_repair": null,
+    "required_shared_or_canonical_mutation_by_this_review": false,
+    "parent_integration": "If closing the21.x source row, attach this complete-patch/branch-specific source evidence through the existing canonical workflow. Main's previous closed row is not independent proof; replace or supplement its old display:block-only rationale with the actual distinct-template, whole-source preservation and minimum-peer evidence. No native/G11 pass follows from this recommendation."
+  },
+  "untouched_tagged_reference": {
+    "tag": "16.2.14",
+    "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "tree": "b8c5da4399eaae44fd7d88e82049c2f18d325bf1",
+    "read_complete_files": [
+      "src/material/legacy-progress-bar/progress-bar.scss",
+      "src/material/legacy-progress-bar/progress-bar.html",
+      "src/material/legacy-progress-bar/progress-bar.ts"
+    ],
+    "test_context": "Read the historical/candidate progress-bar spec transform and determinate/buffer transition-event assertions. The historical family was not executed.",
+    "source_preservation": "Both owned templates are byte-identical to the tag. Both complete class implementations from export class through clamp are byte-identical to the tag. Whole SCSS matches after only the explicitly enumerated owned import and high-contrast adapter substitutions; no text-align, selector, positioning, transition, keyframe or geometry change is normalized away."
+  },
+  "branch_context": [
+    {
+      "line": "21.x",
+      "reviewed_head": "2aa97703ad041a19d77f3d1f9ee3663b82cacec8",
+      "reviewed_tree": "5419beeac25ad9a6da0b350b48123a3848de7c79",
+      "minimum_angular": "21.2.23",
+      "minimum_cdk_material": "21.2.14",
+      "peer_fesm_sha256": "063373f35264b6dd4201878cbf0bfb11b684808ce326d4ad0977d2fc09ac9b08"
+    },
+    {
+      "line": "main",
+      "reviewed_head": "d51ff45b88baba12a81e6f3c1bdf33a2bfc7b91d",
+      "reviewed_tree": "1244a89186a63c0bad2432beaf9a4f5fdedc07e8",
+      "minimum_angular_cdk_material": "22.1.7",
+      "peer_fesm_sha256": "68aec0daeb1c040ffd9e6416cc811c919cfd0b083ef499dd2ca7c04200bd8df0"
+    }
+  ],
+  "ownership_and_callers": [
+    "Owned MatLegacyProgressBar host class is .mat-progress-bar; module declares only that owned class and CommonModule/owned MatCommonModule. Public progress-bar imports in its TS are the exported ProgressBarMode and ProgressAnimationEnd type shapes, available in both actual minimum peer declarations. No current MatProgressBar implementation is imported or added to the owned module.",
+    "Owned legacy template retains SVG pattern/circle/rect, buffer div and primary/secondary fill divs. Its fill uses a ::after pseudo-element explicitly anchored left:0. Host RTL/query geometry is retained through the historical rotateY/rotateZ rules and scale3d value/buffer transforms. This differs materially from the MDC template's bar-inner span and flex-basis buffer implementation.",
+    "Both complete minimum peer component FESM implementations, extracted templates and CSS were read. Their extracted CSS/template bytes match across lines, while FESM hashes and branch versions remain separate. Current host text-align:start is a direction-aware alignment reset under ordinary horizontal LTR/RTL CSS; this is source-semantic evidence, not a computed-style or layout observation.",
+    "The owned ordinary progress-bar theme reaches vendored linear-progress theme-styles and public mat.progress-bar-overrides for current peer colors. The reviewed theme emission changes color/size/shape/keyframes, not the host text-align reset. This exported Sass does not replace the peer's structural component CSS.",
+    "Existing browser-surface-families fixture keeps the public current MatProgressBar in a separate PeerProgressCspModule from the owned legacy component. It invokes both themes, observes the four peer modes and legacy SVG under CSP. Its progress_csp assertions inspect resource styles and SVG presence; they do not exercise parent text-align or measure alignment.",
+    "Owned class listens to transitionend on the historical primary element outside Angular, filters the event target, emits value only in determinate/buffer mode and unsubscribes on destroy. All these class bodies and the historical SCSS transitions remain unchanged by this review. The shared motion-event helper is not called by this progress-bar class. No motion or lifecycle implementation repair is proposed."
+  ],
+  "important_limit_on_reasoning": {
+    "finding": "Main's earlier rationale mentions display:block and absence of a text-align declaration. Those observations alone do not prove absence of inherited-alignment effects.",
+    "reason": "The legacy background is an SVG and some historical absolute children retain auto horizontal insets; static-position rules can matter. The recommendation relies on authentic frozen-source preservation and the separately supplied modern peer reset, not a claim that every legacy child is immune to parent text-align.",
+    "references": [
+      {"url": "https://www.w3.org/TR/CSS22/visudet.html#abs-non-replaced-width", "use": "CSS2.2 static-position/auto-inset rules explain why absolute positioning alone is not an alignment proof."},
+      {"url": "https://www.w3.org/TR/css-text-3/#text-align-property", "use": "CSS Text defines inherited text alignment and the line-start meaning of start."}
+    ]
+  },
+  "focused_diagnostic": {
+    "producer": "compatibility/rc/parallel-progress-bar-alignment-probe.py",
+    "report": "compatibility/rc/parallel-progress-bar-alignment-diagnostic.json",
+    "command": "nice -n 19 python3 compatibility/rc/parallel-progress-bar-alignment-probe.py",
+    "result": "passed",
+    "authenticated_source_blobs": 7,
+    "negative_controls_rejected": 16,
+    "controls": "Per line: accidental text-align transplant, fill-anchor removal, background-width change, modern-template substitution, buffer-scale change, motion-target weakening, missing peer alignment reset, and peer CSS leaking the exact legacy host selector.",
+    "scope": "Byte identity, explicitly bounded source equivalence and source mutation rejection. These controls do not execute Angular, Sass, transforms, layout or motion."
+  },
+  "required_later_execution_if_alignment_qualification_is_claimed": [
+    "Compare authentic tagged legacy and candidate native geometry under parent text-align left/center/right/start/end, inherited/self LTR/RTL and all four modes; inspect primary/buffer/fill/SVG offsets and clipping at multiple widths. Preserve reference-derived expectations.",
+    "Separately verify the current minimum peer resolves start alignment and remains aligned under parent text-align in both branch-correct packed consumers; include nested direction changes rather than inferring behavior from ancestry.",
+    "Run any required enabled/noop/reduced-motion lifecycle/style, historical-family, packed-artifact and complete acceptance matrix through the parent workflow. No such run was launched in this bounded review."
+  ],
+  "no_product_or_shared_changes": true,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "remaining_program_scope": "The complete two-line C00-C05/A01-A10/R01-R03/G01-G13 work, full1697-SHA coverage, authored-use inventory and pending security-review remain independent obligations. This review changes no denominator, golden, exception, owner authority or release baseline."
+}
