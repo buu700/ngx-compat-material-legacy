@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "a69847c0ffc36afcc3f9873c7bf2f28bb431fdd9",
+  "transitions": [
+    {
+      "path": "scripts/dialog-portal-failure-recovery.mjs",
+      "before": {
+        "path": "scripts/dialog-portal-failure-recovery.mjs",
+        "sha256": "e0f84875c25438c7027960762382e5e8fd8fb5efee5b3b8de744f99953dd5aa2",
+        "bytes": 12162
+      },
+      "new_literal_edits": [
+        {
+          "before": "import {autocompleteSelectionSpecSubject} from './autocomplete-selection-spec-subject.mjs';",
+          "after": "import {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';\nimport {snackDomRawCurrentRead} from './snack-dom-source-context.mjs';"
+        },
+        {
+          "before": "export function reviewDialogPortalSource(root=process.cwd(),read=p=>readFileSync(join(root,p))){const prior=dialogPortalPrior(root,read),nativeSpec=autocompleteSelectionSpecSubject({root,read,line:prior.line}),actual=read(DIALOG_PORTAL_SOURCE).toString();assert.equal(actual,repairDialogPortals(prior.product.text),'dialog changes beyond exact three callback repairs');const before=cls(prior.product.text),after=cls(actual);assert.equal(after.node.members.length,before.node.members.length);let preserved=0;for(let i=0;i<before.node.members.length;i++){assert.equal(before.node.members[i].name?.getText(before.source),after.node.members[i].name?.getText(after.source));if(!changed.includes(before.node.members[i].name?.getText(before.source))){assert.equal(before.node.members[i].getText(before.source),after.node.members[i].getText(after.source));preserved++;}}const paths=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','ls-files','projects/ngx-material-legacy'],{cwd:root,encoding:'utf8'}).trim().split('\\n');assert.deepEqual(paths,prior.product_members.map(m=>m.path));for(const m of prior.product_members)if(m.path!==DIALOG_PORTAL_SOURCE){\n const expected=m.path===nativeSpec.path?nativeSpec.after.sha256:m.sha256;\n if(m.path===nativeSpec.path)assert.equal(m.sha256,nativeSpec.before.sha256);\n assert.equal(hash(read(m.path)),expected,'unrelated product/resource changed '+m.path);\n }nativeSpec.assertCurrent();return {line:prior.line,source_parent:prior.source_parent,source:DIALOG_PORTAL_SOURCE,before_sha256:prior.product.sha256,current_sha256:hash(actual),changed_members:changed,other_class_members_unchanged:preserved,other_product_resource_members_unchanged:1140,independently_qualified_native_test_source:{path:nativeSpec.path,before:{...nativeSpec.before},after:{...nativeSpec.after},qualification:{...nativeSpec.bound[0]}},constructors_imports_and_resources_unchanged:true,consumer_HTML_CSS_SCSS_changes:0,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};}",
+          "after": "export function reviewDialogPortalSource(root=process.cwd(),read=p=>readFileSync(join(root,p)),{currentSourceRead}={}){\n if(currentSourceRead){assert.notEqual(currentSourceRead,read);assert.equal(snackDomRawCurrentRead({root,read}),currentSourceRead,'historical portal metadata requires a canonical current source');}\n const prior=dialogPortalPrior(root,read),nativeSpec=autocompleteSelectionReaderSubject({root,read:currentSourceRead??read,line:prior.line}),actual=read(DIALOG_PORTAL_SOURCE).toString();assert.equal(actual,repairDialogPortals(prior.product.text),'dialog changes beyond exact three callback repairs');const before=cls(prior.product.text),after=cls(actual);assert.equal(after.node.members.length,before.node.members.length);let preserved=0;for(let i=0;i<before.node.members.length;i++){assert.equal(before.node.members[i].name?.getText(before.source),after.node.members[i].name?.getText(after.source));if(!changed.includes(before.node.members[i].name?.getText(before.source))){assert.equal(before.node.members[i].getText(before.source),after.node.members[i].getText(after.source));preserved++;}}const paths=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','ls-files','projects/ngx-material-legacy'],{cwd:root,encoding:'utf8'}).trim().split('\\n');assert.deepEqual(paths,prior.product_members.map(m=>m.path));\n const contractInputs='compatibility/rc/historical-contract-repair-source-inputs.json',contractInputRef=nativeSpec.bound.find(ref=>ref.path===contractInputs);assert.ok(contractInputRef);\n const contractBytes=(currentSourceRead??read)(contractInputs);assert.equal(hash(contractBytes),contractInputRef.sha256);assert.equal(contractBytes.length,contractInputRef.bytes);\n const contractSources=currentSourceRead?JSON.parse(contractBytes).images.filter(row=>row.path.startsWith('projects/ngx-material-legacy/')).map(row=>({path:row.path,...row.after})):[];\n if(currentSourceRead)assert.equal(contractSources.length,4);\n for(const m of prior.product_members)if(m.path!==DIALOG_PORTAL_SOURCE){\n // The capsule predates both the owned-state and title repairs. Its exact\n // original two title references are compared only inside this metadata lane.\n const historicalTitle=currentSourceRead&&nativeSpec.titleSource.bound.some(ref=>ref.path===m.path&&ref.path.startsWith('projects/ngx-material-legacy/'));\n const repaired=contractSources.find(ref=>ref.path===m.path);\n if(repaired){\n  // The original portal comparison retains its exact source epoch,including\n  // the menu image before the later packed repair. Actual repairs are a\n  // separate current-source proof,not a replacement historical expectation.\n  assert.equal(hash(read(m.path)),m.sha256,'changed historical contract source '+m.path);\n  const qualified=nativeSpec.qualify(repaired);assert.ok(qualified);assert.equal(qualified.sha256,repaired.sha256);\n  const current=currentSourceRead(m.path);assert.equal(hash(current),qualified.sha256,'changed current contract source '+m.path);assert.equal(current.length,repaired.bytes);\n }else{\n  const expected=historicalTitle?m.sha256:(nativeSpec.qualify(m)??m).sha256;\n  assert.equal(hash(read(m.path)),expected,'unrelated product/resource changed '+m.path);\n }\n }nativeSpec.assertCurrent();return {line:prior.line,source_parent:prior.source_parent,source:DIALOG_PORTAL_SOURCE,before_sha256:prior.product.sha256,current_sha256:hash(actual),changed_members:changed,other_class_members_unchanged:preserved,other_product_resource_members_unchanged:(prior.line==='main'?1133:1140)-(currentSourceRead?0:2),\n independently_qualified_contract_sources:contractSources,...(currentSourceRead?{}:{independently_qualified_title_source:nativeSpec.titleSource.bound.filter(ref=>ref.path.startsWith('projects/ngx-material-legacy/'))}),independently_qualified_silent_Sass_notices:prior.line==='main'?7:0,independently_qualified_native_test_source:{path:nativeSpec.spec.path,before:{...nativeSpec.spec.before},after:{...nativeSpec.spec.after},qualification:{...nativeSpec.spec.bound[0]}},constructors_imports_and_resources_unchanged:true,consumer_HTML_CSS_SCSS_changes:0,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};}"
+        }
+      ],
+      "after": {
+        "path": "scripts/dialog-portal-failure-recovery.mjs",
+        "sha256": "4ef604aa806c031e3a15cdce6ba93c5b0679a2231c6cdc26728918ea538ad31b",
+        "bytes": 14387
+      }
+    },
+    {
+      "path": "scripts/snack-dom-source-context.mjs",
+      "before": {
+        "path": "scripts/snack-dom-source-context.mjs",
+        "sha256": "23b21f88da2f42527f832fe257d069233bfd51cc5dfa3e0c1819490166626e72",
+        "bytes": 45375
+      },
+      "new_literal_edits": [
+        {
+          "before": "source=reviewDialogPortalSource(root,tooltipPriorCallerRead({root,read}));",
+          "after": "source=reviewDialogPortalSource(root,tooltipPriorCallerRead({root,read}),{currentSourceRead:read});"
+        },
+        {
+          "before": "independently_qualified_native_test_source:qualifiedTest,...historicalSource",
+          "after": "independently_qualified_native_test_source:qualifiedTest,independently_qualified_silent_Sass_notices:qualifiedNotices,independently_qualified_contract_sources:qualifiedContracts,...historicalSource"
+        },
+        {
+          "before": " assert.equal(source.other_product_resource_members_unchanged,1140);",
+          "after": " assert.equal(qualifiedNotices,0);assert.equal(qualifiedContracts.length,4);for(const ref of qualifiedContracts){assert.equal((nativeSpec.qualify(ref)??ref).sha256,ref.sha256);assert.equal(hash(read(ref.path)),ref.sha256);}assert.equal(source.other_product_resource_members_unchanged,1140);"
+        },
+        {
+          "before": "return {line,delta,qualification,native_spec_source_successor:qualifiedTest,source_scope_only:true",
+          "after": "return {line,delta,qualification,native_spec_source_successor:qualifiedTest,contract_source_successors:qualifiedContracts,source_scope_only:true"
+        }
+      ],
+      "after": {
+        "path": "scripts/snack-dom-source-context.mjs",
+        "sha256": "34ec6270cb5d89135dcb1f0182561e7b3b9a415995c48a96ceeceed025b61a1d",
+        "bytes": 45789
+      }
+    }
+  ],
+  "g11_claim": "not-passed"
+}

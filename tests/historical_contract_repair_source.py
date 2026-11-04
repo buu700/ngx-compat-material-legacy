@@ -15,8 +15,8 @@ SOURCE = 'compatibility/rc/historical-contract-repair-source-inputs.json'
 READERS = 'compatibility/rc/historical-contract-repair-reader-inputs.json'
 SOURCE_PINS = {'21.x': 'c1d7a8762cad7913a5d4ad60863afb506c56c61d27a78c17a3f5372c51cc9303',
                'main': 'cee92383ce1cb2c82b135e2e3b8be0131a46b114d60a521f7e11e4d0bb017191'}
-READER_PINS = {'21.x': 'fe543d7ed6c5de19376c3adc47e6a1fed48ef47bc7ae0cbceca0b8c8fadfa8e5',
-               'main': 'b7c31ade21f888051e9a903819c89a19e82d536878f7c4d786d22dbae89bd157'}
+READER_PINS = {'21.x': 'ccc8a0261cd47a3b55cdea4b3d996d7189ac03288ffdb67f986ff5faebf9e17a',
+               'main': '702d6f65109297515ee1fc57810eaf8fe0a9f7148742ff8572d90824d57b2944'}
 
 
 def digest(raw):
@@ -124,7 +124,7 @@ def _tool_data(root):
     data = _registry(root, READERS, READER_PINS)
     assert data['canonical_dispositions_changed'] == data['product_changes'] == 0
     assert data['old_programs_executed'] is False
-    assert len(data['tool_transitions']) == (14 if data['line'] == '21.x' else 6)
+    assert len(data['tool_transitions']) == (15 if data['line'] == '21.x' else 7)
     assert len({row['path'] for row in data['tool_transitions']}) == len(data['tool_transitions'])
     ref = data['unchanged_source_subject']
     _identity(_read(root, ref['path']), ref)
