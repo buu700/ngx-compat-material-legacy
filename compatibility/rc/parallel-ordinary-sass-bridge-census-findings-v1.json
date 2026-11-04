@@ -1,0 +1,792 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-11-04T22:46:17.569252+00:00",
+  "decision": "Complete bounded source census; no product/gate/audit admission. Focused proof needs identified, not blanket failure findings.",
+  "worksheet": {
+    "path": "compatibility/rc/parallel-ordinary-sass-bridge-census-worksheet-v1.json",
+    "sha256": "b84fee32ae0114812880b401befad74c98a4367df377348004fecf192851f501",
+    "bytes": 1643
+  },
+  "censuses": {
+    "21.x": {
+      "path": "compatibility/rc/parallel-ordinary-sass-bridge-census-21x-v1.json",
+      "sha256": "5dafda5d1134bc3686d29f80ee4571afdfbc6d402768372878d45b9b6155fe24",
+      "bytes": 888526
+    },
+    "main": {
+      "path": "compatibility/rc/parallel-ordinary-sass-bridge-census-main-v1.json",
+      "sha256": "2965ce6f33e9c77ca83c259b7fb71ecb52a2ee82af602b2aaed6d63d2841ae88",
+      "bytes": 888451
+    }
+  },
+  "cached_evidence": {
+    "path": "compatibility/rc/parallel-ordinary-sass-bridge-census-cached-evidence-v1.json",
+    "sha256": "36a2d2cbf831ba9030e35c387c76ad7e90cfdd71ae084c88e3b0ff3e8de03e12",
+    "bytes": 21712
+  },
+  "counts_per_line": {
+    "classified_exports": 154,
+    "families": 38,
+    "owned_export_modules": 39,
+    "aggregate_companion_families": 13,
+    "aggregate_companion_exports": 53,
+    "other_ordinary_exports": 101,
+    "public_override_reachable_exports": 61,
+    "no_public_override_graph_exports": 93,
+    "empty_source_bodies": 12,
+    "unresolved_include_sites": 0
+  },
+  "minimum_installed_peers": {
+    "21.x": {
+      "material": "21.2.14",
+      "cdk": "21.2.14"
+    },
+    "main": {
+      "material": "22.1.7",
+      "cdk": "22.1.7"
+    }
+  },
+  "contract": {
+    "ordinary_export_obligation": "docs/03-sass-contract.md:42 covers all historical ordinary/current component mixins. The13 all-legacy ordinary companions in lines49ff are an aggregate membership subset, not a cap on the154 ordinary export obligations.",
+    "source_vs_output": "Historical ordinary call syntax and independently owned M2 intent must reach current official components. Old ordinary CSS equality is not current integration proof (doc03:45,117).",
+    "no_false_negative": "A missing direct overrides include is not a failure. Transitive public calls, matching current public tokens, direct CSS, and intentionally empty historical dimensions require individual interpretation."
+  },
+  "public_graph": {
+    "symbols_reaching_public_override": 61,
+    "aggregate_companion_symbols_reaching_public_override": 52,
+    "other_ordinary_symbols_reaching_public_override": 9,
+    "distinct_public_override_apis": [
+      "mat.badge-overrides",
+      "mat.bottom-sheet-overrides",
+      "mat.button-toggle-overrides",
+      "mat.datepicker-overrides",
+      "mat.divider-overrides",
+      "mat.expansion-overrides",
+      "mat.form-field-overrides",
+      "mat.grid-list-overrides",
+      "mat.icon-button-overrides",
+      "mat.icon-overrides",
+      "mat.progress-bar-overrides",
+      "mat.progress-spinner-overrides",
+      "mat.sidenav-overrides",
+      "mat.snack-bar-overrides",
+      "mat.sort-overrides",
+      "mat.stepper-overrides",
+      "mat.toolbar-overrides",
+      "mat.tree-overrides"
+    ],
+    "direct_export_body_public_calls": [
+      "progress-spinner-color",
+      "snack-bar-color",
+      "snack-bar-typography",
+      "datepicker-date-range-colors"
+    ],
+    "same_module_direct_or_local_helper_public_calls": [
+      "progress-bar-theme",
+      "progress-bar-color",
+      "progress-spinner-theme",
+      "progress-spinner-color",
+      "snack-bar-theme",
+      "snack-bar-color",
+      "snack-bar-typography",
+      "datepicker-date-range-colors"
+    ],
+    "interpretation": "The remaining53 public-reachable exports reach public overrides through companion/state helpers. icon-color is the53rd aggregate companion export and emits the already current --mat-icon-color token through owned token-utils instead."
+  },
+  "no_override_graph_partition": {
+    "empty-body": 12,
+    "other-owned-or-direct-path": 8,
+    "owned-token-utility": 24,
+    "vendor-and-token": 13,
+    "vendor-endpoint": 36
+  },
+  "empty_source_bodies": {
+    "symbols": [
+      "autocomplete-typography",
+      "autocomplete-density",
+      "fab-density",
+      "icon-button-typography",
+      "input-density",
+      "menu-density",
+      "progress-bar-typography",
+      "progress-bar-density",
+      "progress-spinner-typography",
+      "progress-spinner-density",
+      "slider-density",
+      "snack-bar-density"
+    ],
+    "all_tagged_default_oracle_css_bytes_zero": true,
+    "limit": "Retained original no-output metadata is not proof that every current state/dimension needs no integration."
+  },
+  "concrete_source_observations": [
+    {
+      "family": "checkbox",
+      "owned": "styles/checkbox/_checkbox-theme.scss:10 includes owned vendored MDC checkbox.theme, backed by m2/mdc/_checkbox.scss prefix(mdc,checkbox). Vendor checkbox theme prefix is checkbox; it calls keys.declare-custom-properties at line123.",
+      "current": "Both installed runtime checkbox modules consume --mat-checkbox-selected-icon-color; no literal --mdc-checkbox-selected-icon-color consumer was found in shipped non-testing Material FESM JS.",
+      "status": "Concrete token-name discrepancy; highest priority focused current checkbox proof. No compile/render failure claimed."
+    },
+    {
+      "family": "button",
+      "owned": "styles/button/_button-theme.scss:41 reaches vendor button-text-theme.theme. Vendor button-text-theme.scss:33 uses text-button prefix and line74 calls keys.declare-custom-properties.",
+      "current": "Both installed button runtimes consume --mat-button-text-label-text-color, not the old --mdc-text-button-label-text-color.",
+      "status": "Concrete token-name discrepancy; prove full variant/typography/density path rather than only old ordinary CSS parity."
+    },
+    {
+      "family": "option/optgroup/icon",
+      "owned": "Owned prefixes(mat,option),(mat,optgroup),(mat,icon) have10/6/1 lexical token keys, respectively.",
+      "current": "Every one of these names appears as a literal var consumer in both installed peers, including --mat-icon-color used by icon-color despite no public override include.",
+      "status": "Counterexample to classifying missing overrides as failure. Exact values, scope/state/cascade and public-API boundary still need proof."
+    },
+    {
+      "family": "form-field",
+      "owned": "color/theme reach the public state helper with exactly three state-layer tokens; typography/density retain separate historical paths.",
+      "status": "Existing three-token state proof cannot be generalized to every filled/outlined current form-field token or every ordinary form-field dimension."
+    },
+    {
+      "family": "dialog-legacy-padding/input",
+      "owned": "dialog-legacy-padding emits specific current-looking .mat-mdc-dialog-* selectors; input color/typography wrappers have empty content and density is empty.",
+      "status": "Direct CSS and transitive/no-output contracts need targeted responsibility/selector checks; neither becomes a required API mirror merely because current peer APIs expose more configuration."
+    }
+  ],
+  "family_matrix": [
+    {
+      "family": "autocomplete",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [
+        "autocomplete-typography",
+        "autocomplete-density"
+      ],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_autocomplete.scss": 1
+      },
+      "focus": "Confirm emitted owned MAT token values, current selector/cascade scope and intended empty dimensions against current public API/consumer source; matching names alone are insufficient."
+    },
+    {
+      "family": "badge",
+      "aggregate_companion": true,
+      "exports": 4,
+      "public_override_graph_exports": 4,
+      "no_public_override_graph_exports": 0,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_badge.scss": 9
+      },
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    },
+    {
+      "family": "bottom-sheet",
+      "aggregate_companion": true,
+      "exports": 4,
+      "public_override_graph_exports": 4,
+      "no_public_override_graph_exports": 0,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_bottom-sheet.scss": 8
+      },
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    },
+    {
+      "family": "button",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [
+        "button-theme",
+        "button-color",
+        "button-typography",
+        "button-density"
+      ],
+      "current_literal_token_hits": {},
+      "focus": "Prioritize exact current-consumer/name/value/selector proof for the historical MDC path; include all dimensions and primary/accent/warn + disabled/state cases. This source census alone does not declare rendered failure."
+    },
+    {
+      "family": "button-toggle",
+      "aggregate_companion": true,
+      "exports": 4,
+      "public_override_graph_exports": 4,
+      "no_public_override_graph_exports": 0,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_legacy-button-toggle.scss": 0,
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_standard-button-toggle.scss": 0
+      },
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    },
+    {
+      "family": "card",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [
+        "card-theme",
+        "card-color",
+        "card-typography",
+        "card-density"
+      ],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_card.scss": 11,
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_elevated-card.scss": 0,
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_outlined-card.scss": 0
+      },
+      "focus": "Separate matching owned MAT helper tokens from historical MDC component tokens; prove both parts, including density/typography and relevant states."
+    },
+    {
+      "family": "checkbox",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [
+        "checkbox-theme",
+        "checkbox-color",
+        "checkbox-typography",
+        "checkbox-density"
+      ],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_checkbox.scss": 0
+      },
+      "focus": "Prioritize exact current-consumer/name/value/selector proof for the historical MDC path; include all dimensions and primary/accent/warn + disabled/state cases. This source census alone does not declare rendered failure."
+    },
+    {
+      "family": "chips",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [
+        "chips-theme",
+        "chips-color",
+        "chips-typography",
+        "chips-density"
+      ],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_chip.scss": 0
+      },
+      "focus": "Prioritize exact current-consumer/name/value/selector proof for the historical MDC path; include all dimensions and primary/accent/warn + disabled/state cases. This source census alone does not declare rendered failure."
+    },
+    {
+      "family": "datepicker",
+      "aggregate_companion": true,
+      "exports": 5,
+      "public_override_graph_exports": 5,
+      "no_public_override_graph_exports": 0,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [
+        "datepicker-theme",
+        "datepicker-density"
+      ],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_datepicker.scss": 36
+      },
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    },
+    {
+      "family": "dialog",
+      "aggregate_companion": false,
+      "exports": 5,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 5,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [
+        "dialog-theme",
+        "dialog-color",
+        "dialog-typography"
+      ],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_dialog.scss": 0
+      },
+      "focus": "Prioritize exact current-consumer/name/value/selector proof for the historical MDC path; include all dimensions and primary/accent/warn + disabled/state cases. This source census alone does not declare rendered failure."
+    },
+    {
+      "family": "divider",
+      "aggregate_companion": true,
+      "exports": 4,
+      "public_override_graph_exports": 4,
+      "no_public_override_graph_exports": 0,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_divider.scss": 2
+      },
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    },
+    {
+      "family": "expansion",
+      "aggregate_companion": true,
+      "exports": 4,
+      "public_override_graph_exports": 4,
+      "no_public_override_graph_exports": 0,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_expansion.scss": 22
+      },
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    },
+    {
+      "family": "fab",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [
+        "fab-density"
+      ],
+      "vendor_reachable_exports": [
+        "fab-theme",
+        "fab-color",
+        "fab-typography"
+      ],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_fab.scss": 0,
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_extended-fab.scss": 0
+      },
+      "focus": "Prioritize exact current-consumer/name/value/selector proof for the historical MDC path; include all dimensions and primary/accent/warn + disabled/state cases. This source census alone does not declare rendered failure."
+    },
+    {
+      "family": "form-field",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 2,
+      "no_public_override_graph_exports": 2,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [
+        "form-field-theme",
+        "form-field-color",
+        "form-field-typography"
+      ],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_filled-text-field.scss": 0,
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_outlined-text-field.scss": 0,
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_form-field.scss": 12
+      },
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    },
+    {
+      "family": "grid-list",
+      "aggregate_companion": true,
+      "exports": 4,
+      "public_override_graph_exports": 4,
+      "no_public_override_graph_exports": 0,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_grid-list.scss": 4
+      },
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    },
+    {
+      "family": "icon",
+      "aggregate_companion": true,
+      "exports": 4,
+      "public_override_graph_exports": 3,
+      "no_public_override_graph_exports": 1,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_icon.scss": 1
+      },
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    },
+    {
+      "family": "icon-button",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [
+        "icon-button-typography"
+      ],
+      "vendor_reachable_exports": [
+        "icon-button-theme",
+        "icon-button-color",
+        "icon-button-density"
+      ],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_icon-button.scss": 0
+      },
+      "focus": "Prioritize exact current-consumer/name/value/selector proof for the historical MDC path; include all dimensions and primary/accent/warn + disabled/state cases. This source census alone does not declare rendered failure."
+    },
+    {
+      "family": "input",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [
+        "input-density"
+      ],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {},
+      "focus": "Confirm historical no-output responsibility and form-field/transitive styling relationship; do not invent a modern input theme mirror just because the current peer exposes more knobs."
+    },
+    {
+      "family": "list",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [
+        "list-theme",
+        "list-color",
+        "list-typography",
+        "list-density"
+      ],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_checkbox.scss": 0,
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_radio.scss": 0,
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_list.scss": 0
+      },
+      "focus": "Prioritize exact current-consumer/name/value/selector proof for the historical MDC path; include all dimensions and primary/accent/warn + disabled/state cases. This source census alone does not declare rendered failure."
+    },
+    {
+      "family": "menu",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [
+        "menu-density"
+      ],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_menu.scss": 11
+      },
+      "focus": "Confirm emitted owned MAT token values, current selector/cascade scope and intended empty dimensions against current public API/consumer source; matching names alone are insufficient."
+    },
+    {
+      "family": "optgroup",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_optgroup.scss": 6
+      },
+      "focus": "Confirm emitted owned MAT token values, current selector/cascade scope and intended empty dimensions against current public API/consumer source; matching names alone are insufficient."
+    },
+    {
+      "family": "option",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_option.scss": 10
+      },
+      "focus": "Confirm emitted owned MAT token values, current selector/cascade scope and intended empty dimensions against current public API/consumer source; matching names alone are insufficient."
+    },
+    {
+      "family": "paginator",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_paginator.scss": 11
+      },
+      "focus": "Confirm emitted owned MAT token values, current selector/cascade scope and intended empty dimensions against current public API/consumer source; matching names alone are insufficient."
+    },
+    {
+      "family": "progress-bar",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 2,
+      "no_public_override_graph_exports": 2,
+      "empty_source_bodies": [
+        "progress-bar-typography",
+        "progress-bar-density"
+      ],
+      "vendor_reachable_exports": [
+        "progress-bar-theme",
+        "progress-bar-color"
+      ],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_linear-progress.scss": 0
+      },
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    },
+    {
+      "family": "progress-spinner",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 2,
+      "no_public_override_graph_exports": 2,
+      "empty_source_bodies": [
+        "progress-spinner-typography",
+        "progress-spinner-density"
+      ],
+      "vendor_reachable_exports": [
+        "progress-spinner-theme",
+        "progress-spinner-color"
+      ],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_circular-progress.scss": 0
+      },
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    },
+    {
+      "family": "radio",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [
+        "radio-theme",
+        "radio-color",
+        "radio-typography",
+        "radio-density"
+      ],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_radio.scss": 0,
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_radio.scss": 3
+      },
+      "focus": "Separate matching owned MAT helper tokens from historical MDC component tokens; prove both parts, including density/typography and relevant states."
+    },
+    {
+      "family": "select",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_select.scss": 13
+      },
+      "focus": "Confirm emitted owned MAT token values, current selector/cascade scope and intended empty dimensions against current public API/consumer source; matching names alone are insufficient."
+    },
+    {
+      "family": "sidenav",
+      "aggregate_companion": true,
+      "exports": 4,
+      "public_override_graph_exports": 4,
+      "no_public_override_graph_exports": 0,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_sidenav.scss": 7
+      },
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    },
+    {
+      "family": "slide-toggle",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [
+        "slide-toggle-theme",
+        "slide-toggle-color",
+        "slide-toggle-typography",
+        "slide-toggle-density"
+      ],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_switch.scss": 0,
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_slide-toggle.scss": 5
+      },
+      "focus": "Separate matching owned MAT helper tokens from historical MDC component tokens; prove both parts, including density/typography and relevant states."
+    },
+    {
+      "family": "slider",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [
+        "slider-density"
+      ],
+      "vendor_reachable_exports": [
+        "slider-theme",
+        "slider-color",
+        "slider-typography"
+      ],
+      "current_literal_token_hits": {},
+      "focus": "Prioritize exact current-consumer/name/value/selector proof for the historical MDC path; include all dimensions and primary/accent/warn + disabled/state cases. This source census alone does not declare rendered failure."
+    },
+    {
+      "family": "snack-bar",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 3,
+      "no_public_override_graph_exports": 1,
+      "empty_source_bodies": [
+        "snack-bar-density"
+      ],
+      "vendor_reachable_exports": [
+        "snack-bar-theme",
+        "snack-bar-color",
+        "snack-bar-typography"
+      ],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_snack-bar.scss": 0,
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_snack-bar.scss": 1
+      },
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    },
+    {
+      "family": "sort",
+      "aggregate_companion": true,
+      "exports": 4,
+      "public_override_graph_exports": 4,
+      "no_public_override_graph_exports": 0,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {},
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    },
+    {
+      "family": "stepper",
+      "aggregate_companion": true,
+      "exports": 4,
+      "public_override_graph_exports": 4,
+      "no_public_override_graph_exports": 0,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_stepper.scss": 26
+      },
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    },
+    {
+      "family": "table",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_table.scss": 23
+      },
+      "focus": "Confirm emitted owned MAT token values, current selector/cascade scope and intended empty dimensions against current public API/consumer source; matching names alone are insufficient."
+    },
+    {
+      "family": "tabs",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [
+        "tabs-theme",
+        "tabs-color",
+        "tabs-typography",
+        "tabs-density"
+      ],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_tab.scss": 0,
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_tab-indicator.scss": 0,
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_tab-header.scss": 0,
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_tab-header-with-background.scss": 0
+      },
+      "focus": "Prioritize exact current-consumer/name/value/selector proof for the historical MDC path; include all dimensions and primary/accent/warn + disabled/state cases. This source census alone does not declare rendered failure."
+    },
+    {
+      "family": "toolbar",
+      "aggregate_companion": true,
+      "exports": 4,
+      "public_override_graph_exports": 4,
+      "no_public_override_graph_exports": 0,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_toolbar.scss": 9
+      },
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    },
+    {
+      "family": "tooltip",
+      "aggregate_companion": false,
+      "exports": 4,
+      "public_override_graph_exports": 0,
+      "no_public_override_graph_exports": 4,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [
+        "tooltip-theme",
+        "tooltip-color",
+        "tooltip-typography",
+        "tooltip-density"
+      ],
+      "current_literal_token_hits": {
+        "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_plain-tooltip.scss": 0
+      },
+      "focus": "Prioritize exact current-consumer/name/value/selector proof for the historical MDC path; include all dimensions and primary/accent/warn + disabled/state cases. This source census alone does not declare rendered failure."
+    },
+    {
+      "family": "tree",
+      "aggregate_companion": true,
+      "exports": 4,
+      "public_override_graph_exports": 4,
+      "no_public_override_graph_exports": 0,
+      "empty_source_bodies": [],
+      "vendor_reachable_exports": [],
+      "current_literal_token_hits": {},
+      "focus": "Review the existing finite bridge receipt scope against current source hashes; prove uncovered direct/config/variant/dimension paths and actual component integration separately."
+    }
+  ],
+  "cross_line_owned_sources": {
+    "captured_owned_input_count": 130,
+    "differences": [
+      {
+        "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+        "21x": {
+          "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+          "sha256": "64c427d112619d01c45815a9b401323e09b2767076a9d1371ee27333d7384382",
+          "bytes": 34929
+        },
+        "main": {
+          "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+          "sha256": "aaa2dd4dfbd9442349523e8ce34164c5c053cd511b975fad2385bdd97f9c7c9c",
+          "bytes": 34933
+        }
+      }
+    ],
+    "interpretation": "All39 export module bytes and their forward/mixin graph agree. The companion helper intentionally differs at three existing21/22 public-peer mappings: expansion and sidenav elevation dimension placement; stepper focus/hover shape0vs4px."
+  },
+  "validation": {
+    "physical_source_bindings_rehashed": {
+      "21.x": 214,
+      "main": 214
+    },
+    "unique_exact_forward_to_local_mixin": 154,
+    "installed_public_override_exports_and_mixin_definitions_checked_per_line": 38,
+    "unresolved_owned_include_sites": 0,
+    "new_sass_compiles": 0,
+    "runtime_or_native_runs": 0,
+    "build_install_network_owner_matrix_actions": false,
+    "existing_files_changed": false,
+    "acceptance_claims": {
+      "runtime": false,
+      "native": false,
+      "floor_qualification": false,
+      "C02": false,
+      "C04": false,
+      "full_audit": false,
+      "canonical": false
+    }
+  },
+  "remaining": "Separate bounded current bridge source/CSS proofs from required current component browser/lifecycle/coexistence evidence. No154-wide integration closure follows from cached old ordinary CSS equality."
+}
