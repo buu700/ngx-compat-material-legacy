@@ -1,0 +1,484 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "b3e4d576b9f0060bb1110766d74c982e4620b2a6",
+  "status": "source-review-complete-no-owned-product-defect-proved",
+  "proposed_final_disposition": "already-adapted",
+  "decision": "The complete two-file/seven-hunk change adds a public CDK connected-overlay opt-in. Both installed public peers already own this feature. Preserve tagged legacy defaults and existing public peer delegation; add no owned CDK/directive mirror, no new legacy component input, and no navigation policy change.",
+  "original_authentication": {
+    "files": 2,
+    "hunks": 7,
+    "trees": 27,
+    "patch_sha256": "d6faf32cab84328138ae04bbfff409dff41a84dac56b813c5def4a7ef39592ca",
+    "tag": "16.2.14",
+    "tagged_members": 16,
+    "anonymous_missing_blob_reads": 8,
+    "anonymous_patch_reads": 1,
+    "shared_cache_modified": false,
+    "all_hunks_exactly_replayed": true,
+    "census_omitted_from_seed": [
+      "tools/public_api_guard/cdk/overlay.md"
+    ]
+  },
+  "hunk_decisions": [
+    {
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "index": 1,
+      "header": "@@ -24,6 +24,7 @@ import {",
+      "sha256": "46091e1327139b454e27c3f248c95f4cf72eceb4071fe0f8f6ab13d8027453ed",
+      "source_judgment": "Angular booleanAttribute import exists only to transform the new CDK input. The owned package does not own or fork the CDK directive; both installed peers already supply it.",
+      "proposed_source_disposition": "already-adapted",
+      "owned_product_change_required": false,
+      "runtime_native_or_floor_qualified": false
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "index": 2,
+      "header": "@@ -112,6 +113,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "sha256": "3f887f1214a13ee3ab2f0f2e8ad7a9c477f0ba03b154b876b997b41269702d7b",
+      "source_judgment": "New directive backing state defaults false. Preserve the same default for owned select and all manual overlay constructors.",
+      "proposed_source_disposition": "already-adapted",
+      "owned_product_change_required": false,
+      "runtime_native_or_floor_qualified": false
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "index": 3,
+      "header": "@@ -230,6 +232,15 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "sha256": "1e6bb5b374292539b4b92e412f52f3468f05d9c48933b5ba00ee2b1b5cbb19e1",
+      "source_judgment": "New CDK input alias and public boolean property are already public on both supported peer versions. Do not mirror this as a new MatLegacySelect or other owned input.",
+      "proposed_source_disposition": "already-adapted",
+      "owned_product_change_required": false,
+      "runtime_native_or_floor_qualified": false
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "index": 4,
+      "header": "@@ -335,6 +346,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "sha256": "6e58b727a6e01069ea0f3b58a48b7ad0b7116356af4b9bb1f044088d12eb56be",
+      "source_judgment": "The new property is copied into OverlayConfig when the peer directive first creates its overlay. Existing manual OverlayConfig callers already use the public overlay contract and are not changed by this hunk.",
+      "proposed_source_disposition": "already-adapted",
+      "owned_product_change_required": false,
+      "runtime_native_or_floor_qualified": false
+    },
+    {
+      "path": "tools/public_api_guard/cdk/overlay.md",
+      "index": 1,
+      "header": "@@ -53,6 +53,8 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "sha256": "2786007b229224ef521e4f6d0c9386532c1e0528b4136354dc9fd52d8689d9c4",
+      "source_judgment": "Public API getter/setter golden documents the peer directive addition; the owned package must not copy current CDK declarations into its own API.",
+      "proposed_source_disposition": "already-adapted",
+      "owned_product_change_required": false,
+      "runtime_native_or_floor_qualified": false
+    },
+    {
+      "path": "tools/public_api_guard/cdk/overlay.md",
+      "index": 2,
+      "header": "@@ -65,6 +67,8 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "sha256": "2eeb71aa76f4bed4108232353770295c81f1dafb447790a3038ff4a443cb908f",
+      "source_judgment": "The accepted input type declaration records Angular input transformation. It is not proof that assigning an arbitrary string directly to a boolean TypeScript property is equivalent to template input coercion.",
+      "proposed_source_disposition": "already-adapted",
+      "owned_product_change_required": false,
+      "runtime_native_or_floor_qualified": false
+    },
+    {
+      "path": "tools/public_api_guard/cdk/overlay.md",
+      "index": 3,
+      "header": "@@ -88,7 +92,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "sha256": "cc0f2c4b584c20e5e7eae4222f7f208151269187cf4dfaabe24194eebc6a2d85",
+      "source_judgment": "The directive input alias metadata is part of the real CDK surface. The alias applies to CdkConnectedOverlay, not the legacy select component selector.",
+      "proposed_source_disposition": "already-adapted",
+      "owned_product_change_required": false,
+      "runtime_native_or_floor_qualified": false
+    }
+  ],
+  "installed_peer_review": [
+    {
+      "version": "21.2.14",
+      "public_peer_feature_present": true,
+      "default": false,
+      "input_alias": "cdkConnectedOverlayDisposeOnNavigation",
+      "property": "disposeOnNavigation",
+      "attribute_transform": "booleanAttribute",
+      "creation_config_mapping": true,
+      "later_shorthand_config_supported": true,
+      "location_subscription": "Location.subscribe, not Router.events",
+      "dialog_config_field_is_distinct": "closeOnNavigation -> OverlayConfig.disposeOnNavigation",
+      "source_only": true,
+      "runtime_executed": false
+    },
+    {
+      "version": "22.1.7",
+      "public_peer_feature_present": true,
+      "default": false,
+      "input_alias": "cdkConnectedOverlayDisposeOnNavigation",
+      "property": "disposeOnNavigation",
+      "attribute_transform": "booleanAttribute",
+      "creation_config_mapping": true,
+      "later_shorthand_config_supported": true,
+      "location_subscription": "Location.subscribe, not Router.events",
+      "dialog_config_field_is_distinct": "closeOnNavigation -> OverlayConfig.disposeOnNavigation",
+      "source_only": true,
+      "runtime_executed": false
+    }
+  ],
+  "caller_review": [
+    {
+      "family": "select",
+      "route": "MatLegacySelect template -> imported public OverlayModule -> CdkConnectedOverlay; ViewChild has actual CdkConnectedOverlay identity",
+      "default": "No disposeOnNavigation input is bound, so peer default false remains unless a consumer supplies public CDK default configuration.",
+      "lifetime": "Peer directive disposes on destruction; owned select clears motion state, streams and key manager on destruction. Internal attach/detach callbacks remain wired to owned close state."
+    },
+    {
+      "family": "dialog",
+      "route": "MatLegacyDialogConfig extends the current public MatDialogConfig; owned base spreads defaults/config into public CDK Dialog.open; peer maps closeOnNavigation to OverlayConfig.disposeOnNavigation",
+      "default": "closeOnNavigation inherits public true; consumer false remains distinct from disableClose and from overlay-level input alias.",
+      "lifetime": "Owned DialogRef handles actual peer-overlay detachments and completes legacy close state. CDK closeOnOverlayDetachments is disabled so that owned lifetime handling remains authoritative."
+    },
+    {
+      "family": "manual dialog construction",
+      "route": "Existing tests construct a legacy container around an explicitly supplied public OverlayRef",
+      "lifetime": "A container is not a Dialog.open service call. The caller-supplied OverlayConfig controls navigation disposal; do not add a container Location subscription or infer that a dialog config mutates a separately created OverlayRef."
+    },
+    {
+      "family": "autocomplete",
+      "route": "Owned trigger -> public Overlay.create(new OverlayConfig(...))",
+      "default": "No navigation opt-in, same as tagged16. Trigger destroy disposes/nulls the retained OverlayRef; detachments participate in panel closing."
+    },
+    {
+      "family": "menu",
+      "route": "Owned trigger -> public OverlayConfig / Overlay.create",
+      "default": "No navigation opt-in, same as tagged16. Menu closes through backdrop/parent/hover/detachments; destroy detaches/disposes the owned retained reference and unsubscribes close/keyboard work."
+    },
+    {
+      "family": "tooltip",
+      "route": "Owned tooltip -> public Overlay.create(config object)",
+      "default": "No navigation opt-in, same as tagged16. Detachments hide/detach the tooltip; directive destroy disposes its overlay and owned subscriptions."
+    },
+    {
+      "family": "snack bar",
+      "route": "Owned service -> new public OverlayConfig -> Overlay.create",
+      "default": "No navigation opt-in, same as tagged16. Owned dismiss/exit timing reaches _finishDismiss and disposes its overlay; do not silently make navigation an early-dismiss trigger."
+    }
+  ],
+  "identity_and_timing_limits": [
+    "The input alias cdkConnectedOverlayDisposeOnNavigation, directive boolean property disposeOnNavigation, OverlayConfig.disposeOnNavigation and DialogConfig.closeOnNavigation are distinct surfaces. Their mapping is proved only at the inspected public peer implementation boundaries.",
+    "Template booleanAttribute coercion is not the same as arbitrary direct property assignment or later shorthand config assignment.",
+    "Both current directives copy disposeOnNavigation during overlay creation; ngOnChanges only updates position/size/open here. Do not assume changing the property after creation updates an existing OverlayRef config.",
+    "Both peers also offer CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG and later shorthand config. No such override was found in owned or readonly Cyph production sources; preserve consumer opt-in capability instead of hard-coding a new legacy policy.",
+    "Disposal subscribes to Angular Location, covering browser history and location strategy behavior. It is not a blanket Router NavigationStart listener and does not promise closing on every programmatic route transition."
+  ],
+  "cyph_sanity": {
+    "readonly": true,
+    "legacy_dialog_alias_import": true,
+    "legacy_dialog_service_calls_present": true,
+    "explicit_navigation_flag_or_connected_overlay_binding_found": false,
+    "no_consumer_HTML_CSS_or_SCSS_change_required_by_recommendation": true,
+    "scope": "Read the actual material dialog service and module; searched TypeScript/HTML under shared/js/cyph for navigation flags and connected-overlay configuration. This is not a Cyph build or behavioral qualification."
+  },
+  "concrete_owned_bug": null,
+  "evidence": [
+    {
+      "path": "compatibility/rc/parallel-overlay-dispose-navigation-originals.json.gz",
+      "sha256": "ed6a440a2639c278d64f24da0c7867d53a0cb11bc6c7ae073a99117020efe53a",
+      "bytes": 74115
+    },
+    {
+      "path": "compatibility/rc/parallel-overlay-dispose-navigation-whole-original.patch",
+      "sha256": "d6faf32cab84328138ae04bbfff409dff41a84dac56b813c5def4a7ef39592ca",
+      "bytes": 7271
+    },
+    {
+      "path": "compatibility/rc/parallel-overlay-dispose-navigation-capture.py",
+      "sha256": "ef66c5dfa7a28cba832547ef64f77468474a7994a3e26c52636fbb76fe4939a9",
+      "bytes": 10308
+    },
+    {
+      "path": "compatibility/rc/parallel-overlay-dispose-navigation-record-review.py",
+      "sha256": "ffadd59182029e823f7cba599f0daf4c8f46d3fdb3ebc618f683d0d32eb74c36",
+      "bytes": 16506
+    }
+  ],
+  "read_only_canonical_context": {
+    "reference": {
+      "path": "compatibility/f10/disposition-ledger/ledger.json",
+      "sha256": "e9ef5c0bf543977809134c3367cf9a33bdda62233ab6b944dc3c4e4ac101585e",
+      "bytes": 4191043
+    },
+    "entries": 1697,
+    "security_review_entries": 1,
+    "closed_dispositions": 426,
+    "open_or_deferred": 1271,
+    "current_selected_disposition": "needs-individual-review",
+    "role": "Acquisition-time status only; this review changes no canonical metadata and grants no live owner acceptance."
+  },
+  "runtime_lifecycle_tests_required_before_behavior_or_floor_claim": [
+    "On each installed minimum peer, exercise the real public CDK directive default false and true/false input transformation before first creation. Verify actual OverlayRef config and exact detach/dispose counts.",
+    "With a real Angular Location/MockLocation, exercise back/forward pop events and hash strategy separately from Router programmatic navigation. True disposes once, false preserves attachment, and explicit detach/destroy releases subscriptions.",
+    "Preserve legacy dialog default navigation close and closeOnNavigation:false opt-out independently of disableClose. Verify beforeClosed/afterClosed, openDialogs/afterAllClosed cleanup, focus restoration and exactly-once events when navigation overlaps enter/exit and reentrant close.",
+    "Test public CDK default-config opt-in only on real connected overlays, including the legacy select internal directive; verify closing state, destruction, navigation while exiting and attempted reopen after disposal. Do not assume a stale disposed overlay can be reused.",
+    "Keep menu/autocomplete/tooltip/snack-bar no-opt-in navigation behavior and route destruction cleanup. For any future opt-in change, explicitly prove lifetime/animation/cleanup ordering and review targeted styles.",
+    "For manually constructed containers/refs, distinguish a caller-created OverlayConfig false/true from a separate MatLegacyDialogConfig. Verify only the supplied overlay determines navigation disposal and no duplicate location listener or close notification is introduced."
+  ],
+  "verification": {
+    "whole_original_authentication_and_patch_replay_executed": true,
+    "current_public_peer_and_owned_source_assertions_executed": true,
+    "Angular_or_upstream_program_executed": false,
+    "runtime_lifecycle_tests_executed": false,
+    "compiler_build_browser_install_full_owner_Actions_or_matrix_executed": false
+  },
+  "source_bindings": [
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "node_modules/@angular/cdk/package.json",
+      "sha256": "10c398ae1ae4854e4c98b3715f8e0f225e34b7773fa3c582f11d67852a003ea9",
+      "bytes": 5041,
+      "role": "installed public CDK identity"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "node_modules/@angular/cdk/types/overlay.d.ts",
+      "sha256": "e15e46ec3d671453aa3be897938cf04b0c29dbdd20480def6d57ebfae53c2499",
+      "bytes": 14625,
+      "role": "public overlay exports"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "node_modules/@angular/cdk/types/_overlay-module-chunk.d.ts",
+      "sha256": "7d89742d60a006d1ccf044a451c774f6baf4f54f41b61c7f309346b9ce84f6cf",
+      "bytes": 45193,
+      "role": "actual public declaration source"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "node_modules/@angular/cdk/fesm2022/_overlay-module-chunk.mjs",
+      "sha256": "16d7e3baa590f2ed9c355b7cc3e87882ee517716cba3a7ea6a95eb0c88231627",
+      "bytes": 92570,
+      "role": "actual installed CDK implementation"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "node_modules/@angular/cdk/fesm2022/dialog.mjs",
+      "sha256": "74f639c81356a04f11e7fcc94668a17da882737a1104cba769f137a57931839c",
+      "bytes": 24088,
+      "role": "actual installed CDK Dialog navigation mapping"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "node_modules/@angular/cdk/types/dialog.d.ts",
+      "sha256": "5d9ab0026ebe92d3607fecb58df3721106f8c63534f2601fc3c387c2e2245d97",
+      "bytes": 19836,
+      "role": "public CDK Dialog config"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "node_modules/@angular/material/package.json",
+      "sha256": "26af34e77987b55564689c8eb7b5352db661d6a737fdec2160417ae42114f355",
+      "bytes": 11422,
+      "role": "installed Material identity"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "node_modules/@angular/material/types/_dialog-chunk.d.ts",
+      "sha256": "5b7d310181e68e89fbdf0d8bfec48151cb5802098c08921fed6e059b406a30e6",
+      "bytes": 14485,
+      "role": "public Material Dialog config"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+      "path": "node_modules/@angular/cdk/package.json",
+      "sha256": "ec60a5803a214c9b9d8bcdc2de0b0c294ecdd420d680d0e95e686f7aa4d46933",
+      "bytes": 5084,
+      "role": "installed public CDK identity"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+      "path": "node_modules/@angular/cdk/types/overlay.d.ts",
+      "sha256": "0b85f5bf55a586129ab50acaf40d6c38616f84e49f6c1b73fb0b09600596b879",
+      "bytes": 14509,
+      "role": "public overlay exports"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+      "path": "node_modules/@angular/cdk/types/_overlay-module-chunk.d.ts",
+      "sha256": "8f6af024f02ebd819c54fa1e5568d6992f4be9cda2f17b331cd7a765f04568ae",
+      "bytes": 45138,
+      "role": "actual public declaration source"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+      "path": "node_modules/@angular/cdk/fesm2022/_overlay-module-chunk.mjs",
+      "sha256": "19811e7834a48d0a7358b5489487d8c025e51d0efe2f14c7881a0d91be736c8b",
+      "bytes": 91804,
+      "role": "actual installed CDK implementation"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+      "path": "node_modules/@angular/cdk/fesm2022/dialog.mjs",
+      "sha256": "715d0f484af26b104b4d043243a9de7cc945d0a34b3175e291ad0f56b08f2c29",
+      "bytes": 23982,
+      "role": "actual installed CDK Dialog navigation mapping"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+      "path": "node_modules/@angular/cdk/types/dialog.d.ts",
+      "sha256": "8dd71a94aa0b86f248133bbc5855fea745edc5531dd616758824f9914a01e3d0",
+      "bytes": 19947,
+      "role": "public CDK Dialog config"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+      "path": "node_modules/@angular/material/package.json",
+      "sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+      "bytes": 11420,
+      "role": "installed Material identity"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+      "path": "node_modules/@angular/material/types/_dialog-chunk.d.ts",
+      "sha256": "68ff25264ce881a59cc9e3de12b094e355c20e11da7385641eb69fbb52311c0e",
+      "bytes": 14630,
+      "role": "public Material Dialog config"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "projects/ngx-material-legacy/legacy-select/select.html",
+      "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da",
+      "bytes": 2792,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "projects/ngx-material-legacy/legacy-select/select-module.ts",
+      "sha256": "d1e33d55f044bc8e5679afc4f1122af99fab9dfa2576f0401ecfbf548a4959dd",
+      "bytes": 1221,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91",
+      "bytes": 46281,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog-config.ts",
+      "sha256": "74f93ae9a4e82f27f12ff7edee36dd3eb1783cbf70b49f4b3cd72f613a0aec05",
+      "bytes": 1780,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog.ts",
+      "sha256": "7f7250274cdd11c1e71474553fc7387843262265f8b44c49339b2467abd68f5d",
+      "bytes": 2973,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog-ref.ts",
+      "sha256": "5807dd454c82b5b328166da9dbf1a165dc7c2743c6c15737571694e2fe475b3c",
+      "bytes": 9377,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+      "sha256": "dafa2038f78994e281943deca66dc8ade6628abceeb45b6f64deec9c00a2ff4c",
+      "bytes": 7337,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+      "sha256": "fb30039e5c9ed9f906de8a734eeeb27c1e5f2a797ed3663225f6e405f737be04",
+      "bytes": 11196,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+      "sha256": "dfc5961661c06ae15f186d25846f4a40f61880ac2c09e9975e0d9faabbbdea2b",
+      "bytes": 94027,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1",
+      "bytes": 40967,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+      "sha256": "f1e499dae58e12e8333ef81e480d069d93599cadda29ed2df32262e44d6c45a8",
+      "bytes": 26780,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+      "sha256": "fc29490be443cdb544e553f762be572fb4e6635216ad47dbb492a5dffa113aad",
+      "bytes": 35820,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+      "sha256": "293baf9806cc7bc0c53ab5a68c745536d79e40e3e2a82928b9515361dbdf302f",
+      "bytes": 11168,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-ref.ts",
+      "sha256": "de41a41cb3c2fdd192d3548f62206cf1da625603bb26f35b2479d5f9fe8236de",
+      "bytes": 4129,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+      "sha256": "1b673f43bacbcf47ea0e504ff3f191d84289e7c7337b20b93e8b5b98e833eb08",
+      "bytes": 13945,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "tests/dialog_caller_owned_contract_subject.mjs",
+      "sha256": "8fa3b55b2fa4f5879f1127382e38e534c075ff9cdff4adac456635a92888badb",
+      "bytes": 21129,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "path": "tests/dialog_caller_owned_service_subject.mjs",
+      "sha256": "8c9be68aa8eff9d6d7ac2536d1516031335dd26688c1a154ff4c63ea5095252d",
+      "bytes": 10122,
+      "role": "owned caller/config/lifetime or existing source test"
+    },
+    {
+      "root": "/home/parallels/cyph",
+      "path": "shared/js/cyph/services/material-dialog.service.ts",
+      "sha256": "d11742c45d78e36da36fcba72e9869571c28768fe8827208e066f87f98ecb9b1",
+      "bytes": 14208,
+      "role": "readonly Cyph integration sanity"
+    },
+    {
+      "root": "/home/parallels/cyph",
+      "path": "shared/js/cyph/modules/cyph-web.module.ts",
+      "sha256": "edc9a64ad271ba3f697a98d1a4a30c43e58d720426088c762949593d4b11b8c0",
+      "bytes": 8388,
+      "role": "readonly Cyph integration sanity"
+    }
+  ],
+  "canonical_decisions_or_registry_or_roster_changes": 0,
+  "product_changes": 0,
+  "all_1697_entries_and_one_security_review_entry_preserved": true,
+  "canonical_admission_granted": false,
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed",
+  "full_audit_plan_closed": false
+}

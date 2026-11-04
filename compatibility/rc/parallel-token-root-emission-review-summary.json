@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "kind": "two-separate-individual-token-root-source-review-summary",
+  "status": "complete for bounded reviews; separate companion repair triage required",
+  "reviews": [
+    "compatibility/rc/parallel-token-root-emission-spinner-review.json",
+    "compatibility/rc/parallel-token-root-emission-snack-review.json"
+  ],
+  "original_patches": 2,
+  "authenticated_commits": 5,
+  "authenticated_blobs_and_tree_chains": 10,
+  "source_negative_controls_rejected": 16,
+  "actual_compiler_emission_executed": true,
+  "compile_calls_total": 2,
+  "compiler_results": [
+    {
+      "line": "21",
+      "path": "compatibility/rc/parallel-token-root-emission-compiled-21.json",
+      "sha256": "9b591b0c57bec0b724acbbd7bed37587fb0c9d1857d845f91917b7d1e535d319",
+      "bytes": 80103,
+      "compiler": "dart-sass\t1.104.1\t(Sass Compiler)\t[Dart]\ndart2js\t3.13.3\t(Dart Compiler)\t[Dart]",
+      "actual_material_minimum": "21.2.14",
+      "elapsed_ms": 430.83087600000005,
+      "css_sha256": "2e9e47fee518838cdb67446d5171dc05556f45d89d692a3246bd22fb6ae191b9",
+      "css_bytes": 1927
+    },
+    {
+      "line": "main",
+      "path": "compatibility/rc/parallel-token-root-emission-compiled-main.json",
+      "sha256": "06951c27608b66ce128fff0c3b440914959b26be44eeda4bbace7adf1f79e2e2",
+      "bytes": 81205,
+      "compiler": "dart-sass\t1.104.1\t(Sass Compiler)\t[Dart]\ndart2js\t3.13.3\t(Dart Compiler)\t[Dart]",
+      "actual_material_minimum": "22.1.7",
+      "elapsed_ms": 442.41762499999993,
+      "css_sha256": "2e9e47fee518838cdb67446d5171dc05556f45d89d692a3246bd22fb6ae191b9",
+      "css_bytes": 1927
+    }
+  ],
+  "findings": [
+    {
+      "sha": "f8252d816806b4fff18bb5f7d313a8edca774459",
+      "owned_file": "projects/ngx-material-legacy/styles/progress-spinner/_progress-spinner-theme.scss",
+      "public_symbols": [
+        "progress-spinner-color",
+        "progress-spinner-theme"
+      ],
+      "actual_minimum_public_api": "@angular/material progress-spinner-overrides((active-indicator-color: value))",
+      "source_and_compiled_gap": "Historical --mdc-circular-progress-active-indicator-color is emitted; actual current circle CSS reads --mat-progress-spinner-active-indicator-color.",
+      "both_minimum_peers": [
+        "21.2.14",
+        "22.1.7"
+      ]
+    },
+    {
+      "sha": "6c724c713fb0510b32ce302a51f1d9d15df4b668",
+      "owned_file": "projects/ngx-material-legacy/styles/snack-bar/_snack-bar-theme.scss",
+      "public_symbols": [
+        "snack-bar-color",
+        "snack-bar-typography",
+        "snack-bar-theme"
+      ],
+      "actual_minimum_public_api": "@angular/material snack-bar-overrides with container-color, supporting-text-color/font/size/weight/line-height; button-color also accepted and already matched historically",
+      "source_and_compiled_gap": "Historical --mdc-snackbar container/text/font tokens are emitted; actual current surface/label CSS reads --mat-snack-bar equivalents. Existing --mat-snack-bar-button-color already matches.",
+      "both_minimum_peers": [
+        "21.2.14",
+        "22.1.7"
+      ]
+    }
+  ],
+  "recommendation": "Do not transplant either root-selector relocation. Preserve raw historical selectors, arguments/maps/model and legacy direct styling; parent should create a separate focused current-public-overrides bridge repair worksheet under the existing C02 contract. No owner question is required by these source findings.",
+  "source_admission_count_changes": 0,
+  "product_or_existing_shared_inputs_changed": false,
+  "computed_style_build_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

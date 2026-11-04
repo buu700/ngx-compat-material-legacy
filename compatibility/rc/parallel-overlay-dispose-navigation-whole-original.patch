@@ -1,0 +1,75 @@
+diff --git a/src/cdk/overlay/overlay-directives.ts b/src/cdk/overlay/overlay-directives.ts
+index 8abfbbaeace1..1e310def7d73 100644
+--- a/src/cdk/overlay/overlay-directives.ts
++++ b/src/cdk/overlay/overlay-directives.ts
+@@ -24,6 +24,7 @@ import {
+   SimpleChanges,
+   TemplateRef,
+   ViewContainerRef,
++  booleanAttribute,
+ } from '@angular/core';
+ import {Subscription} from 'rxjs';
+ import {takeWhile} from 'rxjs/operators';
+@@ -112,6 +113,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+   private _offsetY: number;
+   private _position: FlexibleConnectedPositionStrategy;
+   private _scrollStrategyFactory: () => ScrollStrategy;
++  private _disposeOnNavigation = false;
+ 
+   /** Origin for the connected overlay. */
+   @Input('cdkConnectedOverlayOrigin')
+@@ -230,6 +232,15 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+     this._push = coerceBooleanProperty(value);
+   }
+ 
++  /** Whether the overlay should be disposed of when the user goes backwards/forwards in history. */
++  @Input({alias: 'cdkConnectedOverlayDisposeOnNavigation', transform: booleanAttribute})
++  get disposeOnNavigation(): boolean {
++    return this._disposeOnNavigation;
++  }
++  set disposeOnNavigation(value: boolean) {
++    this._disposeOnNavigation = value;
++  }
++
+   /** Event emitted when the backdrop is clicked. */
+   @Output() readonly backdropClick = new EventEmitter<MouseEvent>();
+ 
+@@ -335,6 +346,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+       positionStrategy,
+       scrollStrategy: this.scrollStrategy,
+       hasBackdrop: this.hasBackdrop,
++      disposeOnNavigation: this.disposeOnNavigation,
+     });
+ 
+     if (this.width || this.width === 0) {
+diff --git a/tools/public_api_guard/cdk/overlay.md b/tools/public_api_guard/cdk/overlay.md
+index a5a0111018c9..9c2cb14aa122 100644
+--- a/tools/public_api_guard/cdk/overlay.md
++++ b/tools/public_api_guard/cdk/overlay.md
+@@ -53,6 +53,8 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+     readonly detach: EventEmitter<void>;
+     get dir(): Direction;
+     disableClose: boolean;
++    get disposeOnNavigation(): boolean;
++    set disposeOnNavigation(value: boolean);
+     get flexibleDimensions(): boolean;
+     set flexibleDimensions(value: BooleanInput);
+     get growAfterOpen(): boolean;
+@@ -65,6 +67,8 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+     minHeight: number | string;
+     minWidth: number | string;
+     // (undocumented)
++    static ngAcceptInputType_disposeOnNavigation: unknown;
++    // (undocumented)
+     ngOnChanges(changes: SimpleChanges): void;
+     // (undocumented)
+     ngOnDestroy(): void;
+@@ -88,7 +92,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+     viewportMargin: number;
+     width: number | string;
+     // (undocumented)
+-    static ɵdir: i0.ɵɵDirectiveDeclaration<CdkConnectedOverlay, "[cdk-connected-overlay], [connected-overlay], [cdkConnectedOverlay]", ["cdkConnectedOverlay"], { "origin": { "alias": "cdkConnectedOverlayOrigin"; "required": false; }; "positions": { "alias": "cdkConnectedOverlayPositions"; "required": false; }; "positionStrategy": { "alias": "cdkConnectedOverlayPositionStrategy"; "required": false; }; "offsetX": { "alias": "cdkConnectedOverlayOffsetX"; "required": false; }; "offsetY": { "alias": "cdkConnectedOverlayOffsetY"; "required": false; }; "width": { "alias": "cdkConnectedOverlayWidth"; "required": false; }; "height": { "alias": "cdkConnectedOverlayHeight"; "required": false; }; "minWidth": { "alias": "cdkConnectedOverlayMinWidth"; "required": false; }; "minHeight": { "alias": "cdkConnectedOverlayMinHeight"; "required": false; }; "backdropClass": { "alias": "cdkConnectedOverlayBackdropClass"; "required": false; }; "panelClass": { "alias": "cdkConnectedOverlayPanelClass"; "required": false; }; "viewportMargin": { "alias": "cdkConnectedOverlayViewportMargin"; "required": false; }; "scrollStrategy": { "alias": "cdkConnectedOverlayScrollStrategy"; "required": false; }; "open": { "alias": "cdkConnectedOverlayOpen"; "required": false; }; "disableClose": { "alias": "cdkConnectedOverlayDisableClose"; "required": false; }; "transformOriginSelector": { "alias": "cdkConnectedOverlayTransformOriginOn"; "required": false; }; "hasBackdrop": { "alias": "cdkConnectedOverlayHasBackdrop"; "required": false; }; "lockPosition": { "alias": "cdkConnectedOverlayLockPosition"; "required": false; }; "flexibleDimensions": { "alias": "cdkConnectedOverlayFlexibleDimensions"; "required": false; }; "growAfterOpen": { "alias": "cdkConnectedOverlayGrowAfterOpen"; "required": false; }; "push": { "alias": "cdkConnectedOverlayPush"; "required": false; }; }, { "backdropClick": "backdropClick"; "positionChange": "positionChange"; "attach": "attach"; "detach": "detach"; "overlayKeydown": "overlayKeydown"; "overlayOutsideClick": "overlayOutsideClick"; }, never, never, true, never>;
++    static ɵdir: i0.ɵɵDirectiveDeclaration<CdkConnectedOverlay, "[cdk-connected-overlay], [connected-overlay], [cdkConnectedOverlay]", ["cdkConnectedOverlay"], { "origin": { "alias": "cdkConnectedOverlayOrigin"; "required": false; }; "positions": { "alias": "cdkConnectedOverlayPositions"; "required": false; }; "positionStrategy": { "alias": "cdkConnectedOverlayPositionStrategy"; "required": false; }; "offsetX": { "alias": "cdkConnectedOverlayOffsetX"; "required": false; }; "offsetY": { "alias": "cdkConnectedOverlayOffsetY"; "required": false; }; "width": { "alias": "cdkConnectedOverlayWidth"; "required": false; }; "height": { "alias": "cdkConnectedOverlayHeight"; "required": false; }; "minWidth": { "alias": "cdkConnectedOverlayMinWidth"; "required": false; }; "minHeight": { "alias": "cdkConnectedOverlayMinHeight"; "required": false; }; "backdropClass": { "alias": "cdkConnectedOverlayBackdropClass"; "required": false; }; "panelClass": { "alias": "cdkConnectedOverlayPanelClass"; "required": false; }; "viewportMargin": { "alias": "cdkConnectedOverlayViewportMargin"; "required": false; }; "scrollStrategy": { "alias": "cdkConnectedOverlayScrollStrategy"; "required": false; }; "open": { "alias": "cdkConnectedOverlayOpen"; "required": false; }; "disableClose": { "alias": "cdkConnectedOverlayDisableClose"; "required": false; }; "transformOriginSelector": { "alias": "cdkConnectedOverlayTransformOriginOn"; "required": false; }; "hasBackdrop": { "alias": "cdkConnectedOverlayHasBackdrop"; "required": false; }; "lockPosition": { "alias": "cdkConnectedOverlayLockPosition"; "required": false; }; "flexibleDimensions": { "alias": "cdkConnectedOverlayFlexibleDimensions"; "required": false; }; "growAfterOpen": { "alias": "cdkConnectedOverlayGrowAfterOpen"; "required": false; }; "push": { "alias": "cdkConnectedOverlayPush"; "required": false; }; "disposeOnNavigation": { "alias": "cdkConnectedOverlayDisposeOnNavigation"; "required": false; }; }, { "backdropClick": "backdropClick"; "positionChange": "positionChange"; "attach": "attach"; "detach": "detach"; "overlayKeydown": "overlayKeydown"; "overlayOutsideClick": "overlayOutsideClick"; }, never, never, true, never>;
+     // (undocumented)
+     static ɵfac: i0.ɵɵFactoryDeclaration<CdkConnectedOverlay, [null, null, null, null, { optional: true; }]>;
+ }
