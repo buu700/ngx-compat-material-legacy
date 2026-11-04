@@ -15,8 +15,8 @@ SOURCE = 'compatibility/rc/historical-contract-repair-source-inputs.json'
 READERS = 'compatibility/rc/historical-contract-repair-reader-inputs.json'
 SOURCE_PINS = {'21.x': 'c1d7a8762cad7913a5d4ad60863afb506c56c61d27a78c17a3f5372c51cc9303',
                'main': 'cee92383ce1cb2c82b135e2e3b8be0131a46b114d60a521f7e11e4d0bb017191'}
-READER_PINS = {'21.x': '577d690ecdad79da270dda15a73649c519e5f9444f9e0a0739d94aecefa45a90',
-               'main': '702d6f65109297515ee1fc57810eaf8fe0a9f7148742ff8572d90824d57b2944'}
+READER_PINS = {'21.x': 'a16f2e253cb34efb9963eadcf921977f2d8464c468797faad5c2dca580b13f35',
+               'main': 'ab76e4170d669a5f7cea18ffcd33d91b05c954572ae96ad65ca9158f5dea9a14'}
 
 
 def digest(raw):
@@ -124,11 +124,26 @@ def _tool_data(root):
     data = _registry(root, READERS, READER_PINS)
     assert data['canonical_dispositions_changed'] == data['product_changes'] == 0
     assert data['old_programs_executed'] is False
-    assert len(data['tool_transitions']) == (17 if data['line'] == '21.x' else 7)
+    assert len(data['tool_transitions']) == ((17 if data['line'] == '21.x' else 7) + len(data['c04_source_successor']['added_tool_paths']) if data['extension_kind'] == 'spinner-snack-c04-source' else (17 if data['line'] == '21.x' else 7))
     assert len({row['path'] for row in data['tool_transitions']}) == len(data['tool_transitions'])
     ref = data['unchanged_source_subject']
     _identity(_read(root, ref['path']), ref)
-    if data['line'] == '21.x':
+    if data['extension_kind'] == 'spinner-snack-c04-source':
+        prior = _prior_c04_registry(root, data)
+        count = 17 if data['line'] == '21.x' else 7
+        assert data['tool_transitions'][:count] == prior['tool_transitions']
+        assert [r['path'] for r in data['tool_transitions'][count:]] == data['c04_source_successor']['added_tool_paths']
+        assert all(r['source_parent'] == data['prior_reader_registry']['source_parent'] for r in data['tool_transitions'][count:])
+        scope = data['c04_source_successor']
+        assert scope['historical_owned_scss_rows'] == 409 and scope['historical_report_rewrites'] == 0
+        assert scope['old_product_read_callback'] is False
+        assert scope['historical_boundaries'] == 4 and scope['current_boundaries'] == 6
+        assert scope['ordinary_all_legacy_companions'] == 13
+        assert scope['physical_product_paths'] == list(SPINNER_SNACK_PATHS)
+        assert [r['path'] for r in data['support_inputs']] == ['scripts/sass-spinner-snack-c04-source.mjs', 'scripts/sass-spinner-snack-bridge-contract.mjs']
+        for ref in data['support_inputs']:
+            _identity(_read(root, ref['path']), ref)
+    elif data['line'] == '21.x':
         assert data['extension_kind'] == 'packed-owner-source-lanes'
         prior_ref = data['prior_reader_registry']
         assert prior_ref['path'] == READERS
@@ -156,6 +171,8 @@ def _tool_data(root):
 def _tool_intermediate(root, data, row):
     if data['line'] != '21.x' or row['path'] != 'scripts/packed-upstream-ledger-epoch.mjs':
         return None
+    if data['extension_kind'] == 'spinner-snack-c04-source':
+        data = _prior_c04_registry(root, data)
     prior_ref = data['prior_reader_registry']
     raw = _original(str(root), prior_ref['source_parent'], READERS)
     _identity(raw, prior_ref)
@@ -214,3 +231,48 @@ def tool_comparison_bytes(ref, root=ROOT):
     if intermediate and prior == intermediate[0]:
         return intermediate[1]
     return before if prior == row['before'] else after
+
+
+SPINNER_SNACK_PATHS = (
+    'projects/ngx-material-legacy/styles/progress-spinner/_progress-spinner-theme.scss',
+    'projects/ngx-material-legacy/styles/snack-bar/_snack-bar-theme.scss')
+
+
+def _prior_c04_registry(root, data):
+    ref = data['prior_reader_registry']
+    pin = {'21.x': ('577d690ecdad79da270dda15a73649c519e5f9444f9e0a0739d94aecefa45a90', 172038),
+           'main': ('702d6f65109297515ee1fc57810eaf8fe0a9f7148742ff8572d90824d57b2944', 29767)}[data['line']]
+    assert ref['path'] == READERS and (ref['sha256'], ref['bytes']) == pin
+    raw = _original(str(root), ref['source_parent'], READERS)
+    _identity(raw, ref)
+    prior = _decoded(raw)
+    assert prior['line'] == data['line'] and prior['source_parent'] == data['source_parent']
+    assert len(prior['tool_transitions']) == (17 if data['line'] == '21.x' else 7)
+    return prior
+
+
+def qualify_spinner_snack_source_reference(ref, root=ROOT):
+    """Two exact physical source images for independent visibility comparisons.
+
+    This metadata check does not replace the JS subject's complete transitive
+    source/semantic receipt guard and does not return historical product bytes.
+    """
+    if ref['path'] not in SPINNER_SNACK_PATHS:
+        return dict(ref)
+    path = 'compatibility/rc/parallel-spinner-snack-public-bridge-integration-source-inputs.json'
+    raw = _read(root, path)
+    assert digest(raw) == '52cb87f967965026ef0056a9d8c36a11a54f36b6d9efab1d235cb3e89c30d64f'
+    packet = _decoded(raw)
+    version = json.loads(_read(root, 'projects/ngx-material-legacy/package.json'))['version']
+    line = '21.x' if version.startswith('21.') else 'main' if version.startswith('22.') else None
+    assert line is not None
+    data = packet['branches'][line]
+    assert [r['path'] for r in data['modules']] == list(SPINNER_SNACK_PATHS)
+    row = next(r for r in data['modules'] if r['path'] == ref['path'])
+    _selected(ref, {'before': row['before'], 'after': row['current']})
+    before = _original(str(root), data['before_commit'], ref['path'])
+    _identity(before, row['before'])
+    assert hashlib.sha1(('blob ' + str(len(before)) + '\0').encode() + before).hexdigest() == row['before']['blob']
+    _identity(_read(root, ref['path']), row['current'])
+    return {**ref, 'sha256': row['current']['sha256'],
+            **({'bytes': row['current']['bytes']} if 'bytes' in ref else {})}

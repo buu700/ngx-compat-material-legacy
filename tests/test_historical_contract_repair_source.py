@@ -60,6 +60,10 @@ class HistoricalContractRepairReferenceTests(unittest.TestCase):
 
     def test_owner_lane_extension_preserves_prior_rows_and_exact_intermediate(self):
         data = subject._tool_data(ROOT)
+        if data['extension_kind'] == 'spinner-snack-c04-source':
+            current = data
+            data = subject._prior_c04_registry(ROOT, data)
+            self.assertEqual(current['tool_transitions'][:17], data['tool_transitions'])
         prior_ref = data['prior_reader_registry']
         prior_raw = subject._original(str(ROOT), prior_ref['source_parent'], subject.READERS)
         prior = json.loads(prior_raw)
@@ -108,6 +112,33 @@ class HistoricalContractRepairReferenceTests(unittest.TestCase):
                 with self.assertRaises(AssertionError):
                     action(middle)
 
+
+    def test_c04_source_successor_preserves_exact_prior_rows_and_two_physical_images(self):
+        data = subject._tool_data(ROOT)
+        self.assertEqual(data['extension_kind'], 'spinner-snack-c04-source')
+        prior = subject._prior_c04_registry(ROOT, data)
+        self.assertEqual(data['tool_transitions'][:17], prior['tool_transitions'])
+        self.assertEqual(len(data['tool_transitions']), 39)
+        self.assertEqual(len(data['support_inputs']), 2)
+        packet = json.loads((ROOT / 'compatibility/rc/parallel-spinner-snack-public-bridge-integration-source-inputs.json').read_bytes())
+        for row in packet['branches']['21.x']['modules']:
+            for side in ['before', 'current']:
+                value = {'path': row['path'], **row[side], 'role': 'historical-source-comparison'}
+                current = subject.qualify_spinner_snack_source_reference(value)
+                self.assertEqual(current['sha256'], row['current']['sha256'])
+                self.assertEqual(current['bytes'], row['current']['bytes'])
+                self.assertEqual(current['role'], value['role'])
+            for change in [{'sha256': '0' * 64}, {'bytes': row['before']['bytes'] + 1}]:
+                with self.assertRaises(AssertionError):
+                    subject.qualify_spinner_snack_source_reference({'path': row['path'], **row['before'], **change})
+        saved = subject._read
+        for ref in data['support_inputs']:
+            def altered(root, path, selected=ref['path']):
+                raw = saved(root, path)
+                return raw + b'\n' if path == selected else raw
+            with patch.object(subject, '_read', altered):
+                with self.assertRaises(AssertionError):
+                    subject._tool_data(ROOT)
 
 if __name__ == '__main__':
     unittest.main()

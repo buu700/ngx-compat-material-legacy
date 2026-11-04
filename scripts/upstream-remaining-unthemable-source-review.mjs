@@ -6,6 +6,7 @@
  */
 /** Fourteen complete individual token-placement reviews; historical Sass and public-peer contracts. */
 import assert from 'node:assert/strict';
+import {spinnerSnackC04Source} from './sass-spinner-snack-c04-source.mjs';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {readFileSync,writeFileSync} from 'node:fs';
@@ -258,7 +259,8 @@ function verifyOwnedBodies({original,current,styles}){
 }
 export function reviewRemainingUnthemableSource({root=process.cwd(),read=path=>readFileSync(join(root,path))}={}){
  const shared=reviewInspectionCompatibilitySource({root,read}),bound=new Map(shared.bound.map(ref=>[ref.path,ref]));
- function member(ref){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed remaining unthemable subject '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;}
+ const c04=spinnerSnackC04Source({root,read});for(const ref of c04.bound)bound.set(ref.path,ref);
+ function member(ref){ref=c04.qualify(ref);const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed remaining unthemable subject '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;}
  function current(path){const raw=read(path);return member({path,sha256:hash(raw),bytes:raw.length});}
  member({path:'scripts/upstream-remaining-unthemable-source-review.mjs',sha256:hash(image),bytes:image.length});for(const ref of [...COMPILER,...SHARED_INPUTS])member(ref);
  assert.equal(JSON.parse(current('package.json')).devDependencies.sass,'1.104.1');assert.equal(JSON.parse(read('package.json')).packageManager,'pnpm@12.4.2');assert.equal(current('.node-version').toString().trim(),'24.21.0');assert.equal(current('.npm-version').toString().trim(),'11.19.0');current('toolchain-lock.json');
@@ -276,8 +278,10 @@ export function reviewRemainingUnthemableSource({root=process.cwd(),read=path=>r
  assert.equal(Object.keys(owned).length,299);assert.equal(Object.keys(fullOwned).length,409);
  const ownedBodies=verifyOwnedBodies({original,current,styles}),entry=current(base+'_index.scss').toString();for(const f of AFFECTED_FAMILIES)assert.equal(entry.includes(f+'-base'),false,'post16 base export leaked '+f);
  const pkg=current('node_modules/@angular/material/package.json'),measurement=measureRemainingUnthemableContracts({reference,owned,peers,catalog,peerManifest:{version:JSON.parse(pkg).version,sha256:hash(pkg)}});assert.equal(measurement.case_count,160);
- const assertCurrent=()=>{shared.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late remaining token placement source change '+ref.path);assert.equal(raw.length,ref.bytes);}};assertCurrent();
- return {report:{schema_version:1,line:'21.x',role:'Fourteen complete individual token placement source proposals; unchanged historical outputs and existing finite companion contracts only',...facts,originals:ORIGINAL,reference:REFERENCE,reference_originals:REFERENCE_ORIGINALS,owned_input_integrity_only:OWNED_INTEGRITY,current_source_bindings:structuredClone([...bound.values()]),compiler:sass.info,compiler_inputs:COMPILER,shared_contract_inputs:SHARED_INPUTS,argument_measurement:measurement,owned_theme_bodies:ownedBodies,owned_scss_members_rehashed:409,reference_sass_members:286,reference_locked_archives:38,prior_CSS_results_reused:false,tagged_reference_Sass_executed:true,approved_installed_minimum_peer_public_Sass_executed:true,captured_post16_patch_Sass_TypeScript_tests_or_workflows_executed:false,component_structural_Sass_freshly_compiled:false,full_Sass_gate_executed:false,canonical_decisions_changed:0,golden_or_finite_contract_changes:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'},bound:structuredClone([...bound.values()]),assertCurrent};
+ const assertCurrent=()=>{c04.assertCurrent();shared.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late remaining token placement source change '+ref.path);assert.equal(raw.length,ref.bytes);}};assertCurrent();
+ const report={schema_version:1,line:'21.x',role:'Fourteen complete individual token placement source proposals; unchanged historical outputs and existing finite companion contracts only',...facts,originals:ORIGINAL,reference:REFERENCE,reference_originals:REFERENCE_ORIGINALS,owned_input_integrity_only:OWNED_INTEGRITY,current_source_bindings:structuredClone([...bound.values()].sort((a,b)=>a.path.localeCompare(b.path))),current_public_bridge:structuredClone(c04.summary),compiler:sass.info,compiler_inputs:COMPILER,shared_contract_inputs:SHARED_INPUTS,argument_measurement:measurement,owned_theme_bodies:ownedBodies,owned_scss_members_rehashed:409,reference_sass_members:286,reference_locked_archives:38,prior_CSS_results_reused:false,tagged_reference_Sass_executed:true,approved_installed_minimum_peer_public_Sass_executed:true,captured_post16_patch_Sass_TypeScript_tests_or_workflows_executed:false,component_structural_Sass_freshly_compiled:false,full_Sass_gate_executed:false,canonical_decisions_changed:0,golden_or_finite_contract_changes:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+ const historical_report=c04.assertReportSuccessor('remaining-unthemable',report);
+ return {report,historical_report,bound:structuredClone([...bound.values()]),assertCurrent};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  assert.equal(process.argv.length,3);const scope=reviewRemainingUnthemableSource();scope.assertCurrent();writeFileSync(process.argv[2],JSON.stringify(scope.report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({result:'pass',original_files:38,original_hunks:54,argument_cases:160,bound:scope.bound.length,canonical_decisions_changed:0}));

@@ -7,6 +7,7 @@
  */
 /** Four independent original reviews share a finite historical Sass measurement. */
 import assert from 'node:assert/strict';
+import {spinnerSnackC04Source} from './sass-spinner-snack-c04-source.mjs';
 import {createHash} from 'node:crypto';
 import {readFileSync,writeFileSync,realpathSync} from 'node:fs';
 import {createRequire} from 'node:module';
@@ -35,13 +36,15 @@ const stylePath=path=>'projects/ngx-material-legacy/styles/'+path.slice('src/mat
 const resourcePath=path=>'projects/ngx-material-legacy/'+path.slice('src/material/'.length);
 
 export function inspectLegacyThemeRetention({root=process.cwd(),read=path=>readFileSync(join(root,path))}={}){
+  const c04=spinnerSnackC04Source({root,read});
   const bound=new Map(),member=path=>{const raw=read(path);bound.set(path,ref(path,raw));return raw;};
   const entryPath='projects/ngx-material-legacy/_index.scss',entry=member(entryPath).toString(),subjects=[];
   for(const subject of retentionSubjects){
     const paths={modern:stylePath(subject.modern_theme),legacy:stylePath(subject.legacy_theme),
       structural:resourcePath(subject.legacy_structural)};
     const modern=member(paths.modern).toString(),legacy=member(paths.legacy).toString();
-    assert.equal(modern,tagged.get(subject.modern_theme).body.replaceAll("'@material/","'../vendor/mdc/"));
+    const expectedModern=tagged.get(subject.modern_theme).body.replaceAll("'@material/","'../vendor/mdc/");
+    if(subject.family==='snack-bar')c04.assertHistoricalSource(paths.modern,expectedModern);else assert.equal(modern,expectedModern);
     assert.equal(legacy,tagged.get(subject.legacy_theme).body,'legacy theme differs from untouched tag');
     assert.equal(/@mixin\s+base\s*\(/.test(modern+legacy),false);
     assert.equal(entry.includes(subject.modern_prefix+'-base'),false);
@@ -64,7 +67,8 @@ export function inspectLegacyThemeRetention({root=process.cwd(),read=path=>readF
     const template=member(join(directory,stem+'.html')).toString();
     assert.equal(/mat-mdc-|\bmdc-/.test(template),false);
     assert.equal(/get-unthemable-tokens\(\)/.test(structural),false);
-    subjects.push({...subject,paths,legacy_theme_exact_tagged_bytes:true,modern_theme_exact_after_MDC_relocation:true,
+    subjects.push({...subject,paths,legacy_theme_exact_tagged_bytes:true,modern_theme_exact_after_MDC_relocation:subject.family!=='snack-bar',
+      ...(subject.family==='snack-bar'?{historical_modern_source_exact_after_MDC_relocation:true,separate_current_public_bridge:true}:{}),
       structural_tagged_body_after_finite_owned_imports_and_high_contrast_call_transport:true,
       existing_non_tagged_motion_suffix:subject.family==='snack-bar'?{sha256:hash(suffix),bytes:Buffer.byteLength(suffix),
         role:'Existing owned engine-free motion; not requalified by this source review'}:null});
@@ -76,11 +80,12 @@ export function inspectLegacyThemeRetention({root=process.cwd(),read=path=>readF
   const peer=JSON.parse(member('node_modules/@angular/material/package.json'));
   assert.equal(peer.version,line==='21.x'?'21.2.14':'22.1.7');
   assert.equal(manifest.peerDependencies['@angular/material'],'^'+peer.version);
-  const assertCurrent=()=>{
+  for(const value of c04.bound)if(!bound.has(value.path))bound.set(value.path,value);
+  const assertCurrent=()=>{c04.assertCurrent();
     assert.equal(hash(readFileSync(join(sourceRoot,archivePath))),archiveHash);
     for(const value of bound.values()){const raw=read(value.path);assert.equal(hash(raw),value.sha256,'late source change '+value.path);assert.equal(raw.length,value.bytes);}
   };
-  assertCurrent();return {line,peer_version:peer.version,subjects,oracle:JSON.parse(oracleRaw),entryPath,bound:[...bound.values()],assertCurrent};
+  assertCurrent();return {line,peer_version:peer.version,subjects,oracle:JSON.parse(oracleRaw),entryPath,bound:[...bound.values()],assertCurrent,current_public_bridge:structuredClone(c04.summary)};
 }
 
 export function compileRetainedLegacyColor({root=process.cwd(),family,body}={}){
@@ -130,7 +135,7 @@ export function measureLegacyThemeRetention({root=process.cwd()}={}){
   scope.assertCurrent();return {schema_version:1,line:scope.line,result:'pass',peer_version:scope.peer_version,
     role:'Four separate original source decisions; finite historical Sass measurements only',compiler:sass.info,
     advertised_Material_minimum_equals_installed:true,authentic_reference:{path:archivePath,sha256:archiveHash},
-    oracle:{path:oraclePath,sha256:oracleHash},subjects:scope.subjects,public_legacy_default_CSS_cases:cases,direct_original_legacy_color_cases:direct,
+    oracle:{path:oraclePath,sha256:oracleHash},current_public_bridge:scope.current_public_bridge,subjects:scope.subjects,public_legacy_default_CSS_cases:cases,direct_original_legacy_color_cases:direct,
     retained_modern16_exports:retentionSubjects.flatMap(row=>['color','theme','typography','density'].map(suffix=>row.modern_prefix+'-'+suffix)),
     post16_base_exports_absent:retentionSubjects.map(row=>row.modern_prefix+'-base'),
     input_members:scope.bound,loaded_sources:[...loaded.values()].sort((a,b)=>a.path.localeCompare(b.path)),

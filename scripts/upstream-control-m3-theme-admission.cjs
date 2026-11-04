@@ -18,7 +18,8 @@ const SOURCE_REVIEW={"path": "compatibility/rc/21x-c04-control-m3-theme-source-r
 const PATCHES={"6b57edb1b164909f8aa1eddac87a915c037e6905": "d5201f108ff5a5d5f38c6d13437c5768ac805c62ba673bba628c3b4ea867e3bd", "75029c273a4aad3ad4481d8c045c9a73ccceb34e": "878ba9207bc62a4440b2493dc75f1282cefaa83f7d45513e16dadecf3aeadafe", "2f958aced5757915f75e4036229d5df63f6ff414": "17f369ca7d3554694b90cfaedc86f20b09cd6a3b3cb05d28021b138ad93a4e63", "289ddd348395f0299a6c7cba2cde8662842df06d": "41c76fdf701d135c1709683cc34cd658d367331ea10c108a0e3a3682899aa7b4"};
 const KIND='individual-historical-control-m3-theme-source-review',SCOPE='control_m3_theme_source_scope';
 const hash=raw=>createHash('sha256').update(raw).digest('hex'),image=readFileSync(__filename);
-const handlerRef={path:HANDLER,sha256:hash(image),bytes:image.length};
+const handlerRef={path:HANDLER,sha256:'e5fbd06feda4bfe1a912bbd74229ca9f80f2c29a8a11ac7e5249aff84e2b327a',bytes:6753};
+const currentHandlerRef={path:HANDLER,sha256:hash(image),bytes:image.length};
 
 function controlM3ThemeProof(row){
  assert.ok(Object.hasOwn(PATCHES,row?.sha));
@@ -51,25 +52,40 @@ function metadataOk({entry,body,review,proof=entry?.individual_proof}){
 function inspectWholeBody({body,root,read}){
  const source=require('./upstream-control-m3-theme-source-review.mjs');
  assert.equal(resolve(root),ROOT);
- const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,handlerRef,
+ const {spinnerSnackC04Source}=require('./sass-spinner-snack-c04-source.mjs');
+ const c04=spinnerSnackC04Source({root,read});assert.deepEqual(c04.qualify(handlerRef),currentHandlerRef);
+ const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,currentHandlerRef,...c04.bound,
   ...body.reviews.map(row=>({path:row.patch_file,sha256:row.diff_sha256}))];
  const assertBound=()=>{for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed control theme admission subject '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}};
  assertBound();assert.deepEqual(JSON.parse(read(REVIEW)),body);
  const current=source.reviewControlM3ThemeSource({root,read});
- assert.deepEqual(current.report,JSON.parse(read(SOURCE_REVIEW.path)));
- const assertCurrent=()=>{current.assertCurrent();assertBound();};assertCurrent();
+ assert.deepEqual(current.historical_report,JSON.parse(read(SOURCE_REVIEW.path)));
+ const assertCurrent=()=>{c04.assertCurrent();current.assertCurrent();assertBound();c04.assertCurrent();};assertCurrent();
  return {bound:structuredClone([...bound,...current.bound]),assertCurrent};
 }
 /** Actual root admission remains fresh for each individual SHA. */
-function inspectSource({entry,body,review,proof,root=ROOT,read=path=>readFileSync(join(root,path))}){
+function inspectSource(args){
+ const {captureSpinnerSnackC04Metadata}=require('./sass-spinner-snack-c04-source.mjs');
+ const capture=()=>captureSpinnerSnackC04Metadata(args,['entry','body','review','proof','root']);
+ const originalMetadata=capture();
+ const {entry,body,review,proof}=originalMetadata;
+ const {root=ROOT,read=path=>readFileSync(join(root,path))}=args;
  assert.equal(metadataOk({entry,body,review,proof}),true);
- inspectWholeBody({body,root,read}).assertCurrent();assert.equal(metadataOk({entry,body,review,proof}),true);return true;
+ inspectWholeBody({body,root,read}).assertCurrent();
+ assert.deepEqual(capture(),originalMetadata,'caller admission metadata changed during source inspection');
+ assert.equal(metadataOk(args),true);return true;
 }
 /** The canonical owner proves all four metadata rows and the whole source body once. */
-function inspectCanonicalSource({entries,body,root=ROOT,read=path=>readFileSync(join(root,path))}){
+function inspectCanonicalSource(args){
+ const {captureSpinnerSnackC04Metadata}=require('./sass-spinner-snack-c04-source.mjs');
+ const capture=()=>captureSpinnerSnackC04Metadata(args,['entries','body','root']);
+ const originalMetadata=capture();
+ const {entries,body}=originalMetadata;
+ const {root=ROOT,read=path=>readFileSync(join(root,path))}=args;
+ const assertCaller=()=>assert.deepEqual(capture(),originalMetadata,'caller canonical metadata changed during source inspection');
  const assertMetadata=()=>{assert.deepEqual(entries.map(entry=>entry.sha),Object.keys(PATCHES));for(const entry of entries)assert.equal(metadataOk({entry,body,review:body.reviews.find(row=>row.sha===entry.sha)}),true);};
- assertMetadata();const source=inspectWholeBody({body,root,read});
- const assertCurrent=()=>{assertMetadata();source.assertCurrent();assertMetadata();};assertCurrent();
+ assertCaller();assertMetadata();const source=inspectWholeBody({body,root,read});
+ const assertCurrent=()=>{assertCaller();assertMetadata();source.assertCurrent();assertMetadata();assertCaller();};assertCurrent();
  return {bound:structuredClone(source.bound),assertCurrent};
 }
 function sourceOk(args){try{return inspectSource(args)===true;}catch{return false;}}

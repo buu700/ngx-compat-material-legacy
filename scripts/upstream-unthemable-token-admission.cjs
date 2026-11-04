@@ -25,6 +25,7 @@ const DIFFS={
 };
 const hash=raw=>createHash('sha256').update(raw).digest('hex'),measurements=new WeakMap();
 function regular(root,path){
+ if(/^node_modules\/sass\/(?:package\.json|sass\.node\.js|sass\.dart\.js)$/.test(path))return require('./historical-contract-repair-readers.mjs').readHistoricalContractRepairOwnerMember(root,path);
  assert.ok(typeof path==='string'&&!path.includes('\\'));const parts=path.split('/');assert.ok(parts.every(part=>part&&part!=='.'&&part!=='..'));
  const peer=path.match(/^node_modules\/@angular\/(material|cdk)\/(.+)$/);
  let file=root,tail=parts;
@@ -54,8 +55,9 @@ function unthemedMetadataOk({entry,body,review,proof}={}){
  }catch{return false;}
 }
 function inspectUnthemedSource({root=ROOT,read=root===ROOT?defaultRead:path=>regular(root,path)}={}){
- const bound=new Map();
- const member=ref=>{const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed token-placement input '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;};
+ const {spinnerSnackC04Source}=require('./sass-spinner-snack-c04-source.mjs');
+ const c04=spinnerSnackC04Source({root,read}),bound=new Map(c04.bound.map(ref=>[ref.path,ref]));
+ const member=ref=>{ref=c04.qualify(ref);const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed token-placement input '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;};
  const body=JSON.parse(member({path:REVIEW,sha256:REVIEW_HASH})),qualification=JSON.parse(member({path:QUALIFICATION,sha256:QUALIFICATION_HASH}));
  assert.equal(qualification.individual_review.sha256,REVIEW_HASH);assert.equal(qualification.complete_original_SHA_reviews,5);assert.equal(qualification.original_hunks,20);
  for(const ref of [...qualification.code_subjects,qualification.actual_Python_unit,qualification.metadata_population_followup.actual_Python_unit,qualification.actual_main_controls])member(ref);
@@ -81,18 +83,26 @@ function inspectUnthemedSource({root=ROOT,read=root===ROOT?defaultRead:path=>reg
  const scopeRaw=member(scopeRef),scope=JSON.parse(scopeRaw);assert.equal(scope.line,'21.x');assert.equal(scope.result,'pass');
  assert.equal(scope.public_legacy_default_CSS_cases.length,15);assert.equal(scope.direct_original_legacy_color_cases.length,5);assert.equal(scope.post16_base_exports_absent.length,5);
  for(const ref of [...scope.input_members,...scope.loaded_sources,scope.producer])member(ref);
- const assertCurrent=()=>{for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late token-placement input '+ref.path);assert.equal(raw.length,ref.bytes);}};
- assertCurrent();return {body,scope,scopeHash:hash(scopeRaw),bound:[...bound.values()],assertCurrent};
+ const assertCurrent=()=>{c04.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late token-placement input '+ref.path);assert.equal(raw.length,ref.bytes);}c04.assertCurrent();};
+ assertCurrent();return {body,scope,scopeHash:hash(scopeRaw),currentSource:c04,bound:[...bound.values()],assertCurrent};
 }
 function unthemedSourceOk(args={}){
  try{
+  const {captureSpinnerSnackC04Metadata}=require('./sass-spinner-snack-c04-source.mjs');
+  const capture=()=>captureSpinnerSnackC04Metadata(args,['entry','body','review','proof','root']);
+  const originalMetadata=capture();
   assert.equal(unthemedMetadataOk(args),true);const root=args.root??ROOT,read=args.read??(root===ROOT?defaultRead:path=>regular(root,path));
-  const inspected=inspectUnthemedSource({root,read});assert.deepEqual(args.body,inspected.body);const rootId=realpathSync(root),previous=measurements.get(read);
+  const inspected=inspectUnthemedSource({root,read});assert.deepEqual(originalMetadata.body,inspected.body);const rootId=realpathSync(root),previous=measurements.get(read);
   if(!previous||previous.root!==rootId||previous.scopeHash!==inspected.scopeHash){
    const {measureTokenPlacementContracts}=require('./measure-unthemable-token-contracts.mjs');
-   assert.deepEqual(measureTokenPlacementContracts({root:rootId}),inspected.scope,'fresh historical Sass contract differs');measurements.set(read,{root:rootId,scopeHash:inspected.scopeHash});
+   const {assertSpinnerSnackTokenPlacementSuccessor}=require('./sass-spinner-snack-c04-source.mjs');
+   const current=measureTokenPlacementContracts({root:rootId});
+   assertSpinnerSnackTokenPlacementSuccessor({historical:inspected.scope,current,source:inspected.currentSource});
+   inspected.assertCurrent();measurements.set(read,{root:rootId,scopeHash:inspected.scopeHash});
   }
-  inspected.assertCurrent();return true;
+  inspected.assertCurrent();
+  assert.deepEqual(capture(),originalMetadata,'caller token-placement metadata changed during source inspection');
+  assert.equal(unthemedMetadataOk(args),true);return true;
  }catch{return false;}
 }
 module.exports={UNTHEMED_SHAS:Object.keys(DIFFS),UNTHEMED_REVIEW:REVIEW,unthemedProof,unthemedMetadataOk,inspectUnthemedSource,unthemedSourceOk,

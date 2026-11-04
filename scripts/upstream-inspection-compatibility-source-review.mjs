@@ -6,6 +6,7 @@
  */
 /** Four whole-patch source proposals; the shared owned Sass model has one owner. */
 import assert from 'node:assert/strict';
+import {spinnerSnackC04Source} from './sass-spinner-snack-c04-source.mjs';
 import {createHash} from 'node:crypto';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {join,resolve} from 'node:path';
@@ -112,7 +113,8 @@ function backwardsHelper(text){
 }
 export function reviewInspectionCompatibilitySource({root=process.cwd(),read=path=>readFileSync(join(root,path))}={}){
  const shared=reviewThemingInspectionSource({root,read}),bound=new Map(shared.bound.map(ref=>[ref.path,ref]));
- function member(ref){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed inspection source subject '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;}
+ const c04=spinnerSnackC04Source({root,read});for(const ref of c04.bound)bound.set(ref.path,ref);
+ function member(ref){ref=c04.qualify(ref);const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed inspection source subject '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;}
  function current(path){const raw=read(path);return member({path,sha256:hash(raw),bytes:raw.length});}
  member({path:'scripts/upstream-inspection-compatibility-source-review.mjs',sha256:hash(image),bytes:image.length});
  const original=JSON.parse(gunzipSync(member(ORIGINAL))),seed=JSON.parse(gunzipSync(member(SEED))),census=JSON.parse(gunzipSync(member(CENSUS)));
@@ -139,13 +141,15 @@ export function reviewInspectionCompatibilitySource({root=process.cwd(),read=pat
  const pkg=JSON.parse(current(packagePath)),ng=JSON.parse(current(ngPackagePath)),exports=JSON.parse(current(exportsPath));
  assert.ok(pkg.version.startsWith('21.'));assert.deepEqual(Object.keys(pkg.exports),['.','./_index']);assert.ok(ng.assets.includes('./styles/**/*.scss'));
  assert.equal(exports.exports.some(key=>key.includes('paginator-variables')||key.includes('button-toggle-variables')||key==='./button-toggle'),false);
- const assertCurrent=()=>{shared.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late inspection source change '+ref.path);assert.equal(raw.length,ref.bytes);}assertAbsent();};assertCurrent();
- return {report:{schema_version:1,line:'21.x',role:'Four individually reviewed original source proposals; no canonical admission or fresh full Sass execution',...facts,
+ const assertCurrent=()=>{c04.assertCurrent();shared.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late inspection source change '+ref.path);assert.equal(raw.length,ref.bytes);}assertAbsent();};assertCurrent();
+ const report={schema_version:1,line:'21.x',role:'Four individually reviewed original source proposals; no canonical admission or fresh full Sass execution',...facts,
   originals:ORIGINAL,seed_originals:SEED,source_census:CENSUS,shared_sass_owner:{path:'scripts/upstream-theming-inspection-source-review.mjs',sha256:shared.bound.find(ref=>ref.path==='scripts/upstream-theming-inspection-source-review.mjs').sha256},
-  current_source_bindings:structuredClone([...bound.values()]),absent_owned_counterparts:absent,historical_exported_functions:25,owned_scss_members:409,public_override_boundaries:4,
+  current_source_bindings:structuredClone([...bound.values()].sort((a,b)=>a.path.localeCompare(b.path))),current_public_bridge:structuredClone(c04.summary),absent_owned_counterparts:absent,historical_exported_functions:25,owned_scss_members:409,public_override_boundaries:6,historical_public_override_boundaries:4,
   tagged_backwards_helper_preserved:true,tagged_legacy_paginator_variables_and_caller_preserved:true,button_toggle_token_defaults_preserved:true,package_asset_and_export_declarations_checked:true,
   legacy_theme_module_source_rewrites:4,legacy_theme_namespace_or_mixin_or_selector_rewrites:0,
-  fresh_compiler_execution_this_review:false,upstream_code_executed:false,source_scope_only:true,canonical_decisions_changed:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'},bound:structuredClone([...bound.values()]),assertCurrent};
+  fresh_compiler_execution_this_review:false,upstream_code_executed:false,source_scope_only:true,canonical_decisions_changed:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+ const historical_report=c04.assertReportSuccessor('inspection-compatibility',report);
+ return {report,historical_report,bound:structuredClone([...bound.values()]),assertCurrent};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  assert.equal(process.argv.length,3);const review=reviewInspectionCompatibilitySource();review.assertCurrent();writeFileSync(process.argv[2],JSON.stringify(review.report,null,2)+'\n',{flag:'wx'});

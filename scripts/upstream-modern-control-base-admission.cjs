@@ -52,8 +52,9 @@ function metadataOk({entry,body,review,proof}={}){
  }catch{return false;}
 }
 function inspectControlSource({root=ROOT,read=root===ROOT?defaultRead:path=>regular(root,path)}={}){
- const bound=new Map();
- const member=ref=>{const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed modern-control input '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;};
+ const {spinnerSnackC04Source}=require('./sass-spinner-snack-c04-source.mjs');
+ const c04=spinnerSnackC04Source({root,read}),bound=new Map(c04.bound.map(ref=>[ref.path,ref]));
+ const member=incoming=>{const ref=c04.qualify(incoming),raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed modern-control input '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;};
  const body=JSON.parse(member({path:REVIEW,sha256:REVIEW_HASH})),qualification=JSON.parse(member({path:QUALIFICATION,sha256:QUALIFICATION_HASH}));
  assert.equal(qualification.individual_review.sha256,REVIEW_HASH);assert.equal(qualification.complete_original_SHA_reviews,4);assert.equal(qualification.original_hunks,17);
  for(const ref of [...qualification.code_subjects,qualification.actual_Python_unit,...qualification.actual_line_controls,qualification.original_acquisition])member(ref);
@@ -70,18 +71,21 @@ function inspectControlSource({root=ROOT,read=root===ROOT?defaultRead:path=>regu
  const scopeRaw=member(scopeRef),scope=JSON.parse(scopeRaw);assert.equal(scope.line,'21.x');assert.equal(scope.result,'pass');
  assert.equal(scope.public_legacy_default_CSS_cases.length,12);assert.equal(scope.direct_original_legacy_color_cases.length,4);assert.equal(scope.post16_base_exports_absent.length,4);
  for(const ref of [...scope.input_members,...scope.loaded_sources,scope.producer])member(ref);
- const assertCurrent=()=>{for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late modern-control input '+ref.path);assert.equal(raw.length,ref.bytes);}};
- assertCurrent();return {body,scope,scopeHash:hash(scopeRaw),bound:[...bound.values()],assertCurrent};
+ const assertCurrent=()=>{c04.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late modern-control input '+ref.path);assert.equal(raw.length,ref.bytes);}};
+ assertCurrent();return {body,scope,scopeHash:hash(scopeRaw),c04,bound:[...bound.values()],assertCurrent};
 }
 function sourceOk(args={}){
  try{
+  const {captureSpinnerSnackC04Metadata}=require('./sass-spinner-snack-c04-source.mjs');
+  const metadata=()=>captureSpinnerSnackC04Metadata(args,['entry','body','review','proof','root']),snapshot=metadata();
   assert.equal(metadataOk(args),true);const root=args.root??ROOT,read=args.read??(root===ROOT?defaultRead:path=>regular(root,path));
-  const inspected=inspectControlSource({root,read});assert.deepEqual(args.body,inspected.body);const rootId=realpathSync(root),previous=measurements.get(read);
+  const inspected=inspectControlSource({root,read});assert.deepEqual(snapshot.body,inspected.body);const rootId=realpathSync(root),previous=measurements.get(read);
   if(!previous||previous.root!==rootId||previous.scopeHash!==inspected.scopeHash){
    const {measureLegacyThemeRetention}=require('./measure-legacy-theme-retention.mjs');
-   assert.deepEqual(measureLegacyThemeRetention({root:rootId}),inspected.scope,'fresh legacy theme contract differs');measurements.set(read,{root:rootId,scopeHash:inspected.scopeHash});
+   const {assertSpinnerSnackRetentionSuccessor}=require('./sass-spinner-snack-c04-source.mjs');
+   assertSpinnerSnackRetentionSuccessor({historical:inspected.scope,current:measureLegacyThemeRetention({root:rootId}),source:inspected.c04});measurements.set(read,{root:rootId,scopeHash:inspected.scopeHash});
   }
-  inspected.assertCurrent();return true;
+  inspected.assertCurrent();assert.deepEqual(metadata(),snapshot);assert.equal(metadataOk(args),true);assert.deepEqual(args.body,inspected.body);assert.deepEqual(metadata(),snapshot);return true;
  }catch{return false;}
 }
 module.exports={CONTROL_SHAS:Object.keys(DIFFS),CONTROL_REVIEW:REVIEW,controlProof,metadataOk,inspectControlSource,sourceOk};

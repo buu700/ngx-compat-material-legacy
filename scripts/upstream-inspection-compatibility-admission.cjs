@@ -18,7 +18,8 @@ const SOURCE_REVIEW={path:PREFIX+'source-review.json',sha256:'852cf937178ada91b0
 const PATCHES={"eeb0cf2666a2346ee99bb023c833da7255720654":"e576846f91a8e961418aa17089ac1f82e3c8d956fadde7bf71d883cc33ee4208","5d65f1dc4a719fd673b4d77f2f5bdba61d7ac523":"7425e82ef12006a04904dbbfa8a36d793d4e3b89980c89ab19818c400a1a4374","f6949e3e57fe25406968eeaea90ba662343c3e79":"d791af4c9299cba50bd3c02eab558a4372f358ab6c883fc019a0d829f42c079e","456741a61a8e85e597e82503941ccab97777bc97":"93fbaf24ad1a15053e4e168bcef18c0071c709e6482699d468d3fcc9db0944d8"};
 const KIND='individual-historical-inspection-compatibility-source-review',SCOPE='inspection_compatibility_source_scope';
 const hash=raw=>createHash('sha256').update(raw).digest('hex'),image=readFileSync(__filename);
-const handlerRef={path:HANDLER,sha256:hash(image),bytes:image.length};
+const handlerRef={path:HANDLER,sha256:'1ce1cdff28bc80ec7cf94f741d3abbd0c5add0454d5d0571e1e6098f08f0e1de',bytes:5534};
+const currentHandlerRef={path:HANDLER,sha256:hash(image),bytes:image.length};
 
 function inspectionProof(row){
  assert.ok(Object.hasOwn(PATCHES,row?.sha));
@@ -48,18 +49,27 @@ function metadataOk({entry,body,review,proof=entry?.individual_proof}){
 }
 
 /** Recompute all original/current source facts on every invocation. */
-function inspectSource({entry,body,review,proof,root=ROOT,read=path=>readFileSync(join(root,path))}){
+function inspectSource(args){
+  const {captureSpinnerSnackC04Metadata}=require('./sass-spinner-snack-c04-source.mjs');
+  const capture=()=>captureSpinnerSnackC04Metadata(args,['entry','body','review','proof','root']);
+  const originalMetadata=capture();
+  const {entry,body,review,proof}=originalMetadata;
+ const {root=ROOT,read=path=>readFileSync(join(root,path))}=args;
   // Source inspection imports the current ledger owner through its candidate
   // inventory helper; defer it until the owner has finished initializing.
   const source=require('./upstream-inspection-compatibility-source-review.mjs');
   assert.equal(resolve(root),ROOT);assert.equal(metadataOk({entry,body,review,proof}),true);
-  const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,handlerRef,
+  const {spinnerSnackC04Source}=require('./sass-spinner-snack-c04-source.mjs');
+  const c04=spinnerSnackC04Source({root,read});assert.deepEqual(c04.qualify(handlerRef),currentHandlerRef);
+  const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,currentHandlerRef,...c04.bound,
    ...body.reviews.map(row=>({path:row.patch_file,sha256:row.diff_sha256}))];
   const assertBound=()=>{for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed inspection admission subject '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}};
   assertBound();assert.deepEqual(JSON.parse(read(REVIEW)),body);
   const current=source.reviewInspectionCompatibilitySource({root,read});
-  assert.deepEqual(current.report,JSON.parse(read(SOURCE_REVIEW.path)));
-  current.assertCurrent();assertBound();return true;
+  assert.deepEqual(current.historical_report,JSON.parse(read(SOURCE_REVIEW.path)));
+  c04.assertCurrent();current.assertCurrent();assertBound();c04.assertCurrent();
+  assert.deepEqual(capture(),originalMetadata,'caller admission metadata changed during source inspection');
+  assert.equal(metadataOk(args),true);return true;
 }
 function sourceOk(args){try{return inspectSource(args)===true;}catch{return false;}}
 

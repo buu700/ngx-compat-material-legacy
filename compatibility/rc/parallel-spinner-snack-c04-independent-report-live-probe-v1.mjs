@@ -1,0 +1,23 @@
+/** Actual physical C04 source subject; independently modeled old report, no producer. */
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {join,resolve} from 'node:path';
+import {createHash} from 'node:crypto';
+import {spinnerSnackC04Source} from '../../scripts/sass-spinner-snack-c04-source.mjs';
+const root=resolve(process.argv[2]),output=resolve(process.argv[3]);
+assert.ok(output.startsWith(join(root,'compatibility/rc/parallel-spinner-snack-c04-independent-')));
+const read=p=>readFileSync(join(root,p)),hash=b=>createHash('sha256').update(b).digest('hex');
+const reportPath='compatibility/rc/21x-c04-theming-inspection-source-review.json';
+let current,armed=false,reportReads=0,changed=false;
+const callback=p=>{if(armed&&p===reportPath){reportReads++;if(reportReads===2){current.role+=' LATE-INVALID';changed=true;}}return read(p);};
+const source=spinnerSnackC04Source({root,read:callback}),historical=JSON.parse(read(reportPath));
+current=structuredClone(historical);
+current.current_source_bindings=[...new Map([...source.bound,...historical.current_source_bindings.map(source.qualify)].map(ref=>[ref.path,ref])).values()].sort((a,b)=>a.path.localeCompare(b.path));
+current.current_public_bridge=structuredClone(source.summary);assert.equal(current.public_override_boundaries,4);current.public_override_boundaries=6;
+delete current.current_owned_sources_and_loaded_peers_match_retained_measurement;current.historical_owned_sources_and_loaded_peers_match_retained_measurement_except_separate_two_module_successor=true;
+source.assertReportSuccessor('theming-inspection',current);const authentic=structuredClone(current);
+armed=true;const returned=source.assertReportSuccessor('theming-inspection',current);armed=false;
+assert.equal(changed,true);assert.equal(reportReads,2);assert.deepEqual(returned,historical);assert.notDeepEqual(current,authentic);
+assert.throws(()=>source.assertReportSuccessor('theming-inspection',current));current=authentic;source.assertReportSuccessor('theming-inspection',current);source.assertCurrent();
+const result={schema_version:1,status:'late-report-mutation-accepted-after-equality',helper:{path:'scripts/sass-spinner-snack-c04-source.mjs',sha256:hash(read('scripts/sass-spinner-snack-c04-source.mjs'))},genuine_physical_subject_constructed:true,provided_callback_returned_genuine_physical_bytes:true,report_constructed_from_immutable_historical_data_and_current_physical_refs:true,current_producer_or_compiler_executed:false,authentic_positive:true,final_guard_report_reads:reportReads,mutated_report_accepted:true,historical_return_value_unchanged:true,independent_second_validation_rejected_mutant:true,restored_authentic_positive:true,actual_owner_or_artifact_qualified:false,g11_claim:'not-passed'};
+writeFileSync(output,JSON.stringify(result,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({status:result.status,reportReads}));

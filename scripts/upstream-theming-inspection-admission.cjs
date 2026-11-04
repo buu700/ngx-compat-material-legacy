@@ -19,7 +19,8 @@ const PATCHES={a7dbf08148467ce7b2f132eba32f9517e39e336f:'9ec928921c615a0e24cba91
  b6e50c631b8f8131f494d57b0b806777da8d4efd:'826acc540b82cce67fe5e5d6a76865198997e512a354535ffb2fbe2f78a80667'};
 const KIND='individual-historical-theming-inspection-source-exclusion',SCOPE='theming_inspection_source_scope';
 const hash=raw=>createHash('sha256').update(raw).digest('hex'),image=readFileSync(__filename);
-const handlerRef={path:HANDLER,sha256:hash(image),bytes:image.length};
+const handlerRef={path:HANDLER,sha256:'2f400340618b469046a19f20fa7c3a89a873e4ab1057b0040e3fd4895e5123ba',bytes:5186};
+const currentHandlerRef={path:HANDLER,sha256:hash(image),bytes:image.length};
 
 function themingProof(row){
  assert.ok(Object.hasOwn(PATCHES,row?.sha));
@@ -49,18 +50,27 @@ function metadataOk({entry,body,review,proof=entry?.individual_proof}){
 }
 
 /** Recompute all original/current source facts on every invocation. */
-function inspectSource({entry,body,review,proof,root=ROOT,read=path=>readFileSync(join(root,path))}){
+function inspectSource(args){
+  const {captureSpinnerSnackC04Metadata}=require('./sass-spinner-snack-c04-source.mjs');
+  const capture=()=>captureSpinnerSnackC04Metadata(args,['entry','body','review','proof','root']);
+  const originalMetadata=capture();
+  const {entry,body,review,proof}=originalMetadata;
+ const {root=ROOT,read=path=>readFileSync(join(root,path))}=args;
   // Source inspection imports the current ledger owner through its candidate
   // inventory helper; defer it until the owner has finished initializing.
   const source=require('./upstream-theming-inspection-source-review.mjs');
   assert.equal(resolve(root),ROOT);assert.equal(metadataOk({entry,body,review,proof}),true);
-  const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,handlerRef,
+  const {spinnerSnackC04Source}=require('./sass-spinner-snack-c04-source.mjs');
+  const c04=spinnerSnackC04Source({root,read});assert.deepEqual(c04.qualify(handlerRef),currentHandlerRef);
+  const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,currentHandlerRef,...c04.bound,
    ...body.reviews.map(row=>({path:row.patch_file,sha256:row.diff_sha256}))];
   const assertBound=()=>{for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed theming admission subject '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}};
   assertBound();assert.deepEqual(JSON.parse(read(REVIEW)),body);
   const current=source.reviewThemingInspectionSource({root,read});
-  assert.deepEqual(current.report,JSON.parse(read(SOURCE_REVIEW.path)));
-  current.assertCurrent();assertBound();return true;
+  assert.deepEqual(current.historical_report,JSON.parse(read(SOURCE_REVIEW.path)));
+  c04.assertCurrent();current.assertCurrent();assertBound();c04.assertCurrent();
+  assert.deepEqual(capture(),originalMetadata,'caller admission metadata changed during source inspection');
+  assert.equal(metadataOk(args),true);return true;
 }
 function sourceOk(args){try{return inspectSource(args)===true;}catch{return false;}}
 

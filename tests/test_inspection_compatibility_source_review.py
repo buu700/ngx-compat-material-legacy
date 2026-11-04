@@ -24,7 +24,7 @@ class InspectionCompatibilitySourceReviewTests(unittest.TestCase):
                            ('tagged_blobs', 8), ('exact_patch_replays', 7), ('whitespace_only_fixups', 1),
                            ('tagged_deleted_modern_files', 2), ('proposed_individual_source_decisions', 4),
                            ('owned_scss_members', 409), ('historical_exported_functions', 25),
-                           ('public_override_boundaries', 4), ('legacy_theme_module_source_rewrites', 4),
+                           ('public_override_boundaries', 6), ('legacy_theme_module_source_rewrites', 4),
                            ('legacy_theme_namespace_or_mixin_or_selector_rewrites', 0)]:
             self.assertEqual(report[key], value, key)
         self.assertGreater(report['source_bindings'], 605)

@@ -25,14 +25,14 @@ class ControlM3ThemeSourceReviewTests(unittest.TestCase):
         expected = dict(original_files=24, original_hunks=43, present_original_blobs=46,
                         authenticated_absent_images=2, tagged_blobs=15, exact_patch_replays=24,
                         authenticated_tree_objects=66, additional_files_beyond_seed=20,
-                        additional_hunks_beyond_seed=32, source_bindings=630, control_cases=56,
-                        exact_tagged_CSS_cases=52, existing_progress_alias_cases=4,
+                        additional_hunks_beyond_seed=32, source_bindings=682, control_cases=56,
+                        exact_tagged_CSS_cases=42, current_spinner_snack_bridge_cases=10, existing_progress_alias_cases=4,
                         historically_empty_cases=14, original_sass_graph_members=82,
-                        original_locked_archive_packages=22, css_semantic_mutants_detected=10)
+                        original_locked_archive_packages=22, css_semantic_mutants_detected=13)
         for key, value in expected.items():
             self.assertEqual(report[key], value, key)
-        self.assertEqual(len(report['rejected']), 121)
-        self.assertEqual(len(set(report['rejected'])), 121)
+        self.assertEqual(len(report['rejected']), 125)
+        self.assertEqual(len(set(report['rejected'])), 125)
         self.assertTrue(report['fresh_bounded_sass_compiler_execution'])
         self.assertTrue(report['tagged_reference_sass_executed'])
         for key in ['component_structural_Sass_freshly_compiled', 'full_sass_gate_executed',

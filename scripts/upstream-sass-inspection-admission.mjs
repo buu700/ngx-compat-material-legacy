@@ -12,7 +12,8 @@ import {readFileSync,realpathSync} from 'node:fs';
 import {join,isAbsolute} from 'node:path';
 import {gunzipSync} from 'node:zlib';
 import {candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';
-import {measureSassInspectionScope} from './measure-sass-inspection-scope.mjs';
+import {measureSassInspectionScope,assertSpinnerSnackInspectionScopeSuccessor} from './measure-sass-inspection-scope.mjs';
+import {spinnerSnackC04Source,captureSpinnerSnackC04Metadata} from './sass-spinner-snack-c04-source.mjs';
 
 const reviewPath='compatibility/rc/upstream-sass-inspection-individual-review.json';
 const pins={main:'365e3b6177017f35a8bc073ff999723fcf189bebf2dbf8bb01e521fc552df79f',
@@ -38,18 +39,18 @@ export function sassInspectionProof(row,line){
   sass_inspection:{sha:row.sha,review:{path:reviewPath,sha256:pins[line]},source_scope_only:true,
    actual_native_packed_or_floor_qualified:false}};
 }
-function member(read,ref){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed Sass review input '+ref.path);return raw;}
+function member(read,ref,c04){ref=c04?c04.qualify(ref):ref;const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed Sass review input '+ref.path);return raw;}
 function safe(path){assert.equal(typeof path,'string');assert.ok(path&&!isAbsolute(path)&&!path.includes('\\')&&path.split('/').every(part=>part&&part!=='.'&&part!=='..'));}
 function inspect({root,read,line}){
- assert.ok(Object.hasOwn(pins,line));
+ assert.ok(Object.hasOwn(pins,line));const c04=spinnerSnackC04Source({root,read}),memberRead=ref=>member(read,ref,c04);
  assert.equal(JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main',line);
- const body=JSON.parse(member(read,{path:reviewPath,sha256:pins[line]}));
+ const body=JSON.parse(memberRead({path:reviewPath,sha256:pins[line]}));
  assert.equal(body.line,line);assert.equal(body.status,'reviewed');assert.equal(body.reviews.length,6);
  assert.equal(body.original_hunks_reviewed,49);assert.equal(body.original_file_occurrences,17);
  assert.equal(body.source_scope_only,true);assert.equal(body.actual_native_packed_or_floor_qualified,false);
  assert.equal(body.canonical_decisions_changed,0);assert.equal(body.g11_claim,'not-passed');
- const original=JSON.parse(gunzipSync(member(read,body.upstream_originals)));
- const census=JSON.parse(gunzipSync(member(read,body.source_census)));assert.equal(census.line,line);assert.equal(census.commits.length,1697);
+ const original=JSON.parse(gunzipSync(memberRead(body.upstream_originals)));
+ const census=JSON.parse(gunzipSync(memberRead(body.source_census)));assert.equal(census.line,line);assert.equal(census.commits.length,1697);
  assert.deepEqual(body.reviews.map(row=>row.sha),SASS_INSPECTION_SHAS);
  let count=0;
  for(const row of body.reviews){
@@ -69,25 +70,28 @@ function inspect({root,read,line}){
    assert.ok(review.decision.length>80);assert.equal(review.upstream_original_suite_executed,false);});
  }
  assert.equal(count,49);
- const packetBytes=member(read,body.current_compiler_scope),packet=JSON.parse(gunzipSync(packetBytes)),scope=packet.actual;
+ const packetBytes=memberRead(body.current_compiler_scope),packet=JSON.parse(gunzipSync(packetBytes)),scope=packet.actual;
  assert.equal(packet.summary.line,line);assert.equal(packet.summary.result,'pass');assert.equal(packet.summary.positive.length,5);assert.equal(packet.summary.rejected.length,10);
  assert.equal(scope.line,line);assert.equal(scope.result,'pass');assert.equal(scope.entry_override_used,false);
- assert.equal(scope.candidate_entry,'projects/ngx-material-legacy/_index.scss');member(read,scope.producer);
- member(read,scope.oracle);assert.equal(scope.owned_scss_population.length,409);
+ assert.equal(scope.candidate_entry,'projects/ngx-material-legacy/_index.scss');memberRead(scope.producer);
+ memberRead(scope.oracle);assert.equal(scope.owned_scss_population.length,409);
  const paths=candidateProductSourcePaths(root).filter(path=>path.endsWith('.scss')).sort();
  assert.deepEqual(paths,scope.owned_scss_population.map(item=>item.path).sort());
- for(const ref of scope.owned_scss_population){safe(ref.path);assert.equal(member(read,ref).length,ref.bytes);}
+ for(const ref of scope.owned_scss_population){safe(ref.path);const current=c04.qualify(ref);assert.equal(memberRead(current).length,current.bytes);}
  const material=realpathSync(join(root,'node_modules/@angular/material')),cdk=realpathSync(join(root,'node_modules/@angular/cdk'));
  const manifest=readFileSync(join(material,'package.json'));assert.equal(hash(manifest),scope.peer.package_json_sha256);
  assert.equal(JSON.parse(manifest).version,line==='21.x'?'21.2.14':'22.1.7');
  for(const [program,roots]of [[scope.candidate,[realpathSync(join(root,'projects/ngx-material-legacy')),material,cdk]],[scope.current,[material,cdk]]]){
   for(const ref of program.loaded_sources){safe(ref.path);assert.ok(Number.isInteger(ref.root)&&ref.root>=0&&ref.root<roots.length);
-   const raw=readFileSync(join(roots[ref.root],ref.path));assert.equal(hash(raw),ref.sha256,'changed loaded Sass input '+ref.path);assert.equal(raw.length,ref.bytes);}
+   const qualified=program===scope.candidate&&ref.root===0?c04.qualify({...ref,path:'projects/ngx-material-legacy/'+ref.path}):ref;
+   const raw=readFileSync(join(roots[ref.root],ref.path));assert.equal(hash(raw),qualified.sha256,'changed loaded Sass input '+ref.path);assert.equal(raw.length,qualified.bytes);}
  }
- return {body,scope,scopeHash:hash(packetBytes)};
+ c04.assertCurrent();return {body,scope,c04,scopeHash:hash(packetBytes)};
 }
-function validateEntry({root,read,entry,body,line},fresh){
+function validateEntry(args,fresh){
  try{
+  const metadata=()=>captureSpinnerSnackC04Metadata(args,['entry','body','line','root']),snapshot=metadata();
+  const {root,read,line}=args;const {entry,body}=snapshot;
   const inspected=inspect({root,read,line}),reviewed=inspected.body,row=reviewed.reviews.find(item=>item.sha===entry.sha);assert.ok(row);
   assert.deepEqual(body,reviewed);assert.equal(entry.evidence_report,reviewPath);
   assert.equal(entry.final_disposition,'do-not-adopt');assert.equal(entry.reason,row.decision);
@@ -98,11 +102,11 @@ function validateEntry({root,read,entry,body,line},fresh){
   if(fresh){
    const previous=measurements.get(read),rootId=realpathSync(root),{scope,scopeHash}=inspected;
    if(!previous||previous.root!==rootId||previous.scopeHash!==scopeHash){
-    assert.deepEqual(measureSassInspectionScope({root:rootId}),scope,'fresh Sass visibility/caller measurement differs');
+    assertSpinnerSnackInspectionScopeSuccessor({root:rootId,historical:scope,current:measureSassInspectionScope({root:rootId}),bridge:inspected.c04.bridge});
     measurements.set(read,{root:rootId,scopeHash});
    }
   }
-  return true;
+  inspected.c04.assertCurrent();assert.deepEqual(metadata(),snapshot);return true;
  }catch{return false;}
 }
 

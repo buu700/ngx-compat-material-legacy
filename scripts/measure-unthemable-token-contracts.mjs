@@ -7,6 +7,7 @@
  */
 /** Five separate source decisions share only authentic reference and Sass measurement. */
 import assert from 'node:assert/strict';
+import {spinnerSnackC04Source} from './sass-spinner-snack-c04-source.mjs';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {readFileSync,writeFileSync,realpathSync} from 'node:fs';
@@ -33,6 +34,7 @@ const stripPublicProgressBridge=source=>{
 };
 
 export function inspectTokenPlacementSources({root=process.cwd(),read=path=>readFileSync(join(root,path))}={}){
+  const c04=spinnerSnackC04Source({root,read});
   const archiveRaw=readFileSync(join(sourceRoot,archivePath));assert.equal(hash(archiveRaw),archiveHash);
   const original=JSON.parse(gunzipSync(archiveRaw));assert.equal(original.reviews.length,5);
   assert.deepEqual(original.reviews.map(row=>row.family),tokenPlacementFamilies);
@@ -51,12 +53,14 @@ export function inspectTokenPlacementSources({root=process.cwd(),read=path=>read
     const originalModern=tagged.get(`src/material/${family}/_${family}-theme.scss`);
     assert.equal(legacy,originalLegacy.body,'historical legacy theme changed: '+family);
     const expectedModern=originalModern.body.replaceAll("'@material/","'../vendor/mdc/");
-    assert.equal(family==='progress-bar'?stripPublicProgressBridge(modern):modern,expectedModern,'modern16 source changed beyond reviewed relocation/bridge: '+family);
+    if(family==='progress-spinner')c04.assertHistoricalSource(paths.modern,expectedModern);
+    else assert.equal(family==='progress-bar'?stripPublicProgressBridge(modern):modern,expectedModern,'modern16 source changed beyond reviewed relocation/bridge: '+family);
     for(const source of [legacy,modern,originalLegacy.body,originalModern.body])assert.equal(/@mixin\s+base\s*\(/.test(source),false);
     assert.equal(entry.includes(family+'-base'),false);
     member(paths.structural);
     families.push({family,paths,legacy_theme_exact_tagged_bytes:true,
-      modern_theme_exact_tagged_bytes_after_MDC_import_relocation:family!=='progress-bar',
+      modern_theme_exact_tagged_bytes_after_MDC_import_relocation:!['progress-bar','progress-spinner'].includes(family),
+      historical_modern_source_exact_after_MDC_relocation:family==='progress-spinner',separate_current_public_bridge:family==='progress-spinner',
       separate_existing_public_progress_bridge:family==='progress-bar',introduced_base_mixin:false});
   }
   const oracleRaw=member(oraclePath);assert.equal(hash(oracleRaw),oracleHash);
@@ -65,12 +69,13 @@ export function inspectTokenPlacementSources({root=process.cwd(),read=path=>read
   const peer=JSON.parse(member('node_modules/@angular/material/package.json'));
   assert.equal(peer.version,line==='21.x'?'21.2.14':'22.1.7');
   assert.equal(manifest.peerDependencies['@angular/material'],'^'+peer.version);
-  const assertCurrent=()=>{
+  for(const value of c04.bound)if(!bound.has(value.path))bound.set(value.path,value);
+  const assertCurrent=()=>{c04.assertCurrent();
     assert.equal(hash(readFileSync(join(sourceRoot,archivePath))),archiveHash,'late original archive change');
     for(const value of bound.values()){const raw=read(value.path);assert.equal(hash(raw),value.sha256,'late source change '+value.path);assert.equal(raw.length,value.bytes);}
   };
   assertCurrent();return {line,peer_version:peer.version,families,original,oracle:JSON.parse(oracleRaw),
-    bound:[...bound.values()],assertCurrent,entryPath,archive:{path:archivePath,sha256:archiveHash}};
+    bound:[...bound.values()],assertCurrent,entryPath,current_public_bridge:structuredClone(c04.summary),archive:{path:archivePath,sha256:archiveHash}};
 }
 
 export function compileLegacyColorSource({root=process.cwd(),family,body}={}){
@@ -121,7 +126,7 @@ export function measureTokenPlacementContracts({root=process.cwd()}={}){
   for(const value of loaded.values()){const raw=read(value.path);assert.equal(hash(raw),value.sha256);assert.equal(raw.length,value.bytes);}
   scope.assertCurrent();return {schema_version:1,line:scope.line,role:'Five individually scoped historical Sass contracts; no rendered/native/packed/full-matrix/audit credit',
     result:'pass',peer_version:scope.peer_version,advertised_Material_minimum_equals_installed:true,compiler:sass.info,
-    authentic_reference:scope.archive,oracle:{path:oraclePath,sha256:oracleHash},families:scope.families,
+    authentic_reference:scope.archive,current_public_bridge:scope.current_public_bridge,oracle:{path:oraclePath,sha256:oracleHash},families:scope.families,
     public_selected_mixin_names:tokenPlacementFamilies.flatMap(family=>['color','theme','typography','density'].map(suffix=>family+'-'+suffix)
       .concat(['color','theme','typography'].map(suffix=>'legacy-'+family+'-'+suffix))),
     post16_base_exports_absent:tokenPlacementFamilies.map(family=>family+'-base'),

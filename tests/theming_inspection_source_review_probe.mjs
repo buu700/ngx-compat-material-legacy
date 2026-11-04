@@ -44,7 +44,7 @@ for(const [fault,path,text]of [
 let late=null;const mutable=path=>path===late?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
 const current=reviewThemingInspectionSource({root,read:mutable});assert.equal(current.report.reviews.length,2);assert.equal(current.report.canonical_decisions_changed,0);
 assert.equal(current.report.owned_scss_members,409);assert.equal(current.report.historical_exported_functions,25);
-assert.equal(current.report.public_override_boundaries,4);assert.equal(current.report.fresh_compiler_execution_this_review,false);
+assert.equal(current.report.public_override_boundaries,6);assert.equal(current.report.fresh_compiler_execution_this_review,false);
 const chosen=[
  'scripts/upstream-theming-inspection-source-review.mjs','scripts/upstream-candidate-source-evidence.mjs',
  'compatibility/rc/21x-c04-theming-inspection-originals.json.gz','compatibility/rc/upstream-complete-patch-census.json.gz',
