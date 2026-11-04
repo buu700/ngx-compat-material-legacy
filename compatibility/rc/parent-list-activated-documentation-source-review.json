@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "c73ab023af60220f19e98e85c32ea9924b217dae",
+  "subject": "docs: show MatListItem activated type (#29845)",
+  "status": "complete bounded source review; canonical decision pending",
+  "proposed_source_disposition": "not-applicable",
+  "reason": "The entire original change adds an explicit boolean return annotation to the modern MatListItem.activated getter. It leaves the getter body, coerceBooleanProperty setter, false initializer, input metadata and aria-current logic unchanged. Both pinned TypeScript versions infer boolean before and after and emit identical JavaScript. The tagged16 and actual owned MatLegacyListItem have no activated member and use their own disable-ripple-only local base; adding a modern input would expand the frozen legacy API. Both supported current public peer declarations already spell activated as boolean. Preserve the owned legacy class and peer ownership; no new API mirror or consumer HTML/CSS/SCSS change is required.",
+  "original_authentication": {
+    "complete_files": 1,
+    "complete_hunks": 1,
+    "tree_objects": 13,
+    "tagged_members": 2,
+    "exact_literal_change": "get activated() { -> get activated(): boolean {",
+    "full_changed_population": [
+      {
+        "path": "src/material/list/list.ts",
+        "status": "M",
+        "before_mode": "100644",
+        "after_mode": "100644",
+        "before_blob": "583f10f1bff7f98ea7f2da6d7ce04cfc3e920788",
+        "after_blob": "642064c411dccaab00ec24a7cb58ec392971b966"
+      }
+    ],
+    "patch_sha256": "898b3597ea7843625468b771b007caabe93fe4bb4fe6623f4e15e0ca9512595a",
+    "missing_anonymous_blob_reads": 0,
+    "upstream_code_executed": false,
+    "shared_cache_modified": false
+  },
+  "hunk_review": [
+    {
+      "path": "src/material/list/list.ts",
+      "header": "@@ -74,7 +74,7 @@ export class MatListItem extends MatListItemBase {",
+      "hunk_sha256": "3dfae1b0d0c84b86fc86d8905162ad50697de26c3c6a2789d3ca4e7984b6a27e",
+      "judgment": "An explicit getter return type clarifies API documentation without changing this already-boolean property inference or emitted JavaScript. This is a TypeScript surface annotation, not a comment-only edit; direct modern public declaration proof and the absent owned legacy member establish scope."
+    }
+  ],
+  "evidence": [
+    {
+      "path": "compatibility/rc/parent-list-activated-documentation-worksheet.json",
+      "sha256": "2fcc84658860a59fb587fff42c7551cd55b797011da9745fa32fa891f6ab4893",
+      "bytes": 1611
+    },
+    {
+      "path": "compatibility/rc/parent-list-activated-documentation-originals.json.gz",
+      "sha256": "1d0a8b1db6131ea1c1fdba5631570855fd0b200437bdf83e402f7e6457aa0fd4",
+      "bytes": 16876
+    },
+    {
+      "path": "compatibility/rc/parent-list-activated-documentation-whole-original.patch",
+      "sha256": "898b3597ea7843625468b771b007caabe93fe4bb4fe6623f4e15e0ca9512595a",
+      "bytes": 457
+    },
+    {
+      "path": "compatibility/rc/parent-list-activated-documentation-source-controls.json",
+      "sha256": "ae0bfaef7a093f6750869ff3152522cecfe465cd9681fad07bb2a55541cb2083",
+      "bytes": 5448
+    },
+    {
+      "path": "compatibility/rc/parent-list-activated-documentation-probe.mjs",
+      "sha256": "8ae54b5dd4b74e62f401385cb9e84c8d9354c47991dacb6cc31b5ecd544d858a",
+      "bytes": 4931
+    },
+    {
+      "path": "compatibility/rc/parent-list-activated-documentation-capture.py",
+      "sha256": "5eeee5bbe121cc7df89208ec852888df0a0dc66a515c041939776bc131b8c914",
+      "bytes": 9736
+    }
+  ],
+  "source_observations": [
+    {
+      "line": "main",
+      "typescript": "6.0.3",
+      "original_inferred_type": "boolean",
+      "after_explicit_type": "boolean",
+      "emitted_javascript_equal": true,
+      "emitted_sha256": "788df90a21d92552f0bfd9df631737a93a47c2d1649fb4d37820c6c41aa1dc63",
+      "peer_public_getter_boolean": true,
+      "owned_class_has_no_activated_member": true,
+      "negative_controls_rejected": 2
+    },
+    {
+      "line": "21.x",
+      "typescript": "5.9.2",
+      "original_inferred_type": "boolean",
+      "after_explicit_type": "boolean",
+      "emitted_javascript_equal": true,
+      "emitted_sha256": "788df90a21d92552f0bfd9df631737a93a47c2d1649fb4d37820c6c41aa1dc63",
+      "peer_public_getter_boolean": true,
+      "owned_class_has_no_activated_member": true,
+      "negative_controls_rejected": 2
+    }
+  ],
+  "cyph_readonly_sanity": {
+    "root": "/home/parallels/cyph",
+    "path": "shared/js/cyph/modules/cyph-shared.module.ts",
+    "sha256": "f3b2c3a0724431d1c90ca01452593cc3fc84d6ed6cead902b18a3fdafe4eb56a",
+    "bytes": 5618,
+    "module_alias": "MatLegacyListModule as MatListModule",
+    "scoped_TS_HTML_search_for_activated_binding": "No [activated] binding found under shared/js/cyph; many legacy mat-list-item consumers exist.",
+    "consumer_build_executed": false
+  },
+  "limits": [
+    "Isolated TypeScript type inspection and transpilation do not qualify complete Angular/AOT modules or current runtime behavior.",
+    "Current public peer source presence is not an advertised floor execution pass.",
+    "No emitted upstream JavaScript, upstream test suite, native/browser/packed/build/consumer execution was run.",
+    "All1697SHA identities and the pending security-review entry remain in scope; canonical counts stay426closed/1271pending."
+  ],
+  "canonical_decisions_or_product_changes": 0,
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed",
+  "full_plan_complete": false
+}
