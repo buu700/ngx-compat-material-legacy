@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "scope": "Cheap isolated cache and callback mutation reproductions against the new base-class admission contract. No reviewed file edited.",
+  "runtime": "/nix/store/w8jijs92barihdb0z54dsgq5szj2wd47-nodejs-24.21.0/bin/node",
+  "node": "24.21.0",
+  "execution": "Each process used nice 19 and a 20-second timeout. No full owner, compiler, build, browser or complete probe was run.",
+  "reproductions": [
+    {
+      "id": "cached-producer-own-toString",
+      "initial_handler_sha256": "95c75d88f2fb46d74b75e57ca23ae42b75ab26832e5993fa779fc1aad96e128a",
+      "initial_location": "scripts/upstream-base-class-removal-admission.cjs producerFunctions loop using hash(fn.toString())",
+      "steps": [
+        "Require upstream-base-class-removal-source.mjs and compute cachedFacts once from its genuine original verifier and the immutable original/census JSON.",
+        "Create replacement function cachedOriginal() that returns structuredClone(cachedFacts), increments a counter, and owns toString = () => original.toString().",
+        "Replace only the module's CommonJS require.cache exported verifyBaseClassRemovalOriginal with that function; leave all disk bytes unchanged.",
+        "Load the admission handler and stage; build authentic body and proposed entry from the pinned current ledger.",
+        "Call inspectSource with authentic root, entry, body, review and proof."
+      ],
+      "initial_actual": {"accepted": true, "cached_producer_calls": 1, "seconds": 1.894027293},
+      "expected": {"accepted": false, "cached_producer_calls": 0},
+      "observed_repair": "Handler captures Function.prototype.toString before importing producers and hashes functionToString.call(fn).",
+      "retest_actual": {"accepted": false, "cached_producer_calls": 0, "error_prefix": "loaded base-class producer function cachedOriginal"},
+      "status": "fixed-and-independently-retested"
+    },
+    {
+      "id": "callback-mutates-accepted-entry",
+      "location": "scripts/upstream-base-class-removal-admission.cjs: inspectSource initial metadataOk and returned assertCurrent",
+      "steps": [
+        "Build authentic body and proposed entry through applyBaseClassRemovalCanonicalStage.",
+        "Set args.read to a callback that changes entry.final_disposition to irrelevant on its first invocation, then always returns genuine readHistoricalContractRepairMember(root, path) bytes.",
+        "Observe metadataOk(args) before sourceOk, execute sourceOk(args), then observe metadataOk(args) after sourceOk."
+      ],
+      "actual": {"metadata_valid_before": true, "accepted": true, "metadata_valid_after": false, "entry_final_disposition": "irrelevant", "mutated": true},
+      "expected": {"accepted": false},
+      "reason": "The entry is checked before callbacks run, but the accepted caller-owned entry/proof/body are not revalidated by the source guard or immediately before returning. Physical source equality does not protect the decision metadata from callback side effects.",
+      "recommended_scope": "Retain immutable internal metadata inputs for source derivation and revalidate live entry/body/review/proof after callback activity and in the retained assertCurrent guard. Add separate entry, proof and body callback mutants; do not update historical reports.",
+      "retest_actual": {"metadata_valid_before": true, "accepted": false, "metadata_valid_after": false},
+      "additional_retests": {"late_entry_proof_and_body_mutants_rejected": 3, "authentic_request_restoration_passes": true},
+      "status": "fixed-and-independently-retested"
+    }
+  ],
+  "early_attempt_note": "An initial system-Node invocation was rejected by the pinned-version guard before any substituted producer call; accepted/rejected results above use pinned Node 24.21.0."
+}

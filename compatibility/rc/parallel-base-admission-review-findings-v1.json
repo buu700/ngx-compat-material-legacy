@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "task": "parallel-base-admission-review",
+  "status": "one-blocking-callback-mutation-defect",
+  "scope": "Bounded source-only admission handler and pure unapplied proposal; actual shared owner and registry application are intentionally outside this contract.",
+  "reviewed_current_images": [
+    {"path": "scripts/upstream-base-class-removal-admission.cjs", "sha256": "7372604bb071e511c674e079bc8e9702c1918226b36005c2af0c5f5f31689bd8"},
+    {"path": "scripts/base-class-removal-canonical-stage.mjs", "sha256": "8b9c27362bf89a53bcb2b27ca185d4da9200014a807be02ffd2a6b7df6d0de13"},
+    {"path": "tests/base_class_removal_admission_probe.mjs", "sha256": "3ce7491fc0bccbac49f3daa3a8f7d0aecc503b6fd23898eed7ade5eaebe3fa63"},
+    {"path": "compatibility/rc/21x-base-class-removal-admission-contract-controls-v4.json", "sha256": "bb47eb6721cc0b5b8b208fc9fb0f1c7026169f72ba576c1db626a9ebc69d6234"},
+    {"path": "compatibility/rc/21x-base-class-removal-admission-canonical-proposal-v4.json", "sha256": "410e6f7973b71aa2bb98505a60bbc8a58634358810ae9ddb4ed413791a0aa99c"}
+  ],
+  "blocking_findings": [
+    {
+      "id": "callback-mutates-accepted-entry",
+      "location": "scripts/upstream-base-class-removal-admission.cjs: inspectSource initial metadata check and assertCurrent closure",
+      "problem": "A genuine physical reader callback can mutate the caller-owned selected entry after metadataOk and sourceOk still returns true. The same accepted arguments then fail metadataOk.",
+      "reproduced": true,
+      "result": {"metadata_valid_before": true, "source_accepted": true, "metadata_valid_after": false, "final_disposition": "irrelevant"},
+      "evidence": "compatibility/rc/parallel-base-admission-review-reproductions-v1.json",
+      "minimum_fix": "Use immutable internal metadata for source derivation; retain exact live metadata identity checks after reader callbacks and at the end of the retained current guard. Add entry/proof/body callback and late mutation controls."
+    }
+  ],
+  "resolved_findings": [
+    {
+      "id": "cached-producer-own-toString",
+      "initial_problem": "The initial handler accepted a cached original verifier returning saved facts when its own toString returned the genuine producer text.",
+      "fix": "Capture Function.prototype.toString and hash the intrinsic call on each loaded producer.",
+      "independent_retest": "Exact saved-facts plus spoofed-own-toString reproduction rejected before the substituted function executed under pinned Node 24.21.0.",
+      "final_probe_controls": "Versioned v4 report contains eight cache substitutions: each of four producers, with and without spoofed own toString. Those complete probe controls were not rerun by this reviewer."
+    }
+  ],
+  "supported_contract_properties": [
+    "The original verifier authenticates target, parent and tagged commits, tree objects and blobs, all 72 changed files and all 329 exact patch hunks against the fixed census and untouched Material 16 tag.",
+    "All 14 substantive-review input paths are members of the pinned historical 715-source list and match their pinned current bytes. There are 329 unique path/index per-hunk decisions.",
+    "Direct hash inspection of all 715 historical bindings finds exactly five changed paths: the four independently owned product repairs and the API exception map now at 113. No other historical binding drift was found.",
+    "The repair subject independently derives exact tagged/baseline before-to-after images, checks current physical bytes, and binds the implementation, use qualification and review. It does not project old product bytes.",
+    "The unchanged frozen final report still explicitly says required_repairs_satisfied=false and canonical_admission_ready=false. The new handler adds a distinct current source decision instead of relabeling that report.",
+    "The final handler treats all three acquisition canonical paths and the API receipt's one duplicate ledger reference as Git-authenticated historical context. Current canonical application remains the shared owner's responsibility.",
+    "Root and package-version checks reject wrong checkout/cross-line source use. Ordinary supplied readers must return the same Buffer bytes as the physical route, and bound sources are rehashed in the retained current guard.",
+    "The pure proposal changes one selected row and two summary scalars. An independent inverse replacement exactly recovered every original ledger byte; inverse registry-record removal exactly recovered every original registry byte.",
+    "All 1696 unselected entry values and the one security-review row remain identical. The exact ledger and registry before-image hashes reject unknown or already-applied input images.",
+    "The handler and proposal explicitly retain source-only scope, canonical admission false, full-owner integration false, native/packed/browser/floor/full-audit false, and G11 not-passed. The API receipt expressly excludes a full 449-symbol program run."
+  ],
+  "report_provenance": "The final v4 report and proposal reference current handler/stage/review/probe bytes. Earlier unversioned/v2 artifacts are historical executions and do not stand in for the final v4 controls.",
+  "checks_performed_by_reviewer": [
+    "Static inspection of all assigned code, metadata, original verifier, substantive review validator and relevant repair-source boundaries",
+    "Direct JSON/hash census of the 715 historical source bindings and the 14 substantive-review input bindings",
+    "Isolated cached-producer spoof reproduction and exact post-fix rejection retest under pinned Node 24.21.0",
+    "Isolated authentic-byte reader callback mutating the accepted entry under pinned Node 24.21.0",
+    "Pure proposal inverse-byte preservation check for ledger and registry"
+  ],
+  "not_executed_by_reviewer": ["complete admission probe", "Python wrapper tests", "full owner", "build", "compiler", "browser", "native", "packed artifact", "floor matrix"],
+  "existing_files_edited": false,
+  "commits_or_remote_operations": false,
+  "canonical_application_or_authority_granted": false
+}

@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "task": "parallel-base-admission-review",
+  "status": "complete-no-remaining-blocking-findings",
+  "supersedes": "compatibility/rc/parallel-base-admission-review-findings-v1.json",
+  "scope": "Only the new source-only admission contract and pure unapplied one-row canonical proposal. Actual shared-owner and registry application remain intentionally outside this review.",
+  "current_images": [
+    {"path": "scripts/upstream-base-class-removal-admission.cjs", "sha256": "e1f94a0a3be7e6226ebec78d0dbf873ad66285d77874d09c2faa7d9ea5bbddec", "bytes": 14191},
+    {"path": "scripts/base-class-removal-canonical-stage.mjs", "sha256": "8b9c27362bf89a53bcb2b27ca185d4da9200014a807be02ffd2a6b7df6d0de13", "bytes": 4514},
+    {"path": "tests/base_class_removal_admission_probe.mjs", "sha256": "239aca0f98ca865257a79e9a127df77f91f1514bb296b3f18eb19dbc1f9ce494", "bytes": 18640},
+    {"path": "compatibility/rc/21x-base-class-removal-admission-contract-controls-v5-final.json", "sha256": "f8495c110c9ab2e89862dec62f3f2246e522de42c37676c56046e857f24737af"},
+    {"path": "compatibility/rc/21x-base-class-removal-admission-canonical-proposal-v5-final.json", "sha256": "a55fd50105779f026bc670faf0ea33192d764e22faa539d991af42408c8cedd5"}
+  ],
+  "blocking_findings": [],
+  "reproduced_and_resolved": [
+    {
+      "id": "cached-producer-own-toString",
+      "before": "A cached original verifier returned saved facts while spoofing its own toString; the initial handler accepted it.",
+      "fix": "Captured Function.prototype.toString is called intrinsically on loaded producer functions.",
+      "independent_exact_retest": {"accepted": false, "cached_producer_calls": 0},
+      "final_probe": "All four producer exports are tested with and without spoofed own toString."
+    },
+    {
+      "id": "callback-mutates-accepted-entry",
+      "before": "A genuine-byte reader changed entry.final_disposition to irrelevant after metadataOk; sourceOk accepted an entry that then failed metadataOk.",
+      "fix": "Source judgments use an authenticated immutable metadata snapshot. The original live request is exactly revalidated at both ends of the retained source guard. The canonical wrapper separately validates its live entries/body and retained source guard.",
+      "independent_exact_retest": {"metadata_valid_before": true, "source_accepted": false, "metadata_valid_after": false},
+      "independent_late_retests": {"entry_mutation_rejected": true, "proof_mutation_rejected": true, "body_mutation_rejected": true, "authentic_request_restoration_passes": true},
+      "final_probe": "Adds physical-reader metadata mutation, late caller/reader mutation, top-level entry replacement, and explicit null-proof controls."
+    }
+  ],
+  "review_conclusions": {
+    "historical_review": "The unchanged original verifier authenticates commits, trees, blobs, all 72 changed files, the untouched 16.2.14 tag and all 329 exact hunks. All 14 substantive review inputs are present in the immutable 715 binding list; all 329 path/index decisions are unique and reproduced by the pure validator.",
+    "current_source": "Independent direct hash inspection found exactly the four qualified product repairs plus the API 113 map as the only changed members among the 715 historical bindings. The finite repair subject derives these exact successors and enforces physical current sources. Unrelated bindings are still exact.",
+    "historical_reports": "The original final report still says required_repairs_satisfied=false and canonical_admission_ready=false. The new distinct decision adds current qualification without modifying or relabeling frozen reports.",
+    "canonical_history": "The three acquisition canonical refs and the API receipt's one duplicate acquisition-ledger reference use the exact Git-authenticated historical route. The source handler grants no acceptance of a current canonical transaction.",
+    "proposal_preservation": "Independent inverse-byte checks recovered the entire original ledger by undoing only the selected row and two scalars, and recovered the original registry by removing its one added record. All other 1696 entries and the one security-review row remain identical.",
+    "authority": "Handler and proposal retain source-only scope. Canonical admission, actual application, full owner integration, runtime/native/packed/browser/floor/full-audit and G11 remain unqualified. The separately bound API receipt explicitly excludes a full 449-symbol program run.",
+    "final_receipts": "Final v5-final control/proposal refs were rehashed and match the current handler, stage, review and probe bytes. Earlier unversioned/v2/v4/v5 records remain historical executions."
+  },
+  "independent_verification": [
+    "Read all requested new files and the exact original verifier, review validator and repair-source boundaries",
+    "Direct 715-member and 14-review-input hash comparison",
+    "Pinned Node 24.21.0 isolated cached-producer acceptance reproduction and exact rejection retest",
+    "Pinned Node 24.21.0 isolated callback-entry acceptance reproduction and exact rejection retest",
+    "One genuine source context followed by three late metadata mutants and authentic restoration",
+    "Pure ledger/registry inverse-byte preservation check",
+    "Rehashed final v5-final provenance references"
+  ],
+  "not_independently_executed": ["complete admission probe", "Python wrapper tests", "full owner", "compiler", "build", "browser", "native", "packed artifact", "consumer floor matrix"],
+  "existing_files_edited": false,
+  "only_new_review_records_written": true,
+  "commits_remote_operations_or_canonical_application": false
+}
