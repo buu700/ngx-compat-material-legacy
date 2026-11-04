@@ -1,4 +1,5 @@
 @use '../vendor/mdc/snackbar/snackbar-theme' as mdc-snackbar-theme;
+@use '@angular/material' as mat;
 @use '../core/theming/theming';
 @use '../core/typography/typography';
 @use '../core/tokens/token-utils';
@@ -11,6 +12,7 @@
 
   .mat-mdc-snack-bar-container {
     @include mdc-snackbar-theme.theme(tokens-mdc-snack-bar.get-color-tokens($config));
+    @include mat.snack-bar-overrides(tokens-mdc-snack-bar.get-color-tokens($config));
     @include token-utils.create-token-values(
       tokens-mat-snack-bar.$prefix,
       tokens-mat-snack-bar.get-color-tokens($config)
@@ -24,6 +26,7 @@
 
   .mat-mdc-snack-bar-container {
     @include mdc-snackbar-theme.theme(tokens-mdc-snack-bar.get-typography-tokens($config));
+    @include mat.snack-bar-overrides(tokens-mdc-snack-bar.get-typography-tokens($config));
   }
 }
 

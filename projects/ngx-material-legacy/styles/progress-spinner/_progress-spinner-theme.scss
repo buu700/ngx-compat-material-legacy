@@ -1,4 +1,5 @@
 @use 'sass:map';
+@use '@angular/material' as mat;
 @use '../core/theming/theming';
 @use '../core/tokens/m2/mdc/circular-progress' as tokens-mdc-circular-progress;
 @use '../vendor/mdc/circular-progress/circular-progress-theme' as mdc-circular-progress-theme;
@@ -9,15 +10,18 @@
 
   .mat-mdc-progress-spinner {
     @include mdc-circular-progress-theme.theme($mdc-circular-progress-color-tokens);
+    @include mat.progress-spinner-overrides($mdc-circular-progress-color-tokens);
 
     &.mat-accent {
       $color: theming.get-color-from-palette(map.get($config, accent));
       @include mdc-circular-progress-theme.theme((active-indicator-color: $color));
+      @include mat.progress-spinner-overrides((active-indicator-color: $color));
     }
 
     &.mat-warn {
       $color: theming.get-color-from-palette(map.get($config, warn));
       @include mdc-circular-progress-theme.theme((active-indicator-color: $color));
+      @include mat.progress-spinner-overrides((active-indicator-color: $color));
     }
   }
 }
