@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "path": "scripts/historical-contract-repair-readers.mjs",
+  "before": {
+    "sha256": "f2d6f90dabd3ad2e0a6d0a7b032184b39c162327c5528081be4645460ff1606e",
+    "bytes": 9861
+  },
+  "after": {
+    "sha256": "ac290b85edcbd362cc01416ba75ac966f37669d76eefe1b0ceb353a217789871",
+    "bytes": 10666
+  },
+  "literal_edits": [
+    {
+      "before": " const compiler=path.match(/^node_modules\\/@angular\\/compiler-cli\\/(.+)$/);",
+      "after": " const sass=path.match(/^node_modules\\/sass\\/(package\\.json|sass\\.node\\.js|sass\\.dart\\.js)$/);\n if(sass){\n  const modules=join(root,'node_modules');assert.ok(lstatSync(modules).isDirectory()&&!lstatSync(modules).isSymbolicLink());\n  const expected=JSON.parse(readEvidenceMember(root,'package.json')).devDependencies.sass;assert.match(expected,/^\\d+\\.\\d+\\.\\d+$/);\n  const directory=realpathSync(join(modules,'sass')),manifest=join(directory,'package.json');\n  assert.ok(lstatSync(manifest).isFile()&&!lstatSync(manifest).isSymbolicLink());\n  const identity=JSON.parse(readFileSync(manifest));assert.equal(identity.name,'sass');assert.equal(identity.version,expected);\n  const file=join(directory,sass[1]);assert.ok(lstatSync(file).isFile()&&!lstatSync(file).isSymbolicLink());return readFileSync(file);\n }\n const compiler=path.match(/^node_modules\\/@angular\\/compiler-cli\\/(.+)$/);"
+    }
+  ],
+  "g11_claim": "not-passed"
+}

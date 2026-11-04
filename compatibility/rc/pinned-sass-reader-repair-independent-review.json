@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "kind": "independent-focused-reader-repair-review",
+  "reviewer": "Codex progress_bar_review subagent",
+  "status": "reviewed; no correctness blocker found within bounded reader scope",
+  "reviewed_worksheet": {
+    "path": "compatibility/rc/pinned-sass-reader-repair-worksheet.json",
+    "sha256": "50ada6bac753ce3e9077537aa0d89d0fbe36897d7a930757487fc49d415cce03",
+    "bytes": 3542
+  },
+  "reviewed_transition": {
+    "path": "compatibility/rc/pinned-sass-reader-repair-transition.json",
+    "sha256": "dc632f2466f4068a185d21f7bf91e3627340c5ab70983946d6a0fe48aa68a32a",
+    "bytes": 1429
+  },
+  "probe": {
+    "path": "compatibility/rc/pinned-sass-reader-repair-probe.mjs",
+    "sha256": "88446672b96025f52baf72421dd0b4a953de08bba9308f916b23ca7afb695f75",
+    "bytes": 11545
+  },
+  "branches": [
+    {
+      "line": "21x",
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "reader_sha256": "ac290b85edcbd362cc01416ba75ac966f37669d76eefe1b0ceb353a217789871",
+      "exact_only_declared_sass_insertion": true,
+      "reader_previous_sha256": "f2d6f90dabd3ad2e0a6d0a7b032184b39c162327c5528081be4645460ff1606e",
+      "report": {
+        "path": "compatibility/rc/pinned-sass-reader-repair-reader-21x.json",
+        "sha256": "08c85824baff3f3924e4a9dbeb71dbfa5cc8451d000391b52c731b1a92e7925d",
+        "bytes": 17906
+      }
+    },
+    {
+      "line": "main",
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+      "reader_sha256": "ac290b85edcbd362cc01416ba75ac966f37669d76eefe1b0ceb353a217789871",
+      "exact_only_declared_sass_insertion": true,
+      "reader_previous_sha256": "f2d6f90dabd3ad2e0a6d0a7b032184b39c162327c5528081be4645460ff1606e",
+      "report": {
+        "path": "compatibility/rc/pinned-sass-reader-repair-reader-main.json",
+        "sha256": "30e534f6bf068e009e95c5556bb5065a0a27ae5bfbd8c14c34de49c7fa1becaa",
+        "bytes": 17911
+      }
+    }
+  ],
+  "conclusion": "The exact three-file Sass package-root symlink exception works through both the direct physical reader and actual snackDomRawCurrentRead route on both branches. The source delta reconstructs precisely to the authenticated prior reader, with no unrelated reader changes.",
+  "source_review": [
+    "Root node_modules is required to be a regular directory. The root manifest is read with strict generic no-symlink/path guards. The root devDependency must be an exact numeric version.",
+    "Only the exact package.json, sass.node.js and sass.dart.js literals select the new symlink-aware Sass branch. That branch requires a regular package manifest with name sass and version matching the root pin, and a regular target file.",
+    "The allowed package root may resolve through the pnpm alias. Generic readEvidenceMember remains unchanged and still rejects the actual linked package paths. All unenumerated linked Sass descendants fall back to that strict generic route and fail.",
+    "Ordinary unlinked regular-file reading is intentionally preserved: an unlisted regular Sass descendant without a linked package root has the same generic behavior as the prior reader. This is a finite symlink exception, not a generic allowlist for every regular file.",
+    "The reader verifies identity/version and regular-file structure; it does not authenticate compiler binary/source content. A same-version, same-length mutated sass.node.js fixture remains readable and fails the separately preserved fixed SHA256 check."
+  ],
+  "execution": {
+    "node": "24.21.0",
+    "nice": 19,
+    "serial": true,
+    "actual_compiler_files_per_line": 3,
+    "actual_read_routes": [
+      "readHistoricalContractRepairOwnerMember",
+      "snackDomRawCurrentRead default physical raw callback"
+    ],
+    "negative_cases_per_line": 19,
+    "rejected_route_path_observations_per_line": 62,
+    "positive_route_observations_per_line": 10,
+    "actual_refs": "Three known COMPILER SHA256/size references parsed and cross-checked against fixed literals from the21.x upstream-selector-density-source-review.mjs; main checked independently against those same explicitly requested compiler refs.",
+    "fixture_cases": [
+      "linked package manifest",
+      "linked Sass node target",
+      "linked Sass dart target",
+      "linked node_modules container",
+      "linked root manifest",
+      "non-file package manifest",
+      "non-file target",
+      "wrong package name",
+      "wrong package version",
+      "six nonexact/nonstring root pins",
+      "missing root pin",
+      "six path escapes/nonliteral paths",
+      "four other linked Sass descendants",
+      "ordinary source symlink"
+    ],
+    "disposable_fixture_cleanup": true,
+    "actual_dependencies_mutated": false,
+    "sass_module_initialized_by_existing_transitive_import": true,
+    "sass_compilation_apis_invoked": false,
+    "source_verifier_or_full_owner_invoked": false
+  },
+  "required_repair": null,
+  "correctness_blockers": [],
+  "parent_remaining_action": "Run the actual selector-density verifier separately through the composed owner route and compare its complete report with the original. These reader tests do not establish that broader verifier/owner result.",
+  "assurance_limits": [
+    "No full owner, compiler/Sass execution, build, browser, packed artifact, minimum consumer runtime or peer-floor qualification.",
+    "This finite reader review does not authenticate arbitrary cached same-version compiler content and does not claim transactional protection against continuously racing filesystem writers."
+  ],
+  "product_shared_registry_or_existing_evidence_mutated": false,
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}
