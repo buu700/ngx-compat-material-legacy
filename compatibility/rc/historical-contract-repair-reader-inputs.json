@@ -55,8 +55,8 @@
         "bytes": 45576
       },
       "after": {
-        "sha256": "9cd00c70f2b2a5d37474c5dbb3e56f2ab6dee289ccf40ffd3dd894c694d30edc",
-        "bytes": 45515
+        "sha256": "5a56396072d115beda317231e03d470e8c2d801e6517d3f26a7fee9c14fe4d34",
+        "bytes": 45529
       },
       "literal_edits": [
         {
@@ -130,6 +130,10 @@
         {
           "before": "packed=packedRepairEpoch(root,roleRead);",
           "after": "packed=packedRepairEpoch(root,rawCurrent,roleRead);"
+        },
+        {
+          "before": "const projected=packedRepairEpoch(root,actual).read;branded.set(projected,{root,raw:actual});",
+          "after": "const projected=packedRepairEpoch(root,actual,metadata.read).read;branded.set(projected,{root,raw:actual});"
         }
       ]
     },
