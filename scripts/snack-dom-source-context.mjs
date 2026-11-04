@@ -216,7 +216,7 @@ export function packedRepairTypeEvidenceRead({root=process.cwd(),read=rawRead(ro
  const digest=hash(actual(target.path));
  if(digest===target.before_sha256)return metadata.read;
  const contract=historicalContractRepairSourceSubject({root});assert.equal(digest,(contract.qualify(target)??target).sha256,'unqualified current menu type-proof source');
- const projected=packedRepairEpoch(root,actual).read;branded.set(projected,{root,raw:actual});return projected;
+ const projected=packedRepairEpoch(root,actual,metadata.read).read;branded.set(projected,{root,raw:actual});return projected;
 }
 export function inspectPackedProductSourceRepairs({root=process.cwd(),read=rawRead(root)}={}){
  const c=packedRepairEpoch(root,currentRaw(root,read));
