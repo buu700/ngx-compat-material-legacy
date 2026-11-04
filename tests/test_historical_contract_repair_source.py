@@ -58,6 +58,56 @@ class HistoricalContractRepairReferenceTests(unittest.TestCase):
                 with self.assertRaises(AssertionError):
                     action()
 
+    def test_owner_lane_extension_preserves_prior_rows_and_exact_intermediate(self):
+        data = subject._tool_data(ROOT)
+        prior_ref = data['prior_reader_registry']
+        prior_raw = subject._original(str(ROOT), prior_ref['source_parent'], subject.READERS)
+        prior = json.loads(prior_raw)
+        self.assertEqual(len(prior['tool_transitions']), 15)
+        unchanged = 0
+        for old in prior['tool_transitions']:
+            current = next(row for row in data['tool_transitions'] if row['path'] == old['path'])
+            if old['path'] == 'scripts/packed-upstream-ledger-epoch.mjs':
+                value = {'path': old['path'], **old['after'], 'annotation': 'retained'}
+                self.assertEqual(subject.qualify_tool_reference(value),
+                                 {'path': old['path'], **current['after'], 'annotation': 'retained'})
+                comparison = subject.tool_comparison_bytes(value)
+                self.assertEqual(subject.digest(comparison), old['after']['sha256'])
+                self.assertEqual(len(comparison), 74930)
+            else:
+                self.assertEqual(current, old)
+                unchanged += 1
+        self.assertEqual(unchanged, 14)
+
+    def test_only_authenticated_epoch_intermediate_can_advance(self):
+        data = subject._tool_data(ROOT)
+        row = next(row for row in data['tool_transitions']
+                   if row['path'] == 'scripts/packed-upstream-ledger-epoch.mjs')
+        middle = {'path': row['path'], 'sha256': '34a8c062367debddf81a5112be37e4aa603e4a3c6b9c8e5c7c34144995d62669', 'bytes': 74930}
+        for action in [subject.qualify_tool_reference, subject.tool_comparison_bytes]:
+            with self.assertRaises(AssertionError):
+                action({**middle, 'bytes': 74931})
+        before = subject._original(str(ROOT), row.get('source_parent', data['source_parent']), row['path']).decode()
+        unknown = None
+        for edit in row['literal_edits']:
+            before = before.replace(edit['before'], edit['after'])
+            digest = subject.digest(before.encode())
+            if digest not in [row['before']['sha256'], row['after']['sha256'], middle['sha256']]:
+                unknown = {'path': row['path'], 'sha256': digest, 'bytes': len(before.encode())}
+                break
+        self.assertIsNotNone(unknown)
+        for action in [subject.qualify_tool_reference, subject.tool_comparison_bytes]:
+            with self.assertRaises(AssertionError):
+                action(unknown)
+        saved = subject._original
+        def changed_prior(root, parent, path):
+            raw = saved(root, parent, path)
+            return raw + b'\n' if path == subject.READERS else raw
+        with patch.object(subject, '_original', changed_prior):
+            for action in [subject.qualify_tool_reference, subject.tool_comparison_bytes]:
+                with self.assertRaises(AssertionError):
+                    action(middle)
+
 
 if __name__ == '__main__':
     unittest.main()

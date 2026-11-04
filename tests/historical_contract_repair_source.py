@@ -15,7 +15,7 @@ SOURCE = 'compatibility/rc/historical-contract-repair-source-inputs.json'
 READERS = 'compatibility/rc/historical-contract-repair-reader-inputs.json'
 SOURCE_PINS = {'21.x': 'c1d7a8762cad7913a5d4ad60863afb506c56c61d27a78c17a3f5372c51cc9303',
                'main': 'cee92383ce1cb2c82b135e2e3b8be0131a46b114d60a521f7e11e4d0bb017191'}
-READER_PINS = {'21.x': '3af8b447d98b9d0bde687d83399e8c625604dbefa78b00535e142b063d8482f3',
+READER_PINS = {'21.x': '577d690ecdad79da270dda15a73649c519e5f9444f9e0a0739d94aecefa45a90',
                'main': '702d6f65109297515ee1fc57810eaf8fe0a9f7148742ff8572d90824d57b2944'}
 
 
@@ -71,8 +71,8 @@ def _identity(raw, ref):
     assert len(raw) == ref['bytes']
 
 
-def _selected(ref, row):
-    prior = next((side for side in [row['before'], row['after']]
+def _selected(ref, row, extra=()):
+    prior = next((side for side in [row['before'], row['after'], *extra]
                   if side['sha256'] == ref['sha256']), None)
     assert prior is not None
     if 'bytes' in ref:
@@ -124,11 +124,48 @@ def _tool_data(root):
     data = _registry(root, READERS, READER_PINS)
     assert data['canonical_dispositions_changed'] == data['product_changes'] == 0
     assert data['old_programs_executed'] is False
-    assert len(data['tool_transitions']) == (15 if data['line'] == '21.x' else 7)
+    assert len(data['tool_transitions']) == (17 if data['line'] == '21.x' else 7)
     assert len({row['path'] for row in data['tool_transitions']}) == len(data['tool_transitions'])
     ref = data['unchanged_source_subject']
     _identity(_read(root, ref['path']), ref)
+    if data['line'] == '21.x':
+        assert data['extension_kind'] == 'packed-owner-source-lanes'
+        prior_ref = data['prior_reader_registry']
+        assert prior_ref['path'] == READERS
+        assert prior_ref['sha256'] == '3af8b447d98b9d0bde687d83399e8c625604dbefa78b00535e142b063d8482f3'
+        assert prior_ref['bytes'] == 55559
+        raw = _original(str(root), prior_ref['source_parent'], READERS)
+        _identity(raw, prior_ref)
+        prior = _decoded(raw)
+        assert prior['line'] == data['line'] and prior['source_parent'] == data['source_parent']
+        assert len(prior['tool_transitions']) == 15
+        old_paths = {row['path'] for row in prior['tool_transitions']}
+        assert [row['path'] for row in data['tool_transitions'] if row['path'] not in old_paths] == [
+            'scripts/packed-upstream-ledger-base.mjs', 'scripts/checker-reference-metadata.mjs']
+        for old in prior['tool_transitions']:
+            current = next(row for row in data['tool_transitions'] if row['path'] == old['path'])
+            if old['path'] == 'scripts/packed-upstream-ledger-epoch.mjs':
+                assert current['literal_edits'][:len(old['literal_edits'])] == old['literal_edits']
+                assert {**current, 'literal_edits': old['literal_edits'], 'after': old['after']} == old
+                assert old['after'] == {'sha256': '34a8c062367debddf81a5112be37e4aa603e4a3c6b9c8e5c7c34144995d62669', 'bytes': 74930}
+            else:
+                assert current == old
     return data
+
+
+def _tool_intermediate(root, data, row):
+    if data['line'] != '21.x' or row['path'] != 'scripts/packed-upstream-ledger-epoch.mjs':
+        return None
+    prior_ref = data['prior_reader_registry']
+    raw = _original(str(root), prior_ref['source_parent'], READERS)
+    _identity(raw, prior_ref)
+    prior = _decoded(raw)
+    old = next(item for item in prior['tool_transitions'] if item['path'] == row['path'])
+    reference = old['after']
+    assert reference == {'sha256': '34a8c062367debddf81a5112be37e4aa603e4a3c6b9c8e5c7c34144995d62669', 'bytes': 74930}
+    image = _original(str(root), prior_ref['source_parent'], row['path'])
+    _identity(image, reference)
+    return reference, image
 
 
 def _derive_tool(root, data, row):
@@ -153,7 +190,8 @@ def qualify_tool_reference(ref, root=ROOT):
         return dict(ref)
     assert len(rows) == 1
     row = rows[0]
-    _selected(ref, row)
+    intermediate = _tool_intermediate(root, data, row)
+    _selected(ref, row, [intermediate[0]] if intermediate else [])
     _derive_tool(root, data, row)
     return {**ref, 'sha256': row['after']['sha256'],
             **({'bytes': row['after']['bytes']} if 'bytes' in ref else {})}
@@ -170,6 +208,9 @@ def tool_comparison_bytes(ref, root=ROOT):
         return raw
     assert len(rows) == 1
     row = rows[0]
-    prior = _selected(ref, row)
+    intermediate = _tool_intermediate(root, data, row)
+    prior = _selected(ref, row, [intermediate[0]] if intermediate else [])
     before, after = _derive_tool(root, data, row)
+    if intermediate and prior == intermediate[0]:
+        return intermediate[1]
     return before if prior == row['before'] else after

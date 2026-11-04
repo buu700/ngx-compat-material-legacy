@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "scope": "Exact private metadata/current source boundary; implementation proposal only",
+  "worksheet": {
+    "path": "compatibility/rc/parallel-base-class-owner-integration-worksheet-v4.json",
+    "sha256": "fccf88bf929ed64c36ecb47b2c8cdee32043a8318729709597dbaec8846ba941",
+    "bytes": 8499
+  },
+  "observed_failure": {
+    "caller": "scripts/packed-upstream-ledger-epoch.mjs epochBeforeInventoryReferenceLedger",
+    "private_read": "context.metadataRead maps OWNER to the authenticated original BASE image",
+    "callee": "scripts/packed-upstream-ledger-base.mjs selectionReaders -> autocompleteSelectionReaderSubject -> dialogTitleReaderSubject -> historicalContractRepairReaderSubject",
+    "rejection": "provided private old OWNER bytes differ from actual current OWNER; the physical reader correctly rejects"
+  },
+  "private_capability": {
+    "writer": "Module-private WeakMap in epoch, separate from existing public readers WeakMap. No exported writer.",
+    "registered_exact_callsites": [
+      "context: title metadataRead",
+      "prepareBeforeLegacyRemovalLedger/epochBeforeLegacyRemovalLedger/qualifyBeforeLegacyRemovalToolReference: inventory.metadataRead",
+      "prepareBeforeTableLocalCompilationLedger/epochBeforeTableLocalCompilationLedger/qualifyBeforeTableLocalCompilationToolReference: legacy.metadataRead",
+      "three terminal public functions: table.metadataRead"
+    ],
+    "finite_paths": {
+      "title": [
+        "scripts/packed-upstream-ledger-epoch.mjs",
+        "compatibility/rc/21x-c04-autocomplete-selection-native-registry.json",
+        "scripts/autocomplete-selection-native-subject.mjs",
+        "compatibility/f10/disposition-ledger/ledger.json"
+      ],
+      "inventory": [
+        "compatibility/f10/disposition-ledger/ledger.json",
+        "compatibility/inventories/source-symbol-inventory.json",
+        ".github/workflows/ci.yml",
+        "scripts/upstream-dialog-title-admission.cjs",
+        "scripts/upstream-dialog-title-native-evidence.mjs"
+      ],
+      "legacy": [
+        "compatibility/f10/disposition-ledger/ledger.json"
+      ],
+      "table": [
+        "compatibility/f10/disposition-ledger/ledger.json"
+      ]
+    },
+    "exported_resolver": "Returns the registered original caller callback plus a reference-only private comparison translation and retained guards. Unknown callbacks pass through unchanged; never substitute a disk reader. Resolve nested brands with root checks. Never expose comparison bytes via public read/raw.",
+    "base_local_writer": "A second private WeakMap only for registeredChecker.beforeRead, registered inside preparePackedUpstreamLedger where that callback is constructed. No exported registration.",
+    "late_semantics": "Each association captures exact before/current reference pairs after the owner guard qualified them. Guard both sides at lookup and after use; reject changed metadata/current callbacks, wrong roots and cyclic associations."
+  },
+  "separate_maps": {
+    "metadata_bound": "Retain every original byte comparison and hash against the exact private predecessor view, including OWNER=original BASE, original native registry and original registered checker. No original expected hash changes.",
+    "current_source_bound": "Physical selection/title/native/current source scopes and all their current input refs. Their constructors receive only the explicitly resolved actual callback. Retain their original guards and merge actual refs into the outer prepared bound map only after preserving the private metadata guard closure.",
+    "selectionMember": "Check physical bytes against actual qualified current ref; check any comparison bytes against the finite captured private ref translation; retain both bindings; return only the original private comparison bytes to the old literal-comparison caller. Unknown differing bytes fail.",
+    "historical_wrapper_calls": "Use the actual physical titleReaders.withHistoricalToolMetadata with explicit comparisonRead:read for historicalChipWrapperMetadata and historicalConsumerWrapperMetadata. Do not construct another current checker from the historical callback."
+  },
+  "exact_base_calls": {
+    "physical_constructors": [
+      "selectionReaders: autocompleteSelectionReaderSubject",
+      "selectionNative: autocompleteSelectionNativeSubject",
+      "prepareSassStage: sassInspectionEntrySourceOk",
+      "prepareRulesJsStage: rulesJsBuildEntrySourceOk",
+      "prepareAutocompleteLandscapeStage: autocompleteLandscapeSourceJudgment",
+      "prepareSelectionNativeStage: autocompleteSelectionSourceJudgments",
+      "prepareLegacySassEntrypointStage and guard: inspectLegacySassEntrypointReview",
+      "prepareTokenBuildStage/prepareUnthemedStage/prepareControlBaseStage/prepareTokenRootStage/prepareFieldTokenStage/prepareBoundaryStage: their actual inspect*Source functions"
+    ],
+    "metadata_comparison_factories": [
+      "historicalChipWrapperMetadata",
+      "historicalConsumerWrapperMetadata",
+      "checkerReferenceMetadata",
+      "all existing ledger/report/Git literal comparisons"
+    ]
+  },
+  "mandatory_old_guards": [
+    {
+      "file": "scripts/packed-upstream-ledger-epoch.mjs",
+      "function": "sourceTransactionTools",
+      "guard": "packet.byte_preserved_base",
+      "required_successor": "Authenticate old BASE bytes through Git + exact literal patch as comparison data, then bind actual new BASE bytes via the narrow reader-owner transition. Keep original packet/hash unchanged."
+    },
+    {
+      "file": "scripts/packed-upstream-ledger-epoch.mjs",
+      "function": "context",
+      "guard": "baseImage hash ee74d3c46ae056f4ffd16cc1d38d60820ca449d96158c776319a2bfcbc6fc715",
+      "required_successor": "Preserve baseImage as the original authenticated BASE metadata image. Bind actual BASE separately; do not use new BASE source as old OWNER metadata."
+    },
+    {
+      "file": "scripts/table-local-compilation-owner-source.mjs",
+      "function": "member",
+      "guard": "old packet.source_members BASE ee74...",
+      "required_successor": "The added BASE transition in historicalContractRepairReaderSubject qualifies the actual current file while comparisonBytes retains the exact old packet bytes."
+    },
+    {
+      "file": "scripts/historical-contract-repair-readers.mjs",
+      "function": "historicalContractRepairReaderSubject",
+      "guard": "15 current transition after-images and pinned manifest",
+      "required_successor": "New named extension over the Git-authenticated prior manifest: epoch edits appended to existing row, BASE row added from exact current commit. All other prior rows deep-equal. Keep prior epoch after-image as an explicitly authenticated intermediate metadata reference."
+    }
+  ],
+  "cycle_control": "The existing epoch/base ESM cycle may include the read-only resolver import. Invoke neither resolver nor owner context during module initialization; focused ESM imports must pass before live probes.",
+  "focused_controls": [
+    "physical positive title/selection context with an authenticated branded comparison callback",
+    "unbranded historical OWNER callback rejects",
+    "spoofed callback/no-op guard cannot register or acquire authority",
+    "wrong-root resolution rejects",
+    "nested registered checker/title/inventory/legacy/table associations resolve to original actual callback",
+    "late actual OWNER/product/peer/metadata mutation rejects; restoring genuine bytes passes",
+    "old metadata bytes remain exact and original literal comparisons unchanged",
+    "public unwrap/read/raw still return actual non-ledger source/tool bytes",
+    "v6 complete patch pointer remains exact"
+  ],
+  "unexecuted": [
+    "full owner",
+    "root admission with physical registry 70",
+    "packed/browser/build/floors/audit"
+  ],
+  "canonical_changes_applied": false,
+  "g11_claim": "not-passed"
+}

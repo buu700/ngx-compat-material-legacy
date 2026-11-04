@@ -18,6 +18,7 @@ import {sassInspectionEntrySourceOk} from './upstream-sass-inspection-admission.
 import {rulesJsBuildEntrySourceOk,rulesJsBuildBoundInputs} from './upstream-rules-js-build-admission.mjs';
 import {autocompleteLandscapeSourceJudgment,AUTOCOMPLETE_LANDSCAPE_SHA,AUTOCOMPLETE_LANDSCAPE_REVIEW} from './autocomplete-landscape-source-judgment.mjs';
 import {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';
+import {packedUpstreamLedgerCurrentSourceLane} from './packed-upstream-ledger-epoch.mjs';
 import {autocompleteSelectionNativeSubject,SELECTION_NATIVE_REGISTRY,SELECTION_NATIVE_SHAS} from './autocomplete-selection-native-subject.mjs';
 import {autocompleteSelectionSourceJudgments} from './autocomplete-selection-source-judgment.mjs';
 import {historicalChipWrapperMetadata,HISTORICAL_WRAPPER_PACKET} from './historical-chip-wrapper-metadata.mjs';
@@ -59,35 +60,108 @@ const disk = root => path => readFileSync(join(root, path));
 const readers = new WeakMap();
 const selectionReaderCache=new WeakMap();
 const selectionNativeCache=new WeakMap();
+const checkerComparisonReaders=new WeakMap(),currentSourceBindings=new WeakMap();
+const sourcePreparationStack=[],scopeBindingMaps=new WeakMap();
+function sourceLane(root,read){
+ const segments=[],seen=new Set();let current=read;
+ for(;;){
+  assert.equal(seen.has(current),false,'cyclic combined canonical source reader');seen.add(current);
+  const frame=checkerComparisonReaders.get(current);
+  if(frame){assert.equal(frame.root,root);segments.push({frame});current=frame.raw;continue;}
+  const owner=packedUpstreamLedgerCurrentSourceLane({root,read:current});segments.push({owner});
+  if(owner.read===current)break;current=owner.read;
+ }
+ const assertCurrent=()=>{for(const segment of segments){if(segment.owner){segment.owner.assertCurrent();continue;}const frame=segment.frame;frame.guard();for(const[reader,ref]of [[frame.read,frame.before],[frame.raw,frame.after]]){
+  const raw=reader(ref.path);assert.equal(hash(raw),ref.sha256,'changed registered checker source lane');assert.equal(raw.length,ref.bytes);
+ }frame.guard();}};
+ const comparisonReference=ref=>{let value={...ref};for(const segment of [...segments].reverse()){if(segment.owner){value=segment.owner.comparisonReference(value);continue;}const frame=segment.frame;if(value.path===frame.after.path){
+  for(const[reader,expected]of [[frame.read,frame.before],[frame.raw,frame.after]]){const raw=reader(expected.path);assert.equal(hash(raw),expected.sha256,'changed checker comparison member');assert.equal(raw.length,expected.bytes);}
+  assert.equal(value.sha256,frame.after.sha256);if(value.bytes!==undefined)assert.equal(value.bytes,frame.after.bytes);
+  value={...value,sha256:frame.before.sha256,...(value.bytes===undefined?{}:{bytes:frame.before.bytes})};
+ }}return value;};
+ return {read:current,comparisonReference,assertCurrent};
+}
+function actualSourceRead(root,read){return sourceLane(root,read).read;}
+/** Resolve only the owner/checker callbacks constructed by these modules. */
+export function packedUpstreamBaseCurrentSourceLane({root,read}){return sourceLane(root,read);}
+function retainSourceScope(root,lane,scope){
+ const batch=sourcePreparationStack.at(-1);
+ if(batch&&batch.root===root&&batch.actual===lane.read){
+  if(!batch.scopes.has(scope)){scope.assertCurrent();batch.scopes.add(scope);}
+ }else{lane.assertCurrent();scope.assertCurrent();}
+ return scope;
+}
+function bindScopeReferences(bound,scope,lane){
+ let scopes=scopeBindingMaps.get(bound);if(!scopes){scopes=new Set();scopeBindingMaps.set(bound,scopes);}
+ if(scopes.has(scope))return;
+ for(const member of scope.bound)bound.set(member.path,lane.comparisonReference(member).sha256);
+ scopes.add(scope);
+}
+function rememberCurrent(root,read,refs){
+ const actual=actualSourceRead(root,read);let subject=currentSourceBindings.get(actual);
+ if(!subject){subject={root,refs:new Map()};currentSourceBindings.set(actual,subject);}assert.equal(subject.root,root);
+ for(const ref of refs){const prior=subject.refs.get(ref.path);if(prior)assert.deepEqual(prior,ref,'changed physical source binding');else subject.refs.set(ref.path,{...ref});}
+}
+function separateSourceBindings(root,read,bound,outerRead){
+ const lane=sourceLane(root,read),outer=sourceLane(root,outerRead),metadataBound=new Map(),outerBound=new Map(),physicalBound=new Map();
+ for(const[path,digest]of bound){
+  const actual=lane.read(path),current={path,sha256:hash(actual),bytes:actual.length},comparison=lane.comparisonReference(current);
+  assert.ok(digest===current.sha256||digest===comparison.sha256,'unqualified physical/comparison binding '+path);
+  const prior=read(path);assert.equal(hash(prior),comparison.sha256,'changed private source comparison '+path);assert.equal(prior.length,comparison.bytes);
+  const outerReference=outer.comparisonReference(current),outerRaw=outerRead(path);assert.equal(hash(outerRaw),outerReference.sha256);assert.equal(outerRaw.length,outerReference.bytes);
+  metadataBound.set(path,comparison.sha256);outerBound.set(path,outerReference.sha256);physicalBound.set(path,current.sha256);
+ }
+ const remembered=currentSourceBindings.get(lane.read);if(remembered){assert.equal(remembered.root,root);for(const ref of remembered.refs.values()){
+  const raw=lane.read(ref.path);assert.equal(hash(raw),ref.sha256,'changed retained physical source '+ref.path);assert.equal(raw.length,ref.bytes);physicalBound.set(ref.path,ref.sha256);
+ }}
+ const assertCurrent=()=>{lane.assertCurrent();for(const[path,digest]of metadataBound)assert.equal(hash(read(path)),digest,'late private source comparison '+path);
+  for(const[path,digest]of outerBound)assert.equal(hash(outerRead(path)),digest,'late outer source comparison '+path);
+  for(const[path,digest]of physicalBound)assert.equal(hash(lane.read(path)),digest,'late physical source binding '+path);lane.assertCurrent();outer.assertCurrent();};
+ assertCurrent();return {metadataBound,outerBound,physicalBound,assertCurrent};
+}
 function selectionNative(root,read,line){
-  const cached=selectionNativeCache.get(read);
-  if(cached){assert.equal(cached.root,root);assert.equal(cached.scope.line,line);cached.scope.assertCurrent();return cached.scope;}
-  const scope=autocompleteSelectionNativeSubject({root,read,line});selectionNativeCache.set(read,{root,scope});return scope;
+  const lane=sourceLane(root,read),actual=lane.read,cached=selectionNativeCache.get(actual);
+  if(cached){assert.equal(cached.root,root);assert.equal(cached.scope.line,line);return retainSourceScope(root,lane,cached.scope);}
+  const scope=autocompleteSelectionNativeSubject({root,read:actual,line});selectionNativeCache.set(actual,{root,scope});rememberCurrent(root,read,scope.bound);return retainSourceScope(root,lane,scope);
 }
 // Historical metadata only. Actual registry bytes never pass through this map.
 function registryBeforeMetadata(root,read,line,ref){
-  ref=checkerBeforeEntrypointMetadata(root,read,ref);
+  ref=sourceComparisonReference(root,read,ref);
   if(ref.path!==SELECTION_NATIVE_REGISTRY)return ref;
   const scope=selectionNative(root,read,line);assert.ok(scope.qualify(ref));
   return {...ref,sha256:scope.before.sha256,...(ref.bytes===undefined?{}:{bytes:scope.before.bytes})};
 }
+function sourceComparisonReference(root,read,ref){
+ return checkerBeforeEntrypointMetadata(root,read,sourceLane(root,read).comparisonReference(ref));
+}
+function selectionComparisonMembers(root,read,source,expected){
+ // The saved stage predates current tool provenance. Retain and check every
+ // physical input, while comparing exactly its authenticated saved path set.
+ const paths=new Set(expected.map(ref=>ref.path));assert.equal(paths.size,expected.length);
+ const current=new Map();for(const ref of source.bound){assert.equal(current.has(ref.path),false,'duplicate physical qualification path');current.set(ref.path,ref);}
+ const selected=expected.map(ref=>{assert.ok(current.has(ref.path),'missing saved qualification path');return current.get(ref.path);});
+ rememberCurrent(root,read,source.bound);
+ return selected.map(ref=>sourceComparisonReference(root,read,ref));
+}
 function selectionReaders(root,read,line){
-  const cached=selectionReaderCache.get(read);
-  if(cached){assert.equal(cached.root,root);assert.equal(cached.scope.spec.line,line);return cached.scope;}
-  const scope=autocompleteSelectionReaderSubject({root,read,line});selectionReaderCache.set(read,{root,scope});return scope;
+  const lane=sourceLane(root,read),actual=lane.read,cached=selectionReaderCache.get(actual);
+  if(cached){assert.equal(cached.root,root);assert.equal(cached.scope.spec.line,line);return retainSourceScope(root,lane,cached.scope);}
+  const scope=autocompleteSelectionReaderSubject({root,read:actual,line});selectionReaderCache.set(actual,{root,scope});rememberCurrent(root,read,scope.bound);return retainSourceScope(root,lane,scope);
 }
 function selectionMember({root,read,line,ref,bound}){
   const scope=selectionReaders(root,read,line),native=ref.path===SELECTION_NATIVE_REGISTRY?selectionNative(root,read,line):null;
-  let current=native?.qualify(ref)??scope.qualify(ref)??ref;const raw=read(ref.path);
-  if(ref.path===testingApiChecker&&hash(raw)!==ref.sha256){
+  let current=native?.qualify(ref)??scope.qualify(ref)??ref;const lane=sourceLane(root,read),actual=lane.read(ref.path),raw=read(ref.path);
+  if(ref.path===testingApiChecker&&hash(actual)!==ref.sha256){
     const historical=checkerBeforeEntrypointMetadata(root,read,ref);assert.deepEqual(historical,ref);
-    current={...ref,sha256:hash(raw),...(ref.bytes===undefined?{}:{bytes:raw.length})};
+    current={...ref,sha256:hash(actual),...(ref.bytes===undefined?{}:{bytes:actual.length})};
   }
-  assert.equal(hash(raw),current.sha256,'changed qualified source subject '+ref.path);
-  if(current.bytes!==undefined)assert.equal(raw.length,current.bytes);
-  for(const member of scope.bound)bound.set(member.path,member.sha256);
-  if(native)for(const member of native.bound)bound.set(member.path,member.sha256);
-  bound.set(ref.path,current.sha256);return raw;
+  assert.equal(hash(actual),current.sha256,'changed physical qualified source subject '+ref.path);
+  if(current.bytes!==undefined)assert.equal(actual.length,current.bytes);
+  const comparison=lane.comparisonReference({...current,bytes:actual.length});
+  assert.equal(hash(raw),comparison.sha256,'changed qualified source comparison '+ref.path);assert.equal(raw.length,comparison.bytes);
+  bindScopeReferences(bound,scope,lane);if(native)bindScopeReferences(bound,native,lane);
+  rememberCurrent(root,read,[{path:ref.path,sha256:hash(actual),bytes:actual.length}]);
+  bound.set(ref.path,comparison.sha256);return raw;
 }
 
 const pythonVersion = () => execFileSync('python3', ['-c', 'import sys;print(sys.version.split()[0])'],
@@ -363,7 +437,7 @@ function prepareSassStage({root,read,line,before,bound}){
     const allowedFields=new Set(['final_disposition','reason','review_depth','affected_branches','evidence_report','individual_proof','patch_sha256']);
     for(const key of new Set([...Object.keys(previous),...Object.keys(current)]))
       if(!allowedFields.has(key))assert.deepEqual(current[key],previous[key],'changed unrelated Sass entry field '+key);
-    assert.equal(sassInspectionEntrySourceOk({root,read,entry:current,body:review,line}),true,'unqualified individual Sass source decision');
+    assert.equal(sassInspectionEntrySourceOk({root,read:actualSourceRead(root,read),entry:current,body:review,line}),true,'unqualified individual Sass source decision');
     const node=bySha.get(change.sha);edits.push({start:node.getStart(source),end:node.end,text:JSON.stringify(current,null,2).replace(/\n/g,'\n    ')});
     expected.entries[index]=current;
   }
@@ -414,7 +488,7 @@ function prepareRulesJsStage({root,read,line,before,bound}){
     for(const key of new Set([...Object.keys(previous),...Object.keys(current)]))
       if(!allowedFields.has(key))assert.deepEqual(current[key],previous[key],'changed unrelated build entry field '+key);
     assert.equal(current.batch_id,'closeout-three-rules-js-build-individual-reviews');
-    assert.equal(rulesJsBuildEntrySourceOk({root,read,entry:current,body:review,line}),true,'unqualified individual build source decision');
+    assert.equal(rulesJsBuildEntrySourceOk({root,read:actualSourceRead(root,read),entry:current,body:review,line}),true,'unqualified individual build source decision');
     const node=bySha.get(change.sha);edits.push({start:node.getStart(source),end:node.end,text:JSON.stringify(current,null,2).replace(/\n/g,'\n    ')});
     expected.entries[index]=current;
   }
@@ -492,7 +566,8 @@ function qualifyAutocompleteRegistry({root,read,line,ref,bound}){
   const after=Buffer.from(text.replace(marker,addition+marker));assert.equal(hash(after),packet.registry.after_sha256);
   assert.equal(after.length,packet.registry.after_bytes);
   const native=selectionNative(root,read,line);assert.equal(hash(after),native.before.sha256);
-  assert.equal(hash(read(ref.path)),native.after.sha256);bound.set(ref.path,native.after.sha256);
+  const comparison=sourceLane(root,read).comparisonReference({path:ref.path,...native.after});
+  assert.equal(hash(read(ref.path)),comparison.sha256);bound.set(ref.path,comparison.sha256);
   for(const checkpoint of [packet.current_source_inspection,packet.current_source_inspector,packet.complete_originals]){
     const bytes=read(checkpoint.path);assert.equal(hash(bytes),checkpoint.sha256);assert.equal(bytes.length,checkpoint.bytes);
     bound.set(checkpoint.path,checkpoint.sha256);
@@ -514,7 +589,7 @@ function prepareAutocompleteLandscapeStage({root,read,line,before,bound}){
   const member=ref=>selectionMember({root,read,line,ref,bound});
   assert.deepEqual(packet.code_subjects.map(ref=>ref.path),['scripts/autocomplete-landscape-source-judgment.mjs',autocompleteRegistryPath,testingApiChecker]);
   for(const ref of packet.code_subjects)member(ref);
-  const currentSource=autocompleteLandscapeSourceJudgment({root,read,line}),review=JSON.parse(member(packet.review));
+  const currentSource=autocompleteLandscapeSourceJudgment({root,read:actualSourceRead(root,read),line}),review=JSON.parse(member(packet.review));
   // Reconstruct only this earlier review's metadata image. Current readers
   // retain the actual source; the native ledger receives its new hash below.
   const spec=selectionReaders(root,read,line).spec,originalBody=structuredClone(currentSource.body);
@@ -634,8 +709,9 @@ function prepareSelectionNativeStage({root,read,line,before,bound}){
     'scripts/autocomplete-selection-native-subject.mjs','scripts/autocomplete-selection-source-judgment.mjs','scripts/autocomplete-selection-native-scopes.mjs',
   ]);
   for(const ref of packet.code_subjects){const value=read(ref.path);assert.equal(hash(value),ref.sha256);assert.equal(value.length,ref.bytes);bound.set(ref.path,ref.sha256);}
-  const source=autocompleteSelectionSourceJudgments({root,read,line}),native=selectionNative(root,read,line);
-  assert.deepEqual(packet.qualification_members,source.bound.map(ref=>checkerBeforeEntrypointMetadata(root,read,ref)));
+  const source=autocompleteSelectionSourceJudgments({root,read:actualSourceRead(root,read),line}),native=selectionNative(root,read,line);
+  retainSourceScope(root,sourceLane(root,read),source);
+  assert.deepEqual(packet.qualification_members,selectionComparisonMembers(root,read,source,packet.qualification_members));
   for(const ref of source.bound)bound.set(ref.path,ref.sha256);
   assert.deepEqual(packet.entries.map(row=>row.sha),SELECTION_NATIVE_SHAS);
   const text=before.toString(),syntax=ledgerSyntax('selection-ledger.json',text);assert.equal(syntax.parseDiagnostics.length,0);
@@ -652,7 +728,7 @@ function prepareSelectionNativeStage({root,read,line,before,bound}){
       evidence_report:judgment.path,source_check:{kind:'individual-source-reviewed-runtime-required',diff_sha256:judgment.body.diff_sha256,
         patch_archive:judgment.body.original_source_archive,original_patch_member:change.sha,evidence_report_sha256:reviewRef.sha256},
       files:judgment.original_paths,review_depth:'individual-compatibility',affected_branches:[line],individual_proof:{...structuredClone(judgment.proof),
-        historical_behavior:{...structuredClone(judgment.proof.historical_behavior),source_members:judgment.proof.historical_behavior.source_members.map(ref=>checkerBeforeEntrypointMetadata(root,read,ref))}},
+        historical_behavior:{...structuredClone(judgment.proof.historical_behavior),source_members:judgment.proof.historical_behavior.source_members.map(ref=>sourceComparisonReference(root,read,ref))}},
       prior_dispositions:[...(prior.prior_dispositions??[]),{source_parent:packet.before.source_parent,source_entry_sha256:hash(json(prior)),source_line:line,final_disposition:prior.final_disposition}]};
     assert.deepEqual(change.after_entry,current);expected.entries[i]=current;
     edits.push({start:nodes.elements[i].getStart(syntax),end:nodes.elements[i].end,text:JSON.stringify(current,null,2).replace(/\n/g,'\n    ')});
@@ -664,7 +740,8 @@ function prepareSelectionNativeStage({root,read,line,before,bound}){
     assert.deepEqual(update.path.slice(0,3),['individual_proof','historical_behavior','source_members']);assert.equal(update.path.length,5);assert.equal(update.path[4],'sha256');
     const i=data.entries.findIndex(row=>row.sha===update.sha);assert.ok(i>=0&&!SELECTION_NATIVE_SHAS.includes(update.sha));
     const ref=expected.entries[i].individual_proof.historical_behavior.source_members[update.path[3]];
-    assert.equal(ref.path,SELECTION_NATIVE_REGISTRY);assert.equal(ref.sha256,update.before);assert.equal(update.before,native.before.sha256);assert.equal(update.after,native.after.sha256);
+    assert.equal(ref.path,SELECTION_NATIVE_REGISTRY);assert.equal(ref.sha256,update.before);assert.equal(update.before,native.before.sha256);
+    assert.equal(update.after,sourceLane(root,read).comparisonReference({path:SELECTION_NATIVE_REGISTRY,...native.after}).sha256);
     ref.sha256=update.after;let node=nodes.elements[i];for(const key of update.path)node=typeof key==='number'?node.elements[key]:property(node,key);
     assert.equal(JSON.parse(node.getText(syntax)),update.before);edits.push({start:node.getStart(syntax),end:node.end,text:JSON.stringify(update.after)});
   }
@@ -693,7 +770,7 @@ function prepareHistoricalWrapperMetadataStage({root,read,line,before,bound}){
   assert.equal(packet.original_dispositions_or_hunk_judgments_changed,0);assert.equal(packet.unrelated_entry_or_byte_changes,0);
   assert.equal(packet.actual_native_artifact_floor_or_G11_qualified,false);assert.equal(packet.g11_claim,'not-passed');
   assert.equal(packet.code_subject.path,'scripts/historical-chip-wrapper-metadata.mjs');selectionMember({root,read,line,ref:packet.code_subject,bound});
-  const source=selectionReaders(root,read,line).titleReaders.withHistoricalToolMetadata(metadata=>historicalChipWrapperMetadata({root,read:metadata,line}));assert.equal(source.before.equals(before),true);
+  const source=selectionReaders(root,read,line).titleReaders.withHistoricalToolMetadata(metadata=>historicalChipWrapperMetadata({root,read:metadata,line}),{comparisonRead:read});assert.equal(source.before.equals(before),true);
   assert.deepEqual(packet.qualification_members,source.bound);assert.deepEqual(packet.entries,source.entries);
   for(const ref of source.bound)selectionMember({root,read,line,ref,bound});
   for(const report of source.reports)assert.equal(selectionMember({root,read,line,ref:report.ref,bound}).equals(report.raw),true);
@@ -719,7 +796,7 @@ function prepareHistoricalConsumerWrapperMetadataStage({root,read,line,before,bo
   assert.equal(packet.original_dispositions_or_hunk_judgments_changed,0);assert.equal(packet.unrelated_entry_or_byte_changes,0);assert.equal(packet.new_upstream_SHA_decisions,0);
   assert.equal(packet.actual_native_artifact_floor_or_G11_qualified,false);assert.equal(packet.g11_claim,'not-passed');
   assert.equal(packet.code_subject.path,'scripts/historical-consumer-wrapper-metadata.mjs');selectionMember({root,read,line,ref:packet.code_subject,bound});
-  const source=selectionReaders(root,read,line).titleReaders.withHistoricalToolMetadata(metadata=>historicalConsumerWrapperMetadata({root,read:metadata,line}));assert.equal(source.before.equals(before),true);
+  const source=selectionReaders(root,read,line).titleReaders.withHistoricalToolMetadata(metadata=>historicalConsumerWrapperMetadata({root,read:metadata,line}),{comparisonRead:read});assert.equal(source.before.equals(before),true);
   assert.deepEqual(packet.qualification_members,source.bound);assert.deepEqual(packet.entries,source.entries);
   for(const ref of source.bound)selectionMember({root,read,line,ref,bound});
   for(const report of source.reports)assert.equal(selectionMember({root,read,line,ref:report.ref,bound}).equals(report.raw),true);
@@ -734,7 +811,7 @@ function prepareLegacySassEntrypointStage({root,read,line,before,bound}){
   const code='scripts/upstream-legacy-sass-entrypoint-admission.mjs';
   const codeHash='1e3e277e3d40976dc970c6adfc0c03be43300239d7e37b14efed3415cd2e8ede';
   assert.equal(hash(read(code)),codeHash);bound.set(code,codeHash);
-  const source=inspectLegacySassEntrypointReview({root,read,line});
+  const source=inspectLegacySassEntrypointReview({root,read:actualSourceRead(root,read),line});
   for(const [path,digest]of source.bound)bound.set(path,digest);
   const original=JSON.parse(before),expected=structuredClone(original);
   assert.equal(original.entries.length,1697);assert.equal(new Set(original.entries.map(row=>row.sha)).size,1697);
@@ -757,7 +834,7 @@ function prepareLegacySassEntrypointStage({root,read,line,before,bound}){
   assert.equal(hash(after),'fbefd5a78fd9d09694567a59636e6452cb1f08ef668f4b6596378662ab00b355');
   const assertCurrent=()=>{
     assert.equal(hash(read(code)),codeHash,'late Sass entrypoint admission code');
-    const current=inspectLegacySassEntrypointReview({root,read,line});
+    const current=inspectLegacySassEntrypointReview({root,read:actualSourceRead(root,read),line});
     assert.deepEqual([...current.bound],[...source.bound],'late Sass entrypoint input membership');
   };
   assertCurrent();return {before,after,individual_decisions:1,unselected_entries_preserved:1696,assertCurrent};
@@ -768,6 +845,7 @@ function prepareCheckerReferenceMetadataStage({root,read,line,before,bound}){
   const current=selectionReaders(root,read,line).qualify({path,sha256:digest})??{path,sha256:digest};
   assert.equal(hash(read(path)),current.sha256,'changed checker reference metadata owner');bound.set(path,current.sha256);
   const source=checkerReferenceMetadata({root,read,line});assert.equal(source.before.equals(before),true);
+  rememberCurrent(root,read,source.current_source_bound);
   for(const ref of source.bound)bound.set(ref.path,ref.sha256);
   return source;
 }
@@ -821,13 +899,13 @@ function prepareTokenBuildStage({root,read,line,before,bound}){
     proof_kind:'individual-owned-mdc-token-validation',scope_key:'mdc_token_source_scope',module:'upstream-token-build-admission.cjs'});
   const knownShas=new Set(JSON.parse(before).entries.map(row=>row.sha));assert.ok(definitions.every(row=>knownShas.has(row.sha)));
   bound.set(registryPath,hash(registryRaw));
-  const source=tokenBuildAdmission.inspectTokenBuildSource({root,read});for(const ref of source.bound)bound.set(ref.path,ref.sha256);
+  const source=tokenBuildAdmission.inspectTokenBuildSource({root,read:actualSourceRead(root,read)});for(const ref of source.bound)bound.set(ref.path,ref.sha256);
   const original=JSON.parse(before),expected=structuredClone(original),index=original.entries.findIndex(row=>row.sha===tokenBuildAdmission.TOKEN_BUILD_SHA);assert.ok(index>=0);
   const prior=original.entries[index];assert.equal(prior.final_disposition,'needs-individual-review');assert.equal(prior.evidence_report,null);
   assert.equal(original.closed_dispositions,357);assert.equal(original.open_or_deferred,1340);
   const entry={...structuredClone(prior),final_disposition:'already-adapted',reason:source.body.decision,review_depth:'individual-compatibility',
     evidence_report:tokenBuildAdmission.TOKEN_BUILD_REVIEW,individual_proof:tokenBuildAdmission.tokenBuildProof(source.body)};
-  assert.equal(tokenBuildAdmission.tokenBuildSourceOk({root,read,entry,body:source.body,review:source.body,proof:entry.individual_proof}),true);
+  assert.equal(tokenBuildAdmission.tokenBuildSourceOk({root,read:actualSourceRead(root,read),entry,body:source.body,review:source.body,proof:entry.individual_proof}),true);
   expected.entries[index]=entry;expected.closed_dispositions=358;expected.open_or_deferred=1339;
   const text=replaceHistoricalConsumerEntries(before,[{sha:entry.sha,after_entry:entry}]).toString(),marker='"entries": [',split=text.indexOf(marker);assert.ok(split>=0);
   let header=text.slice(0,split);
@@ -846,7 +924,7 @@ function prepareUnthemedStage({root,read,before,bound}){
   assert.equal(hash(read(helper)),digest);bound.set(helper,digest);
   for(const sha of unthemedAdmission.UNTHEMED_SHAS)assert.deepEqual(sourceContractDefinitions.find(row=>row.sha===sha),{
     sha,proof_kind:'individual-historical-base-token-source-exclusion',scope_key:'unthemable_token_source_scope',module:'upstream-unthemable-token-admission.cjs'});
-  const source=unthemedAdmission.inspectUnthemedSource({root,read});for(const ref of source.bound)bound.set(ref.path,ref.sha256);
+  const source=unthemedAdmission.inspectUnthemedSource({root,read:actualSourceRead(root,read)});for(const ref of source.bound)bound.set(ref.path,ref.sha256);
   const original=JSON.parse(before),expected=structuredClone(original),replacements=[];
   assert.equal(original.closed_dispositions,358);assert.equal(original.open_or_deferred,1339);
   for(const row of source.body.reviews){
@@ -854,7 +932,7 @@ function prepareUnthemedStage({root,read,before,bound}){
     assert.equal(prior.final_disposition,'needs-individual-review');assert.equal(prior.evidence_report,null);
     const entry={...prior,final_disposition:'do-not-adopt',reason:row.decision,review_depth:'individual-compatibility',
       evidence_report:unthemedAdmission.UNTHEMED_REVIEW,individual_proof:unthemedAdmission.unthemedProof(row)};
-    assert.equal(unthemedAdmission.unthemedSourceOk({root,read,entry,body:source.body,review:row,proof:entry.individual_proof}),true);
+    assert.equal(unthemedAdmission.unthemedSourceOk({root,read:actualSourceRead(root,read),entry,body:source.body,review:row,proof:entry.individual_proof}),true);
     expected.entries[index]=entry;replacements.push({sha:row.sha,after_entry:entry});
   }
   assert.equal(replacements.length,5);expected.closed_dispositions=363;expected.open_or_deferred=1334;
@@ -875,7 +953,7 @@ function prepareControlBaseStage({root,read,before,bound}){
   assert.equal(hash(read(helper)),digest);bound.set(helper,digest);
   for(const sha of controlBaseAdmission.CONTROL_SHAS)assert.deepEqual(sourceContractDefinitions.find(row=>row.sha===sha),{
     sha,proof_kind:'individual-historical-modern-control-base-source-exclusion',scope_key:'modern_control_base_source_scope',module:'upstream-modern-control-base-admission.cjs'});
-  const source=controlBaseAdmission.inspectControlSource({root,read});for(const ref of source.bound)bound.set(ref.path,ref.sha256);
+  const source=controlBaseAdmission.inspectControlSource({root,read:actualSourceRead(root,read)});for(const ref of source.bound)bound.set(ref.path,ref.sha256);
   const original=JSON.parse(before),expected=structuredClone(original),replacements=[];
   assert.equal(original.closed_dispositions,363);assert.equal(original.open_or_deferred,1334);
   for(const row of source.body.reviews){
@@ -883,7 +961,7 @@ function prepareControlBaseStage({root,read,before,bound}){
     assert.equal(prior.final_disposition,'needs-individual-review');assert.equal(prior.evidence_report,null);
     const entry={...prior,final_disposition:'do-not-adopt',reason:row.decision,review_depth:'individual-compatibility',
       evidence_report:controlBaseAdmission.CONTROL_REVIEW,individual_proof:controlBaseAdmission.controlProof(row)};
-    assert.equal(controlBaseAdmission.sourceOk({root,read,entry,body:source.body,review:row,proof:entry.individual_proof}),true);
+    assert.equal(controlBaseAdmission.sourceOk({root,read:actualSourceRead(root,read),entry,body:source.body,review:row,proof:entry.individual_proof}),true);
     expected.entries[index]=entry;replacements.push({sha:row.sha,after_entry:entry});
   }
   assert.equal(replacements.length,4);expected.closed_dispositions=367;expected.open_or_deferred=1330;
@@ -904,7 +982,7 @@ function prepareTokenRootStage({root,read,before,bound}){
   assert.equal(hash(read(helper)),digest);bound.set(helper,digest);
   for(const sha of tokenRootAdmission.ROOT_SHAS)assert.deepEqual(sourceContractDefinitions.find(row=>row.sha===sha),{
     sha,proof_kind:'individual-historical-token-root-source-exclusion',scope_key:'theme_token_root_source_scope',module:'upstream-theme-token-root-admission.cjs'});
-  const source=tokenRootAdmission.inspectRootSource({root,read});for(const ref of source.bound)bound.set(ref.path,ref.sha256);
+  const source=tokenRootAdmission.inspectRootSource({root,read:actualSourceRead(root,read)});for(const ref of source.bound)bound.set(ref.path,ref.sha256);
   const original=JSON.parse(before),expected=structuredClone(original),replacements=[];
   assert.equal(original.closed_dispositions,367);assert.equal(original.open_or_deferred,1330);
   for(const row of source.body.reviews){
@@ -912,7 +990,7 @@ function prepareTokenRootStage({root,read,before,bound}){
     assert.equal(prior.final_disposition,'needs-individual-review');assert.equal(prior.evidence_report,null);
     const entry={...prior,final_disposition:'do-not-adopt',reason:row.decision,review_depth:'individual-compatibility',
       evidence_report:tokenRootAdmission.ROOT_REVIEW,individual_proof:tokenRootAdmission.rootProof(row)};
-    assert.equal(tokenRootAdmission.sourceOk({root,read,entry,body:source.body,review:row,proof:entry.individual_proof}),true);
+    assert.equal(tokenRootAdmission.sourceOk({root,read:actualSourceRead(root,read),entry,body:source.body,review:row,proof:entry.individual_proof}),true);
     expected.entries[index]=entry;replacements.push({sha:row.sha,after_entry:entry});
   }
   assert.equal(replacements.length,2);expected.closed_dispositions=369;expected.open_or_deferred=1328;
@@ -933,7 +1011,7 @@ function prepareFieldTokenStage({root,read,before,bound}){
   assert.equal(hash(read(helper)),digest);bound.set(helper,digest);
   for(const sha of fieldTokenAdmission.FIELD_SHAS)assert.deepEqual(sourceContractDefinitions.find(row=>row.sha===sha),{
     sha,proof_kind:'individual-historical-form-field-tokenization-source-review',scope_key:'form_field_tokenization_source_scope',module:'upstream-form-field-tokenization-admission.cjs'});
-  const source=fieldTokenAdmission.inspectFieldSource({root,read});for(const ref of source.bound)bound.set(ref.path,ref.sha256);
+  const source=fieldTokenAdmission.inspectFieldSource({root,read:actualSourceRead(root,read)});for(const ref of source.bound)bound.set(ref.path,ref.sha256);
   const original=JSON.parse(before),expected=structuredClone(original),replacements=[];
   assert.equal(original.closed_dispositions,369);assert.equal(original.open_or_deferred,1328);
   for(const row of source.body.reviews){
@@ -941,7 +1019,7 @@ function prepareFieldTokenStage({root,read,before,bound}){
     assert.equal(prior.final_disposition,'needs-individual-review');assert.equal(prior.evidence_report,null);
     const entry={...prior,final_disposition:row.proposed_final_disposition,reason:row.decision,review_depth:'individual-compatibility',
       evidence_report:fieldTokenAdmission.FIELD_REVIEW,individual_proof:fieldTokenAdmission.fieldProof(row)};
-    assert.equal(fieldTokenAdmission.sourceOk({root,read,entry,body:source.body,review:row,proof:entry.individual_proof}),true);
+    assert.equal(fieldTokenAdmission.sourceOk({root,read:actualSourceRead(root,read),entry,body:source.body,review:row,proof:entry.individual_proof}),true);
     expected.entries[index]=entry;replacements.push({sha:row.sha,after_entry:entry});
   }
   assert.equal(replacements.length,2);expected.closed_dispositions=371;expected.open_or_deferred=1326;
@@ -962,7 +1040,7 @@ function prepareBoundaryStage({root,read,before,bound}){
   assert.equal(hash(read(helper)),digest);bound.set(helper,digest);
   for(const sha of boundaryAdmission.BOUNDARY_SHAS)assert.deepEqual(sourceContractDefinitions.find(row=>row.sha===sha),{
     sha,proof_kind:'individual-historical-m3-theme-boundary-source-review',scope_key:'m3_theme_boundary_source_scope',module:'upstream-m3-theme-boundary-admission.cjs'});
-  const source=boundaryAdmission.inspectBoundarySource({root,read});for(const ref of source.bound)bound.set(ref.path,ref.sha256);
+  const source=boundaryAdmission.inspectBoundarySource({root,read:actualSourceRead(root,read)});for(const ref of source.bound)bound.set(ref.path,ref.sha256);
   const original=JSON.parse(before),expected=structuredClone(original),replacements=[];
   assert.equal(original.closed_dispositions,371);assert.equal(original.open_or_deferred,1326);
   for(const row of source.body.reviews){
@@ -970,7 +1048,7 @@ function prepareBoundaryStage({root,read,before,bound}){
     assert.equal(prior.final_disposition,'needs-individual-review');assert.equal(prior.evidence_report,null);
     const entry={...prior,final_disposition:row.proposed_final_disposition,reason:row.decision,review_depth:'individual-compatibility',
       evidence_report:boundaryAdmission.BOUNDARY_REVIEW,individual_proof:boundaryAdmission.boundaryProof(row)};
-    assert.equal(boundaryAdmission.sourceOk({root,read,entry,body:source.body,review:row,proof:entry.individual_proof}),true);
+    assert.equal(boundaryAdmission.sourceOk({root,read:actualSourceRead(root,read),entry,body:source.body,review:row,proof:entry.individual_proof}),true);
     expected.entries[index]=entry;replacements.push({sha:row.sha,after_entry:entry});
   }
   assert.equal(replacements.length,5);expected.closed_dispositions=376;expected.open_or_deferred=1321;
@@ -985,11 +1063,27 @@ function prepareBoundaryStage({root,read,before,bound}){
 }
 
 export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(root)} = {}) {
+ read=packedUpstreamLedgerRawRead({root,read});const lane=sourceLane(root,read);
+ lane.assertCurrent();const batch={root,actual:lane.read,scopes:new Set()};
+ const assertBatch=()=>{lane.assertCurrent();for(const scope of batch.scopes)scope.assertCurrent();lane.assertCurrent();};
+ sourcePreparationStack.push(batch);
+ try{
+  const prepared=preparePackedUpstreamLedgerInner({root,read});assertBatch();
+  const assertCurrent=()=>{assertBatch();prepared.assertCurrent();assertBatch();};
+  return {...prepared,assertCurrent,prior_metadata_assert_current:assertCurrent};
+ }finally{assert.equal(sourcePreparationStack.pop(),batch);}
+}
+function preparePackedUpstreamLedgerInner({root,read}) {
   read = packedUpstreamLedgerRawRead({root, read});
   const input = read(inputPath), line = Object.keys(subjects).find(name => subjects[name].sha256 === hash(input));
   assert.ok(line, 'changed qualified upstream inputs');
   const currentRead=read,registeredChecker=line==='21.x'?registeredSourceCheckerTransition({root,read:currentRead}):null;
-  if(registeredChecker)read=registeredChecker.beforeRead;
+  if(registeredChecker){
+    const path='scripts/check-upstream-audit-disposition.mjs';
+    checkerComparisonReaders.set(registeredChecker.beforeRead,{root,raw:currentRead,read:registeredChecker.beforeRead,guard:registeredChecker.assertCurrent,
+      before:{path,sha256:hash(registeredChecker.before),bytes:registeredChecker.before.length},after:{path,sha256:hash(registeredChecker.after),bytes:registeredChecker.after.length}});
+    read=registeredChecker.beforeRead;
+  }
   const data = JSON.parse(input), authority = subjects[line].authority;
   assert.equal(data.line, line); assert.equal(data.schema_version, 1);
   assert.equal(JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.') ? '21.x' : 'main', line);
@@ -1091,7 +1185,10 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
   const fieldToken=line==='21.x'?prepareFieldTokenStage({root,read:currentRead,before:tokenRoot.after,bound}):null;
   const boundary=line==='21.x'?prepareBoundaryStage({root,read:currentRead,before:fieldToken.after,bound}):null;
   specReaders.assertCurrent();
-  return {line, before, after, canonical_after:boundary?.after??fieldToken?.after??tokenRoot?.after??controlBase?.after??registeredMetadata?.after??consumerWrapper.after,modern_control_base_stage:controlBase,theme_token_root_stage:tokenRoot,form_field_tokenization_stage:fieldToken,m3_theme_boundary_stage:boundary,registered_checker_metadata_stage:registeredMetadata,unthemable_stage:unthemed,token_build_stage:tokenBuild,checker_reference_metadata_stage:checkerMetadata,legacy_sass_entrypoint_stage:sassEntrypoint,historical_consumer_wrapper_metadata_stage:consumerWrapper,historical_wrapper_metadata_stage:historicalWrapper, selection_native_stage:nativeSelection, testing_api_stage: next, sass_stage: sass, rules_js_stage:rulesJs, summary_stage:summary, autocomplete_landscape_stage:landscape, native_spec_source:{assertCurrent:specReaders.assertCurrent,bound:structuredClone(specReaders.bound),spec:{path:specReaders.spec.path,line,before:{...specReaders.spec.before},after:{...specReaders.spec.after}}}, native_spec_metadata_stage:nativeSpec, bound, population, analysis_python_version: syntax.current_pinned_python,
+  const separated=separateSourceBindings(root,read,bound,currentRead);
+  return {line, before, after, canonical_after:boundary?.after??fieldToken?.after??tokenRoot?.after??controlBase?.after??registeredMetadata?.after??consumerWrapper.after,modern_control_base_stage:controlBase,theme_token_root_stage:tokenRoot,form_field_tokenization_stage:fieldToken,m3_theme_boundary_stage:boundary,registered_checker_metadata_stage:registeredMetadata,unthemable_stage:unthemed,token_build_stage:tokenBuild,checker_reference_metadata_stage:checkerMetadata,legacy_sass_entrypoint_stage:sassEntrypoint,historical_consumer_wrapper_metadata_stage:consumerWrapper,historical_wrapper_metadata_stage:historicalWrapper, selection_native_stage:nativeSelection, testing_api_stage: next, sass_stage: sass, rules_js_stage:rulesJs, summary_stage:summary, autocomplete_landscape_stage:landscape, native_spec_source:{assertCurrent:specReaders.assertCurrent,bound:structuredClone(specReaders.bound),spec:{path:specReaders.spec.path,line,before:{...specReaders.spec.before},after:{...specReaders.spec.after}}}, native_spec_metadata_stage:nativeSpec,
+    bound:separated.outerBound,metadata_bound:separated.metadataBound,current_source_bound:separated.physicalBound,assertCurrent:separated.assertCurrent,
+    prior_metadata_assert_current:separated.assertCurrent,population, analysis_python_version: syntax.current_pinned_python,
     input_sha256: hash(input),
     entries_changed: 85, scalar_tokens_changed: 179, source_scope_only: true,
     current_native_packed_or_floor_qualified: false};
@@ -1147,6 +1244,7 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
     prepared.theme_token_root_stage?.assertCurrent();
     prepared.form_field_tokenization_stage?.assertCurrent();
     prepared.m3_theme_boundary_stage?.assertCurrent();
+    prepared.assertCurrent();
     for (const [path, digest] of prepared.bound)
       assert.equal(hash(read(path)), digest, 'late current upstream subject change ' + path);
     const population = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '--',

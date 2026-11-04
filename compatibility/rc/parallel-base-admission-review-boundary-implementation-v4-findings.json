@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-11-04T22:02:22.363277+00:00",
+  "task": "Independent read-only source-boundary implementation review",
+  "status": "blocking-mixed-reference-issue-reproduced-awaiting-owner-fix",
+  "worksheet": {
+    "path": "compatibility/rc/parallel-base-admission-review-boundary-implementation-v4-worksheet.json",
+    "sha256": "59e3ec06a3036246b475f5e987e1a6b80494a5610e1f285a27daeba7bbe7ea27",
+    "bytes": 1411
+  },
+  "probe": {
+    "path": "compatibility/rc/parallel-base-admission-review-boundary-implementation-v4-probe.mjs",
+    "sha256": "03dbc3059f8c4eb8da1b5a100323b2910720cd2f3c0842095e64b34d76055bf1",
+    "bytes": 10294
+  },
+  "focused_result": {
+    "path": "compatibility/rc/parallel-base-admission-review-boundary-implementation-v4-result.json",
+    "sha256": "175f81576c8dba461d6339219e68979942c9b813fa257dd154b3b68593c64e49",
+    "bytes": 2924
+  },
+  "reviewed_source_images": [
+    {
+      "path": "scripts/packed-upstream-ledger-epoch.mjs",
+      "sha256": "8f83107f03f1d6db3a2df529f158cf1dd52b92b4f55bb044fdc82295b168acfd",
+      "bytes": 79265
+    },
+    {
+      "path": "scripts/packed-upstream-ledger-base.mjs",
+      "sha256": "ac1f6df3a13c6321e086c61de05a6ad4bedfd72b7d9aabebfcafa5c83b298f69",
+      "bytes": 115457
+    },
+    {
+      "path": "compatibility/rc/autocomplete-selection-ledger-successor.json",
+      "sha256": "c47ae399ecd8426ca2d20e6561ea3e37bb94084bce1e850c22d50065a63eb512",
+      "bytes": 40820
+    }
+  ],
+  "blocking_findings": [
+    {
+      "id": "selection-stage-physical-versus-frozen-native-reference",
+      "path": "scripts/packed-upstream-ledger-base.mjs",
+      "locations": [
+        683,
+        684,
+        705,
+        713
+      ],
+      "trigger": "Prepare the preserved selection stage through a registered title metadata reader while source/native subject construction resolves to the actual callback.",
+      "evidence": {
+        "frozen_native_reference": {
+          "path": "scripts/upstream-historical-behavior-evidence.mjs",
+          "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044",
+          "bytes": 20121
+        },
+        "physical_native_reference": {
+          "path": "scripts/upstream-historical-behavior-evidence.mjs",
+          "sha256": "8efdc7640a20c9c6b163c3e93b664d4b4384979fb0c23304b8d3f4fad02570c1",
+          "bytes": 20399
+        },
+        "exact_current_translator_returns_physical_reference_unchanged": true
+      },
+      "effect": "The original qualification_members equality rejects current native bytes/provenance; generated historical proof members retain the current native hash, and the later frozen source_digest_updates.after also disagrees with actual native.after. A valid current source state cannot complete this preserved stage.",
+      "required_boundary": "Keep physical source/native subjects and their retained guards. Reconstruct a separately authenticated private historical comparison image for the complete frozen stage (including member population, generated proof refs, and native.after) and retain every original literal/equality assertion; no refreshed packet or report."
+    }
+  ],
+  "nonblocking_observations": [
+    {
+      "id": "repeated-complete-guards",
+      "path": "scripts/packed-upstream-ledger-base.mjs",
+      "locations": [
+        64,
+        77,
+        81,
+        118,
+        133,
+        135,
+        136
+      ],
+      "evidence": {
+        "members": 3,
+        "scope_references_per_member": 3,
+        "guard_calls": {
+          "table": 84,
+          "legacy": 84,
+          "inventory": 84,
+          "title": 84,
+          "checker": 30
+        }
+      },
+      "effect": "The new per-member lane resolution and per-scope-reference translation repeatedly invoke every retained complete owner guard. Three in-memory members with three references cause84 calls per owner guard; the actual stage enumerates1142 product inputs and larger scope maps. No wall-clock owner estimate or runtime failure is claimed.",
+      "recommendation": "Bracket bulk operations with complete guards and cache immutable lane/translation facts by actual callback/root/line, retaining individual hashes and all final/cache-reuse guards. Do not remove the physical or prior metadata guard."
+    }
+  ],
+  "reviewed_positive_boundaries": [
+    "The only epoch writer is private bindSourceMetadata at exact context construction sites; resolver exports no writer or filesystem fallback. Base checker registration remains private at exact registeredChecker.beforeRead construction.",
+    "Four nested owner frames and the base checker frame translate references from innermost current image outward, authenticating each intermediate hash/length.",
+    "Separate metadataBound/outerBound/physicalBound preserve different checker/owner reference roles; independently tested late physical and historical mutations reject and restoration accepts.",
+    "Unknown/lookalike callbacks remain themselves; foreign-root resolution and wrong hash/length reject.",
+    "Public raw/unwrap maps remain separate from the new source-metadata map; no new historical tool reader is installed into the existing public historical-ledger unwrapping route.",
+    "No module-initialization call invokes the exported epoch resolver, so the existing import cycle introduces no observed temporal-dead-zone execution at initialization."
+  ],
+  "constructor_concern_resolution": {
+    "sourceTransactionTools_not_established_as_blocker": "Actual inventory/legacy/table frames leave all current repair-helper inputs unchanged. Their projected handler/workflow/inventory/ledger paths do not overlap the helper source members. The epoch title frame, which does project OWNER, is constructed only after context completes.",
+    "title_measurement_boundary": "Original95 title measurement inputs intersect inventory projection at native-evidence and inventory only. titleMeasurementSourceReferences has an existing exact private WeakSet branch for that authentic inventory callback, while all other supplied callbacks reject old bytes.",
+    "caveat": "The pending exact epoch/base manifest extension is owner work in progress and was not qualified by this review. No actual composed owner construction/run is claimed."
+  },
+  "execution_limits": [
+    "Only current private function text extracted into a dependency-isolated probe, with explicit test-only injection; actual context constructors and source producers unexecuted.",
+    "No edits to existing files, manifest, registry, ledger, roster or protected inputs.",
+    "No full owner/build/compiler/browser/native/floor/matrix run or canonical/source admission."
+  ],
+  "coordinated_with": [
+    "Parent /root",
+    "Implementer /root/base_class_admission"
+  ],
+  "product_or_shared_edits": false
+}

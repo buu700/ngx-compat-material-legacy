@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "status": "focused-python-methods-pass",
+  "python": "3.14.7",
+  "executed_tests": 8,
+  "runs": [
+    {
+      "command": "nice -n19 <pinnedPython> -m unittest discover -s tests -p test_historical_contract_repair_source.py -v",
+      "tests": 6,
+      "seconds": 0.086,
+      "result": "pass"
+    },
+    {
+      "command": "PYTHONPATH=tests nice -n19 <pinnedPython> -m unittest -v test_legacy_removal_admission.LegacyRemovalAdmissionTests.test_independent_exact_entry_and_scalar_projection",
+      "tests": 1,
+      "result": "pass",
+      "seconds_including_mistyped_table_selector": 0.3
+    },
+    {
+      "command": "PYTHONPATH=tests nice -n19 <pinnedPython> -m unittest -v test_table_local_compilation_admission.TableLocalCompilationAdmissionTest.test_independent_exact_entry_scalars_and_registry_projection",
+      "tests": 1,
+      "seconds": 0.1,
+      "result": "pass"
+    }
+  ],
+  "resolved_invocation_error": "The first combined invocation used the wrong table class name Tests rather than Test; legacy method passed. Correct table method then passed; no assertion failure remains.",
+  "source_inputs": [
+    {
+      "path": "tests/historical_contract_repair_source.py",
+      "sha256": "f492b7e91361d905268eb86bf139b2a5ce13468636a22b9f5ce74af4172d7021",
+      "bytes": 9311
+    },
+    {
+      "path": "tests/test_historical_contract_repair_source.py",
+      "sha256": "34105639b5e24a6a502bfd958d561db428715bc4c4b5bb4bc778aa7657906385",
+      "bytes": 6478
+    },
+    {
+      "path": "compatibility/rc/historical-contract-repair-reader-inputs.json",
+      "sha256": "cbb4a345ed7124b85b5d424cfb8af6ae8ece9175bf39833ca67c09db0e61ff1b",
+      "bytes": 171839
+    }
+  ],
+  "old_negative_source_projection_assertions_retained": true,
+  "unrelated_prior_manifest_rows_preserved": 14,
+  "authenticated_intermediate_only": {
+    "path": "scripts/packed-upstream-ledger-epoch.mjs",
+    "sha256": "34a8c062367debddf81a5112be37e4aa603e4a3c6b9c8e5c7c34144995d62669",
+    "bytes": 74930
+  },
+  "actual_owner_or_source_producer_construction": false,
+  "canonical_changes_applied": false,
+  "g11_claim": "not-passed"
+}

@@ -85,6 +85,49 @@ const image=readFileSync(fileURLToPath(import.meta.url)),readers=new WeakMap(),o
 const METADATA_ROLE='compatibility/rc/.canonical-owned-tool-metadata-role';
 const metadataToken=Buffer.from('owned canonical tool metadata');
 const disk=root=>path=>readFileSync(join(root,path));
+// Only the exact locally constructed owner contexts below can write this map.
+// It is deliberately separate from public historical-ledger unwrapping.
+const sourceMetadataReaders=new WeakMap();
+const sourceMetadataPaths={
+ title:[OWNER,TITLE_NATIVE_REGISTRY,'scripts/autocomplete-selection-native-subject.mjs',LEDGER],
+ inventory:[LEDGER,'testing/legacy-runner/historical-inventory.json','.github/workflows/ci.yml','scripts/upstream-dialog-title-admission.cjs','scripts/upstream-dialog-title-native-evidence.mjs'],
+ legacy:[LEDGER],table:[LEDGER],
+};
+function bindSourceMetadata(root,context,currentRead,role){
+ assert.ok(Object.hasOwn(sourceMetadataPaths,role));assert.equal(typeof context.metadataRead,'function');
+ assert.notEqual(context.metadataRead,currentRead);assert.equal(typeof context.assertCurrent,'function');
+ assert.equal(sourceMetadataReaders.has(context.metadataRead),false);
+ context.assertCurrent();const references=new Map();
+ for(const path of sourceMetadataPaths[role]){
+  const before=context.metadataRead(path),after=currentRead(path);assert.ok(Buffer.isBuffer(before)&&Buffer.isBuffer(after));
+  if(!before.equals(after))references.set(path,{before:{path,sha256:hash(before),bytes:before.length},after:{path,sha256:hash(after),bytes:after.length}});
+ }
+ context.assertCurrent();sourceMetadataReaders.set(context.metadataRead,{root:resolve(root),raw:currentRead,read:context.metadataRead,guard:context.assertCurrent,references});
+ return context;
+}
+/** Read-only resolver; unknown callbacks receive no authority or disk fallback. */
+export function packedUpstreamLedgerCurrentSourceLane({root,read}){
+ const frames=[],seen=new Set();let current=read;
+ while(sourceMetadataReaders.has(current)){
+  assert.equal(seen.has(current),false,'cyclic canonical source metadata reader');seen.add(current);
+  const frame=sourceMetadataReaders.get(current);assert.equal(frame.root,resolve(root));frames.push(frame);current=frame.raw;
+ }
+ const assertCurrent=()=>{for(const frame of frames){frame.guard();for(const row of frame.references.values()){
+  for(const[reader,ref]of [[frame.read,row.before],[frame.raw,row.after]]){const raw=reader(ref.path);assert.ok(Buffer.isBuffer(raw));assert.equal(hash(raw),ref.sha256,'changed canonical source-lane reference '+ref.path);assert.equal(raw.length,ref.bytes);}
+ }frame.guard();}};
+ const comparisonReference=ref=>{
+  let result={...ref};
+  for(const frame of [...frames].reverse()){
+   const row=frame.references.get(result.path);if(!row)continue;
+   for(const[reader,expected]of [[frame.read,row.before],[frame.raw,row.after]]){const raw=reader(expected.path);assert.ok(Buffer.isBuffer(raw));assert.equal(hash(raw),expected.sha256,'changed canonical source-lane member '+expected.path);assert.equal(raw.length,expected.bytes);}
+   assert.equal(result.sha256,row.after.sha256,'unqualified canonical source-lane reference '+result.path);
+   if(result.bytes!==undefined)assert.equal(result.bytes,row.after.bytes);
+   result={...result,sha256:row.before.sha256,...(result.bytes===undefined?{}:{bytes:row.before.bytes})};
+  }
+  return result;
+ };
+ return {read:current,comparisonReference,assertCurrent,registered_frames:frames.length};
+}
 function original(root,path,authority=AUTHORITY){
  const key=root+'\0'+authority+'\0'+path;
  if(!originals.has(key)){
@@ -114,9 +157,11 @@ function sourceTransactionTools(root,read){
  assert.equal(packet.root_per_SHA_source_dispatch_unchanged,true);assert.equal(packet.actual_native_artifact_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');
  assert.deepEqual(packet.before_owner,{path:OWNER,sha256:'4f93d241fee195be6c9d052473af37f1e19ba9394c8de444a9dd154452f14ebc',bytes:33317});
  assert.deepEqual(packet.helper,canonicalSourceTransactionReference());
- const bound=[{path:SOURCE_TRANSACTION,sha256:SOURCE_TRANSACTION_HASH,bytes:raw.length},packet.helper,packet.byte_preserved_base,packet.byte_preserved_root_checker];
- const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed source transaction tool '+ref.path);assert.equal(value.length,ref.bytes);}};
- assertCurrent();return {bound,assertCurrent};
+ const repairs=historicalContractRepairReaderSubject({root,read}),baseRef=repairs.qualify(packet.byte_preserved_base);assert.ok(baseRef,'unqualified current base source-lane successor');
+ const baseImage=repairs.comparisonBytes(packet.byte_preserved_base);assert.equal(hash(baseImage),packet.byte_preserved_base.sha256);assert.equal(baseImage.length,packet.byte_preserved_base.bytes);
+ const bound=[{path:SOURCE_TRANSACTION,sha256:SOURCE_TRANSACTION_HASH,bytes:raw.length},packet.helper,baseRef,packet.byte_preserved_root_checker,...repairs.bound];
+ const assertCurrent=()=>{repairs.assertCurrent();for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed source transaction tool '+ref.path);assert.equal(value.length,ref.bytes);}};
+ assertCurrent();return {bound,assertCurrent,baseImage:Buffer.from(baseImage)};
 }
 function remainingUnthemableTools(root,read){
  const raw=read(REMAINING_UNTHEMABLE_PACKET);assert.equal(hash(raw),REMAINING_UNTHEMABLE_PACKET_HASH,'changed remaining unthemable canonical packet');const packet=JSON.parse(raw);
@@ -308,8 +353,9 @@ function legacyRegistryMetadataReference(root,read,prior){
 }
 function context(root,read){
  assert.equal(resolve(root),ROOT,'wrong21.x canonical owner checkout');
- const transaction=sourceTransactionTools(root,read);
- const tools=currentThemingTools(root,read);
+ const sourceLane=packedUpstreamLedgerCurrentSourceLane({root,read}),sourceRead=sourceLane.read;
+ const transaction=sourceTransactionTools(root,sourceRead);
+ const tools=currentThemingTools(root,sourceRead);
  const frameRaw=read(FRAMES);assert.equal(hash(frameRaw),FRAMES_HASH,'changed accepted ledger-frame catalog');
  const frames=JSON.parse(frameRaw);assert.equal(frames.schema_version,1);assert.equal(frames.line,'21.x');
  assert.equal(frames.frames.length,21);assert.equal(new Set(frames.frames.map(frame=>frame.sha256)).size,21);
@@ -321,7 +367,7 @@ function context(root,read){
  assert.equal(packet.actual_native_artifact_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');
  const before=original(root,LEDGER);assert.equal(hash(before),TITLE_LEDGER_BEFORE);assert.equal(before.length,packet.before.bytes);
  assert.deepEqual(packet.before,{path:LEDGER,sha256:TITLE_LEDGER_BEFORE,bytes:before.length});
- const baseImage=read(BASE);assert.equal(hash(baseImage),'ee74d3c46ae056f4ffd16cc1d38d60820ca449d96158c776319a2bfcbc6fc715');
+ const baseImage=transaction.baseImage;assert.equal(hash(baseImage),'ee74d3c46ae056f4ffd16cc1d38d60820ca449d96158c776319a2bfcbc6fc715');
  assert.equal(baseImage.equals(original(root,OWNER)),true,'prior owner changed during extraction');
  const nativeBefore=original(root,TITLE_NATIVE_REGISTRY);assert.equal(hash(nativeBefore),TITLE_NATIVE_BEFORE);
  let nativeExpected=nativeBefore.toString();
@@ -371,11 +417,11 @@ function context(root,read){
  const remainingUnthemableStage=applyRemainingUnthemableCanonicalStage({before:coreTokenizationStage.after,body:tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.body});
  assert.deepEqual(tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after,{path:LEDGER,sha256:hash(remainingUnthemableStage.after),bytes:remainingUnthemableStage.after.length});
  const own={path:OWNER,sha256:hash(image),bytes:image.length};
- const repairs=historicalContractRepairReaderSubject({root,read});
+ const repairs=historicalContractRepairReaderSubject({root,read:sourceRead});
  const bound=[...new Map([own,{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound,...repairs.bound].map(ref=>repairs.qualify(ref)??ref).map(ref=>[ref.path,ref])).values()];
  const assertTools=()=>{
-  repairs.assertCurrent();
-  for(const member of bound){const value=read(member.path);assert.equal(hash(value),member.sha256,'changed title owner binding '+member.path);if(member.bytes!==undefined)assert.equal(value.length,member.bytes);}
+  sourceLane.assertCurrent();repairs.assertCurrent();
+  for(const member of bound){const value=sourceRead(member.path);assert.equal(hash(value),member.sha256,'changed title owner binding '+member.path);if(member.bytes!==undefined)assert.equal(value.length,member.bytes);}
  };
  const assertLedger=()=>assert.equal(hash(read(LEDGER)),currentHash,'late title canonical ledger change');
  assertTools();assertLedger();
@@ -384,31 +430,31 @@ function context(root,read){
  // fallback programs, and no product source is projected.
  const metadataRead=path=>{
   if(path===METADATA_ROLE)return metadataToken;
-  if(path===OWNER){assert.equal(hash(read(path)),own.sha256,'changed current owner metadata source');return Buffer.from(baseImage);}
-  if(path===TITLE_NATIVE_REGISTRY){assert.equal(hash(read(path)),TITLE_NATIVE_AFTER,'changed current native metadata source');return Buffer.from(nativeBefore);}
+  if(path===OWNER){assert.equal(hash(sourceRead(path)),own.sha256,'changed current owner metadata source');return Buffer.from(baseImage);}
+  if(path===TITLE_NATIVE_REGISTRY){assert.equal(hash(sourceRead(path)),TITLE_NATIVE_AFTER,'changed current native metadata source');return Buffer.from(nativeBefore);}
   if(path==='scripts/autocomplete-selection-native-subject.mjs'){
-   assert.equal(hash(read(path)),bound.find(member=>member.path===path).sha256,'changed current native-subject metadata source');return original(root,path);
+   assert.equal(hash(sourceRead(path)),bound.find(member=>member.path===path).sha256,'changed current native-subject metadata source');return original(root,path);
   }
   if(path===LEDGER&&[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash)){assertTools();return Buffer.from(before);}
   return read(path);
  };
- const source=title.inspectTitleSource({root,read});
- assert.equal(title.sourceOk({root,read,entry:stage.entry,body,review:body.reviews[0],proof:stage.entry.individual_proof}),true,'fresh title source admission failed');
- const themingSource=inspectCanonicalSourceTransaction({root,read,family:'theming',entries:themingStage.entries,body:tools.body});
+ const source=title.inspectTitleSource({root,read:sourceRead});
+ assert.equal(title.sourceOk({root,read:sourceRead,entry:stage.entry,body,review:body.reviews[0],proof:stage.entry.individual_proof}),true,'fresh title source admission failed');
+ const themingSource=inspectCanonicalSourceTransaction({root,read:sourceRead,family:'theming',entries:themingStage.entries,body:tools.body});
  assert.equal(themingSource.individual_metadata_cases,themingStage.entries.length,'every individual source row must be verified');
- const inspectionSource=inspectCanonicalSourceTransaction({root,read,family:'inspection',entries:inspectionStage.entries,body:tools.successor.body});
+ const inspectionSource=inspectCanonicalSourceTransaction({root,read:sourceRead,family:'inspection',entries:inspectionStage.entries,body:tools.successor.body});
  assert.equal(inspectionSource.individual_metadata_cases,inspectionStage.entries.length,'every individual source row must be verified');
- const selectorDensitySource=inspectCanonicalSourceTransaction({root,read,family:'selector-density',entries:selectorDensityStage.entries,body:tools.successor.successor.body});
+ const selectorDensitySource=inspectCanonicalSourceTransaction({root,read:sourceRead,family:'selector-density',entries:selectorDensityStage.entries,body:tools.successor.successor.body});
  assert.equal(selectorDensitySource.individual_metadata_cases,selectorDensityStage.entries.length,'every individual source row must be verified');
- const buttonTokenizationSource=inspectCanonicalSourceTransaction({root,read,family:'button-tokenization',entries:buttonTokenizationStage.entries,body:tools.successor.successor.successor.body});
+ const buttonTokenizationSource=inspectCanonicalSourceTransaction({root,read:sourceRead,family:'button-tokenization',entries:buttonTokenizationStage.entries,body:tools.successor.successor.successor.body});
  assert.equal(buttonTokenizationSource.individual_metadata_cases,buttonTokenizationStage.entries.length,'every individual source row must be verified');
- const buttonTokenRepairsSource=buttonTokenRepairs.inspectCanonicalSource({root,read,entries:buttonTokenRepairsStage.entries,body:tools.successor.successor.successor.successor.body});
- const surfaceM3ThemeSource=surfaceM3Theme.inspectCanonicalSource({root,read,entries:surfaceM3ThemeStage.entries,body:tools.successor.successor.successor.successor.successor.body});
- const sliderM3RepairsSource=sliderM3Repairs.inspectCanonicalSource({root,read,entries:sliderM3RepairsStage.entries,body:tools.successor.successor.successor.successor.successor.successor.body});
- const controlM3ThemeSource=controlM3Theme.inspectCanonicalSource({root,read,entries:controlM3ThemeStage.entries,body:tools.successor.successor.successor.successor.successor.successor.successor.body});
- const foundationM3ThemeSource=foundationM3Theme.inspectCanonicalSource({root,read,entries:foundationM3ThemeStage.entries,body:tools.successor.successor.successor.successor.successor.successor.successor.successor.body});
- const coreTokenizationSource=coreTokenization.inspectCanonicalSource({root,read,entries:coreTokenizationStage.entries,body:tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.body});
- const remainingUnthemableSource=remainingUnthemable.inspectCanonicalSource({root,read,entries:remainingUnthemableStage.entries,body:tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.body});
+ const buttonTokenRepairsSource=buttonTokenRepairs.inspectCanonicalSource({root,read:sourceRead,entries:buttonTokenRepairsStage.entries,body:tools.successor.successor.successor.successor.body});
+ const surfaceM3ThemeSource=surfaceM3Theme.inspectCanonicalSource({root,read:sourceRead,entries:surfaceM3ThemeStage.entries,body:tools.successor.successor.successor.successor.successor.body});
+ const sliderM3RepairsSource=sliderM3Repairs.inspectCanonicalSource({root,read:sourceRead,entries:sliderM3RepairsStage.entries,body:tools.successor.successor.successor.successor.successor.successor.body});
+ const controlM3ThemeSource=controlM3Theme.inspectCanonicalSource({root,read:sourceRead,entries:controlM3ThemeStage.entries,body:tools.successor.successor.successor.successor.successor.successor.successor.body});
+ const foundationM3ThemeSource=foundationM3Theme.inspectCanonicalSource({root,read:sourceRead,entries:foundationM3ThemeStage.entries,body:tools.successor.successor.successor.successor.successor.successor.successor.successor.body});
+ const coreTokenizationSource=coreTokenization.inspectCanonicalSource({root,read:sourceRead,entries:coreTokenizationStage.entries,body:tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.body});
+ const remainingUnthemableSource=remainingUnthemable.inspectCanonicalSource({root,read:sourceRead,entries:remainingUnthemableStage.entries,body:tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.body});
  const assertCurrent=()=>{assertTools();assertLedger();source.assertCurrent();themingSource.assertCurrent();inspectionSource.assertCurrent();selectorDensitySource.assertCurrent();buttonTokenizationSource.assertCurrent();buttonTokenRepairsSource.assertCurrent();surfaceM3ThemeSource.assertCurrent();sliderM3RepairsSource.assertCurrent();controlM3ThemeSource.assertCurrent();foundationM3ThemeSource.assertCurrent();coreTokenizationSource.assertCurrent();remainingUnthemableSource.assertCurrent();};
  assertCurrent();return {packet,stage,themingStage,inspectionStage,selectorDensityStage,buttonTokenizationStage,buttonTokenRepairsStage,surfaceM3ThemeStage,sliderM3RepairsStage,controlM3ThemeStage,foundationM3ThemeStage,coreTokenizationStage,remainingUnthemableStage,metadataRead,assertCurrent,bound:[...bound,...source.bound,...themingSource.bound,...inspectionSource.bound,...selectorDensitySource.bound,...buttonTokenizationSource.bound,...buttonTokenRepairsSource.bound,...surfaceM3ThemeSource.bound,...sliderM3RepairsSource.bound,...controlM3ThemeSource.bound,...foundationM3ThemeSource.bound,...coreTokenizationSource.bound,...remainingUnthemableSource.bound],
   titleApplied:[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),themingApplied:[tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),inspectionApplied:[tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),selectorDensityApplied:[tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenizationApplied:[tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenRepairsApplied:[tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),surfaceM3ThemeApplied:[tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),sliderM3RepairsApplied:[tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),controlM3ThemeApplied:[tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),foundationM3ThemeApplied:[tools.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),coreTokenizationApplied:[tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),remainingUnthemableApplied:currentHash===tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,currentHash};
@@ -423,9 +469,10 @@ export function packedUpstreamLedgerRawRead({root=process.cwd(),read=disk(root)}
 }
 function prepareBeforeInventoryReferenceLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});
- const ctx=context(root,read),prior=base.preparePackedUpstreamLedger({root,read:ctx.metadataRead});
+ const ctx=bindSourceMetadata(root,context(root,read),read,'title'),prior=base.preparePackedUpstreamLedger({root,read:ctx.metadataRead});
  assert.equal(hash(prior.canonical_after),TITLE_LEDGER_BEFORE);
  const current=actualBound(prior.bound,ctx),native=prior.native_spec_source;
+ for(const[path,digest]of prior.current_source_bound??[])current.set(path,digest);
  const nativeBound=native.bound.map(member=>({...member,sha256:current.get(member.path)??member.sha256,bytes:read(member.path).length}));
  // The old bound set was measured through private metadata. Its public form
  // records actual current tools; the preserved stage checks remain separate.
@@ -443,12 +490,12 @@ function prepareBeforeInventoryReferenceLedger({root=process.cwd(),read=disk(roo
   foundation_m3_theme_stage:{...ctx.foundationM3ThemeStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},
   core_tokenization_stage:{...ctx.coreTokenizationStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},
   remaining_unthemable_stage:{...ctx.remainingUnthemableStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},
-  prior_metadata_assert_current:()=>{ctx.assertCurrent();for(const [path,digest]of prior.bound)assert.equal(hash(ctx.metadataRead(path)),digest);},
-  assertCurrent:ctx.assertCurrent};
+  prior_metadata_assert_current:()=>{ctx.assertCurrent();prior.assertCurrent();for(const [path,digest]of prior.bound)assert.equal(hash(ctx.metadataRead(path)),digest);ctx.assertCurrent();},
+  assertCurrent:()=>{ctx.assertCurrent();prior.assertCurrent();ctx.assertCurrent();}};
 }
 function epochBeforeInventoryReferenceLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});
- const ctx=context(root,read),prior=base.packedUpstreamLedgerEpoch({root,read:ctx.metadataRead});
+ const ctx=bindSourceMetadata(root,context(root,read),read,'title'),prior=base.packedUpstreamLedgerEpoch({root,read:ctx.metadataRead});
  const assertCurrent=()=>{ctx.assertCurrent();prior.assertCurrent();ctx.assertCurrent();};
  const historical=path=>{if(path!==LEDGER)return read(path);ctx.assertCurrent();const value=prior.read(path);ctx.assertCurrent();return value;};
  readers.set(historical,{root:resolve(root),raw:read});assertCurrent();
@@ -481,13 +528,13 @@ function qualifyBeforeInventoryReferenceToolReference({root=process.cwd(),read=d
 /** Exact terminal inventory metadata successor; all prior source stages still execute. */
 function prepareBeforeLegacyRemovalLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});
- const inventory=inventoryReferenceOwnerContext({root,read});
+ const inventory=bindSourceMetadata(root,inventoryReferenceOwnerContext({root,read}),read,'inventory');
  const prior=prepareBeforeInventoryReferenceLedger({root,read:inventory.metadataRead});
  return inventory.wrapPrepared(prior);
 }
 function epochBeforeLegacyRemovalLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});
- const inventory=inventoryReferenceOwnerContext({root,read});
+ const inventory=bindSourceMetadata(root,inventoryReferenceOwnerContext({root,read}),read,'inventory');
  const prior=epochBeforeInventoryReferenceLedger({root,read:inventory.metadataRead});
  const assertCurrent=()=>{inventory.assertCurrent();prior.assertCurrent();inventory.assertCurrent();};
  const historical=path=>{if(path!==LEDGER)return read(path);assertCurrent();const value=prior.read(path);assertCurrent();return value;};
@@ -503,7 +550,7 @@ function epochBeforeLegacyRemovalLedger({root=process.cwd(),read=disk(root)}={})
 function qualifyBeforeLegacyRemovalToolReference({root=process.cwd(),read=disk(root),prior}={}){
  let role;try{role=read(METADATA_ROLE);}catch{/* Raw readers have no metadata capability. */}
  if(role===metadataToken)return qualifyBeforeInventoryReferenceToolReference({root,read,prior});
- const inventory=inventoryReferenceOwnerContext({root,read});
+ const inventory=bindSourceMetadata(root,inventoryReferenceOwnerContext({root,read}),read,'inventory');
  const result=qualifyBeforeInventoryReferenceToolReference({root,read:inventory.metadataRead,prior});
  if(!result)return result;
  const bound=new Map(result.bound.map(ref=>[ref.path,{...ref}]));
@@ -517,13 +564,13 @@ function qualifyBeforeLegacyRemovalToolReference({root=process.cwd(),read=disk(r
 /** The complete prior owner runs first; only the exact new source stage follows. */
 function prepareBeforeTableLocalCompilationLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});
- const legacy=legacyRemovalOwnerContext({root,read});
+ const legacy=bindSourceMetadata(root,legacyRemovalOwnerContext({root,read}),read,'legacy');
  const prior=prepareBeforeLegacyRemovalLedger({root,read:legacy.metadataRead});
  return legacy.wrapPrepared(prior);
 }
 function epochBeforeTableLocalCompilationLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});
- const legacy=legacyRemovalOwnerContext({root,read});
+ const legacy=bindSourceMetadata(root,legacyRemovalOwnerContext({root,read}),read,'legacy');
  const prior=epochBeforeLegacyRemovalLedger({root,read:legacy.metadataRead});
  const assertCurrent=()=>{legacy.assertCurrent();prior.assertCurrent();legacy.assertCurrent();};
  const historical=path=>{if(path!==LEDGER)return read(path);assertCurrent();const raw=prior.read(path);assertCurrent();return raw;};
@@ -537,7 +584,7 @@ function qualifyBeforeTableLocalCompilationToolReference({root=process.cwd(),rea
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.qualifyCanonicalToolReference({root,read,prior});
  let role;try{role=read(METADATA_ROLE);}catch{/* A public reader has no private comparison capability. */}
  if(role===metadataToken)return qualifyBeforeLegacyRemovalToolReference({root,read,prior});
- const legacy=legacyRemovalOwnerContext({root,read});
+ const legacy=bindSourceMetadata(root,legacyRemovalOwnerContext({root,read}),read,'legacy');
  const result=qualifyBeforeLegacyRemovalToolReference({root,read:legacy.metadataRead,prior});
  if(!result)return result;
  const bound=new Map(result.bound.map(ref=>[ref.path,{...ref}]));for(const ref of legacy.bound)bound.set(ref.path,{...ref});
@@ -550,12 +597,12 @@ function qualifyBeforeTableLocalCompilationToolReference({root=process.cwd(),rea
 /** Exact terminal table source decision; every prior current source stage runs. */
 export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});
- const table=tableLocalCompilationOwnerContext({root,read});
+ const table=bindSourceMetadata(root,tableLocalCompilationOwnerContext({root,read}),read,'table');
  const prior=prepareBeforeTableLocalCompilationLedger({root,read:table.metadataRead});return table.wrapPrepared(prior);
 }
 export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});
- const table=tableLocalCompilationOwnerContext({root,read}),prior=epochBeforeTableLocalCompilationLedger({root,read:table.metadataRead});
+ const table=bindSourceMetadata(root,tableLocalCompilationOwnerContext({root,read}),read,'table'),prior=epochBeforeTableLocalCompilationLedger({root,read:table.metadataRead});
  const assertCurrent=()=>{table.assertCurrent();prior.assertCurrent();table.assertCurrent();};
  const historical=path=>{if(path!==LEDGER)return read(path);assertCurrent();const raw=prior.read(path);assertCurrent();return raw;};
  readers.set(historical,{root:resolve(root),raw:read});assertCurrent();
@@ -565,7 +612,7 @@ export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.qualifyCanonicalToolReference({root,read,prior});
  let role;try{role=read(METADATA_ROLE);}catch{/* Public readers have no comparison capability. */}
  if(role===metadataToken)return qualifyBeforeTableLocalCompilationToolReference({root,read,prior});
- const table=tableLocalCompilationOwnerContext({root,read}),result=qualifyBeforeTableLocalCompilationToolReference({root,read:table.metadataRead,prior});if(!result)return result;
+ const table=bindSourceMetadata(root,tableLocalCompilationOwnerContext({root,read}),read,'table'),result=qualifyBeforeTableLocalCompilationToolReference({root,read:table.metadataRead,prior});if(!result)return result;
  const bound=new Map(result.bound.map(ref=>[ref.path,{...ref}]));for(const ref of table.bound)bound.set(ref.path,{...ref});
  const raw=read(result.reference.path),reference={...result.reference,sha256:hash(raw),bytes:raw.length};
  const assertCurrent=()=>{table.assertCurrent();result.assertCurrent();table.assertCurrent();};assertCurrent();
