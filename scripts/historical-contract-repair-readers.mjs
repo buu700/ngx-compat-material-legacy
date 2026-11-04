@@ -16,8 +16,28 @@ import {readHistoricalContractRepairMember} from './historical-contract-repair-s
 const SELF='scripts/historical-contract-repair-readers.mjs',INPUTS='compatibility/rc/historical-contract-repair-reader-inputs.json';
 const PINS={'21.x':'919697c2b238a0cdaf3548eb769f28e4f20f2312d5b86f8fd8922160b2137932',main:'2a6bdf108c5886bdd7ce38489ed3e97b6d00564031a5b6468fa7541b421e7066'};
 const image=readFileSync(fileURLToPath(import.meta.url)),hash=b=>createHash('sha256').update(b).digest('hex'),originals=new Map();
-/** This extra installed tooling root is required by the pinned table source checker. */
+/** Declared peer aliases retain their historical package identity and no-link guards. */
 export function readHistoricalContractRepairOwnerMember(root,path){
+ const peer=path.match(/^projects\/ngx-material-legacy\/node_modules\/@angular\/(material|cdk)\/(.+)$/);
+ const metadata=path.match(/^projects\/ngx-material-legacy\/node_modules\/(@angular\/(?:core|common|forms)|rxjs)\/(package\.json|operators\/package\.json)$/);
+ if(peer||metadata){
+  if(metadata)assert.ok(metadata[2]==='package.json'||metadata[1]==='rxjs');
+  const name=peer?'@angular/'+peer[1]:metadata[1];
+  let file=realpathSync(join(root,'projects/ngx-material-legacy/node_modules',name));
+  assert.equal(file,realpathSync(join(root,'node_modules',name)),'workspace peer differs from the declared root peer');
+  if(metadata){
+   const manifest=join(file,'package.json');assert.equal(lstatSync(manifest).isSymbolicLink(),false);
+   assert.equal(JSON.parse(readFileSync(manifest)).name,name,'wrong workspace peer manifest identity');
+  }
+  for(const part of (peer?peer[2]:metadata[2]).split('/')){
+   assert.ok(part&&part!=='.'&&part!=='..'&&!part.includes('\\'));file=join(file,part);assert.equal(lstatSync(file).isSymbolicLink(),false);
+  }
+  assert.ok(lstatSync(file).isFile());return readFileSync(file);
+ }
+ // The source resolver's root Core manifest has the same identity requirement.
+ if(path==='node_modules/@angular/core/package.json'){
+  const bytes=readHistoricalContractRepairMember(root,path);assert.equal(JSON.parse(bytes).name,'@angular/core','wrong root peer manifest identity');return bytes;
+ }
  const compiler=path.match(/^node_modules\/@angular\/compiler-cli\/(.+)$/);
  if(compiler){
   let file=realpathSync(join(root,'node_modules/@angular/compiler-cli'));

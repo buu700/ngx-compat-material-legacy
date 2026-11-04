@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "0617fd88413a3d172739fd6ffaf2e8b826a6a749",
+  "path": "scripts/historical-contract-repair-readers.mjs",
+  "before": {
+    "path": "scripts/historical-contract-repair-readers.mjs",
+    "sha256": "3a0475591ea4fe7dfaf70b4f89a7c8493960dfe360938c775af752e7f5440545",
+    "bytes": 8094
+  },
+  "literal_edits": [
+    {
+      "before": "/** This extra installed tooling root is required by the pinned table source checker. */\nexport function readHistoricalContractRepairOwnerMember(root,path){\n const compiler=path.match(/^node_modules\\/@angular\\/compiler-cli\\/(.+)$/);",
+      "after": "/** Declared peer aliases retain their historical package identity and no-link guards. */\nexport function readHistoricalContractRepairOwnerMember(root,path){\n const peer=path.match(/^projects\\/ngx-material-legacy\\/node_modules\\/@angular\\/(material|cdk)\\/(.+)$/);\n const metadata=path.match(/^projects\\/ngx-material-legacy\\/node_modules\\/(@angular\\/(?:core|common|forms)|rxjs)\\/(package\\.json|operators\\/package\\.json)$/);\n if(peer||metadata){\n  if(metadata)assert.ok(metadata[2]==='package.json'||metadata[1]==='rxjs');\n  const name=peer?'@angular/'+peer[1]:metadata[1];\n  let file=realpathSync(join(root,'projects/ngx-material-legacy/node_modules',name));\n  assert.equal(file,realpathSync(join(root,'node_modules',name)),'workspace peer differs from the declared root peer');\n  if(metadata){\n   const manifest=join(file,'package.json');assert.equal(lstatSync(manifest).isSymbolicLink(),false);\n   assert.equal(JSON.parse(readFileSync(manifest)).name,name,'wrong workspace peer manifest identity');\n  }\n  for(const part of (peer?peer[2]:metadata[2]).split('/')){\n   assert.ok(part&&part!=='.'&&part!=='..'&&!part.includes('\\\\'));file=join(file,part);assert.equal(lstatSync(file).isSymbolicLink(),false);\n  }\n  assert.ok(lstatSync(file).isFile());return readFileSync(file);\n }\n // The source resolver's root Core manifest has the same identity requirement.\n if(path==='node_modules/@angular/core/package.json'){\n  const bytes=readHistoricalContractRepairMember(root,path);assert.equal(JSON.parse(bytes).name,'@angular/core','wrong root peer manifest identity');return bytes;\n }\n const compiler=path.match(/^node_modules\\/@angular\\/compiler-cli\\/(.+)$/);"
+    }
+  ],
+  "after": {
+    "path": "scripts/historical-contract-repair-readers.mjs",
+    "sha256": "d8a72d0b3dae83c2d3d88412ae4c880e723dbc95592fcfd2cfbe21caff15464c",
+    "bytes": 9514
+  },
+  "product_or_canonical_changes": 0,
+  "g11_claim": "not-passed"
+}
