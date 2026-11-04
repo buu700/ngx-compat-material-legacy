@@ -14,7 +14,7 @@ import {fileURLToPath} from 'node:url';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {readHistoricalContractRepairMember} from './historical-contract-repair-source.mjs';
 const SELF='scripts/historical-contract-repair-readers.mjs',INPUTS='compatibility/rc/historical-contract-repair-reader-inputs.json';
-const PINS={'21.x':'3af8b447d98b9d0bde687d83399e8c625604dbefa78b00535e142b063d8482f3',main:'702d6f65109297515ee1fc57810eaf8fe0a9f7148742ff8572d90824d57b2944'};
+const PINS={'21.x':'577d690ecdad79da270dda15a73649c519e5f9444f9e0a0739d94aecefa45a90',main:'702d6f65109297515ee1fc57810eaf8fe0a9f7148742ff8572d90824d57b2944'};
 const image=readFileSync(fileURLToPath(import.meta.url)),hash=b=>createHash('sha256').update(b).digest('hex'),originals=new Map();
 /** Declared peer aliases retain their historical package identity and no-link guards. */
 export function readHistoricalContractRepairOwnerMember(root,path){
@@ -74,15 +74,20 @@ export function historicalContractRepairReaderSubject({root=process.cwd(),read=p
  const raw=member(INPUTS,{sha256:PINS[line]}),data=JSON.parse(raw);assert.equal(data.schema_version,1);assert.equal(data.line,line);
  assert.equal(data.canonical_dispositions_changed,0);assert.equal(data.product_changes,0);assert.equal(data.old_programs_executed,false);assert.equal(data.actual_native_packed_browser_floor_or_full_audit_qualified,false);assert.equal(data.g11_claim,'not-passed');
  member(SELF,{sha256:hash(image),bytes:image.length});member(data.unchanged_source_subject.path,data.unchanged_source_subject);
+ const intermediate=new Map(),sourceLanes=data.extension_kind==='packed-owner-source-lanes';
  if(data.prior_reader_registry){
   const packed=data.extension_kind==='packed-source',ledger=data.extension_kind==='ledger-reader',roster=data.extension_kind==='roster-reader',cva=data.extension_kind==='cva-reader',owner=data.extension_kind==='current-owner-reader',portal=data.extension_kind==='portal-reader',title=data.extension_kind==='title-measurement-reader';if(!packed&&!ledger&&!roster&&!cva&&!owner&&!portal)assert.equal(line,'21.x');const priorRef=data.prior_reader_registry;assert.equal(priorRef.path,INPUTS);
   const priorBytes=original(root,priorRef.source_parent,priorRef.path);assert.equal(hash(priorBytes),priorRef.sha256);assert.equal(priorBytes.length,priorRef.bytes);
-  const prior=JSON.parse(priorBytes);assert.equal(prior.line,line);assert.equal(prior.source_parent,data.source_parent);assert.equal(prior.tool_transitions.length,title?15:(owner||portal)?(line==='21.x'?14:6):(roster||cva)?(line==='21.x'?13:5):ledger?(line==='21.x'?12:3):packed?(line==='21.x'?11:2):9);
-  const oldPaths=new Set(prior.tool_transitions.map(row=>row.path));assert.deepEqual(data.tool_transitions.filter(row=>!oldPaths.has(row.path)).map(row=>row.path),title?[]:portal?['scripts/dialog-portal-failure-recovery.mjs']:owner?[]:cva?['scripts/packed-cva-source-requalification.mjs']:roster?[]:ledger?(line==='main'?['scripts/inventory-reference-owner.mjs','scripts/browser-owner-source.mjs']:['scripts/inventory-reference-owner.mjs']):packed?['scripts/packed-product-source-recovery.mjs']:['scripts/packed-upstream-ledger-epoch.mjs','scripts/canonical-tool-source-role.mjs']);
+  const prior=JSON.parse(priorBytes);assert.equal(prior.line,line);assert.equal(prior.source_parent,data.source_parent);assert.equal(prior.tool_transitions.length,sourceLanes?15:title?15:(owner||portal)?(line==='21.x'?14:6):(roster||cva)?(line==='21.x'?13:5):ledger?(line==='21.x'?12:3):packed?(line==='21.x'?11:2):9);
+  const oldPaths=new Set(prior.tool_transitions.map(row=>row.path));assert.deepEqual(data.tool_transitions.filter(row=>!oldPaths.has(row.path)).map(row=>row.path),sourceLanes?['scripts/packed-upstream-ledger-base.mjs','scripts/checker-reference-metadata.mjs']:title?[]:portal?['scripts/dialog-portal-failure-recovery.mjs']:owner?[]:cva?['scripts/packed-cva-source-requalification.mjs']:roster?[]:ledger?(line==='main'?['scripts/inventory-reference-owner.mjs','scripts/browser-owner-source.mjs']:['scripts/inventory-reference-owner.mjs']):packed?['scripts/packed-product-source-recovery.mjs']:['scripts/packed-upstream-ledger-epoch.mjs','scripts/canonical-tool-source-role.mjs']);
   for(const row of prior.tool_transitions){const next=data.tool_transitions.find(item=>item.path===row.path);assert.ok(next);assert.deepEqual(next.before,row.before);
-   if(!ledger&&row.path===(title?'scripts/inventory-reference-owner.mjs':cva?'scripts/dialog-title-source-context.mjs':(packed||roster||owner||portal)?'scripts/snack-dom-source-context.mjs':'tests/table_local_compilation_owner_source.py'))assert.deepEqual(next.literal_edits.slice(0,row.literal_edits.length),row.literal_edits);
+   if(sourceLanes&&row.path==='scripts/packed-upstream-ledger-epoch.mjs'){
+    assert.deepEqual(next.literal_edits.slice(0,row.literal_edits.length),row.literal_edits);assert.deepEqual({...next,after:row.after,literal_edits:row.literal_edits},row);
+    const bytes=original(root,priorRef.source_parent,row.path);assert.equal(hash(bytes),row.after.sha256);assert.equal(bytes.length,row.after.bytes);intermediate.set(row.path,{reference:{...row.after},bytes});
+   }else if(!sourceLanes&&!ledger&&row.path===(title?'scripts/inventory-reference-owner.mjs':cva?'scripts/dialog-title-source-context.mjs':(packed||roster||owner||portal)?'scripts/snack-dom-source-context.mjs':'tests/table_local_compilation_owner_source.py'))assert.deepEqual(next.literal_edits.slice(0,row.literal_edits.length),row.literal_edits);
    else assert.deepEqual(next,row,'unrelated earlier reader transition changed');
   }
+  if(sourceLanes){for(const[path,digest]of [['scripts/packed-upstream-ledger-base.mjs','ee74d3c46ae056f4ffd16cc1d38d60820ca449d96158c776319a2bfcbc6fc715'],['scripts/checker-reference-metadata.mjs','1fd8883f7f8872cab67003b355b140020c49ed7ce0422660c7ec51460d14b1ea']]){const row=data.tool_transitions.find(row=>row.path===path);assert.equal(row.source_parent,priorRef.source_parent);assert.equal(row.before.sha256,digest);}}
  }
  const transitions=new Map();
  for(const row of data.tool_transitions){
@@ -92,16 +97,17 @@ export function historicalContractRepairReaderSubject({root=process.cwd(),read=p
   assert.equal(hash(expected),row.after.sha256);assert.equal(Buffer.byteLength(expected),row.after.bytes);const after=member(row.path,row.after);assert.equal(after.toString(),expected);
   transitions.set(row.path,{before:{...row.before},after:{...row.after},beforeBytes:Buffer.from(before),afterBytes:Buffer.from(after)});
  }
- assert.equal(transitions.size,line==='21.x'?15:7);
- const ownsReference=ref=>{const row=transitions.get(ref.path);return Boolean(row&&[row.before.sha256,row.after.sha256].includes(ref.sha256));};
+ assert.equal(transitions.size,line==='21.x'?(sourceLanes?17:15):7);
+ const ownsReference=ref=>{const row=transitions.get(ref.path),middle=intermediate.get(ref.path)?.reference;return Boolean(row&&(ref.sha256===row.before.sha256||ref.sha256===row.after.sha256||(middle&&ref.sha256===middle.sha256)));};
  const side=(ref,target)=>{
   const row=transitions.get(ref.path);if(!row)return null;
-  const prior=ref.sha256===row.before.sha256?row.before:ref.sha256===row.after.sha256?row.after:null;if(!prior)return null;
+  const middle=intermediate.get(ref.path)?.reference;
+  const prior=ref.sha256===row.before.sha256?row.before:ref.sha256===row.after.sha256?row.after:ref.sha256===middle?.sha256?middle:null;if(!prior)return null;
   if(ref.bytes!==undefined)assert.equal(ref.bytes,prior.bytes,'wrong repaired tool reference length');
   member(ref.path,row.after);return {...ref,sha256:row[target].sha256,...(ref.bytes===undefined?{}:{bytes:row[target].bytes})};
  };
  const qualify=ref=>side(ref,'after'),predecessorReference=ref=>side(ref,'before');
- const comparisonBytes=ref=>{assert.ok(ownsReference(ref),'unsupported reader comparison');qualify(ref);const row=transitions.get(ref.path);return Buffer.from(ref.sha256===row.before.sha256?row.beforeBytes:row.afterBytes);};
+ const comparisonBytes=ref=>{assert.ok(ownsReference(ref),'unsupported reader comparison');qualify(ref);const row=transitions.get(ref.path),middle=intermediate.get(ref.path);return Buffer.from(ref.sha256===middle?.reference.sha256?middle.bytes:ref.sha256===row.before.sha256?row.beforeBytes:row.afterBytes);};
  const assertCurrent=()=>{for(const ref of bound.values())member(ref.path,ref);};
  assertCurrent();return {line,bound:structuredClone([...bound.values()]),transitions:structuredClone(data.tool_transitions.map(row=>({path:row.path,before:row.before,after:row.after}))),ownsReference,qualify,predecessorReference,comparisonBytes,assertCurrent,
   old_code_executed:false,old_product_bytes_exposed:false,old_tool_bytes_exposed_as_current:false,current_read_route_returned:false,canonical_admission_granted:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
