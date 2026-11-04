@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "cece800bf646eaeb3b19332b7110bdf87e11430e",
+  "path": "scripts/snack-dom-source-context.mjs",
+  "before": {
+    "path": "scripts/snack-dom-source-context.mjs",
+    "sha256": "de952eccc2a70734b294a9d573b810431c24e5bc25999c75290481d4a29db545",
+    "bytes": 44925
+  },
+  "new_literal_edits": [
+    {
+      "before": "packedCurrentEpochs.set(packed.read,{root,actual:rawCurrent,qualification:packed});read=packed.read;",
+      "after": "packedCurrentEpochs.set(packed.read,{root,actual:rawCurrent,qualification:packed});branded.set(packed.read,{root,raw:rawCurrent});read=packed.read;"
+    },
+    {
+      "before": " read=currentRaw(root,read);\n const internal=packedCurrentEpochs.get(read);",
+      "after": " const internal=packedCurrentEpochs.get(read);\n read=currentRaw(root,read);"
+    },
+    {
+      "before": "for(const m of history.product_members)assert.equal(hash(rawCurrent(m.path)),packed.targets.find(t=>t.path===m.path)?.sha256??owned.targets.find(t=>t.path===m.path)?.sha256??service.targets.find(t=>t.path===m.path)?.sha256??config.targets.find(t=>t.path===m.path)?.sha256??(m.path===SNACK_SOURCE?qualified.delta.sha256:m.path===DIALOG_PORTAL_SOURCE?qualified.dialog.delta.sha256:m.path===TOOLTIP_SOURCE?qualified.tooltip.delta.sha256:m.path===MENU_CONTENT_PANEL_SOURCE?qualified.menu.delta.sha256:(nativeSpec.qualify(m)??m).sha256),'changed raw current product/resource '+m.path);",
+      "after": "for(const m of history.product_members){\n  const special=m.path===SNACK_SOURCE?qualified.delta:m.path===DIALOG_PORTAL_SOURCE?qualified.dialog.delta:m.path===TOOLTIP_SOURCE?qualified.tooltip.delta:m.path===MENU_CONTENT_PANEL_SOURCE?qualified.menu.delta:null;\n  const expected=packed.targets.find(t=>t.path===m.path)??owned.targets.find(t=>t.path===m.path)??service.targets.find(t=>t.path===m.path)??config.targets.find(t=>t.path===m.path)??(special?{path:m.path,sha256:special.sha256}:m);\n  const current=nativeSpec.qualify(expected)??expected;\n  assert.equal(hash(rawCurrent(m.path)),current.sha256,'changed raw current product/resource '+m.path);\n }"
+    }
+  ],
+  "after": {
+    "path": "scripts/snack-dom-source-context.mjs",
+    "sha256": "0bc6a39804b44867ecab2dc6ecbf6f90a62b54adaba083774f15a42e67d22458",
+    "bytes": 45042
+  },
+  "product_or_canonical_changes": 0,
+  "g11_claim": "not-passed"
+}

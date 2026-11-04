@@ -198,10 +198,16 @@ export function readSnackCurrentFocusInputs(options={}){
 }
 export function snackDomContextPrior({root=process.cwd(),read=rawRead(root)}={}){const {data,line}=registry(root,read),bytes=read(data.prior.path);assert.equal(hash(bytes),data.prior.sha256);const prior=capsule(bytes,data.prior.sha256);assert.equal(prior.line,line);assert.equal(prior.selected.length,75);assert.equal(prior.native.length,6);assert.equal(prior.authored_rows.length,12);const key=JSON.stringify([root,data.prior.sha256]);if(!authenticatedPriors.has(key)){for(const m of [...prior.ledgers,...prior.reports,...prior.code_preimages]){assert.equal(hash(m.text),m.sha256);original(root,prior.source_parent,m);}authenticatedPriors.add(key);}return prior;}
 /** The exact packed repairs are checked before exposing their prior source epoch. */
-function packedRepairEpoch(root,read){
+function packedRepairEpoch(root,read,comparisonRead=read){
  const product=productRegistry(root,read),inputs=registry(root,read);assert.equal(product.line,inputs.line);
  const prior=inputs.data.history_product,history=capsule(read(prior.path),prior.sha256);
- return qualifyPackedProductSourceRepairs({root,read,line:product.line,data:product.data.packed_repairs,history,registry:product.data});
+ const qualified=qualifyPackedProductSourceRepairs({root,read,line:product.line,data:product.data.packed_repairs,history,registry:product.data});
+ if(comparisonRead===read)return qualified;
+ const historical=path=>{
+  if(qualified.preimages.has(path)||qualified.contract_preimages.has(path))return qualified.read(path);
+  qualified.assertCurrent(path);return comparisonRead(path);
+ };
+ return {...qualified,read:historical};
 }
 /** Revalidate current repairs before replaying original finite type-proof inputs. */
 export function packedRepairTypeEvidenceRead({root=process.cwd(),read=rawRead(root)}={}){
@@ -219,7 +225,7 @@ export function inspectPackedProductSourceRepairs({root=process.cwd(),read=rawRe
 /** Finite old task subjects only, after every current successor is rechecked. */
 export function snackDomSourceContext({root=process.cwd(),read=rawRead(root)}={}){
  read=currentRaw(root,read);
- const rawCurrent=read,rosterEpoch=currentAuthoredRosterSourceSubject({root,read:rawCurrent}),nativeSpec=autocompleteSelectionReaderSubject({root,read:rawCurrent}),upstreamEpoch=packedUpstreamLedgerEpoch({root,read:rosterEpoch.metadataRead}),focusEpoch=packedUpstreamFocusMetadataEpoch({root,read:upstreamEpoch.read}),roles=packedCvaRoleHistoricalReader({root,read:focusEpoch.read}),roleRead=p=>{if(focusEpoch.inspectors.some(m=>m.path===p)){focusEpoch.assertCurrent();return rawCurrent(p);}return roles.read(p);},packed=packedRepairEpoch(root,roleRead);packedCurrentEpochs.set(packed.read,{root,actual:rawCurrent,qualification:packed});branded.set(packed.read,{root,raw:rawCurrent});read=packed.read;
+ const rawCurrent=read,rosterEpoch=currentAuthoredRosterSourceSubject({root,read:rawCurrent}),nativeSpec=autocompleteSelectionReaderSubject({root,read:rawCurrent}),upstreamEpoch=packedUpstreamLedgerEpoch({root,read:rosterEpoch.metadataRead}),focusEpoch=packedUpstreamFocusMetadataEpoch({root,read:upstreamEpoch.read}),roles=packedCvaRoleHistoricalReader({root,read:focusEpoch.read}),roleRead=p=>{if(focusEpoch.inspectors.some(m=>m.path===p)){focusEpoch.assertCurrent();return rawCurrent(p);}return roles.read(p);},packed=packedRepairEpoch(root,rawCurrent,roleRead);packedCurrentEpochs.set(packed.read,{root,actual:rawCurrent,qualification:packed});branded.set(packed.read,{root,raw:rawCurrent});read=packed.read;
  const qualified=qualifyIndependentSnackProductDelta({root,read}),callerRead=tooltipPriorCallerRead({root,read}),configEpoch=tooltipPriorCallerRead({root,read,currentTooltip:true,currentMenu:true}),owned=inspectSnackCurrentDialogContracts({root,read}),service=owned.defaults,config=service.configuration,{data}=registry(root,read),{data:dataProduct}=productRegistry(root,read),prior=snackDomContextPrior({root,read});tooltipSourceContextPrior({root,read});assert.deepEqual(data.product_inputs,qualified.inputs);assert.equal(data.writes.length,25);for(const m of [...data.writes,...data.history_code_members])assert.equal(hash(read(m.path)),m.sha256,'changed current snack context successor '+m.path);
  for(const m of prior.reports)assert.equal(hash(read(m.path)),m.sha256,'changed immutable original review '+m.path);
  for(const m of data.portal_review_members){assert.equal(hash(read(m.path)),m.sha256,'changed integrated portal review '+m.path);original(root,data.portal_review_source_parent,m);}

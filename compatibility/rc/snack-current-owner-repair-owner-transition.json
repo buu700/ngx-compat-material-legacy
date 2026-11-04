@@ -20,12 +20,20 @@
     {
       "before": "for(const m of history.product_members)assert.equal(hash(rawCurrent(m.path)),packed.targets.find(t=>t.path===m.path)?.sha256??owned.targets.find(t=>t.path===m.path)?.sha256??service.targets.find(t=>t.path===m.path)?.sha256??config.targets.find(t=>t.path===m.path)?.sha256??(m.path===SNACK_SOURCE?qualified.delta.sha256:m.path===DIALOG_PORTAL_SOURCE?qualified.dialog.delta.sha256:m.path===TOOLTIP_SOURCE?qualified.tooltip.delta.sha256:m.path===MENU_CONTENT_PANEL_SOURCE?qualified.menu.delta.sha256:(nativeSpec.qualify(m)??m).sha256),'changed raw current product/resource '+m.path);",
       "after": "for(const m of history.product_members){\n  const special=m.path===SNACK_SOURCE?qualified.delta:m.path===DIALOG_PORTAL_SOURCE?qualified.dialog.delta:m.path===TOOLTIP_SOURCE?qualified.tooltip.delta:m.path===MENU_CONTENT_PANEL_SOURCE?qualified.menu.delta:null;\n  const expected=packed.targets.find(t=>t.path===m.path)??owned.targets.find(t=>t.path===m.path)??service.targets.find(t=>t.path===m.path)??config.targets.find(t=>t.path===m.path)??(special?{path:m.path,sha256:special.sha256}:m);\n  const current=nativeSpec.qualify(expected)??expected;\n  assert.equal(hash(rawCurrent(m.path)),current.sha256,'changed raw current product/resource '+m.path);\n }"
+    },
+    {
+      "before": "function packedRepairEpoch(root,read){\n const product=productRegistry(root,read),inputs=registry(root,read);assert.equal(product.line,inputs.line);\n const prior=inputs.data.history_product,history=capsule(read(prior.path),prior.sha256);\n return qualifyPackedProductSourceRepairs({root,read,line:product.line,data:product.data.packed_repairs,history,registry:product.data});\n}",
+      "after": "function packedRepairEpoch(root,read,comparisonRead=read){\n const product=productRegistry(root,read),inputs=registry(root,read);assert.equal(product.line,inputs.line);\n const prior=inputs.data.history_product,history=capsule(read(prior.path),prior.sha256);\n const qualified=qualifyPackedProductSourceRepairs({root,read,line:product.line,data:product.data.packed_repairs,history,registry:product.data});\n if(comparisonRead===read)return qualified;\n const historical=path=>{\n  if(qualified.preimages.has(path)||qualified.contract_preimages.has(path))return qualified.read(path);\n  qualified.assertCurrent(path);return comparisonRead(path);\n };\n return {...qualified,read:historical};\n}"
+    },
+    {
+      "before": "packed=packedRepairEpoch(root,roleRead);",
+      "after": "packed=packedRepairEpoch(root,rawCurrent,roleRead);"
     }
   ],
   "after": {
     "path": "scripts/snack-dom-source-context.mjs",
-    "sha256": "0bc6a39804b44867ecab2dc6ecbf6f90a62b54adaba083774f15a42e67d22458",
-    "bytes": 45042
+    "sha256": "30b24190cc25375ee3ddc1960696f16e770eafaffa8fb51674b08d189f717180",
+    "bytes": 45361
   },
   "product_or_canonical_changes": 0,
   "g11_claim": "not-passed"

@@ -14,7 +14,7 @@ import {fileURLToPath} from 'node:url';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {readHistoricalContractRepairMember} from './historical-contract-repair-source.mjs';
 const SELF='scripts/historical-contract-repair-readers.mjs',INPUTS='compatibility/rc/historical-contract-repair-reader-inputs.json';
-const PINS={'21.x':'4d94a007cf0b24684d24a66cfb4dbba6f5a0ab4446ab6fb725df34e6ce2dbec1',main:'62ffe4731f07be5098546acdb3392efa2de7d6b400ad0f316952a4b90985c67a'};
+const PINS={'21.x':'3546be2516d5f59ae9c771a37e78a8ccfa0355eab231f23bb8afe055d588ed33',main:'a3d3a0d2c3522233682da89fd3a2e11b3654e2f38cff19e783709b292595eb15'};
 const image=readFileSync(fileURLToPath(import.meta.url)),hash=b=>createHash('sha256').update(b).digest('hex'),originals=new Map();
 /** Declared peer aliases retain their historical package identity and no-link guards. */
 export function readHistoricalContractRepairOwnerMember(root,path){
