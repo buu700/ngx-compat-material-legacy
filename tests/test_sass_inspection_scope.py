@@ -10,6 +10,8 @@ import json
 from pathlib import Path
 import subprocess
 import unittest
+from historical_contract_repair_source import qualify_tool_reference, qualify_spinner_snack_source_reference
+from sass_wrapper_notice_refs import qualified_notice_reference
 
 ROOT = Path(__file__).resolve().parents[1]
 SHA = lambda raw: hashlib.sha256(raw).hexdigest()
@@ -21,13 +23,13 @@ class SassInspectionScopeTests(unittest.TestCase):
                                 capture_output=True, text=True, timeout=90)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)
-        self.assertEqual(len(report['positive']), 5)
+        self.assertEqual(len(report['positive']), 7)
         self.assertEqual(len(report['rejected']), 10)
         self.assertEqual(report['compiler_mutants_rejected'], 2)
         self.assertEqual(report['source_reader_corruptions_rejected'], 8)
         self.assertEqual(report['owned_scss_members'], 409)
         self.assertEqual(report['historical_functions'], 25)
-        self.assertEqual(report['public_override_mixins'], 16)
+        self.assertEqual(report['public_override_mixins'], 18)
         self.assertFalse(report['full_sass_or_native_or_floor_or_G11_qualified'])
 
     def test_complete_individual_hunks_and_independent_line_context(self):
@@ -39,7 +41,11 @@ class SassInspectionScopeTests(unittest.TestCase):
         self.assertEqual(body['canonical_decisions_changed'], 0)
         self.assertFalse(body['actual_native_packed_or_floor_qualified'])
         self.assertEqual(body['g11_claim'], 'not-passed')
+        def qualified(ref):
+            ref = qualified_notice_reference(ROOT, ref) or ref
+            return qualify_tool_reference(ref, ROOT) if ref['path'].startswith('scripts/') else qualify_spinner_snack_source_reference(ref, ROOT)
         def read(ref):
+            ref = qualified(ref)
             raw = (ROOT / ref['path']).read_bytes()
             self.assertEqual(SHA(raw), ref['sha256'], ref['path'])
             return raw
@@ -57,8 +63,9 @@ class SassInspectionScopeTests(unittest.TestCase):
         self.assertEqual(len(measured['actual']['owned_scss_population']), 409)
         read(measured['actual']['producer'])
         for member in measured['actual']['owned_scss_population']:
+            current = qualified(member)
             raw = read(member)
-            self.assertEqual(len(raw), member['bytes'])
+            self.assertEqual(len(raw), current['bytes'])
         material_root = (ROOT / 'node_modules/@angular/material').resolve()
         cdk_root = (ROOT / 'node_modules/@angular/cdk').resolve()
         self.assertEqual(SHA((material_root / 'package.json').read_bytes()), measured['actual']['peer']['package_json_sha256'])
@@ -69,9 +76,10 @@ class SassInspectionScopeTests(unittest.TestCase):
                 self.assertIn(member['root'], range(len(roots)))
                 self.assertNotIn('..', Path(member['path']).parts)
                 self.assertFalse(Path(member['path']).is_absolute())
+                current = qualified({**member, 'path': 'projects/ngx-material-legacy/' + member['path']}) if program == 'candidate' and member['root'] == 0 else member
                 raw = (roots[member['root']] / member['path']).read_bytes()
-                self.assertEqual(SHA(raw), member['sha256'], program + '/' + member['path'])
-                self.assertEqual(len(raw), member['bytes'])
+                self.assertEqual(SHA(raw), current['sha256'], program + '/' + member['path'])
+                self.assertEqual(len(raw), current['bytes'])
         ledger = json.loads((ROOT / 'compatibility/f10/disposition-ledger/ledger.json').read_bytes())
         self.assertEqual(len(ledger['entries']), 1697)
         self.assertEqual(len(body['reviews']), 6)

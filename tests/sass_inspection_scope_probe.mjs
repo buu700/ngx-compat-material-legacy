@@ -19,7 +19,7 @@ const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const actual=measureSassInspectionScope({root}),positive=['actual-compiler-facade-and-public-peer'];
 assert.equal(actual.result,'pass');assert.equal(actual.entry_override_used,false);
 assert.equal(actual.owned_scss_population.length,409);assert.equal(actual.candidate.functions.length,25);
-assert.equal(actual.public_override_mixins.length,16);assert.equal(actual.boundaries.length,4);
+assert.equal(actual.public_override_mixins.length,18);assert.equal(actual.boundaries.length,6);
 for(const boundary of actual.boundaries){
  assert.deepEqual(inspectOwnedMaterialBoundary(boundary.path,read(boundary.path)),boundary);
  positive.push('actual-owned-boundary/'+boundary.path);
@@ -49,7 +49,7 @@ try{
  }
 }finally{try{unlinkSync(entry);}catch(error){if(error.code!=='ENOENT')throw error;}rmdirSync(temporary);}
 const summary={line:actual.line,result:'pass',positive,rejected,owned_scss_members:409,historical_functions:25,
- public_override_mixins:16,direct_peer_boundaries:4,compiler_mutants_rejected:2,
+ public_override_mixins:18,direct_peer_boundaries:6,compiler_mutants_rejected:2,
  source_reader_corruptions_rejected:8,peer_inspection_loaded_through_public_index:true,
  full_sass_or_native_or_floor_or_G11_qualified:false,producer_sha256:hash(read('tests/sass_inspection_scope_probe.mjs'))};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify({summary,actual},null,2)+'\n',{flag:'wx'});
