@@ -1,0 +1,2314 @@
+{
+  "schema_version": 1,
+  "branches": {
+    "21.x": {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "before_modules": [
+        {
+          "path": "projects/ngx-material-legacy/styles/progress-spinner/_progress-spinner-theme.scss",
+          "sha256": "5644d8e6c8e74ec610371384ca33b60e41af97a4ed07d0027e41125c4d53bb9c",
+          "bytes": 1528,
+          "source": "@use 'sass:map';\n@use '../core/theming/theming';\n@use '../core/tokens/m2/mdc/circular-progress' as tokens-mdc-circular-progress;\n@use '../vendor/mdc/circular-progress/circular-progress-theme' as mdc-circular-progress-theme;\n\n@mixin color($config-or-theme) {\n  $config: theming.get-color-config($config-or-theme);\n  $mdc-circular-progress-color-tokens: tokens-mdc-circular-progress.get-color-tokens($config);\n\n  .mat-mdc-progress-spinner {\n    @include mdc-circular-progress-theme.theme($mdc-circular-progress-color-tokens);\n\n    &.mat-accent {\n      $color: theming.get-color-from-palette(map.get($config, accent));\n      @include mdc-circular-progress-theme.theme((active-indicator-color: $color));\n    }\n\n    &.mat-warn {\n      $color: theming.get-color-from-palette(map.get($config, warn));\n      @include mdc-circular-progress-theme.theme((active-indicator-color: $color));\n    }\n  }\n}\n\n@mixin typography($config-or-theme) {}\n\n@mixin density($config-or-theme) {}\n\n@mixin theme($theme-or-color-config) {\n  $theme: theming.private-legacy-get-theme($theme-or-color-config);\n  @include theming.private-check-duplicate-theme-styles($theme, 'mat-progress-spinner') {\n    $color: theming.get-color-config($theme);\n    $density: theming.get-density-config($theme);\n    $typography: theming.get-typography-config($theme);\n\n    @if $color != null {\n      @include color($color);\n    }\n    @if $density != null {\n      @include density($density);\n    }\n    @if $typography != null {\n      @include typography($typography);\n    }\n  }\n}\n"
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/snack-bar/_snack-bar-theme.scss",
+          "sha256": "29ca545098f2b8eb81fbf7f311b5dac5fda4986f641d39ac23ca01eb7a547906",
+          "bytes": 1536,
+          "source": "@use '../vendor/mdc/snackbar/snackbar-theme' as mdc-snackbar-theme;\n@use '../core/theming/theming';\n@use '../core/typography/typography';\n@use '../core/tokens/token-utils';\n@use '../core/tokens/m2/mdc/snack-bar' as tokens-mdc-snack-bar;\n@use '../core/tokens/m2/mat/snack-bar' as tokens-mat-snack-bar;\n\n\n@mixin color($config-or-theme) {\n  $config: theming.get-color-config($config-or-theme);\n\n  .mat-mdc-snack-bar-container {\n    @include mdc-snackbar-theme.theme(tokens-mdc-snack-bar.get-color-tokens($config));\n    @include token-utils.create-token-values(\n      tokens-mat-snack-bar.$prefix,\n      tokens-mat-snack-bar.get-color-tokens($config)\n    );\n  }\n}\n\n@mixin typography($config-or-theme) {\n  $config: typography.private-typography-to-2018-config(\n      theming.get-typography-config($config-or-theme));\n\n  .mat-mdc-snack-bar-container {\n    @include mdc-snackbar-theme.theme(tokens-mdc-snack-bar.get-typography-tokens($config));\n  }\n}\n\n@mixin density($config-or-theme) {}\n\n@mixin theme($theme-or-color-config) {\n  $theme: theming.private-legacy-get-theme($theme-or-color-config);\n  @include theming.private-check-duplicate-theme-styles($theme, 'mat-snack-bar') {\n    $color: theming.get-color-config($theme);\n    $density: theming.get-density-config($theme);\n    $typography: theming.get-typography-config($theme);\n\n    @if $color != null {\n      @include color($color);\n    }\n    @if $density != null {\n      @include density($density);\n    }\n    @if $typography != null {\n      @include typography($typography);\n    }\n  }\n}\n\n"
+        }
+      ],
+      "protected_inputs": [
+        {
+          "path": "projects/ngx-material-legacy/_index.scss",
+          "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+          "bytes": 14151
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/README.md",
+          "sha256": "0c409c4351bb2ac867c22dc66db49c728f87b8b0f433978411fb95d0027017f8",
+          "bytes": 106
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/_progress-spinner-legacy-index.scss",
+          "sha256": "8058870744a1125c15bcd16407dca47ea6820680d7b09e0f4c90546c08fbb631",
+          "bytes": 175
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/_progress-spinner-theme.import.scss",
+          "sha256": "8183c208ff863bee99f1f091cf497331ce06069f3873aecc2deeef355899a9e4",
+          "bytes": 304
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/_progress-spinner-theme.scss",
+          "sha256": "d9231b07757932090ffdf79886cf83ba2f48ada11cf9eb84afbe210eddf4bf2b",
+          "bytes": 1713
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/index.ts",
+          "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+          "bytes": 233
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/color.ts",
+          "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+          "bytes": 1888
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/constructor.ts",
+          "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+          "bytes": 450
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/disable-ripple.ts",
+          "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+          "bytes": 1211
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/disabled.ts",
+          "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+          "bytes": 1073
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/error-state.ts",
+          "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+          "bytes": 2623
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/index.ts",
+          "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+          "bytes": 625
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/initialized.ts",
+          "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+          "bytes": 3061
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/tabindex.ts",
+          "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+          "bytes": 1503
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-module.ts",
+          "sha256": "a36d4381d828eccbf40815dcac053048a054b3fa6ce90f6fb41b58b04183c8ee",
+          "bytes": 374
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/progress-spinner-defaults.ts",
+          "sha256": "eba7d7a529b798ef133afb817bb87afb8fb8fac416f0d6e10a81a39b147c1750",
+          "bytes": 688
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/ng-package.json",
+          "sha256": "7e9ac727fee783de8aa9c29f31937d13f49465f4a9b7a23a648d8176d29270e7",
+          "bytes": 38
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner-module.ts",
+          "sha256": "602539c21983cab5c23e541e6474595e9cb36012efc4522e9acdba4f001ac5fb",
+          "bytes": 650
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.html",
+          "sha256": "df4e7c34e3434e3f99ea651f3aa4b46bcf3f09acebe73e281b24012f8b4c544e",
+          "bytes": 1932
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.scss",
+          "sha256": "c49e724b39ca30c472b418b644cd4c9da6893c74a0b0fa45518555b4672142f3",
+          "bytes": 3867
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.spec.ts",
+          "sha256": "aee88cfa13c68fb9143103c86c5d68f1d0b026cbe61cdc750fb9c7f2b1bbcf25",
+          "bytes": 23563
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts",
+          "sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+          "bytes": 12785
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/public-api.ts",
+          "sha256": "d9b92e443700fd4281c307096f49a7a6e9a3fd521c9c9c55f3313de18a951e82",
+          "bytes": 1134
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/testing/index.ts",
+          "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+          "bytes": 233
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/testing/ng-package.json",
+          "sha256": "7e9ac727fee783de8aa9c29f31937d13f49465f4a9b7a23a648d8176d29270e7",
+          "bytes": 38
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/testing/progress-spinner-harness.spec.ts",
+          "sha256": "87b2956a0ee747b3a452c3365f624d221c55e3f5530b0c4a21ef096c8d28600e",
+          "bytes": 445
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/testing/progress-spinner-harness.ts",
+          "sha256": "613511a61675d38b5e57175637f0e830107840fe07df4fb2514bb9da12786dcd",
+          "bytes": 1826
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/testing/public-api.ts",
+          "sha256": "9b1109850ceeea78d2f575aae637554a69ebb37114c737d35c95b64b12464c37",
+          "bytes": 408
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/README.md",
+          "sha256": "30b1a9d36e783056db6b71607fd8496c3a65e78b0692803edbc4cba5150bf0d4",
+          "bytes": 100
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/_snack-bar-legacy-index.scss",
+          "sha256": "1dd556626a64905284cf55a18eec9401812d049d7f267312124e635823e15227",
+          "bytes": 146
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/_snack-bar-theme.import.scss",
+          "sha256": "a22e4608a363c739b80312fbd39d4d6153949ad99c8976d012dab9628f4e1959",
+          "bytes": 507
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/_snack-bar-theme.scss",
+          "sha256": "fe3d16c42f28230628478c600dde9f3acedc0cb96a34301f501d6cfa8fb15cc7",
+          "bytes": 2541
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/index.ts",
+          "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+          "bytes": 233
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-behaviors/color.ts",
+          "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+          "bytes": 1888
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-behaviors/constructor.ts",
+          "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+          "bytes": 450
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-behaviors/disable-ripple.ts",
+          "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+          "bytes": 1211
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-behaviors/disabled.ts",
+          "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+          "bytes": 1073
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-behaviors/error-state.ts",
+          "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+          "bytes": 2623
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-behaviors/index.ts",
+          "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+          "bytes": 625
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-behaviors/initialized.ts",
+          "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+          "bytes": 3061
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-behaviors/tabindex.ts",
+          "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+          "bytes": 1503
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-module.ts",
+          "sha256": "a36d4381d828eccbf40815dcac053048a054b3fa6ce90f6fb41b58b04183c8ee",
+          "bytes": 374
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+          "sha256": "293baf9806cc7bc0c53ab5a68c745536d79e40e3e2a82928b9515361dbdf302f",
+          "bytes": 11168
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+          "sha256": "1b673f43bacbcf47ea0e504ff3f191d84289e7c7337b20b93e8b5b98e833eb08",
+          "bytes": 13945
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-ref.ts",
+          "sha256": "de41a41cb3c2fdd192d3548f62206cf1da625603bb26f35b2479d5f9fe8236de",
+          "bytes": 4129
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/ng-package.json",
+          "sha256": "7e9ac727fee783de8aa9c29f31937d13f49465f4a9b7a23a648d8176d29270e7",
+          "bytes": 38
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/public-api.ts",
+          "sha256": "b9bae79b1440bfd2bfc1f713b7e16057af43ab06099083ecec49d4a47b35b421",
+          "bytes": 1502
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/simple-snack-bar.html",
+          "sha256": "5a9ee10a904138baa615efc1de868b3fdd3cd8d1f134219f4b0adf3e90617079",
+          "bytes": 206
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/simple-snack-bar.scss",
+          "sha256": "ba31af68b510f8979bb4592de579084bb691f6bda361e03dd052695264cba0a7",
+          "bytes": 894
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/simple-snack-bar.ts",
+          "sha256": "b8e8e30936376cfedc907cf97ec8ba25cf8afce4ac571d2eddd3ca0a46f396bd",
+          "bytes": 1722
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-config.ts",
+          "sha256": "5b670e35acbf80b4173ce9d976689d6322dbfe400d28e08492db331eb3063dab",
+          "bytes": 654
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.html",
+          "sha256": "9b92fdf9e5e74ea73f6f7cd3305dfd79dc832c25f5de1f6d2aa1f63b17ccaee2",
+          "bytes": 373
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.scss",
+          "sha256": "f87776ff2d2a32075eb2794b68cc2a8eb018ec7cedbe494dcdf4c0c586504dfc",
+          "bytes": 1539
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+          "sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5",
+          "bytes": 4650
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-module.ts",
+          "sha256": "6ad8d8687288b979759b12456189c1dac16ca9caa1970787bf16692c78ebd68f",
+          "bytes": 1329
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+          "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3",
+          "bytes": 45763
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.ts",
+          "sha256": "12354cb1619f2dfb9bf62fb65c25cf18cba2206fe960603867743b694311f2cf",
+          "bytes": 1486
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/testing/index.ts",
+          "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+          "bytes": 233
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/testing/ng-package.json",
+          "sha256": "7e9ac727fee783de8aa9c29f31937d13f49465f4a9b7a23a648d8176d29270e7",
+          "bytes": 38
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/testing/public-api.ts",
+          "sha256": "affa661d2b3160dead73b7e38f10ec69b689c32263157003c32e6641f4bd5683",
+          "bytes": 414
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/testing/snack-bar-harness-base.ts",
+          "sha256": "e4d58113fd1561611b6b99c18d1fff0a5fbfe29e84eef504a82fcf3d0e79d178",
+          "bytes": 3901
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/testing/snack-bar-harness.spec.ts",
+          "sha256": "b2b3a7b0f1588106c44efb6762006d062c76b02984c36a94b72c3f08ae70847e",
+          "bytes": 2624
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/testing/snack-bar-harness.ts",
+          "sha256": "2f0fb6ec5044f6f8b20797dadbb21da064580e11e3a7291dfff4b1dd9fef929b",
+          "bytes": 2121
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+          "sha256": "64c427d112619d01c45815a9b401323e09b2767076a9d1371ee27333d7384382",
+          "bytes": 34929
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/theming/_all-theme.scss",
+          "sha256": "460048a52813ec9de04cb90e20a067e03f013b6ee533e9f35174ef2d3512bf7e",
+          "bytes": 3938
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/tokens/m2/_index.scss",
+          "sha256": "a28e7498f3e8ee4c7f6644c2bcb3dce3f99710d11764e12a53a98b7a776f41d4",
+          "bytes": 4183
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_snack-bar.scss",
+          "sha256": "16a8ffe092202483c5387822617c9789ee0aaf6b26a01ffb2ea168fa4c203d58",
+          "bytes": 1450
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_circular-progress.scss",
+          "sha256": "ca2c87c0d6933adebc80a67a7c88cdd04f22e0abe3139842899d7178bced5d36",
+          "bytes": 2539
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_snack-bar.scss",
+          "sha256": "10cc1b80016e142dbd31fa1ed61932d174fe7f8609a30c88d3cd48192800fcf2",
+          "bytes": 4356
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-core/theming/_all-theme.scss",
+          "sha256": "bcc15a0593fe733501d6d1c002dc706c79fe1ba66d7d26dd072d69681ebfe63f",
+          "bytes": 4265
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-progress-spinner/_progress-spinner-theme.scss",
+          "sha256": "71314118b07d874c6331a53fb1a545df1cf3d230f81d490df917dd1ab9546616",
+          "bytes": 1706
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-snack-bar/_snack-bar-theme.scss",
+          "sha256": "b9a6613433a84b02035c6252dd226d31cc74eb71c5dcb68ce76e012579a848bf",
+          "bytes": 2506
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/animation/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/animation/_animation.scss",
+          "sha256": "7b977c4a414bec7a39e9891174317555b34920cdb7512af77d89a54d4ba35070",
+          "bytes": 1993
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/animation/_functions.scss",
+          "sha256": "f4a8a4d4e388087381ac4e77f3576b0d8d92de5f6464a4e9f06c9bc87d0669d8",
+          "bytes": 1239
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/animation/_variables.scss",
+          "sha256": "21796d328b0f6910b09d37a28524c516067429fd5f776f53de49cb5d6ae39f60",
+          "bytes": 1328
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/base/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/base/_mixins.scss",
+          "sha256": "2e58e92f19918dfab87b5ee79a93e9325319736124a30adfc2571b28d6bdba36",
+          "bytes": 1467
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-base.scss",
+          "sha256": "eb9407656f2bedf1bd7214d00683916fbb8f1f86ce02932934573a2fe3f362fc",
+          "bytes": 8242
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-filled-theme.scss",
+          "sha256": "09255a8c8e72dde78f117935808ccbda0c3c89ce2643693e8e18330a685512c3",
+          "bytes": 4326
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-filled.scss",
+          "sha256": "c1bdf053b2138d73d5a4b2cf7546096d93d0206286e507a563b2c8866bf4bfbe",
+          "bytes": 2963
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-outlined-theme.scss",
+          "sha256": "327c28febd4cac5f60e6a4b990276c628b42277521a4300a2c9ba6afc291384e",
+          "bytes": 8872
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-outlined.scss",
+          "sha256": "7e9f8814bc4d8611a034ec4a232168c762041a6caf94957228db4f776ca42b9d",
+          "bytes": 3102
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-protected-theme.scss",
+          "sha256": "d8f45323164eac22bda59dcb0de96b7873bf81f4d7837f76489a920b87e937e0",
+          "bytes": 3492
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-protected.scss",
+          "sha256": "5f00b29f830c453770082b3a242c5a9224a9128f6b1e54533e967abbe68b5963",
+          "bytes": 2915
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-ripple.scss",
+          "sha256": "376cc2b8945cbbe50f28223391038f3e9852e7b61560a49278a872efdfd8cc56",
+          "bytes": 2118
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-shared-theme.scss",
+          "sha256": "3884df93755edfb2cfc464a605a1c560e076809888433aa6a4690c1049d49b8a",
+          "bytes": 21130
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-text-theme.scss",
+          "sha256": "a91ff2ee3fbae6b8113487aa542e4d542f29c7d5cd519d9d19a5f40f6261f7a7",
+          "bytes": 4216
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-text.scss",
+          "sha256": "443a21aa5af862d9547dd7191c324a01cc9aaa51f29bd53546e6f0207691d314",
+          "bytes": 2140
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-theme.scss",
+          "sha256": "0f9ea380249d15ff1cce9bdd2f7b52a3cf334e7fbf649ba6bfa3daf4f013085e",
+          "bytes": 1365
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button.scss",
+          "sha256": "5a33818c16f6f44543ea6095711621022c91fb3cd1e0d63c035f3f46ceae9fd9",
+          "bytes": 5101
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/card/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/card/_card-shared-theme.scss",
+          "sha256": "cc0e0bee61632071ce387b08e250fda40f4dba0ca4f0ed54d5ea587de2e467a2",
+          "bytes": 4217
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/card/_elevated-card-theme.scss",
+          "sha256": "2455c8026311b69fde749ccacfd5295b031833947ba8bcd88b87535b35b88d04",
+          "bytes": 2590
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/card/_mixins.scss",
+          "sha256": "111f8a2fc7963549169f9c9d3e3e1af0e9165bc2b1cc0b671e467173e414d0ae",
+          "bytes": 11330
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/card/_outlined-card-theme.scss",
+          "sha256": "88bab2a082dcea7b7cab2831fa19dde6245d8ca1310d33d5892c5e7a1e5fde82",
+          "bytes": 3854
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/card/_variables.scss",
+          "sha256": "8ae3e7704848229a3e4106f15499efca1ecdceef696345cd516c59f7c73dfd54",
+          "bytes": 1476
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/checkbox/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/checkbox/_checkbox-custom-properties.scss",
+          "sha256": "9201aedc57a8373decf93af70a0c72b1032b225d0f265d81076f6e0f345b12a2",
+          "bytes": 1390
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/checkbox/_checkbox-theme.scss",
+          "sha256": "8f9cbc2b2353179c7395bf8b128a6a16361a2c025721c996bcc45cee46d025dd",
+          "bytes": 26285
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/chips/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/chips/_chip-theme.scss",
+          "sha256": "3b0e47c6a4817dd67254fad7687c123de8c4967a90984055de5ce1e6c3527dc6",
+          "bytes": 49680
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/circular-progress/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/circular-progress/_circular-progress-theme.scss",
+          "sha256": "3165b4cefdbec3d01d72e7bc6864bbf4ee8581f47198b2011d6ea4bd70230b54",
+          "bytes": 6030
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/density/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/density/_density.scss",
+          "sha256": "7b690b9bd7a2068fb2924d9da6eaec26a20d5ff11c214365dd2758717939ec04",
+          "bytes": 3940
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/density/_functions.scss",
+          "sha256": "db5c7ac9c0377a50798ce2bfe7d0c75026c887242199dcc745b24a8331e55637",
+          "bytes": 1198
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/density/_index.scss",
+          "sha256": "caab09f51de52ca5b45152c5585d7a122877de15335cec50bc9d07e058457033",
+          "bytes": 22
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/density/_variables.scss",
+          "sha256": "ff14efa32e1418a1494fcf99795eecf8aec1327c8470bdf3141a3ba1313cce87",
+          "bytes": 1294
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/dialog/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/dialog/_dialog-theme.scss",
+          "sha256": "c8d540da3d07301b233ba7d0444ae050f8726c2bec8f36d7cc57ac536d861fb0",
+          "bytes": 9180
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/dom/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/dom/_dom.scss",
+          "sha256": "316b7d43f65b4e053e0eda8cadefd01e597b69ba5749c8c95e9378951ed0f7b7",
+          "bytes": 3749
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/dom/_mixins.scss",
+          "sha256": "eb120a7891a13d7607dfe9c99713eed15988a152914cbbde0f58c47a0d09f79d",
+          "bytes": 1229
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/elevation/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/elevation/_elevation-theme.scss",
+          "sha256": "fc62413e60330f80e716182a097f3a2ac79c8ffe180627974afcb9f734ac4ea9",
+          "bytes": 13789
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/elevation/_elevation.scss",
+          "sha256": "c9700d954ecad28cbc915e636f59ee5f6cdb3c965a327a825126b8be9e60b3b8",
+          "bytes": 3216
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/elevation/_mixins.scss",
+          "sha256": "019bc54256d6033f8d3db45edc138275a7e14002e517096a79c9d6ac28dd3b82",
+          "bytes": 1324
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/fab/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/fab/_extended-fab-theme.scss",
+          "sha256": "a9afe4b689f0fd4cae7a73e47535d8f881e7aad49dd57d15018df2aa1b792a06",
+          "bytes": 8122
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/fab/_fab-custom-properties.scss",
+          "sha256": "60f3d68a0d6ebf8aaef6bdc7bcec5822d72ab62b01a97368dc19226671bc8400",
+          "bytes": 1228
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/fab/_fab-theme.scss",
+          "sha256": "2bffe54bfc404b582f5e96595cb4cc3c5c819be61d8fed90b1a343a442e53e68",
+          "bytes": 18675
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/fab/_fab.scss",
+          "sha256": "b426dde5aee4fa5e7578624fccaefd7548b23b5d0eef4f761613af4f0cdaf1b4",
+          "bytes": 10963
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/feature-targeting/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/feature-targeting/_feature-targeting.scss",
+          "sha256": "6ec0c3efc173660a9b30374896ddd537d21c0d9dbbf3f16ccc775cdd71bb12d7",
+          "bytes": 7042
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/feature-targeting/_index.scss",
+          "sha256": "8fae0e4029c2116908d7ee2cfd6c50155fe8c274cfd376d40686bc092f97f14e",
+          "bytes": 32
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/floating-label/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/floating-label/_floating-label-theme.scss",
+          "sha256": "564ea35999d60274b73879ed296b9c70e863083bc0caa0469f7494ba2b0c0960",
+          "bytes": 6352
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/floating-label/_floating-label.scss",
+          "sha256": "6fe5d5d8e08654561e36b1b7a48baad2aca5a4edcb9389a71f7f77cf7e73e42d",
+          "bytes": 3561
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/floating-label/_mixins.scss",
+          "sha256": "7534a3dff7cb9c2a04b02f798f16405bb18c7e340a8b29917e1b5809aa5d5b6c",
+          "bytes": 1383
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/floating-label/_variables.scss",
+          "sha256": "57780ac8f8a34aa8dcfaa5772d7e4abb9f92129154e0dbfa3de0bbaf7b5109df",
+          "bytes": 1202
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/focus-ring/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/focus-ring/_focus-ring.scss",
+          "sha256": "7c1ab864e79864534ef6b22d64e936a4351364e7d1bffa877ba291c7a26b5b36",
+          "bytes": 5215
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/form-field/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/form-field/_form-field-theme.scss",
+          "sha256": "83df6b63e79d98ad0f1a6b4f43e5a845631d7c2f574d5978581be2f42ac1c7fc",
+          "bytes": 2906
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/form-field/_form-field.scss",
+          "sha256": "39792151846c77bbe330406edbcbc7eeab3a016a8c79ce6232f1b41e8197ef59",
+          "bytes": 3260
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/form-field/_index.scss",
+          "sha256": "884abf77b421a420e74f1fc1e34eacd857e8b50097316984f6b88636307cfd3b",
+          "bytes": 45
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/form-field/_mixins.scss",
+          "sha256": "693cfa98eca01719c1232d95a669486044bdacaaaee8e0da99d7e02c75897168",
+          "bytes": 1205
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/form-field/_variables.scss",
+          "sha256": "822320676b00f0cb07cb011dee11e392b8d01233c3092b3bf8da29a4b53efded",
+          "bytes": 1219
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/icon-button/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/icon-button/_icon-button-theme.scss",
+          "sha256": "3ac79da16dccaa5457a703f960019de280db35a198158dd31c84b654fa10c089",
+          "bytes": 11190
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/line-ripple/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/line-ripple/_functions.scss",
+          "sha256": "8dc5d95eaf484049210588278398a968be2846bc33c4a32d1a51f36395f42c68",
+          "bytes": 1258
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/line-ripple/_line-ripple-theme.scss",
+          "sha256": "0d0db2ddd30a00c3176aa5aa9dd9d36d5276bb00f9bab6fa832c6e46184ffc99",
+          "bytes": 2654
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/line-ripple/_line-ripple.scss",
+          "sha256": "a0e4b1b3a648134d3d09a692d8ba474c1bb8562ffca1c7addca150dcc10c2365",
+          "bytes": 2360
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/line-ripple/_mixins.scss",
+          "sha256": "78e918728a08a3ce8fd0c96e4e6f88f96f1f95382faeb697a6faf654768cb4ca",
+          "bytes": 1327
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/linear-progress/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/linear-progress/_linear-progress-theme.scss",
+          "sha256": "8f0f8ceb75f565514e11e4579cdfe3a4378255ee4c1b736af589d180156cf802",
+          "bytes": 8782
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/list/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/list/_evolution-mixins.scss",
+          "sha256": "834ca8b82e1258911b81f8a01907b53eb9f979aab86edfa1a0f1442856ead7ec",
+          "bytes": 2140
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/list/_evolution-variables.scss",
+          "sha256": "d50e5e5286fbd7e5e375dd4b5ab72301b790218959e23ee2512ea11bc0feb647",
+          "bytes": 1515
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/list/_list-theme.scss",
+          "sha256": "8514a804ecbbef2588779f2a3ffc99bf81c840f2525f15528321810f1a0ae52e",
+          "bytes": 20788
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/list/_list.scss",
+          "sha256": "eb00cbeffe2c7c5cd2063852a7a81fe4691a014776bc346291d9153cba3e5f66",
+          "bytes": 44577
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/notched-outline/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/notched-outline/_mixins.scss",
+          "sha256": "a6b1bbc03d2b27f87828e782275bd26d7fe6d1216f623da4c45e6c143bb42e62",
+          "bytes": 1436
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/notched-outline/_notched-outline-theme.scss",
+          "sha256": "210c3ecf85c37e4b2aa1a994e8a1147b98aec78f95fa1abed455ba82fc70a957",
+          "bytes": 10670
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/notched-outline/_notched-outline.scss",
+          "sha256": "3aa6f6c12f3ec31693a9e07e7c5b1b18b1307fee58679a097afccaff40ecce34",
+          "bytes": 3414
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/notched-outline/_variables.scss",
+          "sha256": "12c80c5d4d3f14ca1e4bfd4c27d6b66a15e637417fd9f745c033b8d851dec78e",
+          "bytes": 1372
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/radio/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/radio/_radio-theme.scss",
+          "sha256": "a2b560c019ccc8a7ddbde10ebe302095b45d4866b9298193d1cd2ab41040cf18",
+          "bytes": 17108
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/radio/_radio.scss",
+          "sha256": "56f4cd7333a16b28e4926e37f841441bd1d42cfebcb30fd9a032ad3ab40a60d8",
+          "bytes": 9540
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/ripple/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/ripple/_functions.scss",
+          "sha256": "98598c6de1a7c1461bfcba26096fa1d78b6e86ba775d6e469aed822ddae12524",
+          "bytes": 1231
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/ripple/_ripple-theme.scss",
+          "sha256": "f30243bd92cfb083e6bfe456ad94c5dd9cf8e8fcf97528c30f0b3a3d29dd9e71",
+          "bytes": 16301
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/ripple/_ripple.scss",
+          "sha256": "d65051cd2b85525990cf563e6e63f35deaacf7d9b0c1e58fa59cab27d1c68d9c",
+          "bytes": 10879
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/rtl/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/rtl/_rtl.scss",
+          "sha256": "94c82a805b7e60370efdbe6acfe853bf83a7e9138b7751b66f102863ee5c368a",
+          "bytes": 8507
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/shape/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/shape/_functions.scss",
+          "sha256": "08ad2b19191b7a324fa2765cf6d2ef66989d487cef9a907da7849c39dcd7c452",
+          "bytes": 1291
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/shape/_mixins.scss",
+          "sha256": "801115c2c343bcd3bf47783cd0030ca55bc244504a6f9a39d1ab2be9737bbecc",
+          "bytes": 1197
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/shape/_shape.scss",
+          "sha256": "a1e10b4e5ba16e53f603af4206c9a14b79da7ac7f7c0d64de79a57365c6deb5e",
+          "bytes": 13351
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/slider/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/slider/_slider-theme.scss",
+          "sha256": "e90e4ed1667d0c0b7c185b826b73263c31c70bdbc2aa6193ed5de575a74ee6e8",
+          "bytes": 22269
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/snackbar/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/snackbar/_snackbar-theme.scss",
+          "sha256": "2e169af37f50c1449d6871704eca7cc861799e556c18a62dd4a1c7bb5475a8a5",
+          "bytes": 12019
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/switch/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/switch/_switch-theme.scss",
+          "sha256": "ae444d452524de54705a13438f3f45e5574e64ffe48dc210bd939adaaccf2da3",
+          "bytes": 19214
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/switch/_switch.scss",
+          "sha256": "49a771532a3ad183cea575857418d3b2cc2d958626755698da7699c6d2a00e06",
+          "bytes": 8070
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tab-indicator/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tab-indicator/_tab-indicator-theme.scss",
+          "sha256": "a7963638e369498153fcbd7b6dcdd923ae51ea7e3387b9e49102211619f7781e",
+          "bytes": 2627
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tab/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tab/_tab-theme.scss",
+          "sha256": "de5a6edd606d8a45c58e47dd75917493a9b5f9a669cd11751de4441801104d0b",
+          "bytes": 19773
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/_filled-text-field-theme.scss",
+          "sha256": "1d16d204322e73315005d414739de4ed4f0785fae061a12ecd89ebd36af8b777",
+          "bytes": 8765
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/_index.scss",
+          "sha256": "884abf77b421a420e74f1fc1e34eacd857e8b50097316984f6b88636307cfd3b",
+          "bytes": 45
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/_mixins.scss",
+          "sha256": "6d4c892eb55e6bf428354469d6ce81fc77fe354093d8f35da453dcad61fba07b",
+          "bytes": 2365
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/_outlined-text-field-theme.scss",
+          "sha256": "1a4b345bc6738e7c421cdb20c1a2df6a136c32730e553b73aa577f709e39e0c1",
+          "bytes": 7988
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/_text-field-theme.scss",
+          "sha256": "e5cc3461c5bdb982890fbfe4cb5448084bec5d3cdd0f0d4a4331ce3f13033d86",
+          "bytes": 14782
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/_text-field.scss",
+          "sha256": "8beb19631eba2902493547e38b8a545498bd31c42efaaea88b7b215c64dcb23b",
+          "bytes": 81502
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/_variables.scss",
+          "sha256": "876eab1c5b343093cb0d2b498812d0363e1d81a7ee6f9b1969b2c678c4648ff9",
+          "bytes": 9332
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/character-counter/_mixins.scss",
+          "sha256": "34d6e9170bc48c02338c7da4f06e5bde67596dee99b24524a17af701e6fde186",
+          "bytes": 3641
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/helper-text/_mixins.scss",
+          "sha256": "294c3f35dcba7acd2f2c3a91b5eb4f7765c4dca6b927f1e53aec090ebb437348",
+          "bytes": 3865
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/icon/_mixins.scss",
+          "sha256": "64146dee19626f1b1a23bd998979244f7d5416cc0e73d7586a7637cd5d203e1e",
+          "bytes": 5895
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/icon/_variables.scss",
+          "sha256": "c0b92935da4d9b44c7a42c6f4df73d3306b8331e374d5c67cbec61e854bf0c04",
+          "bytes": 1383
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_color-custom-properties.scss",
+          "sha256": "ed1c0fd380a8e3b7ff5243253ae9bfc1fda2aef9b9f36778cc001a8ba12208b9",
+          "bytes": 1147
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_color-palette.scss",
+          "sha256": "8b7bb6a61b633a8e8df992fdc83782630e6de63be4f5a8ee75e202ece5d7626e",
+          "bytes": 6810
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_css.scss",
+          "sha256": "585bbc16a8186967ae471eb50588444b40365cd466c8e9ef30f77ad19788a7cc",
+          "bytes": 4441
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_custom-properties.scss",
+          "sha256": "aa9d5502b6406ae8d918a4000d682cfc8f5e7a83ac7d3df56cc97a28b5cf9525",
+          "bytes": 11756
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_gss.scss",
+          "sha256": "9a20a94eed92cd35eaa48e51b9d78b06808d975914e68503e0480ddd4eae06a9",
+          "bytes": 2154
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_keys.scss",
+          "sha256": "e9202ea3fc19f64f559044862ba8403f7f8a46ed97d39ec51e87ad10d8afc8ef",
+          "bytes": 18558
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_map-ext.scss",
+          "sha256": "5d7ea91c94b69c42166c629e12d7053770f7fc33184e89819b3c32d9b938059d",
+          "bytes": 4248
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_replace.scss",
+          "sha256": "93c23cb86ac9fa57806925a231afd366f51dfbc0c1cc165cf28c4e98dfc71fda",
+          "bytes": 4931
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_selector-ext.scss",
+          "sha256": "38b5a4885294a590b85bb5b195e91ad92018c79450b5ed12a70ce83912b8d24a",
+          "bytes": 18698
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_shadow-dom.scss",
+          "sha256": "75cfa287ee9bb488a4ea1ab69ac7a080770f5b0d7b618c863df21661741e0819",
+          "bytes": 15909
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_state.scss",
+          "sha256": "978e80b56c17242e55fc00112421bf68414804e26d10c31826097f8c77076a8f",
+          "bytes": 23287
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_string-ext.scss",
+          "sha256": "5c6e3b30d73b1a163759340a3c1341add3c0a81adb302c4ce407d43865fe7d10",
+          "bytes": 4245
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_theme-color.scss",
+          "sha256": "e3813ff87c6e612acae1ef70f33fe6dba5c79584eca6c477a5a9ddd21cea5656",
+          "bytes": 12686
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_theme.scss",
+          "sha256": "c57e33ead2667b3221bd5cbfef1555ac734cc486dc9144143d4fb522be052258",
+          "bytes": 11922
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_validate.scss",
+          "sha256": "ff7f26fb544a6dff5d25c11647e80770b61b4a6c18b8348e7f0b43bfb237e589",
+          "bytes": 4033
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_variables.scss",
+          "sha256": "bdd52fa3fa026150526b93520b512d41fa4b3da69a6a43049547da19d513d659",
+          "bytes": 1472
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tokens/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tokens/_resolvers.scss",
+          "sha256": "16a478b2dc00f14fac7885841fb82447ef9cf1ae64c611841cd67c4c5887ec2d",
+          "bytes": 216
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tooltip/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tooltip/_plain-tooltip-theme.scss",
+          "sha256": "bae6a0e2743dc9b63ae21c9699db1d3d84fab0812ee00d3e891509932c14380f",
+          "bytes": 3220
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tooltip/_tooltip-theme.scss",
+          "sha256": "58fb2b43c36c661fb26a7ca9bb58c37c9705d71ba2ad7a8a4cfe18e4d63eacda",
+          "bytes": 8735
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/touch-target/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/touch-target/_mixins.scss",
+          "sha256": "d94ae0a86df09693c4194057d07ee37e60f861ab554f922d2b929caf528aa4cd",
+          "bytes": 1234
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/touch-target/_touch-target.scss",
+          "sha256": "fd77f8c9965c700e62bd3aa6e54d3ac62ad86df65db43327c884c0c20089e869",
+          "bytes": 6083
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/touch-target/_variables.scss",
+          "sha256": "ea400b7994d1a872b1e7a7b61ea67d62949952744596e2731099be70879e7051",
+          "bytes": 1217
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/typography/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/typography/_functions.scss",
+          "sha256": "0d8d8e7695e35f8fe3d857e267346fa175f335dac3d1c93424f6e533a09a7692",
+          "bytes": 1235
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/typography/_index.scss",
+          "sha256": "42a49fabd3e17818e2d1ea0d2bf4f39a3283a5665aab179cd911141c40840068",
+          "bytes": 69
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/typography/_mixins.scss",
+          "sha256": "c933e7ca78df723806ccb47328c22076763ddb777993fa666024105e8c7c3497",
+          "bytes": 1347
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/typography/_typography.scss",
+          "sha256": "abefce9dcf15eaf16ee676ced258bb29eb893cce2e6cf437d97e237298339d77",
+          "bytes": 18594
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/typography/_variables.scss",
+          "sha256": "0b5e55bbe62c41d1c7ab3c6747dd63840ee1fd270d2ba50c890a106c9d742164",
+          "bytes": 1476
+        }
+      ]
+    },
+    "main": {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+      "before_modules": [
+        {
+          "path": "projects/ngx-material-legacy/styles/progress-spinner/_progress-spinner-theme.scss",
+          "sha256": "5644d8e6c8e74ec610371384ca33b60e41af97a4ed07d0027e41125c4d53bb9c",
+          "bytes": 1528,
+          "source": "@use 'sass:map';\n@use '../core/theming/theming';\n@use '../core/tokens/m2/mdc/circular-progress' as tokens-mdc-circular-progress;\n@use '../vendor/mdc/circular-progress/circular-progress-theme' as mdc-circular-progress-theme;\n\n@mixin color($config-or-theme) {\n  $config: theming.get-color-config($config-or-theme);\n  $mdc-circular-progress-color-tokens: tokens-mdc-circular-progress.get-color-tokens($config);\n\n  .mat-mdc-progress-spinner {\n    @include mdc-circular-progress-theme.theme($mdc-circular-progress-color-tokens);\n\n    &.mat-accent {\n      $color: theming.get-color-from-palette(map.get($config, accent));\n      @include mdc-circular-progress-theme.theme((active-indicator-color: $color));\n    }\n\n    &.mat-warn {\n      $color: theming.get-color-from-palette(map.get($config, warn));\n      @include mdc-circular-progress-theme.theme((active-indicator-color: $color));\n    }\n  }\n}\n\n@mixin typography($config-or-theme) {}\n\n@mixin density($config-or-theme) {}\n\n@mixin theme($theme-or-color-config) {\n  $theme: theming.private-legacy-get-theme($theme-or-color-config);\n  @include theming.private-check-duplicate-theme-styles($theme, 'mat-progress-spinner') {\n    $color: theming.get-color-config($theme);\n    $density: theming.get-density-config($theme);\n    $typography: theming.get-typography-config($theme);\n\n    @if $color != null {\n      @include color($color);\n    }\n    @if $density != null {\n      @include density($density);\n    }\n    @if $typography != null {\n      @include typography($typography);\n    }\n  }\n}\n"
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/snack-bar/_snack-bar-theme.scss",
+          "sha256": "29ca545098f2b8eb81fbf7f311b5dac5fda4986f641d39ac23ca01eb7a547906",
+          "bytes": 1536,
+          "source": "@use '../vendor/mdc/snackbar/snackbar-theme' as mdc-snackbar-theme;\n@use '../core/theming/theming';\n@use '../core/typography/typography';\n@use '../core/tokens/token-utils';\n@use '../core/tokens/m2/mdc/snack-bar' as tokens-mdc-snack-bar;\n@use '../core/tokens/m2/mat/snack-bar' as tokens-mat-snack-bar;\n\n\n@mixin color($config-or-theme) {\n  $config: theming.get-color-config($config-or-theme);\n\n  .mat-mdc-snack-bar-container {\n    @include mdc-snackbar-theme.theme(tokens-mdc-snack-bar.get-color-tokens($config));\n    @include token-utils.create-token-values(\n      tokens-mat-snack-bar.$prefix,\n      tokens-mat-snack-bar.get-color-tokens($config)\n    );\n  }\n}\n\n@mixin typography($config-or-theme) {\n  $config: typography.private-typography-to-2018-config(\n      theming.get-typography-config($config-or-theme));\n\n  .mat-mdc-snack-bar-container {\n    @include mdc-snackbar-theme.theme(tokens-mdc-snack-bar.get-typography-tokens($config));\n  }\n}\n\n@mixin density($config-or-theme) {}\n\n@mixin theme($theme-or-color-config) {\n  $theme: theming.private-legacy-get-theme($theme-or-color-config);\n  @include theming.private-check-duplicate-theme-styles($theme, 'mat-snack-bar') {\n    $color: theming.get-color-config($theme);\n    $density: theming.get-density-config($theme);\n    $typography: theming.get-typography-config($theme);\n\n    @if $color != null {\n      @include color($color);\n    }\n    @if $density != null {\n      @include density($density);\n    }\n    @if $typography != null {\n      @include typography($typography);\n    }\n  }\n}\n\n"
+        }
+      ],
+      "protected_inputs": [
+        {
+          "path": "projects/ngx-material-legacy/_index.scss",
+          "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+          "bytes": 14151
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/README.md",
+          "sha256": "0c409c4351bb2ac867c22dc66db49c728f87b8b0f433978411fb95d0027017f8",
+          "bytes": 106
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/_progress-spinner-legacy-index.scss",
+          "sha256": "8058870744a1125c15bcd16407dca47ea6820680d7b09e0f4c90546c08fbb631",
+          "bytes": 175
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/_progress-spinner-theme.import.scss",
+          "sha256": "8183c208ff863bee99f1f091cf497331ce06069f3873aecc2deeef355899a9e4",
+          "bytes": 304
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/_progress-spinner-theme.scss",
+          "sha256": "d9231b07757932090ffdf79886cf83ba2f48ada11cf9eb84afbe210eddf4bf2b",
+          "bytes": 1713
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/index.ts",
+          "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+          "bytes": 233
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/color.ts",
+          "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+          "bytes": 1888
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/constructor.ts",
+          "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+          "bytes": 450
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/disable-ripple.ts",
+          "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+          "bytes": 1211
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/disabled.ts",
+          "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+          "bytes": 1073
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/error-state.ts",
+          "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+          "bytes": 2623
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/index.ts",
+          "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+          "bytes": 625
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/initialized.ts",
+          "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+          "bytes": 3061
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/tabindex.ts",
+          "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+          "bytes": 1503
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-module.ts",
+          "sha256": "a36d4381d828eccbf40815dcac053048a054b3fa6ce90f6fb41b58b04183c8ee",
+          "bytes": 374
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/progress-spinner-defaults.ts",
+          "sha256": "790fe17044a5ea62cbc0a931bd932efcb2e8f71c51a02111840789f544ef5a5c",
+          "bytes": 691
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/ng-package.json",
+          "sha256": "7e9ac727fee783de8aa9c29f31937d13f49465f4a9b7a23a648d8176d29270e7",
+          "bytes": 38
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner-module.ts",
+          "sha256": "602539c21983cab5c23e541e6474595e9cb36012efc4522e9acdba4f001ac5fb",
+          "bytes": 650
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.html",
+          "sha256": "df4e7c34e3434e3f99ea651f3aa4b46bcf3f09acebe73e281b24012f8b4c544e",
+          "bytes": 1932
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.scss",
+          "sha256": "c49e724b39ca30c472b418b644cd4c9da6893c74a0b0fa45518555b4672142f3",
+          "bytes": 3867
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.spec.ts",
+          "sha256": "aee88cfa13c68fb9143103c86c5d68f1d0b026cbe61cdc750fb9c7f2b1bbcf25",
+          "bytes": 23563
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts",
+          "sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+          "bytes": 12785
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/public-api.ts",
+          "sha256": "d9b92e443700fd4281c307096f49a7a6e9a3fd521c9c9c55f3313de18a951e82",
+          "bytes": 1134
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/testing/index.ts",
+          "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+          "bytes": 233
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/testing/ng-package.json",
+          "sha256": "7e9ac727fee783de8aa9c29f31937d13f49465f4a9b7a23a648d8176d29270e7",
+          "bytes": 38
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/testing/progress-spinner-harness.spec.ts",
+          "sha256": "87b2956a0ee747b3a452c3365f624d221c55e3f5530b0c4a21ef096c8d28600e",
+          "bytes": 445
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/testing/progress-spinner-harness.ts",
+          "sha256": "613511a61675d38b5e57175637f0e830107840fe07df4fb2514bb9da12786dcd",
+          "bytes": 1826
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/testing/public-api.ts",
+          "sha256": "9b1109850ceeea78d2f575aae637554a69ebb37114c737d35c95b64b12464c37",
+          "bytes": 408
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/README.md",
+          "sha256": "30b1a9d36e783056db6b71607fd8496c3a65e78b0692803edbc4cba5150bf0d4",
+          "bytes": 100
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/_snack-bar-legacy-index.scss",
+          "sha256": "1dd556626a64905284cf55a18eec9401812d049d7f267312124e635823e15227",
+          "bytes": 146
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/_snack-bar-theme.import.scss",
+          "sha256": "a22e4608a363c739b80312fbd39d4d6153949ad99c8976d012dab9628f4e1959",
+          "bytes": 507
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/_snack-bar-theme.scss",
+          "sha256": "fe3d16c42f28230628478c600dde9f3acedc0cb96a34301f501d6cfa8fb15cc7",
+          "bytes": 2541
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/index.ts",
+          "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+          "bytes": 233
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-behaviors/color.ts",
+          "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+          "bytes": 1888
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-behaviors/constructor.ts",
+          "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+          "bytes": 450
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-behaviors/disable-ripple.ts",
+          "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+          "bytes": 1211
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-behaviors/disabled.ts",
+          "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+          "bytes": 1073
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-behaviors/error-state.ts",
+          "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+          "bytes": 2623
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-behaviors/index.ts",
+          "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+          "bytes": 625
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-behaviors/initialized.ts",
+          "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+          "bytes": 3061
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-behaviors/tabindex.ts",
+          "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+          "bytes": 1503
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-module.ts",
+          "sha256": "a36d4381d828eccbf40815dcac053048a054b3fa6ce90f6fb41b58b04183c8ee",
+          "bytes": 374
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+          "sha256": "293baf9806cc7bc0c53ab5a68c745536d79e40e3e2a82928b9515361dbdf302f",
+          "bytes": 11168
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+          "sha256": "1b673f43bacbcf47ea0e504ff3f191d84289e7c7337b20b93e8b5b98e833eb08",
+          "bytes": 13945
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-ref.ts",
+          "sha256": "de41a41cb3c2fdd192d3548f62206cf1da625603bb26f35b2479d5f9fe8236de",
+          "bytes": 4129
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/ng-package.json",
+          "sha256": "7e9ac727fee783de8aa9c29f31937d13f49465f4a9b7a23a648d8176d29270e7",
+          "bytes": 38
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/public-api.ts",
+          "sha256": "b9bae79b1440bfd2bfc1f713b7e16057af43ab06099083ecec49d4a47b35b421",
+          "bytes": 1502
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/simple-snack-bar.html",
+          "sha256": "5a9ee10a904138baa615efc1de868b3fdd3cd8d1f134219f4b0adf3e90617079",
+          "bytes": 206
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/simple-snack-bar.scss",
+          "sha256": "ba31af68b510f8979bb4592de579084bb691f6bda361e03dd052695264cba0a7",
+          "bytes": 894
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/simple-snack-bar.ts",
+          "sha256": "b8e8e30936376cfedc907cf97ec8ba25cf8afce4ac571d2eddd3ca0a46f396bd",
+          "bytes": 1722
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-config.ts",
+          "sha256": "5b670e35acbf80b4173ce9d976689d6322dbfe400d28e08492db331eb3063dab",
+          "bytes": 654
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.html",
+          "sha256": "9b92fdf9e5e74ea73f6f7cd3305dfd79dc832c25f5de1f6d2aa1f63b17ccaee2",
+          "bytes": 373
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.scss",
+          "sha256": "f87776ff2d2a32075eb2794b68cc2a8eb018ec7cedbe494dcdf4c0c586504dfc",
+          "bytes": 1539
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+          "sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5",
+          "bytes": 4650
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-module.ts",
+          "sha256": "6ad8d8687288b979759b12456189c1dac16ca9caa1970787bf16692c78ebd68f",
+          "bytes": 1329
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+          "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3",
+          "bytes": 45763
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.ts",
+          "sha256": "12354cb1619f2dfb9bf62fb65c25cf18cba2206fe960603867743b694311f2cf",
+          "bytes": 1486
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/testing/index.ts",
+          "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+          "bytes": 233
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/testing/ng-package.json",
+          "sha256": "7e9ac727fee783de8aa9c29f31937d13f49465f4a9b7a23a648d8176d29270e7",
+          "bytes": 38
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/testing/public-api.ts",
+          "sha256": "affa661d2b3160dead73b7e38f10ec69b689c32263157003c32e6641f4bd5683",
+          "bytes": 414
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/testing/snack-bar-harness-base.ts",
+          "sha256": "e4d58113fd1561611b6b99c18d1fff0a5fbfe29e84eef504a82fcf3d0e79d178",
+          "bytes": 3901
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/testing/snack-bar-harness.spec.ts",
+          "sha256": "b2b3a7b0f1588106c44efb6762006d062c76b02984c36a94b72c3f08ae70847e",
+          "bytes": 2624
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/testing/snack-bar-harness.ts",
+          "sha256": "2f0fb6ec5044f6f8b20797dadbb21da064580e11e3a7291dfff4b1dd9fef929b",
+          "bytes": 2121
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+          "sha256": "aaa2dd4dfbd9442349523e8ce34164c5c053cd511b975fad2385bdd97f9c7c9c",
+          "bytes": 34933
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/theming/_all-theme.scss",
+          "sha256": "460048a52813ec9de04cb90e20a067e03f013b6ee533e9f35174ef2d3512bf7e",
+          "bytes": 3938
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/tokens/m2/_index.scss",
+          "sha256": "a28e7498f3e8ee4c7f6644c2bcb3dce3f99710d11764e12a53a98b7a776f41d4",
+          "bytes": 4183
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_snack-bar.scss",
+          "sha256": "16a8ffe092202483c5387822617c9789ee0aaf6b26a01ffb2ea168fa4c203d58",
+          "bytes": 1450
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_circular-progress.scss",
+          "sha256": "ca2c87c0d6933adebc80a67a7c88cdd04f22e0abe3139842899d7178bced5d36",
+          "bytes": 2539
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_snack-bar.scss",
+          "sha256": "10cc1b80016e142dbd31fa1ed61932d174fe7f8609a30c88d3cd48192800fcf2",
+          "bytes": 4356
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-core/theming/_all-theme.scss",
+          "sha256": "bcc15a0593fe733501d6d1c002dc706c79fe1ba66d7d26dd072d69681ebfe63f",
+          "bytes": 4265
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-progress-spinner/_progress-spinner-theme.scss",
+          "sha256": "71314118b07d874c6331a53fb1a545df1cf3d230f81d490df917dd1ab9546616",
+          "bytes": 1706
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-snack-bar/_snack-bar-theme.scss",
+          "sha256": "b9a6613433a84b02035c6252dd226d31cc74eb71c5dcb68ce76e012579a848bf",
+          "bytes": 2506
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/animation/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/animation/_animation.scss",
+          "sha256": "7b977c4a414bec7a39e9891174317555b34920cdb7512af77d89a54d4ba35070",
+          "bytes": 1993
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/animation/_functions.scss",
+          "sha256": "f4a8a4d4e388087381ac4e77f3576b0d8d92de5f6464a4e9f06c9bc87d0669d8",
+          "bytes": 1239
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/animation/_variables.scss",
+          "sha256": "21796d328b0f6910b09d37a28524c516067429fd5f776f53de49cb5d6ae39f60",
+          "bytes": 1328
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/base/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/base/_mixins.scss",
+          "sha256": "2e58e92f19918dfab87b5ee79a93e9325319736124a30adfc2571b28d6bdba36",
+          "bytes": 1467
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-base.scss",
+          "sha256": "eb9407656f2bedf1bd7214d00683916fbb8f1f86ce02932934573a2fe3f362fc",
+          "bytes": 8242
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-filled-theme.scss",
+          "sha256": "09255a8c8e72dde78f117935808ccbda0c3c89ce2643693e8e18330a685512c3",
+          "bytes": 4326
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-filled.scss",
+          "sha256": "c1bdf053b2138d73d5a4b2cf7546096d93d0206286e507a563b2c8866bf4bfbe",
+          "bytes": 2963
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-outlined-theme.scss",
+          "sha256": "327c28febd4cac5f60e6a4b990276c628b42277521a4300a2c9ba6afc291384e",
+          "bytes": 8872
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-outlined.scss",
+          "sha256": "7e9f8814bc4d8611a034ec4a232168c762041a6caf94957228db4f776ca42b9d",
+          "bytes": 3102
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-protected-theme.scss",
+          "sha256": "d8f45323164eac22bda59dcb0de96b7873bf81f4d7837f76489a920b87e937e0",
+          "bytes": 3492
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-protected.scss",
+          "sha256": "5f00b29f830c453770082b3a242c5a9224a9128f6b1e54533e967abbe68b5963",
+          "bytes": 2915
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-ripple.scss",
+          "sha256": "376cc2b8945cbbe50f28223391038f3e9852e7b61560a49278a872efdfd8cc56",
+          "bytes": 2118
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-shared-theme.scss",
+          "sha256": "3884df93755edfb2cfc464a605a1c560e076809888433aa6a4690c1049d49b8a",
+          "bytes": 21130
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-text-theme.scss",
+          "sha256": "a91ff2ee3fbae6b8113487aa542e4d542f29c7d5cd519d9d19a5f40f6261f7a7",
+          "bytes": 4216
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-text.scss",
+          "sha256": "443a21aa5af862d9547dd7191c324a01cc9aaa51f29bd53546e6f0207691d314",
+          "bytes": 2140
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-theme.scss",
+          "sha256": "0f9ea380249d15ff1cce9bdd2f7b52a3cf334e7fbf649ba6bfa3daf4f013085e",
+          "bytes": 1365
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button.scss",
+          "sha256": "5a33818c16f6f44543ea6095711621022c91fb3cd1e0d63c035f3f46ceae9fd9",
+          "bytes": 5101
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/card/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/card/_card-shared-theme.scss",
+          "sha256": "cc0e0bee61632071ce387b08e250fda40f4dba0ca4f0ed54d5ea587de2e467a2",
+          "bytes": 4217
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/card/_elevated-card-theme.scss",
+          "sha256": "2455c8026311b69fde749ccacfd5295b031833947ba8bcd88b87535b35b88d04",
+          "bytes": 2590
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/card/_mixins.scss",
+          "sha256": "111f8a2fc7963549169f9c9d3e3e1af0e9165bc2b1cc0b671e467173e414d0ae",
+          "bytes": 11330
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/card/_outlined-card-theme.scss",
+          "sha256": "88bab2a082dcea7b7cab2831fa19dde6245d8ca1310d33d5892c5e7a1e5fde82",
+          "bytes": 3854
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/card/_variables.scss",
+          "sha256": "8ae3e7704848229a3e4106f15499efca1ecdceef696345cd516c59f7c73dfd54",
+          "bytes": 1476
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/checkbox/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/checkbox/_checkbox-custom-properties.scss",
+          "sha256": "9201aedc57a8373decf93af70a0c72b1032b225d0f265d81076f6e0f345b12a2",
+          "bytes": 1390
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/checkbox/_checkbox-theme.scss",
+          "sha256": "8f9cbc2b2353179c7395bf8b128a6a16361a2c025721c996bcc45cee46d025dd",
+          "bytes": 26285
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/chips/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/chips/_chip-theme.scss",
+          "sha256": "3b0e47c6a4817dd67254fad7687c123de8c4967a90984055de5ce1e6c3527dc6",
+          "bytes": 49680
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/circular-progress/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/circular-progress/_circular-progress-theme.scss",
+          "sha256": "3165b4cefdbec3d01d72e7bc6864bbf4ee8581f47198b2011d6ea4bd70230b54",
+          "bytes": 6030
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/density/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/density/_density.scss",
+          "sha256": "7b690b9bd7a2068fb2924d9da6eaec26a20d5ff11c214365dd2758717939ec04",
+          "bytes": 3940
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/density/_functions.scss",
+          "sha256": "db5c7ac9c0377a50798ce2bfe7d0c75026c887242199dcc745b24a8331e55637",
+          "bytes": 1198
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/density/_index.scss",
+          "sha256": "caab09f51de52ca5b45152c5585d7a122877de15335cec50bc9d07e058457033",
+          "bytes": 22
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/density/_variables.scss",
+          "sha256": "ff14efa32e1418a1494fcf99795eecf8aec1327c8470bdf3141a3ba1313cce87",
+          "bytes": 1294
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/dialog/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/dialog/_dialog-theme.scss",
+          "sha256": "c8d540da3d07301b233ba7d0444ae050f8726c2bec8f36d7cc57ac536d861fb0",
+          "bytes": 9180
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/dom/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/dom/_dom.scss",
+          "sha256": "316b7d43f65b4e053e0eda8cadefd01e597b69ba5749c8c95e9378951ed0f7b7",
+          "bytes": 3749
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/dom/_mixins.scss",
+          "sha256": "eb120a7891a13d7607dfe9c99713eed15988a152914cbbde0f58c47a0d09f79d",
+          "bytes": 1229
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/elevation/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/elevation/_elevation-theme.scss",
+          "sha256": "fc62413e60330f80e716182a097f3a2ac79c8ffe180627974afcb9f734ac4ea9",
+          "bytes": 13789
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/elevation/_elevation.scss",
+          "sha256": "c9700d954ecad28cbc915e636f59ee5f6cdb3c965a327a825126b8be9e60b3b8",
+          "bytes": 3216
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/elevation/_mixins.scss",
+          "sha256": "019bc54256d6033f8d3db45edc138275a7e14002e517096a79c9d6ac28dd3b82",
+          "bytes": 1324
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/fab/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/fab/_extended-fab-theme.scss",
+          "sha256": "a9afe4b689f0fd4cae7a73e47535d8f881e7aad49dd57d15018df2aa1b792a06",
+          "bytes": 8122
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/fab/_fab-custom-properties.scss",
+          "sha256": "60f3d68a0d6ebf8aaef6bdc7bcec5822d72ab62b01a97368dc19226671bc8400",
+          "bytes": 1228
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/fab/_fab-theme.scss",
+          "sha256": "2bffe54bfc404b582f5e96595cb4cc3c5c819be61d8fed90b1a343a442e53e68",
+          "bytes": 18675
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/fab/_fab.scss",
+          "sha256": "b426dde5aee4fa5e7578624fccaefd7548b23b5d0eef4f761613af4f0cdaf1b4",
+          "bytes": 10963
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/feature-targeting/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/feature-targeting/_feature-targeting.scss",
+          "sha256": "6ec0c3efc173660a9b30374896ddd537d21c0d9dbbf3f16ccc775cdd71bb12d7",
+          "bytes": 7042
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/feature-targeting/_index.scss",
+          "sha256": "8fae0e4029c2116908d7ee2cfd6c50155fe8c274cfd376d40686bc092f97f14e",
+          "bytes": 32
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/floating-label/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/floating-label/_floating-label-theme.scss",
+          "sha256": "564ea35999d60274b73879ed296b9c70e863083bc0caa0469f7494ba2b0c0960",
+          "bytes": 6352
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/floating-label/_floating-label.scss",
+          "sha256": "6fe5d5d8e08654561e36b1b7a48baad2aca5a4edcb9389a71f7f77cf7e73e42d",
+          "bytes": 3561
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/floating-label/_mixins.scss",
+          "sha256": "7534a3dff7cb9c2a04b02f798f16405bb18c7e340a8b29917e1b5809aa5d5b6c",
+          "bytes": 1383
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/floating-label/_variables.scss",
+          "sha256": "57780ac8f8a34aa8dcfaa5772d7e4abb9f92129154e0dbfa3de0bbaf7b5109df",
+          "bytes": 1202
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/focus-ring/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/focus-ring/_focus-ring.scss",
+          "sha256": "7c1ab864e79864534ef6b22d64e936a4351364e7d1bffa877ba291c7a26b5b36",
+          "bytes": 5215
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/form-field/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/form-field/_form-field-theme.scss",
+          "sha256": "83df6b63e79d98ad0f1a6b4f43e5a845631d7c2f574d5978581be2f42ac1c7fc",
+          "bytes": 2906
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/form-field/_form-field.scss",
+          "sha256": "39792151846c77bbe330406edbcbc7eeab3a016a8c79ce6232f1b41e8197ef59",
+          "bytes": 3260
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/form-field/_index.scss",
+          "sha256": "884abf77b421a420e74f1fc1e34eacd857e8b50097316984f6b88636307cfd3b",
+          "bytes": 45
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/form-field/_mixins.scss",
+          "sha256": "693cfa98eca01719c1232d95a669486044bdacaaaee8e0da99d7e02c75897168",
+          "bytes": 1205
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/form-field/_variables.scss",
+          "sha256": "822320676b00f0cb07cb011dee11e392b8d01233c3092b3bf8da29a4b53efded",
+          "bytes": 1219
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/icon-button/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/icon-button/_icon-button-theme.scss",
+          "sha256": "3ac79da16dccaa5457a703f960019de280db35a198158dd31c84b654fa10c089",
+          "bytes": 11190
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/line-ripple/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/line-ripple/_functions.scss",
+          "sha256": "8dc5d95eaf484049210588278398a968be2846bc33c4a32d1a51f36395f42c68",
+          "bytes": 1258
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/line-ripple/_line-ripple-theme.scss",
+          "sha256": "0d0db2ddd30a00c3176aa5aa9dd9d36d5276bb00f9bab6fa832c6e46184ffc99",
+          "bytes": 2654
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/line-ripple/_line-ripple.scss",
+          "sha256": "a0e4b1b3a648134d3d09a692d8ba474c1bb8562ffca1c7addca150dcc10c2365",
+          "bytes": 2360
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/line-ripple/_mixins.scss",
+          "sha256": "78e918728a08a3ce8fd0c96e4e6f88f96f1f95382faeb697a6faf654768cb4ca",
+          "bytes": 1327
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/linear-progress/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/linear-progress/_linear-progress-theme.scss",
+          "sha256": "8f0f8ceb75f565514e11e4579cdfe3a4378255ee4c1b736af589d180156cf802",
+          "bytes": 8782
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/list/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/list/_evolution-mixins.scss",
+          "sha256": "834ca8b82e1258911b81f8a01907b53eb9f979aab86edfa1a0f1442856ead7ec",
+          "bytes": 2140
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/list/_evolution-variables.scss",
+          "sha256": "d50e5e5286fbd7e5e375dd4b5ab72301b790218959e23ee2512ea11bc0feb647",
+          "bytes": 1515
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/list/_list-theme.scss",
+          "sha256": "8514a804ecbbef2588779f2a3ffc99bf81c840f2525f15528321810f1a0ae52e",
+          "bytes": 20788
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/list/_list.scss",
+          "sha256": "eb00cbeffe2c7c5cd2063852a7a81fe4691a014776bc346291d9153cba3e5f66",
+          "bytes": 44577
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/notched-outline/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/notched-outline/_mixins.scss",
+          "sha256": "a6b1bbc03d2b27f87828e782275bd26d7fe6d1216f623da4c45e6c143bb42e62",
+          "bytes": 1436
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/notched-outline/_notched-outline-theme.scss",
+          "sha256": "210c3ecf85c37e4b2aa1a994e8a1147b98aec78f95fa1abed455ba82fc70a957",
+          "bytes": 10670
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/notched-outline/_notched-outline.scss",
+          "sha256": "3aa6f6c12f3ec31693a9e07e7c5b1b18b1307fee58679a097afccaff40ecce34",
+          "bytes": 3414
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/notched-outline/_variables.scss",
+          "sha256": "12c80c5d4d3f14ca1e4bfd4c27d6b66a15e637417fd9f745c033b8d851dec78e",
+          "bytes": 1372
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/radio/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/radio/_radio-theme.scss",
+          "sha256": "a2b560c019ccc8a7ddbde10ebe302095b45d4866b9298193d1cd2ab41040cf18",
+          "bytes": 17108
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/radio/_radio.scss",
+          "sha256": "56f4cd7333a16b28e4926e37f841441bd1d42cfebcb30fd9a032ad3ab40a60d8",
+          "bytes": 9540
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/ripple/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/ripple/_functions.scss",
+          "sha256": "98598c6de1a7c1461bfcba26096fa1d78b6e86ba775d6e469aed822ddae12524",
+          "bytes": 1231
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/ripple/_ripple-theme.scss",
+          "sha256": "f30243bd92cfb083e6bfe456ad94c5dd9cf8e8fcf97528c30f0b3a3d29dd9e71",
+          "bytes": 16301
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/ripple/_ripple.scss",
+          "sha256": "d65051cd2b85525990cf563e6e63f35deaacf7d9b0c1e58fa59cab27d1c68d9c",
+          "bytes": 10879
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/rtl/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/rtl/_rtl.scss",
+          "sha256": "94c82a805b7e60370efdbe6acfe853bf83a7e9138b7751b66f102863ee5c368a",
+          "bytes": 8507
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/shape/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/shape/_functions.scss",
+          "sha256": "08ad2b19191b7a324fa2765cf6d2ef66989d487cef9a907da7849c39dcd7c452",
+          "bytes": 1291
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/shape/_mixins.scss",
+          "sha256": "801115c2c343bcd3bf47783cd0030ca55bc244504a6f9a39d1ab2be9737bbecc",
+          "bytes": 1197
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/shape/_shape.scss",
+          "sha256": "a1e10b4e5ba16e53f603af4206c9a14b79da7ac7f7c0d64de79a57365c6deb5e",
+          "bytes": 13351
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/slider/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/slider/_slider-theme.scss",
+          "sha256": "e90e4ed1667d0c0b7c185b826b73263c31c70bdbc2aa6193ed5de575a74ee6e8",
+          "bytes": 22269
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/snackbar/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/snackbar/_snackbar-theme.scss",
+          "sha256": "2e169af37f50c1449d6871704eca7cc861799e556c18a62dd4a1c7bb5475a8a5",
+          "bytes": 12019
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/switch/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/switch/_switch-theme.scss",
+          "sha256": "ae444d452524de54705a13438f3f45e5574e64ffe48dc210bd939adaaccf2da3",
+          "bytes": 19214
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/switch/_switch.scss",
+          "sha256": "49a771532a3ad183cea575857418d3b2cc2d958626755698da7699c6d2a00e06",
+          "bytes": 8070
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tab-indicator/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tab-indicator/_tab-indicator-theme.scss",
+          "sha256": "a7963638e369498153fcbd7b6dcdd923ae51ea7e3387b9e49102211619f7781e",
+          "bytes": 2627
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tab/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tab/_tab-theme.scss",
+          "sha256": "de5a6edd606d8a45c58e47dd75917493a9b5f9a669cd11751de4441801104d0b",
+          "bytes": 19773
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/_filled-text-field-theme.scss",
+          "sha256": "1d16d204322e73315005d414739de4ed4f0785fae061a12ecd89ebd36af8b777",
+          "bytes": 8765
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/_index.scss",
+          "sha256": "884abf77b421a420e74f1fc1e34eacd857e8b50097316984f6b88636307cfd3b",
+          "bytes": 45
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/_mixins.scss",
+          "sha256": "6d4c892eb55e6bf428354469d6ce81fc77fe354093d8f35da453dcad61fba07b",
+          "bytes": 2365
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/_outlined-text-field-theme.scss",
+          "sha256": "1a4b345bc6738e7c421cdb20c1a2df6a136c32730e553b73aa577f709e39e0c1",
+          "bytes": 7988
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/_text-field-theme.scss",
+          "sha256": "e5cc3461c5bdb982890fbfe4cb5448084bec5d3cdd0f0d4a4331ce3f13033d86",
+          "bytes": 14782
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/_text-field.scss",
+          "sha256": "8beb19631eba2902493547e38b8a545498bd31c42efaaea88b7b215c64dcb23b",
+          "bytes": 81502
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/_variables.scss",
+          "sha256": "876eab1c5b343093cb0d2b498812d0363e1d81a7ee6f9b1969b2c678c4648ff9",
+          "bytes": 9332
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/character-counter/_mixins.scss",
+          "sha256": "34d6e9170bc48c02338c7da4f06e5bde67596dee99b24524a17af701e6fde186",
+          "bytes": 3641
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/helper-text/_mixins.scss",
+          "sha256": "294c3f35dcba7acd2f2c3a91b5eb4f7765c4dca6b927f1e53aec090ebb437348",
+          "bytes": 3865
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/icon/_mixins.scss",
+          "sha256": "64146dee19626f1b1a23bd998979244f7d5416cc0e73d7586a7637cd5d203e1e",
+          "bytes": 5895
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/textfield/icon/_variables.scss",
+          "sha256": "c0b92935da4d9b44c7a42c6f4df73d3306b8331e374d5c67cbec61e854bf0c04",
+          "bytes": 1383
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_color-custom-properties.scss",
+          "sha256": "ed1c0fd380a8e3b7ff5243253ae9bfc1fda2aef9b9f36778cc001a8ba12208b9",
+          "bytes": 1147
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_color-palette.scss",
+          "sha256": "8b7bb6a61b633a8e8df992fdc83782630e6de63be4f5a8ee75e202ece5d7626e",
+          "bytes": 6810
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_css.scss",
+          "sha256": "585bbc16a8186967ae471eb50588444b40365cd466c8e9ef30f77ad19788a7cc",
+          "bytes": 4441
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_custom-properties.scss",
+          "sha256": "aa9d5502b6406ae8d918a4000d682cfc8f5e7a83ac7d3df56cc97a28b5cf9525",
+          "bytes": 11756
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_gss.scss",
+          "sha256": "9a20a94eed92cd35eaa48e51b9d78b06808d975914e68503e0480ddd4eae06a9",
+          "bytes": 2154
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_keys.scss",
+          "sha256": "e9202ea3fc19f64f559044862ba8403f7f8a46ed97d39ec51e87ad10d8afc8ef",
+          "bytes": 18558
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_map-ext.scss",
+          "sha256": "5d7ea91c94b69c42166c629e12d7053770f7fc33184e89819b3c32d9b938059d",
+          "bytes": 4248
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_replace.scss",
+          "sha256": "93c23cb86ac9fa57806925a231afd366f51dfbc0c1cc165cf28c4e98dfc71fda",
+          "bytes": 4931
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_selector-ext.scss",
+          "sha256": "38b5a4885294a590b85bb5b195e91ad92018c79450b5ed12a70ce83912b8d24a",
+          "bytes": 18698
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_shadow-dom.scss",
+          "sha256": "75cfa287ee9bb488a4ea1ab69ac7a080770f5b0d7b618c863df21661741e0819",
+          "bytes": 15909
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_state.scss",
+          "sha256": "978e80b56c17242e55fc00112421bf68414804e26d10c31826097f8c77076a8f",
+          "bytes": 23287
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_string-ext.scss",
+          "sha256": "5c6e3b30d73b1a163759340a3c1341add3c0a81adb302c4ce407d43865fe7d10",
+          "bytes": 4245
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_theme-color.scss",
+          "sha256": "e3813ff87c6e612acae1ef70f33fe6dba5c79584eca6c477a5a9ddd21cea5656",
+          "bytes": 12686
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_theme.scss",
+          "sha256": "c57e33ead2667b3221bd5cbfef1555ac734cc486dc9144143d4fb522be052258",
+          "bytes": 11922
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_validate.scss",
+          "sha256": "ff7f26fb544a6dff5d25c11647e80770b61b4a6c18b8348e7f0b43bfb237e589",
+          "bytes": 4033
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/theme/_variables.scss",
+          "sha256": "bdd52fa3fa026150526b93520b512d41fa4b3da69a6a43049547da19d513d659",
+          "bytes": 1472
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tokens/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tokens/_resolvers.scss",
+          "sha256": "16a478b2dc00f14fac7885841fb82447ef9cf1ae64c611841cd67c4c5887ec2d",
+          "bytes": 216
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tooltip/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tooltip/_plain-tooltip-theme.scss",
+          "sha256": "bae6a0e2743dc9b63ae21c9699db1d3d84fab0812ee00d3e891509932c14380f",
+          "bytes": 3220
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/tooltip/_tooltip-theme.scss",
+          "sha256": "58fb2b43c36c661fb26a7ca9bb58c37c9705d71ba2ad7a8a4cfe18e4d63eacda",
+          "bytes": 8735
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/touch-target/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/touch-target/_mixins.scss",
+          "sha256": "d94ae0a86df09693c4194057d07ee37e60f861ab554f922d2b929caf528aa4cd",
+          "bytes": 1234
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/touch-target/_touch-target.scss",
+          "sha256": "fd77f8c9965c700e62bd3aa6e54d3ac62ad86df65db43327c884c0c20089e869",
+          "bytes": 6083
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/touch-target/_variables.scss",
+          "sha256": "ea400b7994d1a872b1e7a7b61ea67d62949952744596e2731099be70879e7051",
+          "bytes": 1217
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/typography/LICENSE",
+          "sha256": "d6cf3b8854951ec25fe35dbdca789ff2d5a9b95d2412abe935706fcb99545de0",
+          "bytes": 1078
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/typography/_functions.scss",
+          "sha256": "0d8d8e7695e35f8fe3d857e267346fa175f335dac3d1c93424f6e533a09a7692",
+          "bytes": 1235
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/typography/_index.scss",
+          "sha256": "42a49fabd3e17818e2d1ea0d2bf4f39a3283a5665aab179cd911141c40840068",
+          "bytes": 69
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/typography/_mixins.scss",
+          "sha256": "c933e7ca78df723806ccb47328c22076763ddb777993fa666024105e8c7c3497",
+          "bytes": 1347
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/typography/_typography.scss",
+          "sha256": "abefce9dcf15eaf16ee676ced258bb29eb893cce2e6cf437d97e237298339d77",
+          "bytes": 18594
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/vendor/mdc/typography/_variables.scss",
+          "sha256": "0b5e55bbe62c41d1c7ab3c6747dd63840ee1fd270d2ba50c890a106c9d742164",
+          "bytes": 1476
+        }
+      ]
+    }
+  },
+  "scope": "Two ordinary explicit-current-component bridges; no13companion/legacy aggregate expansion."
+}
