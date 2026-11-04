@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "kind": "independent-individual-upstream-source-review-recommendation",
+  "reviewer": "Codex progress_bar_review subagent",
+  "status": "complete for bounded source applicability review; canonical admission remains with parent",
+  "upstream_sha": "373a0cbf9531ea9ae0c9eb0e9cbf70f049f863b7",
+  "subject": "fix(material/select): set pointer cursor on entire form field (#27678)",
+  "complete_original_patch": {
+    "parent": "503cb2f18055aa88c717feab037415359aad4041",
+    "tree": "567b263e050b51110266adcf193b02ed0b6ebd05",
+    "changed_paths": ["src/material/select/select.scss"],
+    "before_blob": "59ab26c8efd8410174658f37337948a3240e5a24",
+    "after_blob": "e27bbf5bc32c3d181ceda72eda281022d67e558c",
+    "whole_context_patch": "compatibility/rc/parallel-select-pointer-cursor-whole-original.patch",
+    "source_authentication": "compatibility/rc/parallel-select-pointer-cursor-source-identities.json",
+    "authentication": "Authenticated the full original commit, parent and tagged16.2.14 commit, every traversed Git tree object and13complete source blobs by recomputing Git SHA1. The complete diff-tree changed-path population matches the1697-SHA census. Five absent blobs were retrieved anonymously from immutable angular/components raw GitHub URLs and verified against exact expected blob IDs; the shared partial cache was not modified.",
+    "hunk": "Read all233before/237after stylesheet lines and the complete contemporary select/form-field templates. The only original change inserts four lines under .mat-mdc-form-field-type-mat-select: &:not(.mat-form-field-disabled) .mat-mdc-text-field-wrapper { cursor:pointer; }. Trigger pointer/default rules, label width rules, geometry, panel behavior, TS and templates are unchanged by this commit."
+  },
+  "recommendation": {
+    "proposed_owned_source_action": "do-not-adopt",
+    "both_lines": true,
+    "reason": "Preserve the historical source. The untouched16.2.14 legacy select already sets cursor:pointer on the enabled legacy form-field's flex container, and both maintained lines preserve that whole rule exactly. Both actual minimum current peers already supply the exact upstream modern-wrapper rule. No extra cursor rule, renamed selector, modern wrapper or component transplant is needed to preserve either existing source contract.",
+    "required_owned_source_repair": null,
+    "canonical_note": "A blanket irrelevant/not-owned rationale based on selector names or an abstract base is insufficient. The existing historical equivalent, actual host class generation, disabled binding, DOM regions and conditional public-current-field reachability must be represented. Parent may choose the existing ledger classification after its source/evidence admission review; this record does not close a ledger row.",
+    "not_authorized": "This task supplies no authorization for a new cursor feature, broadened historical hit region or changed CSS expectation."
+  },
+  "tagged_reference": {
+    "tag": "16.2.14",
+    "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "read_source_closure": [
+      "src/material/legacy-select/select.scss",
+      "src/material/legacy-select/select.html",
+      "src/material/legacy-select/select.ts",
+      "src/material/select/select.ts",
+      "src/material/legacy-form-field/form-field.scss",
+      "src/material/legacy-form-field/form-field.html",
+      "src/material/legacy-form-field/form-field.ts"
+    ],
+    "legacy_enabled_rule": ".mat-form-field-type-mat-select:not(.mat-form-field-disabled) .mat-form-field-flex { cursor:pointer; }",
+    "preserved_source_evidence": "The complete legacy form-field-type-mat-select block and complete select-trigger block are byte-identical to the tag on both lines. Historical form-field flex and label-wrapper SCSS blocks are identical. Actual current and tagged form-field templates retain the flex wrapper ancestry and its onContainerClick delegate, with prefix/infix/suffix inside that region. Existing panel/native-motion/template-control-flow adaptations were observed separately and are not represented as whole-file historical equality.",
+    "click_and_disabled_contract": "Tagged and owned select controlType are mat-select. The complete owned onContainerClick body remains the tagged focus(); open(); implementation. The actual owned open path calls _canOpen, whose condition still excludes disabled controls. Cursor reset on .mat-select-disabled .mat-select-trigger remains default. No click, disabled or motion behavior was executed or changed."
+  },
+  "actual_class_and_dom_reachability": [
+    "Owned select provides MatLegacyFormFieldControl using the owned select instance. The legacy-form-field public API reexports the actual current public MatFormFieldControl as MatLegacyFormFieldControl. Owned form-field queries that public control token, reads the owned base's controlType='mat-select', and adds classPrefix='mat-form-field-type-' plus that controlType. Its host disabled class binds to _control.disabled. This produces the exact ancestor/disabled predicates consumed by the existing historical cursor rule.",
+    "The owned form-field template places .mat-form-field-flex inside .mat-form-field-wrapper and binds its click to _control.onContainerClick($event). Prefix/infix/suffix are descendants of the flex region. Label-wrapper/label and outline pointer-events rules were reviewed; the cursor rule targets the clickable flex region, not subscript, underline or the outer host. The original patch title's entire form field wording does not authorize widening the historical cursor region to every host descendant.",
+    "Both actual minimum public peer form-field implementations query MatFormFieldControl, generate classPrefix='mat-mdc-form-field-type-' plus control.controlType, and bind mat-form-field-disabled to _control.disabled. Their templates contain .mat-mdc-text-field-wrapper, with the same control click delegate, enclosing the modern flex/infix/prefix/suffix region. Both actual minimum peer select styles contain the exact enabled-only modern-wrapper rule from the original patch.",
+    "The public current form-field can discover the legacy control token alias, and the owned controlType remains mat-select. Therefore a current form-field containing a legacy select can produce the modern ancestor class and can match the original peer cursor selector if the current-select component CSS is actually loaded. The patched selector is not restricted to a current-select host element. Merely inheriting or owning a select base does not prove this CSS path unreachable.",
+    "Conversely the peer modern-wrapper selector does not target the ordinary legacy form-field flex region, and the historical flex selector does not target the modern text-field wrapper. Both enabled paths and both disabled exclusions were checked against source-derived class predicates and template regions. These are source topology checks, not rendered CSS-cascade observations."
+  ],
+  "conditional_mixed_pair_limit": {
+    "source_reachable": "Current public form-field + owned legacy select is source-reachable through the preserved shared control token and controlType; no blanket not-owned exclusion is justified.",
+    "style_loading_condition": "The modern pointer rule belongs to the current select component styles, not the owned legacy stylesheet or the current form-field's ordinary wrapper CSS. This review does not claim that importing a token/class installs that component's styles, nor that the rule is loaded when no current select component has been instantiated.",
+    "contract_context": "The reviewed docs/04-motion-and-interop.md and research/interop-matrix.json require named mixed-stack and separate-scope scenarios, but do not by themselves prove this select/form-field mixed pairing. It is neither qualified nor newly declared unsupported here.",
+    "if_claimed": "To qualify this pairing, execute a dedicated branch-correct packed consumer with current select styles absent, then loaded through a separate real component, and test enabled/disabled transitions on the modern wrapper. Compare the intended historical guarantee and document any required narrowly authorized adapter only after reproducing a defect. No source repair is justified merely by this conditional path."
+  },
+  "prior_evidence_correction": {
+    "main_row": "Main currently classifies this SHA irrelevant and cites only .mat-select-trigger as the legacy pointer rule. That rationale omits the authentic pre-existing whole-flex rule and does not establish public-current-field reachability. The final decision needs this fuller evidence even though no product change is recommended.",
+    "21_row": "The21.x row remains needs-individual-review. This independent source review is a recommendation, not automatic canonical closure.",
+    "no_ledger_mutation": true
+  },
+  "focused_checks": {
+    "producer": "compatibility/rc/parallel-select-pointer-cursor-probe.py",
+    "report": "compatibility/rc/parallel-select-pointer-cursor-diagnostic.json",
+    "command": "nice -n 19 /nix/store/3inr3nxzqarhb9rh1z7s2s20j8c0395h-python3-3.14.7/bin/python3 compatibility/rc/parallel-select-pointer-cursor-probe.py",
+    "result": "passed",
+    "source_negative_controls_rejected": 24,
+    "method": "Exact complete hunk/source identities, exact historical cursor blocks, actual template-node class regions, class-emission/disabled/control-token protocols, source selector reachability and disabled-guard omission controls. Parser permits the omitted guard so that the negative observes the undesired disabled match rather than failing only due to unsupported syntax.",
+    "controls": "Per line: missing legacy disabled guard, wrong legacy control type/region, historical whole-flex pointer removal, removed shared control alias, removed type-class emission, disabled binding weakening, removed click delegate, missing peer disabled guard, wrong peer control type/wrapper and attempted substitution of the peer modern rule for the legacy region.",
+    "historical_test_source_context": "Candidate historical select tests assert trigger cursor default when disabled and pointer when reenabled through reactive forms and ngModel, and verify panel-open behavior. These existing tests were read, not run; they do not by themselves cover every form-field cursor region or this mixed pairing."
+  },
+  "source_identity_binding": "compatibility/rc/parallel-select-pointer-cursor-diagnostic.json records both current heads/trees, clean scoped dirty-state observations, hashes for all consulted owned/source/protocol files, separately hashed actual minimum21.2.23Angular/21.2.14CDKMaterial and22.1.7peer implementations, and complete source-only limitations. The peer sources and extracted styles/templates are archived under this same prefix.",
+  "tests_not_executed": ["browser cursor hit testing", "Angular projection/DI/query/runtime-style installation", "native click/keyboard/disabled state transitions", "motion lifecycle", "historical runner", "Sass/build", "packed consumer", "runtime/peer-floor execution", "full acceptance"],
+  "no_product_or_shared_changes": true,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "remaining_program_scope": "Both-line C00-C05/A01-A10/R01-R03/G01-G13, complete1697-SHA coverage, authored-use coverage and pending security-review remain independent. This bounded review changes no denominator, historical expectation, golden, exception, peer version or owner authority."
+}
