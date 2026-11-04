@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_parent": "e25bc76c288e3b65732a5c2474237518c94c8a26",
+  "transitions": [
+    {
+      "path": "scripts/dialog-portal-failure-recovery.mjs",
+      "before": {
+        "path": "scripts/dialog-portal-failure-recovery.mjs",
+        "sha256": "78250c763fe00860bf2b8f3f93c13c298b541595e5332efec65fb8b1b1dafd98",
+        "bytes": 13105
+      },
+      "new_literal_edits": [
+        {
+          "before": "assert.deepEqual(paths,prior.product_members.map(m=>m.path));for(const m of prior.product_members)",
+          "after": "assert.deepEqual(paths,prior.product_members.map(m=>m.path));\n const contractInputs='compatibility/rc/historical-contract-repair-source-inputs.json',contractInputRef=nativeSpec.bound.find(ref=>ref.path===contractInputs);assert.ok(contractInputRef);\n const contractBytes=(currentSourceRead??read)(contractInputs);assert.equal(hash(contractBytes),contractInputRef.sha256);assert.equal(contractBytes.length,contractInputRef.bytes);\n const contractSources=currentSourceRead?JSON.parse(contractBytes).images.filter(row=>row.path.startsWith('projects/ngx-material-legacy/')).map(row=>({path:row.path,...row.after})):[];\n if(currentSourceRead)assert.equal(contractSources.length,4);\n for(const m of prior.product_members)"
+        },
+        {
+          "before": " const expected=historicalTitle?m.sha256:(nativeSpec.qualify(m)??m).sha256;\n assert.equal(hash(read(m.path)),expected,'unrelated product/resource changed '+m.path);",
+          "after": " const repaired=contractSources.find(ref=>ref.path===m.path);\n if(repaired){\n  // The original portal comparison retains its exact source epoch,including\n  // the menu image before the later packed repair. Actual repairs are a\n  // separate current-source proof,not a replacement historical expectation.\n  assert.equal(hash(read(m.path)),m.sha256,'changed historical contract source '+m.path);\n  const qualified=nativeSpec.qualify(repaired);assert.ok(qualified);assert.equal(qualified.sha256,repaired.sha256);\n  const current=currentSourceRead(m.path);assert.equal(hash(current),qualified.sha256,'changed current contract source '+m.path);assert.equal(current.length,repaired.bytes);\n }else{\n  const expected=historicalTitle?m.sha256:(nativeSpec.qualify(m)??m).sha256;\n  assert.equal(hash(read(m.path)),expected,'unrelated product/resource changed '+m.path);\n }"
+        },
+        {
+          "before": "...(currentSourceRead?{}:{independently_qualified_title_source:",
+          "after": "independently_qualified_contract_sources:contractSources,...(currentSourceRead?{}:{independently_qualified_title_source:"
+        }
+      ],
+      "after": {
+        "path": "scripts/dialog-portal-failure-recovery.mjs",
+        "sha256": "d66a9f096bb3e40e973219a5153a12b4a529a417f7bbc9f7b3529d4d1211108c",
+        "bytes": 14475
+      }
+    },
+    {
+      "path": "scripts/snack-dom-source-context.mjs",
+      "before": {
+        "path": "scripts/snack-dom-source-context.mjs",
+        "sha256": "5a56396072d115beda317231e03d470e8c2d801e6517d3f26a7fee9c14fe4d34",
+        "bytes": 45529
+      },
+      "new_literal_edits": [
+        {
+          "before": "independently_qualified_silent_Sass_notices:qualifiedNotices,...historicalSource",
+          "after": "independently_qualified_silent_Sass_notices:qualifiedNotices,independently_qualified_contract_sources:qualifiedContracts,...historicalSource"
+        },
+        {
+          "before": " assert.equal(qualifiedNotices,line==='main'?7:0);",
+          "after": " assert.equal(qualifiedNotices,line==='main'?7:0);assert.equal(qualifiedContracts.length,4);for(const ref of qualifiedContracts){assert.equal((nativeSpec.qualify(ref)??ref).sha256,ref.sha256);assert.equal(hash(read(ref.path)),ref.sha256);}"
+        },
+        {
+          "before": "return {line,delta,qualification,native_spec_source_successor:qualifiedTest,source_scope_only:true",
+          "after": "return {line,delta,qualification,native_spec_source_successor:qualifiedTest,contract_source_successors:qualifiedContracts,source_scope_only:true"
+        }
+      ],
+      "after": {
+        "path": "scripts/snack-dom-source-context.mjs",
+        "sha256": "3111b0df6ab8b7e934abea3597e1fdbfe818001afb4b5eba747362ec6ec7f3b4",
+        "bytes": 45824
+      }
+    }
+  ],
+  "g11_claim": "not-passed"
+}
