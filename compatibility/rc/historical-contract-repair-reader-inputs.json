@@ -240,8 +240,8 @@
         "bytes": 44559
       },
       "after": {
-        "sha256": "de952eccc2a70734b294a9d573b810431c24e5bc25999c75290481d4a29db545",
-        "bytes": 44925
+        "sha256": "0bc6a39804b44867ecab2dc6ecbf6f90a62b54adaba083774f15a42e67d22458",
+        "bytes": 45042
       },
       "literal_edits": [
         {
@@ -295,6 +295,18 @@
         {
           "before": "assert.equal(members.size,20);nativeSpec.assertCurrent();const reader=",
           "after": "assert.equal(members.size,20);nativeSpec.assertCurrent();rosterEpoch.assertCurrent();const reader="
+        },
+        {
+          "before": "packedCurrentEpochs.set(packed.read,{root,actual:rawCurrent,qualification:packed});read=packed.read;",
+          "after": "packedCurrentEpochs.set(packed.read,{root,actual:rawCurrent,qualification:packed});branded.set(packed.read,{root,raw:rawCurrent});read=packed.read;"
+        },
+        {
+          "before": " read=currentRaw(root,read);\n const internal=packedCurrentEpochs.get(read);",
+          "after": " const internal=packedCurrentEpochs.get(read);\n read=currentRaw(root,read);"
+        },
+        {
+          "before": "for(const m of history.product_members)assert.equal(hash(rawCurrent(m.path)),packed.targets.find(t=>t.path===m.path)?.sha256??owned.targets.find(t=>t.path===m.path)?.sha256??service.targets.find(t=>t.path===m.path)?.sha256??config.targets.find(t=>t.path===m.path)?.sha256??(m.path===SNACK_SOURCE?qualified.delta.sha256:m.path===DIALOG_PORTAL_SOURCE?qualified.dialog.delta.sha256:m.path===TOOLTIP_SOURCE?qualified.tooltip.delta.sha256:m.path===MENU_CONTENT_PANEL_SOURCE?qualified.menu.delta.sha256:(nativeSpec.qualify(m)??m).sha256),'changed raw current product/resource '+m.path);",
+          "after": "for(const m of history.product_members){\n  const special=m.path===SNACK_SOURCE?qualified.delta:m.path===DIALOG_PORTAL_SOURCE?qualified.dialog.delta:m.path===TOOLTIP_SOURCE?qualified.tooltip.delta:m.path===MENU_CONTENT_PANEL_SOURCE?qualified.menu.delta:null;\n  const expected=packed.targets.find(t=>t.path===m.path)??owned.targets.find(t=>t.path===m.path)??service.targets.find(t=>t.path===m.path)??config.targets.find(t=>t.path===m.path)??(special?{path:m.path,sha256:special.sha256}:m);\n  const current=nativeSpec.qualify(expected)??expected;\n  assert.equal(hash(rawCurrent(m.path)),current.sha256,'changed raw current product/resource '+m.path);\n }"
         }
       ]
     },
@@ -517,9 +529,9 @@
   "g11_claim": "not-passed",
   "prior_reader_registry": {
     "path": "compatibility/rc/historical-contract-repair-reader-inputs.json",
-    "sha256": "1c3ef83adac1d3e9de8951fbc34dff0596fe4a3c353193bbc28f52e3a48de191",
-    "bytes": 39581,
-    "source_parent": "1cc7981ea42bdf2bf4c2da792b045e15fcbca559"
+    "sha256": "919697c2b238a0cdaf3548eb769f28e4f20f2312d5b86f8fd8922160b2137932",
+    "bytes": 42077,
+    "source_parent": "cece800bf646eaeb3b19332b7110bdf87e11430e"
   },
-  "extension_kind": "cva-reader"
+  "extension_kind": "current-owner-reader"
 }
