@@ -38,6 +38,15 @@ export function readHistoricalContractRepairOwnerMember(root,path){
  if(path==='node_modules/@angular/core/package.json'){
   const bytes=readHistoricalContractRepairMember(root,path);assert.equal(JSON.parse(bytes).name,'@angular/core','wrong root peer manifest identity');return bytes;
  }
+ const sass=path.match(/^node_modules\/sass\/(package\.json|sass\.node\.js|sass\.dart\.js)$/);
+ if(sass){
+  const modules=join(root,'node_modules');assert.ok(lstatSync(modules).isDirectory()&&!lstatSync(modules).isSymbolicLink());
+  const expected=JSON.parse(readEvidenceMember(root,'package.json')).devDependencies.sass;assert.match(expected,/^\d+\.\d+\.\d+$/);
+  const directory=realpathSync(join(modules,'sass')),manifest=join(directory,'package.json');
+  assert.ok(lstatSync(manifest).isFile()&&!lstatSync(manifest).isSymbolicLink());
+  const identity=JSON.parse(readFileSync(manifest));assert.equal(identity.name,'sass');assert.equal(identity.version,expected);
+  const file=join(directory,sass[1]);assert.ok(lstatSync(file).isFile()&&!lstatSync(file).isSymbolicLink());return readFileSync(file);
+ }
  const compiler=path.match(/^node_modules\/@angular\/compiler-cli\/(.+)$/);
  if(compiler){
   let file=realpathSync(join(root,'node_modules/@angular/compiler-cli'));
