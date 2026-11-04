@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "inventory_owner_changed": true,
+  "transitions": [
+    {
+      "path": "scripts/inventory-reference-owner.mjs",
+      "before": {
+        "sha256": "1bb1099ae7d42f8e7e5af52dd767285b8fa9400628d364e8a90dfad944a9e847",
+        "bytes": 18399
+      },
+      "after": {
+        "sha256": "31f145763b1b9ec282989d12b91ddfad18888a2dcf7dac64e4fc30e93926f7dd",
+        "bytes": 19268
+      },
+      "new_literal_edits": [
+        {
+          "before": "import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';",
+          "after": "import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';\nimport {historicalContractRepairReaderSubject} from './historical-contract-repair-readers.mjs';"
+        },
+        {
+          "before": " }\n const assertCurrent=()=>{\n  source.assertCurrent();assert.equal(hash(readEvidenceMember(root,PACKET)),hash(packetRaw));",
+          "after": " }\n const repairs=historicalContractRepairReaderSubject({root});\n for(const path of ['scripts/dialog-title-source-context.mjs','scripts/canonical-tool-source-role.mjs']){\n  assert.equal(references.has(path),false);\n  const prior=scope.input_members.filter(row=>row.path===path);assert.equal(prior.length,1);\n  const current=repairs.qualify(prior[0]);assert.ok(current,'unqualified repaired title measurement tool '+path);\n  assert.deepEqual(repairs.predecessorReference(current),prior[0]);\n  previous.set(path,{...prior[0]});references.set(path,{...current});\n }\n const assertCurrent=()=>{\n  repairs.assertCurrent();source.assertCurrent();assert.equal(hash(readEvidenceMember(root,PACKET)),hash(packetRaw));"
+        },
+        {
+          "before": " assertCurrent();return {references,previous,assertCurrent};",
+          "after": " assertCurrent();return {references,previous,bound:structuredClone(repairs.bound),assertCurrent};"
+        },
+        {
+          "before": " subject.assertCurrent();return refs;",
+          "after": " const seen=new Set(refs.map(ref=>ref.path));\n const provenance=subject.bound.filter(ref=>!seen.has(ref.path));\n subject.assertCurrent();return [...refs,...provenance.map(ref=>({...ref}))];"
+        }
+      ]
+    }
+  ],
+  "reader_registry_sha256": "3af8b447d98b9d0bde687d83399e8c625604dbefa78b00535e142b063d8482f3",
+  "g11_claim": "not-passed"
+}

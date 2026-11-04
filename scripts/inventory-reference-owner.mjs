@@ -16,6 +16,7 @@ import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {prepareInventoryReferenceSourceMetadata,INVENTORY_REFERENCE_LEDGER as LEDGER,INVENTORY_REFERENCE_PATH as INVENTORY} from './inventory-reference-proposal.mjs';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
+import {historicalContractRepairReaderSubject} from './historical-contract-repair-readers.mjs';
 const PATH='scripts/inventory-reference-owner.mjs',OWNER='scripts/packed-upstream-ledger-epoch.mjs';
 const PACKET='compatibility/rc/c04-inventory-owner-inputs.json';
 const PINS={"main":"97db675e4fda1c6dd4a7f056159bd47e2aa963dddb9dff3da1af537ae062d15a","21.x":"0d9dfac3813a6dc60644a090a2173ce56eaed1bcbdb32c2be29ce53f32413cdc"};
@@ -46,11 +47,19 @@ function titleMeasurementCurrentSubject(root,scope,source){
   const old=member===INVENTORY?{sha256:hash(priorInventory),bytes:priorInventory.length}:transition.before;
   assert.equal(prior[0].sha256,old.sha256);assert.equal(prior[0].bytes,old.bytes);
  }
+ const repairs=historicalContractRepairReaderSubject({root});
+ for(const path of ['scripts/dialog-title-source-context.mjs','scripts/canonical-tool-source-role.mjs']){
+  assert.equal(references.has(path),false);
+  const prior=scope.input_members.filter(row=>row.path===path);assert.equal(prior.length,1);
+  const current=repairs.qualify(prior[0]);assert.ok(current,'unqualified repaired title measurement tool '+path);
+  assert.deepEqual(repairs.predecessorReference(current),prior[0]);
+  previous.set(path,{...prior[0]});references.set(path,{...current});
+ }
  const assertCurrent=()=>{
-  source.assertCurrent();assert.equal(hash(readEvidenceMember(root,PACKET)),hash(packetRaw));
+  repairs.assertCurrent();source.assertCurrent();assert.equal(hash(readEvidenceMember(root,PACKET)),hash(packetRaw));
   for(const ref of references.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}
  };
- assertCurrent();return {references,previous,assertCurrent};
+ assertCurrent();return {references,previous,bound:structuredClone(repairs.bound),assertCurrent};
 }
 function originalTitleMeasurement(root,value){
  const path='compatibility/rc/21x-c04-dialog-title-replacement-canonical-qualified-owner-source-measurement.json';
@@ -85,7 +94,9 @@ export function titleMeasurementSourceReferences({root,read,scope}={}){
   assert.ok(historicalMetadataReaders.has(read),'historical source bytes require the private metadata reader');
   assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);return {...ref};
  });
- subject.assertCurrent();return refs;
+ const seen=new Set(refs.map(ref=>ref.path));
+ const provenance=subject.bound.filter(ref=>!seen.has(ref.path));
+ subject.assertCurrent();return [...refs,...provenance.map(ref=>({...ref}))];
 }
 /** Fresh focused orchestration checks, never an Actions or product result. */
 function verifyCurrentWorkflow(root){

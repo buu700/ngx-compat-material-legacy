@@ -15,7 +15,7 @@ SOURCE = 'compatibility/rc/historical-contract-repair-source-inputs.json'
 READERS = 'compatibility/rc/historical-contract-repair-reader-inputs.json'
 SOURCE_PINS = {'21.x': 'c1d7a8762cad7913a5d4ad60863afb506c56c61d27a78c17a3f5372c51cc9303',
                'main': 'cee92383ce1cb2c82b135e2e3b8be0131a46b114d60a521f7e11e4d0bb017191'}
-READER_PINS = {'21.x': 'ccc8a0261cd47a3b55cdea4b3d996d7189ac03288ffdb67f986ff5faebf9e17a',
+READER_PINS = {'21.x': '3af8b447d98b9d0bde687d83399e8c625604dbefa78b00535e142b063d8482f3',
                'main': '702d6f65109297515ee1fc57810eaf8fe0a9f7148742ff8572d90824d57b2944'}
 
 

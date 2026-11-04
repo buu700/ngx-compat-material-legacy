@@ -17,6 +17,7 @@ import {dialogTitleBrowserObservedOkay,validateDialogTitleNative} from '../scrip
 import {requiresHistoricalBehavior,validateHistoricalBehavior} from '../scripts/upstream-historical-behavior-evidence.mjs';
 import {readEvidenceMember} from '../scripts/upstream-packed-run-evidence.mjs';
 import {inspectSnackCurrentDialogContracts} from '../scripts/snack-dom-source-context.mjs';
+import {historicalContractRepairReaderSubject} from '../scripts/historical-contract-repair-readers.mjs';
 const root=process.cwd(),require=createRequire(import.meta.url),hash=raw=>createHash('sha256').update(raw).digest('hex');
 const disk=path=>owner.titleRead(root,path),body=JSON.parse(disk(owner.TITLE_REVIEW)),review=body.reviews[0];
 const ledger=JSON.parse(disk('compatibility/f10/disposition-ledger/ledger.json'));
@@ -58,11 +59,24 @@ for(const [id,edit]of [
 }
 assert.equal(io,0);
 const inspected=owner.inspectTitleSource({root,read:disk});inspected.assertCurrent();
+const repairs=historicalContractRepairReaderSubject({root});
+const repairedTools=['scripts/dialog-title-source-context.mjs','scripts/canonical-tool-source-role.mjs'].map(path=>{
+ const prior=inspected.scope.input_members.filter(ref=>ref.path===path);assert.equal(prior.length,1);
+ const current=repairs.qualify(prior[0]);assert.ok(current);assert.deepEqual(repairs.predecessorReference(current),prior[0]);
+ return {prior:prior[0],current};
+});
+assert.equal(inspected.scope.input_members.length,95);
+const measurementPaths=new Set(inspected.scope.input_members.map(ref=>ref.path));
+const provenance=repairs.bound.filter(ref=>!measurementPaths.has(ref.path));
+assert.equal(provenance.length,16);
+assert.deepEqual(inspected.bound.filter(ref=>provenance.some(member=>member.path===ref.path)),provenance);
 const current=inspectSnackCurrentDialogContracts({root});
 assert.deepEqual(inspected.scope.graph.source_members,[...current.proposed_sources].map(([path,text])=>({path,sha256:hash(text),bytes:Buffer.byteLength(text)})));
 assert.deepEqual(inspected.scope.graph.routes,[...current.routes]);
 assert.equal(owner.sourceOk({...args,root,read:disk}),true,'actual fresh child lifecycle execution');
-const sourceFaults=[];
+const sourceFaults=[],repairSourceFaults=[];
+const repairSourceFaultPaths=['scripts/dialog-title-source-context.mjs','scripts/canonical-tool-source-role.mjs',
+ 'compatibility/rc/historical-contract-repair-reader-inputs.json','scripts/historical-contract-repair-readers.mjs'];
 for(const path of [owner.TITLE_SOURCE_REPORT,
  'projects/ngx-material-legacy/legacy-dialog/dialog-content-directives.ts',
  'projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-state.ts',
@@ -71,22 +85,30 @@ for(const path of [owner.TITLE_SOURCE_REPORT,
  'tests/dialog_initial_focus_runtime_probe.mjs','scripts/dialog-title-canonical-source.mjs',
  'scripts/upstream-dialog-title-native-evidence.mjs','node_modules/@angular/core/package.json',
  'node_modules/typescript/lib/typescript.js',
+ ...repairSourceFaultPaths,
 ]){
  const read=p=>p===path?Buffer.concat([disk(p),Buffer.from('\n')]):disk(p);
  assert.throws(()=>owner.inspectTitleSource({root,read}),undefined,path);
- assert.equal(owner.sourceOk({...args,root,read}),false,'post-success source fault '+path);sourceFaults.push(path);
+ assert.equal(owner.sourceOk({...args,root,read}),false,'post-success source fault '+path);
+ (repairSourceFaultPaths.includes(path)?repairSourceFaults:sourceFaults).push(path);
 }
+assert.deepEqual(repairSourceFaults,repairSourceFaultPaths);
 let late=null;const mutable=path=>path===late?Buffer.concat([disk(path),Buffer.from('\n')]):disk(path);
 const lateSubject=owner.inspectTitleSource({root,read:mutable});
 for(const ref of lateSubject.bound){late=ref.path;assert.throws(()=>lateSubject.assertCurrent(),undefined,ref.path);}late=null;lateSubject.assertCurrent();
 
 // Inject only the child transport to show no successful-result cache survives.
-// Controlled transport uses the current inventory identity, while the authentic
+// Controlled transport uses exactly the admitted current bindings, while the authentic
 // recorded scope remains unchanged. This fixture grants no execution credit.
 const currentScope=structuredClone(inspected.scope);
 for(const ref of currentScope.input_members)if(['testing/legacy-runner/historical-inventory.json','scripts/upstream-dialog-title-native-evidence.mjs'].includes(ref.path)){
  const raw=disk(ref.path);ref.sha256=hash(raw);ref.bytes=raw.length;
 }
+for(const {prior,current}of repairedTools){
+ const index=currentScope.input_members.findIndex(ref=>ref.path===prior.path);assert.ok(index>=0);
+ currentScope.input_members[index]={...prior,...current};
+}
+assert.equal(currentScope.input_members.length,95);repairs.assertCurrent();
 let childCalls=0,childOutput=JSON.stringify(currentScope);
 const controlled={exports:{}};
 runInNewContext(readFileSync(join(root,'scripts/upstream-dialog-title-admission.cjs'),'utf8'),{
@@ -138,6 +160,7 @@ inspected.assertCurrent();
 const report={schema_version:1,result:'pass',node:process.version,current_raw_graph_members:49,
  original_exact_patch_replays:9,actual_fresh_lifecycle_execution:true,
  metadata_faults_rejected:metadataFaults,source_faults_rejected:sourceFaults,
+ repair_source_faults_rejected:repairSourceFaults,
  late_source_faults_rejected:lateSubject.bound.length,uncached_child_calls:childCalls,
  native_observation_faults_rejected:nativeFaults,controlled_native_prerequisite_checks:4,
  actual_native_artifact_browser_floor_or_full_audit_qualified:false,canonical_decisions_changed:0,g11_claim:'not-passed',

@@ -13,6 +13,7 @@ import {createRequire} from 'node:module';
 import {dirname,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {inventoryReferenceOwnerContext,titleMeasurementForHistoricalComparison,titleMeasurementSourceReferences} from '../scripts/inventory-reference-owner.mjs';
+import {historicalContractRepairReaderSubject} from '../scripts/historical-contract-repair-readers.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),read=path=>readFileSync(resolve(root,path));
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const mode=process.argv[2];assert.ok(['--source','--runtime'].includes(mode));assert.equal(process.argv.length,3);
@@ -50,7 +51,7 @@ if(mode==='--source'){
  assert.equal(subject.current_native_packed_or_floor_or_g11_credit,false);
  assert.equal(subject.current_workflow_tests.tests_run,14);assert.equal(subject.current_workflow_tests.skipped,0);
  assert.equal(hash(subject.metadataRead('.github/workflows/ci.yml')),packet.historical_workflow_metadata.before.sha256);
- let titleMetadataControls=0;
+ let titleMetadataControls=0,titleToolMetadataControls=0;
  if(line==='21.x'){
   const path='compatibility/rc/21x-c04-dialog-title-replacement-canonical-qualified-owner-source-measurement.json';
   const expected=JSON.parse(read(path)),actual=structuredClone(expected);
@@ -59,10 +60,25 @@ if(mode==='--source'){
   const nativePath='scripts/upstream-dialog-title-native-evidence.mjs',nativeIndex=actual.input_members.findIndex(ref=>ref.path===nativePath);
   const nativeBefore={...actual.input_members[nativeIndex]},nativeAfter=packet.historical_handler_metadata.find(row=>row.after.path===nativePath).after;
   actual.input_members[nativeIndex]={...nativeBefore,...nativeAfter};
+  const repairs=historicalContractRepairReaderSubject({root});
+  const repairedTools=['scripts/dialog-title-source-context.mjs','scripts/canonical-tool-source-role.mjs'].map(path=>{
+   const prior=expected.input_members.filter(ref=>ref.path===path);assert.equal(prior.length,1);
+   const current=repairs.qualify(prior[0]);assert.ok(current);assert.deepEqual(repairs.predecessorReference(current),prior[0]);
+   const index=actual.input_members.findIndex(ref=>ref.path===path);assert.ok(index>=0);
+   actual.input_members[index]={...prior[0],...current};return {index,prior:prior[0],current};
+  });
+  assert.equal(expected.input_members.length,95);assert.equal(actual.input_members.length,95);
   assert.deepEqual(titleMeasurementForHistoricalComparison({root,actual,expected}),expected);
   const currentRefs=titleMeasurementSourceReferences({root,read,scope:expected});
   assert.deepEqual(currentRefs[index],actual.input_members[index]);
+  assert.deepEqual(currentRefs.slice(0,95),actual.input_members);
+  const measurementPaths=new Set(expected.input_members.map(ref=>ref.path));
+  const provenance=repairs.bound.filter(ref=>!measurementPaths.has(ref.path));
+  assert.equal(provenance.length,16);assert.deepEqual(currentRefs.slice(95),provenance);
+  assert.equal(new Set(currentRefs.map(ref=>ref.path)).size,currentRefs.length);
   const historicalRefs=titleMeasurementSourceReferences({root,read:subject.metadataRead,scope:expected});assert.deepEqual(historicalRefs[index],original);
+  assert.deepEqual(historicalRefs.slice(95),provenance);
+  for(const {index,current}of repairedTools)assert.deepEqual(historicalRefs[index],{...actual.input_members[index],...current});
   // Only the registered internal callback may expose the old metadata binding.
   const oldInventory=subject.metadataRead(inventory),oldRead=path=>path===inventory?Buffer.from(oldInventory):read(path);
   assert.throws(()=>titleMeasurementSourceReferences({root,read:oldRead,scope:expected}));titleMetadataControls++;
@@ -82,6 +98,25 @@ if(mode==='--source'){
   for(const mutate of mutations){const changed=structuredClone(actual);mutate(changed);assert.throws(()=>titleMeasurementForHistoricalComparison({root,actual:changed,expected}));titleMetadataControls++;}
   const changedExpected=structuredClone(expected);changedExpected.result='fail';
   assert.throws(()=>titleMeasurementForHistoricalComparison({root,actual,expected:changedExpected}));titleMetadataControls++;
+  for(const {index,prior,current}of repairedTools){
+   const oldTool=repairs.comparisonBytes(prior);
+   const oldRead=path=>path===prior.path?Buffer.from(oldTool):read(path);
+   assert.throws(()=>titleMeasurementSourceReferences({root,read:oldRead,scope:expected}));titleToolMetadataControls++;
+   const changedRead=path=>path===prior.path?Buffer.concat([read(path),Buffer.from(' ')]):read(path);
+   assert.throws(()=>titleMeasurementSourceReferences({root,read:changedRead,scope:expected}));titleToolMetadataControls++;
+   for(const mutate of [
+    value=>value.input_members[index].path+='-foreign',value=>value.input_members[index].sha256=prior.sha256,
+    value=>value.input_members[index].bytes=prior.bytes,value=>value.input_members[index].sha256='0'.repeat(64),
+    value=>value.input_members[index].bytes=current.bytes+1,value=>value.input_members.splice(index,1),
+    value=>value.input_members.push({...value.input_members[index]}),
+   ]){const changed=structuredClone(actual);mutate(changed);assert.throws(()=>titleMeasurementForHistoricalComparison({root,actual:changed,expected}));titleToolMetadataControls++;}
+  }
+  const unrelatedIndex=actual.input_members.findIndex(ref=>ref.path==='scripts/dialog-title-original-subject.mjs');assert.ok(unrelatedIndex>=0);
+  for(const mutate of [
+   value=>value.input_members[unrelatedIndex].sha256='0'.repeat(64),
+   value=>value.lifecycle.observations[3].cases[2].names=['stale-title'],
+  ]){const changed=structuredClone(actual);mutate(changed);assert.throws(()=>titleMeasurementForHistoricalComparison({root,actual:changed,expected}));titleToolMetadataControls++;}
+  assert.equal(titleToolMetadataControls,20);repairs.assertCurrent();
   assert.deepEqual(JSON.parse(read(path)),expected);assert.deepEqual(actual.input_members[index],{...original,sha256:packet.current_inventory.sha256,bytes:packet.current_inventory.bytes});
   assert.equal(hash(subject.metadataRead('scripts/upstream-dialog-title-admission.cjs')),packet.historical_handler_metadata[0].before.sha256);
  }
@@ -98,6 +133,7 @@ if(mode==='--source'){
   original_owner_functions_preserved:old.statements.filter(ts.isFunctionDeclaration).length,
   added_imports:1,added_public_wrappers:wrapperNames.length,cold_source_mutants_rejected:cold,late_source_mutants_rejected:late,
   fresh_current_workflow_tests:subject.current_workflow_tests.tests_run,title_metadata_controls_rejected:titleMetadataControls,
+  title_tool_metadata_controls_rejected:titleToolMetadataControls,
   old_frame_admission_deferred_to_real_owner:true,unknown_frame_not_translated:true,canonical_ledger_unchanged:true,
   actual_owner_compiler_native_or_full_product_execution:false,g11_claim:'not-passed'}));
 }else{

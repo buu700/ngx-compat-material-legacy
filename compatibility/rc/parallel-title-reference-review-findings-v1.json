@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "task": "parallel-title-reference-review",
+  "status": "static-review-complete",
+  "workspace": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+  "existing_files_edited": false,
+  "runtime_tests_executed": false,
+  "build_install_browser_full_owner_commit_push_or_Actions_executed": false,
+  "evidence_state": {
+    "source_owner_failure": "compatibility/rc/snack-current-owner-repair-21x-owner-v1.json",
+    "source_owner_failure_seconds": 75.701007328,
+    "immutable_measurement": "compatibility/rc/21x-c04-dialog-title-replacement-canonical-qualified-owner-source-measurement.json",
+    "immutable_measurement_sha256": "5911c0c1d0b72c3990a1be798132f970f65bd37aa480da5b00ab93c804d47985",
+    "input_members": 95,
+    "graph_source_members": 49,
+    "lifecycle_input_members": 13,
+    "graph_source_mismatches": 0,
+    "lifecycle_input_mismatches": 0,
+    "input_mismatches": [
+      {
+        "path": "scripts/dialog-title-source-context.mjs",
+        "before": {"sha256": "c099a023155608853aba98582331b4cec27eb75bfb09d5d32839f5b323a96d02", "bytes": 10472},
+        "after": {"sha256": "5586ab7c886f8a4ff91c1788144e6f8c099f587cc2586bc53855b2dee7328439", "bytes": 11415},
+        "already_exactly_owned_by": "historicalContractRepairReaderSubject tool_transitions"
+      },
+      {
+        "path": "scripts/canonical-tool-source-role.mjs",
+        "before": {"sha256": "a1adb7c250ff17b732568df8aaebcb22475f6173f781459d77ebe3f0a42891b1", "bytes": 1039},
+        "after": {"sha256": "a419794f15cc4fd68a7ce25a2caced2755fda2cd623165f529140a4c2fe9680a", "bytes": 5636},
+        "already_exactly_owned_by": "historicalContractRepairReaderSubject tool_transitions"
+      },
+      {
+        "path": "scripts/upstream-dialog-title-native-evidence.mjs",
+        "before": {"sha256": "728262b0b862856e265ff04c7a8a86e2836e6f2a2c1ead25f6115a0096598289", "bytes": 3308},
+        "after": {"sha256": "dc7eb1c3759fec7f439cc2c9707b2e592d894e4138961aacd8ac851f7d86f469", "bytes": 3494},
+        "already_advanced_by": "titleMeasurementCurrentSubject"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before": {"sha256": "2698f53be977b484aec2aaf3f9f052fc9b0bc4cd28632acc2ef5481b3ca4f724", "bytes": 90777},
+        "after": {"sha256": "810b917ff7702ff8e759291b5265d3060edb39866bc691ed0700ee6158a02659", "bytes": 102329},
+        "already_advanced_by": "titleMeasurementCurrentSubject"
+      }
+    ]
+  },
+  "diagnosis": {
+    "cause": "The historical report is authentic. Its input_members still carry two historical tool references whose exact successors are already authenticated elsewhere, but titleMeasurementCurrentSubject advances only inventory and native-handler metadata. titleMeasurementSourceReferences returns both tool references unchanged; inspectTitleSource.assertCurrent then compares physical current bytes to the old hashes.",
+    "first_failure": "scripts/upstream-dialog-title-admission.cjs:75",
+    "caller": "scripts/packed-upstream-ledger-epoch.mjs:395",
+    "fresh_lifecycle_not_reached_by_failed_invocation": true,
+    "second_latent_failure": "scripts/canonical-tool-source-role.mjs would fail after only the first tool hash is repaired.",
+    "not_a_product_source_delta": true
+  },
+  "proposed_boundary": {
+    "implementation_owner": "parent task",
+    "target": "21.x scripts/inventory-reference-owner.mjs:titleMeasurementCurrentSubject",
+    "description": "Use historicalContractRepairReaderSubject directly with physical root reads. For exactly scripts/dialog-title-source-context.mjs and scripts/canonical-tool-source-role.mjs, require one original input row, qualify that original reference, require a non-null successor, and verify predecessorReference(successor) is deeply identical to the original reference. Add those successor/original pairs to the existing references/previous maps. Invoke repairSubject.assertCurrent in the subject guard.",
+    "why_finite": "The report supplies the immutable before references; the already-pinned reader manifest supplies and derives the exact after references by literal replay. No expected reference is calculated from candidate bytes, and no arbitrary repaired tool is selected.",
+    "preserve": [
+      "The frozen title report and its hash",
+      "All 95 input members, their order, and exact complete-report comparison",
+      "All graph and lifecycle facts",
+      "Raw current product and tool callbacks",
+      "The private WeakSet restriction on historical metadata readers",
+      "Fresh child lifecycle execution and post-child source guard",
+      "The six engine/runtime native cases and 42 observations per case",
+      "All native, packed, floor, full-audit and G11 non-qualification flags"
+    ],
+    "manifest_constraints": "Extend only the inventory-reference-owner transition by exact appended literals under a separately recognized finite extension; preserve all 15 rows, unchanged before images, and unrelated rows. Do not reuse portal-reader semantics to permit a different changed row or refresh old measurement bytes.",
+    "main_code_change_needed": false
+  },
+  "cycle_review": {
+    "direct_repair_reader_import": "Static relative literal import/require traversal reaches five local files and does not reach inventory-reference-owner.mjs, dialog-title-source-context.mjs or canonical-tool-source-role.mjs. No new cycle was found through this direct import.",
+    "avoid": "Do not invoke dialogTitleReaderSubject to qualify these two references. It enters canonical-tool-source-role.mjs, which imports the packed ledger owner, while the packed owner is already constructing the current title context.",
+    "self_binding": "The repair reader validates inventory-reference-owner as bytes through the finite manifest. It does not execute that tool as part of the qualification; the guard therefore does not recursively call the title measurement helper."
+  },
+  "guard_scope_caveat": {
+    "observation": "titleMeasurementSourceReferences returns an array of 95 references, not the subject guard. inspectTitleSource.assertCurrent rehashes that array. It catches later bytes changes to both newly advanced tool paths, but does not by itself retain guards for every transitive provenance input of repairSubject.",
+    "current_owner_protection": "packed-upstream-ledger-epoch context already includes repairs.bound and repairs.assertCurrent in assertTools, covering late manifest and repaired-reader mutations during the real owner run.",
+    "recommendation": "Test late target bytes at the source-helper boundary and late provenance at the outer epoch boundary. If the standalone source/native API is intended to own late provenance identity too, explicitly retain its subject guard there rather than claiming the existing 95-reference loop covers it."
+  },
+  "recommended_controls_not_executed": [
+    "One fresh actual title source execution reaches the child and deeply matches the historical report after only the four explicitly qualified reference transitions.",
+    "For each of the two newly advanced tool paths, an unregistered callback supplying old bytes, arbitrary changed bytes, or wrong bytes length rejects before admission.",
+    "After successful inspectTitleSource, tamper each new tool path and require returned assertCurrent to reject; retain the existing all-bound-reference late loop.",
+    "For each new input row, revert hash only, revert length only, supply unknown hash, remove the row, duplicate the row, and change its path; require full-report comparison to reject.",
+    "Change an unrelated tool reference and require rejection, proving the bridge did not turn into wildcard repair qualification.",
+    "Preserve graph, lifecycle-observation, line, fresh_lifecycle_executed, native-credit and G11 mutation rejections.",
+    "After a successful owner construction, mutate repair manifest, inventory-reference-owner source, and each two-path tool source and require outer epoch assertCurrent to reject.",
+    "Verify a registered historical metadata reader still returns old inventory/native bindings only where its existing implementation owns them; ordinary public readers stay raw.",
+    "Keep the immutable report byte-for-byte unchanged and keep native-gate rejection when only source evidence exists."
+  ],
+  "existing_test_fixture_changes_needed": [
+    {
+      "path": "tests/inventory_reference_owner_probe.mjs",
+      "lines": "55-62",
+      "change": "Its synthetic actual model currently advances inventory/native only. Add exactly the two authenticated manifest successors and corresponding per-row mutation controls."
+    },
+    {
+      "path": "tests/dialog_title_canonical_admission_probe.mjs",
+      "lines": "67-91",
+      "change": "Add both tool paths to the explicit cold-source fault list. Its late loop already covers all returned bindings. Extend controlled child currentScope with the two exact successors, while preserving the second-call lifecycle mutation and childCalls equals 2 check."
+    }
+  ],
+  "verification_limits": "Only static reads, direct JSON/hash comparison, and relative import/require graph inspection were performed. No source qualifier, lifecycle, browser, owner or helper test was executed by this review."
+}
