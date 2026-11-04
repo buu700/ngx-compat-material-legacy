@@ -17,8 +17,8 @@ const HANDLER = 'scripts/upstream-base-class-removal-admission.cjs';
 const SHA = '55f9618b687fc0da4743a3cf27e113ceb837e151';
 const PREFIX = 'compatibility/rc/21x-base-class-removal-admission-';
 const SOURCE = 'compatibility/rc/21x-base-class-removal-source-';
-const REVIEW = PREFIX + 'individual-review.json';
-const REVIEW_HASH = '7bcfeb099e643da1c0099d4a1773f612d2e4b134d6e85f0679c5b4596f30b762';
+const REVIEW = PREFIX + 'individual-review-v6.json';
+const REVIEW_HASH = '87c1352fefc3b5db4e26c559184afb7d2a620a98e5b6b844ca1df6864e0d7f9e';
 const KIND = 'individual-historical-base-class-removal-source-review';
 const SCOPE = 'base_class_removal_source_scope';
 const hash = raw => createHash('sha256').update(raw).digest('hex');
@@ -138,6 +138,7 @@ function inspectSource(request = {}) {
   assert.deepEqual(originalFacts.files.map(row => row.path), body.complete_original_paths);
   assert.deepEqual(originalFacts.files.filter(row => row.path.startsWith('src/')).map(row => row.path), body.frozen_seed_paths);
   assert.equal(original.diff_sha256, body.diff_sha256);
+  assert.equal(original.diff, read(body.patch_file).toString(), 'complete original patch differs from authenticated original');
   const keys = {original: 'original-qualified', journal: 'review-progress-tabs-tooltip', controls: 'owned-control-member-review',
     overlays: 'owned-overlay-member-review', dialog: 'owned-dialog-member-review', unmatched: 'unmatched-declarations-assessed',
     bindings: 'public-binding-qualified', rx: 'rx-signature-qualified', error: 'error-harness-proposal-qualified',

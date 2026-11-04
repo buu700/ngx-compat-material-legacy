@@ -32,16 +32,16 @@ class BaseClassRemovalAdmissionTest(unittest.TestCase):
         self.assertEqual(report['request_entry_replacement_rejections'], 1)
         self.assertEqual(report['explicit_null_proof_rejections'], 1)
         self.assertEqual(report['historical_acquisition_metadata_successor_cases'], 1)
-        self.assertEqual(report['cold_physical_source_rejections'], 18)
-        self.assertEqual(report['late_physical_source_rejections'], 18)
+        self.assertEqual(report['cold_physical_source_rejections'], 19)
+        self.assertEqual(report['late_physical_source_rejections'], 19)
         self.assertEqual(report['projection_rejections'], 8)
-        self.assertEqual(report['bound'], 1118)
+        self.assertEqual(report['bound'], 1119)
         self.assertEqual(report['canonical_files_changed'], 0)
         self.assertFalse(report['full_owner_integration_qualified'])
         self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified'])
 
     def test_independent_unapplied_proposal_images(self):
-        packet = json.loads((ROOT / (PREFIX + 'canonical-proposal-v5-final.json')).read_bytes())
+        packet = json.loads((ROOT / (PREFIX + 'canonical-proposal-v6.json')).read_bytes())
 
         def image(key, content):
             ref = packet[key]

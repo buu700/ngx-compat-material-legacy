@@ -152,7 +152,7 @@ const sourceControls = [admission.BASE_CLASS_REMOVAL_REVIEW,
   'projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts',
   'projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts',
   'compatibility/rc/api/signature-differences.json',
-  'node_modules/@angular/material/types/form-field-testing.d.ts',
+  'node_modules/@angular/material/types/form-field-testing.d.ts', body.patch_file,
 ];
 for (const path of sourceControls) assert.ok(current.bound.some(ref => ref.path === path), 'unbound control ' + path);
 for (const path of sourceControls) {
