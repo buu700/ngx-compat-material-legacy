@@ -45,6 +45,31 @@
           ]
         },
         {
+          "path": "scripts/browser-reference-proposal.mjs",
+          "before": {
+            "path": "scripts/browser-reference-proposal.mjs",
+            "sha256": "600a430a33955755561f018f46288acd4beed4b9ad4ca6b4daf8aa7cb5bf1d50",
+            "bytes": 13492
+          },
+          "after": {
+            "path": "scripts/browser-reference-proposal.mjs",
+            "sha256": "167ae69e2f1b7fedf637fa16d4294c47ea70500c32928165225809d5703a33b7",
+            "bytes": 13682
+          },
+          "edits": [
+            {
+              "offset": 9597,
+              "before": " const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024,timeout:180000}));\n",
+              "after": " const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER,'--source-metadata'],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024,timeout:180000}));\n"
+            },
+            {
+              "offset": 10274,
+              "before": " assert.equal(verifier.cold_source_faults_rejected,verifier.bound_current_paths);assert.equal(verifier.late_source_faults_rejected,verifier.bound_current_paths);assert.equal(verifier.title_contract_negative_controls,47);assert.equal(verifier.whole_current_dialog_probe_collaborator_runs.length,8);\n",
+              "after": " assert.equal(verifier.source_execution_mode,'source-metadata');assert.equal(verifier.full_source_fault_lifetimes_executed,false);\n for(const key of ['cold_source_faults_rejected','late_source_faults_rejected','cold_source_fault_paths_rejected','late_source_fault_paths_rejected'])assert.equal(Object.hasOwn(verifier,key),false);\n assert.equal(verifier.title_contract_negative_controls,47);assert.equal(verifier.whole_current_dialog_probe_collaborator_runs.length,8);\n"
+            }
+          ]
+        },
+        {
           "path": "scripts/browser-reference-source.mjs",
           "before": {
             "path": "scripts/browser-reference-source.mjs",
@@ -103,8 +128,8 @@
           },
           "after": {
             "path": "scripts/checker-reference-proposal.mjs",
-            "sha256": "46178033f750eb04cf4343509749e3618c9b9683d7eca0db9630f88ffcf66789",
-            "bytes": 13477
+            "sha256": "089a40675b0bb73e32fd286918eb7c722a1a078fcf47b745de76b71c8a523b28",
+            "bytes": 13814
           },
           "edits": [
             {
@@ -116,6 +141,11 @@
               "offset": 7791,
               "before": "",
               "after": " const actual=packedUpstreamLedgerCurrentSourceLane({root,read});\n"
+            },
+            {
+              "offset": 9657,
+              "before": " const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER,'--metadata'],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024,timeout:120000}));\n",
+              "after": " const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER,'--source-metadata'],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024,timeout:120000}));\n assert.equal(verifier.source_execution_mode,'source-metadata');assert.equal(verifier.full_source_fault_lifetimes_executed,false);\n for(const key of ['cold_source_faults_rejected','late_source_faults_rejected','cold_source_fault_paths_rejected','late_source_fault_paths_rejected'])assert.equal(Object.hasOwn(verifier,key),false);\n"
             },
             {
               "offset": 10798,
@@ -261,6 +291,36 @@
               "offset": 80929,
               "before": "",
               "after": "\n/** Physical proof reads; preserve a registered roster reader on the public route. */\nfunction baseClassRemovalProofContext(root,publicRead){\n const actual=currentAuthoredRosterRawRead({root,read:publicRead});\n const boundary=canonicalSourcePhysicalBoundary({root,read:actual}),read=boundary.read;\n const selected=baseClassRemovalOwnerContext({root,read});\n if(actual===publicRead)return {selected:bindSourceMetadata(root,selected,read,'base_class'),boundary};\n // Only the roster module's private registration can select this branch.\n // Its historical JSON views remain on publicRead, never the proof reader.\n const roster=currentAuthoredRosterSourceSubject({root,read});\n const assertCurrent=()=>{selected.assertCurrent();roster.assertCurrent();selected.assertCurrent();boundary.assertPhysical();};\n const refs=new Map([...selected.bound,...roster.bound].map(ref=>[ref.path,{...ref}]));\n const combined={...selected,assertCurrent,bound:[...refs.values()],wrapPrepared:prior=>{\n  const prepared=selected.wrapPrepared(prior),bound=new Map(prepared.bound);for(const ref of refs.values())bound.set(ref.path,ref.sha256);\n  const native=prepared.native_spec_source,nativeBound=native.bound.map(ref=>{const actual=refs.get(ref.path);return actual?{...ref,sha256:actual.sha256,bytes:actual.bytes}:{...ref};});\n  return {...prepared,bound,native_spec_source:{...native,bound:nativeBound}};\n }};\n assertCurrent();return {selected:bindSourceMetadata(root,combined,read,'base_class'),boundary};\n}\n\n/** Exact terminal base-class source decision; all preceding owners still run. */\nexport function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){\n read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});\n const {selected,boundary}=baseClassRemovalProofContext(root,read);\n const prior=prepareBeforeBaseClassRemovalLedger({root,read:selected.metadataRead}),prepared=selected.wrapPrepared(prior);\n const guarded=guard=>()=>{selected.assertCurrent();guard();selected.assertCurrent();boundary.assertPhysical();};\n const assertCurrent=guarded(prepared.assertCurrent);assertCurrent();\n return {...prepared,assertCurrent,\n  prior_metadata_assert_current:guarded(prepared.prior_metadata_assert_current),\n  native_spec_source:{...prepared.native_spec_source,assertCurrent:guarded(prepared.native_spec_source.assertCurrent)},\n  base_class_removal_stage:{...prepared.base_class_removal_stage,assertCurrent:guarded(prepared.base_class_removal_stage.assertCurrent)}};\n}\nexport function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={}){\n read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});\n const publicRead=read,{selected,boundary}=baseClassRemovalProofContext(root,read);\n const prior=epochBeforeBaseClassRemovalLedger({root,read:selected.metadataRead});\n const assertCurrent=()=>{selected.assertCurrent();prior.assertCurrent();selected.assertCurrent();boundary.assertPhysical();};\n const historical=path=>{if(path!==LEDGER)return publicRead(path);assertCurrent();const raw=prior.read(path);assertCurrent();return raw;};\n readers.set(historical,{root:resolve(root),raw:publicRead});assertCurrent();\n return {...prior,read:historical,raw:publicRead,assertCurrent,\n  individual_decisions_applied:prior.individual_decisions_applied+(selected.applied?1:0),\n  base_class_removal_source_decisions_applied:selected.applied?1:0,\n  current_tool_bytes_exposed_without_projection:true,current_native_packed_or_floor_or_g11_credit:false};\n}\nexport function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root),prior}={}){\n read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.qualifyCanonicalToolReference({root,read,prior});\n let role;try{role=read(METADATA_ROLE);}catch{/* Public readers have no private comparison capability. */}\n if(role===metadataToken)return qualifyBeforeBaseClassRemovalToolReference({root,read,prior});\n const {selected,boundary}=baseClassRemovalProofContext(root,read);\n const result=qualifyBeforeBaseClassRemovalToolReference({root,read:selected.metadataRead,prior});if(!result){boundary.assertPhysical();return result;}\n const bound=new Map(result.bound.map(ref=>[ref.path,{...ref}]));for(const ref of selected.bound)bound.set(ref.path,{...ref});\n const raw=boundary.read(result.reference.path),reference={...result.reference,sha256:hash(raw),bytes:raw.length};\n const assertCurrent=()=>{selected.assertCurrent();result.assertCurrent();selected.assertCurrent();boundary.assertPhysical();};assertCurrent();\n return {...result,reference,bound:[...bound.values()],assertCurrent,base_class_removal_source_scope:true};\n}\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/rc-verify.py",
+          "before": {
+            "path": "scripts/rc-verify.py",
+            "sha256": "52fd22f973ae5e7bbbab164838121b74f0fb779bcb23dbdd8b148b86bbd9f370",
+            "bytes": 90680
+          },
+          "after": {
+            "path": "scripts/rc-verify.py",
+            "sha256": "c8a2ed687192174f13050ea6db0088b45738908edb1a7fd55daa002d68917ca0",
+            "bytes": 91438
+          },
+          "edits": [
+            {
+              "offset": 4187,
+              "before": "",
+              "after": "    \"scripts/check-source-contract-regressions.py\": \"source-contract-regressions\",\n"
+            },
+            {
+              "offset": 26950,
+              "before": "",
+              "after": "\n\ndef run_source_contract_regressions(out_dir, run_id, line, results, implemented_ran):\n    \"\"\"Run complete source fault suites once for this RC invocation.\"\"\"\n    code = run_node(\"scripts/check-source-contract-regressions.py\", [])\n    write_check_report(\n        out_dir, run_id, line, \"source-contract-regressions\", exit_code=code,\n        limitations=[\"Source fault controls do not qualify product, browser, security, or full G11 acceptance.\"],\n    )\n    results[\"source-contract-regressions\"] = \"pass\" if code == 0 else \"fail\"\n    implemented_ran.append(\"source-contract-regressions\")\n"
+            },
+            {
+              "offset": 83161,
+              "before": "",
+              "after": "    run_source_contract_regressions(out_dir, run_id, line, results, implemented_ran)\n\n"
             }
           ]
         },
@@ -465,6 +525,31 @@
           ]
         },
         {
+          "path": "tests/browser_reference_source_probe.mjs",
+          "before": {
+            "path": "tests/browser_reference_source_probe.mjs",
+            "sha256": "cca4093034ebb6932fc7e822e70e684413b55d8fff12b40dcccbfdc07713a0e7",
+            "bytes": 7558
+          },
+          "after": {
+            "path": "tests/browser_reference_source_probe.mjs",
+            "sha256": "66fd7d05b55ab8ad1a36f951e3689923645b3561dcc7733fee1eed962f589a92",
+            "bytes": 8252
+          },
+          "edits": [
+            {
+              "offset": 1171,
+              "before": "let tamper=null;const read=path=>{const raw=readCheckerOwnerMember(root,path);return path===tamper?Buffer.concat([raw,Buffer.from(' ')]):raw;};\nconst before=read('compatibility/f10/disposition-ledger/ledger.json'),subject=inspectBrowserReferenceSource({root,read});\nlet cold=0,late=0;\nfor(const ref of subject.bound){tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+ref.path);late++;tamper=null;}\nfor(const ref of subject.bound){tamper=ref.path;assert.throws(()=>inspectBrowserReferenceSource({root,read}),undefined,'cold '+ref.path);cold++;tamper=null;}\n",
+              "after": "const args=process.argv.slice(2),sourceOnly=args[0]==='--source-metadata';if(sourceOnly)args.shift();\n assert.ok(args.length<=1,'expected at most one report output path');\n if(args[0]?.startsWith('-'))assert.fail('unknown option '+args[0]);\n let tamper=null;const read=path=>{const raw=readCheckerOwnerMember(root,path);return path===tamper?Buffer.concat([raw,Buffer.from(' ')]):raw;};\n const before=read('compatibility/f10/disposition-ledger/ledger.json'),subject=inspectBrowserReferenceSource({root,read});\n let cold=0,late=0;const coldPaths=[],latePaths=[];\n if(!sourceOnly){\n  for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+ref.path);late++;latePaths.push(ref.path);tamper=null;}\n  for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>inspectBrowserReferenceSource({root,read}),undefined,'cold '+ref.path);cold++;coldPaths.push(ref.path);tamper=null;}\n  assert.deepEqual(latePaths,subject.bound.map(ref=>ref.path));assert.deepEqual(coldPaths,subject.bound.map(ref=>ref.path));\n }\n\n"
+            },
+            {
+              "offset": 7089,
+              "before": "const report={...subject.report,cold_source_faults_rejected:cold,late_source_faults_rejected:late,bound_current_paths:subject.bound.length,generated_current_lab_sources:generated,title_contract_negative_controls:predicateControls,whole_current_dialog_probe_collaborator_runs:runs,actual_angular_DOM_browser_or_packed_execution:false};\nif(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\\n',{flag:'wx'});console.log(JSON.stringify(report));\n",
+              "after": "const report={...subject.report,source_execution_mode:sourceOnly?'source-metadata':'complete-regression',full_source_fault_lifetimes_executed:!sourceOnly,bound_current_paths:subject.bound.length,\n ...(sourceOnly?{}:{cold_source_faults_rejected:cold,late_source_faults_rejected:late,cold_source_fault_paths_rejected:coldPaths,late_source_fault_paths_rejected:latePaths}),\n generated_current_lab_sources:generated,title_contract_negative_controls:predicateControls,whole_current_dialog_probe_collaborator_runs:runs,actual_angular_DOM_browser_or_packed_execution:false};\nif(args[0])writeFileSync(args[0],JSON.stringify(report,null,2)+'\\n',{flag:'wx'});console.log(JSON.stringify(report));\n"
+            }
+          ]
+        },
+        {
           "path": "tests/checker_reference_source_probe.mjs",
           "before": {
             "path": "tests/checker_reference_source_probe.mjs",
@@ -473,8 +558,8 @@
           },
           "after": {
             "path": "tests/checker_reference_source_probe.mjs",
-            "sha256": "adf6aca0164782e24841c1a808268945bfe60cd03459fe5c28873496f96ffc4b",
-            "bytes": 17415
+            "sha256": "011a1656cfef7bf63c6b3afd5b490cf3452a92aa99e4243905db43569ca86e8e",
+            "bytes": 18113
           },
           "edits": [
             {
@@ -486,6 +571,16 @@
               "offset": 11090,
               "before": "",
               "after": "  if(registry.sourceContractDefinitions.some(row=>row.sha==='55f9618b687fc0da4743a3cf27e113ceb837e151'))expectedAdded.push({sha:'55f9618b687fc0da4743a3cf27e113ceb837e151',proof_kind:'individual-historical-base-class-removal-source-review',scope_key:'base_class_removal_source_scope',module:'upstream-base-class-removal-admission.cjs'});\n"
+            },
+            {
+              "offset": 16060,
+              "before": " const args=process.argv.slice(2),metadata=args[0]==='--metadata';if(metadata)args.shift();assert.ok(args.length<=1);\n",
+              "after": " const args=process.argv.slice(2);let metadata=false,sourceOnly=false;\n if(args[0]==='--metadata'){metadata=true;args.shift();}\n else if(args[0]==='--source-metadata'){metadata=true;sourceOnly=true;args.shift();}\n assert.ok(args.length<=1,'expected at most one report output path');\n if(args[0]?.startsWith('-'))assert.fail('unknown option '+args[0]);\n"
+            },
+            {
+              "offset": 16401,
+              "before": " const subject=await inspect({read});let cold=0,late=0;\n for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+tamper);late++;tamper=null;}\n for(const ref of subject.bound){tamper=ref.path;await assert.rejects(inspect({read}),undefined,'cold '+tamper);cold++;tamper=null;}\n subject.assertCurrent();assert.ok(before.equals(disk(LEDGER)));const report={...subject.report,cold_source_faults_rejected:cold,late_source_faults_rejected:late,bound_current_paths:subject.bound.length};\n",
+              "after": " const subject=await inspect({read});let cold=0,late=0;const coldPaths=[],latePaths=[];\n if(!sourceOnly){\n  for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+tamper);late++;latePaths.push(ref.path);tamper=null;}\n  for(const ref of subject.bound){tamper=ref.path;await assert.rejects(inspect({read}),undefined,'cold '+tamper);cold++;coldPaths.push(ref.path);tamper=null;}\n  assert.deepEqual(latePaths,subject.bound.map(ref=>ref.path));assert.deepEqual(coldPaths,subject.bound.map(ref=>ref.path));\n }\n subject.assertCurrent();assert.ok(before.equals(disk(LEDGER)));\n const report={...subject.report,source_execution_mode:sourceOnly?'source-metadata':'complete-regression',full_source_fault_lifetimes_executed:!sourceOnly,bound_current_paths:subject.bound.length,\n  ...(sourceOnly?{}:{cold_source_faults_rejected:cold,late_source_faults_rejected:late,cold_source_fault_paths_rejected:coldPaths,late_source_fault_paths_rejected:latePaths})};\n"
             }
           ]
         },
@@ -1433,14 +1528,119 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "8223403ca8f5c7dfa617c3aadd38f44c1d2a92f99b43b81518fe88392d3928d4",
-          "bytes": 15982
+          "sha256": "d50222d5bdfcd73445c92b1c2b537045240304c242155a8061606a4680a24926",
+          "bytes": 20264
+        },
+        {
+          "path": "scripts/check-source-contract-regressions.py",
+          "sha256": "660cc3646469243efc42c808661ce613370ac33beefb29b8cd90677ef5350d24",
+          "bytes": 14216
+        },
+        {
+          "path": "scripts/rc_acceptance.py",
+          "sha256": "22f63424d318d9aa184b139afbc99bcda2d08322c48292b20f57c66c6b240b72",
+          "bytes": 30941
+        },
+        {
+          "path": "compatibility/rc/matrices/full-verify.json",
+          "sha256": "a169321789f11e9aab0bb8d9b6f18060c994408878dae63b96b19be5d9f5355c",
+          "bytes": 638195
+        },
+        {
+          "path": "tests/test_source_contract_regressions.py",
+          "sha256": "e33c81254fd0c499cf3784199b3327656c659fdcaad40ca7875e1aaffa294b7e",
+          "bytes": 6162
+        },
+        {
+          "path": "tests/test_source_contract_regression_gate.py",
+          "sha256": "488a6608b2a26a77cf2e9549a3119e499576a34c421f8590f7a665c6729c1482",
+          "bytes": 11145
+        },
+        {
+          "path": "tests/test_rc_acceptance.py",
+          "sha256": "6a2815b455d1e7d153248cdd171dbf278ce30bb8284989ea91651ce24c680a37",
+          "bytes": 25499
+        },
+        {
+          "path": "compatibility/rc/c04-browser-reference-source-inputs.json",
+          "sha256": "5a8bd910e0d9a64a73558b5da0f48abdf8546b455d8db0fcb921678a0ee0a5ae",
+          "bytes": 115478
         }
       ]
     },
     "main": {
       "source_parent": "59ba0e2aa8b76f71b472ea2831273e44e44b5b57",
       "updates": [
+        {
+          "path": "scripts/browser-reference-proposal.mjs",
+          "before": {
+            "path": "scripts/browser-reference-proposal.mjs",
+            "sha256": "600a430a33955755561f018f46288acd4beed4b9ad4ca6b4daf8aa7cb5bf1d50",
+            "bytes": 13492
+          },
+          "after": {
+            "path": "scripts/browser-reference-proposal.mjs",
+            "sha256": "167ae69e2f1b7fedf637fa16d4294c47ea70500c32928165225809d5703a33b7",
+            "bytes": 13682
+          },
+          "edits": [
+            {
+              "offset": 9597,
+              "before": " const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024,timeout:180000}));\n",
+              "after": " const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER,'--source-metadata'],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024,timeout:180000}));\n"
+            },
+            {
+              "offset": 10274,
+              "before": " assert.equal(verifier.cold_source_faults_rejected,verifier.bound_current_paths);assert.equal(verifier.late_source_faults_rejected,verifier.bound_current_paths);assert.equal(verifier.title_contract_negative_controls,47);assert.equal(verifier.whole_current_dialog_probe_collaborator_runs.length,8);\n",
+              "after": " assert.equal(verifier.source_execution_mode,'source-metadata');assert.equal(verifier.full_source_fault_lifetimes_executed,false);\n for(const key of ['cold_source_faults_rejected','late_source_faults_rejected','cold_source_fault_paths_rejected','late_source_fault_paths_rejected'])assert.equal(Object.hasOwn(verifier,key),false);\n assert.equal(verifier.title_contract_negative_controls,47);assert.equal(verifier.whole_current_dialog_probe_collaborator_runs.length,8);\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/browser-reference-source.mjs",
+          "before": {
+            "path": "scripts/browser-reference-source.mjs",
+            "sha256": "59f2ac538149e0d9b2176c231a97147862881fb19b46768a5a4e450d66f9fe38",
+            "bytes": 10443
+          },
+          "after": {
+            "path": "scripts/browser-reference-source.mjs",
+            "sha256": "26040046f029744629276a840865b88dc03f821db8d60bb60738ee168f96626f",
+            "bytes": 10469
+          },
+          "edits": [
+            {
+              "offset": 1916,
+              "before": "  ref=tools.qualifyReference(ref);\n",
+              "after": "  if(ref.sha256!==undefined)ref=tools.qualifyReference(ref);\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/checker-reference-proposal.mjs",
+          "before": {
+            "path": "scripts/checker-reference-proposal.mjs",
+            "sha256": "22c49ba434ee0b1253ad2815b77510adb8259cc3f307005f6b66b73e522502ac",
+            "bytes": 13095
+          },
+          "after": {
+            "path": "scripts/checker-reference-proposal.mjs",
+            "sha256": "71a74b6ab0e38219994eb3b6eaaf6828d0d997e648034732ae46bb39cb8b48bb",
+            "bytes": 13456
+          },
+          "edits": [
+            {
+              "offset": 8137,
+              "before": "  const qualified=tools.qualifyReference({path,sha256:digest,...(bytes===undefined?{}:{bytes})});digest=qualified.sha256;bytes=qualified.bytes;\n",
+              "after": "  if(digest!==undefined){const qualified=tools.qualifyReference({path,sha256:digest,...(bytes===undefined?{}:{bytes})});digest=qualified.sha256;bytes=qualified.bytes;}\n"
+            },
+            {
+              "offset": 9657,
+              "before": " const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER,'--metadata'],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024,timeout:120000}));\n",
+              "after": " const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER,'--source-metadata'],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024,timeout:120000}));\n assert.equal(verifier.source_execution_mode,'source-metadata');assert.equal(verifier.full_source_fault_lifetimes_executed,false);\n for(const key of ['cold_source_faults_rejected','late_source_faults_rejected','cold_source_fault_paths_rejected','late_source_fault_paths_rejected'])assert.equal(Object.hasOwn(verifier,key),false);\n"
+            }
+          ]
+        },
         {
           "path": "scripts/historical-contract-repair-readers.mjs",
           "before": {
@@ -1458,6 +1658,91 @@
               "offset": 4846,
               "before": " if(existsSync(join(root,'compatibility/rc/current-sass-tool-reference-inputs-v2.json')))return currentSassToolReferenceSubject(args);\n",
               "after": " if(existsSync(join(root,'compatibility/rc/parent-base-class-tool-successor-inputs-v3.json'))||existsSync(join(root,'compatibility/rc/current-sass-tool-reference-inputs-v2.json')))return currentSassToolReferenceSubject(args);\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/rc-verify.py",
+          "before": {
+            "path": "scripts/rc-verify.py",
+            "sha256": "54fc3bc163064ff1df4003350c84f9b688582a34273e4d2573d66da3acb46882",
+            "bytes": 96185
+          },
+          "after": {
+            "path": "scripts/rc-verify.py",
+            "sha256": "dc154eea8a34a13aeb49dca78fac4cd4c3c4418c53a30fbdc9f2e807afd9ccdc",
+            "bytes": 96943
+          },
+          "edits": [
+            {
+              "offset": 4187,
+              "before": "",
+              "after": "    \"scripts/check-source-contract-regressions.py\": \"source-contract-regressions\",\n"
+            },
+            {
+              "offset": 26703,
+              "before": "",
+              "after": "\n\ndef run_source_contract_regressions(out_dir, run_id, line, results, implemented_ran):\n    \"\"\"Run complete source fault suites once for this RC invocation.\"\"\"\n    code = run_node(\"scripts/check-source-contract-regressions.py\", [])\n    write_check_report(\n        out_dir, run_id, line, \"source-contract-regressions\", exit_code=code,\n        limitations=[\"Source fault controls do not qualify product, browser, security, or full G11 acceptance.\"],\n    )\n    results[\"source-contract-regressions\"] = \"pass\" if code == 0 else \"fail\"\n    implemented_ran.append(\"source-contract-regressions\")\n"
+            },
+            {
+              "offset": 88325,
+              "before": "",
+              "after": "    run_source_contract_regressions(out_dir, run_id, line, results, implemented_ran)\n\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/browser_reference_source_probe.mjs",
+          "before": {
+            "path": "tests/browser_reference_source_probe.mjs",
+            "sha256": "cca4093034ebb6932fc7e822e70e684413b55d8fff12b40dcccbfdc07713a0e7",
+            "bytes": 7558
+          },
+          "after": {
+            "path": "tests/browser_reference_source_probe.mjs",
+            "sha256": "66fd7d05b55ab8ad1a36f951e3689923645b3561dcc7733fee1eed962f589a92",
+            "bytes": 8252
+          },
+          "edits": [
+            {
+              "offset": 1171,
+              "before": "let tamper=null;const read=path=>{const raw=readCheckerOwnerMember(root,path);return path===tamper?Buffer.concat([raw,Buffer.from(' ')]):raw;};\nconst before=read('compatibility/f10/disposition-ledger/ledger.json'),subject=inspectBrowserReferenceSource({root,read});\nlet cold=0,late=0;\nfor(const ref of subject.bound){tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+ref.path);late++;tamper=null;}\nfor(const ref of subject.bound){tamper=ref.path;assert.throws(()=>inspectBrowserReferenceSource({root,read}),undefined,'cold '+ref.path);cold++;tamper=null;}\n",
+              "after": "const args=process.argv.slice(2),sourceOnly=args[0]==='--source-metadata';if(sourceOnly)args.shift();\n assert.ok(args.length<=1,'expected at most one report output path');\n if(args[0]?.startsWith('-'))assert.fail('unknown option '+args[0]);\n let tamper=null;const read=path=>{const raw=readCheckerOwnerMember(root,path);return path===tamper?Buffer.concat([raw,Buffer.from(' ')]):raw;};\n const before=read('compatibility/f10/disposition-ledger/ledger.json'),subject=inspectBrowserReferenceSource({root,read});\n let cold=0,late=0;const coldPaths=[],latePaths=[];\n if(!sourceOnly){\n  for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+ref.path);late++;latePaths.push(ref.path);tamper=null;}\n  for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>inspectBrowserReferenceSource({root,read}),undefined,'cold '+ref.path);cold++;coldPaths.push(ref.path);tamper=null;}\n  assert.deepEqual(latePaths,subject.bound.map(ref=>ref.path));assert.deepEqual(coldPaths,subject.bound.map(ref=>ref.path));\n }\n\n"
+            },
+            {
+              "offset": 7089,
+              "before": "const report={...subject.report,cold_source_faults_rejected:cold,late_source_faults_rejected:late,bound_current_paths:subject.bound.length,generated_current_lab_sources:generated,title_contract_negative_controls:predicateControls,whole_current_dialog_probe_collaborator_runs:runs,actual_angular_DOM_browser_or_packed_execution:false};\nif(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\\n',{flag:'wx'});console.log(JSON.stringify(report));\n",
+              "after": "const report={...subject.report,source_execution_mode:sourceOnly?'source-metadata':'complete-regression',full_source_fault_lifetimes_executed:!sourceOnly,bound_current_paths:subject.bound.length,\n ...(sourceOnly?{}:{cold_source_faults_rejected:cold,late_source_faults_rejected:late,cold_source_fault_paths_rejected:coldPaths,late_source_fault_paths_rejected:latePaths}),\n generated_current_lab_sources:generated,title_contract_negative_controls:predicateControls,whole_current_dialog_probe_collaborator_runs:runs,actual_angular_DOM_browser_or_packed_execution:false};\nif(args[0])writeFileSync(args[0],JSON.stringify(report,null,2)+'\\n',{flag:'wx'});console.log(JSON.stringify(report));\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/checker_reference_source_probe.mjs",
+          "before": {
+            "path": "tests/checker_reference_source_probe.mjs",
+            "sha256": "0c1158d9c1dcbe5a33f6d8f7660e8ad0435b031020a9610f76655f4648f211a8",
+            "bytes": 15116
+          },
+          "after": {
+            "path": "tests/checker_reference_source_probe.mjs",
+            "sha256": "ec7ab8c7abfef0035994a3addba5ef094ddea0f7921eaf8e358da4888d1aa747",
+            "bytes": 15838
+          },
+          "edits": [
+            {
+              "offset": 2225,
+              "before": "  const qualified=tools.qualifyReference({path,sha256:digest,...(bytes===undefined?{}:{bytes})});digest=qualified.sha256;bytes=qualified.bytes;\n",
+              "after": "  if(digest!==undefined){const qualified=tools.qualifyReference({path,sha256:digest,...(bytes===undefined?{}:{bytes})});digest=qualified.sha256;bytes=qualified.bytes;}\n"
+            },
+            {
+              "offset": 14122,
+              "before": " const args=process.argv.slice(2),metadata=args[0]==='--metadata';if(metadata)args.shift();assert.ok(args.length<=1);\n",
+              "after": " const args=process.argv.slice(2);let metadata=false,sourceOnly=false;\n if(args[0]==='--metadata'){metadata=true;args.shift();}\n else if(args[0]==='--source-metadata'){metadata=true;sourceOnly=true;args.shift();}\n assert.ok(args.length<=1,'expected at most one report output path');\n if(args[0]?.startsWith('-'))assert.fail('unknown option '+args[0]);\n"
+            },
+            {
+              "offset": 14463,
+              "before": " const subject=await inspect({read});let cold=0,late=0;\n for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+tamper);late++;tamper=null;}\n for(const ref of subject.bound){tamper=ref.path;await assert.rejects(inspect({read}),undefined,'cold '+tamper);cold++;tamper=null;}\n subject.assertCurrent();assert.ok(before.equals(disk(LEDGER)));const report={...subject.report,cold_source_faults_rejected:cold,late_source_faults_rejected:late,bound_current_paths:subject.bound.length};\n",
+              "after": " const subject=await inspect({read});let cold=0,late=0;const coldPaths=[],latePaths=[];\n if(!sourceOnly){\n  for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+tamper);late++;latePaths.push(ref.path);tamper=null;}\n  for(const ref of subject.bound){tamper=ref.path;await assert.rejects(inspect({read}),undefined,'cold '+tamper);cold++;coldPaths.push(ref.path);tamper=null;}\n  assert.deepEqual(latePaths,subject.bound.map(ref=>ref.path));assert.deepEqual(coldPaths,subject.bound.map(ref=>ref.path));\n }\n subject.assertCurrent();assert.ok(before.equals(disk(LEDGER)));\n const report={...subject.report,source_execution_mode:sourceOnly?'source-metadata':'complete-regression',full_source_fault_lifetimes_executed:!sourceOnly,bound_current_paths:subject.bound.length,\n  ...(sourceOnly?{}:{cold_source_faults_rejected:cold,late_source_faults_rejected:late,cold_source_fault_paths_rejected:coldPaths,late_source_fault_paths_rejected:latePaths})};\n"
             }
           ]
         },
@@ -1600,8 +1885,53 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "8223403ca8f5c7dfa617c3aadd38f44c1d2a92f99b43b81518fe88392d3928d4",
-          "bytes": 15982
+          "sha256": "d50222d5bdfcd73445c92b1c2b537045240304c242155a8061606a4680a24926",
+          "bytes": 20264
+        },
+        {
+          "path": "scripts/check-source-contract-regressions.py",
+          "sha256": "660cc3646469243efc42c808661ce613370ac33beefb29b8cd90677ef5350d24",
+          "bytes": 14216
+        },
+        {
+          "path": "scripts/rc_acceptance.py",
+          "sha256": "22f63424d318d9aa184b139afbc99bcda2d08322c48292b20f57c66c6b240b72",
+          "bytes": 30941
+        },
+        {
+          "path": "compatibility/rc/matrices/full-verify.json",
+          "sha256": "8bf14a58dfd10ed9c25510fa0483951e0fc90bab423fbf98b03e8dda47c420b8",
+          "bytes": 620168
+        },
+        {
+          "path": "tests/test_source_contract_regressions.py",
+          "sha256": "e33c81254fd0c499cf3784199b3327656c659fdcaad40ca7875e1aaffa294b7e",
+          "bytes": 6162
+        },
+        {
+          "path": "tests/test_source_contract_regression_gate.py",
+          "sha256": "488a6608b2a26a77cf2e9549a3119e499576a34c421f8590f7a665c6729c1482",
+          "bytes": 11145
+        },
+        {
+          "path": "tests/test_rc_acceptance.py",
+          "sha256": "316266da6d92df1033be5b728246fdca143c0a25790dc101309a57fb9c1d6d00",
+          "bytes": 37564
+        },
+        {
+          "path": "compatibility/rc/c04-browser-reference-source-inputs.json",
+          "sha256": "4b0167af85263a3fb652806e25186e8500e02424749adb860610519d28817e6c",
+          "bytes": 115393
+        },
+        {
+          "path": "compatibility/rc/c04-checker-owner-inputs.json",
+          "sha256": "f909f0a47fa49c1c3ba9e84718ad7ba461216cb7da12b61b972be87aa3ba7afc",
+          "bytes": 12073
+        },
+        {
+          "path": "compatibility/rc/c04-browser-owner-inputs.json",
+          "sha256": "d22d4c657197ee2640dd1079861e54fde35e55b9091b7d44f4e024d4b37b46cb",
+          "bytes": 15192
         }
       ]
     }

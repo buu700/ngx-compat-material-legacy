@@ -72,6 +72,7 @@ SCRIPT_CHECKS = {
     "scripts/pack-draft-run.mjs": "pack-library",
     "scripts/check-pack-library.mjs": "pack-library",
     "scripts/check-packed-exports.mjs": "packed-exports",
+    "scripts/check-source-contract-regressions.py": "source-contract-regressions",
     "scripts/check-upstream-audit-disposition.mjs": "upstream-audit-disposition",
     "scripts/check-source-policy.py": "source-policy",
     "scripts/check-dependency-eligibility.py": "dependency-eligibility",
@@ -552,6 +553,17 @@ def run_node(script: str, args: list[str], *, record: bool = True) -> int:
     if record:
         ACTIVE_RUN.record_exit(check_id, code)
     return code
+
+
+def run_source_contract_regressions(out_dir, run_id, line, results, implemented_ran):
+    """Run complete source fault suites once for this RC invocation."""
+    code = run_node("scripts/check-source-contract-regressions.py", [])
+    write_check_report(
+        out_dir, run_id, line, "source-contract-regressions", exit_code=code,
+        limitations=["Source fault controls do not qualify product, browser, security, or full G11 acceptance."],
+    )
+    results["source-contract-regressions"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("source-contract-regressions")
 
 
 def write_missing_report(run_dir: Path, run_id: str, line: str, check_id: str, reason: str) -> None:
@@ -1773,6 +1785,8 @@ def main() -> int:
     )
     results["m3-coexistence"] = "pass" if code == 0 else "fail"
     implemented_ran.append("m3-coexistence")
+
+    run_source_contract_regressions(out_dir, run_id, line, results, implemented_ran)
 
     code = run_node(
         "scripts/check-upstream-audit-disposition.mjs",

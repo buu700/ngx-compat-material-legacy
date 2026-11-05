@@ -35,7 +35,8 @@ class CompleteFixture:
             self.matrix["checks"].append({
                 "check_id": cid, "required": True, "implemented": True,
                 "acceptance": {"gates": list(gates), "subject_kind": kind, "subject_ids": list(subjects),
-                    "cases_by_line": {l: {g: [f"{l}/{cid}/{g}/synthetic-assertion"] for g in groups} for l in ("main", "21.x")}},
+                    "cases_by_line": {l: {g: (list(acceptance.SOURCE_REGRESSION_CASES) if cid == "source-contract-regressions"
+                                              else [f"{l}/{cid}/{g}/synthetic-assertion"]) for g in groups} for l in ("main", "21.x")}},
             })
         write_json(self.matrix_path, self.matrix)
         self.matrix_sha = acceptance.sha256_file(self.matrix_path)

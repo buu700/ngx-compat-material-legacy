@@ -133,12 +133,21 @@ export async function inspectCheckerSource({read=disk}={}){
  source.assertCurrent();return source;
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
- const args=process.argv.slice(2),metadata=args[0]==='--metadata';if(metadata)args.shift();assert.ok(args.length<=1);
+ const args=process.argv.slice(2);let metadata=false,sourceOnly=false;
+ if(args[0]==='--metadata'){metadata=true;args.shift();}
+ else if(args[0]==='--source-metadata'){metadata=true;sourceOnly=true;args.shift();}
+ assert.ok(args.length<=1,'expected at most one report output path');
+ if(args[0]?.startsWith('-'))assert.fail('unknown option '+args[0]);
  const inspect=metadata?inspectCheckerSourceMetadata:inspectCheckerSource;
  const before=disk(LEDGER);let tamper=null;const read=path=>{const raw=disk(path);return path===tamper?Buffer.concat([raw,Buffer.from(' ')]):raw;};
- const subject=await inspect({read});let cold=0,late=0;
- for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+tamper);late++;tamper=null;}
- for(const ref of subject.bound){tamper=ref.path;await assert.rejects(inspect({read}),undefined,'cold '+tamper);cold++;tamper=null;}
- subject.assertCurrent();assert.ok(before.equals(disk(LEDGER)));const report={...subject.report,cold_source_faults_rejected:cold,late_source_faults_rejected:late,bound_current_paths:subject.bound.length};
+ const subject=await inspect({read});let cold=0,late=0;const coldPaths=[],latePaths=[];
+ if(!sourceOnly){
+  for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+tamper);late++;latePaths.push(ref.path);tamper=null;}
+  for(const ref of subject.bound){tamper=ref.path;await assert.rejects(inspect({read}),undefined,'cold '+tamper);cold++;coldPaths.push(ref.path);tamper=null;}
+  assert.deepEqual(latePaths,subject.bound.map(ref=>ref.path));assert.deepEqual(coldPaths,subject.bound.map(ref=>ref.path));
+ }
+ subject.assertCurrent();assert.ok(before.equals(disk(LEDGER)));
+ const report={...subject.report,source_execution_mode:sourceOnly?'source-metadata':'complete-regression',full_source_fault_lifetimes_executed:!sourceOnly,bound_current_paths:subject.bound.length,
+  ...(sourceOnly?{}:{cold_source_faults_rejected:cold,late_source_faults_rejected:late,cold_source_fault_paths_rejected:coldPaths,late_source_fault_paths_rejected:latePaths})};
  if(args[0])writeFileSync(args[0],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));
 }
