@@ -1,0 +1,43 @@
+{
+  "schema_version": 2,
+  "role": "Caller probe AST-only cache optimization receipt; no current source profile qualification",
+  "existing_path_changed": "tests/npm_tooling_caller_probe.mjs",
+  "before": {
+    "sha256": "cb0e142724bab5ebe779736c714c65aa7fa22171533c65b7e2450c09f4045f87",
+    "bytes": 14298
+  },
+  "after": {
+    "sha256": "99d64932d6953966309dc16d876b6b65ee6a73fbfe5c72926874e23107d9b04d",
+    "bytes": 14958
+  },
+  "change": "Cache immutable AST call facts by exact path plus source SHA, require source text equality for cache reuse; baseline unchanged programs are not reparsed for each mutation control",
+  "freshness": "Each audit begins with complete fresh physical profile/historical/source/input and discovery checks; each current JS/TS file read validates its own fingerprint before AST facts may be reused; successful audit also performs fresh complete final checks. No cached pass, population or physical identity result.",
+  "bounded_checks": {
+    "node": "/nix/store/w8jijs92barihdb0z54dsgq5szj2wd47-nodejs-24.21.0/bin/node",
+    "syntax": "passed",
+    "git_diff_check": "passed",
+    "isolated_static_ast_cache_regression": {
+      "result": "pass",
+      "checks": 6,
+      "parses": 4,
+      "controls": [
+        "Same exact path/body reuses identical immutable facts",
+        "Changed source body reparses",
+        "Different path reparses",
+        "Unwrapped changed caller still rejects",
+        "Returning to original body reuses original facts",
+        "Cached arrays and rows are immutable"
+      ]
+    },
+    "historical_static_normalization": "passed unchanged19/21 historical caller sources on pinned Node24.21.0",
+    "actual_unsealed_probe": "both branches reject current profile is not sealed on pinned Node24.21.0"
+  },
+  "unexecuted": [
+    "Sealed current-profile positive and integrated seven negatives pending parent seal",
+    "Python unittest helper/product suites",
+    "npm/archive/network/compiler/build/browser/Actions/push/publish"
+  ],
+  "other_existing_files_edited": false,
+  "commits_created": false,
+  "g11_claim": "not-passed"
+}
