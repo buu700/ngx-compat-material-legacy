@@ -16,7 +16,7 @@ assert.ok(root.includes('ngx-current-sass-source-test-'));
 const checks = [];
 const check = (name, operation) => {operation(); checks.push(name);};
 const context = createCurrentSassSource({root});
-check('four finite module identities', () => assert.equal(context.transitions.length, 4));
+check('five finite module identities', () => assert.equal(context.transitions.length, 5));
 for (const row of context.transitions) {
   check('qualify current ' + row.path, () => assert.equal(context.qualify(row.current).sha256, row.current.sha256));
   check('qualify before ' + row.path, () => assert.equal(context.qualify({path: row.path, ...row.before}).sha256, row.current.sha256));
@@ -42,8 +42,8 @@ check('reference accessor does not run', () => {
   assert.equal(calls, 0);
 });
 check('cold nonphysical reader rejects', () => assert.throws(() => createCurrentSassSource({root, read: () => Buffer.from('wrong')})));
-check('late source mutation rejects', () => {
-  const path = context.transitions[2].path, file = join(root, path), before = readFileSync(file);
+for (const transition of context.transitions) check('late source mutation rejects ' + transition.path, () => {
+  const path = transition.path, file = join(root, path), before = readFileSync(file);
   try {
     writeFileSync(file, Buffer.concat([before, Buffer.from('\n/* changed */\n')]));
     assert.throws(() => context.assertCurrent());

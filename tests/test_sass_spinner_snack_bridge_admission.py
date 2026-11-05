@@ -170,7 +170,7 @@ class SpinnerSnackBridgeAdmissionTests(unittest.TestCase):
         report = dict(schema_version=1, line=cls.line, python='3.14.7', status='finite-direct-current-source-comparator-controls-pass', checks_passed=len(cls.checks), checks=cls.checks,
                       case_results=cls.results, source_inputs=[ref(path) for path in ['scripts/current_sass_spinner_snack_admission.py', 'scripts/current_sass_source.py', 'scripts/sass_spinner_snack_bridge_admission.py', PREFIX + 'inputs-v1.json', cls.packet['source_subject']['path'], cls.packet['source_packet']['path'], cls.branch['observation']['path']]],
                       pure_compiled_rows_reused=15, modeled_assertion_positives=15, actual_packed_assertions_executed=0, actual_independent_source_context_constructed=True,
-                      current_source_descriptor=cls.context.descriptor, current_source_set_successors=cls.context.source_set_successors, old_physical_constructor_executed=False, current_source_module_count=4,
+                      current_source_descriptor=cls.context.descriptor, current_source_set_successors=cls.context.source_set_successors, old_physical_constructor_executed=False, current_source_module_count=5,
                       fresh_sass_compile_executed=False, existing_gates_or_goldens_edited=False, physical_files_mutated=False, indirect_aggregate_cases_qualified=0,
                       actual_native_packed_browser_floor_or_full_audit_qualified=False, g11_claim='not-passed')
         path = ROOT / os.environ['CURRENT_SASS_SPINNER_SNACK_MAINTAINED_RECEIPT']

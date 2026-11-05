@@ -32,14 +32,14 @@ class SassInspectionScopeTests(unittest.TestCase):
         self.assertEqual(report['source_reader_corruptions_rejected'], 8)
         self.assertEqual(report['owned_scss_members'], 409)
         self.assertEqual(report['historical_functions'], 25)
-        self.assertEqual(report['public_override_mixins'], 20)
-        self.assertEqual(report['direct_peer_boundaries'], 8)
+        self.assertEqual(report['public_override_mixins'], 21)
+        self.assertEqual(report['direct_peer_boundaries'], 9)
         self.assertEqual(report['historical_owned_scss_members'], 409)
         self.assertEqual(report['historical_peer_boundaries'], 4)
         self.assertEqual(report['historical_public_override_mixins'], 16)
         self.assertTrue(report['historical_receipt_unchanged'])
-        self.assertEqual(report['comparison']['current_boundaries'], 8)
-        self.assertEqual(report['comparison']['current_override_mixins'], 20)
+        self.assertEqual(report['comparison']['current_boundaries'], 9)
+        self.assertEqual(report['comparison']['current_override_mixins'], 21)
         self.assertFalse(report['comparison']['fresh_compiler_execution_by_comparator'])
         self.assertFalse(report['old_physical_constructor_executed'])
         self.assertFalse(report['css_or_artifact_admission_granted'])
@@ -77,7 +77,7 @@ console.log(JSON.stringify({rejected: rejected.length, absent_or_null_reach_sour
         self.assertEqual(body['g11_claim'], 'not-passed')
         # These archived refs are historical metadata. Their physical checks use
         # the separately guarded current owners, never the old two-module constructor.
-        self.assertTrue((ROOT / 'compatibility/rc/current-sass-tool-reference-inputs-v1.json').is_file())
+        self.assertTrue((ROOT / 'compatibility/rc/current-sass-tool-reference-inputs-v2.json').is_file())
         def qualified(ref):
             ref = qualified_notice_reference(ROOT, ref) or ref
             return qualify_tool_reference(ref, ROOT) if ref['path'].startswith('scripts/') else qualify_spinner_snack_source_reference(ref, ROOT)

@@ -1,32 +1,41 @@
 # Copyright Google LLC All Rights Reserved.
 # Copyright (c) 2026 Ryan Lester.
 # Use of this source code is governed by the MIT license in LICENSE.
-"""Exact current tool recipes on disposable physical source fixtures."""
+"""V2 exact current tool recipes on disposable tool-only physical fixtures."""
+import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import unittest
-from test_current_sass_source import candidate_fixture, NODE, ROOT
-from current_sass_tool_references import CurrentSassToolReferences
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+from current_sass_tool_references import CurrentSassToolReferences, CHECKPOINTS, INPUTS, PREVIOUS_INPUTS
+NODE = '/nix/store/w8jijs92barihdb0z54dsgq5szj2wd47-nodejs-24.21.0/bin/node'
 
 
 def current_tool_fixture(destination):
-    line = candidate_fixture(destination)
-    manifest_path = 'compatibility/rc/current-sass-tool-reference-inputs-v1.json'
-    packet = json.loads((ROOT / manifest_path).read_bytes())
+    """Copy only tool-bound files. Do not import or construct product source owners."""
+    line = '21.x' if json.loads((ROOT / 'projects/ngx-material-legacy/package.json').read_bytes())['version'].startswith('21.') else 'main'
+    packet = json.loads((ROOT / INPUTS).read_bytes())
     branch = packet['branches'][line]
     historical = json.loads((ROOT / branch['historical_registry']['path']).read_bytes())
-    paths = {manifest_path, 'scripts/current-sass-tool-references.mjs', 'scripts/current_sass_tool_references.py', 'scripts/historical-contract-repair-readers.mjs',
+    paths = {INPUTS, PREVIOUS_INPUTS['path'], 'projects/ngx-material-legacy/package.json',
+             'scripts/current-sass-tool-references.mjs', 'scripts/current_sass_tool_references.py', 'scripts/historical-contract-repair-readers.mjs',
              branch['historical_registry']['path'], historical['unchanged_source_subject']['path']}
     paths.update(row['path'] for row in historical['tool_transitions'])
     paths.update(row['path'] for row in historical['support_inputs'])
     paths.update(row['path'] for row in branch['updates'])
     paths.update(row['path'] for row in branch['additional_inputs'])
-    for path in paths:
+    for path in sorted(paths):
         target = destination / path
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes((ROOT / path).read_bytes())
+    git_dir = subprocess.check_output(['git', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0', 'rev-parse', '--absolute-git-dir'], cwd=ROOT, text=True).strip()
+    (destination / '.git').write_text('gitdir: ' + git_dir + '\n')
     return line
 
 
@@ -36,28 +45,53 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
             root = Path(temp)
             line = current_tool_fixture(root)
             child = subprocess.run([NODE, str(ROOT / 'tests/current_sass_tool_reference_probe.mjs'), str(root)],
-                                   cwd=ROOT, capture_output=True, text=True, timeout=60)
+                                   cwd=ROOT, capture_output=True, text=True, timeout=90)
             self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-6000:])
             result = json.loads(child.stdout)
-            self.assertEqual(result['line'], line)
-            self.assertGreaterEqual(result['transitions'], 45 if line == '21.x' else 17)
-            self.assertEqual(len(result['checks']), 8)
+            self.assertEqual((result['line'], result['epoch']), (line, 2))
+            packet = json.loads((ROOT / INPUTS).read_bytes())
+            branch = packet['branches'][line]
+            old = json.loads((ROOT / PREVIOUS_INPUTS['path']).read_bytes())['branches'][line]
+            historical = json.loads((ROOT / branch['historical_registry']['path']).read_bytes())
+            expected_paths = {r['path'] for r in historical['tool_transitions']} | {r['path'] for r in branch['updates']}
+            self.assertEqual(result['transitions'], len(expected_paths))
+            self.assertEqual(result['v1_current_identities'], 95 if line == '21.x' else 19)
+            self.assertEqual(len(result['checks']), 15)
             self.assertEqual(result['compiler_calls'], 0)
             self.assertFalse(result['old_constructor_executed'])
             self.assertFalse(result['artifact_or_audit_admission_granted'])
             source = CurrentSassToolReferences(root)
+            self.assertEqual(source.epoch, 2)
             self.assertEqual(source.transitions, result['transition_rows'])
             for row in source.transitions:
                 before, after = dict(path=row['path'], **row['before']), dict(path=row['path'], **row['after'])
                 self.assertEqual(source.qualify(before), after)
                 self.assertEqual(source.qualify(after), after)
                 self.assertEqual(source.predecessor_reference(after), before)
-                self.assertEqual(len(source.comparison_bytes(before)), before['bytes'])
+                self.assertEqual(hashlib.sha256(source.comparison_bytes(before)).hexdigest(), before['sha256'])
+            for row in historical['tool_transitions']:
+                latest = next(r for r in source.transitions if r['path'] == row['path'])
+                for side in ('before', 'after'):
+                    value = dict(path=row['path'], **row[side])
+                    self.assertEqual(source.qualify(value), dict(path=row['path'], **latest['after']))
+                    self.assertEqual(hashlib.sha256(source.comparison_bytes(value)).hexdigest(), value['sha256'])
+            for row in old['updates']:
+                latest = next(r for r in source.transitions if r['path'] == row['path'])
+                self.assertEqual(source.qualify(row['after']), dict(path=row['path'], **latest['after']))
+                self.assertEqual(hashlib.sha256(source.comparison_bytes(row['after'])).hexdigest(), row['after']['sha256'])
+            self.assertEqual(branch['previous_epoch_source_parent'], CHECKPOINTS[line])
             before = source.transitions[0]
             ref = dict(path=before['path'], **before['before'])
             self.assertIsNone(source.qualify(dict(ref, sha256='0' * 64)))
             with self.assertRaises(AssertionError):
                 source.qualify(dict(ref, bytes=ref['bytes'] + 1))
+            class Foreign(dict):
+                def items(self):
+                    raise RuntimeError('foreign dict methods must not execute')
+            with self.assertRaises(AssertionError):
+                source.qualify(Foreign(ref))
+            with self.assertRaises(AssertionError):
+                source.qualify(dict(ref, extra=Foreign()))
             output = source.transitions
             output[0]['after']['sha256'] = '0' * 64
             self.assertNotEqual(output[0]['after'], source.transitions[0]['after'])
@@ -70,15 +104,18 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
             finally:
                 path.write_bytes(raw)
             source.assert_current()
-            armed = False
+            armed, mutate_metadata = False, False
             first, last = root / 'scripts/current_sass_tool_references.py', source.bound[-1]['path']
-            first_raw = first.read_bytes()
+            first_raw, incoming = first.read_bytes(), dict(ref, extra={'value': 'before'})
             def callback(path):
-                nonlocal armed
+                nonlocal armed, mutate_metadata
                 body = (root / path).read_bytes()
                 if armed and path == last:
                     armed = False
                     first.write_bytes(first_raw + b'\n# changed\n')
+                if mutate_metadata:
+                    mutate_metadata = False
+                    incoming['extra']['value'] = 'after'
                 return body
             live = CurrentSassToolReferences(root, read=callback)
             try:
@@ -88,6 +125,46 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
             finally:
                 first.write_bytes(first_raw)
             live.assert_current()
+            mutate_metadata = True
+            with self.assertRaises(AssertionError):
+                live.qualify(incoming)
+            previous = root / PREVIOUS_INPUTS['path']
+            raw = previous.read_bytes()
+            try:
+                previous.write_bytes(raw + b'\n')
+                with self.assertRaises(AssertionError):
+                    CurrentSassToolReferences(root)
+            finally:
+                previous.write_bytes(raw)
+            source.assert_current()
+
+
+    def test_builder_recipes_are_deterministic_and_checkpoint_rows_are_new_to_base(self):
+        spec = importlib.util.spec_from_file_location('tool_v2_builder', ROOT / 'compatibility/rc/current-sass-tool-reference-v2-builder-v1.py')
+        builder = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(builder)
+        for before, after in [(b'', b'new\n'), (b'unchanged', b'unchanged'),
+                              ('a\nβ\nend'.encode(), 'first\na\nγ\nlast'.encode()),
+                              (b'a\nb\nc\n', b'a\nc\n')]:
+            edits = builder.recipe(before, after)
+            self.assertEqual(edits, builder.recipe(before, after))
+            cursor, result = 0, []
+            for edit in edits:
+                old, offset = edit['before'].encode(), edit['offset']
+                self.assertEqual(before[offset:offset + len(old)], old)
+                result.extend([before[cursor:offset], edit['after'].encode()])
+                cursor = offset + len(old)
+            self.assertEqual(b''.join([*result, before[cursor:]]), after)
+        packet = json.loads((ROOT / INPUTS).read_bytes())
+        line = '21.x' if json.loads((ROOT / 'projects/ngx-material-legacy/package.json').read_bytes())['version'].startswith('21.') else 'main'
+        branch = packet['branches'][line]
+        base_paths = set(subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',
+                                                 'ls-tree', '-r', '--name-only', branch['historical_registry']['source_parent'], '--', 'scripts', 'tests'], cwd=ROOT, text=True).splitlines())
+        for row in branch['updates']:
+            if 'source_parent' in row:
+                self.assertEqual(row['source_parent'], CHECKPOINTS[line])
+                self.assertNotIn(row['path'], base_paths)
+
 
 
 if __name__ == '__main__':

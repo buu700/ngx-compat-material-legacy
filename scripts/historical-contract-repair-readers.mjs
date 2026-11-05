@@ -67,7 +67,7 @@ function original(root,parent,path){
 /** Maintained callers explicitly select the pinned current tool successor when installed. */
 export function historicalContractRepairReaderSubject(args={}){
  const root=resolve(args.root??process.cwd());
- if(existsSync(join(root,'compatibility/rc/current-sass-tool-reference-inputs-v1.json')))return currentSassToolReferenceSubject(args);
+ if(existsSync(join(root,'compatibility/rc/current-sass-tool-reference-inputs-v2.json')))return currentSassToolReferenceSubject(args);
  return historicalContractRepairFrozenReaderSubject(args);
 }
 export function historicalContractRepairFrozenReaderSubject({root=process.cwd(),read=path=>readHistoricalContractRepairOwnerMember(root,path)}={}){

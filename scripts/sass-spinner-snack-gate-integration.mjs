@@ -15,6 +15,7 @@ import {SPINNER_SNACK_BRIDGE_CASES,SPINNER_SNACK_BRIDGE_CONTRACT,spinnerSnackBri
 import {createCurrentSpinnerSnackContract} from './current-sass-spinner-snack-contract.mjs';
 import {SPINNER_SNACK_AGGREGATE_CASES,insertSpinnerSnackIntoAggregateModel} from './sass-spinner-snack-aggregate-contract.mjs';
 import {insertOrdinaryCheckboxButtonIntoAggregateModel} from './sass-ordinary-aggregate-contract.mjs';
+import {insertCardIntoAggregateModel} from './current-sass-card-aggregate-contract.mjs';
 import {DEFAULT_AGGREGATE_CONTRACT,defaultAggregateExpectedCss,defaultAggregateMeasurementOk} from './sass-default-aggregate-contract.mjs';
 import {aggregateColorThemeExpectedCss} from './sass-aggregate-color-theme-contract.mjs';
 import {aggregateTypographyExpectedCss} from './sass-aggregate-typography-contract.mjs';
@@ -25,9 +26,11 @@ const hash=b=>createHash('sha256').update(b).digest('hex'),image=readFileSync(fi
 const raw=readFileSync(new URL('../'+INPUTS,import.meta.url));assert.equal(hash(raw),'fd78f8c7f6e072fb7393c61aef782ccdf3a1c8d009227d08b29921ea2809e0a8');
 const packet=JSON.parse(raw),contexts=new WeakMap(),referenceRuns=new WeakMap();
 const dependencies=[
- ['scripts/current-sass-spinner-snack-contract.mjs','ad72af7336a013fffe311dc143169e30f9b001a4dc9a55a43795473bd863151f'],
+ ['scripts/current-sass-spinner-snack-contract.mjs','daf5e32273427d49a9088011c68649c39e8806ad44f8ca4d7de0190c546a1603'],
  ['scripts/sass-spinner-snack-bridge-contract.mjs','5fe7386872355fa2261856a64392433b29e332d40446c4c03a95db4a5d36ba46'],
  ['scripts/sass-spinner-snack-aggregate-contract.mjs','2e5a955774961793e0578fd17e6d47ce5d72fe8d60a5f56daa442ab5528bc4c0'],
+ ['scripts/current-sass-card-aggregate-contract.mjs','02208408e559bca7f99e73b75ad060d2a96a51deab8f26ed515a8ff6a4bd2b0c'],
+ ['compatibility/rc/ordinary-card-public-bridge-model-v1.mjs','0286969a007029a3628d8a56fb17c0ee2bbfecec735abdf5d95911ac7c709a83'],
  ['scripts/sass-ordinary-aggregate-contract.mjs','a83fe3f31fab8e4973f4d8eeed303e51bb0dd44f0a2ba64d6d1f6739bd60e2d6'],
  ['compatibility/rc/ordinary-checkbox-button-expectation-model-v1.mjs','f094e84d2ce8a3f36aab239eb0d30940da976072a85ca0edcf29b8afb6dc9fb0'],
  ['scripts/sass-default-aggregate-contract.mjs','8f7d599e4187a94e66670015cd3f0e28a223209d887b9481727d1a60d9a2303a'],
@@ -122,7 +125,8 @@ export function spinnerSnackGateAggregateMatch(args={}){
   else if(v.caseId.includes('all-component-typographies')){if(v.companion.contract!=='historical-typography-aggregate-with-qualified-members'||!originalMeasurement(s,v.caseId,v.original))return false;before=aggregateTypographyExpectedCss(v.caseId,v.original,v.companion.peer);}
   else{if(v.companion.contract!=='historical-color-theme-aggregate-with-qualified-members'||!originalMeasurement(s,v.caseId,v.original)||!rippleColorMeasurementOkay(v.caseId,v.actual,s.line))return false;before=aggregateColorThemeExpectedCss(v.caseId,v.original,v.companion.peer);}
   if(before===null)return false;const spinnerSnack=insertSpinnerSnackIntoAggregateModel({caseId:v.caseId,css:before});if(spinnerSnack===null)return false;
-  const expected=insertOrdinaryCheckboxButtonIntoAggregateModel({caseId:v.caseId,css:spinnerSnack});return expected!==null&&v.actual.css===expected;
+  const ordinary=insertOrdinaryCheckboxButtonIntoAggregateModel({caseId:v.caseId,css:spinnerSnack});if(ordinary===null)return false;
+  const expected=insertCardIntoAggregateModel({caseId:v.caseId,css:ordinary});return expected!==null&&v.actual.css===expected;
  },{original:null});
 }
 /** Only referenceObserver's already-authenticated untouched16 environment belongs here. */

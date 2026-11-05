@@ -7,6 +7,7 @@ from sass_default_aggregate_admission import DEFAULT_AGGREGATE_CASES,default_agg
 from sass_default_aggregate_fixture import default_aggregate_receipt
 from sass_spinner_snack_aggregate_admission import SPINNER_SNACK_AGGREGATE_CASES
 from sass_ordinary_control_gate import ORDINARY_CONTROL_DEFAULT_CASES
+from sass_ordinary_card_gate import ORDINARY_CARD_DEFAULT_CASES
 
 def rehash(body,css):
     m=body['actual_measurement'];m.update(css=css,css_sha256=hashlib.sha256(css.encode()).hexdigest(),css_bytes=len(css.encode()));body.update(actual_sha256=m['css_sha256'],actual_bytes=m['css_bytes'])
@@ -72,11 +73,13 @@ class DefaultAggregateContractTests(unittest.TestCase):
 
     def test_actual_coordinator_requires_the_complete_finite_contract(self):
         spec=importlib.util.spec_from_file_location('default_aggregate_coordinator',ROOT/'scripts/rc-verify.py');v=importlib.util.module_from_spec(spec);spec.loader.exec_module(v)
+        self.assertEqual(len(ORDINARY_CARD_DEFAULT_CASES),4)
+        self.assertEqual(set(DEFAULT_AGGREGATE_CASES) & set(ORDINARY_CARD_DEFAULT_CASES),set())
         for line in ['main','21.x']:
             for case in DEFAULT_AGGREGATE_CASES:
                 active,body=self.receipt(line,case);v.ACTIVE_RUN=active
                 # Historical pure model receipts omit the new current/source/run capsule.
-                self.assertEqual(v._sass_seal_assertion_ok(body,'default-aggregate'),case not in set(SPINNER_SNACK_AGGREGATE_CASES) | set(ORDINARY_CONTROL_DEFAULT_CASES))
+                self.assertEqual(v._sass_seal_assertion_ok(body,'default-aggregate'),case not in set(SPINNER_SNACK_AGGREGATE_CASES) | set(ORDINARY_CONTROL_DEFAULT_CASES) | set(ORDINARY_CARD_DEFAULT_CASES))
                 wrong=copy.deepcopy(body);del wrong['current_companion'];self.assertFalse(v._sass_seal_assertion_ok(wrong,'default-aggregate'))
                 wrong=copy.deepcopy(body);wrong['case_id']='mixin-css/button-theme';self.assertFalse(v._sass_seal_assertion_ok(wrong,'default-aggregate'))
 
@@ -87,8 +90,9 @@ import {DEFAULT_AGGREGATE_CASES,DEFAULT_AGGREGATE_CONTRACT,defaultAggregateExpec
 import {compareInventory,classifyPending} from './scripts/sass-api-inventory.mjs';
 import {SPINNER_SNACK_DEFAULT_CASES} from './scripts/sass-spinner-snack-gate-integration.mjs';
 import {ORDINARY_CONTROL_DEFAULT_CASES} from './scripts/sass-ordinary-control-gate.mjs';
+import {ORDINARY_CARD_DEFAULT_CASES} from './scripts/sass-ordinary-card-gate.mjs';
 import {SPINNER_SNACK_AGGREGATE_CASES} from './scripts/sass-spinner-snack-aggregate-contract.mjs';
-const blocked=[...new Set([...SPINNER_SNACK_DEFAULT_CASES,...SPINNER_SNACK_AGGREGATE_CASES.filter(id=>id.startsWith('mixin-css/')),...ORDINARY_CONTROL_DEFAULT_CASES])].sort();
+const blocked=[...new Set([...SPINNER_SNACK_DEFAULT_CASES,...SPINNER_SNACK_AGGREGATE_CASES.filter(id=>id.startsWith('mixin-css/')),...ORDINARY_CONTROL_DEFAULT_CASES,...ORDINARY_CARD_DEFAULT_CASES])].sort();
 const f=JSON.parse(readFileSync('tests/sass_default_aggregate_fixture.json')),c=JSON.parse(readFileSync('fixtures/sass/default-aggregate-contracts.json')),source=JSON.parse(readFileSync('tests/'+f.source_fixture)),o=JSON.parse(readFileSync('compatibility/rc/oracles/material-16.2.14-sass-api.json')),sha=s=>createHash('sha256').update(s).digest('hex');
 for(const line of ['main','21.x']){
  const css=Object.fromEntries(Object.entries(o.members.mixins).filter(([,e])=>e.invocation.invocable).map(([n,e])=>[n,{css:'',sha256:e.invocation.css_sha256}]));

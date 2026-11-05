@@ -1,7 +1,7 @@
 # Copyright Google LLC All Rights Reserved.
 # Copyright (c) 2026 Ryan Lester.
 # Use of this source code is governed by the MIT license in LICENSE.
-"""Four-module physical fixture checks; no workspace product application or CSS claim."""
+"""Five-module physical fixture checks; no workspace product application or CSS claim."""
 import hashlib
 import json
 import os
@@ -17,11 +17,11 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 from current_sass_source import CurrentSassSource
 
 NODE = '/nix/store/w8jijs92barihdb0z54dsgq5szj2wd47-nodejs-24.21.0/bin/node'
-INPUTS = 'compatibility/rc/current-sass-source-inputs-v1.json'
+INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json'
 
 
 def candidate_fixture(destination):
-    """Copy real inputs, then install exactly the two separately proposed afterimages."""
+    """Copy real inputs, then install exactly the three separately proposed afterimages."""
     packet = json.loads((ROOT / INPUTS).read_bytes())
     base = json.loads((ROOT / packet['historical_source_packet']['path']).read_bytes())
     css = json.loads((ROOT / packet['historical_css_packet']['path']).read_bytes())
@@ -30,6 +30,7 @@ def candidate_fixture(destination):
     line = '21.x' if json.loads((ROOT / 'projects/ngx-material-legacy/package.json').read_bytes())['version'].startswith('21.') else 'main'
     source = base['branches'][line]
     paths = {INPUTS, 'scripts/current-sass-source.mjs', 'scripts/current_sass_source.py'}
+    paths.add(packet['prior_four_module_profile']['packet']['path'])
     paths.update(packet[key]['path'] for key in ('historical_source_packet', 'historical_source_subject', 'historical_css_packet', 'proposal', 'protected_input_packet', 'style_template_census'))
     paths.update(css[key]['path'] for key in ('oracle', 'catalog', 'provenance', 'reference_lock'))
     paths.update(row['path'] for row in css['compiler_inputs'])
@@ -67,9 +68,9 @@ class CurrentSassSourceTests(unittest.TestCase):
     def tearDownClass(cls):
         cls.temp.cleanup()
 
-    def test_exact_four_modules_and_before_comparisons(self):
+    def test_exact_five_modules_and_before_comparisons(self):
         self.assertEqual(self.context.line, self.line)
-        self.assertEqual(len(self.context.transitions), 4)
+        self.assertEqual(len(self.context.transitions), 5)
         for row in self.context.transitions:
             with self.subTest(path=row['path']):
                 self.assertEqual(self.context.qualify(row['current']), row['current'])
@@ -83,14 +84,36 @@ class CurrentSassSourceTests(unittest.TestCase):
     def test_wrong_physical_and_late_inputs(self):
         with self.assertRaises(AssertionError):
             CurrentSassSource(self.root, read=lambda _: b'wrong')
-        path = self.root / self.context.transitions[2]['path']
-        before = path.read_bytes()
+        for transition in self.context.transitions:
+            path = self.root / transition['path']
+            before = path.read_bytes()
+            try:
+                path.write_bytes(before + b'\n/* changed */\n')
+                with self.assertRaises(AssertionError):
+                    self.context.assert_current()
+            finally:
+                path.write_bytes(before)
+            self.context.assert_current()
+
+    def test_prior_four_module_card_bytes_cannot_qualify_current_five(self):
+        packet = json.loads((ROOT / INPUTS).read_bytes())
+        prior = json.loads((ROOT / packet['historical_source_packet']['path']).read_bytes())['branches'][self.line]
+        card = packet['additional_modules'][2]
+        self.assertEqual(card['path'], 'projects/ngx-material-legacy/styles/card/_card-theme.scss')
+        self.assertEqual(packet['historical_non_target_reclassified_as_target'], [card['path']])
+        self.assertEqual(packet['branches'][self.line]['historical_non_target_graph_count'], 437)
+        self.assertEqual(packet['branches'][self.line]['current_non_target_graph_count'], 436)
+        before = subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',
+                                          'show', prior['before_commit'] + ':' + card['path']], cwd=ROOT)
+        self.assertEqual(hashlib.sha256(before).hexdigest(), card['before']['sha256'])
+        file = self.root / card['path']
+        current = file.read_bytes()
         try:
-            path.write_bytes(before + b'\n/* changed */\n')
+            file.write_bytes(before)
             with self.assertRaises(AssertionError):
-                self.context.assert_current()
+                CurrentSassSource(self.root)
         finally:
-            path.write_bytes(before)
+            file.write_bytes(current)
         self.context.assert_current()
 
     def test_last_callback_cannot_mutate_earlier_member(self):

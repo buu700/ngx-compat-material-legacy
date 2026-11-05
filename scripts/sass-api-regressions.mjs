@@ -7,6 +7,7 @@
  */
 import {SPINNER_SNACK_DEFAULT_CASES} from './sass-spinner-snack-gate-integration.mjs';
 import {ORDINARY_CONTROL_DEFAULT_CASES} from './sass-ordinary-control-gate.mjs';
+import {ORDINARY_CARD_DEFAULT_CASES} from './sass-ordinary-card-gate.mjs';
 import {functionCaseIds} from './sass-function-contracts.mjs';
 import {mixinArgumentCaseIds} from './sass-mixin-arguments.mjs';
 import {ownedAggregateCaseIds} from './sass-owned-aggregates.mjs';
@@ -102,7 +103,7 @@ for (const [name, entry] of Object.entries(cases)) {
 assert.equal(invocationPlan('x', {params: [{name: 'color', default: null}]}).invocable, false);
 assert.equal(invocationPlan('x', {params: [{name: 'color', default: null}]}, {x: {call: '@include m.x(red);', sources: []}}).invocable, false);
 
-// A hash-only self-comparison preserves every ID, but lacks the twenty current bridge capsules.
+// A hash-only self-comparison preserves every ID, but lacks the twenty-four current bridge capsules.
 const css = {};
 for (const [name, entry] of Object.entries(oracle.members.mixins)) {
   if (entry.invocation?.invocable) css[name] = {css: '', sha256: entry.invocation.css_sha256};
@@ -110,7 +111,7 @@ for (const [name, entry] of Object.entries(oracle.members.mixins)) {
 const exact = compareInventory(oracle, structuredClone(oracle.members), css);
 assert.deepEqual(exact.map(item => item.case_id), ids);
 const exactFailures = exact.filter(item => item.result !== 'pass');
-assert.deepEqual(exactFailures.map(item => item.case_id).sort(), [...SPINNER_SNACK_DEFAULT_CASES,...ORDINARY_CONTROL_DEFAULT_CASES,...exact.filter(item => item.reason?.startsWith('not invoked')).map(item => item.case_id)].sort());
+assert.deepEqual(exactFailures.map(item => item.case_id).sort(), [...SPINNER_SNACK_DEFAULT_CASES,...ORDINARY_CONTROL_DEFAULT_CASES,...ORDINARY_CARD_DEFAULT_CASES,...exact.filter(item => item.reason?.startsWith('not invoked')).map(item => item.case_id)].sort());
 assert.equal(exactFailures.every(item => item.case_id.startsWith('mixin-css/')), true);
 
 // API drift negative on a correct inventory.

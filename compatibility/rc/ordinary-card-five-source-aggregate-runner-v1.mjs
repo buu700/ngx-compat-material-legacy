@@ -1,0 +1,33 @@
+/** Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester. MIT license; see LICENSE. */
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {createRequire} from 'node:module';
+import {readFileSync,writeFileSync,realpathSync} from 'node:fs';
+import {join,relative,isAbsolute} from 'node:path';
+import {pathToFileURL,fileURLToPath} from 'node:url';
+const [root,fixture,out]=process.argv.slice(2),hash=b=>createHash('sha256').update(b).digest('hex');
+const load=p=>import(pathToFileURL(join(root,p)).href);
+const {createCurrentSassSource}=await load('scripts/current-sass-source.mjs');
+const {insertOrdinaryCheckboxButtonIntoAggregateModel}=await load('scripts/sass-ordinary-aggregate-contract.mjs');
+const {insertCardIntoAggregateModel}=await load('scripts/current-sass-card-aggregate-contract.mjs');
+const source=createCurrentSassSource({root:fixture});
+const priorPath='compatibility/rc/parent-spinner-snack-aggregate-integration-'+(source.line==='21.x'?'21':'main')+'-v1.json';
+const priorRaw=readFileSync(join(root,priorPath));
+assert.equal(hash(priorRaw),source.line==='21.x'?'0c3687d30a08412b1eb98cb60048e447a13077db450cbe20b80118081dcfe253':'7b72bd8c9b777d92b4fc141f510a685cf3a3b13be237d52beec3c0eafe696e31');
+const row=JSON.parse(priorRaw).rows.find(r=>r.case_id==='mixin-css/all-component-themes');
+const oracle=JSON.parse(readFileSync(join(root,'compatibility/rc/oracles/material-16.2.14-sass-api.json')));
+const call=JSON.parse(readFileSync(join(root,'fixtures/sass/default-aggregate-contracts.json'))).cases[row.case_id].call;
+const logical="@use '__entry__' as m;\n"+oracle.standard_theme+'\n'+call+'\n';
+assert.equal(hash(logical),row.current.logical_program_sha256);
+const program=logical.replace("'__entry__'",JSON.stringify(pathToFileURL(join(fixture,'projects/ngx-material-legacy/_index.scss')).href));
+const sass=createRequire(join(root,'package.json'))('sass');assert.ok(sass.info.startsWith('dart-sass\t1.104.1\t'));
+const start=performance.now();const measured=sass.compileString(program,{loadPaths:[join(fixture,'node_modules')],style:'expanded',charset:false,silenceDeprecations:['import','if-function','global-builtin','color-functions','slash-div'],logger:{warn(){},debug(){}}});
+const allowed=[join(fixture,'projects/ngx-material-legacy'),join(fixture,'node_modules/@angular/material'),join(fixture,'node_modules/@angular/cdk')].map(path=>realpathSync(path));
+const refs=measured.loadedUrls.map(url=>{assert.equal(url.protocol,'file:');const path=realpathSync(fileURLToPath(url)),group=allowed.findIndex(base=>{const p=relative(base,path);return p&&!isAbsolute(p)&&p!=='..'&&!p.startsWith('../');});assert.ok(group>=0,path);const raw=readFileSync(path);return {root:group,path:relative(allowed[group],path).replaceAll('\\','/'),sha256:hash(raw),bytes:raw.length};}).sort((a,b)=>a.root-b.root||(a.path<b.path?-1:a.path>b.path?1:0));
+const currentSources=Object.values(source.source_sets);assert.equal(currentSources.length,1);assert.deepEqual(refs,currentSources[0]);
+const four=insertOrdinaryCheckboxButtonIntoAggregateModel({caseId:row.case_id,css:row.current.css});assert.notEqual(four,null);
+const expected=insertCardIntoAggregateModel({caseId:row.case_id,css:four});assert.notEqual(expected,null);assert.equal(measured.css,expected);
+source.assertCurrent();
+const report={schema_version:1,line:source.line,role:'One full aggregate source emission; disposable exact five-module source fixture, not packed/browser/owner admission',prior:{path:priorPath,sha256:hash(priorRaw),bytes:priorRaw.length},case_id:row.case_id,logical_program_sha256:hash(logical),physical_program_sha256:hash(program),compiler:sass.info,compile_calls:1,elapsed_ms:Math.round(performance.now()-start),loaded_sources:refs,css:measured.css,css_sha256:hash(measured.css),css_bytes:Buffer.byteLength(measured.css),expected_whole_CSS_matches:true,source_descriptor:source.descriptor,workspace_card_applied:false,packed_browser_floor_fullowner_or_audit_qualified:false,g11_claim:'not-passed'};
+writeFileSync(out,JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({line:source.line,result:'pass',compile_calls:1,elapsed_ms:report.elapsed_ms,loaded_sources:refs.length,css_bytes:report.css_bytes}));
