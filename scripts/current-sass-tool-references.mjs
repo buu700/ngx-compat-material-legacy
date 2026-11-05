@@ -30,7 +30,7 @@ const V3_SOURCE_ANCHORS={
 };
 const PREVIOUS_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v1.json',sha256:'ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f',bytes:478008};
 const CHECKPOINTS={'21.x':'b25aedd02f7b53e8cd8dfcdad369a806a1301619',main:'5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'};
-const INPUTS_SHA='0ac8249ed85aa9c528517bad44f8910f7740e078ac7265ae8e481334103cf7f0';
+const INPUTS_SHA='52d555da0a47a948300637ff4e557664bc735c1a12a9d1642794afd5ff09169a';
 const image=readFileSync(fileURLToPath(import.meta.url));
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const reference=(path,raw)=>({path,sha256:hash(raw),bytes:raw.length});
