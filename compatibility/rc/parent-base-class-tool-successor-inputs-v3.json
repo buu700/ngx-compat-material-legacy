@@ -145,6 +145,26 @@
           ]
         },
         {
+          "path": "scripts/inventory-reference-owner.mjs",
+          "before": {
+            "path": "scripts/inventory-reference-owner.mjs",
+            "sha256": "31f145763b1b9ec282989d12b91ddfad18888a2dcf7dac64e4fc30e93926f7dd",
+            "bytes": 19268
+          },
+          "after": {
+            "path": "scripts/inventory-reference-owner.mjs",
+            "sha256": "f03ade1924c58d577dde4425c00e9654134301d5b05c3fd140365be6b3c5a693",
+            "bytes": 19310
+          },
+          "edits": [
+            {
+              "offset": 11179,
+              "before": " for(const ref of packet.source_members){const raw=member(ref.path,ref.sha256);assert.equal(raw.length,ref.bytes);}\n",
+              "after": " for(const prior of packet.source_members){const ref=legacyTools.qualifyReference(prior),raw=member(ref.path,ref.sha256);assert.equal(raw.length,ref.bytes);}\n"
+            }
+          ]
+        },
+        {
           "path": "scripts/legacy-removal-owner-source.mjs",
           "before": {
             "path": "scripts/legacy-removal-owner-source.mjs",
@@ -1035,6 +1055,66 @@
           ]
         },
         {
+          "path": "tests/test_packed_upstream_ledger_epoch.py",
+          "before": {
+            "path": "tests/test_packed_upstream_ledger_epoch.py",
+            "sha256": "f7b3ae0ede9bd62fb033c49017a84d5b4ca81ce8b7920d72a105b1df1393e6df",
+            "bytes": 17868
+          },
+          "after": {
+            "path": "tests/test_packed_upstream_ledger_epoch.py",
+            "sha256": "ee6fc513ad2657239de2ae5a4cb1b6aa56583ad347d307c1c0badc85c8080ec8",
+            "bytes": 24702
+          },
+          "edits": [
+            {
+              "offset": 1033,
+              "before": "",
+              "after": "TRANSITION = 'compatibility/rc/parent-packed-ledger-retained-test-source-transition-v2.json'\nTRANSITION_SHA256 = '12421e4dee560f64e003879a7a03bc0987a063961b51835a41597eb74baa50be'\nBEFORE_PARENT = 'a2dacc6c0e33eb614b38106ef6ba7bc3a6f45b18'\nBEFORE_SHA256 = 'ba2967b951b8e58859362a916fbf266f67914f4a63931485ee9899e149ef05e8'\nPARTITION_SHA256 = 'bbdec4af787a4713f4f7f2fda00b62c1bc71a73d1ed54b4b4da314574fda89c7'\n"
+            },
+            {
+              "offset": 2721,
+              "before": "",
+              "after": "        if LINE=='21.x':\n            transition_raw=(ROOT/TRANSITION).read_bytes();assert digest(transition_raw)==TRANSITION_SHA256\n            transition=json.loads(transition_raw);phase=expected['id']\n            assert observed['supplemental_data']==[{'id':item,'phase':phase} for item in transition['supplemental_data_controls'].get(phase,[])]\n            assert observed['supplemental_projection']==transition['supplemental_projection_controls'].get(phase,[])\n"
+            },
+            {
+              "offset": 5154,
+              "before": "",
+              "after": "    if LINE=='21.x':\n        raw=(ROOT/TRANSITION).read_bytes();self.assertEqual(digest(raw),TRANSITION_SHA256)\n        transition=json.loads(raw)\n        self.assertEqual(report['supplemental_data'],[{'id':item,'phase':report['phase']} for item in transition['supplemental_data_controls'].get(report['phase'],[])])\n        self.assertEqual(report['supplemental_projection'],transition['supplemental_projection_controls'].get(report['phase'],[]))\n"
+            },
+            {
+              "offset": 8078,
+              "before": "        partition=json.loads((ROOT/PARTITION).read_bytes())\n",
+              "after": "        if LINE!='21.x':\n            partition=json.loads((ROOT/PARTITION).read_bytes())\n            self.assertEqual(partition['line'],LINE)\n            self.assertEqual(partition['source_parent'],SOURCE_PARENT)\n            self.assertEqual(partition['original_probe']['sha256'],ORIGINAL_PROBE_SHA256)\n            environment=dict(os.environ,GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1')\n            for key in ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES']:\n                environment.pop(key,None)\n            original=subprocess.check_output(['git','--no-replace-objects','show',SOURCE_PARENT+':'+PROBE],cwd=ROOT,env=environment)\n            self.assertEqual(digest(original),ORIGINAL_PROBE_SHA256)\n            current=(ROOT/PROBE).read_text();old=original.decode()\n            size=partition['preserved_prefix']['bytes']\n            self.assertEqual((ROOT/PROBE).read_bytes()[:size],original[:size])\n            self.assertEqual(digest(original[:size]),partition['preserved_prefix']['sha256'])\n            fragments=dict(re.findall(r'// BEGIN retained original ([a-z-]+)\\n(.*?)\\n// END retained original \\1',current,re.S))\n            self.assertEqual(fragments,partition['fragments'])\n            self.assertEqual(len(fragments),24 if LINE=='21.x' else 22)\n            ranges=[(0,len(original[:size].decode()))]\n            for name,fragment in fragments.items():\n                if name=='stage-population':\n                    replacement=partition['exact_total_assertion_replacement']\n                    self.assertEqual(fragment.count(replacement['after']),1)\n                    fragment=fragment.replace(replacement['after'],replacement['before'])\n                elif name=='report-summary':\n                    self.assertTrue(fragment.startswith('return ') and fragment.endswith(';'))\n                    fragment='console.log(JSON.stringify('+fragment[len('return '):-1]+'));'\n                self.assertEqual(old.count(fragment),1,name)\n                start=old.index(fragment);ranges.append((start,start+len(fragment)))\n            end=0\n            for start,stop in sorted(ranges):\n                self.assertGreaterEqual(start,end)\n                self.assertEqual(old[end:start].strip(),'','original non-whitespace statement omitted')\n                end=stop\n            self.assertEqual(old[end:].strip(),'')\n            self.assertEqual(catalogue['subjects'][0]['sha256'],digest((ROOT/PROBE).read_bytes()))\n\n            return\n        partition_raw=(ROOT/PARTITION).read_bytes()\n        self.assertEqual((digest(partition_raw),len(partition_raw)),(PARTITION_SHA256,30265))\n        partition=json.loads(partition_raw)\n"
+            },
+            {
+              "offset": 8798,
+              "before": "        current=(ROOT/PROBE).read_text();old=original.decode()\n",
+              "after": "        before=subprocess.check_output(['git','--no-replace-objects','show',BEFORE_PARENT+':'+PROBE],cwd=ROOT,env=environment)\n        self.assertEqual((digest(before),len(before)),(BEFORE_SHA256,42770))\n        current=before.decode();old=original.decode()\n"
+            },
+            {
+              "offset": 8913,
+              "before": "        self.assertEqual((ROOT/PROBE).read_bytes()[:size],original[:size])\n",
+              "after": "        self.assertEqual(before[:size],original[:size])\n"
+            },
+            {
+              "offset": 10334,
+              "before": "        self.assertEqual(catalogue['subjects'][0]['sha256'],digest((ROOT/PROBE).read_bytes()))\n",
+              "after": "        raw=(ROOT/TRANSITION).read_bytes()\n        self.assertEqual(digest(raw),TRANSITION_SHA256)\n        transition=json.loads(raw)\n        self.assertEqual(transition['schema_version'],1)\n        self.assertEqual(transition['line'],'21.x')\n        self.assertEqual(transition['path'],PROBE)\n        self.assertEqual(transition['source_parent'],BEFORE_PARENT)\n        self.assertEqual(transition['before'],{'sha256':BEFORE_SHA256,'bytes':42770})\n        self.assertEqual(transition['partition'],{'path':PARTITION,'sha256':PARTITION_SHA256,'bytes':30265})\n        self.assertEqual(transition['original'],{'parent':SOURCE_PARENT,'sha256':ORIGINAL_PROBE_SHA256,'bytes':29662})\n        self.assertEqual(set(transition['fragments']),{'canonical','before-state','early-guards','previous-state'})\n        self.assertEqual(set(fragments),set(partition['fragments']))\n        for name,change in transition['fragments'].items():\n            self.assertEqual(change['before'],fragments[name])\n            self.assertNotEqual(change['before'],change['after'])\n        end=0; pieces=[]\n        for edit in transition['edits']:\n            start,stop=edit['start'],edit['end']\n            self.assertGreaterEqual(start,end);self.assertGreaterEqual(start,size)\n            self.assertGreaterEqual(stop,start);self.assertLessEqual(stop,len(before))\n            self.assertEqual(before[start:stop],edit['before'].encode())\n            pieces.extend((before[end:start],edit['after'].encode()));end=stop\n        pieces.append(before[end:]); rebuilt=b''.join(pieces)\n        self.assertEqual((digest(rebuilt),len(rebuilt)),(transition['after']['sha256'],transition['after']['bytes']))\n        self.assertEqual(rebuilt,(ROOT/PROBE).read_bytes())\n        successor=dict(re.findall(r'// BEGIN retained original ([a-z-]+)\\n(.*?)\\n// END retained original \\1',rebuilt.decode(),re.S))\n        self.assertEqual(set(successor),set(fragments))\n        for name in fragments:\n            self.assertEqual(successor[name],transition['fragments'][name]['after'] if name in transition['fragments'] else fragments[name])\n        self.assertEqual(catalogue['subjects'][0]['sha256'],digest(rebuilt))\n"
+            },
+            {
+              "offset": 13405,
+              "before": "",
+              "after": "        transition=json.loads((ROOT/TRANSITION).read_bytes()) if LINE=='21.x' else None\n        for row in valid:\n            phase=row['phase'];row['supplemental_data']=[{'id':item,'phase':phase} for item in transition['supplemental_data_controls'].get(phase,[])] if transition else []\n            row['supplemental_projection']=transition['supplemental_projection_controls'].get(phase,[]) if transition else []\n"
+            },
+            {
+              "offset": 16238,
+              "before": "        report={**population,'cases':[c for row in reports for c in row['cases']],'rejected':[c for row in reports for c in row['rejected']]}\n",
+              "after": "        report={**population,'cases':[c for row in reports for c in row['cases']],'rejected':[c for row in reports for c in row['rejected']],\n            'supplemental_data':[c for row in reports for c in row['supplemental_data']],\n            'supplemental_projection':[c for row in reports for c in row['supplemental_projection']]}\n"
+            }
+          ]
+        },
+        {
           "path": "tests/test_remaining_unthemable_admission.py",
           "before": {
             "path": "tests/test_remaining_unthemable_admission.py",
@@ -1136,6 +1216,21 @@
         }
       ],
       "additional_inputs": [
+        {
+          "path": "tests/packed_upstream_ledger_epoch_probe.mjs",
+          "sha256": "f8c5d39419c05c17db59d7f7198974cdb60eadeacb5b79842a28433eeedbafb4",
+          "bytes": 57823
+        },
+        {
+          "path": "compatibility/rc/parent-packed-ledger-retained-test-source-transition-v2.json",
+          "sha256": "12421e4dee560f64e003879a7a03bc0987a063961b51835a41597eb74baa50be",
+          "bytes": 33223
+        },
+        {
+          "path": "compatibility/rc/c04-inventory-owner-inputs.json",
+          "sha256": "0d9dfac3813a6dc60644a090a2173ce56eaed1bcbdb32c2be29ce53f32413cdc",
+          "bytes": 12144
+        },
         {
           "path": "scripts/base-class-removal-owner-source.mjs",
           "sha256": "3d121043970e38bd7c0bc768cf671712b08b5c05299172decccff2d14a6d0788",
@@ -1268,8 +1363,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "c2ecd6e9ac2b623f42a64a9548774dda5cd174d2ba50e55e02f0656100b1cef7",
-          "bytes": 14590
+          "sha256": "b1d41b6bb4728d2e91a40846a0c753c40acdb237747c5dfbb92bc1c7aab44639",
+          "bytes": 15426
         }
       ]
     },
@@ -1430,8 +1525,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "c2ecd6e9ac2b623f42a64a9548774dda5cd174d2ba50e55e02f0656100b1cef7",
-          "bytes": 14590
+          "sha256": "b1d41b6bb4728d2e91a40846a0c753c40acdb237747c5dfbb92bc1c7aab44639",
+          "bytes": 15426
         }
       ]
     }

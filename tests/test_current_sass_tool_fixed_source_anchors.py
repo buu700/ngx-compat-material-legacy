@@ -19,7 +19,7 @@ class CurrentSassToolFixedSourceAnchorsTests(unittest.TestCase):
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-8000:])
         report = json.loads(child.stdout)
         self.assertEqual(report['result'], 'pass')
-        cases = 31 if report['line'] == '21.x' else 3
+        cases = 35 if report['line'] == '21.x' else 3
         self.assertEqual(report['cases'], cases)
         self.assertEqual(report['engines'], 2)
         self.assertEqual(report['accepted_checks'], 2)
