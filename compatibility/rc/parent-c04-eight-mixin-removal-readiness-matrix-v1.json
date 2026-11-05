@@ -1,0 +1,306 @@
+{
+  "schema": "parent-c04-eight-mixin-removal-readiness-matrix-v1",
+  "worksheet": "/tmp/parent-c04-eight-bounded-v1/worksheet.json",
+  "retained_review_sha256": "e021b30e0e9daf76753811b8899db325eca1640ba40496708fd3604e122db5f9",
+  "independent_review_sha256": "ccfca1916f78f86809031170407523d647185c9a9c8388464255611b7bc9e62b",
+  "frozen_heads": {
+    "21.x": "7143c2df99c07aec75822c389cc0f0f72361304a",
+    "main": "036b362c669c3ce0d60da2eb0e217e013c33eed2"
+  },
+  "recheck": "108/108 originally cited physical refs match: 54 per closeout worktree, including recorded installed minimum-peer declarations. This is bounded to those cited files; it is not a whole dependency/population, consumer, or runtime proof.",
+  "new_bounded_findings": [
+    {
+      "topic": "checkbox accessible markup",
+      "evidence": "21.x current checkbox.html SHA f630375b769dac8ba62c05c74d8f6abbb640bb9d6a9539ce01f220220f7b93b5 differs from tagged legacy HTML SHA a4033cb7b0c3cf908c6ca1d47fe6af6563a65d7d8e24d6bcccf05dfd1e653829 by four added bindings: aria-checked mixed, aria-controls, aria-expanded and aria-owns. Tagged shared checkbox.ts lacks those three properties. This is an existing observable augmentation, not proof of defect or justification for removal. Compare native/AX behavior and source authorization before any deliberate legacy behavioral change."
+    },
+    {
+      "topic": "menu backdrop",
+      "evidence": "The omitted/default backdrop is undefined, but explicit null is coerced to false in both the tagged shared menu setter and owned setter. Trigger root/submenu fallback tests must distinguish those inputs."
+    },
+    {
+      "topic": "slide-toggle markup",
+      "evidence": "21.x slide-toggle.html exact byte hash matches tagged legacy HTML aa441ced1917ab6b29a83948533f85c8ceb62c373866460d56e59cfca5a2fabd; equality is only this file, not proof of inherited behavior."
+    },
+    {
+      "topic": "Cyph bounded sanity",
+      "evidence": "Two previously in-scope Cyph service/module files were searched read-only; cyph-web.module.ts imports legacy menu as MatMenuModule. This is not a full consumer audit and does not establish backdrop configuration."
+    }
+  ],
+  "extra_physical_source_hashes": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+      "sha256": "f1e499dae58e12e8333ef81e480d069d93599cadda29ed2df32262e44d6c45a8"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.html",
+      "sha256": "f630375b769dac8ba62c05c74d8f6abbb640bb9d6a9539ce01f220220f7b93b5"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.html",
+      "sha256": "aa441ced1917ab6b29a83948533f85c8ceb62c373866460d56e59cfca5a2fabd"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option-base.ts",
+      "sha256": "b6aba076348d3059f55abeffaddad3faf1db4f4cdb34ed71eb72d51d03e9fe66"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+      "sha256": "a35c9828093141136e677671aefb92409813dc313e9e247d431841aafc36045d"
+    }
+  ],
+  "rows": [
+    {
+      "sha": "c30e234ecdd8659c85c6aa968c40a3107411c1a7",
+      "family": "button",
+      "changed_paths": [
+        "src/material/button/button-base.ts",
+        "src/material/button/button.ts",
+        "src/material/button/fab.ts",
+        "src/material/button/icon-button.ts",
+        "src/material/button/testing/BUILD.bazel",
+        "src/material/button/testing/button-harness.ts",
+        "tools/public_api_guard/material/button.md"
+      ],
+      "retained_diff_sha256": "7bbfc42360c922588a6bbdb6bf72d66fef409f03c89c3f569edf403e3d70412e",
+      "existing_review_input_recheck": {
+        "refs": 16,
+        "unchanged": 16,
+        "full_evidence": "/tmp/parent-c04-eight-bounded-v1/current-physical-references.json"
+      },
+      "owned_boundary": "Owned MatLegacyButton still composes local color/disabled/ripple, uses legacy anchor and inherited members including defaultColor; owned harness is distinct. Modern FAB classes/extended are not an automatic legacy API mandate.",
+      "new_static_analysis": "Inherited owned color/disabled/ripple retain legacy path; modern FAB/extended fields are not automatically legacy API. Verify direct assignment, template coercion, anchor tabindex and disabled click, color reset and harness at both floors.",
+      "existing_case_ids": [
+        "packed-consumer/aot/legacy-button-strict-template",
+        "packed-consumer/aot/current-button-separate-scope",
+        "packed-consumer/harness/legacy-button"
+      ],
+      "historical_inventory_paths": [
+        "src/material/legacy-button/button.spec.ts",
+        "src/material/legacy-button/testing/button-harness.spec.ts"
+      ],
+      "historical_case_id_pattern": "historical-legacy-artifact/original-and-shared-cases/<historical_path>#<index>",
+      "controls_caveat": "Case IDs identify existing narrow controls, not a currently executed passing receipt or proof of every behavior listed.",
+      "remaining": "Packed historical family and strict declaration checks for both floors; direct TS assignment vs template coercion, color reset/default and anchor tab index, disabled/ripple state plus actual harness semantics.",
+      "implementation_readiness": "No implementation established solely by this source comparison; preserve existing owned behavior and measure each unresolved contract first. A proposed departure from the Material-16 legacy contract requires separate behavior decision; an unsupported modern public surface is not authorized by this upstream refactor.",
+      "disposition": "not decided; no packed/minimum-floor/browser qualification asserted"
+    },
+    {
+      "sha": "f8fccef631565ec80acc67e7ea0a654e24be99d9",
+      "family": "checkbox",
+      "changed_paths": [
+        "src/dev-app/slider/slider-demo.ts",
+        "src/material/checkbox/BUILD.bazel",
+        "src/material/checkbox/checkbox.html",
+        "src/material/checkbox/checkbox.ts",
+        "tools/public_api_guard/material/checkbox.md"
+      ],
+      "retained_diff_sha256": "7b4b6df73f3987674f13b4189e1a197a8d5fc602b8cdcfecfe59e455f6dd79dd",
+      "existing_review_input_recheck": {
+        "refs": 14,
+        "unchanged": 14,
+        "full_evidence": "/tmp/parent-c04-eight-bounded-v1/current-physical-references.json"
+      },
+      "owned_boundary": "Owned _MatCheckboxBase retains local mixins, disabled/checked/indeterminate BooleanInput setters and defaultColor; template uses mixed-in tabIndex and native input disabled/aria mixed. Do not assume direct setter boolean transforms match arbitrary JS assignment.",
+      "new_static_analysis": "Owned checkbox mixins and BooleanInput setters remain. Tagged v16 source uses pre-coercion indeterminate change comparison too, so do not silently normalize it. Test repeated string/boolean assignment, mixed events, explicit tabindex recovery, ripple and forms.",
+      "existing_case_ids": [
+        "packed-consumer/harness/checkbox-tabindex-attribute",
+        "packed-consumer/harness/checkbox-node-factory-context",
+        "packed-consumer/harness/value-accessor-checkbox",
+        "pr/main/chromium/zoneful/checkbox/default",
+        "pr/main/chromium/zoneful/checkbox/disabled",
+        "pr/main/chromium/zoneless/checkbox/default",
+        "pr/main/chromium/zoneless/checkbox/disabled"
+      ],
+      "historical_inventory_paths": [
+        "src/material/legacy-checkbox/checkbox.spec.ts",
+        "src/material/legacy-checkbox/testing/checkbox-harness.spec.ts"
+      ],
+      "historical_case_id_pattern": "historical-legacy-artifact/original-and-shared-cases/<historical_path>#<index>",
+      "controls_caveat": "Case IDs identify existing narrow controls, not a currently executed passing receipt or proof of every behavior listed.",
+      "remaining": "Packed focused disabled/reenabled tabindex, mixed state, forms propagation, direct and template coercion including string false and color defaults on both floors.",
+      "implementation_readiness": "No implementation established solely by this source comparison; preserve existing owned behavior and measure each unresolved contract first. A proposed departure from the Material-16 legacy contract requires separate behavior decision; an unsupported modern public surface is not authorized by this upstream refactor.",
+      "disposition": "not decided; no packed/minimum-floor/browser qualification asserted"
+    },
+    {
+      "sha": "925f235e30f4c105007cad7e72515b45b00ea3f5",
+      "family": "autocomplete",
+      "changed_paths": [
+        "src/material/autocomplete/autocomplete-trigger.ts",
+        "src/material/autocomplete/autocomplete.ts",
+        "tools/public_api_guard/material/autocomplete.md"
+      ],
+      "retained_diff_sha256": "40e89ac126ec78ffa7cc782ab1a260b71fcfd77064e025172e0eb5cd81797e32",
+      "existing_review_input_recheck": {
+        "refs": 14,
+        "unchanged": 14,
+        "full_evidence": "/tmp/parent-c04-eight-bounded-v1/current-physical-references.json"
+      },
+      "owned_boundary": "Owned _MatAutocompleteBase and trigger base preserve local ripple, BooleanInput coercion and option-parent provider; some selection behavior is already owned and must be reviewed independently of migration. Modern added semantics/options are not implied by this refactor.",
+      "new_static_analysis": "Owned autoSelectActiveOption and requireSelection setters/defaults exist. Historical basis and public declaration need independent confirmation for each; test typed binding, direct assignment, disabled/readOnly and selection paths. Do not infer modern additions merely from peer declaration.",
+      "existing_case_ids": [
+        "packed-consumer/harness/value-accessor-autocomplete",
+        "pr/main/chromium/zoneful/autocomplete/default",
+        "pr/main/chromium/zoneless/autocomplete/default",
+        "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#172"
+      ],
+      "historical_inventory_paths": [
+        "src/material/legacy-autocomplete/autocomplete.spec.ts",
+        "src/material/legacy-autocomplete/testing/autocomplete-harness.spec.ts"
+      ],
+      "historical_case_id_pattern": "historical-legacy-artifact/original-and-shared-cases/<historical_path>#<index>",
+      "controls_caveat": "Case IDs identify existing narrow controls, not a currently executed passing receipt or proof of every behavior listed.",
+      "remaining": "Packed panel open/close, disabled/readOnly, ripple option inheritance and default injection; direct assignment and binding tests for any already-owned selection APIs, without adding modern ones automatically.",
+      "implementation_readiness": "No implementation established solely by this source comparison; preserve existing owned behavior and measure each unresolved contract first. A proposed departure from the Material-16 legacy contract requires separate behavior decision; an unsupported modern public surface is not authorized by this upstream refactor.",
+      "disposition": "not decided; no packed/minimum-floor/browser qualification asserted"
+    },
+    {
+      "sha": "baa9a8a52d52fcc3ac220a67fe1faea59c4b1f9a",
+      "family": "badge",
+      "changed_paths": [
+        "src/material/badge/BUILD.bazel",
+        "src/material/badge/badge.ts",
+        "tools/public_api_guard/material/badge.md"
+      ],
+      "retained_diff_sha256": "b07379174872188f266aa7acbd9b1f8031563bf142392b2008b3c8f5e48b9be9",
+      "existing_review_input_recheck": {
+        "refs": 8,
+        "unchanged": 8,
+        "full_evidence": "/tmp/parent-c04-eight-bounded-v1/current-physical-references.json"
+      },
+      "owned_boundary": "No legacy-badge component directory exists in inspected worktrees; finite badge Sass facade is a theme bridge, not an owned badge directive. Public current peer component is a distinct caller; verify no legacy feature or property is silently promised from Sass export.",
+      "new_static_analysis": "Ordinary peer badge is not an owned legacy directive; verify exact public peer API and Sass facade emission in packed consumer if companion behavior is in scope. No automatic ordinary badge fork.",
+      "existing_case_ids": [],
+      "historical_inventory_paths": [],
+      "historical_case_id_pattern": null,
+      "controls_caveat": "Case IDs identify existing narrow controls, not a currently executed passing receipt or proof of every behavior listed.",
+      "remaining": "Inspect public minimum peer declaration and run packed badge facade emission/current companion in actual consumer if in scope; no ordinary badge fork or import of private mixin.",
+      "implementation_readiness": "No implementation established solely by this source comparison; preserve existing owned behavior and measure each unresolved contract first. A proposed departure from the Material-16 legacy contract requires separate behavior decision; an unsupported modern public surface is not authorized by this upstream refactor.",
+      "disposition": "not decided; no packed/minimum-floor/browser qualification asserted"
+    },
+    {
+      "sha": "f2dcb65bcf726d42a9eabc33f818e00438e946ac",
+      "family": "button-toggle",
+      "changed_paths": [
+        "src/material/button-toggle/BUILD.bazel",
+        "src/material/button-toggle/button-toggle.ts",
+        "tools/public_api_guard/material/button-toggle.md"
+      ],
+      "retained_diff_sha256": "942492703aabd41eca0dfb306f18a4b9f7831c03ae2b8f9f18e8cfad3e52878a",
+      "existing_review_input_recheck": {
+        "refs": 8,
+        "unchanged": 8,
+        "full_evidence": "/tmp/parent-c04-eight-bounded-v1/current-physical-references.json"
+      },
+      "owned_boundary": "No legacy-button-toggle component directory in inspected worktrees; finite button-toggle theme forwarding supports a modern companion, not authority to create an ordinary component fork or rewrite group behavior.",
+      "new_static_analysis": "Ordinary peer toggle is not an owned legacy component; verify group/individual checked, disabled, multiple, forms and facade emission if companion use is in scope. No automatic fork.",
+      "existing_case_ids": [],
+      "historical_inventory_paths": [],
+      "historical_case_id_pattern": null,
+      "controls_caveat": "Case IDs identify existing narrow controls, not a currently executed passing receipt or proof of every behavior listed.",
+      "remaining": "Verify supported minimum peer group/individual disabled, ripple, checked/multiple and forms behavior where caller relies on it; Sass facade root/nested scope separately.",
+      "implementation_readiness": "No implementation established solely by this source comparison; preserve existing owned behavior and measure each unresolved contract first. A proposed departure from the Material-16 legacy contract requires separate behavior decision; an unsupported modern public surface is not authorized by this upstream refactor.",
+      "disposition": "not decided; no packed/minimum-floor/browser qualification asserted"
+    },
+    {
+      "sha": "4b0a603b9483c574c370985a19e0feb21519d727",
+      "family": "core",
+      "changed_paths": [
+        "src/material/core/option/optgroup.ts",
+        "src/material/core/option/option.ts",
+        "tools/public_api_guard/material/core.md"
+      ],
+      "retained_diff_sha256": "311abc3b4eaf7e6b53f8da6e41448f0c1e67b9a27391447282959e2a62c25dff",
+      "existing_review_input_recheck": {
+        "refs": 16,
+        "unchanged": 16,
+        "full_evidence": "/tmp/parent-c04-eight-bounded-v1/current-physical-references.json"
+      },
+      "owned_boundary": "Owned MatLegacyOption inherits owned _MatOptionBase disabled BooleanInput setter; MatLegacyOptgroup inherits own _MatOptgroupBase with local mixin and option-parent provider. Group-to-option effective disabled and keyboard selection have separate semantic implications.",
+      "new_static_analysis": "Owned option inherits option-base disabled getter as group.disabled OR own _disabled and parent ripple policy; verify optgroup identity, inherited token/provider and disabled keyboard behavior through select/autocomplete/list. Modern boolean transforms do not by themselves authorize behavioral changes.",
+      "existing_case_ids": [],
+      "historical_inventory_paths": [
+        "src/material/legacy-core/option/option.spec.ts",
+        "src/material/legacy-core/testing/optgroup-harness.spec.ts",
+        "src/material/legacy-core/testing/option-harness.spec.ts"
+      ],
+      "historical_case_id_pattern": "historical-legacy-artifact/original-and-shared-cases/<historical_path>#<index>",
+      "controls_caveat": "Case IDs identify existing narrow controls, not a currently executed passing receipt or proof of every behavior listed.",
+      "remaining": "Packed autocomplete/select/list parent option disabled propagation, focus/selection and direct vs template coercion across both lines; confirm token/provider and inherited API identity.",
+      "implementation_readiness": "No implementation established solely by this source comparison; preserve existing owned behavior and measure each unresolved contract first. A proposed departure from the Material-16 legacy contract requires separate behavior decision; an unsupported modern public surface is not authorized by this upstream refactor.",
+      "disposition": "not decided; no packed/minimum-floor/browser qualification asserted"
+    },
+    {
+      "sha": "d72247af7f5e98c39164cf546993e521630c1d02",
+      "family": "menu",
+      "changed_paths": [
+        "src/material/menu/menu-item.ts",
+        "src/material/menu/menu.ts",
+        "tools/public_api_guard/material/menu.md"
+      ],
+      "retained_diff_sha256": "e5d497b89d81dca124563e49db07a12e5610ccb6dfcbd0f401f3513058a2bc44",
+      "existing_review_input_recheck": {
+        "refs": 18,
+        "unchanged": 18,
+        "full_evidence": "/tmp/parent-c04-eight-bounded-v1/current-physical-references.json"
+      },
+      "owned_boundary": "Owned legacy menu-item extends locally mixed _LegacyMenuItemBase; owned menu base retains BooleanInput coercion and nullable backdrop. Preserve null default versus false and submenu/overlay interaction; modern transforms are not proof of identical JS setter behavior.",
+      "new_static_analysis": "Owned initial/default hasBackdrop may be undefined; explicit null passes BooleanInput setter and coerces to false. Trigger uses menu.hasBackdrop == null ? !triggersSubmenu() : menu.hasBackdrop. Test omitted vs explicit null/false/true for root and submenu; calling all cases nullable would conceal a real distinction. Test item focus/ripple and overlap.",
+      "existing_case_ids": [
+        "packed-consumer/harness/legacy-menu",
+        "packed-consumer/harness/menu-lazy-item-destruction",
+        "packed-consumer/harness/nested-menu-item-token-ownership",
+        "pr/main/chromium/zoneful/menu/default",
+        "pr/main/chromium/zoneless/menu/default"
+      ],
+      "historical_inventory_paths": [
+        "src/material/legacy-menu/menu.spec.ts",
+        "src/material/legacy-menu/testing/menu-harness.spec.ts"
+      ],
+      "historical_case_id_pattern": "historical-legacy-artifact/original-and-shared-cases/<historical_path>#<index>",
+      "controls_caveat": "Case IDs identify existing narrow controls, not a currently executed passing receipt or proof of every behavior listed.",
+      "remaining": "Packed menu disabled keyboard focus/click/ripple, backdrop null/false/true and overlay positioning/closure with direct property and template inputs on both floor peers.",
+      "implementation_readiness": "No implementation established solely by this source comparison; preserve existing owned behavior and measure each unresolved contract first. A proposed departure from the Material-16 legacy contract requires separate behavior decision; an unsupported modern public surface is not authorized by this upstream refactor.",
+      "disposition": "not decided; no packed/minimum-floor/browser qualification asserted"
+    },
+    {
+      "sha": "2a3385c7f4e00adc85c3cfcca31dfae8cbab8ffd",
+      "family": "slide-toggle",
+      "changed_paths": [
+        "src/material/slide-toggle/BUILD.bazel",
+        "src/material/slide-toggle/slide-toggle.html",
+        "src/material/slide-toggle/slide-toggle.ts",
+        "tools/public_api_guard/material/slide-toggle.md"
+      ],
+      "retained_diff_sha256": "a3db2fc25f9a506753f5e46642ea1eb6622fc2654b11ae7fdaba4cbf9f591d30",
+      "existing_review_input_recheck": {
+        "refs": 14,
+        "unchanged": 14,
+        "full_evidence": "/tmp/parent-c04-eight-bounded-v1/current-physical-references.json"
+      },
+      "owned_boundary": "Owned _MatSlideToggleBase retains local mixins, BooleanInput checked, default accent and tabIndex getter mapping disabled to -1; its legacy native checkbox template binds tabIndex and disabled. A modern hideIcon capability is not automatically part of legacy surface.",
+      "new_static_analysis": "v16 and current 21.x legacy slide-toggle HTML hashes match exactly. Owned tabindex getter returns -1 while disabled without discarding the configured index; test 7\u2192disabled\u2192enabled, native focus, direct assignment, value accessor and color/ripple. Modern hideIcon is not automatically legacy API.",
+      "existing_case_ids": [
+        "packed-consumer/harness/slide-toggle-tabindex-attribute",
+        "packed-consumer/harness/value-accessor-slide-toggle",
+        "pr/main/chromium/zoneful/slide-toggle/default",
+        "pr/main/chromium/zoneful/slide-toggle/disabled",
+        "pr/main/chromium/zoneless/slide-toggle/default",
+        "pr/main/chromium/zoneless/slide-toggle/disabled"
+      ],
+      "historical_inventory_paths": [
+        "src/material/legacy-slide-toggle/slide-toggle.spec.ts",
+        "src/material/legacy-slide-toggle/testing/slide-toggle-harness.spec.ts"
+      ],
+      "historical_case_id_pattern": "historical-legacy-artifact/original-and-shared-cases/<historical_path>#<index>",
+      "controls_caveat": "Case IDs identify existing narrow controls, not a currently executed passing receipt or proof of every behavior listed.",
+      "remaining": "Packed disabled-to-enabled explicit tabindex restoration, forms checked events, ripple and default color plus direct assignments/template attributes; inspect real focus behavior at both floors.",
+      "implementation_readiness": "No implementation established solely by this source comparison; preserve existing owned behavior and measure each unresolved contract first. A proposed departure from the Material-16 legacy contract requires separate behavior decision; an unsupported modern public surface is not authorized by this upstream refactor.",
+      "disposition": "not decided; no packed/minimum-floor/browser qualification asserted"
+    }
+  ],
+  "limitations": [
+    "No candidate runtime, test, build, installation, review closure or canonical decision.",
+    "Inspect exact selected tagged/current profiles and pin packed artifact/peer hashes before running controls; package peer version declarations and matched physical bytes do not establish consumer runtime behavior.",
+    "No generic policy approval was requested; proposals that deliberately alter historical behavior require their own scoped decision."
+  ]
+}

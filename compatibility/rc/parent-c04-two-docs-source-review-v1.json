@@ -1,0 +1,369 @@
+{
+  "activated_type": {
+    "activated_member_or_input_found": false,
+    "base_chain": "MatLegacyListItem extends _MatListItemMixinBase; _MatListItemMixinBase = mixinDisableRipple(class {})",
+    "component_inputs": [
+      "disableRipple"
+    ],
+    "judgment": "Do not adopt the upstream activated type annotation into the legacy add-on: the owned public class and complete local base chain have no activated API. The change annotates a newer Material class getter only and carries no runtime/decorator change.",
+    "mixin_added_api": [
+      "disableRipple getter/setter, backed by _disableRipple"
+    ],
+    "own_decorated_input": [
+      "disabled"
+    ],
+    "owned_public_class": "MatLegacyListItem",
+    "public_export": "legacy-list/public-api.ts exports MatLegacyListItem",
+    "reviewed_upstream_sha": "c73ab023af60220f19e98e85c32ea9924b217dae",
+    "upstream_patch_is_only_getter_type_annotation": true,
+    "validation": "Static source/export/inheritance inspection only; no TypeScript compile/declaration emit or runtime test requested or run."
+  },
+  "density_docs": {
+    "comment_patch_data": {
+      "file": "projects/ngx-material-legacy/styles/core/theming/_theming.scss",
+      "new": "/// @param {Map | String | Number} $theme-or-config The theme map returned from `define-light-theme` or\n///     `define-dark-theme`, or a density configuration.\n/// @param {String | Number} $default The default density configuration returned if the theme does not\n///     include a `density` configuration.\n/// @returns {String | Number} Density configuration for a theme.",
+      "old": "/// @param {Map} $theme-or-config  The theme map returned from `define-light-theme` or\n///     `define-dark-theme`.\n/// @param {Map} $default The default value returned if the given `$theme` does not include a\n///     `density` configuration.\n/// @returns {Map} Density configuration for a theme.",
+      "status": "Suggested DATA only; not applied."
+    },
+    "finite_owned_module": "projects/ngx-material-legacy/_index.scss forwards only selected Material-16-era theme APIs and owned M2 palette/functions; not a current-peer Sass forward",
+    "owned_api_hashes_are_same_at_cuts": true,
+    "owned_public_export": "projects/ngx-material-legacy/_index.scss explicitly forwards get-density-config from finite owned theming module",
+    "owned_themming_function_lines": "projects/ngx-material-legacy/styles/core/theming/_theming.scss:274-295",
+    "recommendation": "Selective documentation-only adoption is justified: parameter Map | String | Number (Map is the theme wrapper), default String | Number, return String | Number. Drop formatting-only upstream hunks; do not change signatures or implementation. Existing callsites and theme behavior remain untouched.",
+    "reference_material_index": {
+      "bytes": 13000,
+      "sha256": "1a0f14b6768b883185de92dddff5064b5ab51ecf9516675f4b8929fa167654c7"
+    },
+    "reference_material_package_json": {
+      "bytes": 34457,
+      "sha256": "eec076aafbd593807cf4f5ea8e9617d0dc896c17710031f6364cad0b084e3b34"
+    },
+    "reference_material_version": "16.2.14",
+    "reference_themming_function_lines": "core/theming/_theming.scss:274-295; public index forwards get-density-config",
+    "reference_themming_source": {
+      "bytes": 24030,
+      "sha256": "bff91cad406480a7d689d5500401a8696f7b85d9386b550f342b38bf591dc24f"
+    },
+    "reviewed_upstream_sha": "3ea64a90cd3de48e38ede09ba6f2e409324d4d48",
+    "runtime_probe": {
+      "case_summary": {
+        "arbitrary direct map not recognized as a theme": "map returned unchanged, both implementations",
+        "default map and recognized theme density-map": "map returned, both implementations; proves implementation does not enforce docs type at runtime",
+        "default number -1 when a recognized theme has no density": "number -1, both implementations",
+        "default string maximum when a recognized theme has no density": "string maximum, both implementations",
+        "direct number -2": "number -2, both implementations",
+        "direct string maximum": "string maximum, both implementations",
+        "theme density string maximum": "string maximum, both implementations"
+      },
+      "function_body_identity": {
+        "byte_equal": true,
+        "owned": {
+          "bytes": 593,
+          "sha256": "8f53217dd5d5c5c89b12a5b0e7704121e86fe6682865c8becdf473cb4b53bec4"
+        },
+        "reference": {
+          "bytes": 593,
+          "sha256": "8f53217dd5d5c5c89b12a5b0e7704121e86fe6682865c8becdf473cb4b53bec4"
+        }
+      },
+      "interpretation": "The public API type Map | String | Number includes the map-shaped theme wrapper; density configuration/default and extracted density value are documented as scalar string/number values. Runtime pass-through returns arbitrary maps and map-valued density fields because there is no guard, but these are outside the documented density-scale contract and can be unsuitable for density consumers. Preserve implementation behavior; do not infer that the fallback or density value contract includes Map solely from this permissive runtime path. The tested \"maximum\" keyword and -2 numeric scale returned scalar values identically in the published Material 16 package and owned finite helper.",
+      "node": "/nix/store/w8jijs92barihdb0z54dsgq5szj2wd47-nodejs-24.21.0/bin/node (Node 24.21.0)",
+      "owned_module": "absolute local path to styles/core/theming/theming.scss in frozen main root",
+      "owned_output": {
+        "bytes": 1348,
+        "results": [
+          {
+            "css": "",
+            "name": "direct_number",
+            "output": "direct_number=number:-2"
+          },
+          {
+            "css": "",
+            "name": "direct_string",
+            "output": "direct_string=string:\"maximum\""
+          },
+          {
+            "css": "",
+            "name": "default_number",
+            "output": "default_number=number:-1"
+          },
+          {
+            "css": "",
+            "name": "default_string",
+            "output": "default_string=string:\"maximum\""
+          },
+          {
+            "css": "",
+            "name": "default_map",
+            "output": "default_map=map:(scale: -1)"
+          },
+          {
+            "css": "",
+            "name": "direct_map_out_of_domain",
+            "output": "direct_map_out_of_domain=map:(scale: -1)"
+          },
+          {
+            "css": "",
+            "name": "theme_density_number",
+            "output": "theme_density_number=number:-2"
+          },
+          {
+            "css": "",
+            "name": "theme_density_string",
+            "output": "theme_density_string=string:\"maximum\""
+          },
+          {
+            "css": "",
+            "name": "theme_density_map_out_of_domain",
+            "output": "theme_density_map_out_of_domain=map:(scale: -1)"
+          },
+          {
+            "css": "",
+            "name": "theme_missing_density_default",
+            "output": "theme_missing_density_default=map:(scale: -1)"
+          }
+        ],
+        "sha256": "1806e166bac5ffb08d15e685c8a35ac77632259d2d4b3ded4e00f1a7badb3624"
+      },
+      "paired_result_equal": true,
+      "purpose": "Sass function type/value observations for documented scalar cases plus runtime map-edge cases; not a product build or acceptance test.",
+      "reference_module": "@angular/material/core/theming/theming from the integrity-verified 16.2.14 package",
+      "reference_output": {
+        "bytes": 1352,
+        "results": [
+          {
+            "css": "",
+            "name": "direct_number",
+            "output": "direct_number=number:-2"
+          },
+          {
+            "css": "",
+            "name": "direct_string",
+            "output": "direct_string=string:\"maximum\""
+          },
+          {
+            "css": "",
+            "name": "default_number",
+            "output": "default_number=number:-1"
+          },
+          {
+            "css": "",
+            "name": "default_string",
+            "output": "default_string=string:\"maximum\""
+          },
+          {
+            "css": "",
+            "name": "default_map",
+            "output": "default_map=map:(scale: -1)"
+          },
+          {
+            "css": "",
+            "name": "direct_map_out_of_domain",
+            "output": "direct_map_out_of_domain=map:(scale: -1)"
+          },
+          {
+            "css": "",
+            "name": "theme_density_number",
+            "output": "theme_density_number=number:-2"
+          },
+          {
+            "css": "",
+            "name": "theme_density_string",
+            "output": "theme_density_string=string:\"maximum\""
+          },
+          {
+            "css": "",
+            "name": "theme_density_map_out_of_domain",
+            "output": "theme_density_map_out_of_domain=map:(scale: -1)"
+          },
+          {
+            "css": "",
+            "name": "theme_missing_density_default",
+            "output": "theme_missing_density_default=map:(scale: -1)"
+          }
+        ],
+        "sha256": "0d087c391517de671eca0c2b2489c1906daedaf826c76abefc8e93901e3c7a39"
+      },
+      "sass": "Dart Sass 1.104.1, loaded from previously artifact-verified /tmp/parent-c04-tabs-reference-env-v2/node_modules/sass",
+      "script": {
+        "bytes": 1921,
+        "path": "/tmp/parent-c04-density-probe-v1.js",
+        "sha256": "3d336d3a7783711903a8c579ff0252ef1d9693c813eae980acdf536cb8880c07"
+      }
+    }
+  },
+  "limitations": [
+    "This does not close either upstream SHA in the audit ledger, pass G11, or qualify the library.",
+    "The actual Sass probe was confined to helper return values; no component-theme rendering, SassDoc generation, package build, browser, or compiler declaration run.",
+    "Map cases demonstrate permissive runtime behavior, not support. The documented API contract is inferred from the exact upstream post-change SassDoc, Material 16 helper semantics, and density scale consumers; no extra strict runtime validation was introduced or recommended.",
+    "Acquired reference package has exact npm integrity/source provenance in the existing independent verification report, but there is no cryptographic source-to-build attestation."
+  ],
+  "owned_source_identity": {
+    "projects/ngx-material-legacy/_index.scss": {
+      "21": {
+        "bytes": 14151,
+        "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2"
+      },
+      "main": {
+        "bytes": 14151,
+        "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2"
+      },
+      "paired_equal": true
+    },
+    "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/disable-ripple.ts": {
+      "21": {
+        "bytes": 1211,
+        "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53"
+      },
+      "main": {
+        "bytes": 1211,
+        "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53"
+      },
+      "paired_equal": true
+    },
+    "projects/ngx-material-legacy/legacy-list/list.ts": {
+      "21": {
+        "bytes": 6980,
+        "sha256": "6c358d9985e677d5ba8037f3b9aa471d35f657a172ab789f754f41952ebd0d7e"
+      },
+      "main": {
+        "bytes": 6980,
+        "sha256": "6c358d9985e677d5ba8037f3b9aa471d35f657a172ab789f754f41952ebd0d7e"
+      },
+      "paired_equal": true
+    },
+    "projects/ngx-material-legacy/legacy-list/public-api.ts": {
+      "21": {
+        "bytes": 853,
+        "sha256": "876e9a42d638cf07ae9c3dba5b43c3983ac5377531b63f5be06ba47a291e34c7"
+      },
+      "main": {
+        "bytes": 853,
+        "sha256": "876e9a42d638cf07ae9c3dba5b43c3983ac5377531b63f5be06ba47a291e34c7"
+      },
+      "paired_equal": true
+    },
+    "projects/ngx-material-legacy/styles/core/theming/_palette.scss": {
+      "21": {
+        "bytes": 17386,
+        "sha256": "86fcb97f4fe3c1c005edc4840c48ebe7a677d35fa558988db62fb268b0aef300"
+      },
+      "main": {
+        "bytes": 17386,
+        "sha256": "86fcb97f4fe3c1c005edc4840c48ebe7a677d35fa558988db62fb268b0aef300"
+      },
+      "paired_equal": true
+    },
+    "projects/ngx-material-legacy/styles/core/theming/_theming.scss": {
+      "21": {
+        "bytes": 24061,
+        "sha256": "54d065537ee74a0def763b52f37cdabd792b4a29820b02d135d7daf4b05c06e6"
+      },
+      "main": {
+        "bytes": 24061,
+        "sha256": "54d065537ee74a0def763b52f37cdabd792b4a29820b02d135d7daf4b05c06e6"
+      },
+      "paired_equal": true
+    }
+  },
+  "review_bundle_authentication": {
+    "bundle_compressed": {
+      "bytes": 150648,
+      "sha256": "a31076d3c071918d0c9c4f874c8d056de695325e3a2b2dab114d97b714867aba"
+    },
+    "bundle_decompressed": {
+      "bytes": 602226,
+      "sha256": "fd4549820fa434fe57903ce68d7c58f0ae4bcca76f97a49aeb4483f84203cac7"
+    },
+    "commit_packet_rehashes": [
+      {
+        "commit_raw_sha256": "659e9400493e4a12f2d891f7f370fdfd2444c2d905624578946a9495d8a3bba3",
+        "files": [
+          {
+            "bytes": 3552,
+            "git_blob": "583f10f1bff7f98ea7f2da6d7ce04cfc3e920788",
+            "path": "src/material/list/list.ts",
+            "sha256": "f64f8b3758b6f35e34df7e4f47d4ec3f0188a87d7ed204de99187e1ae6f9f628",
+            "side": "before",
+            "verified": true
+          },
+          {
+            "bytes": 3561,
+            "git_blob": "642064c411dccaab00ec24a7cb58ec392971b966",
+            "path": "src/material/list/list.ts",
+            "sha256": "88357df53dce3df50439b1d4a0a22987c0473f9e468ad6dc5d24e529b4d3c352",
+            "side": "after",
+            "verified": true
+          }
+        ],
+        "parent": "7d54e2be2ec56283071e7459eb3e85e94c22474f",
+        "patch": {
+          "bytes": 784,
+          "sha256": "2516d67cc13f048c7b60cef0d376d208ee4ac0966e8023fcb013320a52c4b992",
+          "verified": true
+        },
+        "sha": "c73ab023af60220f19e98e85c32ea9924b217dae"
+      },
+      {
+        "commit_raw_sha256": "9ac933f7be3e82ea0c0770677a5d412ff6926cd2e08b33b78af7d5810145f0ab",
+        "files": [
+          {
+            "bytes": 14351,
+            "git_blob": "9bdf01f26828a185d73a8d28285a789892cb0e8b",
+            "path": "src/material/core/m2/_theming.scss",
+            "sha256": "7e387072073f3aafac5627bc5fd029e32ae4f889a3e27f6fbe68095e1a65ec1c",
+            "side": "before",
+            "verified": true
+          },
+          {
+            "bytes": 14551,
+            "git_blob": "0f6eda8c0b9aad95490b69da2bec26b19f012e3b",
+            "path": "src/material/core/m2/_theming.scss",
+            "sha256": "4d1de62c18684f4992289b91c9b09e4126194912366548d85d82ecf3dd04ba99",
+            "side": "after",
+            "verified": true
+          }
+        ],
+        "parent": "b53de498d2f0cee2ea6bacaa55a3220f3bd02974",
+        "patch": {
+          "bytes": 8717,
+          "sha256": "866dea532f9da13a8b09c6d1f85246fad5a0d747470d5f7350e26383dbfefdf8",
+          "verified": true
+        },
+        "sha": "3ea64a90cd3de48e38ede09ba6f2e409324d4d48"
+      }
+    ],
+    "embedded_review_verified": true,
+    "index": {
+      "bytes": 2045,
+      "sha256": "fd6065a8770b8b2de37ca14e2307d09f71e29df398af5777b0185b5e7aa207d4"
+    },
+    "index_record_count": 12,
+    "member_actual": {
+      "bytes": 6923,
+      "sha256": "788f37fb421884d104c3de8cb85f85e3f5ad824dc74e10d0799cd96441db7da5"
+    },
+    "member_declared_bytes": 6923,
+    "member_declared_sha256": "788f37fb421884d104c3de8cb85f85e3f5ad824dc74e10d0799cd96441db7da5",
+    "member_name": "parent-next-two-docs-source-review-v1.json",
+    "review_source_cuts": {
+      "a188c2dd012a65787f314761c5203400c2324473": {
+        "legacy_list_list_ts_sha256": "6c358d9985e677d5ba8037f3b9aa471d35f657a172ab789f754f41952ebd0d7e",
+        "legacy_list_public_api_sha256": "876e9a42d638cf07ae9c3dba5b43c3983ac5377531b63f5be06ba47a291e34c7",
+        "owned_m2_palette_sha256": "86fcb97f4fe3c1c005edc4840c48ebe7a677d35fa558988db62fb268b0aef300",
+        "owned_m2_theming_sha256": "54d065537ee74a0def763b52f37cdabd792b4a29820b02d135d7daf4b05c06e6",
+        "sass_root_index_sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2"
+      },
+      "ec1bf3ca3c3ea1fe91b96119a61f599346e85449": {
+        "legacy_list_list_ts_sha256": "6c358d9985e677d5ba8037f3b9aa471d35f657a172ab789f754f41952ebd0d7e",
+        "legacy_list_public_api_sha256": "876e9a42d638cf07ae9c3dba5b43c3983ac5377531b63f5be06ba47a291e34c7",
+        "owned_m2_palette_sha256": "86fcb97f4fe3c1c005edc4840c48ebe7a677d35fa558988db62fb268b0aef300",
+        "owned_m2_theming_sha256": "54d065537ee74a0def763b52f37cdabd792b4a29820b02d135d7daf4b05c06e6",
+        "sass_root_index_sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2"
+      }
+    },
+    "signature_verified": false
+  },
+  "schema": "parent-c04-two-docs-source-review-v1",
+  "scope": "Bounded individual source/documentation review; no maintained writes, no canonical disposition, no old-program execution."
+}
