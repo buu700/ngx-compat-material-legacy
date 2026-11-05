@@ -15,8 +15,8 @@ SOURCE = 'compatibility/rc/historical-contract-repair-source-inputs.json'
 READERS = 'compatibility/rc/historical-contract-repair-reader-inputs.json'
 SOURCE_PINS = {'21.x': 'c1d7a8762cad7913a5d4ad60863afb506c56c61d27a78c17a3f5372c51cc9303',
                'main': 'cee92383ce1cb2c82b135e2e3b8be0131a46b114d60a521f7e11e4d0bb017191'}
-READER_PINS = {'21.x': 'a16f2e253cb34efb9963eadcf921977f2d8464c468797faad5c2dca580b13f35',
-               'main': 'ab76e4170d669a5f7cea18ffcd33d91b05c954572ae96ad65ca9158f5dea9a14'}
+READER_PINS = {'21.x': '655b4e39694b5452767604de5c2ce4bb0c0f28ab9632dd82ae390e039964f2d8',
+               'main': '8ba8b2652be4ddcff5d7ee1881f351e83922f8a778c1b318434652f833a89e4d'}
 
 
 def digest(raw):
@@ -124,7 +124,8 @@ def _tool_data(root):
     data = _registry(root, READERS, READER_PINS)
     assert data['canonical_dispositions_changed'] == data['product_changes'] == 0
     assert data['old_programs_executed'] is False
-    assert len(data['tool_transitions']) == ((17 if data['line'] == '21.x' else 7) + len(data['c04_source_successor']['added_tool_paths']) if data['extension_kind'] == 'spinner-snack-c04-source' else (17 if data['line'] == '21.x' else 7))
+    gate = data.get('gate_tool_successor')
+    assert len(data['tool_transitions']) == ((17 if data['line'] == '21.x' else 7) + len(data['c04_source_successor']['added_tool_paths']) + (6 if gate else 0) if data['extension_kind'] == 'spinner-snack-c04-source' else (17 if data['line'] == '21.x' else 7))
     assert len({row['path'] for row in data['tool_transitions']}) == len(data['tool_transitions'])
     ref = data['unchanged_source_subject']
     _identity(_read(root, ref['path']), ref)
@@ -132,15 +133,16 @@ def _tool_data(root):
         prior = _prior_c04_registry(root, data)
         count = 17 if data['line'] == '21.x' else 7
         assert data['tool_transitions'][:count] == prior['tool_transitions']
-        assert [r['path'] for r in data['tool_transitions'][count:]] == data['c04_source_successor']['added_tool_paths']
-        assert all(r['source_parent'] == data['prior_reader_registry']['source_parent'] for r in data['tool_transitions'][count:])
+        end = count + len(data['c04_source_successor']['added_tool_paths'])
+        assert [r['path'] for r in data['tool_transitions'][count:end]] == data['c04_source_successor']['added_tool_paths']
+        assert all(r['source_parent'] == data['prior_reader_registry']['source_parent'] for r in data['tool_transitions'][count:end])
         scope = data['c04_source_successor']
         assert scope['historical_owned_scss_rows'] == 409 and scope['historical_report_rewrites'] == 0
         assert scope['old_product_read_callback'] is False
         assert scope['historical_boundaries'] == 4 and scope['current_boundaries'] == 6
         assert scope['ordinary_all_legacy_companions'] == 13
         assert scope['physical_product_paths'] == list(SPINNER_SNACK_PATHS)
-        assert [r['path'] for r in data['support_inputs']] == ['scripts/sass-spinner-snack-c04-source.mjs', 'scripts/sass-spinner-snack-bridge-contract.mjs']
+        assert [r['path'] for r in data['support_inputs']] == ['scripts/sass-spinner-snack-c04-source.mjs', 'scripts/sass-spinner-snack-bridge-contract.mjs'] + (['scripts/sass-spinner-snack-gate-integration.mjs', 'scripts/sass_spinner_snack_gate_integration.py'] if gate else [])
         for ref in data['support_inputs']:
             _identity(_read(root, ref['path']), ref)
     elif data['line'] == '21.x':
@@ -165,6 +167,52 @@ def _tool_data(root):
                 assert old['after'] == {'sha256': '34a8c062367debddf81a5112be37e4aa603e4a3c6b9c8e5c7c34144995d62669', 'bytes': 74930}
             else:
                 assert current == old
+    if gate:
+        assert data['extension_kind'] == 'spinner-snack-c04-source'
+        prior = _prior_gate_registry(root, data)
+        count = 39 if data['line'] == '21.x' else 11
+        assert data['c04_source_successor'] == prior['c04_source_successor']
+        assert data['prior_reader_registry'] == prior['prior_reader_registry']
+        support = gate['rolled_forward_c04_support']
+        assert support['path'] == 'scripts/sass-spinner-snack-c04-source.mjs'
+        assert support['source_parent'] == gate['prior_reader_registry']['source_parent']
+        assert support['before'] == prior['support_inputs'][0]
+        assert support['after'] == data['support_inputs'][0]
+        assert data['support_inputs'][1] == prior['support_inputs'][1]
+        support_before = _original(str(root), support['source_parent'], support['path'])
+        _identity(support_before, support['before'])
+        support_text = support_before.decode()
+        assert support['literal_edits']
+        for edit in support['literal_edits']:
+            assert support_text.count(edit['before']) == 1
+            support_text = support_text.replace(edit['before'], edit['after'])
+        _identity(support_text.encode(), support['after'])
+        paths = ['scripts/sass-seal.mjs', 'scripts/sass-api-inventory.mjs', 'scripts/sass-mixin-arguments.mjs', 'scripts/sass_mixin_argument_admission.py', 'scripts/rc-verify.py', 'scripts/sass-api-regressions.mjs']
+        assert gate['added_tool_paths'] == paths
+        assert [r['path'] for r in data['tool_transitions'][count:]] == paths
+        assert all(r['source_parent'] == gate['prior_reader_registry']['source_parent'] for r in data['tool_transitions'][count:])
+        for old, current in zip(prior['tool_transitions'], data['tool_transitions'][:count]):
+            if data['line'] == '21.x' and old['path'] == 'tests/test_historical_contract_repair_source.py':
+                proof = gate['rolled_forward_test']
+                assert proof['path'] == old['path'] and proof['source_parent'] == gate['prior_reader_registry']['source_parent']
+                assert proof['before'] == old['after'] and proof['after'] == current['after']
+                assert current['literal_edits'][:len(old['literal_edits'])] == old['literal_edits']
+                assert current['literal_edits'][len(old['literal_edits']):] == proof['literal_edits']
+                assert {**current, 'after': old['after'], 'literal_edits': old['literal_edits']} == old
+                raw = _original(str(root), proof['source_parent'], proof['path'])
+                _identity(raw, proof['before'])
+                text = raw.decode()
+                assert len(proof['literal_edits']) == 2
+                for edit in proof['literal_edits']:
+                    assert text.count(edit['before']) == 1
+                    text = text.replace(edit['before'], edit['after'])
+                _identity(text.encode(), proof['after'])
+            else:
+                assert current == old
+        if data['line'] == 'main':
+            assert gate['rolled_forward_test'] is None
+        assert gate['old_reports_rewritten'] == gate['canonical_dispositions_changed'] == 0
+        assert gate['old_product_reader'] is gate['current_artifact_or_rendering_qualified'] is False
     return data
 
 
@@ -186,7 +234,7 @@ def _tool_intermediate(root, data, row):
 
 
 def _derive_tool(root, data, row):
-    assert re.fullmatch(r'(?:scripts/[^/]+\.(?:mjs|cjs)|tests/[^/]+\.(?:py|mjs))', row['path'])
+    assert re.fullmatch(r'(?:scripts/[^/]+\.(?:mjs|cjs)|tests/[^/]+\.(?:py|mjs))', row['path']) or (data.get('gate_tool_successor') and row['path'] in ['scripts/sass_mixin_argument_admission.py', 'scripts/rc-verify.py'])
     before = _original(str(root), row.get('source_parent', data['source_parent']), row['path'])
     _identity(before, row['before'])
     expected = before.decode()
@@ -236,6 +284,19 @@ def tool_comparison_bytes(ref, root=ROOT):
 SPINNER_SNACK_PATHS = (
     'projects/ngx-material-legacy/styles/progress-spinner/_progress-spinner-theme.scss',
     'projects/ngx-material-legacy/styles/snack-bar/_snack-bar-theme.scss')
+
+
+def _prior_gate_registry(root, data):
+    ref = data['gate_tool_successor']['prior_reader_registry']
+    pins = {'21.x': {'sha256': 'a16f2e253cb34efb9963eadcf921977f2d8464c468797faad5c2dca580b13f35', 'bytes': 333345, 'source_parent': 'af07cb6311c960de054dcf16e2d29ad65f6138f5'}, 'main': {'sha256': 'ab76e4170d669a5f7cea18ffcd33d91b05c954572ae96ad65ca9158f5dea9a14', 'bytes': 67365, 'source_parent': '99aa39254e87bd215d2f3ed7d6821236e9bb483d'}}
+    assert ref == {'path': READERS, **pins[data['line']]}
+    raw = _original(str(root), ref['source_parent'], READERS)
+    _identity(raw, ref)
+    prior = _decoded(raw)
+    assert prior['line'] == data['line'] and prior['source_parent'] == data['source_parent']
+    assert prior['extension_kind'] == 'spinner-snack-c04-source' and 'gate_tool_successor' not in prior
+    assert len(prior['tool_transitions']) == (39 if data['line'] == '21.x' else 11)
+    return prior
 
 
 def _prior_c04_registry(root, data):

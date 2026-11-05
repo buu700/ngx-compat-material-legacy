@@ -14,6 +14,8 @@ from sass_aggregate_color_theme_admission import AGGREGATE_COLOR_THEME_CASES, ag
 from sass_form_field_state_admission import FORM_FIELD_STATE_ARGUMENT_CASES, form_field_state_argument_results_match
 from sass_ripple_color_admission import RIPPLE_COLOR_ARGUMENT_CASES, RIPPLE_COLOR_OWNED_CASES, ripple_color_argument_results_match
 
+from sass_spinner_snack_gate_integration import SPINNER_SNACK_GATE_CASES, spinner_snack_gate_assertion_ok
+
 def mixin_argument_measurements_ok(root,body,*,owned=False):
     try:
         path='fixtures/sass/owned-aggregate-contracts.json' if owned else 'fixtures/sass/mixin-argument-contracts.json';raw=(root/path).read_bytes();catalog=json.loads(raw)
@@ -64,6 +66,9 @@ def mixin_argument_assertion_ok(root,active,body,invocation):
         if any(body.get(k)!=v or type(body.get(k))!=type(v) for k,v in envelope.items()):return False
         library=[a for a in active.manifest['artifacts'] if a['id']=='library']
         if len(library)!=1 or body['tarball_sha256']!=library[0]['sha256'] or not mixin_argument_measurements_ok(root,body,owned=owned):return False
+        if body['case_id'] in SPINNER_SNACK_GATE_CASES:
+            return spinner_snack_gate_assertion_ok(root,active,body,invocation)
+        if 'current_spinner_snack_bridge' in body:return False
         original=body['expected']['css'];actual=body['actual']['css']
         if body['case_id'] not in PROGRESS_COLOR_ALIAS_CASES and 'current_peer_alias' in body:return False
         if body['case_id'] in RIPPLE_COLOR_ARGUMENT_CASES or body['case_id'] in RIPPLE_COLOR_OWNED_CASES:

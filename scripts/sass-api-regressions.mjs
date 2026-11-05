@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import {SPINNER_SNACK_DEFAULT_CASES} from './sass-spinner-snack-gate-integration.mjs';
 import {functionCaseIds} from './sass-function-contracts.mjs';
 import {mixinArgumentCaseIds} from './sass-mixin-arguments.mjs';
 import {ownedAggregateCaseIds} from './sass-owned-aggregates.mjs';
@@ -6,7 +7,8 @@ import {ownedAggregateCaseIds} from './sass-owned-aggregates.mjs';
  * Pure regressions for the sass-api-and-values inventory tools. No Sass compile:
  * the frozen 16.2.14 oracle is compared with itself, then mutated.
  * - The matrix roster equals apiCaseIds(oracle), in order, predeclared.
- * - An exact copy passes every case; drift mutations fail exactly their cases.
+ * - Hash-only self-copies cannot discharge the five source-bound bridge defaults.
+ * - Drift mutations fail exactly their additional cases.
  * - Pending decisions only cover exact recorded digest pairs, never a pass.
  */
 import assert from 'node:assert/strict';
@@ -93,7 +95,7 @@ for (const [name, entry] of Object.entries(cases)) {
 assert.equal(invocationPlan('x', {params: [{name: 'color', default: null}]}).invocable, false);
 assert.equal(invocationPlan('x', {params: [{name: 'color', default: null}]}, {x: {call: '@include m.x(red);', sources: []}}).invocable, false);
 
-// Exact self-comparison passes every predeclared case.
+// A hash-only self-comparison preserves every ID, but lacks the five current bridge capsules.
 const css = {};
 for (const [name, entry] of Object.entries(oracle.members.mixins)) {
   if (entry.invocation?.invocable) css[name] = {css: '', sha256: entry.invocation.css_sha256};
@@ -101,7 +103,7 @@ for (const [name, entry] of Object.entries(oracle.members.mixins)) {
 const exact = compareInventory(oracle, structuredClone(oracle.members), css);
 assert.deepEqual(exact.map(item => item.case_id), ids);
 const exactFailures = exact.filter(item => item.result !== 'pass');
-assert.deepEqual(exactFailures.map(item => item.case_id), exact.filter(item => item.reason?.startsWith('not invoked')).map(item => item.case_id));
+assert.deepEqual(exactFailures.map(item => item.case_id).sort(), [...SPINNER_SNACK_DEFAULT_CASES,...exact.filter(item => item.reason?.startsWith('not invoked')).map(item => item.case_id)].sort());
 assert.equal(exactFailures.every(item => item.case_id.startsWith('mixin-css/')), true);
 
 // API drift negative on a correct inventory.
@@ -152,7 +154,7 @@ assert.equal(classifyPending([{...failing, case_id: 'mixin-css/not-recorded'}], 
 const passed = classifyPending([{case_id: sample.case_id, result: 'pass'}], decisions)[0];
 assert.equal(passed.status, undefined);
 assert.equal(passed.result, 'pass');
-const notInvoked = exact.filter(item => item.result !== 'pass');
+const notInvoked = exact.filter(item => item.reason?.startsWith('not invoked'));
 assert.equal(classifyPending(notInvoked, decisions).every(item => item.status === 'pending-decision'), true);
 
 console.log(`sass-api regressions passed (${ids.length} api cases, ${pendingApi.length} pending, ${decisions.decisions.length} decisions)`);

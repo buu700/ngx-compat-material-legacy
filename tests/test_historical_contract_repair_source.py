@@ -118,8 +118,8 @@ class HistoricalContractRepairReferenceTests(unittest.TestCase):
         self.assertEqual(data['extension_kind'], 'spinner-snack-c04-source')
         prior = subject._prior_c04_registry(ROOT, data)
         self.assertEqual(data['tool_transitions'][:17], prior['tool_transitions'])
-        self.assertEqual(len(data['tool_transitions']), 39)
-        self.assertEqual(len(data['support_inputs']), 2)
+        self.assertEqual(len(data['tool_transitions']), 45)
+        self.assertEqual(len(data['support_inputs']), 4)
         packet = json.loads((ROOT / 'compatibility/rc/parallel-spinner-snack-public-bridge-integration-source-inputs.json').read_bytes())
         for row in packet['branches']['21.x']['modules']:
             for side in ['before', 'current']:

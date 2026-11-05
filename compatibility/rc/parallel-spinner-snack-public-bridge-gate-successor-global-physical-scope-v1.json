@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "role": "Parent-authorized complete private bound-set physical closure after supplied callbacks and metadata reads",
+  "changes": [
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "before_sha256": "ba66a18687696ace41b242276693f5bb0ef236689f8757fa5dcb5a6b05c2b90b",
+      "after_sha256": "54bdcb50e89492c6c224e93bc307cf0e5dd2dabff8fa778e593421f006916592",
+      "bytes": 18467,
+      "literal_edits": [
+        {
+          "before": " root=resolve(root);const bound=new Map();",
+          "after": " root=resolve(root);const bound=new Map();\n // This final pass invokes only trusted filesystem reads, never the supplied callback.\n const assertPhysicalCurrent=()=>{for(const ref of bound.values()){const actual=readEvidenceMember(root,ref.path);assert.equal(hash(actual),ref.sha256,'late physical repaired reader input '+ref.path);assert.equal(actual.length,ref.bytes);}};"
+        },
+        {
+          "before": "  const row=transitions.get(ref.path);if(!row)return null;\n  const middle=intermediate.get(ref.path)?.reference;",
+          "after": "  const path=ref.path,row=transitions.get(path);if(!row)return null;\n  const middle=intermediate.get(path)?.reference;"
+        },
+        {
+          "before": "  member(ref.path,row.after);return {...ref,sha256:row[target].sha256,...(ref.bytes===undefined?{}:{bytes:row[target].bytes})};",
+          "after": "  member(path,row.after);const result={...ref,path,sha256:row[target].sha256,...(ref.bytes===undefined?{}:{bytes:row[target].bytes})};assertPhysicalCurrent();return result;"
+        },
+        {
+          "before": " const comparisonBytes=ref=>{assert.ok(ownsReference(ref),'unsupported reader comparison');qualify(ref);const row=transitions.get(ref.path),middle=intermediate.get(ref.path);return Buffer.from(ref.sha256===middle?.reference.sha256?middle.bytes:ref.sha256===row.before.sha256?row.beforeBytes:row.afterBytes);};",
+          "after": " const comparisonBytes=incoming=>{const ref={...incoming};assert.ok(ownsReference(ref),'unsupported reader comparison');qualify(ref);const row=transitions.get(ref.path),middle=intermediate.get(ref.path);const result=Buffer.from(ref.sha256===middle?.reference.sha256?middle.bytes:ref.sha256===row.before.sha256?row.beforeBytes:row.afterBytes);assertPhysicalCurrent();return result;};"
+        },
+        {
+          "before": " const assertCurrent=()=>{for(const ref of bound.values())member(ref.path,ref);};\n assertCurrent();return {line,bound:",
+          "after": " const assertCurrent=()=>{for(const ref of bound.values())member(ref.path,ref);assertPhysicalCurrent();};\n const result={line,bound:"
+        },
+        {
+          "before": "current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};\n}",
+          "after": "current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};\n assertCurrent();return result;\n}"
+        }
+      ]
+    },
+    {
+      "root": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+      "before_sha256": "ba66a18687696ace41b242276693f5bb0ef236689f8757fa5dcb5a6b05c2b90b",
+      "after_sha256": "54bdcb50e89492c6c224e93bc307cf0e5dd2dabff8fa778e593421f006916592",
+      "bytes": 18467,
+      "literal_edits": [
+        {
+          "before": " root=resolve(root);const bound=new Map();",
+          "after": " root=resolve(root);const bound=new Map();\n // This final pass invokes only trusted filesystem reads, never the supplied callback.\n const assertPhysicalCurrent=()=>{for(const ref of bound.values()){const actual=readEvidenceMember(root,ref.path);assert.equal(hash(actual),ref.sha256,'late physical repaired reader input '+ref.path);assert.equal(actual.length,ref.bytes);}};"
+        },
+        {
+          "before": "  const row=transitions.get(ref.path);if(!row)return null;\n  const middle=intermediate.get(ref.path)?.reference;",
+          "after": "  const path=ref.path,row=transitions.get(path);if(!row)return null;\n  const middle=intermediate.get(path)?.reference;"
+        },
+        {
+          "before": "  member(ref.path,row.after);return {...ref,sha256:row[target].sha256,...(ref.bytes===undefined?{}:{bytes:row[target].bytes})};",
+          "after": "  member(path,row.after);const result={...ref,path,sha256:row[target].sha256,...(ref.bytes===undefined?{}:{bytes:row[target].bytes})};assertPhysicalCurrent();return result;"
+        },
+        {
+          "before": " const comparisonBytes=ref=>{assert.ok(ownsReference(ref),'unsupported reader comparison');qualify(ref);const row=transitions.get(ref.path),middle=intermediate.get(ref.path);return Buffer.from(ref.sha256===middle?.reference.sha256?middle.bytes:ref.sha256===row.before.sha256?row.beforeBytes:row.afterBytes);};",
+          "after": " const comparisonBytes=incoming=>{const ref={...incoming};assert.ok(ownsReference(ref),'unsupported reader comparison');qualify(ref);const row=transitions.get(ref.path),middle=intermediate.get(ref.path);const result=Buffer.from(ref.sha256===middle?.reference.sha256?middle.bytes:ref.sha256===row.before.sha256?row.beforeBytes:row.afterBytes);assertPhysicalCurrent();return result;};"
+        },
+        {
+          "before": " const assertCurrent=()=>{for(const ref of bound.values())member(ref.path,ref);};\n assertCurrent();return {line,bound:",
+          "after": " const assertCurrent=()=>{for(const ref of bound.values())member(ref.path,ref);assertPhysicalCurrent();};\n const result={line,bound:"
+        },
+        {
+          "before": "current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};\n}",
+          "after": "current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};\n assertCurrent();return result;\n}"
+        }
+      ]
+    }
+  ],
+  "routes": [
+    "constructor",
+    "assertCurrent",
+    "side/qualify/predecessor",
+    "comparisonBytes"
+  ],
+  "metadata_only_ownsReference_stays_nonreading": true,
+  "last_guard_is_physical_only_and_has_no_user_callbacks": true,
+  "no_SourceSubject_C02_product_or_MFPython_edit": true,
+  "old_programs_or_compilers_executed": false,
+  "g11_claim": "not-passed"
+}

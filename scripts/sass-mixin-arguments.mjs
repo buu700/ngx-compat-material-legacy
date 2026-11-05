@@ -15,6 +15,9 @@ import {measureAggregateTypographyPeer,aggregateTypographyResultsMatch,AGGREGATE
 import {measureAggregateColorThemePeer,aggregateColorThemeResultsMatch,AGGREGATE_COLOR_THEME_CASES} from './sass-aggregate-color-theme-contract.mjs';
 import {FORM_FIELD_STATE_ARGUMENT_CASES,FORM_FIELD_STATE_CONTRACT,measureFormFieldStatePeer,formFieldStateArgumentResultsMatch} from './sass-form-field-state-contract.mjs';
 import {RIPPLE_COLOR_ARGUMENT_CASES,RIPPLE_COLOR_BINDING_CASES,RIPPLE_COLOR_CONTRACT,measureRippleColorPeer,rippleColorArgumentResultsMatch} from './sass-ripple-color-contract.mjs';
+import {SPINNER_SNACK_GATE_CASES,spinnerSnackGateDescriptor,spinnerSnackGateDirectMatch,spinnerSnackGateAggregateMatch} from './sass-spinner-snack-gate-integration.mjs';
+import {SPINNER_SNACK_BRIDGE_CASES,SPINNER_SNACK_BRIDGE_CONTRACT} from './sass-spinner-snack-bridge-contract.mjs';
+import {SPINNER_SNACK_AGGREGATE_CASES} from './sass-spinner-snack-aggregate-contract.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 export const MIXIN_ARGUMENT_CATALOG='fixtures/sass/mixin-argument-contracts.json';
@@ -72,14 +75,15 @@ export function mixinArgumentResultsMatch(expected,actual) {
     && expected.css===actual.css && expected.css_sha256===sha(expected.css) && actual.css_sha256===sha(actual.css)
     && expected.css_bytes===Buffer.byteLength(expected.css) && actual.css_bytes===Buffer.byteLength(actual.css);
 }
-export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,importers=[],line,referenceEntry,referenceRoot,identity}) {
+export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,importers=[],line,referenceEntry,referenceRoot,identity,spinnerSnackContext}) {
   const catalog=mixinArgumentCatalog();
   const provenance={...identity,catalog:MIXIN_ARGUMENT_CATALOG,catalog_sha256:catalog.sha256};
   const results=catalog.cases.map(probe=>{
-    let expected,actual,error,current_companion,current_peer_alias;
+    let expected,actual,error,current_companion,current_peer_alias,current_spinner_snack_bridge;
     try {
       expected=measureMixinArgument(sass,referenceEntry,[referenceRoot],catalog,probe,[referenceRoot]);
       actual=measureMixinArgument(sass,entry,loadPaths,catalog,probe,allowedRoots,importers);
+      if(SPINNER_SNACK_GATE_CASES.includes(probe.case_id)){if(!spinnerSnackContext||spinnerSnackContext.line!==line)throw Error('spinner/snack current source context missing');current_spinner_snack_bridge=spinnerSnackGateDescriptor(spinnerSnackContext);}
       if(Object.hasOwn(RIPPLE_COLOR_BINDING_CASES,probe.case_id))actual={...actual,line,sass_version:sass.info};
       if (Object.hasOwn(RIPPLE_COLOR_ARGUMENT_CASES,probe.case_id)) {
         const peer=measureRippleColorPeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
@@ -118,7 +122,11 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
     }catch(caught){error=String(caught.message || caught);}
     const wrongCss=(actual?.css || '')+'\n.wrong-nonempty-mixin { color: red; }\n';
     const mutation={css:wrongCss,css_sha256:sha(wrongCss),css_bytes:Buffer.byteLength(wrongCss)};
-    const conforms=value=>Object.hasOwn(RIPPLE_COLOR_ARGUMENT_CASES,probe.case_id)
+    const conforms=value=>SPINNER_SNACK_BRIDGE_CASES.includes(probe.case_id)
+      ? spinnerSnackGateDirectMatch({context:spinnerSnackContext,caseId:probe.case_id,original:expected,actual:{...actual,...value},identity:provenance,descriptor:current_spinner_snack_bridge})
+      : SPINNER_SNACK_AGGREGATE_CASES.includes(probe.case_id)
+      ? spinnerSnackGateAggregateMatch({context:spinnerSnackContext,caseId:probe.case_id,original:expected,actual:{...actual,...value},companion:current_companion,descriptor:current_spinner_snack_bridge})
+      : Object.hasOwn(RIPPLE_COLOR_ARGUMENT_CASES,probe.case_id)
       ? rippleColorArgumentResultsMatch(probe.case_id,expected,{...actual,...value},current_companion)
       : Object.hasOwn(FORM_FIELD_STATE_ARGUMENT_CASES,probe.case_id)
       ? formFieldStateArgumentResultsMatch(probe.case_id,expected,value,current_companion?.peer)
@@ -144,8 +152,8 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
     const mutation_rejected=Boolean(expected && actual && !conforms(mutation));
     const exact=mixinArgumentResultsMatch(expected,actual);
     return {...probe,line,expected,actual,error:error??null,identity:provenance,mutation,mutation_rejected,
-      ...(current_companion?{current_companion}:{}),...(current_peer_alias?{current_peer_alias}:{}),
-      comparison:current_companion?'current-companion-contract':current_peer_alias?'current-peer-color-alias-contract':exact?'historical-exact':'historical-mismatch',
+      ...(current_companion?{current_companion}:{}),...(current_peer_alias?{current_peer_alias}:{}),...(current_spinner_snack_bridge?{current_spinner_snack_bridge}:{}),
+      comparison:SPINNER_SNACK_BRIDGE_CASES.includes(probe.case_id)?SPINNER_SNACK_BRIDGE_CONTRACT:current_companion?'current-companion-contract':current_peer_alias?'current-peer-color-alias-contract':exact?'historical-exact':'historical-mismatch',
       result:!error && conforms(actual) && mutation_rejected?'pass':'fail'};
   });
   return {results,identity:provenance,ok:results.length===498 && results.every(r=>r.result==='pass')};

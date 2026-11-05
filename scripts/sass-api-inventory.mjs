@@ -28,6 +28,8 @@ import {DEFAULT_MAPPED_COMPANION_CASES,DEFAULT_MAPPED_COMPANION_CONTRACT,default
 import {DEFAULT_AGGREGATE_CASES,DEFAULT_AGGREGATE_CONTRACT,defaultAggregateMeasurementOk,defaultAggregateResultsMatch} from './sass-default-aggregate-contract.mjs';
 import {FORM_FIELD_STATE_DEFAULT_CASES,FORM_FIELD_STATE_CONTRACT,formFieldStateDefaultMeasurementOk,formFieldStateDefaultResultsMatch} from './sass-form-field-state-contract.mjs';
 import {RIPPLE_COLOR_DEFAULT_CASES,RIPPLE_COLOR_CONTRACT,rippleColorMeasurementOkay,rippleColorDefaultResultsMatch} from './sass-ripple-color-contract.mjs';
+import {SPINNER_SNACK_DEFAULT_CASES,spinnerSnackGateDefaultMatch,spinnerSnackGateAggregateMatch} from './sass-spinner-snack-gate-integration.mjs';
+import {SPINNER_SNACK_AGGREGATE_CASES} from './sass-spinner-snack-aggregate-contract.mjs';
 const companionTypes=[
   {cases:RIPPLE_COLOR_DEFAULT_CASES,contract:RIPPLE_COLOR_CONTRACT,measurement:rippleColorMeasurementOkay,matches:rippleColorDefaultResultsMatch},
   {cases:FORM_FIELD_STATE_DEFAULT_CASES,contract:FORM_FIELD_STATE_CONTRACT,measurement:formFieldStateDefaultMeasurementOk,matches:formFieldStateDefaultResultsMatch},
@@ -36,7 +38,8 @@ const companionTypes=[
   {cases:DEFAULT_AGGREGATE_CASES,contract:DEFAULT_AGGREGATE_CONTRACT,measurement:defaultAggregateMeasurementOk,matches:defaultAggregateResultsMatch},
 ];
 function companionType(id){return companionTypes.find(t=>Object.hasOwn(t.cases,id));}
-function companionFailure(id,got){
+function companionFailure(id,got,spinnerSnackContext){
+  if(SPINNER_SNACK_AGGREGATE_CASES.includes(id))return spinnerSnackContext&&got.css===got.actual_measurement?.css&&got.sha256===got.actual_measurement?.css_sha256&&spinnerSnackGateAggregateMatch({context:spinnerSnackContext,caseId:id,actual:got.actual_measurement,companion:got.current_companion,descriptor:got.current_spinner_snack_bridge})?null:'finite spinner/snack aggregate contract differs';
   const type=companionType(id);
   return !type||!type.measurement(id,got.actual_measurement,got.actual_measurement?.line)||!type.matches(id,got,got.current_companion)
     ? 'finite default companion contract differs':null;
@@ -394,7 +397,7 @@ function fmtParam(param) {
  * Pure comparison of a candidate inventory (and its invocation CSS digests)
  * against the oracle. One result per predeclared case id; nothing is dropped.
  */
-export function compareInventory(oracle, candidate, candidateCss) {
+export function compareInventory(oracle, candidate, candidateCss,{spinnerSnackContext}={}) {
   const results = [];
   const push = (case_id, failure, extra = {}) => results.push({case_id, result: failure ? 'fail' : 'pass', reason: failure, ...extra});
   const om = oracle.members;
@@ -422,17 +425,21 @@ export function compareInventory(oracle, candidate, candidateCss) {
     const got = candidateCss?.[name];
     const failure = !got ? 'candidate invocation missing'
       : got.error ? `candidate invocation failed: ${got.error}`
+        : SPINNER_SNACK_DEFAULT_CASES.includes(`mixin-css/${name}`)
+          ? (spinnerSnackContext&&spinnerSnackGateDefaultMatch({context:spinnerSnackContext,caseId:`mixin-css/${name}`,got})?null:'finite spinner/snack default contract differs')
         : Object.hasOwn(got,'current_companion')&&Object.hasOwn(got,'current_infrastructure') ? 'conflicting default contracts'
         : Object.hasOwn(got,'current_infrastructure')
           ? (!Object.hasOwn(DEFAULT_CORE_CDK_CASES,`mixin-css/${name}`)
             || !defaultCoreCdkMeasurementOk(`mixin-css/${name}`,got.actual_measurement,got.actual_measurement?.line)
             || !defaultCoreCdkResultsMatch(`mixin-css/${name}`,got,got.current_infrastructure) ? 'finite current CDK contract differs' : null)
           : Object.hasOwn(got,'current_companion')
-            ? companionFailure(`mixin-css/${name}`,got)
+            ? companionFailure(`mixin-css/${name}`,got,spinnerSnackContext)
             : got.sha256 !== invocation.css_sha256 ? 'compiled CSS differs' : null;
     push(`mixin-css/${name}`, failure, {
       invocable: true, expected_sha256: invocation.css_sha256, expected_bytes: invocation.css_bytes,
       actual_sha256: got?.sha256 ?? null, actual_bytes: got?.css === undefined ? null : Buffer.byteLength(got.css),
+      ...(got&&Object.hasOwn(got,'current_spinner_snack_bridge')?{current_spinner_snack_bridge:got.current_spinner_snack_bridge,error:null,actual_measurement:got.actual_measurement}:{}),
+      ...(got&&SPINNER_SNACK_DEFAULT_CASES.includes(`mixin-css/${name}`)?{expected:got.expected,actual:got.actual_measurement,identity:got.identity,mixin:got.mixin,variant:got.variant,call:got.call,comparison:got.comparison,mutation:got.mutation,mutation_rejected:got.mutation_rejected}:{}),
       ...(got&&Object.hasOwn(got,'current_infrastructure')?{current_infrastructure:got.current_infrastructure,actual_measurement:got.actual_measurement,comparison:DEFAULT_CORE_CDK_CONTRACT}:{}),
       ...(got&&Object.hasOwn(got,'current_companion')?{current_companion:got.current_companion,actual_measurement:got.actual_measurement,comparison:companionType(`mixin-css/${name}`)?.contract??DEFAULT_COMPANION_CONTRACT}:{}),
     });
@@ -475,7 +482,7 @@ export function classifyPending(results, decisions) {
  * API negative: wrong-but-nonempty mutations of a candidate inventory must
  * fail exactly their own cases. Returns {detected, expected, failed}.
  */
-export function apiDriftNegative(oracle, candidate, candidateCss) {
+export function apiDriftNegative(oracle, candidate, candidateCss,options={}) {
   const copy = JSON.parse(JSON.stringify(candidate));
   const css = JSON.parse(JSON.stringify(candidateCss || {}));
   const mutated = [];
@@ -492,8 +499,8 @@ export function apiDriftNegative(oracle, candidate, candidateCss) {
   mutated.push(`mixin/${removed}`);
   const cssName = Object.keys(oracle.members.mixins).sort().find(name => oracle.members.mixins[name].invocation?.invocable && css[name]?.sha256);
   if (cssName) { css[cssName] = {...css[cssName], sha256: '0'.repeat(64)}; mutated.push(`mixin-css/${cssName}`); }
-  const baseline = new Set(compareInventory(oracle, candidate, candidateCss).filter(r => r.result === 'fail').map(r => r.case_id));
-  const after = new Set(compareInventory(oracle, copy, css).filter(r => r.result === 'fail').map(r => r.case_id));
+  const baseline = new Set(compareInventory(oracle, candidate, candidateCss,options).filter(r => r.result === 'fail').map(r => r.case_id));
+  const after = new Set(compareInventory(oracle, copy, css,options).filter(r => r.result === 'fail').map(r => r.case_id));
   const newly = [...after].filter(id => !baseline.has(id)).sort();
   const expectedNew = mutated.filter(id => !baseline.has(id)).sort();
   return {detected: expectedNew.length > 0 && JSON.stringify(newly) === JSON.stringify(expectedNew), mutated, newly_failed: newly};
