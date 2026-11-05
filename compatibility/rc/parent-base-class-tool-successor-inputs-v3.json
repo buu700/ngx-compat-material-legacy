@@ -208,19 +208,24 @@
           },
           "after": {
             "path": "scripts/packed-upstream-ledger-epoch.mjs",
-            "sha256": "b4e4d64b39da7324d13cf621446cae1c3d7c99766cf4fd025cfcdfda7bb689f3",
-            "bytes": 85882
+            "sha256": "68b5a199b5eae75b2e9ff37718ce8906f48aeb3fe926aae434e1a2f629d7f2ad",
+            "bytes": 86017
           },
           "edits": [
             {
               "offset": 744,
               "before": "",
-              "after": "import {baseClassRemovalOwnerContext} from './base-class-removal-canonical-stage.mjs';\nimport {currentAuthoredRosterSourceSubject,currentAuthoredRosterRawRead} from './current-authored-roster-source.mjs';\n"
+              "after": "import {baseClassRemovalOwnerContext} from './base-class-removal-canonical-stage.mjs';\nimport {assertBaseClassRemovalSourceInspectorIdentity} from './base-class-removal-owner-source.mjs';\nimport {currentAuthoredRosterSourceSubject,currentAuthoredRosterRawRead} from './current-authored-roster-source.mjs';\n"
             },
             {
               "offset": 8248,
               "before": " legacy:[LEDGER],table:[LEDGER],\n",
               "after": " legacy:[LEDGER],table:[LEDGER],base_class:[LEDGER],\n"
+            },
+            {
+              "offset": 9682,
+              "before": " const assertCurrent=()=>{for(const frame of frames){frame.guard();for(const row of frame.references.values()){\n",
+              "after": " const assertCurrent=()=>{for(const frame of frames){assertBaseClassRemovalSourceInspectorIdentity();for(const row of frame.references.values()){\n"
             },
             {
               "offset": 78409,
@@ -1217,6 +1222,16 @@
       ],
       "additional_inputs": [
         {
+          "path": "tests/test_current_tool_git_data_cache.py",
+          "sha256": "1b2714bf7a32add47bd892278279cf49350a38fa8b0f46e161041ec44cb0afc5",
+          "bytes": 9475
+        },
+        {
+          "path": "tests/test_base_class_source_inspector_identity.py",
+          "sha256": "2d62d82d80b5ad5739ed5417ee3de06f66345ae23224180ef9d775dd74b0e70d",
+          "bytes": 2526
+        },
+        {
           "path": "tests/checker_reference_metadata_owner_probe.mjs",
           "sha256": "b15d95c43fb8b8ee6323588c483d573573290d025478c3ce917ee9b0f75ed5f2",
           "bytes": 11536
@@ -1268,12 +1283,12 @@
         },
         {
           "path": "scripts/base-class-removal-owner-source.mjs",
-          "sha256": "3d121043970e38bd7c0bc768cf671712b08b5c05299172decccff2d14a6d0788",
-          "bytes": 15134
+          "sha256": "5a5b69acf2616dc61aae26330924d8f45d26ae96332adbff40e8c4e76425bb57",
+          "bytes": 15410
         },
         {
           "path": "scripts/base-class-removal-canonical-stage.mjs",
-          "sha256": "1d48c35b75390e7fa59b44677f1a4161966fe193c5b6ea0f55fc34651359b9e6",
+          "sha256": "44787758af5deeed0882180632f21b3e0b6e3003c7b245ecc5e24130b5b6681c",
           "bytes": 9718
         },
         {
@@ -1398,8 +1413,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "3bd21c02972b86d967576b07a620ed403a4d8ec41866a40486304bac429787b7",
-          "bytes": 15790
+          "sha256": "6b78f5e517c135a479486ce6671a3ed4553f1e2161cb4e94927e8b92abc7492a",
+          "bytes": 15934
         }
       ]
     },
@@ -1554,14 +1569,19 @@
       ],
       "additional_inputs": [
         {
+          "path": "tests/test_current_tool_git_data_cache.py",
+          "sha256": "1b2714bf7a32add47bd892278279cf49350a38fa8b0f46e161041ec44cb0afc5",
+          "bytes": 9475
+        },
+        {
           "path": "tests/current_sass_c04_tool_integration_probe.mjs",
           "sha256": "174aca321b1d8d6d9b57366652d97aedbb1ef929e4881d91fc443368ff4a3742",
           "bytes": 8566
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "3bd21c02972b86d967576b07a620ed403a4d8ec41866a40486304bac429787b7",
-          "bytes": 15790
+          "sha256": "6b78f5e517c135a479486ce6671a3ed4553f1e2161cb4e94927e8b92abc7492a",
+          "bytes": 15934
         }
       ]
     }
