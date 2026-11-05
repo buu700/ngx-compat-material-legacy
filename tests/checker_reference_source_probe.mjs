@@ -30,7 +30,7 @@ export async function inspectCheckerSourceMetadata({read=disk}={}){
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
  const tools=checkerOwnerSourceSubject({root:ROOT,read});
  const bound=new Map(tools.bound.map(ref=>[ref.path,{...ref}])),member=(path,digest,bytes)=>{
-  const qualified=tools.qualifyReference({path,sha256:digest,...(bytes===undefined?{}:{bytes})});digest=qualified.sha256;bytes=qualified.bytes;
+  if(digest!==undefined){const qualified=tools.qualifyReference({path,sha256:digest,...(bytes===undefined?{}:{bytes})});digest=qualified.sha256;bytes=qualified.bytes;}
   const raw=read(path);assert.ok(Buffer.isBuffer(raw));if(digest)assert.equal(hash(raw),digest,'changed source input '+path);if(bytes!==undefined)assert.equal(raw.length,bytes);
   bound.set(path,{path,sha256:hash(raw),bytes:raw.length});return raw;
  };
@@ -87,6 +87,7 @@ export async function inspectCheckerSourceMetadata({read=disk}={}){
   const currentRegistry=read(registryPath),qualifiedRegistry=tools.qualifyReference({path:registryPath,sha256:hash(beforeRegistry),bytes:beforeRegistry.length});assert.equal(hash(currentRegistry),qualifiedRegistry.sha256);
   const expectedAdded=hash(currentRegistry)===hash(beforeRegistry)?[]:[{sha:'f7e3ae3bd1b86d5987df57bb06d350001c592931',proof_kind:'individual-historical-legacy-removal-source-exclusion',scope_key:'legacy_removal_source_scope',module:'upstream-legacy-removal-admission.cjs'}];
   if(registry.sourceContractDefinitions.some(row=>row.sha==='3f35b12290ea4dbee4a9d82845c0964b2b4df50d'))expectedAdded.push({sha:'3f35b12290ea4dbee4a9d82845c0964b2b4df50d',proof_kind:'individual-historical-table-local-compilation-source-review',scope_key:'table_local_compilation_source_scope',module:'upstream-table-local-compilation-admission.cjs'});
+  if(registry.sourceContractDefinitions.some(row=>row.sha==='55f9618b687fc0da4743a3cf27e113ceb837e151'))expectedAdded.push({sha:'55f9618b687fc0da4743a3cf27e113ceb837e151',proof_kind:'individual-historical-base-class-removal-source-review',scope_key:'base_class_removal_source_scope',module:'upstream-base-class-removal-admission.cjs'});
   assert.equal(added.length,expectedAdded.length);if(added.length)assert.deepEqual(added,expectedAdded);
   for(const row of registry.sourceContractDefinitions){
    for(const entry of [{sha:row.sha},{sha:'0'.repeat(40),individual_proof:{proof_kind:row.proof_kind}},{sha:'0'.repeat(40),individual_proof:{[row.scope_key]:{}}}]){assert.equal(registered.requiresRegisteredSourceReview(entry),true);positive.push('registered:'+row.sha);}

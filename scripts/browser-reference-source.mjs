@@ -26,7 +26,7 @@ export function inspectBrowserReferenceSource({root,read=path=>readCheckerOwnerM
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
  const tools=browserOwnerSourceSubject({root,read});
  const bound=new Map(tools.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{
-  ref=tools.qualifyReference(ref);
+  if(ref.sha256!==undefined)ref=tools.qualifyReference(ref);
   const raw=read(ref.path),physical=readCheckerOwnerMember(root,ref.path);assert.ok(Buffer.isBuffer(raw));assert.ok(raw.equals(physical),'noncurrent browser source '+ref.path);
   if(ref.sha256)assert.equal(hash(raw),ref.sha256,'changed browser source '+ref.path);
   if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);
