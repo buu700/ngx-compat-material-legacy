@@ -1,0 +1,22 @@
+{
+  "scope": "Independent static inspection of integrated 21.x frame/source owner and actual guard-plan probe; paired source profile inspected as DATA, no owner execution or maintained writes.",
+  "result": "Prepared-guard phase structure and real-probe coverage are consistent with the earlier proposal review. The probe wrapper has a restoration failure mode on subprocess timeout. Physical profile exactness requires coordinated checks after mutations cease.",
+  "observations": [
+    "The source inspector own data-property identity check now executes before the frame constructor and hence before any supplied frame callback.",
+    "Frame node is a dependency of source-owner node. The committed scheduler executes all node preflights, then all consumes, then all finals. The source guard remains atomic with its nested guard; supplied consumed bytes are compared against physical bytes.",
+    "The real test counts 12 actual rejection cases: poisoned planner and inspector at construction; two cold prepared members; two forged consumed buffers; a late frame physical mutation; cold and late inspector poisoning; and three guard/node pointer accessors. It tests restoration after each mutation and successful reuse after faults.",
+    "The builder explicitly includes scheduler and its probe for both lines and the two new base-class leaf test files for 21.x. V3 packet records 39 updates and 51 additional inputs for 21.x and 9 and 14 for main. The recorded owner source pin is a10373f8926e7df98021ac04c4b56b35826984f58845de688e3f13b926b47ed0."
+  ],
+  "finding": {
+    "severity": "test checkout integrity",
+    "file": "tests/test_base_class_guard_plan.py",
+    "detail": "subprocess.run(..., timeout=60) kills and reaps the Node child on timeout. If the timeout, crash, or external termination occurs while its helper or selected owned source file is changed, the child JavaScript finally does not run and the tracked file can remain altered.",
+    "suggestion": "Use an isolated checkout or parent-side finally restoration of exact original bytes for each potentially modified file, with explicit detection/reporting of unexpected external edits. Account separately for termination of the parent process."
+  },
+  "limits": [
+    "No physical file hashes were sampled while root-run tests temporarily mutate files; no fresh profile exactness attestation is made.",
+    "No full composed owner, compiler, full regression, or G11 qualification inferred.",
+    "Frame constructor still reads inputs sequentially; its whole-constructor physical population is not preflighted before the first supplied callback.",
+    "Omitting the former second frame-reader invocation changes sampling of subsequently invalid but unconsumed callback results; meaningful downstream consumed bytes must be guarded where used."
+  ]
+}

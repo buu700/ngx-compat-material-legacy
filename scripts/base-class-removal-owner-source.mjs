@@ -14,6 +14,7 @@ import {join, posix, resolve} from 'node:path';
 import {gunzipSync} from 'node:zlib';
 import admission from './upstream-base-class-removal-admission.cjs';
 import {readHistoricalContractRepairMember} from './historical-contract-repair-source.mjs';
+import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
 import {applyBaseClassRemovalCanonicalStage, baseClassRemovalRegistrySuccessor,
   BASE_CLASS_REMOVAL_LEDGER, BASE_CLASS_REMOVAL_REGISTRY,
   BASE_CLASS_REMOVAL_OWNER_SOURCE_SHA256} from './base-class-removal-canonical-stage.mjs';
@@ -22,11 +23,15 @@ const SELF = 'scripts/base-class-removal-owner-source.mjs';
 const STAGE = 'scripts/base-class-removal-canonical-stage.mjs';
 const INPUTS = 'compatibility/rc/21x-base-class-removal-admission-owner-inputs-v1.json';
 const INPUTS_SHA256 = '7c72a44224d6bd9f3eb141fdffb15d0f7ec11cb21b0f466500f10f12742e8e18';
+const GUARD_PLAN = Object.freeze({path: 'scripts/canonical-source-guard-plan.mjs',
+  sha256: '4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f', bytes: 4609});
+const GUARD_PLAN_FUNCTION_SHA256 = 'fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947';
 const rootDefault = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const image = readFileSync(fileURLToPath(import.meta.url));
 const hash = raw => createHash('sha256').update(raw).digest('hex');
 const blob = raw => createHash('sha1').update('blob ' + raw.length + '\0').update(raw).digest('hex');
 const functionToString = Function.prototype.toString;
+const loadedComposeCanonicalSourceGuards = composeCanonicalSourceGuards;
 const bufferIsBuffer = Buffer.isBuffer, bufferEquals = Buffer.prototype.equals;
 const apply = Reflect.apply;
 const loadedInspectSource = ownValue(admission, 'inspectSource');
@@ -41,6 +46,16 @@ function ownValue(object, key) {
 /** Callback-free check using the source owner's originally captured inspector. */
 export function assertBaseClassRemovalSourceInspectorIdentity() {
   assert.equal(ownValue(admission, 'inspectSource'), loadedInspectSource, 'late loaded base-class source inspector change');
+}
+function assertGuardPlanIdentity() {
+  assert.equal(composeCanonicalSourceGuards, loadedComposeCanonicalSourceGuards, 'changed loaded canonical source guard planner');
+  assert.equal(hash(functionToString.call(loadedComposeCanonicalSourceGuards)), GUARD_PLAN_FUNCTION_SHA256,
+    'unauthenticated loaded canonical source guard planner');
+}
+function assertGuardPlanPhysical(root) {
+  const raw = physical(root, GUARD_PLAN.path);
+  assert.equal(hash(raw), GUARD_PLAN.sha256, 'changed canonical source guard planner');
+  assert.equal(raw.length, GUARD_PLAN.bytes);
 }
 function physicalSweep(root, references, sourceMembers = false) {
   for (const ref of references) {
@@ -93,6 +108,9 @@ function freeze(value) {
 /** Only actual physical callbacks are accepted. No historical-reader fallback. */
 export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read = path => physical(root, path)} = {}) {
   assert.equal(resolve(root), rootDefault);
+  // Reject a poisoned planner before any supplied read callback can restore it.
+  assertGuardPlanIdentity();
+  assertGuardPlanPhysical(root);
   const bound = new Map();
   const current = path => {
     const actual = physical(root, path), supplied = read(path);
@@ -109,6 +127,7 @@ export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read 
     assert.equal(raw.length, ref.bytes);
     return raw;
   };
+  member(GUARD_PLAN);
   assert.equal(hash(image), BASE_CLASS_REMOVAL_OWNER_SOURCE_SHA256, 'loaded base-class leaf differs from stage pin');
   assert.ok(equalBuffers(current(SELF), image), 'loaded/current base-class leaf differs');
   const packetRaw = current(INPUTS);
@@ -155,16 +174,21 @@ export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read 
   assert.ok(!equalBuffers(after, actualLedger) || applied, 'base-class ledger427 requires registry70');
   const registryApplied = equalBuffers(registryAfter, actualRegistry);
   const precursor = !applied;
-  const assertCurrent = () => {
-    for (const ref of bound.values()) {
-      const actual = physical(root, ref.path), supplied = read(ref.path);
-      assert.equal(hash(actual), ref.sha256, 'late base-class frame member ' + ref.path);
-      assert.equal(actual.length, ref.bytes);
-      assert.ok(equalBuffers(actual, supplied), 'late nonphysical base-class frame ' + ref.path);
-      assert.ok(equalBuffers(actual, physical(root, ref.path)), 'physical base-class frame changed during callback ' + ref.path);
-    }
-    physicalSweep(root, bound.values());
-  };
+  const guardNode = Object.freeze({
+    dependencies: Object.freeze([]),
+    preflight: () => { assertGuardPlanIdentity(); physicalSweep(root, bound.values()); },
+    consume: () => {
+      for (const ref of bound.values()) {
+        const actual = physical(root, ref.path), supplied = read(ref.path);
+        assert.equal(hash(actual), ref.sha256, 'late base-class frame member ' + ref.path);
+        assert.equal(actual.length, ref.bytes);
+        assert.ok(equalBuffers(actual, supplied), 'late nonphysical base-class frame ' + ref.path);
+        assert.ok(equalBuffers(actual, physical(root, ref.path)), 'physical base-class frame changed during callback ' + ref.path);
+      }
+    },
+    final: () => { physicalSweep(root, bound.values()); assertGuardPlanIdentity(); },
+  });
+  const assertCurrent = loadedComposeCanonicalSourceGuards(Object.freeze([guardNode]));
   const registrySubject = () => {
     assertCurrent();
     return {raw: Buffer.from(actualRegistry), comparison: Buffer.from(registryBefore),
@@ -203,13 +227,14 @@ export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read 
     registryBefore: Buffer.from(registryBefore), registryAfter: Buffer.from(registryAfter),
     applied, registryApplied, precursor, registrySubject, ledgerSubject, predecessorData,
     ownsReference, predecessorReference, qualifyReference, comparisonBytes,
-    bound: structuredClone([...bound.values()]), assertCurrent,
+    bound: structuredClone([...bound.values()]), guardNode, assertCurrent,
     source_scope_only: true, canonical_frame_admission_granted: false,
     current_native_packed_browser_floor_or_full_audit_qualified: false};
 }
 
 /** Re-executes the immutable source contract on actual bytes; no cached receipt. */
 export function baseClassRemovalOwnerSourceSubject({root = rootDefault, read = path => physical(root, path)} = {}) {
+  assertBaseClassRemovalSourceInspectorIdentity();
   const frames = baseClassRemovalCanonicalFrameSubject({root, read});
   const body = structuredClone(frames.body), entry = structuredClone(frames.stage.entries[0]);
   const checkedRead = path => {
@@ -223,6 +248,7 @@ export function baseClassRemovalOwnerSourceSubject({root = rootDefault, read = p
   assert.equal(hash(functionToString.call(loadedInspectSource)), frames.packet.inspect_source_function_sha256, 'unauthenticated loaded base-class source inspector');
   const source = loadedInspectSource(request);
   const sourceGuard = ownValue(source, 'assertCurrent'), frameGuard = ownValue(frames, 'assertCurrent');
+  const frameGuardNode = ownValue(frames, 'guardNode');
   const bound = new Map(frames.bound.map(ref => [ref.path, {...ref}]));
   for (const ref of source.bound) {
     const before = bound.get(ref.path);
@@ -236,19 +262,21 @@ export function baseClassRemovalOwnerSourceSubject({root = rootDefault, read = p
     assert.equal(ownValue(admission, 'inspectSource'), loadedInspectSource, 'late loaded base-class source inspector change');
     assert.equal(ownValue(source, 'assertCurrent'), sourceGuard, 'changed base-class source guard');
     assert.equal(ownValue(frames, 'assertCurrent'), frameGuard, 'changed base-class frame guard');
+    assert.equal(ownValue(frames, 'guardNode'), frameGuardNode, 'changed base-class frame guard node');
   };
-  const assertCurrent = () => {
-    assertMetadata();
-    frameGuard(); sourceGuard(); frameGuard();
-    physicalSweep(root, bound.values(), true);
-    assertMetadata();
-  };
+  const guardNode = Object.freeze({
+    dependencies: Object.freeze([frameGuardNode]),
+    preflight: () => { assertMetadata(); physicalSweep(root, bound.values(), true); },
+    consume: () => { sourceGuard(); },
+    final: () => { physicalSweep(root, bound.values(), true); assertMetadata(); },
+  });
+  const assertCurrent = loadedComposeCanonicalSourceGuards(Object.freeze([guardNode]));
   assertCurrent();
   return {frames, body: freeze(structuredClone(body)), entry: freeze(structuredClone(entry)), proof: freeze(structuredClone(request.proof)),
     stage: {...frames.stage, before: Buffer.from(frames.stage.before), after: Buffer.from(frames.stage.after),
       entries: freeze(structuredClone(frames.stage.entries))},
     registryBefore: Buffer.from(frames.registryBefore), registryAfter: Buffer.from(frames.registryAfter),
-    source, bound: structuredClone([...bound.values()]), assertCurrent,
+    source, bound: structuredClone([...bound.values()]), guardNode, assertCurrent,
     source_scope_only: true, canonical_admission_granted: false,
     current_native_packed_browser_floor_or_full_audit_qualified: false};
 }
