@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "role": "Conservative source-only two ordinary family bridge proposal; data only",
+  "worksheet": {
+    "path": "compatibility/rc/parallel-checkbox-button-public-bridge-worksheet-v1.json",
+    "sha256": "0886fe5b07df9c023d8a135ac3f18c6f78d9f14fac6e4533243b20805c46dfc3",
+    "bytes": 2946
+  },
+  "proposal": {
+    "path": "compatibility/rc/parallel-checkbox-button-public-bridge-proposed-afterimages-v3.json",
+    "sha256": "31a1a4d48a06d52eacddd901953194c9631b060412e153cefc74b4f81b2ef762",
+    "bytes": 1606
+  },
+  "diff": {
+    "path": "compatibility/rc/parallel-checkbox-button-public-bridge-proposed-v3.diff",
+    "sha256": "a579f99de9ea0a3b60edf27a564217b24666fd9bc623fea08ed968b23b9ca0b7",
+    "bytes": 14959
+  },
+  "source_authentication": {
+    "path": "compatibility/rc/parallel-checkbox-button-public-bridge-source-authentication-v1.json",
+    "sha256": "93355c0d4adfd380742c098158f8bdc65adc7d5cb0861a6aba63a7ddb403fbe3",
+    "bytes": 7397
+  },
+  "public_key_and_consumer_map": {
+    "path": "compatibility/rc/parallel-checkbox-button-public-bridge-public-token-map-v1.json",
+    "sha256": "2677f510d6ce956d726d5c4aa2497d2d7a1895c9568366ff0a844c83b9143de2",
+    "bytes": 93063
+  },
+  "source_census": {
+    "path": "compatibility/rc/parallel-checkbox-button-public-bridge-source-census-v1.json",
+    "sha256": "c290b0823cb53fd742943976954ad81ccff57ebdb46435d4277b4e230071f0a0",
+    "bytes": 212907
+  },
+  "minimum_peers": {
+    "21.x": "Material/CDK21.2.14",
+    "main": "Material/CDK22.1.7"
+  },
+  "public_dependency_boundary": {
+    "additions": [
+      "@angular/material as mat; public checkbox-overrides and button-overrides only"
+    ],
+    "owned_value_dependencies": [
+      "Existing owned16 checkbox token getters",
+      "Owned MDC theme-color, typography, ripple, elevation, density and touch-target source"
+    ],
+    "forbidden": [
+      "Current m2-* Sass call-through",
+      "Current private Sass imports",
+      "Modern component or ordinary DOM fork",
+      "New selectors or consumer changes"
+    ],
+    "new_sass_module": false,
+    "old_namespace_bindings_preserved": true
+  },
+  "checkbox": {
+    "public_key_count": 33,
+    "color": {
+      "default_role": "Existing root/current-selector color map uses owned accent; mat-accent and no-color host inherit it.",
+      "primary": "Existing mat-primary remaps a new accent key to owned primary without mutating caller map.",
+      "warn": "Existing mat-warn remaps a new accent key to owned warn without mutating caller map.",
+      "selected": "Owned accent-selected color and its own contrast tone feed selected icon/checkmark/focus/hover/pressed tokens; palette default separately feeds selected state layers.",
+      "unselected": "Owned foreground.base opacity0.54 border, gray900/light or gray200/dark focus/hover border, foreground.base state layer.",
+      "disabled": "Owned foreground.base opacity0.38 selected/unselected icons; owned white disabled selected checkmark; owned foreground.disabled-text label.",
+      "label": "Within existing owned MDC theme wrapper, text-primary-on-background exact value; no replacement with merely similarly named foreground.text.",
+      "state_layer_opacity": "Owned fixed0.04 hover and0.16 focus/press for selected/unselected; values remain distinct from button opacities."
+    },
+    "unsupported_slot": {
+      "name": "unselected-pressed-icon-color",
+      "old_value": "Same owned normal border value",
+      "current_public_key": false,
+      "current_active_border_consumer": false,
+      "meaning": "Current hover/focus icon rules may remain effective during combined pressed states. Value equality with normal is not proof of historical state parity.",
+      "decision": "Preserve current component structural state behavior through public APIs; explicitly document unsupported historical slot and test combined current states. No selector/private-symbol workaround."
+    },
+    "selected_pressed_icon": {
+      "public": true,
+      "current_literal_consumers": 0,
+      "meaning": "Emit supported owned value without claiming current runtime consumes this otherwise unused slot."
+    },
+    "typography": {
+      "source": "Inside unchanged using-mdc-typography wrapper: map.get(owned mdc-typography.$styles, body2)",
+      "mapping": {
+        "font-family": "label-text-font",
+        "line-height": "label-text-line-height",
+        "font-size": "label-text-size",
+        "letter-spacing": "label-text-tracking",
+        "font-weight": "label-text-weight"
+      },
+      "raw_and_null": "Retain existing 2014/2018 conversion, raw config behavior and wrapper defaults; empty original MDC typography getter remains unchanged."
+    },
+    "density": {
+      "source": "Existing owned token getter clamp-density(scale,-3)",
+      "state_layer_sizes": {
+        "0": "40px",
+        "-1": "36px",
+        "-2": "32px",
+        "-3": "28px"
+      },
+      "touch": "Owned48px size; block by default, existing if-touch-targets-unsupported wrapper adds none.",
+      "edges": "Retain existing clamp min/max/default, out-of-range and fractional semantics; fractional lookup may omit state-layer size and needs explicit expected-emission test."
+    },
+    "theme_from_tokens": "Body remains byte-identical. Existing intentionally incomplete frozen private token boundary is preserved."
+  },
+  "button": {
+    "public_key_count": 75,
+    "variants": {
+      "text": "mat-mdc-button",
+      "filled": "mat-mdc-unelevated-button",
+      "protected": "mat-mdc-raised-button",
+      "outlined": "mat-mdc-outlined-button"
+    },
+    "roles": {
+      "unthemed": "text/outlined label on-surface; filled/protected label on-surface over surface.",
+      "primary": "text/outlined primary; filled/protected on-primary over primary.",
+      "accent": "text/outlined secondary; filled/protected on-secondary over secondary.",
+      "warn": "text/outlined error; filled/protected on-error over error."
+    },
+    "disabled": {
+      "ink": "Exact owned on-surface opacity0.38 light/0.5 dark",
+      "container": "Exact owned on-surface opacity0.12",
+      "outline": "Exact owned on-surface opacity0.12",
+      "scope": "Add per-variant disabled tokens at existing variant roots for current disabled classes/disabledInteractive. Retain and append inside original [disabled][disabled] branches for enabled+disabled token coverage of anchors and buttons.",
+      "runtime": "Current peer retains disabled/ripple suppression; no API/input/config equivalence or lifetime fork is assumed."
+    },
+    "ripple_and_state": {
+      "color": "Copy exact owned private ripple color rules: base on-surface; text/outlined role color; filled/protected on-role contrast color.",
+      "ripple": "rgba(exact owned color,0.1), distinct from persistent state-layer color.",
+      "opacity": {
+        "light": {
+          "hover": 0.04,
+          "focus": 0.12,
+          "press": 0.12
+        },
+        "dark": {
+          "hover": 0.08,
+          "focus": 0.24,
+          "press": 0.24
+        }
+      },
+      "scope": "Exactly four historical variants; inherited current selectors consume public state tokens. No tonal/progress-indicator API mirror."
+    },
+    "elevation": {
+      "source": "Owned MDC elevation-box-shadow(number), not a numeric token alias.",
+      "states": {
+        "normal": 2,
+        "hover": 4,
+        "focus": 4,
+        "pressed": 8,
+        "disabled": 0
+      },
+      "scope": "Protected variant only; original numeric MDC declarations remain unchanged. Added public shadow tokens use actual owned shadow strings."
+    },
+    "typography": {
+      "source": "Inside unchanged owned typography wrapper, owned styles.button",
+      "mapping": {
+        "font-family": "label-text-font",
+        "font-size": "label-text-size",
+        "letter-spacing": "label-text-tracking",
+        "font-weight": "label-text-weight",
+        "text-transform": "label-text-transform"
+      },
+      "line_height": "No stable public button label-line-height key exists at either minimum. Existing direct .mdc-button line-height declaration stays; current host retains mdc-button. Validate computed line-height rather than inventing a key.",
+      "raw_and_null": "Retain owned raw typography conversion, wrapper default/null behavior and text-transform semantics."
+    },
+    "density": {
+      "source": "Exact owned mdc-density.prop-value(mdc-button-theme.$density-config,scale,height)",
+      "heights": {
+        "0": "36px",
+        "-1": "32px",
+        "-2": "28px",
+        "-3": "24px"
+      },
+      "touch": "Owned48px; same existing unsupported-density helper decides none.",
+      "edges": "Retain old range errors at +1/-4 and owned fractional interpolation/min/max/default. Do not substitute modern40px baseline or modern clamp."
+    }
+  },
+  "callers": {
+    "ordinary": "Eight finite root exports, ordinary all-component theme/typography/density callsites, plus latent datepicker-legacy-compat ordinary button import.",
+    "legacy": "Legacy aggregates and legacy datepicker use their separate owned legacy modules; no all-legacy/companion wiring changes proposed.",
+    "cyph": "Read-only six legacy checkbox/button calls; no ordinary component consumer call was found."
+  },
+  "successor_boundary": {
+    "actual_source_authority": "Held. Parent finite four-product source-successor worksheet is prerequisite before application.",
+    "frozen_two_path_subject": "Unchanged and retained as historical evidence. Its authenticated284 unchanged-owned members include these proposed targets, so running it against changed product files must reject.",
+    "future": "A separately bounded four-target current subject must independently authenticate before/current four module identities, exact positioned additions and complete current loaded graph; preserve original two-module evidence and reject every other changed owned member. Old product bytes remain comparison-only, never current read.",
+    "current_gate_scope": "Current gate/source helpers and all CSS models unchanged by this proposal."
+  },
+  "status": {
+    "actual_product_edits": false,
+    "new_compiles_by_this_task": 0,
+    "sass_parser_execution": false,
+    "runtime_or_native_qualified": false,
+    "full_owner_or_audit_accepted": false
+  }
+}
