@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "role": "proposed-exact-browser-zone-and-source-binding-successor",
+  "previous_profile": {
+    "path": "compatibility/rc/parent-base-class-tool-successor-inputs-v3.json",
+    "sha256": "b263cc37bebdf21c6b3e73364b21e50e6a639f7f5fc2126885098a9c7f04ceb1",
+    "bytes": 315976
+  },
+  "browser": {
+    "21.x": {
+      "old_commit": "6bd510e8eb75f19ac9893b627e9149b4c293c038",
+      "new_commit": "5ef90fbc10386f774bb552a91a461a6a4c9349df",
+      "path": "scripts/browser-required-cells.mjs",
+      "before": {
+        "path": "scripts/browser-required-cells.mjs",
+        "sha256": "b20d02256e9f560efcfa5a93ca5512c2a859209486d16d4fd7714f1ca548a127",
+        "bytes": 62901
+      },
+      "after": {
+        "path": "scripts/browser-required-cells.mjs",
+        "sha256": "0ff4701de780b76fdd9388cf9936a3cefeeb5a6e4f35e5c4d8eb6b5d02cefef4",
+        "bytes": 64933
+      },
+      "edits": [
+        {
+          "offset": 16150,
+          "before": "  const zoneNamed = zoneless ? ', provideZonelessChangeDetection' : '';\n",
+          "after": "  const zoneNamed = zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection';\n"
+        },
+        {
+          "offset": 20731,
+          "before": "",
+          "after": "  private readonly zone = inject(NgZone);\n"
+        },
+        {
+          "offset": 23601,
+          "before": "",
+          "after": "    const insideAngularZone = this.zone.run(() => NgZone.isInAngularZone());\n    if (insideAngularZone !== ${!zoneless}) {\n      throw new Error('browser fixture zone mode mismatch');\n    }\n"
+        },
+        {
+          "offset": 23655,
+          "before": "",
+          "after": "      zoneMode: {zoneless: ${zoneless}, insideAngularZone},\n"
+        },
+        {
+          "offset": 28941,
+          "before": "platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {\n",
+          "after": "platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}' }).catch(err => {\n"
+        },
+        {
+          "offset": 52419,
+          "before": "async function waitReady(driver) {\n",
+          "after": "export function validateZoneModeObservation(observed, expectedZoneless) {\n  if (typeof expectedZoneless !== 'boolean') {\n    throw new Error('browser fixture requested mode is invalid');\n  }\n  const expectedInsideAngularZone = !expectedZoneless;\n  if (!observed || typeof observed !== 'object' ||\n      observed.zoneless !== expectedZoneless ||\n      observed.insideAngularZone !== expectedInsideAngularZone) {\n    throw new Error(`browser fixture zone mode mismatch: requested=${expectedZoneless ? 'zoneless' : 'zoneful'} observed=${JSON.stringify(observed)}`);\n  }\n  return {\n    requestedRuntime: expectedZoneless ? 'zoneless' : 'zoneful',\n    zoneless: observed.zoneless,\n    insideAngularZone: observed.insideAngularZone,\n  };\n}\n\nasync function waitReady(driver, expectedZoneless) {\n"
+        },
+        {
+          "offset": 52507,
+          "before": "    const raw = await driver.evaluate('JSON.stringify({ready: document.documentElement.dataset.labReady || \"\", error: (document.getElementById(\"bootstrap-error\") || {}).textContent || \"\", state: document.readyState, text: (document.body && document.body.innerText || \"\").slice(0, 180)})');\n",
+          "after": "    const raw = await driver.evaluate('JSON.stringify({ready: document.documentElement.dataset.labReady || \"\", error: (document.getElementById(\"bootstrap-error\") || {}).textContent || \"\", state: document.readyState, text: (document.body && document.body.innerText || \"\").slice(0, 180), zoneMode: window.__lab ? window.__lab.zoneMode || null : null})');\n"
+        },
+        {
+          "offset": 52954,
+          "before": "    if (status.ready === '1') return;\n",
+          "after": "    if (status.ready === '1') return validateZoneModeObservation(status.zoneMode, expectedZoneless);\n"
+        },
+        {
+          "offset": 56764,
+          "before": "    const built = await buildConsumer(tarball, runtime === 'zoneless');\n",
+          "after": "    if (runtime !== 'zoneless' && runtime !== 'zoneful') throw new Error(`unknown browser runtime mode: ${runtime}`);\n    const expectedZoneless = runtime === 'zoneless';\n    const built = await buildConsumer(tarball, expectedZoneless);\n"
+        },
+        {
+          "offset": 57158,
+          "before": "        engines[engine] = driver.browser;\n        await waitReady(driver);\n",
+          "after": "        const observation = await waitReady(driver, expectedZoneless);\n        const previous = engines[engine]?.zoneModeObservations || [];\n        engines[engine] = {...driver.browser, zoneModeObservations: [...previous, {line: '21.x', requestedRuntime: runtime, observed: observation}]};\n"
+        },
+        {
+          "offset": 59299,
+          "before": "    const built = await buildConsumer(artifact.tarball, runtime === 'zoneless');\n",
+          "after": "    if (runtime !== 'zoneless' && runtime !== 'zoneful') throw new Error(`unknown browser runtime mode: ${runtime}`);\n    const expectedZoneless = runtime === 'zoneless';\n    const built = await buildConsumer(artifact.tarball, expectedZoneless);\n"
+        },
+        {
+          "offset": 59892,
+          "before": "        browsers[engine] = driver.browser;\n        await waitReady(driver);\n",
+          "after": "        const observation = await waitReady(driver, expectedZoneless);\n        const previous = browsers[engine]?.zoneModeObservations || [];\n        browsers[engine] = {...driver.browser, zoneModeObservations: [...previous, {line, requestedRuntime: runtime, observed: observation}]};\n"
+        }
+      ]
+    },
+    "main": {
+      "old_commit": "39d1acd07aa27ef02eb23f81b42ff4b43dd76fdd",
+      "new_commit": "e89618076c03e8385702e45cd0915b10af3f9cb1",
+      "path": "scripts/browser-required-cells.mjs",
+      "before": {
+        "path": "scripts/browser-required-cells.mjs",
+        "sha256": "b2c05123c5b604f4548b354c75feed41b9e6589907f7320dbca2843a9ae8c919",
+        "bytes": 62901
+      },
+      "after": {
+        "path": "scripts/browser-required-cells.mjs",
+        "sha256": "3e1c0399357045c51cff607e7187aee7f379f5e3851d13f117ce886885b958e9",
+        "bytes": 64933
+      },
+      "edits": [
+        {
+          "offset": 16150,
+          "before": "  const zoneNamed = zoneless ? ', provideZonelessChangeDetection' : '';\n",
+          "after": "  const zoneNamed = zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection';\n"
+        },
+        {
+          "offset": 20731,
+          "before": "",
+          "after": "  private readonly zone = inject(NgZone);\n"
+        },
+        {
+          "offset": 23601,
+          "before": "",
+          "after": "    const insideAngularZone = this.zone.run(() => NgZone.isInAngularZone());\n    if (insideAngularZone !== ${!zoneless}) {\n      throw new Error('browser fixture zone mode mismatch');\n    }\n"
+        },
+        {
+          "offset": 23655,
+          "before": "",
+          "after": "      zoneMode: {zoneless: ${zoneless}, insideAngularZone},\n"
+        },
+        {
+          "offset": 28941,
+          "before": "platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {\n",
+          "after": "platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}' }).catch(err => {\n"
+        },
+        {
+          "offset": 52419,
+          "before": "async function waitReady(driver) {\n",
+          "after": "export function validateZoneModeObservation(observed, expectedZoneless) {\n  if (typeof expectedZoneless !== 'boolean') {\n    throw new Error('browser fixture requested mode is invalid');\n  }\n  const expectedInsideAngularZone = !expectedZoneless;\n  if (!observed || typeof observed !== 'object' ||\n      observed.zoneless !== expectedZoneless ||\n      observed.insideAngularZone !== expectedInsideAngularZone) {\n    throw new Error(`browser fixture zone mode mismatch: requested=${expectedZoneless ? 'zoneless' : 'zoneful'} observed=${JSON.stringify(observed)}`);\n  }\n  return {\n    requestedRuntime: expectedZoneless ? 'zoneless' : 'zoneful',\n    zoneless: observed.zoneless,\n    insideAngularZone: observed.insideAngularZone,\n  };\n}\n\nasync function waitReady(driver, expectedZoneless) {\n"
+        },
+        {
+          "offset": 52507,
+          "before": "    const raw = await driver.evaluate('JSON.stringify({ready: document.documentElement.dataset.labReady || \"\", error: (document.getElementById(\"bootstrap-error\") || {}).textContent || \"\", state: document.readyState, text: (document.body && document.body.innerText || \"\").slice(0, 180)})');\n",
+          "after": "    const raw = await driver.evaluate('JSON.stringify({ready: document.documentElement.dataset.labReady || \"\", error: (document.getElementById(\"bootstrap-error\") || {}).textContent || \"\", state: document.readyState, text: (document.body && document.body.innerText || \"\").slice(0, 180), zoneMode: window.__lab ? window.__lab.zoneMode || null : null})');\n"
+        },
+        {
+          "offset": 52954,
+          "before": "    if (status.ready === '1') return;\n",
+          "after": "    if (status.ready === '1') return validateZoneModeObservation(status.zoneMode, expectedZoneless);\n"
+        },
+        {
+          "offset": 56764,
+          "before": "    const built = await buildConsumer(tarball, runtime === 'zoneless');\n",
+          "after": "    if (runtime !== 'zoneless' && runtime !== 'zoneful') throw new Error(`unknown browser runtime mode: ${runtime}`);\n    const expectedZoneless = runtime === 'zoneless';\n    const built = await buildConsumer(tarball, expectedZoneless);\n"
+        },
+        {
+          "offset": 57158,
+          "before": "        engines[engine] = driver.browser;\n        await waitReady(driver);\n",
+          "after": "        const observation = await waitReady(driver, expectedZoneless);\n        const previous = engines[engine]?.zoneModeObservations || [];\n        engines[engine] = {...driver.browser, zoneModeObservations: [...previous, {line: '21.x', requestedRuntime: runtime, observed: observation}]};\n"
+        },
+        {
+          "offset": 59299,
+          "before": "    const built = await buildConsumer(artifact.tarball, runtime === 'zoneless');\n",
+          "after": "    if (runtime !== 'zoneless' && runtime !== 'zoneful') throw new Error(`unknown browser runtime mode: ${runtime}`);\n    const expectedZoneless = runtime === 'zoneless';\n    const built = await buildConsumer(artifact.tarball, expectedZoneless);\n"
+        },
+        {
+          "offset": 59892,
+          "before": "        browsers[engine] = driver.browser;\n        await waitReady(driver);\n",
+          "after": "        const observation = await waitReady(driver, expectedZoneless);\n        const previous = browsers[engine]?.zoneModeObservations || [];\n        browsers[engine] = {...driver.browser, zoneModeObservations: [...previous, {line, requestedRuntime: runtime, observed: observation}]};\n"
+        }
+      ]
+    }
+  },
+  "binder_21": {
+    "old_commit": "5ef90fbc10386f774bb552a91a461a6a4c9349df",
+    "path": "scripts/packed-upstream-ledger-epoch.mjs",
+    "before": {
+      "path": "scripts/packed-upstream-ledger-epoch.mjs",
+      "sha256": "2fcc2f7ce76f3997f17423bf4e682c9a4c899614c8c281e518b0c94084b33a14",
+      "bytes": 92194
+    },
+    "after": {
+      "path": "scripts/packed-upstream-ledger-epoch.mjs",
+      "sha256": "aaf5c8d72539d2934586c8eef8a4abd6bfe065d26b3c0470c0b74a111ad77066",
+      "bytes": 92851
+    },
+    "edits": [
+      {
+        "offset": 8374,
+        "before": "const sourceMetadataReaders=new WeakMap();\n",
+        "after": "const sourceMetadataReaders=new WeakMap(),sourceMetadataBindings=new WeakSet();\n"
+      },
+      {
+        "offset": 11499,
+        "before": "",
+        "after": " assert.equal(sourceMetadataBindings.has(captured.read),false,'reentrant source metadata binding');sourceMetadataBindings.add(captured.read);\n try{\n"
+      },
+      {
+        "offset": 11586,
+        "before": " checked(()=>captured.guard());const references=new Map();\n for(const path of sourceMetadataPaths[role]){\n",
+        "after": " const references=new Map();\n const collect=()=>{for(const path of sourceMetadataPaths[role]){\n"
+      },
+      {
+        "offset": 11993,
+        "before": " }\n checked(()=>captured.guard());sourceMetadataReaders.set(captured.read,{root:resolve(root),raw:currentRead,...captured,references});\n",
+        "after": " }};\n if(captured.node!==undefined){\n  assertLanePlanner(root);\n  const bindingNode=Object.freeze({dependencies:Object.freeze([captured.node]),\n   preflight:()=>{captured.check();assertLanePlanner(root);},\n   consume:()=>{captured.check();collect();captured.check();},\n   final:()=>{captured.check();assertLanePlanner(root);},\n  });\n  lanePlanner(Object.freeze([bindingNode]))();\n }else{checked(()=>captured.guard());collect();checked(()=>captured.guard());}\n sourceMetadataReaders.set(captured.read,{root:resolve(root),raw:currentRead,...captured,references});\n"
+      },
+      {
+        "offset": 12146,
+        "before": "",
+        "after": " }finally{sourceMetadataBindings.delete(captured.read);}\n"
+      }
+    ],
+    "new_bytes_committed": false
+  },
+  "historical_packets_rewritten": false,
+  "old_programs_executed": false,
+  "native_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

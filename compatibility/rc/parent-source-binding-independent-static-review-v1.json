@@ -1,0 +1,25 @@
+{
+  "scope": "Static review of bindSourceMetadata changes and related regression probes; not a security scan, full owner review, or product qualification",
+  "head": "5ef90fbc10386f774bb552a91a461a6a4c9349df",
+  "tracked_diff_sha256": "a281f14fc97027301b41fb934d3431e5b049f6f2216dedf6480fd5cb794605ed",
+  "source_sha256": {
+    "scripts/packed-upstream-ledger-epoch.mjs": "aaf5c8d72539d2934586c8eef8a4abd6bfe065d26b3c0470c0b74a111ad77066",
+    "tests/test_table_guard_graph.py": "6e966dfd971ca9a475de766a703858a5740dc1f41000d5a333e2020db6c62626",
+    "tests/source_binding_guard_graph_probe.mjs": "13017e97378fa897d7e3bae423c3bedc7d74f60dd5bb1ca11f59f6ce7112de25",
+    "scripts/canonical-source-guard-plan.mjs": "4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f",
+    "/tmp/parent-source-binding-single-guard-worksheet-v1.json": "7f0c44de041f4df02b024dd5cf41835225ed27703de65857c96209d19d6dfc50"
+  },
+  "finding": {
+    "severity": "test evidence gap",
+    "location": "tests/source_binding_guard_graph_probe.mjs exception mode",
+    "detail": "The second operation is configured to throw the same sentinel again. exception_recovered therefore proves a repeated fault reaches the callback, not that an unfaulted subsequent operation succeeds as required by the worksheet. Disable the fault and demonstrate later clean completion at the appropriate binding scope before claiming recovery."
+  },
+  "observations": [
+    "On the matching tuple route, the scheduler visits the child graph, executes all preflights before any consumes, and executes child final predicates after the binding row callbacks. Scheduler snapshots and checks descriptors of the graph before and after invocation.",
+    "The private binding lock is keyed by captured metadata reader identity and removed in finally. Registration occurs only after successful guard and row execution. This does not reserve child operations through the row callback and does not purport to prevent alternate plans; the genuine nested base ledger frame remains available.",
+    "Absent or mismatched accepted tuples use the existing guard, rows, guard sequence. Row reads and before/after reference hashes remain fresh and the matched route does not introduce a verdict or byte cache.",
+    "The new probes do not by themselves establish the other worksheet fault cases, including cold rejection before callbacks, mismatched fallback parity, descriptor and scheduler mutation, reentry identity, and successful post-fault operation. These require independent execution evidence or existing targeted coverage."
+  ],
+  "runtime_tests": "Not executed: source enrollment is stale pending successor pins.",
+  "maintained_edits": false
+}

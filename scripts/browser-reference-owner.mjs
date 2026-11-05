@@ -9,8 +9,12 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {browserOwnerSourceSubject,readBrowserOwnerMember} from './browser-owner-source.mjs';
 import {prepareBrowserReferenceSourceMetadata,BROWSER_REFERENCE_LEDGER as LEDGER} from './browser-reference-proposal.mjs';
+import {browserZoneSourceSuccessor} from './browser-zone-source-successor.mjs';
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 export function browserReferenceOwnerContext({root,read=path=>readBrowserOwnerMember(root,path)}={}){
+ const version=JSON.parse(readBrowserOwnerMember(root,'projects/ngx-material-legacy/package.json')).version;
+ const line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
+ const zone=browserZoneSourceSuccessor({root,read,line});
  const tools=browserOwnerSourceSubject({root,read});
  // Source qualification always sees the real physical ledger. The caller's
  // complete image is captured separately and is never projected if unknown.
@@ -18,8 +22,9 @@ export function browserReferenceOwnerContext({root,read=path=>readBrowserOwnerMe
  const source=prepareBrowserReferenceSourceMetadata({root,read:sourceRead});
  assert.equal(source.line,tools.line);assert.equal(hash(source.before),tools.packet.before_ledger.sha256);assert.equal(hash(source.after),tools.packet.after_ledger.sha256);
  const raw=read(LEDGER),current={path:LEDGER,sha256:hash(raw),bytes:raw.length},applied=raw.equals(source.after);
- const bound=new Map([...tools.bound,...source.bound,current].map(ref=>[ref.path,{...ref}]));
- const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'late browser metadata input '+ref.path);assert.equal(value.length,ref.bytes);}};
+ assert.equal(source.line,line);
+ const bound=new Map([...tools.bound,...source.bound,...zone.bound,current].map(ref=>[ref.path,{...ref}]));
+ const assertCurrent=()=>{zone.assertCurrent();tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'late browser metadata input '+ref.path);assert.equal(value.length,ref.bytes);}zone.assertPhysical();};
  const wrapPrepared=prior=>{
   assertCurrent();assert.ok(prior.canonical_after.equals(source.before),'browser stage does not succeed exact checker after-image');
   const currentBound=new Map(prior.bound);for(const ref of bound.values())currentBound.set(ref.path,ref.sha256);
