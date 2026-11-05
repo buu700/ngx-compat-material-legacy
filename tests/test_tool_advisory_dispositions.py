@@ -44,10 +44,16 @@ class ToolAdvisoryDispositionTests(unittest.TestCase):
             shutil.copyfile(ROOT / name, target)
         for name in ["compatibility/rc/tool-advisory-triage", "reference/toolchain/pnpm-12.4.2"]:
             shutil.copytree(ROOT / name, root / name, dirs_exist_ok=True)
-        manifests = json.loads((ROOT / "compatibility/rc/tool-advisory-triage/private-profile-source-manifests.json").read_text())
+        profile_path = eligibility.NPM_CURRENT_PRIVATE_PROFILE_PATH
+        profile = json.loads((ROOT / profile_path).read_text())
+        for name in (profile_path, profile["review"]["path"]):
+            target = root / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / name, target)
         version = json.loads((ROOT / "projects/ngx-material-legacy/package.json").read_text())["version"]
         line = "21.x" if version.startswith("21.") else "main"
-        for row in manifests["lines"][line]["source_files"]:
+        current = profile["lines"][line]
+        for row in current["source_files"] + current["support_files"] + current["input_files"]:
             target = root / row["path"]
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / row["path"], target)
@@ -83,6 +89,21 @@ class ToolAdvisoryDispositionTests(unittest.TestCase):
         private = [row for row in result["classified"] if row["private_profile_evidence"]]
         self.assertEqual(len(private), 7)
         self.assertTrue(all(row["private_profile_evidence"]["source_files"] in {340, 362} for row in private))
+        profile_path = eligibility.NPM_CURRENT_PRIVATE_PROFILE_PATH
+        raw = (ROOT / profile_path).read_bytes()
+        profile = json.loads(raw)
+        version = json.loads((ROOT / "projects/ngx-material-legacy/package.json").read_text())["version"]
+        current = profile["lines"]["21.x" if version.startswith("21.") else "main"]
+        for row in private:
+            binding = row["private_profile_evidence"]
+            self.assertEqual(binding["current_source_parent"], current["source_parent"])
+            self.assertEqual(binding["current_profile"], {
+                "path": profile_path, "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)})
+            for source, field in [("source_files", "current_source_files"),
+                                  ("support_files", "current_support_files"), ("input_files", "current_input_files")]:
+                self.assertEqual(binding[field], len(current[source]))
+        self.assertTrue(all(row["private_profile_evidence"]["current_scope"] ==
+                            "maintained-tool-owned-npm-invocations" for row in private))
         brace = [row for row in private if row["rule_id"] == "npm-private-brace-inputs"]
         self.assertEqual(len(brace), 5)
         self.assertEqual({row["advisory_id"] for row in brace}, eligibility.TOOL_FINDING_SCOPES["npm/brace-expansion@5.0.7"][1])
