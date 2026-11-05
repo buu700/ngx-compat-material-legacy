@@ -1,0 +1,45 @@
+{
+  "scope": "Read-only static review of interim 21.x legacy stage graph, 3 epoch callsites and finite current-tool anchor. No runtime, tests, owner or maintained changes by reviewer; profile is interim and will change.",
+  "snapshots": {
+    "21.x_head": "f7cd28c777a1150894aa39249b6f43c1917d896a",
+    "main_head": "29688d81c1c519d54235c3235b213272b97135d2",
+    "legacy_stage_sha256": "fcb84d9ded918de8d904e2fdc775e4a2ef6598bd4b2eb1bd34126ca148b6e2a2",
+    "legacy_stage_bytes": 15126,
+    "epoch_sha256": "3210c258aaad2719bd0c76f69cf6b633078101457234c26299bd429852c5c3be",
+    "epoch_bytes": 90941
+  },
+  "result": "One concrete cold-inspector identity gap requires correction. Remaining graph path is conditional on the actual route proof and focused real lifecycle validation; no full owner pass.",
+  "finding": {
+    "location": "scripts/legacy-removal-canonical-stage.mjs legacyRemovalOwnerContext and assertInspector",
+    "issue": "The supposedly loaded inspector is obtained from admission.inspectCanonicalSource inside each factory call. The immediate own-value identity check therefore compares a possibly already-replaced property to itself. The source text digest does not authenticate its lexical closure.",
+    "concrete_counterexample": "The actual genuine legacy and table CJS inspectCanonicalSource function bodies are byte-for-byte identical 370 bytes and both hash to 619ce1daf34bc76fa9e610af6e28496957094b4ff4c5d14eb492664405cd67ca, but close over different SHA and inspectSource. Replace the legacy export with the genuine table function before calling composeSourceGuards:true: the cold entry check accepts it, tools and subsequent reads invoke supplied callbacks, and the wrong inspector is eventually invoked. Its different SHA is expected to reject there, so no incorrect positive is asserted; the cold identity/zero-callback and no-redirect invariant is nonetheless violated.",
+    "fix": "Capture the actual legacy inspector at module initialization under trusted committed startup, then compare own-data property identity to that capture and digest before supplied callbacks and at final. Add real cold swapped-identical-body test and late pointer/accessor tests; verify no supplied callback and no swapped inspector call on cold rejection."
+  },
+  "mapping": [
+    "Default composeSourceGuards false and missing/malformed complete tuple retain original CJS construction and entire original assertCurrent path, rather than representing an opaque guard as an empty node. Only three direct genuine epoch calls request opt-in and register matching complete tuple.",
+    "In composed path private checkedSourceRead is phase-selected; physical phase passes independent physical reads to the unchanged CJS source guard and therefore retains its nested tools, authored/currentSass, original, exact legacy population and retained physical-boundary predicates without supplied callbacks. Consume invokes the same genuine source guard with physical-before/supplied/physical-after. phase, sourceActive and stageActive are reset in finally, with idle checks protecting direct and alternate-scheduler node paths.",
+    "Stage bound sweep treats logical projected ledger separately from its authenticated physicalLedger ref; all non-ledger consumed bytes must equal physical before and after. Duplicate source refs against prior bound require matching hash and size; stage and source identities are checked pre/final. Population and dynamically retained boundary remain in genuine nested CJS guard, not a frozen finite-path approximation.",
+    "The physical phase route proof covers the genuine epoch chain and records a direct CJS-only successor input not independently covered by tool/nested-source maps. It does not prove arbitrary external callers supplying historical projected readers. Exported composeSourceGuards:true is a new opt-in surface; no unproven arbitrary reader or projection equivalence should be claimed.",
+    "The pure registry and apply functions have no diff. Earlier callback sampling inside original source guard is moved into consume; explicit tests must demonstrate real predicates and snapshots, no callback/output caching, and same-instance reentry behavior."
+  ],
+  "finite_anchor": {
+    "packet": "compatibility/rc/21x-table-local-compilation-admission-owner-inputs.json",
+    "sha256": "1a35dd57edd9952a23d4bb2e8e9783f19583c00badfd7e9846fdbd2abc94f48b",
+    "bytes": 184121,
+    "code_transitions_index": 1,
+    "after": {
+      "path": "scripts/legacy-removal-canonical-stage.mjs",
+      "sha256": "9b5021340fcab66f2c2b45447b5162f0e25b002b45c7ea7c062c8087dfb80d6c",
+      "bytes": 8412
+    },
+    "observation": "Verified packet bytes and exact after record. Builder and both JS/Python finite maps point to this existing anchor. Interim profile and future tests not qualified."
+  },
+  "tests_required": [
+    "Cold inspector substituted with actual identical-body table inspector, zero user callbacks, and late accessor/pointer mutation.",
+    "Real physical-phase callback absence, CJS-only input cold/late faults, nested population/absence and retained-boundary controls, same-source alternate-scheduler reentry and cleanup; preserve logical 70\u219269\u219268 ledger projection.",
+    "Opaque fallback and unrecognized/mixed reader behavior; complete original source CLI regressions and actual full owner after final profile and focused tests."
+  ],
+  "tests_executed": false,
+  "owner_executed": false,
+  "g11_claim": "not-passed"
+}
