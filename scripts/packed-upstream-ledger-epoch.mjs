@@ -6,6 +6,9 @@
  */
 /** Current canonical owner: preserved prior stages plus one explicit title stage. */
 import assert from 'node:assert/strict';
+import {types} from 'node:util';
+import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
+import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {inventoryReferenceOwnerContext} from './inventory-reference-owner.mjs';
 import {historicalContractRepairReaderSubject} from './historical-contract-repair-readers.mjs';
 import {canonicalSourcePhysicalBoundary} from './current-sass-canonical-source-boundary.mjs';
@@ -97,16 +100,58 @@ const sourceMetadataPaths={
  inventory:[LEDGER,'testing/legacy-runner/historical-inventory.json','.github/workflows/ci.yml','scripts/upstream-dialog-title-admission.cjs','scripts/upstream-dialog-title-native-evidence.mjs'],
  legacy:[LEDGER],table:[LEDGER],base_class:[LEDGER],
 };
-function bindSourceMetadata(root,context,currentRead,role){
- assert.ok(Object.hasOwn(sourceMetadataPaths,role));assert.equal(typeof context.metadataRead,'function');
- assert.notEqual(context.metadataRead,currentRead);assert.equal(typeof context.assertCurrent,'function');
- assert.equal(sourceMetadataReaders.has(context.metadataRead),false);
- context.assertCurrent();const references=new Map();
+// Private binding only: an exact direct factory call elects its own complete plan.
+// Other contexts, including a combined roster spread, retain the full guard.
+const lanePlanner = composeCanonicalSourceGuards;
+const lanePlannerText = Function.prototype.toString;
+const LANE_PLANNER = Object.freeze({path:'scripts/canonical-source-guard-plan.mjs',
+ sha256:'4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f',bytes:4609});
+function assertLanePlanner(root){
+ assert.equal(composeCanonicalSourceGuards,lanePlanner);
+ assert.equal(hash(lanePlannerText.call(lanePlanner)),'fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947');
+ const raw=readEvidenceMember(root,LANE_PLANNER.path);
+ assert.equal(hash(raw),LANE_PLANNER.sha256);assert.equal(raw.length,LANE_PLANNER.bytes);
+}
+function laneOwn(object,key,optional=false){
+ assert.ok(object&&typeof object==='object'&&!types.isProxy(object));
+ const d=Object.getOwnPropertyDescriptor(object,key);
+ if(optional&&!d)return undefined;
+ assert.ok(d&&Object.hasOwn(d,'value'),'non-data source context '+key);return d;
+}
+function laneSame(object,key,saved){
+ const now=laneOwn(object,key,saved===undefined);
+ if(saved===undefined){assert.equal(now,undefined,'added source context '+key);return;}
+ for(const field of ['value','enumerable','writable','configurable'])assert.equal(now[field],saved[field],'changed source context '+key);
+}
+function captureSourceContext(context,allowPlan){
+ const metadata=laneOwn(context,'metadataRead'),guard=laneOwn(context,'assertCurrent');
+ const plan=laneOwn(context,'guardPlan',true);
+ assert.equal(typeof metadata.value,'function');assert.equal(typeof guard.value,'function');
+ let planGuard,planNode,node;
+ if(allowPlan&&plan){
+  const tuple=plan.value;
+  assert.ok(tuple&&typeof tuple==='object'&&!types.isProxy(tuple)&&Object.isFrozen(tuple));
+  assert.deepEqual(Reflect.ownKeys(tuple).sort(),['assertCurrent','node']);
+  planGuard=laneOwn(tuple,'assertCurrent');planNode=laneOwn(tuple,'node');
+  if(planGuard.value===guard.value)node=planNode.value;
+ }
+ const check=()=>{
+  laneSame(context,'metadataRead',metadata);laneSame(context,'assertCurrent',guard);laneSame(context,'guardPlan',plan);
+  if(planGuard){laneSame(plan.value,'assertCurrent',planGuard);laneSame(plan.value,'node',planNode);assert.ok(Object.isFrozen(plan.value));}
+ };
+ check();return {read:metadata.value,guard:guard.value,node,check};
+}
+function bindSourceMetadata(root,context,currentRead,role,allowPlan=false){
+ assert.ok(Object.hasOwn(sourceMetadataPaths,role));
+ const captured=captureSourceContext(context,allowPlan);
+ assert.notEqual(captured.read,currentRead);assert.equal(sourceMetadataReaders.has(captured.read),false);
+ const checked=fn=>{captured.check();const value=fn();captured.check();return value;};
+ checked(()=>captured.guard());const references=new Map();
  for(const path of sourceMetadataPaths[role]){
-  const before=context.metadataRead(path),after=currentRead(path);assert.ok(Buffer.isBuffer(before)&&Buffer.isBuffer(after));
+  const before=checked(()=>captured.read(path)),after=checked(()=>currentRead(path));assert.ok(Buffer.isBuffer(before)&&Buffer.isBuffer(after));
   if(!before.equals(after))references.set(path,{before:{path,sha256:hash(before),bytes:before.length},after:{path,sha256:hash(after),bytes:after.length}});
  }
- context.assertCurrent();sourceMetadataReaders.set(context.metadataRead,{root:resolve(root),raw:currentRead,read:context.metadataRead,guard:context.assertCurrent,references});
+ checked(()=>captured.guard());sourceMetadataReaders.set(captured.read,{root:resolve(root),raw:currentRead,...captured,references});
  return context;
 }
 /** Read-only resolver; unknown callbacks receive no authority or disk fallback. */
@@ -114,23 +159,45 @@ export function packedUpstreamLedgerCurrentSourceLane({root,read}){
  const frames=[],seen=new Set();let current=read;
  while(sourceMetadataReaders.has(current)){
   assert.equal(seen.has(current),false,'cyclic canonical source metadata reader');seen.add(current);
-  const frame=sourceMetadataReaders.get(current);assert.equal(frame.root,resolve(root));frames.push(frame);current=frame.raw;
+  const frame=sourceMetadataReaders.get(current);assert.equal(frame.root,resolve(root));frame.check();frames.push(frame);current=frame.raw;
  }
- const assertCurrent=()=>{for(const frame of frames){assertBaseClassRemovalSourceInspectorIdentity();for(const row of frame.references.values()){
-  for(const[reader,ref]of [[frame.read,row.before],[frame.raw,row.after]]){const raw=reader(ref.path);assert.ok(Buffer.isBuffer(raw));assert.equal(hash(raw),ref.sha256,'changed canonical source-lane reference '+ref.path);assert.equal(raw.length,ref.bytes);}
- }frame.guard();}};
+ const check=()=>{assertBaseClassRemovalSourceInspectorIdentity();for(const frame of frames)frame.check();};
+ const rows=frame=>{for(const row of frame.references.values()){
+  for(const[reader,ref]of [[frame.read,row.before],[frame.raw,row.after]]){
+   check();const raw=reader(ref.path);check();assert.ok(Buffer.isBuffer(raw));
+   assert.equal(hash(raw),ref.sha256,'changed canonical source-lane reference '+ref.path);assert.equal(raw.length,ref.bytes);
+  }
+ }};
+ const original=()=>{for(const frame of frames){check();rows(frame);frame.guard();check();}};
+ // A mixed lane is wholly original; an opaque guard is never represented as
+ // a node with empty physical preflight/final predicates.
+ let assertCurrent=original,guardPlan;
+ if(frames.length>0&&frames.every(frame=>frame.node!==undefined)){
+  assertLanePlanner(root);
+  let consuming=false;
+  const idle=()=>assert.equal(consuming,false,'reentrant canonical source lane consumption');
+  const laneNode=Object.freeze({dependencies:Object.freeze(frames.map(frame=>frame.node)),
+   preflight:()=>{idle();check();assertLanePlanner(root);},
+   consume:()=>{idle();consuming=true;try{for(const frame of frames)rows(frame);}finally{consuming=false;}},
+   final:()=>{check();assertLanePlanner(root);},
+  });
+  const composed=lanePlanner(Object.freeze([laneNode]));
+  assertCurrent=()=>{idle();composed();};
+  guardPlan=Object.freeze({assertCurrent,node:laneNode});
+ }
  const comparisonReference=ref=>{
+  check();
   let result={...ref};
   for(const frame of [...frames].reverse()){
    const row=frame.references.get(result.path);if(!row)continue;
-   for(const[reader,expected]of [[frame.read,row.before],[frame.raw,row.after]]){const raw=reader(expected.path);assert.ok(Buffer.isBuffer(raw));assert.equal(hash(raw),expected.sha256,'changed canonical source-lane member '+expected.path);assert.equal(raw.length,expected.bytes);}
+   for(const[reader,expected]of [[frame.read,row.before],[frame.raw,row.after]]){check();const raw=reader(expected.path);check();assert.ok(Buffer.isBuffer(raw));assert.equal(hash(raw),expected.sha256,'changed canonical source-lane member '+expected.path);assert.equal(raw.length,expected.bytes);}
    assert.equal(result.sha256,row.after.sha256,'unqualified canonical source-lane reference '+result.path);
    if(result.bytes!==undefined)assert.equal(result.bytes,row.after.bytes);
    result={...result,sha256:row.before.sha256,...(result.bytes===undefined?{}:{bytes:row.before.bytes})};
   }
-  return result;
+  check();return result;
  };
- return {read:current,comparisonReference,assertCurrent,registered_frames:frames.length};
+ return {read:current,comparisonReference,assertCurrent,registered_frames:frames.length,...(guardPlan?{guardPlan}:{})};
 }
 // Only the two inventory-owned title handler projections may bridge this
 // historical packet reference to the physical source reader below.
@@ -620,12 +687,12 @@ function qualifyBeforeTableLocalCompilationToolReference({root=process.cwd(),rea
 /** Exact terminal table source decision; every prior current source stage runs. */
 function prepareBeforeBaseClassRemovalLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});
- const table=bindSourceMetadata(root,tableLocalCompilationOwnerContext({root,read}),read,'table');
+ const table=bindSourceMetadata(root,tableLocalCompilationOwnerContext({root,read}),read,'table',true);
  const prior=prepareBeforeTableLocalCompilationLedger({root,read:table.metadataRead});return table.wrapPrepared(prior);
 }
 function epochBeforeBaseClassRemovalLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});
- const table=bindSourceMetadata(root,tableLocalCompilationOwnerContext({root,read}),read,'table'),prior=epochBeforeTableLocalCompilationLedger({root,read:table.metadataRead});
+ const table=bindSourceMetadata(root,tableLocalCompilationOwnerContext({root,read}),read,'table',true),prior=epochBeforeTableLocalCompilationLedger({root,read:table.metadataRead});
  const assertCurrent=()=>{table.assertCurrent();prior.assertCurrent();table.assertCurrent();};
  const historical=path=>{if(path!==LEDGER)return read(path);assertCurrent();const raw=prior.read(path);assertCurrent();return raw;};
  readers.set(historical,{root:resolve(root),raw:read});assertCurrent();
@@ -635,7 +702,7 @@ function qualifyBeforeBaseClassRemovalToolReference({root=process.cwd(),read=dis
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.qualifyCanonicalToolReference({root,read,prior});
  let role;try{role=read(METADATA_ROLE);}catch{/* Public readers have no comparison capability. */}
  if(role===metadataToken)return qualifyBeforeTableLocalCompilationToolReference({root,read,prior});
- const table=bindSourceMetadata(root,tableLocalCompilationOwnerContext({root,read}),read,'table'),result=qualifyBeforeTableLocalCompilationToolReference({root,read:table.metadataRead,prior});if(!result)return result;
+ const table=bindSourceMetadata(root,tableLocalCompilationOwnerContext({root,read}),read,'table',true),result=qualifyBeforeTableLocalCompilationToolReference({root,read:table.metadataRead,prior});if(!result)return result;
  const bound=new Map(result.bound.map(ref=>[ref.path,{...ref}]));for(const ref of table.bound)bound.set(ref.path,{...ref});
  const raw=read(result.reference.path),reference={...result.reference,sha256:hash(raw),bytes:raw.length};
  const assertCurrent=()=>{table.assertCurrent();result.assertCurrent();table.assertCurrent();};assertCurrent();
@@ -647,7 +714,7 @@ function baseClassRemovalProofContext(root,publicRead){
  const actual=currentAuthoredRosterRawRead({root,read:publicRead});
  const boundary=canonicalSourcePhysicalBoundary({root,read:actual}),read=boundary.read;
  const selected=baseClassRemovalOwnerContext({root,read});
- if(actual===publicRead)return {selected:bindSourceMetadata(root,selected,read,'base_class'),boundary};
+ if(actual===publicRead)return {selected:bindSourceMetadata(root,selected,read,'base_class',true),boundary};
  // Only the roster module's private registration can select this branch.
  // Its historical JSON views remain on publicRead, never the proof reader.
  const roster=currentAuthoredRosterSourceSubject({root,read});

@@ -11,6 +11,8 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {gunzipSync} from 'node:zlib';
+import {types} from 'node:util';
+import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {historicalContractRepairReaderSubject} from './historical-contract-repair-readers.mjs';
 import {baseClassRemovalCanonicalFrameSubject} from './base-class-removal-owner-source.mjs';
@@ -18,6 +20,31 @@ import {packedUpstreamLedgerCurrentSourceLane} from './packed-upstream-ledger-ep
 const SELF='scripts/table-local-compilation-owner-source.mjs',INPUTS='compatibility/rc/21x-table-local-compilation-admission-owner-inputs.json';
 const PIN='1a35dd57edd9952a23d4bb2e8e9783f19583c00badfd7e9846fdbd2abc94f48b';
 const image=readFileSync(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex'),originals=new Map();
+const bufferEquals=Buffer.prototype.equals,apply=Reflect.apply;
+const equal=(actual,supplied)=>Buffer.isBuffer(supplied)&&apply(bufferEquals,actual,[supplied]);
+function data(object,key,optional=false){
+ assert.ok(object&&typeof object==='object'&&!types.isProxy(object));
+ const descriptor=Object.getOwnPropertyDescriptor(object,key);
+ if(optional&&!descriptor)return undefined;
+ assert.ok(descriptor&&Object.hasOwn(descriptor,'value'),'non-data table guard metadata '+key);
+ return descriptor;
+}
+function same(object,key,before){
+ const after=data(object,key,before===undefined);
+ if(before===undefined){assert.equal(after,undefined);return;}
+ for(const flag of ['value','enumerable','writable','configurable'])assert.equal(after[flag],before[flag],'changed table guard metadata '+key);
+}
+function planOf(subject){
+ const guard=data(subject,'assertCurrent'),plan=data(subject,'guardPlan',true);
+ let node;
+ if(plan){
+  assert.ok(plan.value&&typeof plan.value==='object'&&!types.isProxy(plan.value)&&Object.isFrozen(plan.value));
+  assert.deepEqual(Reflect.ownKeys(plan.value).sort(),['assertCurrent','node']);
+  assert.equal(data(plan.value,'assertCurrent').value,guard.value,'incomplete table dependency tuple');
+  node=data(plan.value,'node').value;
+ }
+ return {node,check:()=>{same(subject,'assertCurrent',guard);same(subject,'guardPlan',plan);}};
+}
 function original(root,commit,path){
  const key=root+'\0'+commit+'\0'+path;if(!originals.has(key)){
   const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
@@ -67,6 +94,35 @@ export function tableLocalCompilationOwnerSourceSubject({root,read=path=>readEvi
  // A finite private data comparison only. Unknown bytes pass through unchanged
  // to the original strict predecessor gate; no public read/raw uses this view.
  const predecessorData=(path,raw)=>{assert.ok(Buffer.isBuffer(raw));const normalized=frames.predecessorData(path,raw),pair=pairs.get(path);return Buffer.from(pair&&normalized.equals(pair.after)?pair.before:normalized);};
- const assertCurrent=()=>{actual.assertCurrent();frames.assertCurrent();repairs.assertCurrent();for(const ref of bound.values()){const raw=actual.read(ref.path);assert.equal(hash(raw),ref.sha256,'late table owner input '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}for(const ref of bound.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical table owner input '+ref.path);assert.equal(raw.length,ref.bytes);}};
- assertCurrent();return {packet:structuredClone(packet),bound:structuredClone([...bound.values()]),ownsReference,predecessorReference,qualifyReference,comparisonBytes,predecessorData,registryComparisonBytes:()=>Buffer.from(registrySubject().raw),assertCurrent,old_program_executed:false,canonical_frame_admission_granted:false,current_native_or_full_audit_credit:false};
+ const originalAssertCurrent=()=>{actual.assertCurrent();frames.assertCurrent();repairs.assertCurrent();for(const ref of bound.values()){const raw=actual.read(ref.path);assert.equal(hash(raw),ref.sha256,'late table owner input '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}for(const ref of bound.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical table owner input '+ref.path);assert.equal(raw.length,ref.bytes);}};
+ const lane=planOf(actual),repairPlan=planOf(repairs);
+ let assertCurrent=originalAssertCurrent,guardNode,guardPlan;
+ // An empty lane has no registered scope. Any nonempty opaque lane retains
+ // the complete original operation rather than pretending it has a node.
+ if((actual.registered_frames===0||lane.node)&&repairPlan.node){
+  const frameNode=data(frames,'guardNode'),frameGuard=data(frames,'assertCurrent'),sourceRead=data(actual,'read');
+  const physical=()=>{for(const ref of bound.values()){
+   const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'physical table owner input '+ref.path);assert.equal(raw.length,ref.bytes);
+  }};
+  const metadata=()=>{lane.check();repairPlan.check();same(frames,'guardNode',frameNode);same(frames,'assertCurrent',frameGuard);same(actual,'read',sourceRead);};
+  let consuming=false;
+  const idle=()=>assert.equal(consuming,false,'reentrant table owner source consumption');
+  guardNode=Object.freeze({
+   dependencies:Object.freeze([...(lane.node?[lane.node]:[]),frameNode.value,repairPlan.node]),
+   preflight:()=>{idle();metadata();physical();},
+   consume:()=>{
+    idle();consuming=true;
+    try{for(const ref of bound.values()){
+     const before=readEvidenceMember(root,ref.path);assert.equal(hash(before),ref.sha256,'late table owner input '+ref.path);assert.equal(before.length,ref.bytes);
+     const raw=sourceRead.value(ref.path);assert.ok(equal(before,raw),'nonphysical table owner source input '+ref.path);
+     assert.ok(equal(before,readEvidenceMember(root,ref.path)),'table owner input changed during callback '+ref.path);
+    }}finally{consuming=false;}
+   },
+   final:()=>{physical();metadata();},
+  });
+  const composed=composeCanonicalSourceGuards(Object.freeze([guardNode]));
+  assertCurrent=()=>{idle();composed();};
+  guardPlan=Object.freeze({assertCurrent,node:guardNode});
+ }
+ assertCurrent();return {packet:structuredClone(packet),bound:structuredClone([...bound.values()]),ownsReference,predecessorReference,qualifyReference,comparisonBytes,predecessorData,registryComparisonBytes:()=>Buffer.from(registrySubject().raw),assertCurrent,...(guardPlan?{guardNode,guardPlan}:{}),old_program_executed:false,canonical_frame_admission_granted:false,current_native_or_full_audit_credit:false};
 }

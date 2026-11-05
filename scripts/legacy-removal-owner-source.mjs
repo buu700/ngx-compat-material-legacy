@@ -14,9 +14,13 @@ import {gunzipSync} from 'node:zlib';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {tableLocalCompilationOwnerSourceSubject} from './table-local-compilation-owner-source.mjs';
 import {packedUpstreamLedgerCurrentSourceLane} from './packed-upstream-ledger-epoch.mjs';
+import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
 const SELF='scripts/legacy-removal-owner-source.mjs',INPUTS='compatibility/rc/21x-legacy-removal-admission-owner-inputs.json';
 const PIN='f64114770b458614c1251e8aae33b245999e64fee8ffa9216324e0f253bd4e0f';
 const image=readFileSync(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex');
+const bufferEquals=Buffer.prototype.equals,apply=Reflect.apply;
+const equal=(a,b)=>Buffer.isBuffer(b)&&apply(bufferEquals,a,[b]);
+function ownValue(object,key){const d=Object.getOwnPropertyDescriptor(object,key);assert.ok(d&&Object.hasOwn(d,'value'),'non-data legacy source guard '+key);return d.value;}
 function original(root,commit,path){
  const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
  for(const name of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete env[name];
@@ -47,6 +51,31 @@ export function legacyRemovalOwnerSourceSubject({root,read=path=>readEvidenceMem
  // Never returned from a public read/raw route and never imported/evaluated.
  const comparisonBytes=ref=>{if(successor.ownsReference(ref))return successor.comparisonBytes(ref);const row=transitions.get(ref.path);if(!row){if(ref.path==='scripts/upstream-source-contract-registry.mjs'){qualifyRegistry(ref);const subject=registrySubject();return Buffer.from(ref.sha256===hash(subject.before)?subject.before:subject.after);}return Buffer.from(member(ref));}qualifyReference(ref);return Buffer.from(ref.sha256===row.before.sha256?row.beforeBytes:row.afterBytes);};
  const registryComparisonBytes=()=>Buffer.from(registrySubject().before);
- const assertCurrent=()=>{successor.assertCurrent();for(const ref of bound.values()){const raw=actual.read(ref.path);assert.equal(hash(raw),ref.sha256,'late legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}for(const ref of bound.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);}};
- assertCurrent();return {packet:structuredClone(packet),bound:structuredClone([...bound.values()]),qualifyReference,comparisonBytes,registryComparisonBytes,predecessorData:successor.predecessorData,assertCurrent,old_program_executed:false,canonical_frame_admission_granted:false,current_native_or_full_audit_credit:false};
+ const originalAssertCurrent=()=>{successor.assertCurrent();for(const ref of bound.values()){const raw=actual.read(ref.path);assert.equal(hash(raw),ref.sha256,'late legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}for(const ref of bound.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);}};
+ let assertCurrent=originalAssertCurrent,guardNode,guardPlan;
+ if(Object.hasOwn(successor,'guardPlan')){
+  const priorGuard=ownValue(successor,'assertCurrent'),priorPlan=ownValue(successor,'guardPlan'),sourceRead=ownValue(actual,'read');
+  assert.ok(Object.isFrozen(priorPlan));assert.deepEqual(Reflect.ownKeys(priorPlan).sort(),['assertCurrent','node']);assert.equal(ownValue(priorPlan,'assertCurrent'),priorGuard);
+  const priorNode=ownValue(priorPlan,'node');
+  const metadata=()=>{assert.equal(ownValue(successor,'assertCurrent'),priorGuard);assert.equal(ownValue(successor,'guardPlan'),priorPlan);assert.equal(ownValue(actual,'read'),sourceRead);};
+  const physical=()=>{for(const ref of bound.values()){
+   const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'physical legacy source input '+ref.path);assert.equal(raw.length,ref.bytes);
+  }};
+  let consuming=false;
+  const idle=()=>assert.equal(consuming,false,'reentrant legacy source consumption');
+  guardNode=Object.freeze({dependencies:Object.freeze([priorNode]),
+   preflight:()=>{idle();metadata();physical();},
+   consume:()=>{
+    idle();consuming=true;
+    try{for(const ref of bound.values()){
+     const before=readEvidenceMember(root,ref.path);assert.equal(hash(before),ref.sha256,'late legacy source input '+ref.path);assert.equal(before.length,ref.bytes);
+     const raw=sourceRead(ref.path);assert.ok(equal(before,raw),'nonphysical legacy source input '+ref.path);
+     assert.ok(equal(before,readEvidenceMember(root,ref.path)),'legacy source input changed during callback '+ref.path);
+    }}finally{consuming=false;}
+   },
+   final:()=>{physical();metadata();},
+  });
+  const composed=composeCanonicalSourceGuards(Object.freeze([guardNode]));assertCurrent=()=>{idle();composed();};guardPlan=Object.freeze({assertCurrent,node:guardNode});
+ }
+ assertCurrent();return {packet:structuredClone(packet),bound:structuredClone([...bound.values()]),qualifyReference,comparisonBytes,registryComparisonBytes,predecessorData:successor.predecessorData,assertCurrent,...(guardPlan?{guardNode,guardPlan}:{}),old_program_executed:false,canonical_frame_admission_granted:false,current_native_or_full_audit_credit:false};
 }

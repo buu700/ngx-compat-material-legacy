@@ -23,7 +23,7 @@ const read = path => {
   const actual = disk(path); calls++; onRead(path);
   return override?.(path, actual) ?? actual;
 };
-const reject = fn => {assert.throws(fn, error => error?.code === 'ERR_ASSERTION'); rejected++;};
+const reject = (fn, match = () => true) => {assert.throws(fn, error => error?.code === 'ERR_ASSERTION' && match(error)); rejected++;};
 const write = (path, bytes) => writeFileSync(join(root, path), bytes);
 const reset = () => {onRead = () => {}; override = null; calls = 0;};
 
@@ -163,15 +163,17 @@ for (const [outer, inner] of [
 // reject a same-path mutation even if the callback returns either old or new
 // physical bytes. Rejection must precede any later callback that could restore it.
 for (const operation of [owner.assertCurrent, owner.source.assertCurrent]) for (const returned of ['old', 'new']) {
-  const before = disk(sourceOnly.path); let changed = false, restoredLater = false;
+  const before = disk(sourceOnly.path); let changed = false, restoredLater = false, callbacksAfterMutation = 0;
   onRead = path => {
-    if (path === sourceOnly.path) {
-      assert.equal(changed, false);
+    if (changed) {
+      callbacksAfterMutation++;
+      if (path !== sourceOnly.path) {write(sourceOnly.path, before); restoredLater = true;}
+    } else if (path === sourceOnly.path) {
       write(path, Buffer.concat([before, Buffer.from('\n// final source callback drift\n')])); changed = true;
-    } else if (changed) {write(sourceOnly.path, before); restoredLater = true;}
+    }
   };
   override = (path, actual) => path === sourceOnly.path && returned === 'new' ? disk(path) : actual;
-  try {reject(operation); assert.equal(changed, true); assert.equal(restoredLater, false);}
+  try {reject(operation, error => error.message.includes(sourceOnly.path) && /nonphysical|changed during callback/.test(error.message)); assert.equal(changed, true); assert.equal(restoredLater, false); assert.equal(callbacksAfterMutation, 0);}
   finally {write(sourceOnly.path, before); reset();}
   owner.assertCurrent(); reset();
 }
@@ -258,7 +260,15 @@ onRead = path => {
 try {reject(owner.assertCurrent); assert.equal(facadePoisoned, true); assert.equal(facadeGetters, 0);}
 finally {Object.defineProperty(owner.source, 'assertCurrent', facadeGuardBefore); reset();}
 owner.assertCurrent(); reset();
-assert.equal(rejected, 41); assert.equal(getters, 0);
+// A shared frame already consuming in one operation must reject at the other
+// graph's preflight, before an earlier, distinct frame node can call its reader.
+const secondFrame=baseClassRemovalCanonicalFrameSubject({root,read});reset();
+const framePair=composeCanonicalSourceGuards(Object.freeze([secondFrame.guardNode,owner.frames.guardNode]));
+let frameNested=false;
+onRead=()=>{if(!frameNested){frameNested=true;const before=calls;reject(framePair);assert.equal(calls,before);}};
+try{owner.frames.assertCurrent();assert.equal(frameNested,true);}finally{reset();}
+owner.frames.assertCurrent();framePair();reset();
+assert.equal(rejected, 42); assert.equal(getters, 0);
 assert.ok(readFileSync(join(root, helper)).equals(helperBefore));
 console.log(JSON.stringify({result: 'pass', line: '21.x', actual_frame_and_source_owner_executed: true,
   actual_stage_context_executed: true, guard_plan_identity_forwarded: true,
@@ -266,6 +276,7 @@ console.log(JSON.stringify({result: 'pass', line: '21.x', actual_frame_and_sourc
   owned_source_facade_executed: true, standalone_forged_reader_controls: 2,
   source_reentrant_controls: 3, distinct_scope_nesting_controls: 2, metadata_predicate_controls: 3,
   late_facade_pointer_controls: 1,
+  frame_dependency_reentry_controls: 1,
   frame_members: owner.frames.bound.length, source_members: owner.source.bound.length,
   historical_source_bindings_revalidated: owner.source.facts.historical_source_bindings_revalidated,
   rejected_lifetime_faults: rejected, inspector_getters_invoked: getters + constructorGetters,

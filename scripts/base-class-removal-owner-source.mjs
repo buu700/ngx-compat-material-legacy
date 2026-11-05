@@ -221,9 +221,13 @@ export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read 
     frameConsuming = true;
     try { return operation(); } finally { frameConsuming = false; }
   };
+  const assertFramePhysical = () => { assertGuardPlanIdentity(); physicalSweep(root, bound.values()); };
   const guardNode = Object.freeze({
     dependencies: Object.freeze([]),
-    preflight: () => { assertGuardPlanIdentity(); physicalSweep(root, bound.values()); },
+    preflight: () => {
+      assert.equal(frameConsuming, false, 'reentrant base-class frame preflight');
+      assertFramePhysical();
+    },
     consume: () => { consumeFrame(() => {
       for (const ref of bound.values()) {
         const actual = physical(root, ref.path), supplied = read(ref.path);
@@ -248,7 +252,7 @@ export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read 
   const ledgerSubject = () => consumeFrame(() => {
     // This operation consumes only the ledger. Other frame members still have
     // full callback-free cold/final checks against their captured judgments.
-    guardNode.preflight();
+    assertFramePhysical();
     const actual = physical(root, BASE_CLASS_REMOVAL_LEDGER), supplied = read(BASE_CLASS_REMOVAL_LEDGER);
     assert.ok(equalBuffers(actualLedger, actual), 'late base-class ledger subject');
     assert.ok(equalBuffers(actual, supplied), 'nonphysical base-class ledger subject');
