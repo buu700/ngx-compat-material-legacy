@@ -18,9 +18,14 @@ const SELF='scripts/current-sass-tool-references.mjs';
 const INPUTS='compatibility/rc/parent-base-class-tool-successor-inputs-v3.json';
 const V2_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v2.json',sha256:'d25ef6684992ececd518f7932bc68f5d43d433df23868d7a376ebf0a9e56a770',bytes:625566};
 const V3_CHECKPOINTS={'21.x':'d8ab97315b6c77b83f42c2bebcf63b2984fff255',main:'59ba0e2aa8b76f71b472ea2831273e44e44b5b57'};
+const V3_SOURCE_ANCHORS={
+ 'scripts/browser-owner-source.mjs':{packet:{path:'compatibility/rc/21x-legacy-removal-admission-owner-inputs.json',sha256:'f64114770b458614c1251e8aae33b245999e64fee8ffa9216324e0f253bd4e0f',bytes:40975},transition_index:2},
+ 'scripts/checker-owner-source.mjs':{packet:{path:'compatibility/rc/c04-browser-owner-inputs.json',sha256:'710201dd63bfb326485cd2933a9747d53f54b2cf833c47ce332816b0e0db526a',bytes:15193},transition_index:1},
+ 'scripts/checker-reference-proposal.mjs':{packet:{path:'compatibility/rc/c04-checker-owner-inputs.json',sha256:'3ae63a5b436eab901a7ff22cb8ecc9043a5aea8d2fb89ebd9e7f396ea3105bf3',bytes:12073},transition_index:2},
+};
 const PREVIOUS_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v1.json',sha256:'ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f',bytes:478008};
 const CHECKPOINTS={'21.x':'b25aedd02f7b53e8cd8dfcdad369a806a1301619',main:'5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'};
-const INPUTS_SHA='51d936a27841973ed8a1447540fe3f0a51a9aa3ceada049523b263c142401cfe';
+const INPUTS_SHA='7e109b952686ffbbea131bf88a20e8c4df41fa169613996891ad4fb036825a87';
 const image=readFileSync(fileURLToPath(import.meta.url));
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const reference=(path,raw)=>({path,sha256:hash(raw),bytes:raw.length});
@@ -173,8 +178,16 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
    const finiteBefore={
     'scripts/table-local-compilation-canonical-stage.mjs':{path:update.path,sha256:'bdb3137f6db42ed2611ac3a41e400478defed7f0076d203061d1e12d03f63b7c',bytes:8231},
     'scripts/legacy-removal-owner-source.mjs':{path:update.path,sha256:'b88708bb7ed441e24c6ed623371330426d6a947df83452ca343487767d2c9122',bytes:6628},
+    'scripts/browser-owner-source.mjs':{path:update.path,sha256:'f3eed08c7bc7d385a53ba2cabfeb35e4656e7f41871fab08b685104b1f0f84ad',bytes:6019},
+    'scripts/checker-owner-source.mjs':{path:update.path,sha256:'0788290595d4c776ae958ebf8e0c110b281c3840f349d1be93b7e5b988a3567c',bytes:5220},
+    'scripts/checker-reference-proposal.mjs':{path:update.path,sha256:'22c49ba434ee0b1253ad2815b77510adb8259cc3f307005f6b66b73e522502ac',bytes:13095},
    };
    assert.ok(Object.hasOwn(finiteBefore,update.path),'unknown V3 new-row path');assert.deepEqual(update.before,finiteBefore[update.path]);
+   const anchor=V3_SOURCE_ANCHORS[update.path];
+   if(anchor){
+    const packet=JSON.parse(member(anchor.packet));
+    assert.deepEqual(packet.code_transitions[anchor.transition_index].after,update.before,'V3 new source row differs from immutable owner anchor');
+   }
    row={path:update.path,before:{sha256:update.before.sha256,bytes:update.before.bytes},identities:new Map()};rows.set(update.path,row);
   }
   addIdentity(row,update.before,before);addIdentity(row,update.after,after);row.after={sha256:update.after.sha256,bytes:update.after.bytes};

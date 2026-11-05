@@ -47,13 +47,18 @@ TEST_COMPATIBILITY_UPDATES = (
     'tests/m3_theme_boundary_admission_probe.mjs',
     'tests/test_m3_theme_boundary_admission.py',
 )
-UPDATES = {'21.x': (*SHARED_UPDATES, 'scripts/packed-upstream-ledger-epoch.mjs', 'scripts/table-local-compilation-owner-source.mjs', 'scripts/table-local-compilation-canonical-stage.mjs', 'scripts/legacy-removal-owner-source.mjs', 'scripts/upstream-legacy-removal-source.mjs', 'tests/historical_contract_repair_source.py', *TEST_COMPATIBILITY_UPDATES),
+UPDATES = {'21.x': (*SHARED_UPDATES, 'scripts/packed-upstream-ledger-epoch.mjs', 'scripts/table-local-compilation-owner-source.mjs', 'scripts/table-local-compilation-canonical-stage.mjs', 'scripts/legacy-removal-owner-source.mjs', 'scripts/upstream-legacy-removal-source.mjs', 'scripts/browser-owner-source.mjs', 'scripts/checker-owner-source.mjs', 'scripts/checker-reference-proposal.mjs', 'tests/historical_contract_repair_source.py', *TEST_COMPATIBILITY_UPDATES),
            'main': SHARED_UPDATES}
-SUPPORT = {'21.x': ('scripts/base-class-removal-owner-source.mjs', 'scripts/base-class-removal-canonical-stage.mjs', 'compatibility/rc/21x-base-class-removal-admission-owner-inputs-v1.json', 'tests/current_sass_c04_tool_integration_probe.mjs', 'tests/m3_theme_boundary_historical_epoch_data.mjs', SELF),
+SUPPORT = {'21.x': ('scripts/base-class-removal-owner-source.mjs', 'scripts/base-class-removal-canonical-stage.mjs', 'compatibility/rc/21x-base-class-removal-admission-owner-inputs-v1.json', 'tests/current_sass_c04_tool_integration_probe.mjs', 'tests/m3_theme_boundary_historical_epoch_data.mjs', 'tests/m3_theme_boundary_ledger_patch.py', 'tests/dialog_title_canonical_ledger_patch.py', 'compatibility/rc/21x-legacy-removal-admission-owner-inputs.json', 'compatibility/rc/c04-browser-owner-inputs.json', 'compatibility/rc/c04-checker-owner-inputs.json', SELF),
            'main': ('tests/current_sass_c04_tool_integration_probe.mjs', SELF)}
 TABLE_STAGE = dict(path='scripts/table-local-compilation-canonical-stage.mjs', sha256='bdb3137f6db42ed2611ac3a41e400478defed7f0076d203061d1e12d03f63b7c', bytes=8231)
 LEGACY_SOURCE = dict(path='scripts/legacy-removal-owner-source.mjs', sha256='b88708bb7ed441e24c6ed623371330426d6a947df83452ca343487767d2c9122', bytes=6628)
 TABLE_PACKET = dict(path='compatibility/rc/21x-table-local-compilation-admission-owner-inputs.json', sha256='1a35dd57edd9952a23d4bb2e8e9783f19583c00badfd7e9846fdbd2abc94f48b', bytes=184121)
+SOURCE_ANCHORS = {
+    'scripts/browser-owner-source.mjs': dict(before=dict(path='scripts/browser-owner-source.mjs', sha256='f3eed08c7bc7d385a53ba2cabfeb35e4656e7f41871fab08b685104b1f0f84ad', bytes=6019), packet=dict(path='compatibility/rc/21x-legacy-removal-admission-owner-inputs.json', sha256='f64114770b458614c1251e8aae33b245999e64fee8ffa9216324e0f253bd4e0f', bytes=40975), transition_index=2),
+    'scripts/checker-owner-source.mjs': dict(before=dict(path='scripts/checker-owner-source.mjs', sha256='0788290595d4c776ae958ebf8e0c110b281c3840f349d1be93b7e5b988a3567c', bytes=5220), packet=dict(path='compatibility/rc/c04-browser-owner-inputs.json', sha256='710201dd63bfb326485cd2933a9747d53f54b2cf833c47ce332816b0e0db526a', bytes=15193), transition_index=1),
+    'scripts/checker-reference-proposal.mjs': dict(before=dict(path='scripts/checker-reference-proposal.mjs', sha256='22c49ba434ee0b1253ad2815b77510adb8259cc3f307005f6b66b73e522502ac', bytes=13095), packet=dict(path='compatibility/rc/c04-checker-owner-inputs.json', sha256='3ae63a5b436eab901a7ff22cb8ecc9043a5aea8d2fb89ebd9e7f396ea3105bf3', bytes=12073), transition_index=2),
+}
 
 
 def sha(raw):
@@ -142,11 +147,17 @@ def build(roots):
             assert ref(TABLE_PACKET['path'], table_raw) == TABLE_PACKET
             assert json.loads(table_raw)['code_transitions'][0]['after'] == LEGACY_SOURCE
             snapshots.append((root, TABLE_PACKET, table_raw))
+            for anchor in SOURCE_ANCHORS.values():
+                anchor_raw = physical(root, anchor['packet']['path'])
+                assert ref(anchor['packet']['path'], anchor_raw) == anchor['packet']
+                assert json.loads(anchor_raw)['code_transitions'][anchor['transition_index']]['after'] == anchor['before']
+                snapshots.append((root, anchor['packet'], anchor_raw))
         updates = []
         for path in paths:
             before, after = originals[path], physical(root, path)
             predecessor = ref(path, before)
-            exact_new = {TABLE_STAGE['path']: TABLE_STAGE, LEGACY_SOURCE['path']: LEGACY_SOURCE}
+            exact_new = {TABLE_STAGE['path']: TABLE_STAGE, LEGACY_SOURCE['path']: LEGACY_SOURCE,
+                         **{path: anchor['before'] for path, anchor in SOURCE_ANCHORS.items()}}
             assert predecessor == (exact_new[path] if path in exact_new else identities[path])
             updates.append(dict(path=path, before=predecessor, after=ref(path, after), edits=recipe(before, after)))
             snapshots.append((root, ref(path, after), after))
