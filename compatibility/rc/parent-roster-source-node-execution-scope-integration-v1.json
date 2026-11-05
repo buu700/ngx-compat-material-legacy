@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "scope": "Actual roster source-node integration and real registered-roster epoch negative; no complete owner or product gate",
+  "profile_sha256": "6dbcf3c3a66b35c39e7a083dd3cb4c081b17957ebe8f6b2bd3d2ba22ada58b0a",
+  "source_evidence": [
+    {
+      "path": "compatibility/rc/parent-roster-focused-21-v1.json",
+      "sha256": "fbccc3d12749a2e805f3182b7fbb0a036fad3bf07fbb1ffad4370067c9f8e067",
+      "bytes": 21492
+    },
+    {
+      "path": "compatibility/rc/parent-roster-focused-21-v2.json",
+      "sha256": "487c565754861cfa410cf092cb0c73114c31676c08aa488b48985d6f1a9feb7a",
+      "bytes": 21282
+    },
+    {
+      "path": "compatibility/rc/parent-roster-focused-21-v3.json",
+      "sha256": "c7f9c884e08c4081e7750ac6567ccaf30d76cabf9e01b25bf7f49dc7b676ecec",
+      "bytes": 19576
+    },
+    {
+      "path": "compatibility/rc/parent-roster-focused-main-v3.json",
+      "sha256": "342f7a6b6c43ec645e81b9b907a40cf242f49542c9fd2d96006979416eeb8f64",
+      "bytes": 19576
+    },
+    {
+      "path": "compatibility/rc/parent-roster-production-control-v1.json",
+      "sha256": "5a8bdc00c331fa76de294918d3a04f2d0c79f378b8d6da025776668991c1c8a7",
+      "bytes": 19070
+    },
+    {
+      "path": "compatibility/rc/parent-roster-production-control-v2.json",
+      "sha256": "ba1de12b3ab4153893e7831d04a9b90bf1d5f2247aadca87fb15a58b0f5337fc",
+      "bytes": 20058
+    },
+    {
+      "path": "compatibility/rc/parent-roster-production-control-v3.json",
+      "sha256": "97918f43249fe5e36dcc65718b92a07a93c16829878b183b20a499d69d4bb834",
+      "bytes": 18077
+    },
+    {
+      "path": "compatibility/rc/parent-roster-production-control-v4.json",
+      "sha256": "8d73d153c5c6c2956de46a1716b7a95f87d6640dec65bf654da9ebe6d176b45c",
+      "bytes": 18336
+    },
+    {
+      "path": "compatibility/rc/parent-roster-retained-21-v1.json",
+      "sha256": "9172985d3298ed0a9756a2ffc8272a856181b13bb44e7f9e1bb518ef80ab1286",
+      "bytes": 22501
+    },
+    {
+      "path": "compatibility/rc/parent-roster-retained-main-v1.json",
+      "sha256": "a639d52d3a43cf717e6ac15ebc21cd7f374b834aedb507562077c50b582d6180",
+      "bytes": 20480
+    },
+    {
+      "path": "compatibility/rc/parent-actual-owner-epoch-route-priority-correction-v1.json",
+      "sha256": "2523adb09696f0edc7effb3ed885cf91a2e2b2537a830d39c516f86068b57259",
+      "bytes": 7146
+    },
+    {
+      "path": "compatibility/rc/parent-actual-epoch-after-roster-next-unit-v1.json",
+      "sha256": "787cf56b8ab4af9ba779a1b6dd186545fc0a952aff05c22407461756e6169b4e",
+      "bytes": 10154
+    },
+    {
+      "path": "compatibility/rc/parent-actual-inventory-guard-node-design-v1.json",
+      "sha256": "e39fc3fc2a51cf8a76fa83caa81b1139d4c4ec060fce75dffaf48dac3d0deb67",
+      "bytes": 14019
+    },
+    {
+      "path": "compatibility/rc/parent-roster-t12-final-source-review-v1.json",
+      "sha256": "2bf76f97551c9b628aa38c290ceed7391e3424cf3420316cd881841d4212397c",
+      "bytes": 3332
+    },
+    {
+      "path": "compatibility/rc/parent-roster-t12-profile-review-v1.json",
+      "sha256": "1be13fcbb4d4aa02c3cd73888f08f095c19f586e980b7ba8e08331428204767d",
+      "bytes": 3919
+    }
+  ],
+  "positive_executions": {
+    "21.x": {
+      "roster_suite": "compatibility/rc/parent-roster-focused-21-v3.json",
+      "tests": 4,
+      "original_vs_grouped_node_cases": 12,
+      "registered_epoch_negative": "compatibility/rc/parent-roster-production-control-v4.json",
+      "retained_suite": "compatibility/rc/parent-roster-retained-21-v1.json",
+      "retained_tests": 19
+    },
+    "main": {
+      "roster_suite": "compatibility/rc/parent-roster-focused-main-v3.json",
+      "tests": 4,
+      "original_vs_grouped_node_cases": 12,
+      "retained_suite": "compatibility/rc/parent-roster-retained-main-v1.json",
+      "retained_tests": 9
+    }
+  },
+  "failure_history": [
+    "Production v1 rejected a target that was not roster-only before injection; actual full-base census selected a genuinely roster-only target.",
+    "Production v2 hit 60-second child deadline; exact known bytes restored. Fresh per-row document parsing identified and replaced by independently owned per-document analysis, not a current byte or verdict cache.",
+    "Focused v1: actual constructor/guard and all12Node cases passed, wrapper failed because it assumed TAP output. Explicit reporter fixed.",
+    "Focused v2: actual constructor passed; combined guard child reached60seconds. Cross-node case separated into its own new bounded child, retaining every assertion. All children remain60seconds; aggregate capture now210seconds to contain3x60 plus puremetadata."
+  ],
+  "runtime_limits": {
+    "roster_child_seconds": 60,
+    "source_checker_seconds": 120,
+    "source_browser_seconds": 180,
+    "full_owner_seconds": 1800,
+    "product_or_source_producer_budgets_changed": false
+  },
+  "source_snapshots_unchanged": true,
+  "qualification": "Captured uncommitted source images at parent HEADs; full mandatory producer must run again on the following committed source cut.",
+  "full_source_regressions_for_t12_executed": false,
+  "complete_owner_success": false,
+  "canonical_applied": false,
+  "g11_claim": "not-passed"
+}
