@@ -27,9 +27,29 @@ OUTPUT = 'compatibility/rc/parent-base-class-tool-successor-inputs-v3.json'
 SELF = 'compatibility/rc/parent-base-class-tool-successor-builder-v1.py'
 FACTORIES = ('scripts/current-sass-tool-references.mjs', 'scripts/current_sass_tool_references.py')
 SHARED_UPDATES = ('scripts/historical-contract-repair-readers.mjs', 'tests/current_sass_tool_reference_probe.mjs', 'tests/test_current_sass_tool_references.py')
-UPDATES = {'21.x': (*SHARED_UPDATES, 'scripts/packed-upstream-ledger-epoch.mjs', 'scripts/table-local-compilation-owner-source.mjs', 'scripts/table-local-compilation-canonical-stage.mjs', 'scripts/legacy-removal-owner-source.mjs', 'tests/historical_contract_repair_source.py'),
+TEST_COMPATIBILITY_UPDATES = (
+    'tests/current_sass_canonical_test_scope.mjs',
+    'tests/current_sass_canonical_test_scope.py',
+    'tests/legacy_removal_admission_probe.mjs',
+    'tests/test_button_token_repairs_admission.py',
+    'tests/test_button_tokenization_admission.py',
+    'tests/test_control_m3_theme_admission.py',
+    'tests/test_core_tokenization_admission.py',
+    'tests/test_foundation_m3_theme_admission.py',
+    'tests/test_inspection_compatibility_admission.py',
+    'tests/test_legacy_removal_admission.py',
+    'tests/test_legacy_removal_source.py',
+    'tests/test_remaining_unthemable_admission.py',
+    'tests/test_selector_density_admission.py',
+    'tests/test_slider_m3_repairs_admission.py',
+    'tests/test_surface_m3_theme_admission.py',
+    'tests/test_theming_inspection_admission.py',
+    'tests/m3_theme_boundary_admission_probe.mjs',
+    'tests/test_m3_theme_boundary_admission.py',
+)
+UPDATES = {'21.x': (*SHARED_UPDATES, 'scripts/packed-upstream-ledger-epoch.mjs', 'scripts/table-local-compilation-owner-source.mjs', 'scripts/table-local-compilation-canonical-stage.mjs', 'scripts/legacy-removal-owner-source.mjs', 'scripts/upstream-legacy-removal-source.mjs', 'tests/historical_contract_repair_source.py', *TEST_COMPATIBILITY_UPDATES),
            'main': SHARED_UPDATES}
-SUPPORT = {'21.x': ('scripts/base-class-removal-owner-source.mjs', 'scripts/base-class-removal-canonical-stage.mjs', 'compatibility/rc/21x-base-class-removal-admission-owner-inputs-v1.json', 'tests/current_sass_c04_tool_integration_probe.mjs', SELF),
+SUPPORT = {'21.x': ('scripts/base-class-removal-owner-source.mjs', 'scripts/base-class-removal-canonical-stage.mjs', 'compatibility/rc/21x-base-class-removal-admission-owner-inputs-v1.json', 'tests/current_sass_c04_tool_integration_probe.mjs', 'tests/m3_theme_boundary_historical_epoch_data.mjs', SELF),
            'main': ('tests/current_sass_c04_tool_integration_probe.mjs', SELF)}
 TABLE_STAGE = dict(path='scripts/table-local-compilation-canonical-stage.mjs', sha256='bdb3137f6db42ed2611ac3a41e400478defed7f0076d203061d1e12d03f63b7c', bytes=8231)
 LEGACY_SOURCE = dict(path='scripts/legacy-removal-owner-source.mjs', sha256='b88708bb7ed441e24c6ed623371330426d6a947df83452ca343487767d2c9122', bytes=6628)

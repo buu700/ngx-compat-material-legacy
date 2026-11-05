@@ -71,7 +71,10 @@ class SliderM3RepairsAdmissionTests(unittest.TestCase):
         self.assertEqual(report['metadata_rejections'], 36)
         self.assertEqual(report['source_rejections'], 26)
         self.assertEqual(report['historical_registered_source_contracts'], 67)
-        self.assertEqual(report['registered_source_contracts'], 69)
+        from current_sass_canonical_test_scope import current_canonical_registry_subject
+        registry_subject = current_canonical_registry_subject(ROOT)
+        self.assertEqual(report['registered_source_contracts'], registry_subject['registered_source_contracts'])
+        registry_subject['assert_current']()
         self.assertEqual(report['prior_registry_records_preserved'], 38)
         self.assertTrue(report['current_registry_tool_bindings_verified'])
         self.assertTrue(report['all_current_tool_bindings_retained'])

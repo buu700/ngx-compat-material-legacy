@@ -20,7 +20,7 @@ const V2_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v2.js
 const V3_CHECKPOINTS={'21.x':'d8ab97315b6c77b83f42c2bebcf63b2984fff255',main:'59ba0e2aa8b76f71b472ea2831273e44e44b5b57'};
 const PREVIOUS_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v1.json',sha256:'ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f',bytes:478008};
 const CHECKPOINTS={'21.x':'b25aedd02f7b53e8cd8dfcdad369a806a1301619',main:'5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'};
-const INPUTS_SHA='df81e3e53b9f64d034a15eb0f15accc045f67e977c27b0e79b79e6dc19ae728c';
+const INPUTS_SHA='51d936a27841973ed8a1447540fe3f0a51a9aa3ceada049523b263c142401cfe';
 const image=readFileSync(fileURLToPath(import.meta.url));
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const reference=(path,raw)=>({path,sha256:hash(raw),bytes:raw.length});

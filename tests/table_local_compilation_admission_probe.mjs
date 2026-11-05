@@ -15,11 +15,13 @@ import {tmpdir} from 'node:os';
 import {gunzipSync} from 'node:zlib';
 import admission from '../scripts/upstream-table-local-compilation-admission.cjs';
 import {applyTableLocalCompilationCanonicalStage,tableLocalCompilationRegistrySuccessor,TABLE_LOCAL_COMPILATION_LEDGER as LEDGER,TABLE_LOCAL_COMPILATION_REGISTRY as REGISTRY} from '../scripts/table-local-compilation-canonical-stage.mjs';
+import {currentCanonicalTestFrame} from './current_sass_canonical_test_scope.mjs';
 const root=process.cwd(),read=path=>fs.readFileSync(join(root,path)),hash=raw=>createHash('sha256').update(raw).digest('hex');
 const prefix='compatibility/rc/21x-table-local-compilation-admission-',body=JSON.parse(read(admission.TABLE_LOCAL_COMPILATION_REVIEW));
 const before=gunzipSync(read(prefix+'ledger-before.json.gz')),registryBefore=gunzipSync(read(prefix+'registry-before.mjs.gz'));
 const stage=applyTableLocalCompilationCanonicalStage({before,body}),registryAfter=tableLocalCompilationRegistrySuccessor(registryBefore),entry=stage.entries[0],args={root,entry,body,review:body,proof:entry.individual_proof};
-const physicalLedger=read(LEDGER),physicalRegistry=read(REGISTRY);
+const actualLedger=read(LEDGER),actualRegistry=read(REGISTRY),currentFrame=currentCanonicalTestFrame({root,read});
+const physicalLedger=currentFrame.comparison(LEDGER,actualLedger),physicalRegistry=currentFrame.comparison(REGISTRY,actualRegistry);
 assert.ok(physicalLedger.equals(before)||physicalLedger.equals(stage.after),'unknown current table ledger');
 assert.ok(physicalRegistry.equals(registryBefore)||physicalRegistry.equals(registryAfter),'unknown current table registry');
 if(physicalLedger.equals(stage.after))assert.ok(physicalRegistry.equals(registryAfter));
@@ -61,10 +63,10 @@ if(phase==='contract'){
  assert.throws(()=>admission.inspectCanonicalSource({root,entries:[],body}));assert.throws(()=>admission.inspectCanonicalSource({root,entries:[entry,entry],body}));
  for(const value of [Buffer.concat([before,Buffer.from('\n')]),stage.after,Buffer.from('{}')])assert.throws(()=>applyTableLocalCompilationCanonicalStage({before:value,body}));
  for(const value of [Buffer.concat([registryBefore,Buffer.from('\n')]),registryAfter])assert.throws(()=>tableLocalCompilationRegistrySuccessor(value));
- assert.equal(read(LEDGER).equals(physicalLedger),true);assert.equal(read(REGISTRY).equals(physicalRegistry),true);
+ assert.equal(read(LEDGER).equals(actualLedger),true);assert.equal(read(REGISTRY).equals(actualRegistry),true);currentFrame.assertCurrent();
 }else{
- assert.ok(read(REGISTRY).equals(registryAfter),'root test requires exact reversible candidate registry');
- const {sourceContractDefinitions}=await import('../scripts/upstream-source-contract-registry.mjs');assert.equal(sourceContractDefinitions.length,69);
+ assert.ok(physicalRegistry.equals(registryAfter),'root test requires exact authenticated candidate registry DATA');
+ const {sourceContractDefinitions}=await import('../scripts/upstream-source-contract-registry.mjs');assert.equal(sourceContractDefinitions.length,currentFrame.registered_source_contracts);
  const {requiresRegisteredSourceReview}=await import('../scripts/upstream-registered-source-review.mjs');assert.equal(requiresRegisteredSourceReview(entry),true);
  const {reviewMetadataComplete,individualReviewScopeOk}=await import('../scripts/upstream-individual-evidence-scope.mjs');assert.equal(reviewMetadataComplete(args),true);assert.equal(individualReviewScopeOk({...args,requiresIndividual:true,claimsBehavior:false}),true);
  const directory=fs.mkdtempSync(join(tmpdir(),'ngx-table-local-root-')),mutant=join(root,'scripts','.table-local-source-mutant-'+process.pid+'.mjs');
@@ -91,7 +93,7 @@ if(phase==='contract'){
   fs.writeFileSync(mutant,checker.replace(needle,''),{flag:'wx'});
   const bypass=inspect(entry,{fault:'row',checker:'scripts/'+mutant.split('/').at(-1)});assert.equal(bypass.evidence_failures.length,0);assert.deepEqual(bypass.insufficient_review_sha_ids.sensitive,[]);mutantDetected=true;
  }finally{fs.rmSync(mutant,{force:true});fs.rmSync(directory,{recursive:true,force:true});}
- assert.ok(read(LEDGER).equals(physicalLedger));assert.ok(read(REGISTRY).equals(physicalRegistry));
+ assert.ok(read(LEDGER).equals(actualLedger));assert.ok(read(REGISTRY).equals(actualRegistry));currentFrame.assertCurrent();
 }
 const report={schema_version:1,result:'pass',line:'21.x',phase,metadata_positive_cases:phase==='contract'?1:0,metadata_rejections:metadataRejections,cold_source_rejections:coldRejections,late_source_rejections:lateRejections,real_root_positive_rows:rootPositive,real_root_rejected_rows:rootNegative,missing_source_requirement_mutant_detected:mutantDetected,after_sha256:hash(stage.after),registry_after_sha256:hash(registryAfter),individual_decisions_proposed:1,summary_scalar_tokens:2,unselected_entries_preserved:1696,canonical_ledger_applied:physicalLedger.equals(stage.after),full_owner_integration_qualified:false,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])fs.writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));

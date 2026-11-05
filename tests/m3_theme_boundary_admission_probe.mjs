@@ -6,7 +6,7 @@
  */
 /** Actual owner epochs and CLI enforce source checks for declined registered changes. */
 import assert from 'node:assert/strict';
-import {execFileSync,spawnSync} from 'node:child_process';
+import {spawnSync} from 'node:child_process';
 import {readFileSync,writeFileSync,mkdtempSync,rmSync,existsSync} from 'node:fs';
 import {join,basename} from 'node:path';
 import {tmpdir} from 'node:os';
@@ -16,24 +16,40 @@ import {isDeepStrictEqual} from 'node:util';
 import {reviewMetadataComplete,individualReviewScopeOk} from '../scripts/upstream-individual-evidence-scope.mjs';
 import {requiresRegisteredSourceReview} from '../scripts/upstream-registered-source-review.mjs';
 import {packedUpstreamLedgerEpoch} from '../scripts/packed-upstream-ledger-epoch.mjs';
+import {packedUpstreamLedgerEpoch as maintainedBaseEpoch} from '../scripts/packed-upstream-ledger-base.mjs';
+import {historicalM3EpochData} from './m3_theme_boundary_historical_epoch_data.mjs';
 import {sourceContractDefinitions} from '../scripts/upstream-source-contract-registry.mjs';
 import admission from '../scripts/upstream-m3-theme-boundary-admission.cjs';
 const root=process.cwd(),read=path=>readFileSync(join(root,path)),ledger='compatibility/f10/disposition-ledger/ledger.json';
 const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
 for(const key of Object.keys(env))if(key.startsWith('RC_')||['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'].includes(key))delete env[key];
-const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',
- '6e54c9a1c3dad72f65b048f8f19cb7faa18729dc:'+ledger],{cwd:root,env,maxBuffer:8*1024*1024});
+const {before,report:historicalData}=historicalM3EpochData({root,env});
 let late=null;const actual=path=>path===late?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
-const current=packedUpstreamLedgerEpoch({root,read:actual}),previous=packedUpstreamLedgerEpoch({root,read:path=>path===ledger?before:read(path)});
+const historicalRead=path=>path===ledger?before:read(path);
+// The public terminal owner accepts physical current inputs, not this old JSON view.
+assert.throws(()=>packedUpstreamLedgerEpoch({root,read:historicalRead}),
+ error=>error?.code==='ERR_ASSERTION'&&error.message.includes('nonphysical canonical input '+ledger));
+const publicOldProjectionRejected=true;
+const current=packedUpstreamLedgerEpoch({root,read:actual}),previous=maintainedBaseEpoch({root,read:historicalRead});
 current.assertCurrent();previous.assertCurrent();
-assert.equal(current.individual_decisions_applied,88);
+const proposalRaw=read('compatibility/rc/21x-base-class-removal-admission-canonical-proposal-v6.json');
+assert.equal(createHash('sha256').update(proposalRaw).digest('hex'),'720a4fcd0c9d0d67afbeddd106fc9741d7ab34a0848edc1a0f2e6a25019b9881');
+const proposal=JSON.parse(proposalRaw),physicalLedger=read(ledger),physicalHash=createHash('sha256').update(physicalLedger).digest('hex');
+assert.ok([proposal.before.sha256,proposal.after.sha256].includes(physicalHash));
+const expectedBase=Number(physicalHash===proposal.after.sha256);
+assert.equal(physicalLedger.length,(expectedBase?proposal.after:proposal.before).bytes);
+assert.equal(current.legacy_removal_source_decisions_applied,1);assert.equal(current.table_local_compilation_source_decisions_applied,1);
+assert.equal(current.base_class_removal_source_decisions_applied,expectedBase);
+assert.equal(current.individual_decisions_applied,90+expectedBase);
+const preTerminal=current.individual_decisions_applied-current.legacy_removal_source_decisions_applied-current.table_local_compilation_source_decisions_applied-current.base_class_removal_source_decisions_applied;
+assert.equal(preTerminal,88);assert.equal(historicalData.historical_pre_terminal_source_admissions,88);
 assert.equal(current.remaining_unthemable_source_decisions_applied,14);
 assert.equal(current.core_tokenization_source_decisions_applied,3);
 assert.equal(current.foundation_m3_theme_source_decisions_applied,6);
 assert.equal(current.control_m3_theme_source_decisions_applied,4);
 assert.equal(current.title_source_decisions_applied,1);assert.equal(current.title_native_registry_metadata_tokens_applied,14);
-assert.equal(current.theming_source_decisions_applied,2);assert.equal(previous.theming_source_decisions_applied,0);
-assert.equal(previous.title_source_decisions_applied,0);assert.equal(previous.title_native_registry_metadata_tokens_applied,0);assert.equal(current.unthemable_source_decisions_applied,5);assert.equal(current.registered_checker_metadata_tokens_applied,14);
+assert.equal(current.theming_source_decisions_applied,2);assert.equal(historicalData.historical_theming_metadata_admissions,0);
+assert.equal(historicalData.historical_title_metadata_admissions,0);assert.equal(historicalData.historical_title_native_after_references,0);assert.equal(current.unthemable_source_decisions_applied,5);assert.equal(current.registered_checker_metadata_tokens_applied,14);
 assert.equal(previous.individual_decisions_applied,35);assert.equal(previous.unthemable_source_decisions_applied,5);assert.equal(previous.registered_checker_metadata_tokens_applied,14);
 assert.equal(current.form_field_tokenization_decisions_applied,2);assert.equal(previous.form_field_tokenization_decisions_applied,2);
 assert.equal(current.m3_theme_boundary_decisions_applied,5);assert.equal(previous.m3_theme_boundary_decisions_applied,0);
@@ -115,7 +131,11 @@ try{
  mutantCaught=true;rejected.push('actual-CLI-mutant:missing-registered-source-requirement');
 }finally{rmSync(mutant,{force:true});rmSync(dir,{recursive:true,force:true});}
 assert.equal(existsSync(mutant),false);assert.equal(existsSync(dir),false);
-const report={schema_version:1,line:'21.x',current_source_admissions:current.individual_decisions_applied,previous_source_admissions:previous.individual_decisions_applied,
+const report={schema_version:1,line:'21.x',...historicalData,
+ current_epoch_scope:'public physical terminal owner',previous_epoch_scope:'maintained base historical35 JSON view',
+ public_old_projection_rejected:publicOldProjectionRejected,preserved_pre_terminal_source_admissions:preTerminal,
+ legacy_removal_source_admissions:current.legacy_removal_source_decisions_applied,table_local_compilation_source_admissions:current.table_local_compilation_source_decisions_applied,
+ base_class_removal_source_admissions:current.base_class_removal_source_decisions_applied,current_source_admissions:current.individual_decisions_applied,previous_source_admissions:previous.individual_decisions_applied,
  title_source_admissions:current.title_source_decisions_applied,title_native_metadata_tokens:current.title_native_registry_metadata_tokens_applied,
  theming_source_admissions:current.theming_source_decisions_applied,inspection_source_admissions:current.inspection_source_decisions_applied,selector_density_source_admissions:current.selector_density_source_decisions_applied,button_tokenization_source_admissions:current.button_tokenization_source_decisions_applied,button_token_repairs_source_admissions:current.button_token_repairs_source_decisions_applied,surface_m3_theme_source_admissions:current.surface_m3_theme_source_decisions_applied,slider_m3_repairs_source_admissions:current.slider_m3_repairs_source_decisions_applied,control_m3_theme_source_admissions:current.control_m3_theme_source_decisions_applied,foundation_m3_theme_source_admissions:current.foundation_m3_theme_source_decisions_applied,core_tokenization_source_admissions:current.core_tokenization_source_decisions_applied,remaining_unthemable_source_admissions:current.remaining_unthemable_source_decisions_applied,
  pure_metadata_cases:metadataCases,pure_metadata_without_filesystem_or_compiler_bindings:true,metadata_rejections:metadataRejections,source_rejections:sourceRejections,bound_source_members:source.bound.length,all_exact_current_source_members_physically_verified:true,

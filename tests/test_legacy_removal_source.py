@@ -4,6 +4,7 @@
 """Full original population and independent replay; no source disposition pass."""
 from pathlib import Path
 import collections,copy,gzip,hashlib,json,os,re,subprocess,unittest
+from current_sass_canonical_test_scope import current_canonical_test_frame
 from table_local_compilation_owner_source import table_predecessor_data
 from historical_contract_repair_source import qualify_source_reference
 ROOT=Path(__file__).resolve().parents[1]
@@ -103,7 +104,7 @@ class LegacyRemovalSourceTests(unittest.TestCase):
         ledger=json.loads(raw);entry=next(row for row in ledger['entries']if row['sha']==worksheet['sha'])
         self.assertEqual(entry,worksheet['before_entry']);self.assertEqual(ledger['closed_dispositions'],424);self.assertEqual(ledger['open_or_deferred'],1273)
         self.assertEqual(sum(row['final_disposition']=='security-review'for row in ledger['entries']),1)
-        proposal=json.loads((ROOT/'compatibility/rc/21x-legacy-removal-admission-canonical-proposal.json').read_bytes());current=table_predecessor_data(before['path'],(ROOT/before['path']).read_bytes())
+        proposal=json.loads((ROOT/'compatibility/rc/21x-legacy-removal-admission-canonical-proposal.json').read_bytes());current=table_predecessor_data(before['path'],current_canonical_test_frame(ROOT)['comparison'](before['path'],(ROOT/before['path']).read_bytes()))
         self.assertIn(hashlib.sha256(current).hexdigest(),[proposal['before']['sha256'],proposal['after']['sha256']])
         after=gzip.decompress((ROOT/'compatibility/rc/21x-legacy-removal-admission-ledger-after.json.gz').read_bytes());self.assertEqual(hashlib.sha256(after).hexdigest(),proposal['after']['sha256'])
         selected=worksheet['sha'];candidate=json.loads(after)

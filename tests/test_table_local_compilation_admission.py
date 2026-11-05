@@ -8,6 +8,7 @@ from pathlib import Path
 import subprocess
 import unittest
 
+from current_sass_canonical_test_scope import current_canonical_test_frame
 from table_local_compilation_canonical_ledger_patch import derive_table_local_compilation_successor, digest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,12 +37,14 @@ class TableLocalCompilationAdmissionTest(unittest.TestCase):
         packet = json.loads((ROOT / (PREFIX + 'canonical-proposal.json')).read_bytes())
         self.assertEqual(projected['unselected_entries_preserved'], 1696)
         self.assertEqual(projected['entry']['final_disposition'], 'do-not-adopt')
-        actual_ledger = digest((ROOT / packet['before']['path']).read_bytes())
-        actual_registry = digest((ROOT / packet['registry_before']['path']).read_bytes())
+        frame = current_canonical_test_frame(ROOT)
+        actual_ledger = digest(frame['comparison'](packet['before']['path'], (ROOT / packet['before']['path']).read_bytes()))
+        actual_registry = digest(frame['comparison'](packet['registry_before']['path'], (ROOT / packet['registry_before']['path']).read_bytes()))
         self.assertIn(actual_ledger, [packet['before']['sha256'], packet['after']['sha256']])
         self.assertIn(actual_registry, [packet['registry_before']['sha256'], packet['registry_after']['sha256']])
         if actual_ledger == packet['after']['sha256']:
             self.assertEqual(actual_registry, packet['registry_after']['sha256'])
+        frame['assert_current']()
 
 
 if __name__ == '__main__':

@@ -58,10 +58,24 @@ class M3ThemeBoundaryAdmissionTests(unittest.TestCase):
         child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=180)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-7000:])
         report = json.loads(child.stdout)
-        for key, expected in [('current_source_admissions',88),('previous_source_admissions',35),('pure_metadata_cases',5),
+        for key, expected in [('preserved_pre_terminal_source_admissions',88),('previous_source_admissions',35),('pure_metadata_cases',5),
                               ('metadata_rejections',35),('source_rejections',6),('real_root_checker_positive_rows',5),
                               ('real_root_checker_rejected_rows',11),('rejection_controls',10)]:
             self.assertEqual(report[key], expected, key)
+        self.assertEqual(report['current_epoch_scope'], 'public physical terminal owner')
+        self.assertEqual(report['previous_epoch_scope'], 'maintained base historical35 JSON view')
+        self.assertTrue(report['public_old_projection_rejected'])
+        self.assertEqual(report['legacy_removal_source_admissions'], 1)
+        self.assertEqual(report['table_local_compilation_source_admissions'], 1)
+        self.assertIn(report['base_class_removal_source_admissions'], [0, 1])
+        self.assertEqual(report['current_source_admissions'], 90 + report['base_class_removal_source_admissions'])
+        for key, expected in [('historical_title_metadata_admissions', 0), ('historical_theming_metadata_admissions', 0),
+                              ('historical_title_native_after_references', 0), ('historical_native_reference_selection', 14),
+                              ('historical_native_after_positive_references', 14), ('historical_metadata_positive_cases', 3),
+                              ('historical_pre_terminal_source_admissions', 88)]:
+            self.assertEqual(report[key], expected, key)
+        self.assertTrue(report['historical_json_and_program_authenticated_as_Git_DATA'])
+        self.assertFalse(report['historical_program_executed'])
         self.assertEqual(report['title_source_admissions'], 1)
         self.assertEqual(report['title_native_metadata_tokens'], 14)
         self.assertEqual(report['theming_source_admissions'], 2)
