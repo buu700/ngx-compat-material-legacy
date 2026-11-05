@@ -57,16 +57,46 @@ export function tableLocalCompilationOwnerSourceSubject({root,read=path=>readEvi
  const actual=packedUpstreamLedgerCurrentSourceLane({root,read});
  const frames=baseClassRemovalCanonicalFrameSubject({root,read:actual.read});
  const repairs=historicalContractRepairReaderSubject({root,read});
- const bound=new Map([...repairs.bound,...frames.bound].map(ref=>[ref.path,{...ref}])),member=ref=>{const raw=read(ref.path),qualified=repairs.qualify(ref)??ref,comparison=repairs.ownsReference(ref)?repairs.comparisonBytes(ref):raw;assert.ok(Buffer.isBuffer(raw));assert.equal(hash(comparison),ref.sha256,'changed table owner input '+ref.path);if(ref.bytes!==undefined)assert.equal(comparison.length,ref.bytes);assert.equal(hash(raw),qualified.sha256,'changed actual table owner successor '+ref.path);assert.ok(raw.equals(readEvidenceMember(root,ref.path)),'nonphysical table owner source '+ref.path);bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return comparison;};
+ const bound=new Map([...repairs.bound,...frames.bound].map(ref=>[ref.path,{...ref}])),member=(ref,resolution)=>{
+  if(resolution)assert.deepEqual(ref,resolution.reference,'changed planned table member');
+  const before=resolution?readEvidenceMember(root,ref.path):undefined,raw=read(ref.path);
+  if(resolution){
+   assert.deepEqual(ref,resolution.reference,'changed planned table member during callback');
+   assert.ok(equal(before,raw),'nonphysical planned table member '+ref.path);
+   assert.ok(equal(before,readEvidenceMember(root,ref.path)),'planned table member changed during callback '+ref.path);
+  }
+  const qualified=resolution?(resolution.qualified??ref):(repairs.qualify(ref)??ref);
+  const comparison=resolution?(resolution.comparison===undefined?raw:resolution.comparison):(repairs.ownsReference(ref)?repairs.comparisonBytes(ref):raw);
+  assert.ok(Buffer.isBuffer(raw));assert.equal(hash(comparison),ref.sha256,'changed table owner input '+ref.path);if(ref.bytes!==undefined)assert.equal(comparison.length,ref.bytes);assert.equal(hash(raw),qualified.sha256,'changed actual table owner successor '+ref.path);assert.ok(raw.equals(readEvidenceMember(root,ref.path)),'nonphysical table owner source '+ref.path);bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return comparison;
+ };
  const packet=JSON.parse(member({path:INPUTS,sha256:PIN}));assert.equal(packet.schema_version,1);assert.equal(packet.line,'21.x');assert.equal(packet.old_program_executed,false);assert.equal(packet.canonical_dispositions_applied,0);assert.equal(packet.actual_native_packed_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');
  member({path:SELF,sha256:hash(image),bytes:image.length});const transitions=new Map();
+ // Resolve only this authenticated packet's static comparison metadata. Each
+ // later member still reads and checks the actual supplied/physical source.
+ // Results are consumed once in packet order and grant no current-state proof.
+ const staticRefs=[...packet.code_transitions.map(row=>row.after),...packet.source_members];
+ const batchDescriptor=Object.getOwnPropertyDescriptor(repairs,'referenceBatch');
+ let staticResolutions;
+ if(batchDescriptor){
+  assert.ok(Object.hasOwn(batchDescriptor,'value')&&typeof batchDescriptor.value==='function','non-data reference batch');
+  const requests=[],positions=staticRefs.map(ref=>{
+   const qualified=requests.push({kind:'qualify',reference:structuredClone(ref)})-1;
+   const comparison=repairs.ownsReference(ref)?requests.push({kind:'comparison',reference:structuredClone(ref)})-1:undefined;
+   return {reference:structuredClone(ref),qualified,comparison};
+  });
+  const results=apply(batchDescriptor.value,undefined,[requests]);
+  staticResolutions=positions.map(row=>({reference:row.reference,qualified:results[row.qualified],...(row.comparison===undefined?{}:{comparison:results[row.comparison]})}));
+ }
+ let staticIndex=0;
+ const staticMember=ref=>{const resolution=staticResolutions?.[staticIndex++];return member(ref,resolution);};
  for(const row of packet.code_transitions){
   assert.equal(row.before.path,row.after.path);assert.ok(!transitions.has(row.after.path));const before=original(root,packet.source_parent,row.before.path);assert.equal(hash(before),row.before.sha256);assert.equal(before.length,row.before.bytes);
   let expected=before.toString();for(const edit of row.literal_edits){assert.equal(expected.split(edit.before).length,2,'ambiguous table owner edit '+row.after.path);expected=expected.replace(edit.before,edit.after);}
-  assert.equal(hash(expected),row.after.sha256);assert.equal(Buffer.byteLength(expected),row.after.bytes);const after=member(row.after);assert.equal(after.toString(),expected);
+  assert.equal(hash(expected),row.after.sha256);assert.equal(Buffer.byteLength(expected),row.after.bytes);const after=staticMember(row.after);assert.equal(after.toString(),expected);
   transitions.set(row.after.path,{before:{...row.before},after:{...row.after},beforeBytes:before,afterBytes:after});
  }
- assert.equal(transitions.size,packet.code_transition_count);assert.ok(transitions.size>=4);for(const ref of packet.source_members)member(ref);
+ assert.equal(transitions.size,packet.code_transition_count);assert.ok(transitions.size>=4);for(const ref of packet.source_members)staticMember(ref);
+ if(staticResolutions)assert.equal(staticIndex,staticResolutions.length,'unused planned table members');
  const registry='scripts/upstream-source-contract-registry.mjs',ledger='compatibility/f10/disposition-ledger/ledger.json',roster='compatibility/rc/21x-remaining-disposition-worksheet.json';
  const pairs=new Map([[registry,{before:gunzipSync(member(packet.registry_before_image)),after:gunzipSync(member(packet.registry_after_image))}],[ledger,{before:gunzipSync(member(packet.ledger_before_image)),after:gunzipSync(member(packet.ledger_after_image))}],[roster,{before:gunzipSync(member(packet.roster_before_image)),after:gunzipSync(member(packet.roster_after_image))}]]);
  const ancestor=gunzipSync(member(packet.registry_ancestor_image));

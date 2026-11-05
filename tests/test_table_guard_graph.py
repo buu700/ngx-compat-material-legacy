@@ -15,15 +15,16 @@ EXTRA_PATHS = ('guard-plan-population-control.tmp', 'guard-plan-population-contr
 
 
 class TableGuardGraphTests(unittest.TestCase):
-    def run_probe(self, name):
+    def run_probe(self, name, *arguments):
         paths = ('scripts/base-class-removal-canonical-stage.mjs',
                  'projects/ngx-material-legacy/legacy-table/row.ts',
-                 'projects/ngx-material-legacy/legacy-button/button.ts')
+                 'projects/ngx-material-legacy/legacy-button/button.ts',
+                 'scripts/legacy-removal-owner-source.mjs')
         before = {ROOT / path: (ROOT / path).read_bytes() for path in paths}
         extras = [ROOT / 'projects/ngx-material-legacy/legacy-table' / n for n in EXTRA_PATHS]
         self.assertTrue(all(not p.exists() and not p.is_symlink() for p in extras))
         try:
-            child = subprocess.run(['node', str(ROOT / 'tests' / name)], cwd=ROOT,
+            child = subprocess.run(['node', str(ROOT / 'tests' / name), *arguments], cwd=ROOT,
                                    capture_output=True, text=True, timeout=60)
         finally:
             errors = []
@@ -44,6 +45,25 @@ class TableGuardGraphTests(unittest.TestCase):
                 raise ExceptionGroup('Test input recovery requires attention', errors)
         self.assertEqual(child.returncode, 0, child.stdout + child.stderr)
         return json.loads(child.stdout)
+
+    def static_constructor_probe(self, mode, faults):
+        report = self.run_probe('table_static_reference_batch_probe.mjs', mode)
+        self.assertEqual((report['result'], report['mode']), ('pass', mode))
+        self.assertTrue(report['actual_static_table_constructor'])
+        self.assertTrue(report['static_metadata_batch_observed'])
+        self.assertEqual(report['same_callback_mutations_rejected'], faults)
+        self.assertTrue(report['restoration_passed'])
+        self.assertFalse(report['complete_owner_success'])
+        self.assertFalse(report['compiler_or_build_executed'])
+
+    def test_static_metadata_uses_actual_batch_and_fresh_members(self):
+        self.static_constructor_probe('positive', 0)
+
+    def test_static_metadata_batch_rejects_same_callback_old_and_new_bytes(self):
+        self.static_constructor_probe('batch', 2)
+
+    def test_static_member_rejects_same_callback_old_and_new_bytes(self):
+        self.static_constructor_probe('member', 2)
 
     def test_actual_table_source_stage_and_legacy_tool_nodes(self):
         report = self.run_probe('table_guard_graph_probe.mjs')

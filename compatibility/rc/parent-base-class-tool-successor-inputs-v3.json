@@ -503,8 +503,8 @@
           },
           "after": {
             "path": "scripts/table-local-compilation-owner-source.mjs",
-            "sha256": "0af78e33ef00fdec88d48530a7687279d2d51e832261e689cb6bb2b353ac76c8",
-            "bytes": 12415
+            "sha256": "063c93929565a0362a505f3bcd5f879c0528bebc1524f31680e7df8da25fb002",
+            "bytes": 14442
           },
           "edits": [
             {
@@ -530,7 +530,22 @@
             {
               "offset": 1852,
               "before": " const bound=new Map(repairs.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{const raw=read(ref.path),qualified=repairs.qualify(ref)??ref,comparison=repairs.ownsReference(ref)?repairs.comparisonBytes(ref):raw;assert.ok(Buffer.isBuffer(raw));assert.equal(hash(comparison),ref.sha256,'changed table owner input '+ref.path);if(ref.bytes!==undefined)assert.equal(comparison.length,ref.bytes);assert.equal(hash(raw),qualified.sha256,'changed actual table owner successor '+ref.path);assert.ok(raw.equals(readEvidenceMember(root,ref.path)),'nonphysical table owner source '+ref.path);bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return comparison;};\n",
-              "after": " const bound=new Map([...repairs.bound,...frames.bound].map(ref=>[ref.path,{...ref}])),member=ref=>{const raw=read(ref.path),qualified=repairs.qualify(ref)??ref,comparison=repairs.ownsReference(ref)?repairs.comparisonBytes(ref):raw;assert.ok(Buffer.isBuffer(raw));assert.equal(hash(comparison),ref.sha256,'changed table owner input '+ref.path);if(ref.bytes!==undefined)assert.equal(comparison.length,ref.bytes);assert.equal(hash(raw),qualified.sha256,'changed actual table owner successor '+ref.path);assert.ok(raw.equals(readEvidenceMember(root,ref.path)),'nonphysical table owner source '+ref.path);bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return comparison;};\n"
+              "after": " const bound=new Map([...repairs.bound,...frames.bound].map(ref=>[ref.path,{...ref}])),member=(ref,resolution)=>{\n  if(resolution)assert.deepEqual(ref,resolution.reference,'changed planned table member');\n  const before=resolution?readEvidenceMember(root,ref.path):undefined,raw=read(ref.path);\n  if(resolution){\n   assert.deepEqual(ref,resolution.reference,'changed planned table member during callback');\n   assert.ok(equal(before,raw),'nonphysical planned table member '+ref.path);\n   assert.ok(equal(before,readEvidenceMember(root,ref.path)),'planned table member changed during callback '+ref.path);\n  }\n  const qualified=resolution?(resolution.qualified??ref):(repairs.qualify(ref)??ref);\n  const comparison=resolution?(resolution.comparison===undefined?raw:resolution.comparison):(repairs.ownsReference(ref)?repairs.comparisonBytes(ref):raw);\n  assert.ok(Buffer.isBuffer(raw));assert.equal(hash(comparison),ref.sha256,'changed table owner input '+ref.path);if(ref.bytes!==undefined)assert.equal(comparison.length,ref.bytes);assert.equal(hash(raw),qualified.sha256,'changed actual table owner successor '+ref.path);assert.ok(raw.equals(readEvidenceMember(root,ref.path)),'nonphysical table owner source '+ref.path);bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return comparison;\n };\n"
+            },
+            {
+              "offset": 2974,
+              "before": "",
+              "after": " // Resolve only this authenticated packet's static comparison metadata. Each\n // later member still reads and checks the actual supplied/physical source.\n // Results are consumed once in packet order and grant no current-state proof.\n const staticRefs=[...packet.code_transitions.map(row=>row.after),...packet.source_members];\n const batchDescriptor=Object.getOwnPropertyDescriptor(repairs,'referenceBatch');\n let staticResolutions;\n if(batchDescriptor){\n  assert.ok(Object.hasOwn(batchDescriptor,'value')&&typeof batchDescriptor.value==='function','non-data reference batch');\n  const requests=[],positions=staticRefs.map(ref=>{\n   const qualified=requests.push({kind:'qualify',reference:structuredClone(ref)})-1;\n   const comparison=repairs.ownsReference(ref)?requests.push({kind:'comparison',reference:structuredClone(ref)})-1:undefined;\n   return {reference:structuredClone(ref),qualified,comparison};\n  });\n  const results=apply(batchDescriptor.value,undefined,[requests]);\n  staticResolutions=positions.map(row=>({reference:row.reference,qualified:results[row.qualified],...(row.comparison===undefined?{}:{comparison:results[row.comparison]})}));\n }\n let staticIndex=0;\n const staticMember=ref=>{const resolution=staticResolutions?.[staticIndex++];return member(ref,resolution);};\n"
+            },
+            {
+              "offset": 3483,
+              "before": "  assert.equal(hash(expected),row.after.sha256);assert.equal(Buffer.byteLength(expected),row.after.bytes);const after=member(row.after);assert.equal(after.toString(),expected);\n",
+              "after": "  assert.equal(hash(expected),row.after.sha256);assert.equal(Buffer.byteLength(expected),row.after.bytes);const after=staticMember(row.after);assert.equal(after.toString(),expected);\n"
+            },
+            {
+              "offset": 3780,
+              "before": " assert.equal(transitions.size,packet.code_transition_count);assert.ok(transitions.size>=4);for(const ref of packet.source_members)member(ref);\n",
+              "after": " assert.equal(transitions.size,packet.code_transition_count);assert.ok(transitions.size>=4);for(const ref of packet.source_members)staticMember(ref);\n if(staticResolutions)assert.equal(staticIndex,staticResolutions.length,'unused planned table members');\n"
             },
             {
               "offset": 4593,
@@ -1678,8 +1693,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "8191c0ec3805590e56581567edfec8742edc395fb9afea48845edecfaa2f81fa",
-          "bytes": 21701
+          "sha256": "4906f4dbabf036f228c14df02b60abef32895e75ecb107fe63bca5f051b9ea93",
+          "bytes": 21831
         },
         {
           "path": "scripts/check-source-contract-regressions.py",
@@ -1752,6 +1767,16 @@
           "bytes": 1655
         },
         {
+          "path": "tests/finite_reference_batch_probe.mjs",
+          "sha256": "bac8bf0eff05687aae9781cc807b2e5cbe4eaf872cf8eb893ebf4e7cce3a19e9",
+          "bytes": 12330
+        },
+        {
+          "path": "tests/test_finite_reference_batch.py",
+          "sha256": "37be1991dc4e15e95cee33806e1ca933ed3f4ffca4fd1ff5c093c01ee6a15a64",
+          "bytes": 3839
+        },
+        {
           "path": "scripts/current-authored-roster-source.mjs",
           "sha256": "dbffbdf4e8fed392724eaa2181e3accbbf061ace4e7783861e6c33f434336aae",
           "bytes": 15929
@@ -1782,6 +1807,11 @@
           "bytes": 1752
         },
         {
+          "path": "tests/table_static_reference_batch_probe.mjs",
+          "sha256": "f37e731dc24113c87374e86d358216048ac016895088c2002737ad6a46d1fff6",
+          "bytes": 3266
+        },
+        {
           "path": "tests/table_guard_graph_probe.mjs",
           "sha256": "2781e43f8faec031534f05506785d81e6a62688474ef31a27c05971c0869d01c",
           "bytes": 7201
@@ -1793,8 +1823,8 @@
         },
         {
           "path": "tests/test_table_guard_graph.py",
-          "sha256": "5f136f4a118c9e0410ee53efcc87c198a5c1abe30efd620e4ef25e223b36191f",
-          "bytes": 3821
+          "sha256": "d5b74667ee473e187e57a37377391f8991f6d2ea3f950f73ee53d8c00716a1de",
+          "bytes": 4888
         },
         {
           "path": "tests/legacy_stage_guard_graph_probe.mjs",
@@ -2135,8 +2165,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "8191c0ec3805590e56581567edfec8742edc395fb9afea48845edecfaa2f81fa",
-          "bytes": 21701
+          "sha256": "4906f4dbabf036f228c14df02b60abef32895e75ecb107fe63bca5f051b9ea93",
+          "bytes": 21831
         },
         {
           "path": "scripts/check-source-contract-regressions.py",
@@ -2197,6 +2227,16 @@
           "path": "tests/test_canonical_source_guard_plan.py",
           "sha256": "b9ad7b0ca43203646cc6393b25edfe59358bbd822bbe6f2f9ba61bf4c9475708",
           "bytes": 1005
+        },
+        {
+          "path": "tests/finite_reference_batch_probe.mjs",
+          "sha256": "bac8bf0eff05687aae9781cc807b2e5cbe4eaf872cf8eb893ebf4e7cce3a19e9",
+          "bytes": 12330
+        },
+        {
+          "path": "tests/test_finite_reference_batch.py",
+          "sha256": "37be1991dc4e15e95cee33806e1ca933ed3f4ffca4fd1ff5c093c01ee6a15a64",
+          "bytes": 3839
         },
         {
           "path": "scripts/current-authored-roster-source.mjs",
