@@ -1,0 +1,52 @@
+{
+  "schema_version": 13,
+  "scope": "Actual complete V11 source regression gates after finite legacy batch; not full owner, G11 or release qualification",
+  "source_heads": {
+    "21.x": "c55df4d5edbc692ee945c5147371614514590c55",
+    "main": "6913117c47e99695a73d9bc1999dd56b53480dd5"
+  },
+  "results": {
+    "21.x": {
+      "result": "fail",
+      "seconds": 307.91219577216543,
+      "checker": "timeout120",
+      "browser": "timeout180",
+      "source_unchanged": true
+    },
+    "main": {
+      "result": "pass",
+      "seconds": 40.2126828529872,
+      "checker_cold_and_late": 147,
+      "browser_cold_and_late": 191,
+      "source_unchanged": true
+    }
+  },
+  "retained": [
+    {
+      "path": "compatibility/rc/parent-source-contract-regressions-21-v11.json",
+      "sha256": "8070388c87189996666c39a3853f153cb41b1d9b458290345cd875d56d06387f",
+      "bytes": 46350
+    },
+    {
+      "path": "compatibility/rc/parent-source-contract-regressions-main-v11.json",
+      "sha256": "853710e3afce5015ceda8cc9ca21d30facc873d09a2d132d57fcf5620edd5b07",
+      "bytes": 175400
+    },
+    {
+      "path": "compatibility/rc/parent-source-fault-parallelism-readonly-v1.json",
+      "sha256": "425d9016b4459a5db136b08cee7118dbaef61303b9b680100876f858bb96eb1e",
+      "bytes": 5675
+    },
+    {
+      "path": "compatibility/rc/parent-source-fault-parallelism-readonly-v2.json",
+      "sha256": "7e4a84930e789c28e1eb5f8dc289a773869f498a258ac692ef2d27b7544235c5",
+      "bytes": 13537
+    }
+  ],
+  "implementation_assessment": "Bounded legacy batch passed its genuine targeted tests and preserved source predicates, but did not resolve either21 fullgate timeout. No complete-command speedup is claimed.",
+  "parallelism_assessment": "Read-only investigation found late fault same-subject sequence must remain intact and cold process isolation equivalence unproven because of reader registrations and reader-keyed state. No parallel execution change is authorized by this record or implemented.",
+  "next": "Investigate genuine repeated same-actual-object operations without current-byte/parsed/verdict caches, cross-factory dedup, budget increase, reduced source fault coverage or altered same-process failure lifetimes. Fullowner remains deferred until both fresh source gates pass.",
+  "full_owner_executed": false,
+  "canonical_dispositions_applied": 0,
+  "g11_claim": "not-passed"
+}

@@ -1,0 +1,86 @@
+{
+  "scope": "Read-only static extension: inventory of relevant directly traced state and conservative cold-pool design; no source changes, execution, test, coverage approval or deadline claim.",
+  "heads": {
+    "21.x": "c55df4d5edbc692ee945c5147371614514590c55",
+    "main": "6913117c47e99695a73d9bc1999dd56b53480dd5"
+  },
+  "inspected_21_hashes": {
+    "tests/checker_reference_source_probe.mjs": "011a1656cfef7bf63c6b3afd5b490cf3452a92aa99e4243905db43569ca86e8e",
+    "tests/browser_reference_source_probe.mjs": "66fd7d05b55ab8ad1a36f951e3689923645b3561dcc7733fee1eed962f589a92",
+    "scripts/checker-owner-source.mjs": "128a33dc4ea2dc37f084221369285b8e164154e8e21d277f6b32e8ceb945aee4",
+    "scripts/browser-reference-source.mjs": "6abc5b7da3b01e8346b2723bc3903de03b5606caa3752c680304dd02565838b0"
+  },
+  "evidence": [
+    "Checker probe lines 141-150 constructs one subject from a callback whose tamper variable is private to the process, applies every late fault sequentially to that same subject with assert.throws, then runs a fresh full inspect for every cold fault with assert.rejects. It compares both ordered path lists to the entire initial subject.bound, runs a final clean assertCurrent and checks unchanged ledger.",
+    "Browser probe lines 22-32 uses the same single-subject late sequence followed by a fresh full constructor and assert.throws per cold fault, and requires both ordered path lists equal the complete subject.bound. Later it runs additional independent probe checks and emits the final report.",
+    "Checker test calls the probe with metadata and a 120 second subprocess timeout. Browser gate uses its unchanged 180 second budget as stated in task. The script's source identity and its dependent finite enrollments are themselves guarded; changing probe or adding an executing helper needs a reviewed acyclic source successor and enrollment. Full owner operation is separate and remains serial."
+  ],
+  "conclusion": "Distributing the existing late loop among worker-local subjects does not preserve its one-object lifetime and cross-failure cleanup sequence, so no complete-loop parallel replacement is established. A narrow cold-loop parallel design is possible in principle, but changes module/process state and timing and is not yet proven equivalent or shown to fit either deadline. Keep the entire late loop on the original object and preserve all independent checks. No speedup is claimed.",
+  "conditional_cold_only_design": [
+    "After the original full serial late loop completes, schedule every cold path exactly once to a bounded worker pool. Workers use the actual unchanged inspector/constructor and local tamper read callback, each constructs a genuine complete baseline subject and verifies its full ordered bound population with path, digest and byte size against the coordinator's actual baseline. No subset subject, forged subject, shared verdict, source bytes, parsed objects or readers.",
+    "For every assigned path the worker performs the original full cold constructor call with exactly that callback fault and the original assert.rejects for checker or assert.throws for browser, resets its local tamper state, and returns only path/index plus pass or failure. Constructor creation stays per fault. Worker startup must load the authenticated actual code and subject graph, not a substitute; preserve current original full-scope pre/final guards.",
+    "Coordinator rejects missing, extra, duplicate, mismatched or reordered assignments and worker errors/exits/timeouts. Reassemble successful path results in original bound order and retain the exact count/list assertions, initial and final original-subject clean assertions, ledger checks, remaining probe assertions, report fields and write-on-success behavior. Overall original 120/180 wall deadlines include worker startup and shutdown; no worker-level extension.",
+    "Independent processes or worker isolates alter module-level brand/registry/cache identity and discard the serial sequence of cold constructor failures in the original module instance. Require explicit analysis and negative tests for those dependencies and same-process repeated-failure cleanup; if that invariant is required and cannot be preserved, keep the serial cold loop as well. A result from independent instances cannot be represented as testing the original late subject or the original same-process sequence."
+  ],
+  "negative_controls": [
+    "Worker baseline differs by one bound path/hash/size/order; reject before accepting cases.",
+    "One cold fault is not rejected; missing, duplicate or wrong-index worker result; abnormal worker exit or hang; no successful report.",
+    "One deliberately mutated non-assigned population member fails that worker's complete baseline even if its assigned member is unchanged.",
+    "Actual original late subject sees every fault sequentially, and a removed or changed fault fails exact ordered list assertions; final clean recovery remains checked.",
+    "Poison a module-level binding or leave a failure-induced lock in one worker; show whether the serial original would detect it and whether worker isolation loses that observation; keep serial if not equivalent.",
+    "Source changes during execution, ledger changes, stale loaded image, and failures in remaining checker/browser assertions remain visible; preserve source and complete owner gates.",
+    "Measure whole command including worker startup, load and cleanup on both lines under original budgets; test resource contention and failure cleanup. No accepted result on timeout or partial worker outputs."
+  ],
+  "unexecuted": "No runtime, profiling, benchmark, worker prototype or full gate was run; current V11 remains authoritative. Static import traversal over-approximates execution and is not a complete proof of every transitive state use.",
+  "state_inventory": [
+    {
+      "where": "current-sass-tool-references.mjs:73-99; table-local-compilation-owner-source.mjs:23,47-54; historical-contract-repair-readers.mjs:19,58-65; current-authored-roster-source.mjs:24,125-129; packed-upstream-ledger-epoch.mjs:91,225-235",
+      "kind": "process-local immutable historical Git DATA maps",
+      "effect": "They retain historical bytes keyed by Git identity/root and hand out copies. They are not live-source or verdict caches; each process warms its own copies and must still run every physical check."
+    },
+    {
+      "where": "checker-owner-source.mjs:19; browser-owner-source.mjs:19; browser-reference-source.mjs:20; table-local-compilation-owner-source.mjs:23; packed-upstream-ledger-epoch.mjs:91; upstream-base-class-removal-admission.cjs:43",
+      "kind": "module-load images and captured functions",
+      "effect": "Each module instance captures loaded bytes/function identities. Worker baseline matching metadata alone cannot prove foreign or stale loaded code; each worker must authenticate its own actual loaded images and physical files, including the worker implementation."
+    },
+    {
+      "where": "packed-upstream-ledger-epoch.mjs:91,97,145-167,170-174; current-authored-roster-source.mjs:24,125,189; inventory-reference-owner.mjs:24,94,229",
+      "kind": "mutable weak reader/brand registries and active reentry weak set",
+      "effect": "Object identity is local to the module instance. Source metadata binding registers only after collection succeeds and deletes the reentry marker in finally. The loop uses one supplied read closure for all cases, but private constructed readers may persist as weak entries; no reader or brand can be transferred from parent to worker."
+    },
+    {
+      "where": "packed-upstream-ledger-base.mjs:51-64,88-125,147-149,1069-1074",
+      "kind": "immutable before-image syntax/Git caches plus reader-keyed scope caches/bindings and active preparation stack",
+      "effect": "Selection caches retain guarded constructed scope keyed by actual reader and currentSourceBindings accumulates reference metadata; those are not mere immutable Git data. The preparation stack unwinds in finally. These are imported through the epoch graph; static import reachability alone does not establish that each is exercised in these specific cold paths, so require exact runtime reachability before claiming independence."
+    },
+    {
+      "where": "current-sass-tool-references.mjs:113-241; table-local-compilation-owner-source.mjs:61,179-190; legacy-removal-owner-source.mjs:34,87-97; browser-reference-source.mjs:32",
+      "kind": "per-factory bound maps, transition data and active subject locks",
+      "effect": "Fresh construction creates distinct actual subjects and maps; locks guard particular instances and finally releases them. A full subject in each worker must be genuine, with no cross-worker sharing of subjects, current bytes, parsed data or verdicts."
+    },
+    {
+      "where": "tests/checker_reference_source_probe.mjs:139-150; tests/browser_reference_source_probe.mjs:22-32",
+      "kind": "one mutable tamper variable and callback per original command",
+      "effect": "All original cold inspections use that same callback identity after the late sequence, in the same module instance and ordered path sequence. Parallel workers necessarily change identity and inter-case state ordering."
+    }
+  ],
+  "serial_contract_assessment": "The explicit cold assertions require a rejection for each fresh factory and exact ordered coverage; they do not explicitly assert a clean newly constructed subject between faults, nor identify a dedicated per-case cleanup assertion. Nevertheless serial order, one shared callback identity, and same process are actual exercised behavior: later cases and the final original-subject assertion can observe persistent module state. The source alone does not establish that cross-case failure independence is an intended public guarantee, nor prove it irrelevant. Changing it without qualification would alter tested conditions. Late loop must remain serial on exactly its original subject.",
+  "equivalence_decision": "Conditional cold-pool proposal only; do not recommend implementation yet. Each fresh worker can establish an actual complete baseline and execute the same per-path rejection, but independent module state prevents a proof that the original same-process sequential cold assertions are preserved. Establish actual reachable cache/brand/lock state and demonstrate per-failure clean recovery in the original shared-reader process, including poisoned cleanup controls; if this sequence is part of the required contract, keep it serial or obtain a precisely scoped coverage decision. Matching final path lists alone is insufficient.",
+  "pool_protocol": [
+    "Parent completes the unchanged original serial late loop on its original subject before dispatching any cold case. It retains its full actual baseline, clean final assertion, ledger checks, unrelated browser/checker assertions, and existing report schema.",
+    "Every worker loads and authenticates its own actual factory graph and worker code, performs a genuine full baseline, and returns its complete ordered subject.bound path/hash/size list and stable report fields. Parent compares all against its full baseline and rejects stale/foreign images, wrong line/root, or mismatch before accepting any fault result. No subject or reader is shared across isolates.",
+    "For each assigned index worker invokes the actual whole factory freshly with its own one-path supplied-read fault and original throws/rejects assertion; never substitute a shard, source-metadata mode, cached verdict, parsed data or current bytes. Return indexed case verdicts only, not a partial full-gate report.",
+    "Coordinator requires exactly one matching index/path for every original path; rejects duplicate, omitted, foreign, mismatched, out-of-range, abnormal exit, timeout and missing final acknowledgement. Construct original ordered lists, unchanged counts and report only after all cases pass, then run final parent assertions.",
+    "On first failed assertion or protocol error, terminate and reap all workers, suppress success report, preserve diagnostics, and ensure no orphan process or report file. One outer unchanged deadline covers startup, baseline, every case, final checks and cleanup; cancellation/timeout must not be credited as pass."
+  ],
+  "required_negative_tests": [
+    "Cold factory silently succeeds for a single path, or fault callback is never reached; must fail.",
+    "Worker foreign loaded source image or mismatched root/line, report, path, hash, size, or order; reject.",
+    "Duplicate, missing, extra, forged, wrong-index or late result; crash, cancellation and hung worker; reject and reap all workers, no partial report.",
+    "Corrupt a nonassigned bound member and verify each worker baseline rejects the whole population.",
+    "Deliberately retain a reader brand or active lock after failure and compare original same-reader serial behavior with workers; prove fresh clean recovery after each failure without weakening old assertions.",
+    "Original parent actual subject still gets every late fault sequentially; fail a late case and verify no cold-pool success.",
+    "Persistent current physical mutation and replaced source image remain rejected; all unchanged browser/checker non-fault checks and unchanged report contracts still execute.",
+    "Fresh measured complete commands on both lines including worker startup and shutdown under unchanged 120/180 second deadlines; full-owner 1800-second operation is independent."
+  ]
+}
