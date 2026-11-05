@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "role": "Bounded physical source guard integration repair",
+  "basis": {
+    "path": "compatibility/rc/parent-base-class-composed-owner-attempt-v3.json",
+    "sha256": "59fe8ddce36cc3cbc3e337d7a01edc86e49b66a260953b9619a76f9f23d25851",
+    "bytes": 5881
+  },
+  "scope": [
+    {
+      "path": "scripts/browser-owner-source.mjs",
+      "before": {
+        "sha256": "f3eed08c7bc7d385a53ba2cabfeb35e4656e7f41871fab08b685104b1f0f84ad",
+        "bytes": 6019
+      },
+      "after": {
+        "sha256": "9377e8dba64633774c42aea4a93f8829aec62a821a69c868d62efce41c930b72",
+        "bytes": 6408
+      }
+    },
+    {
+      "path": "scripts/checker-owner-source.mjs",
+      "before": {
+        "sha256": "0788290595d4c776ae958ebf8e0c110b281c3840f349d1be93b7e5b988a3567c",
+        "bytes": 5220
+      },
+      "after": {
+        "sha256": "128a33dc4ea2dc37f084221369285b8e164154e8e21d277f6b32e8ceb945aee4",
+        "bytes": 5609
+      }
+    },
+    {
+      "path": "scripts/checker-reference-proposal.mjs",
+      "before": {
+        "sha256": "22c49ba434ee0b1253ad2815b77510adb8259cc3f307005f6b66b73e522502ac",
+        "bytes": 13095
+      },
+      "after": {
+        "sha256": "46178033f750eb04cf4343509749e3618c9b9683d7eca0db9630f88ffcf66789",
+        "bytes": 13477
+      }
+    }
+  ],
+  "observed_defect": "Browser source guard inherited the physical426 ledger binding but compared against the exact private424 metadata view; full source owner rejected.",
+  "adjacent_proven_defects": [
+    "Checker source guard inherits the same physical browser-bound ledger and uses supplied private read, so the same mismatch follows.",
+    "Checker proposal source guard inherits the physical checker-bound ledger and uses supplied private read. Its separate physicalLedger gate does not normalize that bound guard."
+  ],
+  "repair": [
+    "Resolve the existing root-checked private current-source lane at each physical source owner. No new branding writer or accepted public callback is added.",
+    "Keep member/reference comparisons, metadata derivations and public current-image gates byte-identical.",
+    "For inherited physical bindings use actual.read and actual.assertCurrent; after all callback guards finish, perform trusted callback-free complete physical binding sweep."
+  ],
+  "unchanged_intentional_metadata_guards": [
+    "inventory-reference-owner currentLedger overwrites inherited LEDGER binding with caller metadata bytes; retain supplied read.",
+    "checker-reference-owner and browser-reference-owner current binding overwrites inherited LEDGER with caller metadata bytes; preserve that original exact current-image behavior.",
+    "browser-reference-owner sourceRead already supplies physical ledger to browser source/proposal; no unrelated source body changes."
+  ],
+  "validation": {
+    "source_review": "pending independent review",
+    "syntax": "pending",
+    "focused_current_leaf_runtime": "pending bounded tool ownership refresh",
+    "complete_source_owner": "prior attempt rejected; not passed"
+  },
+  "canonical_files_written": false,
+  "product_html_css_scss_changes": false,
+  "g11_claim": "not-passed"
+}

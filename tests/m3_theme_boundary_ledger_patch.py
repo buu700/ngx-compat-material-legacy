@@ -63,8 +63,10 @@ def derive_boundary_successor(root=ROOT, expected_before=None):
 
 
 def verify_boundary_successor(root=ROOT, expected_before=None, candidate=None):
+    from current_sass_canonical_test_scope import historical424_ledger_test_subject
+    subject = historical424_ledger_test_subject(root) if candidate is None else None
     before, after = derive_boundary_successor(root=root, expected_before=expected_before)
-    observed = Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()
+    observed = Path(candidate).read_bytes() if candidate is not None else subject['comparison']
     remaining_unthemable_applied = False
     if HASH(observed) == 'cc74f78b748c9b1226338b96a979558510ab72e50fea4c223cae45a76f4980a1':
         from remaining_unthemable_canonical_ledger_patch import derive_remaining_unthemable_successor
@@ -137,6 +139,8 @@ def verify_boundary_successor(root=ROOT, expected_before=None, candidate=None):
         assert observed == title_after and title_before == after
         observed, title_applied = title_before, True
     assert observed == after
+    if subject is not None:
+        subject['assert_current']()
     return dict(line='21.x', exact_title_successor_verified=title_applied, exact_theming_successor_verified=theming_applied, exact_inspection_successor_verified=inspection_applied, exact_selector_density_successor_verified=selector_density_applied, exact_button_tokenization_successor_verified=button_tokenization_applied, exact_button_token_repairs_successor_verified=button_token_repairs_applied, exact_surface_m3_theme_successor_verified=surface_m3_theme_applied, exact_slider_m3_repairs_successor_verified=slider_m3_repairs_applied, exact_control_m3_theme_successor_verified=control_m3_theme_applied, exact_foundation_m3_theme_successor_verified=foundation_m3_theme_applied, exact_core_tokenization_successor_verified=core_tokenization_applied, exact_remaining_unthemable_successor_verified=remaining_unthemable_applied, individual_decisions=5, unselected_entry_bytes_preserved=1692,
         before_sha256=HASH(before), after_sha256=HASH(after), after_bytes=len(after),
         closed_dispositions=376, pending_dispositions=1321, pending_security_reviews=1,

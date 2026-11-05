@@ -94,8 +94,10 @@ def derive_title_successor(root=ROOT):
     for i, entry in enumerate(data['entries']):
         if entry['sha'] not in selected_ids:
             assert before_text[slice(*before_ranges[i])] == after_text[slice(*after_ranges[i])]
+    from current_sass_canonical_test_scope import historical_title_source_test_subject
+    source_subject = historical_title_source_test_subject(root)
     for member in packet['source_members'] + [packet['root_checker']]:
-        value = (root / member['path']).read_bytes()
+        value = source_subject['comparison_bytes'](member)
         if member['path'] == 'scripts/upstream-source-contract-registry.mjs' and HASH(value) == '03a18cd09e4183f4307f1ec2c17d0797eea72db0440e23530e4d015ea0dae6a8':
             from remaining_unthemable_canonical_ledger_patch import verify_remaining_unthemable_registry_successor
             remaining_before, remaining_after = verify_remaining_unthemable_registry_successor(root)
@@ -154,14 +156,18 @@ def derive_title_successor(root=ROOT):
             value = registry_before  # Exact historical metadata after authenticating current bytes.
         assert HASH(value) == member['sha256']
         if 'bytes' in member: assert len(value) == member['bytes']
-    assert (root / 'scripts/packed-upstream-ledger-base.mjs').read_bytes() == _git(root,PARENT,'scripts/packed-upstream-ledger-epoch.mjs')
+    base_ref, = [member for member in packet['source_members'] if member['path'] == 'scripts/packed-upstream-ledger-base.mjs']
+    assert source_subject['comparison_bytes'](base_ref) == _git(root,PARENT,'scripts/packed-upstream-ledger-epoch.mjs')
     assert (root / 'scripts/check-upstream-audit-disposition.mjs').read_bytes() == _git(root,PARENT,'scripts/check-upstream-audit-disposition.mjs')
+    source_subject['assert_current']()
     return before, after
 
 
 def verify_title_successor(root=ROOT, candidate=None):
+    from current_sass_canonical_test_scope import historical424_ledger_test_subject
+    subject = historical424_ledger_test_subject(root) if candidate is None else None
     before, after = derive_title_successor(root)
-    observed = Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()
+    observed = Path(candidate).read_bytes() if candidate is not None else subject['comparison']
     remaining_unthemable_applied = False
     if HASH(observed) == 'cc74f78b748c9b1226338b96a979558510ab72e50fea4c223cae45a76f4980a1':
         from remaining_unthemable_canonical_ledger_patch import derive_remaining_unthemable_successor
@@ -229,6 +235,8 @@ def verify_title_successor(root=ROOT, candidate=None):
         assert observed == theming_after and theming_before == after
         observed, theming_applied = theming_before, True
     assert observed == after
+    if subject is not None:
+        subject['assert_current']()
     return dict(individual_decisions=1, metadata_tokens=14, summary_scalar_tokens=2,
         unselected_entry_bytes_preserved=1682, population=1697, closed_dispositions=377,
         pending_dispositions=1320, pending_security_reviews=1, before_sha256=HASH(before),

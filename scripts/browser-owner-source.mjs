@@ -7,6 +7,7 @@
 /** Finite current tool successors. Historical bytes are comparison data only. */
 import assert from 'node:assert/strict';
 import {legacyRemovalOwnerSourceSubject} from './legacy-removal-owner-source.mjs';
+import {packedUpstreamLedgerCurrentSourceLane} from './packed-upstream-ledger-epoch.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {readFileSync,realpathSync} from 'node:fs';
@@ -30,6 +31,7 @@ function original(root,commit,path){
 }
 export function browserOwnerSourceSubject({root,read=path=>readBrowserOwnerMember(root,path)}={}){
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
+ const actual=packedUpstreamLedgerCurrentSourceLane({root,read});
  const legacyTools=legacyRemovalOwnerSourceSubject({root,read});
  const bound=new Map(legacyTools.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{
   ref=legacyTools.qualifyReference(ref);
@@ -65,8 +67,10 @@ export function browserOwnerSourceSubject({root,read=path=>readBrowserOwnerMembe
   if(ref.sha256===current.sha256&&ref.sha256!==row.after.sha256)return legacyTools.comparisonBytes(ref);
   return Buffer.from(ref.sha256===row.before.sha256?row.beforeBytes:row.afterBytes);
  };
- const assertCurrent=()=>{legacyTools.assertCurrent();for(const ref of bound.values()){
-  const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late browser owner tool '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readBrowserOwnerMember(root,ref.path)));
+ const assertCurrent=()=>{actual.assertCurrent();legacyTools.assertCurrent();for(const ref of bound.values()){
+  const raw=actual.read(ref.path);assert.equal(hash(raw),ref.sha256,'late browser owner tool '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readBrowserOwnerMember(root,ref.path)));
+ }for(const ref of bound.values()){
+  const raw=readBrowserOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical browser owner tool '+ref.path);assert.equal(raw.length,ref.bytes);
  }};
  assertCurrent();return {line,packet:structuredClone(packet),bound:structuredClone([...bound.values()]),qualifyReference,comparisonBytes,assertCurrent,canonical_frame_admission_granted:false,old_program_executed:false,current_native_or_full_audit_credit:false};
 }

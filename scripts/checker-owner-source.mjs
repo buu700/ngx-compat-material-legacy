@@ -7,6 +7,7 @@
 /** Exact current tool successors;old program images are comparison data only. */
 import assert from 'node:assert/strict';
 import {browserOwnerSourceSubject} from './browser-owner-source.mjs';
+import {packedUpstreamLedgerCurrentSourceLane} from './packed-upstream-ledger-epoch.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {readFileSync,realpathSync} from 'node:fs';
@@ -30,6 +31,7 @@ function original(root,parent,path){
 }
 export function checkerOwnerSourceSubject({root,read=path=>readCheckerOwnerMember(root,path)}={}){
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
+ const actual=packedUpstreamLedgerCurrentSourceLane({root,read});
  const tools=browserOwnerSourceSubject({root,read});
  const bound=new Map(tools.bound.map(ref=>[ref.path,{...ref}])),member=(ref)=>{
   ref=tools.qualifyReference(ref);
@@ -58,8 +60,10 @@ export function checkerOwnerSourceSubject({root,read=path=>readCheckerOwnerMembe
   assert.ok(prior,'unqualified tool reference '+ref.path);if(ref.bytes!==undefined)assert.equal(ref.bytes,prior.bytes);
   return tools.qualifyReference({...ref,sha256:row.after.sha256,bytes:row.after.bytes});
  };
- const assertCurrent=()=>{tools.assertCurrent();for(const ref of bound.values()){
-  const raw=read(ref.path),physical=readCheckerOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'late checker owner tool '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(physical));
+ const assertCurrent=()=>{actual.assertCurrent();tools.assertCurrent();for(const ref of bound.values()){
+  const raw=actual.read(ref.path),physical=readCheckerOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'late checker owner tool '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(physical));
+ }for(const ref of bound.values()){
+  const raw=readCheckerOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical checker owner tool '+ref.path);assert.equal(raw.length,ref.bytes);
  }};
  assertCurrent();return {line,packet:structuredClone(packet),bound:structuredClone([...bound.values()]),qualifyReference,assertCurrent,
   old_program_executed:false,current_native_or_full_audit_credit:false};
