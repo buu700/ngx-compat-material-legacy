@@ -654,13 +654,13 @@ function qualifyBeforeLegacyRemovalToolReference({root=process.cwd(),read=disk(r
 /** The complete prior owner runs first; only the exact new source stage follows. */
 function prepareBeforeTableLocalCompilationLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});
- const legacy=bindSourceMetadata(root,legacyRemovalOwnerContext({root,read}),read,'legacy');
+ const legacy=bindSourceMetadata(root,legacyRemovalOwnerContext({root,read,composeSourceGuards:true}),read,'legacy',true);
  const prior=prepareBeforeLegacyRemovalLedger({root,read:legacy.metadataRead});
  return legacy.wrapPrepared(prior);
 }
 function epochBeforeTableLocalCompilationLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});
- const legacy=bindSourceMetadata(root,legacyRemovalOwnerContext({root,read}),read,'legacy');
+ const legacy=bindSourceMetadata(root,legacyRemovalOwnerContext({root,read,composeSourceGuards:true}),read,'legacy',true);
  const prior=epochBeforeLegacyRemovalLedger({root,read:legacy.metadataRead});
  const assertCurrent=()=>{legacy.assertCurrent();prior.assertCurrent();legacy.assertCurrent();};
  const historical=path=>{if(path!==LEDGER)return read(path);assertCurrent();const raw=prior.read(path);assertCurrent();return raw;};
@@ -674,7 +674,7 @@ function qualifyBeforeTableLocalCompilationToolReference({root=process.cwd(),rea
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.qualifyCanonicalToolReference({root,read,prior});
  let role;try{role=read(METADATA_ROLE);}catch{/* A public reader has no private comparison capability. */}
  if(role===metadataToken)return qualifyBeforeLegacyRemovalToolReference({root,read,prior});
- const legacy=bindSourceMetadata(root,legacyRemovalOwnerContext({root,read}),read,'legacy');
+ const legacy=bindSourceMetadata(root,legacyRemovalOwnerContext({root,read,composeSourceGuards:true}),read,'legacy',true);
  const result=qualifyBeforeLegacyRemovalToolReference({root,read:legacy.metadataRead,prior});
  if(!result)return result;
  const bound=new Map(result.bound.map(ref=>[ref.path,{...ref}]));for(const ref of legacy.bound)bound.set(ref.path,{...ref});

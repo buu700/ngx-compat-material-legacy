@@ -14,11 +14,44 @@ import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {gunzipSync} from 'node:zlib';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
+import {readHistoricalContractRepairOwnerMember} from './historical-contract-repair-readers.mjs';
+import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
+import {types} from 'node:util';
 export const LEGACY_REMOVAL_LEDGER='compatibility/f10/disposition-ledger/ledger.json';
 export const LEGACY_REMOVAL_LEDGER_BEFORE='f0aa2808e6bf022e9901b6edc249e1b08e7be9b7af06af4f154131e4a54c9cee';
 export const LEGACY_REMOVAL_REGISTRY='scripts/upstream-source-contract-registry.mjs';
 export const LEGACY_REMOVAL_REGISTRY_BEFORE='03a18cd09e4183f4307f1ec2c17d0797eea72db0440e23530e4d015ea0dae6a8';
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
+const bufferEquals=Buffer.prototype.equals,apply=Reflect.apply,functionToString=Function.prototype.toString;
+const equal=(a,b)=>Buffer.isBuffer(b)&&apply(bufferEquals,a,[b]);
+function own(object,key,optional=false){
+ assert.ok(object&&typeof object==='object'&&!types.isProxy(object),'invalid legacy guard object');
+ const d=Object.getOwnPropertyDescriptor(object,key);
+ if(optional&&!d)return undefined;
+ assert.ok(d&&Object.hasOwn(d,'value'),'non-data legacy guard '+key);return d;
+}
+function same(object,key,before){
+ const now=own(object,key,before===undefined);
+ if(before===undefined){assert.equal(now,undefined,'added legacy guard '+key);return;}
+ for(const flag of ['value','enumerable','writable','configurable'])assert.equal(now[flag],before[flag],'changed legacy guard '+key);
+}
+const loadedInspector=own(admission,'inspectCanonicalSource').value;
+function assertInspector(){
+ assert.equal(own(admission,'inspectCanonicalSource').value,loadedInspector,'changed legacy canonical source inspector');
+ assert.equal(hash(functionToString.call(loadedInspector)),'619ce1daf34bc76fa9e610af6e28496957094b4ff4c5d14eb492664405cd67ca','unauthenticated legacy source inspector');
+}
+// A missing, malformed or initially mismatched tuple leaves the entire
+// operation original. The captured successful tuple cannot later change.
+function completeTools(subject){
+ const guard=own(subject,'assertCurrent'),plan=own(subject,'guardPlan',true);
+ if(!plan)return null;
+ const tuple=plan.value;
+ if(!tuple||typeof tuple!=='object'||types.isProxy(tuple)||!Object.isFrozen(tuple)||
+    Reflect.ownKeys(tuple).sort().join(',')!=='assertCurrent,node')return null;
+ const tg=Object.getOwnPropertyDescriptor(tuple,'assertCurrent'),tn=Object.getOwnPropertyDescriptor(tuple,'node');
+ if(!tg||!tn||!Object.hasOwn(tg,'value')||!Object.hasOwn(tn,'value')||tg.value!==guard.value||!tn.value)return null;
+ return {node:tn.value,check:()=>{same(subject,'assertCurrent',guard);same(subject,'guardPlan',plan);same(tuple,'assertCurrent',tg);same(tuple,'node',tn);assert.ok(Object.isFrozen(tuple));}};
+}
 export function legacyRemovalRegistrySuccessor(before){
  assert.ok(Buffer.isBuffer(before));assert.equal(hash(before),LEGACY_REMOVAL_REGISTRY_BEFORE);
  const text=before.toString(),marker='];\n';assert.equal(text.split(marker).length,2);
@@ -48,8 +81,12 @@ export function applyLegacyRemovalCanonicalStage({before,body}={}){
 }
 
 /** Real terminal source stage; prior complete-frame gates still own admission. */
-export function legacyRemovalOwnerContext({root,read=path=>readFileSync(join(root,path))}={}){
+export function legacyRemovalOwnerContext({root,read=path=>readFileSync(join(root,path)),composeSourceGuards=false}={}){
+ assert.equal(typeof composeSourceGuards,'boolean');
+ const checkInspector=assertInspector;
+ if(composeSourceGuards)checkInspector();
  const tools=legacyRemovalOwnerSourceSubject({root,read}),packet=tools.packet;
+ const dependency=composeSourceGuards?completeTools(tools):null;
  const bound=new Map(tools.bound.map(ref=>[ref.path,{...ref}]));
  const member=ref=>{const raw=read(ref.path);assert.ok(Buffer.isBuffer(raw));assert.equal(hash(raw),ref.sha256,'changed legacy owner input '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return raw;};
  const proposal=JSON.parse(member(packet.proposal)),body=JSON.parse(member(proposal.review));
@@ -63,8 +100,63 @@ export function legacyRemovalOwnerContext({root,read=path=>readFileSync(join(roo
  assert.ok(comparisonRegistry.equals(registryBefore)||comparisonRegistry.equals(registryAfter),'unqualified legacy source registry');
  const applied=actualLedger.equals(stage.after),registryApplied=comparisonRegistry.equals(registryAfter);if(applied)assert.ok(registryApplied,'legacy ledger successor requires its exact source registry successor');
  for(const[path,raw]of [[LEGACY_REMOVAL_LEDGER,actualLedger],[LEGACY_REMOVAL_REGISTRY,actualRegistry]])bound.set(path,{path,sha256:hash(raw),bytes:raw.length});
- const source=admission.inspectCanonicalSource({root,read,entries:stage.entries,body});for(const ref of source.bound)bound.set(ref.path,{...ref,bytes:ref.bytes??read(ref.path).length});
- const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late legacy canonical input '+ref.path);assert.equal(raw.length,ref.bytes);}};
+ // The default and a missing complete dependency use the entire original
+ // construction and guard, including its original supplied reader.
+ let phase='consume',sourceActive=false,stageActive=false;
+ const idle=()=>{assert.equal(sourceActive,false,'reentrant legacy admission source');assert.equal(stageActive,false,'reentrant legacy canonical stage');};
+ const checkedSourceRead=path=>{
+  assert.ok(phase==='consume'||phase==='physical','invalid legacy source phase');
+  const physical=readHistoricalContractRepairOwnerMember(root,path);
+  if(phase==='physical')return physical;
+  const supplied=read(path);assert.ok(equal(physical,supplied),'nonphysical legacy admission source '+path);
+  assert.ok(equal(physical,readHistoricalContractRepairOwnerMember(root,path)),'legacy admission changed during callback '+path);
+  return physical;
+ };
+ if(dependency){dependency.check();checkInspector();}
+ const source=dependency?loadedInspector({root,read:checkedSourceRead,entries:stage.entries,body}):admission.inspectCanonicalSource({root,read,entries:stage.entries,body});
+ const sourceGuard=dependency?own(source,'assertCurrent'):null;
+ for(const incoming of source.bound){
+  const ref={...incoming};
+  if(ref.bytes===undefined){
+   if(dependency){const physical=readHistoricalContractRepairOwnerMember(root,ref.path);assert.equal(hash(physical),ref.sha256,'unqualified legacy source physical '+ref.path);ref.bytes=physical.length;}
+   else ref.bytes=read(ref.path).length;
+  }
+  if(dependency){const prior=bound.get(ref.path);if(prior){assert.equal(prior.sha256,ref.sha256,'conflicting legacy source reference '+ref.path);assert.equal(prior.bytes,ref.bytes,'conflicting legacy source size '+ref.path);}}
+  bound.set(ref.path,ref);
+ }
+ const originalAssertCurrent=()=>{tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late legacy canonical input '+ref.path);assert.equal(raw.length,ref.bytes);}};
+ let assertCurrent=originalAssertCurrent,guardNode,guardPlan;
+ if(dependency){
+  const physicalLedger=tools.bound.find(ref=>ref.path===LEGACY_REMOVAL_LEDGER);assert.ok(physicalLedger,'missing authenticated legacy physical ledger');
+  const physicalBound=[...bound.values()].map(ref=>({...ref,...(ref.path===LEGACY_REMOVAL_LEDGER?physicalLedger:{})}));
+  const physicalByPath=new Map(physicalBound.map(ref=>[ref.path,ref]));
+  const metadata=()=>{checkInspector();dependency.check();same(source,'assertCurrent',sourceGuard);};
+  const sweep=()=>{for(const ref of physicalBound){const raw=readHistoricalContractRepairOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'physical legacy canonical input '+ref.path);assert.equal(raw.length,ref.bytes);}};
+  const executeSource=next=>{
+   idle();assert.equal(phase,'consume','changed legacy source phase');sourceActive=true;
+   try{phase=next;metadata();assert.equal(apply(sourceGuard.value,undefined,[]),undefined,'legacy source guard returned a value');metadata();}
+   finally{phase='consume';sourceActive=false;}
+  };
+  const sourceNode=Object.freeze({dependencies:Object.freeze([]),
+   preflight:()=>{executeSource('physical');},
+   consume:()=>{executeSource('consume');},
+   final:()=>{executeSource('physical');},
+  });
+  guardNode=Object.freeze({dependencies:Object.freeze([dependency.node,sourceNode]),
+   preflight:()=>{idle();metadata();sweep();},
+   consume:()=>{idle();stageActive=true;try{for(const ref of bound.values()){
+    const physicalRef=physicalByPath.get(ref.path);assert.ok(physicalRef);
+    const beforePhysical=readHistoricalContractRepairOwnerMember(root,ref.path);
+    assert.equal(hash(beforePhysical),physicalRef.sha256,'late physical legacy canonical input '+ref.path);assert.equal(beforePhysical.length,physicalRef.bytes);
+    const supplied=read(ref.path);assert.ok(Buffer.isBuffer(supplied));assert.equal(hash(supplied),ref.sha256,'late legacy canonical input '+ref.path);assert.equal(supplied.length,ref.bytes);
+    if(ref.path!==LEGACY_REMOVAL_LEDGER)assert.ok(equal(beforePhysical,supplied),'nonphysical legacy canonical input '+ref.path);
+    assert.ok(equal(beforePhysical,readHistoricalContractRepairOwnerMember(root,ref.path)),'legacy canonical input changed during callback '+ref.path);
+   }}finally{stageActive=false;}},
+   final:()=>{idle();sweep();metadata();},
+  });
+  const composed=composeCanonicalSourceGuards(Object.freeze([guardNode]));
+  assertCurrent=()=>{idle();composed();};guardPlan=Object.freeze({assertCurrent,node:guardNode});
+ }
  // This private metadata view only maps the two independently derived exact
  // successors. The old actual compiled functions still reject unknown frames.
  const metadataRead=path=>{
@@ -81,5 +173,5 @@ export function legacyRemovalOwnerContext({root,read=path=>readFileSync(join(roo
    native_spec_source:{...native,bound:nativeBound,assertCurrent:()=>{assertCurrent();native.assertCurrent();assertCurrent();}},
    assertCurrent:assertPrior,prior_metadata_assert_current:assertPrior};
  };
- assertCurrent();return {applied,registryApplied,before:Buffer.from(before),after:Buffer.from(stage.after),registryBefore:Buffer.from(registryBefore),registryAfter:Buffer.from(registryAfter),metadataRead,wrapPrepared,bound:structuredClone([...bound.values()]),assertCurrent,source_facts:structuredClone(source.facts),source_scope_only:true,current_native_packed_browser_floor_or_full_audit_qualified:false};
+ assertCurrent();return {applied,registryApplied,before:Buffer.from(before),after:Buffer.from(stage.after),registryBefore:Buffer.from(registryBefore),registryAfter:Buffer.from(registryAfter),metadataRead,wrapPrepared,bound:structuredClone([...bound.values()]),assertCurrent,...(guardPlan?{guardNode,guardPlan}:{}),source_facts:structuredClone(source.facts),source_scope_only:true,current_native_packed_browser_floor_or_full_audit_qualified:false};
 }
