@@ -1,0 +1,72 @@
+@use '__entry__' as m;
+@use 'sass:map';
+$__theme: m.define-light-theme((
+  color: (
+    primary: m.define-palette(m.$indigo-palette),
+    accent: m.define-palette(m.$pink-palette, A200, A100, A400),
+    warn: m.define-palette(m.$red-palette),
+  ),
+  typography: m.define-typography-config(),
+  density: 0,
+));
+$p: m.define-palette(m.$indigo-palette, 700, 200, 900, 300);
+$a: m.define-palette(m.$pink-palette, A200, A100, A400);
+$w: m.define-palette(m.$red-palette, 900);
+$level: m.define-typography-level(19px, 27px, 600, 'Closeout Font', 0.03em);
+$modern: m.define-typography-config($font-family: 'Custom Family', $body-1: $level, $button: $level);
+$legacy: m.define-legacy-typography-config($font-family: 'Legacy Family', $body-1: $level, $button: $level);
+$modern-light: m.define-light-theme((color: (primary: $p, accent: $a, warn: $w), typography: $modern, density: -2));
+$modern-dark: m.define-dark-theme((color: (primary: $p, accent: $a, warn: $w), typography: $modern, density: -2));
+$legacy-light: m.define-light-theme((color: (primary: $p, accent: $a, warn: $w), typography: $legacy, density: -2));
+$legacy-dark: m.define-dark-theme((color: (primary: $p, accent: $a, warn: $w), typography: $legacy, density: -2));
+
+$shadow-color: map.merge(m.get-color-config($modern-light), (background: map.merge(map.get(m.get-color-config($modern-light), background), (card: #cdefab)), foreground: map.merge(map.get(m.get-color-config($modern-light), foreground), (base: #123456, elevation: #7c2349, secondary-text: #654321))));
+$shadow-theme: map.merge($modern-light, (color: $shadow-color));
+/*! ORDINARY-CARD-BEGIN 0 */
+.sass-api-probe { @include m.card-color($__theme); }
+/*! ORDINARY-CARD-END 0 */
+/*! ORDINARY-CARD-BEGIN 1 */
+.sass-api-probe { @include m.card-density($__theme); }
+/*! ORDINARY-CARD-END 1 */
+/*! ORDINARY-CARD-BEGIN 2 */
+.sass-api-probe { @include m.card-theme($__theme); }
+/*! ORDINARY-CARD-END 2 */
+/*! ORDINARY-CARD-BEGIN 3 */
+.sass-api-probe { @include m.card-typography($__theme); }
+/*! ORDINARY-CARD-END 3 */
+/*! ORDINARY-CARD-BEGIN 4 */
+.sass-argument-probe { @include m.card-color($modern-light); }
+/*! ORDINARY-CARD-END 4 */
+/*! ORDINARY-CARD-BEGIN 5 */
+.sass-argument-probe { @include m.card-color(m.get-color-config($modern-light)); }
+/*! ORDINARY-CARD-END 5 */
+/*! ORDINARY-CARD-BEGIN 6 */
+.sass-argument-probe { @include m.card-density($modern-light); }
+/*! ORDINARY-CARD-END 6 */
+/*! ORDINARY-CARD-BEGIN 7 */
+.sass-argument-probe { @include m.card-density(-2); }
+/*! ORDINARY-CARD-END 7 */
+/*! ORDINARY-CARD-BEGIN 8 */
+.sass-argument-probe { @include m.card-theme($modern-light); }
+/*! ORDINARY-CARD-END 8 */
+/*! ORDINARY-CARD-BEGIN 9 */
+.sass-argument-probe { @include m.card-theme($modern-dark); }
+/*! ORDINARY-CARD-END 9 */
+/*! ORDINARY-CARD-BEGIN 10 */
+.sass-argument-probe { @include m.card-typography($modern-light); }
+/*! ORDINARY-CARD-END 10 */
+/*! ORDINARY-CARD-BEGIN 11 */
+.sass-argument-probe { @include m.card-typography($modern); }
+/*! ORDINARY-CARD-END 11 */
+/*! ORDINARY-CARD-BEGIN 12 */
+.ordinary-card-scope { .sass-api-probe { @include m.card-color($__theme); } }
+/*! ORDINARY-CARD-END 12 */
+/*! ORDINARY-CARD-BEGIN 13 */
+.ordinary-card-scope { .sass-api-probe { @include m.card-theme($__theme); } }
+/*! ORDINARY-CARD-END 13 */
+/*! ORDINARY-CARD-BEGIN 14 */
+.ordinary-card-shadow { .sass-argument-probe { @include m.card-color($shadow-color); } }
+/*! ORDINARY-CARD-END 14 */
+/*! ORDINARY-CARD-BEGIN 15 */
+.ordinary-card-shadow { .sass-argument-probe { @include m.card-theme($shadow-theme); } }
+/*! ORDINARY-CARD-END 15 */

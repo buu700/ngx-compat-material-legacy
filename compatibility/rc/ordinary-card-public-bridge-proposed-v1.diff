@@ -1,0 +1,22 @@
+--- projects/ngx-material-legacy/styles/card/_card-theme.scss
++++ projects/ngx-material-legacy/styles/card/_card-theme.scss
+@@ -1,4 +1,5 @@
+ @use 'sass:map';
++@use '@angular/material' as mat;
+ @use '../core/theming/theming';
+ @use '../core/typography/typography';
+ @use '../core/tokens/token-utils';
+@@ -26,6 +27,13 @@
+   .mat-mdc-card {
+     @include mdc-elevated-card-theme.theme($mdc-elevated-card-color-tokens);
+     @include mdc-outlined-card-theme.theme($mdc-outlined-card-color-tokens);
++    @include mat.card-overrides((
++      elevated-container-color: map.get($mdc-elevated-card-color-tokens, container-color),
++      elevated-container-elevation: map.get($mdc-elevated-card-color-tokens, container-elevation),
++      outlined-container-color: map.get($mdc-outlined-card-color-tokens, container-color),
++      outlined-container-elevation: map.get($mdc-outlined-card-color-tokens, container-elevation),
++      outlined-outline-color: map.get($mdc-outlined-card-color-tokens, outline-color),
++    ));
+     @include token-utils.create-token-values(tokens-mat-card.$prefix, $mat-card-color-tokens);
+   }
+ }
