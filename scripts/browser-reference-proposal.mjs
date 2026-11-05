@@ -13,6 +13,7 @@ import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {gunzipSync} from 'node:zlib';
 import {readCheckerOwnerMember} from './checker-owner-source.mjs';
+import {browserZoneSourceSuccessor} from './browser-zone-source-successor.mjs';
 import {inspectBrowserReferenceSource} from './browser-reference-source.mjs';
 import {replaceHistoricalConsumerEntries} from './historical-consumer-wrapper-metadata.mjs';
 export const BROWSER_REFERENCE_PACKET='compatibility/rc/c04-browser-reference-proposal.json';
@@ -88,8 +89,12 @@ export function deriveBrowserReferenceMetadata({before,packet,sources}={}){
 }
 /** Source proof is independent of the actual owner's historical-frame gates. */
 export function prepareBrowserReferenceSourceMetadata({root,read=path=>readCheckerOwnerMember(root,path)}={}){
- const tools=browserOwnerSourceSubject({root,read}),source=inspectBrowserReferenceSource({root,read}),line=source.report.line,pin=PINS[line];assert.ok(pin);
- const bound=new Map(source.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{
+ const physicalPackage=readCheckerOwnerMember(root,'projects/ngx-material-legacy/package.json'),version=JSON.parse(physicalPackage).version;
+ const line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
+ const zone=browserZoneSourceSuccessor({root,read,line});
+ const suppliedPackage=read('projects/ngx-material-legacy/package.json');assert.ok(Buffer.isBuffer(suppliedPackage)&&suppliedPackage.equals(physicalPackage));assert.ok(readCheckerOwnerMember(root,'projects/ngx-material-legacy/package.json').equals(physicalPackage));
+ const tools=browserOwnerSourceSubject({root,read}),source=inspectBrowserReferenceSource({root,read}),pin=PINS[line];assert.ok(pin);assert.equal(source.report.line,line);
+ const bound=new Map([...source.bound,...zone.bound].map(ref=>[ref.path,{...ref}])),member=ref=>{
   ref=tools.qualifyReference(ref);
   const raw=read(ref.path),physical=readCheckerOwnerMember(root,ref.path);assert.ok(Buffer.isBuffer(raw));assert.ok(raw.equals(physical),'noncurrent browser proposal source '+ref.path);
   assert.equal(hash(raw),ref.sha256,'changed browser proposal source '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);
@@ -97,7 +102,11 @@ export function prepareBrowserReferenceSourceMetadata({root,read=path=>readCheck
  };
  const packet=JSON.parse(member({path:BROWSER_REFERENCE_PACKET,sha256:pin.packet}));assert.equal(packet.source_parent,pin.parent);
  member({path:SELF,sha256:hash(image),bytes:image.length});for(const ref of packet.source_members)member(ref);
- const sources=new Map(packet.source_transitions.map(row=>[row.path,member(row.current)]));
+ const sources=new Map(packet.source_transitions.map(row=>{
+  if(row.path!==zone.before.path)return [row.path,member(row.current)];
+  assert.deepEqual(row.current,zone.before);const previous=original(root,pin.parent,row.path);
+  assert.equal(hash(previous),zone.before.sha256);assert.equal(previous.length,zone.before.bytes);zone.assertCurrent();return [row.path,previous];
+ }));
  assert.equal(process.version,'v'+JSON.parse(read('toolchain-lock.json')).repository.node);
  const before=original(root,pin.parent,BROWSER_REFERENCE_LEDGER),result=deriveBrowserReferenceMetadata({before,packet,sources});
  const sourceInputs=JSON.parse(read(packet.qualified_source_inputs.path));
@@ -114,18 +123,18 @@ export function prepareBrowserReferenceSourceMetadata({root,read=path=>readCheck
  assert.equal(verifier.title_contract_negative_controls,47);assert.equal(verifier.whole_current_dialog_probe_collaborator_runs.length,8);
  for(const key of ['canonical_frame_admission_granted','old_programs_executed','actual_native_packed_browser_floor_or_full_audit_qualified','actual_angular_DOM_browser_or_packed_execution'])assert.equal(verifier[key],false);
  assert.equal(verifier.g11_claim,'not-passed');
- const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();assert.ok(readCheckerOwnerMember(root,BROWSER_REFERENCE_LEDGER).equals(physicalLedger),'late physical canonical ledger');for(const ref of bound.values()){
+ const assertCurrent=()=>{zone.assertCurrent();tools.assertCurrent();source.assertCurrent();assert.ok(readCheckerOwnerMember(root,BROWSER_REFERENCE_LEDGER).equals(physicalLedger),'late physical canonical ledger');for(const ref of bound.values()){
   const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late browser proposal source '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readCheckerOwnerMember(root,ref.path)),'late physical browser proposal source '+ref.path);
- }};
+ }zone.assertPhysical();};
  const verifyAfter=candidate=>{assertCurrent();assert.ok(Buffer.isBuffer(candidate)&&candidate.equals(result.after),'not the exact browser-reference after-image');assertCurrent();return {metadata_only:true,canonical_frame_admission_granted:false,native_or_full_audit_credit:false};};
  const verifyInput=candidate=>{assertCurrent();assert.ok(Buffer.isBuffer(candidate)&&(candidate.equals(result.before)||candidate.equals(result.after)),'unregistered canonical browser-reference image');assertCurrent();return {current_canonical_state:candidate.equals(result.before)?'before':'after',canonical_frame_admission_granted:false};};
- assertCurrent();return {line,before:Buffer.from(result.before),after:Buffer.from(result.after),updates:structuredClone(result.updates),preserved:structuredClone(result.preserved),metadata_reference_updates:pin.count,selected_entries:pin.entries,unselected_entry_bytes_preserved:1697-pin.entries,bound:structuredClone([...bound.values()]),verifier:structuredClone(verifier),assertCurrent,verifyAfter,verifyInput,canonical_owner_integration_complete:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+ assertCurrent();return {line,before:Buffer.from(result.before),after:Buffer.from(result.after),updates:structuredClone(result.updates),preserved:structuredClone(result.preserved),metadata_reference_updates:pin.count,selected_entries:pin.entries,unselected_entry_bytes_preserved:1697-pin.entries,bound:structuredClone([...bound.values()]),verifier:structuredClone(verifier),assertCurrent,assertZonePhysical:zone.assertPhysical,verifyAfter,verifyInput,canonical_owner_integration_complete:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 }
 /** The proposal input rule accepts only its two complete exact images. */
 export function prepareBrowserReferenceMetadata({root,read=path=>readCheckerOwnerMember(root,path)}={}){
  const source=prepareBrowserReferenceSourceMetadata({root,read}),current=read(BROWSER_REFERENCE_LEDGER),state=source.verifyInput(current);
  const identity={path:BROWSER_REFERENCE_LEDGER,sha256:hash(current),bytes:current.length};
- const assertCurrent=()=>{source.assertCurrent();const raw=read(BROWSER_REFERENCE_LEDGER);assert.equal(hash(raw),identity.sha256,'late canonical browser-reference image');assert.equal(raw.length,identity.bytes);};
+ const assertCurrent=()=>{source.assertCurrent();const raw=read(BROWSER_REFERENCE_LEDGER);assert.equal(hash(raw),identity.sha256,'late canonical browser-reference image');assert.equal(raw.length,identity.bytes);source.assertZonePhysical();};
  const verifyAfter=candidate=>{assertCurrent();const result=source.verifyAfter(candidate);assertCurrent();return result;};
  const verifyInput=candidate=>{assertCurrent();const result=source.verifyInput(candidate);assertCurrent();return result;};
  assertCurrent();return {...source,...state,bound:structuredClone(source.bound),assertCurrent,verifyAfter,verifyInput};

@@ -94,7 +94,7 @@ const metadataToken=Buffer.from('owned canonical tool metadata');
 const disk=root=>path=>readFileSync(join(root,path));
 // Only the exact locally constructed owner contexts below can write this map.
 // It is deliberately separate from public historical-ledger unwrapping.
-const sourceMetadataReaders=new WeakMap();
+const sourceMetadataReaders=new WeakMap(),sourceMetadataBindings=new WeakSet();
 const sourceMetadataPaths={
  title:[OWNER,TITLE_NATIVE_REGISTRY,'scripts/autocomplete-selection-native-subject.mjs',LEDGER],
  inventory:[LEDGER,'testing/legacy-runner/historical-inventory.json','.github/workflows/ci.yml','scripts/upstream-dialog-title-admission.cjs','scripts/upstream-dialog-title-native-evidence.mjs'],
@@ -145,14 +145,26 @@ function bindSourceMetadata(root,context,currentRead,role,allowPlan=false){
  assert.ok(Object.hasOwn(sourceMetadataPaths,role));
  const captured=captureSourceContext(context,allowPlan);
  assert.notEqual(captured.read,currentRead);assert.equal(sourceMetadataReaders.has(captured.read),false);
+ assert.equal(sourceMetadataBindings.has(captured.read),false,'reentrant source metadata binding');sourceMetadataBindings.add(captured.read);
+ try{
  const checked=fn=>{captured.check();const value=fn();captured.check();return value;};
- checked(()=>captured.guard());const references=new Map();
- for(const path of sourceMetadataPaths[role]){
+ const references=new Map();
+ const collect=()=>{for(const path of sourceMetadataPaths[role]){
   const before=checked(()=>captured.read(path)),after=checked(()=>currentRead(path));assert.ok(Buffer.isBuffer(before)&&Buffer.isBuffer(after));
   if(!before.equals(after))references.set(path,{before:{path,sha256:hash(before),bytes:before.length},after:{path,sha256:hash(after),bytes:after.length}});
- }
- checked(()=>captured.guard());sourceMetadataReaders.set(captured.read,{root:resolve(root),raw:currentRead,...captured,references});
+ }};
+ if(captured.node!==undefined){
+  assertLanePlanner(root);
+  const bindingNode=Object.freeze({dependencies:Object.freeze([captured.node]),
+   preflight:()=>{captured.check();assertLanePlanner(root);},
+   consume:()=>{captured.check();collect();captured.check();},
+   final:()=>{captured.check();assertLanePlanner(root);},
+  });
+  lanePlanner(Object.freeze([bindingNode]))();
+ }else{checked(()=>captured.guard());collect();checked(()=>captured.guard());}
+ sourceMetadataReaders.set(captured.read,{root:resolve(root),raw:currentRead,...captured,references});
  return context;
+ }finally{sourceMetadataBindings.delete(captured.read);}
 }
 /** Read-only resolver; unknown callbacks receive no authority or disk fallback. */
 export function packedUpstreamLedgerCurrentSourceLane({root,read}){

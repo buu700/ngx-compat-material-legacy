@@ -80,6 +80,22 @@ class TableGuardGraphTests(unittest.TestCase):
         self.assertFalse(report['full_composed_owner_executed'])
         self.assertFalse(report['compiler_or_build_executed'])
 
+    def test_actual_binding_final_rejects_base_source_mutation(self):
+        report = self.run_probe('source_binding_guard_graph_probe.mjs')
+        self.assertEqual(report['result'], 'pass')
+        self.assertTrue(report['actual_base_ledger_binding_reached'])
+        self.assertTrue(report['child_final_rejected_late_mutation'])
+        self.assertTrue(report['restoration_passed'])
+        self.assertFalse(report['complete_owner_success'])
+
+    def test_binding_nested_narrow_projection_and_exception_recovery(self):
+        report = self.run_probe('source_binding_guard_graph_probe.mjs', 'exception')
+        self.assertEqual((report['result'], report['mode']), ('pass', 'exception'))
+        self.assertTrue(report['narrow_frame_executed'])
+        self.assertTrue(report['exception_recovered'])
+        self.assertTrue(report['restoration_passed'])
+        self.assertFalse(report['complete_owner_success'])
+
     def test_actual_private_source_lane_row_final_scope(self):
         report = self.run_probe('source_lane_production_route_probe.mjs')
         self.assertEqual(report['result'], 'pass')

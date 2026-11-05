@@ -45,6 +45,36 @@
           ]
         },
         {
+          "path": "scripts/browser-reference-owner.mjs",
+          "before": {
+            "path": "scripts/browser-reference-owner.mjs",
+            "sha256": "7f0ae434273c4d19aa1b533bfbe3a61d8ffd4e4d9eb9959ab40f31d441db28e5",
+            "bytes": 3026
+          },
+          "after": {
+            "path": "scripts/browser-reference-owner.mjs",
+            "sha256": "a17c626776dc34129384baeedfc466239133ff4a3f759492d92029609641ceff",
+            "bytes": 3463
+          },
+          "edits": [
+            {
+              "offset": 549,
+              "before": "",
+              "after": "import {browserZoneSourceSuccessor} from './browser-zone-source-successor.mjs';\n"
+            },
+            {
+              "offset": 715,
+              "before": "",
+              "after": " const version=JSON.parse(readBrowserOwnerMember(root,'projects/ngx-material-legacy/package.json')).version;\n const line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);\n const zone=browserZoneSourceSuccessor({root,read,line});\n"
+            },
+            {
+              "offset": 1369,
+              "before": " const bound=new Map([...tools.bound,...source.bound,current].map(ref=>[ref.path,{...ref}]));\n const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'late browser metadata input '+ref.path);assert.equal(value.length,ref.bytes);}};\n",
+              "after": " assert.equal(source.line,line);\n const bound=new Map([...tools.bound,...source.bound,...zone.bound,current].map(ref=>[ref.path,{...ref}]));\n const assertCurrent=()=>{zone.assertCurrent();tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'late browser metadata input '+ref.path);assert.equal(value.length,ref.bytes);}zone.assertPhysical();};\n"
+            }
+          ]
+        },
+        {
           "path": "scripts/browser-reference-proposal.mjs",
           "before": {
             "path": "scripts/browser-reference-proposal.mjs",
@@ -53,10 +83,25 @@
           },
           "after": {
             "path": "scripts/browser-reference-proposal.mjs",
-            "sha256": "167ae69e2f1b7fedf637fa16d4294c47ea70500c32928165225809d5703a33b7",
-            "bytes": 13682
+            "sha256": "d3587edf54e5d918f132a8507faa415ea7b98109922d259a43a6d36098f7b727",
+            "bytes": 14759
           },
           "edits": [
+            {
+              "offset": 641,
+              "before": "",
+              "after": "import {browserZoneSourceSuccessor} from './browser-zone-source-successor.mjs';\n"
+            },
+            {
+              "offset": 7718,
+              "before": " const tools=browserOwnerSourceSubject({root,read}),source=inspectBrowserReferenceSource({root,read}),line=source.report.line,pin=PINS[line];assert.ok(pin);\n const bound=new Map(source.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{\n",
+              "after": " const physicalPackage=readCheckerOwnerMember(root,'projects/ngx-material-legacy/package.json'),version=JSON.parse(physicalPackage).version;\n const line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);\n const zone=browserZoneSourceSuccessor({root,read,line});\n const suppliedPackage=read('projects/ngx-material-legacy/package.json');assert.ok(Buffer.isBuffer(suppliedPackage)&&suppliedPackage.equals(physicalPackage));assert.ok(readCheckerOwnerMember(root,'projects/ngx-material-legacy/package.json').equals(physicalPackage));\n const tools=browserOwnerSourceSubject({root,read}),source=inspectBrowserReferenceSource({root,read}),pin=PINS[line];assert.ok(pin);assert.equal(source.report.line,line);\n const bound=new Map([...source.bound,...zone.bound].map(ref=>[ref.path,{...ref}])),member=ref=>{\n"
+            },
+            {
+              "offset": 8647,
+              "before": " const sources=new Map(packet.source_transitions.map(row=>[row.path,member(row.current)]));\n",
+              "after": " const sources=new Map(packet.source_transitions.map(row=>{\n  if(row.path!==zone.before.path)return [row.path,member(row.current)];\n  assert.deepEqual(row.current,zone.before);const previous=original(root,pin.parent,row.path);\n  assert.equal(hash(previous),zone.before.sha256);assert.equal(previous.length,zone.before.bytes);zone.assertCurrent();return [row.path,previous];\n }));\n"
+            },
             {
               "offset": 9597,
               "before": " const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024,timeout:180000}));\n",
@@ -66,6 +111,26 @@
               "offset": 10274,
               "before": " assert.equal(verifier.cold_source_faults_rejected,verifier.bound_current_paths);assert.equal(verifier.late_source_faults_rejected,verifier.bound_current_paths);assert.equal(verifier.title_contract_negative_controls,47);assert.equal(verifier.whole_current_dialog_probe_collaborator_runs.length,8);\n",
               "after": " assert.equal(verifier.source_execution_mode,'source-metadata');assert.equal(verifier.full_source_fault_lifetimes_executed,false);\n for(const key of ['cold_source_faults_rejected','late_source_faults_rejected','cold_source_fault_paths_rejected','late_source_fault_paths_rejected'])assert.equal(Object.hasOwn(verifier,key),false);\n assert.equal(verifier.title_contract_negative_controls,47);assert.equal(verifier.whole_current_dialog_probe_collaborator_runs.length,8);\n"
+            },
+            {
+              "offset": 10845,
+              "before": " const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();assert.ok(readCheckerOwnerMember(root,BROWSER_REFERENCE_LEDGER).equals(physicalLedger),'late physical canonical ledger');for(const ref of bound.values()){\n",
+              "after": " const assertCurrent=()=>{zone.assertCurrent();tools.assertCurrent();source.assertCurrent();assert.ok(readCheckerOwnerMember(root,BROWSER_REFERENCE_LEDGER).equals(physicalLedger),'late physical canonical ledger');for(const ref of bound.values()){\n"
+            },
+            {
+              "offset": 11321,
+              "before": " }};\n",
+              "after": " }zone.assertPhysical();};\n"
+            },
+            {
+              "offset": 11952,
+              "before": " assertCurrent();return {line,before:Buffer.from(result.before),after:Buffer.from(result.after),updates:structuredClone(result.updates),preserved:structuredClone(result.preserved),metadata_reference_updates:pin.count,selected_entries:pin.entries,unselected_entry_bytes_preserved:1697-pin.entries,bound:structuredClone([...bound.values()]),verifier:structuredClone(verifier),assertCurrent,verifyAfter,verifyInput,canonical_owner_integration_complete:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};\n",
+              "after": " assertCurrent();return {line,before:Buffer.from(result.before),after:Buffer.from(result.after),updates:structuredClone(result.updates),preserved:structuredClone(result.preserved),metadata_reference_updates:pin.count,selected_entries:pin.entries,unselected_entry_bytes_preserved:1697-pin.entries,bound:structuredClone([...bound.values()]),verifier:structuredClone(verifier),assertCurrent,assertZonePhysical:zone.assertPhysical,verifyAfter,verifyInput,canonical_owner_integration_complete:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};\n"
+            },
+            {
+              "offset": 12910,
+              "before": " const assertCurrent=()=>{source.assertCurrent();const raw=read(BROWSER_REFERENCE_LEDGER);assert.equal(hash(raw),identity.sha256,'late canonical browser-reference image');assert.equal(raw.length,identity.bytes);};\n",
+              "after": " const assertCurrent=()=>{source.assertCurrent();const raw=read(BROWSER_REFERENCE_LEDGER);assert.equal(hash(raw),identity.sha256,'late canonical browser-reference image');assert.equal(raw.length,identity.bytes);source.assertZonePhysical();};\n"
             }
           ]
         },
@@ -78,14 +143,39 @@
           },
           "after": {
             "path": "scripts/browser-reference-source.mjs",
-            "sha256": "26040046f029744629276a840865b88dc03f821db8d60bb60738ee168f96626f",
-            "bytes": 10469
+            "sha256": "6abc5b7da3b01e8346b2723bc3903de03b5606caa3752c680304dd02565838b0",
+            "bytes": 11295
           },
           "edits": [
             {
-              "offset": 1916,
-              "before": "  ref=tools.qualifyReference(ref);\n",
-              "after": "  if(ref.sha256!==undefined)ref=tools.qualifyReference(ref);\n"
+              "offset": 681,
+              "before": "",
+              "after": "import {browserZoneSourceSuccessor} from './browser-zone-source-successor.mjs';\n"
+            },
+            {
+              "offset": 1607,
+              "before": " const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);\n",
+              "after": " const packagePath='projects/ngx-material-legacy/package.json',physicalPackage=readCheckerOwnerMember(root,packagePath);\n const version=JSON.parse(physicalPackage).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);\n const zone=browserZoneSourceSuccessor({root,read,line});\n const suppliedPackage=read(packagePath);assert.ok(Buffer.isBuffer(suppliedPackage)&&suppliedPackage.equals(physicalPackage));assert.ok(readCheckerOwnerMember(root,packagePath).equals(physicalPackage));\n"
+            },
+            {
+              "offset": 1838,
+              "before": " const bound=new Map(tools.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{\n  ref=tools.qualifyReference(ref);\n",
+              "after": " const bound=new Map([...tools.bound,...zone.bound].map(ref=>[ref.path,{...ref}])),member=ref=>{\n  if(ref.sha256!==undefined)ref=tools.qualifyReference(ref);\n"
+            },
+            {
+              "offset": 4431,
+              "before": "  const current=member(row.after);assert.ok(original(root,packet.source_parent,row.path).equals(current),'current source differs from reviewed parent');\n",
+              "after": "  const zoneTransition=row.path===zone.after.path;\n  const current=zoneTransition?original(root,packet.source_parent,row.path):member(row.after);\n  if(zoneTransition){assert.deepEqual(row.after,zone.before);assert.equal(hash(current),zone.before.sha256);assert.equal(current.length,zone.before.bytes);zone.assertCurrent();}\n  else assert.ok(original(root,packet.source_parent,row.path).equals(current),'current source differs from reviewed parent');\n"
+            },
+            {
+              "offset": 9425,
+              "before": " const assertCurrent=()=>{tools.assertCurrent();for(const ref of bound.values()){\n",
+              "after": " const assertCurrent=()=>{zone.assertCurrent();tools.assertCurrent();for(const ref of bound.values()){\n"
+            },
+            {
+              "offset": 9739,
+              "before": " }};\n assertCurrent();return {bound:structuredClone([...bound.values()]),assertCurrent,report:{schema_version:1,line,result:'pass',analysis_node:process.version,analysis_typescript:ts.version,complete_source_transitions:4,individually_reviewed_hunks:totalHunks,selected_references:derived.length,transitions:summaries,current_physical_ledger_sha256:hash(currentLedger),current_physical_ledger_bytes:currentLedger.length,current_ledger_equals_reviewed_cohort:currentLedger.equals(priorLedger),canonical_frame_admission_granted:false,old_programs_executed:false,canonical_dispositions_changed:0,product_changes:0,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};\n",
+              "after": " }zone.assertPhysical();};\n assertCurrent();return {bound:structuredClone([...bound.values()]),assertCurrent,assertZonePhysical:zone.assertPhysical,report:{schema_version:1,line,result:'pass',analysis_node:process.version,analysis_typescript:ts.version,complete_source_transitions:4,individually_reviewed_hunks:totalHunks,selected_references:derived.length,transitions:summaries,current_physical_ledger_sha256:hash(currentLedger),current_physical_ledger_bytes:currentLedger.length,current_ledger_equals_reviewed_cohort:currentLedger.equals(priorLedger),canonical_frame_admission_granted:false,old_programs_executed:false,canonical_dispositions_changed:0,product_changes:0,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};\n"
             }
           ]
         },
@@ -483,8 +573,8 @@
           },
           "after": {
             "path": "scripts/packed-upstream-ledger-epoch.mjs",
-            "sha256": "2fcc2f7ce76f3997f17423bf4e682c9a4c899614c8c281e518b0c94084b33a14",
-            "bytes": 92194
+            "sha256": "aaf5c8d72539d2934586c8eef8a4abd6bfe065d26b3c0470c0b74a111ad77066",
+            "bytes": 92851
           },
           "edits": [
             {
@@ -498,24 +588,29 @@
               "after": "import {baseClassRemovalOwnerContext} from './base-class-removal-canonical-stage.mjs';\nimport {assertBaseClassRemovalSourceInspectorIdentity} from './base-class-removal-owner-source.mjs';\nimport {currentAuthoredRosterSourceSubject,currentAuthoredRosterRawRead} from './current-authored-roster-source.mjs';\n"
             },
             {
+              "offset": 7884,
+              "before": "const sourceMetadataReaders=new WeakMap();\n",
+              "after": "const sourceMetadataReaders=new WeakMap(),sourceMetadataBindings=new WeakSet();\n"
+            },
+            {
               "offset": 8248,
               "before": " legacy:[LEDGER],table:[LEDGER],\n",
               "after": " legacy:[LEDGER],table:[LEDGER],base_class:[LEDGER],\n"
             },
             {
               "offset": 8284,
-              "before": "function bindSourceMetadata(root,context,currentRead,role){\n assert.ok(Object.hasOwn(sourceMetadataPaths,role));assert.equal(typeof context.metadataRead,'function');\n assert.notEqual(context.metadataRead,currentRead);assert.equal(typeof context.assertCurrent,'function');\n assert.equal(sourceMetadataReaders.has(context.metadataRead),false);\n context.assertCurrent();const references=new Map();\n",
-              "after": "// Private binding only: an exact direct factory call elects its own complete plan.\n// Other contexts, including a combined roster spread, retain the full guard.\nconst lanePlanner = composeCanonicalSourceGuards;\nconst lanePlannerText = Function.prototype.toString;\nconst LANE_PLANNER = Object.freeze({path:'scripts/canonical-source-guard-plan.mjs',\n sha256:'4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f',bytes:4609});\nfunction assertLanePlanner(root){\n assert.equal(composeCanonicalSourceGuards,lanePlanner);\n assert.equal(hash(lanePlannerText.call(lanePlanner)),'fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947');\n const raw=readEvidenceMember(root,LANE_PLANNER.path);\n assert.equal(hash(raw),LANE_PLANNER.sha256);assert.equal(raw.length,LANE_PLANNER.bytes);\n}\nfunction laneOwn(object,key,optional=false){\n assert.ok(object&&typeof object==='object'&&!types.isProxy(object));\n const d=Object.getOwnPropertyDescriptor(object,key);\n if(optional&&!d)return undefined;\n assert.ok(d&&Object.hasOwn(d,'value'),'non-data source context '+key);return d;\n}\nfunction laneSame(object,key,saved){\n const now=laneOwn(object,key,saved===undefined);\n if(saved===undefined){assert.equal(now,undefined,'added source context '+key);return;}\n for(const field of ['value','enumerable','writable','configurable'])assert.equal(now[field],saved[field],'changed source context '+key);\n}\nfunction captureSourceContext(context,allowPlan){\n const metadata=laneOwn(context,'metadataRead'),guard=laneOwn(context,'assertCurrent');\n const plan=laneOwn(context,'guardPlan',true);\n assert.equal(typeof metadata.value,'function');assert.equal(typeof guard.value,'function');\n let planGuard,planNode,node;\n if(allowPlan&&plan){\n  const tuple=plan.value;\n  assert.ok(tuple&&typeof tuple==='object'&&!types.isProxy(tuple)&&Object.isFrozen(tuple));\n  assert.deepEqual(Reflect.ownKeys(tuple).sort(),['assertCurrent','node']);\n  planGuard=laneOwn(tuple,'assertCurrent');planNode=laneOwn(tuple,'node');\n  if(planGuard.value===guard.value)node=planNode.value;\n }\n const check=()=>{\n  laneSame(context,'metadataRead',metadata);laneSame(context,'assertCurrent',guard);laneSame(context,'guardPlan',plan);\n  if(planGuard){laneSame(plan.value,'assertCurrent',planGuard);laneSame(plan.value,'node',planNode);assert.ok(Object.isFrozen(plan.value));}\n };\n check();return {read:metadata.value,guard:guard.value,node,check};\n}\nfunction bindSourceMetadata(root,context,currentRead,role,allowPlan=false){\n assert.ok(Object.hasOwn(sourceMetadataPaths,role));\n const captured=captureSourceContext(context,allowPlan);\n assert.notEqual(captured.read,currentRead);assert.equal(sourceMetadataReaders.has(captured.read),false);\n const checked=fn=>{captured.check();const value=fn();captured.check();return value;};\n checked(()=>captured.guard());const references=new Map();\n"
+              "before": "function bindSourceMetadata(root,context,currentRead,role){\n assert.ok(Object.hasOwn(sourceMetadataPaths,role));assert.equal(typeof context.metadataRead,'function');\n assert.notEqual(context.metadataRead,currentRead);assert.equal(typeof context.assertCurrent,'function');\n assert.equal(sourceMetadataReaders.has(context.metadataRead),false);\n context.assertCurrent();const references=new Map();\n for(const path of sourceMetadataPaths[role]){\n  const before=context.metadataRead(path),after=currentRead(path);assert.ok(Buffer.isBuffer(before)&&Buffer.isBuffer(after));\n",
+              "after": "// Private binding only: an exact direct factory call elects its own complete plan.\n// Other contexts, including a combined roster spread, retain the full guard.\nconst lanePlanner = composeCanonicalSourceGuards;\nconst lanePlannerText = Function.prototype.toString;\nconst LANE_PLANNER = Object.freeze({path:'scripts/canonical-source-guard-plan.mjs',\n sha256:'4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f',bytes:4609});\nfunction assertLanePlanner(root){\n assert.equal(composeCanonicalSourceGuards,lanePlanner);\n assert.equal(hash(lanePlannerText.call(lanePlanner)),'fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947');\n const raw=readEvidenceMember(root,LANE_PLANNER.path);\n assert.equal(hash(raw),LANE_PLANNER.sha256);assert.equal(raw.length,LANE_PLANNER.bytes);\n}\nfunction laneOwn(object,key,optional=false){\n assert.ok(object&&typeof object==='object'&&!types.isProxy(object));\n const d=Object.getOwnPropertyDescriptor(object,key);\n if(optional&&!d)return undefined;\n assert.ok(d&&Object.hasOwn(d,'value'),'non-data source context '+key);return d;\n}\nfunction laneSame(object,key,saved){\n const now=laneOwn(object,key,saved===undefined);\n if(saved===undefined){assert.equal(now,undefined,'added source context '+key);return;}\n for(const field of ['value','enumerable','writable','configurable'])assert.equal(now[field],saved[field],'changed source context '+key);\n}\nfunction captureSourceContext(context,allowPlan){\n const metadata=laneOwn(context,'metadataRead'),guard=laneOwn(context,'assertCurrent');\n const plan=laneOwn(context,'guardPlan',true);\n assert.equal(typeof metadata.value,'function');assert.equal(typeof guard.value,'function');\n let planGuard,planNode,node;\n if(allowPlan&&plan){\n  const tuple=plan.value;\n  assert.ok(tuple&&typeof tuple==='object'&&!types.isProxy(tuple)&&Object.isFrozen(tuple));\n  assert.deepEqual(Reflect.ownKeys(tuple).sort(),['assertCurrent','node']);\n  planGuard=laneOwn(tuple,'assertCurrent');planNode=laneOwn(tuple,'node');\n  if(planGuard.value===guard.value)node=planNode.value;\n }\n const check=()=>{\n  laneSame(context,'metadataRead',metadata);laneSame(context,'assertCurrent',guard);laneSame(context,'guardPlan',plan);\n  if(planGuard){laneSame(plan.value,'assertCurrent',planGuard);laneSame(plan.value,'node',planNode);assert.ok(Object.isFrozen(plan.value));}\n };\n check();return {read:metadata.value,guard:guard.value,node,check};\n}\nfunction bindSourceMetadata(root,context,currentRead,role,allowPlan=false){\n assert.ok(Object.hasOwn(sourceMetadataPaths,role));\n const captured=captureSourceContext(context,allowPlan);\n assert.notEqual(captured.read,currentRead);assert.equal(sourceMetadataReaders.has(captured.read),false);\n assert.equal(sourceMetadataBindings.has(captured.read),false,'reentrant source metadata binding');sourceMetadataBindings.add(captured.read);\n try{\n const checked=fn=>{captured.check();const value=fn();captured.check();return value;};\n const references=new Map();\n const collect=()=>{for(const path of sourceMetadataPaths[role]){\n  const before=checked(()=>captured.read(path)),after=checked(()=>currentRead(path));assert.ok(Buffer.isBuffer(before)&&Buffer.isBuffer(after));\n"
             },
             {
-              "offset": 8726,
-              "before": "  const before=context.metadataRead(path),after=currentRead(path);assert.ok(Buffer.isBuffer(before)&&Buffer.isBuffer(after));\n",
-              "after": "  const before=checked(()=>captured.read(path)),after=checked(()=>currentRead(path));assert.ok(Buffer.isBuffer(before)&&Buffer.isBuffer(after));\n"
+              "offset": 9008,
+              "before": " }\n context.assertCurrent();sourceMetadataReaders.set(context.metadataRead,{root:resolve(root),raw:currentRead,read:context.metadataRead,guard:context.assertCurrent,references});\n",
+              "after": " }};\n if(captured.node!==undefined){\n  assertLanePlanner(root);\n  const bindingNode=Object.freeze({dependencies:Object.freeze([captured.node]),\n   preflight:()=>{captured.check();assertLanePlanner(root);},\n   consume:()=>{captured.check();collect();captured.check();},\n   final:()=>{captured.check();assertLanePlanner(root);},\n  });\n  lanePlanner(Object.freeze([bindingNode]))();\n }else{checked(()=>captured.guard());collect();checked(()=>captured.guard());}\n sourceMetadataReaders.set(captured.read,{root:resolve(root),raw:currentRead,...captured,references});\n"
             },
             {
-              "offset": 9011,
-              "before": " context.assertCurrent();sourceMetadataReaders.set(context.metadataRead,{root:resolve(root),raw:currentRead,read:context.metadataRead,guard:context.assertCurrent,references});\n",
-              "after": " checked(()=>captured.guard());sourceMetadataReaders.set(captured.read,{root:resolve(root),raw:currentRead,...captured,references});\n"
+              "offset": 9204,
+              "before": "",
+              "after": " }finally{sourceMetadataBindings.delete(captured.read);}\n"
             },
             {
               "offset": 9553,
@@ -2138,8 +2233,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "ec750ca0a1dadf69b22927e7b14edfea037510d10380ed0eb850d2df7c77d15d",
-          "bytes": 24221
+          "sha256": "ff0395850064370e5bf878cc1567c1ac9e825345f1280829f0a91745c5241e07",
+          "bytes": 25504
         },
         {
           "path": "scripts/check-source-contract-regressions.py",
@@ -2268,8 +2363,8 @@
         },
         {
           "path": "tests/test_table_guard_graph.py",
-          "sha256": "d5b74667ee473e187e57a37377391f8991f6d2ea3f950f73ee53d8c00716a1de",
-          "bytes": 4888
+          "sha256": "6e966dfd971ca9a475de766a703858a5740dc1f41000d5a333e2020db6c62626",
+          "bytes": 5806
         },
         {
           "path": "tests/legacy_stage_guard_graph_probe.mjs",
@@ -2350,12 +2445,72 @@
           "path": "compatibility/rc/21x-base-class-removal-source-final-review.mjs",
           "sha256": "9fb47887c2389e0e40a8ba1fa4e2086e844d96940d82387d8b69c12b739839f0",
           "bytes": 22459
+        },
+        {
+          "path": "scripts/browser-required-cells.mjs",
+          "sha256": "0ff4701de780b76fdd9388cf9936a3cefeeb5a6e4f35e5c4d8eb6b5d02cefef4",
+          "bytes": 64933
+        },
+        {
+          "path": "scripts/browser-zone-source-successor.mjs",
+          "sha256": "23d17ef9ded68ae70bc47c159cec0af92ddc5e2505a0b1f835690180bfacdff3",
+          "bytes": 4222
+        },
+        {
+          "path": "compatibility/rc/parent-zone-binder-finite-transition-v1.json",
+          "sha256": "4ab8f480bd816ef901133e5e3e397ccda61e6add95859e696a660447103afe0c",
+          "bytes": 13592
+        },
+        {
+          "path": "tests/browser_zone_source_successor_probe.mjs",
+          "sha256": "47dfbee229237827f110f946a1acf202b8e01f9350ea5f6a5b5c7c5daf333b5c",
+          "bytes": 3959
+        },
+        {
+          "path": "tests/test_browser_zone_source_successor.py",
+          "sha256": "d5c286694f30251624e730460a8d57ef7b8a0e56d465d5df6a291283dace8626",
+          "bytes": 2254
+        },
+        {
+          "path": "tests/source_binding_guard_graph_probe.mjs",
+          "sha256": "e0e9ef9fb3b73bc2e9afeb40dc2fec865d8a88f536b36813298582311ae503c4",
+          "bytes": 3807
         }
       ]
     },
     "main": {
       "source_parent": "59ba0e2aa8b76f71b472ea2831273e44e44b5b57",
       "updates": [
+        {
+          "path": "scripts/browser-reference-owner.mjs",
+          "before": {
+            "path": "scripts/browser-reference-owner.mjs",
+            "sha256": "7f0ae434273c4d19aa1b533bfbe3a61d8ffd4e4d9eb9959ab40f31d441db28e5",
+            "bytes": 3026
+          },
+          "after": {
+            "path": "scripts/browser-reference-owner.mjs",
+            "sha256": "a17c626776dc34129384baeedfc466239133ff4a3f759492d92029609641ceff",
+            "bytes": 3463
+          },
+          "edits": [
+            {
+              "offset": 549,
+              "before": "",
+              "after": "import {browserZoneSourceSuccessor} from './browser-zone-source-successor.mjs';\n"
+            },
+            {
+              "offset": 715,
+              "before": "",
+              "after": " const version=JSON.parse(readBrowserOwnerMember(root,'projects/ngx-material-legacy/package.json')).version;\n const line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);\n const zone=browserZoneSourceSuccessor({root,read,line});\n"
+            },
+            {
+              "offset": 1369,
+              "before": " const bound=new Map([...tools.bound,...source.bound,current].map(ref=>[ref.path,{...ref}]));\n const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'late browser metadata input '+ref.path);assert.equal(value.length,ref.bytes);}};\n",
+              "after": " assert.equal(source.line,line);\n const bound=new Map([...tools.bound,...source.bound,...zone.bound,current].map(ref=>[ref.path,{...ref}]));\n const assertCurrent=()=>{zone.assertCurrent();tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'late browser metadata input '+ref.path);assert.equal(value.length,ref.bytes);}zone.assertPhysical();};\n"
+            }
+          ]
+        },
         {
           "path": "scripts/browser-reference-proposal.mjs",
           "before": {
@@ -2365,10 +2520,25 @@
           },
           "after": {
             "path": "scripts/browser-reference-proposal.mjs",
-            "sha256": "167ae69e2f1b7fedf637fa16d4294c47ea70500c32928165225809d5703a33b7",
-            "bytes": 13682
+            "sha256": "d3587edf54e5d918f132a8507faa415ea7b98109922d259a43a6d36098f7b727",
+            "bytes": 14759
           },
           "edits": [
+            {
+              "offset": 641,
+              "before": "",
+              "after": "import {browserZoneSourceSuccessor} from './browser-zone-source-successor.mjs';\n"
+            },
+            {
+              "offset": 7718,
+              "before": " const tools=browserOwnerSourceSubject({root,read}),source=inspectBrowserReferenceSource({root,read}),line=source.report.line,pin=PINS[line];assert.ok(pin);\n const bound=new Map(source.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{\n",
+              "after": " const physicalPackage=readCheckerOwnerMember(root,'projects/ngx-material-legacy/package.json'),version=JSON.parse(physicalPackage).version;\n const line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);\n const zone=browserZoneSourceSuccessor({root,read,line});\n const suppliedPackage=read('projects/ngx-material-legacy/package.json');assert.ok(Buffer.isBuffer(suppliedPackage)&&suppliedPackage.equals(physicalPackage));assert.ok(readCheckerOwnerMember(root,'projects/ngx-material-legacy/package.json').equals(physicalPackage));\n const tools=browserOwnerSourceSubject({root,read}),source=inspectBrowserReferenceSource({root,read}),pin=PINS[line];assert.ok(pin);assert.equal(source.report.line,line);\n const bound=new Map([...source.bound,...zone.bound].map(ref=>[ref.path,{...ref}])),member=ref=>{\n"
+            },
+            {
+              "offset": 8647,
+              "before": " const sources=new Map(packet.source_transitions.map(row=>[row.path,member(row.current)]));\n",
+              "after": " const sources=new Map(packet.source_transitions.map(row=>{\n  if(row.path!==zone.before.path)return [row.path,member(row.current)];\n  assert.deepEqual(row.current,zone.before);const previous=original(root,pin.parent,row.path);\n  assert.equal(hash(previous),zone.before.sha256);assert.equal(previous.length,zone.before.bytes);zone.assertCurrent();return [row.path,previous];\n }));\n"
+            },
             {
               "offset": 9597,
               "before": " const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024,timeout:180000}));\n",
@@ -2378,6 +2548,26 @@
               "offset": 10274,
               "before": " assert.equal(verifier.cold_source_faults_rejected,verifier.bound_current_paths);assert.equal(verifier.late_source_faults_rejected,verifier.bound_current_paths);assert.equal(verifier.title_contract_negative_controls,47);assert.equal(verifier.whole_current_dialog_probe_collaborator_runs.length,8);\n",
               "after": " assert.equal(verifier.source_execution_mode,'source-metadata');assert.equal(verifier.full_source_fault_lifetimes_executed,false);\n for(const key of ['cold_source_faults_rejected','late_source_faults_rejected','cold_source_fault_paths_rejected','late_source_fault_paths_rejected'])assert.equal(Object.hasOwn(verifier,key),false);\n assert.equal(verifier.title_contract_negative_controls,47);assert.equal(verifier.whole_current_dialog_probe_collaborator_runs.length,8);\n"
+            },
+            {
+              "offset": 10845,
+              "before": " const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();assert.ok(readCheckerOwnerMember(root,BROWSER_REFERENCE_LEDGER).equals(physicalLedger),'late physical canonical ledger');for(const ref of bound.values()){\n",
+              "after": " const assertCurrent=()=>{zone.assertCurrent();tools.assertCurrent();source.assertCurrent();assert.ok(readCheckerOwnerMember(root,BROWSER_REFERENCE_LEDGER).equals(physicalLedger),'late physical canonical ledger');for(const ref of bound.values()){\n"
+            },
+            {
+              "offset": 11321,
+              "before": " }};\n",
+              "after": " }zone.assertPhysical();};\n"
+            },
+            {
+              "offset": 11952,
+              "before": " assertCurrent();return {line,before:Buffer.from(result.before),after:Buffer.from(result.after),updates:structuredClone(result.updates),preserved:structuredClone(result.preserved),metadata_reference_updates:pin.count,selected_entries:pin.entries,unselected_entry_bytes_preserved:1697-pin.entries,bound:structuredClone([...bound.values()]),verifier:structuredClone(verifier),assertCurrent,verifyAfter,verifyInput,canonical_owner_integration_complete:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};\n",
+              "after": " assertCurrent();return {line,before:Buffer.from(result.before),after:Buffer.from(result.after),updates:structuredClone(result.updates),preserved:structuredClone(result.preserved),metadata_reference_updates:pin.count,selected_entries:pin.entries,unselected_entry_bytes_preserved:1697-pin.entries,bound:structuredClone([...bound.values()]),verifier:structuredClone(verifier),assertCurrent,assertZonePhysical:zone.assertPhysical,verifyAfter,verifyInput,canonical_owner_integration_complete:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};\n"
+            },
+            {
+              "offset": 12910,
+              "before": " const assertCurrent=()=>{source.assertCurrent();const raw=read(BROWSER_REFERENCE_LEDGER);assert.equal(hash(raw),identity.sha256,'late canonical browser-reference image');assert.equal(raw.length,identity.bytes);};\n",
+              "after": " const assertCurrent=()=>{source.assertCurrent();const raw=read(BROWSER_REFERENCE_LEDGER);assert.equal(hash(raw),identity.sha256,'late canonical browser-reference image');assert.equal(raw.length,identity.bytes);source.assertZonePhysical();};\n"
             }
           ]
         },
@@ -2390,14 +2580,39 @@
           },
           "after": {
             "path": "scripts/browser-reference-source.mjs",
-            "sha256": "26040046f029744629276a840865b88dc03f821db8d60bb60738ee168f96626f",
-            "bytes": 10469
+            "sha256": "6abc5b7da3b01e8346b2723bc3903de03b5606caa3752c680304dd02565838b0",
+            "bytes": 11295
           },
           "edits": [
             {
-              "offset": 1916,
-              "before": "  ref=tools.qualifyReference(ref);\n",
-              "after": "  if(ref.sha256!==undefined)ref=tools.qualifyReference(ref);\n"
+              "offset": 681,
+              "before": "",
+              "after": "import {browserZoneSourceSuccessor} from './browser-zone-source-successor.mjs';\n"
+            },
+            {
+              "offset": 1607,
+              "before": " const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);\n",
+              "after": " const packagePath='projects/ngx-material-legacy/package.json',physicalPackage=readCheckerOwnerMember(root,packagePath);\n const version=JSON.parse(physicalPackage).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);\n const zone=browserZoneSourceSuccessor({root,read,line});\n const suppliedPackage=read(packagePath);assert.ok(Buffer.isBuffer(suppliedPackage)&&suppliedPackage.equals(physicalPackage));assert.ok(readCheckerOwnerMember(root,packagePath).equals(physicalPackage));\n"
+            },
+            {
+              "offset": 1838,
+              "before": " const bound=new Map(tools.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{\n  ref=tools.qualifyReference(ref);\n",
+              "after": " const bound=new Map([...tools.bound,...zone.bound].map(ref=>[ref.path,{...ref}])),member=ref=>{\n  if(ref.sha256!==undefined)ref=tools.qualifyReference(ref);\n"
+            },
+            {
+              "offset": 4431,
+              "before": "  const current=member(row.after);assert.ok(original(root,packet.source_parent,row.path).equals(current),'current source differs from reviewed parent');\n",
+              "after": "  const zoneTransition=row.path===zone.after.path;\n  const current=zoneTransition?original(root,packet.source_parent,row.path):member(row.after);\n  if(zoneTransition){assert.deepEqual(row.after,zone.before);assert.equal(hash(current),zone.before.sha256);assert.equal(current.length,zone.before.bytes);zone.assertCurrent();}\n  else assert.ok(original(root,packet.source_parent,row.path).equals(current),'current source differs from reviewed parent');\n"
+            },
+            {
+              "offset": 9425,
+              "before": " const assertCurrent=()=>{tools.assertCurrent();for(const ref of bound.values()){\n",
+              "after": " const assertCurrent=()=>{zone.assertCurrent();tools.assertCurrent();for(const ref of bound.values()){\n"
+            },
+            {
+              "offset": 9739,
+              "before": " }};\n assertCurrent();return {bound:structuredClone([...bound.values()]),assertCurrent,report:{schema_version:1,line,result:'pass',analysis_node:process.version,analysis_typescript:ts.version,complete_source_transitions:4,individually_reviewed_hunks:totalHunks,selected_references:derived.length,transitions:summaries,current_physical_ledger_sha256:hash(currentLedger),current_physical_ledger_bytes:currentLedger.length,current_ledger_equals_reviewed_cohort:currentLedger.equals(priorLedger),canonical_frame_admission_granted:false,old_programs_executed:false,canonical_dispositions_changed:0,product_changes:0,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};\n",
+              "after": " }zone.assertPhysical();};\n assertCurrent();return {bound:structuredClone([...bound.values()]),assertCurrent,assertZonePhysical:zone.assertPhysical,report:{schema_version:1,line,result:'pass',analysis_node:process.version,analysis_typescript:ts.version,complete_source_transitions:4,individually_reviewed_hunks:totalHunks,selected_references:derived.length,transitions:summaries,current_physical_ledger_sha256:hash(currentLedger),current_physical_ledger_bytes:currentLedger.length,current_ledger_equals_reviewed_cohort:currentLedger.equals(priorLedger),canonical_frame_admission_granted:false,old_programs_executed:false,canonical_dispositions_changed:0,product_changes:0,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};\n"
             }
           ]
         },
@@ -2965,8 +3180,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "ec750ca0a1dadf69b22927e7b14edfea037510d10380ed0eb850d2df7c77d15d",
-          "bytes": 24221
+          "sha256": "ff0395850064370e5bf878cc1567c1ac9e825345f1280829f0a91745c5241e07",
+          "bytes": 25504
         },
         {
           "path": "scripts/check-source-contract-regressions.py",
@@ -3097,6 +3312,31 @@
           "path": "tests/test_current_sass_ordinary_aggregate_gate.py",
           "sha256": "89dde6067ea52daf4027707fac8ab26c5cd70d683215c6c1bbdd684df7438905",
           "bytes": 8050
+        },
+        {
+          "path": "scripts/browser-required-cells.mjs",
+          "sha256": "3e1c0399357045c51cff607e7187aee7f379f5e3851d13f117ce886885b958e9",
+          "bytes": 64933
+        },
+        {
+          "path": "scripts/browser-zone-source-successor.mjs",
+          "sha256": "23d17ef9ded68ae70bc47c159cec0af92ddc5e2505a0b1f835690180bfacdff3",
+          "bytes": 4222
+        },
+        {
+          "path": "compatibility/rc/parent-zone-binder-finite-transition-v1.json",
+          "sha256": "4ab8f480bd816ef901133e5e3e397ccda61e6add95859e696a660447103afe0c",
+          "bytes": 13592
+        },
+        {
+          "path": "tests/browser_zone_source_successor_probe.mjs",
+          "sha256": "47dfbee229237827f110f946a1acf202b8e01f9350ea5f6a5b5c7c5daf333b5c",
+          "bytes": 3959
+        },
+        {
+          "path": "tests/test_browser_zone_source_successor.py",
+          "sha256": "d5c286694f30251624e730460a8d57ef7b8a0e56d465d5df6a291283dace8626",
+          "bytes": 2254
         }
       ]
     }
