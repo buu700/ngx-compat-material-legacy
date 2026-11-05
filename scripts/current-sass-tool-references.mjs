@@ -15,8 +15,10 @@ import {types} from 'node:util';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 
 const SELF='scripts/current-sass-tool-references.mjs';
-const INPUTS='compatibility/rc/current-sass-tool-reference-inputs-v1.json';
-const INPUTS_SHA='ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f';
+const INPUTS='compatibility/rc/current-sass-tool-reference-inputs-v2.json';
+const PREVIOUS_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v1.json',sha256:'ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f',bytes:478008};
+const CHECKPOINTS={'21.x':'b25aedd02f7b53e8cd8dfcdad369a806a1301619',main:'5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'};
+const INPUTS_SHA='d25ef6684992ececd518f7932bc68f5d43d433df23868d7a376ebf0a9e56a770';
 const image=readFileSync(fileURLToPath(import.meta.url));
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const reference=(path,raw)=>({path,sha256:hash(raw),bytes:raw.length});
@@ -64,7 +66,7 @@ function gitImages(root,requests){
  assert.equal(cursor,raw.length);return out;
 }
 function edited(before,edits){
- assert.ok(Array.isArray(edits)&&edits.length);let cursor=0;const parts=[];
+ assert.ok(Array.isArray(edits));let cursor=0;const parts=[];
  for(const edit of edits){
   assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor);
   assert.equal(typeof edit.before,'string');assert.equal(typeof edit.after,'string');assert.ok(edit.before!==edit.after);
@@ -85,10 +87,16 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
  const member=ref=>{const raw=read(ref.path);matches(raw,ref);return raw;};
  const assertPhysical=()=>{for(const ref of bound.values())assert.deepEqual(reference(ref.path,readEvidenceMember(root,ref.path)),ref,'late physical current tool input '+ref.path);};
  assert.ok(equalBytes(read(SELF),image));const raw=member({path:INPUTS,sha256:INPUTS_SHA}),packet=JSON.parse(raw);
- assert.equal(packet.schema_version,1);assert.equal(packet.role,'finite-current-sass-tool-reference-successor');
+ assert.equal(packet.schema_version,2);assert.equal(packet.role,'finite-current-sass-tool-reference-successor');
+ assert.deepEqual(packet.previous_epoch,PREVIOUS_INPUTS);const previousRaw=member(PREVIOUS_INPUTS),previous=JSON.parse(previousRaw);
+ assert.equal(previous.schema_version,1);assert.equal(previous.role,packet.role);
  assert.deepEqual(packet.product_paths,[]);assert.equal(packet.historical_programs_executed,false);assert.equal(packet.historical_reports_rewritten,0);assert.equal(packet.artifact_or_audit_admission_granted,false);
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
- const branch=packet.branches[line];assert.ok(branch);const archived=branch.historical_registry;
+ const branch=packet.branches[line],priorBranch=previous.branches[line];assert.ok(branch&&priorBranch);const archived=branch.historical_registry;
+ assert.equal(branch.previous_epoch_source_parent,CHECKPOINTS[line]);assert.deepEqual(archived,priorBranch.historical_registry);
+ assert.deepEqual(branch.intermediate_inputs,priorBranch.intermediate_inputs);
+ const previousGit=gitImages(root,[{commit:CHECKPOINTS[line],path:PREVIOUS_INPUTS.path}]).get(CHECKPOINTS[line]+':'+PREVIOUS_INPUTS.path);
+ assert.ok(equalBytes(previousRaw,previousGit),'V1 epoch differs from committed comparison data');
  assert.equal(new Set(branch.updates.map(r=>r.path)).size,branch.updates.length);assert.equal(new Set(branch.additional_inputs.map(r=>r.path)).size,branch.additional_inputs.length);
  const registryBytes=gitImages(root,[{commit:archived.source_parent,path:archived.path}]).get(archived.source_parent+':'+archived.path);matches(registryBytes,archived);
  // The unchanged registry remains physically present. Its source programs are never run.
@@ -97,7 +105,8 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
  assert.equal(historical.tool_transitions.length,line==='21.x'?45:17);
  assert.equal(historical.canonical_dispositions_changed,0);assert.equal(historical.product_changes,0);assert.equal(historical.old_programs_executed,false);assert.equal(historical.g11_claim,'not-passed');
  const originalRequests=historical.tool_transitions.map(r=>({commit:r.source_parent??historical.source_parent,path:r.path}));
- originalRequests.push(...branch.intermediate_inputs.map(r=>({commit:r.source_parent,path:r.path})),...branch.updates.map(r=>({commit:archived.source_parent,path:r.path})));
+ originalRequests.push(...branch.intermediate_inputs.map(r=>({commit:r.source_parent,path:r.path})),...branch.updates.map(r=>({commit:r.source_parent??archived.source_parent,path:r.path})),...priorBranch.updates.map(r=>({commit:CHECKPOINTS[line],path:r.path})));
+ for(const old of priorBranch.updates){const latest=branch.updates.find(r=>r.path===old.path);assert.ok(latest,'missing V1 current tool '+old.path);assert.deepEqual(latest.before,old.before);assert.equal(latest.source_parent??archived.source_parent,archived.source_parent);}
  const originals=gitImages(root,originalRequests),rows=new Map();
  const addIdentity=(row,ref,bytes)=>{matches(bytes,ref);const prior=row.identities.get(ref.sha256);if(prior)assert.ok(equalBytes(prior,bytes));else row.identities.set(ref.sha256,Buffer.from(bytes));};
  for(const input of historical.tool_transitions){
@@ -108,17 +117,23 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
   const row={path:input.path,before:{...input.before},after:{...input.after},identities:new Map()};
   addIdentity(row,input.before,before);addIdentity(row,input.after,Buffer.from(after));rows.set(input.path,row);
  }
- for(const input of branch.intermediate_inputs){
-  const row=rows.get(input.path);assert.ok(row);addIdentity(row,input,originals.get(input.source_parent+':'+input.path));
- }
  const baselineSupport=new Map(historical.support_inputs.map(r=>[r.path,r]));
  for(const update of branch.updates){
-  assert.ok(toolPath(update.path));const before=originals.get(archived.source_parent+':'+update.path);matches(before,update.before);
+  assert.ok(toolPath(update.path));const parent=update.source_parent??archived.source_parent;assert.ok(parent===archived.source_parent||parent===CHECKPOINTS[line]);
+  const before=originals.get(parent+':'+update.path);matches(before,update.before);
   const prior=rows.get(update.path);if(prior)assert.deepEqual(update.before,{path:update.path,...prior.after});
   else if(baselineSupport.has(update.path))assert.deepEqual(update.before,baselineSupport.get(update.path));
   const after=edited(before,update.edits);matches(after,update.after);assert.ok(equalBytes(member(update.after),after));
   const row=prior??{path:update.path,before:{sha256:update.before.sha256,bytes:update.before.bytes},identities:new Map()};
   addIdentity(row,update.before,before);addIdentity(row,update.after,after);row.after={sha256:update.after.sha256,bytes:update.after.bytes};rows.set(update.path,row);
+ }
+ // Register old accepted identities only after cumulative/latest rows exist.
+ // Several V1 current tools were not in the original 45/17-row registry.
+ for(const input of branch.intermediate_inputs){
+  const row=rows.get(input.path);assert.ok(row);addIdentity(row,input,originals.get(input.source_parent+':'+input.path));
+ }
+ for(const input of priorBranch.updates){
+  const row=rows.get(input.path);assert.ok(row);addIdentity(row,input.after,originals.get(CHECKPOINTS[line]+':'+input.path));
  }
  member(historical.unchanged_source_subject);
  for(const input of historical.support_inputs)if(!branch.updates.some(r=>r.path===input.path))member(input);
@@ -137,7 +152,7 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
   member({path:row.path,...row.after});assert.deepEqual(plain(incoming),snapshot);assertPhysical();return result;
  };
  const transitions=[...rows.values()].map(r=>({path:r.path,before:{...r.before},after:{...r.after}}));
- const result=Object.freeze({line,get bound(){return structuredClone([...bound.values()]);},get transitions(){return structuredClone(transitions);},ownsReference,qualify:ref=>side(ref,'after'),predecessorReference:ref=>side(ref,'before'),comparisonBytes,assertCurrent,
+ const result=Object.freeze({line,epoch:2,get bound(){return structuredClone([...bound.values()]);},get transitions(){return structuredClone(transitions);},ownsReference,qualify:ref=>side(ref,'after'),predecessorReference:ref=>side(ref,'before'),comparisonBytes,assertCurrent,
   old_code_executed:false,old_product_bytes_exposed:false,old_tool_bytes_exposed_as_current:false,current_read_route_returned:false,canonical_admission_granted:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'});
  assertCurrent();return result;
 }

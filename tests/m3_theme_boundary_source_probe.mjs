@@ -11,10 +11,14 @@ import {join,resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {measureM3ThemeBoundary,inspectM3ThemeBoundary,compileWarningModel,compileOriginalInspection} from '../scripts/measure-m3-theme-boundary-contracts.mjs';
 import {themePrelude,parseStyleRules} from '../scripts/check-m3-inclusion-order.mjs';
+import {currentM3ThemeBoundarySubject} from '../scripts/current-m3-theme-boundary-contract.mjs';
+import {historicalM3MeasurementView} from '../scripts/m3-measurement-transport.mjs';
 const root=resolve(process.env.M3_BOUNDARY_SOURCE_ROOT??process.cwd()),read=path=>readFileSync(join(root,path));
 const line=JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21x':'main';
 const recorded=JSON.parse(readFileSync(new URL('../compatibility/rc/21x-c04-m3-theme-boundary-measurement-portable-'+line+'.json',import.meta.url)));
-const measured=measureM3ThemeBoundary({root});assert.deepEqual(measured,recorded);
+const measured=measureM3ThemeBoundary({root}),current=currentM3ThemeBoundarySubject({root,read});
+assert.deepEqual(current.assertSuccessor(measured),recorded);
+const historical=JSON.parse(read('compatibility/rc/21x-c04-m3-theme-boundary-measurement-'+line+'.json'));historicalM3MeasurementView({portable:recorded,historical});
 const scope=inspectM3ThemeBoundary({root});
 const condition='not $theme-ignore-duplication-warnings {',changedWarning=scope.model.replace(condition,'false {');assert.notEqual(changedWarning,scope.model);
 const badWarning=compileWarningModel({root,body:changedWarning,caseId:'repeat'});
@@ -38,6 +42,6 @@ for(const target of ['projects/ngx-material-legacy/styles/core/theming/_theming.
  assert.throws(()=>inspectM3ThemeBoundary({root,read:path=>path===target?changed:read(path)}));sourceRejected++;
 }
 const report={schema_version:1,line:measured.line,historical_default_CSS_cases:16,historical_warning_and_density_cases:6,original_inspection_cases:8,coexistence_source_compile_cases:4,
- compiled_warning_faults_rejected:1,compiled_inspection_faults_rejected:1,compiled_contamination_faults_rejected:1,source_rejections:sourceRejected,fresh_measurement_matches_recorded:true,
+ compiled_warning_faults_rejected:1,compiled_inspection_faults_rejected:1,compiled_contamination_faults_rejected:1,source_rejections:sourceRejected,fresh_measurement_matches_recorded:false,fresh_current_measurement_matches_finite_successor:true,old_report_and_26_program_transport_preserved:true,current_producer_execution_line:'21.x',
  actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed',g13_claim:'not-passed'};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));

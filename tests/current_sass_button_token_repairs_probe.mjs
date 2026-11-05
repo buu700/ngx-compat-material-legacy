@@ -18,7 +18,7 @@ const original=json('compatibility/rc/21x-c04-button-token-repairs-originals.jso
 const facts=verifyButtonTokenRepairsOriginals(original,json('compatibility/rc/upstream-complete-patch-census.json.gz','806433925a6216b52b26a98b3b91eb7129a506ab0363573b7cc21063c1366e97'));
 const historical=json('compatibility/rc/21x-c04-button-token-repairs-source-review.json','cf2ec51ab6fd7cf98e718909940cb75ca6aaad2687bcc0544bd544dadc9ce38f');
 const sharedHistorical=json('compatibility/rc/21x-c04-button-tokenization-source-review.json','4fa19472ae965a5fbc097b51ab60f344acd7791909d97221a954a25f89e9463a');
-const packet=json('compatibility/rc/current-sass-source-inputs-v1.json','9c3b08100262a981698f58c9a2127697b6ca3f03fde99d864451826534f6ed1a');
+const packet=json('compatibility/rc/current-sass-source-inputs-v2.json','46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9');
 const beforePacket=json(packet.historical_source_packet.path,packet.historical_source_packet.sha256);
 const transitions=[...beforePacket.branches['21.x'].modules,...packet.additional_modules].map(r=>({path:r.path,before:r.before,current:r.current}));
 const publicScope=json('compatibility/rc/upstream-sass-inspection-current-scope.json.gz','b0a8f0d0d2ce8cb41943a0585ccdcc25fd6bb0d30c9339f80501ef86c65726f4').actual;
@@ -28,7 +28,7 @@ const publicSources=publicScope.current.loaded_sources.map(r=>({path:'/current/@
 const sharedCurrent=structuredClone(sharedHistorical);
 sharedCurrent.button_measurement=currentButtonTokenizationExpectedMeasurement({historical:sharedHistorical.button_measurement,transitions,publicSources});
 sharedCurrent.current_source_bindings=sharedHistorical.current_source_bindings.map(r=>{const t=transitions.find(t=>t.path===r.path);return t?{path:r.path,...t.current}:r;}).sort((a,b)=>a.path.localeCompare(b.path));
-sharedCurrent.current_public_bridge={module_count:4,role:'modeled shared current source metadata; no actual constructor or source admission'};
+sharedCurrent.current_public_bridge={module_count:5,role:'modeled shared current source metadata; no actual constructor or source admission'};
 const sharedPaths=new Set(sharedHistorical.current_source_bindings.map(r=>r.path));
 const ownReferences=historical.current_source_bindings.filter(r=>!sharedPaths.has(r.path)).map(r=>r.path==='scripts/upstream-button-token-repairs-source-review.mjs'?{path:r.path,sha256:hash(readFileSync(r.path)),bytes:readFileSync(r.path).length}:r);
 ownReferences.push({path:'compatibility/rc/21x-c04-button-token-repairs-source-review.json',sha256:'cf2ec51ab6fd7cf98e718909940cb75ca6aaad2687bcc0544bd544dadc9ce38f',bytes:853841});

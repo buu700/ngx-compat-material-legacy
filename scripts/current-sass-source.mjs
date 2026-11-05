@@ -14,12 +14,14 @@ import {fileURLToPath} from 'node:url';
 import {types} from 'node:util';
 
 const SELF = 'scripts/current-sass-source.mjs';
-const INPUTS = 'compatibility/rc/current-sass-source-inputs-v1.json';
-const INPUTS_SHA = '9c3b08100262a981698f58c9a2127697b6ca3f03fde99d864451826534f6ed1a';
+const INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json';
+const INPUTS_SHA = '46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9';
 const ADDITIONAL = [
   'projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss',
   'projects/ngx-material-legacy/styles/button/_button-theme.scss',
+  'projects/ngx-material-legacy/styles/card/_card-theme.scss',
 ];
+const CARD = ADDITIONAL[2];
 const image = readFileSync(fileURLToPath(import.meta.url));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const blobHash = bytes => createHash('sha1').update('blob ' + bytes.length + '\0').update(bytes).digest('hex');
@@ -75,14 +77,17 @@ function metadata(value) {
 }
 
 /** Read authenticated Git blobs as comparison data, never as current source. */
-function historicalBlobs(root, source) {
+function historicalBlobs(root, source, profile) {
   assert.match(source.before_commit, /^[0-9a-f]{40}$/);
-  const refs = [...source.modules.map(row => ({path: row.path, ...row.before})), ...source.unchanged_owned_sass_before_inputs];
+  assert.match(profile.source_parent, /^[0-9a-f]{40}$/);
+  assert.deepEqual(profile.source_implementations.map(row => row.path), ['scripts/current-sass-source.mjs', 'scripts/current_sass_source.py']);
+  const refs = [...source.modules.map(row => ({path: row.path, ...row.before})), ...source.unchanged_owned_sass_before_inputs,
+    ...profile.source_implementations.map(row => ({...row, source_parent: profile.source_parent}))];
   assert.equal(new Set(refs.map(row => row.path)).size, refs.length);
   const env = {PATH: process.env.PATH, LANG: 'C', LC_ALL: 'C', GIT_CONFIG_GLOBAL: '/dev/null',
     GIT_CONFIG_SYSTEM: '/dev/null', GIT_TERMINAL_PROMPT: '0', GIT_NO_REPLACE_OBJECTS: '1', GIT_NO_LAZY_FETCH: '1'};
   const raw = execFileSync('git', ['--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',
-    'cat-file', '--batch'], {cwd: root, env, input: refs.map(row => source.before_commit + ':' + safe(row.path)).join('\n') + '\n', maxBuffer: 16 * 1024 * 1024});
+    'cat-file', '--batch'], {cwd: root, env, input: refs.map(row => (row.source_parent ?? source.before_commit) + ':' + safe(row.path)).join('\n') + '\n', maxBuffer: 16 * 1024 * 1024});
   const out = new Map();
   let cursor = 0;
   for (const row of refs) {
@@ -132,9 +137,15 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   const raw = read(INPUTS);
   assert.equal(hash(raw), INPUTS_SHA);
   const packet = JSON.parse(raw);
-  assert.equal(packet.schema_version, 1);
+  assert.equal(packet.schema_version, 2);
   assert.deepEqual(packet.additional_modules.map(row => row.path), ADDITIONAL);
   assert.equal(packet.css_admission_granted, false);
+  const priorProfile = packet.prior_four_module_profile;
+  const priorPacket = JSON.parse(member(priorProfile.packet));
+  assert.equal(priorPacket.schema_version, 1);
+  assert.deepEqual(priorPacket.product_paths, packet.product_paths.slice(0, 4));
+  assert.deepEqual(priorPacket.additional_modules, packet.additional_modules.slice(0, 2));
+  assert.deepEqual(packet.historical_non_target_reclassified_as_target, [CARD]);
   const base = JSON.parse(member(packet.historical_source_packet));
   member(packet.historical_source_subject); // Authenticated data; the old constructor never runs.
   const css = JSON.parse(member(packet.historical_css_packet));
@@ -154,7 +165,8 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   assert.equal(source.unchanged_owned_sass_before_inputs.length, branch.unchanged_owned_before_count);
   assert.deepEqual(branch.new_loaded_edges, []);
   assert.deepEqual(packet.product_paths, [...source.modules.map(row => row.path), ...ADDITIONAL]);
-  const historical = historicalBlobs(root, source);
+  assert.equal(branch.current_unchanged_owned_before_count, source.unchanged_owned_sass_before_inputs.length - ADDITIONAL.length);
+  const historical = historicalBlobs(root, source, priorProfile.branches[line]);
   const changes = new Map(packet.additional_modules.map(row => [row.path, row]));
   for (const row of changes.values()) {
     const before = historical.get(row.path);
@@ -183,7 +195,10 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   const graph = census.lines.find(row => row.line === line);
   assert.ok(graph);
   assert.equal(graph.non_target_owned_style_template_graph.length, graph.non_target_graph_count);
-  for (const row of graph.non_target_owned_style_template_graph) member(row);
+  assert.equal(graph.non_target_graph_count, branch.historical_non_target_graph_count);
+  assert.equal(branch.current_non_target_graph_count, graph.non_target_graph_count - 1);
+  assert.deepEqual(graph.non_target_owned_style_template_graph.filter(row => row.path === CARD), [changes.get(CARD).before]);
+  for (const row of graph.non_target_owned_style_template_graph) member(row.path === CARD ? changes.get(CARD).current : row);
   const transitions = [...source.modules.map(row => ({path: row.path, before: row.before, current: row.current})),
     ...packet.additional_modules.map(row => ({path: row.path, before: row.before, current: row.current}))];
   for (const row of transitions) member(row.current);
@@ -228,7 +243,7 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   const result = {root, line, assertCurrent, qualify, assertHistoricalSource, bound: structuredClone([...bound.values()]),
     transitions: structuredClone(transitions), source_sets: structuredClone(sourceSets), source_set_successors: structuredClone(sourceSetSuccessors),
     descriptor: structuredClone({source_subject: reference(SELF, image), source_packet: reference(INPUTS, raw), source_modules: transitions.map(row => row.current)}),
-    source_scope_only: true, metadata_refs_qualified: 4, current_source_reads_are_physical: true,
+    source_scope_only: true, metadata_refs_qualified: 5, current_source_reads_are_physical: true,
     historical_source_bytes_exposed: false, historical_constructor_executed: false, fresh_sass_compilation_this_call: false,
     css_or_artifact_admission_granted: false, current_native_packed_browser_floor_or_full_audit_qualified: false, g11_claim: 'not-passed'};
   assertCurrent();

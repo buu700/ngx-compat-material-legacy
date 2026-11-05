@@ -9,7 +9,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
-from test_current_sass_source import ROOT,NODE
+from test_current_sass_source import ROOT,NODE,candidate_fixture
 from test_current_sass_tool_references import current_tool_fixture
 
 REPORTS=(
@@ -23,6 +23,9 @@ HELPERS=(
     'scripts/sass-spinner-snack-c04-source.mjs','scripts/current-sass-inspection-scope.mjs',
     'scripts/measure-sass-inspection-scope.mjs','scripts/current-sass-legacy-retention-css.mjs',
     'compatibility/rc/current-sass-legacy-retention-reference-v1.json',
+    'compatibility/rc/ordinary-card-c04-successor-model-v1.mjs','compatibility/rc/ordinary-card-c04-successor-inputs-v1.json',
+    'compatibility/rc/ordinary-card-public-bridge-model-v1.mjs','compatibility/rc/ordinary-card-public-bridge-model-v2.mjs',
+    'compatibility/rc/ordinary-card-public-bridge-original-cases-v1.json',
     'compatibility/rc/ordinary-checkbox-button-legacy-composition-model-v1.mjs',
     'compatibility/rc/ordinary-checkbox-button-expectation-model-v1.mjs',
     'compatibility/rc/ordinary-checkbox-button-legacy-composition-cases-v1.json',
@@ -33,7 +36,7 @@ HELPERS=(
 class CurrentC04ToolIntegrationTests(unittest.TestCase):
     def test_real_current_tool_c04_and_exact_archived_successors(self):
         with tempfile.TemporaryDirectory(prefix='ngx-current-sass-c04-tools-') as directory:
-            root=Path(directory);line=current_tool_fixture(root)
+            root=Path(directory);line=candidate_fixture(root);self.assertEqual(current_tool_fixture(root),line)
             for path in HELPERS:
                 destination=root/path;destination.parent.mkdir(parents=True,exist_ok=True);destination.write_bytes((ROOT/path).read_bytes())
             if line=='21.x':
@@ -43,7 +46,7 @@ class CurrentC04ToolIntegrationTests(unittest.TestCase):
             child=subprocess.run([NODE,str(ROOT/'tests/current_sass_c04_tool_integration_probe.mjs'),str(root)],
                 cwd=ROOT,text=True,capture_output=True,timeout=120)
             self.assertEqual(child.returncode,0,child.stderr[-12000:]);report=json.loads(child.stdout)
-            self.assertEqual(report['line'],line);self.assertEqual(len(report['product_refs']),4)
+            self.assertEqual(report['line'],line);self.assertEqual(len(report['product_refs']),5)
             self.assertEqual(report['compiler_calls'],0);self.assertFalse(report['old_physical_constructor_executed'])
             self.assertFalse(report['current_product_projection_used']);self.assertFalse(report['artifact_or_audit_admission_granted'])
             if line=='21.x':

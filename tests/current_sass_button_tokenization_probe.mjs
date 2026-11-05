@@ -14,7 +14,7 @@ import admission from '../scripts/upstream-button-tokenization-admission.cjs';
 const hash=b=>createHash('sha256').update(b).digest('hex');
 function json(path,pin){const raw=readFileSync(path);if(pin)assert.equal(hash(raw),pin);return JSON.parse(path.endsWith('.gz')?gunzipSync(raw):raw);}
 const historicalReport=json('compatibility/rc/21x-c04-button-tokenization-source-review.json','4fa19472ae965a5fbc097b51ab60f344acd7791909d97221a954a25f89e9463a');
-const packet=json('compatibility/rc/current-sass-source-inputs-v1.json','9c3b08100262a981698f58c9a2127697b6ca3f03fde99d864451826534f6ed1a');
+const packet=json('compatibility/rc/current-sass-source-inputs-v2.json','46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9');
 const base=json(packet.historical_source_packet.path,packet.historical_source_packet.sha256);
 const transitions=[...base.branches['21.x'].modules,...packet.additional_modules].map(r=>({path:r.path,before:r.before,current:r.current}));
 const scope=json('compatibility/rc/upstream-sass-inspection-current-scope.json.gz','b0a8f0d0d2ce8cb41943a0585ccdcc25fd6bb0d30c9339f80501ef86c65726f4').actual;

@@ -10,14 +10,16 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {readFileSync,writeFileSync,existsSync,realpathSync} from 'node:fs';
-import {dirname,join,resolve,relative,isAbsolute} from 'node:path';
+import {join,resolve,relative,isAbsolute} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {gunzipSync} from 'node:zlib';
 import {standardThemeSource,invocationPlan,enumerateModule,SILENCE as INVENTORY_SILENCE} from './sass-api-inventory.mjs';
 import {snapshotImporter} from './measure-form-field-tokenization-contracts.mjs';
 import {themePrelude,parseStyleRules} from './check-m3-inclusion-order.mjs';
+import {currentM3ThemeBoundarySubject,M3_CURRENT_ABSENT} from './current-m3-theme-boundary-contract.mjs';
+import {canonicalSourcePhysicalBoundary} from './current-sass-canonical-source-boundary.mjs';
+import {ordinaryCardM3BoundaryExpectedDefaults} from '../compatibility/rc/ordinary-card-c04-successor-model-v1.mjs';
 
-const SOURCE=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const PREFIX='compatibility/rc/21x-c04-m3-theme-boundary-';
 const ARCHIVE=PREFIX+'originals.json.gz',ARCHIVE_HASH='9fd83918610ec1133fe0f31d74a6b01c96155dff3c4913167c045b716d242805';
 const HASH=raw=>createHash('sha256').update(raw).digest('hex');
@@ -27,12 +29,16 @@ export const M3_BOUNDARY_SHAS=Object.freeze(['3f544ef015fbb8c56e991d4e0a9a539d9e
 const own=path=>'projects/ngx-material-legacy/styles/'+path.slice('src/material/'.length);
 const PRIVATE_TOKENS=['private-apply-card-theme-from-tokens','private-apply-checkbox-theme-from-tokens'];
 export function inspectM3ThemeBoundary({root=process.cwd(),read=path=>readFileSync(join(root,path))}={}){
- const raw=readFileSync(join(SOURCE,ARCHIVE));assert.equal(HASH(raw),ARCHIVE_HASH);
+ root=resolve(root);const physical=canonicalSourcePhysicalBoundary({root,read,absentPaths:M3_CURRENT_ABSENT});read=physical.read;
+ const current=currentM3ThemeBoundarySubject({root,read});
+ const raw=read(ARCHIVE);assert.equal(HASH(raw),ARCHIVE_HASH);
  const original=JSON.parse(gunzipSync(raw)),tagged=new Map(original.tagged_reference.members.map(row=>[row.path,row]));
  assert.deepEqual(original.reviews.map(row=>row.sha),M3_BOUNDARY_SHAS);assert.equal(original.original_hunks,42);
  const bound=new Map(),member=path=>{const raw=read(path);bound.set(path,ref(path,raw));return raw;};
  for(const path of ['src/material/card/_card-theme.scss','src/material/checkbox/_checkbox-theme.scss','src/material/_token-theming.scss']){
-  assert.equal(member(own(path)).toString(),tagged.get(path).body.replaceAll("'@material/","'../vendor/mdc/"));
+  const expected=tagged.get(path).body.replaceAll("'@material/","'../vendor/mdc/");
+  if(path==='src/material/_token-theming.scss')assert.equal(member(own(path)).toString(),expected);
+  else {member(own(path));current.assertHistoricalSource(own(path),expected);}
  }
  for(const family of ['card','checkbox']){
   const path=`src/material/legacy-${family}/_${family}-theme.scss`;assert.equal(member(own(path)).toString(),tagged.get(path).body);
@@ -59,10 +65,11 @@ export function inspectM3ThemeBoundary({root=process.cwd(),read=path=>readFileSy
  assert.equal(HASH(oracleRaw),'76908825fdbb55fc188f0add372d371f473cd7874cbf575894247231ab854e2d');
  const absent=['src/material/core/style/_validation.scss','src/material/core/theming/_inspection.scss'];
  for(const path of absent)assert.equal(existsSync(join(root,own(path))),false,'post16 model unexpectedly installed');
- const tools=['scripts/check-m3-inclusion-order.mjs','scripts/measure-form-field-tokenization-contracts.mjs','scripts/sass-api-inventory.mjs'].map(path=>ref(path,readFileSync(join(SOURCE,path))));
+ const tools=current.portable.measurement_tools_from_review_worktree.map(value=>{const next=current.qualifyReference(value);const raw=read(next.path);assert.deepEqual(ref(next.path,raw),next);return next;});
  member('projects/ngx-material-legacy/styles/core/style/_component-high-contrast.scss');member('compatibility/rc/component-high-contrast-source-proof.json');member('compatibility/rc/oracles/material-16.2.14-sass-argument-cases.json');
- const assertCurrent=()=>{assert.equal(HASH(readFileSync(join(SOURCE,ARCHIVE))),ARCHIVE_HASH);for(const value of tools)assert.equal(HASH(readFileSync(join(SOURCE,value.path))),value.sha256);for(const value of bound.values()){const raw=read(value.path);assert.equal(HASH(raw),value.sha256,'late source change '+value.path);assert.equal(raw.length,value.bytes);}};
- assertCurrent();return {original,tagged,model,tagModel,modelPath,oracle:JSON.parse(oracleRaw),line,peer_version:peer.version,bound:[...bound.values()],tools,absent,assertCurrent};
+ for(const value of current.bound)if(!bound.has(value.path))bound.set(value.path,value);
+ const assertCurrent=()=>{assert.equal(HASH(read(ARCHIVE)),ARCHIVE_HASH);for(const value of tools)assert.equal(HASH(read(value.path)),value.sha256);for(const value of bound.values()){const raw=read(value.path);assert.equal(HASH(raw),value.sha256,'late source change '+value.path);assert.equal(raw.length,value.bytes);}current.assertCurrent();physical.assertPhysical();};
+ assertCurrent();return {original,tagged,model,tagModel,modelPath,oracle:JSON.parse(oracleRaw),line,peer_version:peer.version,bound:[...bound.values()],tools,absent,assertCurrent,current};
 }
 
 /** Compile a complete original/owned M2 model with real warning and density-flag side effects. */
@@ -120,11 +127,11 @@ export function measureM3ThemeBoundary({root=process.cwd()}={}){
  const names=enumerateModule(sass,'__entry__',[join(root,'node_modules')],importers);
  for(const name of PRIVATE_TOKENS)assert.ok(names.mixins.includes(name),'historical token export removed');
  for(const name of ['private-validate-type','private-validate-allowed-values','get-theme-version','get-theme-tokens'])assert.equal(names.functions.includes(name),false);
- const defaults=[];
+ const defaults=[],expectedDefaults=ordinaryCardM3BoundaryExpectedDefaults({line:scope.line,historical:scope.current.portable.historical_default_CSS_cases});
  for(const name of [...['legacy-card','legacy-checkbox','card','checkbox'].flatMap(prefix=>['color','typography','theme'].map(s=>prefix+'-'+s)),'card-density','checkbox-density',...PRIVATE_TOKENS]){
   const entry=scope.oracle.members.mixins[name],plan=invocationPlan(name,entry);assert.equal(plan.invocable,true,name);
-  const r=compile(`@use '__entry__' as m;\n${standardThemeSource()}\n${plan.call}\n`);assert.equal(r.css_sha256,entry.invocation.css_sha256,name);assert.equal(r.css_bytes,entry.invocation.css_bytes,name);
-  defaults.push({case_id:'mixin-css/'+name,...r,result:'pass'});
+  const r=compile(`@use '__entry__' as m;\n${standardThemeSource()}\n${plan.call}\n`),row={case_id:'mixin-css/'+name,...r,result:'pass'};
+  assert.deepEqual(row,expectedDefaults.find(value=>value.case_id===row.case_id),'finite M3 default CSS/program/warning difference '+name);defaults.push(row);
  }
  const warnings=[],source=scope.original.reviews[2].sections.find(s=>s.path==='src/material/core/theming/_theming.scss');
  const warningCases=['repeat','separate-ids','nested','ignored','legacy-color-config','changed-color'];
@@ -162,7 +169,8 @@ export function measureM3ThemeBoundary({root=process.cwd()}={}){
  assert.match(C.css,/--mat-card/);assert.match(C.css,/--mat-checkbox/);assert.match(L.css,/\.mat-card/);assert.match(L.css,/\.mat-checkbox/);
  for(const row of coexist)delete row.rules;
  for(const value of loaded.values()){const raw=read(value.path);assert.equal(HASH(raw),value.sha256);assert.equal(raw.length,value.bytes);}
- scope.assertCurrent();return {schema_version:1,line:scope.line,result:'pass',role:'Five individually reviewed upstream changes; finite source/Sass observations only',peer_version:scope.peer_version,advertised_Material_minimum_equals_installed:true,compiler:sass.info,original:{path:ARCHIVE,sha256:ARCHIVE_HASH},historical_default_CSS_cases:defaults,historical_private_token_exports_retained:PRIVATE_TOKENS,post16_inspection_exports_absent:true,historical_warning_and_density_cases:warnings,original_versioned_M3_warning_change:originalM3,original_inspection_cases:helpers,selected_card_checkbox_M2_M3_source_compile_cases:coexist,all_four_orders_preserve_exact_original_rule_sequences:true,input_members:scope.bound,measurement_tools_from_review_worktree:scope.tools,loaded_sources:[...loaded.values()].sort((a,b)=>a.path.localeCompare(b.path)),virtual_original_sources:[...virtual].sort(),producer:ref('scripts/measure-m3-theme-boundary-contracts.mjs',readFileSync(fileURLToPath(import.meta.url))),original_module_helpers_not_a_full_upstream_build:true,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed',g13_claim:'not-passed'};
+ scope.assertCurrent();const report={schema_version:1,line:scope.line,result:'pass',role:'Five individually reviewed upstream changes; finite source/Sass observations only',peer_version:scope.peer_version,advertised_Material_minimum_equals_installed:true,compiler:sass.info,original:{path:ARCHIVE,sha256:ARCHIVE_HASH},historical_default_CSS_cases:defaults,historical_private_token_exports_retained:PRIVATE_TOKENS,post16_inspection_exports_absent:true,historical_warning_and_density_cases:warnings,original_versioned_M3_warning_change:originalM3,original_inspection_cases:helpers,selected_card_checkbox_M2_M3_source_compile_cases:coexist,all_four_orders_preserve_exact_original_rule_sequences:true,input_members:scope.bound,measurement_tools_from_review_worktree:scope.tools,loaded_sources:[...loaded.values()].sort((a,b)=>a.path.localeCompare(b.path)),virtual_original_sources:[...virtual].sort(),producer:ref('scripts/measure-m3-theme-boundary-contracts.mjs',readFileSync(fileURLToPath(import.meta.url))),original_module_helpers_not_a_full_upstream_build:true,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed',g13_claim:'not-passed',current_public_bridge:scope.current.summary,historical_default_CSS_roster_retained_with_separate_finite_public_tokens:true};
+ scope.current.assertSuccessor(report);scope.assertCurrent();scope.current.assertPhysical();return report;
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  assert.ok([3,4].includes(process.argv.length));const result=measureM3ThemeBoundary({root:process.argv[3]??process.cwd()});writeFileSync(process.argv[2],JSON.stringify(result,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({line:result.line,result:result.result,defaults:result.historical_default_CSS_cases.length,warning_cases:result.historical_warning_and_density_cases.length,inspection_cases:result.original_inspection_cases.length,coexistence_source_cases:result.selected_card_checkbox_M2_M3_source_compile_cases.length}));

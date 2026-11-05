@@ -34,7 +34,7 @@ class SelectorDensitySourceReviewTests(unittest.TestCase):
         self.assertEqual(report['source_bindings'], report['expected_source_bindings'])
         self.assertTrue(report['current_source_bindings_match_exact_successor'])
         self.assertEqual(report['historical_public_override_boundaries'], 4)
-        self.assertEqual(report['public_override_boundaries'], 8)
+        self.assertEqual(report['public_override_boundaries'], 9)
         self.assertTrue(report['fresh_bounded_sass_compiler_execution'])
         self.assertTrue(report['tagged_reference_sass_executed'])
         self.assertTrue(report['reviewed_after_selector_mixin_sass_executed'])

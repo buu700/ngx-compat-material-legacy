@@ -17,6 +17,7 @@ import {currentSassToolReferenceSubject} from './current-sass-tool-references.mj
 import {captureCurrentSassMetadata,currentSassSourceSummary} from './current-sass-inspection-scope.mjs';
 import {spinnerSnackPositionedTokenCss} from './sass-spinner-snack-bridge-contract.mjs';
 import {currentLegacyRetentionMeasurement} from './current-sass-legacy-retention-css.mjs';
+import {ordinaryCardTokenPlacementExpected} from '../compatibility/rc/ordinary-card-c04-successor-model-v1.mjs';
 const SELF='scripts/sass-spinner-snack-c04-source.mjs',image=readFileSync(fileURLToPath(import.meta.url));
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const bufferEquals=Buffer.prototype.equals;
@@ -42,6 +43,7 @@ function physicalBoundary(root,providedRead){
  const assertPhysical=()=>{for(const[path,before]of retained)assert.ok(equalBytes(physical(root,path),before),'changed final physical input '+path);};
  return {read,assertPhysical};
 }
+const CARD_EXPECTATION_INPUTS=[{"path":"compatibility/rc/ordinary-card-c04-successor-model-v1.mjs","sha256":"3252d53cdffc0a1e785e2c832a8f8dacacc132fd8dd715d3706bdcb2a58e3a44","bytes":8714},{"path":"compatibility/rc/ordinary-card-c04-successor-inputs-v1.json","sha256":"0ebb1f81be067cee2bbc2149dd9fd4e9188c4129d1482b40145a1a4893ad9634","bytes":144810},{"path":"compatibility/rc/ordinary-card-public-bridge-model-v1.mjs","sha256":"0286969a007029a3628d8a56fb17c0ee2bbfecec735abdf5d95911ac7c709a83","bytes":3929},{"path":"compatibility/rc/ordinary-card-public-bridge-model-v2.mjs","sha256":"171a32edcc51d651173d52840da6a4cdcdf4bb4280b3e717ab96419714f013ad","bytes":4036},{"path":"compatibility/rc/ordinary-card-public-bridge-original-cases-v1.json","sha256":"59e47c924f0f541b7b262a9ee31f6e55bc4160c1c420f683247a1703be470bbf","bytes":127815},{"path":"compatibility/rc/ordinary-checkbox-button-expectation-model-v1.mjs","sha256":"f094e84d2ce8a3f36aab239eb0d30940da976072a85ca0edcf29b8afb6dc9fb0","bytes":13313}];
 const states=new WeakMap();
 function argumentsSnapshot(args,allowed){
  assert.ok(args&&typeof args==='object'&&!types.isProxy(args));assert.equal(Object.getPrototypeOf(args),Object.prototype);
@@ -78,6 +80,7 @@ export function spinnerSnackC04Source(args){
  const captured=argumentsSnapshot(args,['root','read']);let {root,read}=captured.values;
  root=resolve(root);const boundary=physicalBoundary(root,read);read=boundary.read;
  assert.ok(equalBytes(read(SELF),image));
+ const assertCardInputs=()=>{for(const ref of CARD_EXPECTATION_INPUTS){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}};assertCardInputs();
  const bridge=createCurrentSassSource({root,read});
  const tools=currentSassToolReferenceSubject({root,read});assert.equal(tools.line,bridge.line);
  const ownedToolPaths=new Set(tools.transitions.map(row=>row.path)),ownedPaths=new Set([...bridge.transitions.map(row=>row.path),...ownedToolPaths]);
@@ -95,8 +98,8 @@ export function spinnerSnackC04Source(args){
   return tool??source;
  };
  const qualify=ref=>{const original=captureCurrentSassMetadata(ref);if(!ownedPaths.has(original.path))return ref;const result=qualifyInternal(ref);boundary.assertPhysical();return result;};
- const assertCurrent=()=>{bridge.assertCurrent();tools.assertCurrent();for(const ref of reportRefs){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}boundary.assertPhysical();};
- const bound=union(structuredClone([...bridge.bound,...tools.bound]),structuredClone(reportRefs)),summary=currentSassSourceSummary(bridge);
+ const assertCurrent=()=>{bridge.assertCurrent();tools.assertCurrent();assertCardInputs();for(const ref of reportRefs){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}boundary.assertPhysical();};
+ const bound=union(structuredClone([...bridge.bound,...tools.bound]),structuredClone([...reportRefs,...CARD_EXPECTATION_INPUTS])),summary=currentSassSourceSummary(bridge);
  const assertReportSuccessor=(kind,current)=>{
   assert.equal(typeof kind,'string');const currentSnapshot=captureCurrentSassMetadata(current);
   assert.ok(Object.hasOwn(REPORTS,kind));const historical=reports.get(REPORTS[kind].path);assert.ok(historical);
@@ -104,11 +107,11 @@ export function spinnerSnackC04Source(args){
   expected.current_source_bindings=union(bound,historical.current_source_bindings.map(qualifyInternal));
   expected.current_public_bridge=structuredClone(summary);
   if(kind==='theming-inspection'){
-   assert.equal(expected.public_override_boundaries,4);expected.public_override_boundaries=8;
+   assert.equal(expected.public_override_boundaries,4);expected.public_override_boundaries=9;
    assert.equal(expected.current_owned_sources_and_loaded_peers_match_retained_measurement,true);delete expected.current_owned_sources_and_loaded_peers_match_retained_measurement;
-   expected.historical_owned_sources_and_loaded_peers_match_retained_measurement_except_separate_four_module_successor=true;
+   expected.historical_owned_sources_and_loaded_peers_match_retained_measurement_except_separate_five_module_successor=true;
   }else if(kind==='inspection-compatibility'){
-   assert.equal(expected.public_override_boundaries,4);expected.public_override_boundaries=8;expected.historical_public_override_boundaries=4;
+   assert.equal(expected.public_override_boundaries,4);expected.public_override_boundaries=9;expected.historical_public_override_boundaries=4;
    expected.shared_sass_owner=qualifyInternal(expected.shared_sass_owner);
   }else if(kind==='control-m3-theme'){
    const scopeRef=historical.current_source_bindings.find(r=>r.path==='compatibility/rc/upstream-sass-inspection-current-scope.json.gz');assert.ok(scopeRef);
@@ -139,7 +142,7 @@ export function spinnerSnackC04Source(args){
     return {...ref,sha256:current.sha256,bytes:current.bytes};
    });
   }
-  assertCurrent();assert.deepEqual(currentSnapshot,expected,'C04 report changed beyond the exact four-module source successor: '+kind);assertCurrent();assert.deepEqual(captureCurrentSassMetadata(current),currentSnapshot,'C04 current report changed during final source guards');const result=structuredClone(historical);boundary.assertPhysical();return result;
+  assertCurrent();assert.deepEqual(currentSnapshot,expected,'C04 report changed beyond the exact five-module source successor: '+kind);assertCurrent();assert.deepEqual(captureCurrentSassMetadata(current),currentSnapshot,'C04 current report changed during final source guards');const result=structuredClone(historical);boundary.assertPhysical();return result;
  };
  const finish=operation=>{const result=operation();boundary.assertPhysical();return result;};
  const publicBridge={...structuredClone(Object.fromEntries(Object.entries(bridge).filter(([,value])=>typeof value!=='function'))),qualify:ref=>finish(()=>bridge.qualify(ref)),assertCurrent:()=>finish(()=>bridge.assertCurrent()),assertHistoricalSource:(path,expected)=>finish(()=>bridge.assertHistoricalSource(path,expected))};
@@ -165,7 +168,7 @@ export function assertSpinnerSnackRetentionSuccessor(args){
   const rows=id.startsWith('direct-')?expected.direct_original_legacy_color_cases:expected.public_legacy_default_CSS_cases;
   const selected=rows.filter(row=>row.case_id===id);assert.equal(selected.length,1);Object.assign(selected[0],currentLegacyRetentionMeasurement(id));
  }
- source.assertCurrent();assert.deepEqual(current,expected,'legacy retention changed beyond the finite four-module source and nested button CSS successor');
+ source.assertCurrent();assert.deepEqual(current,expected,'legacy retention changed beyond the finite five-module source and nested button CSS successor');
  source.assertCurrent();sameArguments(captured);assert.deepEqual(captureCurrentSassMetadata(liveHistorical),historical);assert.deepEqual(captureCurrentSassMetadata(liveCurrent),current);source.assertPhysical();return true;
 }
 
@@ -173,7 +176,7 @@ export function assertSpinnerSnackTokenPlacementSuccessor(args){
  const captured=argumentsSnapshot(args,['historical','current','source']);let {historical,current,source}=captured.values;
  const liveHistorical=historical,liveCurrent=current;historical=captureCurrentSassMetadata(historical);current=captureCurrentSassMetadata(current);
  source=states.get(source);assert.ok(source,'unrecognized C04 source subject');
- const expected=structuredClone(historical);
+ let expected=structuredClone(historical);
  assert.equal(expected.public_legacy_default_CSS_cases.length,15);assert.equal(expected.direct_original_legacy_color_cases.length,5);
  for(const key of ['input_members','loaded_sources'])expected[key]=historical[key].map(source.qualify);
  expected.input_members.push(...source.bound.filter(ref=>!expected.input_members.some(r=>r.path===ref.path)));
@@ -183,5 +186,6 @@ export function assertSpinnerSnackTokenPlacementSuccessor(args){
   if(bridge){assert.equal(row.modern_theme_exact_tagged_bytes_after_MDC_import_relocation,true);row.modern_theme_exact_tagged_bytes_after_MDC_import_relocation=false;}
   row.historical_modern_source_exact_after_MDC_relocation=bridge;row.separate_current_public_bridge=bridge;
  }
- source.assertCurrent();assert.deepEqual(current,expected,'token placement changed beyond the finite current four-module source successor');source.assertCurrent();sameArguments(captured);assert.deepEqual(captureCurrentSassMetadata(liveHistorical),historical,'historical token-placement input changed during final guards');assert.deepEqual(captureCurrentSassMetadata(liveCurrent),current,'current token-placement input changed during final guards');source.assertPhysical();return true;
+ expected=ordinaryCardTokenPlacementExpected({line:historical.line,prior:expected});
+ source.assertCurrent();assert.deepEqual(current,expected,'token placement changed beyond the finite current five-module source successor');source.assertCurrent();sameArguments(captured);assert.deepEqual(captureCurrentSassMetadata(liveHistorical),historical,'historical token-placement input changed during final guards');assert.deepEqual(captureCurrentSassMetadata(liveCurrent),current,'current token-placement input changed during final guards');source.assertPhysical();return true;
 }

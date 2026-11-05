@@ -34,7 +34,7 @@ class SliderM3RepairsSourceReviewTests(unittest.TestCase):
         self.assertEqual(report['source_bindings'], report['expected_source_bindings'])
         self.assertTrue(report['current_source_bindings_match_exact_successor'])
         self.assertEqual(report['historical_public_override_boundaries'], 4)
-        self.assertEqual(report['public_override_boundaries'], 8)
+        self.assertEqual(report['public_override_boundaries'], 9)
         self.assertTrue(report['fresh_prior_surface_controls_executed'])
         self.assertEqual(len(report['preserved_prior_rejection_controls']), 134)
         self.assertEqual(len(set(report['preserved_prior_rejection_controls'])), 134)

@@ -11,8 +11,12 @@ import re
 import subprocess
 
 SELF = 'scripts/current_sass_tool_references.py'
-INPUTS = 'compatibility/rc/current-sass-tool-reference-inputs-v1.json'
-INPUTS_SHA = 'ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f'
+INPUTS = 'compatibility/rc/current-sass-tool-reference-inputs-v2.json'
+PREVIOUS_INPUTS = dict(path='compatibility/rc/current-sass-tool-reference-inputs-v1.json',
+                       sha256='ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f', bytes=478008)
+CHECKPOINTS = {'21.x': 'b25aedd02f7b53e8cd8dfcdad369a806a1301619',
+               'main': '5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'}
+INPUTS_SHA = 'd25ef6684992ececd518f7932bc68f5d43d433df23868d7a376ebf0a9e56a770'
 _IMAGE = Path(__file__).read_bytes()
 
 
@@ -95,7 +99,7 @@ def _git_images(root, requests):
 
 
 def _edited(before, edits):
-    assert type(edits) is list and edits
+    assert type(edits) is list
     parts, cursor = [], 0
     for edit in edits:
         assert set(edit) == {'offset', 'before', 'after'}
@@ -116,13 +120,23 @@ class CurrentSassToolReferences:
         self._provided, self._bound, self._rows = read, {}, {}
         assert self._read(SELF) == _IMAGE
         packet = json.loads(self._member(dict(path=INPUTS, sha256=INPUTS_SHA)))
-        assert packet['schema_version'] == 1 and packet['role'] == 'finite-current-sass-tool-reference-successor'
+        assert packet['schema_version'] == 2 and packet['role'] == 'finite-current-sass-tool-reference-successor'
+        assert packet['previous_epoch'] == PREVIOUS_INPUTS
+        previous_raw = self._member(PREVIOUS_INPUTS)
+        previous = json.loads(previous_raw)
+        assert previous['schema_version'] == 1 and previous['role'] == packet['role']
         assert packet['product_paths'] == [] and packet['historical_programs_executed'] is False
         assert packet['historical_reports_rewritten'] == 0 and packet['artifact_or_audit_admission_granted'] is False
         version = json.loads(self._read('projects/ngx-material-legacy/package.json'))['version']
         self.line = '21.x' if version.startswith('21.') else 'main' if version.startswith('22.') else None
         assert self.line is not None
         branch = packet['branches'][self.line]
+        prior_branch = previous['branches'][self.line]
+        assert branch['previous_epoch_source_parent'] == CHECKPOINTS[self.line]
+        assert branch['historical_registry'] == prior_branch['historical_registry']
+        assert branch['intermediate_inputs'] == prior_branch['intermediate_inputs']
+        previous_git = _git_images(self.root, [dict(commit=CHECKPOINTS[self.line], path=PREVIOUS_INPUTS['path'])])[(CHECKPOINTS[self.line], PREVIOUS_INPUTS['path'])]
+        assert previous_raw == previous_git, 'V1 epoch differs from committed comparison data'
         assert len({r['path'] for r in branch['updates']}) == len(branch['updates'])
         assert len({r['path'] for r in branch['additional_inputs']}) == len(branch['additional_inputs'])
         archived = branch['historical_registry']
@@ -136,7 +150,13 @@ class CurrentSassToolReferences:
         assert historical['old_programs_executed'] is False and historical['g11_claim'] == 'not-passed'
         requests = [dict(commit=r.get('source_parent', historical['source_parent']), path=r['path']) for r in historical['tool_transitions']]
         requests += [dict(commit=r['source_parent'], path=r['path']) for r in branch['intermediate_inputs']]
-        requests += [dict(commit=archived['source_parent'], path=r['path']) for r in branch['updates']]
+        requests += [dict(commit=r.get('source_parent', archived['source_parent']), path=r['path']) for r in branch['updates']]
+        requests += [dict(commit=CHECKPOINTS[self.line], path=r['path']) for r in prior_branch['updates']]
+        for old in prior_branch['updates']:
+            latest = next((r for r in branch['updates'] if r['path'] == old['path']), None)
+            assert latest is not None, 'missing V1 current tool ' + old['path']
+            assert latest['before'] == old['before']
+            assert latest.get('source_parent', archived['source_parent']) == archived['source_parent']
         images = _git_images(self.root, requests)
         for source in historical['tool_transitions']:
             path = source['path']
@@ -152,13 +172,13 @@ class CurrentSassToolReferences:
             self._add(row, source['before'], before)
             self._add(row, source['after'], after.encode())
             self._rows[path] = row
-        for source in branch['intermediate_inputs']:
-            self._add(self._rows[source['path']], source, images[(source['source_parent'], source['path'])])
         support = {row['path']: row for row in historical['support_inputs']}
         for update in branch['updates']:
             path = update['path']
             assert _tool_path(path)
-            before = images[(archived['source_parent'], path)]
+            parent = update.get('source_parent', archived['source_parent'])
+            assert parent in (archived['source_parent'], CHECKPOINTS[self.line])
+            before = images[(parent, path)]
             _matches(before, update['before'])
             row = self._rows.get(path)
             if row is not None:
@@ -174,6 +194,11 @@ class CurrentSassToolReferences:
             self._add(row, update['after'], after)
             row['after'] = dict(sha256=update['after']['sha256'], bytes=update['after']['bytes'])
             self._rows[path] = row
+        # Latest rows must exist before registering V1 current/intermediate identities.
+        for source in branch['intermediate_inputs']:
+            self._add(self._rows[source['path']], source, images[(source['source_parent'], source['path'])])
+        for source in prior_branch['updates']:
+            self._add(self._rows[source['path']], source['after'], images[(CHECKPOINTS[self.line], source['path'])])
         self._member(historical['unchanged_source_subject'])
         for ref in historical['support_inputs']:
             if not any(row['path'] == ref['path'] for row in branch['updates']):
@@ -183,6 +208,7 @@ class CurrentSassToolReferences:
             self._member(ref)
         for row in self._rows.values():
             self._member(dict(path=row['path'], **row['after']))
+        self.epoch = 2
         self.assert_current()
 
     def _add(self, row, ref, raw):

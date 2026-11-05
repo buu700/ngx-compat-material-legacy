@@ -13,9 +13,9 @@ import vm from 'node:vm';
 import {types} from 'node:util';
 import {authenticateM3HistoricalReport,currentM3ReviewExpectedReport,m3ReviewSourceInputs,m3ReviewBindingUnion} from '../scripts/current-sass-m3-review-source.mjs';
 const require=createRequire(import.meta.url),hash=b=>createHash('sha256').update(b).digest('hex'),read=p=>readFileSync(p);
-const packet=JSON.parse(read('compatibility/rc/current-sass-source-inputs-v1.json'));
+const packet=JSON.parse(read('compatibility/rc/current-sass-source-inputs-v2.json'));
 const oldPacketRaw=read(packet.historical_source_packet.path);assert.equal(hash(oldPacketRaw),packet.historical_source_packet.sha256);
-const oldPacket=JSON.parse(oldPacketRaw),products=[...oldPacket.branches['21.x'].modules,...packet.additional_modules];assert.equal(products.length,4);
+const oldPacket=JSON.parse(oldPacketRaw),products=[...oldPacket.branches['21.x'].modules,...packet.additional_modules];assert.equal(products.length,5);
 const current=new Map(products.map(r=>[r.path,r.current]));
 for(const r of packet.additional_modules){const b=read(r.afterimage.path);assert.equal(hash(b),r.current.sha256);assert.equal(b.length,r.current.bytes);}
 const keys={'core-tokenization':'argument_measurement','foundation-m3-theme':'foundation_measurement','surface-m3-theme':'surface_measurement'};

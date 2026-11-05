@@ -40,7 +40,7 @@ const REPORTS={
   "cases": 36
  }
 };
-const productPaths=['button','checkbox','progress-spinner','snack-bar'].map(f=>'projects/ngx-material-legacy/styles/'+f+'/_'+f+'-theme.scss');
+const productPaths=['button','checkbox','progress-spinner','snack-bar','card'].map(f=>'projects/ngx-material-legacy/styles/'+f+'/_'+f+'-theme.scss');
 const refOnly=r=>({path:r.path,sha256:r.sha256,bytes:r.bytes});
 export function m3ReviewBindingUnion(...groups){
  const map=new Map();for(const r of groups.flat()){const ref=refOnly(r),old=map.get(ref.path);if(old)assert.deepEqual(old,ref,'conflicting report source '+ref.path);else map.set(ref.path,ref);}

@@ -13,11 +13,13 @@ import weakref
 
 ROOT = Path(__file__).resolve().parents[1]
 SELF = 'scripts/current_sass_source.py'
-INPUTS = 'compatibility/rc/current-sass-source-inputs-v1.json'
-INPUTS_SHA = '9c3b08100262a981698f58c9a2127697b6ca3f03fde99d864451826534f6ed1a'
-SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='49baf8905d138897b7ff56232276c9f1889db5ee3ac31fc554cdc0041d8200d5', bytes=12696)
+INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json'
+INPUTS_SHA = '46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9'
+SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='4fa09c23f2a55b24fe3e412793f66868e8e5fc17cc161bee6dc4d2706536d346', bytes=14051)
 ADDITIONAL = ['projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss',
-              'projects/ngx-material-legacy/styles/button/_button-theme.scss']
+              'projects/ngx-material-legacy/styles/button/_button-theme.scss',
+              'projects/ngx-material-legacy/styles/card/_card-theme.scss']
+CARD = ADDITIONAL[2]
 _IMAGE = (ROOT / SELF).read_bytes()
 _STATES = weakref.WeakKeyDictionary()
 
@@ -67,15 +69,18 @@ def _metadata(value):
     return {key: value[key] for key in ('path', 'sha256', 'bytes') if key in value}
 
 
-def _historical_blobs(root, source):
+def _historical_blobs(root, source, profile):
     assert re.fullmatch('[0-9a-f]{40}', source['before_commit'])
-    refs = [dict(path=row['path'], **row['before']) for row in source['modules']] + source['unchanged_owned_sass_before_inputs']
+    assert re.fullmatch('[0-9a-f]{40}', profile['source_parent'])
+    assert [row['path'] for row in profile['source_implementations']] == ['scripts/current-sass-source.mjs', 'scripts/current_sass_source.py']
+    refs = ([dict(path=row['path'], **row['before']) for row in source['modules']] + source['unchanged_owned_sass_before_inputs']
+            + [dict(row, source_parent=profile['source_parent']) for row in profile['source_implementations']])
     assert len({row['path'] for row in refs}) == len(refs)
     env = dict(PATH=os.environ.get('PATH', ''), LANG='C', LC_ALL='C', GIT_CONFIG_GLOBAL='/dev/null',
                GIT_CONFIG_SYSTEM='/dev/null', GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')
     raw = subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',
                                   'cat-file', '--batch'], cwd=root, env=env,
-                                  input=('\n'.join(source['before_commit'] + ':' + _safe(row['path']) for row in refs) + '\n').encode())
+                                  input=('\n'.join(row.get('source_parent', source['before_commit']) + ':' + _safe(row['path']) for row in refs) + '\n').encode())
     cursor, result = 0, {}
     for row in refs:
         end = raw.index(b'\n', cursor)
@@ -92,7 +97,7 @@ def _historical_blobs(root, source):
 
 
 class CurrentSassSource:
-    """One finite four-module source authority, backed by immutable comparison data."""
+    """One finite five-module source authority, backed by immutable comparison data."""
     __slots__ = ('__weakref__',)
 
     def __init__(self, root=ROOT, *, read=None):
@@ -124,8 +129,14 @@ class CurrentSassSource:
         raw = current(INPUTS)
         assert _hash(raw) == INPUTS_SHA
         packet = json.loads(raw)
-        assert packet['schema_version'] == 1 and packet['css_admission_granted'] is False
+        assert packet['schema_version'] == 2 and packet['css_admission_granted'] is False
         assert [row['path'] for row in packet['additional_modules']] == ADDITIONAL
+        prior_profile = packet['prior_four_module_profile']
+        prior_packet = json.loads(member(prior_profile['packet']))
+        assert prior_packet['schema_version'] == 1
+        assert prior_packet['product_paths'] == packet['product_paths'][:4]
+        assert prior_packet['additional_modules'] == packet['additional_modules'][:2]
+        assert packet['historical_non_target_reclassified_as_target'] == [CARD]
         base = json.loads(member(packet['historical_source_packet']))
         member(packet['historical_source_subject'])
         css = json.loads(member(packet['historical_css_packet']))
@@ -146,7 +157,8 @@ class CurrentSassSource:
         assert len(source['unchanged_owned_sass_before_inputs']) == branch['unchanged_owned_before_count']
         assert branch['new_loaded_edges'] == []
         assert packet['product_paths'] == [row['path'] for row in source['modules']] + ADDITIONAL
-        historical = _historical_blobs(root, source)
+        assert branch['current_unchanged_owned_before_count'] == len(source['unchanged_owned_sass_before_inputs']) - len(ADDITIONAL)
+        historical = _historical_blobs(root, source, prior_profile['branches'][line])
         changes = {row['path']: row for row in packet['additional_modules']}
         for row in changes.values():
             before = historical[row['path']]
@@ -172,8 +184,11 @@ class CurrentSassSource:
             member(row)
         graph = next(row for row in census['lines'] if row['line'] == line)
         assert len(graph['non_target_owned_style_template_graph']) == graph['non_target_graph_count']
+        assert graph['non_target_graph_count'] == branch['historical_non_target_graph_count']
+        assert branch['current_non_target_graph_count'] == graph['non_target_graph_count'] - 1
+        assert [row for row in graph['non_target_owned_style_template_graph'] if row['path'] == CARD] == [changes[CARD]['before']]
         for row in graph['non_target_owned_style_template_graph']:
-            member(row)
+            member(changes[CARD]['current'] if row['path'] == CARD else row)
         transitions = [dict(path=row['path'], before=row['before'], current=row['current']) for row in source['modules'] + packet['additional_modules']]
         for row in transitions:
             member(row['current'])

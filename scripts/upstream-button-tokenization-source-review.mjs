@@ -264,8 +264,8 @@ export function measureButtonContracts({reference,owned,peers,catalog,selected}=
 export function currentButtonTokenizationExpectedMeasurement({historical,transitions,publicSources}={}){
  historical=captureCurrentSassMetadata(historical);transitions=captureCurrentSassMetadata(transitions);publicSources=captureCurrentSassMetadata(publicSources);
  assert.equal(historical.case_count,14);assert.deepEqual(historical.cases.map(r=>r.case_id),CURRENT_BUTTON_TOKENIZATION_CASE_IDS);
- const source=new Map(transitions.map(r=>[r.path,r]));assert.equal(source.size,4);
- assert.deepEqual([...source.keys()].sort(),['button','checkbox','progress-spinner','snack-bar'].map(f=>'projects/ngx-material-legacy/styles/'+f+'/_'+f+'-theme.scss').sort());
+ const source=new Map(transitions.map(r=>[r.path,r]));assert.equal(source.size,5);
+ assert.deepEqual([...source.keys()].sort(),['button','checkbox','progress-spinner','snack-bar','card'].map(f=>'projects/ngx-material-legacy/styles/'+f+'/_'+f+'-theme.scss').sort());
  assert.equal(publicSources.length,185);assert.equal(new Set(publicSources.map(r=>r.path)).size,185);
  for(const r of publicSources){assert.match(r.path,/^\/current\/@angular\/(?:material|cdk)\//);assert.ok(r.path.split('/').slice(1).every(p=>p&&p!=='.'&&p!=='..'&&!p.includes('\\')));assert.match(r.sha256,/^[0-9a-f]{64}$/);assert.ok(Number.isSafeInteger(r.bytes)&&r.bytes>0);}
  const expected=structuredClone(historical);
@@ -316,12 +316,12 @@ export function reviewButtonTokenizationSource({root=process.cwd(),read=path=>re
  const assertCurrent=()=>{shared.assertCurrent();c04.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late button source change '+ref.path);assert.equal(raw.length,ref.bytes);}assertAbsent();finalPhysical();};assertCurrent();
  const report={schema_version:1,line:'21.x',role:'Five whole-patch source decisions with finite current ordinary and nested legacy button CSS; no canonical or full product qualification',...facts,
   originals:ORIGINAL,tagged_sass_reference:REFERENCE,reference_identity:IDENTITY,argument_catalog:CATALOG,current_source_bindings:union([...bound.values()]),absent_owned_token_or_modern_component_paths:absent,
-  historical_exported_functions:25,owned_scss_members:409,public_override_boundaries:8,modern_theme_module_source_rewrites:7,legacy_theme_module_source_rewrites:5,legacy_structural_module_source_rewrites:4,namespace_or_mixin_or_selector_rewrites:0,legacy_style_theme_byte_identical_to_tag:true,
+  historical_exported_functions:25,owned_scss_members:409,public_override_boundaries:9,modern_theme_module_source_rewrites:7,legacy_theme_module_source_rewrites:5,legacy_structural_module_source_rewrites:4,namespace_or_mixin_or_selector_rewrites:0,legacy_style_theme_byte_identical_to_tag:true,
   original_sass_graph_members:71,original_locked_archive_packages:17,compiler:sass.info,compiler_inputs:COMPILER,button_measurement:measurement,
   fresh_bounded_sass_compiler_execution:true,tagged_reference_sass_executed:true,upstream_post16_sass_or_typescript_tests_or_workflows_executed:false,package_install_or_javascript_runtime_execution:false,
   full_sass_gate_executed:false,canonical_decisions_changed:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed',
   current_public_bridge:structuredClone(c04.summary),historical_modern_theme_exact_after_seven_MDC_relocations:true,current_modern_theme_exact_after_seven_MDC_relocations:false};
- const expected=structuredClone(historicalReport);expected.role=report.role;expected.public_override_boundaries=8;
+ const expected=structuredClone(historicalReport);expected.role=report.role;expected.public_override_boundaries=9;
  expected.current_source_bindings=union(c04.bound,historicalReport.current_source_bindings.map(r=>c04.qualify(r)),MODEL_INPUTS,[SOURCE_REPORT,PUBLIC_SCOPE]);
  expected.button_measurement=currentButtonTokenizationExpectedMeasurement({historical:historicalReport.button_measurement,transitions:c04.bridge.transitions,publicSources});
  expected.current_public_bridge=structuredClone(c04.summary);expected.historical_modern_theme_exact_after_seven_MDC_relocations=true;expected.current_modern_theme_exact_after_seven_MDC_relocations=false;

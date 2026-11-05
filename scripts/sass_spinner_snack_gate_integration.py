@@ -13,6 +13,7 @@ from current_sass_spinner_snack_admission import (CurrentSpinnerSnackContract,
 from sass_spinner_snack_aggregate_admission import (SPINNER_SNACK_AGGREGATE_CASES,
     insert_spinner_snack_into_aggregate_model)
 from sass_ordinary_aggregate_admission import insert_ordinary_checkbox_button_into_aggregate_model
+from current_sass_card_aggregate import insert_card_into_aggregate_model
 from sass_default_aggregate_admission import (DEFAULT_AGGREGATE_CASES,
     DEFAULT_AGGREGATE_CONTRACT, default_aggregate_expected_css)
 from sass_aggregate_color_theme_admission import aggregate_color_theme_expected_css
@@ -33,9 +34,10 @@ SPINNER_SNACK_DEFAULT_CASES=tuple(value for value in SPINNER_SNACK_BRIDGE_CASES 
 _CONTEXTS=weakref.WeakKeyDictionary()
 _ROOT_CONTEXTS={}
 _DEPENDENCIES={
- 'scripts/current_sass_spinner_snack_admission.py':'08507f9d9a0600b5e316d7bf38a6ee1dd2d2948b3139c81299e8beddc6a3f4d0',
+ 'scripts/current_sass_spinner_snack_admission.py':'7a3f854589e7d7054b36c3ee921cfbe3c9191cc90737e065fbb5cff9be99e373',
  'scripts/sass_spinner_snack_bridge_admission.py':'66a9ad634bede4e0eeef23ece0fe50d49d6fbf28d5bc619da0873d6ec8fae0f3',
  'scripts/sass_spinner_snack_aggregate_admission.py':'2d55dedfe1d1da672337389730e3c31882b8993e0fd40a375950b714a61b6cba',
+ 'scripts/current_sass_card_aggregate.py':'7088b5636766affcde42210908c9dec0902a91d80d253aebac4675f2e1150856',
  'scripts/sass_ordinary_aggregate_admission.py':'0f8451f8a6d398631a70edc810c2c19bd816bf43710eb0f1d83722a3e0f13447',
  'scripts/sass_ordinary_control_css.py':'fd6e306d13fc5a1abb054065ee0e7e9208b5fe49e89d586d6733eaba18afb559',
  'scripts/sass_default_aggregate_admission.py':'35089797f4f06a5d602768b1e8710ff69e855e6262918e8d680fc4f6550106b5',
@@ -187,7 +189,9 @@ def _aggregate(s,body):
     if before is None:return False
     spinner_snack=insert_spinner_snack_into_aggregate_model(case_id=case,css=before)
     if spinner_snack is None:return False
-    expected=insert_ordinary_checkbox_button_into_aggregate_model(case_id=case,css=spinner_snack)
+    ordinary=insert_ordinary_checkbox_button_into_aggregate_model(case_id=case,css=spinner_snack)
+    if ordinary is None:return False
+    expected=insert_card_into_aggregate_model(case_id=case,css=ordinary)
     return expected is not None and actual['css']==expected
 
 def spinner_snack_gate_assertion_ok(root,active,body,invocation,*,context=None):

@@ -25,7 +25,7 @@ const DIFFS={
 };
 const hash=raw=>createHash('sha256').update(raw).digest('hex'),measurements=new WeakMap();
 function regular(root,path){
- if(/^node_modules\/sass\/(?:package\.json|sass\.node\.js|sass\.dart\.js)$/.test(path))return require('./historical-contract-repair-readers.mjs').readHistoricalContractRepairOwnerMember(root,path);
+ if(/^node_modules\/(?:@angular\/core\/package\.json|sass\/(?:package\.json|sass\.node\.js|sass\.dart\.js))$/.test(path))return require('./historical-contract-repair-readers.mjs').readHistoricalContractRepairOwnerMember(root,path);
  assert.ok(typeof path==='string'&&!path.includes('\\'));const parts=path.split('/');assert.ok(parts.every(part=>part&&part!=='.'&&part!=='..'));
  const peer=path.match(/^node_modules\/@angular\/(material|cdk)\/(.+)$/);
  let file=root,tail=parts;

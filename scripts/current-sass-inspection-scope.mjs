@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Ryan Lester.
  * Use of this source code is governed by the MIT license in LICENSE.
  */
-/** Compiler visibility for the explicit four-module owner; no CSS or artifact acceptance. */
+/** Compiler visibility for the explicit five-module owner; no CSS or artifact acceptance. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
@@ -27,6 +27,7 @@ const BOUNDARIES = [
   'styles/datepicker/_datepicker-theme.scss', 'styles/progress-bar/_progress-bar-theme.scss',
   'styles/progress-spinner/_progress-spinner-theme.scss', 'styles/snack-bar/_snack-bar-theme.scss',
   'styles/checkbox/_checkbox-theme.scss', 'styles/button/_button-theme.scss',
+  'styles/card/_card-theme.scss',
 ].sort();
 const HISTORICAL_SCOPE = 'compatibility/rc/upstream-sass-inspection-current-scope.json.gz';
 const HISTORICAL_PINS = {
@@ -38,7 +39,7 @@ const NOTICE_SHA='5be99f3d9441057f9007868ffc7f1c9efe7d7b766b56fa0e640ba80e4cff74
 const NOTICE_NAMES=['bottom-sheet','button-toggle','divider','expansion','sidenav','sort','tree'];
 
 /** Main already owns these seven silent prefixes. Authenticate them separately
- * from the four ordinary source transitions; no other historical hash changes. */
+ * from the five ordinary source transitions; no other historical hash changes. */
 function noticeScope(root,source,historical){
  if(source.line!=='main')return {scope:structuredClone(historical),assertCurrent(){},count:0};
  const readPacket=()=>{
@@ -91,7 +92,7 @@ export function captureCurrentSassMetadata(value) {
 }
 
 export function currentSassSourceSummary(source) {
-  return {role: 'Separately guarded current four-module source; retained source comparisons remain historical',
+  return {role: 'Separately guarded current five-module source; retained source comparisons remain historical',
     sources: captureCurrentSassMetadata(source.transitions), guard_inputs: captureCurrentSassMetadata(source.bound),
     current_source: captureCurrentSassMetadata(source.descriptor), current_source_reads_are_physical: true,
     historical_source_bytes_exposed: false, historical_constructor_executed: false,
@@ -189,25 +190,25 @@ export function assertCurrentSassInspectionScopeSuccessor({root = process.cwd(),
   })].sort((a, b) => a.path.localeCompare(b.path));
   assert.ok(boundaries.every(Boolean));
   assert.deepEqual(boundaries.map(row => row.path.replace('projects/ngx-material-legacy/', '')).sort(), BOUNDARIES);
-  const mixins = [...new Set(boundaries.flatMap(row => row.public_mixin_calls))].sort(); assert.equal(mixins.length, 20);
+  const mixins = [...new Set(boundaries.flatMap(row => row.public_mixin_calls))].sort(); assert.equal(mixins.length, 21);
   const candidate = structuredClone(historical.candidate), peer = structuredClone(historical.current);
   candidate.program = scopeProgram('projects/ngx-material-legacy', 'legacy'); candidate.program_sha256 = hash(candidate.program);
   candidate.loaded_sources = candidate.loaded_sources.map(row => row.root === 0 ? qualify(row, 'projects/ngx-material-legacy/') : row);
   peer.program = scopeProgram('@angular/material', 'peer', mixins); peer.program_sha256 = hash(peer.program);
   peer.messages = [...INSPECTION.map(name => 'inspection/' + name + '/true'), ...mixins.map(name => 'override/' + name + '/true')];
   const expected = {schema_version: 1, line: source.line, result: 'pass',
-    role: 'Four-module current compiler visibility only; historical receipts remain unchanged',
+    role: 'Five-module current compiler visibility only; historical receipts remain unchanged',
     owned_scss_population: census, owned_population_sha256: hash(JSON.stringify(census)), boundaries,
     public_override_mixins: mixins, candidate, current: peer, inspection_names: INSPECTION,
     current_source: source.descriptor, compiler: historical.sass, compile_calls: 2,
     historical_physical_constructor_executed: false, css_or_artifact_admission_granted: false,
     producer: {path: SELF, sha256: hash(image)}, g11_claim: 'not-passed'};
-  assert.deepEqual(current, expected, 'current inspection differs beyond the exact four-module scope successor');
+  assert.deepEqual(current, expected, 'current inspection differs beyond the exact five-module scope successor');
   source.assertCurrent(); readHistorical();notices.assertCurrent();
   assert.deepEqual(captureCurrentSassMetadata(liveHistorical), originalHistorical); assert.deepEqual(captureCurrentSassMetadata(liveCurrent), current);
   assert.ok(readFileSync(join(root, SELF)).equals(image)); source.assertCurrent();
-  return {historical_owned_rows: 409, current_owned_rows: 409, historical_boundaries: 4, current_boundaries: 8,
-    historical_override_mixins: 16, current_override_mixins: 20, historical_functions: 25,
+  return {historical_owned_rows: 409, current_owned_rows: 409, historical_boundaries: 4, current_boundaries: 9,
+    historical_override_mixins: 16, current_override_mixins: 21, historical_functions: 25,
     independently_qualified_notice_prefixes:notices.count,
     fresh_compiler_execution_by_comparator: false, css_or_artifact_admission_granted: false};
 }
@@ -223,7 +224,7 @@ export function measureCurrentSassInspectionScope({root = process.cwd(), entryOv
   const boundaries = census.map(row => inspectOwnedMaterialBoundary(row.path, readFileSync(join(root, row.path)))).filter(Boolean);
   assert.deepEqual(boundaries.map(row => row.path.replace('projects/ngx-material-legacy/', '')).sort(), BOUNDARIES);
   const publicMixins = [...new Set(boundaries.flatMap(row => row.public_mixin_calls))].sort();
-  assert.equal(publicMixins.length, 20);
+  assert.equal(publicMixins.length, 21);
   const oracle = JSON.parse(readFileSync(join(root, 'compatibility/rc/oracles/material-16.2.14-sass-api.json')));
   const material = realpathSync(join(root, 'node_modules/@angular/material'));
   const cdk = realpathSync(join(root, 'node_modules/@angular/cdk'));
@@ -243,7 +244,7 @@ export function measureCurrentSassInspectionScope({root = process.cwd(), entryOv
   assert.ok(readFileSync(join(root, SELF)).equals(image));
   assert.ok(readFileSync(join(root, LEGACY_INSPECTOR)).equals(inspectorImage));
   return {schema_version: 1, line: source.line, result: 'pass',
-    role: 'Four-module current compiler visibility only; historical receipts remain unchanged',
+    role: 'Five-module current compiler visibility only; historical receipts remain unchanged',
     owned_scss_population: census, owned_population_sha256: hash(JSON.stringify(census)), boundaries,
     public_override_mixins: publicMixins, candidate, current, inspection_names: INSPECTION,
     current_source: source.descriptor, compiler: sass.info, compile_calls: 2,

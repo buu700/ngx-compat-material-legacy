@@ -37,12 +37,12 @@ export function currentSliderSelectorExpectedReport({kind,historical,historicalS
  assert.equal(hash(JSON.stringify(historicalShared,null,2)+'\n'),SHARED.sha256);
  assert.equal(historical.line,'21.x');assert.equal(historicalShared.current_source_bindings.length,610);
  const bound=captureCurrentSassMetadata(source.bound),summary=captureCurrentSassMetadata(source.summary),qualify=source.qualify;
- assert.equal(typeof qualify,'function');assert.equal(summary.sources.length,4);
- assert.deepEqual(summary.sources.map(row=>row.path).sort(),['button','checkbox','progress-spinner','snack-bar'].map(name=>'projects/ngx-material-legacy/styles/'+name+'/_'+name+'-theme.scss').sort());
+ assert.equal(typeof qualify,'function');assert.equal(summary.sources.length,5);
+ assert.deepEqual(summary.sources.map(row=>row.path).sort(),['button','card','checkbox','progress-spinner','snack-bar'].map(name=>'projects/ngx-material-legacy/styles/'+name+'/_'+name+'-theme.scss').sort());
  const expected=structuredClone(historical);
  expected.current_source_bindings=union([...bound,...historical.current_source_bindings.map(ref=>qualify(ref)),...common()]);
  expected.current_public_bridge=summary;
- expected.public_override_boundaries=8;expected.historical_public_override_boundaries=4;
+ expected.public_override_boundaries=9;expected.historical_public_override_boundaries=4;
  if(kind==='selector-density'){
   assert.equal(historical.current_source_bindings.length,619);assert.equal(historical.public_override_boundaries,4);
   // Exact insertion/source proof: checkbox retains its existing three calls;
@@ -101,7 +101,7 @@ export function createCurrentSliderSelectorReports({root=process.cwd(),read:prov
  const finalPhysical=()=>{for(const[path,raw]of retained)assert.ok(equalBytes(physical(root,path),raw),'changed final slider/selector input '+path);};
  const owner=spinnerSnackC04Source({root,read}),qualify=owner.qualify,ownerCurrent=owner.assertCurrent;
  const privateSource={bound:captureCurrentSassMetadata(owner.bound),summary:captureCurrentSassMetadata(owner.summary),qualify};
- assert.equal(privateSource.summary.current_source.source_modules.length,4);
+ assert.equal(privateSource.summary.current_source.source_modules.length,5);
  const historical=new Map();
  for(const ref of common()){
   const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);

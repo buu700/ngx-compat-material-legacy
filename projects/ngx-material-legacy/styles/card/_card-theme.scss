@@ -1,4 +1,5 @@
 @use 'sass:map';
+@use '@angular/material' as mat;
 @use '../core/theming/theming';
 @use '../core/typography/typography';
 @use '../core/tokens/token-utils';
@@ -26,6 +27,13 @@
   .mat-mdc-card {
     @include mdc-elevated-card-theme.theme($mdc-elevated-card-color-tokens);
     @include mdc-outlined-card-theme.theme($mdc-outlined-card-color-tokens);
+    @include mat.card-overrides((
+      elevated-container-color: map.get($mdc-elevated-card-color-tokens, container-color),
+      elevated-container-elevation: map.get($mdc-elevated-card-color-tokens, container-elevation),
+      outlined-container-color: map.get($mdc-outlined-card-color-tokens, container-color),
+      outlined-container-elevation: map.get($mdc-outlined-card-color-tokens, container-elevation),
+      outlined-outline-color: map.get($mdc-outlined-card-color-tokens, outline-color),
+    ));
     @include token-utils.create-token-values(tokens-mat-card.$prefix, $mat-card-color-tokens);
   }
 }
@@ -59,12 +67,27 @@
   }
 }
 
+// Fixed owned16 geometry, emitted only by the historical full theme entry point.
+@mixin _current-base() {
+  $elevated: tokens-mdc-elevated-card.get-unthemable-tokens();
+  $outlined: tokens-mdc-outlined-card.get-unthemable-tokens();
+  .mat-mdc-card {
+    @include mat.card-overrides((
+      elevated-container-shape: map.get($elevated, container-shape),
+      outlined-container-shape: map.get($outlined, container-shape),
+      outlined-outline-width: map.get($outlined, outline-width),
+    ));
+  }
+}
+
 @mixin theme($theme-or-color-config) {
   $theme: theming.private-legacy-get-theme($theme-or-color-config);
   @include theming.private-check-duplicate-theme-styles($theme, 'mat-card') {
     $color: theming.get-color-config($theme);
     $density: theming.get-density-config($theme);
     $typography: theming.get-typography-config($theme);
+
+    @include _current-base();
 
     @if $color != null {
       @include color($color);

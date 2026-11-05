@@ -22,6 +22,7 @@ import test_current_sass_spinner_snack_admission as direct_fixture
 from sass_default_aggregate_fixture import default_aggregate_receipt
 from sass_mixin_fixture import mixin_receipt
 from sass_ordinary_aggregate_admission import insert_ordinary_checkbox_button_into_aggregate_model
+from current_sass_card_aggregate import insert_card_into_aggregate_model
 
 def measured(css):return dict(css=css,css_sha256=hashlib.sha256(css.encode()).hexdigest(),css_bytes=len(css.encode()))
 
@@ -35,6 +36,7 @@ class SpinnerSnackGateIntegrationTests(unittest.TestCase):
             'scripts/sass-spinner-snack-bridge-contract.mjs','scripts/sass_spinner_snack_bridge_admission.py',
             'scripts/sass-spinner-snack-aggregate-contract.mjs','scripts/sass-default-aggregate-contract.mjs',
             'scripts/sass-ordinary-aggregate-contract.mjs','compatibility/rc/ordinary-checkbox-button-expectation-model-v1.mjs',
+            'scripts/current-sass-card-aggregate-contract.mjs','compatibility/rc/ordinary-card-public-bridge-model-v1.mjs',
             'scripts/sass-aggregate-color-theme-contract.mjs','scripts/sass-aggregate-typography-contract.mjs','scripts/sass-ripple-color-contract.mjs',*gate._DEPENDENCIES]
         for path in set(paths):
             dest=cls.root/path;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes((ROOT/path).read_bytes())
@@ -57,7 +59,8 @@ class SpinnerSnackGateIntegrationTests(unittest.TestCase):
             cls.bodies.append(body)
         for row in aggregate['rows']:
             case=row['case_id'];body=default_aggregate_receipt(cls.active,case,cls.invocation) if case.startswith('mixin-css/') else mixin_receipt(ROOT,cls.active,case,cls.invocation)
-            current_css=insert_ordinary_checkbox_button_into_aggregate_model(case_id=case,css=row['current']['css']);assert current_css is not None
+            ordinary_css=insert_ordinary_checkbox_button_into_aggregate_model(case_id=case,css=row['current']['css']);assert ordinary_css is not None
+            current_css=insert_card_into_aggregate_model(case_id=case,css=ordinary_css);assert current_css is not None
             actual={**measured(current_css),'program_sha256':row['current']['logical_program_sha256'],'line':cls.line,'sass_version':branch['compiler'],'sources':copy.deepcopy(current_sources)}
             body.update(current_spinner_snack_bridge=copy.deepcopy(descriptor),error=None)
             if case.startswith('mixin-css/'):body.update(actual_measurement=actual,actual_sha256=actual['css_sha256'],actual_bytes=actual['css_bytes'])

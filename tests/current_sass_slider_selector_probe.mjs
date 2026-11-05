@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Ryan Lester.
  * Use of this source code is governed by the MIT license in LICENSE.
  */
-/** Pure report relationship and actual four-source fixture; no tool constructor/compiler. */
+/** Pure report relationship and actual five-source fixture; no tool constructor/compiler. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFileSync,writeFileSync} from 'node:fs';
@@ -19,8 +19,12 @@ const root=process.argv[2];assert.ok(root.includes('ngx-current-sass-source-test
 const hash=raw=>createHash('sha256').update(raw).digest('hex'),read=path=>readFileSync(join(root,path));
 const source=createCurrentSassSource({root});assert.equal(source.line,'21.x');
 const summary=currentSassSourceSummary(source),bound=source.bound;
-const qualify=ref=>{const selected=source.qualify(ref);return selected?{...ref,sha256:selected.sha256,...(Object.hasOwn(ref,'bytes')?{bytes:selected.bytes}:{})}:structuredClone(ref);};
-// This context intentionally supplies only real four-product qualification.
+// These are repeated pure report-model cases. Cache only complete identical
+// metadata judgments from the real source owner; keep its physical guards at
+// the boundary, and exercise late physical mutation explicitly below.
+const judgments=new Map();
+const qualify=ref=>{const key=JSON.stringify(ref);if(!judgments.has(key))judgments.set(key,source.qualify(ref));const selected=judgments.get(key);return selected?{...ref,sha256:selected.sha256,...(Object.hasOwn(ref,'bytes')?{bytes:selected.bytes}:{})}:structuredClone(ref);};
+// This context intentionally supplies only real five-product qualification.
 // Old tool rows stay historical model inputs; it does not claim current tool admission.
 const modelSource={bound,summary,qualify};
 const reportRefs=['selector-density','slider-m3-repairs'].map(currentSliderSelectorReportReference);
@@ -35,7 +39,7 @@ for(const ref of reportRefs){
  const kind=ref.path.includes('selector-density')?'selector-density':'slider-m3-repairs',historical=JSON.parse(read(ref.path));
  const expected=structuredClone(historical);
  expected.current_source_bindings=union([...bound,...historical.current_source_bindings.map(qualify),...extra]);
- expected.current_public_bridge=structuredClone(summary);expected.public_override_boundaries=8;expected.historical_public_override_boundaries=4;
+ expected.current_public_bridge=structuredClone(summary);expected.public_override_boundaries=9;expected.historical_public_override_boundaries=4;
  if(kind==='slider-m3-repairs'){
   expected.shared_source_bindings=union([...bound,...historicalShared.current_source_bindings.map(qualify)]).length;
   expected.shared_measurement_inputs=historical.shared_measurement_inputs.map(qualify);
@@ -49,7 +53,7 @@ for(const ref of reportRefs){
  check(kind+'/independent-whole-report-model',()=>assert.deepEqual(currentSliderSelectorExpectedReport(args),expected));
  check(kind+'/exact-relationship',()=>assert.equal(currentSliderSelectorReportMatches(args),true));
  const mutations={
-  extra:v=>v.allowed=true,boundary:v=>v.public_override_boundaries=4,historical_boundary:v=>v.historical_public_override_boundaries=8,
+  extra:v=>v.allowed=true,boundary:v=>v.public_override_boundaries=4,historical_boundary:v=>v.historical_public_override_boundaries=9,
   descriptor:v=>v.current_public_bridge.sources.pop(),source_hash:v=>v.current_source_bindings[0].sha256='0'.repeat(64),
   old_source_count:v=>v.current_source_bindings.pop(),compiler:v=>v.compiler='foreign',canonical:v=>v.canonical_decisions_changed=1,
  };
@@ -90,8 +94,8 @@ const target=join(root,source.transitions[2].path),before=readFileSync(target);
 check('actual-late-current-source-reject-and-restoration',()=>{try{writeFileSync(target,Buffer.concat([before,Buffer.from('\n// fixture-only mutation\n')]));assert.throws(()=>source.assertCurrent());}finally{writeFileSync(target,before);}source.assertCurrent();});
 check('actual-known-product-foreign-hash-reject',()=>assert.throws(()=>source.qualify({path:source.transitions[2].path,sha256:'0'.repeat(64)})));
 check('zero-getters',()=>assert.equal(getters,0));
-console.log(JSON.stringify({line:source.line,result:'pass',checks,checks_passed:checks.length,getter_calls:getters,actual_four_module_source_fixture:true,
+console.log(JSON.stringify({line:source.line,result:'pass',checks,checks_passed:checks.length,getter_calls:getters,actual_five_module_source_fixture:true,
  report_relationship_modeled_only:true,current_C04_tool_constructor_executed:false,actual_source_producers_or_handlers_executed:false,
  compiler_calls:0,original_CSS_program_error_debug_unchanged:true,historical_source_rows:{selector:619,slider:638},
- selector_caller_modules:20,selector_calls:41,current_public_boundaries:8,historical_public_boundaries:4,
+ selector_caller_modules:20,selector_calls:41,current_public_boundaries:9,historical_public_boundaries:4,
  artifact_or_audit_credit:false,g11_claim:'not-passed'}));

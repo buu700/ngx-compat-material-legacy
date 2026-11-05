@@ -23,13 +23,13 @@ const REPORTS=[
 const RETENTION={path:'compatibility/rc/21x-c04-modern-control-base-measurement-21x.json',sha256:'4e99b606b4bcbf162f00edf8b8dcd7d4ff58a16760ec34d8d674a0b8720c124f',bytes:109842};
 const source=spinnerSnackC04Source({root}),line=source.bridge.line;
 const bound=structuredClone(source.bound),summary=structuredClone(source.summary),transitions=structuredClone(source.bridge.transitions);
-assert.equal(transitions.length,4);checks.push('real current C04/tool constructor');
+assert.equal(transitions.length,5);checks.push('real current C04/tool constructor');
 const productRefs=[];
 for(const row of transitions){
  const before={path:row.path,sha256:row.before.sha256,bytes:row.before.bytes,role:'authentic historical comparison metadata',nested:{preserved:true}};
  const current=source.qualify(before);
  assert.deepEqual(current,{...before,sha256:row.current.sha256,bytes:row.current.bytes});
- productRefs.push({before,current});checks.push('four-module current qualifier '+row.path);
+ productRefs.push({before,current});checks.push('five-module current qualifier '+row.path);
 }
 source.bound.length=0;source.summary.sources.length=0;source.bridge.bound.length=0;source.bridge.transitions[0].path='foreign.scss';
 source.assertCurrent();assert.deepEqual(source.qualify(productRefs[0].before),productRefs[0].current);
@@ -49,9 +49,9 @@ if(line==='21.x'){
  for(const ref of REPORTS)pinned(ref);reports=REPORTS.length;checks.push('all4 immutable C04 report pins retained');
  const historical=JSON.parse(pinned(REPORTS[0])),savedHistorical=structuredClone(historical),current=structuredClone(historical);
  current.current_source_bindings=union(bound,historical.current_source_bindings.map(ref=>source.qualify(ref)));
- current.current_public_bridge=structuredClone(summary);assert.equal(current.public_override_boundaries,4);current.public_override_boundaries=8;
+ current.current_public_bridge=structuredClone(summary);assert.equal(current.public_override_boundaries,4);current.public_override_boundaries=9;
  assert.equal(current.current_owned_sources_and_loaded_peers_match_retained_measurement,true);delete current.current_owned_sources_and_loaded_peers_match_retained_measurement;
- current.historical_owned_sources_and_loaded_peers_match_retained_measurement_except_separate_four_module_successor=true;
+ current.historical_owned_sources_and_loaded_peers_match_retained_measurement_except_separate_five_module_successor=true;
  assert.deepEqual(source.assertReportSuccessor('theming-inspection',current),historical);
  assert.deepEqual(historical,savedHistorical);checks.push('exact theming report successor from archived data');
  const wrongDescriptor=structuredClone(current);wrongDescriptor.current_public_bridge.current_source.source_modules.pop();
@@ -88,7 +88,7 @@ if(line==='21.x'){
  checks.push('main has no21archived C04 REPORTS binding');
 }
 source.assertCurrent();checks.push('final current C04/tool physical assertion');
-const manifest=readFileSync(join(root,'compatibility/rc/current-sass-tool-reference-inputs-v1.json'));
+const manifest=readFileSync(join(root,'compatibility/rc/current-sass-tool-reference-inputs-v2.json'));
 console.log(JSON.stringify({line,checks,product_refs:productRefs,tool_manifest_sha256:hash(manifest),bound_count:bound.length,
  source_summary:summary,authenticated_C04_report_count:reports,unchanged_public_retention_rows:unchangedPublic,
  unchanged_direct_retention_rows:unchangedDirect,compiler_calls:0,old_physical_constructor_executed:false,

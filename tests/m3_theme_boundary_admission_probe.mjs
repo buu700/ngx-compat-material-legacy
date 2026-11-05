@@ -71,7 +71,10 @@ for(const entry of selected){
  }
 }
 const first=selected[0],args={root,entry:first,body,review:body.reviews.find(row=>row.sha===first.sha),proof:first.individual_proof};
-const source=admission.inspectBoundarySource({root,read});assert.ok(source.bound.length>400);
+const source=admission.inspectBoundarySource({root,read});
+assert.equal(new Set(source.bound.map(ref=>ref.path)).size,source.bound.length);
+for(const ref of source.bound){const raw=read(ref.path);assert.equal(createHash('sha256').update(raw).digest('hex'),ref.sha256);assert.equal(raw.length,ref.bytes);}
+source.assertCurrent();source.assertPhysical();
 let sourceRejections=0;
 for(const target of [admission.BOUNDARY_REVIEW,marker.qualification.path,'scripts/measure-m3-theme-boundary-contracts.mjs',
  'projects/ngx-material-legacy/styles/core/theming/_theming.scss','projects/ngx-material-legacy/styles/_token-theming.scss']){
@@ -115,7 +118,7 @@ assert.equal(existsSync(mutant),false);assert.equal(existsSync(dir),false);
 const report={schema_version:1,line:'21.x',current_source_admissions:current.individual_decisions_applied,previous_source_admissions:previous.individual_decisions_applied,
  title_source_admissions:current.title_source_decisions_applied,title_native_metadata_tokens:current.title_native_registry_metadata_tokens_applied,
  theming_source_admissions:current.theming_source_decisions_applied,inspection_source_admissions:current.inspection_source_decisions_applied,selector_density_source_admissions:current.selector_density_source_decisions_applied,button_tokenization_source_admissions:current.button_tokenization_source_decisions_applied,button_token_repairs_source_admissions:current.button_token_repairs_source_decisions_applied,surface_m3_theme_source_admissions:current.surface_m3_theme_source_decisions_applied,slider_m3_repairs_source_admissions:current.slider_m3_repairs_source_decisions_applied,control_m3_theme_source_admissions:current.control_m3_theme_source_decisions_applied,foundation_m3_theme_source_admissions:current.foundation_m3_theme_source_decisions_applied,core_tokenization_source_admissions:current.core_tokenization_source_decisions_applied,remaining_unthemable_source_admissions:current.remaining_unthemable_source_decisions_applied,
- pure_metadata_cases:metadataCases,pure_metadata_without_filesystem_or_compiler_bindings:true,metadata_rejections:metadataRejections,source_rejections:sourceRejections,bound_source_members:source.bound.length,
+ pure_metadata_cases:metadataCases,pure_metadata_without_filesystem_or_compiler_bindings:true,metadata_rejections:metadataRejections,source_rejections:sourceRejections,bound_source_members:source.bound.length,all_exact_current_source_members_physically_verified:true,
  real_root_checker_positive_rows:positive,real_root_checker_rejected_rows:negative,missing_source_requirement_mutant_detected:mutantCaught,
  rejection_controls:rejected.length,rejected,raw_current_checker_preserved:true,all_temporary_checker_files_removed:true,
  five_declined_decisions_individually_enforced:true,declined_source_fault_cannot_bypass:true,metadata_valid_source_fault_rejected:true,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};

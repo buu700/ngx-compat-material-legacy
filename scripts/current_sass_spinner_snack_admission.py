@@ -15,11 +15,11 @@ from sass_spinner_snack_bridge_admission import (SPINNER_SNACK_BRIDGE_CASES,
 ROOT = Path(__file__).resolve().parents[1]
 SELF = 'scripts/current_sass_spinner_snack_admission.py'
 INPUTS = 'compatibility/rc/parallel-spinner-snack-css-contract-inputs-v1.json'
-SOURCE_INPUTS = 'compatibility/rc/current-sass-source-inputs-v1.json'
+SOURCE_INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json'
 PINS = [
-    ('scripts/current-sass-source.mjs', '49baf8905d138897b7ff56232276c9f1889db5ee3ac31fc554cdc0041d8200d5', 12696),
-    ('scripts/current_sass_source.py', 'c394bc5d8a65b188b1c7c2df1021846e6852e4368d614c060a5de404b8cb5161', 12458),
-    (SOURCE_INPUTS, '9c3b08100262a981698f58c9a2127697b6ca3f03fde99d864451826534f6ed1a', 16032),
+    ('scripts/current-sass-source.mjs', '4fa09c23f2a55b24fe3e412793f66868e8e5fc17cc161bee6dc4d2706536d346', 14051),
+    ('scripts/current_sass_source.py', '0252222d3712c2baaac0d8b97442207e9297f231ecf64a50234cc1af1c413df9', 13870),
+    (SOURCE_INPUTS, '46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9', 20239),
     ('scripts/sass_spinner_snack_bridge_admission.py', '66a9ad634bede4e0eeef23ece0fe50d49d6fbf28d5bc619da0873d6ec8fae0f3', 19824),
     (INPUTS, 'fd78f8c7f6e072fb7393c61aef782ccdf3a1c8d009227d08b29921ea2809e0a8', 237068),
 ]

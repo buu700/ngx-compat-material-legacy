@@ -34,10 +34,10 @@ export function assertCurrentSliderSelectorTestSources({kind,scope,root=process.
  assert.deepEqual(scope.historical_report,historical);
  assert.deepEqual(union(scope.bound),expected);assert.equal(scope.bound.length,expected.length);
  assert.deepEqual(scope.report.current_source_bindings,expected);
- assert.equal(scope.report.public_override_boundaries,8);assert.equal(scope.report.historical_public_override_boundaries,4);
+ assert.equal(scope.report.public_override_boundaries,9);assert.equal(scope.report.historical_public_override_boundaries,4);
  scope.assertCurrent();owner.assertCurrent();
  return {historical_source_bindings:REPORTS[kind][2],expected_source_bindings:expected.length,current_source_bindings_match_exact_successor:true,
-  historical_public_override_boundaries:4,public_override_boundaries:8};
+  historical_public_override_boundaries:4,public_override_boundaries:9};
 }
 export function assertCurrentSliderSelectorCanonicalBindings({kind,bound,body,root=process.cwd(),read=path=>readFileSync(join(root,path))}){
  const {expected,owner}=currentSliderSelectorTestBindings({kind,root,read}),prefix='compatibility/rc/21x-c04-'+kind+'-';

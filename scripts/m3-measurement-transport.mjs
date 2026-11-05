@@ -10,7 +10,11 @@ import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {dirname,join,resolve} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
+import {readFileSync} from 'node:fs';
+import {currentSassToolReferenceSubject} from './current-sass-tool-references.mjs';
+import {canonicalSourcePhysicalBoundary} from './current-sass-canonical-source-boundary.mjs';
 const SOURCE=resolve(dirname(fileURLToPath(import.meta.url)),'..');
+const SELF='scripts/m3-measurement-transport.mjs',image=readFileSync(fileURLToPath(import.meta.url));
 const PARENT='cd577db612745ea0a18a6b775b4e2f671b28b16c';
 const PREFIX='compatibility/rc/21x-c04-m3-theme-boundary-';
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
@@ -36,13 +40,15 @@ function originalCode(ref){
  return Buffer.from(originals.get(ref.path));
 }
 /** Private old metadata view only. The caller keeps its raw reader unchanged. */
-export function m3MeasurementSourceEpoch({read}){
+export function m3MeasurementSourceEpoch({root=SOURCE,read}){
+ const boundary=canonicalSourcePhysicalBoundary({root,read});read=boundary.read;assert.equal(hash(read(SELF)),hash(image));
+ const tools=currentSassToolReferenceSubject({root,read});
  const before=new Map(M3_TRANSPORT_CODE.map(ref=>[ref.path,originalCode(ref)]));
- const currentRefs=M3_TRANSPORT_CODE.map(ref=>({path:ref.path,sha256:ref.after,bytes:ref.after_bytes}));
- const assertCurrent=()=>{for(const ref of currentRefs){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed M3 transport source '+ref.path);assert.equal(raw.length,ref.bytes);}};
+ const currentRefs=M3_TRANSPORT_CODE.map(ref=>{const portable={path:ref.path,sha256:ref.after,bytes:ref.after_bytes};const current=tools.qualify(portable);assert.ok(current,'missing current M3 tool identity '+ref.path);return current;});
+ const assertCurrent=()=>{tools.assertCurrent();assert.equal(hash(read(SELF)),hash(image));for(const ref of currentRefs){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed M3 transport source '+ref.path);assert.equal(raw.length,ref.bytes);}boundary.assertPhysical();};
  assertCurrent();
  const beforeRead=path=>{if(!before.has(path))return read(path);assertCurrent();return Buffer.from(before.get(path));};
- return {beforeRead,currentRefs,assertCurrent};
+ return {beforeRead,currentRefs,bound:tools.bound,assertCurrent};
 }
 function warningRows(value){
  assert.deepEqual(value.historical_warning_and_density_cases.map(row=>row.case_id),['repeat','separate-ids','nested','ignored','legacy-color-config','changed-color']);

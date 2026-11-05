@@ -118,7 +118,7 @@ class M3ThemeBoundarySourceTests(unittest.TestCase):
         child = subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=180)
         self.assertEqual(child.returncode,0,(child.stdout+child.stderr)[-5000:]);report = json.loads(child.stdout)
         for key,value in [('historical_default_CSS_cases',16),('historical_warning_and_density_cases',6),('original_inspection_cases',8),('coexistence_source_compile_cases',4),('compiled_warning_faults_rejected',1),('compiled_inspection_faults_rejected',1),('compiled_contamination_faults_rejected',1),('source_rejections',7)]:self.assertEqual(report[key],value,key)
-        self.assertTrue(report['fresh_measurement_matches_recorded']);self.assertFalse(report['actual_native_artifact_browser_floor_or_full_audit_qualified'])
+        self.assertFalse(report['fresh_measurement_matches_recorded']);self.assertTrue(report['fresh_current_measurement_matches_finite_successor']);self.assertTrue(report['old_report_and_26_program_transport_preserved']);self.assertEqual(report['current_producer_execution_line'],'21.x');self.assertFalse(report['actual_native_artifact_browser_floor_or_full_audit_qualified'])
 
 
 if __name__=='__main__':unittest.main()

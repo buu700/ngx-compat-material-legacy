@@ -56,7 +56,7 @@ for(const path of scope.report.absent_owned_counterparts){
 assert.throws(()=>reviewInspectionCompatibilitySource({root,read:path=>{if(path===entry){const e=new Error('unreadable pinned source');e.code='EACCES';throw e;}return read(path);}}),error=>error.code==='EACCES');rejected.push('unreadable-pinned-input-propagates');
 scope.bound.length=0;scope.report.current_source_bindings.length=0;late=entry;assert.throws(()=>scope.assertCurrent());late=null;scope.assertCurrent();rejected.push('public-metadata-cannot-rewrite-guards');
 const report={schema_version:1,result:'pass',original_files:7,original_hunks:14,present_original_blobs:12,tagged_blobs:8,exact_patch_replays:7,whitespace_only_fixups:1,
- tagged_deleted_modern_files:2,proposed_individual_source_decisions:4,source_bindings:bound.size,...sourceQualification,owned_scss_members:409,historical_exported_functions:25,public_override_boundaries:8,historical_public_override_boundaries:4,
+ tagged_deleted_modern_files:2,proposed_individual_source_decisions:4,source_bindings:bound.size,...sourceQualification,owned_scss_members:409,historical_exported_functions:25,public_override_boundaries:9,historical_public_override_boundaries:4,
  legacy_theme_module_source_rewrites:4,legacy_theme_namespace_or_mixin_or_selector_rewrites:0,rejected,
  fresh_compiler_execution_this_review:false,upstream_code_executed:false,canonical_decisions_changed:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});

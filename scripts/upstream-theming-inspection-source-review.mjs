@@ -165,7 +165,7 @@ export function reviewThemingInspectionSource({root=process.cwd(),read=path=>rea
  const owned=candidateProductSourcePaths(root).filter(path=>path.endsWith('.scss')).sort();assert.equal(owned.length,409);
  assert.deepEqual(owned,scope.owned_scss_population.map(ref=>ref.path).sort());
  const boundaries=[];for(const ref of scope.owned_scss_population){const value=member(ref),boundary=inspectOwnedThemingMember(ref.path,value);if(boundary)boundaries.push(boundary);}
- assert.equal(scope.boundaries.length,4);assert.equal(boundaries.length,8);
+ assert.equal(scope.boundaries.length,4);assert.equal(boundaries.length,9);
  assert.deepEqual(boundaries.filter(row=>!c04.bridge.transitions.some(t=>t.path===row.path)),scope.boundaries);
  assert.deepEqual(boundaries.filter(row=>c04.bridge.transitions.some(t=>t.path===row.path)).map(row=>row.path).sort(),c04.bridge.transitions.map(row=>row.path).sort());
  for(const [path,version]of [['projects/ngx-material-legacy/package.json','21.'],['node_modules/@angular/material/package.json','21.2.14'],['node_modules/@angular/cdk/package.json','21.2.14']]){
@@ -180,7 +180,7 @@ export function reviewThemingInspectionSource({root=process.cwd(),read=path=>rea
  assertCurrent();const report={schema_version:1,line:'21.x',role:'Two individual whole-patch source proposals; not canonical admission or a fresh full Sass gate',...originalFacts,
   originals:ORIGINAL,source_census:CENSUS,retained_compiler_scope:SCOPE,historical_exported_functions:25,owned_scss_members:409,public_override_boundaries:boundaries.length,
   current_source_bindings:structuredClone([...bound.values()].sort((a,b)=>a.path.localeCompare(b.path))),current_public_bridge:structuredClone(c04.summary),
-  historical_owned_sources_and_loaded_peers_match_retained_measurement_except_separate_four_module_successor:true,fresh_compiler_execution_this_review:false,canonical_decisions_changed:0,source_scope_only:true,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+  historical_owned_sources_and_loaded_peers_match_retained_measurement_except_separate_five_module_successor:true,fresh_compiler_execution_this_review:false,canonical_decisions_changed:0,source_scope_only:true,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
  const historical_report=c04.assertReportSuccessor('theming-inspection',report);
  return {report,historical_report,bound:structuredClone([...bound.values()]),assertCurrent};
 }

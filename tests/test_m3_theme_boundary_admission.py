@@ -72,6 +72,7 @@ class M3ThemeBoundaryAdmissionTests(unittest.TestCase):
         self.assertEqual(report['core_tokenization_source_admissions'], 3)
         self.assertEqual(report['remaining_unthemable_source_admissions'], 14)
         self.assertTrue(report['pure_metadata_without_filesystem_or_compiler_bindings'])
+        self.assertTrue(report['all_exact_current_source_members_physically_verified'])
         self.assertTrue(report['five_declined_decisions_individually_enforced'])
         self.assertTrue(report['declined_source_fault_cannot_bypass'])
         self.assertTrue(report['metadata_valid_source_fault_rejected'])

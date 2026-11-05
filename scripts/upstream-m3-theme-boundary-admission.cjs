@@ -12,6 +12,13 @@ const {join,resolve,relative,isAbsolute}=require('node:path');
 const {gunzipSync}=require('node:zlib');
 const {isDeepStrictEqual}=require('node:util');
 const {m3MeasurementSourceEpoch,historicalM3MeasurementView,M3_PORTABLE_WITNESSES,M3_TRANSPORT_CODE}=require('./m3-measurement-transport.mjs');
+const {currentM3ThemeBoundarySubject,M3_CURRENT_ABSENT}=require('./current-m3-theme-boundary-contract.mjs');
+const {canonicalSourcePhysicalBoundary}=require('./current-sass-canonical-source-boundary.mjs');
+const {captureCurrentSassMetadata}=require('./current-sass-inspection-scope.mjs');
+const {types}=require('node:util');
+const {measureM3ThemeBoundary}=require('./measure-m3-theme-boundary-contracts.mjs');
+const functionToString=Function.prototype.toString;
+const producerImage=readFileSync(join(__dirname,'measure-m3-theme-boundary-contracts.mjs'));
 const ROOT=resolve(__dirname,'..'),PREFIX='compatibility/rc/21x-c04-m3-theme-boundary-';
 const REVIEW=PREFIX+'individual-review.json',REVIEW_HASH='1471cf3de35c1bf86d13e993c9f55f0cef6849dab20ffdd7b4fcc62f74ec044a';
 const QUALIFICATION=PREFIX+'source-qualification.json',QUALIFICATION_HASH='37d3b1eaa7a4468b48c90435e4d50b5d08053914ff3cb9f6ee2f57505c52ec17';
@@ -25,6 +32,7 @@ const DIFFS={
 };
 const hash=raw=>createHash('sha256').update(raw).digest('hex'),measurements=new WeakMap();
 function regular(root,path){
+ if(path==='node_modules/@angular/core/package.json'||/^node_modules\/sass\/(?:package\.json|sass\.node\.js|sass\.dart\.js)$/.test(path))return require('./historical-contract-repair-readers.mjs').readHistoricalContractRepairOwnerMember(root,path);
  assert.ok(typeof path==='string'&&!path.includes('\\'));const parts=path.split('/');assert.ok(parts.every(part=>part&&part!=='.'&&part!=='..'));
  const peer=path.match(/^node_modules\/@angular\/(material|cdk)\/(.+)$/);let file=root,tail=parts;
  if(peer){file=realpathSync(join(root,'node_modules/@angular',peer[1]));tail=peer[2].split('/');}
@@ -54,11 +62,13 @@ function metadataOk({entry,body,review,proof}={}){
 }
 function inspectBoundarySource({root=ROOT,read=root===ROOT?defaultRead:path=>regular(root,path)}={}){
  const transportPath='scripts/m3-measurement-transport.mjs',transportHash='7bcb7a2d1cef12433240575596b991f0f82c0bdbdbe8f39e2a047fb877bf7fba';
- assert.equal(hash(read(transportPath)),transportHash);const epoch=m3MeasurementSourceEpoch({read});
- const bound=new Map();
+ root=resolve(root);const physical=canonicalSourcePhysicalBoundary({root,read,absentPaths:M3_CURRENT_ABSENT});read=physical.read;
+ const current=currentM3ThemeBoundarySubject({root,read}),epoch=m3MeasurementSourceEpoch({root,read});
+ const bound=new Map([...current.bound,...epoch.bound].map(ref=>[ref.path,ref]));
  const member=ref=>{const previous=M3_TRANSPORT_CODE.find(value=>value.path===ref.path&&value.before===ref.sha256);
-  const raw=previous?epoch.beforeRead(ref.path):read(ref.path);assert.equal(hash(raw),ref.sha256,'changed M3-theme-boundary input '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);
-  bound.set(ref.path,previous?{path:previous.path,sha256:previous.after,bytes:previous.after_bytes}:{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;};
+  const qualified=previous?epoch.currentRefs.find(value=>value.path===ref.path):current.qualifyReference(ref);
+  const raw=previous?epoch.beforeRead(ref.path):read(qualified.path),expected=previous?ref:qualified;assert.equal(hash(raw),expected.sha256,'changed M3-theme-boundary input '+ref.path);if(expected.bytes!==undefined)assert.equal(raw.length,expected.bytes);
+  const actual=previous?qualified:{path:ref.path,sha256:qualified.sha256,bytes:raw.length};if(bound.has(actual.path))assert.deepEqual(bound.get(actual.path),actual);else bound.set(actual.path,actual);return raw;};
  member({path:transportPath,sha256:transportHash});
  const body=JSON.parse(member({path:REVIEW,sha256:REVIEW_HASH})),qualification=JSON.parse(member({path:QUALIFICATION,sha256:QUALIFICATION_HASH}));
  assert.equal(qualification.individual_review.sha256,REVIEW_HASH);assert.equal(qualification.original_commits,5);assert.equal(qualification.original_hunks,42);
@@ -90,19 +100,28 @@ function inspectBoundarySource({root=ROOT,read=root===ROOT?defaultRead:path=>reg
  const portableRaw=member(M3_PORTABLE_WITNESSES['21.x']),portableScope=JSON.parse(portableRaw);member(M3_PORTABLE_WITNESSES.main);
  for(const ref of [...portableScope.input_members,...portableScope.loaded_sources,...portableScope.measurement_tools_from_review_worktree,portableScope.producer])member(ref);
  historicalM3MeasurementView({portable:portableScope,historical:scope});
- const assertCurrent=()=>{epoch.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late M3-theme-boundary input '+ref.path);assert.equal(raw.length,ref.bytes);}};
- assertCurrent();return {body,scope,portableScope,scopeHash:hash(scopeRaw)+':'+hash(portableRaw),bound:[...bound.values()],assertCurrent};
+ const expected=current.expectedReport();
+ const assertCurrent=()=>{epoch.assertCurrent();current.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late M3-theme-boundary input '+ref.path);assert.equal(raw.length,ref.bytes);}physical.assertPhysical();};
+ assertCurrent();return {body,scope,portableScope,currentExpected:expected,scopeHash:hash(scopeRaw)+':'+hash(portableRaw)+':'+hash(JSON.stringify(expected)),bound:[...bound.values()],assertSuccessor:actual=>{const portable=current.assertSuccessor(actual);historicalM3MeasurementView({portable,historical:scope});assertCurrent();physical.assertPhysical();return structuredClone(scope);},assertPhysical:physical.assertPhysical,assertCurrent};
+}
+function captureSourceArgs(args){
+ assert.ok(args&&typeof args==='object'&&!types.isProxy(args));assert.equal(Object.getPrototypeOf(args),Object.prototype);
+ const descriptors=Object.getOwnPropertyDescriptors(args),values={};
+ for(const key of Reflect.ownKeys(descriptors)){assert.ok(['root','read','entry','body','review','proof'].includes(key));const d=descriptors[key];assert.ok(Object.hasOwn(d,'value'));Object.defineProperty(values,key,{value:d.value,enumerable:true});}
+ const snapshot=captureCurrentSassMetadata(Object.fromEntries(Object.entries(values).filter(([key])=>key!=='read')));
+ const assertCurrent=()=>{assert.equal(Object.getPrototypeOf(args),Object.prototype);const now=Object.getOwnPropertyDescriptors(args);assert.deepEqual(Reflect.ownKeys(now),Reflect.ownKeys(descriptors));for(const key of Reflect.ownKeys(descriptors)){assert.ok(Object.hasOwn(now[key],'value'));assert.equal(now[key].value,descriptors[key].value);for(const flag of ['enumerable','writable','configurable'])assert.equal(now[key][flag],descriptors[key][flag]);}assert.deepEqual(captureCurrentSassMetadata(Object.fromEntries(Object.keys(snapshot).map(key=>[key,now[key].value]))),snapshot);};
+ return {values:{...snapshot,...(Object.hasOwn(values,'read')?{read:values.read}:{})},assertCurrent};
 }
 function sourceOk(args={}){
  try{
-  assert.equal(metadataOk(args),true);const root=args.root??ROOT,read=args.read??(root===ROOT?defaultRead:path=>regular(root,path));
-  const inspected=inspectBoundarySource({root,read});assert.deepEqual(args.body,inspected.body);const rootId=realpathSync(root),previous=measurements.get(read);
+  const captured=captureSourceArgs(args),input=captured.values;assert.equal(metadataOk(input),true);const root=input.root??ROOT,read=input.read??(root===ROOT?defaultRead:path=>regular(root,path));
+  const inspected=inspectBoundarySource({root,read});assert.deepEqual(input.body,inspected.body);const rootId=realpathSync(root),previous=measurements.get(read);
+  assert.equal(typeof measureM3ThemeBoundary,'function');assert.ok(producerImage.toString().includes(functionToString.call(measureM3ThemeBoundary)),'loaded M3 producer differs from guarded source');
   if(!previous||previous.root!==rootId||previous.scopeHash!==inspected.scopeHash){
-   const {measureM3ThemeBoundary}=require('./measure-m3-theme-boundary-contracts.mjs');
-   const actual=measureM3ThemeBoundary({root:rootId});assert.deepEqual(actual,inspected.portableScope,'fresh portable M3-theme-boundary contract differs');
-   historicalM3MeasurementView({portable:actual,historical:inspected.scope});measurements.set(read,{root:rootId,scopeHash:inspected.scopeHash});
+   const actual=measureM3ThemeBoundary({root:rootId});inspected.assertSuccessor(actual);measurements.set(read,{root:rootId,scopeHash:inspected.scopeHash});
   }
-  inspected.assertCurrent();return true;
+  inspected.assertCurrent();captured.assertCurrent();inspected.assertPhysical();return true;
  }catch{return false;}
 }
+
 module.exports={BOUNDARY_SHAS:Object.keys(DIFFS),BOUNDARY_REVIEW:REVIEW,boundaryProof,metadataOk,inspectBoundarySource,sourceOk};

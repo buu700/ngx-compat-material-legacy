@@ -26,7 +26,7 @@ positive.push('exact-current-scope-successor-of-authenticated-historical-receipt
 assert.equal(actual.result,'pass');assert.equal(actual.historical_physical_constructor_executed,false);
 assert.equal(actual.css_or_artifact_admission_granted,false);assert.equal(actual.g11_claim,'not-passed');
 assert.equal(actual.owned_scss_population.length,409);assert.equal(actual.candidate.functions.length,25);
-assert.equal(actual.public_override_mixins.length,20);assert.equal(actual.boundaries.length,8);
+assert.equal(actual.public_override_mixins.length,21);assert.equal(actual.boundaries.length,9);
 assert.equal(actual.compile_calls,2);assert.equal(historical.entry_override_used,false);
 assert.equal(historical.owned_scss_population.length,409);assert.equal(historical.boundaries.length,4);
 assert.equal(historical.public_override_mixins.length,16);assert.equal(historical.candidate.functions.length,25);
@@ -67,7 +67,7 @@ for(const [id,name]of [['public-inspection-export','get-theme-color'],['private-
 }
 assert.ok(read(historicalPath).equals(historicalBytes),'historical receipt changed');
 const summary={line:actual.line,result:'pass',positive,rejected,owned_scss_members:409,historical_functions:25,
- public_override_mixins:20,direct_peer_boundaries:8,compiler_observation_mutants_rejected:2,
+ public_override_mixins:21,direct_peer_boundaries:9,compiler_observation_mutants_rejected:2,
  unsupported_entry_overrides_rejected:2,compiler_mutants_executed:0,actual_compiler_calls:actual.compile_calls,
  historical_receipt_sha256:hash(historicalBytes),historical_receipt_unchanged:true,
  historical_owned_scss_members:409,historical_peer_boundaries:4,historical_public_override_mixins:16,comparison,
