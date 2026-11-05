@@ -43,7 +43,12 @@ class BaseClassGuardPlanTests(unittest.TestCase):
         # launching. subprocess.run kills and reaps a timed-out child before
         # this parent-owned recovery executes, unlike the child's own finally.
         paths = [ROOT / 'scripts/canonical-source-guard-plan.mjs',
-                 ROOT / 'compatibility/rc/21x-base-class-owner-guard-plan-transition-v3.json']
+                 ROOT / 'compatibility/rc/21x-base-class-owner-guard-plan-transition-v3.json',
+                 ROOT / 'compatibility/rc/parent-base-admission-current-source-successor-v1.json',
+                 ROOT / 'scripts/upstream-base-class-removal-admission.cjs',
+                 ROOT / 'scripts/historical-contract-repair-source.mjs',
+                 ROOT / 'scripts/upstream-base-class-removal-source.mjs',
+                 ROOT / 'compatibility/rc/21x-base-class-removal-source-final-review.mjs']
         for family in (ROOT / 'projects/ngx-material-legacy').glob('legacy-*'):
             if family.is_dir() and not family.is_symlink():
                 paths.extend(family.rglob('*.ts'))
@@ -64,7 +69,10 @@ class BaseClassGuardPlanTests(unittest.TestCase):
         self.assertEqual(report['narrow_reentrant_controls'], 4)
         self.assertEqual(report['source_read_pairing_controls'], 4)
         self.assertEqual(report['historical_source_bindings_revalidated'], 715)
-        self.assertEqual(report['rejected_lifetime_faults'], 42)
+        self.assertEqual(report['rejected_lifetime_faults'], 70)
+        self.assertEqual(report['admission_successor_faults_rejected'], 28)
+        self.assertTrue(report['exact_historical_proof_preserved'])
+        self.assertTrue(report['default_source_reader_executed'])
         self.assertTrue(report['owned_source_facade_executed'])
         self.assertEqual(report['standalone_forged_reader_controls'], 2)
         self.assertEqual(report['source_reentrant_controls'], 3)

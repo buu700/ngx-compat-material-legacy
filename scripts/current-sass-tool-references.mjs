@@ -23,6 +23,7 @@ const INPUTS='compatibility/rc/parent-base-class-tool-successor-inputs-v3.json';
 const V2_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v2.json',sha256:'d25ef6684992ececd518f7932bc68f5d43d433df23868d7a376ebf0a9e56a770',bytes:625566};
 const V3_CHECKPOINTS={'21.x':'d8ab97315b6c77b83f42c2bebcf63b2984fff255',main:'59ba0e2aa8b76f71b472ea2831273e44e44b5b57'};
 const V3_SOURCE_ANCHORS={
+ 'scripts/upstream-base-class-removal-admission.cjs':{before:{path:'scripts/upstream-base-class-removal-admission.cjs',sha256:'013cbe4ae44ebebcf8331d2aedca972f15c824dd4e61bc795f0efa188d35b69a',bytes:14322},packet:{path:'compatibility/rc/21x-base-class-removal-admission-canonical-proposal-v6.json',sha256:'720a4fcd0c9d0d67afbeddd106fc9741d7ab34a0848edc1a0f2e6a25019b9881',bytes:3578},member_key:'handler'},
  'scripts/legacy-removal-canonical-stage.mjs':{packet:{path:'compatibility/rc/21x-table-local-compilation-admission-owner-inputs.json',sha256:'1a35dd57edd9952a23d4bb2e8e9783f19583c00badfd7e9846fdbd2abc94f48b',bytes:184121},transition_index:1},
  'tests/test_packed_upstream_ledger_epoch.py':{packet:{path:'compatibility/rc/c04-inventory-owner-inputs.json',sha256:'0d9dfac3813a6dc60644a090a2173ce56eaed1bcbdb32c2be29ce53f32413cdc',bytes:12144},source_member_index:9},
  'scripts/browser-reference-source.mjs':{packet:{path:'compatibility/rc/c04-browser-owner-inputs.json',sha256:'710201dd63bfb326485cd2933a9747d53f54b2cf833c47ce332816b0e0db526a',bytes:15193},transition_index:2},
@@ -36,7 +37,7 @@ const V3_SOURCE_ANCHORS={
 const V3_REGRESSION_SOURCE_ANCHORS={"21.x":{"tests/browser_reference_source_probe.mjs":{"before":{"path":"tests/browser_reference_source_probe.mjs","sha256":"cca4093034ebb6932fc7e822e70e684413b55d8fff12b40dcccbfdc07713a0e7","bytes":7558},"packet":{"path":"compatibility/rc/c04-browser-reference-source-inputs.json","sha256":"5a8bd910e0d9a64a73558b5da0f48abdf8546b455d8db0fcb921678a0ee0a5ae","bytes":115478},"source_member_index":50},"scripts/browser-reference-proposal.mjs":{"before":{"path":"scripts/browser-reference-proposal.mjs","sha256":"600a430a33955755561f018f46288acd4beed4b9ad4ca6b4daf8aa7cb5bf1d50","bytes":13492},"packet":{"path":"compatibility/rc/c04-browser-owner-inputs.json","sha256":"710201dd63bfb326485cd2933a9747d53f54b2cf833c47ce332816b0e0db526a","bytes":15193},"transition_index":3}},"main":{"tests/browser_reference_source_probe.mjs":{"before":{"path":"tests/browser_reference_source_probe.mjs","sha256":"cca4093034ebb6932fc7e822e70e684413b55d8fff12b40dcccbfdc07713a0e7","bytes":7558},"packet":{"path":"compatibility/rc/c04-browser-reference-source-inputs.json","sha256":"4b0167af85263a3fb652806e25186e8500e02424749adb860610519d28817e6c","bytes":115393},"source_member_index":48},"tests/checker_reference_source_probe.mjs":{"before":{"path":"tests/checker_reference_source_probe.mjs","sha256":"0c1158d9c1dcbe5a33f6d8f7660e8ad0435b031020a9610f76655f4648f211a8","bytes":15116},"packet":{"path":"compatibility/rc/c04-checker-owner-inputs.json","sha256":"f909f0a47fa49c1c3ba9e84718ad7ba461216cb7da12b61b972be87aa3ba7afc","bytes":12073},"transition_index":0},"scripts/browser-reference-proposal.mjs":{"before":{"path":"scripts/browser-reference-proposal.mjs","sha256":"600a430a33955755561f018f46288acd4beed4b9ad4ca6b4daf8aa7cb5bf1d50","bytes":13492},"packet":{"path":"compatibility/rc/c04-browser-owner-inputs.json","sha256":"d22d4c657197ee2640dd1079861e54fde35e55b9091b7d44f4e024d4b37b46cb","bytes":15192},"transition_index":3},"scripts/checker-reference-proposal.mjs":{"before":{"path":"scripts/checker-reference-proposal.mjs","sha256":"22c49ba434ee0b1253ad2815b77510adb8259cc3f307005f6b66b73e522502ac","bytes":13095},"packet":{"path":"compatibility/rc/c04-checker-owner-inputs.json","sha256":"f909f0a47fa49c1c3ba9e84718ad7ba461216cb7da12b61b972be87aa3ba7afc","bytes":12073},"transition_index":2},"scripts/browser-reference-source.mjs":{"before":{"path":"scripts/browser-reference-source.mjs","sha256":"59f2ac538149e0d9b2176c231a97147862881fb19b46768a5a4e450d66f9fe38","bytes":10443},"packet":{"path":"compatibility/rc/c04-browser-owner-inputs.json","sha256":"d22d4c657197ee2640dd1079861e54fde35e55b9091b7d44f4e024d4b37b46cb","bytes":15192},"transition_index":2}}};
 const PREVIOUS_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v1.json',sha256:'ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f',bytes:478008};
 const CHECKPOINTS={'21.x':'b25aedd02f7b53e8cd8dfcdad369a806a1301619',main:'5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'};
-const INPUTS_SHA='fede9d004968e81c13a5de2ec27be201003513d83735f55f3f8c6d7c01ef48eb';
+const INPUTS_SHA='b263cc37bebdf21c6b3e73364b21e50e6a639f7f5fc2126885098a9c7f04ceb1';
 const image=readFileSync(fileURLToPath(import.meta.url));
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const reference=(path,raw)=>({path,sha256:hash(raw),bytes:raw.length});
@@ -206,6 +207,7 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
   else{
    assert.ok(line==='21.x'||update.path==='scripts/historical-contract-repair-source.mjs'||Object.hasOwn(V3_REGRESSION_SOURCE_ANCHORS[line],update.path),'unknown non-21.x V3 new-row path');
    const finiteBefore={
+    'scripts/upstream-base-class-removal-admission.cjs':{path:update.path,sha256:'013cbe4ae44ebebcf8331d2aedca972f15c824dd4e61bc795f0efa188d35b69a',bytes:14322},
     'scripts/historical-contract-repair-source.mjs':{path:update.path,sha256:'d4870c2cc12609da71b03c1745996693dd26444b2dfd848260cfda1ac3514da5',bytes:13052},
     'scripts/legacy-removal-canonical-stage.mjs':{path:update.path,sha256:'9b5021340fcab66f2c2b45447b5162f0e25b002b45c7ea7c062c8087dfb80d6c',bytes:8412},
     'tests/test_packed_upstream_ledger_epoch.py':{path:update.path,sha256:'f7b3ae0ede9bd62fb033c49017a84d5b4ca81ce8b7920d72a105b1df1393e6df',bytes:17868},
@@ -225,7 +227,7 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
    const anchor=V3_REGRESSION_SOURCE_ANCHORS[line][update.path]??V3_SOURCE_ANCHORS[update.path];
    if(anchor){
     const packet=JSON.parse(member(anchor.packet));
-    const expected=Object.hasOwn(anchor,'source_member_index')?packet.source_members[anchor.source_member_index]:packet.code_transitions[anchor.transition_index].after;
+    const expected=Object.hasOwn(anchor,'source_member_index')?packet.source_members[anchor.source_member_index]:(Object.hasOwn(anchor,'member_key')?packet[anchor.member_key]:packet.code_transitions[anchor.transition_index].after);
     assert.deepEqual(expected,update.before,'V3 new source row differs from immutable owner anchor');
    }
    row={path:update.path,before:{sha256:update.before.sha256,bytes:update.before.bytes},identities:new Map()};rows.set(update.path,row);

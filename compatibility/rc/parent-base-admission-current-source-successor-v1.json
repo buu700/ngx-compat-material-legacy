@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "role": "base-class-admission-current-source-successor",
+  "line": "21.x",
+  "source_parent": "d8ab97315b6c77b83f42c2bebcf63b2984fff255",
+  "historical_owner_inputs": {
+    "path": "compatibility/rc/21x-base-class-removal-admission-owner-inputs-v1.json",
+    "sha256": "7c72a44224d6bd9f3eb141fdffb15d0f7ec11cb21b0f466500f10f12742e8e18",
+    "bytes": 7115
+  },
+  "historical_proposal": {
+    "path": "compatibility/rc/21x-base-class-removal-admission-canonical-proposal-v6.json",
+    "sha256": "720a4fcd0c9d0d67afbeddd106fc9741d7ab34a0848edc1a0f2e6a25019b9881",
+    "bytes": 3578
+  },
+  "code_transitions": [
+    {
+      "path": "scripts/upstream-base-class-removal-admission.cjs",
+      "before": {
+        "path": "scripts/upstream-base-class-removal-admission.cjs",
+        "sha256": "013cbe4ae44ebebcf8331d2aedca972f15c824dd4e61bc795f0efa188d35b69a",
+        "bytes": 14322,
+        "git_blob": "b84db873599d6908d9445dfc9281007ac0a1617b"
+      },
+      "after": {
+        "path": "scripts/upstream-base-class-removal-admission.cjs",
+        "sha256": "0bc2ac430dc20dc9962abd381ba8261ee31a32f95bc373466c0d870a86a9f5bb",
+        "bytes": 17053
+      },
+      "edits": [
+        {
+          "offset": 1236,
+          "before": "const image = readFileSync(__filename), handlerRef = {path: HANDLER, sha256: hash(image), bytes: image.length};\n",
+          "after": "// The v6 proof names the reviewed historical handler as immutable DATA.\n// The actually loaded executable is independently bound as a current member.\nconst image = readFileSync(__filename), currentHandlerRef = {path: HANDLER, sha256: hash(image), bytes: image.length};\nconst handlerRef = Object.freeze({path: HANDLER, sha256: '013cbe4ae44ebebcf8331d2aedca972f15c824dd4e61bc795f0efa188d35b69a', bytes: 14322});\nconst producerTransitions = Object.freeze([{\"before\":{\"path\":\"scripts/upstream-base-class-removal-source.mjs\",\"sha256\":\"1c127473aac8050d206b38c531eb8386492bbc4114acabd7d4a42dd80c30b17b\",\"bytes\":12495},\"after\":{\"path\":\"scripts/upstream-base-class-removal-source.mjs\",\"sha256\":\"2a225cd654fe4940aec34987c7b46453fa624b70743ae5fa63d73ce2341358e2\",\"bytes\":12610}},{\"before\":{\"path\":\"compatibility/rc/21x-base-class-removal-source-final-review.mjs\",\"sha256\":\"67fbedb4ac7310218123d4248f8f93519a9d9c7a03d5ecfccae398f78543084b\",\"bytes\":22339},\"after\":{\"path\":\"compatibility/rc/21x-base-class-removal-source-final-review.mjs\",\"sha256\":\"9fb47887c2389e0e40a8ba1fa4e2086e844d96940d82387d8b69c12b739839f0\",\"bytes\":22459}},{\"before\":{\"path\":\"scripts/historical-contract-repair-source.mjs\",\"sha256\":\"d4870c2cc12609da71b03c1745996693dd26444b2dfd848260cfda1ac3514da5\",\"bytes\":13052},\"after\":{\"path\":\"scripts/historical-contract-repair-source.mjs\",\"sha256\":\"c40c2eedcf643c3173619402bfcce29699cd56cf1f9606de311c3d651f946ba4\",\"bytes\":17590}}]);\nconst bufferEquals = Buffer.prototype.equals;\nconst equal = (actual, supplied) => Buffer.isBuffer(supplied) && Reflect.apply(bufferEquals, actual, [supplied]);\nfunction currentSourceReference(ref) {\n  const row = producerTransitions.find(row => row.before.path === ref.path);\n  if (!row) return ref;\n  assert.deepEqual(ref, row.before, 'unknown base-class producer predecessor');\n  return row.after;\n}\n"
+        },
+        {
+          "offset": 1830,
+          "before": "const {verifyBaseClassRemovalOriginal} = require('./upstream-base-class-removal-source.mjs');\nconst {validateBaseClassRemovalReview} = require('../' + SOURCE + 'final-review.mjs');\nconst {historicalContractRepairSourceSubject, readHistoricalContractRepairMember} = require('./historical-contract-repair-source.mjs');\n",
+          "after": "const {verifyBaseClassRemovalOriginal, baseClassRemovalOriginalLoadedImage} = require('./upstream-base-class-removal-source.mjs');\nconst {validateBaseClassRemovalReview, baseClassRemovalReviewLoadedImage} = require('../' + SOURCE + 'final-review.mjs');\nconst {historicalContractRepairSourceSubject, readHistoricalContractRepairMember, historicalContractRepairLoadedImage} = require('./historical-contract-repair-source.mjs');\n// Producer-owned identities describe each module's own evaluation, even if\n// it was cached before this CJS loaded. Disk-at-import is not load provenance.\nconst loadedSourceReferences = Object.freeze([\n  Object.freeze({...currentHandlerRef}), baseClassRemovalOriginalLoadedImage,\n  baseClassRemovalReviewLoadedImage, historicalContractRepairLoadedImage,\n]);\n"
+        },
+        {
+          "offset": 2383,
+          "before": "  [historicalContractRepairSourceSubject, '03b7124b9363c1c2a6d0b240d3f1d6de1ced5fa1073e34cbe90a414d84a663f4'],\n",
+          "after": "  [historicalContractRepairSourceSubject, '55ebd20ad161283c156eedcd009fd64b374118bf3dfaa26ad5f633684875157c'],\n"
+        },
+        {
+          "offset": 2605,
+          "before": "",
+          "after": "const loadedProducerFunctionSha256 = Object.freeze(producerFunctions.map(([fn]) =>\n  Object.freeze({name: fn.name, sha256: hash(Reflect.apply(functionToString, fn, []))})));\n"
+        },
+        {
+          "offset": 6194,
+          "before": "    if (providedRead) { const provided = providedRead(path); assert.ok(Buffer.isBuffer(provided) && provided.equals(actual), 'nonphysical base-class admission input ' + path); }\n",
+          "after": "    if (providedRead) { const provided = providedRead(path); assert.ok(equal(actual, provided), 'nonphysical base-class admission input ' + path); }\n    assert.ok(equal(actual, readHistoricalContractRepairMember(root, path)), 'base-class admission input changed during callback ' + path);\n"
+        },
+        {
+          "offset": 6846,
+          "before": "  member(handlerRef); member({path: REVIEW, sha256: REVIEW_HASH});\n",
+          "after": "  member(currentHandlerRef); member({path: REVIEW, sha256: REVIEW_HASH});\n"
+        },
+        {
+          "offset": 6965,
+          "before": "  for (const ref of body.source_inputs) member(ref);\n",
+          "after": "  for (const ref of body.source_inputs) member(currentSourceReference(ref));\n"
+        },
+        {
+          "offset": 9106,
+          "before": "    member(successor || ref);\n",
+          "after": "    member(successor || currentSourceReference(ref));\n"
+        },
+        {
+          "offset": 11254,
+          "before": "    else member(ref);\n",
+          "after": "    else member(currentSourceReference(ref));\n"
+        },
+        {
+          "offset": 11929,
+          "before": "      if (providedRead) { const provided = providedRead(ref.path); assert.ok(Buffer.isBuffer(provided) && provided.equals(actual), 'late nonphysical base-class admission input ' + ref.path); }\n",
+          "after": "      if (providedRead) { const provided = providedRead(ref.path); assert.ok(equal(actual, provided), 'late nonphysical base-class admission input ' + ref.path); }\n      assert.ok(equal(actual, readHistoricalContractRepairMember(root, ref.path)), 'base-class admission input changed during callback ' + ref.path);\n"
+        },
+        {
+          "offset": 14235,
+          "before": "  baseClassRemovalProof, metadataOk, inspectSource, sourceOk, inspectCanonicalSource};\n",
+          "after": "  baseClassRemovalProof, metadataOk, inspectSource, sourceOk, inspectCanonicalSource, loadedSourceReferences, loadedProducerFunctionSha256};\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/upstream-base-class-removal-source.mjs",
+      "after": {
+        "path": "scripts/upstream-base-class-removal-source.mjs",
+        "sha256": "2a225cd654fe4940aec34987c7b46453fa624b70743ae5fa63d73ce2341358e2",
+        "bytes": 12610
+      },
+      "edits": [
+        {
+          "offset": 1382,
+          "before": "",
+          "after": "export const baseClassRemovalOriginalLoadedImage=Object.freeze({path:SELF,sha256:hash(image),bytes:image.length});\n"
+        }
+      ],
+      "before": {
+        "path": "scripts/upstream-base-class-removal-source.mjs",
+        "sha256": "1c127473aac8050d206b38c531eb8386492bbc4114acabd7d4a42dd80c30b17b",
+        "bytes": 12495,
+        "git_blob": "ef9a77b0941e2c257ae8f9c89709b6f3907c39d0"
+      }
+    },
+    {
+      "path": "compatibility/rc/21x-base-class-removal-source-final-review.mjs",
+      "after": {
+        "path": "compatibility/rc/21x-base-class-removal-source-final-review.mjs",
+        "sha256": "9fb47887c2389e0e40a8ba1fa4e2086e844d96940d82387d8b69c12b739839f0",
+        "bytes": 22459
+      },
+      "edits": [
+        {
+          "offset": 1023,
+          "before": "",
+          "after": "export const baseClassRemovalReviewLoadedImage = Object.freeze({path: SELF, sha256: hash(image), bytes: image.length});\n"
+        }
+      ],
+      "before": {
+        "path": "compatibility/rc/21x-base-class-removal-source-final-review.mjs",
+        "sha256": "67fbedb4ac7310218123d4248f8f93519a9d9c7a03d5ecfccae398f78543084b",
+        "bytes": 22339,
+        "git_blob": "d9491b9a8cecc5b85ecb23bff81a4887193f3e5e"
+      }
+    },
+    {
+      "path": "scripts/historical-contract-repair-source.mjs",
+      "after": {
+        "path": "scripts/historical-contract-repair-source.mjs",
+        "sha256": "c40c2eedcf643c3173619402bfcce29699cd56cf1f9606de311c3d651f946ba4",
+        "bytes": 17590
+      },
+      "edits": [
+        {
+          "offset": 670,
+          "before": "",
+          "after": "import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';\n"
+        },
+        {
+          "offset": 1097,
+          "before": "",
+          "after": "export const historicalContractRepairLoadedImage=Object.freeze({path:SELF,sha256:hash(image),bytes:image.length});\n"
+        },
+        {
+          "offset": 3177,
+          "before": "",
+          "after": "const planner=composeCanonicalSourceGuards, functionToString=Function.prototype.toString;\nconst equals=Buffer.prototype.equals,apply=Reflect.apply;\nconst equal=(a,b)=>Buffer.isBuffer(b)&&apply(equals,a,[b]);\nconst PLANNER=Object.freeze({path:'scripts/canonical-source-guard-plan.mjs',sha256:'4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f',bytes:4609});\nfunction assertPlanner(root){\n assert.equal(composeCanonicalSourceGuards,planner,'changed historical repair guard planner');\n assert.equal(hash(functionToString.call(planner)),'fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947','unauthenticated historical repair guard planner');\n const raw=readEvidenceMember(root,PLANNER.path);assert.equal(hash(raw),PLANNER.sha256,'changed physical historical repair guard planner');assert.equal(raw.length,PLANNER.bytes);\n}\n\nconst producerIdentityTransitions=Object.freeze([{\"path\":\"scripts/upstream-base-class-removal-source.mjs\",\"after\":{\"path\":\"scripts/upstream-base-class-removal-source.mjs\",\"sha256\":\"2a225cd654fe4940aec34987c7b46453fa624b70743ae5fa63d73ce2341358e2\",\"bytes\":12610},\"edits\":[{\"offset\":1382,\"before\":\"\",\"after\":\"export const baseClassRemovalOriginalLoadedImage=Object.freeze({path:SELF,sha256:hash(image),bytes:image.length});\\n\"}],\"before\":{\"path\":\"scripts/upstream-base-class-removal-source.mjs\",\"sha256\":\"1c127473aac8050d206b38c531eb8386492bbc4114acabd7d4a42dd80c30b17b\",\"bytes\":12495,\"git_blob\":\"ef9a77b0941e2c257ae8f9c89709b6f3907c39d0\"}},{\"path\":\"compatibility/rc/21x-base-class-removal-source-final-review.mjs\",\"after\":{\"path\":\"compatibility/rc/21x-base-class-removal-source-final-review.mjs\",\"sha256\":\"9fb47887c2389e0e40a8ba1fa4e2086e844d96940d82387d8b69c12b739839f0\",\"bytes\":22459},\"edits\":[{\"offset\":1023,\"before\":\"\",\"after\":\"export const baseClassRemovalReviewLoadedImage = Object.freeze({path: SELF, sha256: hash(image), bytes: image.length});\\n\"}],\"before\":{\"path\":\"compatibility/rc/21x-base-class-removal-source-final-review.mjs\",\"sha256\":\"67fbedb4ac7310218123d4248f8f93519a9d9c7a03d5ecfccae398f78543084b\",\"bytes\":22339,\"git_blob\":\"d9491b9a8cecc5b85ecb23bff81a4887193f3e5e\"}}]);\nfunction currentProducerReference(root,line,ref){\n if(line!=='21.x')return ref;\n const row=producerIdentityTransitions.find(row=>row.path===ref.path);if(!row)return ref;\n const before={path:row.path,sha256:row.before.sha256,bytes:row.before.bytes};\n assert.deepEqual(ref,before,'unknown historical-repair producer predecessor');\n const old=original(root,'d8ab97315b6c77b83f42c2bebcf63b2984fff255',row.path);\n assert.equal(hash(old),before.sha256);assert.equal(old.length,before.bytes);\n const edit=row.edits[0],literal=Buffer.from(edit.before);\n assert.ok(equal(old.subarray(edit.offset,edit.offset+literal.length),literal));\n const after=Buffer.concat([old.subarray(0,edit.offset),Buffer.from(edit.after),old.subarray(edit.offset+literal.length)]);\n assert.equal(hash(after),row.after.sha256);assert.equal(after.length,row.after.bytes);\n return row.after;\n}\n"
+        },
+        {
+          "offset": 3276,
+          "before": " root=resolve(root);const physical=path=>readHistoricalContractRepairMember(root,path),bound=new Map();\n",
+          "after": " root=resolve(root);assertPlanner(root);const physical=path=>readHistoricalContractRepairMember(root,path),bound=new Map();\n"
+        },
+        {
+          "offset": 3431,
+          "before": "  if(providedRead){const provided=providedRead(path);assert.ok(Buffer.isBuffer(provided)&&provided.equals(actual),'nonphysical current historical-repair input '+path);}\n",
+          "after": "  if(providedRead){const provided=providedRead(path);assert.ok(equal(actual,provided),'nonphysical current historical-repair input '+path);}\n  assert.ok(equal(actual,physical(path)),'historical-repair input changed during callback '+path);\n"
+        },
+        {
+          "offset": 4603,
+          "before": " const member=ref=>{const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'changed historical-repair evidence '+ref.path);if(ref.bytes!==undefined)assert.equal(bytes.length,ref.bytes);return bytes;};\n",
+          "after": " const member=ref=>{const expected=currentProducerReference(root,line,ref);const bytes=read(ref.path);assert.equal(hash(bytes),expected.sha256,'changed historical-repair evidence '+ref.path);if(expected.bytes!==undefined)assert.equal(bytes.length,expected.bytes);return bytes;};\n"
+        },
+        {
+          "offset": 10377,
+          "before": " const selectedReference=(ref,side)=>{\n",
+          "after": " let active=false;\n const idle=()=>assert.equal(active,false,'reentrant historical repair source operation');\n const selectedReferenceCore=(ref,side)=>{\n"
+        },
+        {
+          "offset": 10892,
+          "before": "  if(providedRead)assert.ok(Buffer.from(providedRead(ref.path)).equals(actual),'nonphysical historical-repair source reference '+ref.path);\n",
+          "after": "  if(providedRead)assert.ok(equal(actual,Buffer.from(providedRead(ref.path))),'nonphysical historical-repair source reference '+ref.path);\n  assert.ok(equal(actual,physical(ref.path)),'historical-repair source reference changed during callback '+ref.path);\n"
+        },
+        {
+          "offset": 11133,
+          "before": "",
+          "after": " const selectedReference=(ref,side)=>{\n  if(!images.has(ref.path))return null;\n  idle();active=true;try{return selectedReferenceCore(ref,side);}finally{active=false;}\n };\n"
+        },
+        {
+          "offset": 11242,
+          "before": " const compareSourceReport=(current,historical)=>{\n",
+          "after": " const compareSourceReport=(current,historical)=>{idle();active=true;try{\n"
+        },
+        {
+          "offset": 11494,
+          "before": "  derived.current_members=derived.current_members.map(ref=>{const selected=qualify(ref);if(!selected)return ref;if(selected.sha256!==ref.sha256)changed++;return selected;});\n",
+          "after": "  derived.current_members=derived.current_members.map(ref=>{const selected=selectedReferenceCore(ref,'after');if(!selected)return ref;if(selected.sha256!==ref.sha256)changed++;return selected;});\n"
+        },
+        {
+          "offset": 12044,
+          "before": " };\n const assertCurrent=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);if(providedRead)assert.ok(Buffer.from(providedRead(ref.path)).equals(actual),'late nonphysical historical-repair input '+ref.path);}};\n assertCurrent();return {line,images:structuredClone([...images.values()]),bound:structuredClone([...bound.values()]),qualify,historicalReference,compareSourceReport,assertCurrent,\n",
+          "after": " }finally{active=false;}};\n const sweep=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);}};\n const guardNode=Object.freeze({dependencies:Object.freeze([]),\n  preflight:()=>{idle();assertPlanner(root);sweep();},\n  consume:()=>{idle();active=true;try{for(const ref of bound.values()){\n   const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);\n   if(providedRead)assert.ok(equal(actual,Buffer.from(providedRead(ref.path))),'late nonphysical historical-repair input '+ref.path);\n   assert.ok(equal(actual,physical(ref.path)),'historical-repair input changed during callback '+ref.path);\n  }}finally{active=false;}},\n  final:()=>{idle();sweep();assertPlanner(root);},\n });\n const composed=planner(Object.freeze([guardNode])),assertCurrent=()=>{idle();composed();};\n const guardPlan=Object.freeze({assertCurrent,node:guardNode});\n assertCurrent();return {line,guardNode,guardPlan,images:structuredClone([...images.values()]),bound:structuredClone([...bound.values()]),qualify,historicalReference,compareSourceReport,assertCurrent,\n"
+        }
+      ],
+      "before": {
+        "path": "scripts/historical-contract-repair-source.mjs",
+        "sha256": "d4870c2cc12609da71b03c1745996693dd26444b2dfd848260cfda1ac3514da5",
+        "bytes": 13052,
+        "git_blob": "f94a752f6cbe51f9054586ff9319842d37692335"
+      }
+    }
+  ],
+  "inspect_source_function_sha256": {
+    "before": "a51ba5f5ab6574b638906895aea1ff462fc120f84ad0a1a4333d8066f19fb389",
+    "after": "789c9016cd5e598f420d6fbde1fef078d2f38779b3db3a0ac4fa7a85d733a047"
+  },
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "canonical_changes_applied": false,
+  "g11_claim": "not-passed",
+  "loaded_source_references": [
+    {
+      "path": "scripts/upstream-base-class-removal-admission.cjs",
+      "sha256": "0bc2ac430dc20dc9962abd381ba8261ee31a32f95bc373466c0d870a86a9f5bb",
+      "bytes": 17053
+    },
+    {
+      "path": "scripts/upstream-base-class-removal-source.mjs",
+      "sha256": "2a225cd654fe4940aec34987c7b46453fa624b70743ae5fa63d73ce2341358e2",
+      "bytes": 12610
+    },
+    {
+      "path": "compatibility/rc/21x-base-class-removal-source-final-review.mjs",
+      "sha256": "9fb47887c2389e0e40a8ba1fa4e2086e844d96940d82387d8b69c12b739839f0",
+      "bytes": 22459
+    },
+    {
+      "path": "scripts/historical-contract-repair-source.mjs",
+      "sha256": "c40c2eedcf643c3173619402bfcce29699cd56cf1f9606de311c3d651f946ba4",
+      "bytes": 17590
+    }
+  ],
+  "loaded_producer_function_sha256": [
+    {
+      "name": "verifyBaseClassRemovalOriginal",
+      "sha256": "d67b84def0d5420b818feb336806d70009c0aaee53dab62c6cd7546da1a7fd33"
+    },
+    {
+      "name": "validateBaseClassRemovalReview",
+      "sha256": "7ba2e397b673ed63a07f00a58a5cfdfcfd89238f8d4d574d6cdb992ae6527734"
+    },
+    {
+      "name": "historicalContractRepairSourceSubject",
+      "sha256": "55ebd20ad161283c156eedcd009fd64b374118bf3dfaa26ad5f633684875157c"
+    },
+    {
+      "name": "readHistoricalContractRepairMember",
+      "sha256": "1c68187440d74b8d393de47b7660de0c86aa0c8689a687f125de1db001a8053b"
+    }
+  ]
+}

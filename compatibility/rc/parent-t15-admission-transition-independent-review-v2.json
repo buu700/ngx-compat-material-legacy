@@ -1,0 +1,28 @@
+{
+  "schema": "parent-t15-admission-transition-independent-review-v2",
+  "status": "prior handler counterexample addressed; narrower cached-producer closure gap remains",
+  "scope": "read-only post-test source snapshot; no mutations or tests run",
+  "prior_finding": "The modified CJS helper/restored disk scenario is addressed by comparing CJS own captured loaded image reference and actual inspector/metadata digests to independently pinned transition before frame callbacks. Parent reports the new control passed zero-callback; not independently rerun.",
+  "positive": [
+    "Reconstructed the nine CJS and ten historical-repair literal edits from pinned d8 Git beforeimages: resulting bytes match both actual files.",
+    "Four physical refs and transition packet are checked before supplied reader and added to frame-bound physical sweeps; captured data uses frozen rows and their export pointer identities are checked.",
+    "V6 proposal.handler and body historical repair ref stay historical metadata; afterimages and current executable inputs remain independently bound.",
+    "No direct pin cycle identified: independently pinned packet is owned outside the CJS and historical repair images."
+  ],
+  "finding": {
+    "title": "Producer source references are captured from disk by the CJS, not from the producer module at its own load",
+    "counterexample": "Fresh process: modify a private helper in scripts/historical-contract-repair-source.mjs (e.g. original(), leaving exported historicalContractRepairSourceSubject and readHistoricalContractRepairMember function text unchanged). Import that module first to cache its altered closures, then restore disk. Import CJS and owner afterward. CJS loadedImages reads the restored physical file; loadedProducerFunctionSha256 hashes the unchanged exported function text; both match the packet. The cold frame accepts and calls supplied read even though the cached private helper differs. The existing cachedproducer control changes an exported function body, so its failure does not cover this case.",
+    "location": [
+      "scripts/upstream-base-class-removal-admission.cjs loadedImages construction and loadedProducerFunctionSha256",
+      "scripts/base-class-removal-owner-source.mjs admissionTransitionPhysical"
+    ],
+    "impact": "Fails claimed full loaded repair-module identity and cold-before-callback contract; this does not establish a forged successful owner result.",
+    "resolution": "Capture authenticated load-image provenance inside each genuine producer module at its own evaluation, bind it to the same actual imported module identity and pinned expected image before callbacks, or use another demonstrably equivalent loader-bound provenance mechanism. Include preloaded private-helper-only mutation followed by restored disk in a fresh process, zero callback assertion, exact cleanup and healthy retry. Consider the threat boundary for self-attestation explicitly; data returned by code that itself can be arbitrarily altered cannot alone authenticate that code."
+  },
+  "reported_tests": "Parent reports 11 base-class tests passed, with source restored; this review did not execute or independently verify them.",
+  "limitations": [
+    "No profile/builder/factory independent review here.",
+    "Full producer and full owner success not established; no canonical approval.",
+    "Report is limited to loaded source identity and transition reconstruction."
+  ]
+}

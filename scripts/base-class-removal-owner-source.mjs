@@ -27,6 +27,9 @@ const GUARD_PLAN = Object.freeze({path: 'scripts/canonical-source-guard-plan.mjs
   sha256: '4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f', bytes: 4609});
 const STAGE_TRANSITION = Object.freeze({path: 'compatibility/rc/21x-base-class-owner-guard-plan-transition-v3.json',
   sha256: '879dd05cc50b934d8cfe2a7bfa816ce598ad9cb172272ca7b5dfa2f5087feb71', bytes: 1655});
+const ADMISSION_TRANSITION = Object.freeze({path: 'compatibility/rc/parent-base-admission-current-source-successor-v1.json',
+  sha256: 'f9fc32edb6e1ede3cf647eba6da1901d31a4df6d687dc9aa41139f3ebcfd090e', bytes: 20020});
+const INSPECT_SOURCE_FUNCTION_SHA256 = '789c9016cd5e598f420d6fbde1fef078d2f38779b3db3a0ac4fa7a85d733a047';
 const GUARD_PLAN_FUNCTION_SHA256 = 'fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947';
 const rootDefault = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const image = readFileSync(fileURLToPath(import.meta.url));
@@ -38,6 +41,8 @@ const bufferIsBuffer = Buffer.isBuffer, bufferEquals = Buffer.prototype.equals;
 const apply = Reflect.apply;
 const loadedInspectSource = ownValue(admission, 'inspectSource');
 const loadedMetadataOk = ownValue(admission, 'metadataOk');
+const loadedSourceReferences = ownValue(admission, 'loadedSourceReferences');
+const loadedProducerFunctionSha256 = ownValue(admission, 'loadedProducerFunctionSha256');
 const METADATA_OK_FUNCTION_SHA256 = 'e8974460da41d90caef069888729fac5696ee47ed81f17d193d74bdbabe36485';
 function equalBuffers(actual, supplied) {
   return bufferIsBuffer(supplied) && apply(bufferEquals, actual, [supplied]);
@@ -49,7 +54,11 @@ function ownValue(object, key) {
 }
 /** Callback-free check using the source owner's originally captured inspector. */
 export function assertBaseClassRemovalSourceInspectorIdentity() {
+  assert.equal(ownValue(admission, 'loadedSourceReferences'), loadedSourceReferences, 'late loaded base-class image references change');
+  assert.equal(ownValue(admission, 'loadedProducerFunctionSha256'), loadedProducerFunctionSha256, 'late loaded base-class producer references change');
   assert.equal(ownValue(admission, 'inspectSource'), loadedInspectSource, 'late loaded base-class source inspector change');
+  assert.equal(hash(functionToString.call(loadedInspectSource)), INSPECT_SOURCE_FUNCTION_SHA256,
+    'unauthenticated loaded base-class source inspector');
   assert.equal(ownValue(admission, 'metadataOk'), loadedMetadataOk, 'late loaded base-class metadata predicate change');
   assert.equal(hash(functionToString.call(loadedMetadataOk)), METADATA_OK_FUNCTION_SHA256,
     'unauthenticated loaded base-class metadata predicate');
@@ -112,12 +121,83 @@ function freeze(value) {
   return value;
 }
 
+// Independently pinned transition DATA connects the historical v6 proof to
+// current executable files. Reconstruct immutable Git DATA; never execute it
+// or supply it to a current-file reader. All checks precede caller callbacks.
+function admissionTransitionPhysical(root) {
+  assertBaseClassRemovalSourceInspectorIdentity();
+  const raw = physical(root, ADMISSION_TRANSITION.path);
+  assert.equal(hash(raw), ADMISSION_TRANSITION.sha256, 'changed base-class admission transition');
+  assert.equal(raw.length, ADMISSION_TRANSITION.bytes);
+  const transition = JSON.parse(raw);
+  // These captured references describe actual module-load images and function
+  // text. Restoring disk after import cannot reattribute an older executable.
+  for (const [name, captured, expected] of [
+    ['loadedSourceReferences', loadedSourceReferences, transition.loaded_source_references],
+    ['loadedProducerFunctionSha256', loadedProducerFunctionSha256, transition.loaded_producer_function_sha256],
+  ]) {
+    assert.equal(ownValue(admission, name), captured, 'changed loaded base-class identity data');
+    assert.ok(Array.isArray(captured) && Object.isFrozen(captured), 'mutable loaded base-class identity data');
+    assert.equal(captured.length, expected.length, 'changed loaded base-class identity population');
+    for (let index = 0; index < expected.length; index++) {
+      const actual = ownValue(captured, String(index));
+      assert.ok(Object.isFrozen(actual), 'mutable loaded base-class member identity');
+      assert.deepEqual(Reflect.ownKeys(actual).sort(), Object.keys(expected[index]).sort());
+      for (const key of Object.keys(expected[index])) {
+        assert.equal(ownValue(actual, key), expected[index][key], 'unauthenticated loaded base-class ' + name);
+      }
+    }
+  }
+  for (const ref of transition.loaded_source_references) {
+    const actual = physical(root, ref.path);
+    assert.equal(hash(actual), ref.sha256, 'changed loaded base-class producer file ' + ref.path);
+    assert.equal(actual.length, ref.bytes);
+  }
+  assert.equal(transition.schema_version, 1);
+  assert.equal(transition.role, 'base-class-admission-current-source-successor');
+  assert.equal(transition.line, '21.x');
+  assert.equal(transition.source_parent, 'd8ab97315b6c77b83f42c2bebcf63b2984fff255');
+  assert.equal(transition.source_scope_only, true);
+  assert.equal(transition.historical_programs_executed, false);
+  assert.equal(transition.canonical_changes_applied, false);
+  assert.equal(transition.g11_claim, 'not-passed');
+  assert.deepEqual(transition.historical_owner_inputs, {path: INPUTS, sha256: INPUTS_SHA256, bytes: 7115});
+  assert.deepEqual(transition.inspect_source_function_sha256, {
+    before: 'a51ba5f5ab6574b638906895aea1ff462fc120f84ad0a1a4333d8066f19fb389',
+    after: INSPECT_SOURCE_FUNCTION_SHA256,
+  });
+  assert.deepEqual(transition.code_transitions.map(row => row.path), [
+    'scripts/upstream-base-class-removal-admission.cjs', 'scripts/upstream-base-class-removal-source.mjs',
+    'compatibility/rc/21x-base-class-removal-source-final-review.mjs', 'scripts/historical-contract-repair-source.mjs',
+  ]);
+  for (const row of transition.code_transitions) {
+    assert.equal(row.before.path, row.path); assert.equal(row.after.path, row.path);
+    const before = original(root, transition.source_parent, row.before);
+    let cursor = 0;
+    const parts = [];
+    for (const edit of row.edits) {
+      assert.deepEqual(Object.keys(edit).sort(), ['after', 'before', 'offset']);
+      assert.ok(Number.isSafeInteger(edit.offset) && edit.offset >= cursor && edit.offset <= before.length);
+      assert.equal(typeof edit.before, 'string'); assert.equal(typeof edit.after, 'string');
+      const old = Buffer.from(edit.before);
+      assert.ok(equalBuffers(before.subarray(edit.offset, edit.offset + old.length), old), 'changed admission literal preimage');
+      parts.push(before.subarray(cursor, edit.offset), Buffer.from(edit.after));
+      cursor = edit.offset + old.length;
+    }
+    const after = Buffer.concat([...parts, before.subarray(cursor)]);
+    assert.equal(hash(after), row.after.sha256); assert.equal(after.length, row.after.bytes);
+    assert.ok(equalBuffers(after, physical(root, row.path)), 'changed current base-class admission source ' + row.path);
+  }
+  return transition;
+}
+
 /** Only actual physical callbacks are accepted. No historical-reader fallback. */
 export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read = path => physical(root, path)} = {}) {
   assert.equal(resolve(root), rootDefault);
   // Reject a poisoned planner before any supplied read callback can restore it.
   assertGuardPlanIdentity();
   assertGuardPlanPhysical(root);
+  const admissionTransition = admissionTransitionPhysical(root);
   const transitionPhysical = physical(root, STAGE_TRANSITION.path);
   assert.equal(hash(transitionPhysical), STAGE_TRANSITION.sha256, 'changed base-class guard-plan transition');
   assert.equal(transitionPhysical.length, STAGE_TRANSITION.bytes);
@@ -138,6 +218,8 @@ export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read 
     return raw;
   };
   member(GUARD_PLAN);
+  member(ADMISSION_TRANSITION);
+  for (const ref of admissionTransition.loaded_source_references) member(ref);
   const transition = JSON.parse(member(STAGE_TRANSITION));
   assert.equal(hash(image), BASE_CLASS_REMOVAL_OWNER_SOURCE_SHA256, 'loaded base-class leaf differs from stage pin');
   assert.ok(equalBuffers(current(SELF), image), 'loaded/current base-class leaf differs');
@@ -149,11 +231,20 @@ export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read 
   assert.equal(packet.g11_claim, 'not-passed');
   assert.ok(JSON.parse(current('projects/ngx-material-legacy/package.json')).version.startsWith('21.'));
   const proposal = JSON.parse(member(packet.proposal));
+  assert.deepEqual(packet.proposal, admissionTransition.historical_proposal);
+  assert.equal(packet.source_parent, admissionTransition.source_parent);
+  assert.equal(packet.inspect_source_function_sha256, admissionTransition.inspect_source_function_sha256.before);
   assert.equal(proposal.sha, admission.BASE_CLASS_REMOVAL_SHA);
   assert.equal(proposal.canonical_ledger_applied, false); assert.equal(proposal.canonical_registry_applied, false);
   assert.equal(proposal.canonical_admission_granted, false); assert.equal(proposal.full_owner_integration_qualified, false);
   const body = JSON.parse(member(proposal.review));
-  member(proposal.handler);
+  const historicalHandler = admissionTransition.code_transitions[0].before;
+  assert.deepEqual(proposal.handler, {path: historicalHandler.path, sha256: historicalHandler.sha256, bytes: historicalHandler.bytes});
+  for (const row of admissionTransition.code_transitions.slice(1)) {
+    const ref = row.before;
+    assert.deepEqual(body.source_inputs.find(member => member.path === ref.path),
+      {path: ref.path, sha256: ref.sha256, bytes: ref.bytes});
+  }
   const oldStage = original(root, packet.source_parent, packet.stage_before);
   assert.deepEqual(proposal.stage, {path: STAGE, sha256: packet.stage_before.sha256, bytes: packet.stage_before.bytes});
   const marker = '__BASE_OWNER_IMAGE_SHA256__';
@@ -290,23 +381,24 @@ export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read 
     applied, registryApplied, precursor, registrySubject, ledgerSubject, predecessorData,
     ownsReference, predecessorReference, qualifyReference, comparisonBytes,
     bound: structuredClone([...bound.values()]), guardNode, assertCurrent,
+    inspectSourceFunctionSha256: admissionTransition.inspect_source_function_sha256.after,
     source_scope_only: true, canonical_frame_admission_granted: false,
     current_native_packed_browser_floor_or_full_audit_qualified: false};
 }
 
 /** Fresh factual qualification plus owned frame/source guard operations. */
-export function baseClassRemovalOwnerSourceSubject({root = rootDefault, read = path => physical(root, path)} = {}) {
+export function baseClassRemovalOwnerSourceSubject({root = rootDefault, read = path => readHistoricalContractRepairMember(root, path)} = {}) {
   assertBaseClassRemovalSourceInspectorIdentity();
   const frames = baseClassRemovalCanonicalFrameSubject({root, read});
   const body = structuredClone(frames.body), entry = structuredClone(frames.stage.entries[0]);
-  // The unchanged inspector freshly computes every original fact on physical
+  // The current inspector freshly computes every original fact on physical
   // bytes. Its private repair references are also inserted into its source
   // bound. Capture that complete judgment set before any further caller read.
   // Supplied-reader validation belongs to the real source operation below;
   // no source bytes, parsed program or successful verdict are retained here.
   const request = {root, entry, body, review: body, proof: entry.individual_proof};
   assert.equal(ownValue(admission, 'inspectSource'), loadedInspectSource, 'changed loaded base-class source inspector');
-  assert.equal(hash(functionToString.call(loadedInspectSource)), frames.packet.inspect_source_function_sha256, 'unauthenticated loaded base-class source inspector');
+  assert.equal(hash(functionToString.call(loadedInspectSource)), frames.inspectSourceFunctionSha256, 'unauthenticated loaded base-class source inspector');
   const physicalSource = loadedInspectSource(request);
   const physicalSourceGuard = ownValue(physicalSource, 'assertCurrent');
   const sourceReferences = ownValue(physicalSource, 'bound');

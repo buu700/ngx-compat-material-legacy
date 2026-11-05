@@ -62,7 +62,7 @@ export function applyBaseClassRemovalCanonicalStage({before, body} = {}) {
 import {baseClassRemovalOwnerSourceSubject} from './base-class-removal-owner-source.mjs';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
-export const BASE_CLASS_REMOVAL_OWNER_SOURCE_SHA256 = '52136a19cfe622ca3a8a918bf1d47e15474e581afab1deea99aa7fde2bbfbe04';
+export const BASE_CLASS_REMOVAL_OWNER_SOURCE_SHA256 = '3aa3234ff9520640ace1be923eb7f933e92c3a2e43085f41241db24e4ebb899d';
 const ownerIsBuffer = Buffer.isBuffer, ownerBufferEquals = Buffer.prototype.equals, ownerApply = Reflect.apply;
 const ownerEqual = (actual, supplied) => ownerIsBuffer(supplied) && ownerApply(ownerBufferEquals, actual, [supplied]);
 function ownerValue(object, key) {

@@ -1,0 +1,44 @@
+{
+  "schema": "parent-t15-admission-transition-independent-review-v1",
+  "status": "finding; cold loaded-executable identity incomplete",
+  "scope": "read-only current 21.x owner integration and literal transition reconstruction; no tests or mutation",
+  "evidence": {
+    "transition": "compatibility/rc/parent-base-admission-current-source-successor-v1.json",
+    "pinned_transition_sha256": "f0303e7118535ad4f886e6b48d464396c42b77cb2acef5cdd1591713ec6ece53",
+    "source_parent": "d8ab97315b6c77b83f42c2bebcf63b2984fff255",
+    "independent_literal_reconstruction": [
+      {
+        "path": "scripts/upstream-base-class-removal-admission.cjs",
+        "edits": 6,
+        "git_before_sha256": "013cbe4ae44ebebcf8331d2aedca972f15c824dd4e61bc795f0efa188d35b69a",
+        "after_sha256": "6b46cf1722acc58d28b5b8e1dd578f4a8462e2175883e03a83e898404fa11c2b",
+        "equals_live": true
+      },
+      {
+        "path": "scripts/historical-contract-repair-source.mjs",
+        "edits": 10,
+        "git_before_sha256": "d4870c2cc12609da71b03c1745996693dd26444b2dfd848260cfda1ac3514da5",
+        "after_sha256": "1a0f3e977ba1779ce3d37f5004dd8932245f692db3f72d5281b1dce8ccc9ff48",
+        "equals_live": true
+      }
+    ]
+  },
+  "positive": [
+    "Packet is independently pinned in owner; it is not included in the CJS or repair image it describes, avoiding this direct hash cycle.",
+    "admissionTransitionPhysical checks exact source_parent and reconstructs full after byte strings from authenticated Git objects before any supplied frame read; member subsequently binds packet, both current files, v6 proposal and original body predecessor.",
+    "Owner hashes captured inspector and metadataOk function strings and checks current own-data pointers before frame callback; frame current and subsequent guard physical sweeps cover admitted references.",
+    "Proposal handler and body source input stay historical while actual current image is separately bound; stage computes and compares existing afterimages. No standalone canonical writes identified."
+  ],
+  "finding": {
+    "title": "Cold physical file and two selected function digests do not authenticate the whole already-loaded CJS image or captured repair module before frame callbacks",
+    "counterexample": "In a fresh process, modify only CJS currentSourceReference or another helper outside inspectSource/metadataOk, import the owner and its CJS dependency, then restore the file before calling baseClassRemovalOwnerSourceSubject. The two captured exported function strings and pointers are unchanged, and admissionTransitionPhysical reconstructs the authentic physical file, so caller read is invoked by frame member before loadedInspectSource later uses the changed captured image and rejects. CJS loadedImages for its repair module and producer-function hashes are also first checked inside inspectSource after frame reads. This violates the stated before-first-supplied-callback loaded-identity requirement, even if eventual qualification fails.",
+    "suggestion": "Bind actual module-load image and loaded repair-module/function identities to exact transition in a callback-free entry check before frame member read, using a narrow immutable provenance check without exposing any reader or registration capability; ensure imported repair function and helper closure cannot be substituted while selected function text stays identical. Test pre-import poison plus restore in fresh process, assert zero callbacks and healthy isolated retry.",
+    "severity": "blocking for the requested cold identity contract; not an assertion of a successful forged owner result"
+  },
+  "test_requirements": "See /tmp/parent-t15-transition-adversarial-test-plan-v1.json; update function/path details for final implementation and preserve actual fault triggers and recovery checks.",
+  "limitations": [
+    "The CJS and owner may still be under active editing; this is a snapshot, not a test pass.",
+    "No full owner success, artifact or canonical approval claimed.",
+    "Profile and builder/factory transitions not independently validated in this bounded source review."
+  ]
+}

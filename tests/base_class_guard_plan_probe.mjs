@@ -7,6 +7,8 @@
 /** Actual prepared frame/source lifetime controls; no composed owner or compiler. */
 import assert from 'node:assert/strict';
 import {readFileSync, writeFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {gunzipSync} from 'node:zlib';
 import {join} from 'node:path';
 import admission from '../scripts/upstream-base-class-removal-admission.cjs';
 import {baseClassRemovalCanonicalFrameSubject, baseClassRemovalOwnerSourceSubject} from '../scripts/base-class-removal-owner-source.mjs';
@@ -16,6 +18,12 @@ import {composeCanonicalSourceGuards} from '../scripts/canonical-source-guard-pl
 
 const root = process.cwd(), helper = 'scripts/canonical-source-guard-plan.mjs';
 const transition = 'compatibility/rc/21x-base-class-owner-guard-plan-transition-v3.json';
+const admissionTransition = 'compatibility/rc/parent-base-admission-current-source-successor-v1.json';
+const handler = 'scripts/upstream-base-class-removal-admission.cjs';
+const repair = 'scripts/historical-contract-repair-source.mjs';
+const admissionMembers = [admissionTransition, handler, repair, 'scripts/upstream-base-class-removal-source.mjs',
+  'compatibility/rc/21x-base-class-removal-source-final-review.mjs'];
+const hash = raw => createHash('sha256').update(raw).digest('hex');
 const disk = path => readHistoricalContractRepairMember(root, path);
 const helperBefore = disk(helper), inspectorBefore = Object.getOwnPropertyDescriptor(admission, 'inspectSource');
 let calls = 0, onRead = () => {}, override = null, rejected = 0;
@@ -28,7 +36,7 @@ const write = (path, bytes) => writeFileSync(join(root, path), bytes);
 const reset = () => {onRead = () => {}; override = null; calls = 0;};
 
 // The new dependency is checked before any supplied constructor callback.
-for (const path of [helper, transition]) {
+for (const path of [helper, transition, ...admissionMembers]) {
   const before = disk(path);
   write(path, Buffer.concat([before, Buffer.from('\n// cold helper drift\n')]));
   try {
@@ -73,7 +81,7 @@ const sourceOnly = owner.source.bound.find(ref => ref.path.startsWith('projects/
 assert.ok(sourceOnly, 'need an actual source-only member');
 
 // A prepared guard checks every physical scope before the first callback.
-for (const path of [helper, transition, sourceOnly.path]) {
+for (const path of [helper, transition, sourceOnly.path, ...admissionMembers]) {
   const before = disk(path); calls = 0;
   write(path, Buffer.concat([before, Buffer.from('\n// cold prepared drift\n')]));
   try {
@@ -84,7 +92,7 @@ for (const path of [helper, transition, sourceOnly.path]) {
 }
 
 // Actual consumed frame and source bytes are still checked independently.
-for (const target of [helper, transition, sourceOnly.path]) {
+for (const target of [helper, transition, sourceOnly.path, ...admissionMembers]) {
   override = (path, actual) => path === target ? Buffer.concat([actual, Buffer.from('\n// forged callback\n')]) : actual;
   try {reject(owner.assertCurrent);} finally {reset();}
   owner.assertCurrent();
@@ -93,15 +101,17 @@ for (const target of [helper, transition, sourceOnly.path]) {
 // A last source callback can change an earlier frame-only dependency. All
 // final physical checks must execute after the complete consume phase.
 reset(); owner.assertCurrent(); const lastCallback = calls; assert.ok(lastCallback > 0);
-calls = 0; let changed = false;
-onRead = () => {
-  if (calls === lastCallback) {
-    write(helper, Buffer.concat([helperBefore, Buffer.from('\n// final source callback drift\n')])); changed = true;
-  }
-};
-try {reject(owner.assertCurrent); assert.equal(changed, true);}
-finally {write(helper, helperBefore); reset();}
-owner.assertCurrent();
+for (const target of [helper, ...admissionMembers]) {
+  const before = disk(target); calls = 0; let changed = false;
+  onRead = () => {
+    if (calls === lastCallback) {
+      write(target, Buffer.concat([before, Buffer.from('\n// final source callback drift\n')])); changed = true;
+    }
+  };
+  try {reject(owner.assertCurrent); assert.equal(changed, true);}
+  finally {write(target, before); reset();}
+  owner.assertCurrent();
+}
 
 // Loaded inspector poisoning cannot be repaired by a first callback, and a
 // final callback cannot leave the inspector poisoned after physical sweeps.
@@ -162,19 +172,19 @@ for (const [outer, inner] of [
 // The genuine inspector's private before-image and owner's after-image must
 // reject a same-path mutation even if the callback returns either old or new
 // physical bytes. Rejection must precede any later callback that could restore it.
-for (const operation of [owner.assertCurrent, owner.source.assertCurrent]) for (const returned of ['old', 'new']) {
-  const before = disk(sourceOnly.path); let changed = false, restoredLater = false, callbacksAfterMutation = 0;
+for (const operation of [owner.assertCurrent, owner.source.assertCurrent]) for (const returned of ['old', 'new']) for (const target of [sourceOnly.path, handler, repair]) {
+  const before = disk(target); let changed = false, restoredLater = false, callbacksAfterMutation = 0;
   onRead = path => {
     if (changed) {
       callbacksAfterMutation++;
-      if (path !== sourceOnly.path) {write(sourceOnly.path, before); restoredLater = true;}
-    } else if (path === sourceOnly.path) {
+      if (path !== target) {write(target, before); restoredLater = true;}
+    } else if (path === target) {
       write(path, Buffer.concat([before, Buffer.from('\n// final source callback drift\n')])); changed = true;
     }
   };
-  override = (path, actual) => path === sourceOnly.path && returned === 'new' ? disk(path) : actual;
-  try {reject(operation, error => error.message.includes(sourceOnly.path) && /nonphysical|changed during callback/.test(error.message)); assert.equal(changed, true); assert.equal(restoredLater, false); assert.equal(callbacksAfterMutation, 0);}
-  finally {write(sourceOnly.path, before); reset();}
+  override = (path, actual) => path === target && returned === 'new' ? disk(path) : actual;
+  try {reject(operation, error => error.message.includes(target) && /nonphysical|changed during callback/.test(error.message)); assert.equal(changed, true); assert.equal(restoredLater, false); assert.equal(callbacksAfterMutation, 0);}
+  finally {write(target, before); reset();}
   owner.assertCurrent(); reset();
 }
 // The owned standalone source surface still consumes the supplied reader. It
@@ -268,7 +278,27 @@ let frameNested=false;
 onRead=()=>{if(!frameNested){frameNested=true;const before=calls;reject(framePair);assert.equal(calls,before);}};
 try{owner.frames.assertCurrent();assert.equal(frameNested,true);}finally{reset();}
 owner.frames.assertCurrent();framePair();reset();
-assert.equal(rejected, 42); assert.equal(getters, 0);
+// The current physical judgment differs from the untouched historical proof.
+const transitionData = JSON.parse(disk(admissionTransition));
+for (const row of transitionData.code_transitions) {
+  const expected = {path: row.after.path, sha256: row.after.sha256, bytes: row.after.bytes};
+  assert.deepEqual(owner.frames.bound.find(ref => ref.path === row.path), expected);
+  assert.deepEqual(owner.source.bound.find(ref => ref.path === row.path), expected);
+}
+assert.deepEqual(owner.frames.proposal.handler, {path: handler,
+  sha256: '013cbe4ae44ebebcf8331d2aedca972f15c824dd4e61bc795f0efa188d35b69a', bytes: 14322});
+assert.deepEqual(owner.frames.stage.entries[0].individual_proof.base_class_removal_source_scope.handler,
+  owner.frames.proposal.handler);
+const proposal = owner.frames.proposal;
+assert.ok(owner.frames.stage.after.equals(gunzipSync(disk(proposal.ledger_after_image.path))));
+assert.ok(owner.frames.registryAfter.equals(gunzipSync(disk(proposal.registry_after_image.path))));
+assert.equal(hash(owner.frames.stage.after), 'c4ccfca72dabf9d03739e904ee352ee22d40e926c25a46c745501242a3d76da8');
+assert.equal(hash(owner.frames.registryAfter), 'e90d2268e862284605dd9b4f5630c0d9d84976f6014679d1aa4acbc47f38c4cc');
+// The default source reader uses the same existing qualified peer-file route.
+const defaultOwner = baseClassRemovalOwnerSourceSubject();
+defaultOwner.assertCurrent();
+assert.equal(defaultOwner.source.facts.historical_source_bindings_revalidated, 715);
+assert.equal(rejected, 70); assert.equal(getters, 0);
 assert.ok(readFileSync(join(root, helper)).equals(helperBefore));
 console.log(JSON.stringify({result: 'pass', line: '21.x', actual_frame_and_source_owner_executed: true,
   actual_stage_context_executed: true, guard_plan_identity_forwarded: true,
@@ -277,6 +307,7 @@ console.log(JSON.stringify({result: 'pass', line: '21.x', actual_frame_and_sourc
   source_reentrant_controls: 3, distinct_scope_nesting_controls: 2, metadata_predicate_controls: 3,
   late_facade_pointer_controls: 1,
   frame_dependency_reentry_controls: 1,
+  admission_successor_faults_rejected: 28, exact_historical_proof_preserved: true, default_source_reader_executed: true,
   frame_members: owner.frames.bound.length, source_members: owner.source.bound.length,
   historical_source_bindings_revalidated: owner.source.facts.historical_source_bindings_revalidated,
   rejected_lifetime_faults: rejected, inspector_getters_invoked: getters + constructorGetters,

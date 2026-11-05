@@ -5,6 +5,7 @@
 import gzip
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -82,10 +83,21 @@ class BaseClassRemovalAdmissionTest(unittest.TestCase):
         self.assertEqual(new['read_note_disposition'], 'owned-retained')
         self.assertEqual(new['g11_claim'], 'not-passed')
         scope = new['individual_proof']['base_class_removal_source_scope']
-        for ref in [packet['handler'], packet['review']]:
-            raw = (ROOT / ref['path']).read_bytes()
-            self.assertEqual(hashlib.sha256(raw).hexdigest(), ref['sha256'])
-            self.assertEqual(len(raw), ref['bytes'])
+        # Review bytes remain current; the handler identity in the v6 proof is
+        # historical DATA. Current executable admission is independently pinned
+        # by the exact successor packet and checked below, never read as old.
+        review = packet['review']
+        review_raw = (ROOT / review['path']).read_bytes()
+        self.assertEqual(hashlib.sha256(review_raw).hexdigest(), review['sha256'])
+        self.assertEqual(len(review_raw), review['bytes'])
+        env = dict(os.environ, GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')
+        for key in ('GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR',
+                    'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES'):
+            env.pop(key, None)
+        def git_data(parent, path):
+            return subprocess.check_output([
+                'git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',
+                'show', parent + ':' + path], cwd=ROOT, env=env)
         # The immutable proposal names the original pure-stage program. It is
         # authenticated as Git DATA; the current program must equal that exact
         # prefix plus the independently owned, pinned extension template.
@@ -97,14 +109,46 @@ class BaseClassRemovalAdmissionTest(unittest.TestCase):
         owner = json.loads(owner_raw)
         stage_ref = owner['stage_before']
         self.assertEqual({key: stage_ref[key] for key in ('path', 'sha256', 'bytes')}, packet['stage'])
-        original = subprocess.check_output([
-            'git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',
-            'show', owner['source_parent'] + ':' + stage_ref['path']], cwd=ROOT)
+        original = git_data(owner['source_parent'], stage_ref['path'])
         self.assertEqual(hashlib.sha256(original).hexdigest(), stage_ref['sha256'])
         self.assertEqual(len(original), stage_ref['bytes'])
         self.assertEqual(hashlib.sha1(b'blob ' + str(len(original)).encode() + b'\0' + original).hexdigest(),
                          stage_ref['git_blob'])
+        successor_raw = (ROOT / 'compatibility/rc/parent-base-admission-current-source-successor-v1.json').read_bytes()
+        successor_pin = re.findall(rb"sha256: '([a-f0-9]{64})', bytes: 20020", leaf)
+        self.assertEqual(len(successor_pin), 1)
+        self.assertEqual(hashlib.sha256(successor_raw).hexdigest(), successor_pin[0].decode())
+        successor = json.loads(successor_raw)
+        self.assertEqual(successor['source_parent'], owner['source_parent'])
+        self.assertEqual(successor['historical_proposal'], owner['proposal'])
+        self.assertEqual({key: successor['code_transitions'][0]['before'][key] for key in ('path', 'sha256', 'bytes')}, packet['handler'])
+        for row in successor['code_transitions']:
+            old = git_data(successor['source_parent'], row['path'])
+            self.assertEqual(hashlib.sha256(old).hexdigest(), row['before']['sha256'])
+            self.assertEqual(len(old), row['before']['bytes'])
+            self.assertEqual(hashlib.sha1(b'blob ' + str(len(old)).encode() + b'\0' + old).hexdigest(), row['before']['git_blob'])
+            cursor, parts = 0, []
+            for edit in row['edits']:
+                offset, literal = edit['offset'], edit['before'].encode()
+                self.assertGreaterEqual(offset, cursor)
+                self.assertEqual(old[offset:offset + len(literal)], literal)
+                parts.extend((old[cursor:offset], edit['after'].encode()))
+                cursor = offset + len(literal)
+            rebuilt = b''.join([*parts, old[cursor:]])
+            self.assertEqual(rebuilt, (ROOT / row['path']).read_bytes())
+            self.assertEqual(hashlib.sha256(rebuilt).hexdigest(), row['after']['sha256'])
+            self.assertEqual(len(rebuilt), row['after']['bytes'])
         template = owner['stage_extension_template']
+        transition_raw = (ROOT / 'compatibility/rc/21x-base-class-owner-guard-plan-transition-v3.json').read_bytes()
+        self.assertEqual(hashlib.sha256(transition_raw).hexdigest(), '879dd05cc50b934d8cfe2a7bfa816ce598ad9cb172272ca7b5dfa2f5087feb71')
+        transition = json.loads(transition_raw)
+        self.assertEqual(hashlib.sha256(template.encode()).hexdigest(), transition['old_extension_template']['sha256'])
+        self.assertEqual(len(template.encode()), transition['old_extension_template']['bytes'])
+        for edit in transition['literal_edits']:
+            self.assertEqual(template.count(edit['old']), edit['occurrences'])
+            template = template.replace(edit['old'], edit['new'])
+        self.assertEqual(hashlib.sha256(template.encode()).hexdigest(), transition['new_extension_template']['sha256'])
+        self.assertEqual(len(template.encode()), transition['new_extension_template']['bytes'])
         self.assertEqual(template.count('__BASE_OWNER_IMAGE_SHA256__'), 1)
         extension = template.replace('__BASE_OWNER_IMAGE_SHA256__', hashlib.sha256(leaf).hexdigest()).encode()
         self.assertEqual((ROOT / stage_ref['path']).read_bytes(), original + extension)

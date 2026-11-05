@@ -19,6 +19,7 @@ const CENSUS={path:'compatibility/rc/upstream-complete-patch-census.json.gz',sha
 const WORKSHEET={path:PREFIX+'worksheet.json',sha256:'a7459210660b5eea641d1239ef0a2c8fb329df8a4c2ef8c8a89a123353b1dace',bytes:8419};
 const PATCH='9407791dd755217128d0dd6f3c2c4542f1bcb8aaaa5ce3b8b745b07e190cf8d0';
 const image=readFileSync(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex');
+export const baseClassRemovalOriginalLoadedImage=Object.freeze({path:SELF,sha256:hash(image),bytes:image.length});
 const gitHash=(kind,raw)=>createHash('sha1').update(kind+' '+Buffer.byteLength(raw)+'\0').update(raw).digest('hex');
 
 export function verifyBaseClassRemovalOriginal(original,census){

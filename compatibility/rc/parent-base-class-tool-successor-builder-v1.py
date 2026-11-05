@@ -64,10 +64,15 @@ SUPPORT['21.x'] = (*SUPPORT['21.x'], 'tests/table_static_reference_batch_probe.m
 SUPPORT = {line: (*paths, 'tests/test_current_sass_source.py', 'tests/current_sass_guard_node_probe.mjs', 'tests/test_current_sass_guard_node.py', 'tests/historical_repair_guard_node_probe.mjs', 'tests/test_historical_repair_guard_node.py') for line, paths in SUPPORT.items()}
 SUPPORT['21.x'] = (*SUPPORT['21.x'], 'tests/legacy_original_source_guard_node_probe.mjs')
 SUPPORT = {line: (*paths, 'tests/test_current_sass_ordinary_aggregate_gate.py') for line, paths in SUPPORT.items()}
+UPDATES['21.x'] = (*UPDATES['21.x'], 'scripts/upstream-base-class-removal-admission.cjs')
+SUPPORT['21.x'] = (*SUPPORT['21.x'], 'compatibility/rc/parent-base-admission-current-source-successor-v1.json', 'compatibility/rc/21x-base-class-removal-admission-canonical-proposal-v6.json')
+SUPPORT['21.x'] = (*SUPPORT['21.x'], 'tests/test_base_class_removal_admission.py')
+SUPPORT['21.x'] = (*SUPPORT['21.x'], 'scripts/upstream-base-class-removal-source.mjs', 'compatibility/rc/21x-base-class-removal-source-final-review.mjs')
 TABLE_STAGE = dict(path='scripts/table-local-compilation-canonical-stage.mjs', sha256='bdb3137f6db42ed2611ac3a41e400478defed7f0076d203061d1e12d03f63b7c', bytes=8231)
 LEGACY_SOURCE = dict(path='scripts/legacy-removal-owner-source.mjs', sha256='b88708bb7ed441e24c6ed623371330426d6a947df83452ca343487767d2c9122', bytes=6628)
 TABLE_PACKET = dict(path='compatibility/rc/21x-table-local-compilation-admission-owner-inputs.json', sha256='1a35dd57edd9952a23d4bb2e8e9783f19583c00badfd7e9846fdbd2abc94f48b', bytes=184121)
 SOURCE_ANCHORS = {
+    'scripts/upstream-base-class-removal-admission.cjs': dict(before=dict(path='scripts/upstream-base-class-removal-admission.cjs', sha256='013cbe4ae44ebebcf8331d2aedca972f15c824dd4e61bc795f0efa188d35b69a', bytes=14322), packet=dict(path='compatibility/rc/21x-base-class-removal-admission-canonical-proposal-v6.json', sha256='720a4fcd0c9d0d67afbeddd106fc9741d7ab34a0848edc1a0f2e6a25019b9881', bytes=3578), member_key='handler'),
     'scripts/legacy-removal-canonical-stage.mjs': dict(before=dict(path='scripts/legacy-removal-canonical-stage.mjs', sha256='9b5021340fcab66f2c2b45447b5162f0e25b002b45c7ea7c062c8087dfb80d6c', bytes=8412), packet=dict(TABLE_PACKET), transition_index=1),
     'tests/test_packed_upstream_ledger_epoch.py': dict(before=dict(path='tests/test_packed_upstream_ledger_epoch.py', sha256='f7b3ae0ede9bd62fb033c49017a84d5b4ca81ce8b7920d72a105b1df1393e6df', bytes=17868), packet=dict(path='compatibility/rc/c04-inventory-owner-inputs.json', sha256='0d9dfac3813a6dc60644a090a2173ce56eaed1bcbdb32c2be29ce53f32413cdc', bytes=12144), source_member_index=9),
     'scripts/browser-reference-source.mjs': dict(before=dict(path='scripts/browser-reference-source.mjs', sha256='59f2ac538149e0d9b2176c231a97147862881fb19b46768a5a4e450d66f9fe38', bytes=10443), packet=dict(path='compatibility/rc/c04-browser-owner-inputs.json', sha256='710201dd63bfb326485cd2933a9747d53f54b2cf833c47ce332816b0e0db526a', bytes=15193), transition_index=2),
@@ -171,14 +176,14 @@ def build(roots):
                 anchor_raw = physical(root, anchor['packet']['path'])
                 assert ref(anchor['packet']['path'], anchor_raw) == anchor['packet']
                 anchor_body = json.loads(anchor_raw)
-                expected = anchor_body['source_members'][anchor['source_member_index']] if 'source_member_index' in anchor else anchor_body['code_transitions'][anchor['transition_index']]['after']
+                expected = anchor_body['source_members'][anchor['source_member_index']] if 'source_member_index' in anchor else (anchor_body[anchor['member_key']] if 'member_key' in anchor else anchor_body['code_transitions'][anchor['transition_index']]['after'])
                 assert expected == anchor['before']
                 snapshots.append((root, anchor['packet'], anchor_raw))
         for anchor in REGRESSION_SOURCE_ANCHORS[line].values():
             anchor_raw = physical(root, anchor['packet']['path'])
             assert ref(anchor['packet']['path'], anchor_raw) == anchor['packet']
             anchor_body = json.loads(anchor_raw)
-            expected = anchor_body['source_members'][anchor['source_member_index']] if 'source_member_index' in anchor else anchor_body['code_transitions'][anchor['transition_index']]['after']
+            expected = anchor_body['source_members'][anchor['source_member_index']] if 'source_member_index' in anchor else (anchor_body[anchor['member_key']] if 'member_key' in anchor else anchor_body['code_transitions'][anchor['transition_index']]['after'])
             assert expected == anchor['before']
             snapshots.append((root, anchor['packet'], anchor_raw))
         updates = []

@@ -20,6 +20,7 @@ const SHA = '55f9618b687fc0da4743a3cf27e113ceb837e151';
 const image = readFileSync(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url), ts = require('typescript');
 const hash = raw => createHash('sha256').update(raw).digest('hex');
+export const baseClassRemovalReviewLoadedImage = Object.freeze({path: SELF, sha256: hash(image), bytes: image.length});
 const pins = {
   original: ['original-qualified.json', '9e0d2542317e5191cdd04af1dbead861cfa382c2b3f9da7b886a8102f2e13183'],
   journal: ['review-progress-tabs-tooltip.json', '5181564df149ce9ab295db99f6be680937ea29762f39d95af08d44c73d60367b'],

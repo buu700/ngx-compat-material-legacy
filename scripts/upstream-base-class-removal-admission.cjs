@@ -23,21 +23,41 @@ const KIND = 'individual-historical-base-class-removal-source-review';
 const SCOPE = 'base_class_removal_source_scope';
 const hash = raw => createHash('sha256').update(raw).digest('hex');
 const functionToString = Function.prototype.toString;
-const image = readFileSync(__filename), handlerRef = {path: HANDLER, sha256: hash(image), bytes: image.length};
+// The v6 proof names the reviewed historical handler as immutable DATA.
+// The actually loaded executable is independently bound as a current member.
+const image = readFileSync(__filename), currentHandlerRef = {path: HANDLER, sha256: hash(image), bytes: image.length};
+const handlerRef = Object.freeze({path: HANDLER, sha256: '013cbe4ae44ebebcf8331d2aedca972f15c824dd4e61bc795f0efa188d35b69a', bytes: 14322});
+const producerTransitions = Object.freeze([{"before":{"path":"scripts/upstream-base-class-removal-source.mjs","sha256":"1c127473aac8050d206b38c531eb8386492bbc4114acabd7d4a42dd80c30b17b","bytes":12495},"after":{"path":"scripts/upstream-base-class-removal-source.mjs","sha256":"2a225cd654fe4940aec34987c7b46453fa624b70743ae5fa63d73ce2341358e2","bytes":12610}},{"before":{"path":"compatibility/rc/21x-base-class-removal-source-final-review.mjs","sha256":"67fbedb4ac7310218123d4248f8f93519a9d9c7a03d5ecfccae398f78543084b","bytes":22339},"after":{"path":"compatibility/rc/21x-base-class-removal-source-final-review.mjs","sha256":"9fb47887c2389e0e40a8ba1fa4e2086e844d96940d82387d8b69c12b739839f0","bytes":22459}},{"before":{"path":"scripts/historical-contract-repair-source.mjs","sha256":"d4870c2cc12609da71b03c1745996693dd26444b2dfd848260cfda1ac3514da5","bytes":13052},"after":{"path":"scripts/historical-contract-repair-source.mjs","sha256":"c40c2eedcf643c3173619402bfcce29699cd56cf1f9606de311c3d651f946ba4","bytes":17590}}]);
+const bufferEquals = Buffer.prototype.equals;
+const equal = (actual, supplied) => Buffer.isBuffer(supplied) && Reflect.apply(bufferEquals, actual, [supplied]);
+function currentSourceReference(ref) {
+  const row = producerTransitions.find(row => row.before.path === ref.path);
+  if (!row) return ref;
+  assert.deepEqual(ref, row.before, 'unknown base-class producer predecessor');
+  return row.after;
+}
 // Capture each producer before loading it. Current-file checks alone would not
 // reject a producer changed after import; exact exported function identities
 // also reject a previously cached implementation with different behavior.
 const producerPaths = ['scripts/upstream-base-class-removal-source.mjs', SOURCE + 'final-review.mjs', 'scripts/historical-contract-repair-source.mjs'];
 const loadedImages = new Map(producerPaths.map(path => [path, readFileSync(join(ROOT, path))]));
-const {verifyBaseClassRemovalOriginal} = require('./upstream-base-class-removal-source.mjs');
-const {validateBaseClassRemovalReview} = require('../' + SOURCE + 'final-review.mjs');
-const {historicalContractRepairSourceSubject, readHistoricalContractRepairMember} = require('./historical-contract-repair-source.mjs');
+const {verifyBaseClassRemovalOriginal, baseClassRemovalOriginalLoadedImage} = require('./upstream-base-class-removal-source.mjs');
+const {validateBaseClassRemovalReview, baseClassRemovalReviewLoadedImage} = require('../' + SOURCE + 'final-review.mjs');
+const {historicalContractRepairSourceSubject, readHistoricalContractRepairMember, historicalContractRepairLoadedImage} = require('./historical-contract-repair-source.mjs');
+// Producer-owned identities describe each module's own evaluation, even if
+// it was cached before this CJS loaded. Disk-at-import is not load provenance.
+const loadedSourceReferences = Object.freeze([
+  Object.freeze({...currentHandlerRef}), baseClassRemovalOriginalLoadedImage,
+  baseClassRemovalReviewLoadedImage, historicalContractRepairLoadedImage,
+]);
 const producerFunctions = [
   [verifyBaseClassRemovalOriginal, 'd67b84def0d5420b818feb336806d70009c0aaee53dab62c6cd7546da1a7fd33'],
   [validateBaseClassRemovalReview, '7ba2e397b673ed63a07f00a58a5cfdfcfd89238f8d4d574d6cdb992ae6527734'],
-  [historicalContractRepairSourceSubject, '03b7124b9363c1c2a6d0b240d3f1d6de1ced5fa1073e34cbe90a414d84a663f4'],
+  [historicalContractRepairSourceSubject, '55ebd20ad161283c156eedcd009fd64b374118bf3dfaa26ad5f633684875157c'],
   [readHistoricalContractRepairMember, '1c68187440d74b8d393de47b7660de0c86aa0c8689a687f125de1db001a8053b'],
 ];
+const loadedProducerFunctionSha256 = Object.freeze(producerFunctions.map(([fn]) =>
+  Object.freeze({name: fn.name, sha256: hash(Reflect.apply(functionToString, fn, []))})));
 
 function baseClassRemovalProof(body) {
   assert.equal(body?.sha, SHA);
@@ -89,7 +109,8 @@ function inspectSource(request = {}) {
   const bound = new Map();
   const read = path => {
     const actual = readHistoricalContractRepairMember(root, path);
-    if (providedRead) { const provided = providedRead(path); assert.ok(Buffer.isBuffer(provided) && provided.equals(actual), 'nonphysical base-class admission input ' + path); }
+    if (providedRead) { const provided = providedRead(path); assert.ok(equal(actual, provided), 'nonphysical base-class admission input ' + path); }
+    assert.ok(equal(actual, readHistoricalContractRepairMember(root, path)), 'base-class admission input changed during callback ' + path);
     const ref = {path, sha256: hash(actual), bytes: actual.length}, prior = bound.get(path);
     if (prior) assert.deepEqual(ref, prior, 'input changed during base-class admission ' + path); else bound.set(path, ref);
     return actual;
@@ -98,9 +119,9 @@ function inspectSource(request = {}) {
     const raw = read(ref.path); assert.equal(hash(raw), ref.sha256, 'changed base-class admission input ' + ref.path);
     if (ref.bytes !== undefined) assert.equal(raw.length, ref.bytes); return raw;
   };
-  member(handlerRef); member({path: REVIEW, sha256: REVIEW_HASH});
+  member(currentHandlerRef); member({path: REVIEW, sha256: REVIEW_HASH});
   assert.deepEqual(JSON.parse(read(REVIEW)), body);
-  for (const ref of body.source_inputs) member(ref);
+  for (const ref of body.source_inputs) member(currentSourceReference(ref));
   for (const [path, loaded] of loadedImages) assert.ok(read(path).equals(loaded), 'loaded/current base-class producer ' + path);
   for (const [fn, expected] of producerFunctions) assert.equal(hash(functionToString.call(fn)), expected, 'loaded base-class producer function ' + fn.name);
   assert.equal(process.versions.node, JSON.parse(read('toolchain-lock.json')).repository.node);
@@ -129,7 +150,7 @@ function inspectSource(request = {}) {
     }
     const successor = repairs.qualify(ref);
     if (successor) { assert.deepEqual(repairs.historicalReference(ref), ref); assert.notEqual(successor.sha256, ref.sha256); changed++; }
-    member(successor || ref);
+    member(successor || currentSourceReference(ref));
   }
   assert.equal(changed, 5); assert.equal(historical, 3);
   const original = JSON.parse(gunzipSync(read(SOURCE + 'originals.json.gz')));
@@ -154,7 +175,7 @@ function inspectSource(request = {}) {
   let apiHistoricalCanonicalReferences = 0;
   for (const ref of api.source_bindings) {
     if (canonicalHistory.has(ref.path)) { historicalCanonicalMember(ref); apiHistoricalCanonicalReferences++; }
-    else member(ref);
+    else member(currentSourceReference(ref));
   }
   assert.equal(apiHistoricalCanonicalReferences, 1);
   assert.equal(api.line, '21.x'); assert.equal(api.status, 'pass'); assert.deepEqual(api.comparison.blocking, []);
@@ -166,7 +187,8 @@ function inspectSource(request = {}) {
     for (const ref of bound.values()) {
       const actual = readHistoricalContractRepairMember(root, ref.path);
       assert.equal(hash(actual), ref.sha256, 'late base-class admission input ' + ref.path); assert.equal(actual.length, ref.bytes);
-      if (providedRead) { const provided = providedRead(ref.path); assert.ok(Buffer.isBuffer(provided) && provided.equals(actual), 'late nonphysical base-class admission input ' + ref.path); }
+      if (providedRead) { const provided = providedRead(ref.path); assert.ok(equal(actual, provided), 'late nonphysical base-class admission input ' + ref.path); }
+      assert.ok(equal(actual, readHistoricalContractRepairMember(root, ref.path)), 'base-class admission input changed during callback ' + ref.path);
     }
     assertMetadata();
   };
@@ -197,4 +219,4 @@ function inspectCanonicalSource(request) {
 }
 module.exports = {BASE_CLASS_REMOVAL_SHA: SHA, BASE_CLASS_REMOVAL_REVIEW: REVIEW, BASE_CLASS_REMOVAL_REVIEW_HASH: REVIEW_HASH,
   BASE_CLASS_REMOVAL_PROOF_KIND: KIND, BASE_CLASS_REMOVAL_SCOPE_KEY: SCOPE,
-  baseClassRemovalProof, metadataOk, inspectSource, sourceOk, inspectCanonicalSource};
+  baseClassRemovalProof, metadataOk, inspectSource, sourceOk, inspectCanonicalSource, loadedSourceReferences, loadedProducerFunctionSha256};
