@@ -88,7 +88,7 @@ if(line==='21.x'){
  checks.push('main has no21archived C04 REPORTS binding');
 }
 source.assertCurrent();checks.push('final current C04/tool physical assertion');
-const manifest=readFileSync(join(root,'compatibility/rc/current-sass-tool-reference-inputs-v2.json'));
+const manifest=readFileSync(join(root,'compatibility/rc/parent-base-class-tool-successor-inputs-v3.json'));
 console.log(JSON.stringify({line,checks,product_refs:productRefs,tool_manifest_sha256:hash(manifest),bound_count:bound.length,
  source_summary:summary,authenticated_C04_report_count:reports,unchanged_public_retention_rows:unchangedPublic,
  unchanged_direct_retention_rows:unchangedDirect,compiler_calls:0,old_physical_constructor_executed:false,

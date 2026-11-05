@@ -11,12 +11,14 @@ import re
 import subprocess
 
 SELF = 'scripts/current_sass_tool_references.py'
-INPUTS = 'compatibility/rc/current-sass-tool-reference-inputs-v2.json'
+INPUTS = 'compatibility/rc/parent-base-class-tool-successor-inputs-v3.json'
+V2_INPUTS = dict(path='compatibility/rc/current-sass-tool-reference-inputs-v2.json', sha256='d25ef6684992ececd518f7932bc68f5d43d433df23868d7a376ebf0a9e56a770', bytes=625566)
+V3_CHECKPOINTS = {'21.x': 'd8ab97315b6c77b83f42c2bebcf63b2984fff255', 'main': '59ba0e2aa8b76f71b472ea2831273e44e44b5b57'}
 PREVIOUS_INPUTS = dict(path='compatibility/rc/current-sass-tool-reference-inputs-v1.json',
                        sha256='ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f', bytes=478008)
 CHECKPOINTS = {'21.x': 'b25aedd02f7b53e8cd8dfcdad369a806a1301619',
                'main': '5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'}
-INPUTS_SHA = 'd25ef6684992ececd518f7932bc68f5d43d433df23868d7a376ebf0a9e56a770'
+INPUTS_SHA = '334b223b96466e62dd937b36f0bd928058a578223aac90582622932b392d40ec'
 _IMAGE = Path(__file__).read_bytes()
 
 
@@ -74,6 +76,8 @@ def _tool_path(path):
 
 def _git_images(root, requests):
     unique = {(row['commit'], row['path']): row for row in requests}
+    if not unique:
+        return {}
     for commit, path in unique:
         assert re.fullmatch('[0-9a-f]{40}', commit)
         assert path and '..' not in path and '\n' not in path and '\0' not in path and not path.startswith('/')
@@ -119,7 +123,13 @@ class CurrentSassToolReferences:
         assert read is None or callable(read)
         self._provided, self._bound, self._rows = read, {}, {}
         assert self._read(SELF) == _IMAGE
-        packet = json.loads(self._member(dict(path=INPUTS, sha256=INPUTS_SHA)))
+        successor = json.loads(self._member(dict(path=INPUTS, sha256=INPUTS_SHA)))
+        assert successor['schema_version'] == 3 and successor['role'] == 'finite-current-sass-tool-reference-successor'
+        assert successor['previous_epoch'] == V2_INPUTS and successor['product_paths'] == []
+        assert successor['historical_programs_executed'] is False and successor['historical_reports_rewritten'] == 0
+        assert successor['artifact_or_audit_admission_granted'] is False
+        v2_raw = self._member(V2_INPUTS)
+        packet = json.loads(v2_raw)
         assert packet['schema_version'] == 2 and packet['role'] == 'finite-current-sass-tool-reference-successor'
         assert packet['previous_epoch'] == PREVIOUS_INPUTS
         previous_raw = self._member(PREVIOUS_INPUTS)
@@ -132,6 +142,35 @@ class CurrentSassToolReferences:
         assert self.line is not None
         branch = packet['branches'][self.line]
         prior_branch = previous['branches'][self.line]
+        next_branch = successor['branches'][self.line]
+        assert next_branch['source_parent'] == V3_CHECKPOINTS[self.line]
+        assert v2_raw == _git_images(self.root, [dict(commit=V3_CHECKPOINTS[self.line], path=V2_INPUTS['path'])])[(V3_CHECKPOINTS[self.line], V2_INPUTS['path'])]
+        assert len({row['path'] for row in next_branch['updates']}) == len(next_branch['updates'])
+        assert len({row['path'] for row in next_branch['additional_inputs']}) == len(next_branch['additional_inputs'])
+        successor_images = _git_images(self.root, [dict(commit=V3_CHECKPOINTS[self.line], path=row['path']) for row in next_branch['updates']])
+        overlays = {}
+        for update in next_branch['updates']:
+            path = update['path']
+            assert set(update) == {'path', 'before', 'after', 'edits'}
+            assert _tool_path(path) and path not in (SELF, 'scripts/current-sass-tool-references.mjs')
+            assert update['before']['path'] == update['after']['path'] == path
+            assert type(update['before']['bytes']) is int and type(update['after']['bytes']) is int
+            before = successor_images[(V3_CHECKPOINTS[self.line], path)]
+            _matches(before, update['before'])
+            after = _edited(before, update['edits'])
+            _matches(after, update['after'])
+            assert self._member(update['after']) == after
+            overlays[path] = (update, before, after)
+
+        def v2_member(ref):
+            overlay = overlays.get(ref['path'])
+            if overlay is None:
+                return self._member(ref)
+            update, before, after = overlay
+            assert {key: ref[key] for key in ('path', 'sha256', 'bytes')} == update['before'], 'unknown V2 predecessor identity'
+            assert self._member(update['after']) == after
+            return before
+
         assert branch['previous_epoch_source_parent'] == CHECKPOINTS[self.line]
         assert branch['historical_registry'] == prior_branch['historical_registry']
         assert branch['intermediate_inputs'] == prior_branch['intermediate_inputs']
@@ -187,7 +226,7 @@ class CurrentSassToolReferences:
                 assert update['before'] == support[path]
             after = _edited(before, update['edits'])
             _matches(after, update['after'])
-            assert self._member(update['after']) == after
+            assert v2_member(update['after']) == after
             if row is None:
                 row = dict(path=path, before=dict(sha256=update['before']['sha256'], bytes=update['before']['bytes']), identities={})
             self._add(row, update['before'], before)
@@ -199,16 +238,32 @@ class CurrentSassToolReferences:
             self._add(self._rows[source['path']], source, images[(source['source_parent'], source['path'])])
         for source in prior_branch['updates']:
             self._add(self._rows[source['path']], source['after'], images[(CHECKPOINTS[self.line], source['path'])])
-        self._member(historical['unchanged_source_subject'])
+        v2_member(historical['unchanged_source_subject'])
         for ref in historical['support_inputs']:
             if not any(row['path'] == ref['path'] for row in branch['updates']):
-                self._member(ref)
+                v2_member(ref)
         for ref in branch['additional_inputs']:
             assert _tool_path(ref['path']) or ref['path'].startswith('compatibility/rc/')
+            v2_member(ref)
+        for path, (update, before, after) in overlays.items():
+            row = self._rows.get(path)
+            if row is not None:
+                assert update['before'] == dict(path=path, **row['after']), 'V3 overlay does not follow exact V2 current row'
+            else:
+                assert self.line == '21.x' and path == 'scripts/table-local-compilation-canonical-stage.mjs'
+                assert update['before'] == dict(path=path, sha256='bdb3137f6db42ed2611ac3a41e400478defed7f0076d203061d1e12d03f63b7c', bytes=8231)
+                row = dict(path=path, before=dict(sha256=update['before']['sha256'], bytes=update['before']['bytes']), identities={})
+                self._rows[path] = row
+            self._add(row, update['before'], before)
+            self._add(row, update['after'], after)
+            row['after'] = dict(sha256=update['after']['sha256'], bytes=update['after']['bytes'])
+        for ref in next_branch['additional_inputs']:
+            assert _tool_path(ref['path']) or ref['path'].startswith('compatibility/rc/')
+            assert ref['path'] not in (SELF, 'scripts/current-sass-tool-references.mjs')
             self._member(ref)
         for row in self._rows.values():
             self._member(dict(path=row['path'], **row['after']))
-        self.epoch = 2
+        self.epoch = 3
         self.assert_current()
 
     def _add(self, row, ref, raw):
