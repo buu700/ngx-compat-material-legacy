@@ -208,8 +208,8 @@
           },
           "after": {
             "path": "scripts/packed-upstream-ledger-epoch.mjs",
-            "sha256": "68b5a199b5eae75b2e9ff37718ce8906f48aeb3fe926aae434e1a2f629d7f2ad",
-            "bytes": 86017
+            "sha256": "a60c881fc22c7ab00cbca7100f04bc5d7973c0ca016a5a8bdc5a03050b71b0e3",
+            "bytes": 87141
           },
           "edits": [
             {
@@ -226,6 +226,21 @@
               "offset": 9682,
               "before": " const assertCurrent=()=>{for(const frame of frames){frame.guard();for(const row of frame.references.values()){\n",
               "after": " const assertCurrent=()=>{for(const frame of frames){assertBaseClassRemovalSourceInspectorIdentity();for(const row of frame.references.values()){\n"
+            },
+            {
+              "offset": 10924,
+              "before": "",
+              "after": "}\n// Only the two inventory-owned title handler projections may bridge this\n// historical packet reference to the physical source reader below.\nfunction titleOwnerPhysicalReference(ref,sourceLane){\n if(!['scripts/upstream-dialog-title-admission.cjs','scripts/upstream-dialog-title-native-evidence.mjs'].includes(ref.path))return ref;\n assertBaseClassRemovalSourceInspectorIdentity();\n const raw=sourceLane.read(ref.path);assert.ok(Buffer.isBuffer(raw));\n const current={path:ref.path,sha256:hash(raw),bytes:raw.length};\n if(current.sha256===ref.sha256){if(ref.bytes!==undefined)assert.equal(current.bytes,ref.bytes);return ref;}\n const comparison=sourceLane.comparisonReference(current);\n assert.equal(comparison.path,ref.path,'unqualified physical title owner path');\n assert.equal(comparison.sha256,ref.sha256,'unqualified physical title owner reference '+ref.path);\n if(ref.bytes!==undefined)assert.equal(comparison.bytes,ref.bytes,'unqualified physical title owner size '+ref.path);\n return {...ref,...current};\n"
+            },
+            {
+              "offset": 49411,
+              "before": " const bound=[...new Map([own,{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound,...repairs.bound].map(ref=>repairs.qualify(ref)??ref).map(ref=>[ref.path,ref])).values()];\n",
+              "after": " const bound=[...new Map([own,{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound,...repairs.bound].map(ref=>repairs.qualify(ref)??ref).map(ref=>titleOwnerPhysicalReference(ref,sourceLane)).map(ref=>[ref.path,ref])).values()];\n"
+            },
+            {
+              "offset": 71894,
+              "before": " const bound=[...new Map([{path:OWNER,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound,...repairs.bound].map(ref=>repairs.qualify(ref)??ref).map(ref=>[ref.path,ref])).values()].map(member=>({...member,bytes:member.bytes??read(member.path).length}));\n",
+              "after": " const bound=[...new Map([{path:OWNER,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound,...repairs.bound].map(ref=>repairs.qualify(ref)??ref).map(ref=>titleOwnerPhysicalReference(ref,sourceLane)).map(ref=>[ref.path,ref])).values()].map(member=>({...member,bytes:member.bytes??read(member.path).length}));\n"
             },
             {
               "offset": 78409,
@@ -1222,6 +1237,11 @@
       ],
       "additional_inputs": [
         {
+          "path": "tests/test_title_owner_physical_reference.py",
+          "sha256": "a7a3efa38edebb7d9c1a8b364c579ff9dd72a3191023c9b1173e2d0ec345f7cd",
+          "bytes": 11926
+        },
+        {
           "path": "tests/test_current_tool_git_data_cache.py",
           "sha256": "1b2714bf7a32add47bd892278279cf49350a38fa8b0f46e161041ec44cb0afc5",
           "bytes": 9475
@@ -1413,8 +1433,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "6b78f5e517c135a479486ce6671a3ed4553f1e2161cb4e94927e8b92abc7492a",
-          "bytes": 15934
+          "sha256": "8223403ca8f5c7dfa617c3aadd38f44c1d2a92f99b43b81518fe88392d3928d4",
+          "bytes": 15982
         }
       ]
     },
@@ -1580,8 +1600,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "6b78f5e517c135a479486ce6671a3ed4553f1e2161cb4e94927e8b92abc7492a",
-          "bytes": 15934
+          "sha256": "8223403ca8f5c7dfa617c3aadd38f44c1d2a92f99b43b81518fe88392d3928d4",
+          "bytes": 15982
         }
       ]
     }

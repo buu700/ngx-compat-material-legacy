@@ -132,6 +132,20 @@ export function packedUpstreamLedgerCurrentSourceLane({root,read}){
  };
  return {read:current,comparisonReference,assertCurrent,registered_frames:frames.length};
 }
+// Only the two inventory-owned title handler projections may bridge this
+// historical packet reference to the physical source reader below.
+function titleOwnerPhysicalReference(ref,sourceLane){
+ if(!['scripts/upstream-dialog-title-admission.cjs','scripts/upstream-dialog-title-native-evidence.mjs'].includes(ref.path))return ref;
+ assertBaseClassRemovalSourceInspectorIdentity();
+ const raw=sourceLane.read(ref.path);assert.ok(Buffer.isBuffer(raw));
+ const current={path:ref.path,sha256:hash(raw),bytes:raw.length};
+ if(current.sha256===ref.sha256){if(ref.bytes!==undefined)assert.equal(current.bytes,ref.bytes);return ref;}
+ const comparison=sourceLane.comparisonReference(current);
+ assert.equal(comparison.path,ref.path,'unqualified physical title owner path');
+ assert.equal(comparison.sha256,ref.sha256,'unqualified physical title owner reference '+ref.path);
+ if(ref.bytes!==undefined)assert.equal(comparison.bytes,ref.bytes,'unqualified physical title owner size '+ref.path);
+ return {...ref,...current};
+}
 function original(root,path,authority=AUTHORITY){
  const key=root+'\0'+authority+'\0'+path;
  if(!originals.has(key)){
@@ -426,7 +440,7 @@ function context(root,read){
  assert.deepEqual(tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.after,{path:LEDGER,sha256:hash(remainingUnthemableStage.after),bytes:remainingUnthemableStage.after.length});
  const own={path:OWNER,sha256:hash(image),bytes:image.length};
  const repairs=historicalContractRepairReaderSubject({root,read:sourceRead});
- const bound=[...new Map([own,{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound,...repairs.bound].map(ref=>repairs.qualify(ref)??ref).map(ref=>[ref.path,ref])).values()];
+ const bound=[...new Map([own,{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound,...repairs.bound].map(ref=>repairs.qualify(ref)??ref).map(ref=>titleOwnerPhysicalReference(ref,sourceLane)).map(ref=>[ref.path,ref])).values()];
  const assertTools=()=>{
   sourceLane.assertCurrent();repairs.assertCurrent();
   for(const member of bound){const value=sourceRead(member.path);assert.equal(hash(value),member.sha256,'changed title owner binding '+member.path);if(member.bytes!==undefined)assert.equal(value.length,member.bytes);}
@@ -528,7 +542,7 @@ function qualifyBeforeInventoryReferenceToolReference({root=process.cwd(),read=d
  const raw=read(PACKET);assert.equal(hash(raw),PACKET_HASH);const packet=JSON.parse(raw);
  const frameRaw=read(FRAMES);assert.equal(hash(frameRaw),FRAMES_HASH,'changed accepted ledger-frame catalog');
  const repairs=historicalContractRepairReaderSubject({root,read:sourceRead});
- const bound=[...new Map([{path:OWNER,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound,...repairs.bound].map(ref=>repairs.qualify(ref)??ref).map(ref=>[ref.path,ref])).values()].map(member=>({...member,bytes:member.bytes??read(member.path).length}));
+ const bound=[...new Map([{path:OWNER,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound,...repairs.bound].map(ref=>repairs.qualify(ref)??ref).map(ref=>titleOwnerPhysicalReference(ref,sourceLane)).map(ref=>[ref.path,ref])).values()].map(member=>({...member,bytes:member.bytes??read(member.path).length}));
  const assertCurrent=()=>{sourceLane.assertCurrent();repairs.assertCurrent();for(const member of bound){const value=sourceRead(member.path);assert.equal(hash(value),member.sha256,'changed current canonical tool '+member.path);if(member.bytes!==undefined)assert.equal(value.length,member.bytes);}repairs.assertCurrent();sourceLane.assertCurrent();boundary.assertPhysical();};
  assertCurrent();const value=sourceRead(prior.path),reference={path:prior.path,sha256:hash(value),bytes:value.length};boundary.assertPhysical();
  return {reference,bound:structuredClone(bound),assertCurrent,individual_source_decisions:1,metadata_tokens:14,old_tool_bytes_exposed:false,current_native_or_packed_qualified:false};
