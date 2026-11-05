@@ -62,7 +62,7 @@ export function applyBaseClassRemovalCanonicalStage({before, body} = {}) {
 import {baseClassRemovalOwnerSourceSubject} from './base-class-removal-owner-source.mjs';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
-export const BASE_CLASS_REMOVAL_OWNER_SOURCE_SHA256 = 'da360e6ec2b7f2079f9501ed75f3a9e095393d3bffb9cb9f2be53a0413e04de9';
+export const BASE_CLASS_REMOVAL_OWNER_SOURCE_SHA256 = '8941be95923157b3f7ef959f7fa77f9a47624e41fa4b338d5aa4a7d25a7539c1';
 const ownerIsBuffer = Buffer.isBuffer, ownerBufferEquals = Buffer.prototype.equals, ownerApply = Reflect.apply;
 const ownerEqual = (actual, supplied) => ownerIsBuffer(supplied) && ownerApply(ownerBufferEquals, actual, [supplied]);
 function ownerValue(object, key) {
@@ -85,9 +85,7 @@ export function baseClassRemovalOwnerContext({root, read = path => readFileSync(
   const assertCurrent = owner.assertCurrent;
   const metadataRead = path => {
     if (path !== BASE_CLASS_REMOVAL_LEDGER) return read(path);
-    frames.assertCurrent();
-    const current = read(path);
-    assert.ok(ownerEqual(frames.ledgerSubject().raw, current), 'late base-class private ledger input');
+    const current = frames.ledgerSubject().raw;
     return applied ? Buffer.from(before) : current;
   };
   const wrapPrepared = prior => {

@@ -25,8 +25,8 @@ const INPUTS = 'compatibility/rc/21x-base-class-removal-admission-owner-inputs-v
 const INPUTS_SHA256 = '7c72a44224d6bd9f3eb141fdffb15d0f7ec11cb21b0f466500f10f12742e8e18';
 const GUARD_PLAN = Object.freeze({path: 'scripts/canonical-source-guard-plan.mjs',
   sha256: '4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f', bytes: 4609});
-const STAGE_TRANSITION = Object.freeze({path: 'compatibility/rc/21x-base-class-owner-guard-plan-transition-v2.json',
-  sha256: '213fa3b3dcae799057c9d8c48b7c66349f5c0e3075e3e7a96b6d457b82410803', bytes: 1369});
+const STAGE_TRANSITION = Object.freeze({path: 'compatibility/rc/21x-base-class-owner-guard-plan-transition-v3.json',
+  sha256: '879dd05cc50b934d8cfe2a7bfa816ce598ad9cb172272ca7b5dfa2f5087feb71', bytes: 1655});
 const GUARD_PLAN_FUNCTION_SHA256 = 'fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947';
 const rootDefault = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const image = readFileSync(fileURLToPath(import.meta.url));
@@ -158,13 +158,15 @@ export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read 
       new: '  const assertCurrent = owner.assertCurrent;\n', occurrences: 1},
     {old: '    metadataRead, wrapPrepared, bound: structuredClone([...bound.values()]), assertCurrent,\n',
       new: '    metadataRead, wrapPrepared, bound: structuredClone([...bound.values()]), assertCurrent, guardPlan: owner.guardPlan,\n', occurrences: 1},
+    {old: "    frames.assertCurrent();\n    const current = read(path);\n    assert.ok(ownerEqual(frames.ledgerSubject().raw, current), 'late base-class private ledger input');\n",
+      new: "    const current = frames.ledgerSubject().raw;\n", occurrences: 1},
   ];
   assert.deepEqual(transition, {
     schema_version: 1, line: '21.x', role: 'base-class-owner-guard-plan-stage-extension-transition',
     prior_owner_inputs: {path: INPUTS, sha256: INPUTS_SHA256, bytes: 7115}, stage_path: STAGE,
     old_extension_template: {sha256: '4659fbd1372b1e7076a9ad241089490188954170f85c06664338c13f34051808', bytes: 5167},
     literal_edits: edits,
-    new_extension_template: {sha256: '1873864432f615ea9b78718a7a84da3faeba04c09db7848e44f5de783c49236a', bytes: 5187},
+    new_extension_template: {sha256: 'be19ac791457306b4e6a5d46ea0b49f241e82e8055e993fab49ecf84935ba229', bytes: 5071},
     owner_image_marker: marker, owner_image_marker_occurrences: 1,
     pure_functions_changed: false, source_scope_only: true, canonical_changes_applied: false, g11_claim: 'not-passed',
   });
@@ -205,10 +207,19 @@ export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read 
   assert.ok(!equalBuffers(after, actualLedger) || applied, 'base-class ledger427 requires registry70');
   const registryApplied = equalBuffers(registryAfter, actualRegistry);
   const precursor = !applied;
+  // The full frame and narrow ledger operation share one callback lifetime.
+  // A dependency node can be run by another owner's scheduler, so protect the
+  // consume predicate itself as well as the direct full-guard entry.
+  let frameConsuming = false;
+  const consumeFrame = operation => {
+    assert.equal(frameConsuming, false, 'reentrant base-class frame consumption');
+    frameConsuming = true;
+    try { return operation(); } finally { frameConsuming = false; }
+  };
   const guardNode = Object.freeze({
     dependencies: Object.freeze([]),
     preflight: () => { assertGuardPlanIdentity(); physicalSweep(root, bound.values()); },
-    consume: () => {
+    consume: () => { consumeFrame(() => {
       for (const ref of bound.values()) {
         const actual = physical(root, ref.path), supplied = read(ref.path);
         assert.equal(hash(actual), ref.sha256, 'late base-class frame member ' + ref.path);
@@ -216,20 +227,31 @@ export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read 
         assert.ok(equalBuffers(actual, supplied), 'late nonphysical base-class frame ' + ref.path);
         assert.ok(equalBuffers(actual, physical(root, ref.path)), 'physical base-class frame changed during callback ' + ref.path);
       }
-    },
+    }); },
     final: () => { physicalSweep(root, bound.values()); assertGuardPlanIdentity(); },
   });
-  const assertCurrent = loadedComposeCanonicalSourceGuards(Object.freeze([guardNode]));
+  const composedFrameGuard = loadedComposeCanonicalSourceGuards(Object.freeze([guardNode]));
+  const assertCurrent = () => {
+    assert.equal(frameConsuming, false, 'reentrant base-class full frame');
+    composedFrameGuard();
+  };
   const registrySubject = () => {
     assertCurrent();
     return {raw: Buffer.from(actualRegistry), comparison: Buffer.from(registryBefore),
       reference: {...bound.get(BASE_CLASS_REMOVAL_REGISTRY)}};
   };
-  const ledgerSubject = () => {
-    assertCurrent();
-    return {raw: Buffer.from(actualLedger), comparison: Buffer.from(before),
+  const ledgerSubject = () => consumeFrame(() => {
+    // This operation consumes only the ledger. Other frame members still have
+    // full callback-free cold/final checks against their captured judgments.
+    guardNode.preflight();
+    const actual = physical(root, BASE_CLASS_REMOVAL_LEDGER), supplied = read(BASE_CLASS_REMOVAL_LEDGER);
+    assert.ok(equalBuffers(actualLedger, actual), 'late base-class ledger subject');
+    assert.ok(equalBuffers(actual, supplied), 'nonphysical base-class ledger subject');
+    assert.ok(equalBuffers(actual, physical(root, BASE_CLASS_REMOVAL_LEDGER)), 'base-class ledger changed during callback');
+    guardNode.final();
+    return {raw: Buffer.from(actual), comparison: Buffer.from(before),
       reference: {...bound.get(BASE_CLASS_REMOVAL_LEDGER)}};
-  };
+  });
   const predecessorData = (path, raw) => {
     assert.ok(Buffer.isBuffer(raw)); assertCurrent();
     return Buffer.from(path === BASE_CLASS_REMOVAL_REGISTRY && equalBuffers(registryAfter, raw) ? registryBefore : raw);

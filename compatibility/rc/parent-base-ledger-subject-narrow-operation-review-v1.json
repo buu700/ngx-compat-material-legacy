@@ -1,0 +1,46 @@
+{
+  "scope": "Static review of proposed frame-local ledgerSubject and base stage metadataRead change. No implementation, tests, mutation or owner execution.",
+  "conclusion": "The narrower design is plausible under the stated physical-frame and consumed-ledger contract; it does not require source-population checks that the existing frame-only metadataRead did not itself perform. It retains every frame physical member at cold and final boundaries and authenticates the ledger bytes actually consumed. A concrete reentrancy parity issue must be resolved in implementation, and full-frame supplied-reader sampling is intentionally reduced.",
+  "current_path": "base-class-removal-canonical-stage.mjs metadataRead(ledger) calls frames.assertCurrent, read(ledger), and frames.ledgerSubject().raw; ledgerSubject calls the same full frames.assertCurrent again. The latter is a composed scheduler with a per-instance running flag. Non-ledger paths delegate unchanged.",
+  "required_narrow_operation": [
+    "Check planner identity and callback-free physical hash/size of the complete captured frame bound before the first supplied read.",
+    "Read ledger physical bytes; require exact equality to the captured actualLedger and its bound digest/size. Invoke original supplied ledger reader, require a Buffer equal to physical/captured; re-read ledger physical and require exact equality.",
+    "After the callback perform callback-free complete captured frame physical sweep and planner identity, including helper and transition packet. Return copies of captured ledger/comparison/reference only after all checks.",
+    "metadataRead must preserve applied selection: true yields copied captured predecessor before; false yields exact checked actual ledger bytes. Non-ledger paths and all other owner and stage guards remain unchanged. No cross-call pass or bytes cache."
+  ],
+  "case_analysis": [
+    {
+      "case": "A cold frame member is corrupt before operation and the first ledger callback would restore it",
+      "result": "Preflight rejects before the callback, including when the member is helper or transition packet; assert callback count zero."
+    },
+    {
+      "case": "Ledger callback leaves earlier helper or another frame member changed",
+      "result": "Full frame final sweep rejects after callback, including same-length drift. If it changes ledger during callback the immediate physical reread also rejects."
+    },
+    {
+      "case": "Ledger callback returns forged/non-Buffer data while disk is unchanged",
+      "result": "Exact Buffer equality rejects the actual supplied bytes. Preserve tests for direct ledgerSubject and actual stage metadataRead."
+    },
+    {
+      "case": "Applied and precursor ledger state",
+      "result": "Only the captured applied state chooses whether the projected predecessor or actual ledger is returned, retaining the existing exact before/after comparison, copies, reference and sizes."
+    },
+    {
+      "case": "Unrelated source-only owner file/population changes",
+      "result": "The old metadataRead itself invokes frame guard rather than owner source guard, so requiring unrelated population within this narrow function would extend its scope. Existing enclosing owner and parent checks still must remain in effect; no conclusion about flattening them follows."
+    },
+    {
+      "case": "Supplied callback returns forged data only for a non-ledger member",
+      "result": "Old frame consumes that callback during guard and rejects; proposed operation never consumes that member through the callback. This changes callback sampling and observability, accepted only under the explicitly stated contract that unconsumed callbacks and call order are not stable API. Full other operations retain complete guards."
+    }
+  ],
+  "implementation_issue": {
+    "issue": "Preserve frame guard reentrancy semantics. Today ledgerSubject calls the same composed frames.assertCurrent guard, whose scheduler running flag rejects a recursive invocation. A direct physical implementation that bypasses the scheduler may permit recursive ledgerSubject from its own supplied ledger callback, or from a supplied callback while full frames.assertCurrent is active; this can recurse, return a value where the old code rejected, or alter exception recovery. A ledger-only running flag does not catch the full-frame-to-ledger direction.",
+    "required": "Use shared same-frame entry state or equivalent guard coordination covering both full assertCurrent and narrow ledgerSubject without blocking normal sequential calls; preserve cleanup on throws and caught nested rejection semantics. Verify actual full\u2192narrow, narrow\u2192full, narrow\u2192narrow, caught and uncaught reentry with real frame callbacks, plus successful subsequent retry."
+  },
+  "tests_and_limits": [
+    "Run actual frame and stage lifecycle cold/late same-size drift, ledger forged bytes, both frame states and non-ledger pass-through using genuine constructor; verify no modified fixture survives failure.",
+    "Verify the existing exhaustive original cold/late source regression populations after source/profile refresh; these focused cases do not replace them.",
+    "No claim that endpoint checks detect external changes fully restored between observations, or that omitted callbacks have been validated. No runtime speedup or owner deadline pass was measured."
+  ]
+}

@@ -14,7 +14,7 @@ import {baseClassRemovalOwnerContext} from '../scripts/base-class-removal-canoni
 import {readHistoricalContractRepairMember} from '../scripts/historical-contract-repair-source.mjs';
 
 const root = process.cwd(), helper = 'scripts/canonical-source-guard-plan.mjs';
-const transition = 'compatibility/rc/21x-base-class-owner-guard-plan-transition-v2.json';
+const transition = 'compatibility/rc/21x-base-class-owner-guard-plan-transition-v3.json';
 const disk = path => readHistoricalContractRepairMember(root, path);
 const helperBefore = disk(helper), inspectorBefore = Object.getOwnPropertyDescriptor(admission, 'inspectSource');
 let calls = 0, onRead = () => {}, override = null, rejected = 0;
@@ -122,10 +122,43 @@ for (const [object, key] of [[owner.frames, 'guardNode'], [owner.frames, 'assert
   owner.assertCurrent();
 }
 
-assert.equal(rejected, 15); assert.equal(getters, 0);
+// Each standalone narrow operation covers the complete physical frame while
+// consuming just its exact current ledger; no operation envelope or cache.
+const ledger = 'compatibility/f10/disposition-ledger/ledger.json';
+const narrowCounts = [];
+for (const [project, expected] of [[() => owner.frames.ledgerSubject().raw, disk(ledger)],
+  [() => context.metadataRead(ledger), context.applied ? context.before : disk(ledger)]]) {
+  reset(); const raw = project(); narrowCounts.push(calls);
+  assert.ok(raw.equals(expected)); assert.equal(calls, 1);
+  reset(); write(helper, Buffer.concat([helperBefore, Buffer.from('\n// cold prepared drift\n')]));
+  try {
+    onRead = () => write(helper, helperBefore);
+    reject(project); assert.equal(calls, 0);
+  } finally {write(helper, helperBefore); reset();}
+  override = (path, actual) => path === ledger ? Buffer.concat([actual, Buffer.from('\n// forged callback\n')]) : actual;
+  try {reject(project);} finally {reset();}
+  onRead = () => write(helper, Buffer.concat([helperBefore, Buffer.from('\n// final source callback drift\n')]));
+  try {reject(project);} finally {write(helper, helperBefore); reset();}
+  project(); reset();
+}
+// Preserve full->narrow, narrow->full, narrow->narrow and dependency-plan
+// reentrancy rejection; a caught nested failure must not poison the next run.
+for (const [outer, inner] of [
+  [owner.frames.assertCurrent, owner.frames.ledgerSubject],
+  [owner.frames.ledgerSubject, owner.frames.assertCurrent],
+  [owner.frames.ledgerSubject, owner.frames.ledgerSubject],
+  [owner.assertCurrent, owner.frames.ledgerSubject],
+]) {
+  let nested = false;
+  onRead = () => {if (!nested) {nested = true; reject(inner);}};
+  try {outer(); assert.equal(nested, true);} finally {reset();}
+  owner.frames.assertCurrent(); owner.frames.ledgerSubject(); reset();
+}
+assert.equal(rejected, 25); assert.equal(getters, 0);
 assert.ok(readFileSync(join(root, helper)).equals(helperBefore));
 console.log(JSON.stringify({result: 'pass', line: '21.x', actual_frame_and_source_owner_executed: true,
   actual_stage_context_executed: true, guard_plan_identity_forwarded: true,
+  narrow_projection_callbacks: narrowCounts, narrow_reentrant_controls: 4,
   frame_members: owner.frames.bound.length, source_members: owner.source.bound.length,
   historical_source_bindings_revalidated: owner.source.facts.historical_source_bindings_revalidated,
   rejected_lifetime_faults: rejected, inspector_getters_invoked: getters + constructorGetters,
