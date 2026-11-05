@@ -1,0 +1,25 @@
+{
+  "scope": "Read-only practical preflight of V10 scratch runner and worksheets; no owner/test or repo edits.",
+  "controller_sha256": "540dc9e2245fa2cf9284ed806379c2d707826bad8629e34a400033c1f820e75e",
+  "controller_bytes": 7157,
+  "worksheet_match": true,
+  "findings": [
+    {
+      "issue": "Only 21.x V7 receipt checked while result claims both gates",
+      "detail": "Runner reads and validates compatibility/rc/parent-source-contract-regressions-21-v7.json only. Its source_inputs include both roots but do not establish the distinct main V7 producer execution or outcome. The runner marks both source gates passed without validating/binding the actual main receipt.",
+      "fix": "Independently load and validate main V7 receipt (line, zero exit, real passing report, unchanged sources and original budgets), bind exact receipt identity and rehash its complete source_inputs too. Keep the actual full source gate semantics and current refs."
+    },
+    {
+      "issue": "Incorrect stated V7 source input count",
+      "detail": "The actual 21 and main V7 source_inputs arrays each contain 148 rows (113 21.x, 35 main), not the worksheet claim of 150.",
+      "fix": "Confirm exact source input roster and count independently, then state actual count rather than asserting 150."
+    }
+  ],
+  "valid_points": [
+    "Pinned unprofiled Node/heap, 1800 deadline, fresh output/receipt, sanitized child Git environment, timeout group kill and reap, partial report and snapshot errors recorded.",
+    "Success requires child exit zero, no timeout, valid full 21.x owner pass report with correct scope, unchanged tracked and enumerated qualified input snapshots; failure exits nonzero after receipt.",
+    "Three canonical files are checked against V9 preimages; selected qualified paths include inherited prior refs and current profile support. Snapshot limits are explicitly acknowledged.",
+    "Prior V9 remains failure; graph flattening is not asserted, no canonical transaction or G11 qualification claimed."
+  ],
+  "limits": "No claim of owner execution, performance, full external environment binding or atomic hostile-filesystem guarantee. Before launch commit reviewed evidence and bind post-commit HEAD/source cut."
+}
