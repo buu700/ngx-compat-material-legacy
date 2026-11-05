@@ -15,6 +15,8 @@ import {gunzipSync} from 'node:zlib';
 import {replayThemingSection} from './upstream-theming-inspection-source-review.mjs';
 import {reviewInspectionCompatibilitySource} from './upstream-inspection-compatibility-source-review.mjs';
 import {measureSurfaceThemeContracts,verifySurfaceThemeReference} from './upstream-surface-m3-theme-source-review.mjs';
+import {createCurrentSliderSelectorReports} from './current-sass-slider-selector-reports.mjs';
+const CURRENT_REPORT_HELPER={"path":"scripts/current-sass-slider-selector-reports.mjs","sha256":"aabc3425e12c038aa483730bf13abf23962693b465ab87e8cefdae35036e36a3","bytes":9342};
 const PREFIX='compatibility/rc/21x-c04-slider-m3-repairs-';
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const gitHash=(kind,raw)=>createHash('sha1').update(kind+' '+Buffer.byteLength(raw)+'\0').update(raw).digest('hex');
@@ -152,8 +154,10 @@ export function assertHistoricalSliderSources({tagged,modernTheme,legacyTheme,le
  assert.equal(legacyStructural,structural,'historical legacy slider structure/geometry/motion changed');
 }
 export function reviewSliderM3RepairsSource({root=process.cwd(),read=path=>readFileSync(join(root,path))}={}){
- const shared=reviewInspectionCompatibilitySource({root,read}),bound=new Map(shared.bound.map(ref=>[ref.path,ref]));
- function member(ref){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed slider repair source '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;}
+ root=resolve(root);const helperBytes=readFileSync(join(root,CURRENT_REPORT_HELPER.path));assert.equal(hash(helperBytes),CURRENT_REPORT_HELPER.sha256);assert.equal(helperBytes.length,CURRENT_REPORT_HELPER.bytes);
+ const currentSource=createCurrentSliderSelectorReports({root,read});read=currentSource.read;
+ const shared=reviewInspectionCompatibilitySource({root,read}),bound=new Map([...shared.bound,...currentSource.bound].map(ref=>[ref.path,ref]));
+ function member(ref){ref=currentSource.qualify(ref);const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed slider repair source '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;}
  function current(path){const raw=read(path);return member({path,sha256:hash(raw),bytes:raw.length});}
  member({path:'scripts/upstream-slider-m3-repairs-source-review.mjs',sha256:hash(image),bytes:image.length});for(const ref of [...COMPILER,...SHARED_INPUTS])member(ref);
  const pkg=JSON.parse(current('package.json'));assert.equal(pkg.devDependencies.sass,'1.104.1');assert.equal(pkg.packageManager,'pnpm@12.4.2');assert.equal(current('.node-version').toString().trim(),'24.21.0');assert.equal(read('.npm-version').toString().trim(),'11.19.0');current('toolchain-lock.json');
@@ -178,15 +182,18 @@ export function reviewSliderM3RepairsSource({root=process.cwd(),read=path=>readF
  const peerPackage=current('node_modules/@angular/material/package.json'),peerManifest={version:JSON.parse(peerPackage).version,sha256:hash(peerPackage)},selected=catalog.cases.filter(p=>p.mixin.startsWith('slider-')||p.mixin.startsWith('legacy-slider-'));
  assert.equal(selected.length,14);assert.equal(selected.filter(p=>p.mixin.startsWith('slider-')).length,8);assert.equal(selected.filter(p=>p.mixin.startsWith('legacy-slider-')).length,6);
  const measurement=measureSurfaceThemeContracts({reference,owned,peers,catalog,peerManifest,selected});assert.equal(measurement.exact_tagged_cases,14);assert.equal(measurement.existing_companion_cases,0);assert.equal(measurement.historically_empty_density_cases,2);
- const assertCurrent=()=>{shared.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late slider repair source change '+ref.path);assert.equal(raw.length,ref.bytes);}assertAbsent();};assertCurrent();
- return {report:{schema_version:1,line:'21.x',role:'Two individual whole-patch source proposals; tagged slider source identity and fourteen exact historical CSS cases',...facts,
-  originals:ORIGINAL,tagged_sass_reference:REFERENCE,reference_originals:REFERENCE_ORIGINALS,reference_identity:IDENTITY,argument_catalog:CATALOG,current_source_bindings:structuredClone([...bound.values()]),shared_source_bindings:shared.bound.length,
-  compiler:sass.info,compiler_inputs:COMPILER,shared_measurement_inputs:SHARED_INPUTS,slider_measurement:measurement,absent_owned_modern_slider_or_token_paths:absent,
+ const assertCurrent=()=>{shared.assertCurrent();currentSource.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late slider repair source change '+ref.path);assert.equal(raw.length,ref.bytes);}assertAbsent();currentSource.assertCurrent();};assertCurrent();
+ const report={schema_version:1,line:'21.x',role:'Two individual whole-patch source proposals; tagged slider source identity and fourteen exact historical CSS cases',...facts,
+  originals:ORIGINAL,tagged_sass_reference:REFERENCE,reference_originals:REFERENCE_ORIGINALS,reference_identity:IDENTITY,argument_catalog:CATALOG,current_source_bindings:structuredClone([...bound.values()]),shared_source_bindings:shared.bound.length,public_override_boundaries:8,historical_public_override_boundaries:4,current_public_bridge:structuredClone(currentSource.summary),
+  compiler:sass.info,compiler_inputs:COMPILER,shared_measurement_inputs:SHARED_INPUTS.map(ref=>currentSource.qualify(ref)),slider_measurement:measurement,absent_owned_modern_slider_or_token_paths:absent,
   original_sass_graph_members:52,original_locked_archive_packages:13,modern_theme_module_URL_rewrites:4,legacy_theme_byte_identical_to_tag:true,legacy_component_module_URL_rewrites:3,prior_high_contrast_argument_cleanups:4,
   legacy_component_other_source_changes:0,namespace_or_mixin_or_selector_rewrites:0,post16_slider_base_or_private_inspection_adopted:false,
   upstream_lock_change_packages:['caniuse-lite'],upstream_lock_old_versions:['1.0.30001495','1.0.30001519','1.0.30001551'],upstream_lock_new_version:'1.0.30001570',upstream_lock_range_selectors:6,upstream_lock_or_browser_target_changes_adopted:false,
   fresh_bounded_sass_compiler_execution:true,tagged_reference_sass_executed:true,component_structural_Sass_freshly_compiled:false,upstream_post16_sass_or_typescript_tests_or_workflows_executed:false,original_or_post16_package_javascript_executed:false,
-  full_sass_gate_executed:false,mixed_M2_M3_native_coexistence_qualified:false,canonical_decisions_changed:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'},bound:structuredClone([...bound.values()]),assertCurrent};
+  full_sass_gate_executed:false,mixed_M2_M3_native_coexistence_qualified:false,canonical_decisions_changed:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+ report.current_source_bindings.sort((a,b)=>a.path.localeCompare(b.path));
+ const historical_report=currentSource.assertReportSuccessor('slider-m3-repairs',report);
+ return {report,historical_report,bound:structuredClone([...bound.values()]),assertCurrent};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  assert.equal(process.argv.length,3);const scope=reviewSliderM3RepairsSource();scope.assertCurrent();writeFileSync(process.argv[2],JSON.stringify(scope.report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({result:'pass',original_files:9,original_hunks:14,slider_cases:scope.report.slider_measurement.case_count,source_bindings:scope.bound.length,canonical_decisions_changed:0}));

@@ -26,11 +26,15 @@ class SliderM3RepairsSourceReviewTests(unittest.TestCase):
                            ('tagged_blobs', 6), ('exact_patch_replays', 9), ('authenticated_tree_objects', 50),
                            ('authenticated_absent_tagged_modules', 1), ('tagged_structural_data_blobs', 2),
                            ('additional_files_beyond_seed', 3), ('additional_hunks_beyond_seed', 3),
-                           ('source_bindings', 638), ('slider_cases', 14), ('exact_tagged_CSS_cases', 14),
+                           ('historical_source_bindings', 638), ('slider_cases', 14), ('exact_tagged_CSS_cases', 14),
                            ('historically_empty_density_cases', 2), ('original_sass_graph_members', 52),
                            ('original_locked_archive_packages', 13), ('css_semantic_mutants_detected', 9),
                            ('static_source_identity_mutants_detected', 6), ('preserved_prior_CSS_semantic_mutants', 10)]:
             self.assertEqual(report[key], value, key)
+        self.assertEqual(report['source_bindings'], report['expected_source_bindings'])
+        self.assertTrue(report['current_source_bindings_match_exact_successor'])
+        self.assertEqual(report['historical_public_override_boundaries'], 4)
+        self.assertEqual(report['public_override_boundaries'], 8)
         self.assertTrue(report['fresh_prior_surface_controls_executed'])
         self.assertEqual(len(report['preserved_prior_rejection_controls']), 134)
         self.assertEqual(len(set(report['preserved_prior_rejection_controls'])), 134)

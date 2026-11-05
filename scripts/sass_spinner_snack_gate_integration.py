@@ -7,11 +7,12 @@ import json
 from pathlib import Path
 import re
 import weakref
-from sass_spinner_snack_bridge_admission import (SpinnerSnackBridgeContract,
-    SPINNER_SNACK_BRIDGE_CASES, SPINNER_SNACK_BRIDGE_CONTRACT,
-    spinner_snack_bridge_assertion_ok)
+from sass_spinner_snack_bridge_admission import (SPINNER_SNACK_BRIDGE_CASES, SPINNER_SNACK_BRIDGE_CONTRACT)
+from current_sass_spinner_snack_admission import (CurrentSpinnerSnackContract,
+    current_spinner_snack_assertion_ok)
 from sass_spinner_snack_aggregate_admission import (SPINNER_SNACK_AGGREGATE_CASES,
     insert_spinner_snack_into_aggregate_model)
+from sass_ordinary_aggregate_admission import insert_ordinary_checkbox_button_into_aggregate_model
 from sass_default_aggregate_admission import (DEFAULT_AGGREGATE_CASES,
     DEFAULT_AGGREGATE_CONTRACT, default_aggregate_expected_css)
 from sass_aggregate_color_theme_admission import aggregate_color_theme_expected_css
@@ -32,8 +33,11 @@ SPINNER_SNACK_DEFAULT_CASES=tuple(value for value in SPINNER_SNACK_BRIDGE_CASES 
 _CONTEXTS=weakref.WeakKeyDictionary()
 _ROOT_CONTEXTS={}
 _DEPENDENCIES={
+ 'scripts/current_sass_spinner_snack_admission.py':'08507f9d9a0600b5e316d7bf38a6ee1dd2d2948b3139c81299e8beddc6a3f4d0',
  'scripts/sass_spinner_snack_bridge_admission.py':'66a9ad634bede4e0eeef23ece0fe50d49d6fbf28d5bc619da0873d6ec8fae0f3',
  'scripts/sass_spinner_snack_aggregate_admission.py':'2d55dedfe1d1da672337389730e3c31882b8993e0fd40a375950b714a61b6cba',
+ 'scripts/sass_ordinary_aggregate_admission.py':'0f8451f8a6d398631a70edc810c2c19bd816bf43710eb0f1d83722a3e0f13447',
+ 'scripts/sass_ordinary_control_css.py':'fd6e306d13fc5a1abb054065ee0e7e9208b5fe49e89d586d6733eaba18afb559',
  'scripts/sass_default_aggregate_admission.py':'35089797f4f06a5d602768b1e8710ff69e855e6262918e8d680fc4f6550106b5',
  'scripts/sass_aggregate_color_theme_admission.py':'5ab3e46159e9c69f22713c69e98594b25f919ce1f83a1c540392c642a21e2622',
  'scripts/sass_aggregate_typography_admission.py':'c344d3b7d1f9f8a660449d52c0bba90355dbf9af1ef4a954668107b9605fb523',
@@ -103,7 +107,7 @@ class SpinnerSnackGateContext:
     def __init__(self,root=ROOT,*,read=None):
         root=Path(root).absolute()
         read,assert_physical=_physical_boundary(root,read)
-        source=SpinnerSnackBridgeContract(root,read=read)
+        source=CurrentSpinnerSnackContract(root,read=read)
         line=source.line
         branch=_PACKET['branches'][line]
         oracle=json.loads((root/_PACKET['oracle']['path']).read_bytes())
@@ -116,7 +120,7 @@ class SpinnerSnackGateContext:
             for path,sha in _DEPENDENCIES.items():assert _hash(_tool(root,path,read))==sha
             source.assert_current()
             assert_physical()
-        sets=list(branch['source_sets'].values())
+        sets=list(source.source_sets.values())
         assert len(sets)==1
         plans={r['case_id']:r for r in branch['cases']}
         for case in SPINNER_SNACK_AGGREGATE_CASES:
@@ -124,7 +128,7 @@ class SpinnerSnackGateContext:
             mixin=case[10:] if default else case.split('/')[1]
             probe={'call':'.sass-api-probe { @include m.'+mixin+'('+('' if mixin.endswith('typographies') else '$__theme')+'); }'} if default else next(p for p in catalog['cases'] if p['case_id']==case)
             plans[case]={**probe,'mixin':mixin,'program_sha256':_hash("@use '__entry__' as m;\n"+(oracle['standard_theme'] if default else catalog['setup'])+'\n'+probe['call']+'\n')}
-        descriptor=dict(contract=SPINNER_SNACK_BRIDGE_CONTRACT,source_line=line,source_subject=_PACKET['source_subject'],source_packet=_PACKET['source_packet'],source_modules=branch['source_modules'],compiler_inputs=_PACKET['compiler_inputs'])
+        descriptor=source.descriptor
         _CONTEXTS[self]=dict(root=root,source=source,line=line,branch=branch,oracle=oracle,catalog=catalog,provenance=provenance,lock=lock,descriptor=_plain(descriptor),current_sources=_plain(sets[0]),plans=plans,assert_current=assert_current,assert_physical=assert_physical)
         assert_current()
         assert_physical()
@@ -181,7 +185,9 @@ def _aggregate(s,body):
             if c['contract']!='historical-color-theme-aggregate-with-qualified-members':return False
             before=aggregate_color_theme_expected_css(body)
     if before is None:return False
-    expected=insert_spinner_snack_into_aggregate_model(case_id=case,css=before)
+    spinner_snack=insert_spinner_snack_into_aggregate_model(case_id=case,css=before)
+    if spinner_snack is None:return False
+    expected=insert_ordinary_checkbox_button_into_aggregate_model(case_id=case,css=spinner_snack)
     return expected is not None and actual['css']==expected
 
 def spinner_snack_gate_assertion_ok(root,active,body,invocation,*,context=None):
@@ -205,7 +211,7 @@ def spinner_snack_gate_assertion_ok(root,active,body,invocation,*,context=None):
             else:
                 probe=next(p for p in s['catalog']['cases'] if p['case_id']==case)
                 assert all(b.get(k)==v for k,v in probe.items())
-            ok=spinner_snack_bridge_assertion_ok(context=s['source'],body=b,active=a,invocation=snapshot['invocation'])
+            ok=current_spinner_snack_assertion_ok(context=s['source'],body=b,active=a,invocation=snapshot['invocation'])
         else:
             fields=dict(kind='assertion',check_id='sass-seal',group='sass-api-and-values',result='pass',exit_code=0,line=s['line'],run_id=a['manifest']['run_id'],invocation_id=snapshot['invocation'],binding=a['binding'],error=None)
             assert all(type(b.get(k)) is type(v) and b.get(k)==v for k,v in fields.items())

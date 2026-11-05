@@ -16,6 +16,8 @@ from sass_ripple_color_admission import RIPPLE_COLOR_ARGUMENT_CASES, RIPPLE_COLO
 
 from sass_spinner_snack_gate_integration import SPINNER_SNACK_GATE_CASES, spinner_snack_gate_assertion_ok
 
+from sass_ordinary_control_gate import ORDINARY_CONTROL_GATE_CASES, ordinary_control_gate_assertion_ok
+
 def mixin_argument_measurements_ok(root,body,*,owned=False):
     try:
         path='fixtures/sass/owned-aggregate-contracts.json' if owned else 'fixtures/sass/mixin-argument-contracts.json';raw=(root/path).read_bytes();catalog=json.loads(raw)
@@ -66,6 +68,9 @@ def mixin_argument_assertion_ok(root,active,body,invocation):
         if any(body.get(k)!=v or type(body.get(k))!=type(v) for k,v in envelope.items()):return False
         library=[a for a in active.manifest['artifacts'] if a['id']=='library']
         if len(library)!=1 or body['tarball_sha256']!=library[0]['sha256'] or not mixin_argument_measurements_ok(root,body,owned=owned):return False
+        if body['case_id'] in ORDINARY_CONTROL_GATE_CASES:
+            return ordinary_control_gate_assertion_ok(root,active,body,invocation)
+        if 'current_ordinary_controls' in body:return False
         if body['case_id'] in SPINNER_SNACK_GATE_CASES:
             return spinner_snack_gate_assertion_ok(root,active,body,invocation)
         if 'current_spinner_snack_bridge' in body:return False

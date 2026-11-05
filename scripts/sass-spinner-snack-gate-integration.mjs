@@ -11,8 +11,10 @@ import {readFileSync,lstatSync,realpathSync} from 'node:fs';
 import {isAbsolute,join,relative,resolve} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {isDeepStrictEqual,types} from 'node:util';
-import {createSpinnerSnackBridgeContract,SPINNER_SNACK_BRIDGE_CASES,SPINNER_SNACK_BRIDGE_CONTRACT,spinnerSnackBridgeResultsMatch} from './sass-spinner-snack-bridge-contract.mjs';
+import {SPINNER_SNACK_BRIDGE_CASES,SPINNER_SNACK_BRIDGE_CONTRACT,spinnerSnackBridgeResultsMatch} from './sass-spinner-snack-bridge-contract.mjs';
+import {createCurrentSpinnerSnackContract} from './current-sass-spinner-snack-contract.mjs';
 import {SPINNER_SNACK_AGGREGATE_CASES,insertSpinnerSnackIntoAggregateModel} from './sass-spinner-snack-aggregate-contract.mjs';
+import {insertOrdinaryCheckboxButtonIntoAggregateModel} from './sass-ordinary-aggregate-contract.mjs';
 import {DEFAULT_AGGREGATE_CONTRACT,defaultAggregateExpectedCss,defaultAggregateMeasurementOk} from './sass-default-aggregate-contract.mjs';
 import {aggregateColorThemeExpectedCss} from './sass-aggregate-color-theme-contract.mjs';
 import {aggregateTypographyExpectedCss} from './sass-aggregate-typography-contract.mjs';
@@ -23,8 +25,11 @@ const hash=b=>createHash('sha256').update(b).digest('hex'),image=readFileSync(fi
 const raw=readFileSync(new URL('../'+INPUTS,import.meta.url));assert.equal(hash(raw),'fd78f8c7f6e072fb7393c61aef782ccdf3a1c8d009227d08b29921ea2809e0a8');
 const packet=JSON.parse(raw),contexts=new WeakMap(),referenceRuns=new WeakMap();
 const dependencies=[
+ ['scripts/current-sass-spinner-snack-contract.mjs','ad72af7336a013fffe311dc143169e30f9b001a4dc9a55a43795473bd863151f'],
  ['scripts/sass-spinner-snack-bridge-contract.mjs','5fe7386872355fa2261856a64392433b29e332d40446c4c03a95db4a5d36ba46'],
  ['scripts/sass-spinner-snack-aggregate-contract.mjs','2e5a955774961793e0578fd17e6d47ce5d72fe8d60a5f56daa442ab5528bc4c0'],
+ ['scripts/sass-ordinary-aggregate-contract.mjs','a83fe3f31fab8e4973f4d8eeed303e51bb0dd44f0a2ba64d6d1f6739bd60e2d6'],
+ ['compatibility/rc/ordinary-checkbox-button-expectation-model-v1.mjs','f094e84d2ce8a3f36aab239eb0d30940da976072a85ca0edcf29b8afb6dc9fb0'],
  ['scripts/sass-default-aggregate-contract.mjs','8f7d599e4187a94e66670015cd3f0e28a223209d887b9481727d1a60d9a2303a'],
  ['scripts/sass-aggregate-color-theme-contract.mjs','7d883b820a7ff2f5eb98e49fdab72d4306b6370605902b3bf71e7bd2d8e362ec'],
  ['scripts/sass-aggregate-typography-contract.mjs','77ac326df5c2fa3b9cf3f08ea1fb400761f750502015c9c724a9b2436bb49b11'],
@@ -82,11 +87,11 @@ function guarded(args,fields,operation,defaults={}){
 }
 export function createSpinnerSnackGateContext(args={}){
  const captured=captureArgs(args,['root','read']);let {root=process.cwd(),read}=captured.values;
- root=resolve(root);const boundary=physicalBoundary(root,read);read=boundary.read;const source=createSpinnerSnackBridgeContract({root,read}),line=source.line,branch=packet.branches[line];
+ root=resolve(root);const boundary=physicalBoundary(root,read);read=boundary.read;const source=createCurrentSpinnerSnackContract({root,read}),line=source.line,branch=packet.branches[line];
  const assertCurrent=()=>{source.assertCurrent();assert.ok(tool(root,SELF,read).equals(image));for(const[path,sha256]of dependencies)assert.equal(hash(tool(root,path,read)),sha256);source.assertCurrent();boundary.assertPhysical();};
  const oracle=JSON.parse(readFileSync(join(root,packet.oracle.path))),catalog=JSON.parse(readFileSync(join(root,packet.catalog.path))),provenance=JSON.parse(readFileSync(join(root,packet.provenance.path))),lock=JSON.parse(readFileSync(join(root,packet.reference_lock.path)));
- const sets=Object.values(branch.source_sets);assert.equal(sets.length,1);const currentSources=plain(sets[0]);
- const descriptor={contract:SPINNER_SNACK_BRIDGE_CONTRACT,source_line:line,source_subject:packet.source_subject,source_packet:packet.source_packet,source_modules:branch.source_modules,compiler_inputs:packet.compiler_inputs};
+ const sets=Object.values(source.source_sets);assert.equal(sets.length,1);const currentSources=plain(sets[0]);
+ const descriptor=plain(source.descriptor);
  const plans=new Map(branch.cases.map(row=>[row.case_id,row]));
  for(const id of SPINNER_SNACK_AGGREGATE_CASES){const isDefault=id.startsWith('mixin-css/'),mixin=isDefault?id.slice(10):id.split('/')[1],probe=isDefault?{call:'.sass-api-probe { @include m.'+mixin+'('+(mixin.endsWith('typographies')?'':'$__theme')+'); }'}:catalog.cases.find(p=>p.case_id===id);assert.ok(probe);plans.set(id,{...probe,mixin,program_sha256:hash("@use '__entry__' as m;\n"+(isDefault?oracle.standard_theme:catalog.setup)+'\n'+probe.call+'\n')});}
  const context=Object.freeze({line,assertCurrent,source_scope_only:true,gate_or_artifact_admission_granted:false});
@@ -116,7 +121,8 @@ export function spinnerSnackGateAggregateMatch(args={}){
   if(v.caseId.startsWith('mixin-css/')){if(v.companion.contract!==DEFAULT_AGGREGATE_CONTRACT||!defaultAggregateMeasurementOk(v.caseId,v.actual,s.line))return false;before=defaultAggregateExpectedCss(v.caseId,v.companion.peer);}
   else if(v.caseId.includes('all-component-typographies')){if(v.companion.contract!=='historical-typography-aggregate-with-qualified-members'||!originalMeasurement(s,v.caseId,v.original))return false;before=aggregateTypographyExpectedCss(v.caseId,v.original,v.companion.peer);}
   else{if(v.companion.contract!=='historical-color-theme-aggregate-with-qualified-members'||!originalMeasurement(s,v.caseId,v.original)||!rippleColorMeasurementOkay(v.caseId,v.actual,s.line))return false;before=aggregateColorThemeExpectedCss(v.caseId,v.original,v.companion.peer);}
-  if(before===null)return false;const expected=insertSpinnerSnackIntoAggregateModel({caseId:v.caseId,css:before});return expected!==null&&v.actual.css===expected;
+  if(before===null)return false;const spinnerSnack=insertSpinnerSnackIntoAggregateModel({caseId:v.caseId,css:before});if(spinnerSnack===null)return false;
+  const expected=insertOrdinaryCheckboxButtonIntoAggregateModel({caseId:v.caseId,css:spinnerSnack});return expected!==null&&v.actual.css===expected;
  },{original:null});
 }
 /** Only referenceObserver's already-authenticated untouched16 environment belongs here. */

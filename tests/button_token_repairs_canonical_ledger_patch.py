@@ -38,7 +38,8 @@ def verify_button_token_repairs_registry_successor(root=ROOT):
                         "    scope_key:'button_token_repairs_source_scope',module:'upstream-button-token-repairs-admission.cjs'},\n" for sha in SHAS)
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == '5fc40f097b86949ce52285987d0fbbcc32841007f5f879dca066cb43ecb675af'
-    current = (root / REGISTRY).read_bytes()
+    from current_sass_canonical_test_scope import historical67_registry_bytes
+    current = historical67_registry_bytes(root)
     if digest(current) == '03a18cd09e4183f4307f1ec2c17d0797eea72db0440e23530e4d015ea0dae6a8':
         from remaining_unthemable_canonical_ledger_patch import verify_remaining_unthemable_registry_successor
         remaining_before, remaining_after = verify_remaining_unthemable_registry_successor(root)
@@ -74,6 +75,7 @@ def verify_button_token_repairs_registry_successor(root=ROOT):
 
 
 def derive_button_token_repairs_successor(root=ROOT):
+    from historical_contract_repair_source import qualify_tool_reference
     from unthemable_ledger_patch import spans
     env = dict(os.environ, GIT_NO_LAZY_FETCH='1', GIT_NO_REPLACE_OBJECTS='1')
     for key in ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES']:
@@ -85,7 +87,7 @@ def derive_button_token_repairs_successor(root=ROOT):
     assert packet['registry_before'] == {'path': REGISTRY, 'sha256': digest(registry_before), 'bytes': len(registry_before)}
     assert packet['registry_after'] == {'path': REGISTRY, 'sha256': digest(registry_after), 'bytes': len(registry_after)}
     assert packet['source_parent'] == '2103cdde255ea68b82b51f94f42e6c9b95824ea0'
-    before = subprocess.check_output(['git', '--no-replace-objects', 'show', packet['source_parent'] + ':' + LEDGER], cwd=root, env=env)
+    before = subprocess.check_output(['git', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0', '--no-replace-objects', 'show', packet['source_parent'] + ':' + LEDGER], cwd=root, env=env)
     assert digest(before) == BEFORE
     assert packet['before'] == {'path': LEDGER, 'sha256': BEFORE, 'bytes': len(before)}
     review_raw = (root / REVIEW).read_bytes()
@@ -95,7 +97,10 @@ def derive_button_token_repairs_successor(root=ROOT):
         assert digest((root / row['patch_file']).read_bytes()) == row['diff_sha256']
     assert [row['sha'] for row in body['reviews']] == SHAS
     handler = next(ref for ref in packet['source_members'] if ref['path'] == 'scripts/upstream-button-token-repairs-admission.cjs')
-    for ref in packet['source_members']:
+    # Frozen packet members remain the proof identity. Only physical rehashes
+    # use the exact authenticated current tool successor.
+    for prior_ref in packet['source_members']:
+        ref = qualify_tool_reference(prior_ref, root)
         raw = (root / ref['path']).read_bytes()
         assert digest(raw) == ref['sha256'] and len(raw) == ref['bytes']
     expected = json.loads(before)

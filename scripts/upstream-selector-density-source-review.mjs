@@ -15,6 +15,8 @@ import {gunzipSync} from 'node:zlib';
 import {replayThemingSection} from './upstream-theming-inspection-source-review.mjs';
 import {reviewInspectionCompatibilitySource} from './upstream-inspection-compatibility-source-review.mjs';
 const require=createRequire(import.meta.url),sass=require('sass');
+import {createCurrentSliderSelectorReports} from './current-sass-slider-selector-reports.mjs';
+const CURRENT_REPORT_HELPER={"path":"scripts/current-sass-slider-selector-reports.mjs","sha256":"aabc3425e12c038aa483730bf13abf23962693b465ab87e8cefdae35036e36a3","bytes":9342};
 const PREFIX='compatibility/rc/21x-c04-selector-density-';
 const ORIGINAL={path:PREFIX+'originals-complete-context.json.gz',sha256:'953704cbc6582bee957c2caa11e533d43a3367a50c77ccb981e35fa9d742e77d'};
 const SEED={path:PREFIX+'originals.json.gz',sha256:'dbb813e06a0c09df47429b966f4fdaa59295ac9d1303f1d80b4caeb90ff5ccd7'};
@@ -170,8 +172,10 @@ export function measureLegacyDensity({owned,tagged}){
  return {cases,case_count:cases.length,tagged_density_mixin_extracted_without_body_edits:true,full_paginator_color_typography_or_product_qualified:false};
 }
 export function reviewSelectorDensitySource({root=process.cwd(),read=path=>readFileSync(join(root,path))}={}){
- const shared=reviewInspectionCompatibilitySource({root,read}),bound=new Map(shared.bound.map(ref=>[ref.path,ref]));
- function member(ref){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed selector/density source '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;}
+ root=resolve(root);const helperBytes=readFileSync(join(root,CURRENT_REPORT_HELPER.path));assert.equal(hash(helperBytes),CURRENT_REPORT_HELPER.sha256);assert.equal(helperBytes.length,CURRENT_REPORT_HELPER.bytes);
+ const currentSource=createCurrentSliderSelectorReports({root,read});read=currentSource.read;
+ const shared=reviewInspectionCompatibilitySource({root,read}),bound=new Map([...shared.bound,...currentSource.bound].map(ref=>[ref.path,ref]));
+ function member(ref){ref=currentSource.qualify(ref);const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed selector/density source '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;}
  function current(path){const raw=read(path);return member({path,sha256:hash(raw),bytes:raw.length});}
  member({path:'scripts/upstream-selector-density-source-review.mjs',sha256:hash(image),bytes:image.length});
  for(const ref of COMPILER)member(ref);
@@ -190,15 +194,19 @@ export function reviewSelectorDensitySource({root=process.cwd(),read=path=>readF
    const calls=[...text.matchAll(new RegExp('@include\\s+'+name.replaceAll('.','\\.')+'\\s*\\(','g'))];if(calls.length)target.push({path:ref.path,calls:calls.length});
   }
  }
- assert.ok(selectorCallers.length>0);assert.deepEqual(densityCallers.map(ref=>ref.path).sort(),['projects/ngx-material-legacy/legacy-paginator/_paginator-theme.scss','projects/ngx-material-legacy/styles/legacy-paginator/_paginator-theme.scss','projects/ngx-material-legacy/styles/tree/_tree-theme.scss']);
+ selectorCallers.sort((a,b)=>a.path.localeCompare(b.path));densityCallers.sort((a,b)=>a.path.localeCompare(b.path));
+ assert.equal(selectorCallers.length,20);assert.equal(selectorCallers.reduce((n,row)=>n+row.calls,0),41);assert.deepEqual(densityCallers.map(ref=>ref.path),['projects/ngx-material-legacy/legacy-paginator/_paginator-theme.scss','projects/ngx-material-legacy/styles/legacy-paginator/_paginator-theme.scss','projects/ngx-material-legacy/styles/tree/_tree-theme.scss']);
  const facade=member(shared.bound.find(ref=>ref.path==='projects/ngx-material-legacy/_index.scss')).toString();assert.ok(facade.includes("@forward './styles/core/style/sass-utils' as private-*;"));
  const aggregate=member(shared.bound.find(ref=>ref.path==='projects/ngx-material-legacy/styles/legacy-core/theming/_all-theme.scss')).toString();
  for(const path of ['legacy-paginator/paginator-theme','tree/tree-theme','badge/badge-theme'])assert.ok(aggregate.includes(path));
- const assertCurrent=()=>{shared.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late selector/density source change '+ref.path);assert.equal(raw.length,ref.bytes);}};assertCurrent();
- return {report:{schema_version:1,line:'21.x',role:'Two individually reviewed source proposals and bounded Sass behavior; no full product or canonical admission credit',...facts,
-  originals:ORIGINAL,seed_originals:SEED,source_census:CENSUS,current_source_bindings:structuredClone([...bound.values()]),selector_callers:selectorCallers,density_wrapper_callers:densityCallers,historical_exported_functions:25,owned_scss_members:409,public_override_boundaries:4,
+ const assertCurrent=()=>{shared.assertCurrent();currentSource.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late selector/density source change '+ref.path);assert.equal(raw.length,ref.bytes);}currentSource.assertCurrent();};assertCurrent();
+ const report={schema_version:1,line:'21.x',role:'Two individually reviewed source proposals and bounded Sass behavior; no full product or canonical admission credit',...facts,
+  originals:ORIGINAL,seed_originals:SEED,source_census:CENSUS,current_source_bindings:structuredClone([...bound.values()]),selector_callers:selectorCallers,density_wrapper_callers:densityCallers,historical_exported_functions:25,owned_scss_members:409,public_override_boundaries:8,historical_public_override_boundaries:4,current_public_bridge:structuredClone(currentSource.summary),
   compiler:sass.info,compiler_inputs:COMPILER,selector_measurement:selector,density_measurement:density,
-  fresh_bounded_sass_compiler_execution:true,tagged_reference_sass_executed:true,reviewed_after_selector_mixin_sass_executed:true,upstream_typescript_tests_or_workflows_executed:false,full_sass_gate_executed:false,canonical_decisions_changed:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'},bound:structuredClone([...bound.values()]),assertCurrent};
+  fresh_bounded_sass_compiler_execution:true,tagged_reference_sass_executed:true,reviewed_after_selector_mixin_sass_executed:true,upstream_typescript_tests_or_workflows_executed:false,full_sass_gate_executed:false,canonical_decisions_changed:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+ report.current_source_bindings.sort((a,b)=>a.path.localeCompare(b.path));
+ const historical_report=currentSource.assertReportSuccessor('selector-density',report);
+ return {report,historical_report,bound:structuredClone([...bound.values()]),assertCurrent};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  assert.equal(process.argv.length,3);const scope=reviewSelectorDensitySource();scope.assertCurrent();writeFileSync(process.argv[2],JSON.stringify(scope.report,null,2)+'\n',{flag:'wx'});

@@ -10,6 +10,7 @@ import {join} from 'node:path';
 import {gunzipSync} from 'node:zlib';
 import {createHash} from 'node:crypto';
 import {verifySelectorDensityOriginals,reviewSelectorDensitySource,measureSelectorHelper,measureLegacyDensity,sassDeclaration} from '../scripts/upstream-selector-density-source-review.mjs';
+import {assertCurrentSliderSelectorTestSources} from './current_sass_slider_selector_sources.mjs';
 const root=process.cwd(),read=path=>readFileSync(join(root,path)),hash=raw=>createHash('sha256').update(raw).digest('hex');
 const gitHash=raw=>createHash('sha1').update('blob '+Buffer.byteLength(raw)+'\0').update(raw).digest('hex');
 const original=JSON.parse(gunzipSync(read('compatibility/rc/21x-c04-selector-density-originals-complete-context.json.gz')));
@@ -52,6 +53,8 @@ for(const fault of ['lost-wrapper','lost-root-state','lost-flag-reset','changed-
 }
 let late=null;const mutable=path=>late===path?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
 const scope=reviewSelectorDensitySource({root,read:mutable});assert.equal(scope.report.reviews.length,2);assert.ok(scope.report.reviews.every(row=>row.proposed_final_disposition==='do-not-adopt'));
+const sourceQualification=assertCurrentSliderSelectorTestSources({kind:'selector-density',scope,root,read:mutable});
+assert.equal(scope.report.selector_callers.length,20);assert.equal(scope.report.selector_callers.reduce((n,row)=>n+row.calls,0),41);
 const roles=[
  'scripts/upstream-selector-density-source-review.mjs','scripts/upstream-inspection-compatibility-source-review.mjs',
  'compatibility/rc/21x-c04-selector-density-originals-complete-context.json.gz','compatibility/rc/21x-c04-selector-density-originals.json.gz',
@@ -65,7 +68,7 @@ const bound=new Set(scope.bound.map(ref=>ref.path));assert.ok(roles.every(path=>
 for(const path of roles){late=path;assert.throws(()=>scope.assertCurrent(),undefined,path);rejected.push('late/'+path);}late=null;scope.assertCurrent();
 scope.bound.length=0;scope.report.current_source_bindings.length=0;late=utils;late='projects/ngx-material-legacy/styles/'+utils;assert.throws(()=>scope.assertCurrent());late=null;scope.assertCurrent();rejected.push('public-metadata-cannot-rewrite-guards');
 const report={schema_version:1,result:'pass',original_files:4,original_hunks:5,present_original_blobs:7,tagged_blobs:6,exact_patch_replays:4,disabled_original_density_assertions:1,
- original_before_selector_mixin_matches_tag:true,proposed_individual_source_decisions:2,source_bindings:bound.size,selector_cases:scope.report.selector_measurement.case_count,density_cases:scope.report.density_measurement.case_count,
+ original_before_selector_mixin_matches_tag:true,proposed_individual_source_decisions:2,source_bindings:bound.size,...sourceQualification,selector_cases:scope.report.selector_measurement.case_count,density_cases:scope.report.density_measurement.case_count,
  reviewed_after_changed_css_cases:scope.report.selector_measurement.reviewed_after_changed_css_cases,original_order_reversal_reproduced_on_pinned_compiler:false,
  selector_caller_modules:scope.report.selector_callers.length,selector_calls:scope.report.selector_callers.reduce((n,row)=>n+row.calls,0),density_caller_modules:scope.report.density_wrapper_callers.length,
  semantic_mutants_detected:9,rejected,fresh_bounded_sass_compiler_execution:true,tagged_reference_sass_executed:true,reviewed_after_selector_mixin_sass_executed:true,

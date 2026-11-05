@@ -6,10 +6,16 @@ from pathlib import Path
 import copy
 import hashlib
 import json
+import os
+import sys
 import unittest
-import sass_spinner_snack_bridge_admission as subject
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+import sass_spinner_snack_bridge_admission as subject
+from current_sass_spinner_snack_admission import (CurrentSpinnerSnackContract,
+    current_spinner_snack_assertion_ok)
+
 PREFIX = 'compatibility/rc/parallel-spinner-snack-css-contract-'
 def digest(value):
     return hashlib.sha256(value.encode() if isinstance(value, str) else value).hexdigest()
@@ -37,7 +43,7 @@ class SpinnerSnackBridgeAdmissionTests(unittest.TestCase):
                 cls.controls['hook'] = None
                 action()
             return b'nonphysical' if path == cls.controls['target'] else (ROOT / path).read_bytes()
-        cls.context = subject.SpinnerSnackBridgeContract(ROOT, read=callback)
+        cls.context = CurrentSpinnerSnackContract(ROOT, read=callback)
     def yes(self, name, value):
         self.assertTrue(value, name)
         self.checks.append(name)
@@ -54,14 +60,14 @@ class SpinnerSnackBridgeAdmissionTests(unittest.TestCase):
                        artifacts_sha256=digest(json.dumps(manifest['artifacts'], sort_keys=True, separators=(',', ':'))))
         active, invocation = dict(manifest=manifest, binding=binding), 'modeled-invocation'
         original = dict(**measured(row['historical']['css']), program_sha256=spec['program_sha256'], sources=[dict(root=0, **self.catalog['original_entry_identity'])])
-        actual = dict(**measured(row['current']['css']), program_sha256=spec['program_sha256'], sources=copy.deepcopy(self.branch['source_sets'][spec['source_set_sha256']]))
+        source_key = next(row['current_sha256'] for row in self.context.source_set_successors if row['historical_sha256'] == spec['source_set_sha256'])
+        actual = dict(**measured(row['current']['css']), program_sha256=spec['program_sha256'], sources=self.context.source_sets[source_key])
         default = row['case_id'].startswith('mixin-css/')
         identity = dict(material_version='16.2.14', material_manifest_sha256=self.provenance['isolated_environment']['material_manifest_sha256'],
                         lock_sha256=self.packet['reference_lock']['sha256'], material_integrity=self.lock['packages']['node_modules/@angular/material']['integrity'],
                         catalog=self.packet['oracle' if default else 'catalog']['path'], catalog_sha256=self.packet['oracle' if default else 'catalog']['sha256'],
                         expected_source='untouched-installed-material16', candidate_source='packed-facade', sass_version=self.branch['compiler'])
-        bridge = dict(contract=subject.SPINNER_SNACK_BRIDGE_CONTRACT, source_line=self.line, source_subject=self.packet['source_subject'],
-                      source_packet=self.packet['source_packet'], source_modules=self.branch['source_modules'], compiler_inputs=self.packet['compiler_inputs'])
+        bridge = self.context.descriptor
         wrong = actual['css'] + '\n.wrong-nonempty-mixin { color: red; }\n'
         body = dict(kind='assertion', check_id='sass-seal', group='sass-api-and-values', result='pass', exit_code=0,
                     line=self.line, run_id=manifest['run_id'], invocation_id=invocation, binding=copy.deepcopy(binding), mutation_rejected=True, error=None,
@@ -107,7 +113,7 @@ class SpinnerSnackBridgeAdmissionTests(unittest.TestCase):
         self.completed.add('pure')
     def test_modeled_assertion_identity_and_live_guards(self):
         for row in self.diagnostic['rows']:
-            self.yes('modeled artifact composition ' + row['case_id'], subject.spinner_snack_bridge_assertion_ok(context=self.context, **self.model(row)))
+            self.yes('modeled artifact composition ' + row['case_id'], current_spinner_snack_assertion_ok(context=self.context, **self.model(row)))
         original = self.model(self.diagnostic['rows'][0])
         def change(path, value):
             def mutation(body):
@@ -128,7 +134,7 @@ class SpinnerSnackBridgeAdmissionTests(unittest.TestCase):
         for name, action in mutants.items():
             value = copy.deepcopy(original)
             action(value)
-            self.no('metadata ' + name, subject.spinner_snack_bridge_assertion_ok(context=self.context, **value))
+            self.no('metadata ' + name, current_spinner_snack_assertion_ok(context=self.context, **value))
         for name in ['missing_source', 'duplicate_source', 'missing_mutation']:
             value = copy.deepcopy(original)
             if name == 'missing_source':
@@ -137,36 +143,40 @@ class SpinnerSnackBridgeAdmissionTests(unittest.TestCase):
                 value['body']['actual']['sources'].append(value['body']['actual']['sources'][0])
             else:
                 del value['body']['mutation']
-            self.no(name, subject.spinner_snack_bridge_assertion_ok(context=self.context, **value))
-        fake = object.__new__(subject.SpinnerSnackBridgeContract)
-        self.no('unregistered context object cannot grant authority', subject.spinner_snack_bridge_assertion_ok(context=fake, **original))
-        paths = [self.packet['oracle']['path'], self.packet['catalog']['path'], self.packet['compiler_inputs'][2]['path'], self.branch['source_modules'][0]['path']]
+            self.no(name, current_spinner_snack_assertion_ok(context=self.context, **value))
+        fake = object.__new__(CurrentSpinnerSnackContract)
+        self.no('unregistered context object cannot grant authority', current_spinner_snack_assertion_ok(context=fake, **original))
+        paths = [self.packet['oracle']['path'], self.packet['catalog']['path'], self.packet['compiler_inputs'][2]['path'], self.context.descriptor['source_modules'][0]['path']]
         for path in paths:
             with self.assertRaises(AssertionError):
-                subject.SpinnerSnackBridgeContract(ROOT, read=lambda candidate, target=path: b'changed' if candidate == target else (ROOT / candidate).read_bytes())
+                CurrentSpinnerSnackContract(ROOT, read=lambda candidate, target=path: b'changed' if candidate == target else (ROOT / candidate).read_bytes())
             self.checks.append('cold callback ' + path)
-        for path in [self.packet['oracle']['path'], self.packet['compiler_inputs'][2]['path']] + [row['path'] for row in self.branch['source_modules']]:
+        for path in [self.packet['oracle']['path'], self.packet['compiler_inputs'][2]['path']] + [row['path'] for row in self.context.descriptor['source_modules']]:
             self.controls['target'] = path
-            self.no('late callback ' + path, subject.spinner_snack_bridge_assertion_ok(context=self.context, **original))
+            self.no('late callback ' + path, current_spinner_snack_assertion_ok(context=self.context, **original))
             self.controls['target'] = None
             self.context.assert_current()
         live = copy.deepcopy(original)
         self.controls['hook'] = lambda: live['body'].__setitem__('call', 'changed-during-source-guard')
-        self.no('live metadata mutation during source guard', subject.spinner_snack_bridge_assertion_ok(context=self.context, **live))
+        self.no('live metadata mutation during source guard', current_spinner_snack_assertion_ok(context=self.context, **live))
         live['body']['call'] = original['body']['call']
-        self.yes('authentic restoration after metadata/source faults', subject.spinner_snack_bridge_assertion_ok(context=self.context, **live))
+        self.yes('authentic restoration after metadata/source faults', current_spinner_snack_assertion_ok(context=self.context, **live))
         self.completed.add('composition')
     @classmethod
     def tearDownClass(cls):
-        if cls.completed != {'pure', 'composition'}:
+        if cls.completed != {'pure', 'composition'} or not os.environ.get('CURRENT_SASS_SPINNER_SNACK_MAINTAINED_RECEIPT'):
             return
         suffix = '21' if cls.line == '21.x' else 'main'
-        report = dict(schema_version=1, line=cls.line, python='3.14.7', status='finite-direct-comparator-controls-pass', checks_passed=len(cls.checks), checks=cls.checks,
-                      case_results=cls.results, source_inputs=[ref(path) for path in ['scripts/sass_spinner_snack_bridge_admission.py', PREFIX + 'inputs-v1.json', cls.packet['source_subject']['path'], cls.packet['source_packet']['path'], cls.branch['observation']['path']]],
+        report = dict(schema_version=1, line=cls.line, python='3.14.7', status='finite-direct-current-source-comparator-controls-pass', checks_passed=len(cls.checks), checks=cls.checks,
+                      case_results=cls.results, source_inputs=[ref(path) for path in ['scripts/current_sass_spinner_snack_admission.py', 'scripts/current_sass_source.py', 'scripts/sass_spinner_snack_bridge_admission.py', PREFIX + 'inputs-v1.json', cls.packet['source_subject']['path'], cls.packet['source_packet']['path'], cls.branch['observation']['path']]],
                       pure_compiled_rows_reused=15, modeled_assertion_positives=15, actual_packed_assertions_executed=0, actual_independent_source_context_constructed=True,
+                      current_source_descriptor=cls.context.descriptor, current_source_set_successors=cls.context.source_set_successors, old_physical_constructor_executed=False, current_source_module_count=4,
                       fresh_sass_compile_executed=False, existing_gates_or_goldens_edited=False, physical_files_mutated=False, indirect_aggregate_cases_qualified=0,
                       actual_native_packed_browser_floor_or_full_audit_qualified=False, g11_claim='not-passed')
-        (ROOT / (PREFIX + 'python-controls-' + suffix + '-v2.json')).write_text(json.dumps(report, indent=2) + '\n')
+        path = ROOT / os.environ['CURRENT_SASS_SPINNER_SNACK_MAINTAINED_RECEIPT']
+        assert path.parent == ROOT / 'compatibility/rc' and path.name.startswith('current-sass-spinner-snack-maintained-tests-python-controls-') and path.suffix == '.json'
+        assert not path.exists()
+        path.write_text(json.dumps(report, indent=2) + '\n')
 
 if __name__ == '__main__':
     unittest.main()

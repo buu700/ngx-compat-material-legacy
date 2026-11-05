@@ -10,6 +10,7 @@ const assert=require('node:assert/strict');
 const {createHash}=require('node:crypto');
 const {readFileSync}=require('node:fs');
 const {join,resolve}=require('node:path');
+const {types}=require('node:util');
 const {gunzipSync}=require('node:zlib');
 const ROOT=resolve(__dirname,'..'),HANDLER='scripts/upstream-foundation-m3-theme-admission.cjs';
 const PREFIX='compatibility/rc/21x-c04-foundation-m3-theme-';
@@ -19,7 +20,33 @@ const SOURCE_REVIEW={"path":"compatibility/rc/21x-c04-foundation-m3-theme-source
 const PATCHES={"76cda4202c3c10192f386b03b583774725fa0451":"45e80630237e5ba5de4455a5587a9f638fbd922868f31fc1977465fa6c66442e","eca41177fc8b6c19a389c6911cac566460596f13":"73087b6989ace1bbe8ef3636805774dd84064fe05b130de5e386cd090ba7b8c2","7a7434a772320f17f082208297f7d19d470ceee3":"10275e219e5a8c5dcb397f552578fc395fcdae6a500012cadb3cab16e7f58b3f","d7b454315ac739eae0318f8de7dce99d6f7996fe":"54be7288d18391cee5e04ede5a80184610c33ead7260292fa9adc246e607b0ef","f67c8711883eec6ee7334aac45a40b3786dc6170":"4c14fc5e72bf33ef85f3b2d2e13df3f755c2e1121823ffa2d7e7ddaaefe241e7","4d50c38579f5a3a8d85b3f192ca6567bbcdcf8de":"89d9d66d948a820488bcab8e1fcbf0e6e86ae8dc4bbe182cf6f3a10e902b2b48"};
 const KIND='individual-historical-foundation-m3-theme-source-review',SCOPE='foundation_m3_theme_source_scope';
 const hash=raw=>createHash('sha256').update(raw).digest('hex'),image=readFileSync(__filename);
-const handlerRef={path:HANDLER,sha256:hash(image),bytes:image.length};
+// The immutable proof uses its original handler identity; current tools qualify separately.
+const handlerRef={path:HANDLER,sha256:'7988c557609cfb11741bcd46f7f2f1cf5cdf8d41ae71e054a5b03fbb875cc715',bytes:7347};
+const currentHandlerRef={path:HANDLER,sha256:hash(image),bytes:image.length};
+const functionText=Function.prototype.toString;
+function plain(value){
+ if(value===null||['undefined','string','boolean'].includes(typeof value))return value;
+ if(typeof value==='number'){assert.ok(Number.isSafeInteger(value));return value;}
+ assert.ok(value&&typeof value==='object'&&!types.isProxy(value));const array=Array.isArray(value);assert.equal(Object.getPrototypeOf(value),array?Array.prototype:Object.prototype);
+ const descriptors=Object.getOwnPropertyDescriptors(value),out=array?[]:{};
+ for(const key of Reflect.ownKeys(descriptors)){assert.equal(typeof key,'string');if(array&&key==='length')continue;const d=descriptors[key];assert.ok(Object.hasOwn(d,'value')&&d.enumerable);if(array)assert.match(key,/^(?:0|[1-9][0-9]*)$/);Object.defineProperty(out,key,{value:plain(d.value),enumerable:true,writable:true,configurable:true});}
+ if(array){assert.equal(out.length,descriptors.length.value);assert.equal(Object.keys(out).length,out.length);}return out;
+}
+function assertLoadedFunction(path,name,fn){
+ const text=readFileSync(join(ROOT,path),'utf8'),marker='export function '+name+'(',start=text.indexOf(marker),end=text.indexOf('\n}\n',start);
+ assert.ok(start>=0&&end>start&&text.indexOf(marker,start+1)===-1);assert.equal(typeof fn,'function');assert.equal(Reflect.apply(functionText,fn,[]),text.slice(start+7,end+2),'changed loaded current source producer '+name);
+}
+
+function captureArgs(args,keys){
+ assert.ok(args&&typeof args==='object'&&!types.isProxy(args));assert.equal(Object.getPrototypeOf(args),Object.prototype);
+ const descriptors=Object.getOwnPropertyDescriptors(args),selected={};
+ for(const key of Reflect.ownKeys(descriptors)){assert.equal(typeof key,'string');assert.ok([...keys,'root','read'].includes(key));const d=descriptors[key];assert.ok(Object.hasOwn(d,'value')&&d.enumerable);if(keys.includes(key))Object.defineProperty(selected,key,{value:d.value,enumerable:true});}
+ const snapshot=plain(selected),root=Object.hasOwn(descriptors,'root')?descriptors.root.value:ROOT,read=Object.hasOwn(descriptors,'read')?descriptors.read.value:path=>readFileSync(join(root,path));
+ assert.equal(typeof root,'string');assert.equal(typeof read,'function');
+ const same=()=>{assert.equal(Object.getPrototypeOf(args),Object.prototype);const after=Object.getOwnPropertyDescriptors(args),current={};assert.deepEqual(Reflect.ownKeys(after),Reflect.ownKeys(descriptors));for(const key of Reflect.ownKeys(descriptors)){const d=after[key];assert.ok(Object.hasOwn(d,'value'));assert.equal(d.value,descriptors[key].value);for(const flag of ['enumerable','writable','configurable'])assert.equal(d[flag],descriptors[key][flag]);if(keys.includes(key))Object.defineProperty(current,key,{value:d.value,enumerable:true});}assert.deepEqual(plain(current),snapshot);};
+ return {value:snapshot,root,read,same};
+}
+
 
 function foundationM3ThemeProof(row){
  assert.ok(Object.hasOwn(PATCHES,row?.sha));
@@ -51,27 +78,33 @@ function metadataOk({entry,body,review,proof=entry?.individual_proof}){
 /** One fresh whole-body review; no caller-supplied source result or success cache. */
 function inspectWholeBody({body,root,read}){
  const source=require('./upstream-foundation-m3-theme-source-review.mjs');
- assert.equal(resolve(root),ROOT);
- const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,handlerRef,
+ const {spinnerSnackC04Source}=require('./sass-spinner-snack-c04-source.mjs');
+ const {m3ReviewPhysicalReader,m3ReviewBindingUnion}=require('./current-sass-m3-review-source.mjs');
+ assert.equal(resolve(root),ROOT);const boundary=m3ReviewPhysicalReader({root,read});read=boundary.read;
+ assertLoadedFunction('scripts/sass-spinner-snack-c04-source.mjs','spinnerSnackC04Source',spinnerSnackC04Source);
+ assertLoadedFunction('scripts/upstream-foundation-m3-theme-source-review.mjs','reviewFoundationM3ThemeSource',source.reviewFoundationM3ThemeSource);
+ const c04=spinnerSnackC04Source({root,read});assert.deepEqual(c04.qualify(handlerRef),currentHandlerRef);
+ const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,currentHandlerRef,
   ...body.reviews.map(row=>({path:row.patch_file,sha256:row.diff_sha256}))];
- const assertBound=()=>{for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed control theme admission subject '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}};
+ const assertBound=()=>{for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed foundation-m3-theme admission subject '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);else ref.bytes=raw.length;}};
  assertBound();assert.deepEqual(JSON.parse(read(REVIEW)),body);
- const current=source.reviewFoundationM3ThemeSource({root,read});
- const archived=gunzipSync(read(SOURCE_REVIEW.path));assert.equal(hash(archived),SOURCE_REVIEW.uncompressed_sha256);assert.equal(archived.length,SOURCE_REVIEW.uncompressed_bytes);
- assert.deepEqual(current.report,JSON.parse(archived));
- const assertCurrent=()=>{current.assertCurrent();assertBound();};assertCurrent();
- return {bound:structuredClone([...bound,...current.bound]),assertCurrent};
+ const archivedBytes=gunzipSync(read(SOURCE_REVIEW.path));assert.equal(hash(archivedBytes),SOURCE_REVIEW.uncompressed_sha256);assert.equal(archivedBytes.length,SOURCE_REVIEW.uncompressed_bytes);const archived=JSON.parse(archivedBytes);
+ const current=source.reviewFoundationM3ThemeSource({root,read});assert.deepEqual(current.historical_report,archived);
+ const assertCurrent=()=>{current.assertCurrent();assertBound();c04.assertCurrent();boundary.assertPhysical();};assertCurrent();
+ return {bound:m3ReviewBindingUnion(bound,current.bound,c04.bound),assertCurrent,assertPhysical:boundary.assertPhysical};
 }
 /** Actual root admission remains fresh for each individual SHA. */
-function inspectSource({entry,body,review,proof,root=ROOT,read=path=>readFileSync(join(root,path))}){
+function inspectSource(args){
+ const live=captureArgs(args,['entry','body','review','proof']),{entry,body,review,proof}=live.value;
  assert.equal(metadataOk({entry,body,review,proof}),true);
- inspectWholeBody({body,root,read}).assertCurrent();assert.equal(metadataOk({entry,body,review,proof}),true);return true;
+ const source=inspectWholeBody({body,root:live.root,read:live.read});source.assertCurrent();live.same();assert.equal(metadataOk({entry,body,review,proof}),true);source.assertPhysical();return true;
 }
-/** The canonical owner proves all six metadata rows and the whole source body once. */
-function inspectCanonicalSource({entries,body,root=ROOT,read=path=>readFileSync(join(root,path))}){
- const assertMetadata=()=>{assert.deepEqual(entries.map(entry=>entry.sha),Object.keys(PATCHES));for(const entry of entries)assert.equal(metadataOk({entry,body,review:body.reviews.find(row=>row.sha===entry.sha)}),true);};
- assertMetadata();const source=inspectWholeBody({body,root,read});
- const assertCurrent=()=>{assertMetadata();source.assertCurrent();assertMetadata();};assertCurrent();
+/** The canonical owner proves all metadata rows and the whole source body once. */
+function inspectCanonicalSource(args){
+ const live=captureArgs(args,['entries','body']),{entries,body}=live.value;
+ const assertMetadata=()=>{live.same();assert.deepEqual(entries.map(entry=>entry.sha),Object.keys(PATCHES));for(const entry of entries)assert.equal(metadataOk({entry,body,review:body.reviews.find(row=>row.sha===entry.sha)}),true);};
+ assertMetadata();const source=inspectWholeBody({body,root:live.root,read:live.read});
+ const assertCurrent=()=>{assertMetadata();source.assertCurrent();assertMetadata();source.assertPhysical();};assertCurrent();
  return {bound:structuredClone(source.bound),assertCurrent};
 }
 function sourceOk(args){try{return inspectSource(args)===true;}catch{return false;}}

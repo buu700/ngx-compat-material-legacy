@@ -5,6 +5,9 @@
  * Use of this source code is governed by the MIT license in LICENSE.
  */
 import assert from 'node:assert/strict';
+import {assertPhysicalAbsentCounterpart} from './current_sass_review_test_scope.mjs';
+import {assertCurrentCanonicalTestRegistry} from './current_sass_canonical_test_scope.mjs';
+import {assertCurrentM3CanonicalTestSources} from './current_sass_m3_review_test_scope.mjs';
 import fs from 'node:fs';
 import {syncBuiltinESMExports} from 'node:module';
 import {createHash} from 'node:crypto';
@@ -22,11 +25,12 @@ const root=process.cwd(),read=path=>fs.readFileSync(join(root,path)),hash=raw=>c
 const ledger='compatibility/f10/disposition-ledger/ledger.json',packetPath='compatibility/rc/21x-c04-core-tokenization-canonical-transition.json';
 const packet=JSON.parse(read(packetPath)),body=JSON.parse(read(admission.CORE_TOKENIZATION_REVIEW)),env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
 for(const key of Object.keys(env))if(key.startsWith('RC_')||['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'].includes(key))delete env[key];
-const before=execFileSync('git',['--no-replace-objects','show',packet.source_parent+':'+ledger],{cwd:root,env,maxBuffer:8*1024*1024});
+const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet.source_parent+':'+ledger],{cwd:root,env,maxBuffer:8*1024*1024});
 const stage=applyCoreTokenizationCanonicalStage({before,body});assert.equal(hash(stage.after),packet.after.sha256);
-const registryBefore=execFileSync('git',['--no-replace-objects','show',packet.source_parent+':'+packet.registry_before.path],{cwd:root,env});
-assert.equal(read(packet.registry_after.path).equals(remainingUnthemableRegistrySuccessor(coreTokenizationRegistrySuccessor(registryBefore))),true);assert.equal(sourceContractDefinitions.length,67);
-const qualified=qualifyCanonicalToolReference({root,read,prior:packet.registry_before});assert.deepEqual(qualified.reference,JSON.parse(read('compatibility/rc/21x-c04-remaining-unthemable-canonical-transition.json')).registry_after);
+const registryBefore=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet.source_parent+':'+packet.registry_before.path],{cwd:root,env});
+const historicalRegistry=remainingUnthemableRegistrySuccessor(coreTokenizationRegistrySuccessor(registryBefore));
+const qualified=qualifyCanonicalToolReference({root,read,prior:packet.registry_before});const registryPopulation=assertCurrentCanonicalTestRegistry({historicalRegistry,qualified,root,read});
+let canonicalPopulation={};
 let metadataCases=0,metadataRejections=0,sourceRejections=0,sourceAbsenceRejections=0;const rejected=[];
 const phase=process.argv[3]??'all',sourcePhases=body.reviews.map(row=>'source/'+row.sha);assert.ok(['all','tools','canonical','root',...sourcePhases].includes(phase));
 const phaseCanonical=phase==='all'||phase==='canonical',phaseRoot=phase==='all'||phase==='root';
@@ -76,7 +80,7 @@ for(const entry of stage.entries.filter(entry=>phase==='all'||phase==='source/'+
   late=path;assert.equal(admission.sourceOk({...args,root,read:mutable}),false,path);sourceRejections++;rejected.push(entry.sha+'/source/'+path);
  }
  for(const path of ['sort','tree','ripple'].map(name=>'projects/ngx-material-legacy/styles/core/tokens/m2/mat/_'+name+'.scss')){
-  assert.equal(admission.sourceOk({...args,root,read:file=>file===path?Buffer.from('@mixin unreviewed() {}'):read(file)}),false,path);sourceAbsenceRejections++;rejected.push(entry.sha+'/source-absence/'+path);
+  assertPhysicalAbsentCounterpart({root,path,assertCurrent:()=>assert.equal(admission.sourceOk({...args,root,read:mutable}),true)});sourceAbsenceRejections++;rejected.push(entry.sha+'/source-absence/'+path);
  }
  late=null;assert.equal(admission.sourceOk({...args,root,read:mutable}),true);assert.ok(reads>2*firstReads);
  assert.equal(individualReviewScopeOk({...args,requiresIndividual:true,claimsBehavior:false}),true);
@@ -95,9 +99,9 @@ for(const fault of ['missing-row','duplicate-row','missing-proof','relabeled','h
  if(fault==='patch-file')x.body.reviews[1].patch_file='unreviewed.patch';
  assert.throws(()=>admission.inspectCanonicalSource(x),undefined,fault);rejected.push('canonical/'+fault);
 }
-let batchLate=null,batchCreated=null;const batchRead=path=>path===batchCreated?Buffer.from('@mixin unreviewed() {}'):path===batchLate?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
+let batchLate=null;const batchRead=path=>path===batchLate?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
 const batch=admission.inspectCanonicalSource({entries:stage.entries,body,root,read:batchRead});
-assert.equal(new Set(batch.bound.map(ref=>ref.path)).size,650);
+canonicalPopulation=assertCurrentM3CanonicalTestSources({kind:'core-tokenization',scope:batch,body,root,read:batchRead});
 const batchPaths=[admission.CORE_TOKENIZATION_REVIEW,'compatibility/rc/21x-c04-core-tokenization-source-qualification.json',
  'compatibility/rc/21x-c04-core-tokenization-source-review.json.gz','scripts/upstream-core-tokenization-admission.cjs',
  ...body.reviews.map(row=>row.patch_file),'scripts/upstream-core-tokenization-source-review.mjs',
@@ -108,7 +112,7 @@ assert.equal(batchPaths.length,15);
 for(const path of batchPaths){batchLate=path;assert.throws(()=>batch.assertCurrent(),undefined,path);rejected.push('canonical/late/'+path);}batchLate=null;batch.assertCurrent();
 batchLate='compatibility/rc/21x-c04-core-tokenization-originals-capture.py';
 assert.throws(()=>admission.inspectCanonicalSource({entries:stage.entries,body,root,read:batchRead}));rejected.push('canonical/no-cached-source-pass');batchLate=null;batch.assertCurrent();
-for(const path of ['sort','tree','ripple'].map(name=>'projects/ngx-material-legacy/styles/core/tokens/m2/mat/_'+name+'.scss')){batchCreated=path;assert.throws(()=>batch.assertCurrent(),undefined,path);rejected.push('canonical/absence/'+path);}batchCreated=null;batch.assertCurrent();
+for(const path of ['sort','tree','ripple'].map(name=>'projects/ngx-material-legacy/styles/core/tokens/m2/mat/_'+name+'.scss')){assertPhysicalAbsentCounterpart({root,path,assertCurrent:batch.assertCurrent});rejected.push('canonical/absence/'+path);}batch.assertCurrent();
 batch.bound.length=0;batchLate=body.reviews[1].patch_file;assert.throws(()=>batch.assertCurrent());rejected.push('canonical/public-bound-metadata-cannot-weaken-guards');batchLate=null;batch.assertCurrent();
 const savedReason=stage.entries[1].reason;stage.entries[1].reason+=' mutated';assert.throws(()=>batch.assertCurrent());stage.entries[1].reason=savedReason;batch.assertCurrent();rejected.push('canonical/late-row-metadata');
 const savedClaim=body.g11_claim;body.g11_claim='passed';assert.throws(()=>batch.assertCurrent());body.g11_claim=savedClaim;batch.assertCurrent();rejected.push('canonical/late-body-metadata');
@@ -140,8 +144,8 @@ try{
 }finally{fs.rmSync(mutant,{force:true});fs.rmSync(directory,{recursive:true,force:true});}
 }
 const report={schema_version:1,result:'pass',phase,canonical_phase_executed:phaseCanonical,root_phase_executed:phaseRoot,pure_metadata_cases:metadataCases,metadata_rejections:metadataRejections,source_rejections:sourceRejections,source_absence_rejections:sourceAbsenceRejections,
- registered_source_contracts:67,prior_registry_records_preserved:50,current_registry_tool_bindings:qualified.bound.length,real_root_positive_rows:rootPositive,real_root_rejected_rows:rootNegative,missing_source_requirement_mutant_detected:mutantDetected,
- late_original_patch_in_tool_role_rejected:phase==='all'||phase==='tools',canonical_whole_body_fresh_source_checked:phaseCanonical,canonical_bound_members:phaseCanonical?650:0,canonical_metadata_rejections:phaseCanonical?8:0,canonical_late_source_rejections:phaseCanonical?15:0,canonical_absence_rejections:phaseCanonical?3:0,canonical_cache_or_guard_mutants_rejected:phaseCanonical?2:0,canonical_late_metadata_mutants_rejected:phaseCanonical?2:0,metadata_after_source_mutants_rejected:phaseCanonical?1:0,
+ historical_registry_tool_bindings:140,...registryPopulation,prior_registry_records_preserved:50,current_registry_tool_bindings:qualified.bound.length,real_root_positive_rows:rootPositive,real_root_rejected_rows:rootNegative,missing_source_requirement_mutant_detected:mutantDetected,
+ late_original_patch_in_tool_role_rejected:phase==='all'||phase==='tools',canonical_whole_body_fresh_source_checked:phaseCanonical,...canonicalPopulation,canonical_bound_members:canonicalPopulation.canonical_bound_members??0,canonical_metadata_rejections:phaseCanonical?8:0,canonical_late_source_rejections:phaseCanonical?15:0,canonical_absence_rejections:phaseCanonical?3:0,canonical_cache_or_guard_mutants_rejected:phaseCanonical?2:0,canonical_late_metadata_mutants_rejected:phaseCanonical?2:0,metadata_after_source_mutants_rejected:phaseCanonical?1:0,
  after_sha256:hash(stage.after),individual_decisions:3,summary_scalar_tokens:2,unselected_entries_preserved:1694,rejected,canonical_ledger_applied:false,
  actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])fs.writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});

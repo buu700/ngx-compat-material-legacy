@@ -26,7 +26,7 @@ class CoreTokenizationSourceReviewTests(unittest.TestCase):
                         authenticated_absent_images=4, tagged_blobs=15, authenticated_tagged_absences=3,
                         exact_patch_replays=12, authenticated_tree_objects=59,
                         additional_files_beyond_seed=0, additional_hunks_beyond_seed=0,
-                        source_bindings=642, argument_cases=32, historically_empty_cases=6,
+                        historical_source_bindings=642, argument_cases=32, historically_empty_cases=6,
                         tree_density_supplemental_boundaries=11, historical_valid_density_fallbacks=10,
                         current_public_density_tokens=10, historical_invalid_density_arguments=1,
                         documented_ownership_differences=3, css_semantic_mutants_detected=9,
@@ -36,6 +36,8 @@ class CoreTokenizationSourceReviewTests(unittest.TestCase):
             self.assertEqual(report[key], value, key)
         self.assertEqual(report['comparison_counts'], {
             'exact-untouched16': 10, 'sort': 4, 'tree': 8, 'ripple-color': 10})
+        self.assertTrue(report['current_source_bindings_match_exact_successor'])
+        self.assertEqual(report['source_bindings'], report['expected_source_bindings'])
         self.assertEqual(len(report['rejected']), 96)
         self.assertEqual(len(set(report['rejected'])), 96)
         self.assertTrue(report['tagged_reference_Sass_executed'])

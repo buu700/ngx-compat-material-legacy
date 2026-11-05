@@ -23,6 +23,8 @@ import {qualifyCanonicalToolReference} from '../scripts/packed-upstream-ledger-e
 import {requiresRegisteredSourceReview} from '../scripts/upstream-registered-source-review.mjs';
 import {sourceContractDefinitions} from '../scripts/upstream-source-contract-registry.mjs';
 import {reviewMetadataComplete,individualReviewScopeOk} from '../scripts/upstream-individual-evidence-scope.mjs';
+import {currentButtonTokenRepairsTestSources} from './current_sass_button_token_repairs_test_scope.mjs';
+import {assertCurrentCanonicalTestRegistry} from './current_sass_canonical_test_scope.mjs';
 const root=process.cwd(),read=path=>fs.readFileSync(join(root,path)),hash=raw=>createHash('sha256').update(raw).digest('hex');
 const ledger='compatibility/f10/disposition-ledger/ledger.json',packetPath='compatibility/rc/21x-c04-button-token-repairs-canonical-transition.json';
 const packet=JSON.parse(read(packetPath)),body=JSON.parse(read(admission.BUTTON_TOKEN_REPAIRS_REVIEW)),env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
@@ -30,8 +32,9 @@ for(const key of Object.keys(env))if(key.startsWith('RC_')||['GIT_DIR','GIT_WORK
 const before=execFileSync('git',['--no-replace-objects','show',packet.source_parent+':'+ledger],{cwd:root,env,maxBuffer:8*1024*1024});
 const stage=applyButtonTokenRepairsCanonicalStage({before,body});assert.equal(hash(stage.after),packet.after.sha256);
 const registryBefore=execFileSync('git',['--no-replace-objects','show',packet.source_parent+':'+packet.registry_before.path],{cwd:root,env});
-assert.equal(read(packet.registry_after.path).equals(remainingUnthemableRegistrySuccessor(coreTokenizationRegistrySuccessor(foundationM3ThemeRegistrySuccessor(controlM3ThemeRegistrySuccessor(sliderM3RepairsRegistrySuccessor(surfaceM3ThemeRegistrySuccessor(buttonTokenRepairsRegistrySuccessor(registryBefore)))))))),true);assert.equal(sourceContractDefinitions.length,67);
-const qualified=qualifyCanonicalToolReference({root,read,prior:packet.registry_before});assert.deepEqual(qualified.reference,JSON.parse(read('compatibility/rc/21x-c04-remaining-unthemable-canonical-transition.json')).registry_after);
+const historicalRegistry=remainingUnthemableRegistrySuccessor(coreTokenizationRegistrySuccessor(foundationM3ThemeRegistrySuccessor(controlM3ThemeRegistrySuccessor(sliderM3RepairsRegistrySuccessor(surfaceM3ThemeRegistrySuccessor(buttonTokenRepairsRegistrySuccessor(registryBefore)))))));
+const qualified=qualifyCanonicalToolReference({root,read,prior:packet.registry_before});
+const registry=assertCurrentCanonicalTestRegistry({historicalRegistry,qualified,root,read});assert.equal(sourceContractDefinitions.length,registry.registered_source_contracts);
 let metadataCases=0,metadataRejections=0,sourceRejections=0;const rejected=[];
 for(const row of body.reviews){
  let patchChanged=false;const patchPath=row.patch_file;
@@ -90,7 +93,12 @@ for(const fault of ['missing-row','duplicate-row','missing-proof','relabeled','h
 }
 let batchLate=null;const batchRead=path=>path===batchLate?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
 const batch=admission.inspectCanonicalSource({entries:stage.entries,body,root,read:batchRead});
-assert.equal(new Set(batch.bound.map(ref=>ref.path)).size,633);
+const sourcePopulation=currentButtonTokenRepairsTestSources({root,read});
+const expectedCanonical=new Map(sourcePopulation.expected.map(ref=>[ref.path,ref]));
+const ownRefs=[{path:admission.BUTTON_TOKEN_REPAIRS_REVIEW,sha256:admission.BUTTON_TOKEN_REPAIRS_REVIEW_HASH},body.source_qualification,body.source_review,
+ {path:'scripts/upstream-button-token-repairs-admission.cjs',sha256:hash(read('scripts/upstream-button-token-repairs-admission.cjs')),bytes:read('scripts/upstream-button-token-repairs-admission.cjs').length},...body.reviews.map(row=>({path:row.patch_file,sha256:row.diff_sha256}))];
+for(const ref of ownRefs){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);const normalized={...ref,bytes:ref.bytes??raw.length};if(expectedCanonical.has(ref.path))assert.deepEqual(expectedCanonical.get(ref.path),normalized);else expectedCanonical.set(ref.path,normalized);}
+assert.equal(new Set(batch.bound.map(ref=>ref.path)).size,batch.bound.length);assert.deepEqual(batch.bound,[...expectedCanonical.values()].sort((a,b)=>a.path.localeCompare(b.path)));
 const batchPaths=[admission.BUTTON_TOKEN_REPAIRS_REVIEW,'compatibility/rc/21x-c04-button-token-repairs-source-qualification.json',
  'compatibility/rc/21x-c04-button-token-repairs-source-review.json','scripts/upstream-button-token-repairs-admission.cjs',
  ...body.reviews.map(row=>row.patch_file),'scripts/upstream-button-token-repairs-source-review.mjs',
@@ -125,8 +133,8 @@ try{
  const bypass=inspect(stage.entries,{inject:true,checker:'scripts/'+basename(mutant)});assert.equal(bypass.evidence_failures.length,0);assert.deepEqual(bypass.insufficient_review_sha_ids.sensitive,[]);mutantDetected=true;rejected.push('root/missing-source-requirement-mutant');
 }finally{fs.rmSync(mutant,{force:true});fs.rmSync(directory,{recursive:true,force:true});}
 const report={schema_version:1,result:'pass',pure_metadata_cases:metadataCases,metadata_rejections:metadataRejections,source_rejections:sourceRejections,
- registered_source_contracts:67,prior_registry_records_preserved:33,current_registry_tool_bindings:qualified.bound.length,real_root_positive_rows:rootPositive,real_root_rejected_rows:rootNegative,missing_source_requirement_mutant_detected:mutantDetected,
- late_original_patch_in_tool_role_rejected:true,canonical_whole_body_fresh_source_checked:true,canonical_bound_members:633,canonical_metadata_rejections:8,canonical_late_source_rejections:13,canonical_cache_or_guard_mutants_rejected:2,
+ ...registry,prior_registry_records_preserved:33,real_root_positive_rows:rootPositive,real_root_rejected_rows:rootNegative,missing_source_requirement_mutant_detected:mutantDetected,
+ late_original_patch_in_tool_role_rejected:true,canonical_whole_body_fresh_source_checked:true,historical_canonical_bound_members:633,canonical_bound_members:expectedCanonical.size,expected_canonical_bound_members:expectedCanonical.size,canonical_source_union_matches_exact_successor:true,canonical_metadata_rejections:8,canonical_late_source_rejections:13,canonical_cache_or_guard_mutants_rejected:2,
  after_sha256:hash(stage.after),individual_decisions:2,summary_scalar_tokens:2,unselected_entries_preserved:1695,rejected,canonical_ledger_applied:false,
  actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])fs.writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});

@@ -5,6 +5,7 @@
  * Use of this source code is governed by the MIT license in LICENSE.
  */
 import assert from 'node:assert/strict';
+import {assertCurrentM3ReviewTestSources} from './current_sass_m3_review_test_scope.mjs';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
@@ -51,6 +52,7 @@ for(const id of ['missing-member','duplicate-member','forged-reference','wrong-a
 }
 let late=null;
 const scope=reviewFoundationM3ThemeSource({read:p=>p===late?Buffer.concat([read(p),Buffer.from('\n')]):read(p)}),report=scope.report,catalog=json('fixtures/sass/mixin-argument-contracts.json'),owned={},fullOwned={},peers={};
+const sourcePopulation=assertCurrentM3ReviewTestSources({kind:'foundation-m3-theme',scope});
 for(const ref of scope.bound){
  const base='projects/ngx-material-legacy/',styles=base+'styles/';
  if(ref.path.startsWith(base)&&ref.path.endsWith('.scss')){const rel=ref.path.slice(base.length);fullOwned['/owned/package/'+rel]=read(ref.path).toString();if(ref.path.startsWith(styles))owned['/owned/material/'+ref.path.slice(styles.length)]=read(ref.path).toString();}
@@ -96,5 +98,5 @@ for(const path of latePaths){assert.ok(scope.bound.some(r=>r.path===path),path);
 const m=report.foundation_measurement;assert.equal(m.historically_empty_family_cases,22);assert.equal(new Set(rejected).size,rejected.length);
 assert.equal(m.cases.filter(c=>c.collateral_control).length,8);assert.ok(m.cases.filter(c=>c.collateral_control).every(c=>c.family==='icon-button'&&c.finite_family_forward_harness.includes("@forward 'button/icon-button-theme' as icon-button-* show")));
 assert.ok(m.cases.filter(c=>c.family==='icon').every(c=>!c.finite_family_forward_harness.includes('icon-button-')));
-const result={result:'pass',...Object.fromEntries(Object.entries(facts).filter(([k])=>k!=='reviews')),source_bindings:scope.bound.length,argument_cases:m.case_count,affected_family_cases:m.affected_family_cases,collateral_icon_button_cases:m.collateral_icon_button_cases,ripple_cases:m.ripple_case_count,comparison_counts:m.comparison_counts,historically_empty_family_cases:m.historically_empty_family_cases,original_sass_graph_members:286,original_locked_archive_packages:38,css_semantic_mutants_detected:16,rejected,fresh_bounded_sass_compiler_execution:true,tagged_reference_sass_executed:true,component_structural_Sass_freshly_compiled:false,full_sass_gate_executed:false,mixed_M2_M3_native_coexistence_qualified:false,canonical_decisions_changed:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+const result={result:'pass',...Object.fromEntries(Object.entries(facts).filter(([k])=>k!=='reviews')),source_bindings:scope.bound.length,...sourcePopulation,argument_cases:m.case_count,affected_family_cases:m.affected_family_cases,collateral_icon_button_cases:m.collateral_icon_button_cases,ripple_cases:m.ripple_case_count,comparison_counts:m.comparison_counts,historically_empty_family_cases:m.historically_empty_family_cases,original_sass_graph_members:286,original_locked_archive_packages:38,css_semantic_mutants_detected:16,rejected,fresh_bounded_sass_compiler_execution:true,tagged_reference_sass_executed:true,component_structural_Sass_freshly_compiled:false,full_sass_gate_executed:false,mixed_M2_M3_native_coexistence_qualified:false,canonical_decisions_changed:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(result,null,2)+'\n',{flag:'wx'});if(process.argv[3])writeFileSync(process.argv[3],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(result));

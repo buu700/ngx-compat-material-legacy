@@ -20,14 +20,16 @@ class InspectionCompatibilitySourceReviewTests(unittest.TestCase):
         child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=90)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-7000:])
         report = json.loads(child.stdout)
+        self.assertEqual(report['source_bindings'], report['expected_source_bindings'])
+        self.assertTrue(report['current_source_bindings_match_exact_successor'])
         for key, value in [('original_files', 7), ('original_hunks', 14), ('present_original_blobs', 12),
                            ('tagged_blobs', 8), ('exact_patch_replays', 7), ('whitespace_only_fixups', 1),
                            ('tagged_deleted_modern_files', 2), ('proposed_individual_source_decisions', 4),
                            ('owned_scss_members', 409), ('historical_exported_functions', 25),
-                           ('public_override_boundaries', 6), ('legacy_theme_module_source_rewrites', 4),
+                           ('public_override_boundaries', 8), ('historical_public_override_boundaries', 4), ('legacy_theme_module_source_rewrites', 4),
                            ('legacy_theme_namespace_or_mixin_or_selector_rewrites', 0)]:
             self.assertEqual(report[key], value, key)
-        self.assertGreater(report['source_bindings'], 605)
+        self.assertEqual(report['historical_source_bindings'], 610)
         self.assertEqual(len(report['rejected']), 35)
         self.assertEqual(len(set(report['rejected'])), 35)
         self.assertFalse(report['fresh_compiler_execution_this_review'])

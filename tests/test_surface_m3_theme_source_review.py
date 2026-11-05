@@ -25,10 +25,12 @@ class SurfaceM3ThemeSourceReviewTests(unittest.TestCase):
         for key, value in [('original_files', 17), ('original_hunks', 32), ('present_original_blobs', 34),
                            ('tagged_blobs', 10), ('exact_patch_replays', 17), ('authenticated_tree_objects', 67),
                            ('additional_files_beyond_seed', 11), ('additional_hunks_beyond_seed', 19),
-                           ('source_bindings', 634), ('original_sass_graph_members', 52), ('original_locked_archive_packages', 13),
+                           ('historical_source_bindings', 634), ('original_sass_graph_members', 52), ('original_locked_archive_packages', 13),
                            ('surface_cases', 36), ('exact_tagged_cases', 32), ('existing_companion_cases', 4),
                            ('historically_empty_density_cases', 4), ('semantic_mutants_detected', 10)]:
             self.assertEqual(report[key], value, key)
+        self.assertTrue(report['current_source_bindings_match_exact_successor'])
+        self.assertEqual(report['source_bindings'], report['expected_source_bindings'])
         self.assertEqual(len(report['rejected']), 134)
         self.assertEqual(len(set(report['rejected'])), 134)
         for key in ['fresh_bounded_sass_compiler_execution', 'tagged_reference_sass_executed', 'existing_companion_contract_unchanged']:

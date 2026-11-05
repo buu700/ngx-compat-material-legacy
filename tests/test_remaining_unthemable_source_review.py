@@ -17,7 +17,9 @@ class RemainingUnthemableSourceReviewTests(unittest.TestCase):
         child=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=180)
         self.assertEqual(child.returncode,0,(child.stdout+child.stderr)[-7000:])
         report=json.loads(child.stdout)
-        for key,value in dict(original_files=38,original_hunks=54,present_original_blobs=76,authenticated_absent_images=0,tagged_blobs=37,authenticated_tagged_absences=0,exact_patch_replays=38,authenticated_tree_objects=123,additional_files_beyond_seed=10,additional_hunks_beyond_seed=10,source_bindings=642,argument_cases=160,css_semantic_mutants_detected=22,late_source_change_controls=36,owned_scss_members_rehashed=409,reference_sass_members=286,reference_locked_archives=38).items():
+        self.assertEqual(report['source_bindings'], report['expected_source_bindings'])
+        self.assertTrue(report['current_source_bindings_match_exact_successor'])
+        for key,value in dict(original_files=38,original_hunks=54,present_original_blobs=76,authenticated_absent_images=0,tagged_blobs=37,authenticated_tagged_absences=0,exact_patch_replays=38,authenticated_tree_objects=123,additional_files_beyond_seed=10,additional_hunks_beyond_seed=10,historical_source_bindings=642,argument_cases=160,css_semantic_mutants_detected=22,late_source_change_controls=36,owned_scss_members_rehashed=409,reference_sass_members=286,reference_locked_archives=38).items():
             self.assertEqual(report[key],value,key)
         self.assertEqual(report['comparison_counts'],{'companion-addition':40,'exact-untouched16':116,'form-field-state':4})
         self.assertEqual(report['historically_empty_cases'],16)

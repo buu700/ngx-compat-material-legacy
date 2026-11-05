@@ -10,6 +10,7 @@ const assert=require('node:assert/strict');
 const {createHash}=require('node:crypto');
 const {readFileSync}=require('node:fs');
 const {join,resolve}=require('node:path');
+const {types}=require('node:util');
 const ROOT=resolve(__dirname,'..'),HANDLER='scripts/upstream-button-token-repairs-admission.cjs';
 const PREFIX='compatibility/rc/21x-c04-button-token-repairs-';
 const REVIEW=PREFIX+'individual-review.json',REVIEW_HASH='981a9a1cf22c7be0c35aa8fc6b4045ddbdca96e5dc60173074f6cfdf2f1050eb';
@@ -18,7 +19,32 @@ const SOURCE_REVIEW={path:PREFIX+'source-review.json',sha256:'cf2ec51ab6fd7cf98e
 const PATCHES={"1de6a3aa37118e4153fb995a8c8f4daecdf6d0b5":"3d64bbeb9cb7f65c9f8c7d8b3ee460795678a078ffcd07cbe06234d33b121415","702ccbe01446502f43e6e7cb365a587ee7558504":"4874b274861e134e506402a41163219e02a3a673967479bc0655e4ec15d2df0b"};
 const KIND='individual-historical-button-token-repairs-source-review',SCOPE='button_token_repairs_source_scope';
 const hash=raw=>createHash('sha256').update(raw).digest('hex'),image=readFileSync(__filename);
-const handlerRef={path:HANDLER,sha256:hash(image),bytes:image.length};
+// Canonical proofs continue to identify the frozen historical handler.
+const handlerRef={path:HANDLER,sha256:'f37a4d04ad26be0a761a9815acf3de1d08fc32c90a057becb0745577ad49a437',bytes:6221};
+const currentHandlerRef={path:HANDLER,sha256:hash(image),bytes:image.length};
+const functionText=Function.prototype.toString;
+function plain(value){
+ if(value===null||['undefined','string','boolean'].includes(typeof value))return value;
+ if(typeof value==='number'){assert.ok(Number.isSafeInteger(value));return value;}
+ assert.ok(value&&typeof value==='object'&&!types.isProxy(value));const array=Array.isArray(value);assert.equal(Object.getPrototypeOf(value),array?Array.prototype:Object.prototype);
+ const descriptors=Object.getOwnPropertyDescriptors(value),out=array?[]:{};
+ for(const key of Reflect.ownKeys(descriptors)){assert.equal(typeof key,'string');if(array&&key==='length')continue;const d=descriptors[key];assert.ok(Object.hasOwn(d,'value')&&d.enumerable);if(array)assert.match(key,/^(?:0|[1-9][0-9]*)$/);Object.defineProperty(out,key,{value:plain(d.value),enumerable:true,writable:true,configurable:true});}
+ if(array){assert.equal(out.length,descriptors.length.value);assert.equal(Object.keys(out).length,out.length);}return out;
+}
+function request(args,keys){
+ assert.ok(args&&typeof args==='object'&&!types.isProxy(args));assert.equal(Object.getPrototypeOf(args),Object.prototype);
+ const descriptors=Object.getOwnPropertyDescriptors(args),allowed=[...keys,'root','read'];
+ for(const key of Reflect.ownKeys(descriptors)){assert.equal(typeof key,'string');assert.ok(allowed.includes(key));assert.ok(Object.hasOwn(descriptors[key],'value')&&descriptors[key].enumerable);}
+ const metadata=()=>{const out={};for(const key of keys)if(Object.hasOwn(args,key)){const d=Object.getOwnPropertyDescriptor(args,key);assert.ok(Object.hasOwn(d,'value'));Object.defineProperty(out,key,{value:d.value,enumerable:true});}return plain(out);};
+ const snapshot=metadata(),root=Object.hasOwn(descriptors,'root')?descriptors.root.value:ROOT,read=Object.hasOwn(descriptors,'read')?descriptors.read.value:path=>readFileSync(join(root,path));
+ assert.equal(typeof root,'string');assert.equal(typeof read,'function');
+ const same=()=>{assert.equal(Object.getPrototypeOf(args),Object.prototype);const after=Object.getOwnPropertyDescriptors(args);assert.deepEqual(Reflect.ownKeys(after),Reflect.ownKeys(descriptors));for(const key of Reflect.ownKeys(descriptors)){assert.ok(Object.hasOwn(after[key],'value'));assert.equal(after[key].value,descriptors[key].value);for(const flag of ['enumerable','writable','configurable'])assert.equal(after[key][flag],descriptors[key][flag]);}assert.deepEqual(metadata(),snapshot);};
+ return {snapshot,root,read,same};
+}
+function assertLoadedFunction(path,name,fn){
+ const text=readFileSync(join(ROOT,path),'utf8'),marker='export function '+name+'(',start=text.indexOf(marker),end=text.indexOf('\n}\n',start);
+ assert.ok(start>=0&&end>start&&text.indexOf(marker,start+1)===-1);assert.equal(typeof fn,'function');assert.equal(Reflect.apply(functionText,fn,[]),text.slice(start+7,end+2),'changed loaded button repair producer '+name);
+}
 
 function buttonTokenRepairsProof(row){
  assert.ok(Object.hasOwn(PATCHES,row?.sha));
@@ -28,8 +54,12 @@ function buttonTokenRepairsProof(row){
 }
 
 /** Pure metadata comparison; no file reads, process execution or source cache. */
-function metadataOk({entry,body,review,proof=entry?.individual_proof}){
+function metadataOk(args){
  try{
+  assert.ok(args&&typeof args==='object'&&!types.isProxy(args));assert.equal(Object.getPrototypeOf(args),Object.prototype);
+  const descriptors=Object.getOwnPropertyDescriptors(args),selected={};
+  for(const key of ['entry','body','review','proof'])if(Object.hasOwn(descriptors,key)){const d=descriptors[key];assert.ok(Object.hasOwn(d,'value')&&d.enumerable);Object.defineProperty(selected,key,{value:d.value,enumerable:true});}
+  const value=plain(selected),{entry,body,review}=value,proof=value.proof===undefined?entry?.individual_proof:value.proof;
   assert.equal(hash(JSON.stringify(body,null,2)+'\n'),REVIEW_HASH);
   assert.equal(body.line,'21.x');assert.equal(body.status,'reviewed');assert.equal(body.reviews.length,2);
   assert.deepEqual(body.reviews.map(row=>row.sha),Object.keys(PATCHES));
@@ -50,26 +80,35 @@ function metadataOk({entry,body,review,proof=entry?.individual_proof}){
 /** One fresh whole-body review; no caller-supplied source result or success cache. */
 function inspectWholeBody({body,root,read}){
  const source=require('./upstream-button-token-repairs-source-review.mjs');
+ const {spinnerSnackC04Source}=require('./sass-spinner-snack-c04-source.mjs');
  assert.equal(resolve(root),ROOT);
- const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,handlerRef,
+ assertLoadedFunction('scripts/sass-spinner-snack-c04-source.mjs','spinnerSnackC04Source',spinnerSnackC04Source);
+ assertLoadedFunction('scripts/upstream-button-token-repairs-source-review.mjs','reviewButtonTokenRepairsSource',source.reviewButtonTokenRepairsSource);
+ const c04=spinnerSnackC04Source({root,read});assert.deepEqual(c04.qualify(handlerRef),currentHandlerRef);
+ const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,currentHandlerRef,
   ...body.reviews.map(row=>({path:row.patch_file,sha256:row.diff_sha256}))];
- const assertBound=()=>{for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed button token-repair admission subject '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}};
+ const assertBound=()=>{for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed button token-repair admission subject '+ref.path);if(ref.bytes===undefined)ref.bytes=raw.length;else assert.equal(raw.length,ref.bytes);}};
  assertBound();assert.deepEqual(JSON.parse(read(REVIEW)),body);
  const current=source.reviewButtonTokenRepairsSource({root,read});
- assert.deepEqual(current.report,JSON.parse(read(SOURCE_REVIEW.path)));
- const assertCurrent=()=>{current.assertCurrent();assertBound();};assertCurrent();
- return {bound:structuredClone([...bound,...current.bound]),assertCurrent};
+ assert.deepEqual(current.historical_report,JSON.parse(read(SOURCE_REVIEW.path)));
+ const assertCurrent=()=>{current.assertCurrent();assertBound();c04.assertCurrent();current.assertCurrent();};assertCurrent();
+ const union=new Map();for(const ref of [...bound,...current.bound]){if(union.has(ref.path))assert.deepEqual(union.get(ref.path),ref);else union.set(ref.path,ref);}
+ return {bound:structuredClone([...union.values()].sort((a,b)=>a.path.localeCompare(b.path))),assertCurrent};
 }
 /** Actual root admission remains fresh for each individual SHA. */
-function inspectSource({entry,body,review,proof,root=ROOT,read=path=>readFileSync(join(root,path))}){
+function inspectSource(args){
+ const captured=request(args,['entry','body','review','proof']),{entry,body,review,proof}=captured.snapshot,{root,read}=captured;
  assert.equal(metadataOk({entry,body,review,proof}),true);
- inspectWholeBody({body,root,read}).assertCurrent();return true;
+ const source=inspectWholeBody({body,root,read});source.assertCurrent();captured.same();source.assertCurrent();captured.same();return true;
 }
 /** The canonical owner proves both metadata rows and the whole source body once. */
-function inspectCanonicalSource({entries,body,root=ROOT,read=path=>readFileSync(join(root,path))}){
+function inspectCanonicalSource(args){
+ const captured=request(args,['entries','body']),{entries,body}=captured.snapshot,{root,read}=captured;
  assert.deepEqual(entries.map(entry=>entry.sha),Object.keys(PATCHES));
  for(const entry of entries)assert.equal(metadataOk({entry,body,review:body.reviews.find(row=>row.sha===entry.sha)}),true);
- return inspectWholeBody({body,root,read});
+ const source=inspectWholeBody({body,root,read});
+ const assertCurrent=()=>{captured.same();source.assertCurrent();captured.same();source.assertCurrent();captured.same();};assertCurrent();
+ return {bound:structuredClone(source.bound),assertCurrent};
 }
 function sourceOk(args){try{return inspectSource(args)===true;}catch{return false;}}
 

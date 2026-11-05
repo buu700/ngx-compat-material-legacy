@@ -18,10 +18,21 @@ import {reviewThemingInspectionSource} from './upstream-theming-inspection-sourc
 import {reviewInspectionCompatibilitySource} from './upstream-inspection-compatibility-source-review.mjs';
 import {reviewSelectorDensitySource} from './upstream-selector-density-source-review.mjs';
 import {reviewButtonTokenizationSource} from './upstream-button-tokenization-source-review.mjs';
+import {spinnerSnackC04Source} from './sass-spinner-snack-c04-source.mjs';
+import {canonicalSourcePhysicalBoundary,captureCanonicalSourceArguments} from './current-sass-canonical-source-boundary.mjs';
 const ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const PATH='scripts/canonical-source-transaction.mjs',image=readFileSync(fileURLToPath(import.meta.url));
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const SELF={path:PATH,sha256:hash(image),bytes:image.length};
+const INSPECTION_ABSENT=[
+ 'core/theming/_inspection.scss','core/theming/_m2-inspection.scss',
+ 'paginator/_paginator-variables.scss','button-toggle/_button-toggle-variables.scss',
+].map(path=>'projects/ngx-material-legacy/styles/'+path);
+const BUTTON_ABSENT=[
+ ...['button-filled','button-protected','filled-button','protected-button','text-button'].map(name=>'core/tokens/m2/mdc/_'+name+'.scss'),
+ 'button/button.scss',
+].map(path=>'projects/ngx-material-legacy/styles/'+path);
+
 const families={
  theming:{handler:theming,review:reviewThemingInspectionSource,prefix:'THEMING',scope:'theming_inspection_source_scope'},
  inspection:{handler:inspection,review:reviewInspectionCompatibilitySource,prefix:'INSPECTION',scope:'inspection_compatibility_source_scope'},
@@ -31,7 +42,11 @@ const families={
 export const canonicalSourceTransactionReference=()=>({...SELF});
 
 /** No result, source scope, compiler callback, or prior transaction can be injected. */
-export function inspectCanonicalSourceTransaction({family,entries,body,root=ROOT,read=path=>readFileSync(join(root,path))}={}){
+export function inspectCanonicalSourceTransaction(args={}){
+ const captured=captureCanonicalSourceArguments(args);
+ const {family,entries,body,root=ROOT,read:suppliedRead=path=>readFileSync(join(root,path))}=captured.values;
+ const absentPaths=family==='theming'?[]:[...INSPECTION_ABSENT,...(family==='button-tokenization'?BUTTON_ABSENT:[])];
+ const boundary=canonicalSourcePhysicalBoundary({root,read:suppliedRead,absentPaths}),read=boundary.read;
  assert.equal(resolve(root),ROOT);assert.ok(Object.hasOwn(families,family),'unknown canonical source family');
  const spec=families[family],handler=spec.handler,shas=handler[spec.prefix+'_SHAS'];
  const reviewPath=handler[spec.prefix+'_REVIEW'],reviewHash=handler[spec.prefix+'_REVIEW_HASH'];
@@ -42,7 +57,8 @@ export function inspectCanonicalSourceTransaction({family,entries,body,root=ROOT
  };
  assertMetadata();
  const handlerRef=entries[0].individual_proof[spec.scope].handler;
- const bound=[SELF,{path:reviewPath,sha256:reviewHash},body.source_qualification,body.source_review,handlerRef,
+ const c04=spinnerSnackC04Source({root,read}),currentHandlerRef=c04.qualify(handlerRef);
+ const bound=[SELF,{path:reviewPath,sha256:reviewHash},body.source_qualification,body.source_review,currentHandlerRef,...c04.bound,
   ...body.reviews.map(row=>({path:row.patch_file,sha256:row.diff_sha256}))].map(ref=>({...ref}));
  const assertBound=()=>{
   for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed canonical source transaction input '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}
@@ -51,8 +67,10 @@ export function inspectCanonicalSourceTransaction({family,entries,body,root=ROOT
  // Every call executes the actual owned verifier, including its compiler work.
  // There is deliberately no transaction/result map outside this invocation.
  const current=spec.review({root,read});
- assert.deepEqual(current.report,JSON.parse(read(body.source_review.path)),'fresh canonical whole-body source report differs');
- const assertCurrent=()=>{assertMetadata();assertBound();current.assertCurrent();assertBound();};
+ // The producer proves its complete finite current report before returning the
+ // authenticated historical report used by these immutable canonical proofs.
+ assert.deepEqual(current.historical_report,JSON.parse(read(body.source_review.path)),'fresh canonical historical report identity differs');
+ const assertCurrent=()=>{captured.assertCurrent();assertMetadata();c04.assertCurrent();assertBound();current.assertCurrent();assertBound();c04.assertCurrent();assertMetadata();captured.assertCurrent();boundary.assertPhysical();captured.assertCurrent();};
  assertCurrent();
  return {bound:structuredClone([...bound,...current.bound]),assertCurrent,individual_metadata_cases:entries.length,
   fresh_whole_body_source_reviews:1,compiler_cases:(current.report.selector_measurement?.case_count??0)+(current.report.density_measurement?.case_count??0)+(current.report.button_measurement?.case_count??0),

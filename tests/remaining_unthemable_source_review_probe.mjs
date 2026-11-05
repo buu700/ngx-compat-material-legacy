@@ -5,6 +5,7 @@
  * Use of this source code is governed by the MIT license in LICENSE.
  */
 import assert from 'node:assert/strict';
+import {assertCurrentReviewTestSources} from './current_sass_review_test_scope.mjs';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
@@ -55,6 +56,7 @@ for(const id of ['missing-member','duplicate-member','forged-reference','wrong-a
 }
 let late=null;
 const scope=reviewRemainingUnthemableSource({read:p=>p===late?Buffer.concat([read(p),Buffer.from('\n')]):read(p)}),report=scope.report,catalog=json('fixtures/sass/mixin-argument-contracts.json'),owned={},peers={};
+const sourceQualification=assertCurrentReviewTestSources({kind:'remaining-unthemable',scope:scope});
 for(const ref of scope.bound){
  const base='projects/ngx-material-legacy/styles/';if(ref.path.startsWith(base)&&ref.path.endsWith('.scss'))owned['/owned/material/'+ref.path.slice(base.length)]=read(ref.path).toString();
  for(const f of ['material','cdk']){const base='node_modules/@angular/'+f+'/';if(ref.path.startsWith(base)&&ref.path.endsWith('.scss'))peers['/@angular/'+f+'/'+ref.path.slice(base.length)]=read(ref.path).toString();}
@@ -76,6 +78,6 @@ for(const id of ['unknown-case','changed-call','changed-setup','younger-peer','w
  if(id==='unknown-case')probe.case_id+='-unreviewed';if(id==='changed-call')probe.call+='\n';if(id==='changed-setup')value.catalog={...catalog,setup:catalog.setup+'\n'};if(id==='younger-peer')value.peerManifest={...value.peerManifest,version:'22.1.7'};if(id==='wrong-peer-identity')value.peerManifest={...value.peerManifest,sha256:'0'.repeat(64)};
  assert.throws(()=>measureRemainingUnthemableContracts(value),undefined,id);rejected.push('arguments/'+id);
 }
-assert.equal(rejected.length,38+54+24+8+36+22+5);assert.equal(new Set(rejected).size,rejected.length);assert.equal(scope.bound.length,642);assert.equal(hash(read('compatibility/f10/disposition-ledger/ledger.json')),'2eadcd59193c5cde7a6dcb9f6c469adca84f46688162d1866ad579c58743bc13');scope.assertCurrent();
-const out={schema_version:1,result:'pass',...facts,source_bindings:scope.bound.length,argument_cases:report.argument_measurement.case_count,comparison_counts:report.argument_measurement.comparison_counts,historically_empty_cases:report.argument_measurement.historically_empty_cases,owned_theme_bodies:report.owned_theme_bodies,css_semantic_mutants_detected:cssMutants,late_source_change_controls:critical.length,owned_scss_members_rehashed:report.owned_scss_members_rehashed,reference_sass_members:286,reference_locked_archives:38,rejected,prior_CSS_results_reused:false,tagged_reference_Sass_executed:true,approved_installed_minimum_peer_public_Sass_executed:true,captured_post16_patch_Sass_TypeScript_tests_or_workflows_executed:false,canonical_decisions_changed:0,golden_or_finite_contract_changes:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+assert.equal(rejected.length,38+54+24+8+36+22+5);assert.equal(new Set(rejected).size,rejected.length);assert.equal(scope.bound.length,sourceQualification.expected_source_bindings);assert.equal(hash(read('compatibility/f10/disposition-ledger/ledger.json')),'2eadcd59193c5cde7a6dcb9f6c469adca84f46688162d1866ad579c58743bc13');scope.assertCurrent();
+const out={schema_version:1,result:'pass',...facts,source_bindings:scope.bound.length,...sourceQualification,argument_cases:report.argument_measurement.case_count,comparison_counts:report.argument_measurement.comparison_counts,historically_empty_cases:report.argument_measurement.historically_empty_cases,owned_theme_bodies:report.owned_theme_bodies,css_semantic_mutants_detected:cssMutants,late_source_change_controls:critical.length,owned_scss_members_rehashed:report.owned_scss_members_rehashed,reference_sass_members:286,reference_locked_archives:38,rejected,prior_CSS_results_reused:false,tagged_reference_Sass_executed:true,approved_installed_minimum_peer_public_Sass_executed:true,captured_post16_patch_Sass_TypeScript_tests_or_workflows_executed:false,canonical_decisions_changed:0,golden_or_finite_contract_changes:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(out,null,2)+'\n',{flag:'wx'});if(process.argv[3])writeFileSync(process.argv[3],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(out));

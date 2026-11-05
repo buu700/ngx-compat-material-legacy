@@ -12,7 +12,7 @@ import {readFileSync,realpathSync} from 'node:fs';
 import {join,isAbsolute} from 'node:path';
 import {gunzipSync} from 'node:zlib';
 import {candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';
-import {measureSassInspectionScope,assertSpinnerSnackInspectionScopeSuccessor} from './measure-sass-inspection-scope.mjs';
+import {measureCurrentSassInspectionScope,assertCurrentSassInspectionScopeSuccessor} from './current-sass-inspection-scope.mjs';
 import {spinnerSnackC04Source,captureSpinnerSnackC04Metadata} from './sass-spinner-snack-c04-source.mjs';
 
 const reviewPath='compatibility/rc/upstream-sass-inspection-individual-review.json';
@@ -102,7 +102,7 @@ function validateEntry(args,fresh){
   if(fresh){
    const previous=measurements.get(read),rootId=realpathSync(root),{scope,scopeHash}=inspected;
    if(!previous||previous.root!==rootId||previous.scopeHash!==scopeHash){
-    assertSpinnerSnackInspectionScopeSuccessor({root:rootId,historical:scope,current:measureSassInspectionScope({root:rootId}),bridge:inspected.c04.bridge});
+    assertCurrentSassInspectionScopeSuccessor({root:rootId,historical:scope,current:measureCurrentSassInspectionScope({root:rootId})});
     measurements.set(read,{root:rootId,scopeHash});
    }
   }

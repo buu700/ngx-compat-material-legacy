@@ -53,14 +53,14 @@ export function inspectTokenPlacementSources({root=process.cwd(),read=path=>read
     const originalModern=tagged.get(`src/material/${family}/_${family}-theme.scss`);
     assert.equal(legacy,originalLegacy.body,'historical legacy theme changed: '+family);
     const expectedModern=originalModern.body.replaceAll("'@material/","'../vendor/mdc/");
-    if(family==='progress-spinner')c04.assertHistoricalSource(paths.modern,expectedModern);
+    if(['progress-spinner','checkbox'].includes(family))c04.assertHistoricalSource(paths.modern,expectedModern);
     else assert.equal(family==='progress-bar'?stripPublicProgressBridge(modern):modern,expectedModern,'modern16 source changed beyond reviewed relocation/bridge: '+family);
     for(const source of [legacy,modern,originalLegacy.body,originalModern.body])assert.equal(/@mixin\s+base\s*\(/.test(source),false);
     assert.equal(entry.includes(family+'-base'),false);
     member(paths.structural);
     families.push({family,paths,legacy_theme_exact_tagged_bytes:true,
-      modern_theme_exact_tagged_bytes_after_MDC_import_relocation:!['progress-bar','progress-spinner'].includes(family),
-      historical_modern_source_exact_after_MDC_relocation:family==='progress-spinner',separate_current_public_bridge:family==='progress-spinner',
+      modern_theme_exact_tagged_bytes_after_MDC_import_relocation:!['progress-bar','progress-spinner','checkbox'].includes(family),
+      historical_modern_source_exact_after_MDC_relocation:['progress-spinner','checkbox'].includes(family),separate_current_public_bridge:['progress-spinner','checkbox'].includes(family),
       separate_existing_public_progress_bridge:family==='progress-bar',introduced_base_mixin:false});
   }
   const oracleRaw=member(oraclePath);assert.equal(hash(oracleRaw),oracleHash);

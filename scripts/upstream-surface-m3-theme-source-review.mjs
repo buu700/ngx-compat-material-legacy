@@ -15,6 +15,9 @@ import {gunzipSync} from 'node:zlib';
 import {sassDeclaration} from './upstream-selector-density-source-review.mjs';
 import {replayThemingSection} from './upstream-theming-inspection-source-review.mjs';
 import {reviewInspectionCompatibilitySource} from './upstream-inspection-compatibility-source-review.mjs';
+import {spinnerSnackC04Source} from './sass-spinner-snack-c04-source.mjs';
+import {captureCurrentSassMetadata} from './current-sass-inspection-scope.mjs';
+import {m3ReviewBindingUnion,m3ReviewSourceInputs,authenticateM3HistoricalReport,m3ReviewPhysicalReader,currentM3ReviewExpectedReport} from './current-sass-m3-review-source.mjs';
 import {companionAdditionPeerProgram,companionAdditionResultsMatch} from './sass-companion-addition-contract.mjs';
 const PREFIX='compatibility/rc/21x-c04-surface-m3-theme-';
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
@@ -214,10 +217,12 @@ export function measureSurfaceThemeContracts({reference,owned,peers,catalog,peer
  return {case_count:cases.length,cases,exact_tagged_cases:cases.filter(c=>!c.peer).length,existing_companion_cases:cases.filter(c=>c.peer).length,historically_empty_density_cases:cases.filter(c=>c.mixin.endsWith('-density')&&!c.expected.css).length,full_facade_or_native_or_packed_qualified:false};
 }
 export function reviewSurfaceThemeSource({root=process.cwd(),read=path=>readFileSync(join(root,path))}={}){
- const shared=reviewInspectionCompatibilitySource({root,read}),bound=new Map(shared.bound.map(ref=>[ref.path,ref]));
- function member(ref){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed surface theme source '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;}
+ root=resolve(root);const boundary=m3ReviewPhysicalReader({root,read});read=boundary.read;
+ const shared=reviewInspectionCompatibilitySource({root,read}),c04=spinnerSnackC04Source({root,read}),bound=new Map(m3ReviewBindingUnion(shared.bound,c04.bound).map(ref=>[ref.path,ref]));
+ function member(ref){ref=c04.qualify(ref);const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed surface theme source '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;}
  function current(path){const raw=read(path);return member({path,sha256:hash(raw),bytes:raw.length});}
  member({path:'scripts/upstream-surface-m3-theme-source-review.mjs',sha256:hash(image),bytes:image.length});for(const ref of [...COMPILER,...CONTRACT_INPUTS])member(ref);
+ const sourceInputs=m3ReviewSourceInputs('surface-m3-theme');for(const ref of sourceInputs)member(ref);const historicalReport=authenticateM3HistoricalReport('surface-m3-theme',member(sourceInputs[0]));
  assert.equal(JSON.parse(current('package.json')).devDependencies.sass,'1.104.1');assert.equal(current('.node-version').toString().trim(),'24.21.0');current('toolchain-lock.json');
  const original=JSON.parse(gunzipSync(member(ORIGINAL)));for(const ref of [original.producer,...original.inputs])member(ref);
  const census=JSON.parse(gunzipSync(member(CENSUS))),capsule=JSON.parse(gunzipSync(member(REFERENCE))),identity=JSON.parse(member(IDENTITY)),catalog=JSON.parse(member(CATALOG));member(capsule.producer);
@@ -246,15 +251,19 @@ export function reviewSurfaceThemeSource({root=process.cwd(),read=path=>readFile
  assert.equal(aggregatorDefinitions,1);assert.equal(Object.keys(owned).length,299);
  const peerPackage=current('node_modules/@angular/material/package.json'),peerManifest={version:JSON.parse(peerPackage).version,sha256:hash(peerPackage)};
  const measurement=measureSurfaceThemeContracts({reference,owned,peers,catalog,peerManifest});assert.equal(measurement.exact_tagged_cases,32);assert.equal(measurement.existing_companion_cases,4);assert.equal(measurement.historically_empty_density_cases,4);
- const assertCurrent=()=>{shared.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late surface theme source change '+ref.path);assert.equal(raw.length,ref.bytes);}};assertCurrent();
- return {report:{schema_version:1,line:'21.x',role:'Three individual whole-patch source proposals; bounded historical/companion Sass proof',...facts,
-  originals:ORIGINAL,tagged_sass_reference:REFERENCE,reference_identity:IDENTITY,argument_catalog:CATALOG,current_source_bindings:structuredClone([...bound.values()]),shared_source_bindings:shared.bound.length,
-  compiler:sass.info,compiler_inputs:COMPILER,existing_companion_contract_inputs:CONTRACT_INPUTS,surface_measurement:measurement,
+ const assertCurrent=()=>{shared.assertCurrent();c04.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late surface theme source change '+ref.path);assert.equal(raw.length,ref.bytes);}boundary.assertPhysical();};assertCurrent();
+ const report={schema_version:1,line:'21.x',role:'Three individual whole-patch source proposals; bounded historical/companion Sass proof',...facts,
+  originals:ORIGINAL,tagged_sass_reference:REFERENCE,reference_identity:IDENTITY,argument_catalog:CATALOG,current_source_bindings:m3ReviewBindingUnion([...bound.values()]),shared_source_bindings:shared.bound.length,
+  compiler:sass.info,compiler_inputs:COMPILER,existing_companion_contract_inputs:CONTRACT_INPUTS.map(r=>c04.qualify(r)),surface_measurement:measurement,
   original_sass_graph_members:52,original_locked_archive_packages:13,owned_style_scss_members:299,owned_public_surface_mixins:NAMES,
   tooltip_module_URL_rewrites:1,slider_module_URL_rewrites:4,legacy_style_theme_byte_identical_to_tag:true,toolbar_tagged_private_bodies_preserved:3,existing_toolbar_companion_contract_unchanged:true,
   historical_M2_token_index_and_modules_preserved:true,card_subtitle_uses_owned_M2_foreground:true,experimental_generator_imports:0,card_CSS_freshly_compiled_this_review:false,owned_M2_aggregator_callers:0,owned_M3_inspection_callers:0,namespace_or_mixin_or_selector_rewrites:0,
   fresh_bounded_sass_compiler_execution:true,tagged_reference_sass_executed:true,upstream_post16_sass_or_typescript_tests_or_workflows_executed:false,package_install_or_javascript_runtime_execution:false,
-  full_sass_gate_executed:false,mixed_M2_M3_native_coexistence_qualified:false,canonical_decisions_changed:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'},bound:structuredClone([...bound.values()]),assertCurrent};
+  full_sass_gate_executed:false,mixed_M2_M3_native_coexistence_qualified:false,canonical_decisions_changed:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed',current_public_bridge:structuredClone(c04.summary)};
+ const expected=currentM3ReviewExpectedReport({kind:'surface-m3-theme',historical:historicalReport,qualify:r=>c04.qualify(r),ownerBound:c04.bound,summary:c04.summary,sharedBound:shared.bound});
+ assert.deepEqual(report,expected,'surface-m3-theme report changed beyond its exact current source/tool successor');
+ const snapshot=captureCurrentSassMetadata(report);assertCurrent();assert.deepEqual(captureCurrentSassMetadata(report),snapshot);boundary.assertPhysical();
+ return {report,historical_report:structuredClone(historicalReport),bound:structuredClone([...bound.values()]),assertCurrent};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  assert.equal(process.argv.length,3);const scope=reviewSurfaceThemeSource();scope.assertCurrent();writeFileSync(process.argv[2],JSON.stringify(scope.report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({result:'pass',original_files:17,original_hunks:32,surface_cases:scope.report.surface_measurement.case_count,source_bindings:scope.bound.length,canonical_decisions_changed:0}));

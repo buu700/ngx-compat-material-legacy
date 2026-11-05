@@ -8,6 +8,7 @@
 /** Four independent original reviews share a finite historical Sass measurement. */
 import assert from 'node:assert/strict';
 import {spinnerSnackC04Source} from './sass-spinner-snack-c04-source.mjs';
+import {currentLegacyRetentionExpectedCss,currentLegacyRetentionMeasurement,compileCurrentLegacyRetentionColor} from './current-sass-legacy-retention-css.mjs';
 import {createHash} from 'node:crypto';
 import {readFileSync,writeFileSync,realpathSync} from 'node:fs';
 import {createRequire} from 'node:module';
@@ -88,7 +89,8 @@ export function inspectLegacyThemeRetention({root=process.cwd(),read=path=>readF
   assertCurrent();return {line,peer_version:peer.version,subjects,oracle:JSON.parse(oracleRaw),entryPath,bound:[...bound.values()],assertCurrent,current_public_bridge:structuredClone(c04.summary)};
 }
 
-export function compileRetainedLegacyColor({root=process.cwd(),family,body}={}){
+export function compileRetainedLegacyColor({root=process.cwd(),family,body,includeCss=false}={}){
+  if(family==='fab'){const actual=compileCurrentLegacyRetentionColor({root,body});if(!includeCss)delete actual.css;return actual;}
   const subject=retentionSubjects.find(row=>row.family===family);assert.ok(subject);
   const sass=createRequire(join(root,'package.json'))('sass');
   const theme=standardThemeSource().replaceAll('m.define-typography-config()','contract_typography.define-typography-config()')
@@ -97,7 +99,7 @@ export function compileRetainedLegacyColor({root=process.cwd(),family,body}={}){
   const program=prefix+body+'\n'+theme+'\n.sass-api-probe { @include color($__theme); }\n';
   const compiled=sass.compileString(program,{url:pathToFileURL(join(root,stylePath(subject.legacy_theme))),
     style:'expanded',silenceDeprecations:SILENCE,logger:{warn(){},debug(){}}});
-  return {program_sha256:hash(program),css_sha256:hash(compiled.css),css_bytes:Buffer.byteLength(compiled.css)};
+  return {program_sha256:hash(program),css_sha256:hash(compiled.css),css_bytes:Buffer.byteLength(compiled.css),...(includeCss?{css:compiled.css}:{})};
 }
 
 export function measureLegacyThemeRetention({root=process.cwd()}={}){
@@ -115,8 +117,9 @@ export function measureLegacyThemeRetention({root=process.cwd()}={}){
       const name=subject.legacy_prefix+'-'+suffix,entry=scope.oracle.members.mixins[name];assert.ok(names.mixins.includes(name));
       const plan=invocationPlan(name,entry,{});assert.equal(plan.invocable,true);
       const compiled=compileInvocation(sass,moduleUrl,[join(root,'node_modules')],plan.call,{importers});assert.equal(compiled.error,null);
-      assert.equal(hash(compiled.css),entry.invocation.css_sha256,'historical CSS differs: '+name);
-      assert.equal(Buffer.byteLength(compiled.css),entry.invocation.css_bytes);
+      const currentId='mixin-css/'+name;
+      if(subject.family==='fab')assert.equal(compiled.css,currentLegacyRetentionExpectedCss(currentId),'finite nested ordinary button CSS differs: '+name);
+      else {assert.equal(hash(compiled.css),entry.invocation.css_sha256,'historical CSS differs: '+name);assert.equal(Buffer.byteLength(compiled.css),entry.invocation.css_bytes);}
       for(const url of compiled.loaded){
         const absolute=realpathSync(fileURLToPath(url));
         const group=allowed.find(group=>{const path=relative(group.root,absolute);return !isAbsolute(path)&&path!=='..'&&!path.startsWith('../');});
@@ -124,11 +127,14 @@ export function measureLegacyThemeRetention({root=process.cwd()}={}){
         const path=group.prefix+relative(group.root,absolute),raw=readFileSync(absolute);loaded.set(path,ref(path,raw));
       }
       const program=`@use '${moduleUrl}' as m;\n${standardThemeSource()}\n${plan.call}\n`;
-      cases.push({case_id:'mixin-css/'+name,program_sha256:hash(program),css_sha256:hash(compiled.css),css_bytes:Buffer.byteLength(compiled.css),result:'pass'});
+      cases.push({case_id:currentId,program_sha256:hash(program),css_sha256:hash(compiled.css),css_bytes:Buffer.byteLength(compiled.css),...(subject.family==='fab'?{comparison:currentLegacyRetentionMeasurement(currentId).comparison}:{}),result:'pass'});
     }
-    const actual=compileRetainedLegacyColor({root,family:subject.family,body:read(stylePath(subject.legacy_theme)).toString()});
+    const actual=compileRetainedLegacyColor({root,family:subject.family,body:read(stylePath(subject.legacy_theme)).toString(),includeCss:subject.family==='fab'});
     const expected=scope.oracle.members.mixins[subject.legacy_prefix+'-color'].invocation;
-    assert.equal(actual.css_sha256,expected.css_sha256);assert.equal(actual.css_bytes,expected.css_bytes);
+    if(subject.family==='fab'){
+      const id='direct-legacy-color/fab';assert.equal(actual.css,currentLegacyRetentionExpectedCss(id));delete actual.css;
+      Object.assign(actual,currentLegacyRetentionMeasurement(id));
+    }else {assert.equal(actual.css_sha256,expected.css_sha256);assert.equal(actual.css_bytes,expected.css_bytes);}
     direct.push({case_id:'direct-legacy-color/'+subject.family,...actual,result:'pass'});
   }
   for(const value of loaded.values()){const raw=read(value.path);assert.equal(hash(raw),value.sha256);assert.equal(raw.length,value.bytes);}

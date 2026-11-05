@@ -10,6 +10,7 @@ const assert=require('node:assert/strict');
 const {createHash}=require('node:crypto');
 const {readFileSync}=require('node:fs');
 const {join,resolve}=require('node:path');
+const {types}=require('node:util');
 const {gunzipSync}=require('node:zlib');
 const ROOT=resolve(__dirname,'..'),HANDLER='scripts/upstream-core-tokenization-admission.cjs';
 const PREFIX='compatibility/rc/21x-c04-core-tokenization-';
@@ -20,7 +21,33 @@ const PATCHES={"f2ad33442e5cba6084438278a7bafca3814ed897":"a52edf0e8456e528fbe9a
 const BOUNDARY={"path":"compatibility/rc/21x-c04-core-tokenization-tree-density-boundary-assessment.json","sha256":"981cf4bbb787764066b783e2e80f2ba5b136d1551fa146d9a8a12f6fdaef209a","bytes":2625};
 const KIND='individual-historical-core-tokenization-source-review',SCOPE='core_tokenization_source_scope';
 const hash=raw=>createHash('sha256').update(raw).digest('hex'),image=readFileSync(__filename);
-const handlerRef={path:HANDLER,sha256:hash(image),bytes:image.length};
+// The immutable proof uses its original handler identity; current tools qualify separately.
+const handlerRef={path:HANDLER,sha256:'db3373d403d45a66c597280ae8dbd3fc5935420affd02e8e9c4905facda0d669',bytes:7870};
+const currentHandlerRef={path:HANDLER,sha256:hash(image),bytes:image.length};
+const functionText=Function.prototype.toString;
+function plain(value){
+ if(value===null||['undefined','string','boolean'].includes(typeof value))return value;
+ if(typeof value==='number'){assert.ok(Number.isSafeInteger(value));return value;}
+ assert.ok(value&&typeof value==='object'&&!types.isProxy(value));const array=Array.isArray(value);assert.equal(Object.getPrototypeOf(value),array?Array.prototype:Object.prototype);
+ const descriptors=Object.getOwnPropertyDescriptors(value),out=array?[]:{};
+ for(const key of Reflect.ownKeys(descriptors)){assert.equal(typeof key,'string');if(array&&key==='length')continue;const d=descriptors[key];assert.ok(Object.hasOwn(d,'value')&&d.enumerable);if(array)assert.match(key,/^(?:0|[1-9][0-9]*)$/);Object.defineProperty(out,key,{value:plain(d.value),enumerable:true,writable:true,configurable:true});}
+ if(array){assert.equal(out.length,descriptors.length.value);assert.equal(Object.keys(out).length,out.length);}return out;
+}
+function assertLoadedFunction(path,name,fn){
+ const text=readFileSync(join(ROOT,path),'utf8'),marker='export function '+name+'(',start=text.indexOf(marker),end=text.indexOf('\n}\n',start);
+ assert.ok(start>=0&&end>start&&text.indexOf(marker,start+1)===-1);assert.equal(typeof fn,'function');assert.equal(Reflect.apply(functionText,fn,[]),text.slice(start+7,end+2),'changed loaded current source producer '+name);
+}
+
+function captureArgs(args,keys){
+ assert.ok(args&&typeof args==='object'&&!types.isProxy(args));assert.equal(Object.getPrototypeOf(args),Object.prototype);
+ const descriptors=Object.getOwnPropertyDescriptors(args),selected={};
+ for(const key of Reflect.ownKeys(descriptors)){assert.equal(typeof key,'string');assert.ok([...keys,'root','read'].includes(key));const d=descriptors[key];assert.ok(Object.hasOwn(d,'value')&&d.enumerable);if(keys.includes(key))Object.defineProperty(selected,key,{value:d.value,enumerable:true});}
+ const snapshot=plain(selected),root=Object.hasOwn(descriptors,'root')?descriptors.root.value:ROOT,read=Object.hasOwn(descriptors,'read')?descriptors.read.value:path=>readFileSync(join(root,path));
+ assert.equal(typeof root,'string');assert.equal(typeof read,'function');
+ const same=()=>{assert.equal(Object.getPrototypeOf(args),Object.prototype);const after=Object.getOwnPropertyDescriptors(args),current={};assert.deepEqual(Reflect.ownKeys(after),Reflect.ownKeys(descriptors));for(const key of Reflect.ownKeys(descriptors)){const d=after[key];assert.ok(Object.hasOwn(d,'value'));assert.equal(d.value,descriptors[key].value);for(const flag of ['enumerable','writable','configurable'])assert.equal(d[flag],descriptors[key][flag]);if(keys.includes(key))Object.defineProperty(current,key,{value:d.value,enumerable:true});}assert.deepEqual(plain(current),snapshot);};
+ return {value:snapshot,root,read,same};
+}
+
 
 function coreTokenizationProof(row){
  assert.ok(Object.hasOwn(PATCHES,row?.sha));
@@ -52,31 +79,34 @@ function metadataOk({entry,body,review,proof=entry?.individual_proof}){
 /** One fresh whole-body review; no caller-supplied source result or success cache. */
 function inspectWholeBody({body,root,read}){
  const source=require('./upstream-core-tokenization-source-review.mjs');
- assert.equal(resolve(root),ROOT);
- const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,BOUNDARY,handlerRef,
+ const {spinnerSnackC04Source}=require('./sass-spinner-snack-c04-source.mjs');
+ const {m3ReviewPhysicalReader,m3ReviewBindingUnion}=require('./current-sass-m3-review-source.mjs');
+ assert.equal(resolve(root),ROOT);const boundary=m3ReviewPhysicalReader({root,read});read=boundary.read;
+ assertLoadedFunction('scripts/sass-spinner-snack-c04-source.mjs','spinnerSnackC04Source',spinnerSnackC04Source);
+ assertLoadedFunction('scripts/upstream-core-tokenization-source-review.mjs','reviewCoreTokenizationSource',source.reviewCoreTokenizationSource);
+ const c04=spinnerSnackC04Source({root,read});assert.deepEqual(c04.qualify(handlerRef),currentHandlerRef);
+ const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,BOUNDARY,currentHandlerRef,
   ...body.reviews.map(row=>({path:row.patch_file,sha256:row.diff_sha256}))];
- const assertBound=()=>{for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed core tokenization admission subject '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}};
+ const assertBound=()=>{for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed core-tokenization admission subject '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);else ref.bytes=raw.length;}};
  assertBound();assert.deepEqual(JSON.parse(read(REVIEW)),body);
- const archivedBytes=gunzipSync(read(SOURCE_REVIEW.path));assert.equal(hash(archivedBytes),SOURCE_REVIEW.uncompressed_sha256);assert.equal(archivedBytes.length,SOURCE_REVIEW.uncompressed_bytes);
- const archived=JSON.parse(archivedBytes);
- // Authenticate expected input identities before expensive compilation. This is
- // an integrity precondition, never a stored-success or CSS-result shortcut.
- assert.equal(archived.current_source_bindings.length,642);bound.push(...archived.current_source_bindings);assertBound();
- const current=source.reviewCoreTokenizationSource({root,read});
- assert.deepEqual(current.report,archived);
- const assertCurrent=()=>{current.assertCurrent();assertBound();};assertCurrent();
- return {bound:structuredClone([...bound,...current.bound]),assertCurrent};
+ const archivedBytes=gunzipSync(read(SOURCE_REVIEW.path));assert.equal(hash(archivedBytes),SOURCE_REVIEW.uncompressed_sha256);assert.equal(archivedBytes.length,SOURCE_REVIEW.uncompressed_bytes);const archived=JSON.parse(archivedBytes);
+ assert.equal(archived.current_source_bindings.length,642);bound.push(...archived.current_source_bindings.map(ref=>c04.qualify(ref)));assertBound();
+ const current=source.reviewCoreTokenizationSource({root,read});assert.deepEqual(current.historical_report,archived);
+ const assertCurrent=()=>{current.assertCurrent();assertBound();c04.assertCurrent();boundary.assertPhysical();};assertCurrent();
+ return {bound:m3ReviewBindingUnion(bound,current.bound,c04.bound),assertCurrent,assertPhysical:boundary.assertPhysical};
 }
 /** Actual root admission remains fresh for each individual SHA. */
-function inspectSource({entry,body,review,proof,root=ROOT,read=path=>readFileSync(join(root,path))}){
+function inspectSource(args){
+ const live=captureArgs(args,['entry','body','review','proof']),{entry,body,review,proof}=live.value;
  assert.equal(metadataOk({entry,body,review,proof}),true);
- inspectWholeBody({body,root,read}).assertCurrent();assert.equal(metadataOk({entry,body,review,proof}),true);return true;
+ const source=inspectWholeBody({body,root:live.root,read:live.read});source.assertCurrent();live.same();assert.equal(metadataOk({entry,body,review,proof}),true);source.assertPhysical();return true;
 }
-/** The canonical owner proves all three metadata rows and the whole source body once. */
-function inspectCanonicalSource({entries,body,root=ROOT,read=path=>readFileSync(join(root,path))}){
- const assertMetadata=()=>{assert.deepEqual(entries.map(entry=>entry.sha),Object.keys(PATCHES));for(const entry of entries)assert.equal(metadataOk({entry,body,review:body.reviews.find(row=>row.sha===entry.sha)}),true);};
- assertMetadata();const source=inspectWholeBody({body,root,read});
- const assertCurrent=()=>{assertMetadata();source.assertCurrent();assertMetadata();};assertCurrent();
+/** The canonical owner proves all metadata rows and the whole source body once. */
+function inspectCanonicalSource(args){
+ const live=captureArgs(args,['entries','body']),{entries,body}=live.value;
+ const assertMetadata=()=>{live.same();assert.deepEqual(entries.map(entry=>entry.sha),Object.keys(PATCHES));for(const entry of entries)assert.equal(metadataOk({entry,body,review:body.reviews.find(row=>row.sha===entry.sha)}),true);};
+ assertMetadata();const source=inspectWholeBody({body,root:live.root,read:live.read});
+ const assertCurrent=()=>{assertMetadata();source.assertCurrent();assertMetadata();source.assertPhysical();};assertCurrent();
  return {bound:structuredClone(source.bound),assertCurrent};
 }
 function sourceOk(args){try{return inspectSource(args)===true;}catch{return false;}}

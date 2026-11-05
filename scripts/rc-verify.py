@@ -39,6 +39,7 @@ from migration_transaction_admission import transaction_assertion_ok
 from migration_frontend_admission import frontend_assertion_ok
 from sass_function_admission import function_assertion_ok
 from sass_mixin_argument_admission import mixin_argument_assertion_ok
+from sass_ordinary_control_gate import ORDINARY_CONTROL_GATE_CASES, ordinary_control_gate_assertion_ok
 from sass_spinner_snack_gate_integration import SPINNER_SNACK_GATE_CASES, spinner_snack_gate_assertion_ok
 from sass_default_core_cdk_admission import DEFAULT_CORE_CDK_CASES, default_core_cdk_envelope_ok
 from sass_ordered_core_admission import ORDERED_CORE_CASES, ordered_core_envelope_ok
@@ -1079,6 +1080,9 @@ def _consumer_floor_assertion_ok(body: dict, invocation: str) -> bool:
 
 
 def _sass_seal_assertion_ok(body: dict, invocation: str) -> bool:
+    if body.get('case_id') in ORDINARY_CONTROL_GATE_CASES and str(body.get('case_id','')).startswith('mixin-css/'):
+        return ordinary_control_gate_assertion_ok(ROOT,ACTIVE_RUN,body,invocation)
+    if 'current_ordinary_controls' in body and body.get('case_id') not in ORDINARY_CONTROL_GATE_CASES:return False
     if body.get('case_id') in SPINNER_SNACK_GATE_CASES and str(body.get('case_id','')).startswith('mixin-css/'):
         return spinner_snack_gate_assertion_ok(ROOT,ACTIVE_RUN,body,invocation)
     if 'current_spinner_snack_bridge' in body and body.get('case_id') not in SPINNER_SNACK_GATE_CASES:return False

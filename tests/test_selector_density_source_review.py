@@ -22,15 +22,19 @@ class SelectorDensitySourceReviewTests(unittest.TestCase):
         report = json.loads(child.stdout)
         for key, value in [('original_files', 4), ('original_hunks', 5), ('present_original_blobs', 7),
                            ('tagged_blobs', 6), ('exact_patch_replays', 4), ('disabled_original_density_assertions', 1),
-                           ('proposed_individual_source_decisions', 2), ('source_bindings', 619),
+                           ('proposed_individual_source_decisions', 2), ('historical_source_bindings', 619),
                            ('selector_cases', 12), ('density_cases', 8), ('reviewed_after_changed_css_cases', 4),
                            ('semantic_mutants_detected', 9), ('density_caller_modules', 3)]:
             self.assertEqual(report[key], value, key)
-        self.assertGreater(report['selector_caller_modules'], 0)
-        self.assertGreaterEqual(report['selector_calls'], report['selector_caller_modules'])
+        self.assertEqual(report['selector_caller_modules'], 20)
+        self.assertEqual(report['selector_calls'], 41)
         self.assertEqual(len(report['rejected']), 38)
         self.assertEqual(len(set(report['rejected'])), 38)
         self.assertTrue(report['original_before_selector_mixin_matches_tag'])
+        self.assertEqual(report['source_bindings'], report['expected_source_bindings'])
+        self.assertTrue(report['current_source_bindings_match_exact_successor'])
+        self.assertEqual(report['historical_public_override_boundaries'], 4)
+        self.assertEqual(report['public_override_boundaries'], 8)
         self.assertTrue(report['fresh_bounded_sass_compiler_execution'])
         self.assertTrue(report['tagged_reference_sass_executed'])
         self.assertTrue(report['reviewed_after_selector_mixin_sass_executed'])

@@ -5,6 +5,7 @@
  * Use of this source code is governed by the MIT license in LICENSE.
  */
 import assert from 'node:assert/strict';
+import {assertCurrentReviewTestSources,assertPhysicalAbsentCounterpart} from './current_sass_review_test_scope.mjs';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {createHash} from 'node:crypto';
@@ -43,8 +44,13 @@ for(const fault of ['source-body','source-roster','archive-integrity','package-r
 }
 let late=null,added=null;const mutable=path=>path===added?Buffer.from('// unreviewed modern module\n'):path===late?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
 const scope=reviewButtonTokenizationSource({root,read:mutable});assert.equal(scope.report.reviews.length,5);assert.ok(scope.report.reviews.every(row=>row.proposed_final_disposition==='do-not-adopt'));
-const bound=new Set(scope.bound.map(ref=>ref.path)),owned={};for(const ref of scope.bound){const prefix='projects/ngx-material-legacy/styles/';if(ref.path.startsWith(prefix)&&ref.path.endsWith('.scss'))owned['/@angular/material/'+ref.path.slice(prefix.length)]=read(ref.path).toString();}
-const catalog=JSON.parse(read('fixtures/sass/mixin-argument-contracts.json')),modern='/@angular/material/button/_button-theme.scss',legacy='/@angular/material/legacy-button/_button-theme.scss';
+const sourceQualification=assertCurrentReviewTestSources({kind:'button-tokenization',scope:scope});
+const bound=new Set(scope.bound.map(ref=>ref.path)),owned={},peers={};
+for(const ref of scope.bound){
+ const prefix='projects/ngx-material-legacy/styles/';if(ref.path.startsWith(prefix)&&ref.path.endsWith('.scss'))owned['/owned/material/'+ref.path.slice(prefix.length)]=read(ref.path).toString();
+ for(const family of ['material','cdk']){const prefix='node_modules/@angular/'+family+'/';if(ref.path.startsWith(prefix)&&ref.path.endsWith('.scss'))peers['/current/@angular/'+family+'/'+ref.path.slice(prefix.length)]=read(ref.path).toString();}
+}
+const catalog=JSON.parse(read('fixtures/sass/mixin-argument-contracts.json')),modern='/owned/material/button/_button-theme.scss',legacy='/owned/material/legacy-button/_button-theme.scss';
 for(const fault of ['container-color','raised-selector','disabled-opacity','empty-density','legacy-ripple-opacity','legacy-font-size','legacy-disabled-overlay']){
  const data=structuredClone(owned);let name='button-color';
  if(fault==='container-color')data[modern]=data[modern].replace('container-color: $background','container-color: red');
@@ -55,7 +61,7 @@ for(const fault of ['container-color','raised-selector','disabled-opacity','empt
  if(fault==='legacy-font-size'){name='legacy-button-typography';data[legacy]=data[legacy].replace('size: typography-utils.font-size($config, button);','size: 99px;');}
  if(fault==='legacy-disabled-overlay'){name='legacy-button-color';data[legacy]=data[legacy].replace('background-color: transparent;','background-color: red;');}
  assert.notDeepEqual(data,owned);const probe=catalog.cases.find(row=>row.mixin===name&&row.variant==='custom-full-theme');assert.ok(probe);
- assert.throws(()=>measureButtonContracts({reference,owned:data,catalog,selected:[probe]}),/button CSS differs from untouched16/,fault);rejected.push('semantic/'+fault);
+ assert.throws(()=>measureButtonContracts({reference,owned:data,peers,catalog,selected:[probe]}),/button CSS differs from finite independently derived current model/,fault);rejected.push('semantic/'+fault);
 }
 const roles=[
  'scripts/upstream-button-tokenization-source-review.mjs','scripts/upstream-inspection-compatibility-source-review.mjs',
@@ -69,10 +75,10 @@ const roles=[
 ];
 assert.equal(roles.length,25);assert.ok(roles.every(path=>bound.has(path)));
 for(const path of roles){late=path;assert.throws(()=>scope.assertCurrent(),undefined,path);rejected.push('late/'+path);}late=null;scope.assertCurrent();
-for(const path of scope.report.absent_owned_token_or_modern_component_paths){added=path;assert.throws(()=>scope.assertCurrent());rejected.push('absent/'+path);}added=null;scope.assertCurrent();
+for(const path of scope.report.absent_owned_token_or_modern_component_paths){assertPhysicalAbsentCounterpart({root,path,assertCurrent:scope.assertCurrent});rejected.push('absent/'+path);}scope.assertCurrent();
 scope.bound.length=0;scope.report.current_source_bindings.length=0;late='projects/ngx-material-legacy/styles/button/_button-theme.scss';assert.throws(()=>scope.assertCurrent());late=null;scope.assertCurrent();rejected.push('public-metadata-cannot-rewrite-guards');
 const report={schema_version:1,result:'pass',original_files:18,original_hunks:47,present_original_blobs:33,tagged_blobs:6,exact_patch_replays:18,added_modules:3,
- proposed_individual_source_decisions:5,source_bindings:bound.size,original_sass_graph_members:71,original_locked_archive_packages:17,button_cases:scope.report.button_measurement.case_count,
+ proposed_individual_source_decisions:5,source_bindings:bound.size,...sourceQualification,original_sass_graph_members:71,original_locked_archive_packages:17,button_cases:scope.report.button_measurement.case_count,
  modern_theme_module_source_rewrites:7,legacy_theme_module_source_rewrites:5,legacy_structural_module_source_rewrites:4,namespace_or_mixin_or_selector_rewrites:0,
  upstream_wrong_component_slot_assertions_reviewed:1,upstream_slot_assertion_repairs_reviewed:1,semantic_mutants_detected:7,rejected,
  fresh_bounded_sass_compiler_execution:true,tagged_reference_sass_executed:true,upstream_post16_sass_or_typescript_tests_or_workflows_executed:false,package_install_or_javascript_runtime_execution:false,

@@ -39,7 +39,8 @@ def verify_remaining_unthemable_registry_successor(root=ROOT):
                         "    scope_key:'remaining_unthemable_source_scope',module:'upstream-remaining-unthemable-admission.cjs'},\n" for sha in SHAS)
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == '03a18cd09e4183f4307f1ec2c17d0797eea72db0440e23530e4d015ea0dae6a8'
-    assert (root / REGISTRY).read_bytes() == after
+    from current_sass_canonical_test_scope import historical67_registry_bytes
+    assert historical67_registry_bytes(root) == after
     return before, after
 
 
@@ -66,9 +67,11 @@ def derive_remaining_unthemable_successor(root=ROOT):
         assert digest((root / row['patch_file']).read_bytes()) == row['diff_sha256']
     assert [row['sha'] for row in body['reviews']] == SHAS
     handler = next(ref for ref in packet['source_members'] if ref['path'] == 'scripts/upstream-remaining-unthemable-admission.cjs')
+    from historical_contract_repair_source import qualify_tool_reference
     for ref in packet['source_members']:
-        raw = (root / ref['path']).read_bytes()
-        assert digest(raw) == ref['sha256'] and len(raw) == ref['bytes']
+        current_ref = qualify_tool_reference(ref, root)
+        raw = (root / current_ref['path']).read_bytes()
+        assert digest(raw) == current_ref['sha256'] and len(raw) == current_ref['bytes']
     expected = json.loads(before)
     assert len(expected['entries']) == len({row['sha'] for row in expected['entries']}) == 1697
     assert expected['closed_dispositions'] == 410 and expected['open_or_deferred'] == 1287

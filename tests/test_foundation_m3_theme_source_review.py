@@ -25,7 +25,7 @@ class FoundationM3ThemeSourceReviewTests(unittest.TestCase):
         expected = dict(original_files=40, original_hunks=81, present_original_blobs=80,
                         authenticated_absent_images=0, tagged_blobs=21, exact_patch_replays=40,
                         authenticated_tree_objects=126, additional_files_beyond_seed=23,
-                        additional_hunks_beyond_seed=44, source_bindings=641, argument_cases=136,
+                        additional_hunks_beyond_seed=44, historical_source_bindings=641, argument_cases=136,
                         affected_family_cases=124, collateral_icon_button_cases=8, ripple_cases=4,
                         historically_empty_family_cases=22, original_sass_graph_members=286,
                         original_locked_archive_packages=38, css_semantic_mutants_detected=16)
@@ -34,6 +34,8 @@ class FoundationM3ThemeSourceReviewTests(unittest.TestCase):
         self.assertEqual(report['comparison_counts'], {
             'exact-untouched16': 108, 'form-field-state': 4, 'sort': 4,
             'tree': 8, 'companion-addition': 8, 'ripple-color': 4})
+        self.assertTrue(report['current_source_bindings_match_exact_successor'])
+        self.assertEqual(report['source_bindings'], report['expected_source_bindings'])
         self.assertEqual(len(report['rejected']), 188)
         self.assertEqual(len(set(report['rejected'])), 188)
         self.assertTrue(report['fresh_bounded_sass_compiler_execution'])

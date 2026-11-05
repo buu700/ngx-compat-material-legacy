@@ -12,6 +12,7 @@ import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
 import {verifySliderM3RepairsOriginals,assertHistoricalSliderSources,reviewSliderM3RepairsSource} from '../scripts/upstream-slider-m3-repairs-source-review.mjs';
 import {verifySurfaceThemeReference,measureSurfaceThemeContracts} from '../scripts/upstream-surface-m3-theme-source-review.mjs';
+import {assertCurrentSliderSelectorTestSources} from './current_sass_slider_selector_sources.mjs';
 const root=process.cwd(),read=p=>readFileSync(join(root,p)),hash=b=>createHash('sha256').update(b).digest('hex'),prefix='compatibility/rc/21x-c04-slider-m3-repairs-';
 const original=JSON.parse(gunzipSync(read(prefix+'originals.json.gz'))),census=JSON.parse(gunzipSync(read('compatibility/rc/upstream-complete-patch-census.json.gz'))),rejected=[];
 // The reused measurement/parser module must still enforce all its prior controls.
@@ -55,7 +56,7 @@ for(const fault of originalFaults){
  assert.throws(()=>verifySliderM3RepairsOriginals(data,census),undefined,fault);rejected.push('original/'+fault);
 }
 let late=null,added=null;const mutable=path=>path===added?Buffer.from('// unreviewed counterpart\n'):path===late?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
-const scope=reviewSliderM3RepairsSource({root,read:mutable}),fullReview=structuredClone(scope.report),bound=new Set(scope.bound.map(ref=>ref.path));assert.equal(bound.size,638);assert.ok(fullReview.reviews.every(r=>r.proposed_final_disposition==='do-not-adopt'));
+const scope=reviewSliderM3RepairsSource({root,read:mutable}),fullReview=structuredClone(scope.report),bound=new Set(scope.bound.map(ref=>ref.path));const sourceQualification=assertCurrentSliderSelectorTestSources({kind:'slider-m3-repairs',scope,root,read:mutable});assert.equal(bound.size,sourceQualification.expected_source_bindings);assert.ok(fullReview.reviews.every(r=>r.proposed_final_disposition==='do-not-adopt'));
 const capsule=JSON.parse(gunzipSync(read('compatibility/rc/21x-c04-surface-m3-theme-tagged-sass-inputs.json.gz'))),oldOriginal=JSON.parse(gunzipSync(read('compatibility/rc/21x-c04-surface-m3-theme-originals.json.gz'))),identity=JSON.parse(read('compatibility/rc/original16-sass-source-diagnostic-identity.json')),reference=verifySurfaceThemeReference(capsule,identity,oldOriginal),catalog=JSON.parse(read('fixtures/sass/mixin-argument-contracts.json')),owned={},peers={};
 for(const ref of scope.bound){const styles='projects/ngx-material-legacy/styles/';if(ref.path.startsWith(styles)&&ref.path.endsWith('.scss'))owned['/owned/material/'+ref.path.slice(styles.length)]=read(ref.path).toString();for(const family of ['material','cdk']){const p='node_modules/@angular/'+family+'/';if(ref.path.startsWith(p)&&ref.path.endsWith('.scss'))peers['/@angular/'+family+'/'+ref.path.slice(p.length)]=read(ref.path).toString();}}
 const manifest=read('node_modules/@angular/material/package.json'),args={reference,owned,peers,catalog,peerManifest:{version:JSON.parse(manifest).version,sha256:hash(manifest)}};
@@ -96,7 +97,7 @@ for(const path of roles){late=path;assert.throws(()=>scope.assertCurrent(),undef
 for(const path of scope.report.absent_owned_modern_slider_or_token_paths){added=path;assert.throws(()=>scope.assertCurrent());rejected.push('absent/'+path);}added=null;scope.assertCurrent();
 late=prefix+'originals-capture.py';assert.throws(()=>reviewSliderM3RepairsSource({root,read:mutable}));rejected.push('no-cached-source-pass');late=null;scope.assertCurrent();
 scope.bound.length=0;scope.report.current_source_bindings.length=0;late=prefix+'source-worksheet.json';assert.throws(()=>scope.assertCurrent());late=null;scope.assertCurrent();rejected.push('public-metadata-cannot-rewrite-guards');
-const report={schema_version:1,result:'pass',...facts,reviews:undefined,source_bindings:bound.size,slider_cases:fullReview.slider_measurement.case_count,exact_tagged_CSS_cases:14,historically_empty_density_cases:2,
+const report={schema_version:1,result:'pass',...facts,reviews:undefined,source_bindings:bound.size,...sourceQualification,slider_cases:fullReview.slider_measurement.case_count,exact_tagged_CSS_cases:14,historically_empty_density_cases:2,
  original_sass_graph_members:52,original_locked_archive_packages:13,css_semantic_mutants_detected:9,static_source_identity_mutants_detected:6,component_structural_Sass_freshly_compiled:false,
  fresh_prior_surface_controls_executed:true,preserved_prior_rejection_controls:prior.rejected,preserved_prior_CSS_semantic_mutants:10,rejected,
  fresh_bounded_sass_compiler_execution:true,tagged_reference_sass_executed:true,upstream_lock_changes_adopted:false,canonical_decisions_changed:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,

@@ -8,6 +8,7 @@
 import assert from 'node:assert/strict';
 import {inventoryReferenceOwnerContext} from './inventory-reference-owner.mjs';
 import {historicalContractRepairReaderSubject} from './historical-contract-repair-readers.mjs';
+import {canonicalSourcePhysicalBoundary} from './current-sass-canonical-source-boundary.mjs';
 import {legacyRemovalOwnerContext} from './legacy-removal-canonical-stage.mjs';
 import {tableLocalCompilationOwnerContext} from './table-local-compilation-canonical-stage.mjs';
 import {legacyRemovalOwnerSourceSubject} from './legacy-removal-owner-source.mjs';
@@ -151,19 +152,21 @@ function foreign(root,read,allowMissing=false){
  const module=require(path);assert.equal(typeof module.packedUpstreamLedgerEpoch,'function');return module;
 }
 function sourceTransactionTools(root,read){
+ const boundary=canonicalSourcePhysicalBoundary({root,read});read=boundary.read;
  const raw=read(SOURCE_TRANSACTION);assert.equal(hash(raw),SOURCE_TRANSACTION_HASH,'changed canonical source transaction packet');const packet=JSON.parse(raw);
  assert.equal(packet.line,'21.x');assert.equal(packet.schema_version,1);assert.equal(packet.canonical_dispositions_changed,0);assert.equal(packet.source_admissions,56);
  assert.deepEqual(packet.families,{theming:2,inspection:4,'selector-density':2,'button-tokenization':5});assert.equal(packet.individual_metadata_rows_preserved,13);
  assert.equal(packet.root_per_SHA_source_dispatch_unchanged,true);assert.equal(packet.actual_native_artifact_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');
  assert.deepEqual(packet.before_owner,{path:OWNER,sha256:'4f93d241fee195be6c9d052473af37f1e19ba9394c8de444a9dd154452f14ebc',bytes:33317});
- assert.deepEqual(packet.helper,canonicalSourceTransactionReference());
- const repairs=historicalContractRepairReaderSubject({root,read}),baseRef=repairs.qualify(packet.byte_preserved_base);assert.ok(baseRef,'unqualified current base source-lane successor');
+ const repairs=historicalContractRepairReaderSubject({root,read}),helperRef=repairs.qualify(packet.helper);
+ assert.deepEqual(helperRef,canonicalSourceTransactionReference(),'unqualified current source transaction helper');
+ const baseRef=repairs.qualify(packet.byte_preserved_base);assert.ok(baseRef,'unqualified current base source-lane successor');
  const baseImage=repairs.comparisonBytes(packet.byte_preserved_base);assert.equal(hash(baseImage),packet.byte_preserved_base.sha256);assert.equal(baseImage.length,packet.byte_preserved_base.bytes);
- const bound=[{path:SOURCE_TRANSACTION,sha256:SOURCE_TRANSACTION_HASH,bytes:raw.length},packet.helper,baseRef,packet.byte_preserved_root_checker,...repairs.bound];
- const assertCurrent=()=>{repairs.assertCurrent();for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed source transaction tool '+ref.path);assert.equal(value.length,ref.bytes);}};
+ const bound=[{path:SOURCE_TRANSACTION,sha256:SOURCE_TRANSACTION_HASH,bytes:raw.length},helperRef,baseRef,packet.byte_preserved_root_checker,...repairs.bound];
+ const assertCurrent=()=>{repairs.assertCurrent();for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed source transaction tool '+ref.path);assert.equal(value.length,ref.bytes);}boundary.assertPhysical();};
  assertCurrent();return {bound,assertCurrent,baseImage:Buffer.from(baseImage)};
 }
-function remainingUnthemableTools(root,read){
+function remainingUnthemableTools(root,read,repairs){
  const raw=read(REMAINING_UNTHEMABLE_PACKET);assert.equal(hash(raw),REMAINING_UNTHEMABLE_PACKET_HASH,'changed remaining unthemable canonical packet');const packet=JSON.parse(raw);
  assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'692c2e3200935e2ff23b201888903b02675e1571');
  assert.equal(packet.individual_decisions,14);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,14);
@@ -173,12 +176,12 @@ function remainingUnthemableTools(root,read){
  assert.deepEqual(packet.registry_after,{path:THEMING_REGISTRY,sha256:hash(registryAfter),bytes:registryAfter.length});
  const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);
  const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-remaining-unthemable-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});
- const bound=[{path:REMAINING_UNTHEMABLE_PACKET,sha256:REMAINING_UNTHEMABLE_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,packet.registry_after,...patches];
+ const bound=[{path:REMAINING_UNTHEMABLE_PACKET,sha256:REMAINING_UNTHEMABLE_PACKET_HASH,bytes:raw.length},...packet.source_members.map(ref=>repairs.qualify(ref)??ref),packet.review,packet.registry_after,...patches,...repairs.bound];
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed remaining unthemable tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
  assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body};
 }
-function coreTokenizationTools(root,read){
- const successor=remainingUnthemableTools(root,read);
+function coreTokenizationTools(root,read,repairs){
+ const successor=remainingUnthemableTools(root,read,repairs);
  const raw=read(CORE_TOKENIZATION_PACKET);assert.equal(hash(raw),CORE_TOKENIZATION_PACKET_HASH,'changed core tokenization canonical packet');const packet=JSON.parse(raw);
  assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'fab613002c9bb6c6235e2157dadeb0b4d982179f');
  assert.equal(packet.individual_decisions,3);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,3);
@@ -189,12 +192,12 @@ function coreTokenizationTools(root,read){
  const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);
  const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-core-tokenization-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});
  assert.equal(registryAfter.equals(successor.registryBefore),true,'remaining unthemable registry does not succeed exact core tokenization registry');
- const bound=[{path:CORE_TOKENIZATION_PACKET,sha256:CORE_TOKENIZATION_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];
+ const bound=[{path:CORE_TOKENIZATION_PACKET,sha256:CORE_TOKENIZATION_PACKET_HASH,bytes:raw.length},...packet.source_members.map(ref=>repairs.qualify(ref)??ref),packet.review,...patches,...successor.bound];
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed core tokenization tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
  assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body,successor};
 }
-function foundationM3ThemeTools(root,read){
- const successor=coreTokenizationTools(root,read);
+function foundationM3ThemeTools(root,read,repairs){
+ const successor=coreTokenizationTools(root,read,repairs);
  const raw=read(FOUNDATION_M3_THEME_PACKET);assert.equal(hash(raw),FOUNDATION_M3_THEME_PACKET_HASH,'changed foundation M3 theme canonical packet');const packet=JSON.parse(raw);
  assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'e91b3ceaf147c882361930c67220014669dd77d3');
  assert.equal(packet.individual_decisions,6);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,6);
@@ -205,12 +208,12 @@ function foundationM3ThemeTools(root,read){
  const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);
  const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-foundation-m3-theme-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});
  assert.equal(registryAfter.equals(successor.registryBefore),true,'core tokenization registry does not succeed exact foundation M3 theme registry');
- const bound=[{path:FOUNDATION_M3_THEME_PACKET,sha256:FOUNDATION_M3_THEME_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];
+ const bound=[{path:FOUNDATION_M3_THEME_PACKET,sha256:FOUNDATION_M3_THEME_PACKET_HASH,bytes:raw.length},...packet.source_members.map(ref=>repairs.qualify(ref)??ref),packet.review,...patches,...successor.bound];
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed foundation M3 theme tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
  assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body,successor};
 }
-function controlM3ThemeTools(root,read){
- const successor=foundationM3ThemeTools(root,read);
+function controlM3ThemeTools(root,read,repairs){
+ const successor=foundationM3ThemeTools(root,read,repairs);
  const raw=read(CONTROL_M3_THEME_PACKET);assert.equal(hash(raw),CONTROL_M3_THEME_PACKET_HASH,'changed control M3 theme canonical packet');const packet=JSON.parse(raw);
  assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'7131016f8bc8011c3ac27e799d0200a6a708f977');
  assert.equal(packet.individual_decisions,4);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,4);
@@ -221,12 +224,12 @@ function controlM3ThemeTools(root,read){
  const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);
  const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-control-m3-theme-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});
  assert.equal(registryAfter.equals(successor.registryBefore),true,'foundation M3 theme registry does not succeed exact control M3 theme registry');
- const bound=[{path:CONTROL_M3_THEME_PACKET,sha256:CONTROL_M3_THEME_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];
+ const bound=[{path:CONTROL_M3_THEME_PACKET,sha256:CONTROL_M3_THEME_PACKET_HASH,bytes:raw.length},...packet.source_members.map(ref=>repairs.qualify(ref)??ref),packet.review,...patches,...successor.bound];
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed control M3 theme tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
  assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body,successor};
 }
-function sliderM3RepairsTools(root,read){
- const successor=controlM3ThemeTools(root,read);
+function sliderM3RepairsTools(root,read,repairs){
+ const successor=controlM3ThemeTools(root,read,repairs);
  const raw=read(SLIDER_M3_REPAIRS_PACKET);assert.equal(hash(raw),SLIDER_M3_REPAIRS_PACKET_HASH,'changed slider M3 repairs canonical packet');const packet=JSON.parse(raw);
  assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'30bcfb49fbf185567b4cd8ba3a022bf0c54a5d56');
  assert.equal(packet.individual_decisions,2);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,2);
@@ -237,12 +240,12 @@ function sliderM3RepairsTools(root,read){
  const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);
  const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-slider-m3-repairs-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});
  assert.equal(registryAfter.equals(successor.registryBefore),true,'control M3 theme registry does not succeed exact slider M3 repairs registry');
- const bound=[{path:SLIDER_M3_REPAIRS_PACKET,sha256:SLIDER_M3_REPAIRS_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];
+ const bound=[{path:SLIDER_M3_REPAIRS_PACKET,sha256:SLIDER_M3_REPAIRS_PACKET_HASH,bytes:raw.length},...packet.source_members.map(ref=>repairs.qualify(ref)??ref),packet.review,...patches,...successor.bound];
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed slider M3 repairs tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
  assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body,successor};
 }
-function surfaceM3ThemeTools(root,read){
- const successor=sliderM3RepairsTools(root,read);
+function surfaceM3ThemeTools(root,read,repairs){
+ const successor=sliderM3RepairsTools(root,read,repairs);
  const raw=read(SURFACE_M3_THEME_PACKET);assert.equal(hash(raw),SURFACE_M3_THEME_PACKET_HASH,'changed surface M3 theme canonical packet');const packet=JSON.parse(raw);
  assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'368363eaf44760e4aea73c5a0811c739777582e3');
  assert.equal(packet.individual_decisions,3);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,3);
@@ -253,12 +256,12 @@ function surfaceM3ThemeTools(root,read){
  const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);
  const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-surface-m3-theme-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});
  assert.equal(registryAfter.equals(successor.registryBefore),true,'slider M3 repairs registry does not succeed exact surface M3 theme registry');
- const bound=[{path:SURFACE_M3_THEME_PACKET,sha256:SURFACE_M3_THEME_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];
+ const bound=[{path:SURFACE_M3_THEME_PACKET,sha256:SURFACE_M3_THEME_PACKET_HASH,bytes:raw.length},...packet.source_members.map(ref=>repairs.qualify(ref)??ref),packet.review,...patches,...successor.bound];
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed surface M3 theme tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
  assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body,successor};
 }
-function buttonTokenRepairsTools(root,read){
- const successor=surfaceM3ThemeTools(root,read);
+function buttonTokenRepairsTools(root,read,repairs){
+ const successor=surfaceM3ThemeTools(root,read,repairs);
  const raw=read(BUTTON_TOKEN_REPAIRS_PACKET);assert.equal(hash(raw),BUTTON_TOKEN_REPAIRS_PACKET_HASH,'changed button token repairs canonical packet');const packet=JSON.parse(raw);
  assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'2103cdde255ea68b82b51f94f42e6c9b95824ea0');
  assert.equal(packet.individual_decisions,2);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,2);
@@ -269,12 +272,12 @@ function buttonTokenRepairsTools(root,read){
  const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);
  const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-button-token-repairs-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});
  assert.equal(registryAfter.equals(successor.registryBefore),true,'surface M3 theme registry does not succeed exact button token-repairs registry');
- const bound=[{path:BUTTON_TOKEN_REPAIRS_PACKET,sha256:BUTTON_TOKEN_REPAIRS_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];
+ const bound=[{path:BUTTON_TOKEN_REPAIRS_PACKET,sha256:BUTTON_TOKEN_REPAIRS_PACKET_HASH,bytes:raw.length},...packet.source_members.map(ref=>repairs.qualify(ref)??ref),packet.review,...patches,...successor.bound];
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed button token repairs tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
  assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body,successor};
 }
-function buttonTokenizationTools(root,read){
- const successor=buttonTokenRepairsTools(root,read);
+function buttonTokenizationTools(root,read,repairs){
+ const successor=buttonTokenRepairsTools(root,read,repairs);
  const raw=read(BUTTON_TOKENIZATION_PACKET);assert.equal(hash(raw),BUTTON_TOKENIZATION_PACKET_HASH,'changed button tokenization canonical packet');const packet=JSON.parse(raw);
  assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'878b00dacaca2a8417dd0aebefc8adce6a8a9277');
  assert.equal(packet.individual_decisions,5);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,5);
@@ -285,12 +288,12 @@ function buttonTokenizationTools(root,read){
  const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);
  const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-button-tokenization-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});
  assert.equal(registryAfter.equals(successor.registryBefore),true,'button token-repairs registry does not succeed exact button-tokenization registry');
- const bound=[{path:BUTTON_TOKENIZATION_PACKET,sha256:BUTTON_TOKENIZATION_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];
+ const bound=[{path:BUTTON_TOKENIZATION_PACKET,sha256:BUTTON_TOKENIZATION_PACKET_HASH,bytes:raw.length},...packet.source_members.map(ref=>repairs.qualify(ref)??ref),packet.review,...patches,...successor.bound];
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed button tokenization tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
  assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body,successor};
 }
-function selectorDensityTools(root,read){
- const successor=buttonTokenizationTools(root,read);
+function selectorDensityTools(root,read,repairs){
+ const successor=buttonTokenizationTools(root,read,repairs);
  const raw=read(SELECTOR_DENSITY_PACKET);assert.equal(hash(raw),SELECTOR_DENSITY_PACKET_HASH,'changed selector/density canonical packet');const packet=JSON.parse(raw);
  assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'f5638de44628fa48df56644f5cccf53720fb8401');
  assert.equal(packet.individual_decisions,2);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,2);
@@ -301,12 +304,12 @@ function selectorDensityTools(root,read){
  const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);
  const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-selector-density-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});
  assert.equal(registryAfter.equals(successor.registryBefore),true,'button tokenization registry does not succeed exact selector/density registry');
- const bound=[{path:SELECTOR_DENSITY_PACKET,sha256:SELECTOR_DENSITY_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];
+ const bound=[{path:SELECTOR_DENSITY_PACKET,sha256:SELECTOR_DENSITY_PACKET_HASH,bytes:raw.length},...packet.source_members.map(ref=>repairs.qualify(ref)??ref),packet.review,...patches,...successor.bound];
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed selector/density tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
  assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body,successor};
 }
-function inspectionTools(root,read){
- const successor=selectorDensityTools(root,read);
+function inspectionTools(root,read,repairs){
+ const successor=selectorDensityTools(root,read,repairs);
  const raw=read(INSPECTION_PACKET);assert.equal(hash(raw),INSPECTION_PACKET_HASH,'changed inspection canonical packet');const packet=JSON.parse(raw);
  assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'83e48681774603aef0eb23fb0ef4cb40b3dca6ec');
  assert.equal(packet.individual_decisions,4);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,4);
@@ -317,12 +320,12 @@ function inspectionTools(root,read){
  const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);
  const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-inspection-compatibility-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});
  assert.equal(registryAfter.equals(successor.registryBefore),true,'selector/density registry does not succeed exact inspection registry');
- const bound=[{path:INSPECTION_PACKET,sha256:INSPECTION_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];
+ const bound=[{path:INSPECTION_PACKET,sha256:INSPECTION_PACKET_HASH,bytes:raw.length},...packet.source_members.map(ref=>repairs.qualify(ref)??ref),packet.review,...patches,...successor.bound];
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed inspection tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
  assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body,successor};
 }
-function themingTools(root,read){
- const successor=inspectionTools(root,read);
+function themingTools(root,read,repairs){
+ const successor=inspectionTools(root,read,repairs);
  const raw=read(THEMING_PACKET);assert.equal(hash(raw),THEMING_PACKET_HASH,'changed theming canonical packet');const packet=JSON.parse(raw);
  assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'1fcb9a09a4d989a58f403db8237a281cab6cfa0d');
  assert.equal(packet.individual_decisions,2);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,2);
@@ -333,17 +336,19 @@ function themingTools(root,read){
  const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);
  const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-theming-inspection-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});
  assert.equal(registryAfter.equals(successor.registryBefore),true,'inspection registry does not succeed exact theming registry');
- const bound=[{path:THEMING_PACKET,sha256:THEMING_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];
+ const bound=[{path:THEMING_PACKET,sha256:THEMING_PACKET_HASH,bytes:raw.length},...packet.source_members.map(ref=>repairs.qualify(ref)??ref),packet.review,...patches,...successor.bound];
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed theming tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
  assertCurrent();return {packet,registryBefore,bound,assertCurrent,body,successor,
   currentReference:ref=>ref.path===THEMING_REGISTRY?successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.packet.registry_after:ref};
 }
 function currentThemingTools(root,read){
+ const boundary=canonicalSourcePhysicalBoundary({root,read});read=boundary.read;
  const legacy=legacyRemovalOwnerSourceSubject({root,read});
  const comparisonRead=path=>path===THEMING_REGISTRY?legacy.registryComparisonBytes():read(path);
- const prior=themingTools(root,comparisonRead);
+ const repairs=historicalContractRepairReaderSubject({root,read});
+ const prior=themingTools(root,comparisonRead,repairs);
  const currentReference=ref=>{const previous=prior.currentReference(ref);return previous.path===THEMING_REGISTRY?legacy.qualifyReference(previous):previous;};
- const bound=prior.bound.map(currentReference),assertCurrent=()=>{legacy.assertCurrent();prior.assertCurrent();for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}};
+ const bound=prior.bound.map(currentReference),assertCurrent=()=>{legacy.assertCurrent();repairs.assertCurrent();prior.assertCurrent();for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}repairs.assertCurrent();boundary.assertPhysical();};
  assertCurrent();return {...prior,bound,currentReference,assertCurrent};
 }
 function legacyRegistryMetadataReference(root,read,prior){
@@ -512,16 +517,17 @@ function qualifyBeforeInventoryReferenceToolReference({root=process.cwd(),read=d
  assert.equal(resolve(root),ROOT);assert.ok([OWNER,TITLE_NATIVE_REGISTRY,'scripts/autocomplete-selection-native-subject.mjs',THEMING_REGISTRY].includes(prior?.path));
  let role;try{role=read(METADATA_ROLE);}catch{/* A physical current reader has no private metadata capability. */}
  if(role===metadataToken){if(prior.path===THEMING_REGISTRY&&hash(read(prior.path))!==prior.sha256)return legacyRegistryMetadataReference(root,read,prior);assert.equal(hash(read(prior.path)),prior.sha256);return null;}
- const transaction=sourceTransactionTools(root,read);
- const tools=currentThemingTools(root,read);
+ const sourceLane=packedUpstreamLedgerCurrentSourceLane({root,read}),boundary=canonicalSourcePhysicalBoundary({root,read:sourceLane.read}),sourceRead=boundary.read;
+ const transaction=sourceTransactionTools(root,sourceRead);
+ const tools=currentThemingTools(root,sourceRead);
  const before=prior.path===THEMING_REGISTRY?[tools.registryBefore,tools.successor.registryBefore,tools.successor.successor.registryBefore,tools.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.successor.successor.successor.successor.successor.registryBefore].find(raw=>hash(raw)===prior.sha256):original(root,prior.path);assert.ok(before,'unqualified canonical registry prior');assert.equal(hash(before),prior.sha256,'unqualified canonical tool prior');
  if(prior.bytes!==undefined)assert.equal(before.length,prior.bytes);
  const raw=read(PACKET);assert.equal(hash(raw),PACKET_HASH);const packet=JSON.parse(raw);
  const frameRaw=read(FRAMES);assert.equal(hash(frameRaw),FRAMES_HASH,'changed accepted ledger-frame catalog');
- const repairs=historicalContractRepairReaderSubject({root,read});
+ const repairs=historicalContractRepairReaderSubject({root,read:sourceRead});
  const bound=[...new Map([{path:OWNER,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound,...repairs.bound].map(ref=>repairs.qualify(ref)??ref).map(ref=>[ref.path,ref])).values()].map(member=>({...member,bytes:member.bytes??read(member.path).length}));
- const assertCurrent=()=>{repairs.assertCurrent();for(const member of bound){const value=read(member.path);assert.equal(hash(value),member.sha256,'changed current canonical tool '+member.path);if(member.bytes!==undefined)assert.equal(value.length,member.bytes);}};
- assertCurrent();const value=read(prior.path),reference={path:prior.path,sha256:hash(value),bytes:value.length};
+ const assertCurrent=()=>{sourceLane.assertCurrent();repairs.assertCurrent();for(const member of bound){const value=sourceRead(member.path);assert.equal(hash(value),member.sha256,'changed current canonical tool '+member.path);if(member.bytes!==undefined)assert.equal(value.length,member.bytes);}repairs.assertCurrent();sourceLane.assertCurrent();boundary.assertPhysical();};
+ assertCurrent();const value=sourceRead(prior.path),reference={path:prior.path,sha256:hash(value),bytes:value.length};boundary.assertPhysical();
  return {reference,bound:structuredClone(bound),assertCurrent,individual_source_decisions:1,metadata_tokens:14,old_tool_bytes_exposed:false,current_native_or_packed_qualified:false};
 }
 

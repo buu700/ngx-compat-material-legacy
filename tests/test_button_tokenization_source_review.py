@@ -20,9 +20,11 @@ class ButtonTokenizationSourceReviewTests(unittest.TestCase):
         child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=90)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-7000:])
         report = json.loads(child.stdout)
+        self.assertEqual(report['source_bindings'], report['expected_source_bindings'])
+        self.assertTrue(report['current_source_bindings_match_exact_successor'])
         for key, value in [('original_files', 18), ('original_hunks', 47), ('present_original_blobs', 33),
                            ('tagged_blobs', 6), ('exact_patch_replays', 18), ('added_modules', 3),
-                           ('proposed_individual_source_decisions', 5), ('source_bindings', 623),
+                           ('proposed_individual_source_decisions', 5), ('historical_source_bindings', 623),
                            ('original_sass_graph_members', 71), ('original_locked_archive_packages', 17),
                            ('button_cases', 14), ('modern_theme_module_source_rewrites', 7),
                            ('legacy_theme_module_source_rewrites', 5), ('legacy_structural_module_source_rewrites', 4),

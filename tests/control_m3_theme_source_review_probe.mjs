@@ -5,6 +5,7 @@
  * Use of this source code is governed by the MIT license in LICENSE.
  */
 import assert from 'node:assert/strict';
+import {assertCurrentReviewTestSources} from './current_sass_review_test_scope.mjs';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
@@ -53,6 +54,7 @@ for(const id of ['missing-member','duplicate-member','forged-reference','wrong-a
 }
 let late=null;
 const scope=reviewControlM3ThemeSource({read:p=>p===late?Buffer.concat([read(p),Buffer.from('\n')]):read(p)}),report=scope.report,catalog=json('fixtures/sass/mixin-argument-contracts.json'),owned={},peers={};
+const sourceQualification=assertCurrentReviewTestSources({kind:'control-m3-theme',scope:scope});
 for(const ref of scope.bound){const p='projects/ngx-material-legacy/styles/';if(ref.path.startsWith(p)&&ref.path.endsWith('.scss'))owned['/owned/material/'+ref.path.slice(p.length)]=read(ref.path).toString();for(const family of ['material','cdk']){const start='node_modules/@angular/'+family+'/';if(ref.path.startsWith(start)&&ref.path.endsWith('.scss'))peers['/@angular/'+family+'/'+ref.path.slice(start.length)]=read(ref.path).toString();}}
 const manifest=read('node_modules/@angular/material/package.json'),args={reference,owned,peers,catalog,peerManifest:{version:JSON.parse(manifest).version,sha256:hash(manifest)}};
 function cssMutant(id,path,before,after,mixin,variant='custom-full-theme'){
@@ -78,5 +80,5 @@ for(const [id,changes]of [['changed-catalog-setup',{catalog:{...catalog,setup:ca
 const latePaths=[prefix+'originals.json.gz',prefix+'tagged-sass-inputs.json.gz','scripts/upstream-control-m3-theme-source-review.mjs','scripts/sass-progress-color-alias-contract.mjs','fixtures/sass/mixin-argument-contracts.json','projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.scss','projects/ngx-material-legacy/styles/progress-bar/_progress-bar-theme.scss','node_modules/@angular/material/progress-bar/_m2-progress-bar.scss'];
 for(const path of latePaths){assert.ok(scope.bound.some(r=>r.path===path),path);late=path;assert.throws(()=>scope.assertCurrent(),undefined,path);rejected.push('late/'+path);}late=null;scope.assertCurrent();
 assert.equal(report.control_measurement.exact_tagged_cases,42);assert.equal(report.control_measurement.existing_progress_alias_cases,4);assert.equal(report.control_measurement.historically_empty_cases,14);assert.equal(new Set(rejected).size,rejected.length);
-const result={result:'pass',...Object.fromEntries(Object.entries(facts).filter(([k])=>k!=='reviews')),source_bindings:scope.bound.length,control_cases:56,exact_tagged_CSS_cases:42,current_spinner_snack_bridge_cases:10,existing_progress_alias_cases:4,historically_empty_cases:14,original_sass_graph_members:82,original_locked_archive_packages:22,css_semantic_mutants_detected:13,rejected,fresh_bounded_sass_compiler_execution:true,tagged_reference_sass_executed:true,component_structural_Sass_freshly_compiled:false,full_sass_gate_executed:false,mixed_M2_M3_native_coexistence_qualified:false,canonical_decisions_changed:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+const result={result:'pass',...Object.fromEntries(Object.entries(facts).filter(([k])=>k!=='reviews')),source_bindings:scope.bound.length,...sourceQualification,control_cases:56,exact_tagged_CSS_cases:42,current_spinner_snack_bridge_cases:10,existing_progress_alias_cases:4,historically_empty_cases:14,original_sass_graph_members:82,original_locked_archive_packages:22,css_semantic_mutants_detected:13,rejected,fresh_bounded_sass_compiler_execution:true,tagged_reference_sass_executed:true,component_structural_Sass_freshly_compiled:false,full_sass_gate_executed:false,mixed_M2_M3_native_coexistence_qualified:false,canonical_decisions_changed:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(result,null,2)+'\n',{flag:'wx'});if(process.argv[3])writeFileSync(process.argv[3],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(result));

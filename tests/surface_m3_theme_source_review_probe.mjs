@@ -5,6 +5,7 @@
  * Use of this source code is governed by the MIT license in LICENSE.
  */
 import assert from 'node:assert/strict';
+import {assertCurrentM3ReviewTestSources} from './current_sass_m3_review_test_scope.mjs';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {createHash} from 'node:crypto';
@@ -58,7 +59,7 @@ for(const fault of ['duplicate-member','missing-member','unknown-package','wrong
  assert.throws(()=>verifySurfaceThemeReference(data,identity,original));rejected.push('reference/'+fault);
 }
 let late=null;const mutable=path=>path===late?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
-const scope=reviewSurfaceThemeSource({root,read:mutable}),fullReview=structuredClone(scope.report),bound=new Set(scope.bound.map(ref=>ref.path));assert.equal(bound.size,634);
+const scope=reviewSurfaceThemeSource({root,read:mutable}),fullReview=structuredClone(scope.report),bound=new Set(scope.bound.map(ref=>ref.path));const sourcePopulation=assertCurrentM3ReviewTestSources({kind:'surface-m3-theme',scope,root,read:mutable});
 assert.equal(fullReview.reviews.length,3);assert.ok(fullReview.reviews.every(r=>r.proposed_final_disposition==='do-not-adopt'));
 const owned={},peers={};for(const ref of scope.bound){
  const styles='projects/ngx-material-legacy/styles/';if(ref.path.startsWith(styles)&&ref.path.endsWith('.scss'))owned['/owned/material/'+ref.path.slice(styles.length)]=read(ref.path).toString();
@@ -100,7 +101,7 @@ const roles=[
 assert.equal(new Set(roles).size,32);assert.ok(roles.every(path=>bound.has(path)));
 for(const path of roles){late=path;assert.throws(()=>scope.assertCurrent(),undefined,path);rejected.push('late/'+path);}late=null;scope.assertCurrent();
 scope.bound.length=0;scope.report.current_source_bindings.length=0;late=prefix+'reference-capture.py';assert.throws(()=>scope.assertCurrent());late=null;scope.assertCurrent();rejected.push('public-metadata-cannot-rewrite-guards');
-const report={schema_version:1,result:'pass',...facts,reviews:undefined,source_bindings:bound.size,original_sass_graph_members:52,original_locked_archive_packages:13,
+const report={schema_version:1,result:'pass',...facts,reviews:undefined,source_bindings:bound.size,...sourcePopulation,original_sass_graph_members:52,original_locked_archive_packages:13,
  surface_cases:fullReview.surface_measurement.case_count,exact_tagged_cases:fullReview.surface_measurement.exact_tagged_cases,existing_companion_cases:fullReview.surface_measurement.existing_companion_cases,
  historically_empty_density_cases:fullReview.surface_measurement.historically_empty_density_cases,semantic_mutants_detected:10,rejected,
  fresh_bounded_sass_compiler_execution:true,tagged_reference_sass_executed:true,existing_companion_contract_unchanged:true,

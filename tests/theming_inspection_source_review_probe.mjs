@@ -5,6 +5,7 @@
  * Use of this source code is governed by the MIT license in LICENSE.
  */
 import assert from 'node:assert/strict';
+import {assertCurrentReviewTestSources} from './current_sass_review_test_scope.mjs';
 import {createHash} from 'node:crypto';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {join} from 'node:path';
@@ -44,7 +45,8 @@ for(const [fault,path,text]of [
 let late=null;const mutable=path=>path===late?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
 const current=reviewThemingInspectionSource({root,read:mutable});assert.equal(current.report.reviews.length,2);assert.equal(current.report.canonical_decisions_changed,0);
 assert.equal(current.report.owned_scss_members,409);assert.equal(current.report.historical_exported_functions,25);
-assert.equal(current.report.public_override_boundaries,6);assert.equal(current.report.fresh_compiler_execution_this_review,false);
+const sourceQualification=assertCurrentReviewTestSources({kind:'theming-inspection',scope:current});
+assert.equal(current.report.public_override_boundaries,8);assert.equal(current.report.fresh_compiler_execution_this_review,false);
 const chosen=[
  'scripts/upstream-theming-inspection-source-review.mjs','scripts/upstream-candidate-source-evidence.mjs',
  'compatibility/rc/21x-c04-theming-inspection-originals.json.gz','compatibility/rc/upstream-complete-patch-census.json.gz',
@@ -62,7 +64,7 @@ for(const path of [entry,'node_modules/@angular/material/package.json',...chosen
 current.bound.length=0;for(const member of current.report.current_source_bindings)member.sha256='0'.repeat(64);
 late=entry;assert.throws(()=>current.assertCurrent());late=null;current.assertCurrent();rejected.push('public-metadata-cannot-rewrite-owned-guards');
 const report={schema_version:1,result:'pass',original_files:11,original_hunks:16,present_original_blobs:18,tagged_blobs:4,exact_patch_replays:11,byte_identical_test_relocations:1,
- proposed_individual_source_decisions:2,source_bindings:bound.size,historical_exported_functions:25,owned_scss_members:409,rejected,
+ proposed_individual_source_decisions:2,source_bindings:bound.size,...sourceQualification,historical_exported_functions:25,owned_scss_members:409,rejected,
  canonical_decisions_changed:0,fresh_compiler_execution_this_review:false,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});
 console.log(JSON.stringify(report));

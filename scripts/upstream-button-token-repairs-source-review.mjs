@@ -7,14 +7,18 @@
 /** Two whole-patch source reviews; no native, packed, floor or full Sass credit. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {readFileSync,writeFileSync} from 'node:fs';
-import {join,resolve} from 'node:path';
+import {readFileSync,writeFileSync,lstatSync,realpathSync} from 'node:fs';
+import {join,resolve,isAbsolute} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {gunzipSync} from 'node:zlib';
 import {replayThemingSection} from './upstream-theming-inspection-source-review.mjs';
 import {reviewButtonTokenizationSource} from './upstream-button-tokenization-source-review.mjs';
+import {spinnerSnackC04Source} from './sass-spinner-snack-c04-source.mjs';
+import {captureCurrentSassMetadata} from './current-sass-inspection-scope.mjs';
 const PREFIX='compatibility/rc/21x-c04-button-token-repairs-';
 const ORIGINAL={path:PREFIX+'originals.json.gz',sha256:'e6cd6cbe4dc427eddf68991b4354b7f18b5b001c30aa88c9ca73c3384d61e80a',bytes:46584};
+const SOURCE_REPORT={path:PREFIX+'source-review.json',sha256:'cf2ec51ab6fd7cf98e718909940cb75ca6aaad2687bcc0544bd544dadc9ce38f',bytes:853841};
+const SHARED_REPORT={path:'compatibility/rc/21x-c04-button-tokenization-source-review.json',sha256:'4fa19472ae965a5fbc097b51ab60f344acd7791909d97221a954a25f89e9463a',bytes:870169};
 const CENSUS='compatibility/rc/upstream-complete-patch-census.json.gz';
 const PATCHES={
  '1de6a3aa37118e4153fb995a8c8f4daecdf6d0b5':'3d64bbeb9cb7f65c9f8c7d8b3ee460795678a078ffcd07cbe06234d33b121415',
@@ -32,6 +36,17 @@ const TAGGED=[
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const gitHash=(kind,raw)=>createHash('sha1').update(kind+' '+Buffer.byteLength(raw)+'\0').update(raw).digest('hex');
 const image=readFileSync(fileURLToPath(import.meta.url));
+const bufferEquals=Buffer.prototype.equals,equalBytes=(a,b)=>Buffer.isBuffer(b)&&Reflect.apply(bufferEquals,a,[b]);
+function physical(root,path){
+ assert.equal(typeof path,'string');assert.ok(path&&!isAbsolute(path)&&!path.includes('\\')&&!path.includes('\0')&&path.split('/').every(p=>p&&p!=='.'&&p!=='..'));
+ const regular=(base,parts)=>{let file=base;for(const part of parts){file=join(file,part);assert.equal(lstatSync(file).isSymbolicLink(),false);}assert.ok(lstatSync(file).isFile());return readFileSync(file);};
+ const peer=/^node_modules\/(@angular\/(?:core|material|cdk)|sass)\/(.+)$/.exec(path);if(!peer)return regular(root,path.split('/'));
+ const modules=join(root,'node_modules');assert.ok(lstatSync(modules).isDirectory()&&!lstatSync(modules).isSymbolicLink());
+ if(peer[1].startsWith('@angular/'))assert.ok(lstatSync(join(modules,'@angular')).isDirectory()&&!lstatSync(join(modules,'@angular')).isSymbolicLink());
+ const base=realpathSync(join(modules,peer[1]));assert.ok(lstatSync(base).isDirectory());assert.equal(JSON.parse(regular(base,['package.json'])).name,peer[1]);
+ if(peer[1]==='sass')assert.ok(['package.json','sass.node.js','sass.dart.js'].includes(peer[2]));return regular(base,peer[2].split('/'));
+}
+const union=(...groups)=>{const refs=new Map();for(const r of groups.flat()){if(refs.has(r.path))assert.deepEqual(refs.get(r.path),r);else refs.set(r.path,r);}return [...refs.values()].sort((a,b)=>a.path.localeCompare(b.path));};
 const theme='src/material/button/_button-theme.scss',style='src/material/button/button.scss',tokens='src/material/core/tokens/m2/mdc/';
 const judgments={
  [BUTTON_TOKEN_REPAIRS_SHAS[0]]:{
@@ -109,21 +124,63 @@ export function verifyButtonTokenRepairsOriginals(original,census){
  const omitted=rename.sections.filter(s=>!rename.frozen_seed_paths.includes(s.path));assert.equal(omitted.length,2);assert.ok(omitted.every(s=>s.status==='D'));
  return {reviews,original_files:files,original_hunks:hunks,present_original_blobs:present,tagged_blobs:6,exact_patch_replays:9,added_modules:additions,deleted_modules:deletions,authenticated_tree_objects:trees.count,authenticated_absent_members:4,frozen_seed_omitted_deletions:2,exact_prefix_only_module_moves:2,raised_color_producer_repairs:3,dark_disabled_opacity_repairs:1};
 }
+/** Pure composition only. The producer authenticates the entire shared current
+ * report, its source context and each qualified own reference before use. */
+export function currentButtonTokenRepairsExpectedReport(args={}){
+ const captured=captureCurrentSassMetadata(args);assert.deepEqual(Object.keys(captured).sort(),['historical','ownReferences','sharedCurrent','sharedHistorical']);
+ const {historical,sharedHistorical,sharedCurrent,ownReferences}=captured;
+ assert.equal(hash(JSON.stringify(historical,null,2)+'\n'),SOURCE_REPORT.sha256);
+ assert.equal(hash(JSON.stringify(sharedHistorical,null,2)+'\n'),SHARED_REPORT.sha256);
+ assert.equal(historical.current_source_bindings.length,627);assert.equal(sharedHistorical.current_source_bindings.length,623);assert.equal(historical.shared_button_source_bindings,623);
+ for(const key of ['tagged_sass_reference','reference_identity','argument_catalog','compiler','compiler_inputs','button_measurement','absent_owned_token_or_modern_component_paths'])assert.deepEqual(historical[key],sharedHistorical[key]);
+ const previous=new Map(sharedHistorical.current_source_bindings.map(r=>[r.path,r]));
+ const extra=historical.current_source_bindings.filter(r=>!previous.has(r.path));assert.equal(extra.length,4);
+ for(const r of historical.current_source_bindings)if(previous.has(r.path))assert.deepEqual(r,previous.get(r.path));
+ assert.deepEqual(ownReferences.map(r=>r.path).sort(),[...extra.map(r=>r.path),SOURCE_REPORT.path].sort());
+ assert.equal(new Set(ownReferences.map(r=>r.path)).size,5);
+ for(const r of ownReferences){assert.deepEqual(Object.keys(r).sort(),['bytes','path','sha256']);assert.match(r.sha256,/^[0-9a-f]{64}$/);assert.ok(Number.isSafeInteger(r.bytes)&&r.bytes>0);if(r.path!=='scripts/upstream-button-token-repairs-source-review.mjs')assert.deepEqual(r,r.path===SOURCE_REPORT.path?SOURCE_REPORT:extra.find(x=>x.path===r.path));}
+ for(const key of ['tagged_sass_reference','reference_identity','argument_catalog','compiler','compiler_inputs','absent_owned_token_or_modern_component_paths'])assert.deepEqual(sharedCurrent[key],sharedHistorical[key]);
+ assert.equal(sharedCurrent.button_measurement.case_count,14);assert.deepEqual(sharedCurrent.button_measurement.cases.map(r=>r.case_id),sharedHistorical.button_measurement.cases.map(r=>r.case_id));
+ const expected=structuredClone(historical);
+ expected.role='Two individually reviewed whole-patch source proposals; finite current ordinary and nested legacy button CSS contract';
+ expected.current_source_bindings=union(sharedCurrent.current_source_bindings,ownReferences);
+ expected.shared_button_source_bindings=sharedCurrent.current_source_bindings.length;
+ expected.button_measurement=structuredClone(sharedCurrent.button_measurement);
+ expected.historical_source_bindings=627;expected.historical_shared_button_source_bindings=623;
+ expected.current_public_bridge=structuredClone(sharedCurrent.current_public_bridge);
+ return expected;
+}
+/** Strict whole-report comparison; no producer/source/run admission. */
+export function currentButtonTokenRepairsReportMatches(args){
+ try{const {current,...inputs}=captureCurrentSassMetadata(args);assert.deepEqual(current,currentButtonTokenRepairsExpectedReport(inputs));return true;}catch{return false;}
+}
 export function reviewButtonTokenRepairsSource({root=process.cwd(),read=path=>readFileSync(join(root,path))}={}){
- const shared=reviewButtonTokenizationSource({root,read}),bound=new Map(shared.bound.map(ref=>[ref.path,ref]));
- function member(ref){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed button token-repair source '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;}
+ root=resolve(root);const suppliedRead=read,retained=new Map();
+ read=path=>{const actual=physical(root,path),before=retained.get(path);if(before)assert.ok(equalBytes(actual,before));else retained.set(path,Buffer.from(actual));assert.ok(equalBytes(actual,suppliedRead(path)),'nonphysical button repair source '+path);assert.ok(equalBytes(actual,physical(root,path)),'button repair input changed during callback '+path);return actual;};
+ const finalPhysical=()=>{for(const[path,before]of retained)assert.ok(equalBytes(physical(root,path),before),'changed final button repair input '+path);for(const path of absent){let missing=false;try{physical(root,path);}catch(error){assert.equal(error.code,'ENOENT');missing=true;}assert.equal(missing,true,'unreviewed modern button source '+path);}};
+ const shared=reviewButtonTokenizationSource({root,read}),c04=spinnerSnackC04Source({root,read}),bound=new Map(shared.bound.map(ref=>[ref.path,ref]));
+ const absent=captureCurrentSassMetadata(shared.historical_report.absent_owned_token_or_modern_component_paths);
+ assert.deepEqual(union(shared.bound),shared.report.current_source_bindings);
+ function member(ref){ref=c04.qualify(ref);const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed button token-repair source '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;}
  member({path:'scripts/upstream-button-token-repairs-source-review.mjs',sha256:hash(image),bytes:image.length});const original=JSON.parse(gunzipSync(member(ORIGINAL)));for(const ref of [original.producer,...original.inputs])member(ref);
+ const historicalReport=JSON.parse(member(SOURCE_REPORT));assert.deepEqual(shared.historical_report,JSON.parse(member(SHARED_REPORT)));
  const facts=verifyButtonTokenRepairsOriginals(original,JSON.parse(gunzipSync(read(CENSUS)))),base='projects/ngx-material-legacy/styles/';
  const current=path=>read(base+path).toString();const owned=current('button/_button-theme.scss');
  assert.ok(owned.includes('@mixin _raised-button-variant($foreground, $background) {\n  @include mdc-button-protected-theme.theme(('));assert.ok(owned.includes('$disabled-ink-color: rgba($on-surface, if($is-dark, 0.5, 0.38));'));assert.equal(/tokens-mdc-|get-color-tokens|core\/tokens/.test(owned),false);
  for(const name of ['filled-button','protected-button'])assert.ok(current('vendor/mdc/button/_button-'+(name==='filled-button'?'filled':'protected')+'-theme.scss').includes("$custom-property-prefix: '"+name+"';"));
  const measurement=shared.report.button_measurement;assert.equal(measurement.case_count,14);const dark=measurement.cases.find(row=>row.mixin==='button-theme'&&row.case_id.endsWith('/custom-dark-theme'));assert.ok(dark);assert.ok(dark.expected.css.includes('rgba(255, 255, 255, 0.5)'));
  for(const row of measurement.cases.filter(row=>row.mixin==='button-color'||row.mixin==='button-theme')){for(const name of ['filled-button','protected-button'])assert.ok(row.actual.css.includes('--mdc-'+name+'-container-color'));for(const name of ['button-filled','button-protected'])assert.equal(row.actual.css.includes('--mdc-'+name+'-'),false);}
- const assertCurrent=()=>{shared.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late button token-repair source change '+ref.path);assert.equal(raw.length,ref.bytes);}};assertCurrent();
- return {report:{schema_version:1,line:'21.x',role:'Two individually reviewed whole-patch source proposals; independent historical button CSS contract',...facts,originals:ORIGINAL,current_source_bindings:structuredClone([...bound.values()]),shared_button_source_bindings:shared.bound.length,
+ const assertCurrent=()=>{shared.assertCurrent();c04.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late button token-repair source change '+ref.path);assert.equal(raw.length,ref.bytes);}finalPhysical();};assertCurrent();
+ const report={schema_version:1,line:'21.x',role:'Two individually reviewed whole-patch source proposals; finite current ordinary and nested legacy button CSS contract',...facts,originals:ORIGINAL,current_source_bindings:union([...bound.values()]),shared_button_source_bindings:shared.bound.length,
   tagged_sass_reference:shared.report.tagged_sass_reference,reference_identity:shared.report.reference_identity,argument_catalog:shared.report.argument_catalog,compiler:shared.report.compiler,compiler_inputs:shared.report.compiler_inputs,button_measurement:measurement,
   original_sass_graph_members:71,original_locked_archive_packages:17,modern_theme_module_source_rewrites:7,legacy_theme_module_source_rewrites:5,legacy_structural_module_source_rewrites:4,namespace_or_mixin_or_selector_rewrites:0,owned_raised_producer_already_protected:true,owned_dark_disabled_opacity_already_historical:true,owned_MDC_prefixes_already_correct:true,
-  absent_owned_token_or_modern_component_paths:structuredClone(shared.report.absent_owned_token_or_modern_component_paths),fresh_bounded_sass_compiler_execution:true,tagged_reference_sass_executed:true,upstream_post16_sass_or_typescript_tests_or_workflows_executed:false,package_install_or_javascript_runtime_execution:false,full_sass_gate_executed:false,canonical_decisions_changed:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'},bound:structuredClone([...bound.values()]),assertCurrent};
+  absent_owned_token_or_modern_component_paths:structuredClone(shared.report.absent_owned_token_or_modern_component_paths),fresh_bounded_sass_compiler_execution:true,tagged_reference_sass_executed:true,upstream_post16_sass_or_typescript_tests_or_workflows_executed:false,package_install_or_javascript_runtime_execution:false,full_sass_gate_executed:false,canonical_decisions_changed:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed',historical_source_bindings:627,historical_shared_button_source_bindings:623,current_public_bridge:structuredClone(shared.report.current_public_bridge)};
+ const sharedPaths=new Set(shared.historical_report.current_source_bindings.map(r=>r.path));
+ const ownPaths=[...historicalReport.current_source_bindings.filter(r=>!sharedPaths.has(r.path)).map(r=>r.path),SOURCE_REPORT.path];
+ const ownReferences=ownPaths.map(path=>{assert.ok(bound.has(path));return bound.get(path);});
+ assert.deepEqual(report,currentButtonTokenRepairsExpectedReport({historical:historicalReport,sharedHistorical:shared.historical_report,sharedCurrent:shared.report,ownReferences}),'button token-repairs report changed beyond the exact finite current successor');
+ const snapshot=captureCurrentSassMetadata(report);assertCurrent();assert.deepEqual(captureCurrentSassMetadata(report),snapshot);finalPhysical();
+ return {report,historical_report:structuredClone(historicalReport),bound:structuredClone([...bound.values()]),assertCurrent};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  assert.equal(process.argv.length,3);const scope=reviewButtonTokenRepairsSource();scope.assertCurrent();writeFileSync(process.argv[2],JSON.stringify(scope.report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({result:'pass',original_files:9,original_hunks:14,button_cases:scope.report.button_measurement.case_count,source_bindings:scope.bound.length,canonical_decisions_changed:0}));

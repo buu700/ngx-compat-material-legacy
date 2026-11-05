@@ -12,7 +12,7 @@ import {createRequire} from 'node:module';
 import {readFileSync,writeFileSync,realpathSync} from 'node:fs';
 import {dirname,join,resolve} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
-import {measureSassInspectionScope} from './measure-sass-inspection-scope.mjs';
+import {measureCurrentSassInspectionScope} from './current-sass-inspection-scope.mjs';
 import {enumerateModule,variableValues} from './sass-api-inventory.mjs';
 import {expectedConditions} from './check-packed-exports.mjs';
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
@@ -21,7 +21,7 @@ const oracleSha='76908825fdbb55fc188f0add372d371f473cd7874cbf575894247231ab854e2
 
 export function measureLegacySassEntrypointScope({root=process.cwd()}={}){
   root=realpathSync(root);const read=path=>readFileSync(join(root,path));
-  const scope=measureSassInspectionScope({root});assert.equal(scope.line,'21.x');
+  const scope=measureCurrentSassInspectionScope({root});assert.equal(scope.line,'21.x');
   const raw=read(oraclePath);assert.equal(hash(raw),oracleSha);const oracle=JSON.parse(raw);
   const sass=createRequire(join(root,'package.json'))('sass');
   assert.equal(JSON.parse(read('node_modules/sass/package.json')).version,oracle.provenance.sass_version);
@@ -75,7 +75,7 @@ export function measureLegacySassEntrypointScope({root=process.cwd()}={}){
   const inputPaths=['projects/ngx-material-legacy/_index.scss','projects/ngx-material-legacy/package.json',
     'projects/ngx-material-legacy/ng-package.json','compatibility/rc/matrices/library-exports.json',oraclePath,
     'projects/ngx-material-legacy/schematics/migrate-legacy/sass-rewrite.js',
-    'scripts/measure-sass-inspection-scope.mjs','scripts/sass-api-inventory.mjs','scripts/check-packed-exports.mjs'];
+    'scripts/current-sass-inspection-scope.mjs','scripts/sass-api-inventory.mjs','scripts/check-packed-exports.mjs'];
   return {schema_version:1,line:scope.line,result:'pass',role:'Current default-module export/value and migration scope only; global compatibility paths and full CSS are not qualified.',
     current_compiler_scope:scope,compiler_exports:names,oracle_member_counts:oracle.counts,
     missing_historical_members:missing,historical_default_variables_matched:Object.keys(values).length,

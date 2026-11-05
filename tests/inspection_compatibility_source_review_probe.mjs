@@ -5,6 +5,7 @@
  * Use of this source code is governed by the MIT license in LICENSE.
  */
 import assert from 'node:assert/strict';
+import {assertCurrentReviewTestSources,assertPhysicalAbsentCounterpart} from './current_sass_review_test_scope.mjs';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {createHash} from 'node:crypto';
@@ -37,6 +38,7 @@ for(const [id,path,text]of [
 let late=null;const mutable=path=>late===path?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
 const scope=reviewInspectionCompatibilitySource({root,read:mutable});assert.equal(scope.report.reviews.length,4);
 assert.deepEqual(scope.report.reviews.map(row=>row.proposed_final_disposition),['do-not-adopt','not-applicable','not-applicable','not-applicable']);
+const sourceQualification=assertCurrentReviewTestSources({kind:'inspection-compatibility',scope:scope});
 const roles=[
  'scripts/upstream-inspection-compatibility-source-review.mjs','scripts/upstream-theming-inspection-source-review.mjs',
  'compatibility/rc/21x-c04-inspection-compatibility-originals-complete-context.json.gz','compatibility/rc/21x-c04-inspection-compatibility-originals.json.gz',
@@ -49,13 +51,12 @@ const roles=[
 const bound=new Set(scope.bound.map(ref=>ref.path));assert.ok(roles.every(path=>bound.has(path)));
 for(const path of roles){late=path;assert.throws(()=>scope.assertCurrent(),undefined,path);rejected.push('late/'+path);}late=null;scope.assertCurrent();
 for(const path of scope.report.absent_owned_counterparts){
- let added=false;const view=member=>added&&member===path?Buffer.from('// unreviewed counterpart\n'):read(member),live=reviewInspectionCompatibilitySource({root,read:view});
- added=true;assert.throws(()=>live.assertCurrent());rejected.push('absent/'+path);
+ assertPhysicalAbsentCounterpart({root,path,assertCurrent:scope.assertCurrent});rejected.push('absent/'+path);
 }
-const absent=scope.report.absent_owned_counterparts[0];assert.throws(()=>reviewInspectionCompatibilitySource({root,read:path=>{if(path===absent){const e=new Error('unreadable');e.code='EACCES';throw e;}return read(path);}}));rejected.push('unreadable-is-not-absent');
+assert.throws(()=>reviewInspectionCompatibilitySource({root,read:path=>{if(path===entry){const e=new Error('unreadable pinned source');e.code='EACCES';throw e;}return read(path);}}),error=>error.code==='EACCES');rejected.push('unreadable-pinned-input-propagates');
 scope.bound.length=0;scope.report.current_source_bindings.length=0;late=entry;assert.throws(()=>scope.assertCurrent());late=null;scope.assertCurrent();rejected.push('public-metadata-cannot-rewrite-guards');
 const report={schema_version:1,result:'pass',original_files:7,original_hunks:14,present_original_blobs:12,tagged_blobs:8,exact_patch_replays:7,whitespace_only_fixups:1,
- tagged_deleted_modern_files:2,proposed_individual_source_decisions:4,source_bindings:bound.size,owned_scss_members:409,historical_exported_functions:25,public_override_boundaries:6,
+ tagged_deleted_modern_files:2,proposed_individual_source_decisions:4,source_bindings:bound.size,...sourceQualification,owned_scss_members:409,historical_exported_functions:25,public_override_boundaries:8,historical_public_override_boundaries:4,
  legacy_theme_module_source_rewrites:4,legacy_theme_namespace_or_mixin_or_selector_rewrites:0,rejected,
  fresh_compiler_execution_this_review:false,upstream_code_executed:false,canonical_decisions_changed:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});

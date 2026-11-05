@@ -5,6 +5,7 @@
  * Use of this source code is governed by the MIT license in LICENSE.
  */
 import assert from 'node:assert/strict';
+import {assertCurrentCanonicalTestRegistry} from './current_sass_canonical_test_scope.mjs';
 import fs from 'node:fs';
 import {syncBuiltinESMExports} from 'node:module';
 import {createHash} from 'node:crypto';
@@ -24,8 +25,8 @@ for(const key of Object.keys(env))if(key.startsWith('RC_')||['GIT_DIR','GIT_WORK
 const before=execFileSync('git',['--no-replace-objects','show',packet.source_parent+':'+ledger],{cwd:root,env,maxBuffer:8*1024*1024});
 const stage=applyRemainingUnthemableCanonicalStage({before,body});assert.equal(hash(stage.after),packet.after.sha256);
 const registryBefore=execFileSync('git',['--no-replace-objects','show',packet.source_parent+':'+packet.registry_before.path],{cwd:root,env});
-assert.equal(read(packet.registry_after.path).equals(remainingUnthemableRegistrySuccessor(registryBefore)),true);assert.equal(sourceContractDefinitions.length,67);
-const qualified=qualifyCanonicalToolReference({root,read,prior:packet.registry_before});assert.deepEqual(qualified.reference,packet.registry_after);
+const historicalRegistry=remainingUnthemableRegistrySuccessor(registryBefore);
+const qualified=qualifyCanonicalToolReference({root,read,prior:packet.registry_before});const registryQualification=assertCurrentCanonicalTestRegistry({historicalRegistry,qualified,root,read});
 let metadataCases=0,metadataRejections=0,sourceRejections=0;const rejected=[];
 const phase=process.argv[3]??'all',sourcePhases=body.reviews.map(row=>'source/'+row.sha),rootPhases=body.reviews.map(row=>'root/'+row.sha);assert.ok(['all','tools','canonical',...rootPhases,...sourcePhases].includes(phase));
 const phaseCanonical=phase==='all'||phase==='canonical',phaseRoot=phase==='all'||phase.startsWith('root/');
@@ -135,7 +136,7 @@ try{
 }finally{fs.rmSync(mutant,{force:true});fs.rmSync(directory,{recursive:true,force:true});}
 }
 const report={schema_version:1,result:'pass',phase,canonical_phase_executed:phaseCanonical,root_phase_executed:phaseRoot,pure_metadata_cases:metadataCases,metadata_rejections:metadataRejections,source_rejections:sourceRejections,
- registered_source_contracts:67,prior_registry_records_preserved:53,current_registry_tool_bindings:qualified.bound.length,real_root_positive_rows:rootPositive,real_root_rejected_rows:rootNegative,missing_source_requirement_mutant_detected:mutantDetected,
+ ...registryQualification,prior_registry_records_preserved:53,real_root_positive_rows:rootPositive,real_root_rejected_rows:rootNegative,missing_source_requirement_mutant_detected:mutantDetected,
  late_original_patch_in_tool_role_rejected:phase==='all'||phase==='tools',canonical_whole_body_fresh_source_checked:phaseCanonical,canonical_bound_members:phaseCanonical?660:0,canonical_metadata_rejections:phaseCanonical?8:0,canonical_late_source_rejections:phaseCanonical?25:0,canonical_cache_or_guard_mutants_rejected:phaseCanonical?2:0,canonical_late_metadata_mutants_rejected:phaseCanonical?2:0,metadata_after_source_mutants_rejected:phaseCanonical?1:0,
  after_sha256:hash(stage.after),individual_decisions:14,summary_scalar_tokens:2,unselected_entries_preserved:1683,rejected,canonical_ledger_applied:false,
  actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};

@@ -11,11 +11,14 @@ import re
 import subprocess
 import tempfile
 import unittest
+import sys
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+
 import current_sass_spinner_snack_admission as subject
 import sass_spinner_snack_bridge_admission as frozen
 from test_current_sass_source import candidate_fixture, NODE
 
-ROOT = Path(__file__).resolve().parents[1]
 PREFIX = 'compatibility/rc/current-sass-spinner-snack-'
 def digest(value): return hashlib.sha256(value.encode() if type(value) is str else value).hexdigest()
 def measured(css): return dict(css=css, css_sha256=digest(css), css_bytes=len(css.encode()))
@@ -49,14 +52,14 @@ class CurrentDirectTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        if cls.js_result is not None:
+        if cls.js_result is not None and os.environ.get('CURRENT_SASS_SPINNER_SNACK_REPORT_VERSION'):
             report = dict(schema_version=1, line=cls.line, role='Current direct15 isolated candidate-source context controls; modeled packed envelopes only',
                 python_checks=cls.checks, js=cls.js_result, source_set_successors=cls.context.source_set_successors,
                 canonical_descriptor=cls.context.descriptor, reused_prior_css_rows=15, old_physical_constructor_executed=False,
                 old_branded_assertion_validator_executed=False, fresh_compiles=0, actual_packed_assertions=0,
                 workspace_product_changed=False, existing_gate_reader_manifest_golden_changed=False,
                 current_ordinary_CSS_or_aggregate_or_browser_floor_fullowner_qualified=False, g11_claim='not-passed')
-            version = os.environ.get('CURRENT_SASS_SPINNER_SNACK_REPORT_VERSION', 'v2')
+            version = os.environ['CURRENT_SASS_SPINNER_SNACK_REPORT_VERSION']
             assert re.fullmatch(r'v[0-9]+', version)
             path = ROOT / (PREFIX + 'controls-' + ('21x' if cls.line == '21.x' else 'main') + '-' + version + '.json')
             assert not path.exists()

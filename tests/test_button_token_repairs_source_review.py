@@ -27,10 +27,14 @@ class ButtonTokenRepairsSourceReviewTests(unittest.TestCase):
                            ('authenticated_tree_objects', 34), ('authenticated_absent_members', 4),
                            ('frozen_seed_omitted_deletions', 2), ('exact_prefix_only_module_moves', 2),
                            ('raised_color_producer_repairs', 3), ('dark_disabled_opacity_repairs', 1),
-                           ('source_bindings', 627), ('shared_button_source_bindings', 623),
+                           ('historical_source_bindings', 627), ('historical_shared_button_source_bindings', 623),
                            ('original_sass_graph_members', 71), ('original_locked_archive_packages', 17),
                            ('button_cases', 14), ('preserved_prior_semantic_mutants', 7), ('additional_semantic_mutants_detected', 4)]:
             self.assertEqual(report[key], value, key)
+        self.assertEqual(report['source_bindings'], report['expected_source_bindings'])
+        self.assertTrue(report['current_source_bindings_match_exact_successor'])
+        self.assertEqual(report['transient_exclusive_physical_absent_source_mutations'], 6)
+        self.assertEqual(report['persistent_product_source_changes'], 0)
         self.assertTrue(report['fresh_prior_button_controls_executed'])
         self.assertEqual(len(report['preserved_prior_rejections']), 55)
         self.assertEqual(len(set(report['preserved_prior_rejections'])), 55)

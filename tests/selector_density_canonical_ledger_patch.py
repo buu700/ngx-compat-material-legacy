@@ -38,7 +38,8 @@ def verify_selector_density_registry_successor(root=ROOT):
                         "    scope_key:'selector_density_source_scope',module:'upstream-selector-density-admission.cjs'},\n" for sha in SHAS)
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == 'c441c65203b4ee240f1c259bc7460a9eb51ef395f619fe3cc5234305120fff38'
-    current = (root / REGISTRY).read_bytes()
+    from current_sass_canonical_test_scope import historical67_registry_bytes
+    current = historical67_registry_bytes(root)
     if digest(current) == '03a18cd09e4183f4307f1ec2c17d0797eea72db0440e23530e4d015ea0dae6a8':
         from remaining_unthemable_canonical_ledger_patch import verify_remaining_unthemable_registry_successor
         remaining_before, remaining_after = verify_remaining_unthemable_registry_successor(root)
@@ -105,9 +106,11 @@ def derive_selector_density_successor(root=ROOT):
         assert digest((root / row['patch_file']).read_bytes()) == row['diff_sha256']
     assert [row['sha'] for row in body['reviews']] == SHAS
     handler = next(ref for ref in packet['source_members'] if ref['path'] == 'scripts/upstream-selector-density-admission.cjs')
+    from historical_contract_repair_source import qualify_tool_reference
     for ref in packet['source_members']:
-        raw = (root / ref['path']).read_bytes()
-        assert digest(raw) == ref['sha256'] and len(raw) == ref['bytes']
+        current = qualify_tool_reference(ref, root) if ref['path'].startswith('scripts/') else ref
+        raw = (root / current['path']).read_bytes()
+        assert digest(raw) == current['sha256'] and len(raw) == current['bytes']
     expected = json.loads(before)
     assert len(expected['entries']) == len({row['sha'] for row in expected['entries']}) == 1697
     assert expected['closed_dispositions'] == 383 and expected['open_or_deferred'] == 1314

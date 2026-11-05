@@ -12,6 +12,8 @@ import {join} from 'node:path';
 import {gunzipSync} from 'node:zlib';
 import {verifyButtonTokenRepairsOriginals,reviewButtonTokenRepairsSource} from '../scripts/upstream-button-token-repairs-source-review.mjs';
 import {verifyButtonReferenceData,measureButtonContracts} from '../scripts/upstream-button-tokenization-source-review.mjs';
+import {assertCurrentButtonTokenRepairsTestSources} from './current_sass_button_token_repairs_test_scope.mjs';
+import {assertPhysicalAbsentCounterpart} from './current_sass_review_test_scope.mjs';
 const root=process.cwd(),read=path=>readFileSync(join(root,path)),hash=raw=>createHash('sha256').update(raw).digest('hex');
 const gitHash=(kind,raw)=>createHash('sha1').update(kind+' '+Buffer.byteLength(raw)+'\0').update(raw).digest('hex');
 const prefix='compatibility/rc/21x-c04-button-token-repairs-',original=JSON.parse(gunzipSync(read(prefix+'originals.json.gz'))),census=JSON.parse(gunzipSync(read('compatibility/rc/upstream-complete-patch-census.json.gz'))),rejected=[];
@@ -45,11 +47,13 @@ for(const fault of ['unknown-sha','duplicate-sha','missing-deleted-module','miss
  if(fault==='capture-worksheet-change')data.worksheet_at_capture.status='passed';
  assert.throws(()=>verifyButtonTokenRepairsOriginals(data,census),undefined,fault);rejected.push('original/'+fault);
 }
-let late=null,added=null;const mutable=path=>path===added?Buffer.from('// unexpected token source\n'):path===late?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
-const scope=reviewButtonTokenRepairsSource({root,read:mutable});assert.equal(scope.report.reviews.length,2);assert.ok(scope.report.reviews.every(row=>row.proposed_final_disposition==='do-not-adopt'));const fullReview=structuredClone(scope.report);const bound=new Set(scope.bound.map(row=>row.path));assert.equal(bound.size,627);
-const capsule=JSON.parse(gunzipSync(read('compatibility/rc/21x-c04-button-tokenization-tagged-sass-inputs.json.gz'))),identity=JSON.parse(read('compatibility/rc/original16-sass-source-diagnostic-identity.json')),reference=verifyButtonReferenceData(capsule,identity,original),catalog=JSON.parse(read('fixtures/sass/mixin-argument-contracts.json')),owned={};
-for(const ref of scope.bound){const prefix='projects/ngx-material-legacy/styles/';if(ref.path.startsWith(prefix)&&ref.path.endsWith('.scss'))owned['/@angular/material/'+ref.path.slice(prefix.length)]=read(ref.path).toString();}
-const modern='/@angular/material/button/_button-theme.scss';
+let late=null;const mutable=path=>path===late?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
+const scope=reviewButtonTokenRepairsSource({root,read:mutable});assert.equal(scope.report.reviews.length,2);assert.ok(scope.report.reviews.every(row=>row.proposed_final_disposition==='do-not-adopt'));const fullReview=structuredClone(scope.report);const bound=new Set(scope.bound.map(row=>row.path));const population=assertCurrentButtonTokenRepairsTestSources({scope,root,read});assert.equal(bound.size,population.expected_source_bindings);
+const capsule=JSON.parse(gunzipSync(read('compatibility/rc/21x-c04-button-tokenization-tagged-sass-inputs.json.gz'))),identity=JSON.parse(read('compatibility/rc/original16-sass-source-diagnostic-identity.json')),reference=verifyButtonReferenceData(capsule,identity,original),catalog=JSON.parse(read('fixtures/sass/mixin-argument-contracts.json')),owned={},peers={};
+for(const ref of scope.bound){const prefix='projects/ngx-material-legacy/styles/';if(ref.path.startsWith(prefix)&&ref.path.endsWith('.scss'))owned['/owned/material/'+ref.path.slice(prefix.length)]=read(ref.path).toString();}
+const publicScope=JSON.parse(gunzipSync(read('compatibility/rc/upstream-sass-inspection-current-scope.json.gz'))).actual;
+for(const ref of publicScope.current.loaded_sources){const family=ref.root===0?'material':'cdk',path='node_modules/@angular/'+family+'/'+ref.path,raw=read(path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);peers['/current/@angular/'+family+'/'+ref.path]=raw.toString();}
+assert.equal(Object.keys(peers).length,185);const modern='/owned/material/button/_button-theme.scss';
 for(const fault of ['raised-uses-filled-producer','dark-disabled-label-opacity','filled-token-prefix','protected-token-prefix']){
  const data=structuredClone(owned);let variant='custom-full-theme',name='button-color';
  if(fault==='raised-uses-filled-producer'){
@@ -59,9 +63,9 @@ for(const fault of ['raised-uses-filled-producer','dark-disabled-label-opacity',
   const before='$disabled-ink-color: rgba($on-surface, if($is-dark, 0.5, 0.38));';assert.ok(data[modern].includes(before));data[modern]=data[modern].replace(before,before.replace('0.5','0.38'));variant='custom-dark-theme';name='button-theme';
  }
  for(const kind of ['filled','protected'])if(fault===kind+'-token-prefix'){
-  const path='/@angular/material/vendor/mdc/button/_button-'+kind+'-theme.scss',before="$custom-property-prefix: '"+kind+"-button';";assert.ok(data[path].includes(before));data[path]=data[path].replace(before,"$custom-property-prefix: 'button-"+kind+"';");
+  const path='/owned/material/vendor/mdc/button/_button-'+kind+'-theme.scss',before="$custom-property-prefix: '"+kind+"-button';";assert.ok(data[path].includes(before));data[path]=data[path].replace(before,"$custom-property-prefix: 'button-"+kind+"';");
  }
- assert.notDeepEqual(data,owned);const probe=catalog.cases.find(row=>row.mixin===name&&row.variant===variant);assert.ok(probe);assert.throws(()=>measureButtonContracts({reference,owned:data,catalog,selected:[probe]}),/button CSS differs from untouched16/,fault);rejected.push('semantic/'+fault);
+ assert.notDeepEqual(data,owned);const probe=catalog.cases.find(row=>row.mixin===name&&row.variant===variant);assert.ok(probe);assert.throws(()=>measureButtonContracts({reference,owned:data,peers,catalog,selected:[probe]}),/button CSS differs from finite independently derived current model/,fault);rejected.push('semantic/'+fault);
 }
 const roles=[
  'scripts/upstream-button-token-repairs-source-review.mjs',prefix+'originals.json.gz',prefix+'reference-capture.py',prefix+'source-worksheet.json',
@@ -73,11 +77,12 @@ const roles=[
 ];
 assert.equal(new Set(roles).size,17);assert.ok(roles.every(path=>bound.has(path)));
 for(const path of roles){late=path;assert.throws(()=>scope.assertCurrent(),undefined,path);rejected.push('late/'+path);}late=null;scope.assertCurrent();
-for(const path of scope.report.absent_owned_token_or_modern_component_paths){added=path;assert.throws(()=>scope.assertCurrent());rejected.push('absent/'+path);}added=null;scope.assertCurrent();
+for(const path of scope.report.absent_owned_token_or_modern_component_paths){assertPhysicalAbsentCounterpart({root,path,assertCurrent:scope.assertCurrent});rejected.push('absent/'+path);}scope.assertCurrent();
 scope.bound.length=0;scope.report.current_source_bindings.length=0;late=prefix+'reference-capture.py';assert.throws(()=>scope.assertCurrent());late=null;scope.assertCurrent();rejected.push('public-metadata-cannot-rewrite-guards');
-const report={schema_version:1,result:'pass',...facts,reviews:undefined,source_bindings:bound.size,shared_button_source_bindings:623,original_sass_graph_members:71,original_locked_archive_packages:17,button_cases:scope.report.button_measurement.case_count,
+const report={schema_version:1,result:'pass',...facts,reviews:undefined,...population,source_bindings:bound.size,shared_button_source_bindings:scope.report.shared_button_source_bindings,original_sass_graph_members:71,original_locked_archive_packages:17,button_cases:scope.report.button_measurement.case_count,
  fresh_prior_button_controls_executed:true,preserved_prior_rejections:prior.rejected,preserved_prior_semantic_mutants:7,additional_semantic_mutants_detected:4,rejected,
  owned_raised_producer_already_protected:true,owned_dark_disabled_opacity_already_historical:true,owned_MDC_prefixes_already_correct:true,
+ transient_exclusive_physical_absent_source_mutations:6,persistent_product_source_changes:0,
  fresh_bounded_sass_compiler_execution:true,tagged_reference_sass_executed:true,upstream_post16_sass_or_typescript_tests_or_workflows_executed:false,package_install_or_javascript_runtime_execution:false,
  full_sass_gate_executed:false,canonical_decisions_changed:0,product_changes:0,consumer_HTML_CSS_SCSS_changes:0,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[3])writeFileSync(process.argv[3],JSON.stringify(fullReview,null,2)+'\n',{flag:'wx'});
