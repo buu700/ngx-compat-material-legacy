@@ -36,7 +36,7 @@ const V3_SOURCE_ANCHORS={
 const V3_REGRESSION_SOURCE_ANCHORS={"21.x":{"tests/browser_reference_source_probe.mjs":{"before":{"path":"tests/browser_reference_source_probe.mjs","sha256":"cca4093034ebb6932fc7e822e70e684413b55d8fff12b40dcccbfdc07713a0e7","bytes":7558},"packet":{"path":"compatibility/rc/c04-browser-reference-source-inputs.json","sha256":"5a8bd910e0d9a64a73558b5da0f48abdf8546b455d8db0fcb921678a0ee0a5ae","bytes":115478},"source_member_index":50},"scripts/browser-reference-proposal.mjs":{"before":{"path":"scripts/browser-reference-proposal.mjs","sha256":"600a430a33955755561f018f46288acd4beed4b9ad4ca6b4daf8aa7cb5bf1d50","bytes":13492},"packet":{"path":"compatibility/rc/c04-browser-owner-inputs.json","sha256":"710201dd63bfb326485cd2933a9747d53f54b2cf833c47ce332816b0e0db526a","bytes":15193},"transition_index":3}},"main":{"tests/browser_reference_source_probe.mjs":{"before":{"path":"tests/browser_reference_source_probe.mjs","sha256":"cca4093034ebb6932fc7e822e70e684413b55d8fff12b40dcccbfdc07713a0e7","bytes":7558},"packet":{"path":"compatibility/rc/c04-browser-reference-source-inputs.json","sha256":"4b0167af85263a3fb652806e25186e8500e02424749adb860610519d28817e6c","bytes":115393},"source_member_index":48},"tests/checker_reference_source_probe.mjs":{"before":{"path":"tests/checker_reference_source_probe.mjs","sha256":"0c1158d9c1dcbe5a33f6d8f7660e8ad0435b031020a9610f76655f4648f211a8","bytes":15116},"packet":{"path":"compatibility/rc/c04-checker-owner-inputs.json","sha256":"f909f0a47fa49c1c3ba9e84718ad7ba461216cb7da12b61b972be87aa3ba7afc","bytes":12073},"transition_index":0},"scripts/browser-reference-proposal.mjs":{"before":{"path":"scripts/browser-reference-proposal.mjs","sha256":"600a430a33955755561f018f46288acd4beed4b9ad4ca6b4daf8aa7cb5bf1d50","bytes":13492},"packet":{"path":"compatibility/rc/c04-browser-owner-inputs.json","sha256":"d22d4c657197ee2640dd1079861e54fde35e55b9091b7d44f4e024d4b37b46cb","bytes":15192},"transition_index":3},"scripts/checker-reference-proposal.mjs":{"before":{"path":"scripts/checker-reference-proposal.mjs","sha256":"22c49ba434ee0b1253ad2815b77510adb8259cc3f307005f6b66b73e522502ac","bytes":13095},"packet":{"path":"compatibility/rc/c04-checker-owner-inputs.json","sha256":"f909f0a47fa49c1c3ba9e84718ad7ba461216cb7da12b61b972be87aa3ba7afc","bytes":12073},"transition_index":2},"scripts/browser-reference-source.mjs":{"before":{"path":"scripts/browser-reference-source.mjs","sha256":"59f2ac538149e0d9b2176c231a97147862881fb19b46768a5a4e450d66f9fe38","bytes":10443},"packet":{"path":"compatibility/rc/c04-browser-owner-inputs.json","sha256":"d22d4c657197ee2640dd1079861e54fde35e55b9091b7d44f4e024d4b37b46cb","bytes":15192},"transition_index":2}}};
 const PREVIOUS_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v1.json',sha256:'ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f',bytes:478008};
 const CHECKPOINTS={'21.x':'b25aedd02f7b53e8cd8dfcdad369a806a1301619',main:'5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'};
-const INPUTS_SHA='6dbcf3c3a66b35c39e7a083dd3cb4c081b17957ebe8f6b2bd3d2ba22ada58b0a';
+const INPUTS_SHA='1f5b7d412216614f49cc600fd8f000df2ddd2627b7ddc20f0ed14c31e9e28958';
 const image=readFileSync(fileURLToPath(import.meta.url));
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const reference=(path,raw)=>({path,sha256:hash(raw),bytes:raw.length});
@@ -233,8 +233,8 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
  for(const input of nextBranch.additional_inputs){assert.ok(toolPath(input.path)||input.path.startsWith('compatibility/rc/'));assert.ok(input.path!==SELF&&input.path!=='scripts/current_sass_tool_references.py');member(input);}
  for(const row of rows.values())member({path:row.path,...row.after});
  assert.deepEqual(bound.get(GUARD_PLAN.path),GUARD_PLAN,'current tool guard planner missing from finite bound');
- let consuming=false;
- const assertIdle=()=>assert.equal(consuming,false,'reentrant current tool guard consumption');
+ let consuming=false,batching=false;
+ const assertIdle=()=>{assert.equal(consuming,false,'reentrant current tool guard consumption');assert.equal(batching,false,'reentrant current tool reference batch');};
  const guardNode=Object.freeze({
   dependencies:Object.freeze([]),
   preflight:()=>{assertIdle();assertPlanner();assertPhysical();},
@@ -245,18 +245,45 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
  const assertCurrent=()=>{assertIdle();composedGuard();};
  const guardPlan=Object.freeze({assertCurrent,node:guardNode});
  const ownsReference=incoming=>{try{const ref=metadata(incoming),row=rows.get(ref.path),raw=row?.identities.get(ref.sha256);return Boolean(raw&&(ref.bytes===undefined||ref.bytes===raw.length));}catch{return false;}};
- const side=(incoming,target)=>{
+ const sideCore=(incoming,target)=>{
   const snapshot=plain(incoming),ref=metadata(snapshot),row=rows.get(ref.path);if(!row)return null;
   const prior=row.identities.get(ref.sha256);if(!prior)return null;matches(prior,ref);member({path:row.path,...row.after});
   const result={...snapshot,sha256:row[target].sha256,...(ref.bytes===undefined?{}:{bytes:row[target].bytes})};
-  assert.deepEqual(plain(incoming),snapshot);assertPhysical();return result;
+  assert.deepEqual(plain(incoming),snapshot);return result;
  };
- const comparisonBytes=incoming=>{
+ const side=(incoming,target)=>{assert.equal(batching,false,'reentrant current tool reference batch');const result=sideCore(incoming,target);if(result!==null)assertPhysical();return result;};
+ const comparisonCore=incoming=>{
   const snapshot=plain(incoming),ref=metadata(snapshot),row=rows.get(ref.path);assert.ok(row&&row.identities.has(ref.sha256));const result=Buffer.from(row.identities.get(ref.sha256));matches(result,ref);
-  member({path:row.path,...row.after});assert.deepEqual(plain(incoming),snapshot);assertPhysical();return result;
+  member({path:row.path,...row.after});assert.deepEqual(plain(incoming),snapshot);return result;
+ };
+ const comparisonBytes=incoming=>{assert.equal(batching,false,'reentrant current tool reference batch');const result=comparisonCore(incoming);assertPhysical();return result;};
+ // One finite metadata operation on this actual subject. Every request still
+ // consumes its own fresh current member; only the enclosing physical scope
+ // is shared. Independent public operations retain their original sweeps.
+ const referenceBatch=incoming=>{
+  assertIdle();const snapshot=plain(incoming);
+  assert.ok(Array.isArray(snapshot)&&snapshot.length>0,'reference batch requires nonempty requests');
+  for(const request of snapshot){
+   assert.ok(request&&typeof request==='object'&&!Array.isArray(request));
+   assert.deepEqual(Object.keys(request).sort(),['kind','reference']);
+   assert.ok(['qualify','predecessor','comparison'].includes(request.kind),'unknown reference batch operation');
+   const ref=metadata(request.reference),row=rows.get(ref.path),prior=row?.identities.get(ref.sha256);
+   if(request.kind==='comparison')assert.ok(prior,'unknown reference batch comparison');
+   if(prior)matches(prior,ref);
+  }
+  batching=true;
+  try{
+   assertPlanner();assertPhysical();const result=[];
+   for(let index=0;index<snapshot.length;index++){
+    assert.deepEqual(plain(incoming),snapshot,'changed reference batch input');
+    const request=incoming[index];
+    result.push(request.kind==='comparison'?comparisonCore(request.reference):sideCore(request.reference,request.kind==='qualify'?'after':'before'));
+   }
+   assert.deepEqual(plain(incoming),snapshot,'changed reference batch input');assertPhysical();assertPlanner();return result;
+  }finally{batching=false;}
  };
  const transitions=[...rows.values()].map(r=>({path:r.path,before:{...r.before},after:{...r.after}}));
- const result=Object.freeze({line,epoch:3,get bound(){return structuredClone([...bound.values()]);},get transitions(){return structuredClone(transitions);},ownsReference,qualify:ref=>side(ref,'after'),predecessorReference:ref=>side(ref,'before'),comparisonBytes,assertCurrent,guardNode,guardPlan,
+ const result=Object.freeze({line,epoch:3,get bound(){return structuredClone([...bound.values()]);},get transitions(){return structuredClone(transitions);},ownsReference,qualify:ref=>side(ref,'after'),predecessorReference:ref=>side(ref,'before'),comparisonBytes,referenceBatch,assertCurrent,guardNode,guardPlan,
   old_code_executed:false,old_product_bytes_exposed:false,old_tool_bytes_exposed_as_current:false,current_read_route_returned:false,canonical_admission_granted:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'});
  assertCurrent();return result;
 }
