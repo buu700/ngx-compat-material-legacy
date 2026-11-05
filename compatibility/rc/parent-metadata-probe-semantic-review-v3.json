@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "status": "mostly-closed-one-bounded-semantic-gap",
+  "patches": [
+    {
+      "path": "/tmp/parent-checker-chip-consumer-callbacks-v2/three-probes.patch",
+      "sha256": "3ab84f0bbeb49025789b1ae5b2b1b9c0a79c8cb286ba6ee454f25b36811da377",
+      "matches_receipt": true
+    },
+    {
+      "path": "/tmp/parent-checker-chip-consumer-callbacks-v2/wrapper-methods-only.patch",
+      "sha256": "aa0f4f909a0f7479863a3fb874298eddaf433030d36b4a4c799142c764f6729e",
+      "matches_receipt": true
+    }
+  ],
+  "review": {
+    "checker_14": {
+      "result": "closed for candidate ledger DATA semantics",
+      "evidence": [
+        "valid before and after baselines are both passed through assertCheckerDATA",
+        "all 14 named sha/index transitions require exact before path+digest and current checker digest",
+        "selected entries are constrained to exactly one digest replacement; unselected 1683 entries and ledger header are preserved",
+        "negative single-digest reversion fails at the selected checker digest transition predicate"
+      ]
+    },
+    "chip_4": {
+      "result": "closed for ledger entries and hunk preservation; report independent-reference completeness gap remains",
+      "evidence": [
+        "valid before and after baselines are both checked",
+        "all four named transitions require before/after references, and exact selected-entry reconstruction constrains other fields",
+        "unselected 1693 entries and header are preserved; dispositions/reason/proof kind remain; 198 source hunk judgments are compared to old report bytes",
+        "partial-wrapper, decision mutation, and single-reference reversion each hit explicit semantic predicates"
+      ]
+    },
+    "consumer_65": {
+      "result": "closed for ledger entries and hunk preservation; report independent-reference completeness gap remains",
+      "evidence": [
+        "valid before and after stage baselines are both checked",
+        "all 65 named one-reference changes are constrained against before/after source references and candidate entries",
+        "unselected 1632 entries and header are preserved; dispositions/reason/proof kind remain; all 7770 hunk reviews are checked against their authenticated original source",
+        "source-reference reversion and disposition mutants hit explicit predicates; original malformed-byte fault remains separate"
+      ]
+    },
+    "report_independent_references": {
+      "result": "gap",
+      "detail": "Chip and consumer validators compare report.body.independent_source_evidence only at the selected reference index. They do not assert the complete array equals the corresponding expected post-stage individual_proof.source_evidence array (old references preserved at all other indices, with only the authorized selected digest changed). A regression that corrupts a nonselected independent reference in a successor report is not isolated by the explicit DATA predicates.",
+      "bounded_fix": "For each chip/consumer report, assert deep equality of the complete independent_source_evidence array to the post-stage entry's complete source_evidence array. Add one candidate report control that changes a nonselected independent reference while leaving the ledger entry and selected reference valid, and require rejection through that predicate."
+    },
+    "original_controls": {
+      "result": "preserved by static diff inspection",
+      "detail": "Checker's prior late-source and partial-update tail remains; chip retains the changed packet/code/review and late wrapper fault tail plus reported 4/15 counts; consumer retains late wrapper, report controls and malformed-byte control plus its existing 3/12 contract. Added single-reference/disposition semantic cases do not inflate historical control counts. Supplemental physical reader rejection checks remain distinct from DATA predicates."
+    }
+  },
+  "data_harness": {
+    "reviewed_as": "isolated DATA harness: requires only assert, fs, path, child_process and crypto; child process is fixed Git-show for pinned historical ledger blobs; no owner/probe imports or dynamic code execution found",
+    "command": "node /tmp/parent-checker-chip-consumer-callbacks-v2/pure-data-harness.cjs",
+    "result": "pass",
+    "output": "14 checker, 4 chip, and 65 consumer selected DATA invariants: both baselines and six semantic mutants plus original format fault passed; no owners or probes imported"
+  },
+  "limits": [
+    "No owners, probes, Python consumer methods, CLI, source/profile/HEAD changes, or product tests executed.",
+    "The harness pass is DATA-only and does not establish runtime qualification."
+  ]
+}

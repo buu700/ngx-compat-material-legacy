@@ -73,6 +73,36 @@ assert.equal(preparedHistory.selection_native_stage.individual_decisions,3);
 assert.equal(preparedHistory.current_native_packed_or_floor_qualified,false);
 assert.equal(current.read('scripts/check-upstream-audit-disposition.mjs').equals(diskRead('scripts/check-upstream-audit-disposition.mjs')),true);
 const historicalFrames=[preparedHistory.before,preparedHistory.after,...['testing_api_stage','sass_stage','rules_js_stage','summary_stage','autocomplete_landscape_stage','native_spec_metadata_stage','selection_native_stage','historical_wrapper_metadata_stage','historical_consumer_wrapper_metadata_stage','legacy_sass_entrypoint_stage','checker_reference_metadata_stage','token_build_stage','unthemable_stage','registered_checker_metadata_stage','modern_control_base_stage','theme_token_root_stage','form_field_tokenization_stage','m3_theme_boundary_stage'].map(name=>preparedHistory[name].after)];
+// Candidate DATA must preserve the exact authenticated 27-decision checkpoint,
+// and the earlier Sass-only transition independently preserves 1,696 raw rows.
+function assertSassCheckpointDATA(candidate,baseline,earlier,reviewRaw){
+ const digest=raw=>createHash('sha256').update(raw).digest('hex');
+ assert.equal(digest(baseline),'1a6efeb50fff4ab828deff45262c0686dfc1bbed1c3fe118983882ac44990829');assert.equal(baseline.length,4028141);
+ assert.equal(digest(earlier.before),'c444a0532332e11c1bfb4f737135a0710909a1a6f91332f8327e8ed2e0174ac3');
+ assert.equal(digest(earlier.after),'fbefd5a78fd9d09694567a59636e6452cb1f08ef668f4b6596378662ab00b355');
+ assert.equal(digest(reviewRaw),'e9173324c715f86a8784ae133f598d1b320c5cbbcdab21757623c3648a49a1ea');
+ const review=JSON.parse(reviewRaw),before=JSON.parse(earlier.before),after=JSON.parse(earlier.after),reference=JSON.parse(baseline),actual=JSON.parse(candidate);
+ assert.equal(review.sha,SHA);assert.equal(review.line,'21.x');assert.equal(review.status,'reviewed');assert.equal(review.source_review_complete,true);assert.equal(review.proposed_final_disposition,'not-applicable');
+ assert.equal(before.entries.length,1697);assert.equal(new Set(before.entries.map(row=>row.sha)).size,1697);assert.equal(reference.entries.length,1697);assert.equal(actual.entries.length,1697);
+ const index=before.entries.findIndex(row=>row.sha===SHA);assert.ok(index>=0);assert.equal(after.entries[index].sha,SHA);assert.equal(reference.entries[index].sha,SHA);assert.equal(actual.entries[index].sha,SHA);
+ assert.equal(before.closed_dispositions,356);assert.equal(before.open_or_deferred,1341);assert.equal(after.closed_dispositions,357);assert.equal(after.open_or_deferred,1340);
+ const prior=before.entries[index],expected=structuredClone(prior);assert.equal(prior.final_disposition,'needs-individual-review');assert.equal(prior.evidence_report,null);
+ expected.final_disposition='not-applicable';expected.reason=review.decision;expected.review_depth='individual-compatibility';expected.evidence_report=REVIEW;
+ expected.individual_proof={proof_kind:'individual-legacy-sass-default-module-exclusion',diff_sha256:'a939a0f4eed396376268ba2cdfaee50caf97d586cb3e5b42472e8738fd3cbd39',review_depth:'individual-compatibility',affected_branches:['21.x'],decision:review.decision,legacy_sass_entrypoint_scope:{sha:SHA,review:{path:REVIEW,sha256:'e9173324c715f86a8784ae133f598d1b320c5cbbcdab21757623c3648a49a1ea'},source_scope_only:true,actual_native_artifact_browser_floor_or_audit_qualified:false}};
+ assert.deepEqual(after.entries[index],expected);assert.deepEqual(reference.entries[index],expected);
+ const selected=actual.entries[index];assert.equal(selected.reason,review.decision,'selected Sass reason');assert.equal(selected.final_disposition,'not-applicable','selected Sass disposition');assert.deepEqual(selected.individual_proof?.legacy_sass_entrypoint_scope,expected.individual_proof.legacy_sass_entrypoint_scope,'selected Sass scope');assert.deepEqual(selected,expected,'selected Sass reviewed entry');
+ const spans=raw=>{const text=raw.toString(),markers=[...text.matchAll(/^    \{/gm)];assert.equal(markers.length,1697);return markers.map((mark,i)=>{const start=mark.index+4,next=i+1<markers.length?markers[i+1].index:text.indexOf('\n  ],',start);assert.ok(next>start);return text.slice(start,next).trimEnd().replace(/,$/,'');});};
+ const stageBeforeSpans=spans(earlier.before),stageAfterSpans=spans(earlier.after),referenceSpans=spans(json(reference)),actualSpans=spans(candidate);
+ for(let i=0;i<1697;i++)if(i!==index){
+  assert.deepEqual(after.entries[i],before.entries[i],'Sass stage unselected entry');assert.equal(stageAfterSpans[i],stageBeforeSpans[i],'Sass stage unselected entry bytes');
+  assert.deepEqual(actual.entries[i],reference.entries[i],'checkpoint unselected entry');assert.equal(actualSpans[i],referenceSpans[i],'checkpoint unselected entry bytes');
+ }
+ const closed=new Set(['irrelevant','not-applicable','inherited','already-adapted','do-not-adopt','adapt','already-present']),pending=new Set(['open','needs-individual-review','security-review']);
+ assert.ok(actual.entries.every(row=>closed.has(row.final_disposition)||pending.has(row.final_disposition)));assert.equal(actual.closed_dispositions,actual.entries.filter(row=>closed.has(row.final_disposition)).length,'checkpoint summary closed');assert.equal(actual.open_or_deferred,actual.entries.filter(row=>pending.has(row.final_disposition)).length,'checkpoint summary pending');
+ assert.equal(reference.closed_dispositions,363);assert.equal(reference.open_or_deferred,1334);
+ const headers=value=>{const result=structuredClone(value);delete result.entries;return result;};assert.deepEqual(headers(actual),headers(reference),'checkpoint header');
+}
+const semanticReview=diskRead(REVIEW);assertSassCheckpointDATA(json(JSON.parse(registeredBefore)),registeredBefore,stage,semanticReview);
 const rejected=[];
 for(const [id,mutate]of [
   ['unselected-row',value=>value.entries.find(row=>row.sha!==SHA).reason+=' unreviewed mutation'],
@@ -81,7 +111,7 @@ for(const [id,mutate]of [
   ['incorrect-summary',value=>value.open_or_deferred++],
 ]){
   const value=JSON.parse(read(ledger));mutate(value);
-  const candidate=json(value);assert.equal(historicalFrames.some(frame=>candidate.equals(frame)),false,'historical DATA '+id);
+  const candidate=json(value);assert.throws(()=>assertSassCheckpointDATA(candidate,registeredBefore,stage,semanticReview),error=>error.code==='ERR_ASSERTION'&&error.message.split('\n')[0]==={'unselected-row':'checkpoint unselected entry','selected-row-reason':'selected Sass reason','selected-row-missing-scope':'selected Sass scope','incorrect-summary':'checkpoint summary pending'}[id],'semantic DATA '+id);assert.equal(historicalFrames.some(frame=>candidate.equals(frame)),false,'historical DATA '+id);
   assert.throws(()=>packedUpstreamLedgerEpoch({root,read:path=>path===ledger?candidate:diskRead(path)}),error=>error?.code==='ERR_ASSERTION'&&error.message.includes('nonphysical canonical input '+ledger),id);rejected.push(id);
 }
 for(const path of [REVIEW,'scripts/check-upstream-audit-disposition.mjs',

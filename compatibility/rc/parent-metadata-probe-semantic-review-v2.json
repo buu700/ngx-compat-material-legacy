@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "status": "semantic-blocker-open-static-review",
+  "candidate_patches": [
+    {
+      "path": "/tmp/parent-checker-chip-consumer-callbacks-v1/three-probes.patch",
+      "sha256": "7de491e1eb268c3449a38ae3ede6e1215e52ce91e5e214fdcde048af32b440d8"
+    },
+    {
+      "path": "/tmp/parent-checker-chip-consumer-callbacks-v1/wrapper-methods-only.patch",
+      "sha256": "aa0f4f909a0f7479863a3fb874298eddaf433030d36b4a4c799142c764f6729e"
+    }
+  ],
+  "review_basis": "Static source and DATA-validator inspection only. No owners, probes, Python test methods, CLI, or tests executed; no maintained writes.",
+  "common_finding": "The new DATA helpers assert the valid whole checkpoint, then reject a targeted mutant by requiring full JSON/byte equality with that checkpoint. This rejects the payload, but does not establish that the named admission predicate is what rejected it. Separate rejectHistoricalReader checks exercise the physical boundary and cannot supply the missing semantic evidence because they reject every nonphysical canonical ledger input.",
+  "per_admission_gaps": [
+    {
+      "scope": "checker reference metadata",
+      "target": "14 selected checker-reference digest updates",
+      "current_predicate": "assertCheckerDATA(bytes) deep-compares parsed bytes with source.after. The loop before it verifies review-selected before/after hashes on source.after, not on the candidate bytes. The partial-fourteen mutant is therefore rejected only as a nonidentical corpus.",
+      "bounded_semantic_predicates": [
+        "Accept the complete valid before frame as the negative-control starting point and the complete valid after frame as positive control.",
+        "For each of the 14 review.selected_entries, locate exactly the named sha and source_member_index; require the prior {path,sha256} to match before_sha256 and the candidate to carry the same path with after_sha256 equal to checker.current_sha256.",
+        "Require no other checker-path references to change, all unselected entries and all non-reference fields of selected entries to remain equal to before, and ledger header/decision/hunk fields to remain unchanged. Check 0-to-14 selected token count and zero decision changes against candidate bytes."
+      ],
+      "mutant_control": "Change exactly one of the 14 candidate digests back to its valid before_sha256, leaving all other bytes valid. The candidate-specific predicate must reject due to that selected reference."
+    },
+    {
+      "scope": "historical chip wrapper metadata",
+      "target": "4 chip source-reference refreshes, 4 report refreshes, preserved 198 hunk judgments",
+      "current_predicate": "assertWrapperDATA(bytes) deep-compares parsed bytes with checkpoint. The partial-wrapper mutant and changed-disposition mutant are rejected as any corpus difference; the predicate does not identify the reference-refresh or no-new-decision invariant.",
+      "bounded_semantic_predicates": [
+        "Accept exact valid pre-stage and post-stage checkpoint controls.",
+        "For each of the four transport-required sha/index transitions, require only the named source_evidence reference to move from its recorded before digest to its wrapper after digest; require the corresponding independent report reference and evidence-report digest to match the qualified report.",
+        "Require all four target entries to preserve final_disposition, reason, proof kind and original hunk judgment payloads; require the four report updates and total 198 original hunks; require zero new decisions and all 1693 unselected entries unchanged."
+      ],
+      "mutant_controls": [
+        "Revert exactly one selected source-reference update on an otherwise valid post-stage frame; reject on that transition predicate.",
+        "Change only final_disposition (or another decision-bearing field) on the valid post-stage frame; reject on the explicit unchanged-disposition/no-new-decision predicate."
+      ]
+    },
+    {
+      "scope": "historical consumer wrapper metadata",
+      "target": "65 consumer source-reference refreshes, matching report refreshes, preserved 7770 hunk judgments",
+      "current_predicate": "assertConsumerDATA(bytes) deep-compares with the complete checkpoint. The malformed-byte fault detects changed bytes/hash but does not prove the 65 admitted transitions or preserved review/decision content.",
+      "bounded_semantic_predicates": [
+        "Accept exact valid pre-stage and complete post-stage frames.",
+        "For each of 65 transport-required sha/index transitions, require the recorded wrapper after digest at the exact source_evidence position, matching independent_source_evidence position, refreshed evidence_report path/digest and successor metadata; require exactly one source-reference update per target entry.",
+        "Require original final dispositions and proof/hunk judgment payloads to remain intact, sum the 7770 original hunk reviews from their validated source reports, require zero decision changes/no new upstream SHA decisions, and preserve all 1632 unselected entries."
+      ],
+      "mutant_control": "From a valid post-stage frame, revert one named source digest (and separately alter one disposition or one original hunk field); reject for the corresponding semantic invariant. A generic byte corruption should remain only a format/integrity control."
+    }
+  ],
+  "recommendation": "Keep the existing physical-boundary rejection controls, but add candidate-specific semantic validators over authenticated complete baseline DATA. Reuse the maintained derivation packets/source entries to identify exact target rows and expected digest transitions; compare per-entry fields and explicit unchanged decision/hunk invariants, rather than using only whole-ledger equality. Preserve a positive valid baseline for each validator and at least one invariant-specific negative mutation per admission family. Do not claim runtime reader behavior from these DATA checks.",
+  "scope_limits": [
+    "No patch application",
+    "No owner/probe/test execution",
+    "No canonical/profile/HEAD/maintained changes",
+    "No runtime qualification"
+  ]
+}

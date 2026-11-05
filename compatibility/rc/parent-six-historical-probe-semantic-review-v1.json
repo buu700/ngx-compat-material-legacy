@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "review_scope": "six integrated historical probes; static source and DATA inspection only",
+  "read_only": true,
+  "probes": {
+    "tests/unthemable_token_ledger_probe.mjs": {
+      "ledger_candidate_mutants": [],
+      "finding": "No per-candidate ledger mutant was found. Its named missing-marker, forged-qualification, valid-metadata/source-fault, and actual CLI source-requirement mutant controls use the real checker and assert the target SHA's evidence/insufficient-review outcomes."
+    },
+    "tests/token_build_ledger_probe.mjs": {
+      "ledger_candidate_mutants": [],
+      "finding": "No per-candidate ledger mutant was found. Its three named marker, qualification, and proof-kind faults are sent through the real checker and must place the target SHA in behavior insufficient-review."
+    },
+    "tests/legacy_sass_entrypoint_ledger_probe.mjs": {
+      "ledger_candidate_mutants_requiring_named_DATA_predicates": [
+        {
+          "fault_id": "unselected-row",
+          "current_rejection": "candidate differs from every historical frame, then packedUpstreamLedgerEpoch rejects it as nonphysical canonical input",
+          "required_predicate": "all 1696 non-target entries remain semantically and byte-for-byte equal to the authentic before frame"
+        },
+        {
+          "fault_id": "selected-row-reason",
+          "current_rejection": "candidate differs from every historical frame, then generic physical-input rejection",
+          "required_predicate": "the selected SHA's reason, decision and other stage-owned fields equal the reviewed stage output"
+        },
+        {
+          "fault_id": "selected-row-missing-scope",
+          "current_rejection": "candidate differs from every historical frame, then generic physical-input rejection",
+          "required_predicate": "the target has the exact legacy_sass_entrypoint_scope qualification required by this stage"
+        },
+        {
+          "fault_id": "incorrect-summary",
+          "current_rejection": "candidate differs from every historical frame, then generic physical-input rejection",
+          "required_predicate": "closed_dispositions and open_or_deferred are derived correctly from the candidate entries (357 and 1340 for this stage)"
+        }
+      ],
+      "finding": "These four controls do not establish their named ledger semantics: historicalFrames inequality is only a generic not-a-known-frame check and the physical owner rejects any candidate bytes before a stage predicate can be exercised. The maintained DATA helper legacy_sass_entrypoint_ledger_patch.py independently derives the one-row successor from the authentic before frame, checks summary counts and preservation of all unselected entry bytes, and exposes verify_sass_entrypoint_successor(candidate=...). A bounded regression can route these candidate faults through equivalent DATA verification and assert the corresponding predicate failure while retaining the real physical-owner rejection control separately."
+    },
+    "tests/modern_control_base_admission_probe.mjs": {
+      "ledger_candidate_mutants": [],
+      "finding": "No per-candidate ledger mutant was found. The metadata mutations are checked by the pure metadata predicate and the real CLI checker; the valid-metadata source-fault and removed-source-requirement controls remain explicit."
+    },
+    "tests/theme_token_root_admission_probe.mjs": {
+      "ledger_candidate_mutants": [],
+      "finding": "No per-candidate ledger mutant was found. The probe has real-checker metadata and source-fault controls rather than synthetic ledger-candidate semantic mutants."
+    },
+    "tests/form_field_tokenization_admission_probe.mjs": {
+      "ledger_candidate_mutants": [],
+      "finding": "No per-candidate ledger mutant was found. The probe has real-checker metadata and source-fault controls rather than synthetic ledger-candidate semantic mutants."
+    }
+  },
+  "control_tail_review": "Static comparison against the authenticated original probe source shows the existing real-checker/control tails remain represented: source faults, metadata faults, actual CLI source-requirement mutants where present, missing registration/registry controls, and late-source checks. No fault tail removal was identified in the five probes without ledger-candidate mutants. The four legacy Sass ledger-candidate controls still execute their rejection assertions, but currently prove only generic nonphysical rejection rather than named historical-stage semantics.",
+  "validation": "No probe, owner, CLI, or runtime test was executed. Source and maintained DATA helper were inspected only.",
+  "assessment": "One bounded semantic gap: legacy_sass_entrypoint_ledger_probe.mjs's four candidate-ledger faults require named DATA predicates. No analogous per-candidate gap found in the other five probes."
+}

@@ -17,6 +17,17 @@ class HistoricalChipWrapperMetadataTests(unittest.TestCase):
                                text=True, capture_output=True, timeout=120)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-6000:])
         result = json.loads(child.stdout)
+        # Historical complete JSON counts remain distinct from actual current source guards.
+        from current_sass_canonical_test_scope import current_canonical_test_frame
+        physical = current_canonical_test_frame(ROOT)
+        self.assertTrue(result['historical_json_comparison_only'])
+        self.assertTrue(result['original_program_authenticated_as_DATA'])
+        self.assertFalse(result['original_program_executed'])
+        self.assertTrue(result['current_physical_owner_guarded'])
+        self.assertEqual(result['current_physical_source_admissions'], physical['individual_source_reviews'])
+        self.assertEqual(result['current_physical_base_class_decisions'], physical['base_class_decisions'])
+        self.assertEqual(result['current_nonphysical_ledger_rejections'], 4)
+        physical['assert_current']()
         self.assertEqual((result['positive'], result['rejected']), (4, 15))
         self.assertEqual(result['original_hunks_preserved'], 198)
         self.assertFalse(result['native_or_G11_qualified'])

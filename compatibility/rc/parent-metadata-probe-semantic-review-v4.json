@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "status": "semantic-review-pass-static-and-data-only",
+  "patch": {
+    "path": "/tmp/parent-checker-chip-consumer-callbacks-v3/three-probes.patch",
+    "sha256": "0553335e84c931d893a7c5598d599ff003797928cbdad3934ab56d507f389b02",
+    "receipt_sha256": "ab7518fc162231df2151b142ef0a3f2dc5f824396846fa4a5047e7ef1617350b",
+    "hashes_match": true
+  },
+  "independent_reference_gap": {
+    "result": "closed",
+    "evidence": [
+      "Chip validator now compares each entire report.body.independent_source_evidence array with the corresponding after_entry.individual_proof.source_evidence.",
+      "Consumer validator applies the same full-array comparison for each of 65 reports.",
+      "Each helper is used from the main DATA candidate validator and has a positive valid-report control plus a negative mutation at a nonselected reference index.",
+      "The selected reference stays valid and the ledger candidate stays unchanged for these report-only mutants, isolating the independent-reference invariant."
+    ]
+  },
+  "other_scope_checks": {
+    "checker_14": "Both before/after baselines pass; exact selected path/digest changes are checked for all 14 rows; selected non-reference fields and 1683 unselected entries are preserved; the partial-reference control remains targeted.",
+    "chip_4": "Both before/after baselines pass; four exact selected transitions, 1693 unselected entries, header, decisions and 198 original hunk judgments are checked. Original partial, decision-change and single-reference reversion controls remain.",
+    "consumer_65": "Both before/after baselines pass; 65 exact selected transitions, 1632 unselected entries, header, decisions and 7770 original hunk judgments are checked. Source reversion, disposition-change and malformed-byte controls remain."
+  },
+  "original_faults_and_control_tails": "Static diff shows V3 adds only full independent-array helper calls and two report-only mutant controls to V2. Prior checker/chip/consumer fault sections and historical control counts remain; chip still asserts positive/rejected 4/15, and the unchanged Python wrapper patch retains the consumer 3/12 checks. Supplemental physical-reader rejections remain separate.",
+  "data_harness": {
+    "inspected_before_running": true,
+    "scope": "Only assert, fs, path, child_process, crypto; child process is fixed git show for immutable ledger DATA. No owner/probe imports or dynamic loading.",
+    "command": "node /tmp/parent-checker-chip-consumer-callbacks-v3/pure-data-harness.cjs",
+    "result": "pass",
+    "output": "14 checker, 4 chip, and 65 consumer selected DATA invariants: both baselines and eight semantic mutants plus original format fault passed; no owners or probes imported"
+  },
+  "limits": [
+    "No owners, probes, Python consumer methods, CLI, maintained edits, profile changes, or HEAD mutations.",
+    "This is not runtime qualification."
+  ]
+}

@@ -63,6 +63,17 @@ class CheckerReferenceMetadataTests(unittest.TestCase):
                                capture_output=True, text=True, timeout=120)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-6000:])
         report = json.loads(child.stdout)
+        # Historical complete JSON counts remain distinct from actual current source guards.
+        from current_sass_canonical_test_scope import current_canonical_test_frame
+        physical = current_canonical_test_frame(ROOT)
+        self.assertTrue(report['historical_json_comparison_only'])
+        self.assertTrue(report['original_program_authenticated_as_DATA'])
+        self.assertFalse(report['original_program_executed'])
+        self.assertTrue(report['current_physical_owner_guarded'])
+        self.assertEqual(report['current_physical_source_admissions'], physical['individual_source_reviews'])
+        self.assertEqual(report['current_physical_base_class_decisions'], physical['base_class_decisions'])
+        self.assertEqual(report['current_nonphysical_ledger_rejections'], 3)
+        physical['assert_current']()
         self.assertFalse(report['preflight_only'])
         self.assertEqual(report['metadata_tokens_applied'], 14)
         self.assertEqual(report['previous_metadata_tokens_applied'], 0)

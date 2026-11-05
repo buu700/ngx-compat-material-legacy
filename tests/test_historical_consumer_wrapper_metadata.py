@@ -26,6 +26,17 @@ class HistoricalConsumerWrapperMetadataTests(unittest.TestCase):
                                capture_output=True, text=True, timeout=180)
         self.assertEqual(child.returncode, 0, child.stderr[-5000:])
         report = json.loads(child.stdout)
+        # Historical complete JSON counts remain distinct from actual current source guards.
+        from current_sass_canonical_test_scope import current_canonical_test_frame
+        physical = current_canonical_test_frame(root)
+        self.assertTrue(report['historical_json_comparison_only'])
+        self.assertTrue(report['original_program_authenticated_as_DATA'])
+        self.assertFalse(report['original_program_executed'])
+        self.assertTrue(report['current_physical_owner_guarded'])
+        self.assertEqual(report['current_physical_source_admissions'], physical['individual_source_reviews'])
+        self.assertEqual(report['current_physical_base_class_decisions'], physical['base_class_decisions'])
+        self.assertEqual(report['current_nonphysical_ledger_rejections'], 2)
+        physical['assert_current']()
         self.assertEqual(report['metadata_positive_cases'], 3)
         self.assertEqual(report['rejection_controls'], 12)
         self.assertEqual(report['metadata_entries'], 65)
