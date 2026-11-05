@@ -1,0 +1,106 @@
+{
+  "schema": "parent-checkbox-four-aria-source-review-v2",
+  "scope": "Source-only review of the four additional checkbox ARIA bindings in frozen 21.x checkout. No repository/dependency writes, build, test, DOM, or accessibility-tree execution.",
+  "reviewed": {
+    "checkout": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+    "frozen_head": "801cbac757b7cdba26bce86fbabaef6e30d547d2",
+    "readiness_matrix": {
+      "path": "compatibility/rc/parent-c04-eight-mixin-removal-readiness-matrix-v1.json",
+      "sha256": "c636e07571ccbc561a5149c32bfc430e2e6212b23fb046c7884415527c93f2f2",
+      "relevant_finding": "The matrix identifies four additions to owned checkbox.html compared with tagged legacy checkbox HTML, and explicitly says this is an observable augmentation, not proof of defect or grounds for removal."
+    },
+    "head_note": "The matrix itself records heads 7143c2df99c07aec75822c389cc0f0f72361304a (21.x) and 036b362c669c3ce0d60da2eb0e217e013c33eed2 (main); the physical checkout HEAD observed for this review is 801cbac757b7cdba26bce86fbabaef6e30d547d2. The reviewed current template and checkbox-base files were rehashed at this actual HEAD and match the matrix-reported physical hashes exactly. The matrix HEAD is retained as the matrix subject, not represented as current HEAD."
+  },
+  "source_identity": {
+    "owned_template": {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.html",
+      "sha256": "f630375b769dac8ba62c05c74d8f6abbb640bb9d6a9539ce01f220220f7b93b5",
+      "size": 2202,
+      "observed_bindings": [
+        "[attr.aria-checked]=\"indeterminate ? 'mixed' : null\"",
+        "[attr.aria-controls]=\"ariaControls\"",
+        "[attr.aria-expanded]=\"ariaExpanded\"",
+        "[attr.aria-owns]=\"ariaOwns\""
+      ],
+      "target": "The bindings are on the existing visually-hidden, focusable native input[type=checkbox], adjacent to its native checked/disabled/name/value properties and aria-label/labelledby/describedby bindings."
+    },
+    "tagged_reference": {
+      "immutable_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "baseline": "baseline/angular-components-16.2.x",
+      "template_path": "src/material/legacy-checkbox/checkbox.html",
+      "git_blob": "22b400daac3ce2087e4d256aa6b103b2e2d1a04c",
+      "sha256": "a4033cb7b0c3cf908c6ca1d47fe6af6563a65d7d8e24d6bcccf05dfd1e653829",
+      "size": 2005,
+      "comparison": "Exact tagged template contains aria-label, aria-labelledby, and aria-describedby on the native input, followed directly by change/click handlers; it has none of the four reviewed bindings. Tagged src/material/legacy-checkbox/checkbox.ts SHA-256 is 072551993542bffeacc517777d2144cab604e174b0c38988811a3c94ab45b908 and contains none of ariaExpanded, ariaControls, or ariaOwns."
+    },
+    "owned_input_declarations": {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/internal/checkbox-base.ts",
+      "sha256": "e4e3aaa653750e7d9ce901e76c3ee0b9fe3f242439bbf0850ad1594503dd1437",
+      "size": 16642,
+      "lines": "118-128",
+      "details": [
+        "aria-expanded is an @Input alias using booleanAttribute and has default null; source comment says it is for a checkbox controlling visibility of another element.",
+        "aria-controls and aria-owns are nullable string inputs, each defaulting to null."
+      ],
+      "native_mixed_state": "The existing indeterminate setter calls _syncIndeterminate; that writes the same boolean to native input.indeterminate. The template additionally emits aria-checked=mixed only while indeterminate is true; it removes the explicit attribute otherwise, leaving native checked state in control."
+    },
+    "reviewed_current_files_rechecked_at_actual_head": {
+      "template_sha256": "f630375b769dac8ba62c05c74d8f6abbb640bb9d6a9539ce01f220220f7b93b5",
+      "checkbox_base_sha256": "e4e3aaa653750e7d9ce901e76c3ee0b9fe3f242439bbf0850ad1594503dd1437",
+      "result": "both hashes match the bytes reviewed and the readiness-matrix recorded template hash"
+    }
+  },
+  "provenance": {
+    "commit": "8d7760976393e64a4af92ab9252943876aa95958",
+    "parent": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
+    "author": "Ryan Lester",
+    "committed": "2026-10-01T14:27:09-04:00",
+    "subject": "fix(21.x): port recent main product adaptations",
+    "commit_body": "The commit says it ports recent main product adaptations, including checkbox, onto 21.x as a path port without changing the Angular 21 lockfile; it does not claim G01-G13.",
+    "exact_checkbox_hunk": "The template diff adds the four listed bindings. The same commit adds ariaExpanded (booleanAttribute transform), ariaControls, ariaOwns and their comments to checkbox-base.ts. The matrix cites upstream ref f8fccef631565ec80acc67e7ea0a654e24be99d9, but that object is not available in this local Git object database; this review therefore does not assert its exact source hunk or intent."
+  },
+  "installed_peer_reference": {
+    "package": "@angular/material",
+    "version": "21.2.14",
+    "realpath": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/node_modules/.pnpm/@angular+material@21.2.14_2accc8ca36ac823889e623ca448b580e/node_modules/@angular/material",
+    "package_json_sha256": "26af34e77987b55564689c8eb7b5352db661d6a737fdec2160417ae42114f355",
+    "fesm2022_checkbox_sha256": "159fb481b1016432c567cc8fce5a2adcdd69bce002f86fb0863a2186c037c9e3",
+    "types_checkbox_dts_sha256": "b6216cb4611de94b3fccbffff8be4843707812a951a65f25b2e3de330d2e8e85",
+    "evidence": "Installed Material 21 MatCheckbox template forwards aria-checked=mixed, aria-controls, aria-expanded and aria-owns to its native checkbox input. Its public declaration documents the three input properties and component metadata exposes them. The modern template is MDC-based and structurally differs from the owned legacy template; this establishes current-peer support, not Material-16 provenance or authorization to change the legacy contract."
+  },
+  "semantics_and_assessment": [
+    {
+      "binding": "aria-checked",
+      "meaning": "Explicitly exposes the tri-state mixed state while the component is indeterminate. For checked/unchecked, the binding removes its ARIA attribute and relies on native input.checked. Owned source also keeps native input.indeterminate synchronized.",
+      "assessment": "This is a deliberate redundant mixed-state exposure relative to the native indeterminate property; it matches the installed Material 21 template. No static evidence here establishes a defect."
+    },
+    {
+      "binding": "aria-controls",
+      "meaning": "An optional ID reference from the checkbox to the element(s) it controls. The nullable input defaults to null, so no relation is emitted unless a caller supplies one.",
+      "assessment": "Applicability depends on the consuming control; source alone cannot prove that supplied IDs exist or match a controlled region."
+    },
+    {
+      "binding": "aria-expanded",
+      "meaning": "An optional expanded/collapsed state, boolean-transformed and forwarded to the input. The null default removes the attribute; false and true can express collapsed and expanded states.",
+      "assessment": "Only appropriate when the checkbox actually controls visibility/expansion, as its source comment says. It is distinct from the checkbox's checked state."
+    },
+    {
+      "binding": "aria-owns",
+      "meaning": "An optional ID reference that asserts accessible-tree ownership of referenced node(s); the nullable input defaults to null.",
+      "assessment": "This can alter accessibility-tree parentage and should be supplied only when that relationship is intended and valid."
+    }
+  ],
+  "recommendation": "Do not remove or alter these bindings solely because the Material 16 template lacks them. Preserve the frozen 21.x behavior pending an intentional compatibility decision and targeted DOM/AX validation. Treat aria-checked as the mixed-state case and controls/expanded/owns as opt-in relationships whose caller-provided IDs and state must be validated.",
+  "proposed_runtime_assertions_not_executed": [
+    "With no optional relation inputs, confirm the native checkbox input has no aria-controls, aria-expanded, or aria-owns attributes; confirm it retains its accessible name and native checked/unchecked state.",
+    "With a real controlled region, confirm supplied aria-controls IDREF resolves to that region and aria-expanded false/true tracks its collapsed/visible state. Also assert checkbox checked state remains independently represented.",
+    "When indeterminate becomes true, assert input.indeterminate is true and aria-checked is 'mixed'; after clearing it, assert input.indeterminate is false, explicit aria-checked is absent, and native checked state is preserved.",
+    "If exercising aria-owns, use a fixture with actual target IDs and verify browser accessibility-tree ownership and absence of duplicate/orphaned nodes; do not treat attribute presence alone as accessibility proof.",
+    "Run the same assertions at the supported peer floors and inspect browser accessibility snapshots/axe output; exact spoken output should not be asserted because it varies by browser and assistive technology."
+  ],
+  "limits": [
+    "Source review only. No component runtime, browser DOM, accessibility tree, screen reader, or minimum-peer tests were run.",
+    "The exact historical Material 16 source is authenticated locally; the cited upstream adaptation commit is not present locally, so the port's remote origin was not independently reconstructed.",
+    "Installed Material 21 evidence establishes support by the current parent but does not settle the Material 16 legacy public API contract."
+  ]
+}

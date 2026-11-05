@@ -1,0 +1,77 @@
+{
+  "schema": "parent-browser-zone-mode-followup-v2",
+  "finding": {
+    "path": "/tmp/parent-c04-tabs-browser-required-zone-mode-finding-v1.json",
+    "sha256": "91d2b91baaf6d4c6bf95f6559aa56f8f4b63b5ed629f3488623607f09ddf0c35",
+    "bytes": 4424
+  },
+  "status": "Runtime observations confirm static coverage gap; maintained repair pending",
+  "actual_scope": "Installed21 Angular NgModule bootstrap in isolated Chromium; no library artifact or product gates",
+  "observations": [
+    {
+      "mode": "default",
+      "observed": {
+        "mode": "default",
+        "inside": false,
+        "outside": false
+      },
+      "expected_inside": false,
+      "pass": true
+    },
+    {
+      "mode": "zoneful",
+      "observed": {
+        "mode": "zoneful",
+        "inside": true,
+        "outside": false
+      },
+      "expected_inside": true,
+      "pass": true
+    },
+    {
+      "mode": "zoneless",
+      "observed": {
+        "mode": "zoneless",
+        "inside": false,
+        "outside": false
+      },
+      "expected_inside": false,
+      "pass": true
+    }
+  ],
+  "observed_input_bytes_current_after_run": true,
+  "runtime": {
+    "path": "/tmp/parent-browser-zone-mode-probe-v2/runtime.json",
+    "sha256": "5d46817c0c3946be6ba8431822fac67df9e004f4adf997094006f540aadfdfa4",
+    "bytes": 200829
+  },
+  "build": {
+    "path": "/tmp/parent-browser-zone-mode-probe-v2/build.json",
+    "sha256": "5be7667ea38c11426b817e90ed98405605f1ec4f386242de5f789924a79d025d",
+    "bytes": 191642
+  },
+  "scripts": [
+    {
+      "path": "/tmp/parent-browser-zone-mode-probe-v2/build.mjs",
+      "sha256": "121003c4a4bfba2421522ff5736c4467203e217f7cb80f9a54fffedea6d87e30",
+      "bytes": 2570
+    },
+    {
+      "path": "/tmp/parent-browser-zone-mode-probe-v2/run.mjs",
+      "sha256": "53409f4b5c838fdb6387a2f5d6a9a5e109d2d00de3486a7d9cceda2f581224c6",
+      "bytes": 3573
+    }
+  ],
+  "initial_build_failure": "V1 failed reading esbuild metafile paths relative to wrong working dir; V2 explicitly sets absWorkingDir to source root",
+  "runner_exit": 1,
+  "runner_exit_reason": "All observations saved before snap Chromium launcher kill returned EACCES; runtime observation report is not overall runner success",
+  "cleanup": {
+    "path": "/tmp/parent-browser-zone-mode-probe-v2/cleanup.json",
+    "sha256": "9039e13012d977389928ccd055e11f7025c15ab705d6b6b8cb774a72a9d8ee80",
+    "bytes": 268
+  },
+  "additional_static_confirmation": "Actual maintained harness uses platformBrowserDynamic().bootstrapModule, and installed core.mjs bootstrapModuleFactory line723 also prepends provideZonelessChangeDetectionInternal; bootstrapApplication is not the sole evidence",
+  "maintained_source_writes": false,
+  "implementation_assigned_to": "regression_producer_review Terra6.1high scratchpatch duringownerfreeze",
+  "g11_claim": "not-passed"
+}
