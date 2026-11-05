@@ -104,7 +104,7 @@ export function prepareCheckerReferenceSourceMetadata({root,read=path=>currentFi
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version;
  const line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);const pin=pins[line],tools=checkerOwnerSourceSubject({root,read}),bound=new Map(tools.bound.map(ref=>[ref.path,{...ref}]));
  const member=(path,digest,bytes)=>{
-  const qualified=tools.qualifyReference({path,sha256:digest,...(bytes===undefined?{}:{bytes})});digest=qualified.sha256;bytes=qualified.bytes;
+  if(digest!==undefined){const qualified=tools.qualifyReference({path,sha256:digest,...(bytes===undefined?{}:{bytes})});digest=qualified.sha256;bytes=qualified.bytes;}
   const physical=currentFile(root,path),raw=read(path);assert.ok(Buffer.isBuffer(raw));
   if(digest)assert.equal(hash(raw),digest,'changed checker proposal input '+path);if(bytes!==undefined)assert.equal(raw.length,bytes);
   assert.equal(hash(raw),hash(physical),'noncurrent source supplied '+path);bound.set(path,{path,sha256:hash(raw),bytes:raw.length});return raw;
@@ -118,7 +118,9 @@ export function prepareCheckerReferenceSourceMetadata({root,read=path=>currentFi
  assert.deepEqual(result.updates.map(row=>row.sha),sourceInputs.selected_references.map(row=>row.sha));
  const artifact=member(packet.after_image.path,packet.after_image.sha256,packet.after_image.bytes);assert.ok(gunzipSync(artifact).equals(result.after),'proposal artifact differs from derivation');
  const physicalLedger=currentFile(root,CHECKER_REFERENCE_LEDGER);
- const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER,'--metadata'],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024,timeout:120000}));
+ const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER,'--source-metadata'],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024,timeout:120000}));
+ assert.equal(verifier.source_execution_mode,'source-metadata');assert.equal(verifier.full_source_fault_lifetimes_executed,false);
+ for(const key of ['cold_source_faults_rejected','late_source_faults_rejected','cold_source_fault_paths_rejected','late_source_fault_paths_rejected'])assert.equal(Object.hasOwn(verifier,key),false);
  assert.equal(verifier.canonical_frame_admission_granted,false);assert.equal(verifier.current_ledger_sha256,hash(physicalLedger));assert.equal(verifier.current_ledger_bytes,physicalLedger.length);
  assert.equal(verifier.result,'pass');assert.equal(verifier.line,line);assert.equal(verifier.current_checker_sha256,pin.checker);
  assert.equal(verifier.selected_references,pin.count);assert.equal(verifier.actual_guard_exclusion_checks,line==='21.x'?25:26);

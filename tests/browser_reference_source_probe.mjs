@@ -19,11 +19,18 @@ import {browserPeerVersions} from '../scripts/browser-peer-versions.mjs';
 import {legacyDialogTitleLifetimeNativeOkay as okay} from '../scripts/dialog-title-lifetime-fixture.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),hash=raw=>createHash('sha256').update(raw).digest('hex');
 const ts=createRequire(import.meta.url)('typescript');
-let tamper=null;const read=path=>{const raw=readCheckerOwnerMember(root,path);return path===tamper?Buffer.concat([raw,Buffer.from(' ')]):raw;};
-const before=read('compatibility/f10/disposition-ledger/ledger.json'),subject=inspectBrowserReferenceSource({root,read});
-let cold=0,late=0;
-for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+ref.path);late++;tamper=null;}
-for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>inspectBrowserReferenceSource({root,read}),undefined,'cold '+ref.path);cold++;tamper=null;}
+const args=process.argv.slice(2),sourceOnly=args[0]==='--source-metadata';if(sourceOnly)args.shift();
+ assert.ok(args.length<=1,'expected at most one report output path');
+ if(args[0]?.startsWith('-'))assert.fail('unknown option '+args[0]);
+ let tamper=null;const read=path=>{const raw=readCheckerOwnerMember(root,path);return path===tamper?Buffer.concat([raw,Buffer.from(' ')]):raw;};
+ const before=read('compatibility/f10/disposition-ledger/ledger.json'),subject=inspectBrowserReferenceSource({root,read});
+ let cold=0,late=0;const coldPaths=[],latePaths=[];
+ if(!sourceOnly){
+  for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+ref.path);late++;latePaths.push(ref.path);tamper=null;}
+  for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>inspectBrowserReferenceSource({root,read}),undefined,'cold '+ref.path);cold++;coldPaths.push(ref.path);tamper=null;}
+  assert.deepEqual(latePaths,subject.bound.map(ref=>ref.path));assert.deepEqual(coldPaths,subject.bound.map(ref=>ref.path));
+ }
+
 const versions=browserPeerVersions(JSON.parse(read('projects/ngx-material-legacy/package.json'))),generated=[];
 for(const zoneless of [false,true]){
  const spec=candidateInstallSpec(versions,zoneless);
@@ -82,5 +89,7 @@ for(const rejected of [false,true]){
  await Promise.resolve();await Promise.resolve();await Promise.resolve();assert.equal(result.window.__status,next);runs.push({late_completion_rejected:rejected,next_cell_status_preserved:true});
 }
 subject.assertCurrent();assert.ok(before.equals(read('compatibility/f10/disposition-ledger/ledger.json')));
-const report={...subject.report,cold_source_faults_rejected:cold,late_source_faults_rejected:late,bound_current_paths:subject.bound.length,generated_current_lab_sources:generated,title_contract_negative_controls:predicateControls,whole_current_dialog_probe_collaborator_runs:runs,actual_angular_DOM_browser_or_packed_execution:false};
-if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));
+const report={...subject.report,source_execution_mode:sourceOnly?'source-metadata':'complete-regression',full_source_fault_lifetimes_executed:!sourceOnly,bound_current_paths:subject.bound.length,
+ ...(sourceOnly?{}:{cold_source_faults_rejected:cold,late_source_faults_rejected:late,cold_source_fault_paths_rejected:coldPaths,late_source_fault_paths_rejected:latePaths}),
+ generated_current_lab_sources:generated,title_contract_negative_controls:predicateControls,whole_current_dialog_probe_collaborator_runs:runs,actual_angular_DOM_browser_or_packed_execution:false};
+if(args[0])writeFileSync(args[0],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));

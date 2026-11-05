@@ -1,5 +1,6 @@
 """Synthetic local-Git fixtures validate manifests; no release build is claimed."""
 from __future__ import annotations
+import ast
 import hashlib
 import importlib.util
 import json
@@ -15,6 +16,61 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import rc_acceptance as acceptance
 from test_rc_acceptance import CompleteFixture, write_json
+
+
+def copy_verifier_fixture_scripts(root):
+    """Copy the real local Python import closure needed by the copied coordinator."""
+    pending = ['rc-verify.py']
+    copied = set()
+    while pending:
+        name = pending.pop()
+        if name in copied:
+            continue
+        source = ROOT / 'scripts' / name
+        copied.add(name)
+        shutil.copy2(source, root / 'scripts' / name)
+        tree = ast.parse(source.read_text())
+        for node in ast.walk(tree):
+            modules = ([node.module] if isinstance(node, ast.ImportFrom) and node.module else
+                       [alias.name for alias in node.names] if isinstance(node, ast.Import) else [])
+            for module in modules:
+                dependency = module.split('.')[0] + '.py'
+                if (ROOT / 'scripts' / dependency).is_file() and dependency not in copied:
+                    pending.append(dependency)
+
+
+    # The imported admission modules load finite source and reference data at
+    # import time; copy literal in-repository dependencies and JSON references.
+    pending_paths = []
+    for name in copied:
+        tree = ast.parse((ROOT / 'scripts' / name).read_text())
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                value = node.value
+                if value.startswith(('fixtures/sass/', 'reference/material-16.2.14/', 'compatibility/rc/', 'projects/ngx-material-legacy/')):
+                    pending_paths.append(value)
+    seen = set()
+    while pending_paths:
+        relative = pending_paths.pop()
+        if relative in seen or '..' in Path(relative).parts or relative.startswith('compatibility/rc/reports/'):
+            continue
+        seen.add(relative)
+        source = ROOT / relative
+        if not source.is_file():
+            continue
+        target = root / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if not target.exists():
+            shutil.copy2(source, target)
+        if source.suffix == '.json':
+            def references(value):
+                if isinstance(value, dict):
+                    for item in value.values(): references(item)
+                elif isinstance(value, list):
+                    for item in value: references(item)
+                elif isinstance(value, str) and value.startswith(('fixtures/sass/', 'reference/material-16.2.14/', 'compatibility/rc/', 'projects/ngx-material-legacy/')):
+                    pending_paths.append(value)
+            references(json.loads(source.read_bytes()))
 
 
 def initialize_git(root):
@@ -151,8 +207,8 @@ class FullSealerTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.f = CompleteFixture(self.root)
         (self.root / 'scripts').mkdir()
-        for name in ('rc_acceptance.py', 'rc-verify.py', 'archive_run_closure.py', 'consumer_floor_admission.py', 'owned_rendered_admission.py', 'migration_workspace_admission.py', 'migration_transaction_admission.py', 'migration_frontend_admission.py', 'sass_function_admission.py', 'sass_mixin_argument_admission.py', 'm3_rendered_admission.py', 'seal-draft-run.mjs'):
-            shutil.copy2(ROOT / 'scripts' / name, self.root / 'scripts' / name)
+        copy_verifier_fixture_scripts(self.root)
+        shutil.copy2(ROOT / 'scripts/seal-draft-run.mjs', self.root / 'scripts/seal-draft-run.mjs')
         write_json(self.root / 'projects/ngx-material-legacy/package.json', {'version': '22.0.0-rc.0'})
         git = initialize_git(self.root)
         spec = importlib.util.spec_from_file_location('synthetic_verify_source', self.root / 'scripts/rc-verify.py')
@@ -306,8 +362,19 @@ class CoordinatorEntryTests(WriterFixture):
 
     def setUp(self):
         super().setUp()
-        for name in ('rc-verify.py', 'rc_acceptance.py', 'archive_run_closure.py', 'consumer_floor_admission.py', 'owned_rendered_admission.py', 'migration_workspace_admission.py', 'migration_transaction_admission.py', 'migration_frontend_admission.py', 'sass_function_admission.py', 'sass_mixin_argument_admission.py', 'm3_rendered_admission.py'):
-            shutil.copy2(ROOT / 'scripts' / name, self.root / 'scripts' / name)
+        copy_verifier_fixture_scripts(self.root)
+        # Exercise the real source-inventory preflight against the actual finite
+        # tagged roster and its bound candidate and shim bytes.
+        inventory = acceptance.read_json(ROOT / 'testing/legacy-runner/historical-inventory.json')
+        inventory_paths = {'testing/legacy-runner/historical-inventory.json',
+                           'testing/legacy-runner/historical-specs.json',
+                           'compatibility/handoff/codex-closeout/reference/historical-paths.csv'}
+        inventory_paths.update(row['candidate'] for row in inventory['rows'])
+        inventory_paths.update(row['path'] for row in inventory['shared_suite_shims'])
+        for relative in inventory_paths:
+            destination = self.root / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / relative, destination)
         shutil.copy2(ROOT / 'compatibility/rc/matrices/full-verify.json',
                      self.root / 'compatibility/rc/matrices/full-verify.json')
         write_json(self.root / 'projects/ngx-material-legacy/package.json', {'version': '22.0.0-rc.0'})
@@ -335,6 +402,10 @@ const child=spawnSync(process.execPath,['scripts/write-draft-run.mjs','--line',l
 '--tarball',path.join(out,'library.tgz')],{stdio:'inherit'});
 process.exit(child.status??1);
 ''')
+            elif script.endswith('.py'):
+                p.write_text("# Synthetic coordinator child; no product qualification.\n"
+                             "import os, sys\n"
+                             f"sys.exit(7 if os.environ.get('SYNTHETIC_FAIL') == {script!r} else 0)\n")
             else:
                 relative = self.verify.FIXED_DETAILS.get(script, (None, None))[1]
                 code = "// Synthetic product process for coordinator testing only.\n"

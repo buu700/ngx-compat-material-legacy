@@ -105,11 +105,13 @@ export function prepareBrowserReferenceSourceMetadata({root,read=path=>readCheck
  const qualified=JSON.parse(read(packet.qualified_source.path));assert.equal(qualified.selected_references,pin.count);assert.equal(qualified.distinct_selected_shas,pin.entries);
  const artifact=member(packet.after_image);assert.ok(gunzipSync(artifact).equals(result.after),'browser proposal artifact differs from independent derivation');
  const physicalLedger=readCheckerOwnerMember(root,BROWSER_REFERENCE_LEDGER);
- const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024,timeout:180000}));
+ const verifier=JSON.parse(execFileSync(process.execPath,[VERIFIER,'--source-metadata'],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024,timeout:180000}));
  assert.equal(verifier.result,'pass');assert.equal(verifier.line,line);assert.equal(verifier.complete_source_transitions,4);assert.equal(verifier.individually_reviewed_hunks,23);assert.equal(verifier.selected_references,pin.count);
  assert.equal(verifier.current_physical_ledger_sha256,hash(physicalLedger));assert.equal(verifier.current_physical_ledger_bytes,physicalLedger.length);
  assert.equal(verifier.analysis_node,process.version);assert.equal(verifier.analysis_typescript,JSON.parse(read('package.json')).devDependencies.typescript);
- assert.equal(verifier.cold_source_faults_rejected,verifier.bound_current_paths);assert.equal(verifier.late_source_faults_rejected,verifier.bound_current_paths);assert.equal(verifier.title_contract_negative_controls,47);assert.equal(verifier.whole_current_dialog_probe_collaborator_runs.length,8);
+ assert.equal(verifier.source_execution_mode,'source-metadata');assert.equal(verifier.full_source_fault_lifetimes_executed,false);
+ for(const key of ['cold_source_faults_rejected','late_source_faults_rejected','cold_source_fault_paths_rejected','late_source_fault_paths_rejected'])assert.equal(Object.hasOwn(verifier,key),false);
+ assert.equal(verifier.title_contract_negative_controls,47);assert.equal(verifier.whole_current_dialog_probe_collaborator_runs.length,8);
  for(const key of ['canonical_frame_admission_granted','old_programs_executed','actual_native_packed_browser_floor_or_full_audit_qualified','actual_angular_DOM_browser_or_packed_execution'])assert.equal(verifier[key],false);
  assert.equal(verifier.g11_claim,'not-passed');
  const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();assert.ok(readCheckerOwnerMember(root,BROWSER_REFERENCE_LEDGER).equals(physicalLedger),'late physical canonical ledger');for(const ref of bound.values()){

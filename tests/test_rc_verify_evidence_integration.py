@@ -1,6 +1,8 @@
 """Coordinator regressions; subprocesses below are synthetic fixtures only."""
 from __future__ import annotations
 import contextlib
+import copy
+import shutil
 import importlib.util
 import io
 import json
@@ -400,15 +402,49 @@ class CoordinatorTests(unittest.TestCase):
         )
         self.assertEqual(acceptance.read_json(path)["coverage"], "complete")
 
+    def _current_sass_gate_bodies(self, invocation, tarball):
+        # Reuse the exact modeled envelopes and authenticated candidate fixture
+        # from the individual gate tests, then bind them to this synthetic run.
+        from test_sass_ordinary_control_gate import OrdinaryControlGateTests
+        from test_ordinary_card_gate import OrdinaryCardGateTests
+        from test_sass_ordinary_control_gate_owned import OwnedOrdinaryControlGateTests
+        from test_sass_spinner_snack_gate_integration import SpinnerSnackGateIntegrationTests
+        modeled = {}
+        for cls in (OrdinaryControlGateTests, OwnedOrdinaryControlGateTests, OrdinaryCardGateTests, SpinnerSnackGateIntegrationTests):
+            cls.setUpClass()
+            try:
+                if cls is OrdinaryCardGateTests:
+                    owner = cls()
+                    bodies = [owner.model(row)['body'] for row in cls.rows]
+                else:
+                    bodies = cls.bodies
+                for body in bodies:
+                    modeled[body['case_id']] = copy.deepcopy(body)
+                ignored = []
+                if (self.root / 'node_modules').exists():
+                    ignored.append('node_modules')
+                shutil.copytree(cls.root, self.root, dirs_exist_ok=True, symlinks=True,
+                                ignore=shutil.ignore_patterns(*ignored))
+            finally:
+                cls.tearDownClass()
+        for body in modeled.values():
+            body.update(line=self.run.binding['source_line'], run_id=self.run.manifest['run_id'],
+                        invocation_id=invocation, binding=copy.deepcopy(self.run.binding),
+                        tarball_sha256=tarball)
+        return modeled
+
     def _sass_seal_bodies(self, ids, *, tarball=None):
         invocation = self.run.invocation("sass-seal")
         self.run.manifest['oracles']['current_peer'] += [{'id':'@angular/material','version':'22.1.7'},{'id':'@angular/cdk','version':'22.1.7'},{'id':'@angular/core','version':'22.1.7'}]
         library = next(item for item in self.f.run["artifacts"] if item["id"] == "library")
         oracle_sha = verify.evidence_sha256(verify.SASS_API_ORACLE)
+        modeled = self._current_sass_gate_bodies(invocation, tarball or library["sha256"])
         bodies = {}
         for case_id in ids:
             body = {"case_id": case_id, "result": "pass", "kind": "assertion"}
-            if case_id.startswith('owned-style/'):
+            if case_id in modeled:
+                body=modeled[case_id]
+            elif case_id.startswith('owned-style/'):
                 from owned_style_fixture import style_receipt
                 body=style_receipt(ROOT,self.run,case_id,invocation)
             elif case_id.startswith('owned-aggregate/'):

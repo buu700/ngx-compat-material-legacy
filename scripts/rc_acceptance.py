@@ -27,6 +27,7 @@ CHECK_CONTRACT = {
     "browser-matrix": (("G10",), "artifact", ("library",), ("release-engine-runtime-state-matrix",)),
     "api-completeness": (("G02",), "artifact", ("library",), ("export-contract", "typescript-signatures", "runtime-di-identity")),
     "engine-free-consumer": (("G04",), "artifact", ("library",), ("engine-absence", "strict-consumer", "testing-entrypoints")),
+    "source-contract-regressions": (("G11",), "source", ("source",), ("current-source-regressions",)),
     "upstream-audit-disposition": (("G03", "G08", "G11"), "source", ("source",), ("upstream-shas", "authored-symbols", "installed-peer-fixes", "current-advisories")),
     "source-policy": (("G03",), "source", ("source",), ("authored-boundary", "packed-boundary")),
     "companion-bridge-tokens": (("G07",), "source", ("source",), ("compiled-override-tokens",)),
@@ -38,6 +39,10 @@ CHECK_CONTRACT = {
     "dependency-eligibility": (("G08", "G11", "G13"), "source", ("source",), ("locks-tools-maturity", "vendor-provenance-license")),
     "release-metadata": (("G01", "G13"), "artifact", ("library", "migrate-cli"), ("package-metadata-license", "instructions-provenance")),
 }
+SOURCE_REGRESSION_CASES = (
+    "source-contract-regressions/checker-source/full-fault-lifetimes",
+    "source-contract-regressions/browser-source/full-fault-lifetimes",
+)
 GATES = {f"G{i:02d}" for i in range(1, 14)}
 REQUIRED_REVIEWS = ("independent-release-review", "applicable-exception-authorizations")
 _HEX64 = re.compile(r"[0-9a-f]{64}\Z")
@@ -218,6 +223,10 @@ def validate_matrix(matrix: dict[str, Any]) -> dict[str, dict[str, Any]]:
                 listed = strings(ids, f"{cid}/{line}/{group}")
                 require(not seen.intersection(listed), f"{cid}/{line}: case occurs in multiple groups")
                 seen.update(listed)
+        if cid == "source-contract-regressions":
+            for line, case_groups in cases.items():
+                require(case_groups["current-source-regressions"] == list(SOURCE_REGRESSION_CASES),
+                        f"{cid}/{line}: both exact full source regression cases are mandatory")
         covered.update(gates)
         by_id[cid] = row
     require(set(by_id) == set(CHECK_CONTRACT), f"matrix omitted mandatory checks: {sorted(set(CHECK_CONTRACT) - set(by_id))}")
