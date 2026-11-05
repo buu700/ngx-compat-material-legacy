@@ -290,10 +290,14 @@ export function baseClassRemovalOwnerSourceSubject({root = rootDefault, read = p
   assertBaseClassRemovalSourceInspectorIdentity();
   const frames = baseClassRemovalCanonicalFrameSubject({root, read});
   const body = structuredClone(frames.body), entry = structuredClone(frames.stage.entries[0]);
+  // This private callback is consumed only by the pinned inspector. Its
+  // constructor and returned guard read a private physical before-image before
+  // invoking it, then compare our returned bytes with that before-image. Supply
+  // the independent after-image here: together they retain physical/read/physical
+  // checks without a redundant callback-free read before the same callback.
   const checkedRead = path => {
-    const actual = readHistoricalContractRepairMember(root, path), supplied = read(path);
+    const supplied = read(path), actual = readHistoricalContractRepairMember(root, path);
     assert.ok(equalBuffers(actual, supplied), 'nonphysical base-class owner source input ' + path);
-    assert.ok(equalBuffers(actual, readHistoricalContractRepairMember(root, path)), 'physical base-class owner source changed during callback ' + path);
     return actual;
   };
   const request = {root, read: checkedRead, entry, body, review: body, proof: entry.individual_proof};

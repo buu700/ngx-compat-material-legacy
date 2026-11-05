@@ -154,11 +154,27 @@ for (const [outer, inner] of [
   try {outer(); assert.equal(nested, true);} finally {reset();}
   owner.frames.assertCurrent(); owner.frames.ledgerSubject(); reset();
 }
-assert.equal(rejected, 25); assert.equal(getters, 0);
+// The genuine inspector's private before-image and owner's after-image must
+// reject a same-path mutation even if the callback returns either old or new
+// physical bytes. Rejection must precede any later callback that could restore it.
+for (const returned of ['old', 'new']) {
+  const before = disk(sourceOnly.path); let changed = false, restoredLater = false;
+  onRead = path => {
+    if (path === sourceOnly.path) {
+      assert.equal(changed, false);
+      write(path, Buffer.concat([before, Buffer.from('\n// final source callback drift\n')])); changed = true;
+    } else if (changed) {write(sourceOnly.path, before); restoredLater = true;}
+  };
+  override = (path, actual) => path === sourceOnly.path && returned === 'new' ? disk(path) : actual;
+  try {reject(owner.assertCurrent); assert.equal(changed, true); assert.equal(restoredLater, false);}
+  finally {write(sourceOnly.path, before); reset();}
+  owner.assertCurrent(); reset();
+}
+assert.equal(rejected, 27); assert.equal(getters, 0);
 assert.ok(readFileSync(join(root, helper)).equals(helperBefore));
 console.log(JSON.stringify({result: 'pass', line: '21.x', actual_frame_and_source_owner_executed: true,
   actual_stage_context_executed: true, guard_plan_identity_forwarded: true,
-  narrow_projection_callbacks: narrowCounts, narrow_reentrant_controls: 4,
+  narrow_projection_callbacks: narrowCounts, narrow_reentrant_controls: 4, source_read_pairing_controls: 2,
   frame_members: owner.frames.bound.length, source_members: owner.source.bound.length,
   historical_source_bindings_revalidated: owner.source.facts.historical_source_bindings_revalidated,
   rejected_lifetime_faults: rejected, inspector_getters_invoked: getters + constructorGetters,

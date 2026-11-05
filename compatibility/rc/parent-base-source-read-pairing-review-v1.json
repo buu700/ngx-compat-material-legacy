@@ -1,0 +1,23 @@
+{
+  "scope": "Read-only static trace of base source owner checkedRead and captured CJS inspectSource, including nested repair readers. No owner execution, mutations or tests.",
+  "verdict": "No concrete defect found in the proposed read pairing under the existing trusted loaded-inspector contract and non-continuous filesystem model. Every observed invocation of checkedRead is bracketed by an independently read CJS physical-before buffer and a proposed inner physical-after read. The optimization removes a duplicate physical read without reusing current bytes across assertions.",
+  "call_trace": [
+    "base-class-removal-owner-source.mjs constructs private request with read: checkedRead, verifies exact loaded admission.inspectSource identity and function digest, and passes the request only to that captured inspector. No other direct checkedRead call or returned checkedRead reference was found.",
+    "upstream-base-class-removal-admission.cjs inspectSource captures request.read as providedRead. Its local read obtains physical actual first, invokes providedRead(path), compares returned Buffer with that original actual, snapshots its own bound reference and returns that original physical buffer. Constructor member, loaded image and final review reads all use this local wrapper.",
+    "historicalContractRepairSourceSubject receives the CJS local read, not checkedRead directly. Its own physical reads and calls to that wrapper therefore retain at least the CJS-before and new owner-after bracket at the ultimate external callback, including nested current assertions and repair qualification.",
+    "CJS returned source assertCurrent loop obtains physical actual and validates its bound hash/size before providedRead, then requires its returned Buffer equal that original actual. The private first physical buffer is not passed to supplied callback; request metadata is captured and checked by existing source and owner guards.",
+    "Proposed checkedRead calls the real supplied reader exactly once, then independently reads physical bytes, requires supplied equal physical and returns that physical-after buffer. CJS compares it to its private physical-before buffer, so a persistent same-path mutation across the callback is rejected even when the callback returns old or new bytes."
+  ],
+  "controls": [
+    "Actual prepared source-owner guard: corrupt a source-only bound file before operation and arrange first supplied callback on another path to restore it; real owner callback-free union preflight must reject before that callback, and verify success after restoration. This is a prepared-guard property, not a claim that full sequential construction has whole-source preflight.",
+    "On an actually consumed path mutate physical bytes during provided callback and return the old bytes; assert CJS-before/owner-after mismatch rejects. Repeat returning new bytes, non-Buffer or forged bytes; record that real callback ran and restore in finally.",
+    "From a later actual callback change an earlier source-only bound file and leave it changed; owner final full union physical check must reject. If the later callback restores that file before the final observation, no continuous detection claim is valid; judgments must use previously checked/captured bytes.",
+    "Exercise constructor inputs, nested historical repair reads and post-construction source guard separately, using real captured inspector and real owned paths. Include stable positive and descriptor/inspector poison controls; maintain exact original per-path cold and late regression suites."
+  ],
+  "caveats": [
+    "Equivalence relies on no additional consumer of checkedRead and unchanged pinned genuine CJS source/inspector function; make that attribution finite and update owner image/stage and profile pins.",
+    "Callback-free physical reads separated by a transient external change that is restored before observation cannot establish continuous immutability; neither design guarantees it.",
+    "Physical read errors, symlink/root handling, Buffer equality and independent owner preflight/final checks must remain unchanged. No direct supplied reader is exported, no monkeypatch of the CJS proof, and no current result/receipt is cached.",
+    "This is static reasoning only, not timing, full owner qualification or G11 pass."
+  ]
+}
