@@ -20,7 +20,7 @@ const V2_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v2.js
 const V3_CHECKPOINTS={'21.x':'d8ab97315b6c77b83f42c2bebcf63b2984fff255',main:'59ba0e2aa8b76f71b472ea2831273e44e44b5b57'};
 const PREVIOUS_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v1.json',sha256:'ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f',bytes:478008};
 const CHECKPOINTS={'21.x':'b25aedd02f7b53e8cd8dfcdad369a806a1301619',main:'5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'};
-const INPUTS_SHA='334b223b96466e62dd937b36f0bd928058a578223aac90582622932b392d40ec';
+const INPUTS_SHA='df81e3e53b9f64d034a15eb0f15accc045f67e977c27b0e79b79e6dc19ae728c';
 const image=readFileSync(fileURLToPath(import.meta.url));
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const reference=(path,raw)=>({path,sha256:hash(raw),bytes:raw.length});
@@ -169,8 +169,12 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
   let row=rows.get(update.path);
   if(row)assert.deepEqual(update.before,{path:row.path,...row.after},'V3 overlay does not follow exact V2 current row');
   else{
-   assert.equal(line,'21.x');assert.equal(update.path,'scripts/table-local-compilation-canonical-stage.mjs');
-   assert.deepEqual(update.before,{path:update.path,sha256:'bdb3137f6db42ed2611ac3a41e400478defed7f0076d203061d1e12d03f63b7c',bytes:8231});
+   assert.equal(line,'21.x');
+   const finiteBefore={
+    'scripts/table-local-compilation-canonical-stage.mjs':{path:update.path,sha256:'bdb3137f6db42ed2611ac3a41e400478defed7f0076d203061d1e12d03f63b7c',bytes:8231},
+    'scripts/legacy-removal-owner-source.mjs':{path:update.path,sha256:'b88708bb7ed441e24c6ed623371330426d6a947df83452ca343487767d2c9122',bytes:6628},
+   };
+   assert.ok(Object.hasOwn(finiteBefore,update.path),'unknown V3 new-row path');assert.deepEqual(update.before,finiteBefore[update.path]);
    row={path:update.path,before:{sha256:update.before.sha256,bytes:update.before.bytes},identities:new Map()};rows.set(update.path,row);
   }
   addIdentity(row,update.before,before);addIdentity(row,update.after,after);row.after={sha256:update.after.sha256,bytes:update.after.bytes};

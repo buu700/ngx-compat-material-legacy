@@ -1,0 +1,166 @@
+{
+  "schema_version": 3,
+  "role": "bounded-V3-exact-one-legacy-source-row-followup-receipt",
+  "status": "paired source-only five-test suites pass; complete owner still separately pending after prior failed attempt",
+  "packet": {
+    "path": "compatibility/rc/parent-base-class-tool-successor-inputs-v3.json",
+    "sha256": "df81e3e53b9f64d034a15eb0f15accc045f67e977c27b0e79b79e6dc19ae728c",
+    "bytes": 57512
+  },
+  "previous_packet_preserved": {
+    "path": "compatibility/rc/parent-base-class-tool-successor-before-refresh-v3.json",
+    "sha256": "334b223b96466e62dd937b36f0bd928058a578223aac90582622932b392d40ec",
+    "bytes": 55698
+  },
+  "legacy_review": {
+    "path": "compatibility/rc/parent-base-class-owner-independent-legacy-review-v1.json",
+    "sha256": "e44c2b05b172d49dbcdf46cbfdde4f72786f9e0f7689f1c5292e0bb45e66ab22",
+    "bytes": 2128
+  },
+  "new_exact_overlay": {
+    "path": "scripts/legacy-removal-owner-source.mjs",
+    "before": {
+      "path": "scripts/legacy-removal-owner-source.mjs",
+      "sha256": "b88708bb7ed441e24c6ed623371330426d6a947df83452ca343487767d2c9122",
+      "bytes": 6628
+    },
+    "after": {
+      "path": "scripts/legacy-removal-owner-source.mjs",
+      "sha256": "b22d02c4ca9a80d1efcecb8520a5ce8f28fb64d11849dcf37910153375c805b4",
+      "bytes": 7007
+    },
+    "edits": [
+      {
+        "offset": 665,
+        "before": "",
+        "after": "import {packedUpstreamLedgerCurrentSourceLane} from './packed-upstream-ledger-epoch.mjs';\n"
+      },
+      {
+        "offset": 1619,
+        "before": "",
+        "after": " const actual=packedUpstreamLedgerCurrentSourceLane({root,read});\n"
+      },
+      {
+        "offset": 6027,
+        "before": " const assertCurrent=()=>{successor.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}};\n",
+        "after": " const assertCurrent=()=>{actual.assertCurrent();successor.assertCurrent();for(const ref of bound.values()){const raw=actual.read(ref.path);assert.equal(hash(raw),ref.sha256,'late legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}for(const ref of bound.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);}};\n"
+      }
+    ]
+  },
+  "existing_source_edits_paired": [
+    {
+      "path": "scripts/current-sass-tool-references.mjs",
+      "sha256": "537087ac4d983e5e4457187638781e8739eb5e33b4a5308e03a808a7db6c4d42",
+      "bytes": 17731
+    },
+    {
+      "path": "scripts/current_sass_tool_references.py",
+      "sha256": "68589028bbdec460d386a5a18445ac5ebd66f03a385f1c4f9efd1903dcb08e29",
+      "bytes": 18114
+    },
+    {
+      "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
+      "sha256": "433f3c49f60c710644e4c87b14f52a3ce39e852601d07755bd8c443f17bcbf0f",
+      "bytes": 9483
+    }
+  ],
+  "finite_new_row_rule": "Only exact old table-stage bdb3137f/8231 and legacy-owner-source b88708bb/6628 rows may be added when absent from V2. Every other overlay must follow an existing exact V2 current row. Both exceptions21-only and committed checkpoint Git-authenticated.",
+  "legacy_attribution": {
+    "source_parent": "d8ab97315b6c77b83f42c2bebcf63b2984fff255",
+    "frozen_table_packet": {
+      "path": "compatibility/rc/21x-table-local-compilation-admission-owner-inputs.json",
+      "sha256": "1a35dd57edd9952a23d4bb2e8e9783f19583c00badfd7e9846fdbd2abc94f48b",
+      "bytes": 184121
+    },
+    "location": "code_transitions[0].after",
+    "builder_check": true
+  },
+  "guard_preservation": [
+    "private exact full predecessor triple before comparing V2 DATA",
+    "all actual V3 successor/support physical bindings/final sweeps",
+    "original/intermediate/V1/V2 accepted identities and public APIs",
+    "no old programs executed",
+    "no generic additional-path fallback",
+    "self-image factory checks/exclusion avoids hash cycle"
+  ],
+  "checks": {
+    "builder_rebuild_equal": true,
+    "paired_packet_factories_equal": true,
+    "old_V1_V2_packets_and_builder_equal_checkpoint_Git": true,
+    "git_diff_check_both": true,
+    "only_one_new_overlay_relative_to_prior_packet": true
+  },
+  "branches": {
+    "21.x": {
+      "overlays": 8,
+      "support": 5,
+      "test_receipt": {
+        "path": "compatibility/rc/parent-base-class-tool-successor-tests-attempt-v3.json",
+        "sha256": "c2a9258dffbae90568ad2cb877955a266a23fda38c5db3887eeafac5adc30d00",
+        "bytes": 1888
+      },
+      "elapsed_seconds": 13.556449298048392,
+      "factories": [
+        {
+          "path": "scripts/current-sass-tool-references.mjs",
+          "sha256": "537087ac4d983e5e4457187638781e8739eb5e33b4a5308e03a808a7db6c4d42",
+          "bytes": 17731
+        },
+        {
+          "path": "scripts/current_sass_tool_references.py",
+          "sha256": "68589028bbdec460d386a5a18445ac5ebd66f03a385f1c4f9efd1903dcb08e29",
+          "bytes": 18114
+        }
+      ]
+    },
+    "main": {
+      "overlays": 3,
+      "support": 2,
+      "test_receipt": {
+        "path": "compatibility/rc/parent-base-class-tool-successor-tests-attempt-v3.json",
+        "sha256": "e128bafdc10b9555d7fb4e5ce3543beae4336ba6d9109adb876e16a7cadab24d",
+        "bytes": 1887
+      },
+      "elapsed_seconds": 3.0110208760015666,
+      "factories": [
+        {
+          "path": "scripts/current-sass-tool-references.mjs",
+          "sha256": "537087ac4d983e5e4457187638781e8739eb5e33b4a5308e03a808a7db6c4d42",
+          "bytes": 17731
+        },
+        {
+          "path": "scripts/current_sass_tool_references.py",
+          "sha256": "68589028bbdec460d386a5a18445ac5ebd66f03a385f1c4f9efd1903dcb08e29",
+          "bytes": 18114
+        }
+      ]
+    }
+  },
+  "tests": {
+    "python_per_line": 5,
+    "js_named_controls_per_line": 22,
+    "failed_attempts": 0,
+    "legacy_coverage": "Existing all-overlay exact-before/after comparison bytes, qualification, wrong-length/hash and physical callback controls iterate the added row; builder also checks exact frozen table packet predecessor."
+  },
+  "runtime_not_executed": [
+    "complete owner/source composition",
+    "parent third last-callback mutation control",
+    "canonical transaction",
+    "compiler/build/dependency/network/Actions",
+    "commits"
+  ],
+  "canonical_DATA_preflight": {
+    "review": {
+      "path": "compatibility/rc/parent-base-class-canonical-transaction-review-v1.json",
+      "sha256": "f38497bba5a15de33c85254553daf095c3f075849d5509ebd6c516ccd21a7a4a",
+      "bytes": 9750
+    },
+    "candidate_roster": {
+      "path": "compatibility/rc/parent-base-class-canonical-transaction-proposed-roster-v1.json",
+      "sha256": "3309f64a5c1e3f04df08f7e907485d0d67c4d1cb64bddb22acb9ec9d8103891f",
+      "bytes": 271234
+    },
+    "application_ready": false,
+    "requires": "Successful complete owner plus new source checkpoint/provenance reflected in NEW candidate/review version before canonical write."
+  }
+}

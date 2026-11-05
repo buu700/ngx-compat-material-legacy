@@ -35,6 +35,36 @@
           ]
         },
         {
+          "path": "scripts/legacy-removal-owner-source.mjs",
+          "before": {
+            "path": "scripts/legacy-removal-owner-source.mjs",
+            "sha256": "b88708bb7ed441e24c6ed623371330426d6a947df83452ca343487767d2c9122",
+            "bytes": 6628
+          },
+          "after": {
+            "path": "scripts/legacy-removal-owner-source.mjs",
+            "sha256": "b22d02c4ca9a80d1efcecb8520a5ce8f28fb64d11849dcf37910153375c805b4",
+            "bytes": 7007
+          },
+          "edits": [
+            {
+              "offset": 665,
+              "before": "",
+              "after": "import {packedUpstreamLedgerCurrentSourceLane} from './packed-upstream-ledger-epoch.mjs';\n"
+            },
+            {
+              "offset": 1619,
+              "before": "",
+              "after": " const actual=packedUpstreamLedgerCurrentSourceLane({root,read});\n"
+            },
+            {
+              "offset": 6027,
+              "before": " const assertCurrent=()=>{successor.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}};\n",
+              "after": " const assertCurrent=()=>{actual.assertCurrent();successor.assertCurrent();for(const ref of bound.values()){const raw=actual.read(ref.path);assert.equal(hash(raw),ref.sha256,'late legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}for(const ref of bound.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);}};\n"
+            }
+          ]
+        },
+        {
           "path": "scripts/packed-upstream-ledger-epoch.mjs",
           "before": {
             "path": "scripts/packed-upstream-ledger-epoch.mjs",
@@ -353,8 +383,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "d58b42c49330526f21b1f71a536b0b6a0bc73e81eaaf27e4c15dd8592e9ed6d6",
-          "bytes": 8691
+          "sha256": "433f3c49f60c710644e4c87b14f52a3ce39e852601d07755bd8c443f17bcbf0f",
+          "bytes": 9483
         }
       ]
     },
@@ -515,8 +545,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "d58b42c49330526f21b1f71a536b0b6a0bc73e81eaaf27e4c15dd8592e9ed6d6",
-          "bytes": 8691
+          "sha256": "433f3c49f60c710644e4c87b14f52a3ce39e852601d07755bd8c443f17bcbf0f",
+          "bytes": 9483
         }
       ]
     }
