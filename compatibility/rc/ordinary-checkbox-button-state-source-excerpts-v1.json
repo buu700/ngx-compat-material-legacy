@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "role": "Exact line-addressable source evidence, no executable/computed proof",
+  "refs": [
+    {
+      "path": "compatibility/rc/ordinary-checkbox-button-state-tagged16-checkbox-component.scss",
+      "sha256": "76b1e1991b12dd28d2f1df602c5f3cb1de75da93154ea381e30b0ce1818db5ac",
+      "bytes": 9290,
+      "start_line": 22,
+      "end_line": 59,
+      "excerpt": "  .mdc-checkbox {\n    // Add the slots for MDC checkbox.\n    @include mdc-checkbox-theme.theme-styles(map.merge($mdc-checkbox-slots, (\n      // Angular Material focuses the native input. rather than the element MDC expects,\n      // so we create this slot ourselves.\n        selected-focus-icon-color: null,\n        unselected-focus-icon-color: null,\n      // MDC expects `.mdc-checkbox__ripple::before` to be the state layer, but we use\n      // `.mdc-checkbox__ripple` instead, so we emit the state layer slots ourselves.\n        unselected-hover-state-layer-opacity: null,\n        unselected-hover-state-layer-color: null,\n        unselected-focus-state-layer-opacity: null,\n        unselected-focus-state-layer-color: null,\n        unselected-pressed-state-layer-opacity: null,\n        unselected-pressed-state-layer-color: null,\n        selected-hover-state-layer-opacity: null,\n        selected-hover-state-layer-color: null,\n        selected-focus-state-layer-opacity: null,\n        selected-focus-state-layer-color: null,\n        selected-pressed-state-layer-opacity: null,\n        selected-pressed-state-layer-color: null,\n    )));\n\n    @include token-utils.use-tokens(tokens-mdc-checkbox.$prefix, $mdc-checkbox-slots) {\n      // MDC expects focus on .mdc-checkbox, but we focus the native element instead, so we need to\n      // emit a our own slot for the focus styles.\n      .mdc-checkbox__native-control:enabled:focus {\n        // Extra `:focus` included to achieve higher specificity than MDC's `:hover` style.\n        &:focus:not(:checked):not(:indeterminate) ~ .mdc-checkbox__background {\n          @include token-utils.create-token-slot(border-color, unselected-focus-icon-color);\n        }\n\n        &:checked,\n        &:indeterminate {\n          & ~ .mdc-checkbox__background {\n            @include token-utils.create-token-slot(border-color, selected-focus-icon-color);\n            @include token-utils.create-token-slot(background-color, selected-focus-icon-color);\n          }"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/vendor/mdc/checkbox/_checkbox-theme.scss",
+      "sha256": "8f9cbc2b2353179c7395bf8b128a6a16361a2c025721c996bcc45cee46d025dd",
+      "bytes": 26285,
+      "start_line": 146,
+      "end_line": 169,
+      "excerpt": "  @include _icon-color(\n    map.get($theme, unselected-icon-color),\n    map.get($theme, selected-icon-color)\n  );\n\n  &:hover {\n    @include _icon-color(\n      map.get($theme, unselected-hover-icon-color),\n      map.get($theme, selected-hover-icon-color)\n    );\n  }\n\n  @include ripple-theme.focus() {\n    @include _icon-color(\n      map.get($theme, unselected-focus-icon-color),\n      map.get($theme, selected-focus-icon-color)\n    );\n  }\n\n  @include ripple-theme.active() {\n    @include _icon-color(\n      map.get($theme, unselected-pressed-icon-color),\n      map.get($theme, selected-pressed-icon-color)\n    );"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/vendor/mdc/checkbox/_checkbox-theme.scss",
+      "sha256": "8f9cbc2b2353179c7395bf8b128a6a16361a2c025721c996bcc45cee46d025dd",
+      "bytes": 26285,
+      "start_line": 700,
+      "end_line": 709,
+      "excerpt": "///\n/// Helps select the checkbox background only when its native control is in\n/// unmarked & enabled state.\n/// @access private\n///\n@mixin if-unmarked-enabled_ {\n  .mdc-checkbox__native-control:enabled:not(:checked):not(:indeterminate):not([data-indeterminate='true'])\n    ~ {\n    @content;\n  }"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/vendor/mdc/ripple/_ripple-theme.scss",
+      "sha256": "f30243bd92cfb083e6bfe456ad94c5dd9cf8e8fcf97528c30f0b3a3d29dd9e71",
+      "bytes": 16301,
+      "start_line": 72,
+      "end_line": 75,
+      "excerpt": "// State selector variables used for state selector mixins below.\n$_hover-selector: '&:hover';\n$_focus-selector: '&.mdc-ripple-upgraded--background-focused, &:not(.mdc-ripple-upgraded):focus';\n$_active-selector: '&:not(:disabled):active';"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_checkbox.scss",
+      "sha256": "5b3924089e17121d456084ff1b0eaaa20a6c301bd88c28503cd058a888944819",
+      "bytes": 6427,
+      "start_line": 53,
+      "end_line": 99,
+      "excerpt": "@function get-color-tokens($config) {\n  $foreground: map.get($config, foreground);\n  $accent: map.get($config, accent);\n  $is-dark: map.get($config, is-dark);\n  $foreground-base: theming.get-color-from-palette($foreground, base);\n  $accent-default: theming.get-color-from-palette($accent, default);\n  $disabled-color: theming.get-color-from-palette($foreground, base, 0.38);\n  $selected-color: theming.get-color-from-palette($accent);\n  $border-color: theming.get-color-from-palette($foreground, base, 0.54);\n  $active-border-color:\n    theming.get-color-from-palette(palette.$gray-palette, if($is-dark, 200, 900));\n\n  @return (\n    // The color of the checkbox fill when the checkbox is selected and disabled.\n    disabled-selected-icon-color: $disabled-color,\n    // The color of the checkbox border when the checkbox is unselected and disabled.\n    disabled-unselected-icon-color: $disabled-color,\n    // The color of the checkmark when the checkbox is selected.\n    selected-checkmark-color: _contrast-tone($selected-color, $is-dark),\n    // The color of the checkbox fill when the checkbox is selected and focused.\n    selected-focus-icon-color: $selected-color,\n    // The color of the checkbox fill when the checkbox is selected and hovered.\n    selected-hover-icon-color: $selected-color,\n    // The color of the checkbox fill when the checkbox is selected.\n    selected-icon-color: $selected-color,\n    // The color of the checkbox fill when the checkbox is selected an pressed.\n    selected-pressed-icon-color: $selected-color,\n    // The color of the checkbox border when the checkbox is unselected and focused.\n    unselected-focus-icon-color: $active-border-color,\n    // The color of the checkbox border when the checkbox is unselected and hovered.\n    unselected-hover-icon-color: $active-border-color,\n    // The color of the checkbox border when the checkbox is unselected.\n    unselected-icon-color: $border-color,\n    // The color of the checkbox border when the checkbox is unselected and pressed.\n    unselected-pressed-icon-color: $border-color,\n    // The color of the ripple when the checkbox is selected and focused.\n    selected-focus-state-layer-color: $accent-default,\n    // The color of the ripple when the checkbox is selected and hovered.\n    selected-hover-state-layer-color: $accent-default,\n    // The color of the ripple when the checkbox is selected and pressed.\n    selected-pressed-state-layer-color: $accent-default,\n    // The color of the ripple when the checkbox is unselected and focused.\n    unselected-focus-state-layer-color: $foreground-base,\n    // The color of the ripple when the checkbox is unselected and hovered.\n    unselected-hover-state-layer-color: $foreground-base,\n    // The color of the ripple when the checkbox is unselected and pressed.\n    unselected-pressed-state-layer-color: $foreground-base,"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/button/_button-theme.scss",
+      "sha256": "5af18a9384b617116ebdf30ff9ebc18f6844208aa4b6b3f958a43a022d8d499d",
+      "bytes": 7303,
+      "start_line": 185,
+      "end_line": 193,
+      "excerpt": "\n@mixin typography($config-or-theme) {\n  $config: typography.private-typography-to-2018-config(\n    theming.get-typography-config($config-or-theme));\n  @include mdc-helpers.using-mdc-typography($config) {\n    @include mdc-button.without-ripple($query: mdc-helpers.$mdc-typography-styles-query);\n  }\n}\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button.scss",
+      "sha256": "5a33818c16f6f44543ea6095711621022c91fb3cd1e0d63c035f3f46ceae9fd9",
+      "bytes": 5101,
+      "start_line": 91,
+      "end_line": 100,
+      "excerpt": "// Legacy mixins\n\n@mixin without-ripple($query: feature-targeting.all()) {\n  @include button-base.deprecated-static-styles-without-ripple($query: $query);\n  @include button-text.static-styles-without-ripple($query: $query);\n  @include button-filled.static-styles-without-ripple($query: $query);\n  @include button-protected.static-styles-without-ripple($query: $query);\n  @include button-outlined.static-styles-without-ripple($query: $query);\n  @include _theme-styles-without-ripple($query: $query);\n}"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-base.scss",
+      "sha256": "eb9407656f2bedf1bd7214d00683916fbb8f1f86ce02932934573a2fe3f362fc",
+      "bytes": 8242,
+      "start_line": 146,
+      "end_line": 157,
+      "excerpt": "/// @deprecated Contains typography declarations now part of theme-styles.\n@mixin deprecated-static-styles-without-ripple(\n  $query: feature-targeting.all()\n) {\n  @include _deprecated-typography-styles($query: $query);\n  @include _static-styles-base($query: $query);\n}\n\n@mixin _deprecated-typography-styles($query) {\n  .mdc-button {\n    @include typography.typography(button, $query);\n  }"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/vendor/mdc/button/_button-base.scss",
+      "sha256": "eb9407656f2bedf1bd7214d00683916fbb8f1f86ce02932934573a2fe3f362fc",
+      "bytes": 8242,
+      "start_line": 169,
+      "end_line": 185,
+      "excerpt": "@mixin _root-structure($query) {\n  $feat-structure: feature-targeting.create-target($query, structure);\n\n  @include elevation-theme.overlay-surface-position($query: $query);\n  @include elevation-theme.overlay-dimensions(100%, $query: $query);\n\n  @include feature-targeting.targets($feat-structure) {\n    display: inline-flex;\n    // position: relative; already set in mdc-elevation-overlay-surface-position\n    align-items: center;\n    justify-content: center;\n    box-sizing: border-box;\n    min-width: 64px;\n    border: none;\n    outline: none;\n    /* @alternate */\n    line-height: inherit;"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/mdc-helpers/_mdc-helpers.scss",
+      "sha256": "c2f96f4b14306f2a1535efda611bd03b8774e603c6d17ace3b438e097066e52e",
+      "bytes": 11469,
+      "start_line": 39,
+      "end_line": 59,
+      "excerpt": "@function typography-level-config-to-mdc($mat-config, $mat-level) {\n  $mdc-level: map.get($mat-typography-mdc-level-mappings, $mat-level);\n\n  $result-with-nulls: map.merge(\n      if($mdc-level,\n          map.get(mdc-typography.$styles, $mdc-level),\n          (\n            text-decoration: none,\n            -moz-osx-font-smoothing: grayscale,\n            -webkit-font-smoothing: antialiased\n          )),\n      if($mat-level,\n          (\n            font-size: typography-utils.font-size($mat-config, $mat-level),\n            line-height: typography-utils.line-height($mat-config, $mat-level),\n            font-weight: typography-utils.font-weight($mat-config, $mat-level),\n            letter-spacing: typography-utils.letter-spacing($mat-config, $mat-level),\n            font-family: typography-utils.font-family($mat-config, $mat-level),\n            // Angular Material doesn't use text-transform, so disable it.\n            text-transform: none,\n          ),"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-button/_button-theme.scss",
+      "sha256": "dbeccc67f7538f9e9b7529dd3226a45b0a8b3ad7079970fd553dcb25c067c3d0",
+      "bytes": 7604,
+      "start_line": 168,
+      "end_line": 201,
+      "excerpt": "  @include datepicker-legacy-compat.legacy-button-compat-theme((\n      color: $config,\n      typography: null,\n      density: null,\n  ));\n}\n\n/// @deprecated Use `mat.button-typography` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n/// @breaking-change 17.0.0\n@mixin typography($config-or-theme) {\n  $config: typography.private-typography-to-2014-config(\n      theming.get-typography-config($config-or-theme));\n  .mat-button, .mat-raised-button, .mat-icon-button, .mat-stroked-button,\n  .mat-flat-button, .mat-fab, .mat-mini-fab {\n    font: {\n      family: typography-utils.font-family($config, button);\n      size: typography-utils.font-size($config, button);\n      weight: typography-utils.font-weight($config, button);\n    }\n  }\n\n  @include datepicker-legacy-compat.legacy-button-compat-theme((\n      color: null,\n      typography: $config,\n      density: null,\n  ));\n}\n\n@mixin _density($config-or-theme) {\n  @include datepicker-legacy-compat.legacy-button-compat-theme((\n      color: null,\n      typography: null,\n      density: theming.get-density-config($config-or-theme)\n  ));"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/datepicker/_datepicker-legacy-compat.scss",
+      "sha256": "a2a43eb85c21c0f592aa7d770a89d0d68227d90b0616e5fff587825c8ec70acc",
+      "bytes": 1871,
+      "start_line": 1,
+      "end_line": 8,
+      "excerpt": "@use '../button/button-theme';\n@use '../button/icon-button-theme';\n\n@mixin legacy-button-compat-theme($theme) {\n  .mat-datepicker-content {\n    @include button-theme.theme($theme);\n    @include icon-button-theme.theme($theme);\n  }"
+    },
+    {
+      "path": "compatibility/rc/ordinary-checkbox-button-state-21-checkbox-component.css",
+      "sha256": "c0720a1ac9a89ad1b9c0439d9b2e94fe72be2cec1d9d3ba7abe05a711c3cccff",
+      "bytes": 19017,
+      "start_line": 128,
+      "end_line": 149,
+      "excerpt": ".mdc-checkbox:hover > .mdc-checkbox__native-control:not(:checked) ~ .mdc-checkbox__background,\n.mdc-checkbox:hover > .mdc-checkbox__native-control:not(:indeterminate) ~ .mdc-checkbox__background {\n  border-color: var(--mat-checkbox-unselected-hover-icon-color, var(--mat-sys-on-surface));\n  background-color: transparent;\n}\n\n.mdc-checkbox:hover > .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background,\n.mdc-checkbox:hover > .mdc-checkbox__native-control:indeterminate ~ .mdc-checkbox__background {\n  border-color: var(--mat-checkbox-selected-hover-icon-color, var(--mat-sys-primary));\n  background-color: var(--mat-checkbox-selected-hover-icon-color, var(--mat-sys-primary));\n}\n\n.mdc-checkbox__native-control:focus:focus:not(:checked) ~ .mdc-checkbox__background,\n.mdc-checkbox__native-control:focus:focus:not(:indeterminate) ~ .mdc-checkbox__background {\n  border-color: var(--mat-checkbox-unselected-focus-icon-color, var(--mat-sys-on-surface));\n}\n\n.mdc-checkbox__native-control:focus:focus:checked ~ .mdc-checkbox__background,\n.mdc-checkbox__native-control:focus:focus:indeterminate ~ .mdc-checkbox__background {\n  border-color: var(--mat-checkbox-selected-focus-icon-color, var(--mat-sys-primary));\n  background-color: var(--mat-checkbox-selected-focus-icon-color, var(--mat-sys-primary));\n}"
+    },
+    {
+      "path": "compatibility/rc/ordinary-checkbox-button-state-21-checkbox-component.css",
+      "sha256": "c0720a1ac9a89ad1b9c0439d9b2e94fe72be2cec1d9d3ba7abe05a711c3cccff",
+      "bytes": 19017,
+      "start_line": 15,
+      "end_line": 55,
+      "excerpt": ".mdc-checkbox:hover > .mdc-checkbox__ripple {\n  opacity: var(--mat-checkbox-unselected-hover-state-layer-opacity, var(--mat-sys-hover-state-layer-opacity));\n  background-color: var(--mat-checkbox-unselected-hover-state-layer-color, var(--mat-sys-on-surface));\n}\n.mdc-checkbox:hover > .mat-mdc-checkbox-ripple > .mat-ripple-element {\n  background-color: var(--mat-checkbox-unselected-hover-state-layer-color, var(--mat-sys-on-surface));\n}\n.mdc-checkbox .mdc-checkbox__native-control:focus + .mdc-checkbox__ripple {\n  opacity: var(--mat-checkbox-unselected-focus-state-layer-opacity, var(--mat-sys-focus-state-layer-opacity));\n  background-color: var(--mat-checkbox-unselected-focus-state-layer-color, var(--mat-sys-on-surface));\n}\n.mdc-checkbox .mdc-checkbox__native-control:focus ~ .mat-mdc-checkbox-ripple .mat-ripple-element {\n  background-color: var(--mat-checkbox-unselected-focus-state-layer-color, var(--mat-sys-on-surface));\n}\n.mdc-checkbox:active > .mdc-checkbox__native-control + .mdc-checkbox__ripple {\n  opacity: var(--mat-checkbox-unselected-pressed-state-layer-opacity, var(--mat-sys-pressed-state-layer-opacity));\n  background-color: var(--mat-checkbox-unselected-pressed-state-layer-color, var(--mat-sys-primary));\n}\n.mdc-checkbox:active > .mdc-checkbox__native-control ~ .mat-mdc-checkbox-ripple .mat-ripple-element {\n  background-color: var(--mat-checkbox-unselected-pressed-state-layer-color, var(--mat-sys-primary));\n}\n.mdc-checkbox:hover > .mdc-checkbox__native-control:checked + .mdc-checkbox__ripple {\n  opacity: var(--mat-checkbox-selected-hover-state-layer-opacity, var(--mat-sys-hover-state-layer-opacity));\n  background-color: var(--mat-checkbox-selected-hover-state-layer-color, var(--mat-sys-primary));\n}\n.mdc-checkbox:hover > .mdc-checkbox__native-control:checked ~ .mat-mdc-checkbox-ripple .mat-ripple-element {\n  background-color: var(--mat-checkbox-selected-hover-state-layer-color, var(--mat-sys-primary));\n}\n.mdc-checkbox .mdc-checkbox__native-control:focus:checked + .mdc-checkbox__ripple {\n  opacity: var(--mat-checkbox-selected-focus-state-layer-opacity, var(--mat-sys-focus-state-layer-opacity));\n  background-color: var(--mat-checkbox-selected-focus-state-layer-color, var(--mat-sys-primary));\n}\n.mdc-checkbox .mdc-checkbox__native-control:focus:checked ~ .mat-mdc-checkbox-ripple .mat-ripple-element {\n  background-color: var(--mat-checkbox-selected-focus-state-layer-color, var(--mat-sys-primary));\n}\n.mdc-checkbox:active > .mdc-checkbox__native-control:checked + .mdc-checkbox__ripple {\n  opacity: var(--mat-checkbox-selected-pressed-state-layer-opacity, var(--mat-sys-pressed-state-layer-opacity));\n  background-color: var(--mat-checkbox-selected-pressed-state-layer-color, var(--mat-sys-on-surface));\n}\n.mdc-checkbox:active > .mdc-checkbox__native-control:checked ~ .mat-mdc-checkbox-ripple .mat-ripple-element {\n  background-color: var(--mat-checkbox-selected-pressed-state-layer-color, var(--mat-sys-on-surface));"
+    },
+    {
+      "path": "compatibility/rc/ordinary-checkbox-button-state-21-button-component.css",
+      "sha256": "a658686b35f9962a8b100877597e6011a8945e618df4d62668bb4c95716990f6",
+      "bytes": 24519,
+      "start_line": 14,
+      "end_line": 31,
+      "excerpt": ".mdc-button {\n  -webkit-user-select: none;\n  user-select: none;\n  position: relative;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  box-sizing: border-box;\n  min-width: 64px;\n  border: none;\n  outline: none;\n  line-height: inherit;\n  -webkit-appearance: none;\n  overflow: visible;\n  vertical-align: middle;\n  background: transparent;\n  padding: 0 8px;\n}"
+    },
+    {
+      "path": "compatibility/rc/ordinary-checkbox-button-state-main-checkbox-component.css",
+      "sha256": "19e52b5d8e79e96b09cc6fba7825a2bfe97fb346e22dfab8bdec574ce4f23002",
+      "bytes": 19146,
+      "start_line": 128,
+      "end_line": 149,
+      "excerpt": ".mdc-checkbox:hover > .mdc-checkbox__native-control:not(:checked) ~ .mdc-checkbox__background,\n.mdc-checkbox:hover > .mdc-checkbox__native-control:not(:indeterminate) ~ .mdc-checkbox__background {\n  border-color: var(--mat-checkbox-unselected-hover-icon-color, var(--mat-sys-on-surface));\n  background-color: transparent;\n}\n\n.mdc-checkbox:hover > .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background,\n.mdc-checkbox:hover > .mdc-checkbox__native-control:indeterminate ~ .mdc-checkbox__background {\n  border-color: var(--mat-checkbox-selected-hover-icon-color, var(--mat-sys-primary));\n  background-color: var(--mat-checkbox-selected-hover-icon-color, var(--mat-sys-primary));\n}\n\n.mdc-checkbox__native-control:focus:focus:not(:checked) ~ .mdc-checkbox__background,\n.mdc-checkbox__native-control:focus:focus:not(:indeterminate) ~ .mdc-checkbox__background {\n  border-color: var(--mat-checkbox-unselected-focus-icon-color, var(--mat-sys-on-surface));\n}\n\n.mdc-checkbox__native-control:focus:focus:checked ~ .mdc-checkbox__background,\n.mdc-checkbox__native-control:focus:focus:indeterminate ~ .mdc-checkbox__background {\n  border-color: var(--mat-checkbox-selected-focus-icon-color, var(--mat-sys-primary));\n  background-color: var(--mat-checkbox-selected-focus-icon-color, var(--mat-sys-primary));\n}"
+    },
+    {
+      "path": "compatibility/rc/ordinary-checkbox-button-state-main-checkbox-component.css",
+      "sha256": "19e52b5d8e79e96b09cc6fba7825a2bfe97fb346e22dfab8bdec574ce4f23002",
+      "bytes": 19146,
+      "start_line": 15,
+      "end_line": 55,
+      "excerpt": ".mdc-checkbox:hover > .mdc-checkbox__ripple {\n  opacity: var(--mat-checkbox-unselected-hover-state-layer-opacity, var(--mat-sys-hover-state-layer-opacity));\n  background-color: var(--mat-checkbox-unselected-hover-state-layer-color, var(--mat-sys-on-surface));\n}\n.mdc-checkbox:hover > .mat-mdc-checkbox-ripple > .mat-ripple-element {\n  background-color: var(--mat-checkbox-unselected-hover-state-layer-color, var(--mat-sys-on-surface));\n}\n.mdc-checkbox .mdc-checkbox__native-control:focus + .mdc-checkbox__ripple {\n  opacity: var(--mat-checkbox-unselected-focus-state-layer-opacity, var(--mat-sys-focus-state-layer-opacity));\n  background-color: var(--mat-checkbox-unselected-focus-state-layer-color, var(--mat-sys-on-surface));\n}\n.mdc-checkbox .mdc-checkbox__native-control:focus ~ .mat-mdc-checkbox-ripple .mat-ripple-element {\n  background-color: var(--mat-checkbox-unselected-focus-state-layer-color, var(--mat-sys-on-surface));\n}\n.mdc-checkbox:active > .mdc-checkbox__native-control + .mdc-checkbox__ripple {\n  opacity: var(--mat-checkbox-unselected-pressed-state-layer-opacity, var(--mat-sys-pressed-state-layer-opacity));\n  background-color: var(--mat-checkbox-unselected-pressed-state-layer-color, var(--mat-sys-primary));\n}\n.mdc-checkbox:active > .mdc-checkbox__native-control ~ .mat-mdc-checkbox-ripple .mat-ripple-element {\n  background-color: var(--mat-checkbox-unselected-pressed-state-layer-color, var(--mat-sys-primary));\n}\n.mdc-checkbox:hover > .mdc-checkbox__native-control:checked + .mdc-checkbox__ripple {\n  opacity: var(--mat-checkbox-selected-hover-state-layer-opacity, var(--mat-sys-hover-state-layer-opacity));\n  background-color: var(--mat-checkbox-selected-hover-state-layer-color, var(--mat-sys-primary));\n}\n.mdc-checkbox:hover > .mdc-checkbox__native-control:checked ~ .mat-mdc-checkbox-ripple .mat-ripple-element {\n  background-color: var(--mat-checkbox-selected-hover-state-layer-color, var(--mat-sys-primary));\n}\n.mdc-checkbox .mdc-checkbox__native-control:focus:checked + .mdc-checkbox__ripple {\n  opacity: var(--mat-checkbox-selected-focus-state-layer-opacity, var(--mat-sys-focus-state-layer-opacity));\n  background-color: var(--mat-checkbox-selected-focus-state-layer-color, var(--mat-sys-primary));\n}\n.mdc-checkbox .mdc-checkbox__native-control:focus:checked ~ .mat-mdc-checkbox-ripple .mat-ripple-element {\n  background-color: var(--mat-checkbox-selected-focus-state-layer-color, var(--mat-sys-primary));\n}\n.mdc-checkbox:active > .mdc-checkbox__native-control:checked + .mdc-checkbox__ripple {\n  opacity: var(--mat-checkbox-selected-pressed-state-layer-opacity, var(--mat-sys-pressed-state-layer-opacity));\n  background-color: var(--mat-checkbox-selected-pressed-state-layer-color, var(--mat-sys-on-surface));\n}\n.mdc-checkbox:active > .mdc-checkbox__native-control:checked ~ .mat-mdc-checkbox-ripple .mat-ripple-element {\n  background-color: var(--mat-checkbox-selected-pressed-state-layer-color, var(--mat-sys-on-surface));"
+    },
+    {
+      "path": "compatibility/rc/ordinary-checkbox-button-state-main-button-component.css",
+      "sha256": "5fd6cd3bdc273e31834e14f22e1ca7a732f38e2cc491fbb67cb2752bdb570bde",
+      "bytes": 25170,
+      "start_line": 14,
+      "end_line": 31,
+      "excerpt": ".mdc-button {\n  -webkit-user-select: none;\n  user-select: none;\n  position: relative;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  box-sizing: border-box;\n  min-width: 64px;\n  border: none;\n  outline: none;\n  line-height: inherit;\n  -webkit-appearance: none;\n  overflow: visible;\n  vertical-align: middle;\n  background: transparent;\n  padding: 0 8px;\n}"
+    }
+  ],
+  "compiler_calls": 0,
+  "g11_claim": "not-passed"
+}

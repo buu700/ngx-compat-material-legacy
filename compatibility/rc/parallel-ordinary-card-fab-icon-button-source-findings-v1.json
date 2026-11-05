@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-11-05T00:34:02.534609+00:00",
+  "decision": "Completed paired bounded SOURCE TRIAGE only; concrete role/name translation gaps and preserved-path counterexamples, no rendered failure or implementation admission",
+  "worksheet": {
+    "path": "compatibility/rc/parallel-ordinary-card-fab-icon-button-source-worksheet-v2.json",
+    "sha256": "1e091fe03e47c82650377088bde1cd38309de5a382084e45c667ceab1a21f8b1",
+    "bytes": 20757
+  },
+  "evidence": {
+    "path": "compatibility/rc/parallel-ordinary-card-fab-icon-button-source-paired-evidence-v1.json",
+    "sha256": "70b12c70ccebdceb38b56370ecde55fe34484d3cb98c56b2c600ff7aee495f1a",
+    "bytes": 81883
+  },
+  "producer": {
+    "path": "compatibility/rc/parallel-ordinary-card-fab-icon-button-source-inspect-v1.py",
+    "sha256": "143ec989dcfc15e2df0afb8bd6854c713d805f600f82ffd7ff3caba3cb879a31",
+    "bytes": 9702
+  },
+  "inspected_roots": {
+    "21.x": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+    "main": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy"
+  },
+  "scope": {
+    "ordinary_census_total": 154,
+    "selected_exports_per_line": 12,
+    "families": [
+      "card",
+      "fab",
+      "icon-button"
+    ],
+    "minimum_peers": {
+      "21.x": {
+        "material": "21.2.14",
+        "cdk": "21.2.14"
+      },
+      "main": {
+        "material": "22.1.7",
+        "cdk": "22.1.7"
+      }
+    },
+    "all12_owned_module_bytes_equal_existing_frozen_census": true,
+    "current_consumer_token_names_for_selected_roles_equal_both_lines": true,
+    "source_input_refs_per_line": 44
+  },
+  "family_findings": [
+    {
+      "family": "card",
+      "status": "Five color-role token names require current public translation;11existingMATnames already consumed",
+      "affected_exports": [
+        "card-color",
+        "card-theme"
+      ],
+      "owned_module": "projects/ngx-material-legacy/styles/card/_card-theme.scss",
+      "source_lines": {
+        "color": 11,
+        "typography": 33,
+        "density": 48,
+        "theme": 62
+      },
+      "source_fact": "color computes independently owned elevated/outlined M2 maps, resolves elevation+customshadow to actualboxshadow, then vendor.theme emitsMDCprefixes under .mat-mdc-card. Current native elevated/outlinedrules consume MATcardnames.",
+      "public_api": "mat.card-overrides",
+      "finite_color_keys": [
+        "elevated-container-color",
+        "elevated-container-elevation",
+        "outlined-container-color",
+        "outlined-container-elevation",
+        "outlined-outline-color"
+      ],
+      "preserve_values": "Use already-resolved owned values, including background.card, foreground.base at0.12 and custom foreground.elevation; do not pass raw elevationnumbers or use current sys/M2private defaults.",
+      "existing_positive": "Owned --mat-card-subtitle-text-color and10title/subtitletypography names all occur as actual current native var consumers on bothfloors. This is name/route evidence, not a value/cascade/render pass.",
+      "preserve_dimensions": "card-density body calls three getters returningempty maps; its immutable tagged default output is0bytes and current card density map isalsoempty. No density repair inferred.",
+      "limit": "Owned unthemable shape4px/outlinewidth1px and current base ownership need a separate targeted style decision; do not automatically add current filled appearance or its tokens."
+    },
+    {
+      "family": "icon-button",
+      "status": "Concrete icon/disabled/state-color name gaps; density has a still-matching direct CSS path",
+      "affected_exports": [
+        "icon-button-color",
+        "icon-button-theme"
+      ],
+      "owned_module": "projects/ngx-material-legacy/styles/button/_icon-button-theme.scss",
+      "source_lines": {
+        "color": 26,
+        "typography": 67,
+        "density": 70,
+        "theme": 107
+      },
+      "source_fact": "Vendor theme emits --mdc-icon-button-icon-color/disabled-icon-color; owned ripple helpers emit --mat-mdc-button-persistent-ripple-color and --mat-mdc-button-ripple-color. Current shipped icon-button chunk consumes --mat-icon-button-icon-color/disabled-icon-color/state-layer-color/ripple-color.",
+      "public_api": "mat.icon-button-overrides",
+      "finite_initial_keys": [
+        "icon-color",
+        "disabled-icon-color",
+        "state-layer-color",
+        "ripple-color"
+      ],
+      "preserve_values": "Retain defaultinherit, primary/accent/warn ownpalette values, owned surfacecontrast calculation and disabled0.5dark/0.38light; do not replace with current privateM2 fixed38percent assumptions.",
+      "density_counterexample": "The owned .mat-mdc-icon-button.mat-mdc-button-base block emits the old state-layer-size variable AND width/height usingthatvariable, pluscomputedpadding. Current MatIconButton stillinherits mat-mdc-button-base. Therefore missing native --mdc consumer doesnot establish broken density.",
+      "density_followup": "Check whether additive public state-layer-size/touch-target values are needed for native internals/cascade; retain existing direct geometry, oldalias,24px iconmath and oldtouch-target rule. Current upstream M2density itself emits old+new sizealiases, a source hint ratherthan permission tocall it.",
+      "preserve_dimensions": "icon-button-typography is historically empty, taggeddefault0bytes, and current publictoken typography map isalsoempty. Do not fill it with newfeatures."
+    },
+    {
+      "family": "fab",
+      "status": "Normal/small color+foreground and extended label token names differ; preserve per-variant/state role calculations",
+      "affected_exports": [
+        "fab-color",
+        "fab-typography",
+        "fab-theme"
+      ],
+      "owned_module": "projects/ngx-material-legacy/styles/button/_fab-theme.scss",
+      "source_lines": {
+        "color": 33,
+        "typography": 83,
+        "density": 98,
+        "theme": 101
+      },
+      "source_fact": "Owned _fab-variant emits --mdc-fab-container-color/icon-color and --mat-mdc-fab-color, while current normal/mini rules consume separate --mat-fab-{container-color,foreground-color} and --mat-fab-small-{container-color,foreground-color}. Extended M2label4tokens use --mdc-extended-fab-*, current native uses --mat-fab-extended-*.",
+      "public_api": "mat.fab-overrides",
+      "finite_initial_color_keys": [
+        "container-color",
+        "foreground-color",
+        "small-container-color",
+        "small-foreground-color"
+      ],
+      "extended_typography_keys": [
+        "extended-label-text-font",
+        "extended-label-text-size",
+        "extended-label-text-tracking",
+        "extended-label-text-weight"
+      ],
+      "disabled_role_keys": [
+        "disabled-state-container-color",
+        "disabled-state-foreground-color",
+        "small-disabled-state-container-color",
+        "small-disabled-state-foreground-color"
+      ],
+      "state_role_keys": [
+        "state-layer-color",
+        "ripple-color",
+        "small-state-layer-color",
+        "small-ripple-color"
+      ],
+      "preserve_values": "Preserve distinct old surface/primary/accent/warn background+white-or-black foreground computations; disabledcontainer0.12 and disabledforeground0.5dark/0.38light. Rippleforeground roles come from existing using-mdc-theme/buttonprivate path and must not be equated to _fab-variant foreground without proof.",
+      "selector_counterexample": "Current native FAB stillhas mdc-fab and mdc-fab--extended aliases togetherwith mat-mdc-* classes, so historical typography selector presence isnot dead merelybecause consumer tokenschanged. Current extended typography property bindings use newnames; cascade/output effect remains unmeasured.",
+      "preserve_dimensions": "fab-density is historically empty/taggeddefault0bytes. Current publicdensity offers touch-target settings, butthat alone doesnot add a historical feature requirement.",
+      "limit": "Base circularshapes,extended48px/labelstructure and6/8/12elevation behavior need separate focused style/ownership proof; do not copy currentM3 base defaults or expose newvariantfeatures."
+    }
+  ],
+  "implementation_queue_after_checkbox_button": [
+    {
+      "order": 1,
+      "work": "card-color/theme finite5key public translation",
+      "why": "Smallest independently owned role map; preserve existing11MATtypography/subtitle declarations and emptydensity behavior.",
+      "later_required_proof": [
+        "Untouched16 rolevalues/customforeground shadow and rawconfig/fulltheme forms",
+        "Both currentnative elevated/outlined component selectors and computedcolor/shadow; order/specificity/M2M3coexistence",
+        "Any base shape responsibility separate, no currentfilledvariant expansion"
+      ]
+    },
+    {
+      "order": 2,
+      "work": "icon-button-color/theme plus bounded density/state review",
+      "why": "Reuse reviewedbutton-state role evidence afteritexists, while keeping icon palette/disabled/defaultinherit calculations distinct.",
+      "later_required_proof": [
+        "Default/primary/accent/warn,button+anchor disabled,light/dark,keyboardfocus/hover/pressed/ripple",
+        "Density0/-3/-5:directwidth/height/padding/touch target preserved before anypublicaliasaddition",
+        "Emptytypography remains no-op; anynewpublicstateopacity emission derived from owned16ripplemaps, notM3fallbacks"
+      ]
+    },
+    {
+      "order": 3,
+      "work": "fab normal/mini color+disabled and extendedtypography bridge",
+      "why": "More state/size variants and differing oldforeground/ripple roles; avoidone genericprefix replacement.",
+      "later_required_proof": [
+        "Normal/mini/extended hosts and existingpalette selectors,light/dark disabledstate and ripple/focus",
+        "Custom button typography and existingnull-config fallback; preserveowned/vendor CSS bytes outside specificallyreviewed additions",
+        "Emptydensity doesnot automaticallygain currenttouch-targetfeatures; base/elevation/shape responsibility separatelyreviewed"
+      ]
+    }
+  ],
+  "unchanged_constraints": [
+    "Keep the12exportnames/signatures,existingnamespacebindings,ownedpalette/thememap values and caller maps",
+    "Use only eachminimumpeerpublicoverrides entry; currentM2/M3/private generators were read as development reference and never invoked/imported by this task",
+    "Keep legacy-owned HTML/CSS/SCSS,consumerselectors and existingordinarydirectCSS; no ordinarycomponentfork, currentAPI mirror or selector rewrite",
+    "Each laterimplementation gets itsown boundedworksheet/single sharedowner; direct proof grants no automatic all-component aggregate/packed/browser/floor credit"
+  ],
+  "executed_checks": [
+    "Rehashed44pinned sourceinputs perline before/afterread-onlyinspector",
+    "All12ownedforwardmodules remainbyte-exact toexisting154census and their taggeddefaultoracle entries",
+    "Decoded existing shipped componentstyle literals onlyto locateactualcurrentvar consumers, checked publicoverride namespace/keysource for17role-namepairs perline and11existingMATcardnames"
+  ],
+  "not_executed": [
+    "No Sasscompiler/build/network/Actions/install/browser/runtime/renderedtests",
+    "No product/helper/test/sharedregistry/ledger/canonicalchanges",
+    "No current CSSgolden or consumer expectation changes",
+    "Uncompleted runtime-restricted readerclosingreview remainspaused/unqualified and wasnot resumed"
+  ],
+  "g11_claim": "not-passed"
+}

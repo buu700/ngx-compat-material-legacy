@@ -1,0 +1,345 @@
+--- a/projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss
++++ b/projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss
+@@ -1,4 +1,8 @@
+ @use 'sass:map';
++@use '@angular/material' as mat;
++@use '../vendor/mdc/theme/theme-color' as mdc-theme-color;
++@use '../vendor/mdc/typography/typography' as mdc-typography;
++@use '../vendor/mdc/touch-target/touch-target' as mdc-touch-target;
+ @use '../vendor/mdc/checkbox/checkbox-theme' as mdc-checkbox-theme;
+ @use '../vendor/mdc/form-field' as mdc-form-field;
+ @use '../core/style/sass-utils';
+@@ -6,6 +10,39 @@
+ @use '../core/typography/typography';
+ @use '../core/mdc-helpers/mdc-helpers';
+ @use '../core/tokens/m2/mdc/checkbox' as tokens-mdc-checkbox;
++
++// The finite public bridge uses the owned16 values without forwarding an open token map.
++// The public API omits unselected-pressed-icon; combined pressed states need lifecycle proof.
++@function _current-color-tokens($config) {
++  $color: tokens-mdc-checkbox.get-color-tokens($config);
++  $base: tokens-mdc-checkbox.get-unthemable-tokens();
++  @return (
++    disabled-selected-icon-color: map.get($color, disabled-selected-icon-color),
++    disabled-unselected-icon-color: map.get($color, disabled-unselected-icon-color),
++    selected-checkmark-color: map.get($color, selected-checkmark-color),
++    selected-focus-icon-color: map.get($color, selected-focus-icon-color),
++    selected-hover-icon-color: map.get($color, selected-hover-icon-color),
++    selected-icon-color: map.get($color, selected-icon-color),
++    selected-pressed-icon-color: map.get($color, selected-pressed-icon-color),
++    unselected-focus-icon-color: map.get($color, unselected-focus-icon-color),
++    unselected-hover-icon-color: map.get($color, unselected-hover-icon-color),
++    unselected-icon-color: map.get($color, unselected-icon-color),
++    selected-focus-state-layer-color: map.get($color, selected-focus-state-layer-color),
++    selected-hover-state-layer-color: map.get($color, selected-hover-state-layer-color),
++    selected-pressed-state-layer-color: map.get($color, selected-pressed-state-layer-color),
++    unselected-focus-state-layer-color: map.get($color, unselected-focus-state-layer-color),
++    unselected-hover-state-layer-color: map.get($color, unselected-hover-state-layer-color),
++    unselected-pressed-state-layer-color: map.get($color, unselected-pressed-state-layer-color),
++    disabled-selected-checkmark-color: map.get($base, disabled-selected-checkmark-color),
++    selected-focus-state-layer-opacity: map.get($base, selected-focus-state-layer-opacity),
++    selected-hover-state-layer-opacity: map.get($base, selected-hover-state-layer-opacity),
++    selected-pressed-state-layer-opacity: map.get($base, selected-pressed-state-layer-opacity),
++    unselected-focus-state-layer-opacity: map.get($base, unselected-focus-state-layer-opacity),
++    unselected-hover-state-layer-opacity: map.get($base, unselected-hover-state-layer-opacity),
++    unselected-pressed-state-layer-opacity: map.get($base, unselected-pressed-state-layer-opacity),
++    disabled-label-color: theming.get-color-from-palette(map.get($config, foreground), disabled-text),
++  );
++}
+ 
+ @mixin color($config-or-theme) {
+   $config: theming.get-color-config($config-or-theme);
+@@ -15,22 +52,28 @@
+ 
+   @include sass-utils.current-selector-or-root() {
+     @include mdc-checkbox-theme.theme(tokens-mdc-checkbox.get-color-tokens($config));
++    @include mat.checkbox-overrides(_current-color-tokens($config));
+   }
+ 
+   .mat-mdc-checkbox {
+     &.mat-primary {
+       $primary-config: map.merge($config, (accent: $primary));
+       @include mdc-checkbox-theme.theme(tokens-mdc-checkbox.get-color-tokens($primary-config));
++      @include mat.checkbox-overrides(_current-color-tokens($primary-config));
+     }
+ 
+     &.mat-warn {
+       $warn-config: map.merge($config, (accent: $warn));
+       @include mdc-checkbox-theme.theme(tokens-mdc-checkbox.get-color-tokens($warn-config));
++      @include mat.checkbox-overrides(_current-color-tokens($warn-config));
+     }
+ 
+     @include mdc-helpers.using-mdc-theme($config) {
+       // TODO(mmalerba): Switch to static-styles, theme-styles, and theme once they're available.
+       @include mdc-form-field.core-styles($query: mdc-helpers.$mdc-theme-styles-query);
++      @include mat.checkbox-overrides((
++        label-text-color: mdc-theme-color.prop-value(text-primary-on-background),
++      ));
+     }
+ 
+     &.mat-mdc-checkbox-disabled label {
+@@ -52,6 +95,14 @@
+     @include mdc-helpers.using-mdc-typography($config) {
+       // TODO(mmalerba): Switch to static-styles, theme-styles, and theme once they're available.
+       @include mdc-form-field.core-styles($query: mdc-helpers.$mdc-typography-styles-query);
++      $label: map.get(mdc-typography.$styles, body2);
++      @include mat.checkbox-overrides((
++        label-text-font: map.get($label, font-family),
++        label-text-line-height: map.get($label, line-height),
++        label-text-size: map.get($label, font-size),
++        label-text-tracking: map.get($label, letter-spacing),
++        label-text-weight: map.get($label, font-weight),
++      ));
+     }
+   }
+ }
+@@ -61,6 +112,14 @@
+ 
+   @include sass-utils.current-selector-or-root() {
+     @include mdc-checkbox-theme.theme(tokens-mdc-checkbox.get-density-tokens($density-scale));
++    @include mat.checkbox-overrides((
++      state-layer-size: map.get(tokens-mdc-checkbox.get-density-tokens($density-scale), state-layer-size),
++      touch-target-size: mdc-touch-target.$height,
++      touch-target-display: block,
++    ));
++    @include mdc-helpers.if-touch-targets-unsupported($density-scale) {
++      @include mat.checkbox-overrides((touch-target-display: none));
++    }
+   }
+ 
+   @include mdc-helpers.if-touch-targets-unsupported($density-scale) {
+--- a/projects/ngx-material-legacy/styles/button/_button-theme.scss
++++ b/projects/ngx-material-legacy/styles/button/_button-theme.scss
+@@ -1,4 +1,10 @@
+ @use 'sass:map';
++@use '@angular/material' as mat;
++@use '../vendor/mdc/ripple/ripple-theme' as mdc-ripple-theme;
++@use '../vendor/mdc/elevation/elevation-theme' as mdc-elevation-theme;
++@use '../vendor/mdc/typography/typography' as mdc-typography;
++@use '../vendor/mdc/density/density' as mdc-density;
++@use '../vendor/mdc/touch-target/touch-target' as mdc-touch-target;
+ @use '../vendor/mdc/button/button' as mdc-button;
+ @use '../vendor/mdc/button/button-theme' as mdc-button-theme;
+ @use '../vendor/mdc/button/button-text-theme' as mdc-button-text-theme;
+@@ -12,9 +18,58 @@
+ @use '../core/theming/theming';
+ @use '../core/typography/typography';
+ 
++// These lists are finite: the four button variants accepted by the owned16 source API.
++@mixin _current-ripple-color($variants, $color, $opacities) {
++  $tokens: ();
++  @each $variant in $variants {
++    $tokens: map.merge($tokens, (
++      '#{$variant}-state-layer-color': $color,
++      '#{$variant}-disabled-state-layer-color': $color,
++      '#{$variant}-ripple-color': rgba($color, 0.1),
++      '#{$variant}-hover-state-layer-opacity': map.get($opacities, hover),
++      '#{$variant}-focus-state-layer-opacity': map.get($opacities, focus),
++      '#{$variant}-pressed-state-layer-opacity': map.get($opacities, press),
++    ));
++  }
++  @include mat.button-overrides($tokens);
++}
++
++@mixin _current-ripple-theme-styles($config, $is-filled, $variants) {
++  $opacities: if(map.get($config, is-dark),
++    mdc-ripple-theme.$light-ink-opacities, mdc-ripple-theme.$dark-ink-opacities);
++  @include _current-ripple-color($variants, mdc-theme-color.prop-value(on-surface), $opacities);
++  &.mat-primary {
++    @include _current-ripple-color($variants,
++      mdc-theme-color.prop-value(if($is-filled, on-primary, primary)), $opacities);
++  }
++  &.mat-accent {
++    @include _current-ripple-color($variants,
++      mdc-theme-color.prop-value(if($is-filled, on-secondary, secondary)), $opacities);
++  }
++  &.mat-warn {
++    @include _current-ripple-color($variants,
++      mdc-theme-color.prop-value(if($is-filled, on-error, error)), $opacities);
++  }
++}
++
++@function _current-density-tokens($height, $display) {
++  $tokens: ();
++  @each $variant in (text, filled, protected, outlined) {
++    $tokens: map.merge($tokens, (
++      '#{$variant}-container-height': $height,
++      '#{$variant}-touch-target-size': mdc-touch-target.$height,
++      '#{$variant}-touch-target-display': $display,
++    ));
++  }
++  @return $tokens;
++}
++
+ @mixin _button-variant($color) {
+   @include mdc-button-text-theme.theme((
+     label-text-color: $color,
++  ));
++  @include mat.button-overrides((
++    text-label-text-color: $color,
+   ));
+ }
+ 
+@@ -23,6 +78,10 @@
+     container-color: $background,
+     label-text-color: $foreground,
+   ));
++  @include mat.button-overrides((
++    filled-container-color: $background,
++    filled-label-text-color: $foreground,
++  ));
+ }
+ 
+ @mixin _raised-button-variant($foreground, $background) {
+@@ -30,11 +89,18 @@
+     container-color: $background,
+     label-text-color: $foreground,
+   ));
++  @include mat.button-overrides((
++    protected-container-color: $background,
++    protected-label-text-color: $foreground,
++  ));
+ }
+ 
+ @mixin _outlined-button-variant($color) {
+   @include mdc-button-outlined-theme.theme((
+     label-text-color: $color,
++  ));
++  @include mat.button-overrides((
++    outlined-label-text-color: $color,
+   ));
+ }
+ 
+@@ -54,6 +120,9 @@
+     $on-error: mdc-theme-color.prop-value(on-error);
+ 
+     .mat-mdc-button {
++      @include mat.button-overrides((
++        text-disabled-label-text-color: $disabled-ink-color,
++      ));
+       &.mat-unthemed {
+         @include _button-variant($on-surface);
+       }
+@@ -77,10 +146,18 @@
+           disabled-label-text-color: $disabled-ink-color,
+           label-text-color: $disabled-ink-color
+         ));
++        @include mat.button-overrides((
++          text-disabled-label-text-color: $disabled-ink-color,
++          text-label-text-color: $disabled-ink-color,
++        ));
+       }
+     }
+ 
+     .mat-mdc-unelevated-button {
++      @include mat.button-overrides((
++        filled-disabled-label-text-color: $disabled-ink-color,
++        filled-disabled-container-color: $disabled-container-color,
++      ));
+       &.mat-unthemed {
+         @include _unelevated-button-variant($on-surface, $surface);
+       }
+@@ -106,10 +183,25 @@
+           container-color: $disabled-container-color,
+           label-text-color: $disabled-ink-color,
+         ));
++        @include mat.button-overrides((
++          filled-disabled-container-color: $disabled-container-color,
++          filled-disabled-label-text-color: $disabled-ink-color,
++          filled-container-color: $disabled-container-color,
++          filled-label-text-color: $disabled-ink-color,
++        ));
+       }
+     }
+ 
+     .mat-mdc-raised-button {
++      @include mat.button-overrides((
++        protected-disabled-label-text-color: $disabled-ink-color,
++        protected-disabled-container-color: $disabled-container-color,
++        protected-container-elevation-shadow: mdc-elevation-theme.elevation-box-shadow(2),
++        protected-hover-container-elevation-shadow: mdc-elevation-theme.elevation-box-shadow(4),
++        protected-focus-container-elevation-shadow: mdc-elevation-theme.elevation-box-shadow(4),
++        protected-pressed-container-elevation-shadow: mdc-elevation-theme.elevation-box-shadow(8),
++        protected-disabled-container-elevation-shadow: mdc-elevation-theme.elevation-box-shadow(0),
++      ));
+       &.mat-unthemed {
+         @include _raised-button-variant($on-surface, $surface);
+       }
+@@ -136,10 +228,23 @@
+           label-text-color: $disabled-ink-color,
+           container-elevation: 0,
+         ));
++        @include mat.button-overrides((
++          protected-disabled-container-color: $disabled-container-color,
++          protected-disabled-label-text-color: $disabled-ink-color,
++          protected-container-color: $disabled-container-color,
++          protected-label-text-color: $disabled-ink-color,
++          protected-container-elevation-shadow: mdc-elevation-theme.elevation-box-shadow(0),
++          protected-disabled-container-elevation-shadow: mdc-elevation-theme.elevation-box-shadow(0),
++        ));
+       }
+     }
+ 
+     .mat-mdc-outlined-button {
++      @include mat.button-overrides((
++        outlined-disabled-label-text-color: $disabled-ink-color,
++        outlined-outline-color: rgba($on-surface, 0.12),
++        outlined-disabled-outline-color: rgba($on-surface, 0.12),
++      ));
+       @include mdc-button-outlined-theme.theme((
+         outline-color: rgba(mdc-theme-color.prop-value(on-surface), 0.12)
+       ));
+@@ -169,16 +274,24 @@
+           outline-color: rgba($on-surface, 0.12),
+           disabled-outline-color: rgba($on-surface, 0.12),
+         ));
++        @include mat.button-overrides((
++          outlined-label-text-color: $disabled-ink-color,
++          outlined-disabled-label-text-color: $disabled-ink-color,
++          outlined-outline-color: rgba($on-surface, 0.12),
++          outlined-disabled-outline-color: rgba($on-surface, 0.12),
++        ));
+       }
+     }
+ 
+     // Ripple colors
+     .mat-mdc-button, .mat-mdc-outlined-button {
+       @include button-theme-private.ripple-theme-styles($config, false);
++      @include _current-ripple-theme-styles($config, false, (text, outlined));
+     }
+ 
+     .mat-mdc-raised-button, .mat-mdc-unelevated-button {
+       @include button-theme-private.ripple-theme-styles($config, true);
++      @include _current-ripple-theme-styles($config, true, (protected, filled));
+     }
+   }
+ }
+@@ -188,6 +301,16 @@
+     theming.get-typography-config($config-or-theme));
+   @include mdc-helpers.using-mdc-typography($config) {
+     @include mdc-button.without-ripple($query: mdc-helpers.$mdc-typography-styles-query);
++    $label: map.get(mdc-typography.$styles, button);
++    @each $variant in (text, filled, protected, outlined) {
++      @include mat.button-overrides((
++        '#{$variant}-label-text-font': map.get($label, font-family),
++        '#{$variant}-label-text-size': map.get($label, font-size),
++        '#{$variant}-label-text-tracking': map.get($label, letter-spacing),
++        '#{$variant}-label-text-weight': map.get($label, font-weight),
++        '#{$variant}-label-text-transform': map.get($label, text-transform),
++      ));
++    }
+   }
+ }
+ 
+@@ -201,6 +324,11 @@
+     &.mat-mdc-button-base {
+       @include mdc-button-theme.density($density-scale, $query: mdc-helpers.$mdc-base-styles-query);
+       @include button-theme-private.touch-target-density($density-scale);
++      $height: mdc-density.prop-value(mdc-button-theme.$density-config, $density-scale, height);
++      @include mat.button-overrides(_current-density-tokens($height, block));
++      @include mdc-helpers.if-touch-targets-unsupported($density-scale) {
++        @include mat.button-overrides(_current-density-tokens($height, none));
++      }
+     }
+   }
+ }
