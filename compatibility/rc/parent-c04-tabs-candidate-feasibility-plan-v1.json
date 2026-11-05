@@ -1,0 +1,45 @@
+{
+  "schema": "parent-c04-tabs-candidate-feasibility-plan-v1",
+  "status": "read-only proposal; no candidate build or execution",
+  "reference_findings": "/tmp/parent-c04-tabs-reference-derived-findings-v1.json",
+  "reference_raw": "/tmp/parent-c04-tabs-reference-observations-v1.json",
+  "review_target": {
+    "line": "21.x",
+    "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+    "observed_head": "bde3b3a5220f18c4396656d00647c63770946707",
+    "working_tree": "actively changing during review; snapshot is not a frozen identity and must be rechecked before execution",
+    "package_root": "dist/ngx-material-legacy",
+    "package_manifest_sha256": "f9fabba4d7a1a078fb80aec6e9af8f7a3202cfe7c3d6f4f4694f238709c8f8e0",
+    "tabs_fesm_path": "dist/ngx-material-legacy/fesm2022/ngx-compat-material-legacy-legacy-tabs.mjs",
+    "tabs_fesm_sha256": "6002cde844ed1cee78d761b6fb606323daf40f2e3bf7b3aa46782f86dc267967",
+    "source_template_sha256": "c2357fd60f548fb15f4a347be322b6ec36279c5bcd5729124962f7fcf03d2161",
+    "source_tab_body_base_sha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+    "freshness": "dist timestamps are October 26; no proof it represents current source or HEAD. Do not call it a fresh source artifact or release artifact. Freeze and hash full package dependency closure, identify a fresh pack, or label any explicit existing-dist trial exploratory.",
+    "workspace_manifest_sha256": "a3a268beffc3620d3fdeeadc1269c9e9676adbf3e40f55d45cd9683c85e4a060",
+    "pnpm_lock_sha256": "e8b2cd00e56fd38e40f547bcacd2b38088b71548f40b3e15137fb91a1bef87a2",
+    "root_node": "24.21.0"
+  },
+  "runtime_profile": {
+    "packages": "workspace 21.x Angular core/common/compiler/platform-browser 21.2.23, Material/CDK 21.2.14, zone.js 0.15.1, rxjs 7.8.2; independently verify resolved package versions and complete paths/hashes",
+    "linkage": "partial compilation in tabs FESM uses \u0275\u0275ngDeclare; import @angular/compiler before library, as reference does; bootstrap smoke required, cannot assume JIT succeeds",
+    "tools": "workspace pinned esbuild 0.25.5 and Sass from pnpm lock; verify actual executable and dependencies at the eventual frozen snapshot",
+    "browser": "same /snap/bin/chromium 156.0.8078.79, viewport 1000x800, DPR 1, fonts, locale and same external CDP harness; reidentify exact browser binary/revision"
+  },
+  "fixture_changes": {
+    "consumer": "preserve the same Host/PanelProbe template, controls, observations, CDP actions and completion gates; change only actual tabs import to @ngx-compat/material-legacy/legacy-tabs. Copy the fixture into a fresh isolated directory; resolve package and dependencies from captured immutable candidates, verify metafile all inputs and no external imports.",
+    "engine_free": "Do not import or install @angular/animations or call provideAnimations/provideNoopAnimations in candidate. For disabled candidate mode use public MATERIAL_ANIMATIONS with animationsDisabled=true as in scripts/browser-required-cells.mjs; enabled mode use its corresponding non-disabled provider or no provider, controlling prefers-reduced-motion explicitly and recording result. Actual source legacy-core/internal/legacy-animations.ts checks this token, ANIMATION_MODULE_TYPE and reduced motion. The reference providers remain unchanged; mode mapping is an independently inspected equivalence, not identical implementation.",
+    "theme": "Build a candidate theme with candidate Sass facade using browser-required-cells.mjs themeSource: indigo primary, pink A200/A100/A400 accent, red warn, light density 0, mat.core(), mat.legacy-core(), all-legacy-component-themes under a matching wrapper. Reference uses verified Material 16 legacy-indigo-pink.css; do not claim style byte identity or theme equivalence without comparison. Include fixture root in candidate light wrapper; record resulting CSS and hashes. Ensure styles do not suppress enabled CSS transitions.",
+    "same_contract": "Exact consumer template, labels, action inputs and snapshots must remain identical; preserve action schedules and report public events faithfully. No manual change detection. Separate process/page/injector for each runtime."
+  },
+  "qualification_before_build": [
+    "Root chooses exact line and artifact/profile identity; check current HEAD/worktree and capture source, complete dist, peer, tool and theme hashes, and provenance. Do not conflate workspace-dist with a freshly packed artifact.",
+    "Verify runtime peer graph and package provenance, no implicit newer peers, no @angular/animations in candidate bundle metafile; use only frozen authorized inputs and scratch outputs.",
+    "Record browser identity and reduced-motion preference, then first isolated JIT bootstrap smoke; if unsupported, report failure and plan separate bounded linker path rather than modifying fixture assertions.",
+    "Only after root review, build and execute the same CDP cases; preserve failures/inconclusives and reference observations independently."
+  ],
+  "limits": [
+    "Existing workspace-dist freshness is unproved and current worktree is changing.",
+    "No candidate build or runtime performed; CSS/provider equivalence and JIT are unverified.",
+    "Reference compiled-template verification left two generated barrel maps unresolved, so neither side currently establishes C04 closure."
+  ]
+}

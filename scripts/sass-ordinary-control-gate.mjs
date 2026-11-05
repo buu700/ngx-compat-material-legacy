@@ -28,7 +28,7 @@ const raw=readFileSync(new URL('../'+INPUTS,import.meta.url));assert.equal(hash(
 const ownedRaw=readFileSync(new URL('../fixtures/sass/owned-aggregate-contracts.json',import.meta.url));assert.equal(hash(ownedRaw),'b83f5ee9e898004e2fce2ae49719dbed923dd2b5eabf06f3f463a8ad33f24c7a');const owned=JSON.parse(ownedRaw);assert.equal(owned.cases.length,20);
 const packet=JSON.parse(raw),contexts=new WeakMap(),referenceRuns=new WeakMap();
 const dependencies=[
- ['scripts/current-sass-spinner-snack-contract.mjs','daf5e32273427d49a9088011c68649c39e8806ad44f8ca4d7de0190c546a1603'],
+ ['scripts/current-sass-spinner-snack-contract.mjs','1d826e445dcd35f19d3bc5529f54248966cb3151833f5e7319badf904881e3e7'],
  ['compatibility/rc/ordinary-checkbox-button-expectation-model-v1.mjs','f094e84d2ce8a3f36aab239eb0d30940da976072a85ca0edcf29b8afb6dc9fb0'],
  ['compatibility/rc/ordinary-checkbox-button-legacy-composition-model-v1.mjs','2b136425698aa80d0ae368f74968fff94267d40b612b00b0bfba5577763a0692'],
  ['compatibility/rc/ordinary-checkbox-button-legacy-composition-cases-v1.json','8f4186d34848a0f298170c2124bbb727ff31a3995a1e8f041ab05476ffe1125d'],

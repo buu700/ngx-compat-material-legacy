@@ -43,7 +43,7 @@ _DEPENDENCIES={
  'compatibility/rc/ordinary-checkbox-button-legacy-composition-model-v1.mjs':'2b136425698aa80d0ae368f74968fff94267d40b612b00b0bfba5577763a0692',
  'compatibility/rc/ordinary-checkbox-button-legacy-composition-cases-v1.json':'8f4186d34848a0f298170c2124bbb727ff31a3995a1e8f041ab05476ffe1125d',
  'compatibility/rc/ordinary-checkbox-button-legacy-composition-known-before-v1.json':'3e96bf8c73dc35d1cb9d132c74f69b6f91ee7d22b19b185cf3540d68d3cb9f43',
- 'scripts/current_sass_spinner_snack_admission.py':'7a3f854589e7d7054b36c3ee921cfbe3c9191cc90737e065fbb5cff9be99e373',
+ 'scripts/current_sass_spinner_snack_admission.py':'4802bf8827a5ec45569efd5b5d010ab934f72d63ff371fa097fd358892d99d85',
  'scripts/sass_ordinary_control_css.py':'fd6e306d13fc5a1abb054065ee0e7e9208b5fe49e89d586d6733eaba18afb559',
  'scripts/sass_default_aggregate_admission.py':'35089797f4f06a5d602768b1e8710ff69e855e6262918e8d680fc4f6550106b5',
  'scripts/sass_aggregate_color_theme_admission.py':'5ab3e46159e9c69f22713c69e98594b25f919ce1f83a1c540392c642a21e2622',

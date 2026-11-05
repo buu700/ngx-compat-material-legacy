@@ -1,0 +1,76 @@
+{
+  "review": "T14 current Sass source guard-node static review",
+  "scope": "Read-only source inspection of both maintained roots; no tests, profiles, runtime execution, or repository writes.",
+  "roots": {
+    "21": {
+      "scripts/current-sass-source.mjs": {
+        "sha256": "eb96891168b146becaf5cbd9e437509a3e2371945e982fc58ca6b343cefb4160",
+        "bytes": 15564
+      },
+      "scripts/current_sass_source.py": {
+        "sha256": "2a8672f63c9639b6e600240db25a7148573f778caaae69a768fd27eb6b435ab3",
+        "bytes": 13870
+      },
+      "scripts/canonical-source-guard-plan.mjs": {
+        "sha256": "4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f",
+        "bytes": 4609
+      },
+      "tests/test_current_sass_source.py": {
+        "sha256": "0e0e68b23da2fa8c6f06277225a678cc9bc2cfe6eb0e12f390c0aa59940d0355",
+        "bytes": 9064
+      },
+      "scripts/current-sass-spinner-snack-contract.mjs": {
+        "sha256": "1d826e445dcd35f19d3bc5529f54248966cb3151833f5e7319badf904881e3e7",
+        "bytes": 15655
+      }
+    },
+    "main": {
+      "scripts/current-sass-source.mjs": {
+        "sha256": "eb96891168b146becaf5cbd9e437509a3e2371945e982fc58ca6b343cefb4160",
+        "bytes": 15564
+      },
+      "scripts/current_sass_source.py": {
+        "sha256": "2a8672f63c9639b6e600240db25a7148573f778caaae69a768fd27eb6b435ab3",
+        "bytes": 13870
+      },
+      "scripts/canonical-source-guard-plan.mjs": {
+        "sha256": "4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f",
+        "bytes": 4609
+      },
+      "tests/test_current_sass_source.py": {
+        "sha256": "0e0e68b23da2fa8c6f06277225a678cc9bc2cfe6eb0e12f390c0aa59940d0355",
+        "bytes": 9064
+      },
+      "scripts/current-sass-spinner-snack-contract.mjs": {
+        "sha256": "1d826e445dcd35f19d3bc5529f54248966cb3151833f5e7319badf904881e3e7",
+        "bytes": 15655
+      }
+    }
+  },
+  "paired_copies_match": true,
+  "verified_source_js_pin": {
+    "path": "scripts/current-sass-source.mjs",
+    "sha256": "eb96891168b146becaf5cbd9e437509a3e2371945e982fc58ca6b343cefb4160",
+    "bytes": 15564,
+    "matches_both_roots": true
+  },
+  "findings": [
+    {
+      "severity": "blocker",
+      "path": "scripts/current-sass-spinner-snack-contract.mjs",
+      "detail": "PINS[0] still authenticates scripts/current-sass-source.mjs at 4fa09c23f2a55b24fe3e412793f66868e8e5fc17cc161bee6dc4d2706536d346/14051 bytes, while actual current source is eb96891168b146becaf5cbd9e437509a3e2371945e982fc58ca6b343cefb4160/15564 bytes. createCurrentSpinnerSnackContract calls member() for all PINS before creating current source, so construction necessarily rejects. expectedDescriptor.source_subject also uses this stale PINS[0]."
+    }
+  ],
+  "planner_bound_propagation": "The new planner reference is bound by member(plannerReference) and therefore appears in source.bound. Reviewed current Sass consumers and probes generally derive exact successors dynamically from source.bound (e.g. sass-spinner-snack-c04-source.mjs and current Sass slider reports), so no separate static expected-member cardinality mismatch was found. The stale spinner-snack pin above is the concrete incompatible consumer.",
+  "static_design_review": {
+    "sameinstance_local_node": "Guard node is frozen and per-instance, dependencies are empty; preflight/final run assertPhysical without supplied reader callbacks. Consume traverses all bound references through member() (physical read, optional callback equality, physical reread, identity check). Each phase sets active before planner/source assertions and clears it in finally.",
+    "reentry": "assertCurrent, qualify, and assertHistoricalSource check idle; nested same-instance/alternate plan attempts during callbacks encounter the same active node and fail. Distinct constructor instances have separate closures.",
+    "planner_binding": "Imports composeCanonicalSourceGuards, checks imported binding identity, function source hash, and physical helper SHA/size before and after each phase; planner file is added to bound references.",
+    "semantics": "Historical comparison and transition construction remain data-only; public qualify/assertHistoricalSource logic and descriptor are intact apart from binding the helper in bound.",
+    "fixture": "candidate_fixture copies canonical-source-guard-plan.mjs so actual JS planner can be loaded from fixture. Python SOURCE_JS pin matches actual JS source bytes; JS/Python parity asserts descriptor, transitions, source sets and successors, not bound cardinality."
+  },
+  "limitations": [
+    "No runtime/tests/profile were run, per instruction.",
+    "Root tests were still being written at review time; their eventual coverage and outcome are not assessed."
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "schema": "parent-c04-tabs-reference-execution-summary-v1",
+  "observations": "/tmp/parent-c04-tabs-reference-observations-v1.json",
+  "harness": "/tmp/parent-c04-tabs-reference-cdp-v1.mjs",
+  "metafile_verification": "/tmp/parent-c04-tabs-reference-metafile-verification-v1.json",
+  "browser": "Chrome/156.0.8078.79",
+  "cases": [
+    {
+      "id": "initial-default-enabled",
+      "status": "observed",
+      "phase_count": 1
+    },
+    {
+      "id": "initial-second-noop-tabindex",
+      "status": "observed",
+      "phase_count": 1
+    },
+    {
+      "id": "noop-detach-roundtrip",
+      "status": "observed",
+      "phase_count": 7
+    },
+    {
+      "id": "noop-preserved-roundtrip",
+      "status": "observed",
+      "phase_count": 7
+    },
+    {
+      "id": "program-change-focus-outgoing-detach",
+      "status": "observed",
+      "phase_count": 5
+    },
+    {
+      "id": "program-change-focus-outgoing-preserved",
+      "status": "observed",
+      "phase_count": 8
+    },
+    {
+      "id": "pointer-selection",
+      "status": "observed",
+      "phase_count": 4
+    },
+    {
+      "id": "keyboard-navigation-selection",
+      "status": "observed",
+      "phase_count": 5
+    },
+    {
+      "id": "rapid-reverse-enabled",
+      "status": "observed-correlation-unproven",
+      "phase_count": 6
+    },
+    {
+      "id": "runtime-input-changes",
+      "status": "observed",
+      "phase_count": 9
+    }
+  ],
+  "observed_examples": [
+    "Noop preserve=false roundtrip destroyed Alpha instance 1 and created Alpha instance 3 on return; preserve=true retained Alpha instance 1.",
+    "After programmatic transition from focused Alpha, both preserved and detached variants no longer had the Alpha button as active element at settled snapshot.",
+    "Configured contentTabIndex=0 appeared on the selected panel and not the inactive panel in observed settled states."
+  ],
+  "limits": [
+    "Reference fixture feasibility observations only; no comparison, C04 closure, screen-reader behavior or candidate qualification.",
+    "Source verification records two unresolved generated barrels; JIT fixture was consumer-only.",
+    "Void animationDone event cannot associate completion with a specific cancelled cycle; all public event records and local animation state retained.",
+    "CDP AX is browser accessibility tree, not screen-reader speech.",
+    "Rapid reversal returned to selected Alpha before the first completion event, but void completion cannot be matched to a specific animation cycle.",
+    "The first launch failed to find DevToolsActivePort because snap Chromium uses a private temporary directory; corrected run used the DevTools URL from process stderr and completed in a fresh profile.",
+    "No candidate run, no expected-output golden and no C04 closure."
+  ]
+}

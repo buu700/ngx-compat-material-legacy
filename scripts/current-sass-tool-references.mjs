@@ -36,7 +36,7 @@ const V3_SOURCE_ANCHORS={
 const V3_REGRESSION_SOURCE_ANCHORS={"21.x":{"tests/browser_reference_source_probe.mjs":{"before":{"path":"tests/browser_reference_source_probe.mjs","sha256":"cca4093034ebb6932fc7e822e70e684413b55d8fff12b40dcccbfdc07713a0e7","bytes":7558},"packet":{"path":"compatibility/rc/c04-browser-reference-source-inputs.json","sha256":"5a8bd910e0d9a64a73558b5da0f48abdf8546b455d8db0fcb921678a0ee0a5ae","bytes":115478},"source_member_index":50},"scripts/browser-reference-proposal.mjs":{"before":{"path":"scripts/browser-reference-proposal.mjs","sha256":"600a430a33955755561f018f46288acd4beed4b9ad4ca6b4daf8aa7cb5bf1d50","bytes":13492},"packet":{"path":"compatibility/rc/c04-browser-owner-inputs.json","sha256":"710201dd63bfb326485cd2933a9747d53f54b2cf833c47ce332816b0e0db526a","bytes":15193},"transition_index":3}},"main":{"tests/browser_reference_source_probe.mjs":{"before":{"path":"tests/browser_reference_source_probe.mjs","sha256":"cca4093034ebb6932fc7e822e70e684413b55d8fff12b40dcccbfdc07713a0e7","bytes":7558},"packet":{"path":"compatibility/rc/c04-browser-reference-source-inputs.json","sha256":"4b0167af85263a3fb652806e25186e8500e02424749adb860610519d28817e6c","bytes":115393},"source_member_index":48},"tests/checker_reference_source_probe.mjs":{"before":{"path":"tests/checker_reference_source_probe.mjs","sha256":"0c1158d9c1dcbe5a33f6d8f7660e8ad0435b031020a9610f76655f4648f211a8","bytes":15116},"packet":{"path":"compatibility/rc/c04-checker-owner-inputs.json","sha256":"f909f0a47fa49c1c3ba9e84718ad7ba461216cb7da12b61b972be87aa3ba7afc","bytes":12073},"transition_index":0},"scripts/browser-reference-proposal.mjs":{"before":{"path":"scripts/browser-reference-proposal.mjs","sha256":"600a430a33955755561f018f46288acd4beed4b9ad4ca6b4daf8aa7cb5bf1d50","bytes":13492},"packet":{"path":"compatibility/rc/c04-browser-owner-inputs.json","sha256":"d22d4c657197ee2640dd1079861e54fde35e55b9091b7d44f4e024d4b37b46cb","bytes":15192},"transition_index":3},"scripts/checker-reference-proposal.mjs":{"before":{"path":"scripts/checker-reference-proposal.mjs","sha256":"22c49ba434ee0b1253ad2815b77510adb8259cc3f307005f6b66b73e522502ac","bytes":13095},"packet":{"path":"compatibility/rc/c04-checker-owner-inputs.json","sha256":"f909f0a47fa49c1c3ba9e84718ad7ba461216cb7da12b61b972be87aa3ba7afc","bytes":12073},"transition_index":2},"scripts/browser-reference-source.mjs":{"before":{"path":"scripts/browser-reference-source.mjs","sha256":"59f2ac538149e0d9b2176c231a97147862881fb19b46768a5a4e450d66f9fe38","bytes":10443},"packet":{"path":"compatibility/rc/c04-browser-owner-inputs.json","sha256":"d22d4c657197ee2640dd1079861e54fde35e55b9091b7d44f4e024d4b37b46cb","bytes":15192},"transition_index":2}}};
 const PREVIOUS_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v1.json',sha256:'ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f',bytes:478008};
 const CHECKPOINTS={'21.x':'b25aedd02f7b53e8cd8dfcdad369a806a1301619',main:'5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'};
-const INPUTS_SHA='1f5b7d412216614f49cc600fd8f000df2ddd2627b7ddc20f0ed14c31e9e28958';
+const INPUTS_SHA='fede9d004968e81c13a5de2ec27be201003513d83735f55f3f8c6d7c01ef48eb';
 const image=readFileSync(fileURLToPath(import.meta.url));
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const reference=(path,raw)=>({path,sha256:hash(raw),bytes:raw.length});
@@ -204,8 +204,9 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
   let row=rows.get(update.path);
   if(row)assert.deepEqual(update.before,{path:row.path,...row.after},'V3 overlay does not follow exact V2 current row');
   else{
-   assert.ok(line==='21.x'||Object.hasOwn(V3_REGRESSION_SOURCE_ANCHORS[line],update.path),'unknown non-21.x V3 new-row path');
+   assert.ok(line==='21.x'||update.path==='scripts/historical-contract-repair-source.mjs'||Object.hasOwn(V3_REGRESSION_SOURCE_ANCHORS[line],update.path),'unknown non-21.x V3 new-row path');
    const finiteBefore={
+    'scripts/historical-contract-repair-source.mjs':{path:update.path,sha256:'d4870c2cc12609da71b03c1745996693dd26444b2dfd848260cfda1ac3514da5',bytes:13052},
     'scripts/legacy-removal-canonical-stage.mjs':{path:update.path,sha256:'9b5021340fcab66f2c2b45447b5162f0e25b002b45c7ea7c062c8087dfb80d6c',bytes:8412},
     'tests/test_packed_upstream_ledger_epoch.py':{path:update.path,sha256:'f7b3ae0ede9bd62fb033c49017a84d5b4ca81ce8b7920d72a105b1df1393e6df',bytes:17868},
     'scripts/browser-reference-source.mjs':{path:update.path,sha256:'59f2ac538149e0d9b2176c231a97147862881fb19b46768a5a4e450d66f9fe38',bytes:10443},
@@ -220,6 +221,7 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
    };
    for(const [path,anchor]of Object.entries(V3_REGRESSION_SOURCE_ANCHORS[line]))finiteBefore[path]=anchor.before;
    assert.ok(Object.hasOwn(finiteBefore,update.path),'unknown V3 new-row path');assert.deepEqual(update.before,finiteBefore[update.path]);
+   if(update.path==='scripts/historical-contract-repair-source.mjs')assert.deepEqual(update.before,historical.unchanged_source_subject,'historical repair overlay must follow the immutable source identity');
    const anchor=V3_REGRESSION_SOURCE_ANCHORS[line][update.path]??V3_SOURCE_ANCHORS[update.path];
    if(anchor){
     const packet=JSON.parse(member(anchor.packet));

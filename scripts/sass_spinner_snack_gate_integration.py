@@ -34,7 +34,7 @@ SPINNER_SNACK_DEFAULT_CASES=tuple(value for value in SPINNER_SNACK_BRIDGE_CASES 
 _CONTEXTS=weakref.WeakKeyDictionary()
 _ROOT_CONTEXTS={}
 _DEPENDENCIES={
- 'scripts/current_sass_spinner_snack_admission.py':'7a3f854589e7d7054b36c3ee921cfbe3c9191cc90737e065fbb5cff9be99e373',
+ 'scripts/current_sass_spinner_snack_admission.py':'4802bf8827a5ec45569efd5b5d010ab934f72d63ff371fa097fd358892d99d85',
  'scripts/sass_spinner_snack_bridge_admission.py':'66a9ad634bede4e0eeef23ece0fe50d49d6fbf28d5bc619da0873d6ec8fae0f3',
  'scripts/sass_spinner_snack_aggregate_admission.py':'2d55dedfe1d1da672337389730e3c31882b8993e0fd40a375950b714a61b6cba',
  'scripts/current_sass_card_aggregate.py':'7088b5636766affcde42210908c9dec0902a91d80d253aebac4675f2e1150856',

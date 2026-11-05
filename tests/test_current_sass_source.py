@@ -29,7 +29,7 @@ def candidate_fixture(destination):
     census = json.loads((ROOT / packet['style_template_census']['path']).read_bytes())
     line = '21.x' if json.loads((ROOT / 'projects/ngx-material-legacy/package.json').read_bytes())['version'].startswith('21.') else 'main'
     source = base['branches'][line]
-    paths = {INPUTS, 'scripts/current-sass-source.mjs', 'scripts/current_sass_source.py'}
+    paths = {INPUTS, 'scripts/current-sass-source.mjs', 'scripts/current_sass_source.py', 'scripts/canonical-source-guard-plan.mjs'}
     paths.add(packet['prior_four_module_profile']['packet']['path'])
     paths.update(packet[key]['path'] for key in ('historical_source_packet', 'historical_source_subject', 'historical_css_packet', 'proposal', 'protected_input_packet', 'style_template_census'))
     paths.update(css[key]['path'] for key in ('oracle', 'catalog', 'provenance', 'reference_lock'))

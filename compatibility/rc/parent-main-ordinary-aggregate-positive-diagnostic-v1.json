@@ -1,0 +1,24 @@
+{
+  "scope": "Main-only targeted reproduction of test_current_sass_ordinary_aggregate_gate.py::CurrentOrdinaryAggregateGateTests.test_bounded_three_dimension_composition",
+  "command": "python3 /tmp/diagnose-main-card-gap.py",
+  "result": "single test fails at positive mixin-css/all-component-colors",
+  "instrumented_false_branch": {
+    "function": "sass_spinner_snack_gate_integration._aggregate",
+    "branch": "final exact CSS equality, after all preceding case/descriptor/measurement/default-envelope checks pass",
+    "line": 195
+  },
+  "css_evidence": {
+    "expected_bytes": 106608,
+    "expected_sha256": "feb42d7f181c63715dcd2703cc716ba5adf3271f90a7f5ddb837bacd632ee064",
+    "fixture_actual_bytes": 105987,
+    "fixture_actual_sha256": "0ea97d09118fb579a23bf035e658639d7b9037031c77ef95aed9366239579fcb",
+    "card_shape_tokens_absent_from_fixture_actual": true,
+    "applying_gate_insert_card_model_to_fixture_actual_returns_exact_expected": true
+  },
+  "cause": "Test fixture builds actual CSS by applying only insert_ordinary_checkbox_button_into_aggregate_model to row.current.css. Gate expectation composes spinner/snack, ordinary, then card; fixture omits the card transformation. The final expected CSS differs by card shape and outlined width declarations.",
+  "baseline": "The test fixture and gate both match HEAD; gate HEAD already applies insert_card_into_aggregate_model after ordinary insertion. Current gate diff for this path only changes the dependency hash. This is a preexisting modeled positive fixture omission, not introduced by current source/pin updates.",
+  "limitations": [
+    "One test only, main root only, using its exact candidate fixture and pinned Node subprocess.",
+    "No maintained files or expectations changed; no broader suite or CSS compilation performed."
+  ]
+}

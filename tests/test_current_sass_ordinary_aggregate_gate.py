@@ -17,6 +17,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(ROOT/'scripts'),str(ROOT/'tests')]
 import sass_spinner_snack_gate_integration as gate
 from sass_ordinary_aggregate_admission import insert_ordinary_checkbox_button_into_aggregate_model
+from current_sass_card_aggregate import insert_card_into_aggregate_model
 from test_current_sass_source import candidate_fixture,NODE
 from sass_default_aggregate_fixture import default_aggregate_receipt
 from sass_mixin_fixture import mixin_receipt
@@ -34,6 +35,7 @@ class CurrentOrdinaryAggregateGateTests(unittest.TestCase):
             # references to the same authenticated peer package roots.
             paths=['scripts/sass-spinner-snack-gate-integration.mjs','scripts/sass-spinner-snack-bridge-contract.mjs',
                 'scripts/current-sass-spinner-snack-contract.mjs','scripts/sass-spinner-snack-aggregate-contract.mjs',
+                'scripts/current-sass-card-aggregate-contract.mjs','compatibility/rc/ordinary-card-public-bridge-model-v1.mjs',
                 'scripts/sass-ordinary-aggregate-contract.mjs','compatibility/rc/ordinary-checkbox-button-expectation-model-v1.mjs',
                 'scripts/sass-default-aggregate-contract.mjs','scripts/sass-aggregate-color-theme-contract.mjs',
                 'scripts/sass-aggregate-typography-contract.mjs','scripts/sass-ripple-color-contract.mjs',
@@ -52,6 +54,8 @@ class CurrentOrdinaryAggregateGateTests(unittest.TestCase):
                 row=next(row for row in packet['rows'] if row['case_id']==case)
                 body=default_aggregate_receipt(active,case,invocation) if case.startswith('mixin-css/') else mixin_receipt(ROOT,active,case,invocation)
                 css=insert_ordinary_checkbox_button_into_aggregate_model(case_id=case,css=row['current']['css']);self.assertIsNotNone(css)
+                # This archived row predates the separately owned card successor.
+                css=insert_card_into_aggregate_model(case_id=case,css=css);self.assertIsNotNone(css)
                 actual={**measured(css),'program_sha256':row['current']['logical_program_sha256'],'line':line,'sass_version':state['branch']['compiler'],'sources':copy.deepcopy(state['current_sources'])}
                 body.update(current_spinner_snack_bridge=copy.deepcopy(descriptor),error=None)
                 if case.startswith('mixin-css/'):
