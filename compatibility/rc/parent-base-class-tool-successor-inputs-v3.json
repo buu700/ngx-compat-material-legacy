@@ -133,8 +133,8 @@
           },
           "after": {
             "path": "scripts/legacy-removal-owner-source.mjs",
-            "sha256": "b22d02c4ca9a80d1efcecb8520a5ce8f28fb64d11849dcf37910153375c805b4",
-            "bytes": 7007
+            "sha256": "584e49ad810cb7676302d0760a8d3f40f8749661b8f6dce11706b27758037041",
+            "bytes": 7030
           },
           "edits": [
             {
@@ -146,6 +146,11 @@
               "offset": 1619,
               "before": "",
               "after": " const actual=packedUpstreamLedgerCurrentSourceLane({root,read});\n"
+            },
+            {
+              "offset": 4852,
+              "before": " const qualifyReference=value=>{const ref=successor.predecessorReference(value),row=transitions.get(ref.path);if(!row)return ref.path==='scripts/upstream-source-contract-registry.mjs'?qualifyRegistry(ref):{...ref};const previous=ref.sha256===row.before.sha256?row.before:ref.sha256===row.after.sha256?row.after:null;assert.ok(previous,'unqualified legacy code reference '+ref.path);if(ref.bytes!==undefined)assert.equal(ref.bytes,previous.bytes);return successor.qualifyReference({...ref,sha256:row.after.sha256,bytes:row.after.bytes});};\n",
+              "after": " const qualifyReference=value=>{const ref=successor.predecessorReference(value),row=transitions.get(ref.path);if(!row)return ref.path==='scripts/upstream-source-contract-registry.mjs'?qualifyRegistry(ref):successor.qualifyReference(ref);const previous=ref.sha256===row.before.sha256?row.before:ref.sha256===row.after.sha256?row.after:null;assert.ok(previous,'unqualified legacy code reference '+ref.path);if(ref.bytes!==undefined)assert.equal(ref.bytes,previous.bytes);return successor.qualifyReference({...ref,sha256:row.after.sha256,bytes:row.after.bytes});};\n"
             },
             {
               "offset": 6027,
