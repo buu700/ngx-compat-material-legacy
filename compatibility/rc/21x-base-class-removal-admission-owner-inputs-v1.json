@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Exact base-class physical frames and explicit appended owner implementation; historical pure stage is DATA only",
+  "source_parent": "d8ab97315b6c77b83f42c2bebcf63b2984fff255",
+  "proposal": {
+    "path": "compatibility/rc/21x-base-class-removal-admission-canonical-proposal-v6.json",
+    "sha256": "720a4fcd0c9d0d67afbeddd106fc9741d7ab34a0848edc1a0f2e6a25019b9881",
+    "bytes": 3578
+  },
+  "stage_before": {
+    "path": "scripts/base-class-removal-canonical-stage.mjs",
+    "sha256": "8b9c27362bf89a53bcb2b27ca185d4da9200014a807be02ffd2a6b7df6d0de13",
+    "bytes": 4514,
+    "git_blob": "aba1ca53b17cd782edd5c8eb79a23ed8dbaaf82f"
+  },
+  "ledger_before": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "e9ef5c0bf543977809134c3367cf9a33bdda62233ab6b944dc3c4e4ac101585e",
+    "bytes": 4191043,
+    "git_blob": "68a336be1682c08108d05c1b5e6e6171628da6cd"
+  },
+  "registry_before": {
+    "path": "scripts/upstream-source-contract-registry.mjs",
+    "sha256": "be50b37d181b43960361860dd7cb3bb24d0f2d1b0a2ecfaa5a85a791e4869399",
+    "bytes": 15548,
+    "git_blob": "1df739d13f0ee095594a3050a431629feaee3f24"
+  },
+  "stage_extension_template": "\n/** The immutable proposal above remains DATA-authenticated; this appended owner\n * composes fresh physical source qualification without applying canonical files. */\nimport {baseClassRemovalOwnerSourceSubject} from './base-class-removal-owner-source.mjs';\nimport {readFileSync} from 'node:fs';\nimport {join} from 'node:path';\nexport const BASE_CLASS_REMOVAL_OWNER_SOURCE_SHA256 = '__BASE_OWNER_IMAGE_SHA256__';\nconst ownerIsBuffer = Buffer.isBuffer, ownerBufferEquals = Buffer.prototype.equals, ownerApply = Reflect.apply;\nconst ownerEqual = (actual, supplied) => ownerIsBuffer(supplied) && ownerApply(ownerBufferEquals, actual, [supplied]);\nfunction ownerValue(object, key) {\n  const descriptor = Object.getOwnPropertyDescriptor(object, key);\n  assert.ok(descriptor && Object.hasOwn(descriptor, 'value'), 'non-data prior base-class metadata ' + key);\n  return descriptor.value;\n}\nfunction ownerDataCopy(object) {\n  return Object.fromEntries(Object.entries(Object.getOwnPropertyDescriptors(object)).map(([key, descriptor]) => {\n    assert.ok(Object.hasOwn(descriptor, 'value'), 'non-data prior base-class field ' + key);\n    return [key, descriptor.value];\n  }));\n}\n\nexport function baseClassRemovalOwnerContext({root, read = path => readFileSync(join(root, path))} = {}) {\n  const owner = baseClassRemovalOwnerSourceSubject({root, read});\n  const frames = owner.frames, applied = frames.applied;\n  const before = Buffer.from(owner.stage.before), after = Buffer.from(owner.stage.after);\n  const bound = new Map(owner.bound.map(ref => [ref.path, {...ref}]));\n  const assertCurrent = () => owner.assertCurrent();\n  const metadataRead = path => {\n    if (path !== BASE_CLASS_REMOVAL_LEDGER) return read(path);\n    frames.assertCurrent();\n    const current = read(path);\n    assert.ok(ownerEqual(frames.ledgerSubject().raw, current), 'late base-class private ledger input');\n    return applied ? Buffer.from(before) : current;\n  };\n  const wrapPrepared = prior => {\n    assert.ok(ownerEqual(before, ownerValue(prior, 'canonical_after')), 'base-class stage does not follow complete table owner');\n    const priorBound = ownerValue(prior, 'bound'); assert.ok(priorBound instanceof Map);\n    const priorGuard = ownerValue(prior, 'assertCurrent'), metadataGuard = ownerValue(prior, 'prior_metadata_assert_current');\n    assert.equal(typeof priorGuard, 'function'); assert.equal(typeof metadataGuard, 'function');\n    const native = ownerValue(prior, 'native_spec_source');\n    const nativeReferences = ownerValue(native, 'bound'), nativeGuard = ownerValue(native, 'assertCurrent');\n    assert.ok(Array.isArray(nativeReferences)); assert.equal(typeof nativeGuard, 'function');\n    const assertPriorMetadata = () => {\n      assert.equal(ownerValue(prior, 'assertCurrent'), priorGuard, 'changed prior base-class source guard');\n      assert.equal(ownerValue(prior, 'prior_metadata_assert_current'), metadataGuard, 'changed prior base-class metadata guard');\n      assert.equal(ownerValue(prior, 'native_spec_source'), native, 'changed prior base-class native subject');\n      assert.equal(ownerValue(native, 'assertCurrent'), nativeGuard, 'changed prior base-class native guard');\n      assert.equal(ownerValue(prior, 'bound'), priorBound, 'changed prior base-class bound map');\n      assert.equal(ownerValue(native, 'bound'), nativeReferences, 'changed prior base-class native references');\n      assert.ok(ownerEqual(before, ownerValue(prior, 'canonical_after')), 'late prior base-class ledger');\n    };\n    const assertPrior = () => {\n      assertPriorMetadata(); assertCurrent(); assertPriorMetadata();\n      priorGuard(); metadataGuard(); assertCurrent(); assertPriorMetadata();\n    };\n    const currentBound = new Map(priorBound);\n    for (const ref of bound.values()) currentBound.set(ref.path, ref.sha256);\n    const nativeBound = nativeReferences.map(ref => {\n      const actual = bound.get(ref.path);\n      return actual ? {...ref, sha256: actual.sha256, bytes: actual.bytes} : {...ref};\n    });\n    assertPrior();\n    return {...ownerDataCopy(prior), canonical_after: Buffer.from(after), bound: currentBound,\n      base_class_removal_stage: {...owner.stage, before: Buffer.from(before), after: Buffer.from(after),\n        entries: structuredClone(owner.stage.entries), assertCurrent: assertPrior,\n        physically_applied: applied, source_scope_only: true, current_native_or_packed_or_floor_qualified: false},\n      native_spec_source: {...ownerDataCopy(native), bound: nativeBound,\n        assertCurrent: () => {assertPrior(); nativeGuard(); assertPrior();}},\n      assertCurrent: assertPrior, prior_metadata_assert_current: assertPrior};\n  };\n  assertCurrent();\n  return {applied, registryApplied: frames.registryApplied, precursor: frames.precursor,\n    before: Buffer.from(before), after: Buffer.from(after),\n    registryBefore: Buffer.from(owner.registryBefore), registryAfter: Buffer.from(owner.registryAfter),\n    metadataRead, wrapPrepared, bound: structuredClone([...bound.values()]), assertCurrent,\n    source_facts: structuredClone(owner.source.facts), source_scope_only: true,\n    current_native_packed_browser_floor_or_full_audit_qualified: false};\n}\n",
+  "stage_extension_substitution": "Exactly one __BASE_OWNER_IMAGE_SHA256__ occurrence is replaced with SHA256 of the loaded/current identical leaf; no other token or source normalization",
+  "pure_function_sha256": {
+    "baseClassRemovalRegistrySuccessor": "50e2ac726bf5d77b8a6219429d53ad3e987a7b0c3fbc7ac50e1ef009c67206f3",
+    "applyBaseClassRemovalCanonicalStage": "5c89ccc9d92556d2a1612bfb0f47980a03202b0455211aca04c3d28bf221d30a"
+  },
+  "source_scope_only": true,
+  "canonical_changes_applied": false,
+  "g11_claim": "not-passed",
+  "inspect_source_function_sha256": "a51ba5f5ab6574b638906895aea1ff462fc120f84ad0a1a4333d8066f19fb389"
+}

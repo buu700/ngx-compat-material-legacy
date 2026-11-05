@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "role": "independent-read-only-base-class-owner-source-review",
+  "status": "three concrete callback/identity boundary corrections required before bounded source qualification",
+  "reviewed_refs": [
+    {
+      "path": "scripts/base-class-removal-owner-source.mjs",
+      "sha256": "1fb990164eb09c110787cc41f85b3874be490b6ab1a0e8bc124735062c71631a",
+      "bytes": 13176
+    },
+    {
+      "path": "scripts/base-class-removal-canonical-stage.mjs",
+      "sha256": "0c838cc2fbba01164882917dde1b21d3d234f33040ef67ef3bf56af1413bef15",
+      "bytes": 8396
+    },
+    {
+      "path": "compatibility/rc/21x-base-class-removal-admission-owner-inputs-v1.json",
+      "sha256": "c58c57b047d54b9f62740a769786a62d52bd91cba08bd419bc24cfaa82a5fa56",
+      "bytes": 5777
+    },
+    {
+      "path": "tests/parent-base-class-owner-implementation-probe-v1.mjs",
+      "sha256": "99380c1fb8e808fc07fd4b2af96a6c6775ff01256f6b567a81dcca71c8d74719",
+      "bytes": 12437
+    },
+    {
+      "path": "compatibility/rc/parent-base-class-owner-implementation-receipt-v1.json",
+      "sha256": "bc2d7a8d1363979a25d0646fe4fbc2f1278e2d1bd988864dddec8bcf57693b65",
+      "bytes": 4274
+    },
+    {
+      "path": "compatibility/rc/parent-base-class-owner-implementation-controls-v1.json",
+      "sha256": "cccf238d30db0f2799ab5f892e0c41782e307939b1f3e70cb1be9f29881453fc",
+      "bytes": 5155
+    },
+    {
+      "path": "scripts/upstream-base-class-removal-admission.cjs",
+      "sha256": "013cbe4ae44ebebcf8331d2aedca972f15c824dd4e61bc795f0efa188d35b69a",
+      "bytes": 14322
+    },
+    {
+      "path": "scripts/table-local-compilation-owner-source.mjs",
+      "sha256": "ea923e05a1a205af2e0c455233ca77483abd2614348bbb0dbf34e1867db6f1f1",
+      "bytes": 8837
+    },
+    {
+      "path": "scripts/table-local-compilation-canonical-stage.mjs",
+      "sha256": "13cfd062a7623d3d432edfd01f9ef2e0a4338cfbdc1a1dbe32ad9127f4444b90",
+      "bytes": 8248
+    }
+  ],
+  "source_parent": "d8ab97315b6c77b83f42c2bebcf63b2984fff255",
+  "data_authentication": {
+    "old_pure_stage_git_blob_and_prefix": true,
+    "exact_pinned_template_plus_one_loaded_leaf_SHA_substitution": true,
+    "four_gzip_and_decoded_frames_authenticated_as_DATA": true,
+    "before_ledger_registry_equal_pinned_Git_blobs": true,
+    "decoded_after_counts": {
+      "closed": 427,
+      "open": 1270,
+      "entries": 1697,
+      "registry": 70,
+      "security_review": 1
+    },
+    "no_hash_cycle": "packet pins old stage and fixed extension template; leaf pins packet; stage embeds leaf SHA, derived from template without embedding stage SHA",
+    "no_disk_fallback": "physical reader requires exact maintained root and rejects symlink members; historical Git bodies remain comparison DATA",
+    "fresh_source_handler": "captured original inspectSource identity plus pinned function body; source guard retained and conflicting union refs rejected",
+    "prior_native": "captured source/metadata/native guards retained and independently owned native refs replaced with actual owner refs"
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "status": "source-demonstrated; no new runtime reproduction",
+      "path": "scripts/base-class-removal-owner-source.mjs",
+      "lines": "75-81,135-142",
+      "problem": "Frame current/assertCurrent read actual bytes before calling the supplied reader; assertCurrent has no final callback-free physical pass. Last callback can mutate an already-checked member (or its own path after actual was read), return original bytes, and let the guard return successfully with physical drift.",
+      "static_sequence": [
+        "Construct with unarmed physical reader.",
+        "Arm reader only for final REGISTRY callback in frame.assertCurrent().",
+        "Callback obtains original registry bytes, appends bytes to earlier STAGE, returns original registry buffer.",
+        "Loop validates stored registry bytes and ends; no subsequent trusted STAGE read occurs."
+      ],
+      "smallest_fix": "After every callback in current, verify actual path again; after assertCurrent callback loop, rehash/size every bound member using physical only. Add a final-loop armed regression, preserving the initial test as narrower constructor coverage.",
+      "existing_control_gap": "final-physical-guard-detects-callback-side-effect-after-earlier-stage-read fires during constructor initial registry read, so its later guard catches the mutation; it does not fire during the final guard loop."
+    },
+    {
+      "id": "F2",
+      "status": "source-demonstrated; no new runtime reproduction",
+      "path": "scripts/base-class-removal-owner-source.mjs",
+      "lines": "77,140",
+      "problem": "Exact callback equality invokes caller-owned supplied.equals. A Buffer carrying different bytes can attach equals(){return true}; a getter can also execute during validation. This accepts a nonphysical callback despite the stated boundary, although public current bytes still come from physical().",
+      "smallest_fix": "Capture Buffer.prototype.equals and compare via Reflect.apply using the trusted actual Buffer, after Buffer.isBuffer(supplied). Add wrong Buffer with forged equals/getter controls.",
+      "existing_control_gap": "Cold wrong readers attach assertion/toString methods to the reader function, not an overridden equals on its returned Buffer."
+    },
+    {
+      "id": "F3",
+      "status": "source-demonstrated; no new runtime reproduction",
+      "paths": [
+        {
+          "path": "scripts/base-class-removal-owner-source.mjs",
+          "lines": "202-208"
+        },
+        {
+          "path": "scripts/base-class-removal-canonical-stage.mjs",
+          "lines": "89-97"
+        }
+      ],
+      "problem": "Live metadata/function/native identity checks occur only before callback-bearing source/frame/prior guards. A final callback can replace admission.inspectSource, frames.assertCurrent, prior.assertCurrent, or prior.native_spec_source after their checks and let the current guard return successfully. Detection on the next call is later than the promised guarded return.",
+      "smallest_fix": "Factor callback-free live metadata/function/native/ledger checks and run both before and after all callback-bearing guards. Preserve captured original guard calls and final physical sweep. Add substitutions armed inside the final callback/guard rather than only before invocation.",
+      "existing_control_gap": "Substitution controls change inspectors/guards/native subjects before invocation; none substitutes from the final callback/guard itself."
+    }
+  ],
+  "parent_table_appendix": {
+    "path": "scripts/table-local-compilation-owner-source.mjs",
+    "condition": "Final guard runs actual/frames/repair guards before its actual.read loop, then only compares each same path with readEvidenceMember and returns. Last callback can mutate an earlier bound member after earlier guards/checks.",
+    "smallest_fix": "Final callback-free readEvidenceMember hash/size sweep over actual bound refs. For table canonical-stage projected metadata ledger, use actual-source lane reference mapping or separate actual physical binding map; do not reject approved metadata projection by comparing its projected hash directly to disk."
+  },
+  "existing_36_controls": "Their recorded pass is retained as bounded evidence; it does not cover the three final-callback counterexamples above.",
+  "execution": {
+    "new_runtime_or_probe_executed": false,
+    "source_code_edits": false,
+    "data_only_operations": [
+      "read source/JSON",
+      "hash source/evidence",
+      "read pinned Git blobs",
+      "decompress/hash four static frame images"
+    ],
+    "unexecuted": [
+      "actual physical42770 pair",
+      "complete prior or resulting owner composition",
+      "native/compiler/build/dependency/network/Actions"
+    ]
+  },
+  "not_claimed": [
+    "vulnerability verdict",
+    "canonical approval",
+    "full owner or product qualification",
+    "new runtime reproduction"
+  ]
+}

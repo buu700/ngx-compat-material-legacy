@@ -13,11 +13,13 @@ import {historicalContractRepairReaderSubject} from '../scripts/historical-contr
 const root=process.argv[2],checks=[];
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const check=(name,operation)=>{operation();checks.push(name);};
-const packet=JSON.parse(readFileSync(join(root,'compatibility/rc/current-sass-tool-reference-inputs-v2.json')));
+const successorPath='compatibility/rc/parent-base-class-tool-successor-inputs-v3.json';
+const successor=JSON.parse(readFileSync(join(root,successorPath)));
+const packet=JSON.parse(readFileSync(join(root,successor.previous_epoch.path)));
 const previous=JSON.parse(readFileSync(join(root,packet.previous_epoch.path)));
 const source=currentSassToolReferenceSubject({root}),branch=packet.branches[source.line];
-check('V2 current maintained dispatch',()=>{
- assert.equal(source.epoch,2);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);
+check('V3 current maintained dispatch',()=>{
+ assert.equal(source.epoch,3);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);
 });
 check('all original and latest identities qualify with exact comparison bytes',()=>{
  for(const row of source.transitions){
@@ -46,6 +48,43 @@ check('checkpoint-parent tools and unchanged recipes are finite',()=>{
  for(const row of selected){assert.equal(source.ownsReference(row.before),true);assert.equal(source.ownsReference(row.after),true);}
  const first=selected[0],latest=source.transitions.find(r=>r.path===first.path);
  assert.deepEqual(source.qualify(first.before),{path:first.path,...latest.after});
+});
+check('all V2 current identities remain exact comparison data',()=>{
+ for(const old of branch.updates){
+  const latest=source.transitions.find(r=>r.path===old.path);assert.ok(latest);
+  assert.deepEqual(source.qualify(old.after),{path:latest.path,...latest.after});
+  assert.equal(hash(source.comparisonBytes(old.after)),old.after.sha256);
+ }
+});
+const nextBranch=successor.branches[source.line];
+check('each V3 predecessor and literal successor is exact',()=>{
+ for(const row of nextBranch.updates){
+  assert.equal(hash(source.comparisonBytes(row.before)),row.before.sha256);
+  assert.equal(hash(source.comparisonBytes(row.after)),row.after.sha256);
+  assert.deepEqual(source.qualify(row.before),row.after);
+  assert.deepEqual(source.qualify(row.after),row.after);
+  assert.equal(source.ownsReference({...row.before,bytes:row.before.bytes+1}),false);
+  assert.throws(()=>source.qualify({...row.before,bytes:row.before.bytes+1}));
+  assert.equal(source.qualify({...row.before,sha256:'0'.repeat(64)}),null);
+ }
+});
+check('new table stage predecessor is the frozen owner packet identity',()=>{
+ const row=nextBranch.updates.find(r=>r.path==='scripts/table-local-compilation-canonical-stage.mjs');
+ if(source.line==='21.x'){
+  assert.ok(row);assert.deepEqual(row.before,{path:row.path,sha256:'bdb3137f6db42ed2611ac3a41e400478defed7f0076d203061d1e12d03f63b7c',bytes:8231});
+  assert.deepEqual(source.qualify(row.before),row.after);
+ }else assert.equal(row,undefined);
+});
+check('historical callback cannot stand in for physical overlay source',()=>{
+ const row=nextBranch.updates[0];if(!row)return;
+ const old=source.comparisonBytes(row.before);assert.notEqual(row.before.sha256,row.after.sha256);
+ assert.throws(()=>currentSassToolReferenceSubject({root,read:path=>path===row.path?old:readFileSync(join(root,path))}));
+ source.assertCurrent();
+});
+check('new support bytes reject cold and late physical change',()=>{
+ const ref=nextBranch.additional_inputs[0];assert.ok(ref);const path=join(root,ref.path),raw=readFileSync(path);
+ try{writeFileSync(path,Buffer.concat([raw,Buffer.from('\n')]));assert.throws(()=>source.assertCurrent());assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{writeFileSync(path,raw);}
+ source.assertCurrent();
 });
 const first=source.transitions[0],ref={path:first.path,...first.before};
 check('unknown hash and byte length rejected',()=>{
@@ -92,9 +131,19 @@ check('V1 comparison packet cannot change cold or late',()=>{
  try{writeFileSync(path,Buffer.concat([raw,Buffer.from('\n')]));assert.throws(()=>source.assertCurrent());assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{writeFileSync(path,raw);}
  source.assertCurrent();
 });
-check('V1-only data never selects current maintained factory',()=>{
- const path=join(root,'compatibility/rc/current-sass-tool-reference-inputs-v2.json'),raw=readFileSync(path),visited=[];const sentinel=new Error('stop frozen reader before evaluation');
- try{unlinkSync(path);assert.throws(()=>historicalContractRepairReaderSubject({root,read:name=>{visited.push(name);throw sentinel;}}),error=>error===sentinel);assert.deepEqual(visited,['projects/ngx-material-legacy/package.json']);assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{writeFileSync(path,raw);}
+check('V2 comparison packet cannot change cold or late',()=>{
+ const path=join(root,successor.previous_epoch.path),raw=readFileSync(path);
+ try{writeFileSync(path,Buffer.concat([raw,Buffer.from('\n')]));assert.throws(()=>source.assertCurrent());assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{writeFileSync(path,raw);}
  source.assertCurrent();
 });
-console.log(JSON.stringify({line:source.line,epoch:source.epoch,transitions:source.transitions.length,transition_rows:source.transitions,bound:source.bound.length,v1_current_identities:previous.branches[source.line].updates.length,checkpoint_parent_updates:branch.updates.filter(r=>r.source_parent).length,checks,compiler_calls:0,old_constructor_executed:false,frozen_dispatch_stopped_before_evaluation:true,historical_programs_executed:false,artifact_or_audit_admission_granted:false}));
+check('installed V3 cannot downgrade when V2 predecessor is absent',()=>{
+ const path=join(root,successor.previous_epoch.path),raw=readFileSync(path);
+ try{unlinkSync(path);assert.throws(()=>historicalContractRepairReaderSubject({root}));assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{writeFileSync(path,raw);}
+ source.assertCurrent();
+});
+check('V1-only data never selects current maintained factory',()=>{
+ const paths=[successorPath,successor.previous_epoch.path],saved=paths.map(path=>readFileSync(join(root,path))),visited=[];const sentinel=new Error('stop frozen reader before evaluation');
+ try{for(const path of paths)unlinkSync(join(root,path));assert.throws(()=>historicalContractRepairReaderSubject({root,read:name=>{visited.push(name);throw sentinel;}}),error=>error===sentinel);assert.deepEqual(visited,['projects/ngx-material-legacy/package.json']);assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{paths.forEach((path,index)=>writeFileSync(join(root,path),saved[index]));}
+ source.assertCurrent();
+});
+console.log(JSON.stringify({line:source.line,epoch:source.epoch,transitions:source.transitions.length,transition_rows:source.transitions,bound:source.bound.length,v1_current_identities:previous.branches[source.line].updates.length,v2_current_identities:branch.updates.length,v3_overlay_count:nextBranch.updates.length,checkpoint_parent_updates:branch.updates.filter(r=>r.source_parent).length,checks,compiler_calls:0,old_constructor_executed:false,frozen_dispatch_stopped_before_evaluation:true,historical_programs_executed:false,artifact_or_audit_admission_granted:false}));

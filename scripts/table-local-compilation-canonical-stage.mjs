@@ -14,6 +14,7 @@ import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {gunzipSync} from 'node:zlib';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
+import {readHistoricalContractRepairOwnerMember} from './historical-contract-repair-readers.mjs';
 export const TABLE_LOCAL_COMPILATION_LEDGER='compatibility/f10/disposition-ledger/ledger.json';
 export const TABLE_LOCAL_COMPILATION_LEDGER_BEFORE='4fd46af746fb9e2b0a27b0cd4b1341ed3b06cda873a6432eb4e6e35dbeb56ad9';
 export const TABLE_LOCAL_COMPILATION_REGISTRY='scripts/upstream-source-contract-registry.mjs';
@@ -54,10 +55,14 @@ export function tableLocalCompilationOwnerContext({root,read=path=>readFileSync(
  assert.ok(gunzipSync(member(packet.ledger_after_image)).equals(stage.after));assert.ok(gunzipSync(member(packet.registry_after_image)).equals(registryAfter));
  const actualLedger=read(TABLE_LOCAL_COMPILATION_LEDGER),actualRegistry=read(TABLE_LOCAL_COMPILATION_REGISTRY),registryRef=tools.qualifyReference(proposal.registry_before);
  assert.ok(actualRegistry.equals(readEvidenceMember(root,TABLE_LOCAL_COMPILATION_REGISTRY)),'nonphysical table registry');assert.equal(hash(actualRegistry),registryRef.sha256);
- const applied=actualLedger.equals(stage.after),registryApplied=actualRegistry.equals(registryAfter);if(applied)assert.ok(registryApplied,'table ledger requires exact registry successor');
+ const applied=actualLedger.equals(stage.after),registryApplied=tools.registryComparisonBytes().equals(registryAfter);if(applied)assert.ok(registryApplied,'table ledger requires exact registry successor');
  for(const[path,raw]of [[TABLE_LOCAL_COMPILATION_LEDGER,actualLedger],[TABLE_LOCAL_COMPILATION_REGISTRY,actualRegistry]])bound.set(path,{path,sha256:hash(raw),bytes:raw.length});
  const source=admission.inspectCanonicalSource({root,read,entries:stage.entries,body});for(const ref of source.bound)bound.set(ref.path,{...ref});
- const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late table canonical input '+ref.path);assert.equal(raw.length,ref.bytes);}};
+ // Only the private ledger reference can differ from physical bytes here.
+ // Its exact physical frame is independently authenticated by the leaf.
+ const physicalLedger=tools.bound.find(ref=>ref.path===TABLE_LOCAL_COMPILATION_LEDGER);assert.ok(physicalLedger);
+ const physicalBound=[...bound.values()].map(ref=>({...ref,...(ref.path===TABLE_LOCAL_COMPILATION_LEDGER?physicalLedger:{})}));
+ const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late table canonical input '+ref.path);assert.equal(raw.length,ref.bytes);}for(const ref of physicalBound){const raw=readHistoricalContractRepairOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical table canonical input '+ref.path);assert.equal(raw.length,ref.bytes);}};
  const metadataRead=path=>{if(path!==TABLE_LOCAL_COMPILATION_LEDGER)return read(path);const raw=read(path);assert.ok(raw.equals(actualLedger),'late table ledger');return applied?Buffer.from(before):raw;};
  const wrapPrepared=prior=>{
   assertCurrent();assert.ok(prior.canonical_after.equals(before),'table stage does not succeed complete prior owner');const currentBound=new Map(prior.bound);for(const ref of bound.values())currentBound.set(ref.path,ref.sha256);

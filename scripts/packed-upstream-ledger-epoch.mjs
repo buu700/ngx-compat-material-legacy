@@ -11,6 +11,8 @@ import {historicalContractRepairReaderSubject} from './historical-contract-repai
 import {canonicalSourcePhysicalBoundary} from './current-sass-canonical-source-boundary.mjs';
 import {legacyRemovalOwnerContext} from './legacy-removal-canonical-stage.mjs';
 import {tableLocalCompilationOwnerContext} from './table-local-compilation-canonical-stage.mjs';
+import {baseClassRemovalOwnerContext} from './base-class-removal-canonical-stage.mjs';
+import {currentAuthoredRosterSourceSubject,currentAuthoredRosterRawRead} from './current-authored-roster-source.mjs';
 import {legacyRemovalOwnerSourceSubject} from './legacy-removal-owner-source.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
@@ -92,7 +94,7 @@ const sourceMetadataReaders=new WeakMap();
 const sourceMetadataPaths={
  title:[OWNER,TITLE_NATIVE_REGISTRY,'scripts/autocomplete-selection-native-subject.mjs',LEDGER],
  inventory:[LEDGER,'testing/legacy-runner/historical-inventory.json','.github/workflows/ci.yml','scripts/upstream-dialog-title-admission.cjs','scripts/upstream-dialog-title-native-evidence.mjs'],
- legacy:[LEDGER],table:[LEDGER],
+ legacy:[LEDGER],table:[LEDGER],base_class:[LEDGER],
 };
 function bindSourceMetadata(root,context,currentRead,role){
  assert.ok(Object.hasOwn(sourceMetadataPaths,role));assert.equal(typeof context.metadataRead,'function');
@@ -601,12 +603,12 @@ function qualifyBeforeTableLocalCompilationToolReference({root=process.cwd(),rea
 
 
 /** Exact terminal table source decision; every prior current source stage runs. */
-export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){
+function prepareBeforeBaseClassRemovalLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});
  const table=bindSourceMetadata(root,tableLocalCompilationOwnerContext({root,read}),read,'table');
  const prior=prepareBeforeTableLocalCompilationLedger({root,read:table.metadataRead});return table.wrapPrepared(prior);
 }
-export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={}){
+function epochBeforeBaseClassRemovalLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});
  const table=bindSourceMetadata(root,tableLocalCompilationOwnerContext({root,read}),read,'table'),prior=epochBeforeTableLocalCompilationLedger({root,read:table.metadataRead});
  const assertCurrent=()=>{table.assertCurrent();prior.assertCurrent();table.assertCurrent();};
@@ -614,7 +616,7 @@ export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={
  readers.set(historical,{root:resolve(root),raw:read});assertCurrent();
  return {...prior,read:historical,raw:read,assertCurrent,individual_decisions_applied:prior.individual_decisions_applied+(table.applied?1:0),table_local_compilation_source_decisions_applied:table.applied?1:0,current_tool_bytes_exposed_without_projection:true,current_native_packed_or_floor_or_g11_credit:false};
 }
-export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root),prior}={}){
+function qualifyBeforeBaseClassRemovalToolReference({root=process.cwd(),read=disk(root),prior}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.qualifyCanonicalToolReference({root,read,prior});
  let role;try{role=read(METADATA_ROLE);}catch{/* Public readers have no comparison capability. */}
  if(role===metadataToken)return qualifyBeforeTableLocalCompilationToolReference({root,read,prior});
@@ -623,4 +625,59 @@ export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root
  const raw=read(result.reference.path),reference={...result.reference,sha256:hash(raw),bytes:raw.length};
  const assertCurrent=()=>{table.assertCurrent();result.assertCurrent();table.assertCurrent();};assertCurrent();
  return {...result,reference,bound:[...bound.values()],assertCurrent,table_local_compilation_source_scope:true};
+}
+
+/** Physical proof reads; preserve a registered roster reader on the public route. */
+function baseClassRemovalProofContext(root,publicRead){
+ const actual=currentAuthoredRosterRawRead({root,read:publicRead});
+ const boundary=canonicalSourcePhysicalBoundary({root,read:actual}),read=boundary.read;
+ const selected=baseClassRemovalOwnerContext({root,read});
+ if(actual===publicRead)return {selected:bindSourceMetadata(root,selected,read,'base_class'),boundary};
+ // Only the roster module's private registration can select this branch.
+ // Its historical JSON views remain on publicRead, never the proof reader.
+ const roster=currentAuthoredRosterSourceSubject({root,read});
+ const assertCurrent=()=>{selected.assertCurrent();roster.assertCurrent();selected.assertCurrent();boundary.assertPhysical();};
+ const refs=new Map([...selected.bound,...roster.bound].map(ref=>[ref.path,{...ref}]));
+ const combined={...selected,assertCurrent,bound:[...refs.values()],wrapPrepared:prior=>{
+  const prepared=selected.wrapPrepared(prior),bound=new Map(prepared.bound);for(const ref of refs.values())bound.set(ref.path,ref.sha256);
+  const native=prepared.native_spec_source,nativeBound=native.bound.map(ref=>{const actual=refs.get(ref.path);return actual?{...ref,sha256:actual.sha256,bytes:actual.bytes}:{...ref};});
+  return {...prepared,bound,native_spec_source:{...native,bound:nativeBound}};
+ }};
+ assertCurrent();return {selected:bindSourceMetadata(root,combined,read,'base_class'),boundary};
+}
+
+/** Exact terminal base-class source decision; all preceding owners still run. */
+export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){
+ read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});
+ const {selected,boundary}=baseClassRemovalProofContext(root,read);
+ const prior=prepareBeforeBaseClassRemovalLedger({root,read:selected.metadataRead}),prepared=selected.wrapPrepared(prior);
+ const guarded=guard=>()=>{selected.assertCurrent();guard();selected.assertCurrent();boundary.assertPhysical();};
+ const assertCurrent=guarded(prepared.assertCurrent);assertCurrent();
+ return {...prepared,assertCurrent,
+  prior_metadata_assert_current:guarded(prepared.prior_metadata_assert_current),
+  native_spec_source:{...prepared.native_spec_source,assertCurrent:guarded(prepared.native_spec_source.assertCurrent)},
+  base_class_removal_stage:{...prepared.base_class_removal_stage,assertCurrent:guarded(prepared.base_class_removal_stage.assertCurrent)}};
+}
+export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={}){
+ read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});
+ const publicRead=read,{selected,boundary}=baseClassRemovalProofContext(root,read);
+ const prior=epochBeforeBaseClassRemovalLedger({root,read:selected.metadataRead});
+ const assertCurrent=()=>{selected.assertCurrent();prior.assertCurrent();selected.assertCurrent();boundary.assertPhysical();};
+ const historical=path=>{if(path!==LEDGER)return publicRead(path);assertCurrent();const raw=prior.read(path);assertCurrent();return raw;};
+ readers.set(historical,{root:resolve(root),raw:publicRead});assertCurrent();
+ return {...prior,read:historical,raw:publicRead,assertCurrent,
+  individual_decisions_applied:prior.individual_decisions_applied+(selected.applied?1:0),
+  base_class_removal_source_decisions_applied:selected.applied?1:0,
+  current_tool_bytes_exposed_without_projection:true,current_native_packed_or_floor_or_g11_credit:false};
+}
+export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root),prior}={}){
+ read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.qualifyCanonicalToolReference({root,read,prior});
+ let role;try{role=read(METADATA_ROLE);}catch{/* Public readers have no private comparison capability. */}
+ if(role===metadataToken)return qualifyBeforeBaseClassRemovalToolReference({root,read,prior});
+ const {selected,boundary}=baseClassRemovalProofContext(root,read);
+ const result=qualifyBeforeBaseClassRemovalToolReference({root,read:selected.metadataRead,prior});if(!result){boundary.assertPhysical();return result;}
+ const bound=new Map(result.bound.map(ref=>[ref.path,{...ref}]));for(const ref of selected.bound)bound.set(ref.path,{...ref});
+ const raw=boundary.read(result.reference.path),reference={...result.reference,sha256:hash(raw),bytes:raw.length};
+ const assertCurrent=()=>{selected.assertCurrent();result.assertCurrent();selected.assertCurrent();boundary.assertPhysical();};assertCurrent();
+ return {...result,reference,bound:[...bound.values()],assertCurrent,base_class_removal_source_scope:true};
 }

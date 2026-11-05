@@ -249,7 +249,7 @@ def _derive_tool(root, data, row):
 
 
 def qualify_tool_reference(ref, root=ROOT):
-    if (Path(root) / 'compatibility/rc/current-sass-tool-reference-inputs-v2.json').is_file():
+    if any((Path(root) / path).is_file() for path in ('compatibility/rc/parent-base-class-tool-successor-inputs-v3.json', 'compatibility/rc/current-sass-tool-reference-inputs-v2.json')):
         tools = _current_tool_subject(root)
         selected = tools.qualify(ref)
         if selected is None:
@@ -270,7 +270,7 @@ def qualify_tool_reference(ref, root=ROOT):
 
 
 def tool_comparison_bytes(ref, root=ROOT):
-    if (Path(root) / 'compatibility/rc/current-sass-tool-reference-inputs-v2.json').is_file():
+    if any((Path(root) / path).is_file() for path in ('compatibility/rc/parent-base-class-tool-successor-inputs-v3.json', 'compatibility/rc/current-sass-tool-reference-inputs-v2.json')):
         tools = _current_tool_subject(root)
         if ref['path'] in {row['path'] for row in tools.transitions}:
             return tools.comparison_bytes(ref)
@@ -329,7 +329,7 @@ def _prior_c04_registry(root, data):
 
 
 def qualify_spinner_snack_source_reference(ref, root=ROOT):
-    if (Path(root) / 'compatibility/rc/current-sass-tool-reference-inputs-v2.json').is_file():
+    if any((Path(root) / path).is_file() for path in ('compatibility/rc/parent-base-class-tool-successor-inputs-v3.json', 'compatibility/rc/current-sass-tool-reference-inputs-v2.json')):
         source = _current_product_subject(root)
         selected = source.qualify(ref)
         return dict(ref) if selected is None else {**ref, 'sha256': selected['sha256'], **({'bytes': selected['bytes']} if 'bytes' in ref else {})}
@@ -377,7 +377,7 @@ def _current_tool_cached(root, manifest_sha):
 
 def _current_tool_subject(root):
     root = str(Path(root).absolute())
-    manifest = _read(root, 'compatibility/rc/current-sass-tool-reference-inputs-v2.json')
+    manifest = _read(root, 'compatibility/rc/parent-base-class-tool-successor-inputs-v3.json')
     subject = _current_tool_cached(root, digest(manifest))
     subject.assert_current()
     return subject

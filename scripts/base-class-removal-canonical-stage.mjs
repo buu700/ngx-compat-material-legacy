@@ -56,3 +56,81 @@ export function applyBaseClassRemovalCanonicalStage({before, body} = {}) {
     source_scope_only: true, canonical_admission_granted: false, canonical_transaction_delegated_to_shared_owner: true,
     current_native_packed_browser_floor_or_full_audit_qualified: false, g11_claim: 'not-passed'};
 }
+
+/** The immutable proposal above remains DATA-authenticated; this appended owner
+ * composes fresh physical source qualification without applying canonical files. */
+import {baseClassRemovalOwnerSourceSubject} from './base-class-removal-owner-source.mjs';
+import {readFileSync} from 'node:fs';
+import {join} from 'node:path';
+export const BASE_CLASS_REMOVAL_OWNER_SOURCE_SHA256 = '3d121043970e38bd7c0bc768cf671712b08b5c05299172decccff2d14a6d0788';
+const ownerIsBuffer = Buffer.isBuffer, ownerBufferEquals = Buffer.prototype.equals, ownerApply = Reflect.apply;
+const ownerEqual = (actual, supplied) => ownerIsBuffer(supplied) && ownerApply(ownerBufferEquals, actual, [supplied]);
+function ownerValue(object, key) {
+  const descriptor = Object.getOwnPropertyDescriptor(object, key);
+  assert.ok(descriptor && Object.hasOwn(descriptor, 'value'), 'non-data prior base-class metadata ' + key);
+  return descriptor.value;
+}
+function ownerDataCopy(object) {
+  return Object.fromEntries(Object.entries(Object.getOwnPropertyDescriptors(object)).map(([key, descriptor]) => {
+    assert.ok(Object.hasOwn(descriptor, 'value'), 'non-data prior base-class field ' + key);
+    return [key, descriptor.value];
+  }));
+}
+
+export function baseClassRemovalOwnerContext({root, read = path => readFileSync(join(root, path))} = {}) {
+  const owner = baseClassRemovalOwnerSourceSubject({root, read});
+  const frames = owner.frames, applied = frames.applied;
+  const before = Buffer.from(owner.stage.before), after = Buffer.from(owner.stage.after);
+  const bound = new Map(owner.bound.map(ref => [ref.path, {...ref}]));
+  const assertCurrent = () => owner.assertCurrent();
+  const metadataRead = path => {
+    if (path !== BASE_CLASS_REMOVAL_LEDGER) return read(path);
+    frames.assertCurrent();
+    const current = read(path);
+    assert.ok(ownerEqual(frames.ledgerSubject().raw, current), 'late base-class private ledger input');
+    return applied ? Buffer.from(before) : current;
+  };
+  const wrapPrepared = prior => {
+    assert.ok(ownerEqual(before, ownerValue(prior, 'canonical_after')), 'base-class stage does not follow complete table owner');
+    const priorBound = ownerValue(prior, 'bound'); assert.ok(priorBound instanceof Map);
+    const priorGuard = ownerValue(prior, 'assertCurrent'), metadataGuard = ownerValue(prior, 'prior_metadata_assert_current');
+    assert.equal(typeof priorGuard, 'function'); assert.equal(typeof metadataGuard, 'function');
+    const native = ownerValue(prior, 'native_spec_source');
+    const nativeReferences = ownerValue(native, 'bound'), nativeGuard = ownerValue(native, 'assertCurrent');
+    assert.ok(Array.isArray(nativeReferences)); assert.equal(typeof nativeGuard, 'function');
+    const assertPriorMetadata = () => {
+      assert.equal(ownerValue(prior, 'assertCurrent'), priorGuard, 'changed prior base-class source guard');
+      assert.equal(ownerValue(prior, 'prior_metadata_assert_current'), metadataGuard, 'changed prior base-class metadata guard');
+      assert.equal(ownerValue(prior, 'native_spec_source'), native, 'changed prior base-class native subject');
+      assert.equal(ownerValue(native, 'assertCurrent'), nativeGuard, 'changed prior base-class native guard');
+      assert.equal(ownerValue(prior, 'bound'), priorBound, 'changed prior base-class bound map');
+      assert.equal(ownerValue(native, 'bound'), nativeReferences, 'changed prior base-class native references');
+      assert.ok(ownerEqual(before, ownerValue(prior, 'canonical_after')), 'late prior base-class ledger');
+    };
+    const assertPrior = () => {
+      assertPriorMetadata(); assertCurrent(); assertPriorMetadata();
+      priorGuard(); metadataGuard(); assertCurrent(); assertPriorMetadata();
+    };
+    const currentBound = new Map(priorBound);
+    for (const ref of bound.values()) currentBound.set(ref.path, ref.sha256);
+    const nativeBound = nativeReferences.map(ref => {
+      const actual = bound.get(ref.path);
+      return actual ? {...ref, sha256: actual.sha256, bytes: actual.bytes} : {...ref};
+    });
+    assertPrior();
+    return {...ownerDataCopy(prior), canonical_after: Buffer.from(after), bound: currentBound,
+      base_class_removal_stage: {...owner.stage, before: Buffer.from(before), after: Buffer.from(after),
+        entries: structuredClone(owner.stage.entries), assertCurrent: assertPrior,
+        physically_applied: applied, source_scope_only: true, current_native_or_packed_or_floor_qualified: false},
+      native_spec_source: {...ownerDataCopy(native), bound: nativeBound,
+        assertCurrent: () => {assertPrior(); nativeGuard(); assertPrior();}},
+      assertCurrent: assertPrior, prior_metadata_assert_current: assertPrior};
+  };
+  assertCurrent();
+  return {applied, registryApplied: frames.registryApplied, precursor: frames.precursor,
+    before: Buffer.from(before), after: Buffer.from(after),
+    registryBefore: Buffer.from(owner.registryBefore), registryAfter: Buffer.from(owner.registryAfter),
+    metadataRead, wrapPrepared, bound: structuredClone([...bound.values()]), assertCurrent,
+    source_facts: structuredClone(owner.source.facts), source_scope_only: true,
+    current_native_packed_browser_floor_or_full_audit_qualified: false};
+}

@@ -15,10 +15,12 @@ import {types} from 'node:util';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 
 const SELF='scripts/current-sass-tool-references.mjs';
-const INPUTS='compatibility/rc/current-sass-tool-reference-inputs-v2.json';
+const INPUTS='compatibility/rc/parent-base-class-tool-successor-inputs-v3.json';
+const V2_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v2.json',sha256:'d25ef6684992ececd518f7932bc68f5d43d433df23868d7a376ebf0a9e56a770',bytes:625566};
+const V3_CHECKPOINTS={'21.x':'d8ab97315b6c77b83f42c2bebcf63b2984fff255',main:'59ba0e2aa8b76f71b472ea2831273e44e44b5b57'};
 const PREVIOUS_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v1.json',sha256:'ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f',bytes:478008};
 const CHECKPOINTS={'21.x':'b25aedd02f7b53e8cd8dfcdad369a806a1301619',main:'5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'};
-const INPUTS_SHA='d25ef6684992ececd518f7932bc68f5d43d433df23868d7a376ebf0a9e56a770';
+const INPUTS_SHA='334b223b96466e62dd937b36f0bd928058a578223aac90582622932b392d40ec';
 const image=readFileSync(fileURLToPath(import.meta.url));
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const reference=(path,raw)=>({path,sha256:hash(raw),bytes:raw.length});
@@ -52,6 +54,7 @@ function metadata(value){
 function matches(raw,ref){assert.equal(hash(raw),ref.sha256);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}
 function gitImages(root,requests){
  const unique=[...new Map(requests.map(r=>[r.commit+':'+r.path,r])).values()];
+ if(unique.length===0)return new Map();
  for(const r of unique){assert.match(r.commit,/^[0-9a-f]{40}$/);assert.ok(r.path&&!r.path.includes('..')&&!r.path.includes('\n')&&!r.path.includes('\0')&&!r.path.startsWith('/'));}
  const env={PATH:process.env.PATH,LANG:'C',LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1'};
  const raw=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','cat-file','--batch'],{cwd:root,env,input:unique.map(r=>r.commit+':'+r.path).join('\n')+'\n',maxBuffer:32*1024*1024});
@@ -86,13 +89,37 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
  };
  const member=ref=>{const raw=read(ref.path);matches(raw,ref);return raw;};
  const assertPhysical=()=>{for(const ref of bound.values())assert.deepEqual(reference(ref.path,readEvidenceMember(root,ref.path)),ref,'late physical current tool input '+ref.path);};
- assert.ok(equalBytes(read(SELF),image));const raw=member({path:INPUTS,sha256:INPUTS_SHA}),packet=JSON.parse(raw);
+ assert.ok(equalBytes(read(SELF),image));const successor=JSON.parse(member({path:INPUTS,sha256:INPUTS_SHA}));
+ assert.equal(successor.schema_version,3);assert.equal(successor.role,'finite-current-sass-tool-reference-successor');
+ assert.deepEqual(successor.previous_epoch,V2_INPUTS);assert.deepEqual(successor.product_paths,[]);
+ assert.equal(successor.historical_programs_executed,false);assert.equal(successor.historical_reports_rewritten,0);assert.equal(successor.artifact_or_audit_admission_granted,false);
+ const raw=member(V2_INPUTS),packet=JSON.parse(raw);
  assert.equal(packet.schema_version,2);assert.equal(packet.role,'finite-current-sass-tool-reference-successor');
  assert.deepEqual(packet.previous_epoch,PREVIOUS_INPUTS);const previousRaw=member(PREVIOUS_INPUTS),previous=JSON.parse(previousRaw);
  assert.equal(previous.schema_version,1);assert.equal(previous.role,packet.role);
  assert.deepEqual(packet.product_paths,[]);assert.equal(packet.historical_programs_executed,false);assert.equal(packet.historical_reports_rewritten,0);assert.equal(packet.artifact_or_audit_admission_granted,false);
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
  const branch=packet.branches[line],priorBranch=previous.branches[line];assert.ok(branch&&priorBranch);const archived=branch.historical_registry;
+ const nextBranch=successor.branches[line];assert.ok(nextBranch);assert.equal(nextBranch.source_parent,V3_CHECKPOINTS[line]);
+ const previousGitV2=gitImages(root,[{commit:V3_CHECKPOINTS[line],path:V2_INPUTS.path}]).get(V3_CHECKPOINTS[line]+':'+V2_INPUTS.path);
+ assert.ok(equalBytes(raw,previousGitV2),'V2 packet differs from committed comparison data');
+ assert.equal(new Set(nextBranch.updates.map(r=>r.path)).size,nextBranch.updates.length);
+ assert.equal(new Set(nextBranch.additional_inputs.map(r=>r.path)).size,nextBranch.additional_inputs.length);
+ const successorImages=gitImages(root,nextBranch.updates.map(r=>({commit:V3_CHECKPOINTS[line],path:r.path}))),overlays=new Map();
+ for(const update of nextBranch.updates){
+  assert.deepEqual(Object.keys(update).sort(),['after','before','edits','path']);assert.ok(toolPath(update.path)&&update.path!==SELF&&update.path!=='scripts/current_sass_tool_references.py');
+  assert.equal(update.before.path,update.path);assert.equal(update.after.path,update.path);assert.ok(Number.isSafeInteger(update.before.bytes));assert.ok(Number.isSafeInteger(update.after.bytes));
+  const before=successorImages.get(V3_CHECKPOINTS[line]+':'+update.path);matches(before,update.before);
+  const after=edited(before,update.edits);matches(after,update.after);assert.ok(equalBytes(member(update.after),after));
+  overlays.set(update.path,{update,before,after});
+ }
+ // Only complete, authenticated predecessor identities select private comparison
+ // DATA. Every physical read above/below remains the exact latest source image.
+ const v2Member=ref=>{
+  const overlay=overlays.get(ref.path);if(!overlay)return member(ref);
+  assert.deepEqual(metadata(ref),overlay.update.before,'unknown V2 predecessor identity '+ref.path);
+  assert.ok(equalBytes(member(overlay.update.after),overlay.after));return Buffer.from(overlay.before);
+ };
  assert.equal(branch.previous_epoch_source_parent,CHECKPOINTS[line]);assert.deepEqual(archived,priorBranch.historical_registry);
  assert.deepEqual(branch.intermediate_inputs,priorBranch.intermediate_inputs);
  const previousGit=gitImages(root,[{commit:CHECKPOINTS[line],path:PREVIOUS_INPUTS.path}]).get(CHECKPOINTS[line]+':'+PREVIOUS_INPUTS.path);
@@ -123,7 +150,7 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
   const before=originals.get(parent+':'+update.path);matches(before,update.before);
   const prior=rows.get(update.path);if(prior)assert.deepEqual(update.before,{path:update.path,...prior.after});
   else if(baselineSupport.has(update.path))assert.deepEqual(update.before,baselineSupport.get(update.path));
-  const after=edited(before,update.edits);matches(after,update.after);assert.ok(equalBytes(member(update.after),after));
+  const after=edited(before,update.edits);matches(after,update.after);assert.ok(equalBytes(v2Member(update.after),after));
   const row=prior??{path:update.path,before:{sha256:update.before.sha256,bytes:update.before.bytes},identities:new Map()};
   addIdentity(row,update.before,before);addIdentity(row,update.after,after);row.after={sha256:update.after.sha256,bytes:update.after.bytes};rows.set(update.path,row);
  }
@@ -135,9 +162,20 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
  for(const input of priorBranch.updates){
   const row=rows.get(input.path);assert.ok(row);addIdentity(row,input.after,originals.get(CHECKPOINTS[line]+':'+input.path));
  }
- member(historical.unchanged_source_subject);
- for(const input of historical.support_inputs)if(!branch.updates.some(r=>r.path===input.path))member(input);
- for(const input of branch.additional_inputs){assert.ok(toolPath(input.path)||input.path.startsWith('compatibility/rc/'));member(input);}
+ v2Member(historical.unchanged_source_subject);
+ for(const input of historical.support_inputs)if(!branch.updates.some(r=>r.path===input.path))v2Member(input);
+ for(const input of branch.additional_inputs){assert.ok(toolPath(input.path)||input.path.startsWith('compatibility/rc/'));v2Member(input);}
+ for(const {update,before,after} of overlays.values()){
+  let row=rows.get(update.path);
+  if(row)assert.deepEqual(update.before,{path:row.path,...row.after},'V3 overlay does not follow exact V2 current row');
+  else{
+   assert.equal(line,'21.x');assert.equal(update.path,'scripts/table-local-compilation-canonical-stage.mjs');
+   assert.deepEqual(update.before,{path:update.path,sha256:'bdb3137f6db42ed2611ac3a41e400478defed7f0076d203061d1e12d03f63b7c',bytes:8231});
+   row={path:update.path,before:{sha256:update.before.sha256,bytes:update.before.bytes},identities:new Map()};rows.set(update.path,row);
+  }
+  addIdentity(row,update.before,before);addIdentity(row,update.after,after);row.after={sha256:update.after.sha256,bytes:update.after.bytes};
+ }
+ for(const input of nextBranch.additional_inputs){assert.ok(toolPath(input.path)||input.path.startsWith('compatibility/rc/'));assert.ok(input.path!==SELF&&input.path!=='scripts/current_sass_tool_references.py');member(input);}
  for(const row of rows.values())member({path:row.path,...row.after});
  const assertCurrent=()=>{for(const ref of [...bound.values()])member(ref);assertPhysical();};
  const ownsReference=incoming=>{try{const ref=metadata(incoming),row=rows.get(ref.path),raw=row?.identities.get(ref.sha256);return Boolean(raw&&(ref.bytes===undefined||ref.bytes===raw.length));}catch{return false;}};
@@ -152,7 +190,7 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
   member({path:row.path,...row.after});assert.deepEqual(plain(incoming),snapshot);assertPhysical();return result;
  };
  const transitions=[...rows.values()].map(r=>({path:r.path,before:{...r.before},after:{...r.after}}));
- const result=Object.freeze({line,epoch:2,get bound(){return structuredClone([...bound.values()]);},get transitions(){return structuredClone(transitions);},ownsReference,qualify:ref=>side(ref,'after'),predecessorReference:ref=>side(ref,'before'),comparisonBytes,assertCurrent,
+ const result=Object.freeze({line,epoch:3,get bound(){return structuredClone([...bound.values()]);},get transitions(){return structuredClone(transitions);},ownsReference,qualify:ref=>side(ref,'after'),predecessorReference:ref=>side(ref,'before'),comparisonBytes,assertCurrent,
   old_code_executed:false,old_product_bytes_exposed:false,old_tool_bytes_exposed_as_current:false,current_read_route_returned:false,canonical_admission_granted:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'});
  assertCurrent();return result;
 }

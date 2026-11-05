@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "role": "bounded-new-terminal-final-guard-recommendation",
+  "source_refs": [
+    {
+      "path": "scripts/packed-upstream-ledger-epoch.mjs",
+      "sha256": "f29a51091d3f505bfc5f64ada06b7d6ca6cf4a5a76ffbf1d52f07485e447d633",
+      "bytes": 84561
+    },
+    {
+      "path": "scripts/current-sass-canonical-source-boundary.mjs",
+      "sha256": "c17749854a547adc05d9beb6ebb34c7476d0c160314140f8548b3902e9ba8034",
+      "bytes": 3751
+    },
+    {
+      "path": "scripts/packed-upstream-ledger-base.mjs",
+      "sha256": "239329b95403e09eff67ce9ef6225c479574675b3e82deb3422ff11bb850c7f2",
+      "bytes": 118364
+    }
+  ],
+  "concrete_condition": "The NEW terminal selected/prior/selected guard sequence ends in selected source callbacks. A last callback can mutate a previously validated prior-only path outside selected.bound1129; selected physical sweep cannot cover that path. The epoch prior result does not expose a complete bound set, so enumerating selected refs cannot close this condition.",
+  "recommendation": "Reuse existing canonicalSourcePhysicalBoundary in each NEW21terminal, after unwrap/foreign and qualifier METADATA_ROLE handling. Save publicRead as the original unwrapped caller. Use boundary.read privately under selected owner and all prior composition so it records the complete actual-read footprint; append boundary.assertPhysical after every terminal callback-bearing guard.",
+  "identity_preservation": [
+    "Public epoch raw remains exactly publicRead.",
+    "Public historical non-LEDGER reads call publicRead.",
+    "Public readers map historical.raw remains publicRead; never register proof boundary.read there, because unwrap must not strip recording.",
+    "Existing private source-metadata resolver can terminate at boundary.read: it remains an actual physical reader with no projection, preserving recording of actual source reads.",
+    "Only selected.metadataRead applies the exact private LEDGER projection.",
+    "Remote main and private role delegation happen before boundary construction."
+  ],
+  "entrypoints": [
+    "preparePackedUpstreamLedger",
+    "packedUpstreamLedgerEpoch",
+    "qualifyCanonicalToolReference"
+  ],
+  "exposed_guards_to_finish": [
+    "terminal assertCurrent",
+    "prepared prior_metadata_assert_current",
+    "prepared native_spec_source.assertCurrent",
+    "new prepared base_class_removal_stage.assertCurrent"
+  ],
+  "null_result": "Run boundary.assertPhysical before returning qualifier null.",
+  "controls": [
+    "Arm original reader only during final selected guard, mutate earlier prior-only already-recorded path, require rejection.",
+    "Repeat through native, prior-metadata, new base-stage prepared guard surfaces.",
+    "Assert epoch.raw===original caller.",
+    "Assert public packedUpstreamLedgerRawRead(epoch.read)===original caller.",
+    "Assert non-LEDGER public passthrough invokes original caller.",
+    "Assert actual source lane retains physical proof reader and unknown callback gains no metadata projection.",
+    "Prove final sweep performs no supplied callbacks and existing selected/prior/native guard failures still propagate."
+  ],
+  "scope": "No new framework, helper API, broad inherited audit, generic filename waiver, or public read projection. Existing helper itself remains unchanged.",
+  "runtime_executed": false,
+  "code_edits": false
+}

@@ -82,10 +82,32 @@ class BaseClassRemovalAdmissionTest(unittest.TestCase):
         self.assertEqual(new['read_note_disposition'], 'owned-retained')
         self.assertEqual(new['g11_claim'], 'not-passed')
         scope = new['individual_proof']['base_class_removal_source_scope']
-        for ref in [packet['handler'], packet['stage'], packet['review']]:
+        for ref in [packet['handler'], packet['review']]:
             raw = (ROOT / ref['path']).read_bytes()
             self.assertEqual(hashlib.sha256(raw).hexdigest(), ref['sha256'])
             self.assertEqual(len(raw), ref['bytes'])
+        # The immutable proposal names the original pure-stage program. It is
+        # authenticated as Git DATA; the current program must equal that exact
+        # prefix plus the independently owned, pinned extension template.
+        leaf = (ROOT / 'scripts/base-class-removal-owner-source.mjs').read_bytes()
+        pins = re.findall(rb"^const INPUTS_SHA256 = '([a-f0-9]{64})';$", leaf, re.M)
+        self.assertEqual(len(pins), 1)
+        owner_raw = (ROOT / (PREFIX + 'owner-inputs-v1.json')).read_bytes()
+        self.assertEqual(hashlib.sha256(owner_raw).hexdigest(), pins[0].decode())
+        owner = json.loads(owner_raw)
+        stage_ref = owner['stage_before']
+        self.assertEqual({key: stage_ref[key] for key in ('path', 'sha256', 'bytes')}, packet['stage'])
+        original = subprocess.check_output([
+            'git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',
+            'show', owner['source_parent'] + ':' + stage_ref['path']], cwd=ROOT)
+        self.assertEqual(hashlib.sha256(original).hexdigest(), stage_ref['sha256'])
+        self.assertEqual(len(original), stage_ref['bytes'])
+        self.assertEqual(hashlib.sha1(b'blob ' + str(len(original)).encode() + b'\0' + original).hexdigest(),
+                         stage_ref['git_blob'])
+        template = owner['stage_extension_template']
+        self.assertEqual(template.count('__BASE_OWNER_IMAGE_SHA256__'), 1)
+        extension = template.replace('__BASE_OWNER_IMAGE_SHA256__', hashlib.sha256(leaf).hexdigest()).encode()
+        self.assertEqual((ROOT / stage_ref['path']).read_bytes(), original + extension)
         self.assertEqual(scope['repaired_source_or_API_paths'], 5)
         self.assertEqual(scope['historical_source_bindings'], 715)
         self.assertTrue(scope['source_scope_only'])
