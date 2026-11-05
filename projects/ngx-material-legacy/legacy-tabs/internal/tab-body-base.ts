@@ -41,6 +41,23 @@ function tabBodyNgZone(): NgZone | null {
   return inject(NgZone, {optional: true});
 }
 
+// Capture the rendered transform before the group's active classes change layout.
+// Keys are pane elements, so nested groups and removed panes remain independent.
+const pendingRenderedTransforms = new WeakMap<Element, string>();
+
+export function captureActiveTabBodyTransforms(wrapper: HTMLElement | undefined): void {
+  if (!wrapper) return;
+  for (const body of Array.from(wrapper.children)) {
+    pendingRenderedTransforms.delete(body);
+    const content = body.firstElementChild;
+    const view = content?.ownerDocument.defaultView;
+    if (body.classList.contains('mat-tab-body-animating') &&
+        content?.classList.contains('mat-tab-body-content') && view) {
+      pendingRenderedTransforms.set(body, view.getComputedStyle(content).transform);
+    }
+  }
+}
+
 /**
  * These position states are used internally as animation states for the tab body.
  */
@@ -73,6 +90,8 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
   private _pendingTransition: LegacyTabTransitionEvent | undefined;
   private _deferredCentering: LegacyTabTransitionEvent | undefined;
   private _originTransition: LegacyTabTransitionEvent | undefined;
+  private _ownedReverseTransform: string | undefined;
+  private _reverseEndNotBefore = 0;
   private readonly _ngZone = tabBodyNgZone();
   private readonly _changeDetectorRef: ChangeDetectorRef;
 
@@ -216,6 +235,8 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this._restoreReverseTransform();
+    pendingRenderedTransforms.delete(this._elementRef.nativeElement);
     this._destroyed = true;
     this._pendingTransition = undefined;
     this._deferredCentering = undefined;
@@ -251,10 +272,13 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
     if (event.propertyName && event.propertyName !== 'transform') {
       return;
     }
+    if (this._reverseEndNotBefore && this._transitionClock() < this._reverseEndNotBefore) {
+      return;
+    }
     this._finishTransition(this._pendingTransition);
   }
 
-  private _startTransition(): void {
+  private _startTransition(fromOverride?: string): void {
     if (this._destroyed) {
       return;
     }
@@ -262,12 +286,19 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
       clearTimeout(this._fallbackTimer);
       this._fallbackTimer = undefined;
     }
+    // A failed CSS restart can still leave an old end queued. Protect every
+    // replacement of a live phase, but keep disabled motion immediate.
+    const protectsReplacement = !!this._pendingTransition && !this._cssAnimationsDisabled();
     const transition = this._pendingTransition = {
-      fromState: this._initialized ? this._previousPosition || 'void' : 'void',
+      fromState: fromOverride ?? (this._initialized ? this._previousPosition || 'void' : 'void'),
       toState: this._position,
     };
     this._deferredCentering = undefined;
     this._originTransition = undefined;
+    // CSS events can be delivered around one frame early. The deadline filters
+    // obviously stale ends; native events do not carry a transition identity.
+    this._reverseEndNotBefore = protectsReplacement ?
+      this._transitionClock() + Math.max(0, this._durationMilliseconds() - 16) : 0;
     // Keep the departing content visible with the existing historical selector
     // while its transform changes; completion removes this class.
     this._elementRef.nativeElement.classList.add('mat-tab-body-animating');
@@ -310,6 +341,9 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
     this._pendingTransition = undefined;
     this._deferredCentering = undefined;
     this._originTransition = undefined;
+    this._reverseEndNotBefore = 0;
+    pendingRenderedTransforms.delete(this._elementRef.nativeElement);
+    this._restoreReverseTransform();
     if (!this._isCenterPosition(transition.toState)) {
       this._contentElement?.nativeElement.style.setProperty('visibility', 'hidden');
     }
@@ -325,8 +359,7 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
     }
     // A native transitionend normally completes the phase. Allow its configured
     // duration plus a small delivery buffer before the missing-event fallback.
-    const duration = this._animationDurationInput.trim().match(/^(\d*\.?\d+)(ms|s)$/);
-    const milliseconds = duration ? Number(duration[1]) * (duration[2] === 's' ? 1000 : 1) : 500;
+    const milliseconds = this._durationMilliseconds();
     const initialCenter = transition.fromState === 'void' && transition.toState === 'center';
     const delay = this._cssAnimationsDisabled() || initialCenter ? 0 : milliseconds + 100;
     const run = () => {
@@ -341,6 +374,78 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
     } else {
       this._fallbackTimer = setTimeout(run, delay);
     }
+  }
+
+  private _transitionClock(): number {
+    const view = this._elementRef.nativeElement.ownerDocument?.defaultView;
+    if (view?.performance) return view.performance.now();
+    if (typeof performance !== 'undefined') return performance.now();
+    // A server without a Performance API has no native transition events.
+    return Date.now();
+  }
+
+  private _durationMilliseconds(): number {
+    const duration = this._animationDurationInput.trim().match(/^(\d*\.?\d+)(ms|s)$/);
+    return duration ? Number(duration[1]) * (duration[2] === 's' ? 1000 : 1) : 500;
+  }
+
+  private _restoreReverseTransform(): void {
+    const style = this._contentElement?.nativeElement.style;
+    if (style && this._ownedReverseTransform !== undefined &&
+        style.transform === this._ownedReverseTransform && !style.getPropertyPriority('transform')) {
+      style.removeProperty('transform');
+    }
+    this._ownedReverseTransform = undefined;
+  }
+
+  /** Restart a reversed CSS transition from its pre-layout rendered transform. */
+  private _restartReverseTransition(): boolean {
+    const host = this._elementRef.nativeElement;
+    const rendered = pendingRenderedTransforms.get(host);
+    pendingRenderedTransforms.delete(host);
+    const content = this._contentElement?.nativeElement;
+    const style = content?.style;
+    if (!this._pendingTransition || this._cssAnimationsDisabled() || rendered === undefined ||
+        !content || !style || style.transitionProperty || style.getPropertyPriority('transition-property') ||
+        style.getPropertyPriority('transform') ||
+        (style.transform && style.transform !== this._ownedReverseTransform)) {
+      return false;
+    }
+    const transition = this._pendingTransition;
+    const position = this._position;
+    const previousTransform = style.getPropertyValue('transform');
+    const previousOwned = this._ownedReverseTransform;
+    style.setProperty('transition-property', 'none');
+    style.setProperty('transform', rendered);
+    const temporaryTransform = style.transform;
+    let measured = false;
+    try {
+      content.getBoundingClientRect();
+      measured = true;
+    } catch {
+      // Restore only properties still owned by this interrupted attempt.
+    } finally {
+      if (style.transitionProperty === 'none' && !style.getPropertyPriority('transition-property')) {
+        style.removeProperty('transition-property');
+      }
+    }
+    if (!measured || this._destroyed || this._pendingTransition !== transition ||
+        this._position !== position || style.transform !== temporaryTransform ||
+        style.getPropertyPriority('transform') || style.transitionProperty) {
+      if (style.transform === temporaryTransform && !style.getPropertyPriority('transform')) {
+        if (previousTransform && !(this._destroyed && previousTransform === previousOwned)) {
+          style.setProperty('transform', previousTransform);
+        } else {
+          style.removeProperty('transform');
+        }
+      }
+      return false;
+    }
+    const target = this._isCenterPosition(this._position) ? 'none' :
+      this._position === 'left' ? 'translate3d(-100%, 0, 0)' : 'translate3d(100%, 0, 0)';
+    style.setProperty('transform', target);
+    this._ownedReverseTransform = style.transform;
+    return true;
   }
 
   private _setActiveClass(isActive: boolean): void {
@@ -376,6 +481,22 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
     }
     this._previousPosition = this._position;
     this._position = position;
+    const changesCenter = this._isCenterPosition(this._position) ||
+      this._isCenterPosition(this._previousPosition || '');
+    const priorTransition = this._pendingTransition;
+    const changesOwnedDeparture = !changesCenter && !!priorTransition &&
+      this._isCenterPosition(priorTransition.fromState) && this._ownedReverseTransform !== undefined;
+    const restarted = this._initialized && (changesCenter || changesOwnedDeparture) &&
+      this._restartReverseTransition();
+    // Layout can synchronously destroy the body or initiate a newer position.
+    if (this._destroyed || this._position !== position || this._pendingTransition !== priorTransition) {
+      return;
+    }
+    if (!restarted && this._ownedReverseTransform !== undefined) {
+      // A direction change or consumer style can prevent restarting. Release
+      // only our own target so it cannot override the newly selected class.
+      this._restoreReverseTransform();
+    }
 
     if (this._isCenterPosition(this._position)) {
       this._setActiveClass(true);
@@ -383,11 +504,10 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
       this._setActiveClass(false);
     }
 
-    if (this._cssAnimationsDisabled() || this._initialized &&
-      (this._isCenterPosition(this._position) || this._isCenterPosition(this._previousPosition || ''))) {
+    if (this._cssAnimationsDisabled() || this._initialized && (changesCenter || changesOwnedDeparture)) {
       // Attach before the content can animate. An off-center pane is hidden by
       // existing CSS, so relying on transitionstart can leave the active tab empty.
-      this._startTransition();
+      this._startTransition(changesOwnedDeparture ? priorTransition?.fromState : undefined);
     }
   }
 
