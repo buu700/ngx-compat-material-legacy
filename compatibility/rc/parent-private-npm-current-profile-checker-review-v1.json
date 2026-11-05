@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "role": "Independent read-only static review of new current private npm checker integration",
+  "status": "one concrete discovery-population omission reported; implementation not sealed/qualified",
+  "lines": {
+    "21.x": {
+      "checker": {
+        "path": "scripts/check-dependency-eligibility.py",
+        "sha256": "5981fecea1a3fb43245408f54b812cd40221b8186b2ce1f2d766f76dfefde984",
+        "bytes": 109703
+      },
+      "current_source_parent": "7728e8aec140dd40d137112caa047d6d7c006282",
+      "preserved_source_predicates": {
+        "private_npm_brace_validation": true,
+        "private_npm_source_paths": true,
+        "_tool_proof_bytes": true,
+        "archive_selector_triage_brace_invocation_block": true
+      },
+      "new_validator_sha256": "02bd23083a305aa3d802283b34479f93455a084f4dc8f255353ea287264ad635",
+      "new_validator_location": 600
+    },
+    "main": {
+      "checker": {
+        "path": "scripts/check-dependency-eligibility.py",
+        "sha256": "4b38c65309eccfe37e7e3a4e131577af7d3d06c0e2053f40e5fa71c6f3d938a4",
+        "bytes": 109674
+      },
+      "current_source_parent": "f794a1e4e07b2f745917c839dc8901ab50288a9d",
+      "preserved_source_predicates": {
+        "private_npm_brace_validation": true,
+        "private_npm_source_paths": true,
+        "_tool_proof_bytes": true,
+        "archive_selector_triage_brace_invocation_block": true
+      },
+      "new_validator_sha256": "02bd23083a305aa3d802283b34479f93455a084f4dc8f255353ea287264ad635",
+      "new_validator_location": 600
+    }
+  },
+  "finding": {
+    "id": "current-private-npm-discovery-handoff-omission",
+    "location": "scripts/check-dependency-eligibility.py:_private_npm_current_profile support_discovery and assert_current",
+    "scope": "both21.x and main",
+    "facts": [
+      "The initial validator requires exactly one discovery group rooted at tests and re-enumerates that group plus primary scripts/workflows.",
+      "Both maintained helper routes also run unittest discovery under compatibility/handoff/codex-closeout/tools with pattern test_*.py:21 run-helper-checks.py CHECKS; main helper_ci.py static_configuration extra commands.",
+      "Existing support byte rows cover the two currently present handoff modules, but adding a new test_*.py there changes executed discovery membership without modifying any bound current source row or tests discovery member. The initial predicate would not detect this added code."
+    ],
+    "required_fix": "Require explicit exact current handoff discovery membership and re-enumerate it alongside tests, rejecting extra/missing/linked members. Preserve whole current support bytes and original sole checker trust exclusion.",
+    "owner_response": "Parent acknowledged and is implementing exactly two groups, tests and compatibility/handoff/codex-closeout/tools, each with full six-suffix recursive code population. Fixed receipt must inspect actual resulting bytes separately."
+  },
+  "other_static_observations": [
+    "Original three historical documents remain pinned by unchanged NPM_PRIVATE_PROFILE_ARTIFACTS constants and read as DATA. Historical parent/count fields retain their original meaning.",
+    "New primary/support/input rows require exact four-field sorted unique records; overlaps and checker self-authentication reject; physical _tool_proof_bytes SHA/size and Git blob checks cover every row.",
+    "Old evidence source_hashes has exact key equality and each28/30 historical digest is paired with the respective exact current row SHA.",
+    "New pinned profile/read-only review digest binds current source parent and all three row-list digests. An all-zero profile digest remains unsealed and fails closed.",
+    "Current source guard is invoked once before archive processing and again after original archive/selector/triage/brace validation, immediately before binding return.",
+    "No generic historical fallback, source projection, archive member shortcut or changed advisory verdict predicate is added."
+  ],
+  "limits": {
+    "checker_or_tests_imported_or_executed": false,
+    "archive_dependency_historical_code_executed": false,
+    "positive_current_profile_or_mutation_controls_executed": false,
+    "new_vulnerability_verdict_or_risk_acceptance": false,
+    "g11_claim": "not-passed"
+  }
+}
