@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "role": "actual terminal composed owner failure and bounded performance diagnosis; no acceptance evidence",
+  "source_head": "78a3de23bdbf92614a66906227a61aca6431bc51",
+  "full_owner_attempt": {
+    "path": "compatibility/rc/parent-base-class-composed-owner-attempt-v8.json",
+    "sha256": "05fe4509b4b693cec2294b36b3dcdbe4cab60f06988cc6b888724251153618a4",
+    "bytes": 7500
+  },
+  "diagnostic_capture": {
+    "schema_version": 1,
+    "role": "bounded 90-second actual owner V8 profiler diagnostic; no qualification",
+    "prior_attempt": {
+      "path": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/compatibility/rc/parent-base-class-composed-owner-attempt-v8.json",
+      "sha256": "05fe4509b4b693cec2294b36b3dcdbe4cab60f06988cc6b888724251153618a4",
+      "bytes": 7500
+    },
+    "source_head": "78a3de23bdbf92614a66906227a61aca6431bc51",
+    "command": [
+      "/nix/store/w8jijs92barihdb0z54dsgq5szj2wd47-nodejs-24.21.0/bin/node",
+      "--max-old-space-size=4096",
+      "--prof",
+      "--no-logfile-per-isolate",
+      "--logfile=/tmp/parent-owner-cost-diagnostic-v1/v8.log",
+      "compatibility/rc/snack-current-owner-repair-owner-probe.mjs",
+      "compatibility/rc/snack-current-owner-repair-source-cost-diagnostic-v1.json"
+    ],
+    "exit_code": -9,
+    "diagnostic_budget_expired": true,
+    "seconds": 90.08536608493887,
+    "stdout": "",
+    "stderr": "",
+    "source_unchanged": true,
+    "qualifies_owner": false,
+    "canonical_applied": false,
+    "g11_claim": "not-passed",
+    "log": {
+      "path": "/tmp/parent-owner-cost-diagnostic-v1/v8.log",
+      "sha256": "23cf4b3efcbc986018b4ce0ce9566e55c8c326d43f7f75dd85158d223503f9d5",
+      "bytes": 61445368
+    }
+  },
+  "processed_profile": {
+    "path": "/tmp/parent-owner-cost-diagnostic-v1/processed.txt",
+    "sha256": "99e6f9a039ad8a35e56ba96215294c11ee035147a7c518861c9136c2678e4c2d",
+    "bytes": 606844
+  },
+  "independent_interpretation": {
+    "scope": "independent interpretation of finished 90-second V8 diagnostic profile, static guard analysis",
+    "processed_profile": "/tmp/parent-owner-cost-diagnostic-v1/processed.txt",
+    "processed_sha256": "99e6f9a039ad8a35e56ba96215294c11ee035147a7c518861c9136c2678e4c2d",
+    "profile_total_ticks": 69576,
+    "observations": [
+      {
+        "root": "__read@@GLIBC_2.17",
+        "ticks": 22387,
+        "total_percent": 32.2,
+        "meaning": "32.2% of all sampled ticks, not 69576 read ticks"
+      },
+      {
+        "stack": "__read \u2190 readSync \u2190 readFileSync \u2190 readEvidenceMember",
+        "ticks": 19187,
+        "parent_percent": 87.9
+      },
+      {
+        "stack": "previous \u2190 readHistoricalContractRepairMember",
+        "ticks": 8706,
+        "parent_percent": 45.4
+      },
+      {
+        "stack": "previous \u2190 base-class owner checkedRead",
+        "ticks": 2391,
+        "parent_percent": 27.5
+      },
+      {
+        "stack": "readEvidenceMember \u2190 readHistoricalContractRepairOwnerMember",
+        "ticks": 6088,
+        "parent_percent": 31.7
+      },
+      {
+        "stack": "previous \u2190 canonical source boundary read",
+        "ticks": 4525,
+        "parent_percent": 74.3
+      },
+      {
+        "stack": "sampled hash update \u2190 base owner physicalSweep \u2190 owner.assertCurrent \u2190 canonical-stage.assertCurrent \u2190 sourceLane.assertCurrent",
+        "ticks": 389,
+        "meaning": "shows this exact guard chain was reached; a branch within nested sampled counts, not a duration estimate"
+      },
+      {
+        "stack": "base frame guard \u2190 ledgerSubject \u2190 metadataRead",
+        "meaning": "shows metadata projection invokes the frame guard path; other branch samples metadataRead directly invoking frame guard"
+      }
+    ],
+    "stack_direction": "In bottom-up profile the root is sampled callee and deeper indentation moves outward toward callers. Corrected summary uses inner_callee_chain for preceding inner frames. Indented percentages describe parent subtree shares, not end-to-end shares. Inclusive samples overlap and must not be summed.",
+    "phase": "The profile sampled actual snack owner construction including base-class owner source guard, canonical source physical boundaries and source-lane frame guards. Sampling does not prove which later stage dominates the full 1800-second V8 lifetime or that construction made particular progress; there is no timeline or full run completion.",
+    "credible_target": {
+      "location": "packed-upstream-ledger-epoch.mjs:119-121 and nested tableLocalCompilationOwnerSourceSubject.assertCurrent / baseClassRemovalOwnerSourceSubject.assertCurrent",
+      "evidence": "The actual profile shows sourceLane invoking base owner assertCurrent and its physical sweeps; checkedRead and canonical physical boundary generate material overlapping physical reads. The code shows per-frame guard calls plus nested owner-source guards whose own sourceLane.assertCurrent can invoke prior frame guards.",
+      "direction": "Research a single per-call nonrecursive guard composition which still executes each distinct owner predicate and validates each supplied/projection byte, rather than repeatedly entering an earlier frame guard via outer frame guards. Maintain callback-free cold physical/loaded-identity preflight, each scope\u2019s live checks at relevant consumption boundaries, and a final trusted physical/absence sweep. Preserve unknown-reader rejection, exact private frame registry and public assertCurrent; no current/result/receipt cache or new external authority.",
+      "status": "Not yet a safe patch. Exact transitive guard graph, mutable captured identities, callback timing, population/absence checks and applicable immutable source attribution must be proved first; retain real cold and success\u2192late tests. A leaf-only sweep substitution is a smaller testable change but observed I/O categories are broader and do not establish that it will meet deadline."
+    },
+    "limitations": [
+      "No raw logfile or active process changed; no candidate implemented or benchmarked.",
+      "Sampling threshold and truncation hide lower stacks; inlining and shared libraries obscure some callers.",
+      "Full source checks, profile cut pin refresh and actual cold/late owner execution remain mandatory.",
+      "G11 remains not-passed."
+    ]
+  },
+  "raw_profile_available_locally_only": true,
+  "runtime_qualification": false,
+  "canonical_transaction_applied": false,
+  "g11_claim": "not-passed"
+}
