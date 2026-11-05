@@ -38,6 +38,10 @@ function ownValue(object, key) {
   assert.ok(descriptor && Object.hasOwn(descriptor, 'value'), 'non-data base-class metadata ' + key);
   return descriptor.value;
 }
+/** Callback-free check using the source owner's originally captured inspector. */
+export function assertBaseClassRemovalSourceInspectorIdentity() {
+  assert.equal(ownValue(admission, 'inspectSource'), loadedInspectSource, 'late loaded base-class source inspector change');
+}
 function physicalSweep(root, references, sourceMembers = false) {
   for (const ref of references) {
     const actual = sourceMembers ? readHistoricalContractRepairMember(root, ref.path) : physical(root, ref.path);

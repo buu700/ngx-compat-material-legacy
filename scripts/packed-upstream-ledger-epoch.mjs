@@ -12,6 +12,7 @@ import {canonicalSourcePhysicalBoundary} from './current-sass-canonical-source-b
 import {legacyRemovalOwnerContext} from './legacy-removal-canonical-stage.mjs';
 import {tableLocalCompilationOwnerContext} from './table-local-compilation-canonical-stage.mjs';
 import {baseClassRemovalOwnerContext} from './base-class-removal-canonical-stage.mjs';
+import {assertBaseClassRemovalSourceInspectorIdentity} from './base-class-removal-owner-source.mjs';
 import {currentAuthoredRosterSourceSubject,currentAuthoredRosterRawRead} from './current-authored-roster-source.mjs';
 import {legacyRemovalOwnerSourceSubject} from './legacy-removal-owner-source.mjs';
 import {createHash} from 'node:crypto';
@@ -115,7 +116,7 @@ export function packedUpstreamLedgerCurrentSourceLane({root,read}){
   assert.equal(seen.has(current),false,'cyclic canonical source metadata reader');seen.add(current);
   const frame=sourceMetadataReaders.get(current);assert.equal(frame.root,resolve(root));frames.push(frame);current=frame.raw;
  }
- const assertCurrent=()=>{for(const frame of frames){frame.guard();for(const row of frame.references.values()){
+ const assertCurrent=()=>{for(const frame of frames){assertBaseClassRemovalSourceInspectorIdentity();for(const row of frame.references.values()){
   for(const[reader,ref]of [[frame.read,row.before],[frame.raw,row.after]]){const raw=reader(ref.path);assert.ok(Buffer.isBuffer(raw));assert.equal(hash(raw),ref.sha256,'changed canonical source-lane reference '+ref.path);assert.equal(raw.length,ref.bytes);}
  }frame.guard();}};
  const comparisonReference=ref=>{

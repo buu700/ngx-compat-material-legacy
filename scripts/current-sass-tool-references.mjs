@@ -8,7 +8,7 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
-import {readFileSync,lstatSync} from 'node:fs';
+import {readFileSync,lstatSync,realpathSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {types} from 'node:util';
@@ -30,7 +30,7 @@ const V3_SOURCE_ANCHORS={
 };
 const PREVIOUS_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v1.json',sha256:'ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f',bytes:478008};
 const CHECKPOINTS={'21.x':'b25aedd02f7b53e8cd8dfcdad369a806a1301619',main:'5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'};
-const INPUTS_SHA='3f1f3039b63828b2779ced3af50c64402edfd8a4036c433557c17c370cbdd959';
+const INPUTS_SHA='0ac8249ed85aa9c528517bad44f8910f7740e078ac7265ae8e481334103cf7f0';
 const image=readFileSync(fileURLToPath(import.meta.url));
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const reference=(path,raw)=>({path,sha256:hash(raw),bytes:raw.length});
@@ -62,21 +62,33 @@ function metadata(value){
  return out;
 }
 function matches(raw,ref){assert.equal(hash(raw),ref.sha256);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}
+// Process-local authenticated immutable Git blobs only; current inputs are never cached.
+const immutableGitImages=new Map();
 function gitImages(root,requests){
- const unique=[...new Map(requests.map(r=>[r.commit+':'+r.path,r])).values()];
- if(unique.length===0)return new Map();
- for(const r of unique){assert.match(r.commit,/^[0-9a-f]{40}$/);assert.ok(r.path&&!r.path.includes('..')&&!r.path.includes('\n')&&!r.path.includes('\0')&&!r.path.startsWith('/'));}
- const env={PATH:process.env.PATH,LANG:'C',LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1'};
- const raw=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','cat-file','--batch'],{cwd:root,env,input:unique.map(r=>r.commit+':'+r.path).join('\n')+'\n',maxBuffer:32*1024*1024});
- const out=new Map();let cursor=0;
- for(const r of unique){
-  const end=raw.indexOf(10,cursor);assert.ok(end>cursor);const[blob,kind,sizeText]=raw.subarray(cursor,end).toString().split(' '),size=Number(sizeText);
-  assert.equal(kind,'blob');assert.ok(Number.isSafeInteger(size)&&size>=0);const bytes=raw.subarray(end+1,end+1+size);
-  assert.equal(bytes.length,size);assert.equal(raw[end+1+size],10);
-  assert.equal(createHash('sha1').update('blob '+size+'\0').update(bytes).digest('hex'),blob);
-  out.set(r.commit+':'+r.path,Buffer.from(bytes));cursor=end+size+2;
+ const unique=new Map();
+ for(const r of requests){
+  const commit=r.commit,path=r.path;assert.match(commit,/^[0-9a-f]{40}$/);assert.ok(typeof path==='string'&&path&&!path.includes('..')&&!path.includes('\n')&&!path.includes('\0')&&!path.startsWith('/'));
+  unique.set(commit+':'+path,{commit,path});
  }
- assert.equal(cursor,raw.length);return out;
+ if(unique.size===0)return new Map();
+ const resolvedRoot=realpathSync(resolve(root)),cached=immutableGitImages.get(resolvedRoot)??new Map();
+ const missing=[...unique].filter(([key])=>!cached.has(key));
+ if(missing.length){
+  const env={PATH:process.env.PATH,LANG:'C',LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1'};
+  const raw=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','cat-file','--batch'],{cwd:resolvedRoot,env,input:missing.map(([,r])=>r.commit+':'+r.path).join('\n')+'\n',maxBuffer:32*1024*1024});
+  const verified=new Map();let cursor=0;
+  for(const [key] of missing){
+   const end=raw.indexOf(10,cursor);assert.ok(end>cursor);const fields=raw.subarray(cursor,end).toString().split(' ');assert.equal(fields.length,3);
+   const [blob,kind,sizeText]=fields;assert.match(blob,/^[0-9a-f]{40}$/);assert.equal(kind,'blob');assert.match(sizeText,/^(?:0|[1-9][0-9]*)$/);
+   const size=Number(sizeText);assert.ok(Number.isSafeInteger(size)&&size>=0);const bytes=raw.subarray(end+1,end+1+size);
+   assert.equal(bytes.length,size);assert.equal(raw[end+1+size],10);assert.equal(createHash('sha1').update('blob '+size+'\0').update(bytes).digest('hex'),blob);
+   verified.set(key,Buffer.from(bytes));cursor=end+size+2;
+  }
+  assert.equal(cursor,raw.length);
+  for(const [key,value] of verified)cached.set(key,value);
+  immutableGitImages.set(resolvedRoot,cached);
+ }
+ return new Map([...unique.keys()].map(key=>[key,Buffer.from(cached.get(key))]));
 }
 function edited(before,edits){
  assert.ok(Array.isArray(edits));let cursor=0;const parts=[];

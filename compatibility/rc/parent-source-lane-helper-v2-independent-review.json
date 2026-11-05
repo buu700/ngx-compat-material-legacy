@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "status": "identity-divergence-closed-static-only",
+  "scope": "Independent static and immutable Git DATA review; no owner or CLI execution",
+  "patch": {
+    "path": "/tmp/source-lane-helper-v2.patch",
+    "sha256": "633902ab5705899a3b9ec887cd3210569c4784dad7da53bc89883a6f812f9ec3"
+  },
+  "identity_review": {
+    "same_owner_capture": true,
+    "explanation": "The exported helper executes ownValue(admission, inspectSource) and compares against loadedInspectSource captured in the same leaf module and checked by the existing source owner. Epoch imports that helper as an ESM binding and calls it before reference readers for every registered frame. The separately captured epoch pointer from v1 is removed.",
+    "capability": "The helper returns no owner object, reader, source or authority; on success assert.equal returns undefined and on mismatch or accessor descriptor it throws. ownValue uses a property descriptor and does not call the inspected getter.",
+    "scope": "Cold original identity is authenticated by the existing source owner on construction; this helper alone does not hash the source function and has no independent owner-admission semantics.",
+    "remaining_assumptions": "Registration, frames/references and wrapped source/frame/request metadata are internal to the legitimate current contexts; no route exposing the exact instance to the supplied callback was identified. No complete transitive mutable-callable audit or runtime proof."
+  },
+  "stage_authentication": {
+    "packet_sha256": "7c72a44224d6bd9f3eb141fdffb15d0f7ec11cb21b0f466500f10f12742e8e18",
+    "source_parent": "d8ab97315b6c77b83f42c2bebcf63b2984fff255",
+    "git_stage_before_sha256": "8b9c27362bf89a53bcb2b27ca185d4da9200014a807be02ffd2a6b7df6d0de13",
+    "git_stage_before_bytes": 4514,
+    "leaf_sha256": "5a5b69acf2616dc61aae26330924d8f45d26ae96332adbff40e8c4e76425bb57",
+    "stage_sha256": "44787758af5deeed0882180632f21b3e0b6e3003c7b245ecc5e24130b5b6681c",
+    "verified": "The exact scratch stage equals the independently authenticated immutable Git prefix plus the packet extension template with its single marker replaced by the scratch leaf SHA. Neither immutable packet nor template is changed; pure prefix functions are byte-identical.",
+    "limitation": "Full successor reference/profile reseal and runtime source-owner validation remain separate."
+  },
+  "controls_review": {
+    "candidate_control": "/tmp/source-lane-helper-v2-control.mjs",
+    "finding": "The supplied scratch control directly tests the leaf helper with a changed property and non-invoked getter. It imports the epoch without a query suffix and does not itself drive a registered frame or prove that the epoch calls the helper. To test fresh evaluation use a fresh query URL after replacement; separately exercise a real registered frame, exact 180-second cold/late controls and callback restoration."
+  },
+  "limits": [
+    "All before/after reference hash and size checks and the trailing full guard remain in the patch.",
+    "Entry-time transient physical changes restored before any affected consumption are accepted under the stated premise.",
+    "No relaxed cold or late roster, timeout change, owner run or G11 qualification."
+  ],
+  "syntax": "node --check passed for three scratch modules",
+  "g11_claim": "not-passed"
+}

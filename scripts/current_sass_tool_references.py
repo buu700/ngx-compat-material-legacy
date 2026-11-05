@@ -28,7 +28,7 @@ PREVIOUS_INPUTS = dict(path='compatibility/rc/current-sass-tool-reference-inputs
                        sha256='ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f', bytes=478008)
 CHECKPOINTS = {'21.x': 'b25aedd02f7b53e8cd8dfcdad369a806a1301619',
                'main': '5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'}
-INPUTS_SHA = '3f1f3039b63828b2779ced3af50c64402edfd8a4036c433557c17c370cbdd959'
+INPUTS_SHA = '0ac8249ed85aa9c528517bad44f8910f7740e078ac7265ae8e481334103cf7f0'
 _IMAGE = Path(__file__).read_bytes()
 
 
@@ -84,32 +84,45 @@ def _tool_path(path):
     return type(path) is str and re.fullmatch(r'(?:scripts|tests)/[a-zA-Z0-9_.-]+\.(?:mjs|cjs|py)', path)
 
 
+# Process-local authenticated immutable Git blobs only; current inputs are never cached.
+_GIT_IMAGES = {}
+
+
 def _git_images(root, requests):
-    unique = {(row['commit'], row['path']): row for row in requests}
+    unique = {}
+    for row in requests:
+        commit, path = row['commit'], row['path']
+        assert type(commit) is str and re.fullmatch('[0-9a-f]{40}', commit)
+        assert type(path) is str and path and '..' not in path and '\n' not in path and '\0' not in path and not path.startswith('/')
+        unique[(commit, path)] = row
     if not unique:
         return {}
-    for commit, path in unique:
-        assert re.fullmatch('[0-9a-f]{40}', commit)
-        assert path and '..' not in path and '\n' not in path and '\0' not in path and not path.startswith('/')
-    env = dict(PATH=os.environ['PATH'], LANG='C', LC_ALL='C', GIT_CONFIG_GLOBAL='/dev/null',
-               GIT_CONFIG_SYSTEM='/dev/null', GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')
-    raw = subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',
-                                   'cat-file', '--batch'], cwd=root, env=env,
-                                  input=('\n'.join(commit + ':' + path for commit, path in unique) + '\n').encode())
-    out, cursor = {}, 0
-    for key in unique:
-        end = raw.index(b'\n', cursor)
-        blob, kind, length = raw[cursor:end].decode().split(' ')
-        assert kind == 'blob'
-        size = int(length)
-        assert size >= 0
-        body = raw[end + 1:end + size + 1]
-        assert len(body) == size and raw[end + size + 1] == 10
-        assert hashlib.sha1(b'blob ' + str(size).encode() + b'\0' + body).hexdigest() == blob
-        out[key] = body
-        cursor = end + size + 2
-    assert cursor == len(raw)
-    return out
+    resolved_root = str(Path(root).resolve(strict=True))
+    cached = _GIT_IMAGES.get(resolved_root, {})
+    missing = [key for key in unique if key not in cached]
+    if missing:
+        env = dict(PATH=os.environ['PATH'], LANG='C', LC_ALL='C', GIT_CONFIG_GLOBAL='/dev/null',
+                   GIT_CONFIG_SYSTEM='/dev/null', GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')
+        raw = subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',
+                                       'cat-file', '--batch'], cwd=resolved_root, env=env,
+                                      input=('\n'.join(commit + ':' + path for commit, path in missing) + '\n').encode())
+        verified, cursor = {}, 0
+        for key in missing:
+            end = raw.index(b'\n', cursor)
+            fields = raw[cursor:end].decode().split(' ')
+            assert len(fields) == 3
+            blob, kind, length = fields
+            assert re.fullmatch('[0-9a-f]{40}', blob) and kind == 'blob' and re.fullmatch(r'(?:0|[1-9][0-9]*)', length)
+            size = int(length)
+            body = raw[end + 1:end + size + 1]
+            assert len(body) == size and raw[end + size + 1] == 10
+            assert hashlib.sha1(b'blob ' + str(size).encode() + b'\0' + body).hexdigest() == blob
+            verified[key] = body
+            cursor = end + size + 2
+        assert cursor == len(raw)
+        cached.update(verified)
+        _GIT_IMAGES[resolved_root] = cached
+    return {key: cached[key] for key in unique}
 
 
 def _edited(before, edits):

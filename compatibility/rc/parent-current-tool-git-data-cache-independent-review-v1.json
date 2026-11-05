@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "candidate_patch": "/tmp/current-tool-git-data-cache-v1/candidate.patch",
+  "candidate_patch_sha256": "0e86d7319dfaa7b09b20c726e9a272245f42aff3c89eb769d0aa90190127a9c5",
+  "verdict": "No cache correctness or authority-boundary blocker found. The patch caches only verified immutable Git cat-file blob bytes, with resolved-root and commit/path keys; current reads and owner guards remain physical.",
+  "reviewed_properties": {
+    "validation_before_warm_lookup": "Both helpers validate every request's commit and path before computing cache misses or returning warm data. Duplicate requests are deduplicated only after validation.",
+    "content_authentication": "Each batch record must have a well-formed blob SHA, blob type, canonical nonnegative size, exact body and separator; the Git blob SHA-1 is recomputed and the complete batch must be consumed.",
+    "atomic_publication": "New entries are staged in a local verified map and published only after the entire response passes checks. A malformed or truncated batch cannot publish its earlier records.",
+    "root_isolation": "Keys include realpath-resolved repository root plus exact commit/path; separate resolved roots have separate maps.",
+    "defensive_results": "JavaScript returns a fresh Buffer copy per result. Python returns immutable bytes. Neither cache's stored values are exposed to callers.",
+    "noncached_inputs": "Only git cat-file immutable commit/path bytes are cached. Physical readEvidenceMember/_physical calls, supplied-reader comparisons, bound metadata, receipts, and final physical sweeps are untouched.",
+    "no_program_execution": "The cache fetches Git blobs with cat-file; it does not evaluate retrieved source or execute historical programs. The patch is confined to gitImages/_git_images and the JS realpath import."
+  },
+  "fixture_validation": {
+    "command": "python3 /tmp/current-tool-git-data-cache-v1/fixture.py (run with repository cwd for TypeScript resolution)",
+    "result": "pass",
+    "coverage": ["warm hit", "JS defensive buffer copy", "Python immutable bytes", "invalid warm request rejected before another Git call", "same commit isolated across resolved roots", "truncated multi-object batch publishes no partial cache"],
+    "scope": "Temporary local Git repositories and extracted cache functions only; no current source factory, owner, probe, or CLI was run.",
+    "execution_note": "An initial invocation from the fixture directory could not resolve the repository TypeScript dependency; rerunning from the project cwd passed both JS and Python fixtures."
+  },
+  "remaining_limitations": "The fixture does not test actual source-factory cold/late physical guards or paired-source pin resealing; those remain parent-owned verification. The cache stores raw immutable Git blobs, which may include historical reference-packet files, but it does not cache parsed or derived metadata/receipt/owner state.",
+  "assessment": "Candidate is sound for the bounded immutable-Git-DATA cache behavior reviewed. No maintained files or Git state were changed."
+}
