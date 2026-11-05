@@ -30,6 +30,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import {MAT_TAB_GROUP, _MatTabBase} from './tab-base';
+import {captureActiveTabBodyTransforms} from './tab-body-base';
 import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion';
 type BooleanInput = string | boolean | null | undefined;
 type NumberInput = string | number | null | undefined;
@@ -262,6 +263,7 @@ export abstract class _MatTabGroupBase
     // If there is a change in selected index, emit a change event. Should not trigger if
     // the selected index has not yet been initialized.
     if (this._selectedIndex != indexToSelect) {
+      captureActiveTabBodyTransforms(this._tabBodyWrapper?.nativeElement);
       const isFirstRun = this._selectedIndex == null;
 
       if (!isFirstRun) {
