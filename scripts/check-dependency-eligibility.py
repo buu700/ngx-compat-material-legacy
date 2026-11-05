@@ -591,6 +591,129 @@ def private_npm_source_paths(root: Path) -> set[str]:
     return names
 
 
+NPM_CURRENT_PRIVATE_PROFILE_PATH = "compatibility/rc/parent-private-npm-current-profile-inputs-v1.json"
+# Sealed only after complete current source and command preconditions are reviewed.
+# An absent or unsealed profile fails closed during development.
+NPM_CURRENT_PRIVATE_PROFILE_SHA256 = "0000000000000000000000000000000000000000000000000000000000000000"
+
+
+def _private_npm_current_profile(root: Path, line: str, manifests: dict, evidence: dict):
+    """Authenticate one current source cut without changing historical verdicts.
+
+    The checker is the existing trust anchor. All other primary and finite
+    support inputs are current physical bytes, never a historical source view.
+    """
+    if root.is_symlink() or not root.is_dir():
+        raise ValueError("missing or linked current private npm root")
+    profile_ref = {"path": NPM_CURRENT_PRIVATE_PROFILE_PATH,
+                   "sha256": NPM_CURRENT_PRIVATE_PROFILE_SHA256}
+    profile_raw = _tool_proof_bytes(root, profile_ref["path"], profile_ref)
+    profile_ref["bytes"] = len(profile_raw)
+    profile = json.loads(profile_raw)
+    if (profile.get("schema_version") != 1
+            or profile.get("scope") != "maintained-tool-owned-npm-invocations"
+            or profile.get("historical_artifacts") != NPM_PRIVATE_PROFILE_ARTIFACTS):
+        raise ValueError("foreign current private npm profile")
+    branch = profile["lines"][line]
+    historical = manifests["lines"][line]
+    if (branch["historical_source_parent"] != historical["source_parent"]
+            or branch["historical_source_files"] != len(historical["source_files"])
+            or re.fullmatch(r"[0-9a-f]{40}", branch["source_parent"]) is None):
+        raise ValueError("current private npm source attribution changed")
+
+    def source_rows(name):
+        values = branch[name]
+        if type(values) is not list:
+            raise ValueError("invalid current private npm source rows")
+        rows = {}
+        for row in values:
+            if (type(row) is not dict or set(row) != {"path", "sha256", "bytes", "git_blob"}
+                    or type(row["path"]) is not str or row["path"] in rows
+                    or type(row["bytes"]) is not int or row["bytes"] < 1
+                    or type(row["sha256"]) is not str or re.fullmatch(r"[0-9a-f]{64}", row["sha256"]) is None
+                    or type(row["git_blob"]) is not str or re.fullmatch(r"[0-9a-f]{40}", row["git_blob"]) is None):
+                raise ValueError("invalid or duplicate current private npm source")
+            rows[row["path"]] = row
+        if list(rows) != sorted(rows):
+            raise ValueError("unordered current private npm source population")
+        return rows
+
+    primary, support, inputs = (source_rows(name) for name in ("source_files", "support_files", "input_files"))
+    all_rows = {**primary, **support, **inputs}
+    if len(all_rows) != len(primary) + len(support) + len(inputs):
+        raise ValueError("overlapping current private npm input populations")
+    if "scripts/check-dependency-eligibility.py" in all_rows:
+        raise ValueError("current private npm profile cannot self-authenticate its checker")
+    groups = branch["support_discovery"]
+    suffixes = [".cjs", ".js", ".mjs", ".py", ".sh", ".ts"]
+    discovery_roots = {"tests", "compatibility/handoff/codex-closeout/tools"}
+    if type(groups) is not list or len(groups) != len(discovery_roots):
+        raise ValueError("current private npm discovery scope changed")
+    grouped = {}
+    for group in groups:
+        if (type(group) is not dict or set(group) != {"root", "suffixes", "paths"}
+                or group["root"] not in discovery_roots or group["root"] in grouped
+                or group["suffixes"] != suffixes or type(group["paths"]) is not list
+                or group["paths"] != sorted(set(group["paths"]))
+                or not set(group["paths"]).issubset(support)):
+            raise ValueError("current private npm discovery scope changed")
+        grouped[group["root"]] = group
+    if set(grouped) != discovery_roots:
+        raise ValueError("current private npm discovery roots changed")
+    source_hashes = evidence["roots"][line]["source_hashes"]
+    attribution = branch["historical_source_hashes"]
+    if set(attribution) != set(source_hashes):
+        raise ValueError("current private npm historical input population changed")
+    for path, digest in source_hashes.items():
+        if (path not in all_rows or attribution[path] != {
+                "historical_sha256": digest, "current_sha256": all_rows[path]["sha256"]}):
+            raise ValueError("current private npm historical input attribution changed")
+    review_ref = profile["review"]
+    if (type(review_ref) is not dict or set(review_ref) != {"path", "sha256", "bytes"}
+            or type(review_ref["bytes"]) is not int or review_ref["bytes"] < 1):
+        raise ValueError("invalid current private npm review reference")
+    review = json.loads(_tool_proof_bytes(root, review_ref["path"], review_ref))
+    roster_hash = lambda rows: hashlib.sha256(json.dumps(list(rows.values()), sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    expected_review = {"source_parent": branch["source_parent"],
+                       "source_files_sha256": roster_hash(primary),
+                       "support_files_sha256": roster_hash(support),
+                       "input_files_sha256": roster_hash(inputs),
+                       "preconditions": "unchanged-maintained-tool-owned-npm"}
+    if (review.get("schema_version") != 1 or review.get("scope") != profile["scope"]
+            or review["lines"][line] != expected_review):
+        raise ValueError("current private npm review does not bind complete current inputs")
+
+    def assert_current():
+        _tool_proof_bytes(root, profile_ref["path"], profile_ref)
+        _tool_proof_bytes(root, review_ref["path"], review_ref)
+        if set(primary) != private_npm_source_paths(root):
+            raise ValueError("current private npm command source population changed")
+        for name, group in grouped.items():
+            parent = root
+            for part in name.split("/"):
+                parent = parent / part
+                if parent.is_symlink() or not parent.is_dir():
+                    raise ValueError("missing or linked current private npm support directory")
+            found = set()
+            for path in parent.rglob("*"):
+                if path.is_symlink():
+                    raise ValueError("linked current private npm support")
+                if path.is_file() and path.suffix in suffixes:
+                    found.add(path.relative_to(root).as_posix())
+            if found != set(group["paths"]):
+                raise ValueError("current private npm discovered source population changed")
+        for path, row in all_rows.items():
+            raw = _tool_proof_bytes(root, path, row)
+            if hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest() != row["git_blob"]:
+                raise ValueError("current private npm source Git blob changed")
+
+    assert_current()
+    binding = {"current_profile": profile_ref, "current_source_parent": branch["source_parent"],
+               "current_source_files": len(primary), "current_support_files": len(support),
+               "current_input_files": len(inputs), "current_scope": profile["scope"]}
+    return binding, assert_current
+
+
 def private_npm_disposition_evidence(root: Path, archives: dict[str, bytes]) -> dict:
     """Admit only the exact reviewed private profile; never a general npm waiver."""
     base = "compatibility/rc/tool-advisory-triage/"
@@ -607,14 +730,9 @@ def private_npm_disposition_evidence(root: Path, archives: dict[str, bytes]) -> 
     if subject["source_parent"] != evidence["roots"][line]["revision"]:
         raise ValueError("private npm source attribution changed")
     rows = {row["path"]: row for row in subject["source_files"]}
-    if len(rows) != len(subject["source_files"]) or rows.keys() != private_npm_source_paths(root):
-        raise ValueError("private npm command source population changed")
-    for path, row in rows.items():
-        raw = _tool_proof_bytes(root, path, row)
-        if hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest() != row["git_blob"]:
-            raise ValueError("private npm source Git blob changed")
-    for path, digest in evidence["roots"][line]["source_hashes"].items():
-        _tool_proof_bytes(root, path, {"sha256": digest})
+    if len(rows) != len(subject["source_files"]):
+        raise ValueError("historical private npm source population changed")
+    current_binding, assert_current_profile = _private_npm_current_profile(root, line, manifests, evidence)
 
     # Check actual archive bytes and the complete selector-call population;
     # report hashes alone cannot authenticate fabricated dependency excerpts.
@@ -655,10 +773,11 @@ def private_npm_disposition_evidence(root: Path, archives: dict[str, bytes]) -> 
         raise ValueError("private npm triage scope changed")
     brace = private_npm_brace_validation(root, line, triage)
     findings.update(brace["findings"])
+    assert_current_profile()
     details = {row["id"]: row["body"] for row in evidence["current_advisories"]}
     return {"findings": findings, "details": details, "binding": {"line": line,
             "reviewed_source_parent": subject["source_parent"], "source_files": len(rows),
-            "artifacts": dict(NPM_PRIVATE_PROFILE_ARTIFACTS), "brace_validation": brace["binding"]}}
+            "artifacts": dict(NPM_PRIVATE_PROFILE_ARTIFACTS), "brace_validation": brace["binding"], **current_binding}}
 
 
 def _tool_proof_bytes(root: Path, relative: str, expected: dict | None = None) -> bytes:

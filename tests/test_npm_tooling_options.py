@@ -29,8 +29,9 @@ class NpmToolingOptionsTests(unittest.TestCase):
         report = json.loads(result.stdout)
         version = json.loads((ROOT / 'projects/ngx-material-legacy/package.json').read_text())['version']
         self.assertEqual(report['calls'], 19 if version.startswith('21.') else 21)
-        self.assertEqual(report['negative_controls'], 4)
-        self.assertTrue(report['original_argv_workdir_timeouts_and_other_behavior_preserved'])
+        self.assertEqual(report['negative_controls'], 7)
+        self.assertEqual(report['historical_normalization'], 'authenticated old Git source DATA only')
+        self.assertEqual(report['current_source_identity'], 'complete pinned raw programs; no historical projection')
 
     def test_old_or_changed_profile_cannot_reuse_compiled_fixture_cache(self):
         result = subprocess.run(['node', str(ROOT / 'tests/npm_tooling_cache_probe.mjs')],
