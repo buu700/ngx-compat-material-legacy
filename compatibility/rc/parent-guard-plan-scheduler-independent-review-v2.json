@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "role": "independent revised scheduler static review and bounded synthetic tests; no owner integration claim",
+  "source_head": "fbbafc907504087cae5fd341c2dd8113680c7b7d",
+  "inputs": [
+    {
+      "path": "scripts/canonical-source-guard-plan.mjs",
+      "sha256": "4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f",
+      "bytes": 4609
+    },
+    {
+      "path": "tests/canonical_source_guard_plan_probe.mjs",
+      "sha256": "28a4b35b3f7a4edab28b4c7abe826ee3645a753313b300b90b517c3885e49c01",
+      "bytes": 9185
+    }
+  ],
+  "prior_review": {
+    "path": "/tmp/parent-guard-plan-scheduler-independent-review-v1.json",
+    "sha256": "6a14e96c8928362db7cf7ecbc3910daf1bccb399c459ea7b6bb3793cf11e2514",
+    "bytes": 6356
+  },
+  "status": "previous two scheduler blockers addressed; no additional snapshot leak identified in the reviewed module; integration unqualified",
+  "prior_findings_resolution": [
+    {
+      "id": "mutable-internal-snapshot-exposed-as-this",
+      "analysis": "Phase functions now execute via a module-captured Reflect.apply with undefined receiver; frozen snapshot routing is never passed as receiver or argument. Test covers ordinary strict functions and an attempted this.final assignment; final counter proves the intended predicate ran."
+    },
+    {
+      "id": "non-synchronous-or-false-predicates-are-accepted",
+      "analysis": "Async/generator function kinds and proxy functions are rejected at graph capture; every executed local predicate must return exactly undefined. Test covers async/generator, a resolved Promise, a thenable object, generator object and booleans; final counter proves later final was not invoked."
+    }
+  ],
+  "static_observations": [
+    "Dependency/root graph is captured from own data descriptors on plain non-Proxy objects and dense arrays; postorder identity dedup checks cycles; later root/node/dependency descriptor/value changes are checked before and after a successful call.",
+    "Each invocation reruns preflight for all captured nodes, then consume, then final; there is no source/owner/result cache. During execution no mutable snapshot is exposed via predicate receiver.",
+    "A caught nested reentrant rejection permits the outer operation to continue by design; its real final pass still runs. Uncaught nested failure clears running in finally, allowing a later clean call.",
+    "The exact-undefined protocol fails closed if a synchronous function returns a rejected Promise, but this test uses Promise.resolve rather than Promise.reject; an unhandled rejection from a bad adapter is a possible process-level failure and needs integration handling. Do not reinterpret a rejected adapter as a successful guard.",
+    "Metadata restored entirely before final is not itself detected by endpoint comparison. Captured routing prevents redirection, but real owner predicates must independently use isolated judgments and recheck meaningful live metadata."
+  ],
+  "bounded_test": {
+    "command": [
+      "/nix/store/w8jijs92barihdb0z54dsgq5szj2wd47-nodejs-24.21.0/bin/node",
+      "--test",
+      "tests/canonical_source_guard_plan_probe.mjs"
+    ],
+    "exit_code": 0,
+    "tests": 13,
+    "passed": 13,
+    "failed": 0,
+    "scope": "synthetic scheduler graph and temporary physical files only; actual source-owner composition not run"
+  },
+  "test_coverage_gaps_and_nonclaims": [
+    "The controls use synthetic nodes/readers and a temporary two-file model; they do not prove actual WeakMap brands, 70\u219269\u219268 frame projections, callback-free real physical preflight/final, legacy population or exact M3 absent paths.",
+    "Graph mutation tests cover function replacement and accessor/proxy/sparse/cycle rejection, but do not separately demonstrate root-array/dependency-array replacement, post-capture accessor installation, or descriptor-flag mutation during a callback; add targeted cases if these guarantees are relied on.",
+    "Receiver test confirms this is undefined in an ES-module strict function; a sloppy-mode function gets globalThis rather than undefined, which still must never be the internal snapshot. Consider a Function-created sloppy callback test.",
+    "Direct returned thenable and Promise.resolve are covered; rejected Promise behavior and a predicate that schedules later work but returns undefined are not covered. Rejecting every source of delayed side effect is not possible through function type checks alone; genuine owner adapters must be synchronous by construction.",
+    "The 13 controls establish neither provenance of actual owner predicates nor completeness of their source/absence/population/captured-metadata checks. Preserve and run the earlier compound lifetime review and original full cold/late CLI paths after real integration.",
+    "Internal callback ordering/count is not a compatibility API; tests may verify scheduler\u2019s declared phase order but must not demand former recursive counts or cache real owner judgments."
+  ],
+  "owner_integration_proven": false,
+  "canonical_applied": false,
+  "g11_claim": "not-passed"
+}
