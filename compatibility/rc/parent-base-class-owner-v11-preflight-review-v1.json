@@ -1,0 +1,22 @@
+{
+  "scope": "Static preflight of unexecuted V11 runner and draft worksheet while V8 source producer is running. No source/runtime mutation or assumption of V8 result.",
+  "controller_sha256": "a44965c1aa1043f4c1dcdfba25cae41b5c3d45f1bbd84dfe431bcfc44f0c5043",
+  "findings": [
+    {
+      "issue": "Worksheet T14 cut not explicitly enforced",
+      "detail": "Runner checks the two V8 source_heads equal each other but does not assert they equal worksheet\u2019s exact T14 program cut 3c348bd913e97580952e39295057ce2c027b4b2a / 6533be7d665988e38e0b8c80a1f7f3e1362b713d. Rehashing program files supports byte equality but does not establish the specified exact provenance cut.",
+      "fix": "Compare both receipt source_heads to the explicit T14 codecut before launch; later metadata-only owner HEAD may differ and should remain separately recorded."
+    },
+    {
+      "issue": "Retained full report self-consistency not directly checked",
+      "detail": "The runner checks each stdout_report result and line but not exact passed case IDs, per-case statuses, g11 claim or source_commit-to-source_heads relationship. Trusted producer normally produces those, but the worksheet promises full reports pass.",
+      "fix": "Require both expected source regression case IDs exactly once with pass, report g11_claim not-passed and report source_commit equal the line\u2019s corresponding source_heads entry."
+    }
+  ],
+  "other_observations": [
+    "Expected scope from actual profile and explicit producer/factory/profile paths is 182 (131 21.x, 51 main); source-input rows must be unique and exact and are rehashed independently for both receipts.",
+    "Pinned unprofiled Node, original 1800/4096 limits, fresh output, environment sanitization, process group timeout kill/reap, retained malformed report and snapshot errors, and fail-closed actual full owner report success criteria are present. V10 timeout and exact canonical prestate checked.",
+    "No independent V8 pass is asserted; both V8 receipts and genuine full current source runs remain required. Capture final metadata-only preparation heads separately and confirm program bytes still match gates.",
+    "Pre-launch validation failure and unexpected external interruption are not guaranteed a terminal receipt; no hostile concurrent-filesystem or complete external input binding claim."
+  ]
+}
