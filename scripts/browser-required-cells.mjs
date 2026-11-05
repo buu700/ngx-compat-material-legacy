@@ -219,7 +219,7 @@ function labHtml() {
 
 function labSource(zoneless) {
   const zoneImport = zoneless ? '' : "import 'zone.js';\n";
-  const zoneNamed = zoneless ? ', provideZonelessChangeDetection' : '';
+  const zoneNamed = zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection';
   const zoneProvider = zoneless ? 'provideZonelessChangeDetection(), ' : '';
   return `${zoneImport}import {CSP_NONCE, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, NgZone, Directive, Injector, Input, NgModule, QueryList, TemplateRef, ViewChild, ViewChildren, ViewContainerRef, afterNextRender, forwardRef, inject, signal${zoneNamed}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
@@ -293,6 +293,7 @@ export class DialogBody {}
 })
 export class LabRoot {
   readonly rippleOnly = typeof window !== 'undefined' && new URL(window.location.href).searchParams.get('legacyRippleOnly') === '1';
+  private readonly zone = inject(NgZone);
   private dialog = inject(MatLegacyDialog);
   private snack = inject(MatLegacySnackBar);
   cspOnly = typeof window !== 'undefined' && !!(window as unknown as {__cspOnly?: boolean}).__cspOnly;
@@ -342,7 +343,12 @@ ${chipFocusLifecycleFixtureMembers()}
   }
   ngAfterViewInit(): void {
     const lab = this;
+    const insideAngularZone = this.zone.run(() => NgZone.isInAngularZone());
+    if (insideAngularZone !== ${!zoneless}) {
+      throw new Error('browser fixture zone mode mismatch');
+    }
     (window as unknown as {__lab: unknown}).__lab = {
+      zoneMode: {zoneless: ${zoneless}, insideAngularZone},
       closeTransient() {
         lab.rippleFrameLab?.dispose();
         try { lab.dialog.closeAll(); } catch { /* overlay already gone */ }
@@ -458,7 +464,7 @@ ${chipFocusLifecycleFixtureMembers()}
 })
 export class LabModule {}
 
-platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {
+platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}' }).catch(err => {
   const node = document.createElement('pre');
   node.id = 'bootstrap-error';
   node.textContent = String(err);
@@ -999,14 +1005,31 @@ function asJson(raw) {
   return raw;
 }
 
-async function waitReady(driver) {
+export function validateZoneModeObservation(observed, expectedZoneless) {
+  if (typeof expectedZoneless !== 'boolean') {
+    throw new Error('browser fixture requested mode is invalid');
+  }
+  const expectedInsideAngularZone = !expectedZoneless;
+  if (!observed || typeof observed !== 'object' ||
+      observed.zoneless !== expectedZoneless ||
+      observed.insideAngularZone !== expectedInsideAngularZone) {
+    throw new Error(`browser fixture zone mode mismatch: requested=${expectedZoneless ? 'zoneless' : 'zoneful'} observed=${JSON.stringify(observed)}`);
+  }
+  return {
+    requestedRuntime: expectedZoneless ? 'zoneless' : 'zoneful',
+    zoneless: observed.zoneless,
+    insideAngularZone: observed.insideAngularZone,
+  };
+}
+
+async function waitReady(driver, expectedZoneless) {
   let last = '';
   for (let i = 0; i < 90; i += 1) {
-    const raw = await driver.evaluate('JSON.stringify({ready: document.documentElement.dataset.labReady || "", error: (document.getElementById("bootstrap-error") || {}).textContent || "", state: document.readyState, text: (document.body && document.body.innerText || "").slice(0, 180)})');
+    const raw = await driver.evaluate('JSON.stringify({ready: document.documentElement.dataset.labReady || "", error: (document.getElementById("bootstrap-error") || {}).textContent || "", state: document.readyState, text: (document.body && document.body.innerText || "").slice(0, 180), zoneMode: window.__lab ? window.__lab.zoneMode || null : null})');
     const status = asJson(raw);
     last = JSON.stringify(status).slice(0, 400);
     if (status.error) throw new Error(`bootstrap failed: ${status.error}`);
-    if (status.ready === '1') return;
+    if (status.ready === '1') return validateZoneModeObservation(status.zoneMode, expectedZoneless);
     await sleep(500);
   }
   throw new Error(`lab did not become ready: ${last}`);
@@ -1098,15 +1121,18 @@ export async function executeIds(tarball, ids) {
   for (const [key, bucket] of groups) {
     const [, runtime, engine] = key.split('|');
     console.error(`building main ${runtime} for ${bucket.length} ${engine} cells`);
-    const built = await buildConsumer(tarball, runtime === 'zoneless');
+    if (runtime !== 'zoneless' && runtime !== 'zoneful') throw new Error(`unknown browser runtime mode: ${runtime}`);
+    const expectedZoneless = runtime === 'zoneless';
+    const built = await buildConsumer(tarball, expectedZoneless);
     if (runtime === 'zoneless' && built.bundleHasZone) throw new Error('zoneless bundle contains Zone');
     const {server, origin} = await startServer(built.consumer);
     try {
       const drive = DRIVERS[engine];
       if (!drive) throw new Error(`no driver for ${engine}`);
       await drive(origin, async driver => {
-        engines[engine] = driver.browser;
-        await waitReady(driver);
+        const observation = await waitReady(driver, expectedZoneless);
+        const previous = engines[engine]?.zoneModeObservations || [];
+        engines[engine] = {...driver.browser, zoneModeObservations: [...previous, {line: '21.x', requestedRuntime: runtime, observed: observation}]};
         outcomes.push(...await runCells(driver, bucket));
       });
     } catch (error) {
@@ -1156,7 +1182,9 @@ export async function main(argv) {
     const artifact = artifacts[line];
     if (!artifact) throw new Error(`no tarball for line ${line}`);
     console.error(`building ${line} ${runtime} for ${ids.length} ${engine} cells`);
-    const built = await buildConsumer(artifact.tarball, runtime === 'zoneless');
+    if (runtime !== 'zoneless' && runtime !== 'zoneful') throw new Error(`unknown browser runtime mode: ${runtime}`);
+    const expectedZoneless = runtime === 'zoneless';
+    const built = await buildConsumer(artifact.tarball, expectedZoneless);
     if (runtime === 'zoneless' && built.bundleHasZone) throw new Error(`zoneless bundle contains Zone for ${line}`);
     if (args.buildOnly && line === 'main' && runtime === 'zoneful') {
       console.log(JSON.stringify({built: built.consumer, versions: built.versions}));
@@ -1167,8 +1195,9 @@ export async function main(argv) {
       const drive = DRIVERS[engine];
       if (!drive) throw new Error(`no driver for ${engine}`);
       await drive(origin, async driver => {
-        browsers[engine] = driver.browser;
-        await waitReady(driver);
+        const observation = await waitReady(driver, expectedZoneless);
+        const previous = browsers[engine]?.zoneModeObservations || [];
+        browsers[engine] = {...driver.browser, zoneModeObservations: [...previous, {line, requestedRuntime: runtime, observed: observation}]};
         outcomes.push(...await runCells(driver, ids.filter(id => !id.endsWith('/csp-nonce'))));
         if (engine === 'chromium') {
           outcomes.push(...await runCsp(driver, origin, ids.filter(id => id.endsWith('/csp-nonce'))));
