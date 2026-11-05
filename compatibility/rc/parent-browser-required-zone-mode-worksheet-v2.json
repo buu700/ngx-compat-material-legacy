@@ -1,0 +1,36 @@
+{
+  "status": "scratch proposal; not applied or browser validated",
+  "problem": "Importing zone.js does not itself establish zoneful Angular change detection at current peers. The lab must verify the injected NgZone's execution mode before signalling readiness.",
+  "patches": {
+    "21.x": {
+      "patch": "/tmp/parent-browser-required-zone-mode-21.patch",
+      "source_before_sha256": "b20d02256e9f560efcfa5a93ca5512c2a859209486d16d4fd7714f1ca548a127",
+      "source_after_sha256": "0ff4701de780b76fdd9388cf9936a3cefeeb5a6e4f35e5c4d8eb6b5d02cefef4",
+      "before_bytes": 62901,
+      "after_bytes": 64933,
+      "patch_sha256": "3bcd0a8dfa3f5238ec403c3b4255e81ce46909380f555b15546cf170d40473d6"
+    },
+    "main": {
+      "patch": "/tmp/parent-browser-required-zone-mode-main.patch",
+      "source_before_sha256": "b2c05123c5b604f4548b354c75feed41b9e6589907f7320dbca2843a9ae8c919",
+      "source_after_sha256": "3e1c0399357045c51cff607e7187aee7f379f5e3851d13f117ce886885b958e9",
+      "before_bytes": 62901,
+      "after_bytes": 64933,
+      "patch_sha256": "3666c764839153321c1bd0eead841a664ba189a33a9581da72e916e9abd43a90"
+    }
+  },
+  "design": "waitReady(expectedZoneless) derives expected mode from the actual matrix request runtime field, rejects any runtime label other than zoneful/zoneless, reads window.__lab.zoneMode only after declared readiness, and validates both that self-reported label and the actual NgZone membership observation against the request. It returns the validated observation; both browser execution entry points preserve per-engine zoneModeObservations with line, requested runtime and observed values. Existing fixture elements, actions, styling and the applicationProviders public-provider choice are unchanged.",
+  "public_api_scope": "Installed 21.2.23 and 22.1.7 core declarations expose both public provider functions; advertised minimum core peers respectively ^21.2.23 and ^22.1.7. Full browser applicability is untested. Existing 21.2.23 peer-only probe used module providers for its zoneful observation; applicationProviders is the documented variant and remains to be exercised.",
+  "transition_bindings": {
+    "21.x": "c04-browser-reference-source-inputs.json transitions[0].after; c04-browser-reference-proposal.json source_transitions[0].current and updates[0,2,5,8,11,15].after_reference",
+    "main": "c04-browser-reference-source-inputs.json transitions[1].after; c04-browser-reference-proposal.json source_transitions[1].current and updates[2,4,6,9,12,14,17].after_reference",
+    "proof_requirements": "Do not replace immutable before images or assert a new parent hash as historical fact. Existing browser-reference-source.mjs requires reviewed Git source_parent bytes, exact literal reconstruction, complete diff and hunk reviews, hunk count, and raw source census. Introduce an independently reviewed exact finite successor for changed labSource and consumed source identity, preserving the prior records as predecessor; establish and authenticate the new Git cut only after actual source commit. Reconcile proposal/current references and dependent profile/factory anchors transitively with real reviewed outputs, not hash substitution. current-sass-tool-references.mjs, current_sass_tool_references.py and parent-base-class-tool-successor-builder-v1.py contain historical packet identity anchors that must remain authenticated through any successor; determine precise successor enrollment during integration, rather than rewrite them blindly."
+  },
+  "validation": "Node 24.21.0 --check passed for both scratch modules; six pure predicate controls passed. No build, TypeScript compile, Angular runtime, browser/CDP, product suite, source gate, or G11 validation was performed. The previous Angular 21 isolated probe did not exercise the current applicationProviders variant and its overall runner exited 1 during Chromium cleanup.",
+  "schema": "parent-browser-required-zone-mode-worksheet-v2",
+  "behavioral_control": {
+    "path": "/tmp/parent-browser-zone-mode-predicate-control-v1.mjs",
+    "sha256": "6c772edc76f0e215ffca1e656d1242f3130f3c897d5bfe6d43cb25dbb562809a",
+    "result": "six pure predicate cases passed under pinned Node 24.21.0: exact zoneful/zoneless actual observations accepted; missing, label-mismatched, zone-membership-mismatched and inverted observations rejected. Both scratch-module predicate bodies were copied byte-for-byte into the control harness. This does not run or import browser harness modules."
+  }
+}
