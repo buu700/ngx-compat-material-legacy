@@ -15,6 +15,7 @@ import {gunzipSync} from 'node:zlib';
 import admission from './upstream-base-class-removal-admission.cjs';
 import {readHistoricalContractRepairMember} from './historical-contract-repair-source.mjs';
 import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
+import {tabsFiniteSourceSuccessor} from './tabs-finite-source-successor.mjs';
 import {applyBaseClassRemovalCanonicalStage, baseClassRemovalRegistrySuccessor,
   BASE_CLASS_REMOVAL_LEDGER, BASE_CLASS_REMOVAL_REGISTRY,
   BASE_CLASS_REMOVAL_OWNER_SOURCE_SHA256} from './base-class-removal-canonical-stage.mjs';
@@ -29,6 +30,8 @@ const STAGE_TRANSITION = Object.freeze({path: 'compatibility/rc/21x-base-class-o
   sha256: '879dd05cc50b934d8cfe2a7bfa816ce598ad9cb172272ca7b5dfa2f5087feb71', bytes: 1655});
 const ADMISSION_TRANSITION = Object.freeze({path: 'compatibility/rc/parent-base-admission-current-source-successor-v1.json',
   sha256: 'f9fc32edb6e1ede3cf647eba6da1901d31a4df6d687dc9aa41139f3ebcfd090e', bytes: 20020});
+const ADMISSION_TABS_TRANSITION = Object.freeze({path: 'compatibility/rc/parent-base-admission-tabs-source-successor-v1.json',
+  sha256: '76a45031cc14d8a0bdda804467febff74d850d992bc288fe0799e52caf0f811f', bytes: 10132});
 const INSPECT_SOURCE_FUNCTION_SHA256 = '789c9016cd5e598f420d6fbde1fef078d2f38779b3db3a0ac4fa7a85d733a047';
 const GUARD_PLAN_FUNCTION_SHA256 = 'fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947';
 const rootDefault = resolve(fileURLToPath(new URL('..', import.meta.url)));
@@ -130,11 +133,26 @@ function admissionTransitionPhysical(root) {
   assert.equal(hash(raw), ADMISSION_TRANSITION.sha256, 'changed base-class admission transition');
   assert.equal(raw.length, ADMISSION_TRANSITION.bytes);
   const transition = JSON.parse(raw);
+  const successorRaw = physical(root, ADMISSION_TABS_TRANSITION.path);
+  assert.equal(hash(successorRaw), ADMISSION_TABS_TRANSITION.sha256, 'changed tabs admission transition');
+  assert.equal(successorRaw.length, ADMISSION_TABS_TRANSITION.bytes);
+  const successor = JSON.parse(successorRaw);
+  assert.equal(successor.schema_version, 1);assert.equal(successor.role, 'base-admission-tabs-source-successor');
+  assert.equal(successor.line, '21.x');assert.equal(successor.source_parent, '058628c44cbc51d9272777624101e91b6c0a5a42');
+  assert.deepEqual(successor.previous_transition, ADMISSION_TRANSITION);
+  assert.equal(successor.source_scope_only, true);assert.equal(successor.historical_programs_executed, false);
+  assert.equal(successor.canonical_changes_applied, false);assert.equal(successor.g11_claim, 'not-passed');
+  assert.equal(successor.unchanged_inspect_source_sha256, INSPECT_SOURCE_FUNCTION_SHA256);
+  assert.equal(successor.unchanged_metadata_ok_sha256, METADATA_OK_FUNCTION_SHA256);
+  assert.deepEqual(successor.transitions.map(row=>row.path), ['scripts/upstream-base-class-removal-admission.cjs','scripts/historical-contract-repair-source.mjs']);
+  const advanced=new Map(successor.transitions.map(row=>[row.path,row]));
+  assert.deepEqual(successor.additional_members.map(ref=>ref.path), ['scripts/tabs-finite-source-successor.mjs','compatibility/rc/parent-tabs-finite-source-successor-v1.json']);
+  for(const ref of successor.additional_members){const actual=physical(root,ref.path);assert.equal(hash(actual),ref.sha256,'changed tabs admission member '+ref.path);assert.equal(actual.length,ref.bytes);}
   // These captured references describe actual module-load images and function
   // text. Restoring disk after import cannot reattribute an older executable.
   for (const [name, captured, expected] of [
-    ['loadedSourceReferences', loadedSourceReferences, transition.loaded_source_references],
-    ['loadedProducerFunctionSha256', loadedProducerFunctionSha256, transition.loaded_producer_function_sha256],
+    ['loadedSourceReferences', loadedSourceReferences, successor.loaded_source_references],
+    ['loadedProducerFunctionSha256', loadedProducerFunctionSha256, successor.loaded_producer_function_sha256],
   ]) {
     assert.equal(ownValue(admission, name), captured, 'changed loaded base-class identity data');
     assert.ok(Array.isArray(captured) && Object.isFrozen(captured), 'mutable loaded base-class identity data');
@@ -148,7 +166,7 @@ function admissionTransitionPhysical(root) {
       }
     }
   }
-  for (const ref of transition.loaded_source_references) {
+  for (const ref of successor.loaded_source_references) {
     const actual = physical(root, ref.path);
     assert.equal(hash(actual), ref.sha256, 'changed loaded base-class producer file ' + ref.path);
     assert.equal(actual.length, ref.bytes);
@@ -186,9 +204,23 @@ function admissionTransitionPhysical(root) {
     }
     const after = Buffer.concat([...parts, before.subarray(cursor)]);
     assert.equal(hash(after), row.after.sha256); assert.equal(after.length, row.after.bytes);
-    assert.ok(equalBuffers(after, physical(root, row.path)), 'changed current base-class admission source ' + row.path);
+    const next=advanced.get(row.path);
+    if(next){assert.deepEqual({path:next.before.path,sha256:next.before.sha256,bytes:next.before.bytes},row.after);
+      assert.ok(equalBuffers(after,original(root,successor.source_parent,next.before)),'changed prior tabs admission source '+row.path);
+    }else assert.ok(equalBuffers(after, physical(root, row.path)), 'changed current base-class admission source ' + row.path);
   }
-  return transition;
+  for(const row of successor.transitions){
+    assert.equal(row.before.path,row.path);assert.equal(row.after.path,row.path);
+    const before=original(root,successor.source_parent,row.before);let cursor=0;const parts=[];
+    for(const edit of row.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=before.length);assert.equal(typeof edit.before,'string');assert.equal(typeof edit.after,'string');const old=Buffer.from(edit.before);assert.ok(equalBuffers(before.subarray(edit.offset,edit.offset+old.length),old),'changed tabs admission literal preimage');parts.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+old.length;}
+    const after=Buffer.concat([...parts,before.subarray(cursor)]);assert.equal(hash(after),row.after.sha256);assert.equal(after.length,row.after.bytes);assert.ok(equalBuffers(after,physical(root,row.path)),'changed current tabs admission source '+row.path);
+  }
+  // Construct the genuine tabs guard with a private physical reader before any
+  // caller callback. Its complete bound population joins this frame's cold and
+  // final sweeps, including callbacks that run later in the outer owner.
+  const tabs = tabsFiniteSourceSuccessor({root, line: '21.x', read: path => physical(root, path)});
+  return {...transition, loaded_source_references: successor.loaded_source_references,
+    additional_members: [...successor.additional_members, ...tabs.bound]};
 }
 
 /** Only actual physical callbacks are accepted. No historical-reader fallback. */
@@ -218,8 +250,8 @@ export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read 
     return raw;
   };
   member(GUARD_PLAN);
-  member(ADMISSION_TRANSITION);
-  for (const ref of admissionTransition.loaded_source_references) member(ref);
+  member(ADMISSION_TRANSITION);member(ADMISSION_TABS_TRANSITION);
+  for (const ref of [...admissionTransition.loaded_source_references,...admissionTransition.additional_members]) member(ref);
   const transition = JSON.parse(member(STAGE_TRANSITION));
   assert.equal(hash(image), BASE_CLASS_REMOVAL_OWNER_SOURCE_SHA256, 'loaded base-class leaf differs from stage pin');
   assert.ok(equalBuffers(current(SELF), image), 'loaded/current base-class leaf differs');

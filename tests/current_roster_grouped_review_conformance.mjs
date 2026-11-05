@@ -95,6 +95,19 @@ test('new export accepts a valid row and keeps exact source/evidence binding', a
   assertOneValid(stableComparison(f));
 });
 
+test('public helper ignores an attempted extra source-reference override', () => {
+  const original = bytes('original source'), changed = bytes('changed source'), evidence = bytes('evidence');
+  const path = REVIEW_ROOT + 'strict.json', item = {file: 'button.ts', module: '@angular/core', symbol: 'Directive'};
+  const reviewDoc = bytes(doc([review(item, original, 'evidence/strict.txt', evidence)]));
+  const candidate = row(item.file, item.module, item.symbol, path, reviewDoc);
+  const f = fixture([candidate], [[path, reviewDoc]], [[item.file, changed]], [['evidence/strict.txt', evidence]]);
+  let invoked = false;
+  const result = groupedReview(f.candidate, LINE, p => f.readMember(p), digest, () => { invoked = true; return digest(changed); });
+  assert.equal(invoked, false);
+  assertInsufficient(result, [item]);
+  assert.deepEqual(result, legacyReview(f.candidate, LINE, p => f.readMember(p), digest));
+});
+
 test('interleaved references group by path, retain row order, and count duplicate candidate uses separately', async () => {
   const srcA = bytes('source A'), srcB = bytes('source B'), evA = bytes('evidence A'), evB = bytes('evidence B');
   const pathA = REVIEW_ROOT + 'a.json', pathB = REVIEW_ROOT + 'b.json';

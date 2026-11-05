@@ -1,0 +1,1096 @@
+{
+  "schema_version": 1,
+  "role": "finite-tabs-current-source-successor",
+  "evidence_reviewed": true,
+  "old_programs_executed": false,
+  "full_owner_or_native_qualification": false,
+  "g11_claim": "not-passed",
+  "branches": {
+    "21.x": {
+      "transitions": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+          "source_parent": "26f81e67732c005bf792b7361afee4e4d538f036",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+            "sha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+            "bytes": 14475,
+            "git_blob": "74d429f39709a2e6cddbfecc18a865e1908f1042"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+            "sha256": "15d4c2d2daa1aafce8f6b263f9e2423742c3221af56954c829eea1ed693ea926",
+            "bytes": 20364
+          },
+          "edits": [
+            {
+              "offset": 1174,
+              "before": "",
+              "after": "// Capture the rendered transform before the group's active classes change layout.\n// Keys are pane elements, so nested groups and removed panes remain independent.\nconst pendingRenderedTransforms = new WeakMap<Element, string>();\n\nexport function captureActiveTabBodyTransforms(wrapper: HTMLElement | undefined): void {\n  if (!wrapper) return;\n  for (const body of Array.from(wrapper.children)) {\n    pendingRenderedTransforms.delete(body);\n    const content = body.firstElementChild;\n    const view = content?.ownerDocument.defaultView;\n    if (body.classList.contains('mat-tab-body-animating') &&\n        content?.classList.contains('mat-tab-body-content') && view) {\n      pendingRenderedTransforms.set(body, view.getComputedStyle(content).transform);\n    }\n  }\n}\n\n"
+            },
+            {
+              "offset": 2233,
+              "before": "",
+              "after": "  private _ownedReverseTransform: string | undefined;\n  private _reverseEndNotBefore = 0;\n"
+            },
+            {
+              "offset": 7813,
+              "before": "",
+              "after": "    this._restoreReverseTransform();\n    pendingRenderedTransforms.delete(this._elementRef.nativeElement);\n"
+            },
+            {
+              "offset": 8862,
+              "before": "",
+              "after": "    if (this._reverseEndNotBefore && this._transitionClock() < this._reverseEndNotBefore) {\n      return;\n    }\n"
+            },
+            {
+              "offset": 8920,
+              "before": "  private _startTransition(): void {\n",
+              "after": "  private _startTransition(fromOverride?: string): void {\n"
+            },
+            {
+              "offset": 9135,
+              "before": "",
+              "after": "    // A failed CSS restart can still leave an old end queued. Protect every\n    // replacement of a live phase, but keep disabled motion immediate.\n    const protectsReplacement = !!this._pendingTransition && !this._cssAnimationsDisabled();\n"
+            },
+            {
+              "offset": 9186,
+              "before": "      fromState: this._initialized ? this._previousPosition || 'void' : 'void',\n",
+              "after": "      fromState: fromOverride ?? (this._initialized ? this._previousPosition || 'void' : 'void'),\n"
+            },
+            {
+              "offset": 9385,
+              "before": "",
+              "after": "    // CSS events can be delivered around one frame early. The deadline filters\n    // obviously stale ends; native events do not carry a transition identity.\n    this._reverseEndNotBefore = protectsReplacement ?\n      this._transitionClock() + Math.max(0, this._durationMilliseconds() - 16) : 0;\n"
+            },
+            {
+              "offset": 11125,
+              "before": "",
+              "after": "    this._reverseEndNotBefore = 0;\n    pendingRenderedTransforms.delete(this._elementRef.nativeElement);\n    this._restoreReverseTransform();\n"
+            },
+            {
+              "offset": 11820,
+              "before": "    const duration = this._animationDurationInput.trim().match(/^(\\d*\\.?\\d+)(ms|s)$/);\n    const milliseconds = duration ? Number(duration[1]) * (duration[2] === 's' ? 1000 : 1) : 500;\n",
+              "after": "    const milliseconds = this._durationMilliseconds();\n"
+            },
+            {
+              "offset": 12567,
+              "before": "",
+              "after": "  }\n\n  private _transitionClock(): number {\n    const view = this._elementRef.nativeElement.ownerDocument?.defaultView;\n    if (view?.performance) return view.performance.now();\n    if (typeof performance !== 'undefined') return performance.now();\n    // A server without a Performance API has no native transition events.\n    return Date.now();\n  }\n\n  private _durationMilliseconds(): number {\n    const duration = this._animationDurationInput.trim().match(/^(\\d*\\.?\\d+)(ms|s)$/);\n    return duration ? Number(duration[1]) * (duration[2] === 's' ? 1000 : 1) : 500;\n  }\n\n  private _restoreReverseTransform(): void {\n    const style = this._contentElement?.nativeElement.style;\n    if (style && this._ownedReverseTransform !== undefined &&\n        style.transform === this._ownedReverseTransform && !style.getPropertyPriority('transform')) {\n      style.removeProperty('transform');\n    }\n    this._ownedReverseTransform = undefined;\n  }\n\n  /** Restart a reversed CSS transition from its pre-layout rendered transform. */\n  private _restartReverseTransition(): boolean {\n    const host = this._elementRef.nativeElement;\n    const rendered = pendingRenderedTransforms.get(host);\n    pendingRenderedTransforms.delete(host);\n    const content = this._contentElement?.nativeElement;\n    const style = content?.style;\n    if (!this._pendingTransition || this._cssAnimationsDisabled() || rendered === undefined ||\n        !content || !style || style.transitionProperty || style.getPropertyPriority('transition-property') ||\n        style.getPropertyPriority('transform') ||\n        (style.transform && style.transform !== this._ownedReverseTransform)) {\n      return false;\n    }\n    const transition = this._pendingTransition;\n    const position = this._position;\n    const previousTransform = style.getPropertyValue('transform');\n    const previousOwned = this._ownedReverseTransform;\n    style.setProperty('transition-property', 'none');\n    style.setProperty('transform', rendered);\n    const temporaryTransform = style.transform;\n    let measured = false;\n    try {\n      content.getBoundingClientRect();\n      measured = true;\n    } catch {\n      // Restore only properties still owned by this interrupted attempt.\n    } finally {\n      if (style.transitionProperty === 'none' && !style.getPropertyPriority('transition-property')) {\n        style.removeProperty('transition-property');\n      }\n    }\n    if (!measured || this._destroyed || this._pendingTransition !== transition ||\n        this._position !== position || style.transform !== temporaryTransform ||\n        style.getPropertyPriority('transform') || style.transitionProperty) {\n      if (style.transform === temporaryTransform && !style.getPropertyPriority('transform')) {\n        if (previousTransform && !(this._destroyed && previousTransform === previousOwned)) {\n          style.setProperty('transform', previousTransform);\n        } else {\n          style.removeProperty('transform');\n        }\n      }\n      return false;\n    }\n    const target = this._isCenterPosition(this._position) ? 'none' :\n      this._position === 'left' ? 'translate3d(-100%, 0, 0)' : 'translate3d(100%, 0, 0)';\n    style.setProperty('transform', target);\n    this._ownedReverseTransform = style.transform;\n    return true;\n"
+            },
+            {
+              "offset": 13659,
+              "before": "",
+              "after": "    const changesCenter = this._isCenterPosition(this._position) ||\n      this._isCenterPosition(this._previousPosition || '');\n    const priorTransition = this._pendingTransition;\n    const changesOwnedDeparture = !changesCenter && !!priorTransition &&\n      this._isCenterPosition(priorTransition.fromState) && this._ownedReverseTransform !== undefined;\n    const restarted = this._initialized && (changesCenter || changesOwnedDeparture) &&\n      this._restartReverseTransition();\n    // Layout can synchronously destroy the body or initiate a newer position.\n    if (this._destroyed || this._position !== position || this._pendingTransition !== priorTransition) {\n      return;\n    }\n    if (!restarted && this._ownedReverseTransform !== undefined) {\n      // A direction change or consumer style can prevent restarting. Release\n      // only our own target so it cannot override the newly selected class.\n      this._restoreReverseTransform();\n    }\n"
+            },
+            {
+              "offset": 13822,
+              "before": "    if (this._cssAnimationsDisabled() || this._initialized &&\n      (this._isCenterPosition(this._position) || this._isCenterPosition(this._previousPosition || ''))) {\n",
+              "after": "    if (this._cssAnimationsDisabled() || this._initialized && (changesCenter || changesOwnedDeparture)) {\n"
+            },
+            {
+              "offset": 14155,
+              "before": "      this._startTransition();\n",
+              "after": "      this._startTransition(changesOwnedDeparture ? priorTransition?.fromState : undefined);\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+          "source_parent": "26f81e67732c005bf792b7361afee4e4d538f036",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+            "sha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+            "bytes": 18122,
+            "git_blob": "d9ebe3480cfa2dd445dc7e4f8f8537010b6442cc"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+            "sha256": "339cd7dee4e6431d4a603b215bf5a78fb654b23dfb49bfe50246cb44af17515e",
+            "bytes": 18261
+          },
+          "edits": [
+            {
+              "offset": 662,
+              "before": "",
+              "after": "import {captureActiveTabBodyTransforms} from './tab-body-base';\n"
+            },
+            {
+              "offset": 8790,
+              "before": "",
+              "after": "      captureActiveTabBodyTransforms(this._tabBodyWrapper?.nativeElement);\n"
+            }
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "path": "projects/ngx-material-legacy/package.json",
+          "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d",
+          "bytes": 1397
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-body-reversal.spec.ts",
+          "sha256": "edd9e7149268ad22888e28f8ffa6ed27ce5683b15e28022a3c13b844fbbd9c54",
+          "bytes": 9127
+        },
+        {
+          "path": "compatibility/rc/c04-tabs-reversal-packet-v3.json",
+          "sha256": "a6e2e06b4804011e749cb7704c49cbcd0a4be4f1c999986f1f7d5e5dbd3ad57c",
+          "bytes": 4176
+        },
+        {
+          "path": "compatibility/rc/parent-tabs-affected-source-use-reviews-v1.json.gz",
+          "sha256": "86943bbfe564564180fc12be4b2848fcee5348f861c622164413771e06a38149",
+          "bytes": 39912
+        },
+        {
+          "path": "compatibility/rc/parent-tabs-authored-use-scan-21-v1.json.gz",
+          "sha256": "30a771d9d55052f6968bbe591959274386387a4abfbf9da7f17d85cf1ed73577",
+          "bytes": 122048
+        },
+        {
+          "path": "compatibility/rc/c04-tabs-reversal-evidence-eb68852f896222b29bfb08bdb4583b77b16bcbb3f907786144c8a467f31b5410.tar.gz",
+          "sha256": "eb68852f896222b29bfb08bdb4583b77b16bcbb3f907786144c8a467f31b5410",
+          "bytes": 584303
+        }
+      ],
+      "scan_path": "compatibility/rc/parent-tabs-authored-use-scan-21-v1.json.gz",
+      "review_path": "compatibility/rc/parent-tabs-affected-source-use-reviews-v1.json.gz",
+      "old_population_sha256": "b6b172aa5bc2dd61f5a81ebcc6477c4ff253dd26cc4b9ff0f0295911193b7947",
+      "current_population_sha256": "d34f1abe18c0d374304314ba9693df1a2b624204b58d26f4e3bd3863e2cd95be",
+      "review_rows": [
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "ChangeDetectorRef",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "Directive",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "ElementRef",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "EventEmitter",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "Input",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "NgZone",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "OnDestroy",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "OnInit",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "Optional",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "Output",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "ViewChild",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "inject",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/cdk/portal",
+          "symbol": "CdkPortalOutlet",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/cdk/portal",
+          "symbol": "TemplatePortal",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/cdk/bidi",
+          "symbol": "Direction",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/cdk/bidi",
+          "symbol": "Directionality",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "ANIMATION_MODULE_TYPE",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+          "reviewSha256": "27da5caee5de5838c49459b9e189a4a7ed8a68d65baa851e366f8458b6e16a92",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "AfterContentChecked",
+          "reviewPath": "compatibility/f10/authored-use-reviews/framework-lifecycle-types.json",
+          "reviewSha256": "df3208b24750a27e28e0b3af0c13b1d564f131d7fe0a254d757646385b6128fc",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "AfterContentInit",
+          "reviewPath": "compatibility/f10/authored-use-reviews/framework-lifecycle-types.json",
+          "reviewSha256": "df3208b24750a27e28e0b3af0c13b1d564f131d7fe0a254d757646385b6128fc",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "ChangeDetectionStrategy",
+          "reviewPath": "compatibility/f10/authored-use-reviews/metadata-current-profile-requalified-boundaries.json",
+          "reviewSha256": "cecf72fbe4e6131b89d4edc235e79d319e77a398afe89285117eef07bfaf88f3",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "ChangeDetectorRef",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-change-detector-boundaries.json",
+          "reviewSha256": "9d06d77ffe2b23cc900a0aeaabd78165699c4012822ed71ef479780bf55afe01",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "Component",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-class-decorator-boundaries.json",
+          "reviewSha256": "4f626d2d5c581414383c38fefaee754640ee2c04d2e87eccf8da1715762f3e1f",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "ContentChildren",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-property-and-parameter-boundaries.json",
+          "reviewSha256": "d50e06dd075d718df079cb41346ad6fd63623ff0a6f70e3800a064747d224ded",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "Directive",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-class-decorator-boundaries.json",
+          "reviewSha256": "4f626d2d5c581414383c38fefaee754640ee2c04d2e87eccf8da1715762f3e1f",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "ElementRef",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-element-ref-boundaries.json",
+          "reviewSha256": "82b3cf2268ba3cc081be7ba0d8b93b2f3e76a3919e6884e91d560b48238b609e",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "EventEmitter",
+          "reviewPath": "compatibility/f10/authored-use-reviews/public-event-emitter-boundary.json",
+          "reviewSha256": "3901aa0beb82870f33987a05f0190f4030f58f934e2ca24b946b94d4339860ab",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "Inject",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-property-and-parameter-boundaries.json",
+          "reviewSha256": "d50e06dd075d718df079cb41346ad6fd63623ff0a6f70e3800a064747d224ded",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "Input",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-property-and-parameter-boundaries.json",
+          "reviewSha256": "d50e06dd075d718df079cb41346ad6fd63623ff0a6f70e3800a064747d224ded",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "OnDestroy",
+          "reviewPath": "compatibility/f10/authored-use-reviews/framework-lifecycle-types.json",
+          "reviewSha256": "df3208b24750a27e28e0b3af0c13b1d564f131d7fe0a254d757646385b6128fc",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "Optional",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-property-and-parameter-boundaries.json",
+          "reviewSha256": "d50e06dd075d718df079cb41346ad6fd63623ff0a6f70e3800a064747d224ded",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "Output",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-property-and-parameter-boundaries.json",
+          "reviewSha256": "d50e06dd075d718df079cb41346ad6fd63623ff0a6f70e3800a064747d224ded",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "QueryList",
+          "reviewPath": "compatibility/f10/authored-use-reviews/public-query-list-boundary.json",
+          "reviewSha256": "e93259df0af6615d878400bf0ac45a0cd7559a2f1170e349f42fd890b8b0e03f",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "ViewChild",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-property-and-parameter-boundaries.json",
+          "reviewSha256": "d50e06dd075d718df079cb41346ad6fd63623ff0a6f70e3800a064747d224ded",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "ViewEncapsulation",
+          "reviewPath": "compatibility/f10/authored-use-reviews/metadata-current-profile-requalified-boundaries.json",
+          "reviewSha256": "cecf72fbe4e6131b89d4edc235e79d319e77a398afe89285117eef07bfaf88f3",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/cdk/coercion",
+          "symbol": "BooleanInput",
+          "reviewPath": "compatibility/f10/authored-use-reviews/owned-coercion-input-types.json",
+          "reviewSha256": "47d8954bcc765750de02878c68dde1903bebbe00ace7dfa590601b40fd6c9fe7",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": true
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/cdk/coercion",
+          "symbol": "coerceBooleanProperty",
+          "reviewPath": "compatibility/f10/authored-use-reviews/public-boolean-number-coercion.json",
+          "reviewSha256": "fcf99334da3a6fca5a882c03d4a03ca6d2f9d4b650725721a6cf30a954277839",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/cdk/coercion",
+          "symbol": "coerceNumberProperty",
+          "reviewPath": "compatibility/f10/authored-use-reviews/public-boolean-number-coercion.json",
+          "reviewSha256": "fcf99334da3a6fca5a882c03d4a03ca6d2f9d4b650725721a6cf30a954277839",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/cdk/coercion",
+          "symbol": "NumberInput",
+          "reviewPath": "compatibility/f10/authored-use-reviews/owned-coercion-input-types.json",
+          "reviewSha256": "47d8954bcc765750de02878c68dde1903bebbe00ace7dfa590601b40fd6c9fe7",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": true
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/material/core",
+          "symbol": "ThemePalette",
+          "reviewPath": "compatibility/f10/authored-use-reviews/public-theme-palette-label-types.json",
+          "reviewSha256": "485e628ad760750768004daac9c0b69cb4f63cd9c2806d50cd94ab5fb1a177b8",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/material/tabs",
+          "symbol": "MAT_TABS_CONFIG",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/material/tabs",
+          "symbol": "MatTabsConfig",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/cdk/a11y",
+          "symbol": "FocusOrigin",
+          "reviewPath": "compatibility/f10/authored-use-reviews/focus-origin-types.json",
+          "reviewSha256": "d5a94cd2875d7b1bcf11e9af46c49ccd12a3ff88ad737066658c116917686664",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "assertInInjectionContext",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "f7e13d605a0c5fd09425b9ce78c9e4f214cfb60173e475d0a2573b7602bf81ea",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        }
+      ]
+    },
+    "main": {
+      "transitions": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+          "source_parent": "02db9040695ee65bd372796f5e05fa7eb1d322c6",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+            "sha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+            "bytes": 14475,
+            "git_blob": "74d429f39709a2e6cddbfecc18a865e1908f1042"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+            "sha256": "15d4c2d2daa1aafce8f6b263f9e2423742c3221af56954c829eea1ed693ea926",
+            "bytes": 20364
+          },
+          "edits": [
+            {
+              "offset": 1174,
+              "before": "",
+              "after": "// Capture the rendered transform before the group's active classes change layout.\n// Keys are pane elements, so nested groups and removed panes remain independent.\nconst pendingRenderedTransforms = new WeakMap<Element, string>();\n\nexport function captureActiveTabBodyTransforms(wrapper: HTMLElement | undefined): void {\n  if (!wrapper) return;\n  for (const body of Array.from(wrapper.children)) {\n    pendingRenderedTransforms.delete(body);\n    const content = body.firstElementChild;\n    const view = content?.ownerDocument.defaultView;\n    if (body.classList.contains('mat-tab-body-animating') &&\n        content?.classList.contains('mat-tab-body-content') && view) {\n      pendingRenderedTransforms.set(body, view.getComputedStyle(content).transform);\n    }\n  }\n}\n\n"
+            },
+            {
+              "offset": 2233,
+              "before": "",
+              "after": "  private _ownedReverseTransform: string | undefined;\n  private _reverseEndNotBefore = 0;\n"
+            },
+            {
+              "offset": 7813,
+              "before": "",
+              "after": "    this._restoreReverseTransform();\n    pendingRenderedTransforms.delete(this._elementRef.nativeElement);\n"
+            },
+            {
+              "offset": 8862,
+              "before": "",
+              "after": "    if (this._reverseEndNotBefore && this._transitionClock() < this._reverseEndNotBefore) {\n      return;\n    }\n"
+            },
+            {
+              "offset": 8920,
+              "before": "  private _startTransition(): void {\n",
+              "after": "  private _startTransition(fromOverride?: string): void {\n"
+            },
+            {
+              "offset": 9135,
+              "before": "",
+              "after": "    // A failed CSS restart can still leave an old end queued. Protect every\n    // replacement of a live phase, but keep disabled motion immediate.\n    const protectsReplacement = !!this._pendingTransition && !this._cssAnimationsDisabled();\n"
+            },
+            {
+              "offset": 9186,
+              "before": "      fromState: this._initialized ? this._previousPosition || 'void' : 'void',\n",
+              "after": "      fromState: fromOverride ?? (this._initialized ? this._previousPosition || 'void' : 'void'),\n"
+            },
+            {
+              "offset": 9385,
+              "before": "",
+              "after": "    // CSS events can be delivered around one frame early. The deadline filters\n    // obviously stale ends; native events do not carry a transition identity.\n    this._reverseEndNotBefore = protectsReplacement ?\n      this._transitionClock() + Math.max(0, this._durationMilliseconds() - 16) : 0;\n"
+            },
+            {
+              "offset": 11125,
+              "before": "",
+              "after": "    this._reverseEndNotBefore = 0;\n    pendingRenderedTransforms.delete(this._elementRef.nativeElement);\n    this._restoreReverseTransform();\n"
+            },
+            {
+              "offset": 11820,
+              "before": "    const duration = this._animationDurationInput.trim().match(/^(\\d*\\.?\\d+)(ms|s)$/);\n    const milliseconds = duration ? Number(duration[1]) * (duration[2] === 's' ? 1000 : 1) : 500;\n",
+              "after": "    const milliseconds = this._durationMilliseconds();\n"
+            },
+            {
+              "offset": 12567,
+              "before": "",
+              "after": "  }\n\n  private _transitionClock(): number {\n    const view = this._elementRef.nativeElement.ownerDocument?.defaultView;\n    if (view?.performance) return view.performance.now();\n    if (typeof performance !== 'undefined') return performance.now();\n    // A server without a Performance API has no native transition events.\n    return Date.now();\n  }\n\n  private _durationMilliseconds(): number {\n    const duration = this._animationDurationInput.trim().match(/^(\\d*\\.?\\d+)(ms|s)$/);\n    return duration ? Number(duration[1]) * (duration[2] === 's' ? 1000 : 1) : 500;\n  }\n\n  private _restoreReverseTransform(): void {\n    const style = this._contentElement?.nativeElement.style;\n    if (style && this._ownedReverseTransform !== undefined &&\n        style.transform === this._ownedReverseTransform && !style.getPropertyPriority('transform')) {\n      style.removeProperty('transform');\n    }\n    this._ownedReverseTransform = undefined;\n  }\n\n  /** Restart a reversed CSS transition from its pre-layout rendered transform. */\n  private _restartReverseTransition(): boolean {\n    const host = this._elementRef.nativeElement;\n    const rendered = pendingRenderedTransforms.get(host);\n    pendingRenderedTransforms.delete(host);\n    const content = this._contentElement?.nativeElement;\n    const style = content?.style;\n    if (!this._pendingTransition || this._cssAnimationsDisabled() || rendered === undefined ||\n        !content || !style || style.transitionProperty || style.getPropertyPriority('transition-property') ||\n        style.getPropertyPriority('transform') ||\n        (style.transform && style.transform !== this._ownedReverseTransform)) {\n      return false;\n    }\n    const transition = this._pendingTransition;\n    const position = this._position;\n    const previousTransform = style.getPropertyValue('transform');\n    const previousOwned = this._ownedReverseTransform;\n    style.setProperty('transition-property', 'none');\n    style.setProperty('transform', rendered);\n    const temporaryTransform = style.transform;\n    let measured = false;\n    try {\n      content.getBoundingClientRect();\n      measured = true;\n    } catch {\n      // Restore only properties still owned by this interrupted attempt.\n    } finally {\n      if (style.transitionProperty === 'none' && !style.getPropertyPriority('transition-property')) {\n        style.removeProperty('transition-property');\n      }\n    }\n    if (!measured || this._destroyed || this._pendingTransition !== transition ||\n        this._position !== position || style.transform !== temporaryTransform ||\n        style.getPropertyPriority('transform') || style.transitionProperty) {\n      if (style.transform === temporaryTransform && !style.getPropertyPriority('transform')) {\n        if (previousTransform && !(this._destroyed && previousTransform === previousOwned)) {\n          style.setProperty('transform', previousTransform);\n        } else {\n          style.removeProperty('transform');\n        }\n      }\n      return false;\n    }\n    const target = this._isCenterPosition(this._position) ? 'none' :\n      this._position === 'left' ? 'translate3d(-100%, 0, 0)' : 'translate3d(100%, 0, 0)';\n    style.setProperty('transform', target);\n    this._ownedReverseTransform = style.transform;\n    return true;\n"
+            },
+            {
+              "offset": 13659,
+              "before": "",
+              "after": "    const changesCenter = this._isCenterPosition(this._position) ||\n      this._isCenterPosition(this._previousPosition || '');\n    const priorTransition = this._pendingTransition;\n    const changesOwnedDeparture = !changesCenter && !!priorTransition &&\n      this._isCenterPosition(priorTransition.fromState) && this._ownedReverseTransform !== undefined;\n    const restarted = this._initialized && (changesCenter || changesOwnedDeparture) &&\n      this._restartReverseTransition();\n    // Layout can synchronously destroy the body or initiate a newer position.\n    if (this._destroyed || this._position !== position || this._pendingTransition !== priorTransition) {\n      return;\n    }\n    if (!restarted && this._ownedReverseTransform !== undefined) {\n      // A direction change or consumer style can prevent restarting. Release\n      // only our own target so it cannot override the newly selected class.\n      this._restoreReverseTransform();\n    }\n"
+            },
+            {
+              "offset": 13822,
+              "before": "    if (this._cssAnimationsDisabled() || this._initialized &&\n      (this._isCenterPosition(this._position) || this._isCenterPosition(this._previousPosition || ''))) {\n",
+              "after": "    if (this._cssAnimationsDisabled() || this._initialized && (changesCenter || changesOwnedDeparture)) {\n"
+            },
+            {
+              "offset": 14155,
+              "before": "      this._startTransition();\n",
+              "after": "      this._startTransition(changesOwnedDeparture ? priorTransition?.fromState : undefined);\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+          "source_parent": "02db9040695ee65bd372796f5e05fa7eb1d322c6",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+            "sha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+            "bytes": 18122,
+            "git_blob": "d9ebe3480cfa2dd445dc7e4f8f8537010b6442cc"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+            "sha256": "339cd7dee4e6431d4a603b215bf5a78fb654b23dfb49bfe50246cb44af17515e",
+            "bytes": 18261
+          },
+          "edits": [
+            {
+              "offset": 662,
+              "before": "",
+              "after": "import {captureActiveTabBodyTransforms} from './tab-body-base';\n"
+            },
+            {
+              "offset": 8790,
+              "before": "",
+              "after": "      captureActiveTabBodyTransforms(this._tabBodyWrapper?.nativeElement);\n"
+            }
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "path": "projects/ngx-material-legacy/package.json",
+          "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c",
+          "bytes": 1391
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-body-reversal.spec.ts",
+          "sha256": "edd9e7149268ad22888e28f8ffa6ed27ce5683b15e28022a3c13b844fbbd9c54",
+          "bytes": 9127
+        },
+        {
+          "path": "compatibility/rc/c04-tabs-reversal-packet-v3.json",
+          "sha256": "a6e2e06b4804011e749cb7704c49cbcd0a4be4f1c999986f1f7d5e5dbd3ad57c",
+          "bytes": 4176
+        },
+        {
+          "path": "compatibility/rc/parent-tabs-affected-source-use-reviews-v1.json.gz",
+          "sha256": "86943bbfe564564180fc12be4b2848fcee5348f861c622164413771e06a38149",
+          "bytes": 39912
+        },
+        {
+          "path": "compatibility/rc/parent-tabs-authored-use-scan-main-v1.json.gz",
+          "sha256": "155ad6b36ba56c0fe7b3ad68b7b3205c24e37f5fd1ff6028f4d07e93be892273",
+          "bytes": 122049
+        },
+        {
+          "path": "compatibility/rc/c04-tabs-reversal-evidence-eb68852f896222b29bfb08bdb4583b77b16bcbb3f907786144c8a467f31b5410.tar.gz",
+          "sha256": "eb68852f896222b29bfb08bdb4583b77b16bcbb3f907786144c8a467f31b5410",
+          "bytes": 584303
+        }
+      ],
+      "scan_path": "compatibility/rc/parent-tabs-authored-use-scan-main-v1.json.gz",
+      "review_path": "compatibility/rc/parent-tabs-affected-source-use-reviews-v1.json.gz",
+      "old_population_sha256": "2375a711bc22510af51c57f7928a1c49d584352a34408a25df66cf2a9ef0f946",
+      "current_population_sha256": "4d68829e1c363dd5ffa1c1bc93c81b163b0eafac7ae7483cd70655a8f75cd287",
+      "review_rows": [
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "ChangeDetectorRef",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "Directive",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "ElementRef",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "EventEmitter",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "Input",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "NgZone",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "OnDestroy",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "OnInit",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "Optional",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "Output",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "ViewChild",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "inject",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/cdk/portal",
+          "symbol": "CdkPortalOutlet",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/cdk/portal",
+          "symbol": "TemplatePortal",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/cdk/bidi",
+          "symbol": "Direction",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/cdk/bidi",
+          "symbol": "Directionality",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "ANIMATION_MODULE_TYPE",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+          "reviewSha256": "277c426af47f734939311b74911f441ddc47fafa6d04111ec1919aed89e872b3",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "AfterContentChecked",
+          "reviewPath": "compatibility/f10/authored-use-reviews/framework-lifecycle-types.json",
+          "reviewSha256": "5f78eedd26f3f32ca0571d41e6e58ee776c0c9acd04c1709af389054ba864377",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "AfterContentInit",
+          "reviewPath": "compatibility/f10/authored-use-reviews/framework-lifecycle-types.json",
+          "reviewSha256": "5f78eedd26f3f32ca0571d41e6e58ee776c0c9acd04c1709af389054ba864377",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "ChangeDetectionStrategy",
+          "reviewPath": "compatibility/f10/authored-use-reviews/metadata-current-profile-requalified-boundaries.json",
+          "reviewSha256": "170535b402f9ec4dc080d720770dce9190ce2368da1a56e0f7e5652163230126",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "ChangeDetectorRef",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-change-detector-boundaries.json",
+          "reviewSha256": "ee3e9baf91d2b88da01d5b515fac9be7fd7e608d7b0f6b8983f4811cdd1ae714",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "Component",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-class-decorator-boundaries.json",
+          "reviewSha256": "0a140a0de168616e715702d043102d0de51c0f8540857b8200ee8047a1abfb0b",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "ContentChildren",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-property-and-parameter-boundaries.json",
+          "reviewSha256": "14731e904f3cf178315fa7bb605230be16c30c4fcfbacaef2c6784096edfdb57",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "Directive",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-class-decorator-boundaries.json",
+          "reviewSha256": "0a140a0de168616e715702d043102d0de51c0f8540857b8200ee8047a1abfb0b",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "ElementRef",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-element-ref-boundaries.json",
+          "reviewSha256": "d9eadfffb540446f979ce5b259a3881b715a02d659703c2901abeccbf6cdc046",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "EventEmitter",
+          "reviewPath": "compatibility/f10/authored-use-reviews/public-event-emitter-boundary.json",
+          "reviewSha256": "d8614a627b645540772986858aead5e7ab05b865d2fb2dbf6e6ed3e35eed8e36",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "Inject",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-property-and-parameter-boundaries.json",
+          "reviewSha256": "14731e904f3cf178315fa7bb605230be16c30c4fcfbacaef2c6784096edfdb57",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "Input",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-property-and-parameter-boundaries.json",
+          "reviewSha256": "14731e904f3cf178315fa7bb605230be16c30c4fcfbacaef2c6784096edfdb57",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "OnDestroy",
+          "reviewPath": "compatibility/f10/authored-use-reviews/framework-lifecycle-types.json",
+          "reviewSha256": "5f78eedd26f3f32ca0571d41e6e58ee776c0c9acd04c1709af389054ba864377",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "Optional",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-property-and-parameter-boundaries.json",
+          "reviewSha256": "14731e904f3cf178315fa7bb605230be16c30c4fcfbacaef2c6784096edfdb57",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "Output",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-property-and-parameter-boundaries.json",
+          "reviewSha256": "14731e904f3cf178315fa7bb605230be16c30c4fcfbacaef2c6784096edfdb57",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "QueryList",
+          "reviewPath": "compatibility/f10/authored-use-reviews/public-query-list-boundary.json",
+          "reviewSha256": "d8db0d03fc6fda9012a5df360d630896220c188258c7a27606cbd042e17bb253",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "ViewChild",
+          "reviewPath": "compatibility/f10/authored-use-reviews/historical-menu-requalified-property-and-parameter-boundaries.json",
+          "reviewSha256": "14731e904f3cf178315fa7bb605230be16c30c4fcfbacaef2c6784096edfdb57",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "ViewEncapsulation",
+          "reviewPath": "compatibility/f10/authored-use-reviews/metadata-current-profile-requalified-boundaries.json",
+          "reviewSha256": "170535b402f9ec4dc080d720770dce9190ce2368da1a56e0f7e5652163230126",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/cdk/coercion",
+          "symbol": "BooleanInput",
+          "reviewPath": "compatibility/f10/authored-use-reviews/owned-coercion-input-types.json",
+          "reviewSha256": "a00c70defd874e86dc6ddf88dc553cbd426f70a02c4d313b88840ae472d38dd8",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": true
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/cdk/coercion",
+          "symbol": "coerceBooleanProperty",
+          "reviewPath": "compatibility/f10/authored-use-reviews/public-boolean-number-coercion.json",
+          "reviewSha256": "1b4510df64018a6e743baa2b87dc445177f5fd63cfbd70aa75283f488ee55523",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/cdk/coercion",
+          "symbol": "coerceNumberProperty",
+          "reviewPath": "compatibility/f10/authored-use-reviews/public-boolean-number-coercion.json",
+          "reviewSha256": "1b4510df64018a6e743baa2b87dc445177f5fd63cfbd70aa75283f488ee55523",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/cdk/coercion",
+          "symbol": "NumberInput",
+          "reviewPath": "compatibility/f10/authored-use-reviews/owned-coercion-input-types.json",
+          "reviewSha256": "a00c70defd874e86dc6ddf88dc553cbd426f70a02c4d313b88840ae472d38dd8",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": true
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/material/core",
+          "symbol": "ThemePalette",
+          "reviewPath": "compatibility/f10/authored-use-reviews/public-theme-palette-label-types.json",
+          "reviewSha256": "2c2ec8921588fad213bd98bbd53f09e9e0fa4bb258719edbfa808e4e9248a542",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/material/tabs",
+          "symbol": "MAT_TABS_CONFIG",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/material/tabs",
+          "symbol": "MatTabsConfig",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/cdk/a11y",
+          "symbol": "FocusOrigin",
+          "reviewPath": "compatibility/f10/authored-use-reviews/focus-origin-types.json",
+          "reviewSha256": "e63c6098bc0fea05f023dd781d1c2876da9375767bdc803376cf488db1df6a4a",
+          "beforeSha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "retained_removed": false
+        },
+        {
+          "file": "legacy-tabs/internal/tab-body-base.ts",
+          "module": "@angular/core",
+          "symbol": "assertInInjectionContext",
+          "reviewPath": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+          "reviewSha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295",
+          "beforeSha256": "dd9a83822ad9e0c70b282da47f727696bace3699877797f5e7342406435ea615",
+          "retained_removed": false
+        }
+      ]
+    }
+  }
+}

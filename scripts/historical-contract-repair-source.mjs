@@ -14,6 +14,7 @@ import {fileURLToPath} from 'node:url';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {authoredUseReviewEvidence} from './authored-use-inventory.mjs';
 import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
+import {tabsFiniteSourceSuccessor} from './tabs-finite-source-successor.mjs';
 const SELF='scripts/historical-contract-repair-source.mjs',INPUTS='compatibility/rc/historical-contract-repair-source-inputs.json';
 const PINS={'21.x':'c1d7a8762cad7913a5d4ad60863afb506c56c61d27a78c17a3f5372c51cc9303',main:'cee92383ce1cb2c82b135e2e3b8be0131a46b114d60a521f7e11e4d0bb017191'};
 const image=readFileSync(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex'),originals=new Map();
@@ -72,17 +73,21 @@ function currentProducerReference(root,line,ref){
 
 export function historicalContractRepairSourceSubject({root=process.cwd(),read:providedRead}={}){
  root=resolve(root);assertPlanner(root);const physical=path=>readHistoricalContractRepairMember(root,path),bound=new Map();
+ const physicalVersion=JSON.parse(physical('projects/ngx-material-legacy/package.json')).version;
+ const physicalLine=physicalVersion.startsWith('21.')?'21.x':physicalVersion.startsWith('22.')?'main':null;assert.ok(physicalLine);
+ const tabs=tabsFiniteSourceSuccessor({root,read:providedRead??physical,line:physicalLine});
+ for(const ref of tabs.bound)bound.set(ref.path,{...ref});
  const read=path=>{
   const actual=physical(path);
   if(providedRead){const provided=providedRead(path);assert.ok(equal(actual,provided),'nonphysical current historical-repair input '+path);}
   assert.ok(equal(actual,physical(path)),'historical-repair input changed during callback '+path);
   const ref=reference(path,actual),previous=bound.get(path);if(previous)assert.deepEqual(ref,previous,'input changed during historical-repair qualification '+path);else bound.set(path,ref);return actual;
  };
- const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
+ const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);assert.equal(line,physicalLine,'historical-repair package line changed');
  const raw=read(INPUTS);assert.equal(hash(raw),PINS[line],'changed finite historical-repair input registry');const data=JSON.parse(raw);assert.equal(data.line,line);assert.equal(data.schema_version,1);
  assert.equal(data.source_scope_only,true);assert.equal(data.canonical_decisions_changed,0);assert.equal(data.actual_native_packed_browser_floor_or_full_audit_qualified,false);assert.equal(data.g11_claim,'not-passed');
  assert.equal(process.versions.node,JSON.parse(read('toolchain-lock.json')).repository.node);assert.ok(read(SELF).equals(image),'loaded historical-repair source owner differs from current file');
- const member=ref=>{const expected=currentProducerReference(root,line,ref);const bytes=read(ref.path);assert.equal(hash(bytes),expected.sha256,'changed historical-repair evidence '+ref.path);if(expected.bytes!==undefined)assert.equal(bytes.length,expected.bytes);return bytes;};
+ const member=ref=>{const prior=currentProducerReference(root,line,ref),expected=tabs.qualify(prior)??prior;const bytes=read(ref.path);assert.equal(hash(bytes),expected.sha256,'changed historical-repair evidence '+ref.path);if(expected.bytes!==undefined)assert.equal(bytes.length,expected.bytes);return bytes;};
  const implementation=JSON.parse(member(data.implementation)),useQualified=JSON.parse(member(data.current_use_qualification)),useProof=JSON.parse(member(data.current_use_source_proof)),review=JSON.parse(member(data.current_use_review));
  for(const record of [implementation,useQualified,useProof,review])assert.equal(record.line,line,'cross-line historical-repair evidence');
  assert.equal(implementation.g11_claim,'not-passed');assert.equal(implementation.canonical_admission_ready,false);assert.equal(implementation.actual_native_packed_browser_floor_or_full_audit_qualified,false);
@@ -157,7 +162,7 @@ export function historicalContractRepairSourceSubject({root=process.cwd(),read:p
   assert.equal(changed,4,'source boundary must contain all four repair preimages');assert.deepEqual(current,derived,'fresh source facts differ beyond the four qualified reference successors');
   return {current_metadata:derived,historical_comparison:structuredClone(historical),changed_source_references:changed,metadata_comparison_only:true,old_product_bytes_exposed:false};
  }finally{active=false;}};
- const sweep=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);}};
+ const sweep=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);}tabs.assertPhysical();};
  const guardNode=Object.freeze({dependencies:Object.freeze([]),
   preflight:()=>{idle();assertPlanner(root);sweep();},
   consume:()=>{idle();active=true;try{for(const ref of bound.values()){

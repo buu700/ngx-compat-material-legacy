@@ -27,7 +27,7 @@ const functionToString = Function.prototype.toString;
 // The actually loaded executable is independently bound as a current member.
 const image = readFileSync(__filename), currentHandlerRef = {path: HANDLER, sha256: hash(image), bytes: image.length};
 const handlerRef = Object.freeze({path: HANDLER, sha256: '013cbe4ae44ebebcf8331d2aedca972f15c824dd4e61bc795f0efa188d35b69a', bytes: 14322});
-const producerTransitions = Object.freeze([{"before":{"path":"scripts/upstream-base-class-removal-source.mjs","sha256":"1c127473aac8050d206b38c531eb8386492bbc4114acabd7d4a42dd80c30b17b","bytes":12495},"after":{"path":"scripts/upstream-base-class-removal-source.mjs","sha256":"2a225cd654fe4940aec34987c7b46453fa624b70743ae5fa63d73ce2341358e2","bytes":12610}},{"before":{"path":"compatibility/rc/21x-base-class-removal-source-final-review.mjs","sha256":"67fbedb4ac7310218123d4248f8f93519a9d9c7a03d5ecfccae398f78543084b","bytes":22339},"after":{"path":"compatibility/rc/21x-base-class-removal-source-final-review.mjs","sha256":"9fb47887c2389e0e40a8ba1fa4e2086e844d96940d82387d8b69c12b739839f0","bytes":22459}},{"before":{"path":"scripts/historical-contract-repair-source.mjs","sha256":"d4870c2cc12609da71b03c1745996693dd26444b2dfd848260cfda1ac3514da5","bytes":13052},"after":{"path":"scripts/historical-contract-repair-source.mjs","sha256":"c40c2eedcf643c3173619402bfcce29699cd56cf1f9606de311c3d651f946ba4","bytes":17590}}]);
+const producerTransitions = Object.freeze([{"before":{"path":"scripts/upstream-base-class-removal-source.mjs","sha256":"1c127473aac8050d206b38c531eb8386492bbc4114acabd7d4a42dd80c30b17b","bytes":12495},"after":{"path":"scripts/upstream-base-class-removal-source.mjs","sha256":"2a225cd654fe4940aec34987c7b46453fa624b70743ae5fa63d73ce2341358e2","bytes":12610}},{"before":{"path":"compatibility/rc/21x-base-class-removal-source-final-review.mjs","sha256":"67fbedb4ac7310218123d4248f8f93519a9d9c7a03d5ecfccae398f78543084b","bytes":22339},"after":{"path":"compatibility/rc/21x-base-class-removal-source-final-review.mjs","sha256":"9fb47887c2389e0e40a8ba1fa4e2086e844d96940d82387d8b69c12b739839f0","bytes":22459}},{"before":{"path":"scripts/historical-contract-repair-source.mjs","sha256":"d4870c2cc12609da71b03c1745996693dd26444b2dfd848260cfda1ac3514da5","bytes":13052},"after":{"path":"scripts/historical-contract-repair-source.mjs","sha256":"3e54bee94f62d9db7586d26a756ff260920a680a21d1059f642f64a718f22765","bytes":18178}}]);
 const bufferEquals = Buffer.prototype.equals;
 const equal = (actual, supplied) => Buffer.isBuffer(supplied) && Reflect.apply(bufferEquals, actual, [supplied]);
 function currentSourceReference(ref) {
@@ -39,22 +39,24 @@ function currentSourceReference(ref) {
 // Capture each producer before loading it. Current-file checks alone would not
 // reject a producer changed after import; exact exported function identities
 // also reject a previously cached implementation with different behavior.
-const producerPaths = ['scripts/upstream-base-class-removal-source.mjs', SOURCE + 'final-review.mjs', 'scripts/historical-contract-repair-source.mjs'];
+const producerPaths = ['scripts/upstream-base-class-removal-source.mjs', SOURCE + 'final-review.mjs', 'scripts/historical-contract-repair-source.mjs', 'scripts/tabs-finite-source-successor.mjs'];
 const loadedImages = new Map(producerPaths.map(path => [path, readFileSync(join(ROOT, path))]));
 const {verifyBaseClassRemovalOriginal, baseClassRemovalOriginalLoadedImage} = require('./upstream-base-class-removal-source.mjs');
 const {validateBaseClassRemovalReview, baseClassRemovalReviewLoadedImage} = require('../' + SOURCE + 'final-review.mjs');
 const {historicalContractRepairSourceSubject, readHistoricalContractRepairMember, historicalContractRepairLoadedImage} = require('./historical-contract-repair-source.mjs');
+const {tabsFiniteSourceSuccessor, tabsFiniteSourceLoadedImage} = require('./tabs-finite-source-successor.mjs');
 // Producer-owned identities describe each module's own evaluation, even if
 // it was cached before this CJS loaded. Disk-at-import is not load provenance.
 const loadedSourceReferences = Object.freeze([
   Object.freeze({...currentHandlerRef}), baseClassRemovalOriginalLoadedImage,
-  baseClassRemovalReviewLoadedImage, historicalContractRepairLoadedImage,
+  baseClassRemovalReviewLoadedImage, historicalContractRepairLoadedImage, tabsFiniteSourceLoadedImage,
 ]);
 const producerFunctions = [
   [verifyBaseClassRemovalOriginal, 'd67b84def0d5420b818feb336806d70009c0aaee53dab62c6cd7546da1a7fd33'],
   [validateBaseClassRemovalReview, '7ba2e397b673ed63a07f00a58a5cfdfcfd89238f8d4d574d6cdb992ae6527734'],
-  [historicalContractRepairSourceSubject, '55ebd20ad161283c156eedcd009fd64b374118bf3dfaa26ad5f633684875157c'],
+  [historicalContractRepairSourceSubject, 'edada19b97eb420fa6826ed8059340ff2ad27ebdfe6668c25604d2c2f1503a2a'],
   [readHistoricalContractRepairMember, '1c68187440d74b8d393de47b7660de0c86aa0c8689a687f125de1db001a8053b'],
+  [tabsFiniteSourceSuccessor, 'e90e768aac01e8b9a9c65032a5724d3dc2c3a2539a402d80ea880ef30fc08007'],
 ];
 const loadedProducerFunctionSha256 = Object.freeze(producerFunctions.map(([fn]) =>
   Object.freeze({name: fn.name, sha256: hash(Reflect.apply(functionToString, fn, []))})));

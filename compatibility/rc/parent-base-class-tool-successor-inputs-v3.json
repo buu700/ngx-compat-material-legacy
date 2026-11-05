@@ -393,14 +393,14 @@
           },
           "after": {
             "path": "scripts/historical-contract-repair-source.mjs",
-            "sha256": "c40c2eedcf643c3173619402bfcce29699cd56cf1f9606de311c3d651f946ba4",
-            "bytes": 17590
+            "sha256": "3e54bee94f62d9db7586d26a756ff260920a680a21d1059f642f64a718f22765",
+            "bytes": 18178
           },
           "edits": [
             {
               "offset": 670,
               "before": "",
-              "after": "import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';\n"
+              "after": "import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';\nimport {tabsFiniteSourceSuccessor} from './tabs-finite-source-successor.mjs';\n"
             },
             {
               "offset": 1097,
@@ -415,7 +415,7 @@
             {
               "offset": 3276,
               "before": " root=resolve(root);const physical=path=>readHistoricalContractRepairMember(root,path),bound=new Map();\n",
-              "after": " root=resolve(root);assertPlanner(root);const physical=path=>readHistoricalContractRepairMember(root,path),bound=new Map();\n"
+              "after": " root=resolve(root);assertPlanner(root);const physical=path=>readHistoricalContractRepairMember(root,path),bound=new Map();\n const physicalVersion=JSON.parse(physical('projects/ngx-material-legacy/package.json')).version;\n const physicalLine=physicalVersion.startsWith('21.')?'21.x':physicalVersion.startsWith('22.')?'main':null;assert.ok(physicalLine);\n const tabs=tabsFiniteSourceSuccessor({root,read:providedRead??physical,line:physicalLine});\n for(const ref of tabs.bound)bound.set(ref.path,{...ref});\n"
             },
             {
               "offset": 3431,
@@ -423,9 +423,14 @@
               "after": "  if(providedRead){const provided=providedRead(path);assert.ok(equal(actual,provided),'nonphysical current historical-repair input '+path);}\n  assert.ok(equal(actual,physical(path)),'historical-repair input changed during callback '+path);\n"
             },
             {
+              "offset": 3808,
+              "before": " const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);\n",
+              "after": " const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);assert.equal(line,physicalLine,'historical-repair package line changed');\n"
+            },
+            {
               "offset": 4603,
               "before": " const member=ref=>{const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'changed historical-repair evidence '+ref.path);if(ref.bytes!==undefined)assert.equal(bytes.length,ref.bytes);return bytes;};\n",
-              "after": " const member=ref=>{const expected=currentProducerReference(root,line,ref);const bytes=read(ref.path);assert.equal(hash(bytes),expected.sha256,'changed historical-repair evidence '+ref.path);if(expected.bytes!==undefined)assert.equal(bytes.length,expected.bytes);return bytes;};\n"
+              "after": " const member=ref=>{const prior=currentProducerReference(root,line,ref),expected=tabs.qualify(prior)??prior;const bytes=read(ref.path);assert.equal(hash(bytes),expected.sha256,'changed historical-repair evidence '+ref.path);if(expected.bytes!==undefined)assert.equal(bytes.length,expected.bytes);return bytes;};\n"
             },
             {
               "offset": 10377,
@@ -455,7 +460,7 @@
             {
               "offset": 12044,
               "before": " };\n const assertCurrent=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);if(providedRead)assert.ok(Buffer.from(providedRead(ref.path)).equals(actual),'late nonphysical historical-repair input '+ref.path);}};\n assertCurrent();return {line,images:structuredClone([...images.values()]),bound:structuredClone([...bound.values()]),qualify,historicalReference,compareSourceReport,assertCurrent,\n",
-              "after": " }finally{active=false;}};\n const sweep=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);}};\n const guardNode=Object.freeze({dependencies:Object.freeze([]),\n  preflight:()=>{idle();assertPlanner(root);sweep();},\n  consume:()=>{idle();active=true;try{for(const ref of bound.values()){\n   const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);\n   if(providedRead)assert.ok(equal(actual,Buffer.from(providedRead(ref.path))),'late nonphysical historical-repair input '+ref.path);\n   assert.ok(equal(actual,physical(ref.path)),'historical-repair input changed during callback '+ref.path);\n  }}finally{active=false;}},\n  final:()=>{idle();sweep();assertPlanner(root);},\n });\n const composed=planner(Object.freeze([guardNode])),assertCurrent=()=>{idle();composed();};\n const guardPlan=Object.freeze({assertCurrent,node:guardNode});\n assertCurrent();return {line,guardNode,guardPlan,images:structuredClone([...images.values()]),bound:structuredClone([...bound.values()]),qualify,historicalReference,compareSourceReport,assertCurrent,\n"
+              "after": " }finally{active=false;}};\n const sweep=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);}tabs.assertPhysical();};\n const guardNode=Object.freeze({dependencies:Object.freeze([]),\n  preflight:()=>{idle();assertPlanner(root);sweep();},\n  consume:()=>{idle();active=true;try{for(const ref of bound.values()){\n   const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);\n   if(providedRead)assert.ok(equal(actual,Buffer.from(providedRead(ref.path))),'late nonphysical historical-repair input '+ref.path);\n   assert.ok(equal(actual,physical(ref.path)),'historical-repair input changed during callback '+ref.path);\n  }}finally{active=false;}},\n  final:()=>{idle();sweep();assertPlanner(root);},\n });\n const composed=planner(Object.freeze([guardNode])),assertCurrent=()=>{idle();composed();};\n const guardPlan=Object.freeze({assertCurrent,node:guardNode});\n assertCurrent();return {line,guardNode,guardPlan,images:structuredClone([...images.values()]),bound:structuredClone([...bound.values()]),qualify,historicalReference,compareSourceReport,assertCurrent,\n"
             }
           ]
         },
@@ -978,24 +983,34 @@
           },
           "after": {
             "path": "scripts/upstream-base-class-removal-admission.cjs",
-            "sha256": "0bc2ac430dc20dc9962abd381ba8261ee31a32f95bc373466c0d870a86a9f5bb",
-            "bytes": 17053
+            "sha256": "674f98fd526f2b23d53f691dceab2da126b0cdf4a810aba8752ac5b8546a7e99",
+            "bytes": 17337
           },
           "edits": [
             {
               "offset": 1236,
               "before": "const image = readFileSync(__filename), handlerRef = {path: HANDLER, sha256: hash(image), bytes: image.length};\n",
-              "after": "// The v6 proof names the reviewed historical handler as immutable DATA.\n// The actually loaded executable is independently bound as a current member.\nconst image = readFileSync(__filename), currentHandlerRef = {path: HANDLER, sha256: hash(image), bytes: image.length};\nconst handlerRef = Object.freeze({path: HANDLER, sha256: '013cbe4ae44ebebcf8331d2aedca972f15c824dd4e61bc795f0efa188d35b69a', bytes: 14322});\nconst producerTransitions = Object.freeze([{\"before\":{\"path\":\"scripts/upstream-base-class-removal-source.mjs\",\"sha256\":\"1c127473aac8050d206b38c531eb8386492bbc4114acabd7d4a42dd80c30b17b\",\"bytes\":12495},\"after\":{\"path\":\"scripts/upstream-base-class-removal-source.mjs\",\"sha256\":\"2a225cd654fe4940aec34987c7b46453fa624b70743ae5fa63d73ce2341358e2\",\"bytes\":12610}},{\"before\":{\"path\":\"compatibility/rc/21x-base-class-removal-source-final-review.mjs\",\"sha256\":\"67fbedb4ac7310218123d4248f8f93519a9d9c7a03d5ecfccae398f78543084b\",\"bytes\":22339},\"after\":{\"path\":\"compatibility/rc/21x-base-class-removal-source-final-review.mjs\",\"sha256\":\"9fb47887c2389e0e40a8ba1fa4e2086e844d96940d82387d8b69c12b739839f0\",\"bytes\":22459}},{\"before\":{\"path\":\"scripts/historical-contract-repair-source.mjs\",\"sha256\":\"d4870c2cc12609da71b03c1745996693dd26444b2dfd848260cfda1ac3514da5\",\"bytes\":13052},\"after\":{\"path\":\"scripts/historical-contract-repair-source.mjs\",\"sha256\":\"c40c2eedcf643c3173619402bfcce29699cd56cf1f9606de311c3d651f946ba4\",\"bytes\":17590}}]);\nconst bufferEquals = Buffer.prototype.equals;\nconst equal = (actual, supplied) => Buffer.isBuffer(supplied) && Reflect.apply(bufferEquals, actual, [supplied]);\nfunction currentSourceReference(ref) {\n  const row = producerTransitions.find(row => row.before.path === ref.path);\n  if (!row) return ref;\n  assert.deepEqual(ref, row.before, 'unknown base-class producer predecessor');\n  return row.after;\n}\n"
+              "after": "// The v6 proof names the reviewed historical handler as immutable DATA.\n// The actually loaded executable is independently bound as a current member.\nconst image = readFileSync(__filename), currentHandlerRef = {path: HANDLER, sha256: hash(image), bytes: image.length};\nconst handlerRef = Object.freeze({path: HANDLER, sha256: '013cbe4ae44ebebcf8331d2aedca972f15c824dd4e61bc795f0efa188d35b69a', bytes: 14322});\nconst producerTransitions = Object.freeze([{\"before\":{\"path\":\"scripts/upstream-base-class-removal-source.mjs\",\"sha256\":\"1c127473aac8050d206b38c531eb8386492bbc4114acabd7d4a42dd80c30b17b\",\"bytes\":12495},\"after\":{\"path\":\"scripts/upstream-base-class-removal-source.mjs\",\"sha256\":\"2a225cd654fe4940aec34987c7b46453fa624b70743ae5fa63d73ce2341358e2\",\"bytes\":12610}},{\"before\":{\"path\":\"compatibility/rc/21x-base-class-removal-source-final-review.mjs\",\"sha256\":\"67fbedb4ac7310218123d4248f8f93519a9d9c7a03d5ecfccae398f78543084b\",\"bytes\":22339},\"after\":{\"path\":\"compatibility/rc/21x-base-class-removal-source-final-review.mjs\",\"sha256\":\"9fb47887c2389e0e40a8ba1fa4e2086e844d96940d82387d8b69c12b739839f0\",\"bytes\":22459}},{\"before\":{\"path\":\"scripts/historical-contract-repair-source.mjs\",\"sha256\":\"d4870c2cc12609da71b03c1745996693dd26444b2dfd848260cfda1ac3514da5\",\"bytes\":13052},\"after\":{\"path\":\"scripts/historical-contract-repair-source.mjs\",\"sha256\":\"3e54bee94f62d9db7586d26a756ff260920a680a21d1059f642f64a718f22765\",\"bytes\":18178}}]);\nconst bufferEquals = Buffer.prototype.equals;\nconst equal = (actual, supplied) => Buffer.isBuffer(supplied) && Reflect.apply(bufferEquals, actual, [supplied]);\nfunction currentSourceReference(ref) {\n  const row = producerTransitions.find(row => row.before.path === ref.path);\n  if (!row) return ref;\n  assert.deepEqual(ref, row.before, 'unknown base-class producer predecessor');\n  return row.after;\n}\n"
+            },
+            {
+              "offset": 1581,
+              "before": "const producerPaths = ['scripts/upstream-base-class-removal-source.mjs', SOURCE + 'final-review.mjs', 'scripts/historical-contract-repair-source.mjs'];\n",
+              "after": "const producerPaths = ['scripts/upstream-base-class-removal-source.mjs', SOURCE + 'final-review.mjs', 'scripts/historical-contract-repair-source.mjs', 'scripts/tabs-finite-source-successor.mjs'];\n"
             },
             {
               "offset": 1830,
               "before": "const {verifyBaseClassRemovalOriginal} = require('./upstream-base-class-removal-source.mjs');\nconst {validateBaseClassRemovalReview} = require('../' + SOURCE + 'final-review.mjs');\nconst {historicalContractRepairSourceSubject, readHistoricalContractRepairMember} = require('./historical-contract-repair-source.mjs');\n",
-              "after": "const {verifyBaseClassRemovalOriginal, baseClassRemovalOriginalLoadedImage} = require('./upstream-base-class-removal-source.mjs');\nconst {validateBaseClassRemovalReview, baseClassRemovalReviewLoadedImage} = require('../' + SOURCE + 'final-review.mjs');\nconst {historicalContractRepairSourceSubject, readHistoricalContractRepairMember, historicalContractRepairLoadedImage} = require('./historical-contract-repair-source.mjs');\n// Producer-owned identities describe each module's own evaluation, even if\n// it was cached before this CJS loaded. Disk-at-import is not load provenance.\nconst loadedSourceReferences = Object.freeze([\n  Object.freeze({...currentHandlerRef}), baseClassRemovalOriginalLoadedImage,\n  baseClassRemovalReviewLoadedImage, historicalContractRepairLoadedImage,\n]);\n"
+              "after": "const {verifyBaseClassRemovalOriginal, baseClassRemovalOriginalLoadedImage} = require('./upstream-base-class-removal-source.mjs');\nconst {validateBaseClassRemovalReview, baseClassRemovalReviewLoadedImage} = require('../' + SOURCE + 'final-review.mjs');\nconst {historicalContractRepairSourceSubject, readHistoricalContractRepairMember, historicalContractRepairLoadedImage} = require('./historical-contract-repair-source.mjs');\nconst {tabsFiniteSourceSuccessor, tabsFiniteSourceLoadedImage} = require('./tabs-finite-source-successor.mjs');\n// Producer-owned identities describe each module's own evaluation, even if\n// it was cached before this CJS loaded. Disk-at-import is not load provenance.\nconst loadedSourceReferences = Object.freeze([\n  Object.freeze({...currentHandlerRef}), baseClassRemovalOriginalLoadedImage,\n  baseClassRemovalReviewLoadedImage, historicalContractRepairLoadedImage, tabsFiniteSourceLoadedImage,\n]);\n"
             },
             {
               "offset": 2383,
               "before": "  [historicalContractRepairSourceSubject, '03b7124b9363c1c2a6d0b240d3f1d6de1ced5fa1073e34cbe90a414d84a663f4'],\n",
-              "after": "  [historicalContractRepairSourceSubject, '55ebd20ad161283c156eedcd009fd64b374118bf3dfaa26ad5f633684875157c'],\n"
+              "after": "  [historicalContractRepairSourceSubject, 'edada19b97eb420fa6826ed8059340ff2ad27ebdfe6668c25604d2c2f1503a2a'],\n"
+            },
+            {
+              "offset": 2602,
+              "before": "",
+              "after": "  [tabsFiniteSourceSuccessor, 'e90e768aac01e8b9a9c65032a5724d3dc2c3a2539a402d80ea880ef30fc08007'],\n"
             },
             {
               "offset": 2605,
@@ -2103,12 +2118,12 @@
         },
         {
           "path": "scripts/base-class-removal-owner-source.mjs",
-          "sha256": "3aa3234ff9520640ace1be923eb7f933e92c3a2e43085f41241db24e4ebb899d",
-          "bytes": 31047
+          "sha256": "ffc48c2656fd19a544c78a4cca98df344e8544b760aedeb1c8768e02d8f62999",
+          "bytes": 34844
         },
         {
           "path": "scripts/base-class-removal-canonical-stage.mjs",
-          "sha256": "083f4836b65636daaa201b5ce607313047cf355b0d5050d31679f15f7ddaf755",
+          "sha256": "989c81977957564217aaf7ba3aa369e8a434c7d3774c3b933b23761965a1fe5d",
           "bytes": 9622
         },
         {
@@ -2233,8 +2248,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "ff0395850064370e5bf878cc1567c1ac9e825345f1280829f0a91745c5241e07",
-          "bytes": 25504
+          "sha256": "0ade3b087bc8c6ec8dafdb8fdf85f5ad4ea075ea716341c5810815125c57be79",
+          "bytes": 26332
         },
         {
           "path": "scripts/check-source-contract-regressions.py",
@@ -2318,8 +2333,8 @@
         },
         {
           "path": "scripts/current-authored-roster-source.mjs",
-          "sha256": "dbffbdf4e8fed392724eaa2181e3accbbf061ace4e7783861e6c33f434336aae",
-          "bytes": 15929
+          "sha256": "4fe3cd87718d98cbdb7051fad6690f5a36e14ce542c106821e8e978a5d97929f",
+          "bytes": 19581
         },
         {
           "path": "tests/roster_source_guard_node_probe.mjs",
@@ -2328,12 +2343,12 @@
         },
         {
           "path": "tests/current_roster_grouped_review_conformance.mjs",
-          "sha256": "599a8e9de75cf784a28bfa7d7cb9e6587a14a3cc63d8fe5e6564614e4f7514c3",
-          "bytes": 15096
+          "sha256": "d7e61a15dd0b300b9b2090704a363d8a9f73c598d7bf78bd2197bc7f8d856577",
+          "bytes": 16014
         },
         {
           "path": "tests/test_current_roster_guard_node.py",
-          "sha256": "890ac1aeb3f153b7981df9d3b7ace1e0a299dd7ffb9db0554761a66c21c3ae85",
+          "sha256": "db12ac005be50d7b81c2d2c9014def1a8897b735480f78ba9d8e7631fb1375bc",
           "bytes": 4045
         },
         {
@@ -2475,6 +2490,61 @@
           "path": "tests/source_binding_guard_graph_probe.mjs",
           "sha256": "e0e9ef9fb3b73bc2e9afeb40dc2fec865d8a88f536b36813298582311ae503c4",
           "bytes": 3807
+        },
+        {
+          "path": "scripts/tabs-finite-source-successor.mjs",
+          "sha256": "849391de899541de13e0307673f0164f35439e16accde0718bd61bd51c9669f7",
+          "bytes": 5951
+        },
+        {
+          "path": "compatibility/rc/parent-tabs-finite-source-successor-v1.json",
+          "sha256": "4d4f79f238c802df6be6c34c8503f4e0e04b04e1c3e148b5c82bbfefcaa05938",
+          "bytes": 67135
+        },
+        {
+          "path": "compatibility/rc/parent-tabs-affected-source-use-reviews-v1.json.gz",
+          "sha256": "86943bbfe564564180fc12be4b2848fcee5348f861c622164413771e06a38149",
+          "bytes": 39912
+        },
+        {
+          "path": "compatibility/rc/c04-tabs-reversal-packet-v3.json",
+          "sha256": "a6e2e06b4804011e749cb7704c49cbcd0a4be4f1c999986f1f7d5e5dbd3ad57c",
+          "bytes": 4176
+        },
+        {
+          "path": "compatibility/rc/c04-tabs-reversal-evidence-eb68852f896222b29bfb08bdb4583b77b16bcbb3f907786144c8a467f31b5410.tar.gz",
+          "sha256": "eb68852f896222b29bfb08bdb4583b77b16bcbb3f907786144c8a467f31b5410",
+          "bytes": 584303
+        },
+        {
+          "path": "compatibility/rc/parent-tabs-authored-use-scan-21-v1.json.gz",
+          "sha256": "30a771d9d55052f6968bbe591959274386387a4abfbf9da7f17d85cf1ed73577",
+          "bytes": 122048
+        },
+        {
+          "path": "tests/tabs_finite_source_successor_probe.mjs",
+          "sha256": "c71ffff8e7f00375bcd5b55e737c6a231616c1cc71a152706a5ae4fbb1ffaeae",
+          "bytes": 6485
+        },
+        {
+          "path": "tests/tabs_finite_source_successor_runner.py",
+          "sha256": "d5160e853261fc0f41e3b12029749f33b6e6286fdb541ffc3770581a7ee22599",
+          "bytes": 2387
+        },
+        {
+          "path": "compatibility/rc/parent-base-admission-tabs-source-successor-v1.json",
+          "sha256": "76a45031cc14d8a0bdda804467febff74d850d992bc288fe0799e52caf0f811f",
+          "bytes": 10132
+        },
+        {
+          "path": "tests/tabs_finite_source_successor_t16_probe.mjs",
+          "sha256": "ab50bec897d5538bc79e725f17094388c2143a6d6e0283086b2131cc102c13ac",
+          "bytes": 3379
+        },
+        {
+          "path": "tests/tabs_finite_source_successor_t16_runner.py",
+          "sha256": "df85083cc0331290f3d4bf71aaed68ff61063471a8fa7aef6f852d5c7301006d",
+          "bytes": 2268
         }
       ]
     },
@@ -2790,14 +2860,14 @@
           },
           "after": {
             "path": "scripts/historical-contract-repair-source.mjs",
-            "sha256": "c40c2eedcf643c3173619402bfcce29699cd56cf1f9606de311c3d651f946ba4",
-            "bytes": 17590
+            "sha256": "3e54bee94f62d9db7586d26a756ff260920a680a21d1059f642f64a718f22765",
+            "bytes": 18178
           },
           "edits": [
             {
               "offset": 670,
               "before": "",
-              "after": "import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';\n"
+              "after": "import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';\nimport {tabsFiniteSourceSuccessor} from './tabs-finite-source-successor.mjs';\n"
             },
             {
               "offset": 1097,
@@ -2812,7 +2882,7 @@
             {
               "offset": 3276,
               "before": " root=resolve(root);const physical=path=>readHistoricalContractRepairMember(root,path),bound=new Map();\n",
-              "after": " root=resolve(root);assertPlanner(root);const physical=path=>readHistoricalContractRepairMember(root,path),bound=new Map();\n"
+              "after": " root=resolve(root);assertPlanner(root);const physical=path=>readHistoricalContractRepairMember(root,path),bound=new Map();\n const physicalVersion=JSON.parse(physical('projects/ngx-material-legacy/package.json')).version;\n const physicalLine=physicalVersion.startsWith('21.')?'21.x':physicalVersion.startsWith('22.')?'main':null;assert.ok(physicalLine);\n const tabs=tabsFiniteSourceSuccessor({root,read:providedRead??physical,line:physicalLine});\n for(const ref of tabs.bound)bound.set(ref.path,{...ref});\n"
             },
             {
               "offset": 3431,
@@ -2820,9 +2890,14 @@
               "after": "  if(providedRead){const provided=providedRead(path);assert.ok(equal(actual,provided),'nonphysical current historical-repair input '+path);}\n  assert.ok(equal(actual,physical(path)),'historical-repair input changed during callback '+path);\n"
             },
             {
+              "offset": 3808,
+              "before": " const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);\n",
+              "after": " const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);assert.equal(line,physicalLine,'historical-repair package line changed');\n"
+            },
+            {
               "offset": 4603,
               "before": " const member=ref=>{const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'changed historical-repair evidence '+ref.path);if(ref.bytes!==undefined)assert.equal(bytes.length,ref.bytes);return bytes;};\n",
-              "after": " const member=ref=>{const expected=currentProducerReference(root,line,ref);const bytes=read(ref.path);assert.equal(hash(bytes),expected.sha256,'changed historical-repair evidence '+ref.path);if(expected.bytes!==undefined)assert.equal(bytes.length,expected.bytes);return bytes;};\n"
+              "after": " const member=ref=>{const prior=currentProducerReference(root,line,ref),expected=tabs.qualify(prior)??prior;const bytes=read(ref.path);assert.equal(hash(bytes),expected.sha256,'changed historical-repair evidence '+ref.path);if(expected.bytes!==undefined)assert.equal(bytes.length,expected.bytes);return bytes;};\n"
             },
             {
               "offset": 10377,
@@ -2852,7 +2927,7 @@
             {
               "offset": 12044,
               "before": " };\n const assertCurrent=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);if(providedRead)assert.ok(Buffer.from(providedRead(ref.path)).equals(actual),'late nonphysical historical-repair input '+ref.path);}};\n assertCurrent();return {line,images:structuredClone([...images.values()]),bound:structuredClone([...bound.values()]),qualify,historicalReference,compareSourceReport,assertCurrent,\n",
-              "after": " }finally{active=false;}};\n const sweep=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);}};\n const guardNode=Object.freeze({dependencies:Object.freeze([]),\n  preflight:()=>{idle();assertPlanner(root);sweep();},\n  consume:()=>{idle();active=true;try{for(const ref of bound.values()){\n   const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);\n   if(providedRead)assert.ok(equal(actual,Buffer.from(providedRead(ref.path))),'late nonphysical historical-repair input '+ref.path);\n   assert.ok(equal(actual,physical(ref.path)),'historical-repair input changed during callback '+ref.path);\n  }}finally{active=false;}},\n  final:()=>{idle();sweep();assertPlanner(root);},\n });\n const composed=planner(Object.freeze([guardNode])),assertCurrent=()=>{idle();composed();};\n const guardPlan=Object.freeze({assertCurrent,node:guardNode});\n assertCurrent();return {line,guardNode,guardPlan,images:structuredClone([...images.values()]),bound:structuredClone([...bound.values()]),qualify,historicalReference,compareSourceReport,assertCurrent,\n"
+              "after": " }finally{active=false;}};\n const sweep=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);}tabs.assertPhysical();};\n const guardNode=Object.freeze({dependencies:Object.freeze([]),\n  preflight:()=>{idle();assertPlanner(root);sweep();},\n  consume:()=>{idle();active=true;try{for(const ref of bound.values()){\n   const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);\n   if(providedRead)assert.ok(equal(actual,Buffer.from(providedRead(ref.path))),'late nonphysical historical-repair input '+ref.path);\n   assert.ok(equal(actual,physical(ref.path)),'historical-repair input changed during callback '+ref.path);\n  }}finally{active=false;}},\n  final:()=>{idle();sweep();assertPlanner(root);},\n });\n const composed=planner(Object.freeze([guardNode])),assertCurrent=()=>{idle();composed();};\n const guardPlan=Object.freeze({assertCurrent,node:guardNode});\n assertCurrent();return {line,guardNode,guardPlan,images:structuredClone([...images.values()]),bound:structuredClone([...bound.values()]),qualify,historicalReference,compareSourceReport,assertCurrent,\n"
             }
           ]
         },
@@ -3180,8 +3255,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "ff0395850064370e5bf878cc1567c1ac9e825345f1280829f0a91745c5241e07",
-          "bytes": 25504
+          "sha256": "0ade3b087bc8c6ec8dafdb8fdf85f5ad4ea075ea716341c5810815125c57be79",
+          "bytes": 26332
         },
         {
           "path": "scripts/check-source-contract-regressions.py",
@@ -3255,8 +3330,8 @@
         },
         {
           "path": "scripts/current-authored-roster-source.mjs",
-          "sha256": "dbffbdf4e8fed392724eaa2181e3accbbf061ace4e7783861e6c33f434336aae",
-          "bytes": 15929
+          "sha256": "4fe3cd87718d98cbdb7051fad6690f5a36e14ce542c106821e8e978a5d97929f",
+          "bytes": 19581
         },
         {
           "path": "tests/roster_source_guard_node_probe.mjs",
@@ -3265,12 +3340,12 @@
         },
         {
           "path": "tests/current_roster_grouped_review_conformance.mjs",
-          "sha256": "599a8e9de75cf784a28bfa7d7cb9e6587a14a3cc63d8fe5e6564614e4f7514c3",
-          "bytes": 15096
+          "sha256": "d7e61a15dd0b300b9b2090704a363d8a9f73c598d7bf78bd2197bc7f8d856577",
+          "bytes": 16014
         },
         {
           "path": "tests/test_current_roster_guard_node.py",
-          "sha256": "890ac1aeb3f153b7981df9d3b7ace1e0a299dd7ffb9db0554761a66c21c3ae85",
+          "sha256": "db12ac005be50d7b81c2d2c9014def1a8897b735480f78ba9d8e7631fb1375bc",
           "bytes": 4045
         },
         {
@@ -3337,6 +3412,46 @@
           "path": "tests/test_browser_zone_source_successor.py",
           "sha256": "d5c286694f30251624e730460a8d57ef7b8a0e56d465d5df6a291283dace8626",
           "bytes": 2254
+        },
+        {
+          "path": "scripts/tabs-finite-source-successor.mjs",
+          "sha256": "849391de899541de13e0307673f0164f35439e16accde0718bd61bd51c9669f7",
+          "bytes": 5951
+        },
+        {
+          "path": "compatibility/rc/parent-tabs-finite-source-successor-v1.json",
+          "sha256": "4d4f79f238c802df6be6c34c8503f4e0e04b04e1c3e148b5c82bbfefcaa05938",
+          "bytes": 67135
+        },
+        {
+          "path": "compatibility/rc/parent-tabs-affected-source-use-reviews-v1.json.gz",
+          "sha256": "86943bbfe564564180fc12be4b2848fcee5348f861c622164413771e06a38149",
+          "bytes": 39912
+        },
+        {
+          "path": "compatibility/rc/c04-tabs-reversal-packet-v3.json",
+          "sha256": "a6e2e06b4804011e749cb7704c49cbcd0a4be4f1c999986f1f7d5e5dbd3ad57c",
+          "bytes": 4176
+        },
+        {
+          "path": "compatibility/rc/c04-tabs-reversal-evidence-eb68852f896222b29bfb08bdb4583b77b16bcbb3f907786144c8a467f31b5410.tar.gz",
+          "sha256": "eb68852f896222b29bfb08bdb4583b77b16bcbb3f907786144c8a467f31b5410",
+          "bytes": 584303
+        },
+        {
+          "path": "compatibility/rc/parent-tabs-authored-use-scan-main-v1.json.gz",
+          "sha256": "155ad6b36ba56c0fe7b3ad68b7b3205c24e37f5fd1ff6028f4d07e93be892273",
+          "bytes": 122049
+        },
+        {
+          "path": "tests/tabs_finite_source_successor_probe.mjs",
+          "sha256": "c71ffff8e7f00375bcd5b55e737c6a231616c1cc71a152706a5ae4fbb1ffaeae",
+          "bytes": 6485
+        },
+        {
+          "path": "tests/tabs_finite_source_successor_runner.py",
+          "sha256": "d5160e853261fc0f41e3b12029749f33b6e6286fdb541ffc3770581a7ee22599",
+          "bytes": 2387
         }
       ]
     }

@@ -1,0 +1,9 @@
+{
+ "supersedes":"/tmp/tabs-finite-source-owner-wiring-independent-review-v1.json",
+ "correction":"The V1 static review missed a real defect in roster SHA 268c8289b6a35d58aff37820d1bf0281200e642c3c59cb729d1ad490f9d2bc0a. The private expectedSource call referenced ref.path/ref.sha256 from an earlier block-scoped grouping loop; its ReferenceError was swallowed as an insufficient review, so the genuine roster constructor failed with seenReviewKeys size 0 instead of 43 on both lines. The exported public helper tests did not exercise the owner-only selector. V1's no-blocker assessment is withdrawn for that snapshot.",
+ "fixed_source_sha256_both_roots":"4fe3cd87718d98cbdb7051fad6690f5a36e14ce542c106821e8e978a5d97929f",
+ "fix_assessment":"At the revised snapshot, the private selector receives the actual current grouped document path and per-item expected hash; the surrounding code has already checked the document's actual hash against that item. This corrects the identified lexical scope error. The public wrapper remains strict. This is a static finding only; genuine constructor baseline and fault controls are still running and their outcomes must be recorded separately.",
+ "other_sha256":{"leaf":"70e58c5ee8e10f83c42375c34b54f5be2002d06bdf46cf01771b2dadf4ce601f","packet":"4d4f79f238c802df6be6c34c8503f4e0e04b04e1c3e148b5c82bbfefcaa05938","historical_repair":"3e54bee94f62d9db7586d26a756ff260920a680a21d1059f642f64a718f22765"},
+ "remaining":"Run genuine constructors on both lines and private actual row negative/late-fault tests, preserve the failed initial evidence, finish and independently review the acyclic T16 executable and loaded-function successor plus finite profile, and execute original full source and owner gates. No complete owner, G11, C04 or release pass.",
+ "tests":"No runtime tests independently executed by this reviewer."
+}

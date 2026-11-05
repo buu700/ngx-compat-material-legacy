@@ -51,7 +51,7 @@ class CurrentRosterGuardNodeTests(unittest.TestCase):
         child = subprocess.run(['node', '--test', '--test-reporter=tap', str(ROOT / 'tests/current_roster_grouped_review_conformance.mjs')],
                                cwd=ROOT, capture_output=True, text=True, timeout=60)
         self.assertEqual(child.returncode, 0, child.stdout + child.stderr)
-        self.assertIn('# tests 12', child.stdout)
+        self.assertIn('# tests 13', child.stdout)
         self.assertIn('# fail 0', child.stdout)
 
     def test_actual_constructor_current_reads_and_historical_rosters(self):
