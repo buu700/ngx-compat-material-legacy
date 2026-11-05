@@ -1,0 +1,35 @@
+{
+  "scope": "Static independent review of uncommitted 21.x narrow ledger operation, transition and probe versus committed parent. No runtime tests, owner execution, or maintained writes. Active mutable test prevented physical hashing of its target files.",
+  "result": "No concrete gap found under the agreed physical-frame and consumed-ledger contract. Focused tests cover the currently selected actual ledger state, not both applied and precursor states independently. Full-source and owner qualification remain outstanding.",
+  "observations": [
+    "The frame-node consume itself runs under shared frameConsuming state; direct frames.assertCurrent rejects if a narrow consume is active. ledgerSubject enters that same state with finally cleanup. Thus actual full\u2192narrow, narrow\u2192full, narrow\u2192narrow and a composed owner scheduler executing the frame node\u2192narrow all reject during the supplied callback; caught nested rejection leaves outer consume active and subsequent independent operations can retry.",
+    "Narrow ledgerSubject performs actual frozen frame-node physical preflight, reads physical ledger, calls supplied reader, compares physical to captured actualLedger and supplied bytes, re-reads physical ledger, executes actual frame-node physical final then returns copies. The preflight includes planner identity and all captured frame members; final sweep detects persistent late frame changes.",
+    "Stage metadataRead delegates non-ledger paths unchanged and returns the actual checked ledger subject bytes when precursor, or copied before bytes when applied. Exact actual-supplied comparison retained; omitted non-ledger supplied-reader checks are the agreed non-stable sampling difference.",
+    "V3 transition ref is pinned and physical-checked in constructor; the exact fully asserted transition uses the existing two edits plus the three-line-to-one ledger edit, checks old/new template byte length/hash and unique marker/edits, then validates full authenticated Git stage prefix plus substituted current owner image. Existing V2 is not edited by this diff.",
+    "Probe adds six real direct/stage cold helper, forged ledger and late helper faults, plus four caught recursive controls, with clean subsequent guard retry. It asserts one consumed callback and selected actual output; those callback counts are diagnostic, not public contract. The positive applied/precursor expression selects the actual current state and does not exercise both states."
+  ],
+  "profile_data": {
+    "sha256": "3ceede1550caa77e0255f74ae30657b790f2d7177a44801df80b59127e887140",
+    "bytes": 206363,
+    "identical_between_worktrees": true,
+    "prior_committed_metadata_and_update_lists_unchanged": true,
+    "counts": {
+      "21.x": {
+        "updates": 39,
+        "additional_inputs": 54
+      },
+      "main": {
+        "updates": 9,
+        "additional_inputs": 15
+      }
+    },
+    "unique_paths_within_each_roster": true,
+    "physical_references": "Not independently checked while unit test mutates helper and transition packet."
+  },
+  "limitations": [
+    "Planner and per-frame metadata protections rely on trusted committed scheduler startup and frozen owned node as in prior review.",
+    "Real tests should cover rejected and caught reentrancy on actual caller paths, same-length persistent cold/late frame changes, forged bytes, and both applied and precursor projections where an authentic fixture can represent each; do not fake product or canonical state.",
+    "Full legacy population and absent-path guarantees remain enclosing owner obligations; this frame-only operation does not cover them.",
+    "No continuous immutability claim, actual performance measurement, full source regression or G11 pass."
+  ]
+}
