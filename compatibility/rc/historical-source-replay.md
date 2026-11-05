@@ -1170,3 +1170,35 @@ The original26 replay entries,23 wrapper records,two successors and six-tool/two
 progress-path protocol remain unchanged. The original Python90-second budget is
 retained. This policy-control route cannot export an integration original report
 and grants no current native,packed,consumer,floor or audit credit.
+
+
+## Finite current npm checker seal transport
+
+The current npm checker remains the sole trust anchor for its exact current
+profile SHA. A final source frame must already contain its fixed v2 profile
+filename handoff. After the frame and replay-helper pins are committed, the npm
+profile is generated from that exact code cut and committed as immutable DATA.
+The final checker may change only its single exact
+`NPM_CURRENT_PRIVATE_PROFILE_SHA256` literal to that profile's actual SHA.
+
+The replay guard authenticates the complete checker beforeprogram from the
+selected frame's Gitblob and reconstructs the complete afterprogram with that
+one replacement. An optional single descriptor in this existing HEAD-owned
+document names schema_version1, the checkout line, and the fixed v2 profile
+path/SHA256/size/immutable commit. The descriptor uses canonical two-space JSON,
+so duplicate fields and alternate parses are rejected. Its marker name is
+`npm-current-profile-checker-self-pin-v1`; the actual descriptor is added only
+after the final profile is committed. No descriptor is present in this spec.
+
+The guard requires frame ancestry through the profile's local code source parent,
+the profile DATA commit, and caller HEAD. It checks the document against HEAD
+before use and checks physical document/profile/checker bytes after callbacks.
+The document must be absent from all three npm profile populations on both
+lines and both existing executable discovery groups; an already bound row is
+never filtered. This is replay transport authority only, not semantic approval
+of a new npm profile or a replacement npm trust anchor. All npm predicates and
+review qualification remain required. The exact six HEAD-tool paths, two mutable
+progress paths, original historical programs and rejection vectors are unchanged.
+Missing or malformed descriptors cannot admit a changed checker. Ordinary exact
+frame checker bytes retain their original guard route. No historical program is
+executed or returned as current source.
