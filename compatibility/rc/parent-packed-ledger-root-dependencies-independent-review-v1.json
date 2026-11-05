@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "status": "no_static_blocker",
+  "scope": "Read-only exact dependency diff across 21.x and main; no maintained mutations and no runtime owner execution",
+  "findings": [],
+  "evidence": {
+    "shared_files": "JS and Python factories, fixed-anchor controls, builder, V3 profile, and fixed-anchor test are byte-identical across the two closeout worktrees",
+    "profile": "bdfc409dba4b1a1f71e4b47e3d39a327e23ba86f0136176fa53df60c3554aa73, 172714 bytes, 21.x 36 updates and 30 additional inputs",
+    "new_python_row": "Hardcoded inventory packet SHA 0d9dfac3813a6dc60644a090a2173ce56eaed1bcbdb32c2be29ce53f32413cdc and size 12144; source_members[9] has exact predecessor f7b3ae0e...1393e6df/17868, independently matching Git d8ab97315b6c77b83f42c2bebcf63b2984fff255. Both current factories and builder use fixed anchor and finite before identity. No profile-provided anchor authority added.",
+    "inventory_owner": "Original 21.x immutable registry contains the inventory owner; its registered after 31f14576...3926f7dd/19268 matches Git d8 and V3 predecessor. Ordered V3 edits reconstruct exact physical updated owner f03ade19...b3c5a693/19310. Full original source-member reference passes qualifyReference before current digest and byte size checks, so 17868-byte predecessor can resolve to 24702-byte current file.",
+    "python_transition": "V3 ordered edits reconstruct physical updated Python file ee6fc513...c8080ec8/24702 from exact Git d8 predecessor.",
+    "controls": "Prior loop and controls preserved, one fixed row adds four analogous negative cases. Counts are 31 total before (one accepted, 30 rejected) and 35 total now (one accepted, 34 rejected) on 21.x; both engines per case. Test expects 35 for 21.x and three for main. This corrects the shorthand 31-to-35 negative cases.",
+    "authority": "Factory code enforces fixed identities and packet identity, Git checkpoint and physical after images; profile controls edits but cannot confer a new source-row anchor. Historical programs are read as data."
+  },
+  "limitations": [
+    "No runtime factory, owner, phase, main-line or product checks executed by this review; root runs tests independently.",
+    "Final result requires tests against unchanged exact source and profile bytes."
+  ],
+  "g11_claim": "not-passed"
+}

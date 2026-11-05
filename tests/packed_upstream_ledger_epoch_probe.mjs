@@ -25,6 +25,10 @@ const ledgerPath = 'compatibility/f10/disposition-ledger/ledger.json';
 const owner = 'scripts/snack-dom-source-context.mjs';
 const style = 'projects/ngx-material-legacy/styles/button/_button-theme.scss';
 const input = JSON.parse(read(inputPath)), cases = [], rejected = [];
+import {execFileSync} from 'node:child_process';
+import {gunzipSync} from 'node:zlib';
+import {currentSassToolReferenceSubject} from '../scripts/current-sass-tool-references.mjs';
+import {currentCanonicalTestFrame} from './current_sass_canonical_test_scope.mjs';
 // Phase selection affects this test's orchestration only. Every cold owner call
 // and every late-success-then-corruption lifetime below remains unchanged.
 const line=JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main';
@@ -51,11 +55,92 @@ function expectedAdmissions(){
  assert.equal(Number.isSafeInteger(roster.individual_source_reviews_with_retained_evidence),true);
  return roster.individual_source_reviews_with_retained_evidence;
 }
+function historicalLedgerData(ref){
+ const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
+ for(const key of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete env[key];
+ const raw=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',ref.source_parent+':'+ledgerPath],{cwd:root,env,maxBuffer:8*1024*1024});
+ assert.equal(hash(raw),ref.sha256);return raw;
+}
+const supplementalData=[], supplementalProjection=[];
+const dataControls={
+ 'unrelated-canonical-entry-change':'input-guards','mixed-before-and-after-canonical-ledger':'input-guards',
+ 'partial-seven-individual-admission':'testing-api','partial-six-Sass-admission':'sass',
+ 'partial-three-build-admission':'build','wrong-summary-count-with-identical-entries':'summary',
+ 'partial-landscape-source-decision':'landscape-ledger','partial-landscape-registry-digests':'landscape-ledger',
+ 'partial-native-spec-proof-digests':'native-spec','partial-native-spec-review-pointer':'native-spec',
+ 'partial-three-selection-source-admission':'selection','partial-eleven-selection-registry-digests':'selection',
+ 'stripped-required-selection-native-marker':'selection'};
+function supplementalDataCheck(id,corrupt){
+ if(line!=='21.x'||!Object.hasOwn(dataControls,id))return;
+ const prepared=getPrepared(),catalogRaw=read(framePath);assert.equal(hash(catalogRaw),'1818801b7b603d2707fe7f2571dd5819edb7de12e259934bc71b24354c8fd456');assert.equal(catalogRaw.length,4267);const catalog=JSON.parse(catalogRaw);
+ const stageNames=['testing_api_stage','sass_stage','rules_js_stage','summary_stage','autocomplete_landscape_stage','native_spec_metadata_stage','selection_native_stage','historical_wrapper_metadata_stage','historical_consumer_wrapper_metadata_stage','legacy_sass_entrypoint_stage','checker_reference_metadata_stage','token_build_stage','unthemable_stage','registered_checker_metadata_stage','modern_control_base_stage','theme_token_root_stage','form_field_tokenization_stage','m3_theme_boundary_stage','title_stage'];
+ const frames=[prepared.before,prepared.after,...stageNames.map(name=>prepared[name].after)];
+ assert.deepEqual(frames.map((raw,i)=>({role:catalog.frames[i].role,sha256:hash(raw),bytes:raw.length})),catalog.frames);
+ const proposalRaw=read('compatibility/rc/21x-base-class-removal-admission-canonical-proposal-v6.json');
+ assert.equal(hash(proposalRaw),'720a4fcd0c9d0d67afbeddd106fc9741d7ab34a0848edc1a0f2e6a25019b9881');assert.equal(proposalRaw.length,3578);
+ const proposal=JSON.parse(proposalRaw);
+ const images=['before','after'].map(side=>{const ref=proposal['ledger_'+side+'_image'],raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);const image=gunzipSync(raw);assert.equal(hash(image),proposal[side].sha256);assert.equal(image.length,proposal[side].bytes);return image;});
+ const current=currentCanonicalTestFrame({root,read});assert.ok(images.some(image=>image.equals(prepared.canonical_after)));assert.ok(read(ledgerPath).equals(prepared.canonical_after));
+ const baseline=dataControls[id]==='input-guards'?prepared.after:prepared.canonical_after;
+ assert.ok([...frames,...images].some(frame=>frame.equals(baseline)));
+ const mutant=corrupt(ledgerPath);assert.ok(Buffer.isBuffer(mutant));assertHistoricalDataInvariant(id,baseline,mutant,prepared);
+ assert.equal(supplementalData.some(row=>row.id===id),false);supplementalData.push({id,phase:dataControls[id]});current.assertCurrent();prepared.assertCurrent();
+}
+function assertHistoricalDataInvariant(id, baselineRaw, mutantRaw, prepared){
+ const baseline=JSON.parse(baselineRaw),mutant=JSON.parse(mutantRaw);
+ const entry=(ledger,sha)=>{const matches=ledger.entries.filter(row=>row.sha===sha);assert.equal(matches.length,1);return matches[0];};
+ const readPacket=(name,digest)=>{const raw=read('compatibility/rc/'+name);assert.equal(hash(raw),digest);return JSON.parse(name.endsWith('.gz')?gunzipSync(raw):raw);};
+ const compare=project=>{const expected=project(baseline);assert.doesNotThrow(()=>assert.deepEqual(project(baseline),expected));assert.throws(()=>assert.deepEqual(project(mutant),expected));};
+ const value=(ledger,row)=>row.path.reduce((v,key)=>v[key],entry(ledger,row.sha));
+ if(id==='unrelated-canonical-entry-change'){
+  const selected=new Set(input.reports.map(row=>row.after.path)),row=baseline.entries.find(item=>!selected.has(item.evidence_report));
+  assert.ok(row);assert.equal(entry(mutant,row.sha).reason,row.reason+' Unrelated change.');
+  compare(ledger=>ledger.entries.filter(item=>!selected.has(item.evidence_report)).map(item=>[item.sha,item.reason]));
+ }else if(id==='mixed-before-and-after-canonical-ledger'){
+  const selected=new Set(input.reports.map(row=>row.after.path)),row=baseline.entries.find(item=>selected.has(item.evidence_report)),prior=JSON.parse(prepared.before);
+  assert.ok(row);assert.notDeepEqual(row,entry(prior,row.sha));assert.deepEqual(entry(mutant,row.sha),entry(prior,row.sha));
+  compare(ledger=>baseline.entries.filter(item=>selected.has(item.evidence_report)).map(item=>entry(ledger,item.sha)));
+ }else if(['partial-seven-individual-admission','partial-six-Sass-admission','partial-three-build-admission'].includes(id)){
+  const config={
+   'partial-seven-individual-admission':['upstream-testing-api-21x-ledger-transition.json.gz','cd65646ca6055cac2cd23077d6bcf75c66f7c111666de703227efcc018d2a3e1','testing_api_21x',7,prepared.after],
+   'partial-six-Sass-admission':['upstream-sass-inspection-ledger-transition.json.gz','98d02b52e86689e4e05f4a750f044ee5c8a22f812ddb92dc9214d5156d298803','sass_inspection',6,prepared.sass_stage.before],
+   'partial-three-build-admission':['upstream-rules-js-build-ledger-transition.json.gz','c0e61d07aecb56a56c6c3b1d70d836c28edcfccbb36967f28460921037894191','rules_js_build_source_scope',3,prepared.rules_js_stage.before]
+  }[id];
+  const packet=readPacket(config[0],config[1]),rows=packet.entries,prior=JSON.parse(config[4]);assert.equal(rows.length,config[3]);assert.equal(new Set(rows.map(row=>row.sha)).size,config[3]);
+  for(const row of rows)assert.deepEqual(entry(baseline,row.sha).individual_proof[config[2]],row.after_entry.individual_proof[config[2]]);
+  const affected=rows.filter(row=>JSON.stringify(entry(mutant,row.sha))!==JSON.stringify(entry(baseline,row.sha)));assert.equal(affected.length,1);assert.deepEqual(entry(mutant,affected[0].sha),entry(prior,affected[0].sha));
+  compare(ledger=>rows.map(row=>entry(ledger,row.sha).individual_proof?.[config[2]]));
+ }else if(id==='wrong-summary-count-with-identical-entries'){
+  const closed=new Set(['irrelevant','not-applicable','inherited','already-adapted','do-not-adopt','adapt','already-present']),pending=new Set(['open','needs-individual-review','security-review']);
+  const validate=ledger=>{assert.equal(ledger.entries.length,1697);assert.ok(ledger.entries.every(row=>closed.has(row.final_disposition)||pending.has(row.final_disposition)));assert.equal(ledger.closed_dispositions,ledger.entries.filter(row=>closed.has(row.final_disposition)).length);assert.equal(ledger.open_or_deferred,ledger.entries.filter(row=>pending.has(row.final_disposition)).length);};
+  assert.deepEqual(mutant.entries,baseline.entries);assert.equal(mutant.open_or_deferred,baseline.open_or_deferred+1);assert.doesNotThrow(()=>validate(baseline));assert.throws(()=>validate(mutant));
+ }else if(id==='partial-landscape-source-decision'){
+  const packet=readPacket('autocomplete-landscape-ledger-transition.json.gz','d8de61098c5eb4fba574da97b1e6d582f13a3a3be3332bdb83ad00aa9c0f64ba'),sha=packet.entry.sha,prior=JSON.parse(prepared.autocomplete_landscape_stage.before);
+  assert.equal(sha,'008212a9807fd01fd32fe136a075763b7b2c854d');assert.deepEqual(entry(mutant,sha),entry(prior,sha));assert.notDeepEqual(entry(baseline,sha).individual_proof,entry(prior,sha).individual_proof);
+  compare(ledger=>entry(ledger,sha).individual_proof);
+ }else if(['partial-landscape-registry-digests','partial-eleven-selection-registry-digests','partial-native-spec-proof-digests','partial-native-spec-review-pointer'].includes(id)){
+  const config=id==='partial-landscape-registry-digests'?['autocomplete-landscape-ledger-transition.json.gz','d8de61098c5eb4fba574da97b1e6d582f13a3a3be3332bdb83ad00aa9c0f64ba','source_digest_updates',10]:id==='partial-eleven-selection-registry-digests'?['autocomplete-selection-ledger-successor.json','c47ae399ecd8426ca2d20e6561ea3e37bb94084bce1e850c22d50065a63eb512','source_digest_updates',11]:['autocomplete-selection-spec-ledger-successor.json','46338d4f9dc08c0e93a22611352cbbcb9170baa98b58323d1ffed4252963dac4','literal_updates',5];
+  const packet=readPacket(config[0],config[1]),rows=packet[config[2]];assert.equal(rows.length,config[3]);assert.equal(new Set(rows.map(row=>JSON.stringify([row.sha,row.path]))).size,rows.length);
+  const stage=id==='partial-landscape-registry-digests'?prepared.autocomplete_landscape_stage:id==='partial-eleven-selection-registry-digests'?prepared.selection_native_stage:prepared.native_spec_metadata_stage;const stageAfter=JSON.parse(stage.after);for(const row of rows)assert.equal(value(stageAfter,row),row.after);
+  const changed=rows.filter(row=>value(mutant,row)!==value(baseline,row));assert.equal(changed.length,1);assert.equal(value(mutant,changed[0]),changed[0].before);assert.notEqual(value(baseline,changed[0]),changed[0].before);
+  if(id==='partial-native-spec-proof-digests')assert.equal(changed[0].path.at(-1),'sha256');
+  if(id==='partial-native-spec-review-pointer')assert.deepEqual(changed[0].path,['evidence_report']);
+  compare(ledger=>rows.map(row=>value(ledger,row)));
+ }else if(['partial-three-selection-source-admission','stripped-required-selection-native-marker'].includes(id)){
+  const packet=readPacket('autocomplete-selection-ledger-successor.json','c47ae399ecd8426ca2d20e6561ea3e37bb94084bce1e850c22d50065a63eb512'),rows=packet.entries;assert.equal(rows.length,3);assert.equal(new Set(rows.map(row=>row.sha)).size,3);
+  for(const row of rows)assert.equal(entry(baseline,row.sha).individual_proof.proof_kind,row.after_entry.individual_proof.proof_kind);
+  const sha=rows[0].sha;if(id==='partial-three-selection-source-admission')assert.deepEqual(entry(mutant,sha),entry(JSON.parse(prepared.selection_native_stage.before),sha));else assert.equal(entry(mutant,sha).individual_proof.proof_kind,undefined);
+  compare(ledger=>rows.map(row=>entry(ledger,row.sha).individual_proof?.proof_kind));
+ }else assert.fail('unknown supplemental DATA invariant '+id);
+}
+const rejects = (() => {
 // BEGIN retained original rejection-helper
 function rejects(id, corrupt) {
   assert.throws(() => packedUpstreamLedgerEpoch({root, read: corrupt}), undefined, id); rejected.push(id);
 }
 // END retained original rejection-helper
+return (id, corrupt) => { supplementalDataCheck(id, corrupt); return rejects(id, corrupt); };
+})();
 function phase_canonical(){
  const prepared=getPrepared();
 // BEGIN retained original canonical
@@ -70,7 +155,9 @@ if(input.line==='21.x'){
  const stageNames=['testing_api_stage','sass_stage','rules_js_stage','summary_stage','autocomplete_landscape_stage','native_spec_metadata_stage','selection_native_stage','historical_wrapper_metadata_stage','historical_consumer_wrapper_metadata_stage','legacy_sass_entrypoint_stage','checker_reference_metadata_stage','token_build_stage','unthemable_stage','registered_checker_metadata_stage','modern_control_base_stage','theme_token_root_stage','form_field_tokenization_stage','m3_theme_boundary_stage','title_stage'];
  const frames=[{role:'before',raw:prepared.before},{role:'initial-metadata',raw:prepared.after},...stageNames.map(role=>({role,raw:prepared[role].after}))].map(({role,raw})=>({role,sha256:hash(raw),bytes:raw.length}));
  assert.deepEqual(catalog.frames,frames);assert.equal(new Set(frames.map(frame=>frame.sha256)).size,21);
- assert.equal(catalog.prior_owner.sha256,hash(read(catalog.prior_owner.path)));
+ const tools=currentSassToolReferenceSubject({root,read}),prior=tools.comparisonBytes(catalog.prior_owner),qualified=tools.qualify(catalog.prior_owner),actual=read(catalog.prior_owner.path);
+ assert.equal(hash(prior),catalog.prior_owner.sha256);assert.equal(prior.length,catalog.prior_owner.bytes);
+ assert.deepEqual({sha256:qualified.sha256,bytes:qualified.bytes},{sha256:'239329b95403e09eff67ce9ef6225c479574675b3e82deb3422ff11bb850c7f2',bytes:118364});assert.equal(hash(actual),qualified.sha256);assert.equal(actual.length,qualified.bytes);tools.assertCurrent();
  assert.equal(catalog.title_transition.sha256,hash(read(catalog.title_transition.path)));
  assert.equal(catalog.new_dispositions,0);assert.equal(catalog.actual_native_artifact_browser_floor_or_full_audit_qualified,false);
  frameCount=frames.length;cases.push('finite-frame-catalog-equals-every-independently-prepared-complete-stage');
@@ -96,9 +183,18 @@ cases.push('only-one-historical-ledger-projected-all-current-product-code-and-re
 function phase_before_state(){
  const prepared=getPrepared();
 // BEGIN retained original before-state
-const before = packedUpstreamLedgerEpoch({root, read: path => path === ledgerPath ? prepared.before : read(path)});
-assert.equal(before.applied, false); assert.deepEqual(before.projected_metadata_paths, []);
-assert.equal(before.read(ledgerPath).equals(prepared.before), true);
+if(line==='21.x'){
+ const catalog=JSON.parse(read(framePath)),oldFrame=catalog.frames.find(row=>row.role==='before');
+ assert.deepEqual({sha256:hash(prepared.before),bytes:prepared.before.length},{sha256:oldFrame.sha256,bytes:oldFrame.bytes});assert.ok(historicalLedgerData(input.before_ledger).equals(prepared.before));
+ const physicalFrame=currentCanonicalTestFrame({root,read}),before=packedUpstreamLedgerEpoch({root,read});
+ assert.equal(before.raw,read);assert.equal(before.individual_decisions_applied,physicalFrame.individual_source_reviews);assert.ok(before.read(ledgerPath).equals(prepared.before));
+ assert.throws(()=>packedUpstreamLedgerEpoch({root,read:path=>path===ledgerPath?prepared.before:read(path)}),error=>error.code==='ERR_ASSERTION'&&error.message==='nonphysical canonical input '+ledgerPath);
+ supplementalProjection.push('historical-before-rejected-at-physical-boundary');before.assertCurrent();physicalFrame.assertCurrent();prepared.assertCurrent();
+}else{
+ const before = packedUpstreamLedgerEpoch({root, read: path => path === ledgerPath ? prepared.before : read(path)});
+ assert.equal(before.applied, false); assert.deepEqual(before.projected_metadata_paths, []);
+ assert.equal(before.read(ledgerPath).equals(prepared.before), true);
+}
 cases.push('unapplied-exact-before-state-does-not-claim-admission-or-project-product');
 // END retained original before-state
 }
@@ -116,7 +212,7 @@ function phase_early_guards(){
 // BEGIN retained original early-guards
 if(input.line==='21.x'){
  const touched=new Set();
- assert.throws(()=>packedUpstreamLedgerEpoch({root,read:path=>{touched.add(path);return path===ledgerPath?Buffer.concat([read(path),Buffer.from(' ')]):read(path);}}),/not an accepted complete ledger frame/);
+ assert.throws(()=>packedUpstreamLedgerEpoch({root,read:path=>{touched.add(path);return path===ledgerPath?Buffer.concat([read(path),Buffer.from(' ')]):read(path);}}),error=>error.code==='ERR_ASSERTION'&&error.message==='nonphysical canonical input '+ledgerPath);
  assert.equal(touched.has('scripts/packed-upstream-ledger-base.mjs'),false);
  assert.equal(touched.has('compatibility/rc/21x-c04-dialog-title-replacement-canonical-qualified-owner-source-measurement.json'),false);
  rejected.push('unknown-ledger-frame-rejected-before-expensive-source-preparation');
@@ -429,11 +525,28 @@ cases.push('three-complete-selection-source-decisions-and-eleven-exact-registry-
 function phase_previous_state(){
  const prepared=getPrepared();
 // BEGIN retained original previous-state
-const previousComplete=packedUpstreamLedgerEpoch({root,read:p=>p===ledgerPath?prepared.selection_native_stage.before:read(p)});
-assert.equal(previousComplete.selection_native_decisions_applied,0);assert.equal(previousComplete.selection_native_registry_digests_applied,0);
-assert.equal(previousComplete.individual_decisions_applied,input.line==='21.x'?17:10);
-assert.equal(previousComplete.native_spec_source_digests_applied,3);
-assert.equal(previousComplete.read(landscapeRegistry).equals(read(landscapeRegistry)),true);
+if(line==='21.x'){
+ const packet=JSON.parse(read('compatibility/rc/autocomplete-selection-ledger-successor.json'));
+ const raw=prepared.selection_native_stage.before,prior=JSON.parse(raw),after=JSON.parse(prepared.selection_native_stage.after);
+ assert.ok(raw.equals(prepared.native_spec_metadata_stage.after));assert.equal(hash(raw),packet.before.sha256);assert.equal(raw.length,packet.before.bytes);assert.ok(historicalLedgerData(packet.before).equals(raw));
+ assert.deepEqual([prepared.testing_api_stage.individual_decisions,prepared.sass_stage.individual_decisions,prepared.rules_js_stage.individual_decisions,prepared.autocomplete_landscape_stage.individual_decisions],[7,6,3,1]);
+ assert.equal(packet.entries.length,3);assert.equal(new Set(packet.entries.map(row=>row.sha)).size,3);
+ for(const row of packet.entries){const entry=prior.entries.find(value=>value.sha===row.sha);assert.ok(entry);assert.equal(hash(bytes(entry)),row.before_entry_sha256);assert.notDeepEqual(entry,row.after_entry);}
+ const updates=packet.source_digest_updates;assert.equal(updates.length,11);assert.equal(new Set(updates.map(row=>JSON.stringify([row.sha,row.path]))).size,11);
+ const value=(ledger,row)=>row.path.reduce((item,key)=>item[key],ledger.entries.find(entry=>entry.sha===row.sha));
+ for(const row of updates){assert.equal(value(prior,row),row.before);assert.notEqual(value(prior,row),row.after);assert.equal(value(after,row),row.after);}
+ const spec=JSON.parse(read('compatibility/rc/autocomplete-selection-spec-ledger-successor.json'));
+ assert.equal(prepared.native_spec_metadata_stage.source_proof_digests,3);assert.equal(prepared.native_spec_metadata_stage.source_review_pointers,2);assert.equal(spec.literal_updates.length,5);
+ for(const row of spec.literal_updates)assert.equal(value(prior,row),row.after);
+ const frame=currentCanonicalTestFrame({root,read}),previousComplete=packedUpstreamLedgerEpoch({root,read});assert.equal(previousComplete.raw,read);assert.equal(previousComplete.individual_decisions_applied,frame.individual_source_reviews);assert.ok(previousComplete.read(landscapeRegistry).equals(read(landscapeRegistry)));
+ assert.throws(()=>packedUpstreamLedgerEpoch({root,read:p=>p===ledgerPath?raw:read(p)}),error=>error.code==='ERR_ASSERTION'&&error.message==='nonphysical canonical input '+ledgerPath);
+ supplementalProjection.push('historical-selection-before-rejected-at-physical-boundary');previousComplete.assertCurrent();frame.assertCurrent();prepared.assertCurrent();
+}else{
+ const previousComplete=packedUpstreamLedgerEpoch({root,read:p=>p===ledgerPath?prepared.selection_native_stage.before:read(p)});
+ assert.equal(previousComplete.selection_native_decisions_applied,0);assert.equal(previousComplete.selection_native_registry_digests_applied,0);
+ assert.equal(previousComplete.individual_decisions_applied,10);assert.equal(previousComplete.native_spec_source_digests_applied,3);
+ assert.equal(previousComplete.read(landscapeRegistry).equals(read(landscapeRegistry)),true);
+}
 cases.push('earlier-exact-complete-metadata-state-cannot-claim-new-selection-admissions');
 // END retained original previous-state
 }
@@ -683,5 +796,5 @@ if(requested==='--catalog'){
  assert.deepEqual(subjects(),beforeSubjects,'retained test subjects changed during the phase');
  const summary=requested==='all'||requested==='stage-population'?originalSummary(facts.canonical?.complete_ledger_frames??null):null;
  assert.deepEqual(subjects(),beforeSubjects,'retained test subjects changed before report output');
- console.log(JSON.stringify({...summary,schema_version:1,line,result:'pass',phase:requested,cases,rejected,facts,subjects:beforeSubjects,summary,full_retained_roster_executed:requested==='all',actual_native_artifact_browser_floor_or_full_audit_qualified:false,current_native_packed_or_floor_or_g11_credit:false}));
+ console.log(JSON.stringify({...summary,schema_version:1,line,result:'pass',phase:requested,cases,rejected,facts,supplemental_data:supplementalData,supplemental_projection:supplementalProjection,subjects:beforeSubjects,summary,full_retained_roster_executed:requested==='all',actual_native_artifact_browser_floor_or_full_audit_qualified:false,current_native_packed_or_floor_or_g11_credit:false}));
 }

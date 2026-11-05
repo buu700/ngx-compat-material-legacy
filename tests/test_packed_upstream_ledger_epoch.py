@@ -22,6 +22,11 @@ LINE = '21.x' if json.loads((ROOT/'projects/ngx-material-legacy/package.json').r
 # iteration evidence only. No earlier phase result is loaded or reused.
 RETAINED_LEDGER_PHASE_TIMEOUT_SECONDS = 1800 if LINE == '21.x' else 180
 PARTITION = 'compatibility/rc/c04-retained-ledger-phases-partition.json'
+TRANSITION = 'compatibility/rc/parent-packed-ledger-retained-test-source-transition-v2.json'
+TRANSITION_SHA256 = '12421e4dee560f64e003879a7a03bc0987a063961b51835a41597eb74baa50be'
+BEFORE_PARENT = 'a2dacc6c0e33eb614b38106ef6ba7bc3a6f45b18'
+BEFORE_SHA256 = 'ba2967b951b8e58859362a916fbf266f67914f4a63931485ee9899e149ef05e8'
+PARTITION_SHA256 = 'bbdec4af787a4713f4f7f2fda00b62c1bc71a73d1ed54b4b4da314574fda89c7'
 SOURCE_PARENT = '2018c4d03132ea6356ef2d131117c24bb213c520'
 ORIGINAL_PROBE_SHA256 = '8e3c933f278cc5e640b4edb1f774892499994e0a3e083e35313cf1691000da4c'
 EXPECTED_PHASE_IDS = ['canonical', 'reader-projection', 'before-state', 'public-reader-metadata', 'early-guards', 'input-guards', 'reader-root', 'python-runtime', 'live-input-guards', 'source-context', 'stage-population', 'testing-api', 'sass', 'build', 'summary', 'landscape-registry', 'landscape-ledger', 'native-spec', 'selection', 'previous-state']
@@ -50,6 +55,11 @@ def verify_phase_reports(catalogue,reports):
     for expected,observed in zip(catalogue['phases'],reports,strict=True):
         assert observed['result']=='pass' and observed['line']==LINE
         assert observed['cases']==expected['cases'] and observed['rejected']==expected['rejected']
+        if LINE=='21.x':
+            transition_raw=(ROOT/TRANSITION).read_bytes();assert digest(transition_raw)==TRANSITION_SHA256
+            transition=json.loads(transition_raw);phase=expected['id']
+            assert observed['supplemental_data']==[{'id':item,'phase':phase} for item in transition['supplemental_data_controls'].get(phase,[])]
+            assert observed['supplemental_projection']==transition['supplemental_projection_controls'].get(phase,[])
         assert observed['subjects']==catalogue['subjects']
         assert observed['full_retained_roster_executed'] is False
         assert observed['actual_native_artifact_browser_floor_or_full_audit_qualified'] is False
@@ -92,6 +102,11 @@ def verify_ci_phase_contract(report, catalogue):
     self.assertEqual(report['line'],LINE)
     self.assertEqual(report['cases'],phase['cases'])
     self.assertEqual(report['rejected'],phase['rejected'])
+    if LINE=='21.x':
+        raw=(ROOT/TRANSITION).read_bytes();self.assertEqual(digest(raw),TRANSITION_SHA256)
+        transition=json.loads(raw)
+        self.assertEqual(report['supplemental_data'],[{'id':item,'phase':report['phase']} for item in transition['supplemental_data_controls'].get(report['phase'],[])])
+        self.assertEqual(report['supplemental_projection'],transition['supplemental_projection_controls'].get(report['phase'],[]))
     self.assertEqual(report['subjects'],catalogue['subjects'])
     for flag in ['full_retained_roster_executed','actual_native_artifact_browser_floor_or_full_audit_qualified','current_native_packed_or_floor_or_g11_credit']:
         self.assertIs(report[flag],False)
@@ -133,7 +148,46 @@ class PackedUpstreamLedgerEpochTests(unittest.TestCase):
 
     def test_phase_catalogue_preserves_all_original_statements_and_controls(self):
         catalogue=phase_catalogue()
-        partition=json.loads((ROOT/PARTITION).read_bytes())
+        if LINE!='21.x':
+            partition=json.loads((ROOT/PARTITION).read_bytes())
+            self.assertEqual(partition['line'],LINE)
+            self.assertEqual(partition['source_parent'],SOURCE_PARENT)
+            self.assertEqual(partition['original_probe']['sha256'],ORIGINAL_PROBE_SHA256)
+            environment=dict(os.environ,GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1')
+            for key in ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES']:
+                environment.pop(key,None)
+            original=subprocess.check_output(['git','--no-replace-objects','show',SOURCE_PARENT+':'+PROBE],cwd=ROOT,env=environment)
+            self.assertEqual(digest(original),ORIGINAL_PROBE_SHA256)
+            current=(ROOT/PROBE).read_text();old=original.decode()
+            size=partition['preserved_prefix']['bytes']
+            self.assertEqual((ROOT/PROBE).read_bytes()[:size],original[:size])
+            self.assertEqual(digest(original[:size]),partition['preserved_prefix']['sha256'])
+            fragments=dict(re.findall(r'// BEGIN retained original ([a-z-]+)\n(.*?)\n// END retained original \1',current,re.S))
+            self.assertEqual(fragments,partition['fragments'])
+            self.assertEqual(len(fragments),24 if LINE=='21.x' else 22)
+            ranges=[(0,len(original[:size].decode()))]
+            for name,fragment in fragments.items():
+                if name=='stage-population':
+                    replacement=partition['exact_total_assertion_replacement']
+                    self.assertEqual(fragment.count(replacement['after']),1)
+                    fragment=fragment.replace(replacement['after'],replacement['before'])
+                elif name=='report-summary':
+                    self.assertTrue(fragment.startswith('return ') and fragment.endswith(';'))
+                    fragment='console.log(JSON.stringify('+fragment[len('return '):-1]+'));'
+                self.assertEqual(old.count(fragment),1,name)
+                start=old.index(fragment);ranges.append((start,start+len(fragment)))
+            end=0
+            for start,stop in sorted(ranges):
+                self.assertGreaterEqual(start,end)
+                self.assertEqual(old[end:start].strip(),'','original non-whitespace statement omitted')
+                end=stop
+            self.assertEqual(old[end:].strip(),'')
+            self.assertEqual(catalogue['subjects'][0]['sha256'],digest((ROOT/PROBE).read_bytes()))
+
+            return
+        partition_raw=(ROOT/PARTITION).read_bytes()
+        self.assertEqual((digest(partition_raw),len(partition_raw)),(PARTITION_SHA256,30265))
+        partition=json.loads(partition_raw)
         self.assertEqual(partition['line'],LINE)
         self.assertEqual(partition['source_parent'],SOURCE_PARENT)
         self.assertEqual(partition['original_probe']['sha256'],ORIGINAL_PROBE_SHA256)
@@ -142,9 +196,11 @@ class PackedUpstreamLedgerEpochTests(unittest.TestCase):
             environment.pop(key,None)
         original=subprocess.check_output(['git','--no-replace-objects','show',SOURCE_PARENT+':'+PROBE],cwd=ROOT,env=environment)
         self.assertEqual(digest(original),ORIGINAL_PROBE_SHA256)
-        current=(ROOT/PROBE).read_text();old=original.decode()
+        before=subprocess.check_output(['git','--no-replace-objects','show',BEFORE_PARENT+':'+PROBE],cwd=ROOT,env=environment)
+        self.assertEqual((digest(before),len(before)),(BEFORE_SHA256,42770))
+        current=before.decode();old=original.decode()
         size=partition['preserved_prefix']['bytes']
-        self.assertEqual((ROOT/PROBE).read_bytes()[:size],original[:size])
+        self.assertEqual(before[:size],original[:size])
         self.assertEqual(digest(original[:size]),partition['preserved_prefix']['sha256'])
         fragments=dict(re.findall(r'// BEGIN retained original ([a-z-]+)\n(.*?)\n// END retained original \1',current,re.S))
         self.assertEqual(fragments,partition['fragments'])
@@ -166,7 +222,36 @@ class PackedUpstreamLedgerEpochTests(unittest.TestCase):
             self.assertEqual(old[end:start].strip(),'','original non-whitespace statement omitted')
             end=stop
         self.assertEqual(old[end:].strip(),'')
-        self.assertEqual(catalogue['subjects'][0]['sha256'],digest((ROOT/PROBE).read_bytes()))
+        raw=(ROOT/TRANSITION).read_bytes()
+        self.assertEqual(digest(raw),TRANSITION_SHA256)
+        transition=json.loads(raw)
+        self.assertEqual(transition['schema_version'],1)
+        self.assertEqual(transition['line'],'21.x')
+        self.assertEqual(transition['path'],PROBE)
+        self.assertEqual(transition['source_parent'],BEFORE_PARENT)
+        self.assertEqual(transition['before'],{'sha256':BEFORE_SHA256,'bytes':42770})
+        self.assertEqual(transition['partition'],{'path':PARTITION,'sha256':PARTITION_SHA256,'bytes':30265})
+        self.assertEqual(transition['original'],{'parent':SOURCE_PARENT,'sha256':ORIGINAL_PROBE_SHA256,'bytes':29662})
+        self.assertEqual(set(transition['fragments']),{'canonical','before-state','early-guards','previous-state'})
+        self.assertEqual(set(fragments),set(partition['fragments']))
+        for name,change in transition['fragments'].items():
+            self.assertEqual(change['before'],fragments[name])
+            self.assertNotEqual(change['before'],change['after'])
+        end=0; pieces=[]
+        for edit in transition['edits']:
+            start,stop=edit['start'],edit['end']
+            self.assertGreaterEqual(start,end);self.assertGreaterEqual(start,size)
+            self.assertGreaterEqual(stop,start);self.assertLessEqual(stop,len(before))
+            self.assertEqual(before[start:stop],edit['before'].encode())
+            pieces.extend((before[end:start],edit['after'].encode()));end=stop
+        pieces.append(before[end:]); rebuilt=b''.join(pieces)
+        self.assertEqual((digest(rebuilt),len(rebuilt)),(transition['after']['sha256'],transition['after']['bytes']))
+        self.assertEqual(rebuilt,(ROOT/PROBE).read_bytes())
+        successor=dict(re.findall(r'// BEGIN retained original ([a-z-]+)\n(.*?)\n// END retained original \1',rebuilt.decode(),re.S))
+        self.assertEqual(set(successor),set(fragments))
+        for name in fragments:
+            self.assertEqual(successor[name],transition['fragments'][name]['after'] if name in transition['fragments'] else fragments[name])
+        self.assertEqual(catalogue['subjects'][0]['sha256'],digest(rebuilt))
 
     def test_phase_local_dependencies_and_real_scope_faults(self):
         script=r"""
@@ -206,6 +291,10 @@ console.log(JSON.stringify({result:'pass',actual_phase_scope_checked:true,missin
         # and are never written as live phase execution results.
         catalogue=phase_catalogue()
         valid=[dict(phase=p['id'],result='pass',line=LINE,cases=p['cases'],rejected=p['rejected'],subjects=catalogue['subjects'],full_retained_roster_executed=False,actual_native_artifact_browser_floor_or_full_audit_qualified=False,current_native_packed_or_floor_or_g11_credit=False)for p in catalogue['phases']]
+        transition=json.loads((ROOT/TRANSITION).read_bytes()) if LINE=='21.x' else None
+        for row in valid:
+            phase=row['phase'];row['supplemental_data']=[{'id':item,'phase':phase} for item in transition['supplemental_data_controls'].get(phase,[])] if transition else []
+            row['supplemental_projection']=transition['supplemental_projection_controls'].get(phase,[]) if transition else []
         verify_phase_reports(catalogue,valid)
         for fault in ['missing-phase','duplicate-phase','reordered-phase','missing-case','extra-case','missing-control','duplicate-control','wrong-subject','wrong-line','failed-child','whole-roster-claim','native-claim']:
             rows=copy.deepcopy(valid)
@@ -242,7 +331,9 @@ console.log(JSON.stringify({result:'pass',actual_phase_scope_checked:true,missin
         for subject in catalogue['subjects']:
             raw=(ROOT/subject['path']).read_bytes();self.assertEqual(digest(raw),subject['sha256']);self.assertEqual(len(raw),subject['bytes'])
         population=next(r for r in reports if r['phase']=='stage-population')['summary']
-        report={**population,'cases':[c for row in reports for c in row['cases']],'rejected':[c for row in reports for c in row['rejected']]}
+        report={**population,'cases':[c for row in reports for c in row['cases']],'rejected':[c for row in reports for c in row['rejected']],
+            'supplemental_data':[c for row in reports for c in row['supplemental_data']],
+            'supplemental_projection':[c for row in reports for c in row['supplemental_projection']]}
         expected=13
         if LINE=='21.x':
             roster=json.loads((ROOT/'compatibility/rc/21x-remaining-disposition-worksheet.json').read_bytes())

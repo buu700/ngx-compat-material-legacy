@@ -146,7 +146,7 @@ export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwner
  const owner=member(OWNER,packet.after_owner.sha256);assert.equal(legacyTools.comparisonBytes(packet.after_owner).toString(),ownerExpected);
  assert.equal(hash(owner),legacyTools.qualifyReference(packet.after_owner).sha256);
  assert.equal(hash(readEvidenceMember(root,OWNER)),legacyTools.qualifyReference(packet.after_owner).sha256,'actual loaded owner path differs from qualified code');
- for(const ref of packet.source_members){const raw=member(ref.path,ref.sha256);assert.equal(raw.length,ref.bytes);}
+ for(const prior of packet.source_members){const ref=legacyTools.qualifyReference(prior),raw=member(ref.path,ref.sha256);assert.equal(raw.length,ref.bytes);}
  const historicalHandlers=new Map();
  for(const transition of packet.historical_handler_metadata){
   assert.equal(line,'21.x');assert.ok(['scripts/upstream-dialog-title-admission.cjs','scripts/upstream-dialog-title-native-evidence.mjs'].includes(transition.after.path));

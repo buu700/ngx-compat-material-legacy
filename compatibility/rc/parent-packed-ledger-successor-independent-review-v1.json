@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "status": "blocked-static-review",
+  "scope": "Scratch candidate only; no maintained source, profile or HEAD mutation",
+  "candidate_patch_sha256": "12dd38c00d6755c86812e5945ad8fbb48e7a0e9a954833f36df689b2132977ab",
+  "transition_packet_sha256": "794d1b2e4fc7a26b784610fff837b68e077855982b9ed003cab0d39717528253",
+  "checks": {
+    "git_apply_check": "passed against current worktree; packet is a separate untracked scratch file and must also be installed",
+    "independent_edit_reconstruction": "passed: 33 ordered before-verified edits reconstruct exact scratch probe, 24 marked fragments and exactly 4 changed",
+    "original_partition_replay": "scratch data-check.py passed against Git-pinned 2018 original and before image, with complete non-whitespace coverage and 4 reconstruction mutations; examined its assertions",
+    "successor_semantics": "canonical checks historical comparison plus current qualified owner; before-state and previous-state authenticate historical bytes as data and exercise physical current owner; early guard asserts physical failure before costly preparation. Historical programs are not executed.",
+    "catalogs": "original cases and rejected lists retained; supplemental 13 data and 2 projection IDs checked separately",
+    "copyright": "both changed test source headers retain Google notice followed by Ryan Lester",
+    "mock_authority": "no mock used as source authority in reviewed changes; synthetic phase aggregation fixtures are explicitly labeled and tested as fixtures",
+    "runtime": "not executed; no phase, CLI, product, suite, or G11 credit"
+  },
+  "blockers": [
+    {
+      "id": "semantic-rejection-coverage",
+      "detail": "13 retained invalid-ledger controls now call the physical public owner with nonphysical supplied ledger bytes. The physical guard rejects before historical admission logic; supplementalDataCheck only asserts the mutant differs from authenticated complete frames and records its ID. It does not independently exercise the relevant transition/decision invariant or demonstrate that the historical reader would reject that specific partial or mixed state. Therefore retained labels plus distinctness do not preserve prior semantic rejection coverage. Add independent data-level validation for each affected invariant or another non-mock means to verify it, while keeping the physical boundary."
+    },
+    {
+      "id": "owner-and-profile",
+      "detail": "Pending separately owned source_members[9] factory anchor, inventory full-reference byte-size handling, and profile reseal; references/hashes must be checked after those changes and runtime tests run on final exact bytes."
+    },
+    {
+      "id": "line-portability",
+      "detail": "test_phase_catalogue_preserves_all_original_statements_and_controls unconditionally requires transition line 21.x and a 21.x Git before image and partition hash, despite existing LINE main handling. Confirm this test is 21.x-only by contract or guard/rework this transition for main; no main runtime was run."
+    }
+  ],
+  "limitations": [
+    "Static replay and candidate-provided data-check are not runtime proof.",
+    "No expensive owners or suites run.",
+    "Patch does not contain its separately supplied required transition JSON."
+  ],
+  "g11_claim": "not-passed"
+}

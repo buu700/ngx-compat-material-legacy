@@ -31,8 +31,11 @@ FIXED = ('scripts/table-local-compilation-canonical-stage.mjs',
          'tests/browser_reference_owner_probe.mjs',
          'tests/test_browser_reference_owner.py',
          'tests/checker_reference_source_probe.mjs',
-         'scripts/browser-reference-source.mjs')
+         'scripts/browser-reference-source.mjs',
+         'tests/test_packed_upstream_ledger_epoch.py')
+SOURCE_MEMBER_ANCHOR = 'tests/test_packed_upstream_ledger_epoch.py'
 ANCHORS = {
+    SOURCE_MEMBER_ANCHOR: ('compatibility/rc/c04-inventory-owner-inputs.json', 9),
     'scripts/browser-reference-source.mjs': ('compatibility/rc/c04-browser-owner-inputs.json', 2),
     'tests/checker_reference_source_probe.mjs': ('compatibility/rc/21x-table-local-compilation-admission-owner-inputs.json', 4),
     'scripts/browser-owner-source.mjs': ('compatibility/rc/21x-legacy-removal-admission-owner-inputs.json', 2),
@@ -119,7 +122,7 @@ with tempfile.TemporaryDirectory(prefix='ngx-tool-fixed-anchors-') as temp:
                 assert result['code'] == 'ERR_ASSERTION'
         cases.append(dict(id=identifier, accepted=accepted, engines=2))
 
-    evaluate('baseline-fixed-nine' if line == '21.x' else 'baseline-main', copy.deepcopy(baseline), True)
+    evaluate('baseline-fixed-ten' if line == '21.x' else 'baseline-main', copy.deepcopy(baseline), True)
     if line == '21.x':
         for path, (anchor_path, index) in ANCHORS.items():
             label = Path(path).stem
@@ -129,7 +132,10 @@ with tempfile.TemporaryDirectory(prefix='ngx-tool-fixed-anchors-') as temp:
                     changed = originals[anchor_path] + b'\n'
                 else:
                     data = json.loads(originals[anchor_path])
-                    data['code_transitions'][index]['after']['sha256'] = '0' * 64
+                    if path == SOURCE_MEMBER_ANCHOR:
+                        data['source_members'][index]['sha256'] = '0' * 64
+                    else:
+                        data['code_transitions'][index]['after']['sha256'] = '0' * 64
                     changed = (json.dumps(data, indent=2) + '\n').encode()
                 (root / anchor_path).write_bytes(changed)
                 support = next(row for row in packet['branches'][line]['additional_inputs'] if row['path'] == anchor_path)
@@ -166,7 +172,7 @@ with tempfile.TemporaryDirectory(prefix='ngx-tool-fixed-anchors-') as temp:
 
 report = dict(schema_version=1, result='pass', line=line, cases=len(cases), engines=2,
     accepted_checks=2, rejected_checks=2 * (len(cases) - 1), case_rows=cases,
-    fixed_source_rows_verified=9 if line == '21.x' else 0,
+    fixed_source_rows_verified=10 if line == '21.x' else 0,
     current_factories_executed=True, old_Git_programs_executed=False,
     product_or_source_owners_executed=False, current_root_mutated=False)
 print(json.dumps(report))
