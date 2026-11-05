@@ -37,6 +37,8 @@ const loadedComposeCanonicalSourceGuards = composeCanonicalSourceGuards;
 const bufferIsBuffer = Buffer.isBuffer, bufferEquals = Buffer.prototype.equals;
 const apply = Reflect.apply;
 const loadedInspectSource = ownValue(admission, 'inspectSource');
+const loadedMetadataOk = ownValue(admission, 'metadataOk');
+const METADATA_OK_FUNCTION_SHA256 = 'e8974460da41d90caef069888729fac5696ee47ed81f17d193d74bdbabe36485';
 function equalBuffers(actual, supplied) {
   return bufferIsBuffer(supplied) && apply(bufferEquals, actual, [supplied]);
 }
@@ -48,6 +50,9 @@ function ownValue(object, key) {
 /** Callback-free check using the source owner's originally captured inspector. */
 export function assertBaseClassRemovalSourceInspectorIdentity() {
   assert.equal(ownValue(admission, 'inspectSource'), loadedInspectSource, 'late loaded base-class source inspector change');
+  assert.equal(ownValue(admission, 'metadataOk'), loadedMetadataOk, 'late loaded base-class metadata predicate change');
+  assert.equal(hash(functionToString.call(loadedMetadataOk)), METADATA_OK_FUNCTION_SHA256,
+    'unauthenticated loaded base-class metadata predicate');
 }
 function assertGuardPlanIdentity() {
   assert.equal(composeCanonicalSourceGuards, loadedComposeCanonicalSourceGuards, 'changed loaded canonical source guard planner');
@@ -285,49 +290,97 @@ export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read 
     current_native_packed_browser_floor_or_full_audit_qualified: false};
 }
 
-/** Re-executes the immutable source contract on actual bytes; no cached receipt. */
+/** Fresh factual qualification plus owned frame/source guard operations. */
 export function baseClassRemovalOwnerSourceSubject({root = rootDefault, read = path => physical(root, path)} = {}) {
   assertBaseClassRemovalSourceInspectorIdentity();
   const frames = baseClassRemovalCanonicalFrameSubject({root, read});
   const body = structuredClone(frames.body), entry = structuredClone(frames.stage.entries[0]);
-  // This private callback is consumed only by the pinned inspector. Its
-  // constructor and returned guard read a private physical before-image before
-  // invoking it, then compare our returned bytes with that before-image. Supply
-  // the independent after-image here: together they retain physical/read/physical
-  // checks without a redundant callback-free read before the same callback.
-  const checkedRead = path => {
-    const supplied = read(path), actual = readHistoricalContractRepairMember(root, path);
-    assert.ok(equalBuffers(actual, supplied), 'nonphysical base-class owner source input ' + path);
-    return actual;
-  };
-  const request = {root, read: checkedRead, entry, body, review: body, proof: entry.individual_proof};
+  // The unchanged inspector freshly computes every original fact on physical
+  // bytes. Its private repair references are also inserted into its source
+  // bound. Capture that complete judgment set before any further caller read.
+  // Supplied-reader validation belongs to the real source operation below;
+  // no source bytes, parsed program or successful verdict are retained here.
+  const request = {root, entry, body, review: body, proof: entry.individual_proof};
   assert.equal(ownValue(admission, 'inspectSource'), loadedInspectSource, 'changed loaded base-class source inspector');
   assert.equal(hash(functionToString.call(loadedInspectSource)), frames.packet.inspect_source_function_sha256, 'unauthenticated loaded base-class source inspector');
-  const source = loadedInspectSource(request);
-  const sourceGuard = ownValue(source, 'assertCurrent'), frameGuard = ownValue(frames, 'assertCurrent');
+  const physicalSource = loadedInspectSource(request);
+  const physicalSourceGuard = ownValue(physicalSource, 'assertCurrent');
+  const sourceReferences = ownValue(physicalSource, 'bound');
+  assert.ok(Array.isArray(sourceReferences));
+  const sourceBound = new Map();
+  for (const value of sourceReferences) {
+    assert.deepEqual(Reflect.ownKeys(value).sort(), ['bytes', 'path', 'sha256']);
+    const ref = {path: ownValue(value, 'path'), sha256: ownValue(value, 'sha256'), bytes: ownValue(value, 'bytes')};
+    assert.equal(typeof ref.path, 'string'); assert.match(ref.sha256, /^[0-9a-f]{64}$/);
+    assert.ok(Number.isSafeInteger(ref.bytes) && ref.bytes >= 0);
+    assert.equal(sourceBound.has(ref.path), false, 'duplicate base-class source judgment');
+    sourceBound.set(ref.path, Object.freeze(ref));
+  }
+  assert.ok(sourceBound.size > 0);
+  const frameGuard = ownValue(frames, 'assertCurrent');
   const frameGuardNode = ownValue(frames, 'guardNode');
   const bound = new Map(frames.bound.map(ref => [ref.path, {...ref}]));
-  for (const ref of source.bound) {
+  for (const ref of sourceBound.values()) {
     const before = bound.get(ref.path);
     if (before) assert.deepEqual(ref, before);
     bound.set(ref.path, {...ref});
   }
-  const intended = structuredClone({entry, body, proof: request.proof});
-  const assertMetadata = () => {
-    assert.deepEqual({entry: ownValue(request, 'entry'), body: ownValue(request, 'body'), proof: ownValue(request, 'proof')},
-      intended, 'changed base-class owner source metadata');
-    assert.equal(ownValue(admission, 'inspectSource'), loadedInspectSource, 'late loaded base-class source inspector change');
+  const metadata = () => {
+    const liveEntry = ownValue(request, 'entry'), proof = ownValue(request, 'proof');
+    return {entry: liveEntry, body: ownValue(request, 'body'), review: ownValue(request, 'review'),
+      proof: proof === undefined ? ownValue(liveEntry, 'individual_proof') : proof};
+  };
+  const intended = structuredClone(metadata());
+  const assertSourceMetadata = () => {
+    assert.equal(resolve(ownValue(request, 'root') ?? rootDefault), rootDefault);
+    assertBaseClassRemovalSourceInspectorIdentity();
+    assert.equal(loadedMetadataOk(metadata()), true, 'changed live base-class owner metadata');
+    assert.deepEqual(metadata(), intended, 'changed base-class owner source metadata');
+    assert.equal(ownValue(physicalSource, 'assertCurrent'), physicalSourceGuard, 'changed private base-class source guard');
     assert.equal(ownValue(source, 'assertCurrent'), sourceGuard, 'changed base-class source guard');
+    assertGuardPlanIdentity(); assertGuardPlanPhysical(root);
+  };
+  let sourceConsuming = false;
+  const assertSourceIdle = () => assert.equal(sourceConsuming, false, 'reentrant base-class source consumption');
+  const sourceNode = Object.freeze({
+    dependencies: Object.freeze([]),
+    preflight: () => { assertSourceIdle(); assertSourceMetadata(); physicalSweep(root, sourceBound.values(), true); },
+    consume: () => {
+      assertSourceIdle(); sourceConsuming = true;
+      try {
+        for (const ref of sourceBound.values()) {
+          const actual = readHistoricalContractRepairMember(root, ref.path);
+          assert.equal(hash(actual), ref.sha256, 'late base-class owner source input ' + ref.path);
+          assert.equal(actual.length, ref.bytes);
+          const supplied = read(ref.path);
+          assert.ok(equalBuffers(actual, supplied), 'nonphysical base-class owner source input ' + ref.path);
+          assert.ok(equalBuffers(actual, readHistoricalContractRepairMember(root, ref.path)),
+            'base-class owner source changed during callback ' + ref.path);
+        }
+      } finally { sourceConsuming = false; }
+    },
+    final: () => { physicalSweep(root, sourceBound.values(), true); assertSourceMetadata(); },
+  });
+  const composedSourceGuard = loadedComposeCanonicalSourceGuards(Object.freeze([sourceNode]));
+  const sourceGuard = () => { assertSourceIdle(); composedSourceGuard(); };
+  // This facade intentionally owns its standalone guard. It preserves the
+  // factual data shape without exposing the weaker physical-only CJS guard.
+  const source = {bound: structuredClone([...sourceBound.values()]),
+    historical_canonical_context: structuredClone(ownValue(physicalSource, 'historical_canonical_context')),
+    assertCurrent: sourceGuard, facts: structuredClone(ownValue(physicalSource, 'facts'))};
+  const assertMetadata = () => {
+    assertSourceMetadata();
     assert.equal(ownValue(frames, 'assertCurrent'), frameGuard, 'changed base-class frame guard');
     assert.equal(ownValue(frames, 'guardNode'), frameGuardNode, 'changed base-class frame guard node');
   };
   const guardNode = Object.freeze({
-    dependencies: Object.freeze([frameGuardNode]),
-    preflight: () => { assertMetadata(); physicalSweep(root, bound.values(), true); },
-    consume: () => { sourceGuard(); },
-    final: () => { physicalSweep(root, bound.values(), true); assertMetadata(); },
+    dependencies: Object.freeze([frameGuardNode, sourceNode]),
+    preflight: assertMetadata,
+    consume: () => {},
+    final: assertMetadata,
   });
-  const assertCurrent = loadedComposeCanonicalSourceGuards(Object.freeze([guardNode]));
+  const composedOwnerGuard = loadedComposeCanonicalSourceGuards(Object.freeze([guardNode]));
+  const assertCurrent = () => { assertSourceIdle(); composedOwnerGuard(); };
   const guardPlan = Object.freeze({assertCurrent, node: guardNode});
   assertCurrent();
   return {frames, body: freeze(structuredClone(body)), entry: freeze(structuredClone(entry)), proof: freeze(structuredClone(request.proof)),

@@ -1,0 +1,45 @@
+{
+  "scope": "Read-only static predicate mapping for proposed physical-only CJS source construction and owner-local source node. No implementation, tests, owner execution, or maintained changes.",
+  "verdict": "The internal finite predicate mapping is plausible under trusted committed loading and exact source attribution, but the proposal as stated is not yet complete behavioral equivalence: the exported owner returns the actual source object, whose standalone source.assertCurrent currently validates the supplied reader. Constructing it without request.read makes that reachable standalone guard physical-only. This change must be explicitly resolved and tested before calling the decomposition safe.",
+  "predicate_map": [
+    {
+      "original": "CJS assertMetadata before and after source guard: resolve(request.root ?? ROOT) equals ROOT; metadataOk({entry,body,review,proof or entry.individual_proof}) true; deepEqual metadata to CJS constructor intended snapshot.",
+      "replacement_requirement": "At preflight and final check root resolution; own-data access and exact captured entry, body, review and proof semantics including fallback; invoke the genuine captured pure metadataOk authenticated to unchanged loaded image and function, then deep-equal all fields to isolated constructor-equivalent snapshot. Preserve review even though current outer owner intended snapshot checks only entry/body/proof. Capture predicate identity and guard against late replacement. Trusted module initialization is required to justify its lexical helper/handlerRef closure."
+    },
+    {
+      "original": "repairs.assertCurrent iterates private repair bound: physical hash and length, then CJS local read because repair providedRead is CJS wrapper; local read rereads physical and enforces CJS private source bound if existing.",
+      "replacement_requirement": "Prove repair-bound membership and identical refs in immutable source snapshot: actual CJS constructor explicitly member(ref) for each repairs.bound before returning. Verify schema, uniqueness and cross-frame overlap/conflict; strict physical checks using the same trusted reader and expected digest/size for the full captured set at preflight and final. Snapshot immediately after constructor before any subsequent external callback, and keep it inaccessible to user code."
+    },
+    {
+      "original": "CJS source guard loops its private bound, physical hash/size and supplied reader equality. With no supplied reader the original physical-only guard does not invoke caller.",
+      "replacement_requirement": "At preflight/final physical-sweep all captured source refs; consume each intended source ref fresh with physical-before hash/size, actual supplied callback once, intrinsic Buffer equality and independent physical-after equality. No current-byte, parsed result, owner verdict or receipt caching."
+    },
+    {
+      "original": "Outer owner assertMetadata guards loaded inspector identity, source.assertCurrent and frame guard/frame node identity, request entry/body/proof and owner union sweep.",
+      "replacement_requirement": "Retain all existing outer identity and captured frame/source metadata checks; do not silently replace sourceGuard identity with a different callable or omit checks on exposed source object. Coordinate source/frame node and actual outer scheduler reentrancy, catch/retry and finally cleanup."
+    }
+  ],
+  "concrete_counterexample": {
+    "surface": "baseClassRemovalOwnerSourceSubject is exported and returns {source,...}; source.assertCurrent is a reachable callable.",
+    "old": "After constructing the actual owner with a supplied read that becomes nonphysical on a bound source path, calling owner.source.assertCurrent invokes that reader through CJS and rejects.",
+    "proposed": "With CJS request.read omitted, the same returned CJS source.assertCurrent checks physical files only and succeeds without invoking the forged reader. This is not merely a different order/count of callbacks within the proposed full owner operation; it changes what a separately reachable guard verifies.",
+    "resolution": "Establish and enforce that the source object is truly private and no supported consumer can rely on its standalone guard, or provide an independently reviewed equally strict standalone source operation/facade without modifying/faking the genuine guard, source predicates or private capability. Test actual direct source.assertCurrent with forged supplied bytes, not just the outer owner guard. Existing tests access and mutate owner.source.assertCurrent to verify pointer integrity; preserve that test semantics."
+  },
+  "other_limits": [
+    "The CJS original source guard and replacement cover finite captured source/repair paths, not new untracked legacy product population, absent paths, roster and other owners; retain genuine owners of those predicates.",
+    "Without providedRead in the CJS constructor, original constructor callback sampling is deferred; that sampling change is acceptable only under the explicitly stated non-stable callback contract. Frame construction still calls user code before source snapshot; no whole-constructor cold preflight is established.",
+    "CJS sourceGuard uses its own private map; the returned clone matches only if its complete membership and overlapping repair refs remain stable. The actual source trace supports the membership relation, but the implementation must authenticate image/function, assert exact source-bound capture shape, protect its copy, and test no missing/conflicting refs.",
+    "A standalone clone plus hash checks cannot recreate unobserved transient filesystem changes or prove general continuous immutability. The owner still must use snapshot judgments and per-consumption before/after physical reads.",
+    "No performance or V9 recovery claim; v9 timed out, and original nested callbacks are omitted only where genuinely unconsumed."
+  ],
+  "minimum_controls": [
+    "Direct standalone source guard forged-reader negative and clean recovery, in addition to outer owner tests.",
+    "Cold later source member restored by first supplied callback, persistent late mutation of earlier source member, same-path old/new/forged/non-Buffer callback bytes, exact source-bound coverage and duplicate/conflict controls.",
+    "Actual inspector/predicate/guard identity poison, review/root/proof metadata accessors or mutation, and shared source node reentry from direct owner and alternate scheduler with clean retry.",
+    "Actual complete original checker/browser cold/late source regression producers and real owner after reviewed attribution and profile refresh under original deadlines."
+  ],
+  "tests_executed": false,
+  "owner_executed": false,
+  "maintained_changes": false,
+  "g11_claim": "not-passed"
+}
