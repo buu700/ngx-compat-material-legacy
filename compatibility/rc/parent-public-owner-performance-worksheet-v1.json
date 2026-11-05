@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "role": "Bounded public-owner performance diagnosis; no optimization implemented",
+  "current_cut": "1839c4557859790a3ab2bbba6b08998eab633107c56d8934bc6a6e9b18b41f07",
+  "evidence": [
+    {
+      "path": "compatibility/rc/parent-public-epoch-positive-diagnostic-v1.json",
+      "sha256": "199e9d5737f01dd2688f59113198c948d54b73a98fac0a8e1b4c3a9139950f49",
+      "bytes": 2011
+    },
+    {
+      "path": "compatibility/rc/parent-public-epoch-positive-diagnostic-unprofiled-v1.json",
+      "sha256": "9c7725e89c6b9b7275b5ca960c80006d8eee3fcdca0eb2268412177765d3454f",
+      "bytes": 1613
+    }
+  ],
+  "profile": {
+    "raw_path": "/tmp/parent-public-epoch-positive-v1.log",
+    "raw_sha256": "5990713bb9eea78618b4c80161dd1a8f06b0780084eebf5835605e033088d347",
+    "raw_bytes": 85115279,
+    "processed_path": "/tmp/parent-public-epoch-positive-v1-profile.txt",
+    "processed_sha256": "13b975742fb4ea25219e9fc14b8076806a1c3467c52594716313401b3d1d8848",
+    "processed_bytes": 549915,
+    "partial_due_to180second_cap": true,
+    "total_ticks": 139413,
+    "read_ticks": 52405,
+    "syscall_ticks": 26578,
+    "open_ticks": 3119,
+    "JavaScript_ticks": 3038,
+    "GC_ticks": 10393
+  },
+  "finding": "Samples are dominated by readFileSync/readEvidenceMember and repeated full physical/source guard sweeps under base-class owner/metadata source lanes. Profiling alone does not prove which repeated sweep may safely be removed; unprofiled single positive also exceeds180second outer diagnostic budget.",
+  "scope": "Measure source-validation composition and identify redundant sweeps inside one current-owner operation. No persistent receipt/source cache or weakened input authority.",
+  "requirements": [
+    "Preserve fresh physical member equality, strict provided-reader checks, metadata descriptor/snapshot identity and final callback-free complete physical sweep.",
+    "No fabricated owner objects/private-capability registration for arbitrary historical readers.",
+    "Keep source inspection contract and all original cold/late/mutation lifetimes; do not increase timeouts or reduce populations to hide failures.",
+    "Use only a bounded worksheet-backed change, exact successor ownership/seal update and targeted genuine runtime controls.",
+    "Measure before full regression; reuse only immutable Git data or computations whose complete authenticated inputs remain freshly verified."
+  ],
+  "canonical_files_changed": false,
+  "product_changes": false,
+  "optimization_applied": false,
+  "g11_claim": "not-passed"
+}

@@ -16,7 +16,7 @@ import {isDeepStrictEqual} from 'node:util';
 import {reviewMetadataComplete,individualReviewScopeOk} from '../scripts/upstream-individual-evidence-scope.mjs';
 import {requiresRegisteredSourceReview} from '../scripts/upstream-registered-source-review.mjs';
 import {packedUpstreamLedgerEpoch} from '../scripts/packed-upstream-ledger-epoch.mjs';
-import {packedUpstreamLedgerEpoch as historicalLedgerEpoch} from '../scripts/packed-upstream-ledger-base.mjs';
+import {preparePackedUpstreamLedger as prepareHistoricalLedger} from '../scripts/packed-upstream-ledger-base.mjs';
 import {currentCanonicalTestFrame} from './current_sass_canonical_test_scope.mjs';
 import {sourceContractDefinitions} from '../scripts/upstream-source-contract-registry.mjs';
 import admission from '../scripts/upstream-form-field-tokenization-admission.cjs';
@@ -27,30 +27,45 @@ const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','m
  'd026dd06511ea9bba6def16619ae0e387a9ac074:'+ledger],{cwd:root,env,maxBuffer:8*1024*1024});
 const authenticCurrent=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',
  '6e54c9a1c3dad72f65b048f8f19cb7faa18729dc:'+ledger],{cwd:root,env,maxBuffer:8*1024*1024});
-const currentRead=path=>path===ledger?authenticCurrent:read(path);
-let late=null;const actual=path=>path===late?Buffer.concat([currentRead(path),Buffer.from('\n')]):currentRead(path);
-// Historical JSON comparisons use maintained base code; no old Git program executes.
-const current=historicalLedgerEpoch({root,read:actual}),previous=historicalLedgerEpoch({root,read:path=>path===ledger?before:read(path)});
-// Public owner admission always sees the actual physical complete frame.
-const physicalRead=path=>path===late?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
+let late=null;const physicalRead=path=>path===late?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
+// The superseded old callback/raw/count assertions remain exact Git program
+// DATA. No old program is imported or executed.
+const oldProgram=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',
+ 'd8ab97315b6c77b83f42c2bebcf63b2984fff255:tests/form_field_tokenization_admission_probe.mjs'],{cwd:root,env,maxBuffer:1024*1024});
+assert.equal(createHash('sha256').update(oldProgram).digest('hex'),'7c715d2f82514cf5d7470bf36972269963605717ea289011cf6bfd5c6fe7f23b');assert.equal(oldProgram.length,12747);
+// Maintained base preparation sees current physical sources and ledger only.
+const preparedHistory=prepareHistoricalLedger({root,read:physicalRead});
+const counts=Object.freeze({registered:preparedHistory.testing_api_stage.individual_decisions+preparedHistory.sass_stage.individual_decisions+
+ preparedHistory.rules_js_stage.individual_decisions+preparedHistory.autocomplete_landscape_stage.individual_decisions+
+ preparedHistory.selection_native_stage.individual_decisions+preparedHistory.legacy_sass_entrypoint_stage.individual_decisions+
+ preparedHistory.token_build_stage.individual_decisions+preparedHistory.unthemable_stage.individual_decisions,
+ modern:preparedHistory.modern_control_base_stage.individual_decisions,
+ theme:preparedHistory.theme_token_root_stage.individual_decisions,form:preparedHistory.form_field_tokenization_stage.individual_decisions});
+assert.equal(counts.registered,27);assert.equal(counts.modern,4);assert.equal(counts.theme,2);assert.equal(counts.form,2);
+assert.equal(before.equals(preparedHistory.form_field_tokenization_stage.before),true);assert.equal(authenticCurrent.equals(preparedHistory.form_field_tokenization_stage.after),true);
+assert.equal(preparedHistory.modern_control_base_stage.before.equals(preparedHistory.registered_checker_metadata_stage.after),true);
+assert.equal(preparedHistory.theme_token_root_stage.before.equals(preparedHistory.modern_control_base_stage.after),true);
+assert.equal(preparedHistory.form_field_tokenization_stage.before.equals(preparedHistory.theme_token_root_stage.after),true);
+assert.equal(preparedHistory.unthemable_stage.individual_decisions,5);
+assert.equal(preparedHistory.registered_checker_metadata_stage.metadata_tokens,14);
+assert.equal(preparedHistory.token_build_stage.individual_decisions,1);
+assert.equal(preparedHistory.checker_reference_metadata_stage.checker_digest_tokens,14);
+assert.equal(preparedHistory.current_native_packed_or_floor_qualified,false);
+// Both exact historical before/after frames precede/follow only this source stage.
+assert.equal(JSON.parse(before).entries.filter(row=>admission.FIELD_SHAS.includes(row.sha)&&row.individual_proof?.form_field_tokenization_source_scope!==undefined).length,0);
 const physicalFrame=currentCanonicalTestFrame({root,read}),physicalOwner=packedUpstreamLedgerEpoch({root,read:physicalRead});
 assert.equal(physicalOwner.individual_decisions_applied,physicalFrame.individual_source_reviews);
 assert.equal(physicalOwner.base_class_removal_source_decisions_applied,physicalFrame.base_class_decisions);
-assert.equal(physicalOwner.raw,physicalRead);physicalOwner.assertCurrent();physicalFrame.assertCurrent();
-current.assertCurrent();previous.assertCurrent();
-assert.equal(current.individual_decisions_applied,35);assert.equal(current.unthemable_source_decisions_applied,5);assert.equal(current.registered_checker_metadata_tokens_applied,14);
-assert.equal(previous.individual_decisions_applied,33);assert.equal(previous.unthemable_source_decisions_applied,5);assert.equal(previous.registered_checker_metadata_tokens_applied,14);
-assert.equal(current.form_field_tokenization_decisions_applied,2);assert.equal(previous.form_field_tokenization_decisions_applied,0);
-assert.equal(current.theme_token_root_decisions_applied,2);assert.equal(previous.theme_token_root_decisions_applied,2);
-assert.equal(current.modern_control_base_decisions_applied,4);assert.equal(previous.modern_control_base_decisions_applied,4);
-for(const state of [current,previous]){assert.equal(state.token_build_decisions_applied,1);assert.equal(state.checker_reference_metadata_tokens_applied,14);assert.equal(state.current_native_packed_or_floor_or_g11_credit,false);}
-assert.equal(current.raw,actual);assert.equal(current.read('scripts/check-upstream-audit-disposition.mjs').equals(read('scripts/check-upstream-audit-disposition.mjs')),true);
+assert.equal(physicalOwner.raw,physicalRead);assert.equal(physicalOwner.current_native_packed_or_floor_or_g11_credit,false);
+assert.equal(physicalOwner.read('scripts/check-upstream-audit-disposition.mjs').equals(read('scripts/check-upstream-audit-disposition.mjs')),true);
+physicalOwner.assertCurrent();preparedHistory.assertCurrent();physicalFrame.assertCurrent();
+assert.equal(counts.registered+counts.modern+counts.theme+counts.form,35);assert.equal(counts.registered+counts.modern+counts.theme,33);
 const rejected=[];
 for(const path of ['scripts/upstream-form-field-tokenization-admission.cjs','scripts/upstream-registered-source-review.mjs',
  'scripts/registered-source-checker-transition.mjs','scripts/check-upstream-audit-disposition.mjs','scripts/upstream-source-contract-registry.mjs']){
- late=path;assert.throws(()=>current.read(ledger),undefined,path);assert.throws(()=>physicalOwner.assertCurrent(),undefined,'physical '+path);late=null;rejected.push('late:'+path);
+ late=path;assert.throws(()=>preparedHistory.assertCurrent(),undefined,'base physical '+path);assert.throws(()=>physicalOwner.assertCurrent(),undefined,'physical '+path);late=null;rejected.push('late:'+path);
 }
-current.assertCurrent();
+preparedHistory.assertCurrent();
 const registry='scripts/upstream-source-contract-registry.mjs';
 const missing=Buffer.from('export const sourceContractDefinitions='+JSON.stringify(sourceContractDefinitions.filter(row=>row.sha!==admission.FIELD_SHAS[0]))+';\n');
 assert.throws(()=>packedUpstreamLedgerEpoch({root,read:path=>path===registry?missing:read(path)}));rejected.push('missing-registration');
@@ -116,8 +131,8 @@ try{
  mutantCaught=true;rejected.push('actual-CLI-mutant:missing-registered-source-requirement');
 }finally{rmSync(mutant,{force:true});rmSync(dir,{recursive:true,force:true});}
 assert.equal(existsSync(mutant),false);assert.equal(existsSync(dir),false);
-physicalOwner.assertCurrent();physicalFrame.assertCurrent();
-const report={schema_version:1,line:'21.x',historical_json_comparison_only:true,current_physical_source_admissions:physicalOwner.individual_decisions_applied,current_physical_base_class_decisions:physicalOwner.base_class_removal_source_decisions_applied,current_physical_owner_guarded:true,current_source_admissions:35,previous_source_admissions:33,
+physicalOwner.assertCurrent();preparedHistory.assertCurrent();physicalFrame.assertCurrent();
+const report={schema_version:1,line:'21.x',historical_json_comparison_only:true,original_program_authenticated_as_DATA:true,original_program_executed:false,current_physical_source_admissions:physicalOwner.individual_decisions_applied,current_physical_base_class_decisions:physicalOwner.base_class_removal_source_decisions_applied,current_physical_owner_guarded:true,current_source_admissions:35,previous_source_admissions:33,
  pure_metadata_cases:metadataCases,pure_metadata_without_filesystem_or_compiler_bindings:true,metadata_rejections:metadataRejections,source_rejections:sourceRejections,bound_source_members:source.bound.length,
  real_root_checker_positive_rows:positive,real_root_checker_rejected_rows:negative,missing_source_requirement_mutant_detected:mutantCaught,
  rejection_controls:rejected.length,rejected,raw_current_checker_preserved:true,all_temporary_checker_files_removed:true,

@@ -1,0 +1,1349 @@
+{
+  "schema_version": 3,
+  "role": "finite-current-sass-tool-reference-successor",
+  "previous_epoch": {
+    "path": "compatibility/rc/current-sass-tool-reference-inputs-v2.json",
+    "sha256": "d25ef6684992ececd518f7932bc68f5d43d433df23868d7a376ebf0a9e56a770",
+    "bytes": 625566
+  },
+  "product_paths": [],
+  "historical_programs_executed": false,
+  "historical_reports_rewritten": 0,
+  "artifact_or_audit_admission_granted": false,
+  "branches": {
+    "21.x": {
+      "source_parent": "d8ab97315b6c77b83f42c2bebcf63b2984fff255",
+      "updates": [
+        {
+          "path": "scripts/browser-owner-source.mjs",
+          "before": {
+            "path": "scripts/browser-owner-source.mjs",
+            "sha256": "f3eed08c7bc7d385a53ba2cabfeb35e4656e7f41871fab08b685104b1f0f84ad",
+            "bytes": 6019
+          },
+          "after": {
+            "path": "scripts/browser-owner-source.mjs",
+            "sha256": "9377e8dba64633774c42aea4a93f8829aec62a821a69c868d62efce41c930b72",
+            "bytes": 6408
+          },
+          "edits": [
+            {
+              "offset": 376,
+              "before": "",
+              "after": "import {packedUpstreamLedgerCurrentSourceLane} from './packed-upstream-ledger-epoch.mjs';\n"
+            },
+            {
+              "offset": 2157,
+              "before": "",
+              "after": " const actual=packedUpstreamLedgerCurrentSourceLane({root,read});\n"
+            },
+            {
+              "offset": 5467,
+              "before": " const assertCurrent=()=>{legacyTools.assertCurrent();for(const ref of bound.values()){\n  const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late browser owner tool '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readBrowserOwnerMember(root,ref.path)));\n",
+              "after": " const assertCurrent=()=>{actual.assertCurrent();legacyTools.assertCurrent();for(const ref of bound.values()){\n  const raw=actual.read(ref.path);assert.equal(hash(raw),ref.sha256,'late browser owner tool '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readBrowserOwnerMember(root,ref.path)));\n }for(const ref of bound.values()){\n  const raw=readBrowserOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical browser owner tool '+ref.path);assert.equal(raw.length,ref.bytes);\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/browser-reference-source.mjs",
+          "before": {
+            "path": "scripts/browser-reference-source.mjs",
+            "sha256": "59f2ac538149e0d9b2176c231a97147862881fb19b46768a5a4e450d66f9fe38",
+            "bytes": 10443
+          },
+          "after": {
+            "path": "scripts/browser-reference-source.mjs",
+            "sha256": "26040046f029744629276a840865b88dc03f821db8d60bb60738ee168f96626f",
+            "bytes": 10469
+          },
+          "edits": [
+            {
+              "offset": 1916,
+              "before": "  ref=tools.qualifyReference(ref);\n",
+              "after": "  if(ref.sha256!==undefined)ref=tools.qualifyReference(ref);\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/checker-owner-source.mjs",
+          "before": {
+            "path": "scripts/checker-owner-source.mjs",
+            "sha256": "0788290595d4c776ae958ebf8e0c110b281c3840f349d1be93b7e5b988a3567c",
+            "bytes": 5220
+          },
+          "after": {
+            "path": "scripts/checker-owner-source.mjs",
+            "sha256": "128a33dc4ea2dc37f084221369285b8e164154e8e21d277f6b32e8ceb945aee4",
+            "bytes": 5609
+          },
+          "edits": [
+            {
+              "offset": 363,
+              "before": "",
+              "after": "import {packedUpstreamLedgerCurrentSourceLane} from './packed-upstream-ledger-epoch.mjs';\n"
+            },
+            {
+              "offset": 2144,
+              "before": "",
+              "after": " const actual=packedUpstreamLedgerCurrentSourceLane({root,read});\n"
+            },
+            {
+              "offset": 4709,
+              "before": " const assertCurrent=()=>{tools.assertCurrent();for(const ref of bound.values()){\n  const raw=read(ref.path),physical=readCheckerOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'late checker owner tool '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(physical));\n",
+              "after": " const assertCurrent=()=>{actual.assertCurrent();tools.assertCurrent();for(const ref of bound.values()){\n  const raw=actual.read(ref.path),physical=readCheckerOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'late checker owner tool '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(physical));\n }for(const ref of bound.values()){\n  const raw=readCheckerOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical checker owner tool '+ref.path);assert.equal(raw.length,ref.bytes);\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/checker-reference-proposal.mjs",
+          "before": {
+            "path": "scripts/checker-reference-proposal.mjs",
+            "sha256": "22c49ba434ee0b1253ad2815b77510adb8259cc3f307005f6b66b73e522502ac",
+            "bytes": 13095
+          },
+          "after": {
+            "path": "scripts/checker-reference-proposal.mjs",
+            "sha256": "46178033f750eb04cf4343509749e3618c9b9683d7eca0db9630f88ffcf66789",
+            "bytes": 13477
+          },
+          "edits": [
+            {
+              "offset": 368,
+              "before": "",
+              "after": "import {packedUpstreamLedgerCurrentSourceLane} from './packed-upstream-ledger-epoch.mjs';\n"
+            },
+            {
+              "offset": 7791,
+              "before": "",
+              "after": " const actual=packedUpstreamLedgerCurrentSourceLane({root,read});\n"
+            },
+            {
+              "offset": 10798,
+              "before": " const assertCurrent=()=>{tools.assertCurrent();assert.equal(hash(currentFile(root,CHECKER_REFERENCE_LEDGER)),hash(physicalLedger),'late physical canonical source image');for(const ref of bound.values()){\n  const raw=read(ref.path),physical=currentFile(root,ref.path);assert.equal(hash(raw),ref.sha256,'late proposal input '+ref.path);assert.equal(raw.length,ref.bytes);assert.equal(hash(physical),ref.sha256,'late physical proposal input '+ref.path);\n",
+              "after": " const assertCurrent=()=>{actual.assertCurrent();tools.assertCurrent();assert.equal(hash(currentFile(root,CHECKER_REFERENCE_LEDGER)),hash(physicalLedger),'late physical canonical source image');for(const ref of bound.values()){\n  const raw=actual.read(ref.path),physical=currentFile(root,ref.path);assert.equal(hash(raw),ref.sha256,'late proposal input '+ref.path);assert.equal(raw.length,ref.bytes);assert.equal(hash(physical),ref.sha256,'late physical proposal input '+ref.path);\n }for(const ref of bound.values()){\n  const raw=currentFile(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical checker proposal input '+ref.path);assert.equal(raw.length,ref.bytes);\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/historical-contract-repair-readers.mjs",
+          "before": {
+            "path": "scripts/historical-contract-repair-readers.mjs",
+            "sha256": "ddfd6539917d1327a28e5b9987e38c260c1872094807a3e540b8dac03d96e4a8",
+            "bytes": 19785
+          },
+          "after": {
+            "path": "scripts/historical-contract-repair-readers.mjs",
+            "sha256": "cc6051858e17d852363bc767ca07fa8c6cf27930318f783405e0f8489bb20a25",
+            "bytes": 19876
+          },
+          "edits": [
+            {
+              "offset": 4846,
+              "before": " if(existsSync(join(root,'compatibility/rc/current-sass-tool-reference-inputs-v2.json')))return currentSassToolReferenceSubject(args);\n",
+              "after": " if(existsSync(join(root,'compatibility/rc/parent-base-class-tool-successor-inputs-v3.json'))||existsSync(join(root,'compatibility/rc/current-sass-tool-reference-inputs-v2.json')))return currentSassToolReferenceSubject(args);\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/legacy-removal-owner-source.mjs",
+          "before": {
+            "path": "scripts/legacy-removal-owner-source.mjs",
+            "sha256": "b88708bb7ed441e24c6ed623371330426d6a947df83452ca343487767d2c9122",
+            "bytes": 6628
+          },
+          "after": {
+            "path": "scripts/legacy-removal-owner-source.mjs",
+            "sha256": "584e49ad810cb7676302d0760a8d3f40f8749661b8f6dce11706b27758037041",
+            "bytes": 7030
+          },
+          "edits": [
+            {
+              "offset": 665,
+              "before": "",
+              "after": "import {packedUpstreamLedgerCurrentSourceLane} from './packed-upstream-ledger-epoch.mjs';\n"
+            },
+            {
+              "offset": 1619,
+              "before": "",
+              "after": " const actual=packedUpstreamLedgerCurrentSourceLane({root,read});\n"
+            },
+            {
+              "offset": 4852,
+              "before": " const qualifyReference=value=>{const ref=successor.predecessorReference(value),row=transitions.get(ref.path);if(!row)return ref.path==='scripts/upstream-source-contract-registry.mjs'?qualifyRegistry(ref):{...ref};const previous=ref.sha256===row.before.sha256?row.before:ref.sha256===row.after.sha256?row.after:null;assert.ok(previous,'unqualified legacy code reference '+ref.path);if(ref.bytes!==undefined)assert.equal(ref.bytes,previous.bytes);return successor.qualifyReference({...ref,sha256:row.after.sha256,bytes:row.after.bytes});};\n",
+              "after": " const qualifyReference=value=>{const ref=successor.predecessorReference(value),row=transitions.get(ref.path);if(!row)return ref.path==='scripts/upstream-source-contract-registry.mjs'?qualifyRegistry(ref):successor.qualifyReference(ref);const previous=ref.sha256===row.before.sha256?row.before:ref.sha256===row.after.sha256?row.after:null;assert.ok(previous,'unqualified legacy code reference '+ref.path);if(ref.bytes!==undefined)assert.equal(ref.bytes,previous.bytes);return successor.qualifyReference({...ref,sha256:row.after.sha256,bytes:row.after.bytes});};\n"
+            },
+            {
+              "offset": 6027,
+              "before": " const assertCurrent=()=>{successor.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}};\n",
+              "after": " const assertCurrent=()=>{actual.assertCurrent();successor.assertCurrent();for(const ref of bound.values()){const raw=actual.read(ref.path);assert.equal(hash(raw),ref.sha256,'late legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}for(const ref of bound.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);}};\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/packed-upstream-ledger-epoch.mjs",
+          "before": {
+            "path": "scripts/packed-upstream-ledger-epoch.mjs",
+            "sha256": "19450dff2f3989d1656e0bcb6a56a315edb9d9f0b125aa96babe088623c490a8",
+            "bytes": 80929
+          },
+          "after": {
+            "path": "scripts/packed-upstream-ledger-epoch.mjs",
+            "sha256": "b4e4d64b39da7324d13cf621446cae1c3d7c99766cf4fd025cfcdfda7bb689f3",
+            "bytes": 85882
+          },
+          "edits": [
+            {
+              "offset": 744,
+              "before": "",
+              "after": "import {baseClassRemovalOwnerContext} from './base-class-removal-canonical-stage.mjs';\nimport {currentAuthoredRosterSourceSubject,currentAuthoredRosterRawRead} from './current-authored-roster-source.mjs';\n"
+            },
+            {
+              "offset": 8248,
+              "before": " legacy:[LEDGER],table:[LEDGER],\n",
+              "after": " legacy:[LEDGER],table:[LEDGER],base_class:[LEDGER],\n"
+            },
+            {
+              "offset": 78409,
+              "before": "export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){\n",
+              "after": "function prepareBeforeBaseClassRemovalLedger({root=process.cwd(),read=disk(root)}={}){\n"
+            },
+            {
+              "offset": 78838,
+              "before": "export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={}){\n",
+              "after": "function epochBeforeBaseClassRemovalLedger({root=process.cwd(),read=disk(root)}={}){\n"
+            },
+            {
+              "offset": 79832,
+              "before": "export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root),prior}={}){\n",
+              "after": "function qualifyBeforeBaseClassRemovalToolReference({root=process.cwd(),read=disk(root),prior}={}){\n"
+            },
+            {
+              "offset": 80929,
+              "before": "",
+              "after": "\n/** Physical proof reads; preserve a registered roster reader on the public route. */\nfunction baseClassRemovalProofContext(root,publicRead){\n const actual=currentAuthoredRosterRawRead({root,read:publicRead});\n const boundary=canonicalSourcePhysicalBoundary({root,read:actual}),read=boundary.read;\n const selected=baseClassRemovalOwnerContext({root,read});\n if(actual===publicRead)return {selected:bindSourceMetadata(root,selected,read,'base_class'),boundary};\n // Only the roster module's private registration can select this branch.\n // Its historical JSON views remain on publicRead, never the proof reader.\n const roster=currentAuthoredRosterSourceSubject({root,read});\n const assertCurrent=()=>{selected.assertCurrent();roster.assertCurrent();selected.assertCurrent();boundary.assertPhysical();};\n const refs=new Map([...selected.bound,...roster.bound].map(ref=>[ref.path,{...ref}]));\n const combined={...selected,assertCurrent,bound:[...refs.values()],wrapPrepared:prior=>{\n  const prepared=selected.wrapPrepared(prior),bound=new Map(prepared.bound);for(const ref of refs.values())bound.set(ref.path,ref.sha256);\n  const native=prepared.native_spec_source,nativeBound=native.bound.map(ref=>{const actual=refs.get(ref.path);return actual?{...ref,sha256:actual.sha256,bytes:actual.bytes}:{...ref};});\n  return {...prepared,bound,native_spec_source:{...native,bound:nativeBound}};\n }};\n assertCurrent();return {selected:bindSourceMetadata(root,combined,read,'base_class'),boundary};\n}\n\n/** Exact terminal base-class source decision; all preceding owners still run. */\nexport function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){\n read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});\n const {selected,boundary}=baseClassRemovalProofContext(root,read);\n const prior=prepareBeforeBaseClassRemovalLedger({root,read:selected.metadataRead}),prepared=selected.wrapPrepared(prior);\n const guarded=guard=>()=>{selected.assertCurrent();guard();selected.assertCurrent();boundary.assertPhysical();};\n const assertCurrent=guarded(prepared.assertCurrent);assertCurrent();\n return {...prepared,assertCurrent,\n  prior_metadata_assert_current:guarded(prepared.prior_metadata_assert_current),\n  native_spec_source:{...prepared.native_spec_source,assertCurrent:guarded(prepared.native_spec_source.assertCurrent)},\n  base_class_removal_stage:{...prepared.base_class_removal_stage,assertCurrent:guarded(prepared.base_class_removal_stage.assertCurrent)}};\n}\nexport function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={}){\n read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});\n const publicRead=read,{selected,boundary}=baseClassRemovalProofContext(root,read);\n const prior=epochBeforeBaseClassRemovalLedger({root,read:selected.metadataRead});\n const assertCurrent=()=>{selected.assertCurrent();prior.assertCurrent();selected.assertCurrent();boundary.assertPhysical();};\n const historical=path=>{if(path!==LEDGER)return publicRead(path);assertCurrent();const raw=prior.read(path);assertCurrent();return raw;};\n readers.set(historical,{root:resolve(root),raw:publicRead});assertCurrent();\n return {...prior,read:historical,raw:publicRead,assertCurrent,\n  individual_decisions_applied:prior.individual_decisions_applied+(selected.applied?1:0),\n  base_class_removal_source_decisions_applied:selected.applied?1:0,\n  current_tool_bytes_exposed_without_projection:true,current_native_packed_or_floor_or_g11_credit:false};\n}\nexport function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root),prior}={}){\n read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.qualifyCanonicalToolReference({root,read,prior});\n let role;try{role=read(METADATA_ROLE);}catch{/* Public readers have no private comparison capability. */}\n if(role===metadataToken)return qualifyBeforeBaseClassRemovalToolReference({root,read,prior});\n const {selected,boundary}=baseClassRemovalProofContext(root,read);\n const result=qualifyBeforeBaseClassRemovalToolReference({root,read:selected.metadataRead,prior});if(!result){boundary.assertPhysical();return result;}\n const bound=new Map(result.bound.map(ref=>[ref.path,{...ref}]));for(const ref of selected.bound)bound.set(ref.path,{...ref});\n const raw=boundary.read(result.reference.path),reference={...result.reference,sha256:hash(raw),bytes:raw.length};\n const assertCurrent=()=>{selected.assertCurrent();result.assertCurrent();selected.assertCurrent();boundary.assertPhysical();};assertCurrent();\n return {...result,reference,bound:[...bound.values()],assertCurrent,base_class_removal_source_scope:true};\n}\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/table-local-compilation-canonical-stage.mjs",
+          "before": {
+            "path": "scripts/table-local-compilation-canonical-stage.mjs",
+            "sha256": "bdb3137f6db42ed2611ac3a41e400478defed7f0076d203061d1e12d03f63b7c",
+            "bytes": 8231
+          },
+          "after": {
+            "path": "scripts/table-local-compilation-canonical-stage.mjs",
+            "sha256": "704df42aa5144f728ba3a386ceabcf97e7bb7b8bd879998ae9121b37826c91b2",
+            "bytes": 8953
+          },
+          "edits": [
+            {
+              "offset": 783,
+              "before": "",
+              "after": "import {readHistoricalContractRepairOwnerMember} from './historical-contract-repair-readers.mjs';\n"
+            },
+            {
+              "offset": 5884,
+              "before": " const applied=actualLedger.equals(stage.after),registryApplied=actualRegistry.equals(registryAfter);if(applied)assert.ok(registryApplied,'table ledger requires exact registry successor');\n",
+              "after": " const applied=actualLedger.equals(stage.after),registryApplied=tools.registryComparisonBytes().equals(registryAfter);if(applied)assert.ok(registryApplied,'table ledger requires exact registry successor');\n"
+            },
+            {
+              "offset": 6399,
+              "before": " const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late table canonical input '+ref.path);assert.equal(raw.length,ref.bytes);}};\n",
+              "after": " // Only the private ledger reference can differ from physical bytes here.\n // Its exact physical frame is independently authenticated by the leaf.\n const physicalLedger=tools.bound.find(ref=>ref.path===TABLE_LOCAL_COMPILATION_LEDGER);assert.ok(physicalLedger);\n const physicalBound=[...bound.values()].map(ref=>({...ref,...(ref.path===TABLE_LOCAL_COMPILATION_LEDGER?physicalLedger:{})}));\n const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late table canonical input '+ref.path);assert.equal(raw.length,ref.bytes);}for(const ref of physicalBound){const raw=readHistoricalContractRepairOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical table canonical input '+ref.path);assert.equal(raw.length,ref.bytes);}};\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/table-local-compilation-owner-source.mjs",
+          "before": {
+            "path": "scripts/table-local-compilation-owner-source.mjs",
+            "sha256": "bcf8438d4366926f7c476d287319a7ae5d2a92d1a8313e632b4d066f6a3f4d90",
+            "bytes": 7977
+          },
+          "after": {
+            "path": "scripts/table-local-compilation-owner-source.mjs",
+            "sha256": "9939957cbe84a89927e6c3493c1cbd3d86ef28542162e67d588818841c99a2a1",
+            "bytes": 9030
+          },
+          "edits": [
+            {
+              "offset": 665,
+              "before": "",
+              "after": "import {baseClassRemovalCanonicalFrameSubject} from './base-class-removal-owner-source.mjs';\nimport {packedUpstreamLedgerCurrentSourceLane} from './packed-upstream-ledger-epoch.mjs';\n"
+            },
+            {
+              "offset": 1785,
+              "before": "",
+              "after": " const actual=packedUpstreamLedgerCurrentSourceLane({root,read});\n const frames=baseClassRemovalCanonicalFrameSubject({root,read:actual.read});\n"
+            },
+            {
+              "offset": 1852,
+              "before": " const bound=new Map(repairs.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{const raw=read(ref.path),qualified=repairs.qualify(ref)??ref,comparison=repairs.ownsReference(ref)?repairs.comparisonBytes(ref):raw;assert.ok(Buffer.isBuffer(raw));assert.equal(hash(comparison),ref.sha256,'changed table owner input '+ref.path);if(ref.bytes!==undefined)assert.equal(comparison.length,ref.bytes);assert.equal(hash(raw),qualified.sha256,'changed actual table owner successor '+ref.path);assert.ok(raw.equals(readEvidenceMember(root,ref.path)),'nonphysical table owner source '+ref.path);bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return comparison;};\n",
+              "after": " const bound=new Map([...repairs.bound,...frames.bound].map(ref=>[ref.path,{...ref}])),member=ref=>{const raw=read(ref.path),qualified=repairs.qualify(ref)??ref,comparison=repairs.ownsReference(ref)?repairs.comparisonBytes(ref):raw;assert.ok(Buffer.isBuffer(raw));assert.equal(hash(comparison),ref.sha256,'changed table owner input '+ref.path);if(ref.bytes!==undefined)assert.equal(comparison.length,ref.bytes);assert.equal(hash(raw),qualified.sha256,'changed actual table owner successor '+ref.path);assert.ok(raw.equals(readEvidenceMember(root,ref.path)),'nonphysical table owner source '+ref.path);bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return comparison;};\n"
+            },
+            {
+              "offset": 4593,
+              "before": "  const raw=read(registry),pair=pairs.get(registry);assert.ok(raw.equals(readEvidenceMember(root,registry)),'nonphysical current registry');assert.ok([ancestor,pair.before,pair.after].some(value=>raw.equals(value)),'unknown current registry frame');\n  const reference={path:registry,sha256:hash(raw),bytes:raw.length};if(bound.has(registry))assert.equal(bound.get(registry).sha256,reference.sha256);else bound.set(registry,reference);return {raw,reference};\n",
+              "after": "  const physical=read(registry),pair=pairs.get(registry),frame=frames.registrySubject(),raw=frame.comparison;assert.ok(physical.equals(frame.raw)&&physical.equals(readEvidenceMember(root,registry)),'nonphysical current registry');assert.ok([ancestor,pair.before,pair.after].some(value=>raw.equals(value)),'unknown current registry frame');\n  const reference={...frame.reference};if(bound.has(registry))assert.equal(bound.get(registry).sha256,reference.sha256);else bound.set(registry,reference);return {raw,physical,reference};\n"
+            },
+            {
+              "offset": 5055,
+              "before": " const ownsReference=ref=>{const row=transitions.get(ref.path);return repairs.ownsReference(ref)||Boolean(row&&[row.before.sha256,row.after.sha256].includes(ref.sha256))||ref.path===registry&&[ancestor,...Object.values(pairs.get(registry))].some(raw=>hash(raw)===ref.sha256);};\n",
+              "after": " const ownsReference=ref=>{const row=transitions.get(ref.path);return frames.ownsReference(ref)||repairs.ownsReference(ref)||Boolean(row&&[row.before.sha256,row.after.sha256].includes(ref.sha256))||ref.path===registry&&[ancestor,...Object.values(pairs.get(registry))].some(raw=>hash(raw)===ref.sha256);};\n"
+            },
+            {
+              "offset": 5370,
+              "before": "  const ref=repairs.predecessorReference(value)??value;\n",
+              "after": "  const repaired=repairs.predecessorReference(value)??value,ref=frames.ownsReference(repaired)?frames.predecessorReference(repaired):repaired;\n"
+            },
+            {
+              "offset": 5895,
+              "before": "  const ref=repairs.predecessorReference(value)??value;\n",
+              "after": "  const repaired=repairs.predecessorReference(value)??value,ref=frames.ownsReference(repaired)?frames.predecessorReference(repaired):repaired;\n"
+            },
+            {
+              "offset": 6660,
+              "before": "",
+              "after": "  if(frames.ownsReference(ref))return frames.comparisonBytes(ref);\n"
+            },
+            {
+              "offset": 7230,
+              "before": " const predecessorData=(path,raw)=>{assert.ok(Buffer.isBuffer(raw));const pair=pairs.get(path);return Buffer.from(pair&&raw.equals(pair.after)?pair.before:raw);};\n const assertCurrent=()=>{repairs.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late table owner input '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}};\n assertCurrent();return {packet:structuredClone(packet),bound:structuredClone([...bound.values()]),ownsReference,predecessorReference,qualifyReference,comparisonBytes,predecessorData,assertCurrent,old_program_executed:false,canonical_frame_admission_granted:false,current_native_or_full_audit_credit:false};\n",
+              "after": " const predecessorData=(path,raw)=>{assert.ok(Buffer.isBuffer(raw));const normalized=frames.predecessorData(path,raw),pair=pairs.get(path);return Buffer.from(pair&&normalized.equals(pair.after)?pair.before:normalized);};\n const assertCurrent=()=>{actual.assertCurrent();frames.assertCurrent();repairs.assertCurrent();for(const ref of bound.values()){const raw=actual.read(ref.path);assert.equal(hash(raw),ref.sha256,'late table owner input '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}for(const ref of bound.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical table owner input '+ref.path);assert.equal(raw.length,ref.bytes);}};\n assertCurrent();return {packet:structuredClone(packet),bound:structuredClone([...bound.values()]),ownsReference,predecessorReference,qualifyReference,comparisonBytes,predecessorData,registryComparisonBytes:()=>Buffer.from(registrySubject().raw),assertCurrent,old_program_executed:false,canonical_frame_admission_granted:false,current_native_or_full_audit_credit:false};\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/upstream-legacy-removal-source.mjs",
+          "before": {
+            "path": "scripts/upstream-legacy-removal-source.mjs",
+            "sha256": "91a107647a2e823c9e73eb45255df65b7bee8185ae16f25106baa673358528ef",
+            "bytes": 28603
+          },
+          "after": {
+            "path": "scripts/upstream-legacy-removal-source.mjs",
+            "sha256": "1940e23aa979b94c0083f94d131004f9dcc67e8d309369c540d825037282fd3d",
+            "bytes": 29752
+          },
+          "edits": [
+            {
+              "offset": 535,
+              "before": "import {historicalContractRepairSourceSubject,readHistoricalContractRepairMember} from './historical-contract-repair-source.mjs';\n",
+              "after": "import {historicalContractRepairSourceSubject} from './historical-contract-repair-source.mjs';\nimport {createCurrentSassSource} from './current-sass-source.mjs';\nimport {canonicalSourcePhysicalBoundary} from './current-sass-canonical-source-boundary.mjs';\nimport {readHistoricalContractRepairOwnerMember} from './historical-contract-repair-readers.mjs';\n"
+            },
+            {
+              "offset": 14376,
+              "before": " return readHistoricalContractRepairMember(root,path);\n",
+              "after": " return readHistoricalContractRepairOwnerMember(root,path);\n"
+            },
+            {
+              "offset": 15088,
+              "before": "",
+              "after": " const physicalBoundary=canonicalSourcePhysicalBoundary({root,read:providedRead});\n"
+            },
+            {
+              "offset": 15131,
+              "before": "  const raw=providedRead(path);assert.ok(Buffer.isBuffer(raw));assert.ok(raw.equals(legacyRemovalPhysical(root,path)),'nonphysical legacy review source '+path);\n",
+              "after": "  const raw=physicalBoundary.read(path);assert.ok(Buffer.isBuffer(raw));\n"
+            },
+            {
+              "offset": 15564,
+              "before": "",
+              "after": " const currentSass=createCurrentSassSource({root,read:readCurrent});\n"
+            },
+            {
+              "offset": 16727,
+              "before": " const read=path=>{const raw=readCurrent(path),prior=expectedMembers.get(path);assert.ok(prior,'unknown legacy boundary input '+path);const ref=repairs.qualify(prior)??prior;assert.equal(hash(raw),ref.sha256,'changed owned legacy boundary '+path);assert.equal(raw.length,ref.bytes);members.set(path,{...ref});return raw;};\n",
+              "after": " const read=path=>{const raw=readCurrent(path),prior=expectedMembers.get(path);assert.ok(prior,'unknown legacy boundary input '+path);const repaired=repairs.qualify(prior)??prior,ref=currentSass.qualify(repaired)??repaired;assert.equal(hash(raw),ref.sha256,'changed owned legacy boundary '+path);assert.equal(raw.length,ref.bytes);members.set(path,{...ref});return raw;};\n"
+            },
+            {
+              "offset": 25466,
+              "before": " const sourceComparison=repairs.compareSourceReport(report,expected);\n assert.deepEqual(sourceComparison.historical_comparison,expected,'original legacy metadata comparison changed');\n",
+              "after": " // Derive only finite authenticated Sass reference successors as metadata.\n // The original boundary and four-repair comparison remain untouched.\n const sassExpected=structuredClone(expected);let sassReferenceSuccessors=0;\n sassExpected.current_members=sassExpected.current_members.map(prior=>{\n  const current=currentSass.qualify(prior);if(!current)return prior;\n  if(current.sha256!==prior.sha256)sassReferenceSuccessors++;\n  return {...prior,...current};\n });\n assert.equal(sassReferenceSuccessors,5,'legacy boundary must retain all five Sass predecessor references');\n const sourceComparison=repairs.compareSourceReport(report,sassExpected);\n assert.deepEqual(sourceComparison.historical_comparison,sassExpected,'original four-repair metadata comparison changed');\n assert.deepEqual(JSON.parse(pinned(LEGACY_BOUNDARY,LEGACY_BOUNDARY_SHA)),expected,'original legacy metadata comparison changed');\n"
+            },
+            {
+              "offset": 27666,
+              "before": " const assertCurrent=()=>{repairs.assertCurrent();original.assertCurrent();assert.deepEqual(legacyRemovalProductPopulation(root),productPaths,'changed complete legacy product population');for(const ref of bound.values()){const raw=readCurrent(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}};\n assertCurrent();return {bound:structuredClone([...bound.values()]),assertCurrent,review:structuredClone(review),report:structuredClone(report),historical_comparison_report:structuredClone(sourceComparison.historical_comparison),qualified_product_reference_successors:sourceComparison.changed_source_references,facts:{line:'21.x',sha:SHA,complete_original_files:746,original_text_hunks:797,nondeletion_hunks_individually_reviewed:97,deleted_paths_complete_membership:702,fresh_original_and_owned_boundary_review:true,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};\n",
+              "after": " const assertCurrent=()=>{repairs.assertCurrent();original.assertCurrent();currentSass.assertCurrent();assert.deepEqual(legacyRemovalProductPopulation(root),productPaths,'changed complete legacy product population');for(const ref of bound.values()){const raw=readCurrent(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}physicalBoundary.assertPhysical();};\n assertCurrent();return {bound:structuredClone([...bound.values()]),assertCurrent,review:structuredClone(review),report:structuredClone(report),historical_comparison_report:structuredClone(expected),qualified_product_reference_successors:sourceComparison.changed_source_references,current_sass_reference_successors:sassReferenceSuccessors,facts:{line:'21.x',sha:SHA,complete_original_files:746,original_text_hunks:797,nondeletion_hunks_individually_reviewed:97,deleted_paths_complete_membership:702,fresh_original_and_owned_boundary_review:true,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/browser_reference_owner_probe.mjs",
+          "before": {
+            "path": "tests/browser_reference_owner_probe.mjs",
+            "sha256": "4f5d024bfd072129ec819374131795fb3d77e3e6e419d5d1617eade28ff25463",
+            "bytes": 13406
+          },
+          "after": {
+            "path": "tests/browser_reference_owner_probe.mjs",
+            "sha256": "fdbf1456a891245264562c9773e86e068333ac28d718ade60bb4d1ce29768aa5",
+            "bytes": 16476
+          },
+          "edits": [
+            {
+              "offset": 1024,
+              "before": "",
+              "after": "import {currentCanonicalTestFrame} from './current_sass_canonical_test_scope.mjs';\n"
+            },
+            {
+              "offset": 1824,
+              "before": "const legacyTools=legacyRemovalOwnerSourceSubject({root,read}),table=tableLocalCompilationOwnerContext({root,read}),legacy=legacyRemovalOwnerContext({root,read:table.metadataRead});\nconst stageRead=path=>path===LEDGER?legacy.metadataRead(path):read(path);\n",
+              "after": "// These externally constructed contexts stay on the actual physical source lane.\nconst currentFrame=currentCanonicalTestFrame({root,read});\nconst legacyTools=legacyRemovalOwnerSourceSubject({root,read}),table=tableLocalCompilationOwnerContext({root,read}),legacy=legacyRemovalOwnerContext({root,read});\nconst stageRead=read;\n// Retain the old caller assertions as authenticated program DATA; never execute it.\nconst historicalEnv={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};\nfor(const key of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete historicalEnv[key];\nconst historicalProbe=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show','d8ab97315b6c77b83f42c2bebcf63b2984fff255:tests/browser_reference_owner_probe.mjs'],{cwd:root,env:historicalEnv,maxBuffer:1024*1024});\nassert.equal(hash(historicalProbe),'4f5d024bfd072129ec819374131795fb3d77e3e6e419d5d1617eade28ff25463');assert.equal(historicalProbe.length,13406);\nfor(const statement of ['assert.equal(unknown.applied,false);','assert.equal(unknown.browser.applied,false);','assert.ok(unknown.metadataRead(LEDGER).equals(unknownRead(LEDGER)));','assert.equal(context.browser.applied,true);','assert.ok(prepared.canonical_after.equals(disk(LEDGER)));'])assert.equal(historicalProbe.toString().split(statement).length,2);\n"
+            },
+            {
+              "offset": 5770,
+              "before": " const unknownRead=path=>path===LEDGER?Buffer.concat([disk(path),Buffer.from(' ')]):disk(path),unknown=inventoryReferenceOwnerContext({root,read:unknownRead});\n assert.equal(unknown.applied,false);assert.equal(unknown.browser.applied,false);assert.ok(unknown.metadataRead(LEDGER).equals(unknownRead(LEDGER)));\n",
+              "after": " const unknownRead=path=>path===LEDGER?Buffer.concat([disk(path),Buffer.from(' ')]):disk(path);\n // The current strict physical source gate rejects this callback outright.\n assert.throws(()=>inventoryReferenceOwnerContext({root,read:unknownRead}),error=>error?.code==='ERR_ASSERTION'&&error.message.includes('nonphysical base-class frame input '+LEDGER));\n const {packedUpstreamLedgerEpoch:rejectNonphysicalEpoch}=await import('../scripts/packed-upstream-ledger-epoch.mjs');\n assert.throws(()=>rejectNonphysicalEpoch({root,read:unknownRead}),error=>error?.code==='ERR_ASSERTION'&&error.message.includes('nonphysical canonical input '+LEDGER));\n"
+            },
+            {
+              "offset": 6266,
+              "before": " assert.ok(disk(LEDGER).equals(beforeLive));\n const report={schema_version:1,line:input.line,mode:'source-only',actual_owner_byte_identical:false,before_owner_byte_identical:true,current_owner_successor_authenticated:true,code_transitions:8,source_preservation:preservation,cold_current_tool_mutants_rejected:cold,late_all_source_mutants_rejected:late,unknown_frame_not_translated:true,source_context_grants_no_canonical_admission:true,public_snapshots_do_not_change_private_guards:true,canonical_ledger_unchanged:true,actual_complete_owner_or_retained_roster_executed:false,current_native_packed_or_floor_or_g11_credit:false,g11_claim:'not-passed'};\n",
+              "after": " context.assertCurrent();legacy.assertCurrent();table.assertCurrent();currentFrame.assertCurrent();assert.ok(disk(LEDGER).equals(beforeLive));\n const report={schema_version:1,line:input.line,mode:'source-only',actual_owner_byte_identical:false,before_owner_byte_identical:true,current_owner_successor_authenticated:true,code_transitions:8,source_preservation:preservation,cold_current_tool_mutants_rejected:cold,late_all_source_mutants_rejected:late,unknown_frame_not_translated:true,current_nonphysical_callback_rejected:true,current_nonphysical_callbacks_rejected:2,historical_unknown_passthrough_assertions_authenticated_as_DATA:true,source_context_grants_no_canonical_admission:true,public_snapshots_do_not_change_private_guards:true,canonical_ledger_unchanged:true,actual_complete_owner_or_retained_roster_executed:false,current_native_packed_or_floor_or_g11_credit:false,g11_claim:'not-passed'};\n"
+            },
+            {
+              "offset": 7318,
+              "before": " assert.equal(hash(prepared.browser_reference_stage.after),input.after_ledger.sha256);assert.ok(prepared.canonical_after.equals(disk(LEDGER)));\n",
+              "after": " assert.equal(hash(prepared.browser_reference_stage.after),input.after_ledger.sha256);\n const baseStage=prepared.base_class_removal_stage,tableStage=prepared.table_local_compilation_stage,legacyStage=prepared.legacy_removal_stage,browserStage=prepared.browser_reference_stage;\n assert.ok(baseStage.before.equals(tableStage.after));assert.ok(tableStage.before.equals(legacyStage.after));assert.ok(legacyStage.before.equals(browserStage.after));\n assert.ok(prepared.canonical_after.equals(baseStage.after));\n assert.equal(baseStage.physically_applied,currentFrame.base_class_decisions===1);\n assert.ok((baseStage.physically_applied?baseStage.after:baseStage.before).equals(disk(LEDGER)));\n"
+            },
+            {
+              "offset": 8335,
+              "before": " assert.equal(epoch.individual_decisions_applied-epoch.legacy_removal_source_decisions_applied-epoch.table_local_compilation_source_decisions_applied,input.line==='21.x'?88:13);assert.equal(epoch.table_local_compilation_source_decisions_applied,1);assert.ok(prepared.table_local_compilation_stage.after.equals(table.after));assert.equal(epoch.legacy_removal_source_decisions_applied,1);assert.equal(epoch.inventory_reference_metadata_applied,true);assert.deepEqual(epoch.projected_metadata_paths,[LEDGER]);assert.equal(epoch.current_native_packed_or_floor_or_g11_credit,false);\n",
+              "after": " assert.equal(epoch.individual_decisions_applied,currentFrame.individual_source_reviews);assert.equal(epoch.base_class_removal_source_decisions_applied,currentFrame.base_class_decisions);assert.equal(epoch.individual_decisions_applied-epoch.legacy_removal_source_decisions_applied-epoch.table_local_compilation_source_decisions_applied-epoch.base_class_removal_source_decisions_applied,input.line==='21.x'?88:13);assert.equal(epoch.table_local_compilation_source_decisions_applied,1);assert.ok(prepared.table_local_compilation_stage.after.equals(table.after));assert.equal(epoch.legacy_removal_source_decisions_applied,1);assert.equal(epoch.inventory_reference_metadata_applied,true);assert.deepEqual(epoch.projected_metadata_paths,[LEDGER]);assert.equal(epoch.current_native_packed_or_floor_or_g11_credit,false);\n"
+            },
+            {
+              "offset": 9009,
+              "before": " const context=inventoryReferenceOwnerContext({root,read:stageRead});assert.equal(context.browser.applied,true);const raw=api.packedUpstreamLedgerRawRead({root,read:epoch.read});assert.equal(raw,read);\n",
+              "after": " const context=inventoryReferenceOwnerContext({root,read});assert.equal(context.browser.applied,false);assert.ok(browserStage.before.equals(context.browser.before));assert.ok(browserStage.after.equals(context.browser.after));const raw=api.packedUpstreamLedgerRawRead({root,read:epoch.read});assert.equal(raw,read);\n"
+            },
+            {
+              "offset": 11730,
+              "before": " epoch.assertCurrent();prepared.assertCurrent();assert.ok(disk(LEDGER).equals(beforeLive));\n const report={schema_version:1,line:input.line,mode:'actual-composite-owner',actual_prepare_and_epoch_called:true,prepare_seconds:Number(prepareSeconds.toFixed(3)),epoch_seconds:Number(epochSeconds.toFixed(3)),source_admissions:epoch.individual_decisions_applied,preserved_source_admissions:epoch.individual_decisions_applied-epoch.legacy_removal_source_decisions_applied-epoch.table_local_compilation_source_decisions_applied,table_local_compilation_source_admissions:epoch.table_local_compilation_source_decisions_applied,legacy_removal_source_admissions:epoch.legacy_removal_source_decisions_applied,browser_metadata_entries:prepared.browser_reference_stage.metadata_entries,selected_entries:prepared.browser_reference_stage.selected_entries,preserved_checker_metadata_entries:prepared.checker_reference_stage.metadata_entries,preserved_inventory_metadata_entries:prepared.inventory_reference_stage.metadata_entries,current_context_bound_sources:context.bound.length,public_current_paths:paths,public_historical_projection_paths:epoch.projected_metadata_paths,actual_epoch_late_controls_rejected:controls,table_epoch_late_controls_rejected:controls-priorTableControls,preserved_legacy_epoch_late_controls_rejected:priorTableControls,preserved_epoch_late_controls_rejected:priorControls,canonical_ledger_unchanged_during_probe:true,current_native_packed_or_floor_or_g11_credit:false,full_retained_roster_executed:false,g11_claim:'not-passed'};\n",
+              "after": " epoch.assertCurrent();prepared.assertCurrent();context.assertCurrent();legacy.assertCurrent();table.assertCurrent();currentFrame.assertCurrent();assert.ok(disk(LEDGER).equals(beforeLive));\n const report={schema_version:1,line:input.line,mode:'actual-composite-owner',actual_prepare_and_epoch_called:true,prepare_seconds:Number(prepareSeconds.toFixed(3)),epoch_seconds:Number(epochSeconds.toFixed(3)),source_admissions:epoch.individual_decisions_applied,preserved_source_admissions:epoch.individual_decisions_applied-epoch.legacy_removal_source_decisions_applied-epoch.table_local_compilation_source_decisions_applied-epoch.base_class_removal_source_decisions_applied,base_class_removal_source_admissions:epoch.base_class_removal_source_decisions_applied,external_browser_context_physically_applied:context.browser.applied,historical_browser_stage_relation_verified:true,table_local_compilation_source_admissions:epoch.table_local_compilation_source_decisions_applied,legacy_removal_source_admissions:epoch.legacy_removal_source_decisions_applied,browser_metadata_entries:prepared.browser_reference_stage.metadata_entries,selected_entries:prepared.browser_reference_stage.selected_entries,preserved_checker_metadata_entries:prepared.checker_reference_stage.metadata_entries,preserved_inventory_metadata_entries:prepared.inventory_reference_stage.metadata_entries,current_context_bound_sources:context.bound.length,public_current_paths:paths,public_historical_projection_paths:epoch.projected_metadata_paths,actual_epoch_late_controls_rejected:controls,table_epoch_late_controls_rejected:controls-priorTableControls,preserved_legacy_epoch_late_controls_rejected:priorTableControls,preserved_epoch_late_controls_rejected:priorControls,canonical_ledger_unchanged_during_probe:true,current_native_packed_or_floor_or_g11_credit:false,full_retained_roster_executed:false,g11_claim:'not-passed'};\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/checker_reference_source_probe.mjs",
+          "before": {
+            "path": "tests/checker_reference_source_probe.mjs",
+            "sha256": "d15e169d07033f25f089c2f50d78aa77f924879256674431d9c1cfa20660fe47",
+            "bytes": 17054
+          },
+          "after": {
+            "path": "tests/checker_reference_source_probe.mjs",
+            "sha256": "adf6aca0164782e24841c1a808268945bfe60cd03459fe5c28873496f96ffc4b",
+            "bytes": 17415
+          },
+          "edits": [
+            {
+              "offset": 2225,
+              "before": "  const qualified=tools.qualifyReference({path,sha256:digest,...(bytes===undefined?{}:{bytes})});digest=qualified.sha256;bytes=qualified.bytes;\n",
+              "after": "  if(digest!==undefined){const qualified=tools.qualifyReference({path,sha256:digest,...(bytes===undefined?{}:{bytes})});digest=qualified.sha256;bytes=qualified.bytes;}\n"
+            },
+            {
+              "offset": 11090,
+              "before": "",
+              "after": "  if(registry.sourceContractDefinitions.some(row=>row.sha==='55f9618b687fc0da4743a3cf27e113ceb837e151'))expectedAdded.push({sha:'55f9618b687fc0da4743a3cf27e113ceb837e151',proof_kind:'individual-historical-base-class-removal-source-review',scope_key:'base_class_removal_source_scope',module:'upstream-base-class-removal-admission.cjs'});\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/current_sass_canonical_test_scope.mjs",
+          "before": {
+            "path": "tests/current_sass_canonical_test_scope.mjs",
+            "sha256": "8c4cb8d905f5d6789a70a90ba0d9879a87a97a1e6abd2143e2db0291bb8cfbc3",
+            "bytes": 2359
+          },
+          "after": {
+            "path": "tests/current_sass_canonical_test_scope.mjs",
+            "sha256": "278a1d13ecb55386ee8d4948eebfcd5c4c8d68c3689623ef3e073ad73a6f6d74",
+            "bytes": 9390
+          },
+          "edits": [
+            {
+              "offset": 340,
+              "before": "import {readFileSync} from 'node:fs';\n",
+              "after": "import {readFileSync,lstatSync} from 'node:fs';\nimport {execFileSync} from 'node:child_process';\nimport {gunzipSync} from 'node:zlib';\n"
+            },
+            {
+              "offset": 708,
+              "before": "",
+              "after": "import {readHistoricalContractRepairOwnerMember} from '../scripts/historical-contract-repair-readers.mjs';\n"
+            },
+            {
+              "offset": 864,
+              "before": "",
+              "after": "const REGISTRY='scripts/upstream-source-contract-registry.mjs',LEDGER='compatibility/f10/disposition-ledger/ledger.json';\nconst PROPOSAL='compatibility/rc/21x-base-class-removal-admission-canonical-proposal-v6.json';\nconst PROPOSAL_SHA='720a4fcd0c9d0d67afbeddd106fc9741d7ab34a0848edc1a0f2e6a25019b9881';\nconst SOURCE_PARENT='d8ab97315b6c77b83f42c2bebcf63b2984fff255';\nconst BASE_RECORD=\"  {sha:'55f9618b687fc0da4743a3cf27e113ceb837e151',proof_kind:'individual-historical-base-class-removal-source-review',\\n    scope_key:'base_class_removal_source_scope',module:'upstream-base-class-removal-admission.cjs'},\\n\";\nconst equal=Function.call.bind(Buffer.prototype.equals);\nfunction physical(root,path){\n let cursor=root;assert.equal(lstatSync(cursor).isSymbolicLink(),false);\n for(const part of path.split('/')){assert.ok(part&&!['.','..'].includes(part));cursor=join(cursor,part);assert.equal(lstatSync(cursor).isSymbolicLink(),false);}\n assert.ok(lstatSync(cursor).isFile());return readFileSync(cursor);\n}\nfunction gitData(root,path){\n const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};\n for(const key of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete env[key];\n return execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',SOURCE_PARENT+':'+path],{cwd:root,env,maxBuffer:8*1024*1024});\n}\nfunction boundData(root,read){\n const bound=new Map();\n const member=path=>{const bytes=physical(root,path),supplied=read(path);assert.ok(Buffer.isBuffer(supplied)&&equal(bytes,supplied),'test callback must expose current physical bytes '+path);assert.ok(equal(physical(root,path),bytes),'callback changed physical test input '+path);bound.set(path,Buffer.from(bytes));return bytes;};\n const assertPhysical=()=>{for(const[path,bytes]of bound)assert.ok(equal(physical(root,path),bytes),'changed current physical test input '+path);};\n const assertCurrent=()=>{\n  for(const[path,bytes]of bound){const supplied=read(path);assert.ok(Buffer.isBuffer(supplied)&&equal(bytes,supplied),'changed current test callback '+path);}\n  assertPhysical();\n };\n const raw=member(PROPOSAL);assert.equal(hash(raw),PROPOSAL_SHA);assert.equal(raw.length,3578);\n const packet=JSON.parse(raw);\n const image=ref=>{const bytes=member(ref.path);assert.equal(hash(bytes),ref.sha256);assert.equal(bytes.length,ref.bytes);return gunzipSync(bytes);};\n return {bound,member,image,packet,assertCurrent,assertPhysical};\n}\n/** Finite current registry identity; historical67/69 bytes never become a reader. */\nexport function currentCanonicalTestRegistry({root=process.cwd(),read=path=>readFileSync(join(root,path))}={}){\n const data=boundData(root,read),{packet,image,member}=data;\n const before=image(packet.registry_before_image),after=image(packet.registry_after_image);\n assert.deepEqual({sha256:hash(before),bytes:before.length},{sha256:'be50b37d181b43960361860dd7cb3bb24d0f2d1b0a2ecfaa5a85a791e4869399',bytes:15548});\n assert.deepEqual({sha256:hash(after),bytes:after.length},{sha256:'e90d2268e862284605dd9b4f5630c0d9d84976f6014679d1aa4acbc47f38c4cc',bytes:15768});\n assert.ok(equal(gitData(root,REGISTRY),before));\n const text=before.toString();assert.equal(text.split('];\\n').length,2);assert.equal(text.replace('];\\n',BASE_RECORD+'];\\n'),after.toString());\n const actual=member(REGISTRY);assert.ok(equal(actual,before)||equal(actual,after),'unqualified current registry');\n const count=equal(actual,before)?69:70;data.assertCurrent();\n return {actual:Buffer.from(actual),comparison69:Buffer.from(before),registered_source_contracts:count,assertCurrent:data.assertCurrent,assertPhysical:data.assertPhysical};\n}\n/** Exact physical426/69,426/70 precursor or427/70, with comparison DATA only. */\nexport function currentCanonicalTestFrame({root=process.cwd(),read=path=>readFileSync(join(root,path))}={}){\n const registry=currentCanonicalTestRegistry({root,read}),data=boundData(root,read),{packet,image,member}=data;\n const before=image(packet.ledger_before_image),after=image(packet.ledger_after_image);\n for(const[name,bytes]of [['before',before],['after',after]]){assert.equal(hash(bytes),packet[name].sha256);assert.equal(bytes.length,packet[name].bytes);}\n assert.ok(equal(gitData(root,LEDGER),before));\n const span=bytes=>{const text=bytes.toString(),markers=[...text.matchAll(/^    \\{/gm)],matches=[];\n  for(let i=0;i<markers.length;i++){const start=markers[i].index+4,next=i+1<markers.length?markers[i+1].index:text.indexOf('\\n  ],',start);const slice=text.slice(start,next).trimEnd().replace(/,$/,'');const row=JSON.parse(slice);if(row.sha===packet.sha)matches.push({start,end:start+slice.length,row});}\n  assert.equal(markers.length,1697);assert.equal(matches.length,1);return {text,...matches[0]};};\n const old=span(before),next=span(after);let expected=old.text.slice(0,old.start)+next.text.slice(next.start,next.end)+old.text.slice(old.end);\n for(const[key,prior,current]of [['closed_dispositions',426,427],['open_or_deferred',1271,1270]]){const token=`  \"${key}\": ${prior},`;assert.equal(expected.split(token).length,2);expected=expected.replace(token,`  \"${key}\": ${current},`);}\n assert.equal(expected,after.toString()); // All1696 unselected entry bytes remain exact.\n const actual=member(LEDGER);assert.ok(equal(actual,before)||equal(actual,after),'unqualified current test ledger');assert.ok(!equal(actual,after)||registry.registered_source_contracts===70);\n const assertCurrent=()=>{registry.assertCurrent();data.assertCurrent();registry.assertPhysical();data.assertPhysical();};\n const comparison=(path,supplied)=>{assertCurrent();assert.ok([LEDGER,REGISTRY].includes(path));assert.ok(Buffer.isBuffer(supplied)&&equal(supplied,path===LEDGER?actual:registry.actual));return Buffer.from(path===LEDGER?before:registry.comparison69);};\n assertCurrent();return {comparison,assertCurrent,registered_source_contracts:registry.registered_source_contracts,individual_source_reviews:equal(actual,after)?91:90,base_class_decisions:equal(actual,after)?1:0};\n}\n"
+            },
+            {
+              "offset": 1224,
+              "before": " const path='scripts/upstream-source-contract-registry.mjs',actual=read(path);\n assert.deepEqual(actual,expected,'current registry must be the exact two finite source successors');\n assert.equal(sourceContractDefinitions.length,69);assert.equal(new Set(sourceContractDefinitions.map(row=>row.sha)).size,69);\n assert.deepEqual(qualified.reference,{path,sha256:hash(expected),bytes:expected.length});\n",
+              "after": " const current=currentCanonicalTestRegistry({root,read}),path=REGISTRY,actual=read(path);\n assert.deepEqual(current.comparison69,expected,'exact two finite source successors retained as DATA');\n assert.equal(sourceContractDefinitions.length,current.registered_source_contracts);assert.equal(new Set(sourceContractDefinitions.map(row=>row.sha)).size,current.registered_source_contracts);\n assert.deepEqual(qualified.reference,{path,sha256:hash(actual),bytes:actual.length});\n"
+            },
+            {
+              "offset": 1684,
+              "before": "  assert.equal(guards.has(ref.path),false,'duplicate current canonical guard');\n  const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256);assert.equal(bytes.length,ref.bytes);guards.set(ref.path,ref);\n",
+              "after": "  const observed={path:ref.path,sha256:ref.sha256,bytes:ref.bytes};\n  assert.equal(guards.has(observed.path),false,'duplicate current canonical guard');\n  const bytes=read(observed.path);assert.equal(hash(bytes),observed.sha256);assert.equal(bytes.length,observed.bytes);\n  assert.equal(ref.path,observed.path);assert.equal(ref.sha256,observed.sha256);assert.equal(ref.bytes,observed.bytes);guards.set(observed.path,observed);\n"
+            },
+            {
+              "offset": 2089,
+              "before": " qualified.assertCurrent();tools.assertCurrent();\n return {historical_registered_source_contracts:67,registered_source_contracts:69,\n",
+              "after": " qualified.assertCurrent();tools.assertCurrent();current.assertCurrent();\n // The last registry callback cannot invalidate an earlier qualified/tool input.\n // These trusted reads preserve the existing finite declared-peer read rules.\n for(const ref of guards.values()){\n  const bytes=readHistoricalContractRepairOwnerMember(root,ref.path);\n  assert.equal(hash(bytes),ref.sha256,'changed final physical canonical test input '+ref.path);\n  assert.equal(bytes.length,ref.bytes);\n }\n return {historical_registered_source_contracts:67,registered_source_contracts:current.registered_source_contracts,\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/current_sass_canonical_test_scope.py",
+          "before": {
+            "path": "tests/current_sass_canonical_test_scope.py",
+            "sha256": "f652880224869f982cefd9bfbfbe07489fafc40614e0b9ee1aa6d6bdc97d7dbb",
+            "bytes": 1877
+          },
+          "after": {
+            "path": "tests/current_sass_canonical_test_scope.py",
+            "sha256": "07f3512ac39c8a4661c185dc845f018eccc75dd890ac32c9f159c1518cdce4bb",
+            "bytes": 32324
+          },
+          "edits": [
+            {
+              "offset": 252,
+              "before": "",
+              "after": "import gzip\nimport json\nimport os\nimport re\nimport subprocess\n"
+            },
+            {
+              "offset": 992,
+              "before": "",
+              "after": "BASE_RECORD = (\n    b\"  {sha:'55f9618b687fc0da4743a3cf27e113ceb837e151',proof_kind:'individual-historical-base-class-removal-source-review',\\n\"\n    b\"    scope_key:'base_class_removal_source_scope',module:'upstream-base-class-removal-admission.cjs'},\\n\"\n)\nBASE_CURRENT = 'e90d2268e862284605dd9b4f5630c0d9d84976f6014679d1aa4acbc47f38c4cc'\nLEDGER = 'compatibility/f10/disposition-ledger/ledger.json'\nPROPOSAL = 'compatibility/rc/21x-base-class-removal-admission-canonical-proposal-v6.json'\nPROPOSAL_SHA = '720a4fcd0c9d0d67afbeddd106fc9741d7ab34a0848edc1a0f2e6a25019b9881'\nSOURCE_PARENT = 'd8ab97315b6c77b83f42c2bebcf63b2984fff255'\n\n\ndef _physical(root, path):\n    cursor = Path(root)\n    assert cursor.is_dir() and not cursor.is_symlink()\n    for part in path.split('/'):\n        assert part not in ('', '.', '..')\n        cursor = cursor / part\n        assert not cursor.is_symlink()\n    assert cursor.is_file()\n    return cursor.read_bytes()\n\n\ndef _git_data(root, path):\n    env = dict(os.environ, GIT_NO_LAZY_FETCH='1', GIT_NO_REPLACE_OBJECTS='1')\n    for key in ('GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR',\n                'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES'):\n        env.pop(key, None)\n    return subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0',\n        '-c', 'maintenance.auto=0', 'show', SOURCE_PARENT + ':' + path], cwd=root, env=env)\n\n\ndef _proposal(root, bound):\n    raw = _physical(root, PROPOSAL)\n    assert len(raw) == 3578 and hashlib.sha256(raw).hexdigest() == PROPOSAL_SHA\n    bound[PROPOSAL] = raw\n    return json.loads(raw)\n\n\ndef _image(root, ref, bound):\n    raw = _physical(root, ref['path'])\n    assert len(raw) == ref['bytes'] and hashlib.sha256(raw).hexdigest() == ref['sha256']\n    bound[ref['path']] = raw\n    return gzip.decompress(raw)\n\n\ndef current_canonical_registry_subject(root):\n    \"\"\"Authenticate only current69/70; old67/69 programs are comparison DATA.\"\"\"\n    bound = {}\n    packet = _proposal(root, bound)\n    before = _image(root, packet['registry_before_image'], bound)\n    after = _image(root, packet['registry_after_image'], bound)\n    assert len(before) == 15548 and hashlib.sha256(before).hexdigest() == CURRENT\n    assert len(after) == 15768 and hashlib.sha256(after).hexdigest() == BASE_CURRENT\n    assert _git_data(root, REGISTRY) == before\n    assert before.count(b'];\\n') == 1\n    assert before.replace(b'];\\n', BASE_RECORD + b'];\\n') == after\n    raw = _physical(root, REGISTRY)\n    assert raw in (before, after), 'unqualified current registry'\n    bound[REGISTRY] = raw\n    count = 69 if raw == before else 70\n\n    def assert_current():\n        for path, expected in bound.items():\n            assert _physical(root, path) == expected, 'changed current test subject ' + path\n    assert_current()\n    return dict(raw=raw, comparison69=before, registered_source_contracts=count,\n                assert_current=assert_current)\n\n\ndef current_canonical_test_frame(root):\n    \"\"\"Exact426/69,426/70 precursor or427/70; comparison bytes carry no authority.\"\"\"\n    registry = current_canonical_registry_subject(root)\n    bound = {}\n    packet = _proposal(root, bound)\n    before = _image(root, packet['ledger_before_image'], bound)\n    after = _image(root, packet['ledger_after_image'], bound)\n    for name, raw in [('before', before), ('after', after)]:\n        assert len(raw) == packet[name]['bytes']\n        assert hashlib.sha256(raw).hexdigest() == packet[name]['sha256']\n    assert _git_data(root, LEDGER) == before\n    target = packet['sha']\n    def span(raw):\n        text = raw.decode()\n        decoder = json.JSONDecoder()\n        found = []\n        for marker in re.finditer(r'^    \\{', text, re.M):\n            start = marker.start() + 4\n            row, end = decoder.raw_decode(text, start)\n            if row.get('sha') == target:\n                found.append((start, end, row))\n        assert len(found) == 1\n        return text, found[0]\n    old, (start, end, _) = span(before)\n    new, (new_start, new_end, _) = span(after)\n    expected = old[:start] + new[new_start:new_end] + old[end:]\n    for key, prior, current in [('closed_dispositions', 426, 427), ('open_or_deferred', 1271, 1270)]:\n        token = f'  \"{key}\": {prior},'\n        assert expected.count(token) == 1\n        expected = expected.replace(token, f'  \"{key}\": {current},', 1)\n    assert expected.encode() == after  # All1696 unselected entry bytes remain exact.\n    raw = _physical(root, LEDGER)\n    assert raw in (before, after), 'unqualified current test ledger'\n    assert raw != after or registry['registered_source_contracts'] == 70\n    bound[LEDGER] = raw\n\n    def assert_current():\n        registry['assert_current']()\n        for path, expected_raw in bound.items():\n            assert _physical(root, path) == expected_raw, 'changed current test frame ' + path\n    def comparison(path, supplied):\n        assert_current()\n        assert path in (LEDGER, REGISTRY)\n        assert supplied == (raw if path == LEDGER else registry['raw'])\n        return before if path == LEDGER else registry['comparison69']\n    assert_current()\n    return dict(comparison=comparison, assert_current=assert_current,\n                registered_source_contracts=registry['registered_source_contracts'],\n                individual_source_reviews=91 if raw == after else 90,\n                base_class_decisions=1 if raw == after else 0)\n"
+            },
+            {
+              "offset": 1033,
+              "before": "    \"\"\"Authenticate current69, then return only exact preceding67 comparison bytes.\"\"\"\n    cursor = Path(root)\n    assert cursor.is_dir() and not cursor.is_symlink()\n    for part in REGISTRY.split('/'):\n        cursor = cursor / part\n        assert not cursor.is_symlink()\n    raw = cursor.read_bytes()\n",
+              "after": "    \"\"\"Authenticate current69/70, retain exact69\u219267 assertions on comparison DATA.\"\"\"\n    subject = current_canonical_registry_subject(root)\n    raw = subject['comparison69']\n"
+            },
+            {
+              "offset": 1817,
+              "before": "    assert cursor.read_bytes() == raw\n",
+              "after": "    subject['assert_current']()\n"
+            },
+            {
+              "offset": 1877,
+              "before": "",
+              "after": "\n\n# Fixed historical JSON DATA epochs; no source-owner or old program executes.\n_HISTORICAL424_SHA = 'cc74f78b748c9b1226338b96a979558510ab72e50fea4c223cae45a76f4980a1'\n_LEDGER_DATA_PINS = {'compatibility/rc/21x-legacy-removal-admission-canonical-proposal.json': ('a4d300a0b5c6bc4070f940049d99ab6f3eab1f481ec34bb4a98e4b246f963eb7', 1494), 'compatibility/rc/21x-table-local-compilation-admission-canonical-proposal.json': ('970624c3e7d3e452b57789c35b90b79a37044ea269cf7ed96a5a2a40b3dac8a8', 1568), 'compatibility/rc/c04-inventory-reference-proposal.json': ('c1ace65c1154b0d97295be951b1bda4d2ba135c8ef7a9b117ba0c083ea9c0843', 27195), 'compatibility/rc/c04-checker-reference-proposal.json': ('58af70dec579e45bd47862065ec2bb8cfcfd7cbeb9081303930508f6d07c2d7f', 13538), 'compatibility/rc/c04-browser-reference-proposal.json': ('52d231aca902638226f5065c6622a6f857745990cdd23ee9df211aaf5e5ee56e', 18691), 'compatibility/rc/21x-table-local-compilation-admission-ledger-before.json.gz': ('8578ae4a1b3ef83c7ae32d7b4099ee097d14ba3b47bf4c3a851c104d1fad53a8', 606187), 'compatibility/rc/21x-table-local-compilation-admission-ledger-after.json.gz': ('26df249d622e57e4b9bb07c54ef688ba8e17d6bcc1da6bbdb4817c7097b69086', 607011), 'compatibility/rc/21x-legacy-removal-admission-ledger-before.json.gz': ('84de7f9c24d3e6a422658b9a87dc73b3a6bb0391556ad7c381ddf4c23f8a0ecc', 605384), 'compatibility/rc/21x-legacy-removal-admission-ledger-after.json.gz': ('8578ae4a1b3ef83c7ae32d7b4099ee097d14ba3b47bf4c3a851c104d1fad53a8', 606187)}\n_LEDGER_GIT_DATA = ({'subject': 'd8ab97315b6c77b83f42c2bebcf63b2984fff255:compatibility/f10/disposition-ledger/ledger.json', 'git_blob': '68a336be1682c08108d05c1b5e6e6171628da6cd', 'sha256': 'e9ef5c0bf543977809134c3367cf9a33bdda62233ab6b944dc3c4e4ac101585e', 'bytes': 4191043}, {'subject': '24365f67b82cc9fe26cd5089384c5d27ce7f4ab2:compatibility/f10/disposition-ledger/ledger.json', 'git_blob': 'cf4b9454e123895d406224a0361de0bb7f7b0462', 'sha256': 'f0aa2808e6bf022e9901b6edc249e1b08e7be9b7af06af4f154131e4a54c9cee', 'bytes': 4183477}, {'subject': '7378668ffa018b9cbf5498d84a5db32fa824cc26:compatibility/f10/disposition-ledger/ledger.json', 'git_blob': 'cf089d4c3a40c71a44e974702e8880c881b86a8f', 'sha256': '8f311ad001bf2daa3152b878414bd010a621d31b76c118d19f4184e5bed0ef17', 'bytes': 4183477}, {'subject': '7bae903e9a1309c6e226909ed8ee1bae5ad4eccf:compatibility/f10/disposition-ledger/ledger.json', 'git_blob': 'ce7e827d67c73b86bea7c26670e7ed4d63c5e253', 'sha256': '558b6891e575422cdfcdaff2f59fa7611cf53246130da3afeec68571d1c77a1b', 'bytes': 4183477}, {'subject': '3aefef647f2237cca488d0b5de62cd2981f3dc7e:compatibility/f10/disposition-ledger/ledger.json', 'git_blob': '857e56ccb950cad64c4df069ca955c509b78a4f1', 'sha256': 'cc74f78b748c9b1226338b96a979558510ab72e50fea4c223cae45a76f4980a1', 'bytes': 4183477}, {'subject': '165839cf603d3255aa93d7feaee4e21adb20c2e1:compatibility/f10/disposition-ledger/ledger.json', 'git_blob': '900f4dc1f9da0f4e6e1ebd359ca8f817092f9d27', 'sha256': '4fd46af746fb9e2b0a27b0cd4b1341ed3b06cda873a6432eb4e6e35dbeb56ad9', 'bytes': 4187291})\n\n\ndef _historical_ledger_git_data(root):\n    env = dict(os.environ, GIT_NO_LAZY_FETCH='1', GIT_NO_REPLACE_OBJECTS='1')\n    for key in ('GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR',\n                'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES'):\n        env.pop(key, None)\n    output = subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0',\n        '-c', 'maintenance.auto=0', 'cat-file', '--batch'], cwd=root, env=env,\n        input=('\\n'.join(ref['subject'] for ref in _LEDGER_GIT_DATA) + '\\n').encode())\n    cursor, images = 0, {}\n    for ref in _LEDGER_GIT_DATA:\n        end = output.index(b'\\n', cursor)\n        assert output[cursor:end].decode() == f\"{ref['git_blob']} blob {ref['bytes']}\"\n        raw = output[end + 1:end + 1 + ref['bytes']]\n        cursor = end + 1 + ref['bytes']\n        assert output[cursor:cursor + 1] == b'\\n'\n        cursor += 1\n        assert len(raw) == ref['bytes'] and hashlib.sha256(raw).hexdigest() == ref['sha256']\n        assert hashlib.sha1(b'blob ' + str(len(raw)).encode() + b'\\0' + raw).hexdigest() == ref['git_blob']\n        images[ref['sha256']] = raw\n    assert cursor == len(output)\n    return images\n\n\ndef _ledger_entry_spans(raw):\n    text, decoder, rows = raw.decode(), json.JSONDecoder(), {}\n    for marker in re.finditer(r'^    \\{', text, re.M):\n        start = marker.start() + 4\n        entry, end = decoder.raw_decode(text, start)\n        assert type(entry) is dict and entry['sha'] not in rows\n        rows[entry['sha']] = (start, end, entry)\n    assert len(rows) == 1697\n    return text, rows\n\n\ndef _semantic_ledger_data_pair(before, after, sha):\n    \"\"\"Exact one-row/two-scalar DATA proof, preserving all unselected bytes.\"\"\"\n    old, old_rows = _ledger_entry_spans(before)\n    new, new_rows = _ledger_entry_spans(after)\n    assert list(old_rows) == list(new_rows)\n    changed = [key for key in old_rows if old_rows[key][2] != new_rows[key][2]]\n    assert changed == [sha]\n    start, end, _ = old_rows[sha]\n    new_start, new_end, _ = new_rows[sha]\n    expected = old[:start] + new[new_start:new_end] + old[end:]\n    prior, current = json.loads(before), json.loads(after)\n    for key, delta in [('closed_dispositions', 1), ('open_or_deferred', -1)]:\n        assert current[key] == prior[key] + delta\n        token = f'  \"{key}\": {prior[key]},'\n        assert expected.count(token) == 1\n        expected = expected.replace(token, f'  \"{key}\": {current[key]},', 1)\n    assert expected.encode() == after\n    assert prior['entries'] == [old_rows[key][2] for key in new_rows]\n    assert [row for row in prior['entries'] if row['final_disposition'] == 'security-review'] == [\n        row for row in current['entries'] if row['final_disposition'] == 'security-review']\n\n\ndef _metadata_ledger_data_pair(before, after, packet, count, selected_count):\n    \"\"\"Reproduce only the complete pinned reference cohort at exact JSON pointers.\"\"\"\n    text, rows = _ledger_entry_spans(before)\n    expected = json.loads(before)\n    entries = {row['sha']: row for row in expected['entries']}\n    selected, seen = set(), set()\n    assert len(packet['updates']) == count\n    for update in packet['updates']:\n        sha, pointer = update['sha'], update['pointer']\n        assert (sha, pointer) not in seen\n        seen.add((sha, pointer))\n        parts = pointer.split('/')[1:]\n        assert parts[0] == 'individual_proof' and parts[-2] == 'source_members'\n        node = entries[sha]\n        for part in parts[:-1]:\n            node = node[int(part)] if type(node) is list else node[part]\n        key = int(parts[-1]) if type(node) is list else parts[-1]\n        assert node[key] == update['before_reference']\n        assert set(node[key]) == {'path', 'sha256'}\n        assert update['before_reference']['path'] == update['after_reference']['path']\n        node[key] = dict(update['after_reference'])\n        selected.add(sha)\n    assert len(selected) == selected_count\n    edits = []\n    for sha in selected:\n        start, end, prior = rows[sha]\n        encoded = lambda value: (json.dumps(value, indent=2, ensure_ascii=False) + '\\n').encode()\n        updates = [row for row in packet['updates'] if row['sha'] == sha]\n        assert all(hashlib.sha256(encoded(prior)).hexdigest() == row['before_entry_sha256'] for row in updates)\n        assert all(hashlib.sha256(encoded(entries[sha])).hexdigest() == row['after_entry_sha256'] for row in updates)\n        edits.append((start, end, json.dumps(entries[sha], indent=2, ensure_ascii=False).replace('\\n', '\\n    ')))\n    for start, end, value in sorted(edits, reverse=True):\n        text = text[:start] + value + text[end:]\n    assert text.encode() == after and json.loads(after) == expected\n    assert len(before) == len(after)\n    assert {key: value for key, value in json.loads(before).items() if key != 'entries'} == {\n        key: value for key, value in expected.items() if key != 'entries'}\n\n\ndef historical424_ledger_test_subject(root):\n    \"\"\"Current whole physical frame -> exact old424 JSON DATA; no source admission.\"\"\"\n    frame = current_canonical_test_frame(root)\n    physical = _physical(root, LEDGER)\n    current426 = frame['comparison'](LEDGER, physical)\n    git = _historical_ledger_git_data(root)\n    assert current426 == git['e9ef5c0bf543977809134c3367cf9a33bdda62233ab6b944dc3c4e4ac101585e']\n    bound = {}\n\n    def member(path):\n        digest, size = _LEDGER_DATA_PINS[path]\n        raw = _physical(root, path)\n        assert len(raw) == size and hashlib.sha256(raw).hexdigest() == digest\n        bound[path] = raw\n        return raw\n\n    current = current426\n    for family, sha in [('table-local-compilation', '3f35b12290ea4dbee4a9d82845c0964b2b4df50d'),\n                        ('legacy-removal', 'f7e3ae3bd1b86d5987df57bb06d350001c592931')]:\n        prefix = 'compatibility/rc/21x-' + family + '-admission-'\n        packet = json.loads(member(prefix + 'canonical-proposal.json'))\n        before = gzip.decompress(member(prefix + 'ledger-before.json.gz'))\n        after = gzip.decompress(member(prefix + 'ledger-after.json.gz'))\n        for name, raw in [('before', before), ('after', after)]:\n            assert packet[name] == dict(path=LEDGER, sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw))\n            assert git[packet[name]['sha256']] == raw\n        _semantic_ledger_data_pair(before, after, sha)\n        assert current == after\n        current = before\n    for family, count, selected in [('browser', 16, 8), ('checker', 5, 5), ('inventory', 19, 19)]:\n        packet = json.loads(member('compatibility/rc/c04-' + family + '-reference-proposal.json'))\n        assert packet['line'] == '21.x'\n        before, after = (git[packet[name]['sha256']] for name in ('before_ledger', 'after_ledger'))\n        for name, raw in [('before_ledger', before), ('after_ledger', after)]:\n            assert packet[name] == dict(path=LEDGER, sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw))\n        _metadata_ledger_data_pair(before, after, packet, count, selected)\n        assert current == after\n        current = before\n    assert len(current) == 4183477 and hashlib.sha256(current).hexdigest() == _HISTORICAL424_SHA\n\n    def assert_current():\n        frame['assert_current']()\n        for path, expected in bound.items():\n            assert _physical(root, path) == expected, 'changed historical ledger DATA subject ' + path\n        frame['assert_current']()\n    assert_current()\n    return dict(comparison=current, assert_current=assert_current,\n                physical_current_source_reviews=frame['individual_source_reviews'],\n                historical_closed_dispositions=424, historical_DATA_only=True)\n\n\n# Complete fixed title test binding roster. Returned program bytes are DATA only.\n_TITLE_SOURCE_PACKET = 'compatibility/rc/21x-c04-dialog-title-replacement-canonical-admitted-transition.json'\n_TITLE_SOURCE_PACKET_REF = {'path': 'compatibility/rc/21x-c04-dialog-title-replacement-canonical-admitted-transition.json', 'sha256': '87ac44ebc3d8c8fcf082803ecf4f6deac68b62ef349ce0d95c037dbb85e9cbea', 'bytes': 4410}\n_TITLE_SOURCE_REFS = ({'path': 'scripts/packed-upstream-ledger-base.mjs', 'sha256': 'ee74d3c46ae056f4ffd16cc1d38d60820ca449d96158c776319a2bfcbc6fc715', 'bytes': 109664}, {'path': 'scripts/upstream-historical-behavior-evidence.mjs', 'sha256': '8efdc7640a20c9c6b163c3e93b664d4b4384979fb0c23304b8d3f4fad02570c1', 'bytes': 20399}, {'path': 'scripts/upstream-source-contract-registry.mjs', 'sha256': 'd63a79ffe4aa63a6fb839e5f08abf1c6311832e2e73d73cbdfd55d6722098493', 'bytes': 4624}, {'path': 'scripts/upstream-dialog-title-admission.cjs', 'sha256': '1a0c187706c6e0517cae533821071108b75dab1567aefbcf88b6ed1b64208b58', 'bytes': 7760}, {'path': 'scripts/upstream-dialog-title-native-evidence.mjs', 'sha256': '728262b0b862856e265ff04c7a8a86e2836e6f2a2c1ead25f6115a0096598289', 'bytes': 3308}, {'path': 'scripts/dialog-title-canonical-stage.mjs', 'sha256': 'e183becf00a87f56e9509a9b47be59dac996e2f987b71c53d087b38d52435255', 'bytes': 4844}, {'path': 'scripts/dialog-title-source-context.mjs', 'sha256': 'c099a023155608853aba98582331b4cec27eb75bfb09d5d32839f5b323a96d02', 'bytes': 10472}, {'path': 'scripts/autocomplete-selection-native-subject.mjs', 'sha256': 'b5855c37ac4e8a7f6c24fbf64eaa2b748572728f824d5c960bdb12eaebc7fd57', 'bytes': 11403}, {'path': 'scripts/canonical-tool-source-role.mjs', 'sha256': 'a1adb7c250ff17b732568df8aaebcb22475f6173f781459d77ebe3f0a42891b1', 'bytes': 1039}, {'path': 'scripts/check-upstream-audit-disposition.mjs', 'sha256': '4a6002153caabe102887bcd8847128818c2f7025a3d1257d97cd446f34fbf106'})\n_TITLE_INVENTORY_PACKET = {'path': 'compatibility/rc/c04-inventory-owner-inputs.json', 'sha256': '0d9dfac3813a6dc60644a090a2173ce56eaed1bcbdb32c2be29ce53f32413cdc', 'bytes': 12144}\n_TITLE_HANDLER_GIT_DATA = ({'commit': '8432c416934b3592581b526125a0df97077bb4cf', 'path': 'scripts/upstream-dialog-title-admission.cjs', 'sha256': '1a0c187706c6e0517cae533821071108b75dab1567aefbcf88b6ed1b64208b58', 'bytes': 7760, 'git_blob': '1ab0292ad097999c439db33b509943486dd5e312'}, {'commit': '8432c416934b3592581b526125a0df97077bb4cf', 'path': 'scripts/upstream-dialog-title-native-evidence.mjs', 'sha256': '728262b0b862856e265ff04c7a8a86e2836e6f2a2c1ead25f6115a0096598289', 'bytes': 3308, 'git_blob': '590bf1b1bdd6591892a178b098f38e5f24511ec8'})\n_TITLE_HANDLER_TRANSITIONS = ({'before_parent': '8432c416934b3592581b526125a0df97077bb4cf', 'before': {'path': 'scripts/upstream-dialog-title-admission.cjs', 'sha256': '1a0c187706c6e0517cae533821071108b75dab1567aefbcf88b6ed1b64208b58', 'bytes': 7760}, 'after': {'path': 'scripts/upstream-dialog-title-admission.cjs', 'sha256': 'f47da6d30d3f79930f12b3c650c85d6ae097f202d17b9e64f15cf4bc7c25cdd9', 'bytes': 8052}, 'literal_edits': [{'before': ' const bound=[{path:TITLE_SOURCE_REPORT', 'after': \" const {titleMeasurementSourceReferences}=require('./inventory-reference-owner.mjs');\\n const bound=[{path:TITLE_SOURCE_REPORT\"}, {'before': '...scope.input_members,...types.map', 'after': '...titleMeasurementSourceReferences({root,read,scope}),...types.map'}, {'before': \"  assert.deepEqual(JSON.parse(raw),inspected.scope,'fresh current title source evidence differs');\", 'after': \"  const {titleMeasurementForHistoricalComparison}=require('./inventory-reference-owner.mjs');\\n  assert.deepEqual(titleMeasurementForHistoricalComparison({root,actual:JSON.parse(raw),expected:inspected.scope}),inspected.scope,'fresh current title source evidence differs');\"}], 'role': 'Historical handler image is private binding metadata only;current compiled handler retains a fresh lifecycle child and strict complete comparison after one authenticated inventory-reference transition'}, {'before_parent': '8432c416934b3592581b526125a0df97077bb4cf', 'before': {'path': 'scripts/upstream-dialog-title-native-evidence.mjs', 'sha256': '728262b0b862856e265ff04c7a8a86e2836e6f2a2c1ead25f6115a0096598289', 'bytes': 3308}, 'after': {'path': 'scripts/upstream-dialog-title-native-evidence.mjs', 'sha256': 'dc7eb1c3759fec7f439cc2c9707b2e592d894e4138961aacd8ac851f7d86f469', 'bytes': 3494}, 'literal_edits': [{'before': \"  for(const member of JSON.parse(source).input_members.filter(row=>!row.path.startsWith('node_modules/'))){\", 'after': \"  const {titleMeasurementSourceReferences}=require('./inventory-reference-owner.mjs');\\n  const members=titleMeasurementSourceReferences({root,read:path=>readEvidenceMember(root,path),scope:JSON.parse(source)});\\n  for(const member of members.filter(row=>!row.path.startsWith('node_modules/'))){\"}], 'role': 'Exact inventory input-binding successor;all original native observation and same-run browser prerequisite checks remain unchanged'})\n_TITLE_FINITE_TOOL_PATHS = ('scripts/packed-upstream-ledger-base.mjs', 'scripts/dialog-title-source-context.mjs', 'scripts/canonical-tool-source-role.mjs')\n\n\ndef _historical_title_handler_data(root):\n    \"\"\"Two fixed Git/literal handler transitions, never imported or executed.\"\"\"\n    ref = _TITLE_INVENTORY_PACKET\n    raw = _physical(root, ref['path'])\n    assert len(raw) == ref['bytes'] and hashlib.sha256(raw).hexdigest() == ref['sha256']\n    packet = json.loads(raw)\n    assert packet['line'] == '21.x'\n    assert tuple(packet['historical_handler_metadata']) == _TITLE_HANDLER_TRANSITIONS\n    bound = {ref['path']: raw}\n    env = dict(os.environ, GIT_NO_LAZY_FETCH='1', GIT_NO_REPLACE_OBJECTS='1')\n    for key in ('GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR',\n                'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES'):\n        env.pop(key, None)\n    output = subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0',\n        '-c', 'maintenance.auto=0', 'cat-file', '--batch'], cwd=root, env=env,\n        input=('\\n'.join(row['commit'] + ':' + row['path'] for row in _TITLE_HANDLER_GIT_DATA) + '\\n').encode())\n    cursor, before_images = 0, {}\n    for ref in _TITLE_HANDLER_GIT_DATA:\n        end = output.index(b'\\n', cursor)\n        assert output[cursor:end].decode() == f\"{ref['git_blob']} blob {ref['bytes']}\"\n        before = output[end + 1:end + 1 + ref['bytes']]\n        cursor = end + 1 + ref['bytes']\n        assert output[cursor:cursor + 1] == b'\\n'\n        cursor += 1\n        assert len(before) == ref['bytes'] and hashlib.sha256(before).hexdigest() == ref['sha256']\n        assert hashlib.sha1(b'blob ' + str(len(before)).encode() + b'\\0' + before).hexdigest() == ref['git_blob']\n        before_images[ref['path']] = before\n    assert cursor == len(output)\n    for transition in _TITLE_HANDLER_TRANSITIONS:\n        path = transition['before']['path']\n        assert transition['after']['path'] == path\n        assert transition['before_parent'] == '8432c416934b3592581b526125a0df97077bb4cf'\n        before = before_images[path]\n        assert transition['before'] == dict(path=path, sha256=hashlib.sha256(before).hexdigest(), bytes=len(before))\n        after = before.decode()\n        for edit in transition['literal_edits']:\n            assert after.count(edit['before']) == 1\n            after = after.replace(edit['before'], edit['after'])\n        after = after.encode()\n        assert transition['after'] == dict(path=path, sha256=hashlib.sha256(after).hexdigest(), bytes=len(after))\n        assert _physical(root, path) == after\n        bound[path] = after\n\n    def assert_current():\n        for path, expected in bound.items():\n            assert _physical(root, path) == expected, 'changed title handler comparison subject ' + path\n    assert_current()\n    return dict(before=before_images, assert_current=assert_current)\n\n\ndef historical_title_source_test_subject(root):\n    \"\"\"Exact ten historical bindings as DATA; retain current physical authority.\"\"\"\n    from historical_contract_repair_source import _current_tool_subject\n    packet_raw = _physical(root, _TITLE_SOURCE_PACKET)\n    assert len(packet_raw) == _TITLE_SOURCE_PACKET_REF['bytes']\n    assert hashlib.sha256(packet_raw).hexdigest() == _TITLE_SOURCE_PACKET_REF['sha256']\n    packet = json.loads(packet_raw)\n    assert tuple(packet['source_members'] + [packet['root_checker']]) == _TITLE_SOURCE_REFS\n    expected = {ref['path']: ref for ref in _TITLE_SOURCE_REFS}\n    assert len(expected) == len(_TITLE_SOURCE_REFS) == 10\n    tools = _current_tool_subject(root)\n    registry = current_canonical_registry_subject(root)\n    registry67 = historical67_registry_bytes(root)\n    handlers = _historical_title_handler_data(root)\n    bound = {_TITLE_SOURCE_PACKET: packet_raw}\n    comparison = {}\n    for path, ref in expected.items():\n        actual = _physical(root, path)\n        bound[path] = actual\n        if path in _TITLE_FINITE_TOOL_PATHS:\n            assert tools.owns_reference(ref)\n            current = tools.qualify(ref)\n            assert current == dict(ref, sha256=hashlib.sha256(actual).hexdigest(), bytes=len(actual))\n            comparison[path] = tools.comparison_bytes(ref)\n        elif path in handlers['before']:\n            comparison[path] = handlers['before'][path]\n        elif path == REGISTRY:\n            assert actual == registry['raw']\n            comparison[path] = registry67\n        else:\n            comparison[path] = actual\n        if path != REGISTRY:\n            assert hashlib.sha256(comparison[path]).hexdigest() == ref['sha256']\n            if 'bytes' in ref:\n                assert len(comparison[path]) == ref['bytes']\n\n    def assert_current():\n        tools.assert_current()\n        handlers['assert_current']()\n        registry['assert_current']()\n        for path, actual in bound.items():\n            assert _physical(root, path) == actual, 'changed title source comparison binding ' + path\n        tools.assert_current()\n\n    def comparison_bytes(incoming):\n        assert type(incoming) is dict\n        snapshot = dict(incoming)\n        assert snapshot == expected[snapshot['path']]\n        assert_current()\n        raw = comparison[snapshot['path']]\n        assert incoming == snapshot\n        assert_current()\n        return raw\n    assert_current()\n    return dict(comparison_bytes=comparison_bytes, assert_current=assert_current,\n                historical_source_bindings=10, historical_DATA_only=True)\n\n\n# Complete fixed four-producer checker test cohort; historical programs are DATA.\n_CHECKER_GUARD_REVIEW = {'path': 'compatibility/rc/checker-reference-metadata-review.json', 'sha256': 'b65c4822274eaf5f5ee7cfe3683e8b2e29a6867518d317e1a644cbc8b6924c62', 'bytes': 119371}\n_CHECKER_GUARD_REFS = ({'path': 'scripts/upstream-testing-api-21x-admission.mjs', 'sha256': '6415108225487d444d065d805d3b1dcc9bb804fac5bf61f3874ec7a75cf77bd3', 'bytes': 11601}, {'path': 'scripts/upstream-sass-inspection-admission.mjs', 'sha256': '29291c30c7469cd3e0517574fddbcbf6a1cbf49f0a750d974f4736fd1ea22345', 'bytes': 8760}, {'path': 'scripts/upstream-rules-js-build-admission.mjs', 'sha256': '45a308f40bc92cf2072799c538d9b4c202709b74dd8ce3551808017bc58ce0c0', 'bytes': 9409}, {'path': 'scripts/upstream-legacy-sass-entrypoint-admission.mjs', 'sha256': '1e3e277e3d40976dc970c6adfc0c03be43300239d7e37b14efed3415cd2e8ede', 'bytes': 9712})\n_CHECKER_GUARD_TITLE_PACKET = {'path': 'compatibility/rc/dialog-title-current-source-reader-successors.json', 'sha256': 'c189a19263d4862df74b47f590c1cb21875932406e150b9dc35141c448a86369', 'bytes': 30832}\n_CHECKER_GUARD_TITLE_PATHS = ('scripts/upstream-testing-api-21x-admission.mjs', 'scripts/upstream-rules-js-build-admission.mjs')\n_CHECKER_GUARD_FINITE_TOOL_PATH = 'scripts/upstream-sass-inspection-admission.mjs'\n\n\ndef historical_checker_guard_test_subject(root):\n    \"\"\"Four exact old producer bindings, retaining actual current physical guards.\"\"\"\n    from historical_contract_repair_source import _current_tool_subject\n    from dialog_title_reader_refs import title_prior_tool_bytes\n    bound = {}\n    for ref in (_CHECKER_GUARD_REVIEW, _CHECKER_GUARD_TITLE_PACKET):\n        raw = _physical(root, ref['path'])\n        assert len(raw) == ref['bytes'] and hashlib.sha256(raw).hexdigest() == ref['sha256']\n        bound[ref['path']] = raw\n    review = json.loads(bound[_CHECKER_GUARD_REVIEW['path']])\n    assert tuple(review['guard_modules']) == _CHECKER_GUARD_REFS\n    expected = {ref['path']: ref for ref in _CHECKER_GUARD_REFS}\n    assert len(expected) == len(_CHECKER_GUARD_REFS) == 4\n    tools = _current_tool_subject(root)\n    comparison = {}\n    for path, ref in expected.items():\n        actual = _physical(root, path)\n        bound[path] = actual\n        if path == _CHECKER_GUARD_FINITE_TOOL_PATH:\n            assert tools.owns_reference(ref)\n            current = tools.qualify(ref)\n            assert current == dict(ref, sha256=hashlib.sha256(actual).hexdigest(), bytes=len(actual))\n            comparison[path] = tools.comparison_bytes(ref)\n        elif path in _CHECKER_GUARD_TITLE_PATHS:\n            # The existing fixed title packet authenticates current bytes and\n            # exact before-Git/literal transformation. No new role is registered.\n            comparison[path] = title_prior_tool_bytes(root, path)\n        else:\n            assert path == 'scripts/upstream-legacy-sass-entrypoint-admission.mjs'\n            comparison[path] = actual\n        assert hashlib.sha256(comparison[path]).hexdigest() == ref['sha256']\n        assert len(comparison[path]) == ref['bytes']\n\n    def assert_current():\n        tools.assert_current()\n        for path, actual in bound.items():\n            assert _physical(root, path) == actual, 'changed checker producer comparison binding ' + path\n        tools.assert_current()\n\n    def comparison_bytes(incoming):\n        assert type(incoming) is dict\n        snapshot = dict(incoming)\n        assert snapshot == expected[snapshot['path']]\n        assert_current()\n        raw = comparison[snapshot['path']]\n        assert incoming == snapshot\n        assert_current()\n        return raw\n    assert_current()\n    return dict(comparison_bytes=comparison_bytes, assert_current=assert_current,\n                historical_producer_bindings=4, historical_DATA_only=True)\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/current_sass_tool_reference_probe.mjs",
+          "before": {
+            "path": "tests/current_sass_tool_reference_probe.mjs",
+            "sha256": "c355142cfbef88e148337756bb4f3d41f44d450d00a9dfa17319b80f49cd3629",
+            "bytes": 7771
+          },
+          "after": {
+            "path": "tests/current_sass_tool_reference_probe.mjs",
+            "sha256": "68e588bfd45fd89179a12dd440f80eb845ff878ef51c0107e426f6f952121890",
+            "bytes": 11055
+          },
+          "edits": [
+            {
+              "offset": 710,
+              "before": "const packet=JSON.parse(readFileSync(join(root,'compatibility/rc/current-sass-tool-reference-inputs-v2.json')));\n",
+              "after": "const successorPath='compatibility/rc/parent-base-class-tool-successor-inputs-v3.json';\nconst successor=JSON.parse(readFileSync(join(root,successorPath)));\nconst packet=JSON.parse(readFileSync(join(root,successor.previous_epoch.path)));\n"
+            },
+            {
+              "offset": 993,
+              "before": "check('V2 current maintained dispatch',()=>{\n assert.equal(source.epoch,2);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);\n",
+              "after": "check('V3 current maintained dispatch',()=>{\n assert.equal(source.epoch,3);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);\n"
+            },
+            {
+              "offset": 3126,
+              "before": "",
+              "after": "});\ncheck('all V2 current identities remain exact comparison data',()=>{\n for(const old of branch.updates){\n  const latest=source.transitions.find(r=>r.path===old.path);assert.ok(latest);\n  assert.deepEqual(source.qualify(old.after),{path:latest.path,...latest.after});\n  assert.equal(hash(source.comparisonBytes(old.after)),old.after.sha256);\n }\n});\nconst nextBranch=successor.branches[source.line];\ncheck('each V3 predecessor and literal successor is exact',()=>{\n for(const row of nextBranch.updates){\n  assert.equal(hash(source.comparisonBytes(row.before)),row.before.sha256);\n  assert.equal(hash(source.comparisonBytes(row.after)),row.after.sha256);\n  assert.deepEqual(source.qualify(row.before),row.after);\n  assert.deepEqual(source.qualify(row.after),row.after);\n  assert.equal(source.ownsReference({...row.before,bytes:row.before.bytes+1}),false);\n  assert.throws(()=>source.qualify({...row.before,bytes:row.before.bytes+1}));\n  assert.equal(source.qualify({...row.before,sha256:'0'.repeat(64)}),null);\n }\n});\ncheck('new table stage predecessor is the frozen owner packet identity',()=>{\n const row=nextBranch.updates.find(r=>r.path==='scripts/table-local-compilation-canonical-stage.mjs');\n if(source.line==='21.x'){\n  assert.ok(row);assert.deepEqual(row.before,{path:row.path,sha256:'bdb3137f6db42ed2611ac3a41e400478defed7f0076d203061d1e12d03f63b7c',bytes:8231});\n  assert.deepEqual(source.qualify(row.before),row.after);\n }else assert.equal(row,undefined);\n});\ncheck('historical callback cannot stand in for physical overlay source',()=>{\n const row=nextBranch.updates[0];if(!row)return;\n const old=source.comparisonBytes(row.before);assert.notEqual(row.before.sha256,row.after.sha256);\n assert.throws(()=>currentSassToolReferenceSubject({root,read:path=>path===row.path?old:readFileSync(join(root,path))}));\n source.assertCurrent();\n});\ncheck('new support bytes reject cold and late physical change',()=>{\n const ref=nextBranch.additional_inputs[0];assert.ok(ref);const path=join(root,ref.path),raw=readFileSync(path);\n try{writeFileSync(path,Buffer.concat([raw,Buffer.from('\\n')]));assert.throws(()=>source.assertCurrent());assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{writeFileSync(path,raw);}\n source.assertCurrent();\n"
+            },
+            {
+              "offset": 6675,
+              "before": "check('V1-only data never selects current maintained factory',()=>{\n const path=join(root,'compatibility/rc/current-sass-tool-reference-inputs-v2.json'),raw=readFileSync(path),visited=[];const sentinel=new Error('stop frozen reader before evaluation');\n try{unlinkSync(path);assert.throws(()=>historicalContractRepairReaderSubject({root,read:name=>{visited.push(name);throw sentinel;}}),error=>error===sentinel);assert.deepEqual(visited,['projects/ngx-material-legacy/package.json']);assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{writeFileSync(path,raw);}\n",
+              "after": "check('V2 comparison packet cannot change cold or late',()=>{\n const path=join(root,successor.previous_epoch.path),raw=readFileSync(path);\n try{writeFileSync(path,Buffer.concat([raw,Buffer.from('\\n')]));assert.throws(()=>source.assertCurrent());assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{writeFileSync(path,raw);}\n"
+            },
+            {
+              "offset": 7282,
+              "before": "console.log(JSON.stringify({line:source.line,epoch:source.epoch,transitions:source.transitions.length,transition_rows:source.transitions,bound:source.bound.length,v1_current_identities:previous.branches[source.line].updates.length,checkpoint_parent_updates:branch.updates.filter(r=>r.source_parent).length,checks,compiler_calls:0,old_constructor_executed:false,frozen_dispatch_stopped_before_evaluation:true,historical_programs_executed:false,artifact_or_audit_admission_granted:false}));\n",
+              "after": "check('installed V3 cannot downgrade when V2 predecessor is absent',()=>{\n const path=join(root,successor.previous_epoch.path),raw=readFileSync(path);\n try{unlinkSync(path);assert.throws(()=>historicalContractRepairReaderSubject({root}));assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{writeFileSync(path,raw);}\n source.assertCurrent();\n});\ncheck('V1-only data never selects current maintained factory',()=>{\n const paths=[successorPath,successor.previous_epoch.path],saved=paths.map(path=>readFileSync(join(root,path))),visited=[];const sentinel=new Error('stop frozen reader before evaluation');\n try{for(const path of paths)unlinkSync(join(root,path));assert.throws(()=>historicalContractRepairReaderSubject({root,read:name=>{visited.push(name);throw sentinel;}}),error=>error===sentinel);assert.deepEqual(visited,['projects/ngx-material-legacy/package.json']);assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{paths.forEach((path,index)=>writeFileSync(join(root,path),saved[index]));}\n source.assertCurrent();\n});\nconsole.log(JSON.stringify({line:source.line,epoch:source.epoch,transitions:source.transitions.length,transition_rows:source.transitions,bound:source.bound.length,v1_current_identities:previous.branches[source.line].updates.length,v2_current_identities:branch.updates.length,v3_overlay_count:nextBranch.updates.length,checkpoint_parent_updates:branch.updates.filter(r=>r.source_parent).length,checks,compiler_calls:0,old_constructor_executed:false,frozen_dispatch_stopped_before_evaluation:true,historical_programs_executed:false,artifact_or_audit_admission_granted:false}));\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/historical_contract_repair_source.py",
+          "before": {
+            "path": "tests/historical_contract_repair_source.py",
+            "sha256": "72f888d868c4c8db2c499422ba2ef2166ce34c7db375ac8dc7295fdf25c108e8",
+            "bytes": 20005
+          },
+          "after": {
+            "path": "tests/historical_contract_repair_source.py",
+            "sha256": "ece8f5659eef1e4005e3af042b2a4c3a90eb333538be9f84416f37c832f2ef91",
+            "bytes": 20286
+          },
+          "edits": [
+            {
+              "offset": 13244,
+              "before": "    if (Path(root) / 'compatibility/rc/current-sass-tool-reference-inputs-v2.json').is_file():\n",
+              "after": "    if any((Path(root) / path).is_file() for path in ('compatibility/rc/parent-base-class-tool-successor-inputs-v3.json', 'compatibility/rc/current-sass-tool-reference-inputs-v2.json')):\n"
+            },
+            {
+              "offset": 14146,
+              "before": "    if (Path(root) / 'compatibility/rc/current-sass-tool-reference-inputs-v2.json').is_file():\n",
+              "after": "    if any((Path(root) / path).is_file() for path in ('compatibility/rc/parent-base-class-tool-successor-inputs-v3.json', 'compatibility/rc/current-sass-tool-reference-inputs-v2.json')):\n"
+            },
+            {
+              "offset": 17068,
+              "before": "    if (Path(root) / 'compatibility/rc/current-sass-tool-reference-inputs-v2.json').is_file():\n",
+              "after": "    if any((Path(root) / path).is_file() for path in ('compatibility/rc/parent-base-class-tool-successor-inputs-v3.json', 'compatibility/rc/current-sass-tool-reference-inputs-v2.json')):\n"
+            },
+            {
+              "offset": 19481,
+              "before": "    manifest = _read(root, 'compatibility/rc/current-sass-tool-reference-inputs-v2.json')\n",
+              "after": "    manifest = _read(root, 'compatibility/rc/parent-base-class-tool-successor-inputs-v3.json')\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/legacy_removal_admission_probe.mjs",
+          "before": {
+            "path": "tests/legacy_removal_admission_probe.mjs",
+            "sha256": "fc2436da1bb2458bab3b82408f3f4386507dacd50241993eabcda30acc1817a9",
+            "bytes": 14644
+          },
+          "after": {
+            "path": "tests/legacy_removal_admission_probe.mjs",
+            "sha256": "491470564d22443e343b8cb76837012ed37ae1f5a2f73da4f747b7c3d9f93916",
+            "bytes": 14900
+          },
+          "edits": [
+            {
+              "offset": 955,
+              "before": "",
+              "after": "import {currentCanonicalTestFrame} from './current_sass_canonical_test_scope.mjs';\n"
+            },
+            {
+              "offset": 2035,
+              "before": "const iterationLedger=before,currentLedger=read(LEDGER),currentRegistry=read(REGISTRY),physicalLedger=iterationTools.predecessorData(LEDGER,currentLedger),physicalRegistry=iterationTools.predecessorData(REGISTRY,currentRegistry);\n",
+              "after": "const currentFrame=currentCanonicalTestFrame({root,read});\nconst iterationLedger=before,currentLedger=read(LEDGER),currentRegistry=read(REGISTRY),physicalLedger=iterationTools.predecessorData(LEDGER,currentFrame.comparison(LEDGER,currentLedger)),physicalRegistry=iterationTools.predecessorData(REGISTRY,currentFrame.comparison(REGISTRY,currentRegistry));\n"
+            },
+            {
+              "offset": 9563,
+              "before": " iterationTools.assertCurrent();assert.ok(read(LEDGER).equals(currentLedger));assert.ok(read(REGISTRY).equals(currentRegistry));\n",
+              "after": " iterationTools.assertCurrent();currentFrame.assertCurrent();assert.ok(read(LEDGER).equals(currentLedger));assert.ok(read(REGISTRY).equals(currentRegistry));\n"
+            },
+            {
+              "offset": 9845,
+              "before": " assert.equal(iterationTools.predecessorData(REGISTRY,read(REGISTRY)).equals(registryAfter),true);\n const {sourceContractDefinitions}=await import('../scripts/upstream-source-contract-registry.mjs');assert.equal(sourceContractDefinitions.length-(sourceContractDefinitions.some(row=>row.sha==='3f35b12290ea4dbee4a9d82845c0964b2b4df50d')?1:0),68);\n",
+              "after": " assert.equal(physicalRegistry.equals(registryAfter),true);currentFrame.assertCurrent();\n const {sourceContractDefinitions}=await import('../scripts/upstream-source-contract-registry.mjs');assert.equal(sourceContractDefinitions.length-(currentFrame.registered_source_contracts-68),68);\n"
+            },
+            {
+              "offset": 13698,
+              "before": " assert.equal(iterationLedger.equals(before),true);assert.ok(read(LEDGER).equals(currentLedger));\n",
+              "after": " assert.equal(iterationLedger.equals(before),true);assert.ok(read(LEDGER).equals(currentLedger));assert.ok(read(REGISTRY).equals(currentRegistry));currentFrame.assertCurrent();\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/m3_theme_boundary_admission_probe.mjs",
+          "before": {
+            "path": "tests/m3_theme_boundary_admission_probe.mjs",
+            "sha256": "b7ec9f8c3b54dfadd89cf12680c24d1896e31ad27e76c57e63411652c125fd65",
+            "bytes": 14512
+          },
+          "after": {
+            "path": "tests/m3_theme_boundary_admission_probe.mjs",
+            "sha256": "d96e54f5b225a81619948f07bb203114f52e4819d181f625dd7f6072d15f0b6f",
+            "bytes": 16610
+          },
+          "edits": [
+            {
+              "offset": 301,
+              "before": "import {execFileSync,spawnSync} from 'node:child_process';\n",
+              "after": "import {spawnSync} from 'node:child_process';\n"
+            },
+            {
+              "offset": 939,
+              "before": "",
+              "after": "import {packedUpstreamLedgerEpoch as maintainedBaseEpoch} from '../scripts/packed-upstream-ledger-base.mjs';\nimport {historicalM3EpochData} from './m3_theme_boundary_historical_epoch_data.mjs';\n"
+            },
+            {
+              "offset": 1521,
+              "before": "const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',\n '6e54c9a1c3dad72f65b048f8f19cb7faa18729dc:'+ledger],{cwd:root,env,maxBuffer:8*1024*1024});\n",
+              "after": "const {before,report:historicalData}=historicalM3EpochData({root,env});\n"
+            },
+            {
+              "offset": 1823,
+              "before": "const current=packedUpstreamLedgerEpoch({root,read:actual}),previous=packedUpstreamLedgerEpoch({root,read:path=>path===ledger?before:read(path)});\n",
+              "after": "const historicalRead=path=>path===ledger?before:read(path);\n// The public terminal owner accepts physical current inputs, not this old JSON view.\nassert.throws(()=>packedUpstreamLedgerEpoch({root,read:historicalRead}),\n error=>error?.code==='ERR_ASSERTION'&&error.message.includes('nonphysical canonical input '+ledger));\nconst publicOldProjectionRejected=true;\nconst current=packedUpstreamLedgerEpoch({root,read:actual}),previous=maintainedBaseEpoch({root,read:historicalRead});\n"
+            },
+            {
+              "offset": 2020,
+              "before": "assert.equal(current.individual_decisions_applied,88);\n",
+              "after": "const proposalRaw=read('compatibility/rc/21x-base-class-removal-admission-canonical-proposal-v6.json');\nassert.equal(createHash('sha256').update(proposalRaw).digest('hex'),'720a4fcd0c9d0d67afbeddd106fc9741d7ab34a0848edc1a0f2e6a25019b9881');\nconst proposal=JSON.parse(proposalRaw),physicalLedger=read(ledger),physicalHash=createHash('sha256').update(physicalLedger).digest('hex');\nassert.ok([proposal.before.sha256,proposal.after.sha256].includes(physicalHash));\nconst expectedBase=Number(physicalHash===proposal.after.sha256);\nassert.equal(physicalLedger.length,(expectedBase?proposal.after:proposal.before).bytes);\nassert.equal(current.legacy_removal_source_decisions_applied,1);assert.equal(current.table_local_compilation_source_decisions_applied,1);\nassert.equal(current.base_class_removal_source_decisions_applied,expectedBase);\nassert.equal(current.individual_decisions_applied,90+expectedBase);\nconst preTerminal=current.individual_decisions_applied-current.legacy_removal_source_decisions_applied-current.table_local_compilation_source_decisions_applied-current.base_class_removal_source_decisions_applied;\nassert.equal(preTerminal,88);assert.equal(historicalData.historical_pre_terminal_source_admissions,88);\n"
+            },
+            {
+              "offset": 2479,
+              "before": "assert.equal(current.theming_source_decisions_applied,2);assert.equal(previous.theming_source_decisions_applied,0);\nassert.equal(previous.title_source_decisions_applied,0);assert.equal(previous.title_native_registry_metadata_tokens_applied,0);assert.equal(current.unthemable_source_decisions_applied,5);assert.equal(current.registered_checker_metadata_tokens_applied,14);\n",
+              "after": "assert.equal(current.theming_source_decisions_applied,2);assert.equal(historicalData.historical_theming_metadata_admissions,0);\nassert.equal(historicalData.historical_title_metadata_admissions,0);assert.equal(historicalData.historical_title_native_after_references,0);assert.equal(current.unthemable_source_decisions_applied,5);assert.equal(current.registered_checker_metadata_tokens_applied,14);\n"
+            },
+            {
+              "offset": 12361,
+              "before": "const report={schema_version:1,line:'21.x',current_source_admissions:current.individual_decisions_applied,previous_source_admissions:previous.individual_decisions_applied,\n",
+              "after": "const report={schema_version:1,line:'21.x',...historicalData,\n current_epoch_scope:'public physical terminal owner',previous_epoch_scope:'maintained base historical35 JSON view',\n public_old_projection_rejected:publicOldProjectionRejected,preserved_pre_terminal_source_admissions:preTerminal,\n legacy_removal_source_admissions:current.legacy_removal_source_decisions_applied,table_local_compilation_source_admissions:current.table_local_compilation_source_decisions_applied,\n base_class_removal_source_admissions:current.base_class_removal_source_decisions_applied,current_source_admissions:current.individual_decisions_applied,previous_source_admissions:previous.individual_decisions_applied,\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_browser_reference_owner.py",
+          "before": {
+            "path": "tests/test_browser_reference_owner.py",
+            "sha256": "ffa0cb70dddc77825e971788b271a6caf6c3ad126f65c41e6b53d321fba50e64",
+            "bytes": 4074
+          },
+          "after": {
+            "path": "tests/test_browser_reference_owner.py",
+            "sha256": "5ccce7b0162023baf6f9ae074f6fbd87e82c303b88e54052bff15ac4a1c2e866",
+            "bytes": 4824
+          },
+          "edits": [
+            {
+              "offset": 1899,
+              "before": "        self.assertTrue(report['unknown_frame_not_translated']);self.assertTrue(report['source_context_grants_no_canonical_admission']);self.assertTrue(report['public_snapshots_do_not_change_private_guards']);self.assertTrue(report['canonical_ledger_unchanged'])\n",
+              "after": "        self.assertTrue(report['unknown_frame_not_translated']);self.assertTrue(report['current_nonphysical_callback_rejected']);self.assertEqual(report['current_nonphysical_callbacks_rejected'],2);self.assertTrue(report['historical_unknown_passthrough_assertions_authenticated_as_DATA']);self.assertTrue(report['source_context_grants_no_canonical_admission']);self.assertTrue(report['public_snapshots_do_not_change_private_guards']);self.assertTrue(report['canonical_ledger_unchanged'])\n"
+            },
+            {
+              "offset": 2396,
+              "before": "",
+              "after": "        from current_sass_canonical_test_scope import current_canonical_test_frame\n        frame = current_canonical_test_frame(ROOT)\n"
+            },
+            {
+              "offset": 2655,
+              "before": "        self.assertTrue(report['actual_prepare_and_epoch_called']);self.assertEqual(report['preserved_source_admissions'],88 if report['line']=='21.x'else 13);self.assertEqual(report['source_admissions']-report['table_local_compilation_source_admissions'],89);self.assertEqual(report['table_local_compilation_source_admissions'],1);self.assertEqual(report['legacy_removal_source_admissions'],1)\n",
+              "after": "        self.assertTrue(report['actual_prepare_and_epoch_called']);self.assertEqual(report['preserved_source_admissions'],88 if report['line']=='21.x'else 13);self.assertEqual(report['source_admissions'],frame['individual_source_reviews']);self.assertEqual(report['base_class_removal_source_admissions'],frame['base_class_decisions']);self.assertEqual(report['source_admissions']-report['table_local_compilation_source_admissions']-report['base_class_removal_source_admissions'],89);self.assertFalse(report['external_browser_context_physically_applied']);self.assertTrue(report['historical_browser_stage_relation_verified']);frame['assert_current']();self.assertEqual(report['table_local_compilation_source_admissions'],1);self.assertEqual(report['legacy_removal_source_admissions'],1)\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_button_token_repairs_admission.py",
+          "before": {
+            "path": "tests/test_button_token_repairs_admission.py",
+            "sha256": "87b5a21142d30d5c938bafcc86342c8b625ab2112d0b29235e5dca26a91203fb",
+            "bytes": 5884
+          },
+          "after": {
+            "path": "tests/test_button_token_repairs_admission.py",
+            "sha256": "992d70e4cedc930e4e5249249b886b3320d415989aed789001b123e323c57951",
+            "bytes": 6131
+          },
+          "edits": [
+            {
+              "offset": 4244,
+              "before": "        self.assertEqual(report['registered_source_contracts'], 69)\n",
+              "after": "        from current_sass_canonical_test_scope import current_canonical_registry_subject\n        registry_subject = current_canonical_registry_subject(ROOT)\n        self.assertEqual(report['registered_source_contracts'], registry_subject['registered_source_contracts'])\n        registry_subject['assert_current']()\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_button_tokenization_admission.py",
+          "before": {
+            "path": "tests/test_button_tokenization_admission.py",
+            "sha256": "c0247a56448b5467939ce37d2ffeee8cf3627246f212a4127dd1bb657bb305ad",
+            "bytes": 5349
+          },
+          "after": {
+            "path": "tests/test_button_tokenization_admission.py",
+            "sha256": "211618adebdab3e855363ba83cfddbcd8a24e0f68ed6679327e84ed59c0e38f9",
+            "bytes": 5596
+          },
+          "edits": [
+            {
+              "offset": 4268,
+              "before": "        self.assertEqual(report['registered_source_contracts'], 69)\n",
+              "after": "        from current_sass_canonical_test_scope import current_canonical_registry_subject\n        registry_subject = current_canonical_registry_subject(ROOT)\n        self.assertEqual(report['registered_source_contracts'], registry_subject['registered_source_contracts'])\n        registry_subject['assert_current']()\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_control_m3_theme_admission.py",
+          "before": {
+            "path": "tests/test_control_m3_theme_admission.py",
+            "sha256": "8cf77a80434b298c14d29f2c15db2a617c0447281b3f56ce121f8fe6b4f50066",
+            "bytes": 5827
+          },
+          "after": {
+            "path": "tests/test_control_m3_theme_admission.py",
+            "sha256": "58169163691a0b0c974f5e336d67dcdc012bc50667d67fd6256dfc63c87a74c1",
+            "bytes": 6074
+          },
+          "edits": [
+            {
+              "offset": 4223,
+              "before": "        self.assertEqual(report['registered_source_contracts'], 69)\n",
+              "after": "        from current_sass_canonical_test_scope import current_canonical_registry_subject\n        registry_subject = current_canonical_registry_subject(ROOT)\n        self.assertEqual(report['registered_source_contracts'], registry_subject['registered_source_contracts'])\n        registry_subject['assert_current']()\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_core_tokenization_admission.py",
+          "before": {
+            "path": "tests/test_core_tokenization_admission.py",
+            "sha256": "42bc04490c699240cabb7182e743dfe16dafaeb6ba9266e999a8e8fb75d0b7a8",
+            "bytes": 8100
+          },
+          "after": {
+            "path": "tests/test_core_tokenization_admission.py",
+            "sha256": "fd877f72ca1d45158b31d60bf328cf27c3a8bc35495c8d67ad64e2c2615fb27d",
+            "bytes": 8347
+          },
+          "edits": [
+            {
+              "offset": 6117,
+              "before": "        self.assertEqual(report['registered_source_contracts'], 69)\n",
+              "after": "        from current_sass_canonical_test_scope import current_canonical_registry_subject\n        registry_subject = current_canonical_registry_subject(ROOT)\n        self.assertEqual(report['registered_source_contracts'], registry_subject['registered_source_contracts'])\n        registry_subject['assert_current']()\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_current_sass_tool_references.py",
+          "before": {
+            "path": "tests/test_current_sass_tool_references.py",
+            "sha256": "fbd1c611ff50a55c0eb590dbb84c9d4e67ab465dada745f666b57e07862b04e1",
+            "bytes": 9760
+          },
+          "after": {
+            "path": "tests/test_current_sass_tool_references.py",
+            "sha256": "a0ae927c0ee4a11f81ab84e31c9311e0a964e732fa8dc740f762d0d012307502",
+            "bytes": 14967
+          },
+          "edits": [
+            {
+              "offset": 147,
+              "before": "\"\"\"V2 exact current tool recipes on disposable tool-only physical fixtures.\"\"\"\n",
+              "after": "\"\"\"V3 exact current tool recipes on disposable tool-only physical fixtures.\"\"\"\n"
+            },
+            {
+              "offset": 361,
+              "before": "",
+              "after": "from unittest import mock\n"
+            },
+            {
+              "offset": 447,
+              "before": "from current_sass_tool_references import CurrentSassToolReferences, CHECKPOINTS, INPUTS, PREVIOUS_INPUTS\n",
+              "after": "import current_sass_tool_references as tool_module\nfrom current_sass_tool_references import CurrentSassToolReferences, CHECKPOINTS, INPUTS, PREVIOUS_INPUTS, V2_INPUTS, V3_CHECKPOINTS\n"
+            },
+            {
+              "offset": 898,
+              "before": "    packet = json.loads((ROOT / INPUTS).read_bytes())\n",
+              "after": "    successor = json.loads((ROOT / INPUTS).read_bytes())\n    next_branch = successor['branches'][line]\n    packet = json.loads((ROOT / V2_INPUTS['path']).read_bytes())\n"
+            },
+            {
+              "offset": 1079,
+              "before": "    paths = {INPUTS, PREVIOUS_INPUTS['path'], 'projects/ngx-material-legacy/package.json',\n",
+              "after": "    paths = {INPUTS, V2_INPUTS['path'], PREVIOUS_INPUTS['path'], 'projects/ngx-material-legacy/package.json',\n"
+            },
+            {
+              "offset": 1690,
+              "before": "",
+              "after": "    paths.update(row['path'] for row in next_branch['updates'])\n    paths.update(row['path'] for row in next_branch['additional_inputs'])\n"
+            },
+            {
+              "offset": 2721,
+              "before": "            self.assertEqual((result['line'], result['epoch']), (line, 2))\n            packet = json.loads((ROOT / INPUTS).read_bytes())\n",
+              "after": "            self.assertEqual((result['line'], result['epoch']), (line, 3))\n            successor = json.loads((ROOT / INPUTS).read_bytes())\n            next_branch = successor['branches'][line]\n            packet = json.loads((ROOT / V2_INPUTS['path']).read_bytes())\n"
+            },
+            {
+              "offset": 3095,
+              "before": "            expected_paths = {r['path'] for r in historical['tool_transitions']} | {r['path'] for r in branch['updates']}\n",
+              "after": "            expected_paths = {r['path'] for r in historical['tool_transitions']} | {r['path'] for r in branch['updates']} | {r['path'] for r in next_branch['updates']}\n"
+            },
+            {
+              "offset": 3382,
+              "before": "            self.assertEqual(len(result['checks']), 15)\n",
+              "after": "            self.assertEqual(len(result['checks']), 22)\n            self.assertEqual(result['v2_current_identities'], len(branch['updates']))\n            self.assertEqual(result['v3_overlay_count'], len(next_branch['updates']))\n"
+            },
+            {
+              "offset": 3690,
+              "before": "            self.assertEqual(source.epoch, 2)\n",
+              "after": "            self.assertEqual(source.epoch, 3)\n"
+            },
+            {
+              "offset": 5116,
+              "before": "",
+              "after": "            for overlay in next_branch['updates']:\n                self.assertEqual(hashlib.sha256(source.comparison_bytes(overlay['before'])).hexdigest(), overlay['before']['sha256'])\n                self.assertEqual(source.qualify(overlay['before']), overlay['after'])\n                with self.assertRaises(AssertionError):\n                    source.qualify(dict(overlay['before'], bytes=overlay['before']['bytes'] + 1))\n            self.assertEqual(next_branch['source_parent'], V3_CHECKPOINTS[line])\n"
+            },
+            {
+              "offset": 7954,
+              "before": "        spec = importlib.util.spec_from_file_location('tool_v2_builder', ROOT / 'compatibility/rc/current-sass-tool-reference-v2-builder-v1.py')\n",
+              "after": "        spec = importlib.util.spec_from_file_location('tool_v3_builder', ROOT / 'compatibility/rc/parent-base-class-tool-successor-builder-v1.py')\n"
+            },
+            {
+              "offset": 8938,
+              "before": "        packet = json.loads((ROOT / INPUTS).read_bytes())\n",
+              "after": "        packet = json.loads((ROOT / V2_INPUTS['path']).read_bytes())\n"
+            },
+            {
+              "offset": 9712,
+              "before": "",
+              "after": "    def test_resealed_successor_cannot_change_committed_predecessor_or_add_path(self):\n        with tempfile.TemporaryDirectory(prefix='ngx-tool-v3-resealed-') as directory:\n            root = Path(directory)\n            line = current_tool_fixture(root)\n            path = root / INPUTS\n            original = path.read_bytes()\n            baseline = json.loads(original)\n            for kind in ('wrong-parent', 'wrong-before-sha', 'wrong-before-bytes', 'unowned-row', 'wrong-recipe'):\n                packet = json.loads(original)\n                branch = packet['branches'][line]\n                row = branch['updates'][0]\n                if kind == 'wrong-parent':\n                    branch['source_parent'] = '0' * 40\n                elif kind == 'wrong-before-sha':\n                    row['before']['sha256'] = '0' * 64\n                elif kind == 'wrong-before-bytes':\n                    row['before']['bytes'] += 1\n                elif kind == 'unowned-row':\n                    branch['updates'].append(dict(path='scripts/current-sass-tool-references.mjs', before=dict(path='scripts/current-sass-tool-references.mjs', sha256='0' * 64, bytes=0), after=dict(path='scripts/current-sass-tool-references.mjs', sha256='0' * 64, bytes=0), edits=[]))\n                else:\n                    row['edits'][0]['before'] += 'wrong'\n                raw = (json.dumps(packet, indent=2) + '\\n').encode()\n                path.write_bytes(raw)\n                try:\n                    with mock.patch.object(tool_module, 'INPUTS_SHA', hashlib.sha256(raw).hexdigest()):\n                        with self.assertRaises(AssertionError, msg=kind):\n                            CurrentSassToolReferences(root)\n                finally:\n                    path.write_bytes(original)\n            source = CurrentSassToolReferences(root)\n            self.assertEqual(source.epoch, 3)\n            self.assertEqual(baseline['branches'][line]['source_parent'], V3_CHECKPOINTS[line])\n\n    def test_no_overlay_branch_preserves_exact_v2_physical_subject(self):\n        # Restore predecessor source as DATA in a disposable tree. No old module\n        # is imported or executed; the current Python factory reads those bytes.\n        with tempfile.TemporaryDirectory(prefix='ngx-tool-v3-no-overlays-') as directory:\n            root = Path(directory)\n            line = current_tool_fixture(root)\n            packet_path = root / INPUTS\n            packet = json.loads(packet_path.read_bytes())\n            branch = packet['branches'][line]\n            for row in branch['updates']:\n                raw = subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0', 'show', V3_CHECKPOINTS[line] + ':' + row['path']], cwd=ROOT)\n                self.assertEqual(hashlib.sha256(raw).hexdigest(), row['before']['sha256'])\n                (root / row['path']).write_bytes(raw)\n            branch['updates'] = []\n            raw = (json.dumps(packet, indent=2) + '\\n').encode()\n            packet_path.write_bytes(raw)\n            with mock.patch.object(tool_module, 'INPUTS_SHA', hashlib.sha256(raw).hexdigest()):\n                source = CurrentSassToolReferences(root)\n                self.assertEqual(source.epoch, 3)\n                source.assert_current()\n\n    def test_frozen_reader_implementation_is_unchanged(self):\n        current = (ROOT / 'scripts/historical-contract-repair-readers.mjs').read_bytes()\n        line = '21.x' if json.loads((ROOT / 'projects/ngx-material-legacy/package.json').read_bytes())['version'].startswith('21.') else 'main'\n        previous = subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0', 'show', V3_CHECKPOINTS[line] + ':scripts/historical-contract-repair-readers.mjs'], cwd=ROOT)\n        marker = b'export function historicalContractRepairFrozenReaderSubject('\n        self.assertEqual(current[current.index(marker):], previous[previous.index(marker):])\n\n\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_foundation_m3_theme_admission.py",
+          "before": {
+            "path": "tests/test_foundation_m3_theme_admission.py",
+            "sha256": "538ca9651300d409cbb18f8c2e26f0768fba53591d25054cca0e3f7586d7655f",
+            "bytes": 7991
+          },
+          "after": {
+            "path": "tests/test_foundation_m3_theme_admission.py",
+            "sha256": "21fd10afa670d07507d682c54d2f3d746ef757433e28b440501b55746febcbb7",
+            "bytes": 8238
+          },
+          "edits": [
+            {
+              "offset": 6076,
+              "before": "        self.assertEqual(report['registered_source_contracts'], 69)\n",
+              "after": "        from current_sass_canonical_test_scope import current_canonical_registry_subject\n        registry_subject = current_canonical_registry_subject(ROOT)\n        self.assertEqual(report['registered_source_contracts'], registry_subject['registered_source_contracts'])\n        registry_subject['assert_current']()\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_inspection_compatibility_admission.py",
+          "before": {
+            "path": "tests/test_inspection_compatibility_admission.py",
+            "sha256": "f4e96344b4a1e9430d1bd7549bfced0adb988d0398dcd8a2aa2b877f546f5207",
+            "bytes": 5417
+          },
+          "after": {
+            "path": "tests/test_inspection_compatibility_admission.py",
+            "sha256": "adde82089eb8126823f50600134bd49744075060181ef926cb1daa4ee58a70c8",
+            "bytes": 5664
+          },
+          "edits": [
+            {
+              "offset": 4336,
+              "before": "        self.assertEqual(report['registered_source_contracts'], 69)\n",
+              "after": "        from current_sass_canonical_test_scope import current_canonical_registry_subject\n        registry_subject = current_canonical_registry_subject(ROOT)\n        self.assertEqual(report['registered_source_contracts'], registry_subject['registered_source_contracts'])\n        registry_subject['assert_current']()\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_legacy_removal_admission.py",
+          "before": {
+            "path": "tests/test_legacy_removal_admission.py",
+            "sha256": "e9c68df9d137254a57c296b374fa2eefbd15f1cd75c77117b199d6eb86010713",
+            "bytes": 7704
+          },
+          "after": {
+            "path": "tests/test_legacy_removal_admission.py",
+            "sha256": "2bc232a50631e93a850c2fe0637dcad10f39bfc7f72409ab42cfcad7e0bfe0ce",
+            "bytes": 8013
+          },
+          "edits": [
+            {
+              "offset": 303,
+              "before": "",
+              "after": "from current_sass_canonical_test_scope import current_canonical_test_frame\n"
+            },
+            {
+              "offset": 1922,
+              "before": "        packet=json.loads((ROOT/(PREFIX+'canonical-proposal.json')).read_bytes());current=digest(table_predecessor_data(packet['before']['path'],(ROOT/packet['before']['path']).read_bytes()))\n",
+              "after": "        packet=json.loads((ROOT/(PREFIX+'canonical-proposal.json')).read_bytes());current=digest(table_predecessor_data(packet['before']['path'],current_canonical_test_frame(ROOT)['comparison'](packet['before']['path'],(ROOT/packet['before']['path']).read_bytes())))\n"
+            },
+            {
+              "offset": 6730,
+              "before": "        live_ledger=digest(table_predecessor_data(packet['before']['path'],(ROOT/packet['before']['path']).read_bytes()));live_registry=digest(table_predecessor_data(packet['registry_before']['path'],(ROOT/packet['registry_before']['path']).read_bytes()))\n",
+              "after": "        live_ledger=digest(table_predecessor_data(packet['before']['path'],current_canonical_test_frame(ROOT)['comparison'](packet['before']['path'],(ROOT/packet['before']['path']).read_bytes())));live_registry=digest(table_predecessor_data(packet['registry_before']['path'],current_canonical_test_frame(ROOT)['comparison'](packet['registry_before']['path'],(ROOT/packet['registry_before']['path']).read_bytes())))\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_legacy_removal_source.py",
+          "before": {
+            "path": "tests/test_legacy_removal_source.py",
+            "sha256": "b603892320cefb7cc6d56f5f58d61b762b19021f5427f84212cbd73d47a085ec",
+            "bytes": 11465
+          },
+          "after": {
+            "path": "tests/test_legacy_removal_source.py",
+            "sha256": "75895145876faffac2c5e8cd8ab98f018b0381fc5a383e6b43d8b9be695a6a18",
+            "bytes": 11605
+          },
+          "edits": [
+            {
+              "offset": 323,
+              "before": "",
+              "after": "from current_sass_canonical_test_scope import current_canonical_test_frame\n"
+            },
+            {
+              "offset": 9215,
+              "before": "        proposal=json.loads((ROOT/'compatibility/rc/21x-legacy-removal-admission-canonical-proposal.json').read_bytes());current=table_predecessor_data(before['path'],(ROOT/before['path']).read_bytes())\n",
+              "after": "        proposal=json.loads((ROOT/'compatibility/rc/21x-legacy-removal-admission-canonical-proposal.json').read_bytes());current=table_predecessor_data(before['path'],current_canonical_test_frame(ROOT)['comparison'](before['path'],(ROOT/before['path']).read_bytes()))\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_m3_theme_boundary_admission.py",
+          "before": {
+            "path": "tests/test_m3_theme_boundary_admission.py",
+            "sha256": "b32774a9460a14f2699e6af8eb3e04184fcbad36a585eb1bfafa0729572a45a9",
+            "bytes": 5768
+          },
+          "after": {
+            "path": "tests/test_m3_theme_boundary_admission.py",
+            "sha256": "e7143c096697d0e0cc810b36c191caf481080e997b5db8240464b35b94181b2e",
+            "bytes": 7050
+          },
+          "edits": [
+            {
+              "offset": 4027,
+              "before": "        for key, expected in [('current_source_admissions',88),('previous_source_admissions',35),('pure_metadata_cases',5),\n",
+              "after": "        for key, expected in [('preserved_pre_terminal_source_admissions',88),('previous_source_admissions',35),('pure_metadata_cases',5),\n"
+            },
+            {
+              "offset": 4425,
+              "before": "",
+              "after": "        self.assertEqual(report['current_epoch_scope'], 'public physical terminal owner')\n        self.assertEqual(report['previous_epoch_scope'], 'maintained base historical35 JSON view')\n        self.assertTrue(report['public_old_projection_rejected'])\n        self.assertEqual(report['legacy_removal_source_admissions'], 1)\n        self.assertEqual(report['table_local_compilation_source_admissions'], 1)\n        self.assertIn(report['base_class_removal_source_admissions'], [0, 1])\n        self.assertEqual(report['current_source_admissions'], 90 + report['base_class_removal_source_admissions'])\n        for key, expected in [('historical_title_metadata_admissions', 0), ('historical_theming_metadata_admissions', 0),\n                              ('historical_title_native_after_references', 0), ('historical_native_reference_selection', 14),\n                              ('historical_native_after_positive_references', 14), ('historical_metadata_positive_cases', 3),\n                              ('historical_pre_terminal_source_admissions', 88)]:\n            self.assertEqual(report[key], expected, key)\n        self.assertTrue(report['historical_json_and_program_authenticated_as_Git_DATA'])\n        self.assertFalse(report['historical_program_executed'])\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_remaining_unthemable_admission.py",
+          "before": {
+            "path": "tests/test_remaining_unthemable_admission.py",
+            "sha256": "b7dbe0040cc80a5e49bf49a20bbef4f06a33b041f8df69efa32bbde25087c094",
+            "bytes": 8163
+          },
+          "after": {
+            "path": "tests/test_remaining_unthemable_admission.py",
+            "sha256": "61171fcf8cfefdf1fdc4dc277202fcd6fcf1908820a94b3135949ed3e301b3ca",
+            "bytes": 8410
+          },
+          "edits": [
+            {
+              "offset": 6411,
+              "before": "        self.assertEqual(report['registered_source_contracts'], 69)\n",
+              "after": "        from current_sass_canonical_test_scope import current_canonical_registry_subject\n        registry_subject = current_canonical_registry_subject(ROOT)\n        self.assertEqual(report['registered_source_contracts'], registry_subject['registered_source_contracts'])\n        registry_subject['assert_current']()\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_selector_density_admission.py",
+          "before": {
+            "path": "tests/test_selector_density_admission.py",
+            "sha256": "1d0259b30097aa7e291a4b52a5d899e99634d4c24fbe8e765072478ba6097409",
+            "bytes": 5275
+          },
+          "after": {
+            "path": "tests/test_selector_density_admission.py",
+            "sha256": "05d5991f9b5208136b1886130128b4933641374cf6868e8ba1d7dd905c1d7e5b",
+            "bytes": 5522
+          },
+          "edits": [
+            {
+              "offset": 4197,
+              "before": "        self.assertEqual(report['registered_source_contracts'], 69)\n",
+              "after": "        from current_sass_canonical_test_scope import current_canonical_registry_subject\n        registry_subject = current_canonical_registry_subject(ROOT)\n        self.assertEqual(report['registered_source_contracts'], registry_subject['registered_source_contracts'])\n        registry_subject['assert_current']()\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_slider_m3_repairs_admission.py",
+          "before": {
+            "path": "tests/test_slider_m3_repairs_admission.py",
+            "sha256": "aa4f06051f63df0572321d22c80fff33e1495dbf72c541ee26509037fb09e8e7",
+            "bytes": 6016
+          },
+          "after": {
+            "path": "tests/test_slider_m3_repairs_admission.py",
+            "sha256": "3a8b152a57c350450995c84b8e8e2adf6b29c4009bb1e3d0c86e31056351c693",
+            "bytes": 6263
+          },
+          "edits": [
+            {
+              "offset": 4211,
+              "before": "        self.assertEqual(report['registered_source_contracts'], 69)\n",
+              "after": "        from current_sass_canonical_test_scope import current_canonical_registry_subject\n        registry_subject = current_canonical_registry_subject(ROOT)\n        self.assertEqual(report['registered_source_contracts'], registry_subject['registered_source_contracts'])\n        registry_subject['assert_current']()\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_surface_m3_theme_admission.py",
+          "before": {
+            "path": "tests/test_surface_m3_theme_admission.py",
+            "sha256": "6863aefb7ad6761097e7508e1669be9582b11d05d39afd28e33d4e999b3c0bdd",
+            "bytes": 5824
+          },
+          "after": {
+            "path": "tests/test_surface_m3_theme_admission.py",
+            "sha256": "1d96ef1d4048bf196d94f34740401e73fcc88dcb36ac4dc1c9e999d2a0cca92f",
+            "bytes": 6071
+          },
+          "edits": [
+            {
+              "offset": 4213,
+              "before": "        self.assertEqual(report['registered_source_contracts'], 69)\n",
+              "after": "        from current_sass_canonical_test_scope import current_canonical_registry_subject\n        registry_subject = current_canonical_registry_subject(ROOT)\n        self.assertEqual(report['registered_source_contracts'], registry_subject['registered_source_contracts'])\n        registry_subject['assert_current']()\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_theming_inspection_admission.py",
+          "before": {
+            "path": "tests/test_theming_inspection_admission.py",
+            "sha256": "519785fd60c814f013bf18f61cd48a4fdcf895e760d556298df17f0af5d6ae70",
+            "bytes": 5242
+          },
+          "after": {
+            "path": "tests/test_theming_inspection_admission.py",
+            "sha256": "fc66cbc0307956ed43bcaa3d5115f38c5c179c4d26e796895691b1355da2f728",
+            "bytes": 5489
+          },
+          "edits": [
+            {
+              "offset": 4164,
+              "before": "        self.assertEqual(report['registered_source_contracts'], 69)\n",
+              "after": "        from current_sass_canonical_test_scope import current_canonical_registry_subject\n        registry_subject = current_canonical_registry_subject(ROOT)\n        self.assertEqual(report['registered_source_contracts'], registry_subject['registered_source_contracts'])\n        registry_subject['assert_current']()\n"
+            }
+          ]
+        }
+      ],
+      "additional_inputs": [
+        {
+          "path": "scripts/base-class-removal-owner-source.mjs",
+          "sha256": "3d121043970e38bd7c0bc768cf671712b08b5c05299172decccff2d14a6d0788",
+          "bytes": 15134
+        },
+        {
+          "path": "scripts/base-class-removal-canonical-stage.mjs",
+          "sha256": "1d48c35b75390e7fa59b44677f1a4161966fe193c5b6ea0f55fc34651359b9e6",
+          "bytes": 9718
+        },
+        {
+          "path": "compatibility/rc/21x-base-class-removal-admission-owner-inputs-v1.json",
+          "sha256": "7c72a44224d6bd9f3eb141fdffb15d0f7ec11cb21b0f466500f10f12742e8e18",
+          "bytes": 7115
+        },
+        {
+          "path": "tests/current_sass_c04_tool_integration_probe.mjs",
+          "sha256": "174aca321b1d8d6d9b57366652d97aedbb1ef929e4881d91fc443368ff4a3742",
+          "bytes": 8566
+        },
+        {
+          "path": "tests/m3_theme_boundary_historical_epoch_data.mjs",
+          "sha256": "49c7bbcf2209ae87a30c72b1d37584b9286949c091257d9e43dd2410de547f64",
+          "bytes": 5909
+        },
+        {
+          "path": "tests/m3_theme_boundary_ledger_patch.py",
+          "sha256": "52aead5497425a23a09b49a8f77f25afd20455c34e84764ecc8b4c265ebec258",
+          "bytes": 10680
+        },
+        {
+          "path": "tests/dialog_title_canonical_ledger_patch.py",
+          "sha256": "62bf0cfa644f67edbd078c8a4138667dad5bfa5ddc7f854d3e6517e542751d29",
+          "bytes": 18153
+        },
+        {
+          "path": "compatibility/rc/21x-legacy-removal-admission-owner-inputs.json",
+          "sha256": "f64114770b458614c1251e8aae33b245999e64fee8ffa9216324e0f253bd4e0f",
+          "bytes": 40975
+        },
+        {
+          "path": "compatibility/rc/c04-browser-owner-inputs.json",
+          "sha256": "710201dd63bfb326485cd2933a9747d53f54b2cf833c47ce332816b0e0db526a",
+          "bytes": 15193
+        },
+        {
+          "path": "compatibility/rc/c04-checker-owner-inputs.json",
+          "sha256": "3ae63a5b436eab901a7ff22cb8ecc9043a5aea8d2fb89ebd9e7f396ea3105bf3",
+          "bytes": 12073
+        },
+        {
+          "path": "compatibility/rc/21x-table-local-compilation-admission-owner-inputs.json",
+          "sha256": "1a35dd57edd9952a23d4bb2e8e9783f19583c00badfd7e9846fdbd2abc94f48b",
+          "bytes": 184121
+        },
+        {
+          "path": "tests/checker_reference_metadata_patch.py",
+          "sha256": "9cf5ac1f86768d32a7e664983f5a39e025065615ecdd53da520a8f26bcbfa5fe",
+          "bytes": 6781
+        },
+        {
+          "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
+          "sha256": "8dab62b8d42f3cc4d57fd3ddfbaaca24737252bdf115924d1695ccbf75a6d7ef",
+          "bytes": 13950
+        }
+      ]
+    },
+    "main": {
+      "source_parent": "59ba0e2aa8b76f71b472ea2831273e44e44b5b57",
+      "updates": [
+        {
+          "path": "scripts/historical-contract-repair-readers.mjs",
+          "before": {
+            "path": "scripts/historical-contract-repair-readers.mjs",
+            "sha256": "ddfd6539917d1327a28e5b9987e38c260c1872094807a3e540b8dac03d96e4a8",
+            "bytes": 19785
+          },
+          "after": {
+            "path": "scripts/historical-contract-repair-readers.mjs",
+            "sha256": "cc6051858e17d852363bc767ca07fa8c6cf27930318f783405e0f8489bb20a25",
+            "bytes": 19876
+          },
+          "edits": [
+            {
+              "offset": 4846,
+              "before": " if(existsSync(join(root,'compatibility/rc/current-sass-tool-reference-inputs-v2.json')))return currentSassToolReferenceSubject(args);\n",
+              "after": " if(existsSync(join(root,'compatibility/rc/parent-base-class-tool-successor-inputs-v3.json'))||existsSync(join(root,'compatibility/rc/current-sass-tool-reference-inputs-v2.json')))return currentSassToolReferenceSubject(args);\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/current_sass_tool_reference_probe.mjs",
+          "before": {
+            "path": "tests/current_sass_tool_reference_probe.mjs",
+            "sha256": "c355142cfbef88e148337756bb4f3d41f44d450d00a9dfa17319b80f49cd3629",
+            "bytes": 7771
+          },
+          "after": {
+            "path": "tests/current_sass_tool_reference_probe.mjs",
+            "sha256": "68e588bfd45fd89179a12dd440f80eb845ff878ef51c0107e426f6f952121890",
+            "bytes": 11055
+          },
+          "edits": [
+            {
+              "offset": 710,
+              "before": "const packet=JSON.parse(readFileSync(join(root,'compatibility/rc/current-sass-tool-reference-inputs-v2.json')));\n",
+              "after": "const successorPath='compatibility/rc/parent-base-class-tool-successor-inputs-v3.json';\nconst successor=JSON.parse(readFileSync(join(root,successorPath)));\nconst packet=JSON.parse(readFileSync(join(root,successor.previous_epoch.path)));\n"
+            },
+            {
+              "offset": 993,
+              "before": "check('V2 current maintained dispatch',()=>{\n assert.equal(source.epoch,2);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);\n",
+              "after": "check('V3 current maintained dispatch',()=>{\n assert.equal(source.epoch,3);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);\n"
+            },
+            {
+              "offset": 3126,
+              "before": "",
+              "after": "});\ncheck('all V2 current identities remain exact comparison data',()=>{\n for(const old of branch.updates){\n  const latest=source.transitions.find(r=>r.path===old.path);assert.ok(latest);\n  assert.deepEqual(source.qualify(old.after),{path:latest.path,...latest.after});\n  assert.equal(hash(source.comparisonBytes(old.after)),old.after.sha256);\n }\n});\nconst nextBranch=successor.branches[source.line];\ncheck('each V3 predecessor and literal successor is exact',()=>{\n for(const row of nextBranch.updates){\n  assert.equal(hash(source.comparisonBytes(row.before)),row.before.sha256);\n  assert.equal(hash(source.comparisonBytes(row.after)),row.after.sha256);\n  assert.deepEqual(source.qualify(row.before),row.after);\n  assert.deepEqual(source.qualify(row.after),row.after);\n  assert.equal(source.ownsReference({...row.before,bytes:row.before.bytes+1}),false);\n  assert.throws(()=>source.qualify({...row.before,bytes:row.before.bytes+1}));\n  assert.equal(source.qualify({...row.before,sha256:'0'.repeat(64)}),null);\n }\n});\ncheck('new table stage predecessor is the frozen owner packet identity',()=>{\n const row=nextBranch.updates.find(r=>r.path==='scripts/table-local-compilation-canonical-stage.mjs');\n if(source.line==='21.x'){\n  assert.ok(row);assert.deepEqual(row.before,{path:row.path,sha256:'bdb3137f6db42ed2611ac3a41e400478defed7f0076d203061d1e12d03f63b7c',bytes:8231});\n  assert.deepEqual(source.qualify(row.before),row.after);\n }else assert.equal(row,undefined);\n});\ncheck('historical callback cannot stand in for physical overlay source',()=>{\n const row=nextBranch.updates[0];if(!row)return;\n const old=source.comparisonBytes(row.before);assert.notEqual(row.before.sha256,row.after.sha256);\n assert.throws(()=>currentSassToolReferenceSubject({root,read:path=>path===row.path?old:readFileSync(join(root,path))}));\n source.assertCurrent();\n});\ncheck('new support bytes reject cold and late physical change',()=>{\n const ref=nextBranch.additional_inputs[0];assert.ok(ref);const path=join(root,ref.path),raw=readFileSync(path);\n try{writeFileSync(path,Buffer.concat([raw,Buffer.from('\\n')]));assert.throws(()=>source.assertCurrent());assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{writeFileSync(path,raw);}\n source.assertCurrent();\n"
+            },
+            {
+              "offset": 6675,
+              "before": "check('V1-only data never selects current maintained factory',()=>{\n const path=join(root,'compatibility/rc/current-sass-tool-reference-inputs-v2.json'),raw=readFileSync(path),visited=[];const sentinel=new Error('stop frozen reader before evaluation');\n try{unlinkSync(path);assert.throws(()=>historicalContractRepairReaderSubject({root,read:name=>{visited.push(name);throw sentinel;}}),error=>error===sentinel);assert.deepEqual(visited,['projects/ngx-material-legacy/package.json']);assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{writeFileSync(path,raw);}\n",
+              "after": "check('V2 comparison packet cannot change cold or late',()=>{\n const path=join(root,successor.previous_epoch.path),raw=readFileSync(path);\n try{writeFileSync(path,Buffer.concat([raw,Buffer.from('\\n')]));assert.throws(()=>source.assertCurrent());assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{writeFileSync(path,raw);}\n"
+            },
+            {
+              "offset": 7282,
+              "before": "console.log(JSON.stringify({line:source.line,epoch:source.epoch,transitions:source.transitions.length,transition_rows:source.transitions,bound:source.bound.length,v1_current_identities:previous.branches[source.line].updates.length,checkpoint_parent_updates:branch.updates.filter(r=>r.source_parent).length,checks,compiler_calls:0,old_constructor_executed:false,frozen_dispatch_stopped_before_evaluation:true,historical_programs_executed:false,artifact_or_audit_admission_granted:false}));\n",
+              "after": "check('installed V3 cannot downgrade when V2 predecessor is absent',()=>{\n const path=join(root,successor.previous_epoch.path),raw=readFileSync(path);\n try{unlinkSync(path);assert.throws(()=>historicalContractRepairReaderSubject({root}));assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{writeFileSync(path,raw);}\n source.assertCurrent();\n});\ncheck('V1-only data never selects current maintained factory',()=>{\n const paths=[successorPath,successor.previous_epoch.path],saved=paths.map(path=>readFileSync(join(root,path))),visited=[];const sentinel=new Error('stop frozen reader before evaluation');\n try{for(const path of paths)unlinkSync(join(root,path));assert.throws(()=>historicalContractRepairReaderSubject({root,read:name=>{visited.push(name);throw sentinel;}}),error=>error===sentinel);assert.deepEqual(visited,['projects/ngx-material-legacy/package.json']);assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{paths.forEach((path,index)=>writeFileSync(join(root,path),saved[index]));}\n source.assertCurrent();\n});\nconsole.log(JSON.stringify({line:source.line,epoch:source.epoch,transitions:source.transitions.length,transition_rows:source.transitions,bound:source.bound.length,v1_current_identities:previous.branches[source.line].updates.length,v2_current_identities:branch.updates.length,v3_overlay_count:nextBranch.updates.length,checkpoint_parent_updates:branch.updates.filter(r=>r.source_parent).length,checks,compiler_calls:0,old_constructor_executed:false,frozen_dispatch_stopped_before_evaluation:true,historical_programs_executed:false,artifact_or_audit_admission_granted:false}));\n"
+            }
+          ]
+        },
+        {
+          "path": "tests/test_current_sass_tool_references.py",
+          "before": {
+            "path": "tests/test_current_sass_tool_references.py",
+            "sha256": "fbd1c611ff50a55c0eb590dbb84c9d4e67ab465dada745f666b57e07862b04e1",
+            "bytes": 9760
+          },
+          "after": {
+            "path": "tests/test_current_sass_tool_references.py",
+            "sha256": "a0ae927c0ee4a11f81ab84e31c9311e0a964e732fa8dc740f762d0d012307502",
+            "bytes": 14967
+          },
+          "edits": [
+            {
+              "offset": 147,
+              "before": "\"\"\"V2 exact current tool recipes on disposable tool-only physical fixtures.\"\"\"\n",
+              "after": "\"\"\"V3 exact current tool recipes on disposable tool-only physical fixtures.\"\"\"\n"
+            },
+            {
+              "offset": 361,
+              "before": "",
+              "after": "from unittest import mock\n"
+            },
+            {
+              "offset": 447,
+              "before": "from current_sass_tool_references import CurrentSassToolReferences, CHECKPOINTS, INPUTS, PREVIOUS_INPUTS\n",
+              "after": "import current_sass_tool_references as tool_module\nfrom current_sass_tool_references import CurrentSassToolReferences, CHECKPOINTS, INPUTS, PREVIOUS_INPUTS, V2_INPUTS, V3_CHECKPOINTS\n"
+            },
+            {
+              "offset": 898,
+              "before": "    packet = json.loads((ROOT / INPUTS).read_bytes())\n",
+              "after": "    successor = json.loads((ROOT / INPUTS).read_bytes())\n    next_branch = successor['branches'][line]\n    packet = json.loads((ROOT / V2_INPUTS['path']).read_bytes())\n"
+            },
+            {
+              "offset": 1079,
+              "before": "    paths = {INPUTS, PREVIOUS_INPUTS['path'], 'projects/ngx-material-legacy/package.json',\n",
+              "after": "    paths = {INPUTS, V2_INPUTS['path'], PREVIOUS_INPUTS['path'], 'projects/ngx-material-legacy/package.json',\n"
+            },
+            {
+              "offset": 1690,
+              "before": "",
+              "after": "    paths.update(row['path'] for row in next_branch['updates'])\n    paths.update(row['path'] for row in next_branch['additional_inputs'])\n"
+            },
+            {
+              "offset": 2721,
+              "before": "            self.assertEqual((result['line'], result['epoch']), (line, 2))\n            packet = json.loads((ROOT / INPUTS).read_bytes())\n",
+              "after": "            self.assertEqual((result['line'], result['epoch']), (line, 3))\n            successor = json.loads((ROOT / INPUTS).read_bytes())\n            next_branch = successor['branches'][line]\n            packet = json.loads((ROOT / V2_INPUTS['path']).read_bytes())\n"
+            },
+            {
+              "offset": 3095,
+              "before": "            expected_paths = {r['path'] for r in historical['tool_transitions']} | {r['path'] for r in branch['updates']}\n",
+              "after": "            expected_paths = {r['path'] for r in historical['tool_transitions']} | {r['path'] for r in branch['updates']} | {r['path'] for r in next_branch['updates']}\n"
+            },
+            {
+              "offset": 3382,
+              "before": "            self.assertEqual(len(result['checks']), 15)\n",
+              "after": "            self.assertEqual(len(result['checks']), 22)\n            self.assertEqual(result['v2_current_identities'], len(branch['updates']))\n            self.assertEqual(result['v3_overlay_count'], len(next_branch['updates']))\n"
+            },
+            {
+              "offset": 3690,
+              "before": "            self.assertEqual(source.epoch, 2)\n",
+              "after": "            self.assertEqual(source.epoch, 3)\n"
+            },
+            {
+              "offset": 5116,
+              "before": "",
+              "after": "            for overlay in next_branch['updates']:\n                self.assertEqual(hashlib.sha256(source.comparison_bytes(overlay['before'])).hexdigest(), overlay['before']['sha256'])\n                self.assertEqual(source.qualify(overlay['before']), overlay['after'])\n                with self.assertRaises(AssertionError):\n                    source.qualify(dict(overlay['before'], bytes=overlay['before']['bytes'] + 1))\n            self.assertEqual(next_branch['source_parent'], V3_CHECKPOINTS[line])\n"
+            },
+            {
+              "offset": 7954,
+              "before": "        spec = importlib.util.spec_from_file_location('tool_v2_builder', ROOT / 'compatibility/rc/current-sass-tool-reference-v2-builder-v1.py')\n",
+              "after": "        spec = importlib.util.spec_from_file_location('tool_v3_builder', ROOT / 'compatibility/rc/parent-base-class-tool-successor-builder-v1.py')\n"
+            },
+            {
+              "offset": 8938,
+              "before": "        packet = json.loads((ROOT / INPUTS).read_bytes())\n",
+              "after": "        packet = json.loads((ROOT / V2_INPUTS['path']).read_bytes())\n"
+            },
+            {
+              "offset": 9712,
+              "before": "",
+              "after": "    def test_resealed_successor_cannot_change_committed_predecessor_or_add_path(self):\n        with tempfile.TemporaryDirectory(prefix='ngx-tool-v3-resealed-') as directory:\n            root = Path(directory)\n            line = current_tool_fixture(root)\n            path = root / INPUTS\n            original = path.read_bytes()\n            baseline = json.loads(original)\n            for kind in ('wrong-parent', 'wrong-before-sha', 'wrong-before-bytes', 'unowned-row', 'wrong-recipe'):\n                packet = json.loads(original)\n                branch = packet['branches'][line]\n                row = branch['updates'][0]\n                if kind == 'wrong-parent':\n                    branch['source_parent'] = '0' * 40\n                elif kind == 'wrong-before-sha':\n                    row['before']['sha256'] = '0' * 64\n                elif kind == 'wrong-before-bytes':\n                    row['before']['bytes'] += 1\n                elif kind == 'unowned-row':\n                    branch['updates'].append(dict(path='scripts/current-sass-tool-references.mjs', before=dict(path='scripts/current-sass-tool-references.mjs', sha256='0' * 64, bytes=0), after=dict(path='scripts/current-sass-tool-references.mjs', sha256='0' * 64, bytes=0), edits=[]))\n                else:\n                    row['edits'][0]['before'] += 'wrong'\n                raw = (json.dumps(packet, indent=2) + '\\n').encode()\n                path.write_bytes(raw)\n                try:\n                    with mock.patch.object(tool_module, 'INPUTS_SHA', hashlib.sha256(raw).hexdigest()):\n                        with self.assertRaises(AssertionError, msg=kind):\n                            CurrentSassToolReferences(root)\n                finally:\n                    path.write_bytes(original)\n            source = CurrentSassToolReferences(root)\n            self.assertEqual(source.epoch, 3)\n            self.assertEqual(baseline['branches'][line]['source_parent'], V3_CHECKPOINTS[line])\n\n    def test_no_overlay_branch_preserves_exact_v2_physical_subject(self):\n        # Restore predecessor source as DATA in a disposable tree. No old module\n        # is imported or executed; the current Python factory reads those bytes.\n        with tempfile.TemporaryDirectory(prefix='ngx-tool-v3-no-overlays-') as directory:\n            root = Path(directory)\n            line = current_tool_fixture(root)\n            packet_path = root / INPUTS\n            packet = json.loads(packet_path.read_bytes())\n            branch = packet['branches'][line]\n            for row in branch['updates']:\n                raw = subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0', 'show', V3_CHECKPOINTS[line] + ':' + row['path']], cwd=ROOT)\n                self.assertEqual(hashlib.sha256(raw).hexdigest(), row['before']['sha256'])\n                (root / row['path']).write_bytes(raw)\n            branch['updates'] = []\n            raw = (json.dumps(packet, indent=2) + '\\n').encode()\n            packet_path.write_bytes(raw)\n            with mock.patch.object(tool_module, 'INPUTS_SHA', hashlib.sha256(raw).hexdigest()):\n                source = CurrentSassToolReferences(root)\n                self.assertEqual(source.epoch, 3)\n                source.assert_current()\n\n    def test_frozen_reader_implementation_is_unchanged(self):\n        current = (ROOT / 'scripts/historical-contract-repair-readers.mjs').read_bytes()\n        line = '21.x' if json.loads((ROOT / 'projects/ngx-material-legacy/package.json').read_bytes())['version'].startswith('21.') else 'main'\n        previous = subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0', 'show', V3_CHECKPOINTS[line] + ':scripts/historical-contract-repair-readers.mjs'], cwd=ROOT)\n        marker = b'export function historicalContractRepairFrozenReaderSubject('\n        self.assertEqual(current[current.index(marker):], previous[previous.index(marker):])\n\n\n"
+            }
+          ]
+        }
+      ],
+      "additional_inputs": [
+        {
+          "path": "tests/current_sass_c04_tool_integration_probe.mjs",
+          "sha256": "174aca321b1d8d6d9b57366652d97aedbb1ef929e4881d91fc443368ff4a3742",
+          "bytes": 8566
+        },
+        {
+          "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
+          "sha256": "8dab62b8d42f3cc4d57fd3ddfbaaca24737252bdf115924d1695ccbf75a6d7ef",
+          "bytes": 13950
+        }
+      ]
+    }
+  }
+}

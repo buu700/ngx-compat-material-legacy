@@ -16,14 +16,18 @@ sys.path.insert(0, str(ROOT / 'tests'))
 
 class CheckerReferenceMetadataTests(unittest.TestCase):
     def test_independent_reconstruction_and_mutations(self):
+        from current_sass_canonical_test_scope import historical424_ledger_test_subject
+        subject = historical424_ledger_test_subject(ROOT)
         from checker_reference_metadata_patch import verify_checker_reference_successor, LEDGER
         result = verify_checker_reference_successor()
         self.assertEqual(result['checker_digest_tokens_updated'], 14)
         self.assertEqual(result['unselected_entries_preserved'], 1683)
         self.assertEqual(result['new_SHA_decisions'], 0)
-        original = json.loads((ROOT / LEDGER).read_bytes())
+        original = json.loads(subject['comparison'])
         with tempfile.TemporaryDirectory(prefix='ngx-checker-reference-') as directory:
             candidate = Path(directory) / 'candidate.json'
+            candidate.write_bytes(subject['comparison'])
+            verify_checker_reference_successor(candidate=candidate)
             for fault in ('selected', 'unselected', 'header', 'clearance'):
                 value = json.loads(json.dumps(original))
                 if fault == 'selected':
@@ -39,6 +43,7 @@ class CheckerReferenceMetadataTests(unittest.TestCase):
                 candidate.write_text(json.dumps(value, indent=2) + '\n')
                 with self.subTest(fault=fault), self.assertRaises(AssertionError):
                     verify_checker_reference_successor(candidate=candidate)
+        subject['assert_current']()
 
     def test_actual_checker_contracts_and_rejections(self):
         child = subprocess.run(['node', 'tests/checker_reference_metadata_probe.mjs'], cwd=ROOT,

@@ -15,6 +15,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class M3ThemeBoundaryAdmissionTests(unittest.TestCase):
     def test_independent_five_entries_and_real_failures(self):
+        from current_sass_canonical_test_scope import historical424_ledger_test_subject
+        subject = historical424_ledger_test_subject(ROOT)
         from m3_theme_boundary_ledger_patch import verify_boundary_successor, LEDGER, SHAS
         report = verify_boundary_successor()
         self.assertEqual(report['individual_decisions'], 5)
@@ -32,9 +34,11 @@ class M3ThemeBoundaryAdmissionTests(unittest.TestCase):
         self.assertTrue(report['exact_remaining_unthemable_successor_verified'])
         self.assertEqual(report['unselected_entry_bytes_preserved'], 1692)
         self.assertEqual(report['pending_security_reviews'], 1)
-        original = json.loads((ROOT / LEDGER).read_bytes())
+        original = json.loads(subject['comparison'])
         with tempfile.TemporaryDirectory(prefix='ngx-control-base-independent-') as directory:
             path = Path(directory) / 'candidate.json'
+            path.write_bytes(subject['comparison'])
+            verify_boundary_successor(candidate=path)
             for fault in ['selected', 'unselected', 'header', 'clearance', 'missing-security-row', 'security-status', 'swap-dispositions']:
                 value = json.loads(json.dumps(original))
                 if fault == 'selected': del next(row for row in value['entries'] if row['sha'] in SHAS)['individual_proof']['m3_theme_boundary_source_scope']
@@ -51,6 +55,7 @@ class M3ThemeBoundaryAdmissionTests(unittest.TestCase):
         output = os.environ.get('M3_BOUNDARY_RECONSTRUCTION_REPORT')
         if output:
             with Path(output).open('x') as stream: json.dump(report, stream, indent=2); stream.write('\n')
+        subject['assert_current']()
 
     def test_pure_metadata_fresh_source_exact_owner_and_real_CLI(self):
         command = ['node', 'tests/m3_theme_boundary_admission_probe.mjs']

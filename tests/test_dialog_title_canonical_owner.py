@@ -17,6 +17,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class DialogTitleCanonicalOwnerTests(unittest.TestCase):
     def test_independent_complete_byte_transition(self):
+        from current_sass_canonical_test_scope import historical424_ledger_test_subject
+        subject = historical424_ledger_test_subject(ROOT)
         from dialog_title_canonical_ledger_patch import verify_title_successor, LEDGER, SHA
         report = verify_title_successor()
         self.assertEqual(report['individual_decisions'], 1)
@@ -34,7 +36,7 @@ class DialogTitleCanonicalOwnerTests(unittest.TestCase):
         self.assertEqual(report['metadata_tokens'], 14)
         self.assertEqual(report['unselected_entry_bytes_preserved'], 1682)
         from unthemable_ledger_patch import spans
-        raw = (ROOT / LEDGER).read_bytes()
+        raw = subject['comparison']
         data = json.loads(raw)
         text, _, ranges = spans(raw)
         with tempfile.TemporaryDirectory(prefix='ngx-title-independent-') as directory:
@@ -83,6 +85,7 @@ class DialogTitleCanonicalOwnerTests(unittest.TestCase):
         if os.environ.get('DIALOG_TITLE_CANONICAL_RECONSTRUCTION_REPORT'):
             with Path(os.environ['DIALOG_TITLE_CANONICAL_RECONSTRUCTION_REPORT']).open('x') as stream:
                 json.dump(report, stream, indent=2); stream.write('\n')
+        subject['assert_current']()
 
     def test_current_readers_and_actual_root_native_rejection(self):
         command = ['node', 'tests/dialog_title_canonical_owner_probe.mjs']

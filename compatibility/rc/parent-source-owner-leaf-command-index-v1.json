@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "scope": "Exact9 source-only child commands/entrypoints and original budgets; command DATA only",
+  "node_resolution": "node from pinned Chainman/toolchain PATH, not durable host absolute Nix path",
+  "no_commands_executed": true,
+  "children": [
+    {
+      "id": "checker-source",
+      "source": {
+        "path": "scripts/checker-reference-proposal.mjs",
+        "sha256": "46178033f750eb04cf4343509749e3618c9b9683d7eca0db9630f88ffcf66789",
+        "bytes": 13477
+      },
+      "current_export_or_entrypoint": "tests/checker_reference_source_probe.mjs CLI --metadata -> inspectCheckerSourceMetadata",
+      "argv": [
+        "node",
+        "tests/checker_reference_source_probe.mjs",
+        "--metadata"
+      ],
+      "cwd": "21.x worktree root",
+      "existing_parent_timeout_ms": 120000,
+      "stdin": null,
+      "scope": "Full current source verifier; its cold/late262+262 loops still execute under --metadata. Parent reported106.28s success; retain original120s budget.",
+      "executed_here": false
+    },
+    {
+      "id": "browser-source",
+      "source": {
+        "path": "scripts/browser-reference-proposal.mjs",
+        "sha256": "600a430a33955755561f018f46288acd4beed4b9ad4ca6b4daf8aa7cb5bf1d50",
+        "bytes": 13492
+      },
+      "current_export_or_entrypoint": "tests/browser_reference_source_probe.mjs CLI -> inspectBrowserReferenceSource",
+      "argv": [
+        "node",
+        "tests/browser_reference_source_probe.mjs"
+      ],
+      "cwd": "21.x worktree root",
+      "existing_parent_timeout_ms": 180000,
+      "stdin": null,
+      "scope": "Full source transition verifier incl cold/late guard loops and synthetic VM collaborators. Parent reported direct exported inspector2.501s; that does not by itself run all CLI tail loops.",
+      "executed_here": false
+    },
+    {
+      "id": "inventory-rebinding",
+      "source": {
+        "path": "scripts/inventory-reference-proposal.mjs",
+        "sha256": "058f2e671cfb7fddd48a68a588991aae74e685376e16ab9c50e33fd4b96ffefa",
+        "bytes": 11760
+      },
+      "current_export_or_entrypoint": "scripts/historical_inventory_rebinding.py __main__ -> expected_successor",
+      "argv": [
+        "python3",
+        "scripts/historical_inventory_rebinding.py"
+      ],
+      "cwd": "21.x worktree root",
+      "existing_parent_timeout_ms": null,
+      "stdin": null,
+      "scope": "Pure finite source/inventory/current transitions. Original parent call has NO timeout; no fabricated existing budget. Git child DATA only.",
+      "executed_here": false
+    },
+    {
+      "id": "helper-ci14",
+      "source": {
+        "path": "scripts/inventory-reference-owner.mjs",
+        "sha256": "31f145763b1b9ec282989d12b91ddfad18888a2dcf7dac64e4fc30e93926f7dd",
+        "bytes": 19268
+      },
+      "current_export_or_entrypoint": "private verifyCurrentWorkflow(root); exact fixed embedded current Python program",
+      "argv": [
+        "python3",
+        "-B",
+        "-c",
+        "import contextlib,io,json,sys,unittest\nfrom pathlib import Path\nroot=Path.cwd();sys.path.insert(0,str(root));log=io.StringIO()\nloader=unittest.TestLoader()\nsuite=loader.discover(str(root/'tests'),pattern='test_helper_ci.py')\ndef cases(suite):\n for item in suite:\n  if isinstance(item,unittest.TestSuite):yield from cases(item)\n  else:yield item\nids=[case.id()for case in cases(suite)]\nassert not loader.errors,loader.errors\nassert len(ids)==len(set(ids))==14,ids\nwith contextlib.redirect_stdout(log),contextlib.redirect_stderr(log):\n result=unittest.TextTestRunner(stream=log,verbosity=2).run(suite)\nreport={'result':'pass'if result.wasSuccessful()and not result.skipped else'fail','tests_run':result.testsRun,'test_ids':ids,'skipped':len(result.skipped),'full_Actions_execution_qualified':False}\nprint(json.dumps(report))\nif report['result']!='pass':sys.stderr.write(log.getvalue());sys.exit(1)\n"
+      ],
+      "cwd": "21.x worktree root",
+      "existing_parent_timeout_ms": 120000,
+      "stdin": null,
+      "scope": "Exactly14 distinct current test_helper_ci tests, no skips; generates disposable Node fixture children. This is not a full helper-suite/source-owner run.",
+      "executed_here": false
+    },
+    {
+      "id": "title-canonical",
+      "source": {
+        "path": "scripts/upstream-dialog-title-admission.cjs",
+        "sha256": "f47da6d30d3f79930f12b3c650c85d6ae097f202d17b9e64f15cf4bc7c25cdd9",
+        "bytes": 8052
+      },
+      "current_export_or_entrypoint": "scripts/dialog-title-canonical-source.mjs CLI -> measureDialogTitleCanonicalSource",
+      "argv": [
+        "node",
+        "scripts/dialog-title-canonical-source.mjs"
+      ],
+      "cwd": "21.x worktree root",
+      "existing_parent_timeout_ms": 60000,
+      "stdin": null,
+      "scope": "Fresh current49-source graph + synthetic title lifecycle; no browser/Angular compiler child. Current module entry executes diagnostic, not historical program.",
+      "executed_here": false
+    },
+    {
+      "id": "bazel-python-analysis",
+      "source": {
+        "path": "scripts/upstream-bazel-build-scope.mjs",
+        "sha256": "0f49844cb731a91d589a8f573c74f56fdbb33d397ba75462aa2087b760bc1c2b",
+        "bytes": 15156
+      },
+      "current_export_or_entrypoint": "analyzeBazelBuildSubjects(readMember) invokes pure Python stdin analyzer",
+      "argv": [
+        "python3",
+        "scripts/upstream_bazel_source_analysis.py"
+      ],
+      "cwd": "21.x worktree root",
+      "existing_parent_timeout_ms": 20000,
+      "stdin": {
+        "transport": "gzip-decode fixed current compatibility/rc/bazel-build-only-subjects.json.gz bytes as DATA; hash checks before passing stdin",
+        "compressed_sha256": "536465cb9e0a708ddc72371fb12a4de727293ea1bb1bfb7dd0232327b83b6346",
+        "decoded_sha256": "58fa17886575b3998bb402dc645b408ac5af57af531c35554cd683fb7509be90",
+        "source": "compatibility/rc/bazel-build-only-subjects.json.gz"
+      },
+      "scope": "Exact direct Python source-analysis child only. Full JS export also transpiles finite TS DATA; avoid conflating that export with the Python-only child.",
+      "executed_here": false
+    },
+    {
+      "id": "python-version",
+      "source": {
+        "path": "scripts/packed-upstream-ledger-base.mjs",
+        "sha256": "239329b95403e09eff67ce9ef6225c479574675b3e82deb3422ff11bb850c7f2",
+        "bytes": 118364
+      },
+      "current_export_or_entrypoint": "pythonVersion()",
+      "argv": [
+        "python3",
+        "-c",
+        "import sys;print(sys.version.split()[0])"
+      ],
+      "cwd": "21.x worktree root",
+      "existing_parent_timeout_ms": null,
+      "stdin": null,
+      "scope": "Version only; original parent call has no timeout.",
+      "executed_here": false
+    },
+    {
+      "id": "authored-population",
+      "source": {
+        "path": "scripts/authored-current-use-inventory.mjs",
+        "sha256": "41d662ab92853a6ca25a2d487d0301f7aa986edfb80c919a7beafc08a252f7a9",
+        "bytes": 9780
+      },
+      "current_export_or_entrypoint": "scanCurrentAuthoredUses default files",
+      "argv": [
+        "rg",
+        "--files",
+        "--hidden",
+        "--no-ignore",
+        "projects/ngx-material-legacy",
+        "--glob",
+        "*.ts",
+        "--glob",
+        "!*.spec.ts"
+      ],
+      "cwd": "21.x worktree root",
+      "existing_parent_timeout_ms": null,
+      "stdin": null,
+      "scope": "Population subprocess only; not full exported TS authored-use analysis. Original parent call has no timeout.",
+      "executed_here": false
+    },
+    {
+      "id": "accessor-population",
+      "source": {
+        "path": "scripts/value-accessor-token-source-review.mjs",
+        "sha256": "13107e6d3f1bbb0b881d3b0415f72667950a386954ccd2c4490c716e8f13f523",
+        "bytes": 10687
+      },
+      "current_export_or_entrypoint": "scanValueAccessorTokenUses population child",
+      "argv": [
+        "rg",
+        "--files",
+        "projects/ngx-material-legacy",
+        "-g",
+        "*.ts",
+        "-g",
+        "!*.spec.ts"
+      ],
+      "cwd": "21.x worktree root",
+      "existing_parent_timeout_ms": null,
+      "stdin": null,
+      "scope": "Population subprocess only; exported scanner additionally constructs TS program/typechecker. Original parent call has no timeout.",
+      "executed_here": false
+    }
+  ],
+  "explicit_exclusions": [
+    "Acquisition/capture archive extraction",
+    "Dependency install/npm/pack/compiler/build",
+    "Actual browser launch/native/packed gate",
+    "Full inherited execution helpers/style admission",
+    "Full root/snack owner"
+  ],
+  "scope_caveats": [
+    "Only first5 are standalone maintained leaf diagnostic entrypoints. Others are direct source-analysis/population/version child commands rather than substitutes for their containing owners.",
+    "No new timeout is asserted where original child had none. Parent may impose its own outer cap, recorded separately.",
+    "A direct exported browser inspector success and full browser CLI probe success are distinct; CLI retains cold/late loops.",
+    "Bazel Python stdin must remain exact decoded authenticated subject DATA. No old Git code executed."
+  ]
+}
