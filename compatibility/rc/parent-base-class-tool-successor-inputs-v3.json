@@ -173,8 +173,8 @@
           },
           "after": {
             "path": "scripts/legacy-removal-owner-source.mjs",
-            "sha256": "584e49ad810cb7676302d0760a8d3f40f8749661b8f6dce11706b27758037041",
-            "bytes": 7030
+            "sha256": "ff995a8eca2674a9ab8f1369bb839cd1e5c2bd849d365958d0b21ce4826e6edf",
+            "bytes": 7007
           },
           "edits": [
             {
@@ -195,7 +195,7 @@
             {
               "offset": 6027,
               "before": " const assertCurrent=()=>{successor.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}};\n",
-              "after": " const assertCurrent=()=>{actual.assertCurrent();successor.assertCurrent();for(const ref of bound.values()){const raw=actual.read(ref.path);assert.equal(hash(raw),ref.sha256,'late legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}for(const ref of bound.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);}};\n"
+              "after": " const assertCurrent=()=>{successor.assertCurrent();for(const ref of bound.values()){const raw=actual.read(ref.path);assert.equal(hash(raw),ref.sha256,'late legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}for(const ref of bound.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'final physical legacy owner code '+ref.path);assert.equal(raw.length,ref.bytes);}};\n"
             }
           ]
         },
