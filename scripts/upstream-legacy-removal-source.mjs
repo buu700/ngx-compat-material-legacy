@@ -7,6 +7,8 @@
 /** Complete original-object authentication only; substantive review is separate. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
+import {types} from 'node:util';
+import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
 import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {gunzipSync,inflateSync} from 'node:zlib';
@@ -23,6 +25,32 @@ const SOURCE={path:'compatibility/rc/21x-legacy-removal-source-originals.json.gz
 const CENSUS={path:'compatibility/rc/upstream-complete-patch-census.json.gz',sha256:'806433925a6216b52b26a98b3b91eb7129a506ab0363573b7cc21063c1366e97'};
 const SELF='scripts/upstream-legacy-removal-source.mjs',image=readFileSync(fileURLToPath(import.meta.url));
 const hash=raw=>createHash('sha256').update(raw).digest('hex'),git=(kind,raw)=>createHash('sha1').update(kind+' '+raw.length+'\0').update(raw).digest('hex');
+const planner=composeCanonicalSourceGuards, functionToString=Function.prototype.toString;
+const equals=Buffer.prototype.equals, apply=Reflect.apply;
+const equal=(a,b)=>Buffer.isBuffer(b)&&apply(equals,a,[b]);
+const PLANNER=Object.freeze({path:'scripts/canonical-source-guard-plan.mjs',sha256:'4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f',bytes:4609});
+function assertPlanner(root){
+ assert.equal(composeCanonicalSourceGuards,planner,'changed legacy source planner');
+ assert.equal(hash(apply(functionToString,planner,[])),'fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947','unauthenticated legacy source planner');
+ const raw=readEvidenceMember(root,PLANNER.path);assert.equal(hash(raw),PLANNER.sha256);assert.equal(raw.length,PLANNER.bytes);
+}
+// A missing or malformed initial tuple leaves the complete original guard opaque.
+// After capture every identity and descriptor remains part of the real graph.
+function childTuple(subject){
+ try{
+  if(!subject||typeof subject!=='object'||types.isProxy(subject))return null;
+  const ds=Object.getOwnPropertyDescriptors(subject), names=['assertCurrent','guardNode','guardPlan'];
+  if(names.some(k=>!ds[k]||!Object.hasOwn(ds[k],'value')))return null;
+  const guard=ds.assertCurrent.value,node=ds.guardNode.value,plan=ds.guardPlan.value;
+  if(typeof guard!=='function'||types.isProxy(guard)||!node||typeof node!=='object'||types.isProxy(node)||!plan||typeof plan!=='object'||types.isProxy(plan)||Object.getPrototypeOf(plan)!==Object.prototype||!Object.isFrozen(plan))return null;
+  const pd=Object.getOwnPropertyDescriptors(plan),keys=Reflect.ownKeys(pd);
+  if(keys.some(k=>typeof k!=='string')||keys.sort().join(',')!=='assertCurrent,node'||keys.some(k=>!Object.hasOwn(pd[k],'value'))||pd.assertCurrent.value!==guard||pd.node.value!==node)return null;
+  return {node,check(){for(const k of names){const d=Object.getOwnPropertyDescriptor(subject,k),old=ds[k];assert.ok(d&&Object.hasOwn(d,'value'));for(const flag of ['value','enumerable','configurable','writable'])assert.equal(d[flag],old[flag],'changed legacy child '+k);}
+   const now=Object.getOwnPropertyDescriptors(plan);assert.deepEqual(Reflect.ownKeys(now).sort(),['assertCurrent','node']);for(const k of ['assertCurrent','node'])for(const flag of ['value','enumerable','configurable','writable'])assert.equal(now[k][flag],pd[k][flag],'changed legacy child plan '+k);
+  }};
+ }catch{return null;}
+}
+
 const zero='0'.repeat(40),lines=text=>text.match(/[^\n]*\n|[^\n]+$/g)??[];
 function binaryLiterals(patch){
  const alphabet='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~';assert.equal(alphabet.length,85);
@@ -107,11 +135,14 @@ export function authenticateLegacyRemovalOriginals(capsule,census){
  return {schema_version:1,line:'21.x',sha:SHA,complete_original_files:746,original_text_hunks:hunks,modified_files:44,deleted_files:702,authenticated_binary_deletions:binary,authenticated_empty_text_deletions:empty,authenticated_tree_objects:trees.size,untouched_tagged_members:tagged.length,tagged_primary_testing_API_files:44,tagged_API_goldens:44,complete_changed_population_derived_from_tree_objects:true,all_text_hunks_replayed_to_exact_after_blobs:true,both_binary_literals_reconstructed:true,substantive_hunk_or_ownership_review_completed:false,canonical_decisions_changed:0,upstream_code_executed:false,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 }
 export function inspectLegacyRemovalOriginals({root,read=path=>readEvidenceMember(root,path)}={}){
- const bound=new Map(),member=ref=>{const raw=read(ref.path);assert.ok(Buffer.isBuffer(raw));assert.ok(raw.equals(readEvidenceMember(root,ref.path)));if(ref.sha256)assert.equal(hash(raw),ref.sha256,'changed original source '+ref.path);bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return raw;};
+ assertPlanner(root);let active=false;const idle=()=>assert.equal(active,false,'reentrant legacy originals');
+ const physical=path=>readEvidenceMember(root,path),bound=new Map(),member=ref=>{idle();const before=physical(ref.path);active=true;let raw;try{raw=read(ref.path);}finally{active=false;}assert.ok(equal(before,raw));assert.ok(equal(before,physical(ref.path)));if(ref.sha256)assert.equal(hash(raw),ref.sha256,'changed original source '+ref.path);bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return raw;};
  const raw=member(SOURCE),censusRaw=member(CENSUS);member({path:SELF,sha256:hash(image)});
  const original=JSON.parse(gunzipSync(raw,{maxOutputLength:64*1024*1024})),census=JSON.parse(gunzipSync(censusRaw,{maxOutputLength:64*1024*1024})),facts=authenticateLegacyRemovalOriginals(original,census);
- const assertCurrent=()=>{for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late original source '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readEvidenceMember(root,ref.path)));}};
- assertCurrent();return {bound:structuredClone([...bound.values()]),facts:structuredClone(facts),assertCurrent};
+ const sweep=()=>{for(const ref of bound.values()){const raw=physical(ref.path);assert.equal(hash(raw),ref.sha256,'late original source '+ref.path);assert.equal(raw.length,ref.bytes);}};
+ const guardNode=Object.freeze({dependencies:Object.freeze([]),preflight:()=>{idle();assertPlanner(root);sweep();},consume:()=>{idle();for(const ref of bound.values()){const before=physical(ref.path);assert.equal(hash(before),ref.sha256);assert.equal(before.length,ref.bytes);active=true;let raw;try{raw=read(ref.path);}finally{active=false;}assert.ok(equal(before,raw),'nonphysical original source '+ref.path);assert.ok(equal(before,physical(ref.path)),'changed original source during callback '+ref.path);}},final:()=>{idle();sweep();assertPlanner(root);}});
+ const composed=planner(Object.freeze([guardNode])),assertCurrent=()=>{idle();composed();};const guardPlan=Object.freeze({assertCurrent,node:guardNode});
+ assertCurrent();return {bound:structuredClone([...bound.values()]),facts:structuredClone(facts),assertCurrent,guardNode,guardPlan};
 }
 
 /** Finite branch-native source review; no CLI, old program, compiler callback or success cache. */
@@ -135,9 +166,11 @@ function legacyRemovalProductPopulation(root){
 }
 export function inspectLegacyRemovalSourceReview({root,read:providedRead=path=>legacyRemovalPhysical(root,path)}={}){
  assert.equal(resolve(root),resolve(dirname(fileURLToPath(import.meta.url)),'..'));
- const physicalBoundary=canonicalSourcePhysicalBoundary({root,read:providedRead});
+ assertPlanner(root);let active=false;const idle=()=>assert.equal(active,false,'reentrant legacy source review');
+ const checkedProvidedRead=path=>{idle();active=true;try{return providedRead(path);}finally{active=false;}};
+ const physicalBoundary=canonicalSourcePhysicalBoundary({root,read:checkedProvidedRead});
  const bound=new Map(),readCurrent=path=>{
-  const raw=physicalBoundary.read(path);assert.ok(Buffer.isBuffer(raw));
+  idle();const raw=physicalBoundary.read(path);assert.ok(Buffer.isBuffer(raw));
   const prior=bound.get(path);if(prior){assert.equal(hash(raw),prior.sha256);assert.equal(raw.length,prior.bytes);}else bound.set(path,{path,sha256:hash(raw),bytes:raw.length});return raw;
  };
  const repairs=historicalContractRepairSourceSubject({root,read:readCurrent});
@@ -258,6 +291,14 @@ const report={schema_version:1,line:'21.x',role:'current owned source boundary o
  }
  assert.deepEqual(counts,review.deletion_group_counts);assert.equal(modified.length,44);assert.equal(deleted.length,702);assert.equal(modified.reduce((total,row)=>total+row.hunks.length,0),97);
  const productPaths=[...product];
- const assertCurrent=()=>{repairs.assertCurrent();original.assertCurrent();currentSass.assertCurrent();assert.deepEqual(legacyRemovalProductPopulation(root),productPaths,'changed complete legacy product population');for(const ref of bound.values()){const raw=readCurrent(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}physicalBoundary.assertPhysical();};
- assertCurrent();return {bound:structuredClone([...bound.values()]),assertCurrent,review:structuredClone(review),report:structuredClone(report),historical_comparison_report:structuredClone(expected),qualified_product_reference_successors:sourceComparison.changed_source_references,current_sass_reference_successors:sassReferenceSuccessors,facts:{line:'21.x',sha:SHA,complete_original_files:746,original_text_hunks:797,nondeletion_hunks_individually_reviewed:97,deleted_paths_complete_membership:702,fresh_original_and_owned_boundary_review:true,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};
+ const originalGuard=()=>{idle();repairs.assertCurrent();original.assertCurrent();currentSass.assertCurrent();assert.deepEqual(legacyRemovalProductPopulation(root),productPaths,'changed complete legacy product population');for(const ref of bound.values()){const raw=readCurrent(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}physicalBoundary.assertPhysical();};
+ const children=[repairs,original,currentSass].map(childTuple);let assertCurrent=originalGuard,guardNode,guardPlan;
+ if(children.every(Boolean)){
+  const checkChildren=()=>{idle();for(const child of children)child.check();};
+  const sweep=()=>{assert.deepEqual(legacyRemovalProductPopulation(root),productPaths,'changed complete legacy product population');physicalBoundary.assertPhysical();for(const ref of bound.values()){const raw=legacyRemovalPhysical(root,ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}};
+  guardNode=Object.freeze({dependencies:Object.freeze(children.map(child=>child.node)),preflight:()=>{checkChildren();assertPlanner(root);sweep();},consume:()=>{checkChildren();for(const ref of bound.values()){const raw=readCurrent(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}checkChildren();},final:()=>{checkChildren();sweep();assertPlanner(root);checkChildren();}});
+  let composed;try{composed=planner(Object.freeze([guardNode]));}catch{guardNode=undefined;}
+  if(composed){assertCurrent=()=>{idle();composed();};guardPlan=Object.freeze({assertCurrent,node:guardNode});}
+ }
+ assertCurrent();return {bound:structuredClone([...bound.values()]),assertCurrent,...(guardPlan?{guardNode,guardPlan}:{}),review:structuredClone(review),report:structuredClone(report),historical_comparison_report:structuredClone(expected),qualified_product_reference_successors:sourceComparison.changed_source_references,current_sass_reference_successors:sassReferenceSuccessors,facts:{line:'21.x',sha:SHA,complete_original_files:746,original_text_hunks:797,nondeletion_hunks_individually_reviewed:97,deleted_paths_complete_membership:702,fresh_original_and_owned_boundary_review:true,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};
 }

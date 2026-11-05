@@ -13,6 +13,7 @@ import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {authoredUseReviewEvidence} from './authored-use-inventory.mjs';
+import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
 const SELF='scripts/historical-contract-repair-source.mjs',INPUTS='compatibility/rc/historical-contract-repair-source-inputs.json';
 const PINS={'21.x':'c1d7a8762cad7913a5d4ad60863afb506c56c61d27a78c17a3f5372c51cc9303',main:'cee92383ce1cb2c82b135e2e3b8be0131a46b114d60a521f7e11e4d0bb017191'};
 const image=readFileSync(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex'),originals=new Map();
@@ -43,12 +44,22 @@ function original(root,parent,path){
  }return Buffer.from(originals.get(id));
 }
 const reference=(path,raw)=>({path,sha256:hash(raw),bytes:raw.length});
+const planner=composeCanonicalSourceGuards, functionToString=Function.prototype.toString;
+const equals=Buffer.prototype.equals,apply=Reflect.apply;
+const equal=(a,b)=>Buffer.isBuffer(b)&&apply(equals,a,[b]);
+const PLANNER=Object.freeze({path:'scripts/canonical-source-guard-plan.mjs',sha256:'4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f',bytes:4609});
+function assertPlanner(root){
+ assert.equal(composeCanonicalSourceGuards,planner,'changed historical repair guard planner');
+ assert.equal(hash(functionToString.call(planner)),'fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947','unauthenticated historical repair guard planner');
+ const raw=readEvidenceMember(root,PLANNER.path);assert.equal(hash(raw),PLANNER.sha256,'changed physical historical repair guard planner');assert.equal(raw.length,PLANNER.bytes);
+}
 
 export function historicalContractRepairSourceSubject({root=process.cwd(),read:providedRead}={}){
- root=resolve(root);const physical=path=>readHistoricalContractRepairMember(root,path),bound=new Map();
+ root=resolve(root);assertPlanner(root);const physical=path=>readHistoricalContractRepairMember(root,path),bound=new Map();
  const read=path=>{
   const actual=physical(path);
-  if(providedRead){const provided=providedRead(path);assert.ok(Buffer.isBuffer(provided)&&provided.equals(actual),'nonphysical current historical-repair input '+path);}
+  if(providedRead){const provided=providedRead(path);assert.ok(equal(actual,provided),'nonphysical current historical-repair input '+path);}
+  assert.ok(equal(actual,physical(path)),'historical-repair input changed during callback '+path);
   const ref=reference(path,actual),previous=bound.get(path);if(previous)assert.deepEqual(ref,previous,'input changed during historical-repair qualification '+path);else bound.set(path,ref);return actual;
  };
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
@@ -107,24 +118,42 @@ export function historicalContractRepairSourceSubject({root=process.cwd(),read:p
  for(const row of review.reviews){assert.equal(known.has(key(row)),false);known.add(key(row));const source=images.get('projects/ngx-material-legacy/'+row.file);assert.ok(source);assert.equal(row.candidate_source_sha256,source.after.sha256);}
  const reviewed=authoredUseReviewEvidence({symbol_uses:review.reviews.map(row=>({file:row.file,module:row.module,symbol:row.symbol,status:'reviewed',disposition:'closed',source_review:data.current_use_review}))},line,read,hash);
  assert.equal(reviewed.reviewed,95);assert.equal(reviewed.insufficient,0);
- const selectedReference=(ref,side)=>{
+ let active=false;
+ const idle=()=>assert.equal(active,false,'reentrant historical repair source operation');
+ const selectedReferenceCore=(ref,side)=>{
   const row=images.get(ref.path);if(!row)return null;
   const previous=ref.sha256===row.before.sha256?row.before:ref.sha256===row.after.sha256?row.after:null;assert.ok(previous,'unreviewed historical-repair source reference '+ref.path);
   if(ref.bytes!==undefined)assert.equal(ref.bytes,previous.bytes);
   const actual=physical(ref.path);assert.equal(hash(actual),row.after.sha256,'late actual historical-repair source '+ref.path);assert.equal(actual.length,row.after.bytes);
-  if(providedRead)assert.ok(Buffer.from(providedRead(ref.path)).equals(actual),'nonphysical historical-repair source reference '+ref.path);
+  if(providedRead)assert.ok(equal(actual,Buffer.from(providedRead(ref.path))),'nonphysical historical-repair source reference '+ref.path);
+  assert.ok(equal(actual,physical(ref.path)),'historical-repair source reference changed during callback '+ref.path);
   return {...ref,sha256:row[side].sha256,...(ref.bytes===undefined?{}:{bytes:row[side].bytes})};
  };
+ const selectedReference=(ref,side)=>{
+  if(!images.has(ref.path))return null;
+  idle();active=true;try{return selectedReferenceCore(ref,side);}finally{active=false;}
+ };
  const qualify=ref=>selectedReference(ref,'after'),historicalReference=ref=>selectedReference(ref,'before');
- const compareSourceReport=(current,historical)=>{
+ const compareSourceReport=(current,historical)=>{idle();active=true;try{
   assert.ok(Array.isArray(historical.current_members)&&historical.current_members.length>1000,'expected complete immutable source boundary');
   const derived=structuredClone(historical);let changed=0;
-  derived.current_members=derived.current_members.map(ref=>{const selected=qualify(ref);if(!selected)return ref;if(selected.sha256!==ref.sha256)changed++;return selected;});
+  derived.current_members=derived.current_members.map(ref=>{const selected=selectedReferenceCore(ref,'after');if(!selected)return ref;if(selected.sha256!==ref.sha256)changed++;return selected;});
   assert.equal(changed,4,'source boundary must contain all four repair preimages');assert.deepEqual(current,derived,'fresh source facts differ beyond the four qualified reference successors');
   return {current_metadata:derived,historical_comparison:structuredClone(historical),changed_source_references:changed,metadata_comparison_only:true,old_product_bytes_exposed:false};
- };
- const assertCurrent=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);if(providedRead)assert.ok(Buffer.from(providedRead(ref.path)).equals(actual),'late nonphysical historical-repair input '+ref.path);}};
- assertCurrent();return {line,images:structuredClone([...images.values()]),bound:structuredClone([...bound.values()]),qualify,historicalReference,compareSourceReport,assertCurrent,
+ }finally{active=false;}};
+ const sweep=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);}};
+ const guardNode=Object.freeze({dependencies:Object.freeze([]),
+  preflight:()=>{idle();assertPlanner(root);sweep();},
+  consume:()=>{idle();active=true;try{for(const ref of bound.values()){
+   const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);
+   if(providedRead)assert.ok(equal(actual,Buffer.from(providedRead(ref.path))),'late nonphysical historical-repair input '+ref.path);
+   assert.ok(equal(actual,physical(ref.path)),'historical-repair input changed during callback '+ref.path);
+  }}finally{active=false;}},
+  final:()=>{idle();sweep();assertPlanner(root);},
+ });
+ const composed=planner(Object.freeze([guardNode])),assertCurrent=()=>{idle();composed();};
+ const guardPlan=Object.freeze({assertCurrent,node:guardNode});
+ assertCurrent();return {line,guardNode,guardPlan,images:structuredClone([...images.values()]),bound:structuredClone([...bound.values()]),qualify,historicalReference,compareSourceReport,assertCurrent,
   current_use_reviews:95,current_use_current_input_bindings:currentBindings,current_use_historical_roster_metadata_inputs:historicalBindings,current_use_historical_canonical_context_inputs:historicalCanonicalBindings,canonical_context_admission_granted:false,
   old_product_bytes_exposed:false,current_read_route_returned:false,canonical_rosters_or_dispositions_changed:false,
   current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};

@@ -26,7 +26,14 @@ const context=legacyRemovalOwnerContext({root,read,composeSourceGuards:true});re
 assert.ok(Object.isFrozen(context.guardPlan)&&Object.isFrozen(context.guardNode));
 assert.equal(context.guardPlan.assertCurrent,context.assertCurrent);assert.equal(context.guardPlan.node,context.guardNode);
 assert.equal(context.guardNode.dependencies.length,2);
-const source=context.guardNode.dependencies[1];
+// A distributed source graph exposes local predicates, not one opaque whole
+// source guard. Reproduce the scheduler's dependency-first identity traversal
+// for each phase so every actual scope participates exactly once per phase.
+const ordered=[],visited=new Set(),active=new Set();
+const visit=node=>{assert.equal(active.has(node),false,'cyclic real guard graph');if(visited.has(node))return;active.add(node);for(const child of node.dependencies)visit(child);active.delete(node);visited.add(node);ordered.push(node);};
+visit(context.guardNode);assert.ok(ordered.length>2,'expected actual distributed source graph');
+const runPhase=phase=>{for(const node of ordered)Reflect.apply(node[phase],undefined,[]);};
+const source=Object.freeze({preflight:()=>runPhase('preflight'),consume:()=>runPhase('consume'),final:()=>runPhase('final')});
 const inspector=Object.getOwnPropertyDescriptor(admission,'inspectCanonicalSource');
 assert.equal(Function.prototype.toString.call(inspector.value),Function.prototype.toString.call(tableAdmission.inspectCanonicalSource));
 if(group==='cold'){
@@ -64,7 +71,7 @@ if(group==='cold'){
  source.consume();assert.ok(calls>0);const count=calls;reset();
  const alternate=composeCanonicalSourceGuards(Object.freeze([context.guardNode]));
  let nested=false;
- onRead=()=>{if(calls===count&&!nested){nested=true;for(const operation of [context.assertCurrent,alternate,source.preflight,source.consume,source.final]){const prior=calls;reject(operation,error=>error.message.includes('reentrant'));assert.equal(calls,prior);}}};
+ onRead=()=>{if(calls===count&&!nested){nested=true;for(const operation of [context.assertCurrent,alternate,context.guardNode.preflight,context.guardNode.consume,context.guardNode.final]){const prior=calls;reject(operation,error=>error.message.includes('reentrant'));assert.equal(calls,prior);}}};
  try{source.consume();assert.equal(nested,true);}finally{reset();}
  const suppliedFailure=new Error('actual supplied callback failed');let reached=false;
  onRead=path=>{if(path===target){reached=true;throw suppliedFailure;}};
@@ -73,14 +80,14 @@ if(group==='cold'){
 }else{
  const later=operation=>composeCanonicalSourceGuards(Object.freeze([context.guardNode,Object.freeze({dependencies:Object.freeze([]),preflight:()=>{},consume:operation,final:()=>{}})]));
  let reached=false;
- try{reject(later(()=>{reached=true;write(target,Buffer.concat([before,drift]));}),error=>error.message.includes('changed legacy removal admission source '+target));assert.equal(reached,true);}
+ try{reject(later(()=>{reached=true;write(target,Buffer.concat([before,drift]));}),error=>error.message.includes(target)&&/physical|changed|late/.test(error.message));assert.equal(reached,true);}
  finally{write(target,before);reset();}
  reached=false;
  try{reject(later(()=>{reached=true;write(population,extra);}),error=>error.message.includes('changed complete legacy product population'));assert.equal(reached,true);}
  finally{unlinkSync(join(root,population));reset();}
  let last=0;source.consume();last=calls;reset();let swapped=false;
  onRead=()=>{if(calls===last){swapped=true;Object.defineProperty(admission,'inspectCanonicalSource',{...inspector,value:tableAdmission.inspectCanonicalSource});}};
- try{reject(source.consume,error=>error.message.includes('changed legacy canonical source inspector'));assert.equal(swapped,true);}
+ try{reject(()=>{source.consume();source.final();},error=>error.message.includes('changed legacy canonical source inspector'));assert.equal(swapped,true);}
  finally{Object.defineProperty(admission,'inspectCanonicalSource',inspector);reset();}
  context.assertCurrent();assert.ok(calls>0);reset();
 }

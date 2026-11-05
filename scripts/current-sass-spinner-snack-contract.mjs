@@ -19,7 +19,7 @@ const SELF = 'scripts/current-sass-spinner-snack-contract.mjs';
 const INPUTS = 'compatibility/rc/parallel-spinner-snack-css-contract-inputs-v1.json';
 const SOURCE_INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json';
 const PINS = [
-  ['scripts/current-sass-source.mjs', '4fa09c23f2a55b24fe3e412793f66868e8e5fc17cc161bee6dc4d2706536d346', 14051],
+  ['scripts/current-sass-source.mjs', 'eb96891168b146becaf5cbd9e437509a3e2371945e982fc58ca6b343cefb4160', 15564],
   [SOURCE_INPUTS, '46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9', 20239],
   ['scripts/sass-spinner-snack-bridge-contract.mjs', '5fe7386872355fa2261856a64392433b29e332d40446c4c03a95db4a5d36ba46', 15205],
   [INPUTS, 'fd78f8c7f6e072fb7393c61aef782ccdf3a1c8d009227d08b29921ea2809e0a8', 237068],

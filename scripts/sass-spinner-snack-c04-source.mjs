@@ -145,7 +145,7 @@ export function spinnerSnackC04Source(args){
   assertCurrent();assert.deepEqual(currentSnapshot,expected,'C04 report changed beyond the exact five-module source successor: '+kind);assertCurrent();assert.deepEqual(captureCurrentSassMetadata(current),currentSnapshot,'C04 current report changed during final source guards');const result=structuredClone(historical);boundary.assertPhysical();return result;
  };
  const finish=operation=>{const result=operation();boundary.assertPhysical();return result;};
- const publicBridge={...structuredClone(Object.fromEntries(Object.entries(bridge).filter(([,value])=>typeof value!=='function'))),qualify:ref=>finish(()=>bridge.qualify(ref)),assertCurrent:()=>finish(()=>bridge.assertCurrent()),assertHistoricalSource:(path,expected)=>finish(()=>bridge.assertHistoricalSource(path,expected))};
+ const publicBridge={...structuredClone(Object.fromEntries(Object.entries(bridge).filter(([key,value])=>!['guardNode','guardPlan'].includes(key)&&typeof value!=='function'))),qualify:ref=>finish(()=>bridge.qualify(ref)),assertCurrent:()=>finish(()=>bridge.assertCurrent()),assertHistoricalSource:(path,expected)=>finish(()=>bridge.assertHistoricalSource(path,expected))};
  assertCurrent();const result={bridge:publicBridge,qualify,assertCurrent,assertReportSuccessor,
   bound:structuredClone(bound),
   summary:structuredClone(summary),

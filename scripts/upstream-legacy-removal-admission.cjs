@@ -10,6 +10,9 @@ const assert=require('node:assert/strict');
 const {createHash}=require('node:crypto');
 const {readFileSync}=require('node:fs');
 const {join,resolve}=require('node:path');
+const {types}=require('node:util');
+const {composeCanonicalSourceGuards}=require('./canonical-source-guard-plan.mjs');
+const {readHistoricalContractRepairOwnerMember}=require('./historical-contract-repair-readers.mjs');
 const ROOT=resolve(__dirname,'..'),HANDLER='scripts/upstream-legacy-removal-admission.cjs';
 const SHA='f7e3ae3bd1b86d5987df57bb06d350001c592931';
 const REVIEW="compatibility/rc/21x-legacy-removal-admission-individual-review.json",REVIEW_HASH="0463edeb805c14023d197271aa290536f0d23d1fbed3f1f31948668506b2e4b1",DIFF="d1477575b2278fe7848fbc158df11dfcc142698ec496a34c0c340f6e3b37826c";
@@ -38,17 +41,53 @@ function metadataOk({entry,body,review,proof=entry?.individual_proof}){
   assert.deepEqual(proof,legacyRemovalProof(body));assert.deepEqual(entry.individual_proof,proof);return true;
  }catch{return false;}
 }
+const planner=composeCanonicalSourceGuards,functionToString=Function.prototype.toString,equals=Buffer.prototype.equals;
+const PLANNER=Object.freeze({path:'scripts/canonical-source-guard-plan.mjs',sha256:'4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f',bytes:4609});
+function assertPlanner(root){
+ assert.equal(require('./canonical-source-guard-plan.mjs').composeCanonicalSourceGuards,planner);
+ assert.equal(hash(Reflect.apply(functionToString,planner,[])),'fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947');
+ const raw=readHistoricalContractRepairOwnerMember(root,PLANNER.path);assert.equal(hash(raw),PLANNER.sha256);assert.equal(raw.length,PLANNER.bytes);
+}
+function completeChild(subject){
+ try{
+  if(!subject||typeof subject!=='object'||types.isProxy(subject))return null;
+  const ds=Object.getOwnPropertyDescriptors(subject),gd=ds.assertCurrent,pd=ds.guardPlan;
+  if(!gd||!pd||!Object.hasOwn(gd,'value')||!Object.hasOwn(pd,'value'))return null;
+  const plan=pd.value;if(!plan||typeof plan!=='object'||types.isProxy(plan)||!Object.isFrozen(plan)||Object.getPrototypeOf(plan)!==Object.prototype)return null;
+  const dsPlan=Object.getOwnPropertyDescriptors(plan);
+  if(Reflect.ownKeys(dsPlan).some(k=>typeof k!=='string')||Reflect.ownKeys(dsPlan).sort().join(',')!=='assertCurrent,node'||!Object.hasOwn(dsPlan.assertCurrent,'value')||!Object.hasOwn(dsPlan.node,'value')||dsPlan.assertCurrent.value!==gd.value||typeof gd.value!=='function'||types.isProxy(gd.value))return null;
+  const node=dsPlan.node.value;if(!node||typeof node!=='object'||types.isProxy(node))return null;
+  return {node,check:()=>{
+   for(const [object,key,before] of [[subject,'assertCurrent',gd],[subject,'guardPlan',pd],[plan,'assertCurrent',dsPlan.assertCurrent],[plan,'node',dsPlan.node]]){const now=Object.getOwnPropertyDescriptor(object,key);assert.ok(now&&Object.hasOwn(now,'value'));for(const flag of ['value','enumerable','writable','configurable'])assert.equal(now[flag],before[flag],'changed legacy admission child '+key);}
+   assert.ok(Object.isFrozen(plan));assert.deepEqual(Reflect.ownKeys(plan).sort(),['assertCurrent','node']);
+  }};
+ }catch{return null;}
+}
 /** Fresh object, hunk, API, Sass, test and complete current-source verification. */
-function inspectSource({entry,body,review,proof,root=ROOT,read=path=>readFileSync(join(root,path))}){
- assert.equal(resolve(root),ROOT);assert.equal(metadataOk({entry,body,review,proof}),true);
+function inspectSource({entry,body,review,proof,root=ROOT,read:suppliedRead=path=>readFileSync(join(root,path))}){
+ assert.equal(resolve(root),ROOT);assert.equal(metadataOk({entry,body,review,proof}),true);assertPlanner(root);
+ let active=false;const idle=()=>assert.equal(active,false,'reentrant legacy admission source');
+ const read=path=>{idle();active=true;try{return suppliedRead(path);}finally{active=false;}};
  const tools=historicalContractRepairReaderSubject({root,read});
- const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,BOUNDARY,VERIFIER,SUCCESSOR,handlerRef,{path:body.patch_file,sha256:DIFF}].map(ref=>tools.qualify(ref)??{...ref});
+ const bound=[{path:REVIEW,sha256:REVIEW_HASH},QUALIFICATION,SOURCE_REVIEW,BOUNDARY,VERIFIER,SUCCESSOR,handlerRef,PLANNER,{path:body.patch_file,sha256:DIFF}].map(ref=>tools.qualify(ref)??{...ref});
  for(const ref of tools.bound)if(!bound.some(member=>member.path===ref.path))bound.push({...ref});
  const assertBound=()=>{for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed legacy removal admission source '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}};
  assertBound();assert.deepEqual(JSON.parse(read(REVIEW)),body);
  const source=require('./upstream-legacy-removal-source.mjs').inspectLegacyRemovalSourceReview({root,read});
  assert.deepEqual(source.review,JSON.parse(read(SOURCE_REVIEW.path)));assert.deepEqual(source.historical_comparison_report,JSON.parse(read(BOUNDARY.path)));
- const assertCurrent=()=>{tools.assertCurrent();assertBound();source.assertCurrent();assertBound();};assertCurrent();return {bound:[...bound,...source.bound],assertCurrent,facts:source.facts};
+ const originalGuard=()=>{idle();tools.assertCurrent();assertBound();source.assertCurrent();assertBound();};
+ const children=[tools,source].map(completeChild);let assertCurrent=originalGuard,guardNode,guardPlan;
+ if(children.every(Boolean)){
+  const metadata=()=>{idle();assertPlanner(root);for(const child of children)child.check();};
+  const physical=()=>{for(const ref of bound){const raw=readHistoricalContractRepairOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'physical legacy admission input '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}};
+  guardNode=Object.freeze({dependencies:Object.freeze(children.map(child=>child.node)),
+   preflight:()=>{metadata();physical();},
+   consume:()=>{metadata();for(const ref of bound){const before=readHistoricalContractRepairOwnerMember(root,ref.path);assert.equal(hash(before),ref.sha256);if(ref.bytes!==undefined)assert.equal(before.length,ref.bytes);const supplied=read(ref.path);assert.ok(Buffer.isBuffer(supplied)&&Reflect.apply(equals,before,[supplied]),'nonphysical legacy admission input '+ref.path);assert.ok(Reflect.apply(equals,before,[readHistoricalContractRepairOwnerMember(root,ref.path)]),'legacy admission input changed during callback '+ref.path);}metadata();},
+   final:()=>{metadata();physical();metadata();}});
+  let composed;try{composed=planner(Object.freeze([guardNode]));}catch{guardNode=undefined;}
+  if(composed){assertCurrent=()=>{idle();composed();};guardPlan=Object.freeze({assertCurrent,node:guardNode});}
+ }
+ assertCurrent();return {bound:[...bound,...source.bound],assertCurrent,...(guardPlan?{guardNode,guardPlan}:{}),facts:source.facts};
 }
 function sourceOk(args){try{const source=inspectSource(args);source.assertCurrent();return true;}catch{return false;}}
 function inspectCanonicalSource({entries,body,...args}){

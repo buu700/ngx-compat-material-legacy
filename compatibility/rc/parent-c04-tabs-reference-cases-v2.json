@@ -1,0 +1,232 @@
+{
+  "schema": "parent-c04-tabs-reference-cases-v2",
+  "status": "unexecuted fixture and source-derived observation contract; no browser or candidate observation",
+  "reference": {
+    "material": "16.2.14",
+    "untouched_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "design": "/tmp/parent-c04-tabs-browser-oracle-jit-design-v1.json",
+    "fixture": "/tmp/parent-c04-tabs-reference-app-v2.mjs"
+  },
+  "harness_contract": {
+    "fresh_page_per_case": true,
+    "ready": "Wait for c04-ready or inspect c04BootstrapError; a bootstrap failure fails the reference attempt.",
+    "input": "Initial query parameters: animations=enabled|noop, preserve=true|false, contentTabIndex=0|unset, selected=0|1. Bounded runtime setters accept preserve boolean and contentTabIndex null or 0; selected accepts 0 or 1. Call setters independently and observe resulting state.",
+    "observation": "Capture full snapshots at initial settling, immediately after each action, first animation frame, and completion: event sequence with timestamp/action marker, panel and content wrapper styles and rects, child and focusable descendant styles and rects, local animation records, DOM and focus, and lifecycle. getAnimations subtree support is feature-detected; unavailable or throwing yields inconclusive, not motion completion. Capture CDP AX separately.",
+    "user_actions": "Use actual browser pointer and keyboard actions on role=tab elements, not synthetic events or internal members. Call markExternalAction immediately before each such action to mark the event stream; action IDs record observation context, not causal proof. Focus/select and bounded state setters use NgZone.run.",
+    "completion": "For initial settling, waitFor with requireAnimationDone=false requires selected DOM agreement, two stable frames and no pending/running local animations. Before each transition save the event-array length and call waitFor with afterEvent and requireAnimationDone=true; it also requires selected DOM agreement, two stable frames and no pending/running local animations. Missing event or deadline is inconclusive/failure, never a passing fixed sleep. Unsupported animation inspection is explicitly inconclusive. A void animationDone after the cursor cannot prove which cancelled or reversed cycle produced it; retain all timestamps and action markers for external analysis.",
+    "identity": "Compare panel name and instance number across snapshots with lifecycle create/destroy events. The child is a lazy consumer ng-template so its lifecycle is observable without modifying the library.",
+    "isolation": "Reference and candidate run in independent pages and injectors with the same browser binary, viewport, DPR, fonts, action sequence and appropriate styles. Never create reference expectations from candidate output."
+  },
+  "source_grounded_expectations": [
+    "The 16 tab-group template gives each tab role=tab, aria-controls, aria-selected and each panel role=tabpanel, id and aria-labelledby; compare actual associations, not generated identifier spelling.",
+    "Only the selected panel receives the configured contentTabIndex when non-null; no panel gets the attribute when it is null. The original group panel template has no aria-hidden binding; record the actual attribute without imposing it as an accessibility rule.",
+    "The original declares selectedTabChange, selectedIndexChange and animationDone outputs. Record emitted values and order; do not assume every operation emits any particular sequence without runtime evidence.",
+    "preserveContent retains previously attached tab content; with preservation disabled the original may detach it after its leaving transition. Observe identity and lifecycle after actual completion, rather than assuming exact timing or focus relocation."
+  ],
+  "cases": [
+    {
+      "id": "initial-default-enabled",
+      "config": {
+        "animations": "enabled",
+        "preserve": false,
+        "contentTabIndex": null,
+        "selected": 0
+      },
+      "actions": [],
+      "observe": [
+        "selected Alpha and associated panel",
+        "default panel tabindex",
+        "initial child instances and lifecycle",
+        "focus and AX"
+      ]
+    },
+    {
+      "id": "initial-second-noop-tabindex",
+      "config": {
+        "animations": "noop",
+        "preserve": false,
+        "contentTabIndex": 0,
+        "selected": 1
+      },
+      "actions": [],
+      "observe": [
+        "selected Beta and associated panel",
+        "only active panel tabindex zero",
+        "initial child and AX"
+      ]
+    },
+    {
+      "id": "program-change-focus-outgoing-detach",
+      "config": {
+        "animations": "enabled",
+        "preserve": false,
+        "contentTabIndex": 0,
+        "selected": 0
+      },
+      "actions": [
+        "focusPanel(alpha)",
+        "select(1)",
+        "wait for new animationDone and stable selected DOM"
+      ],
+      "observe": [
+        "outgoing focused descendant at immediate, first-frame and completion",
+        "events and attachment",
+        "alpha destroy or retained identity as actually observed",
+        "computed visibility and AX"
+      ]
+    },
+    {
+      "id": "program-change-focus-outgoing-preserved",
+      "config": {
+        "animations": "enabled",
+        "preserve": true,
+        "contentTabIndex": 0,
+        "selected": 0
+      },
+      "actions": [
+        "focusPanel(alpha)",
+        "select(1)",
+        "wait for new animationDone and stable selected DOM",
+        "select(0)",
+        "wait for new animationDone and stable selected DOM"
+      ],
+      "observe": [
+        "outgoing focus and visibility at each phase",
+        "alpha instance retained on return",
+        "events and lifecycle",
+        "AX after each completion"
+      ]
+    },
+    {
+      "id": "noop-detach-roundtrip",
+      "config": {
+        "animations": "noop",
+        "preserve": false,
+        "contentTabIndex": null,
+        "selected": 0
+      },
+      "actions": [
+        "select(1)",
+        "wait for new animationDone and stable selected DOM",
+        "select(0)",
+        "wait for new animationDone and stable selected DOM"
+      ],
+      "observe": [
+        "attachment, create and destruction timing",
+        "instance identity on return",
+        "public event stream"
+      ]
+    },
+    {
+      "id": "noop-preserved-roundtrip",
+      "config": {
+        "animations": "noop",
+        "preserve": true,
+        "contentTabIndex": null,
+        "selected": 0
+      },
+      "actions": [
+        "select(1)",
+        "wait for new animationDone and stable selected DOM",
+        "select(0)",
+        "wait for new animationDone and stable selected DOM"
+      ],
+      "observe": [
+        "retained alpha identity and attachment",
+        "public event stream",
+        "computed visibility and focus"
+      ]
+    },
+    {
+      "id": "keyboard-navigation-selection",
+      "config": {
+        "animations": "enabled",
+        "preserve": false,
+        "contentTabIndex": 0,
+        "selected": 0
+      },
+      "actions": [
+        "focus Alpha tab with browser input",
+        "send ArrowRight using browser keyboard",
+        "record focused and selected tabs",
+        "send Enter using browser keyboard if selection has not already changed",
+        "wait for new animationDone and stable selected DOM"
+      ],
+      "observe": [
+        "focused versus selected header after each key",
+        "public selection events",
+        "tab/panel association",
+        "focus and AX"
+      ]
+    },
+    {
+      "id": "pointer-selection",
+      "config": {
+        "animations": "enabled",
+        "preserve": false,
+        "contentTabIndex": null,
+        "selected": 0
+      },
+      "actions": [
+        "click Beta tab with browser pointer",
+        "wait for new animationDone and stable selected DOM"
+      ],
+      "observe": [
+        "selected tab and panel",
+        "focus target",
+        "events",
+        "lifecycle"
+      ]
+    },
+    {
+      "id": "rapid-reverse-enabled",
+      "config": {
+        "animations": "enabled",
+        "preserve": true,
+        "contentTabIndex": 0,
+        "selected": 0
+      },
+      "actions": [
+        "select(1)",
+        "capture immediate state and first animation frame",
+        "select(0) before the first transition completes",
+        "wait for new animationDone and stable selected DOM"
+      ],
+      "observe": [
+        "intermediate and final selection",
+        "all public events without imposed count or ordering",
+        "instance identity",
+        "focus, visibility and AX"
+      ],
+      "guard": "If the first transition already completed before reverse can be issued, record the case as not exercised, not passed; browser must use the same action scheduling for both runtimes."
+    },
+    {
+      "id": "runtime-input-changes",
+      "config": {
+        "animations": "noop",
+        "preserve": false,
+        "contentTabIndex": null,
+        "selected": 0
+      },
+      "actions": [
+        "setContentTabIndex(0), then wait for stable selected DOM without requiring a new animationDone",
+        "setPreserve(true), then wait for stable selected DOM without requiring a new animationDone",
+        "select(1), await new animationDone and settled animations",
+        "select(0), await new animationDone and settled animations"
+      ],
+      "observe": [
+        "active panel tabindex after runtime setter",
+        "identity and lifecycle across preservation changes",
+        "event and action markers, computed child visibility and local animations"
+      ]
+    }
+  ],
+  "limitations": [
+    "No build, JIT bootstrap, browser, accessibility or runtime observation has been performed.",
+    "Compiler 16 package integrity and isolated reference environment remain to be established. Angular 16 partial-compiled JIT compatibility is unproved.",
+    "waitFor relies on requestAnimationFrame, local Web Animations inspection and public animationDone; missing events or unsupported inspection are inconclusive. The void event cannot identify a cancelled or reversed transition; inspect the complete recorded sequence externally. Feature detection cannot independently establish that a browser correctly implements the subtree option.",
+    "Stable selected DOM alone does not establish that an animation is complete. CSS must be supplied equally by the later independent harness; this fixture does not fabricate the original component styles.",
+    "No screen-reader behavior or owner qualification is claimed.",
+    "CSS rects and computed styles are observations, not alone proof of accessibility-tree exposure. Non-local animations or CSS behavior outside the tab group are outside local animation inspection."
+  ]
+}

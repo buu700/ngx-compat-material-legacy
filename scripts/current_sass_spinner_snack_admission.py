@@ -17,8 +17,8 @@ SELF = 'scripts/current_sass_spinner_snack_admission.py'
 INPUTS = 'compatibility/rc/parallel-spinner-snack-css-contract-inputs-v1.json'
 SOURCE_INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json'
 PINS = [
-    ('scripts/current-sass-source.mjs', '4fa09c23f2a55b24fe3e412793f66868e8e5fc17cc161bee6dc4d2706536d346', 14051),
-    ('scripts/current_sass_source.py', '0252222d3712c2baaac0d8b97442207e9297f231ecf64a50234cc1af1c413df9', 13870),
+    ('scripts/current-sass-source.mjs', 'eb96891168b146becaf5cbd9e437509a3e2371945e982fc58ca6b343cefb4160', 15564),
+    ('scripts/current_sass_source.py', '2a8672f63c9639b6e600240db25a7148573f778caaae69a768fd27eb6b435ab3', 13870),
     (SOURCE_INPUTS, '46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9', 20239),
     ('scripts/sass_spinner_snack_bridge_admission.py', '66a9ad634bede4e0eeef23ece0fe50d49d6fbf28d5bc619da0873d6ec8fae0f3', 19824),
     (INPUTS, 'fd78f8c7f6e072fb7393c61aef782ccdf3a1c8d009227d08b29921ea2809e0a8', 237068),

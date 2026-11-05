@@ -26,7 +26,7 @@ const hash=b=>createHash('sha256').update(b).digest('hex'),image=readFileSync(fi
 const raw=readFileSync(new URL('../'+INPUTS,import.meta.url));assert.equal(hash(raw),'fd78f8c7f6e072fb7393c61aef782ccdf3a1c8d009227d08b29921ea2809e0a8');
 const packet=JSON.parse(raw),contexts=new WeakMap(),referenceRuns=new WeakMap();
 const dependencies=[
- ['scripts/current-sass-spinner-snack-contract.mjs','daf5e32273427d49a9088011c68649c39e8806ad44f8ca4d7de0190c546a1603'],
+ ['scripts/current-sass-spinner-snack-contract.mjs','1d826e445dcd35f19d3bc5529f54248966cb3151833f5e7319badf904881e3e7'],
  ['scripts/sass-spinner-snack-bridge-contract.mjs','5fe7386872355fa2261856a64392433b29e332d40446c4c03a95db4a5d36ba46'],
  ['scripts/sass-spinner-snack-aggregate-contract.mjs','2e5a955774961793e0578fd17e6d47ce5d72fe8d60a5f56daa442ab5528bc4c0'],
  ['scripts/current-sass-card-aggregate-contract.mjs','02208408e559bca7f99e73b75ad060d2a96a51deab8f26ed515a8ff6a4bd2b0c'],

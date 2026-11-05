@@ -12,6 +12,7 @@ import {lstatSync, readFileSync, realpathSync} from 'node:fs';
 import {isAbsolute, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {types} from 'node:util';
+import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
 
 const SELF = 'scripts/current-sass-source.mjs';
 const INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json';
@@ -28,6 +29,11 @@ const blobHash = bytes => createHash('sha1').update('blob ' + bytes.length + '\0
 const bufferEquals = Buffer.prototype.equals;
 const equalBytes = (actual, supplied) => Buffer.isBuffer(supplied) && Reflect.apply(bufferEquals, actual, [supplied]);
 const reference = (path, bytes) => ({path, sha256: hash(bytes), bytes: bytes.length});
+const planner = composeCanonicalSourceGuards;
+const plannerFunctionImage = 'fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947';
+const plannerReference = Object.freeze({path: 'scripts/canonical-source-guard-plan.mjs',
+  sha256: '4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f', bytes: 4609});
+const functionToString = Function.prototype.toString;
 
 function safe(path) {
   assert.equal(typeof path, 'string');
@@ -115,6 +121,14 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   assert.ok(lstatSync(root).isDirectory() && !lstatSync(root).isSymbolicLink());
   assert.ok(providedRead === undefined || typeof providedRead === 'function');
   const bound = new Map();
+  const assertPlanner = () => {
+    assert.equal(composeCanonicalSourceGuards, planner);
+    assert.equal(hash(Reflect.apply(functionToString, planner, [])), plannerFunctionImage);
+    assert.deepEqual(reference(plannerReference.path, physical(root, plannerReference.path)), plannerReference,
+      'changed current Sass guard planner');
+  };
+  // Authenticate executable policy before the first supplied callback.
+  assertPlanner();
   const assertPhysical = () => {
     for (const row of bound.values()) assert.deepEqual(reference(row.path, physical(root, row.path)), row, 'changed final physical source ' + row.path);
   };
@@ -133,6 +147,7 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
     assert.equal(bytes.length, row.bytes);
     return bytes;
   };
+  member(plannerReference);
   assert.ok(equalBytes(read(SELF), image));
   const raw = read(INPUTS);
   assert.equal(hash(raw), INPUTS_SHA);
@@ -213,11 +228,22 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
     sourceSets[currentHash] = current;
     sourceSetSuccessors.push({historical_sha256: historicalHash, current_sha256: currentHash});
   }
-  const assertCurrent = () => {
-    for (const row of [...bound.values()]) member(row);
-    assertPhysical();
+  let active = false;
+  const idle = () => assert.equal(active, false, 'reentrant current Sass source');
+  const phase = operation => () => {
+    idle(); active = true;
+    try { assertPlanner(); operation(); assertPlanner(); }
+    finally { active = false; }
   };
+  const guardNode = Object.freeze({dependencies: Object.freeze([]),
+    preflight: phase(assertPhysical),
+    consume: phase(() => {for (const row of bound.values()) member(row);}),
+    final: phase(assertPhysical)});
+  const composed = planner(Object.freeze([guardNode]));
+  const assertCurrent = () => {idle(); composed();};
+  const guardPlan = Object.freeze({assertCurrent, node: guardNode});
   const qualify = incoming => {
+    idle();
     const original = metadata(incoming), row = transitions.find(row => row.path === original.path);
     if (!row) return null;
     const selected = [row.before, row.current].find(value => value.sha256 === original.sha256);
@@ -230,6 +256,7 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
     return result;
   };
   const assertHistoricalSource = (path, expected) => {
+    idle();
     const row = transitions.find(row => row.path === safe(path));
     assert.ok(row && (typeof expected === 'string' || Buffer.isBuffer(expected)));
     const copy = Buffer.from(expected);
@@ -240,7 +267,7 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
     assertPhysical();
     return {path, before_sha256: row.before.sha256, current_sha256: row.current.sha256, exact_historical_comparison: true, current_physical_source_guarded: true};
   };
-  const result = {root, line, assertCurrent, qualify, assertHistoricalSource, bound: structuredClone([...bound.values()]),
+  const result = {root, line, assertCurrent, guardNode, guardPlan, qualify, assertHistoricalSource, bound: structuredClone([...bound.values()]),
     transitions: structuredClone(transitions), source_sets: structuredClone(sourceSets), source_set_successors: structuredClone(sourceSetSuccessors),
     descriptor: structuredClone({source_subject: reference(SELF, image), source_packet: reference(INPUTS, raw), source_modules: transitions.map(row => row.current)}),
     source_scope_only: true, metadata_refs_qualified: 5, current_source_reads_are_physical: true,

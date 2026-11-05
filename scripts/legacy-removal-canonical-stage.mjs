@@ -102,19 +102,22 @@ export function legacyRemovalOwnerContext({root,read=path=>readFileSync(join(roo
  for(const[path,raw]of [[LEGACY_REMOVAL_LEDGER,actualLedger],[LEGACY_REMOVAL_REGISTRY,actualRegistry]])bound.set(path,{path,sha256:hash(raw),bytes:raw.length});
  // The default and a missing complete dependency use the entire original
  // construction and guard, including its original supplied reader.
- let phase='consume',sourceActive=false,stageActive=false;
- const idle=()=>{assert.equal(sourceActive,false,'reentrant legacy admission source');assert.equal(stageActive,false,'reentrant legacy canonical stage');};
+ let phase='consume',sourceActive=false,stageActive=false,callbackActive=false;
+ const idle=()=>{assert.equal(sourceActive,false,'reentrant legacy admission source');assert.equal(stageActive,false,'reentrant legacy canonical stage');assert.equal(callbackActive,false,'reentrant legacy source callback');};
  const checkedSourceRead=path=>{
   assert.ok(phase==='consume'||phase==='physical','invalid legacy source phase');
   const physical=readHistoricalContractRepairOwnerMember(root,path);
   if(phase==='physical')return physical;
-  const supplied=read(path);assert.ok(equal(physical,supplied),'nonphysical legacy admission source '+path);
+  assert.equal(callbackActive,false,'reentrant legacy source callback');callbackActive=true;let supplied;
+  try{supplied=read(path);}finally{callbackActive=false;}
+  assert.ok(equal(physical,supplied),'nonphysical legacy admission source '+path);
   assert.ok(equal(physical,readHistoricalContractRepairOwnerMember(root,path)),'legacy admission changed during callback '+path);
   return physical;
  };
  if(dependency){dependency.check();checkInspector();}
  const source=dependency?loadedInspector({root,read:checkedSourceRead,entries:stage.entries,body}):admission.inspectCanonicalSource({root,read,entries:stage.entries,body});
  const sourceGuard=dependency?own(source,'assertCurrent'):null;
+ const sourceDependency=dependency?completeTools(source):null;
  for(const incoming of source.bound){
   const ref={...incoming};
   if(ref.bytes===undefined){
@@ -130,14 +133,14 @@ export function legacyRemovalOwnerContext({root,read=path=>readFileSync(join(roo
   const physicalLedger=tools.bound.find(ref=>ref.path===LEGACY_REMOVAL_LEDGER);assert.ok(physicalLedger,'missing authenticated legacy physical ledger');
   const physicalBound=[...bound.values()].map(ref=>({...ref,...(ref.path===LEGACY_REMOVAL_LEDGER?physicalLedger:{})}));
   const physicalByPath=new Map(physicalBound.map(ref=>[ref.path,ref]));
-  const metadata=()=>{checkInspector();dependency.check();same(source,'assertCurrent',sourceGuard);};
+  const metadata=()=>{checkInspector();dependency.check();same(source,'assertCurrent',sourceGuard);if(sourceDependency)sourceDependency.check();};
   const sweep=()=>{for(const ref of physicalBound){const raw=readHistoricalContractRepairOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'physical legacy canonical input '+ref.path);assert.equal(raw.length,ref.bytes);}};
   const executeSource=next=>{
    idle();assert.equal(phase,'consume','changed legacy source phase');sourceActive=true;
    try{phase=next;metadata();assert.equal(apply(sourceGuard.value,undefined,[]),undefined,'legacy source guard returned a value');metadata();}
    finally{phase='consume';sourceActive=false;}
   };
-  const sourceNode=Object.freeze({dependencies:Object.freeze([]),
+  const sourceNode=sourceDependency?sourceDependency.node:Object.freeze({dependencies:Object.freeze([]),
    preflight:()=>{executeSource('physical');},
    consume:()=>{executeSource('consume');},
    final:()=>{executeSource('physical');},

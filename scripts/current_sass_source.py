@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SELF = 'scripts/current_sass_source.py'
 INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json'
 INPUTS_SHA = '46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9'
-SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='4fa09c23f2a55b24fe3e412793f66868e8e5fc17cc161bee6dc4d2706536d346', bytes=14051)
+SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='eb96891168b146becaf5cbd9e437509a3e2371945e982fc58ca6b343cefb4160', bytes=15564)
 ADDITIONAL = ['projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss',
               'projects/ngx-material-legacy/styles/button/_button-theme.scss',
               'projects/ngx-material-legacy/styles/card/_card-theme.scss']

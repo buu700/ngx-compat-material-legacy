@@ -3,11 +3,13 @@
 # Use of this source code is governed by the MIT license in LICENSE.
 """Full original population and independent replay; no source disposition pass."""
 from pathlib import Path
-import collections,copy,gzip,hashlib,json,os,re,subprocess,unittest
+import collections,copy,gzip,hashlib,json,os,re,subprocess,unittest,sys
 from current_sass_canonical_test_scope import current_canonical_test_frame
 from table_local_compilation_owner_source import table_predecessor_data
 from historical_contract_repair_source import qualify_source_reference
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'scripts'))
+from current_sass_source import CurrentSassSource
 PREFIX='compatibility/rc/21x-legacy-removal-source-'
 def sha(raw):return hashlib.sha256(raw).hexdigest()
 def static_names(path,body,current=None,seen=()):
@@ -46,9 +48,17 @@ def check_review(original,review,boundary):
     rows=review['complete_deleted_path_membership'];assert [row['path']for row in rows]==[row['path']for row in deleted]
     members={row['path']:row for row in boundary['current_members']}
     assert len(members)==len(boundary['current_members'])
+    sass=CurrentSassSource(ROOT)
+    repair_successors=sass_successors=0
     for member in members.values():
         current=qualify_source_reference(member,ROOT)
+        repair_successors+=current['sha256']!=member['sha256']
+        prior=current
+        current=sass.qualify(current) or current
+        sass_successors+=current['sha256']!=prior['sha256']
         raw=(ROOT/member['path']).read_bytes();assert sha(raw)==current['sha256'];assert len(raw)==current['bytes']
+    sass.assert_current()
+    assert repair_successors==4 and sass_successors==5
     for actual,expected in zip(rows,deleted):
         assert actual['before_blob']==expected['before_blob'];assert actual['before_sha256']==expected['before']['sha256'];assert actual['patch_sha256']==expected['patch_sha256']
         assert actual['hunks']==[{k:h[k]for k in ['index','sha256']}for h in expected['hunks']]

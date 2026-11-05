@@ -30,7 +30,7 @@ PREVIOUS_INPUTS = dict(path='compatibility/rc/current-sass-tool-reference-inputs
                        sha256='ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f', bytes=478008)
 CHECKPOINTS = {'21.x': 'b25aedd02f7b53e8cd8dfcdad369a806a1301619',
                'main': '5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'}
-INPUTS_SHA = '1f5b7d412216614f49cc600fd8f000df2ddd2627b7ddc20f0ed14c31e9e28958'
+INPUTS_SHA = 'fede9d004968e81c13a5de2ec27be201003513d83735f55f3f8c6d7c01ef48eb'
 _IMAGE = Path(__file__).read_bytes()
 
 
@@ -275,8 +275,9 @@ class CurrentSassToolReferences:
             if row is not None:
                 assert update['before'] == dict(path=path, **row['after']), 'V3 overlay does not follow exact V2 current row'
             else:
-                assert self.line == '21.x' or path in V3_REGRESSION_SOURCE_ANCHORS[self.line], 'unknown non-21.x V3 new-row path'
+                assert self.line == '21.x' or path == 'scripts/historical-contract-repair-source.mjs' or path in V3_REGRESSION_SOURCE_ANCHORS[self.line], 'unknown non-21.x V3 new-row path'
                 finite_before = {
+                    'scripts/historical-contract-repair-source.mjs': dict(path=path, sha256='d4870c2cc12609da71b03c1745996693dd26444b2dfd848260cfda1ac3514da5', bytes=13052),
                     'scripts/legacy-removal-canonical-stage.mjs': dict(path=path, sha256='9b5021340fcab66f2c2b45447b5162f0e25b002b45c7ea7c062c8087dfb80d6c', bytes=8412),
                     'tests/test_packed_upstream_ledger_epoch.py': dict(path=path, sha256='f7b3ae0ede9bd62fb033c49017a84d5b4ca81ce8b7920d72a105b1df1393e6df', bytes=17868),
                     'scripts/browser-reference-source.mjs': dict(path=path, sha256='59f2ac538149e0d9b2176c231a97147862881fb19b46768a5a4e450d66f9fe38', bytes=10443),
@@ -292,6 +293,8 @@ class CurrentSassToolReferences:
                 finite_before.update({key: anchor['before'] for key, anchor in V3_REGRESSION_SOURCE_ANCHORS[self.line].items()})
                 assert path in finite_before, 'unknown V3 new-row path'
                 assert update['before'] == finite_before[path]
+                if path == 'scripts/historical-contract-repair-source.mjs':
+                    assert update['before'] == historical['unchanged_source_subject'], 'historical repair overlay must follow the immutable source identity'
                 anchor = V3_REGRESSION_SOURCE_ANCHORS[self.line].get(path) or V3_SOURCE_ANCHORS.get(path)
                 if anchor is not None:
                     anchor_packet = json.loads(self._member(anchor['packet']))
