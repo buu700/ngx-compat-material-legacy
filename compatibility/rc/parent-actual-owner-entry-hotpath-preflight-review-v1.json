@@ -1,0 +1,19 @@
+{
+  "scope": "Read-only preflight of scratch V8 actual-owner entry controller and worksheet. No runtime, repo edits, diagnostic, owner or profile execution.",
+  "controller": "/tmp/run-parent-actual-owner-entry-hotpath-v1.py",
+  "controller_sha256": "0c8e7c9556049a85e50249dba1cfdab62b1efd3c8b23802c961d882bfb459ad6",
+  "worksheet_binding": "Controller SHA-256 and size 3717 bytes match worksheet. Owner probe output path conforms to its prefix requirement and initially absent.",
+  "finding": {
+    "issue": "Terminal receipt lost for malformed or partial owner report",
+    "detail": "After group timeout kill/reap and after snapshot, existing out is parsed with json.loads before the receipt is opened. Empty, truncated, invalid JSON or unreadable output throws and produces no terminal receipt; a hard timeout can interrupt writeFileSync.",
+    "fix": "Record raw output path, size and digest when present; catch decode/JSON/type errors and place descriptive failure in exclusive terminal receipt, preserving the original output. Avoid treating malformed/partial output as a successful owner result. Also capture snapshot/log errors as structured terminal status where possible, without hiding failure."
+  },
+  "observations": [
+    "Pinned node path, --prof explicit fresh /tmp logfile, output prefix, fresh exclusive receipt, 4096 heap, separate session, deadline=180s and killpg(SIGKILL)/communicate reap on timeout are explicit. Full qualification remains unprofiled 1800s and is not claimed.",
+    "Pre/post snapshots enumerate both roots tracked paths, reject symlinks/nonregular tracked files, hash size and bytes and capture both HEADs. Identical aggregate hashes/counts are supported by exact in-memory before/after equality. The tracked-only snapshot does not independently cover untracked or ignored owner inputs, TypeScript peer bytes, directory population, modes or Git repository internals; do not state all owner source or environment bytes are bound by this snapshot.",
+    "Snapshot before captures current HEAD but is not compared to a separately supplied expected post-worksheet-commit identity. Record immutable post-commit HEADs and V7 provenance externally, ensure the diagnostic source cut contains the passing source code plus approved worksheet/receipt additions, and prevent stale reused output.",
+    "Git snapshot function strips inherited GIT_* variables, but the owner child inherits GIT_* other than RC_ variables. Some actual owner Git calls inherit environment. For reproducible immutable source attribution, sanitize potentially redirecting Git environment in child as well or explicitly bind and verify clean environment.",
+    "No broad cleanup is performed; output/log are preserved. Group kill covers ordinary descendants in the same process group; a process that deliberately creates a separate session is not covered. On launcher interruption or unexpected communicate failure, lifecycle and receipt are not explicitly protected by a top-level finally; add cleanup/failure receipt if this controller must guarantee those cases.",
+    "V7 passed-fault counts are externally supplied and not independently checked here; prior V9 timeout or hypothetical hotspot is not proof of this diagnostic\u2019s reached stack. No performance, full owner, product, release, C04 or G11 conclusion follows."
+  ]
+}
