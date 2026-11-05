@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "role": "One bounded empty-source-lane duplicate guard optimization candidate",
+  "basis": {
+    "path": "compatibility/rc/parent-public-owner-performance-worksheet-v1.json",
+    "sha256": "062e8923d1774a749ada070a1096bf8fb1e7ed2a7bc8eee89a0bc1a477623e55",
+    "bytes": 2551
+  },
+  "before": {
+    "path": "scripts/packed-upstream-ledger-epoch.mjs",
+    "sha256": "b4e4d64b39da7324d13cf621446cae1c3d7c99766cf4fd025cfcdfda7bb689f3",
+    "bytes": 85882
+  },
+  "patch_DATA": "--- a/scripts/packed-upstream-ledger-epoch.mjs\n+++ b/scripts/packed-upstream-ledger-epoch.mjs\n@@ -117,7 +117,7 @@\n  }\n  const assertCurrent=()=>{for(const frame of frames){frame.guard();for(const row of frame.references.values()){\n   for(const[reader,ref]of [[frame.read,row.before],[frame.raw,row.after]]){const raw=reader(ref.path);assert.ok(Buffer.isBuffer(raw));assert.equal(hash(raw),ref.sha256,'changed canonical source-lane reference '+ref.path);assert.equal(raw.length,ref.bytes);}\n- }frame.guard();}};\n+ }if(frame.references.size)frame.guard();}};\n  const comparisonReference=ref=>{\n   let result={...ref};\n   for(const frame of [...frames].reverse()){\n",
+  "patch_sha256": "733705818fbb8782a0a89e600ecba40fabeae7695f1d5054cc657efa72775845",
+  "candidate_sha256": "0180e5b116db7d3ac699087d0fd8e842309dfb747e3b4a89c75155066650ac34",
+  "decision": "Skip only the second consecutive full guard for a frame with no projected references. The first complete guard and its internal callbacks always execute. Frames with comparisons retain both bracketing guards. No source/receipt/data cache or authority surface added.",
+  "observable_difference": "This removes an otherwise duplicate reader-callback invocation sequence. Reader call counts are not treated as stable API. All actual bytes consumed remain validated, and first-guard metadata and final physical checks remain. Genuine cold/late and final-callback mutation controls must be measured; static reasoning is not a pass.",
+  "static_empty_route": "Exact physical426/69 matches baseclass before; appliedfalse makes sole LEDGER metadataRead equalphysical, so genuine bindSourceMetadata creates empty references.",
+  "static_nonempty_route": "Genuine inventory role projects authenticated prior inventory/workflow/title handler metadata; its comparisons retain before+after guards.",
+  "original_test_lifetimes": "Public/cold owner calls, rejected cases and late success-then-corruption lifetimes remain unchanged. No timeout or case count change.",
+  "canonical_files_changed": false,
+  "product_changes": false,
+  "runtime_qualified": false,
+  "g11_claim": "not-passed"
+}

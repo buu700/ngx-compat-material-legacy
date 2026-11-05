@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "role": "Followup diagnosis and withdrawal of unsuccessful empty-reference guard optimization",
+  "basis": {
+    "path": "compatibility/rc/parent-public-owner-performance-worksheet-v1.json",
+    "sha256": "062e8923d1774a749ada070a1096bf8fb1e7ed2a7bc8eee89a0bc1a477623e55",
+    "bytes": 2551
+  },
+  "candidate": {
+    "path": "compatibility/rc/parent-source-lane-empty-guard-candidate-v1.json",
+    "sha256": "44537d70a96eb2e6a9766ff85cebc63df64abb9aedb9cbf13c1bfab2066da756",
+    "bytes": 2644
+  },
+  "attempted_profile_DATA": {
+    "path": "compatibility/rc/parent-source-lane-empty-guard-inputs-v1.json",
+    "sha256": "5d27c66d2ed6096923289c2f9c543af7de5fdfd82d87fdb13a346a738088c529",
+    "bytes": 161948
+  },
+  "result": {
+    "path": "compatibility/rc/parent-public-epoch-positive-diagnostic-unprofiled-v2.json",
+    "sha256": "676f72aa05e10f35558900500401e59db592ea94aa5a1bd850c8ecf0851b0a21",
+    "bytes": 1846
+  },
+  "decision": "Candidate still reached180-second diagnostic cap. Root restored exact prior epoch source and paired1839 profile/factory inputs before separate packed-probe integration. No optimization remains in current epoch source.",
+  "restored_epoch": {
+    "path": "scripts/packed-upstream-ledger-epoch.mjs",
+    "sha256": "b4e4d64b39da7324d13cf621446cae1c3d7c99766cf4fd025cfcdfda7bb689f3",
+    "bytes": 85882
+  },
+  "independent_attribution": {
+    "scope": "Read-only inspection of 21.x epoch owner, physical boundary and canonical stages; existing profile reviewed. No maintained files, Git state or profile modified; no owner run or performance experiment executed.",
+    "evidence": [
+      "scripts/base-class-removal-canonical-stage.mjs:86-91 metadataRead(LEDGER) calls frames.assertCurrent(), then read(path), then frames.ledgerSubject().raw. scripts/base-class-removal-owner-source.mjs:169-173 ledgerSubject calls the same full frames.assertCurrent() again.",
+      "Frame guard iterates every bound member, reading actual physical bytes, invoking supplied read, rereading physical bytes and ending with physicalSweep. Nested physical boundary itself verifies physical bytes before and after supplied callback and retains final sweep state.",
+      "Metadata readers are stacked by epoch.mjs bindSourceMetadata and inherited across table, legacy, inventory and title. Their repeated guard walks call the base-class metadata reader for LEDGER, multiplying redundant physical scans. Epoch assertCurrent and historical wrappers also sandwich prior guards. The existing source-lane empty-reference change does not remove the repeated base-class frame sweeps.",
+      "Profile identifies readEvidenceMember, path traversal and lstat, with stacks through base-class checkedRead, physicalSweep and nested canonical readers. It does not prove an individual edit meets the 180-second budget."
+    ],
+    "minimal_candidate": {
+      "location": "scripts/base-class-removal-canonical-stage.mjs:88",
+      "change": "Remove only the initial frames.assertCurrent() inside metadataRead(LEDGER); keep current=read(path), frames.ledgerSubject().raw comparison, and return behavior exactly as-is. ledgerSubject performs a full frames.assertCurrent() after the reader callback; this preserves frame reference checks, callback-vs-physical comparison, final physical sweep, and comparison to retained actual ledger. All outer/current owner guards remain unchanged.",
+      "caveat": "This changes ordering and callback invocation counts; it is a candidate, not a proven equivalent or sufficient repair. A malicious stateful reader can react differently to different invocation counts, so verify cold and callback-triggered mutations. A direct standalone metadataRead caller must still be tested. Existing identity-authenticated source packet and hash lineage may require an exact authorized successor; do not rewrite DATA-authenticated historical bytes or bypass actual current source verification."
+    },
+    "if_insufficient": "Measure guard invocation counts on bounded scratch instrumentation with no replacement of actual physical readers. A larger private projection boundary could compose already-qualified predecessor transforms but must retain one full fresh pre/after public-operation guard, each supplied-reader call and final physical sweep; do not add a reentrancy/global guard skip or cached receipts. Such a redesign changes timing of callback effects and requires explicit proof; insufficient evidence here to prescribe it as behavior-equivalent.",
+    "required_controls": [
+      "Genuine physical positive public packedUpstreamLedgerEpoch construction, returned assertCurrent and frame.assertCurrent, and historical ledger read; unchanged 180-second deadline, no mocks or persistent caches. Report measured result.",
+      "Direct metadataRead(LEDGER): cold supplied reader discrepancy; reader mutates a non-ledger bound member during ledger callback (including mutation after an earlier pass); reader returns stale/nonphysical ledger; mutation after construction before assertCurrent/read; final physical sweep detects late physical mutations. Confirm throws for each.",
+      "Exact before/after ledger bytes and decision counts across applied and precursor valid physical frames, public raw reader identity, non-ledger public passthrough and all existing historical reference-qualification tests. Keep historical predecessor bytes as DATA only, current executable source and actual physical current authority authenticated.",
+      "Exercise registered roster-reader public route, direct normal supplied reader and nonregistered adversarial reader, plus existing source-identity, bound-reference and path/symlink checks. No test may replace the owner or weaken physical sweeps."
+    ],
+    "status": "Diagnostic attribution only; no verified repair, no positive test completed.",
+    "followup_diagnostic": {
+      "execution": "30-second pinned Node 24.21.0 with preload delegating original fs methods; timed out deliberately, not a passing owner test. Deep 10-second repeat also deliberately timed out. An initial Node 22 launch failed immediately at version identity check.",
+      "counts": "Last periodic snapshot: 551,504 readFileSync, 3,160,000 lstatSync, 25,149 realpathSync. Counts instrumented and incomplete, not benchmark claims. Deep repeat last snapshot: 150,000 reads, 906,269 lstat, 1,773 realpath.",
+      "deep_samples": "Among 75 stack samples (1 per 2,000 reads), 41 came through constructing baseClassRemovalOwnerContext (epoch line 634); 15 through bindSourceMetadata first/second selected owner guard (lines 103/108); 3 through base-class metadataRead passthrough; remaining 16 lacked those frames. No source-lane guard stack sampled in the early 10-second capture. This does not establish which later call dominates total timeout.",
+      "interpretation": "Multiple full, real source sweeps already consume substantial work before source-lane guard enters the picture. Source-lane frames retain actual contexts whose guards use their original projected read closures; merely unwrapping sourceLane.read does not rebind those closures. Replacing frame.guard with an actual-physical context would require proving equivalent behavior for predecessor ledger frames and callbacks; table and legacy guards require predecessor-projected ledger, so this is not a simple substitution.",
+      "constraint": "base-class stage extension is exact historical packet concatenation. Any source-stage edit, including earlier candidate, requires explicit independently verified current successor and preservation of immutable historical data; a changed hash alone is invalid.",
+      "conclusion": "No safe sufficient minimal repair is demonstrated. A proposal to suppress nested callbacks, use raw physical reads in a projection guard, cache receipts or omit final sweeps is unproven and must not be treated as validated."
+    }
+  },
+  "attribution_correction": "The embedded review was written incrementally: its initial scope says no performance experiment while its followup records delegated instrumented experiments. Followup diagnostic details supersede that scope wording. The initial nested-guard attribution is a hypothesis; 10-second early samples do not establish the cause of the full180-second timeout.",
+  "direct_real_context_timing": {
+    "node": "24.21.0",
+    "read": "real disk supplied reader",
+    "outer_cap_seconds": 60,
+    "source_cut": "before packed-probe integration, epoch source candidate and5d27 inputs still present; direct base-class stage and leaf unchanged",
+    "operations": [
+      {
+        "phase": "constructed",
+        "seconds": 4.068077086000001,
+        "bound_length": 1129,
+        "source_facts": {
+          "original_files": 72,
+          "original_hunks": 329,
+          "member_entries": 361,
+          "changed_headers": 71,
+          "tagged_declarations": 65,
+          "historical_source_bindings_revalidated": 715,
+          "qualified_repair_successors": 5,
+          "authenticated_historical_canonical_context": 3,
+          "additional_historical_canonical_reference_occurrences": 1,
+          "pure_original_authentication_reexecuted": true,
+          "pure_individual_hunk_review_reexecuted": true,
+          "source_scope_only": true,
+          "canonical_transaction_delegated_to_shared_owner": true,
+          "canonical_admission_granted": false,
+          "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+          "g11_claim": "not-passed"
+        },
+        "applied": false,
+        "registry_applied": false,
+        "precursor": true
+      },
+      {
+        "phase": "assertCurrent",
+        "seconds": 0.5686755419999999
+      }
+    ],
+    "limited_credit": "Only actual baseClassRemovalOwnerContext construction and one returned assertCurrent completed. No public epoch, phase, full owner or product qualification."
+  },
+  "unresolved": "Need a bounded source-validation composition repair that preserves cold/late callbacks, metadata and final physical checks, with genuine unchanged-byte public runtime controls. No proven sufficient edit yet.",
+  "canonical_files_changed": false,
+  "product_changes": false,
+  "optimization_applied": false,
+  "g11_claim": "not-passed"
+}
