@@ -10,6 +10,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 from sass_mixin_argument_admission import mixin_argument_assertion_ok,mixin_argument_measurements_ok
 from sass_mixin_fixture import mixin_receipt
+from sass_spinner_snack_gate_integration import SPINNER_SNACK_GATE_CASES
 class SassMixinArgumentTests(unittest.TestCase):
     def test_complete_argument_roster_and_actual_measurement_fence(self):
         code=r"""
@@ -40,7 +41,8 @@ try {
  const aggregateColorThemeCases=Object.keys((await import('./scripts/sass-aggregate-color-theme-contract.mjs')).AGGREGATE_COLOR_THEME_CASES);
  const formFieldStateCases=Object.keys((await import('./scripts/sass-form-field-state-contract.mjs')).FORM_FIELD_STATE_ARGUMENT_CASES);
  const rippleCases=Object.keys((await import('./scripts/sass-ripple-color-contract.mjs')).RIPPLE_COLOR_ARGUMENT_CASES);
- assert.deepEqual(result.results.filter(p=>p.result!=='pass').map(p=>p.case_id).sort(),[...sortCases,...treeCases,...additionCases,...aliasCases,...shapeCases,...controlsCases,...aggregateDensityCases,...aggregateTypographyCases,...aggregateColorThemeCases,...formFieldStateCases,...rippleCases].sort());
+ const spinnerSnackCases=(await import('./scripts/sass-spinner-snack-bridge-contract.mjs')).SPINNER_SNACK_BRIDGE_CASES.filter(id=>id.startsWith('mixin-argument/'));
+ assert.deepEqual(result.results.filter(p=>p.result!=='pass').map(p=>p.case_id).sort(),[...new Set([...sortCases,...treeCases,...additionCases,...aliasCases,...shapeCases,...controlsCases,...aggregateDensityCases,...aggregateTypographyCases,...aggregateColorThemeCases,...formFieldStateCases,...rippleCases,...spinnerSnackCases])].sort());
  const observed=result.results[0];assert.equal(mixinArgumentResultsMatch(observed.expected,observed.actual),true);
  assert.equal(mixinArgumentResultsMatch(observed.expected,{...observed.actual,css:'wrong'}),false);
  assert.equal(mixinArgumentResultsMatch(observed.expected,observed.mutation),false);
@@ -58,7 +60,7 @@ try {
             seen_variants=set()
             for probe in catalog['cases']:
                 body=mixin_receipt(ROOT,active,probe['case_id'],'synthetic-invocation')
-                self.assertTrue(mixin_argument_assertion_ok(ROOT,active,body,'synthetic-invocation'))
+                self.assertEqual(mixin_argument_assertion_ok(ROOT,active,body,'synthetic-invocation'),probe['case_id'] not in SPINNER_SNACK_GATE_CASES)
                 if probe['variant'] in seen_variants:continue
                 seen_variants.add(probe['variant'])
                 for key,value in [('line','foreign'),('call',''),('argument','$changed'),('binding',{}),('expected',{}),('identity',{}),('mutation',{}),('mutation_rejected',False)]:

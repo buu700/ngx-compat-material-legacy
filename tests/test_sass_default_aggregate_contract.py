@@ -5,6 +5,7 @@ from types import SimpleNamespace
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 from sass_default_aggregate_admission import DEFAULT_AGGREGATE_CASES,default_aggregate_assertion_ok,default_aggregate_envelope_ok
 from sass_default_aggregate_fixture import default_aggregate_receipt
+from sass_spinner_snack_aggregate_admission import SPINNER_SNACK_AGGREGATE_CASES
 
 def rehash(body,css):
     m=body['actual_measurement'];m.update(css=css,css_sha256=hashlib.sha256(css.encode()).hexdigest(),css_bytes=len(css.encode()));body.update(actual_sha256=m['css_sha256'],actual_bytes=m['css_bytes'])
@@ -72,7 +73,9 @@ class DefaultAggregateContractTests(unittest.TestCase):
         spec=importlib.util.spec_from_file_location('default_aggregate_coordinator',ROOT/'scripts/rc-verify.py');v=importlib.util.module_from_spec(spec);spec.loader.exec_module(v)
         for line in ['main','21.x']:
             for case in DEFAULT_AGGREGATE_CASES:
-                active,body=self.receipt(line,case);v.ACTIVE_RUN=active;self.assertTrue(v._sass_seal_assertion_ok(body,'default-aggregate'))
+                active,body=self.receipt(line,case);v.ACTIVE_RUN=active
+                # Historical pure model receipts omit the new current/source/run capsule.
+                self.assertEqual(v._sass_seal_assertion_ok(body,'default-aggregate'),case not in SPINNER_SNACK_AGGREGATE_CASES)
                 wrong=copy.deepcopy(body);del wrong['current_companion'];self.assertFalse(v._sass_seal_assertion_ok(wrong,'default-aggregate'))
                 wrong=copy.deepcopy(body);wrong['case_id']='mixin-css/button-theme';self.assertFalse(v._sass_seal_assertion_ok(wrong,'default-aggregate'))
 
@@ -81,6 +84,9 @@ class DefaultAggregateContractTests(unittest.TestCase):
 import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {createHash} from 'node:crypto';
 import {DEFAULT_AGGREGATE_CASES,DEFAULT_AGGREGATE_CONTRACT,defaultAggregateExpectedCss,defaultAggregateMeasurementOk,defaultAggregateResultsMatch} from './scripts/sass-default-aggregate-contract.mjs';
 import {compareInventory,classifyPending} from './scripts/sass-api-inventory.mjs';
+import {SPINNER_SNACK_DEFAULT_CASES} from './scripts/sass-spinner-snack-gate-integration.mjs';
+import {SPINNER_SNACK_AGGREGATE_CASES} from './scripts/sass-spinner-snack-aggregate-contract.mjs';
+const blocked=[...SPINNER_SNACK_DEFAULT_CASES,...SPINNER_SNACK_AGGREGATE_CASES.filter(id=>id.startsWith('mixin-css/'))].sort();
 const f=JSON.parse(readFileSync('tests/sass_default_aggregate_fixture.json')),c=JSON.parse(readFileSync('fixtures/sass/default-aggregate-contracts.json')),source=JSON.parse(readFileSync('tests/'+f.source_fixture)),o=JSON.parse(readFileSync('compatibility/rc/oracles/material-16.2.14-sass-api.json')),sha=s=>createHash('sha256').update(s).digest('hex');
 for(const line of ['main','21.x']){
  const css=Object.fromEntries(Object.entries(o.members.mixins).filter(([,e])=>e.invocation.invocable).map(([n,e])=>[n,{css:'',sha256:e.invocation.css_sha256}]));
@@ -91,10 +97,10 @@ for(const line of ['main','21.x']){
   const changed=structuredClone(got);changed.css+='\n.unrelated {color:red}';changed.sha256=sha(changed.css);changed.actual_measurement.css=changed.css;changed.actual_measurement.css_sha256=changed.sha256;changed.actual_measurement.css_bytes=Buffer.byteLength(changed.css);assert.equal(defaultAggregateResultsMatch(id,changed,contract),false);
   const p=structuredClone(peer);p.sources=[];assert.equal(defaultAggregateExpectedCss(id,p),null);
  }
- const results=compareInventory(o,o.members,css);assert.equal(results.length,651);assert.ok(results.every(r=>r.result==='pass'));
+ const results=compareInventory(o,o.members,css);assert.equal(results.length,651);assert.deepEqual(results.filter(r=>r.result!=='pass').map(r=>r.case_id).sort(),blocked);
  for(const id of Object.keys(DEFAULT_AGGREGATE_CASES)){
   const changed={...css,[id.slice(10)]:{...css[id.slice(10)],css:css[id.slice(10)].css+'\n.unrelated {color:red}'}};changed[id.slice(10)].sha256=sha(changed[id.slice(10)].css);
-  assert.deepEqual(classifyPending(compareInventory(o,o.members,changed),{decisions:[]}).filter(r=>r.result!=='pass').map(r=>r.case_id),[id]);
+  assert.deepEqual(classifyPending(compareInventory(o,o.members,changed),{decisions:[]}).filter(r=>r.result!=='pass').map(r=>r.case_id).sort(),[...new Set([...blocked,id])].sort());
  }
  const any=css['all-component-themes'].current_companion;
  const unknown={...css,'button-theme':{...css['button-theme'],current_companion:any}};assert.ok(compareInventory(o,o.members,unknown).some(r=>r.case_id==='mixin-css/button-theme'&&r.result==='fail'));

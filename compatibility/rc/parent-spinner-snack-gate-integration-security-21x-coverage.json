@@ -1,0 +1,82 @@
+{
+  "completeness": "complete",
+  "deferred": [],
+  "documentType": "codex-security.coverage",
+  "excludePaths": [],
+  "explicitExclusions": [
+    {
+      "pattern": "Unchanged unrelated repository areas",
+      "reason": "Bounded diff scan reviewed changed helpers and directly supporting call sites."
+    },
+    {
+      "pattern": "Full CI, packaging, browser, and consumer compatibility gates",
+      "reason": "Those product gates are outside a security diff scan."
+    },
+    {
+      "pattern": "Ordinary Sass bridge proposals",
+      "reason": "They are outside this exact frozen implementation patch."
+    },
+    {
+      "pattern": "Unchanged unrelated repository areas",
+      "reason": "Bounded diff scan reviews changed helpers and directly supporting call sites."
+    }
+  ],
+  "includePaths": [
+    "."
+  ],
+  "inventoryStrategy": "diff",
+  "mode": "working_tree",
+  "openQuestions": [],
+  "scanId": "dcc63883-f8d8-4466-a4a5-2ab8afd55eea",
+  "schemaVersion": "1.0",
+  "surfaces": [
+    {
+      "disposition": "no_issue_found",
+      "id": "callback-trust",
+      "label": "Supplied reader callback and post-callback physical sweep",
+      "notes": "Every callback-bearing accepting route ends with a trusted callback-free bound-set sweep; non-owned passthrough creates no current-source claim.",
+      "receiptRefs": [],
+      "riskArea": "Trust-boundary bypass"
+    },
+    {
+      "disposition": "no_issue_found",
+      "id": "hash-admission",
+      "label": "Owned-path and manifest hash admission",
+      "notes": "Known owned paths require rostered before/after identities; foreign hashes reject.",
+      "receiptRefs": [],
+      "riskArea": "Integrity"
+    },
+    {
+      "disposition": "no_issue_found",
+      "id": "provenance",
+      "label": "Historical and current provenance attribution",
+      "notes": "Git preimages, pinned manifests, current physical bytes and untouched-reference identities remain separate.",
+      "receiptRefs": [],
+      "riskArea": "Provenance confusion"
+    },
+    {
+      "disposition": "no_issue_found",
+      "id": "path-command",
+      "label": "Path containment and command execution",
+      "notes": "Paths are finite relative no-link members; Git is invoked by argv with fixed command structure and hex commit identities.",
+      "receiptRefs": [],
+      "riskArea": "Path and command injection"
+    },
+    {
+      "disposition": "no_issue_found",
+      "id": "object-semantics",
+      "label": "Hostile object and Buffer comparison behavior",
+      "notes": "Gate inputs require plain data descriptors; Buffer comparison uses the captured intrinsic; final physical checks follow metadata revalidation.",
+      "receiptRefs": [],
+      "riskArea": "Validation bypass"
+    },
+    {
+      "disposition": "no_issue_found",
+      "id": "availability",
+      "label": "Resource and denial-of-service behavior",
+      "notes": "No attacker-reachable runtime path or unbounded external input was established; this code executes in bounded local build/audit tooling.",
+      "receiptRefs": [],
+      "riskArea": "Availability"
+    }
+  ]
+}

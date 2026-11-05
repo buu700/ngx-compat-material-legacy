@@ -31,6 +31,7 @@ import {emitMixinMismatchArchive} from './sass-mismatch-diagnostic.mjs';
 import {runFunctionContracts} from './sass-function-contracts.mjs';
 import {runMixinArgumentContracts,firstMixinCssDifference} from './sass-mixin-arguments.mjs';
 import {runOwnedAggregateContracts} from './sass-owned-aggregates.mjs';
+import {createSpinnerSnackGateContext,spinnerSnackGateDescriptor,spinnerSnackGateMeasurementOk,SPINNER_SNACK_GATE_CASES,SPINNER_SNACK_DEFAULT_CASES,measureSpinnerSnackDefaultReferences,attachSpinnerSnackDefaultReferences} from './sass-spinner-snack-gate-integration.mjs';
 import {DEFAULT_CORE_CDK_CASES,DEFAULT_CORE_CDK_CONTRACT,measureDefaultCoreCdkPeer,defaultCoreCdkMeasurementOk} from './sass-default-core-cdk-contract.mjs';
 import {DEFAULT_COMPANION_CASES,DEFAULT_COMPANION_CONTRACT,measureDefaultCompanionPeer,defaultCompanionMeasurementOk} from './sass-default-companion-contract.mjs';
 import {DEFAULT_MAPPED_COMPANION_CASES,DEFAULT_MAPPED_COMPANION_CONTRACT,measureDefaultMappedCompanionPeer,defaultMappedCompanionMeasurementOk} from './sass-default-mapped-companion-contract.mjs';
@@ -333,7 +334,7 @@ function sha256Text(text) {
 }
 
 /** Planned CSS measurements only; this grants no variable/signature inventory coverage. */
-export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line = 'main', importer = makeImporter()}) {
+export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line = 'main', spinnerSnackContext, importer = makeImporter()}) {
   const moduleUrl = pathToFileURL(entryFile).href;
   const css = {};
   let coreCdkPeer;
@@ -351,7 +352,7 @@ export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line 
     if(foreign.length){css[name]={error:`loaded outside the packed package and peers: ${foreign[0]}`};continue;}
     css[name]={css:compiled.css,sha256:sha256Text(compiled.css)};
     const caseId=`mixin-css/${name}`;
-    const defaultEntry=DEFAULT_CORE_CDK_CASES[caseId]||DEFAULT_COMPANION_CASES[caseId]||DEFAULT_MAPPED_COMPANION_CASES[caseId]||DEFAULT_AGGREGATE_CASES[caseId]||FORM_FIELD_STATE_DEFAULT_CASES[caseId]||RIPPLE_COLOR_DEFAULT_CASES[caseId];
+    const defaultEntry=DEFAULT_CORE_CDK_CASES[caseId]||DEFAULT_COMPANION_CASES[caseId]||DEFAULT_MAPPED_COMPANION_CASES[caseId]||DEFAULT_AGGREGATE_CASES[caseId]||FORM_FIELD_STATE_DEFAULT_CASES[caseId]||RIPPLE_COLOR_DEFAULT_CASES[caseId]||(SPINNER_SNACK_DEFAULT_CASES.includes(caseId)?plan:null);
     if(defaultEntry){
       try{
         if(plan.call!==defaultEntry.call)throw Error('default invocation changed');
@@ -363,7 +364,13 @@ export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line 
         }).sort((a,b)=>a.root-b.root||a.path.localeCompare(b.path));
         const program="@use '__entry__' as m;\n"+standardThemeSource()+'\n'+plan.call+'\n';
         const actual_measurement={line,css:compiled.css,css_sha256:sha256Text(compiled.css),css_bytes:Buffer.byteLength(compiled.css),program_sha256:sha256Text(program),sass_version:sass.info,sources};
-        if(Object.hasOwn(RIPPLE_COLOR_DEFAULT_CASES,caseId)){
+        if(SPINNER_SNACK_GATE_CASES.includes(caseId)){
+          if(!spinnerSnackContext||spinnerSnackContext.line!==line||!spinnerSnackGateMeasurementOk({context:spinnerSnackContext,caseId,actual:actual_measurement}))throw Error('spinner/snack current source measurement incomplete');
+          css[name]={...css[name],actual_measurement,current_spinner_snack_bridge:spinnerSnackGateDescriptor(spinnerSnackContext)};
+        }
+        if(SPINNER_SNACK_DEFAULT_CASES.includes(caseId)){
+          // The untouched16 referenceObserver adds the original measurement before inventory comparison.
+        }else if(Object.hasOwn(RIPPLE_COLOR_DEFAULT_CASES,caseId)){
           if(!rippleColorMeasurementOkay(caseId,actual_measurement,line))throw Error('ripple color measurement incomplete');
           const peer=measureRippleColorPeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line,caseId});
           css[name]={...css[name],actual_measurement,current_companion:{classification:'conforming-current-companion',contract:RIPPLE_COLOR_CONTRACT,peer}};
@@ -416,10 +423,11 @@ export function apiAssertionBody(result, {oracleSha256, tarballSha256, runId, in
     oracle: 'compatibility/rc/oracles/material-16.2.14-sass-api.json',
     oracle_sha256: oracleSha256,
   };
-  for (const key of ['expected', 'actual', 'expected_params', 'actual_params', 'expected_sha256', 'actual_sha256', 'expected_bytes', 'actual_bytes','current_infrastructure','current_companion','actual_measurement','comparison']) {
+  for (const key of ['expected', 'actual', 'expected_params', 'actual_params', 'expected_sha256', 'actual_sha256', 'expected_bytes', 'actual_bytes','current_infrastructure','current_companion','actual_measurement','comparison','current_spinner_snack_bridge','identity','mixin','variant','call','mutation','mutation_rejected','error']) {
     if (result[key] !== undefined) body[key] = result[key];
   }
-  if(result.current_infrastructure||result.current_companion){body.binding=binding;body.exit_code=0;}
+  if(result.current_infrastructure||result.current_companion||result.current_spinner_snack_bridge){body.binding=binding;body.exit_code=0;}
+  if(result.current_spinner_snack_bridge){body.error=null;}
   return body;
 }
 
@@ -528,23 +536,28 @@ async function main() {
   const oracle = JSON.parse(oracleText);
   const decisions = JSON.parse(readFileSync(PENDING_DECISIONS_PATH, 'utf8'));
   const allowedRoots = [installedLib, installedMaterial, realpathSync(join(consumer, 'node_modules/@angular/cdk'))];
+  const spinnerSnackContext=createSpinnerSnackGateContext({root});
   const api = runSassApi({
-    oracle, entryFile: entry, loadPaths: [join(consumer, 'node_modules')], packageRoot: installedLib, allowedRoots,
+    oracle, entryFile: entry, loadPaths: [join(consumer, 'node_modules')], packageRoot: installedLib, allowedRoots, spinnerSnackContext,
   });
   const apiIds = apiCaseIds(oracle);
-  const apiResults = classifyPending(compareInventory(oracle, api.members, api.css), decisions);
-  if (JSON.stringify(apiResults.map(item => item.case_id)) !== JSON.stringify(apiIds)) {
-    fail(1, 'sass-api-and-values results do not match the predeclared case ids');
-  }
-  const drift = apiDriftNegative(oracle, api.members, api.css);
   let functions;
   try {functions = runFunctionContracts({sass,entry,loadPaths:[join(consumer,'node_modules')],allowedRoots,
     importers:[makeImporter({requested,denied})],line:'main',
     referenceObserver:reference=>({
-      ...runMixinArgumentContracts({sass,entry,loadPaths:[join(consumer,'node_modules')],allowedRoots,importers:[makeImporter({requested,denied})],line:'main',...reference}),
+      spinner_snack_defaults:measureSpinnerSnackDefaultReferences({sass,...reference}),
+      ...runMixinArgumentContracts({sass,entry,loadPaths:[join(consumer,'node_modules')],allowedRoots,importers:[makeImporter({requested,denied})],line:'main',spinnerSnackContext,...reference}),
       owned_aggregates:runOwnedAggregateContracts({sass,entry,loadPaths:[join(consumer,'node_modules')],allowedRoots,importers:[makeImporter({requested,denied})],line:'main',...reference}),
     })});}
   catch (error) {functions={ok:false,error:error.message,results:[]};}
+  try{if(functions.mixin_arguments?.spinner_snack_defaults)api.css=attachSpinnerSnackDefaultReferences({context:spinnerSnackContext,css:api.css,references:functions.mixin_arguments.spinner_snack_defaults});}
+  catch(error){functions={...functions,ok:false,error:String(error.message||error)};}
+  const apiResults = classifyPending(compareInventory(oracle, api.members, api.css,{spinnerSnackContext}), decisions);
+  if (JSON.stringify(apiResults.map(item => item.case_id)) !== JSON.stringify(apiIds)) {
+    fail(1, 'sass-api-and-values results do not match the predeclared case ids');
+  }
+  const drift = apiDriftNegative(oracle, api.members, api.css,{spinnerSnackContext});
+
 
   // Isolation negatives actually executed by this seal: archived import refusal,
   // a temp-copy declaration mutation that compare-css.py must reject, a hidden

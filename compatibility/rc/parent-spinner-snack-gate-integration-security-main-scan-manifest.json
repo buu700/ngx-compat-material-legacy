@@ -1,0 +1,104 @@
+{
+  "documentType": "codex-security.scan-manifest",
+  "scan": {
+    "artifacts": [
+      {
+        "mediaType": "application/json",
+        "path": "findings.json",
+        "sha256": "260d0b7c96bd5f0744a40fecaa344e4a1460346fc8bca8941ddcbe8e4e05a6de"
+      },
+      {
+        "mediaType": "application/json",
+        "path": "coverage.json",
+        "sha256": "71669a4cd1ea73eaba1c9906846eb8e6d686a8bc305b3409f9a119565b2a92fb"
+      }
+    ],
+    "completedAt": "2026-11-05T00:49:37.230425Z",
+    "coverageRef": "coverage.json",
+    "findingsRef": "findings.json",
+    "id": "4e6888fd-49d2-45df-a0e8-7d36845ae171",
+    "preservedSources": {
+      "checkpoint-heads/d56d1e8eb196c70f713ac51943c5a411bf81f41b1537ff575620ce4c0bd8c902.json": "d56d1e8eb196c70f713ac51943c5a411bf81f41b1537ff575620ce4c0bd8c902",
+      "checkpoints/0e9d2590758e25767259adae3f13a70aa1d542d88f933b3093df93928dbc2dbf.json": "0e9d2590758e25767259adae3f13a70aa1d542d88f933b3093df93928dbc2dbf",
+      "checkpoints/6808f06730797f34a75c96454849326005b2cf5f0f7670ddad500b392ec4ddde.json": "5a201d85b5818bdfba5e79a672a3620c1f0c54f8369b6b701a4e2c07d6c777ae",
+      "checkpoints/bfcfad4516a3df1a2b38edcce10227d1e1e5df36f0039587214320c551b7fd14.json": "bfcfad4516a3df1a2b38edcce10227d1e1e5df36f0039587214320c551b7fd14",
+      "checkpoints/da5b0dfe5ed224be82012785370b3f319e742af1185127f0a67591b48dd2dc31.json": "3c1624cf4e11674292ea9fe9edd766369862fdffbb18ef43508fcaa1c892bd04",
+      "source-order/35053867e85cbc9407ba6e356299b6be4d31765f86f39d52e6e3f5db68832feb.json": "35053867e85cbc9407ba6e356299b6be4d31765f86f39d52e6e3f5db68832feb"
+    },
+    "producer": {
+      "name": "codex-security-plugin",
+      "version": "0.1.32"
+    },
+    "scope": {
+      "artifactsReviewed": [
+        "completed 21.x scan dcc63883-f8d8-4466-a4a5-2ab8afd55eea",
+        "compatibility/rc/historical-contract-repair-reader-inputs.json",
+        "scripts/historical-contract-repair-readers.mjs",
+        "scripts/rc-verify.py",
+        "scripts/sass-api-inventory.mjs",
+        "scripts/sass-api-regressions.mjs",
+        "scripts/sass-mixin-arguments.mjs",
+        "scripts/sass-seal.mjs",
+        "scripts/sass-spinner-snack-c04-source.mjs",
+        "scripts/sass-spinner-snack-gate-integration.mjs",
+        "scripts/sass_mixin_argument_admission.py",
+        "scripts/sass_spinner_snack_gate_integration.py"
+      ],
+      "excludePaths": [],
+      "includePaths": [
+        "."
+      ],
+      "limitations": [
+        "No filesystem atomicity claim beyond callback closure",
+        "No full repository security claim",
+        "Build-tool review, not a shipped runtime audit"
+      ],
+      "runtimeStatus": "No candidate required dynamic validation; no new tests were run by this scan.",
+      "summary": "Exact main-line 16-file patch: all 11 executable/configuration review items closed.",
+      "validationMode": "Byte-identity carry-forward plus branch-differential static review"
+    },
+    "sealedAt": "2026-11-05T00:49:37.230425Z",
+    "startedAt": "2026-11-05T00:46:52.021677Z",
+    "status": "completed",
+    "target": {
+      "baseRevision": "db2ca5fb0090c43f405ffc5221c052de88458139",
+      "displayName": "codex-security-spinner-snack-main-1793839169",
+      "headRevision": "db2ca5fb0090c43f405ffc5221c052de88458139",
+      "kind": "git_diff",
+      "snapshotDigest": "codex-security-snapshot/v1:sha256:7408dc3deb20730a7b76cadc90ffd215849d9801ebe7f23507fa845bd3f3723d",
+      "targetId": "target_sha256_3af65c99ff69689348591465dabbcfe0897558f411b4f66e870c24a96608a22e"
+    },
+    "threatModel": {
+      "assets": [
+        "Integrity of source-bound Sass gate decisions",
+        "Separation of current and historical source provenance",
+        "Availability of local verification tooling"
+      ],
+      "assumptions": [
+        "Local repository and filesystem are trusted except for supplied-callback mutation during an invocation",
+        "No general atomic filesystem snapshot is claimed",
+        "Common helper byte identity carries the completed 21.x code review while branch-specific files were reviewed differentially"
+      ],
+      "attackerCapabilities": [
+        "Supply a read callback and metadata objects to exported helper APIs",
+        "Mutate files during callback execution",
+        "Provide malformed local configuration or report metadata"
+      ],
+      "securityObjectives": [
+        "End every accepting callback-bearing route with callback-free physical revalidation",
+        "Reject foreign owned hashes",
+        "Preserve packed run and artifact bindings",
+        "Avoid attacker-controlled command or path execution",
+        "Keep main adapters semantically aligned with common reviewed helpers"
+      ],
+      "summary": "The main-line patch changes build/audit admission code that decides whether Sass API reports may claim current workspace source. The primary implementation is byte-identical to the completed 21.x review; branch-specific manifests and adapters were reviewed separately.",
+      "trustBoundaries": [
+        "Supplied callback versus trusted physical reads",
+        "Metadata/hash claims versus manifest-bound identities",
+        "Historical reference bytes versus current source attribution",
+        "Branch-specific adapters versus common gate helper"
+      ]
+    }
+  },
+  "schemaVersion": "1.0"
+}

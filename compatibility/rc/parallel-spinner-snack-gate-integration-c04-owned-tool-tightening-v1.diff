@@ -1,0 +1,19 @@
+--- a/scripts/sass-spinner-snack-c04-source.mjs
++++ b/scripts/sass-spinner-snack-c04-source.mjs
+@@ -61,7 +61,7 @@
+  root=resolve(root);const boundary=physicalBoundary(root,read);read=boundary.read;
+  const bridge=currentSpinnerSnackBridgeSourceSubject({root,read});
+  const tools=historicalContractRepairReaderSubject({root,read});
+- const ownedPaths=new Set([...bridge.transitions,...tools.transitions].map(row=>row.path));
++ const ownedToolPaths=new Set(tools.transitions.map(row=>row.path)),ownedPaths=new Set([...bridge.transitions.map(row=>row.path),...ownedToolPaths]);
+  const reports=new Map(),reportRefs=tools.line==='21.x'?Object.values(REPORTS):[];
+  for(const ref of reportRefs){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);reports.set(ref.path,JSON.parse(ref.path.endsWith('.gz')?gunzipSync(raw):raw));}
+  const qualifyInternal=ref=>{
+@@ -70,6 +70,7 @@
+   // Other references are unchanged metadata, with no current-source qualification.
+   if(!ownedPaths.has(original.path))return ref;
+   const source=qualifySpinnerSnackSourceRef(bridge,ref),tool=tools.qualify(source);
++  if(ownedToolPaths.has(original.path))assert.ok(tool,'unknown owned C04 tool reference');
+   assert.deepEqual(capture(),original,'C04 reference changed during qualification');
+   return tool??source;
+  };
