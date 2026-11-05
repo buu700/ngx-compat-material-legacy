@@ -718,14 +718,31 @@ function baseClassRemovalProofContext(root,publicRead){
  // Only the roster module's private registration can select this branch.
  // Its historical JSON views remain on publicRead, never the proof reader.
  const roster=currentAuthoredRosterSourceSubject({root,read});
- const assertCurrent=()=>{selected.assertCurrent();roster.assertCurrent();selected.assertCurrent();boundary.assertPhysical();};
- const refs=new Map([...selected.bound,...roster.bound].map(ref=>[ref.path,{...ref}]));
- const combined={...selected,assertCurrent,bound:[...refs.values()],wrapPrepared:prior=>{
+ const originalAssertCurrent=()=>{selected.assertCurrent();roster.assertCurrent();selected.assertCurrent();boundary.assertPhysical();};
+ const refs=new Map();
+ for(const ref of [...selected.bound,...roster.bound]){
+  const previous=refs.get(ref.path);if(previous){assert.equal(previous.sha256,ref.sha256,'conflicting combined roster reference '+ref.path);assert.equal(previous.bytes,ref.bytes);}
+  refs.set(ref.path,{...ref});
+ }
+ const selectedContext=captureSourceContext(selected,true),rosterContext=captureSourceContext(roster,true);
+ let assertCurrent=originalAssertCurrent,guardPlan;
+ if(selectedContext.node&&rosterContext.node){
+  const physicalDescriptor=laneOwn(boundary,'assertPhysical'),physicalGuard=physicalDescriptor.value;
+  const metadata=()=>{selectedContext.check();rosterContext.check();laneSame(boundary,'assertPhysical',physicalDescriptor);assertLanePlanner(root);};
+  // The complete boundary remains live: metadata/ledger side operations may
+  // retain new physical judgments after these genuine source nodes are made.
+  const guardNode=Object.freeze({dependencies:Object.freeze([selectedContext.node,rosterContext.node]),
+   preflight:()=>{metadata();physicalGuard();},consume:()=>{},final:()=>{physicalGuard();metadata();},
+  });
+  const composed=lanePlanner(Object.freeze([guardNode]));
+  assertCurrent=()=>{metadata();composed();};guardPlan=Object.freeze({assertCurrent,node:guardNode});
+ }
+ const combined={...selected,assertCurrent,...(guardPlan?{guardPlan}:{}),bound:[...refs.values()],wrapPrepared:prior=>{
   const prepared=selected.wrapPrepared(prior),bound=new Map(prepared.bound);for(const ref of refs.values())bound.set(ref.path,ref.sha256);
   const native=prepared.native_spec_source,nativeBound=native.bound.map(ref=>{const actual=refs.get(ref.path);return actual?{...ref,sha256:actual.sha256,bytes:actual.bytes}:{...ref};});
   return {...prepared,bound,native_spec_source:{...native,bound:nativeBound}};
  }};
- assertCurrent();return {selected:bindSourceMetadata(root,combined,read,'base_class'),boundary};
+ assertCurrent();return {selected:bindSourceMetadata(root,combined,read,'base_class',Boolean(guardPlan)),boundary};
 }
 
 /** Exact terminal base-class source decision; all preceding owners still run. */
