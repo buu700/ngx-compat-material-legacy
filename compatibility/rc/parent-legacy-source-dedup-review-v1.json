@@ -1,0 +1,24 @@
+{
+  "verdict": "Candidate sound for adjacent walks under current module-private registration and accepted callback-count/ordering change; runtime and source-lineage successor verification pending.",
+  "scope": "Read-only static inspection; no maintained files or Git state modified, no tests or owner runs.",
+  "source_sha256": "584e49ad810cb7676302d0760a8d3f40f8749661b8f6dce11706b27758037041",
+  "candidate_sha256": "ff995a8eca2674a9ab8f1369bb839cd1e5c2bd849d365958d0b21ce4826e6edf",
+  "patch": "/tmp/legacy-source-dedup-v1.patch",
+  "frame_identity_reason": [
+    "legacy source constructs its source lane with {root,read}; immediately calls tableLocalCompilationOwnerSourceSubject with the same root and read. Table source resolves its own lane with the same arguments.",
+    "packedUpstreamLedgerCurrentSourceLane follows sourceMetadataReaders WeakMap keyed by exact callback identity, collecting the stored frame objects in order and checking their resolved root; each frame.raw determines the next key. bindSourceMetadata is the only set and asserts the metadataRead key is absent; it creates a new metadataRead context and cannot replace an existing registration. Existing frame data is not exposed through the resolver and is not mutated after registration.",
+    "The table constructor invokes the supplied reader for package.json before resolving its lane, but that cannot register or replace any existing supplied read-chain key using this private binding API; synchronous reentrant construction registers only newly created metadataRead callbacks."
+  ],
+  "guard_equivalence": [
+    "Legacy assertCurrent invokes actual.assertCurrent then successor.assertCurrent with no code, supplied read, result use or data decision in between. Table successor begins with its own actual.assertCurrent on the same frame objects and same order; it executes the original frame guards and all before/after historical-reference checks.",
+    "Retained successor continues full frames.assertCurrent, repairs.assertCurrent, current bound checks and callback-free table final physical sweep. Legacy continues its full bound supplied-reader checks and callback-free legacy final physical sweep. actual.read stays unchanged, as do public paths and metadata projection.",
+    "If the first walk would detect state restored before the second walk, eliminating it changes observation of a transient state, including state created/restored by arbitrary callback or external concurrent writer. No decision or input is consumed in the gap between these walks; exact invocation count/order and such extra temporal observation are explicitly outside the stated contract. No other concrete gap identified statically."
+  ],
+  "controls": [
+    "Authenticate exact old and new leaf using independently owned explicit successor packet with literal edit, source references and physical loaded function identity; do not alter immutable base stage extension or change historical DATA.",
+    "Run genuine 180-second physical public epoch positive, historical ledger read and repeated assertCurrent; report actual timing and results.",
+    "Test cold and late wrong supplied bytes, source and ledger mutation, changed loaded function/metadata identity, callback-induced persistent mutation during retained guard, final callback mutation after path visited, and final callback-free physical sweep; cover applied and precursor frames and private registered, unregistered and roster-reader routes.",
+    "Add targeted control demonstrating every existing frame guard executes through the retained successor and source-lane references are validated; two contexts have same frame chain. Exercise throwing/reentrant callbacks and ordinary raw public identity."
+  ],
+  "limits": "Static review only; no authority to claim successor packet integrated, speedup sufficient, all tests pass, or no observable difference for stateful callbacks."
+}

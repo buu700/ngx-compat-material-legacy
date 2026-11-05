@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "patch": "/tmp/legacy-source-dedup-v1.patch",
+  "patch_sha256": "38ea22f633c716622a5415cce6cd8b885a68f8ac72231dab87f26c0c062d766b",
+  "verdict": "No consumed-data, identity, or late-coverage gap found statically; the deleted first source-lane guard is immediately duplicated by the retained successor guard over the same private frame chain.",
+  "review_scope": "Read-only static review of patch and related source; no maintained files changed and no owners, probes, or runtime tests executed.",
+  "evidence": [
+    "legacyRemovalOwnerSourceSubject constructs actual and successor with the same root and read callback. tableLocalCompilationOwnerSourceSubject constructs its own actual lane with that same root and read callback.",
+    "sourceMetadataReaders is a module-private WeakMap. bindSourceMetadata rejects an already registered metadataRead callback and only registers its newly constructed context.metadataRead; it does not replace or mutate an existing frame registration.",
+    "packedUpstreamLedgerCurrentSourceLane walks the registered callback chain into frame objects once and its assertCurrent checks every frame guard and each before/after reference. The duplicate legacy actual.assertCurrent call and the first operation of successor.assertCurrent therefore traverse the same registered frames in the same order.",
+    "There is no intervening callback, supplied read, result use, or data decision between the two old guard calls. The retained successor continues its frame, repair, reference, current bound-reader, and final physical sweeps. The legacy wrapper still performs its late supplied-reader checks and final callback-free physical sweep."
+  ],
+  "bounded_caveat": "Removing a duplicate walk changes callback invocation count and the temporal sample. A stateful reader or concurrent writer could create and restore a transient condition during the removed walk. The specified review premise excludes exact internal callback count/order as an API promise; no consumed data or decision depends on that additional temporal observation. Runtime performance and mutation-control coverage remain unverified.",
+  "assessment": "The one-line candidate is statically sound for the adjacent duplicated frame walk under the stated contract. Existing downstream and physical checks remain in place. No concrete gap identified beyond the acknowledged callback-count and temporal-sampling change.",
+  "validation": "No tests or owners executed; no candidate was applied."
+}
