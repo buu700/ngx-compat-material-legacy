@@ -428,3 +428,64 @@ def historical_title_source_test_subject(root):
     assert_current()
     return dict(comparison_bytes=comparison_bytes, assert_current=assert_current,
                 historical_source_bindings=10, historical_DATA_only=True)
+
+
+# Complete fixed four-producer checker test cohort; historical programs are DATA.
+_CHECKER_GUARD_REVIEW = {'path': 'compatibility/rc/checker-reference-metadata-review.json', 'sha256': 'b65c4822274eaf5f5ee7cfe3683e8b2e29a6867518d317e1a644cbc8b6924c62', 'bytes': 119371}
+_CHECKER_GUARD_REFS = ({'path': 'scripts/upstream-testing-api-21x-admission.mjs', 'sha256': '6415108225487d444d065d805d3b1dcc9bb804fac5bf61f3874ec7a75cf77bd3', 'bytes': 11601}, {'path': 'scripts/upstream-sass-inspection-admission.mjs', 'sha256': '29291c30c7469cd3e0517574fddbcbf6a1cbf49f0a750d974f4736fd1ea22345', 'bytes': 8760}, {'path': 'scripts/upstream-rules-js-build-admission.mjs', 'sha256': '45a308f40bc92cf2072799c538d9b4c202709b74dd8ce3551808017bc58ce0c0', 'bytes': 9409}, {'path': 'scripts/upstream-legacy-sass-entrypoint-admission.mjs', 'sha256': '1e3e277e3d40976dc970c6adfc0c03be43300239d7e37b14efed3415cd2e8ede', 'bytes': 9712})
+_CHECKER_GUARD_TITLE_PACKET = {'path': 'compatibility/rc/dialog-title-current-source-reader-successors.json', 'sha256': 'c189a19263d4862df74b47f590c1cb21875932406e150b9dc35141c448a86369', 'bytes': 30832}
+_CHECKER_GUARD_TITLE_PATHS = ('scripts/upstream-testing-api-21x-admission.mjs', 'scripts/upstream-rules-js-build-admission.mjs')
+_CHECKER_GUARD_FINITE_TOOL_PATH = 'scripts/upstream-sass-inspection-admission.mjs'
+
+
+def historical_checker_guard_test_subject(root):
+    """Four exact old producer bindings, retaining actual current physical guards."""
+    from historical_contract_repair_source import _current_tool_subject
+    from dialog_title_reader_refs import title_prior_tool_bytes
+    bound = {}
+    for ref in (_CHECKER_GUARD_REVIEW, _CHECKER_GUARD_TITLE_PACKET):
+        raw = _physical(root, ref['path'])
+        assert len(raw) == ref['bytes'] and hashlib.sha256(raw).hexdigest() == ref['sha256']
+        bound[ref['path']] = raw
+    review = json.loads(bound[_CHECKER_GUARD_REVIEW['path']])
+    assert tuple(review['guard_modules']) == _CHECKER_GUARD_REFS
+    expected = {ref['path']: ref for ref in _CHECKER_GUARD_REFS}
+    assert len(expected) == len(_CHECKER_GUARD_REFS) == 4
+    tools = _current_tool_subject(root)
+    comparison = {}
+    for path, ref in expected.items():
+        actual = _physical(root, path)
+        bound[path] = actual
+        if path == _CHECKER_GUARD_FINITE_TOOL_PATH:
+            assert tools.owns_reference(ref)
+            current = tools.qualify(ref)
+            assert current == dict(ref, sha256=hashlib.sha256(actual).hexdigest(), bytes=len(actual))
+            comparison[path] = tools.comparison_bytes(ref)
+        elif path in _CHECKER_GUARD_TITLE_PATHS:
+            # The existing fixed title packet authenticates current bytes and
+            # exact before-Git/literal transformation. No new role is registered.
+            comparison[path] = title_prior_tool_bytes(root, path)
+        else:
+            assert path == 'scripts/upstream-legacy-sass-entrypoint-admission.mjs'
+            comparison[path] = actual
+        assert hashlib.sha256(comparison[path]).hexdigest() == ref['sha256']
+        assert len(comparison[path]) == ref['bytes']
+
+    def assert_current():
+        tools.assert_current()
+        for path, actual in bound.items():
+            assert _physical(root, path) == actual, 'changed checker producer comparison binding ' + path
+        tools.assert_current()
+
+    def comparison_bytes(incoming):
+        assert type(incoming) is dict
+        snapshot = dict(incoming)
+        assert snapshot == expected[snapshot['path']]
+        assert_current()
+        raw = comparison[snapshot['path']]
+        assert incoming == snapshot
+        assert_current()
+        return raw
+    assert_current()
+    return dict(comparison_bytes=comparison_bytes, assert_current=assert_current,
+                historical_producer_bindings=4, historical_DATA_only=True)

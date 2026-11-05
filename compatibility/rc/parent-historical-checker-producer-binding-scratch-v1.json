@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "scope": "SCRATCH ONLY checker producer fixed4historical DATA binding successor, awaiting parent apply review/freeze release",
+  "basis": {
+    "path": "compatibility/rc/parent-historical-python-remaining-source-bindings-worksheet-v1.json",
+    "sha256": "5f73a0f31ee4b173696c1165181d50d0ea21572e4c4f0ccc232808d77f62df27",
+    "bytes": 24915
+  },
+  "source_parent": "7c3def616238e8d0051f1ae988a161da17b3a858",
+  "before_Git_provenance": [
+    {
+      "commit": "7c3def616238e8d0051f1ae988a161da17b3a858",
+      "path": "tests/current_sass_canonical_test_scope.py",
+      "git_blob": "411462723a7a113fc972a2dc82d037d56a1f1220",
+      "sha256": "4c7ca5e77aec8e6a38ba5d198a31b00acd9584cc061ad3e8a0ee7b225d346f45",
+      "bytes": 28486
+    },
+    {
+      "commit": "7c3def616238e8d0051f1ae988a161da17b3a858",
+      "path": "tests/checker_reference_metadata_patch.py",
+      "git_blob": "e12ca5161e6499a72cf0070df3dd9db31f2da114",
+      "sha256": "8aa2e6f76077bc42906642cab79003a7a7489e05d652392a3440ff2573d06e33",
+      "bytes": 6591
+    }
+  ],
+  "patch": {
+    "path": "/tmp/parent-checker-producer-binding-v1/checker-producer-binding-v1.patch",
+    "sha256": "2c24233e482252024545c7031de5c9333e2367970c410ddde90404e05a7488e6",
+    "bytes": 5449
+  },
+  "recipes": [
+    {
+      "path": "tests/current_sass_canonical_test_scope.py",
+      "before": {
+        "sha256": "4c7ca5e77aec8e6a38ba5d198a31b00acd9584cc061ad3e8a0ee7b225d346f45",
+        "bytes": 28486
+      },
+      "after": {
+        "sha256": "07f3512ac39c8a4661c185dc845f018eccc75dd890ac32c9f159c1518cdce4bb",
+        "bytes": 32324
+      },
+      "edits": [
+        {
+          "offset": 28486,
+          "before": "",
+          "after": "\n\n# Complete fixed four-producer checker test cohort; historical programs are DATA.\n_CHECKER_GUARD_REVIEW = {'path': 'compatibility/rc/checker-reference-metadata-review.json', 'sha256': 'b65c4822274eaf5f5ee7cfe3683e8b2e29a6867518d317e1a644cbc8b6924c62', 'bytes': 119371}\n_CHECKER_GUARD_REFS = ({'path': 'scripts/upstream-testing-api-21x-admission.mjs', 'sha256': '6415108225487d444d065d805d3b1dcc9bb804fac5bf61f3874ec7a75cf77bd3', 'bytes': 11601}, {'path': 'scripts/upstream-sass-inspection-admission.mjs', 'sha256': '29291c30c7469cd3e0517574fddbcbf6a1cbf49f0a750d974f4736fd1ea22345', 'bytes': 8760}, {'path': 'scripts/upstream-rules-js-build-admission.mjs', 'sha256': '45a308f40bc92cf2072799c538d9b4c202709b74dd8ce3551808017bc58ce0c0', 'bytes': 9409}, {'path': 'scripts/upstream-legacy-sass-entrypoint-admission.mjs', 'sha256': '1e3e277e3d40976dc970c6adfc0c03be43300239d7e37b14efed3415cd2e8ede', 'bytes': 9712})\n_CHECKER_GUARD_TITLE_PACKET = {'path': 'compatibility/rc/dialog-title-current-source-reader-successors.json', 'sha256': 'c189a19263d4862df74b47f590c1cb21875932406e150b9dc35141c448a86369', 'bytes': 30832}\n_CHECKER_GUARD_TITLE_PATHS = ('scripts/upstream-testing-api-21x-admission.mjs', 'scripts/upstream-rules-js-build-admission.mjs')\n_CHECKER_GUARD_FINITE_TOOL_PATH = 'scripts/upstream-sass-inspection-admission.mjs'\n\n\ndef historical_checker_guard_test_subject(root):\n    \"\"\"Four exact old producer bindings, retaining actual current physical guards.\"\"\"\n    from historical_contract_repair_source import _current_tool_subject\n    from dialog_title_reader_refs import title_prior_tool_bytes\n    bound = {}\n    for ref in (_CHECKER_GUARD_REVIEW, _CHECKER_GUARD_TITLE_PACKET):\n        raw = _physical(root, ref['path'])\n        assert len(raw) == ref['bytes'] and hashlib.sha256(raw).hexdigest() == ref['sha256']\n        bound[ref['path']] = raw\n    review = json.loads(bound[_CHECKER_GUARD_REVIEW['path']])\n    assert tuple(review['guard_modules']) == _CHECKER_GUARD_REFS\n    expected = {ref['path']: ref for ref in _CHECKER_GUARD_REFS}\n    assert len(expected) == len(_CHECKER_GUARD_REFS) == 4\n    tools = _current_tool_subject(root)\n    comparison = {}\n    for path, ref in expected.items():\n        actual = _physical(root, path)\n        bound[path] = actual\n        if path == _CHECKER_GUARD_FINITE_TOOL_PATH:\n            assert tools.owns_reference(ref)\n            current = tools.qualify(ref)\n            assert current == dict(ref, sha256=hashlib.sha256(actual).hexdigest(), bytes=len(actual))\n            comparison[path] = tools.comparison_bytes(ref)\n        elif path in _CHECKER_GUARD_TITLE_PATHS:\n            # The existing fixed title packet authenticates current bytes and\n            # exact before-Git/literal transformation. No new role is registered.\n            comparison[path] = title_prior_tool_bytes(root, path)\n        else:\n            assert path == 'scripts/upstream-legacy-sass-entrypoint-admission.mjs'\n            comparison[path] = actual\n        assert hashlib.sha256(comparison[path]).hexdigest() == ref['sha256']\n        assert len(comparison[path]) == ref['bytes']\n\n    def assert_current():\n        tools.assert_current()\n        for path, actual in bound.items():\n            assert _physical(root, path) == actual, 'changed checker producer comparison binding ' + path\n        tools.assert_current()\n\n    def comparison_bytes(incoming):\n        assert type(incoming) is dict\n        snapshot = dict(incoming)\n        assert snapshot == expected[snapshot['path']]\n        assert_current()\n        raw = comparison[snapshot['path']]\n        assert incoming == snapshot\n        assert_current()\n        return raw\n    assert_current()\n    return dict(comparison_bytes=comparison_bytes, assert_current=assert_current,\n                historical_producer_bindings=4, historical_DATA_only=True)\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/checker_reference_metadata_patch.py",
+      "before": {
+        "sha256": "8aa2e6f76077bc42906642cab79003a7a7489e05d652392a3440ff2573d06e33",
+        "bytes": 6591
+      },
+      "after": {
+        "sha256": "9cf5ac1f86768d32a7e664983f5a39e025065615ecdd53da520a8f26bcbfa5fe",
+        "bytes": 6781
+      },
+      "edits": [
+        {
+          "offset": 1751,
+          "before": "",
+          "after": "    from current_sass_canonical_test_scope import historical_checker_guard_test_subject\n    source_subject = historical_checker_guard_test_subject(root)\n"
+        },
+        {
+          "offset": 1791,
+          "before": "        current = title_prior_tool_bytes(root, ref['path'])\n",
+          "after": "        current = source_subject['comparison_bytes'](ref)\n"
+        },
+        {
+          "offset": 5328,
+          "before": "",
+          "after": "    source_subject['assert_current']()\n"
+        }
+      ]
+    }
+  ],
+  "pure_controls": {
+    "checks_passed": 31,
+    "checks": [
+      "all original derive assertion ASTs identical in order",
+      "original14token/evidence/output derivation bytes unchanged",
+      "original default/explicit verification function unchanged",
+      "old shared scope retained as exact byte prefix",
+      "strict unchanged metadata compatibility/rc/21x-c04-sass-entrypoint-individual-review.json",
+      "strict unchanged metadata compatibility/rc/checker-reference-metadata-review.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-token-test-build-individual-review.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-token-test-build-source-qualification.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-unthemable-token-placement-individual-review.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-unthemable-token-placement-source-qualification.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-unthemable-token-placement-tooltip-context-reconciliation.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-modern-control-base-individual-review.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-modern-control-base-source-qualification.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-theme-token-root-individual-review.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-theme-token-root-source-qualification.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-form-field-tokenization-individual-review.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-form-field-tokenization-source-qualification.json",
+      "strict unchanged metadata compatibility/rc/chip-focus-native-requalification-77ffdf98ba71c11d908b29e02b516dddf487ae0b.json",
+      "strict unchanged metadata compatibility/rc/chip-focus-native-requalification-db06fa8d8939d793f598bc3dbedc96a5a71c0db0.json",
+      "strict unchanged metadata compatibility/rc/chip-focus-native-requalification-5dd614aa100e28f0815fdd83e5b68f4239ef01f9.json",
+      "strict unchanged metadata compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-selection-d5d468a29a2db4c0676c57d60bc8431ed4fd6e18-individual-source-judgment.json",
+      "strict unchanged metadata compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-selection-13629b0cd814ccc5fa01cf670b8b3001bc0021ff-individual-source-judgment.json",
+      "strict unchanged metadata compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-selection-cf868a5089a4c9eaddd4a55fd18b952fb96d5c19-individual-source-judgment.json",
+      "strict unchanged metadata compatibility/rc/packed-upstream-source-chip-lifecycle.json",
+      "strict unchanged metadata compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-landscape-selection-spec-source-judgment.json",
+      "strict unchanged metadata compatibility/rc/chip-focus-native-requalification-classic-list.json",
+      "strict unchanged metadata compatibility/rc/chip-focus-native-requalification-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "complete immutable4producer roster",
+      "exact2title paths",
+      "oneSass API role disjoint from title paths",
+      "strict remainingraw path"
+    ],
+    "scope": "scratch AST/source-span preservation and all23strict direct metadata bindings; fixed4role census",
+    "current_API_or_new_subject_constructed": false,
+    "source_owner_or_oldGitprogram_or_compiler_or_CLI_executed": false,
+    "maintained_files_edited": false
+  },
+  "pure_control_program_as_DATA": "from pathlib import Path\nimport ast,hashlib,json\ns=Path(__file__).resolve().parent;r=Path('/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy');checks=[]\ndef check(name,value):assert value,name;checks.append(name)\np='tests/checker_reference_metadata_patch.py';a=(s/'before'/p).read_text();b=(s/'after'/p).read_text();A=ast.parse(a);B=ast.parse(b)\nf=lambda t,n:next(x for x in t.body if isinstance(x,ast.FunctionDef)and x.name==n)\ncheck('all original derive assertion ASTs identical in order',[ast.dump(x,include_attributes=False)for x in ast.walk(f(A,'derive_checker_reference_successor'))if isinstance(x,ast.Assert)]==[ast.dump(x,include_attributes=False)for x in ast.walk(f(B,'derive_checker_reference_successor'))if isinstance(x,ast.Assert)])\ncheck('original14token/evidence/output derivation bytes unchanged',a[a.index('    original = json.loads(before)'):a.index('    return before, after')]==b[b.index('    original = json.loads(before)'):b.index(\"    source_subject['assert_current']()\")])\ncheck('original default/explicit verification function unchanged',ast.get_source_segment(a,f(A,'verify_checker_reference_successor'))==ast.get_source_segment(b,f(B,'verify_checker_reference_successor')))\ncheck('old shared scope retained as exact byte prefix',(s/'after/tests/current_sass_canonical_test_scope.py').read_bytes().startswith((s/'before/tests/current_sass_canonical_test_scope.py').read_bytes()))\ndata=json.loads(Path('/tmp/remaining_python_binding_census_v1.json').read_bytes())\nfor ref in data['direct_fixed_metadata']:\n raw=(r/ref['path']).read_bytes();check('strict unchanged metadata '+ref['path'],hashlib.sha256(raw).hexdigest()==ref['sha256']and len(raw)==ref['bytes'])\nmodule=ast.parse((s/'after/tests/current_sass_canonical_test_scope.py').read_text());constants={}\nfor n in module.body:\n if isinstance(n,ast.Assign)and len(n.targets)==1 and isinstance(n.targets[0],ast.Name)and n.targets[0].id.startswith('_CHECKER_GUARD_'):constants[n.targets[0].id]=ast.literal_eval(n.value)\nrefs=constants['_CHECKER_GUARD_REFS'];check('complete immutable4producer roster',tuple(json.loads((r/constants['_CHECKER_GUARD_REVIEW']['path']).read_bytes())['guard_modules'])==refs and len({x['path']for x in refs})==4)\ncheck('exact2title paths',len(constants['_CHECKER_GUARD_TITLE_PATHS'])==2)\ncheck('oneSass API role disjoint from title paths',constants['_CHECKER_GUARD_FINITE_TOOL_PATH']not in constants['_CHECKER_GUARD_TITLE_PATHS'])\ncheck('strict remainingraw path',set(x['path']for x in refs)-set(constants['_CHECKER_GUARD_TITLE_PATHS'])-{constants['_CHECKER_GUARD_FINITE_TOOL_PATH']}=={'scripts/upstream-legacy-sass-entrypoint-admission.mjs'})\nfor p in (s/'after/tests').glob('*.py'):ast.parse(p.read_text())\nreport={'checks_passed':len(checks),'checks':checks,'scope':'scratch AST/source-span preservation and all23strict direct metadata bindings; fixed4role census','current_API_or_new_subject_constructed':False,'source_owner_or_oldGitprogram_or_compiler_or_CLI_executed':False,'maintained_files_edited':False}\n(s/'pure-controls-v1.json').write_text(json.dumps(report,indent=2)+'\\n');print(json.dumps(report))\n",
+  "roles": {
+    "existing_Sass_finite_API": 1,
+    "existing_title_literal_Git": 2,
+    "unchanged_strict_raw": 1,
+    "new_production_API_or_identity_registration": 0
+  },
+  "preserved": "All original derive assertion ASTs,14token/evidence/output payload bytes and verify/default/explicit function unchanged; existing scope exact byte prefix preserved.23direct metadata remain strict.",
+  "maintained_sources_edited": false,
+  "current_API_or_new_subject_constructed": false,
+  "old_Git_program_or_source_owner_or_compiler_or_CLI_executed": false,
+  "postseal_controls_pending": "Fixed4metadata negatives/current physical cold+late faults and actual9default routes under Git-only guard after authorized application+V3reseal",
+  "prospective_new_support_path": "tests/checker_reference_metadata_patch.py; parent immutableownerref preflight before SUPPORT-only enrollment; no new historical UPDATE role",
+  "qualification_granted": false
+}

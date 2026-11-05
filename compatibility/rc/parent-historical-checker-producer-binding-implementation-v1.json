@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "scope": "Applied exact parent-reviewed2c24233e test-only fixed4checkerproducer DATA binding successor",
+  "source_frozen": true,
+  "basis_scratch_receipt": {
+    "path": "compatibility/rc/parent-historical-checker-producer-binding-scratch-v1.json",
+    "sha256": "58c1edd63c9bf32b32b4271a788b38d7210e1f36a2e217cca283675fb3b80952",
+    "bytes": 14347
+  },
+  "old_reference_preflight": {
+    "path": "compatibility/rc/parent-historical-checker-python-reference-preflight-v1.json",
+    "sha256": "b08d5f83320914af7ee33db9df54fdfda0ccc3441d455094a50988f6e0593f0d",
+    "bytes": 13566
+  },
+  "recipes": [
+    {
+      "path": "tests/current_sass_canonical_test_scope.py",
+      "before": {
+        "sha256": "4c7ca5e77aec8e6a38ba5d198a31b00acd9584cc061ad3e8a0ee7b225d346f45",
+        "bytes": 28486
+      },
+      "after": {
+        "sha256": "07f3512ac39c8a4661c185dc845f018eccc75dd890ac32c9f159c1518cdce4bb",
+        "bytes": 32324
+      },
+      "edits": [
+        {
+          "offset": 28486,
+          "before": "",
+          "after": "\n\n# Complete fixed four-producer checker test cohort; historical programs are DATA.\n_CHECKER_GUARD_REVIEW = {'path': 'compatibility/rc/checker-reference-metadata-review.json', 'sha256': 'b65c4822274eaf5f5ee7cfe3683e8b2e29a6867518d317e1a644cbc8b6924c62', 'bytes': 119371}\n_CHECKER_GUARD_REFS = ({'path': 'scripts/upstream-testing-api-21x-admission.mjs', 'sha256': '6415108225487d444d065d805d3b1dcc9bb804fac5bf61f3874ec7a75cf77bd3', 'bytes': 11601}, {'path': 'scripts/upstream-sass-inspection-admission.mjs', 'sha256': '29291c30c7469cd3e0517574fddbcbf6a1cbf49f0a750d974f4736fd1ea22345', 'bytes': 8760}, {'path': 'scripts/upstream-rules-js-build-admission.mjs', 'sha256': '45a308f40bc92cf2072799c538d9b4c202709b74dd8ce3551808017bc58ce0c0', 'bytes': 9409}, {'path': 'scripts/upstream-legacy-sass-entrypoint-admission.mjs', 'sha256': '1e3e277e3d40976dc970c6adfc0c03be43300239d7e37b14efed3415cd2e8ede', 'bytes': 9712})\n_CHECKER_GUARD_TITLE_PACKET = {'path': 'compatibility/rc/dialog-title-current-source-reader-successors.json', 'sha256': 'c189a19263d4862df74b47f590c1cb21875932406e150b9dc35141c448a86369', 'bytes': 30832}\n_CHECKER_GUARD_TITLE_PATHS = ('scripts/upstream-testing-api-21x-admission.mjs', 'scripts/upstream-rules-js-build-admission.mjs')\n_CHECKER_GUARD_FINITE_TOOL_PATH = 'scripts/upstream-sass-inspection-admission.mjs'\n\n\ndef historical_checker_guard_test_subject(root):\n    \"\"\"Four exact old producer bindings, retaining actual current physical guards.\"\"\"\n    from historical_contract_repair_source import _current_tool_subject\n    from dialog_title_reader_refs import title_prior_tool_bytes\n    bound = {}\n    for ref in (_CHECKER_GUARD_REVIEW, _CHECKER_GUARD_TITLE_PACKET):\n        raw = _physical(root, ref['path'])\n        assert len(raw) == ref['bytes'] and hashlib.sha256(raw).hexdigest() == ref['sha256']\n        bound[ref['path']] = raw\n    review = json.loads(bound[_CHECKER_GUARD_REVIEW['path']])\n    assert tuple(review['guard_modules']) == _CHECKER_GUARD_REFS\n    expected = {ref['path']: ref for ref in _CHECKER_GUARD_REFS}\n    assert len(expected) == len(_CHECKER_GUARD_REFS) == 4\n    tools = _current_tool_subject(root)\n    comparison = {}\n    for path, ref in expected.items():\n        actual = _physical(root, path)\n        bound[path] = actual\n        if path == _CHECKER_GUARD_FINITE_TOOL_PATH:\n            assert tools.owns_reference(ref)\n            current = tools.qualify(ref)\n            assert current == dict(ref, sha256=hashlib.sha256(actual).hexdigest(), bytes=len(actual))\n            comparison[path] = tools.comparison_bytes(ref)\n        elif path in _CHECKER_GUARD_TITLE_PATHS:\n            # The existing fixed title packet authenticates current bytes and\n            # exact before-Git/literal transformation. No new role is registered.\n            comparison[path] = title_prior_tool_bytes(root, path)\n        else:\n            assert path == 'scripts/upstream-legacy-sass-entrypoint-admission.mjs'\n            comparison[path] = actual\n        assert hashlib.sha256(comparison[path]).hexdigest() == ref['sha256']\n        assert len(comparison[path]) == ref['bytes']\n\n    def assert_current():\n        tools.assert_current()\n        for path, actual in bound.items():\n            assert _physical(root, path) == actual, 'changed checker producer comparison binding ' + path\n        tools.assert_current()\n\n    def comparison_bytes(incoming):\n        assert type(incoming) is dict\n        snapshot = dict(incoming)\n        assert snapshot == expected[snapshot['path']]\n        assert_current()\n        raw = comparison[snapshot['path']]\n        assert incoming == snapshot\n        assert_current()\n        return raw\n    assert_current()\n    return dict(comparison_bytes=comparison_bytes, assert_current=assert_current,\n                historical_producer_bindings=4, historical_DATA_only=True)\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/checker_reference_metadata_patch.py",
+      "before": {
+        "sha256": "8aa2e6f76077bc42906642cab79003a7a7489e05d652392a3440ff2573d06e33",
+        "bytes": 6591
+      },
+      "after": {
+        "sha256": "9cf5ac1f86768d32a7e664983f5a39e025065615ecdd53da520a8f26bcbfa5fe",
+        "bytes": 6781
+      },
+      "edits": [
+        {
+          "offset": 1751,
+          "before": "",
+          "after": "    from current_sass_canonical_test_scope import historical_checker_guard_test_subject\n    source_subject = historical_checker_guard_test_subject(root)\n"
+        },
+        {
+          "offset": 1791,
+          "before": "        current = title_prior_tool_bytes(root, ref['path'])\n",
+          "after": "        current = source_subject['comparison_bytes'](ref)\n"
+        },
+        {
+          "offset": 5328,
+          "before": "",
+          "after": "    source_subject['assert_current']()\n"
+        }
+      ]
+    }
+  ],
+  "reviewed_patch": {
+    "path": "/tmp/parent-checker-producer-binding-v1/checker-producer-binding-v1.patch",
+    "sha256": "2c24233e482252024545c7031de5c9333e2367970c410ddde90404e05a7488e6",
+    "bytes": 5449
+  },
+  "pure_controls": {
+    "checks_passed": 31,
+    "checks": [
+      "all original derive assertion ASTs identical in order",
+      "original14token/evidence/output derivation bytes unchanged",
+      "original default/explicit verification function unchanged",
+      "old shared scope retained as exact byte prefix",
+      "strict unchanged metadata compatibility/rc/21x-c04-sass-entrypoint-individual-review.json",
+      "strict unchanged metadata compatibility/rc/checker-reference-metadata-review.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-token-test-build-individual-review.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-token-test-build-source-qualification.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-unthemable-token-placement-individual-review.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-unthemable-token-placement-source-qualification.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-unthemable-token-placement-tooltip-context-reconciliation.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-modern-control-base-individual-review.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-modern-control-base-source-qualification.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-theme-token-root-individual-review.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-theme-token-root-source-qualification.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-form-field-tokenization-individual-review.json",
+      "strict unchanged metadata compatibility/rc/21x-c04-form-field-tokenization-source-qualification.json",
+      "strict unchanged metadata compatibility/rc/chip-focus-native-requalification-77ffdf98ba71c11d908b29e02b516dddf487ae0b.json",
+      "strict unchanged metadata compatibility/rc/chip-focus-native-requalification-db06fa8d8939d793f598bc3dbedc96a5a71c0db0.json",
+      "strict unchanged metadata compatibility/rc/chip-focus-native-requalification-5dd614aa100e28f0815fdd83e5b68f4239ef01f9.json",
+      "strict unchanged metadata compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-selection-d5d468a29a2db4c0676c57d60bc8431ed4fd6e18-individual-source-judgment.json",
+      "strict unchanged metadata compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-selection-13629b0cd814ccc5fa01cf670b8b3001bc0021ff-individual-source-judgment.json",
+      "strict unchanged metadata compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-selection-cf868a5089a4c9eaddd4a55fd18b952fb96d5c19-individual-source-judgment.json",
+      "strict unchanged metadata compatibility/rc/packed-upstream-source-chip-lifecycle.json",
+      "strict unchanged metadata compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-landscape-selection-spec-source-judgment.json",
+      "strict unchanged metadata compatibility/rc/chip-focus-native-requalification-classic-list.json",
+      "strict unchanged metadata compatibility/rc/chip-focus-native-requalification-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "complete immutable4producer roster",
+      "exact2title paths",
+      "oneSass API role disjoint from title paths",
+      "strict remainingraw path"
+    ],
+    "scope": "scratch AST/source-span preservation and all23strict direct metadata bindings; fixed4role census",
+    "current_API_or_new_subject_constructed": false,
+    "source_owner_or_oldGitprogram_or_compiler_or_CLI_executed": false,
+    "maintained_files_edited": false
+  },
+  "fixed_roles": {
+    "complete_b65guard_roster": 4,
+    "existing_Sass_API_role": 1,
+    "existing_title_literal_Git_roles": 2,
+    "strict_unchanged_raw_role": 1,
+    "new_registration_or_production_API": 0
+  },
+  "original_assertion_ASTs_14token_evidence_output_payload_bytes_and_verifier_body_unchanged": true,
+  "original23direct_metadata_files_remain_strict": true,
+  "deferred_postseal_controls": [
+    {
+      "path": "/tmp/parent-checker-producer-binding-v1/after_seal_controls.py",
+      "sha256": "e6484124534c19c816889359e8f5ba2f230b9a728914e518ede31f9d4f8694c2",
+      "bytes": 3186
+    },
+    {
+      "path": "/tmp/parent-checker-producer-binding-v1/after_seal_default_chain.py",
+      "sha256": "829eeff08abd43bd827b4bcc7848c15ae8f98a556c59dac64f2a1da8a7863f9d",
+      "bytes": 2541
+    },
+    {
+      "path": "/tmp/parent-checker-producer-binding-v1/after_seal_mutations.py",
+      "sha256": "9b35949c2b9bc792673314f7602154f94ecec5ee465b76c783bb0c4d2ad4a129",
+      "bytes": 3256
+    }
+  ],
+  "deferred_control_programs_as_DATA": {
+    "after_seal_controls.py": "from pathlib import Path\nimport hashlib,json,shutil,subprocess,sys,tempfile\nr=Path('/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy');s=Path(__file__).resolve().parent\nsys.dont_write_bytecode=True;sys.path.insert(0,str(r/'tests'));original=subprocess.Popen;commands=[]\ndef git_only(args,*a,**kw):\n assert type(args)is list and args and args[0]=='git','non-Git subprocess denied: '+repr(args)\n assert not kw.get('shell',False)and any(x in args for x in ['show','cat-file','rev-parse']);commands.append(args);return original(args,*a,**kw)\nsubprocess.Popen=git_only\nimport current_sass_canonical_test_scope as m\nfrom historical_contract_repair_source import _current_tool_subject\nchecks=[]\ndef check(name,fn):fn();checks.append(name)\ndef same(a,b):assert a==b\ndef rejects(name,fn):\n try:fn()\n except (AssertionError,KeyError,FileNotFoundError):checks.append(name)\n else:raise AssertionError('control admitted '+name)\nsubject=m.historical_checker_guard_test_subject(r)\nfor ref in m._CHECKER_GUARD_REFS:\n raw=subject['comparison_bytes'](dict(ref));check('exact original guard DATA '+ref['path'],lambda raw=raw,ref=ref:same(hashlib.sha256(raw).hexdigest(),ref['sha256']))\n for key in ['path','sha256','bytes']:\n  bad=dict(ref);bad[key]='scripts/unregistered-guard.mjs'if key=='path'else('0'*64 if key=='sha256'else -1);rejects('wrong '+key+' '+ref['path'],lambda bad=bad:subject['comparison_bytes'](bad))\n bad=dict(ref,unregistered=True);rejects('extra metadata '+ref['path'],lambda bad=bad:subject['comparison_bytes'](bad))\nsubject['assert_current']();tools=_current_tool_subject(r)\nwith tempfile.TemporaryDirectory(prefix='ngx-checker-guard-bindings-')as td:\n root=Path(td);paths={ref['path']for ref in tools.bound}|{ref['path']for ref in m._CHECKER_GUARD_REFS}|{m._CHECKER_GUARD_REVIEW['path'],m._CHECKER_GUARD_TITLE_PACKET['path'],'projects/ngx-material-legacy/package.json'}\n for path in paths:\n  dest=root/path;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(r/path,dest)\n (root/'.git').write_bytes((r/'.git').read_bytes());current=m.historical_checker_guard_test_subject(root)\n targets=[*[ref['path']for ref in m._CHECKER_GUARD_REFS],m._CHECKER_GUARD_REVIEW['path'],m._CHECKER_GUARD_TITLE_PACKET['path']]\n for path in targets:\n  old=(root/path).read_bytes();(root/path).write_bytes(old+b'\\n');rejects('late actual binding '+path,current['assert_current']);(root/path).write_bytes(old);current['assert_current']()\n  (root/path).write_bytes(old+b'\\n');rejects('cold actual binding '+path,lambda:m.historical_checker_guard_test_subject(root));(root/path).write_bytes(old)\n current['assert_current']()\nreport={'checks_passed':len(checks),'checks':checks,'Git_read_commands':len(commands),'scope':'actual maintained fixed4guard DATA subject + disposable physical/metadata controls','subprocess_policy':'Git show/cat-file/rev-parse only; all other heads denied before launch','physical_maintained_files_mutated':False,'source_owner_or_oldGitprogram_or_compiler_or_CLI_executed':False}\n(s/'after-seal-controls-v1.json').write_text(json.dumps(report,indent=2)+'\\n');print(json.dumps({'checks_passed':len(checks),'Git_read_commands':len(commands)}))\n",
+    "after_seal_default_chain.py": "from pathlib import Path\nimport ast,importlib,json,subprocess,sys,tempfile,time\nroot=Path('/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy');scratch=Path(__file__).resolve().parent\nsys.dont_write_bytecode=True;sys.path.insert(0,str(root/'tests'))\noriginal=subprocess.Popen;commands=[]\ndef git_only(args,*a,**kw):\n assert type(args) is list and args and args[0]=='git', 'non-Git subprocess denied in DATA controls: '+repr(args)\n assert not kw.get('shell',False)\n assert any(x in args for x in ['show','cat-file','rev-parse']), 'non-read Git denied'\n commands.append(args)\n return original(args,*a,**kw)\nsubprocess.Popen=git_only\nroutes=[('m3_theme_boundary_ledger_patch','verify_boundary_successor'),('dialog_title_canonical_ledger_patch','verify_title_successor'),('legacy_sass_entrypoint_ledger_patch','verify_sass_entrypoint_successor'),('checker_reference_metadata_patch','verify_checker_reference_successor'),('token_build_ledger_patch','verify_token_build_successor'),('unthemable_ledger_patch','verify_unthemable_successor'),('modern_control_base_ledger_patch','verify_control_successor'),('theme_token_root_ledger_patch','verify_root_successor'),('form_field_tokenization_ledger_patch','verify_field_successor')]\nchecks=[];failures=[]\nfor module,name in routes:\n start=time.monotonic()\n try:\n  report=getattr(importlib.import_module(module),name)(root=root)\n  checks.append({'route':module+':'+name,'elapsed_seconds':round(time.monotonic()-start,3),'report':report})\n except Exception as e:\n  detail={}\n  tb=e.__traceback__\n  while tb:\n   if tb.tb_frame.f_code.co_name=='derive_title_successor':\n    local=tb.tb_frame.f_locals\n    if 'member' in local and 'value' in local:\n     import hashlib\n     detail={'member':local['member'],'actual_sha256':hashlib.sha256(local['value']).hexdigest(),'actual_bytes':len(local['value'])}\n   tb=tb.tb_next\n  failures.append({'route':module+':'+name,'error':repr(e),'elapsed_seconds':round(time.monotonic()-start,3),'detail':detail})\n  import traceback;traceback.print_exc()\n  break\nreport={'checks_passed':len(checks),'checks':checks,'failures':failures,'Git_read_commands':len(commands),'subprocess_policy':'Git show/cat-file/rev-parse only; all other executable heads denied before launch','maintained_files_edited':False,'source_owner_runtime_executed':False}\n(scratch/'after-seal-default-chain-v1.json').write_text(json.dumps(report,indent=2)+'\\n');print(json.dumps({'passed':len(checks),'failures':failures,'git_reads':len(commands)}))\nsys.exit(bool(failures))\n",
+    "after_seal_mutations.py": "from pathlib import Path\nimport importlib,io,json,os,subprocess,sys,time,unittest\nr=Path('/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy');s=Path(__file__).resolve().parent\nsys.dont_write_bytecode=True;sys.path.insert(0,str(r/'tests'));original=subprocess.Popen;commands=[]\n# Existing optional report destinations must not mutate the maintained checkout.\nfor key in list(os.environ):\n if key.startswith('RC_')or'REPORT'in key:os.environ.pop(key,None)\ndef git_only(args,*a,**kw):\n assert type(args)is list and args and args[0]=='git','non-Git subprocess denied: '+repr(args)\n assert not kw.get('shell',False)and any(x in args for x in ['show','cat-file','rev-parse']);commands.append(args);return original(args,*a,**kw)\nsubprocess.Popen=git_only\nselected=[\n ('test_legacy_sass_entrypoint_ledger','LegacySassEntrypointLedgerTests','test_independent_exact_reconstruction_and_mutations'),\n ('test_checker_reference_metadata','CheckerReferenceMetadataTests','test_independent_reconstruction_and_mutations'),\n ('test_token_build_admission','TokenBuildAdmissionTests','test_independent_canonical_delta_and_mutations'),\n ('test_unthemable_token_admission','UnthemableTokenAdmissionTests','test_independent_five_decisions_and_fourteen_metadata_tokens'),\n ('test_modern_control_base_admission','ModernControlBaseAdmissionTests','test_independent_four_entries_and_real_failures'),\n ('test_theme_token_root_admission','ThemeTokenRootAdmissionTests','test_independent_two_entries_and_real_failures'),\n ('test_form_field_tokenization_admission','FormFieldTokenizationAdmissionTests','test_independent_two_entries_and_real_failures'),\n ('test_m3_theme_boundary_admission','M3ThemeBoundaryAdmissionTests','test_independent_five_entries_and_real_failures'),\n ('test_dialog_title_canonical_owner','DialogTitleCanonicalOwnerTests','test_independent_complete_byte_transition'),\n]\nresults=[]\nfor module,cls,method in selected:\n case=getattr(importlib.import_module(module),cls)(method);stream=io.StringIO();start=time.monotonic();result=unittest.TextTestRunner(stream=stream,verbosity=2).run(unittest.TestSuite([case]));elapsed=time.monotonic()-start\n results.append({'test_id':case.id(),'elapsed_seconds':round(elapsed,6),'pass':result.wasSuccessful()and result.testsRun==1 and not result.skipped,'tests_run':result.testsRun,'failures':len(result.failures),'errors':len(result.errors),'skipped':len(result.skipped),'log':stream.getvalue()})\n print(json.dumps({'test_id':case.id(),'pass':results[-1]['pass'],'elapsed_seconds':results[-1]['elapsed_seconds']}),flush=True)\n if not results[-1]['pass']:break\nreport={'selected_original_independent_mutation_methods':9,'methods_run':len(results),'methods_passed':sum(x['pass']for x in results),'results':results,'Git_read_commands':len(commands),'subprocess_policy':'Git show/cat-file/rev-parse only; all other executable heads denied before launch','physical_maintained_files_mutated':False,'source_owner_or_oldGitprogram_or_compiler_or_CLI_executed':False}\n(s/'after-seal-mutations-v1.json').write_text(json.dumps(report,indent=2)+'\\n');print(json.dumps({'methods_run':len(results),'methods_passed':report['methods_passed'],'Git_read_commands':len(commands)}));sys.exit(report['methods_passed']!=9)\n"
+  },
+  "runtime_status_at_receipt": "31purepreservation/DATA checks passed; actual4guard API/physical controls,9default route positives and9original independent mutation testmethods prepared but not executed yet. Parent V6 seal signal received separately; versioned runtime result to follow.",
+  "current_API_or_new_subject_constructed_by_this_cut": false,
+  "old_Git_program_or_sourceowner_or_compiler_or_CLI_executed": false,
+  "production_files_or_APIs_modified": false,
+  "qualification_granted": false,
+  "g11_claim": "not-passed"
+}

@@ -36,8 +36,10 @@ def derive_checker_reference_successor(root=ROOT, expected_before=None):
         from unthemable_ledger_patch import qualified_checker_before
         checker = qualified_checker_before(root)
     assert HASH(checker) == CURRENT == review['checker']['current_sha256']
+    from current_sass_canonical_test_scope import historical_checker_guard_test_subject
+    source_subject = historical_checker_guard_test_subject(root)
     for ref in review['guard_modules']:
-        current = title_prior_tool_bytes(root, ref['path'])
+        current = source_subject['comparison_bytes'](ref)
         assert HASH(current) == ref['sha256'] and len(current) == ref['bytes']
     original = json.loads(before)
     expected = copy.deepcopy(original)
@@ -109,6 +111,7 @@ def derive_checker_reference_successor(root=ROOT, expected_before=None):
     assert [(row['sha'], row['final_disposition'], row['reason'], row['individual_proof'].get('decision') if row.get('individual_proof') else None)
             for row in original['entries']] == [(row['sha'], row['final_disposition'], row['reason'], row['individual_proof'].get('decision') if row.get('individual_proof') else None)
             for row in expected['entries']]
+    source_subject['assert_current']()
     return before, after
 
 

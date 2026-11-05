@@ -27,11 +27,15 @@ FIXED = ('scripts/table-local-compilation-canonical-stage.mjs',
          'scripts/legacy-removal-owner-source.mjs',
          'scripts/browser-owner-source.mjs',
          'scripts/checker-owner-source.mjs',
-         'scripts/checker-reference-proposal.mjs')
+         'scripts/checker-reference-proposal.mjs',
+         'tests/browser_reference_owner_probe.mjs',
+         'tests/test_browser_reference_owner.py')
 ANCHORS = {
     'scripts/browser-owner-source.mjs': ('compatibility/rc/21x-legacy-removal-admission-owner-inputs.json', 2),
     'scripts/checker-owner-source.mjs': ('compatibility/rc/c04-browser-owner-inputs.json', 1),
     'scripts/checker-reference-proposal.mjs': ('compatibility/rc/c04-checker-owner-inputs.json', 2),
+    'tests/browser_reference_owner_probe.mjs': ('compatibility/rc/21x-table-local-compilation-admission-owner-inputs.json', 9),
+    'tests/test_browser_reference_owner.py': ('compatibility/rc/21x-table-local-compilation-admission-owner-inputs.json', 10),
 }
 UNOWNED = 'scripts/compare-css.py'
 hash_bytes = lambda raw: hashlib.sha256(raw).hexdigest()
@@ -111,7 +115,7 @@ with tempfile.TemporaryDirectory(prefix='ngx-tool-fixed-anchors-') as temp:
                 assert result['code'] == 'ERR_ASSERTION'
         cases.append(dict(id=identifier, accepted=accepted, engines=2))
 
-    evaluate('baseline-fixed-five' if line == '21.x' else 'baseline-main', copy.deepcopy(baseline), True)
+    evaluate('baseline-fixed-seven' if line == '21.x' else 'baseline-main', copy.deepcopy(baseline), True)
     if line == '21.x':
         for path, (anchor_path, index) in ANCHORS.items():
             label = Path(path).stem
@@ -158,7 +162,7 @@ with tempfile.TemporaryDirectory(prefix='ngx-tool-fixed-anchors-') as temp:
 
 report = dict(schema_version=1, result='pass', line=line, cases=len(cases), engines=2,
     accepted_checks=2, rejected_checks=2 * (len(cases) - 1), case_rows=cases,
-    fixed_source_rows_verified=5 if line == '21.x' else 0,
+    fixed_source_rows_verified=7 if line == '21.x' else 0,
     current_factories_executed=True, old_Git_programs_executed=False,
     product_or_source_owners_executed=False, current_root_mutated=False)
 print(json.dumps(report))
