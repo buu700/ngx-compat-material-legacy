@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "base-class-owner-guard-plan-stage-extension-transition",
+  "prior_owner_inputs": {
+    "path": "compatibility/rc/21x-base-class-removal-admission-owner-inputs-v1.json",
+    "sha256": "7c72a44224d6bd9f3eb141fdffb15d0f7ec11cb21b0f466500f10f12742e8e18",
+    "bytes": 7115
+  },
+  "stage_path": "scripts/base-class-removal-canonical-stage.mjs",
+  "old_extension_template": {
+    "sha256": "4659fbd1372b1e7076a9ad241089490188954170f85c06664338c13f34051808",
+    "bytes": 5167
+  },
+  "literal_edits": [
+    {
+      "old": "  const assertCurrent = () => owner.assertCurrent();\n",
+      "new": "  const assertCurrent = owner.assertCurrent;\n",
+      "occurrences": 1
+    },
+    {
+      "old": "    metadataRead, wrapPrepared, bound: structuredClone([...bound.values()]), assertCurrent,\n",
+      "new": "    metadataRead, wrapPrepared, bound: structuredClone([...bound.values()]), assertCurrent, guardPlan: owner.guardPlan,\n",
+      "occurrences": 1
+    }
+  ],
+  "new_extension_template": {
+    "sha256": "1873864432f615ea9b78718a7a84da3faeba04c09db7848e44f5de783c49236a",
+    "bytes": 5187
+  },
+  "owner_image_marker": "__BASE_OWNER_IMAGE_SHA256__",
+  "owner_image_marker_occurrences": 1,
+  "pure_functions_changed": false,
+  "source_scope_only": true,
+  "canonical_changes_applied": false,
+  "g11_claim": "not-passed"
+}

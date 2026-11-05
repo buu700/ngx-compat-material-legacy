@@ -10,9 +10,11 @@ import {readFileSync, writeFileSync} from 'node:fs';
 import {join} from 'node:path';
 import admission from '../scripts/upstream-base-class-removal-admission.cjs';
 import {baseClassRemovalCanonicalFrameSubject, baseClassRemovalOwnerSourceSubject} from '../scripts/base-class-removal-owner-source.mjs';
+import {baseClassRemovalOwnerContext} from '../scripts/base-class-removal-canonical-stage.mjs';
 import {readHistoricalContractRepairMember} from '../scripts/historical-contract-repair-source.mjs';
 
 const root = process.cwd(), helper = 'scripts/canonical-source-guard-plan.mjs';
+const transition = 'compatibility/rc/21x-base-class-owner-guard-plan-transition-v2.json';
 const disk = path => readHistoricalContractRepairMember(root, path);
 const helperBefore = disk(helper), inspectorBefore = Object.getOwnPropertyDescriptor(admission, 'inspectSource');
 let calls = 0, onRead = () => {}, override = null, rejected = 0;
@@ -25,12 +27,15 @@ const write = (path, bytes) => writeFileSync(join(root, path), bytes);
 const reset = () => {onRead = () => {}; override = null; calls = 0;};
 
 // The new dependency is checked before any supplied constructor callback.
-write(helper, Buffer.concat([helperBefore, Buffer.from('\n// cold helper drift\n')]));
-try {
-  onRead = () => write(helper, helperBefore);
-  reject(() => baseClassRemovalCanonicalFrameSubject({root, read}));
-  assert.equal(calls, 0);
-} finally {write(helper, helperBefore); reset();}
+for (const path of [helper, transition]) {
+  const before = disk(path);
+  write(path, Buffer.concat([before, Buffer.from('\n// cold helper drift\n')]));
+  try {
+    onRead = () => write(path, before);
+    reject(() => baseClassRemovalCanonicalFrameSubject({root, read}));
+    assert.equal(calls, 0);
+  } finally {write(path, before); reset();}
+}
 
 // A source inspector already poisoned at entry cannot be restored by the
 // frame constructor's first callback and then used as apparently current.
@@ -47,6 +52,15 @@ const owner = baseClassRemovalOwnerSourceSubject({root, read});
 assert.equal(owner.source.facts.historical_source_bindings_revalidated, 715);
 assert.ok(Object.isFrozen(owner.guardNode) && Object.isFrozen(owner.frames.guardNode));
 assert.equal(owner.guardNode.dependencies.length, 1);
+assert.ok(Object.isFrozen(owner.guardPlan));
+assert.equal(owner.guardPlan.assertCurrent, owner.assertCurrent);
+assert.equal(owner.guardPlan.node, owner.guardNode);
+assert.ok(owner.frames.bound.some(ref => ref.path === transition));
+const context = baseClassRemovalOwnerContext({root, read});
+assert.ok(Object.isFrozen(context.guardPlan));
+assert.equal(context.guardPlan.assertCurrent, context.assertCurrent);
+assert.ok(Object.isFrozen(context.guardPlan.node));
+context.assertCurrent(); reset();
 assert.equal(owner.guardNode.dependencies[0], owner.frames.guardNode);
 assert.ok(owner.frames.bound.some(ref => ref.path === helper && ref.bytes === helperBefore.length));
 const sourceOnly = owner.source.bound.find(ref => ref.path.startsWith('projects/ngx-material-legacy/legacy-')
@@ -54,7 +68,7 @@ const sourceOnly = owner.source.bound.find(ref => ref.path.startsWith('projects/
 assert.ok(sourceOnly, 'need an actual source-only member');
 
 // A prepared guard checks every physical scope before the first callback.
-for (const path of [helper, sourceOnly.path]) {
+for (const path of [helper, transition, sourceOnly.path]) {
   const before = disk(path); calls = 0;
   write(path, Buffer.concat([before, Buffer.from('\n// cold prepared drift\n')]));
   try {
@@ -65,7 +79,7 @@ for (const path of [helper, sourceOnly.path]) {
 }
 
 // Actual consumed frame and source bytes are still checked independently.
-for (const target of [helper, sourceOnly.path]) {
+for (const target of [helper, transition, sourceOnly.path]) {
   override = (path, actual) => path === target ? Buffer.concat([actual, Buffer.from('\n// forged callback\n')]) : actual;
   try {reject(owner.assertCurrent);} finally {reset();}
   owner.assertCurrent();
@@ -108,9 +122,10 @@ for (const [object, key] of [[owner.frames, 'guardNode'], [owner.frames, 'assert
   owner.assertCurrent();
 }
 
-assert.equal(rejected, 12); assert.equal(getters, 0);
+assert.equal(rejected, 15); assert.equal(getters, 0);
 assert.ok(readFileSync(join(root, helper)).equals(helperBefore));
 console.log(JSON.stringify({result: 'pass', line: '21.x', actual_frame_and_source_owner_executed: true,
+  actual_stage_context_executed: true, guard_plan_identity_forwarded: true,
   frame_members: owner.frames.bound.length, source_members: owner.source.bound.length,
   historical_source_bindings_revalidated: owner.source.facts.historical_source_bindings_revalidated,
   rejected_lifetime_faults: rejected, inspector_getters_invoked: getters + constructorGetters,

@@ -1,0 +1,28 @@
+{
+  "scope": "Static independent review of scratch transition packet, verifier proposal and review against committed 21.x owner and epoch. No owner, maintained writes or tests executed.",
+  "result": "No concrete defect found in the exact two-edit DATA transition or proposed narrowly private binder, conditional on implementing all listed identity/final-boundary checks and retaining existing projections and guards. Binder is design-only, so its implementation cannot yet be qualified.",
+  "packet": {
+    "sha256": "213fa3b3dcae799057c9d8c48b7c66349f5c0e3075e3e7a96b6d457b82410803",
+    "bytes": 1369,
+    "prior_packet_sha256": "7c72a44224d6bd9f3eb141fdffb15d0f7ec11cb21b0f466500f10f12742e8e18",
+    "prior_packet_bytes": 7115,
+    "old_template_sha256": "4659fbd1372b1e7076a9ad241089490188954170f85c06664338c13f34051808",
+    "old_template_bytes": 5167,
+    "new_template_sha256": "1873864432f615ea9b78718a7a84da3faeba04c09db7848e44f5de783c49236a",
+    "new_template_bytes": 5187,
+    "each_edit_occurrences": 1,
+    "marker_occurrences_before_and_after": 1,
+    "observation": "Hashes, byte sizes and counts independently recomputed from actual prior packet. The marker is retained until the owner image hash is substituted, so the transition packet need not pin the resulting owner/stage bytes and does not introduce a hash cycle."
+  },
+  "reachability": [
+    "The stage function constructs owner locally, immediately captures frame/stage data, and returns a separate context exposing selected copied fields and closures, not the owner object itself. The supplied read callback receives a path and does not receive that owner reference. Under trusted committed startup there is no supported route in this function exposing the exact owner object whose assertCurrent property the old wrapper dynamically reads. The new alias is therefore equivalent for that actual private object; it intentionally would not follow unsupported property reassignment if such a reference escaped.",
+    "The genuine owner composed guard is a zero-argument closure; capturing and calling the same function without its former owner receiver does not alter its semantics. The proposed tuple originates from that actual closure and actual node, while exposing no source reader or projection.",
+    "Private epoch baseClassRemovalProofContext constructs selected itself. Its combined roster branch spreads selected then replaces assertCurrent with a distinct wrapper that also guards roster and physical boundary. Exact tuple-guard/context-guard identity mismatch must keep this branch opaque; using the selected node there would omit required scope."
+  ],
+  "requirements_before_implementation_acceptance": [
+    "Preserve old V1 packet hash, source-parent Git prefix, original pure-function checks and current image self authentication; authenticate transition physical bytes before supplied callback and add its member to frame bound. Validate the entire finite packet fields and exact ordered edits, both template hashes and exact marker counts.",
+    "Construct the frozen tuple from the actual owner node and function; capture context own data descriptors, tuple identity, guard identity and node, reject changed or accessor protected metadata at required entry/final boundaries. Never accept externally supplied registration or infer authority from function equality on arbitrary objects.",
+    "In the combined roster or other mismatching wrapper case, use the entire existing guard; do not substitute selected node for augmented guard. Preserve metadataRead, source-lane projection checks and callback lifetimes until separately factored and proved.",
+    "Refresh source image and finite profile, then run meaningful actual lifecycle tests including direct matching node, combined opaque mismatch, mutation or accessor corruption of protected tuple/context, cold and late physical/projection drift. No full owner/performance or G11 claim until separately established."
+  ]
+}

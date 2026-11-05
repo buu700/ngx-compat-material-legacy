@@ -25,6 +25,8 @@ const INPUTS = 'compatibility/rc/21x-base-class-removal-admission-owner-inputs-v
 const INPUTS_SHA256 = '7c72a44224d6bd9f3eb141fdffb15d0f7ec11cb21b0f466500f10f12742e8e18';
 const GUARD_PLAN = Object.freeze({path: 'scripts/canonical-source-guard-plan.mjs',
   sha256: '4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f', bytes: 4609});
+const STAGE_TRANSITION = Object.freeze({path: 'compatibility/rc/21x-base-class-owner-guard-plan-transition-v2.json',
+  sha256: '213fa3b3dcae799057c9d8c48b7c66349f5c0e3075e3e7a96b6d457b82410803', bytes: 1369});
 const GUARD_PLAN_FUNCTION_SHA256 = 'fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947';
 const rootDefault = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const image = readFileSync(fileURLToPath(import.meta.url));
@@ -111,6 +113,9 @@ export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read 
   // Reject a poisoned planner before any supplied read callback can restore it.
   assertGuardPlanIdentity();
   assertGuardPlanPhysical(root);
+  const transitionPhysical = physical(root, STAGE_TRANSITION.path);
+  assert.equal(hash(transitionPhysical), STAGE_TRANSITION.sha256, 'changed base-class guard-plan transition');
+  assert.equal(transitionPhysical.length, STAGE_TRANSITION.bytes);
   const bound = new Map();
   const current = path => {
     const actual = physical(root, path), supplied = read(path);
@@ -128,6 +133,7 @@ export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read 
     return raw;
   };
   member(GUARD_PLAN);
+  const transition = JSON.parse(member(STAGE_TRANSITION));
   assert.equal(hash(image), BASE_CLASS_REMOVAL_OWNER_SOURCE_SHA256, 'loaded base-class leaf differs from stage pin');
   assert.ok(equalBuffers(current(SELF), image), 'loaded/current base-class leaf differs');
   const packetRaw = current(INPUTS);
@@ -147,7 +153,32 @@ export function baseClassRemovalCanonicalFrameSubject({root = rootDefault, read 
   assert.deepEqual(proposal.stage, {path: STAGE, sha256: packet.stage_before.sha256, bytes: packet.stage_before.bytes});
   const marker = '__BASE_OWNER_IMAGE_SHA256__';
   assert.equal(packet.stage_extension_template.split(marker).length, 2, 'ambiguous exact owner extension');
-  const extension = packet.stage_extension_template.replace(marker, hash(image));
+  const edits = [
+    {old: '  const assertCurrent = () => owner.assertCurrent();\n',
+      new: '  const assertCurrent = owner.assertCurrent;\n', occurrences: 1},
+    {old: '    metadataRead, wrapPrepared, bound: structuredClone([...bound.values()]), assertCurrent,\n',
+      new: '    metadataRead, wrapPrepared, bound: structuredClone([...bound.values()]), assertCurrent, guardPlan: owner.guardPlan,\n', occurrences: 1},
+  ];
+  assert.deepEqual(transition, {
+    schema_version: 1, line: '21.x', role: 'base-class-owner-guard-plan-stage-extension-transition',
+    prior_owner_inputs: {path: INPUTS, sha256: INPUTS_SHA256, bytes: 7115}, stage_path: STAGE,
+    old_extension_template: {sha256: '4659fbd1372b1e7076a9ad241089490188954170f85c06664338c13f34051808', bytes: 5167},
+    literal_edits: edits,
+    new_extension_template: {sha256: '1873864432f615ea9b78718a7a84da3faeba04c09db7848e44f5de783c49236a', bytes: 5187},
+    owner_image_marker: marker, owner_image_marker_occurrences: 1,
+    pure_functions_changed: false, source_scope_only: true, canonical_changes_applied: false, g11_claim: 'not-passed',
+  });
+  let template = packet.stage_extension_template;
+  assert.equal(hash(Buffer.from(template)), transition.old_extension_template.sha256);
+  assert.equal(Buffer.byteLength(template), transition.old_extension_template.bytes);
+  for (const {old, new: replacement, occurrences} of edits) {
+    assert.equal(template.split(old).length, occurrences + 1, 'ambiguous guard-plan template edit');
+    template = template.replace(old, replacement);
+  }
+  assert.equal(hash(Buffer.from(template)), transition.new_extension_template.sha256);
+  assert.equal(Buffer.byteLength(template), transition.new_extension_template.bytes);
+  assert.equal(template.split(marker).length, 2, 'ambiguous new owner extension');
+  const extension = template.replace(marker, hash(image));
   assert.ok(equalBuffers(current(STAGE), Buffer.concat([oldStage, Buffer.from(extension)])), 'changed pure stage or owner extension');
   for (const [fn, name] of [[baseClassRemovalRegistrySuccessor, 'baseClassRemovalRegistrySuccessor'],
     [applyBaseClassRemovalCanonicalStage, 'applyBaseClassRemovalCanonicalStage']]) {
@@ -271,12 +302,13 @@ export function baseClassRemovalOwnerSourceSubject({root = rootDefault, read = p
     final: () => { physicalSweep(root, bound.values(), true); assertMetadata(); },
   });
   const assertCurrent = loadedComposeCanonicalSourceGuards(Object.freeze([guardNode]));
+  const guardPlan = Object.freeze({assertCurrent, node: guardNode});
   assertCurrent();
   return {frames, body: freeze(structuredClone(body)), entry: freeze(structuredClone(entry)), proof: freeze(structuredClone(request.proof)),
     stage: {...frames.stage, before: Buffer.from(frames.stage.before), after: Buffer.from(frames.stage.after),
       entries: freeze(structuredClone(frames.stage.entries))},
     registryBefore: Buffer.from(frames.registryBefore), registryAfter: Buffer.from(frames.registryAfter),
-    source, bound: structuredClone([...bound.values()]), guardNode, assertCurrent,
+    source, bound: structuredClone([...bound.values()]), guardNode, guardPlan, assertCurrent,
     source_scope_only: true, canonical_admission_granted: false,
     current_native_packed_browser_floor_or_full_audit_qualified: false};
 }

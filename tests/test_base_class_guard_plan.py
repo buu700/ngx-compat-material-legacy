@@ -42,7 +42,8 @@ class BaseClassGuardPlanTests(unittest.TestCase):
         # Back up its finite possible owned family population and helper before
         # launching. subprocess.run kills and reaps a timed-out child before
         # this parent-owned recovery executes, unlike the child's own finally.
-        paths = [ROOT / 'scripts/canonical-source-guard-plan.mjs']
+        paths = [ROOT / 'scripts/canonical-source-guard-plan.mjs',
+                 ROOT / 'compatibility/rc/21x-base-class-owner-guard-plan-transition-v2.json']
         for family in (ROOT / 'projects/ngx-material-legacy').glob('legacy-*'):
             if family.is_dir() and not family.is_symlink():
                 paths.extend(family.rglob('*.ts'))
@@ -57,8 +58,10 @@ class BaseClassGuardPlanTests(unittest.TestCase):
         self.assertEqual(report['result'], 'pass')
         self.assertEqual(report['line'], '21.x')
         self.assertTrue(report['actual_frame_and_source_owner_executed'])
+        self.assertTrue(report['actual_stage_context_executed'])
+        self.assertTrue(report['guard_plan_identity_forwarded'])
         self.assertEqual(report['historical_source_bindings_revalidated'], 715)
-        self.assertEqual(report['rejected_lifetime_faults'], 12)
+        self.assertEqual(report['rejected_lifetime_faults'], 15)
         self.assertEqual(report['inspector_getters_invoked'], 0)
         self.assertTrue(report['restoration_passed'])
         self.assertTrue(report['constructor_full_guard_retained'])

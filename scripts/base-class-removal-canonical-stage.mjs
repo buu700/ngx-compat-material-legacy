@@ -62,7 +62,7 @@ export function applyBaseClassRemovalCanonicalStage({before, body} = {}) {
 import {baseClassRemovalOwnerSourceSubject} from './base-class-removal-owner-source.mjs';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
-export const BASE_CLASS_REMOVAL_OWNER_SOURCE_SHA256 = 'a10373f8926e7df98021ac04c4b56b35826984f58845de688e3f13b926b47ed0';
+export const BASE_CLASS_REMOVAL_OWNER_SOURCE_SHA256 = 'da360e6ec2b7f2079f9501ed75f3a9e095393d3bffb9cb9f2be53a0413e04de9';
 const ownerIsBuffer = Buffer.isBuffer, ownerBufferEquals = Buffer.prototype.equals, ownerApply = Reflect.apply;
 const ownerEqual = (actual, supplied) => ownerIsBuffer(supplied) && ownerApply(ownerBufferEquals, actual, [supplied]);
 function ownerValue(object, key) {
@@ -82,7 +82,7 @@ export function baseClassRemovalOwnerContext({root, read = path => readFileSync(
   const frames = owner.frames, applied = frames.applied;
   const before = Buffer.from(owner.stage.before), after = Buffer.from(owner.stage.after);
   const bound = new Map(owner.bound.map(ref => [ref.path, {...ref}]));
-  const assertCurrent = () => owner.assertCurrent();
+  const assertCurrent = owner.assertCurrent;
   const metadataRead = path => {
     if (path !== BASE_CLASS_REMOVAL_LEDGER) return read(path);
     frames.assertCurrent();
@@ -130,7 +130,7 @@ export function baseClassRemovalOwnerContext({root, read = path => readFileSync(
   return {applied, registryApplied: frames.registryApplied, precursor: frames.precursor,
     before: Buffer.from(before), after: Buffer.from(after),
     registryBefore: Buffer.from(owner.registryBefore), registryAfter: Buffer.from(owner.registryAfter),
-    metadataRead, wrapPrepared, bound: structuredClone([...bound.values()]), assertCurrent,
+    metadataRead, wrapPrepared, bound: structuredClone([...bound.values()]), assertCurrent, guardPlan: owner.guardPlan,
     source_facts: structuredClone(owner.source.facts), source_scope_only: true,
     current_native_packed_browser_floor_or_full_audit_qualified: false};
 }
