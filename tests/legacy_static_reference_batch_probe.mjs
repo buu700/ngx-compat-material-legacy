@@ -12,7 +12,7 @@ import {createHash} from 'node:crypto';
 import {legacyRemovalOwnerSourceSubject} from '../scripts/legacy-removal-owner-source.mjs';
 import {tableLocalCompilationOwnerSourceSubject} from '../scripts/table-local-compilation-owner-source.mjs';
 import {readHistoricalContractRepairMember} from '../scripts/historical-contract-repair-source.mjs';
-const root=process.cwd(),group=process.argv[2];assert.ok(['table','baseline','constructor','final'].includes(group));
+const root=process.cwd(),group=process.argv[2];assert.ok(['table','baseline','constructor','final','retention','parent-overwrite'].includes(group));
 const disk=path=>readHistoricalContractRepairMember(root,path),hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const child='scripts/tabs-finite-source-successor.mjs',packetPath='compatibility/rc/21x-legacy-removal-admission-owner-inputs.json';
 const packet=JSON.parse(disk(packetPath)),refs=[...packet.code_transitions.map(row=>row.after),...packet.source_members];
@@ -25,7 +25,72 @@ const restore=()=>{for(const[path,before] of saved){const now=disk(path);assert.
 const targetError=(fn,path)=>assert.throws(fn,error=>String(error?.message).includes(path),'expected targeted rejection '+path);
 const isStaticMember=()=>{const stack=String(new Error().stack).split('\n');const i=stack.findIndex(row=>/at read \([^\n]*legacy_static_reference_batch_probe\.mjs:/.test(row));return i>=0&&/at member \([^\n]*legacy-removal-owner-source\.mjs:/.test(stack[i+1]??'')&&/at staticMember \([^\n]*legacy-removal-owner-source\.mjs:/.test(stack[i+2]??'');};
 try{
- if(group==='table'){
+ if(group==='parent-overwrite'){
+  const table=tableLocalCompilationOwnerSourceSubject({root,read});
+  const parent=legacyRemovalOwnerSourceSubject({root,read});
+  const tableRefs=new Map(table.bound.map(ref=>[ref.path,ref]));
+  const candidate=table.packet.source_members.map(ref=>tableRefs.get(ref.path)).find(ref=>ref&&Number.isSafeInteger(ref.bytes)&&!table.ownsReference(ref)&&parent.bound.some(row=>row.path===ref.path&&row.sha256===ref.sha256&&row.bytes===ref.bytes));
+  assert.ok(candidate,'no genuine inherited unowned table packet reference found');
+  assert.equal(hash(disk(candidate.path)),candidate.sha256);
+  reset();parent.assertCurrent();const callbackCount=calls;assert.ok(callbackCount>0);reset();
+  let outerCalls=0,nestedCalls=0,inside=false,reached=false,updatedRef,error;
+  onRead=()=>{
+   if(inside){nestedCalls++;return;}
+   outerCalls++;
+   if(outerCalls!==callbackCount)return;
+   reached=true;inside=true;
+   try{
+    fault(candidate.path);const altered=disk(candidate.path);updatedRef={...candidate,sha256:hash(altered),bytes:altered.length};
+    assert.ok(parent.comparisonBytes(updatedRef).equals(altered));
+    writeFileSync(join(root,candidate.path),saved.get(candidate.path));
+    assert.equal(hash(disk(candidate.path)),candidate.sha256);
+   }finally{inside=false;}
+  };
+  try{parent.assertCurrent();assert.fail('expected parent physical mismatch');}catch(e){error=e;}
+  assert.ok(reached&&outerCalls===callbackCount,'last original callback not reached');assert.ok(updatedRef,'genuine comparison API did not update');
+  assert.ok(String(error?.message).includes('physical legacy source '+candidate.path),'wrong parent fault '+String(error));
+  assert.match(String(error.stack),/\bfinal\b/);
+  reset();assert.ok(parent.comparisonBytes(candidate).equals(disk(candidate.path)));reset();parent.assertCurrent();
+  console.log(JSON.stringify({result:'pass',group,actual_parent:true,target:candidate.path,original_callbacks:outerCalls,nested_api_callbacks:nestedCalls,physical_restored_before_final:true,parent_live_overwrite_rejected_in_final:true,actual_api_recovery:true,full_owner_pass:false}));
+ }else if(group==='retention'){
+  const table=tableLocalCompilationOwnerSourceSubject({root,read});
+  const other=tableLocalCompilationOwnerSourceSubject({root,read});
+  assert.equal(typeof table.retainsReferences,'function');assert.ok(table.guardNode&&other.guardNode);
+  const inherited=structuredClone(table.bound),node=table.guardNode;assert.ok(inherited.length>0);reset();
+  assert.equal(table.retainsReferences(inherited,node),true);assert.equal(table.retainsReferences(inherited,other.guardNode),false);
+  const wrongHash=structuredClone(inherited);wrongHash[0].sha256='0'.repeat(64);
+  const wrongSize=structuredClone(inherited);wrongSize[0].bytes++;
+  const unknown=[...inherited,{path:'tests/not-a-source-member.mjs',sha256:'0'.repeat(64),bytes:1}];
+  for(const invalid of [wrongHash,wrongSize,unknown,new Proxy(inherited,{})])assert.equal(table.retainsReferences(invalid,node),false);
+  let getterCalls=0;const accessor={get path(){getterCalls++;return inherited[0].path;},sha256:inherited[0].sha256,bytes:inherited[0].bytes};
+  assert.equal(table.retainsReferences([accessor],node),false);assert.equal(getterCalls,0);
+  assert.equal(calls,0,'retention metadata unexpectedly invoked supplied reader');
+  // A real comparison on a previously unbound, unowned packet ref can append it
+  // to the actual private table map, without any synthetic state hook.
+  const extra=refs.find(ref=>!inherited.some(row=>row.path===ref.path)&&!table.ownsReference(ref));
+  assert.ok(extra,'expected a genuine unbound unowned reference');
+  assert.ok(table.comparisonBytes(extra).equals(disk(extra.path)));reset();
+  assert.equal(table.retainsReferences(inherited,node),true);
+  const extended=[...inherited,extra];assert.equal(table.retainsReferences(extended,node),true);
+  assert.equal(calls,0);
+  let overwriteSupported=false,overwriteError=null;fault(extra.path);const changed=disk(extra.path),updated={...extra,sha256:hash(changed),bytes:changed.length};
+  try{
+   try{table.comparisonBytes(updated);overwriteSupported=true;}catch(error){assert.equal(error?.code,'ERR_ASSERTION');overwriteError=String(error.message);}
+   if(overwriteSupported){assert.equal(table.retainsReferences(extended,node),false);assert.equal(table.retainsReferences([...inherited,updated],node),true);}
+  }finally{restore();}
+  table.comparisonBytes(extra);reset();assert.equal(table.retainsReferences(extended,node),true);table.assertCurrent();reset();
+  const parent=legacyRemovalOwnerSourceSubject({root,read});reset();
+  parent.assertCurrent();const callbackCount=calls;assert.ok(callbackCount>0);reset();
+  const local='compatibility/rc/21x-legacy-removal-admission-individual-review.json',outcomes=[];
+  for(const target of [child,local]){
+   assert.ok(parent.bound.some(ref=>ref.path===target));let reached=false,error;
+   onRead=()=>{if(calls===callbackCount){reached=true;fault(target);}};
+   try{parent.assertCurrent();assert.fail('expected persistent fault');}catch(e){error=e;}
+   assert.ok(reached,'final callback not reached');assert.ok(String(error?.message).includes(target),'wrong fault '+String(error));
+   outcomes.push({path:target,callbacks:callbackCount,reason:String(error.message),stack_mentions_final:/\bfinal\b/.test(String(error.stack))});restore();parent.assertCurrent();reset();
+  }
+  console.log(JSON.stringify({result:'pass',group,actual_table_and_legacy:true,retention_exact_node_and_mismatch_checks:true,private_map_genuine_addition:true,private_map_genuine_overwrite_supported:overwriteSupported,private_map_overwrite_rejection:overwriteError,metadata_reader_callbacks:0,parent_last_callback_faults:outcomes,full_owner_pass:false}));
+ }else if(group==='table'){
   const table=tableLocalCompilationOwnerSourceSubject({root,read});assert.equal(typeof table.legacyStaticReferences,'function');reset();
   const results=table.legacyStaticReferences(refs);assert.ok(Array.isArray(results));assert.equal(results.length,refs.length);
   const missingRefs=refs.filter(ref=>!table.bound.some(item=>item.path===ref.path));

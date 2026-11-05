@@ -32,6 +32,7 @@ export function legacyRemovalOwnerSourceSubject({root,read=path=>readEvidenceMem
  const actual=packedUpstreamLedgerCurrentSourceLane({root,read});
  const successor=tableLocalCompilationOwnerSourceSubject({root,read});
  const bound=new Map(successor.bound.map(ref=>[ref.path,{...ref}])),member=(ref,resolution)=>{const before=resolution?readEvidenceMember(root,ref.path):undefined,raw=read(ref.path);if(resolution){assert.deepEqual(ref,resolution.reference,'changed planned legacy member');assert.ok(equal(before,raw),'nonphysical planned legacy member '+ref.path);assert.ok(equal(before,readEvidenceMember(root,ref.path)),'planned legacy member changed during callback '+ref.path);}const owned=resolution?true:successor.ownsReference(ref),qualified=resolution?resolution.qualified:owned?successor.qualifyReference(ref):ref,comparison=resolution?resolution.comparison:owned?successor.comparisonBytes(ref):raw;assert.ok(Buffer.isBuffer(raw));assert.equal(hash(comparison),ref.sha256,'changed legacy owner code '+ref.path);if(ref.bytes!==undefined)assert.equal(comparison.length,ref.bytes);assert.equal(hash(raw),qualified.sha256,'changed actual legacy owner successor '+ref.path);assert.ok(raw.equals(readEvidenceMember(root,ref.path)),'nonphysical legacy owner code '+ref.path);bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return comparison;};
+ const inherited=Object.freeze([...bound.values()].map(ref=>Object.freeze({path:ref.path,sha256:ref.sha256,bytes:ref.bytes}))),inheritedByPath=new Map(inherited.map(ref=>[ref.path,ref]));
  const packet=JSON.parse(member({path:INPUTS,sha256:PIN}));assert.equal(packet.schema_version,1);assert.equal(packet.line,'21.x');assert.equal(packet.canonical_dispositions_applied,0);assert.equal(packet.old_program_executed,false);assert.equal(packet.actual_native_packed_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');
  member({path:SELF,sha256:hash(image),bytes:image.length});const transitions=new Map();
  const staticRefs=[...packet.code_transitions.map(row=>row.after),...packet.source_members];
@@ -47,11 +48,23 @@ export function legacyRemovalOwnerSourceSubject({root,read=path=>readEvidenceMem
  if(resolutions)assert.equal(index,staticRefs.length,'unused planned legacy members');};
  // Share only this exact table subject's complete graph. Opaque or mismatched
  // tuples keep the original sequence, including every frame/registry operation.
- const guard=Object.getOwnPropertyDescriptor(successor,'assertCurrent'),plan=Object.getOwnPropertyDescriptor(successor,'guardPlan'),batch=Object.getOwnPropertyDescriptor(successor,'legacyStaticReferences'),ownership=Object.getOwnPropertyDescriptor(successor,'ownsReference');
+ const guard=Object.getOwnPropertyDescriptor(successor,'assertCurrent'),plan=Object.getOwnPropertyDescriptor(successor,'guardPlan'),batch=Object.getOwnPropertyDescriptor(successor,'legacyStaticReferences'),ownership=Object.getOwnPropertyDescriptor(successor,'ownsReference'),witness=Object.getOwnPropertyDescriptor(successor,'retainsReferences');
  const tuple=plan&&Object.hasOwn(plan,'value')?plan.value:undefined;
  const plainTuple=tuple&&typeof tuple==='object'&&!types.isProxy(tuple);
  const tupleGuard=plainTuple?Object.getOwnPropertyDescriptor(tuple,'assertCurrent'):undefined;
  const tupleNode=plainTuple?Object.getOwnPropertyDescriptor(tuple,'node'):undefined;
+ const physical=node=>{
+  let retained=false;
+  if(witness&&Object.hasOwn(witness,'value')&&typeof witness.value==='function'&&!types.isProxy(witness.value)&&!types.isAsyncFunction(witness.value)&&!types.isGeneratorFunction(witness.value)&&guard&&Object.hasOwn(guard,'value')&&plainTuple&&Object.isFrozen(tuple)&&Reflect.ownKeys(tuple).length===2&&tupleGuard&&Object.hasOwn(tupleGuard,'value')&&tupleGuard.value===guard.value&&tupleNode&&Object.hasOwn(tupleNode,'value')&&tupleNode.value===node){
+   const now=Object.getOwnPropertyDescriptor(successor,'retainsReferences');assert.ok(now);for(const field of ['value','enumerable','writable','configurable'])assert.equal(now[field],witness[field],'changed legacy retention witness');
+   retained=apply(witness.value,undefined,[inherited,node]);assert.equal(typeof retained,'boolean','invalid legacy retention witness');
+  }
+  for(const ref of bound.values()){
+   const saved=inheritedByPath.get(ref.path);
+   if(retained&&saved&&saved.path===ref.path&&saved.sha256===ref.sha256&&saved.bytes===ref.bytes)continue;
+   const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'physical legacy source '+ref.path);assert.equal(raw.length,ref.bytes);
+  }
+ };
  const uncovered=staticRefs.filter(ref=>!bound.has(ref.path));
  const usable=guard&&Object.hasOwn(guard,'value')&&typeof guard.value==='function'&&batch&&Object.hasOwn(batch,'value')&&typeof batch.value==='function'&&ownership&&Object.hasOwn(ownership,'value')&&typeof ownership.value==='function'&&
   plainTuple&&Object.isFrozen(tuple)&&Reflect.ownKeys(tuple).length===2&&tupleGuard&&Object.hasOwn(tupleGuard,'value')&&tupleGuard.value===guard.value&&tupleNode&&Object.hasOwn(tupleNode,'value')&&tupleNode.value&&typeof tupleNode.value==='object'&&!types.isProxy(tupleNode.value)&&
@@ -60,8 +73,7 @@ export function legacyRemovalOwnerSourceSubject({root,read=path=>readEvidenceMem
   for(const ref of uncovered){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'physical uncovered legacy source '+ref.path);assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:ref.bytes});}
   const snapshot=structuredClone(staticRefs);
   const check=()=>{assert.deepEqual(staticRefs,snapshot,'changed legacy packet references');for(const [key,saved]of [['assertCurrent',guard],['guardPlan',plan],['legacyStaticReferences',batch],['ownsReference',ownership]]){const now=Object.getOwnPropertyDescriptor(successor,key);assert.ok(now);for(const field of ['value','enumerable','writable','configurable'])assert.equal(now[field],saved[field],'changed legacy binding '+key);}assert.equal(ownValue(tuple,'assertCurrent'),guard.value);assert.equal(ownValue(tuple,'node'),tupleNode.value);};
-  const physical=()=>{for(const ref of bound.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'physical planned legacy source '+ref.path);assert.equal(raw.length,ref.bytes);}};
-  const bindingNode=Object.freeze({dependencies:Object.freeze([tupleNode.value]),preflight:()=>{check();physical();},consume:()=>{check();const resolutions=apply(batch.value,undefined,[staticRefs]);collect(resolutions);check();},final:()=>{physical();check();}});
+  const bindingNode=Object.freeze({dependencies:Object.freeze([tupleNode.value]),preflight:()=>{check();physical(tupleNode.value);},consume:()=>{check();const resolutions=apply(batch.value,undefined,[staticRefs]);collect(resolutions);check();},final:()=>{physical(tupleNode.value);check();}});
   composeCanonicalSourceGuards(Object.freeze([bindingNode]))();
  }else collect();
  const registrySubject=()=>{
@@ -81,13 +93,10 @@ export function legacyRemovalOwnerSourceSubject({root,read=path=>readEvidenceMem
   assert.ok(Object.isFrozen(priorPlan));assert.deepEqual(Reflect.ownKeys(priorPlan).sort(),['assertCurrent','node']);assert.equal(ownValue(priorPlan,'assertCurrent'),priorGuard);
   const priorNode=ownValue(priorPlan,'node');
   const metadata=()=>{assert.equal(ownValue(successor,'assertCurrent'),priorGuard);assert.equal(ownValue(successor,'guardPlan'),priorPlan);assert.equal(ownValue(actual,'read'),sourceRead);};
-  const physical=()=>{for(const ref of bound.values()){
-   const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'physical legacy source input '+ref.path);assert.equal(raw.length,ref.bytes);
-  }};
   let consuming=false;
   const idle=()=>assert.equal(consuming,false,'reentrant legacy source consumption');
   guardNode=Object.freeze({dependencies:Object.freeze([priorNode]),
-   preflight:()=>{idle();metadata();physical();},
+   preflight:()=>{idle();metadata();physical(priorNode);},
    consume:()=>{
     idle();consuming=true;
     try{for(const ref of bound.values()){
@@ -96,7 +105,7 @@ export function legacyRemovalOwnerSourceSubject({root,read=path=>readEvidenceMem
      assert.ok(equal(before,readEvidenceMember(root,ref.path)),'legacy source input changed during callback '+ref.path);
     }}finally{consuming=false;}
    },
-   final:()=>{physical();metadata();},
+   final:()=>{physical(priorNode);metadata();},
   });
   const composed=composeCanonicalSourceGuards(Object.freeze([guardNode]));assertCurrent=()=>{idle();composed();};guardPlan=Object.freeze({assertCurrent,node:guardNode});
  }

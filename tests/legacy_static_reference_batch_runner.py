@@ -35,6 +35,8 @@ class LegacyStaticReferenceBatchTests(unittest.TestCase):
             print(json.dumps(result,sort_keys=True))
     def test_actual_constructor_baseline(self):self.run_group('baseline')
     def test_last_row_final_faults(self):self.run_group('final')
+    def test_real_table_retention_and_parent_final(self):self.run_group('retention')
+    def test_parent_live_overwrite_final(self):self.run_group('parent-overwrite')
     def test_real_table_semantics(self):self.run_group('table')
     def test_real_legacy_constructor_fault_lifetimes(self):self.run_group('constructor')
 if __name__=='__main__':unittest.main()

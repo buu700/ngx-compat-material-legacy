@@ -195,5 +195,19 @@ export function tableLocalCompilationOwnerSourceSubject({root,read=path=>readEvi
   assertCurrent=()=>{idle();composed();};
   guardPlan=Object.freeze({assertCurrent,node:guardNode});
  }
- assertCurrent();return {packet:structuredClone(packet),bound:structuredClone([...bound.values()]),ownsReference,predecessorReference,qualifyReference,comparisonBytes,predecessorData,registryComparisonBytes:()=>Buffer.from(registrySubject().raw),assertCurrent,...(guardPlan?{guardNode,guardPlan,legacyStaticReferences}:{}),old_program_executed:false,canonical_frame_admission_granted:false,current_native_or_full_audit_credit:false};
+ const retainsReferences=(refs,node)=>{
+  if(node!==guardNode||!guardPlan||!Array.isArray(refs)||types.isProxy(refs))return false;
+  for(let index=0;index<refs.length;index++){
+   const item=Object.getOwnPropertyDescriptor(refs,String(index));
+   if(!item||!Object.hasOwn(item,'value'))return false;
+   const ref=item.value;
+   if(!ref||typeof ref!=='object'||types.isProxy(ref))return false;
+   const fields=['path','sha256','bytes'].map(key=>Object.getOwnPropertyDescriptor(ref,key));
+   if(fields.some(field=>!field||!Object.hasOwn(field,'value')))return false;
+   const [path,sha256,bytes]=fields.map(field=>field.value),actual=bound.get(path);
+   if(!actual||actual.path!==path||actual.sha256!==sha256||actual.bytes!==bytes)return false;
+  }
+  return true;
+ };
+ assertCurrent();return {packet:structuredClone(packet),bound:structuredClone([...bound.values()]),ownsReference,predecessorReference,qualifyReference,comparisonBytes,predecessorData,registryComparisonBytes:()=>Buffer.from(registrySubject().raw),assertCurrent,...(guardPlan?{guardNode,guardPlan,legacyStaticReferences,retainsReferences}:{}),old_program_executed:false,canonical_frame_admission_granted:false,current_native_or_full_audit_credit:false};
 }
