@@ -33,7 +33,7 @@ PREVIOUS_INPUTS = dict(path='compatibility/rc/current-sass-tool-reference-inputs
                        sha256='ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f', bytes=478008)
 CHECKPOINTS = {'21.x': 'b25aedd02f7b53e8cd8dfcdad369a806a1301619',
                'main': '5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'}
-INPUTS_SHA = 'c4b33f24cef78dd6d6ed9b9fd99d6eca66ed4bb7626206c4d844eab0df296f81'
+INPUTS_SHA = '0703d636d847370259094c6e0767727329e9a31b0cc5bbdcb882cfac0d8fb021'
 _IMAGE = Path(__file__).read_bytes()
 
 
