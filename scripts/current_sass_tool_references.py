@@ -18,7 +18,7 @@ PREVIOUS_INPUTS = dict(path='compatibility/rc/current-sass-tool-reference-inputs
                        sha256='ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f', bytes=478008)
 CHECKPOINTS = {'21.x': 'b25aedd02f7b53e8cd8dfcdad369a806a1301619',
                'main': '5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'}
-INPUTS_SHA = '334b223b96466e62dd937b36f0bd928058a578223aac90582622932b392d40ec'
+INPUTS_SHA = 'df81e3e53b9f64d034a15eb0f15accc045f67e977c27b0e79b79e6dc19ae728c'
 _IMAGE = Path(__file__).read_bytes()
 
 
@@ -250,8 +250,13 @@ class CurrentSassToolReferences:
             if row is not None:
                 assert update['before'] == dict(path=path, **row['after']), 'V3 overlay does not follow exact V2 current row'
             else:
-                assert self.line == '21.x' and path == 'scripts/table-local-compilation-canonical-stage.mjs'
-                assert update['before'] == dict(path=path, sha256='bdb3137f6db42ed2611ac3a41e400478defed7f0076d203061d1e12d03f63b7c', bytes=8231)
+                assert self.line == '21.x'
+                finite_before = {
+                    'scripts/table-local-compilation-canonical-stage.mjs': dict(path=path, sha256='bdb3137f6db42ed2611ac3a41e400478defed7f0076d203061d1e12d03f63b7c', bytes=8231),
+                    'scripts/legacy-removal-owner-source.mjs': dict(path=path, sha256='b88708bb7ed441e24c6ed623371330426d6a947df83452ca343487767d2c9122', bytes=6628),
+                }
+                assert path in finite_before, 'unknown V3 new-row path'
+                assert update['before'] == finite_before[path]
                 row = dict(path=path, before=dict(sha256=update['before']['sha256'], bytes=update['before']['bytes']), identities={})
                 self._rows[path] = row
             self._add(row, update['before'], before)

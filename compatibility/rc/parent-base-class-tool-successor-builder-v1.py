@@ -27,11 +27,13 @@ OUTPUT = 'compatibility/rc/parent-base-class-tool-successor-inputs-v3.json'
 SELF = 'compatibility/rc/parent-base-class-tool-successor-builder-v1.py'
 FACTORIES = ('scripts/current-sass-tool-references.mjs', 'scripts/current_sass_tool_references.py')
 SHARED_UPDATES = ('scripts/historical-contract-repair-readers.mjs', 'tests/current_sass_tool_reference_probe.mjs', 'tests/test_current_sass_tool_references.py')
-UPDATES = {'21.x': (*SHARED_UPDATES, 'scripts/packed-upstream-ledger-epoch.mjs', 'scripts/table-local-compilation-owner-source.mjs', 'scripts/table-local-compilation-canonical-stage.mjs', 'tests/historical_contract_repair_source.py'),
+UPDATES = {'21.x': (*SHARED_UPDATES, 'scripts/packed-upstream-ledger-epoch.mjs', 'scripts/table-local-compilation-owner-source.mjs', 'scripts/table-local-compilation-canonical-stage.mjs', 'scripts/legacy-removal-owner-source.mjs', 'tests/historical_contract_repair_source.py'),
            'main': SHARED_UPDATES}
 SUPPORT = {'21.x': ('scripts/base-class-removal-owner-source.mjs', 'scripts/base-class-removal-canonical-stage.mjs', 'compatibility/rc/21x-base-class-removal-admission-owner-inputs-v1.json', 'tests/current_sass_c04_tool_integration_probe.mjs', SELF),
            'main': ('tests/current_sass_c04_tool_integration_probe.mjs', SELF)}
 TABLE_STAGE = dict(path='scripts/table-local-compilation-canonical-stage.mjs', sha256='bdb3137f6db42ed2611ac3a41e400478defed7f0076d203061d1e12d03f63b7c', bytes=8231)
+LEGACY_SOURCE = dict(path='scripts/legacy-removal-owner-source.mjs', sha256='b88708bb7ed441e24c6ed623371330426d6a947df83452ca343487767d2c9122', bytes=6628)
+TABLE_PACKET = dict(path='compatibility/rc/21x-table-local-compilation-admission-owner-inputs.json', sha256='1a35dd57edd9952a23d4bb2e8e9783f19583c00badfd7e9846fdbd2abc94f48b', bytes=184121)
 
 
 def sha(raw):
@@ -115,11 +117,17 @@ def build(roots):
         assert ref(previous['historical_registry']['path'], physical(root, previous['historical_registry']['path'])) == {k: previous['historical_registry'][k] for k in ('path', 'sha256', 'bytes')}
         identities = {row['path']: dict(path=row['path'], **row['after']) for row in registry['tool_transitions']}
         identities.update({row['path']: row['after'] for row in previous['updates']})
+        if line == '21.x':
+            table_raw = physical(root, TABLE_PACKET['path'])
+            assert ref(TABLE_PACKET['path'], table_raw) == TABLE_PACKET
+            assert json.loads(table_raw)['code_transitions'][0]['after'] == LEGACY_SOURCE
+            snapshots.append((root, TABLE_PACKET, table_raw))
         updates = []
         for path in paths:
             before, after = originals[path], physical(root, path)
             predecessor = ref(path, before)
-            assert predecessor == (TABLE_STAGE if path == TABLE_STAGE['path'] else identities[path])
+            exact_new = {TABLE_STAGE['path']: TABLE_STAGE, LEGACY_SOURCE['path']: LEGACY_SOURCE}
+            assert predecessor == (exact_new[path] if path in exact_new else identities[path])
             updates.append(dict(path=path, before=predecessor, after=ref(path, after), edits=recipe(before, after)))
             snapshots.append((root, ref(path, after), after))
         additional = []

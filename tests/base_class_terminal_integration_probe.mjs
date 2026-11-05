@@ -12,6 +12,7 @@ import {join} from 'node:path';
 import {gunzipSync} from 'node:zlib';
 import {tableLocalCompilationOwnerSourceSubject} from '../scripts/table-local-compilation-owner-source.mjs';
 import {tableLocalCompilationOwnerContext} from '../scripts/table-local-compilation-canonical-stage.mjs';
+import {legacyRemovalOwnerSourceSubject} from '../scripts/legacy-removal-owner-source.mjs';
 import {baseClassRemovalCanonicalFrameSubject} from '../scripts/base-class-removal-owner-source.mjs';
 import {packedUpstreamLedgerCurrentSourceLane} from '../scripts/packed-upstream-ledger-epoch.mjs';
 
@@ -69,8 +70,9 @@ function finalCallbackMutation(construct,label){
 }
 finalCallbackMutation(read=>tableLocalCompilationOwnerSourceSubject({root,read}),'table source final callback');
 finalCallbackMutation(read=>tableLocalCompilationOwnerContext({root,read}),'table canonical final callback');
+finalCallbackMutation(read=>legacyRemovalOwnerSourceSubject({root,read}),'legacy source final callback');
 console.log(JSON.stringify({result:'pass',line:'21.x',private_comparison:'70→69→68',
   current_registry_sha256:hash(read(registry)),source_bound:table.bound.length,
   unbranded_and_spoofed_capabilities_rejected:true,late_callback_mutation_and_restoration:true,
-  final_callback_physical_mutation_rejections:2,
+  final_callback_physical_mutation_rejections:3,
   full_composed_owner_executed:false,compiler_or_build_executed:false,g11_claim:'not-passed'}));

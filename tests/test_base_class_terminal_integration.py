@@ -21,7 +21,7 @@ class BaseClassTerminalIntegrationTests(unittest.TestCase):
         self.assertEqual(report['private_comparison'], '70→69→68')
         self.assertTrue(report['unbranded_and_spoofed_capabilities_rejected'])
         self.assertTrue(report['late_callback_mutation_and_restoration'])
-        self.assertEqual(report['final_callback_physical_mutation_rejections'], 2)
+        self.assertEqual(report['final_callback_physical_mutation_rejections'], 3)
         self.assertFalse(report['full_composed_owner_executed'])
         self.assertFalse(report['compiler_or_build_executed'])
 
