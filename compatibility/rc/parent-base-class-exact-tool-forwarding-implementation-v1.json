@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "role": "Exact inherited tool successor forwarding implementation and focused runtime checks",
+  "source_head_before": "13a3edce4987fa7d529b9fe58eb3378f9531a787",
+  "worksheet": {
+    "path": "compatibility/rc/parent-base-class-exact-tool-forwarding-worksheet-v1.json",
+    "sha256": "c287ad39fe2344f98b186fa7702a4e22d90f63029486b63c53850ce9bc3c9199",
+    "bytes": 1351
+  },
+  "subjects": [
+    {
+      "path": "scripts/legacy-removal-owner-source.mjs",
+      "sha256": "584e49ad810cb7676302d0760a8d3f40f8749661b8f6dce11706b27758037041",
+      "bytes": 7030
+    },
+    {
+      "path": "compatibility/rc/parent-base-class-tool-successor-inputs-v3.json",
+      "sha256": "e31275cc52ab662f0bd2c6159abd1b9c37da6c729611ecfb4425ef67be014184",
+      "bytes": 155793
+    },
+    {
+      "path": "scripts/current-sass-tool-references.mjs",
+      "sha256": "e0cb607e52df18c30feba77acc01a90080a937f8d9fd74b46b413c2aa976dfe9",
+      "bytes": 19893
+    },
+    {
+      "path": "scripts/current_sass_tool_references.py",
+      "sha256": "9409781966c2a49bd219e3faac272dd442b7f3810413df1e977e2b0413c26b3e",
+      "bytes": 20504
+    }
+  ],
+  "change": "The no-local-transition branch retains the existing table/current-tool exact qualification after predecessor normalization, instead of returning the historical predecessor identity.",
+  "direct_actual_source_subjects": [
+    {
+      "name": "browser",
+      "status": "pass",
+      "seconds": 1.465328418,
+      "bound_physical_refs": 249
+    },
+    {
+      "name": "checker",
+      "status": "pass",
+      "seconds": 1.594575959,
+      "bound_physical_refs": 250
+    }
+  ],
+  "additional_actual_legacy_subject_checks": {
+    "status": "pass",
+    "checks": [
+      "Exact inherited historical checker identity qualifies to current physical bytes",
+      "Comparison remains exact original DATA",
+      "Wrong byte size rejected",
+      "Late supplied-reader mutation rejected",
+      "Unmodified final physical guards pass"
+    ],
+    "reader_calls": 2520,
+    "root_mutated": false,
+    "old_programs_executed": false
+  },
+  "paired_focused_tests": [
+    {
+      "line": "21.x",
+      "tests": 6,
+      "status": "pass",
+      "seconds": 21.099
+    },
+    {
+      "line": "main",
+      "tests": 6,
+      "status": "pass",
+      "seconds": 3.602
+    }
+  ],
+  "code_scope": "One branch expression; paired factories change only exact V3 packet SHA; V3 existing legacy source recipe changes without new ownership paths/anchors. No source-owner or public-reader weakening.",
+  "canonical_transaction_applied": false,
+  "product_changes": false,
+  "full_composed_owner": "retry pending",
+  "g11_claim": "not-passed",
+  "focused_control_programs_data": [
+    {
+      "name": "parent-tool-forwarding-leaf-v1.mjs",
+      "sha256": "52cc61a354f600b6a259090694f130fefdb871bac8a1d3f067c1b39c0c205855",
+      "bytes": 957,
+      "body": "import {browserOwnerSourceSubject} from '/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/browser-owner-source.mjs';\nimport {checkerOwnerSourceSubject} from '/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/checker-owner-source.mjs';\nimport {createHash} from 'node:crypto';\nimport {readFileSync} from 'node:fs';\nconst root=process.cwd(), hash=b=>createHash('sha256').update(b).digest('hex');\nfor(const [name,factory] of [['browser',browserOwnerSourceSubject],['checker',checkerOwnerSourceSubject]]) {\n const start=performance.now(), subject=factory({root});\n subject.assertCurrent();\n for(const ref of subject.bound) {\n  const raw=readFileSync(root+'/'+ref.path);\n  if(hash(raw)!==ref.sha256||raw.length!==ref.bytes)throw Error('nonphysical bound '+ref.path);\n }\n console.log(JSON.stringify({name,status:'pass',seconds:(performance.now()-start)/1000,bound:subject.bound.length}));\n}\n",
+      "role": "Exact current temporary control program retained as DATA; not an old upstream program"
+    },
+    {
+      "name": "parent-tool-forwarding-controls-v1.mjs",
+      "sha256": "9a94f1539ec5f36d77cd6f81a52690a07142cec729621b697a961d549cb66d7f",
+      "bytes": 1729,
+      "body": "import assert from 'node:assert/strict';\nimport {legacyRemovalOwnerSourceSubject} from '/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/legacy-removal-owner-source.mjs';\nimport {readEvidenceMember} from '/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/upstream-packed-run-evidence.mjs';\nimport {createHash} from 'node:crypto';\nconst root=process.cwd(),target='scripts/checker-owner-source.mjs',hash=b=>createHash('sha256').update(b).digest('hex');\nlet corrupt=false,calls=0; const read=p=>{calls++;const b=readEvidenceMember(root,p);return corrupt&&p===target?Buffer.concat([b,Buffer.from('\\n')]):b;};\nconst subject=legacyRemovalOwnerSourceSubject({root,read});\nconst packet=JSON.parse(readEvidenceMember(root,'compatibility/rc/c04-browser-owner-inputs.json'));\nconst row=packet.code_transitions.find(r=>r.after.path===target);assert.ok(row);\nconst qualified=subject.qualifyReference(row.after),physical=readEvidenceMember(root,target);\nassert.equal(qualified.sha256,hash(physical));assert.equal(qualified.bytes,physical.length);\nassert.equal(hash(subject.comparisonBytes(row.after)),row.after.sha256);\nassert.throws(()=>subject.qualifyReference({...row.after,bytes:row.after.bytes+1}),assert.AssertionError);\ncorrupt=true;assert.throws(()=>subject.assertCurrent(),assert.AssertionError);corrupt=false;subject.assertCurrent();\nconsole.log(JSON.stringify({status:'pass',checks:['exact inherited historical identity qualifies to current physical bytes','comparison remains exact original DATA','wrong size rejected','late supplied-reader mutation rejected','unmodified final physical guards pass'],calls,old_programs_executed:false,root_mutated:false}));\n",
+      "role": "Exact current temporary control program retained as DATA; not an old upstream program"
+    }
+  ]
+}

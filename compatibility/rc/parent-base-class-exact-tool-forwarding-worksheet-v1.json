@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "role": "Bounded exact successor forwarding repair",
+  "source_head": "13a3edce4987fa7d529b9fe58eb3378f9531a787",
+  "failure": {
+    "path": "compatibility/rc/parent-base-class-composed-owner-attempt-v5.json",
+    "sha256": "faeb21eb9dd49fdb0fc44dc0957dd0c6c8a4664af1a920c189e5cb857b417955",
+    "bytes": 7778
+  },
+  "subject": {
+    "path": "scripts/legacy-removal-owner-source.mjs",
+    "sha256": "b22d02c4ca9a80d1efcecb8520a5ce8f28fb64d11849dcf37910153375c805b4",
+    "bytes": 7007
+  },
+  "change": {
+    "before": "if(!row)return ref.path==='scripts/upstream-source-contract-registry.mjs'?qualifyRegistry(ref):{...ref};",
+    "after": "if(!row)return ref.path==='scripts/upstream-source-contract-registry.mjs'?qualifyRegistry(ref):successor.qualifyReference(ref);"
+  },
+  "contract": "A reference absent from local transitions must retain the existing exact table/current-tool qualification after predecessor normalization. Registry and local transitions unchanged; comparison DATA never becomes a public reader.",
+  "checks_planned": [
+    "Direct browser/checker source subjects and all original references",
+    "Existing focused finite tool positive/negative controls",
+    "Full composed owner only after leaf pass"
+  ],
+  "canonical_files_changed": false,
+  "product_changes": false,
+  "g11_claim": "not-passed"
+}
