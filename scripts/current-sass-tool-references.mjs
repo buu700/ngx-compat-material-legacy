@@ -38,7 +38,7 @@ const V3_REGRESSION_SOURCE_ANCHORS={"21.x":{"tests/browser_reference_source_prob
 const PREVIOUS_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v1.json',sha256:'ffb8fb98babb084a86e4d49f13ef17069f784eb732365c566f6c764efd62e64f',bytes:478008};
 const CHECKPOINTS={'21.x':'b25aedd02f7b53e8cd8dfcdad369a806a1301619',main:'5e9f8e51fd53b63500ce9f292a3b0bd9e8b4e2d8'};
 for(const [line,anchor] of Object.entries({"21.x":{"before":{"path":"scripts/browser-reference-owner.mjs","sha256":"7f0ae434273c4d19aa1b533bfbe3a61d8ffd4e4d9eb9959ab40f31d441db28e5","bytes":3026},"packet":{"path":"compatibility/rc/c04-browser-owner-inputs.json","sha256":"710201dd63bfb326485cd2933a9747d53f54b2cf833c47ce332816b0e0db526a","bytes":15193},"source_member_index":0},"main":{"before":{"path":"scripts/browser-reference-owner.mjs","sha256":"7f0ae434273c4d19aa1b533bfbe3a61d8ffd4e4d9eb9959ab40f31d441db28e5","bytes":3026},"packet":{"path":"compatibility/rc/c04-browser-owner-inputs.json","sha256":"d22d4c657197ee2640dd1079861e54fde35e55b9091b7d44f4e024d4b37b46cb","bytes":15192},"source_member_index":0}})) V3_REGRESSION_SOURCE_ANCHORS[line]['scripts/browser-reference-owner.mjs']=anchor;
-const INPUTS_SHA='df7996e84ed89a1451477f56e623d069576ec90d69dc87cf293c5aba46824676';
+const INPUTS_SHA='c4b33f24cef78dd6d6ed9b9fd99d6eca66ed4bb7626206c4d844eab0df296f81';
 const image=readFileSync(fileURLToPath(import.meta.url));
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const reference=(path,raw)=>({path,sha256:hash(raw),bytes:raw.length});

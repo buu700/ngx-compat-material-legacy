@@ -19,6 +19,7 @@ import {baseClassRemovalCanonicalFrameSubject} from './base-class-removal-owner-
 import {packedUpstreamLedgerCurrentSourceLane} from './packed-upstream-ledger-epoch.mjs';
 const SELF='scripts/table-local-compilation-owner-source.mjs',INPUTS='compatibility/rc/21x-table-local-compilation-admission-owner-inputs.json';
 const PIN='1a35dd57edd9952a23d4bb2e8e9783f19583c00badfd7e9846fdbd2abc94f48b';
+const LEGACY_INPUTS='compatibility/rc/21x-legacy-removal-admission-owner-inputs.json',LEGACY_PIN='f64114770b458614c1251e8aae33b245999e64fee8ffa9216324e0f253bd4e0f';
 const image=readFileSync(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex'),originals=new Map();
 const bufferEquals=Buffer.prototype.equals,apply=Reflect.apply;
 const equal=(actual,supplied)=>Buffer.isBuffer(supplied)&&apply(bufferEquals,actual,[supplied]);
@@ -121,6 +122,46 @@ export function tableLocalCompilationOwnerSourceSubject({root,read=path=>readEvi
   const row=transitions.get(ref.path);if(row){qualifyReference(ref);return Buffer.from(ref.sha256===row.before.sha256?row.beforeBytes:row.afterBytes);}
   if(ref.path===registry){qualifyReference(ref);return Buffer.from([ancestor,...Object.values(pairs.get(registry))].find(raw=>hash(raw)===ref.sha256));}return Buffer.from(member(ref));
  };
+ // Resolve only immutable historical comparison data for the caller's finite
+ // legacy packet operation. Current source bytes are consumed afresh by each
+ // batch request and again by the caller; unrecognized cases use its old path.
+ const legacyStaticReferences=refs=>{
+  assert.ok(Array.isArray(refs)&&refs.length>0);
+  const snapshot=structuredClone(refs),legacyRaw=readEvidenceMember(root,LEGACY_INPUTS);
+  assert.equal(hash(legacyRaw),LEGACY_PIN,'changed legacy batch packet');
+  const legacy=JSON.parse(legacyRaw),expected=[...legacy.code_transitions.map(row=>row.after),...legacy.source_members];
+  assert.equal(expected.length,25);assert.deepEqual(snapshot,expected,'foreign legacy batch references');
+  const batch=data(repairs,'referenceBatch',true);
+  if(!batch||typeof batch.value!=='function')return null;
+  const available=new Map(repairs.transitions.map(row=>[row.path,row]));
+  const eligible=[];
+  for(let i=0;i<snapshot.length;i++){
+   const ref=snapshot[i],row=available.get(ref.path);
+   // Only a strict historical before-image can be retained as comparison DATA.
+   if(row&&row.before.sha256===ref.sha256&&row.before.sha256!==row.after.sha256&&
+      repairs.ownsReference(ref)&&!frames.ownsReference(ref)&&ref.path!==registry){
+    eligible.push(i);
+   }
+  }
+  if(!eligible.length)return null;
+  const first=[];
+  for(const i of eligible){first.push({kind:'predecessor',reference:snapshot[i]},{kind:'comparison',reference:snapshot[i]});}
+  const initial=apply(batch.value,undefined,[first]);same(repairs,'referenceBatch',batch);assert.deepEqual(refs,snapshot);
+  const accepted=[],second=[];
+  for(let index=0;index<eligible.length;index++){
+   const i=eligible[index],normalized=initial[index*2]??snapshot[i];
+   if(frames.ownsReference(normalized)||transitions.has(normalized.path)||normalized.path===registry)continue;
+   accepted.push({i,normalized,comparison:initial[index*2+1]});
+   second.push({kind:'qualify',reference:normalized});
+  }
+  if(!accepted.length)return null;
+  const qualified=apply(batch.value,undefined,[second]);same(repairs,'referenceBatch',batch);assert.deepEqual(refs,snapshot);
+  const result=snapshot.map(()=>null);
+  for(let i=0;i<accepted.length;i++){
+   const row=accepted[i];result[row.i]={reference:snapshot[row.i],qualified:qualified[i]??row.normalized,comparison:row.comparison};
+  }
+  return result;
+ };
  // A finite private data comparison only. Unknown bytes pass through unchanged
  // to the original strict predecessor gate; no public read/raw uses this view.
  const predecessorData=(path,raw)=>{assert.ok(Buffer.isBuffer(raw));const normalized=frames.predecessorData(path,raw),pair=pairs.get(path);return Buffer.from(pair&&normalized.equals(pair.after)?pair.before:normalized);};
@@ -154,5 +195,5 @@ export function tableLocalCompilationOwnerSourceSubject({root,read=path=>readEvi
   assertCurrent=()=>{idle();composed();};
   guardPlan=Object.freeze({assertCurrent,node:guardNode});
  }
- assertCurrent();return {packet:structuredClone(packet),bound:structuredClone([...bound.values()]),ownsReference,predecessorReference,qualifyReference,comparisonBytes,predecessorData,registryComparisonBytes:()=>Buffer.from(registrySubject().raw),assertCurrent,...(guardPlan?{guardNode,guardPlan}:{}),old_program_executed:false,canonical_frame_admission_granted:false,current_native_or_full_audit_credit:false};
+ assertCurrent();return {packet:structuredClone(packet),bound:structuredClone([...bound.values()]),ownsReference,predecessorReference,qualifyReference,comparisonBytes,predecessorData,registryComparisonBytes:()=>Buffer.from(registrySubject().raw),assertCurrent,...(guardPlan?{guardNode,guardPlan,legacyStaticReferences}:{}),old_program_executed:false,canonical_frame_admission_granted:false,current_native_or_full_audit_credit:false};
 }

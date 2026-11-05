@@ -11,6 +11,7 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {gunzipSync} from 'node:zlib';
+import {types} from 'node:util';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {tableLocalCompilationOwnerSourceSubject} from './table-local-compilation-owner-source.mjs';
 import {packedUpstreamLedgerCurrentSourceLane} from './packed-upstream-ledger-epoch.mjs';
@@ -30,17 +31,39 @@ export function legacyRemovalOwnerSourceSubject({root,read=path=>readEvidenceMem
  assert.ok(JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.'));
  const actual=packedUpstreamLedgerCurrentSourceLane({root,read});
  const successor=tableLocalCompilationOwnerSourceSubject({root,read});
- const bound=new Map(successor.bound.map(ref=>[ref.path,{...ref}])),member=ref=>{const raw=read(ref.path),owned=successor.ownsReference(ref),qualified=owned?successor.qualifyReference(ref):ref,comparison=owned?successor.comparisonBytes(ref):raw;assert.ok(Buffer.isBuffer(raw));assert.equal(hash(comparison),ref.sha256,'changed legacy owner code '+ref.path);if(ref.bytes!==undefined)assert.equal(comparison.length,ref.bytes);assert.equal(hash(raw),qualified.sha256,'changed actual legacy owner successor '+ref.path);assert.ok(raw.equals(readEvidenceMember(root,ref.path)),'nonphysical legacy owner code '+ref.path);bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return comparison;};
+ const bound=new Map(successor.bound.map(ref=>[ref.path,{...ref}])),member=(ref,resolution)=>{const before=resolution?readEvidenceMember(root,ref.path):undefined,raw=read(ref.path);if(resolution){assert.deepEqual(ref,resolution.reference,'changed planned legacy member');assert.ok(equal(before,raw),'nonphysical planned legacy member '+ref.path);assert.ok(equal(before,readEvidenceMember(root,ref.path)),'planned legacy member changed during callback '+ref.path);}const owned=resolution?true:successor.ownsReference(ref),qualified=resolution?resolution.qualified:owned?successor.qualifyReference(ref):ref,comparison=resolution?resolution.comparison:owned?successor.comparisonBytes(ref):raw;assert.ok(Buffer.isBuffer(raw));assert.equal(hash(comparison),ref.sha256,'changed legacy owner code '+ref.path);if(ref.bytes!==undefined)assert.equal(comparison.length,ref.bytes);assert.equal(hash(raw),qualified.sha256,'changed actual legacy owner successor '+ref.path);assert.ok(raw.equals(readEvidenceMember(root,ref.path)),'nonphysical legacy owner code '+ref.path);bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return comparison;};
  const packet=JSON.parse(member({path:INPUTS,sha256:PIN}));assert.equal(packet.schema_version,1);assert.equal(packet.line,'21.x');assert.equal(packet.canonical_dispositions_applied,0);assert.equal(packet.old_program_executed,false);assert.equal(packet.actual_native_packed_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');
  member({path:SELF,sha256:hash(image),bytes:image.length});const transitions=new Map();
+ const staticRefs=[...packet.code_transitions.map(row=>row.after),...packet.source_members];
+ const collect=resolutions=>{let index=0;const staticMember=ref=>member(ref,resolutions?.[index++]??undefined);
  for(const row of packet.code_transitions){
   assert.equal(row.before.path,row.after.path);assert.ok(!transitions.has(row.after.path));
   const before=original(root,packet.source_parent,row.before.path);assert.equal(hash(before),row.before.sha256);assert.equal(before.length,row.before.bytes);
   let expected=before.toString();for(const edit of row.literal_edits){assert.equal(expected.split(edit.before).length,2,'ambiguous legacy owner successor '+row.after.path);expected=expected.replace(edit.before,edit.after);}
-  assert.equal(hash(expected),row.after.sha256);assert.equal(Buffer.byteLength(expected),row.after.bytes);const after=member(row.after);assert.equal(after.toString(),expected);
+  assert.equal(hash(expected),row.after.sha256);assert.equal(Buffer.byteLength(expected),row.after.bytes);const after=staticMember(row.after);assert.equal(after.toString(),expected);
   transitions.set(row.after.path,{before:{...row.before},after:{...row.after},beforeBytes:before,afterBytes:after});
  }
- assert.equal(transitions.size,packet.code_transition_count);assert.ok(transitions.size>=4);for(const ref of packet.source_members)member(ref);
+ assert.equal(transitions.size,packet.code_transition_count);assert.ok(transitions.size>=4);for(const ref of packet.source_members)staticMember(ref);
+ if(resolutions)assert.equal(index,staticRefs.length,'unused planned legacy members');};
+ // Share only this exact table subject's complete graph. Opaque or mismatched
+ // tuples keep the original sequence, including every frame/registry operation.
+ const guard=Object.getOwnPropertyDescriptor(successor,'assertCurrent'),plan=Object.getOwnPropertyDescriptor(successor,'guardPlan'),batch=Object.getOwnPropertyDescriptor(successor,'legacyStaticReferences'),ownership=Object.getOwnPropertyDescriptor(successor,'ownsReference');
+ const tuple=plan&&Object.hasOwn(plan,'value')?plan.value:undefined;
+ const plainTuple=tuple&&typeof tuple==='object'&&!types.isProxy(tuple);
+ const tupleGuard=plainTuple?Object.getOwnPropertyDescriptor(tuple,'assertCurrent'):undefined;
+ const tupleNode=plainTuple?Object.getOwnPropertyDescriptor(tuple,'node'):undefined;
+ const uncovered=staticRefs.filter(ref=>!bound.has(ref.path));
+ const usable=guard&&Object.hasOwn(guard,'value')&&typeof guard.value==='function'&&batch&&Object.hasOwn(batch,'value')&&typeof batch.value==='function'&&ownership&&Object.hasOwn(ownership,'value')&&typeof ownership.value==='function'&&
+  plainTuple&&Object.isFrozen(tuple)&&Reflect.ownKeys(tuple).length===2&&tupleGuard&&Object.hasOwn(tupleGuard,'value')&&tupleGuard.value===guard.value&&tupleNode&&Object.hasOwn(tupleNode,'value')&&tupleNode.value&&typeof tupleNode.value==='object'&&!types.isProxy(tupleNode.value)&&
+  uncovered.every(ref=>Number.isSafeInteger(ref.bytes)&&ref.bytes>=0&&!apply(ownership.value,undefined,[ref]));
+ if(usable){
+  for(const ref of uncovered){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'physical uncovered legacy source '+ref.path);assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:ref.bytes});}
+  const snapshot=structuredClone(staticRefs);
+  const check=()=>{assert.deepEqual(staticRefs,snapshot,'changed legacy packet references');for(const [key,saved]of [['assertCurrent',guard],['guardPlan',plan],['legacyStaticReferences',batch],['ownsReference',ownership]]){const now=Object.getOwnPropertyDescriptor(successor,key);assert.ok(now);for(const field of ['value','enumerable','writable','configurable'])assert.equal(now[field],saved[field],'changed legacy binding '+key);}assert.equal(ownValue(tuple,'assertCurrent'),guard.value);assert.equal(ownValue(tuple,'node'),tupleNode.value);};
+  const physical=()=>{for(const ref of bound.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'physical planned legacy source '+ref.path);assert.equal(raw.length,ref.bytes);}};
+  const bindingNode=Object.freeze({dependencies:Object.freeze([tupleNode.value]),preflight:()=>{check();physical();},consume:()=>{check();const resolutions=apply(batch.value,undefined,[staticRefs]);collect(resolutions);check();},final:()=>{physical();check();}});
+  composeCanonicalSourceGuards(Object.freeze([bindingNode]))();
+ }else collect();
  const registrySubject=()=>{
   const path='scripts/upstream-source-contract-registry.mjs',before=gunzipSync(member(packet.registry_before_image)),after=gunzipSync(member(packet.registry_after_image)),physical=read(path),raw=successor.predecessorData(path,physical);
   assert.ok(physical.equals(readEvidenceMember(root,path)),'nonphysical registry comparison source');assert.ok(raw.equals(before)||raw.equals(after),'unqualified registry comparison source');
