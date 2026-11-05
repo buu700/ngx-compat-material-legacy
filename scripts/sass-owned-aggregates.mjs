@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {join} from 'node:path';
 import {measureMixinArgument,mixinArgumentResultsMatch} from './sass-mixin-arguments.mjs';
 import {RIPPLE_COLOR_OWNED_CASES,RIPPLE_COLOR_CONTRACT,measureRippleColorPeer,rippleColorArgumentResultsMatch} from './sass-ripple-color-contract.mjs';
+import {ORDINARY_CONTROL_GATE_CASES,ORDINARY_CONTROL_CONTRACT,ordinaryControlGateDescriptor,ordinaryControlGateDirectMatch} from './sass-ordinary-control-gate.mjs';
 const root=fileURLToPath(new URL('..',import.meta.url));
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 export const OWNED_AGGREGATE_CATALOG='fixtures/sass/owned-aggregate-contracts.json';
@@ -21,14 +22,16 @@ export function ownedAggregateCatalog() {
  return {...catalog,sha256:hash(bytes)};
 }
 export const ownedAggregateCaseIds=()=>ownedAggregateCatalog().cases.map(probe=>probe.case_id);
-export function runOwnedAggregateContracts({sass,entry,loadPaths,allowedRoots,importers=[],line,referenceEntry,referenceRoot,identity}) {
+export function runOwnedAggregateContracts({sass,entry,loadPaths,allowedRoots,importers=[],line,referenceEntry,referenceRoot,identity,ordinaryControlContext}) {
  const catalog=ownedAggregateCatalog();
  const provenance={...identity,catalog:OWNED_AGGREGATE_CATALOG,catalog_sha256:catalog.sha256};
  const results=catalog.cases.map(probe=>{
-  let expected,actual,error,current_companion;
+  let expected,actual,error,current_companion,current_ordinary_controls;
   try {
    expected=measureMixinArgument(sass,referenceEntry,[referenceRoot],catalog,{...probe,call:probe.reference_call},[referenceRoot]);
    actual=measureMixinArgument(sass,entry,loadPaths,catalog,probe,allowedRoots,importers);
+   if(!ordinaryControlContext||ordinaryControlContext.line!==line)throw Error('owned ordinary controls current source context missing');
+   current_ordinary_controls=ordinaryControlGateDescriptor(ordinaryControlContext);actual={...actual,line,sass_version:sass.info};
    if(Object.hasOwn(RIPPLE_COLOR_OWNED_CASES,probe.case_id)){
     actual={...actual,line,sass_version:sass.info};
     const peer=measureRippleColorPeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
@@ -37,10 +40,10 @@ export function runOwnedAggregateContracts({sass,entry,loadPaths,allowedRoots,im
   }catch(caught){error=String(caught.message||caught);}
   const css=(actual?.css||'')+'\n.wrong-nonempty-mixin { color: red; }\n';
   const mutation={css,css_sha256:hash(css),css_bytes:Buffer.byteLength(css)};
-  const conforms=value=>Object.hasOwn(RIPPLE_COLOR_OWNED_CASES,probe.case_id)?rippleColorArgumentResultsMatch(probe.case_id,expected,{...actual,...value},current_companion):mixinArgumentResultsMatch(expected,value);
+  const conforms=value=>ORDINARY_CONTROL_GATE_CASES.includes(probe.case_id)&&ordinaryControlGateDirectMatch({context:ordinaryControlContext,caseId:probe.case_id,original:expected,actual:{...actual,...value},identity:provenance,descriptor:current_ordinary_controls,companion:current_companion??null});
   const mutation_rejected=Boolean(expected&&actual&&!conforms(mutation));
   return {...probe,line,expected,actual,error:error??null,identity:provenance,mutation,mutation_rejected,
-   ...(current_companion?{current_companion,comparison:'current-companion-contract'}:{}),
+   ...(current_companion?{current_companion}:{}),current_ordinary_controls,comparison:ORDINARY_CONTROL_CONTRACT,
    result:!error&&conforms(actual)&&mutation_rejected?'pass':'fail'};
  });
  return {results,identity:provenance,ok:results.length===20&&results.every(row=>row.result==='pass')};

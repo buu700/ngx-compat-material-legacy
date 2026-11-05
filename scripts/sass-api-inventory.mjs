@@ -30,6 +30,7 @@ import {FORM_FIELD_STATE_DEFAULT_CASES,FORM_FIELD_STATE_CONTRACT,formFieldStateD
 import {RIPPLE_COLOR_DEFAULT_CASES,RIPPLE_COLOR_CONTRACT,rippleColorMeasurementOkay,rippleColorDefaultResultsMatch} from './sass-ripple-color-contract.mjs';
 import {SPINNER_SNACK_DEFAULT_CASES,spinnerSnackGateDefaultMatch,spinnerSnackGateAggregateMatch} from './sass-spinner-snack-gate-integration.mjs';
 import {SPINNER_SNACK_AGGREGATE_CASES} from './sass-spinner-snack-aggregate-contract.mjs';
+import {ORDINARY_CONTROL_GATE_CASES,ORDINARY_CONTROL_DEFAULT_CASES,ORDINARY_CONTROL_CONTRACT,ordinaryControlGateDescriptor,ordinaryControlGateDirectMatch,ordinaryControlGateDefaultMatch} from './sass-ordinary-control-gate.mjs';
 const companionTypes=[
   {cases:RIPPLE_COLOR_DEFAULT_CASES,contract:RIPPLE_COLOR_CONTRACT,measurement:rippleColorMeasurementOkay,matches:rippleColorDefaultResultsMatch},
   {cases:FORM_FIELD_STATE_DEFAULT_CASES,contract:FORM_FIELD_STATE_CONTRACT,measurement:formFieldStateDefaultMeasurementOk,matches:formFieldStateDefaultResultsMatch},
@@ -397,7 +398,7 @@ function fmtParam(param) {
  * Pure comparison of a candidate inventory (and its invocation CSS digests)
  * against the oracle. One result per predeclared case id; nothing is dropped.
  */
-export function compareInventory(oracle, candidate, candidateCss,{spinnerSnackContext}={}) {
+export function compareInventory(oracle, candidate, candidateCss,{spinnerSnackContext,ordinaryControlContext}={}) {
   const results = [];
   const push = (case_id, failure, extra = {}) => results.push({case_id, result: failure ? 'fail' : 'pass', reason: failure, ...extra});
   const om = oracle.members;
@@ -425,6 +426,9 @@ export function compareInventory(oracle, candidate, candidateCss,{spinnerSnackCo
     const got = candidateCss?.[name];
     const failure = !got ? 'candidate invocation missing'
       : got.error ? `candidate invocation failed: ${got.error}`
+        : ORDINARY_CONTROL_DEFAULT_CASES.includes(`mixin-css/${name}`)
+          ? (ordinaryControlContext&&ordinaryControlGateDefaultMatch({context:ordinaryControlContext,caseId:`mixin-css/${name}`,got})?null:'finite ordinary controls default contract differs')
+        : Object.hasOwn(got,'current_ordinary_controls') ? 'ordinary controls capsule outside finite scope'
         : SPINNER_SNACK_DEFAULT_CASES.includes(`mixin-css/${name}`)
           ? (spinnerSnackContext&&spinnerSnackGateDefaultMatch({context:spinnerSnackContext,caseId:`mixin-css/${name}`,got})?null:'finite spinner/snack default contract differs')
         : Object.hasOwn(got,'current_companion')&&Object.hasOwn(got,'current_infrastructure') ? 'conflicting default contracts'
@@ -438,10 +442,11 @@ export function compareInventory(oracle, candidate, candidateCss,{spinnerSnackCo
     push(`mixin-css/${name}`, failure, {
       invocable: true, expected_sha256: invocation.css_sha256, expected_bytes: invocation.css_bytes,
       actual_sha256: got?.sha256 ?? null, actual_bytes: got?.css === undefined ? null : Buffer.byteLength(got.css),
+      ...(got&&ORDINARY_CONTROL_DEFAULT_CASES.includes(`mixin-css/${name}`)?{current_ordinary_controls:got.current_ordinary_controls,error:got.error??null,actual_measurement:got.actual_measurement,expected:got.expected,actual:got.actual_measurement,identity:got.identity,mixin:got.mixin,variant:got.variant,call:got.call,comparison:got.comparison,mutation:got.mutation,mutation_rejected:got.mutation_rejected}:{}),
       ...(got&&Object.hasOwn(got,'current_spinner_snack_bridge')?{current_spinner_snack_bridge:got.current_spinner_snack_bridge,error:null,actual_measurement:got.actual_measurement}:{}),
       ...(got&&SPINNER_SNACK_DEFAULT_CASES.includes(`mixin-css/${name}`)?{expected:got.expected,actual:got.actual_measurement,identity:got.identity,mixin:got.mixin,variant:got.variant,call:got.call,comparison:got.comparison,mutation:got.mutation,mutation_rejected:got.mutation_rejected}:{}),
       ...(got&&Object.hasOwn(got,'current_infrastructure')?{current_infrastructure:got.current_infrastructure,actual_measurement:got.actual_measurement,comparison:DEFAULT_CORE_CDK_CONTRACT}:{}),
-      ...(got&&Object.hasOwn(got,'current_companion')?{current_companion:got.current_companion,actual_measurement:got.actual_measurement,comparison:companionType(`mixin-css/${name}`)?.contract??DEFAULT_COMPANION_CONTRACT}:{}),
+      ...(got&&Object.hasOwn(got,'current_companion')?{current_companion:got.current_companion,actual_measurement:got.actual_measurement,comparison:ORDINARY_CONTROL_DEFAULT_CASES.includes(`mixin-css/${name}`)?got.comparison:companionType(`mixin-css/${name}`)?.contract??DEFAULT_COMPANION_CONTRACT}:{}),
     });
   }
   for (const name of Object.keys(om.mixins).sort()) {

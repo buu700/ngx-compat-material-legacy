@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "role": "Source-backed correction of exactly3proposed phase entries; original proposal preserved, no blanket exemption",
+  "tagged_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+  "authenticated_source_chain": [
+    {
+      "tagged_path": "src/material/legacy-core/density/private/_all-density.scss",
+      "tagged_blob": "54d3a1c553104f32d5d5fe642dc65597bfe71dda",
+      "tagged_sha256": "a68ca3358b3019df02065db99127c074c83742b44d6287200634a2dff618372d",
+      "owned": {
+        "path": "projects/ngx-material-legacy/styles/legacy-core/density/private/_all-density.scss",
+        "sha256": "a68ca3358b3019df02065db99127c074c83742b44d6287200634a2dff618372d",
+        "bytes": 2172
+      },
+      "exact_named_bodies_equal": [
+        {
+          "symbol": "@mixin all-legacy-component-densities",
+          "tagged_body_sha256": "00e6beecf6fa71e7c0e1f1d504a3a2779be4fe46b9d86edf76c12bd9040c2ddf",
+          "line": 15,
+          "body": "@mixin all-legacy-component-densities($config-or-theme) {\n  // In case a theme object has been passed instead of a configuration for\n  // the density system, extract the density config from the theme object.\n  $config: if(theming.private-is-theme-object($config-or-theme),\n      theming.get-density-config($config-or-theme), $config-or-theme);\n\n  @if $config == null {\n    @error 'No density configuration specified.';\n  }\n\n  // TODO: COMP-309: Do not use individual mixins. Instead, use the all-theme mixin and only\n  // specify a `density` config while setting `color` and `typography` to `null`. This is currently\n  // not possible as it would introduce a circular dependency for density because the `mat-core`\n  // mixin that is transitively loaded by the `all-theme` file, imports `all-density` which\n  // would then load `all-theme` again. This ultimately results a circular dependency.\n\n  // Add legacy density includes here, e.g.:\n  // @include <legacy-component>-theme.density($config);\n  @include form-field-theme.density($config);\n  @include expansion-theme.density($config);\n  @include stepper-theme.density($config);\n  @include toolbar-theme.density($config);\n  @include tree-theme.density($config);\n  @include button-toggle-theme.density($config);\n}"
+        }
+      ]
+    },
+    {
+      "tagged_path": "src/material/legacy-button/_button-theme.scss",
+      "tagged_blob": "548e1b5c7334c2cc9c39e569726a4eb99ba66b20",
+      "tagged_sha256": "dbeccc67f7538f9e9b7529dd3226a45b0a8b3ad7079970fd553dcb25c067c3d0",
+      "owned": {
+        "path": "projects/ngx-material-legacy/styles/legacy-button/_button-theme.scss",
+        "sha256": "dbeccc67f7538f9e9b7529dd3226a45b0a8b3ad7079970fd553dcb25c067c3d0",
+        "bytes": 7604
+      },
+      "exact_named_bodies_equal": [
+        {
+          "symbol": "@mixin _density",
+          "tagged_body_sha256": "2dc4b47b3f3a97f81a655b25035b08b4491cf3ffd41cf0e40963eadf32cba24b",
+          "line": 196,
+          "body": "@mixin _density($config-or-theme) {\n  @include datepicker-legacy-compat.legacy-button-compat-theme((\n      color: null,\n      typography: null,\n      density: theming.get-density-config($config-or-theme)\n  ));\n}"
+        },
+        {
+          "symbol": "@mixin theme",
+          "tagged_body_sha256": "424eae680dabb8478f1f6067d2ec8b74aab0fbfac297cc7ca42a937dd5db5960",
+          "line": 206,
+          "body": "@mixin theme($theme-or-color-config) {\n  $theme: theming.private-legacy-get-theme($theme-or-color-config);\n  @include theming.private-check-duplicate-theme-styles($theme, 'mat-legacy-button') {\n    $color: theming.get-color-config($theme);\n    $density: theming.get-density-config($theme);\n    $typography: theming.get-typography-config($theme);\n\n    @if $color != null {\n      @include color($color);\n    }\n    @if $density != null {\n      @include _density($density);\n    }\n    @if $typography != null {\n      @include typography($typography);\n    }\n  }\n}"
+        }
+      ]
+    },
+    {
+      "tagged_path": "src/material/datepicker/_datepicker-legacy-compat.scss",
+      "tagged_blob": "bd290f4a6269fb94deca0ce87b80c17087208fdc",
+      "tagged_sha256": "a2a43eb85c21c0f592aa7d770a89d0d68227d90b0616e5fff587825c8ec70acc",
+      "owned": {
+        "path": "projects/ngx-material-legacy/styles/datepicker/_datepicker-legacy-compat.scss",
+        "sha256": "a2a43eb85c21c0f592aa7d770a89d0d68227d90b0616e5fff587825c8ec70acc",
+        "bytes": 1871
+      },
+      "exact_named_bodies_equal": [
+        {
+          "symbol": "@mixin legacy-button-compat-theme",
+          "tagged_body_sha256": "af55bf118613eb59b3bc868294bb6fad275f8a258dc77d1c248b41ab3dd02f6f",
+          "line": 4,
+          "body": "@mixin legacy-button-compat-theme($theme) {\n  .mat-datepicker-content {\n    @include button-theme.theme($theme);\n    @include icon-button-theme.theme($theme);\n  }\n}"
+        }
+      ]
+    }
+  ],
+  "original_owned_catalog": {
+    "path": "fixtures/sass/owned-aggregate-contracts.json",
+    "sha256": "b83f5ee9e898004e2fce2ae49719dbed923dd2b5eabf06f3f463a8ad33f24c7a",
+    "bytes": 97224
+  },
+  "original22_membership": {
+    "path": "reference/material-16.2.14/owned-aggregate-membership.scss",
+    "sha256": "bcc15a0593fe733501d6d1c002dc706c79fe1ba66d7d26dd072d69681ebfe63f",
+    "bytes": 4265
+  },
+  "frozen_phase_proposal": {
+    "path": "compatibility/rc/ordinary-checkbox-button-legacy-composition-cases-v1.json",
+    "sha256": "8f4186d34848a0f298170c2124bbb727ff31a3995a1e8f041ab05476ffe1125d",
+    "bytes": 12675
+  },
+  "erroneous_zero_addition_phase_ids": [
+    "mixin-css/private-all-legacy-component-densities",
+    "mixin-argument/private-all-legacy-component-densities/custom-full-theme",
+    "mixin-argument/private-all-legacy-component-densities/raw-density-config"
+  ],
+  "preserved_erroneous_original_entries": [
+    {
+      "case_id": "mixin-css/private-all-legacy-component-densities",
+      "phases": [
+        "density"
+      ],
+      "origin": "oracle",
+      "untouched16_css_sha256": "17c432bd89acea02ce4c462a497508dbdc3d3606dc568d83aa94e2571a6f8120"
+    },
+    {
+      "case_id": "mixin-argument/private-all-legacy-component-densities/custom-full-theme",
+      "phases": [
+        "density"
+      ],
+      "origin": "argument-catalog",
+      "program_sha256": "162e31ee0f2c7ff4df5fccbce29b202a59a91b211ad1661d7fbd5865abffb248"
+    },
+    {
+      "case_id": "mixin-argument/private-all-legacy-component-densities/raw-density-config",
+      "phases": [
+        "density"
+      ],
+      "origin": "argument-catalog",
+      "program_sha256": "2354048c7e096a34c5f7e3c61c0f51e7440aa658ebee4d67091773007aa77509"
+    }
+  ],
+  "private_density_chain": "Authentic privatealllegacydensity invokes only legacy-form-field.density +5ordinarycompaniondensity functions; no legacy-button.theme/_density or datepickerlegacycompat call",
+  "finite_current_handling": "Authenticate exact old default/argument aggregate expected model, peer and programs/current physical source set; expected CSS unchanged for ONLYthese3IDs. Whole actual CSS equality required, surpriseordinarysegments and unknownIDs reject.",
+  "owned_density_phase_ids_preserved": [
+    "owned-aggregate/densities/modern-light",
+    "owned-aggregate/densities/legacy-dark",
+    "owned-aggregate/densities/raw-config",
+    "owned-aggregate/densities/repeat",
+    "owned-aggregate/densities/inverse"
+  ],
+  "owned_source_chain": "all-owned-component-densities\u2192all-owned-component-themes(density-only map)\u2192legacy-button.theme\u2192private_density(nonnull density)\u2192datepickerlegacycompat.theme\u2192ordinarybutton.theme\u2192button.density; original22reference_call uses legacy-button-theme(density-only) too",
+  "owned_current_locations": [
+    {
+      "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+      "line": 779
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+      "line": 827
+    }
+  ],
+  "owned_phase_conclusion": "Fiveowneddensityplans are NOTzero; do not remove their inherited ordinarydensity phase.",
+  "old41model_current_qualification": "Not claimed; prior synthetic41vector pass only demonstrated declared pureplan transform. These3actual-source counterexamples override proposal assumption in new gate composition.",
+  "new_compiles": 0,
+  "old_proposal_mutated": false
+}

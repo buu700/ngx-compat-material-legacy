@@ -8,10 +8,30 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
-import {createSpinnerSnackGateContext,SPINNER_SNACK_DEFAULT_CASES} from '../scripts/sass-spinner-snack-gate-integration.mjs';
+import {createSpinnerSnackGateContext,SPINNER_SNACK_DEFAULT_CASES,spinnerSnackGateDescriptor,spinnerSnackGateDirectMatch,spinnerSnackGateAggregateMatch} from '../scripts/sass-spinner-snack-gate-integration.mjs';
 import {compareInventory,apiDriftNegative,apiCaseIds} from '../scripts/sass-api-inventory.mjs';
 const root=new URL('..',import.meta.url),input=JSON.parse(readFileSync(0,'utf8')),hash=b=>createHash('sha256').update(b).digest('hex');
-const context=createSpinnerSnackGateContext({root:root.pathname});assert.equal(context.line,input.line);
+const candidateRoot=input.candidate_root??root.pathname;
+if(input.candidate_root)assert.ok(candidateRoot.includes('ngx-current-sass-source-test-'));
+let hook;const providedRead=path=>{if(hook){const run=hook;hook=null;run();}return readFileSync(new URL(path,new URL('file://'+candidateRoot.replace(/\/$/,'')+'/')));};
+const context=createSpinnerSnackGateContext({root:candidateRoot,read:providedRead});assert.equal(context.line,input.line);
+if(input.focused_current_context){
+ const controls=[];
+ const matches=body=>body.comparison==='historical-spinner-snack-css-with-positioned-public-tokens'
+  ?spinnerSnackGateDirectMatch({context,caseId:body.case_id,original:body.expected,actual:body.actual,identity:body.identity,descriptor:body.current_spinner_snack_bridge})
+  :spinnerSnackGateAggregateMatch({context,caseId:body.case_id,original:body.expected??null,actual:body.actual??body.actual_measurement,companion:body.current_companion,descriptor:body.current_spinner_snack_bridge});
+ assert.equal(input.bodies.length,24);
+ for(const body of input.bodies){assert.ok(matches(body),body.case_id);controls.push('current candidate source positive '+body.case_id);}
+ for(const body of [input.bodies[0],input.bodies[15],input.bodies[18]]){
+  const copy=structuredClone(body);copy.current_spinner_snack_bridge.source_modules.pop();assert.equal(matches(copy),false);controls.push('missing current module rejects '+body.case_id);
+ }
+ const body=structuredClone(input.bodies[0]),args={context,caseId:body.case_id,original:body.expected,actual:body.actual,identity:body.identity,descriptor:body.current_spinner_snack_bridge};
+ hook=()=>args.descriptor=structuredClone(args.descriptor);assert.equal(spinnerSnackGateDirectMatch(args),false);controls.push('live outer descriptor replacement rejects');
+ const live=structuredClone(body);let getters=0;hook=()=>Object.defineProperty(live.identity,'catalog',{get(){getters++;return 'wrong';},enumerable:true});assert.equal(matches(live),false);assert.equal(getters,0);controls.push('live nested getter rejects without execution');
+ assert.equal(spinnerSnackGateDirectMatch({...args,context:{line:input.line,assertCurrent(){}}}),false);controls.push('fake context rejects');
+ console.log(JSON.stringify({line:input.line,controls,descriptor:spinnerSnackGateDescriptor(context),candidate_fixture_only:true,actual_compiles:0,actual_packed_assertions:0,broad_inventory_dispatch_executed:false}));
+ process.exit(0);
+}
 const oracle=JSON.parse(readFileSync(new URL('compatibility/rc/oracles/material-16.2.14-sass-api.json',root))),candidate=structuredClone(oracle.members),css={};
 for(const[name,entry]of Object.entries(oracle.members.mixins))if(entry.invocation.invocable)css[name]={css:'',sha256:entry.invocation.css_sha256};
 for(const body of input.bodies.filter(b=>b.case_id.startsWith('mixin-css/'))){const actual=body.actual_measurement??body.actual;css[body.case_id.slice(10)]={...structuredClone(body),css:actual.css,sha256:actual.css_sha256,actual_measurement:structuredClone(actual)};}

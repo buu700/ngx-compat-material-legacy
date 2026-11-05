@@ -10,10 +10,14 @@ import {createHash} from 'node:crypto';
 import {readFileSync,lstatSync,realpathSync} from 'node:fs';
 import {isAbsolute,join,resolve} from 'node:path';
 import {gunzipSync} from 'node:zlib';
-import {currentSpinnerSnackBridgeSourceSubject} from '../compatibility/rc/parallel-spinner-snack-public-bridge-integration-source-subject.mjs';
-import {historicalContractRepairReaderSubject} from './historical-contract-repair-readers.mjs';
-import {qualifySpinnerSnackSourceRef,currentSpinnerSnackSourceSummary,captureSpinnerSnackC04Metadata} from './measure-sass-inspection-scope.mjs';
+import {fileURLToPath} from 'node:url';
+import {types} from 'node:util';
+import {createCurrentSassSource} from './current-sass-source.mjs';
+import {currentSassToolReferenceSubject} from './current-sass-tool-references.mjs';
+import {captureCurrentSassMetadata,currentSassSourceSummary} from './current-sass-inspection-scope.mjs';
 import {spinnerSnackPositionedTokenCss} from './sass-spinner-snack-bridge-contract.mjs';
+import {currentLegacyRetentionMeasurement} from './current-sass-legacy-retention-css.mjs';
+const SELF='scripts/sass-spinner-snack-c04-source.mjs',image=readFileSync(fileURLToPath(import.meta.url));
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const bufferEquals=Buffer.prototype.equals;
 const equalBytes=(actual,supplied)=>Buffer.isBuffer(supplied)&&Reflect.apply(bufferEquals,actual,[supplied]);
@@ -39,6 +43,16 @@ function physicalBoundary(root,providedRead){
  return {read,assertPhysical};
 }
 const states=new WeakMap();
+function argumentsSnapshot(args,allowed){
+ assert.ok(args&&typeof args==='object'&&!types.isProxy(args));assert.equal(Object.getPrototypeOf(args),Object.prototype);
+ const descriptors=Object.getOwnPropertyDescriptors(args),values={};
+ for(const key of Reflect.ownKeys(descriptors)){assert.equal(typeof key,'string');assert.ok(allowed.includes(key));const d=descriptors[key];assert.ok(Object.hasOwn(d,'value')&&d.enumerable);Object.defineProperty(values,key,{value:d.value,enumerable:true});}
+ return {args,allowed,descriptors,values};
+}
+function sameArguments(before){
+ const after=argumentsSnapshot(before.args,before.allowed);assert.deepEqual(Reflect.ownKeys(after.descriptors),Reflect.ownKeys(before.descriptors));
+ for(const key of Reflect.ownKeys(before.descriptors)){assert.equal(after.descriptors[key].value,before.descriptors[key].value);for(const flag of ['enumerable','writable','configurable'])assert.equal(after.descriptors[key][flag],before.descriptors[key][flag]);}
+}
 const REPORTS={
  'theming-inspection':{path:'compatibility/rc/21x-c04-theming-inspection-source-review.json',sha256:'55d2533ffe204f9e589cc82fd78d66dd286d31f89769573d71cbb1d8425687d2',bytes:133530},
  'inspection-compatibility':{path:'compatibility/rc/21x-c04-inspection-compatibility-source-review.json',sha256:'852cf937178ada91b0c604d349cf214cd810266af6118122c19e0dd534c55118',bytes:135386},
@@ -52,43 +66,49 @@ export const SPINNER_SNACK_CONTROL_CASE_IDS=Object.freeze([
  'snack-bar-theme/custom-full-theme','snack-bar-theme/custom-dark-theme',
  'snack-bar-typography/custom-full-theme','snack-bar-typography/raw-typography-config',
 ].map(id=>'mixin-argument/'+id));
+export const CURRENT_SASS_C04_RETENTION_CASE_IDS=Object.freeze([
+ 'mixin-css/legacy-button-color','mixin-css/legacy-button-theme','mixin-css/legacy-button-typography','direct-legacy-color/fab',
+]);
 const sorted=refs=>refs.sort((a,b)=>a.path.localeCompare(b.path));
 const union=(a,b)=>sorted([...new Map([...a,...b].map(r=>[r.path,r])).values()]);
 
 export {captureSpinnerSnackC04Metadata} from './measure-sass-inspection-scope.mjs';
 
-export function spinnerSnackC04Source({root,read}){
+export function spinnerSnackC04Source(args){
+ const captured=argumentsSnapshot(args,['root','read']);let {root,read}=captured.values;
  root=resolve(root);const boundary=physicalBoundary(root,read);read=boundary.read;
- const bridge=currentSpinnerSnackBridgeSourceSubject({root,read});
- const tools=historicalContractRepairReaderSubject({root,read});
+ assert.ok(equalBytes(read(SELF),image));
+ const bridge=createCurrentSassSource({root,read});
+ const tools=currentSassToolReferenceSubject({root,read});assert.equal(tools.line,bridge.line);
  const ownedToolPaths=new Set(tools.transitions.map(row=>row.path)),ownedPaths=new Set([...bridge.transitions.map(row=>row.path),...ownedToolPaths]);
  const reports=new Map(),reportRefs=tools.line==='21.x'?Object.values(REPORTS):[];
  for(const ref of reportRefs){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);reports.set(ref.path,JSON.parse(ref.path.endsWith('.gz')?gunzipSync(raw):raw));}
  const qualifyInternal=ref=>{
-  const capture=()=>captureSpinnerSnackC04Metadata(ref);
+  const capture=()=>captureCurrentSassMetadata(ref);
   const original=capture();
   // Other references are unchanged metadata, with no current-source qualification.
   if(!ownedPaths.has(original.path))return ref;
-  const source=qualifySpinnerSnackSourceRef(bridge,ref),tool=tools.qualify(source);
+  const product=bridge.qualify(original);
+  const source=product?{...original,sha256:product.sha256,...(Object.hasOwn(original,'bytes')?{bytes:product.bytes}:{})}:original,tool=tools.qualify(source);
   if(ownedToolPaths.has(original.path))assert.ok(tool,'unknown owned C04 tool reference');
   assert.deepEqual(capture(),original,'C04 reference changed during qualification');
   return tool??source;
  };
- const qualify=ref=>{const original=captureSpinnerSnackC04Metadata(ref);if(!ownedPaths.has(original.path))return ref;const result=qualifyInternal(ref);boundary.assertPhysical();return result;};
+ const qualify=ref=>{const original=captureCurrentSassMetadata(ref);if(!ownedPaths.has(original.path))return ref;const result=qualifyInternal(ref);boundary.assertPhysical();return result;};
  const assertCurrent=()=>{bridge.assertCurrent();tools.assertCurrent();for(const ref of reportRefs){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}boundary.assertPhysical();};
- const bound=union(structuredClone([...bridge.bound,...tools.bound]),structuredClone(reportRefs)),summary=currentSpinnerSnackSourceSummary(bridge);
+ const bound=union(structuredClone([...bridge.bound,...tools.bound]),structuredClone(reportRefs)),summary=currentSassSourceSummary(bridge);
  const assertReportSuccessor=(kind,current)=>{
-  assert.equal(typeof kind,'string');const currentSnapshot=captureSpinnerSnackC04Metadata(current);
+  assert.equal(typeof kind,'string');const currentSnapshot=captureCurrentSassMetadata(current);
   assert.ok(Object.hasOwn(REPORTS,kind));const historical=reports.get(REPORTS[kind].path);assert.ok(historical);
   const expected=structuredClone(historical);
   expected.current_source_bindings=union(bound,historical.current_source_bindings.map(qualifyInternal));
   expected.current_public_bridge=structuredClone(summary);
   if(kind==='theming-inspection'){
-   assert.equal(expected.public_override_boundaries,4);expected.public_override_boundaries=6;
+   assert.equal(expected.public_override_boundaries,4);expected.public_override_boundaries=8;
    assert.equal(expected.current_owned_sources_and_loaded_peers_match_retained_measurement,true);delete expected.current_owned_sources_and_loaded_peers_match_retained_measurement;
-   expected.historical_owned_sources_and_loaded_peers_match_retained_measurement_except_separate_two_module_successor=true;
+   expected.historical_owned_sources_and_loaded_peers_match_retained_measurement_except_separate_four_module_successor=true;
   }else if(kind==='inspection-compatibility'){
-   assert.equal(expected.public_override_boundaries,4);expected.public_override_boundaries=6;expected.historical_public_override_boundaries=4;
+   assert.equal(expected.public_override_boundaries,4);expected.public_override_boundaries=8;expected.historical_public_override_boundaries=4;
    expected.shared_sass_owner=qualifyInternal(expected.shared_sass_owner);
   }else if(kind==='control-m3-theme'){
    const scopeRef=historical.current_source_bindings.find(r=>r.path==='compatibility/rc/upstream-sass-inspection-current-scope.json.gz');assert.ok(scopeRef);
@@ -112,8 +132,14 @@ export function spinnerSnackC04Source({root,read}){
     }
    }
    assert.equal(count,10);assert.equal(expected.control_measurement.exact_tagged_cases,52);expected.control_measurement.exact_tagged_cases=42;expected.control_measurement.current_spinner_snack_bridge_cases=10;
+  }else if(kind==='remaining-unthemable'){
+   for(const row of expected.argument_measurement.cases)row.actual.loaded_sources=row.actual.loaded_sources.map(ref=>{
+    if(!ref.path.startsWith('/owned/material/'))return ref;
+    const current=qualifyInternal({...ref,path:'projects/ngx-material-legacy/styles/'+ref.path.slice('/owned/material/'.length)});
+    return {...ref,sha256:current.sha256,bytes:current.bytes};
+   });
   }
-  assertCurrent();assert.deepEqual(currentSnapshot,expected,'C04 report changed beyond the exact spinner/snack source successor: '+kind);assertCurrent();assert.deepEqual(captureSpinnerSnackC04Metadata(current),currentSnapshot,'C04 current report changed during final source guards');const result=structuredClone(historical);boundary.assertPhysical();return result;
+  assertCurrent();assert.deepEqual(currentSnapshot,expected,'C04 report changed beyond the exact four-module source successor: '+kind);assertCurrent();assert.deepEqual(captureCurrentSassMetadata(current),currentSnapshot,'C04 current report changed during final source guards');const result=structuredClone(historical);boundary.assertPhysical();return result;
  };
  const finish=operation=>{const result=operation();boundary.assertPhysical();return result;};
  const publicBridge={...structuredClone(Object.fromEntries(Object.entries(bridge).filter(([,value])=>typeof value!=='function'))),qualify:ref=>finish(()=>bridge.qualify(ref)),assertCurrent:()=>finish(()=>bridge.assertCurrent()),assertHistoricalSource:(path,expected)=>finish(()=>bridge.assertHistoricalSource(path,expected))};
@@ -121,29 +147,31 @@ export function spinnerSnackC04Source({root,read}){
   bound:structuredClone(bound),
   summary:structuredClone(summary),
   assertHistoricalSource:(path,expected)=>finish(()=>bridge.assertHistoricalSource(path,expected))};
- states.set(result,{bound,summary,qualify:qualifyInternal,assertCurrent,assertPhysical:boundary.assertPhysical});boundary.assertPhysical();return result;
+ states.set(result,{bound,summary,qualify:qualifyInternal,assertCurrent,assertPhysical:boundary.assertPhysical});sameArguments(captured);boundary.assertPhysical();return result;
 }
 
-/** Exact old measurement projection: only two source refs and the explicit
- * current-source appendix change; legacy output rows remain byte-identical. */
-export function assertSpinnerSnackRetentionSuccessor({historical,current,source}){
- const liveHistorical=historical,liveCurrent=current;historical=captureSpinnerSnackC04Metadata(historical);current=captureSpinnerSnackC04Metadata(current);
+/** Only the four authenticated nested ordinary-button measurements change. */
+export function assertSpinnerSnackRetentionSuccessor(args){
+ const captured=argumentsSnapshot(args,['historical','current','source']);let {historical,current,source}=captured.values;
+ const liveHistorical=historical,liveCurrent=current;historical=captureCurrentSassMetadata(historical);current=captureCurrentSassMetadata(current);
  source=states.get(source);assert.ok(source,'unrecognized C04 source subject');
- const expected=structuredClone(historical);
+ const expected=structuredClone(historical),fab=historical.subjects.find(row=>row.family==='fab');assert.ok(fab);assert.equal(fab.legacy_prefix,'legacy-button');
  for(const key of ['input_members','loaded_sources'])expected[key]=historical[key].map(source.qualify);
  expected.input_members.push(...source.bound.filter(ref=>!expected.input_members.some(r=>r.path===ref.path)));
- expected.producer=source.qualify(historical.producer);
- expected.current_public_bridge=structuredClone(source.summary);
+ expected.producer=source.qualify(historical.producer);expected.current_public_bridge=structuredClone(source.summary);
  const snack=expected.subjects.find(row=>row.family==='snack-bar');assert.ok(snack);
- snack.modern_theme_exact_after_MDC_relocation=false;
- snack.historical_modern_source_exact_after_MDC_relocation=true;
- snack.separate_current_public_bridge=true;
- source.assertCurrent();assert.deepEqual(current,expected,'legacy retention changed beyond the finite current two-module source successor');source.assertCurrent();assert.deepEqual(captureSpinnerSnackC04Metadata(liveHistorical),historical,'historical retention input changed during final guards');assert.deepEqual(captureSpinnerSnackC04Metadata(liveCurrent),current,'current retention input changed during final guards');
- source.assertPhysical();return true;
+ snack.modern_theme_exact_after_MDC_relocation=false;snack.historical_modern_source_exact_after_MDC_relocation=true;snack.separate_current_public_bridge=true;
+ for(const id of CURRENT_SASS_C04_RETENTION_CASE_IDS){
+  const rows=id.startsWith('direct-')?expected.direct_original_legacy_color_cases:expected.public_legacy_default_CSS_cases;
+  const selected=rows.filter(row=>row.case_id===id);assert.equal(selected.length,1);Object.assign(selected[0],currentLegacyRetentionMeasurement(id));
+ }
+ source.assertCurrent();assert.deepEqual(current,expected,'legacy retention changed beyond the finite four-module source and nested button CSS successor');
+ source.assertCurrent();sameArguments(captured);assert.deepEqual(captureCurrentSassMetadata(liveHistorical),historical);assert.deepEqual(captureCurrentSassMetadata(liveCurrent),current);source.assertPhysical();return true;
 }
 
-export function assertSpinnerSnackTokenPlacementSuccessor({historical,current,source}){
- const liveHistorical=historical,liveCurrent=current;historical=captureSpinnerSnackC04Metadata(historical);current=captureSpinnerSnackC04Metadata(current);
+export function assertSpinnerSnackTokenPlacementSuccessor(args){
+ const captured=argumentsSnapshot(args,['historical','current','source']);let {historical,current,source}=captured.values;
+ const liveHistorical=historical,liveCurrent=current;historical=captureCurrentSassMetadata(historical);current=captureCurrentSassMetadata(current);
  source=states.get(source);assert.ok(source,'unrecognized C04 source subject');
  const expected=structuredClone(historical);
  assert.equal(expected.public_legacy_default_CSS_cases.length,15);assert.equal(expected.direct_original_legacy_color_cases.length,5);
@@ -151,9 +179,9 @@ export function assertSpinnerSnackTokenPlacementSuccessor({historical,current,so
  expected.input_members.push(...source.bound.filter(ref=>!expected.input_members.some(r=>r.path===ref.path)));
  expected.producer=source.qualify(historical.producer);expected.current_public_bridge=structuredClone(source.summary);
  for(const row of expected.families){
-  const spinner=row.family==='progress-spinner';
-  if(spinner){assert.equal(row.modern_theme_exact_tagged_bytes_after_MDC_import_relocation,true);row.modern_theme_exact_tagged_bytes_after_MDC_import_relocation=false;}
-  row.historical_modern_source_exact_after_MDC_relocation=spinner;row.separate_current_public_bridge=spinner;
+  const bridge=['checkbox','progress-spinner'].includes(row.family);
+  if(bridge){assert.equal(row.modern_theme_exact_tagged_bytes_after_MDC_import_relocation,true);row.modern_theme_exact_tagged_bytes_after_MDC_import_relocation=false;}
+  row.historical_modern_source_exact_after_MDC_relocation=bridge;row.separate_current_public_bridge=bridge;
  }
- source.assertCurrent();assert.deepEqual(current,expected,'token placement changed beyond the finite current two-module source successor');source.assertCurrent();assert.deepEqual(captureSpinnerSnackC04Metadata(liveHistorical),historical,'historical token-placement input changed during final guards');assert.deepEqual(captureSpinnerSnackC04Metadata(liveCurrent),current,'current token-placement input changed during final guards');source.assertPhysical();return true;
+ source.assertCurrent();assert.deepEqual(current,expected,'token placement changed beyond the finite current four-module source successor');source.assertCurrent();sameArguments(captured);assert.deepEqual(captureCurrentSassMetadata(liveHistorical),historical,'historical token-placement input changed during final guards');assert.deepEqual(captureCurrentSassMetadata(liveCurrent),current,'current token-placement input changed during final guards');source.assertPhysical();return true;
 }

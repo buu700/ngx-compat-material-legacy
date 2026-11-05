@@ -5,6 +5,7 @@
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -130,8 +131,12 @@ class OrdinaryAggregateTests(unittest.TestCase):
             prior_compiled_rows_reused=18, modeled_outputs=self.outputs, python_controls=self.checks,
             javascript=javascript, compiler_calls=0, source_or_artifact_admission=False, fresh_current_ordinary_aggregate_CSS_qualified=False,
             packed_browser_floor_fullowner_or_G11_qualified=False)
-        path = ROOT / (PREFIX + 'controls-' + ('21x' if self.line == '21.x' else 'main') + '.json')
-        self.assertFalse(path.exists());path.write_text(json.dumps(report, indent=2) + '\n')
+        export = os.environ.get('SASS_ORDINARY_AGGREGATE_RECEIPT')
+        if export:
+            path = ROOT / export
+            self.assertEqual(path.parent, ROOT / 'compatibility/rc')
+            self.assertTrue(path.name.startswith(PREFIX.rsplit('/', 1)[1] + 'controls-') and path.suffix == '.json')
+            self.assertFalse(path.exists());path.write_text(json.dumps(report, indent=2) + '\n')
 
 
 if __name__ == '__main__':

@@ -1,4 +1,8 @@
 @use 'sass:map';
+@use '@angular/material' as mat;
+@use '../vendor/mdc/theme/theme-color' as mdc-theme-color;
+@use '../vendor/mdc/typography/typography' as mdc-typography;
+@use '../vendor/mdc/touch-target/touch-target' as mdc-touch-target;
 @use '../vendor/mdc/checkbox/checkbox-theme' as mdc-checkbox-theme;
 @use '../vendor/mdc/form-field' as mdc-form-field;
 @use '../core/style/sass-utils';
@@ -6,6 +10,39 @@
 @use '../core/typography/typography';
 @use '../core/mdc-helpers/mdc-helpers';
 @use '../core/tokens/m2/mdc/checkbox' as tokens-mdc-checkbox;
+
+// The finite public bridge uses the owned16 values without forwarding an open token map.
+// The public API omits unselected-pressed-icon; combined pressed states need lifecycle proof.
+@function _current-color-tokens($config) {
+  $color: tokens-mdc-checkbox.get-color-tokens($config);
+  $base: tokens-mdc-checkbox.get-unthemable-tokens();
+  @return (
+    disabled-selected-icon-color: map.get($color, disabled-selected-icon-color),
+    disabled-unselected-icon-color: map.get($color, disabled-unselected-icon-color),
+    selected-checkmark-color: map.get($color, selected-checkmark-color),
+    selected-focus-icon-color: map.get($color, selected-focus-icon-color),
+    selected-hover-icon-color: map.get($color, selected-hover-icon-color),
+    selected-icon-color: map.get($color, selected-icon-color),
+    selected-pressed-icon-color: map.get($color, selected-pressed-icon-color),
+    unselected-focus-icon-color: map.get($color, unselected-focus-icon-color),
+    unselected-hover-icon-color: map.get($color, unselected-hover-icon-color),
+    unselected-icon-color: map.get($color, unselected-icon-color),
+    selected-focus-state-layer-color: map.get($color, selected-focus-state-layer-color),
+    selected-hover-state-layer-color: map.get($color, selected-hover-state-layer-color),
+    selected-pressed-state-layer-color: map.get($color, selected-pressed-state-layer-color),
+    unselected-focus-state-layer-color: map.get($color, unselected-focus-state-layer-color),
+    unselected-hover-state-layer-color: map.get($color, unselected-hover-state-layer-color),
+    unselected-pressed-state-layer-color: map.get($color, unselected-pressed-state-layer-color),
+    disabled-selected-checkmark-color: map.get($base, disabled-selected-checkmark-color),
+    selected-focus-state-layer-opacity: map.get($base, selected-focus-state-layer-opacity),
+    selected-hover-state-layer-opacity: map.get($base, selected-hover-state-layer-opacity),
+    selected-pressed-state-layer-opacity: map.get($base, selected-pressed-state-layer-opacity),
+    unselected-focus-state-layer-opacity: map.get($base, unselected-focus-state-layer-opacity),
+    unselected-hover-state-layer-opacity: map.get($base, unselected-hover-state-layer-opacity),
+    unselected-pressed-state-layer-opacity: map.get($base, unselected-pressed-state-layer-opacity),
+    disabled-label-color: theming.get-color-from-palette(map.get($config, foreground), disabled-text),
+  );
+}
 
 @mixin color($config-or-theme) {
   $config: theming.get-color-config($config-or-theme);
@@ -15,22 +52,28 @@
 
   @include sass-utils.current-selector-or-root() {
     @include mdc-checkbox-theme.theme(tokens-mdc-checkbox.get-color-tokens($config));
+    @include mat.checkbox-overrides(_current-color-tokens($config));
   }
 
   .mat-mdc-checkbox {
     &.mat-primary {
       $primary-config: map.merge($config, (accent: $primary));
       @include mdc-checkbox-theme.theme(tokens-mdc-checkbox.get-color-tokens($primary-config));
+      @include mat.checkbox-overrides(_current-color-tokens($primary-config));
     }
 
     &.mat-warn {
       $warn-config: map.merge($config, (accent: $warn));
       @include mdc-checkbox-theme.theme(tokens-mdc-checkbox.get-color-tokens($warn-config));
+      @include mat.checkbox-overrides(_current-color-tokens($warn-config));
     }
 
     @include mdc-helpers.using-mdc-theme($config) {
       // TODO(mmalerba): Switch to static-styles, theme-styles, and theme once they're available.
       @include mdc-form-field.core-styles($query: mdc-helpers.$mdc-theme-styles-query);
+      @include mat.checkbox-overrides((
+        label-text-color: mdc-theme-color.prop-value(text-primary-on-background),
+      ));
     }
 
     &.mat-mdc-checkbox-disabled label {
@@ -52,6 +95,14 @@
     @include mdc-helpers.using-mdc-typography($config) {
       // TODO(mmalerba): Switch to static-styles, theme-styles, and theme once they're available.
       @include mdc-form-field.core-styles($query: mdc-helpers.$mdc-typography-styles-query);
+      $label: map.get(mdc-typography.$styles, body2);
+      @include mat.checkbox-overrides((
+        label-text-font: map.get($label, font-family),
+        label-text-line-height: map.get($label, line-height),
+        label-text-size: map.get($label, font-size),
+        label-text-tracking: map.get($label, letter-spacing),
+        label-text-weight: map.get($label, font-weight),
+      ));
     }
   }
 }
@@ -61,6 +112,14 @@
 
   @include sass-utils.current-selector-or-root() {
     @include mdc-checkbox-theme.theme(tokens-mdc-checkbox.get-density-tokens($density-scale));
+    @include mat.checkbox-overrides((
+      state-layer-size: map.get(tokens-mdc-checkbox.get-density-tokens($density-scale), state-layer-size),
+      touch-target-size: mdc-touch-target.$height,
+      touch-target-display: block,
+    ));
+    @include mdc-helpers.if-touch-targets-unsupported($density-scale) {
+      @include mat.checkbox-overrides((touch-target-display: none));
+    }
   }
 
   @include mdc-helpers.if-touch-targets-unsupported($density-scale) {

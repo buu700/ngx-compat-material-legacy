@@ -23,14 +23,48 @@ class SassInspectionScopeTests(unittest.TestCase):
                                 capture_output=True, text=True, timeout=90)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)
-        self.assertEqual(len(report['positive']), 7)
-        self.assertEqual(len(report['rejected']), 10)
-        self.assertEqual(report['compiler_mutants_rejected'], 2)
+        self.assertEqual(len(report['positive']), 10)
+        self.assertEqual(len(report['rejected']), 12)
+        self.assertEqual(report['compiler_observation_mutants_rejected'], 2)
+        self.assertEqual(report['unsupported_entry_overrides_rejected'], 2)
+        self.assertEqual(report['compiler_mutants_executed'], 0)
+        self.assertEqual(report['actual_compiler_calls'], 2)
         self.assertEqual(report['source_reader_corruptions_rejected'], 8)
         self.assertEqual(report['owned_scss_members'], 409)
         self.assertEqual(report['historical_functions'], 25)
-        self.assertEqual(report['public_override_mixins'], 18)
+        self.assertEqual(report['public_override_mixins'], 20)
+        self.assertEqual(report['direct_peer_boundaries'], 8)
+        self.assertEqual(report['historical_owned_scss_members'], 409)
+        self.assertEqual(report['historical_peer_boundaries'], 4)
+        self.assertEqual(report['historical_public_override_mixins'], 16)
+        self.assertTrue(report['historical_receipt_unchanged'])
+        self.assertEqual(report['comparison']['current_boundaries'], 8)
+        self.assertEqual(report['comparison']['current_override_mixins'], 20)
+        self.assertFalse(report['comparison']['fresh_compiler_execution_by_comparator'])
+        self.assertFalse(report['old_physical_constructor_executed'])
+        self.assertFalse(report['css_or_artifact_admission_granted'])
+        self.assertEqual(report['g11_claim'], 'not-passed')
         self.assertFalse(report['full_sass_or_native_or_floor_or_G11_qualified'])
+
+    def test_nonnull_entry_override_rejected_before_sources_or_compiler(self):
+        code = """
+import assert from 'node:assert/strict';
+import {measureCurrentSassInspectionScope} from './scripts/current-sass-inspection-scope.mjs';
+const root = '/deliberately-missing-current-sass-inspection-source';
+const rejected = [];
+for (const entryOverride of ['file:///unreviewed-entry.scss', '', false, 0, {}, []]) {
+  assert.throws(() => measureCurrentSassInspectionScope({root, entryOverride}), /entryOverride is not supported/);
+  rejected.push(typeof entryOverride);
+}
+for (const entryOverride of [undefined, null]) {
+  assert.throws(() => measureCurrentSassInspectionScope({root, entryOverride}), error => error.code === 'ENOENT');
+}
+console.log(JSON.stringify({rejected: rejected.length, absent_or_null_reach_source_guard: 2, compiler_calls: 0}));
+"""
+        child = subprocess.run(['node', '--input-type=module', '-'], input=code, cwd=ROOT,
+                               capture_output=True, text=True, timeout=10)
+        self.assertEqual(child.returncode, 0, child.stdout + child.stderr)
+        self.assertEqual(json.loads(child.stdout), dict(rejected=6, absent_or_null_reach_source_guard=2, compiler_calls=0))
 
     def test_complete_individual_hunks_and_independent_line_context(self):
         body = json.loads((ROOT / 'compatibility/rc/upstream-sass-inspection-individual-review.json').read_bytes())
@@ -41,6 +75,9 @@ class SassInspectionScopeTests(unittest.TestCase):
         self.assertEqual(body['canonical_decisions_changed'], 0)
         self.assertFalse(body['actual_native_packed_or_floor_qualified'])
         self.assertEqual(body['g11_claim'], 'not-passed')
+        # These archived refs are historical metadata. Their physical checks use
+        # the separately guarded current owners, never the old two-module constructor.
+        self.assertTrue((ROOT / 'compatibility/rc/current-sass-tool-reference-inputs-v1.json').is_file())
         def qualified(ref):
             ref = qualified_notice_reference(ROOT, ref) or ref
             return qualify_tool_reference(ref, ROOT) if ref['path'].startswith('scripts/') else qualify_spinner_snack_source_reference(ref, ROOT)
@@ -61,6 +98,11 @@ class SassInspectionScopeTests(unittest.TestCase):
         self.assertNotIn('/tmp/', measured['actual']['candidate']['program'])
         self.assertEqual(measured['actual']['peer']['version'], '21.2.14' if line == '21.x' else '22.1.7')
         self.assertEqual(len(measured['actual']['owned_scss_population']), 409)
+        self.assertEqual(len(measured['actual']['boundaries']), 4)
+        self.assertEqual(len(measured['actual']['public_override_mixins']), 16)
+        self.assertEqual(len(measured['actual']['candidate']['functions']), 25)
+        self.assertFalse(measured['actual']['actual_current_product_or_floor_or_G11_qualified'])
+        self.assertFalse(measured['actual']['full_sass_gate_executed'])
         read(measured['actual']['producer'])
         for member in measured['actual']['owned_scss_population']:
             current = qualified(member)

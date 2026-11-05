@@ -8,7 +8,8 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
-import {readFileSync,lstatSync,realpathSync} from 'node:fs';
+import {readFileSync,lstatSync,realpathSync,existsSync} from 'node:fs';
+import {currentSassToolReferenceSubject} from './current-sass-tool-references.mjs';
 import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
@@ -63,7 +64,13 @@ function original(root,parent,path){
   originals.set(key,execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',parent+':'+path],{cwd:root,env,maxBuffer:2*1024*1024}));
  }return Buffer.from(originals.get(key));
 }
-export function historicalContractRepairReaderSubject({root=process.cwd(),read=path=>readHistoricalContractRepairOwnerMember(root,path)}={}){
+/** Maintained callers explicitly select the pinned current tool successor when installed. */
+export function historicalContractRepairReaderSubject(args={}){
+ const root=resolve(args.root??process.cwd());
+ if(existsSync(join(root,'compatibility/rc/current-sass-tool-reference-inputs-v1.json')))return currentSassToolReferenceSubject(args);
+ return historicalContractRepairFrozenReaderSubject(args);
+}
+export function historicalContractRepairFrozenReaderSubject({root=process.cwd(),read=path=>readHistoricalContractRepairOwnerMember(root,path)}={}){
  root=resolve(root);const bound=new Map();
  // This final pass invokes only trusted filesystem reads, never the supplied callback.
  const assertPhysicalCurrent=()=>{for(const ref of bound.values()){const actual=readEvidenceMember(root,ref.path);assert.equal(hash(actual),ref.sha256,'late physical repaired reader input '+ref.path);assert.equal(actual.length,ref.bytes);}};

@@ -249,6 +249,13 @@ def _derive_tool(root, data, row):
 
 
 def qualify_tool_reference(ref, root=ROOT):
+    if (Path(root) / 'compatibility/rc/current-sass-tool-reference-inputs-v1.json').is_file():
+        tools = _current_tool_subject(root)
+        selected = tools.qualify(ref)
+        if selected is None:
+            assert ref['path'] not in {row['path'] for row in tools.transitions}, 'unknown owned current tool hash'
+            return dict(ref)
+        return selected
     data = _tool_data(root)
     rows = [row for row in data['tool_transitions'] if row['path'] == ref['path']]
     if not rows:
@@ -263,6 +270,15 @@ def qualify_tool_reference(ref, root=ROOT):
 
 
 def tool_comparison_bytes(ref, root=ROOT):
+    if (Path(root) / 'compatibility/rc/current-sass-tool-reference-inputs-v1.json').is_file():
+        tools = _current_tool_subject(root)
+        if ref['path'] in {row['path'] for row in tools.transitions}:
+            return tools.comparison_bytes(ref)
+        raw = _read(root, ref['path'])
+        assert digest(raw) == ref['sha256']
+        if 'bytes' in ref:
+            assert len(raw) == ref['bytes']
+        return raw
     data = _tool_data(root)
     rows = [row for row in data['tool_transitions'] if row['path'] == ref['path']]
     if not rows:
@@ -313,6 +329,10 @@ def _prior_c04_registry(root, data):
 
 
 def qualify_spinner_snack_source_reference(ref, root=ROOT):
+    if (Path(root) / 'compatibility/rc/current-sass-tool-reference-inputs-v1.json').is_file():
+        source = _current_product_subject(root)
+        selected = source.qualify(ref)
+        return dict(ref) if selected is None else {**ref, 'sha256': selected['sha256'], **({'bytes': selected['bytes']} if 'bytes' in ref else {})}
     """Two exact physical source images for independent visibility comparisons.
 
     This metadata check does not replace the JS subject's complete transitive
@@ -337,3 +357,39 @@ def qualify_spinner_snack_source_reference(ref, root=ROOT):
     _identity(_read(root, ref['path']), row['current'])
     return {**ref, 'sha256': row['current']['sha256'],
             **({'bytes': row['current']['bytes']} if 'bytes' in ref else {})}
+
+
+@functools.lru_cache(maxsize=8)
+def _load_current_subject(root, module_name):
+    import importlib.util
+    path = Path(root) / 'scripts' / (module_name + '.py')
+    spec = importlib.util.spec_from_file_location('_historical_' + module_name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+@functools.lru_cache(maxsize=8)
+def _current_tool_cached(root, manifest_sha):
+    module = _load_current_subject(root, 'current_sass_tool_references')
+    return module.CurrentSassToolReferences(root)
+
+
+def _current_tool_subject(root):
+    root = str(Path(root).absolute())
+    manifest = _read(root, 'compatibility/rc/current-sass-tool-reference-inputs-v1.json')
+    subject = _current_tool_cached(root, digest(manifest))
+    subject.assert_current()
+    return subject
+
+
+@functools.lru_cache(maxsize=8)
+def _current_product_cached(root):
+    module = _load_current_subject(root, 'current_sass_source')
+    return module.CurrentSassSource(root)
+
+
+def _current_product_subject(root):
+    subject = _current_product_cached(str(Path(root).absolute()))
+    subject.assert_current()
+    return subject

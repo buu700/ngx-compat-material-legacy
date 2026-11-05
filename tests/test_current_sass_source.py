@@ -9,10 +9,13 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
 
 from current_sass_source import CurrentSassSource
 
-ROOT = Path(__file__).resolve().parents[1]
 NODE = '/nix/store/w8jijs92barihdb0z54dsgq5szj2wd47-nodejs-24.21.0/bin/node'
 INPUTS = 'compatibility/rc/current-sass-source-inputs-v1.json'
 
