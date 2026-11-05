@@ -17,6 +17,7 @@ import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
 const SELF='scripts/historical-contract-repair-source.mjs',INPUTS='compatibility/rc/historical-contract-repair-source-inputs.json';
 const PINS={'21.x':'c1d7a8762cad7913a5d4ad60863afb506c56c61d27a78c17a3f5372c51cc9303',main:'cee92383ce1cb2c82b135e2e3b8be0131a46b114d60a521f7e11e4d0bb017191'};
 const image=readFileSync(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex'),originals=new Map();
+export const historicalContractRepairLoadedImage=Object.freeze({path:SELF,sha256:hash(image),bytes:image.length});
 const SOURCE_PATHS=Object.freeze([
  'projects/ngx-material-legacy/legacy-form-field/testing/error-harness.ts',
  'projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts',
@@ -54,6 +55,21 @@ function assertPlanner(root){
  const raw=readEvidenceMember(root,PLANNER.path);assert.equal(hash(raw),PLANNER.sha256,'changed physical historical repair guard planner');assert.equal(raw.length,PLANNER.bytes);
 }
 
+const producerIdentityTransitions=Object.freeze([{"path":"scripts/upstream-base-class-removal-source.mjs","after":{"path":"scripts/upstream-base-class-removal-source.mjs","sha256":"2a225cd654fe4940aec34987c7b46453fa624b70743ae5fa63d73ce2341358e2","bytes":12610},"edits":[{"offset":1382,"before":"","after":"export const baseClassRemovalOriginalLoadedImage=Object.freeze({path:SELF,sha256:hash(image),bytes:image.length});\n"}],"before":{"path":"scripts/upstream-base-class-removal-source.mjs","sha256":"1c127473aac8050d206b38c531eb8386492bbc4114acabd7d4a42dd80c30b17b","bytes":12495,"git_blob":"ef9a77b0941e2c257ae8f9c89709b6f3907c39d0"}},{"path":"compatibility/rc/21x-base-class-removal-source-final-review.mjs","after":{"path":"compatibility/rc/21x-base-class-removal-source-final-review.mjs","sha256":"9fb47887c2389e0e40a8ba1fa4e2086e844d96940d82387d8b69c12b739839f0","bytes":22459},"edits":[{"offset":1023,"before":"","after":"export const baseClassRemovalReviewLoadedImage = Object.freeze({path: SELF, sha256: hash(image), bytes: image.length});\n"}],"before":{"path":"compatibility/rc/21x-base-class-removal-source-final-review.mjs","sha256":"67fbedb4ac7310218123d4248f8f93519a9d9c7a03d5ecfccae398f78543084b","bytes":22339,"git_blob":"d9491b9a8cecc5b85ecb23bff81a4887193f3e5e"}}]);
+function currentProducerReference(root,line,ref){
+ if(line!=='21.x')return ref;
+ const row=producerIdentityTransitions.find(row=>row.path===ref.path);if(!row)return ref;
+ const before={path:row.path,sha256:row.before.sha256,bytes:row.before.bytes};
+ assert.deepEqual(ref,before,'unknown historical-repair producer predecessor');
+ const old=original(root,'d8ab97315b6c77b83f42c2bebcf63b2984fff255',row.path);
+ assert.equal(hash(old),before.sha256);assert.equal(old.length,before.bytes);
+ const edit=row.edits[0],literal=Buffer.from(edit.before);
+ assert.ok(equal(old.subarray(edit.offset,edit.offset+literal.length),literal));
+ const after=Buffer.concat([old.subarray(0,edit.offset),Buffer.from(edit.after),old.subarray(edit.offset+literal.length)]);
+ assert.equal(hash(after),row.after.sha256);assert.equal(after.length,row.after.bytes);
+ return row.after;
+}
+
 export function historicalContractRepairSourceSubject({root=process.cwd(),read:providedRead}={}){
  root=resolve(root);assertPlanner(root);const physical=path=>readHistoricalContractRepairMember(root,path),bound=new Map();
  const read=path=>{
@@ -66,7 +82,7 @@ export function historicalContractRepairSourceSubject({root=process.cwd(),read:p
  const raw=read(INPUTS);assert.equal(hash(raw),PINS[line],'changed finite historical-repair input registry');const data=JSON.parse(raw);assert.equal(data.line,line);assert.equal(data.schema_version,1);
  assert.equal(data.source_scope_only,true);assert.equal(data.canonical_decisions_changed,0);assert.equal(data.actual_native_packed_browser_floor_or_full_audit_qualified,false);assert.equal(data.g11_claim,'not-passed');
  assert.equal(process.versions.node,JSON.parse(read('toolchain-lock.json')).repository.node);assert.ok(read(SELF).equals(image),'loaded historical-repair source owner differs from current file');
- const member=ref=>{const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'changed historical-repair evidence '+ref.path);if(ref.bytes!==undefined)assert.equal(bytes.length,ref.bytes);return bytes;};
+ const member=ref=>{const expected=currentProducerReference(root,line,ref);const bytes=read(ref.path);assert.equal(hash(bytes),expected.sha256,'changed historical-repair evidence '+ref.path);if(expected.bytes!==undefined)assert.equal(bytes.length,expected.bytes);return bytes;};
  const implementation=JSON.parse(member(data.implementation)),useQualified=JSON.parse(member(data.current_use_qualification)),useProof=JSON.parse(member(data.current_use_source_proof)),review=JSON.parse(member(data.current_use_review));
  for(const record of [implementation,useQualified,useProof,review])assert.equal(record.line,line,'cross-line historical-repair evidence');
  assert.equal(implementation.g11_claim,'not-passed');assert.equal(implementation.canonical_admission_ready,false);assert.equal(implementation.actual_native_packed_browser_floor_or_full_audit_qualified,false);
