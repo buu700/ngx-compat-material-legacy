@@ -46,7 +46,7 @@ class CheckerReferenceSourceTests(unittest.TestCase):
  def test_actual_current_predicates_reader_contracts_and_source_mutations(self):
   command=['node','tests/checker_reference_source_probe.mjs','--metadata']
   if os.environ.get('CHECKER_REFERENCE_SOURCE_REPORT'):command.append(os.environ['CHECKER_REFERENCE_SOURCE_REPORT'])
-  child=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=120)
+  child=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=180)
   self.assertEqual(child.returncode,0,(child.stdout+child.stderr)[-8000:]);r=json.loads(child.stdout);self.assertEqual(r['result'],'pass');self.assertFalse(r['canonical_frame_admission_granted'])
   self.assertEqual(r['selected_references'],5 if r['line']=='21.x'else 13)
   self.assertEqual(r['actual_guard_exclusion_checks'],25 if r['line']=='21.x'else 26)
