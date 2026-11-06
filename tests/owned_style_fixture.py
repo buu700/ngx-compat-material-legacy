@@ -5,6 +5,9 @@ from owned_rendered_admission import owned_schema
 
 def _style_value(case,property):
     if property.startswith('rect-'):return '40'
+    if property=='visibility':return 'visible'
+    if property in ('opacity','effective-opacity'):return '1'
+    if property=='state-active':return 'true'
     context=case.split('/')[1]
     if context in ('theme-light','theme-dark') and property in ('color','background-color'):
         return 'rgb(11, 22, 33)' if context=='theme-light' else 'rgb(44, 55, 66)'
@@ -20,6 +23,7 @@ def style_receipt(root,active,case,invocation):
         prop.update(reference=value,candidate=value)
     body['mutation']['property']='line-height' if any(p['property']=='line-height' for p in body['properties']) else body['properties'][0]['property']
     body['mutation']['reference']=next(p['reference'] for p in body['properties'] if p['property']==body['mutation']['property'])
+    if '/snack-' in case:body['lifecycle']={'first_events':['action','dismissed:true'],'first_removed':True,'reopened':True,'second_events':['dismissed:false'],'second_removed':True,'negative_events':['dismissed:false'],'negative_removed':True}
     if body['context']=='typography':
         from sass_mixin_fixture import mixin_receipt
         body['reference_kind']='untouched-material-16.2.14-compiled-css'

@@ -16,10 +16,10 @@ class OwnedRenderedStylesTests(unittest.TestCase):
         code=r'''
 import assert from 'node:assert/strict';
 import {OWNED_STYLE_PROBES, ownedStyleCaseIds, assessOwnedStyles} from './scripts/sass-owned-rendered.mjs';
-assert.equal(ownedStyleCaseIds().length,37);
-assert.equal(Object.values(OWNED_STYLE_PROBES).filter(p=>p.context==='typography').length,4);
-for(const probe of Object.values(OWNED_STYLE_PROBES).filter(p=>p.context==='typography'))for(const property of ['font-family','font-size','line-height','rect-height','rect-width'])assert.ok(probe.properties.includes(property));
-const reference=Object.fromEntries(Object.entries(OWNED_STYLE_PROBES).map(([id,p])=>[id,{found:true,values:Object.fromEntries(p.properties.map(k=>[k,k.startsWith('rect-')?'40':'tagged-value']))}]));
+assert.equal(ownedStyleCaseIds().length,57);
+assert.equal(Object.values(OWNED_STYLE_PROBES).filter(p=>p.context==='typography').length,8);
+for(const probe of Object.values(OWNED_STYLE_PROBES).filter(p=>p.context==='typography'&&p.properties.includes('font-family')))for(const property of ['font-family','font-size','line-height','rect-height','rect-width'])assert.ok(probe.properties.includes(property));
+const reference=Object.fromEntries(Object.entries(OWNED_STYLE_PROBES).map(([id,p])=>[id,{found:true,values:Object.fromEntries(p.properties.map(k=>[k,k.startsWith('rect-')?'40':k==='visibility'?'visible':['opacity','effective-opacity'].includes(k)?'1':k==='state-active'?'true':'tagged-value']))}]));
 for(const [id,p]of Object.entries(OWNED_STYLE_PROBES))if(['theme-light','theme-dark'].includes(p.context))for(const property of p.properties)if(['color','background-color'].includes(property))reference[id].values[property]=p.context==='theme-light'?'rgb(11, 22, 33)':'rgb(44, 55, 66)';
 const negative=structuredClone(reference);
 for(const [id,p] of Object.entries(OWNED_STYLE_PROBES)){const property=p.properties.includes('line-height')?'line-height':p.properties[0];negative[id].values[property]='wrong-but-nonempty';}
@@ -63,7 +63,7 @@ for(const [id,p]of Object.entries(OWNED_STYLE_PROBES))if(['theme-light','theme-d
                         bad=copy.deepcopy(body);bad['custom_typography_theme'][field]=value;self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
                     bad=copy.deepcopy(body);bad['custom_typography_theme']['expected']=copy.deepcopy(bad['custom_typography_theme']['actual']);self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
 
-                    for value in ('0','NaN','-1','rgba(0,0,0,0.5)'):
+                    for value in (('0','NaN','-1','rgba(0,0,0,0.5)') if any(p['property']=='rect-height' for p in body['properties']) else ()):
                         bad=copy.deepcopy(body)
                         for prop in bad['properties']:
                             if prop['property']=='rect-height':prop.update(reference=value,candidate=value)
@@ -71,7 +71,7 @@ for(const [id,p]of Object.entries(OWNED_STYLE_PROBES))if(['theme-light','theme-d
 
                 if body['context'] in ('theme-light','theme-dark'):
                     snack='/snack-' in case;dark=body['context']=='theme-dark'
-                    target=('snack-container' if dark else 'snack-primary-action') if snack else ('disabled-placeholder' if dark else 'invalid-arrow')
+                    target=('snack-container' if dark else 'snack-primary-action') if snack else ('visible-disabled-placeholder' if dark else 'invalid-arrow')
                     witness=body['customization_witness']
                     self.assertEqual(witness['baseline_case_id'],'owned-style/light/'+target)
                     self.assertEqual(witness['themed_case_id'],'owned-style/'+body['context']+'/'+target)
@@ -96,11 +96,15 @@ for(const [id,p]of Object.entries(OWNED_STYLE_PROBES))if(['theme-light','theme-d
         after=json.loads((ROOT/matrix_path).read_bytes())
         groups=lambda data:next(row for row in data['checks'] if row['check_id']=='sass-seal')['acceptance']['cases_by_line']
         old=groups(before)[task['line']]['owned-rendered'];new=groups(after)[task['line']]['owned-rendered']
-        self.assertEqual(len(old),24);self.assertEqual(new[:24],old);self.assertEqual(len(new),37)
+        self.assertEqual(len(old),24);self.assertEqual(new[:24],old);self.assertEqual(len(new),57)
         expected=json.loads(subprocess.check_output(['node','--input-type=module','-e',"import {ownedStyleCaseIds} from './scripts/sass-owned-rendered.mjs';console.log(JSON.stringify(ownedStyleCaseIds()));"],cwd=ROOT))
         self.assertEqual(new,expected)
-        groups(after)[task['line']]['owned-rendered']=old
-        self.assertEqual(after,before)
+        baseline={'21.x':'2f5201af2294a1c99552fb1876583b4e8d11b5f2','main':'9734b4a9ada49cdfe3dc8b4dfe44d1e04664a2ed'}[task['line']]
+        before_current=json.loads(subprocess.check_output(['git','show',baseline+':'+matrix_path],cwd=ROOT))
+        current=groups(before_current)[task['line']]['owned-rendered']
+        self.assertEqual(len(current),37);self.assertEqual(new[:37],current)
+        groups(after)[task['line']]['owned-rendered']=current
+        self.assertEqual(after,before_current)
 
     def test_actual_writer_preserves_current_theme_and_overlay_receipts(self):
         subjects=[];inputs=[]
@@ -109,7 +113,7 @@ for(const [id,p]of Object.entries(OWNED_STYLE_PROBES))if(['theme-light','theme-d
             active=SimpleNamespace(binding={'source_line':line},manifest={'run_id':'synthetic','artifacts':[{'id':'library','sha256':'d'*64}],'oracles':{'current_peer':[{'id':'@angular/material','version':version},{'id':'@angular/cdk','version':version},{'id':'@angular/core','version':'22.1.7' if line=='main' else '21.2.23'}]}})
             for suffix in ('light/snack-action','typography/snack-action','theme-light/snack-primary-action','theme-dark/snack-container'):
                 body=style_receipt(ROOT,active,'owned-style/'+suffix,'writer');context=body['context']
-                item={k:body[k] for k in ('case_id','group','kind','result','selector','context','reference_kind','found','properties','mutation_detected','mutation')}
+                item={k:body[k] for k in ('case_id','group','kind','result','selector','context','reference_kind','found','properties','mutation_detected','mutation','lifecycle') if k in body}
                 if 'customization_witness' in body:item['customization_witness']=body['customization_witness']
                 rendered={k:body[k] for k in ('line','identities','versions','browser')}
                 rendered['settlement']={mode:{context:frame} for mode,frame in body['settlement'].items()}

@@ -40,6 +40,12 @@ export const OWNED_STYLE_PROBES = Object.freeze({
     ['snack-action','.mat-simple-snackbar-action',['color','line-height']],
     ['snack-primary-action','.mat-simple-snackbar-action button',['color']],
   ].map(([name,selector,properties])=>[context+'/'+name,{context,selector,properties}]))),
+  ...Object.fromEntries(['light','custom','typography','theme-light','theme-dark'].flatMap(context=>[
+    ['visible-disabled-placeholder','#s-standalone .mat-select-placeholder',['color','visibility','opacity','effective-opacity','rect-height','rect-width']],
+    ['combined-disabled-invalid-arrow','#s-combined.mat-select-invalid .mat-select-arrow',['color']],
+    ['snack-focused-action','.mat-simple-snackbar-action button',['color','state-active'],'focus'],
+    ['snack-disabled-action','.mat-simple-snackbar-action button',['color','state-active'],'disabled'],
+  ].map(([name,selector,properties,state])=>[context+'/'+name,{context,selector,properties,...(state?{state}:{})}]))),
 });
 export const OWNED_STYLE_CONTEXTS=Object.freeze(['light','custom','typography','theme-light','theme-dark']);
 export const ownedThemeVariant=context=>context==='theme-light'?'custom-full-theme':context==='theme-dark'?'custom-dark-theme':null;
@@ -50,7 +56,7 @@ function themeWitness(id,context,reference,candidate){
   // These independent tagged recipes use primary600/warn500 by default and
   // custom primary700(text300)/warn900; dark disabled text and snack surfaces
   // also differ. Read actual computed values rather than hardcoding RGB output.
-  const name=snack?(dark?'snack-container':'snack-primary-action'):(dark?'disabled-placeholder':'invalid-arrow');
+  const name=snack?(dark?'snack-container':'snack-primary-action'):(dark?'visible-disabled-placeholder':'invalid-arrow');
   const property=snack&&dark?'background-color':'color',baseline='light/'+name,themed=context+'/'+name;
   return {baseline_case_id:'owned-style/'+baseline,themed_case_id:'owned-style/'+themed,property,
     reference:{baseline:reference?.[baseline]?.values?.[property]??null,themed:reference?.[themed]?.values?.[property]??null},
@@ -61,6 +67,8 @@ export function assessOwnedStyles(reference, candidate, negative) {
     const before=reference?.[id], after=candidate?.[id];
     const properties=spec.properties.map(property=>({property,reference:before?.values?.[property]??null,candidate:after?.values?.[property]??null}));
     const found=before?.found===true&&after?.found===true;
+    const stateActive=!spec.state||[before,after].every(v=>v?.values?.['state-active']==='true');
+    const visible=!spec.properties.includes('visibility')||(['reference','candidate'].every(mode=>({reference:before,candidate:after}[mode]?.values?.visibility==='visible' && Number({reference:before,candidate:after}[mode]?.values?.opacity)>0 && Number({reference:before,candidate:after}[mode]?.values?.['effective-opacity'])>0)));
     const match=found&&properties.every(p=>typeof p.reference==='string'&&p.reference!==''&&p.candidate===p.reference&&(!p.property.startsWith('rect-')||(Number.isFinite(Number(p.reference))&&Number(p.reference)>0)));
     const mutation=negative?.[id];
     const mutationProperty=spec.properties.includes('line-height')?'line-height':spec.properties[0];
@@ -72,7 +80,7 @@ export function assessOwnedStyles(reference, candidate, negative) {
     const effective=!customization_witness||(Object.values(customization_witness.reference).every(value=>typeof value==='string'&&value.length>0)
       &&customization_witness.reference.baseline!==customization_witness.reference.themed
       &&customization_witness.reference.baseline===customization_witness.candidate.baseline&&customization_witness.reference.themed===customization_witness.candidate.themed);
-    return [id,{case_id:`owned-style/${id}`,group:'owned-rendered',kind:'assertion',result:match&&sensitivity&&effective?'pass':'fail',selector:spec.selector,context:spec.context,reference_kind,
+    return [id,{case_id:`owned-style/${id}`,group:'owned-rendered',kind:'assertion',result:match&&sensitivity&&effective&&visible&&stateActive?'pass':'fail',selector:spec.selector,context:spec.context,reference_kind,
       ...(customization_witness?{customization_witness}:{}),found,properties,mutation_detected:sensitivity,mutation:{found:mutation?.found===true,property:mutationProperty,reference:mutationReference??null,observed:mutationObserved??null}}];
   }));
 }
@@ -94,3 +102,6 @@ export function ownedStyleContextProgram(context,mode){
     return true;
   })()`;
 }
+
+/** Action click must complete, and a later snackbar must reopen and dismiss independently. */
+export function assessSnackLifecycle(x){return !!x && x.first_removed===true && x.reopened===true && x.second_removed===true && x.negative_removed===true && JSON.stringify(x.negative_events)===JSON.stringify(['dismissed:false']) && JSON.stringify(x.negative_events)!==JSON.stringify(x.first_events) && JSON.stringify(x.first_events)===JSON.stringify(['action','dismissed:true']) && JSON.stringify(x.second_events)===JSON.stringify(['dismissed:false']);}
