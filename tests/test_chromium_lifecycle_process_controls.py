@@ -17,3 +17,11 @@ class ChromiumLifecycleProcessControls(unittest.TestCase):
         child = subprocess.run(['node', 'tests/chromium-lifecycle-process-controls.mjs'], cwd=ROOT,
                                capture_output=True, text=True, timeout=90)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-12000:])
+
+    def test_independent_detached_ephemeral_startup(self):
+        expected = (ROOT / '.node-version').read_text().strip()
+        version = subprocess.run(['node', '--version'], cwd=ROOT, capture_output=True, text=True, timeout=10, check=True)
+        self.assertEqual(version.stdout.strip(), 'v' + expected)
+        child = subprocess.run(['node', 'tests/chromium-lifecycle-independent-startup.mjs'], cwd=ROOT,
+                               capture_output=True, text=True, timeout=30)
+        self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-12000:])

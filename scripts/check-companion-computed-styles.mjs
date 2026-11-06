@@ -31,6 +31,7 @@
  * kind:assertion file per main case is written there. 21.x is rendered as a
  * report slice only. No G06/G07/G08 claim is made here.
  */
+import {announcedChromeEndpoint, debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {spawn, spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
@@ -723,12 +724,12 @@ const INDEX_HTML = `<!doctype html><html><head>
 </head><body><lab-root></lab-root><script src="/app.js"></script></body></html>
 `;
 
-export async function withChromium(distDir, run, {debugPort: portOverride = null} = {}) {
+export async function withChromium(distDir, run, {debugPort: portOverride = null, responseHeaders = {}, chromiumArgs = null, requireAnnouncedEndpoint = false} = {}) {
   const server = createServer((req, res) => {
     const file = req.url === '/' ? 'index.html' : req.url.split('?')[0].replace(/^\//, '');
     try {
       const body = readFileSync(join(distDir, file));
-      res.writeHead(200, {'content-type': file.endsWith('.js') ? 'text/javascript' : file.endsWith('.css') ? 'text/css' : 'text/html'});
+      res.writeHead(200, {'content-type': file.endsWith('.js') ? 'text/javascript' : file.endsWith('.css') ? 'text/css' : 'text/html', ...responseHeaders});
       res.end(body);
     } catch {
       res.writeHead(404);
@@ -736,7 +737,7 @@ export async function withChromium(distDir, run, {debugPort: portOverride = null
     }
   });
   let chrome, ws, browserWs, ownedPage, version, debugPort, spawnError, callbackResult;
-  let failed = false, callbackFinished = false, endpointGone = false, serverCleanupError;
+  let failed = false, callbackFinished = false, endpointGone = false, serverCleanupError, authenticatedEndpoint = false;
   let exited = Promise.resolve();
   const done = () => !chrome || chrome.exitCode !== null || chrome.signalCode !== null || (!!spawnError && !chrome.pid);
   const bounded = (promise, ms) => new Promise((resolveBound, reject) => {
@@ -762,12 +763,15 @@ export async function withChromium(distDir, run, {debugPort: portOverride = null
     const {port} = server.address();
     const pageUrl = `http://127.0.0.1:${port}/`;
     const chromeBin = resolveChromeBin();
-    debugPort = Number(portOverride || process.env.COMPANION_CDP_PORT || 9334);
+    const requestedDebugPort = Number(portOverride ?? (process.env.COMPANION_CDP_PORT || 9334));
+    debugPort = requestedDebugPort;
     const chromeDir = mkdtempSync(join(tmpdir(), 'ngx-compat-chrome-companion-'));
     chrome = spawn(chromeBin, [
       '--headless=new', `--remote-debugging-port=${debugPort}`, `--user-data-dir=${chromeDir}`,
-      '--no-sandbox', '--disable-gpu', '--window-size=1280,1000', '--force-device-scale-factor=1',
-      '--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4',
+      '--no-sandbox', '--disable-gpu', ...(chromiumArgs ?? [
+        '--window-size=1280,1000', '--force-device-scale-factor=1',
+        '--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4',
+      ]),
       pageUrl,
     ], {stdio: ['ignore', 'ignore', 'pipe']});
     let chromeLog = '';
@@ -780,7 +784,15 @@ export async function withChromium(distDir, run, {debugPort: portOverride = null
     const failedStart = () => (!!spawnError && !chrome.pid) || chrome.signalCode !== null ||
       (chrome.exitCode !== null && chrome.exitCode !== 0);
     for (let i = 0; i < 80 && !version && !failedStart(); i += 1) {
-      try { version = await jsonGet(`http://127.0.0.1:${debugPort}/json/version`); } catch { await sleep(250); }
+      try {
+        if (requestedDebugPort === 0 || requireAnnouncedEndpoint) {
+          const endpoint = announcedChromeEndpoint(chromeLog, requestedDebugPort);
+          if (!endpoint) throw new Error('waiting for Chromium endpoint');
+          const observed = await jsonGet(`http://127.0.0.1:${endpoint.port}/json/version`);
+          if (!debuggerMatchesChild(observed, endpoint)) throw new Error('debugger does not belong to Chromium child');
+          debugPort = endpoint.port; version = observed; authenticatedEndpoint = true;
+        } else version = await jsonGet(`http://127.0.0.1:${debugPort}/json/version`);
+      } catch { await sleep(250); }
     }
     if (!version) throw new Error(`Chromium did not open debugging port ${debugPort}\n${spawnError || chromeLog.slice(-1000)}`);
     let pages = [];
@@ -828,12 +840,13 @@ export async function withChromium(distDir, run, {debugPort: portOverride = null
   } finally {
     // Reconfirm that this endpoint still contains our exact server URL before
     // asking the browser-level CDP endpoint to exit; never close a foreign port.
-    if (ownedPage && version?.webSocketDebuggerUrl) {
+    if ((authenticatedEndpoint || ownedPage) && version?.webSocketDebuggerUrl) {
       try {
         const currentVersion = await jsonGet(`http://127.0.0.1:${debugPort}/json/version`);
-        const pages = await jsonGet(`http://127.0.0.1:${debugPort}/json/list`);
-        if (currentVersion.webSocketDebuggerUrl === version.webSocketDebuggerUrl &&
-            pages.some((target) => target.id === ownedPage.id && target.type === 'page')) {
+        const ownsCurrentEndpoint = currentVersion.webSocketDebuggerUrl === version.webSocketDebuggerUrl;
+        const pages = authenticatedEndpoint ? [] : await jsonGet(`http://127.0.0.1:${debugPort}/json/list`);
+        if (ownsCurrentEndpoint && (authenticatedEndpoint ||
+            pages.some((target) => target.id === ownedPage.id && target.type === 'page'))) {
           browserWs = new WebSocket(localSocket(version.webSocketDebuggerUrl));
           let acceptOpen = true;
           try {
@@ -855,7 +868,7 @@ export async function withChromium(distDir, run, {debugPort: portOverride = null
       try { chrome.kill(); } catch { /* e.g. snap denied a signal */ }
       await bounded(exited, 1500);
     }
-    if (ownedPage) {
+    if (authenticatedEndpoint || ownedPage) {
       // A snap-style launcher can exit before the browser process. Observe the
       // endpoint itself for a bounded interval after requesting browser exit.
       for (let i = 0; i < 10 && !endpointGone; i += 1) {
@@ -872,7 +885,7 @@ export async function withChromium(distDir, run, {debugPort: portOverride = null
         if (result !== true) serverCleanupError = result || new Error('fixture server close timed out');
       }
     } catch (error) { serverCleanupError = error; }
-    if ((ownedPage ? !endpointGone : !done()) || serverCleanupError) {
+    if (((authenticatedEndpoint || ownedPage) ? !endpointGone : !done()) || serverCleanupError) {
       const cleanup = new Error(serverCleanupError ? `Chromium fixture server cleanup failed: ${serverCleanupError.message}` : `Chromium cleanup could not confirm owned endpoint closure or unowned launcher exit${spawnError ? ': ' + spawnError.message : ''}`);
       if (failed) console.error(cleanup.message);
       else { if (callbackFinished) cleanup.callbackResult = callbackResult; throw cleanup; }
