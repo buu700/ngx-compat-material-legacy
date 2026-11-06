@@ -3358,13 +3358,12 @@ describe('MatSelect', () => {
 
       expect(fixture.componentInstance.control.value).toBe(false);
       expect(fixture.componentInstance.select.selected).toBeTruthy();
-      // No floating label in this fixture, so should-float stays false (label-removal fix).
-      expect(formField.classList).not.toContain('mat-form-field-should-float');
+      expect(formField.classList).toContain('mat-form-field-should-float');
       expect(trigger.textContent).toContain('Falsy');
     }));
 
     it('should not consider the reset values as selected when resetting the form control', fakeAsync(() => {
-      expect(formField.classList).not.toContain('mat-form-field-should-float');
+      expect(formField.classList).toContain('mat-form-field-should-float');
 
       fixture.componentInstance.control.reset();
       fixture.detectChanges();
