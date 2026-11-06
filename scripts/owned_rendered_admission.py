@@ -59,10 +59,17 @@ def owned_rendered_ok(root,active,body,invocation):
             for mode,frame in frames.items():
                 expected=dict(context=schema['context'],body_scope=True,nested_scope=False,overlay_in_body=True,overlay_outside_nested=True,mutation_present=mode=='negative',theme_stylesheet_sha256=theme['expected' if mode=='reference' else 'actual']['css_sha256'])
                 if frame!=expected or any(type(frame[k]) is not bool for k in ('body_scope','nested_scope','overlay_in_body','overlay_outside_nested','mutation_present')):return False
+        if '/snack-' in body['case_id']:
+            life=body['lifecycle']
+            if life!={'first_events':['action','dismissed:true'],'first_removed':True,'reopened':True,'second_events':['dismissed:false'],'second_removed':True,'negative_events':['dismissed:false'],'negative_removed':True}:return False
+            if any(type(life[k]) is not bool for k in ('first_removed','reopened','second_removed','negative_removed')):return False
         props=body['properties']
         if [p['property'] for p in props]!=[p['property'] for p in schema['properties']]:return False
         if any(not isinstance(p['reference'],str) or not p['reference'] or p['candidate']!=p['reference'] for p in props):return False
         for prop in props:
+            if prop['property']=='visibility' and prop['reference']!='visible':return False
+            if prop['property'] in ('opacity','effective-opacity') and (not math.isfinite(float(prop['reference'])) or float(prop['reference'])<=0 or float(prop['reference'])>1):return False
+            if prop['property']=='state-active' and prop['reference']!='true':return False
             if prop['property'].startswith('rect-') and (not math.isfinite(float(prop['reference'])) or float(prop['reference'])<=0):return False
         mutation=body['mutation']
         if mutation['found'] is not True or any(not isinstance(mutation[k],str) or not mutation[k] for k in ('reference','observed')) or mutation['reference']==mutation['observed']:return False

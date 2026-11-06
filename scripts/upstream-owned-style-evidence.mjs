@@ -31,14 +31,14 @@ const commonMembers=[
 const styleCases=(names,extra=[])=>['light','theme-light','theme-dark'].flatMap(context=>names.map(name=>'owned-style/'+context+'/'+name)).concat(extra);
 const scopes=new Map([
   [SNACK_STYLE_SHA,{patch:'54a23a310fdb6c13ccca73846eb6c7e0e7798324bd308678e018e6a0152d02ba',kind:'original-snack-action-and-body-overlay-styles',
-    cases:styleCases(['snack-container','snack-action','snack-primary-action'],['owned-style/typography/snack-action']),
+    cases:styleCases(['snack-container','snack-action','snack-primary-action'],['owned-style/typography/snack-action',...['light','custom','typography','theme-light','theme-dark'].flatMap(context=>['snack-focused-action','snack-disabled-action'].map(name=>'owned-style/'+context+'/'+name))]),
     members:[...commonMembers,'projects/ngx-material-legacy/styles/legacy-snack-bar/_snack-bar-theme.scss',
       'projects/ngx-material-legacy/styles/snack-bar/_snack-bar-theme.scss','projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.scss',
       'compatibility/f10/disposition-ledger/evidence/closeout-snack-bar-style-decision.json',
       'compatibility/f10/disposition-ledger/evidence/patches/'+SNACK_STYLE_SHA+'.patch']}],
   [SELECT_STYLE_SHA,{patch:'57d55f6c66ece9e528f32fc87e09c23fdce736da221d50c27647323f6a93a82f',kind:'original-disabled-select-and-custom-map-styles',
     cases:styleCases(['disabled-placeholder','disabled-value','invalid-arrow'],[
-      ...['disabled-placeholder','disabled-value','invalid-arrow'].map(name=>'owned-style/custom/'+name),'owned-style/typography/select-value']),
+      ...['disabled-placeholder','disabled-value','invalid-arrow'].map(name=>'owned-style/custom/'+name),'owned-style/typography/select-value',...['light','custom','typography','theme-light','theme-dark'].flatMap(context=>['visible-disabled-placeholder','combined-disabled-invalid-arrow'].map(name=>'owned-style/'+context+'/'+name))]),
     members:[...commonMembers,'projects/ngx-material-legacy/styles/legacy-select/_select-theme.scss',
       'projects/ngx-material-legacy/styles/select/_select-theme.scss','projects/ngx-material-legacy/legacy-select/select.scss',
       'compatibility/f10/disposition-ledger/evidence/closeout-select-style-decision.json',
