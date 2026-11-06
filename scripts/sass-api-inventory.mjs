@@ -23,6 +23,8 @@ import {dirname, join, relative, resolve, isAbsolute} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 
 import {DEFAULT_CORE_CDK_CASES,defaultCoreCdkResultsMatch,defaultCoreCdkMeasurementOk,DEFAULT_CORE_CDK_CONTRACT} from './sass-default-core-cdk-contract.mjs';
+import {ORDINARY_DENSITY_CASES} from './sass-ordinary-density-peer.mjs';
+import {ordinaryDensityGateMatch} from './sass-ordinary-density-gate.mjs';
 import {DEFAULT_COMPANION_CASES,DEFAULT_COMPANION_CONTRACT,defaultCompanionMeasurementOk,defaultCompanionResultsMatch} from './sass-default-companion-contract.mjs';
 import {DEFAULT_MAPPED_COMPANION_CASES,DEFAULT_MAPPED_COMPANION_CONTRACT,defaultMappedCompanionMeasurementOk,defaultMappedCompanionResultsMatch} from './sass-default-mapped-companion-contract.mjs';
 import {DEFAULT_AGGREGATE_CASES,DEFAULT_AGGREGATE_CONTRACT,defaultAggregateMeasurementOk,defaultAggregateResultsMatch} from './sass-default-aggregate-contract.mjs';
@@ -399,7 +401,7 @@ function fmtParam(param) {
  * Pure comparison of a candidate inventory (and its invocation CSS digests)
  * against the oracle. One result per predeclared case id; nothing is dropped.
  */
-export function compareInventory(oracle, candidate, candidateCss,{spinnerSnackContext,ordinaryControlContext,ordinaryCardContext}={}) {
+export function compareInventory(oracle, candidate, candidateCss,{spinnerSnackContext,ordinaryControlContext,ordinaryCardContext,ordinaryDensityContext}={}) {
   const results = [];
   const push = (case_id, failure, extra = {}) => results.push({case_id, result: failure ? 'fail' : 'pass', reason: failure, ...extra});
   const om = oracle.members;
@@ -427,6 +429,9 @@ export function compareInventory(oracle, candidate, candidateCss,{spinnerSnackCo
     const got = candidateCss?.[name];
     const failure = !got ? 'candidate invocation missing'
       : got.error ? `candidate invocation failed: ${got.error}`
+        : ORDINARY_DENSITY_CASES.includes(`mixin-css/${name}`)
+          ? (ordinaryDensityContext&&got.css===got.actual_measurement?.css&&got.sha256===got.actual_measurement?.css_sha256&&ordinaryDensityGateMatch({context:ordinaryDensityContext,caseId:`mixin-css/${name}`,original:null,actual:got.actual_measurement,companion:got.current_companion,descriptor:got.current_ordinary_density})?null:'finite ordinary density aggregate differs')
+        : Object.hasOwn(got,'current_ordinary_density') ? 'ordinary density capsule outside finite scope'
         : ORDINARY_CARD_DEFAULT_CASES.includes(`mixin-css/${name}`)
           ? (ordinaryCardContext&&ordinaryCardGateDefaultMatch({context:ordinaryCardContext,caseId:`mixin-css/${name}`,got})?null:'finite ordinary card default contract differs')
         : Object.hasOwn(got,'current_ordinary_card') ? 'ordinary card capsule outside finite scope'
@@ -451,6 +456,7 @@ export function compareInventory(oracle, candidate, candidateCss,{spinnerSnackCo
       ...(got&&Object.hasOwn(got,'current_spinner_snack_bridge')?{current_spinner_snack_bridge:got.current_spinner_snack_bridge,error:null,actual_measurement:got.actual_measurement}:{}),
       ...(got&&SPINNER_SNACK_DEFAULT_CASES.includes(`mixin-css/${name}`)?{expected:got.expected,actual:got.actual_measurement,identity:got.identity,mixin:got.mixin,variant:got.variant,call:got.call,comparison:got.comparison,mutation:got.mutation,mutation_rejected:got.mutation_rejected}:{}),
       ...(got&&Object.hasOwn(got,'current_infrastructure')?{current_infrastructure:got.current_infrastructure,actual_measurement:got.actual_measurement,comparison:DEFAULT_CORE_CDK_CONTRACT}:{}),
+      ...(got&&Object.hasOwn(got,'current_ordinary_density')?{current_ordinary_density:got.current_ordinary_density}:{}),
       ...(got&&Object.hasOwn(got,'current_companion')?{current_companion:got.current_companion,actual_measurement:got.actual_measurement,comparison:ORDINARY_CONTROL_DEFAULT_CASES.includes(`mixin-css/${name}`)?got.comparison:companionType(`mixin-css/${name}`)?.contract??DEFAULT_COMPANION_CONTRACT}:{}),
     });
   }

@@ -172,6 +172,10 @@ def default_aggregate_assertion_ok(body):
         required=['_index.scss','styles/bridges/_companion-overrides.scss','styles/bridges/_m2-system.scss','styles/core/theming/_theming.scss',e['source_path']]
         if not all(any(s['root']==0 and s['path']==path for s in ss) for path in required):return False
         if body['case_id']=='mixin-css/private-all-legacy-component-densities' and not any(s['root']==0 and s['path']==e['source_path'] and s['sha256']==_PRIVATE['sha256'] and s['bytes']==_PRIVATE['bytes'] for s in ss):return False
+        if body['case_id']=='mixin-css/all-component-densities':
+            from sass_ordinary_density_gate import OrdinaryDensityGateContext,ordinary_density_gate_match
+            return ordinary_density_gate_match(OrdinaryDensityGateContext(ROOT),body)
+        if 'current_ordinary_density' in body:return False
         expected=default_aggregate_expected_css(body['case_id'],c['peer'],line)
         return expected is not None and expected==m['css']
     except (KeyError,TypeError,ValueError,AttributeError):return False
