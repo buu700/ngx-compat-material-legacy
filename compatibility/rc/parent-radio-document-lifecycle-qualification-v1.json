@@ -1,0 +1,424 @@
+{
+  "schema_version": 1,
+  "time_utc": "2026-11-06T22:03:22.288366+00:00",
+  "purpose": "Repair queued radio focus for server rendering and destruction without changing Material16 structure or styles",
+  "source_path": "projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts",
+  "source_sha256": "4309745c130643044a35bf664da6e58f59b070ddcb69787245071d0564d24bef",
+  "parents": {
+    "21": "87db51fd6ca026df37bcf95e296dbf39645c485a",
+    "main": "7870ef230c0e980d8b58eab81374358142eca065"
+  },
+  "implementation": [
+    "Read activeElement from the input ownerDocument instead of the global document.",
+    "Set a private destruction flag from ngOnDestroy and skip queued focus after destruction."
+  ],
+  "public_TS_API_changes": 0,
+  "product_HTML_CSS_SCSS_changes": 0,
+  "golden_changes": 0,
+  "tests_each_line": {
+    "protocol": {
+      "executed_scenarios": 7,
+      "mutants_rejected": 6,
+      "unittest_exit": 0
+    },
+    "actual_SSR": {
+      "exit": 0,
+      "captured_errors": 0,
+      "radios_rendered": 2,
+      "node": {
+        "21": "20.19.0",
+        "main": "22.22.3"
+      },
+      "HTML_byte_identical_to_prior_artifact": true
+    },
+    "actual_browser": {
+      "exit": 0,
+      "passed": 18,
+      "modes": [
+        "zoneful",
+        "zoneless"
+      ],
+      "browser": "Nix Chromium149.0.7827.0",
+      "covers": [
+        "public setter and host binding",
+        "tab index before queued focus",
+        "distinct groups",
+        "disabled selection",
+        "unchanged selection",
+        "iframe ownerDocument",
+        "focus moved before callback",
+        "component destruction before callback",
+        "checkbox ARIA combinations"
+      ]
+    },
+    "packed_historical_runner": {
+      "exit": 0,
+      "executed": 64,
+      "passed": 64,
+      "failed": 0,
+      "skipped": 0,
+      "includes_runner_controls": 2
+    }
+  },
+  "negative_controls": {
+    "prior_21_artifact_default_SSR_exit": 1,
+    "prior_21_artifact_expected_ReferenceError_control_exit": 0,
+    "prior_browser_v2": "21.x actual component destruction failed in both zone modes; two additional iframe fixture failures came from invalid DOCUMENT override and were repaired by DOM adoption. All failures retained."
+  },
+  "packed_bindings": {
+    "21": {
+      "tar_sha256": "ee5320afb5ce045fa5d8891569d705695c2a12f832a7695cd12ab70b24e93405",
+      "tar_bytes": 1151632,
+      "historical_extracted_files_compared": 556,
+      "radio_fesm_sha256": "94e865b5f1101d38a6b5ed847141f22d078f39d784a4d834f3234b3535adceb2",
+      "dist_and_SSR_radio_equal_tar": true,
+      "focused_browser_source_map_radio_equal_owned_TS": true
+    },
+    "main": {
+      "tar_sha256": "eab8ee40771e47406dab34272879fd510f63da94b3936a81bcff2fc9f033a801",
+      "tar_bytes": 1149871,
+      "historical_extracted_files_compared": 512,
+      "radio_fesm_sha256": "24622b9ee50f8827fe81fdd6ab08ef1d6dd4cfd80b948d46cc91caee789e6199",
+      "dist_and_SSR_radio_equal_tar": true,
+      "focused_browser_source_map_radio_equal_owned_TS": true
+    }
+  },
+  "cyph_sanity": {
+    "tracked_diff": "empty",
+    "inspected": [
+      "shared/js/cyph/modules/cyph-shared.module.ts",
+      "shared/js/cyph/components/dynamic-form/dynamic-form.component.html",
+      "shared/js/cyph/components/dynamic-form/dynamic-form.component.scss"
+    ],
+    "result": "Radio module alias, group/button markup and radio group padding rules require no changes. No consumer build was executed for this narrow fix."
+  },
+  "independent_review": {
+    "scope": "Independent read-only review by Sol6 high",
+    "initial_finding": "Protocol test set destruction flag directly and did not exercise lifecycle hook.",
+    "remediation": "Probe invokes actual ngOnDestroy with stubs and rejects missing-hook assignment mutant; actual Angular destroy browser case also passes.",
+    "final_review": "No remaining concrete findings. Reviewer did not independently execute tests."
+  },
+  "evidence_archive": {
+    "path": "compatibility/rc/parent-radio-document-lifecycle-d693dcea2904e42bd6fa5a01ece560457a8acfe69e1c570c5e02157e75329e12.tar.gz",
+    "sha256": "d693dcea2904e42bd6fa5a01ece560457a8acfe69e1c570c5e02157e75329e12",
+    "bytes": 6597399,
+    "members": [
+      {
+        "path": "21/after/radio-base.ts",
+        "sha256": "4309745c130643044a35bf664da6e58f59b070ddcb69787245071d0564d24bef",
+        "bytes": 21511
+      },
+      {
+        "path": "21/before/radio-base.ts",
+        "sha256": "584e9b199758f9975fd68e76d7e566b939f1fbec8656970a598e96c9fae2c8b2",
+        "bytes": 21344
+      },
+      {
+        "path": "21/browser/build.mjs",
+        "sha256": "0c5aa0f9f23d85373de4299040d06d8bd96d01f668bc5fd693428d62eabc84c7",
+        "bytes": 632
+      },
+      {
+        "path": "21/browser/entry.ts",
+        "sha256": "22b00029486d4c395caff41ab66c271356fb348d8672181f0f1ea38423ec0c4b",
+        "bytes": 150
+      },
+      {
+        "path": "21/browser/focus.iife.js.map",
+        "sha256": "dfa79c17a942e9a79d5a413d9b492bde2e5ff53bdf0ea4fa875ba09344f17d5e",
+        "bytes": 9234761
+      },
+      {
+        "path": "21/browser/focus.spec.ts",
+        "sha256": "a7f35a7972fc5b25028c41bf0447f7b04dcaa5e8918dfc04bc2e9b2bd8a608a0",
+        "bytes": 6903
+      },
+      {
+        "path": "21/browser/karma-final-v3.log",
+        "sha256": "5039adbb1ab09c2fed3f517f2c46109e2a7d6c7762d3def717b2b5ea06087f68",
+        "bytes": 2604
+      },
+      {
+        "path": "21/browser/karma.conf.cjs",
+        "sha256": "5dfa4b2580c204cf3bad907a1bab3c218ae1b38ed1e21a4e78ec5ce8a46e37c4",
+        "bytes": 909
+      },
+      {
+        "path": "21/browser/prior-failure-v2.log",
+        "sha256": "c625c00cfa8d158c96b6e4bb69e3c3478dfd72085a736f21b0ce53ebad8683bc",
+        "bytes": 5563
+      },
+      {
+        "path": "21/historical/exit-code-attempt1.txt",
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "bytes": 2
+      },
+      {
+        "path": "21/historical/exit-code.txt",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "bytes": 2
+      },
+      {
+        "path": "21/historical/radio-results.json",
+        "sha256": "0226b38d06d6a95307410c07b49faa931478797125b105fe1094763fa001d345",
+        "bytes": 13371
+      },
+      {
+        "path": "21/historical/runner-attempt1.log",
+        "sha256": "c6bbac167daf2a4d45ff7ecbad8119dbc0fe87ae5a17082e3e57d2c80e025b0f",
+        "bytes": 7069
+      },
+      {
+        "path": "21/historical/runner.log",
+        "sha256": "06d0609e75d819674c87415bc42e879f04c19d9205a1fd170b6fc81930820332",
+        "bytes": 8269
+      },
+      {
+        "path": "21/historical/tarball.sha256",
+        "sha256": "a7d903b3a1448b9a835b88a1107ca73ecef5ed44de420d26d6cee0779a0b62dd",
+        "bytes": 138
+      },
+      {
+        "path": "21/pack/ngx-compat-material-legacy-21.0.0-rc.0.tgz",
+        "sha256": "ee5320afb5ce045fa5d8891569d705695c2a12f832a7695cd12ab70b24e93405",
+        "bytes": 1151632
+      },
+      {
+        "path": "21/pack/pack-meta.json",
+        "sha256": "1d83fd3269b0bb9cbf10e3e6251f1a1f2118d88f9aca98351b21ac4b2e33c3f9",
+        "bytes": 517
+      },
+      {
+        "path": "21/root-radio-pack-21-v3.log",
+        "sha256": "432eb3770c4a24b1b11fa50ef52c52fe7e74e08d4c6553ac515673ada7a35354",
+        "bytes": 57278
+      },
+      {
+        "path": "21/root-radio-protocol-21-v5.log",
+        "sha256": "b95562903a365f072ad284e7af902de7b951a81ab2860d8c00c3030bc8112e99",
+        "bytes": 98
+      },
+      {
+        "path": "21/ssr/baseline-v4.log",
+        "sha256": "f465fc1a22b913cee4627ccdcac94110e54fdb4495309cf33aa0ac6b37c3891d",
+        "bytes": 209
+      },
+      {
+        "path": "21/ssr/baseline.html",
+        "sha256": "eb60fdbfc684be0044dc47823f5558a5740e390b5d05aae4df2ba4942ea1eba6",
+        "bytes": 5186
+      },
+      {
+        "path": "21/ssr/final-v3.html",
+        "sha256": "eb60fdbfc684be0044dc47823f5558a5740e390b5d05aae4df2ba4942ea1eba6",
+        "bytes": 5186
+      },
+      {
+        "path": "21/ssr/final-v3.log",
+        "sha256": "4599a3bddadedf1176c205237c01fd23ba38f87653ef5bad71025d13ce9ea7c3",
+        "bytes": 445
+      },
+      {
+        "path": "21/ssr/install-final-v1.log",
+        "sha256": "8c497ac8067e1724cccec8dab491af614c94afe7ef160dbbc14f9479387b4b7a",
+        "bytes": 25
+      },
+      {
+        "path": "21/ssr/package-lock.json",
+        "sha256": "496cb9beb7f06d3f2850b366aecea98efda1ad0ddf2f0508e16e1deaee0c3acf",
+        "bytes": 9025
+      },
+      {
+        "path": "21/ssr/package.json",
+        "sha256": "18444bc42ab6d79c53710effaa311e5f0ba5ad39404e45cbaa4deef2994f64ab",
+        "bytes": 526
+      },
+      {
+        "path": "21/tests/radio_owner_document_probe.mjs",
+        "sha256": "5b6f0420f4343a150d39a23e3f83a27cb0afe268826fcd60423165ce30b189c3",
+        "bytes": 5155
+      },
+      {
+        "path": "21/tests/radio_ssr_fixture.mjs",
+        "sha256": "89c7e04d44b5b11556aab64e39a028e3a9493f5b59d3e5ef5fe73c272e8a68d2",
+        "bytes": 3425
+      },
+      {
+        "path": "21/tests/test_radio_owner_document.py",
+        "sha256": "d7649119219fac6a65b8550118791c04b6200311fe7f45ce642ca15ba50dd0c6",
+        "bytes": 929
+      },
+      {
+        "path": "independent-review.json",
+        "sha256": "9dcb1143e4713e2b525e432bc93c1766d826bcabc9233736b74edcfb9fa0fb35",
+        "bytes": 420
+      },
+      {
+        "path": "main/after/radio-base.ts",
+        "sha256": "4309745c130643044a35bf664da6e58f59b070ddcb69787245071d0564d24bef",
+        "bytes": 21511
+      },
+      {
+        "path": "main/before/radio-base.ts",
+        "sha256": "584e9b199758f9975fd68e76d7e566b939f1fbec8656970a598e96c9fae2c8b2",
+        "bytes": 21344
+      },
+      {
+        "path": "main/browser/build.mjs",
+        "sha256": "0ffad2f4fa5cb9f3ad8b6a857d609cd52edc8ac184d01c6be77e58b41e964975",
+        "bytes": 1263
+      },
+      {
+        "path": "main/browser/entry.ts",
+        "sha256": "9b7f6f1e18ce0e867d47814135483584834fb37228ba6504424ae02300b76c1f",
+        "bytes": 152
+      },
+      {
+        "path": "main/browser/focus.iife.js.map",
+        "sha256": "cfb6f4c7c9204befba9d81337d8fe106792dded058a485d209f840ad8601ac7e",
+        "bytes": 9502619
+      },
+      {
+        "path": "main/browser/focus.spec.ts",
+        "sha256": "8ab02c0990a4528a7e32253bc11e9a71e3ee6cce0d3b7da3640d0c755f528586",
+        "bytes": 7107
+      },
+      {
+        "path": "main/browser/karma-final-v3.log",
+        "sha256": "ec19bac1753fbf6f3f8368dcc88fddf1f9eb38b1b057401fec430361e1ad577e",
+        "bytes": 2604
+      },
+      {
+        "path": "main/browser/karma.conf.cjs",
+        "sha256": "44f1ade9b474d7db2b76564419e09b3a9381187ac4f5b3eb959d538a0a0406f9",
+        "bytes": 915
+      },
+      {
+        "path": "main/historical/exit-code.txt",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "bytes": 2
+      },
+      {
+        "path": "main/historical/radio-results.json",
+        "sha256": "0afd60af12ea73f81920b3f161cc6bb09fcfd545ade524041f0e28892866140b",
+        "bytes": 13373
+      },
+      {
+        "path": "main/historical/runner.log",
+        "sha256": "14585e102567de27c860c34e36bbcf4882a14ede17da85046a7159441db2b62b",
+        "bytes": 8279
+      },
+      {
+        "path": "main/historical/tarball.sha256",
+        "sha256": "b0f74e31e216e7b5c41a9a79cbf3abbff0c9ee6f5b983b60cea1eef3bb13caed",
+        "bytes": 140
+      },
+      {
+        "path": "main/pack/ngx-compat-material-legacy-22.0.0-rc.0.tgz",
+        "sha256": "eab8ee40771e47406dab34272879fd510f63da94b3936a81bcff2fc9f033a801",
+        "bytes": 1149871
+      },
+      {
+        "path": "main/pack/pack-meta.json",
+        "sha256": "0f17bf20748e93e78b8b704f391acc73ee8d46ebaa76bcd1b05ca649bc8eb82b",
+        "bytes": 624
+      },
+      {
+        "path": "main/root-radio-pack-main-v3.log",
+        "sha256": "b1dabe349676984a8bdad142aa80ae3634345cc736d231742974acdbf6bf0ccd",
+        "bytes": 57405
+      },
+      {
+        "path": "main/root-radio-protocol-main-v5.log",
+        "sha256": "5a826ccd6273c037ba00ca4a2869460667652ce407f864e4bdb8342a8cd646ff",
+        "bytes": 98
+      },
+      {
+        "path": "main/ssr/baseline-v4.log",
+        "sha256": "a980ca8020a959caddb895686abc032db29f4acd2b281e3541a074cee384271b",
+        "bytes": 209
+      },
+      {
+        "path": "main/ssr/baseline.html",
+        "sha256": "6af1f9a478920d6fd11490356d518c262c307f74caa711f21f5de6679a7323e7",
+        "bytes": 5185
+      },
+      {
+        "path": "main/ssr/final-v3.html",
+        "sha256": "6af1f9a478920d6fd11490356d518c262c307f74caa711f21f5de6679a7323e7",
+        "bytes": 5185
+      },
+      {
+        "path": "main/ssr/final-v3.log",
+        "sha256": "5b288a162767d53f7def9c93e5959a63f4f6033b968fca37b44e4255bddb5131",
+        "bytes": 445
+      },
+      {
+        "path": "main/ssr/install-final-v1.log",
+        "sha256": "27ac7c0286a79accdb1dc955628d53a2c203a8577059f3f7492568fabfea048e",
+        "bytes": 25
+      },
+      {
+        "path": "main/ssr/package-lock.json",
+        "sha256": "0022445eb3576b6666c25e2796b0a262598e5b9b72cac6e627016143145dd8fb",
+        "bytes": 9408
+      },
+      {
+        "path": "main/ssr/package.json",
+        "sha256": "ac66347f7c3df0d7414c0c42fc514737d4f32bf70611065e18287b80e7336ef1",
+        "bytes": 518
+      },
+      {
+        "path": "main/tests/radio_owner_document_probe.mjs",
+        "sha256": "5b6f0420f4343a150d39a23e3f83a27cb0afe268826fcd60423165ce30b189c3",
+        "bytes": 5155
+      },
+      {
+        "path": "main/tests/radio_ssr_fixture.mjs",
+        "sha256": "89c7e04d44b5b11556aab64e39a028e3a9493f5b59d3e5ef5fe73c272e8a68d2",
+        "bytes": 3425
+      },
+      {
+        "path": "main/tests/test_radio_owner_document.py",
+        "sha256": "d7649119219fac6a65b8550118791c04b6200311fe7f45ce642ca15ba50dd0c6",
+        "bytes": 929
+      },
+      {
+        "path": "root-radio-packed-bindings-v3.json",
+        "sha256": "b6edb871be6112d3216075ab8d9f1d0a932deac9a5c35f4833ab2041726193ba",
+        "bytes": 745
+      },
+      {
+        "path": "root-radio-serial-pack-v3-state.json",
+        "sha256": "30ea91a1459c1787c8d303593dfd7279f4f348236f691cb8dc10fe4171ff4670",
+        "bytes": 882
+      },
+      {
+        "path": "root-radio-serial-pack-v3.py",
+        "sha256": "38f139a2fb4e6e6a335270da591fa17c587ec06cbd00bafd41ec864c6e12efd9",
+        "bytes": 1851
+      },
+      {
+        "path": "root-radio-ssr-21-before-control-v1.log",
+        "sha256": "2ef69179708fd3f8e622a1c78ed5dc8c854e41d5875dc04329b96f409972829d",
+        "bytes": 505
+      },
+      {
+        "path": "root-radio-ssr-21-before-default-v1.log",
+        "sha256": "a2121555d36e49265c693ccaa5f311075b90606f720b745679c9074f933192ee",
+        "bytes": 472
+      },
+      {
+        "path": "root-radio-ssr-install-v1.mjs",
+        "sha256": "3e7307ef07e7daa56bc1b8456a7d16f53e0eb8780fe7c7a9419e0dbb5470b349",
+        "bytes": 638
+      }
+    ]
+  },
+  "limits": [
+    "Focused radio repair qualification only; no full browser/floor matrix, verify-lite, full artifact suite or G-gate pass claimed.",
+    "Historical runner was given an extracted tarball root and external dependency links; its report has no run_id or artifact_sha256. External binding comparison verifies every regular tar member (556 on21,512 onmain) and records tar hashes.",
+    "No canonical audit dispositions, profiles or epoch packets changed.",
+    "No push, Actions, publication or credential operations."
+  ]
+}
