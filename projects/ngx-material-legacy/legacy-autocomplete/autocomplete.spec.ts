@@ -41,7 +41,7 @@ import {MatLegacyOption, MatLegacyOptionSelectionChange} from '@ngx-compat/mater
 import {MatLegacyFormField, MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
 import {By} from '@angular/platform-browser';
 import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
-import {BehaviorSubject, EMPTY, Observable, Subject, Subscription} from 'rxjs';
+import {BehaviorSubject, EMPTY, Observable, of, Subject, Subscription} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 
 import {MatLegacyInputModule} from '../legacy-input/index';
@@ -177,6 +177,23 @@ describe('MatAutocomplete', () => {
             .toBe(true);
         });
       });
+    }));
+
+    it('should close after an early closing-action subscriber sees overlay detach', fakeAsync(() => {
+      const trigger = fixture.componentInstance.trigger;
+      const closingActionSpy = jasmine.createSpy('early closing action listener');
+      const subscription = trigger.panelClosingActions.subscribe(closingActionSpy);
+
+      trigger.openPanel();
+      fixture.detectChanges();
+      flush();
+      zone.simulateZoneExit();
+      expect(trigger.panelOpen).toBe(true);
+
+      (trigger as any)._overlayRef.detach();
+      expect(closingActionSpy).toHaveBeenCalledOnceWith(null);
+      expect(trigger.panelOpen).toBe(false);
+      subscription.unsubscribe();
     }));
 
     it('should close the panel when the user clicks away', fakeAsync(() => {
@@ -806,6 +823,7 @@ describe('MatAutocomplete', () => {
       fixture.detectChanges();
       tick();
       expect(changes).not.toHaveBeenCalled();
+      input.blur();
       dispatchFakeEvent(document, 'click');
       fixture.detectChanges();
       tick();
@@ -839,6 +857,7 @@ describe('MatAutocomplete', () => {
       expect(fixture.componentInstance.trigger.panelOpen).toBe(true);
       expect(input.value).toBe('Cali');
       expect(filteredChanges).not.toHaveBeenCalled();
+      input.blur();
       dispatchFakeEvent(document, 'click');
       fixture.detectChanges();
       tick();
@@ -2128,10 +2147,10 @@ describe('MatAutocomplete', () => {
 
     it('should fit an above-position panel inside the handset landscape viewport', fakeAsync(() => {
       const changes = new BehaviorSubject({matches: true, breakpoints: {[Breakpoints.HandsetLandscape]: true}});
-      const observer = {observe: (query: string) => {
-        expect(query).toBe(Breakpoints.HandsetLandscape);
-        return changes.asObservable();
-      }};
+      const observer = {observe: (query: string) =>
+        query === Breakpoints.HandsetLandscape
+          ? changes.asObservable()
+          : of({matches: false, breakpoints: {[query]: false}})};
       const fixture = createComponent(SimpleAutocomplete, [{provide: BreakpointObserver, useValue: observer}]);
       fixture.componentInstance.position = 'above';
       fixture.detectChanges();
@@ -2157,10 +2176,10 @@ describe('MatAutocomplete', () => {
 
     it('should reset landscape configuration and unsubscribe without destroying the observer', fakeAsync(() => {
       const changes = new BehaviorSubject({matches: true, breakpoints: {[Breakpoints.HandsetLandscape]: true}});
-      const observe = jasmine.createSpy('handset observer').and.callFake((query: string) => {
-        expect(query).toBe(Breakpoints.HandsetLandscape);
-        return changes.asObservable();
-      });
+      const observe = jasmine.createSpy('breakpoint observer').and.callFake((query: string) =>
+        query === Breakpoints.HandsetLandscape
+          ? changes.asObservable()
+          : of({matches: false, breakpoints: {[query]: false}}));
       const fixture = createComponent(SimpleAutocomplete, [{provide: BreakpointObserver, useValue: {observe}}]);
       fixture.detectChanges();
       fixture.componentInstance.trigger.openPanel();
@@ -2174,7 +2193,8 @@ describe('MatAutocomplete', () => {
       expect(flexible).toHaveBeenCalledOnceWith(false);
       expect(grow).toHaveBeenCalledOnceWith(false);
       expect(margin).toHaveBeenCalledOnceWith(0);
-      expect(observe).toHaveBeenCalledTimes(1);
+      expect(observe.calls.allArgs().filter(([query]) => query === Breakpoints.HandsetLandscape))
+        .toHaveSize(1);
       fixture.destroy();
       changes.next({matches: true, breakpoints: {[Breakpoints.HandsetLandscape]: true}});
       expect(flexible).toHaveBeenCalledTimes(1);
@@ -2189,7 +2209,10 @@ describe('MatAutocomplete', () => {
 
     it('should reuse one handset subscription across panel close and reopen', fakeAsync(() => {
       const changes = new BehaviorSubject({matches: false, breakpoints: {[Breakpoints.HandsetLandscape]: false}});
-      const observe = jasmine.createSpy('handset observer').and.returnValue(changes.asObservable());
+      const observe = jasmine.createSpy('breakpoint observer').and.callFake((query: string) =>
+        query === Breakpoints.HandsetLandscape
+          ? changes.asObservable()
+          : of({matches: false, breakpoints: {[query]: false}}));
       const fixture = createComponent(SimpleAutocomplete, [{provide: BreakpointObserver, useValue: {observe}}]);
       fixture.detectChanges();
       fixture.componentInstance.trigger.openPanel();
@@ -2206,7 +2229,8 @@ describe('MatAutocomplete', () => {
       zone.simulateZoneExit();
       expect(fixture.componentInstance.trigger.panelOpen).toBe(true);
       expect((fixture.componentInstance.trigger as any)._positionStrategy).toBe(strategy);
-      expect(observe).toHaveBeenCalledTimes(1);
+      expect(observe.calls.allArgs().filter(([query]) => query === Breakpoints.HandsetLandscape))
+        .toHaveSize(1);
       fixture.destroy();
       changes.complete();
     }));
@@ -2752,6 +2776,21 @@ describe('MatAutocomplete', () => {
       option.click();
       expect(closingActionSpy).toHaveBeenCalledWith(jasmine.any(MatLegacyOptionSelectionChange));
     });
+
+    it('should keep observing closing actions after the panel reopens', fakeAsync(() => {
+      dispatchFakeEvent(document, 'click');
+      expect(closingActionSpy).toHaveBeenCalledOnceWith(null);
+
+      trigger.openPanel();
+      fixture.detectChanges();
+      flush();
+      const option = overlayContainerElement.querySelector('mat-option') as HTMLElement;
+      option.click();
+
+      expect(closingActionSpy).toHaveBeenCalledTimes(2);
+      expect(closingActionSpy.calls.mostRecent().args[0])
+        .toEqual(jasmine.any(MatLegacyOptionSelectionChange));
+    }));
 
     it('should close the panel when pressing escape', () => {
       expect(closingActionSpy).not.toHaveBeenCalled();
