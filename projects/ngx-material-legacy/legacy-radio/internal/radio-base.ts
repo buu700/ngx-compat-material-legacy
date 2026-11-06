@@ -476,6 +476,9 @@ export abstract class _MatRadioButtonBase
   /** Unregister function for _radioDispatcher */
   private _removeUniqueSelectionListener: () => void = () => {};
 
+  /** Whether this radio has been destroyed. */
+  private _isDestroyed = false;
+
   /** Previous value of the input's tabindex. */
   private _previousTabIndex: number | undefined;
 
@@ -561,6 +564,7 @@ export abstract class _MatRadioButtonBase
   }
 
   ngOnDestroy() {
+    this._isDestroyed = true;
     this._focusMonitor.stopMonitoring(this._elementRef);
     this._removeUniqueSelectionListener();
   }
@@ -653,13 +657,14 @@ export abstract class _MatRadioButtonBase
         // became selected, move focus to the selected radio (or blur if it is disabled).
         queueMicrotask(() => {
           if (
+            !this._isDestroyed &&
             group &&
             group.selected &&
             group.selected !== this &&
-            document.activeElement === input
+            input.ownerDocument.activeElement === input
           ) {
             group.selected._inputElement.nativeElement.focus();
-            if (document.activeElement === input) {
+            if (input.ownerDocument.activeElement === input) {
               this._inputElement.nativeElement.blur();
             }
           }
