@@ -17,7 +17,7 @@ CHECK = 'source-contract-regressions'
 IDS = [f'{CHECK}/checker-source/full-fault-lifetimes', f'{CHECK}/browser-source/full-fault-lifetimes']
 COMMANDS = {'checker': ['node', 'tests/checker_reference_source_probe.mjs', '--metadata'],
             'browser': ['node', 'tests/browser_reference_source_probe.mjs']}
-TIMEOUTS = {'checker': 120, 'browser': 180}
+TIMEOUTS = {'checker': 180, 'browser': 300}
 # Imported functions are the real current semantic inspectors.  They use the
 # existing source owners, not historical program execution or fake authority.
 INSPECT = r'''

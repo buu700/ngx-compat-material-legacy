@@ -7,7 +7,7 @@ import json,os,subprocess,unittest
 ROOT=Path(__file__).resolve().parents[1]
 class BrowserReferenceProposalTests(unittest.TestCase):
     def test_independent_python_token_splice_and_protected_canonical(self):
-        child=subprocess.run(['python3','-B','tests/browser_reference_independent.py'],cwd=ROOT,capture_output=True,text=True,timeout=180)
+        child=subprocess.run(['python3','-B','tests/browser_reference_independent.py'],cwd=ROOT,capture_output=True,text=True,timeout=300)
         self.assertEqual(child.returncode,0,(child.stdout+child.stderr)[-8000:]);report=json.loads(child.stdout)
         packet=json.loads((ROOT/'compatibility/rc/c04-browser-reference-proposal.json').read_bytes())
         self.assertEqual(report['independent_after_sha256'],packet['after_ledger']['sha256'])

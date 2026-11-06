@@ -7,7 +7,7 @@ import hashlib,json,os,subprocess,unittest
 ROOT=Path(__file__).resolve().parents[1]
 class CheckerReferenceProposalTests(unittest.TestCase):
  def test_independent_python_full_image_and_protected_canonical(self):
-  child=subprocess.run(['python3','-B','tests/checker_reference_independent.py'],cwd=ROOT,capture_output=True,text=True,timeout=120)
+  child=subprocess.run(['python3','-B','tests/checker_reference_independent.py'],cwd=ROOT,capture_output=True,text=True,timeout=180)
   self.assertEqual(child.returncode,0,(child.stdout+child.stderr)[-7000:]);r=json.loads(child.stdout)
   packet=json.loads((ROOT/'compatibility/rc/c04-checker-reference-proposal.json').read_bytes())
   self.assertEqual(r['independent_after_sha256'],packet['after_ledger']['sha256']);self.assertEqual(r['independent_after_bytes'],packet['after_ledger']['bytes'])

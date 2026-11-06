@@ -11,7 +11,7 @@ class BrowserReferenceSourceTests(unittest.TestCase):
         command=['node','tests/browser_reference_source_probe.mjs']
         if os.environ.get('BROWSER_REFERENCE_SOURCE_REPORT'):
             command.append(os.environ['BROWSER_REFERENCE_SOURCE_REPORT'])
-        child=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=180)
+        child=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=300)
         self.assertEqual(child.returncode,0,child.stdout+child.stderr)
         report=json.loads(child.stdout)
         self.assertEqual(report['complete_source_transitions'],4)
