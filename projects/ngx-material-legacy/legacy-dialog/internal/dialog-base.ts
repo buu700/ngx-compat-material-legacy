@@ -13,11 +13,13 @@
 import {Dialog, DialogConfig, DialogRef} from '@angular/cdk/dialog';
 import {ComponentType, Overlay, OverlayContainer, ScrollStrategy} from '@angular/cdk/overlay';
 import {
+  assertInInjectionContext,
   ComponentRef,
   Injectable,
   InjectionToken,
   Injector,
   OnDestroy,
+  runInInjectionContext,
   TemplateRef,
   Type,
 } from '@angular/core';
@@ -26,6 +28,7 @@ import {Observable, Subject, defer} from 'rxjs';
 import {startWith} from 'rxjs/operators';
 import {MatLegacyDialogRef} from '../dialog-ref';
 import {_MatDialogContainerBase} from './dialog-container-base';
+import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';
 
 /** @docs-private */
 export function MAT_DIALOG_SCROLL_STRATEGY_FACTORY(overlay: Overlay): () => ScrollStrategy {
@@ -44,6 +47,9 @@ export abstract class _MatDialogBase<C extends _MatDialogContainerBase> implemen
   private _scrollStrategy: () => ScrollStrategy;
   protected _idPrefix = 'mat-dialog-';
   private _dialog: Dialog;
+  private readonly _injector: Injector;
+  private readonly _animationMode?: 'NoopAnimations' | 'BrowserAnimations';
+  private readonly _hasInjectionContext: boolean;
   protected dialogConfigClass = MatDialogConfig;
 
   /** Keeps track of the currently-open dialogs. */
@@ -91,8 +97,26 @@ export abstract class _MatDialogBase<C extends _MatDialogContainerBase> implemen
      */
     _animationMode?: 'NoopAnimations' | 'BrowserAnimations',
   ) {
+    try {
+      assertInInjectionContext(_MatDialogBase);
+      this._hasInjectionContext = true;
+    } catch {
+      this._hasInjectionContext = false;
+    }
+    this._injector = injector;
+    this._animationMode = _animationMode;
     this._scrollStrategy = scrollStrategy;
-    this._dialog = injector.get(Dialog);
+    this._dialog = this._injector.get(Dialog);
+  }
+
+  /** Match the injector used for the dialog container on every open. */
+  private _animationsDisabled(config: MatDialogConfig): boolean {
+    if (!this._hasInjectionContext) {
+      return this._animationMode === 'NoopAnimations';
+    }
+
+    const injector = config.injector || config.viewContainerRef?.injector || this._injector;
+    return runInInjectionContext(injector, legacyAnimationsDisabled);
   }
 
   open<T, D = any, R = any>(
@@ -127,6 +151,7 @@ export abstract class _MatDialogBase<C extends _MatDialogContainerBase> implemen
 
     const cdkRef = this._dialog.open<R, D, T>(componentOrTemplateRef, {
       ...config,
+      ...(this._animationsDisabled(config) ? {disableAnimations: true} : {}),
       positionStrategy: this._overlay.position().global().centerHorizontally().centerVertically(),
       // Disable closing since we need to sync it up to the animation ourselves.
       disableClose: true,
