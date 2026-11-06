@@ -1,0 +1,35 @@
+{
+  "scope": "Read-only contingency inspection; no code edits, tests, runtime or gate claim.",
+  "heads": {
+    "21.x": "f55709911cbef22493cc7b8687c28769060dbabd",
+    "main": "6b3c1b439b4815f6607e3ee6d80aea6e3a1a047f"
+  },
+  "21_source_sha256": {
+    "browser_owner": "9377e8dba64633774c42aea4a93f8829aec62a821a69c868d62efce41c930b72",
+    "checker_owner": "128a33dc4ea2dc37f084221369285b8e164154e8e21d277f6b32e8ceb945aee4",
+    "legacy_owner": "b2a62ea74313cfc0ca99953082464eebd12559daa4529914b83ebd78c67fb9d4"
+  },
+  "actual_edges": {
+    "21_legacy_to_browser": "browserOwnerSourceSubject constructs one actual legacyRemovalOwnerSourceSubject with same root/read and initializes parent bound from legacyTools.bound. Its assertCurrent calls actual source lane guard, then legacyTools.assertCurrent, then reads/hashes every parent member via actual.read with browser physical equality and finally rehashes every parent member physically. It currently exports no guardPlan, does not have a callback-free full parent preflight, and does not perform physical-before/provided/physical-after for each parent consume.",
+    "21_browser_to_checker": "checkerOwnerSourceSubject constructs one actual browserOwnerSourceSubject with same root/read, clones tools.bound, and likewise runs actual lane guard, tools.assertCurrent, all parent supplied/current physical checks and a full physical final. Neither the browser subject nor checker subject exports guardPlan, so there is no existing composed edge here.",
+    "main_difference": "Main browser owner constructs a historicalContractRepairReaderSubject rather than a legacy owner, and has different physical/guard behavior. Do not apply 21 assumptions or source changes to main without a separate review."
+  },
+  "candidate": "The only proposed next finite 21.x edge is the actual legacy successor captured by browser owner, but it is a NEW parent composition, not an optimization of an already existing browser cold/final graph. No code is proposed until full graph/reader equivalence is established.",
+  "required_proof": [
+    "Legacy subject exposes an identity-bound, callback-free membership witness for its own LIVE private bound and exact guardPlan.node, not a clone, bytes, reader, cached source verdict, or authority grant. Capture immutable exact inherited path/hash/size tuples, witness descriptor, guard, plan and node from the same actual legacyTools object and check descriptors/identity throughout.",
+    "Browser must first gain a genuine full parent guardPlan that executes its exact legacy child node, complete actual source lane and all browser-local nodes. The current actual.assertCurrent occurs before child guard and performs relevant metadata/identity checks even if the lane has no frames; do not silently discard or represent it by an empty node. Opaque, unrepresented, different subject, mismatched tuple or otherwise unprovable scope uses the unchanged original full operation.",
+    "All node preflights callback-free before all consumes; all finals callback-free after all consumes. At parent preflight and final the exact child physical sweep must have happened immediately in the same complete graph with no callback between it and a live witness. Parent skips a row only when witness confirms every fixed inherited tuple and current live parent row matches its own inherited path/hash/size; mismatch or false witness uses full original physical verification. Read and hash every new/local/changed parent row dynamically.",
+    "Every original parent member supplied callback and its original read order and checks remain; stronger physical-before/provided/physical-after must use same actual source reader and the correct browser physical resolver, not an imported historical reader or substitute factory. Preserve transitions, qualification, comparison data, method identities and child lock/reentry cleanup.",
+    "readBrowserOwnerMember has special physical resolution for node_modules/typescript/lib/typescript.js and node_modules/typescript/package.json; legacy/table physical checks use readEvidenceMember. Do not treat any path as covered unless the exact physical resolver semantics are proven identical for that path; special TypeScript rows stay browser-local unless actually proven covered under the same rules.",
+    "Legacy comparisonBytes and registry paths can mutate its live private bound during later operations. Returned child bound is a snapshot, not proof of live state. Witness and exact expected parent row must be checked at both phases; child scope extensions or overwrites and parent additions must not escape final checks. The existing callback-free final ordering and exceptions must be maintained, with no cross-object path/digest deduplication."
+  ],
+  "counts": "For N proven identical inherited reference tuples covered by the exact child node, at most N physical hashes could be removed from the original browser final sweep per invocation; a new browser cold preflight must also cover all rows and may add work. The child still runs its physical guard, and every browser provided/physical member operation remains. Neither N, callback counts nor net saved hashes/time is measured; no speedup claim.",
+  "tests": [
+    "Reuse same-node witness identity, exact tuple match, false/missing/opaque fallback, child bound overwrite and parent bound overwrite, dynamic local/new rows, inherited/local cold and final persistent mutations, late last callback, per-member fresh reads, exception and reentry recovery.",
+    "New browser-specific negative: mutate either TypeScript special physical path or substitute a different resolver/reader identity while generic child path/hash metadata happens to match; the browser's special physical check must remain and reject.",
+    "Nonempty and empty actual source lane with altered planner/identity metadata; verify no lost original actual.assertCurrent coverage, and prove full fallback when lane cannot be composed.",
+    "Distinct legacy objects with identical bytes cannot stand in for the captured child; retained source callback/registry after browser construction cannot bypass later final checks.",
+    "Keep complete checker/browser fault grids and existing wall deadlines, plus independent full owner gates."
+  ],
+  "limits": "Source inspection only, no workload execution, measurements, updated source enrollment or owner qualification. Count is a structural conditional upper bound, not an observed runtime outcome."
+}
