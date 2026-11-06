@@ -244,6 +244,11 @@ jobs:
           python3 -c "import json; m=json.load(open('$META')); assert m.get('tarball') and m.get('sha256'); print(m.get('source_sha'), m['sha256'][:12], m['tarball'])"
           echo "run_dir=$RUN" >> "$GITHUB_OUTPUT"
 
+      - name: Dialog focus and motion source lifecycle regressions
+        run: |
+          just chainman exec -- node scripts/dialog-initial-focus-source-test.mjs
+          just chainman exec -- node scripts/dialog-motion-source-test.mjs
+
       - name: Require the packed export map
         run: |
           set -euo pipefail

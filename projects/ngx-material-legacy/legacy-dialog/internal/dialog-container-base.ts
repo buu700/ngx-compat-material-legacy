@@ -17,10 +17,11 @@ import {Platform} from '@angular/cdk/platform';
 import {BasePortalOutlet, CdkPortalOutlet, ComponentPortal, DomPortal, TemplatePortal}
   from '@angular/cdk/portal';
 import {
-  assertInInjectionContext, ChangeDetectorRef, Component, ComponentRef, DOCUMENT,
-  ElementRef, EmbeddedViewRef, EventEmitter, Inject, inject, NgZone, OnDestroy,
+  afterNextRender, ApplicationRef, assertInInjectionContext, ChangeDetectorRef, Component, ComponentRef, DOCUMENT,
+  ElementRef, EmbeddedViewRef, EventEmitter, Inject, inject, Injector, NgZone, OnDestroy,
   Optional, ProviderToken, Renderer2, ViewChild,
 } from '@angular/core';
+import type {AfterRenderRef} from '@angular/core';
 import {MatDialogConfig} from '@angular/material/dialog';
 import type {LegacyDialogRuntimeConfig} from '../dialog-config';
 import {Subject, Subscription} from 'rxjs';
@@ -67,6 +68,15 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
 
   private readonly _legacyFocusNotifications = new Subject<void>();
   private readonly _legacyFocusStableSubscriptions = new Subscription();
+  private readonly _legacyRenderInjector = ambientService(Injector);
+  private readonly _legacyApplicationRef = ambientService(ApplicationRef);
+  private _legacyAfterRender: AfterRenderRef | null = null;
+  private _legacyFocusEpoch = 0;
+  private _legacyInitialFocusPending = false;
+  private _legacyPendingOpenedTime: number | null = null;
+  private _legacyPendingFocusListenerCleanup: (() => void) | null = null;
+  private _legacyPendingInitialZoneSubscription: Subscription | null = null;
+  private _legacyPendingRecapture: Subscription | null = null;
 
   private readonly _legacyChangeDetector = ambientService(ChangeDetectorRef);
   private readonly _legacyDialogRef = ambientService(DialogRef);
@@ -183,18 +193,40 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
       return;
     }
     if (!legacyDialogContainsFocus(this._elementRef.nativeElement)) {
-      this._trapFocus();
+      if (this._legacyInitialFocusPending) {
+        if (this._legacyPendingRecapture && !this._legacyPendingRecapture.closed) {
+          return;
+        }
+        this._legacyAfterRender?.destroy();
+        this._legacyAfterRender = null;
+        const epoch = this._legacyFocusEpoch;
+        this._trapFocus(false, () => {
+          if (!this._legacyFocusDestroyed && epoch === this._legacyFocusEpoch) {
+            const openedTime = this._legacyPendingOpenedTime;
+            this._cancelPendingInitialFocus();
+            if (openedTime !== null) {
+              this._animationStateChanged.next({state: 'opened', totalTime: openedTime});
+            }
+          }
+        });
+      } else {
+        this._trapFocus();
+      }
     }
   }
 
   /** Preserve the original direct-focus and public NgZone stability timing. */
-  protected _trapFocus(): void {
+  protected _trapFocus(initial = false, onFocusInvoked?: () => void): void {
     if (this._legacyFocusDestroyed) {
       return;
     }
     const focus = () => {
       if (this._legacyFocusDestroyed) {
         return;
+      }
+      if (onFocusInvoked) {
+        this._legacyPendingFocusListenerCleanup?.();
+        this._legacyPendingFocusListenerCleanup = null;
       }
       this._legacyFocusCleanup?.();
       const cleanup = focusLegacyDialogInitially({
@@ -221,14 +253,121 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
         cleanup?.();
       } else {
         this._legacyFocusCleanup = cleanup;
+        onFocusInvoked?.();
       }
     };
-    if ((this._config.autoFocus === true || this._config.autoFocus === 'first-tabbable')
-        && !this._ngZone.isStable) {
-      this._legacyFocusStableSubscriptions.add(this._ngZone.onStable.pipe(take(1)).subscribe(focus));
+    const firstTabbable = this._config.autoFocus === true || this._config.autoFocus === 'first-tabbable';
+    // Stable application views can attach before child controls complete their
+    // initial render and model update. Manual construction keeps the direct path.
+    const deferInitialFocus = initial && firstTabbable && this._ngZone.isStable
+        && this._legacyRenderInjector && this._legacyApplicationRef instanceof ApplicationRef
+        && this._isBrowser();
+    if (deferInitialFocus) {
+      this._cancelPendingInitialFocus();
+      this._legacyInitialFocusPending = true;
+      const epoch = this._legacyFocusEpoch;
+      const activeRoots = (): {roots: (Document | ShadowRoot)[], active: Element | null} => {
+        const roots: (Document | ShadowRoot)[] = [this._document];
+        let active: Element | null = this._document.activeElement;
+        while (active) {
+          let next: Document | ShadowRoot | null = active.shadowRoot;
+          if (!next && active.tagName === 'IFRAME') {
+            try {
+              next = (active as HTMLIFrameElement).contentDocument;
+            } catch {
+              next = null;
+            }
+          }
+          if (!next) break;
+          roots.push(next);
+          active = next.activeElement;
+        }
+        return {roots, active};
+      };
+      const {roots: focusRoots, active: previousActiveElement} = activeRoots();
+      const cancelPendingFocus = () => {
+        const openedTime = this._legacyPendingOpenedTime;
+        this._cancelPendingInitialFocus();
+        if (openedTime !== null && !this._legacyFocusDestroyed) {
+          this._animationStateChanged.next({state: 'opened', totalTime: openedTime});
+        }
+      };
+      const cancelOnFocus = () => {
+        if (activeRoots().active !== previousActiveElement) cancelPendingFocus();
+      };
+      const checkFocusOut = () => {
+        if (activeRoots().active !== previousActiveElement) {
+          queueMicrotask(() => {
+            if (!this._legacyFocusDestroyed && this._legacyInitialFocusPending
+                && epoch === this._legacyFocusEpoch) {
+              cancelPendingFocus();
+            }
+          });
+        }
+      };
+      for (const root of focusRoots) {
+        root.addEventListener('focusin', cancelOnFocus, true);
+        root.addEventListener('focusout', checkFocusOut, true);
+      }
+      this._legacyPendingFocusListenerCleanup = () => {
+        for (const root of focusRoots) {
+          root.removeEventListener('focusin', cancelOnFocus, true);
+          root.removeEventListener('focusout', checkFocusOut, true);
+        }
+      };
+      const injector = this._legacyRenderInjector!;
+      // NgModel schedules its initial model update during the first render. Register
+      // the next render callback after its queued promise has marked the view dirty.
+      this._legacyAfterRender = afterNextRender({mixedReadWrite: () => queueMicrotask(() => {
+        if (this._legacyFocusDestroyed || epoch !== this._legacyFocusEpoch) return;
+        this._legacyAfterRender = afterNextRender({mixedReadWrite: () => {
+          if (!this._legacyFocusDestroyed && epoch === this._legacyFocusEpoch) {
+            const currentFocus = activeRoots();
+            if (currentFocus.active !== previousActiveElement ||
+                currentFocus.roots.length !== focusRoots.length ||
+                currentFocus.roots.some((root, index) => root !== focusRoots[index])) {
+              cancelPendingFocus();
+              return;
+            }
+            this._legacyAfterRender = null;
+            this._legacyInitialFocusPending = false;
+            this._legacyPendingFocusListenerCleanup?.();
+            this._legacyPendingFocusListenerCleanup = null;
+            focus();
+            if (!this._legacyFocusDestroyed && epoch === this._legacyFocusEpoch
+                && this._legacyPendingOpenedTime !== null) {
+              const totalTime = this._legacyPendingOpenedTime;
+              this._legacyPendingOpenedTime = null;
+              this._animationStateChanged.next({state: 'opened', totalTime});
+            }
+          }
+        }}, {injector, manualCleanup: true});
+      })}, {injector, manualCleanup: true});
+    } else if (firstTabbable && !this._ngZone.isStable) {
+      const subscription = this._ngZone.onStable.pipe(take(1)).subscribe(focus);
+      this._legacyFocusStableSubscriptions.add(subscription);
+      if (initial) {
+        this._legacyPendingInitialZoneSubscription = subscription;
+      } else if (onFocusInvoked) {
+        this._legacyPendingRecapture = subscription;
+      }
     } else {
       focus();
     }
+  }
+
+  protected _cancelPendingInitialFocus(): void {
+    this._legacyFocusEpoch++;
+    this._legacyPendingInitialZoneSubscription?.unsubscribe();
+    this._legacyPendingInitialZoneSubscription = null;
+    this._legacyPendingRecapture?.unsubscribe();
+    this._legacyPendingRecapture = null;
+    this._legacyPendingFocusListenerCleanup?.();
+    this._legacyPendingFocusListenerCleanup = null;
+    this._legacyInitialFocusPending = false;
+    this._legacyPendingOpenedTime = null;
+    this._legacyAfterRender?.destroy();
+    this._legacyAfterRender = null;
   }
 
   ngOnDestroy(): void {
@@ -236,6 +375,7 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
       return;
     }
     this._legacyFocusDestroyed = true;
+    this._cancelPendingInitialFocus();
     destroyLegacyDialogContainerState(this);
     try {
       this._legacyFocusStableSubscriptions.unsubscribe();
@@ -262,15 +402,19 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
 
   protected _captureInitialFocus(): void {
     if (!this._config.delayFocusTrap) {
-      this._trapFocus();
+      this._trapFocus(true);
     }
   }
 
   protected _openAnimationDone(totalTime: number) {
     if (this._config.delayFocusTrap) {
-      this._trapFocus();
+      this._trapFocus(true);
     }
-    this._animationStateChanged.next({state: 'opened', totalTime});
+    if (this._legacyInitialFocusPending) {
+      this._legacyPendingOpenedTime = totalTime;
+    } else {
+      this._animationStateChanged.next({state: 'opened', totalTime});
+    }
   }
 
   private _assertContentAvailable(): void {
