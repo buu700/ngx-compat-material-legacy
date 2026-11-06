@@ -54,7 +54,7 @@ import {
 } from '@angular/core';
 import {normalizePassiveListenerOptions} from '@angular/cdk/platform';
 import {asapScheduler, merge, Observable, of as observableOf, Subscription} from 'rxjs';
-import {delay, filter, takeUntil} from 'rxjs/operators';
+import {delay, filter, map, takeUntil} from 'rxjs/operators';
 import {_MatMenuBase} from './menu-base';
 import type {MatMenuPanel} from './menu-panel';
 import {MAT_MENU_PANEL} from './menu-panel-token';
@@ -107,6 +107,11 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
   private _keydownSubscription = Subscription.EMPTY;
   private _attachedMenu: MatMenuPanel | null = null;
   private _menuGeneration = 0;
+  private _bindingCloseInProgress = false;
+  private _destroyingMenu = false;
+  private _openingGeneration: number | null = null;
+  private _attachmentGeneration: number | null = null;
+  private _deferredMenu: MatMenuPanel | null | undefined;
   private _destroyed = false;
   private _closedMenus = new WeakSet<MatMenuPanel>();
   private _scrollStrategy: () => ScrollStrategy;
@@ -156,10 +161,47 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
     return this._menu;
   }
   set menu(menu: MatMenuPanel | null) {
+    if (this._bindingCloseInProgress || this._destroyingMenu) {
+      this._deferredMenu = menu;
+      return;
+    }
     if (menu === this._menu) {
       return;
     }
 
+    const previousMenu = this._menu;
+    if (previousMenu && this.menuOpen && this._attachedMenu === previousMenu) {
+      const generation = this._menuGeneration;
+      this._bindingCloseInProgress = true;
+      try {
+        previousMenu.close.emit();
+      } finally {
+        this._bindingCloseInProgress = false;
+      }
+      if (this._deferredMenu !== undefined) {
+        menu = this._deferredMenu;
+        this._deferredMenu = undefined;
+      }
+      // A close callback can destroy the trigger or replace the binding itself.
+      if (this._destroyed || this._menu !== previousMenu) {
+        return;
+      }
+      // A callback may have reopened the previous menu during its close event.
+      if (this.menuOpen && generation !== this._menuGeneration) {
+        return;
+      }
+      // A completed close stream cannot notify the trigger.
+      if (this.menuOpen && this._attachedMenu === previousMenu) {
+        this._destroyMenu(undefined);
+        if (this._destroyed || this._menu !== previousMenu) {
+          return;
+        }
+      }
+    }
+
+    if (!this.menuOpen && this._openingGeneration !== null && this._attachedMenu === previousMenu && previousMenu) {
+      this._menuGeneration++;
+    }
     this._menu = menu;
     this._menuCloseSubscription.unsubscribe();
 
@@ -390,21 +432,42 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
       menu.hasBackdrop == null ? !this.triggersSubmenu() : menu.hasBackdrop;
     MENU_PANEL_OWNERS.set(menu, this);
     this._attachedMenu = menu;
-    overlayRef.attach(this._getPortal(menu));
+    this._openingGeneration = generation;
+    this._attachmentGeneration = generation;
+    try {
+      overlayRef.attach(this._getPortal(menu));
 
-    if (menu.lazyContent) {
-      menu.lazyContent.attach(this.menuData);
-    }
+      if (menu.lazyContent) {
+        menu.lazyContent.attach(this.menuData);
+      }
 
-    if (this._destroyed || generation !== this._menuGeneration || MENU_PANEL_OWNERS.get(menu) !== this) {
-      return;
-    }
+      if (this._destroyed || generation !== this._menuGeneration || MENU_PANEL_OWNERS.get(menu) !== this) {
+        if (this._openingGeneration === generation) this._openingGeneration = null;
+        if (this._attachedMenu === menu && this._attachmentGeneration === generation && MENU_PANEL_OWNERS.get(menu) === this) {
+          this._detachMenu(menu, overlayRef);
+        }
+        return;
+      }
 
-    this._closingActionsSubscription = this._menuClosingActions().subscribe(() => this.closeMenu());
-    this._initMenu(menu);
+      this._closingActionsSubscription = this._menuClosingActions().subscribe(() => this.closeMenu());
+      this._initMenu(menu, generation);
+      if (this._openingGeneration === generation) this._openingGeneration = null;
 
-    if (this._destroyed || generation !== this._menuGeneration || !this.menuOpen) {
-      return;
+      if (this._destroyed || generation !== this._menuGeneration || !this.menuOpen) {
+        if (this._attachedMenu === menu && this._attachmentGeneration === generation && MENU_PANEL_OWNERS.get(menu) === this && !this.menuOpen) {
+          this._closingActionsSubscription.unsubscribe();
+          this._detachMenu(menu, overlayRef);
+        }
+        return;
+      }
+
+    } catch (error) {
+      if (this._openingGeneration === generation) this._openingGeneration = null;
+      if (this._attachedMenu === menu && this._attachmentGeneration === generation && MENU_PANEL_OWNERS.get(menu) === this) {
+        this._closingActionsSubscription.unsubscribe();
+        this._detachMenu(menu, overlayRef);
+      }
+      throw error;
     }
 
     if (typeof (menu as _MatMenuBase)._startAnimation === 'function') {
@@ -445,63 +508,73 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
 
   /** Closes the menu and does the necessary cleanup. */
   private _destroyMenu(reason: MenuCloseReason) {
-    if (this._destroyed || !this._overlayRef || !this.menuOpen) {
+    if (this._destroyed || this._destroyingMenu || !this._overlayRef || !this.menuOpen) {
       return;
     }
 
-    const menu = this._attachedMenu || this.menu;
-    const overlayRef = this._overlayRef;
-    const generation = ++this._menuGeneration;
-    const openedBy = this._openedBy;
-    this._openedBy = undefined;
-    this._closingActionsSubscription.unsubscribe();
-    this._keydownSubscription.unsubscribe();
-    overlayRef.detachBackdrop();
-    // Retain painting without intercepting interaction meant for lower overlays.
-    overlayRef.overlayElement.style.pointerEvents = 'none';
-    // Always restore focus if the user is navigating using the keyboard or the menu was opened
-    // programmatically. We don't restore for non-root triggers, because it can prevent focus
-    // from making it back to the root trigger when closing a long chain of menus by clicking
-    // on the backdrop.
-    if (this.restoreFocus && (reason === 'keydown' || !openedBy || !this.triggersSubmenu())) {
-      // Fall back to program like focusFirstItem when open was not from mouse/touch
-      // (e.g. click after a non-primary mousedown). Native focus() can otherwise
-      // inherit a stale FocusMonitor mouse origin from that mousedown.
-      this.focus(openedBy || 'program');
-    }
+    this._destroyingMenu = true;
+    try {
+      const menu = this._attachedMenu || this.menu;
+      const overlayRef = this._overlayRef;
+      const generation = ++this._menuGeneration;
+      const openedBy = this._openedBy;
+      this._openedBy = undefined;
+      this._closingActionsSubscription.unsubscribe();
+      this._keydownSubscription.unsubscribe();
+      overlayRef.detachBackdrop();
+      // Retain painting without intercepting interaction meant for lower overlays.
+      overlayRef.overlayElement.style.pointerEvents = 'none';
+      // Always restore focus if the user is navigating using the keyboard or the menu was opened
+      // programmatically. We don't restore for non-root triggers, because it can prevent focus
+      // from making it back to the root trigger when closing a long chain of menus by clicking
+      // on the backdrop.
+      if (this.restoreFocus && (reason === 'keydown' || !openedBy || !this.triggersSubmenu())) {
+        // Fall back to program like focusFirstItem when open was not from mouse/touch
+        // (e.g. click after a non-primary mousedown). Native focus() can otherwise
+        // inherit a stale FocusMonitor mouse origin from that mousedown.
+        this.focus(openedBy || 'program');
+      }
 
-    if (this._destroyed || generation !== this._menuGeneration) {
-      return;
-    }
-    this._setIsMenuOpen(false);
-    if (this._destroyed || generation !== this._menuGeneration) {
-      return;
-    }
-    if (menu instanceof _MatMenuBase && MENU_PANEL_OWNERS.get(menu) === this) {
-      // CSS motion needs the overlay and lazy views to remain attached. Close
-      // state/focus are already settled; only physical removal waits for void.
-      const removal = new Subscription();
-      this._pendingRemoval = removal;
-      const remove = () => {
-        if (generation === this._menuGeneration && MENU_PANEL_OWNERS.get(menu) === this) {
-          this._pendingRemoval = Subscription.EMPTY;
-          removal.unsubscribe();
-          this._detachMenu(menu, overlayRef);
-        }
-      };
-      removal.add(menu._animationDone.subscribe({
-        next: event => {
-          if (event.toState === 'void') {
-            remove();
+      if (this._destroyed || generation !== this._menuGeneration) {
+        return;
+      }
+      this._setIsMenuOpen(false);
+      if (this._destroyed || generation !== this._menuGeneration) {
+        return;
+      }
+      if (menu instanceof _MatMenuBase && MENU_PANEL_OWNERS.get(menu) === this) {
+        // CSS motion needs the overlay and lazy views to remain attached. Close
+        // state/focus are already settled; only physical removal waits for void.
+        const removal = new Subscription();
+        this._pendingRemoval = removal;
+        const remove = () => {
+          if (generation === this._menuGeneration && MENU_PANEL_OWNERS.get(menu) === this) {
+            this._pendingRemoval = Subscription.EMPTY;
+            removal.unsubscribe();
+            this._detachMenu(menu, overlayRef);
           }
-        },
-        complete: remove,
-      }));
-      menu._resetAnimation();
-    } else if (menu) {
-      this._detachMenu(menu, overlayRef);
-    } else {
-      overlayRef.detach();
+        };
+        removal.add(menu._animationDone.subscribe({
+          next: event => {
+            if (event.toState === 'void') {
+              remove();
+            }
+          },
+          complete: remove,
+        }));
+        menu._resetAnimation();
+      } else if (menu) {
+        this._detachMenu(menu, overlayRef);
+      } else {
+        overlayRef.detach();
+      }
+    } finally {
+      this._destroyingMenu = false;
+      if (!this._bindingCloseInProgress && this._deferredMenu !== undefined) {
+        const deferred = this._deferredMenu;
+        this._deferredMenu = undefined;
+        this.menu = deferred;
+      }
     }
   }
 
@@ -510,6 +583,7 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
     const owned = MENU_PANEL_OWNERS.get(menu) === this;
     if (this._attachedMenu === menu) {
       this._attachedMenu = null;
+      this._attachmentGeneration = null;
     }
     if (owned) {
       MENU_PANEL_OWNERS.delete(menu);
@@ -524,12 +598,14 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
    * This method sets the menu state to open and focuses the first item if
    * the menu was opened via the keyboard.
    */
-  private _initMenu(menu: MatMenuPanel): void {
+  private _initMenu(menu: MatMenuPanel, generation: number): void {
     menu.parentMenu = this.triggersSubmenu() ? (this._parentMaterialMenu as MatMenuPanel | undefined) : undefined;
     menu.direction = this.dir;
     this._setMenuElevation(menu);
     menu.focusFirstItem(this._openedBy || 'program');
-    this._setIsMenuOpen(true);
+    if (!this._destroyed && generation === this._menuGeneration && this.menu === menu) {
+      this._setIsMenuOpen(true);
+    }
   }
 
   /** Updates the menu elevation based on the amount of parent menus that it has. */
@@ -765,9 +841,18 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
       // it won't be closed immediately after it is opened.
       .pipe(
         filter(active => active === this._menuItemInstance && !active.disabled),
+        map(() => {
+          const owner = this._parentMaterialMenu && MENU_PANEL_OWNERS.get(this._parentMaterialMenu);
+          return {owner, generation: owner?._menuGeneration};
+        }),
         delay(0, asapScheduler),
       )
-      .subscribe(() => {
+      .subscribe(({owner, generation}) => {
+        // Reject a hover queued for an earlier opening of the parent.
+        if (!owner || !owner.menuOpen || owner._menuGeneration !== generation ||
+            !this._parentMaterialMenu || MENU_PANEL_OWNERS.get(this._parentMaterialMenu) !== owner) {
+          return;
+        }
         this._openedBy = 'mouse';
         // Open without waiting for a previous panel animation to finish.
         this.openMenu();

@@ -1709,6 +1709,245 @@ describe('MatMenu', () => {
     });
   });
 
+  it('closes and removes an open panel when its binding is cleared', fakeAsync(() => {
+    const fixture = createComponent(MenuRebinding);
+    fixture.detectChanges();
+    const {trigger, triggerEl} = fixture.componentInstance;
+    trigger.openMenu();
+    fixture.detectChanges();
+    tick(500);
+    let closed = 0;
+    trigger.menuClosed.subscribe(() => closed++);
+    trigger.menu = null;
+    fixture.detectChanges();
+    tick(500);
+    expect(closed).toBe(1);
+    expect(document.activeElement).toBe(triggerEl.nativeElement);
+    expect(trigger.menuOpen).toBeFalse();
+    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);
+    fixture.destroy();
+    tick(500);
+  }));
+
+  it('replaces an open panel while motion is enabled', fakeAsync(() => {
+    const fixture = createComponent(MenuRebinding, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}]);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance;
+    instance.trigger.openMenu();
+    fixture.detectChanges();
+    tick(1);
+    let closed = 0;
+    instance.trigger.menuClosed.subscribe(() => closed++);
+    instance.trigger.menu = instance.second;
+    fixture.detectChanges();
+    expect(closed).toBe(1);
+    expect(instance.trigger.menuOpen).toBeFalse();
+    instance.trigger.openMenu();
+    fixture.detectChanges();
+    tick(500);
+    expect(instance.trigger.menuOpen).toBeTrue();
+    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);
+    expect(overlayContainerElement.textContent).toContain('Second');
+    fixture.destroy();
+    tick(500);
+  }));
+
+  it('honors a binding change from an earlier panel close observer', fakeAsync(() => {
+    const fixture = createComponent(MenuRebinding);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance;
+    instance.trigger.menu = null;
+    let calls = 0;
+    instance.first.closed.subscribe(() => {
+      if (++calls < 3) {
+        instance.trigger.menu = instance.second;
+      }
+    });
+    instance.trigger.menu = instance.first;
+    instance.trigger.openMenu();
+    fixture.detectChanges();
+    tick(500);
+    instance.trigger.menu = null;
+    fixture.detectChanges();
+    tick(500);
+    expect(calls).toBe(1);
+    expect(instance.trigger.menu).toBe(instance.second);
+    expect(instance.trigger.menuOpen).toBeFalse();
+    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);
+    fixture.destroy();
+    tick(500);
+  }));
+
+  it('cleans an interrupted opening when its focus callback clears the binding', fakeAsync(() => {
+    const fixture = createComponent(MenuRebinding);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance;
+    const focus = spyOn(instance.first, 'focusFirstItem').and.callFake(() => instance.trigger.menu = null);
+    instance.trigger.openMenu();
+    fixture.detectChanges();
+    tick(500);
+    expect(focus).toHaveBeenCalledTimes(1);
+    expect(instance.trigger.menu).toBeNull();
+    expect(instance.trigger.menuOpen).toBeFalse();
+    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);
+    fixture.destroy();
+    tick(500);
+  }));
+
+  it('cleans up when the close stream completes before a binding is cleared', fakeAsync(() => {
+    const fixture = createComponent(MenuRebinding);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance;
+    instance.trigger.openMenu();
+    fixture.detectChanges();
+    tick(500);
+    instance.first.close.complete();
+    instance.trigger.menu = null;
+    fixture.detectChanges();
+    tick(500);
+    expect(instance.trigger.menuOpen).toBeFalse();
+    expect(instance.trigger.menu).toBeNull();
+    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);
+    fixture.destroy();
+    tick(500);
+  }));
+
+  it('honors a binding change during focus restoration', fakeAsync(() => {
+    const fixture = createComponent(MenuRebinding);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance;
+    instance.trigger.openMenu();
+    fixture.detectChanges();
+    tick(500);
+    const other = document.createElement('button');
+    document.body.appendChild(other);
+    other.focus();
+    let calls = 0;
+    instance.triggerEl.nativeElement.addEventListener('focus', () => {
+      if (++calls < 3) {
+        instance.trigger.menu = instance.second;
+      }
+    });
+    instance.trigger.menu = null;
+    fixture.detectChanges();
+    tick(500);
+    expect(calls).toBe(1);
+    expect(instance.trigger.menu).toBe(instance.second);
+    expect(document.activeElement).toBe(instance.triggerEl.nativeElement);
+    expect(instance.trigger.menuOpen).toBeFalse();
+    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);
+    other.remove();
+    fixture.destroy();
+    tick(500);
+  }));
+
+  it('ignores hover while the parent is exiting', fakeAsync(() => {
+    const fixture = createComponent(MenuHoverReopen, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}]);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance;
+    instance.root.openMenu();
+    fixture.detectChanges();
+    tick(1);
+    const item = overlayContainerElement.querySelector('[mat-menu-item]') as HTMLElement;
+    instance.root.closeMenu();
+    fixture.detectChanges();
+    item.dispatchEvent(new MouseEvent('mouseenter'));
+    tick(1);
+    expect(instance.childTrigger.menuOpen).toBeFalse();
+    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);
+    fixture.destroy();
+    tick(500);
+  }));
+
+  it('opens a submenu on hover while the parent is open', fakeAsync(() => {
+    const fixture = createComponent(MenuHoverReopen, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}]);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance;
+    instance.root.openMenu();
+    fixture.detectChanges();
+    tick(1);
+    const item = overlayContainerElement.querySelector('[mat-menu-item]') as HTMLElement;
+    item.dispatchEvent(new MouseEvent('mouseenter'));
+    tick(1);
+    expect(instance.childTrigger.menuOpen).toBeTrue();
+    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(2);
+    fixture.destroy();
+    tick(500);
+  }));
+
+  it('ignores a hover queued for a previous parent opening', fakeAsync(() => {
+    const fixture = createComponent(MenuHoverReopen, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}]);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance;
+    instance.root.openMenu();
+    fixture.detectChanges();
+    tick(1);
+    const item = overlayContainerElement.querySelector('[mat-menu-item]') as HTMLElement;
+    item.dispatchEvent(new MouseEvent('mouseenter'));
+    instance.root.closeMenu();
+    instance.root.openMenu();
+    fixture.detectChanges();
+    tick(1);
+    expect(instance.childTrigger.menuOpen).toBeFalse();
+    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);
+    fixture.destroy();
+    tick(500);
+  }));
+
+  it('preserves a newer opening of the same panel during lazy attachment', fakeAsync(() => {
+    const fixture = createComponent(MenuLazyReopen, [], [MenuLazyChild]);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance;
+    instance.trigger.openMenu();
+    fixture.detectChanges();
+    tick(500);
+    expect(instance.calls).toBeGreaterThan(0);
+    expect(instance.trigger.menu).toBe(instance.menu);
+    expect(instance.trigger.menuOpen).toBeTrue();
+    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);
+    fixture.destroy();
+    tick(500);
+  }));
+
+  it('survives trigger destruction from a close callback during rebinding', fakeAsync(() => {
+    const fixture = createComponent(MenuRebinding);
+    fixture.detectChanges();
+    const trigger = fixture.componentInstance.trigger;
+    trigger.openMenu();
+    fixture.detectChanges();
+    tick(500);
+    let closed = 0;
+    trigger.menuClosed.subscribe(() => {
+      closed++;
+      fixture.destroy();
+    });
+    trigger.menu = null;
+    tick(500);
+    expect(closed).toBe(1);
+    expect(trigger.menuOpen).toBeFalse();
+    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);
+  }));
+
+  it('cleans an interrupted opening when the focus hook throws', fakeAsync(() => {
+    const fixture = createComponent(MenuRebinding);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance;
+    const focus = spyOn(instance.first, 'focusFirstItem').and.throwError('focus failed');
+    expect(() => instance.trigger.openMenu()).toThrowError('focus failed');
+    fixture.detectChanges();
+    tick(500);
+    expect(instance.trigger.menuOpen).toBeFalse();
+    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);
+    focus.and.stub();
+    instance.trigger.openMenu();
+    fixture.detectChanges();
+    tick(500);
+    expect(instance.trigger.menuOpen).toBeTrue();
+    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);
+    fixture.destroy();
+    tick(500);
+  }));
+
   it('restores focus before menuClosed and allows a synchronous reopen', fakeAsync(() => {
     const fixture = createComponent(SimpleMenu, [], [FakeIcon]);
     fixture.detectChanges();
@@ -2882,6 +3121,62 @@ class SimpleMenu {
   ariaLabel: string;
   ariaLabelledby: string;
   ariaDescribedby: string;
+}
+
+@Component({selector: 'menu-lazy-child', template: ''})
+class MenuLazyChild {
+  @Output() initialized = new EventEmitter<void>();
+  ngOnInit() {
+    this.initialized.emit();
+  }
+}
+
+@Component({
+  template: `
+    <button [matMenuTriggerFor]="menu" #trigger="matMenuTrigger">Open</button>
+    <mat-menu #menu="matMenu"><ng-template matMenuContent>
+      <menu-lazy-child (initialized)="reopen()"></menu-lazy-child>
+      <button mat-menu-item>Item</button>
+    </ng-template></mat-menu>
+  `,
+})
+class MenuLazyReopen {
+  @ViewChild('trigger') trigger: MatLegacyMenuTrigger;
+  @ViewChild('menu') menu: MatLegacyMenu;
+  calls = 0;
+  reopen() {
+    if (++this.calls === 1) {
+      this.trigger.menu = null;
+      this.trigger.menu = this.menu;
+      this.trigger.openMenu();
+    }
+  }
+}
+
+@Component({
+  template: `
+    <button [matMenuTriggerFor]="parent" #root="matMenuTrigger">Root</button>
+    <mat-menu #parent="matMenu"><button mat-menu-item [matMenuTriggerFor]="child" #childTrigger="matMenuTrigger">Submenu</button></mat-menu>
+    <mat-menu #child="matMenu"><button mat-menu-item>Child</button></mat-menu>
+  `,
+})
+class MenuHoverReopen {
+  @ViewChild('root') root: MatLegacyMenuTrigger;
+  @ViewChild('childTrigger') childTrigger: MatLegacyMenuTrigger;
+}
+
+@Component({
+  template: `
+    <button [matMenuTriggerFor]="first" #triggerEl>Open</button>
+    <mat-menu #first="matMenu"><button mat-menu-item>First</button></mat-menu>
+    <mat-menu #second="matMenu"><button mat-menu-item>Second</button></mat-menu>
+  `,
+})
+class MenuRebinding {
+  @ViewChild(MatLegacyMenuTrigger) trigger: MatLegacyMenuTrigger;
+  @ViewChild('triggerEl') triggerEl: ElementRef<HTMLElement>;
+  @ViewChild('first') first: MatLegacyMenu;
+  @ViewChild('second') second: MatLegacyMenu;
 }
 
 @Component({
