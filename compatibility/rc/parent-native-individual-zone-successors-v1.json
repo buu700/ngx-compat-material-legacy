@@ -1,0 +1,517 @@
+{
+  "schema_version": 1,
+  "role": "seven-native-individual-zone-source-successors",
+  "historical_packets_rewritten": false,
+  "old_programs_executed": false,
+  "native_or_full_audit_qualified": false,
+  "lines": {
+    "21.x": {
+      "checkpoint": "1acdae0058291217be7121f228f48983ebb7889a",
+      "inputs_sha256": "9cf55fc94eaf3a8e6c26d53f5e9242559b5e6dfa7bdd240d2c0789115256656b",
+      "files": [
+        {
+          "path": "scripts/native-motion-consumer.ts",
+          "before_sha256": "e9bf194677879f978ddbc574f33f13b0d709ade42d53dbb0542d1bb670a77e3a",
+          "before_bytes": 39130,
+          "after_sha256": "0fc93c9a430012883c2a00e7b68dad359ed826d71fb091b344035263fd62deb5",
+          "after_bytes": 39181,
+          "edits": [
+            {
+              "offset": 0,
+              "before": "/*ZONE_IMPORT*/import {Component, NgModule, ViewChild, signal/*ZONE_NAMED*/} from '@angular/core';\n",
+              "after": "/*ZONE_IMPORT*/import {Component, NgModule, NgZone, ViewChild, inject, signal/*ZONE_NAMED*/} from '@angular/core';\n"
+            },
+            {
+              "offset": 5568,
+              "before": "",
+              "after": "  private readonly closeoutZone = inject(NgZone);\n"
+            },
+            {
+              "offset": 5596,
+              "before": "",
+              "after": "    const zone = this.closeoutZone;\n    (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = zone.run(() => NgZone.isInAngularZone());\n"
+            },
+            {
+              "offset": 10837,
+              "before": "    // Disabled motion next()+complete()s _onEnter inside open(), before this\n    // subscribe. A Subject does not replay and complete() does not set closed,\n    // so the only public signal of that single next is a synchronous complete.\n",
+              "after": "    let completions = 0;\n"
+            },
+            {
+              "offset": 11152,
+              "before": "      complete: () => { if (notifications === 0) notifications = 1; },\n",
+              "after": "      complete: () => { completions += 1; },\n"
+            },
+            {
+              "offset": 11326,
+              "before": "      return !!el && notifications >= 1;\n",
+              "after": "      return !!el && completions >= 1;\n"
+            },
+            {
+              "offset": 11849,
+              "before": "",
+              "after": "      completions,\n"
+            },
+            {
+              "offset": 11994,
+              "before": "      notify: {key: `snack-bar/afterOpened/${mode}`, observation: {notifications, detectChangesCalls: 0}},\n",
+              "after": "      notify: {key: `snack-bar/afterOpened/${mode}`, observation: {notifications, completions, detectChangesCalls: 0}},\n"
+            },
+            {
+              "offset": 38910,
+              "before": "platformBrowserDynamic().bootstrapModule(MotionModule).catch(err => {\n",
+              "after": "platformBrowserDynamic().bootstrapModule(MotionModule/*ZONE_BOOTSTRAP*/).catch(err => {\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/native-motion-page.mjs",
+          "before_sha256": "376072104c126bae2a18d0cc2c6afd28ece6cffb2ff2e90691ab924c66757596",
+          "before_bytes": 764,
+          "after_sha256": "3410e239890e9a0f1498516369cb97bca206e9b9a4449495c9a5112e4ed0f53c",
+          "after_bytes": 903,
+          "edits": [
+            {
+              "offset": 590,
+              "before": "    .replace('/*ZONE_NAMED*/', zoneless ? ', provideZonelessChangeDetection' : '')\n    .replace('/*ZONE_PROVIDER*/', zoneless ? 'provideZonelessChangeDetection(), ' : '');\n",
+              "after": "    .replace('/*ZONE_NAMED*/', zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection')\n    .replace('/*ZONE_PROVIDER*/', zoneless ? 'provideZonelessChangeDetection(), ' : '')\n    .replace('/*ZONE_BOOTSTRAP*/', zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}');\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/native-motion-roster.mjs",
+          "before_sha256": "91e6cc5b79463407f7b47ca6cad32eb04e7f25b90859461c0796901c618430f2",
+          "before_bytes": 15685,
+          "after_sha256": "2ef90a923a439de60d0cd23e8673e738d4cf5d2dcddecb847a3ace834c6f2f4c",
+          "after_bytes": 16327,
+          "edits": [
+            {
+              "offset": 7371,
+              "before": "",
+              "after": "  if (component === 'snack-bar' && obs.completions !== 1) return 'completion count';\n"
+            },
+            {
+              "offset": 10463,
+              "before": "",
+              "after": "  if (!['zoneful', 'zoneless'].includes(parts[3]) || obs?.angularZoneEntered !== (parts[3] === 'zoneful')) return ['Angular zone mode mismatch or unobserved'];\n"
+            },
+            {
+              "offset": 11191,
+              "before": "    if (obs.notifications !== 1) return ['emitted more than once'];\n",
+              "after": "    if (obs.notifications !== 1) return [obs.notifications > 1 ? 'emitted more than once' : 'notification count'];\n    if (suffix.startsWith('snack-bar/') && obs.completions !== 1) return ['completion count'];\n"
+            },
+            {
+              "offset": 11308,
+              "before": "export function samplePass(caseId) {\n",
+              "after": "function samplePassBody(caseId) {\n"
+            },
+            {
+              "offset": 12373,
+              "before": "",
+              "after": "      ...(component === 'snack-bar' ? {completions: 1} : {}),\n"
+            },
+            {
+              "offset": 12384,
+              "before": "  if (group === 'exactly-once-notification') return {notifications: 1, detectChangesCalls: 0, ...(suffix.startsWith('tabs/') ? {duplicateEndEventsDispatched: true} : {})};\n",
+              "after": "  if (group === 'exactly-once-notification') return {notifications: 1, detectChangesCalls: 0, ...(suffix.startsWith('snack-bar/') ? {completions: 1} : {}), ...(suffix.startsWith('tabs/') ? {duplicateEndEventsDispatched: true} : {})};\n"
+            },
+            {
+              "offset": 13795,
+              "before": "",
+              "after": "}\n\nexport function samplePass(caseId) {\n  return {...samplePassBody(caseId), angularZoneEntered: caseId.split('/')[3] === 'zoneful'};\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/native-motion-run.mjs",
+          "before_sha256": "a1385e9604f8b243ef766e85669c09f2200115938f6eb52fecbaab92ebba6c59",
+          "before_bytes": 17567,
+          "after_sha256": "928fa0e7a76365b8ebb5fb5d53cbc4c6f3d051d939e37183a14cfe792a21ad05",
+          "after_bytes": 18315,
+          "edits": [
+            {
+              "offset": 12386,
+              "before": "async function waitReady(driver) {\n",
+              "after": "async function waitReady(driver, runtime) {\n"
+            },
+            {
+              "offset": 12474,
+              "before": "    const status = asJson(await driver.evaluate('JSON.stringify({ready: document.documentElement.dataset.labReady || \"\", error: (document.getElementById(\"bootstrap-error\") || {}).textContent || \"\"})'));\n",
+              "after": "    const status = asJson(await driver.evaluate('JSON.stringify({ready: document.documentElement.dataset.labReady || \"\", error: (document.getElementById(\"bootstrap-error\") || {}).textContent || \"\", angularZoneEntered: window.__closeoutAngularZoneEntered})'));\n"
+            },
+            {
+              "offset": 12802,
+              "before": "    if (status.ready === '1') return;\n",
+              "after": "    if (status.ready === '1') {\n      if (status.angularZoneEntered !== (runtime === 'zoneful')) throw new Error(`Angular zone mismatch for ${runtime}`);\n      return status.angularZoneEntered;\n    }\n"
+            },
+            {
+              "offset": 13784,
+              "before": "function absorb(bucket, step) {\n",
+              "after": "function absorb(bucket, step, angularZoneEntered) {\n"
+            },
+            {
+              "offset": 13948,
+              "before": "  const store = (key, observation) => { if (key && observation) bucket[key] = observation; };\n",
+              "after": "  const store = (key, observation) => { if (key && observation) bucket[key] = {...observation, angularZoneEntered}; };\n"
+            },
+            {
+              "offset": 14316,
+              "before": "async function collect(driver, scene, mode, bucket) {\n  await waitReady(driver);\n",
+              "after": "async function collect(driver, scene, mode, bucket, runtime, observations) {\n  observations.push(await waitReady(driver, runtime));\n"
+            },
+            {
+              "offset": 14499,
+              "before": "    absorb(bucket, await clickProbe(driver, button));\n",
+              "after": "    absorb(bucket, await clickProbe(driver, button), observations.at(-1));\n"
+            },
+            {
+              "offset": 14957,
+              "before": "async function runEngine(engine, runtime, origin, bucket, engines) {\n",
+              "after": "async function runEngine(engine, runtime, origin, bucket, engines, zoneObservations) {\n  const observed = [];\n"
+            },
+            {
+              "offset": 15217,
+              "before": "      await collect(driver, 'modes', 'enabled', bucket);\n",
+              "after": "      await collect(driver, 'modes', 'enabled', bucket, runtime, observed);\n"
+            },
+            {
+              "offset": 15342,
+              "before": "      await collect(driver, 'interrupt', 'enabled', bucket);\n",
+              "after": "      await collect(driver, 'interrupt', 'enabled', bucket, runtime, observed);\n"
+            },
+            {
+              "offset": 15477,
+              "before": "      await collect(driver, 'modes', 'provider-disabled', bucket);\n",
+              "after": "      await collect(driver, 'modes', 'provider-disabled', bucket, runtime, observed);\n"
+            },
+            {
+              "offset": 15738,
+              "before": "      await collect(driver, 'modes', 'reduced', bucket);\n",
+              "after": "      await collect(driver, 'modes', 'reduced', bucket, runtime, observed);\n"
+            },
+            {
+              "offset": 15873,
+              "before": "",
+              "after": "    zoneObservations[runtime][engine] = observed;\n"
+            },
+            {
+              "offset": 15893,
+              "before": "",
+              "after": "    for (const key of Object.keys(bucket)) delete bucket[key];\n    zoneObservations[runtime][engine] = observed;\n"
+            },
+            {
+              "offset": 16382,
+              "before": "",
+              "after": "  const zoneObservations = Object.fromEntries(RUNTIMES.map(runtime => [runtime, {}]));\n"
+            },
+            {
+              "offset": 16835,
+              "before": "        await runEngine(engine, runtime, origin, bucket, engines);\n",
+              "after": "        await runEngine(engine, runtime, origin, bucket, engines, zoneObservations);\n"
+            },
+            {
+              "offset": 17534,
+              "before": "  return {outcomes, engines};\n",
+              "after": "  return {outcomes, engines, zoneObservations};\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/ripple-hydration-application.mjs",
+          "before_sha256": "432231a645e5bc0ce8e375e9da9745177f7f1b577ac1ee0758913cdd5989a59f",
+          "before_bytes": 8230,
+          "after_sha256": "bb535b98b1aa50e3a8b67ab26934f0173638ccc0959aa8caac0384294f32f1d6",
+          "after_bytes": 8418,
+          "edits": [
+            {
+              "offset": 6831,
+              "before": "  return publicRippleNativeEventsOkay(row?.native_peer_events, line)\n",
+              "after": "  return ['zoneful', 'zoneless'].includes(row?.runtime)\n    && replay?.angular_zone_entered === (row.runtime === 'zoneful')\n    && live?.angular_zone_entered === (row.runtime === 'zoneful')\n    && publicRippleNativeEventsOkay(row?.native_peer_events, line)\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/ripple-hydration-component-fixture.mjs",
+          "before_sha256": "2518dfb938446f31a1ba614f4e5c89cae973fbb8d8f6742207665ad3a94a3169",
+          "before_bytes": 4146,
+          "after_sha256": "a3e4375a59cfe8946f4707163a845cdec45dc738de370eeb1960b30a0af24b7d",
+          "after_bytes": 4215,
+          "edits": [
+            {
+              "offset": 3573,
+              "before": "  snapshot() {return {clicks: this.clicks(), deliveries: this.deliveries.map(row => ({...row})),\n",
+              "after": "  snapshot() {return {angular_zone_entered: this.zone.run(() => NgZone.isInAngularZone()), clicks: this.clicks(), deliveries: this.deliveries.map(row => ({...row})),\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/ripple-hydration-replay.mjs",
+          "before_sha256": "59d499fa66c018456eca5b67e97dc3417854426d0733e01ba660a886bd77c605",
+          "before_bytes": 12086,
+          "after_sha256": "0e3f7262be5a7d337520799a3e35b25ae8e3028f9e48717bf5aeb53d1fd15b25",
+          "after_bytes": 12100,
+          "edits": [
+            {
+              "offset": 10383,
+              "before": "          const observed = await observeHydrationReplay(driver);\n",
+              "after": "          const observed = {...await observeHydrationReplay(driver), runtime};\n"
+            }
+          ]
+        }
+      ]
+    },
+    "main": {
+      "checkpoint": "0d681a13389565d2416b3485ab3278f4bde2e82e",
+      "inputs_sha256": "02145c1e2d01220cbe31d4356d4095c0346d3c1e56411b508a4e6c85dd736783",
+      "files": [
+        {
+          "path": "scripts/native-motion-consumer.ts",
+          "before_sha256": "e9bf194677879f978ddbc574f33f13b0d709ade42d53dbb0542d1bb670a77e3a",
+          "before_bytes": 39130,
+          "after_sha256": "0fc93c9a430012883c2a00e7b68dad359ed826d71fb091b344035263fd62deb5",
+          "after_bytes": 39181,
+          "edits": [
+            {
+              "offset": 0,
+              "before": "/*ZONE_IMPORT*/import {Component, NgModule, ViewChild, signal/*ZONE_NAMED*/} from '@angular/core';\n",
+              "after": "/*ZONE_IMPORT*/import {Component, NgModule, NgZone, ViewChild, inject, signal/*ZONE_NAMED*/} from '@angular/core';\n"
+            },
+            {
+              "offset": 5568,
+              "before": "",
+              "after": "  private readonly closeoutZone = inject(NgZone);\n"
+            },
+            {
+              "offset": 5596,
+              "before": "",
+              "after": "    const zone = this.closeoutZone;\n    (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = zone.run(() => NgZone.isInAngularZone());\n"
+            },
+            {
+              "offset": 10837,
+              "before": "    // Disabled motion next()+complete()s _onEnter inside open(), before this\n    // subscribe. A Subject does not replay and complete() does not set closed,\n    // so the only public signal of that single next is a synchronous complete.\n",
+              "after": "    let completions = 0;\n"
+            },
+            {
+              "offset": 11152,
+              "before": "      complete: () => { if (notifications === 0) notifications = 1; },\n",
+              "after": "      complete: () => { completions += 1; },\n"
+            },
+            {
+              "offset": 11326,
+              "before": "      return !!el && notifications >= 1;\n",
+              "after": "      return !!el && completions >= 1;\n"
+            },
+            {
+              "offset": 11849,
+              "before": "",
+              "after": "      completions,\n"
+            },
+            {
+              "offset": 11994,
+              "before": "      notify: {key: `snack-bar/afterOpened/${mode}`, observation: {notifications, detectChangesCalls: 0}},\n",
+              "after": "      notify: {key: `snack-bar/afterOpened/${mode}`, observation: {notifications, completions, detectChangesCalls: 0}},\n"
+            },
+            {
+              "offset": 38910,
+              "before": "platformBrowserDynamic().bootstrapModule(MotionModule).catch(err => {\n",
+              "after": "platformBrowserDynamic().bootstrapModule(MotionModule/*ZONE_BOOTSTRAP*/).catch(err => {\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/native-motion-page.mjs",
+          "before_sha256": "376072104c126bae2a18d0cc2c6afd28ece6cffb2ff2e90691ab924c66757596",
+          "before_bytes": 764,
+          "after_sha256": "3410e239890e9a0f1498516369cb97bca206e9b9a4449495c9a5112e4ed0f53c",
+          "after_bytes": 903,
+          "edits": [
+            {
+              "offset": 590,
+              "before": "    .replace('/*ZONE_NAMED*/', zoneless ? ', provideZonelessChangeDetection' : '')\n    .replace('/*ZONE_PROVIDER*/', zoneless ? 'provideZonelessChangeDetection(), ' : '');\n",
+              "after": "    .replace('/*ZONE_NAMED*/', zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection')\n    .replace('/*ZONE_PROVIDER*/', zoneless ? 'provideZonelessChangeDetection(), ' : '')\n    .replace('/*ZONE_BOOTSTRAP*/', zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}');\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/native-motion-roster.mjs",
+          "before_sha256": "7256d8eeaec834512037af3651e5dedd2486e753f1d77d507e98d15e8bc2a6ca",
+          "before_bytes": 15690,
+          "after_sha256": "44b8d063b5efd546591b0f163aa53788951fb696641f85e1cbab36f905a5eb24",
+          "after_bytes": 16332,
+          "edits": [
+            {
+              "offset": 7376,
+              "before": "",
+              "after": "  if (component === 'snack-bar' && obs.completions !== 1) return 'completion count';\n"
+            },
+            {
+              "offset": 10468,
+              "before": "",
+              "after": "  if (!['zoneful', 'zoneless'].includes(parts[3]) || obs?.angularZoneEntered !== (parts[3] === 'zoneful')) return ['Angular zone mode mismatch or unobserved'];\n"
+            },
+            {
+              "offset": 11196,
+              "before": "    if (obs.notifications !== 1) return ['emitted more than once'];\n",
+              "after": "    if (obs.notifications !== 1) return [obs.notifications > 1 ? 'emitted more than once' : 'notification count'];\n    if (suffix.startsWith('snack-bar/') && obs.completions !== 1) return ['completion count'];\n"
+            },
+            {
+              "offset": 11313,
+              "before": "export function samplePass(caseId) {\n",
+              "after": "function samplePassBody(caseId) {\n"
+            },
+            {
+              "offset": 12378,
+              "before": "",
+              "after": "      ...(component === 'snack-bar' ? {completions: 1} : {}),\n"
+            },
+            {
+              "offset": 12389,
+              "before": "  if (group === 'exactly-once-notification') return {notifications: 1, detectChangesCalls: 0, ...(suffix.startsWith('tabs/') ? {duplicateEndEventsDispatched: true} : {})};\n",
+              "after": "  if (group === 'exactly-once-notification') return {notifications: 1, detectChangesCalls: 0, ...(suffix.startsWith('snack-bar/') ? {completions: 1} : {}), ...(suffix.startsWith('tabs/') ? {duplicateEndEventsDispatched: true} : {})};\n"
+            },
+            {
+              "offset": 13800,
+              "before": "",
+              "after": "}\n\nexport function samplePass(caseId) {\n  return {...samplePassBody(caseId), angularZoneEntered: caseId.split('/')[3] === 'zoneful'};\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/native-motion-run.mjs",
+          "before_sha256": "ed203ed407a79f4e857cf58f035426f9d01b650144a642803a7ac700e306789b",
+          "before_bytes": 17504,
+          "after_sha256": "72ae19cf9c0d6b3e96998e623eafb165caeb9b819c8523075a74db90c510af9e",
+          "after_bytes": 18252,
+          "edits": [
+            {
+              "offset": 12323,
+              "before": "async function waitReady(driver) {\n",
+              "after": "async function waitReady(driver, runtime) {\n"
+            },
+            {
+              "offset": 12411,
+              "before": "    const status = asJson(await driver.evaluate('JSON.stringify({ready: document.documentElement.dataset.labReady || \"\", error: (document.getElementById(\"bootstrap-error\") || {}).textContent || \"\"})'));\n",
+              "after": "    const status = asJson(await driver.evaluate('JSON.stringify({ready: document.documentElement.dataset.labReady || \"\", error: (document.getElementById(\"bootstrap-error\") || {}).textContent || \"\", angularZoneEntered: window.__closeoutAngularZoneEntered})'));\n"
+            },
+            {
+              "offset": 12739,
+              "before": "    if (status.ready === '1') return;\n",
+              "after": "    if (status.ready === '1') {\n      if (status.angularZoneEntered !== (runtime === 'zoneful')) throw new Error(`Angular zone mismatch for ${runtime}`);\n      return status.angularZoneEntered;\n    }\n"
+            },
+            {
+              "offset": 13721,
+              "before": "function absorb(bucket, step) {\n",
+              "after": "function absorb(bucket, step, angularZoneEntered) {\n"
+            },
+            {
+              "offset": 13885,
+              "before": "  const store = (key, observation) => { if (key && observation) bucket[key] = observation; };\n",
+              "after": "  const store = (key, observation) => { if (key && observation) bucket[key] = {...observation, angularZoneEntered}; };\n"
+            },
+            {
+              "offset": 14253,
+              "before": "async function collect(driver, scene, mode, bucket) {\n  await waitReady(driver);\n",
+              "after": "async function collect(driver, scene, mode, bucket, runtime, observations) {\n  observations.push(await waitReady(driver, runtime));\n"
+            },
+            {
+              "offset": 14436,
+              "before": "    absorb(bucket, await clickProbe(driver, button));\n",
+              "after": "    absorb(bucket, await clickProbe(driver, button), observations.at(-1));\n"
+            },
+            {
+              "offset": 14894,
+              "before": "async function runEngine(engine, runtime, origin, bucket, engines) {\n",
+              "after": "async function runEngine(engine, runtime, origin, bucket, engines, zoneObservations) {\n  const observed = [];\n"
+            },
+            {
+              "offset": 15154,
+              "before": "      await collect(driver, 'modes', 'enabled', bucket);\n",
+              "after": "      await collect(driver, 'modes', 'enabled', bucket, runtime, observed);\n"
+            },
+            {
+              "offset": 15279,
+              "before": "      await collect(driver, 'interrupt', 'enabled', bucket);\n",
+              "after": "      await collect(driver, 'interrupt', 'enabled', bucket, runtime, observed);\n"
+            },
+            {
+              "offset": 15414,
+              "before": "      await collect(driver, 'modes', 'provider-disabled', bucket);\n",
+              "after": "      await collect(driver, 'modes', 'provider-disabled', bucket, runtime, observed);\n"
+            },
+            {
+              "offset": 15675,
+              "before": "      await collect(driver, 'modes', 'reduced', bucket);\n",
+              "after": "      await collect(driver, 'modes', 'reduced', bucket, runtime, observed);\n"
+            },
+            {
+              "offset": 15810,
+              "before": "",
+              "after": "    zoneObservations[runtime][engine] = observed;\n"
+            },
+            {
+              "offset": 15830,
+              "before": "",
+              "after": "    for (const key of Object.keys(bucket)) delete bucket[key];\n    zoneObservations[runtime][engine] = observed;\n"
+            },
+            {
+              "offset": 16319,
+              "before": "",
+              "after": "  const zoneObservations = Object.fromEntries(RUNTIMES.map(runtime => [runtime, {}]));\n"
+            },
+            {
+              "offset": 16772,
+              "before": "        await runEngine(engine, runtime, origin, bucket, engines);\n",
+              "after": "        await runEngine(engine, runtime, origin, bucket, engines, zoneObservations);\n"
+            },
+            {
+              "offset": 17471,
+              "before": "  return {outcomes, engines};\n",
+              "after": "  return {outcomes, engines, zoneObservations};\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/ripple-hydration-application.mjs",
+          "before_sha256": "432231a645e5bc0ce8e375e9da9745177f7f1b577ac1ee0758913cdd5989a59f",
+          "before_bytes": 8230,
+          "after_sha256": "bb535b98b1aa50e3a8b67ab26934f0173638ccc0959aa8caac0384294f32f1d6",
+          "after_bytes": 8418,
+          "edits": [
+            {
+              "offset": 6831,
+              "before": "  return publicRippleNativeEventsOkay(row?.native_peer_events, line)\n",
+              "after": "  return ['zoneful', 'zoneless'].includes(row?.runtime)\n    && replay?.angular_zone_entered === (row.runtime === 'zoneful')\n    && live?.angular_zone_entered === (row.runtime === 'zoneful')\n    && publicRippleNativeEventsOkay(row?.native_peer_events, line)\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/ripple-hydration-component-fixture.mjs",
+          "before_sha256": "2518dfb938446f31a1ba614f4e5c89cae973fbb8d8f6742207665ad3a94a3169",
+          "before_bytes": 4146,
+          "after_sha256": "a3e4375a59cfe8946f4707163a845cdec45dc738de370eeb1960b30a0af24b7d",
+          "after_bytes": 4215,
+          "edits": [
+            {
+              "offset": 3573,
+              "before": "  snapshot() {return {clicks: this.clicks(), deliveries: this.deliveries.map(row => ({...row})),\n",
+              "after": "  snapshot() {return {angular_zone_entered: this.zone.run(() => NgZone.isInAngularZone()), clicks: this.clicks(), deliveries: this.deliveries.map(row => ({...row})),\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/ripple-hydration-replay.mjs",
+          "before_sha256": "59d499fa66c018456eca5b67e97dc3417854426d0733e01ba660a886bd77c605",
+          "before_bytes": 12086,
+          "after_sha256": "0e3f7262be5a7d337520799a3e35b25ae8e3028f9e48717bf5aeb53d1fd15b25",
+          "after_bytes": 12100,
+          "edits": [
+            {
+              "offset": 10383,
+              "before": "          const observed = await observeHydrationReplay(driver);\n",
+              "after": "          const observed = {...await observeHydrationReplay(driver), runtime};\n"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

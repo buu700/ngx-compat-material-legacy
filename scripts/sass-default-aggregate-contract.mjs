@@ -1,5 +1,6 @@
 /** Eight default aggregates retain every historical byte around finite public additions. */
 import {createHash} from 'node:crypto';
+import {historicalStepperPeerCss} from './sass-stepper-historical-model.mjs';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {measureM2PeerProgram,peerMeasurementMatches} from './sass-current-companion-peer.mjs';
@@ -117,6 +118,8 @@ export function defaultAggregateExpectedCss(id,peer){
   if(!floor||!inputs||!peerMeasurementMatches(peer,defaultAggregatePeerProgram(id),{})||peer.program_sha256!==floor.program_sha256||peer.css_sha256!==floor.css_sha256||peer.css_bytes!==floor.css_bytes
     ||peer.cdk_version!==peer.peer_version||peer.cdk_version!==inputs.cdk_version||peer.cdk_package_json_sha256!==inputs.cdk_package_json_sha256||peer.sources.length!==inputs.sources.length||peer.sources.some(s=>!sourceSets[peer.line].has(JSON.stringify([s.root,s.path,s.sha256,s.bytes]))))return null;
   const p=members(peer.css,profile.public_families);if(!p)return null;const o=Object.fromEntries(Object.entries(profile.originals).map(([f,m])=>[f,m.css]));
+  p.stepper=historicalStepperPeerCss(p.stepper,o.stepper,peer.line,['color','theme'].includes(profile.dimension));
+  if(p.stepper===null)return null;
   const css=profile.dimension==='density'?densityModel(e.original_css,o,p):profile.dimension==='typography'?typographyModel(e.original_css,o,p):colorThemeModel(e.original_css,o,p,e);
   const withState=Object.hasOwn(FORM_FIELD_STATE_AGGREGATE_CASES,id)?insertFormFieldStateInAggregate(id,css,peer):css;
   return Object.hasOwn(RIPPLE_COLOR_BINDING_CASES,id)?insertRippleColorInExpectedModel(id,withState,peer,{aggregate:true}):withState;

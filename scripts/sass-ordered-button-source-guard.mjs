@@ -12,9 +12,9 @@ import {isDeepStrictEqual,types} from 'node:util';
 import {spawnSync} from 'node:child_process';
 import {createOrdinaryDensityGateContext} from './sass-ordinary-density-gate.mjs';
 import {createCurrentSpinnerSnackContract} from './current-sass-spinner-snack-contract.mjs';
-const root=dirname(dirname(fileURLToPath(import.meta.url))),self=readFileSync(new URL(import.meta.url)), hashes={'21.x':'c32ebf84dd28be5330a0b185ddaa6820616ae66ca84087f00ebad228fb630d18',main:'ec1af9fc46f8b85acdaf183015419314cb0a02ae3e83f12e5366135f98816e14'},sha=b=>createHash('sha256').update(b).digest('hex');
+const root=dirname(dirname(fileURLToPath(import.meta.url))),self=readFileSync(new URL(import.meta.url)), hashes={'21.x':'2a95566f4495533efe5150bcfb2a371b54e6c9f1b9c95be32e5e63e3eaea0544',main:'f8c847d9b1feb3c01e6cd7e849890cc0828fee606fe979370182594ba32b1f9a'},sha=b=>createHash('sha256').update(b).digest('hex');
 function check(line){if(!readFileSync(new URL(import.meta.url)).equals(self))throw Error('guard changed');const raw=readFileSync(join(root,'fixtures/sass/ordered-button-proof-inputs.json'));if(sha(raw)!==hashes[line])throw Error('manifest changed');const m=JSON.parse(raw);if(m.schema_version!==1||!Array.isArray(m.files)||new Set(m.files.map(x=>x.path)).size!==m.files.length)throw Error('manifest invalid');for(const e of m.files){let p=root;for(const part of e.path.split('/')){if(!part||part==='.'||part==='..')throw Error('invalid path');p=join(p,part);if(lstatSync(p).isSymbolicLink())throw Error('linked input')}const b=readFileSync(p);if(b.length!==e.bytes||sha(b)!==e.sha256)throw Error('input changed');}}
-const expectedSha=b=>createHash('sha256').update(b).digest('hex'),expectedEngineHash='6f6475a85f4361d0bb90c15c5b966c799499def63d2f1f5a93e2bfb09d584b86';
+const expectedSha=b=>createHash('sha256').update(b).digest('hex'),expectedEngineHash='356337aa30fed58fcc25afeaabca5ebb3695623c0f17a0aff497a3bd92b4a383';
 function expectedPlain(v){
  if(v===null||['string','boolean'].includes(typeof v))return v;
  if(typeof v==='number'){if(!Number.isSafeInteger(v))throw Error('number');return v;}

@@ -13,8 +13,48 @@ import {isAbsolute, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {types} from 'node:util';
 import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
+import {selectDialogFiniteSuccessor} from './select-dialog-finite-source-successor.mjs';
+import {dialogFocusFiniteSourceSuccessor} from './dialog-focus-finite-source-successor.mjs';
 
 const SELF = 'scripts/current-sass-source.mjs';
+const SIXTH_HELPER = Object.freeze({path: 'scripts/stepper-sixth-source.mjs',
+  sha256: 'e14efe828ea074fb1aa61bab093add26e836f238d2f869e49206baf890175657'});
+const FOCUS_HELPER = Object.freeze({path: 'scripts/dialog-focus-finite-source-successor.mjs',
+  sha256: 'd45ce542f0d8a546d77e1a43fc0385f01ff51f908987871803a3a9fd8cc384d7'});
+const compileVerifiedHelper = Function;
+// Load this exact builtins-only helper image synchronously, without an ESM cache entry.
+// Synchronous loading preserves the existing CommonJS callers of this source authority.
+function stepperFactory(root) {
+  const raw = physical(root, SIXTH_HELPER.path);
+  assert.equal(hash(raw), SIXTH_HELPER.sha256, 'changed sixth source executable');
+  let text = raw.toString();
+  const imports = [
+    "import assert from 'node:assert/strict';",
+    "import {execFileSync} from 'node:child_process';",
+    "import {createHash} from 'node:crypto';",
+    "import {lstatSync, readFileSync} from 'node:fs';",
+    "import {isAbsolute, join, resolve} from 'node:path';",
+    "import {fileURLToPath} from 'node:url';",
+    "import {types} from 'node:util';",
+  ];
+  for (const statement of imports) {
+    assert.equal(text.split(statement).length, 2);
+    text = text.replace(statement, '');
+  }
+  for (const [before, after] of [
+    ['fileURLToPath(import.meta.url)', 'selfFile'],
+    ['export const stepperSixthLoadedImage', 'const stepperSixthLoadedImage'],
+    ['export function createStepperSixthSource', 'function createStepperSixthSource'],
+  ]) {assert.equal(text.split(before).length, 2); text = text.replace(before, after);}
+  assert.doesNotMatch(text, /\bimport\s|\bexport\s|import\.meta/);
+  const factory = compileVerifiedHelper('deps', 'selfFile',
+    'const {assert, execFileSync, createHash, lstatSync, readFileSync, isAbsolute, join, resolve, fileURLToPath, types} = deps;\n' +
+    text + '\nreturn createStepperSixthSource;')(
+      {assert, execFileSync, createHash, lstatSync, readFileSync, isAbsolute, join, resolve, fileURLToPath, types},
+      join(root, SIXTH_HELPER.path));
+  assert.ok(equalBytes(raw, physical(root, SIXTH_HELPER.path)), 'sixth helper changed during load');
+  return factory;
+}
 const INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json';
 const INPUTS_SHA = '46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9';
 const ADDITIONAL = [
@@ -131,6 +171,9 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   assertPlanner();
   const assertPhysical = () => {
     for (const row of bound.values()) assert.deepEqual(reference(row.path, physical(root, row.path)), row, 'changed final physical source ' + row.path);
+    product.assertPhysical();
+    focus.assertPhysical();
+    sixth.assertPhysical();
   };
   const read = path => {
     const actual = physical(root, path);
@@ -141,10 +184,21 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
     assert.ok(equalBytes(physical(root, path), actual), 'source changed during read ' + path);
     return actual;
   };
+  const initialVersion = JSON.parse(physical(root, 'projects/ngx-material-legacy/package.json')).version;
+  const initialLine = initialVersion.startsWith('21.') ? '21.x' : initialVersion.startsWith('22.') ? 'main' : null;
+  const product = selectDialogFiniteSuccessor({root, read: providedRead ?? (path => physical(root,path)), line: initialLine});
+  assert.equal(hash(physical(root, FOCUS_HELPER.path)), FOCUS_HELPER.sha256);
+  const focus = dialogFocusFiniteSourceSuccessor({root, read: providedRead ?? (path => physical(root,path)), line: initialLine});
+  const sixth = stepperFactory(root)({root, read: providedRead});
+  for (const owner of [product, focus, sixth]) for (const ref of owner.bound) {
+    if (bound.has(ref.path)) assert.deepEqual(bound.get(ref.path), ref);
+    else bound.set(ref.path, {...ref});
+  }
   const member = row => {
+    const expected = sixth.qualify(row) ?? focus.qualify(row) ?? product.qualify(row) ?? row;
     const bytes = read(row.path);
-    assert.equal(hash(bytes), row.sha256, 'changed current Sass source ' + row.path);
-    assert.equal(bytes.length, row.bytes);
+    assert.equal(hash(bytes), expected.sha256, 'changed current Sass source ' + row.path);
+    assert.equal(bytes.length, expected.bytes);
     return bytes;
   };
   member(plannerReference);
@@ -200,6 +254,8 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
     assert.deepEqual(reference(row.path, Buffer.from(expected)), row.current);
     assert.ok(equalBytes(member(row.afterimage), Buffer.from(expected)));
   }
+  assert.ok(!changes.has(sixth.transition.path));
+  changes.set(sixth.transition.path, structuredClone(sixth.transition));
   for (const row of source.inputs) member(changes.get(row.path)?.current ?? row);
   member(source.semantic_receipt);
   for (const row of source.unchanged_owned_sass_before_inputs) {
@@ -215,7 +271,7 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   assert.deepEqual(graph.non_target_owned_style_template_graph.filter(row => row.path === CARD), [changes.get(CARD).before]);
   for (const row of graph.non_target_owned_style_template_graph) member(row.path === CARD ? changes.get(CARD).current : row);
   const transitions = [...source.modules.map(row => ({path: row.path, before: row.before, current: row.current})),
-    ...packet.additional_modules.map(row => ({path: row.path, before: row.before, current: row.current}))];
+    ...packet.additional_modules.map(row => ({path: row.path, before: row.before, current: row.current})), sixth.transition];
   for (const row of transitions) member(row.current);
   const sourceSets = {}, sourceSetSuccessors = [];
   for (const [historicalHash, rows] of Object.entries(css.branches[line].source_sets)) {
@@ -225,6 +281,9 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
     return changed ? {...row, sha256: changed.current.sha256, bytes: changed.current.bytes} : {...row};
     });
     const currentHash = hash(JSON.stringify(current));
+    assert.equal(historicalHash, sixth.source_set.historical_sha256);
+    assert.equal(currentHash, sixth.source_set.v3_current_sha256);
+    assert.deepEqual(current, sixth.source_set.rows);
     sourceSets[currentHash] = current;
     sourceSetSuccessors.push({historical_sha256: historicalHash, current_sha256: currentHash});
   }
@@ -270,7 +329,7 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   const result = {root, line, assertCurrent, guardNode, guardPlan, qualify, assertHistoricalSource, bound: structuredClone([...bound.values()]),
     transitions: structuredClone(transitions), source_sets: structuredClone(sourceSets), source_set_successors: structuredClone(sourceSetSuccessors),
     descriptor: structuredClone({source_subject: reference(SELF, image), source_packet: reference(INPUTS, raw), source_modules: transitions.map(row => row.current)}),
-    source_scope_only: true, metadata_refs_qualified: 5, current_source_reads_are_physical: true,
+    source_scope_only: true, metadata_refs_qualified: 6, current_source_reads_are_physical: true,
     historical_source_bytes_exposed: false, historical_constructor_executed: false, fresh_sass_compilation_this_call: false,
     css_or_artifact_admission_granted: false, current_native_packed_browser_floor_or_full_audit_qualified: false, g11_claim: 'not-passed'};
   assertCurrent();

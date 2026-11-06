@@ -81,12 +81,12 @@ for(const [mode,zero]of [['enabled',false],['provider-disabled',false],['reduced
   assert.deepEqual(result.value.notify.observation,result.value.observation);
   for(const group of ['enabled-disabled-reduced','exactly-once-notification']) {
     const id='native-motion/'+SOURCE_LINE+'/chromium/zoneful/'+group+'/tabs/'+(group==='exactly-once-notification'?'animationDone/':'')+suffix;
-    assert.deepEqual(assertCase(id,result.value.observation),[]);
+    assert.deepEqual(assertCase(id,{...result.value.observation,angularZoneEntered:true}),[]);
   }
   cases.push({id:'complete-producer-'+suffix,result:'pass'});
 }
 const duplicate=await run({outputs:2});assert.equal(duplicate.value.observation.notifications,2);
-assert.ok(assertCase('native-motion/'+SOURCE_LINE+'/chromium/zoneful/exactly-once-notification/tabs/animationDone/enabled',duplicate.value.observation).length);
+assert.deepEqual(assertCase('native-motion/'+SOURCE_LINE+'/chromium/zoneful/exactly-once-notification/tabs/animationDone/enabled',{...duplicate.value.observation,angularZoneEntered:true}),['emitted more than once']);
 assert.equal(duplicate.subscriptions,0);cases.push({id:'actual-double-output-is-rejected',result:'pass'});
 for(const options of [{outputs:0},{failDispatch:true},{originThrows:true}]) {
  const result=await run(options);assert.ok(result.error);assert.equal(result.subscriptions,0);assert.equal(result.listeners,0);

@@ -181,5 +181,36 @@ class CurrentDirectTests(unittest.TestCase):
         type(self).js_result = result
         self.checks.append('independent JS/Python canonical descriptor and source-set parity')
 
+    def test_05_v4_product_cold_late_and_final_callback(self):
+        product = 'projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts'
+        earlier = 'projects/ngx-material-legacy/legacy-select/select.html'
+        with self.assertRaises(AssertionError):
+            subject.CurrentSpinnerSnackContract(self.root, read=lambda p: b'wrong' if p == product else (self.root / p).read_bytes())
+        self.controls['target'] = product
+        self.check('v4 product late callback rejects', False, subject.current_spinner_snack_assertion_ok(**self.model(self.rows[0])))
+        self.controls['target'] = None
+        file = self.root / earlier
+        original = file.read_bytes()
+        self.controls['trace'] = []
+        self.context.assert_current()
+        count = len(self.controls['trace'])
+        self.controls['trace'] = None
+        seen = 0
+        def last_callback(_):
+            nonlocal seen
+            seen += 1
+            if seen < count:
+                self.controls['hook'] = last_callback
+            else:
+                file.write_bytes(original + b'\n<!-- changed -->\n')
+        self.controls['hook'] = last_callback
+        try:
+            self.check('v4 product final callback rejects', False, subject.current_spinner_snack_assertion_ok(**self.model(self.rows[0])))
+            self.assertEqual(seen, count)
+        finally:
+            file.write_bytes(original)
+            self.controls['hook'] = None
+        self.check('v4 product restored', True, subject.current_spinner_snack_assertion_ok(**self.model(self.rows[0])))
+
 
 if __name__ == '__main__': unittest.main()

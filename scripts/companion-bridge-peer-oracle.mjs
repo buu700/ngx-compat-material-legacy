@@ -1,10 +1,9 @@
 /**
  * In-run current-peer M2 oracle for the thirteen companion bridges.
  *
- * The expected value of every rostered bridge token is whatever the installed
- * @angular/material peer emits for the same M2 theme through its own public
- * `mat.m2-define-*` theme constructors and `mat.<companion>-theme` mixins.
- * Historical v16 output is deliberately NOT used as the oracle here.
+ * Current peers supply the expectation for every rostered token except the
+ * four owned Material-16 Stepper colors and two square state-layer shapes.
+ * Those six values come from authenticated tagged-reference observations.
  *
  * Checker-only: the product bridges never call the peer's m2 Sass; this module
  * compiles the peer only to obtain the expected values and compares them with
@@ -129,6 +128,59 @@ ${level}$theme: ${ns}.${m2Prefix}define-${scenario.type}-theme((
 `;
 }
 
+const HISTORICAL_STEPPER_COLORS = [
+  '--mat-stepper-header-hover-state-layer-color',
+  '--mat-stepper-header-focus-state-layer-color',
+  '--mat-stepper-header-error-state-label-text-color',
+  '--mat-stepper-header-error-state-icon-foreground-color',
+];
+const HISTORICAL_STEPPER_SHAPES = [
+  '--mat-stepper-header-focus-state-layer-shape',
+  '--mat-stepper-header-hover-state-layer-shape',
+];
+const HISTORICAL_STEPPER_TOKENS = new Set([...HISTORICAL_STEPPER_COLORS, ...HISTORICAL_STEPPER_SHAPES]);
+const historicalFixtureBytes = readFileSync(new URL('../fixtures/sass/stepper-historical-bridge-oracle.json', import.meta.url));
+const HISTORICAL_FIXTURE_SHA = 'a952c70fbb725c5ec0bd78d8b6bb7b54ac506c5dcf0600616c29e328f8bf67d9';
+const HISTORICAL_MANIFEST_SHA = 'ed9b9c8e69c63bb134b71a25ded9d68d21f1d120cdd513ba423126864986fe74';
+const HISTORICAL_SHAPE_SHA = '9834806bacc495276bfeae3c36c6e583daff0ee35919b3f373ccd31c404ca805';
+if (sha256(historicalFixtureBytes) !== HISTORICAL_FIXTURE_SHA) throw Error('tagged Stepper oracle bytes changed');
+const historicalFixture = JSON.parse(historicalFixtureBytes);
+const manifestBytes = readFileSync(new URL('../tests/fixtures/stepper-material-16/source-manifest.json', import.meta.url));
+const shapeBytes = readFileSync(new URL('../tests/fixtures/stepper-material-16/shape-observation.json', import.meta.url));
+if (sha256(manifestBytes) !== HISTORICAL_MANIFEST_SHA || sha256(shapeBytes) !== HISTORICAL_SHAPE_SHA) throw Error('tagged Stepper provenance changed');
+const historicalManifest = JSON.parse(manifestBytes), historicalShape = JSON.parse(shapeBytes);
+if (historicalFixture.schema_version !== 1 || historicalFixture.archive_sha256 !== historicalManifest.archive_sha256 ||
+    historicalFixture.source_manifest_sha256 !== HISTORICAL_MANIFEST_SHA ||
+    historicalFixture.sources.length !== 163 || historicalManifest.source_files.length !== 163 ||
+    historicalFixture.sources.some((s, i) => s.path !== historicalManifest.source_files[i].path ||
+      s.sha256 !== historicalManifest.source_files[i].sha256 || !Number.isInteger(s.bytes) || s.bytes < 1) ||
+    JSON.stringify(Object.keys(historicalFixture.scenarios)) !== JSON.stringify(SCENARIOS.map(s => s.id)) ||
+    Object.values(historicalShape.cases).some(states => ['normal','hover','focus'].some(k => states[k] !== '0px'))) {
+  throw Error('tagged Stepper oracle provenance differs');
+}
+const historicalColors = {};
+for (const scenario of SCENARIOS) {
+  const entry = historicalFixture.scenarios[scenario.id];
+  const source = "@use '@angular/material' as mat;\n" + themeSass('mat', scenario, {m2Prefix: ''}) +
+    '\n.historical { @include mat.stepper-theme($theme); }\n';
+  if (entry.source !== source || entry.source_sha256 !== sha256(source) || entry.css_sha256 !== sha256(entry.css)) {
+    throw Error('tagged Stepper scenario bytes changed');
+  }
+  const root = parseCustomProperties(entry.css, '.historical')[':root'];
+  if (!root || HISTORICAL_STEPPER_COLORS.some(token => {
+    const re = new RegExp(token + ':\\s*[^;]+;', 'g');
+    return typeof root[token] !== 'string' || [...entry.css.matchAll(re)].length !== 1;
+  })) throw Error('tagged Stepper scenario tokens incomplete');
+  historicalColors[scenario.id] = Object.fromEntries(HISTORICAL_STEPPER_COLORS.map(token => [token, root[token]]));
+}
+const historicalProof = Object.freeze({fixture_sha256: HISTORICAL_FIXTURE_SHA,
+  source_manifest_sha256: HISTORICAL_MANIFEST_SHA, shape_sha256: HISTORICAL_SHAPE_SHA,
+  archive_sha256: historicalFixture.archive_sha256});
+function historicalStepperValue(line, scenario, token) {
+  if (!['main','21.x'].includes(line) || !HISTORICAL_STEPPER_TOKENS.has(token)) return null;
+  return HISTORICAL_STEPPER_SHAPES.includes(token) ? '0' : historicalColors[scenario]?.[token] ?? null;
+}
+
 export function peerIdentity(root) {
   const require = createRequire(path.join(root, 'package.json'));
   const pkgJson = require.resolve(`${PEER_PACKAGE}/package.json`);
@@ -198,19 +250,18 @@ export function peerSourceFor(materialRoot, component, key) {
 
 /**
  * Pure comparison. `peer`/`candidate` are maps scenarioId -> parsed custom
- * properties. A case passes only when, in every scenario, the peer emits a
- * non-empty root value, the candidate root (when emitted) equals it, and the
- * selector-scoped (accent/warn variant) declarations of that token are the
- * same set with the same values in peer and candidate. A token must be emitted
- * by the candidate in at least one selector of every scenario.
+ * properties. The installed peer must emit every token. For six finite Stepper
+ * fields, the candidate must instead equal the tagged historical value; all
+ * other declarations must equal the peer in every selector and scenario.
  */
-export function compareTokens({caseIds, peer, candidate, sources}) {
+export function compareTokens({caseIds, peer, candidate, sources, line}) {
   const cases = [];
   const requiredScenarios = SCENARIOS.map(scenario => scenario.id);
   const complete = [peer, candidate].every(measurements =>
     Object.keys(measurements).length === requiredScenarios.length
       && requiredScenarios.every(id => Object.hasOwn(measurements, id)));
   for (const token of caseIds) {
+    const historical = HISTORICAL_STEPPER_TOKENS.has(token);
     const scenarios = [];
     let ok = Boolean(sources[token]) && complete;
     for (const scenarioId of requiredScenarios) {
@@ -222,8 +273,11 @@ export function compareTokens({caseIds, peer, candidate, sources}) {
       const checks = [...selectors].sort().map((selector) => {
         const expected = p[selector]?.[token] ?? null;
         const actual = c[selector]?.[token] ?? null;
-        const match = typeof expected === 'string' && expected !== '' && expected === actual;
-        return {selector, expected_peer: expected, candidate: actual, match};
+        const expectedHistorical = historical && selector === ':root' ? historicalStepperValue(line, scenarioId, token) : null;
+        const match = typeof expected === 'string' && expected !== '' &&
+          (historical ? expectedHistorical !== null && actual === expectedHistorical : expected === actual);
+        return historical ? {selector, expected_peer: expected, expected_historical: expectedHistorical, candidate: actual, match}
+          : {selector, expected_peer: expected, candidate: actual, match};
       });
       const rootPeer = p[':root']?.[token];
       const emitted = checks.some((check) => check.candidate !== null);
@@ -239,6 +293,7 @@ export function compareTokens({caseIds, peer, candidate, sources}) {
       token,
       result: ok ? 'pass' : 'fail',
       expected_peer: root?.expected_peer ?? null,
+      ...(historical ? {expected_historical: root?.expected_historical ?? null, historical_oracle: historicalProof} : {}),
       candidate: root?.candidate ?? null,
       scenarios,
     });
@@ -282,6 +337,8 @@ export function runPeerOracle(root, {bridgeSource, candidateOverride} = {}) {
   const caseIds = rosterCaseIds(allowed);
   if (new Set(caseIds).size !== caseIds.length) throw new Error('duplicate companion bridge case ids');
   const identity = peerIdentity(root);
+  const line = identity.version === '22.1.7' ? 'main' : identity.version === '21.2.14' ? '21.x' : null;
+  if (line === null) throw Error('unrecognized companion peer floor');
   const peer = {};
   const candidate = {};
   for (const scenario of SCENARIOS) {
@@ -295,7 +352,7 @@ export function runPeerOracle(root, {bridgeSource, candidateOverride} = {}) {
       sources[`--mat-${component}-${key}`] = peerSourceFor(identity.realpath, component, key);
     }
   }
-  const cases = compareTokens({caseIds, peer, candidate, sources});
+  const cases = compareTokens({caseIds, peer, candidate, sources, line});
   for (const entry of cases) {
     const component = COMPANIONS.find((c) => entry.token.startsWith(`--mat-${c}-`));
     entry.component = component;
@@ -312,7 +369,10 @@ export function runPeerOracle(root, {bridgeSource, candidateOverride} = {}) {
   };
 }
 
-export function writeAssertions(dir, oracle, {runId, invocationId, line = '21.x'}) {
+export function writeAssertions(dir, oracle, {runId, invocationId, line} = {}) {
+  const peerLine = oracle.identity.version === '22.1.7' ? 'main' : oracle.identity.version === '21.2.14' ? '21.x' : null;
+  if (peerLine === null || (line !== undefined && line !== peerLine)) throw Error('assertion peer floor differs');
+  line = peerLine;
   mkdirSync(dir, {recursive: true});
   const written = [];
   for (const entry of oracle.cases) {
@@ -334,8 +394,12 @@ export function writeAssertions(dir, oracle, {runId, invocationId, line = '21.x'
       peer_package_json_sha256: oracle.identity.package_json_sha256,
       peer_source_file: entry.peer_source_file,
       peer_source_sha256: entry.peer_source_sha256,
-      oracle: 'current-peer m2-define-*-theme + mat.<companion>-theme compiled in this invocation',
+      oracle: HISTORICAL_STEPPER_TOKENS.has(entry.token)
+        ? 'tagged Material 16 Stepper CSS and shape; current peer measured in this invocation'
+        : 'current-peer m2-define-*-theme + mat.<companion>-theme compiled in this invocation',
       expected_peer: entry.expected_peer,
+      ...(HISTORICAL_STEPPER_TOKENS.has(entry.token) ? {expected_historical: entry.expected_historical,
+        historical_oracle: entry.historical_oracle} : {}),
       candidate: entry.candidate,
       scenarios: entry.scenarios,
     };

@@ -73,12 +73,15 @@ function inspectSource({entry,body,review,proof,root=ROOT,read:suppliedRead=path
  for(const ref of tools.bound)if(!bound.some(member=>member.path===ref.path))bound.push({...ref});
  const assertBound=()=>{for(const ref of bound){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed legacy removal admission source '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}};
  assertBound();assert.deepEqual(JSON.parse(read(REVIEW)),body);
- const source=require('./upstream-legacy-removal-source.mjs').inspectLegacyRemovalSourceReview({root,read});
+ const verifierPath=require.resolve('./upstream-legacy-removal-source.mjs'),verifierModule=require(verifierPath),verifierDescriptor=Object.getOwnPropertyDescriptor(verifierModule,'inspectLegacyRemovalSourceReview');
+ assert.ok(verifierDescriptor&&Object.hasOwn(verifierDescriptor,'value')&&typeof verifierDescriptor.value==='function','missing loaded legacy inspector');const verifier=verifierDescriptor.value;
+ const assertVerifier=()=>{assert.equal(require.cache[verifierPath]?.exports,verifierModule,'changed loaded legacy inspector module');assert.deepEqual(Object.getOwnPropertyDescriptor(verifierModule,'inspectLegacyRemovalSourceReview'),verifierDescriptor,'changed loaded legacy inspector descriptor');assert.equal(hash(Reflect.apply(functionToString,verifier,[])),'e2a0142d9a77bc095c1b91c7a55500ffa219b7993d9fdfa9a88defd4a09dc844','changed loaded legacy inspector function');};
+ assertVerifier();const source=verifier({root,read});assertVerifier();
  assert.deepEqual(source.review,JSON.parse(read(SOURCE_REVIEW.path)));assert.deepEqual(source.historical_comparison_report,JSON.parse(read(BOUNDARY.path)));
- const originalGuard=()=>{idle();tools.assertCurrent();assertBound();source.assertCurrent();assertBound();};
+ const originalGuard=()=>{idle();assertVerifier();tools.assertCurrent();assertBound();source.assertCurrent();assertBound();assertVerifier();};
  const children=[tools,source].map(completeChild);let assertCurrent=originalGuard,guardNode,guardPlan;
  if(children.every(Boolean)){
-  const metadata=()=>{idle();assertPlanner(root);for(const child of children)child.check();};
+  const metadata=()=>{idle();assertPlanner(root);assertVerifier();for(const child of children)child.check();assertVerifier();};
   const physical=()=>{for(const ref of bound){const raw=readHistoricalContractRepairOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'physical legacy admission input '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}};
   guardNode=Object.freeze({dependencies:Object.freeze(children.map(child=>child.node)),
    preflight:()=>{metadata();physical();},

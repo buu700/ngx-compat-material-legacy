@@ -11,7 +11,7 @@ from sass_default_aggregate_admission import default_aggregate_expected_css,DEFA
 from sass_aggregate_density_admission import aggregate_density_expected_css
 _ROOT=Path(__file__).resolve().parents[1]
 _IMAGE=Path(__file__).read_bytes()
-_MANIFEST={'21.x':'ca614625716d81489fed77d39a0b37e896760db8351fcc91221c4b59488ce4ed','main':'df51e66bd03153ffc6e5eef3dacf989ba294bdd1060b040513e09ad5aec14756'}
+_MANIFEST={'21.x':'8ea082998e3fb6b409ab145f50924cf859213f0d5d7544fecff63ab6f10ac321','main':'5b68ae2e2fc034535ff4a9a5c975ba47c197f81e3b7788036d85a36b0ff63ffc'}
 _CASES=('mixin-css/all-component-densities','mixin-argument/all-component-densities/custom-full-theme','mixin-argument/all-component-densities/raw-density-config')
 _CONTEXTS=weakref.WeakKeyDictionary()
 _hash=lambda b:hashlib.sha256(b.encode() if type(b) is str else b).hexdigest()

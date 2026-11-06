@@ -14,6 +14,7 @@ import {fileURLToPath} from 'node:url';
 import {gunzipSync,inflateSync} from 'node:zlib';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {historicalContractRepairSourceSubject} from './historical-contract-repair-source.mjs';
+import {tabsFiniteSourceSuccessor} from './tabs-finite-source-successor.mjs';
 import {createCurrentSassSource} from './current-sass-source.mjs';
 import {canonicalSourcePhysicalBoundary} from './current-sass-canonical-source-boundary.mjs';
 import {readHistoricalContractRepairOwnerMember} from './historical-contract-repair-readers.mjs';
@@ -175,6 +176,7 @@ export function inspectLegacyRemovalSourceReview({root,read:providedRead=path=>l
  };
  const repairs=historicalContractRepairSourceSubject({root,read:readCurrent});
  const currentSass=createCurrentSassSource({root,read:readCurrent});
+ const tabs=tabsFiniteSourceSuccessor({root,read:readCurrent,line:'21.x'});
  const pinned=(path,digest)=>{const raw=readCurrent(path);assert.equal(hash(raw),digest,'changed qualified legacy review '+path);return raw;};
  const review=JSON.parse(pinned(LEGACY_REVIEW,LEGACY_REVIEW_SHA)),expected=JSON.parse(pinned(LEGACY_BOUNDARY,LEGACY_BOUNDARY_SHA));
  const qualification=JSON.parse(pinned(LEGACY_QUALIFICATION,LEGACY_QUALIFICATION_SHA));
@@ -185,11 +187,15 @@ export function inspectLegacyRemovalSourceReview({root,read:providedRead=path=>l
  const original=inspectLegacyRemovalOriginals({root,read:readCurrent});
  const capsule=JSON.parse(gunzipSync(readCurrent(SOURCE.path)));
  const base='projects/ngx-material-legacy/',members=new Map(),expectedMembers=new Map(expected.current_members.map(row=>[row.path,row]));
- const read=path=>{const raw=readCurrent(path),prior=expectedMembers.get(path);assert.ok(prior,'unknown legacy boundary input '+path);const repaired=repairs.qualify(prior)??prior,ref=currentSass.qualify(repaired)??repaired;assert.equal(hash(raw),ref.sha256,'changed owned legacy boundary '+path);assert.equal(raw.length,ref.bytes);members.set(path,{...ref});return raw;};
+ const read=path=>{const raw=readCurrent(path),prior=expectedMembers.get(path);assert.ok(prior,'unknown legacy boundary input '+path);const repaired=repairs.qualify(prior)??prior,sassRef=currentSass.qualify(repaired)??repaired,ref=tabs.qualify(sassRef)??sassRef;assert.equal(hash(raw),ref.sha256,'changed owned legacy boundary '+path);assert.equal(raw.length,ref.bytes);members.set(path,{...ref});return raw;};
  read(SOURCE.path);
 const tag=new Map(capsule.tagged_reference.members.map(row=>[row.path,row]));
-const product=legacyRemovalProductPopulation(root);
-assert.deepEqual(product,expected.current_members.filter(row=>row.path.startsWith(base)).map(row=>row.path).sort());
+const product=expected.current_members.filter(row=>row.path.startsWith(base)).map(row=>row.path).sort();
+const addition='projects/ngx-material-legacy/legacy-tabs/tab-body-reversal.spec.ts';
+assert.ok(!product.includes(addition));
+const additionRefs=tabs.bound.filter(ref=>ref.path===addition);assert.equal(additionRefs.length,1);
+assert.deepEqual(legacyRemovalProductPopulation(root),[...product,addition].sort());
+const extra=readCurrent(addition);assert.equal(hash(extra),additionRefs[0].sha256);assert.equal(extra.length,additionRefs[0].bytes);
 for(const path of product)read(path);
 const source=(path,body)=>ts.createSourceFile(path,body,ts.ScriptTarget.Latest,true,ts.ScriptKind.TS);
 const exportModifier=node=>node.modifiers?.some(m=>m.kind===ts.SyntaxKind.ExportKeyword);
@@ -258,7 +264,7 @@ const deletedCompatibility=capsule.sections.find(row=>row.path==='src/material/l
 const inventory=JSON.parse(read('testing/legacy-runner/historical-inventory.json'));assert.equal(inventory.rows.length,57);
 const tests=capsule.sections.filter(row=>row.status==='D'&&row.path.startsWith('src/material/')&&row.path.includes('.spec.'));
 assert.equal(tests.length,57);assert.deepEqual(tests.map(row=>row.path).sort(),inventory.rows.map(row=>row.historical_path).sort());
-for(const row of inventory.rows){assert.ok(members.has(row.candidate));assert.equal(hash(read(row.candidate)),row.candidate_sha256);}
+for(const row of inventory.rows){assert.ok(members.has(row.candidate));const previous={path:row.candidate,sha256:row.candidate_sha256},qualified=repairs.qualify(previous)??previous;assert.equal(hash(read(row.candidate)),qualified.sha256);}
 const packageJson=JSON.parse(read(base+'package.json')),packager=JSON.parse(read(base+'ng-package.json'));
 assert.ok(Object.keys(packageJson.exports).every(path=>!path.includes('prebuilt')));
 const experimentalImports=[];
@@ -267,13 +273,18 @@ original.assertCurrent();
 const report={schema_version:1,line:'21.x',role:'current owned source boundary only; not full API/behavior/native qualification',original_source:original.facts,analysis_runtime:{node:process.version,typescript:ts.version},product_population:product.length,current_members:[...members.values()].sort((a,b)=>a.path.localeCompare(b.path)),api_name_inventory:api,existing_recipe_alias_removals:recipeAliases,legacy_forward_bindings:facade,legacy_density_compatibility_exact_relocation:{before:deletedCompatibility.path,current:base+'styles/core/density/private/_compatibility.scss',sha256:hash(density)},historical_suite:{rows:57,complete_deleted_spec_membership:true,current_candidate_hashes_match:true,execution_credit:false},package_boundary:{peerDependencies:packageJson.peerDependencies,exports:packageJson.exports,packaged_assets:packager.assets,original_prebuilt_CSS_exports_are_not_advertised_by_owned_manifest:true},experimental_imports:experimentalImports,canonical_decisions_changed:0,product_changes:0,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
  // Derive only finite authenticated Sass reference successors as metadata.
  // The original boundary and four-repair comparison remain untouched.
- const sassExpected=structuredClone(expected);let sassReferenceSuccessors=0;
+ const sassExpected=structuredClone(expected);let sassReferenceSuccessors=0;const sassChangedPaths=[];
  sassExpected.current_members=sassExpected.current_members.map(prior=>{
   const current=currentSass.qualify(prior);if(!current)return prior;
-  if(current.sha256!==prior.sha256)sassReferenceSuccessors++;
+  if(current.sha256!==prior.sha256){sassReferenceSuccessors++;sassChangedPaths.push(prior.path);}
   return {...prior,...current};
  });
- assert.equal(sassReferenceSuccessors,5,'legacy boundary must retain all five Sass predecessor references');
+ assert.equal(currentSass.metadata_refs_qualified,6);
+ assert.equal(sassReferenceSuccessors,6,'legacy boundary must retain all six authenticated Sass predecessor references');
+ assert.deepEqual(sassChangedPaths.sort(),currentSass.transitions.map(row=>row.path).sort(),'only the authenticated six Sass members may change');
+ let tabsReferenceSuccessors=0;
+ sassExpected.current_members=sassExpected.current_members.map(prior=>{const current=tabs.qualify(prior);if(!current)return prior;if(current.sha256!==prior.sha256)tabsReferenceSuccessors++;return {...prior,...current};});
+ assert.equal(tabsReferenceSuccessors,2,'legacy boundary must retain both authenticated tabs predecessor references');
  const sourceComparison=repairs.compareSourceReport(report,sassExpected);
  assert.deepEqual(sourceComparison.historical_comparison,sassExpected,'original four-repair metadata comparison changed');
  assert.deepEqual(JSON.parse(pinned(LEGACY_BOUNDARY,LEGACY_BOUNDARY_SHA)),expected,'original legacy metadata comparison changed');
@@ -290,15 +301,16 @@ const report={schema_version:1,line:'21.x',role:'current owned source boundary o
   for(const ref of note.current_targets)assert.deepEqual(ref,expectedMembers.get(ref.path));if(note.group.startsWith('owned-'))assert.ok(note.current_targets.length);
  }
  assert.deepEqual(counts,review.deletion_group_counts);assert.equal(modified.length,44);assert.equal(deleted.length,702);assert.equal(modified.reduce((total,row)=>total+row.hunks.length,0),97);
- const productPaths=[...product];
- const originalGuard=()=>{idle();repairs.assertCurrent();original.assertCurrent();currentSass.assertCurrent();assert.deepEqual(legacyRemovalProductPopulation(root),productPaths,'changed complete legacy product population');for(const ref of bound.values()){const raw=readCurrent(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}physicalBoundary.assertPhysical();};
+ const extraSource=source(addition,extra.toString());for(const node of extraSource.statements)if((ts.isImportDeclaration(node)||ts.isExportDeclaration(node))&&node.moduleSpecifier)assert.doesNotMatch(node.moduleSpecifier.text,/material-experimental|(?:column-resize|popover-edit|selection)\//);
+ const productPaths=[...product,addition].sort();
+ const originalGuard=()=>{idle();repairs.assertCurrent();original.assertCurrent();currentSass.assertCurrent();tabs.assertCurrent();assert.deepEqual(legacyRemovalProductPopulation(root),productPaths,'changed complete legacy product population');for(const ref of bound.values()){const raw=readCurrent(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}physicalBoundary.assertPhysical();};
  const children=[repairs,original,currentSass].map(childTuple);let assertCurrent=originalGuard,guardNode,guardPlan;
  if(children.every(Boolean)){
-  const checkChildren=()=>{idle();for(const child of children)child.check();};
+  const checkChildren=()=>{idle();tabs.assertCurrent();for(const child of children)child.check();};
   const sweep=()=>{assert.deepEqual(legacyRemovalProductPopulation(root),productPaths,'changed complete legacy product population');physicalBoundary.assertPhysical();for(const ref of bound.values()){const raw=legacyRemovalPhysical(root,ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}};
   guardNode=Object.freeze({dependencies:Object.freeze(children.map(child=>child.node)),preflight:()=>{checkChildren();assertPlanner(root);sweep();},consume:()=>{checkChildren();for(const ref of bound.values()){const raw=readCurrent(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}checkChildren();},final:()=>{checkChildren();sweep();assertPlanner(root);checkChildren();}});
   let composed;try{composed=planner(Object.freeze([guardNode]));}catch{guardNode=undefined;}
   if(composed){assertCurrent=()=>{idle();composed();};guardPlan=Object.freeze({assertCurrent,node:guardNode});}
  }
- assertCurrent();return {bound:structuredClone([...bound.values()]),assertCurrent,...(guardPlan?{guardNode,guardPlan}:{}),review:structuredClone(review),report:structuredClone(report),historical_comparison_report:structuredClone(expected),qualified_product_reference_successors:sourceComparison.changed_source_references,current_sass_reference_successors:sassReferenceSuccessors,facts:{line:'21.x',sha:SHA,complete_original_files:746,original_text_hunks:797,nondeletion_hunks_individually_reviewed:97,deleted_paths_complete_membership:702,fresh_original_and_owned_boundary_review:true,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};
+ assertCurrent();return {bound:structuredClone([...bound.values()]),assertCurrent,...(guardPlan?{guardNode,guardPlan}:{}),review:structuredClone(review),report:{...structuredClone(report),role:'current owned source boundary including authenticated tabs successor; not full API/behavior/native qualification',product_population:productPaths.length,current_members:[...structuredClone(report.current_members),{...additionRefs[0]}].sort((a,b)=>a.path.localeCompare(b.path))},historical_projection_report:structuredClone(report),historical_comparison_report:structuredClone(expected),qualified_product_reference_successors:sourceComparison.changed_source_references,current_sass_reference_successors:sassReferenceSuccessors,facts:{line:'21.x',sha:SHA,complete_original_files:746,original_text_hunks:797,nondeletion_hunks_individually_reviewed:97,deleted_paths_complete_membership:702,fresh_original_and_owned_boundary_review:true,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};
 }

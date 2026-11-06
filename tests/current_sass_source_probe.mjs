@@ -16,7 +16,7 @@ assert.ok(root.includes('ngx-current-sass-source-test-'));
 const checks = [];
 const check = (name, operation) => {operation(); checks.push(name);};
 const context = createCurrentSassSource({root});
-check('five finite module identities', () => assert.equal(context.transitions.length, 5));
+check('six finite module identities', () => assert.equal(context.transitions.length, 6));
 for (const row of context.transitions) {
   check('qualify current ' + row.path, () => assert.equal(context.qualify(row.current).sha256, row.current.sha256));
   check('qualify before ' + row.path, () => assert.equal(context.qualify({path: row.path, ...row.before}).sha256, row.current.sha256));

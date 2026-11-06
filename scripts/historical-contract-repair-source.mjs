@@ -15,6 +15,8 @@ import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {authoredUseReviewEvidence} from './authored-use-inventory.mjs';
 import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
 import {tabsFiniteSourceSuccessor} from './tabs-finite-source-successor.mjs';
+import {selectDialogFiniteSuccessor} from './select-dialog-finite-source-successor.mjs';
+import {dialogFocusFiniteSourceSuccessor} from './dialog-focus-finite-source-successor.mjs';
 const SELF='scripts/historical-contract-repair-source.mjs',INPUTS='compatibility/rc/historical-contract-repair-source-inputs.json';
 const PINS={'21.x':'c1d7a8762cad7913a5d4ad60863afb506c56c61d27a78c17a3f5372c51cc9303',main:'cee92383ce1cb2c82b135e2e3b8be0131a46b114d60a521f7e11e4d0bb017191'};
 const image=readFileSync(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex'),originals=new Map();
@@ -71,12 +73,60 @@ function currentProducerReference(root,line,ref){
  return row.after;
 }
 
+function reviewHistoricalRepairEvidence(candidate, line, readMember, sha256, select) {
+  const rows=Array.isArray(candidate?.symbol_uses)?candidate.symbol_uses:[];
+  const insufficient=[];
+  let reviewed=0;
+  for (const row of rows) {
+    if (row.disposition !== 'closed' || row.status !== 'reviewed') continue;
+    let valid=false;
+    try {
+      const ref=row.source_review;
+      if (!ref || typeof ref.path !== 'string' || !ref.path.startsWith('compatibility/f10/authored-use-reviews/')
+          || !/^[0-9a-f]{64}$/.test(ref.sha256 || '')) throw Error('missing review');
+      const bytes=readMember(ref.path);
+      if (!bytes || !bytes.length || sha256(bytes)!==ref.sha256) throw Error('changed review');
+      const body=JSON.parse(bytes.toString('utf8'));
+      if (body.schema_version!==1 || body.line!==line || body.status!=='reviewed'
+          || !Array.isArray(body.reviews)) throw Error('wrong review scope');
+      const matches=body.reviews.filter(r=>r.file===row.file && r.module===row.module && r.symbol===row.symbol);
+      if (matches.length!==1) throw Error('missing or ambiguous use');
+      const review=matches[0];
+      if (!['stable-public-peer','owned-replacement','removed-use','test-only'].includes(review.conclusion)
+          || typeof review.decision!=='string' || review.decision.trim().length<80
+          || typeof review.reviewer!=='string' || !review.reviewer.trim()
+          || !Array.isArray(review.independent_evidence) || !review.independent_evidence.length) throw Error('missing source judgment');
+      const source=readMember('projects/ngx-material-legacy/'+row.file);
+      const sourceRef={path:'projects/ngx-material-legacy/'+row.file,sha256:review.candidate_source_sha256};
+      const selected=select.qualify(sourceRef)??sourceRef;
+      if (!source || !source.length || !/^[0-9a-f]{64}$/.test(review.candidate_source_sha256 || '')
+          || sha256(source)!==selected.sha256) throw Error('stale source');
+      if (review.conclusion==='test-only' && !/(?:^|\/)testing\/|\.spec\.ts$/.test(row.file)) throw Error('production use');
+      for (const evidence of review.independent_evidence) {
+        if (!evidence || typeof evidence.path!=='string' || (evidence.path===ref.path || evidence.path==='projects/ngx-material-legacy/'+row.file)
+            || !/^[0-9a-f]{64}$/.test(evidence.sha256 || '')) throw Error('invalid evidence');
+        const data=readMember(evidence.path);
+        const selected=select.qualify(evidence)??evidence;
+        if (!data || !data.length || sha256(data)!==selected.sha256) throw Error('missing or changed independent evidence');
+      }
+      valid=true;
+    } catch { /* Unproved closed labels remain failed. */ }
+    if (valid) reviewed++;
+    else insufficient.push({file:row.file,module:row.module,symbol:row.symbol});
+  }
+  return {reviewed,insufficient:insufficient.length,insufficient_uses:insufficient};
+}
+
 export function historicalContractRepairSourceSubject({root=process.cwd(),read:providedRead}={}){
  root=resolve(root);assertPlanner(root);const physical=path=>readHistoricalContractRepairMember(root,path),bound=new Map();
  const physicalVersion=JSON.parse(physical('projects/ngx-material-legacy/package.json')).version;
  const physicalLine=physicalVersion.startsWith('21.')?'21.x':physicalVersion.startsWith('22.')?'main':null;assert.ok(physicalLine);
  const tabs=tabsFiniteSourceSuccessor({root,read:providedRead??physical,line:physicalLine});
- for(const ref of tabs.bound)bound.set(ref.path,{...ref});
+ const select=selectDialogFiniteSuccessor({root,read:providedRead??physical,line:physicalLine});
+ const focus=dialogFocusFiniteSourceSuccessor({root,read:providedRead??physical,line:physicalLine});
+ for(const ref of [...tabs.bound,...select.bound,...focus.bound]){const previous=bound.get(ref.path);if(previous)assert.deepEqual(previous,ref,'conflicting finite historical-repair input '+ref.path);else bound.set(ref.path,{...ref});}
+ const currentSuccessor=ref=>focus.qualify(ref)??select.qualify(ref);
+ const historicalSuccessor=ref=>focus.historicalReference(ref)??select.historicalReference(ref);
  const read=path=>{
   const actual=physical(path);
   if(providedRead){const provided=providedRead(path);assert.ok(equal(actual,provided),'nonphysical current historical-repair input '+path);}
@@ -87,7 +137,7 @@ export function historicalContractRepairSourceSubject({root=process.cwd(),read:p
  const raw=read(INPUTS);assert.equal(hash(raw),PINS[line],'changed finite historical-repair input registry');const data=JSON.parse(raw);assert.equal(data.line,line);assert.equal(data.schema_version,1);
  assert.equal(data.source_scope_only,true);assert.equal(data.canonical_decisions_changed,0);assert.equal(data.actual_native_packed_browser_floor_or_full_audit_qualified,false);assert.equal(data.g11_claim,'not-passed');
  assert.equal(process.versions.node,JSON.parse(read('toolchain-lock.json')).repository.node);assert.ok(read(SELF).equals(image),'loaded historical-repair source owner differs from current file');
- const member=ref=>{const prior=currentProducerReference(root,line,ref),expected=tabs.qualify(prior)??prior;const bytes=read(ref.path);assert.equal(hash(bytes),expected.sha256,'changed historical-repair evidence '+ref.path);if(expected.bytes!==undefined)assert.equal(bytes.length,expected.bytes);return bytes;};
+ const member=ref=>{const prior=currentProducerReference(root,line,ref),tab=tabs.qualify(prior)??prior,selected=select.qualify(tab)??tab,expected=focus.qualify(selected)??selected;const bytes=read(ref.path);assert.equal(hash(bytes),expected.sha256,'changed historical-repair evidence '+ref.path);if(expected.bytes!==undefined)assert.equal(bytes.length,expected.bytes);return bytes;};
  const implementation=JSON.parse(member(data.implementation)),useQualified=JSON.parse(member(data.current_use_qualification)),useProof=JSON.parse(member(data.current_use_source_proof)),review=JSON.parse(member(data.current_use_review));
  for(const record of [implementation,useQualified,useProof,review])assert.equal(record.line,line,'cross-line historical-repair evidence');
  assert.equal(implementation.g11_claim,'not-passed');assert.equal(implementation.canonical_admission_ready,false);assert.equal(implementation.actual_native_packed_browser_floor_or_full_audit_qualified,false);
@@ -107,7 +157,7 @@ export function historicalContractRepairSourceSubject({root=process.cwd(),read:p
    assert.ok(row.literal_edits.length>0);for(const edit of row.literal_edits){assert.equal(expected.split(edit.before).length,2,'ambiguous historical product repair '+row.path);expected=expected.replace(edit.before,edit.after);}
    const applied=implementation.applied.filter(item=>item.path===row.path);assert.equal(applied.length,1);assert.equal(applied[0].before_sha256,row.before.sha256);assert.equal(applied[0].after_sha256,row.after.sha256);
   }
-  assert.equal(hash(expected),row.after.sha256);assert.equal(Buffer.byteLength(expected),row.after.bytes);const current=member({path:row.path,...row.after});assert.equal(current.toString(),expected,'current historical repair exceeds its exact reviewed delta');
+  assert.equal(hash(expected),row.after.sha256);assert.equal(Buffer.byteLength(expected),row.after.bytes);const current=member({path:row.path,...row.after}),successor=select.qualify({path:row.path,...row.after});if(successor){assert.equal(hash(current),successor.sha256);assert.equal(current.length,successor.bytes);}else assert.equal(current.toString(),expected,'current historical repair exceeds its exact reviewed delta');
   images.set(row.path,{...structuredClone(row)});
  }
  // These two inputs described the original choice of prior caller reviews.
@@ -137,21 +187,22 @@ export function historicalContractRepairSourceSubject({root=process.cwd(),read:p
  assert.equal(historicalBindings,2);assert.equal(historicalCanonicalBindings,line==='21.x'?3:1);assert.equal(currentBindings,line==='21.x'?1102:724);
  const known=new Set();
  for(const row of review.reviews){assert.equal(known.has(key(row)),false);known.add(key(row));const source=images.get('projects/ngx-material-legacy/'+row.file);assert.ok(source);assert.equal(row.candidate_source_sha256,source.after.sha256);}
- const reviewed=authoredUseReviewEvidence({symbol_uses:review.reviews.map(row=>({file:row.file,module:row.module,symbol:row.symbol,status:'reviewed',disposition:'closed',source_review:data.current_use_review}))},line,read,hash);
+ const reviewed=reviewHistoricalRepairEvidence({symbol_uses:review.reviews.map(row=>({file:row.file,module:row.module,symbol:row.symbol,status:'reviewed',disposition:'closed',source_review:data.current_use_review}))},line,read,hash,{qualify:currentSuccessor});
  assert.equal(reviewed.reviewed,95);assert.equal(reviewed.insufficient,0);
  let active=false;
  const idle=()=>assert.equal(active,false,'reentrant historical repair source operation');
  const selectedReferenceCore=(ref,side)=>{
-  const row=images.get(ref.path);if(!row)return null;
-  const previous=ref.sha256===row.before.sha256?row.before:ref.sha256===row.after.sha256?row.after:null;assert.ok(previous,'unreviewed historical-repair source reference '+ref.path);
+  const row=images.get(ref.path);if(!row){const selected=side==='after'?currentSuccessor(ref):historicalSuccessor(ref);if(selected){select.assertCurrent();focus.assertCurrent();}return selected;}
+  const successor=focus.qualify({path:ref.path,...row.after})??select.qualify({path:ref.path,...row.after});const current=successor??row.after;
+  const previous=ref.sha256===row.before.sha256?row.before:ref.sha256===row.after.sha256?row.after:ref.sha256===current.sha256?current:null;assert.ok(previous,'unreviewed historical-repair source reference '+ref.path);
   if(ref.bytes!==undefined)assert.equal(ref.bytes,previous.bytes);
-  const actual=physical(ref.path);assert.equal(hash(actual),row.after.sha256,'late actual historical-repair source '+ref.path);assert.equal(actual.length,row.after.bytes);
+  const actual=physical(ref.path);assert.equal(hash(actual),current.sha256,'late actual historical-repair source '+ref.path);assert.equal(actual.length,current.bytes);
   if(providedRead)assert.ok(equal(actual,Buffer.from(providedRead(ref.path))),'nonphysical historical-repair source reference '+ref.path);
   assert.ok(equal(actual,physical(ref.path)),'historical-repair source reference changed during callback '+ref.path);
-  return {...ref,sha256:row[side].sha256,...(ref.bytes===undefined?{}:{bytes:row[side].bytes})};
+  const target=side==='after'?current:row.before;return {...ref,sha256:target.sha256,...(ref.bytes===undefined?{}:{bytes:target.bytes})};
  };
  const selectedReference=(ref,side)=>{
-  if(!images.has(ref.path))return null;
+  if(!images.has(ref.path)&&!select.qualify(ref)&&!focus.qualify(ref))return null;
   idle();active=true;try{return selectedReferenceCore(ref,side);}finally{active=false;}
  };
  const qualify=ref=>selectedReference(ref,'after'),historicalReference=ref=>selectedReference(ref,'before');
@@ -159,10 +210,10 @@ export function historicalContractRepairSourceSubject({root=process.cwd(),read:p
   assert.ok(Array.isArray(historical.current_members)&&historical.current_members.length>1000,'expected complete immutable source boundary');
   const derived=structuredClone(historical);let changed=0;
   derived.current_members=derived.current_members.map(ref=>{const selected=selectedReferenceCore(ref,'after');if(!selected)return ref;if(selected.sha256!==ref.sha256)changed++;return selected;});
-  assert.equal(changed,4,'source boundary must contain all four repair preimages');assert.deepEqual(current,derived,'fresh source facts differ beyond the four qualified reference successors');
+  assert.equal(changed,14,'source boundary must contain the exact reviewed original repairs and finite product successors, including the dialog focus pair');assert.deepEqual(current,derived,'fresh source facts differ beyond the finite qualified reference successors');
   return {current_metadata:derived,historical_comparison:structuredClone(historical),changed_source_references:changed,metadata_comparison_only:true,old_product_bytes_exposed:false};
  }finally{active=false;}};
- const sweep=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);}tabs.assertPhysical();};
+ const sweep=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);}tabs.assertPhysical();select.assertPhysical();focus.assertPhysical();};
  const guardNode=Object.freeze({dependencies:Object.freeze([]),
   preflight:()=>{idle();assertPlanner(root);sweep();},
   consume:()=>{idle();active=true;try{for(const ref of bound.values()){
@@ -170,7 +221,7 @@ export function historicalContractRepairSourceSubject({root=process.cwd(),read:p
    if(providedRead)assert.ok(equal(actual,Buffer.from(providedRead(ref.path))),'late nonphysical historical-repair input '+ref.path);
    assert.ok(equal(actual,physical(ref.path)),'historical-repair input changed during callback '+ref.path);
   }}finally{active=false;}},
-  final:()=>{idle();sweep();assertPlanner(root);},
+  final:()=>{idle();sweep();focus.assertCurrent();assertPlanner(root);},
  });
  const composed=planner(Object.freeze([guardNode])),assertCurrent=()=>{idle();composed();};
  const guardPlan=Object.freeze({assertCurrent,node:guardNode});

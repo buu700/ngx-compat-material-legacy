@@ -12,7 +12,8 @@
  * (companion-bridge-peer-oracle.mjs): the installed @angular/material peer is
  * compiled with its own m2 theme constructors and companion theme mixins, and
  * every rostered allowed token (root and accent/warn variant declarations)
- * must equal the peer value. Under rc-verify, one kind:assertion file per
+ * must equal its finite expected value. Six Stepper fields use tagged Material
+ * 16 evidence; the other tokens use the installed peer. One assertion per
  * token is written to RC_ASSERTION_OUTPUT_DIR.
  *
  * Does not render components or claim G06–G08 / RC-05-A02.
@@ -264,7 +265,7 @@ for (const component of names) {
 const oracle = runPeerOracle(root, {bridgeSource});
 const failedCases = oracle.cases.filter((entry) => entry.result !== 'pass');
 for (const entry of failedCases) {
-  errors.push(`${entry.case_id}: candidate ${entry.candidate} != peer ${entry.expected_peer}`);
+  errors.push(`${entry.case_id}: candidate ${entry.candidate} != expected ${entry.expected_historical ?? entry.expected_peer}`);
 }
 for (const token of oracle.unexpected) errors.push(`${token}: emitted but not in an allowed list`);
 const assertionDir = process.env.RC_ASSERTION_OUTPUT_DIR;
@@ -310,7 +311,7 @@ const report = {
   g06_g07_g08_claim: 'not-passed',
   limitations: [
     'Compiled CSS custom-property inventory against owned $*-allowed lists and public *-overrides forwards.',
-    'Expected values are the installed current peer M2 output compiled in this run, not v16 output.',
+    'Expected values are current peer M2 output except six Stepper fields from authenticated tagged Material 16 CSS and shape.',
     'No browser/DOM computed-style rows were captured (not RC-05-A02 / G07).',
     'Does not claim ordered aggregate CSS parity or G06–G08.',
   ],

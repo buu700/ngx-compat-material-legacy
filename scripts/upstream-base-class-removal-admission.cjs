@@ -34,29 +34,32 @@ function currentSourceReference(ref) {
   const row = producerTransitions.find(row => row.before.path === ref.path);
   if (!row) return ref;
   assert.deepEqual(ref, row.before, 'unknown base-class producer predecessor');
+  if (ref.path === 'scripts/historical-contract-repair-source.mjs') return {path: ref.path, sha256: 'bd7cfbf2235438c604fdc6bc7c4b37e7c365c755d1f8287ce51393389ce6f78d', bytes: 22621};
   return row.after;
 }
 // Capture each producer before loading it. Current-file checks alone would not
 // reject a producer changed after import; exact exported function identities
 // also reject a previously cached implementation with different behavior.
-const producerPaths = ['scripts/upstream-base-class-removal-source.mjs', SOURCE + 'final-review.mjs', 'scripts/historical-contract-repair-source.mjs', 'scripts/tabs-finite-source-successor.mjs'];
+const producerPaths = ['scripts/upstream-base-class-removal-source.mjs', SOURCE + 'final-review.mjs', 'scripts/historical-contract-repair-source.mjs', 'scripts/tabs-finite-source-successor.mjs', 'scripts/select-dialog-finite-source-successor.mjs'];
 const loadedImages = new Map(producerPaths.map(path => [path, readFileSync(join(ROOT, path))]));
 const {verifyBaseClassRemovalOriginal, baseClassRemovalOriginalLoadedImage} = require('./upstream-base-class-removal-source.mjs');
 const {validateBaseClassRemovalReview, baseClassRemovalReviewLoadedImage} = require('../' + SOURCE + 'final-review.mjs');
 const {historicalContractRepairSourceSubject, readHistoricalContractRepairMember, historicalContractRepairLoadedImage} = require('./historical-contract-repair-source.mjs');
 const {tabsFiniteSourceSuccessor, tabsFiniteSourceLoadedImage} = require('./tabs-finite-source-successor.mjs');
+const {selectDialogFiniteSuccessor, selectDialogFiniteLoadedImage} = require('./select-dialog-finite-source-successor.mjs');
 // Producer-owned identities describe each module's own evaluation, even if
 // it was cached before this CJS loaded. Disk-at-import is not load provenance.
 const loadedSourceReferences = Object.freeze([
   Object.freeze({...currentHandlerRef}), baseClassRemovalOriginalLoadedImage,
-  baseClassRemovalReviewLoadedImage, historicalContractRepairLoadedImage, tabsFiniteSourceLoadedImage,
+  baseClassRemovalReviewLoadedImage, historicalContractRepairLoadedImage, tabsFiniteSourceLoadedImage, selectDialogFiniteLoadedImage,
 ]);
 const producerFunctions = [
   [verifyBaseClassRemovalOriginal, 'd67b84def0d5420b818feb336806d70009c0aaee53dab62c6cd7546da1a7fd33'],
   [validateBaseClassRemovalReview, '7ba2e397b673ed63a07f00a58a5cfdfcfd89238f8d4d574d6cdb992ae6527734'],
-  [historicalContractRepairSourceSubject, 'edada19b97eb420fa6826ed8059340ff2ad27ebdfe6668c25604d2c2f1503a2a'],
+  [historicalContractRepairSourceSubject, '51435959193c0c4e4dd952c2e03e2d2fa0f4e8df27dd0ef5f5754099d9b2c786'],
   [readHistoricalContractRepairMember, '1c68187440d74b8d393de47b7660de0c86aa0c8689a687f125de1db001a8053b'],
   [tabsFiniteSourceSuccessor, 'e90e768aac01e8b9a9c65032a5724d3dc2c3a2539a402d80ea880ef30fc08007'],
+  [selectDialogFiniteSuccessor, 'defdd26e4a9d39b584ba523d4e37cda5ef528c3ad50a64b5e50cd7270cb63a4a'],
 ];
 const loadedProducerFunctionSha256 = Object.freeze(producerFunctions.map(([fn]) =>
   Object.freeze({name: fn.name, sha256: hash(Reflect.apply(functionToString, fn, []))})));
@@ -147,18 +150,18 @@ function inspectSource(request = {}) {
     const old = gitOriginal(root, body.canonical_history_commit, ref.path);
     assert.equal(hash(old), ref.sha256, 'unauthenticated acquisition context ' + ref.path); assert.equal(old.length, ref.bytes);
   };
-  let changed = 0, historical = 0;
+  let changed = 0, historical = 0; const changedPaths = [];
   for (const ref of final.source_bindings) {
     if (canonicalHistory.has(ref.path)) {
       historicalCanonicalMember(ref);
       historical++; continue;
     }
     const successor = repairs.qualify(ref);
-    if (successor) { assert.deepEqual(repairs.historicalReference(ref), ref); assert.notEqual(successor.sha256, ref.sha256); changed++; }
+    if (successor) { assert.deepEqual(repairs.historicalReference(ref), ref); assert.notEqual(successor.sha256, ref.sha256); changed++; changedPaths.push(ref.path); }
     const prior = successor || currentSourceReference(ref);
     member(tabs.qualify(prior) || prior);
   }
-  assert.equal(changed, 5); assert.equal(historical, 3);
+  assert.equal(changed, 10); assert.deepEqual(changedPaths.sort(), ['compatibility/rc/api/signature-differences.json','projects/ngx-material-legacy/legacy-dialog/dialog-container.ts','projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts','projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts','projects/ngx-material-legacy/legacy-form-field/testing/error-harness.ts','projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts','projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts','projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts','projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts','projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts']); assert.equal(historical, 3);
   const original = JSON.parse(gunzipSync(read(SOURCE + 'originals.json.gz')));
   const census = JSON.parse(gunzipSync(read('compatibility/rc/upstream-complete-patch-census.json.gz')));
   const originalFacts = verifyBaseClassRemovalOriginal(original, census);
@@ -187,6 +190,13 @@ function inspectSource(request = {}) {
   assert.equal(api.line, '21.x'); assert.equal(api.status, 'pass'); assert.deepEqual(api.comparison.blocking, []);
   assert.equal(api.waiver_transition.current, 113); assert.equal(api.controls_rejected, 11);
   assert.equal(api.full449symbol_program_executed, false);
+  // The tabs successor owns additional source evidence beyond the historical
+  // 715-row roster. Include every current tabs judgment in the returned guard.
+  for (const ref of tabs.bound) {
+    const prior = bound.get(ref.path);
+    if (prior) assert.deepEqual(prior, ref, 'conflicting tabs source judgment ' + ref.path);
+    else bound.set(ref.path, ref);
+  }
   const assertCurrent = () => {
     assertMetadata();
     repairs.assertCurrent();
@@ -197,6 +207,8 @@ function inspectSource(request = {}) {
       if (providedRead) { const provided = providedRead(ref.path); assert.ok(equal(actual, provided), 'late nonphysical base-class admission input ' + ref.path); }
       assert.ok(equal(actual, readHistoricalContractRepairMember(root, ref.path)), 'base-class admission input changed during callback ' + ref.path);
     }
+    // A later supplied callback can change a tabs-only input already checked.
+    tabs.assertCurrent();
     assertMetadata();
   };
   assertCurrent();

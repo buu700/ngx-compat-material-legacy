@@ -14,7 +14,7 @@ import {spawnSync} from 'node:child_process';
 import {join,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {isDeepStrictEqual,types} from 'node:util';
-const expectedSha=b=>createHash('sha256').update(b).digest('hex'),expectedEngineHash='6f6475a85f4361d0bb90c15c5b966c799499def63d2f1f5a93e2bfb09d584b86';
+const expectedSha=b=>createHash('sha256').update(b).digest('hex'),expectedEngineHash='356337aa30fed58fcc25afeaabca5ebb3695623c0f17a0aff497a3bd92b4a383';
 function expectedPlain(v){
  if(v===null||['string','boolean'].includes(typeof v))return v;
  if(typeof v==='number'){if(!Number.isSafeInteger(v))throw Error('number');return v;}

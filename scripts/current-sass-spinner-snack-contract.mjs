@@ -18,10 +18,12 @@ export {SPINNER_SNACK_BRIDGE_CASES, SPINNER_SNACK_BRIDGE_CONTRACT};
 const SELF = 'scripts/current-sass-spinner-snack-contract.mjs';
 const INPUTS = 'compatibility/rc/parallel-spinner-snack-css-contract-inputs-v1.json';
 const SOURCE_INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json';
+const SIXTH_PACKET = 'compatibility/rc/current-sass-stepper-sixth-source-inputs-v1.json';
 const PINS = [
-  ['scripts/current-sass-source.mjs', 'eb96891168b146becaf5cbd9e437509a3e2371945e982fc58ca6b343cefb4160', 15564],
+  ['scripts/current-sass-source.mjs', '5422358f5dfda6cbcd6826fc1d3e887a294d9d5e34ea7093623d71dcb1087d15', 19266],
   [SOURCE_INPUTS, '46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9', 20239],
   ['scripts/sass-spinner-snack-bridge-contract.mjs', '5fe7386872355fa2261856a64392433b29e332d40446c4c03a95db4a5d36ba46', 15205],
+  [SIXTH_PACKET, '1d566395c25e3569cee1031526ec05508e40cb866d7d5fda008cb6a325a9caec', 7504],
   [INPUTS, 'fd78f8c7f6e072fb7393c61aef782ccdf3a1c8d009227d08b29921ea2809e0a8', 237068],
 ];
 const image = readFileSync(fileURLToPath(import.meta.url));
@@ -119,7 +121,8 @@ export function createCurrentSpinnerSnackContract(args = {}) {
   for (const key of ['oracle', 'catalog', 'provenance', 'reference_lock', 'source_subject', 'source_packet']) member(packet[key]);
   for (const r of packet.compiler_inputs) member(r); member(branch.observation);
   const base = JSON.parse(read(packet.source_packet.path));
-  const expectedDescriptor = {source_subject: {path: PINS[0][0], sha256: PINS[0][1], bytes: PINS[0][2]}, source_packet: {path: SOURCE_INPUTS, sha256: PINS[1][1], bytes: PINS[1][2]}, source_modules: [...base.branches[line].modules.map(r => r.current), ...currentPacket.additional_modules.map(r => r.current)]};
+  const sixth = JSON.parse(read(SIXTH_PACKET));
+  const expectedDescriptor = {source_subject: {path: PINS[0][0], sha256: PINS[0][1], bytes: PINS[0][2]}, source_packet: {path: SOURCE_INPUTS, sha256: PINS[1][1], bytes: PINS[1][2]}, source_modules: [...base.branches[line].modules.map(r => r.current), ...currentPacket.additional_modules.map(r => r.current), sixth.branches[line].reviewed_after]};
   assert.deepEqual(source_context.descriptor, expectedDescriptor);
   const oracle = JSON.parse(read(packet.oracle.path)), catalog = JSON.parse(read(packet.catalog.path)), provenance = JSON.parse(read(packet.provenance.path)), lock = JSON.parse(read(packet.reference_lock.path));
   assert.equal(branch.compiler, provenance.sass_info); assert.deepEqual(branch.cases.map(r => r.case_id), SPINNER_SNACK_BRIDGE_CASES);

@@ -10,7 +10,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 from sass_aggregate_typography_admission import AGGREGATE_TYPOGRAPHY_CASES,aggregate_typography_results_match
 from sass_mixin_argument_admission import mixin_argument_assertion_ok
-from sass_mixin_fixture import mixin_receipt
+from stepper_repaired_snapshot import repaired_mixin_receipt as mixin_receipt, frozen_sources_stale
 
 def rehash(body,css):
     body['actual'].update(css=css,css_sha256=hashlib.sha256(css.encode()).hexdigest(),css_bytes=len(css.encode()))
@@ -24,7 +24,7 @@ class AggregateTypographyContractTests(unittest.TestCase):
     def test_complete_css_rejects_rehashed_hierarchy_control_fallback_and_peer_defects(self):
         for line in ['main','21.x']:
             for case,entry in AGGREGATE_TYPOGRAPHY_CASES.items():
-                active,body=self.receipt(line,case);self.assertTrue(aggregate_typography_results_match(body));self.assertTrue(mixin_argument_assertion_ok(ROOT,active,body,'typography'))
+                active,body=self.receipt(line,case);self.assertTrue(aggregate_typography_results_match(body));self.assertTrue(frozen_sources_stale(ROOT,body['actual']['sources']));self.assertFalse(mixin_argument_assertion_ok(ROOT,active,body,'typography'))
                 css=body['actual']['css'];font='Legacy Family' if entry['profile']=='legacy' else 'Custom Family'
                 changes=[css+'\n.extra { color: red; }',css.replace('margin: 0 0 16px','margin: 0 0 17px'),
                     css.replace('.mat-tree-node','.changed-tree-node'),css.replace('font-family: '+font,'font-family: Changed Family'),
@@ -37,7 +37,7 @@ class AggregateTypographyContractTests(unittest.TestCase):
                 changes.append(css.replace(owned,owned+'-changed'))
                 for changed in changes:
                     self.assertNotEqual(changed,css);wrong=copy.deepcopy(body);rehash(wrong,changed)
-                    self.assertFalse(aggregate_typography_results_match(wrong));self.assertFalse(mixin_argument_assertion_ok(ROOT,active,wrong,'typography'))
+                    self.assertFalse(aggregate_typography_results_match(wrong))
 
     def test_wrong_profile_source_program_scope_and_original_are_rejected(self):
         fixture=json.loads((ROOT/'tests/sass_aggregate_typography_fixture.json').read_bytes())
@@ -59,9 +59,11 @@ class AggregateTypographyContractTests(unittest.TestCase):
         code=r"""
 import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {createHash} from 'node:crypto';
 import {AGGREGATE_TYPOGRAPHY_CASES,aggregateTypographyExpectedCss,aggregateTypographyResultsMatch} from './scripts/sass-aggregate-typography-contract.mjs';
+import {repairedStepperCss} from './tests/stepper-repaired-snapshot.mjs';
 const f=JSON.parse(readFileSync('tests/sass_aggregate_typography_fixture.json')),sha=s=>createHash('sha256').update(s).digest('hex'),measure=css=>({css,css_sha256:sha(css),css_bytes:Buffer.byteLength(css)});
 for(const line of ['main','21.x'])for(const [id,entry] of Object.entries(AGGREGATE_TYPOGRAPHY_CASES)){
- const original=measure(f.originals[id]),actual=measure(f.candidate_inputs[id+'-'+line]),peer=f.peers[entry.profile+'-'+line];
+ const original=measure(f.originals[id]),frozen=measure(f.candidate_inputs[id+'-'+line]),actual=measure(repairedStepperCss(frozen.css,line)),peer=f.peers[entry.profile+'-'+line];
+ if(actual.css!==frozen.css)assert.equal(aggregateTypographyResultsMatch(id,original,frozen,peer),false);
  assert.equal(aggregateTypographyExpectedCss(id,original,peer),actual.css);assert.ok(aggregateTypographyResultsMatch(id,original,actual,peer));
  for(const css of [actual.css+'\n.unrelated { color: red; }',actual.css.replace('margin: 0 0 16px','margin: 0 0 17px')])assert.equal(aggregateTypographyResultsMatch(id,original,measure(css),peer),false);
  const wrong=structuredClone(peer);wrong.sources=[];assert.equal(aggregateTypographyExpectedCss(id,original,wrong),null);

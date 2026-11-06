@@ -68,6 +68,32 @@ check('each V3 predecessor and literal successor is exact',()=>{
   assert.equal(source.qualify({...row.before,sha256:'0'.repeat(64)}),null);
  }
 });
+check('floor data successor stays exact and physically guarded',()=>{
+ const path='compatibility/rc/consumer-floor-plan.json', row=nextBranch.updates.find(r=>r.path===path);assert.ok(row);
+ const before=source.comparisonBytes(row.before), after=source.comparisonBytes(row.after);
+ assert.deepEqual(source.qualify(row.before),row.after);assert.deepEqual(source.qualify(row.after),row.after);
+ const old=JSON.parse(before), latest=JSON.parse(after), profiles=latest.node_sources_by_platform;delete latest.node_sources_by_platform;
+ assert.deepEqual(latest,old);assert.deepEqual(profiles['linux-x64'],old.node_sources);assert.ok(profiles['linux-arm64']);
+ assert.equal(source.qualify({...row.before,sha256:'0'.repeat(64)}),null);assert.equal(source.qualify({path:'compatibility/rc/not-the-floor.json',sha256:row.before.sha256}),null);
+ assert.throws(()=>currentSassToolReferenceSubject({root,read:p=>p===path?before:readFileSync(join(root,p))}));
+ const physical=join(root,path), saved=readFileSync(physical);
+ try{writeFileSync(physical,before);assert.throws(()=>source.assertCurrent());assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{writeFileSync(physical,saved);}
+ try{writeFileSync(physical,Buffer.concat([saved,Buffer.from(' ')]));assert.throws(()=>source.assertCurrent());assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{writeFileSync(physical,saved);}
+ let armed=false;const last=source.bound.at(-1).path,live=currentSassToolReferenceSubject({root,read:p=>{const raw=readFileSync(join(root,p));if(armed&&p===last){armed=false;writeFileSync(physical,before);}return raw;}});
+ try{armed=true;assert.throws(()=>live.assertCurrent());}finally{writeFileSync(physical,saved);}live.assertCurrent();
+});
+check('floor roster predecessor remains data with physical guards',()=>{
+ const path='scripts/consumer-floor-roster.mjs',row=nextBranch.updates.find(r=>r.path===path);assert.ok(row);
+ const before=source.comparisonBytes(row.before),after=source.comparisonBytes(row.after);
+ assert.deepEqual(source.qualify(row.before),row.after);assert.deepEqual(source.qualify(row.after),row.after);
+ assert.equal(hash(before),row.before.sha256);assert.equal(hash(after),row.after.sha256);
+ assert.equal(source.qualify({...row.before,sha256:'0'.repeat(64)}),null);
+ assert.throws(()=>currentSassToolReferenceSubject({root,read:p=>p===path?before:readFileSync(join(root,p))}));
+ const physical=join(root,path),saved=readFileSync(physical);
+ for(const altered of [before,Buffer.concat([saved,Buffer.from(' ')])])try{writeFileSync(physical,altered);assert.throws(()=>source.assertCurrent());assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{writeFileSync(physical,saved);}
+ let armed=false;const last=source.bound.at(-1).path,live=currentSassToolReferenceSubject({root,read:p=>{const raw=readFileSync(join(root,p));if(armed&&p===last){armed=false;writeFileSync(physical,before);}return raw;}});
+ try{armed=true;assert.throws(()=>live.assertCurrent());}finally{writeFileSync(physical,saved);}live.assertCurrent();
+});
 check('new table stage predecessor is the frozen owner packet identity',()=>{
  const row=nextBranch.updates.find(r=>r.path==='scripts/table-local-compilation-canonical-stage.mjs');
  if(source.line==='21.x'){

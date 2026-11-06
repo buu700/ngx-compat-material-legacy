@@ -1,13 +1,14 @@
 """One whole ordered aggregate: historical sequence and exact public contributions."""
 import hashlib,json,re,subprocess,shutil
 from pathlib import Path
+from sass_stepper_historical_model import historical_stepper_peer_css
 from sass_ordered_button_composition import compose_ordered_aggregate_button
 from sass_ordered_button_source_guard import ordered_button_source_guard
 from sass_current_companion_admission import peer_measurement_ok
 from sass_ordered_core_admission import ordered_core_expected_css
 from sass_ripple_color_admission import insert_ripple_color_in_expected_model, ripple_color_measurement_ok
 ROOT=Path(__file__).resolve().parents[1]
-_EXPECTED_ENGINE='6f6475a85f4361d0bb90c15c5b966c799499def63d2f1f5a93e2bfb09d584b86'
+_EXPECTED_ENGINE='356337aa30fed58fcc25afeaabca5ebb3695623c0f17a0aff497a3bd92b4a383'
 def _expected_plain(value):
     if value is None or type(value) in (str,bool):return value
     if type(value) is int and abs(value)<=9007199254740991:return value
@@ -109,8 +110,10 @@ def _parent(scope,*parts):
     if not values or any(not p.startswith(opening) or not p.endswith('\n}') or p.count(opening)!=1 for p in values):return None
     return opening+'\n'.join(p[len(opening):-2] for p in values)+'\n}'
 
-def _theme_model(group,p):
+def _theme_model(group,p,line):
     profile=_CATALOG['profiles'][group];css=_CATALOG['parts'][group];scope=profile['scope'];lead=scope+' ' if scope else '';o={f:m['css'] for f,m in profile['originals'].items()}
+    p={**p,'stepper':historical_stepper_peer_css(p['stepper'],o['stepper'],line,True)}
+    if p['stepper'] is None:return None
     if not scope:p={f:_root_blocks(body) for f,body in p.items()}
     order=[f for f in _FAMILIES if o[f]];pos=[css.find(o[f]) for f in order]
     if any(css.count(o[f])!=1 for f in order):return None
@@ -151,7 +154,7 @@ def ordered_aggregate_expected_css(peers,line):
         if set(peers)!=set(['core']+_GROUPS) or peers['core']['line']!=line:return None
         core=ordered_core_expected_css('02-core',peers['core'],line);parts={g:_members(g,peers[g],line) for g in _GROUPS}
         if core is None or any(p is None for p in parts.values()):return None
-        light=_theme_model('light',parts['light']);dark=_theme_model('dark',parts['dark'])
+        light=_theme_model('light',parts['light'],line);dark=_theme_model('dark',parts['dark'],line)
         if light is None or dark is None:return None
         css=core+'\n'+'\n\n'.join([light,dark,_CATALOG['parts']['panel']+'\n\n'+parts['panel']['expansion']])
         return insert_ripple_color_in_expected_model('06-aggregate-and-companions',css,peers['light'],aggregate=True)

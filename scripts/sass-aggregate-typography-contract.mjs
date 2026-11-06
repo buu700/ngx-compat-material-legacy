@@ -1,5 +1,6 @@
 /** Four typography aggregates: retain every owned byte around qualified companions. */
 import {createHash} from 'node:crypto';
+import {historicalStepperPeerCss} from './sass-stepper-historical-model.mjs';
 import {readFileSync} from 'node:fs';
 import {SCENARIOS,themeSass,COMPANIONS} from './companion-bridge-peer-oracle.mjs';
 import {measureM2PeerProgram,peerMeasurementMatches} from './sass-current-companion-peer.mjs';
@@ -46,6 +47,8 @@ export function aggregateTypographyExpectedCss(caseId,original,peer){
     || peer.program_sha256!==floor.program_sha256 || peer.css_sha256!==floor.css_sha256)return null;
   const p=peerMembers(peer.css);if(!p)return null;
   const o=Object.fromEntries(Object.entries(profile.originals).map(([family,m])=>[family,m.css]));
+  p.stepper=historicalStepperPeerCss(p.stepper,o.stepper,peer.line,false);
+  if(p.stepper===null)return null;
   if(COMPANIONS.some(f=>!Object.hasOwn(o,f) || sha(o[f])!==profile.originals[f].css_sha256
     || Buffer.byteLength(o[f])!==profile.originals[f].css_bytes))return null;
   if(p['grid-list']!==o['grid-list'] || p.toolbar!==o.toolbar || p.icon!=='' || p.sort!==''

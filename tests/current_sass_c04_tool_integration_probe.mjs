@@ -23,13 +23,13 @@ const REPORTS=[
 const RETENTION={path:'compatibility/rc/21x-c04-modern-control-base-measurement-21x.json',sha256:'4e99b606b4bcbf162f00edf8b8dcd7d4ff58a16760ec34d8d674a0b8720c124f',bytes:109842};
 const source=spinnerSnackC04Source({root}),line=source.bridge.line;
 const bound=structuredClone(source.bound),summary=structuredClone(source.summary),transitions=structuredClone(source.bridge.transitions);
-assert.equal(transitions.length,5);checks.push('real current C04/tool constructor');
+assert.equal(transitions.length,6);checks.push('real current C04/tool constructor with sixth historical bridge transition');
 const productRefs=[];
 for(const row of transitions){
  const before={path:row.path,sha256:row.before.sha256,bytes:row.before.bytes,role:'authentic historical comparison metadata',nested:{preserved:true}};
  const current=source.qualify(before);
  assert.deepEqual(current,{...before,sha256:row.current.sha256,bytes:row.current.bytes});
- productRefs.push({before,current});checks.push('five-module current qualifier '+row.path);
+ productRefs.push({before,current});checks.push('six-source current qualifier '+row.path);
 }
 source.bound.length=0;source.summary.sources.length=0;source.bridge.bound.length=0;source.bridge.transitions[0].path='foreign.scss';
 source.assertCurrent();assert.deepEqual(source.qualify(productRefs[0].before),productRefs[0].current);

@@ -6,6 +6,7 @@
  */
 /** One sequence-sensitive aggregate preserves whole owned16 CSS around public peers. */
 import {createHash} from 'node:crypto';
+import {historicalStepperPeerCss} from './sass-stepper-historical-model.mjs';
 import {readFileSync,realpathSync} from 'node:fs';
 import {isAbsolute,join,relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -77,9 +78,11 @@ function parent(scope,...parts){
   if(!values.length||values.some(p=>!p.startsWith(opening)||!p.endsWith('\n}')||p.split(opening).length!==2))return null;
   return opening+values.map(p=>p.slice(opening.length,-2)).join('\n')+'\n}';
 }
-function themeModel(group,p){
+function themeModel(group,p,line){
   const profile=catalog.profiles[group],css=catalog.parts[group],scope=profile.scope,lead=scope?scope+' ':'';
   const o=Object.fromEntries(Object.entries(profile.originals).map(([f,m])=>[f,m.css]));
+  p={...p,stepper:historicalStepperPeerCss(p.stepper,o.stepper,line,true)};
+  if(p.stepper===null)return null;
   if(!scope)p=Object.fromEntries(Object.entries(p).map(([f,css])=>[f,rootBlocks(css)]));
   const order=families.filter(f=>o[f]);if(order.some(f=>css.split(o[f]).length!==2))return null;
   const pos=order.map(f=>css.indexOf(o[f])),sep=Object.fromEntries(order.slice(0,-1).map((f,i)=>[f,css.slice(pos[i]+o[f].length,pos[i+1])]));
@@ -112,7 +115,7 @@ export function orderedAggregateExpectedCss(peers,line){
   if(!peers||!equal(Object.keys(peers).sort(),['core',...groups].sort())||peers.core?.line!==line)return null;
   const core=orderedCoreExpectedCss('02-core',peers.core),parts=Object.fromEntries(groups.map(g=>[g,members(g,peers[g],line)]));
   if(core===null||Object.values(parts).some(p=>p===null))return null;
-  const light=themeModel('light',parts.light),dark=themeModel('dark',parts.dark);if(light===null||dark===null)return null;
+  const light=themeModel('light',parts.light,line),dark=themeModel('dark',parts.dark,line);if(light===null||dark===null)return null;
   const css=core+'\n'+[light,dark,catalog.parts.panel+'\n\n'+parts.panel.expansion].join('\n\n');
   return insertRippleColorInExpectedModel(id,css,peers.light,{aggregate:true});
 }

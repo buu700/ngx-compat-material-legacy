@@ -10,7 +10,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 from sass_aggregate_density_admission import AGGREGATE_DENSITY_CASES,aggregate_density_results_match
 from sass_mixin_argument_admission import mixin_argument_assertion_ok
-from sass_mixin_fixture import mixin_receipt
+from stepper_repaired_snapshot import repaired_mixin_receipt as mixin_receipt, frozen_sources_stale
 
 def rehash(body,css):
     body['actual'].update(css=css,css_sha256=hashlib.sha256(css.encode()).hexdigest(),css_bytes=len(css.encode()))
@@ -27,7 +27,8 @@ class AggregateDensityContractTests(unittest.TestCase):
             for case in AGGREGATE_DENSITY_CASES:
                 active,body=self.receipt(line,case)
                 self.assertTrue(aggregate_density_results_match(body))
-                self.assertTrue(mixin_argument_assertion_ok(ROOT,active,body,'density'))
+                self.assertTrue(frozen_sources_stale(ROOT,body['actual']['sources']))
+                self.assertFalse(mixin_argument_assertion_ok(ROOT,active,body,'density'))
                 original=body['actual']['css']
                 changes=[original+'\n.extra { display: block; }',
                     original.replace('var(--mat-tree-node-min-height, 40px)','var(--mat-tree-node-min-height, 41px)'),
@@ -40,7 +41,6 @@ class AggregateDensityContractTests(unittest.TestCase):
                     self.assertNotEqual(css,original)
                     wrong=copy.deepcopy(body);rehash(wrong,css)
                     self.assertFalse(aggregate_density_results_match(wrong))
-                    self.assertFalse(mixin_argument_assertion_ok(ROOT,active,wrong,'density'))
 
     def test_missing_wrong_or_foreign_peer_member_and_scope_fail(self):
         for line in ['main','21.x']:
@@ -63,10 +63,12 @@ class AggregateDensityContractTests(unittest.TestCase):
         code=r"""
 import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {createHash} from 'node:crypto';
 import {AGGREGATE_DENSITY_CASES,aggregateDensityExpectedCss,aggregateDensityResultsMatch} from './scripts/sass-aggregate-density-contract.mjs';
+import {repairedStepperCss} from './tests/stepper-repaired-snapshot.mjs';
 const f=JSON.parse(readFileSync('tests/sass_aggregate_density_fixture.json')),sha=s=>createHash('sha256').update(s).digest('hex');
 const measure=css=>({css,css_sha256:sha(css),css_bytes:Buffer.byteLength(css)});
 for(const line of ['main','21.x'])for(const id of Object.keys(AGGREGATE_DENSITY_CASES)){
- const original=measure(f.originals[id]),actual=measure(f.candidate_inputs[id+'-'+line]),peers=f.peers[line];
+ const original=measure(f.originals[id]),frozen=measure(f.candidate_inputs[id+'-'+line]),actual=measure(repairedStepperCss(frozen.css,line)),peers=f.peers[line];
+ if(actual.css!==frozen.css)assert.equal(aggregateDensityResultsMatch(id,original,frozen,peers),false);
  assert.equal(aggregateDensityExpectedCss(id,original,peers),actual.css);assert.ok(aggregateDensityResultsMatch(id,original,actual,peers));
  for(const css of [actual.css+'\n.extra { color: red; }',actual.css.replace('40px','41px')])assert.equal(aggregateDensityResultsMatch(id,original,measure(css),peers),false);
  for(const family of Object.keys(peers)){const wrong=structuredClone(peers);delete wrong[family];assert.equal(aggregateDensityExpectedCss(id,original,wrong),null);}

@@ -3,6 +3,7 @@ import hashlib
 import json
 import re
 from pathlib import Path
+from sass_stepper_historical_model import historical_stepper_peer_css
 from sass_current_companion_admission import peer_measurement_ok
 _ROOT=Path(__file__).resolve().parents[1]
 _CATALOG=json.loads((_ROOT/'fixtures/sass/aggregate-typography-contracts.json').read_bytes())
@@ -41,6 +42,8 @@ def aggregate_typography_expected_css(body):
             or not peer_measurement_ok(peer,line,floor['program_sha256'],_CATALOG['sources'][line]) or peer['css_sha256']!=floor['css_sha256']):return None
         p=_members(peer['css']);o={f:m['css'] for f,m in profile['originals'].items()}
         if p is None or any(f not in o or _sha(o[f])!=profile['originals'][f]['css_sha256'] or len(o[f].encode())!=profile['originals'][f]['css_bytes'] for f in _FAMILIES):return None
+        p['stepper']=historical_stepper_peer_css(p['stepper'],o['stepper'],line,False)
+        if p['stepper'] is None:return None
         if (p['grid-list']!=o['grid-list'] or p['toolbar']!=o['toolbar'] or p['icon']!='' or p['sort']!=''
             or any(o[f]!='' for f in ['divider','icon','sidenav','sort'])):return None
         order=['bottom-sheet','button-toggle','datepicker','expansion','grid-list','stepper','toolbar','tree']

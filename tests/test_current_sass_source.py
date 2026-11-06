@@ -1,7 +1,7 @@
 # Copyright Google LLC All Rights Reserved.
 # Copyright (c) 2026 Ryan Lester.
 # Use of this source code is governed by the MIT license in LICENSE.
-"""Five-module physical fixture checks; no workspace product application or CSS claim."""
+"""Six-module physical fixture checks; no workspace product application or CSS claim."""
 import hashlib
 import json
 import os
@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 
 from current_sass_source import CurrentSassSource
+from select_dialog_finite_source_successor_v4 import PACKETS, PATHS, LATEST, SELF as PRODUCT_SUCCESSOR, SelectDialogFiniteSourceV4
 
 NODE = '/nix/store/w8jijs92barihdb0z54dsgq5szj2wd47-nodejs-24.21.0/bin/node'
 INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json'
@@ -29,7 +30,13 @@ def candidate_fixture(destination):
     census = json.loads((ROOT / packet['style_template_census']['path']).read_bytes())
     line = '21.x' if json.loads((ROOT / 'projects/ngx-material-legacy/package.json').read_bytes())['version'].startswith('21.') else 'main'
     source = base['branches'][line]
-    paths = {INPUTS, 'scripts/current-sass-source.mjs', 'scripts/current_sass_source.py', 'scripts/canonical-source-guard-plan.mjs'}
+    paths = {INPUTS, 'scripts/current-sass-source.mjs', 'scripts/current_sass_source.py', 'scripts/canonical-source-guard-plan.mjs', 'scripts/select-dialog-finite-source-successor.mjs'}
+    paths.update(row['path'] for row in CurrentSassSource(ROOT).bound)
+    paths.update(('scripts/upstream-packed-run-evidence.mjs', 'scripts/dialog-focus-finite-source-successor.mjs', 'scripts/stepper-sixth-source.mjs'))
+    paths.add(PRODUCT_SUCCESSOR)
+    paths.update(row[0] for row in PACKETS)
+    paths.update(PATHS)
+    paths.update(LATEST)
     paths.add(packet['prior_four_module_profile']['packet']['path'])
     paths.update(packet[key]['path'] for key in ('historical_source_packet', 'historical_source_subject', 'historical_css_packet', 'proposal', 'protected_input_packet', 'style_template_census'))
     paths.update(css[key]['path'] for key in ('oracle', 'catalog', 'provenance', 'reference_lock'))
@@ -68,13 +75,13 @@ class CurrentSassSourceTests(unittest.TestCase):
     def tearDownClass(cls):
         cls.temp.cleanup()
 
-    def test_exact_five_modules_and_before_comparisons(self):
+    def test_exact_six_modules_and_before_comparisons(self):
         self.assertEqual(self.context.line, self.line)
-        self.assertEqual(len(self.context.transitions), 5)
+        self.assertEqual(len(self.context.transitions), 6)
         for row in self.context.transitions:
             with self.subTest(path=row['path']):
-                self.assertEqual(self.context.qualify(row['current']), row['current'])
-                self.assertEqual(self.context.qualify({**row['before'], 'path': row['path']}), row['current'])
+                self.assertEqual(self.context.qualify(row['current']), {key: row['current'][key] for key in ('path', 'sha256', 'bytes')})
+                self.assertEqual(self.context.qualify({**row['before'], 'path': row['path']}), {key: row['current'][key] for key in ('path', 'sha256', 'bytes')})
                 with self.assertRaises(AssertionError):
                     self.context.qualify(dict(path=row['path'], sha256='0' * 64))
                 with self.assertRaises(AssertionError):
@@ -94,6 +101,101 @@ class CurrentSassSourceTests(unittest.TestCase):
             finally:
                 path.write_bytes(before)
             self.context.assert_current()
+
+    def test_v4_product_predecessors_and_physical_controls(self):
+        successor = SelectDialogFiniteSourceV4(self.root, line=self.line)
+        packet = json.loads((self.root / PACKETS[-1][0]).read_bytes())
+        branch = packet['branches'][self.line]
+        rows = branch['transitions']
+        latest = branch['d61_menu_transitions']
+        self.assertEqual(len({row['path'] for row in successor.bound if row['path'].startswith('projects/ngx-material-legacy/legacy-')}), 9)
+        for row in rows + latest:
+            with self.subTest(path=row['path']):
+                before = {key: row['before'][key] for key in ('path', 'sha256', 'bytes')}
+                after = {key: row['after'][key] for key in ('path', 'sha256', 'bytes')}
+                current = successor.qualify(before)
+                self.assertEqual(current['path'], row['path'])
+                self.assertEqual(successor.qualify(after), current)
+                self.assertEqual(successor.historical_reference(before)['sha256'],
+                                 next(r for r in rows + latest if r['path'] == row['path'])['before']['sha256'])
+                with self.assertRaises(AssertionError):
+                    successor.qualify(dict(path=row['path'], sha256='0' * 64))
+        target = self.root / latest[-1]['path']
+        original = target.read_bytes()
+        try:
+            target.write_bytes(original + b'\n// changed product\n')
+            with self.assertRaises(AssertionError):
+                SelectDialogFiniteSourceV4(self.root, line=self.line)
+            with self.assertRaises(AssertionError):
+                successor.assert_current()
+        finally:
+            target.write_bytes(original)
+        successor.assert_current()
+        packet_file = self.root / PACKETS[-1][0]
+        packet_bytes = packet_file.read_bytes()
+        try:
+            packet_file.write_bytes(packet_bytes + b'\n')
+            with self.assertRaises(AssertionError):
+                SelectDialogFiniteSourceV4(self.root, line=self.line)
+        finally:
+            packet_file.write_bytes(packet_bytes)
+        successor.assert_current()
+
+    def test_v4_successor_final_callback_sweeps_earlier_product(self):
+        target = self.root / PATHS[0]
+        original = target.read_bytes()
+        armed = False
+        last = 'projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts'
+        def callback(path):
+            nonlocal armed
+            raw = (self.root / path).read_bytes()
+            if armed and path == last:
+                armed = False
+                target.write_bytes(original + b'\n<!-- changed -->\n')
+            return raw
+        successor = SelectDialogFiniteSourceV4(self.root, read=callback, line=self.line)
+        try:
+            armed = True
+            with self.assertRaises(AssertionError):
+                successor.assert_current()
+        finally:
+            target.write_bytes(original)
+        successor.assert_current()
+
+    def test_v4_optimized_python_rejects_source_constructors(self):
+        code = ("import sys; from pathlib import Path; "
+                "sys.path.insert(0, sys.argv[1]); "
+                "from select_dialog_finite_source_successor_v4 import SelectDialogFiniteSourceV4; "
+                "from current_sass_source import CurrentSassSource; "
+                "root = Path(sys.argv[2]); "
+                "\nfor cls in (SelectDialogFiniteSourceV4, CurrentSassSource):\n"
+                "    try: cls(root)\n"
+                "    except RuntimeError as error:\n"
+                "        if 'optimized Python' not in str(error): raise\n"
+                "    else: raise RuntimeError('optimized constructor accepted')\n")
+        child = subprocess.run([sys.executable, '-O', '-c', code, str(ROOT / 'scripts'), str(self.root)],
+                               cwd=ROOT, text=True, capture_output=True, timeout=30)
+        self.assertEqual(child.returncode, 0, child.stderr)
+
+    def test_v4_last_callback_cannot_mutate_earlier_product(self):
+        target = self.root / PATHS[0]
+        original = target.read_bytes()
+        armed = False
+        def callback(path):
+            nonlocal armed
+            raw = (self.root / path).read_bytes()
+            if armed and path == self.context.bound[-1]['path']:
+                armed = False
+                target.write_bytes(original + b'\n<!-- changed -->\n')
+            return raw
+        context = CurrentSassSource(self.root, read=callback)
+        try:
+            armed = True
+            with self.assertRaises(AssertionError):
+                context.assert_current()
+        finally:
+            target.write_bytes(original)
+        context.assert_current()
 
     def test_prior_four_module_card_bytes_cannot_qualify_current_five(self):
         packet = json.loads((ROOT / INPUTS).read_bytes())

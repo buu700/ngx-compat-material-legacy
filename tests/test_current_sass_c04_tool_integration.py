@@ -46,7 +46,7 @@ class CurrentC04ToolIntegrationTests(unittest.TestCase):
             child=subprocess.run([NODE,str(ROOT/'tests/current_sass_c04_tool_integration_probe.mjs'),str(root)],
                 cwd=ROOT,text=True,capture_output=True,timeout=120)
             self.assertEqual(child.returncode,0,child.stderr[-12000:]);report=json.loads(child.stdout)
-            self.assertEqual(report['line'],line);self.assertEqual(len(report['product_refs']),5)
+            self.assertEqual(report['line'],line);self.assertEqual(len(report['product_refs']),6)
             self.assertEqual(report['compiler_calls'],0);self.assertFalse(report['old_physical_constructor_executed'])
             self.assertFalse(report['current_product_projection_used']);self.assertFalse(report['artifact_or_audit_admission_granted'])
             if line=='21.x':

@@ -1,7 +1,7 @@
 # Copyright Google LLC All Rights Reserved.
 # Copyright (c) 2026 Ryan Lester.
 # Use of this source code is governed by the MIT license in LICENSE.
-"""Card12 five-source contexts, retained CSS and modeled envelopes; no compiler."""
+"""Card12 six-source contexts, retained CSS and modeled envelopes; no compiler."""
 import copy
 import hashlib
 import json
@@ -66,7 +66,7 @@ class OrdinaryCardGateTests(unittest.TestCase):
             destination = os.environ.get('ORDINARY_CARD_GATE_REPORT')
             if destination:
                 report = dict(schema_version=1, result='pass' if len(cls.checks)==14 and len(cls.rejects)==34 and cls.js is not None and cls.js['result']=='pass' else 'incomplete', line=cls.line, python_checks=cls.checks, python_rejected=cls.rejects,
-                    js=cls.js, actual_five_source_constructor=True, source_population=len(cls.sources), reused_retained_batches=2,
+                    js=cls.js, actual_six_source_constructor=True, source_population=len(cls.sources), reused_retained_batches=2,
                     fresh_compiles=0, actual_artifact_runs=0, workspace_card_applied=False, g11_claim='not-passed')
                 with Path(destination).open('x') as output:
                     output.write(json.dumps(report, indent=2) + '\n')
@@ -94,13 +94,13 @@ class OrdinaryCardGateTests(unittest.TestCase):
         return dict(root=self.root, context=self.context, body=body, active=SimpleNamespace(manifest=manifest, binding=binding), invocation=invocation)
 
     def test_01_all_twelve_actual_context_modeled_envelopes(self):
-        self.assertEqual(len(self.descriptor['source']['source_modules']), 5)
+        self.assertEqual(len(self.descriptor['source']['source_modules']), 6)
         self.assertEqual(len(self.rows), 12)
         self.assertEqual(sum(row['dimension'] in ('color', 'theme') for row in self.rows), 6)
         for row in self.rows:
             with self.subTest(case=row['case_id']):
                 self.assertTrue(gate.ordinary_card_gate_assertion_ok(**self.model(row)))
-                self.checks.append('actual-five-source/modeled-envelope/' + row['case_id'])
+                self.checks.append('actual-six-source/modeled-envelope/' + row['case_id'])
         copied = self.context.bound
         copied.clear()
         descriptor = gate.ordinary_card_gate_descriptor(self.context)

@@ -11,7 +11,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 from sass_mixin_argument_admission import mixin_argument_assertion_ok
 from sass_companion_addition_admission import COMPANION_ADDITION_CASES
-from sass_mixin_fixture import mixin_receipt
+from stepper_repaired_snapshot import repaired_mixin_receipt as mixin_receipt
 
 def active(line):
     return SimpleNamespace(binding={'source_line':line},manifest={'run_id':'synthetic','artifacts':[dict(id='library',sha256='c'*64)]})

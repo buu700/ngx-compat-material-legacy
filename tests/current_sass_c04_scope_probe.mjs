@@ -27,7 +27,13 @@ const qualify=(ref,prefix='')=>{const row=rows.get(prefix+ref.path),notice=notic
  if(notice){assert.ok([notice.before.sha256,notice.after.sha256].includes(ref.sha256));return {...ref,sha256:notice.after.sha256,bytes:notice.after.bytes};}
  return structuredClone(ref);};
 const census=historical.owned_scss_population.map(r=>qualify(r));
-const boundaries=[...structuredClone(historical.boundaries),...source.transitions.map(r=>inspectOwnedMaterialBoundary(r.path,read(r.path)))].sort((a,b)=>a.path.localeCompare(b.path));
+const bridgePath='projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss';
+assert.equal(historical.boundaries.filter(r=>r.path===bridgePath).length,1);
+assert.equal(source.transitions.filter(r=>r.path===bridgePath).length,1);
+const changed=source.transitions.map(r=>inspectOwnedMaterialBoundary(r.path,read(r.path)));
+assert.equal(changed.length,6);assert.equal(changed.filter(r=>r.path!==bridgePath).length,5);
+const boundaries=[...structuredClone(historical.boundaries).map(r=>r.path===bridgePath?changed.find(row=>row.path===bridgePath):r),
+ ...changed.filter(r=>r.path!==bridgePath)].sort((a,b)=>a.path.localeCompare(b.path));
 const mixins=[...historical.public_override_mixins,'progress-spinner-overrides','snack-bar-overrides','checkbox-overrides','button-overrides','card-overrides'].sort();
 const candidate=structuredClone(historical.candidate),peer=structuredClone(historical.current);
 candidate.program=candidate.program.replace('owned-material16-inspection-scope','projects/ngx-material-legacy');candidate.program_sha256=hash(candidate.program);
@@ -43,6 +49,9 @@ const checks=[],check=(name,operation)=>{operation();checks.push(name);};
 check('exact independently assembled five-module scope model',()=>assert.equal(assertCurrentSassInspectionScopeSuccessor({root,historical,current}).current_boundaries,9));
 const mutants={
  old_boundary_count:v=>v.boundaries.splice(4),old_override_count:v=>v.public_override_mixins.pop(),
+ historical_bridge_afterimage:v=>v.boundaries.find(r=>r.path===bridgePath).sha256=historical.boundaries.find(r=>r.path===bridgePath).sha256,
+ unknown_material_import:v=>v.boundaries.find(r=>r.path===bridgePath).peer_url='@angular/material/private',
+ widened_mixin_roster:v=>v.public_override_mixins.push('unowned-overrides'),
  historical_owned_hash:v=>v.owned_scss_population.find(r=>r.path.includes('/checkbox/_checkbox-theme')).sha256='0'.repeat(64),
  unrelated_owned_hash:v=>v.owned_scss_population.find(r=>r.path.includes('/legacy-checkbox/')).sha256='0'.repeat(64),
  candidate_program:v=>v.candidate.program+=' ',candidate_program_hash:v=>v.candidate.program_sha256='0'.repeat(64),

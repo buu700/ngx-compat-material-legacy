@@ -1,5 +1,6 @@
 /** Eight color/theme aggregates: exact historical CSS and finite public additions. */
 import {createHash} from 'node:crypto';
+import {historicalStepperPeerCss} from './sass-stepper-historical-model.mjs';
 import {readFileSync} from 'node:fs';
 import {SCENARIOS,themeSass,COMPANIONS} from './companion-bridge-peer-oracle.mjs';
 import {measureM2PeerProgram,peerMeasurementMatches} from './sass-current-companion-peer.mjs';
@@ -70,6 +71,8 @@ export function aggregateColorThemeExpectedCss(caseId,original,peer){
     || peer.program_sha256!==floor.program_sha256 || peer.css_sha256!==floor.css_sha256
     || peer.sources.length!==sources.length || sources.some(s=>!peer.sources.some(v=>v.root===s.root&&v.path===s.path&&v.sha256===s.sha256&&v.bytes===s.bytes)))return null;
   const p=members(peer.css),o=Object.fromEntries(Object.entries(profile.originals).map(([f,m])=>[f,m.css]));
+  if(p)p.stepper=historicalStepperPeerCss(p.stepper,o.stepper,peer.line,true);
+  if(p?.stepper===null)return null;
   if(!p || COMPANIONS.some(f=>!Object.hasOwn(o,f)||sha(o[f])!==profile.originals[f].css_sha256||Buffer.byteLength(o[f])!==profile.originals[f].css_bytes))return null;
   if(p['grid-list']!==o['grid-list'] || p.icon!==o.icon.replace('}\n\n.sass-argument-probe .mat-icon.mat-primary','}\n.sass-argument-probe .mat-icon.mat-primary'))return null;
   const order=COMPANIONS.filter(f=>o[f]);

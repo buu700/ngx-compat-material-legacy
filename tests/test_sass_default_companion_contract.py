@@ -4,7 +4,7 @@ from pathlib import Path
 from types import SimpleNamespace
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 from sass_default_companion_admission import DEFAULT_COMPANION_CASES,default_companion_assertion_ok,default_companion_envelope_ok
-from sass_default_companion_fixture import default_companion_receipt
+from stepper_repaired_snapshot import repaired_default_companion_receipt as default_companion_receipt, repaired_stepper_css
 
 def rehash(body,css):
     m=body['actual_measurement'];m.update(css=css,css_sha256=hashlib.sha256(css.encode()).hexdigest(),css_bytes=len(css.encode()));body.update(actual_sha256=m['css_sha256'],actual_bytes=m['css_bytes'])
@@ -19,7 +19,7 @@ class DefaultCompanionContractTests(unittest.TestCase):
             for case,e in DEFAULT_COMPANION_CASES.items():
                 active,body=self.receipt(line,case);self.assertTrue(default_companion_assertion_ok(body));self.assertTrue(default_companion_envelope_ok(active,body,'default-companion'))
                 css=body['actual_measurement']['css'];peer=body['current_companion']['peer']['css']
-                self.assertEqual(css,(e['original_css']+e['separator'] if e['original_css'] else '')+peer)
+                self.assertEqual(css,repaired_stepper_css((e['original_css']+e['separator'] if e['original_css'] else '')+peer,line))
                 changes=[css+'\n.unrelated { color:red; }',css.replace('.sass-api-probe','.foreign-scope',1)]
                 # Preserve syntactically valid CSS while dropping all owned rules
                 # or changing the complete current contribution's declaration.
@@ -61,21 +61,37 @@ class DefaultCompanionContractTests(unittest.TestCase):
 import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {createHash} from 'node:crypto';
 import {DEFAULT_COMPANION_CASES,DEFAULT_COMPANION_CONTRACT,defaultCompanionExpectedCss,defaultCompanionMeasurementOk,defaultCompanionResultsMatch} from './scripts/sass-default-companion-contract.mjs';
 import {compareInventory,classifyPending} from './scripts/sass-api-inventory.mjs';
+import {remeasureStepper} from './tests/stepper-repaired-snapshot.mjs';
 const f=JSON.parse(readFileSync('tests/sass_default_companion_fixture.json')),c=JSON.parse(readFileSync('fixtures/sass/default-companion-contracts.json')),source=JSON.parse(readFileSync('tests/'+f.source_fixture)),o=JSON.parse(readFileSync('compatibility/rc/oracles/material-16.2.14-sass-api.json')),sha=s=>createHash('sha256').update(s).digest('hex');
 for(const line of ['main','21.x']){
  const css=Object.fromEntries(Object.entries(o.members.mixins).filter(([,e])=>e.invocation.invocable).map(([n,e])=>[n,{css:'',sha256:e.invocation.css_sha256}]));
  for(const id of Object.keys(DEFAULT_COMPANION_CASES)){
-  const saved=f.measurements[id+'-'+line],m={...saved,sources:source.source_sets[saved.source_set]},stored=f.peers[id+'-'+line],peer={...stored,sources:c.peer_inputs[stored.source_set].sources},contract={classification:'conforming-current-companion',contract:DEFAULT_COMPANION_CONTRACT,peer};
+  const saved=f.measurements[id+'-'+line],frozen={...saved,sources:source.source_sets[saved.source_set]},m=remeasureStepper(frozen,line),stored=f.peers[id+'-'+line],peer={...stored,sources:c.peer_inputs[stored.source_set].sources},contract={classification:'conforming-current-companion',contract:DEFAULT_COMPANION_CONTRACT,peer};
   const got={css:m.css,sha256:m.css_sha256,actual_measurement:m,current_companion:contract};css[id.slice(10)]=got;
+  if(m.css!==frozen.css)assert.equal(defaultCompanionResultsMatch(id,{css:frozen.css,sha256:frozen.css_sha256,actual_measurement:frozen,current_companion:contract},contract),false);
   assert.equal(defaultCompanionExpectedCss(id,peer),m.css);assert.ok(defaultCompanionMeasurementOk(id,m,line));assert.ok(defaultCompanionResultsMatch(id,got,contract));
   const changed=structuredClone(got);changed.css+='\n.unrelated {color:red}';changed.sha256=sha(changed.css);changed.actual_measurement.css=changed.css;changed.actual_measurement.css_sha256=changed.sha256;changed.actual_measurement.css_bytes=Buffer.byteLength(changed.css);assert.equal(defaultCompanionResultsMatch(id,changed,contract),false);
   const stale=structuredClone(got);stale.actual_measurement.css+='\n.stale {color:red}';stale.actual_measurement.css_sha256=sha(stale.actual_measurement.css);assert.equal(defaultCompanionResultsMatch(id,stale,contract),false);
   const p=structuredClone(peer);p.sources=[];assert.equal(defaultCompanionExpectedCss(id,p),null);
  }
- const results=compareInventory(o,o.members,css);assert.equal(results.length,651);assert.ok(results.every(r=>r.result==='pass'));
+ const staleGroups=[
+  ['finite ordinary density aggregate differs',['all-component-densities']],
+  ['finite ordinary controls default contract differs',['all-legacy-component-colors','all-legacy-component-themes','all-legacy-component-typographies','button-color','button-density','button-theme','button-typography','checkbox-color','checkbox-density','checkbox-theme','checkbox-typography','legacy-button-color','legacy-button-theme','legacy-button-typography','private-all-legacy-component-densities']],
+  ['finite ordinary card default contract differs',['card-color','card-density','card-theme','card-typography']],
+  ['finite private card comparison differs',['private-check-duplicate-theme-styles']],
+  ['finite spinner/snack default contract differs',['progress-spinner-color','progress-spinner-theme','snack-bar-color','snack-bar-theme','snack-bar-typography']]
+ ];
+ const stale=Object.fromEntries(staleGroups.flatMap(([reason,names])=>names.map(name=>['mixin-css/'+name,reason])));
+ assert.equal(Object.keys(stale).length,26);
+ for(const id of Object.keys(stale))assert.deepEqual(Object.keys(css[id.slice(10)]).sort(),['css','sha256']);
+ const results=compareInventory(o,o.members,css);assert.equal(results.length,651);
+ assert.deepEqual(Object.fromEntries(results.filter(r=>r.result!=='pass').map(r=>[r.case_id,r.reason])),stale);
+ assert.equal(results.filter(r=>r.result==='pass').length,625);
  for(const id of Object.keys(DEFAULT_COMPANION_CASES)){
   const changed={...css,[id.slice(10)]:{...css[id.slice(10)],css:css[id.slice(10)].css+'\n.unrelated {color:red}'}};changed[id.slice(10)].sha256=sha(changed[id.slice(10)].css);
-  assert.deepEqual(classifyPending(compareInventory(o,o.members,changed),{decisions:[]}).filter(r=>r.result!=='pass').map(r=>r.case_id),[id]);
+  const changedResults=classifyPending(compareInventory(o,o.members,changed),{decisions:[]});
+  assert.deepEqual(changedResults.filter(r=>r.result!=='pass').map(r=>r.case_id).sort(),[...Object.keys(stale),id].sort());
+  for(const [staleId,reason] of Object.entries(stale))assert.equal(changedResults.find(r=>r.case_id===staleId).reason,reason);
  }
  const foreign={...css,'button-theme':{...css['button-theme'],current_companion:css['badge-color'].current_companion}};assert.ok(compareInventory(o,o.members,foreign).some(r=>r.case_id==='mixin-css/button-theme'&&r.result==='fail'));
  const conflicting={...css,'badge-color':{...css['badge-color'],current_infrastructure:null}};assert.ok(compareInventory(o,o.members,conflicting).some(r=>r.case_id==='mixin-css/badge-color'&&r.result==='fail'));

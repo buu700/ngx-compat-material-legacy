@@ -8,7 +8,7 @@ from sass_ordinary_density_gate import OrdinaryDensityGateContext
 from current_sass_spinner_snack_admission import CurrentSpinnerSnackContract
 _ROOT=Path(__file__).resolve().parents[1]
 _SELF=Path(__file__).read_bytes()
-_HASHES={'21.x':'c32ebf84dd28be5330a0b185ddaa6820616ae66ca84087f00ebad228fb630d18','main':'ec1af9fc46f8b85acdaf183015419314cb0a02ae3e83f12e5366135f98816e14'}
+_HASHES={'21.x':'2a95566f4495533efe5150bcfb2a371b54e6c9f1b9c95be32e5e63e3eaea0544','main':'f8c847d9b1feb3c01e6cd7e849890cc0828fee606fe979370182594ba32b1f9a'}
 def _check(line):
     if Path(__file__).read_bytes()!=_SELF: raise ValueError('guard changed')
     raw=(_ROOT/'fixtures/sass/ordered-button-proof-inputs.json').read_bytes()
@@ -23,7 +23,7 @@ def _check(line):
             if p.is_symlink():raise ValueError('linked input')
         b=p.read_bytes()
         if len(b)!=e['bytes'] or hashlib.sha256(b).hexdigest()!=e['sha256']:raise ValueError('changed input')
-_EXPECTED_ENGINE='6f6475a85f4361d0bb90c15c5b966c799499def63d2f1f5a93e2bfb09d584b86'
+_EXPECTED_ENGINE='356337aa30fed58fcc25afeaabca5ebb3695623c0f17a0aff497a3bd92b4a383'
 def _expected_plain(value):
     if value is None or type(value) in (str,bool):return value
     if type(value) is int and abs(value)<=9007199254740991:return value

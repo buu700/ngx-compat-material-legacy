@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "role": "finite-dialog-focus-current-source-successor",
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "canonical_admission_granted": false,
+  "g11_claim": "not-passed",
+  "previous_packet": {
+    "path": "compatibility/rc/parent-select-dialog-menu-snack-d61-menu-finite-source-v4.json",
+    "sha256": "f8f9423c7dff2ffd5ee72fa812f137bb5db8e59a4b88b7c1868086e3bdb28777",
+    "bytes": 112277
+  },
+  "branches": {
+    "21.x": {
+      "transitions": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "source_parent": "4b80ca0ac0ce6255c83b7eaea1c04bd6cd51f4cb",
+          "source_commit": "616bf749eb63e4f7d300291d38ecfed9bb573213",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+            "sha256": "fb30039e5c9ed9f906de8a734eeeb27c1e5f2a797ed3663225f6e405f737be04",
+            "bytes": 11196,
+            "git_blob": "dbbf557f7e9fcbb2706aa8bede8dfdb31717af24"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+            "sha256": "c413b76dfa611d3eaabcc38446861161f134d63f9427f29a61fc175963827fdd",
+            "bytes": 17839,
+            "git_blob": "7a38f04c79ecb0c9d6fd783ac5e79927b280071c"
+          },
+          "edits": [
+            {
+              "offset": 706,
+              "before": "",
+              "after": "fterNextRender, ApplicationRef, a"
+            },
+            {
+              "offset": 846,
+              "before": "",
+              "after": "Injector, "
+            },
+            {
+              "offset": 914,
+              "before": "",
+              "after": "} from '@angular/core';\nimport type {AfterRenderRef"
+            },
+            {
+              "offset": 2779,
+              "before": "",
+              "after": ";\n  private readonly _legacyRenderInjector = ambientService(Injector);\n  private readonly _legacyApplicationRef = ambientService(ApplicationRef);\n  private _legacyAfterRender: AfterRenderRef | null = null;\n  private _legacyFocusEpoch = 0;\n  private _legacyInitialFocusPending = false;\n  private _legacyPendingOpenedTime: number | null = null;\n  private _legacyPendingFocusListenerCleanup: (() => void) | null = null;\n  private _legacyPendingInitialZoneSubscription: Subscription | null = null;\n  private _legacyPendingRecapture: Subscription | null = null"
+            },
+            {
+              "offset": 7234,
+              "before": "",
+              "after": "if (this._legacyInitialFocusPending) {\n        if (this._legacyPendingRecapture && !this._legacyPendingRecapture.closed) {\n          return;\n        }\n        this._legacyAfterRender?.destroy();\n        this._legacyAfterRender = null;\n        const epoch = this._legacyFocusEpoch;\n        this._trapFocus(false, () => {\n          if (!this._legacyFocusDestroyed && epoch === this._legacyFocusEpoch) {\n            const openedTime = this._legacyPendingOpenedTime;\n            this._cancelPendingInitialFocus();\n            if (openedTime !== null) {\n              this._animationStateChanged.next({state: 'opened', totalTime: openedTime});\n            }\n          }\n        });\n      } else {\n        "
+            },
+            {
+              "offset": 7252,
+              "before": "",
+              "after": "\n      }"
+            },
+            {
+              "offset": 7367,
+              "before": "",
+              "after": "initial = false, onFocusInvoked?: () => void"
+            },
+            {
+              "offset": 7515,
+              "before": "",
+              "after": ";\n      }\n      if (onFocusInvoked) {\n        this._legacyPendingFocusListenerCleanup?.();\n        this._legacyPendingFocusListenerCleanup = null"
+            },
+            {
+              "offset": 8467,
+              "before": "",
+              "after": "  onFocusInvoked?.();\n      "
+            },
+            {
+              "offset": 8480,
+              "before": "",
+              "after": "const f"
+            },
+            {
+              "offset": 8481,
+              "before": "f",
+              "after": "rstTabbable"
+            },
+            {
+              "offset": 8483,
+              "before": "((",
+              "after": "= "
+            },
+            {
+              "offset": 8563,
+              "before": ")",
+              "after": ";\n    // Stable application views can attach before child controls complete their\n    // initial render and model update. Manual construction keeps the direct path.\n    const deferInitialFocus = initial && firstTabbable && this._ngZone.isStable"
+            },
+            {
+              "offset": 8572,
+              "before": "",
+              "after": " && this._legacyRenderInjector && this._legacyApplicationRef instanceof ApplicationRef\n        && this._isBrowser();\n    if (deferInitialFocus) {\n      this._cancelPendingInitialFocus();\n      this._legacyInitialFocusPending = true;\n      const epoch = this._legacyFocusEpoch;\n      const activeRoots = (): {roots: (Document | ShadowRoot)[], active: Element | null} => {\n        const roots: (Document | ShadowRoot)[] = [this._document];\n        let active: Element | null = this._document.activeElement;\n        while (active) {\n          let next: Document | ShadowRoot | null = active.shadowRoot;\n          if (!next && active.tagName === 'IFRAME') {\n            try {\n              next = (active as HTMLIFrameElement).contentDocument;\n            } catch {\n              next = null;\n            }\n          }\n          if (!next) break;\n          roots.push(next);\n          active = next.activeElement;\n        }\n        return {roots, active};\n      };\n      const {roots: focusRoots, active: previousActiveElement} = activeRoots();\n      const cancelPendingFocus = () => {\n        const openedTime = this._legacyPendingOpenedTime;\n        this._cancelPendingInitialFocus();\n        if (openedTime !== null && !this._legacyFocusDestroyed) {\n          this._animationStateChanged.next({state: 'opened', totalTime: openedTime});\n        }\n      };\n      const cancelOnFocus = () => {\n        if (activeRoots().active !== previousActiveElement) cancelPendingFocus();\n      };\n      const checkFocusOut = () => {\n        if (activeRoots().active !== previousActiveElement) {\n          queueMicrotask(() => {\n            if (!this._legacyFocusDestroyed && this._legacyInitialFocusPending\n                && epoch === this._legacyFocusEpoch) {\n              cancelPendingFocus();\n            }\n          });\n        }\n      };\n      for (const root of focusRoots) {\n        root.addEventListener('focusin', cancelOnFocus, true);\n        root.addEventListener('focusout', checkFocusOut, true);\n      }\n      this._legacyPendingFocusListenerCleanup = () => {\n        for (const root of focusRoots) {\n          root.removeEventListener('focusin', cancelOnFocus, true);\n          root.removeEventListener('focusout', checkFocusOut, true);\n        }\n      };\n      const injector = this._legacyRenderInjector!;\n      // NgModel schedules its initial model update during the first render. Register\n      // the next render callback after its queued promise has marked the view dirty.\n      this._legacyAfterRender = afterNextRender({mixedReadWrite: () => queueMicrotask(() => {\n        if (this._legacyFocusDestroyed || epoch !== this._legacyFocusEpoch) return;\n        this._legacyAfterRender = afterNextRender({mixedReadWrite: () => {\n          if (!this._legacyFocusDestroyed && epoch === this._legacyFocusEpoch) {\n            const currentFocus = activeRoots();\n            if (currentFocus.active !== previousActiveElement ||\n                currentFocus.roots.length !== focusRoots.length ||\n                currentFocus.roots.some((root, index) => root !== focusRoots[index])) {\n              cancelPendingFocus();\n              return;\n            }\n            this._legacyAfterRender = null;\n            this._legacyInitialFocusPending = false;\n            this._legacyPendingFocusListenerCleanup?.();\n            this._legacyPendingFocusListenerCleanup = null;\n            focus();\n            if (!this._legacyFocusDestroyed && epoch === this._legacyFocusEpoch\n                && this._legacyPendingOpenedTime !== null) {\n              const totalTime = this._legacyPendingOpenedTime;\n              this._legacyPendingOpenedTime = null;\n              this._animationStateChanged.next({state: 'opened', totalTime});\n            }\n          }\n        }}, {injector, manualCleanup: true});\n      })}, {injector, manualCleanup: true});\n    } else if (firstTabbable"
+            },
+            {
+              "offset": 8608,
+              "before": "",
+              "after": "cons"
+            },
+            {
+              "offset": 8609,
+              "before": "hi",
+              "after": " "
+            },
+            {
+              "offset": 8612,
+              "before": "._legacyFocusStableS",
+              "after": ""
+            },
+            {
+              "offset": 8643,
+              "before": "s.add(",
+              "after": " = "
+            },
+            {
+              "offset": 8701,
+              "before": "",
+              "after": ";\n      this._legacyFocusStableSubscriptions.add(subscription"
+            },
+            {
+              "offset": 8703,
+              "before": "",
+              "after": "\n      if (initial) {\n        this._legacyPendingInitialZoneSubscription = subscription;\n      } else if (onFocusInvoked) {\n        this._legacyPendingRecapture = subscription;\n      }"
+            },
+            {
+              "offset": 8737,
+              "before": "",
+              "after": "\n  }\n\n  protected _cancelPendingInitialFocus(): void {\n    this._legacyFocusEpoch++;\n    this._legacyPendingInitialZoneSubscription?.unsubscribe();\n    this._legacyPendingInitialZoneSubscription = null;\n    this._legacyPendingRecapture?.unsubscribe();\n    this._legacyPendingRecapture = null;\n    this._legacyPendingFocusListenerCleanup?.();\n    this._legacyPendingFocusListenerCleanup = null;\n    this._legacyInitialFocusPending = false;\n    this._legacyPendingOpenedTime = null;\n    this._legacyAfterRender?.destroy();\n    this._legacyAfterRender = null;"
+            },
+            {
+              "offset": 8862,
+              "before": "",
+              "after": ";\n    this._cancelPendingInitialFocus()"
+            },
+            {
+              "offset": 9607,
+              "before": "",
+              "after": "true"
+            },
+            {
+              "offset": 9734,
+              "before": "",
+              "after": "true"
+            },
+            {
+              "offset": 9743,
+              "before": "",
+              "after": "    if (this._legacyInitialFocusPending) {\n      this._legacyPendingOpenedTime = totalTime;\n    } else {\n  "
+            },
+            {
+              "offset": 9810,
+              "before": "",
+              "after": "\n    }"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.ts",
+          "source_parent": "4b80ca0ac0ce6255c83b7eaea1c04bd6cd51f4cb",
+          "source_commit": "616bf749eb63e4f7d300291d38ecfed9bb573213",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.ts",
+            "sha256": "0495cc891e7e1578d05d9679fe61acf155c9bdb47b31032d53c324bc201616ac",
+            "bytes": 10351,
+            "git_blob": "f5d5e5554599932f72addd7f1587b43b5b292320"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.ts",
+            "sha256": "a2223c0bb364c1738d10eb40e2d776c00b6ef2375a673c164d18d6528debe3df",
+            "bytes": 10390,
+            "git_blob": "df18554a5b15e979b366c7bdb5c3ba34346ee8fd"
+          },
+          "edits": [
+            {
+              "offset": 6682,
+              "before": "",
+              "after": "PendingInitialFocus();\n    this._cancel"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

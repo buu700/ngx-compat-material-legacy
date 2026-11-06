@@ -16,6 +16,8 @@ import admission from './upstream-base-class-removal-admission.cjs';
 import {readHistoricalContractRepairMember} from './historical-contract-repair-source.mjs';
 import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
 import {tabsFiniteSourceSuccessor} from './tabs-finite-source-successor.mjs';
+import {selectDialogFiniteSuccessor} from './select-dialog-finite-source-successor.mjs';
+import {dialogFocusFiniteSourceSuccessor} from './dialog-focus-finite-source-successor.mjs';
 import {applyBaseClassRemovalCanonicalStage, baseClassRemovalRegistrySuccessor,
   BASE_CLASS_REMOVAL_LEDGER, BASE_CLASS_REMOVAL_REGISTRY,
   BASE_CLASS_REMOVAL_OWNER_SOURCE_SHA256} from './base-class-removal-canonical-stage.mjs';
@@ -39,6 +41,9 @@ const INSPECT_SOURCE_FUNCTION_SHA256 = '87225357bc9646fe78f8b5f89111763a196a3fc8
 const GUARD_PLAN_FUNCTION_SHA256 = 'fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947';
 const rootDefault = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const image = readFileSync(fileURLToPath(import.meta.url));
+const PRODUCT_TRANSITION = Object.freeze({path:'compatibility/rc/parent-base-admission-select-dialog-menu-snack-source-successor-v3.json', sha256:'e148fe519781431d0f409a82818b1654044b7f2e8dea2d8dc98627317eeb5dd8', bytes:12856});
+const FINAL_TRANSITION = Object.freeze({path:'compatibility/rc/parent-base-admission-tab-final-callback-current-helper-successor-v4.json', sha256:'a1871ddc716fdf05891025401484fc502b66b280e7dbef0ecc835d3b16480e56', bytes:3691});
+const FOCUS_TRANSITION = Object.freeze({path:'compatibility/rc/parent-base-admission-dialog-focus-historical-repair-successor-v5.json', sha256:'08b56c2f141a0df71d8ea238fdf192c89096438d5f0a4daf9ac66c6d5b3d3ad7', bytes:8654});
 const hash = raw => createHash('sha256').update(raw).digest('hex');
 const blob = raw => createHash('sha1').update('blob ' + raw.length + '\0').update(raw).digest('hex');
 const functionToString = Function.prototype.toString;
@@ -63,7 +68,7 @@ export function assertBaseClassRemovalSourceInspectorIdentity() {
   assert.equal(ownValue(admission, 'loadedSourceReferences'), loadedSourceReferences, 'late loaded base-class image references change');
   assert.equal(ownValue(admission, 'loadedProducerFunctionSha256'), loadedProducerFunctionSha256, 'late loaded base-class producer references change');
   assert.equal(ownValue(admission, 'inspectSource'), loadedInspectSource, 'late loaded base-class source inspector change');
-  assert.equal(hash(functionToString.call(loadedInspectSource)), INSPECT_SOURCE_FUNCTION_SHA256,
+  assert.equal(hash(functionToString.call(loadedInspectSource)), '04804bcf2d65cfb53e66acd791598189101e15780b99a991263bda68b2ac717e',
     'unauthenticated loaded base-class source inspector');
   assert.equal(ownValue(admission, 'metadataOk'), loadedMetadataOk, 'late loaded base-class metadata predicate change');
   assert.equal(hash(functionToString.call(loadedMetadataOk)), METADATA_OK_FUNCTION_SHA256,
@@ -87,12 +92,21 @@ function physicalSweep(root, references, sourceMembers = false) {
   }
 }
 const gitCache = new Map();
+const FOCUS_PEER_DECLARATIONS = new Set([
+  'node_modules/@angular/core/types/core.d.ts',
+  'node_modules/@angular/core/types/_discovery-chunk.d.ts',
+  'node_modules/@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts',
+]);
 
 function physical(root, path) {
   assert.equal(resolve(root), rootDefault, 'foreign base-class source root');
   assert.equal(typeof path, 'string');
   assert.ok(path && !posix.isAbsolute(path) && posix.normalize(path) === path && !path.includes('\\')
     && path.split('/').every(part => part && !['.', '..', '.git'].includes(part)), 'invalid base-class source path');
+  // The reviewed public Angular peer package root is a normal pnpm link.
+  // Only these three focus declarations use that root policy; every descendant
+  // and every owned or unrelated member retains the ordinary no-link check.
+  if (FOCUS_PEER_DECLARATIONS.has(path)) return readHistoricalContractRepairMember(root, path);
   let cursor = root;
   assert.ok(lstatSync(cursor).isDirectory() && !lstatSync(cursor).isSymbolicLink());
   for (const part of path.split('/')) {
@@ -144,6 +158,33 @@ function admissionTransitionPhysical(root) {
   assert.equal(hash(inspectorRaw), ADMISSION_INSPECTOR_TRANSITION.sha256, 'changed tabs inspector transition');
   assert.equal(inspectorRaw.length, ADMISSION_INSPECTOR_TRANSITION.bytes);
   const inspector = JSON.parse(inspectorRaw);
+  const productRaw=physical(root,PRODUCT_TRANSITION.path);assert.equal(hash(productRaw),PRODUCT_TRANSITION.sha256);assert.equal(productRaw.length,PRODUCT_TRANSITION.bytes);const product=JSON.parse(productRaw);
+  assert.equal(product.schema_version,1);assert.equal(product.role,'base-admission-select-dialog-menu-snack-source-successor');assert.equal(product.line,'21.x');assert.deepEqual(product.previous_transition,ADMISSION_INSPECTOR_TRANSITION);assert.deepEqual(product.inspect_source_function_sha256,{before:INSPECT_SOURCE_FUNCTION_SHA256,after:'e8d62ce8008ec27e578e490cb874d05a3c4857915177598447703c756a7fe6ea'});assert.equal(product.source_scope_only,true);assert.equal(product.historical_programs_executed,false);assert.equal(product.canonical_changes_applied,false);assert.equal(product.g11_claim,'not-passed');
+  const previousProduct={path:'compatibility/rc/parent-base-admission-select-dialog-menu-source-successor-v2.json',sha256:'ce99518b40ae50b05995a51363755452fb9b42973143a1864534cfec527cd91c',bytes:7257};assert.deepEqual(product.previous_product_transition,previousProduct);const previousProductRaw=physical(root,previousProduct.path);assert.equal(hash(previousProductRaw),previousProduct.sha256);assert.equal(previousProductRaw.length,previousProduct.bytes);const previousProductData=JSON.parse(previousProductRaw);const olderProduct={path:'compatibility/rc/parent-base-admission-select-dialog-source-successor-v1.json',sha256:'f336394eaedba9d794d0898c2e8a83104cbbb6ccf7f988f7d20359281d28ce47',bytes:6486};assert.deepEqual(previousProductData.previous_product_transition,olderProduct);const olderProductRaw=physical(root,olderProduct.path);assert.equal(hash(olderProductRaw),olderProduct.sha256);assert.equal(olderProductRaw.length,olderProduct.bytes);assert.deepEqual(previousProductData.transitions.map(row=>row.before),JSON.parse(olderProductRaw).transitions.map(row=>row.before));assert.deepEqual(product.transitions.map(row=>row.before),previousProductData.transitions.map(row=>row.before));assert.equal(product.inspect_source_function_sha256.before,previousProductData.inspect_source_function_sha256.before);
+  assert.deepEqual(product.transitions.map(r=>r.path),['scripts/upstream-base-class-removal-admission.cjs','scripts/historical-contract-repair-source.mjs']);const productRows=new Map(product.transitions.map(r=>[r.path,r]));
+  const finalRaw=physical(root,FINAL_TRANSITION.path);assert.equal(hash(finalRaw),FINAL_TRANSITION.sha256);assert.equal(finalRaw.length,FINAL_TRANSITION.bytes);const terminal=JSON.parse(finalRaw);
+  assert.equal(terminal.schema_version,1);assert.equal(terminal.role,'base-admission-tab-final-callback-current-helper-successor');assert.equal(terminal.line,'21.x');assert.deepEqual(terminal.previous_transition,PRODUCT_TRANSITION);assert.equal(terminal.source_scope_only,true);assert.equal(terminal.historical_programs_executed,false);assert.equal(terminal.canonical_changes_applied,false);assert.equal(terminal.g11_claim,'not-passed');
+  assert.deepEqual(terminal.inspector_transition.before,{sha256:productRows.get('scripts/upstream-base-class-removal-admission.cjs').after.sha256,bytes:productRows.get('scripts/upstream-base-class-removal-admission.cjs').after.bytes});
+  assert.equal(terminal.inspector_transition.path,'scripts/upstream-base-class-removal-admission.cjs');
+  assert.deepEqual(terminal.helper_transition,{path:'scripts/select-dialog-finite-source-successor.mjs',before:{sha256:'30a33621af0d81f5dd1b94b2a4e404340b59385b774e9d813459b0af3d3f6dc8',bytes:6583},after:{sha256:'775695fe8809f46768dbfb4eb454f54f4a806e095284e39d8932afff56ccf24c',bytes:7856}});
+  assert.deepEqual(terminal.loaded_helper_function_sha256,{before:'95e2377d1d642aaeb0f75c8367b0c5e3af9a5bf1b1933d1be5987cb80a510065',after:'defdd26e4a9d39b584ba523d4e37cda5ef528c3ad50a64b5e50cd7270cb63a4a'});
+  assert.deepEqual(terminal.inspect_source_function_sha256,{before:product.inspect_source_function_sha256.after,after:'f0311f216e3614d8ebfcb80c1b85b3ad6007871420db8810a19850cc7dfde295'});
+  const focusRaw=physical(root,FOCUS_TRANSITION.path);assert.equal(hash(focusRaw),FOCUS_TRANSITION.sha256);assert.equal(focusRaw.length,FOCUS_TRANSITION.bytes);const focusTransition=JSON.parse(focusRaw);
+  assert.equal(focusTransition.schema_version,1);assert.equal(focusTransition.role,'base-admission-dialog-focus-historical-repair-successor');assert.equal(focusTransition.line,'21.x');assert.deepEqual(focusTransition.previous_transition,FINAL_TRANSITION);assert.equal(focusTransition.source_scope_only,true);assert.equal(focusTransition.historical_programs_executed,false);assert.equal(focusTransition.canonical_changes_applied,false);assert.equal(focusTransition.g11_claim,'not-passed');
+  assert.deepEqual(focusTransition.transitions.map(row=>row.path),['scripts/historical-contract-repair-source.mjs','scripts/upstream-base-class-removal-admission.cjs']);
+  assert.deepEqual(focusTransition.loaded_function_sha256,{historical_repair_before:'7255839162c783597c2c69d6e5f81051a5ba46cc6bdeaf3d45a882f82d3a16fd',historical_repair_after:'51435959193c0c4e4dd952c2e03e2d2fa0f4e8df27dd0ef5f5754099d9b2c786',inspector_before:terminal.inspect_source_function_sha256.after,inspector_after:'04804bcf2d65cfb53e66acd791598189101e15780b99a991263bda68b2ac717e'});
+  const focusOrigin=focusTransition.reviewed_focus_origin;assert.deepEqual(focusOrigin,{path:'compatibility/rc/parent-dialog-focus-finite-source-successor-v5.json',sha256:'74890ca9a672ac9ce3114087447c7117eea0502bfac1a96d54b1ac4e327caa51',bytes:12280});const originRaw=physical(root,focusOrigin.path);assert.equal(hash(originRaw),focusOrigin.sha256);assert.equal(originRaw.length,focusOrigin.bytes);
+  const focusHelper=focusTransition.focus_helper;assert.deepEqual(focusHelper,{path:'scripts/dialog-focus-finite-source-successor.mjs',sha256:'d45ce542f0d8a546d77e1a43fc0385f01ff51f908987871803a3a9fd8cc384d7',bytes:9207});const focusHelperRaw=physical(root,focusHelper.path);assert.equal(hash(focusHelperRaw),focusHelper.sha256);assert.equal(focusHelperRaw.length,focusHelper.bytes);
+  const reviewedHelper=terminal.reviewed_helper_origin;assert.deepEqual(reviewedHelper,{path:'compatibility/rc/parent-select-dialog-menu-snack-d61-menu-finite-source-v4.json',sha256:'f8f9423c7dff2ffd5ee72fa812f137bb5db8e59a4b88b7c1868086e3bdb28777',bytes:112277,independent_review_sha256:'b8b2acf50e772dd0e913db1b6dfa0fd17c56ef3ac6d259bddf555f2947f37357'});const reviewedRaw=physical(root,reviewedHelper.path);assert.equal(hash(reviewedRaw),reviewedHelper.sha256);assert.equal(reviewedRaw.length,reviewedHelper.bytes);
+  let oldInspector,oldHistorical;
+  for(const row of product.transitions){const before=original(root,product.source_parent,row.before);let cursor=0,parts=[];for(const edit of row.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=before.length);const old=Buffer.from(edit.before);assert.ok(equalBuffers(before.subarray(edit.offset,edit.offset+old.length),old));parts.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+old.length;}const after=Buffer.concat([...parts,before.subarray(cursor)]);assert.equal(hash(after),row.after.sha256);assert.equal(after.length,row.after.bytes);if(row.path===terminal.inspector_transition.path)oldInspector=after;else oldHistorical=after;}
+  assert.ok(oldInspector);let finalCursor=0,finalParts=[];for(const edit of terminal.inspector_transition.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=finalCursor&&edit.offset<=oldInspector.length);const old=Buffer.from(edit.before);assert.ok(equalBuffers(oldInspector.subarray(edit.offset,edit.offset+old.length),old));finalParts.push(oldInspector.subarray(finalCursor,edit.offset),Buffer.from(edit.after));finalCursor=edit.offset+old.length;}const currentInspector=Buffer.concat([...finalParts,oldInspector.subarray(finalCursor)]);assert.equal(hash(currentInspector),terminal.inspector_transition.after.sha256);assert.equal(currentInspector.length,terminal.inspector_transition.after.bytes);assert.deepEqual({path:terminal.inspector_transition.path,...terminal.inspector_transition.after},{path:focusTransition.transitions[1].path,...focusTransition.transitions[1].before});
+  assert.deepEqual({path:product.transitions[1].path,...product.transitions[1].after},{path:focusTransition.transitions[0].path,...focusTransition.transitions[0].before});
+  assert.ok(oldHistorical);const predecessorImages=new Map([[focusTransition.transitions[0].path,oldHistorical],[focusTransition.transitions[1].path,currentInspector]]);
+  for(const row of focusTransition.transitions){const before=predecessorImages.get(row.path);assert.equal(hash(before),row.before.sha256);assert.equal(before.length,row.before.bytes);let cursor=0,parts=[];for(const edit of row.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=before.length);const old=Buffer.from(edit.before);assert.ok(equalBuffers(before.subarray(edit.offset,edit.offset+old.length),old));parts.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+old.length;}const after=Buffer.concat([...parts,before.subarray(cursor)]);assert.equal(hash(after),row.after.sha256);assert.equal(after.length,row.after.bytes);assert.ok(equalBuffers(after,physical(root,row.path)));}
+  const helperRaw=physical(root,terminal.helper_transition.path);assert.equal(hash(helperRaw),terminal.helper_transition.after.sha256);assert.equal(helperRaw.length,terminal.helper_transition.after.bytes);
+  const focusRows=new Map(focusTransition.transitions.map(row=>[row.path,row]));const selectedRefs=inspector.loaded_source_references.map(ref=>focusRows.has(ref.path)?{path:ref.path,...focusRows.get(ref.path).after}:productRows.get(ref.path)?.after??ref);selectedRefs.push({path:terminal.helper_transition.path,...terminal.helper_transition.after});
+  const selectedFunctions=successor.loaded_producer_function_sha256.map(ref=>ref.name==='historicalContractRepairSourceSubject'?{...ref,sha256:focusTransition.loaded_function_sha256.historical_repair_after}:ref);selectedFunctions.push({name:'selectDialogFiniteSuccessor',sha256:terminal.loaded_helper_function_sha256.after});
   assert.equal(inspector.schema_version, 1); assert.equal(inspector.role, 'base-admission-tabs-inspector-successor');
   assert.equal(inspector.line, '21.x'); assert.equal(inspector.source_parent, '2f5201af2294a1c99552fb1876583b4e8d11b5f2');
   assert.deepEqual(inspector.previous_transition, ADMISSION_TABS_TRANSITION);
@@ -171,8 +212,8 @@ function admissionTransitionPhysical(root) {
   // These captured references describe actual module-load images and function
   // text. Restoring disk after import cannot reattribute an older executable.
   for (const [name, captured, expected] of [
-    ['loadedSourceReferences', loadedSourceReferences, inspector.loaded_source_references],
-    ['loadedProducerFunctionSha256', loadedProducerFunctionSha256, successor.loaded_producer_function_sha256],
+    ['loadedSourceReferences', loadedSourceReferences, selectedRefs],
+    ['loadedProducerFunctionSha256', loadedProducerFunctionSha256, selectedFunctions],
   ]) {
     assert.equal(ownValue(admission, name), captured, 'changed loaded base-class identity data');
     assert.ok(Array.isArray(captured) && Object.isFrozen(captured), 'mutable loaded base-class identity data');
@@ -186,7 +227,7 @@ function admissionTransitionPhysical(root) {
       }
     }
   }
-  for (const ref of inspector.loaded_source_references) {
+  for (const ref of selectedRefs) {
     const actual = physical(root, ref.path);
     assert.equal(hash(actual), ref.sha256, 'changed loaded base-class producer file ' + ref.path);
     assert.equal(actual.length, ref.bytes);
@@ -235,7 +276,7 @@ function admissionTransitionPhysical(root) {
     for(const edit of row.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=before.length);assert.equal(typeof edit.before,'string');assert.equal(typeof edit.after,'string');const old=Buffer.from(edit.before);assert.ok(equalBuffers(before.subarray(edit.offset,edit.offset+old.length),old),'changed tabs admission literal preimage');parts.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+old.length;}
     const after=Buffer.concat([...parts,before.subarray(cursor)]);assert.equal(hash(after),row.after.sha256);assert.equal(after.length,row.after.bytes);if(row.path===inspectorRow.path){
       assert.ok(equalBuffers(after,original(root,inspector.source_parent,inspectorRow.before)),'changed prior tabs inspector source');
-    }else assert.ok(equalBuffers(after,physical(root,row.path)),'changed current tabs admission source '+row.path);
+    }else {const next=productRows.get(row.path);assert.ok(next);assert.deepEqual(next.before,{...row.after,git_blob:next.before.git_blob});assert.ok(equalBuffers(after,original(root,product.source_parent,next.before)),'changed product predecessor '+row.path);}
   }
   const inspectorBefore = original(root, inspector.source_parent, inspectorRow.before);
   let inspectorCursor = 0; const inspectorParts = [];
@@ -250,14 +291,16 @@ function admissionTransitionPhysical(root) {
   }
   const inspectorAfter = Buffer.concat([...inspectorParts, inspectorBefore.subarray(inspectorCursor)]);
   assert.equal(hash(inspectorAfter), inspectorRow.after.sha256); assert.equal(inspectorAfter.length, inspectorRow.after.bytes);
-  assert.ok(equalBuffers(inspectorAfter, physical(root, inspectorRow.path)), 'changed current tabs inspector source');
+  const productInspector=productRows.get(inspectorRow.path);assert.deepEqual(productInspector.before,{...inspectorRow.after,git_blob:productInspector.before.git_blob});assert.ok(equalBuffers(inspectorAfter,original(root,product.source_parent,productInspector.before)),'changed product inspector predecessor');
   // Construct the genuine tabs guard with a private physical reader before any
   // caller callback. Its complete bound population joins this frame's cold and
   // final sweeps, including callbacks that run later in the outer owner.
   const tabs = tabsFiniteSourceSuccessor({root, line: '21.x', read: path => physical(root, path)});
-  return {...transition, inspect_source_function_sha256: {before: transition.inspect_source_function_sha256.before, after: inspector.inspect_source_function_sha256.after},
-    loaded_source_references: inspector.loaded_source_references,
-    additional_members: [ADMISSION_INSPECTOR_TRANSITION, ...successor.additional_members, ...tabs.bound]};
+  const productGuard=selectDialogFiniteSuccessor({root,line:'21.x',read:path=>physical(root,path)});
+  const focusGuard=dialogFocusFiniteSourceSuccessor({root,line:'21.x',read:path=>physical(root,path)});
+  return {...transition, inspect_source_function_sha256: {before: transition.inspect_source_function_sha256.before, after: focusTransition.loaded_function_sha256.inspector_after},
+    loaded_source_references: selectedRefs,
+    additional_members: [FOCUS_TRANSITION,focusOrigin,focusHelper,FINAL_TRANSITION,reviewedHelper,PRODUCT_TRANSITION,previousProduct,olderProduct,ADMISSION_INSPECTOR_TRANSITION,...successor.additional_members,...tabs.bound,...productGuard.bound,...focusGuard.bound]};
 }
 
 /** Only actual physical callbacks are accepted. No historical-reader fallback. */

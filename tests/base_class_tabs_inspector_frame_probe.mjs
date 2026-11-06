@@ -12,7 +12,7 @@ import {tabsFiniteSourceSuccessor} from '../scripts/tabs-finite-source-successor
 import {baseClassRemovalCanonicalFrameSubject} from '../scripts/base-class-removal-owner-source.mjs';
 const root=process.cwd(),read=p=>readFileSync(join(root,p));
 const packet='compatibility/rc/parent-base-admission-tabs-inspector-successor-v1.json';
-const data=JSON.parse(read(packet)),finite=JSON.parse(read('compatibility/rc/parent-tabs-finite-source-successor-v1.json'));
+const data=JSON.parse(read('compatibility/rc/parent-base-admission-tab-final-callback-current-helper-successor-v4.json')),finite=JSON.parse(read('compatibility/rc/parent-tabs-finite-source-successor-v1.json'));
 const selector=tabsFiniteSourceSuccessor({root,line:'21.x',read});
 for(const row of finite.branches['21.x'].transitions){
  assert.equal(selector.qualify(row.before).sha256,row.after.sha256);

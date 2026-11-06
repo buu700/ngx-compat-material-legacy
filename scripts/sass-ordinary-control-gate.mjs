@@ -28,14 +28,14 @@ const raw=readFileSync(new URL('../'+INPUTS,import.meta.url));assert.equal(hash(
 const ownedRaw=readFileSync(new URL('../fixtures/sass/owned-aggregate-contracts.json',import.meta.url));assert.equal(hash(ownedRaw),'b83f5ee9e898004e2fce2ae49719dbed923dd2b5eabf06f3f463a8ad33f24c7a');const owned=JSON.parse(ownedRaw);assert.equal(owned.cases.length,20);
 const packet=JSON.parse(raw),contexts=new WeakMap(),referenceRuns=new WeakMap();
 const dependencies=[
- ['scripts/current-sass-spinner-snack-contract.mjs','1d826e445dcd35f19d3bc5529f54248966cb3151833f5e7319badf904881e3e7'],
+ ['scripts/current-sass-spinner-snack-contract.mjs','1460552c5787a120e5f42c1cb2a85cedcd5cfeef25dc78a84daaceb09eb4c777'],
  ['compatibility/rc/ordinary-checkbox-button-expectation-model-v1.mjs','f094e84d2ce8a3f36aab239eb0d30940da976072a85ca0edcf29b8afb6dc9fb0'],
  ['compatibility/rc/ordinary-checkbox-button-legacy-composition-model-v1.mjs','2b136425698aa80d0ae368f74968fff94267d40b612b00b0bfba5577763a0692'],
  ['compatibility/rc/ordinary-checkbox-button-legacy-composition-cases-v1.json','8f4186d34848a0f298170c2124bbb727ff31a3995a1e8f041ab05476ffe1125d'],
  ['compatibility/rc/ordinary-checkbox-button-legacy-composition-known-before-v1.json','3e96bf8c73dc35d1cb9d132c74f69b6f91ee7d22b19b185cf3540d68d3cb9f43'],
- ['scripts/sass-default-aggregate-contract.mjs','8f7d599e4187a94e66670015cd3f0e28a223209d887b9481727d1a60d9a2303a'],
- ['scripts/sass-aggregate-color-theme-contract.mjs','7d883b820a7ff2f5eb98e49fdab72d4306b6370605902b3bf71e7bd2d8e362ec'],
- ['scripts/sass-aggregate-typography-contract.mjs','77ac326df5c2fa3b9cf3f08ea1fb400761f750502015c9c724a9b2436bb49b11'],
+ ['scripts/sass-default-aggregate-contract.mjs','fbdf6b2bf55518a2d9be62aaf5bce95edbd679bce842bd20601c57669bb63cfc'],
+ ['scripts/sass-aggregate-color-theme-contract.mjs','68d0aae9a0314ab49b82f63638a30661638bbd840487b1409da5ea62a03efef0'],
+ ['scripts/sass-aggregate-typography-contract.mjs','db5ec59660647a5590302253925212e1688b4ee3eab1714b5b20c26c0844548a'],
  ['scripts/sass-aggregate-density-contract.mjs','99ac7674aecf5bd4204c3c418e25dd7cf2d4329fe07fd7803dddeda0050cc090'],
  ['scripts/sass-ripple-color-contract.mjs','92e7173b0db32bdf88f7597c9d986168c3b094ee5e655c379fcab7cafbc310ef'],
  ['fixtures/sass/owned-aggregate-contracts.json','b83f5ee9e898004e2fce2ae49719dbed923dd2b5eabf06f3f463a8ad33f24c7a'],
