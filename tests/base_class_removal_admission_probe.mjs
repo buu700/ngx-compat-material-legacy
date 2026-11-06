@@ -16,6 +16,15 @@ import {applyBaseClassRemovalCanonicalStage, baseClassRemovalRegistrySuccessor,
   BASE_CLASS_REMOVAL_LEDGER as LEDGER, BASE_CLASS_REMOVAL_REGISTRY as REGISTRY} from '../scripts/base-class-removal-canonical-stage.mjs';
 
 assert.equal(process.versions.node, '24.21.0');
+// Optional process isolation preserves every control while bounding wall time.
+// The original no-argument and report-writing interfaces remain unchanged.
+const phase = process.argv[2] === '--phase' ? process.argv[3] : null;
+const phases = ['metadata-cold', 'metadata-late', 'physical-cold', 'physical-late', 'projection'];
+if (phase !== null) assert.ok(process.argv.length === 4 && phases.includes(phase), 'unknown admission test phase');
+const inPhase = (...values) => phase === null || values.includes(phase);
+const finishPhase = details => { console.log(JSON.stringify({result: 'pass', phase, ...details,
+  full_owner_integration_qualified: false, actual_native_packed_browser_floor_or_full_audit_qualified: false})); };
+
 const root = process.cwd(), hash = raw => createHash('sha256').update(raw).digest('hex');
 const physicalRead = fs.readFileSync, read = path => physicalRead(resolve(root, path));
 const body = JSON.parse(read(admission.BASE_CLASS_REMOVAL_REVIEW));
@@ -63,7 +72,7 @@ const metadataControls = {
   'extra-scope': x => x.proof[admission.BASE_CLASS_REMOVAL_SCOPE_KEY].cached_source_success = true,
   'extra-entry': x => x.entry.cached_source_success = true,
 };
-for (const [id, mutate] of Object.entries(metadataControls)) {
+if (inPhase('metadata-cold')) for (const [id, mutate] of Object.entries(metadataControls)) {
   const x = structuredClone(args); mutate(x); assert.equal(admission.metadataOk(x), false, id);
 }
 // Authentic disk bytes must not bless a stale or substituted loaded producer.
@@ -76,7 +85,7 @@ const producerCacheControls = [
   ['../scripts/historical-contract-repair-source.mjs', 'historicalContractRepairSourceSubject'],
   ['../scripts/historical-contract-repair-source.mjs', 'readHistoricalContractRepairMember'],
 ].flatMap(([module, exported]) => [[module, exported, false], [module, exported, true]]);
-for (const [module, exported, spoofOwnToString] of producerCacheControls) {
+if (inPhase('metadata-cold')) for (const [module, exported, spoofOwnToString] of producerCacheControls) {
   const path = require.resolve(module), cached = require.cache[path], original = cached.exports[exported];
   const substituted = (...values) => original(...values);
   if (spoofOwnToString) {
@@ -96,6 +105,7 @@ const metadataMutationControls = {
   proof: x => x.proof[admission.BASE_CLASS_REMOVAL_SCOPE_KEY].canonical_admission_granted = true,
   body: x => x.body.original_hunks--,
 };
+if (inPhase('metadata-cold')) {
 assert.equal(admission.sourceOk({...args, proof: null}), false, 'explicit null proof is not an omitted proof');
 assert.equal(admission.sourceOk({...args, read}), true, 'positive physical reader');
 for (const [id, mutate] of Object.entries(metadataMutationControls)) {
@@ -105,6 +115,12 @@ for (const [id, mutate] of Object.entries(metadataMutationControls)) {
   assert.equal(admission.sourceOk(live), false, 'metadata changed by cold reader ' + id);
   assert.equal(admission.metadataOk(live), false);
 }
+if (phase === 'metadata-cold') { finishPhase({metadata_rejections: Object.keys(metadataControls).length,
+  substituted_loaded_producer_rejections: producerCacheControls.length, metadata_reader_positive_cases: 1,
+  cold_metadata_reader_mutation_rejections: Object.keys(metadataMutationControls).length,
+  explicit_null_proof_rejections: 1}); process.exit(0); }
+}
+if (inPhase('metadata-late')) {
 const live = structuredClone(args); let readerMutation = null;
 live.read = path => { const mutate = readerMutation; readerMutation = null; if (mutate) mutate(live); return read(path); };
 const liveSource = admission.inspectSource(live);
@@ -118,14 +134,27 @@ for (const [id, mutate] of Object.entries(metadataMutationControls)) {
 const replaced = structuredClone(args);
 replaced.read = path => { replaced.entry = {...replaced.entry, final_disposition: 'irrelevant'}; return read(path); };
 assert.equal(admission.sourceOk(replaced), false, 'reader replaced request entry object');
+if (phase === 'metadata-late') { finishPhase({late_metadata_caller_mutation_rejections: Object.keys(metadataMutationControls).length,
+  late_metadata_reader_mutation_rejections: Object.keys(metadataMutationControls).length, request_entry_replacement_rejections: 1}); process.exit(0); }
+}
 const current = admission.inspectCanonicalSource({root, entries: stage.entries, body}); current.assertCurrent();
 assert.equal(current.bound.length, new Set(current.bound.map(ref => ref.path)).size);
+// The finite tabs packet adds two owner members and its five non-package
+// evidence members; both source rows and the package were already bound.
+const tabsPacketPath = 'compatibility/rc/parent-tabs-finite-source-successor-v1.json';
+const tabsPacket = JSON.parse(read(tabsPacketPath));
+const tabsPaths = ['scripts/tabs-finite-source-successor.mjs', tabsPacketPath,
+  ...tabsPacket.branches['21.x'].evidence.map(ref => ref.path),
+  ...tabsPacket.branches['21.x'].transitions.map(row => row.path)];
+for (const path of tabsPaths) assert.ok(current.bound.some(ref => ref.path === path), 'unbound tabs successor ' + path);
+
 assert.equal(current.facts.qualified_repair_successors, 5);
 assert.equal(current.facts.authenticated_historical_canonical_context, 3);
 for (const ref of current.historical_canonical_context) assert.ok(!current.bound.some(member => member.path === ref.path));
 assert.ok(current.bound.length > 1000);
 // These exact future canonical bytes are acquisition metadata, authenticated
 // against original Git. Their transaction receives no source-owner acceptance.
+if (inPhase('projection')) {
 fs.readFileSync = function (file, ...options) {
   if (typeof file === 'string' && resolve(file) === resolve(root, LEDGER)) return Buffer.from(stage.after);
   if (typeof file === 'string' && resolve(file) === resolve(root, REGISTRY)) return Buffer.from(registryAfter);
@@ -133,6 +162,7 @@ fs.readFileSync = function (file, ...options) {
 }; syncBuiltinESMExports();
 try { assert.equal(admission.sourceOk(args), true); current.assertCurrent(); }
 finally { fs.readFileSync = physicalRead; syncBuiltinESMExports(); }
+}
 
 // Change the physical read route, not only an injectable candidate reader. This
 // challenges cold qualification and the closure retained after qualification.
@@ -155,7 +185,7 @@ const sourceControls = [admission.BASE_CLASS_REMOVAL_REVIEW,
   'node_modules/@angular/material/types/form-field-testing.d.ts', body.patch_file,
 ];
 for (const path of sourceControls) assert.ok(current.bound.some(ref => ref.path === path), 'unbound control ' + path);
-for (const path of sourceControls) {
+if (inPhase('physical-cold', 'physical-late')) for (const path of sourceControls) {
   const target = fs.realpathSync(resolve(root, path));
   fs.readFileSync = function (file, ...options) {
     const raw = physicalRead.call(this, file, ...options);
@@ -163,11 +193,14 @@ for (const path of sourceControls) {
       ? (typeof raw === 'string' ? raw + '\n' : Buffer.concat([raw, Buffer.from('\n')])) : raw;
   }; syncBuiltinESMExports();
   try {
-    assert.equal(admission.sourceOk(args), false, 'cold physical source ' + path);
-    assert.throws(() => current.assertCurrent(), undefined, 'late physical source ' + path);
+    if (inPhase('physical-cold')) assert.equal(admission.sourceOk(args), false, 'cold physical source ' + path);
+    if (inPhase('physical-late')) assert.throws(() => current.assertCurrent(), undefined, 'late physical source ' + path);
   } finally { fs.readFileSync = physicalRead; syncBuiltinESMExports(); }
 }
 
+if (phase === 'physical-cold' || phase === 'physical-late') {
+  finishPhase({controls: sourceControls, bound: current.bound.length}); process.exit(0);
+}
 // A reader cannot project old product bytes or fabricate a current producer.
 let projected = null;
 const projectedRead = path => path === projected ? Buffer.concat([read(path), Buffer.from('\n')]) : read(path);
@@ -196,6 +229,8 @@ assert.deepEqual(afterRegistry.sourceContractDefinitions.slice(0, -1), beforeReg
 assert.equal(afterRegistry.sourceContractDefinitions.at(-1).sha, sha);
 assert.deepEqual(body, originalBody); assert.ok(read(LEDGER).equals(physicalLedger)); assert.ok(read(REGISTRY).equals(physicalRegistry)); assert.ok(read(finalPath).equals(finalBefore));
 
+if (phase === 'projection') { finishPhase({projection_controls: projectionControls,
+  historical_acquisition_metadata_successor_cases: 1, bound: current.bound.length}); process.exit(0); }
 const ref = (path, raw) => ({path, sha256: hash(raw), bytes: raw.length});
 const proposalImages = process.argv.length === 4 ? [
   ['ledger_before_image', '-ledger-before.json.gz', before], ['ledger_after_image', '-ledger-after.json.gz', stage.after],

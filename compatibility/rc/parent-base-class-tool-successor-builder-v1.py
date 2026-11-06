@@ -81,6 +81,7 @@ SUPPORT = {line: (*paths, 'scripts/tabs-finite-source-successor.mjs', 'compatibi
 SUPPORT['21.x'] = (*SUPPORT['21.x'], 'compatibility/rc/parent-base-admission-tabs-source-successor-v1.json', 'tests/tabs_finite_source_successor_t16_probe.mjs', 'tests/tabs_finite_source_successor_t16_runner.py')
 SUPPORT['21.x'] = (*SUPPORT['21.x'], 'tests/legacy_static_reference_batch_probe.mjs', 'tests/legacy_static_reference_batch_runner.py')
 SUPPORT = {line: (*paths, 'tests/browser_reference_independent.py', 'tests/browser_reference_independent_support.py', 'tests/test_browser_reference_independent_metadata.py') for line, paths in SUPPORT.items()}
+SUPPORT['21.x'] = (*SUPPORT['21.x'], 'compatibility/rc/parent-base-admission-tabs-inspector-successor-v1.json', 'tests/test_base_class_tabs_inspector_successor.py', 'tests/base_class_tabs_inspector_frame_probe.mjs', 'tests/base_class_tabs_inspector_successor_probe.mjs', 'tests/base_class_removal_admission_probe.mjs')
 TABLE_STAGE = dict(path='scripts/table-local-compilation-canonical-stage.mjs', sha256='bdb3137f6db42ed2611ac3a41e400478defed7f0076d203061d1e12d03f63b7c', bytes=8231)
 LEGACY_SOURCE = dict(path='scripts/legacy-removal-owner-source.mjs', sha256='b88708bb7ed441e24c6ed623371330426d6a947df83452ca343487767d2c9122', bytes=6628)
 TABLE_PACKET = dict(path='compatibility/rc/21x-table-local-compilation-admission-owner-inputs.json', sha256='1a35dd57edd9952a23d4bb2e8e9783f19583c00badfd7e9846fdbd2abc94f48b', bytes=184121)

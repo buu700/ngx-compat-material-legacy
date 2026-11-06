@@ -32,7 +32,10 @@ const ADMISSION_TRANSITION = Object.freeze({path: 'compatibility/rc/parent-base-
   sha256: 'f9fc32edb6e1ede3cf647eba6da1901d31a4df6d687dc9aa41139f3ebcfd090e', bytes: 20020});
 const ADMISSION_TABS_TRANSITION = Object.freeze({path: 'compatibility/rc/parent-base-admission-tabs-source-successor-v1.json',
   sha256: '76a45031cc14d8a0bdda804467febff74d850d992bc288fe0799e52caf0f811f', bytes: 10132});
-const INSPECT_SOURCE_FUNCTION_SHA256 = '789c9016cd5e598f420d6fbde1fef078d2f38779b3db3a0ac4fa7a85d733a047';
+const ADMISSION_INSPECTOR_TRANSITION = Object.freeze({path: 'compatibility/rc/parent-base-admission-tabs-inspector-successor-v1.json',
+  sha256: 'a5d00961753b75706cc9ac9412a64763fec68b162667d13ce26964bcd078a5af', bytes: 3745});
+const HISTORICAL_INSPECT_SOURCE_FUNCTION_SHA256 = '789c9016cd5e598f420d6fbde1fef078d2f38779b3db3a0ac4fa7a85d733a047';
+const INSPECT_SOURCE_FUNCTION_SHA256 = '87225357bc9646fe78f8b5f89111763a196a3fc8475300eec67b124f571728fb';
 const GUARD_PLAN_FUNCTION_SHA256 = 'fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947';
 const rootDefault = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const image = readFileSync(fileURLToPath(import.meta.url));
@@ -137,12 +140,29 @@ function admissionTransitionPhysical(root) {
   assert.equal(hash(successorRaw), ADMISSION_TABS_TRANSITION.sha256, 'changed tabs admission transition');
   assert.equal(successorRaw.length, ADMISSION_TABS_TRANSITION.bytes);
   const successor = JSON.parse(successorRaw);
+  const inspectorRaw = physical(root, ADMISSION_INSPECTOR_TRANSITION.path);
+  assert.equal(hash(inspectorRaw), ADMISSION_INSPECTOR_TRANSITION.sha256, 'changed tabs inspector transition');
+  assert.equal(inspectorRaw.length, ADMISSION_INSPECTOR_TRANSITION.bytes);
+  const inspector = JSON.parse(inspectorRaw);
+  assert.equal(inspector.schema_version, 1); assert.equal(inspector.role, 'base-admission-tabs-inspector-successor');
+  assert.equal(inspector.line, '21.x'); assert.equal(inspector.source_parent, '2f5201af2294a1c99552fb1876583b4e8d11b5f2');
+  assert.deepEqual(inspector.previous_transition, ADMISSION_TABS_TRANSITION);
+  assert.equal(inspector.source_scope_only, true); assert.equal(inspector.historical_programs_executed, false);
+  assert.equal(inspector.canonical_changes_applied, false); assert.equal(inspector.g11_claim, 'not-passed');
+  assert.deepEqual(inspector.inspect_source_function_sha256, {before: HISTORICAL_INSPECT_SOURCE_FUNCTION_SHA256, after: INSPECT_SOURCE_FUNCTION_SHA256});
+  assert.deepEqual(inspector.loaded_producer_function_sha256, successor.loaded_producer_function_sha256);
+  const inspectorRow = inspector.transition;
+  assert.equal(inspectorRow.path, 'scripts/upstream-base-class-removal-admission.cjs');
+  assert.equal(inspectorRow.before.path, inspectorRow.path); assert.equal(inspectorRow.after.path, inspectorRow.path);
+  assert.deepEqual({path: inspectorRow.before.path, sha256: inspectorRow.before.sha256, bytes: inspectorRow.before.bytes}, successor.transitions[0].after);
+  assert.deepEqual(inspector.loaded_source_references, successor.loaded_source_references.map(ref =>
+    ref.path === inspectorRow.path ? inspectorRow.after : ref));
   assert.equal(successor.schema_version, 1);assert.equal(successor.role, 'base-admission-tabs-source-successor');
   assert.equal(successor.line, '21.x');assert.equal(successor.source_parent, '058628c44cbc51d9272777624101e91b6c0a5a42');
   assert.deepEqual(successor.previous_transition, ADMISSION_TRANSITION);
   assert.equal(successor.source_scope_only, true);assert.equal(successor.historical_programs_executed, false);
   assert.equal(successor.canonical_changes_applied, false);assert.equal(successor.g11_claim, 'not-passed');
-  assert.equal(successor.unchanged_inspect_source_sha256, INSPECT_SOURCE_FUNCTION_SHA256);
+  assert.equal(successor.unchanged_inspect_source_sha256, HISTORICAL_INSPECT_SOURCE_FUNCTION_SHA256);
   assert.equal(successor.unchanged_metadata_ok_sha256, METADATA_OK_FUNCTION_SHA256);
   assert.deepEqual(successor.transitions.map(row=>row.path), ['scripts/upstream-base-class-removal-admission.cjs','scripts/historical-contract-repair-source.mjs']);
   const advanced=new Map(successor.transitions.map(row=>[row.path,row]));
@@ -151,7 +171,7 @@ function admissionTransitionPhysical(root) {
   // These captured references describe actual module-load images and function
   // text. Restoring disk after import cannot reattribute an older executable.
   for (const [name, captured, expected] of [
-    ['loadedSourceReferences', loadedSourceReferences, successor.loaded_source_references],
+    ['loadedSourceReferences', loadedSourceReferences, inspector.loaded_source_references],
     ['loadedProducerFunctionSha256', loadedProducerFunctionSha256, successor.loaded_producer_function_sha256],
   ]) {
     assert.equal(ownValue(admission, name), captured, 'changed loaded base-class identity data');
@@ -166,7 +186,7 @@ function admissionTransitionPhysical(root) {
       }
     }
   }
-  for (const ref of successor.loaded_source_references) {
+  for (const ref of inspector.loaded_source_references) {
     const actual = physical(root, ref.path);
     assert.equal(hash(actual), ref.sha256, 'changed loaded base-class producer file ' + ref.path);
     assert.equal(actual.length, ref.bytes);
@@ -182,7 +202,7 @@ function admissionTransitionPhysical(root) {
   assert.deepEqual(transition.historical_owner_inputs, {path: INPUTS, sha256: INPUTS_SHA256, bytes: 7115});
   assert.deepEqual(transition.inspect_source_function_sha256, {
     before: 'a51ba5f5ab6574b638906895aea1ff462fc120f84ad0a1a4333d8066f19fb389',
-    after: INSPECT_SOURCE_FUNCTION_SHA256,
+    after: HISTORICAL_INSPECT_SOURCE_FUNCTION_SHA256,
   });
   assert.deepEqual(transition.code_transitions.map(row => row.path), [
     'scripts/upstream-base-class-removal-admission.cjs', 'scripts/upstream-base-class-removal-source.mjs',
@@ -213,14 +233,31 @@ function admissionTransitionPhysical(root) {
     assert.equal(row.before.path,row.path);assert.equal(row.after.path,row.path);
     const before=original(root,successor.source_parent,row.before);let cursor=0;const parts=[];
     for(const edit of row.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=before.length);assert.equal(typeof edit.before,'string');assert.equal(typeof edit.after,'string');const old=Buffer.from(edit.before);assert.ok(equalBuffers(before.subarray(edit.offset,edit.offset+old.length),old),'changed tabs admission literal preimage');parts.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+old.length;}
-    const after=Buffer.concat([...parts,before.subarray(cursor)]);assert.equal(hash(after),row.after.sha256);assert.equal(after.length,row.after.bytes);assert.ok(equalBuffers(after,physical(root,row.path)),'changed current tabs admission source '+row.path);
+    const after=Buffer.concat([...parts,before.subarray(cursor)]);assert.equal(hash(after),row.after.sha256);assert.equal(after.length,row.after.bytes);if(row.path===inspectorRow.path){
+      assert.ok(equalBuffers(after,original(root,inspector.source_parent,inspectorRow.before)),'changed prior tabs inspector source');
+    }else assert.ok(equalBuffers(after,physical(root,row.path)),'changed current tabs admission source '+row.path);
   }
+  const inspectorBefore = original(root, inspector.source_parent, inspectorRow.before);
+  let inspectorCursor = 0; const inspectorParts = [];
+  for (const edit of inspectorRow.edits) {
+    assert.deepEqual(Object.keys(edit).sort(), ['after', 'before', 'offset']);
+    assert.ok(Number.isSafeInteger(edit.offset) && edit.offset >= inspectorCursor && edit.offset <= inspectorBefore.length);
+    assert.equal(typeof edit.before, 'string'); assert.equal(typeof edit.after, 'string');
+    const old = Buffer.from(edit.before);
+    assert.ok(equalBuffers(inspectorBefore.subarray(edit.offset, edit.offset + old.length), old), 'changed tabs inspector literal preimage');
+    inspectorParts.push(inspectorBefore.subarray(inspectorCursor, edit.offset), Buffer.from(edit.after));
+    inspectorCursor = edit.offset + old.length;
+  }
+  const inspectorAfter = Buffer.concat([...inspectorParts, inspectorBefore.subarray(inspectorCursor)]);
+  assert.equal(hash(inspectorAfter), inspectorRow.after.sha256); assert.equal(inspectorAfter.length, inspectorRow.after.bytes);
+  assert.ok(equalBuffers(inspectorAfter, physical(root, inspectorRow.path)), 'changed current tabs inspector source');
   // Construct the genuine tabs guard with a private physical reader before any
   // caller callback. Its complete bound population joins this frame's cold and
   // final sweeps, including callbacks that run later in the outer owner.
   const tabs = tabsFiniteSourceSuccessor({root, line: '21.x', read: path => physical(root, path)});
-  return {...transition, loaded_source_references: successor.loaded_source_references,
-    additional_members: [...successor.additional_members, ...tabs.bound]};
+  return {...transition, inspect_source_function_sha256: {before: transition.inspect_source_function_sha256.before, after: inspector.inspect_source_function_sha256.after},
+    loaded_source_references: inspector.loaded_source_references,
+    additional_members: [ADMISSION_INSPECTOR_TRANSITION, ...successor.additional_members, ...tabs.bound]};
 }
 
 /** Only actual physical callbacks are accepted. No historical-reader fallback. */

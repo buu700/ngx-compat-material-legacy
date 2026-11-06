@@ -17,29 +17,49 @@ PREFIX = 'compatibility/rc/21x-base-class-removal-admission-'
 
 class BaseClassRemovalAdmissionTest(unittest.TestCase):
     def test_current_source_contract(self):
-        child = subprocess.run(
-            ['node', 'tests/base_class_removal_admission_probe.mjs'],
-            cwd=ROOT, capture_output=True, text=True, timeout=120,
-        )
-        self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-8000:])
-        report = json.loads(child.stdout)
-        self.assertEqual(report['result'], 'pass')
-        self.assertEqual(report['metadata_rejections'], 22)
-        self.assertEqual(report['substituted_loaded_producer_rejections'], 8)
-        self.assertEqual(report['metadata_reader_positive_cases'], 1)
-        self.assertEqual(report['cold_metadata_reader_mutation_rejections'], 3)
-        self.assertEqual(report['late_metadata_caller_mutation_rejections'], 3)
-        self.assertEqual(report['late_metadata_reader_mutation_rejections'], 3)
-        self.assertEqual(report['request_entry_replacement_rejections'], 1)
-        self.assertEqual(report['explicit_null_proof_rejections'], 1)
-        self.assertEqual(report['historical_acquisition_metadata_successor_cases'], 1)
-        self.assertEqual(report['cold_physical_source_rejections'], 19)
-        self.assertEqual(report['late_physical_source_rejections'], 19)
-        self.assertEqual(report['projection_rejections'], 8)
-        self.assertEqual(report['bound'], 1119)
-        self.assertEqual(report['canonical_files_changed'], 0)
-        self.assertFalse(report['full_owner_integration_qualified'])
-        self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified'])
+        reports = {}
+        phases = ('metadata-cold', 'metadata-late', 'physical-cold', 'physical-late', 'projection')
+        for phase in phases:
+            child = subprocess.run(
+                ['node', 'tests/base_class_removal_admission_probe.mjs', '--phase', phase],
+                cwd=ROOT, capture_output=True, text=True, timeout=120,
+            )
+            self.assertEqual(child.returncode, 0, phase + ': ' + (child.stdout + child.stderr)[-8000:])
+            report = json.loads(child.stdout)
+            self.assertEqual(report['result'], 'pass')
+            self.assertEqual(report['phase'], phase)
+            self.assertFalse(report['full_owner_integration_qualified'])
+            self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified'])
+            reports[phase] = report
+        cold, late = reports['metadata-cold'], reports['metadata-late']
+        self.assertEqual(cold['metadata_rejections'], 22)
+        self.assertEqual(cold['substituted_loaded_producer_rejections'], 8)
+        self.assertEqual(cold['metadata_reader_positive_cases'], 1)
+        self.assertEqual(cold['cold_metadata_reader_mutation_rejections'], 3)
+        self.assertEqual(cold['explicit_null_proof_rejections'], 1)
+        self.assertEqual(late['late_metadata_caller_mutation_rejections'], 3)
+        self.assertEqual(late['late_metadata_reader_mutation_rejections'], 3)
+        self.assertEqual(late['request_entry_replacement_rejections'], 1)
+        physical = reports['physical-cold']['controls']
+        self.assertEqual(len(physical), 19)
+        self.assertEqual(len(set(physical)), 19)
+        self.assertEqual(reports['physical-late']['controls'], physical)
+        projection = reports['projection']
+        self.assertEqual(projection['projection_controls'], [physical[i] for i in (1, 2, 12, 16)])
+        self.assertEqual(2 * len(projection['projection_controls']), 8)
+        self.assertEqual(projection['historical_acquisition_metadata_successor_cases'], 1)
+        tabs = json.loads((ROOT / 'compatibility/rc/parent-tabs-finite-source-successor-v1.json').read_bytes())
+        package = 'projects/ngx-material-legacy/package.json'
+        added = {'scripts/tabs-finite-source-successor.mjs', 'compatibility/rc/parent-tabs-finite-source-successor-v1.json'}
+        added.update(ref['path'] for ref in tabs['branches']['21.x']['evidence'] if ref['path'] != package)
+        for phase in ('physical-cold', 'physical-late', 'projection'):
+            self.assertEqual(reports[phase]['bound'], 1119 + len(added))
+
+    def test_unknown_or_empty_phase_rejected(self):
+        for arguments in (['--phase'], ['--phase', ''], ['--phase', 'unknown']):
+            child = subprocess.run(['node', 'tests/base_class_removal_admission_probe.mjs', *arguments],
+                                   cwd=ROOT, capture_output=True, text=True, timeout=30)
+            self.assertNotEqual(child.returncode, 0, arguments)
 
     def test_independent_unapplied_proposal_images(self):
         packet = json.loads((ROOT / (PREFIX + 'canonical-proposal-v6.json')).read_bytes())
@@ -122,11 +142,28 @@ class BaseClassRemovalAdmissionTest(unittest.TestCase):
         self.assertEqual(successor['source_parent'], owner['source_parent'])
         self.assertEqual(successor['historical_proposal'], owner['proposal'])
         self.assertEqual({key: successor['code_transitions'][0]['before'][key] for key in ('path', 'sha256', 'bytes')}, packet['handler'])
-        for row in successor['code_transitions']:
-            old = git_data(successor['source_parent'], row['path'])
+        tabs_raw = (ROOT / 'compatibility/rc/parent-base-admission-tabs-source-successor-v1.json').read_bytes()
+        self.assertEqual(hashlib.sha256(tabs_raw).hexdigest(), '76a45031cc14d8a0bdda804467febff74d850d992bc288fe0799e52caf0f811f')
+        tabs = json.loads(tabs_raw)
+        self.assertEqual(tabs['previous_transition']['sha256'], hashlib.sha256(successor_raw).hexdigest())
+        inspector_raw = (ROOT / 'compatibility/rc/parent-base-admission-tabs-inspector-successor-v1.json').read_bytes()
+        inspector = json.loads(inspector_raw)
+        self.assertEqual(inspector['previous_transition']['sha256'], hashlib.sha256(tabs_raw).hexdigest())
+        pin = re.search(rb"const ADMISSION_INSPECTOR_TRANSITION = Object.freeze\(\{path: '[^']+',\n  sha256: '([a-f0-9]{64})', bytes: (\d+)\}\);", leaf)
+        self.assertIsNotNone(pin)
+        self.assertEqual(hashlib.sha256(inspector_raw).hexdigest(), pin[1].decode())
+        self.assertEqual(len(inspector_raw), int(pin[2]))
+        transitions = [(successor['source_parent'], row) for row in successor['code_transitions']]
+        transitions += [(tabs['source_parent'], row) for row in tabs['transitions']]
+        transitions += [(inspector['source_parent'], inspector['transition'])]
+        last = {}
+        for parent, row in transitions:
+            old = git_data(parent, row['path'])
             self.assertEqual(hashlib.sha256(old).hexdigest(), row['before']['sha256'])
             self.assertEqual(len(old), row['before']['bytes'])
             self.assertEqual(hashlib.sha1(b'blob ' + str(len(old)).encode() + b'\0' + old).hexdigest(), row['before']['git_blob'])
+            if row['path'] in last:
+                self.assertEqual(last[row['path']], old)
             cursor, parts = 0, []
             for edit in row['edits']:
                 offset, literal = edit['offset'], edit['before'].encode()
@@ -135,9 +172,11 @@ class BaseClassRemovalAdmissionTest(unittest.TestCase):
                 parts.extend((old[cursor:offset], edit['after'].encode()))
                 cursor = offset + len(literal)
             rebuilt = b''.join([*parts, old[cursor:]])
-            self.assertEqual(rebuilt, (ROOT / row['path']).read_bytes())
             self.assertEqual(hashlib.sha256(rebuilt).hexdigest(), row['after']['sha256'])
             self.assertEqual(len(rebuilt), row['after']['bytes'])
+            last[row['path']] = rebuilt
+        for path, rebuilt in last.items():
+            self.assertEqual(rebuilt, (ROOT / path).read_bytes())
         template = owner['stage_extension_template']
         transition_raw = (ROOT / 'compatibility/rc/21x-base-class-owner-guard-plan-transition-v3.json').read_bytes()
         self.assertEqual(hashlib.sha256(transition_raw).hexdigest(), '879dd05cc50b934d8cfe2a7bfa816ce598ad9cb172272ca7b5dfa2f5087feb71')

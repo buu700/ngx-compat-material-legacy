@@ -133,6 +133,9 @@ function inspectSource(request = {}) {
   assert.equal(repairs.line, '21.x'); assert.equal(repairs.old_product_bytes_exposed, false);
   for (const ref of repairs.bound) member(ref);
   assert.deepEqual(repairs.images.map(({path, before, after}) => ({path, before, after})), body.qualified_repair_successors);
+  // The separately reviewed tabs repair succeeds two historical source bindings.
+  // Its selector is only an expected reference; retain its own fresh guard.
+  const tabs = tabsFiniteSourceSuccessor({root, line: '21.x', read});
   const final = JSON.parse(read(SOURCE + 'final-review-qualified.json'));
   assert.equal(final.source_bindings.length, 715); assert.equal(new Set(final.source_bindings.map(ref => ref.path)).size, 715);
   assert.equal(final.required_repairs_satisfied, false); assert.equal(final.canonical_admission_ready, false);
@@ -152,7 +155,8 @@ function inspectSource(request = {}) {
     }
     const successor = repairs.qualify(ref);
     if (successor) { assert.deepEqual(repairs.historicalReference(ref), ref); assert.notEqual(successor.sha256, ref.sha256); changed++; }
-    member(successor || currentSourceReference(ref));
+    const prior = successor || currentSourceReference(ref);
+    member(tabs.qualify(prior) || prior);
   }
   assert.equal(changed, 5); assert.equal(historical, 3);
   const original = JSON.parse(gunzipSync(read(SOURCE + 'originals.json.gz')));
@@ -186,6 +190,7 @@ function inspectSource(request = {}) {
   const assertCurrent = () => {
     assertMetadata();
     repairs.assertCurrent();
+    tabs.assertCurrent();
     for (const ref of bound.values()) {
       const actual = readHistoricalContractRepairMember(root, ref.path);
       assert.equal(hash(actual), ref.sha256, 'late base-class admission input ' + ref.path); assert.equal(actual.length, ref.bytes);
