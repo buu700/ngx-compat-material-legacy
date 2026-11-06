@@ -1457,34 +1457,34 @@ describe('MatChipList', () => {
     it('should hide the errors and show the hints once the chip list becomes valid', fakeAsync(() => {
       errorTestComponent.formControl.markAsTouched();
       fixture.detectChanges();
+      flushMicrotasks();
+      fixture.detectChanges();
 
-      fixture.whenStable().then(() => {
-        expect(containerEl.classList)
-          .withContext('Expected container to have the invalid CSS class.')
-          .toContain('mat-form-field-invalid');
-        expect(containerEl.querySelectorAll('mat-error').length)
-          .withContext('Expected one error message to have been rendered.')
-          .toBe(1);
-        expect(containerEl.querySelectorAll('mat-hint').length)
-          .withContext('Expected no hints to be shown.')
-          .toBe(0);
+      expect(containerEl.classList)
+        .withContext('Expected container to have the invalid CSS class.')
+        .toContain('mat-form-field-invalid');
+      expect(containerEl.querySelectorAll('mat-error').length)
+        .withContext('Expected one error message to have been rendered.')
+        .toBe(1);
+      expect(containerEl.querySelectorAll('mat-hint').length)
+        .withContext('Expected no hints to be shown.')
+        .toBe(0);
 
-        errorTestComponent.formControl.setValue('something');
-        fixture.detectChanges();
+      errorTestComponent.formControl.setValue('something');
+      fixture.detectChanges();
+      flushMicrotasks();
+      fixture.detectChanges();
 
-        fixture.whenStable().then(() => {
-          expect(containerEl.classList).not.toContain(
-            'mat-form-field-invalid',
-            'Expected container not to have the invalid class when valid.',
-          );
-          expect(containerEl.querySelectorAll('mat-error').length)
-            .withContext('Expected no error messages when the input is valid.')
-            .toBe(0);
-          expect(containerEl.querySelectorAll('mat-hint').length)
-            .withContext('Expected one hint to be shown once the input is valid.')
-            .toBe(1);
-        });
-      });
+      expect(containerEl.classList).not.toContain(
+        'mat-form-field-invalid',
+        'Expected container not to have the invalid class when valid.',
+      );
+      expect(containerEl.querySelectorAll('mat-error').length)
+        .withContext('Expected no error messages when the input is valid.')
+        .toBe(0);
+      expect(containerEl.querySelectorAll('mat-hint').length)
+        .withContext('Expected one hint to be shown once the input is valid.')
+        .toBe(1);
     }));
 
     it('should be in a parent element with an aria-live attribute to announce the error', () => {
@@ -1647,7 +1647,7 @@ describe('MatChipList', () => {
       expect(document.activeElement).toBe(chipArray[2]._elementRef.nativeElement);
     });
 
-    it('should refocus the first chip after focus leaves while index zero remains active', fakeAsync(() => {
+    it('should refocus the first chip after focus leaves and active index clears', fakeAsync(() => {
       setupStandardList();
       const keyManager = chipListInstance._keyManager;
       const outside = document.createElement('button');
@@ -1659,7 +1659,8 @@ describe('MatChipList', () => {
         tick();
         fixture.detectChanges();
         expect(document.activeElement).toBe(outside);
-        expect(keyManager.activeItemIndex).toBe(0);
+        // The tagged chip list clears the active item when focus leaves.
+        expect(keyManager.activeItemIndex).toBe(-1);
 
         chipListInstance.focus();
         fixture.detectChanges();

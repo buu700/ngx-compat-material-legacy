@@ -34,8 +34,7 @@ import {SpyLocation} from '@angular/common/testing';
 import {Directionality} from '@angular/cdk/bidi';
 import {supportsShadowDom} from '../internal/owned-shadow-dom';
 import {MatLegacyDialogContainer} from './dialog-container';
-import {_MatDialogContainerBase} from './internal/dialog-container-base';
-import {legacyDialogFocusNotifications} from './internal/dialog-container-state';
+import {_MatLegacyDialogContainerBase as _MatDialogContainerBase} from '@ngx-compat/material-legacy/legacy-dialog';
 import {MatDialogConfig} from '@angular/material/dialog';
 import {MatLegacyDialogConfig} from './dialog-config';
 import {ComponentPortal} from '@angular/cdk/portal';
@@ -58,6 +57,15 @@ import {
 } from './index';
 import {Subject} from 'rxjs';
 import {MatLegacyDialogRef, MatLegacyDialogState} from '@ngx-compat/material-legacy/legacy-dialog';
+
+/** Read the stream installed by the packed container instead of a workspace-local WeakMap. */
+function legacyDialogFocusNotifications(container: object): {subscribe: Subject<void>['subscribe']} {
+  const stream = (container as {_focusTrapped?: Subject<void>})._focusTrapped;
+  if (!stream || typeof stream.subscribe !== 'function') {
+    throw Error('Packed legacy dialog focus stream is unavailable');
+  }
+  return stream;
+}
 
 describe('MatDialog', () => {
   let dialog: MatLegacyDialog;
@@ -164,6 +172,10 @@ describe('MatDialog', () => {
     // callback should not be called before animation is complete
     expect(spy).not.toHaveBeenCalled();
 
+    flushMicrotasks();
+    viewContainerFixture.detectChanges();
+    flushMicrotasks();
+    viewContainerFixture.detectChanges();
     flushMicrotasks();
     expect(spy).toHaveBeenCalled();
   }));
@@ -899,6 +911,10 @@ describe('MatDialog', () => {
     const dialogRef = dialog.open(PizzaMsg, {viewContainerRef: testViewContainerRef});
     viewContainerFixture.detectChanges();
     flush();
+    viewContainerFixture.detectChanges();
+    flushMicrotasks();
+    viewContainerFixture.detectChanges();
+    flushMicrotasks();
 
     expect(sibling.getAttribute('aria-hidden'))
       .withContext('Expected sibling to be hidden')
@@ -1041,6 +1057,10 @@ describe('MatDialog', () => {
           viewContainerRef: testViewContainerRef,
         });
 
+        viewContainerFixture.detectChanges();
+        flushMicrotasks();
+        viewContainerFixture.detectChanges();
+        flushMicrotasks();
         viewContainerFixture.detectChanges();
         flushMicrotasks();
 
@@ -1243,6 +1263,10 @@ describe('MatDialog', () => {
 
       viewContainerFixture.detectChanges();
       flushMicrotasks();
+      viewContainerFixture.detectChanges();
+      flushMicrotasks();
+      viewContainerFixture.detectChanges();
+      flushMicrotasks();
 
       expect(document.activeElement!.tagName)
         .withContext('Expected first tabbable element (input) in the dialog to be focused.')
@@ -1348,6 +1372,10 @@ describe('MatDialog', () => {
       flushMicrotasks();
       viewContainerFixture.detectChanges();
       flushMicrotasks();
+      viewContainerFixture.detectChanges();
+      flushMicrotasks();
+      viewContainerFixture.detectChanges();
+      flushMicrotasks();
 
       expect(document.activeElement!.id).not.toBe(
         'dialog-trigger',
@@ -1387,6 +1415,10 @@ describe('MatDialog', () => {
       flushMicrotasks();
       fixture.detectChanges();
       flushMicrotasks();
+      fixture.detectChanges();
+      flushMicrotasks();
+      fixture.detectChanges();
+      flushMicrotasks();
 
       const spy = spyOn(button, 'focus').and.callThrough();
       dialogRef.close();
@@ -1414,6 +1446,11 @@ describe('MatDialog', () => {
 
       tick(500);
       viewContainerFixture.detectChanges();
+      flushMicrotasks();
+      viewContainerFixture.detectChanges();
+      flushMicrotasks();
+      viewContainerFixture.detectChanges();
+      flushMicrotasks();
       expect(lastFocusOrigin!)
         .withContext('Expected the trigger button to be blurred')
         .toBeNull();
@@ -1449,6 +1486,11 @@ describe('MatDialog', () => {
 
       tick(500);
       viewContainerFixture.detectChanges();
+      flushMicrotasks();
+      viewContainerFixture.detectChanges();
+      flushMicrotasks();
+      viewContainerFixture.detectChanges();
+      flushMicrotasks();
       expect(lastFocusOrigin!)
         .withContext('Expected the trigger button to be blurred')
         .toBeNull();
@@ -1489,6 +1531,11 @@ describe('MatDialog', () => {
 
       tick(500);
       viewContainerFixture.detectChanges();
+      flushMicrotasks();
+      viewContainerFixture.detectChanges();
+      flushMicrotasks();
+      viewContainerFixture.detectChanges();
+      flushMicrotasks();
       tick(500);
       expect(lastFocusOrigin!).withContext('Expected the trigger button to be blurred').toBeNull();
 
@@ -1591,6 +1638,10 @@ describe('MatDialog', () => {
 
       viewContainerFixture.detectChanges();
       flushMicrotasks();
+      viewContainerFixture.detectChanges();
+      flushMicrotasks();
+      viewContainerFixture.detectChanges();
+      flushMicrotasks();
 
       expect(document.activeElement!.tagName)
         .withContext('Expected dialog container to be focused.')
@@ -1609,6 +1660,10 @@ describe('MatDialog', () => {
         restoreFocus: false,
       });
 
+      flushMicrotasks();
+      viewContainerFixture.detectChanges();
+      flushMicrotasks();
+      viewContainerFixture.detectChanges();
       flushMicrotasks();
       viewContainerFixture.detectChanges();
       flushMicrotasks();
@@ -1644,6 +1699,10 @@ describe('MatDialog', () => {
 
       const dialogRef = dialog.open(PizzaMsg, {viewContainerRef: testViewContainerRef});
 
+      flushMicrotasks();
+      viewContainerFixture.detectChanges();
+      flushMicrotasks();
+      viewContainerFixture.detectChanges();
       flushMicrotasks();
       viewContainerFixture.detectChanges();
       flushMicrotasks();
@@ -2343,6 +2402,7 @@ describe('Owned legacy dialog initial focus', () => {
     const disposed = spyOn(overlay, 'dispose').and.callThrough();
     const config = new MatDialogConfig();
     config.autoFocus = 'dialog';
+    config.delayFocusTrap = false;
     config.restoreFocus = true;
     const monitor = TestBed.inject(FocusMonitor);
     const focused = spyOn(monitor, 'focusVia').and.callThrough();
@@ -2402,6 +2462,7 @@ describe('Owned legacy dialog initial focus', () => {
       target.remove();
       host.remove();
       view.destroy();
+      view.nativeElement.remove();
     }
   }));
 
@@ -2430,6 +2491,7 @@ describe('Owned legacy dialog initial focus', () => {
       target.remove();
       host.remove();
       view.destroy();
+      view.nativeElement.remove();
     }
   }));
 
@@ -2449,6 +2511,7 @@ describe('Owned legacy dialog initial focus', () => {
     expect(fixture.nativeElement.parentElement.querySelectorAll('.cdk-focus-trap-anchor').length)
       .toBe(0);
     fixture.destroy();
+    fixture.nativeElement.remove();
   }));
 
   it('should cancel queued initial focus when the container is destroyed', fakeAsync(() => {
@@ -2461,6 +2524,7 @@ describe('Owned legacy dialog initial focus', () => {
       Promise.resolve().then(() => {});
       fixture.componentInstance.requestInitialFocus();
       fixture.destroy();
+      fixture.nativeElement.remove();
     });
     flushMicrotasks();
     expect(focus).not.toHaveBeenCalled();
@@ -2480,6 +2544,7 @@ describe('Owned legacy dialog initial focus', () => {
       expect(document.activeElement).toBe(heading);
     });
     fixture.destroy();
+    fixture.nativeElement.remove();
     flushMicrotasks();
     expect(heading.hasAttribute('tabindex')).toBe(false);
   }));
@@ -2494,6 +2559,7 @@ describe('Owned legacy dialog initial focus', () => {
     expect(document.activeElement).toBe(heading);
     expect(heading.getAttribute('tabindex')).toBe('-1');
     fixture.destroy();
+    fixture.nativeElement.remove();
     expect(heading.hasAttribute('tabindex')).toBe(false);
   }));
 });
@@ -2633,6 +2699,7 @@ for (const mode of ['enabled', 'di-disabled'] as const) {
       expect(fixture.componentInstance._state).toBe('enter');
       expect(fixture.componentInstance._animationsEnabled).toBe(mode === 'enabled');
       fixture.destroy();
+      fixture.nativeElement.remove();
     });
 
     it('should cancel queued open work on actual fixture destruction', fakeAsync(() => {
@@ -2643,6 +2710,7 @@ for (const mode of ['enabled', 'di-disabled'] as const) {
       fixture.componentInstance.attachComponentPortal(new ComponentPortal(LegacyMotionContent));
       expect(states).toEqual(['opening']);
       fixture.destroy();
+      fixture.nativeElement.remove();
       flush();
       expect(states).toEqual(['opening']);
       expect(document.querySelectorAll('.cdk-focus-trap-anchor').length).toBe(0);
@@ -2664,6 +2732,7 @@ for (const mode of ['enabled', 'di-disabled'] as const) {
       expect(fixture.nativeElement.classList.contains('mat-legacy-dialog-container-open')).toBe(false);
       expect(fixture.nativeElement.classList.contains('mat-legacy-dialog-container-opening')).toBe(false);
       fixture.destroy();
+      fixture.nativeElement.remove();
     }));
 
     if (mode === 'enabled') {
@@ -2672,6 +2741,7 @@ for (const mode of ['enabled', 'di-disabled'] as const) {
         config.enterAnimationDuration = '0ms';
         config.exitAnimationDuration = '0ms';
         config.restoreFocus = false;
+        config.autoFocus = 'dialog';
         TestBed.overrideProvider(MatLegacyDialogConfig, {useValue: config});
         const fixture = TestBed.createComponent(MatLegacyDialogContainer);
         fixture.detectChanges();
@@ -2685,6 +2755,7 @@ for (const mode of ['enabled', 'di-disabled'] as const) {
         expect(fixture.nativeElement.classList.contains('mat-legacy-dialog-container-opening')).toBe(false);
         expect(getComputedStyle(fixture.nativeElement).opacity).toBe('1');
         fixture.destroy();
+        fixture.nativeElement.remove();
         flush();
         expect(states).toEqual(['opening', 'opened']);
       }));
