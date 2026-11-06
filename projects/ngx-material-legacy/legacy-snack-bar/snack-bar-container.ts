@@ -44,12 +44,18 @@ export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {
   private readonly _legacyAnimationsDisabled = legacyAnimationsDisabled();
   readonly _animationsEnabled = !this._legacyAnimationsDisabled;
 
+  private _legacyMotionDestroyed = false;
   private _enterFallback: ReturnType<typeof setTimeout> | null = null;
   private _exitFallback: ReturnType<typeof setTimeout> | null = null;
 
   protected override _afterEnterMotionStarted(): void {
     if (!this._animationsEnabled) {
-      this._notifyEnter();
+      // Let callers subscribe after open() returns, as with the historical no-op animation.
+      queueMicrotask(() => {
+        if (!this._legacyMotionDestroyed && this._animationState === 'visible') {
+          this._notifyEnter();
+        }
+      });
       return;
     }
     if (this._enterFallback !== null) {
@@ -109,6 +115,7 @@ export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {
   }
 
   override ngOnDestroy() {
+    this._legacyMotionDestroyed = true;
     if (this._enterFallback !== null) {
       clearTimeout(this._enterFallback);
     }

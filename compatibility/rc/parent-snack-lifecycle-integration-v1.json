@@ -1,0 +1,539 @@
+{
+  "schema": "parent-snack-lifecycle-integration-v1",
+  "change": "Restore asynchronous no-op afterOpened notification so an immediate caller receives next and complete; suppress stale opening after dismissal, replacement or destruction.",
+  "motion_review": "Seven lifecycle regressions cover subscription timing, dismissal, replacement, destruction, duration and subscriber reentry. Compiled container template and CSS matched prior artifact bytes in independent review; no HTML/CSS/SCSS source changed.",
+  "source_and_spec_binding": {
+    "branches": {
+      "21": {
+        "prototype_tarball_sha256": "f83ed7caf0c56026bfcb19b8f537cb5557b084bd7824d622e25ee5d99458b88c",
+        "source_map": "package/fesm2022/ngx-compat-material-legacy-legacy-snack-bar.mjs.map",
+        "sources": {
+          "snack-bar-container.ts": {
+            "source_sha256": "a35d7e06fb778203478236024a6137e34624f0ed7f10fabcc7ac3bd9aaf4a510",
+            "current_sha256": "a35d7e06fb778203478236024a6137e34624f0ed7f10fabcc7ac3bd9aaf4a510",
+            "exact_except_documented_comment": true
+          },
+          "internal/snack-bar-base.ts": {
+            "source_sha256": "293baf9806cc7bc0c53ab5a68c745536d79e40e3e2a82928b9515361dbdf302f",
+            "current_sha256": "2064e816539a77a2749ab9d2141721a40ab27e3dfbf4edafa1f5b9afedfc453b",
+            "exact_except_documented_comment": true
+          }
+        },
+        "maintained_spec_sha256": "92425afa5ddcb406c75b4af69ea9dd795f3b3d10ef8898b909a7bd1ad69f7230",
+        "spec_is_independently_tested_exact_bytes": true
+      },
+      "main": {
+        "prototype_tarball_sha256": "963b8b64ecaa75aaa209eb98356909699e0d660e759ec46599df5164331cbff1",
+        "source_map": "package/fesm2022/ngx-compat-material-legacy-legacy-snack-bar.mjs.map",
+        "sources": {
+          "snack-bar-container.ts": {
+            "source_sha256": "a35d7e06fb778203478236024a6137e34624f0ed7f10fabcc7ac3bd9aaf4a510",
+            "current_sha256": "a35d7e06fb778203478236024a6137e34624f0ed7f10fabcc7ac3bd9aaf4a510",
+            "exact_except_documented_comment": true
+          },
+          "internal/snack-bar-base.ts": {
+            "source_sha256": "293baf9806cc7bc0c53ab5a68c745536d79e40e3e2a82928b9515361dbdf302f",
+            "current_sha256": "2064e816539a77a2749ab9d2141721a40ab27e3dfbf4edafa1f5b9afedfc453b",
+            "exact_except_documented_comment": true
+          }
+        },
+        "maintained_spec_sha256": "92425afa5ddcb406c75b4af69ea9dd795f3b3d10ef8898b909a7bd1ad69f7230",
+        "spec_is_independently_tested_exact_bytes": true
+      }
+    },
+    "prior_attempt": "Initial exact-source assertion incorrectly assumed prototype contained later comment patch. It failed on service comment only; actual source diff was inspected and this receipt accounts for that sole comment delta. Runtime source is identical.",
+    "limits": "Source binding to independent prior scratch tarball runs only; no new current packed/full graph qualification."
+  },
+  "application": {
+    "schema": "parent-snack-lifecycle-controlled-integration-v1",
+    "patches": {
+      "/tmp/c04-snackbar-batch/prototype.patch": "b9d63f4fac9c89ba653d43ad23f669e6b3d5fb207a433c25076d44aad7b0db04",
+      "/tmp/c04-snackbar-batch/comment.patch": "dca3d03411e4d57456bdce7f738a7142c5f55f8edb8dac4825c32b2461104b12",
+      "/tmp/c04-snackbar-batch/tests-v3.patch": "93ecac77cbcf15f6f0c407184f0f4986b992f2a4639812cd867fb10daa75c7e6"
+    },
+    "reviews": {
+      "/tmp/c04-snackbar-independent-review-v1.json": "19747c821b56e23cd5823edc8541c724fd4f4fc43dc0d6a98de5e57cd6063ea4",
+      "/tmp/c04-snackbar-microtask-independent-review-v1.json": "9531a853cad5cd1860a79cb6d7158cdb265fd9df2c4642d934b247aa3d5d149e"
+    },
+    "branches": {
+      "21": {
+        "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+        "before_head": "98cc39341c3bc2f971cfafa6c00fcc6d0ff9f06d",
+        "before": {
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts": {
+            "sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5",
+            "bytes": 4650
+          },
+          "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts": {
+            "sha256": "293baf9806cc7bc0c53ab5a68c745536d79e40e3e2a82928b9515361dbdf302f",
+            "bytes": 11168
+          },
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts": {
+            "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3",
+            "bytes": 45763
+          }
+        },
+        "unrelated_before": {
+          "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts": {
+            "sha256": "b3b29351381b979f024c6b99222209838fb5cc13fcd167c4b96b297ac8e5a124",
+            "bytes": 8361
+          },
+          "projects/ngx-material-legacy/legacy-select/select.html": {
+            "sha256": "9d895bf6cbf1b2da7063acedc1fed7ee4cf7f10ce25bc7a797e8ee32875feec2",
+            "bytes": 2843
+          },
+          "projects/ngx-material-legacy/legacy-select/select.spec.ts": {
+            "sha256": "7cf9610d306941613ae22a4615121a67a5328b82da2b5f768c7382cee6b8c3dc",
+            "bytes": 226954
+          },
+          "compatibility/rc/parent-base-class-canonical-generator-independent-review-v1.json": {
+            "sha256": "45c382a25d2b4f2f8b0d2e4d2728c4d9fb9540987a100802df061a93aadd821b",
+            "bytes": 2716
+          },
+          "compatibility/rc/parent-base-class-tool-successor-inputs-v3-before-refresh-v10.json": {
+            "sha256": "1839c4557859790a3ab2bbba6b08998eab633107c56d8934bc6a6e9b18b41f07",
+            "bytes": 161767
+          },
+          "compatibility/rc/parent-checker-chip-consumer-callbacks-scratch-v1.json": {
+            "sha256": "85c57e4ed1e375cdccf0c0767d73a2bbc83c82383539a80057aa42803ce398a4",
+            "bytes": 54371
+          },
+          "compatibility/rc/snack-current-owner-repair-base-class-preapplication-v11.json": {
+            "sha256": "c357c61bd227814046de3ada493531c7265c6acb1d8411ee75507aa5b0b7c27b",
+            "bytes": 2538
+          },
+          "compatibility/rc/snack-current-owner-repair-base-class-preapplication-v14.json": {
+            "sha256": "8f9710794d5ee0e3df10e20d0148178885152728f0030bf36a9353ec015a1013",
+            "bytes": 2558
+          },
+          "tests/dialog_backdrop_policy_runtime_probe.mjs": {
+            "sha256": "ca51a4aee4f54ffa7642e31a4c29946501264a870a7149e86a32aea691ed42ff",
+            "bytes": 7621
+          },
+          "tests/test_dialog_backdrop_policy_runtime.py": {
+            "sha256": "9e92add250391319518bdfba8a02057d59acfb137fad1384f7ef7fb5d815af12",
+            "bytes": 1119
+          }
+        },
+        "after": {
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts": {
+            "sha256": "a35d7e06fb778203478236024a6137e34624f0ed7f10fabcc7ac3bd9aaf4a510",
+            "bytes": 4960
+          },
+          "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts": {
+            "sha256": "2064e816539a77a2749ab9d2141721a40ab27e3dfbf4edafa1f5b9afedfc453b",
+            "bytes": 11168
+          },
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts": {
+            "sha256": "92425afa5ddcb406c75b4af69ea9dd795f3b3d10ef8898b909a7bd1ad69f7230",
+            "bytes": 49266
+          }
+        },
+        "unrelated_after": {
+          "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts": {
+            "sha256": "b3b29351381b979f024c6b99222209838fb5cc13fcd167c4b96b297ac8e5a124",
+            "bytes": 8361
+          },
+          "projects/ngx-material-legacy/legacy-select/select.html": {
+            "sha256": "9d895bf6cbf1b2da7063acedc1fed7ee4cf7f10ce25bc7a797e8ee32875feec2",
+            "bytes": 2843
+          },
+          "projects/ngx-material-legacy/legacy-select/select.spec.ts": {
+            "sha256": "7cf9610d306941613ae22a4615121a67a5328b82da2b5f768c7382cee6b8c3dc",
+            "bytes": 226954
+          },
+          "compatibility/rc/parent-base-class-canonical-generator-independent-review-v1.json": {
+            "sha256": "45c382a25d2b4f2f8b0d2e4d2728c4d9fb9540987a100802df061a93aadd821b",
+            "bytes": 2716
+          },
+          "compatibility/rc/parent-base-class-tool-successor-inputs-v3-before-refresh-v10.json": {
+            "sha256": "1839c4557859790a3ab2bbba6b08998eab633107c56d8934bc6a6e9b18b41f07",
+            "bytes": 161767
+          },
+          "compatibility/rc/parent-checker-chip-consumer-callbacks-scratch-v1.json": {
+            "sha256": "85c57e4ed1e375cdccf0c0767d73a2bbc83c82383539a80057aa42803ce398a4",
+            "bytes": 54371
+          },
+          "compatibility/rc/snack-current-owner-repair-base-class-preapplication-v11.json": {
+            "sha256": "c357c61bd227814046de3ada493531c7265c6acb1d8411ee75507aa5b0b7c27b",
+            "bytes": 2538
+          },
+          "compatibility/rc/snack-current-owner-repair-base-class-preapplication-v14.json": {
+            "sha256": "8f9710794d5ee0e3df10e20d0148178885152728f0030bf36a9353ec015a1013",
+            "bytes": 2558
+          },
+          "tests/dialog_backdrop_policy_runtime_probe.mjs": {
+            "sha256": "ca51a4aee4f54ffa7642e31a4c29946501264a870a7149e86a32aea691ed42ff",
+            "bytes": 7621
+          },
+          "tests/test_dialog_backdrop_policy_runtime.py": {
+            "sha256": "9e92add250391319518bdfba8a02057d59acfb137fad1384f7ef7fb5d815af12",
+            "bytes": 1119
+          }
+        },
+        "diff": "diff --git a/projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts b/projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts\nindex 0720d48ce..ffc030e35 100644\n--- a/projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts\n+++ b/projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts\n@@ -237,7 +237,7 @@ export abstract class _MatSnackBarBase implements OnDestroy {\n       }\n     });\n \n-    // Subscribe before enter() so noop-animation sync _onEnter still arms duration.\n+    // Subscribe before enter() so the opening notification arms the duration timer.\n     if (config.duration && config.duration > 0) {\n       snackBarRef.afterOpened().subscribe(() => snackBarRef._dismissAfter(config.duration!));\n     }\ndiff --git a/projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts b/projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts\nindex 80c5bc255..cd0cff189 100644\n--- a/projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts\n+++ b/projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts\n@@ -44,12 +44,18 @@ export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {\n   private readonly _legacyAnimationsDisabled = legacyAnimationsDisabled();\n   readonly _animationsEnabled = !this._legacyAnimationsDisabled;\n \n+  private _legacyMotionDestroyed = false;\n   private _enterFallback: ReturnType<typeof setTimeout> | null = null;\n   private _exitFallback: ReturnType<typeof setTimeout> | null = null;\n \n   protected override _afterEnterMotionStarted(): void {\n     if (!this._animationsEnabled) {\n-      this._notifyEnter();\n+      // Let callers subscribe after open() returns, as with the historical no-op animation.\n+      queueMicrotask(() => {\n+        if (!this._legacyMotionDestroyed && this._animationState === 'visible') {\n+          this._notifyEnter();\n+        }\n+      });\n       return;\n     }\n     if (this._enterFallback !== null) {\n@@ -109,6 +115,7 @@ export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {\n   }\n \n   override ngOnDestroy() {\n+    this._legacyMotionDestroyed = true;\n     if (this._enterFallback !== null) {\n       clearTimeout(this._enterFallback);\n     }\ndiff --git a/projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts b/projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts\nindex d532ca11d..ccfad7a95 100644\n--- a/projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts\n+++ b/projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts\n@@ -647,7 +647,7 @@ describe('MatSnackBar', () => {\n   it('should cap the timeout to the maximum accepted delay in setTimeout', fakeAsync(() => {\n     const config = new MatLegacySnackBarConfig();\n     config.duration = Infinity;\n-    // Spy before open so noop-animation sync afterOpened still records the capped timer\n+    // Spy before open to observe the capped duration timer.\n     // (Material-current async suite spies before open for the same reason).\n     spyOn(window, 'setTimeout').and.callThrough();\n     snackBar.open('content', 'test', config);\n@@ -1211,3 +1211,109 @@ class BurritosNotification {\n class ComponentThatProvidesMatSnackBar {\n   constructor(public snackBar: MatLegacySnackBar) {}\n }\n+\n+\n+describe('legacy snack bar no-op open notification', () => {\n+  beforeEach(() => {\n+    TestBed.configureTestingModule({\n+      imports: [MatLegacySnackBarModule],\n+      providers: [LEGACY_NOOP_ANIMATIONS],\n+    });\n+  });\n+\n+  it('notifies a caller who subscribes immediately after open returns', fakeAsync(() => {\n+    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n+    let notifications = 0;\n+    let completed = false;\n+    ref.afterOpened().subscribe({next: () => notifications++, complete: () => completed = true});\n+    expect(notifications).toBe(0);\n+    expect(completed).toBeFalse();\n+    tick();\n+    expect(notifications).toBe(1);\n+    expect(completed).toBeTrue();\n+    ref.dismiss();\n+    tick();\n+  }));\n+\n+  it('does not notify a snack bar dismissed before its enter completes', fakeAsync(() => {\n+    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n+    let notifications = 0;\n+    ref.afterOpened().subscribe(() => notifications++);\n+    ref.dismiss();\n+    tick();\n+    expect(notifications).toBe(0);\n+  }));\n+\n+  it('only notifies the replacement when replaced before enter completes', fakeAsync(() => {\n+    const snackBar = TestBed.inject(MatLegacySnackBar);\n+    const previous = snackBar.open('previous');\n+    let previousNotifications = 0;\n+    previous.afterOpened().subscribe(() => previousNotifications++);\n+    const next = snackBar.open('next');\n+    let nextNotifications = 0;\n+    next.afterOpened().subscribe(() => nextNotifications++);\n+    tick();\n+    expect(previousNotifications).toBe(0);\n+    expect(nextNotifications).toBe(1);\n+    next.dismiss();\n+    tick();\n+  }));\n+\n+  it('does not notify after the container is destroyed', fakeAsync(() => {\n+    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n+    let notifications = 0;\n+    ref.afterOpened().subscribe(() => notifications++);\n+    ref.containerInstance.ngOnDestroy();\n+    tick();\n+    expect(notifications).toBe(0);\n+  }));\n+\n+  it('still starts the duration timer when opening completes', fakeAsync(() => {\n+    const ref = TestBed.inject(MatLegacySnackBar).open('message', '', {duration: 100});\n+    let opened = 0;\n+    let dismissed = 0;\n+    ref.afterOpened().subscribe(() => opened++);\n+    ref.afterDismissed().subscribe(() => dismissed++);\n+    tick();\n+    expect(opened).toBe(1);\n+    tick(100);\n+    expect(dismissed).toBe(1);\n+  }));\n+});\n+\n+\n+describe('legacy snack bar reentrant no-op notification', () => {\n+  beforeEach(() => TestBed.configureTestingModule({\n+    imports: [MatLegacySnackBarModule],\n+    providers: [LEGACY_NOOP_ANIMATIONS],\n+  }));\n+\n+  it('allows an afterOpened subscriber to dismiss immediately', fakeAsync(() => {\n+    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n+    let opened = 0;\n+    let dismissed = 0;\n+    ref.afterDismissed().subscribe(() => dismissed++);\n+    ref.afterOpened().subscribe(() => { opened++; ref.dismiss(); });\n+    tick();\n+    expect(opened).toBe(1);\n+    expect(dismissed).toBe(1);\n+  }));\n+\n+  it('allows an afterOpened subscriber to replace the snack bar', fakeAsync(() => {\n+    const snackBar = TestBed.inject(MatLegacySnackBar);\n+    const previous = snackBar.open('previous');\n+    let previousOpened = 0;\n+    let nextOpened = 0;\n+    let next: MatLegacySnackBarRef<LegacySimpleSnackBar>;\n+    previous.afterOpened().subscribe(() => {\n+      previousOpened++;\n+      next = snackBar.open('next');\n+      next.afterOpened().subscribe(() => nextOpened++);\n+    });\n+    tick();\n+    expect(previousOpened).toBe(1);\n+    expect(nextOpened).toBe(1);\n+    next!.dismiss();\n+    tick();\n+  }));\n+});\n"
+      },
+      "main": {
+        "root": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+        "before_head": "ed2cb5f984f67d60febcefa3a032899038e000a1",
+        "before": {
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts": {
+            "sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5",
+            "bytes": 4650
+          },
+          "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts": {
+            "sha256": "293baf9806cc7bc0c53ab5a68c745536d79e40e3e2a82928b9515361dbdf302f",
+            "bytes": 11168
+          },
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts": {
+            "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3",
+            "bytes": 45763
+          }
+        },
+        "unrelated_before": {
+          "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts": {
+            "sha256": "b3b29351381b979f024c6b99222209838fb5cc13fcd167c4b96b297ac8e5a124",
+            "bytes": 8361
+          },
+          "projects/ngx-material-legacy/legacy-select/select.html": {
+            "sha256": "9d895bf6cbf1b2da7063acedc1fed7ee4cf7f10ce25bc7a797e8ee32875feec2",
+            "bytes": 2843
+          },
+          "projects/ngx-material-legacy/legacy-select/select.spec.ts": {
+            "sha256": "ac1f5c3cfe7efedfbe4ca4eb86452fccada944ce1ead224e9779bd9d28f1c499",
+            "bytes": 226944
+          },
+          "tests/dialog_backdrop_policy_runtime_probe.mjs": {
+            "sha256": "ca51a4aee4f54ffa7642e31a4c29946501264a870a7149e86a32aea691ed42ff",
+            "bytes": 7621
+          },
+          "tests/test_dialog_backdrop_policy_runtime.py": {
+            "sha256": "9e92add250391319518bdfba8a02057d59acfb137fad1384f7ef7fb5d815af12",
+            "bytes": 1119
+          }
+        },
+        "after": {
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts": {
+            "sha256": "a35d7e06fb778203478236024a6137e34624f0ed7f10fabcc7ac3bd9aaf4a510",
+            "bytes": 4960
+          },
+          "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts": {
+            "sha256": "2064e816539a77a2749ab9d2141721a40ab27e3dfbf4edafa1f5b9afedfc453b",
+            "bytes": 11168
+          },
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts": {
+            "sha256": "92425afa5ddcb406c75b4af69ea9dd795f3b3d10ef8898b909a7bd1ad69f7230",
+            "bytes": 49266
+          }
+        },
+        "unrelated_after": {
+          "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts": {
+            "sha256": "b3b29351381b979f024c6b99222209838fb5cc13fcd167c4b96b297ac8e5a124",
+            "bytes": 8361
+          },
+          "projects/ngx-material-legacy/legacy-select/select.html": {
+            "sha256": "9d895bf6cbf1b2da7063acedc1fed7ee4cf7f10ce25bc7a797e8ee32875feec2",
+            "bytes": 2843
+          },
+          "projects/ngx-material-legacy/legacy-select/select.spec.ts": {
+            "sha256": "ac1f5c3cfe7efedfbe4ca4eb86452fccada944ce1ead224e9779bd9d28f1c499",
+            "bytes": 226944
+          },
+          "tests/dialog_backdrop_policy_runtime_probe.mjs": {
+            "sha256": "ca51a4aee4f54ffa7642e31a4c29946501264a870a7149e86a32aea691ed42ff",
+            "bytes": 7621
+          },
+          "tests/test_dialog_backdrop_policy_runtime.py": {
+            "sha256": "9e92add250391319518bdfba8a02057d59acfb137fad1384f7ef7fb5d815af12",
+            "bytes": 1119
+          }
+        },
+        "diff": "diff --git a/projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts b/projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts\nindex 0720d48ce..ffc030e35 100644\n--- a/projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts\n+++ b/projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts\n@@ -237,7 +237,7 @@ export abstract class _MatSnackBarBase implements OnDestroy {\n       }\n     });\n \n-    // Subscribe before enter() so noop-animation sync _onEnter still arms duration.\n+    // Subscribe before enter() so the opening notification arms the duration timer.\n     if (config.duration && config.duration > 0) {\n       snackBarRef.afterOpened().subscribe(() => snackBarRef._dismissAfter(config.duration!));\n     }\ndiff --git a/projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts b/projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts\nindex 80c5bc255..cd0cff189 100644\n--- a/projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts\n+++ b/projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts\n@@ -44,12 +44,18 @@ export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {\n   private readonly _legacyAnimationsDisabled = legacyAnimationsDisabled();\n   readonly _animationsEnabled = !this._legacyAnimationsDisabled;\n \n+  private _legacyMotionDestroyed = false;\n   private _enterFallback: ReturnType<typeof setTimeout> | null = null;\n   private _exitFallback: ReturnType<typeof setTimeout> | null = null;\n \n   protected override _afterEnterMotionStarted(): void {\n     if (!this._animationsEnabled) {\n-      this._notifyEnter();\n+      // Let callers subscribe after open() returns, as with the historical no-op animation.\n+      queueMicrotask(() => {\n+        if (!this._legacyMotionDestroyed && this._animationState === 'visible') {\n+          this._notifyEnter();\n+        }\n+      });\n       return;\n     }\n     if (this._enterFallback !== null) {\n@@ -109,6 +115,7 @@ export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {\n   }\n \n   override ngOnDestroy() {\n+    this._legacyMotionDestroyed = true;\n     if (this._enterFallback !== null) {\n       clearTimeout(this._enterFallback);\n     }\ndiff --git a/projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts b/projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts\nindex d532ca11d..ccfad7a95 100644\n--- a/projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts\n+++ b/projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts\n@@ -647,7 +647,7 @@ describe('MatSnackBar', () => {\n   it('should cap the timeout to the maximum accepted delay in setTimeout', fakeAsync(() => {\n     const config = new MatLegacySnackBarConfig();\n     config.duration = Infinity;\n-    // Spy before open so noop-animation sync afterOpened still records the capped timer\n+    // Spy before open to observe the capped duration timer.\n     // (Material-current async suite spies before open for the same reason).\n     spyOn(window, 'setTimeout').and.callThrough();\n     snackBar.open('content', 'test', config);\n@@ -1211,3 +1211,109 @@ class BurritosNotification {\n class ComponentThatProvidesMatSnackBar {\n   constructor(public snackBar: MatLegacySnackBar) {}\n }\n+\n+\n+describe('legacy snack bar no-op open notification', () => {\n+  beforeEach(() => {\n+    TestBed.configureTestingModule({\n+      imports: [MatLegacySnackBarModule],\n+      providers: [LEGACY_NOOP_ANIMATIONS],\n+    });\n+  });\n+\n+  it('notifies a caller who subscribes immediately after open returns', fakeAsync(() => {\n+    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n+    let notifications = 0;\n+    let completed = false;\n+    ref.afterOpened().subscribe({next: () => notifications++, complete: () => completed = true});\n+    expect(notifications).toBe(0);\n+    expect(completed).toBeFalse();\n+    tick();\n+    expect(notifications).toBe(1);\n+    expect(completed).toBeTrue();\n+    ref.dismiss();\n+    tick();\n+  }));\n+\n+  it('does not notify a snack bar dismissed before its enter completes', fakeAsync(() => {\n+    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n+    let notifications = 0;\n+    ref.afterOpened().subscribe(() => notifications++);\n+    ref.dismiss();\n+    tick();\n+    expect(notifications).toBe(0);\n+  }));\n+\n+  it('only notifies the replacement when replaced before enter completes', fakeAsync(() => {\n+    const snackBar = TestBed.inject(MatLegacySnackBar);\n+    const previous = snackBar.open('previous');\n+    let previousNotifications = 0;\n+    previous.afterOpened().subscribe(() => previousNotifications++);\n+    const next = snackBar.open('next');\n+    let nextNotifications = 0;\n+    next.afterOpened().subscribe(() => nextNotifications++);\n+    tick();\n+    expect(previousNotifications).toBe(0);\n+    expect(nextNotifications).toBe(1);\n+    next.dismiss();\n+    tick();\n+  }));\n+\n+  it('does not notify after the container is destroyed', fakeAsync(() => {\n+    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n+    let notifications = 0;\n+    ref.afterOpened().subscribe(() => notifications++);\n+    ref.containerInstance.ngOnDestroy();\n+    tick();\n+    expect(notifications).toBe(0);\n+  }));\n+\n+  it('still starts the duration timer when opening completes', fakeAsync(() => {\n+    const ref = TestBed.inject(MatLegacySnackBar).open('message', '', {duration: 100});\n+    let opened = 0;\n+    let dismissed = 0;\n+    ref.afterOpened().subscribe(() => opened++);\n+    ref.afterDismissed().subscribe(() => dismissed++);\n+    tick();\n+    expect(opened).toBe(1);\n+    tick(100);\n+    expect(dismissed).toBe(1);\n+  }));\n+});\n+\n+\n+describe('legacy snack bar reentrant no-op notification', () => {\n+  beforeEach(() => TestBed.configureTestingModule({\n+    imports: [MatLegacySnackBarModule],\n+    providers: [LEGACY_NOOP_ANIMATIONS],\n+  }));\n+\n+  it('allows an afterOpened subscriber to dismiss immediately', fakeAsync(() => {\n+    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n+    let opened = 0;\n+    let dismissed = 0;\n+    ref.afterDismissed().subscribe(() => dismissed++);\n+    ref.afterOpened().subscribe(() => { opened++; ref.dismiss(); });\n+    tick();\n+    expect(opened).toBe(1);\n+    expect(dismissed).toBe(1);\n+  }));\n+\n+  it('allows an afterOpened subscriber to replace the snack bar', fakeAsync(() => {\n+    const snackBar = TestBed.inject(MatLegacySnackBar);\n+    const previous = snackBar.open('previous');\n+    let previousOpened = 0;\n+    let nextOpened = 0;\n+    let next: MatLegacySnackBarRef<LegacySimpleSnackBar>;\n+    previous.afterOpened().subscribe(() => {\n+      previousOpened++;\n+      next = snackBar.open('next');\n+      next.afterOpened().subscribe(() => nextOpened++);\n+    });\n+    tick();\n+    expect(previousOpened).toBe(1);\n+    expect(nextOpened).toBe(1);\n+    next!.dismiss();\n+    tick();\n+  }));\n+});\n"
+      }
+    },
+    "remote_actions": "none",
+    "root_review_delta": "Only the service comment differs from the reviewed comment patch: opening notification accurately describes the next handler; runtime and regression code exactly match the reviewed patches.",
+    "qualification_limit": "66/66 per floor belongs to independently tested prior prototype tarballs, not the current maintained graph or final RC artifact. No new browser/full source/RC gate is claimed."
+  },
+  "retained_index": {
+    "archive": "parent-snackbar-repair-d383929d49789bbb40dea8193caaa9fb9c74276baa674b983bc3c5421c8e2982.tar.gz",
+    "archive_bytes": 4660782,
+    "archive_member_count": 64,
+    "archive_sha256": "d383929d49789bbb40dea8193caaa9fb9c74276baa674b983bc3c5421c8e2982",
+    "claims": {
+      "current_packed_full_motion_or_zone_free_gate_pass": false,
+      "prior_independent_prototype_66_of_66_per_floor": true
+    },
+    "members": {
+      "CONTENTS.json": {
+        "bytes": 19766,
+        "sha256": "0280b956de9af94f104c6a2ca7e1cc501391f72a985cb0afc5e7d1fba8832dd7"
+      },
+      "artifacts/baseline-21.tgz": {
+        "bytes": 1144278,
+        "sha256": "aadc6dcc1284ac36312314aeab1e9b0234dc30ddf65c6a833ff154afd4efcc91"
+      },
+      "artifacts/baseline-main.tgz": {
+        "bytes": 1142568,
+        "sha256": "5b8a87189e893a0c5367a38e20a41d97d5f1399a1e20a32a9e1848025306ccdd"
+      },
+      "artifacts/prototype-21.tgz": {
+        "bytes": 1142850,
+        "sha256": "f83ed7caf0c56026bfcb19b8f537cb5557b084bd7824d622e25ee5d99458b88c"
+      },
+      "artifacts/prototype-main.tgz": {
+        "bytes": 1142745,
+        "sha256": "963b8b64ecaa75aaa209eb98356909699e0d660e759ec46599df5164331cbff1"
+      },
+      "author-review/review.md": {
+        "bytes": 12232,
+        "sha256": "8303e6cdc5c00e537f678c9a2f2e47c80d92f3f7529b9c035875c70f7e6390fa"
+      },
+      "diffs/21-working-tree.patch": {
+        "bytes": 6918,
+        "sha256": "6b836986e0cdbc20e9cee2696568df24de93a2b194ac813b8002ca6722eb6558"
+      },
+      "diffs/main-working-tree.patch": {
+        "bytes": 6918,
+        "sha256": "6b836986e0cdbc20e9cee2696568df24de93a2b194ac813b8002ca6722eb6558"
+      },
+      "historical-reference/tag16-interruption.log": {
+        "bytes": 1481,
+        "sha256": "6d1e0fc1f49cf6081bb5cd5c47fc14ce26fdc0a33564e66f4c63c8759661ee51"
+      },
+      "independent-review/microtask-independent-review-v1.json": {
+        "bytes": 2739,
+        "sha256": "9531a853cad5cd1860a79cb6d7158cdb265fd9df2c4642d934b247aa3d5d149e"
+      },
+      "independent-review/snackbar-independent-review-v1.json": {
+        "bytes": 8592,
+        "sha256": "19747c821b56e23cd5823edc8541c724fd4f4fc43dc0d6a98de5e57cd6063ea4"
+      },
+      "integration/controlled-integration-v1.json": {
+        "bytes": 24415,
+        "sha256": "5331eb966c44e3b2828a167eb1b14b96d3bea9062ece278dc6f73d3ba292d1f0"
+      },
+      "integration/controller.py": {
+        "bytes": 4074,
+        "sha256": "87309cc1dc13ce52c57911f9bfb549f345c3d85e007405ab056dff8f1aa3656c"
+      },
+      "integration/prototype-source-binding-v1.json": {
+        "bytes": 2367,
+        "sha256": "7623e232080440cf484853bc90c3e592f34df294361ad71aa6cb419d8c57eb25"
+      },
+      "patches/comment.patch": {
+        "bytes": 516,
+        "sha256": "dca3d03411e4d57456bdce7f738a7142c5f55f8edb8dac4825c32b2461104b12"
+      },
+      "patches/prototype.patch": {
+        "bytes": 1134,
+        "sha256": "b9d63f4fac9c89ba653d43ad23f669e6b3d5fb207a433c25076d44aad7b0db04"
+      },
+      "patches/tests-v2.patch": {
+        "bytes": 3900,
+        "sha256": "cfc4ac9ef4d4db41330777e82559d1a5be12642b67996778e3c079502b723386"
+      },
+      "patches/tests-v3.patch": {
+        "bytes": 4427,
+        "sha256": "93ecac77cbcf15f6f0c407184f0f4986b992f2a4639812cd867fb10daa75c7e6"
+      },
+      "patches/tests.patch": {
+        "bytes": 2667,
+        "sha256": "806aa1ff2d072775caeb6905cabf30322340f281175784fad1b1eb6f774505cb"
+      },
+      "preimages/21/HEAD-98cc39341c3bc2f971cfafa6c00fcc6d0ff9f06d/projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts": {
+        "bytes": 11168,
+        "sha256": "293baf9806cc7bc0c53ab5a68c745536d79e40e3e2a82928b9515361dbdf302f"
+      },
+      "preimages/21/HEAD-98cc39341c3bc2f971cfafa6c00fcc6d0ff9f06d/projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts": {
+        "bytes": 4650,
+        "sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5"
+      },
+      "preimages/21/HEAD-98cc39341c3bc2f971cfafa6c00fcc6d0ff9f06d/projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts": {
+        "bytes": 45763,
+        "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3"
+      },
+      "preimages/main/HEAD-ed2cb5f984f67d60febcefa3a032899038e000a1/projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts": {
+        "bytes": 11168,
+        "sha256": "293baf9806cc7bc0c53ab5a68c745536d79e40e3e2a82928b9515361dbdf302f"
+      },
+      "preimages/main/HEAD-ed2cb5f984f67d60febcefa3a032899038e000a1/projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts": {
+        "bytes": 4650,
+        "sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5"
+      },
+      "preimages/main/HEAD-ed2cb5f984f67d60febcefa3a032899038e000a1/projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts": {
+        "bytes": 45763,
+        "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3"
+      },
+      "provenance/next-snackbar-terra-assignment-v1.json": {
+        "bytes": 19905,
+        "sha256": "aea8aba47beffff4793a14e86f5d2ce601d7bc09cd8bae2c7dba5993456bb18e"
+      },
+      "provenance/original-object-acquisition-snackbar-10-v2.json": {
+        "bytes": 57615,
+        "sha256": "a4092af3ae9b7f3e6c5c8c88b61d8323cab0f3a629db3a2b2eee35efabd79321"
+      },
+      "provenance/verified-inventory.json": {
+        "bytes": 5365,
+        "sha256": "a4ab258ad7db4e654f07c5e7dd6870737dc82d3e30f2d34067e34c0731dc79a9"
+      },
+      "runs/full-21.json": {
+        "bytes": 12200,
+        "sha256": "e1ff2fd7c8d856b5df947eae4b6baef708fcc3d04ae0ca0cb72676ee5bf85197"
+      },
+      "runs/full-21.log": {
+        "bytes": 7657,
+        "sha256": "4f6e2a2b6a6a48d93b9c2a5619c8d75a2b9d78b0b7d109a3dc34dcc9ec191ded"
+      },
+      "runs/full-main.json": {
+        "bytes": 12202,
+        "sha256": "30bc41fa8d7ad85c9abd8b2eaea9f072343275b89176b9080803c067ba025c1f"
+      },
+      "runs/full-main.log": {
+        "bytes": 7658,
+        "sha256": "8eac9aa7f935d0045fc30a4e0dee7dc2a35a2f3ab8d81e66dc5dc07a51c918c0"
+      },
+      "runs/full-v2-21.json": {
+        "bytes": 12738,
+        "sha256": "6fa1c43363ac3248a5e45b9e3442a4fb7320453624835351f90044203d15c3f1"
+      },
+      "runs/full-v2-21.log": {
+        "bytes": 7868,
+        "sha256": "d994715f042f14027203ce2c8e73903b07eb6b9b3b2ef0460c8581303e66cfc9"
+      },
+      "runs/full-v2-main.json": {
+        "bytes": 12740,
+        "sha256": "3a793fac6b8d9ac7c163beda437eafde389177bca48a2c0dbba5580181f17031"
+      },
+      "runs/full-v2-main.log": {
+        "bytes": 7877,
+        "sha256": "47ced680ca90c2f8ef0249da2cc0014fad9b89ee95ff326e50c879570dd6c406"
+      },
+      "runs/independent-21-report.json": {
+        "bytes": 12747,
+        "sha256": "c9b285846034175e0e8f8423786e25f5861d2b09c89b319eec55d65d676403a1"
+      },
+      "runs/independent-main-report.json": {
+        "bytes": 12749,
+        "sha256": "125a0822f96fd4e64c2c14ad3f0668a0b842014998f95c1e257d411bdafb2382"
+      },
+      "runs/mutant-21-report.json": {
+        "bytes": 15339,
+        "sha256": "dc25bf992b113cc583ef1d50ead3a053bd84adf3ecf02ebcf3f491e5992919dd"
+      },
+      "runs/mutant-21.log": {
+        "bytes": 9588,
+        "sha256": "1018e5c9090414b6e535ae81db79d4ef440dd782ccd2e6db8a4b9d582187531b"
+      },
+      "runs/negative-21.log": {
+        "bytes": 3664,
+        "sha256": "d224fef99a84d1b4eab5d5e436c6f1f2180373f7902cabd36ee033cd065dad41"
+      },
+      "runs/open-21.json": {
+        "bytes": 1800,
+        "sha256": "943b06ec92c7a39c59c3121a13626d0baf240eb82343a10ae2bb0bb4433a02fe"
+      },
+      "runs/open-21.log": {
+        "bytes": 1827,
+        "sha256": "95e36c8148c73a26e29da93a311c5be709ff9294e8e366a8dc3a338dc99df55f"
+      },
+      "runs/open-main.json": {
+        "bytes": 1802,
+        "sha256": "ac1cc6bdc3ab7be2ff52519cddc39d03ec8dab8eba57048ebc4117ffd6220c54"
+      },
+      "runs/open-main.log": {
+        "bytes": 1828,
+        "sha256": "37efb363063b9fb98d9253d6c871915cbb4b25b29718748f90a29a32c8ff714d"
+      },
+      "runs/portable-negative-21.log": {
+        "bytes": 2861,
+        "sha256": "4d379234e93bfb4eed9a557414be7f06869f6d77cc088e01eca742f9e4f8f870"
+      },
+      "runs/portable-negative-main.log": {
+        "bytes": 2862,
+        "sha256": "2b64276a5948744455fff3c7cb4a0a72e3e115d788680c2be1800d79a241713b"
+      },
+      "runs/prototype-21.json": {
+        "bytes": 2362,
+        "sha256": "05305dc5c07e940b3a6141609d19ed76f11e25c1352938dbd682eef927de11ac"
+      },
+      "runs/prototype-21.log": {
+        "bytes": 2226,
+        "sha256": "9355ccf2345f59609c4515cca6155fd4116b8e0823fabdf901d91b1a8a5e6136"
+      },
+      "runs/prototype-main.json": {
+        "bytes": 2364,
+        "sha256": "2c554b567d3b9c4f7d1606fde13518c0583804db4bc28314d57b7cc7ecb94c78"
+      },
+      "runs/prototype-main.log": {
+        "bytes": 2227,
+        "sha256": "2ec38c882743f7d797d616cd7653ba4608a189b7f6c654b0c37a67b3e0aa6ed4"
+      },
+      "runs/tag16-run2.log": {
+        "bytes": 1997,
+        "sha256": "9ffce6a0ff2cfa4a8e4a919de551aa0586ea92ca9fb7529bfb2d8613e2721eb5"
+      },
+      "runs/zoneless-21.json": {
+        "bytes": 1555,
+        "sha256": "ec9779b6ba177bda6b36708caa05d8252d886f2ec6c06ec81450f4c3b022ba73"
+      },
+      "runs/zoneless-21.log": {
+        "bytes": 2121,
+        "sha256": "84c22dee1b7503da12066caef66fea24f13a8b715702bac436cdace2510cc46b"
+      },
+      "runs/zoneless-main.json": {
+        "bytes": 1557,
+        "sha256": "63e1e0cdd504f4652be57e1837eb58ccc300464f4a77a8e0058beac8a27bf4d9"
+      },
+      "runs/zoneless-main.log": {
+        "bytes": 2123,
+        "sha256": "53922cb085aaafa7a409b71dd3532d917a0315ac0dfe7121a444299f52445f44"
+      },
+      "tests/independent-21-snack-bar.spec.ts": {
+        "bytes": 49266,
+        "sha256": "92425afa5ddcb406c75b4af69ea9dd795f3b3d10ef8898b909a7bd1ad69f7230"
+      },
+      "tests/independent-main-snack-bar.spec.ts": {
+        "bytes": 49266,
+        "sha256": "92425afa5ddcb406c75b4af69ea9dd795f3b3d10ef8898b909a7bd1ad69f7230"
+      },
+      "working-after/21/projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts": {
+        "bytes": 11168,
+        "sha256": "2064e816539a77a2749ab9d2141721a40ab27e3dfbf4edafa1f5b9afedfc453b"
+      },
+      "working-after/21/projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts": {
+        "bytes": 4960,
+        "sha256": "a35d7e06fb778203478236024a6137e34624f0ed7f10fabcc7ac3bd9aaf4a510"
+      },
+      "working-after/21/projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts": {
+        "bytes": 49266,
+        "sha256": "92425afa5ddcb406c75b4af69ea9dd795f3b3d10ef8898b909a7bd1ad69f7230"
+      },
+      "working-after/main/projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts": {
+        "bytes": 11168,
+        "sha256": "2064e816539a77a2749ab9d2141721a40ab27e3dfbf4edafa1f5b9afedfc453b"
+      },
+      "working-after/main/projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts": {
+        "bytes": 4960,
+        "sha256": "a35d7e06fb778203478236024a6137e34624f0ed7f10fabcc7ac3bd9aaf4a510"
+      },
+      "working-after/main/projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts": {
+        "bytes": 49266,
+        "sha256": "92425afa5ddcb406c75b4af69ea9dd795f3b3d10ef8898b909a7bd1ad69f7230"
+      }
+    },
+    "retainer_script_sha256": "d02ba9e198ddbe35a1803ceb715a537ce8cbe5eb8cf0504a34b3f610edce85ef",
+    "schema": "parent-snackbar-repair-index-v1"
+  },
+  "archive": {
+    "path": "compatibility/rc/parent-snackbar-repair-d383929d49789bbb40dea8193caaa9fb9c74276baa674b983bc3c5421c8e2982.tar.gz",
+    "sha256": "d383929d49789bbb40dea8193caaa9fb9c74276baa674b983bc3c5421c8e2982",
+    "bytes": 4660782
+  },
+  "limits": [
+    "Independent 66/66 test results per floor concern prior prototype tarballs; current final packed qualification is pending.",
+    "No native animation/reduced-motion/full browser/Zone-free/hydration/full owner/G11/release claim.",
+    "Author assignment citation has a one-character checksum discrepancy disclosed in retained CONTENTS; full review and original-object identities require their separately retained evidence."
+  ],
+  "remote_actions": "none"
+}
