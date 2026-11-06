@@ -3,8 +3,8 @@ import copy,hashlib,importlib.util,json,subprocess,sys,unittest
 from pathlib import Path
 from types import SimpleNamespace
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
-from sass_ordered_aggregate_admission import ordered_aggregate_assertion_ok,ordered_aggregate_envelope_ok
-from sass_ordered_aggregate_fixture import ordered_aggregate_receipt
+from sass_ordered_aggregate_admission import ordered_aggregate_assertion_ok,ordered_aggregate_envelope_ok,ordered_aggregate_expected_css
+from stepper_repaired_snapshot import repaired_ordered_aggregate_receipt as ordered_aggregate_receipt, frozen_sources_stale
 
 def rehash(body,css):
     m=body['actual_measurement'];m.update(css=css,css_sha256=hashlib.sha256(css.encode()).hexdigest(),css_bytes=len(css.encode()));body['candidate_sha256']=m['css_sha256']
@@ -19,7 +19,7 @@ class OrderedAggregateContractTests(unittest.TestCase):
             ('legacy-container-size, 22px','legacy-container-size, 99px'),('padding: 8px','padding: 9px'),('touch-target-display, none','touch-target-display, block'),('--mat-sort-arrow-color','--changed-sort-arrow-color'),('node-min-height, 48px','node-min-height, 99px'),
             ('.dark-shell .mat-badge-accent','.changed-shell .mat-badge-accent'),('.single-panel','.changed-panel'),('--mat-badge-container-shape: 50%','--mat-badge-container-shape: 25%'),('--mat-stepper-header-height','--changed-stepper-header-height')]
         for line in ['main','21.x']:
-            active,body=self.receipt(line);self.assertTrue(ordered_aggregate_envelope_ok(active,body,'ordered'));css=body['actual_measurement']['css']
+            active,body=self.receipt(line);self.assertTrue(frozen_sources_stale(ROOT,body['actual_measurement']['sources']));self.assertFalse(ordered_aggregate_envelope_ok(active,body,'ordered'));css=body['actual_measurement']['css'];self.assertEqual(css,ordered_aggregate_expected_css(body['current_companion']['peers'],line))
             for before,after in changes:
                 changed=css.replace(before,after,1);self.assertTrue(changed!=css,before);wrong=copy.deepcopy(body);rehash(wrong,changed);self.assertFalse(ordered_aggregate_assertion_ok(wrong),before)
             for appended in ['\n.unrelated { color:red; }','\n.dark-shell .mat-badge-content { width:22px; height:22px; }','\n.dark-shell .mat-tree-node { min-height:48px; }']:
@@ -48,7 +48,7 @@ class OrderedAggregateContractTests(unittest.TestCase):
     def test_real_coordinator_rejects_unqualified_or_conflicting_aggregate_receipts(self):
         spec=importlib.util.spec_from_file_location('aggregate_coordinator',ROOT/'scripts/rc-verify.py');v=importlib.util.module_from_spec(spec);spec.loader.exec_module(v)
         for line in ['main','21.x']:
-            active,body=self.receipt(line);v.ACTIVE_RUN=active;self.assertTrue(v._sass_seal_assertion_ok(body,'ordered'))
+            active,body=self.receipt(line);v.ACTIVE_RUN=active;self.assertTrue(frozen_sources_stale(ROOT,body['actual_measurement']['sources']));self.assertFalse(v._sass_seal_assertion_ok(body,'ordered'))
             for key in ['current_companion','actual_measurement']:
                 wrong=copy.deepcopy(body);del wrong[key];self.assertFalse(v._sass_seal_assertion_ok(wrong,'ordered'))
             wrong=copy.deepcopy(body);wrong['current_infrastructure']=None;self.assertFalse(v._sass_seal_assertion_ok(wrong,'ordered'))
@@ -58,14 +58,17 @@ class OrderedAggregateContractTests(unittest.TestCase):
 import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {createHash} from 'node:crypto';
 import {ORDERED_AGGREGATE_CASES,ORDERED_AGGREGATE_CONTRACT,orderedAggregateExpectedCss,orderedAggregateMeasurementOk,orderedAggregateResultMatches} from './scripts/sass-ordered-aggregate-contract.mjs';
 import {orderedCssResults} from './scripts/sass-ordered-css.mjs';
+import {remeasureStepper} from './tests/stepper-repaired-snapshot.mjs';
 const f=JSON.parse(readFileSync('tests/sass_ordered_aggregate_fixture.json')),c=JSON.parse(readFileSync('fixtures/sass/ordered-aggregate-contracts.json')),source=JSON.parse(readFileSync('tests/'+f.source_fixture)),id='06-aggregate-and-companions',sha=s=>createHash('sha256').update(s).digest('hex');
 for(const line of ['main','21.x']){
- const saved=f.measurements[line],m={...saved,sources:source.source_sets[saved.source_set]},peers={};
+ const saved=f.measurements[line],frozen={...saved,sources:source.source_sets[saved.source_set]},m=remeasureStepper(frozen,line),peers={};
  for(const group of ['core','light','dark','panel']){const p=f.peers[group+'-'+line];peers[group]={...p,...(group==='core'?{}:{sources:c.peer_inputs[line].sources})};}
+ assert.ok(orderedAggregateMeasurementOk(frozen,line));
  assert.ok(orderedAggregateMeasurementOk(m,line));assert.equal(orderedAggregateExpectedCss(peers,line),m.css);
  const record={id,status:'compiled',module:'@ngx-compat/material-legacy',fixture_sha256:ORDERED_AGGREGATE_CASES[id].fixture_sha256,css_sha256:m.css_sha256,actual_measurement:m,current_companion:{classification:'conforming-current-companion',contract:ORDERED_AGGREGATE_CONTRACT,peers}};
- const row={file:id+'.css',status:'blocked',baseline_sha256:ORDERED_AGGREGATE_CASES[id].reference_sha256,candidate_sha256:m.css_sha256};assert.ok(orderedAggregateResultMatches(row,record));
- const good=orderedCssResults({files:[row]},{fixtures:[record]}).find(r=>r.case_id===id);assert.equal(good.result,'pass');assert.equal(good.raw_status,'blocked');assert.equal(good.status,'conforming-current-companion');
+ const row={file:id+'.css',status:'blocked',baseline_sha256:ORDERED_AGGREGATE_CASES[id].reference_sha256,candidate_sha256:m.css_sha256};assert.equal(orderedAggregateResultMatches(row,record),false);
+ assert.equal(orderedAggregateResultMatches({...row,candidate_sha256:frozen.css_sha256},{...record,css_sha256:frozen.css_sha256,actual_measurement:frozen}),false);
+ const oldSource=orderedCssResults({files:[row]},{fixtures:[record]}).find(r=>r.case_id===id);assert.equal(oldSource.result,'fail');
  assert.equal(orderedCssResults({files:[row]},{fixtures:[record,record]}).find(r=>r.case_id===id).result,'fail');
  assert.equal(orderedCssResults({files:[row,row]},{fixtures:[record]}).find(r=>r.case_id===id).result,'fail');
  assert.equal(orderedAggregateResultMatches(row,{...record,current_infrastructure:null}),false);

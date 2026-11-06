@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "role": "finite-browser-surface-source-successor",
+  "independent_fixture_review": {
+    "path": "compatibility/rc/c02-a11y-independent-review-v1.json",
+    "sha256": "040856754eda748cd02e9c31744116bc993b04b7f7ba9779f3936ee5b15c943f",
+    "bytes": 3968
+  },
+  "branches": {
+    "21.x": {
+      "source_parent": "717e695a693364901b975eb1186879cfdec12597",
+      "intermediate_commit": "40c8268374acb5aab081bae54209530b7dae3452",
+      "reference_packet": {
+        "path": "compatibility/rc/c04-browser-reference-source-inputs.json",
+        "sha256": "5a8bd910e0d9a64a73558b5da0f48abdf8546b455d8db0fcb921678a0ee0a5ae",
+        "bytes": 115478
+      },
+      "transitions": [
+        {
+          "path": "scripts/browser-surface-families.mjs",
+          "before": {
+            "path": "scripts/browser-surface-families.mjs",
+            "sha256": "eb1174d483d0204ea7aa984d345427a331705a1e132beb9b5b1dec9a2c63827e",
+            "bytes": 42762
+          },
+          "intermediate": {
+            "path": "scripts/browser-surface-families.mjs",
+            "sha256": "917a0b49f48a552bfcb63c31d86c109d1864ccb62383c1d76755ffc583bde4ff",
+            "bytes": 40219
+          },
+          "after": {
+            "path": "scripts/browser-surface-families.mjs",
+            "sha256": "082a1193aa9b6cdcf371b628b545ac95a58f9b245de7b374ed451f4590563b46",
+            "bytes": 40549
+          },
+          "before_to_intermediate": [
+            {
+              "offset": 805,
+              "before": "import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';\n",
+              "after": "import {withChromium} from './check-companion-computed-styles.mjs';\n"
+            },
+            {
+              "offset": 1979,
+              "before": "import {spawn, spawnSync} from 'node:child_process';\n",
+              "after": "import {spawnSync} from 'node:child_process';\n"
+            },
+            {
+              "offset": 2075,
+              "before": "import {createServer} from 'node:http';\n",
+              "after": ""
+            },
+            {
+              "offset": 20649,
+              "before": "const server = createServer((req, res) => {\n  const file = req.url === '/' ? 'index.html' : req.url.split('?')[0].replace(/^\\//, '');\n  try {\n    const body = readFileSync(join(consumer, 'dist', file));\n    res.writeHead(200, {\n      'content-type': file.endsWith('.js') ? 'text/javascript' : file.endsWith('.css') ? 'text/css' : 'text/html',\n      'content-security-policy': PEER_ICON_TT_CSP + \"; img-src 'none'\",\n    });\n    res.end(body);\n  } catch {\n    res.writeHead(404);\n    res.end();\n  }\n});\nawait new Promise(resolve => server.listen(0, '127.0.0.1', resolve));\nconst {port} = server.address();\nconst pageUrl = `http://127.0.0.1:${port}/`;\nconst chromeDir = mkdtempSync(join(tmpdir(), 'ngx-compat-chrome-surface-'));\nconst requestedDebugPort = Number(process.env.CDP_PORT || '0');\nlet debugPort = 0;\nconst chrome = spawn(chromeBin, [\n\n  '--headless=new',\n  '--remote-debugging-port=' + String(requestedDebugPort),\n  '--user-data-dir=' + chromeDir,\n  '--no-sandbox',\n  '--disable-gpu',\n  pageUrl,\n], {stdio: ['ignore', 'ignore', 'pipe']});\nlet chromeLog = '';\nchrome.stderr.on('data', chunk => { chromeLog += chunk; });\n\n",
+              "after": ""
+            },
+            {
+              "offset": 21857,
+              "before": "async function jsonGet(url) {\n  const response = await fetch(url);\n  if (!response.ok) throw new Error(`${url} ${response.status}`);\n  return response.json();\n}\nlet version = null;\nfor (let i = 0; i < 50; i += 1) {\n  try {\n    const endpoint=announcedChromeEndpoint(chromeLog,requestedDebugPort);\n    if(!endpoint){await sleep(100);continue;}\n    const observed=await jsonGet(`http://127.0.0.1:${endpoint.port}/json/version`);\n    if(!debuggerMatchesChild(observed,endpoint))throw Error('debugger does not belong to the surface child');\n    version=observed;debugPort=endpoint.port;break;\n  } catch {\n    await sleep(100);\n  }\n}\nif (!version) fail(1, `Chromium did not open a debugging port\\n${chromeLog.slice(-1000)}`);\nconst targets = await jsonGet(`http://127.0.0.1:${debugPort}/json/list`);\nconst page = targets.find(target => target.type === 'page');\nif (!page) fail(1, 'Chromium opened no page');\nconst ws = new WebSocket(page.webSocketDebuggerUrl);\nawait new Promise((resolve, reject) => {\n  ws.addEventListener('open', resolve);\n  ws.addEventListener('error', reject);\n});\nlet nextId = 0;\nconst pending = new Map();\nws.addEventListener('message', event => {\n  const message = JSON.parse(event.data);\n  const waiter = pending.get(message.id);\n  if (!waiter) return;\n  pending.delete(message.id);\n  if (message.error) waiter.reject(new Error(JSON.stringify(message.error)));\n  else waiter.resolve(message.result);\n});\nfunction send(method, params = {}) {\n  const id = ++nextId;\n  return new Promise((resolve, reject) => {\n    pending.set(id, {resolve, reject});\n    ws.send(JSON.stringify({id, method, params}));\n  });\n}\nasync function evaluate(expression) {\n  const result = await send('Runtime.evaluate', {expression, returnByValue: true, awaitPromise: false});\n  return result.result?.value;\n}\nasync function waitFor(predicateExpr, attempts = 50, delayMs = 100) {\n  for (let i = 0; i < attempts; i += 1) {\n    if (await evaluate(predicateExpr)) return true;\n    await sleep(delayMs);\n  }\n  return false;\n}\n\n",
+              "after": ""
+            },
+            {
+              "offset": 24397,
+              "before": "",
+              "after": "\nlet version = null;\nawait withChromium(join(consumer, 'dist'), async ({send, browser}) => {\n  version = {Browser: browser};\n  const evaluate = async (expression) => {\n    const result = await send('Runtime.evaluate', {expression, returnByValue: true, awaitPromise: false});\n    return result.result?.value;\n  };\n  const waitFor = async (predicateExpr, attempts = 50, delayMs = 100) => {\n    for (let i = 0; i < attempts; i += 1) {\n      if (await evaluate(predicateExpr)) return true;\n      await sleep(delayMs);\n    }\n    return false;\n  };\n"
+            },
+            {
+              "offset": 37055,
+              "before": "} finally {\n  ws.close();\n  chrome.kill();\n  server.close();\n",
+              "after": ""
+            },
+            {
+              "offset": 37118,
+              "before": "",
+              "after": "}, {debugPort: Number(process.env.CDP_PORT || '0'), chromiumArgs: [], requireAnnouncedEndpoint: true,\n  responseHeaders: {'content-security-policy': PEER_ICON_TT_CSP + \"; img-src 'none'\"}});\n"
+            }
+          ],
+          "intermediate_to_after": [
+            {
+              "offset": 13915,
+              "before": "    const launch=() => {\n",
+              "after": "    let persistentRef: LegacyRippleRef | null=null;\n    const launch=(persistent=true) => {\n"
+            },
+            {
+              "offset": 14179,
+              "before": "      const ref=renderer.fadeInRipple(0,0,{centered:true,radius:12,persistent:true,animation:{enterDuration:60,exitDuration:60}});\n",
+              "after": "      const ref=renderer.fadeInRipple(0,0,{centered:true,radius:12,persistent,animation:{enterDuration:60,exitDuration:60}});\n"
+            },
+            {
+              "offset": 15589,
+              "before": "      startFallback:() => {fallback=launch();return {initial_state:LegacyRippleState[fallback.state],initial_connected:fallback.element.isConnected};},\n",
+              "after": "      startFallback:() => {fallback=launch(false);return {initial_state:LegacyRippleState[fallback.state],initial_connected:fallback.element.isConnected};},\n"
+            },
+            {
+              "offset": 15883,
+              "before": "",
+              "after": "      startPersistent:() => {persistentRef=launch();return snapshot(persistentRef);},\n      readPersistent:() => persistentRef?snapshot(persistentRef):null,\n      fadePersistent:() => {persistentRef?.fadeOut();return persistentRef?snapshot(persistentRef):null;},\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/legacy-core-high-contrast-contract.mjs",
+          "before": {
+            "path": "scripts/legacy-core-high-contrast-contract.mjs",
+            "sha256": "3f095503501b42742604127d05fe9323ad0721ff84df131f9755e1402538ebfc",
+            "bytes": 5014
+          },
+          "intermediate": {
+            "path": "scripts/legacy-core-high-contrast-contract.mjs",
+            "sha256": "3f095503501b42742604127d05fe9323ad0721ff84df131f9755e1402538ebfc",
+            "bytes": 5014
+          },
+          "after": {
+            "path": "scripts/legacy-core-high-contrast-contract.mjs",
+            "sha256": "833b2104610b2efb92220515824789e177e48b55786a905634fe1a43316a2c9a",
+            "bytes": 6544
+          },
+          "before_to_intermediate": [],
+          "intermediate_to_after": [
+            {
+              "offset": 1289,
+              "before": "",
+              "after": "const persistent=mode=>mode?.initial_state==='FADING_IN' && mode.initial_connected===true\n  && mode.visible_state==='VISIBLE' && mode.visible_connected===true && mode.visible_wait_completed===true\n  && mode.dismissed_state==='FADING_OUT' && mode.dismissed_connected===true\n  && mode.final_state==='HIDDEN' && mode.final_connected===false && mode.hidden_wait_completed===true;\n\n"
+            },
+            {
+              "offset": 1913,
+              "before": "    && fallback(historic.fallback) && fallback(forced.fallback);\n",
+              "after": "    && fallback(historic.fallback) && fallback(forced.fallback)\n    && persistent(historic.persistent) && persistent(forced.persistent);\n"
+            },
+            {
+              "offset": 4764,
+              "before": "",
+              "after": "      const start=await evaluate('window.__closeoutCoreContrast.startPersistent()');\n      const visible_wait_completed=await waitFor('window.__closeoutCoreContrast.readPersistent()?.state === \"VISIBLE\"',20,50);\n      await send('Runtime.evaluate',{expression:'new Promise(r=>setTimeout(r,250))',awaitPromise:true,returnByValue:true});\n      const visible=await evaluate('window.__closeoutCoreContrast.readPersistent()');\n      const dismissed=await evaluate('window.__closeoutCoreContrast.fadePersistent()');\n      const hidden_wait_completed=await waitFor('window.__closeoutCoreContrast.readPersistent()?.state === \"HIDDEN\"',20,50);\n      const final=await evaluate('window.__closeoutCoreContrast.readPersistent()');\n      observations[key].persistent={initial_state:start.state,initial_connected:start.connected,\n        visible_state:visible.state,visible_connected:visible.connected,visible_wait_completed,\n        dismissed_state:dismissed.state,dismissed_connected:dismissed.connected,\n        final_state:final.state,final_connected:final.connected,hidden_wait_completed};\n"
+            }
+          ]
+        }
+      ]
+    },
+    "main": {
+      "source_parent": "874969c2a1112b68b341d63cb913e40b732d613a",
+      "intermediate_commit": "ccb11b1e47e0e03dfd94cb3dbd50954523f70164",
+      "reference_packet": {
+        "path": "compatibility/rc/c04-browser-reference-source-inputs.json",
+        "sha256": "4b0167af85263a3fb652806e25186e8500e02424749adb860610519d28817e6c",
+        "bytes": 115393
+      },
+      "transitions": [
+        {
+          "path": "scripts/browser-surface-families.mjs",
+          "before": {
+            "path": "scripts/browser-surface-families.mjs",
+            "sha256": "eb1174d483d0204ea7aa984d345427a331705a1e132beb9b5b1dec9a2c63827e",
+            "bytes": 42762
+          },
+          "intermediate": {
+            "path": "scripts/browser-surface-families.mjs",
+            "sha256": "917a0b49f48a552bfcb63c31d86c109d1864ccb62383c1d76755ffc583bde4ff",
+            "bytes": 40219
+          },
+          "after": {
+            "path": "scripts/browser-surface-families.mjs",
+            "sha256": "082a1193aa9b6cdcf371b628b545ac95a58f9b245de7b374ed451f4590563b46",
+            "bytes": 40549
+          },
+          "before_to_intermediate": [
+            {
+              "offset": 805,
+              "before": "import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';\n",
+              "after": "import {withChromium} from './check-companion-computed-styles.mjs';\n"
+            },
+            {
+              "offset": 1979,
+              "before": "import {spawn, spawnSync} from 'node:child_process';\n",
+              "after": "import {spawnSync} from 'node:child_process';\n"
+            },
+            {
+              "offset": 2075,
+              "before": "import {createServer} from 'node:http';\n",
+              "after": ""
+            },
+            {
+              "offset": 20649,
+              "before": "const server = createServer((req, res) => {\n  const file = req.url === '/' ? 'index.html' : req.url.split('?')[0].replace(/^\\//, '');\n  try {\n    const body = readFileSync(join(consumer, 'dist', file));\n    res.writeHead(200, {\n      'content-type': file.endsWith('.js') ? 'text/javascript' : file.endsWith('.css') ? 'text/css' : 'text/html',\n      'content-security-policy': PEER_ICON_TT_CSP + \"; img-src 'none'\",\n    });\n    res.end(body);\n  } catch {\n    res.writeHead(404);\n    res.end();\n  }\n});\nawait new Promise(resolve => server.listen(0, '127.0.0.1', resolve));\nconst {port} = server.address();\nconst pageUrl = `http://127.0.0.1:${port}/`;\nconst chromeDir = mkdtempSync(join(tmpdir(), 'ngx-compat-chrome-surface-'));\nconst requestedDebugPort = Number(process.env.CDP_PORT || '0');\nlet debugPort = 0;\nconst chrome = spawn(chromeBin, [\n\n  '--headless=new',\n  '--remote-debugging-port=' + String(requestedDebugPort),\n  '--user-data-dir=' + chromeDir,\n  '--no-sandbox',\n  '--disable-gpu',\n  pageUrl,\n], {stdio: ['ignore', 'ignore', 'pipe']});\nlet chromeLog = '';\nchrome.stderr.on('data', chunk => { chromeLog += chunk; });\n\n",
+              "after": ""
+            },
+            {
+              "offset": 21857,
+              "before": "async function jsonGet(url) {\n  const response = await fetch(url);\n  if (!response.ok) throw new Error(`${url} ${response.status}`);\n  return response.json();\n}\nlet version = null;\nfor (let i = 0; i < 50; i += 1) {\n  try {\n    const endpoint=announcedChromeEndpoint(chromeLog,requestedDebugPort);\n    if(!endpoint){await sleep(100);continue;}\n    const observed=await jsonGet(`http://127.0.0.1:${endpoint.port}/json/version`);\n    if(!debuggerMatchesChild(observed,endpoint))throw Error('debugger does not belong to the surface child');\n    version=observed;debugPort=endpoint.port;break;\n  } catch {\n    await sleep(100);\n  }\n}\nif (!version) fail(1, `Chromium did not open a debugging port\\n${chromeLog.slice(-1000)}`);\nconst targets = await jsonGet(`http://127.0.0.1:${debugPort}/json/list`);\nconst page = targets.find(target => target.type === 'page');\nif (!page) fail(1, 'Chromium opened no page');\nconst ws = new WebSocket(page.webSocketDebuggerUrl);\nawait new Promise((resolve, reject) => {\n  ws.addEventListener('open', resolve);\n  ws.addEventListener('error', reject);\n});\nlet nextId = 0;\nconst pending = new Map();\nws.addEventListener('message', event => {\n  const message = JSON.parse(event.data);\n  const waiter = pending.get(message.id);\n  if (!waiter) return;\n  pending.delete(message.id);\n  if (message.error) waiter.reject(new Error(JSON.stringify(message.error)));\n  else waiter.resolve(message.result);\n});\nfunction send(method, params = {}) {\n  const id = ++nextId;\n  return new Promise((resolve, reject) => {\n    pending.set(id, {resolve, reject});\n    ws.send(JSON.stringify({id, method, params}));\n  });\n}\nasync function evaluate(expression) {\n  const result = await send('Runtime.evaluate', {expression, returnByValue: true, awaitPromise: false});\n  return result.result?.value;\n}\nasync function waitFor(predicateExpr, attempts = 50, delayMs = 100) {\n  for (let i = 0; i < attempts; i += 1) {\n    if (await evaluate(predicateExpr)) return true;\n    await sleep(delayMs);\n  }\n  return false;\n}\n\n",
+              "after": ""
+            },
+            {
+              "offset": 24397,
+              "before": "",
+              "after": "\nlet version = null;\nawait withChromium(join(consumer, 'dist'), async ({send, browser}) => {\n  version = {Browser: browser};\n  const evaluate = async (expression) => {\n    const result = await send('Runtime.evaluate', {expression, returnByValue: true, awaitPromise: false});\n    return result.result?.value;\n  };\n  const waitFor = async (predicateExpr, attempts = 50, delayMs = 100) => {\n    for (let i = 0; i < attempts; i += 1) {\n      if (await evaluate(predicateExpr)) return true;\n      await sleep(delayMs);\n    }\n    return false;\n  };\n"
+            },
+            {
+              "offset": 37055,
+              "before": "} finally {\n  ws.close();\n  chrome.kill();\n  server.close();\n",
+              "after": ""
+            },
+            {
+              "offset": 37118,
+              "before": "",
+              "after": "}, {debugPort: Number(process.env.CDP_PORT || '0'), chromiumArgs: [], requireAnnouncedEndpoint: true,\n  responseHeaders: {'content-security-policy': PEER_ICON_TT_CSP + \"; img-src 'none'\"}});\n"
+            }
+          ],
+          "intermediate_to_after": [
+            {
+              "offset": 13915,
+              "before": "    const launch=() => {\n",
+              "after": "    let persistentRef: LegacyRippleRef | null=null;\n    const launch=(persistent=true) => {\n"
+            },
+            {
+              "offset": 14179,
+              "before": "      const ref=renderer.fadeInRipple(0,0,{centered:true,radius:12,persistent:true,animation:{enterDuration:60,exitDuration:60}});\n",
+              "after": "      const ref=renderer.fadeInRipple(0,0,{centered:true,radius:12,persistent,animation:{enterDuration:60,exitDuration:60}});\n"
+            },
+            {
+              "offset": 15589,
+              "before": "      startFallback:() => {fallback=launch();return {initial_state:LegacyRippleState[fallback.state],initial_connected:fallback.element.isConnected};},\n",
+              "after": "      startFallback:() => {fallback=launch(false);return {initial_state:LegacyRippleState[fallback.state],initial_connected:fallback.element.isConnected};},\n"
+            },
+            {
+              "offset": 15883,
+              "before": "",
+              "after": "      startPersistent:() => {persistentRef=launch();return snapshot(persistentRef);},\n      readPersistent:() => persistentRef?snapshot(persistentRef):null,\n      fadePersistent:() => {persistentRef?.fadeOut();return persistentRef?snapshot(persistentRef):null;},\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/legacy-core-high-contrast-contract.mjs",
+          "before": {
+            "path": "scripts/legacy-core-high-contrast-contract.mjs",
+            "sha256": "3f095503501b42742604127d05fe9323ad0721ff84df131f9755e1402538ebfc",
+            "bytes": 5014
+          },
+          "intermediate": {
+            "path": "scripts/legacy-core-high-contrast-contract.mjs",
+            "sha256": "3f095503501b42742604127d05fe9323ad0721ff84df131f9755e1402538ebfc",
+            "bytes": 5014
+          },
+          "after": {
+            "path": "scripts/legacy-core-high-contrast-contract.mjs",
+            "sha256": "833b2104610b2efb92220515824789e177e48b55786a905634fe1a43316a2c9a",
+            "bytes": 6544
+          },
+          "before_to_intermediate": [],
+          "intermediate_to_after": [
+            {
+              "offset": 1289,
+              "before": "",
+              "after": "const persistent=mode=>mode?.initial_state==='FADING_IN' && mode.initial_connected===true\n  && mode.visible_state==='VISIBLE' && mode.visible_connected===true && mode.visible_wait_completed===true\n  && mode.dismissed_state==='FADING_OUT' && mode.dismissed_connected===true\n  && mode.final_state==='HIDDEN' && mode.final_connected===false && mode.hidden_wait_completed===true;\n\n"
+            },
+            {
+              "offset": 1913,
+              "before": "    && fallback(historic.fallback) && fallback(forced.fallback);\n",
+              "after": "    && fallback(historic.fallback) && fallback(forced.fallback)\n    && persistent(historic.persistent) && persistent(forced.persistent);\n"
+            },
+            {
+              "offset": 4764,
+              "before": "",
+              "after": "      const start=await evaluate('window.__closeoutCoreContrast.startPersistent()');\n      const visible_wait_completed=await waitFor('window.__closeoutCoreContrast.readPersistent()?.state === \"VISIBLE\"',20,50);\n      await send('Runtime.evaluate',{expression:'new Promise(r=>setTimeout(r,250))',awaitPromise:true,returnByValue:true});\n      const visible=await evaluate('window.__closeoutCoreContrast.readPersistent()');\n      const dismissed=await evaluate('window.__closeoutCoreContrast.fadePersistent()');\n      const hidden_wait_completed=await waitFor('window.__closeoutCoreContrast.readPersistent()?.state === \"HIDDEN\"',20,50);\n      const final=await evaluate('window.__closeoutCoreContrast.readPersistent()');\n      observations[key].persistent={initial_state:start.state,initial_connected:start.connected,\n        visible_state:visible.state,visible_connected:visible.connected,visible_wait_completed,\n        dismissed_state:dismissed.state,dismissed_connected:dismissed.connected,\n        final_state:final.state,final_connected:final.connected,hidden_wait_completed};\n"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "old_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "source_scope_only": true,
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

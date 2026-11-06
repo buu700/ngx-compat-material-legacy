@@ -1,0 +1,9 @@
+#!/usr/bin/python3
+import os,sys,subprocess
+args=sys.argv[1:]
+if args and args[0]=='ls-files':
+ root=os.getcwd();parent=os.environ['C03_PARENT']
+ data=subprocess.check_output(['/usr/bin/git','ls-tree','-r','-z',parent,'--','projects/ngx-material-legacy'],cwd=root)
+ sys.stdout.buffer.write(b''.join(x.split(b'\t',1)[1]+b'\0' for x in data.split(b'\0') if x))
+else:
+ os.execv('/usr/bin/git',['/usr/bin/git',*args])

@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /** Whole immutable patches and individual owned-source decisions; native guards remain mandatory. */
+import {nativeIndividualZoneSourceSuccessor} from './native-individual-zone-source-successor.mjs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFileSync,writeFileSync,existsSync} from 'node:fs';
@@ -100,7 +101,8 @@ export function inspectNativeIndividualSourceJudgments({root=rootDefault,readMem
  const load=reference=>{const bytes=read(reference.path);assert.equal(hash(bytes),reference.sha256,'native individual source capsule changed');return JSON.parse(gunzipSync(bytes));};
  const prior=load(inputs.prior),trees=load(inputs.upstream_trees);assert.equal(prior.line,inputs.line);assert.equal(prior.source_parent,inputs.source_parent);
  const before=new Map(prior.previous_members.map(row=>{assert.equal(hash(row.text),row.sha256);return [row.path,Buffer.from(row.text)];}));assert.equal(before.size,4);
- for(const ref of [...inputs.current_sources,...inputs.implementation_evidence])assert.equal(hash(read(ref.path)),ref.sha256,'native individual current source/evidence changed '+ref.path);
+ const zoneSource=nativeIndividualZoneSourceSuccessor({root,read,line:inputs.line});
+ for(const ref of [...inputs.current_sources,...inputs.implementation_evidence]){const current=zoneSource.qualify(ref)??ref;assert.equal(hash(read(current.path)),current.sha256,'native individual current source/evidence changed '+current.path);}
  const actualRequirements=[formFieldHoverRequirements(FORM_FIELD_HOVER_SHA,inputs.line),tabCompletionRequirements(TAB_COMPLETION_SHA,inputs.line),rippleReplayRequirements(RIPPLE_REPLAY_SHA,inputs.line)];assert.deepEqual(actualRequirements,inputs.runtime_requirements,'mandatory native requirements changed');
  const originals=prior.originals.map(original=>reviewOriginalNativePatch(original,trees.subjects.find(row=>row.sha===original.sha)));assert.deepEqual(originals.map(row=>row.sha),[FORM_FIELD_HOVER_SHA,TAB_COMPLETION_SHA,RIPPLE_REPLAY_SHA]);
  const reference='reference/material-16.2.14/error-helper-sources/form-field-focus-overlay.scss',candidate='projects/ngx-material-legacy/styles/form-field/_form-field-focus-overlay.scss';
@@ -109,7 +111,7 @@ export function inspectNativeIndividualSourceJudgments({root=rootDefault,readMem
  for(const row of css.rows){assert.equal(formFieldStateArgumentResultsMatch(row.case_id,row.expected,row.actual,row.peer),true,'complete historical field CSS contract rejected');assert.equal(row.peer.line,inputs.line);for(const member of row.actual.sources.filter(row=>row.root===0))assert.equal(hash(read('projects/ngx-material-legacy/'+member.path)),member.sha256,'compiled CSS source changed');}
  const life=JSON.parse(read('compatibility/rc/remaining-native-admission-tab-repair-lifecycle-controls.json'));
  assert.equal(life.source_sha256,hash(read('projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts')));assert.equal(life.passed,47);assert.equal(life.failed,0);assert.equal(life.mutants.length,22);assert.deepEqual(life.completion_contract.candidate,life.completion_contract.reference);assert.notDeepEqual(life.completion_contract.removed_filter,life.completion_contract.reference);
- const route=inspectRippleReplaySourceRoute({root,readMember:read}),routeControls=JSON.parse(read('compatibility/rc/remaining-native-admission-ripple-route-source-controls.json'));
+ const route=inspectRippleReplaySourceRoute({root,readMember:read}),routeControls=zoneSource.routeControls;
  assert.equal(routeControls.controls,39);assert.deepEqual(routeControls.analysis,route);assert.equal(routeControls.source_helper_sha256,hash(read('scripts/ripple-replay-route-source.mjs')));assert.equal(routeControls.producer_sha256,hash(read('tests/ripple_replay_route_source_probe.mjs')));assert.ok(route.lines.every(row=>row.private_symbols_invoked===false));assert.equal(route.actual_angular_native_or_packed_qualified,false);
  assert.ok(read('projects/ngx-material-legacy/legacy-core/public-api.ts').toString().includes('MatRipple as MatLegacyRipple'),'legacy public ripple alias changed');
  const ledgerPath='compatibility/f10/disposition-ledger/ledger.json',oldLedger=JSON.parse(before.get(ledgerPath)),entries=new Map(),writes=new Map();assert.equal(oldLedger.entries.length,1697);assert.equal(prior.previous_entries.length,3);
@@ -128,7 +130,8 @@ export function inspectNativeIndividualSourceJudgments({root=rootDefault,readMem
  }
  let text=before.get(ledgerPath).toString();for(const [sha,entry]of entries){const previous=oldLedger.entries.find(row=>row.sha===sha),format=value=>JSON.stringify(value,null,2).split('\n').map(line=>'    '+line).join('\n');assert.equal(text.split(format(previous)).length,2);text=text.replace(format(previous),format(entry));}writes.set(ledgerPath,Buffer.from(text));
  assertNativeIndividualMetadataState({previous:before,writes,read,has:path=>existsSync(resolve(root,path))});
- return {line:inputs.line,source_judgments:3,original_hunks:4,proof,entries:[...entries.values()],writes,previous:before,actual_current_native_or_packed_or_floor_qualified:false,g11_claim:'not-passed'};
+ zoneSource.assertCurrent();
+ return {line:inputs.line,zone_individual_source_bound:zoneSource.bound,source_judgments:3,original_hunks:4,proof,entries:[...entries.values()],writes,previous:before,actual_current_native_or_packed_or_floor_qualified:false,g11_claim:'not-passed'};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  const result=inspectNativeIndividualSourceJudgments();if(process.argv.includes('--write'))for(const[path,bytes]of result.writes){const target=resolve(rootDefault,path);if(!existsSync(target)||!readFileSync(target).equals(bytes))writeFileSync(target,bytes);}

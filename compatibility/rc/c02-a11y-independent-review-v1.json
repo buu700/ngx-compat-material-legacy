@@ -1,0 +1,84 @@
+{
+  "scope": "Independent logical review of supplemental high-contrast fixture, lifecycle assessment, and tests against committed v3 surface adapter; no full C02 or G11 claim",
+  "result": "accept bounded proposal",
+  "base_heads": {
+    "main": "ccb11b1e47e0e03dfd94cb3dbd50954523f70164",
+    "21.x": "40c8268374acb5aab081bae54209530b7dae3452"
+  },
+  "patches": [
+    {
+      "path": "/tmp/c02-a11y-fixture-v2.patch",
+      "sha256": "cb2c5812eb3a2131c2f95b694bb7e1078dfb4db32ee42d01a831b83f3dad333a",
+      "bytes": 2181
+    },
+    {
+      "path": "/tmp/c02-a11y-guard-v1.patch",
+      "sha256": "642379a2a0bd7bb45e15436ad078588cb8689bc20a9a79454777abdac056eb5b",
+      "bytes": 3103
+    },
+    {
+      "path": "/tmp/c02-a11y-test-v1.patch",
+      "sha256": "749f5130872a657979e4805bbf68c1195f1b017b8bfdaf9cfec15a612fdc29ad",
+      "bytes": 2273
+    }
+  ],
+  "base_main": [
+    {
+      "path": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/browser-surface-families.mjs",
+      "sha256": "917a0b49f48a552bfcb63c31d86c109d1864ccb62383c1d76755ffc583bde4ff",
+      "bytes": 40219
+    },
+    {
+      "path": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/legacy-core-high-contrast-contract.mjs",
+      "sha256": "3f095503501b42742604127d05fe9323ad0721ff84df131f9755e1402538ebfc",
+      "bytes": 5014
+    },
+    {
+      "path": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/tests/test_legacy_core_high_contrast_contract.py",
+      "sha256": "7c135d0c5aa8b7effcddc98faff4926f17722666d2bfde6b60bb100687f4a5fc",
+      "bytes": 2936
+    }
+  ],
+  "candidate": [
+    {
+      "path": "/tmp/c02-a11y-independent-review-v1/scripts/browser-surface-families.mjs",
+      "sha256": "082a1193aa9b6cdcf371b628b545ac95a58f9b245de7b374ed451f4590563b46",
+      "bytes": 40549
+    },
+    {
+      "path": "/tmp/c02-a11y-independent-review-v1/scripts/legacy-core-high-contrast-contract.mjs",
+      "sha256": "833b2104610b2efb92220515824789e177e48b55786a905634fe1a43316a2c9a",
+      "bytes": 6544
+    },
+    {
+      "path": "/tmp/c02-a11y-independent-review-v1/tests/test_legacy_core_high_contrast_contract.py",
+      "sha256": "d2e5315ed65ac195e32b4729801801073543fd013e941e2508cdc82339b19417",
+      "bytes": 3464
+    }
+  ],
+  "independent_control": {
+    "path": "/tmp/c02-a11y-independent-review-v1/guard-negatives.mjs",
+    "sha256": "7da002b25f9575ffe3b841bf9755f1a124a911ae1c58b65919b97cb619759b21",
+    "bytes": 1685
+  },
+  "findings": [
+    "Existing fixture launches persistent ripple and incorrectly expects timer-only hidden state. Renderer completion moves it to VISIBLE and only nonpersistent unheld ripple automatically fades out. Proposal sets transient fallback and separately tests persistent visibility beyond 60ms+100ms fallback, explicit fade out, hidden state and detachment.",
+    "Existing synthetic lifecycle sequence and class/forced-colors style checks remain; changes affect only fixture, observation guard, and assessment tests; no CSS change.",
+    "No blocking defect found. All three patches pass git apply --check on both line heads."
+  ],
+  "independent_tests": [
+    {
+      "command": "Pinned Python 3.14.7 -B unittest discover with pinned Node 24.21.0 on independently patched scratch",
+      "result": "pass: 1 unittest"
+    },
+    {
+      "command": "Pinned Node 24.21.0 guard-negatives.mjs",
+      "result": "pass: 30 single-field negative controls across transient and persistent records in both modes"
+    }
+  ],
+  "limits": [
+    "Native transition events are not independently counted; the checks establish observed timing and state rather than exclusively identifying the mechanism that delivered transition completion.",
+    "Prior browser reports used a different lifecycle adapter revision and do not qualify this candidate combined with v3.",
+    "No browser, full product or C02/G11 gate was executed in this review."
+  ]
+}

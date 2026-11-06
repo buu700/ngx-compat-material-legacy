@@ -1,7 +1,7 @@
 # Copyright Google LLC All Rights Reserved.
 # Copyright (c) 2026 Ryan Lester.
 # Use of this source code is governed by the MIT license in LICENSE.
-"""Finite card12 gate. Context privately owns the maintained five-module source."""
+"""Finite card12 gate. Context privately owns six authenticated source successors."""
 import hashlib
 import json
 from pathlib import Path
@@ -123,8 +123,8 @@ class OrdinaryCardGateContext:
         sd=_plain(source.descriptor)
         assert sd['source_subject']['path']=='scripts/current-sass-source.mjs' and sd['source_packet']['path']=='compatibility/rc/current-sass-source-inputs-v2.json'
         member(sd['source_subject']);member(sd['source_packet'])
-        modules=sd['source_modules'];assert len(modules)==len({r['path'] for r in modules})==5
-        assert sorted(r['path'] for r in modules)==sorted('projects/ngx-material-legacy/styles/'+f+'/_'+f+'-theme.scss' for f in ('progress-spinner','snack-bar','checkbox','button','card'))
+        modules=sd['source_modules'];assert len(modules)==len({r['path'] for r in modules})==6
+        assert sorted(r['path'] for r in modules)==sorted([*('projects/ngx-material-legacy/styles/'+f+'/_'+f+'-theme.scss' for f in ('progress-spinner','snack-bar','checkbox','button','card')),'projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss'])
         assert next(r for r in modules if r['path'].endswith('/card/_card-theme.scss'))==dict(path='projects/ngx-material-legacy/styles/card/_card-theme.scss',sha256='dc5e055d95aabf5c8a8ae4ba70acee8a9a1315e6f46715e8846c932f79d51fbf',bytes=5349)
         current_by_path={r['path']:r for r in modules};sets=_plain(source.source_sets);successors=_plain(source.source_set_successors)
         assert len(sets)==len(successors)==1

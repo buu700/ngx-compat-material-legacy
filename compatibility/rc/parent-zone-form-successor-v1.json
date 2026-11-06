@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "role": "finite-browser-form-zone-runtime-successor",
+  "historical_packets_rewritten": false,
+  "old_programs_executed": false,
+  "native_or_full_audit_qualified": false,
+  "g11_claim": "not-passed",
+  "reviewed_zone_manifest_sha256": "e7550053b60038262485bc792c5caf589ad271b9783671563748a4734e39ec3f",
+  "lines": {
+    "21.x": {
+      "path": "scripts/browser-form-families.mjs",
+      "before_commit": "1acdae0058291217be7121f228f48983ebb7889a",
+      "before": {
+        "path": "scripts/browser-form-families.mjs",
+        "sha256": "be36cfbe1d51dbee6edd4e9a9a0dc6c3bf2b4567a3e7b6fae75c050cc51653ba",
+        "bytes": 20903
+      },
+      "after": {
+        "path": "scripts/browser-form-families.mjs",
+        "sha256": "fee6a1636db401f07f5402db9f60b9caf27cbb78b7649e3104fb484169d55a17",
+        "bytes": 21585
+      },
+      "reference_packet": {
+        "path": "compatibility/rc/c04-browser-reference-source-inputs.json",
+        "sha256": "5a8bd910e0d9a64a73558b5da0f48abdf8546b455d8db0fcb921678a0ee0a5ae",
+        "transition_index": 3
+      },
+      "edits": [
+        {
+          "offset": 5360,
+          "before": "`}import {Component, NgModule, NgZone, ViewChild, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';\n",
+          "after": "`}import {Component, NgModule, NgZone, ViewChild, inject${zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection'}} from '@angular/core';\n"
+        },
+        {
+          "offset": 7547,
+          "before": "",
+          "after": "  readonly angularZoneEntered = (() => { const zone = inject(NgZone); const entered = zone.run(() => NgZone.isInAngularZone()); (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = entered; return entered; })();\n"
+        },
+        {
+          "offset": 7873,
+          "before": "  outlineDirection = 'ltr';\n",
+          "after": "  outlineDirection: 'ltr' | 'rtl' = 'ltr';\n"
+        },
+        {
+          "offset": 8298,
+          "before": "platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {\n",
+          "after": "platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}'}).catch(err => {\n"
+        },
+        {
+          "offset": 14295,
+          "before": "",
+          "after": "let angularZoneEntered = null;\n"
+        },
+        {
+          "offset": 18295,
+          "before": "",
+          "after": "  angularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');\n"
+        },
+        {
+          "offset": 18591,
+          "before": "  ? (zoneGlobal === 'undefined' && bundleHasZone === false)\n  : true;\n",
+          "after": "  ? (zoneGlobal === 'undefined' && bundleHasZone === false && angularZoneEntered === false)\n  : (zoneGlobal === 'function' && bundleHasZone === true && angularZoneEntered === true);\n"
+        },
+        {
+          "offset": 19626,
+          "before": "",
+          "after": "  angular_zone_entered: angularZoneEntered,\n"
+        },
+        {
+          "offset": 20804,
+          "before": "",
+          "after": "  angular_zone_entered: angularZoneEntered,\n"
+        }
+      ]
+    },
+    "main": {
+      "path": "scripts/browser-form-families.mjs",
+      "before_commit": "0d681a13389565d2416b3485ab3278f4bde2e82e",
+      "before": {
+        "path": "scripts/browser-form-families.mjs",
+        "sha256": "be36cfbe1d51dbee6edd4e9a9a0dc6c3bf2b4567a3e7b6fae75c050cc51653ba",
+        "bytes": 20903
+      },
+      "after": {
+        "path": "scripts/browser-form-families.mjs",
+        "sha256": "fee6a1636db401f07f5402db9f60b9caf27cbb78b7649e3104fb484169d55a17",
+        "bytes": 21585
+      },
+      "reference_packet": {
+        "path": "compatibility/rc/c04-browser-reference-source-inputs.json",
+        "sha256": "4b0167af85263a3fb652806e25186e8500e02424749adb860610519d28817e6c",
+        "transition_index": 3
+      },
+      "edits": [
+        {
+          "offset": 5360,
+          "before": "`}import {Component, NgModule, NgZone, ViewChild, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';\n",
+          "after": "`}import {Component, NgModule, NgZone, ViewChild, inject${zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection'}} from '@angular/core';\n"
+        },
+        {
+          "offset": 7547,
+          "before": "",
+          "after": "  readonly angularZoneEntered = (() => { const zone = inject(NgZone); const entered = zone.run(() => NgZone.isInAngularZone()); (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = entered; return entered; })();\n"
+        },
+        {
+          "offset": 7873,
+          "before": "  outlineDirection = 'ltr';\n",
+          "after": "  outlineDirection: 'ltr' | 'rtl' = 'ltr';\n"
+        },
+        {
+          "offset": 8298,
+          "before": "platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {\n",
+          "after": "platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}'}).catch(err => {\n"
+        },
+        {
+          "offset": 14295,
+          "before": "",
+          "after": "let angularZoneEntered = null;\n"
+        },
+        {
+          "offset": 18295,
+          "before": "",
+          "after": "  angularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');\n"
+        },
+        {
+          "offset": 18591,
+          "before": "  ? (zoneGlobal === 'undefined' && bundleHasZone === false)\n  : true;\n",
+          "after": "  ? (zoneGlobal === 'undefined' && bundleHasZone === false && angularZoneEntered === false)\n  : (zoneGlobal === 'function' && bundleHasZone === true && angularZoneEntered === true);\n"
+        },
+        {
+          "offset": 19626,
+          "before": "",
+          "after": "  angular_zone_entered: angularZoneEntered,\n"
+        },
+        {
+          "offset": 20804,
+          "before": "",
+          "after": "  angular_zone_entered: angularZoneEntered,\n"
+        }
+      ]
+    }
+  }
+}

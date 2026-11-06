@@ -1,0 +1,939 @@
+{
+  "schema_version": 1,
+  "role": "finite-select-dialog-menu-snack-d61-menu-current-source-successor",
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "canonical_admission_granted": false,
+  "g11_claim": "not-passed",
+  "branches": {
+    "21.x": {
+      "transitions": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/select.html",
+          "source_parent": "1acdae0058291217be7121f228f48983ebb7889a",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-select/select.html",
+            "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da",
+            "bytes": 2792,
+            "git_blob": "05679478af008a3400afb40af289560b233ca799"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-select/select.html",
+            "sha256": "9d895bf6cbf1b2da7063acedc1fed7ee4cf7f10ce25bc7a797e8ee32875feec2",
+            "bytes": 2843,
+            "git_blob": "e12daf48f7b4e94a6dd303e54982cac3859276d7"
+          },
+          "edits": [
+            {
+              "offset": 1479,
+              "before": "",
+              "after": "  [cdkConnectedOverlayDisposeOnNavigation]=\"false\"\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+          "source_parent": "1acdae0058291217be7121f228f48983ebb7889a",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+            "sha256": "d45d31bba50e87a53d614ef018e5105efac589c45e98b70bbceb9f269228b483",
+            "bytes": 223517,
+            "git_blob": "793a2e11658933fb6e7d496e969228d210e351cc"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+            "sha256": "7cf9610d306941613ae22a4615121a67a5328b82da2b5f768c7382cee6b8c3dc",
+            "bytes": 226954,
+            "git_blob": "835eb4c60c86bd379f8b23ae3552d2f602f81d71"
+          },
+          "edits": [
+            {
+              "offset": 201,
+              "before": "import {OverlayContainer} from '@angular/cdk/overlay';\n",
+              "after": "import {CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG, OverlayContainer} from '@angular/cdk/overlay';\nimport {Location} from '@angular/common';\nimport {SpyLocation} from '@angular/common/testing';\n"
+            },
+            {
+              "offset": 223517,
+              "before": "",
+              "after": "\n\n@Component({\n  standalone: false,\n  template: `\n    <mat-select [disabled]=\"disabled\">\n      @if (showOption) { <mat-option value=\"a\">A</mat-option> }\n    </mat-select>\n  `,\n})\nclass SelectNavigationFixture {\n  @ViewChild(MatLegacySelect) select: MatLegacySelect;\n  disabled = false;\n  showOption = true;\n}\n\ndescribe('legacy select overlay navigation', () => {\n  function setup(disposeOnNavigation: boolean) {\n    const config = {disposeOnNavigation: true};\n    TestBed.configureTestingModule({\n      imports: [MatLegacySelectModule],\n      declarations: [SelectNavigationFixture],\n      providers: [\n        LEGACY_NOOP_ANIMATIONS,\n        {provide: Location, useClass: SpyLocation},\n        ...(disposeOnNavigation ? [{provide: CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG, useValue: config}] : []),\n      ],\n    });\n    const fixture = TestBed.createComponent(SelectNavigationFixture);\n    fixture.detectChanges();\n    return {fixture, config, overlay: TestBed.inject(OverlayContainer).getContainerElement()};\n  }\n\n  for (const configured of [false, true]) {\n    it(`keeps the panel usable after history navigation (configured: ${configured})`, fakeAsync(() => {\n      const {fixture, config, overlay} = setup(configured);\n      const select = fixture.componentInstance.select;\n      select.open();\n      fixture.detectChanges();\n      tick(250);\n      fixture.detectChanges();\n      expect(select.panelOpen).toBeTrue();\n      expect(overlay.querySelector('.mat-select-panel')).not.toBeNull();\n\n      (TestBed.inject(Location) as SpyLocation).simulateUrlPop('/next');\n      fixture.detectChanges();\n      tick(250);\n      fixture.detectChanges();\n      expect(select.panelOpen).toBeTrue();\n      expect(overlay.querySelector('.mat-select-panel')).not.toBeNull();\n\n      select.close();\n      fixture.detectChanges();\n      tick(250);\n      fixture.detectChanges();\n      expect(select.panelOpen).toBeFalse();\n      expect(overlay.querySelector('.mat-select-panel')).toBeNull();\n      select.open();\n      fixture.detectChanges();\n      tick(250);\n      fixture.detectChanges();\n      expect(select.panelOpen).toBeTrue();\n      expect(overlay.querySelector('.mat-select-panel')).not.toBeNull();\n      if (configured) {\n        expect(TestBed.inject(CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG)).toBe(config);\n        expect(config).toEqual({disposeOnNavigation: true});\n      }\n      fixture.destroy();\n      tick(500);\n    }));\n  }\n\n  it('does not open when disabled or without options', fakeAsync(() => {\n    const {fixture, config, overlay} = setup(true);\n    const select = fixture.componentInstance.select;\n    fixture.componentInstance.disabled = true;\n    fixture.detectChanges();\n    select.open();\n    fixture.detectChanges();\n    expect(select.panelOpen).toBeFalse();\n    expect(overlay.querySelector('.mat-select-panel')).toBeNull();\n\n    fixture.componentInstance.disabled = false;\n    fixture.componentInstance.showOption = false;\n    fixture.detectChanges();\n    select.open();\n    fixture.detectChanges();\n    expect(select.panelOpen).toBeFalse();\n    expect(overlay.querySelector('.mat-select-panel')).toBeNull();\n    expect(TestBed.inject(CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG)).toBe(config);\n    expect(config).toEqual({disposeOnNavigation: true});\n    fixture.destroy();\n    tick(500);\n  }));\n});\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "source_parent": "1acdae0058291217be7121f228f48983ebb7889a",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+            "sha256": "dafa2038f78994e281943deca66dc8ade6628abceeb45b6f64deec9c00a2ff4c",
+            "bytes": 7337,
+            "git_blob": "199ccb7fed3d4ef5d2d1eade9f8ab9e2d96a6172"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+            "sha256": "b3b29351381b979f024c6b99222209838fb5cc13fcd167c4b96b297ac8e5a124",
+            "bytes": 8361,
+            "git_blob": "9312b071a4f15c82bb146fe5a2c98dffdcc4d89f"
+          },
+          "edits": [
+            {
+              "offset": 571,
+              "before": "",
+              "after": "  assertInInjectionContext,\n"
+            },
+            {
+              "offset": 644,
+              "before": "",
+              "after": "  runInInjectionContext,\n"
+            },
+            {
+              "offset": 955,
+              "before": "",
+              "after": "import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';\n"
+            },
+            {
+              "offset": 1712,
+              "before": "",
+              "after": "  private readonly _injector: Injector;\n  private readonly _animationMode?: 'NoopAnimations' | 'BrowserAnimations';\n  private readonly _hasInjectionContext: boolean;\n"
+            },
+            {
+              "offset": 3383,
+              "before": "",
+              "after": "    try {\n      assertInInjectionContext(_MatDialogBase);\n      this._hasInjectionContext = true;\n    } catch {\n      this._hasInjectionContext = false;\n    }\n    this._injector = injector;\n    this._animationMode = _animationMode;\n"
+            },
+            {
+              "offset": 3426,
+              "before": "    this._dialog = injector.get(Dialog);\n",
+              "after": "    this._dialog = this._injector.get(Dialog);\n  }\n\n  /** Match the injector used for the dialog container on every open. */\n  private _animationsDisabled(config: MatDialogConfig): boolean {\n    if (!this._hasInjectionContext) {\n      return this._animationMode === 'NoopAnimations';\n    }\n\n    const injector = config.injector || config.viewContainerRef?.injector || this._injector;\n    return runInInjectionContext(injector, legacyAnimationsDisabled);\n"
+            },
+            {
+              "offset": 4651,
+              "before": "",
+              "after": "      ...(this._animationsDisabled(config) ? {disableAnimations: true} : {}),\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "source_parent": "1acdae0058291217be7121f228f48983ebb7889a",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "f1e499dae58e12e8333ef81e480d069d93599cadda29ed2df32262e44d6c45a8",
+            "bytes": 26780,
+            "git_blob": "5c3987ceefcc5f6ec7f5869ca46e7c5537068680"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "8e35b1a458a5b501053286d23fd4cf1934aa9e2237f5e0e2f1c6ffbb69221215",
+            "bytes": 26879,
+            "git_blob": "43f1f2972d3f32ddecbaa968c3a18a68ac0e6b92"
+          },
+          "edits": [
+            {
+              "offset": 9723,
+              "before": "    this._closingActionsSubscription.unsubscribe();\n",
+              "after": "    // Keep closing actions alive until the attached overlay is detached so the\n    // menu's historical close notification is emitted during teardown.\n"
+            },
+            {
+              "offset": 14807,
+              "before": "    this._setIsMenuOpen(false);\n    if (this._destroyed || generation !== this._menuGeneration) {\n      return;\n    }\n\n",
+              "after": ""
+            },
+            {
+              "offset": 15616,
+              "before": "",
+              "after": "    if (this._destroyed || generation !== this._menuGeneration) {\n      return;\n    }\n    this._setIsMenuOpen(false);\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+          "source_parent": "1acdae0058291217be7121f228f48983ebb7889a",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6",
+            "bytes": 112600,
+            "git_blob": "f6d79ccdb48d4520e4d5bba2a0871a1a5c5d0b05"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "ae3c8c981a50ac6ba11f943a3f1ceba644f28da9b707a05ff10225afc6fc8d1c",
+            "bytes": 117005,
+            "git_blob": "4c60ce9eeec8490f6408c8e113d0620faf629b13"
+          },
+          "edits": [
+            {
+              "offset": 355,
+              "before": "import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';\n",
+              "after": "import {_LegacyViewport as ViewportRuler, LEGACY_ANIMATIONS_TEST_OVERRIDE} from '@ngx-compat/material-legacy/legacy-core';\n"
+            },
+            {
+              "offset": 44571,
+              "before": "  it('should keep the panel in the viewport when more items are added while open', () => {\n",
+              "after": "  it('should keep the panel in the viewport when more items are added while open', async () => {\n"
+            },
+            {
+              "offset": 44999,
+              "before": "",
+              "after": "    // Current CDK positions attached overlays after the next render.\n    await fixture.whenStable();\n    fixture.detectChanges();\n"
+            },
+            {
+              "offset": 45345,
+              "before": "    fixture.detectChanges();\n    // Ensure the flexible strategy remeasures after content height changes.\n    // items.changes + reapplyLastPosition can miss a layout pass under the\n    // current CDK peer; updatePosition preserves the viewport assertion.\n    fixture.componentInstance.trigger.updatePosition();\n",
+              "after": ""
+            },
+            {
+              "offset": 62752,
+              "before": "",
+              "after": "\n  it('restores focus before menuClosed and allows a synchronous reopen', fakeAsync(() => {\n    const fixture = createComponent(SimpleMenu, [], [FakeIcon]);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    const triggerElement = instance.triggerEl.nativeElement;\n    triggerElement.click();\n    fixture.detectChanges();\n    tick(500);\n    let observedFocus: Element | null = null;\n    let closed = 0;\n    const sub = instance.trigger.menuClosed.subscribe(() => {\n      closed++;\n      observedFocus = document.activeElement;\n      instance.trigger.openMenu();\n    });\n    instance.trigger.closeMenu();\n    fixture.detectChanges();\n    tick(500);\n    expect(observedFocus).toBe(triggerElement);\n    expect(closed).toBe(1);\n    expect(instance.trigger.menuOpen).toBeTrue();\n    expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeTruthy();\n    sub.unsubscribe();\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('teardown emits one close and blocks reopening from the close observer', fakeAsync(() => {\n    const fixture = createComponent(SimpleMenu, [], [FakeIcon]);\n    fixture.detectChanges();\n    const trigger = fixture.componentInstance.trigger;\n    const menu = fixture.componentInstance.menu;\n    trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    const events: string[] = [];\n    menu.closed.subscribe({next: () => { events.push('close'); trigger.openMenu(); }, complete: () => events.push('complete')});\n    fixture.destroy();\n    tick(500);\n    expect(events).toEqual(['close', 'complete']);\n    expect(trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeFalsy();\n  }));\n\n  it('keeps exit attached until completion and ignores duplicate end', fakeAsync(() => {\n    const fixture = createComponent(SimpleMenu, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}], [FakeIcon]);\n    fixture.detectChanges(); const instance = fixture.componentInstance;\n    instance.trigger.openMenu(); fixture.detectChanges(); tick(1);\n    const panel = overlayContainerElement.querySelector('.mat-menu-panel') as HTMLElement;\n    expect(panel.classList).toContain('mat-menu-panel-animations-enabled');\n    expect(getComputedStyle(panel).animationName).toBe('mat-legacy-menu-enter');\n    const completions: string[] = [];\n    const sub = instance.menu._animationDone.subscribe((event: any) => completions.push(event.toState));\n    instance.trigger.closeMenu(); fixture.detectChanges();\n    expect(instance.trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.contains(panel)).toBeTrue();\n    panel.dispatchEvent(new AnimationEvent('animationend', {animationName: 'mat-legacy-menu-exit'}));\n    panel.dispatchEvent(new AnimationEvent('animationend', {animationName: 'mat-legacy-menu-exit'}));\n    expect(completions.filter(x => x === 'void').length).toBe(1);\n    expect(overlayContainerElement.contains(panel)).toBeFalse();\n    sub.unsubscribe(); fixture.destroy(); tick(500);\n  }));\n\n  it('reopening while exiting cancels stale fallback removal', fakeAsync(() => {\n    const fixture = createComponent(SimpleMenu, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}], [FakeIcon]);\n    fixture.detectChanges(); const trigger = fixture.componentInstance.trigger;\n    trigger.openMenu(); fixture.detectChanges(); tick(1);\n    trigger.closeMenu(); fixture.detectChanges(); tick(25);\n    trigger.openMenu(); fixture.detectChanges(); tick(500);\n    expect(trigger.menuOpen).toBeTrue();\n    expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeTruthy();\n    fixture.destroy(); tick(500);\n  }));\n\n  it('reentrant close from focus restoration emits menuClosed once', fakeAsync(() => {\n    const fixture = createComponent(SimpleMenu, [], [FakeIcon]); fixture.detectChanges();\n    const instance = fixture.componentInstance; const trigger = instance.trigger;\n    trigger.openMenu(); fixture.detectChanges(); tick(500);\n    const focused = document.createElement('button'); document.body.appendChild(focused); focused.focus();\n    let closed = 0; const sub = trigger.menuClosed.subscribe(() => closed++);\n    instance.triggerEl.nativeElement.addEventListener('focus', () => trigger.closeMenu(), {once:true});\n    trigger.closeMenu(); fixture.detectChanges(); tick(500);\n    expect(closed).toBe(1); expect(trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeFalsy();\n    focused.remove(); sub.unsubscribe(); fixture.destroy(); tick(500);\n  }));\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+          "source_parent": "98cc39341c3bc2f971cfafa6c00fcc6d0ff9f06d",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+            "sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5",
+            "bytes": 4650,
+            "git_blob": "80c5bc255ca477299b3852da074757e04d00ff3c"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+            "sha256": "a35d7e06fb778203478236024a6137e34624f0ed7f10fabcc7ac3bd9aaf4a510",
+            "bytes": 4960,
+            "git_blob": "cd0cff189e3a69689e62b143eb95112bbe485b3b"
+          },
+          "edits": [
+            {
+              "offset": 1982,
+              "before": "",
+              "after": "  private _legacyMotionDestroyed = false;\n"
+            },
+            {
+              "offset": 2216,
+              "before": "      this._notifyEnter();\n",
+              "after": "      // Let callers subscribe after open() returns, as with the historical no-op animation.\n      queueMicrotask(() => {\n        if (!this._legacyMotionDestroyed && this._animationState === 'visible') {\n          this._notifyEnter();\n        }\n      });\n"
+            },
+            {
+              "offset": 4078,
+              "before": "",
+              "after": "    this._legacyMotionDestroyed = true;\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+          "source_parent": "98cc39341c3bc2f971cfafa6c00fcc6d0ff9f06d",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+            "sha256": "293baf9806cc7bc0c53ab5a68c745536d79e40e3e2a82928b9515361dbdf302f",
+            "bytes": 11168,
+            "git_blob": "0720d48ce26a3e408f4a4a8ae59ba02629e09482"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+            "sha256": "2064e816539a77a2749ab9d2141721a40ab27e3dfbf4edafa1f5b9afedfc453b",
+            "bytes": 11168,
+            "git_blob": "ffc030e3530abf873e5edce6bdadf056421013fb"
+          },
+          "edits": [
+            {
+              "offset": 8562,
+              "before": "    // Subscribe before enter() so noop-animation sync _onEnter still arms duration.\n",
+              "after": "    // Subscribe before enter() so the opening notification arms the duration timer.\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+          "source_parent": "98cc39341c3bc2f971cfafa6c00fcc6d0ff9f06d",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+            "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3",
+            "bytes": 45763,
+            "git_blob": "d532ca11d2f6a679581b05a7b934b9888715db20"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+            "sha256": "92425afa5ddcb406c75b4af69ea9dd795f3b3d10ef8898b909a7bd1ad69f7230",
+            "bytes": 49266,
+            "git_blob": "ccfad7a95a4a27682be77a2af23c4556b8cfeba2"
+          },
+          "edits": [
+            {
+              "offset": 24526,
+              "before": "    // Spy before open so noop-animation sync afterOpened still records the capped timer\n",
+              "after": "    // Spy before open to observe the capped duration timer.\n"
+            },
+            {
+              "offset": 45763,
+              "before": "",
+              "after": "\n\ndescribe('legacy snack bar no-op open notification', () => {\n  beforeEach(() => {\n    TestBed.configureTestingModule({\n      imports: [MatLegacySnackBarModule],\n      providers: [LEGACY_NOOP_ANIMATIONS],\n    });\n  });\n\n  it('notifies a caller who subscribes immediately after open returns', fakeAsync(() => {\n    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n    let notifications = 0;\n    let completed = false;\n    ref.afterOpened().subscribe({next: () => notifications++, complete: () => completed = true});\n    expect(notifications).toBe(0);\n    expect(completed).toBeFalse();\n    tick();\n    expect(notifications).toBe(1);\n    expect(completed).toBeTrue();\n    ref.dismiss();\n    tick();\n  }));\n\n  it('does not notify a snack bar dismissed before its enter completes', fakeAsync(() => {\n    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n    let notifications = 0;\n    ref.afterOpened().subscribe(() => notifications++);\n    ref.dismiss();\n    tick();\n    expect(notifications).toBe(0);\n  }));\n\n  it('only notifies the replacement when replaced before enter completes', fakeAsync(() => {\n    const snackBar = TestBed.inject(MatLegacySnackBar);\n    const previous = snackBar.open('previous');\n    let previousNotifications = 0;\n    previous.afterOpened().subscribe(() => previousNotifications++);\n    const next = snackBar.open('next');\n    let nextNotifications = 0;\n    next.afterOpened().subscribe(() => nextNotifications++);\n    tick();\n    expect(previousNotifications).toBe(0);\n    expect(nextNotifications).toBe(1);\n    next.dismiss();\n    tick();\n  }));\n\n  it('does not notify after the container is destroyed', fakeAsync(() => {\n    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n    let notifications = 0;\n    ref.afterOpened().subscribe(() => notifications++);\n    ref.containerInstance.ngOnDestroy();\n    tick();\n    expect(notifications).toBe(0);\n  }));\n\n  it('still starts the duration timer when opening completes', fakeAsync(() => {\n    const ref = TestBed.inject(MatLegacySnackBar).open('message', '', {duration: 100});\n    let opened = 0;\n    let dismissed = 0;\n    ref.afterOpened().subscribe(() => opened++);\n    ref.afterDismissed().subscribe(() => dismissed++);\n    tick();\n    expect(opened).toBe(1);\n    tick(100);\n    expect(dismissed).toBe(1);\n  }));\n});\n\n\ndescribe('legacy snack bar reentrant no-op notification', () => {\n  beforeEach(() => TestBed.configureTestingModule({\n    imports: [MatLegacySnackBarModule],\n    providers: [LEGACY_NOOP_ANIMATIONS],\n  }));\n\n  it('allows an afterOpened subscriber to dismiss immediately', fakeAsync(() => {\n    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n    let opened = 0;\n    let dismissed = 0;\n    ref.afterDismissed().subscribe(() => dismissed++);\n    ref.afterOpened().subscribe(() => { opened++; ref.dismiss(); });\n    tick();\n    expect(opened).toBe(1);\n    expect(dismissed).toBe(1);\n  }));\n\n  it('allows an afterOpened subscriber to replace the snack bar', fakeAsync(() => {\n    const snackBar = TestBed.inject(MatLegacySnackBar);\n    const previous = snackBar.open('previous');\n    let previousOpened = 0;\n    let nextOpened = 0;\n    let next: MatLegacySnackBarRef<LegacySimpleSnackBar>;\n    previous.afterOpened().subscribe(() => {\n      previousOpened++;\n      next = snackBar.open('next');\n      next.afterOpened().subscribe(() => nextOpened++);\n    });\n    tick();\n    expect(previousOpened).toBe(1);\n    expect(nextOpened).toBe(1);\n    next!.dismiss();\n    tick();\n  }));\n});\n"
+            }
+          ]
+        }
+      ],
+      "d61_menu_transitions": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "source_parent": "27aafacc46a8b1375729f1248139d9a9265a152e",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+            "sha256": "b3b29351381b979f024c6b99222209838fb5cc13fcd167c4b96b297ac8e5a124",
+            "bytes": 8361,
+            "git_blob": "9312b071a4f15c82bb146fe5a2c98dffdcc4d89f"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+            "sha256": "4926702c9f5aaafa17c7489692da5b67dcdde261d79cafd0628f95a4134ea61a",
+            "bytes": 8226,
+            "git_blob": "19222ce80ae8a58bcaaa8f606967dd8ce573ae5f"
+          },
+          "edits": [
+            {
+              "offset": 398,
+              "before": "import {Dialog, DialogConfig, DialogRef} from '@angular/cdk/dialog';\n",
+              "after": "import {Dialog, DialogConfig} from '@angular/cdk/dialog';\n"
+            },
+            {
+              "offset": 6901,
+              "before": "          // Prevent content from resolving the CDK DialogRef accidentally.\n          {provide: DialogRef, useValue: null},\n",
+              "after": ""
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+          "source_parent": "27aafacc46a8b1375729f1248139d9a9265a152e",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+            "sha256": "dfc5961661c06ae15f186d25846f4a40f61880ac2c09e9975e0d9faabbbdea2b",
+            "bytes": 94027,
+            "git_blob": "a9b710ad36c22af45c2cb5ff0ca82b17df8b2458"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+            "sha256": "c95640a45f9f029e818bcd9c1510337b1952a7164393aa8cc56f85cd188d783d",
+            "bytes": 97904,
+            "git_blob": "07a15a2147ea5f0d2724977b1e88d7efdc6ad9cd"
+          },
+          "edits": [
+            {
+              "offset": 538,
+              "before": "",
+              "after": "  inject as injectToken,\n"
+            },
+            {
+              "offset": 94027,
+              "before": "",
+              "after": "\nlet captured: Array<{cdk: CdkDialogRef; optional: CdkDialogRef | null; legacy: MatLegacyDialogRef<any>}> = [];\n\n@Directive({standalone: false, selector: '[dialogRefProbe]'})\nclass DialogRefProbe {\n  constructor() {\n    captured.push({\n      cdk: injectToken(CdkDialogRef),\n      optional: injectToken(CdkDialogRef, {optional: true}),\n      legacy: injectToken(MatLegacyDialogRef),\n    });\n  }\n}\n\n@Component({standalone: false, template: '<button dialogRefProbe>dialog</button>'})\nclass DialogRefContent {}\n\n@Component({\n  standalone: false,\n  template: '<button id=\"origin\">origin</button><ng-template><button dialogRefProbe>template</button></ng-template>',\n})\nclass DialogRefHost {\n  @ViewChild(TemplateRef) template!: TemplateRef<any>;\n}\n\ndescribe('legacy dialog content reference injection', () => {\n  beforeEach(() => {\n    captured = [];\n    TestBed.configureTestingModule({\n      declarations: [DialogRefProbe, DialogRefContent, DialogRefHost],\n      imports: [MatLegacyDialogModule],\n      providers: [LEGACY_NOOP_ANIMATIONS],\n    });\n  });\n\n  for (const kind of ['component', 'template'] as const) {\n    for (const method of ['legacy', 'cdk'] as const) {\n      it(`retains ${kind} reference identity and ${method} close behavior`, fakeAsync(() => {\n        const fixture = TestBed.createComponent(DialogRefHost);\n        fixture.detectChanges();\n        const origin = fixture.nativeElement.querySelector('#origin') as HTMLElement;\n        origin.focus();\n        const dialog = TestBed.inject(MatLegacyDialog);\n        const ref = kind === 'component' ? dialog.open(DialogRefContent) :\n          dialog.open(fixture.componentInstance.template);\n        fixture.detectChanges();\n        tick(250);\n        fixture.detectChanges();\n\n        const pair = captured[0];\n        expect(pair.legacy).toBe(ref);\n        expect(pair.cdk).toBeTruthy();\n        expect(pair.optional).toBe(pair.cdk);\n        expect(pair.cdk).not.toBe(pair.legacy as unknown as CdkDialogRef);\n        const before: unknown[] = [];\n        const after: unknown[] = [];\n        ref.beforeClosed().subscribe(value => before.push(value));\n        ref.afterClosed().subscribe(value => after.push(value));\n        pair[method].close(`${method}-result`);\n        fixture.detectChanges();\n        tick(500);\n        fixture.detectChanges();\n\n        const result = method === 'legacy' ? 'legacy-result' : undefined;\n        expect(before).toEqual([result]);\n        expect(after).toEqual([result]);\n        expect(dialog.openDialogs.length).toBe(0);\n        expect(document.activeElement).toBe(origin);\n        fixture.destroy();\n      }));\n    }\n  }\n\n  it('cleans up a CDK-closed nested child and a legacy-closed parent', fakeAsync(() => {\n    const fixture = TestBed.createComponent(DialogRefHost);\n    fixture.detectChanges();\n    const origin = fixture.nativeElement.querySelector('#origin') as HTMLElement;\n    origin.focus();\n    const dialog = TestBed.inject(MatLegacyDialog);\n    const outer = dialog.open(DialogRefContent);\n    fixture.detectChanges();\n    tick(250);\n    const inner = dialog.open(DialogRefContent);\n    fixture.detectChanges();\n    tick(250);\n    expect(captured.length).toBe(2);\n    let innerAfter = 0;\n    let outerAfter = 0;\n    inner.afterClosed().subscribe(() => innerAfter++);\n    outer.afterClosed().subscribe(() => outerAfter++);\n    captured[1].cdk.close('child');\n    fixture.detectChanges();\n    tick(500);\n    fixture.detectChanges();\n    expect(dialog.openDialogs.length).toBe(1);\n    expect(innerAfter).toBe(1);\n    expect(outerAfter).toBe(0);\n    outer.close('outer');\n    fixture.detectChanges();\n    tick(500);\n    fixture.detectChanges();\n    expect(dialog.openDialogs.length).toBe(0);\n    expect(innerAfter).toBe(1);\n    expect(outerAfter).toBe(1);\n    expect(document.activeElement).toBe(origin);\n    fixture.destroy();\n  }));\n});\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "source_parent": "9e5508b9a7fb004132b92888274a0344bf5b57f6",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "8e35b1a458a5b501053286d23fd4cf1934aa9e2237f5e0e2f1c6ffbb69221215",
+            "bytes": 26879,
+            "git_blob": "43f1f2972d3f32ddecbaa968c3a18a68ac0e6b92"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "e4ecb1452e92a1cc30fb1ebc97c6e24244b432dade5f30b6c58855d8e10cc5b2",
+            "bytes": 30651,
+            "git_blob": "777ccf29403ab133d3ba1e923a622abab089b81b"
+          },
+          "edits": [
+            {
+              "offset": 1461,
+              "before": "import {delay, filter, takeUntil} from 'rxjs/operators';\n",
+              "after": "import {delay, filter, map, takeUntil} from 'rxjs/operators';\n"
+            },
+            {
+              "offset": 3438,
+              "before": "",
+              "after": "  private _bindingCloseInProgress = false;\n  private _destroyingMenu = false;\n  private _openingGeneration: number | null = null;\n  private _attachmentGeneration: number | null = null;\n  private _deferredMenu: MatMenuPanel | null | undefined;\n"
+            },
+            {
+              "offset": 5049,
+              "before": "",
+              "after": "    if (this._bindingCloseInProgress || this._destroyingMenu) {\n      this._deferredMenu = menu;\n      return;\n    }\n"
+            },
+            {
+              "offset": 5101,
+              "before": "",
+              "after": "    const previousMenu = this._menu;\n    if (previousMenu && this.menuOpen && this._attachedMenu === previousMenu) {\n      const generation = this._menuGeneration;\n      this._bindingCloseInProgress = true;\n      try {\n        previousMenu.close.emit();\n      } finally {\n        this._bindingCloseInProgress = false;\n      }\n      if (this._deferredMenu !== undefined) {\n        menu = this._deferredMenu;\n        this._deferredMenu = undefined;\n      }\n      // A close callback can destroy the trigger or replace the binding itself.\n      if (this._destroyed || this._menu !== previousMenu) {\n        return;\n      }\n      // A callback may have reopened the previous menu during its close event.\n      if (this.menuOpen && generation !== this._menuGeneration) {\n        return;\n      }\n      // A completed close stream cannot notify the trigger.\n      if (this.menuOpen && this._attachedMenu === previousMenu) {\n        this._destroyMenu(undefined);\n        if (this._destroyed || this._menu !== previousMenu) {\n          return;\n        }\n      }\n    }\n\n    if (!this.menuOpen && this._openingGeneration !== null && this._attachedMenu === previousMenu && previousMenu) {\n      this._menuGeneration++;\n    }\n"
+            },
+            {
+              "offset": 12547,
+              "before": "    overlayRef.attach(this._getPortal(menu));\n",
+              "after": "    this._openingGeneration = generation;\n    this._attachmentGeneration = generation;\n    try {\n      overlayRef.attach(this._getPortal(menu));\n"
+            },
+            {
+              "offset": 12594,
+              "before": "    if (menu.lazyContent) {\n      menu.lazyContent.attach(this.menuData);\n    }\n",
+              "after": "      if (menu.lazyContent) {\n        menu.lazyContent.attach(this.menuData);\n      }\n"
+            },
+            {
+              "offset": 12675,
+              "before": "    if (this._destroyed || generation !== this._menuGeneration || MENU_PANEL_OWNERS.get(menu) !== this) {\n      return;\n    }\n",
+              "after": "      if (this._destroyed || generation !== this._menuGeneration || MENU_PANEL_OWNERS.get(menu) !== this) {\n        if (this._openingGeneration === generation) this._openingGeneration = null;\n        if (this._attachedMenu === menu && this._attachmentGeneration === generation && MENU_PANEL_OWNERS.get(menu) === this) {\n          this._detachMenu(menu, overlayRef);\n        }\n        return;\n      }\n"
+            },
+            {
+              "offset": 12802,
+              "before": "    this._closingActionsSubscription = this._menuClosingActions().subscribe(() => this.closeMenu());\n    this._initMenu(menu);\n",
+              "after": "      this._closingActionsSubscription = this._menuClosingActions().subscribe(() => this.closeMenu());\n      this._initMenu(menu, generation);\n      if (this._openingGeneration === generation) this._openingGeneration = null;\n"
+            },
+            {
+              "offset": 12930,
+              "before": "    if (this._destroyed || generation !== this._menuGeneration || !this.menuOpen) {\n      return;\n",
+              "after": "      if (this._destroyed || generation !== this._menuGeneration || !this.menuOpen) {\n        if (this._attachedMenu === menu && this._attachmentGeneration === generation && MENU_PANEL_OWNERS.get(menu) === this && !this.menuOpen) {\n          this._closingActionsSubscription.unsubscribe();\n          this._detachMenu(menu, overlayRef);\n        }\n        return;\n      }\n\n    } catch (error) {\n      if (this._openingGeneration === generation) this._openingGeneration = null;\n      if (this._attachedMenu === menu && this._attachmentGeneration === generation && MENU_PANEL_OWNERS.get(menu) === this) {\n        this._closingActionsSubscription.unsubscribe();\n        this._detachMenu(menu, overlayRef);\n      }\n      throw error;\n"
+            },
+            {
+              "offset": 14341,
+              "before": "    if (this._destroyed || !this._overlayRef || !this.menuOpen) {\n",
+              "after": "    if (this._destroyed || this._destroyingMenu || !this._overlayRef || !this.menuOpen) {\n"
+            },
+            {
+              "offset": 14428,
+              "before": "    const menu = this._attachedMenu || this.menu;\n    const overlayRef = this._overlayRef;\n    const generation = ++this._menuGeneration;\n    const openedBy = this._openedBy;\n    this._openedBy = undefined;\n    this._closingActionsSubscription.unsubscribe();\n    this._keydownSubscription.unsubscribe();\n    overlayRef.detachBackdrop();\n    // Retain painting without intercepting interaction meant for lower overlays.\n    overlayRef.overlayElement.style.pointerEvents = 'none';\n    // Always restore focus if the user is navigating using the keyboard or the menu was opened\n    // programmatically. We don't restore for non-root triggers, because it can prevent focus\n    // from making it back to the root trigger when closing a long chain of menus by clicking\n    // on the backdrop.\n    if (this.restoreFocus && (reason === 'keydown' || !openedBy || !this.triggersSubmenu())) {\n      // Fall back to program like focusFirstItem when open was not from mouse/touch\n      // (e.g. click after a non-primary mousedown). Native focus() can otherwise\n      // inherit a stale FocusMonitor mouse origin from that mousedown.\n      this.focus(openedBy || 'program');\n    }\n",
+              "after": "    this._destroyingMenu = true;\n    try {\n      const menu = this._attachedMenu || this.menu;\n      const overlayRef = this._overlayRef;\n      const generation = ++this._menuGeneration;\n      const openedBy = this._openedBy;\n      this._openedBy = undefined;\n      this._closingActionsSubscription.unsubscribe();\n      this._keydownSubscription.unsubscribe();\n      overlayRef.detachBackdrop();\n      // Retain painting without intercepting interaction meant for lower overlays.\n      overlayRef.overlayElement.style.pointerEvents = 'none';\n      // Always restore focus if the user is navigating using the keyboard or the menu was opened\n      // programmatically. We don't restore for non-root triggers, because it can prevent focus\n      // from making it back to the root trigger when closing a long chain of menus by clicking\n      // on the backdrop.\n      if (this.restoreFocus && (reason === 'keydown' || !openedBy || !this.triggersSubmenu())) {\n        // Fall back to program like focusFirstItem when open was not from mouse/touch\n        // (e.g. click after a non-primary mousedown). Native focus() can otherwise\n        // inherit a stale FocusMonitor mouse origin from that mousedown.\n        this.focus(openedBy || 'program');\n      }\n"
+            },
+            {
+              "offset": 15597,
+              "before": "    if (this._destroyed || generation !== this._menuGeneration) {\n      return;\n    }\n    this._setIsMenuOpen(false);\n    if (this._destroyed || generation !== this._menuGeneration) {\n      return;\n    }\n    if (menu instanceof _MatMenuBase && MENU_PANEL_OWNERS.get(menu) === this) {\n      // CSS motion needs the overlay and lazy views to remain attached. Close\n      // state/focus are already settled; only physical removal waits for void.\n      const removal = new Subscription();\n      this._pendingRemoval = removal;\n      const remove = () => {\n        if (generation === this._menuGeneration && MENU_PANEL_OWNERS.get(menu) === this) {\n          this._pendingRemoval = Subscription.EMPTY;\n          removal.unsubscribe();\n          this._detachMenu(menu, overlayRef);\n        }\n      };\n      removal.add(menu._animationDone.subscribe({\n        next: event => {\n          if (event.toState === 'void') {\n            remove();\n",
+              "after": "      if (this._destroyed || generation !== this._menuGeneration) {\n        return;\n      }\n      this._setIsMenuOpen(false);\n      if (this._destroyed || generation !== this._menuGeneration) {\n        return;\n      }\n      if (menu instanceof _MatMenuBase && MENU_PANEL_OWNERS.get(menu) === this) {\n        // CSS motion needs the overlay and lazy views to remain attached. Close\n        // state/focus are already settled; only physical removal waits for void.\n        const removal = new Subscription();\n        this._pendingRemoval = removal;\n        const remove = () => {\n          if (generation === this._menuGeneration && MENU_PANEL_OWNERS.get(menu) === this) {\n            this._pendingRemoval = Subscription.EMPTY;\n            removal.unsubscribe();\n            this._detachMenu(menu, overlayRef);\n"
+            },
+            {
+              "offset": 16542,
+              "before": "        },\n        complete: remove,\n      }));\n      menu._resetAnimation();\n    } else if (menu) {\n      this._detachMenu(menu, overlayRef);\n    } else {\n      overlayRef.detach();\n",
+              "after": "        };\n        removal.add(menu._animationDone.subscribe({\n          next: event => {\n            if (event.toState === 'void') {\n              remove();\n            }\n          },\n          complete: remove,\n        }));\n        menu._resetAnimation();\n      } else if (menu) {\n        this._detachMenu(menu, overlayRef);\n      } else {\n        overlayRef.detach();\n      }\n    } finally {\n      this._destroyingMenu = false;\n      if (!this._bindingCloseInProgress && this._deferredMenu !== undefined) {\n        const deferred = this._deferredMenu;\n        this._deferredMenu = undefined;\n        this.menu = deferred;\n      }\n"
+            },
+            {
+              "offset": 17017,
+              "before": "",
+              "after": "      this._attachmentGeneration = null;\n"
+            },
+            {
+              "offset": 17333,
+              "before": "  private _initMenu(menu: MatMenuPanel): void {\n",
+              "after": "  private _initMenu(menu: MatMenuPanel, generation: number): void {\n"
+            },
+            {
+              "offset": 17615,
+              "before": "    this._setIsMenuOpen(true);\n",
+              "after": "    if (!this._destroyed && generation === this._menuGeneration && this.menu === menu) {\n      this._setIsMenuOpen(true);\n    }\n"
+            },
+            {
+              "offset": 26128,
+              "before": "",
+              "after": "        map(() => {\n          const owner = this._parentMaterialMenu && MENU_PANEL_OWNERS.get(this._parentMaterialMenu);\n          return {owner, generation: owner?._menuGeneration};\n        }),\n"
+            },
+            {
+              "offset": 26169,
+              "before": "      .subscribe(() => {\n",
+              "after": "      .subscribe(({owner, generation}) => {\n        // Reject a hover queued for an earlier opening of the parent.\n        if (!owner || !owner.menuOpen || owner._menuGeneration !== generation ||\n            !this._parentMaterialMenu || MENU_PANEL_OWNERS.get(this._parentMaterialMenu) !== owner) {\n          return;\n        }\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+          "source_parent": "9e5508b9a7fb004132b92888274a0344bf5b57f6",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "ae3c8c981a50ac6ba11f943a3f1ceba644f28da9b707a05ff10225afc6fc8d1c",
+            "bytes": 117005,
+            "git_blob": "4c60ce9eeec8490f6408c8e113d0620faf629b13"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "fefc0509a3c6597aa78b68ec885a14f9c4eae5f8d0742d8055b1fdc4e5f4ce0a",
+            "bytes": 127882,
+            "git_blob": "100a4b09fa8027c1befac7a904c8272f90b71e8c"
+          },
+          "edits": [
+            {
+              "offset": 62611,
+              "before": "",
+              "after": "  it('closes and removes an open panel when its binding is cleared', fakeAsync(() => {\n    const fixture = createComponent(MenuRebinding);\n    fixture.detectChanges();\n    const {trigger, triggerEl} = fixture.componentInstance;\n    trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    let closed = 0;\n    trigger.menuClosed.subscribe(() => closed++);\n    trigger.menu = null;\n    fixture.detectChanges();\n    tick(500);\n    expect(closed).toBe(1);\n    expect(document.activeElement).toBe(triggerEl.nativeElement);\n    expect(trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('replaces an open panel while motion is enabled', fakeAsync(() => {\n    const fixture = createComponent(MenuRebinding, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}]);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    instance.trigger.openMenu();\n    fixture.detectChanges();\n    tick(1);\n    let closed = 0;\n    instance.trigger.menuClosed.subscribe(() => closed++);\n    instance.trigger.menu = instance.second;\n    fixture.detectChanges();\n    expect(closed).toBe(1);\n    expect(instance.trigger.menuOpen).toBeFalse();\n    instance.trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    expect(instance.trigger.menuOpen).toBeTrue();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);\n    expect(overlayContainerElement.textContent).toContain('Second');\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('honors a binding change from an earlier panel close observer', fakeAsync(() => {\n    const fixture = createComponent(MenuRebinding);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    instance.trigger.menu = null;\n    let calls = 0;\n    instance.first.closed.subscribe(() => {\n      if (++calls < 3) {\n        instance.trigger.menu = instance.second;\n      }\n    });\n    instance.trigger.menu = instance.first;\n    instance.trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    instance.trigger.menu = null;\n    fixture.detectChanges();\n    tick(500);\n    expect(calls).toBe(1);\n    expect(instance.trigger.menu).toBe(instance.second);\n    expect(instance.trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('cleans an interrupted opening when its focus callback clears the binding', fakeAsync(() => {\n    const fixture = createComponent(MenuRebinding);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    const focus = spyOn(instance.first, 'focusFirstItem').and.callFake(() => instance.trigger.menu = null);\n    instance.trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    expect(focus).toHaveBeenCalledTimes(1);\n    expect(instance.trigger.menu).toBeNull();\n    expect(instance.trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('cleans up when the close stream completes before a binding is cleared', fakeAsync(() => {\n    const fixture = createComponent(MenuRebinding);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    instance.trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    instance.first.close.complete();\n    instance.trigger.menu = null;\n    fixture.detectChanges();\n    tick(500);\n    expect(instance.trigger.menuOpen).toBeFalse();\n    expect(instance.trigger.menu).toBeNull();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('honors a binding change during focus restoration', fakeAsync(() => {\n    const fixture = createComponent(MenuRebinding);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    instance.trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    const other = document.createElement('button');\n    document.body.appendChild(other);\n    other.focus();\n    let calls = 0;\n    instance.triggerEl.nativeElement.addEventListener('focus', () => {\n      if (++calls < 3) {\n        instance.trigger.menu = instance.second;\n      }\n    });\n    instance.trigger.menu = null;\n    fixture.detectChanges();\n    tick(500);\n    expect(calls).toBe(1);\n    expect(instance.trigger.menu).toBe(instance.second);\n    expect(document.activeElement).toBe(instance.triggerEl.nativeElement);\n    expect(instance.trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);\n    other.remove();\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('ignores hover while the parent is exiting', fakeAsync(() => {\n    const fixture = createComponent(MenuHoverReopen, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}]);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    instance.root.openMenu();\n    fixture.detectChanges();\n    tick(1);\n    const item = overlayContainerElement.querySelector('[mat-menu-item]') as HTMLElement;\n    instance.root.closeMenu();\n    fixture.detectChanges();\n    item.dispatchEvent(new MouseEvent('mouseenter'));\n    tick(1);\n    expect(instance.childTrigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('opens a submenu on hover while the parent is open', fakeAsync(() => {\n    const fixture = createComponent(MenuHoverReopen, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}]);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    instance.root.openMenu();\n    fixture.detectChanges();\n    tick(1);\n    const item = overlayContainerElement.querySelector('[mat-menu-item]') as HTMLElement;\n    item.dispatchEvent(new MouseEvent('mouseenter'));\n    tick(1);\n    expect(instance.childTrigger.menuOpen).toBeTrue();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(2);\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('ignores a hover queued for a previous parent opening', fakeAsync(() => {\n    const fixture = createComponent(MenuHoverReopen, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}]);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    instance.root.openMenu();\n    fixture.detectChanges();\n    tick(1);\n    const item = overlayContainerElement.querySelector('[mat-menu-item]') as HTMLElement;\n    item.dispatchEvent(new MouseEvent('mouseenter'));\n    instance.root.closeMenu();\n    instance.root.openMenu();\n    fixture.detectChanges();\n    tick(1);\n    expect(instance.childTrigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('preserves a newer opening of the same panel during lazy attachment', fakeAsync(() => {\n    const fixture = createComponent(MenuLazyReopen, [], [MenuLazyChild]);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    instance.trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    expect(instance.calls).toBeGreaterThan(0);\n    expect(instance.trigger.menu).toBe(instance.menu);\n    expect(instance.trigger.menuOpen).toBeTrue();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('survives trigger destruction from a close callback during rebinding', fakeAsync(() => {\n    const fixture = createComponent(MenuRebinding);\n    fixture.detectChanges();\n    const trigger = fixture.componentInstance.trigger;\n    trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    let closed = 0;\n    trigger.menuClosed.subscribe(() => {\n      closed++;\n      fixture.destroy();\n    });\n    trigger.menu = null;\n    tick(500);\n    expect(closed).toBe(1);\n    expect(trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);\n  }));\n\n  it('cleans an interrupted opening when the focus hook throws', fakeAsync(() => {\n    const fixture = createComponent(MenuRebinding);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    const focus = spyOn(instance.first, 'focusFirstItem').and.throwError('focus failed');\n    expect(() => instance.trigger.openMenu()).toThrowError('focus failed');\n    fixture.detectChanges();\n    tick(500);\n    expect(instance.trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);\n    focus.and.stub();\n    instance.trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    expect(instance.trigger.menuOpen).toBeTrue();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);\n    fixture.destroy();\n    tick(500);\n  }));\n\n"
+            },
+            {
+              "offset": 105896,
+              "before": "",
+              "after": "@Component({selector: 'menu-lazy-child', template: ''})\nclass MenuLazyChild {\n  @Output() initialized = new EventEmitter<void>();\n  ngOnInit() {\n    this.initialized.emit();\n  }\n}\n\n@Component({\n  template: `\n    <button [matMenuTriggerFor]=\"menu\" #trigger=\"matMenuTrigger\">Open</button>\n    <mat-menu #menu=\"matMenu\"><ng-template matMenuContent>\n      <menu-lazy-child (initialized)=\"reopen()\"></menu-lazy-child>\n      <button mat-menu-item>Item</button>\n    </ng-template></mat-menu>\n  `,\n})\nclass MenuLazyReopen {\n  @ViewChild('trigger') trigger: MatLegacyMenuTrigger;\n  @ViewChild('menu') menu: MatLegacyMenu;\n  calls = 0;\n  reopen() {\n    if (++this.calls === 1) {\n      this.trigger.menu = null;\n      this.trigger.menu = this.menu;\n      this.trigger.openMenu();\n    }\n  }\n}\n\n@Component({\n  template: `\n    <button [matMenuTriggerFor]=\"parent\" #root=\"matMenuTrigger\">Root</button>\n    <mat-menu #parent=\"matMenu\"><button mat-menu-item [matMenuTriggerFor]=\"child\" #childTrigger=\"matMenuTrigger\">Submenu</button></mat-menu>\n    <mat-menu #child=\"matMenu\"><button mat-menu-item>Child</button></mat-menu>\n  `,\n})\nclass MenuHoverReopen {\n  @ViewChild('root') root: MatLegacyMenuTrigger;\n  @ViewChild('childTrigger') childTrigger: MatLegacyMenuTrigger;\n}\n\n@Component({\n  template: `\n    <button [matMenuTriggerFor]=\"first\" #triggerEl>Open</button>\n    <mat-menu #first=\"matMenu\"><button mat-menu-item>First</button></mat-menu>\n    <mat-menu #second=\"matMenu\"><button mat-menu-item>Second</button></mat-menu>\n  `,\n})\nclass MenuRebinding {\n  @ViewChild(MatLegacyMenuTrigger) trigger: MatLegacyMenuTrigger;\n  @ViewChild('triggerEl') triggerEl: ElementRef<HTMLElement>;\n  @ViewChild('first') first: MatLegacyMenu;\n  @ViewChild('second') second: MatLegacyMenu;\n}\n\n"
+            }
+          ]
+        }
+      ]
+    },
+    "main": {
+      "transitions": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/select.html",
+          "source_parent": "0d681a13389565d2416b3485ab3278f4bde2e82e",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-select/select.html",
+            "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da",
+            "bytes": 2792,
+            "git_blob": "05679478af008a3400afb40af289560b233ca799"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-select/select.html",
+            "sha256": "9d895bf6cbf1b2da7063acedc1fed7ee4cf7f10ce25bc7a797e8ee32875feec2",
+            "bytes": 2843,
+            "git_blob": "e12daf48f7b4e94a6dd303e54982cac3859276d7"
+          },
+          "edits": [
+            {
+              "offset": 1479,
+              "before": "",
+              "after": "  [cdkConnectedOverlayDisposeOnNavigation]=\"false\"\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+          "source_parent": "0d681a13389565d2416b3485ab3278f4bde2e82e",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+            "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13",
+            "bytes": 223507,
+            "git_blob": "d13e227562379bb37ae72a2599e279cffbb16f79"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+            "sha256": "ac1f5c3cfe7efedfbe4ca4eb86452fccada944ce1ead224e9779bd9d28f1c499",
+            "bytes": 226944,
+            "git_blob": "b1473b5585ec363d8a53b139bf934e87aa0c1ec4"
+          },
+          "edits": [
+            {
+              "offset": 201,
+              "before": "import {OverlayContainer} from '@angular/cdk/overlay';\n",
+              "after": "import {CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG, OverlayContainer} from '@angular/cdk/overlay';\nimport {Location} from '@angular/common';\nimport {SpyLocation} from '@angular/common/testing';\n"
+            },
+            {
+              "offset": 223507,
+              "before": "",
+              "after": "\n\n@Component({\n  standalone: false,\n  template: `\n    <mat-select [disabled]=\"disabled\">\n      @if (showOption) { <mat-option value=\"a\">A</mat-option> }\n    </mat-select>\n  `,\n})\nclass SelectNavigationFixture {\n  @ViewChild(MatLegacySelect) select: MatLegacySelect;\n  disabled = false;\n  showOption = true;\n}\n\ndescribe('legacy select overlay navigation', () => {\n  function setup(disposeOnNavigation: boolean) {\n    const config = {disposeOnNavigation: true};\n    TestBed.configureTestingModule({\n      imports: [MatLegacySelectModule],\n      declarations: [SelectNavigationFixture],\n      providers: [\n        LEGACY_NOOP_ANIMATIONS,\n        {provide: Location, useClass: SpyLocation},\n        ...(disposeOnNavigation ? [{provide: CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG, useValue: config}] : []),\n      ],\n    });\n    const fixture = TestBed.createComponent(SelectNavigationFixture);\n    fixture.detectChanges();\n    return {fixture, config, overlay: TestBed.inject(OverlayContainer).getContainerElement()};\n  }\n\n  for (const configured of [false, true]) {\n    it(`keeps the panel usable after history navigation (configured: ${configured})`, fakeAsync(() => {\n      const {fixture, config, overlay} = setup(configured);\n      const select = fixture.componentInstance.select;\n      select.open();\n      fixture.detectChanges();\n      tick(250);\n      fixture.detectChanges();\n      expect(select.panelOpen).toBeTrue();\n      expect(overlay.querySelector('.mat-select-panel')).not.toBeNull();\n\n      (TestBed.inject(Location) as SpyLocation).simulateUrlPop('/next');\n      fixture.detectChanges();\n      tick(250);\n      fixture.detectChanges();\n      expect(select.panelOpen).toBeTrue();\n      expect(overlay.querySelector('.mat-select-panel')).not.toBeNull();\n\n      select.close();\n      fixture.detectChanges();\n      tick(250);\n      fixture.detectChanges();\n      expect(select.panelOpen).toBeFalse();\n      expect(overlay.querySelector('.mat-select-panel')).toBeNull();\n      select.open();\n      fixture.detectChanges();\n      tick(250);\n      fixture.detectChanges();\n      expect(select.panelOpen).toBeTrue();\n      expect(overlay.querySelector('.mat-select-panel')).not.toBeNull();\n      if (configured) {\n        expect(TestBed.inject(CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG)).toBe(config);\n        expect(config).toEqual({disposeOnNavigation: true});\n      }\n      fixture.destroy();\n      tick(500);\n    }));\n  }\n\n  it('does not open when disabled or without options', fakeAsync(() => {\n    const {fixture, config, overlay} = setup(true);\n    const select = fixture.componentInstance.select;\n    fixture.componentInstance.disabled = true;\n    fixture.detectChanges();\n    select.open();\n    fixture.detectChanges();\n    expect(select.panelOpen).toBeFalse();\n    expect(overlay.querySelector('.mat-select-panel')).toBeNull();\n\n    fixture.componentInstance.disabled = false;\n    fixture.componentInstance.showOption = false;\n    fixture.detectChanges();\n    select.open();\n    fixture.detectChanges();\n    expect(select.panelOpen).toBeFalse();\n    expect(overlay.querySelector('.mat-select-panel')).toBeNull();\n    expect(TestBed.inject(CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG)).toBe(config);\n    expect(config).toEqual({disposeOnNavigation: true});\n    fixture.destroy();\n    tick(500);\n  }));\n});\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "source_parent": "0d681a13389565d2416b3485ab3278f4bde2e82e",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+            "sha256": "dafa2038f78994e281943deca66dc8ade6628abceeb45b6f64deec9c00a2ff4c",
+            "bytes": 7337,
+            "git_blob": "199ccb7fed3d4ef5d2d1eade9f8ab9e2d96a6172"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+            "sha256": "b3b29351381b979f024c6b99222209838fb5cc13fcd167c4b96b297ac8e5a124",
+            "bytes": 8361,
+            "git_blob": "9312b071a4f15c82bb146fe5a2c98dffdcc4d89f"
+          },
+          "edits": [
+            {
+              "offset": 571,
+              "before": "",
+              "after": "  assertInInjectionContext,\n"
+            },
+            {
+              "offset": 644,
+              "before": "",
+              "after": "  runInInjectionContext,\n"
+            },
+            {
+              "offset": 955,
+              "before": "",
+              "after": "import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';\n"
+            },
+            {
+              "offset": 1712,
+              "before": "",
+              "after": "  private readonly _injector: Injector;\n  private readonly _animationMode?: 'NoopAnimations' | 'BrowserAnimations';\n  private readonly _hasInjectionContext: boolean;\n"
+            },
+            {
+              "offset": 3383,
+              "before": "",
+              "after": "    try {\n      assertInInjectionContext(_MatDialogBase);\n      this._hasInjectionContext = true;\n    } catch {\n      this._hasInjectionContext = false;\n    }\n    this._injector = injector;\n    this._animationMode = _animationMode;\n"
+            },
+            {
+              "offset": 3426,
+              "before": "    this._dialog = injector.get(Dialog);\n",
+              "after": "    this._dialog = this._injector.get(Dialog);\n  }\n\n  /** Match the injector used for the dialog container on every open. */\n  private _animationsDisabled(config: MatDialogConfig): boolean {\n    if (!this._hasInjectionContext) {\n      return this._animationMode === 'NoopAnimations';\n    }\n\n    const injector = config.injector || config.viewContainerRef?.injector || this._injector;\n    return runInInjectionContext(injector, legacyAnimationsDisabled);\n"
+            },
+            {
+              "offset": 4651,
+              "before": "",
+              "after": "      ...(this._animationsDisabled(config) ? {disableAnimations: true} : {}),\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "source_parent": "0d681a13389565d2416b3485ab3278f4bde2e82e",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "f1e499dae58e12e8333ef81e480d069d93599cadda29ed2df32262e44d6c45a8",
+            "bytes": 26780,
+            "git_blob": "5c3987ceefcc5f6ec7f5869ca46e7c5537068680"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "8e35b1a458a5b501053286d23fd4cf1934aa9e2237f5e0e2f1c6ffbb69221215",
+            "bytes": 26879,
+            "git_blob": "43f1f2972d3f32ddecbaa968c3a18a68ac0e6b92"
+          },
+          "edits": [
+            {
+              "offset": 9723,
+              "before": "    this._closingActionsSubscription.unsubscribe();\n",
+              "after": "    // Keep closing actions alive until the attached overlay is detached so the\n    // menu's historical close notification is emitted during teardown.\n"
+            },
+            {
+              "offset": 14807,
+              "before": "    this._setIsMenuOpen(false);\n    if (this._destroyed || generation !== this._menuGeneration) {\n      return;\n    }\n\n",
+              "after": ""
+            },
+            {
+              "offset": 15616,
+              "before": "",
+              "after": "    if (this._destroyed || generation !== this._menuGeneration) {\n      return;\n    }\n    this._setIsMenuOpen(false);\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+          "source_parent": "0d681a13389565d2416b3485ab3278f4bde2e82e",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6",
+            "bytes": 112600,
+            "git_blob": "f6d79ccdb48d4520e4d5bba2a0871a1a5c5d0b05"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "ae3c8c981a50ac6ba11f943a3f1ceba644f28da9b707a05ff10225afc6fc8d1c",
+            "bytes": 117005,
+            "git_blob": "4c60ce9eeec8490f6408c8e113d0620faf629b13"
+          },
+          "edits": [
+            {
+              "offset": 355,
+              "before": "import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';\n",
+              "after": "import {_LegacyViewport as ViewportRuler, LEGACY_ANIMATIONS_TEST_OVERRIDE} from '@ngx-compat/material-legacy/legacy-core';\n"
+            },
+            {
+              "offset": 44571,
+              "before": "  it('should keep the panel in the viewport when more items are added while open', () => {\n",
+              "after": "  it('should keep the panel in the viewport when more items are added while open', async () => {\n"
+            },
+            {
+              "offset": 44999,
+              "before": "",
+              "after": "    // Current CDK positions attached overlays after the next render.\n    await fixture.whenStable();\n    fixture.detectChanges();\n"
+            },
+            {
+              "offset": 45345,
+              "before": "    fixture.detectChanges();\n    // Ensure the flexible strategy remeasures after content height changes.\n    // items.changes + reapplyLastPosition can miss a layout pass under the\n    // current CDK peer; updatePosition preserves the viewport assertion.\n    fixture.componentInstance.trigger.updatePosition();\n",
+              "after": ""
+            },
+            {
+              "offset": 62752,
+              "before": "",
+              "after": "\n  it('restores focus before menuClosed and allows a synchronous reopen', fakeAsync(() => {\n    const fixture = createComponent(SimpleMenu, [], [FakeIcon]);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    const triggerElement = instance.triggerEl.nativeElement;\n    triggerElement.click();\n    fixture.detectChanges();\n    tick(500);\n    let observedFocus: Element | null = null;\n    let closed = 0;\n    const sub = instance.trigger.menuClosed.subscribe(() => {\n      closed++;\n      observedFocus = document.activeElement;\n      instance.trigger.openMenu();\n    });\n    instance.trigger.closeMenu();\n    fixture.detectChanges();\n    tick(500);\n    expect(observedFocus).toBe(triggerElement);\n    expect(closed).toBe(1);\n    expect(instance.trigger.menuOpen).toBeTrue();\n    expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeTruthy();\n    sub.unsubscribe();\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('teardown emits one close and blocks reopening from the close observer', fakeAsync(() => {\n    const fixture = createComponent(SimpleMenu, [], [FakeIcon]);\n    fixture.detectChanges();\n    const trigger = fixture.componentInstance.trigger;\n    const menu = fixture.componentInstance.menu;\n    trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    const events: string[] = [];\n    menu.closed.subscribe({next: () => { events.push('close'); trigger.openMenu(); }, complete: () => events.push('complete')});\n    fixture.destroy();\n    tick(500);\n    expect(events).toEqual(['close', 'complete']);\n    expect(trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeFalsy();\n  }));\n\n  it('keeps exit attached until completion and ignores duplicate end', fakeAsync(() => {\n    const fixture = createComponent(SimpleMenu, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}], [FakeIcon]);\n    fixture.detectChanges(); const instance = fixture.componentInstance;\n    instance.trigger.openMenu(); fixture.detectChanges(); tick(1);\n    const panel = overlayContainerElement.querySelector('.mat-menu-panel') as HTMLElement;\n    expect(panel.classList).toContain('mat-menu-panel-animations-enabled');\n    expect(getComputedStyle(panel).animationName).toBe('mat-legacy-menu-enter');\n    const completions: string[] = [];\n    const sub = instance.menu._animationDone.subscribe((event: any) => completions.push(event.toState));\n    instance.trigger.closeMenu(); fixture.detectChanges();\n    expect(instance.trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.contains(panel)).toBeTrue();\n    panel.dispatchEvent(new AnimationEvent('animationend', {animationName: 'mat-legacy-menu-exit'}));\n    panel.dispatchEvent(new AnimationEvent('animationend', {animationName: 'mat-legacy-menu-exit'}));\n    expect(completions.filter(x => x === 'void').length).toBe(1);\n    expect(overlayContainerElement.contains(panel)).toBeFalse();\n    sub.unsubscribe(); fixture.destroy(); tick(500);\n  }));\n\n  it('reopening while exiting cancels stale fallback removal', fakeAsync(() => {\n    const fixture = createComponent(SimpleMenu, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}], [FakeIcon]);\n    fixture.detectChanges(); const trigger = fixture.componentInstance.trigger;\n    trigger.openMenu(); fixture.detectChanges(); tick(1);\n    trigger.closeMenu(); fixture.detectChanges(); tick(25);\n    trigger.openMenu(); fixture.detectChanges(); tick(500);\n    expect(trigger.menuOpen).toBeTrue();\n    expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeTruthy();\n    fixture.destroy(); tick(500);\n  }));\n\n  it('reentrant close from focus restoration emits menuClosed once', fakeAsync(() => {\n    const fixture = createComponent(SimpleMenu, [], [FakeIcon]); fixture.detectChanges();\n    const instance = fixture.componentInstance; const trigger = instance.trigger;\n    trigger.openMenu(); fixture.detectChanges(); tick(500);\n    const focused = document.createElement('button'); document.body.appendChild(focused); focused.focus();\n    let closed = 0; const sub = trigger.menuClosed.subscribe(() => closed++);\n    instance.triggerEl.nativeElement.addEventListener('focus', () => trigger.closeMenu(), {once:true});\n    trigger.closeMenu(); fixture.detectChanges(); tick(500);\n    expect(closed).toBe(1); expect(trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeFalsy();\n    focused.remove(); sub.unsubscribe(); fixture.destroy(); tick(500);\n  }));\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+          "source_parent": "ed2cb5f984f67d60febcefa3a032899038e000a1",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+            "sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5",
+            "bytes": 4650,
+            "git_blob": "80c5bc255ca477299b3852da074757e04d00ff3c"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+            "sha256": "a35d7e06fb778203478236024a6137e34624f0ed7f10fabcc7ac3bd9aaf4a510",
+            "bytes": 4960,
+            "git_blob": "cd0cff189e3a69689e62b143eb95112bbe485b3b"
+          },
+          "edits": [
+            {
+              "offset": 1982,
+              "before": "",
+              "after": "  private _legacyMotionDestroyed = false;\n"
+            },
+            {
+              "offset": 2216,
+              "before": "      this._notifyEnter();\n",
+              "after": "      // Let callers subscribe after open() returns, as with the historical no-op animation.\n      queueMicrotask(() => {\n        if (!this._legacyMotionDestroyed && this._animationState === 'visible') {\n          this._notifyEnter();\n        }\n      });\n"
+            },
+            {
+              "offset": 4078,
+              "before": "",
+              "after": "    this._legacyMotionDestroyed = true;\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+          "source_parent": "ed2cb5f984f67d60febcefa3a032899038e000a1",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+            "sha256": "293baf9806cc7bc0c53ab5a68c745536d79e40e3e2a82928b9515361dbdf302f",
+            "bytes": 11168,
+            "git_blob": "0720d48ce26a3e408f4a4a8ae59ba02629e09482"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+            "sha256": "2064e816539a77a2749ab9d2141721a40ab27e3dfbf4edafa1f5b9afedfc453b",
+            "bytes": 11168,
+            "git_blob": "ffc030e3530abf873e5edce6bdadf056421013fb"
+          },
+          "edits": [
+            {
+              "offset": 8562,
+              "before": "    // Subscribe before enter() so noop-animation sync _onEnter still arms duration.\n",
+              "after": "    // Subscribe before enter() so the opening notification arms the duration timer.\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+          "source_parent": "ed2cb5f984f67d60febcefa3a032899038e000a1",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+            "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3",
+            "bytes": 45763,
+            "git_blob": "d532ca11d2f6a679581b05a7b934b9888715db20"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+            "sha256": "92425afa5ddcb406c75b4af69ea9dd795f3b3d10ef8898b909a7bd1ad69f7230",
+            "bytes": 49266,
+            "git_blob": "ccfad7a95a4a27682be77a2af23c4556b8cfeba2"
+          },
+          "edits": [
+            {
+              "offset": 24526,
+              "before": "    // Spy before open so noop-animation sync afterOpened still records the capped timer\n",
+              "after": "    // Spy before open to observe the capped duration timer.\n"
+            },
+            {
+              "offset": 45763,
+              "before": "",
+              "after": "\n\ndescribe('legacy snack bar no-op open notification', () => {\n  beforeEach(() => {\n    TestBed.configureTestingModule({\n      imports: [MatLegacySnackBarModule],\n      providers: [LEGACY_NOOP_ANIMATIONS],\n    });\n  });\n\n  it('notifies a caller who subscribes immediately after open returns', fakeAsync(() => {\n    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n    let notifications = 0;\n    let completed = false;\n    ref.afterOpened().subscribe({next: () => notifications++, complete: () => completed = true});\n    expect(notifications).toBe(0);\n    expect(completed).toBeFalse();\n    tick();\n    expect(notifications).toBe(1);\n    expect(completed).toBeTrue();\n    ref.dismiss();\n    tick();\n  }));\n\n  it('does not notify a snack bar dismissed before its enter completes', fakeAsync(() => {\n    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n    let notifications = 0;\n    ref.afterOpened().subscribe(() => notifications++);\n    ref.dismiss();\n    tick();\n    expect(notifications).toBe(0);\n  }));\n\n  it('only notifies the replacement when replaced before enter completes', fakeAsync(() => {\n    const snackBar = TestBed.inject(MatLegacySnackBar);\n    const previous = snackBar.open('previous');\n    let previousNotifications = 0;\n    previous.afterOpened().subscribe(() => previousNotifications++);\n    const next = snackBar.open('next');\n    let nextNotifications = 0;\n    next.afterOpened().subscribe(() => nextNotifications++);\n    tick();\n    expect(previousNotifications).toBe(0);\n    expect(nextNotifications).toBe(1);\n    next.dismiss();\n    tick();\n  }));\n\n  it('does not notify after the container is destroyed', fakeAsync(() => {\n    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n    let notifications = 0;\n    ref.afterOpened().subscribe(() => notifications++);\n    ref.containerInstance.ngOnDestroy();\n    tick();\n    expect(notifications).toBe(0);\n  }));\n\n  it('still starts the duration timer when opening completes', fakeAsync(() => {\n    const ref = TestBed.inject(MatLegacySnackBar).open('message', '', {duration: 100});\n    let opened = 0;\n    let dismissed = 0;\n    ref.afterOpened().subscribe(() => opened++);\n    ref.afterDismissed().subscribe(() => dismissed++);\n    tick();\n    expect(opened).toBe(1);\n    tick(100);\n    expect(dismissed).toBe(1);\n  }));\n});\n\n\ndescribe('legacy snack bar reentrant no-op notification', () => {\n  beforeEach(() => TestBed.configureTestingModule({\n    imports: [MatLegacySnackBarModule],\n    providers: [LEGACY_NOOP_ANIMATIONS],\n  }));\n\n  it('allows an afterOpened subscriber to dismiss immediately', fakeAsync(() => {\n    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n    let opened = 0;\n    let dismissed = 0;\n    ref.afterDismissed().subscribe(() => dismissed++);\n    ref.afterOpened().subscribe(() => { opened++; ref.dismiss(); });\n    tick();\n    expect(opened).toBe(1);\n    expect(dismissed).toBe(1);\n  }));\n\n  it('allows an afterOpened subscriber to replace the snack bar', fakeAsync(() => {\n    const snackBar = TestBed.inject(MatLegacySnackBar);\n    const previous = snackBar.open('previous');\n    let previousOpened = 0;\n    let nextOpened = 0;\n    let next: MatLegacySnackBarRef<LegacySimpleSnackBar>;\n    previous.afterOpened().subscribe(() => {\n      previousOpened++;\n      next = snackBar.open('next');\n      next.afterOpened().subscribe(() => nextOpened++);\n    });\n    tick();\n    expect(previousOpened).toBe(1);\n    expect(nextOpened).toBe(1);\n    next!.dismiss();\n    tick();\n  }));\n});\n"
+            }
+          ]
+        }
+      ],
+      "d61_menu_transitions": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "source_parent": "d0741fbc8848217b0578eaeea7284cde1ef3e6dd",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+            "sha256": "b3b29351381b979f024c6b99222209838fb5cc13fcd167c4b96b297ac8e5a124",
+            "bytes": 8361,
+            "git_blob": "9312b071a4f15c82bb146fe5a2c98dffdcc4d89f"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+            "sha256": "4926702c9f5aaafa17c7489692da5b67dcdde261d79cafd0628f95a4134ea61a",
+            "bytes": 8226,
+            "git_blob": "19222ce80ae8a58bcaaa8f606967dd8ce573ae5f"
+          },
+          "edits": [
+            {
+              "offset": 398,
+              "before": "import {Dialog, DialogConfig, DialogRef} from '@angular/cdk/dialog';\n",
+              "after": "import {Dialog, DialogConfig} from '@angular/cdk/dialog';\n"
+            },
+            {
+              "offset": 6901,
+              "before": "          // Prevent content from resolving the CDK DialogRef accidentally.\n          {provide: DialogRef, useValue: null},\n",
+              "after": ""
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+          "source_parent": "d0741fbc8848217b0578eaeea7284cde1ef3e6dd",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+            "sha256": "dfc5961661c06ae15f186d25846f4a40f61880ac2c09e9975e0d9faabbbdea2b",
+            "bytes": 94027,
+            "git_blob": "a9b710ad36c22af45c2cb5ff0ca82b17df8b2458"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+            "sha256": "c95640a45f9f029e818bcd9c1510337b1952a7164393aa8cc56f85cd188d783d",
+            "bytes": 97904,
+            "git_blob": "07a15a2147ea5f0d2724977b1e88d7efdc6ad9cd"
+          },
+          "edits": [
+            {
+              "offset": 538,
+              "before": "",
+              "after": "  inject as injectToken,\n"
+            },
+            {
+              "offset": 94027,
+              "before": "",
+              "after": "\nlet captured: Array<{cdk: CdkDialogRef; optional: CdkDialogRef | null; legacy: MatLegacyDialogRef<any>}> = [];\n\n@Directive({standalone: false, selector: '[dialogRefProbe]'})\nclass DialogRefProbe {\n  constructor() {\n    captured.push({\n      cdk: injectToken(CdkDialogRef),\n      optional: injectToken(CdkDialogRef, {optional: true}),\n      legacy: injectToken(MatLegacyDialogRef),\n    });\n  }\n}\n\n@Component({standalone: false, template: '<button dialogRefProbe>dialog</button>'})\nclass DialogRefContent {}\n\n@Component({\n  standalone: false,\n  template: '<button id=\"origin\">origin</button><ng-template><button dialogRefProbe>template</button></ng-template>',\n})\nclass DialogRefHost {\n  @ViewChild(TemplateRef) template!: TemplateRef<any>;\n}\n\ndescribe('legacy dialog content reference injection', () => {\n  beforeEach(() => {\n    captured = [];\n    TestBed.configureTestingModule({\n      declarations: [DialogRefProbe, DialogRefContent, DialogRefHost],\n      imports: [MatLegacyDialogModule],\n      providers: [LEGACY_NOOP_ANIMATIONS],\n    });\n  });\n\n  for (const kind of ['component', 'template'] as const) {\n    for (const method of ['legacy', 'cdk'] as const) {\n      it(`retains ${kind} reference identity and ${method} close behavior`, fakeAsync(() => {\n        const fixture = TestBed.createComponent(DialogRefHost);\n        fixture.detectChanges();\n        const origin = fixture.nativeElement.querySelector('#origin') as HTMLElement;\n        origin.focus();\n        const dialog = TestBed.inject(MatLegacyDialog);\n        const ref = kind === 'component' ? dialog.open(DialogRefContent) :\n          dialog.open(fixture.componentInstance.template);\n        fixture.detectChanges();\n        tick(250);\n        fixture.detectChanges();\n\n        const pair = captured[0];\n        expect(pair.legacy).toBe(ref);\n        expect(pair.cdk).toBeTruthy();\n        expect(pair.optional).toBe(pair.cdk);\n        expect(pair.cdk).not.toBe(pair.legacy as unknown as CdkDialogRef);\n        const before: unknown[] = [];\n        const after: unknown[] = [];\n        ref.beforeClosed().subscribe(value => before.push(value));\n        ref.afterClosed().subscribe(value => after.push(value));\n        pair[method].close(`${method}-result`);\n        fixture.detectChanges();\n        tick(500);\n        fixture.detectChanges();\n\n        const result = method === 'legacy' ? 'legacy-result' : undefined;\n        expect(before).toEqual([result]);\n        expect(after).toEqual([result]);\n        expect(dialog.openDialogs.length).toBe(0);\n        expect(document.activeElement).toBe(origin);\n        fixture.destroy();\n      }));\n    }\n  }\n\n  it('cleans up a CDK-closed nested child and a legacy-closed parent', fakeAsync(() => {\n    const fixture = TestBed.createComponent(DialogRefHost);\n    fixture.detectChanges();\n    const origin = fixture.nativeElement.querySelector('#origin') as HTMLElement;\n    origin.focus();\n    const dialog = TestBed.inject(MatLegacyDialog);\n    const outer = dialog.open(DialogRefContent);\n    fixture.detectChanges();\n    tick(250);\n    const inner = dialog.open(DialogRefContent);\n    fixture.detectChanges();\n    tick(250);\n    expect(captured.length).toBe(2);\n    let innerAfter = 0;\n    let outerAfter = 0;\n    inner.afterClosed().subscribe(() => innerAfter++);\n    outer.afterClosed().subscribe(() => outerAfter++);\n    captured[1].cdk.close('child');\n    fixture.detectChanges();\n    tick(500);\n    fixture.detectChanges();\n    expect(dialog.openDialogs.length).toBe(1);\n    expect(innerAfter).toBe(1);\n    expect(outerAfter).toBe(0);\n    outer.close('outer');\n    fixture.detectChanges();\n    tick(500);\n    fixture.detectChanges();\n    expect(dialog.openDialogs.length).toBe(0);\n    expect(innerAfter).toBe(1);\n    expect(outerAfter).toBe(1);\n    expect(document.activeElement).toBe(origin);\n    fixture.destroy();\n  }));\n});\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "source_parent": "b8642bbff54bb4b41e1f980a84f9903dab012c06",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "8e35b1a458a5b501053286d23fd4cf1934aa9e2237f5e0e2f1c6ffbb69221215",
+            "bytes": 26879,
+            "git_blob": "43f1f2972d3f32ddecbaa968c3a18a68ac0e6b92"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "e4ecb1452e92a1cc30fb1ebc97c6e24244b432dade5f30b6c58855d8e10cc5b2",
+            "bytes": 30651,
+            "git_blob": "777ccf29403ab133d3ba1e923a622abab089b81b"
+          },
+          "edits": [
+            {
+              "offset": 1461,
+              "before": "import {delay, filter, takeUntil} from 'rxjs/operators';\n",
+              "after": "import {delay, filter, map, takeUntil} from 'rxjs/operators';\n"
+            },
+            {
+              "offset": 3438,
+              "before": "",
+              "after": "  private _bindingCloseInProgress = false;\n  private _destroyingMenu = false;\n  private _openingGeneration: number | null = null;\n  private _attachmentGeneration: number | null = null;\n  private _deferredMenu: MatMenuPanel | null | undefined;\n"
+            },
+            {
+              "offset": 5049,
+              "before": "",
+              "after": "    if (this._bindingCloseInProgress || this._destroyingMenu) {\n      this._deferredMenu = menu;\n      return;\n    }\n"
+            },
+            {
+              "offset": 5101,
+              "before": "",
+              "after": "    const previousMenu = this._menu;\n    if (previousMenu && this.menuOpen && this._attachedMenu === previousMenu) {\n      const generation = this._menuGeneration;\n      this._bindingCloseInProgress = true;\n      try {\n        previousMenu.close.emit();\n      } finally {\n        this._bindingCloseInProgress = false;\n      }\n      if (this._deferredMenu !== undefined) {\n        menu = this._deferredMenu;\n        this._deferredMenu = undefined;\n      }\n      // A close callback can destroy the trigger or replace the binding itself.\n      if (this._destroyed || this._menu !== previousMenu) {\n        return;\n      }\n      // A callback may have reopened the previous menu during its close event.\n      if (this.menuOpen && generation !== this._menuGeneration) {\n        return;\n      }\n      // A completed close stream cannot notify the trigger.\n      if (this.menuOpen && this._attachedMenu === previousMenu) {\n        this._destroyMenu(undefined);\n        if (this._destroyed || this._menu !== previousMenu) {\n          return;\n        }\n      }\n    }\n\n    if (!this.menuOpen && this._openingGeneration !== null && this._attachedMenu === previousMenu && previousMenu) {\n      this._menuGeneration++;\n    }\n"
+            },
+            {
+              "offset": 12547,
+              "before": "    overlayRef.attach(this._getPortal(menu));\n",
+              "after": "    this._openingGeneration = generation;\n    this._attachmentGeneration = generation;\n    try {\n      overlayRef.attach(this._getPortal(menu));\n"
+            },
+            {
+              "offset": 12594,
+              "before": "    if (menu.lazyContent) {\n      menu.lazyContent.attach(this.menuData);\n    }\n",
+              "after": "      if (menu.lazyContent) {\n        menu.lazyContent.attach(this.menuData);\n      }\n"
+            },
+            {
+              "offset": 12675,
+              "before": "    if (this._destroyed || generation !== this._menuGeneration || MENU_PANEL_OWNERS.get(menu) !== this) {\n      return;\n    }\n",
+              "after": "      if (this._destroyed || generation !== this._menuGeneration || MENU_PANEL_OWNERS.get(menu) !== this) {\n        if (this._openingGeneration === generation) this._openingGeneration = null;\n        if (this._attachedMenu === menu && this._attachmentGeneration === generation && MENU_PANEL_OWNERS.get(menu) === this) {\n          this._detachMenu(menu, overlayRef);\n        }\n        return;\n      }\n"
+            },
+            {
+              "offset": 12802,
+              "before": "    this._closingActionsSubscription = this._menuClosingActions().subscribe(() => this.closeMenu());\n    this._initMenu(menu);\n",
+              "after": "      this._closingActionsSubscription = this._menuClosingActions().subscribe(() => this.closeMenu());\n      this._initMenu(menu, generation);\n      if (this._openingGeneration === generation) this._openingGeneration = null;\n"
+            },
+            {
+              "offset": 12930,
+              "before": "    if (this._destroyed || generation !== this._menuGeneration || !this.menuOpen) {\n      return;\n",
+              "after": "      if (this._destroyed || generation !== this._menuGeneration || !this.menuOpen) {\n        if (this._attachedMenu === menu && this._attachmentGeneration === generation && MENU_PANEL_OWNERS.get(menu) === this && !this.menuOpen) {\n          this._closingActionsSubscription.unsubscribe();\n          this._detachMenu(menu, overlayRef);\n        }\n        return;\n      }\n\n    } catch (error) {\n      if (this._openingGeneration === generation) this._openingGeneration = null;\n      if (this._attachedMenu === menu && this._attachmentGeneration === generation && MENU_PANEL_OWNERS.get(menu) === this) {\n        this._closingActionsSubscription.unsubscribe();\n        this._detachMenu(menu, overlayRef);\n      }\n      throw error;\n"
+            },
+            {
+              "offset": 14341,
+              "before": "    if (this._destroyed || !this._overlayRef || !this.menuOpen) {\n",
+              "after": "    if (this._destroyed || this._destroyingMenu || !this._overlayRef || !this.menuOpen) {\n"
+            },
+            {
+              "offset": 14428,
+              "before": "    const menu = this._attachedMenu || this.menu;\n    const overlayRef = this._overlayRef;\n    const generation = ++this._menuGeneration;\n    const openedBy = this._openedBy;\n    this._openedBy = undefined;\n    this._closingActionsSubscription.unsubscribe();\n    this._keydownSubscription.unsubscribe();\n    overlayRef.detachBackdrop();\n    // Retain painting without intercepting interaction meant for lower overlays.\n    overlayRef.overlayElement.style.pointerEvents = 'none';\n    // Always restore focus if the user is navigating using the keyboard or the menu was opened\n    // programmatically. We don't restore for non-root triggers, because it can prevent focus\n    // from making it back to the root trigger when closing a long chain of menus by clicking\n    // on the backdrop.\n    if (this.restoreFocus && (reason === 'keydown' || !openedBy || !this.triggersSubmenu())) {\n      // Fall back to program like focusFirstItem when open was not from mouse/touch\n      // (e.g. click after a non-primary mousedown). Native focus() can otherwise\n      // inherit a stale FocusMonitor mouse origin from that mousedown.\n      this.focus(openedBy || 'program');\n    }\n",
+              "after": "    this._destroyingMenu = true;\n    try {\n      const menu = this._attachedMenu || this.menu;\n      const overlayRef = this._overlayRef;\n      const generation = ++this._menuGeneration;\n      const openedBy = this._openedBy;\n      this._openedBy = undefined;\n      this._closingActionsSubscription.unsubscribe();\n      this._keydownSubscription.unsubscribe();\n      overlayRef.detachBackdrop();\n      // Retain painting without intercepting interaction meant for lower overlays.\n      overlayRef.overlayElement.style.pointerEvents = 'none';\n      // Always restore focus if the user is navigating using the keyboard or the menu was opened\n      // programmatically. We don't restore for non-root triggers, because it can prevent focus\n      // from making it back to the root trigger when closing a long chain of menus by clicking\n      // on the backdrop.\n      if (this.restoreFocus && (reason === 'keydown' || !openedBy || !this.triggersSubmenu())) {\n        // Fall back to program like focusFirstItem when open was not from mouse/touch\n        // (e.g. click after a non-primary mousedown). Native focus() can otherwise\n        // inherit a stale FocusMonitor mouse origin from that mousedown.\n        this.focus(openedBy || 'program');\n      }\n"
+            },
+            {
+              "offset": 15597,
+              "before": "    if (this._destroyed || generation !== this._menuGeneration) {\n      return;\n    }\n    this._setIsMenuOpen(false);\n    if (this._destroyed || generation !== this._menuGeneration) {\n      return;\n    }\n    if (menu instanceof _MatMenuBase && MENU_PANEL_OWNERS.get(menu) === this) {\n      // CSS motion needs the overlay and lazy views to remain attached. Close\n      // state/focus are already settled; only physical removal waits for void.\n      const removal = new Subscription();\n      this._pendingRemoval = removal;\n      const remove = () => {\n        if (generation === this._menuGeneration && MENU_PANEL_OWNERS.get(menu) === this) {\n          this._pendingRemoval = Subscription.EMPTY;\n          removal.unsubscribe();\n          this._detachMenu(menu, overlayRef);\n        }\n      };\n      removal.add(menu._animationDone.subscribe({\n        next: event => {\n          if (event.toState === 'void') {\n            remove();\n",
+              "after": "      if (this._destroyed || generation !== this._menuGeneration) {\n        return;\n      }\n      this._setIsMenuOpen(false);\n      if (this._destroyed || generation !== this._menuGeneration) {\n        return;\n      }\n      if (menu instanceof _MatMenuBase && MENU_PANEL_OWNERS.get(menu) === this) {\n        // CSS motion needs the overlay and lazy views to remain attached. Close\n        // state/focus are already settled; only physical removal waits for void.\n        const removal = new Subscription();\n        this._pendingRemoval = removal;\n        const remove = () => {\n          if (generation === this._menuGeneration && MENU_PANEL_OWNERS.get(menu) === this) {\n            this._pendingRemoval = Subscription.EMPTY;\n            removal.unsubscribe();\n            this._detachMenu(menu, overlayRef);\n"
+            },
+            {
+              "offset": 16542,
+              "before": "        },\n        complete: remove,\n      }));\n      menu._resetAnimation();\n    } else if (menu) {\n      this._detachMenu(menu, overlayRef);\n    } else {\n      overlayRef.detach();\n",
+              "after": "        };\n        removal.add(menu._animationDone.subscribe({\n          next: event => {\n            if (event.toState === 'void') {\n              remove();\n            }\n          },\n          complete: remove,\n        }));\n        menu._resetAnimation();\n      } else if (menu) {\n        this._detachMenu(menu, overlayRef);\n      } else {\n        overlayRef.detach();\n      }\n    } finally {\n      this._destroyingMenu = false;\n      if (!this._bindingCloseInProgress && this._deferredMenu !== undefined) {\n        const deferred = this._deferredMenu;\n        this._deferredMenu = undefined;\n        this.menu = deferred;\n      }\n"
+            },
+            {
+              "offset": 17017,
+              "before": "",
+              "after": "      this._attachmentGeneration = null;\n"
+            },
+            {
+              "offset": 17333,
+              "before": "  private _initMenu(menu: MatMenuPanel): void {\n",
+              "after": "  private _initMenu(menu: MatMenuPanel, generation: number): void {\n"
+            },
+            {
+              "offset": 17615,
+              "before": "    this._setIsMenuOpen(true);\n",
+              "after": "    if (!this._destroyed && generation === this._menuGeneration && this.menu === menu) {\n      this._setIsMenuOpen(true);\n    }\n"
+            },
+            {
+              "offset": 26128,
+              "before": "",
+              "after": "        map(() => {\n          const owner = this._parentMaterialMenu && MENU_PANEL_OWNERS.get(this._parentMaterialMenu);\n          return {owner, generation: owner?._menuGeneration};\n        }),\n"
+            },
+            {
+              "offset": 26169,
+              "before": "      .subscribe(() => {\n",
+              "after": "      .subscribe(({owner, generation}) => {\n        // Reject a hover queued for an earlier opening of the parent.\n        if (!owner || !owner.menuOpen || owner._menuGeneration !== generation ||\n            !this._parentMaterialMenu || MENU_PANEL_OWNERS.get(this._parentMaterialMenu) !== owner) {\n          return;\n        }\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+          "source_parent": "b8642bbff54bb4b41e1f980a84f9903dab012c06",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "ae3c8c981a50ac6ba11f943a3f1ceba644f28da9b707a05ff10225afc6fc8d1c",
+            "bytes": 117005,
+            "git_blob": "4c60ce9eeec8490f6408c8e113d0620faf629b13"
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "fefc0509a3c6597aa78b68ec885a14f9c4eae5f8d0742d8055b1fdc4e5f4ce0a",
+            "bytes": 127882,
+            "git_blob": "100a4b09fa8027c1befac7a904c8272f90b71e8c"
+          },
+          "edits": [
+            {
+              "offset": 62611,
+              "before": "",
+              "after": "  it('closes and removes an open panel when its binding is cleared', fakeAsync(() => {\n    const fixture = createComponent(MenuRebinding);\n    fixture.detectChanges();\n    const {trigger, triggerEl} = fixture.componentInstance;\n    trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    let closed = 0;\n    trigger.menuClosed.subscribe(() => closed++);\n    trigger.menu = null;\n    fixture.detectChanges();\n    tick(500);\n    expect(closed).toBe(1);\n    expect(document.activeElement).toBe(triggerEl.nativeElement);\n    expect(trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('replaces an open panel while motion is enabled', fakeAsync(() => {\n    const fixture = createComponent(MenuRebinding, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}]);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    instance.trigger.openMenu();\n    fixture.detectChanges();\n    tick(1);\n    let closed = 0;\n    instance.trigger.menuClosed.subscribe(() => closed++);\n    instance.trigger.menu = instance.second;\n    fixture.detectChanges();\n    expect(closed).toBe(1);\n    expect(instance.trigger.menuOpen).toBeFalse();\n    instance.trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    expect(instance.trigger.menuOpen).toBeTrue();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);\n    expect(overlayContainerElement.textContent).toContain('Second');\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('honors a binding change from an earlier panel close observer', fakeAsync(() => {\n    const fixture = createComponent(MenuRebinding);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    instance.trigger.menu = null;\n    let calls = 0;\n    instance.first.closed.subscribe(() => {\n      if (++calls < 3) {\n        instance.trigger.menu = instance.second;\n      }\n    });\n    instance.trigger.menu = instance.first;\n    instance.trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    instance.trigger.menu = null;\n    fixture.detectChanges();\n    tick(500);\n    expect(calls).toBe(1);\n    expect(instance.trigger.menu).toBe(instance.second);\n    expect(instance.trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('cleans an interrupted opening when its focus callback clears the binding', fakeAsync(() => {\n    const fixture = createComponent(MenuRebinding);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    const focus = spyOn(instance.first, 'focusFirstItem').and.callFake(() => instance.trigger.menu = null);\n    instance.trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    expect(focus).toHaveBeenCalledTimes(1);\n    expect(instance.trigger.menu).toBeNull();\n    expect(instance.trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('cleans up when the close stream completes before a binding is cleared', fakeAsync(() => {\n    const fixture = createComponent(MenuRebinding);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    instance.trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    instance.first.close.complete();\n    instance.trigger.menu = null;\n    fixture.detectChanges();\n    tick(500);\n    expect(instance.trigger.menuOpen).toBeFalse();\n    expect(instance.trigger.menu).toBeNull();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('honors a binding change during focus restoration', fakeAsync(() => {\n    const fixture = createComponent(MenuRebinding);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    instance.trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    const other = document.createElement('button');\n    document.body.appendChild(other);\n    other.focus();\n    let calls = 0;\n    instance.triggerEl.nativeElement.addEventListener('focus', () => {\n      if (++calls < 3) {\n        instance.trigger.menu = instance.second;\n      }\n    });\n    instance.trigger.menu = null;\n    fixture.detectChanges();\n    tick(500);\n    expect(calls).toBe(1);\n    expect(instance.trigger.menu).toBe(instance.second);\n    expect(document.activeElement).toBe(instance.triggerEl.nativeElement);\n    expect(instance.trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);\n    other.remove();\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('ignores hover while the parent is exiting', fakeAsync(() => {\n    const fixture = createComponent(MenuHoverReopen, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}]);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    instance.root.openMenu();\n    fixture.detectChanges();\n    tick(1);\n    const item = overlayContainerElement.querySelector('[mat-menu-item]') as HTMLElement;\n    instance.root.closeMenu();\n    fixture.detectChanges();\n    item.dispatchEvent(new MouseEvent('mouseenter'));\n    tick(1);\n    expect(instance.childTrigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('opens a submenu on hover while the parent is open', fakeAsync(() => {\n    const fixture = createComponent(MenuHoverReopen, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}]);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    instance.root.openMenu();\n    fixture.detectChanges();\n    tick(1);\n    const item = overlayContainerElement.querySelector('[mat-menu-item]') as HTMLElement;\n    item.dispatchEvent(new MouseEvent('mouseenter'));\n    tick(1);\n    expect(instance.childTrigger.menuOpen).toBeTrue();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(2);\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('ignores a hover queued for a previous parent opening', fakeAsync(() => {\n    const fixture = createComponent(MenuHoverReopen, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}]);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    instance.root.openMenu();\n    fixture.detectChanges();\n    tick(1);\n    const item = overlayContainerElement.querySelector('[mat-menu-item]') as HTMLElement;\n    item.dispatchEvent(new MouseEvent('mouseenter'));\n    instance.root.closeMenu();\n    instance.root.openMenu();\n    fixture.detectChanges();\n    tick(1);\n    expect(instance.childTrigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('preserves a newer opening of the same panel during lazy attachment', fakeAsync(() => {\n    const fixture = createComponent(MenuLazyReopen, [], [MenuLazyChild]);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    instance.trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    expect(instance.calls).toBeGreaterThan(0);\n    expect(instance.trigger.menu).toBe(instance.menu);\n    expect(instance.trigger.menuOpen).toBeTrue();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);\n    fixture.destroy();\n    tick(500);\n  }));\n\n  it('survives trigger destruction from a close callback during rebinding', fakeAsync(() => {\n    const fixture = createComponent(MenuRebinding);\n    fixture.detectChanges();\n    const trigger = fixture.componentInstance.trigger;\n    trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    let closed = 0;\n    trigger.menuClosed.subscribe(() => {\n      closed++;\n      fixture.destroy();\n    });\n    trigger.menu = null;\n    tick(500);\n    expect(closed).toBe(1);\n    expect(trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);\n  }));\n\n  it('cleans an interrupted opening when the focus hook throws', fakeAsync(() => {\n    const fixture = createComponent(MenuRebinding);\n    fixture.detectChanges();\n    const instance = fixture.componentInstance;\n    const focus = spyOn(instance.first, 'focusFirstItem').and.throwError('focus failed');\n    expect(() => instance.trigger.openMenu()).toThrowError('focus failed');\n    fixture.detectChanges();\n    tick(500);\n    expect(instance.trigger.menuOpen).toBeFalse();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(0);\n    focus.and.stub();\n    instance.trigger.openMenu();\n    fixture.detectChanges();\n    tick(500);\n    expect(instance.trigger.menuOpen).toBeTrue();\n    expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);\n    fixture.destroy();\n    tick(500);\n  }));\n\n"
+            },
+            {
+              "offset": 105896,
+              "before": "",
+              "after": "@Component({selector: 'menu-lazy-child', template: ''})\nclass MenuLazyChild {\n  @Output() initialized = new EventEmitter<void>();\n  ngOnInit() {\n    this.initialized.emit();\n  }\n}\n\n@Component({\n  template: `\n    <button [matMenuTriggerFor]=\"menu\" #trigger=\"matMenuTrigger\">Open</button>\n    <mat-menu #menu=\"matMenu\"><ng-template matMenuContent>\n      <menu-lazy-child (initialized)=\"reopen()\"></menu-lazy-child>\n      <button mat-menu-item>Item</button>\n    </ng-template></mat-menu>\n  `,\n})\nclass MenuLazyReopen {\n  @ViewChild('trigger') trigger: MatLegacyMenuTrigger;\n  @ViewChild('menu') menu: MatLegacyMenu;\n  calls = 0;\n  reopen() {\n    if (++this.calls === 1) {\n      this.trigger.menu = null;\n      this.trigger.menu = this.menu;\n      this.trigger.openMenu();\n    }\n  }\n}\n\n@Component({\n  template: `\n    <button [matMenuTriggerFor]=\"parent\" #root=\"matMenuTrigger\">Root</button>\n    <mat-menu #parent=\"matMenu\"><button mat-menu-item [matMenuTriggerFor]=\"child\" #childTrigger=\"matMenuTrigger\">Submenu</button></mat-menu>\n    <mat-menu #child=\"matMenu\"><button mat-menu-item>Child</button></mat-menu>\n  `,\n})\nclass MenuHoverReopen {\n  @ViewChild('root') root: MatLegacyMenuTrigger;\n  @ViewChild('childTrigger') childTrigger: MatLegacyMenuTrigger;\n}\n\n@Component({\n  template: `\n    <button [matMenuTriggerFor]=\"first\" #triggerEl>Open</button>\n    <mat-menu #first=\"matMenu\"><button mat-menu-item>First</button></mat-menu>\n    <mat-menu #second=\"matMenu\"><button mat-menu-item>Second</button></mat-menu>\n  `,\n})\nclass MenuRebinding {\n  @ViewChild(MatLegacyMenuTrigger) trigger: MatLegacyMenuTrigger;\n  @ViewChild('triggerEl') triggerEl: ElementRef<HTMLElement>;\n  @ViewChild('first') first: MatLegacyMenu;\n  @ViewChild('second') second: MatLegacyMenu;\n}\n\n"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "previous_packet": {
+    "path": "compatibility/rc/parent-select-dialog-menu-snack-finite-source-v3.json",
+    "sha256": "bb2be03706f10cc22029facdb916d3527bf40cef120f0746d4ddd8794371159d",
+    "bytes": 49370
+  }
+}

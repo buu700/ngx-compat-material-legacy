@@ -10,12 +10,13 @@ from pathlib import Path
 import re
 import subprocess
 import weakref
+from select_dialog_finite_source_successor_v4 import SelectDialogFiniteSourceV4
 
 ROOT = Path(__file__).resolve().parents[1]
 SELF = 'scripts/current_sass_source.py'
 INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json'
 INPUTS_SHA = '46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9'
-SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='eb96891168b146becaf5cbd9e437509a3e2371945e982fc58ca6b343cefb4160', bytes=15564)
+SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='5422358f5dfda6cbcd6826fc1d3e887a294d9d5e34ea7093623d71dcb1087d15', bytes=19266)
 ADDITIONAL = ['projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss',
               'projects/ngx-material-legacy/styles/button/_button-theme.scss',
               'projects/ngx-material-legacy/styles/card/_card-theme.scss']
@@ -96,11 +97,23 @@ def _historical_blobs(root, source, profile):
     return result
 
 
+def _verified_helper(root, path, digest, name):
+    # Execute only this pinned physical image; never reuse an import-cache authority.
+    raw = _physical(root, path)
+    assert _hash(raw) == digest, 'changed source executable ' + path
+    namespace = {'__file__': str(root / path), '__name__': '_verified_' + name}
+    exec(compile(raw, str(root / path), 'exec'), namespace)
+    assert _physical(root, path) == raw, 'source executable changed during load'
+    return namespace[name]
+
+
 class CurrentSassSource:
-    """One finite five-module source authority, backed by immutable comparison data."""
+    """One finite six-module source authority, backed by immutable comparison data."""
     __slots__ = ('__weakref__',)
 
     def __init__(self, root=ROOT, *, read=None):
+        if not __debug__:
+            raise RuntimeError('optimized Python cannot authenticate current Sass source')
         root = Path(root).absolute()
         assert root.is_dir() and not root.is_symlink()
         assert read is None or callable(read)
@@ -108,6 +121,9 @@ class CurrentSassSource:
         def assert_physical():
             for row in bound.values():
                 assert _ref(row['path'], _physical(root, row['path'])) == row, 'changed final physical source ' + row['path']
+            product.assert_physical()
+            focus.assert_physical()
+            sixth.assert_physical()
         def current(path):
             actual = _physical(root, path)
             row = _ref(path, actual)
@@ -121,9 +137,25 @@ class CurrentSassSource:
             assert _physical(root, path) == actual, 'source changed during read ' + path
             return actual
         def member(row):
+            row = sixth.qualify(row) or focus.qualify(row) or product.qualify(row) or row
             raw = current(row['path'])
             assert _hash(raw) == row['sha256'] and len(raw) == row['bytes'], 'changed current Sass source ' + row['path']
             return raw
+        initial_version = json.loads(_physical(root, 'projects/ngx-material-legacy/package.json'))['version']
+        initial_line = '21.x' if initial_version.startswith('21.') else 'main' if initial_version.startswith('22.') else None
+        product = SelectDialogFiniteSourceV4(root, read=read, line=initial_line)
+        Focus = _verified_helper(root, 'scripts/dialog_focus_finite_source_successor_v5.py',
+                                 '75b912981d5ea107b1b56736b26543601574cbf549bec19e667d4987afce5778', 'DialogFocusFiniteSourceV5')
+        Sixth = _verified_helper(root, 'scripts/stepper_sixth_source.py',
+                                 '3b6408d97f09d887686952600844c306ad434d1f626cc6a4b74701b536ce79d7', 'StepperSixthSource')
+        focus = Focus(root, read=read, line=initial_line)
+        sixth = Sixth(root, read=read)
+        for owner in (product, focus, sixth):
+            for row in owner.bound:
+                if row['path'] in bound:
+                    assert bound[row['path']] == row
+                else:
+                    bound[row['path']] = dict(row)
         assert current(SELF) == _IMAGE
         member(SOURCE_JS)
         raw = current(INPUTS)
@@ -149,7 +181,7 @@ class CurrentSassSource:
         census = json.loads(member(packet['style_template_census']))
         version = json.loads(current('projects/ngx-material-legacy/package.json'))['version']
         line = '21.x' if version.startswith('21.') else 'main' if version.startswith('22.') else None
-        assert line is not None
+        assert line is not None and line == initial_line
         source, branch = base['branches'][line], packet['branches'][line]
         member(css['branches'][line]['observation'])
         assert branch['minimum_versions'] == source['minimum_versions']
@@ -173,6 +205,9 @@ class CurrentSassSource:
             expected += ''.join(lines[cursor:])
             assert _ref(row['path'], expected.encode()) == row['current']
             assert member(row['afterimage']) == expected.encode()
+        sixth_transition = sixth.transition
+        assert sixth_transition['path'] not in changes
+        changes[sixth_transition['path']] = sixth_transition
         for row in source['inputs']:
             member(changes[row['path']]['current'] if row['path'] in changes else row)
         member(source['semantic_receipt'])
@@ -189,7 +224,7 @@ class CurrentSassSource:
         assert [row for row in graph['non_target_owned_style_template_graph'] if row['path'] == CARD] == [changes[CARD]['before']]
         for row in graph['non_target_owned_style_template_graph']:
             member(changes[CARD]['current'] if row['path'] == CARD else row)
-        transitions = [dict(path=row['path'], before=row['before'], current=row['current']) for row in source['modules'] + packet['additional_modules']]
+        transitions = [dict(path=row['path'], before=row['before'], current=row['current']) for row in source['modules'] + packet['additional_modules']] + [sixth_transition]
         for row in transitions:
             member(row['current'])
         source_sets, source_set_successors = {}, []
@@ -200,6 +235,9 @@ class CurrentSassSource:
                 changed = changes.get('projects/ngx-material-legacy/' + row['path']) if row['root'] == 0 else None
                 current_rows.append(dict(row, sha256=changed['current']['sha256'], bytes=changed['current']['bytes']) if changed else dict(row))
             current_hash = _hash(json.dumps(current_rows, separators=(',', ':')).encode())
+            assert key == sixth.source_set['historical_sha256']
+            assert current_hash == sixth.source_set['v3_current_sha256']
+            assert current_rows == sixth.source_set['rows']
             source_sets[current_hash] = current_rows
             source_set_successors.append(dict(historical_sha256=key, current_sha256=current_hash))
         def assert_current():

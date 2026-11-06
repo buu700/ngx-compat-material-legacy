@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "role": "main-inventory-rc-acceptance-finite-successor",
+  "line": "main",
+  "inventory_source_packet": {
+    "path": "compatibility/rc/c04-inventory-owner-inputs.json",
+    "sha256": "97db675e4fda1c6dd4a7f056159bd47e2aa963dddb9dff3da1af537ae062d15a",
+    "bytes": 7436
+  },
+  "source_member_index": 11,
+  "old_commit": "9fc9cbaf94c97e271dc8e1a7e11970d17ebe34e1",
+  "new_commit": "015b63fe350a6c612a0f4fcb2d171921db75caf2",
+  "before": {
+    "path": "scripts/rc_acceptance.py",
+    "sha256": "cedf06b6a777808d8ad566e91e410d3a3ffd6942ed5470111e9be71808b18890",
+    "bytes": 30369
+  },
+  "after": {
+    "path": "scripts/rc_acceptance.py",
+    "sha256": "22f63424d318d9aa184b139afbc99bcda2d08322c48292b20f57c66c6b240b72",
+    "bytes": 30941
+  },
+  "edits": [
+    {
+      "offset": 1845,
+      "before": "",
+      "after": "    \"source-contract-regressions\": ((\"G11\",), \"source\", (\"source\",), (\"current-source-regressions\",)),\n"
+    },
+    {
+      "offset": 3182,
+      "before": "",
+      "after": "SOURCE_REGRESSION_CASES = (\n    \"source-contract-regressions/checker-source/full-fault-lifetimes\",\n    \"source-contract-regressions/browser-source/full-fault-lifetimes\",\n)\n"
+    },
+    {
+      "offset": 12830,
+      "before": "",
+      "after": "        if cid == \"source-contract-regressions\":\n            for line, case_groups in cases.items():\n                require(case_groups[\"current-source-regressions\"] == list(SOURCE_REGRESSION_CASES),\n                        f\"{cid}/{line}: both exact full source regression cases are mandatory\")\n"
+    }
+  ],
+  "functional_change": "Adds explicit source-contract regression gate and requires both checker and browser full fault-lifetime cases in the matrix.",
+  "old_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "g11_claim": "not-passed",
+  "actual_native_packed_browser_floor_or_full_audit_qualified": false
+}

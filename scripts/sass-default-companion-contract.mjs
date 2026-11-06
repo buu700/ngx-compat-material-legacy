@@ -1,5 +1,6 @@
 /** Finite default companion cases: complete historical CSS plus exact public peer CSS. */
 import {createHash} from 'node:crypto';
+import {historicalStepperPeerCss} from './sass-stepper-historical-model.mjs';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {measureM2PeerProgram,peerMeasurementMatches} from './sass-current-companion-peer.mjs';
@@ -41,7 +42,9 @@ export function defaultCompanionExpectedCss(id,peer){
    ||peer.program_sha256!==floor.program_sha256||peer.css_sha256!==floor.css_sha256
    ||peer.cdk_version!==peer.peer_version||peer.cdk_version!==inputs.cdk_version||peer.cdk_package_json_sha256!==inputs.cdk_package_json_sha256
    ||peer.sources.length!==inputs.sources.length||peer.sources.some(s=>!peerSourceSets[peer.line].has(JSON.stringify([s.root,s.path,s.sha256,s.bytes]))))return null;
- return (e.original_css?e.original_css+e.separator:'')+peer.css;
+ const addition=e.family==='stepper' ? historicalStepperPeerCss(peer.css,e.original_css,peer.line,e.dimensions.includes('color')) : peer.css;
+ if(addition===null)return null;
+ return (e.original_css?e.original_css+e.separator:'')+addition;
 }
 export function defaultCompanionMeasurementOk(id,m,line){
  const e=DEFAULT_COMPANION_CASES[id];

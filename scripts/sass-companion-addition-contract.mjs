@@ -1,5 +1,6 @@
 /** Finite append-only companion differences; original CSS remains byte exact. */
 import {createHash} from 'node:crypto';
+import {historicalStepperPeerCss} from './sass-stepper-historical-model.mjs';
 import {readFileSync} from 'node:fs';
 import {SCENARIOS,themeSass} from './companion-bridge-peer-oracle.mjs';
 import {measureM2PeerProgram,peerMeasurementMatches} from './sass-current-companion-peer.mjs';
@@ -33,7 +34,9 @@ export function companionAdditionExpectedCss(caseId,original,peer){
       || sha(original.css)!==entry.original_sha256 || original.css_bytes!==Buffer.byteLength(original.css)
       || !peerMeasurementMatches(peer,companionAdditionPeerProgram(caseId),catalog.sources[peer.line][entry.family])
       || peer.program_sha256!==floor.program_sha256 || peer.css_sha256!==floor.css_sha256)return null;
-  return (original.css?original.css+entry.separator:'')+peer.css;
+  const addition=entry.family==='stepper' ? historicalStepperPeerCss(peer.css,original.css,peer.line,entry.dimensions.includes('color')) : peer.css;
+  if(addition===null)return null;
+  return (original.css?original.css+entry.separator:'')+addition;
 }
 export function companionAdditionResultsMatch(caseId,original,actual,peer){
   const expected=companionAdditionExpectedCss(caseId,original,peer);

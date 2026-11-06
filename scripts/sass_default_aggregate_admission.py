@@ -1,6 +1,7 @@
 """Eight finite default aggregates retain historical membership and complete CSS."""
 import hashlib,json,re
 from pathlib import Path
+from sass_stepper_historical_model import historical_stepper_peer_css
 from sass_current_companion_admission import peer_measurement_ok
 from sass_form_field_state_admission import FORM_FIELD_STATE_AGGREGATE_CASES, insert_form_field_state_in_aggregate
 from sass_ripple_color_admission import RIPPLE_COLOR_BINDING_CASES, insert_ripple_color_in_expected_model, ripple_color_measurement_ok
@@ -149,6 +150,8 @@ def default_aggregate_expected_css(case,peer,line):
             or len(peer['sources'])!=len(inputs['sources']) or {(s['root'],s['path'],s['sha256'],s['bytes']) for s in peer['sources']}!=_SOURCESETS[line]):return None
         p=_members(peer['css'],profile['public_families'])
         if p is None:return None
+        p['stepper']=historical_stepper_peer_css(p['stepper'],profile['originals']['stepper']['css'],line,profile['dimension'] in ('color','theme'))
+        if p['stepper'] is None:return None
         css=e['original_css']
         modeled = density(css,profile,p) if profile['dimension']=='density' else typography(css,profile,p) if profile['dimension']=='typography' else color_theme(css,profile,p,e['name'])
         with_state=insert_form_field_state_in_aggregate(case,modeled,peer) if case in FORM_FIELD_STATE_AGGREGATE_CASES else modeled

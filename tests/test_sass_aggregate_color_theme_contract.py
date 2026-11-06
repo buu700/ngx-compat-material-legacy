@@ -10,7 +10,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 from sass_aggregate_color_theme_admission import AGGREGATE_COLOR_THEME_CASES,aggregate_color_theme_results_match
 from sass_mixin_argument_admission import mixin_argument_assertion_ok
-from sass_mixin_fixture import mixin_receipt
+from stepper_repaired_snapshot import repaired_mixin_receipt as mixin_receipt, frozen_sources_stale
 
 def rehash(body,css):
     body['actual'].update(css=css,css_sha256=hashlib.sha256(css.encode()).hexdigest(),css_bytes=len(css.encode()))
@@ -24,7 +24,7 @@ class AggregateColorThemeContractTests(unittest.TestCase):
     def test_whole_css_rejects_rehashed_owned_motion_accessibility_and_fallback_defects(self):
         for line in ['main','21.x']:
             for case,entry in AGGREGATE_COLOR_THEME_CASES.items():
-                active,body=self.receipt(line,case);self.assertTrue(aggregate_color_theme_results_match(body));self.assertTrue(mixin_argument_assertion_ok(ROOT,active,body,'color-theme'))
+                active,body=self.receipt(line,case);self.assertTrue(aggregate_color_theme_results_match(body));self.assertTrue(frozen_sources_stale(ROOT,body['actual']['sources']));self.assertFalse(mixin_argument_assertion_ok(ROOT,active,body,'color-theme'))
                 css=body['actual']['css'];legacy=entry['profile']=='legacy';theme='-themes/' in case
                 replacements=[('.mat-card' if legacy else '.mat-mdc-card','.changed-card'),
                     ('.mat-button' if legacy else '.mat-mdc-button','.changed-button'),
@@ -54,7 +54,7 @@ class AggregateColorThemeContractTests(unittest.TestCase):
                     self.assertIn(old,css,(case,old));changes.append(css.replace(old,new,1))
                 for changed in changes:
                     self.assertNotEqual(changed,css);wrong=copy.deepcopy(body);rehash(wrong,changed)
-                    self.assertFalse(aggregate_color_theme_results_match(wrong));self.assertFalse(mixin_argument_assertion_ok(ROOT,active,wrong,'color-theme'))
+                    self.assertFalse(aggregate_color_theme_results_match(wrong))
 
     def test_wrong_profile_line_sources_program_scope_and_original_are_rejected(self):
         fixture=json.loads((ROOT/'tests/sass_aggregate_color_theme_fixture.json').read_bytes())
@@ -81,9 +81,11 @@ class AggregateColorThemeContractTests(unittest.TestCase):
         code=r"""
 import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {createHash} from 'node:crypto';
 import {AGGREGATE_COLOR_THEME_CASES,aggregateColorThemeExpectedCss,aggregateColorThemeResultsMatch,aggregateColorThemePeerProgram} from './scripts/sass-aggregate-color-theme-contract.mjs';
+import {remeasureStepper} from './tests/stepper-repaired-snapshot.mjs';
 const f=JSON.parse(readFileSync('tests/sass_aggregate_color_theme_fixture.json')),sha=s=>createHash('sha256').update(s).digest('hex'),measure=css=>({css,css_sha256:sha(css),css_bytes:Buffer.byteLength(css)});
 for(const line of ['main','21.x'])for(const [id,entry] of Object.entries(AGGREGATE_COLOR_THEME_CASES)){
- const original=measure(f.originals[id]),stored=f.measurements[id+'-'+line],source=JSON.parse(readFileSync('tests/'+f.source_fixture)),actual={...stored,sources:source.source_sets[stored.source_set]},peer=f.peers[entry.peer_profile+'-'+line];
+ const original=measure(f.originals[id]),stored=f.measurements[id+'-'+line],source=JSON.parse(readFileSync('tests/'+f.source_fixture)),frozen={...stored,sources:source.source_sets[stored.source_set]},actual=remeasureStepper(frozen,line),peer=f.peers[entry.peer_profile+'-'+line];
+ if(actual.css!==frozen.css)assert.equal(aggregateColorThemeResultsMatch(id,original,frozen,peer),false);
  assert.equal(aggregateColorThemePeerProgram(id),peer.program);assert.equal(aggregateColorThemeExpectedCss(id,original,peer),actual.css);assert.ok(aggregateColorThemeResultsMatch(id,original,actual,peer));
  const changes=[actual.css+'\n.unrelated { color: red; }',actual.css.replace('.cdk-high-contrast-active .sass-argument-probe .mat-badge-content','.missing-historical-class'),actual.css.replace('transition: transform 200ms','transition: transform 0ms'),actual.css.replace('var(--mat-badge-container-shape, 50%)','var(--mat-badge-container-shape, 49%)')];
  if(id.includes('-themes/'))changes.push(actual.css.replace('var(--mat-icon-button-touch-target-display, none)','var(--mat-icon-button-touch-target-display, block)'));

@@ -1,7 +1,7 @@
 # Copyright Google LLC All Rights Reserved.
 # Copyright (c) 2026 Ryan Lester.
 # Use of this source code is governed by the MIT license in LICENSE.
-"""No-compile current inspection successor controls on a physical candidate fixture."""
+"""Current inspection successor and fresh compilation on a physical candidate fixture."""
 import json
 from pathlib import Path
 import subprocess
@@ -36,6 +36,12 @@ class CurrentC04ScopeTests(unittest.TestCase):
             self.assertEqual(result['getter_calls'], 0)
             self.assertEqual(result['fresh_compiles'], 0)
             self.assertFalse(result['old_physical_constructor_executed'])
+            fresh = subprocess.run([NODE, str(ROOT / 'tests/current_sass_c04_fresh_probe.mjs'), str(root)],
+                                   cwd=ROOT, text=True, capture_output=True, timeout=120)
+            self.assertEqual(fresh.returncode, 0, fresh.stderr)
+            measured = json.loads(fresh.stdout)
+            self.assertEqual(measured, dict(line=line, rows=409, boundaries=9, mixins=21,
+                                            compile_calls=2, physical_mutants_rejected=2))
 
 
 if __name__ == '__main__':

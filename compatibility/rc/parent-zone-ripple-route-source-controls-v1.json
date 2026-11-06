@@ -1,0 +1,480 @@
+{
+  "schema_version": 1,
+  "scope": "Exact complete minimum source route and semantic/authenticity controls only; source strings are parsed, never invoked.",
+  "controls": 39,
+  "cases": [
+    {
+      "id": "changed-pinned-namespace",
+      "result": "rejected"
+    },
+    {
+      "id": "main-changed-authentic-member-core",
+      "result": "rejected"
+    },
+    {
+      "id": "main-changed-authentic-member-debug",
+      "result": "rejected"
+    },
+    {
+      "id": "main-changed-authentic-member-primitives",
+      "result": "rejected"
+    },
+    {
+      "id": "main-changed-authentic-member-material",
+      "result": "rejected"
+    },
+    {
+      "id": "main-changed-authentic-member-cdk",
+      "result": "rejected"
+    },
+    {
+      "id": "main-changed-authentic-member-platform",
+      "result": "rejected"
+    },
+    {
+      "id": "main-changed-authentic-member-platformTypes",
+      "result": "rejected"
+    },
+    {
+      "id": "main-provider-public-stability",
+      "result": "rejected"
+    },
+    {
+      "id": "main-registered-target-identity",
+      "result": "rejected"
+    },
+    {
+      "id": "main-dispatcher-registration",
+      "result": "rejected"
+    },
+    {
+      "id": "main-stashed-listener-map",
+      "result": "rejected"
+    },
+    {
+      "id": "main-listener-event-identity",
+      "result": "rejected"
+    },
+    {
+      "id": "main-replay-event-path-patch",
+      "result": "rejected"
+    },
+    {
+      "id": "main-native-document-receiver",
+      "result": "rejected"
+    },
+    {
+      "id": "main-native-target-delegation",
+      "result": "rejected"
+    },
+    {
+      "id": "main-angular-host-listener",
+      "result": "rejected"
+    },
+    {
+      "id": "main-manual-native-replay-launch",
+      "result": "rejected"
+    },
+    {
+      "id": "main-native-redispatch-in-replay-chain",
+      "result": "rejected"
+    },
+    {
+      "id": "main-wrong-private-floor-catch",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-changed-authentic-member-core",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-changed-authentic-member-debug",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-changed-authentic-member-primitives",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-changed-authentic-member-material",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-changed-authentic-member-cdk",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-changed-authentic-member-platform",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-changed-authentic-member-platformTypes",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-provider-public-stability",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-registered-target-identity",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-dispatcher-registration",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-stashed-listener-map",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-listener-event-identity",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-replay-event-path-patch",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-native-document-receiver",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-native-target-delegation",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-angular-host-listener",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-manual-native-replay-launch",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-native-redispatch-in-replay-chain",
+      "result": "rejected"
+    },
+    {
+      "id": "21.x-wrong-private-floor-catch",
+      "result": "rejected"
+    }
+  ],
+  "analysis": {
+    "schema_version": 1,
+    "namespace": {
+      "path": "compatibility/rc/material-public-subjects.json",
+      "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+    },
+    "lines": [
+      {
+        "line": "main",
+        "public_feature": "@angular/platform-browser#withEventReplay",
+        "public_ripple": "@angular/material/core#MatRipple",
+        "helper_has_replay_catch": true,
+        "expected_replay_route": "Queued event info -> Angular EventDispatcher -> registered replay delegate -> stashed __jsaction_fns handlers; no DOM redispatch in the complete inspected replay chain.",
+        "expected_peer_route": "MatRipple has no Angular host listeners. Its RippleEventManager listens directly at document capture; public launch() calls the renderer and receives no replay event.",
+        "fixture_route": "The nativeReplay Angular handler records delivery only. It neither launches a ripple, forwards to a manager, nor redispatches a DOM event. Actual browser no-launch replay plus genuine live native creation remains mandatory.",
+        "complete_subjects": [
+          {
+            "role": "public-feature",
+            "complete_source": "function withEventReplay() {\n  return hydrationFeature(HydrationFeatureKind.EventReplay, _withEventReplay());\n}",
+            "sha256": "f552cd3b4fd6d5bd715c3e78050b73fe939ec4243430c7f9e4157fb7e015db64"
+          },
+          {
+            "role": "public-feature-declaration",
+            "complete_source": "declare function withEventReplay(): HydrationFeature<HydrationFeatureKind.EventReplay>;",
+            "sha256": "33870dd1f4423326f2126b1f16adf9d70f4b773e7e1f1b5b79e970ea09caaa2e"
+          },
+          {
+            "role": "core-replay-setup",
+            "complete_source": "initEventReplay = (eventDelegation, injector) => {\n  const appId = injector.get(APP_ID);\n  const earlyJsactionData = window._ejsas[appId];\n  const eventContract = eventDelegation.instance = new EventContract(new EventContractContainer(earlyJsactionData.c));\n  for (const et of earlyJsactionData.et) {\n    eventContract.addEvent(et);\n  }\n  for (const et of earlyJsactionData.etc) {\n    eventContract.addEvent(et);\n  }\n  const eventInfos = getAppScopedQueuedEventInfos(appId);\n  eventContract.replayEarlyEventInfos(eventInfos);\n  clearAppScopedEarlyEventContract(appId);\n  const dispatcher = new EventDispatcher(event => {\n    invokeRegisteredReplayListeners(injector, event, event.currentTarget);\n  });\n  registerDispatcher(eventContract, dispatcher);\n}",
+            "sha256": "fb0678cba5b6475fadd00010a099327fd2e23b96ffb8bdb2bf0335b8f52f325e"
+          },
+          {
+            "role": "registered-replay-callback",
+            "complete_source": "function invokeRegisteredReplayListeners(injector, event, currentTarget) {\n  const blockName = (currentTarget && currentTarget.getAttribute(DEFER_BLOCK_SSR_ID_ATTRIBUTE)) ?? '';\n  if (/d\\d+/.test(blockName)) {\n    hydrateAndInvokeBlockListeners(blockName, injector, event, currentTarget);\n  } else if (event.eventPhase === EventPhase.REPLAY) {\n    invokeListeners(event, currentTarget);\n  }\n}",
+            "sha256": "410e523c5e0c8a9abdb252273f23158221c42fdc2a21ba01430d64c2b6fd1514"
+          },
+          {
+            "role": "stashed-listener-invocation",
+            "complete_source": "function invokeListeners(event, currentTarget) {\n  const handlerFns = currentTarget?.__jsaction_fns?.get(event.type);\n  if (!handlerFns || !currentTarget?.isConnected) {\n    return;\n  }\n  if (currentTarget && handledEventElements.get(event)?.has(currentTarget)) {\n    return;\n  }\n  for (const handler of handlerFns) {\n    handler(event);\n  }\n}",
+            "sha256": "ae31b924945fd8f6de352882ee0971c71235a19ef2eea75b69676d1ff33252d2"
+          },
+          {
+            "role": "queued-replay-route",
+            "complete_source": "replayEarlyEventInfos(earlyEventInfos) {\n    for (let i = 0; i < earlyEventInfos.length; i++) {\n      const earlyEventInfo = earlyEventInfos[i];\n      const eventTypes = this.getEventTypesForBrowserEventType(earlyEventInfo.eventType);\n      for (let j = 0; j < eventTypes.length; j++) {\n        const eventInfo = cloneEventInfo(earlyEventInfo);\n        setEventType(eventInfo, eventTypes[j]);\n        this.handleEventInfo(eventInfo);\n      }\n    }\n  }",
+            "sha256": "07f66ee7c84bfb66f8f7bae99226b1a63d830dea2263db2e2aca6d8a8cff2fa0"
+          },
+          {
+            "role": "replay-dispatch-to-delegate",
+            "complete_source": "dispatchToDelegate(eventInfoWrapper) {\n    if (eventInfoWrapper.getIsReplay()) {\n      prepareEventForReplay(eventInfoWrapper);\n    }\n    prepareEventForBubbling(eventInfoWrapper);\n    while (eventInfoWrapper.getAction()) {\n      prepareEventForDispatch(eventInfoWrapper);\n      if (isCaptureEventType(eventInfoWrapper.getEventType()) && eventInfoWrapper.getAction().element !== eventInfoWrapper.getTargetElement()) {\n        return;\n      }\n      this.dispatchDelegate(eventInfoWrapper.getEvent(), eventInfoWrapper.getAction().name);\n      if (propagationStopped(eventInfoWrapper)) {\n        return;\n      }\n      this.actionResolver.resolveParentAction(eventInfoWrapper.eventInfo);\n    }\n  }",
+            "sha256": "0d403df9f3a416cbec0eb7f5cc4df865891a0a8dcc594a52cda90b7599a7392e"
+          },
+          {
+            "role": "throwing-replay-event-patch",
+            "complete_source": "function prepareEventForReplay(eventInfoWrapper) {\n  const event = eventInfoWrapper.getEvent();\n  const target = eventInfoWrapper.getTargetElement();\n  const originalPreventDefault = event.preventDefault.bind(event);\n  patchEventInstance(event, 'target', target);\n  patchEventInstance(event, 'eventPhase', EventPhase.REPLAY);\n  patchEventInstance(event, 'preventDefault', () => {\n    originalPreventDefault();\n    throw new Error(PREVENT_DEFAULT_ERROR_MESSAGE + (ngDevMode ? PREVENT_DEFAULT_ERROR_MESSAGE_DETAILS : ''));\n  });\n  patchEventInstance(event, 'composedPath', () => {\n    throw new Error(COMPOSED_PATH_ERROR_MESSAGE + (ngDevMode ? COMPOSED_PATH_ERROR_MESSAGE_DETAILS : ''));\n  });\n}",
+            "sha256": "f0888277fdbf76f5e633a0b3492f9a0f7b9533c45e91f6249f6bb8ae714a470e"
+          },
+          {
+            "role": "public-directive",
+            "complete_source": "class MatRipple {\n  _elementRef = inject(ElementRef);\n  _animationsDisabled = _animationsDisabled();\n  color;\n  unbounded = false;\n  centered = false;\n  radius = 0;\n  animation;\n  get disabled() {\n    return this._disabled;\n  }\n  set disabled(value) {\n    if (value) {\n      this.fadeOutAllNonPersistent();\n    }\n    this._disabled = value;\n    this._setupTriggerEventsIfEnabled();\n  }\n  _disabled = false;\n  get trigger() {\n    return this._trigger || this._elementRef.nativeElement;\n  }\n  set trigger(trigger) {\n    this._trigger = trigger;\n    this._setupTriggerEventsIfEnabled();\n  }\n  _trigger;\n  _rippleRenderer;\n  _globalOptions;\n  _isInitialized = false;\n  constructor() {\n    const ngZone = inject(NgZone);\n    const platform = inject(Platform);\n    const globalOptions = inject(MAT_RIPPLE_GLOBAL_OPTIONS, {\n      optional: true\n    });\n    const injector = inject(Injector);\n    this._globalOptions = globalOptions || {};\n    this._rippleRenderer = new RippleRenderer(this, ngZone, this._elementRef, platform, injector);\n  }\n  ngOnInit() {\n    this._isInitialized = true;\n    this._setupTriggerEventsIfEnabled();\n  }\n  ngOnDestroy() {\n    this._rippleRenderer._removeTriggerEvents();\n  }\n  fadeOutAll() {\n    this._rippleRenderer.fadeOutAll();\n  }\n  fadeOutAllNonPersistent() {\n    this._rippleRenderer.fadeOutAllNonPersistent();\n  }\n  get rippleConfig() {\n    return {\n      centered: this.centered,\n      radius: this.radius,\n      color: this.color,\n      animation: {\n        ...this._globalOptions.animation,\n        ...(this._animationsDisabled ? {\n          enterDuration: 0,\n          exitDuration: 0\n        } : {}),\n        ...this.animation\n      },\n      terminateOnPointerUp: this._globalOptions.terminateOnPointerUp\n    };\n  }\n  get rippleDisabled() {\n    return this.disabled || !!this._globalOptions.disabled;\n  }\n  _setupTriggerEventsIfEnabled() {\n    if (!this.disabled && this._isInitialized) {\n      this._rippleRenderer.setupTriggerEvents(this.trigger);\n    }\n  }\n  launch(configOrX, y = 0, config) {\n    if (typeof configOrX === 'number') {\n      return this._rippleRenderer.fadeInRipple(configOrX, y, {\n        ...this.rippleConfig,\n        ...config\n      });\n    } else {\n      return this._rippleRenderer.fadeInRipple(0, 0, {\n        ...this.rippleConfig,\n        ...configOrX\n      });\n    }\n  }\n  static ɵfac = i0.ɵɵngDeclareFactory({\n    minVersion: \"12.0.0\",\n    version: \"22.1.6\",\n    ngImport: i0,\n    type: MatRipple,\n    deps: [],\n    target: i0.ɵɵFactoryTarget.Directive\n  });\n  static ɵdir = i0.ɵɵngDeclareDirective({\n    minVersion: \"14.0.0\",\n    version: \"22.1.6\",\n    type: MatRipple,\n    isStandalone: true,\n    selector: \"[mat-ripple], [matRipple]\",\n    inputs: {\n      color: [\"matRippleColor\", \"color\"],\n      unbounded: [\"matRippleUnbounded\", \"unbounded\"],\n      centered: [\"matRippleCentered\", \"centered\"],\n      radius: [\"matRippleRadius\", \"radius\"],\n      animation: [\"matRippleAnimation\", \"animation\"],\n      disabled: [\"matRippleDisabled\", \"disabled\"],\n      trigger: [\"matRippleTrigger\", \"trigger\"]\n    },\n    host: {\n      properties: {\n        \"class.mat-ripple-unbounded\": \"unbounded\"\n      },\n      classAttribute: \"mat-ripple\"\n    },\n    exportAs: [\"matRipple\"],\n    ngImport: i0\n  });\n}",
+            "sha256": "d4faf93c028d07a051518c220c33f94d7fa40542feb7ea958cda48d23e31baf0"
+          },
+          {
+            "role": "native-document-manager",
+            "complete_source": "class RippleEventManager {\n  _events = new Map();\n  addHandler(ngZone, name, element, handler) {\n    const handlersForEvent = this._events.get(name);\n    if (handlersForEvent) {\n      const handlersForElement = handlersForEvent.get(element);\n      if (handlersForElement) {\n        handlersForElement.add(handler);\n      } else {\n        handlersForEvent.set(element, new Set([handler]));\n      }\n    } else {\n      this._events.set(name, new Map([[element, new Set([handler])]]));\n      ngZone.runOutsideAngular(() => {\n        document.addEventListener(name, this._delegateEventHandler, passiveCapturingEventOptions$1);\n      });\n    }\n  }\n  removeHandler(name, element, handler) {\n    const handlersForEvent = this._events.get(name);\n    if (!handlersForEvent) {\n      return;\n    }\n    const handlersForElement = handlersForEvent.get(element);\n    if (!handlersForElement) {\n      return;\n    }\n    handlersForElement.delete(handler);\n    if (handlersForElement.size === 0) {\n      handlersForEvent.delete(element);\n    }\n    if (handlersForEvent.size === 0) {\n      this._events.delete(name);\n      document.removeEventListener(name, this._delegateEventHandler, passiveCapturingEventOptions$1);\n    }\n  }\n  _delegateEventHandler = event => {\n    const target = _getEventTarget(event);\n    if (target) {\n      this._events.get(event.type)?.forEach((handlers, element) => {\n        if (element === target || element.contains(target)) {\n          handlers.forEach(handler => handler.handleEvent(event));\n        }\n      });\n    }\n  };\n}",
+            "sha256": "2f5e411c54b930baf96c9c09c06495cb93abfb11849a304dcbaa0134a6a1de39"
+          },
+          {
+            "role": "private-target-helper",
+            "complete_source": "function _getEventTarget(event) {\n  if (event.composedPath) {\n    try {\n      return event.composedPath()[0];\n    } catch {}\n  }\n  return event.target;\n}",
+            "sha256": "293cdb7f5257425c1e2022bf54cb8d60a57f6016ce15d07adeb1d1c2bcbd6a4d"
+          },
+          {
+            "role": "diagnostic-no-forwarding-handler",
+            "complete_source": "nativeReplay(event: MouseEvent) {\n    // Only observe Angular delivery. Public MatRipple owns its native listener;\n    // no manual launch or event forwarding is performed for this host.\n    let path_threw = false;\n    try {event.composedPath();} catch {path_threw = true;}\n    this.nativeReplayDeliveries.push({type: event.type, path_threw,\n      target_id: event.target instanceof HTMLElement ? event.target.id : '', peer_present: !!this.replayNativePeer});\n  }",
+            "sha256": "bc4b713669a0497a0dab54fb81c9122c90b971ec293eeee6bb0610f5ff09e4e5"
+          }
+        ],
+        "new_runtime_dependencies": 0,
+        "private_symbols_invoked": false,
+        "actual_angular_native_or_packed_qualified": false,
+        "g11_claim": "not-passed",
+        "peer_reference": {
+          "public_route": "@angular/material/core#MatRipple",
+          "core_version": "22.1.7",
+          "cdk_version": "22.1.7",
+          "material_version": "22.1.7",
+          "helper_has_replay_catch": true,
+          "helper": {
+            "path": "compatibility/rc/material-public-source-members/ba6a8afdd5fde4736ff8fe14ed7c2caaf06041a247ab20d083b7fc7bc4309f8a.gz",
+            "sha256": "ba6a8afdd5fde4736ff8fe14ed7c2caaf06041a247ab20d083b7fc7bc4309f8a"
+          },
+          "caller": {
+            "path": "compatibility/rc/material-public-source-members/a5da707a2f05673bccfe9fe92f4384ddff0d4d5d7c77bd7cf65ad62eeaa339ae.gz",
+            "sha256": "a5da707a2f05673bccfe9fe92f4384ddff0d4d5d7c77bd7cf65ad62eeaa339ae"
+          }
+        },
+        "authenticated_source_members": [
+          {
+            "package": "@angular/core",
+            "module_path": "fesm2022/core.mjs",
+            "path": "compatibility/rc/framework-enum-sources/22.1.7/fesm2022/core.mjs",
+            "stored_sha256": "3030cadda05c2c4bdf15f41f5bb2b571a81b78c375b5d0876aa5bc93d2398337",
+            "raw_sha256": "3030cadda05c2c4bdf15f41f5bb2b571a81b78c375b5d0876aa5bc93d2398337",
+            "bytes": 133731
+          },
+          {
+            "package": "@angular/core",
+            "module_path": "fesm2022/_debug_node-chunk.mjs",
+            "path": "compatibility/rc/framework-enum-sources/22.1.7/fesm2022/_debug_node-chunk.mjs",
+            "stored_sha256": "29bbc73e55bbfc1d541628946de10d7c81697fcbf7ad9cccd3ba795da5b2ce19",
+            "raw_sha256": "29bbc73e55bbfc1d541628946de10d7c81697fcbf7ad9cccd3ba795da5b2ce19",
+            "bytes": 747184
+          },
+          {
+            "package": "@angular/core",
+            "module_path": "fesm2022/primitives-event-dispatch.mjs",
+            "path": "compatibility/rc/element-ref-peer-sources/22.1.7/fesm2022/primitives-event-dispatch.mjs.gz",
+            "stored_sha256": "a08e8908b2fd9991f2206289c82353f9d9dd5b82ff20b14bb6b37cea6272b8e2",
+            "raw_sha256": "9882fc0dacfc728f56ffd88172f1434405ff151f8cb2d5962d0109aaaf7793ce",
+            "bytes": 25767
+          },
+          {
+            "package": "@angular/material",
+            "module_path": "fesm2022/_ripple-chunk.mjs",
+            "path": "compatibility/rc/material-public-source-members/a5da707a2f05673bccfe9fe92f4384ddff0d4d5d7c77bd7cf65ad62eeaa339ae.gz",
+            "stored_sha256": "98d7a2786877fd21d8e516877bdebd251c43e60094b7dd672f34ebac68d36a07",
+            "raw_sha256": "a5da707a2f05673bccfe9fe92f4384ddff0d4d5d7c77bd7cf65ad62eeaa339ae",
+            "bytes": 18791
+          },
+          {
+            "package": "@angular/cdk",
+            "module_path": "fesm2022/_shadow-dom-chunk.mjs",
+            "path": "compatibility/rc/material-public-source-members/ba6a8afdd5fde4736ff8fe14ed7c2caaf06041a247ab20d083b7fc7bc4309f8a.gz",
+            "stored_sha256": "fb8545fc80413f2a08f4afdda812d778ad9e67f61500a64ef4e51e1249bca2ed",
+            "raw_sha256": "ba6a8afdd5fde4736ff8fe14ed7c2caaf06041a247ab20d083b7fc7bc4309f8a",
+            "bytes": 1290
+          },
+          {
+            "package": "@angular/platform-browser",
+            "module_path": "fesm2022/platform-browser.mjs",
+            "path": "compatibility/rc/material-public-source-members/179bd315556b5a9dda73b00a9be2fd6609acc9188d02ae8018b4c879ee4248fb.gz",
+            "stored_sha256": "4a27e3ac97871d61cfb15ec4c0afbdc28061f997cb0d5170fbd3e820e5989566",
+            "raw_sha256": "179bd315556b5a9dda73b00a9be2fd6609acc9188d02ae8018b4c879ee4248fb",
+            "bytes": 17308
+          },
+          {
+            "package": "@angular/platform-browser",
+            "module_path": "types/platform-browser.d.ts",
+            "path": "compatibility/rc/material-public-source-members/09d93f1024a398839a27ef120ea906c6a08bc7f13424daa89cc0b7b5343c54cf.gz",
+            "stored_sha256": "d985fa52c7b1712779ff11bbe8f470802a708b105ae6cf13d4bac20fba61763a",
+            "raw_sha256": "09d93f1024a398839a27ef120ea906c6a08bc7f13424daa89cc0b7b5343c54cf",
+            "bytes": 32153
+          }
+        ]
+      },
+      {
+        "line": "21.x",
+        "public_feature": "@angular/platform-browser#withEventReplay",
+        "public_ripple": "@angular/material/core#MatRipple",
+        "helper_has_replay_catch": false,
+        "expected_replay_route": "Queued event info -> Angular EventDispatcher -> registered replay delegate -> stashed __jsaction_fns handlers; no DOM redispatch in the complete inspected replay chain.",
+        "expected_peer_route": "MatRipple has no Angular host listeners. Its RippleEventManager listens directly at document capture; public launch() calls the renderer and receives no replay event.",
+        "fixture_route": "The nativeReplay Angular handler records delivery only. It neither launches a ripple, forwards to a manager, nor redispatches a DOM event. Actual browser no-launch replay plus genuine live native creation remains mandatory.",
+        "complete_subjects": [
+          {
+            "role": "public-feature",
+            "complete_source": "function withEventReplay() {\n  return hydrationFeature(HydrationFeatureKind.EventReplay, _withEventReplay());\n}",
+            "sha256": "f552cd3b4fd6d5bd715c3e78050b73fe939ec4243430c7f9e4157fb7e015db64"
+          },
+          {
+            "role": "public-feature-declaration",
+            "complete_source": "declare function withEventReplay(): HydrationFeature<HydrationFeatureKind.EventReplay>;",
+            "sha256": "33870dd1f4423326f2126b1f16adf9d70f4b773e7e1f1b5b79e970ea09caaa2e"
+          },
+          {
+            "role": "core-replay-setup",
+            "complete_source": "initEventReplay = (eventDelegation, injector) => {\n  const appId = injector.get(APP_ID);\n  const earlyJsactionData = window._ejsas[appId];\n  const eventContract = eventDelegation.instance = new EventContract(new EventContractContainer(earlyJsactionData.c));\n  for (const et of earlyJsactionData.et) {\n    eventContract.addEvent(et);\n  }\n  for (const et of earlyJsactionData.etc) {\n    eventContract.addEvent(et);\n  }\n  const eventInfos = getAppScopedQueuedEventInfos(appId);\n  eventContract.replayEarlyEventInfos(eventInfos);\n  clearAppScopedEarlyEventContract(appId);\n  const dispatcher = new EventDispatcher(event => {\n    invokeRegisteredReplayListeners(injector, event, event.currentTarget);\n  });\n  registerDispatcher(eventContract, dispatcher);\n}",
+            "sha256": "fb0678cba5b6475fadd00010a099327fd2e23b96ffb8bdb2bf0335b8f52f325e"
+          },
+          {
+            "role": "registered-replay-callback",
+            "complete_source": "function invokeRegisteredReplayListeners(injector, event, currentTarget) {\n  const blockName = (currentTarget && currentTarget.getAttribute(DEFER_BLOCK_SSR_ID_ATTRIBUTE)) ?? '';\n  if (/d\\d+/.test(blockName)) {\n    hydrateAndInvokeBlockListeners(blockName, injector, event, currentTarget);\n  } else if (event.eventPhase === EventPhase.REPLAY) {\n    invokeListeners(event, currentTarget);\n  }\n}",
+            "sha256": "410e523c5e0c8a9abdb252273f23158221c42fdc2a21ba01430d64c2b6fd1514"
+          },
+          {
+            "role": "stashed-listener-invocation",
+            "complete_source": "function invokeListeners(event, currentTarget) {\n  const handlerFns = currentTarget?.__jsaction_fns?.get(event.type);\n  if (!handlerFns || !currentTarget?.isConnected) {\n    return;\n  }\n  if (currentTarget && handledEventElements.get(event)?.has(currentTarget)) {\n    return;\n  }\n  for (const handler of handlerFns) {\n    handler(event);\n  }\n}",
+            "sha256": "ae31b924945fd8f6de352882ee0971c71235a19ef2eea75b69676d1ff33252d2"
+          },
+          {
+            "role": "queued-replay-route",
+            "complete_source": "replayEarlyEventInfos(earlyEventInfos) {\n    for (let i = 0; i < earlyEventInfos.length; i++) {\n      const earlyEventInfo = earlyEventInfos[i];\n      const eventTypes = this.getEventTypesForBrowserEventType(earlyEventInfo.eventType);\n      for (let j = 0; j < eventTypes.length; j++) {\n        const eventInfo = cloneEventInfo(earlyEventInfo);\n        setEventType(eventInfo, eventTypes[j]);\n        this.handleEventInfo(eventInfo);\n      }\n    }\n  }",
+            "sha256": "07f66ee7c84bfb66f8f7bae99226b1a63d830dea2263db2e2aca6d8a8cff2fa0"
+          },
+          {
+            "role": "replay-dispatch-to-delegate",
+            "complete_source": "dispatchToDelegate(eventInfoWrapper) {\n    if (eventInfoWrapper.getIsReplay()) {\n      prepareEventForReplay(eventInfoWrapper);\n    }\n    prepareEventForBubbling(eventInfoWrapper);\n    while (eventInfoWrapper.getAction()) {\n      prepareEventForDispatch(eventInfoWrapper);\n      if (isCaptureEventType(eventInfoWrapper.getEventType()) && eventInfoWrapper.getAction().element !== eventInfoWrapper.getTargetElement()) {\n        return;\n      }\n      this.dispatchDelegate(eventInfoWrapper.getEvent(), eventInfoWrapper.getAction().name);\n      if (propagationStopped(eventInfoWrapper)) {\n        return;\n      }\n      this.actionResolver.resolveParentAction(eventInfoWrapper.eventInfo);\n    }\n  }",
+            "sha256": "0d403df9f3a416cbec0eb7f5cc4df865891a0a8dcc594a52cda90b7599a7392e"
+          },
+          {
+            "role": "throwing-replay-event-patch",
+            "complete_source": "function prepareEventForReplay(eventInfoWrapper) {\n  const event = eventInfoWrapper.getEvent();\n  const target = eventInfoWrapper.getTargetElement();\n  const originalPreventDefault = event.preventDefault.bind(event);\n  patchEventInstance(event, 'target', target);\n  patchEventInstance(event, 'eventPhase', EventPhase.REPLAY);\n  patchEventInstance(event, 'preventDefault', () => {\n    originalPreventDefault();\n    throw new Error(PREVENT_DEFAULT_ERROR_MESSAGE + (ngDevMode ? PREVENT_DEFAULT_ERROR_MESSAGE_DETAILS : ''));\n  });\n  patchEventInstance(event, 'composedPath', () => {\n    throw new Error(COMPOSED_PATH_ERROR_MESSAGE + (ngDevMode ? COMPOSED_PATH_ERROR_MESSAGE_DETAILS : ''));\n  });\n}",
+            "sha256": "f0888277fdbf76f5e633a0b3492f9a0f7b9533c45e91f6249f6bb8ae714a470e"
+          },
+          {
+            "role": "public-directive",
+            "complete_source": "class MatRipple {\n  _elementRef = inject(ElementRef);\n  _animationsDisabled = _animationsDisabled();\n  color;\n  unbounded = false;\n  centered = false;\n  radius = 0;\n  animation;\n  get disabled() {\n    return this._disabled;\n  }\n  set disabled(value) {\n    if (value) {\n      this.fadeOutAllNonPersistent();\n    }\n    this._disabled = value;\n    this._setupTriggerEventsIfEnabled();\n  }\n  _disabled = false;\n  get trigger() {\n    return this._trigger || this._elementRef.nativeElement;\n  }\n  set trigger(trigger) {\n    this._trigger = trigger;\n    this._setupTriggerEventsIfEnabled();\n  }\n  _trigger;\n  _rippleRenderer;\n  _globalOptions;\n  _isInitialized = false;\n  constructor() {\n    const ngZone = inject(NgZone);\n    const platform = inject(Platform);\n    const globalOptions = inject(MAT_RIPPLE_GLOBAL_OPTIONS, {\n      optional: true\n    });\n    const injector = inject(Injector);\n    this._globalOptions = globalOptions || {};\n    this._rippleRenderer = new RippleRenderer(this, ngZone, this._elementRef, platform, injector);\n  }\n  ngOnInit() {\n    this._isInitialized = true;\n    this._setupTriggerEventsIfEnabled();\n  }\n  ngOnDestroy() {\n    this._rippleRenderer._removeTriggerEvents();\n  }\n  fadeOutAll() {\n    this._rippleRenderer.fadeOutAll();\n  }\n  fadeOutAllNonPersistent() {\n    this._rippleRenderer.fadeOutAllNonPersistent();\n  }\n  get rippleConfig() {\n    return {\n      centered: this.centered,\n      radius: this.radius,\n      color: this.color,\n      animation: {\n        ...this._globalOptions.animation,\n        ...(this._animationsDisabled ? {\n          enterDuration: 0,\n          exitDuration: 0\n        } : {}),\n        ...this.animation\n      },\n      terminateOnPointerUp: this._globalOptions.terminateOnPointerUp\n    };\n  }\n  get rippleDisabled() {\n    return this.disabled || !!this._globalOptions.disabled;\n  }\n  _setupTriggerEventsIfEnabled() {\n    if (!this.disabled && this._isInitialized) {\n      this._rippleRenderer.setupTriggerEvents(this.trigger);\n    }\n  }\n  launch(configOrX, y = 0, config) {\n    if (typeof configOrX === 'number') {\n      return this._rippleRenderer.fadeInRipple(configOrX, y, {\n        ...this.rippleConfig,\n        ...config\n      });\n    } else {\n      return this._rippleRenderer.fadeInRipple(0, 0, {\n        ...this.rippleConfig,\n        ...configOrX\n      });\n    }\n  }\n  static ɵfac = i0.ɵɵngDeclareFactory({\n    minVersion: \"12.0.0\",\n    version: \"21.2.11\",\n    ngImport: i0,\n    type: MatRipple,\n    deps: [],\n    target: i0.ɵɵFactoryTarget.Directive\n  });\n  static ɵdir = i0.ɵɵngDeclareDirective({\n    minVersion: \"14.0.0\",\n    version: \"21.2.11\",\n    type: MatRipple,\n    isStandalone: true,\n    selector: \"[mat-ripple], [matRipple]\",\n    inputs: {\n      color: [\"matRippleColor\", \"color\"],\n      unbounded: [\"matRippleUnbounded\", \"unbounded\"],\n      centered: [\"matRippleCentered\", \"centered\"],\n      radius: [\"matRippleRadius\", \"radius\"],\n      animation: [\"matRippleAnimation\", \"animation\"],\n      disabled: [\"matRippleDisabled\", \"disabled\"],\n      trigger: [\"matRippleTrigger\", \"trigger\"]\n    },\n    host: {\n      properties: {\n        \"class.mat-ripple-unbounded\": \"unbounded\"\n      },\n      classAttribute: \"mat-ripple\"\n    },\n    exportAs: [\"matRipple\"],\n    ngImport: i0\n  });\n}",
+            "sha256": "d04ee7d589f04d7f768bbf685b17616c9e1e9cfe75b332f0708c5bb7fb948a36"
+          },
+          {
+            "role": "native-document-manager",
+            "complete_source": "class RippleEventManager {\n  _events = new Map();\n  addHandler(ngZone, name, element, handler) {\n    const handlersForEvent = this._events.get(name);\n    if (handlersForEvent) {\n      const handlersForElement = handlersForEvent.get(element);\n      if (handlersForElement) {\n        handlersForElement.add(handler);\n      } else {\n        handlersForEvent.set(element, new Set([handler]));\n      }\n    } else {\n      this._events.set(name, new Map([[element, new Set([handler])]]));\n      ngZone.runOutsideAngular(() => {\n        document.addEventListener(name, this._delegateEventHandler, passiveCapturingEventOptions$1);\n      });\n    }\n  }\n  removeHandler(name, element, handler) {\n    const handlersForEvent = this._events.get(name);\n    if (!handlersForEvent) {\n      return;\n    }\n    const handlersForElement = handlersForEvent.get(element);\n    if (!handlersForElement) {\n      return;\n    }\n    handlersForElement.delete(handler);\n    if (handlersForElement.size === 0) {\n      handlersForEvent.delete(element);\n    }\n    if (handlersForEvent.size === 0) {\n      this._events.delete(name);\n      document.removeEventListener(name, this._delegateEventHandler, passiveCapturingEventOptions$1);\n    }\n  }\n  _delegateEventHandler = event => {\n    const target = _getEventTarget(event);\n    if (target) {\n      this._events.get(event.type)?.forEach((handlers, element) => {\n        if (element === target || element.contains(target)) {\n          handlers.forEach(handler => handler.handleEvent(event));\n        }\n      });\n    }\n  };\n}",
+            "sha256": "2f5e411c54b930baf96c9c09c06495cb93abfb11849a304dcbaa0134a6a1de39"
+          },
+          {
+            "role": "private-target-helper",
+            "complete_source": "function _getEventTarget(event) {\n  return event.composedPath ? event.composedPath()[0] : event.target;\n}",
+            "sha256": "e99a09799045f1941851cb3a167782aa19a3f1c20ed6b1ace3b2ce9d1492ba26"
+          },
+          {
+            "role": "diagnostic-no-forwarding-handler",
+            "complete_source": "nativeReplay(event: MouseEvent) {\n    // Only observe Angular delivery. Public MatRipple owns its native listener;\n    // no manual launch or event forwarding is performed for this host.\n    let path_threw = false;\n    try {event.composedPath();} catch {path_threw = true;}\n    this.nativeReplayDeliveries.push({type: event.type, path_threw,\n      target_id: event.target instanceof HTMLElement ? event.target.id : '', peer_present: !!this.replayNativePeer});\n  }",
+            "sha256": "bc4b713669a0497a0dab54fb81c9122c90b971ec293eeee6bb0610f5ff09e4e5"
+          }
+        ],
+        "new_runtime_dependencies": 0,
+        "private_symbols_invoked": false,
+        "actual_angular_native_or_packed_qualified": false,
+        "g11_claim": "not-passed",
+        "peer_reference": {
+          "public_route": "@angular/material/core#MatRipple",
+          "core_version": "21.2.23",
+          "cdk_version": "21.2.14",
+          "material_version": "21.2.14",
+          "helper_has_replay_catch": false,
+          "helper": {
+            "path": "compatibility/rc/material-public-source-members/98455cf5ae4c2fbc66b0b5b2875549e6a453df0587d536ef7b140c48a351f228.gz",
+            "sha256": "98455cf5ae4c2fbc66b0b5b2875549e6a453df0587d536ef7b140c48a351f228"
+          },
+          "caller": {
+            "path": "compatibility/rc/material-public-source-members/37a91cadf041513ac559096dbaf6fb708772fee939cc00e1df23aba1f01540f3.gz",
+            "sha256": "37a91cadf041513ac559096dbaf6fb708772fee939cc00e1df23aba1f01540f3"
+          }
+        },
+        "authenticated_source_members": [
+          {
+            "package": "@angular/core",
+            "module_path": "fesm2022/core.mjs",
+            "path": "compatibility/rc/framework-enum-sources/21.2.23/fesm2022/core.mjs",
+            "stored_sha256": "20749b4e23941479caf068878eb3ce7828609ec6c0734b6020b182dd632c2ab7",
+            "raw_sha256": "20749b4e23941479caf068878eb3ce7828609ec6c0734b6020b182dd632c2ab7",
+            "bytes": 117738
+          },
+          {
+            "package": "@angular/core",
+            "module_path": "fesm2022/_debug_node-chunk.mjs",
+            "path": "compatibility/rc/framework-enum-sources/21.2.23/fesm2022/_debug_node-chunk.mjs",
+            "stored_sha256": "989c2736c705135d8ec0bf60f6ed8be93f769cac8b6c77626bc3685ad4df09f7",
+            "raw_sha256": "989c2736c705135d8ec0bf60f6ed8be93f769cac8b6c77626bc3685ad4df09f7",
+            "bytes": 716772
+          },
+          {
+            "package": "@angular/core",
+            "module_path": "fesm2022/primitives-event-dispatch.mjs",
+            "path": "compatibility/rc/element-ref-peer-sources/21.2.23/fesm2022/primitives-event-dispatch.mjs.gz",
+            "stored_sha256": "3b64d1ead636bb0bd76c3647479f3a82a15302a157d7c2bc39d2f5b3d1dfe780",
+            "raw_sha256": "f62297aaa9ece59a3a21eea053a937c637a04f1985d4eb5bb0aa05a8c5ebe74e",
+            "bytes": 25768
+          },
+          {
+            "package": "@angular/material",
+            "module_path": "fesm2022/_ripple-chunk.mjs",
+            "path": "compatibility/rc/material-public-source-members/37a91cadf041513ac559096dbaf6fb708772fee939cc00e1df23aba1f01540f3.gz",
+            "stored_sha256": "5ae7f8ec67a027f754a41eb76d1ca9c3d0c7c0abf5721428e35ab8eb590160a3",
+            "raw_sha256": "37a91cadf041513ac559096dbaf6fb708772fee939cc00e1df23aba1f01540f3",
+            "bytes": 18933
+          },
+          {
+            "package": "@angular/cdk",
+            "module_path": "fesm2022/_shadow-dom-chunk.mjs",
+            "path": "compatibility/rc/material-public-source-members/98455cf5ae4c2fbc66b0b5b2875549e6a453df0587d536ef7b140c48a351f228.gz",
+            "stored_sha256": "be6e8f61eeea5f7c186c729b2f8d01a69d6cc88c994a8c0ad8c5333874afb6f5",
+            "raw_sha256": "98455cf5ae4c2fbc66b0b5b2875549e6a453df0587d536ef7b140c48a351f228",
+            "bytes": 1242
+          },
+          {
+            "package": "@angular/platform-browser",
+            "module_path": "fesm2022/platform-browser.mjs",
+            "path": "compatibility/rc/material-public-source-members/4b3a893b8288ddf33d23915730703af6177dc6e4cd9f4a06e2ed276e77ecda4a.gz",
+            "stored_sha256": "995830677c46788f17bd1cb82031b4bede1b027319dc723328ac55b8cec6ce51",
+            "raw_sha256": "4b3a893b8288ddf33d23915730703af6177dc6e4cd9f4a06e2ed276e77ecda4a",
+            "bytes": 22650
+          },
+          {
+            "package": "@angular/platform-browser",
+            "module_path": "types/platform-browser.d.ts",
+            "path": "compatibility/rc/material-public-source-members/62a127264597c37b6cd7e8ceee26c690a05c88c632669f566a18fb3b23eb6ea1.gz",
+            "stored_sha256": "6304500098d850927146ed1c5858c6ff7c3c745f169e246fcbd827b111c9cf36",
+            "raw_sha256": "62a127264597c37b6cd7e8ceee26c690a05c88c632669f566a18fb3b23eb6ea1",
+            "bytes": 35840
+          }
+        ]
+      }
+    ],
+    "fixture": {
+      "path": "scripts/ripple-hydration-component-fixture.mjs",
+      "sha256": "a3e4375a59cfe8946f4707163a845cdec45dc738de370eeb1960b30a0af24b7d"
+    },
+    "scope": "Complete exact-floor source reachability only. No private runtime symbols are invoked, no framework/CDK patch is installed, and no source tracing or protocol result qualifies the genuine packed Angular/native application.",
+    "actual_angular_native_or_packed_qualified": false,
+    "g11_claim": "not-passed"
+  },
+  "source_helper_sha256": "915178edffd5f6e0ec46208853b8842f37daf5246e2764fad00f9bd21ea92c68",
+  "producer_sha256": "7c02788def6f6cec49507e4b5c92b9fccd0faab47f45255a163abe19639c84e0",
+  "private_symbols_invoked": false,
+  "actual_angular_native_or_packed_qualified": false,
+  "g11_claim": "not-passed"
+}

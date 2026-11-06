@@ -64,7 +64,7 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
             expected_paths = {r['path'] for r in historical['tool_transitions']} | {r['path'] for r in branch['updates']} | {r['path'] for r in next_branch['updates']}
             self.assertEqual(result['transitions'], len(expected_paths))
             self.assertEqual(result['v1_current_identities'], 95 if line == '21.x' else 19)
-            self.assertEqual(len(result['checks']), 22)
+            self.assertEqual(len(result['checks']), 24)
             self.assertEqual(result['v2_current_identities'], len(branch['updates']))
             self.assertEqual(result['v3_overlay_count'], len(next_branch['updates']))
             self.assertEqual(result['compiler_calls'], 0)
@@ -79,6 +79,77 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
                 self.assertEqual(source.qualify(after), after)
                 self.assertEqual(source.predecessor_reference(after), before)
                 self.assertEqual(hashlib.sha256(source.comparison_bytes(before)).hexdigest(), before['sha256'])
+            floor = next(row for row in next_branch['updates'] if row['path'] == 'compatibility/rc/consumer-floor-plan.json')
+            before_floor = source.comparison_bytes(floor['before'])
+            after_floor = source.comparison_bytes(floor['after'])
+            self.assertEqual(source.qualify(floor['before']), floor['after'])
+            self.assertEqual(source.qualify(floor['after']), floor['after'])
+            old_plan, new_plan = json.loads(before_floor), json.loads(after_floor)
+            profiles = new_plan.pop('node_sources_by_platform')
+            self.assertEqual(new_plan, old_plan)
+            self.assertEqual(profiles['linux-x64'], old_plan['node_sources'])
+            self.assertIn('linux-arm64', profiles)
+            self.assertIsNone(source.qualify(dict(floor['before'], sha256='0'*64)))
+            self.assertIsNone(source.qualify(dict(path='compatibility/rc/not-the-floor.json', sha256=floor['before']['sha256'])))
+            def wrong_floor(path):
+                return before_floor if path == floor['path'] else (root / path).read_bytes()
+            with self.assertRaises(AssertionError): CurrentSassToolReferences(root, read=wrong_floor)
+            floor_path = root / floor['path']; saved_floor = floor_path.read_bytes()
+            try:
+                floor_path.write_bytes(before_floor)
+                with self.assertRaises(AssertionError): source.assert_current()
+                with self.assertRaises(AssertionError): CurrentSassToolReferences(root)
+            finally: floor_path.write_bytes(saved_floor)
+            try:
+                floor_path.write_bytes(saved_floor + b' ')
+                with self.assertRaises(AssertionError): source.assert_current()
+                with self.assertRaises(AssertionError): CurrentSassToolReferences(root)
+            finally: floor_path.write_bytes(saved_floor)
+            armed_floor = False; last_floor = source.bound[-1]['path']
+            def mutate_floor(path):
+                nonlocal armed_floor
+                raw = (root / path).read_bytes()
+                if armed_floor and path == last_floor:
+                    armed_floor = False
+                    floor_path.write_bytes(before_floor)
+                return raw
+            live_floor = CurrentSassToolReferences(root, read=mutate_floor)
+            try:
+                armed_floor = True
+                with self.assertRaises(AssertionError): live_floor.assert_current()
+            finally: floor_path.write_bytes(saved_floor)
+            live_floor.assert_current()
+            roster = next(row for row in next_branch['updates'] if row['path'] == 'scripts/consumer-floor-roster.mjs')
+            roster_before, roster_after = source.comparison_bytes(roster['before']), source.comparison_bytes(roster['after'])
+            self.assertEqual(source.qualify(roster['before']), roster['after'])
+            self.assertEqual(source.qualify(roster['after']), roster['after'])
+            self.assertEqual(hashlib.sha256(roster_before).hexdigest(), roster['before']['sha256'])
+            self.assertEqual(hashlib.sha256(roster_after).hexdigest(), roster['after']['sha256'])
+            self.assertIsNone(source.qualify(dict(roster['before'], sha256='0'*64)))
+            def wrong_roster(path):
+                return roster_before if path == roster['path'] else (root / path).read_bytes()
+            with self.assertRaises(AssertionError): CurrentSassToolReferences(root, read=wrong_roster)
+            roster_path = root / roster['path']; saved_roster = roster_path.read_bytes()
+            for altered in (roster_before, saved_roster + b' '):
+                try:
+                    roster_path.write_bytes(altered)
+                    with self.assertRaises(AssertionError): source.assert_current()
+                    with self.assertRaises(AssertionError): CurrentSassToolReferences(root)
+                finally: roster_path.write_bytes(saved_roster)
+            armed_roster = False; last_roster = source.bound[-1]['path']
+            def mutate_roster(path):
+                nonlocal armed_roster
+                raw = (root / path).read_bytes()
+                if armed_roster and path == last_roster:
+                    armed_roster = False
+                    roster_path.write_bytes(roster_before)
+                return raw
+            live_roster = CurrentSassToolReferences(root, read=mutate_roster)
+            try:
+                armed_roster = True
+                with self.assertRaises(AssertionError): live_roster.assert_current()
+            finally: roster_path.write_bytes(saved_roster)
+            live_roster.assert_current()
             for row in historical['tool_transitions']:
                 latest = next(r for r in source.transitions if r['path'] == row['path'])
                 for side in ('before', 'after'):
@@ -189,7 +260,7 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
             path = root / INPUTS
             original = path.read_bytes()
             baseline = json.loads(original)
-            for kind in ('wrong-parent', 'wrong-before-sha', 'wrong-before-bytes', 'unowned-row', 'wrong-recipe'):
+            for kind in ('wrong-parent', 'wrong-before-sha', 'wrong-before-bytes', 'unowned-row', 'wrong-recipe', 'floor-wrong-before', 'unrelated-data-path'):
                 packet = json.loads(original)
                 branch = packet['branches'][line]
                 row = branch['updates'][0]
@@ -199,6 +270,11 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
                     row['before']['sha256'] = '0' * 64
                 elif kind == 'wrong-before-bytes':
                     row['before']['bytes'] += 1
+                elif kind == 'floor-wrong-before':
+                    next(r for r in branch['updates'] if r['path'] == 'compatibility/rc/consumer-floor-plan.json')['before']['sha256'] = '0' * 64
+                elif kind == 'unrelated-data-path':
+                    row = next(r for r in branch['updates'] if r['path'] == 'compatibility/rc/consumer-floor-plan.json')
+                    row['path'] = row['before']['path'] = row['after']['path'] = 'compatibility/rc/current-sass-tool-reference-inputs-v1.json'
                 elif kind == 'unowned-row':
                     branch['updates'].append(dict(path='scripts/current-sass-tool-references.mjs', before=dict(path='scripts/current-sass-tool-references.mjs', sha256='0' * 64, bytes=0), after=dict(path='scripts/current-sass-tool-references.mjs', sha256='0' * 64, bytes=0), edits=[]))
                 else:

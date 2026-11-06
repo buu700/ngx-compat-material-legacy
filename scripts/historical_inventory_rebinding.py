@@ -6,6 +6,7 @@
 """Verify the finite13-member current-source inventory successor; never execute tests."""
 from __future__ import annotations
 import copy
+from select_dialog_finite_source_successor import make_finite_product_successor
 import hashlib
 import json
 import os
@@ -67,6 +68,7 @@ def expected_successor(root=ROOT, *, read_member=None):
     version = json.loads(read('projects/ngx-material-legacy/package.json'))['version']
     line = '21.x' if version.startswith('21.') else 'main' if version.startswith('22.') else None
     need(line in PINS, 'unrecognized actual package line')
+    qualify_product, product_sweep = make_finite_product_successor(root)
     pins = PINS[line]
     old_raw = git(root, 'show', pins['parent'] + ':' + INVENTORY)
     need(sha(old_raw) == pins['inventory_sha256'], 'changed immutable inventory parent')
@@ -102,7 +104,7 @@ def expected_successor(root=ROOT, *, read_member=None):
     stale = []
     for section, path_key, hash_key in [('rows', 'candidate', 'candidate_sha256'), ('shared_suite_shims', 'path', 'sha256')]:
         for row in before[section]:
-            if sha(read(row[path_key])) != row[hash_key]:
+            if sha(read(row[path_key])) != qualify_product(row[path_key], row[hash_key]):
                 stale.append((section, row[path_key], row[hash_key], sha(read(row[path_key]))))
     need(stale == [(t['section'], t['path'], t['before_sha256'], t['after_sha256']) for t in targets],
          'stale source population differs from the reviewed13-member cohort')
@@ -136,6 +138,7 @@ def expected_successor(root=ROOT, *, read_member=None):
         'prior_adaptation_summary': old_summary, 'derived_adaptation_summary': {'identical_to_historical': 2, 'adapted': 55},
         'unchanged_identical_candidates': identical, 'derived_summary_scalars_changed': 2,
         'execution_claims_changed': 0, 'actual_Angular_native_packed_or_floor_qualified': False, 'g11_claim': 'not-passed'}]
+    product_sweep()
     return expected, {'line': line, 'source_parent': pins['parent'], 'before_inventory_sha256': sha(old_raw),
                       'members': targets, 'historical_paths': 57, 'shared_shims': 21,
                       'source_bindings_changed': 13, 'derived_summary_scalars_changed': 2,

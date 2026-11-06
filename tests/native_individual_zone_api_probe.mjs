@@ -1,0 +1,13 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by the MIT license in LICENSE.
+ */
+/** Enumerate changed declarations; exact bytes are bound by the source successor. */
+import assert from 'node:assert/strict';import{createRequire}from'node:module';import{readFileSync}from'node:fs';import{execFileSync}from'node:child_process';
+const ts=createRequire(import.meta.url)('typescript'),line=JSON.parse(readFileSync('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main',commit=line==='21.x'?'1acdae0058291217be7121f228f48983ebb7889a':'0d681a13389565d2416b3485ab3278f4bde2e82e';
+const expected={'scripts/native-motion-consumer.ts':['class:MotionRoot:closeoutZone','class:MotionRoot:measureSnack','class:MotionRoot:ngAfterViewInit'],'scripts/native-motion-page.mjs':['fn:motionSource'],'scripts/native-motion-roster.mjs':['fn:assertCase','fn:enabledProblem','fn:samplePass','fn:samplePassBody'],'scripts/native-motion-run.mjs':['fn:absorb','fn:collect','fn:executeNativeMotion','fn:runEngine','fn:waitReady'],'scripts/ripple-hydration-application.mjs':['fn:rippleHydrationReplayOkay'],'scripts/ripple-hydration-component-fixture.mjs':[],'scripts/ripple-hydration-replay.mjs':['fn:runRippleHydrationReplay']};
+function parse(path,text){const f=ts.createSourceFile(path,text,ts.ScriptTarget.Latest,true,path.endsWith('.ts')?ts.ScriptKind.TS:ts.ScriptKind.JS),items=new Map(),exports=[];assert.equal(f.parseDiagnostics.length,0);function walk(n){if(ts.isFunctionDeclaration(n)&&n.name)items.set('fn:'+n.name.text,n.getText(f));if(ts.isClassDeclaration(n))for(const v of n.members)if(v.name)items.set('class:'+n.name?.text+':'+v.name.getText(f),v.getText(f));ts.forEachChild(n,walk);}walk(f);for(const n of f.statements)if(n.modifiers?.some(m=>m.kind===ts.SyntaxKind.ExportKeyword)){if(n.name)exports.push(n.name.text);if(ts.isVariableStatement(n))for(const d of n.declarationList.declarations)exports.push(d.name.getText(f));}return {items,exports:exports.sort()};}
+for(const [path,allowed]of Object.entries(expected)){const before=execFileSync('git',['show',commit+':'+path]).toString(),current=readFileSync(path,'utf8'),a=parse(path,before),b=parse(path,current);assert.deepEqual(b.exports,a.exports,'export declarations changed '+path);const changed=[...new Set([...a.items.keys(),...b.items.keys()])].filter(k=>a.items.get(k)!==b.items.get(k)).sort();assert.deepEqual(changed,allowed,path);}
+console.log(JSON.stringify({line,seven_sources:true,export_names_preserved:true,changed_declarations_enumerated:true,explicit_non_zone_change:'snack next/completion accounting and acceptance',native_executed:false}));

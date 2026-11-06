@@ -1,6 +1,7 @@
 """Thirty-one default companion cases retain whole original CSS and exact public peers."""
 import hashlib,json,re
 from pathlib import Path
+from sass_stepper_historical_model import historical_stepper_peer_css
 from sass_current_companion_admission import peer_measurement_ok
 ROOT=Path(__file__).resolve().parents[1]
 _CATALOG=json.loads((ROOT/'fixtures/sass/default-companion-contracts.json').read_bytes())
@@ -32,7 +33,9 @@ def default_companion_expected_css(case,peer,line):
         if (not peer_measurement_ok(peer,line,floor['program_sha256'],{}) or peer['css_sha256']!=floor['css_sha256']
             or peer['cdk_version']!=peer['peer_version'] or peer['cdk_version']!=inputs['cdk_version'] or peer['cdk_package_json_sha256']!=inputs['cdk_package_json_sha256']
             or len(peer['sources'])!=len(inputs['sources']) or {(s['root'],s['path'],s['sha256'],s['bytes']) for s in peer['sources']}!=_SOURCESETS[line]):return None
-        return (e['original_css']+e['separator'] if e['original_css'] else '')+peer['css']
+        addition=historical_stepper_peer_css(peer['css'],e['original_css'],line,'color' in e['dimensions']) if e['family']=='stepper' else peer['css']
+        if addition is None:return None
+        return (e['original_css']+e['separator'] if e['original_css'] else '')+addition
     except (KeyError,TypeError,ValueError,AttributeError):return None
 
 def default_companion_assertion_ok(body):

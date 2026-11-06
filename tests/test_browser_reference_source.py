@@ -32,8 +32,12 @@ class BrowserReferenceSourceTests(unittest.TestCase):
     def test_protected_ledger_and_browser_helpers_remain_exact(self):
         packet=json.loads((ROOT/'compatibility/rc/c04-browser-reference-source-inputs.json').read_bytes())
         for ref in [packet['protected_ledger'],*[row['after']for row in packet['transitions']]]:
+            # The zone and surface successors authenticate their current bytes
+            # separately; the immutable review names these Git DATA images.
+            historical = {packet['protected_ledger']['path'], 'scripts/browser-required-cells.mjs',
+                          'scripts/browser-surface-families.mjs', 'scripts/browser-form-families.mjs'}
             raw=(subprocess.check_output(['git','--no-replace-objects','show',packet['source_parent']+':'+ref['path']],cwd=ROOT)
-                 if ref['path']==packet['protected_ledger']['path']else(ROOT/ref['path']).read_bytes())
+                 if ref['path'] in historical else (ROOT/ref['path']).read_bytes())
             self.assertEqual(hashlib.sha256(raw).hexdigest(),ref['sha256'])
             self.assertEqual(len(raw),ref['bytes'])
         self.assertFalse(packet['canonical_frame_admission_granted'])

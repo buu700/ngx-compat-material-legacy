@@ -2,6 +2,7 @@
 import hashlib
 import json
 from pathlib import Path
+from sass_stepper_historical_model import historical_stepper_peer_css
 from sass_current_companion_admission import peer_measurement_ok
 
 _CATALOG=json.loads((Path(__file__).resolve().parents[1]/'fixtures/sass/companion-addition-contracts.json').read_bytes())
@@ -23,7 +24,9 @@ def companion_addition_expected_css(body):
         original=body['expected'];peer=contract['peer'];line=body['line'];floor=entry['peers'][line]
         if original['css_sha256']!=entry['original_sha256'] or hashlib.sha256(original['css'].encode()).hexdigest()!=entry['original_sha256'] or original['css_bytes']!=len(original['css'].encode()):return None
         if not peer_measurement_ok(peer,line,floor['program_sha256'],_CATALOG['sources'][line][entry['family']]) or peer['css_sha256']!=floor['css_sha256']:return None
-        return (original['css']+entry['separator'] if original['css'] else '')+peer['css']
+        addition=historical_stepper_peer_css(peer['css'],original['css'],line,'color' in entry['dimensions']) if entry['family']=='stepper' else peer['css']
+        if addition is None:return None
+        return (original['css']+entry['separator'] if original['css'] else '')+addition
     except (KeyError,TypeError,ValueError,AttributeError):return None
 
 def companion_addition_results_match(body):

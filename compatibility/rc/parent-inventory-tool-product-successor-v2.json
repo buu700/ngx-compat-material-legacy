@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "role": "inventory-tool-finite-product-successor",
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "g11_claim": "not-passed",
+  "previous_packet": {
+    "path": "compatibility/rc/parent-inventory-python-product-successor-v1.json",
+    "sha256": "1dec61d2e9c5fb9abc95d4f66e23e4dc99ed3b26b8847df37950634494990043",
+    "bytes": 2672
+  },
+  "branches": {
+    "21.x": {
+      "transitions": [
+        {
+          "path": "scripts/historical_inventory_rebinding.py",
+          "source_parent": "1acdae0058291217be7121f228f48983ebb7889a",
+          "before": {
+            "path": "scripts/historical_inventory_rebinding.py",
+            "sha256": "0c5b37759c25026df64da4ce33ae08c15bbf38a6ab0b004cf8a186d993d9b44d",
+            "bytes": 10051
+          },
+          "after": {
+            "path": "scripts/historical_inventory_rebinding.py",
+            "sha256": "1014fae26c962bf8934d93bca44d30dfe49575b2b9e23288e8eb930323f48ce1",
+            "bytes": 10256
+          },
+          "edits": [
+            {
+              "offset": 369,
+              "before": "",
+              "after": "\nfrom select_dialog_finite_source_successor import make_finite_product_successor"
+            },
+            {
+              "offset": 3229,
+              "before": "",
+              "after": "qualify_product, product_sweep = make_finite_product_successor(root)\n    "
+            },
+            {
+              "offset": 5984,
+              "before": "",
+              "after": "qualify_product(row[path_key], "
+            },
+            {
+              "offset": 5997,
+              "before": "",
+              "after": ")"
+            },
+            {
+              "offset": 8917,
+              "before": "",
+              "after": "product_sweep()\n    "
+            }
+          ]
+        },
+        {
+          "path": "scripts/inventory-reference-proposal.mjs",
+          "source_parent": "1acdae0058291217be7121f228f48983ebb7889a",
+          "before": {
+            "path": "scripts/inventory-reference-proposal.mjs",
+            "sha256": "058f2e671cfb7fddd48a68a588991aae74e685376e16ab9c50e33fd4b96ffefa",
+            "bytes": 11760
+          },
+          "after": {
+            "path": "scripts/inventory-reference-proposal.mjs",
+            "sha256": "3386aaeadcf046749aa8372e1b1d71ffec4cead059846a1ba1cd9c68657e5a28",
+            "bytes": 13540
+          },
+          "edits": [
+            {
+              "offset": 654,
+              "before": "",
+              "after": "import {selectDialogFiniteSuccessor} from './select-dialog-finite-source-successor.mjs';\nimport {inventoryFiniteToolSuccessor} from './inventory-finite-tool-successor.mjs';\n"
+            },
+            {
+              "offset": 1048,
+              "before": "const validatorHash='0c5b37759c25026df64da4ce33ae08c15bbf38a6ab0b004cf8a186d993d9b44d';\n",
+              "after": "const validatorHash='1014fae26c962bf8934d93bca44d30dfe49575b2b9e23288e8eb930323f48ce1';\n"
+            },
+            {
+              "offset": 7872,
+              "before": " const pin=pins[line],bound=new Map();\n",
+              "after": " const product=selectDialogFiniteSuccessor({root,line,read}),tool=inventoryFiniteToolSuccessor({root,line,read}),pin=pins[line],bound=new Map([...product.bound,...tool.bound].map(ref=>[ref.path,{...ref}]));\n let active=false;const idle=()=>assert.equal(active,false,'reentrant inventory reference consumption');\n"
+            },
+            {
+              "offset": 7944,
+              "before": "  readEvidenceMember(root,path);const raw=read(path);assert.ok(Buffer.isBuffer(raw));\n  if(expected)assert.equal(hash(raw),expected,'unqualified inventory proposal input '+path);\n  bound.set(path,{path,sha256:hash(raw),bytes:raw.length});return raw;\n",
+              "after": "  idle();const actual=readEvidenceMember(root,path),raw=read(path);assert.ok(Buffer.isBuffer(raw));assert.ok(actual.equals(raw),'nonphysical inventory proposal input '+path);assert.ok(actual.equals(readEvidenceMember(root,path)),'inventory proposal input changed during callback '+path);\n  if(expected){const ref={path,sha256:expected};const selected=tool.qualify(product.qualify(ref)??ref)??product.qualify(ref)??ref;assert.equal(hash(raw),selected.sha256,'unqualified inventory proposal input '+path);}\n  const current={path,sha256:hash(raw),bytes:raw.length},prior=bound.get(path);if(prior)assert.deepEqual(current,prior,'changed repeated inventory proposal input '+path);else bound.set(path,current);return raw;\n"
+            },
+            {
+              "offset": 8397,
+              "before": " for(const ref of packet.source_members){const raw=member(ref.path,ref.sha256);assert.equal(raw.length,ref.bytes);}\n member(sourceValidator,validatorHash);\n",
+              "after": " for(const ref of packet.source_members){const selected=tool.qualify(product.qualify(ref)??ref)??product.qualify(ref)??ref;const raw=member(ref.path,ref.sha256);assert.equal(raw.length,selected.bytes);}\n member(sourceValidator,validatorHash);member('scripts/select_dialog_finite_source_successor.py','d5cb25d0908f93fb0d8e8d4701f2db0ec9a0726df8133dabe45906372b17fda7');\n"
+            },
+            {
+              "offset": 9572,
+              "before": " const assertCurrent=()=>{for(const ref of bound.values()){\n  const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late inventory reference input change '+ref.path);assert.equal(raw.length,ref.bytes);\n }};\n",
+              "after": " const sweep=()=>{for(const ref of bound.values()){const actual=readEvidenceMember(root,ref.path);assert.equal(hash(actual),ref.sha256,'physical inventory reference input change '+ref.path);assert.equal(actual.length,ref.bytes);}};\n const assertCurrent=()=>{idle();active=true;try{sweep();product.assertCurrent();tool.assertCurrent();for(const ref of bound.values()){\n  const actual=readEvidenceMember(root,ref.path),raw=read(ref.path);assert.ok(Buffer.isBuffer(raw)&&actual.equals(raw),'nonphysical inventory reference input '+ref.path);assert.ok(actual.equals(readEvidenceMember(root,ref.path)),'inventory reference input changed during callback '+ref.path);assert.equal(hash(actual),ref.sha256,'late inventory reference input change '+ref.path);assert.equal(actual.length,ref.bytes);\n }product.assertCurrent();tool.assertCurrent();sweep();}finally{active=false;}};\n"
+            }
+          ]
+        }
+      ]
+    },
+    "main": {
+      "transitions": [
+        {
+          "path": "scripts/historical_inventory_rebinding.py",
+          "source_parent": "0d681a13389565d2416b3485ab3278f4bde2e82e",
+          "before": {
+            "path": "scripts/historical_inventory_rebinding.py",
+            "sha256": "0c5b37759c25026df64da4ce33ae08c15bbf38a6ab0b004cf8a186d993d9b44d",
+            "bytes": 10051
+          },
+          "after": {
+            "path": "scripts/historical_inventory_rebinding.py",
+            "sha256": "1014fae26c962bf8934d93bca44d30dfe49575b2b9e23288e8eb930323f48ce1",
+            "bytes": 10256
+          },
+          "edits": [
+            {
+              "offset": 369,
+              "before": "",
+              "after": "\nfrom select_dialog_finite_source_successor import make_finite_product_successor"
+            },
+            {
+              "offset": 3229,
+              "before": "",
+              "after": "qualify_product, product_sweep = make_finite_product_successor(root)\n    "
+            },
+            {
+              "offset": 5984,
+              "before": "",
+              "after": "qualify_product(row[path_key], "
+            },
+            {
+              "offset": 5997,
+              "before": "",
+              "after": ")"
+            },
+            {
+              "offset": 8917,
+              "before": "",
+              "after": "product_sweep()\n    "
+            }
+          ]
+        },
+        {
+          "path": "scripts/inventory-reference-proposal.mjs",
+          "source_parent": "0d681a13389565d2416b3485ab3278f4bde2e82e",
+          "before": {
+            "path": "scripts/inventory-reference-proposal.mjs",
+            "sha256": "058f2e671cfb7fddd48a68a588991aae74e685376e16ab9c50e33fd4b96ffefa",
+            "bytes": 11760
+          },
+          "after": {
+            "path": "scripts/inventory-reference-proposal.mjs",
+            "sha256": "3386aaeadcf046749aa8372e1b1d71ffec4cead059846a1ba1cd9c68657e5a28",
+            "bytes": 13540
+          },
+          "edits": [
+            {
+              "offset": 654,
+              "before": "",
+              "after": "import {selectDialogFiniteSuccessor} from './select-dialog-finite-source-successor.mjs';\nimport {inventoryFiniteToolSuccessor} from './inventory-finite-tool-successor.mjs';\n"
+            },
+            {
+              "offset": 1048,
+              "before": "const validatorHash='0c5b37759c25026df64da4ce33ae08c15bbf38a6ab0b004cf8a186d993d9b44d';\n",
+              "after": "const validatorHash='1014fae26c962bf8934d93bca44d30dfe49575b2b9e23288e8eb930323f48ce1';\n"
+            },
+            {
+              "offset": 7872,
+              "before": " const pin=pins[line],bound=new Map();\n",
+              "after": " const product=selectDialogFiniteSuccessor({root,line,read}),tool=inventoryFiniteToolSuccessor({root,line,read}),pin=pins[line],bound=new Map([...product.bound,...tool.bound].map(ref=>[ref.path,{...ref}]));\n let active=false;const idle=()=>assert.equal(active,false,'reentrant inventory reference consumption');\n"
+            },
+            {
+              "offset": 7944,
+              "before": "  readEvidenceMember(root,path);const raw=read(path);assert.ok(Buffer.isBuffer(raw));\n  if(expected)assert.equal(hash(raw),expected,'unqualified inventory proposal input '+path);\n  bound.set(path,{path,sha256:hash(raw),bytes:raw.length});return raw;\n",
+              "after": "  idle();const actual=readEvidenceMember(root,path),raw=read(path);assert.ok(Buffer.isBuffer(raw));assert.ok(actual.equals(raw),'nonphysical inventory proposal input '+path);assert.ok(actual.equals(readEvidenceMember(root,path)),'inventory proposal input changed during callback '+path);\n  if(expected){const ref={path,sha256:expected};const selected=tool.qualify(product.qualify(ref)??ref)??product.qualify(ref)??ref;assert.equal(hash(raw),selected.sha256,'unqualified inventory proposal input '+path);}\n  const current={path,sha256:hash(raw),bytes:raw.length},prior=bound.get(path);if(prior)assert.deepEqual(current,prior,'changed repeated inventory proposal input '+path);else bound.set(path,current);return raw;\n"
+            },
+            {
+              "offset": 8397,
+              "before": " for(const ref of packet.source_members){const raw=member(ref.path,ref.sha256);assert.equal(raw.length,ref.bytes);}\n member(sourceValidator,validatorHash);\n",
+              "after": " for(const ref of packet.source_members){const selected=tool.qualify(product.qualify(ref)??ref)??product.qualify(ref)??ref;const raw=member(ref.path,ref.sha256);assert.equal(raw.length,selected.bytes);}\n member(sourceValidator,validatorHash);member('scripts/select_dialog_finite_source_successor.py','d5cb25d0908f93fb0d8e8d4701f2db0ec9a0726df8133dabe45906372b17fda7');\n"
+            },
+            {
+              "offset": 9572,
+              "before": " const assertCurrent=()=>{for(const ref of bound.values()){\n  const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late inventory reference input change '+ref.path);assert.equal(raw.length,ref.bytes);\n }};\n",
+              "after": " const sweep=()=>{for(const ref of bound.values()){const actual=readEvidenceMember(root,ref.path);assert.equal(hash(actual),ref.sha256,'physical inventory reference input change '+ref.path);assert.equal(actual.length,ref.bytes);}};\n const assertCurrent=()=>{idle();active=true;try{sweep();product.assertCurrent();tool.assertCurrent();for(const ref of bound.values()){\n  const actual=readEvidenceMember(root,ref.path),raw=read(ref.path);assert.ok(Buffer.isBuffer(raw)&&actual.equals(raw),'nonphysical inventory reference input '+ref.path);assert.ok(actual.equals(readEvidenceMember(root,ref.path)),'inventory reference input changed during callback '+ref.path);assert.equal(hash(actual),ref.sha256,'late inventory reference input change '+ref.path);assert.equal(actual.length,ref.bytes);\n }product.assertCurrent();tool.assertCurrent();sweep();}finally{active=false;}};\n"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

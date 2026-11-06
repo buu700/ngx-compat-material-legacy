@@ -29,6 +29,7 @@ const BOUNDARIES = [
   'styles/checkbox/_checkbox-theme.scss', 'styles/button/_button-theme.scss',
   'styles/card/_card-theme.scss',
 ].sort();
+const COMPANION_BRIDGE = 'projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss';
 const HISTORICAL_SCOPE = 'compatibility/rc/upstream-sass-inspection-current-scope.json.gz';
 const HISTORICAL_PINS = {
   '21.x': {sha256: 'b0a8f0d0d2ce8cb41943a0585ccdcc25fd6bb0d30c9339f80501ef86c65726f4', bytes: 61597},
@@ -184,10 +185,19 @@ export function assertCurrentSassInspectionScopeSuccessor({root = process.cwd(),
     return {...ref, sha256: row.current.sha256, ...(Object.hasOwn(ref, 'bytes') ? {bytes: row.current.bytes} : {})};
   };
   const census = historical.owned_scss_population.map(row => qualify(row));
-  const boundaries = [...structuredClone(historical.boundaries), ...source.transitions.map(row => {
+  assert.equal(source.transitions.length, 6);
+  assert.equal(source.transitions.filter(row => row.path === COMPANION_BRIDGE).length, 1);
+  assert.equal(historical.boundaries.filter(row => row.path === COMPANION_BRIDGE).length, 1);
+  const currentBoundaries = source.transitions.map(row => {
     const raw = readFileSync(join(root, row.path)); assert.equal(hash(raw), row.current.sha256); assert.equal(raw.length, row.current.bytes);
     return inspectOwnedMaterialBoundary(row.path, raw);
-  })].sort((a, b) => a.path.localeCompare(b.path));
+  });
+  const newBoundaries = currentBoundaries.filter(row => row.path !== COMPANION_BRIDGE);
+  assert.equal(newBoundaries.length, 5);
+  assert.ok(newBoundaries.every(row => !historical.boundaries.some(old => old.path === row.path)));
+  const bridge = currentBoundaries.find(row => row.path === COMPANION_BRIDGE);
+  const boundaries = [...structuredClone(historical.boundaries).map(row => row.path === COMPANION_BRIDGE ? bridge : row),
+    ...newBoundaries].sort((a, b) => a.path.localeCompare(b.path));
   assert.ok(boundaries.every(Boolean));
   assert.deepEqual(boundaries.map(row => row.path.replace('projects/ngx-material-legacy/', '')).sort(), BOUNDARIES);
   const mixins = [...new Set(boundaries.flatMap(row => row.public_mixin_calls))].sort(); assert.equal(mixins.length, 21);

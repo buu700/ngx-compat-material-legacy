@@ -3,6 +3,7 @@ import hashlib
 import json
 import re
 from pathlib import Path
+from sass_stepper_historical_model import historical_stepper_peer_css
 from sass_current_companion_admission import peer_measurement_ok
 from sass_datepicker_controls_admission import ORIGINAL_CALENDAR_DENSITY, CURRENT_CALENDAR_FALLBACKS
 from sass_form_field_state_admission import FORM_FIELD_STATE_AGGREGATE_CASES, insert_form_field_state_in_aggregate
@@ -55,6 +56,8 @@ def aggregate_color_theme_expected_css(body):
             or peer['css_sha256']!=floor['css_sha256'] or len(peer['sources'])!=len(sources) or any(s not in peer['sources'] for s in sources)):return None
         p=_members(peer['css']);o={f:m['css'] for f,m in profile['originals'].items()}
         if p is None or any(f not in o or _sha(o[f])!=profile['originals'][f]['css_sha256'] or len(o[f].encode())!=profile['originals'][f]['css_bytes'] for f in _FAMILIES):return None
+        p['stepper']=historical_stepper_peer_css(p['stepper'],o['stepper'],line,True)
+        if p['stepper'] is None:return None
         if p['grid-list']!=o['grid-list'] or p['icon']!=o['icon'].replace('}\n\n.sass-argument-probe .mat-icon.mat-primary','}\n.sass-argument-probe .mat-icon.mat-primary'):return None
         order=[f for f in _FAMILIES if o[f]];css=original['css']
         if any(css.count(o[f])!=1 for f in order):return None

@@ -16,11 +16,13 @@ ROOT = Path(__file__).resolve().parents[1]
 SELF = 'scripts/current_sass_spinner_snack_admission.py'
 INPUTS = 'compatibility/rc/parallel-spinner-snack-css-contract-inputs-v1.json'
 SOURCE_INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json'
+SIXTH_PACKET = 'compatibility/rc/current-sass-stepper-sixth-source-inputs-v1.json'
 PINS = [
-    ('scripts/current-sass-source.mjs', 'eb96891168b146becaf5cbd9e437509a3e2371945e982fc58ca6b343cefb4160', 15564),
-    ('scripts/current_sass_source.py', '2a8672f63c9639b6e600240db25a7148573f778caaae69a768fd27eb6b435ab3', 13870),
+    ('scripts/current-sass-source.mjs', '5422358f5dfda6cbcd6826fc1d3e887a294d9d5e34ea7093623d71dcb1087d15', 19266),
+    ('scripts/current_sass_source.py', '1bf1bd2ff60bf3ee7b1aa44c7e0f443ae0642098cdac8f1d9d81f2aa0587bbbb', 16237),
     (SOURCE_INPUTS, '46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9', 20239),
     ('scripts/sass_spinner_snack_bridge_admission.py', '66a9ad634bede4e0eeef23ece0fe50d49d6fbf28d5bc619da0873d6ec8fae0f3', 19824),
+    (SIXTH_PACKET, '1d566395c25e3569cee1031526ec05508e40cb866d7d5fda008cb6a325a9caec', 7504),
     (INPUTS, 'fd78f8c7f6e072fb7393c61aef782ccdf3a1c8d009227d08b29921ea2809e0a8', 237068),
 ]
 _IMAGE = (ROOT / SELF).read_bytes()
@@ -131,9 +133,10 @@ class CurrentSpinnerSnackContract:
             member(r)
         member(branch['observation'])
         base = json.loads(current(packet['source_packet']['path']))
+        sixth = json.loads(current(SIXTH_PACKET))
         canonical_source = dict(source_subject=dict(path=PINS[0][0], sha256=PINS[0][1], bytes=PINS[0][2]),
             source_packet=dict(path=SOURCE_INPUTS, sha256=PINS[2][1], bytes=PINS[2][2]),
-            source_modules=[r['current'] for r in base['branches'][line]['modules'] + current_packet['additional_modules']])
+            source_modules=[r['current'] for r in base['branches'][line]['modules'] + current_packet['additional_modules']] + [sixth['branches'][line]['reviewed_after']])
         assert source_context.descriptor == canonical_source
         oracle, catalog, provenance, lock = [json.loads(current(packet[k]['path'])) for k in ('oracle', 'catalog', 'provenance', 'reference_lock')]
         assert branch['compiler'] == provenance['sass_info']

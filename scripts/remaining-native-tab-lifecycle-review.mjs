@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /** Finite source/API/style review; never a packed/native admission or golden. */
+import {zoneTabProducerSourceSuccessor} from './zone-tab-producer-source-successor.mjs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
@@ -74,15 +75,19 @@ export function inspectTabLifecycleRepair({root=rootDefault,readMember}={}){
   const bytes=read(path);assert.equal(createHash('sha1').update('blob '+bytes.length+'\0').update(bytes).digest('hex'),blob,'unreviewed product delta '+path);}
  const prefix='compatibility/rc/remaining-native-admission-tab-repair-',lifecycle=json(prefix+'lifecycle-controls.json'),producer=json(prefix+'producer-controls.json'),admission=json(prefix+'admission-controls.json'),dispatch=json(prefix+'dispatch-controls.json'),cyph=json(prefix+'cyph-style.json');
  assert.equal(lifecycle.source_sha256,hash(read(tab)));assert.equal(lifecycle.passed,47);assert.equal(lifecycle.failed,0);assert.equal(lifecycle.cases.length,47);assert.ok(lifecycle.cases.every(row=>row.result==='pass'));assert.equal(lifecycle.mutants.length,22);assert.ok(lifecycle.mutants.every(row=>row.result==='rejected'&&row.failed_case_ids.length));assert.deepEqual(lifecycle.completion_contract.candidate,lifecycle.completion_contract.reference);assert.equal(lifecycle.native_browser_execution,false);assert.equal(lifecycle.packed_execution,false);
- assert.equal(producer.source_sha256,hash(read('scripts/native-motion-consumer.ts')));assert.equal(producer.cases.length,29);assert.ok(producer.cases.every(row=>row.result==='pass'));assert.equal(producer.native_executed,false);
+ const zoneTab=zoneTabProducerSourceSuccessor({root,read,line:prior.line});zoneTab.assertCurrent();
  assert.equal(admission.helper_sha256,hash(read('scripts/upstream-tab-completion-evidence.mjs')));assert.equal(admission.producer_sha256,hash(read('tests/upstream/tab-completion-admission.mjs')));assert.equal(admission.native_helper_sha256,hash(read('scripts/upstream-native-motion-run-evidence.mjs')));
  assert.equal(admission.line,prior.line);assert.equal(admission.full_packed_roster,106);assert.equal(admission.full_native_roster,306);assert.equal(admission.required_tab_cases,54);assert.equal(admission.actual_reader_writer_controls,72);assert.equal(admission.cached_actual_full_native_raw_controls,306);assert.equal(admission.cached_actual_tab_semantic_controls,3102);assert.equal(admission.actual_packed_native_or_floor_qualified,false);
  assert.equal(dispatch.line,prior.line);assert.equal(dispatch.actual_root_cli_cases,25);assert.equal(dispatch.root_sha256,hash(read('scripts/check-upstream-audit-disposition.mjs')));assert.equal(dispatch.actual_native_packed_or_floor_qualified,false);
  assert.equal(cyph.line,prior.line);assert.equal(cyph.cyph_head,style.cyph_head);assert.equal(cyph.cyph_clean,true);assert.equal(cyph.consumer_written,false);assert.equal(cyph.cyph_build_executed,false);assert.equal(cyph.css_scss_changes,0);assert.equal(cyph.resources_checked,439);assert.equal(cyph.resources_unchanged,438);assert.equal(cyph.template_change.current_sha256,hash(read(template)));assert.equal(cyph.template_change.only_existing_visibility_expression_changed,true);
  for(const row of style.cyph_members)assert.deepEqual(cyph.cyph_members.find(member=>member.path===row.path),row);
+ zoneTab.assertCurrent();
+ const sourceMembers=[...before.keys(),'scripts/remaining-native-tab-lifecycle-review.mjs'].map(path=>({path,sha256:hash(read(path))}));
+ zoneTab.assertCurrent();
  return {schema_version:1,line:prior.line,prior:{path:priorPath,sha256:pin.prior},source_parent:pin.parent,...delta,unchanged_product_members:1139,unchanged_resources:438,css_scss_changes:0,
+  zone_tab_producer_source:zoneTab.bound,
   controls:{lifecycle:47,lifecycle_mutants:22,producer:29,admission_reader_writer:72,admission_native_raw:306,admission_tab_semantic:3102,root_cli:25},
-  source_members:[...before.keys(),'scripts/remaining-native-tab-lifecycle-review.mjs'].map(path=>({path,sha256:hash(read(path))})),
+  source_members:sourceMembers,
   scope:'Owned tab lifecycle, exact one-expression template delta and public import roles only. Tagged source and synthetic controls are distinct from actual Angular/packed/native/floor execution. Existing G11 contexts and historical-reader requalification remain pending.',actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url))console.log(JSON.stringify(inspectTabLifecycleRepair(),null,2));

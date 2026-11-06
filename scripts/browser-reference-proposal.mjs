@@ -95,14 +95,16 @@ export function prepareBrowserReferenceSourceMetadata({root,read=path=>readCheck
  const suppliedPackage=read('projects/ngx-material-legacy/package.json');assert.ok(Buffer.isBuffer(suppliedPackage)&&suppliedPackage.equals(physicalPackage));assert.ok(readCheckerOwnerMember(root,'projects/ngx-material-legacy/package.json').equals(physicalPackage));
  const tools=browserOwnerSourceSubject({root,read}),source=inspectBrowserReferenceSource({root,read}),pin=PINS[line];assert.ok(pin);assert.equal(source.report.line,line);
  const bound=new Map([...source.bound,...zone.bound].map(ref=>[ref.path,{...ref}])),member=ref=>{
-  ref=tools.qualifyReference(ref);
-  const raw=read(ref.path),physical=readCheckerOwnerMember(root,ref.path);assert.ok(Buffer.isBuffer(raw));assert.ok(raw.equals(physical),'noncurrent browser proposal source '+ref.path);
+  ref=source.qualifyFormReference(ref)??source.qualifySurfaceReference(ref)??tools.qualifyReference(ref);
+  const physical=readCheckerOwnerMember(root,ref.path),raw=read(ref.path);assert.ok(Buffer.isBuffer(raw));assert.ok(raw.equals(physical),'noncurrent browser proposal source '+ref.path);assert.ok(physical.equals(readCheckerOwnerMember(root,ref.path)),'browser proposal source changed during callback '+ref.path);
   assert.equal(hash(raw),ref.sha256,'changed browser proposal source '+ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);
   bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return raw;
  };
  const packet=JSON.parse(member({path:BROWSER_REFERENCE_PACKET,sha256:pin.packet}));assert.equal(packet.source_parent,pin.parent);
  member({path:SELF,sha256:hash(image),bytes:image.length});for(const ref of packet.source_members)member(ref);
  const sources=new Map(packet.source_transitions.map(row=>{
+  if(row.path===source.formBefore.path){assert.deepEqual(row.current,source.formBefore);member(row.current);const previous=original(root,pin.parent,row.path);assert.equal(hash(previous),source.formBefore.sha256);assert.equal(previous.length,source.formBefore.bytes);source.assertCurrent();return [row.path,previous];}
+  if(row.path===source.surfaceBefore.path){assert.deepEqual(row.current,source.surfaceBefore);member(row.current);const previous=original(root,pin.parent,row.path);assert.equal(hash(previous),source.surfaceBefore.sha256);assert.equal(previous.length,source.surfaceBefore.bytes);source.assertCurrent();return [row.path,previous];}
   if(row.path!==zone.before.path)return [row.path,member(row.current)];
   assert.deepEqual(row.current,zone.before);const previous=original(root,pin.parent,row.path);
   assert.equal(hash(previous),zone.before.sha256);assert.equal(previous.length,zone.before.bytes);zone.assertCurrent();return [row.path,previous];
@@ -124,17 +126,17 @@ export function prepareBrowserReferenceSourceMetadata({root,read=path=>readCheck
  for(const key of ['canonical_frame_admission_granted','old_programs_executed','actual_native_packed_browser_floor_or_full_audit_qualified','actual_angular_DOM_browser_or_packed_execution'])assert.equal(verifier[key],false);
  assert.equal(verifier.g11_claim,'not-passed');
  const assertCurrent=()=>{zone.assertCurrent();tools.assertCurrent();source.assertCurrent();assert.ok(readCheckerOwnerMember(root,BROWSER_REFERENCE_LEDGER).equals(physicalLedger),'late physical canonical ledger');for(const ref of bound.values()){
-  const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late browser proposal source '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readCheckerOwnerMember(root,ref.path)),'late physical browser proposal source '+ref.path);
- }zone.assertPhysical();};
+  const physical=readCheckerOwnerMember(root,ref.path),raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late browser proposal source '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(physical),'late physical browser proposal source '+ref.path);assert.ok(physical.equals(readCheckerOwnerMember(root,ref.path)),'late browser proposal source changed during callback '+ref.path);
+ }zone.assertPhysical();source.assertSurfacePhysical();source.assertFormPhysical();};
  const verifyAfter=candidate=>{assertCurrent();assert.ok(Buffer.isBuffer(candidate)&&candidate.equals(result.after),'not the exact browser-reference after-image');assertCurrent();return {metadata_only:true,canonical_frame_admission_granted:false,native_or_full_audit_credit:false};};
  const verifyInput=candidate=>{assertCurrent();assert.ok(Buffer.isBuffer(candidate)&&(candidate.equals(result.before)||candidate.equals(result.after)),'unregistered canonical browser-reference image');assertCurrent();return {current_canonical_state:candidate.equals(result.before)?'before':'after',canonical_frame_admission_granted:false};};
- assertCurrent();return {line,before:Buffer.from(result.before),after:Buffer.from(result.after),updates:structuredClone(result.updates),preserved:structuredClone(result.preserved),metadata_reference_updates:pin.count,selected_entries:pin.entries,unselected_entry_bytes_preserved:1697-pin.entries,bound:structuredClone([...bound.values()]),verifier:structuredClone(verifier),assertCurrent,assertZonePhysical:zone.assertPhysical,verifyAfter,verifyInput,canonical_owner_integration_complete:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+ assertCurrent();return {line,before:Buffer.from(result.before),after:Buffer.from(result.after),updates:structuredClone(result.updates),preserved:structuredClone(result.preserved),metadata_reference_updates:pin.count,selected_entries:pin.entries,unselected_entry_bytes_preserved:1697-pin.entries,bound:structuredClone([...bound.values()]),verifier:structuredClone(verifier),assertCurrent,assertZonePhysical:zone.assertPhysical,assertSurfacePhysical:source.assertSurfacePhysical,assertFormPhysical:source.assertFormPhysical,verifyAfter,verifyInput,canonical_owner_integration_complete:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 }
 /** The proposal input rule accepts only its two complete exact images. */
 export function prepareBrowserReferenceMetadata({root,read=path=>readCheckerOwnerMember(root,path)}={}){
  const source=prepareBrowserReferenceSourceMetadata({root,read}),current=read(BROWSER_REFERENCE_LEDGER),state=source.verifyInput(current);
  const identity={path:BROWSER_REFERENCE_LEDGER,sha256:hash(current),bytes:current.length};
- const assertCurrent=()=>{source.assertCurrent();const raw=read(BROWSER_REFERENCE_LEDGER);assert.equal(hash(raw),identity.sha256,'late canonical browser-reference image');assert.equal(raw.length,identity.bytes);source.assertZonePhysical();};
+ const assertCurrent=()=>{source.assertCurrent();const raw=read(BROWSER_REFERENCE_LEDGER);assert.equal(hash(raw),identity.sha256,'late canonical browser-reference image');assert.equal(raw.length,identity.bytes);source.assertZonePhysical();source.assertSurfacePhysical();source.assertFormPhysical();};
  const verifyAfter=candidate=>{assertCurrent();const result=source.verifyAfter(candidate);assertCurrent();return result;};
  const verifyInput=candidate=>{assertCurrent();const result=source.verifyInput(candidate);assertCurrent();return result;};
  assertCurrent();return {...source,...state,bound:structuredClone(source.bound),assertCurrent,verifyAfter,verifyInput};

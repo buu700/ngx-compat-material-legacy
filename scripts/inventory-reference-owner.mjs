@@ -8,6 +8,7 @@
 import assert from 'node:assert/strict';
 import {checkerReferenceOwnerContext} from './checker-reference-owner.mjs';
 import {browserReferenceOwnerContext} from './browser-reference-owner.mjs';
+import {inventoryRcAcceptanceSourceSuccessor} from './inventory-rc-acceptance-source-successor.mjs';
 import {readCheckerOwnerMember} from './checker-owner-source.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
@@ -15,6 +16,8 @@ import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {prepareInventoryReferenceSourceMetadata,INVENTORY_REFERENCE_LEDGER as LEDGER,INVENTORY_REFERENCE_PATH as INVENTORY} from './inventory-reference-proposal.mjs';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
+import {readHistoricalContractRepairOwnerMember} from './historical-contract-repair-readers.mjs';
+import {inventoryFiniteToolSuccessor} from './inventory-finite-tool-successor.mjs';
 const PATH='scripts/inventory-reference-owner.mjs',OWNER='scripts/packed-upstream-ledger-epoch.mjs';
 const PACKET='compatibility/rc/c04-inventory-owner-inputs.json';
 const PINS={"main":"97db675e4fda1c6dd4a7f056159bd47e2aa963dddb9dff3da1af537ae062d15a","21.x":"0d9dfac3813a6dc60644a090a2173ce56eaed1bcbdb32c2be29ce53f32413cdc"};
@@ -114,11 +117,16 @@ if report['result']!='pass':sys.stderr.write(log.getvalue());sys.exit(1)
 export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwnerMember(root,path)}={}){
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version;
  const line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
- const bound=new Map();
+ const rc=inventoryRcAcceptanceSourceSuccessor({root,read});
+ const tool=inventoryFiniteToolSuccessor({root,line,read});
+ const bound=new Map([...rc.bound,...tool.bound].map(ref=>[ref.path,{...ref}]));
+ let active=false;const idle=()=>assert.equal(active,false,'reentrant inventory owner consumption');
  const member=(path,expected)=>{
-  readEvidenceMember(root,path);const raw=read(path);assert.ok(Buffer.isBuffer(raw));
+  idle();
+  if(expected){const first=rc.qualify({path,sha256:expected})??{path,sha256:expected};expected=(tool.qualify(first)??first).sha256;}
+  const physical=readHistoricalContractRepairOwnerMember(root,path),raw=read(path);assert.ok(Buffer.isBuffer(raw)&&physical.equals(raw),'nonphysical inventory owner input '+path);assert.ok(physical.equals(readHistoricalContractRepairOwnerMember(root,path)),'inventory owner input changed during callback '+path);
   if(expected)assert.equal(hash(raw),expected,'changed inventory owner input '+path);
-  bound.set(path,{path,sha256:hash(raw),bytes:raw.length});return raw;
+  const ref={path,sha256:hash(raw),bytes:raw.length},prior=bound.get(path);if(prior)assert.deepEqual(ref,prior,'changed repeated inventory owner input '+path);else bound.set(path,ref);return raw;
  };
  const packetRaw=member(PACKET,PINS[line]),packet=JSON.parse(packetRaw);assert.equal(packet.line,line);assert.equal(packet.schema_version,1);
  assert.equal(packet.old_functions_executed_as_current_compiled_code,true);assert.equal(packet.old_program_execution,false);
@@ -131,7 +139,7 @@ export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwner
  assert.equal(hash(ownerExpected),packet.after_owner.sha256);assert.equal(Buffer.byteLength(ownerExpected),packet.after_owner.bytes);
  const owner=member(OWNER,packet.after_owner.sha256);assert.equal(owner.toString(),ownerExpected);
  assert.equal(hash(readEvidenceMember(root,OWNER)),packet.after_owner.sha256,'actual loaded owner path differs from qualified code');
- for(const ref of packet.source_members){const raw=member(ref.path,ref.sha256);assert.equal(raw.length,ref.bytes);}
+ for(const prior of packet.source_members){const first=rc.qualify(prior)??prior,ref=tool.qualify(first)??first,raw=member(ref.path,ref.sha256);assert.equal(raw.length,ref.bytes);}
  const historicalHandlers=new Map();
  for(const transition of packet.historical_handler_metadata){
   assert.equal(line,'21.x');assert.ok(['scripts/upstream-dialog-title-admission.cjs','scripts/upstream-dialog-title-native-evidence.mjs'].includes(transition.after.path));
@@ -179,9 +187,11 @@ export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwner
  const currentLedger=member(LEDGER),applied=currentLedger.equals(source.after)||checker.applied||browser.applied;
  // The original owner validates all old complete frames. Only this exact
  // independently derived after-image maps to its qualified predecessor.
- const assertCurrent=()=>{
-  source.assertCurrent();checker.assertCurrent();browser.assertCurrent();assertPhysicalCI();
-  for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late inventory owner input '+ref.path);assert.equal(raw.length,ref.bytes);}
+ const sweep=()=>{for(const ref of bound.values()){const raw=readHistoricalContractRepairOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'physical inventory owner input '+ref.path);assert.equal(raw.length,ref.bytes);}};
+ const assertCurrent=()=>{idle();active=true;try{sweep();
+  tool.assertCurrent();rc.assertCurrent();source.assertCurrent();checker.assertCurrent();browser.assertCurrent();assertPhysicalCI();
+  for(const ref of bound.values()){const actual=readHistoricalContractRepairOwnerMember(root,ref.path),raw=read(ref.path);assert.ok(Buffer.isBuffer(raw)&&actual.equals(raw),'nonphysical inventory owner input '+ref.path);assert.ok(actual.equals(readHistoricalContractRepairOwnerMember(root,ref.path)),'inventory owner input changed during callback '+ref.path);assert.equal(hash(actual),ref.sha256,'late inventory owner input '+ref.path);assert.equal(actual.length,ref.bytes);}
+  browser.assertSurfacePhysical();browser.assertFormPhysical();rc.assertPhysical();sweep();}finally{active=false;}
  };
  const metadataRead=path=>{
   const handler=historicalHandlers.get(path);if(handler){assert.equal(hash(read(path)),handler.after.sha256,'changed current title handler');return Buffer.from(handler.before);}

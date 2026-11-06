@@ -15,6 +15,8 @@ import {fileURLToPath} from 'node:url';
 import {gunzipSync} from 'node:zlib';
 import {readCheckerOwnerMember} from './checker-owner-source.mjs';
 import {browserZoneSourceSuccessor} from './browser-zone-source-successor.mjs';
+import {browserSurfaceSourceSuccessor} from './browser-surface-source-successor.mjs';
+import {browserFormZoneSourceSuccessor} from './browser-form-zone-source-successor.mjs';
 const SELF='scripts/browser-reference-source.mjs',INPUT='compatibility/rc/c04-browser-reference-source-inputs.json';
 const PINS={"main":"4b0167af85263a3fb652806e25186e8500e02424749adb860610519d28817e6c","21.x":"5a8bd910e0d9a64a73558b5da0f48abdf8546b455d8db0fcb921678a0ee0a5ae"};
 const image=readFileSync(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex');
@@ -27,11 +29,14 @@ export function inspectBrowserReferenceSource({root,read=path=>readCheckerOwnerM
  const packagePath='projects/ngx-material-legacy/package.json',physicalPackage=readCheckerOwnerMember(root,packagePath);
  const version=JSON.parse(physicalPackage).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
  const zone=browserZoneSourceSuccessor({root,read,line});
+ const surface=browserSurfaceSourceSuccessor({root,read,line});
+ const formZone=browserFormZoneSourceSuccessor({root,read,line});
  const suppliedPackage=read(packagePath);assert.ok(Buffer.isBuffer(suppliedPackage)&&suppliedPackage.equals(physicalPackage));assert.ok(readCheckerOwnerMember(root,packagePath).equals(physicalPackage));
  const tools=browserOwnerSourceSubject({root,read});
- const bound=new Map([...tools.bound,...zone.bound].map(ref=>[ref.path,{...ref}])),member=ref=>{
-  if(ref.sha256!==undefined)ref=tools.qualifyReference(ref);
-  const raw=read(ref.path),physical=readCheckerOwnerMember(root,ref.path);assert.ok(Buffer.isBuffer(raw));assert.ok(raw.equals(physical),'noncurrent browser source '+ref.path);
+ const bound=new Map([...tools.bound,...zone.bound,...surface.bound,...formZone.bound].map(ref=>[ref.path,{...ref}])),member=ref=>{
+  if(ref.sha256!==undefined)ref=formZone.qualify(ref)??surface.qualify(ref)??tools.qualifyReference(ref);
+  const physical=readCheckerOwnerMember(root,ref.path),raw=read(ref.path);assert.ok(Buffer.isBuffer(raw));assert.ok(raw.equals(physical),'noncurrent browser source '+ref.path);
+  assert.ok(physical.equals(readCheckerOwnerMember(root,ref.path)),'browser source changed during callback '+ref.path);
   if(ref.sha256)assert.equal(hash(raw),ref.sha256,'changed browser source '+ref.path);
   if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);
   bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return raw;
@@ -53,9 +58,11 @@ export function inspectBrowserReferenceSource({root,read=path=>readCheckerOwnerM
  for(const row of packet.transitions){
   const old=original(root,row.before.commit,row.path);assert.equal(hash(old),row.before.sha256);assert.equal(old.length,row.before.bytes);
   assert.ok(gunzipSync(member(row.before.capture)).equals(old),'capture differs from untouched Git source');
-  const zoneTransition=row.path===zone.after.path;
-  const current=zoneTransition?original(root,packet.source_parent,row.path):member(row.after);
+  const zoneTransition=row.path===zone.after.path,surfaceTransition=row.path===surface.after.path,formTransition=row.path===formZone.after.path;
+  const current=zoneTransition||surfaceTransition||formTransition?original(root,packet.source_parent,row.path):member(row.after);
   if(zoneTransition){assert.deepEqual(row.after,zone.before);assert.equal(hash(current),zone.before.sha256);assert.equal(current.length,zone.before.bytes);zone.assertCurrent();}
+  else if(surfaceTransition){assert.deepEqual(row.after,surface.before);assert.equal(hash(current),surface.before.sha256);assert.equal(current.length,surface.before.bytes);member(surface.after);surface.assertCurrent();}
+  else if(formTransition){assert.deepEqual(row.after,formZone.before);assert.equal(hash(current),formZone.before.sha256);assert.equal(current.length,formZone.before.bytes);member(formZone.after);formZone.assertCurrent();}
   else assert.ok(original(root,packet.source_parent,row.path).equals(current),'current source differs from reviewed parent');
   let expected=old.toString();for(const edit of row.literal_edits){assert.equal(expected.split(edit.before).length,2,'ambiguous browser source edit');expected=expected.replace(edit.before,edit.after);}
   assert.equal(current.toString(),expected,'unreviewed browser helper transition');
@@ -94,8 +101,8 @@ export function inspectBrowserReferenceSource({root,read=path=>readCheckerOwnerM
  const census=JSON.parse(member(packet.raw_source_census));
  assert.deepEqual(derived.sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b))),census.rows.slice().sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b))));
  assert.equal(derived.length,line==='main'?18:16);assert.equal(totalHunks,23);
- const assertCurrent=()=>{zone.assertCurrent();tools.assertCurrent();for(const ref of bound.values()){
-  const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late browser source '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(readCheckerOwnerMember(root,ref.path)),'late physical browser source '+ref.path);
- }zone.assertPhysical();};
- assertCurrent();return {bound:structuredClone([...bound.values()]),assertCurrent,assertZonePhysical:zone.assertPhysical,report:{schema_version:1,line,result:'pass',analysis_node:process.version,analysis_typescript:ts.version,complete_source_transitions:4,individually_reviewed_hunks:totalHunks,selected_references:derived.length,transitions:summaries,current_physical_ledger_sha256:hash(currentLedger),current_physical_ledger_bytes:currentLedger.length,current_ledger_equals_reviewed_cohort:currentLedger.equals(priorLedger),canonical_frame_admission_granted:false,old_programs_executed:false,canonical_dispositions_changed:0,product_changes:0,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};
+ const assertCurrent=()=>{zone.assertCurrent();surface.assertCurrent();formZone.assertCurrent();tools.assertCurrent();for(const ref of bound.values()){
+  const physical=readCheckerOwnerMember(root,ref.path),raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late browser source '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(physical),'late physical browser source '+ref.path);assert.ok(physical.equals(readCheckerOwnerMember(root,ref.path)),'late browser source changed during callback '+ref.path);
+ }zone.assertPhysical();surface.assertPhysical();formZone.assertPhysical();};
+ assertCurrent();return {bound:structuredClone([...bound.values()]),assertCurrent,assertZonePhysical:zone.assertPhysical,assertSurfacePhysical:surface.assertPhysical,assertFormPhysical:formZone.assertPhysical,qualifySurfaceReference:surface.qualify,qualifyFormReference:formZone.qualify,surfaceBefore:{...surface.before},formBefore:{...formZone.before},report:{schema_version:1,line,result:'pass',analysis_node:process.version,analysis_typescript:ts.version,complete_source_transitions:4,individually_reviewed_hunks:totalHunks,selected_references:derived.length,transitions:summaries,current_physical_ledger_sha256:hash(currentLedger),current_physical_ledger_bytes:currentLedger.length,current_ledger_equals_reviewed_cohort:currentLedger.equals(priorLedger),canonical_frame_admission_granted:false,old_programs_executed:false,canonical_dispositions_changed:0,product_changes:0,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};
 }

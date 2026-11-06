@@ -1,0 +1,443 @@
+{
+  "schema_version": 1,
+  "role": "four-browser-zone-runtime-source-successors",
+  "old_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "native_or_full_audit_qualified": false,
+  "lines": {
+    "21.x": {
+      "checkpoint": "1acdae0058291217be7121f228f48983ebb7889a",
+      "transition_packet_sha256": "d67a40842eed84850828523b6b5389941284a55ea65b22a04b9362fe2beee2ad",
+      "files": [
+        {
+          "path": "scripts/browser-dialog-escape.mjs",
+          "before_sha256": "7fd8534b32cffb9d67cb31f3082edceb8cd711c8984854c6f1b333d531497038",
+          "before_bytes": 25839,
+          "after_sha256": "34a443affc280dcc7500cfb08fd56755f1ee0d1305bf32d4fa62f01f6f3c9c13",
+          "after_bytes": 26696,
+          "edits": [
+            {
+              "offset": 5178,
+              "before": "`}import {CSP_NONCE, ChangeDetectionStrategy, Component, NgModule, TemplateRef, ViewChild, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';\n",
+              "after": "`}import {CSP_NONCE, ChangeDetectionStrategy, Component, NgModule, NgZone, TemplateRef, ViewChild, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection'}} from '@angular/core';\n"
+            },
+            {
+              "offset": 6249,
+              "before": "",
+              "after": "  readonly angularZoneEntered = (() => { const zone = inject(NgZone); const entered = zone.run(() => NgZone.isInAngularZone()); (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = entered; return entered; })();\n"
+            },
+            {
+              "offset": 7100,
+              "before": "platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {\n",
+              "after": "platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}'}).catch(err => {\n"
+            },
+            {
+              "offset": 13532,
+              "before": "",
+              "after": "  let cspAngularZoneEntered = null;\n"
+            },
+            {
+              "offset": 14011,
+              "before": "",
+              "after": "    cspAngularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');\n"
+            },
+            {
+              "offset": 14708,
+              "before": "  const nonceClean = cspOpened && stylesWithNonce > 0 && nonceViolations.length === 0;\n",
+              "after": "  const nonceClean = cspError === null && cspOpened && stylesWithNonce > 0 && nonceViolations.length === 0;\n"
+            },
+            {
+              "offset": 15272,
+              "before": "",
+              "after": "    angular_zone_entered: cspAngularZoneEntered,\n"
+            },
+            {
+              "offset": 15866,
+              "before": "  if (!missingDetected || !nonceClean) process.exit(1);\n",
+              "after": "  if (!missingDetected || !nonceClean || cspAngularZoneEntered !== !zoneless) process.exit(1);\n"
+            },
+            {
+              "offset": 16284,
+              "before": "",
+              "after": "let angularZoneEntered = null;\n"
+            },
+            {
+              "offset": 17211,
+              "before": "",
+              "after": "  angularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');\n"
+            },
+            {
+              "offset": 23715,
+              "before": "",
+              "after": "  angular_zone_entered: angularZoneEntered,\n"
+            },
+            {
+              "offset": 25491,
+              "before": "const zoneOk = zoneless ? zoneGlobal === 'undefined' && bundleHasZone === false : true;\n",
+              "after": "const zoneOk = zoneless ? zoneGlobal === 'undefined' && bundleHasZone === false && angularZoneEntered === false : zoneGlobal === 'function' && bundleHasZone === true && angularZoneEntered === true;\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/browser-overlay-families.mjs",
+          "before_sha256": "fe795ab1fa627aa32d68d7c480923b8445cea0ea651598429a248b1c84c69f35",
+          "before_bytes": 26151,
+          "after_sha256": "0ac1732c4ed2806aaaef6b3e50a3909ab5e9fbefc127e3673a4892db83b1de62",
+          "after_bytes": 26782,
+          "edits": [
+            {
+              "offset": 5892,
+              "before": "`}import {Component, Directive, NgModule, TemplateRef, ViewChild, ViewContainerRef, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';\n",
+              "after": "`}import {Component, Directive, NgModule, NgZone, TemplateRef, ViewChild, ViewContainerRef, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection'}} from '@angular/core';\n"
+            },
+            {
+              "offset": 8841,
+              "before": "",
+              "after": "  readonly angularZoneEntered = (() => { const zone = inject(NgZone); const entered = zone.run(() => NgZone.isInAngularZone()); (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = entered; return entered; })();\n"
+            },
+            {
+              "offset": 9560,
+              "before": "platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {\n",
+              "after": "platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}'}).catch(err => {\n"
+            },
+            {
+              "offset": 15696,
+              "before": "",
+              "after": "let angularZoneEntered = null;\n"
+            },
+            {
+              "offset": 22831,
+              "before": "",
+              "after": "  angularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');\n"
+            },
+            {
+              "offset": 23274,
+              "before": "  ? (zoneGlobal === 'undefined' && bundleHasZone === false)\n  : true;\n",
+              "after": "  ? (zoneGlobal === 'undefined' && bundleHasZone === false && angularZoneEntered === false)\n  : (zoneGlobal === 'function' && bundleHasZone === true && angularZoneEntered === true);\n"
+            },
+            {
+              "offset": 24824,
+              "before": "",
+              "after": "  angular_zone_entered: angularZoneEntered,\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/browser-form-families.mjs",
+          "before_sha256": "be36cfbe1d51dbee6edd4e9a9a0dc6c3bf2b4567a3e7b6fae75c050cc51653ba",
+          "before_bytes": 20903,
+          "after_sha256": "fee6a1636db401f07f5402db9f60b9caf27cbb78b7649e3104fb484169d55a17",
+          "after_bytes": 21585,
+          "edits": [
+            {
+              "offset": 5360,
+              "before": "`}import {Component, NgModule, NgZone, ViewChild, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';\n",
+              "after": "`}import {Component, NgModule, NgZone, ViewChild, inject${zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection'}} from '@angular/core';\n"
+            },
+            {
+              "offset": 7547,
+              "before": "",
+              "after": "  readonly angularZoneEntered = (() => { const zone = inject(NgZone); const entered = zone.run(() => NgZone.isInAngularZone()); (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = entered; return entered; })();\n"
+            },
+            {
+              "offset": 7873,
+              "before": "  outlineDirection = 'ltr';\n",
+              "after": "  outlineDirection: 'ltr' | 'rtl' = 'ltr';\n"
+            },
+            {
+              "offset": 8298,
+              "before": "platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {\n",
+              "after": "platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}'}).catch(err => {\n"
+            },
+            {
+              "offset": 14295,
+              "before": "",
+              "after": "let angularZoneEntered = null;\n"
+            },
+            {
+              "offset": 18295,
+              "before": "",
+              "after": "  angularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');\n"
+            },
+            {
+              "offset": 18591,
+              "before": "  ? (zoneGlobal === 'undefined' && bundleHasZone === false)\n  : true;\n",
+              "after": "  ? (zoneGlobal === 'undefined' && bundleHasZone === false && angularZoneEntered === false)\n  : (zoneGlobal === 'function' && bundleHasZone === true && angularZoneEntered === true);\n"
+            },
+            {
+              "offset": 19626,
+              "before": "",
+              "after": "  angular_zone_entered: angularZoneEntered,\n"
+            },
+            {
+              "offset": 20804,
+              "before": "",
+              "after": "  angular_zone_entered: angularZoneEntered,\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/browser-control-families.mjs",
+          "before_sha256": "e6cb4fa2b086b6ee9e437e8f7501fc4ba274fe547a95676cbedc18ed15eb7cc3",
+          "before_bytes": 23113,
+          "after_sha256": "5fe2efe7ba7da0bdb8e884b09209b4dffcfc192c1247606fb346386946334049",
+          "after_bytes": 23752,
+          "edits": [
+            {
+              "offset": 5090,
+              "before": "`}import {Component, NgModule${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';\n",
+              "after": "`}import {Component, NgModule, NgZone, inject${zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection'}} from '@angular/core';\n"
+            },
+            {
+              "offset": 7509,
+              "before": "",
+              "after": "  readonly angularZoneEntered = (() => { const zone = inject(NgZone); const entered = zone.run(() => NgZone.isInAngularZone()); (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = entered; return entered; })();\n"
+            },
+            {
+              "offset": 8107,
+              "before": "platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {\n",
+              "after": "platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}'}).catch(err => {\n"
+            },
+            {
+              "offset": 14184,
+              "before": "",
+              "after": "let angularZoneEntered = null;\n"
+            },
+            {
+              "offset": 19160,
+              "before": "",
+              "after": "  angularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');\n"
+            },
+            {
+              "offset": 19946,
+              "before": "  ? (zoneGlobal === 'undefined' && bundleHasZone === false)\n  : true;\n",
+              "after": "  ? (zoneGlobal === 'undefined' && bundleHasZone === false && angularZoneEntered === false)\n  : (zoneGlobal === 'function' && bundleHasZone === true && angularZoneEntered === true);\n"
+            },
+            {
+              "offset": 21037,
+              "before": "",
+              "after": "  angular_zone_entered: angularZoneEntered,\n"
+            }
+          ]
+        }
+      ]
+    },
+    "main": {
+      "checkpoint": "0d681a13389565d2416b3485ab3278f4bde2e82e",
+      "transition_packet_sha256": "d67a40842eed84850828523b6b5389941284a55ea65b22a04b9362fe2beee2ad",
+      "files": [
+        {
+          "path": "scripts/browser-dialog-escape.mjs",
+          "before_sha256": "7fd8534b32cffb9d67cb31f3082edceb8cd711c8984854c6f1b333d531497038",
+          "before_bytes": 25839,
+          "after_sha256": "34a443affc280dcc7500cfb08fd56755f1ee0d1305bf32d4fa62f01f6f3c9c13",
+          "after_bytes": 26696,
+          "edits": [
+            {
+              "offset": 5178,
+              "before": "`}import {CSP_NONCE, ChangeDetectionStrategy, Component, NgModule, TemplateRef, ViewChild, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';\n",
+              "after": "`}import {CSP_NONCE, ChangeDetectionStrategy, Component, NgModule, NgZone, TemplateRef, ViewChild, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection'}} from '@angular/core';\n"
+            },
+            {
+              "offset": 6249,
+              "before": "",
+              "after": "  readonly angularZoneEntered = (() => { const zone = inject(NgZone); const entered = zone.run(() => NgZone.isInAngularZone()); (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = entered; return entered; })();\n"
+            },
+            {
+              "offset": 7100,
+              "before": "platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {\n",
+              "after": "platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}'}).catch(err => {\n"
+            },
+            {
+              "offset": 13532,
+              "before": "",
+              "after": "  let cspAngularZoneEntered = null;\n"
+            },
+            {
+              "offset": 14011,
+              "before": "",
+              "after": "    cspAngularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');\n"
+            },
+            {
+              "offset": 14708,
+              "before": "  const nonceClean = cspOpened && stylesWithNonce > 0 && nonceViolations.length === 0;\n",
+              "after": "  const nonceClean = cspError === null && cspOpened && stylesWithNonce > 0 && nonceViolations.length === 0;\n"
+            },
+            {
+              "offset": 15272,
+              "before": "",
+              "after": "    angular_zone_entered: cspAngularZoneEntered,\n"
+            },
+            {
+              "offset": 15866,
+              "before": "  if (!missingDetected || !nonceClean) process.exit(1);\n",
+              "after": "  if (!missingDetected || !nonceClean || cspAngularZoneEntered !== !zoneless) process.exit(1);\n"
+            },
+            {
+              "offset": 16284,
+              "before": "",
+              "after": "let angularZoneEntered = null;\n"
+            },
+            {
+              "offset": 17211,
+              "before": "",
+              "after": "  angularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');\n"
+            },
+            {
+              "offset": 23715,
+              "before": "",
+              "after": "  angular_zone_entered: angularZoneEntered,\n"
+            },
+            {
+              "offset": 25491,
+              "before": "const zoneOk = zoneless ? zoneGlobal === 'undefined' && bundleHasZone === false : true;\n",
+              "after": "const zoneOk = zoneless ? zoneGlobal === 'undefined' && bundleHasZone === false && angularZoneEntered === false : zoneGlobal === 'function' && bundleHasZone === true && angularZoneEntered === true;\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/browser-overlay-families.mjs",
+          "before_sha256": "fe795ab1fa627aa32d68d7c480923b8445cea0ea651598429a248b1c84c69f35",
+          "before_bytes": 26151,
+          "after_sha256": "0ac1732c4ed2806aaaef6b3e50a3909ab5e9fbefc127e3673a4892db83b1de62",
+          "after_bytes": 26782,
+          "edits": [
+            {
+              "offset": 5892,
+              "before": "`}import {Component, Directive, NgModule, TemplateRef, ViewChild, ViewContainerRef, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';\n",
+              "after": "`}import {Component, Directive, NgModule, NgZone, TemplateRef, ViewChild, ViewContainerRef, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection'}} from '@angular/core';\n"
+            },
+            {
+              "offset": 8841,
+              "before": "",
+              "after": "  readonly angularZoneEntered = (() => { const zone = inject(NgZone); const entered = zone.run(() => NgZone.isInAngularZone()); (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = entered; return entered; })();\n"
+            },
+            {
+              "offset": 9560,
+              "before": "platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {\n",
+              "after": "platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}'}).catch(err => {\n"
+            },
+            {
+              "offset": 15696,
+              "before": "",
+              "after": "let angularZoneEntered = null;\n"
+            },
+            {
+              "offset": 22831,
+              "before": "",
+              "after": "  angularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');\n"
+            },
+            {
+              "offset": 23274,
+              "before": "  ? (zoneGlobal === 'undefined' && bundleHasZone === false)\n  : true;\n",
+              "after": "  ? (zoneGlobal === 'undefined' && bundleHasZone === false && angularZoneEntered === false)\n  : (zoneGlobal === 'function' && bundleHasZone === true && angularZoneEntered === true);\n"
+            },
+            {
+              "offset": 24824,
+              "before": "",
+              "after": "  angular_zone_entered: angularZoneEntered,\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/browser-form-families.mjs",
+          "before_sha256": "be36cfbe1d51dbee6edd4e9a9a0dc6c3bf2b4567a3e7b6fae75c050cc51653ba",
+          "before_bytes": 20903,
+          "after_sha256": "fee6a1636db401f07f5402db9f60b9caf27cbb78b7649e3104fb484169d55a17",
+          "after_bytes": 21585,
+          "edits": [
+            {
+              "offset": 5360,
+              "before": "`}import {Component, NgModule, NgZone, ViewChild, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';\n",
+              "after": "`}import {Component, NgModule, NgZone, ViewChild, inject${zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection'}} from '@angular/core';\n"
+            },
+            {
+              "offset": 7547,
+              "before": "",
+              "after": "  readonly angularZoneEntered = (() => { const zone = inject(NgZone); const entered = zone.run(() => NgZone.isInAngularZone()); (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = entered; return entered; })();\n"
+            },
+            {
+              "offset": 7873,
+              "before": "  outlineDirection = 'ltr';\n",
+              "after": "  outlineDirection: 'ltr' | 'rtl' = 'ltr';\n"
+            },
+            {
+              "offset": 8298,
+              "before": "platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {\n",
+              "after": "platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}'}).catch(err => {\n"
+            },
+            {
+              "offset": 14295,
+              "before": "",
+              "after": "let angularZoneEntered = null;\n"
+            },
+            {
+              "offset": 18295,
+              "before": "",
+              "after": "  angularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');\n"
+            },
+            {
+              "offset": 18591,
+              "before": "  ? (zoneGlobal === 'undefined' && bundleHasZone === false)\n  : true;\n",
+              "after": "  ? (zoneGlobal === 'undefined' && bundleHasZone === false && angularZoneEntered === false)\n  : (zoneGlobal === 'function' && bundleHasZone === true && angularZoneEntered === true);\n"
+            },
+            {
+              "offset": 19626,
+              "before": "",
+              "after": "  angular_zone_entered: angularZoneEntered,\n"
+            },
+            {
+              "offset": 20804,
+              "before": "",
+              "after": "  angular_zone_entered: angularZoneEntered,\n"
+            }
+          ]
+        },
+        {
+          "path": "scripts/browser-control-families.mjs",
+          "before_sha256": "e6cb4fa2b086b6ee9e437e8f7501fc4ba274fe547a95676cbedc18ed15eb7cc3",
+          "before_bytes": 23113,
+          "after_sha256": "5fe2efe7ba7da0bdb8e884b09209b4dffcfc192c1247606fb346386946334049",
+          "after_bytes": 23752,
+          "edits": [
+            {
+              "offset": 5090,
+              "before": "`}import {Component, NgModule${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';\n",
+              "after": "`}import {Component, NgModule, NgZone, inject${zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection'}} from '@angular/core';\n"
+            },
+            {
+              "offset": 7509,
+              "before": "",
+              "after": "  readonly angularZoneEntered = (() => { const zone = inject(NgZone); const entered = zone.run(() => NgZone.isInAngularZone()); (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = entered; return entered; })();\n"
+            },
+            {
+              "offset": 8107,
+              "before": "platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {\n",
+              "after": "platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}'}).catch(err => {\n"
+            },
+            {
+              "offset": 14184,
+              "before": "",
+              "after": "let angularZoneEntered = null;\n"
+            },
+            {
+              "offset": 19160,
+              "before": "",
+              "after": "  angularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');\n"
+            },
+            {
+              "offset": 19946,
+              "before": "  ? (zoneGlobal === 'undefined' && bundleHasZone === false)\n  : true;\n",
+              "after": "  ? (zoneGlobal === 'undefined' && bundleHasZone === false && angularZoneEntered === false)\n  : (zoneGlobal === 'function' && bundleHasZone === true && angularZoneEntered === true);\n"
+            },
+            {
+              "offset": 21037,
+              "before": "",
+              "after": "  angular_zone_entered: angularZoneEntered,\n"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
