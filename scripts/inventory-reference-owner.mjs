@@ -100,7 +100,7 @@ export function titleMeasurementSourceReferences({root,read,scope}={}){
  subject.assertCurrent();return [...refs,...provenance.map(ref=>({...ref}))];
 }
 /** Fresh focused orchestration checks, never an Actions or product result. */
-function verifyCurrentWorkflow(root){
+function verifyCurrentWorkflow(root,workflow){
  const program=`import contextlib,io,json,sys,unittest
 from pathlib import Path
 root=Path.cwd();sys.path.insert(0,str(root));log=io.StringIO()
@@ -122,7 +122,14 @@ if report['result']!='pass':sys.stderr.write(log.getvalue());sys.exit(1)
  const result=JSON.parse(execFileSync('python3',['-B','-c',program],{cwd:root,encoding:'utf8',maxBuffer:1024*1024,timeout:120000}));
  assert.equal(result.result,'pass');assert.equal(result.tests_run,14);assert.equal(result.test_ids.length,14);
  assert.equal(new Set(result.test_ids).size,14);assert.equal(result.skipped,0);assert.equal(result.full_Actions_execution_qualified,false);
- return result;
+ const source_regressions=workflow.source_test_expectations.map(expected=>{
+  const output=JSON.parse(execFileSync(process.execPath,[expected.path],{cwd:root,encoding:'utf8',maxBuffer:1024*1024,timeout:120000}));
+  assert.equal(output.cases,expected.cases,'current CI source cases changed '+expected.path);
+  assert.equal(output.mutants_rejected,expected.mutants_rejected,'current CI source mutants changed '+expected.path);
+  assert.equal(output.node,process.version);
+  return {path:expected.path,cases:output.cases,mutants_rejected:output.mutants_rejected,source_only:true};
+ });
+ return {...result,source_regressions,full_Actions_execution_qualified:false};
 }
 export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwnerMember(root,path)}={}){
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version;
@@ -172,7 +179,11 @@ export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwner
  for(const[raw,ref]of [[oldWorkflow,workflow.before],[newWorkflow,workflow.after]]){
   assert.equal(ref.path,workflow.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);
  }
- assert.ok(read(workflow.path).equals(newWorkflow));
+ assert.deepEqual(tool.workflow.before,workflow.after);
+ const currentWorkflowRef=tool.workflow.current,currentWorkflow=read(workflow.path);
+ assert.equal(currentWorkflowRef.path,workflow.path);assert.equal(hash(currentWorkflow),currentWorkflowRef.sha256);
+ assert.equal(currentWorkflow.length,currentWorkflowRef.bytes);
+ assert.ok(currentWorkflow.equals(readEvidenceMember(root,workflow.path)),'nonphysical current workflow');
  const qualifiedCI=JSON.parse(member(workflow.qualified_transition.path,workflow.qualified_transition.sha256));
  assert.equal(qualifiedCI.source_parent,workflow.before_parent);assert.equal(qualifiedCI.line,line);
  for(const flag of ['actual_Actions_run_executed','full_helper_suite_executed','full_product_native_packed_browser_peer_floor_or_independent_audit_qualified'])assert.equal(qualifiedCI[flag],false);
@@ -207,7 +218,7 @@ export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwner
  const metadataRead=path=>{
   const handler=historicalHandlers.get(path);if(handler){assert.equal(hash(read(path)),handler.after.sha256,'changed current title handler');return Buffer.from(handler.before);}
   if(path===INVENTORY){assert.equal(hash(read(path)),packet.current_inventory.sha256,'changed current inventory metadata');return Buffer.from(oldInventory);}
-  if(path===workflow.path){assert.equal(hash(read(path)),workflow.after.sha256,'changed current workflow');return Buffer.from(oldWorkflow);}
+  if(path===workflow.path){assert.equal(hash(read(path)),currentWorkflowRef.sha256,'changed current workflow');return Buffer.from(oldWorkflow);}
   if(path===OWNER&&line==='main'){const current=read(path);assert.equal(hash(current),packet.after_owner.sha256,'changed current owner code');return current;}
   if(path===LEDGER){const raw=read(path);assert.equal(hash(raw),hash(currentLedger),'late canonical metadata image change');return applied?Buffer.from(source.before):raw;}
   return read(path);
@@ -231,7 +242,7 @@ export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwner
    inventory_reference_stage:stage,native_spec_source:{...native,bound:nativeBound,assertCurrent:()=>{assertCurrent();native.assertCurrent();assertCurrent();}},
    prior_metadata_assert_current:assertPrior,assertCurrent:assertPrior}));
  }
- assertCurrent();const currentWorkflowTests=verifyCurrentWorkflow(root);assertCurrent();
+ assertCurrent();const currentWorkflowTests=verifyCurrentWorkflow(root,tool.workflow);assertCurrent();
  historicalMetadataReaders.add(metadataRead);
  return {line,metadataRead,wrapPrepared,assertCurrent,applied,checker,browser,metadata_entries:packet.metadata_entries,current_workflow_tests:structuredClone(currentWorkflowTests),
   before:Buffer.from(source.before),after:Buffer.from(source.after),bound:structuredClone([...bound.values()]),

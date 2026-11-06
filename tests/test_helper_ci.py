@@ -211,7 +211,16 @@ class HelperCiTests(unittest.TestCase):
         original = subprocess.check_output(['git', '--no-replace-objects', 'show', parent + ':.github/workflows/ci.yml'], cwd=ROOT, text=True)
         current = (ROOT / '.github/workflows/ci.yml').read_text()
         self.assertEqual(current.split('jobs:\n')[0], original.split('jobs:\n')[0])
-        self.assertEqual(current.split('  packed-consumer-aot:\n')[1], original.split('  packed-consumer-aot:\n')[1])
+        source_regressions = (
+            '      - name: Dialog focus and motion source lifecycle regressions\n'
+            '        run: |\n'
+            '          just chainman exec -- node scripts/dialog-initial-focus-source-test.mjs\n'
+            '          just chainman exec -- node scripts/dialog-motion-source-test.mjs\n'
+            '\n'
+        )
+        self.assertEqual(current.count(source_regressions), 1)
+        self.assertEqual(current.split('  packed-consumer-aot:\n')[1].replace(source_regressions, ''),
+                         original.split('  packed-consumer-aot:\n')[1])
         helper = current.split('  packed-consumer-aot:\n')[0]
         old_required = original.split('  helper-checks:\n')[1].split('    name: ')[1].splitlines()[0]
         gate = helper.split('  helper-checks:\n')[1]
