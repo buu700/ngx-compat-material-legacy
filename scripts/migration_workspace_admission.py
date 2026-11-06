@@ -1,8 +1,18 @@
+# Copyright Google LLC All Rights Reserved.
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.dev/license
+# Copyright (c) 2026 Ryan Lester.
+
 """The old-workspace route admits only packed migration plus the upgraded consumer."""
 import hashlib
+import gzip
+import io
+from pathlib import PurePosixPath
 import json
 import re
-from rc_acceptance import EvidenceError, assertion_directory, checked_file
+import tarfile
+import zlib
+from rc_acceptance import EvidenceError, assertion_directory, checked_file, contained_file
 from consumer_floor_admission import ENGINE_PACKAGE, ENGINE_ENTRY, HEX
 
 SUPPORT_FILES = dict(application='application.ts',styles='styles.scss',css='css.css',package='package.json',
@@ -65,6 +75,37 @@ def old_workspace_ids(root):
     catalog=json.loads((root/'fixtures/migration/cases.json').read_text())
     return {c['id']:c for c in catalog['cases'] if isinstance(c.get('expected_after'),str) and c['expected_after']!=c['before'] and c.get('expect_ok') is not False}
 
+CLI_FILES=['package/package.json','package/bin/migrate-legacy.js','package/lib/ts-rewrite.js',
+           'package/lib/sass-rewrite.js','package/lib/transaction-write.js','package/LICENSE']
+
+def cli_archive_identities(active, artifact):
+    # Match safe-package-extract's CLI bounds and validate the authenticated bytes,
+    # including all members, before reading any selected file.
+    max_files=1000; max_bytes=10*1024*1024; raw_limit=max_bytes+max_files*1024
+    path=contained_file(active.run_dir,artifact['path'])
+    if path.stat().st_size > raw_limit: raise ValueError('oversized archive')
+    with path.open('rb') as stream: data=stream.read(raw_limit+1)
+    if len(data)>raw_limit or len(data)!=artifact['bytes'] or hashlib.sha256(data).hexdigest()!=artifact['sha256']:raise ValueError('artifact identity')
+    with gzip.GzipFile(fileobj=io.BytesIO(data)) as stream: raw=stream.read(raw_limit+1)
+    if len(raw)>raw_limit:raise ValueError('oversized decompressed archive')
+    with tarfile.open(fileobj=io.BytesIO(raw),mode='r:') as archive:
+        members=archive.getmembers();seen=set();total=0;selected={}
+        if not members or len(members)>max_files:raise ValueError('member count')
+        for member in members:
+            path=PurePosixPath(member.name); normalized=path.as_posix()
+            if (path.is_absolute() or '..' in path.parts or not path.parts or path.parts[0]!='package'
+                or chr(92) in member.name or normalized!=member.name.rstrip('/') or normalized in seen
+                or not (member.isdir() or member.isfile())):raise ValueError('unsafe member')
+            seen.add(normalized);total+=member.size
+            if member.size<0 or total>max_bytes:raise ValueError('package size')
+            if normalized in CLI_FILES:
+                if not member.isfile():raise ValueError('nonregular support file')
+                payload=archive.extractfile(member).read()
+                if len(payload)!=member.size:raise ValueError('incomplete support file')
+                selected[normalized]=dict(path=normalized,bytes=len(payload),sha256=hashlib.sha256(payload).hexdigest())
+        if set(selected)!=set(CLI_FILES):raise ValueError('missing support file')
+        return [selected[name] for name in CLI_FILES]
+
 def old_workspace_assertion_ok(root,active,body,invocation):
     try:
         fixtures=old_workspace_ids(root)
@@ -77,8 +118,12 @@ def old_workspace_assertion_ok(root,active,body,invocation):
         provenance=json.loads((root/'reference/material-16.2.14/PROVENANCE.json').read_text())
         if body['material_manifest_sha256']!=provenance['isolated_environment']['material_manifest_sha256']:return False
         identities=[body['cli'],*body['cli_support']]
+        if body['cli']['path']!='package/bin/migrate-legacy.js':return False
         if {i['path'] for i in identities}!={'package/package.json','package/bin/migrate-legacy.js','package/lib/ts-rewrite.js','package/lib/sass-rewrite.js','package/lib/transaction-write.js','package/LICENSE'} or len(identities)!=6:return False
         if any(not re.fullmatch(r'[0-9a-f]{64}',i['sha256']) or type(i['bytes']) is not int or i['bytes']<1 for i in identities):return False
+        cli_artifact=next(a for a in active.manifest['artifacts'] if a['id']=='migrate-cli')
+        expected=cli_archive_identities(active,cli_artifact)
+        if {i['path']:(i['sha256'],i['bytes']) for i in identities}!={i['path']:(i['sha256'],i['bytes']) for i in expected}:return False
         upgraded=body['upgraded_consumer']
         if any(upgraded.get(k)!=v for k,v in dict(result='pass',line=line,library_sha256=artifacts['library'],cli_sha256=artifacts['migrate-cli'],strict_templates=True,skip_lib_check=False).items()):return False
         tools=json.loads((root/'toolchain-lock.json').read_text())
@@ -98,4 +143,4 @@ def old_workspace_assertion_ok(root,active,body,invocation):
             for k in ('before','after'):
                 if body[k+'_sha256']!=hashlib.sha256(body[k].encode()).hexdigest():return False
         return True
-    except (KeyError,ValueError,TypeError,OSError,EvidenceError,AttributeError):return False
+    except (KeyError,ValueError,TypeError,OSError,EvidenceError,AttributeError,StopIteration,EOFError,tarfile.TarError,zlib.error):return False
