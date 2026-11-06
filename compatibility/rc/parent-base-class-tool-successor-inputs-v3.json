@@ -1608,14 +1608,24 @@
           },
           "after": {
             "path": "tests/test_browser_reference_proposal.py",
-            "sha256": "6af6decd44ecdfb7861b4fcf9f4ae66602403bc26c7621158136541fa936a407",
-            "bytes": 3283
+            "sha256": "269e66d49932df04570bf5e255aa11d77690a077f950ff356a6af944ac5c006d",
+            "bytes": 3869
           },
           "edits": [
             {
+              "offset": 255,
+              "before": "import json,os,subprocess,unittest\n",
+              "after": "import hashlib,json,os,subprocess,unittest\n"
+            },
+            {
               "offset": 463,
               "before": "        child=subprocess.run(['python3','-B','tests/browser_reference_independent.py'],cwd=ROOT,capture_output=True,text=True,timeout=180)\n",
-              "after": "        child=subprocess.run(['python3','-B','tests/browser_reference_independent.py'],cwd=ROOT,capture_output=True,text=True,timeout=300)\n"
+              "after": "        child=subprocess.run(['python3','-B','tests/browser_reference_independent.py','--metadata'],cwd=ROOT,capture_output=True,text=True,timeout=300)\n"
+            },
+            {
+              "offset": 1394,
+              "before": "        self.assertTrue(report['canonical_ledger_unchanged']);self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified'])\n",
+              "after": "        self.assertTrue(report['canonical_ledger_unchanged']);self.assertEqual(report['source_execution_mode'],'source-metadata');self.assertFalse(report['current_canonical_frame_verified']);self.assertFalse(report['canonical_frame_admission_granted']);self.assertFalse(report['canonical_owner_integration_complete']);self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified']);self.assertEqual(report['g11_claim'],'not-passed')\n        ledger=(ROOT/'compatibility/f10/disposition-ledger/ledger.json').read_bytes()\n        self.assertEqual(report['current_physical_ledger_sha256'],hashlib.sha256(ledger).hexdigest());self.assertEqual(report['current_physical_ledger_bytes'],len(ledger))\n"
             }
           ]
         },
@@ -2343,8 +2353,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "6c5fe77c92d9c90268ee58de38d8fe4798faabe26b5b19bf46334f3eb7fab049",
-          "bytes": 29065
+          "sha256": "8e0c76414e0ccc8a5802d61a035f71f787a252493db0ad5148cb39fb24c17a16",
+          "bytes": 29275
         },
         {
           "path": "tests/test_checker_reference_proposal.py",
@@ -2660,6 +2670,21 @@
           "path": "tests/legacy_static_reference_batch_runner.py",
           "sha256": "480c611223230e2381de8bfdb8329754b56bb351d294b2bc825bdcd47d2ea612",
           "bytes": 2966
+        },
+        {
+          "path": "tests/browser_reference_independent.py",
+          "sha256": "ca9506ee6d9c9a67095021bebb3ff64300804533e15212181b9951c8cbe31651",
+          "bytes": 8492
+        },
+        {
+          "path": "tests/browser_reference_independent_support.py",
+          "sha256": "940cc5a7f6ab6f59c2dfcae1c98bd8084d9e4df725364bd6b60dd09d79f292f5",
+          "bytes": 5084
+        },
+        {
+          "path": "tests/test_browser_reference_independent_metadata.py",
+          "sha256": "5a9697ad0e2ebb663c7f05024914db96713d69ef2d9cd529b69639f829aa0826",
+          "bytes": 5839
         }
       ]
     },
@@ -3280,14 +3305,24 @@
           },
           "after": {
             "path": "tests/test_browser_reference_proposal.py",
-            "sha256": "6af6decd44ecdfb7861b4fcf9f4ae66602403bc26c7621158136541fa936a407",
-            "bytes": 3283
+            "sha256": "269e66d49932df04570bf5e255aa11d77690a077f950ff356a6af944ac5c006d",
+            "bytes": 3869
           },
           "edits": [
             {
+              "offset": 255,
+              "before": "import json,os,subprocess,unittest\n",
+              "after": "import hashlib,json,os,subprocess,unittest\n"
+            },
+            {
               "offset": 463,
               "before": "        child=subprocess.run(['python3','-B','tests/browser_reference_independent.py'],cwd=ROOT,capture_output=True,text=True,timeout=180)\n",
-              "after": "        child=subprocess.run(['python3','-B','tests/browser_reference_independent.py'],cwd=ROOT,capture_output=True,text=True,timeout=300)\n"
+              "after": "        child=subprocess.run(['python3','-B','tests/browser_reference_independent.py','--metadata'],cwd=ROOT,capture_output=True,text=True,timeout=300)\n"
+            },
+            {
+              "offset": 1394,
+              "before": "        self.assertTrue(report['canonical_ledger_unchanged']);self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified'])\n",
+              "after": "        self.assertTrue(report['canonical_ledger_unchanged']);self.assertEqual(report['source_execution_mode'],'source-metadata');self.assertFalse(report['current_canonical_frame_verified']);self.assertFalse(report['canonical_frame_admission_granted']);self.assertFalse(report['canonical_owner_integration_complete']);self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified']);self.assertEqual(report['g11_claim'],'not-passed')\n        ledger=(ROOT/'compatibility/f10/disposition-ledger/ledger.json').read_bytes()\n        self.assertEqual(report['current_physical_ledger_sha256'],hashlib.sha256(ledger).hexdigest());self.assertEqual(report['current_physical_ledger_bytes'],len(ledger))\n"
             }
           ]
         },
@@ -3430,8 +3465,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "6c5fe77c92d9c90268ee58de38d8fe4798faabe26b5b19bf46334f3eb7fab049",
-          "bytes": 29065
+          "sha256": "8e0c76414e0ccc8a5802d61a035f71f787a252493db0ad5148cb39fb24c17a16",
+          "bytes": 29275
         },
         {
           "path": "tests/test_checker_reference_proposal.py",
@@ -3637,6 +3672,21 @@
           "path": "tests/tabs_finite_source_successor_runner.py",
           "sha256": "d5160e853261fc0f41e3b12029749f33b6e6286fdb541ffc3770581a7ee22599",
           "bytes": 2387
+        },
+        {
+          "path": "tests/browser_reference_independent.py",
+          "sha256": "ca9506ee6d9c9a67095021bebb3ff64300804533e15212181b9951c8cbe31651",
+          "bytes": 8492
+        },
+        {
+          "path": "tests/browser_reference_independent_support.py",
+          "sha256": "940cc5a7f6ab6f59c2dfcae1c98bd8084d9e4df725364bd6b60dd09d79f292f5",
+          "bytes": 5084
+        },
+        {
+          "path": "tests/test_browser_reference_independent_metadata.py",
+          "sha256": "5a9697ad0e2ebb663c7f05024914db96713d69ef2d9cd529b69639f829aa0826",
+          "bytes": 5839
         }
       ]
     }

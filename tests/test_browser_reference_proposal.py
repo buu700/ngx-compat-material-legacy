@@ -3,11 +3,11 @@
 # Use of this source code is governed by the MIT license in LICENSE.
 """Independent full-image derivation and real source/proposal failure controls."""
 from pathlib import Path
-import json,os,subprocess,unittest
+import hashlib,json,os,subprocess,unittest
 ROOT=Path(__file__).resolve().parents[1]
 class BrowserReferenceProposalTests(unittest.TestCase):
     def test_independent_python_token_splice_and_protected_canonical(self):
-        child=subprocess.run(['python3','-B','tests/browser_reference_independent.py'],cwd=ROOT,capture_output=True,text=True,timeout=300)
+        child=subprocess.run(['python3','-B','tests/browser_reference_independent.py','--metadata'],cwd=ROOT,capture_output=True,text=True,timeout=300)
         self.assertEqual(child.returncode,0,(child.stdout+child.stderr)[-8000:]);report=json.loads(child.stdout)
         packet=json.loads((ROOT/'compatibility/rc/c04-browser-reference-proposal.json').read_bytes())
         self.assertEqual(report['independent_after_sha256'],packet['after_ledger']['sha256'])
@@ -16,7 +16,9 @@ class BrowserReferenceProposalTests(unittest.TestCase):
         self.assertEqual(report['selected_entries'],packet['selected_entries'])
         self.assertEqual(report['unselected_entry_bytes_preserved'],1697-packet['selected_entries'])
         self.assertEqual(report['preserved_native_reference_count'],packet['preserved_native_reference_count'])
-        self.assertTrue(report['canonical_ledger_unchanged']);self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified'])
+        self.assertTrue(report['canonical_ledger_unchanged']);self.assertEqual(report['source_execution_mode'],'source-metadata');self.assertFalse(report['current_canonical_frame_verified']);self.assertFalse(report['canonical_frame_admission_granted']);self.assertFalse(report['canonical_owner_integration_complete']);self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified']);self.assertEqual(report['g11_claim'],'not-passed')
+        ledger=(ROOT/'compatibility/f10/disposition-ledger/ledger.json').read_bytes()
+        self.assertEqual(report['current_physical_ledger_sha256'],hashlib.sha256(ledger).hexdigest());self.assertEqual(report['current_physical_ledger_bytes'],len(ledger))
         if os.environ.get('BROWSER_REFERENCE_INDEPENDENT_REPORT'):
             with Path(os.environ['BROWSER_REFERENCE_INDEPENDENT_REPORT']).open('x')as output:output.write(json.dumps(report,indent=2)+'\n')
     def test_actual_verifier_and_exact_complete_proposal_controls(self):
