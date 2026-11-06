@@ -14,7 +14,7 @@
 import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {browserPeerVersions,browserLibraryLine,readBrowserPackedPackage,browserConsumerDependencies,browserCompilerOptions} from './browser-peer-versions.mjs';
 import {createHash} from 'node:crypto';
-import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
+import {withChromium} from './check-companion-computed-styles.mjs';
 import {observeLegacyCoreHighContrast,legacyCoreHighContrastOkay} from './legacy-core-high-contrast-contract.mjs';
 import {observeRippleColorBinding,rippleColorBindingOkay} from './ripple-color-binding-observation.mjs';
 import {PEER_ICON_TT_CSP, peerIconTtOkay} from './peer-icon-tt-admission.mjs';
@@ -32,9 +32,8 @@ if (typeof globalThis.WebSocket !== 'function') {
   process.exit(relaunch.status ?? 1);
 }
 
-import {spawn, spawnSync} from 'node:child_process';
+import {spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
-import {createServer} from 'node:http';
 import {existsSync, mkdtempSync, mkdirSync, readFileSync, realpathSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {dirname, join, relative, resolve} from 'node:path';
@@ -373,94 +372,7 @@ writeFileSync(join(consumer, 'dist/index.html'),
 
 writeFileSync(join(consumer,'dist/progress.css'),progressCss);
 
-const server = createServer((req, res) => {
-  const file = req.url === '/' ? 'index.html' : req.url.split('?')[0].replace(/^\//, '');
-  try {
-    const body = readFileSync(join(consumer, 'dist', file));
-    res.writeHead(200, {
-      'content-type': file.endsWith('.js') ? 'text/javascript' : file.endsWith('.css') ? 'text/css' : 'text/html',
-      'content-security-policy': PEER_ICON_TT_CSP + "; img-src 'none'",
-    });
-    res.end(body);
-  } catch {
-    res.writeHead(404);
-    res.end();
-  }
-});
-await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-const {port} = server.address();
-const pageUrl = `http://127.0.0.1:${port}/`;
-const chromeDir = mkdtempSync(join(tmpdir(), 'ngx-compat-chrome-surface-'));
-const requestedDebugPort = Number(process.env.CDP_PORT || '0');
-let debugPort = 0;
-const chrome = spawn(chromeBin, [
-
-  '--headless=new',
-  '--remote-debugging-port=' + String(requestedDebugPort),
-  '--user-data-dir=' + chromeDir,
-  '--no-sandbox',
-  '--disable-gpu',
-  pageUrl,
-], {stdio: ['ignore', 'ignore', 'pipe']});
-let chromeLog = '';
-chrome.stderr.on('data', chunk => { chromeLog += chunk; });
-
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
-async function jsonGet(url) {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`${url} ${response.status}`);
-  return response.json();
-}
-let version = null;
-for (let i = 0; i < 50; i += 1) {
-  try {
-    const endpoint=announcedChromeEndpoint(chromeLog,requestedDebugPort);
-    if(!endpoint){await sleep(100);continue;}
-    const observed=await jsonGet(`http://127.0.0.1:${endpoint.port}/json/version`);
-    if(!debuggerMatchesChild(observed,endpoint))throw Error('debugger does not belong to the surface child');
-    version=observed;debugPort=endpoint.port;break;
-  } catch {
-    await sleep(100);
-  }
-}
-if (!version) fail(1, `Chromium did not open a debugging port\n${chromeLog.slice(-1000)}`);
-const targets = await jsonGet(`http://127.0.0.1:${debugPort}/json/list`);
-const page = targets.find(target => target.type === 'page');
-if (!page) fail(1, 'Chromium opened no page');
-const ws = new WebSocket(page.webSocketDebuggerUrl);
-await new Promise((resolve, reject) => {
-  ws.addEventListener('open', resolve);
-  ws.addEventListener('error', reject);
-});
-let nextId = 0;
-const pending = new Map();
-ws.addEventListener('message', event => {
-  const message = JSON.parse(event.data);
-  const waiter = pending.get(message.id);
-  if (!waiter) return;
-  pending.delete(message.id);
-  if (message.error) waiter.reject(new Error(JSON.stringify(message.error)));
-  else waiter.resolve(message.result);
-});
-function send(method, params = {}) {
-  const id = ++nextId;
-  return new Promise((resolve, reject) => {
-    pending.set(id, {resolve, reject});
-    ws.send(JSON.stringify({id, method, params}));
-  });
-}
-async function evaluate(expression) {
-  const result = await send('Runtime.evaluate', {expression, returnByValue: true, awaitPromise: false});
-  return result.result?.value;
-}
-async function waitFor(predicateExpr, attempts = 50, delayMs = 100) {
-  for (let i = 0; i < attempts; i += 1) {
-    if (await evaluate(predicateExpr)) return true;
-    await sleep(delayMs);
-  }
-  return false;
-}
-
 const families = {
   button: {present: false, disabled_class: false, focused: false},
   card: {present: false},
@@ -478,6 +390,21 @@ let peerFormHover = null;
 let coreHighContrast = null;
 let rippleColorBinding = null;
 let contentObserver = null;
+
+let version = null;
+await withChromium(join(consumer, 'dist'), async ({send, browser}) => {
+  version = {Browser: browser};
+  const evaluate = async (expression) => {
+    const result = await send('Runtime.evaluate', {expression, returnByValue: true, awaitPromise: false});
+    return result.result?.value;
+  };
+  const waitFor = async (predicateExpr, attempts = 50, delayMs = 100) => {
+    for (let i = 0; i < attempts; i += 1) {
+      if (await evaluate(predicateExpr)) return true;
+      await sleep(delayMs);
+    }
+    return false;
+  };
 
 try {
   await send('Runtime.enable');
@@ -677,11 +604,9 @@ try {
   angularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');
 } catch (err) {
   error = String(err);
-} finally {
-  ws.close();
-  chrome.kill();
-  server.close();
 }
+}, {debugPort: Number(process.env.CDP_PORT || '0'), chromiumArgs: [], requireAnnouncedEndpoint: true,
+  responseHeaders: {'content-security-policy': PEER_ICON_TT_CSP + "; img-src 'none'"}});
 
 const runtime = zoneless ? 'zoneless' : 'zoneful';
 const cells = [
