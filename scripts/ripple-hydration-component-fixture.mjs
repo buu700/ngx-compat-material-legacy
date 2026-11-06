@@ -60,7 +60,7 @@ export class RippleHydrationLab {
     this.nativeReplayDeliveries.push({type: event.type, path_threw,
       target_id: event.target instanceof HTMLElement ? event.target.id : '', peer_present: !!this.replayNativePeer});
   }
-  snapshot() {return {clicks: this.clicks(), deliveries: this.deliveries.map(row => ({...row})),
+  snapshot() {return {angular_zone_entered: this.zone.run(() => NgZone.isInAngularZone()), clicks: this.clicks(), deliveries: this.deliveries.map(row => ({...row})),
     native_replay_deliveries: this.nativeReplayDeliveries.map(row => ({...row})),
     actual_native_replay_peer_present: !!this.replayNativePeer,
     actual_peer_directive_present: !!this.peer, actual_owned_renderer_present: !!this.owned,

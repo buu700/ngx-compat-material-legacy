@@ -118,7 +118,7 @@ if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Libra
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
 writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js';
-`}import {Component, Directive, NgModule, TemplateRef, ViewChild, ViewContainerRef, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
+`}import {Component, Directive, NgModule, NgZone, TemplateRef, ViewChild, ViewContainerRef, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection'}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
@@ -175,6 +175,7 @@ ${snackMotionFixture}
   \`,
 })
 export class LabRoot {
+  readonly angularZoneEntered = (() => { const zone = inject(NgZone); const entered = zone.run(() => NgZone.isInAngularZone()); (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = entered; return entered; })();
   selectedValue = '';
   tipMessage = 'Hello tip';
   private snack = inject(MatLegacySnackBar);
@@ -200,7 +201,7 @@ export class LabRoot {
 })
 export class LabModule {}
 
-platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {
+platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}'}).catch(err => {
   const node = document.createElement('pre');
   node.id = 'bootstrap-error';
   node.textContent = String(err);
@@ -355,6 +356,7 @@ const families = {
 let error = null;
 let diagnostic = null;
 let zoneGlobal = null;
+let angularZoneEntered = null;
 
 try {
   await send('Runtime.enable');
@@ -481,6 +483,7 @@ try {
   families.tabs.pagination = await observeTabPaginationNative({send,evaluate,waitFor});
 
   zoneGlobal = await evaluate('typeof Zone === "undefined" ? "undefined" : typeof Zone');
+  angularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');
 } catch (err) {
   error = String(err);
 } finally {
@@ -498,8 +501,8 @@ const cells = [
   `pr/main/chromium/${runtime}/tabs/default`,
 ];
 const zoneOk = zoneless
-  ? (zoneGlobal === 'undefined' && bundleHasZone === false)
-  : true;
+  ? (zoneGlobal === 'undefined' && bundleHasZone === false && angularZoneEntered === false)
+  : (zoneGlobal === 'function' && bundleHasZone === true && angularZoneEntered === true);
 const menuClosedOk = zoneless
   ? (families.menu.closed_by_escape || families.menu.closed_by_backdrop)
   : families.menu.closed_by_escape;
@@ -530,6 +533,7 @@ const report = {
   zoneless,
   bundle_has_zone: bundleHasZone,
   zone_global: zoneGlobal,
+  angular_zone_entered: angularZoneEntered,
   families,
   credited_cell_ids: ok ? cells : [],
   matrix_updated: false,

@@ -14,7 +14,7 @@ import {publicRippleReplaySample} from '../ripple_public_replay_sample.mjs';
 import {rippleHydrationApplication} from '../../scripts/ripple-hydration-application.mjs';
 const input=host=>['mousedown','mouseup','click'].map(type=>({type,trusted:true,target_id:host}));
 const delivery=(type,replay)=>({type,path_threw:replay,target_id:'replay-peer',peer_present:true});
-const snapshot=replay=>({clicks:replay?1:2,deliveries:replay?[delivery('mousedown',true),delivery('click',true)]
+const snapshot=(replay,runtime)=>({angular_zone_entered:runtime==='zoneful',clicks:replay?1:2,deliveries:replay?[delivery('mousedown',true),delivery('click',true)]
   :[delivery('mousedown',true),delivery('click',true),delivery('mousedown',false),delivery('click',false)],
   actual_peer_directive_present:true,actual_owned_renderer_present:true,owned_ripple_launches:replay?1:2,peer_ripple_launches:replay?1:2});
 export function rippleReplayRuntimeSample(line,runtime) {
@@ -22,7 +22,7 @@ export function rippleReplayRuntimeSample(line,runtime) {
   return {runtime,dependencies:spec.dependencies,source_sha256:Object.fromEntries(Object.entries(spec.files).map(([path,source])=>[path,hash(source)])),
     lock_sha256:'c'.repeat(64),browser:{launched:true,engine:'chromium',protocol:'cdp',product:'Chrome/128.0.0.0',binary:'/synthetic/chromium',port:12345},
     server_hydration_metadata:true,before_bootstrap:true,captured_native:input('replay-peer'),ssr_button_reused:true,window_errors:[],
-    replayed:snapshot(true),live:snapshot(false),destroyed:true,remaining_ripple_nodes:0,public_peer_replay:publicRippleReplaySample(),
+    replayed:snapshot(true,runtime),live:snapshot(false,runtime),destroyed:true,remaining_ripple_nodes:0,public_peer_replay:publicRippleReplaySample(),
     native_peer_events:{phase:'fault',normal_creations:1,fault_creations:line==='main'?1:0,path_calls:1,
       normal_input:input('native-peer'),fault_input:input('native-peer'),normal_errors:[],
       fault_errors:line==='main'?[]:['Error: __PEER_COMPOSED_PATH_CONTROL__']},ok:true};

@@ -11,6 +11,7 @@ export function motionSource(zoneless) {
   }
   return raw
     .replace('/*ZONE_IMPORT*/', zoneless ? '' : "import 'zone.js';\n")
-    .replace('/*ZONE_NAMED*/', zoneless ? ', provideZonelessChangeDetection' : '')
-    .replace('/*ZONE_PROVIDER*/', zoneless ? 'provideZonelessChangeDetection(), ' : '');
+    .replace('/*ZONE_NAMED*/', zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection')
+    .replace('/*ZONE_PROVIDER*/', zoneless ? 'provideZonelessChangeDetection(), ' : '')
+    .replace('/*ZONE_BOOTSTRAP*/', zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}');
 }

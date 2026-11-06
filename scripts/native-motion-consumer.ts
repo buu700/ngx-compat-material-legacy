@@ -1,4 +1,4 @@
-/*ZONE_IMPORT*/import {Component, NgModule, ViewChild, signal/*ZONE_NAMED*/} from '@angular/core';
+/*ZONE_IMPORT*/import {Component, NgModule, NgZone, ViewChild, inject, signal/*ZONE_NAMED*/} from '@angular/core';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
@@ -95,7 +95,10 @@ export class MotionRoot {
     private snack: MatLegacySnackBar,
   ) {}
 
+  private readonly closeoutZone = inject(NgZone);
   ngAfterViewInit(): void {
+    const zone = this.closeoutZone;
+    (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = zone.run(() => NgZone.isInAngularZone());
     document.documentElement.dataset.labReady = '1';
   }
 
@@ -206,16 +209,14 @@ export class MotionRoot {
     try { this.snack.dismiss(); } catch { /* none open */ }
     let notifications = 0;
     const ref = this.snack.open('Saved', 'OK', {duration: 30000});
-    // Disabled motion next()+complete()s _onEnter inside open(), before this
-    // subscribe. A Subject does not replay and complete() does not set closed,
-    // so the only public signal of that single next is a synchronous complete.
+    let completions = 0;
     ref.afterOpened().subscribe({
       next: () => { notifications += 1; },
-      complete: () => { if (notifications === 0) notifications = 1; },
+      complete: () => { completions += 1; },
     });
     await this.waitFor(() => {
       const el = document.querySelector('snack-bar-container');
-      return !!el && notifications >= 1;
+      return !!el && completions >= 1;
     }, 1500);
     const el = document.querySelector('snack-bar-container') as HTMLElement;
     const mode = this.mode();
@@ -225,6 +226,7 @@ export class MotionRoot {
       durationMs: this.duration(el, 'animation-duration'),
       finalState: this.visible(el) ? 'visible' : 'hidden',
       notifications,
+      completions,
       detectChangesCalls: 0,
     };
     ref.dismiss();
@@ -232,7 +234,7 @@ export class MotionRoot {
     return {
       key: `snack-bar/${mode}`,
       observation,
-      notify: {key: `snack-bar/afterOpened/${mode}`, observation: {notifications, detectChangesCalls: 0}},
+      notify: {key: `snack-bar/afterOpened/${mode}`, observation: {notifications, completions, detectChangesCalls: 0}},
     };
   }
 
@@ -784,7 +786,7 @@ export class MotionRoot {
 })
 export class MotionModule {}
 
-platformBrowserDynamic().bootstrapModule(MotionModule).catch(err => {
+platformBrowserDynamic().bootstrapModule(MotionModule/*ZONE_BOOTSTRAP*/).catch(err => {
   const node = document.createElement('pre');
   node.id = 'bootstrap-error';
   node.textContent = String(err);

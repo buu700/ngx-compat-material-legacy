@@ -12,7 +12,7 @@ import {publicRippleReplaySample} from './ripple_public_replay_sample.mjs';
 function driver(variant) {
   const calls=[];let clicks=0,started=false,cleaned=false,native=false,fault=false,publicPhase='before-bootstrap',publicLive=false;
   const event=(type,path_threw)=>({type,path_threw,target_id:'replay-peer',peer_present:true});
-  const snapshot=()=>({clicks,deliveries:clicks===1?[event('mousedown',true),event('click',true)]
+  const snapshot=()=>({angular_zone_entered:true,clicks,deliveries:clicks===1?[event('mousedown',true),event('click',true)]
     :[event('mousedown',true),event('click',true),event('mousedown',false),event('click',false)],
     actual_peer_directive_present:true,actual_owned_renderer_present:true,owned_ripple_launches:clicks,peer_ripple_launches:clicks});
   return {calls,get cleaned(){return cleaned;},async pointerClick(point) {
@@ -56,7 +56,7 @@ function driver(variant) {
     throw Error('Unknown driver expression: '+expression);
   }};
 }
-const positive=driver('live');assert.equal(rippleHydrationReplayOkay(await observeHydrationReplay(positive),'main'),true);
+const positive=driver('live');assert.equal(rippleHydrationReplayOkay({...await observeHydrationReplay(positive),runtime:'zoneful'},'main'),true);
 assert.deepEqual(positive.calls.filter(call=>!call.startsWith('public-')),['observe-server','early-input','record-input','release-bootstrap','live-input',
   'observe-native-peer','native-normal','begin-native-fault','native-fault','native-cleanup','destroy','finally-cleanup']);
 const failed=driver('input-failed');await assert.rejects(()=>observeHydrationReplay(failed),/Native input unavailable/);

@@ -111,7 +111,7 @@ if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Libra
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
 writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js';
-`}import {CSP_NONCE, ChangeDetectionStrategy, Component, NgModule, TemplateRef, ViewChild, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
+`}import {CSP_NONCE, ChangeDetectionStrategy, Component, NgModule, NgZone, TemplateRef, ViewChild, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection'}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
@@ -133,6 +133,7 @@ export class DialogBody {}
   template: '<button id="open" type="button" (click)="open()">Open</button><lab-dialog-title-lifetime></lab-dialog-title-lifetime><mat-select id="choice" style="font-size:20px"><mat-option id="option-a" value="a">A</mat-option></mat-select>',
 })
 export class LabRoot {
+  readonly angularZoneEntered = (() => { const zone = inject(NgZone); const entered = zone.run(() => NgZone.isInAngularZone()); (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = entered; return entered; })();
   private dialog = inject(MatLegacyDialog);
   open() { this.dialog.open(DialogBody); }
   @ViewChild(DialogTitleLifetimeLab) titleLifetime!: DialogTitleLifetimeLab;
@@ -149,7 +150,7 @@ export class LabRoot {
 })
 export class LabModule {}
 
-platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {
+platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}'}).catch(err => {
   const node = document.createElement('pre');
   node.id = 'bootstrap-error';
   node.textContent = String(err);
@@ -301,6 +302,7 @@ if (csp) {
   let stylesWithNonce = 0;
   let cspOpened = false;
   let cspError = null;
+  let cspAngularZoneEntered = null;
   try {
     await send('Runtime.enable');
     await send('Page.enable');
@@ -308,6 +310,7 @@ if (csp) {
     missingViolations = await evaluate('window.__cspViolations || []');
     await send('Page.navigate', {url: `http://127.0.0.1:${port}/`});
     for (let i = 0; i < 50 && !(await evaluate('!!document.getElementById("open")')); i += 1) await sleep(100);
+    cspAngularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');
     await evaluate('document.getElementById("open").click()');
     for (let i = 0; i < 50 && !(await evaluate('!!document.getElementById("dialog-body")')); i += 1) await sleep(100);
     cspOpened = await evaluate('!!document.getElementById("dialog-body")');
@@ -321,7 +324,7 @@ if (csp) {
     server.close();
   }
   const missingDetected = missingViolations.some(item => String(item).includes('style-src'));
-  const nonceClean = cspOpened && stylesWithNonce > 0 && nonceViolations.length === 0;
+  const nonceClean = cspError === null && cspOpened && stylesWithNonce > 0 && nonceViolations.length === 0;
   const cspReport = {
     schema_version: 1,
     role: 'strict CSP nonce for the dialog page',
@@ -334,6 +337,7 @@ if (csp) {
     nonce_violations: nonceViolations,
     dialog_opened_with_nonce: cspOpened,
     nonce_clean: nonceClean,
+    angular_zone_entered: cspAngularZoneEntered,
     matrix_updated: false,
     error: cspError,
     limitations: [
@@ -350,7 +354,7 @@ if (csp) {
     nonce_violations: nonceViolations.length,
     dialog_opened_with_nonce: cspOpened,
   }, null, 2));
-  if (!missingDetected || !nonceClean) process.exit(1);
+  if (!missingDetected || !nonceClean || cspAngularZoneEntered !== !zoneless) process.exit(1);
   process.exit(0);
 }
 let opened = false;
@@ -366,6 +370,7 @@ let dialogMotion = null;
 let dialogTitleLifetime = null;
 let dialogTitleLifetimeError = null;
 let zoneGlobal = null;
+let angularZoneEntered = null;
 let error = null;
 let diagnostic = null;
 try {
@@ -382,6 +387,7 @@ try {
   diagnostic = await evaluate('({errors: window.__errors || [], text: document.body.innerText, html: document.body.innerHTML.slice(0, 500)})');
   if (await evaluate('!!document.getElementById("bootstrap-error")')) throw new Error('bootstrap failed');
   zoneGlobal = await evaluate('typeof Zone');
+  angularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');
   await evaluate(`(() => {
     window.__dialogTransitions = [];
     document.addEventListener('transitionend', event => {
@@ -488,6 +494,7 @@ const report = {
   dialog_transition_on_container: transitionOnContainer,
   dialog_noop_under_reduced_motion: reducedMotion ? reducedNoop : null,
   zone_global: zoneGlobal,
+  angular_zone_entered: angularZoneEntered,
   bundle_has_zone: bundleHasZone,
   bundle_has_partial_declarations: bundleDeclares,
   bundle_imports_angular_compiler: bundleCompilerImport,
@@ -520,5 +527,5 @@ console.log(JSON.stringify({
   zone_global: report.zone_global,
 }, null, 2));
 const motionOk = reducedMotion ? report.dialog_noop_under_reduced_motion : report.dialog_transition_on_container;
-const zoneOk = zoneless ? zoneGlobal === 'undefined' && bundleHasZone === false : true;
+const zoneOk = zoneless ? zoneGlobal === 'undefined' && bundleHasZone === false && angularZoneEntered === false : zoneGlobal === 'function' && bundleHasZone === true && angularZoneEntered === true;
 if (!report.dialog_title_lifetime_ok || !report.closed_by_escape || !report.focus_restored_to_open_button || !report.closed_by_backdrop_click || !report.select_panel_closed_by_escape || !report.select_font_geometry_ok || !motionOk || !zoneOk) process.exit(1);
