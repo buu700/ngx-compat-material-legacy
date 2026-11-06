@@ -16,6 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import rc_acceptance as acceptance
+from migration_cli_fixture import write_cli_archive
 
 
 def write_json(path, obj):
@@ -43,8 +44,11 @@ class CompleteFixture:
         artifacts = []
         for aid in ("library", "migrate-cli"):
             p = self.run_dir / f"{aid}.tgz"
-            p.write_bytes(f"synthetic {aid} bytes, not a package".encode())
-            artifacts.append({"id": aid, "path": p.name, "bytes": p.stat().st_size, "sha256": acceptance.sha256_file(p)})
+            if aid == "migrate-cli":
+                artifacts.append(write_cli_archive(self.run_dir))
+            else:
+                p.write_bytes(f"synthetic {aid} bytes, not a package".encode())
+                artifacts.append({"id": aid, "path": p.name, "bytes": p.stat().st_size, "sha256": acceptance.sha256_file(p)})
         self.run = {
             "schema_version": 1, "template": False, "stage": "draft", "purpose": "candidate",
             "run_id": "synthetic-evaluator-unit-test", "source": {"line": line, "commit": "a" * 40,

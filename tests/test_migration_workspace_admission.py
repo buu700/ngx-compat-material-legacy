@@ -10,12 +10,13 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 from migration_workspace_admission import old_workspace_assertion_ok, old_workspace_ids
 from migration_workspace_fixture import workspace_receipt
+from migration_cli_fixture import write_cli_archive
 
 class WorkspaceAdmissionTests(unittest.TestCase):
     def test_retained_consumer_inputs_and_engine_negatives(self):
         for line in ('main','21.x'):
             with tempfile.TemporaryDirectory() as tmp:
-                active=SimpleNamespace(run_dir=Path(tmp),binding={'source_line':line},manifest={'run_id':'synthetic','artifacts':[{'id':'library','sha256':'d'*64},{'id':'migrate-cli','sha256':'e'*64}]})
+                active=SimpleNamespace(run_dir=Path(tmp),binding={'source_line':line},manifest={'run_id':'synthetic','artifacts':[{'id':'library','sha256':'d'*64},write_cli_archive(Path(tmp))]})
                 def rewrite(body,name,value):
                     upgraded=body['upgraded_consumer'];record=upgraded['support'][name]
                     raw=json.dumps(value).encode() if isinstance(value,dict) else value
@@ -63,7 +64,7 @@ class WorkspaceAdmissionTests(unittest.TestCase):
     def test_both_lines_and_unbound_or_failed_evidence(self):
         temporary=tempfile.TemporaryDirectory();self.addCleanup(temporary.cleanup)
         for line in ('main','21.x'):
-            active=SimpleNamespace(run_dir=Path(temporary.name),binding={'source_line':line},manifest={'run_id':'synthetic','artifacts':[{'id':'library','sha256':'d'*64},{'id':'migrate-cli','sha256':'e'*64}]})
+            active=SimpleNamespace(run_dir=Path(temporary.name),binding={'source_line':line},manifest={'run_id':'synthetic','artifacts':[{'id':'library','sha256':'d'*64},write_cli_archive(Path(temporary.name))]})
             for case in [*old_workspace_ids(ROOT),'old-workspace/upgraded-consumer']:
                 body=workspace_receipt(ROOT,active,case,'one')
                 self.assertTrue(old_workspace_assertion_ok(ROOT,active,body,'one'),case)
