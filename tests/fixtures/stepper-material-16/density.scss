@@ -1,0 +1,7 @@
+@use 'sass:map'; @use '@angular/material' as m;
+$p: m.define-palette(m.$indigo-palette); $a: m.define-palette(m.$pink-palette);
+$l: m.define-light-theme((color:(primary:$p,accent:$a)));
+@each $name, $scale in (zero:0, minus-one:-1, minus-two:-2, minus-three:-3, minus-four:-4) {
+  .density-#{$name} { @include m.stepper-density($scale); }
+  .density-theme-#{$name} { @include m.stepper-theme(map.merge($l,(density:$scale))); }
+}
