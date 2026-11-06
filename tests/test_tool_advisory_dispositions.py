@@ -211,7 +211,7 @@ class ToolAdvisoryDispositionTests(unittest.TestCase):
         now = eligibility.datetime.now(eligibility.timezone.utc)
         aged = now - eligibility.timedelta(days=30)
         by_key = {row["id"].removeprefix("npm/"): row["vulns"] for row in tool["rows"] if row["id"].startswith("npm/")}
-        def osv(packages):
+        def osv(packages, capture=None):
             results = [{"vulns": copy.deepcopy(by_key.get(f"{name}@{version}", []))} for name, version in packages]
             if disagreement:
                 results[packages.index(("ip-address", "10.2.0"))] = {"vulns": [{"id": "UNREVIEWED-TOOL-FINDING"}]}

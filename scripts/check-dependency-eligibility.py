@@ -15,6 +15,7 @@ import io
 import json
 import os
 import re
+import subprocess
 import tarfile
 import tomllib
 from datetime import datetime, timedelta, timezone
@@ -141,12 +142,12 @@ def assess_stored_query(report: dict, peers: dict, now: datetime) -> dict:
     return {"ok": not errors and classified == "queried", "result": classified, "errors": errors, "rows": rows}
 
 
-def vendor_observations(manifest_path: Path) -> dict:
+def vendor_observations(root: Path, manifest_path: Path) -> dict:
     manifest = json.loads(manifest_path.read_text())
     bad = []
     missing = []
     for item in manifest.get("files") or []:
-        path = ROOT / item["dest"]
+        path = root / item["dest"]
         if not path.is_file() or path.is_symlink():
             missing.append(item["dest"])
             continue
@@ -155,7 +156,7 @@ def vendor_observations(manifest_path: Path) -> dict:
             bad.append(item["dest"])
     packages = list(manifest.get("packages") or [])
     license_missing = []
-    vendor_root = ROOT / "projects/ngx-material-legacy/styles/vendor/mdc"
+    vendor_root = root / "projects/ngx-material-legacy/styles/vendor/mdc"
     for name in packages:
         license_path = vendor_root / name / "LICENSE"
         if not license_path.is_file():
@@ -171,11 +172,16 @@ def vendor_observations(manifest_path: Path) -> dict:
     }
 
 
-def _http_json(url: str, method: str = "GET", payload: bytes | None = None, timeout: int = 60) -> tuple[int | None, object | None, str]:
+def _http_json(url: str, method: str = "GET", payload: bytes | None = None, timeout: int = 60,
+               capture: dict | None = None) -> tuple[int | None, object | None, str]:
     """Return (status, parsed JSON or None, error). Network failure stays unknown."""
     import urllib.error
     import urllib.request
 
+    if capture is not None:
+        capture.update({"url": url, "method": method, "request_sha256": hashlib.sha256(payload or b"").hexdigest(),
+                        "request_bytes": len(payload or b""), "received_at_utc": None,
+                        "response_sha256": None, "response_bytes": None, "http_status": None, "error": None})
     request = urllib.request.Request(
         url,
         data=payload,
@@ -194,33 +200,47 @@ def _http_json(url: str, method: str = "GET", payload: bytes | None = None, time
         raw = exc.read()
         status = exc.code
     except Exception as exc:  # noqa: BLE001 — lookup failure is an unknown result, not a crash
-        return None, None, f"{type(exc).__name__}: {exc}"
+        error = f"{type(exc).__name__}: {exc}"
+        if capture is not None:
+            capture.update(received_at_utc=datetime.now(timezone.utc).isoformat(), error=error)
+        return None, None, error
+    if capture is not None:
+        capture.update(received_at_utc=datetime.now(timezone.utc).isoformat(),
+                       response_sha256=hashlib.sha256(raw).hexdigest(), response_bytes=len(raw),
+                       http_status=int(status) if status is not None else None)
     try:
         return int(status), json.loads(raw.decode("utf-8")), ""
     except Exception as exc:  # noqa: BLE001
-        return int(status) if status is not None else None, None, f"json: {exc}"
+        error = f"json: {exc}"
+        if capture is not None:
+            capture["error"] = error
+        return int(status) if status is not None else None, None, error
 
 
-def _npm_publish_time(name: str, version: str) -> tuple[datetime | None, str]:
+def _npm_publish_time(name: str, version: str, capture: dict | None = None) -> tuple[datetime | None, str]:
     from urllib.parse import quote
 
     url = f"https://registry.npmjs.org/{quote(name, safe='@')}"
-    status, body, error = _http_json(url, timeout=45)
+    status, body, error = _http_json(url, timeout=45, capture=capture)
     if status != 200 or not isinstance(body, dict):
         return None, error or f"http_status={status}"
     published = (body.get("time") or {}).get(version)
+    if capture is not None:
+        capture.update(package=name, version=version, selected_publish_time=published)
     parsed = parse_time(published) if isinstance(published, str) else None
     if parsed is None:
         return None, "publish time missing"
     return parsed, ""
 
 
-def _node_publish_time(version: str) -> tuple[datetime | None, str]:
-    status, body, error = _http_json("https://nodejs.org/dist/index.json", timeout=45)
+def _node_publish_time(version: str, capture: dict | None = None) -> tuple[datetime | None, str]:
+    status, body, error = _http_json("https://nodejs.org/dist/index.json", timeout=45, capture=capture)
     if status != 200 or not isinstance(body, list):
         return None, error or f"http_status={status}"
     for row in body:
         if isinstance(row, dict) and row.get("version") == f"v{version}":
+            if capture is not None:
+                capture.update(version=version, selected_release_date=row.get("date"))
             parsed = parse_time(row.get("date") or "")
             if parsed is None:
                 return None, "node publish date missing"
@@ -228,15 +248,17 @@ def _node_publish_time(version: str) -> tuple[datetime | None, str]:
     return None, f"node {version} not in index"
 
 
-def _osv_batch(packages: list[tuple[str, str]]) -> tuple[int | None, list | None, str]:
+def _osv_batch(packages: list[tuple[str, str]], capture: dict | None = None) -> tuple[int | None, list | None, str]:
     queries = [
         {"package": {"name": name, "ecosystem": "npm"}, "version": version}
         for name, version in packages
     ]
     payload = json.dumps({"queries": queries}).encode()
     status, body, error = _http_json(
-        "https://api.osv.dev/v1/querybatch", method="POST", payload=payload, timeout=120,
+        "https://api.osv.dev/v1/querybatch", method="POST", payload=payload, timeout=120, capture=capture,
     )
+    if capture is not None:
+        capture.update(queries=queries, parsed_response=body)
     if error and status is None:
         return None, None, error
     if not isinstance(body, dict):
@@ -410,7 +432,9 @@ def query_tool_advisories(subjects: dict) -> dict:
     cutoff = datetime.now(timezone.utc).isoformat()
     queries = subjects["queries"]
     payload = json.dumps({"queries": [row["query"] for row in queries]}).encode()
-    status, response, error = _http_json("https://api.osv.dev/v1/querybatch", method="POST", payload=payload, timeout=120)
+    transport = {}
+    status, response, error = _http_json("https://api.osv.dev/v1/querybatch", method="POST", payload=payload, timeout=120, capture=transport)
+    transport.update(queries=[row["query"] for row in queries], parsed_response=response)
     results = response.get("results") if isinstance(response, dict) else None
     complete = status == 200 and not error and isinstance(results, list) and len(results) == len(queries)
     rows, unresolved = [], []
@@ -430,7 +454,7 @@ def query_tool_advisories(subjects: dict) -> dict:
             "cutoff": cutoff, "endpoint": "https://api.osv.dev/v1/querybatch",
             "error": error, "expected_queries": len(queries), "rows": rows,
             "uncovered": [] if complete else [row["id"] for row in queries if row["id"] not in {r["id"] for r in rows}],
-            "unresolved": unresolved, "inventory": subjects}
+            "unresolved": unresolved, "inventory": subjects, "transport": transport}
 
 
 def tool_advisory_coverage_ok(root: Path, observation: dict | None, now: datetime | None = None) -> bool:
@@ -1137,7 +1161,8 @@ def remediation_note(key: str, advisory: str, fixes: list[str], published: datet
     return note
 
 
-def _remediation_notes(unresolved: list[str], rows: dict, now: datetime) -> list[dict]:
+def _remediation_notes(unresolved: list[str], rows: dict, now: datetime,
+                       capture: list[dict] | None = None) -> list[dict]:
     notes = []
     for key in unresolved:
         row = rows.get(key) or {}
@@ -1146,13 +1171,25 @@ def _remediation_notes(unresolved: list[str], rows: dict, now: datetime) -> list
             advisory = item.get("id") if isinstance(item, dict) else None
             if not (isinstance(name, str) and isinstance(version, str) and isinstance(advisory, str)):
                 continue
-            status, body, error = _http_json(f"https://api.osv.dev/v1/vulns/{advisory}", timeout=45)
+            transport = {}
+            status, body, error = _http_json(f"https://api.osv.dev/v1/vulns/{advisory}", timeout=45, capture=transport)
+            transport["parsed_response"] = body
+            if capture is not None:
+                capture.append({"kind": "advisory-detail", "package": key, "advisory": advisory,
+                                "error": error, "http": transport})
             if status != 200 or not isinstance(body, dict):
                 notes.append({"package": key, "advisory": advisory, "fixed_version": None, "state": "advisory-unknown",
                               "detail": f"{key} {advisory}: advisory detail unknown ({error or f'http_status={status}'})"})
                 continue
             fixes = fixed_versions(body, name, version)
-            published, age_error = _npm_publish_time(name, fixes[0]) if fixes else (None, "")
+            if fixes:
+                transport = {}
+                published, age_error = _npm_publish_time(name, fixes[0], capture=transport)
+                if capture is not None:
+                    capture.append({"kind": "fixed-release-age", "package": name, "version": fixes[0],
+                                    "error": age_error, "http": transport})
+            else:
+                published, age_error = None, ""
             notes.append(remediation_note(key, advisory, fixes, published, now, age_error))
     return notes
 
@@ -1501,8 +1538,82 @@ def assess_age_exceptions(records: list[dict], excludes: list[str] | None, now: 
     return {"active": active, "expired": expired, "problems": problems}
 
 
+def physical_subject_binding(root: Path) -> dict:
+    """Bind this lookup to final physical inputs, including disposition membership."""
+    if root.is_symlink() or not root.is_dir():
+        raise ValueError("missing or linked dependency source root")
+    package = json.loads((root / "projects/ngx-material-legacy/package.json").read_text())
+    line = {"21": "21.x", "22": "main"}.get(package["version"].split(".")[0])
+    if line is None:
+        raise ValueError("unknown library line")
+    paths = {
+        "package.json", "projects/ngx-material-legacy/package.json", "pnpm-lock.yaml",
+        "pnpm-workspace.yaml", "toolchain-lock.json", "chainman.toml", "chainman.lock",
+        "compatibility/vendored-sass-manifest.json", f"compatibility/peers-{package['version'].split('.')[0]}.proposed.json",
+        "compatibility/toolchain-advisory-subjects.json", "compatibility/tooling-release-evidence.json",
+        "chainman/minimum-age-exceptions.toml",
+        "compatibility/rc/parent-private-npm-current-profile-inputs-v1.json",
+        "scripts/check-dependency-eligibility.py", "SECURITY.md",
+        "compatibility/rc/tool-advisory-dispositions.json",
+        "compatibility/rc/tool-advisory-details-diagnostic.json",
+    }
+    paths.update(private_npm_source_paths(root))
+    catalog = json.loads((root / "compatibility/toolchain-advisory-subjects.json").read_text())
+    paths.update(catalog["pnpm_source"][key]["path"] for key in ("cargo_lock", "registry_attestations"))
+    profile = json.loads((root / NPM_CURRENT_PRIVATE_PROFILE_PATH).read_text())["lines"][line]
+    paths.update(row["path"] for group in ("source_files", "support_files", "input_files") for row in profile[group])
+    # These are the complete retained proof/source populations consumed by tool dispositions.
+    # Discovery records additions/removals as well as changes to existing members.
+    groups = [
+        ("compatibility/rc/tool-advisory-triage", None),
+        ("reference/toolchain/pnpm-12.4.2", None),
+        ("tests", {".cjs", ".js", ".mjs", ".py", ".sh", ".ts"}),
+        ("compatibility/handoff/codex-closeout/tools", {".cjs", ".js", ".mjs", ".py", ".sh", ".ts"}),
+    ]
+    for directory, suffixes in groups:
+        parent = root / directory
+        if parent.is_symlink() or not parent.is_dir():
+            raise ValueError("missing or linked dependency proof directory: " + directory)
+        for item in parent.rglob("*"):
+            if item.is_symlink():
+                raise ValueError("linked dependency proof input")
+            if item.is_file() and (suffixes is None or item.suffix in suffixes):
+                paths.add(item.relative_to(root).as_posix())
+    dispositions = root / "compatibility/rc/dependency-dispositions"
+    if dispositions.is_symlink() or not dispositions.is_dir():
+        raise ValueError("physical disposition directory missing or linked")
+    paths.update(item.relative_to(root).as_posix() for item in dispositions.glob("*.json") if item.is_file())
+    manifest = json.loads((root / "compatibility/vendored-sass-manifest.json").read_text())
+    paths.update(row["dest"] for row in manifest.get("files", []) if isinstance(row, dict) and isinstance(row.get("dest"), str))
+    paths.update(f"projects/ngx-material-legacy/styles/vendor/mdc/{name}/LICENSE"
+                 for name in manifest.get("packages", []) if isinstance(name, str))
+    members = []
+    for name in sorted(paths):
+        relative = PurePosixPath(name)
+        if relative.is_absolute() or ".." in relative.parts:
+            raise ValueError("dependency binding input escapes source root")
+        path = root / name
+        linked = any((root.joinpath(*relative.parts[:index])).is_symlink()
+                     for index in range(1, len(relative.parts) + 1))
+        if linked or not path.is_file():
+            members.append({"path": name, "missing_or_linked": True})
+        else:
+            data = path.read_bytes()
+            members.append({"path": name, "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)})
+    population = json.dumps(members, sort_keys=True, separators=(",", ":")).encode()
+    try:
+        commit = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], stderr=subprocess.DEVNULL, text=True).strip()
+        tree = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD^{tree}"], stderr=subprocess.DEVNULL, text=True).strip()
+    except (OSError, subprocess.CalledProcessError):
+        commit = tree = None
+    return {"line": line, "source_commit": commit, "source_tree": tree,
+            "population_sha256": hashlib.sha256(population).hexdigest(), "members": members,
+            "physical_inputs_valid": not any(row.get("missing_or_linked") for row in members)}
+
+
 def perform_lookup(root: Path, now: datetime) -> dict:
     """Live advisory, registry-age, and vendor lookup. Failure stays unknown."""
+    subject_before = physical_subject_binding(root)
     packages = lock_packages((root / "pnpm-lock.yaml").read_text())
     manifest = json.loads((root / "compatibility/vendored-sass-manifest.json").read_text())
     vendor_version = manifest.get("version")
@@ -1523,7 +1634,8 @@ def perform_lookup(root: Path, now: datetime) -> dict:
                 if q["query"].get("package", {}).get("ecosystem") == "npm"]
     age_packages = packages + [item for item in tool_npm if item not in packages]
     queried = age_packages + [item for item in vendor_packages if item not in age_packages]
-    status, results, error = _osv_batch(queried) if queried else (None, [], "no packages")
+    osv_transport = {}
+    status, results, error = _osv_batch(queried, capture=osv_transport) if queried else (None, [], "no packages")
     truncated = bool(results is not None and len(results) != len(queried))
     rows, unresolved = ({}, [error or "advisory lookup failed"])
     if results is not None and status == 200 and not truncated:
@@ -1535,16 +1647,20 @@ def perform_lookup(root: Path, now: datetime) -> dict:
 
     age_unknown = []
     age_young = []
+    age_observations = []
     if status == 200 and not truncated and not error:
         from concurrent.futures import ThreadPoolExecutor
 
-        def _age(item: tuple[str, str]) -> tuple[str, datetime | None, str]:
+        def _age(item: tuple[str, str]) -> tuple[str, datetime | None, str, dict]:
             name, version = item
-            published, age_error = _npm_publish_time(name, version)
-            return f"{name}@{version}", published, age_error
+            transport = {}
+            published, age_error = _npm_publish_time(name, version, capture=transport)
+            return f"{name}@{version}", published, age_error, transport
 
         with ThreadPoolExecutor(max_workers=12) as pool:
-            for key, published, age_error in pool.map(_age, age_packages):
+            for key, published, age_error, transport in pool.map(_age, age_packages):
+                age_observations.append({"package": key, "published_at": published.isoformat() if published else None,
+                                         "error": age_error, "http": transport})
                 if published is None:
                     age_unknown.append(f"{key}: {age_error}")
                 elif published > now:
@@ -1554,7 +1670,13 @@ def perform_lookup(root: Path, now: datetime) -> dict:
 
     records, load_error = load_age_exceptions(root)
     excludes = pnpm_age_excludes((root / "pnpm-workspace.yaml").read_text())
-    exceptions = assess_age_exceptions(records, excludes, now, _npm_publish_time, load_error)
+    exception_age_http = []
+    def exception_publish_time(name, version):
+        transport = {}
+        published, error = _npm_publish_time(name, version, capture=transport)
+        exception_age_http.append({"package": name, "version": version, "error": error, "http": transport})
+        return published, error
+    exceptions = assess_age_exceptions(records, excludes, now, exception_publish_time, load_error)
     # Only an exact, live, cited grant defers an age finding, and only for its own version.
     age_excepted = [exceptions["active"][key] for key in age_young if key in exceptions["active"]]
     age_young = [key for key in age_young if key not in exceptions["active"]]
@@ -1563,10 +1685,11 @@ def perform_lookup(root: Path, now: datetime) -> dict:
     tool_ok = status == 200 and not truncated
     repo = toolchain.get("repository") or {}
     release = toolchain.get("release") or {}
+    toolchain_http = {"node": {}, "pnpm": {}, "npm": {}}
     checks = {
-        "node": _node_publish_time(repo.get("node") or ""),
-        "pnpm": _npm_publish_time("pnpm", repo.get("pnpm") or ""),
-        "npm": _npm_publish_time("npm", release.get("npm") or ""),
+        "node": _node_publish_time(repo.get("node") or "", capture=toolchain_http["node"]),
+        "pnpm": _npm_publish_time("pnpm", repo.get("pnpm") or "", capture=toolchain_http["pnpm"]),
+        "npm": _npm_publish_time("npm", release.get("npm") or "", capture=toolchain_http["npm"]),
     }
     toolchain_report = {}
     for label, (published, age_error) in checks.items():
@@ -1583,6 +1706,7 @@ def perform_lookup(root: Path, now: datetime) -> dict:
         tool_detail.append(f"{label} published {published.date().isoformat()} age_days={age_days:.1f}")
 
     vendor_unknown = []
+    vendor_age_observations = []
     vendor_queried = bool(vendor_packages) and status == 200 and not truncated and not error
     for name, version in vendor_packages:
         key = f"{name}@{version}"
@@ -1590,7 +1714,10 @@ def perform_lookup(root: Path, now: datetime) -> dict:
             vendor_unknown.append(key)
             vendor_queried = False
             continue
-        published, age_error = _npm_publish_time(name, version)
+        transport = {}
+        published, age_error = _npm_publish_time(name, version, capture=transport)
+        vendor_age_observations.append({"package": key, "published_at": published.isoformat() if published else None,
+                                        "error": age_error, "http": transport})
         if published is None:
             vendor_unknown.append(f"{key}: {age_error}")
             vendor_queried = False
@@ -1598,7 +1725,13 @@ def perform_lookup(root: Path, now: datetime) -> dict:
         vendor_queried = False
 
     dispositions = load_finding_dispositions(root)
-    refresh_exception_patch_status(rows, dispositions, now)
+    exception_patch_http = []
+    def exception_patch_lookup(url, **kwargs):
+        transport = {}
+        status, body, error = _http_json(url, capture=transport, **kwargs)
+        exception_patch_http.append({"error": error, "http": {**transport, "parsed_response": body}})
+        return status, body, error
+    refresh_exception_patch_status(rows, dispositions, now, lookup=exception_patch_lookup)
     # Age queries include tool npm packages. Their findings have a separate,
     # complete tool query and disposition scope; overlapping workspace/vendor
     # packages retain their independent findings and cannot use a tool review.
@@ -1621,8 +1754,25 @@ def perform_lookup(root: Path, now: datetime) -> dict:
     unresolved.extend("tool disposition evidence is unknown: " + error for error in classified_tools["errors"])
     http_known = status == 200 and not truncated and not error and bool(rows or not queried)
     result = "queried" if http_known else "unknown"
-    remediation = _remediation_notes(unresolved, rows, now) if http_known else []
+    remediation_http = []
+    remediation = _remediation_notes(unresolved, rows, now, capture=remediation_http) if http_known else []
     return {
+        "subject_binding": subject_before,
+        "subject_binding_valid": subject_before == physical_subject_binding(root),
+        "lookup_evidence": {
+            "osv": {**osv_transport, "ordered_packages": [f"{name}@{version}" for name, version in queried],
+                    "results": results, "result_error": error, "truncated": truncated},
+            "npm_age": age_observations, "vendor_age": vendor_age_observations,
+            "age_unknown": age_unknown, "age_young": age_young, "age_excepted": age_excepted,
+            "age_exception_problems": exceptions["problems"], "age_exceptions_expired": exceptions["expired"],
+            "uncovered": uncovered, "vendor_unknown": vendor_unknown,
+            "exception_age_http": exception_age_http, "exception_patch_http": exception_patch_http,
+            "remediation_http": remediation_http,
+            "toolchain_age": toolchain_report, "toolchain_http": toolchain_http,
+            "normalized_rows": rows, "unresolved": unresolved + blocked, "blocked": blocked,
+            "excepted": classified["excepted"], "finding_dispositions": classified["classified"],
+            "remediation": remediation,
+        },
         "http_status": status,
         "result": result,
         "truncated": truncated or bool(error and "truncated" in error),
@@ -1667,7 +1817,7 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
     covered = set(stored_assessment["rows"])
     uncovered = [f"{name}@{version}" for name, version in packages if f"{name}@{version}" not in covered]
     toolchain = json.loads((root / "toolchain-lock.json").read_text())
-    vendor = vendor_observations(root / "compatibility/vendored-sass-manifest.json")
+    vendor = vendor_observations(root, root / "compatibility/vendored-sass-manifest.json")
     # A stored file is not this run. Only an explicit lookup dict from this process counts.
     live = lookup if lookup_performed and isinstance(lookup, dict) else None
     if lookup_performed and live is None:
@@ -1688,6 +1838,12 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
     lookup_result = "not-run" if live is None else live.get("result") or "unknown"
     live_rows = (live or {}).get("rows") or {}
     pin_errors = []
+    current_subject = physical_subject_binding(root) if live is not None else None
+    observed_subject = live.get("subject_binding") if live is not None else None
+    subject_valid = bool(live and observed_subject == current_subject and live.get("subject_binding_valid") is True
+                         and current_subject["physical_inputs_valid"])
+    if live is not None and not subject_valid:
+        pin_errors.append("lookup source or lock inputs changed during execution")
     if live is not None:
         if live.get("http_status") != 200 or live.get("result") != "queried":
             pin_errors.append(f"this run advisory query is unknown (http_status={live.get('http_status')})")
@@ -1785,6 +1941,14 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
             })
     return {
         "cases": cases,
+        "source_binding": current_subject,
+        "lookup_source_binding": observed_subject,
+        "source_binding_valid": subject_valid,
+        "lookup_evidence": (live or {}).get("lookup_evidence"),
+        "complete_unresolved": (live or {}).get("unresolved", []),
+        "complete_blocked": (live or {}).get("blocked_findings", []),
+        "complete_excepted": (live or {}).get("excepted_findings", []),
+        "complete_remediation": (live or {}).get("remediation", []),
         "lookup": lookup_result,
         "lookup_cutoff": (live or {}).get("cutoff"),
         "stored_result": stored_assessment["result"],
@@ -1837,10 +2001,33 @@ def coordinator_request(root: Path = ROOT) -> dict | None:
         "output": output,
         "run_dir": output.parents[2],
         "line": binding.get("source_line"),
+        "root": root,
     }
 
 
+def enforce_final_subject_binding(observation: dict, root: Path, binding: dict | None = None) -> bool:
+    """A lookup cannot pass after physical source/lock drift or a foreign coordinator binding."""
+    current = physical_subject_binding(root)
+    recorded = observation.get("lookup_source_binding")
+    valid = (observation.get("source_binding_valid") is True and recorded == current
+             and current["physical_inputs_valid"])
+    if binding:
+        valid = valid and binding.get("source_line") == current["line"]
+        for key in ("source_commit", "source_tree"):
+            if binding.get(key) is not None:
+                valid = valid and binding[key] == current[key]
+    observation["source_binding"] = current
+    observation["source_binding_valid"] = bool(valid)
+    if not valid:
+        for case in observation["cases"]:
+            if case["case_id"] == "dependency-eligibility/locks-tools-maturity/direct-pin-shape":
+                case["result"] = "fail"
+                case["detail"] = "lookup source or lock inputs changed or coordinator source binding is foreign"
+    return bool(valid)
+
+
 def write_acceptance(request: dict, observation: dict) -> bool:
+    enforce_final_subject_binding(observation, request.get("root", ROOT), request.get("binding"))
     cases = observation["cases"]
     failed = [item["case_id"] for item in cases if item["result"] != "pass"]
     assertion = {
@@ -1850,6 +2037,14 @@ def write_acceptance(request: dict, observation: dict) -> bool:
         "invocation_id": request["invocation"],
         "lookup": observation["lookup"],
         "lookup_cutoff": observation.get("lookup_cutoff"),
+        "source_binding": observation.get("source_binding"),
+        "lookup_source_binding": observation.get("lookup_source_binding"),
+        "source_binding_valid": observation.get("source_binding_valid"),
+        "lookup_evidence": observation.get("lookup_evidence"),
+        "complete_unresolved": observation.get("complete_unresolved"),
+        "complete_blocked": observation.get("complete_blocked"),
+        "complete_excepted": observation.get("complete_excepted"),
+        "complete_remediation": observation.get("complete_remediation"),
         "line": request["line"],
         "binding": request["binding"],
         "stored_result": observation["stored_result"],
@@ -1858,6 +2053,7 @@ def write_acceptance(request: dict, observation: dict) -> bool:
         "uncovered_sample": observation["uncovered_sample"],
         "tool_advisories": observation.get("tool_advisories"),
         "tool_finding_dispositions": observation.get("tool_finding_dispositions"),
+        "vendor": observation["vendor"],
         "vendor_files": observation["vendor"]["files"],
         "vendor_hash_mismatches": observation["vendor"]["hash_mismatches"],
         "security_clearance": "not-passed",
@@ -1932,6 +2128,8 @@ def main() -> int:
     request = coordinator_request(args.root)
     live_lookup = perform_lookup(args.root, now) if args.lookup else None
     observation = evaluate(args.root, now, lookup_performed=args.lookup, lookup=live_lookup)
+    if args.lookup:
+        enforce_final_subject_binding(observation, args.root, request.get("binding") if request else None)
     failed = [item["case_id"] for item in observation["cases"] if item["result"] != "pass"]
     summary = {
         "ok": not failed,

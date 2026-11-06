@@ -126,14 +126,14 @@ class ToolAdvisoryCoverageTests(unittest.TestCase):
         aged = now - eligibility.timedelta(days=30)
         with patch.object(eligibility, "tool_advisory_subjects", return_value=tool["inventory"]), \
              patch.object(eligibility, "query_tool_advisories", return_value=tool), \
-             patch.object(eligibility, "_osv_batch", side_effect=lambda packages: (200, [{} for _ in packages], "")), \
+             patch.object(eligibility, "_osv_batch", side_effect=lambda packages, capture=None: (200, [{} for _ in packages], "")), \
              patch.object(eligibility, "_npm_publish_time", return_value=(aged, "")) as ages, \
              patch.object(eligibility, "_node_publish_time", return_value=(aged, "")), \
              patch.object(eligibility, "assess_age_exceptions", return_value={"active": {}, "expired": [], "problems": []}), \
              patch.object(eligibility, "refresh_exception_patch_status"), \
              patch.object(eligibility, "_remediation_notes", return_value=[]):
             live = eligibility.perform_lookup(ROOT, now)
-        self.assertIn(unittest.mock.call("http-cache-semantics", "4.2.0"), ages.call_args_list)
+        self.assertIn(unittest.mock.call("http-cache-semantics", "4.2.0", capture=unittest.mock.ANY), ages.call_args_list)
         self.assertIn("tool:npm/http-cache-semantics@4.2.0", live["unresolved"])
         observed = eligibility.evaluate(ROOT, now, lookup_performed=True, lookup=live)
         cases = {row["case_id"]: row["result"] for row in observed["cases"]}
