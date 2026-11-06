@@ -237,7 +237,7 @@ export abstract class _MatSnackBarBase implements OnDestroy {
       }
     });
 
-    // Subscribe before enter() so noop-animation sync _onEnter still arms duration.
+    // Subscribe before enter() so the opening notification arms the duration timer.
     if (config.duration && config.duration > 0) {
       snackBarRef.afterOpened().subscribe(() => snackBarRef._dismissAfter(config.duration!));
     }

@@ -647,7 +647,7 @@ describe('MatSnackBar', () => {
   it('should cap the timeout to the maximum accepted delay in setTimeout', fakeAsync(() => {
     const config = new MatLegacySnackBarConfig();
     config.duration = Infinity;
-    // Spy before open so noop-animation sync afterOpened still records the capped timer
+    // Spy before open to observe the capped duration timer.
     // (Material-current async suite spies before open for the same reason).
     spyOn(window, 'setTimeout').and.callThrough();
     snackBar.open('content', 'test', config);
@@ -1211,3 +1211,109 @@ class BurritosNotification {
 class ComponentThatProvidesMatSnackBar {
   constructor(public snackBar: MatLegacySnackBar) {}
 }
+
+
+describe('legacy snack bar no-op open notification', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [MatLegacySnackBarModule],
+      providers: [LEGACY_NOOP_ANIMATIONS],
+    });
+  });
+
+  it('notifies a caller who subscribes immediately after open returns', fakeAsync(() => {
+    const ref = TestBed.inject(MatLegacySnackBar).open('message');
+    let notifications = 0;
+    let completed = false;
+    ref.afterOpened().subscribe({next: () => notifications++, complete: () => completed = true});
+    expect(notifications).toBe(0);
+    expect(completed).toBeFalse();
+    tick();
+    expect(notifications).toBe(1);
+    expect(completed).toBeTrue();
+    ref.dismiss();
+    tick();
+  }));
+
+  it('does not notify a snack bar dismissed before its enter completes', fakeAsync(() => {
+    const ref = TestBed.inject(MatLegacySnackBar).open('message');
+    let notifications = 0;
+    ref.afterOpened().subscribe(() => notifications++);
+    ref.dismiss();
+    tick();
+    expect(notifications).toBe(0);
+  }));
+
+  it('only notifies the replacement when replaced before enter completes', fakeAsync(() => {
+    const snackBar = TestBed.inject(MatLegacySnackBar);
+    const previous = snackBar.open('previous');
+    let previousNotifications = 0;
+    previous.afterOpened().subscribe(() => previousNotifications++);
+    const next = snackBar.open('next');
+    let nextNotifications = 0;
+    next.afterOpened().subscribe(() => nextNotifications++);
+    tick();
+    expect(previousNotifications).toBe(0);
+    expect(nextNotifications).toBe(1);
+    next.dismiss();
+    tick();
+  }));
+
+  it('does not notify after the container is destroyed', fakeAsync(() => {
+    const ref = TestBed.inject(MatLegacySnackBar).open('message');
+    let notifications = 0;
+    ref.afterOpened().subscribe(() => notifications++);
+    ref.containerInstance.ngOnDestroy();
+    tick();
+    expect(notifications).toBe(0);
+  }));
+
+  it('still starts the duration timer when opening completes', fakeAsync(() => {
+    const ref = TestBed.inject(MatLegacySnackBar).open('message', '', {duration: 100});
+    let opened = 0;
+    let dismissed = 0;
+    ref.afterOpened().subscribe(() => opened++);
+    ref.afterDismissed().subscribe(() => dismissed++);
+    tick();
+    expect(opened).toBe(1);
+    tick(100);
+    expect(dismissed).toBe(1);
+  }));
+});
+
+
+describe('legacy snack bar reentrant no-op notification', () => {
+  beforeEach(() => TestBed.configureTestingModule({
+    imports: [MatLegacySnackBarModule],
+    providers: [LEGACY_NOOP_ANIMATIONS],
+  }));
+
+  it('allows an afterOpened subscriber to dismiss immediately', fakeAsync(() => {
+    const ref = TestBed.inject(MatLegacySnackBar).open('message');
+    let opened = 0;
+    let dismissed = 0;
+    ref.afterDismissed().subscribe(() => dismissed++);
+    ref.afterOpened().subscribe(() => { opened++; ref.dismiss(); });
+    tick();
+    expect(opened).toBe(1);
+    expect(dismissed).toBe(1);
+  }));
+
+  it('allows an afterOpened subscriber to replace the snack bar', fakeAsync(() => {
+    const snackBar = TestBed.inject(MatLegacySnackBar);
+    const previous = snackBar.open('previous');
+    let previousOpened = 0;
+    let nextOpened = 0;
+    let next: MatLegacySnackBarRef<LegacySimpleSnackBar>;
+    previous.afterOpened().subscribe(() => {
+      previousOpened++;
+      next = snackBar.open('next');
+      next.afterOpened().subscribe(() => nextOpened++);
+    });
+    tick();
+    expect(previousOpened).toBe(1);
+    expect(nextOpened).toBe(1);
+    next!.dismiss();
+    tick();
+  }));
+});
