@@ -1018,8 +1018,8 @@
           },
           "after": {
             "path": "scripts/upstream-base-class-removal-admission.cjs",
-            "sha256": "674f98fd526f2b23d53f691dceab2da126b0cdf4a810aba8752ac5b8546a7e99",
-            "bytes": 17337
+            "sha256": "7f82b208627012010bc2ee605f85fc255f6058d957bc83f5f6c644f91315021b",
+            "bytes": 17640
           },
           "edits": [
             {
@@ -1068,14 +1068,24 @@
               "after": "  for (const ref of body.source_inputs) member(currentSourceReference(ref));\n"
             },
             {
+              "offset": 7842,
+              "before": "",
+              "after": "  // The separately reviewed tabs repair succeeds two historical source bindings.\n  // Its selector is only an expected reference; retain its own fresh guard.\n  const tabs = tabsFiniteSourceSuccessor({root, line: '21.x', read});\n"
+            },
+            {
               "offset": 9106,
               "before": "    member(successor || ref);\n",
-              "after": "    member(successor || currentSourceReference(ref));\n"
+              "after": "    const prior = successor || currentSourceReference(ref);\n    member(tabs.qualify(prior) || prior);\n"
             },
             {
               "offset": 11254,
               "before": "    else member(ref);\n",
               "after": "    else member(currentSourceReference(ref));\n"
+            },
+            {
+              "offset": 11683,
+              "before": "",
+              "after": "    tabs.assertCurrent();\n"
             },
             {
               "offset": 11929,
@@ -2223,12 +2233,12 @@
         },
         {
           "path": "scripts/base-class-removal-owner-source.mjs",
-          "sha256": "ffc48c2656fd19a544c78a4cca98df344e8544b760aedeb1c8768e02d8f62999",
-          "bytes": 34844
+          "sha256": "5a58c52f9151e447afa4771c180eb1f50468eebf3d5d7ab59c7a966be12f01ee",
+          "bytes": 38430
         },
         {
           "path": "scripts/base-class-removal-canonical-stage.mjs",
-          "sha256": "989c81977957564217aaf7ba3aa369e8a434c7d3774c3b933b23761965a1fe5d",
+          "sha256": "06ab6e0e3ef5c9755558dddf6246268c2b298b648c2c0ab118f3c5acce6af3ec",
           "bytes": 9622
         },
         {
@@ -2353,8 +2363,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "8e0c76414e0ccc8a5802d61a035f71f787a252493db0ad5148cb39fb24c17a16",
-          "bytes": 29275
+          "sha256": "641dad68188527b9b9012214e13a0e5c9057fe8ef1c4fa3c1a23fa3ae5926276",
+          "bytes": 29594
         },
         {
           "path": "tests/test_checker_reference_proposal.py",
@@ -2373,8 +2383,8 @@
         },
         {
           "path": "compatibility/rc/matrices/full-verify.json",
-          "sha256": "a169321789f11e9aab0bb8d9b6f18060c994408878dae63b96b19be5d9f5355c",
-          "bytes": 638195
+          "sha256": "602b757afae14bd2d7e668634e02c4e410bc2fe3f5e031671859fd1d57a4d541",
+          "bytes": 639483
         },
         {
           "path": "tests/test_source_contract_regressions.py",
@@ -2388,8 +2398,8 @@
         },
         {
           "path": "tests/test_rc_acceptance.py",
-          "sha256": "6a2815b455d1e7d153248cdd171dbf278ce30bb8284989ea91651ce24c680a37",
-          "bytes": 25499
+          "sha256": "fefba61fa5eb0d19a42573651097fa65e847d6e954bc58e6e245ccc256b31cc4",
+          "bytes": 25680
         },
         {
           "path": "compatibility/rc/c04-browser-reference-source-inputs.json",
@@ -2563,8 +2573,8 @@
         },
         {
           "path": "tests/test_base_class_removal_admission.py",
-          "sha256": "416139452a4ec6f7d1b901f7e085c2d934c497e635d95f0901071a349459570e",
-          "bytes": 11746
+          "sha256": "b88afc07708faa42894a83c6283f0bc08cd6c6a423712a2ce5b151b21a8e6f1b",
+          "bytes": 14586
         },
         {
           "path": "scripts/upstream-base-class-removal-source.mjs",
@@ -2685,6 +2695,31 @@
           "path": "tests/test_browser_reference_independent_metadata.py",
           "sha256": "5a9697ad0e2ebb663c7f05024914db96713d69ef2d9cd529b69639f829aa0826",
           "bytes": 5839
+        },
+        {
+          "path": "compatibility/rc/parent-base-admission-tabs-inspector-successor-v1.json",
+          "sha256": "a5d00961753b75706cc9ac9412a64763fec68b162667d13ce26964bcd078a5af",
+          "bytes": 3745
+        },
+        {
+          "path": "tests/test_base_class_tabs_inspector_successor.py",
+          "sha256": "64791414a0ad2106ff4ed19f1410b0b8dcdfea821b650da5b5103495f8bf1edf",
+          "bytes": 4635
+        },
+        {
+          "path": "tests/base_class_tabs_inspector_frame_probe.mjs",
+          "sha256": "2440f077ba27a258638a92faf975764ce06f773260e35f20b238072714ccea36",
+          "bytes": 2573
+        },
+        {
+          "path": "tests/base_class_tabs_inspector_successor_probe.mjs",
+          "sha256": "3aabce4991efe0b0ed8f3f3e7e9119571083956c2213f37ae1fa416d503e4239",
+          "bytes": 4377
+        },
+        {
+          "path": "tests/base_class_removal_admission_probe.mjs",
+          "sha256": "1c110bfff71e69b64a7c2f87380ba0a636cc17c8055112cf16bc12d62844f753",
+          "bytes": 21258
         }
       ]
     },
@@ -3465,8 +3500,8 @@
         },
         {
           "path": "compatibility/rc/parent-base-class-tool-successor-builder-v1.py",
-          "sha256": "8e0c76414e0ccc8a5802d61a035f71f787a252493db0ad5148cb39fb24c17a16",
-          "bytes": 29275
+          "sha256": "641dad68188527b9b9012214e13a0e5c9057fe8ef1c4fa3c1a23fa3ae5926276",
+          "bytes": 29594
         },
         {
           "path": "tests/test_checker_reference_proposal.py",
@@ -3485,8 +3520,8 @@
         },
         {
           "path": "compatibility/rc/matrices/full-verify.json",
-          "sha256": "8bf14a58dfd10ed9c25510fa0483951e0fc90bab423fbf98b03e8dda47c420b8",
-          "bytes": 620168
+          "sha256": "fe88ccd67bd87d0d754e95997e95d7fc651c508443edf274548f835a79461b33",
+          "bytes": 621456
         },
         {
           "path": "tests/test_source_contract_regressions.py",
@@ -3500,8 +3535,8 @@
         },
         {
           "path": "tests/test_rc_acceptance.py",
-          "sha256": "316266da6d92df1033be5b728246fdca143c0a25790dc101309a57fb9c1d6d00",
-          "bytes": 37564
+          "sha256": "6bd29085455e62f10d896ca23819f80ca96a68f1c8792c7c9385e1a32ce760f2",
+          "bytes": 37745
         },
         {
           "path": "compatibility/rc/c04-browser-reference-source-inputs.json",
