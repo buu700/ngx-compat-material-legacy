@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "role": "inventory-current-ci-workflow-helper-test-successor",
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "full_Actions_execution_qualified": false,
+  "g11_claim": "not-passed",
+  "previous_packet": {
+    "path": "compatibility/rc/parent-inventory-current-workflow-successor-v1.json",
+    "sha256": "37172d8f47ec4bada65019581a444b5b2feb5979aeebad7edf471b2f8aceb3e0",
+    "bytes": 3466
+  },
+  "branches": {
+    "21.x": {
+      "source_parent": "8432c416934b3592581b526125a0df97077bb4cf",
+      "before": {
+        "path": "tests/test_helper_ci.py",
+        "sha256": "d5d0897eb0f9733a6f796660858409e5451c89601bdb80a2291b33be6a197535",
+        "bytes": 17476
+      },
+      "current": {
+        "path": "tests/test_helper_ci.py",
+        "sha256": "ba422a6ac11a29a8cd8ee8b9f1de8e03fa77e4edd2d809bc73a76a9d1a203f44",
+        "bytes": 17957
+      },
+      "edit": {
+        "offset": 12730,
+        "before": "        self.assertEqual(current.split('  packed-consumer-aot:\\n')[1], original.split('  packed-consumer-aot:\\n')[1])",
+        "after": "        source_regressions = (\n            '      - name: Dialog focus and motion source lifecycle regressions\\n'\n            '        run: |\\n'\n            '          just chainman exec -- node scripts/dialog-initial-focus-source-test.mjs\\n'\n            '          just chainman exec -- node scripts/dialog-motion-source-test.mjs\\n'\n            '\\n'\n        )\n        self.assertEqual(current.count(source_regressions), 1)\n        self.assertEqual(current.split('  packed-consumer-aot:\\n')[1].replace(source_regressions, ''),\n                         original.split('  packed-consumer-aot:\\n')[1])"
+      },
+      "semantic_review": "The protected packed-consumer suffix remains exact after removing exactly one authenticated CI source-regression step. All other helper tests and workflow assertions retain their prior bytes."
+    },
+    "main": {
+      "source_parent": "fac017a4659437a3de25b7cb3c7a9861764a51bc",
+      "before": {
+        "path": "tests/test_helper_ci.py",
+        "sha256": "d5d0897eb0f9733a6f796660858409e5451c89601bdb80a2291b33be6a197535",
+        "bytes": 17476
+      },
+      "current": {
+        "path": "tests/test_helper_ci.py",
+        "sha256": "ba422a6ac11a29a8cd8ee8b9f1de8e03fa77e4edd2d809bc73a76a9d1a203f44",
+        "bytes": 17957
+      },
+      "edit": {
+        "offset": 12730,
+        "before": "        self.assertEqual(current.split('  packed-consumer-aot:\\n')[1], original.split('  packed-consumer-aot:\\n')[1])",
+        "after": "        source_regressions = (\n            '      - name: Dialog focus and motion source lifecycle regressions\\n'\n            '        run: |\\n'\n            '          just chainman exec -- node scripts/dialog-initial-focus-source-test.mjs\\n'\n            '          just chainman exec -- node scripts/dialog-motion-source-test.mjs\\n'\n            '\\n'\n        )\n        self.assertEqual(current.count(source_regressions), 1)\n        self.assertEqual(current.split('  packed-consumer-aot:\\n')[1].replace(source_regressions, ''),\n                         original.split('  packed-consumer-aot:\\n')[1])"
+      },
+      "semantic_review": "The protected packed-consumer suffix remains exact after removing exactly one authenticated CI source-regression step. All other helper tests and workflow assertions retain their prior bytes."
+    }
+  }
+}
