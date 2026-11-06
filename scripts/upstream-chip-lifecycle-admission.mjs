@@ -14,7 +14,7 @@ import {inspectChipFocusRepair} from './chip-focus-contract.mjs';
 import {validateBrowserMatrixRun} from './upstream-browser-run-evidence.mjs';
 import {chipFocusLifecycleNativeOkay} from './chip-focus-lifecycle-native-contract.mjs';
 import {legacyChipBlurNativeOkay} from './legacy-chip-blur-native-contract.mjs';
-import {readCurrentChipFocusInputs,TAB_ADAPTER_INVENTORY_INPUTS,CURRENT_CHIP_FOCUS_INPUTS} from './tab-adapter-product-inventory-context.mjs';
+import {readCurrentChipFocusInputs} from './tab-adapter-product-inventory-context.mjs';
 const hash=b=>createHash('sha256').update(b).digest('hex'),json=d=>JSON.stringify(d,null,2)+'\n';
 const foundationPath='compatibility/rc/chip-lifecycle-scope-source-review.json';
 const foundationPins={main:'d9d949b47c3a0365cdc9a54fe667af0a9cec3538b2b88821d2d0e7ce8d7527dc','21.x':'827179d966d3c982ff0c825056f090224e2b6e7a1c179644bbf6901d0ed264b8'};
@@ -26,7 +26,7 @@ export const CHIP_LIFECYCLE_NATIVE_SHAS=Object.freeze([CHIP_LIFECYCLE_SHAS[1],CH
 const nativeKind='historical-required-individual-behavior';
 const extraMembers=[
  'scripts/upstream-chip-lifecycle-admission.mjs','scripts/upstream-chip-lifecycle-scope.mjs',
- 'scripts/tab-adapter-product-inventory-context.mjs',TAB_ADAPTER_INVENTORY_INPUTS,CURRENT_CHIP_FOCUS_INPUTS,
+ 'scripts/tab-adapter-product-inventory-context.mjs','compatibility/rc/tab-adapter-product-inventory-inputs.json','compatibility/rc/tab-adapter-product-inventory-focus-inputs.json',
  'projects/ngx-material-legacy/legacy-tabs/tab-body.ts','projects/ngx-material-legacy/legacy-tabs/internal/tab-portal-construction-context.ts',
  'scripts/chip-focus-contract.mjs','scripts/chip-focus-repair.mjs','scripts/chip-list-focus-contract.mjs',
  'scripts/upstream-browser-run-evidence.mjs','scripts/upstream-packed-run-evidence.mjs',
