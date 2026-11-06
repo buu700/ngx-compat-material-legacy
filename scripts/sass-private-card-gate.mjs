@@ -13,7 +13,7 @@ const pins={'scripts/current-sass-spinner-snack-contract.mjs':'1d826e445dcd35f19
 function plain(x){if(x===null||typeof x==='string'||typeof x==='boolean')return x;if(typeof x==='number'&&Number.isSafeInteger(x))return x;if(!x||typeof x!=='object'||types.isProxy(x))throw Error('invalid data');const array=Array.isArray(x);if(Object.getPrototypeOf(x)!==(array?Array.prototype:Object.prototype))throw Error('prototype');const ds=Object.getOwnPropertyDescriptors(x),out=array?[]:{};for(const k of Reflect.ownKeys(ds)){if(array&&k==='length')continue;if(typeof k!=='string'||!Object.hasOwn(ds[k],'value')||!ds[k].enumerable||(array&&!/^(0|[1-9][0-9]*)$/.test(k)))throw Error('descriptor');Object.defineProperty(out,k,{value:plain(ds[k].value),enumerable:true,writable:true,configurable:true})}if(array&&out.length!==ds.length.value)throw Error('array');return out}
 function read(root,path){let p=root;for(const bit of path.split('/')){p=join(p,bit);if(lstatSync(p).isSymbolicLink())throw Error('linked proof input')}return readFileSync(p)}
 export const PRIVATE_CARD_CASE=id;export const PRIVATE_CARD_CONTRACT=contract;
-const expectedSha=b=>createHash('sha256').update(b).digest('hex'),expectedEngineHash='f65f305500d7bb2986e32495558dad5886f227d3942fa84637a37dc36b296b16';
+const expectedSha=b=>createHash('sha256').update(b).digest('hex'),expectedEngineHash='6f6475a85f4361d0bb90c15c5b966c799499def63d2f1f5a93e2bfb09d584b86';
 function expectedPlain(v){
  if(v===null||['string','boolean'].includes(typeof v))return v;
  if(typeof v==='number'){if(!Number.isSafeInteger(v))throw Error('number');return v;}

@@ -11,10 +11,10 @@ import {join,dirname,resolve,relative,isAbsolute} from 'node:path';
 import {tmpdir} from 'node:os';
 import {spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
-const pins={'21.x':'2452ab4c806fb61e53602bc3b15427ae8b03a69dba58f6bd7bfbe7598c04dda3',main:'518508f0c6fe3b9e477be1b87bed1607bda6d7433696a8ed4c0dd7932d2867d6'};
+const pins={'21.x':{'private-card':'2452ab4c806fb61e53602bc3b15427ae8b03a69dba58f6bd7bfbe7598c04dda3','ordered-aggregate-06':'fefb586b666f814425a43b2aa997967189aeb02d3abe388d7f464dd06e9ffc53'},main:{'private-card':'518508f0c6fe3b9e477be1b87bed1607bda6d7433696a8ed4c0dd7932d2867d6','ordered-aggregate-06':'c65d85fb794c0eddc852065c929da0a395f4f56a45dbc652b06690881b84cf73'}};
 const sha=b=>createHash('sha256').update(b).digest('hex');
 const [rootArg,line,operation]=process.argv.slice(1),root=realpathSync(rootArg);
-if(process.version!=='v24.21.0'||!Object.hasOwn(pins,line)||operation!=='private-card')throw Error('execution identity');
+if(process.version!=='v24.21.0'||!Object.hasOwn(pins,line)||!Object.hasOwn(pins[line],operation))throw Error('execution identity');
 const safePath=p=>{if(typeof p!=='string'||!p||p.startsWith('/')||p.includes('\\')||p.split('/').some(x=>!x||x==='.'||x==='..'))throw Error('invalid closure path');return p;};
 function readInput(row){
  const logical=safePath(row.path);let base=root,tail=logical;
@@ -26,7 +26,7 @@ function readInput(row){
  if(!lstatSync(path).isFile())throw Error('nonregular closure file');const b=readFileSync(path);
  if(b.length!==row.bytes||sha(b)!==row.sha256)throw Error('changed closure input '+logical);return b;
 }
-const manifestPath='fixtures/sass/private-card-expected-isolation-inputs.json',manifestRaw=readInput({path:manifestPath,bytes:readFileSync(join(root,manifestPath)).length,sha256:pins[line]});
+const manifestPath=operation==='private-card'?'fixtures/sass/private-card-expected-isolation-inputs.json':'fixtures/sass/expected-isolation-inputs.json',manifestRaw=readInput({path:manifestPath,bytes:readFileSync(join(root,manifestPath)).length,sha256:pins[line][operation]});
 const manifest=JSON.parse(manifestRaw);
 if(Object.keys(manifest).sort().join('|')!=='entries|files|line|schema_version'||manifest.schema_version!==1||manifest.line!==line||!Object.hasOwn(manifest.entries,operation)||!Array.isArray(manifest.files)||manifest.files.length<1)throw Error('closure manifest');
 const names=new Set(),images=[];
