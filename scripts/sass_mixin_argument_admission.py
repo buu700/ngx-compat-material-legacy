@@ -69,6 +69,7 @@ def mixin_argument_assertion_ok(root,active,body,invocation):
         if any(body.get(k)!=v or type(body.get(k))!=type(v) for k,v in envelope.items()):return False
         library=[a for a in active.manifest['artifacts'] if a['id']=='library']
         if len(library)!=1 or body['tarball_sha256']!=library[0]['sha256'] or not mixin_argument_measurements_ok(root,body,owned=owned):return False
+        if body['case_id'] not in ('mixin-argument/all-component-densities/custom-full-theme','mixin-argument/all-component-densities/raw-density-config') and 'current_ordinary_density' in body:return False
         if body['case_id'] in ORDINARY_CARD_GATE_CASES:
             return ordinary_card_gate_assertion_ok(root,active,body,invocation)
         if 'current_ordinary_card' in body:return False
@@ -98,6 +99,9 @@ def mixin_argument_assertion_ok(root,active,body,invocation):
             if not aggregate_color_theme_results_match(body):return False
         elif body['case_id'] in AGGREGATE_TYPOGRAPHY_CASES:
             if not aggregate_typography_results_match(body):return False
+        elif body['case_id'] in ('mixin-argument/all-component-densities/custom-full-theme','mixin-argument/all-component-densities/raw-density-config'):
+            from sass_ordinary_density_gate import OrdinaryDensityGateContext,ordinary_density_gate_match
+            if body.get('comparison')!='current-companion-contract' or not ordinary_density_gate_match(OrdinaryDensityGateContext(root),body):return False
         elif body['case_id'] in AGGREGATE_DENSITY_CASES:
             if not aggregate_density_results_match(body):return False
         elif body['case_id'] in DATEPICKER_CONTROLS_CASES:

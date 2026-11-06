@@ -26,6 +26,8 @@
  *
  * Does not claim G06–G08.
  */
+import {ORDINARY_DENSITY_CASES,measureOrdinaryDensityPeer} from './sass-ordinary-density-peer.mjs';
+import {createOrdinaryDensityGateContext,ordinaryDensityGateDescriptor,ordinaryDensityGateMatch} from './sass-ordinary-density-gate.mjs';
 import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {createHash} from 'node:crypto';
 import {emitMixinMismatchArchive} from './sass-mismatch-diagnostic.mjs';
@@ -337,7 +339,7 @@ function sha256Text(text) {
 }
 
 /** Planned CSS measurements only; this grants no variable/signature inventory coverage. */
-export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line = '21.x', spinnerSnackContext, ordinaryControlContext, ordinaryCardContext, importer = makeImporter()}) {
+export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line = '21.x', spinnerSnackContext, ordinaryControlContext, ordinaryCardContext, ordinaryDensityContext, importer = makeImporter()}) {
   const moduleUrl = pathToFileURL(entryFile).href;
   const css = {};
   let coreCdkPeer;
@@ -379,6 +381,7 @@ export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line 
           if(!spinnerSnackContext||spinnerSnackContext.line!==line||!spinnerSnackGateMeasurementOk({context:spinnerSnackContext,caseId,actual:actual_measurement}))throw Error('spinner/snack current source measurement incomplete');
           css[name]={...css[name],actual_measurement,current_spinner_snack_bridge:spinnerSnackGateDescriptor(spinnerSnackContext)};
         }
+        if(ORDINARY_DENSITY_CASES.includes(caseId)){if(!ordinaryDensityContext||ordinaryDensityContext.line!==line)throw Error('ordinary density current source context missing');const peer=measureOrdinaryDensityPeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line,caseId});css[name]={...css[name],current_ordinary_density:ordinaryDensityGateDescriptor(ordinaryDensityContext,peer)};}
         if(SPINNER_SNACK_DEFAULT_CASES.includes(caseId)||ORDINARY_CARD_DEFAULT_CASES.includes(caseId)||(ORDINARY_CONTROL_DEFAULT_CASES.includes(caseId)&&!Object.hasOwn(DEFAULT_AGGREGATE_CASES,caseId))){
           // The untouched16 referenceObserver adds the original measurement before inventory comparison.
         }else if(Object.hasOwn(RIPPLE_COLOR_DEFAULT_CASES,caseId)){
@@ -434,7 +437,7 @@ export function apiAssertionBody(result, {oracleSha256, tarballSha256, runId, in
     oracle: 'compatibility/rc/oracles/material-16.2.14-sass-api.json',
     oracle_sha256: oracleSha256,
   };
-  for (const key of ['expected', 'actual', 'expected_params', 'actual_params', 'expected_sha256', 'actual_sha256', 'expected_bytes', 'actual_bytes','current_infrastructure','current_companion','actual_measurement','comparison','current_ordinary_controls','current_ordinary_card','current_spinner_snack_bridge','identity','mixin','variant','call','mutation','mutation_rejected','error']) {
+  for (const key of ['expected', 'actual', 'expected_params', 'actual_params', 'expected_sha256', 'actual_sha256', 'expected_bytes', 'actual_bytes','current_infrastructure','current_companion','actual_measurement','comparison','current_ordinary_controls','current_ordinary_card','current_ordinary_density','current_spinner_snack_bridge','identity','mixin','variant','call','mutation','mutation_rejected','error']) {
     if (result[key] !== undefined) body[key] = result[key];
   }
   if(result.current_infrastructure||result.current_companion||result.current_spinner_snack_bridge||result.current_ordinary_controls||result.current_ordinary_card){body.binding=binding;body.exit_code=0;}
@@ -555,11 +558,12 @@ async function main() {
   const oracle = JSON.parse(oracleText);
   const decisions = JSON.parse(readFileSync(PENDING_DECISIONS_PATH, 'utf8'));
   const allowedRoots = [installedLib, installedMaterial, realpathSync(join(consumer, 'node_modules/@angular/cdk'))];
+  const ordinaryDensityContext=createOrdinaryDensityGateContext({root});
   const spinnerSnackContext=createSpinnerSnackGateContext({root});
   const ordinaryControlContext=createOrdinaryControlGateContext({root});
   const ordinaryCardContext=createOrdinaryCardGateContext({root});
   const api = runSassApi({
-    oracle, entryFile: entry, loadPaths: [join(consumer, 'node_modules')], packageRoot: installedLib, allowedRoots, spinnerSnackContext, ordinaryControlContext, ordinaryCardContext,
+    oracle, entryFile: entry, loadPaths: [join(consumer, 'node_modules')], packageRoot: installedLib, allowedRoots, spinnerSnackContext, ordinaryControlContext, ordinaryCardContext, ordinaryDensityContext,
   });
   const apiIds = apiCaseIds(oracle);
   let functions;
@@ -569,7 +573,7 @@ async function main() {
       spinner_snack_defaults:measureSpinnerSnackDefaultReferences({sass,...reference}),
       ordinary_control_defaults:measureOrdinaryControlDefaultReferences({sass,...reference}),
       ordinary_card_defaults:measureOrdinaryCardDefaultReferences({sass,...reference}),
-      ...runMixinArgumentContracts({sass,entry,loadPaths:[join(consumer,'node_modules')],allowedRoots,importers:[makeImporter({requested,denied})],line:'21.x',spinnerSnackContext,ordinaryControlContext,ordinaryCardContext,...reference}),
+      ...runMixinArgumentContracts({sass,entry,loadPaths:[join(consumer,'node_modules')],allowedRoots,importers:[makeImporter({requested,denied})],line:'21.x',spinnerSnackContext,ordinaryControlContext,ordinaryCardContext,ordinaryDensityContext,...reference}),
       owned_aggregates:runOwnedAggregateContracts({sass,entry,loadPaths:[join(consumer,'node_modules')],allowedRoots,importers:[makeImporter({requested,denied})],line:'21.x',ordinaryControlContext,...reference}),
     })});}
   catch (error) {functions={ok:false,error:error.message,results:[]};}
@@ -579,11 +583,11 @@ async function main() {
   catch(error){functions={...functions,ok:false,error:String(error.message||error)};}
   try{if(functions.mixin_arguments?.ordinary_card_defaults)api.css=attachOrdinaryCardDefaultReferences({context:ordinaryCardContext,css:api.css,references:functions.mixin_arguments.ordinary_card_defaults});}
   catch(error){functions={...functions,ok:false,error:String(error.message||error)};}
-  const apiResults = classifyPending(compareInventory(oracle, api.members, api.css,{spinnerSnackContext,ordinaryControlContext,ordinaryCardContext}), decisions);
+  const apiResults = classifyPending(compareInventory(oracle, api.members, api.css,{spinnerSnackContext,ordinaryControlContext,ordinaryCardContext,ordinaryDensityContext}), decisions);
   if (JSON.stringify(apiResults.map(item => item.case_id)) !== JSON.stringify(apiIds)) {
     fail(1, 'sass-api-and-values results do not match the predeclared case ids');
   }
-  const drift = apiDriftNegative(oracle, api.members, api.css,{spinnerSnackContext,ordinaryControlContext,ordinaryCardContext});
+  const drift = apiDriftNegative(oracle, api.members, api.css,{spinnerSnackContext,ordinaryControlContext,ordinaryCardContext,ordinaryDensityContext});
 
 
   // Isolation negatives actually executed by this seal: archived import refusal,

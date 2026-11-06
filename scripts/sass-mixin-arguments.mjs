@@ -3,6 +3,8 @@ import {createHash} from 'node:crypto';
 import {readFileSync,realpathSync} from 'node:fs';
 import {dirname,isAbsolute,join,relative,resolve} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
+import {ORDINARY_DENSITY_CASES,measureOrdinaryDensityPeer} from './sass-ordinary-density-peer.mjs';
+import {createOrdinaryDensityGateContext,ordinaryDensityGateDescriptor,ordinaryDensityGateMatch} from './sass-ordinary-density-gate.mjs';
 import {SILENCE,THEME_PARAMS} from './sass-api-inventory.mjs';
 import {measureSortPeer,sortCompanionResultsMatch,SORT_COMPANION_CASES} from './sass-sort-companion-contract.mjs';
 import {measureTreePeer,treeCompanionResultsMatch,TREE_COMPANION_CASES} from './sass-tree-companion-contract.mjs';
@@ -77,14 +79,16 @@ export function mixinArgumentResultsMatch(expected,actual) {
     && expected.css===actual.css && expected.css_sha256===sha(expected.css) && actual.css_sha256===sha(actual.css)
     && expected.css_bytes===Buffer.byteLength(expected.css) && actual.css_bytes===Buffer.byteLength(actual.css);
 }
-export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,importers=[],line,referenceEntry,referenceRoot,identity,spinnerSnackContext,ordinaryControlContext,ordinaryCardContext}) {
+export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,importers=[],line,referenceEntry,referenceRoot,identity,spinnerSnackContext,ordinaryControlContext,ordinaryCardContext,ordinaryDensityContext,diagnosticCaseId}) {
   const catalog=mixinArgumentCatalog();
+  if(diagnosticCaseId!==undefined && (typeof diagnosticCaseId!=='string'||!['mixin-argument/all-component-densities/custom-full-theme','mixin-argument/all-component-densities/raw-density-config'].includes(diagnosticCaseId)||catalog.cases.filter(p=>p.case_id===diagnosticCaseId).length!==1))throw Error('unknown diagnostic case');
   const provenance={...identity,catalog:MIXIN_ARGUMENT_CATALOG,catalog_sha256:catalog.sha256};
-  const results=catalog.cases.map(probe=>{
-    let expected,actual,error,current_companion,current_peer_alias,current_spinner_snack_bridge,current_ordinary_controls,current_ordinary_card;
+  const results=(diagnosticCaseId===undefined?catalog.cases:catalog.cases.filter(p=>p.case_id===diagnosticCaseId)).map(probe=>{
+    let expected,actual,error,current_companion,current_peer_alias,current_spinner_snack_bridge,current_ordinary_controls,current_ordinary_card,current_ordinary_density;
     try {
       expected=measureMixinArgument(sass,referenceEntry,[referenceRoot],catalog,probe,[referenceRoot]);
       actual=measureMixinArgument(sass,entry,loadPaths,catalog,probe,allowedRoots,importers);
+      if(ORDINARY_DENSITY_CASES.includes(probe.case_id)){if(!ordinaryDensityContext||ordinaryDensityContext.line!==line)throw Error('ordinary density current source context missing');const peer=measureOrdinaryDensityPeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],line,caseId:probe.case_id});current_ordinary_density=ordinaryDensityGateDescriptor(ordinaryDensityContext,peer);actual={...actual,line,sass_version:sass.info};}
       if(SPINNER_SNACK_GATE_CASES.includes(probe.case_id)){if(!spinnerSnackContext||spinnerSnackContext.line!==line)throw Error('spinner/snack current source context missing');current_spinner_snack_bridge=spinnerSnackGateDescriptor(spinnerSnackContext);}
       if(ORDINARY_CARD_GATE_CASES.includes(probe.case_id)){if(!ordinaryCardContext||ordinaryCardContext.line!==line)throw Error('ordinary card current source context missing');current_ordinary_card=ordinaryCardGateDescriptor(ordinaryCardContext);actual={...actual,line,sass_version:sass.info};}
       if(ORDINARY_CONTROL_GATE_CASES.includes(probe.case_id)){if(!ordinaryControlContext||ordinaryControlContext.line!==line)throw Error('ordinary controls current source context missing');current_ordinary_controls=ordinaryControlGateDescriptor(ordinaryControlContext);actual={...actual,line,sass_version:sass.info};}
@@ -152,6 +156,8 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
       ? aggregateColorThemeResultsMatch(probe.case_id,expected,{...actual,...value},current_companion?.peer)
       : Object.hasOwn(AGGREGATE_TYPOGRAPHY_CASES,probe.case_id)
       ? aggregateTypographyResultsMatch(probe.case_id,expected,value,current_companion?.peer)
+      : ORDINARY_DENSITY_CASES.includes(probe.case_id)
+      ? ordinaryDensityGateMatch({context:ordinaryDensityContext,caseId:probe.case_id,original:expected,actual:{...actual,...value},companion:current_companion,descriptor:current_ordinary_density})
       : Object.hasOwn(AGGREGATE_DENSITY_CASES,probe.case_id)
       ? aggregateDensityResultsMatch(probe.case_id,expected,value,current_companion?.peers)
       : Object.hasOwn(DATEPICKER_CONTROLS_CASES,probe.case_id)
@@ -160,9 +166,9 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
     const mutation_rejected=Boolean(expected && actual && !conforms(mutation));
     const exact=mixinArgumentResultsMatch(expected,actual);
     return {...probe,line,expected,actual,error:error??null,identity:provenance,mutation,mutation_rejected,
-      ...(current_companion?{current_companion}:{}),...(current_peer_alias?{current_peer_alias}:{}),...(current_spinner_snack_bridge?{current_spinner_snack_bridge}:{}),...(current_ordinary_controls?{current_ordinary_controls}:{}),...(current_ordinary_card?{current_ordinary_card}:{}),
+      ...(current_ordinary_density?{current_ordinary_density}:{}),...(current_companion?{current_companion}:{}),...(current_peer_alias?{current_peer_alias}:{}),...(current_spinner_snack_bridge?{current_spinner_snack_bridge}:{}),...(current_ordinary_controls?{current_ordinary_controls}:{}),...(current_ordinary_card?{current_ordinary_card}:{}),
       comparison:ORDINARY_CARD_GATE_CASES.includes(probe.case_id)?ORDINARY_CARD_CONTRACT:ORDINARY_CONTROL_GATE_CASES.includes(probe.case_id)?ORDINARY_CONTROL_CONTRACT:SPINNER_SNACK_BRIDGE_CASES.includes(probe.case_id)?SPINNER_SNACK_BRIDGE_CONTRACT:current_companion?'current-companion-contract':current_peer_alias?'current-peer-color-alias-contract':exact?'historical-exact':'historical-mismatch',
       result:!error && conforms(actual) && mutation_rejected?'pass':'fail'};
   });
-  return {results,identity:provenance,ok:results.length===498 && results.every(r=>r.result==='pass')};
+  return {results,identity:provenance,...(diagnosticCaseId===undefined?{}:{diagnostic_only:true}),ok:diagnosticCaseId===undefined && results.length===498 && results.every(r=>r.result==='pass')};
 }
