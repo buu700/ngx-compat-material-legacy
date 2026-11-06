@@ -18,5 +18,5 @@ class RippleHydrationApplicationTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)
         self.assertEqual(report['specifications'], 4)
-        self.assertEqual(report['negative_mutations'], 26)
+        self.assertEqual(report['negative_mutations'], 30)
         self.assertFalse(report['native_or_packed_AOT_executed'])

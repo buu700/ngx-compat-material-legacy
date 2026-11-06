@@ -155,7 +155,7 @@ export async function runRippleHydrationReplay({tarball, runId=null, reportPath}
       const built = await build(tarball,line,runtime);
       await withServer(built, async origin => {
         await withChromium(origin, async driver => {
-          const observed = await observeHydrationReplay(driver);
+          const observed = {...await observeHydrationReplay(driver), runtime};
           report.results.push({runtime, dependencies:built.spec.dependencies, lock_sha256:built.lock_sha256,
             source_sha256:built.source_sha256, browser:driver.browser, ...observed, ok:rippleHydrationReplayOkay(observed, line)});
           if (!rippleHydrationReplayOkay(observed, line)) throw Error(`Hydration replay contract failed: ${runtime}`);

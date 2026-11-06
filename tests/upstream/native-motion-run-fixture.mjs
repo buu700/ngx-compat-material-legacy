@@ -28,7 +28,7 @@ export async function writeSyntheticNativeMotionRun(sourceRoot, fixture, makeObs
     console: {log() {}, error() {}}, ...rosterModule, qualifyNativeMotionOutcomes,
     coordinatorRequest: () => request, resolveLibraryFromRun: () => ({tarball: 'synthetic-not-a-package.tgz', digest: f.library.sha256, bytes: f.library.bytes}),
     preflight: () => ({missing: [], notes: []}),
-    executeNativeMotion: async () => ({outcomes: ids.map(id => ({id, ok: true, observation: makeObservation(id), evidence: 'Synthetic native observation; no browser launched'})),
+    executeNativeMotion: async () => ({outcomes: ids.map(id => ({id, ok: true, observation: {...makeObservation(id), angularZoneEntered: id.split('/')[3] === 'zoneful'}, evidence: 'Synthetic native observation; no browser launched'})),
       engines: {chromium: {launched: true, product: 'Chrome/128'}, firefox: {launched: true, browserName: 'firefox', version: '130'},
         webkit: {launched: true, backend: 'webkitgtk', api: 'WebKit2-4.1', safari_certification: false, sandboxDisabled: false}}}),
     gitValue: args => args[0] === 'status' ? '' : args[1] === 'HEAD' ? f.request.binding.source_commit : f.request.binding.source_tree};

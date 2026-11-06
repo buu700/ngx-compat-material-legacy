@@ -41,10 +41,10 @@ for (const line of ['main','21.x']) for (const runtime of ['zoneful','zoneless']
 assert.throws(()=>rippleHydrationApplication('next','zoneful'));
 assert.throws(()=>rippleHydrationApplication('main','other'));
 const event = (type, replay) => ({type,path_threw:replay,target_id:'replay-peer',peer_present:true});
-const snapshot = replay => ({clicks:replay?1:2,deliveries:replay?[event('mousedown',true),event('click',true)]
+const snapshot = replay => ({angular_zone_entered:true,clicks:replay?1:2,deliveries:replay?[event('mousedown',true),event('click',true)]
   :[event('mousedown',true),event('click',true),event('mousedown',false),event('click',false)],
   actual_peer_directive_present:true,actual_owned_renderer_present:true,owned_ripple_launches:replay?1:2,peer_ripple_launches:replay?1:2});
-const positive = {server_hydration_metadata:true,before_bootstrap:true,
+const positive = {runtime:'zoneful',server_hydration_metadata:true,before_bootstrap:true,
   captured_native:['mousedown','mouseup','click'].map(type=>({type,trusted:true,target_id:'replay-peer'})),
   ssr_button_reused:true,window_errors:[],replayed:snapshot(true),live:snapshot(false),destroyed:true,remaining_ripple_nodes:0,
   public_peer_replay:publicRippleReplaySample()};
@@ -53,8 +53,11 @@ const nativeEvents = line => ({phase:'fault', normal_creations:1, fault_creation
   fault_input:['mousedown','mouseup','click'].map(type=>({type,trusted:true,target_id:'native-peer'})),
   normal_errors:[], fault_errors:line==='main'?[]:['Error: __PEER_COMPOSED_PATH_CONTROL__'], path_calls:1});
 for(const line of ['main','21.x']) assert.equal(rippleHydrationReplayOkay({...positive,native_peer_events:nativeEvents(line)},line),true);
+const zonelessPositive=structuredClone(positive);zonelessPositive.runtime='zoneless';zonelessPositive.replayed.angular_zone_entered=false;zonelessPositive.live.angular_zone_entered=false;zonelessPositive.native_peer_events=nativeEvents('main');assert.equal(rippleHydrationReplayOkay(zonelessPositive,'main'),true);
+const wrongZoneless=structuredClone(zonelessPositive);wrongZoneless.replayed.angular_zone_entered=true;assert.equal(rippleHydrationReplayOkay(wrongZoneless,'main'),false);
 positive.native_peer_events=nativeEvents('main');
 const mutants = [
+  row=>{delete row.runtime;}, row=>{row.runtime='zoneless';}, row=>{delete row.replayed.angular_zone_entered;}, row=>{row.live.angular_zone_entered=false;},
   row=>{row.server_hydration_metadata=false;}, row=>{row.before_bootstrap=false;},
   row=>{row.captured_native[0].trusted=false;}, row=>{row.captured_native.pop();},
   row=>{row.ssr_button_reused=false;}, row=>{row.window_errors.push('composedPath failure');},

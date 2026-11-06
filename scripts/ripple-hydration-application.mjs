@@ -102,7 +102,10 @@ if (isMainModule(import.meta.url)) {
 export function rippleHydrationReplayOkay(row, line) {
   const replay = row?.replayed, live = row?.live;
   const deliveries = replay?.deliveries;
-  return publicRippleNativeEventsOkay(row?.native_peer_events, line)
+  return ['zoneful', 'zoneless'].includes(row?.runtime)
+    && replay?.angular_zone_entered === (row.runtime === 'zoneful')
+    && live?.angular_zone_entered === (row.runtime === 'zoneful')
+    && publicRippleNativeEventsOkay(row?.native_peer_events, line)
     && publicRippleReplayOkay(row?.public_peer_replay)
     && row?.server_hydration_metadata === true && row?.before_bootstrap === true
     && Array.isArray(row?.captured_native) && row.captured_native.length === 3

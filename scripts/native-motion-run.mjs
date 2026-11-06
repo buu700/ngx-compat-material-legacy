@@ -294,13 +294,16 @@ function startServer(consumer) {
   });
 }
 
-async function waitReady(driver) {
+async function waitReady(driver, runtime) {
   let last = '';
   for (let i = 0; i < 90; i += 1) {
-    const status = asJson(await driver.evaluate('JSON.stringify({ready: document.documentElement.dataset.labReady || "", error: (document.getElementById("bootstrap-error") || {}).textContent || ""})'));
+    const status = asJson(await driver.evaluate('JSON.stringify({ready: document.documentElement.dataset.labReady || "", error: (document.getElementById("bootstrap-error") || {}).textContent || "", angularZoneEntered: window.__closeoutAngularZoneEntered})'));
     last = JSON.stringify(status).slice(0, 500);
     if (status.error) throw new Error(`bootstrap failed: ${status.error}`);
-    if (status.ready === '1') return;
+    if (status.ready === '1') {
+      if (status.angularZoneEntered !== (runtime === 'zoneful')) throw new Error(`Angular zone mismatch for ${runtime}`);
+      return status.angularZoneEntered;
+    }
     await sleep(100);
   }
   throw new Error(`motion page did not bootstrap: ${last}`);
@@ -319,12 +322,12 @@ async function clickProbe(driver, button) {
   throw new Error(`probe ${button} timed out ${last}`);
 }
 
-function absorb(bucket, step) {
+function absorb(bucket, step, angularZoneEntered) {
   if (!step || step.error) {
     if (step && step.error) console.error(`native-motion probe error: ${step.error}`);
     return;
   }
-  const store = (key, observation) => { if (key && observation) bucket[key] = observation; };
+  const store = (key, observation) => { if (key && observation) bucket[key] = {...observation, angularZoneEntered}; };
   if (step.results && typeof step.results === 'object') {
     for (const [key, observation] of Object.entries(step.results)) store(key, observation);
     return;
@@ -333,11 +336,11 @@ function absorb(bucket, step) {
   if (step.notify) store(step.notify.key, step.notify.observation);
 }
 
-async function collect(driver, scene, mode, bucket) {
-  await waitReady(driver);
+async function collect(driver, scene, mode, bucket, runtime, observations) {
+  observations.push(await waitReady(driver, runtime));
   for (const button of buttonsFor(scene, mode)) {
     console.log(`native-motion ${mode} ${button}`);
-    absorb(bucket, await clickProbe(driver, button));
+    absorb(bucket, await clickProbe(driver, button), observations.at(-1));
   }
 }
 
@@ -350,24 +353,28 @@ function evidenceOf(observation) {
   return parts.join(' ') || 'observed';
 }
 
-async function runEngine(engine, runtime, origin, bucket, engines) {
+async function runEngine(engine, runtime, origin, bucket, engines, zoneObservations) {
+  const observed = [];
   const drive = DRIVERS[engine];
   const port = PORTS[engine];
   const options = port ? {port} : {};
   try {
     await drive(origin, async driver => {
       engines[engine] = driver.browser;
-      await collect(driver, 'modes', 'enabled', bucket);
+      await collect(driver, 'modes', 'enabled', bucket, runtime, observed);
       await driver.goto(`${origin}/?mode=enabled&scene=interrupt`);
-      await collect(driver, 'interrupt', 'enabled', bucket);
+      await collect(driver, 'interrupt', 'enabled', bucket, runtime, observed);
       await driver.goto(`${origin}/?mode=provider-disabled&scene=modes`);
-      await collect(driver, 'modes', 'provider-disabled', bucket);
+      await collect(driver, 'modes', 'provider-disabled', bucket, runtime, observed);
     }, {...options, startPath: '/?mode=enabled&scene=modes'});
     await drive(origin, async driver => {
       engines[engine] = {...(engines[engine] || {}), ...driver.browser, launched: true};
-      await collect(driver, 'modes', 'reduced', bucket);
+      await collect(driver, 'modes', 'reduced', bucket, runtime, observed);
     }, {...options, reduced: true, startPath: '/?mode=reduced&scene=modes'});
+    zoneObservations[runtime][engine] = observed;
   } catch (error) {
+    for (const key of Object.keys(bucket)) delete bucket[key];
+    zoneObservations[runtime][engine] = observed;
     const message = error instanceof Error ? error.message : String(error);
     engines[engine] = {...(engines[engine] || {}), engine, launched: !!(engines[engine] && engines[engine].launched), error: message};
     console.error(`native-motion ${engine} ${runtime} failed: ${message}`);
@@ -379,6 +386,7 @@ export async function executeNativeMotion(tarball) {
   const collected = {};
   for (const runtime of RUNTIMES) collected[runtime] = {};
   const engines = {};
+  const zoneObservations = Object.fromEntries(RUNTIMES.map(runtime => [runtime, {}]));
   for (const runtime of RUNTIMES) {
     console.error(`native-motion building ${runtime}`);
     const built = await buildConsumer(tarball, runtime === 'zoneless');
@@ -388,7 +396,7 @@ export async function executeNativeMotion(tarball) {
       for (const engine of ENGINES) {
         const bucket = {};
         collected[runtime][engine] = bucket;
-        await runEngine(engine, runtime, origin, bucket, engines);
+        await runEngine(engine, runtime, origin, bucket, engines, zoneObservations);
       }
     } finally {
       server.close();
@@ -405,6 +413,6 @@ export async function executeNativeMotion(tarball) {
     console.error(`native-motion failed ${failed.length}`);
     for (const row of failed.slice(0, 24)) console.error(`${row.id} ${row.evidence}`);
   }
-  return {outcomes, engines};
+  return {outcomes, engines, zoneObservations};
 }
 

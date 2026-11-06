@@ -71,6 +71,10 @@ const goodEngines = {
   webkit: {launched: true, backend: 'webkitgtk', api: 'WebKit2-4.1', safari_certification: false, version: '2.52.6'},
 };
 const goodOutcomes = roster.ids.map(id => ({id, ok: true, observation: samplePass(id), evidence: 'observed'}));
+const wrongMode = {...samplePass(roster.ids[0]), angularZoneEntered: roster.ids[0].split('/')[3] !== 'zoneful'};
+expect('actual Angular mode mismatch is rejected', assertCase(roster.ids[0], wrongMode).includes('Angular zone mode mismatch or unobserved'));
+const missingMode = samplePass(roster.ids[0]); delete missingMode.angularZoneEntered;
+expect('missing actual Angular mode is rejected', assertCase(roster.ids[0], missingMode).includes('Angular zone mode mismatch or unobserved'));
 const good = observationProblems({
   requiredIds: roster.ids, outcomes: goodOutcomes, engines: goodEngines, sourceClean: true, artifactSha: 'abc', boundSha: 'abc',
 });
@@ -125,6 +129,15 @@ const descendant = observationProblems({
   engines: goodEngines, sourceClean: true, artifactSha: 'abc', boundSha: 'abc',
 });
 expect('descendant stand-in', descendant.problems.some(item => item.includes('descendant event counted as completion')));
+
+for (const group of ['enabled-disabled-reduced/snack-bar/provider-disabled', 'exactly-once-notification/snack-bar/afterOpened/provider-disabled']) {
+  const target = roster.ids.find(id => id.endsWith('/' + group));
+  for (const [label, changed] of [['completion without next', {notifications: 0, completions: 1}], ['missing completion', {notifications: 1, completions: 0}]]) {
+    const rejected = observationProblems({requiredIds: roster.ids, outcomes: withOne(target, () => changed),
+      engines: goodEngines, sourceClean: true, artifactSha: 'abc', boundSha: 'abc'});
+    expect(`snack ${group} ${label} rejected`, rejected.problems.some(item => item.includes('notification count') || item.includes('completion count')));
+  }
+}
 
 const twiceId = roster.ids.find(id => id.endsWith('/exactly-once-notification/dialog/afterOpened/enabled'));
 const twice = observationProblems({

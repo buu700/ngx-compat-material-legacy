@@ -170,6 +170,7 @@ function enabledProblem(component, mode, obs) {
       return 'disabled menu exit still animating';
     }
   }
+  if (component === 'snack-bar' && obs.completions !== 1) return 'completion count';
   if (component === 'tabs' && obs.duplicateEndEventsDispatched !== true) return 'tab duplicate completion control missing';
   if (NOTIFICATION_CONTRACT.has(component) && obs.notifications !== 1) return 'notification count';
   return null;
@@ -233,6 +234,7 @@ function interruptProblem(suffix, obs) {
 export function assertCase(caseId, obs) {
   const parts = String(caseId || '').split('/');
   if (parts.length < 6 || parts[0] !== 'native-motion' || parts[1] !== SOURCE_LINE) return ['unknown case'];
+  if (!['zoneful', 'zoneless'].includes(parts[3]) || obs?.angularZoneEntered !== (parts[3] === 'zoneful')) return ['Angular zone mode mismatch or unobserved'];
   const group = parts[4];
   const suffix = parts.slice(5).join('/');
   if (group === 'enabled-disabled-reduced') {
@@ -248,13 +250,14 @@ export function assertCase(caseId, obs) {
     if (!obs || typeof obs !== 'object') return ['missing observation'];
     if (obs.detectChangesCalls !== 0) return ['detectChanges stand-in'];
     if (suffix.startsWith('tabs/') && obs.duplicateEndEventsDispatched !== true) return ['tab duplicate completion control missing'];
-    if (obs.notifications !== 1) return ['emitted more than once'];
+    if (obs.notifications !== 1) return [obs.notifications > 1 ? 'emitted more than once' : 'notification count'];
+    if (suffix.startsWith('snack-bar/') && obs.completions !== 1) return ['completion count'];
     return [];
   }
   return ['unknown case'];
 }
 
-export function samplePass(caseId) {
+function samplePassBody(caseId) {
   const parts = caseId.split('/');
   const group = parts[4];
   const suffix = parts.slice(5).join('/');
@@ -274,9 +277,10 @@ export function samplePass(caseId) {
       }} : {}),
       ...(component === 'tabs' ? {duplicateEndEventsDispatched: true} : {}),
       detectChangesCalls: 0,
+      ...(component === 'snack-bar' ? {completions: 1} : {}),
     };
   }
-  if (group === 'exactly-once-notification') return {notifications: 1, detectChangesCalls: 0, ...(suffix.startsWith('tabs/') ? {duplicateEndEventsDispatched: true} : {})};
+  if (group === 'exactly-once-notification') return {notifications: 1, detectChangesCalls: 0, ...(suffix.startsWith('snack-bar/') ? {completions: 1} : {}), ...(suffix.startsWith('tabs/') ? {duplicateEndEventsDispatched: true} : {})};
   const base = {detectChangesCalls: 0};
   if (suffix === 'dialog/rapid-reversal') return {...base, containers: 0, leaks: 0, openedAfterClose: 0};
   if (suffix === 'dialog/reopen-instance') return {...base, secondInstance: true, staleClosed: false, leaks: 0};
@@ -289,6 +293,10 @@ export function samplePass(caseId) {
   if (suffix === 'tooltip/destroy-while-shown') return {...base, destroyed: true, leaks: 0};
   if (suffix === 'tabs/rapid-reversal') return {...base, durationMs: MIN_ENABLED_MS.tabs, finalState: 'visible', animating: false};
   return base;
+}
+
+export function samplePass(caseId) {
+  return {...samplePassBody(caseId), angularZoneEntered: caseId.split('/')[3] === 'zoneful'};
 }
 
 export function observationProblems({requiredIds, outcomes, engines, sourceClean, artifactSha, boundSha}) {

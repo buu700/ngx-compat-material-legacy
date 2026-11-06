@@ -107,7 +107,7 @@ if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Libra
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
 writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js';
-`}import {Component, NgModule, NgZone, ViewChild, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
+`}import {Component, NgModule, NgZone, ViewChild, inject${zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection'}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -145,6 +145,7 @@ import {MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';
   \`,
 })
 export class LabRoot {
+  readonly angularZoneEntered = (() => { const zone = inject(NgZone); const entered = zone.run(() => NgZone.isInAngularZone()); (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = entered; return entered; })();
   readonly chipControl = new FormControl<string | null>(null);
 ${chipFocusLifecycleFixtureMembers()}
   ngAfterViewInit(): void {
@@ -154,7 +155,7 @@ ${chipFocusLifecycleFixtureMembers()}
   name = '';
   outlineVisible = true;
   outlinePrefix = false;
-  outlineDirection = 'ltr';
+  outlineDirection: 'ltr' | 'rtl' = 'ltr';
 }
 
 @NgModule({
@@ -172,7 +173,7 @@ ${chipFocusLifecycleFixtureMembers()}
 })
 export class LabModule {}
 
-platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {
+platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders: [provideZoneChangeDetection()]}'}).catch(err => {
   const node = document.createElement('pre');
   node.id = 'bootstrap-error';
   node.textContent = String(err);
@@ -330,6 +331,7 @@ const families = {
 let error = null;
 let diagnostic = null;
 let zoneGlobal = null;
+let angularZoneEntered = null;
 
 try {
   await send('Runtime.enable');
@@ -400,6 +402,7 @@ try {
   families['form-field'].outline_geometry = outlineRows;
 
   zoneGlobal = await evaluate('typeof Zone === "undefined" ? "undefined" : typeof Zone');
+  angularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');
 } catch (err) {
   error = String(err);
 } finally {
@@ -414,8 +417,8 @@ const cells = [
   `pr/main/chromium/${runtime}/form-field/default`,
 ];
 const zoneOk = zoneless
-  ? (zoneGlobal === 'undefined' && bundleHasZone === false)
-  : true;
+  ? (zoneGlobal === 'undefined' && bundleHasZone === false && angularZoneEntered === false)
+  : (zoneGlobal === 'function' && bundleHasZone === true && angularZoneEntered === true);
 const ok =
   !error
   && zoneOk
@@ -438,6 +441,7 @@ const report = {
   zoneless,
   bundle_has_zone: bundleHasZone,
   zone_global: zoneGlobal,
+  angular_zone_entered: angularZoneEntered,
   families,
   credited_cell_ids: ok ? cells : [],
   matrix_updated: false,
@@ -463,6 +467,7 @@ console.log(JSON.stringify({
   zoneless,
   bundle_has_zone: bundleHasZone,
   zone_global: zoneGlobal,
+  angular_zone_entered: angularZoneEntered,
   families,
   credited_cell_ids: report.credited_cell_ids,
 }, null, 2));
