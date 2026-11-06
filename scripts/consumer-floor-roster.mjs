@@ -23,10 +23,17 @@ export function floorConfigurations(plan, line, manifest) {
     ...row, ...plan.current_configuration, typescript: plan.current_configuration.typescript_by_line[line]});
   for (const node of plan.cli_node_versions) configurations.push({group: 'cli-runtime-floors', case_id: `cli/node-${node}`, node});
   for (const configuration of configurations) {
-    const pin = plan.node_sources[configuration.node];
-    const filename = `node-v${configuration.node}-${plan.runtime_platform}.tar.xz`;
-    if (!pin || !/^[0-9a-f]{64}$/.test(pin.sha256)
-      || pin.url !== `https://nodejs.org/dist/v${configuration.node}/${filename}`) throw new Error('unqualified exact Node binary');
+    const profiles = plan.node_sources_by_platform;
+    if (!profiles || JSON.stringify(Object.keys(profiles).sort()) !== JSON.stringify(['linux-arm64', 'linux-x64'])
+      || JSON.stringify(profiles['linux-x64']) !== JSON.stringify(plan.node_sources)
+      || plan.runtime_platform !== 'linux-x64') throw new Error('unqualified platform profiles');
+    for (const platform of ['linux-x64', 'linux-arm64']) {
+      const pin = profiles[platform][configuration.node];
+      const filename = `node-v${configuration.node}-${platform}.tar.xz`;
+      if (!pin || !/^[0-9a-f]{64}$/.test(pin.sha256)
+        || pin.url !== `https://nodejs.org/dist/v${configuration.node}/${filename}`
+        || pin.checksum_source !== `https://nodejs.org/dist/v${configuration.node}/SHASUMS256.txt`) throw new Error('unqualified exact Node binary');
+    }
   }
   if (new Set(configurations.map(item => item.case_id)).size !== configurations.length) throw new Error('duplicate floor configuration');
   return configurations;

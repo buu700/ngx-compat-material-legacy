@@ -725,7 +725,7 @@ const result = {
   floor_configuration: floorConfiguration,
   experimental_peer: candidateFloor,
   advertised_floor_acceptance_credit: !candidateFloor,
-  node_runtime: {version: process.version, exec_path: process.execPath},
+  node_runtime: {version: process.version, exec_path: process.execPath, platform: `${process.platform}-${process.arch}`},
   aot: {status: 'pending'},
   harness: {status: skipHarness ? 'skipped' : 'pending'},
   errors: [],

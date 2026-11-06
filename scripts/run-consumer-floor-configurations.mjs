@@ -6,6 +6,7 @@ import {tmpdir} from 'node:os';
 import {dirname, isAbsolute, join, relative, resolve, sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {floorConfigurations,candidateFloorConfigurations} from './consumer-floor-roster.mjs';
+import {runtimeProfile,verifyRuntimeArchive,verifyRuntimeExecutable} from './consumer-floor-runtime.mjs';
 import {extractMigrationCli} from './migration-run-inputs.mjs';
 import {coordinatorRequest, lineForPackageVersion} from './packed-consumer-evidence.mjs';
 
@@ -64,22 +65,19 @@ if (!npmCli.endsWith('/npm-cli.js') || child(process.execPath, [npmCli, '--versi
 }
 async function runtime(version) {
   if (binaries.has(version)) return binaries.get(version);
-  if (process.platform !== 'linux' || process.arch !== 'x64') throw new Error('qualified floor platform is linux-x64');
-  const pin = plan.node_sources[version];
+  const {platform, pin} = runtimeProfile(plan, process.platform, process.arch, version);
   const response = await fetch(pin.url, {signal: AbortSignal.timeout(120000)});
   if (!response.ok) throw new Error(`Node ${version} acquisition HTTP ${response.status}`);
   const bytes = Buffer.from(await response.arrayBuffer());
-  if (bytes.length > 100 * 1024 * 1024 || hash(bytes) !== pin.sha256) throw new Error('Node archive hash/size mismatch');
+  verifyRuntimeArchive(bytes, pin);
   const archive = join(owned, `node-${version}.tar.xz`);
   writeFileSync(archive, bytes);
-  const prefix = `node-v${version}-linux-x64`;
+  const prefix = `node-v${version}-${platform}`;
   const members = child('tar', ['-tJf', archive]).stdout.trim().split('\n');
   if (!members.length || members.some(name => name.startsWith('/') || name.split('/').includes('..') || !(name === `${prefix}/` || name.startsWith(`${prefix}/`)))) throw new Error('Node archive path escape');
   child('tar', ['--no-same-owner', '--no-same-permissions', '-xJf', archive, '-C', owned]);
   const executable = join(owned, prefix, 'bin/node');
-  const actual = child(executable, ['--version']).stdout.trim();
-  if (actual !== `v${version}` || lstatSync(executable).isSymbolicLink()) throw new Error('downloaded Node version mismatch');
-  const value = {executable, archive_sha256: pin.sha256, version: actual, executable_sha256: hash(readFileSync(executable))};
+  const value = {...verifyRuntimeExecutable(executable, version, platform, child), archive_sha256: pin.sha256};
   binaries.set(version, value);
   return value;
 }
@@ -110,7 +108,7 @@ try {
           experiment ? '--candidate-floor-case' : '--floor-case', configuration.case_id, '--floor-out', detailPath];
         child(node.executable, command, {env, timeout: 600000});
         const detail = JSON.parse(readFileSync(detailPath, 'utf8'));
-        if ((experiment && (detail.experimental_peer !== true || detail.advertised_floor_acceptance_credit !== false)) || detail.status !== 'ok' || detail.node_runtime.version !== `v${configuration.node}`
+        if ((experiment && (detail.experimental_peer !== true || detail.advertised_floor_acceptance_credit !== false)) || detail.status !== 'ok' || detail.node_runtime.version !== `v${configuration.node}` || detail.node_runtime.platform !== node.platform
           || detail.tarball.sha256 !== library.sha256 || detail.aot.status !== 'ok' || detail.harness.status !== 'ok'
           || detail.isolation?.animation_engine?.installed_packages?.length !== 0
           || detail.isolation?.animation_engine?.lock_packages?.length !== 0

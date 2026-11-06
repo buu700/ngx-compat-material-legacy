@@ -23,6 +23,10 @@ assert.equal(configurations.filter(c => c.group === 'cli-runtime-floors').length
 assert.ok(configurations.some(c => c.node === '18.0.0' && c.group === 'cli-runtime-floors'));
 assert.ok(!configurations.some(c => c.node === '18.0.0' && c.group === 'library-runtime'));
 for (const mutate of [
+ p => {p.node_sources_by_platform['linux-arm64']['18.0.0'].sha256 = 'unverified';},
+ p => {p.node_sources_by_platform['linux-arm64']['18.0.0'].url = p.node_sources['18.0.0'].url;},
+ p => {delete p.node_sources_by_platform['linux-arm64'];},
+ p => {p.node_sources_by_platform['linux-other'] = {};},
  p => {p.node_sources['18.0.0'].sha256 = 'unverified';},
  p => {p.node_sources['18.0.0'].url = 'https://example.com/node.tar.xz';},
  p => {p.rxjs_minima = ['7.8.2'];},
