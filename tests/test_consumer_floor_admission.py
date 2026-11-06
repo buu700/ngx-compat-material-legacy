@@ -46,6 +46,29 @@ class FloorAdmissionTests(unittest.TestCase):
                     rehash(body['consumer_detail'],detail)
                     self.assertFalse(floor_assertion_ok(ROOT,active,body,'one'),(line,mutation))
 
+    def test_platform_profile_positive_and_cross_platform_rejections(self):
+        plan=json.loads((ROOT/'compatibility/rc/consumer-floor-plan.json').read_text())
+        for line in ('main','21.x'):
+            with tempfile.TemporaryDirectory() as tmp:
+                active=SimpleNamespace(run_dir=Path(tmp),binding={'source_line':line},manifest={'run_id':'synthetic','artifacts':[{'id':'library','sha256':'d'*64},{'id':'migrate-cli','sha256':'e'*64}]})
+                for case, config in reviewed_configurations(plan,line).items():
+                    body=write_floor_receipt(ROOT,active,case,'one')
+                    self.assertTrue(floor_assertion_ok(ROOT,active,body,'one'))
+                    for platform in ('unknown',None,'linux-arm64'):
+                        bad=copy.deepcopy(body)
+                        if platform is None: del bad['runtime']['platform']
+                        else: bad['runtime']['platform']=platform
+                        self.assertFalse(floor_assertion_ok(ROOT,active,bad,'one'),(case,platform))
+                    body['runtime']['platform']='linux-arm64'
+                    body['runtime']['archive_sha256']=plan['node_sources_by_platform']['linux-arm64'][config['node']]['sha256']
+                    if config['group']=='library-runtime':
+                        path=active.run_dir/body['consumer_detail']['path']; detail=json.loads(path.read_text())
+                        detail['node_runtime']['platform']='linux-arm64'; raw=json.dumps(detail).encode();path.write_bytes(raw)
+                        body['consumer_detail'].update(sha256=hashlib.sha256(raw).hexdigest(),bytes=len(raw))
+                    self.assertTrue(floor_assertion_ok(ROOT,active,body,'one'),case)
+                    bad=copy.deepcopy(body);bad['runtime']['archive_sha256']='0'*64
+                    self.assertFalse(floor_assertion_ok(ROOT,active,bad,'one'))
+
     def test_both_lines_and_invalid_receipts(self):
         plan=json.loads((ROOT/'compatibility/rc/consumer-floor-plan.json').read_text())
         for line in ('main','21.x'):

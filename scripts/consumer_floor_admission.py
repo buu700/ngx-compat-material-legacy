@@ -51,7 +51,8 @@ def floor_assertion_ok(root: Path, active, body: dict, invocation: str) -> bool:
         if len(artifacts) != 2 or body.get('artifacts') != artifacts:
             return False
         runtime = body['runtime']
-        if runtime['version'] != 'v'+config['node'] or runtime['archive_sha256'] != plan['node_sources'][config['node']]['sha256']:
+        platform = runtime['platform']
+        if platform not in ('linux-x64', 'linux-arm64') or runtime['version'] != 'v'+config['node'] or runtime['archive_sha256'] != plan['node_sources_by_platform'][platform][config['node']]['sha256']:
             return False
         if not HEX.fullmatch(runtime['executable_sha256']) or not Path(runtime['executable']).is_absolute():
             return False
@@ -72,7 +73,7 @@ def floor_assertion_ok(root: Path, active, body: dict, invocation: str) -> bool:
                 return False
             if detail.get('experimental_peer') is True or detail.get('advertised_floor_acceptance_credit') is False:
                 return False
-            if detail['floor_configuration'] != config or detail['node_runtime'] != {'version':runtime['version'], 'exec_path':runtime['executable']}:
+            if detail['floor_configuration'] != config or detail['node_runtime'] != {'version':runtime['version'], 'exec_path':runtime['executable'], 'platform':platform}:
                 return False
             if detail['tarball']['sha256'] != artifacts['library'] or detail['status'] != 'ok' or detail.get('errors') != []:
                 return False
