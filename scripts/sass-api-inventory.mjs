@@ -23,6 +23,7 @@ import {dirname, join, relative, resolve, isAbsolute} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 
 import {DEFAULT_CORE_CDK_CASES,defaultCoreCdkResultsMatch,defaultCoreCdkMeasurementOk,DEFAULT_CORE_CDK_CONTRACT} from './sass-default-core-cdk-contract.mjs';
+import {PRIVATE_CARD_CASE,PRIVATE_CARD_CONTRACT,privateCardGateMatch} from './sass-private-card-gate.mjs';
 import {ORDINARY_DENSITY_CASES} from './sass-ordinary-density-peer.mjs';
 import {ordinaryDensityGateMatch} from './sass-ordinary-density-gate.mjs';
 import {DEFAULT_COMPANION_CASES,DEFAULT_COMPANION_CONTRACT,defaultCompanionMeasurementOk,defaultCompanionResultsMatch} from './sass-default-companion-contract.mjs';
@@ -401,7 +402,7 @@ function fmtParam(param) {
  * Pure comparison of a candidate inventory (and its invocation CSS digests)
  * against the oracle. One result per predeclared case id; nothing is dropped.
  */
-export function compareInventory(oracle, candidate, candidateCss,{spinnerSnackContext,ordinaryControlContext,ordinaryCardContext,ordinaryDensityContext}={}) {
+export function compareInventory(oracle, candidate, candidateCss,{spinnerSnackContext,ordinaryControlContext,ordinaryCardContext,ordinaryDensityContext,privateCardContext}={}) {
   const results = [];
   const push = (case_id, failure, extra = {}) => results.push({case_id, result: failure ? 'fail' : 'pass', reason: failure, ...extra});
   const om = oracle.members;
@@ -429,6 +430,9 @@ export function compareInventory(oracle, candidate, candidateCss,{spinnerSnackCo
     const got = candidateCss?.[name];
     const failure = !got ? 'candidate invocation missing'
       : got.error ? `candidate invocation failed: ${got.error}`
+        : `mixin-css/${name}`===PRIVATE_CARD_CASE
+          ? (privateCardContext&&got.comparison===PRIVATE_CARD_CONTRACT&&got.error===null&&got.mutation_rejected===true&&!['current_companion','current_infrastructure','current_spinner_snack_bridge','current_ordinary_card','current_ordinary_controls','current_ordinary_density','current_peer_alias'].some(k=>Object.hasOwn(got,k))&&got.mutation?.css===got.css+'\n.wrong-nonempty-mixin { color: red; }\n'&&got.mutation?.css_sha256===sha256(got.mutation.css)&&got.mutation?.css_bytes===Buffer.byteLength(got.mutation.css)&&got.css===got.actual_measurement?.css&&got.sha256===got.actual_measurement?.css_sha256&&privateCardGateMatch({context:privateCardContext,caseId:PRIVATE_CARD_CASE,expected:got.expected,actual:got.actual_measurement,identity:got.identity,descriptor:got.current_private_card})?null:'finite private card comparison differs')
+        : Object.hasOwn(got,'current_private_card') ? 'private card capsule outside finite scope'
         : ORDINARY_DENSITY_CASES.includes(`mixin-css/${name}`)
           ? (ordinaryDensityContext&&got.css===got.actual_measurement?.css&&got.sha256===got.actual_measurement?.css_sha256&&ordinaryDensityGateMatch({context:ordinaryDensityContext,caseId:`mixin-css/${name}`,original:null,actual:got.actual_measurement,companion:got.current_companion,descriptor:got.current_ordinary_density})?null:'finite ordinary density aggregate differs')
         : Object.hasOwn(got,'current_ordinary_density') ? 'ordinary density capsule outside finite scope'
@@ -451,6 +455,7 @@ export function compareInventory(oracle, candidate, candidateCss,{spinnerSnackCo
     push(`mixin-css/${name}`, failure, {
       invocable: true, expected_sha256: invocation.css_sha256, expected_bytes: invocation.css_bytes,
       actual_sha256: got?.sha256 ?? null, actual_bytes: got?.css === undefined ? null : Buffer.byteLength(got.css),
+      ...(got&&`mixin-css/${name}`===PRIVATE_CARD_CASE?{current_private_card:got.current_private_card,error:got.error??null,actual_measurement:got.actual_measurement,expected:got.expected,actual:got.actual_measurement,identity:got.identity,mixin:got.mixin,variant:got.variant,call:got.call,comparison:got.comparison,mutation:got.mutation,mutation_rejected:got.mutation_rejected}:{}),
       ...(got&&ORDINARY_CARD_DEFAULT_CASES.includes(`mixin-css/${name}`)?{current_ordinary_card:got.current_ordinary_card,error:got.error??null,actual_measurement:got.actual_measurement,expected:got.expected,actual:got.actual_measurement,identity:got.identity,mixin:got.mixin,variant:got.variant,call:got.call,comparison:got.comparison,mutation:got.mutation,mutation_rejected:got.mutation_rejected}:{}),
       ...(got&&ORDINARY_CONTROL_DEFAULT_CASES.includes(`mixin-css/${name}`)?{current_ordinary_controls:got.current_ordinary_controls,error:got.error??null,actual_measurement:got.actual_measurement,expected:got.expected,actual:got.actual_measurement,identity:got.identity,mixin:got.mixin,variant:got.variant,call:got.call,comparison:got.comparison,mutation:got.mutation,mutation_rejected:got.mutation_rejected}:{}),
       ...(got&&Object.hasOwn(got,'current_spinner_snack_bridge')?{current_spinner_snack_bridge:got.current_spinner_snack_bridge,error:null,actual_measurement:got.actual_measurement}:{}),

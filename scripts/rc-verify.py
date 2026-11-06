@@ -38,6 +38,7 @@ from migration_workspace_admission import old_workspace_assertion_ok, workspace_
 from migration_transaction_admission import transaction_assertion_ok
 from migration_frontend_admission import frontend_assertion_ok
 from sass_function_admission import function_assertion_ok
+from sass_private_card_gate import private_card_assertion_ok
 from sass_mixin_argument_admission import mixin_argument_assertion_ok
 from sass_ordinary_control_gate import ORDINARY_CONTROL_GATE_CASES, ordinary_control_gate_assertion_ok
 from sass_ordinary_card_gate import ORDINARY_CARD_GATE_CASES, ordinary_card_gate_assertion_ok
@@ -1093,6 +1094,8 @@ def _consumer_floor_assertion_ok(body: dict, invocation: str) -> bool:
 
 
 def _sass_seal_assertion_ok(body: dict, invocation: str) -> bool:
+    if body.get('case_id')=='mixin-css/private-check-duplicate-theme-styles':return private_card_assertion_ok(ROOT,ACTIVE_RUN,body,invocation)
+    if 'current_private_card' in body:return False
     if body.get('case_id') in ORDINARY_CARD_GATE_CASES and str(body.get('case_id','')).startswith('mixin-css/'):
         return ordinary_card_gate_assertion_ok(ROOT,ACTIVE_RUN,body,invocation)
     if 'current_ordinary_card' in body and body.get('case_id') not in ORDINARY_CARD_GATE_CASES:return False
