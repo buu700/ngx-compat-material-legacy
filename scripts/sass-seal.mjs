@@ -27,6 +27,7 @@
  */
 import {ORDINARY_DENSITY_CASES,measureOrdinaryDensityPeer} from './sass-ordinary-density-peer.mjs';
 import {createOrdinaryDensityGateContext,ordinaryDensityGateDescriptor,ordinaryDensityGateMatch} from './sass-ordinary-density-gate.mjs';
+import {PRIVATE_CARD_CASE,PRIVATE_CARD_CONTRACT,createPrivateCardGateContext,privateCardGateDescriptor,privateCardGateMatch,measurePrivateCardReference,attachPrivateCardReference} from './sass-private-card-gate.mjs';
 import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {createHash} from 'node:crypto';
 import {emitMixinMismatchArchive} from './sass-mismatch-diagnostic.mjs';
@@ -338,7 +339,7 @@ function sha256Text(text) {
 }
 
 /** Planned CSS measurements only; this grants no variable/signature inventory coverage. */
-export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line = 'main', spinnerSnackContext, ordinaryControlContext, ordinaryCardContext, ordinaryDensityContext, importer = makeImporter()}) {
+export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line = 'main', spinnerSnackContext, ordinaryControlContext, ordinaryCardContext, ordinaryDensityContext, privateCardContext, importer = makeImporter()}) {
   const moduleUrl = pathToFileURL(entryFile).href;
   const css = {};
   let coreCdkPeer;
@@ -356,7 +357,7 @@ export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line 
     if(foreign.length){css[name]={error:`loaded outside the packed package and peers: ${foreign[0]}`};continue;}
     css[name]={css:compiled.css,sha256:sha256Text(compiled.css)};
     const caseId=`mixin-css/${name}`;
-    const defaultEntry=DEFAULT_CORE_CDK_CASES[caseId]||DEFAULT_COMPANION_CASES[caseId]||DEFAULT_MAPPED_COMPANION_CASES[caseId]||DEFAULT_AGGREGATE_CASES[caseId]||FORM_FIELD_STATE_DEFAULT_CASES[caseId]||RIPPLE_COLOR_DEFAULT_CASES[caseId]||((SPINNER_SNACK_DEFAULT_CASES.includes(caseId)||ORDINARY_CONTROL_DEFAULT_CASES.includes(caseId)||ORDINARY_CARD_DEFAULT_CASES.includes(caseId))?plan:null);
+    const defaultEntry=DEFAULT_CORE_CDK_CASES[caseId]||DEFAULT_COMPANION_CASES[caseId]||DEFAULT_MAPPED_COMPANION_CASES[caseId]||DEFAULT_AGGREGATE_CASES[caseId]||FORM_FIELD_STATE_DEFAULT_CASES[caseId]||RIPPLE_COLOR_DEFAULT_CASES[caseId]||((SPINNER_SNACK_DEFAULT_CASES.includes(caseId)||ORDINARY_CONTROL_DEFAULT_CASES.includes(caseId)||ORDINARY_CARD_DEFAULT_CASES.includes(caseId)||caseId===PRIVATE_CARD_CASE)?plan:null);
     if(defaultEntry){
       try{
         if(plan.call!==defaultEntry.call)throw Error('default invocation changed');
@@ -381,7 +382,8 @@ export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line 
           css[name]={...css[name],actual_measurement,current_spinner_snack_bridge:spinnerSnackGateDescriptor(spinnerSnackContext)};
         }
         if(ORDINARY_DENSITY_CASES.includes(caseId)){if(!ordinaryDensityContext||ordinaryDensityContext.line!==line)throw Error('ordinary density current source context missing');const peer=measureOrdinaryDensityPeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line,caseId});css[name]={...css[name],current_ordinary_density:ordinaryDensityGateDescriptor(ordinaryDensityContext,peer)};}
-        if(SPINNER_SNACK_DEFAULT_CASES.includes(caseId)||ORDINARY_CARD_DEFAULT_CASES.includes(caseId)||(ORDINARY_CONTROL_DEFAULT_CASES.includes(caseId)&&!Object.hasOwn(DEFAULT_AGGREGATE_CASES,caseId))){
+        if(caseId===PRIVATE_CARD_CASE){if(!privateCardContext||privateCardContext.line!==line)throw Error('private card current source context missing');css[name]={...css[name],actual_measurement,current_private_card:privateCardGateDescriptor(privateCardContext)};}
+        if(caseId===PRIVATE_CARD_CASE||SPINNER_SNACK_DEFAULT_CASES.includes(caseId)||ORDINARY_CARD_DEFAULT_CASES.includes(caseId)||(ORDINARY_CONTROL_DEFAULT_CASES.includes(caseId)&&!Object.hasOwn(DEFAULT_AGGREGATE_CASES,caseId))){
           // The untouched16 referenceObserver adds the original measurement before inventory comparison.
         }else if(Object.hasOwn(RIPPLE_COLOR_DEFAULT_CASES,caseId)){
           if(!rippleColorMeasurementOkay(caseId,actual_measurement,line))throw Error('ripple color measurement incomplete');
@@ -436,11 +438,11 @@ export function apiAssertionBody(result, {oracleSha256, tarballSha256, runId, in
     oracle: 'compatibility/rc/oracles/material-16.2.14-sass-api.json',
     oracle_sha256: oracleSha256,
   };
-  for (const key of ['expected', 'actual', 'expected_params', 'actual_params', 'expected_sha256', 'actual_sha256', 'expected_bytes', 'actual_bytes','current_infrastructure','current_companion','actual_measurement','comparison','current_ordinary_controls','current_ordinary_card','current_ordinary_density','current_spinner_snack_bridge','identity','mixin','variant','call','mutation','mutation_rejected','error']) {
+  for (const key of ['expected', 'actual', 'expected_params', 'actual_params', 'expected_sha256', 'actual_sha256', 'expected_bytes', 'actual_bytes','current_infrastructure','current_companion','actual_measurement','comparison','current_ordinary_controls','current_ordinary_card','current_private_card','current_ordinary_density','current_spinner_snack_bridge','identity','mixin','variant','call','mutation','mutation_rejected','error']) {
     if (result[key] !== undefined) body[key] = result[key];
   }
-  if(result.current_infrastructure||result.current_companion||result.current_spinner_snack_bridge||result.current_ordinary_controls||result.current_ordinary_card){body.binding=binding;body.exit_code=0;}
-  if(result.current_spinner_snack_bridge||result.current_ordinary_controls||result.current_ordinary_card){body.error=null;}
+  if(result.current_infrastructure||result.current_companion||result.current_spinner_snack_bridge||result.current_ordinary_controls||result.current_ordinary_card||result.current_private_card){body.binding=binding;body.exit_code=0;}
+  if(result.current_spinner_snack_bridge||result.current_ordinary_controls||result.current_ordinary_card||result.current_private_card){body.error=null;}
   return body;
 }
 
@@ -550,11 +552,12 @@ async function main() {
   const decisions = JSON.parse(readFileSync(PENDING_DECISIONS_PATH, 'utf8'));
   const allowedRoots = [installedLib, installedMaterial, realpathSync(join(consumer, 'node_modules/@angular/cdk'))];
   const ordinaryDensityContext=createOrdinaryDensityGateContext({root});
+  const privateCardContext=createPrivateCardGateContext({root});
   const spinnerSnackContext=createSpinnerSnackGateContext({root});
   const ordinaryControlContext=createOrdinaryControlGateContext({root});
   const ordinaryCardContext=createOrdinaryCardGateContext({root});
   const api = runSassApi({
-    oracle, entryFile: entry, loadPaths: [join(consumer, 'node_modules')], packageRoot: installedLib, allowedRoots, spinnerSnackContext, ordinaryControlContext, ordinaryCardContext, ordinaryDensityContext,
+    oracle, entryFile: entry, loadPaths: [join(consumer, 'node_modules')], packageRoot: installedLib, allowedRoots, spinnerSnackContext, ordinaryControlContext, ordinaryCardContext, ordinaryDensityContext, privateCardContext,
   });
   const apiIds = apiCaseIds(oracle);
   let functions;
@@ -564,6 +567,7 @@ async function main() {
       spinner_snack_defaults:measureSpinnerSnackDefaultReferences({sass,...reference}),
       ordinary_control_defaults:measureOrdinaryControlDefaultReferences({sass,...reference}),
       ordinary_card_defaults:measureOrdinaryCardDefaultReferences({sass,...reference}),
+      private_card_reference:measurePrivateCardReference({context:privateCardContext,...reference}),
       ...runMixinArgumentContracts({sass,entry,loadPaths:[join(consumer,'node_modules')],allowedRoots,importers:[makeImporter({requested,denied})],line:'main',spinnerSnackContext,ordinaryControlContext,ordinaryCardContext,ordinaryDensityContext,...reference}),
       owned_aggregates:runOwnedAggregateContracts({sass,entry,loadPaths:[join(consumer,'node_modules')],allowedRoots,importers:[makeImporter({requested,denied})],line:'main',ordinaryControlContext,...reference}),
     })});}
@@ -574,11 +578,13 @@ async function main() {
   catch(error){functions={...functions,ok:false,error:String(error.message||error)};}
   try{if(functions.mixin_arguments?.ordinary_card_defaults)api.css=attachOrdinaryCardDefaultReferences({context:ordinaryCardContext,css:api.css,references:functions.mixin_arguments.ordinary_card_defaults});}
   catch(error){functions={...functions,ok:false,error:String(error.message||error)};}
-  const apiResults = classifyPending(compareInventory(oracle, api.members, api.css,{spinnerSnackContext,ordinaryControlContext,ordinaryCardContext,ordinaryDensityContext}), decisions);
+  try{if(functions.mixin_arguments?.private_card_reference)api.css=attachPrivateCardReference({context:privateCardContext,css:api.css,reference:functions.mixin_arguments.private_card_reference});}
+  catch(error){functions={...functions,ok:false,error:String(error.message||error)};}
+  const apiResults = classifyPending(compareInventory(oracle, api.members, api.css,{spinnerSnackContext,ordinaryControlContext,ordinaryCardContext,ordinaryDensityContext,privateCardContext}), decisions);
   if (JSON.stringify(apiResults.map(item => item.case_id)) !== JSON.stringify(apiIds)) {
     fail(1, 'sass-api-and-values results do not match the predeclared case ids');
   }
-  const drift = apiDriftNegative(oracle, api.members, api.css,{spinnerSnackContext,ordinaryControlContext,ordinaryCardContext,ordinaryDensityContext});
+  const drift = apiDriftNegative(oracle, api.members, api.css,{spinnerSnackContext,ordinaryControlContext,ordinaryCardContext,ordinaryDensityContext,privateCardContext});
 
 
   // Isolation negatives actually executed by this seal: archived import refusal,
