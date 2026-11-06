@@ -1,0 +1,916 @@
+{
+  "schema": "parent-menu-binding-lifecycle-integration-v1",
+  "change": "Close and remove cleared or replaced menu bindings, preserve reentrant close and attachment ownership, and reject submenu hover events queued for an earlier parent opening. Twelve maintained regression cases added. These intentionally repair two defects also observed in tagged16.",
+  "retained_index": {
+    "archive_bytes": 941168,
+    "archive_path": "/tmp/c04-menu002-retained-v1-04ad27a5cb15c6ac10f68a32ba4bad5bfe95bb4234755086c13ccdf6f1636fab.tar.gz",
+    "archive_sha256": "04ad27a5cb15c6ac10f68a32ba4bad5bfe95bb4234755086c13ccdf6f1636fab",
+    "author_results": {
+      "21": {
+        "executed": 161,
+        "failed": 0,
+        "passed": 161,
+        "skipped": 0
+      },
+      "main": {
+        "executed": 161,
+        "failed": 0,
+        "passed": 161,
+        "skipped": 0
+      },
+      "targeted_per_floor": "22/23; sole disabledInteractive failure remains separate and unaddressed"
+    },
+    "baseline_and_adoption": "Read-only git apply --check succeeded for candidate plus tests against both current maintained roots. No actual apply was performed. Full v6 author suite results checked by hash and totals, not independently rerun; previous v2/v3 negative diagnostics retained in independent receipts.",
+    "candidate_product_patch": {
+      "path": "/tmp/c04-menu002-candidate-v5.patch",
+      "sha256": "3a4f34c3486f227a362319ddaeb5179771121b454408cfba7b4050624cfad566"
+    },
+    "candidate_tests_patch": {
+      "notes": "12 focused cases added to existing menu.spec; includes clear, motion replacement, earlier close observer, focus-init rebind/throw, completed close stream, focus restoration, hover exiting/open/reopened generation, same-panel lazy reentry, destruction during close. Existing suite separately covers synchronous reopen.",
+      "path": "/tmp/c04-menu002-tests-v6.patch",
+      "sha256": "9c2022f7292c4b5eb62054229a381789fc41cdcc17bf875a930be65d6427774a"
+    },
+    "final_independent_review_sha256": "259fc589be243342575d8a33ec02c72e17bfb1871d7fa1a277619c59fd72d28b",
+    "independent_results": {
+      "21": {
+        "executed": 18,
+        "failed": 1,
+        "passed": 17,
+        "skipped": 0
+      },
+      "main": {
+        "executed": 18,
+        "failed": 1,
+        "passed": 17,
+        "skipped": 0
+      },
+      "notes": "Both 17/18 with sole disabledInteractive failure; prior observer, initialization clearing, and same-panel lazy ABA diagnostics pass. Browser fixture uses scratch workspace-dist and synthetic/fake callback controls, not packed-artifact qualification. Launcher logged a shutdown crash/resource warning after browser reported results."
+    },
+    "limits": [
+      "No maintained files were written.",
+      "Full v6 author suites were preserved and hash/totals checked as reported; they were not independently rerun.",
+      "Independent focused runs were 17/18 each, with disabledInteractive as the sole failure; shutdown resource warnings are retained in logs.",
+      "No current packed-artifact, complete browser matrix, real transition timing, security, G11, or release-gate claim.",
+      "No product integration authorized by this retention packet."
+    ],
+    "maintained_current_preimages": {
+      "21": {
+        "head": "27aafacc46a8b1375729f1248139d9a9265a152e",
+        "preimages": [
+          {
+            "bytes": 26879,
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "retained_path": "preimages/21/projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "8e35b1a458a5b501053286d23fd4cf1934aa9e2237f5e0e2f1c6ffbb69221215"
+          },
+          {
+            "bytes": 117005,
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "retained_path": "preimages/21/projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "ae3c8c981a50ac6ba11f943a3f1ceba644f28da9b707a05ff10225afc6fc8d1c"
+          }
+        ],
+        "root": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+        "target_worktree_status": "clean for retained target paths"
+      },
+      "main": {
+        "head": "d0741fbc8848217b0578eaeea7284cde1ef3e6dd",
+        "preimages": [
+          {
+            "bytes": 26879,
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "retained_path": "preimages/main/projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "8e35b1a458a5b501053286d23fd4cf1934aa9e2237f5e0e2f1c6ffbb69221215"
+          },
+          {
+            "bytes": 117005,
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "retained_path": "preimages/main/projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "ae3c8c981a50ac6ba11f943a3f1ceba644f28da9b707a05ff10225afc6fc8d1c"
+          }
+        ],
+        "root": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+        "target_worktree_status": "clean for retained target paths"
+      }
+    },
+    "member_count": 40,
+    "members": [
+      {
+        "bytes": 28748,
+        "path": "evidence/author_full_21/menu-results-v6.json",
+        "sha256": "e8c8be3ea6823cc36c341160dfc82bff27677c96cba5f0af7a6c04cd0b2021ff"
+      },
+      {
+        "bytes": 28750,
+        "path": "evidence/author_full_main/menu-results-v6.json",
+        "sha256": "bccea13acf375c371e2823fd71b2652c9a02006863d7e19293c64ea8bcace1db"
+      },
+      {
+        "bytes": 6399,
+        "path": "evidence/independent-21/log.log",
+        "sha256": "1e1d6daf296a89119ee537008a30ba37455425a281fb22214a48be9939b930ab"
+      },
+      {
+        "bytes": 4918,
+        "path": "evidence/independent-21/result.json",
+        "sha256": "8066202e83573d6d6eb2f2b821200f17d01f85c2699308d82f53842ecdfe3c87"
+      },
+      {
+        "bytes": 11230,
+        "path": "evidence/independent-21/spec.ts",
+        "sha256": "cfea4a5449645fd55a21ecb0021fa46e418fb3c7796ce12de74454291d7b13be"
+      },
+      {
+        "bytes": 6398,
+        "path": "evidence/independent-main/log.log",
+        "sha256": "0b30ea2bec1848d6a0d4ace1954e73bfa7206b548b7e8ab3ee255bb35fdce5c4"
+      },
+      {
+        "bytes": 4920,
+        "path": "evidence/independent-main/result.json",
+        "sha256": "a9f6cb2342aa0db5b6fc758038cc6e542b1d500abb1eb31da51bc1cce513c142"
+      },
+      {
+        "bytes": 11230,
+        "path": "evidence/independent-main/spec.ts",
+        "sha256": "cfea4a5449645fd55a21ecb0021fa46e418fb3c7796ce12de74454291d7b13be"
+      },
+      {
+        "bytes": 12489,
+        "path": "evidence/indexed/00-c04-menu002-candidate-v5.patch",
+        "sha256": "3a4f34c3486f227a362319ddaeb5179771121b454408cfba7b4050624cfad566"
+      },
+      {
+        "bytes": 14453,
+        "path": "evidence/indexed/01-c04-menu002-targeted-v4.spec.ts",
+        "sha256": "4e23f3e45fddfeec913d4dce198a5a4853199ca8c21cc3d78d29415c9b9348f6"
+      },
+      {
+        "bytes": 5784,
+        "path": "evidence/indexed/02-results-v5.json",
+        "sha256": "6bc81660356c5675c4be2c09eeadba35931fa4ac0f14cac24d0132f1686a090d"
+      },
+      {
+        "bytes": 5786,
+        "path": "evidence/indexed/03-results-v5.json",
+        "sha256": "06eb7dd769508909a14aaa796c07d90eaf3531ff2e1e7e13176bd1e1b24b160c"
+      },
+      {
+        "bytes": 6263,
+        "path": "evidence/indexed/04-probe-review.log",
+        "sha256": "d5485fc3b30488af38b0a100a2b8f4af24c7a35aa64718878ba9378ecf73d5f0"
+      },
+      {
+        "bytes": 6421,
+        "path": "evidence/indexed/05-probe-aba.log",
+        "sha256": "4a9546207c7587f9949d66eb0646a90798771326d1917d422306f83fdbf23b1e"
+      },
+      {
+        "bytes": 7722,
+        "path": "evidence/indexed/06-run-v2.log",
+        "sha256": "ce43a837c2009ba22cee92b31bd04dc5c53655d3bee50f236f974fe94ef0f511"
+      },
+      {
+        "bytes": 7783,
+        "path": "evidence/indexed/07-run-v3.log",
+        "sha256": "79f49adda2b54e6d2d90d41a068456d457c03c416a04b438abe5bb49c0db34a5"
+      },
+      {
+        "bytes": 7284,
+        "path": "evidence/indexed/08-run-v4.log",
+        "sha256": "1b79c238aae76691e09d8a35a9d2a55a72e23aed0d008b210dea13261fa6ace8"
+      },
+      {
+        "bytes": 11679,
+        "path": "evidence/indexed/09-c04-menu002-tests-v6.patch",
+        "sha256": "9c2022f7292c4b5eb62054229a381789fc41cdcc17bf875a930be65d6427774a"
+      },
+      {
+        "bytes": 28748,
+        "path": "evidence/indexed/10-menu-results-v6.json",
+        "sha256": "e8c8be3ea6823cc36c341160dfc82bff27677c96cba5f0af7a6c04cd0b2021ff"
+      },
+      {
+        "bytes": 28750,
+        "path": "evidence/indexed/11-menu-results-v6.json",
+        "sha256": "bccea13acf375c371e2823fd71b2652c9a02006863d7e19293c64ea8bcace1db"
+      },
+      {
+        "bytes": 6399,
+        "path": "evidence/indexed/12-run-v5.log",
+        "sha256": "1e1d6daf296a89119ee537008a30ba37455425a281fb22214a48be9939b930ab"
+      },
+      {
+        "bytes": 4918,
+        "path": "evidence/indexed/13-results-v5.json",
+        "sha256": "8066202e83573d6d6eb2f2b821200f17d01f85c2699308d82f53842ecdfe3c87"
+      },
+      {
+        "bytes": 26879,
+        "path": "preimages/21/projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+        "sha256": "8e35b1a458a5b501053286d23fd4cf1934aa9e2237f5e0e2f1c6ffbb69221215"
+      },
+      {
+        "bytes": 117005,
+        "path": "preimages/21/projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+        "sha256": "ae3c8c981a50ac6ba11f943a3f1ceba644f28da9b707a05ff10225afc6fc8d1c"
+      },
+      {
+        "bytes": 26879,
+        "path": "preimages/main/projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+        "sha256": "8e35b1a458a5b501053286d23fd4cf1934aa9e2237f5e0e2f1c6ffbb69221215"
+      },
+      {
+        "bytes": 117005,
+        "path": "preimages/main/projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+        "sha256": "ae3c8c981a50ac6ba11f943a3f1ceba644f28da9b707a05ff10225afc6fc8d1c"
+      },
+      {
+        "bytes": 7391,
+        "path": "source-evidence/independent-final-review-v1.json",
+        "sha256": "259fc589be243342575d8a33ec02c72e17bfb1871d7fa1a277619c59fd72d28b"
+      },
+      {
+        "bytes": 111064,
+        "path": "source-evidence/runtime-contract-assignment-v2.json",
+        "sha256": "701d7030012ba83fd6aa93c5f610f205a7c120afd2371e0ecd5815efe72c6fae"
+      },
+      {
+        "bytes": 2169065,
+        "path": "source-evidence/runtime-contract-closure-manifest-v1.json",
+        "sha256": "c388f8e4e8f6371f16ef895dc5d63ed0340c04e91967d63b6ee110bb95adf830"
+      },
+      {
+        "bytes": 2992,
+        "path": "source-evidence/scratch-v6-index.json",
+        "sha256": "3ba5d1b382685cdfe433f59a2e71d68bcb072e163ee85533d85e7cf14e8d2966"
+      },
+      {
+        "bytes": 10943,
+        "path": "source-originals/77393153fd4f6acad65fad6b8f0eefeb8dcd4b06.patch",
+        "sha256": "54b926776f31b5a74f12b6814d79d56b013a5104939063d4f63252dcc282677f"
+      },
+      {
+        "bytes": 6903,
+        "path": "source-originals/7b2627de2acff330a0d3ae1956de8f5b96025532.patch",
+        "sha256": "95495ac79762cac4d46d3c39aae57c2336bafd52e7a897f4b8770c6d79c1e3d0"
+      },
+      {
+        "bytes": 2568,
+        "path": "source-originals/813f66b839d1684c3d5342e55ba61e948c979fab.patch",
+        "sha256": "05b93e00f364439c845f4de824ccb7cf852e3d92a01a6443cab4edadf48c2be9"
+      },
+      {
+        "bytes": 6049,
+        "path": "source-originals/814ff1a25a5cb0bfeead32903ea8a23c70bf50da.patch",
+        "sha256": "5d214f434fd53b6c3b1e699b6a0f4364f543c778486222a279d10a78d8de0554"
+      },
+      {
+        "bytes": 1152,
+        "path": "source-originals/81eeff4beddbadd6518aca123182ae271be80819.patch",
+        "sha256": "79ae2de6d5169521a17def2e94b41fe197339db45e29d665dd3b6fb0a6145bce"
+      },
+      {
+        "bytes": 43868,
+        "path": "source-originals/867cee73273760c10945af16257e457945068668.patch",
+        "sha256": "a7248140c5385def956d46079cf05a81393eb37630ad5b33fd1689749e5a6414"
+      },
+      {
+        "bytes": 6342,
+        "path": "source-originals/879cbe7557d33c3bf7ecb7c48c91dd9e86c2181e.patch",
+        "sha256": "888c8dd9bdb2f6f869ca46fea3860fc0c08b619970783d9a1f6266890d6f53b1"
+      },
+      {
+        "bytes": 2029,
+        "path": "source-originals/8b729f39e6c34729b03e6b47c2bc2112333d3d16.patch",
+        "sha256": "bc47914070fde9183451f7b2e3031efe819a83b3c1204f5ec393b4a210d78f00"
+      },
+      {
+        "bytes": 1260,
+        "path": "source-originals/904abe1f1e027b89e524ec1de69a16187b68d1af.patch",
+        "sha256": "59287ee72fb2e673159b0ed88d92d550090a033d08da55dc7fd1cd685e3832ef"
+      },
+      {
+        "bytes": 4345,
+        "path": "source-originals/9381f90653c8e43d470f9f364f46744e04356c02.patch",
+        "sha256": "02649c4425ab579aab67d568f749918fc44f27e4cc66ef18b48fc411473bf4e9"
+      }
+    ],
+    "original_source_batch": {
+      "assignment_id": "C04-Runtime-material-menu-002",
+      "assignment_sha256": "701d7030012ba83fd6aa93c5f610f205a7c120afd2371e0ecd5815efe72c6fae",
+      "closure_manifest_sha256": "c388f8e4e8f6371f16ef895dc5d63ed0340c04e91967d63b6ee110bb95adf830",
+      "ordered_path_occurrences": 29,
+      "original_count": 10,
+      "rows": [
+        {
+          "complete_changed_file_count": 3,
+          "complete_changed_files": [
+            {
+              "after_blob": "cabacfe4b5a8c5008941ab7d86bf01492e469200",
+              "after_mode": "100644",
+              "before_blob": "fc4369907ddd4e03ffffe09649ca2045258d1d0e",
+              "before_mode": "100644",
+              "path": "src/material/menu/menu-content.ts",
+              "status": "M"
+            },
+            {
+              "after_blob": "42bdbe2b8febf616e2fc9ee46ef44e3845a381b7",
+              "after_mode": "100644",
+              "before_blob": "d7f85f2a22d13720c8cd7286fb658114ff1c7fe7",
+              "before_mode": "100644",
+              "path": "src/material/menu/menu-trigger.ts",
+              "status": "M"
+            },
+            {
+              "after_blob": "d25a6c9713b110d3965012f22187d94e0c99dfc2",
+              "after_mode": "100644",
+              "before_blob": "fc7de98f09283c7c03ea14e28b6af21e78e3c97f",
+              "before_mode": "100644",
+              "path": "src/material/menu/menu.spec.ts",
+              "status": "M"
+            }
+          ],
+          "ledger_path_set_matches_complete_original": true,
+          "ledger_paths": [
+            "src/material/menu/menu-content.ts",
+            "src/material/menu/menu-trigger.ts",
+            "src/material/menu/menu.spec.ts"
+          ],
+          "parent": "02967137f3aba759811e81bc7be5acc6cc6ebc6d",
+          "patch_path": "source-originals/77393153fd4f6acad65fad6b8f0eefeb8dcd4b06.patch",
+          "patch_sha256": "54b926776f31b5a74f12b6814d79d56b013a5104939063d4f63252dcc282677f",
+          "proposed_disposition": "Do not adopt upstream lifecycle decoupling",
+          "raw_commit_sha256": "bb66ac8b68ec3f3a6dea94f28eb0a2195a8244744f8c51a89af8db07bf0aa3e0",
+          "sha": "77393153fd4f6acad65fad6b8f0eefeb8dcd4b06",
+          "subject": "fix(material/menu): decouple menu lifecycle from animations (#30148)",
+          "tree": "0cfc28d9a6a36c505038abe4393c05a1b33690e8"
+        },
+        {
+          "complete_changed_file_count": 4,
+          "complete_changed_files": [
+            {
+              "after_blob": "6f42f60caa10bae53c15b94d8c138bd9db0167db",
+              "after_mode": "100644",
+              "before_blob": "d4cc3801ed01ebbc5a26eda30c66096acc045289",
+              "before_mode": "100644",
+              "path": "src/dev-app/menu/menu-demo.html",
+              "status": "M"
+            },
+            {
+              "after_blob": "9b8ab63420f14b91a8ac9aea2d06e0fda19c9556",
+              "after_mode": "100644",
+              "before_blob": "4fb81fba46b542d0a442ae0cb3d31d8759cbf62e",
+              "before_mode": "100644",
+              "path": "src/material/menu/BUILD.bazel",
+              "status": "M"
+            },
+            {
+              "after_blob": "1519ceeccd4d270cddde5299c5357319352c9fc0",
+              "after_mode": "100644",
+              "before_blob": "efdf997a3b88ff6c1bbbdf9e088c2a8a39a8107a",
+              "before_mode": "100644",
+              "path": "src/material/menu/menu-trigger-base.ts",
+              "status": "M"
+            },
+            {
+              "after_blob": "14c1ecb99d9703eec56faf7bad92c5f7f985529b",
+              "after_mode": "100644",
+              "before_blob": "28a0d50fd10e35edce475eb490511982b450250a",
+              "before_mode": "100644",
+              "path": "src/material/menu/menu.spec.ts",
+              "status": "M"
+            }
+          ],
+          "ledger_path_set_matches_complete_original": false,
+          "ledger_paths": [
+            "src/material/menu/BUILD.bazel",
+            "src/material/menu/menu-trigger-base.ts",
+            "src/material/menu/menu.spec.ts"
+          ],
+          "parent": "eba6ee844b8e8e6044e1675b5e41ff13224ead75",
+          "patch_path": "source-originals/7b2627de2acff330a0d3ae1956de8f5b96025532.patch",
+          "patch_sha256": "95495ac79762cac4d46d3c39aae57c2336bafd52e7a897f4b8770c6d79c1e3d0",
+          "proposed_disposition": "Pending individual behavior decision",
+          "raw_commit_sha256": "f68a61d7a46dc7f8d28e7b12701c9a5485804e1d612bc2d9078ac0e8000e4a90",
+          "sha": "7b2627de2acff330a0d3ae1956de8f5b96025532",
+          "subject": "fix(material/menu): Do not open the menu when trigger is aria-disabled (properly handle disabledInteractive) (#32601)",
+          "tree": "1b74fc5f5558c674f61d5a543b8901bc4571ae88"
+        },
+        {
+          "complete_changed_file_count": 3,
+          "complete_changed_files": [
+            {
+              "after_blob": "2b79df3d1af951143d21b0e23637f987e1aaac74",
+              "after_mode": "100644",
+              "before_blob": "e2c4711e4da04abac2abfbcf84579c4907ef4c80",
+              "before_mode": "100644",
+              "path": "goldens/material/menu/index.api.md",
+              "status": "M"
+            },
+            {
+              "after_blob": "bfa7b7419207f737a044a77293d782f71898fce1",
+              "after_mode": "100644",
+              "before_blob": "d8988e08ef3fb292561ab3747464054e72a5a10b",
+              "before_mode": "100644",
+              "path": "src/material/menu/menu.html",
+              "status": "M"
+            },
+            {
+              "after_blob": "88c2ec9e13908dc966687569ae331c5b6b7642be",
+              "after_mode": "100644",
+              "before_blob": "aa081b9440b5f74bff2b3e5f96e4c407cc51c7bd",
+              "before_mode": "100644",
+              "path": "src/material/menu/menu.ts",
+              "status": "M"
+            }
+          ],
+          "ledger_path_set_matches_complete_original": false,
+          "ledger_paths": [
+            "src/material/menu/menu.html",
+            "src/material/menu/menu.ts"
+          ],
+          "parent": "2789a0b69a34a31fe2513b9308a6426c101171b0",
+          "patch_path": "source-originals/813f66b839d1684c3d5342e55ba61e948c979fab.patch",
+          "patch_sha256": "05b93e00f364439c845f4de824ccb7cf852e3d92a01a6443cab4edadf48c2be9",
+          "proposed_disposition": "Do not adopt internal signal rewrite",
+          "raw_commit_sha256": "0d9e0eccd05239a7a9b9b5ac78a53f5dde2793b1f6d80270bc971d6c367e5fdf",
+          "sha": "813f66b839d1684c3d5342e55ba61e948c979fab",
+          "subject": "fix(material/menu): switch internal state to signals (#31934)",
+          "tree": "1c95e89199dee60729605101ed1bae57acdbb8ca"
+        },
+        {
+          "complete_changed_file_count": 4,
+          "complete_changed_files": [
+            {
+              "after_blob": "6bcf558fedcc8967d57fe2b12f00edfb9d81afcd",
+              "after_mode": "100644",
+              "before_blob": "7c8c377bad63867dae66976275c565946f18b613",
+              "before_mode": "100644",
+              "path": "goldens/material/menu/index.api.md",
+              "status": "M"
+            },
+            {
+              "after_blob": "c8c669b79f5015c95cc81a3845562f8f499a5253",
+              "after_mode": "100644",
+              "before_blob": "9e1267bb7b277ec59f979345a7f7a21d0d4cd7fc",
+              "before_mode": "100644",
+              "path": "src/material/menu/BUILD.bazel",
+              "status": "M"
+            },
+            {
+              "after_blob": "0000000000000000000000000000000000000000",
+              "after_mode": "000000",
+              "before_blob": "29dc0ad5364d2673c9aab73ce3738c934d88ec95",
+              "before_mode": "100644",
+              "path": "src/material/menu/menu-animations.ts",
+              "status": "D"
+            },
+            {
+              "after_blob": "8e394389e6b848cdb11f59e4a602eb42495d600e",
+              "after_mode": "100644",
+              "before_blob": "464e14ad7496d399042a71c742f3bc394754acc3",
+              "before_mode": "100644",
+              "path": "src/material/menu/public-api.ts",
+              "status": "M"
+            }
+          ],
+          "ledger_path_set_matches_complete_original": false,
+          "ledger_paths": [
+            "src/material/menu/BUILD.bazel",
+            "src/material/menu/menu-animations.ts",
+            "src/material/menu/public-api.ts"
+          ],
+          "parent": "232b9fc59535c5f04aaf16e07589e593395df4c1",
+          "patch_path": "source-originals/814ff1a25a5cb0bfeead32903ea8a23c70bf50da.patch",
+          "patch_sha256": "5d214f434fd53b6c3b1e699b6a0f4364f543c778486222a279d10a78d8de0554",
+          "proposed_disposition": "Do not adopt modern API deletion",
+          "raw_commit_sha256": "0a803193ac4e8fe9edee0adc1f1c4bcbdcaad49da15e9692e3547c89ee19a02c",
+          "sha": "814ff1a25a5cb0bfeead32903ea8a23c70bf50da",
+          "subject": "fix(material/menu): remove deprecated animation definitions",
+          "tree": "eabf0679e7b886c3f8763866c22b6b3881781e39"
+        },
+        {
+          "complete_changed_file_count": 1,
+          "complete_changed_files": [
+            {
+              "after_blob": "7d4cb842557a5fbdc2d5c9dbc587df8743714d06",
+              "after_mode": "100644",
+              "before_blob": "adcccddb7c0f5eed371db173918401b939d12179",
+              "before_mode": "100644",
+              "path": "src/material/menu/menu-trigger.ts",
+              "status": "M"
+            }
+          ],
+          "ledger_path_set_matches_complete_original": true,
+          "ledger_paths": [
+            "src/material/menu/menu-trigger.ts"
+          ],
+          "parent": "c2d240694b0342e816bbc1d7230a832eafc67e41",
+          "patch_path": "source-originals/81eeff4beddbadd6518aca123182ae271be80819.patch",
+          "patch_sha256": "79ae2de6d5169521a17def2e94b41fe197339db45e29d665dd3b6fb0a6145bce",
+          "proposed_disposition": "Adapt bounded owned hover guard, pending final qualification",
+          "raw_commit_sha256": "eeb6650878abeb0c172f06a40374106521bb3fe7971e352690b927ca339dc490",
+          "sha": "81eeff4beddbadd6518aca123182ae271be80819",
+          "subject": "fix(material/menu): prevent child menu reopening while parent is animating away (#31958)",
+          "tree": "6afeb82cdb61ed1eadea361cba9fdba8fa0edaa6"
+        },
+        {
+          "complete_changed_file_count": 6,
+          "complete_changed_files": [
+            {
+              "after_blob": "5d1bdfa5b1981cab361fc5f0ba33c84985175143",
+              "after_mode": "100644",
+              "before_blob": "f791dc2d3cde80eb5021935d7d8fd3bc5bb001ba",
+              "before_mode": "100644",
+              "path": "goldens/material/menu/index.api.md",
+              "status": "M"
+            },
+            {
+              "after_blob": "b88ba04bd6b5aabea80cb232e87cc7a04e6a62bb",
+              "after_mode": "100644",
+              "before_blob": "2b2fea4110f3943ccfac89d8705baec4211ce4b4",
+              "before_mode": "100644",
+              "path": "src/material/menu/BUILD.bazel",
+              "status": "M"
+            },
+            {
+              "after_blob": "1112776de1f37f28b55905d3162dbee30c4fdaed",
+              "after_mode": "100644",
+              "before_blob": "0000000000000000000000000000000000000000",
+              "before_mode": "000000",
+              "path": "src/material/menu/menu-trigger-base.ts",
+              "status": "A"
+            },
+            {
+              "after_blob": "adcccddb7c0f5eed371db173918401b939d12179",
+              "after_mode": "100644",
+              "before_blob": "85bb928eb85c9b1f56c46a0977f3c2bc1bfad20b",
+              "before_mode": "100644",
+              "path": "src/material/menu/menu-trigger.ts",
+              "status": "M"
+            },
+            {
+              "after_blob": "8683da549054a43da767d57fbdd5803cbabe84f5",
+              "after_mode": "100644",
+              "before_blob": "901b65b60c7855bcb4814f91c8b6ce712e936280",
+              "before_mode": "100644",
+              "path": "src/material/menu/module.ts",
+              "status": "M"
+            },
+            {
+              "after_blob": "524c9c12d25fee00fcbe5574c25a4c1b58d56721",
+              "after_mode": "100644",
+              "before_blob": "dbb976b59ae9a496d12aee72a81cfb8de5166a75",
+              "before_mode": "100644",
+              "path": "src/material/menu/public-api.ts",
+              "status": "M"
+            }
+          ],
+          "ledger_path_set_matches_complete_original": false,
+          "ledger_paths": [
+            "src/material/menu/BUILD.bazel",
+            "src/material/menu/menu-trigger-base.ts",
+            "src/material/menu/menu-trigger.ts",
+            "src/material/menu/module.ts",
+            "src/material/menu/public-api.ts"
+          ],
+          "parent": "0bdf5127542572e41160a8d8e3e1784000ea5e9a",
+          "patch_path": "source-originals/867cee73273760c10945af16257e457945068668.patch",
+          "patch_sha256": "a7248140c5385def956d46079cf05a81393eb37630ad5b33fd1689749e5a6414",
+          "proposed_disposition": "Do not adopt modern trigger/base/context refactor",
+          "raw_commit_sha256": "7e729f02015c43f8ea610b0752c156dab5087ac324a963902c1e07eefc6874ce",
+          "sha": "867cee73273760c10945af16257e457945068668",
+          "subject": "refactor(material/menu): move trigger logic into base class",
+          "tree": "0e5742e29146f15db5f59daf26346dd6dcf907cd"
+        },
+        {
+          "complete_changed_file_count": 3,
+          "complete_changed_files": [
+            {
+              "after_blob": "61b0c11819afc57c7f64ef0f8e905ee9be770f78",
+              "after_mode": "100644",
+              "before_blob": "42a7535808b86b4a4d0224be667e7a50391b0aa6",
+              "before_mode": "100644",
+              "path": "src/material/menu/BUILD.bazel",
+              "status": "M"
+            },
+            {
+              "after_blob": "29dc0ad5364d2673c9aab73ce3738c934d88ec95",
+              "after_mode": "100644",
+              "before_blob": "1e988537cc2687c2a53880a664c608d124e59af0",
+              "before_mode": "100644",
+              "path": "src/material/menu/menu-animations.ts",
+              "status": "M"
+            },
+            {
+              "after_blob": "5c8d334ec8ca3aca49cb9b141eddc4f3d6ac6519",
+              "after_mode": "100644",
+              "before_blob": "9bc9954d6531bf5edc31ec9aa38ffd729f7df86a",
+              "before_mode": "100644",
+              "path": "tools/public_api_guard/material/menu.md",
+              "status": "M"
+            }
+          ],
+          "ledger_path_set_matches_complete_original": false,
+          "ledger_paths": [
+            "src/material/menu/BUILD.bazel",
+            "src/material/menu/menu-animations.ts"
+          ],
+          "parent": "37693e308a205489c39a4697ac70ed025e768673",
+          "patch_path": "source-originals/879cbe7557d33c3bf7ecb7c48c91dd9e86c2181e.patch",
+          "patch_sha256": "888c8dd9bdb2f6f869ca46fea3860fc0c08b619970783d9a1f6266890d6f53b1",
+          "proposed_disposition": "Do not adopt modern compatibility metadata rewrite",
+          "raw_commit_sha256": "629d3e36655fd90b5ba1977cae30b4dc28561a81ba8fe09767afd800a47f972f",
+          "sha": "879cbe7557d33c3bf7ecb7c48c91dd9e86c2181e",
+          "subject": "fix(material/menu): remove remaining animation dependencies",
+          "tree": "abc1fd774d3a1ee7e9191601cc2dfbce0dc4e187"
+        },
+        {
+          "complete_changed_file_count": 2,
+          "complete_changed_files": [
+            {
+              "after_blob": "6e8bf225b59c2603cc11a3ee21794b60a20fec66",
+              "after_mode": "100644",
+              "before_blob": "beb574eee2cc97aad27f39aefd7a8dbe62051383",
+              "before_mode": "100644",
+              "path": "src/material/menu/menu-trigger-base.ts",
+              "status": "M"
+            },
+            {
+              "after_blob": "969a34725eb3d9877596358ae80647903a202a3a",
+              "after_mode": "100644",
+              "before_blob": "908e6eb32ff44b106f7742b572d9595e96df9f9d",
+              "before_mode": "100644",
+              "path": "src/material/menu/menu.spec.ts",
+              "status": "M"
+            }
+          ],
+          "ledger_path_set_matches_complete_original": true,
+          "ledger_paths": [
+            "src/material/menu/menu-trigger-base.ts",
+            "src/material/menu/menu.spec.ts"
+          ],
+          "parent": "9818e3cc93cf2761c2e45cde369272aa7d8db932",
+          "patch_path": "source-originals/8b729f39e6c34729b03e6b47c2bc2112333d3d16.patch",
+          "patch_sha256": "bc47914070fde9183451f7b2e3031efe819a83b3c1204f5ec393b4a210d78f00",
+          "proposed_disposition": "Adapt bounded owned clear/replace behavior, pending final qualification",
+          "raw_commit_sha256": "5394583c604bbce3e477afdc44878303514dc980efdf37eeb1a24336730dcee9",
+          "sha": "8b729f39e6c34729b03e6b47c2bc2112333d3d16",
+          "subject": "fix(material/menu): close menu when cleared from trigger (#33306)",
+          "tree": "ac1582c09830f30a1d64ac05badc968ebf100e44"
+        },
+        {
+          "complete_changed_file_count": 1,
+          "complete_changed_files": [
+            {
+              "after_blob": "76c75a2305a0ac8ef7111f50475d63dbb9e3bba6",
+              "after_mode": "100644",
+              "before_blob": "567cfff85120e018c6718bf30c15587a18d7e55f",
+              "before_mode": "100644",
+              "path": "src/material/menu/menu.scss",
+              "status": "M"
+            }
+          ],
+          "ledger_path_set_matches_complete_original": true,
+          "ledger_paths": [
+            "src/material/menu/menu.scss"
+          ],
+          "parent": "cc00a74ea50df0ea076bfa887f25a023d9bb749f",
+          "patch_path": "source-originals/904abe1f1e027b89e524ec1de69a16187b68d1af.patch",
+          "patch_sha256": "59287ee72fb2e673159b0ed88d92d550090a033d08da55dc7fd1cd685e3832ef",
+          "proposed_disposition": "Not applicable to owned selector",
+          "raw_commit_sha256": "479a9b5bf8adadf08c95b167ae2efe469ea7b7c3dac019ce43c112775c3b8b57",
+          "sha": "904abe1f1e027b89e524ec1de69a16187b68d1af",
+          "subject": "fix(material/menu): prevent divider styles from bleeding out (#29111)",
+          "tree": "d27988647b1c70d56e9238925995f24a4b35d8f9"
+        },
+        {
+          "complete_changed_file_count": 2,
+          "complete_changed_files": [
+            {
+              "after_blob": "ae46031d7f1ab43fa0c53905fec5484b5257a030",
+              "after_mode": "100644",
+              "before_blob": "7f234a34de7e3f24a51fe6502188583a8ec63ac1",
+              "before_mode": "100644",
+              "path": "src/material/menu/menu.html",
+              "status": "M"
+            },
+            {
+              "after_blob": "c2e0716ec0fe0850a1d3a6fab87426872b31603d",
+              "after_mode": "100644",
+              "before_blob": "666226b7ddb20f2b567e911782260e00792d4f21",
+              "before_mode": "100644",
+              "path": "src/material/menu/menu.ts",
+              "status": "M"
+            }
+          ],
+          "ledger_path_set_matches_complete_original": true,
+          "ledger_paths": [
+            "src/material/menu/menu.html",
+            "src/material/menu/menu.ts"
+          ],
+          "parent": "8ec47aa4be765568b4f4ac772829913660e70362",
+          "patch_path": "source-originals/9381f90653c8e43d470f9f364f46744e04356c02.patch",
+          "patch_sha256": "02649c4425ab579aab67d568f749918fc44f27e4cc66ef18b48fc411473bf4e9",
+          "proposed_disposition": "Do not adopt NgClass refactor",
+          "raw_commit_sha256": "791ddb29129f18dd092cae20b72ed3c47c8f14e3fa5c74f4906f8716878f2b23",
+          "sha": "9381f90653c8e43d470f9f364f46744e04356c02",
+          "subject": "fix(material/menu): remove dependency on NgClass (#28877)",
+          "tree": "08b0eed338c060e925a22c4e72170a2dae047085"
+        }
+      ]
+    },
+    "review_conclusion": "Within authorized intentional fixes, no remaining source-level blocker found. Binding close deferral handles prior synchronous observer; captured generations and per-attachment identity guard cleanup against newer opening; delayed hover binds to owner and generation; preserves owned motion exit and uses local trigger/panel behavior. Narrow catch covers attachment and initialization; later _startAnimation throw keeps pre-existing handling. Shared panel and unusual callback combinations remain bounded by tests, not universal proof.",
+    "role": "bounded retention packet for C04 material/menu-002 v5 product candidate and v6 focused tests; no canonical integration or gate authorization",
+    "schema_version": 1,
+    "scratch_index_sha256": "3ba5d1b382685cdfe433f59a2e71d68bcb072e163ee85533d85e7cf14e8d2966",
+    "unresolved": "7b disabledInteractive remains open, with no generic aria-disabled guard adopted. Historical 16 shares the two intentionally repaired defects, so no parity claim. No current packed-artifact, full native browser matrix, real transition timing, security review or G11 conclusion."
+  },
+  "archive": {
+    "path": "compatibility/rc/parent-menu-binding-lifecycle-evidence-04ad27a5cb15c6ac10f68a32ba4bad5bfe95bb4234755086c13ccdf6f1636fab.tar.gz",
+    "sha256": "04ad27a5cb15c6ac10f68a32ba4bad5bfe95bb4234755086c13ccdf6f1636fab",
+    "bytes": 941168
+  },
+  "independent_review": {
+    "scope": "Independent source and focused scratch browser review for C04 material menu 002; no maintained writes, canonical closure, packed-artifact or release gate claim.",
+    "candidate": {
+      "path": "/tmp/c04-menu002-candidate-v5.patch",
+      "sha256": "3a4f34c3486f227a362319ddaeb5179771121b454408cfba7b4050624cfad566"
+    },
+    "maintainable_tests": {
+      "path": "/tmp/c04-menu002-tests-v6.patch",
+      "sha256": "9c2022f7292c4b5eb62054229a381789fc41cdcc17bf875a930be65d6427774a",
+      "notes": "12 focused cases added to existing menu.spec; includes clear, motion replacement, earlier close observer, focus-init rebind/throw, completed close stream, focus restoration, hover exiting/open/reopened generation, same-panel lazy reentry, destruction during close. Existing suite separately covers synchronous reopen."
+    },
+    "originals": {
+      "assignment": "/tmp/c04-runtime-contract-source-assignments-v2.json",
+      "exact_repo": "/tmp/c04-originals-runtime-contract-40-exact-v1.git",
+      "result": "All ten direct-parent complete full-index binary diffs regenerated with no lazy fetch or replacements and byte-matched; all 29 ordered paths reconcile to assignment and packet.",
+      "rows": [
+        {
+          "sha": "77393153fd4f6acad65fad6b8f0eefeb8dcd4b06",
+          "patch_sha256": "54b926776f31b5a74f12b6814d79d56b013a5104939063d4f63252dcc282677f",
+          "paths": 3,
+          "proposed_disposition": "Do not adopt upstream lifecycle decoupling"
+        },
+        {
+          "sha": "7b2627de2acff330a0d3ae1956de8f5b96025532",
+          "patch_sha256": "95495ac79762cac4d46d3c39aae57c2336bafd52e7a897f4b8770c6d79c1e3d0",
+          "paths": 4,
+          "proposed_disposition": "Pending individual behavior decision"
+        },
+        {
+          "sha": "813f66b839d1684c3d5342e55ba61e948c979fab",
+          "patch_sha256": "05b93e00f364439c845f4de824ccb7cf852e3d92a01a6443cab4edadf48c2be9",
+          "paths": 3,
+          "proposed_disposition": "Do not adopt internal signal rewrite"
+        },
+        {
+          "sha": "814ff1a25a5cb0bfeead32903ea8a23c70bf50da",
+          "patch_sha256": "5d214f434fd53b6c3b1e699b6a0f4364f543c778486222a279d10a78d8de0554",
+          "paths": 4,
+          "proposed_disposition": "Do not adopt modern API deletion"
+        },
+        {
+          "sha": "81eeff4beddbadd6518aca123182ae271be80819",
+          "patch_sha256": "79ae2de6d5169521a17def2e94b41fe197339db45e29d665dd3b6fb0a6145bce",
+          "paths": 1,
+          "proposed_disposition": "Adapt bounded owned hover guard, pending final qualification"
+        },
+        {
+          "sha": "867cee73273760c10945af16257e457945068668",
+          "patch_sha256": "a7248140c5385def956d46079cf05a81393eb37630ad5b33fd1689749e5a6414",
+          "paths": 6,
+          "proposed_disposition": "Do not adopt modern trigger/base/context refactor"
+        },
+        {
+          "sha": "879cbe7557d33c3bf7ecb7c48c91dd9e86c2181e",
+          "patch_sha256": "888c8dd9bdb2f6f869ca46fea3860fc0c08b619970783d9a1f6266890d6f53b1",
+          "paths": 3,
+          "proposed_disposition": "Do not adopt modern compatibility metadata rewrite"
+        },
+        {
+          "sha": "8b729f39e6c34729b03e6b47c2bc2112333d3d16",
+          "patch_sha256": "bc47914070fde9183451f7b2e3031efe819a83b3c1204f5ec393b4a210d78f00",
+          "paths": 2,
+          "proposed_disposition": "Adapt bounded owned clear/replace behavior, pending final qualification"
+        },
+        {
+          "sha": "904abe1f1e027b89e524ec1de69a16187b68d1af",
+          "patch_sha256": "59287ee72fb2e673159b0ed88d92d550090a033d08da55dc7fd1cd685e3832ef",
+          "paths": 1,
+          "proposed_disposition": "Not applicable to owned selector"
+        },
+        {
+          "sha": "9381f90653c8e43d470f9f364f46744e04356c02",
+          "patch_sha256": "02649c4425ab579aab67d568f749918fc44f27e4cc66ef18b48fc411473bf4e9",
+          "paths": 2,
+          "proposed_disposition": "Do not adopt NgClass refactor"
+        }
+      ]
+    },
+    "review": "Within authorized intentional fixes, no remaining source-level blocker found. Binding close deferral handles prior synchronous observer; captured generations and per-attachment identity guard cleanup against newer opening; delayed hover binds to owner and generation; preserves owned motion exit and uses local trigger/panel behavior. Narrow catch covers attachment and initialization; later _startAnimation throw keeps pre-existing handling. Shared panel and unusual callback combinations remain bounded by tests, not universal proof.",
+    "test_reports": {
+      "author_full_21": {
+        "path": "/tmp/c04-menu002-fix-21/menu-results-v6.json",
+        "sha256": "e8c8be3ea6823cc36c341160dfc82bff27677c96cba5f0af7a6c04cd0b2021ff",
+        "totals": {
+          "executed": 161,
+          "passed": 161,
+          "failed": 0,
+          "skipped": 0
+        }
+      },
+      "author_full_main": {
+        "path": "/tmp/c04-menu002-fix-main/menu-results-v6.json",
+        "sha256": "bccea13acf375c371e2823fd71b2652c9a02006863d7e19293c64ea8bcace1db",
+        "totals": {
+          "executed": 161,
+          "passed": 161,
+          "failed": 0,
+          "skipped": 0
+        }
+      },
+      "author_targeted": "V5 target tests 22/23 on each floor, sole failure disabledInteractive; separate contract decision remains open.",
+      "independent_21": {
+        "spec": "/tmp/c04-menu002-independent-probe/frozen-v5.spec.ts",
+        "spec_sha256": "cfea4a5449645fd55a21ecb0021fa46e418fb3c7796ce12de74454291d7b13be",
+        "log": "/tmp/c04-menu002-independent-probe/run-v5.log",
+        "log_sha256": "1e1d6daf296a89119ee537008a30ba37455425a281fb22214a48be9939b930ab",
+        "result": "/tmp/c04-menu002-independent-probe/results-v5.json",
+        "result_sha256": "8066202e83573d6d6eb2f2b821200f17d01f85c2699308d82f53842ecdfe3c87",
+        "totals": {
+          "executed": 18,
+          "passed": 17,
+          "failed": 1,
+          "skipped": 0
+        }
+      },
+      "independent_main": {
+        "spec": "/tmp/c04-menu002-independent-main/projects/c04-menu002.spec.ts",
+        "spec_sha256": "cfea4a5449645fd55a21ecb0021fa46e418fb3c7796ce12de74454291d7b13be",
+        "log": "/tmp/c04-menu002-independent-main/run.log",
+        "log_sha256": "0b30ea2bec1848d6a0d4ace1954e73bfa7206b548b7e8ab3ee255bb35fdce5c4",
+        "result": "/tmp/c04-menu002-independent-main/results.json",
+        "result_sha256": "a9f6cb2342aa0db5b6fc758038cc6e542b1d500abb1eb31da51bc1cce513c142",
+        "totals": {
+          "executed": 18,
+          "passed": 17,
+          "failed": 1,
+          "skipped": 0
+        }
+      },
+      "independent_qualification": "Both 17/18 with sole disabledInteractive failure; prior observer, initialization clearing, and same-panel lazy ABA diagnostics pass. Browser fixture uses scratch workspace-dist and synthetic/fake callback controls, not packed-artifact qualification. Launcher logged a shutdown crash/resource warning after browser reported results."
+    },
+    "baseline_and_adoption": "Read-only git apply --check succeeded for candidate plus tests against both current maintained roots. No actual apply was performed. Full v6 author suite results checked by hash and totals, not independently rerun; previous v2/v3 negative diagnostics retained in independent receipts.",
+    "unresolved": "7b disabledInteractive remains open, with no generic aria-disabled guard adopted. Historical 16 shares the two intentionally repaired defects, so no parity claim. No current packed-artifact, full native browser matrix, real transition timing, security review or G11 conclusion."
+  },
+  "source_before": {
+    "21": {
+      "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts": {
+        "sha256": "8e35b1a458a5b501053286d23fd4cf1934aa9e2237f5e0e2f1c6ffbb69221215",
+        "bytes": 26879
+      },
+      "projects/ngx-material-legacy/legacy-menu/menu.spec.ts": {
+        "sha256": "ae3c8c981a50ac6ba11f943a3f1ceba644f28da9b707a05ff10225afc6fc8d1c",
+        "bytes": 117005
+      }
+    },
+    "main": {
+      "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts": {
+        "sha256": "8e35b1a458a5b501053286d23fd4cf1934aa9e2237f5e0e2f1c6ffbb69221215",
+        "bytes": 26879
+      },
+      "projects/ngx-material-legacy/legacy-menu/menu.spec.ts": {
+        "sha256": "ae3c8c981a50ac6ba11f943a3f1ceba644f28da9b707a05ff10225afc6fc8d1c",
+        "bytes": 117005
+      }
+    }
+  },
+  "source_after": {
+    "21": {
+      "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts": {
+        "sha256": "e4ecb1452e92a1cc30fb1ebc97c6e24244b432dade5f30b6c58855d8e10cc5b2",
+        "bytes": 30651
+      },
+      "projects/ngx-material-legacy/legacy-menu/menu.spec.ts": {
+        "sha256": "fefc0509a3c6597aa78b68ec885a14f9c4eae5f8d0742d8055b1fdc4e5f4ce0a",
+        "bytes": 127882
+      }
+    },
+    "main": {
+      "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts": {
+        "sha256": "e4ecb1452e92a1cc30fb1ebc97c6e24244b432dade5f30b6c58855d8e10cc5b2",
+        "bytes": 30651
+      },
+      "projects/ngx-material-legacy/legacy-menu/menu.spec.ts": {
+        "sha256": "fefc0509a3c6597aa78b68ec885a14f9c4eae5f8d0742d8055b1fdc4e5f4ce0a",
+        "bytes": 127882
+      }
+    }
+  },
+  "fresh_maintained_checks": {},
+  "limits": "Author scratch registered menu tests passed161/161 on each peer floor. Independent targeted tests passed17/18, sole disabledInteractive probe still a separate open decision, with launcher shutdown resource errors preserved. No full packed/native matrix, real transition timing, source/G11/security or release pass. No HTML/CSS/SCSS changes.",
+  "remote_actions": "none"
+}
