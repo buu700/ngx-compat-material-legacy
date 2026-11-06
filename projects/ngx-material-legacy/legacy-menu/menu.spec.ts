@@ -12,7 +12,7 @@ import {
 } from '@angular/cdk/keycodes';
 import {Overlay, OverlayContainer} from '@angular/cdk/overlay';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
-import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';
+import {_LegacyViewport as ViewportRuler, LEGACY_ANIMATIONS_TEST_OVERRIDE} from '@ngx-compat/material-legacy/legacy-core';
 import {
   createKeyboardEvent,
   createMouseEvent,
@@ -1250,7 +1250,7 @@ describe('MatMenu', () => {
     expect(panel.classList).toContain('mat-menu-after');
   }));
 
-  it('should keep the panel in the viewport when more items are added while open', () => {
+  it('should keep the panel in the viewport when more items are added while open', async () => {
     const fixture = createComponent(SimpleMenu, [], [FakeIcon]);
     fixture.detectChanges();
 
@@ -1260,6 +1260,9 @@ describe('MatMenu', () => {
     triggerEl.style.bottom = '300px';
     triggerEl.click();
     fixture.detectChanges();
+    // Current CDK positions attached overlays after the next render.
+    await fixture.whenStable();
+    fixture.detectChanges();
 
     const panel = overlayContainerElement.querySelector('.mat-menu-panel')!;
     const viewportHeight = viewportRuler.getViewportSize().height;
@@ -1267,11 +1270,6 @@ describe('MatMenu', () => {
     expect(Math.floor(panelRect.bottom)).toBeLessThan(viewportHeight);
 
     fixture.componentInstance.extraItems = new Array(50).fill('Hello there');
-    fixture.detectChanges();
-    // Ensure the flexible strategy remeasures after content height changes.
-    // items.changes + reapplyLastPosition can miss a layout pass under the
-    // current CDK peer; updatePosition preserves the viewport assertion.
-    fixture.componentInstance.trigger.updatePosition();
     fixture.detectChanges();
     panelRect = panel.getBoundingClientRect();
     expect(Math.floor(panelRect.bottom)).toBe(viewportHeight);
@@ -1710,6 +1708,93 @@ describe('MatMenu', () => {
       }));
     });
   });
+
+  it('restores focus before menuClosed and allows a synchronous reopen', fakeAsync(() => {
+    const fixture = createComponent(SimpleMenu, [], [FakeIcon]);
+    fixture.detectChanges();
+    const instance = fixture.componentInstance;
+    const triggerElement = instance.triggerEl.nativeElement;
+    triggerElement.click();
+    fixture.detectChanges();
+    tick(500);
+    let observedFocus: Element | null = null;
+    let closed = 0;
+    const sub = instance.trigger.menuClosed.subscribe(() => {
+      closed++;
+      observedFocus = document.activeElement;
+      instance.trigger.openMenu();
+    });
+    instance.trigger.closeMenu();
+    fixture.detectChanges();
+    tick(500);
+    expect(observedFocus).toBe(triggerElement);
+    expect(closed).toBe(1);
+    expect(instance.trigger.menuOpen).toBeTrue();
+    expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeTruthy();
+    sub.unsubscribe();
+    fixture.destroy();
+    tick(500);
+  }));
+
+  it('teardown emits one close and blocks reopening from the close observer', fakeAsync(() => {
+    const fixture = createComponent(SimpleMenu, [], [FakeIcon]);
+    fixture.detectChanges();
+    const trigger = fixture.componentInstance.trigger;
+    const menu = fixture.componentInstance.menu;
+    trigger.openMenu();
+    fixture.detectChanges();
+    tick(500);
+    const events: string[] = [];
+    menu.closed.subscribe({next: () => { events.push('close'); trigger.openMenu(); }, complete: () => events.push('complete')});
+    fixture.destroy();
+    tick(500);
+    expect(events).toEqual(['close', 'complete']);
+    expect(trigger.menuOpen).toBeFalse();
+    expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeFalsy();
+  }));
+
+  it('keeps exit attached until completion and ignores duplicate end', fakeAsync(() => {
+    const fixture = createComponent(SimpleMenu, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}], [FakeIcon]);
+    fixture.detectChanges(); const instance = fixture.componentInstance;
+    instance.trigger.openMenu(); fixture.detectChanges(); tick(1);
+    const panel = overlayContainerElement.querySelector('.mat-menu-panel') as HTMLElement;
+    expect(panel.classList).toContain('mat-menu-panel-animations-enabled');
+    expect(getComputedStyle(panel).animationName).toBe('mat-legacy-menu-enter');
+    const completions: string[] = [];
+    const sub = instance.menu._animationDone.subscribe((event: any) => completions.push(event.toState));
+    instance.trigger.closeMenu(); fixture.detectChanges();
+    expect(instance.trigger.menuOpen).toBeFalse();
+    expect(overlayContainerElement.contains(panel)).toBeTrue();
+    panel.dispatchEvent(new AnimationEvent('animationend', {animationName: 'mat-legacy-menu-exit'}));
+    panel.dispatchEvent(new AnimationEvent('animationend', {animationName: 'mat-legacy-menu-exit'}));
+    expect(completions.filter(x => x === 'void').length).toBe(1);
+    expect(overlayContainerElement.contains(panel)).toBeFalse();
+    sub.unsubscribe(); fixture.destroy(); tick(500);
+  }));
+
+  it('reopening while exiting cancels stale fallback removal', fakeAsync(() => {
+    const fixture = createComponent(SimpleMenu, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}], [FakeIcon]);
+    fixture.detectChanges(); const trigger = fixture.componentInstance.trigger;
+    trigger.openMenu(); fixture.detectChanges(); tick(1);
+    trigger.closeMenu(); fixture.detectChanges(); tick(25);
+    trigger.openMenu(); fixture.detectChanges(); tick(500);
+    expect(trigger.menuOpen).toBeTrue();
+    expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeTruthy();
+    fixture.destroy(); tick(500);
+  }));
+
+  it('reentrant close from focus restoration emits menuClosed once', fakeAsync(() => {
+    const fixture = createComponent(SimpleMenu, [], [FakeIcon]); fixture.detectChanges();
+    const instance = fixture.componentInstance; const trigger = instance.trigger;
+    trigger.openMenu(); fixture.detectChanges(); tick(500);
+    const focused = document.createElement('button'); document.body.appendChild(focused); focused.focus();
+    let closed = 0; const sub = trigger.menuClosed.subscribe(() => closed++);
+    instance.triggerEl.nativeElement.addEventListener('focus', () => trigger.closeMenu(), {once:true});
+    trigger.closeMenu(); fixture.detectChanges(); tick(500);
+    expect(closed).toBe(1); expect(trigger.menuOpen).toBeFalse();
+    expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeFalsy();
+    focused.remove(); sub.unsubscribe(); fixture.destroy(); tick(500);
+  }));
 
   describe('animations', () => {
     it('should enable ripples on items by default', fakeAsync(() => {
