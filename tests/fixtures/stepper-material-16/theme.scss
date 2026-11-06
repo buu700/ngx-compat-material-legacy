@@ -1,0 +1,6 @@
+@use 'sass:map'; @use '@angular/material' as m;
+$p:m.define-palette(m.$indigo-palette); $a:m.define-palette(m.$pink-palette); $w:m.define-palette(m.$red-palette);
+$l:m.define-light-theme((color:(primary:$p,accent:$a,warn:$w))); $d:m.define-dark-theme((color:(primary:$p,accent:$a,warn:$w)));
+$cl:map.deep-merge($l,(color:(warn:(default:#8a1234,text:#1166aa),foreground:(text:#223344,secondary-text:#345678),background:(hover:#44aa22,card:#faf3d1))));
+$cd:map.deep-merge($d,(color:(warn:(default:#d31862,text:#f4c208),foreground:(text:#ddeeff,secondary-text:#abcdef),background:(hover:#4422aa,card:#172839))));
+.light {@include m.stepper-theme($l)} .dark {@include m.stepper-theme($d)} .custom-light {@include m.stepper-theme($cl)} .custom-dark {@include m.stepper-theme($cd)}
