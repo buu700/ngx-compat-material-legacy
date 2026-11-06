@@ -305,7 +305,8 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
     this._menuOpen = false;
     this._pendingRemoval.unsubscribe();
     this._keydownSubscription.unsubscribe();
-    this._closingActionsSubscription.unsubscribe();
+    // Keep closing actions alive until the attached overlay is detached so the
+    // menu's historical close notification is emitted during teardown.
     if (this._attachedMenu && this._overlayRef) {
       this._detachMenu(this._attachedMenu, this._overlayRef);
     }
@@ -458,11 +459,6 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
     overlayRef.detachBackdrop();
     // Retain painting without intercepting interaction meant for lower overlays.
     overlayRef.overlayElement.style.pointerEvents = 'none';
-    this._setIsMenuOpen(false);
-    if (this._destroyed || generation !== this._menuGeneration) {
-      return;
-    }
-
     // Always restore focus if the user is navigating using the keyboard or the menu was opened
     // programmatically. We don't restore for non-root triggers, because it can prevent focus
     // from making it back to the root trigger when closing a long chain of menus by clicking
@@ -474,6 +470,10 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
       this.focus(openedBy || 'program');
     }
 
+    if (this._destroyed || generation !== this._menuGeneration) {
+      return;
+    }
+    this._setIsMenuOpen(false);
     if (this._destroyed || generation !== this._menuGeneration) {
       return;
     }
