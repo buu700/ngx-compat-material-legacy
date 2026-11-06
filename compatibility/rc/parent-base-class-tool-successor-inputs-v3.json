@@ -753,14 +753,24 @@
           },
           "after": {
             "path": "scripts/inventory-reference-owner.mjs",
-            "sha256": "f78e5f4b3dfe774bed173d8ee55cb040619bafeddc8b0ed46a243b0f4fe4fa2f",
-            "bytes": 20737
+            "sha256": "5c07edeef760510715657e5a2319704297ea1677ef9cca5ce50e359ca1da085d",
+            "bytes": 21785
           },
           "edits": [
             {
               "offset": 1023,
               "before": "import {historicalContractRepairReaderSubject} from './historical-contract-repair-readers.mjs';\n",
               "after": "import {inventoryFiniteToolSuccessor} from './inventory-finite-tool-successor.mjs';\nimport {historicalContractRepairReaderSubject,readHistoricalContractRepairOwnerMember} from './historical-contract-repair-readers.mjs';\n"
+            },
+            {
+              "offset": 7558,
+              "before": "function verifyCurrentWorkflow(root){\n",
+              "after": "function verifyCurrentWorkflow(root,workflow){\n"
+            },
+            {
+              "offset": 8895,
+              "before": " return result;\n",
+              "after": " const source_regressions=workflow.source_test_expectations.map(expected=>{\n  const output=JSON.parse(execFileSync(process.execPath,[expected.path],{cwd:root,encoding:'utf8',maxBuffer:1024*1024,timeout:120000}));\n  assert.equal(output.cases,expected.cases,'current CI source cases changed '+expected.path);\n  assert.equal(output.mutants_rejected,expected.mutants_rejected,'current CI source mutants changed '+expected.path);\n  assert.equal(output.node,process.version);\n  return {path:expected.path,cases:output.cases,mutants_rejected:output.mutants_rejected,source_only:true};\n });\n return {...result,source_regressions,full_Actions_execution_qualified:false};\n"
             },
             {
               "offset": 9268,
@@ -783,9 +793,24 @@
               "after": " for(const prior of packet.source_members){const first=legacyTools.qualifyReference(prior),ref=tool.qualify(first)??first,raw=member(ref.path,ref.sha256);assert.equal(raw.length,ref.bytes);}\n"
             },
             {
+              "offset": 13119,
+              "before": " assert.ok(read(workflow.path).equals(newWorkflow));\n",
+              "after": " assert.deepEqual(tool.workflow.before,workflow.after);\n const currentWorkflowRef=tool.workflow.current,currentWorkflow=read(workflow.path);\n assert.equal(currentWorkflowRef.path,workflow.path);assert.equal(hash(currentWorkflow),currentWorkflowRef.sha256);\n assert.equal(currentWorkflow.length,currentWorkflowRef.bytes);\n assert.ok(currentWorkflow.equals(readEvidenceMember(root,workflow.path)),'nonphysical current workflow');\n"
+            },
+            {
               "offset": 16029,
               "before": " const assertCurrent=()=>{\n  legacyTools.assertCurrent();source.assertCurrent();checker.assertCurrent();browser.assertCurrent();assertPhysicalCI();\n  for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late inventory owner input '+ref.path);assert.equal(raw.length,ref.bytes);}\n",
               "after": " const sweep=()=>{for(const ref of bound.values()){const raw=readHistoricalContractRepairOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'physical inventory owner input '+ref.path);assert.equal(raw.length,ref.bytes);}};\n const assertCurrent=()=>{idle();active=true;try{sweep();\n  tool.assertCurrent();legacyTools.assertCurrent();source.assertCurrent();checker.assertCurrent();browser.assertCurrent();assertPhysicalCI();\n  for(const ref of bound.values()){const actual=readHistoricalContractRepairOwnerMember(root,ref.path),raw=read(ref.path);assert.ok(Buffer.isBuffer(raw)&&actual.equals(raw),'nonphysical inventory owner input '+ref.path);assert.ok(actual.equals(readHistoricalContractRepairOwnerMember(root,ref.path)),'inventory owner input changed during callback '+ref.path);assert.equal(hash(actual),ref.sha256,'late inventory owner input '+ref.path);assert.equal(actual.length,ref.bytes);}\n  browser.assertSurfacePhysical();browser.assertFormPhysical();sweep();}finally{active=false;}\n"
+            },
+            {
+              "offset": 16716,
+              "before": "  if(path===workflow.path){assert.equal(hash(read(path)),workflow.after.sha256,'changed current workflow');return Buffer.from(oldWorkflow);}\n",
+              "after": "  if(path===workflow.path){assert.equal(hash(read(path)),currentWorkflowRef.sha256,'changed current workflow');return Buffer.from(oldWorkflow);}\n"
+            },
+            {
+              "offset": 18750,
+              "before": " assertCurrent();const currentWorkflowTests=verifyCurrentWorkflow(root);assertCurrent();\n",
+              "after": " assertCurrent();const currentWorkflowTests=verifyCurrentWorkflow(root,tool.workflow);assertCurrent();\n"
             }
           ]
         },
@@ -3588,8 +3613,8 @@
         },
         {
           "path": "scripts/inventory-finite-tool-successor.mjs",
-          "sha256": "e654b958b169d7aa78c2d84426e51a99bafa540c2cb763406058334ddf8a43ea",
-          "bytes": 4408
+          "sha256": "58e3094ceadc518e4656d048dadb09b25b0f40daf93dd25caa6b43e2736e1066",
+          "bytes": 10560
         },
         {
           "path": "scripts/select_dialog_finite_source_successor.py",
@@ -4715,8 +4740,8 @@
           },
           "after": {
             "path": "scripts/inventory-reference-owner.mjs",
-            "sha256": "22695d0aca497400ee41cefa94ad4f7ddd5b6338d4c866390749aeeedb1864cb",
-            "bytes": 19781
+            "sha256": "7885af6e1cb5d94f488f2c8ef2895da38f9744aafda77819dbfb3d134d5c0365",
+            "bytes": 20829
           },
           "edits": [
             {
@@ -4728,6 +4753,16 @@
               "offset": 940,
               "before": "",
               "after": "import {readHistoricalContractRepairOwnerMember} from './historical-contract-repair-readers.mjs';\nimport {inventoryFiniteToolSuccessor} from './inventory-finite-tool-successor.mjs';\n"
+            },
+            {
+              "offset": 6606,
+              "before": "function verifyCurrentWorkflow(root){\n",
+              "after": "function verifyCurrentWorkflow(root,workflow){\n"
+            },
+            {
+              "offset": 7943,
+              "before": " return result;\n",
+              "after": " const source_regressions=workflow.source_test_expectations.map(expected=>{\n  const output=JSON.parse(execFileSync(process.execPath,[expected.path],{cwd:root,encoding:'utf8',maxBuffer:1024*1024,timeout:120000}));\n  assert.equal(output.cases,expected.cases,'current CI source cases changed '+expected.path);\n  assert.equal(output.mutants_rejected,expected.mutants_rejected,'current CI source mutants changed '+expected.path);\n  assert.equal(output.node,process.version);\n  return {path:expected.path,cases:output.cases,mutants_rejected:output.mutants_rejected,source_only:true};\n });\n return {...result,source_regressions,full_Actions_execution_qualified:false};\n"
             },
             {
               "offset": 8251,
@@ -4750,9 +4785,24 @@
               "after": " for(const prior of packet.source_members){const first=rc.qualify(prior)??prior,ref=tool.qualify(first)??first,raw=member(ref.path,ref.sha256);assert.equal(raw.length,ref.bytes);}\n"
             },
             {
+              "offset": 11815,
+              "before": " assert.ok(read(workflow.path).equals(newWorkflow));\n",
+              "after": " assert.deepEqual(tool.workflow.before,workflow.after);\n const currentWorkflowRef=tool.workflow.current,currentWorkflow=read(workflow.path);\n assert.equal(currentWorkflowRef.path,workflow.path);assert.equal(hash(currentWorkflow),currentWorkflowRef.sha256);\n assert.equal(currentWorkflow.length,currentWorkflowRef.bytes);\n assert.ok(currentWorkflow.equals(readEvidenceMember(root,workflow.path)),'nonphysical current workflow');\n"
+            },
+            {
               "offset": 14725,
               "before": " const assertCurrent=()=>{\n  source.assertCurrent();checker.assertCurrent();browser.assertCurrent();assertPhysicalCI();\n  for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late inventory owner input '+ref.path);assert.equal(raw.length,ref.bytes);}\n",
               "after": " const sweep=()=>{for(const ref of bound.values()){const raw=readHistoricalContractRepairOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'physical inventory owner input '+ref.path);assert.equal(raw.length,ref.bytes);}};\n const assertCurrent=()=>{idle();active=true;try{sweep();\n  tool.assertCurrent();rc.assertCurrent();source.assertCurrent();checker.assertCurrent();browser.assertCurrent();assertPhysicalCI();\n  for(const ref of bound.values()){const actual=readHistoricalContractRepairOwnerMember(root,ref.path),raw=read(ref.path);assert.ok(Buffer.isBuffer(raw)&&actual.equals(raw),'nonphysical inventory owner input '+ref.path);assert.ok(actual.equals(readHistoricalContractRepairOwnerMember(root,ref.path)),'inventory owner input changed during callback '+ref.path);assert.equal(hash(actual),ref.sha256,'late inventory owner input '+ref.path);assert.equal(actual.length,ref.bytes);}\n  browser.assertSurfacePhysical();browser.assertFormPhysical();rc.assertPhysical();sweep();}finally{active=false;}\n"
+            },
+            {
+              "offset": 15384,
+              "before": "  if(path===workflow.path){assert.equal(hash(read(path)),workflow.after.sha256,'changed current workflow');return Buffer.from(oldWorkflow);}\n",
+              "after": "  if(path===workflow.path){assert.equal(hash(read(path)),currentWorkflowRef.sha256,'changed current workflow');return Buffer.from(oldWorkflow);}\n"
+            },
+            {
+              "offset": 17418,
+              "before": " assertCurrent();const currentWorkflowTests=verifyCurrentWorkflow(root);assertCurrent();\n",
+              "after": " assertCurrent();const currentWorkflowTests=verifyCurrentWorkflow(root,tool.workflow);assertCurrent();\n"
             }
           ]
         },
@@ -5885,8 +5935,8 @@
         },
         {
           "path": "scripts/inventory-finite-tool-successor.mjs",
-          "sha256": "e654b958b169d7aa78c2d84426e51a99bafa540c2cb763406058334ddf8a43ea",
-          "bytes": 4408
+          "sha256": "58e3094ceadc518e4656d048dadb09b25b0f40daf93dd25caa6b43e2736e1066",
+          "bytes": 10560
         },
         {
           "path": "scripts/select_dialog_finite_source_successor.py",
