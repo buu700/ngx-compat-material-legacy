@@ -1,10 +1,47 @@
 """One whole ordered aggregate: historical sequence and exact public contributions."""
-import hashlib,json,re
+import hashlib,json,re,subprocess,shutil
 from pathlib import Path
+from sass_ordered_button_composition import compose_ordered_aggregate_button
+from sass_ordered_button_source_guard import ordered_button_source_guard
 from sass_current_companion_admission import peer_measurement_ok
 from sass_ordered_core_admission import ordered_core_expected_css
 from sass_ripple_color_admission import insert_ripple_color_in_expected_model, ripple_color_measurement_ok
 ROOT=Path(__file__).resolve().parents[1]
+_EXPECTED_ENGINE='6f6475a85f4361d0bb90c15c5b966c799499def63d2f1f5a93e2bfb09d584b86'
+def _expected_plain(value):
+    if value is None or type(value) in (str,bool):return value
+    if type(value) is int and abs(value)<=9007199254740991:return value
+    if type(value) is list:return [_expected_plain(v) for v in value]
+    if type(value) is dict and all(type(k) is str for k in value):return {k:_expected_plain(v) for k,v in value.items()}
+    raise ValueError('plain expected input required')
+def _isolated_expected_computation(root,line,operation,value):
+    if not __debug__:raise ValueError('assertions required')
+    payload=_expected_plain(value);path=Path(root)/'scripts/sass-expected-snapshot-engine.mjs';raw=path.read_bytes()
+    if hashlib.sha256(raw).hexdigest()!=_EXPECTED_ENGINE:raise ValueError('trusted expected bootstrap changed')
+    node=shutil.which('node')
+    if not node:raise ValueError('pinned Node unavailable')
+    result=subprocess.run([node,'--input-type=module','--eval',raw.decode(),str(root),line,operation],input=json.dumps(payload,separators=(',',':'),ensure_ascii=False),text=True,capture_output=True,cwd=root,env={'LANG':'C.UTF-8','LC_ALL':'C.UTF-8','TZ':'UTC'},timeout=150)
+    if result.returncode!=0:raise ValueError('expected isolation failed: '+result.stderr[:1000])
+    out=_expected_plain(json.loads(result.stdout))
+    if out['line']!=line or out['operation']!=operation or out['schema_version']!=1 or type(out['css']) is not str or out['css_sha256']!=hashlib.sha256(out['css'].encode()).hexdigest() or out['css_bytes']!=len(out['css'].encode()) or payload!=_expected_plain(value):raise ValueError('expected output identity')
+    if path.read_bytes()!=raw:raise ValueError('bootstrap changed during evaluation')
+    return out
+
+def _isolated_aggregate_matches(line,sources,peers,actual_css):
+    out=_isolated_expected_computation(ROOT,line,'ordered-aggregate-06',dict(peers=peers))
+    if out['css']!=actual_css:return False
+    raw=(ROOT/'fixtures/sass/expected-isolation-inputs.json').read_bytes()
+    if hashlib.sha256(raw).hexdigest()!=out['closure_sha256']:return False
+    roots=('projects/ngx-material-legacy/','node_modules/@angular/material/','node_modules/@angular/cdk/')
+    expected=[]
+    for row in json.loads(raw)['files']:
+        for index,prefix in enumerate(roots):
+            if row['path'].startswith(prefix) and row['path'].endswith('.scss'):
+                expected.append(dict(root=index,path=row['path'][len(prefix):],sha256=row['sha256'],bytes=row['bytes']))
+    expected.sort(key=lambda row:(row['root'],row['path']))
+    return bool(expected) and expected==sources
+
+
 _CATALOG=json.loads((ROOT/'fixtures/sass/ordered-aggregate-contracts.json').read_bytes())
 ORDERED_AGGREGATE_CASES=_CATALOG['cases']
 ORDERED_AGGREGATE_CONTRACT='historical-ordered-aggregate-with-qualified-public-members'
@@ -135,8 +172,7 @@ def ordered_aggregate_assertion_ok(body):
             or '..' in s['path'].split('/') or not re.fullmatch('[0-9a-f]{64}',s['sha256']) or type(s['bytes']) is not int or s['bytes']<1 for s in ss)
             or len({(s['root'],s['path']) for s in ss})!=len(ss)):return False
         if not all(any(s['root']==0 and s['path']==p for s in ss) for p in ['_index.scss','styles/core/_core.scss','styles/core/theming/_theming.scss','styles/legacy-core/theming/_all-theme.scss','styles/bridges/_companion-overrides.scss']):return False
-        expected=ordered_aggregate_expected_css(c['peers'],line)
-        return expected is not None and expected==m['css']
+        return m['sass_version']=='dart-sass\t1.104.1\t(Sass Compiler)\t[Dart]\ndart2js\t3.13.3\t(Dart Compiler)\t[Dart]' and ordered_button_source_guard(line,m['sources'],c['peers'],m['css']) and _isolated_aggregate_matches(line,m['sources'],c['peers'],m['css'])
     except (KeyError,TypeError,ValueError,AttributeError):return False
 
 def ordered_aggregate_envelope_ok(active,body,invocation):
