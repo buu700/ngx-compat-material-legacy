@@ -2,7 +2,7 @@ import {DataSource} from '@angular/cdk/collections';
 import {CDK_VIRTUAL_SCROLL_VIEWPORT, CdkVirtualScrollViewport, ScrollingModule} from '@angular/cdk/scrolling';
 import {CdkColumnDef, CdkFooterRowDef, CdkHeaderRowDef, CdkRowDef, CdkTable, CdkTableModule} from '@angular/cdk/table';
 import {By} from '@angular/platform-browser';
-import {ChangeDetectionStrategy, Component, Directive, inject, OnInit, ViewChild, AfterViewInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Directive, inject, OnInit, QueryList, ViewChild, ViewChildren, AfterViewInit} from '@angular/core';
 import {
   waitForAsync,
   ComponentFixture,
@@ -88,15 +88,21 @@ describe('MatTable', () => {
       expect(inner.querySelector('tbody > tr > td')?.textContent.trim()).toBe('Inner');
       expect(outer.querySelector('thead > tr > th')?.textContent.trim()).toBe('Header');
       expect(outer.querySelector('tfoot > tr > td')?.textContent.trim()).toBe('Footer');
-      const owners = fixture.debugElement.queryAll(By.directive(_LegacyTableDefinitionOwner));
+      const owners = fixture.componentInstance.definitionOwners.toArray();
       expect(owners.length).toBe(6);
-      for (const owner of owners) {
-        const nearest = owner.injector.get(CdkTable);
-        const definitions = [owner.injector.get(CdkColumnDef, null), owner.injector.get(CdkHeaderRowDef, null),
-          owner.injector.get(CdkFooterRowDef, null), owner.injector.get(CdkRowDef, null)].filter(Boolean);
-        expect(definitions.length).toBe(1);
-        expect(definitions[0]!._table).toBe(nearest);
-      }
+      const outerTable = fixture.debugElement.query(By.css('#raw-outer'))!.injector.get(CdkTable);
+      const innerTable = fixture.debugElement.query(By.css('#raw-inner'))!.injector.get(CdkTable);
+      const columns = fixture.componentInstance.columnDefs.toArray();
+      const headers = fixture.componentInstance.headerDefs.toArray();
+      const footers = fixture.componentInstance.footerDefs.toArray();
+      const rows = fixture.componentInstance.rowDefs.toArray();
+      expect([columns.length, headers.length, footers.length, rows.length]).toEqual([2, 1, 1, 2]);
+      expect(columns[0]._table).toBe(outerTable);
+      expect(columns[1]._table).toBe(innerTable);
+      expect(headers[0]._table).toBe(outerTable);
+      expect(footers[0]._table).toBe(outerTable);
+      expect(rows[0]._table).toBe(innerTable);
+      expect(rows[1]._table).toBe(outerTable);
     });
   }
 
@@ -1190,7 +1196,13 @@ export function expectTableToMatchContent(tableElement: Element, expected: any[]
       <tr mat-footer-row *cdkFooterRowDef="['value']"></tr>
     </table>
   `})
-class RawNestedLegacyTablesApp {}
+class RawNestedLegacyTablesApp {
+  @ViewChildren(_LegacyTableDefinitionOwner) definitionOwners!: QueryList<_LegacyTableDefinitionOwner>;
+  @ViewChildren(CdkColumnDef) columnDefs!: QueryList<CdkColumnDef>;
+  @ViewChildren(CdkHeaderRowDef) headerDefs!: QueryList<CdkHeaderRowDef>;
+  @ViewChildren(CdkFooterRowDef) footerDefs!: QueryList<CdkFooterRowDef>;
+  @ViewChildren(CdkRowDef) rowDefs!: QueryList<CdkRowDef<unknown>>;
+}
 
 @Component({standalone: false, template: `
     <table mat-table id="raw-outer" [dataSource]="[{value:'Outer'}]">
@@ -1207,7 +1219,13 @@ class RawNestedLegacyTablesApp {}
       <tr mat-footer-row *cdkFooterRowDef="['value']"></tr>
     </table>
   `})
-class RawNestedCurrentTableApp {}
+class RawNestedCurrentTableApp {
+  @ViewChildren(_LegacyTableDefinitionOwner) definitionOwners!: QueryList<_LegacyTableDefinitionOwner>;
+  @ViewChildren(CdkColumnDef) columnDefs!: QueryList<CdkColumnDef>;
+  @ViewChildren(CdkHeaderRowDef) headerDefs!: QueryList<CdkHeaderRowDef>;
+  @ViewChildren(CdkFooterRowDef) footerDefs!: QueryList<CdkFooterRowDef>;
+  @ViewChildren(CdkRowDef) rowDefs!: QueryList<CdkRowDef<unknown>>;
+}
 
 @Component({standalone: false, template: `
   <table mat-table [dataSource]="[{value: 'Legacy'}]">

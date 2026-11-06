@@ -792,13 +792,15 @@ describe('MatTabGroup', () => {
     it('should resolve the exported legacy tab token to the nearest tab', () => {
       const fixture = TestBed.createComponent(SimpleTabsTestApp);
       fixture.detectChanges();
-      const tabs = fixture.debugElement.queryAll(By.directive(MatLegacyTab));
-      const labels = fixture.debugElement.queryAll(By.directive(MatLegacyTabLabel));
+      const tabs = fixture.componentInstance.tabs.toArray();
+      const labels = fixture.componentInstance.labels.toArray();
+      const tabsByToken = fixture.componentInstance.tabsByToken.toArray();
       expect(tabs.length).toBe(3);
       expect(labels.length).toBe(3);
+      expect(tabsByToken.length).toBe(3);
       tabs.forEach((tab, index) => {
-        expect(tab.injector.get(MAT_LEGACY_TAB)).toBe(tab.componentInstance);
-        expect(labels[index].componentInstance._closestTab).toBe(tab.componentInstance);
+        expect(tabsByToken[index]).toBe(tab);
+        expect(labels[index]._closestTab).toBe(tab);
       });
     });
 
@@ -809,9 +811,11 @@ describe('MatTabGroup', () => {
       });
       const fixture = TestBed.createComponent(SimpleTabsTestApp);
       fixture.detectChanges();
-      const labels = fixture.debugElement.queryAll(By.directive(MatLegacyTabLabel));
+      const tabs = fixture.componentInstance.tabs.toArray();
+      const labels = fixture.componentInstance.labels.toArray();
+      expect(tabs.length).toBe(3);
       expect(labels.length).toBe(3);
-      labels.forEach(label => expect(label.componentInstance._closestTab).toBe(suppliedTab));
+      labels.forEach(label => expect(label._closestTab).toBe(suppliedTab));
     });
 
     it('should not throw an error when binding isActive to the view', fakeAsync(() => {
@@ -1079,6 +1083,8 @@ describe('nested MatTabGroup with enabled animations', () => {
 class SimpleTabsTestApp {
   @ViewChild(MatLegacyTabGroup) tabGroup: MatLegacyTabGroup;
   @ViewChildren(MatLegacyTab) tabs: QueryList<MatLegacyTab>;
+  @ViewChildren(MAT_LEGACY_TAB) tabsByToken: QueryList<MatLegacyTab>;
+  @ViewChildren(MatLegacyTabLabel) labels: QueryList<MatLegacyTabLabel>;
   selectedIndex: number = 1;
   focusEvent: any;
   selectEvent: any;
