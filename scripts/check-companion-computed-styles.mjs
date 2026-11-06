@@ -735,39 +735,67 @@ export async function withChromium(distDir, run, {debugPort: portOverride = null
       res.end();
     }
   });
-  await new Promise((resolveListen) => server.listen(0, '127.0.0.1', resolveListen));
-  const {port} = server.address();
-  const chromeBin = resolveChromeBin();
-  const debugPort = Number(portOverride || process.env.COMPANION_CDP_PORT || 9334);
-  const chromeDir = mkdtempSync(join(tmpdir(), 'ngx-compat-chrome-companion-'));
-  const chrome = spawn(chromeBin, [
-    '--headless=new', `--remote-debugging-port=${debugPort}`, `--user-data-dir=${chromeDir}`,
-    '--no-sandbox', '--disable-gpu', '--window-size=1280,1000', '--force-device-scale-factor=1',
-    // Headless reports (hover: none); the peer gates hover styles on (hover: hover).
-    '--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4',
-    `http://127.0.0.1:${port}/`,
-  ], {stdio: ['ignore', 'ignore', 'pipe']});
-  let chromeLog = '';
-  chrome.stderr.on('data', (chunk) => { chromeLog += chunk; });
-  let ws;
+  let chrome, ws, browserWs, ownedPage, version, debugPort, spawnError, callbackResult;
+  let failed = false, callbackFinished = false, endpointGone = false, serverCleanupError;
+  let exited = Promise.resolve();
+  const done = () => !chrome || chrome.exitCode !== null || chrome.signalCode !== null || (!!spawnError && !chrome.pid);
+  const bounded = (promise, ms) => new Promise((resolveBound, reject) => {
+    const timer = setTimeout(resolveBound, ms);
+    Promise.resolve(promise).then((value) => { clearTimeout(timer); resolveBound(value); },
+      (error) => { clearTimeout(timer); reject(error); });
+  });
+  const localSocket = (value) => {
+    const socket = new URL(value);
+    if (socket.protocol !== 'ws:' || socket.hostname !== '127.0.0.1' || socket.port !== String(debugPort)) throw new Error('Unexpected Chromium WebSocket endpoint');
+    return value;
+  };
+  const jsonGet = async (url) => {
+    const response = await fetch(url, {signal: AbortSignal.timeout(1500)});
+    if (!response.ok) throw new Error(`${url} ${response.status}`);
+    return response.json();
+  };
   try {
-    const jsonGet = async (url) => {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`${url} ${response.status}`);
-      return response.json();
-    };
-    let version = null;
-    for (let i = 0; i < 80 && !version; i += 1) {
+    await new Promise((resolveListen, reject) => {
+      server.once('error', reject);
+      server.listen(0, '127.0.0.1', resolveListen);
+    });
+    const {port} = server.address();
+    const pageUrl = `http://127.0.0.1:${port}/`;
+    const chromeBin = resolveChromeBin();
+    debugPort = Number(portOverride || process.env.COMPANION_CDP_PORT || 9334);
+    const chromeDir = mkdtempSync(join(tmpdir(), 'ngx-compat-chrome-companion-'));
+    chrome = spawn(chromeBin, [
+      '--headless=new', `--remote-debugging-port=${debugPort}`, `--user-data-dir=${chromeDir}`,
+      '--no-sandbox', '--disable-gpu', '--window-size=1280,1000', '--force-device-scale-factor=1',
+      '--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4',
+      pageUrl,
+    ], {stdio: ['ignore', 'ignore', 'pipe']});
+    let chromeLog = '';
+    chrome.stderr.on('data', (chunk) => { chromeLog += chunk; });
+    exited = new Promise((resolveExit) => {
+      chrome.once('exit', resolveExit);
+      // Spawn and signal failures emit error; always consume them.
+      chrome.on('error', (error) => { spawnError = error; if (!chrome.pid) resolveExit(); });
+    });
+    const failedStart = () => (!!spawnError && !chrome.pid) || chrome.signalCode !== null ||
+      (chrome.exitCode !== null && chrome.exitCode !== 0);
+    for (let i = 0; i < 80 && !version && !failedStart(); i += 1) {
       try { version = await jsonGet(`http://127.0.0.1:${debugPort}/json/version`); } catch { await sleep(250); }
     }
-    if (!version) throw new Error(`Chromium did not open debugging port ${debugPort}\n${chromeLog.slice(-1000)}`);
-    const page = (await jsonGet(`http://127.0.0.1:${debugPort}/json/list`)).find((target) => target.type === 'page');
-    if (!page) throw new Error('Chromium opened no page');
-    ws = new WebSocket(page.webSocketDebuggerUrl);
-    await new Promise((resolveOpen, reject) => {
-      ws.addEventListener('open', resolveOpen);
-      ws.addEventListener('error', reject);
-    });
+    if (!version) throw new Error(`Chromium did not open debugging port ${debugPort}\n${spawnError || chromeLog.slice(-1000)}`);
+    let pages = [];
+    for (let i = 0; i < 20 && pages.length === 0; i += 1) {
+      pages = (await jsonGet(`http://127.0.0.1:${debugPort}/json/list`)).filter((target) => target.type === 'page' && target.url === pageUrl);
+      if (!pages.length) await sleep(100);
+    }
+    if (pages.length !== 1) throw new Error('Chromium opened no unique owned page');
+    ownedPage = pages[0];
+    ws = new WebSocket(localSocket(ownedPage.webSocketDebuggerUrl));
+    const opened = await bounded(new Promise((resolveOpen, reject) => {
+      ws.addEventListener('open', () => resolveOpen(true), {once: true});
+      ws.addEventListener('error', reject, {once: true});
+    }), 5000);
+    if (!opened) throw new Error('Chromium page WebSocket open timed out');
     let nextId = 0;
     const pending = new Map();
     ws.addEventListener('message', (event) => {
@@ -792,12 +820,63 @@ export async function withChromium(distDir, run, {debugPort: portOverride = null
     };
     await send('Runtime.enable');
     await send('Page.enable');
-    return await run({send, evaluate, browser: version.Browser || null, port});
+    callbackResult = await run({send, evaluate, browser: version.Browser || null, port});
+    callbackFinished = true;
+    return callbackResult;
+  } catch (error) {
+    failed = true; throw error;
   } finally {
+    // Reconfirm that this endpoint still contains our exact server URL before
+    // asking the browser-level CDP endpoint to exit; never close a foreign port.
+    if (ownedPage && version?.webSocketDebuggerUrl) {
+      try {
+        const currentVersion = await jsonGet(`http://127.0.0.1:${debugPort}/json/version`);
+        const pages = await jsonGet(`http://127.0.0.1:${debugPort}/json/list`);
+        if (currentVersion.webSocketDebuggerUrl === version.webSocketDebuggerUrl &&
+            pages.some((target) => target.id === ownedPage.id && target.type === 'page')) {
+          browserWs = new WebSocket(localSocket(version.webSocketDebuggerUrl));
+          let acceptOpen = true;
+          try {
+            await bounded(new Promise((resolveOpen, reject) => {
+              browserWs.addEventListener('open', () => {
+                if (!acceptOpen) return;
+                try { browserWs.send(JSON.stringify({id: 1, method: 'Browser.close'})); resolveOpen(); } catch (error) { reject(error); }
+              }, {once: true});
+              browserWs.addEventListener('error', reject, {once: true});
+            }), 1500);
+          } finally { acceptOpen = false; }
+          await bounded(exited, 1500);
+        }
+      } catch { /* Fall back to the child process below. */ }
+    }
+    try { browserWs?.close(); } catch { /* already closed */ }
     try { ws?.close(); } catch { /* already closed */ }
-    chrome.kill();
-    await new Promise((resolveExit) => chrome.once('exit', resolveExit));
-    server.close();
+    if (!done()) {
+      try { chrome.kill(); } catch { /* e.g. snap denied a signal */ }
+      await bounded(exited, 1500);
+    }
+    if (ownedPage) {
+      // A snap-style launcher can exit before the browser process. Observe the
+      // endpoint itself for a bounded interval after requesting browser exit.
+      for (let i = 0; i < 10 && !endpointGone; i += 1) {
+        try { await fetch(`http://127.0.0.1:${debugPort}/json/version`, {signal: AbortSignal.timeout(200)}); }
+        catch (error) { endpointGone = error?.cause?.code === 'ECONNREFUSED'; }
+        if (!endpointGone) await sleep(100);
+      }
+    }
+    try {
+      if (server.listening) {
+        const closed = new Promise((resolveClose) => server.close((error) => resolveClose(error || true)));
+        server.closeAllConnections?.();
+        const result = await bounded(closed, 1500);
+        if (result !== true) serverCleanupError = result || new Error('fixture server close timed out');
+      }
+    } catch (error) { serverCleanupError = error; }
+    if ((ownedPage ? !endpointGone : !done()) || serverCleanupError) {
+      const cleanup = new Error(serverCleanupError ? `Chromium fixture server cleanup failed: ${serverCleanupError.message}` : `Chromium cleanup could not confirm owned endpoint closure or unowned launcher exit${spawnError ? ': ' + spawnError.message : ''}`);
+      if (failed) console.error(cleanup.message);
+      else { if (callbackFinished) cleanup.callbackResult = callbackResult; throw cleanup; }
+    }
   }
 }
 
