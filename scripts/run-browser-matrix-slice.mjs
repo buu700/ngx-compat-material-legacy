@@ -70,6 +70,24 @@ const tarballSha = sha256File(tarball);
 
 const scenarios = [
   {
+    id: 'dialog-focus-exit-race',
+    script: 'scripts/browser-dialog-focus-reinsert.mjs',
+    args: ['--zoneless', '--enabled-motion'],
+    cells: [],
+    detail: 'compatibility/rc/reports/browser-dialog-focus-exit-race.json',
+    require: report => !report.error && report.assertions &&
+      Object.values(report.assertions).every(value => value === true),
+  },
+  ...['zoneful', 'zoneless'].map(mode => ({
+    id: 'dialog-focus-lifecycle-' + mode,
+    script: 'scripts/browser-dialog-focus-reinsert.mjs',
+    args: mode === 'zoneless' ? ['--zoneless'] : [],
+    cells: [],
+    detail: 'compatibility/rc/reports/browser-dialog-focus-reinsert-' + mode + '.json',
+    require: report => !report.error && report.assertions &&
+      Object.values(report.assertions).every(value => value === true),
+  })),
+  {
     id: 'dialog-escape-zoneful',
     script: 'scripts/browser-dialog-escape.mjs',
     args: [],

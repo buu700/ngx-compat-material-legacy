@@ -186,6 +186,7 @@ export class MatLegacyDialogContainer extends _MatDialogContainerBase implements
     if (this._animationDestroyed || this._state === 'exit') {
       return;
     }
+    this._cancelPendingInitialFocus();
     this._cancelAnimationWork();
     this._animationCompleted = false;
     this._state = 'exit';

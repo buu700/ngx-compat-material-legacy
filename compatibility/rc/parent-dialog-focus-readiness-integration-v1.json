@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "scope": "Owned dialog initial render readiness and exit cancellation; bounded implementation integration",
+  "patch_sha256": "93869925718897ad5d1db3d93a8cbe16f41a8d4dc0d60790b52cc6218af4adca",
+  "root_review": "Reviewed initial-zone subscription ownership, closing cancellation, recapture/listener cleanup, epoch checks and unchanged public method surface; separate lifetime subscription collection stays open. Pinned Node rerun of actual maintained sources passed both lines.",
+  "source_tests": {
+    "node": "24.21.0",
+    "per_line": {
+      "focus_cases": 30,
+      "focus_mutants_rejected": 7,
+      "motion_cases": 20,
+      "motion_mutants_rejected": 6
+    }
+  },
+  "cyph_source_sanity": {
+    "shared/js/cyph/services/material-dialog.service.ts": {
+      "sha256": "d11742c45d78e36da36fcba72e9869571c28768fe8827208e066f87f98ecb9b1",
+      "bytes": 14208
+    },
+    "shared/js/cyph/components/dialog-media/dialog-media.component.ts": {
+      "sha256": "43a4ff2190fd195ac2d4991a036c09294952f05cb00b20a1532cb22a155c8221",
+      "bytes": 5371
+    }
+  },
+  "cyph_consumer_changes_required": false,
+  "product_html_css_scss_changes": 0,
+  "intentional_readiness_tradeoff": "See retained parent-dialog-readiness-cyph-decision-v1.json; closed shadow pre-opened focus timing is not claimed equivalent.",
+  "evidence_archive": {
+    "path": "compatibility/rc/parent-dialog-focus-readiness-evidence-355eb1df48462280b0fc24599e01e26125b4df39395520a660884ef2d059bfb1.tar.gz",
+    "sha256": "355eb1df48462280b0fc24599e01e26125b4df39395520a660884ef2d059bfb1",
+    "bytes": 48490,
+    "members": [
+      {
+        "path": "c04-dialog-exit-independent-sol6-v1.json",
+        "sha256": "ccaddc0c784266dea40a647e2f9a7d9d8f39ac435bb1c2afa2bc90558a855c48",
+        "bytes": 6205
+      },
+      {
+        "path": "c04-dialog-focus-exit-repaired-21-sol6.patch",
+        "sha256": "93869925718897ad5d1db3d93a8cbe16f41a8d4dc0d60790b52cc6218af4adca",
+        "bytes": 83416
+      },
+      {
+        "path": "c04-dialog-focus-exit-repaired-main-sol6.patch",
+        "sha256": "93869925718897ad5d1db3d93a8cbe16f41a8d4dc0d60790b52cc6218af4adca",
+        "bytes": 83416
+      },
+      {
+        "path": "c04-dialog-focus-exit-fix-evidence-v1.json",
+        "sha256": "f6a19d16a4dd5f9b72039bb9e116e84053f497328624d4c7de6614a7e3598acd",
+        "bytes": 4961
+      },
+      {
+        "path": "parent-dialog-readiness-cyph-decision-v1.json",
+        "sha256": "344d0eb057f52c972a33bf54c9114f29f72156e25e0217cbf8303f0370f9098a",
+        "bytes": 2816
+      },
+      {
+        "path": "parent-dialog-focus-maintained-21-v4.json",
+        "sha256": "e4529335007c7aed35361e877f916f3ee6922a6e3210a96ca27a80e1033dfc6d",
+        "bytes": 5611
+      },
+      {
+        "path": "parent-dialog-focus-maintained-main-v4.json",
+        "sha256": "59e2f880ebafab1f96772ec2ed3d99410289c0b966faab6c73be256a638d6260",
+        "bytes": 5609
+      },
+      {
+        "path": "parent-dialog-motion-maintained-21-v4.json",
+        "sha256": "55f405cdefe0fe5119dcec3c5589348fdc8396c78c1d745f8f929fceebc489b2",
+        "bytes": 5154
+      },
+      {
+        "path": "parent-dialog-motion-maintained-main-v4.json",
+        "sha256": "abace218b25e5955774d50a666df86c8c770b19011700888297ae78db15d6d3d",
+        "bytes": 5153
+      }
+    ]
+  },
+  "limits": [
+    "No fresh packed, AOT, native browser, full source profile, Sass seal, Actions, release or G11 qualification.",
+    "Source profile and audit bindings still require finite composition for the new source afterimages.",
+    "Previous native exit evidence is historical; additional unstable-zone repair was tested using actual source under deterministic fixtures."
+  ]
+}
