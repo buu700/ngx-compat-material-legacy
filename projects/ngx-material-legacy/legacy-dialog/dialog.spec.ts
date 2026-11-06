@@ -25,6 +25,7 @@ import {
   Injectable,
   NgModule,
   createNgModule,
+  inject as injectToken,
 } from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {LEGACY_ENABLED_ANIMATIONS, LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
@@ -2690,3 +2691,111 @@ for (const mode of ['enabled', 'di-disabled'] as const) {
     }
   });
 }
+
+let captured: Array<{cdk: CdkDialogRef; optional: CdkDialogRef | null; legacy: MatLegacyDialogRef<any>}> = [];
+
+@Directive({standalone: false, selector: '[dialogRefProbe]'})
+class DialogRefProbe {
+  constructor() {
+    captured.push({
+      cdk: injectToken(CdkDialogRef),
+      optional: injectToken(CdkDialogRef, {optional: true}),
+      legacy: injectToken(MatLegacyDialogRef),
+    });
+  }
+}
+
+@Component({standalone: false, template: '<button dialogRefProbe>dialog</button>'})
+class DialogRefContent {}
+
+@Component({
+  standalone: false,
+  template: '<button id="origin">origin</button><ng-template><button dialogRefProbe>template</button></ng-template>',
+})
+class DialogRefHost {
+  @ViewChild(TemplateRef) template!: TemplateRef<any>;
+}
+
+describe('legacy dialog content reference injection', () => {
+  beforeEach(() => {
+    captured = [];
+    TestBed.configureTestingModule({
+      declarations: [DialogRefProbe, DialogRefContent, DialogRefHost],
+      imports: [MatLegacyDialogModule],
+      providers: [LEGACY_NOOP_ANIMATIONS],
+    });
+  });
+
+  for (const kind of ['component', 'template'] as const) {
+    for (const method of ['legacy', 'cdk'] as const) {
+      it(`retains ${kind} reference identity and ${method} close behavior`, fakeAsync(() => {
+        const fixture = TestBed.createComponent(DialogRefHost);
+        fixture.detectChanges();
+        const origin = fixture.nativeElement.querySelector('#origin') as HTMLElement;
+        origin.focus();
+        const dialog = TestBed.inject(MatLegacyDialog);
+        const ref = kind === 'component' ? dialog.open(DialogRefContent) :
+          dialog.open(fixture.componentInstance.template);
+        fixture.detectChanges();
+        tick(250);
+        fixture.detectChanges();
+
+        const pair = captured[0];
+        expect(pair.legacy).toBe(ref);
+        expect(pair.cdk).toBeTruthy();
+        expect(pair.optional).toBe(pair.cdk);
+        expect(pair.cdk).not.toBe(pair.legacy as unknown as CdkDialogRef);
+        const before: unknown[] = [];
+        const after: unknown[] = [];
+        ref.beforeClosed().subscribe(value => before.push(value));
+        ref.afterClosed().subscribe(value => after.push(value));
+        pair[method].close(`${method}-result`);
+        fixture.detectChanges();
+        tick(500);
+        fixture.detectChanges();
+
+        const result = method === 'legacy' ? 'legacy-result' : undefined;
+        expect(before).toEqual([result]);
+        expect(after).toEqual([result]);
+        expect(dialog.openDialogs.length).toBe(0);
+        expect(document.activeElement).toBe(origin);
+        fixture.destroy();
+      }));
+    }
+  }
+
+  it('cleans up a CDK-closed nested child and a legacy-closed parent', fakeAsync(() => {
+    const fixture = TestBed.createComponent(DialogRefHost);
+    fixture.detectChanges();
+    const origin = fixture.nativeElement.querySelector('#origin') as HTMLElement;
+    origin.focus();
+    const dialog = TestBed.inject(MatLegacyDialog);
+    const outer = dialog.open(DialogRefContent);
+    fixture.detectChanges();
+    tick(250);
+    const inner = dialog.open(DialogRefContent);
+    fixture.detectChanges();
+    tick(250);
+    expect(captured.length).toBe(2);
+    let innerAfter = 0;
+    let outerAfter = 0;
+    inner.afterClosed().subscribe(() => innerAfter++);
+    outer.afterClosed().subscribe(() => outerAfter++);
+    captured[1].cdk.close('child');
+    fixture.detectChanges();
+    tick(500);
+    fixture.detectChanges();
+    expect(dialog.openDialogs.length).toBe(1);
+    expect(innerAfter).toBe(1);
+    expect(outerAfter).toBe(0);
+    outer.close('outer');
+    fixture.detectChanges();
+    tick(500);
+    fixture.detectChanges();
+    expect(dialog.openDialogs.length).toBe(0);
+    expect(innerAfter).toBe(1);
+    expect(outerAfter).toBe(1);
+    expect(document.activeElement).toBe(origin);
+    fixture.destroy();
+  }));
+});

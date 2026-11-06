@@ -10,7 +10,7 @@
  * Adapted to current CDK Dialog / Overlay peers without private Material 22 APIs.
  */
 
-import {Dialog, DialogConfig, DialogRef} from '@angular/cdk/dialog';
+import {Dialog, DialogConfig} from '@angular/cdk/dialog';
 import {ComponentType, Overlay, OverlayContainer, ScrollStrategy} from '@angular/cdk/overlay';
 import {
   assertInInjectionContext,
@@ -176,8 +176,6 @@ export abstract class _MatDialogBase<C extends _MatDialogContainerBase> implemen
           {provide: this._dialogContainerType, useValue: dialogContainer},
           {provide: this._dialogDataToken, useValue: cdkConfig.data},
           {provide: this._dialogRefConstructor, useValue: dialogRef},
-          // Prevent content from resolving the CDK DialogRef accidentally.
-          {provide: DialogRef, useValue: null},
         ];
       },
     });
