@@ -12,7 +12,9 @@ import {
   A,
   ESCAPE,
 } from '@angular/cdk/keycodes';
-import {OverlayContainer} from '@angular/cdk/overlay';
+import {CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG, OverlayContainer} from '@angular/cdk/overlay';
+import {Location} from '@angular/common';
+import {SpyLocation} from '@angular/common/testing';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
 import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';
 import {
@@ -6137,3 +6139,98 @@ class SelectInsideDynamicFormGroup {
     });
   }
 }
+
+
+@Component({
+  standalone: false,
+  template: `
+    <mat-select [disabled]="disabled">
+      @if (showOption) { <mat-option value="a">A</mat-option> }
+    </mat-select>
+  `,
+})
+class SelectNavigationFixture {
+  @ViewChild(MatLegacySelect) select: MatLegacySelect;
+  disabled = false;
+  showOption = true;
+}
+
+describe('legacy select overlay navigation', () => {
+  function setup(disposeOnNavigation: boolean) {
+    const config = {disposeOnNavigation: true};
+    TestBed.configureTestingModule({
+      imports: [MatLegacySelectModule],
+      declarations: [SelectNavigationFixture],
+      providers: [
+        LEGACY_NOOP_ANIMATIONS,
+        {provide: Location, useClass: SpyLocation},
+        ...(disposeOnNavigation ? [{provide: CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG, useValue: config}] : []),
+      ],
+    });
+    const fixture = TestBed.createComponent(SelectNavigationFixture);
+    fixture.detectChanges();
+    return {fixture, config, overlay: TestBed.inject(OverlayContainer).getContainerElement()};
+  }
+
+  for (const configured of [false, true]) {
+    it(`keeps the panel usable after history navigation (configured: ${configured})`, fakeAsync(() => {
+      const {fixture, config, overlay} = setup(configured);
+      const select = fixture.componentInstance.select;
+      select.open();
+      fixture.detectChanges();
+      tick(250);
+      fixture.detectChanges();
+      expect(select.panelOpen).toBeTrue();
+      expect(overlay.querySelector('.mat-select-panel')).not.toBeNull();
+
+      (TestBed.inject(Location) as SpyLocation).simulateUrlPop('/next');
+      fixture.detectChanges();
+      tick(250);
+      fixture.detectChanges();
+      expect(select.panelOpen).toBeTrue();
+      expect(overlay.querySelector('.mat-select-panel')).not.toBeNull();
+
+      select.close();
+      fixture.detectChanges();
+      tick(250);
+      fixture.detectChanges();
+      expect(select.panelOpen).toBeFalse();
+      expect(overlay.querySelector('.mat-select-panel')).toBeNull();
+      select.open();
+      fixture.detectChanges();
+      tick(250);
+      fixture.detectChanges();
+      expect(select.panelOpen).toBeTrue();
+      expect(overlay.querySelector('.mat-select-panel')).not.toBeNull();
+      if (configured) {
+        expect(TestBed.inject(CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG)).toBe(config);
+        expect(config).toEqual({disposeOnNavigation: true});
+      }
+      fixture.destroy();
+      tick(500);
+    }));
+  }
+
+  it('does not open when disabled or without options', fakeAsync(() => {
+    const {fixture, config, overlay} = setup(true);
+    const select = fixture.componentInstance.select;
+    fixture.componentInstance.disabled = true;
+    fixture.detectChanges();
+    select.open();
+    fixture.detectChanges();
+    expect(select.panelOpen).toBeFalse();
+    expect(overlay.querySelector('.mat-select-panel')).toBeNull();
+
+    fixture.componentInstance.disabled = false;
+    fixture.componentInstance.showOption = false;
+    fixture.detectChanges();
+    select.open();
+    fixture.detectChanges();
+    expect(select.panelOpen).toBeFalse();
+    expect(overlay.querySelector('.mat-select-panel')).toBeNull();
+    expect(TestBed.inject(CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG)).toBe(config);
+    expect(config).toEqual({disposeOnNavigation: true});
+    fixture.destroy();
+    tick(500);
+  }));
+});
