@@ -1,0 +1,21 @@
+diff --git a/projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts b/projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts
+index 1e2e5237b..277cdb622 100644
+--- a/projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts
++++ b/projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts
+@@ -30,7 +30,6 @@ import {
+ import {TemplatePortal} from '@angular/cdk/portal';
+ import {
+   MAT_MENU_SCROLL_STRATEGY,
+-  MatMenuItem as PeerMatMenuItem,
+   MenuCloseReason,
+   MenuPositionX,
+   MenuPositionY,
+@@ -319,7 +318,7 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
+     @Inject(MAT_MENU_PANEL) @Optional() parentMenu: MatMenuPanel,
+     // `MatMenuTrigger` is commonly used in combination with a `MatMenuItem`.
+     // tslint:disable-next-line: lightweight-tokens
+-    @Optional() @Self() @Inject(PeerMatMenuItem) private _menuItemInstance: MatMenuItem,
++    @Optional() @Self() @Inject(MatMenuItem) private _menuItemInstance: MatMenuItem,
+     @Optional() private _dir: Directionality,
+     private _focusMonitor: FocusMonitor | null,
+     private _ngZone?: NgZone,
