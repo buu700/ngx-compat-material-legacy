@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "scope": "Bounded version-query addendum to previous 22 install/pack callers; no claim of all npm calls or exhaustive dynamic process routes",
+  "root": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+  "head": "23b50ff4aa72d4a3c901c5d71ebaf2bbeb64ad71",
+  "baseline": "e0418ab3a913ad591efc66a227603206620f1646",
+  "files": [
+    {
+      "path": "scripts/write-draft-run.mjs",
+      "current_sha256": "89e7efdd1c55a2d7fa6e403c58e02107bf881ecc512200d811048d516e9f4408",
+      "baseline_sha256": "89e7efdd1c55a2d7fa6e403c58e02107bf881ecc512200d811048d516e9f4408",
+      "whole_file_changed": false
+    },
+    {
+      "path": "scripts/rc-verify.py",
+      "current_sha256": "d5689f5253abae336aff6d07c66c2c2453b292edc7816045343c16db5831f00b",
+      "baseline_sha256": "54fc3bc163064ff1df4003350c84f9b688582a34273e4d2573d66da3acb46882",
+      "whole_file_changed": true
+    },
+    {
+      "path": "scripts/check-toolchain.py",
+      "current_sha256": "22375b149d7a832e5ae63091891222782b0ceb24ae4202525c36f722e0588298",
+      "baseline_sha256": "22375b149d7a832e5ae63091891222782b0ceb24ae4202525c36f722e0588298",
+      "whole_file_changed": false
+    },
+    {
+      "path": "scripts/check-pack-library.mjs",
+      "current_sha256": "b0954d0c3d4119db99c877509077c25ef769e60bfd5f8f7390aa48991dc1d327",
+      "baseline_sha256": "b0954d0c3d4119db99c877509077c25ef769e60bfd5f8f7390aa48991dc1d327",
+      "whole_file_changed": false
+    },
+    {
+      "path": "scripts/run-consumer-floor-configurations.mjs",
+      "current_sha256": "837aa49edc0ae31f19062e8dd8fe7aa0ea46ff10d1800230f5f67e9798452094",
+      "baseline_sha256": "92fbb230fd358bf771101e005acfbe892201c682a83df0f1ebb6eb0b07767052",
+      "whole_file_changed": true
+    },
+    {
+      "path": "scripts/rc-verify-lite.py",
+      "current_sha256": "90c2c418accbebd3ad287c664b6ba3d7914669f47c6063f6c07dedc5e87f78c2",
+      "baseline_sha256": "90c2c418accbebd3ad287c664b6ba3d7914669f47c6063f6c07dedc5e87f78c2",
+      "whole_file_changed": false
+    },
+    {
+      "path": "scripts/pack-draft-run.mjs",
+      "current_sha256": "e0701341ddb0d703cf17e32919e8251d163dfd303a17eb1cf9b2c31b6c60eab2",
+      "baseline_sha256": "e0701341ddb0d703cf17e32919e8251d163dfd303a17eb1cf9b2c31b6c60eab2",
+      "whole_file_changed": false
+    },
+    {
+      "path": "chainman.toml",
+      "current_sha256": "30f3d978279a0f9086a654da8d1f3aa0f883daa3bd26298877102eba0123e666",
+      "baseline_sha256": "30f3d978279a0f9086a654da8d1f3aa0f883daa3bd26298877102eba0123e666",
+      "whole_file_changed": false
+    },
+    {
+      "path": "toolchain-lock.json",
+      "current_sha256": "5e20f11d3a06b03fb5194af421e4ba11aafa2609fa4d0a34793b39097b65278b",
+      "baseline_sha256": "5e20f11d3a06b03fb5194af421e4ba11aafa2609fa4d0a34793b39097b65278b",
+      "whole_file_changed": false
+    }
+  ],
+  "routes": [
+    {
+      "path": "scripts/write-draft-run.mjs",
+      "callsite": 158,
+      "helper": "toolVersion lines 69-75 uses spawnSync",
+      "executable_and_argv": [
+        "npm",
+        "-v"
+      ],
+      "cwd": "repository root derived from import.meta.url",
+      "environment": "inherited process.env (no env override)",
+      "provenance": "npm literal, resolved by OS PATH; pack-draft-run.mjs:114 invokes writer; Chainman pack-draft task lines 51-53",
+      "result": "first output line recorded in run.environment.tool_versions.npm",
+      "condition": "draft manifest creation",
+      "baseline_comparison": "The listed call, helper, flags, cwd and env expressions are present with same relevant behavior at e0418ab; broader unrelated changes to file are not ruled out."
+    },
+    {
+      "path": "scripts/rc-verify.py",
+      "callsite": 360,
+      "helper": "nested version helper lines 349-351 subprocess.run",
+      "executable_and_argv": [
+        "npm",
+        "-v"
+      ],
+      "cwd": "root parameter passed by execute_pack using ROOT",
+      "environment": "inherited process environment (no env override)",
+      "provenance": "name from finite tuple (node,pnpm,npm); PATH lookup; pack_environment called at line 380",
+      "result": "first stdout/stderr line recorded as prepack environment tool_versions.npm",
+      "condition": "prepack coordinator execution",
+      "baseline_comparison": "The listed call, helper, flags, cwd and env expressions are present with same relevant behavior at e0418ab; broader unrelated changes to file are not ruled out."
+    },
+    {
+      "path": "scripts/check-toolchain.py",
+      "callsite": "159-163",
+      "helper": "runtime_checks subprocess.run",
+      "executable_and_argv": [
+        "npm",
+        "--version"
+      ],
+      "cwd": "inherited parent process working directory; --root is not passed as cwd",
+      "environment": "inherited parent environment (no env override)",
+      "provenance": "npm key added to expected from lock.release.npm; executable PATH lookup; lock argument may be supplied using --lock",
+      "result": "full trimmed stdout compared with requested exact npm version",
+      "condition": "--runtime and --release, with valid lock; verify-lite lines 145-146 invokes this combination",
+      "baseline_comparison": "The listed call, helper, flags, cwd and env expressions are present with same relevant behavior at e0418ab; broader unrelated changes to file are not ruled out."
+    },
+    {
+      "path": "scripts/check-pack-library.mjs",
+      "callsite": 139,
+      "helper": "runCommand lines 76-79 spawnSync",
+      "executable_and_argv": [
+        "npm",
+        "-v"
+      ],
+      "cwd": "repository root derived from import.meta.url",
+      "environment": "inherited process.env (no env override)",
+      "provenance": "npm literal, PATH lookup; rc-verify.py:1651 runs checker on run manifest",
+      "result": "first stdout/stderr line compared with recorded run.environment.tool_versions.npm",
+      "condition": "pack-library observation",
+      "baseline_comparison": "The listed call, helper, flags, cwd and env expressions are present with same relevant behavior at e0418ab; broader unrelated changes to file are not ruled out."
+    },
+    {
+      "path": "scripts/run-consumer-floor-configurations.mjs",
+      "callsite": "62-63",
+      "helper": "child helper lines 57-60 spawnSync",
+      "executable_and_argv": [
+        "sh",
+        "-c",
+        "command -v npm"
+      ],
+      "cwd": "repository root derived from import.meta.url",
+      "environment": "copy of process.env, NODE_OPTIONS empty, RC_* and NODE_PATH removed; other keys retained",
+      "provenance": "shell command fixed; command -v resolves npm via shell PATH, realpathSync obtains CLI path",
+      "result": "resolved real path required to end /npm-cli.js",
+      "condition": "consumer floor setup",
+      "baseline_comparison": "The listed call, helper, flags, cwd and env expressions are present with same relevant behavior at e0418ab; broader unrelated changes to file are not ruled out."
+    },
+    {
+      "path": "scripts/run-consumer-floor-configurations.mjs",
+      "callsite": 63,
+      "helper": "child helper lines 57-60 spawnSync",
+      "executable_and_argv": [
+        "process.execPath",
+        "<realpath npm-cli.js>",
+        "--version"
+      ],
+      "cwd": "repository root derived from import.meta.url",
+      "environment": "copy of process.env, NODE_OPTIONS empty, RC_* and NODE_PATH removed; other keys retained",
+      "provenance": "Node executable is current process.execPath; CLI path from previous command; expected value lock.release.npm",
+      "result": "trimmed stdout compared with release.npm",
+      "condition": "consumer floor setup",
+      "baseline_comparison": "The listed call, helper, flags, cwd and env expressions are present with same relevant behavior at e0418ab; broader unrelated changes to file are not ruled out."
+    }
+  ],
+  "configuration_and_limits": [
+    "These version calls do not use npmToolingOptions, so its npm_* and token scrubbing and owned configs cannot be attributed to them. They retain specified inherited environment; runtime npm config startup behavior is not established here.",
+    "Absolute runtime resolution depends on PATH, shell behavior or process.execPath and runtime state. A fixed cwd does not itself establish npm config loading behavior.",
+    "Baseline comparison concerns listed version command contracts, not all file edits; run-consumer-floor-configurations.mjs changed runtime acquisition platform support elsewhere, and rc-verify.py has other edits.",
+    "No tests, installs, network calls, security disposition or historical code execution. Literal search and named helper inspection are bounded and cannot exclude all computed or generated routes."
+  ]
+}

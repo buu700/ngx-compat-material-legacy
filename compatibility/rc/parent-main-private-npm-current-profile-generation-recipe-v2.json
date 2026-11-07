@@ -1,0 +1,340 @@
+{
+  "schema_version": 2,
+  "role": "Reproducible source-identity generation DATA; no advisory verdict",
+  "source_checkpoint": "23b50ff4aa72d4a3c901c5d71ebaf2bbeb64ad71",
+  "generator": {
+    "sha256": "209ac24532da00efeeb6ae0c203a3d462350082a6a9d2f6cf5291cf3350bd224",
+    "bytes": 15444,
+    "source_utf8": "#!/usr/bin/env python3\n\"\"\"Prepare main-only profile candidate. Source identity census; no security verdict.\"\"\"\nimport argparse, hashlib, json, os, re, subprocess, sys\nfrom pathlib import Path, PurePosixPath\n\nRC='compatibility/rc/'\nSUFFIXES=['.cjs','.js','.mjs','.py','.sh','.ts']\nROOTS=['tests','compatibility/handoff/codex-closeout/tools']\nCHECKER='scripts/check-dependency-eligibility.py'\nCURRENT_NPM_ROSTER='compatibility/rc/npm-tooling-current-callers-v2.json'\nCAP=3000000\nSOURCE_CAP=4000000\n\ndef fail(msg): raise ValueError(msg)\ndef digest(b): return hashlib.sha256(b).hexdigest()\ndef canonical(v): return digest(json.dumps(v,sort_keys=True,separators=(',',':')).encode())\ndef pathcheck(s):\n if not isinstance(s,str) or not s or s.startswith('/') or any(x in ('','.','..') for x in s.split('/')): fail('unsafe path: '+repr(s))\n return s\ndef git(root,*args,input=None):\n p=subprocess.run(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',*args],cwd=root,input=input,stdout=subprocess.PIPE,stderr=subprocess.PIPE)\n if p.returncode: fail('git failed: '+p.stderr.decode(errors='replace'))\n return p.stdout\ndef safe_bytes(root,name):\n return checked_bytes(root,name,CAP)\ndef source_bytes(root,name):\n return checked_bytes(root,name,SOURCE_CAP)\ndef checked_bytes(root,name,limit):\n pathcheck(name); p=root\n for part in name.split('/'):\n  p=p/part\n  if p.is_symlink(): fail('symlink: '+name)\n if not p.is_file(): fail('missing file: '+name)\n b=p.read_bytes()\n if not 0<len(b)<=limit: fail('invalid byte count: '+name)\n return b\ndef ref(root,name):\n b=safe_bytes(root,name); return {'path':name,'sha256':digest(b),'bytes':len(b)}\ndef verify_ref(root,r):\n if type(r)!=dict or set(r)!={'path','sha256','bytes'} or ref(root,r['path'])!=r: fail('reference mismatch: '+repr(r))\ndef load(root,name): return json.loads(safe_bytes(root,name))\ndef discover(root,directory,exts):\n parent=root/directory\n if parent.is_symlink() or not parent.is_dir(): fail('missing or linked discovery root: '+directory)\n found=set()\n for p in parent.rglob('*'):\n  if p.is_symlink(): fail('symlink in discovery: '+str(p))\n  if p.is_file() and p.suffix in exts: found.add(p.relative_to(root).as_posix())\n return found\n\ndef ignored_generated_reference(root,candidate,prefix):\n # The prefix allowlist is deliberately finite. Confirm the exact candidate\n # through Git ignore rules; pnpm's node_modules symlink prevents Git from\n # resolving descendants, so only that specific error permits a root check.\n if prefix not in ('dist/','node_modules/') or not candidate.startswith(prefix): return False\n p=subprocess.run(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','check-ignore','--no-index','-v','--',candidate],cwd=root,stdout=subprocess.PIPE,stderr=subprocess.PIPE)\n if p.returncode==0: return True\n if prefix=='node_modules/' and b'beyond a symbolic link' in p.stderr:\n  q=subprocess.run(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','check-ignore','--no-index','-v','--','node_modules'],cwd=root,stdout=subprocess.PIPE,stderr=subprocess.PIPE)\n  return q.returncode==0\n return False\n\ndef require_new_target(root,tree,name):\n pathcheck(name); current=root\n for part in name.split('/'):\n  current=current/part\n  if current.is_symlink(): fail('candidate output target has symlink component: '+name)\n if name in tree or current.exists(): fail('candidate output target already exists: '+name)\n if not current.parent.is_dir(): fail('candidate output target parent is missing or not a directory: '+name)\n\ndef run(a):\n root=Path(a.root).resolve(strict=True); out=Path(a.out).resolve()\n if out==root or root in out.parents: fail('output must be outside worktree')\n if out.exists(): fail('output directory already exists')\n if not re.fullmatch('[0-9a-f]{40}',a.commit): fail('commit must be full SHA-1')\n if git(root,'rev-parse','HEAD').decode().strip()!=a.commit: fail('HEAD differs from frozen commit')\n if git(root,'status','--porcelain=v1','--untracked-files=no'): fail('tracked worktree or index is dirty')\n tree={}\n for rec in git(root,'ls-tree','-r','-z',a.commit).split(b'\\0'):\n  if rec:\n   meta,n=rec.split(b'\\t',1); mode,kind,oid=meta.decode().split(); name=n.decode(); pathcheck(name)\n   tree[name]=(mode,oid)\n profile=load(root,RC+'parent-private-npm-current-profile-inputs-v1.json')\n verify_ref(root,profile['review']); review=load(root,profile['review']['path'])\n old=load(root,RC+'tool-advisory-triage/private-profile-source-manifests.json')\n evidence=load(root,RC+'tool-advisory-triage/private-profile-remaining-evidence.json')\n brace=load(root,RC+'tool-advisory-triage/brace-profile-validation/manifest.json')['lines']['main']['source_inputs']\n if set(profile['lines'])!={'main','21.x'} or set(review['lines'])!={'main','21.x'}: fail('unexpected line population')\n primary=discover(root,'scripts',SUFFIXES)|discover(root,'.github/workflows',['.yml','.yaml'])\n primary.discard(CHECKER)\n primary.update(['.npmrc','chainman.toml','chainman.lock','justfile','package.json','projects/ngx-material-legacy/package.json','pnpm-lock.yaml'])\n support={r['path'] for r in profile['lines']['main']['support_files']}\n groups=[]\n excluded_references=[]\n for directory in ROOTS:\n  paths=discover(root,directory,SUFFIXES); support.update(paths)\n  groups.append({'root':directory,'suffixes':SUFFIXES,'paths':sorted(paths)})\n # Recursively inspect relative literal imports/references to tracked files. This is\n # conservative finite discovery, not a proof that dynamic calls are absent.\n pending=list(primary|support); visited=set(); literals=re.compile(r'''[\"']((?:\\.{1,2}/)[^\"'\\n\\r]+)[\"']''')\n while pending:\n  name=pending.pop()\n  if name in visited: continue\n  visited.add(name)\n  if name not in tree: fail('untracked or missing relevant file: '+name)\n  if Path(name).suffix not in SUFFIXES+['.json','.yaml','.yml']: continue\n  try: content=source_bytes(root,name).decode('utf-8')\n  except UnicodeDecodeError: continue\n  for m in literals.finditer(content):\n   value=m.group(1)\n   if any(c in value for c in '*?${}'): continue\n   resolved=os.path.normpath(os.path.join(os.path.dirname(name),value)).replace(os.sep,'/')\n   if resolved.startswith('../') or resolved in ('.','..'): continue\n   candidates=[resolved]+[resolved+x for x in SUFFIXES+['.json','.yaml','.yml']]+[resolved+'/index'+x for x in SUFFIXES]\n   for candidate in candidates:\n    if candidate not in tree and (root/candidate).is_file():\n     prefix=next((p for p in ('dist/','node_modules/') if candidate.startswith(p)),None)\n     if prefix is not None and ignored_generated_reference(root,candidate,prefix):\n      excluded_references.append({'source':name,'candidate':candidate,'reason':'out-of-source generated/runtime input'})\n      continue\n     fail('untracked literal reference: '+candidate)\n    if candidate in tree and candidate!=CHECKER and candidate not in primary and candidate not in support:\n     support.add(candidate); pending.append(candidate)\n # Include previously bound finite inputs and independently enumerated sources.\n inputs=({r['path'] for r in profile['lines']['main']['input_files']}|{r['path'] for r in brace}|set(evidence['roots']['main']['source_hashes'])|{'toolchain-lock.json','.node-version','.npm-version','SECURITY.md',CURRENT_NPM_ROSTER})-primary-support\n if primary&support or CHECKER in primary|support|inputs: fail('overlapping rows or checker self-reference')\n # Reject untracked files inside both executable discovery roots, including ignored\n # files if their suffix would enter discovery; relevant names must be Git blobs.\n all_names=sorted(primary|support|inputs)\n for name in all_names:\n  pathcheck(name)\n  if name not in tree or tree[name][0] not in ('100644','100755'): fail('missing tracked regular blob: '+name)\n requests=''.join(tree[n][1]+'\\n' for n in all_names).encode(); data=git(root,'cat-file','--batch',input=requests); pos=0; rows={}\n for name in all_names:\n  end=data.index(b'\\n',pos); oid,kind,size=data[pos:end].decode().split(); size=int(size)\n  b=data[end+1:end+1+size]; pos=end+1+size+1\n  if kind!='blob' or oid!=tree[name][1] or data[pos-1:pos]!=b'\\n' or b!=source_bytes(root,name): fail('physical/blob mismatch: '+name)\n  if hashlib.sha1(b'blob '+str(size).encode()+b'\\0'+b).hexdigest()!=oid: fail('blob hash mismatch: '+name)\n  rows[name]={'path':name,'sha256':digest(b),'bytes':size,'git_blob':oid}\n if pos!=len(data): fail('trailing git batch data')\n # Review names the earlier source checkpoint X; the frozen commit Y must\n # preserve the complete physical census and discovery populations from X.\n sem=json.loads(Path(a.semantic_index).read_bytes())\n if set(sem)!={'schema_version','semantic_review_refs','current_source_reviews'} or sem['schema_version']!=2 or type(sem['semantic_review_refs'])!=list or not sem['semantic_review_refs'] or type(sem['current_source_reviews'])!=dict or set(sem['current_source_reviews'])!={'main'}: fail('invalid independently authored semantic index')\n new_refs=sem['semantic_review_refs']; old_refs=review.get('semantic_review_refs',[])\n refs=old_refs+new_refs; seen=set()\n for item in refs:\n  verify_ref(root,item); n=item['path']\n  if n in seen: fail('duplicate semantic review: '+n)\n  if n not in tree or tree[n][0] not in ('100644','100755'): fail('untracked semantic review: '+n)\n  if n in all_names: fail('semantic review inside source projection: '+n)\n  seen.add(n)\n  if git(root,'cat-file','blob',tree[n][1])!=safe_bytes(root,n): fail('semantic review physical/blob mismatch: '+n)\n refs=sorted(refs,key=lambda x:x['path'])\n current=sem['current_source_reviews']['main']\n if current not in new_refs: fail('current main review must be newly supplied')\n authored=json.loads(safe_bytes(root,current['path']))\n main={'source_parent':a.commit,'historical_source_parent':old['lines']['main']['source_parent'],'historical_source_files':len(old['lines']['main']['source_files']),'source_files':[rows[n] for n in sorted(primary)],'support_files':[rows[n] for n in sorted(support)],'input_files':[rows[n] for n in sorted(inputs)],'support_discovery':groups,'historical_source_hashes':{n:{'historical_sha256':d,'current_sha256':rows[n]['sha256']} for n,d in sorted(evidence['roots']['main']['source_hashes'].items())}}\n expected={'schema_version':1,'role':'current-source-semantic-review','line':'main','preconditions':'unchanged-maintained-tool-owned-npm',**{n+'_sha256':canonical(main[n]) for n in ('source_files','support_files','input_files')}}\n if type(authored)!=dict or set(authored)!=set(expected)|{'source_parent','evidence_refs'} or any(authored.get(k)!=v for k,v in expected.items()) or type(authored.get('source_parent'))!=str or not re.fullmatch('[0-9a-f]{40}',authored['source_parent']): fail('semantic review scope or source projection mismatch')\n if type(authored['evidence_refs'])!=list or not authored['evidence_refs'] or any(r not in refs or r==current for r in authored['evidence_refs']) or [r['path'] for r in authored['evidence_refs']]!=sorted(set(r['path'] for r in authored['evidence_refs'])): fail('semantic evidence references invalid')\n source=authored['source_parent']\n if source==a.commit: fail('semantic review must follow source checkpoint')\n parents=git(root,'rev-list','--parents','-n','1',a.commit).decode().strip().split()\n if len(parents)!=2 or parents[0]!=a.commit or parents[1]!=source: fail('reviewed source checkpoint must be the sole direct parent')\n oldtree={}\n for rec in git(root,'ls-tree','-r','-z',source).split(b'\\0'):\n  if rec:\n   meta,n=rec.split(b'\\t',1); mode,kind,oid=meta.decode().split(); name=n.decode(); pathcheck(name)\n   oldtree[name]=(mode,oid)\n if current['path'] in oldtree: fail('semantic marker must be authored after source checkpoint')\n changed=set(oldtree)^set(tree) | {n for n in set(oldtree)&set(tree) if oldtree[n]!=tree[n]}\n new_ref_paths={item['path'] for item in new_refs}\n for n in changed:\n  if n in oldtree or n not in tree or tree[n][0]!='100644' or Path(n).suffix!='.json': fail('source checkpoint to review commit may add only regular JSON review files')\n  if n not in new_ref_paths: fail('changed review file is missing from new semantic review references: '+n)\n  try: json.loads(safe_bytes(root,n))\n  except Exception: fail('new semantic review file is not JSON: '+n)\n if changed!=new_ref_paths: fail('new semantic review references must exactly match source checkpoint to review commit additions')\n if any(oldtree.get(n)!=tree[n] for n in all_names): fail('source projection changed since reviewed checkpoint')\n def discovered(t,base,exts): return {n for n in t if n.startswith(base+'/') and Path(n).suffix in exts}\n for directory,exts in [('scripts',SUFFIXES),('.github/workflows',['.yml','.yaml'])]+[(r,SUFFIXES) for r in ROOTS]:\n  if discovered(oldtree,directory,exts)!=discovered(tree,directory,exts): fail('discovered population changed since reviewed checkpoint')\n profile['lines']['main']=main\n review['lines']['main']={'source_parent':a.commit,'source_files_sha256':canonical(main['source_files']),'support_files_sha256':canonical(main['support_files']),'input_files_sha256':canonical(main['input_files']),'preconditions':'unchanged-maintained-tool-owned-npm'}\n profile['schema_version']=2\n review['semantic_review_refs']=refs\n review['current_source_reviews']={'main':current}\n review['method']=['Candidate finite source identity inventory; physical bytes compared to frozen Git blobs.','Relative literal tracked references recursively discovered; dynamic or computed references require independent semantic review.']\n review['limits']=['Census is not semantic or security clearance. Review references are separately authored and must be independently authenticated and assessed.']\n review_raw=(json.dumps(review,indent=2)+'\\n').encode(); pathcheck(a.review_path); pathcheck(a.profile_path)\n if a.profile_path==a.review_path: fail('candidate profile and review targets must be distinct')\n require_new_target(root,tree,a.profile_path); require_new_target(root,tree,a.review_path)\n if len(review_raw)>CAP: fail('review exceeds cap')\n profile['review']={'path':a.review_path,'sha256':digest(review_raw),'bytes':len(review_raw)}\n profile_raw=(json.dumps(profile,indent=2)+'\\n').encode()\n if len(profile_raw)>CAP: fail('profile exceeds cap')\n out.mkdir(parents=True,exist_ok=False)\n (out/'review.json').write_bytes(review_raw); (out/'profile.json').write_bytes(profile_raw)\n result={'status':'candidate only; no semantic or security clearance','commit':a.commit,'profile_target':a.profile_path,'profile_sha256':digest(profile_raw),'review_target':a.review_path,'review_sha256':digest(review_raw),'counts':{'source':len(primary),'support':len(support),'inputs':len(inputs)},'excluded_references':sorted(excluded_references,key=lambda x:(x['source'],x['candidate'])),'reviewed_source_checkpoint':source,'checker_changes_required':['Independently review checker proposal and then pin the exact schema 2 profile target and SHA256.']}\n (out/'report.json').write_text(json.dumps(result,indent=2)+'\\n'); print(json.dumps(result,indent=2))\nif __name__=='__main__':\n p=argparse.ArgumentParser(); p.add_argument('--root',required=True); p.add_argument('--commit',required=True); p.add_argument('--out',required=True); p.add_argument('--semantic-index',required=True); p.add_argument('--profile-path',required=True); p.add_argument('--review-path',required=True)\n try: run(p.parse_args())\n except Exception as e: print('ERROR: '+str(e),file=sys.stderr); sys.exit(1)\n"
+  },
+  "fixture": {
+    "sha256": "bf95306f833dab37abe95ffa680baeb3b108df45d2b551448bab426108c783d7",
+    "bytes": 14603,
+    "source_utf8": "import tempfile, pathlib, subprocess, json, hashlib, os\nG='/tmp/current-profile-source-cap-v1/generator-semantic-v6.py'\nMAINTAINED=pathlib.Path(os.environ['PROFILE_MAINTAINED_SOURCE_FIXTURE'])\nC='/tmp/current-profile-source-cap-v1/generator-census-v6.py'\ndef cmd(*a,cwd=None): return subprocess.run(a,cwd=cwd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)\ndef put(r,p,data):\n x=r/p; x.parent.mkdir(parents=True,exist_ok=True); x.write_bytes(data) if isinstance(data,bytes) else x.write_text(data if isinstance(data,str) else json.dumps(data))\ndef h(b): return hashlib.sha256(b).hexdigest()\nwith tempfile.TemporaryDirectory(prefix='profile-gen-test-') as t:\n root=pathlib.Path(t)/'repo';root.mkdir();rc='compatibility/rc/'\n cmd('git','init','-q',cwd=root);cmd('git','config','user.name','fixture',cwd=root);cmd('git','config','user.email','fixture@example.invalid',cwd=root)\n maintained=MAINTAINED.read_bytes()\n for p in ['.gitignore','scripts/a.js','.github/workflows/a.yml','tests/a.py','compatibility/handoff/codex-closeout/tools/a.py','.npmrc','chainman.toml','chainman.lock','justfile','package.json','projects/ngx-material-legacy/package.json','pnpm-lock.yaml','toolchain-lock.json','.node-version','.npm-version','SECURITY.md','old-input.json','semantic.json','support-extra.json','compatibility/rc/npm-tooling-current-callers-v2.json']:\n  content='/dist/\\n/node_modules\\n' if p=='.gitignore' else ('import \\\"../support-extra.json\\\"\\nimport \\\"../dist/generated.mjs\\\"\\nimport \\\"../node_modules/pkg/runtime.mjs\\\"\\n' if p=='scripts/a.js' else (maintained if p=='support-extra.json' else '{}\\n'))\n  put(root,p,content)\n oldbranch={'source_parent':'1'*40,'source_files':[{}]}; evidence={'roots':{'main':{'source_hashes':{'old-input.json':'2'*64}}}}\n review={'schema_version':1,'scope':'maintained-tool-owned-npm-invocations','lines':{'21.x':{'sentinel':'preserve'},'main':{}},'semantic_review_refs':[]}\n put(root,rc+'old-review.json',review); b=(root/(rc+'old-review.json')).read_bytes()\n profile={'schema_version':1,'scope':'maintained-tool-owned-npm-invocations','historical_artifacts':{'sentinel':'preserve'},'lines':{'21.x':{'sentinel':'preserve'},'main':{'support_files':[],'input_files':[]}},'review':{'path':rc+'old-review.json','sha256':h(b),'bytes':len(b)},'provenance_limits':['preserve']}\n put(root,rc+'parent-private-npm-current-profile-inputs-v1.json',profile)\n put(root,rc+'tool-advisory-triage/private-profile-source-manifests.json',{'lines':{'main':oldbranch}})\n put(root,rc+'tool-advisory-triage/private-profile-remaining-evidence.json',evidence)\n put(root,rc+'tool-advisory-triage/brace-profile-validation/manifest.json',{'lines':{'main':{'source_inputs':[{'path':'old-input.json'}]}}})\n put(root,'dist/generated.mjs','generated\\n');deps=pathlib.Path(t)/'fake-node-modules';(deps/'pkg').mkdir(parents=True);(deps/'pkg'/'runtime.mjs').write_text('runtime\\n');(root/'node_modules').symlink_to(deps,target_is_directory=True)\n cmd('git','add','.',cwd=root);assert cmd('git','commit','-qm','fixture',cwd=root).returncode==0\n checkpoint=cmd('git','rev-parse','HEAD',cwd=root).stdout.strip()\n def row(n):\n  b=(root/n).read_bytes(); return {'path':n,'sha256':h(b),'bytes':len(b),'git_blob':hashlib.sha1(b'blob '+str(len(b)).encode()+b'\\0'+b).hexdigest()}\n def roster(names): return h(json.dumps([row(n) for n in sorted(names)],sort_keys=True,separators=(',',':')).encode())\n primary=['.npmrc','chainman.toml','chainman.lock','justfile','package.json','projects/ngx-material-legacy/package.json','pnpm-lock.yaml','scripts/a.js','.github/workflows/a.yml']\n support=['tests/a.py','compatibility/handoff/codex-closeout/tools/a.py','support-extra.json']\n inputs=['old-input.json','toolchain-lock.json','.node-version','.npm-version','SECURITY.md','compatibility/rc/npm-tooling-current-callers-v2.json']\n contextname=rc+'context-review.json';contextbytes=b'{\"evidence\":\"contextual authored evidence\"}\\n';put(root,contextname,contextbytes);contextref={'path':contextname,'sha256':h(contextbytes),'bytes':len(contextbytes)}\n authored={'evidence_refs':[contextref],'schema_version':1,'role':'current-source-semantic-review','line':'main','source_parent':checkpoint,'preconditions':'unchanged-maintained-tool-owned-npm','source_files_sha256':roster(primary),'support_files_sha256':roster(support),'input_files_sha256':roster(inputs)}\n name=rc+'semantic-review.json';put(root,name,authored); b=(root/name).read_bytes();ref={'path':name,'sha256':h(b),'bytes':len(b)}\n index=pathlib.Path(t)/'index.json';index.write_text(json.dumps({'schema_version':2,'semantic_review_refs':[ref,contextref],'current_source_reviews':{'main':ref}}))\n cmd('git','add',name,contextname,cwd=root);assert cmd('git','commit','-qm','review',cwd=root).returncode==0\n head=cmd('git','rev-parse','HEAD',cwd=root).stdout.strip()\n def run(out,commit=head,profile_target=rc+'next-profile.json',review_target=rc+'next-review.json'): return cmd('python3',G,'--root',str(root),'--commit',commit,'--out',str(pathlib.Path(t)/out),'--semantic-index',str(index),'--profile-path',profile_target,'--review-path',review_target)\n def run_census(out,commit=head): return cmd('python3',C,'--root',str(root),'--commit',commit,'--out',str(pathlib.Path(t)/out),'--semantic-index',str(index),'--profile-path',rc+'next-profile.json','--review-path',rc+'next-review.json')\n x=run('bad-head','0'*40); assert x.returncode and 'HEAD differs' in x.stderr,x.stderr\n (root/'scripts/a.js').write_text('dirty\\n');x=run('dirty');assert x.returncode and 'dirty' in x.stderr,x.stderr\n cmd('git','restore','scripts/a.js',cwd=root)\n put(root,'tests/new.py','x\\n');x=run('untracked');assert x.returncode and 'untracked' in x.stderr,x.stderr;(root/'tests/new.py').unlink()\n x=run('valid');assert not x.returncode,x.stderr\n roster_file=root/'compatibility/rc/npm-tooling-current-callers-v2.json';roster_original=roster_file.read_bytes();roster_file.write_bytes(roster_original+b'\\n');x=run('roster-tamper',head);assert x.returncode and 'dirty' in x.stderr,x.stderr;roster_file.write_bytes(roster_original)\n x=run('target-cross-collision',head,rc+'colliding-target.json',rc+'colliding-target.json');assert x.returncode and 'targets must be distinct' in x.stderr,x.stderr\n x=run('target-existing-profile',head,rc+'parent-private-npm-current-profile-inputs-v1.json',rc+'unused-review.json');assert x.returncode and 'target already exists' in x.stderr,x.stderr\n x=run('target-existing-artifact',head,rc+'unused-profile.json','package.json');assert x.returncode and 'target already exists' in x.stderr,x.stderr\n x=run('target-symlink-parent',head,'node_modules/new-profile.json',rc+'unused-review.json');assert x.returncode and 'symlink component' in x.stderr,x.stderr\n x=run('target-unsafe',head,'../foreign-profile.json',rc+'unused-review.json');assert x.returncode and 'unsafe path' in x.stderr,x.stderr\n census=run_census('census',head)\n assert not census.returncode,census.stderr\n census_doc=json.loads((pathlib.Path(t)/'census'/'census.json').read_text())\n assert census_doc['excluded_references']==[{'source':'scripts/a.js','candidate':'dist/generated.mjs','reason':'out-of-source generated/runtime input'},{'source':'scripts/a.js','candidate':'node_modules/pkg/runtime.mjs','reason':'out-of-source generated/runtime input'}],census_doc['excluded_references']\n assert next(row for row in census_doc['main']['support_files'] if row['path']=='support-extra.json')['bytes']==len(maintained)\n assert 'compatibility/rc/npm-tooling-current-callers-v2.json' in [row['path'] for row in census_doc['main']['input_files']]\n out=pathlib.Path(t)/'valid';p=json.loads((out/'profile.json').read_text());main_rows=p['lines']['main']\n def candidate(label,extra=None,extra_bytes=b'',executable=False,source_parent=None,restore_route=False,gitlink=None):\n  checkpoint_now=cmd('git','rev-parse','HEAD',cwd=root).stdout.strip();authored_parent=source_parent or checkpoint_now\n  if restore_route:\n   source=root/'tests/a.py';original=source.read_bytes();source.write_bytes(b'intermediate mutation\\n');cmd('git','add','tests/a.py',cwd=root);cmd('git','commit','-qm','intermediate source mutation',cwd=root)\n   source.write_bytes(original);cmd('git','add','tests/a.py',cwd=root);cmd('git','commit','-qm','restore source before review',cwd=root)\n  evidence_path=rc+label+'-evidence.json';evidence_bytes=json.dumps({'evidence':label}).encode()+b'\\n';put(root,evidence_path,evidence_bytes);evidence_ref={'path':evidence_path,'sha256':h(evidence_bytes),'bytes':len(evidence_bytes)}\n  authored={'schema_version':1,'role':'current-source-semantic-review','line':'main','source_parent':authored_parent,'preconditions':'unchanged-maintained-tool-owned-npm','source_files_sha256':h(json.dumps(main_rows['source_files'],sort_keys=True,separators=(',',':')).encode()),'support_files_sha256':h(json.dumps(main_rows['support_files'],sort_keys=True,separators=(',',':')).encode()),'input_files_sha256':h(json.dumps(main_rows['input_files'],sort_keys=True,separators=(',',':')).encode()),'evidence_refs':[evidence_ref]}\n  marker_path=rc+label+'-semantic-review.json';marker_bytes=json.dumps(authored).encode()+b'\\n';put(root,marker_path,marker_bytes);marker_ref={'path':marker_path,'sha256':h(marker_bytes),'bytes':len(marker_bytes)}\n  refs=[marker_ref,evidence_ref]\n  index.write_text(json.dumps({'schema_version':2,'semantic_review_refs':refs,'current_source_reviews':{'main':marker_ref}}))\n  add=[marker_path,evidence_path]\n  if extra:\n   put(root,extra,extra_bytes)\n   if executable: (root/extra).chmod(0o755)\n   add.append(extra)\n  if gitlink in ('add','change'):\n   (root/'review-gitlink').mkdir(exist_ok=True);assert cmd('git','update-index','--add','--cacheinfo','160000,'+checkpoint_now+',review-gitlink',cwd=root).returncode==0\n  elif gitlink=='remove':\n   assert cmd('git','update-index','--force-remove','--','review-gitlink',cwd=root).returncode==0\n  cmd('git','add','--',*add,cwd=root);cmd('git','commit','-qm',label,cwd=root);y=cmd('git','rev-parse','HEAD',cwd=root).stdout.strip()\n  result=run(label,y)\n  return result,checkpoint_now\n for op in ('add','change','remove'):\n  badlink,unused=candidate('bad-gitlink-'+op,gitlink=op);assert badlink.returncode and 'only regular JSON' in badlink.stderr,badlink.stderr\n badtxt,xtxt=candidate('bad-txt','compatibility/rc/unreviewed-note.txt',b'plain text\\n');assert badtxt.returncode and 'only regular JSON' in badtxt.stderr,badtxt.stderr\n badexec,xexec=candidate('bad-executable','scripts/unreviewed-tool',b'#!/bin/sh\\nexit 0\\n',True);assert badexec.returncode and 'only regular JSON' in badexec.stderr,badexec.stderr\n badjson,xjson=candidate('bad-unreferenced-json','compatibility/rc/unreviewed-extra.json',b'{\\\"extra\\\":true}\\n');assert badjson.returncode and 'missing from new semantic review references' in badjson.stderr,badjson.stderr\n badroute,xroute=candidate('bad-restore-route',source_parent=cmd('git','rev-parse','HEAD',cwd=root).stdout.strip(),restore_route=True);assert badroute.returncode and 'sole direct parent' in badroute.stderr,badroute.stderr\n index.write_text(json.dumps({'schema_version':2,'semantic_review_refs':[ref,contextref],'current_source_reviews':{'main':ref}}))\n large_path=rc+'oversized-semantic-reference.json';put(root,large_path,maintained);cmd('git','add',large_path,cwd=root);cmd('git','commit','-qm','large proof fixture',cwd=root);large_head=cmd('git','rev-parse','HEAD',cwd=root).stdout.strip()\n large_ref={'path':large_path,'sha256':h(maintained),'bytes':len(maintained)};original_index=index.read_text();large_index=json.loads(original_index);large_index['semantic_review_refs'].append(large_ref);index.write_text(json.dumps(large_index))\n x=run('oversized-semantic-ref',large_head);assert x.returncode and 'invalid byte count: '+large_path in x.stderr,x.stderr\n index.write_text(original_index)\n over_source=maintained+b'x'*(4000001-len(maintained));put(root,'support-extra.json',over_source);cmd('git','add','support-extra.json',cwd=root);cmd('git','commit','-qm','oversized source fixture',cwd=root);oversized_head=cmd('git','rev-parse','HEAD',cwd=root).stdout.strip()\n x=run('oversized-source',oversized_head);assert x.returncode and 'invalid byte count: support-extra.json' in x.stderr,x.stderr\n x=run_census('oversized-source-census',oversized_head);assert x.returncode and 'invalid byte count: support-extra.json' in x.stderr,x.stderr\n put(root,'support-extra.json',maintained);cmd('git','add','support-extra.json',cwd=root);cmd('git','commit','-qm','restore source fixture',cwd=root);restored_head=cmd('git','rev-parse','HEAD',cwd=root).stdout.strip();x,unused=candidate('valid-after-source-restore');assert not x.returncode,x.stderr\n\n r=json.loads((out/'review.json').read_text())\n assert p['schema_version']==2 and r['current_source_reviews']['main']==ref\n assert p['lines']['21.x']==profile['lines']['21.x'] and r['lines']['21.x']==review['lines']['21.x'] and p['historical_artifacts']==profile['historical_artifacts']\n assert 'support-extra.json' in [z['path'] for z in p['lines']['main']['support_files']]\n assert 'compatibility/rc/npm-tooling-current-callers-v2.json' in [z['path'] for z in p['lines']['main']['input_files']]\n assert p['lines']['main']['historical_source_hashes']['old-input.json']['historical_sha256']=='2'*64\n assert run('valid').returncode\n put(root,'scripts/a.js','import \\\"../artifacts/untracked.mjs\\\"\\n');put(root,'artifacts/untracked.mjs','untracked\\n');cmd('git','add','scripts/a.js',cwd=root);cmd('git','commit','-qm','wrong prefix fixture',cwd=root);wrong_head=cmd('git','rev-parse','HEAD',cwd=root).stdout.strip();x=run('wrong-prefix',wrong_head);assert x.returncode and 'untracked literal reference: artifacts/untracked.mjs' in x.stderr,x.stderr;(root/'artifacts/untracked.mjs').unlink()\n put(root,'scripts/a.js','changed after review\\n');cmd('git','add','scripts/a.js',cwd=root);cmd('git','commit','-qm','changed source',cwd=root); changed=cmd('git','rev-parse','HEAD',cwd=root).stdout.strip()\n x=run('changed-source',changed);assert x.returncode and ('projection mismatch' in x.stderr or 'projection changed' in x.stderr or 'executable changes' in x.stderr),x.stderr\n print('PASS explicit current caller roster input bound and tamper rejected; exact X-to-Y JSON-only review commit; crosscollision/existing/unsafe/symlink targets rejected; gitlink additions/changes/deletions, TXT/executable/unreferenced JSON and multi-commit restore route rejected; 3,022,703-byte source accepted in both modes; same bytes as semantic ref and 4,000,001-byte source rejected; generated-ignore and nonignored artifacts-reference controls and two-commit fixture pass')\n"
+  },
+  "implementation_notes": [
+    "New current caller roster is an explicit finite input, retaining the historical roster.",
+    "Fresh JSON-only direct-child semantic commit; every changed document is a newly supplied semantic reference.",
+    "Fresh distinct candidate targets; existing historical artifacts cannot be named as targets.",
+    "Proof/semantic documents remain <=3000000 bytes; only source/support/input rows permit <=4000000."
+  ],
+  "generator_preparation": {
+    "schema_version": 1,
+    "status": "root fixture passed; independent final static diff review found no residual defect",
+    "prior_preparation": {
+      "status": "fixture_passed_for_independent_review",
+      "task": "temporary generator V5 exact JSON-only X-to-Y workflow, collision-free external targets, and explicit current caller roster input",
+      "provisional_v4": "not authoritative; current npm caller probe consumes compatibility/rc/npm-tooling-current-callers-v2.json, which V4 omitted from INPUT rows; root must recensus after freeze",
+      "repo_edits": false,
+      "profile_or_pin_issued": false,
+      "real_census_run": false,
+      "source_cap_and_reference_rules": "preserved from V4; 3MB proof/semantic refs/output and 4MB only source/support/input reads and row verification",
+      "v5_files": {
+        "generator_semantic": {
+          "path": "/tmp/current-profile-source-cap-v1/generator-semantic-v5.py",
+          "sha256": "dd4aa36e851fd22a51bff97343111efce1777dc77882ac7fefad0ce26880fbbb"
+        },
+        "generator_census": {
+          "path": "/tmp/current-profile-source-cap-v1/generator-census-v5.py",
+          "sha256": "ba2244d7093bd41b064ccd3157586059f73d24636a9cdde72c199f1980729102"
+        },
+        "fixture_tests": {
+          "path": "/tmp/current-profile-source-cap-v1/fixture-tests-v5.py",
+          "sha256": "c798caed53fee0577c86b88b59d979bda3073746ba9aa8380030d43ed3f63cd7"
+        },
+        "fixture_log": {
+          "path": "/tmp/current-profile-source-cap-v1/fixture-tests-v5.log",
+          "sha256": "e8e7afdd9f5a1788b739ab00d8a67dfbbf5545b4b2b414a327eb79378f7d1774"
+        },
+        "patches": {
+          "semantic": {
+            "path": "/tmp/current-profile-source-cap-v1/generator-semantic-v5.patch",
+            "sha256": "4b0f8f644373c3d66d3e16ee6e45d8d7727c3ccfe3dd803f2fbba65cbe50954a"
+          },
+          "census": {
+            "path": "/tmp/current-profile-source-cap-v1/generator-census-v5.patch",
+            "sha256": "919250edbf1eb0c676f51e68a7e003e0a18e6d037a66abd6d7de684d24175d15"
+          },
+          "fixtures": {
+            "path": "/tmp/current-profile-source-cap-v1/fixture-tests-v5.patch",
+            "sha256": "0d40e6cdf7215ddd0b96b4c5d008dec142fb379a6bff52ac0db99cfdc97b4ed0"
+          }
+        }
+      },
+      "preserved_v4_sha256": {
+        "generator-semantic-v4.py": "e2ea8d5856400586fbd9f21eb7104e2eda843c34d0ad00f616ee607bc8af495a",
+        "generator-census-v4.py": "fade14217432884039de543b8ee205c3c1ae8b4f5570301d202e436f74e8fb27",
+        "fixture-tests-v4.py": "75745a0f21b0fc2b9da0c4c99c1385968deb96694c2b2964f31187d379644766"
+      },
+      "verification": "fixture suite passed: explicit current caller roster row bound and file tamper rejected; positive exact X->Y commit with marker and authored evidence JSON; target crosscollision, existing historical/artifact target, unsafe target, and symlink parent rejected; .txt, executable, unreferenced JSON and multi-commit mutation/restore rejected; 3,022,703-byte source accepted; same-size semantic reference rejected at 3MB; 4,000,001-byte source rejected; ignored generated dist/node_modules references recorded/excluded",
+      "root_followup": "root may rerun fixture and fresh census at final source freeze; no census was run in this task"
+    },
+    "root_changes": [
+      "Retain all Git leaf entries, including gitlinks, in X/Y tree maps",
+      "Add negative added/changed/deleted gitlink controls",
+      "Restore nonignored artifacts-reference negative control"
+    ],
+    "files": [
+      {
+        "path": "/tmp/current-profile-source-cap-v1/generator-semantic-v6.py",
+        "sha256": "209ac24532da00efeeb6ae0c203a3d462350082a6a9d2f6cf5291cf3350bd224",
+        "bytes": 15444
+      },
+      {
+        "path": "/tmp/current-profile-source-cap-v1/generator-census-v6.py",
+        "sha256": "a51aea50b707f379643f2cbdaaa60ff606379bb18ba731ab271b59c63d58fa2d",
+        "bytes": 15652
+      },
+      {
+        "path": "/tmp/current-profile-source-cap-v1/fixture-tests-v6.py",
+        "sha256": "bf95306f833dab37abe95ffa680baeb3b108df45d2b551448bab426108c783d7",
+        "bytes": 14603
+      },
+      {
+        "path": "/tmp/current-profile-source-cap-v1/root-generator-fixture-v6.log",
+        "sha256": "f46ded926e89063751f296ed9e0cad13e58cf876fe6b6dcdf7cf61fe3dc2f2d9",
+        "bytes": 473
+      }
+    ],
+    "repository_mutation": false,
+    "profile_or_pin_issued": false,
+    "independent_final_review": {
+      "verdict": "V5 gitlink finding closed by source inspection; no additional defect identified in bounded V5-to-V6 diff",
+      "scope": "Independent static review of exact V5-to-V6 diffs and updated fixture assertions; no security verdict, execution, profile or marker issuance.",
+      "artifacts": [
+        {
+          "path": "/tmp/current-profile-source-cap-v1/generator-semantic-v6.py",
+          "sha256": "209ac24532da00efeeb6ae0c203a3d462350082a6a9d2f6cf5291cf3350bd224"
+        },
+        {
+          "path": "/tmp/current-profile-source-cap-v1/generator-census-v6.py",
+          "sha256": "a51aea50b707f379643f2cbdaaa60ff606379bb18ba731ab271b59c63d58fa2d"
+        },
+        {
+          "path": "/tmp/current-profile-source-cap-v1/fixture-tests-v6.py",
+          "sha256": "bf95306f833dab37abe95ffa680baeb3b108df45d2b551448bab426108c783d7"
+        }
+      ],
+      "finding_status": {
+        "V5-01": "Closed: both semantic tree maps include every recursive ls-tree leaf including gitlinks; additions, deletions and OID or mode changes enter changed, and fail the newly added regular JSON requirements. Census also retains leaves and continues requiring source rows to have regular file modes.",
+        "V4-01": "Remains closed under direct-child and fresh JSON-only leaf policy, including gitlinks.",
+        "V4-02": "V5 fresh target validation unchanged.",
+        "caller_roster": "V5 explicit finite roster input unchanged."
+      },
+      "fixtures": "V6 adds separate add/change/remove gitlink negative cases and reinstates nonignored artifacts literal-reference rejection. Test code inspected but not executed; parent running fixtures.",
+      "context": "Previous context review qualifications remain; direct manual per-route review remains an author-owned assertion, not independently reverified here.",
+      "limitations": [
+        "No fixture, census, checker, qualification, or product tests executed.",
+        "This is a bounded diff review; it does not certify evidence substance or eliminate finite discovery and dynamic execution limitations documented in V5 review.",
+        "Generator-side stricter checks do not substitute for maintained checker execution."
+      ],
+      "repository_edits": false
+    }
+  },
+  "root_fixture_execution": {
+    "status": "passed",
+    "exit_code": 0,
+    "fixture": {
+      "path": "/tmp/current-profile-source-cap-v1/fixture-tests-v6.py",
+      "sha256": "bf95306f833dab37abe95ffa680baeb3b108df45d2b551448bab426108c783d7",
+      "bytes": 14603
+    },
+    "stdout": {
+      "path": "/tmp/current-profile-source-cap-v1/root-generator-fixture-v6.log",
+      "sha256": "f46ded926e89063751f296ed9e0cad13e58cf876fe6b6dcdf7cf61fe3dc2f2d9",
+      "bytes": 473
+    },
+    "stdout_utf8": "PASS explicit current caller roster input bound and tamper rejected; exact X-to-Y JSON-only review commit; crosscollision/existing/unsafe/symlink targets rejected; gitlink additions/changes/deletions, TXT/executable/unreferenced JSON and multi-commit restore route rejected; 3,022,703-byte source accepted in both modes; same bytes as semantic ref and 4,000,001-byte source rejected; generated-ignore and nonignored artifacts-reference controls and two-commit fixture pass\n",
+    "maintained_source_fixture": "fixtures/sass/ripple-color-contracts.json",
+    "runner": "Python3.14.7",
+    "repository_mutation": false,
+    "scope": "Temporary semantic/census generator controls only; no source/profile/advisory authority issued"
+  },
+  "independent_review": {
+    "verdict": "V5 gitlink finding closed by source inspection; no additional defect identified in bounded V5-to-V6 diff",
+    "scope": "Independent static review of exact V5-to-V6 diffs and updated fixture assertions; no security verdict, execution, profile or marker issuance.",
+    "artifacts": [
+      {
+        "path": "/tmp/current-profile-source-cap-v1/generator-semantic-v6.py",
+        "sha256": "209ac24532da00efeeb6ae0c203a3d462350082a6a9d2f6cf5291cf3350bd224"
+      },
+      {
+        "path": "/tmp/current-profile-source-cap-v1/generator-census-v6.py",
+        "sha256": "a51aea50b707f379643f2cbdaaa60ff606379bb18ba731ab271b59c63d58fa2d"
+      },
+      {
+        "path": "/tmp/current-profile-source-cap-v1/fixture-tests-v6.py",
+        "sha256": "bf95306f833dab37abe95ffa680baeb3b108df45d2b551448bab426108c783d7"
+      }
+    ],
+    "finding_status": {
+      "V5-01": "Closed: both semantic tree maps include every recursive ls-tree leaf including gitlinks; additions, deletions and OID or mode changes enter changed, and fail the newly added regular JSON requirements. Census also retains leaves and continues requiring source rows to have regular file modes.",
+      "V4-01": "Remains closed under direct-child and fresh JSON-only leaf policy, including gitlinks.",
+      "V4-02": "V5 fresh target validation unchanged.",
+      "caller_roster": "V5 explicit finite roster input unchanged."
+    },
+    "fixtures": "V6 adds separate add/change/remove gitlink negative cases and reinstates nonignored artifacts literal-reference rejection. Test code inspected but not executed; parent running fixtures.",
+    "context": "Previous context review qualifications remain; direct manual per-route review remains an author-owned assertion, not independently reverified here.",
+    "limitations": [
+      "No fixture, census, checker, qualification, or product tests executed.",
+      "This is a bounded diff review; it does not certify evidence substance or eliminate finite discovery and dynamic execution limitations documented in V5 review.",
+      "Generator-side stricter checks do not substitute for maintained checker execution."
+    ],
+    "repository_edits": false
+  },
+  "prior_independent_reviews": [
+    {
+      "verdict": "changes required",
+      "scope": "Independent read-only source review of prepared V4 generator, census variant, fixture, and maintained schema-2 checker; no authority issued",
+      "findings": [
+        {
+          "id": "V4-01",
+          "severity": "blocker",
+          "location": "generator-semantic-v4.py:162-167; fixture-tests-v4.py:33-45,55-58",
+          "issue": "The X-to-Y check compares endpoint trees and rejects only selected suffixes, rather than requiring JSON-only commits. The passing fixture adds a .txt file after X; extensionless executables and other non-JSON changes outside the source projection are also accepted. Intermediate source changes followed by restoration are invisible, and fixture explicitly accepts a source change and restore.",
+          "recommendation": "Enforce the stated JSON-only policy over every commit in the X-to-Y ancestry (including modes and deletions), or explicitly narrow and obtain agreement on the intended policy. Make the positive fixture JSON-only and add negative non-JSON, extensionless and change-then-restore fixtures."
+        },
+        {
+          "id": "V4-02",
+          "severity": "blocker",
+          "location": "generator-semantic-v4.py:175-176",
+          "issue": "Target checks prohibit only profile target equal to old profile and review target equal to old review. They allow the reverse collisions and other existing historical paths, so reported candidate installation targets can overwrite immutable artifacts. The generator itself writes only to the external output directory.",
+          "recommendation": "Require both distinct targets to be fresh, untracked and physically absent, with symlink-safe parent checks, and test reverse and historical collisions."
+        }
+      ],
+      "observations": [
+        "Primary and support discovery populations match the maintained checker and source rows use 4,000,000 bytes; proof references and generated documents use 3,000,000 bytes.",
+        "The marker is required absent at X; its exact source/support/input roster digests and nonempty authenticated evidence references are checked; ancestry and endpoint projection equality are checked. Hash authentication does not assess evidence substance.",
+        "Existing 21.x branch and historical artifact fields are retained in memory. Finite literal discovery excludes computed/dynamic references, with explicitly recorded ignored dist and node_modules exceptions.",
+        "Fixture scripts invoke alternate /tmp filenames, whose SHA-256 values matched the reviewed V4 generator files at review time."
+      ],
+      "validation": "Static inspection only; did not rerun fixtures, checker, census, or expensive tests. Progress report claims fixture and compilation passes, not independently verified.",
+      "repository_edits": false
+    },
+    {
+      "verdict": "changes required: one remaining direct-child policy gap",
+      "scope": "Static independent ordinary source review of frozen V5 changes, fixture assertions, and updated authored context; no security verdict, execution, profile or marker issuance.",
+      "artifacts": [
+        {
+          "path": "/tmp/current-profile-source-cap-v1/generator-semantic-v5.py",
+          "sha256": "dd4aa36e851fd22a51bff97343111efce1777dc77882ac7fefad0ce26880fbbb"
+        },
+        {
+          "path": "/tmp/current-profile-source-cap-v1/generator-census-v5.py",
+          "sha256": "ba2244d7093bd41b064ccd3157586059f73d24636a9cdde72c199f1980729102"
+        },
+        {
+          "path": "/tmp/current-profile-source-cap-v1/fixture-tests-v5.py",
+          "sha256": "c798caed53fee0577c86b88b59d979bda3073746ba9aa8380030d43ed3f63cd7"
+        },
+        {
+          "path": "/tmp/root-main-current-profile-review-v5.py",
+          "sha256": "426ec54f96a97bd60c5c3098c0e7095927cf6814680f9f7595138c6e9c5dbc1a"
+        }
+      ],
+      "prior_findings": {
+        "V4-01": "Closed for Git blob entries: Y requires X as its sole direct parent, and every changed blob must be a newly added mode 100644 parsed JSON file exactly matching new semantic refs. Remaining non-blob gap is recorded below.",
+        "V4-02": "Closed: distinct target paths must not exist physically or in the tracked blob tree; parent symlinks and missing parent directories rejected.",
+        "current_caller_roster": "Both generators add compatibility/rc/npm-tooling-current-callers-v2.json explicitly to input candidates; if already discovered as support it remains bound as support. Fixture checks input inclusion and dirty tracked tampering."
+      },
+      "findings": [
+        {
+          "id": "V5-01",
+          "severity": "blocker for exact JSON-only policy",
+          "location": "generator-semantic-v5.py:69-82 and 165-179",
+          "issue": "Both ls-tree parsers keep only kind blob and silently omit Git submodule entries (mode 160000, kind commit). Thus an added, removed or changed gitlink outside the projection can be part of the single Y commit without appearing in changed, and Y can be accepted despite containing a non-JSON change outside the new semantic references.",
+          "recommendation": "Collect and compare all leaf tree entries, or reject gitlinks in either tree, and add fixtures for added, removed and changed gitlinks as appropriate."
+        }
+      ],
+      "fixture_inspection": "Positive fixture uses JSON evidence and marker. Negative cases cover non-JSON, extensionless executable, unreferenced JSON and intermediate source mutation/restore; targets existing, same, symlink-parent and unsafe; source/proof byte limits and generated ignore examples. Assertions reviewed statically, not executed; the prior nonignored artifacts reference negative was removed in V5.",
+      "context_review": {
+        "CTX-01": "Closed in updated draft: bounded 22 routes, no exhaustive dynamic proof, and concrete Sass/immutable closure, compiler/peer/helper and inherited environment limits are stated adjacent to decision.",
+        "CTX-02": "Addressed by explicit assertion of parent manual per-route review; raw report excerpts alone remain insufficient to independently verify that work. Not independently re-reviewed in this task.",
+        "separation": "Draft preserves separate historical and 21.x artifacts and disclaims advisory, G11 and product qualification."
+      },
+      "checker_compatibility": "Stricter direct-child and new-reference conditions add generator-side constraints without conflicting with the maintained schema-2 checker, which authenticates marker digests but does not enforce Git ancestry. Full generated profile was not exercised against checker.",
+      "limitations": [
+        "Static review only; no fixtures, checker, census, npm operations or qualification re-executed.",
+        "Finite literal discovery does not prove absence of dynamic routes; ignored dist/node_modules exceptions are explicitly scoped and logged.",
+        "Hash authentication binds evidence bytes, not their substantive correctness."
+      ],
+      "repository_edits": false
+    },
+    {
+      "verdict": "qualify claims before issuance",
+      "scope": "Ordinary read-only review of draft contextual review against four underlying reports, qualification record, source-pass record and selected current source. Not a security review; no marker or profile issued.",
+      "sources": [
+        {
+          "path": "/tmp/root-main-current-profile-review-v5.py",
+          "sha256": "667831a50ad8561a1d254f95a9c31f95b00591580f6715b6ffa64a45731bf1a2"
+        },
+        {
+          "path": "/tmp/c01-current-command-boundary/report.json",
+          "sha256": "7825820fa106353468aeb42a944fff723e3635691326bc7fcfe216efaa0cbedf"
+        },
+        {
+          "path": "/tmp/c01-current-command-boundary/npm-version-addendum.json",
+          "sha256": "0251d3e263a3a4b3ae5aa375264e249b3112417fd58207afd7ff916bf957ba5b"
+        },
+        {
+          "path": "/tmp/c01-current-command-boundary/context-delta-v4.json",
+          "sha256": "9d9ecb9ef86f2117c00f77827e0edeab767400ecf36b3cc736290ca403e6cc43"
+        },
+        {
+          "path": "/tmp/c01-current-command-boundary/execution-delta-v1.json",
+          "sha256": "bddeada383a8aac96595fa9c9b89f779a5ff6c6d61a3e99b5bbbb25584dd69c0"
+        },
+        {
+          "path": "/tmp/root-main-current-command-qualification-v1/qualification.json",
+          "sha256": "b999628ddb33a9140d1bd69918abc7d3351124d19322d2627889767517b2cfd1"
+        },
+        {
+          "path": "/tmp/root-main-tool-source-full-v1/state.json",
+          "sha256": "2023614d30d3ff5039780b0635841573a53065bb260229000f65c2a133aba4c2"
+        },
+        {
+          "path": "/tmp/root-main-tool-source-full-v1/output.log",
+          "sha256": "b53ae2dd9dcc2ccc503fbb91d45ef2eae56d6f9f52f7a8d907a0ee061dde2037"
+        }
+      ],
+      "findings": [
+        {
+          "id": "CTX-01",
+          "issue": "The decision asserts the specifically maintained finite commands and reviewed input flow preserve prior boundaries but does not explicitly preserve the cited reports\u2019 limits on completeness. The 22-row direct roster is inherited rather than independently exhaustive; patch/regex discovery does not close dynamic/generated dispatch. Snapshot entries execute Sass, sass.dart.js and immutable closure code whose subprocess behavior was not exhaustively traced. Peer/compiler/helper roots and inherited PATH, NODE_OPTIONS and executable behavior remain concrete unresolved routes.",
+          "evidence": [
+            "report.json interpretation.limits",
+            "context-delta-v4.json preconditions_and_limits",
+            "execution-delta-v1.json concrete_unresolved and limits",
+            "draft semantic_facts source-dispatch-and-executable-helpers and decision"
+          ],
+          "recommendation": "State those bounded-discovery and unresolved execution limits explicitly beside the decision, and make preservation conditional on them; avoid implying all routes or executable dependency internals have been established."
+        },
+        {
+          "id": "CTX-02",
+          "issue": "The claim that all 22 routes were read with manifest, cwd, environment and npmToolingOptions is not independently substantiated by the captured direct-roster excerpts alone. The underlying report explicitly calls the roster inherited and its extraction incomplete for some multiline and transitive context. The author may have performed additional inspection not recorded in these cited reports.",
+          "evidence": [
+            "draft semantic_facts finite-owned-invocations",
+            "report.json interpretation.limits and direct_roster"
+          ],
+          "recommendation": "Cite the route-by-route review evidence for those attributes or qualify the sentence to the actual documented inspection and separate unresolved manifest/transitive detail."
+        }
+      ],
+      "observations": [
+        "The draft distinguishes physical digest identity from substantive source context and explicitly excludes security, advisory disposition, G11, product tests and third-party internals.",
+        "The new current caller roster is required by tests/npm_tooling_caller_probe.mjs and the draft requires its inclusion as a separate input while retaining the historical roster; the census artifact was not available for this review.",
+        "The four copied reports and root qualification make separate claims; the source qualification log is bound by SHA256 and explicitly limited to maintained inventory-reference owner source controls. These records were inspected, not independently rerun.",
+        "The requested policy that a direct child of X contain only newly supplied semantic-reference paths that are fresh at X, regular nonexecutable JSON files is stricter than and compatible with maintained schema-2 marker validation; checker itself does not enforce commit ancestry or this policy."
+      ],
+      "limitations": [
+        "No exhaustive re-review of all 22 routes, no execution of draft, census, probe, source qualification, tests or security triage.",
+        "Unconfirmed factual claims beyond cited source evidence are not characterized as false."
+      ],
+      "repository_edits": false
+    }
+  ],
+  "limits": [
+    "The recipe is DATA and cannot grant semantic or security clearance.",
+    "Candidate output remains outside the worktree until independently reviewed.",
+    "Historical profile, historical advisory evidence and parked 21.x are not rewritten."
+  ]
+}
