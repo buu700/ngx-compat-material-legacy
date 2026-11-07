@@ -27,6 +27,7 @@ import {
   EventEmitter,
   QueryList,
   ViewChild,
+  signal,
 } from '@angular/core';
 import {Subject} from 'rxjs';
 import {MAT_OPTGROUP, _MatOptgroupBase} from './optgroup-base';
@@ -53,6 +54,7 @@ export class _MatOptionBase<T = any> implements FocusableOption, AfterViewChecke
   private _selected = false;
   private _active = false;
   private _disabled = false;
+  #legacyDisabledState = signal(false);
   private _mostRecentViewValue = '';
 
   /** Whether the wrapping component is in multiple selection mode. */
@@ -74,10 +76,13 @@ export class _MatOptionBase<T = any> implements FocusableOption, AfterViewChecke
   /** Whether the option is disabled. */
   @Input()
   get disabled(): boolean {
+    // Track views that read this option before its input is updated.
+    this.#legacyDisabledState();
     return (this.group && this.group.disabled) || this._disabled;
   }
   set disabled(value: BooleanInput) {
     this._disabled = coerceBooleanProperty(value);
+    this.#legacyDisabledState.set(this._disabled);
   }
 
   /** Whether ripples for the option are disabled. */

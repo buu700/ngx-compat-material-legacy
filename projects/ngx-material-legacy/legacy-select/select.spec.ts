@@ -6338,3 +6338,34 @@ describe('legacy select parent state propagation', () => {
     }
   }
 });
+
+@Component({standalone: false, template: `
+  <button id="option-disable" (click)="disabled.set(true)">Disable</button>
+  <button id="option-enable" (click)="disabled.set(false)">Enable</button>
+  <mat-select><span id="option-disabled-echo">{{option.disabled}}</span>
+    <mat-option #option="matOption" [disabled]="disabled()" value="a">A</mat-option>
+  </mat-select>
+`})
+class ScheduledOptionDisabledFixture {
+  @ViewChild(MatLegacySelect) select: MatLegacySelect;
+  disabled = signal(false);
+}
+
+describe('legacy select option disabled notification', () => {
+  it('updates a parent view after option changes under zoneless scheduling', async () => {
+    TestBed.configureTestingModule({imports: [MatLegacySelectModule], declarations: [ScheduledOptionDisabledFixture],
+      providers: [provideZonelessChangeDetection(), LEGACY_NOOP_ANIMATIONS]});
+    const fixture = TestBed.createComponent(ScheduledOptionDisabledFixture);
+    fixture.autoDetectChanges(); await fixture.whenStable();
+    fixture.componentInstance.select.open(); await fixture.whenStable();
+    const overlay = TestBed.inject(OverlayContainer).getContainerElement();
+    const option = () => overlay.querySelector('mat-option')!;
+    const echo = () => overlay.querySelector('#option-disabled-echo')!.textContent!.trim();
+    expect(echo()).toBe('false');
+    fixture.nativeElement.querySelector('#option-disable').click(); await fixture.whenStable();
+    expect(option().getAttribute('aria-disabled')).toBe('true'); expect(echo()).toBe('true');
+    fixture.nativeElement.querySelector('#option-enable').click(); await fixture.whenStable();
+    expect(option().getAttribute('aria-disabled')).toBe('false'); expect(echo()).toBe('false');
+    fixture.destroy();
+  });
+});
