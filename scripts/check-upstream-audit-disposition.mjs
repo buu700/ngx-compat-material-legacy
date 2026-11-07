@@ -32,7 +32,8 @@ import {COMMENT_SCOPE_ROLE,COMMENT_SHAS,commentScopeEvidenceOk} from './upstream
 import {SLIDER_TOKEN_SHA,SLIDER_TOKEN_ROLE,sliderTokenEvidenceOk} from './upstream-slider-token-evidence.mjs';
 import {SLIDER_RANGE_SHAS,SLIDER_RANGE_ROLE,sliderRangeEvidenceOk} from './upstream-slider-range-followups.mjs';
 import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';
-import {c04FirstIndividualEvidenceClass} from './upstream-c04-first-individual-evidence.mjs';
+import {C04_FIRST_SHAS,c04FirstIndividualEvidenceClass} from './upstream-c04-first-individual-evidence.mjs';
+import {requiresTestingApi21xProof} from './upstream-testing-api-21x-admission.mjs';
 import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';
 import {requiresArtifactBehavior,validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';
 import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';
@@ -306,8 +307,21 @@ function individualPatchBound(entry, proof) {
     ? body.reviews.find(item => item?.sha === entry.sha) : body;
   if (!review || review.sha !== entry.sha || review.diff_sha256 !== proof.diff_sha256) return false;
   if(!individualReviewScopeOk({entry,proof,body,review,
-    requiresIndividual:Boolean(sensitiveClass(entry))||requiresChipLifecycleScope(entry,proof)||requiresChipModernizationScope(entry,proof)||requiresChipInputApiScope(entry,proof)||requiresChipEditScope(entry,proof)||requiresHistoricalBehavior(entry,proof)||requiresArtifactBehavior(entry,proof)||requiresOwnedStyle(entry,proof)||INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition),
-    claimsBehavior:INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition)}))return false;
+    requiresIndividual:Object.hasOwn(entry,'individual_proof')||Boolean(sensitiveClass(entry))||requiresChipLifecycleScope(entry,proof)||requiresChipModernizationScope(entry,proof)||requiresChipInputApiScope(entry,proof)||requiresChipEditScope(entry,proof)||requiresHistoricalBehavior(entry,proof)||requiresArtifactBehavior(entry,proof)||requiresOwnedStyle(entry,proof)||INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition)||(entry.final_disposition==='do-not-adopt'&&entry.bucket==='behavior-semantic'),
+    claimsBehavior:INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition),
+    specialized: INHERITED.has(entry.final_disposition)||C04_FIRST_SHAS.includes(entry.sha)
+      ||requiresTestingApi21xProof(proof,rel=>{const f=regularRepoMember(rel);return f?readFileSync(f):null;})
+      ||requiresBootstrapPreparation(entry)||requiresRulesJsBuild(entry)||requiresSassInspectionScope(entry)
+      ||requiresChipLifecycleScope(entry,proof)||requiresChipModernizationScope(entry,proof)
+      ||requiresChipInputApiScope(entry,proof)||requiresChipEditScope(entry,proof)||requiresModernChipScope(entry,proof)
+      ||requiresHistoricalBehavior(entry,proof)||requiresArtifactBehavior(entry,proof)||requiresOwnedStyle(entry,proof)
+      ||requiresNativeDate(entry,proof)||requiresProgressCsp(entry,proof)||requiresGeneratedIdentity(entry,proof)
+      ||requiresBidiBehavior(entry,proof)||requiresSelectionBehavior(entry,proof)||requiresFormFieldHover(entry,proof)
+      ||requiresTabCompletion(entry,proof)||requiresRippleReplay(entry,proof)||requiresContentObserver(entry,proof)
+      ||requiresMediaMatcher(entry,proof)||SLIDER_INPUT_SHAS.includes(entry.sha)||SLIDER_RANGE_SHAS.includes(entry.sha)
+      ||entry.sha===SLIDER_TOKEN_SHA||entry.sha===SLIDER_THUMB_DESTROY_SHA||BAZEL_BUILD_SHAS.includes(entry.sha)
+      ||COMMENT_SHAS.includes(entry.sha)||TEST_IMPORT_SHAS.includes(entry.sha)||Object.hasOwn(TEST_CONSOLIDATION_PATCHES,entry.sha)
+      ||Object.hasOwn(BUILD_SCOPE_PATCHES,entry.sha)}))return false;
   let bytes;
   if (requiresRulesJsBuild(entry)) {
     bytes = rulesJsBuildOriginalPatch(readRegularRepoBytes,entry.sha);
@@ -441,6 +455,7 @@ const circularEvidence = [];
 const insufficientSensitive = [];
 const insufficientInherited = [];
 const insufficientBehavior = [];
+const insufficientIndividual = [];
 const missingBranch = [];
 for (const entry of ledgerBySha.values()) {
   const disposition = entry.final_disposition;
@@ -454,8 +469,11 @@ for (const entry of ledgerBySha.values()) {
   }
   const sensitive = sensitiveClass(entry) || requiresHistoricalBehavior(entry, entry.individual_proof) || requiresArtifactBehavior(entry, entry.individual_proof) || requiresOwnedStyle(entry, entry.individual_proof) || requiresNativeDate(entry, entry.individual_proof) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)
     || requiresFormFieldHover(entry, entry.individual_proof) || requiresTabCompletion(entry, entry.individual_proof) || requiresRippleReplay(entry, entry.individual_proof) || requiresContentObserver(entry, entry.individual_proof) || requiresMediaMatcher(entry, entry.individual_proof) || requiresChipEditScope(entry, entry.individual_proof) || requiresChipInputApiScope(entry, entry.individual_proof) || requiresChipModernizationScope(entry, entry.individual_proof) || requiresChipLifecycleScope(entry, entry.individual_proof);
-  const needsIndividual = Boolean(sensitive) || INHERITED.has(disposition) || BEHAVIOR.has(disposition);
+  const needsIndividual = Boolean(sensitive) || INHERITED.has(disposition) || BEHAVIOR.has(disposition)
+    || (disposition === 'do-not-adopt' && entry.bucket === 'behavior-semantic')
+    || Object.hasOwn(entry, 'individual_proof');
   if (needsIndividual && !individualProofOk(entry)) {
+    insufficientIndividual.push(entry.sha);
     if (sensitive) insufficientSensitive.push(entry.sha);
     if (INHERITED.has(disposition)) insufficientInherited.push(entry.sha);
     if (BEHAVIOR.has(disposition)) insufficientBehavior.push(entry.sha);
@@ -504,7 +522,7 @@ const structuralOk = missing.length === 0 && unresolved.length === 0 && conflict
   && !forgedClearance && ledger.g11_claim === 'not-passed';
 const dispositionOk = structuralOk && missingEvidence.length === 0 && circularEvidence.length === 0
   && insufficientSensitive.length === 0 && insufficientInherited.length === 0
-  && insufficientBehavior.length === 0 && missingBranch.length === 0
+  && insufficientBehavior.length === 0 && insufficientIndividual.length === 0 && missingBranch.length === 0
   && symbolInventory.complete && symbolUsesOpen === 0 && symbolStatus === 'closed' && symbolReviewEvidence.insufficient === 0
   && currentSymbolAdmission.ready;
 
@@ -527,6 +545,7 @@ const summary = {
   insufficient_sensitive: insufficientSensitive.length,
   insufficient_inherited: insufficientInherited.length,
   insufficient_behavior: insufficientBehavior.length,
+  insufficient_individual: insufficientIndividual.length,
   missing_branch_applicability: missingBranch.length,
   authored_use_inventory: symbolInventory,
   authored_use_review_evidence: {reviewed:symbolReviewEvidence.reviewed,insufficient:symbolReviewEvidence.insufficient,insufficient_use_sample:symbolReviewEvidence.insufficient_uses.slice(0,20)},
@@ -548,6 +567,7 @@ const report = {
     sensitive: insufficientSensitive,
     inherited: insufficientInherited,
     behavior: insufficientBehavior,
+    individual: insufficientIndividual,
     branch_applicability: missingBranch,
   },
   seed_rows: seedShas.size,
@@ -563,6 +583,7 @@ const report = {
   insufficient_sensitive: insufficientSensitive.length,
   insufficient_inherited: insufficientInherited.length,
   insufficient_behavior: insufficientBehavior.length,
+  insufficient_individual: insufficientIndividual.length,
   missing_branch_applicability: missingBranch.length,
   authored_use_inventory: symbolInventory,
   authored_use_review_evidence: symbolReviewEvidence,
@@ -653,7 +674,7 @@ const advisory = request ? validateCurrentAdvisories({runDir: request.runDir, bi
 const CASE_RESULTS = [
   ['upstream-shas', 'upstream-audit/upstream-shas/unique-membership', missing.length === 0 && conflicts.length === 0 && outside.length === 0 && unresolved.length === 0],
   ['upstream-shas', 'upstream-audit/upstream-shas/allowed-vocabulary', unknown.length === 0 && !forgedClearance],
-  ['upstream-shas', 'upstream-audit/upstream-shas/sensitive-individual-proof', insufficientSensitive.length === 0],
+  ['upstream-shas', 'upstream-audit/upstream-shas/sensitive-individual-proof', insufficientSensitive.length === 0 && insufficientIndividual.length === 0],
   ['upstream-shas', 'upstream-audit/upstream-shas/independent-evidence', missingEvidence.length === 0 && circularEvidence.length === 0],
   ['authored-symbols', 'upstream-audit/authored-symbols/complete-use-dispositions', symbolInventory.complete && symbolUsesOpen === 0 && symbolStatus === 'closed' && symbolReviewEvidence.insufficient === 0 && currentSymbolAdmission.ready],
   ['installed-peer-fixes', 'upstream-audit/installed-peer-fixes/content-not-ancestry', insufficientInherited.length === 0],

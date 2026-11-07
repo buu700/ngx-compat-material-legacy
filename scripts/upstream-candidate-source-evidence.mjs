@@ -9,6 +9,7 @@ import {createHash} from 'node:crypto';
 import {lstatSync, readdirSync} from 'node:fs';
 import {join} from 'node:path';
 import {requiresTestingApi21xProof,testingApi21xSourceEvidenceOk} from './upstream-testing-api-21x-admission.mjs';
+import {knownIndividualProofKind} from './upstream-individual-evidence-scope.mjs';
 
 const sourceKinds = new Set(['candidate-source-line-match', 'candidate-source-equivalent']);
 const normalize = text => text.replace(/\s/g, '');
@@ -31,6 +32,33 @@ export function candidateProductSourcePaths(root) {
 
 /** Source presence is a bounded proof, never execution or inherited behavior. */
 export function candidateSourceEvidenceOk(proof, readMember, productPaths) {
+  try {
+    if (!proof || typeof proof !== 'object' || Array.isArray(proof)) return false;
+    if (Object.hasOwn(proof, 'proof_kind') && !knownIndividualProofKind(proof.proof_kind)) return false;
+    for (const field of ['source_members', 'source_evidence']) {
+      if (!Object.hasOwn(proof, field)) continue;
+      // Historical source_evidence lists may denote earlier snapshots. Do not
+      // reinterpret them as current bytes without an explicit reviewed scope.
+      if (field === 'source_evidence' && proof.source_evidence_scope !== 'current') return false;
+      const refs = proof[field];
+      if (!Array.isArray(refs) || !refs.length) return false;
+      const seen = new Set();
+      for (const ref of refs) {
+        if (!ref || typeof ref !== 'object' || Array.isArray(ref) ||
+            Object.keys(ref).some(key => !['path', 'sha256', 'bytes'].includes(key)) || typeof ref.path !== 'string' ||
+            !ref.path || ref.path.startsWith('/') || ref.path.includes('\\') ||
+            ref.path.split('/').some(part => !part || part === '.' || part === '..') ||
+            (field === 'source_members' && !ref.path.startsWith('projects/ngx-material-legacy/')) ||
+            !/^[0-9a-f]{64}$/.test(ref.sha256 || '') || seen.has(ref.path)) return false;
+        const bytes = readMember(ref.path);
+        if (!Buffer.isBuffer(bytes) || createHash('sha256').update(bytes).digest('hex') !== ref.sha256 ||
+            (Object.hasOwn(ref, 'bytes') && (!Number.isSafeInteger(ref.bytes) || ref.bytes !== bytes.length))) return false;
+        seen.add(ref.path);
+      }
+    }
+    if (proof.proof_kind === 'individual-contextual-source-review' &&
+        (!Array.isArray(proof.source_members) || !proof.source_members.length)) return false;
+  } catch { return false; }
   if (requiresTestingApi21xProof(proof, readMember)) return testingApi21xSourceEvidenceOk(proof, readMember, productPaths);
   if (!sourceKinds.has(proof?.proof_kind)) {
     return !['candidate_member', 'added_lines', 'equivalent_candidate_lines', 'absent_in_package']

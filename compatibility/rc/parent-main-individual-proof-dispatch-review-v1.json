@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "role": "Root integration of individual upstream review source identity and dispatch enforcement",
+  "parent": "107ccae1864dc4cbc56c4af1b8e70983a1fe947f",
+  "proposal_manifest_sha256": "06294571a8a9ccc433b31e1d6a28208c5477193239b4a3f8a79cd7eb5d0b0a56",
+  "proposal_manifest": {
+    "base": "f91579195745c6c354c906ee2b5f3235bbfefe02",
+    "status": "awaiting-independent-review",
+    "artifacts": {
+      "individual-proof-hardening-v5.patch": {
+        "sha256": "5c4ff3d36c1d83a0b167573f65cad4edc45bccb340dc040ed52cdff0b5d41845",
+        "bytes": 30390
+      },
+      "worksheet-v5.md": {
+        "sha256": "61c3e7c94102fb4d1eab81ead38c184bdc13c581d18376b93421bbaeec783ad3",
+        "bytes": 3848
+      },
+      "production-controls-v5-final.log": {
+        "sha256": "1089ab57aa04edc62877210792edd1b2c01171a21b21e3f0f4cdf3a2cc4e0baf",
+        "bytes": 100
+      },
+      "candidate-v5-current-report.json": {
+        "sha256": "295cc3032f8d074fe6c83b1196f63f96547ca4095e1b3811a1e76276443d01db",
+        "bytes": 198929
+      },
+      "migration-v5-cause-audit.json": {
+        "sha256": "bbf1426f7da6706c60eaa4dd93e0fbca1b9b79fdb43279b9a1843a75e3614426",
+        "bytes": 155669
+      },
+      "c04-production-v5-mutations.json": {
+        "sha256": "fa485c9535505d3f0d203bbe975f1c30c58c40093ff42c55a54e9ecc64ee719b",
+        "bytes": 2290
+      },
+      "c04-production-mutations.py": {
+        "sha256": "13c593fb5bf92471fafa9c33dbf4b7dbc055a90fdcb9f86e42fd8c93ff338362",
+        "bytes": 2119
+      },
+      "baseline-production-repro.json": {
+        "sha256": "5b52b5b6b8d019478bd619d95f45ed3ec8d459322382c997572fefcc09dcd26d",
+        "bytes": 434
+      },
+      "proof-kind-census.json": {
+        "sha256": "a355ebacf67c5e393c0d5cc75334f788a5524bde5ccd905a78b5e0e837d35934",
+        "bytes": 166499
+      },
+      "proof-kind-census-21.json": {
+        "sha256": "3a63184657dabdea5e1b2ea54c1e8995f011664df279838a58ab54e0956f0601",
+        "bytes": 21707
+      }
+    },
+    "subject": {
+      "scripts/check-upstream-audit-disposition.mjs": {
+        "sha256": "414ce3b3117a76734735bba4d4480bb4a5ff6c9c5cd4634427f93d31c1c40b1c",
+        "bytes": 48386
+      },
+      "scripts/upstream-candidate-source-evidence.mjs": {
+        "sha256": "128d26d6c5a4e485abac1dd6589e14976ef2691d256d9f3896167b071a9a01de",
+        "bytes": 5382
+      },
+      "scripts/upstream-individual-evidence-scope.mjs": {
+        "sha256": "aedc1ad2fce5320e868d7271f1af9ff107c849af4ad005c2eb9b8ac630d91eb0",
+        "bytes": 9228
+      },
+      "tests/test_upstream_contextual_proof_hardening.py": {
+        "sha256": "4027130f182ca49e0ff5bb1936403169541e90d2672c28dd5cc09081d49c1ea4",
+        "bytes": 8514
+      }
+    },
+    "limits": [
+      "identity and review consistency do not establish semantic relevance or correctness",
+      "specialists authorize fixed required scopes only; extra annotations are non-authoritative",
+      "no 21.x execution, admission, security clearance, or historical replay pass"
+    ]
+  },
+  "independent_review": {
+    "sha256": "14ede6418ec75013af07e940f72b947fa607bdcb6c5da5d7302312563d4df684",
+    "text": "# Independent individual-proof hardening review\n\nThe v5 checker change is supported within its stated identity and dispatch scope. It is not an admission of any ledger row or substantive proof of an upstream decision. Patch SHA-256: `5c4ff3d36c1d83a0b167573f65cad4edc45bccb340dc040ed52cdff0b5d41845`; base `f91579195745c6c354c906ee2b5f3235bbfefe02`. Strict whitespace application to an isolated index passed, and all four patch afterimages match the inspected worktree bytes.\n\nThe earlier helper defects were reproduced: v1 accepted a required do-not-adopt proof without a kind or source and accepted unrecognized source claims without reading them. V5 requires a known kind on every dispatched proof, requires individually supplied proofs to enter that dispatch, and applies finite schemas and current-byte hash checks to generic/contextual authoritative fields. My separate pinned-Node v5 helper probe rejected missing kind, unknown source fields and nesting, stale source, contradictory entry/review decisions, branches and dispositions, and inherited claims on the contextual route. The same probe accepts a consistently rehashed **unrelated** source file and coherent fabricated decision. That is an explicit identity/consistency limitation: per-SHA source relevance, completeness and semantic truth still require a substantive review or fixed subject-specific contract.\n\nA source walk traced each declared specialized delegation to its corresponding downstream owner guard: inherited execution; finite C04 and testing API guards; bootstrap, Sass/build and chip source guards; slider/comment/test/build finite evidence guards; and registered behavior/runtime validators. No missing listed delegation was found by this static walk. The generic helper intentionally treats unrelated specialized annotations as non-authoritative; several fixed-field owners ignore extras, while C04 and chip lifecycle require exact proof equality. Such extras do not add required subject coverage or replace the owner checks. This is not a proof that all possible specialized data paths or arbitrary nested metadata are validated.\n\nDynamic specialist evidence is bounded to the finite C04 owner. Its existing probe passed five genuine positives, 80 negative controls and 20 extracted checker-route checks. An additional independent test passed the same five genuine positives and rejected 30 changes covering wrong SHA, kind, required diff, branch, current source bytes and extra source claim. The owner's recorded actual production CLI controls also show the C04 subject-specific evidence/individual checks rejecting wrong SHA, kind, branch, missing diff and changed source; whole CLI return codes remain failed for unrelated aggregate gates. No broad specialist browser or runtime matrix was independently rerun.\n\nThe owner's v5 real-CLI generic control log records a pass; I inspected the log, not its full execution. The exact v5 ledger report has 785 insufficient-individual rows, with 180 net newly unresolved versus its baseline evidence/insufficiency union. I independently counted 180 unique IDs in the supplied cause audit: 31 missing proofs, 109 unverified or ambiguous historical `source_evidence` records, 15 unsupported legacy proof shapes, four missing kinds at existing sensitive gates, and 21 previously optional explicit proofs missing kinds. Historical references may be valid historical evidence despite not matching current physical bytes; these rows remain unresolved for separately owned investigation, not automatically false and not grandfathered. No 21.x runtime, full historical suite, security clearance, G11 or release claim follows.\n"
+  },
+  "root_checks": [
+    "Strict whitespace apply andexact4afterimagesverified;all10proposalartifacthashesrechecked.",
+    "Node24.21syntaxchecksfor3changedmodulespassed. Longreal-CLIcontrols207.5sareauthorretainedresultsinspectedindependently,notrepeatedatroot.",
+    "No1697-SHAledgerentry/1736frozen-use/current-cutoffrow,golden,temporaryexception,packagepeerorproductresourcechanged."
+  ],
+  "behavior": [
+    "Everyexplicitindividual_proofentersdispatchandrequiresknownkind. Behavior-semanticdo-not-adoptwithoutproofisnotwaived.",
+    "Generic/contextualproofsbindcurrentbytes,diff,source-onlyscope,reviewdecision/entryreason,dispositionandbranchagreement;extraneouscontextualsourcefieldscannotgrantcoverage.",
+    "Registeredspecialistownersretainrequiredsource/runtimeguardsandtheirhistorical/currentsemantics;unrelatedextraannotationsareNOTadditionalmachine-verifiedevidence."
+  ],
+  "migration": {
+    "recorded_source_checkpoint": "f91579195745c6c354c906ee2b5f3235bbfefe02",
+    "insufficient_individual": 785,
+    "net_new_unresolved": 180,
+    "causes": {
+      "missing_behavior_do_not_adopt_proof": 31,
+      "ambiguous_legacy_source_evidence": 109,
+      "unsupported_legacy_proof_shapes": 15,
+      "missing_kind_at_sensitive_gate": 4,
+      "previous_optional_kindless_proof": 21
+    },
+    "meaning": "Moretruthfuladmissiondeficiencies,not180newproductbugsorautomaticrejectionofhistoricaljudgments. Eachneedsexactownedinvestigation."
+  },
+  "limits": [
+    "Identityandconsistentmanualtextdonotprovesourcerelevance,semantictruthorcompletereview. Independentper-SHAhunk/contextreviewremainsrequired.",
+    "Countsareexactf915-ledger/draftreplay,notfreshfullcurrent107ccadmission;sourcechangeselsewherecanadddeficiencies.",
+    "RegisteredC04dynamiccontrolsandstaticownerroutewalkwerereviewed;notalllegacyruntime/specialistmatricesreexecuted.",
+    "Oldhistorical/CI-contextspecialistfixturesalreadyfailclosedandremainpending;no21runtime/security/G11/full-audit/releaseclaim.",
+    "NewCLI/helperimagesneedseparatecurrentTOOL/sourcecontextreconciliationafterfrozen6ccework."
+  ]
+}
