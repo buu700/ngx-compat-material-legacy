@@ -1,0 +1,209 @@
+{
+  "sha": "e61d152e002937f4bc9df96851c2932e15ce7461",
+  "status": "reviewed",
+  "diff": "diff --git a/src/material/autocomplete/autocomplete-trigger.ts b/src/material/autocomplete/autocomplete-trigger.ts\nindex fd888e649..4dc9182a0 100644\n--- a/src/material/autocomplete/autocomplete-trigger.ts\n+++ b/src/material/autocomplete/autocomplete-trigger.ts\n@@ -19,10 +19,9 @@ import {\n   PositionStrategy,\n   ScrollStrategy,\n } from '@angular/cdk/overlay';\n-import {_getEventTarget} from '@angular/cdk/platform';\n+import {_getEventTarget, _getFocusedElementPierceShadowDom} from '@angular/cdk/platform';\n import {TemplatePortal} from '@angular/cdk/portal';\n import {ViewportRuler} from '@angular/cdk/scrolling';\n-import {DOCUMENT} from '@angular/common';\n import {\n   AfterViewInit,\n   ChangeDetectorRef,\n@@ -147,7 +146,6 @@ export class MatAutocompleteTrigger\n   private _changeDetectorRef = inject(ChangeDetectorRef);\n   private _dir = inject(Directionality, {optional: true});\n   private _formField = inject<MatFormField | null>(MAT_FORM_FIELD, {optional: true, host: true});\n-  private _document = inject(DOCUMENT);\n   private _viewportRuler = inject(ViewportRuler);\n   private _scrollStrategy = inject(MAT_AUTOCOMPLETE_SCROLL_STRATEGY);\n   private _renderer = inject(Renderer2);\n@@ -216,8 +214,7 @@ export class MatAutocompleteTrigger\n     // If the user blurred the window while the autocomplete is focused, it means that it'll be\n     // refocused when they come back. In this case we want to skip the first focus event, if the\n     // pane was closed, in order to avoid reopening it unintentionally.\n-    this._canOpenOnNextFocus =\n-      this._document.activeElement !== this._element.nativeElement || this.panelOpen;\n+    this._canOpenOnNextFocus = this.panelOpen || !this._hasFocus();\n   };\n \n   /** `View -> model callback called when value changes` */\n@@ -424,7 +421,7 @@ export class MatAutocompleteTrigger\n           // true. Its main purpose is to handle the case where the input is focused from an\n           // outside click which propagates up to the `body` listener within the same sequence\n           // and causes the panel to close immediately (see #3106).\n-          this._document.activeElement !== this._element.nativeElement &&\n+          !this._hasFocus() &&\n           (!formField || !formField.contains(clickTarget)) &&\n           (!customOrigin || !customOrigin.contains(clickTarget)) &&\n           !!this._overlayRef &&\n@@ -551,7 +548,7 @@ export class MatAutocompleteTrigger\n         }\n       }\n \n-      if (this._canOpen() && this._document.activeElement === event.target) {\n+      if (this._canOpen() && this._hasFocus()) {\n         // When the `input` event fires, the input's value will have already changed. This means\n         // that if we take the `this._element.nativeElement.value` directly, it'll be one keystroke\n         // behind. This can be a problem when the user selects a value, changes a character while\n@@ -580,6 +577,11 @@ export class MatAutocompleteTrigger\n     }\n   }\n \n+  /** Whether the input currently has focus. */\n+  private _hasFocus(): boolean {\n+    return _getFocusedElementPierceShadowDom() === this._element.nativeElement;\n+  }\n+\n   /**\n    * In \"auto\" mode, the label will animate down as soon as focus is lost.\n    * This causes the value to jump when selecting an option with the mouse.\n",
+  "diff_sha256": "1be0f3469dff5dbe4d9086c27864d0ec9ec1e41ff0ab216c1f66e972611c0415",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798",
+      "bytes": 43007
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+      "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+      "bytes": 11316
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+      "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+      "bytes": 1596
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683",
+      "bytes": 165528
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/owned-shadow-dom.ts",
+      "sha256": "4457eb4e175a215230845618126f0345d9230bde62120524016a7d1561f4ff3b",
+      "bytes": 1440
+    }
+  ],
+  "decision": "The entire parent diff replaces document.activeElement checks for window blur, outside clicks and input opening with a shadow-piercing focused-element helper. Owned trigger uses its local focusedElementPierceShadowDom in all three locations; the local helper walks open shadow roots and retains its own no-document handling rather than importing upstream private CDK utilities. Its global-document and closed-shadow-root limits remain; no shadow browser execution is claimed.",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "already-adapted",
+  "previous_ledger_entry_complete": {
+    "sha": "e61d152e002937f4bc9df96851c2932e15ce7461",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/autocomplete): incorrectly resolving focused element in shadow DOM (#30619)",
+    "final_disposition": "already-adapted",
+    "reason": "Autocomplete focus checks use _getFocusedElementPierceShadowDom via _hasFocus().",
+    "read_note_disposition": "owned-retained",
+    "files": [
+      "src/material/autocomplete/autocomplete-trigger.ts"
+    ],
+    "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+    "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts _hasFocus",
+    "batch_id": "product-adapt-residual-2026-10-01-k",
+    "recorded_at_utc": "2026-10-01T17:45:00Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "product_adaptation": true
+  },
+  "shared_context": {
+    "path": "compatibility/f10/disposition-ledger/evidence/select-auto-eight-main-v1/source-context.json",
+    "sha256": "a088eae993971f1402602568f49aa4eaec4bca9f1a44ed70fe6e9032e1309097"
+  },
+  "source_change_role_review": "The _hasFocus helper, all three callers, and owned open-shadow traversal remain unchanged. The pointer policy can alter the physical target beneath a hidden pane, but does not change the composed-event or focus lookup logic. The appended test concerns pointer state and supplies no new shadow-DOM execution.",
+  "historical_reference": {
+    "tag": "16.2.14",
+    "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "identity": "legacy wrappers inherit the shared autocomplete bases, not current peer internals"
+  },
+  "minimum_peer": {
+    "version": "22.1.7",
+    "source_context_path": "compatibility/f10/disposition-ledger/evidence/select-auto-eight-main-v1/source-context.json"
+  },
+  "supporting_evidence": {
+    "pointer_fix_committed_record": "compatibility/rc/parent-main-autocomplete-pointer-state-review-v1.json",
+    "pointer_consumer_record": "compatibility/rc/parent-main-pointer-consumer-qualification-v1.json",
+    "render_replay_committed_record": "compatibility/rc/parent-main-render-replay-repair-v1.json",
+    "interpretation": "Pointer record binds selected family and actual AOT physical clicks to d24d and baseline 08dae. Render replay record binds source-protocol tests only, not actual component DI or native execution. Historical independent reviews and raw inputs remain separately scoped."
+  },
+  "limitations": "This entry is source-only and makes no runtime, full injector, browser matrix, security or G11 claim.",
+  "predecessor_proposal_entry_complete": {
+    "sha": "e61d152e002937f4bc9df96851c2932e15ce7461",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/autocomplete): incorrectly resolving focused element in shadow DOM (#30619)",
+    "final_disposition": "already-adapted",
+    "reason": "The entire parent diff replaces document.activeElement checks for window blur, outside clicks and input opening with a shadow-piercing focused-element helper. Owned trigger uses its local focusedElementPierceShadowDom in all three locations; the local helper walks open shadow roots and retains its own no-document handling rather than importing upstream private CDK utilities. Its global-document and closed-shadow-root limits remain; no shadow browser execution is claimed.",
+    "read_note_disposition": "already-adapted",
+    "files": [
+      "src/material/autocomplete/autocomplete-trigger.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/select-auto-next-main-v2/e61d152e002937f4bc9df96851c2932e15ce7461.json",
+    "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts _hasFocus",
+    "batch_id": "individual-source-review-main-select-auto-next-v2",
+    "recorded_at_utc": "2026-10-01T17:45:00Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "product_adaptation": true,
+    "individual_proof": {
+      "proof_kind": "individual-contextual-source-review",
+      "source_conclusion_only": true,
+      "execution_claim": "not-claimed",
+      "source_members": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+          "sha256": "79f14a12676f6835602cf2f66b4650817e15a944ed8555cb3281231abcc8f8f0",
+          "bytes": 41708
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+          "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+          "bytes": 11316
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+          "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+          "bytes": 1596
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+          "sha256": "1eaace45b9f3f144c3f8b2dd845e826a19e616ee4bb31d3923a545fda353cc7c",
+          "bytes": 162944
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/owned-shadow-dom.ts",
+          "sha256": "4457eb4e175a215230845618126f0345d9230bde62120524016a7d1561f4ff3b",
+          "bytes": 1440
+        }
+      ],
+      "diff_sha256": "1be0f3469dff5dbe4d9086c27864d0ec9ec1e41ff0ab216c1f66e972611c0415",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "The entire parent diff replaces document.activeElement checks for window blur, outside clicks and input opening with a shadow-piercing focused-element helper. Owned trigger uses its local focusedElementPierceShadowDom in all three locations; the local helper walks open shadow roots and retains its own no-document handling rather than importing upstream private CDK utilities. Its global-document and closed-shadow-root limits remain; no shadow browser execution is claimed."
+    }
+  },
+  "predecessor_per_sha_review_complete": {
+    "sha": "e61d152e002937f4bc9df96851c2932e15ce7461",
+    "status": "reviewed",
+    "diff": "diff --git a/src/material/autocomplete/autocomplete-trigger.ts b/src/material/autocomplete/autocomplete-trigger.ts\nindex fd888e649..4dc9182a0 100644\n--- a/src/material/autocomplete/autocomplete-trigger.ts\n+++ b/src/material/autocomplete/autocomplete-trigger.ts\n@@ -19,10 +19,9 @@ import {\n   PositionStrategy,\n   ScrollStrategy,\n } from '@angular/cdk/overlay';\n-import {_getEventTarget} from '@angular/cdk/platform';\n+import {_getEventTarget, _getFocusedElementPierceShadowDom} from '@angular/cdk/platform';\n import {TemplatePortal} from '@angular/cdk/portal';\n import {ViewportRuler} from '@angular/cdk/scrolling';\n-import {DOCUMENT} from '@angular/common';\n import {\n   AfterViewInit,\n   ChangeDetectorRef,\n@@ -147,7 +146,6 @@ export class MatAutocompleteTrigger\n   private _changeDetectorRef = inject(ChangeDetectorRef);\n   private _dir = inject(Directionality, {optional: true});\n   private _formField = inject<MatFormField | null>(MAT_FORM_FIELD, {optional: true, host: true});\n-  private _document = inject(DOCUMENT);\n   private _viewportRuler = inject(ViewportRuler);\n   private _scrollStrategy = inject(MAT_AUTOCOMPLETE_SCROLL_STRATEGY);\n   private _renderer = inject(Renderer2);\n@@ -216,8 +214,7 @@ export class MatAutocompleteTrigger\n     // If the user blurred the window while the autocomplete is focused, it means that it'll be\n     // refocused when they come back. In this case we want to skip the first focus event, if the\n     // pane was closed, in order to avoid reopening it unintentionally.\n-    this._canOpenOnNextFocus =\n-      this._document.activeElement !== this._element.nativeElement || this.panelOpen;\n+    this._canOpenOnNextFocus = this.panelOpen || !this._hasFocus();\n   };\n \n   /** `View -> model callback called when value changes` */\n@@ -424,7 +421,7 @@ export class MatAutocompleteTrigger\n           // true. Its main purpose is to handle the case where the input is focused from an\n           // outside click which propagates up to the `body` listener within the same sequence\n           // and causes the panel to close immediately (see #3106).\n-          this._document.activeElement !== this._element.nativeElement &&\n+          !this._hasFocus() &&\n           (!formField || !formField.contains(clickTarget)) &&\n           (!customOrigin || !customOrigin.contains(clickTarget)) &&\n           !!this._overlayRef &&\n@@ -551,7 +548,7 @@ export class MatAutocompleteTrigger\n         }\n       }\n \n-      if (this._canOpen() && this._document.activeElement === event.target) {\n+      if (this._canOpen() && this._hasFocus()) {\n         // When the `input` event fires, the input's value will have already changed. This means\n         // that if we take the `this._element.nativeElement.value` directly, it'll be one keystroke\n         // behind. This can be a problem when the user selects a value, changes a character while\n@@ -580,6 +577,11 @@ export class MatAutocompleteTrigger\n     }\n   }\n \n+  /** Whether the input currently has focus. */\n+  private _hasFocus(): boolean {\n+    return _getFocusedElementPierceShadowDom() === this._element.nativeElement;\n+  }\n+\n   /**\n    * In \"auto\" mode, the label will animate down as soon as focus is lost.\n    * This causes the value to jump when selecting an option with the mouse.\n",
+    "diff_sha256": "1be0f3469dff5dbe4d9086c27864d0ec9ec1e41ff0ab216c1f66e972611c0415",
+    "source_conclusion_only": true,
+    "execution_claim": "not-claimed",
+    "source_members": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "79f14a12676f6835602cf2f66b4650817e15a944ed8555cb3281231abcc8f8f0",
+        "bytes": 41708
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+        "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+        "bytes": 11316
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+        "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+        "bytes": 1596
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "1eaace45b9f3f144c3f8b2dd845e826a19e616ee4bb31d3923a545fda353cc7c",
+        "bytes": 162944
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/owned-shadow-dom.ts",
+        "sha256": "4457eb4e175a215230845618126f0345d9230bde62120524016a7d1561f4ff3b",
+        "bytes": 1440
+      }
+    ],
+    "decision": "The entire parent diff replaces document.activeElement checks for window blur, outside clicks and input opening with a shadow-piercing focused-element helper. Owned trigger uses its local focusedElementPierceShadowDom in all three locations; the local helper walks open shadow roots and retains its own no-document handling rather than importing upstream private CDK utilities. Its global-document and closed-shadow-root limits remain; no shadow browser execution is claimed.",
+    "affected_branches": [
+      "main"
+    ],
+    "final_disposition": "already-adapted",
+    "previous_ledger_entry_complete": {
+      "sha": "e61d152e002937f4bc9df96851c2932e15ce7461",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/autocomplete): incorrectly resolving focused element in shadow DOM (#30619)",
+      "final_disposition": "already-adapted",
+      "reason": "Autocomplete focus checks use _getFocusedElementPierceShadowDom via _hasFocus().",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts _hasFocus",
+      "batch_id": "product-adapt-residual-2026-10-01-k",
+      "recorded_at_utc": "2026-10-01T17:45:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    "historical_reference": {
+      "tag": "16.2.14",
+      "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "scope": "original legacy source, not a current runtime assertion"
+    },
+    "minimum_peer": {
+      "tag": "22.1.7",
+      "commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "scope": "peer API identities, not a whole-runtime pass"
+    },
+    "predecessor": {
+      "packet": "select-auto-next-main-v1.patch",
+      "sha256": "af3c092b3c118589c9cee6a591d2bc9b81a71af5cf6401e6004f65b3bf016819",
+      "correction": "216ae0 tagged legacy inherited requireSelection through shared bases; v1 historical wording was wrong."
+    },
+    "limitations": "Source-only individual assessment; no new execution, global artifact, release, security, or G11 pass claimed."
+  }
+}

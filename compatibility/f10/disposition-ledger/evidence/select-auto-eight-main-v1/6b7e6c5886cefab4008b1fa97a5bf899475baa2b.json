@@ -1,0 +1,224 @@
+{
+  "sha": "6b7e6c5886cefab4008b1fa97a5bf899475baa2b",
+  "status": "reviewed",
+  "diff": "diff --git a/src/material/autocomplete/autocomplete-trigger.ts b/src/material/autocomplete/autocomplete-trigger.ts\nindex 1434a1a3a..a8bce9796 100644\n--- a/src/material/autocomplete/autocomplete-trigger.ts\n+++ b/src/material/autocomplete/autocomplete-trigger.ts\n@@ -407,7 +407,9 @@ export class MatAutocompleteTrigger\n         // If we're in the Shadow DOM, the event target will be the shadow root, so we have to\n         // fall back to check the first element in the path of the click event.\n         const clickTarget = _getEventTarget<HTMLElement>(event)!;\n-        const formField = this._formField ? this._formField._elementRef.nativeElement : null;\n+        const formField = this._formField\n+          ? this._formField.getConnectedOverlayOrigin().nativeElement\n+          : null;\n         const customOrigin = this.connectedTo ? this.connectedTo.elementRef.nativeElement : null;\n \n         return (\n",
+  "diff_sha256": "ff98914343e9a677537b1674543e99e35504d355e80ecc4ff0ebec0af8af16fc",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798",
+      "bytes": 43007
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+      "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+      "bytes": 11316
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+      "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+      "bytes": 1596
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683",
+      "bytes": 165528
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "sha256": "ea2bcd2a85cb1511cfa57a7d68d2edd45757ecd703df0ebfa0d613e3f4b79ccd",
+      "bytes": 28690
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+      "sha256": "2dd63d98dcc0a2305b34df9c07d67e0329ae911a97a417a6738952ca3d76c93c",
+      "bytes": 3980
+    }
+  ],
+  "decision": "The complete parent diff narrows the excluded outside-click area from the whole form-field host to its connected overlay origin, so hints can be treated as outside after focus moves. Owned outside-click logic calls the owned form field getConnectedOverlayOrigin and retains input, focus, custom-origin and overlay exclusions. The owned legacy form field and its template determine the actual origin; this does not import the current Material form-field token or claim a click test.",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "already-adapted",
+  "previous_ledger_entry_complete": {
+    "sha": "6b7e6c5886cefab4008b1fa97a5bf899475baa2b",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/autocomplete): not closing when clicking on hint area (#28316)",
+    "final_disposition": "already-adapted",
+    "reason": "Outside-click stream uses form-field getConnectedOverlayOrigin so hint clicks close the panel.",
+    "read_note_disposition": "not-applied",
+    "files": [
+      "src/material/autocomplete/autocomplete-trigger.ts"
+    ],
+    "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+    "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts _getOutsideClickStream",
+    "batch_id": "product-adapt-priority-2026-10-01-j",
+    "recorded_at_utc": "2026-10-01T17:22:07Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "product_adaptation": true
+  },
+  "shared_context": {
+    "path": "compatibility/f10/disposition-ledger/evidence/select-auto-eight-main-v1/source-context.json",
+    "sha256": "a088eae993971f1402602568f49aa4eaec4bca9f1a44ed70fe6e9032e1309097"
+  },
+  "source_change_role_review": "The exact getConnectedOverlayOrigin and outside-click exclusions are unchanged. A hidden pane is now pointer-transparent absent a consumer override; that can let a click reach the underlying target, after which the existing focus, connected origin, custom origin and overlay predicates still govern closure. The appended test checks pane policy and does not assert hint-area closure.",
+  "historical_reference": {
+    "tag": "16.2.14",
+    "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "identity": "legacy wrappers inherit the shared autocomplete bases, not current peer internals"
+  },
+  "minimum_peer": {
+    "version": "22.1.7",
+    "source_context_path": "compatibility/f10/disposition-ledger/evidence/select-auto-eight-main-v1/source-context.json"
+  },
+  "supporting_evidence": {
+    "pointer_fix_committed_record": "compatibility/rc/parent-main-autocomplete-pointer-state-review-v1.json",
+    "pointer_consumer_record": "compatibility/rc/parent-main-pointer-consumer-qualification-v1.json",
+    "render_replay_committed_record": "compatibility/rc/parent-main-render-replay-repair-v1.json",
+    "interpretation": "Pointer record binds selected family and actual AOT physical clicks to d24d and baseline 08dae. Render replay record binds source-protocol tests only, not actual component DI or native execution. Historical independent reviews and raw inputs remain separately scoped."
+  },
+  "limitations": "This entry is source-only and makes no runtime, full injector, browser matrix, security or G11 claim.",
+  "predecessor_proposal_entry_complete": {
+    "sha": "6b7e6c5886cefab4008b1fa97a5bf899475baa2b",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/autocomplete): not closing when clicking on hint area (#28316)",
+    "final_disposition": "already-adapted",
+    "reason": "The complete parent diff narrows the excluded outside-click area from the whole form-field host to its connected overlay origin, so hints can be treated as outside after focus moves. Owned outside-click logic calls the owned form field getConnectedOverlayOrigin and retains input, focus, custom-origin and overlay exclusions. The owned legacy form field and its template determine the actual origin; this does not import the current Material form-field token or claim a click test.",
+    "read_note_disposition": "already-adapted",
+    "files": [
+      "src/material/autocomplete/autocomplete-trigger.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/select-auto-next-main-v2/6b7e6c5886cefab4008b1fa97a5bf899475baa2b.json",
+    "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts _getOutsideClickStream",
+    "batch_id": "individual-source-review-main-select-auto-next-v2",
+    "recorded_at_utc": "2026-10-01T17:22:07Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "product_adaptation": true,
+    "individual_proof": {
+      "proof_kind": "individual-contextual-source-review",
+      "source_conclusion_only": true,
+      "execution_claim": "not-claimed",
+      "source_members": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+          "sha256": "79f14a12676f6835602cf2f66b4650817e15a944ed8555cb3281231abcc8f8f0",
+          "bytes": 41708
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+          "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+          "bytes": 11316
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+          "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+          "bytes": 1596
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+          "sha256": "1eaace45b9f3f144c3f8b2dd845e826a19e616ee4bb31d3923a545fda353cc7c",
+          "bytes": 162944
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+          "sha256": "ea2bcd2a85cb1511cfa57a7d68d2edd45757ecd703df0ebfa0d613e3f4b79ccd",
+          "bytes": 28690
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+          "sha256": "2dd63d98dcc0a2305b34df9c07d67e0329ae911a97a417a6738952ca3d76c93c",
+          "bytes": 3980
+        }
+      ],
+      "diff_sha256": "ff98914343e9a677537b1674543e99e35504d355e80ecc4ff0ebec0af8af16fc",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "The complete parent diff narrows the excluded outside-click area from the whole form-field host to its connected overlay origin, so hints can be treated as outside after focus moves. Owned outside-click logic calls the owned form field getConnectedOverlayOrigin and retains input, focus, custom-origin and overlay exclusions. The owned legacy form field and its template determine the actual origin; this does not import the current Material form-field token or claim a click test."
+    }
+  },
+  "predecessor_per_sha_review_complete": {
+    "sha": "6b7e6c5886cefab4008b1fa97a5bf899475baa2b",
+    "status": "reviewed",
+    "diff": "diff --git a/src/material/autocomplete/autocomplete-trigger.ts b/src/material/autocomplete/autocomplete-trigger.ts\nindex 1434a1a3a..a8bce9796 100644\n--- a/src/material/autocomplete/autocomplete-trigger.ts\n+++ b/src/material/autocomplete/autocomplete-trigger.ts\n@@ -407,7 +407,9 @@ export class MatAutocompleteTrigger\n         // If we're in the Shadow DOM, the event target will be the shadow root, so we have to\n         // fall back to check the first element in the path of the click event.\n         const clickTarget = _getEventTarget<HTMLElement>(event)!;\n-        const formField = this._formField ? this._formField._elementRef.nativeElement : null;\n+        const formField = this._formField\n+          ? this._formField.getConnectedOverlayOrigin().nativeElement\n+          : null;\n         const customOrigin = this.connectedTo ? this.connectedTo.elementRef.nativeElement : null;\n \n         return (\n",
+    "diff_sha256": "ff98914343e9a677537b1674543e99e35504d355e80ecc4ff0ebec0af8af16fc",
+    "source_conclusion_only": true,
+    "execution_claim": "not-claimed",
+    "source_members": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "79f14a12676f6835602cf2f66b4650817e15a944ed8555cb3281231abcc8f8f0",
+        "bytes": 41708
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+        "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+        "bytes": 11316
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+        "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+        "bytes": 1596
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "1eaace45b9f3f144c3f8b2dd845e826a19e616ee4bb31d3923a545fda353cc7c",
+        "bytes": 162944
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+        "sha256": "ea2bcd2a85cb1511cfa57a7d68d2edd45757ecd703df0ebfa0d613e3f4b79ccd",
+        "bytes": 28690
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+        "sha256": "2dd63d98dcc0a2305b34df9c07d67e0329ae911a97a417a6738952ca3d76c93c",
+        "bytes": 3980
+      }
+    ],
+    "decision": "The complete parent diff narrows the excluded outside-click area from the whole form-field host to its connected overlay origin, so hints can be treated as outside after focus moves. Owned outside-click logic calls the owned form field getConnectedOverlayOrigin and retains input, focus, custom-origin and overlay exclusions. The owned legacy form field and its template determine the actual origin; this does not import the current Material form-field token or claim a click test.",
+    "affected_branches": [
+      "main"
+    ],
+    "final_disposition": "already-adapted",
+    "previous_ledger_entry_complete": {
+      "sha": "6b7e6c5886cefab4008b1fa97a5bf899475baa2b",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/autocomplete): not closing when clicking on hint area (#28316)",
+      "final_disposition": "already-adapted",
+      "reason": "Outside-click stream uses form-field getConnectedOverlayOrigin so hint clicks close the panel.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts _getOutsideClickStream",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    "historical_reference": {
+      "tag": "16.2.14",
+      "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "scope": "original legacy source, not a current runtime assertion"
+    },
+    "minimum_peer": {
+      "tag": "22.1.7",
+      "commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "scope": "peer API identities, not a whole-runtime pass"
+    },
+    "predecessor": {
+      "packet": "select-auto-next-main-v1.patch",
+      "sha256": "af3c092b3c118589c9cee6a591d2bc9b81a71af5cf6401e6004f65b3bf016819",
+      "correction": "216ae0 tagged legacy inherited requireSelection through shared bases; v1 historical wording was wrong."
+    },
+    "limitations": "Source-only individual assessment; no new execution, global artifact, release, security, or G11 pass claimed."
+  }
+}

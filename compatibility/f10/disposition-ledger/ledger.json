@@ -9286,17 +9286,50 @@
       "sha": "373a0cbf9531ea9ae0c9eb0e9cbf70f049f863b7",
       "bucket": "behavior-semantic",
       "subject": "fix(material/select): set pointer cursor on entire form field (#27678)",
-      "final_disposition": "irrelevant",
-      "reason": "The patch sets cursor pointer on .mat-mdc-form-field-type-mat-select .mat-mdc-text-field-wrapper. This package has no such selector. The owned legacy select sets cursor pointer on .mat-select-trigger. That rule was not changed.",
-      "read_note_disposition": "not-owned",
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "final_disposition": "already-adapted",
+      "reason": "The complete parent diff sets pointer cursor on the enabled MDC form-field text-field wrapper when it contains a select. The owned legacy select stylesheet independently sets pointer on its enabled legacy form-field flex element, which is the corresponding wrapper in the owned legacy form-field template. This preserves its historical selectors and does not copy the MDC selector. No computed-style execution is claimed.",
+      "read_note_disposition": "already-adapted",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/select-auto-eight-main-v1/373a0cbf9531ea9ae0c9eb0e9cbf70f049f863b7.json",
       "files": [
         "src/material/select/select.scss"
       ],
-      "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+      "batch_id": "individual-source-review-main-select-auto-eight-v1",
       "recorded_at_utc": "2026-10-01T16:46:41Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.scss",
+            "sha256": "7f8269121e0d449b08966ea8fcb2544e0866243851317f429cea745caa96a45f",
+            "bytes": 6064
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.html",
+            "sha256": "9d895bf6cbf1b2da7063acedc1fed7ee4cf7f10ce25bc7a797e8ee32875feec2",
+            "bytes": 2843
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+            "sha256": "2dd63d98dcc0a2305b34df9c07d67e0329ae911a97a417a6738952ca3d76c93c",
+            "bytes": 3980
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field.scss",
+            "sha256": "1b80f7d539c8bea5647377e10fd380f03239e1d7ed7c101052b9b26f4c45cee8",
+            "bytes": 8224
+          }
+        ],
+        "diff_sha256": "93b6ffe8ee0bb52185df9ec882ccef5fdcd6560ebde51ca71f6a94d0d9dba99b",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete parent diff sets pointer cursor on the enabled MDC form-field text-field wrapper when it contains a select. The owned legacy select stylesheet independently sets pointer on its enabled legacy form-field flex element, which is the corresponding wrapper in the owned legacy form-field template. This preserves its historical selectors and does not copy the MDC selector. No computed-style execution is claimed."
+      }
     },
     {
       "sha": "eef45562035448212e0f827c5dbc31b3fd621255",
@@ -21434,18 +21467,66 @@
       "bucket": "behavior-semantic",
       "subject": "fix(material/autocomplete): prevent hidden overlay from blocking clicks (#28677)",
       "final_disposition": "already-adapted",
-      "reason": "Adapted owned autocomplete.scss: hidden panel now sets pointer-events: none so an empty overlay cannot block clicks.",
-      "read_note_disposition": "owned-retained",
+      "reason": "The complete upstream change adds pointer-events none to the modern hidden panel. Owned legacy source instead controls the attached OverlayRef pane because an empty option group gives the hidden pane height and the pane itself can intercept the target. The local guarded policy records prior inline value and priority, disables the hidden pane, restores only its own unchanged override on visibility, respects distinguishable external changes, and releases state on detach. The inline write has an unavoidable same-value ambiguity. This is a source decision; bounded artifact observations are separately identified in the review.",
+      "read_note_disposition": "already-adapted",
       "files": [
         "src/material/autocomplete/autocomplete.scss"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/select-auto-eight-main-v1/979e903020ec8e23747fa35414708be2c99e7e99.json",
       "source_check": "legacy-autocomplete/autocomplete.scss mat-autocomplete-hidden pointer-events: none",
-      "batch_id": "product-adapt-a11y-overlay-2026-10-01-i",
+      "batch_id": "individual-source-review-main-select-auto-eight-v1",
       "recorded_at_utc": "2026-10-01T17:10:57Z",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "product_adaptation": true
+      "product_adaptation": true,
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798",
+            "bytes": 43007
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+            "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+            "bytes": 11316
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+            "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+            "bytes": 1596
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "sha256": "c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683",
+            "bytes": 165528
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.scss",
+            "sha256": "9fbb5eb60784e41f97296c9fd958871dfa4cee3975f0c4bcd3cfe54f6ec6aae4",
+            "bytes": 1171
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.html",
+            "sha256": "8fae4afdffea376599d694a16698ee1a9502097cc9819ec2766a4a5d55b418ae",
+            "bytes": 325
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/style/_menu-common.scss",
+            "sha256": "656f7685cad1e990c4035ee1605acc005b15986a397003169d5424426de8d470",
+            "bytes": 2376
+          }
+        ],
+        "diff_sha256": "95cad3d587177a81d83adde2966e2558cecbc9c52f51c4e7e3ec8f9dd5604064",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete upstream change adds pointer-events none to the modern hidden panel. Owned legacy source instead controls the attached OverlayRef pane because an empty option group gives the hidden pane height and the pane itself can intercept the target. The local guarded policy records prior inline value and priority, disables the hidden pane, restores only its own unchanged override on visibility, respects distinguishable external changes, and releases state on detach. The inline write has an unavoidable same-value ambiguity. This is a source decision; bounded artifact observations are separately identified in the review."
+      }
     },
     {
       "sha": "a3b28df38c393d47de6dd88b50a3a587869241fa",
@@ -22306,37 +22387,103 @@
       "bucket": "behavior-semantic",
       "subject": "fix(material/autocomplete): requireSelection sometimes not clearing value when editing after selection (#28628)",
       "final_disposition": "already-adapted",
-      "reason": "Capture input value on keydown via _valueOnLastKeydown and pass it into _openPanelInternal so requireSelection clears after edit-before-blur.",
-      "read_note_disposition": "owned-retained",
+      "reason": "The complete parent diff adds pre-keydown attach-value capture for requireSelection, consolidates opening and display-value lookup, and updates focus, keyboard, selection and reset behavior. The owned trigger has corresponding keydown capture, attaches with that captured value, computes display from option.value, and resets the control on closing when the input differs. Its deliberate animation-done clearing path is retained. Tagged 16 legacy wrappers inherited requireSelection and its attach-value comparison from the shared autocomplete bases; the original comparison captured the input on overlay attach. The owned code keeps that API and adds the reviewed pre-keydown capture locally, without a private upstream peer import. This source decision asserts no execution or IME/other input-event coverage.",
+      "read_note_disposition": "already-adapted",
       "files": [
         "src/material/autocomplete/autocomplete-trigger.ts"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/select-auto-eight-main-v1/216ae0cca12d1a9139f0faf0a85fceb157fc2490.json",
       "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts _valueOnLastKeydown",
-      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "batch_id": "individual-source-review-main-select-auto-eight-v1",
       "recorded_at_utc": "2026-10-01T17:22:07Z",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "product_adaptation": true
+      "product_adaptation": true,
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798",
+            "bytes": 43007
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+            "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+            "bytes": 11316
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+            "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+            "bytes": 1596
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "sha256": "c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683",
+            "bytes": 165528
+          }
+        ],
+        "diff_sha256": "9f42cbb22923717ddd26aaa9e3865d2745ea8049b575c438139a52162a7ce94d",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete parent diff adds pre-keydown attach-value capture for requireSelection, consolidates opening and display-value lookup, and updates focus, keyboard, selection and reset behavior. The owned trigger has corresponding keydown capture, attaches with that captured value, computes display from option.value, and resets the control on closing when the input differs. Its deliberate animation-done clearing path is retained. Tagged 16 legacy wrappers inherited requireSelection and its attach-value comparison from the shared autocomplete bases; the original comparison captured the input on overlay attach. The owned code keeps that API and adds the reviewed pre-keydown capture locally, without a private upstream peer import. This source decision asserts no execution or IME/other input-event coverage."
+      }
     },
     {
       "sha": "2f17c69b81f3f67ec9c179ac859a646f6306ce8c",
       "bucket": "behavior-semantic",
       "subject": "fix(material/autocomplete): panel not visible when opened from multiple triggers (#28843)",
       "final_disposition": "already-adapted",
-      "reason": "Track _latestOpeningTrigger and only reset panel open state when the closing trigger is still the latest opener.",
-      "read_note_disposition": "owned-retained",
+      "reason": "The parent diff adds shared-panel latest-trigger identity and guards its open-state reset, while clearing each closing trigger local overlay state; the additional aria-owns hunk only changes local expression. Owned autocomplete tracks _latestOpeningTrigger, sets it on attach, and resets shared _isOpen only for that trigger; it clears local state and retains modal ownership removal. The API-guard addition concerns the modern implementation, not a new legacy peer dependency. No multi-trigger browser execution is claimed.",
+      "read_note_disposition": "already-adapted",
       "files": [
         "src/material/autocomplete/autocomplete-trigger.ts",
         "src/material/autocomplete/autocomplete.ts"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/select-auto-eight-main-v1/2f17c69b81f3f67ec9c179ac859a646f6306ce8c.json",
       "source_check": "legacy-autocomplete autocomplete-base/trigger-base _latestOpeningTrigger",
-      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "batch_id": "individual-source-review-main-select-auto-eight-v1",
       "recorded_at_utc": "2026-10-01T17:22:07Z",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "product_adaptation": true
+      "product_adaptation": true,
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798",
+            "bytes": 43007
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+            "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+            "bytes": 11316
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+            "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+            "bytes": 1596
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "sha256": "c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683",
+            "bytes": 165528
+          }
+        ],
+        "diff_sha256": "e4fe792dda2f6ef88e0c804ab7dd31a5239db8d39644464ab94b8df843e8aed9",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The parent diff adds shared-panel latest-trigger identity and guards its open-state reset, while clearing each closing trigger local overlay state; the additional aria-owns hunk only changes local expression. Owned autocomplete tracks _latestOpeningTrigger, sets it on attach, and resets shared _isOpen only for that trigger; it clears local state and retains modal ownership removal. The API-guard addition concerns the modern implementation, not a new legacy peer dependency. No multi-trigger browser execution is claimed."
+      }
     },
     {
       "sha": "008212a9807fd01fd32fe136a075763b7b2c854d",
@@ -22945,18 +23092,61 @@
       "bucket": "behavior-semantic",
       "subject": "fix(material/autocomplete): not closing when clicking on hint area (#28316)",
       "final_disposition": "already-adapted",
-      "reason": "Outside-click stream uses form-field getConnectedOverlayOrigin so hint clicks close the panel.",
-      "read_note_disposition": "not-applied",
+      "reason": "The complete parent diff narrows the excluded outside-click area from the whole form-field host to its connected overlay origin, so hints can be treated as outside after focus moves. Owned outside-click logic calls the owned form field getConnectedOverlayOrigin and retains input, focus, custom-origin and overlay exclusions. The owned legacy form field and its template determine the actual origin; this does not import the current Material form-field token or claim a click test.",
+      "read_note_disposition": "already-adapted",
       "files": [
         "src/material/autocomplete/autocomplete-trigger.ts"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/select-auto-eight-main-v1/6b7e6c5886cefab4008b1fa97a5bf899475baa2b.json",
       "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts _getOutsideClickStream",
-      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "batch_id": "individual-source-review-main-select-auto-eight-v1",
       "recorded_at_utc": "2026-10-01T17:22:07Z",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "product_adaptation": true
+      "product_adaptation": true,
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798",
+            "bytes": 43007
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+            "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+            "bytes": 11316
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+            "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+            "bytes": 1596
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "sha256": "c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683",
+            "bytes": 165528
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+            "sha256": "ea2bcd2a85cb1511cfa57a7d68d2edd45757ecd703df0ebfa0d613e3f4b79ccd",
+            "bytes": 28690
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+            "sha256": "2dd63d98dcc0a2305b34df9c07d67e0329ae911a97a417a6738952ca3d76c93c",
+            "bytes": 3980
+          }
+        ],
+        "diff_sha256": "ff98914343e9a677537b1674543e99e35504d355e80ecc4ff0ebec0af8af16fc",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete parent diff narrows the excluded outside-click area from the whole form-field host to its connected overlay origin, so hints can be treated as outside after focus moves. Owned outside-click logic calls the owned form field getConnectedOverlayOrigin and retains input, focus, custom-origin and overlay exclusions. The owned legacy form field and its template determine the actual origin; this does not import the current Material form-field token or claim a click test."
+      }
     },
     {
       "sha": "eb22e2e85fc007c6357067a2fcf57cb54283f8d5",
@@ -24849,18 +25039,56 @@
       "bucket": "behavior-semantic",
       "subject": "fix(material/autocomplete): incorrectly resolving focused element in shadow DOM (#30619)",
       "final_disposition": "already-adapted",
-      "reason": "Autocomplete focus checks use _getFocusedElementPierceShadowDom via _hasFocus().",
-      "read_note_disposition": "owned-retained",
+      "reason": "The entire parent diff replaces document.activeElement checks for window blur, outside clicks and input opening with a shadow-piercing focused-element helper. Owned trigger uses its local focusedElementPierceShadowDom in all three locations; the local helper walks open shadow roots and retains its own no-document handling rather than importing upstream private CDK utilities. Its global-document and closed-shadow-root limits remain; no shadow browser execution is claimed.",
+      "read_note_disposition": "already-adapted",
       "files": [
         "src/material/autocomplete/autocomplete-trigger.ts"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/select-auto-eight-main-v1/e61d152e002937f4bc9df96851c2932e15ce7461.json",
       "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts _hasFocus",
-      "batch_id": "product-adapt-residual-2026-10-01-k",
+      "batch_id": "individual-source-review-main-select-auto-eight-v1",
       "recorded_at_utc": "2026-10-01T17:45:00Z",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "product_adaptation": true
+      "product_adaptation": true,
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798",
+            "bytes": 43007
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+            "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+            "bytes": 11316
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+            "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+            "bytes": 1596
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "sha256": "c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683",
+            "bytes": 165528
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/owned-shadow-dom.ts",
+            "sha256": "4457eb4e175a215230845618126f0345d9230bde62120524016a7d1561f4ff3b",
+            "bytes": 1440
+          }
+        ],
+        "diff_sha256": "1be0f3469dff5dbe4d9086c27864d0ec9ec1e41ff0ab216c1f66e972611c0415",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The entire parent diff replaces document.activeElement checks for window blur, outside clicks and input opening with a shadow-piercing focused-element helper. Owned trigger uses its local focusedElementPierceShadowDom in all three locations; the local helper walks open shadow roots and retains its own no-document handling rather than importing upstream private CDK utilities. Its global-document and closed-shadow-root limits remain; no shadow browser execution is claimed."
+      }
     },
     {
       "sha": "48b2680f6b41be5dc9bda7f261279cc4c9ad7d64",
@@ -25066,19 +25294,57 @@
       "sha": "12b767111e1fc3c01867cacc02ad73e0aec81fed",
       "bucket": "behavior-semantic",
       "subject": "fix(material/autocomplete): fix initial render logic (#30348)",
-      "final_disposition": "not-applicable",
-      "reason": "Upstream only swaps Injector for EnvironmentInjector on an afterNextRender path the owned legacy trigger does not schedule.",
-      "read_note_disposition": "not-applied",
+      "final_disposition": "do-not-adopt",
+      "reason": "The complete upstream change switches the initial-render hook from an Injector to an EnvironmentInjector. Owned legacy keeps the view-container Injector to preserve its existing constructor and uses a local helper that races zone stability with a stable afterNextRender callback, destroys the scheduled render handle on unsubscribe, and retains a zone-only fallback for a manually supplied injector without ApplicationRef. Angular 22.1.7 accepts a public Injector for afterNextRender. The modern substitution is not transplanted; this decision does not assert equivalent timing for every custom injector or view lifetime.",
+      "read_note_disposition": "do-not-adopt",
       "files": [
         "src/material/autocomplete/autocomplete-trigger.ts"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/select-auto-eight-main-v1/12b767111e1fc3c01867cacc02ad73e0aec81fed.json",
       "source_check": "legacy-autocomplete trigger has no afterNextRender injector callback",
-      "batch_id": "product-adapt-residual-2026-10-01-k",
+      "batch_id": "individual-source-review-main-select-auto-eight-v1",
       "recorded_at_utc": "2026-10-01T17:45:00Z",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "category": "autocomplete-initial-render-na"
+      "category": "autocomplete-initial-render-na",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798",
+            "bytes": 43007
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+            "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+            "bytes": 11316
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+            "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+            "bytes": 1596
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "sha256": "c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683",
+            "bytes": 165528
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/after-legacy-render.ts",
+            "sha256": "444f4817504fa96c727631c2d6c815949b44e99328fa195d37ccdd59dace0dd3",
+            "bytes": 1310
+          }
+        ],
+        "diff_sha256": "8c730d81b0e5b0e42d6bbc1f7cd1913f2ca371b912d1523ba152649f867eaf0f",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete upstream change switches the initial-render hook from an Injector to an EnvironmentInjector. Owned legacy keeps the view-container Injector to preserve its existing constructor and uses a local helper that races zone stability with a stable afterNextRender callback, destroys the scheduled render handle on unsubscribe, and retains a zone-only fallback for a manually supplied injector without ApplicationRef. Angular 22.1.7 accepts a public Injector for afterNextRender. The modern substitution is not transplanted; this decision does not assert equivalent timing for every custom injector or view lifetime."
+      }
     },
     {
       "sha": "d4e61e233088ce0d5bbfb6cf3ff652e303e7e38d",
@@ -60190,18 +60456,50 @@
         "src/material/autocomplete/autocomplete.spec.ts"
       ],
       "diff_sha256": "99db1bcabbb5c35b60601eaf26d182d3e102a78f05af57b99a8fbb569ad59609",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/249db698b9d80823e83d3e15dd67f138e24cd9d1.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/select-auto-eight-main-v1/249db698b9d80823e83d3e15dd67f138e24cd9d1.json",
+      "batch_id": "individual-source-review-main-select-auto-eight-v1",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/autocomplete/autocomplete-trigger.ts changes `afterNextRender,`. That line is not in the legacy sources. @angular/material/autocomplete is exercised by projects/ngx-material-legacy/legacy-autocomplete/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/autocomplete imported by projects/ngx-material-legacy/legacy-autocomplete/public-api.ts"
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "do-not-adopt",
+      "reason": "The entire upstream change replaces a zone-stability initial wait with afterNextRender, uses an initialized subject for subscriptions before the view query, and changes the subscription callback zone boundary, alongside extensive test timing revisions. Owned legacy independently uses an initialized subject with destroy completion and retains a guarded hybrid of onStable and afterNextRender, with cancellation and delayed option-change handling. Its closing-action getter remains outside the zone.run reset callback, so the modern refactor is not copied wholesale. The historical zoneful ordering remains deliberate and this source decision does not assert universal scheduling equivalence.",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798",
+            "bytes": 43007
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+            "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+            "bytes": 11316
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+            "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+            "bytes": 1596
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "sha256": "c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683",
+            "bytes": 165528
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/after-legacy-render.ts",
+            "sha256": "444f4817504fa96c727631c2d6c815949b44e99328fa195d37ccdd59dace0dd3",
+            "bytes": 1310
+          }
+        ],
+        "diff_sha256": "4a21e433e2ecaec85ca5dad65a399c129b137fdeff8e517a9c8158e71dfcd931",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The entire upstream change replaces a zone-stability initial wait with afterNextRender, uses an initialized subject for subscriptions before the view query, and changes the subscription callback zone boundary, alongside extensive test timing revisions. Owned legacy independently uses an initialized subject with destroy completion and retains a guarded hybrid of onStable and afterNextRender, with cancellation and delayed option-change handling. Its closing-action getter remains outside the zone.run reset callback, so the modern refactor is not copied wholesale. The historical zoneful ordering remains deliberate and this source decision does not assert universal scheduling equivalence."
       }
     },
     {

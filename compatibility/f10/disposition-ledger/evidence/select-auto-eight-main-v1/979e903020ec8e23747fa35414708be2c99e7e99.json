@@ -1,0 +1,95 @@
+{
+  "sha": "979e903020ec8e23747fa35414708be2c99e7e99",
+  "status": "reviewed",
+  "diff": "diff --git a/src/material/autocomplete/autocomplete.scss b/src/material/autocomplete/autocomplete.scss\nindex 06d07c5f9..09cf50fcf 100644\n--- a/src/material/autocomplete/autocomplete.scss\n+++ b/src/material/autocomplete/autocomplete.scss\n@@ -46,6 +46,7 @@ div.mat-mdc-autocomplete-panel {\n \n   &.mat-mdc-autocomplete-hidden {\n     visibility: hidden;\n+    pointer-events: none;\n   }\n }\n \n",
+  "diff_sha256": "95cad3d587177a81d83adde2966e2558cecbc9c52f51c4e7e3ec8f9dd5604064",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798",
+      "bytes": 43007
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+      "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+      "bytes": 11316
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+      "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+      "bytes": 1596
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683",
+      "bytes": 165528
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.scss",
+      "sha256": "9fbb5eb60784e41f97296c9fd958871dfa4cee3975f0c4bcd3cfe54f6ec6aae4",
+      "bytes": 1171
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.html",
+      "sha256": "8fae4afdffea376599d694a16698ee1a9502097cc9819ec2766a4a5d55b418ae",
+      "bytes": 325
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/style/_menu-common.scss",
+      "sha256": "656f7685cad1e990c4035ee1605acc005b15986a397003169d5424426de8d470",
+      "bytes": 2376
+    }
+  ],
+  "decision": "The complete upstream change adds pointer-events none to the modern hidden panel. Owned legacy source instead controls the attached OverlayRef pane because an empty option group gives the hidden pane height and the pane itself can intercept the target. The local guarded policy records prior inline value and priority, disables the hidden pane, restores only its own unchanged override on visibility, respects distinguishable external changes, and releases state on detach. The inline write has an unavoidable same-value ambiguity. This is a source decision; bounded artifact observations are separately identified in the review.",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "already-adapted",
+  "previous_ledger_entry_complete": {
+    "sha": "979e903020ec8e23747fa35414708be2c99e7e99",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/autocomplete): prevent hidden overlay from blocking clicks (#28677)",
+    "final_disposition": "already-adapted",
+    "reason": "Adapted owned autocomplete.scss: hidden panel now sets pointer-events: none so an empty overlay cannot block clicks.",
+    "read_note_disposition": "owned-retained",
+    "files": [
+      "src/material/autocomplete/autocomplete.scss"
+    ],
+    "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+    "source_check": "legacy-autocomplete/autocomplete.scss mat-autocomplete-hidden pointer-events: none",
+    "batch_id": "product-adapt-a11y-overlay-2026-10-01-i",
+    "recorded_at_utc": "2026-10-01T17:10:57Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "product_adaptation": true
+  },
+  "shared_context": {
+    "path": "compatibility/f10/disposition-ledger/evidence/select-auto-eight-main-v1/source-context.json",
+    "sha256": "a088eae993971f1402602568f49aa4eaec4bca9f1a44ed70fe6e9032e1309097"
+  },
+  "source_change_role_review": "The owned implementation and pointer predecessor are examined against the complete upstream parent diff and tagged 16 shared base; any execution receipts below are limited to the named artifact and fixture.",
+  "historical_reference": {
+    "tag": "16.2.14",
+    "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "identity": "legacy wrappers inherit the shared autocomplete bases, not current peer internals"
+  },
+  "minimum_peer": {
+    "version": "22.1.7",
+    "source_context_path": "compatibility/f10/disposition-ledger/evidence/select-auto-eight-main-v1/source-context.json"
+  },
+  "supporting_evidence": {
+    "pointer_fix_committed_record": "compatibility/rc/parent-main-autocomplete-pointer-state-review-v1.json",
+    "pointer_consumer_record": "compatibility/rc/parent-main-pointer-consumer-qualification-v1.json",
+    "render_replay_committed_record": "compatibility/rc/parent-main-render-replay-repair-v1.json",
+    "interpretation": "Pointer record binds selected family and actual AOT physical clicks to d24d and baseline 08dae. Render replay record binds source-protocol tests only, not actual component DI or native execution. Historical independent reviews and raw inputs remain separately scoped."
+  },
+  "limitations": "This entry is source-only and makes no runtime, full injector, browser matrix, security or G11 claim.",
+  "whole_hunk_analysis": {
+    "upstream": "The parent has one SCSS addition under the MDC hidden-panel class; it has no TypeScript or test hunks.",
+    "tagged_legacy": "The 16 legacy panel uses distinct mat-autocomplete selectors and historical option-group content; no new MDC selector is imported.",
+    "current": "_updatePanelState saves and restores the public pane inline pointer state around the owned showPanel lifecycle. Same-value same-priority external writes are indistinguishable, while distinct value or priority is retained.",
+    "bounded_observation": "The committed pointer record binds d24d actual packed Chromium 149: 198/198 selected autocomplete cases versus 197/198 baseline 08dae with only the new regression failing; genuine no-Zone and explicitly Zone-backed AOT runs each give candidate 19/19 and four baseline hidden-pane failures. No other-browser or full artifact qualification is inferred."
+  }
+}

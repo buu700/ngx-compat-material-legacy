@@ -1,0 +1,194 @@
+{
+  "sha": "216ae0cca12d1a9139f0faf0a85fceb157fc2490",
+  "status": "reviewed",
+  "diff": "diff --git a/src/material/autocomplete/autocomplete-trigger.ts b/src/material/autocomplete/autocomplete-trigger.ts\nindex a8bce9796..1bc33c6b5 100644\n--- a/src/material/autocomplete/autocomplete-trigger.ts\n+++ b/src/material/autocomplete/autocomplete-trigger.ts\n@@ -144,6 +144,9 @@ export class MatAutocompleteTrigger\n   /** Value of the input element when the panel was attached (even if there are no options). */\n   private _valueOnAttach: string | number | null;\n \n+  /** Value on the previous keydown event. */\n+  private _valueOnLastKeydown: string | null;\n+\n   /** Strategy that is used to position the panel. */\n   private _positionStrategy: FlexibleConnectedPositionStrategy;\n \n@@ -285,13 +288,7 @@ export class MatAutocompleteTrigger\n \n   /** Opens the autocomplete suggestion panel. */\n   openPanel(): void {\n-    this._attachOverlay();\n-    this._floatLabel();\n-    // Add aria-owns attribute when the autocomplete becomes visible.\n-    if (this._trackedModal) {\n-      const panelId = this.autocomplete.id;\n-      addAriaReferencedId(this._trackedModal, 'aria-owns', panelId);\n-    }\n+    this._openPanelInternal();\n   }\n \n   /** Closes the autocomplete suggestion panel. */\n@@ -461,6 +458,8 @@ export class MatAutocompleteTrigger\n       event.preventDefault();\n     }\n \n+    this._valueOnLastKeydown = this._element.nativeElement.value;\n+\n     if (this.activeOption && keyCode === ENTER && this.panelOpen && !hasModifier) {\n       this.activeOption._selectViaInteraction();\n       this._resetActiveItem();\n@@ -472,7 +471,7 @@ export class MatAutocompleteTrigger\n       if (keyCode === TAB || (isArrowKey && !hasModifier && this.panelOpen)) {\n         this.autocomplete._keyManager.onKeydown(event);\n       } else if (isArrowKey && this._canOpen()) {\n-        this.openPanel();\n+        this._openPanelInternal(this._valueOnLastKeydown);\n       }\n \n       if (isArrowKey || this.autocomplete._keyManager.activeItem !== prevActiveItem) {\n@@ -480,7 +479,7 @@ export class MatAutocompleteTrigger\n \n         if (this.autocomplete.autoSelectActiveOption && this.activeOption) {\n           if (!this._pendingAutoselectedOption) {\n-            this._valueBeforeAutoSelection = this._element.nativeElement.value;\n+            this._valueBeforeAutoSelection = this._valueOnLastKeydown;\n           }\n \n           this._pendingAutoselectedOption = this.activeOption;\n@@ -523,7 +522,7 @@ export class MatAutocompleteTrigger\n         const selectedOption = this.autocomplete.options?.find(option => option.selected);\n \n         if (selectedOption) {\n-          const display = this.autocomplete.displayWith?.(selectedOption) ?? selectedOption.value;\n+          const display = this._getDisplayValue(selectedOption.value);\n \n           if (value !== display) {\n             selectedOption.deselect(false);\n@@ -532,7 +531,14 @@ export class MatAutocompleteTrigger\n       }\n \n       if (this._canOpen() && this._document.activeElement === event.target) {\n-        this.openPanel();\n+        // When the `input` event fires, the input's value will have already changed. This means\n+        // that if we take the `this._element.nativeElement.value` directly, it'll be one keystroke\n+        // behind. This can be a problem when the user selects a value, changes a character while\n+        // the input still has focus and then clicks away (see #28432). To work around it, we\n+        // capture the value in `keydown` so we can use it here.\n+        const valueOnAttach = this._valueOnLastKeydown ?? this._element.nativeElement.value;\n+        this._valueOnLastKeydown = null;\n+        this._openPanelInternal(valueOnAttach);\n       }\n     }\n   }\n@@ -542,14 +548,14 @@ export class MatAutocompleteTrigger\n       this._canOpenOnNextFocus = true;\n     } else if (this._canOpen()) {\n       this._previousValue = this._element.nativeElement.value;\n-      this._attachOverlay();\n+      this._attachOverlay(this._previousValue);\n       this._floatLabel(true);\n     }\n   }\n \n   _handleClick(): void {\n     if (this._canOpen() && !this.panelOpen) {\n-      this.openPanel();\n+      this._openPanelInternal();\n     }\n   }\n \n@@ -657,11 +663,14 @@ export class MatAutocompleteTrigger\n     }\n   }\n \n+  /** Given a value, returns the string that should be shown within the input. */\n+  private _getDisplayValue<T>(value: T): T | string {\n+    const autocomplete = this.autocomplete;\n+    return autocomplete && autocomplete.displayWith ? autocomplete.displayWith(value) : value;\n+  }\n+\n   private _assignOptionValue(value: any): void {\n-    const toDisplay =\n-      this.autocomplete && this.autocomplete.displayWith\n-        ? this.autocomplete.displayWith(value)\n-        : value;\n+    const toDisplay = this._getDisplayValue(value);\n \n     if (value == null) {\n       this._clearPreviousSelectedOption(null, false);\n@@ -733,7 +742,17 @@ export class MatAutocompleteTrigger\n     });\n   }\n \n-  private _attachOverlay(): void {\n+  private _openPanelInternal(valueOnAttach = this._element.nativeElement.value) {\n+    this._attachOverlay(valueOnAttach);\n+    this._floatLabel();\n+    // Add aria-owns attribute when the autocomplete becomes visible.\n+    if (this._trackedModal) {\n+      const panelId = this.autocomplete.id;\n+      addAriaReferencedId(this._trackedModal, 'aria-owns', panelId);\n+    }\n+  }\n+\n+  private _attachOverlay(valueOnAttach: string): void {\n     if (!this.autocomplete && (typeof ngDevMode === 'undefined' || ngDevMode)) {\n       throw getMatAutocompleteMissingPanelError();\n     }\n@@ -759,7 +778,8 @@ export class MatAutocompleteTrigger\n \n     if (overlayRef && !overlayRef.hasAttached()) {\n       overlayRef.attach(this._portal);\n-      this._valueOnAttach = this._element.nativeElement.value;\n+      this._valueOnAttach = valueOnAttach;\n+      this._valueOnLastKeydown = null;\n       this._closingActionsSubscription = this._subscribeToClosingActions();\n     }\n \ndiff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts\nindex e4150c61b..9632f858a 100644\n--- a/src/material/autocomplete/autocomplete.spec.ts\n+++ b/src/material/autocomplete/autocomplete.spec.ts\n@@ -2780,6 +2780,48 @@ describe('MDC-based MatAutocomplete', () => {\n       expect(spy).not.toHaveBeenCalled();\n       subscription.unsubscribe();\n     }));\n+\n+    it('should clear the value if requireSelection is enabled and the user edits the input before clicking away', fakeAsync(() => {\n+      const input = fixture.nativeElement.querySelector('input');\n+      const {stateCtrl, trigger} = fixture.componentInstance;\n+      fixture.componentInstance.requireSelection = true;\n+      fixture.detectChanges();\n+      tick();\n+\n+      // Simulate opening the input and clicking the first option.\n+      trigger.openPanel();\n+      fixture.detectChanges();\n+      zone.simulateZoneExit();\n+      (overlayContainerElement.querySelector('mat-option') as HTMLElement).click();\n+      tick();\n+      fixture.detectChanges();\n+\n+      expect(trigger.panelOpen).toBe(false);\n+      expect(input.value).toBe('Alabama');\n+      expect(stateCtrl.value).toEqual({code: 'AL', name: 'Alabama'});\n+\n+      // Simulate pressing backspace while focus is still on the input.\n+      dispatchFakeEvent(input, 'keydown');\n+      input.value = 'Alabam';\n+      fixture.detectChanges();\n+      dispatchFakeEvent(input, 'input');\n+      fixture.detectChanges();\n+      zone.simulateZoneExit();\n+\n+      expect(trigger.panelOpen).toBe(true);\n+      expect(input.value).toBe('Alabam');\n+      expect(stateCtrl.value).toEqual({code: 'AL', name: 'Alabama'});\n+\n+      // Simulate clicking away.\n+      input.blur();\n+      dispatchFakeEvent(document, 'click');\n+      fixture.detectChanges();\n+      tick();\n+\n+      expect(trigger.panelOpen).toBe(false);\n+      expect(input.value).toBe('');\n+      expect(stateCtrl.value).toBe(null);\n+    }));\n   });\n \n   describe('panel closing', () => {\n",
+  "diff_sha256": "9f42cbb22923717ddd26aaa9e3865d2745ea8049b575c438139a52162a7ce94d",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798",
+      "bytes": 43007
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+      "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+      "bytes": 11316
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+      "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+      "bytes": 1596
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683",
+      "bytes": 165528
+    }
+  ],
+  "decision": "The complete parent diff adds pre-keydown attach-value capture for requireSelection, consolidates opening and display-value lookup, and updates focus, keyboard, selection and reset behavior. The owned trigger has corresponding keydown capture, attaches with that captured value, computes display from option.value, and resets the control on closing when the input differs. Its deliberate animation-done clearing path is retained. Tagged 16 legacy wrappers inherited requireSelection and its attach-value comparison from the shared autocomplete bases; the original comparison captured the input on overlay attach. The owned code keeps that API and adds the reviewed pre-keydown capture locally, without a private upstream peer import. This source decision asserts no execution or IME/other input-event coverage.",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "already-adapted",
+  "previous_ledger_entry_complete": {
+    "sha": "216ae0cca12d1a9139f0faf0a85fceb157fc2490",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/autocomplete): requireSelection sometimes not clearing value when editing after selection (#28628)",
+    "final_disposition": "already-adapted",
+    "reason": "Capture input value on keydown via _valueOnLastKeydown and pass it into _openPanelInternal so requireSelection clears after edit-before-blur.",
+    "read_note_disposition": "owned-retained",
+    "files": [
+      "src/material/autocomplete/autocomplete-trigger.ts"
+    ],
+    "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+    "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts _valueOnLastKeydown",
+    "batch_id": "product-adapt-priority-2026-10-01-j",
+    "recorded_at_utc": "2026-10-01T17:22:07Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "product_adaptation": true
+  },
+  "shared_context": {
+    "path": "compatibility/f10/disposition-ledger/evidence/select-auto-eight-main-v1/source-context.json",
+    "sha256": "a088eae993971f1402602568f49aa4eaec4bca9f1a44ed70fe6e9032e1309097"
+  },
+  "source_change_role_review": "The appended spec exclusively adds hidden-pane pointer coverage. The trigger delta adds a WeakMap and guarded inline pane policy inside _updatePanelState; pre-keydown capture, attachment value, display and close/reset code are unchanged. The new policy changes hit testing for hidden overlays, so it is relevant to outside clicks but does not change the value comparison or animation-done path reviewed here.",
+  "historical_reference": {
+    "tag": "16.2.14",
+    "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "identity": "legacy wrappers inherit the shared autocomplete bases, not current peer internals"
+  },
+  "minimum_peer": {
+    "version": "22.1.7",
+    "source_context_path": "compatibility/f10/disposition-ledger/evidence/select-auto-eight-main-v1/source-context.json"
+  },
+  "supporting_evidence": {
+    "pointer_fix_committed_record": "compatibility/rc/parent-main-autocomplete-pointer-state-review-v1.json",
+    "pointer_consumer_record": "compatibility/rc/parent-main-pointer-consumer-qualification-v1.json",
+    "render_replay_committed_record": "compatibility/rc/parent-main-render-replay-repair-v1.json",
+    "interpretation": "Pointer record binds selected family and actual AOT physical clicks to d24d and baseline 08dae. Render replay record binds source-protocol tests only, not actual component DI or native execution. Historical independent reviews and raw inputs remain separately scoped."
+  },
+  "limitations": "This entry is source-only and makes no runtime, full injector, browser matrix, security or G11 claim.",
+  "predecessor_proposal_entry_complete": {
+    "sha": "216ae0cca12d1a9139f0faf0a85fceb157fc2490",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/autocomplete): requireSelection sometimes not clearing value when editing after selection (#28628)",
+    "final_disposition": "already-adapted",
+    "reason": "The complete parent diff adds pre-keydown attach-value capture for requireSelection, consolidates opening and display-value lookup, and updates focus, keyboard, selection and reset behavior. The owned trigger has corresponding keydown capture, attaches with that captured value, computes display from option.value, and resets the control on closing when the input differs. Its deliberate animation-done clearing path is retained. Tagged 16 legacy wrappers inherited requireSelection and its attach-value comparison from the shared autocomplete bases; the original comparison captured the input on overlay attach. The owned code keeps that API and adds the reviewed pre-keydown capture locally, without a private upstream peer import. This source decision asserts no execution or IME/other input-event coverage.",
+    "read_note_disposition": "already-adapted",
+    "files": [
+      "src/material/autocomplete/autocomplete-trigger.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/select-auto-next-main-v2/216ae0cca12d1a9139f0faf0a85fceb157fc2490.json",
+    "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts _valueOnLastKeydown",
+    "batch_id": "individual-source-review-main-select-auto-next-v2",
+    "recorded_at_utc": "2026-10-01T17:22:07Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "product_adaptation": true,
+    "individual_proof": {
+      "proof_kind": "individual-contextual-source-review",
+      "source_conclusion_only": true,
+      "execution_claim": "not-claimed",
+      "source_members": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+          "sha256": "79f14a12676f6835602cf2f66b4650817e15a944ed8555cb3281231abcc8f8f0",
+          "bytes": 41708
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+          "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+          "bytes": 11316
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+          "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+          "bytes": 1596
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+          "sha256": "1eaace45b9f3f144c3f8b2dd845e826a19e616ee4bb31d3923a545fda353cc7c",
+          "bytes": 162944
+        }
+      ],
+      "diff_sha256": "9f42cbb22923717ddd26aaa9e3865d2745ea8049b575c438139a52162a7ce94d",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "The complete parent diff adds pre-keydown attach-value capture for requireSelection, consolidates opening and display-value lookup, and updates focus, keyboard, selection and reset behavior. The owned trigger has corresponding keydown capture, attaches with that captured value, computes display from option.value, and resets the control on closing when the input differs. Its deliberate animation-done clearing path is retained. Tagged 16 legacy wrappers inherited requireSelection and its attach-value comparison from the shared autocomplete bases; the original comparison captured the input on overlay attach. The owned code keeps that API and adds the reviewed pre-keydown capture locally, without a private upstream peer import. This source decision asserts no execution or IME/other input-event coverage."
+    }
+  },
+  "predecessor_per_sha_review_complete": {
+    "sha": "216ae0cca12d1a9139f0faf0a85fceb157fc2490",
+    "status": "reviewed",
+    "diff": "diff --git a/src/material/autocomplete/autocomplete-trigger.ts b/src/material/autocomplete/autocomplete-trigger.ts\nindex a8bce9796..1bc33c6b5 100644\n--- a/src/material/autocomplete/autocomplete-trigger.ts\n+++ b/src/material/autocomplete/autocomplete-trigger.ts\n@@ -144,6 +144,9 @@ export class MatAutocompleteTrigger\n   /** Value of the input element when the panel was attached (even if there are no options). */\n   private _valueOnAttach: string | number | null;\n \n+  /** Value on the previous keydown event. */\n+  private _valueOnLastKeydown: string | null;\n+\n   /** Strategy that is used to position the panel. */\n   private _positionStrategy: FlexibleConnectedPositionStrategy;\n \n@@ -285,13 +288,7 @@ export class MatAutocompleteTrigger\n \n   /** Opens the autocomplete suggestion panel. */\n   openPanel(): void {\n-    this._attachOverlay();\n-    this._floatLabel();\n-    // Add aria-owns attribute when the autocomplete becomes visible.\n-    if (this._trackedModal) {\n-      const panelId = this.autocomplete.id;\n-      addAriaReferencedId(this._trackedModal, 'aria-owns', panelId);\n-    }\n+    this._openPanelInternal();\n   }\n \n   /** Closes the autocomplete suggestion panel. */\n@@ -461,6 +458,8 @@ export class MatAutocompleteTrigger\n       event.preventDefault();\n     }\n \n+    this._valueOnLastKeydown = this._element.nativeElement.value;\n+\n     if (this.activeOption && keyCode === ENTER && this.panelOpen && !hasModifier) {\n       this.activeOption._selectViaInteraction();\n       this._resetActiveItem();\n@@ -472,7 +471,7 @@ export class MatAutocompleteTrigger\n       if (keyCode === TAB || (isArrowKey && !hasModifier && this.panelOpen)) {\n         this.autocomplete._keyManager.onKeydown(event);\n       } else if (isArrowKey && this._canOpen()) {\n-        this.openPanel();\n+        this._openPanelInternal(this._valueOnLastKeydown);\n       }\n \n       if (isArrowKey || this.autocomplete._keyManager.activeItem !== prevActiveItem) {\n@@ -480,7 +479,7 @@ export class MatAutocompleteTrigger\n \n         if (this.autocomplete.autoSelectActiveOption && this.activeOption) {\n           if (!this._pendingAutoselectedOption) {\n-            this._valueBeforeAutoSelection = this._element.nativeElement.value;\n+            this._valueBeforeAutoSelection = this._valueOnLastKeydown;\n           }\n \n           this._pendingAutoselectedOption = this.activeOption;\n@@ -523,7 +522,7 @@ export class MatAutocompleteTrigger\n         const selectedOption = this.autocomplete.options?.find(option => option.selected);\n \n         if (selectedOption) {\n-          const display = this.autocomplete.displayWith?.(selectedOption) ?? selectedOption.value;\n+          const display = this._getDisplayValue(selectedOption.value);\n \n           if (value !== display) {\n             selectedOption.deselect(false);\n@@ -532,7 +531,14 @@ export class MatAutocompleteTrigger\n       }\n \n       if (this._canOpen() && this._document.activeElement === event.target) {\n-        this.openPanel();\n+        // When the `input` event fires, the input's value will have already changed. This means\n+        // that if we take the `this._element.nativeElement.value` directly, it'll be one keystroke\n+        // behind. This can be a problem when the user selects a value, changes a character while\n+        // the input still has focus and then clicks away (see #28432). To work around it, we\n+        // capture the value in `keydown` so we can use it here.\n+        const valueOnAttach = this._valueOnLastKeydown ?? this._element.nativeElement.value;\n+        this._valueOnLastKeydown = null;\n+        this._openPanelInternal(valueOnAttach);\n       }\n     }\n   }\n@@ -542,14 +548,14 @@ export class MatAutocompleteTrigger\n       this._canOpenOnNextFocus = true;\n     } else if (this._canOpen()) {\n       this._previousValue = this._element.nativeElement.value;\n-      this._attachOverlay();\n+      this._attachOverlay(this._previousValue);\n       this._floatLabel(true);\n     }\n   }\n \n   _handleClick(): void {\n     if (this._canOpen() && !this.panelOpen) {\n-      this.openPanel();\n+      this._openPanelInternal();\n     }\n   }\n \n@@ -657,11 +663,14 @@ export class MatAutocompleteTrigger\n     }\n   }\n \n+  /** Given a value, returns the string that should be shown within the input. */\n+  private _getDisplayValue<T>(value: T): T | string {\n+    const autocomplete = this.autocomplete;\n+    return autocomplete && autocomplete.displayWith ? autocomplete.displayWith(value) : value;\n+  }\n+\n   private _assignOptionValue(value: any): void {\n-    const toDisplay =\n-      this.autocomplete && this.autocomplete.displayWith\n-        ? this.autocomplete.displayWith(value)\n-        : value;\n+    const toDisplay = this._getDisplayValue(value);\n \n     if (value == null) {\n       this._clearPreviousSelectedOption(null, false);\n@@ -733,7 +742,17 @@ export class MatAutocompleteTrigger\n     });\n   }\n \n-  private _attachOverlay(): void {\n+  private _openPanelInternal(valueOnAttach = this._element.nativeElement.value) {\n+    this._attachOverlay(valueOnAttach);\n+    this._floatLabel();\n+    // Add aria-owns attribute when the autocomplete becomes visible.\n+    if (this._trackedModal) {\n+      const panelId = this.autocomplete.id;\n+      addAriaReferencedId(this._trackedModal, 'aria-owns', panelId);\n+    }\n+  }\n+\n+  private _attachOverlay(valueOnAttach: string): void {\n     if (!this.autocomplete && (typeof ngDevMode === 'undefined' || ngDevMode)) {\n       throw getMatAutocompleteMissingPanelError();\n     }\n@@ -759,7 +778,8 @@ export class MatAutocompleteTrigger\n \n     if (overlayRef && !overlayRef.hasAttached()) {\n       overlayRef.attach(this._portal);\n-      this._valueOnAttach = this._element.nativeElement.value;\n+      this._valueOnAttach = valueOnAttach;\n+      this._valueOnLastKeydown = null;\n       this._closingActionsSubscription = this._subscribeToClosingActions();\n     }\n \ndiff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts\nindex e4150c61b..9632f858a 100644\n--- a/src/material/autocomplete/autocomplete.spec.ts\n+++ b/src/material/autocomplete/autocomplete.spec.ts\n@@ -2780,6 +2780,48 @@ describe('MDC-based MatAutocomplete', () => {\n       expect(spy).not.toHaveBeenCalled();\n       subscription.unsubscribe();\n     }));\n+\n+    it('should clear the value if requireSelection is enabled and the user edits the input before clicking away', fakeAsync(() => {\n+      const input = fixture.nativeElement.querySelector('input');\n+      const {stateCtrl, trigger} = fixture.componentInstance;\n+      fixture.componentInstance.requireSelection = true;\n+      fixture.detectChanges();\n+      tick();\n+\n+      // Simulate opening the input and clicking the first option.\n+      trigger.openPanel();\n+      fixture.detectChanges();\n+      zone.simulateZoneExit();\n+      (overlayContainerElement.querySelector('mat-option') as HTMLElement).click();\n+      tick();\n+      fixture.detectChanges();\n+\n+      expect(trigger.panelOpen).toBe(false);\n+      expect(input.value).toBe('Alabama');\n+      expect(stateCtrl.value).toEqual({code: 'AL', name: 'Alabama'});\n+\n+      // Simulate pressing backspace while focus is still on the input.\n+      dispatchFakeEvent(input, 'keydown');\n+      input.value = 'Alabam';\n+      fixture.detectChanges();\n+      dispatchFakeEvent(input, 'input');\n+      fixture.detectChanges();\n+      zone.simulateZoneExit();\n+\n+      expect(trigger.panelOpen).toBe(true);\n+      expect(input.value).toBe('Alabam');\n+      expect(stateCtrl.value).toEqual({code: 'AL', name: 'Alabama'});\n+\n+      // Simulate clicking away.\n+      input.blur();\n+      dispatchFakeEvent(document, 'click');\n+      fixture.detectChanges();\n+      tick();\n+\n+      expect(trigger.panelOpen).toBe(false);\n+      expect(input.value).toBe('');\n+      expect(stateCtrl.value).toBe(null);\n+    }));\n   });\n \n   describe('panel closing', () => {\n",
+    "diff_sha256": "9f42cbb22923717ddd26aaa9e3865d2745ea8049b575c438139a52162a7ce94d",
+    "source_conclusion_only": true,
+    "execution_claim": "not-claimed",
+    "source_members": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "79f14a12676f6835602cf2f66b4650817e15a944ed8555cb3281231abcc8f8f0",
+        "bytes": 41708
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+        "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+        "bytes": 11316
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+        "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+        "bytes": 1596
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "1eaace45b9f3f144c3f8b2dd845e826a19e616ee4bb31d3923a545fda353cc7c",
+        "bytes": 162944
+      }
+    ],
+    "decision": "The complete parent diff adds pre-keydown attach-value capture for requireSelection, consolidates opening and display-value lookup, and updates focus, keyboard, selection and reset behavior. The owned trigger has corresponding keydown capture, attaches with that captured value, computes display from option.value, and resets the control on closing when the input differs. Its deliberate animation-done clearing path is retained. Tagged 16 legacy wrappers inherited requireSelection and its attach-value comparison from the shared autocomplete bases; the original comparison captured the input on overlay attach. The owned code keeps that API and adds the reviewed pre-keydown capture locally, without a private upstream peer import. This source decision asserts no execution or IME/other input-event coverage.",
+    "affected_branches": [
+      "main"
+    ],
+    "final_disposition": "already-adapted",
+    "previous_ledger_entry_complete": {
+      "sha": "216ae0cca12d1a9139f0faf0a85fceb157fc2490",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/autocomplete): requireSelection sometimes not clearing value when editing after selection (#28628)",
+      "final_disposition": "already-adapted",
+      "reason": "Capture input value on keydown via _valueOnLastKeydown and pass it into _openPanelInternal so requireSelection clears after edit-before-blur.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts _valueOnLastKeydown",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    "historical_reference": {
+      "tag": "16.2.14",
+      "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "scope": "original legacy source, not a current runtime assertion"
+    },
+    "minimum_peer": {
+      "tag": "22.1.7",
+      "commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "scope": "peer API identities, not a whole-runtime pass"
+    },
+    "predecessor": {
+      "packet": "select-auto-next-main-v1.patch",
+      "sha256": "af3c092b3c118589c9cee6a591d2bc9b81a71af5cf6401e6004f65b3bf016819",
+      "correction": "216ae0 tagged legacy inherited requireSelection through shared bases; v1 historical wording was wrong."
+    },
+    "limitations": "Source-only individual assessment; no new execution, global artifact, release, security, or G11 pass claimed."
+  }
+}
