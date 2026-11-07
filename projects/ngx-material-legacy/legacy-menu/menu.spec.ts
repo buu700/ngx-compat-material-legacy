@@ -27,6 +27,7 @@ import {
   ANIMATION_MODULE_TYPE,
   ChangeDetectionStrategy,
   Component,
+  Directive,
   ElementRef,
   EventEmitter,
   Input,
@@ -50,6 +51,7 @@ import {
   MenuPositionY,
   MAT_MENU_SCROLL_STRATEGY,
   MatMenuItem,
+  MatMenuModule,
 } from '@angular/material/menu';
 import {
   MAT_LEGACY_MENU_PANEL,
@@ -109,6 +111,50 @@ describe('MatMenu', () => {
     expect(item.injector.get(MAT_LEGACY_MENU_PANEL)).toBe(fixture.componentInstance.menu);
     expect(legacyItem._parentMenu).toBe(fixture.componentInstance.menu);
   }));
+
+  it('ignores a foreign peer item token when looking up its owned item', fakeAsync(() => {
+    const fixture = createComponent(ForeignPeerTokenMenu, [], [ForeignPeerItemToken]);
+    fixture.detectChanges();
+    fixture.componentInstance.root.openMenu();
+    fixture.detectChanges();
+    tick(500);
+    const child = fixture.componentInstance.child;
+    expect(child.triggersSubmenu()).toBeFalse();
+    expect(foreignItem._setTriggersSubmenu).not.toHaveBeenCalled();
+    child.openMenu();
+    fixture.detectChanges();
+    tick(500);
+    child.closeMenu();
+    fixture.detectChanges();
+    tick(500);
+    expect(foreignItem._setHighlighted).not.toHaveBeenCalled();
+  }));
+
+  it('uses the actual owned item for a submenu and keeps its peer provider identity', fakeAsync(() => {
+    const fixture = createComponent(MenuHoverReopen);
+    fixture.detectChanges();
+    fixture.componentInstance.root.openMenu();
+    fixture.detectChanges();
+    tick(500);
+    const item = fixture.debugElement.query(By.directive(MatLegacyMenuItem));
+    const owned = item.injector.get(MatLegacyMenuItem);
+    expect(item.injector.get(MatMenuItem)).toBe(owned);
+    const child = fixture.componentInstance.childTrigger;
+    expect(child.triggersSubmenu()).toBeTrue();
+    expect(owned._triggersSubmenu).toBeTrue();
+    child.openMenu();
+    fixture.detectChanges();
+    expect(owned._highlighted).toBeTrue();
+    child.closeMenu();
+    fixture.detectChanges();
+    expect(owned._highlighted).toBeFalse();
+    tick(500);
+  }));
+
+  it('rejects a host matched by both peer and legacy item components', () => {
+    TestBed.configureTestingModule({imports: [MatLegacyMenuModule, MatMenuModule], declarations: [BothItemSelectors], providers: [LEGACY_NOOP_ANIMATIONS]});
+    expect(() => { const fixture = TestBed.createComponent(BothItemSelectors); fixture.detectChanges(); }).toThrowError(/NG0300/);
+  });
 
   it('should preserve historical boolean coercion for bare legacy item attributes', fakeAsync(() => {
     const fixture = createComponent(SimpleMenu, [], [FakeIcon]);
@@ -3643,3 +3689,19 @@ class MenuWithRepeatedItems {
   @ViewChild(MatLegacyMenu, {static: false}) menu: MatLegacyMenu;
   items = ['One', 'Two', 'Three'];
 }
+
+const foreignItem = {
+  _setTriggersSubmenu: jasmine.createSpy('foreign submenu setter'),
+  _setHighlighted: jasmine.createSpy('foreign highlight setter'),
+};
+@Directive({selector: '[foreignPeerItem]', standalone: false, providers: [{provide: MatMenuItem, useValue: foreignItem}]})
+class ForeignPeerItemToken {}
+@Component({standalone: false, template: `<button [matMenuTriggerFor]="parent" #root="matMenuTrigger">root</button>
+<mat-menu #parent="matMenu"><button foreignPeerItem [matMenuTriggerFor]="child" #childTrigger="matMenuTrigger">child</button></mat-menu>
+<mat-menu #child="matMenu"><button mat-menu-item>item</button></mat-menu>`})
+class ForeignPeerTokenMenu {
+ @ViewChild('root') root: MatLegacyMenuTrigger;
+ @ViewChild('childTrigger') child: MatLegacyMenuTrigger;
+}
+@Component({standalone: false, template: `<button mat-menu-item>duplicate</button>`})
+class BothItemSelectors {}

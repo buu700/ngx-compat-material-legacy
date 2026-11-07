@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "role": "Root legacy menu item injection ownership repair review",
+  "parent": "38e1ed8d076d4b45727f4feab7270c873f3adf68",
+  "proposal_sha256": "b0da997104559325dd4bba99e947847ba38130b475541cce7cd3f11e669eadb5",
+  "qualified_isolated_source": {
+    "repository": "buu700/ngx-compat-material-legacy",
+    "line": "main",
+    "commit": "a439fa67fd6b1f18b3fad3c9cb9198cd9d56c7f8",
+    "git_tree_sha": "c7addd0531511a83313c8958c82768c738a7b618",
+    "content_sha256": "ac120a7233e8fcafc99a01b513e6f2b5f10cfec94c741ae574708ae6bcae36bc",
+    "clean": true,
+    "candidate_base_commit": "a439fa67fd6b1f18b3fad3c9cb9198cd9d56c7f8"
+  },
+  "source_images": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+      "before_sha256": "cf194f6db3222ed6603df40c2a74738facd19a6d69855f3a46150514996c78af",
+      "after_sha256": "5f9b5fbe09d5bdc50bcb937e458ffb83bd49dddca1b0c0c64fadb5d267cfe6a3",
+      "bytes": 30731
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+      "before_sha256": "503624af3d7254ef40217085c397d23625495a6d3817578f26b36a04275ae435",
+      "after_sha256": "fc8cb329b2b528de2e1071878154d240bcf9f9ecfb1357d868e5161eeceab64c",
+      "bytes": 134523
+    }
+  ],
+  "independent_review": {
+    "sha256": "264c8694acfea14b4f68310d51d65bb4c571cbf6546708493b3b280cbecc2e23",
+    "report": {
+      "patch": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/menu-authored-main/identity-qualification/proposed.patch",
+      "patch_sha256": "b0da997104559325dd4bba99e947847ba38130b475541cce7cd3f11e669eadb5",
+      "candidate_commit": "a439fa67fd6b1f18b3fad3c9cb9198cd9d56c7f8",
+      "candidate_commit_scope": "isolated root snapshot, not canonical ancestry",
+      "result": "no concrete blocker within bounded product fix",
+      "reasoning": [
+        "Trigger parameter remains _LegacyMenuItemBase typed, @Optional and @Self; injection now uses the exact owned token already provided by MatLegacyMenuItem. Existing peer MatMenuItem useExisting provider remains, so peer lookup identity for owned item is preserved. The unrelated peer token is no longer invoked as if it had owned private methods.",
+        "Existing manual constructor overloads and body are unchanged; independent construction of exported base from both extracted artifacts with sentinel sixth argument retained that exact object. Loading both package copies in one Node process emitted Angular component-ID warnings, without affecting those assertions.",
+        "Mixing current and legacy item components on the same selector raises NG0300 in the explicit test; no claim that those two components can coexist on one host.",
+        "All 45 packed declarations byte-identical; all 439 project HTML/CSS/SCSS and 303 packed HTML/CSS/SCSS byte-identical. Only trigger source and menu spec differ across full product trees.",
+        "Cyph TypeScript search found one legacy menu trigger import and no direct menu item token or trigger constructor in the searched tree."
+      ],
+      "tests": [
+        {
+          "subject": "candidate",
+          "artifact_sha256": "bdc8cfd77bd36638c7ae8ad74437b94d37aeddca6abd32560300a31d8a849b84",
+          "mode": "artifact",
+          "result": "169 passed, 0 failed; all three new cases passed",
+          "report": "tree/artifacts/candidate/reports/legacy-menu-20261107T130758Z.json",
+          "report_sha256": "1f6178fa2d5ff68bf6acc69fa39649c275b7916580f54ccb5fbfdf0e23f815b3",
+          "log_sha256": "1493b20f3e8167151ec1c426a8df811d6843ac8733f47b11797e64b54f3f2dbd"
+        },
+        {
+          "subject": "baseline negative",
+          "artifact_sha256": "de6ffdb22268d884037f4661bf8972dc04531cbf0a5eb97f008728e57c54a840",
+          "mode": "artifact with same candidate tests",
+          "result": "168 passed, 1 failed: foreign peer token selected, foreign setter called, _getHostElement TypeError",
+          "report": "tree/artifacts/baseline/reports/legacy-menu-20261107T130815Z.json",
+          "report_sha256": "41e5783a4443b6037602ea3b3e24e37f8aa6a47c5df179dd6d7a9a7ae704f8a0",
+          "log_sha256": "8e475dbcaa466edc33c26f0373f9f3106c337600e917e227b5d521ab4c6394a1"
+        }
+      ],
+      "environment": "Node v24.21.0; Chromium 149.0.7827.0 custom; Linux arm64; Angular/Material/CDK 22.1.7 peers per run manifest.",
+      "limits": [
+        "The new DI behavior deliberately ignores third-party providers of the current peer item token unless they also provide the owned token.",
+        "No formal 41-source admission, full historical suite, native M3, wider browser/floor matrix, G11, security or release claim."
+      ]
+    }
+  },
+  "qualification": {
+    "proposal": "Use owned _LegacyMenuItemBase token for the optional self-injection, while preserving the legacy item peer-token useExisting provider and constructor parameter/type.",
+    "candidate_source_sha256": "5f9b5fbe09d5bdc50bcb937e458ffb83bd49dddca1b0c0c64fadb5d267cfe6a3",
+    "canonical_source_sha256": "cf194f6db3222ed6603df40c2a74738facd19a6d69855f3a46150514996c78af",
+    "patch_sha256": "b0da997104559325dd4bba99e947847ba38130b475541cce7cd3f11e669eadb5",
+    "candidate_pack_sha256": "bdc8cfd77bd36638c7ae8ad74437b94d37aeddca6abd32560300a31d8a849b84",
+    "baseline_pack_sha256": "de6ffdb22268d884037f4661bf8972dc04531cbf0a5eb97f008728e57c54a840",
+    "reports": [
+      {
+        "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/menu-authored-main/identity-qualification/workspace/artifacts/main/identity-candidate-v2/reports/legacy-menu-20261107T130128Z.json",
+        "sha256": "9393b4e804985ee46250f23757fac41531c5535f9a5112f20ab5d3be338406f1",
+        "subject_mode": "artifact",
+        "artifact_sha256": "bdc8cfd77bd36638c7ae8ad74437b94d37aeddca6abd32560300a31d8a849b84",
+        "totals": {
+          "executed": 169,
+          "passed": 169,
+          "failed": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/menu-authored-main/identity-qualification/workspace/artifacts/main/baseline-de6-copy/reports/legacy-menu-20261107T130143Z.json",
+        "sha256": "a0e0aeff8636f594360530dc90bb1cd0e2bb67c5ffbe05af10954fbeda14519f",
+        "subject_mode": "artifact",
+        "artifact_sha256": "de6ffdb22268d884037f4661bf8972dc04531cbf0a5eb97f008728e57c54a840",
+        "totals": {
+          "executed": 169,
+          "passed": 168,
+          "failed": 1,
+          "skipped": 0
+        }
+      }
+    ],
+    "html_css_scss": {
+      "baseline_files": 439,
+      "candidate_files": 439,
+      "changed": 0,
+      "added": 0,
+      "removed": 0
+    },
+    "declaration_files": {
+      "baseline_files": 45,
+      "candidate_files": 45,
+      "changed": 0,
+      "added": 0,
+      "removed": 0
+    },
+    "cyph_inventory_sha256": "472fb7b2c685e1f44032dec8003c050d284f7dc18c7509bd42caf8107b74483b",
+    "positive_log_sha256": "ddd4bf4564eaf045c9412545b1762fd9441e1965783e66c58d26e46ba2b12885",
+    "negative_log_sha256": "0e046455bf79f9b39588cbffbb0b06491233b95f4532707cc8b764c4f919f370",
+    "qualification": "Isolated candidate only; no change committed to canonical checkout, no full product suite, floor matrix, browser matrix or security scan."
+  },
+  "root_checks": [
+    "All1143projectfilesmatchthequalifiedisolatedcandidateworkspace, bothchangedfilesalso matchitsactualcommittedGitblobs.",
+    "All439projectHTML/CSS/SCSSfilesbyte-equalcurrentmainparent.",
+    "Rehashedbaselineandcandidatepackedtarballs;45declarationsand303packedHTML/CSS/SCSSmembersbyte-equal;onlymenuFESMJSandtwosourcemapsdiffer.",
+    "Actualcandidateartifact169testsallpass;baselinede6same169tests failssoleforeign-peer-tokenregression;rootrehashedbothretainedreports.",
+    "Independentreviewconfirmedownedoptional-selfDIlookupandpeer-tokenaliasproviderunchanged, manualconstructionretains suppliedargument;constructor overloads/types/bodyunchanged.",
+    "RootCyphTSsearchfoundonlyMatLegacyMenuTriggeraliasimportandViewChildqueryinchat-message.component.ts;noitemtokenoverrideormanualitem/triggerconstruction."
+  ],
+  "behavior": "Use the owned menu item base token, already provided by the legacy item, for submenu/highlight behavior. A foreign value under the peer item token no longer turns an ordinary trigger into a legacy submenu or receives owned private-method calls.",
+  "limits": [
+    "Intentional change for peer-only custom providers: an owned legacy item is required for legacy submenu item behavior. Current and legacy item components on one host remain Angular NG0300.",
+    "Qualification is the isolated candidate pack/source, not a fresh full current-main packed verifier. Source-bound current protocols must explicitly qualify these two new project afterimages and removed peer import before current-source readiness.",
+    "No HTML/CSS/SCSS consumer edits or public declaration changes. No Cyph build, full browser/floor suite, security/G11/complete-audit or release claim.",
+    "Existing source-role/private-profile frames remain historical until their separately reviewed current-source successors are integrated."
+  ]
+}
