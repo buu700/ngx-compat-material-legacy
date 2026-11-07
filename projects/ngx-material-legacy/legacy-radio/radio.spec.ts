@@ -1246,15 +1246,18 @@ describe('legacy radio group ownership boundary', () => {
   function verifyForeignGroupBoundary(Host: Type<any>) {
       TestBed.configureTestingModule({imports: [Host]});
       const fixture = TestBed.createComponent(Host); fixture.detectChanges(); tick(); fixture.detectChanges();
-      const group = fixture.debugElement.query(By.directive(CurrentRadioGroup)).injector.get(CurrentRadioGroup) as any;
+      const group = fixture.debugElement.query(By.directive(CurrentRadioGroup)).injector.get(CurrentRadioGroup);
       const buttons = fixture.debugElement.queryAll(By.directive(MatLegacyRadioButton));
       expect(buttons.length).toBe(2);
-      const cva = spyOn(group, '_controlValueAccessorChangeFn').and.callThrough();
-      const emit = spyOn(group, '_emitChangeEvent').and.callThrough();
-      const touch = spyOn(group, '_touch').and.callThrough();
+      const valueBefore = group.value, selectedBefore = group.selected;
+      const cva = jasmine.createSpy('foreign group change callback');
+      const touched = jasmine.createSpy('foreign group touched callback');
+      const changed = jasmine.createSpy('foreign group change event');
+      group.registerOnChange(cva); group.registerOnTouched(touched); group.change.subscribe(changed);
       const input = buttons[1].nativeElement.querySelector('input') as HTMLInputElement;
       input.click(); input.focus(); tick(); input.blur(); tick();
-      expect(cva).not.toHaveBeenCalled(); expect(emit).not.toHaveBeenCalled(); expect(touch).not.toHaveBeenCalled();
+      expect(cva).not.toHaveBeenCalled(); expect(changed).not.toHaveBeenCalled(); expect(touched).not.toHaveBeenCalled();
+      expect(group.value).toBe(valueBefore); expect(group.selected).toBe(selectedBefore);
       expect(buttons.map(node => node.componentInstance.radioGroup)).toEqual([null, null]);
       fixture.destroy();
   }
