@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "role": "Root integration of historical empty-menu visibility and native CSS animation lifecycle repair",
+  "parent": "782197eccfdd353980ce4c1eaba047abae9f7424",
+  "qualification_sha256": "098f337a20d0b9c9fb59da5c88fb84a73d47c6b432610b9e6ed6fd177ce710c6",
+  "qualification": {
+    "scope": "Isolated legacy menu empty-content motion source/style fix proposal; no canonical change",
+    "root_head": "782197eccfdd353980ce4c1eaba047abae9f7424",
+    "patch_sha256": "06f409f3adcfb71d19cde437c5f430ae093a8de75adc31d153a1bde9eb7934a6",
+    "base_menu_scss_sha256": "12060fcd8ce36c824a71fd9ecaaa801ab381d0a56158ed7bcbf4a85e29ebdc75",
+    "candidate_menu_scss_sha256": "87cfc81cd06a7a90e77336384372953cfeff27f038533b2c9c62dd024ba2c571",
+    "candidate_spec_sha256": "1839ef39b9d26b5880e11e29eeb6fe7b755390de73cf8c4bc71b8590875ae2ff",
+    "candidate_artifact_sha256": "b5df0c88eb31f119a58f4138535da3b999fe9745188fbdbd711f9f1a194b2f61",
+    "baseline_artifact_sha256": "bdc8cfd77bd36638c7ae8ad74437b94d37aeddca6abd32560300a31d8a849b84",
+    "reference": {
+      "untouched_material_16_scss_sha256": "44ca0598ca575bf732f875667b5ae330786b505e36fa8d39c2a06c7e0de3fee1",
+      "untouched_material_16_motion_sha256": "d383bf1b1dc1408813543ea209d743526b8382e9f840bffa14e7d55f04824518",
+      "observation": "historical ng-animating disables pointer events; tagged motion uses opacity/scale and never hides empty panel by display:none."
+    },
+    "style_review": {
+      "compiled_delta": "compiled-css-delta.patch",
+      "compiled_delta_sha256": "44afadecf5bf4459eb7e9178375e433237bfb5dccb5e4cb42bfd504c41ab9bec",
+      "scope": "exactly two removed :has empty-content display:none rules; pointer-events none preserved for both legacy ng-animating and owned animating classes; no other Sass output change in isolated menu.scss compilation.",
+      "resource_comparison": "439 product HTML/CSS/SCSS files examined, only legacy-menu/menu.scss differs; no other added/removed resources.",
+      "declaration_files": 45,
+      "changed_declarations": []
+    },
+    "tests": [
+      {
+        "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/menu-empty-motion/workspace/artifacts/main/identity-baseline/reports/legacy-menu-20261107T145920Z.json",
+        "sha256": "cdb14da64f881f6209aa73b63b441c365fd6c6e4169d0e5a8426c897e95052ba",
+        "artifact_sha256": "bdc8cfd77bd36638c7ae8ad74437b94d37aeddca6abd32560300a31d8a849b84",
+        "totals": {
+          "executed": 176,
+          "passed": 173,
+          "failed": 3,
+          "skipped": 0
+        },
+        "failures": [
+          {
+            "suite": "MatMenu",
+            "description": "keeps an empty panel visible through native CSS enter completion",
+            "log": [
+              "Expected 'none' not to be 'none'.\n    at <Jasmine>\n    at UserContext.<anonymous> (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:92579:55)",
+              "Expected false to be true.\n    at <Jasmine>\n    at UserContext.<anonymous> (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:92580:31)",
+              "Expected true to be false.\n    at <Jasmine>\n    at UserContext.<anonymous> (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:92582:72)"
+            ]
+          },
+          {
+            "suite": "MatMenu",
+            "description": "completes real empty-menu exit and shared-trigger reopen (motion true)",
+            "log": [
+              "Expected 'none' not to be 'none'.\n    at <Jasmine>\n    at UserContext.<anonymous> (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:92624:64)",
+              "Expected false to be true.\n    at <Jasmine>\n    at UserContext.<anonymous> (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:92636:32)"
+            ]
+          },
+          {
+            "suite": "MatMenu",
+            "description": "keeps an empty shared menu rendered through enter, transfer and exit (motion true)",
+            "log": [
+              "Expected 'none' not to be 'none'.\n    at <Jasmine>\n    at UserContext.<anonymous> (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:92703:59)\n    at UserContext.fakeAsyncFn (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:32050:27)\n    at _ZoneDelegate2.invoke (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:27918:168)\n    at _ProxyZoneSpec.onInvoke (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:31234:43)",
+              "Expected 'none' not to be 'none'.\n    at <Jasmine>\n    at UserContext.<anonymous> (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:92706:59)\n    at UserContext.fakeAsyncFn (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:32050:27)\n    at _ZoneDelegate2.invoke (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:27918:168)\n    at _ProxyZoneSpec.onInvoke (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:31234:43)",
+              "Expected 'none' not to be 'none'.\n    at <Jasmine>\n    at UserContext.<anonymous> (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:92718:59)\n    at UserContext.fakeAsyncFn (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:32050:27)\n    at _ZoneDelegate2.invoke (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:27918:168)\n    at _ProxyZoneSpec.onInvoke (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:31234:43)",
+              "Expected 'none' not to be 'none'.\n    at <Jasmine>\n    at UserContext.<anonymous> (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:92731:59)\n    at UserContext.fakeAsyncFn (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:32050:27)\n    at _ZoneDelegate2.invoke (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:27918:168)\n    at _ProxyZoneSpec.onInvoke (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?4b6afeb7600fed1a042b422fa9c3b36ecb83d646:31234:43)"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/menu-empty-motion/workspace/artifacts/main/empty-motion-candidate/reports/legacy-menu-20261107T145938Z.json",
+        "sha256": "2c681e26b0c754e77b9d81796eabbe1f75b94a05872a77987eb375c54c8979f9",
+        "artifact_sha256": "b5df0c88eb31f119a58f4138535da3b999fe9745188fbdbd711f9f1a194b2f61",
+        "totals": {
+          "executed": 176,
+          "passed": 176,
+          "failed": 0,
+          "skipped": 0
+        },
+        "failures": []
+      }
+    ],
+    "test_scope": "Same final fixture on both packed subjects. Native Chromium uses animationstart/end events with bounded 1500ms waits and explicit in-flight exit visibility, plus bounded DOM-removal poll; synthetic animationstart/end checks empty shared triggers and pointer styles, immediate populated lazy transfer with enabled/disabled motion; existing menu suite retained.",
+    "limitations": [
+      "Native browser Chromium 149 only and specific timing; no screen reader, peer/floor matrix, full historical suite, security or release claim.",
+      "Static historical reference analyzed; no original Material16 browser execution; no golden updates.",
+      "Candidate packed product built before final two test-only additions; production SCSS bytes match final source, final test source hash is recorded independently.",
+      "Event waits have a 1500ms bound; extremely stalled animation delivery can still time out."
+    ]
+  },
+  "independent_review": {
+    "sha256": "1de688e3d6f0b17b6ba25bfdd74b0d29e8be8d6b4bc885db32a99fba8e4c19b4",
+    "record": {
+      "scope": "Independent source/style and retained packed behavior review of menu empty-motion v2",
+      "patch_sha256": "06f409f3adcfb71d19cde437c5f430ae093a8de75adc31d153a1bde9eb7934a6",
+      "qualification_sha256": "098f337a20d0b9c9fb59da5c88fb84a73d47c6b432610b9e6ed6fd177ce710c6",
+      "base": "782197eccfdd353980ce4c1eaba047abae9f7424",
+      "result": "No remaining finding in bounded review",
+      "review": [
+        "Removed exactly two empty-content display:none rules; both animation pointer-events rules retained. Compiled CSS diff hash independently verified.",
+        "Strict whitespace apply check passed. Historical static reference has no empty-panel display rule; no tagged browser execution claimed.",
+        "Event-based named start/end waits and bounded removal polling address v1 fixed-sleep timing concern; bound remains subject to extreme browser stalls.",
+        "Verified both retained report and packed tar hashes; same final fixture reports baseline 173/176 and candidate 176/176, with empty motion regression controls.",
+        "Synthetic shared trigger and populated lazy transfer assertions are supplemental to actual native enter, exit and reopen observations."
+      ],
+      "artifact_sha256": {
+        "baseline": "bdc8cfd77bd36638c7ae8ad74437b94d37aeddca6abd32560300a31d8a849b84",
+        "candidate": "b5df0c88eb31f119a58f4138535da3b999fe9745188fbdbd711f9f1a194b2f61"
+      },
+      "limits": "Chromium 149 only; no independent fresh browser rerun, historical16 browser execution, full historical suite, accessibility, full matrix, security, or release qualification. Candidate packed product predates final test-only changes; SCSS bytes bound by qualification."
+    }
+  },
+  "root_review": {
+    "all1143_project_files_match_qualified_workspace": true,
+    "both_changed_file_hashes_match": true,
+    "all_test_reports_and_compiled_delta_rehashed": true,
+    "exact_css_delta": "--- baseline-menu.css\n+++ candidate-menu.css\n@@ -15,9 +15,6 @@\n }\n .mat-menu-panel.ng-animating {\n   pointer-events: none;\n-}\n-.mat-menu-panel.ng-animating:has(.mat-menu-content:empty) {\n-  display: none;\n }\n .cdk-high-contrast-active .mat-menu-panel {\n   outline: solid 1px;\n@@ -169,6 +166,3 @@\n .mat-menu-panel.mat-menu-panel-animations-enabled.mat-menu-panel-animating {\n   pointer-events: none;\n }\n-.mat-menu-panel.mat-menu-panel-animations-enabled.mat-menu-panel-animating:has(.mat-menu-content:empty) {\n-  display: none;\n-}\n",
+    "reason": "Empty-content display:none cancels actual enter animation, preventing animationend and leaving animating state set. Removed only both nonhistorical hide selectors while retaining pointer suppression. Tests use named native event waits and bounded DOM removal plus separate synthetic transfer controls; candidate176/176 vs baseline173/176.",
+    "goldens_changed": false
+  },
+  "pending": [
+    "Shared resting_resource_css_probe currently expects removed menu rules as old unqualified receipts. Its narrow source-specific successor is owned by formfield remediation author and is not claimed passing here.",
+    "New product/menu.spec images require finite source-context/inventory reconciliation after product repair batch.",
+    "Other active formfield/dialog repairs mean this is not finalpackedbranch qualification."
+  ]
+}
