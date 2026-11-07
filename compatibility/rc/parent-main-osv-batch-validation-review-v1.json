@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "role": "Root integration of fail-closed OSV querybatch envelope and row validation",
+  "parent": "5ddd6f98b9af8c4b4f7bee619eb291c2a9950b1c",
+  "qualification_sha256": "ee95ca73efad62bd830005fda27f14601b62fbc4bac9c43bac1a1aa641137967",
+  "qualification": {
+    "base": "dc645ffb75bd357d479e78e86b1f98825c068709",
+    "supersedes": "0864a05d23da2148587ca025e2dd0a6b60c52c63c8f2a252a4c28d78f9f7a568",
+    "patch": {
+      "path": "../osv-batch-validation-v2.patch",
+      "sha256": "23419ade4291ed5da14113c77e13771d3694f0d4d4034938779e7f8f3ca679d5",
+      "bytes": 16363
+    },
+    "afterimages": [
+      {
+        "path": "scripts/check-dependency-eligibility.py",
+        "sha256": "434bb8aacc0678e6b9c28fc745651d8dad198823e52220a28943ae22419f6da6",
+        "bytes": 137316
+      },
+      {
+        "path": "tests/test_osv_batch_schema.py",
+        "sha256": "527a1fb166c93fa451c1aaea1f5e1c60b16c8d7aa04c1aa348e98c3974b0359b",
+        "bytes": 8253
+      }
+    ],
+    "tests": [
+      {
+        "path": "../schema-v2-final.log",
+        "sha256": "e11bbb630c1a6ea91f4322ac92d7ce2a6c043ad84d3e41ecf0d0f5a73e9c9fd0",
+        "bytes": 104
+      },
+      {
+        "path": "../schema-v1-envelope-negative.log",
+        "sha256": "bdc72a752a36807a6aff0e770dc6a8ad7b65962fd1adc7428cb7c7b57c998c40",
+        "bytes": 6599
+      },
+      {
+        "path": "../schema-integration.log",
+        "sha256": "332ea49043ed8047e1c191ccb4a7e10a7f0ce879f7acb15370b9de64830a81c8",
+        "bytes": 3246
+      }
+    ],
+    "protocol": "https://google.github.io/osv.dev/post-v1-querybatch/",
+    "limits": [
+      "No full advisory scan, security clearance, exception renewal, withdrawal suppression or G11 claim.",
+      "OSV documented ordering is trusted; rows do not echo package identity, so reordered valid responses cannot be independently detected.",
+      "Existing broader report-fidelity suite cannot initialize on dc645 due 23 absent common-module source binding paths; separate source-owner integration required.",
+      "schema-v1-envelope-negative.log demonstrates pre-v2 v1 false success; original dc645 baseline failures separately retained in schema-baseline.log.",
+      "Fresh one-package batch is separately retained and does not constitute a full source-bound dependency-eligibility run."
+    ]
+  },
+  "independent_review": {
+    "sha256": "b19a83f97f15f24746a214b0fe4135293281460b9ed32fd0938ccac3aa2aa5e3",
+    "text": "# Independent review: OSV batch validation v2\n\nReviewed immutable `../osv-batch-validation-v2.patch`, SHA-256 `23419ade4291ed5da14113c77e13771d3694f0d4d4034938779e7f8f3ca679d5`, base `dc645ffb75bd357d479e78e86b1f98825c068709`. Applied independently to a temporary copy of the base script and the minimum fixture files. No canonical edits or remote calls.\n\n**Result:** No remaining finding in the bounded parser and status-flow review. The earlier top-level envelope finding is addressed for both consumers. `_osv_batch_envelope_error` requires exactly the `results` field, a list and the expected count; `_osv_batch` returns its error to `perform_lookup`, which leaves status unknown and rows empty; `query_tool_advisories` independently marks malformed envelopes unknown. Valid `{ \"results\": [{}] }` remains accepted. Raw response capture remains available. The row validator rejects error, unexpected and pagination fields, invalid findings, and count mismatch before normalization; valid finding IDs flow to classification. Disposition logic and withdrawn handling are unchanged.\n\nRan six new schema tests successfully, including mocked complete producer invalid envelopes and valid result, tool producer error/unknown envelopes, malformed rows and expired braces grant. Re-ran original reproduction: valid envelope produced workspace `(200, [{}], '')` and tool `queried`; error and unexpected field produced workspace errors and tool `unknown`. Ran retained original `test_osv_http_failure_and_malformed_rows_are_preserved_not_passed` successfully with the class fixture setup bypassed; the test itself does not need a physical root. All tests were offline and used mocks.\n\nLimits: Full report-fidelity suite was not run because its physical fixture is blocked by 23 separately removed common-module source paths; physical binding and live OSV service were not assessed. This is a bounded correctness review, not a security scan or complete release qualification.\n"
+  },
+  "retained_v1_rejection": {
+    "sha256": "b331d132538ae211425a69c85ff7630df213407efdb00cbc7b8ca40d1ca68a59",
+    "text": "# Independent review: original OSV batch validation patch\n\nPatch: `../osv-batch-validation.patch`; SHA-256 `0864a05d23da2148587ca025e2dd0a6b60c52c63c8f2a252a4c28d78f9f7a568`. Reviewed in a temporary tree with the patch applied to the canonical checkout's matching source. No canonical edits or network calls.\n\n**Finding:** The response envelope is not validated by `_osv_batch` (original source lines 263\u2013270) or `query_tool_advisories` (original source lines 438\u2013443). HTTP 200 with `{\"results\":[{}],\"error\":\"failed\"}` or `{\"results\":[{}],\"unexpected\":\"value\"}` is accepted as a successful empty workspace batch and queried tool batch. This violates fail-closed handling of malformed/error/unknown responses. The parser does correctly preserve `{\"results\":[{}]}` as an empty result. The added tests exercise row validation but not malformed envelopes with valid-looking results.\n\nRun `python3 repro.py /path/to/patched/scripts/check-dependency-eligibility.py`. Observed output:\n\n```\n{'results': [{}]} workspace= (200, [{}], '') tool= queried\n{'results': [{}], 'error': 'failed'} workspace= (200, [{}], '') tool= queried\n{'results': [{}], 'unexpected': 'value'} workspace= (200, [{}], '') tool= queried\n```\n\nThe five added schema tests passed. The retained original `test_osv_http_failure_and_malformed_rows_are_preserved_not_passed` passed against patched source with class fixture setup bypassed, because that particular test requires no physical root. It covers HTTP failure, missing results, and count mismatch, not mixed valid results and bad envelope fields. Full report-fidelity suite was not run; its full physical fixture is blocked by 23 separately removed common-module paths. The review does not assert live OSV availability or assess unrelated code.\n"
+  },
+  "root_checks": [
+    "Strict whitespace apply passes on current parent; exact both afterimages and all retained test log hashes verified.",
+    "PinnedPython3.14.7 actual unittest discover test_osv_batch_schema.py:6 passed.",
+    "Invalid/error/unknown envelopes and malformed/paginated rows become errors/unknown instead of clean; valid ordered empty rows remain accepted. Existing findings remain unresolved.",
+    "No dependency/peer version, grant expiry, temporary exception, advisory suppression, production resource or golden changed."
+  ],
+  "limits": [
+    "Protocol ordering trusted because OSV rows do not echo queried package identity; no false claim reordered valid rows can be independently detected.",
+    "Existing full report-fidelity physical fixture references23 deleted common-module paths and is not claimed passing. Independent retained transport negative passed with unused fixture bypassed.",
+    "No fresh full advisory lookup/eligibility/security/G11/audit/release claim; fresh one-package advisory observations remain separate.",
+    "Checker source image changed and requires later exact source/tool context successor."
+  ]
+}

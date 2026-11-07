@@ -248,6 +248,21 @@ def _node_publish_time(version: str, capture: dict | None = None) -> tuple[datet
     return None, f"node {version} not in index"
 
 
+def _osv_batch_envelope_error(body: object, expected_count: int) -> str:
+    """A querybatch envelope must contain only the complete ordered results."""
+    if not isinstance(body, dict):
+        return "advisory body is not an object"
+    if "error" in body:
+        return "advisory batch reports an error"
+    if set(body) != {"results"}:
+        return "advisory batch envelope has missing or unrecognized fields"
+    if not isinstance(body["results"], list):
+        return "advisory results missing or not a list"
+    if len(body["results"]) != expected_count:
+        return "advisory batch result count does not match requested queries"
+    return ""
+
+
 def _osv_batch(packages: list[tuple[str, str]], capture: dict | None = None) -> tuple[int | None, list | None, str]:
     queries = [
         {"package": {"name": name, "ecosystem": "npm"}, "version": version}
@@ -261,12 +276,11 @@ def _osv_batch(packages: list[tuple[str, str]], capture: dict | None = None) -> 
         capture.update(queries=queries, parsed_response=body)
     if error and status is None:
         return None, None, error
-    if not isinstance(body, dict):
-        return status, None, error or "advisory body is not an object"
-    results = body.get("results")
+    envelope_error = _osv_batch_envelope_error(body, len(queries))
+    results = body.get("results") if isinstance(body, dict) else None
     if not isinstance(results, list):
-        return status, None, "advisory results missing"
-    return status, results, ""
+        results = None
+    return status, results, error or envelope_error
 
 
 def inspect_tool_archive(raw: bytes, pin: dict) -> list[dict]:
@@ -428,6 +442,51 @@ def tool_advisory_subjects(root: Path, acquire=acquire_tool_archive) -> dict:
                             "This census does not replace Node-core advisory review or a vulnerability applicability/clearance decision."]}
 
 
+def _osv_batch_row_error(result: object) -> str:
+    """Validate one ordered OSV querybatch result; incomplete data stays unknown."""
+    if not isinstance(result, dict):
+        return "result is not an object"
+    if "error" in result:
+        return "result reports an error"
+    # Pagination is per query. Never interpret a partial page as a clean row.
+    if "next_page_token" in result:
+        return "result is paginated"
+    if set(result) - {"vulns"}:
+        return "result contains unrecognized fields"
+    if "vulns" not in result:
+        return ""
+    vulns = result["vulns"]
+    if not isinstance(vulns, list):
+        return "vulns is not a list"
+    ids = set()
+    for vuln in vulns:
+        if not isinstance(vuln, dict):
+            return "vulnerability is not an object"
+        advisory = vuln.get("id")
+        if not isinstance(advisory, str) or not advisory.strip():
+            return "vulnerability id is missing or invalid"
+        if advisory in ids:
+            return "duplicate vulnerability id"
+        ids.add(advisory)
+        if "modified" in vuln and (not isinstance(vuln["modified"], str) or parse_time(vuln["modified"]) is None):
+            return "vulnerability modified timestamp is invalid"
+        if "summary" in vuln and vuln["summary"] is not None and not isinstance(vuln["summary"], str):
+            return "vulnerability summary is invalid"
+    return ""
+
+
+def _osv_workspace_batch_error(packages: list[tuple[str, str]], results: object) -> str:
+    if not isinstance(results, list) or len(results) != len(packages):
+        return "advisory batch result count does not match requested packages"
+    if len(set(packages)) != len(packages):
+        return "advisory batch contains duplicate requested packages"
+    for index, (package, result) in enumerate(zip(packages, results)):
+        error = _osv_batch_row_error(result)
+        if error:
+            return f"advisory batch row {index} ({package[0]}@{package[1]}): {error}"
+    return ""
+
+
 def query_tool_advisories(subjects: dict) -> dict:
     cutoff = datetime.now(timezone.utc).isoformat()
     queries = subjects["queries"]
@@ -436,17 +495,16 @@ def query_tool_advisories(subjects: dict) -> dict:
     status, response, error = _http_json("https://api.osv.dev/v1/querybatch", method="POST", payload=payload, timeout=120, capture=transport)
     transport.update(queries=[row["query"] for row in queries], parsed_response=response)
     results = response.get("results") if isinstance(response, dict) else None
-    complete = status == 200 and not error and isinstance(results, list) and len(results) == len(queries)
+    envelope_error = _osv_batch_envelope_error(response, len(queries))
+    error = error or envelope_error
+    complete = status == 200 and not error
     rows, unresolved = [], []
     if complete:
         for subject, result in zip(queries, results):
-            if not isinstance(result, dict) or "error" in result or not isinstance(result.get("vulns", []), list):
+            if _osv_batch_row_error(result):
                 complete = False
                 break
             vulns = result.get("vulns", [])
-            if any(not isinstance(vuln, dict) or not isinstance(vuln.get("id"), str) or not vuln["id"] for vuln in vulns):
-                complete = False
-                break
             rows.append({**subject, "vulns": vulns})
             if vulns:
                 unresolved.append(subject["id"])
@@ -1224,8 +1282,9 @@ def classify_tool_findings(root: Path, observation: dict, now: datetime | None =
 def _vuln_rows(packages: list[tuple[str, str]], results: list) -> tuple[dict, list[str]]:
     rows = {}
     unresolved = []
-    if len(results) != len(packages):
-        return rows, [f"truncated advisory batch {len(results)}/{len(packages)}"]
+    error = _osv_workspace_batch_error(packages, results)
+    if error:
+        return rows, [error]
     for (name, version), result in zip(packages, results):
         vulns_in = result.get("vulns") if isinstance(result, dict) else None
         if vulns_in is None:
@@ -1784,14 +1843,18 @@ def perform_lookup(root: Path, now: datetime) -> dict:
                            "rows": [], "uncovered": ["tool census unknown"], "unresolved": []}
     tool_npm = [(q["query"]["package"]["name"], q["query"]["version"]) for q in tool_subjects["queries"]
                 if q["query"].get("package", {}).get("ecosystem") == "npm"]
-    age_packages = packages + [item for item in tool_npm if item not in packages]
+    age_packages = list(dict.fromkeys(packages + tool_npm))
     queried = age_packages + [item for item in vendor_packages if item not in age_packages]
     osv_transport = {}
     status, results, error = _osv_batch(queried, capture=osv_transport) if queried else (None, [], "no packages")
     truncated = bool(results is not None and len(results) != len(queried))
+    if status == 200 and not error and not truncated:
+        error = _osv_workspace_batch_error(queried, results)
     rows, unresolved = ({}, [error or "advisory lookup failed"])
-    if results is not None and status == 200 and not truncated:
+    if results is not None and status == 200 and not truncated and not error:
         rows, unresolved = _vuln_rows(queried, results)
+    elif error:
+        unresolved = [error]
     elif status != 200:
         unresolved = [error or f"advisory http_status={status}"]
     covered = set(rows)
