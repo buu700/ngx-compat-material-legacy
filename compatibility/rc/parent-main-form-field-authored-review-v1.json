@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "role": "Root bounded main form-field authored-use review and token regression integration",
+  "parent": "27615a4ee00e497282945b9252cfd192515b5635",
+  "product_source": {
+    "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+    "sha256": "3d855b29cf307af3f023f383c3bd74c2bb18ac35c16a0b61c845a167949815c2",
+    "unchanged": true
+  },
+  "source_proposal_sha256": "34cbb7095e5f1a4e81c3d4fd79abda1d0ec87eaf9a4067bca8476c5708804274",
+  "portable_test_patch_sha256": "0c4f75b3c5b73dbcc9930040efd4a8d1c97d634c30139d61767f4bf8eb6d723b",
+  "independent_review": {
+    "sha256": "ebfd7d4d82eed12da211b4e1e9383d6e0f1666dbc3f0a5938bcd3b35e55880a2",
+    "text": "# Independent incremental review: form-field admission v4\n\nNo material blocker found for this bounded successor. This supplements `form-field-main-admission-independent/review.md` SHA-256 `de9222dde7b12000c17833605e7b32110d5c6b16d6849e6ff27d388745d573ab`, and the earlier 33-use and motion review; it does not make an admission, security or release-gate claim.\n\nThe frozen successor patch SHA-256 is `34cbb7095e5f1a4e81c3d4fd79abda1d0ec87eaf9a4067bca8476c5708804274`; manifest SHA-256 is `b00362685a0e3407ff8175d6748a8c02830dd9a59cc12aeab1df80d73ef40f6c`. `git apply --check` succeeded on main `27615a4ee00e497282945b9252cfd192515b5635`; product, frozen authored roster and shared inventory checker have no diff between 8baa and that HEAD. This is an applicability check, not patch installation.\n\n## Resolver correction and v4 observation\n\nThe v4 receipt SHA-256 `c1be4b517af96eb8960290ab590bcc064f1820e064a7cbd34767531eddb7cf87` links predecessor v3 receipt `7d4c3ddb511c58d678ccdd7a1ff742caa89a68f50e56fb34c4edf575a0457a64` and the same 8baa packed artifact `de6ffdb22268d884037f4661bf8972dc04531cbf0a5eb97f008728e57c54a840`. Rehashed the source snapshot, all test inputs, four reports and metafiles, patch, log, pack snapshot, predecessor receipt, Node and browser files, lock and dependency files. The v4 build fixture alone changes from v3: `createRequire` now receives `realpathSync` of the installed compiler-cli package, allowing Node's normal pnpm dependency lookup rather than the v3 explicit NODE_PATH. The other five frozen test inputs, all four observations and all four bundle-metafile hashes are identical to v3. No expected behavior was changed. Each bundle metafile excludes the animation engine according to the exact input-name check.\n\nIndependently ran pinned Node v24.21.0 with `env -u NODE_PATH`, resolved the actual realpath of `@angular/compiler-cli/package.json`, and called `createRequire` on that realpath. It resolves Babel to the receipt's pnpm `@babel/core` 8.0.1 entry; the compiler's installed package declares `@babel/core` 8.0.1 and the locked compiler snapshot lists that version. The package, entry and lock bytes match receipt hashes. The receipt and resolution record state NODE_PATH was absent during the actual run; the independent command reproduces that resolution now but does not independently recover a completed process's environment. The receipt records the pinned Chrome wrapper and every actual report says `Chrome/149.0.7827.0`; prior review checked explicit executable selection, announced-child endpoint and wrapper version. No independent browser rerun was performed here.\n\nThe four cases remain the same focused real-Angular initial hint \u2192 error, coalesced final-kind and destruction checks under BrowserAnimations/NoopAnimations token \u00d7 Material motion policy combinations. They do not establish reverse transition, full SSR, other browsers, all runtime cases, or 21.x. The v2 Chrome156 observation and v3 run remain historical observations; v4 corrects resolver setup without broadening their assertions.\n\n## Successor preservation and checker\n\nIndependently compared baseline 8baa, predecessor, and v4 candidate rosters. All 1,736 triples and ordering and root metadata are unchanged; indices 46\u201378 alone receive updated review references and retain their complete baseline rows in `prior_disposition_record`. All 33 individual prior records/references, current source hashes, conclusions and decision text remain equal to the predecessor. Thirteen motion-related reviews append five v4 receipt/report references while retaining all prior v3 references; the context retains every predecessor field and adds the `focused_v4_receipt` field. The copied v4 receipt and four report bytes equal their original retained hashes. Their raw bundle metafiles, source snapshot and pack record are still external local evidence paths; transfer them with the review if independently reproducible evidence is needed.\n\nExecuted the successor direct checker probe with pinned Node24 and explicit canonical fallback. It reproduces baseline 340 to 307 insufficient, exactly 33 selected uses, and all ten specified negative controls, including alteration of the v4 receipt. It also repeats that a plausible changed review paired with a recomputed mutable roster hash is accepted: these checks enforce references and shape, not semantic-forgery detection or immutable authorship. The substantive source judgments come from the separate bounded review. No full C04, browser matrix, G11 or release qualification is inferred.\n"
+  },
+  "manifest": {
+    "line": "main",
+    "source_commit": "8baa761eca624c9d71293c3d31750a2b3fdeebf0",
+    "source_sha256": "3d855b29cf307af3f023f383c3bd74c2bb18ac35c16a0b61c845a167949815c2",
+    "baseline_roster_sha256": "6120541cdccccef6ec103192e86b539b61b27002d8636465f83bb3786a9e7d5b",
+    "candidate_roster_sha256": "e51c696b68534f3faf9d16da77c63d99aa0c98ad64007453a6827a5fe86aee62",
+    "roster_length": 1736,
+    "changed_indexes": [
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78
+    ],
+    "changed_count": 33,
+    "other_entries_and_root_metadata": "exact structural equality to baseline",
+    "patch_sha256": "34cbb7095e5f1a4e81c3d4fd79abda1d0ec87eaf9a4067bca8476c5708804274",
+    "files": {
+      "compatibility/f10/authored-use-reviews/form-field-main-8baa-browser-both-disabled.json": "a7b5aaeee60da48a5c7ff6c8b4347da78740975874c67edd424b4569c05ad0d2",
+      "compatibility/f10/authored-use-reviews/form-field-main-8baa-browser-config-disabled.json": "a7b5aaeee60da48a5c7ff6c8b4347da78740975874c67edd424b4569c05ad0d2",
+      "compatibility/f10/authored-use-reviews/form-field-main-8baa-browser-enabled.json": "803f8f8c9bc5ef842e08f4050d932c9d7500597de6c400c238975f155dba6cce",
+      "compatibility/f10/authored-use-reviews/form-field-main-8baa-browser-receipt.json": "7d4c3ddb511c58d678ccdd7a1ff742caa89a68f50e56fb34c4edf575a0457a64",
+      "compatibility/f10/authored-use-reviews/form-field-main-8baa-browser-token-noop.json": "a7b5aaeee60da48a5c7ff6c8b4347da78740975874c67edd424b4569c05ad0d2",
+      "compatibility/f10/authored-use-reviews/form-field-main-8baa-context.json": "097e4d3eddad91af38d69755a97d5354d785ccec491436a563642b205484daa6",
+      "compatibility/f10/authored-use-reviews/form-field-main-8baa-per-use.json": "1dcdaae3cbac9085f32e0b8f7f69c801466609e14751d028ae51845cb1184594",
+      "compatibility/f10/authored-use-reviews/form-field-main-8baa-v4-browser-both-disabled.json": "a7b5aaeee60da48a5c7ff6c8b4347da78740975874c67edd424b4569c05ad0d2",
+      "compatibility/f10/authored-use-reviews/form-field-main-8baa-v4-browser-config-disabled.json": "a7b5aaeee60da48a5c7ff6c8b4347da78740975874c67edd424b4569c05ad0d2",
+      "compatibility/f10/authored-use-reviews/form-field-main-8baa-v4-browser-enabled.json": "803f8f8c9bc5ef842e08f4050d932c9d7500597de6c400c238975f155dba6cce",
+      "compatibility/f10/authored-use-reviews/form-field-main-8baa-v4-browser-receipt.json": "c1be4b517af96eb8960290ab590bcc064f1820e064a7cbd34767531eddb7cf87",
+      "compatibility/f10/authored-use-reviews/form-field-main-8baa-v4-browser-token-noop.json": "a7b5aaeee60da48a5c7ff6c8b4347da78740975874c67edd424b4569c05ad0d2",
+      "tests/form_field_main_source_admission_probe.mjs": "1262f261054a48c892c6d3ce93051692012cc60eccc99c45c144cdf97351aa81"
+    },
+    "probe_result_sha256": "7dda4aeacb4c147fe5b3553434f6a50131a654925bb45fd4da9a8d619c2e81d2",
+    "v4_receipt_sha256": "c1be4b517af96eb8960290ab590bcc064f1820e064a7cbd34767531eddb7cf87",
+    "predecessor_patch_sha256": "f6e09d35e3562398839c437ed66526282423b90386a60b6852e18878b26e8d66",
+    "limitations": [
+      "Existing checker identity/shape gate accepts changed review when mutable review hash is also recomputed.",
+      "Focused browser cases, not full runtime matrix, 21.x, security or G11 clearance."
+    ]
+  },
+  "root_checks": [
+    "All1736 ordered file/module/symbol triples and root metadata preserved; exactly33 form-field rows changed, each embeds its complete previous row.",
+    "Every formal proposal manifest file hash equals actual canonical bytes.",
+    "Ran maintained direct admission probe on canonical source with AUTHORED_PROPOSAL_FALLBACK and NODE_PATH unset under Node24.21.0:340to307 insufficient, exact33removed, ten controls reject.",
+    "Reviewed realpath compiler dependency resolution correction; declared pnpm Babel8.0.1 is used without NODE_PATH.",
+    "Independent reviewer checked exact pinned Chromium149/Node24, v4 receipt, reports, bundle inputs and all previous records.",
+    "Packed product HTML/CSS/SCSS and TypeScript source unchanged."
+  ],
+  "receipt_sha256": "c1be4b517af96eb8960290ab590bcc064f1820e064a7cbd34767531eddb7cf87",
+  "limits": [
+    "Existing identity-only checker accepts a plausible edited review when its mutable roster digest is recomputed; these conclusions are the reviewed technical judgments in this immutable integration record, not proof of external authorship.",
+    "Four direct provider cases only: enabled, token-noop, config-disabled and both-disabled. Other states and server evidence retain their separate historical scopes.",
+    "Raw packed receipt snapshots and bundle metafiles are retained in external closeout state; the maintained test sources are included here. Final acceptance must preserve/reproduce required evidence.",
+    "Private current execution profiles bind the previous build helper and require a separately authenticated source successor before current profile readiness.",
+    "No full current packed verifier, 21.x, G11, security-clearance, complete-audit, push, Actions or publication claim."
+  ]
+}
