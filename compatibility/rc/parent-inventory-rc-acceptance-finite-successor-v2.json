@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "role": "main-inventory-rc-acceptance-finite-successor",
+  "line": "main",
+  "previous_epoch": {
+    "path": "compatibility/rc/parent-inventory-rc-acceptance-finite-successor-v1.json",
+    "sha256": "0ca5086955c42abaabbf0ba2c8ed91c12c2e62ec0694a658481d7006982b947b",
+    "bytes": 1935
+  },
+  "old_commit": "7870ef230c0e980d8b58eab81374358142eca065",
+  "new_commit": "70fecd1e31cb0e2a881b3b3e803fae3fcbddefde",
+  "before": {
+    "path": "scripts/rc_acceptance.py",
+    "sha256": "22f63424d318d9aa184b139afbc99bcda2d08322c48292b20f57c66c6b240b72",
+    "bytes": 30941
+  },
+  "after": {
+    "path": "scripts/rc_acceptance.py",
+    "sha256": "19ed3f06e34178e6b31d1d88f92c33f74d1a1bd680477152c1a90e9685df3194",
+    "bytes": 40963
+  },
+  "edits": [
+    {
+      "offset": 379,
+      "before": "",
+      "after": "\nimport subprocess"
+    },
+    {
+      "offset": 2120,
+      "before": "",
+      "after": "typeahead-execution\": ((\"G11\",), \"artifact\", (\"library\",), (\"focused-typeahead\",)),\n    \""
+    },
+    {
+      "offset": 3284,
+      "before": "",
+      "after": "\nTYPEAHEAD_CASES = ('MatSelectionList without forms > with list option > should be able to jump focus down to an item by typing', 'MatSelectionList without forms > with list option > should not select items while using the typeahead', 'MatMenu > should route typeahead focus through the public menu keydown and skip disabled matches', 'MatMenu > should update menu typeahead targets after dynamic items change', 'MatSelect > core > accessibility > for select > should be able to select options by typing on a closed select', 'MatSelect > core > accessibility > for select > should skip a disabled option after the closed select options change during typeahead', 'MatSelect > core > accessibility > for select > should not open the select when pressing space while typing', 'MatSelect > core > accessibility > for select > should be able to customize the typeahead debounce interval', 'MatSelect > core > accessibility > for select > should cancel the typeahead selection on blur')\n"
+    },
+    {
+      "offset": 4577,
+      "before": "",
+      "after": "_value"
+    },
+    {
+      "offset": 4606,
+      "before": "dict[str, ",
+      "after": ""
+    },
+    {
+      "offset": 4619,
+      "before": "]",
+      "after": ""
+    },
+    {
+      "offset": 4955,
+      "before": "",
+      "after": "\n    return value\n\n\ndef parse_json(data: bytes, label: Any) -> dict[str, Any]:\n    value = parse_json_value(data, label)"
+    },
+    {
+      "offset": 7555,
+      "before": "",
+      "after": "\n\n\nTYPEAHEAD_CHECKER_FILES = frozenset({\n    \"scripts/revalidate-typeahead.mjs\", \"scripts/upstream-typeahead-evidence.mjs\",\n    \"scripts/typeahead-run-projection.mjs\", \"scripts/upstream-packed-run-evidence.mjs\",\n    \"scripts/packed-consumer-evidence.mjs\", \"scripts/run-typeahead-execution.py\",\n    \"compatibility/rc/matrices/library-exports.json\",\n})\nTYPEAHEAD_SOURCE_PREFIXES = (\"projects/ngx-material-legacy/\", \"testing/legacy-runner/\",\n    \"compatibility/rc/typeahead-fixture/\", \"compatibility/rc/typeahead-runner/\", \"node_modules/\")\n\n\ndef register_typeahead_files(snapshot: EvidenceSnapshot, records: Any) -> None:\n    require(isinstance(records, list) and bool(records), \"typeahead: missing validated file inventory\")\n    seen = set()\n    for record in records:\n        require(isinstance(record, dict) and set(record) == {\"root\", \"path\", \"sha256\", \"bytes\"}, \"typeahead: invalid inventory record\")\n        path = record.get(\"path\")\n        require(record.get(\"root\") == \"repository\" and isinstance(path, str) and\n                (path in TYPEAHEAD_CHECKER_FILES or path.startswith(TYPEAHEAD_SOURCE_PREFIXES)),\n                \"typeahead: invalid inventory role/path\")\n        require(path not in seen, \"typeahead: duplicate inventory path\")\n        seen.add(path)\n        key = (\"repository\", path)\n        if key in snapshot.files:\n            require(snapshot.files[key] == record, \"typeahead: inconsistent existing identity\")\n            checked_file(snapshot.roots[\"repository\"], record, \"typeahead existing identity\")\n        else:\n            snapshot.checked(\"repository\", record, \"typeahead-input\")\n    require(TYPEAHEAD_CHECKER_FILES <= seen, \"typeahead: missing loaded checker identity\")"
+    },
+    {
+      "offset": 13124,
+      "before": "",
+      "after": "typeahead-execution\":\n            require(cases[\"main\"][\"focused-typeahead\"] == list(TYPEAHEAD_CASES) and cases[\"21.x\"][\"focused-typeahead\"] is None, f\"{cid}: fixed main roster required\")\n        if cid == \""
+    },
+    {
+      "offset": 17097,
+      "before": "",
+      "after": "validate_typeahead_observation(snapshot, run, binding, invocation, output_paths):\n    \"\"\"Bind the focused report to actual selected results and retained input bytes.\"\"\"\n    prefix = assertion_directory(\"typeahead-execution\", invocation)\n    observation_path = prefix + \"/observation.json\"\n    require(observation_path in output_paths, \"typeahead: observation is not an output\")\n    obs = snapshot.json(\"run\", observation_path, \"assertion-output\")\n    library = next(a for a in run[\"artifacts\"] if a[\"id\"] == \"library\")\n    require(obs.get(\"schema_version\") == 1 and obs.get(\"kind\") == \"typeahead-execution\" and obs.get(\"sha\") == \"ff36c80f9c7a14f0e9f36eafc3e1423d34e7c916\", \"typeahead: wrong observation identity\")\n    require(obs.get(\"run_id\") == run[\"run_id\"] and obs.get(\"line\") == \"main\" and obs.get(\"invocation_id\") == invocation and obs.get(\"binding\") == binding, \"typeahead: wrong execution binding\")\n    require(obs.get(\"library\") == {\"sha256\": library[\"sha256\"], \"bytes\": library[\"bytes\"]} and obs.get(\"inputs_unchanged\") is True, \"typeahead: wrong artifact or changed inputs\")\n    files = obs.get(\"files\")\n    required = {\"raw-report.json\", \"commands.json\", \"inputs-before.json\", \"metafile.json\", \"bundle.js\", \"bundle-inputs.json\", \"entry.generated.ts\"}\n    require(isinstance(files, dict) and set(files) == required, \"typeahead: missing or unknown support files\")\n    for name, identity in files.items():\n        path = prefix + \"/\" + name\n        require(path in output_paths and isinstance(identity, dict) and set(identity) == {\"sha256\", \"bytes\"}, \"typeahead: missing support output\")\n        snapshot.checked(\"run\", {\"path\": path, **identity}, \"assertion-output\")\n    raw = snapshot.json(\"run\", prefix + \"/raw-report.json\", \"assertion-output\")\n    specs = raw.get(\"specs\")\n    require(isinstance(specs, list) and all(isinstance(r, dict) and type(r.get(\"skipped\")) is bool for r in specs), \"typeahead: invalid spec statuses\")\n    selected = [r for r in specs if r[\"skipped\"] is False]\n    require(raw.get(\"subject_mode\") == \"artifact\" and raw.get(\"mode\") == \"normal\" and raw.get(\"run_id\") == run[\"run_id\"] and raw.get(\"artifact_sha256\") == library[\"sha256\"], \"typeahead: raw result binding mismatch\")\n    require(isinstance(raw.get(\"totals\"), dict) and all(type(v) is int for v in raw[\"totals\"].values()) and raw.get(\"totals\") == {\"executed\": 496, \"passed\": 9, \"failed\": 0, \"skipped\": 487} and obs.get(\"counts\") == raw[\"totals\"] and raw.get(\"failures\") == [] and len(raw.get(\"specs\", [])) == 496, \"typeahead: incomplete results\")\n    require(obs.get(\"selected_cases\") == selected and [r.get(\"full_name\") for r in selected] == list(TYPEAHEAD_CASES) and all(r.get(\"success\") is True for r in selected), \"typeahead: selected case results differ\")\n    require(all(sum(r.get(\"full_name\") == name for r in specs) == 1 for name in TYPEAHEAD_CASES), \"typeahead: duplicate case\")\n    peers = {\"fesm2022/_list-key-manager-chunk.mjs\": \"63042ad0a8264bfedfaac1c03d2b0eee450bcd7890a09792dc83256195e00057\", \"fesm2022/_typeahead-chunk.mjs\": \"c26eed04140a44b175020b75b3a16bf73c2913a064ae61c79dc744d5fa3e4622\"}\n    require(obs.get(\"peer_version\") == \"22.1.7\" and obs.get(\"peer_members\") == peers and type(obs.get(\"extracted_files\")) is int and obs[\"extracted_files\"] > 0, \"typeahead: invalid peer or extraction identity\")\n    initial = snapshot.json(\"run\", prefix + \"/inputs-before.json\", \"assertion-output\")\n    require(initial.get(\"artifact\") == library[\"sha256\"] and initial.get(\"peer\") == peers, \"typeahead: wrong input snapshot\")\n    _, log_bytes = snapshot.capture(\"run\", prefix + \"/commands.json\", \"assertion-output\")\n    log = parse_json_value(log_bytes, prefix + \"/commands.json\")\n    require(isinstance(log, list) and len(log) == 3, \"typeahead: incomplete command log\")\n    commands = [\"testing/legacy-runner/build.mjs\", \"testing/legacy-runner/build.mjs\", \"node_modules/karma/bin/karma\"]\n    require(all(isinstance(row, dict) and type(row.get(\"exit_code\")) is int and row[\"exit_code\"] == 0 and isinstance(row.get(\"command\"), list) and len(row[\"command\"]) >= 2 and row[\"command\"][1] == expected for row, expected in zip(log, commands)), \"typeahead: failed or unexpected command\")\n    meta = snapshot.json(\"run\", prefix + \"/metafile.json\", \"assertion-output\")\n    graph = snapshot.json(\"run\", prefix + \"/bundle-inputs.json\", \"assertion-output\")\n    require(isinstance(meta.get(\"inputs\"), dict) and isinstance(graph.get(\"inputs\"), list) and graph.get(\"schema_version\") == 1 and graph[\"inputs\"] and all(isinstance(row, dict) for row in graph[\"inputs\"]), \"typeahead: invalid bundle graph\")\n    rows = graph[\"inputs\"]\n    require([row.get(\"key\") for row in rows] == list(meta[\"inputs\"]) and any(row.get(\"origin\") == \"artifact\" for row in rows) and any(row.get(\"origin\") == \"generated\" and row.get(\"path\") == \"entry.generated.ts\" for row in rows), \"typeahead: incomplete bundle graph\")\n    require(all(any(row.get(\"origin\") == \"dependency\" and isinstance(row.get(\"path\"), str) and row[\"path\"].endswith(\"@angular/cdk/\" + path) and row.get(\"sha256\") == digest for row in rows) for path, digest in peers.items()), \"typeahead: missing peer inputs\")\n    return obs\n\n\ndef "
+    },
+    {
+      "offset": 17739,
+      "before": "",
+      "after": "\n    typeahead_files: list[dict[str, Any]] = []"
+    },
+    {
+      "offset": 27637,
+      "before": "",
+      "after": "if cid == \"typeahead-execution\":\n                validate_typeahead_observation(snapshot, run, binding, invocation, output_paths)\n                # Replay the very same finite validator used by upstream admission,\n                # with identities from the coordinator, not from the child report.\n                observation = next(item for item in outputs if item[\"path\"] == assertion_directory(cid, invocation) + \"/observation.json\")\n                request = {\"line\": line, \"runId\": run_id, \"runDir\": str(run_path.parent), \"binding\": binding,\n                           \"packedConsumerExecution\": {\"run_id\": run_id, \"exit_code\": process_results.get(\"packed-consumer\"), \"invocation_id\": invocation_ids.get(\"packed-consumer\")},\n                           \"typeaheadExecution\": {\"run_id\": run_id, \"exit_code\": actual_exit, \"invocation_id\": invocation, \"output\": observation}}\n                completed = subprocess.run([\"node\", str(root / \"scripts/revalidate-typeahead.mjs\")], input=json.dumps({\"root\": str(root), \"request\": request}), text=True, capture_output=True, cwd=root)\n                require(completed.returncode == 0, f\"{cid}: shared finite validation failed: {completed.stderr.strip()}\")\n                outcome = parse_json_value(completed.stdout.encode(), \"typeahead shared validator\")\n                require(outcome.get(\"ok\") is True and outcome.get(\"invocation_id\") == invocation and outcome.get(\"output\") == observation, f\"{cid}: shared validator identity mismatch\")\n                register_typeahead_files(snapshot, outcome.get(\"validated_files\"))\n                typeahead_files = outcome[\"validated_files\"]\n            "
+    },
+    {
+      "offset": 30099,
+      "before": "",
+      "after": "summary[\"typeahead_validated_files\"] = typeahead_files\n    "
+    }
+  ],
+  "receipts": [
+    {
+      "path": "compatibility/rc/parent-main-typeahead-coordinator-qualification-v1.json",
+      "sha256": "6d0ee8e3cc3428c50268e8a05ed000b4db3a0358763243c07275c0ad4d30c9ec",
+      "bytes": 7756
+    },
+    {
+      "path": "compatibility/rc/parent-main-typeahead-coordinator-6655dd5324ca48647f1226c06d38677941832afb0324bff336cfef9e192d57c2.tar.gz",
+      "sha256": "6655dd5324ca48647f1226c06d38677941832afb0324bff336cfef9e192d57c2",
+      "bytes": 468958
+    }
+  ],
+  "old_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "g11_claim": "not-passed"
+}

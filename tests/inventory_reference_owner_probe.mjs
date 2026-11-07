@@ -46,7 +46,7 @@ if(mode==='--source'){
  let tamper=null;const liveRead=path=>{const raw=read(path);return path===tamper?Buffer.concat([raw,Buffer.from(' ')]):raw;};
  const subject=inventoryReferenceOwnerContext({root,read:liveRead});
  assert.equal(hash(subject.metadataRead(inventory)),packet.prior_inventory_sha256);
- assert.equal(hash(subject.metadataRead(owner)),line==='main'?packet.before_owner.sha256:packet.after_owner.sha256);
+ assert.equal(hash(subject.metadataRead(owner)),packet.after_owner.sha256);
  assert.equal(subject.current_native_packed_or_floor_or_g11_credit,false);
  assert.equal(subject.current_workflow_tests.tests_run,14);assert.equal(subject.current_workflow_tests.skipped,0);
  assert.equal(hash(subject.metadataRead('.github/workflows/ci.yml')),packet.historical_workflow_metadata.before.sha256);
@@ -91,14 +91,14 @@ if(mode==='--source'){
  for(const ref of subject.bound){if(ref.path===ledger)continue;tamper=ref.path;assert.throws(()=>inventoryReferenceOwnerContext({root,read:liveRead}),undefined,'cold '+tamper);cold++;tamper=null;}
  // A source context never substitutes for the real owner's complete frame gate.
  const unknownRead=path=>path===ledger?Buffer.concat([read(path),Buffer.from(' ')]):read(path);
- const unknown=inventoryReferenceOwnerContext({root,read:unknownRead});assert.equal(unknown.applied,false);assert.ok(unknown.metadataRead(ledger).equals(unknownRead(ledger)));
+ assert.throws(()=>inventoryReferenceOwnerContext({root,read:unknownRead}),/nonphysical inventory owner input/);
  subject.bound.length=0;subject.before.fill(0);subject.after.fill(0);subject.assertCurrent();
  assert.ok(read(ledger).equals(canonicalBefore));
  console.log(JSON.stringify({schema_version:1,line,mode:'source-only',original_top_level_statements_preserved:old.statements.length,
   original_owner_functions_preserved:old.statements.filter(ts.isFunctionDeclaration).length,
   added_imports:1,added_public_wrappers:wrapperNames.length,cold_source_mutants_rejected:cold,late_source_mutants_rejected:late,
   fresh_current_workflow_tests:subject.current_workflow_tests.tests_run,title_metadata_controls_rejected:titleMetadataControls,
-  old_frame_admission_deferred_to_real_owner:true,unknown_frame_not_translated:true,canonical_ledger_unchanged:true,
+  old_frame_admission_deferred_to_real_owner:true,nonphysical_ledger_rejected:true,canonical_ledger_unchanged:true,
   actual_owner_compiler_native_or_full_product_execution:false,g11_claim:'not-passed'}));
 }else{
  let tamper=null;const liveRead=path=>{const raw=read(path);return path===tamper?Buffer.concat([raw,Buffer.from(' ')]):raw;};

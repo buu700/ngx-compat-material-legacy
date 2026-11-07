@@ -20,6 +20,9 @@ const GUARD_PLAN=Object.freeze({path:'scripts/canonical-source-guard-plan.mjs',s
 const GUARD_PLAN_FUNCTION_SHA256='fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947';
 const loadedComposeCanonicalSourceGuards=composeCanonicalSourceGuards, functionToString=Function.prototype.toString;
 const INPUTS='compatibility/rc/parent-base-class-tool-successor-inputs-v3.json';
+const V4_INPUTS=Object.freeze({path:'compatibility/rc/parent-base-class-tool-successor-inputs-v4.json',sha256:'60088525932c75c41782874396eb72f8bcec479ec2ad4d911090e1e2b3964b24',bytes:109915});
+const V4_PARENT='7870ef230c0e980d8b58eab81374358142eca065';
+const V4_COMMITS=Object.freeze({'tests/current_sass_tool_reference_probe.mjs':'authored','scripts/browser-reference-source.mjs':'authored','scripts/checker-reference-proposal.mjs':'authored','tests/checker_reference_source_probe.mjs':'authored','tests/test_current_sass_tool_references.py':'authored','scripts/check-upstream-audit-disposition.mjs':'70fecd1e31cb0e2a881b3b3e803fae3fcbddefde','scripts/rc-verify.py':'70fecd1e31cb0e2a881b3b3e803fae3fcbddefde','scripts/rc_acceptance.py':'70fecd1e31cb0e2a881b3b3e803fae3fcbddefde','compatibility/rc/matrices/full-verify.json':'70fecd1e31cb0e2a881b3b3e803fae3fcbddefde','tests/test_rc_acceptance.py':'70fecd1e31cb0e2a881b3b3e803fae3fcbddefde','scripts/select-dialog-finite-source-successor.mjs':'0da0a92934ffae20098de762d78c329dc932c04c','scripts/select_dialog_finite_source_successor_v4.py':'0da0a92934ffae20098de762d78c329dc932c04c','scripts/remaining-native-tab-lifecycle-review.mjs':'b30c40a7b58513047cdf453c28ae7e33cd40d5f3','scripts/inventory-reference-owner.mjs':'948e8290b74953c83d11268368f38952d0b51fd7','scripts/inventory-reference-proposal.mjs':'948e8290b74953c83d11268368f38952d0b51fd7','scripts/inventory-finite-tool-successor.mjs':'948e8290b74953c83d11268368f38952d0b51fd7','tests/inventory_finite_source_probe.mjs':'948e8290b74953c83d11268368f38952d0b51fd7','scripts/inventory-rc-acceptance-source-successor.mjs':'authored'});
 const V2_INPUTS={path:'compatibility/rc/current-sass-tool-reference-inputs-v2.json',sha256:'d25ef6684992ececd518f7932bc68f5d43d433df23868d7a376ebf0a9e56a770',bytes:625566};
 const V3_CHECKPOINTS={'21.x':'d8ab97315b6c77b83f42c2bebcf63b2984fff255',main:'59ba0e2aa8b76f71b472ea2831273e44e44b5b57'};
 const V3_SOURCE_ANCHORS={
@@ -144,6 +147,39 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
  assert.equal(previous.schema_version,1);assert.equal(previous.role,packet.role);
  assert.deepEqual(packet.product_paths,[]);assert.equal(packet.historical_programs_executed,false);assert.equal(packet.historical_reports_rewritten,0);assert.equal(packet.artifact_or_audit_admission_granted,false);
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
+ const v4Overlays=new Map();
+ if(line==='main'){
+  const v4=JSON.parse(member(V4_INPUTS));assert.equal(v4.schema_version,4);assert.equal(v4.role,successor.role);assert.equal(v4.source_parent,V4_PARENT);
+  assert.deepEqual(v4.previous_epoch,{path:INPUTS,sha256:INPUTS_SHA,bytes:read(INPUTS).length});assert.deepEqual(v4.product_paths,[]);
+  assert.equal(v4.historical_programs_executed,false);assert.equal(v4.historical_reports_rewritten,0);assert.equal(v4.artifact_or_audit_admission_granted,false);
+  assert.deepEqual(v4.updates.map(x=>x.path).sort(),Object.keys(V4_COMMITS).sort());
+  const requests=v4.updates.flatMap(u=>[{commit:V4_PARENT,path:u.path},...(u.source_commit==='authored'?[]:[{commit:u.source_commit,path:u.path}])]);const images=gitImages(root,requests);
+  for(const u of v4.updates){
+   assert.deepEqual(Object.keys(u).sort(),['after','before','edits','path','source_commit']);assert.equal(u.source_commit,V4_COMMITS[u.path]);assert.equal(u.before.path,u.path);assert.equal(u.after.path,u.path);
+   const before=images.get(V4_PARENT+':'+u.path);matches(before,u.before);const after=edited(before,u.edits);matches(after,u.after);
+   if(u.source_commit!=='authored')assert.ok(equalBytes(images.get(u.source_commit+':'+u.path),after));
+   assert.ok(equalBytes(member(u.after),after));v4Overlays.set(u.path,{update:u,before,after});
+  }
+  const browser=JSON.parse(member({path:'compatibility/rc/c04-browser-owner-inputs.json',sha256:'d22d4c657197ee2640dd1079861e54fde35e55b9091b7d44f4e024d4b37b46cb',bytes:15192}));
+  assert.deepEqual(browser.source_members.find(ref=>ref.path==='scripts/check-upstream-audit-disposition.mjs'),v4.updates.find(u=>u.path==='scripts/check-upstream-audit-disposition.mjs').before);
+  for(const receipt of v4.receipts)member(receipt);
+  const native=JSON.parse(member(v4.receipts[4]));
+  assert.equal(native.role,'main-native-tab-source-composition-qualification');
+  assert.equal(native.source_parent,'70fecd1e31cb0e2a881b3b3e803fae3fcbddefde');
+  assert.deepEqual(native.sources[0],v4.updates.find(u=>u.path==='scripts/remaining-native-tab-lifecycle-review.mjs').after);
+  assert.deepEqual(native.archive,v4.receipts[5]);
+  for(const ref of native.sources)member(ref);
+  const inventory=JSON.parse(member(v4.receipts[6]));
+  assert.equal(inventory.role,'main-nine-spec-inventory-source-qualification');
+  assert.equal(inventory.source_parent,'70fecd1e31cb0e2a881b3b3e803fae3fcbddefde');
+  assert.deepEqual(inventory.archive,v4.receipts[7]);
+  for(const ref of inventory.sources){
+   const update=v4.updates.find(u=>u.path===ref.path);
+   if(update)assert.deepEqual(update.after,ref);
+   member(ref);
+  }
+ }
+ const v3Member=ref=>{const overlay=v4Overlays.get(ref.path);if(!overlay)return member(ref);assert.deepEqual(metadata(ref),overlay.update.before,'unknown V3 predecessor identity '+ref.path);assert.ok(equalBytes(member(overlay.update.after),overlay.after));return Buffer.from(overlay.before);};
  const branch=packet.branches[line],priorBranch=previous.branches[line];assert.ok(branch&&priorBranch);const archived=branch.historical_registry;
  const nextBranch=successor.branches[line];assert.ok(nextBranch);assert.equal(nextBranch.source_parent,V3_CHECKPOINTS[line]);
  const previousGitV2=gitImages(root,[{commit:V3_CHECKPOINTS[line],path:V2_INPUTS.path}]).get(V3_CHECKPOINTS[line]+':'+V2_INPUTS.path);
@@ -155,15 +191,15 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
   assert.deepEqual(Object.keys(update).sort(),['after','before','edits','path']);assert.ok((toolPath(update.path)||update.path==='compatibility/rc/consumer-floor-plan.json')&&update.path!==SELF&&update.path!=='scripts/current_sass_tool_references.py');
   assert.equal(update.before.path,update.path);assert.equal(update.after.path,update.path);assert.ok(Number.isSafeInteger(update.before.bytes));assert.ok(Number.isSafeInteger(update.after.bytes));
   const before=successorImages.get(V3_CHECKPOINTS[line]+':'+update.path);matches(before,update.before);
-  const after=edited(before,update.edits);matches(after,update.after);assert.ok(equalBytes(member(update.after),after));
+  const after=edited(before,update.edits);matches(after,update.after);assert.ok(equalBytes(v3Member(update.after),after));
   overlays.set(update.path,{update,before,after});
  }
  // Only complete, authenticated predecessor identities select private comparison
  // DATA. Every physical read above/below remains the exact latest source image.
  const v2Member=ref=>{
-  const overlay=overlays.get(ref.path);if(!overlay)return member(ref);
+  const overlay=overlays.get(ref.path);if(!overlay)return v3Member(ref);
   assert.deepEqual(metadata(ref),overlay.update.before,'unknown V2 predecessor identity '+ref.path);
-  assert.ok(equalBytes(member(overlay.update.after),overlay.after));return Buffer.from(overlay.before);
+  assert.ok(equalBytes(v3Member(overlay.update.after),overlay.after));return Buffer.from(overlay.before);
  };
  assert.equal(branch.previous_epoch_source_parent,CHECKPOINTS[line]);assert.deepEqual(archived,priorBranch.historical_registry);
  assert.deepEqual(branch.intermediate_inputs,priorBranch.intermediate_inputs);
@@ -172,7 +208,7 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
  assert.equal(new Set(branch.updates.map(r=>r.path)).size,branch.updates.length);assert.equal(new Set(branch.additional_inputs.map(r=>r.path)).size,branch.additional_inputs.length);
  const registryBytes=gitImages(root,[{commit:archived.source_parent,path:archived.path}]).get(archived.source_parent+':'+archived.path);matches(registryBytes,archived);
  // The unchanged registry remains physically present. Its source programs are never run.
- assert.ok(equalBytes(member(archived),registryBytes));const historical=JSON.parse(registryBytes);
+ assert.ok(equalBytes(v3Member(archived),registryBytes));const historical=JSON.parse(registryBytes);
  assert.equal(historical.line,line);assert.equal(historical.extension_kind,'spinner-snack-c04-source');assert.ok(historical.gate_tool_successor);
  assert.equal(historical.tool_transitions.length,line==='21.x'?45:17);
  assert.equal(historical.canonical_dispositions_changed,0);assert.equal(historical.product_changes,0);assert.equal(historical.old_programs_executed,false);assert.equal(historical.g11_claim,'not-passed');
@@ -235,7 +271,7 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
    if(update.path==='scripts/historical-contract-repair-source.mjs')assert.deepEqual(update.before,historical.unchanged_source_subject,'historical repair overlay must follow the immutable source identity');
    const anchor=V3_REGRESSION_SOURCE_ANCHORS[line][update.path]??V3_SOURCE_ANCHORS[update.path];
    if(anchor){
-    const packet=JSON.parse(member(anchor.packet));
+    const packet=JSON.parse(v3Member(anchor.packet));
     const expected=Object.hasOwn(anchor,'source_input_index')?packet.source_inputs[anchor.source_input_index]:(Object.hasOwn(anchor,'source_member_index')?packet.source_members[anchor.source_member_index]:(Object.hasOwn(anchor,'member_key')?packet[anchor.member_key]:packet.code_transitions[anchor.transition_index].after));
     assert.deepEqual(expected,update.before,'V3 new source row differs from immutable owner anchor');
    }
@@ -243,7 +279,13 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
   }
   addIdentity(row,update.before,before);addIdentity(row,update.after,after);row.after={sha256:update.after.sha256,bytes:update.after.bytes};
  }
- for(const input of nextBranch.additional_inputs){assert.ok(toolPath(input.path)||input.path.startsWith('compatibility/rc/'));assert.ok(input.path!==SELF&&input.path!=='scripts/current_sass_tool_references.py');member(input);}
+ for(const input of nextBranch.additional_inputs){assert.ok(toolPath(input.path)||input.path.startsWith('compatibility/rc/'));assert.ok(input.path!==SELF&&input.path!=='scripts/current_sass_tool_references.py');v3Member(input);}
+ for(const {update,before,after} of v4Overlays.values()){
+  let row=rows.get(update.path);
+  if(row)assert.deepEqual(update.before,{path:row.path,...row.after},'V4 overlay does not follow exact V3 current row');
+  else{assert.ok(nextBranch.additional_inputs.some(ref=>JSON.stringify(ref)===JSON.stringify(update.before)) || update.path==='scripts/check-upstream-audit-disposition.mjs','unknown V4 predecessor');row={path:update.path,before:{sha256:update.before.sha256,bytes:update.before.bytes},identities:new Map()};rows.set(update.path,row);}
+  addIdentity(row,update.before,before);addIdentity(row,update.after,after);row.after={sha256:update.after.sha256,bytes:update.after.bytes};
+ }
  for(const row of rows.values())member({path:row.path,...row.after});
  assert.deepEqual(bound.get(GUARD_PLAN.path),GUARD_PLAN,'current tool guard planner missing from finite bound');
  let consuming=false,batching=false;
@@ -296,7 +338,7 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
   }finally{batching=false;}
  };
  const transitions=[...rows.values()].map(r=>({path:r.path,before:{...r.before},after:{...r.after}}));
- const result=Object.freeze({line,epoch:3,get bound(){return structuredClone([...bound.values()]);},get transitions(){return structuredClone(transitions);},ownsReference,qualify:ref=>side(ref,'after'),predecessorReference:ref=>side(ref,'before'),comparisonBytes,referenceBatch,assertCurrent,guardNode,guardPlan,
+ const result=Object.freeze({line,epoch:line==='main'?4:3,get bound(){return structuredClone([...bound.values()]);},get transitions(){return structuredClone(transitions);},ownsReference,qualify:ref=>side(ref,'after'),predecessorReference:ref=>side(ref,'before'),comparisonBytes,referenceBatch,assertCurrent,guardNode,guardPlan,
   old_code_executed:false,old_product_bytes_exposed:false,old_tool_bytes_exposed_as_current:false,current_read_route_returned:false,canonical_admission_granted:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'});
  assertCurrent();return result;
 }

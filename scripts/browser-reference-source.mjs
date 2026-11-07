@@ -16,6 +16,7 @@ import {gunzipSync} from 'node:zlib';
 import {readCheckerOwnerMember} from './checker-owner-source.mjs';
 import {browserZoneSourceSuccessor} from './browser-zone-source-successor.mjs';
 import {browserSurfaceSourceSuccessor} from './browser-surface-source-successor.mjs';
+import {inventoryFiniteToolSuccessor} from './inventory-finite-tool-successor.mjs';
 import {browserFormZoneSourceSuccessor} from './browser-form-zone-source-successor.mjs';
 const SELF='scripts/browser-reference-source.mjs',INPUT='compatibility/rc/c04-browser-reference-source-inputs.json';
 const PINS={"main":"4b0167af85263a3fb652806e25186e8500e02424749adb860610519d28817e6c","21.x":"5a8bd910e0d9a64a73558b5da0f48abdf8546b455d8db0fcb921678a0ee0a5ae"};
@@ -31,16 +32,35 @@ export function inspectBrowserReferenceSource({root,read=path=>readCheckerOwnerM
  const zone=browserZoneSourceSuccessor({root,read,line});
  const surface=browserSurfaceSourceSuccessor({root,read,line});
  const formZone=browserFormZoneSourceSuccessor({root,read,line});
+ const workflow=inventoryFiniteToolSuccessor({root,read,line});
  const suppliedPackage=read(packagePath);assert.ok(Buffer.isBuffer(suppliedPackage)&&suppliedPackage.equals(physicalPackage));assert.ok(readCheckerOwnerMember(root,packagePath).equals(physicalPackage));
  const tools=browserOwnerSourceSubject({root,read});
- const bound=new Map([...tools.bound,...zone.bound,...surface.bound,...formZone.bound].map(ref=>[ref.path,{...ref}])),member=ref=>{
-  if(ref.sha256!==undefined)ref=formZone.qualify(ref)??surface.qualify(ref)??tools.qualifyReference(ref);
+ const bound=new Map([...tools.bound,...zone.bound,...surface.bound,...formZone.bound,...workflow.bound].map(ref=>[ref.path,{...ref}]));
+ const slicePath='scripts/run-browser-matrix-slice.mjs';
+ const sliceBefore={path:slicePath,sha256:'63129120785dbec5264198f0d1b8fadb7eb01b014040dc04e66c20872e46d610'};
+ const sliceAfter={path:slicePath,sha256:'7be17c3f34fa5943fade75bfd4bb51b06e524bcf25049ab1a7d1f58549257a6a',bytes:19860};
+ const dialogSliceQualify=ref=>{if(line!=='main'||ref.path!==slicePath)return null;const prior=ref.sha256===sliceBefore.sha256?sliceBefore:ref.sha256===sliceAfter.sha256?sliceAfter:null;assert.ok(prior,'unknown dialog slice source');if(ref.bytes!==undefined)assert.equal(ref.bytes,prior===sliceBefore?original(root,'36cc0feb5ff9fefe95d354b251ac8f6b37b067e2',slicePath).length:prior.bytes);return {...ref,sha256:sliceAfter.sha256,...(ref.bytes===undefined?{}:{bytes:sliceAfter.bytes})};};
+ const peerPath='tests/browser_peer_versions_probe.mjs';
+ const peerBefore={path:peerPath,sha256:'84d0d6dc654decb0352762e2cc57ccbd34723363ec314ad22b1a6839cb8457b9',bytes:3835};
+ const peerAfter={path:peerPath,sha256:'0816108e3dbcfdb565acf53e2c4d584e17e5e71835b9eed594f743a91654d2e8',bytes:4719};
+ const dialogPeerQualify=ref=>{if(line!=='main'||ref.path!==peerPath)return null;const prior=ref.sha256===peerBefore.sha256?peerBefore:ref.sha256===peerAfter.sha256?peerAfter:null;assert.ok(prior,'unknown browser peer test source');if(ref.bytes!==undefined)assert.equal(ref.bytes,prior.bytes);return {...ref,sha256:peerAfter.sha256,...(ref.bytes===undefined?{}:{bytes:peerAfter.bytes})};};
+ const member=ref=>{
+  if(ref.sha256!==undefined)ref=dialogPeerQualify(ref)??dialogSliceQualify(ref)??workflow.qualify(ref)??formZone.qualify(ref)??surface.qualify(ref)??tools.qualifyReference(ref);
   const physical=readCheckerOwnerMember(root,ref.path),raw=read(ref.path);assert.ok(Buffer.isBuffer(raw));assert.ok(raw.equals(physical),'noncurrent browser source '+ref.path);
   assert.ok(physical.equals(readCheckerOwnerMember(root,ref.path)),'browser source changed during callback '+ref.path);
   if(ref.sha256)assert.equal(hash(raw),ref.sha256,'changed browser source '+ref.path);
   if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);
   bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return raw;
  };
+ if(line==='main'){
+  const receipt=JSON.parse(member({path:'compatibility/rc/parent-dialog-focus-readiness-integration-v1.json',sha256:'08a872956a859beee736ec1aa1c1b01e3f7197ee36132c099b406ef918be16ab',bytes:3708}));
+  assert.equal(receipt.patch_sha256,'93869925718897ad5d1db3d93a8cbe16f41a8d4dc0d60790b52cc6218af4adca');
+  assert.equal(receipt.evidence_archive.sha256,'355eb1df48462280b0fc24599e01e26125b4df39395520a660884ef2d059bfb1');member({path:receipt.evidence_archive.path,sha256:receipt.evidence_archive.sha256,bytes:receipt.evidence_archive.bytes});
+  const peerOld=original(root,'feaa956a5d593aa73d41fc4160772fa82cdf8972',peerPath),peerCurrent=original(root,'0ca6505896139dab0643f91f4179c3b351b5c068',peerPath);
+  assert.equal(hash(peerOld),peerBefore.sha256);assert.equal(peerOld.length,peerBefore.bytes);assert.equal(hash(peerCurrent),peerAfter.sha256);assert.equal(peerCurrent.length,peerAfter.bytes);assert.ok(readCheckerOwnerMember(root,peerPath).equals(peerCurrent));
+  const before=original(root,'36cc0feb5ff9fefe95d354b251ac8f6b37b067e2',slicePath),after=original(root,'b8e00f603869daaabb72e5b5ee464ce510fe9b47',slicePath);
+  assert.equal(hash(before),sliceBefore.sha256);assert.equal(hash(after),sliceAfter.sha256);assert.equal(after.length,sliceAfter.bytes);assert.ok(readCheckerOwnerMember(root,slicePath).equals(after));
+ }
  const packet=JSON.parse(member({path:INPUT,sha256:PINS[line]}));assert.equal(packet.line,line);assert.equal(packet.schema_version,1);
  assert.equal(packet.canonical_frame_admission_granted,false);assert.equal(packet.canonical_dispositions_changed,0);assert.equal(packet.product_changes,0);
  assert.equal(packet.old_programs_executed,false);assert.equal(packet.actual_native_packed_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');
@@ -101,7 +121,7 @@ export function inspectBrowserReferenceSource({root,read=path=>readCheckerOwnerM
  const census=JSON.parse(member(packet.raw_source_census));
  assert.deepEqual(derived.sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b))),census.rows.slice().sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b))));
  assert.equal(derived.length,line==='main'?18:16);assert.equal(totalHunks,23);
- const assertCurrent=()=>{zone.assertCurrent();surface.assertCurrent();formZone.assertCurrent();tools.assertCurrent();for(const ref of bound.values()){
+ const assertCurrent=()=>{workflow.assertCurrent();zone.assertCurrent();surface.assertCurrent();formZone.assertCurrent();tools.assertCurrent();for(const ref of bound.values()){
   const physical=readCheckerOwnerMember(root,ref.path),raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late browser source '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(physical),'late physical browser source '+ref.path);assert.ok(physical.equals(readCheckerOwnerMember(root,ref.path)),'late browser source changed during callback '+ref.path);
  }zone.assertPhysical();surface.assertPhysical();formZone.assertPhysical();};
  assertCurrent();return {bound:structuredClone([...bound.values()]),assertCurrent,assertZonePhysical:zone.assertPhysical,assertSurfacePhysical:surface.assertPhysical,assertFormPhysical:formZone.assertPhysical,qualifySurfaceReference:surface.qualify,qualifyFormReference:formZone.qualify,surfaceBefore:{...surface.before},formBefore:{...formZone.before},report:{schema_version:1,line,result:'pass',analysis_node:process.version,analysis_typescript:ts.version,complete_source_transitions:4,individually_reviewed_hunks:totalHunks,selected_references:derived.length,transitions:summaries,current_physical_ledger_sha256:hash(currentLedger),current_physical_ledger_bytes:currentLedger.length,current_ledger_equals_reviewed_cohort:currentLedger.equals(priorLedger),canonical_frame_admission_granted:false,old_programs_executed:false,canonical_dispositions_changed:0,product_changes:0,actual_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'}};

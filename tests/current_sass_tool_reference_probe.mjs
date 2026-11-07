@@ -19,7 +19,7 @@ const packet=JSON.parse(readFileSync(join(root,successor.previous_epoch.path)));
 const previous=JSON.parse(readFileSync(join(root,packet.previous_epoch.path)));
 const source=currentSassToolReferenceSubject({root}),branch=packet.branches[source.line];
 check('V3 current maintained dispatch',()=>{
- assert.equal(source.epoch,3);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);
+ assert.equal(source.epoch,source.line==='main'?4:3);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);
 });
 check('all original and latest identities qualify with exact comparison bytes',()=>{
  for(const row of source.transitions){
@@ -61,8 +61,9 @@ check('each V3 predecessor and literal successor is exact',()=>{
  for(const row of nextBranch.updates){
   assert.equal(hash(source.comparisonBytes(row.before)),row.before.sha256);
   assert.equal(hash(source.comparisonBytes(row.after)),row.after.sha256);
-  assert.deepEqual(source.qualify(row.before),row.after);
-  assert.deepEqual(source.qualify(row.after),row.after);
+  const latest=source.transitions.find(r=>r.path===row.path);assert.ok(latest);
+  assert.deepEqual(source.qualify(row.before),{path:row.path,...latest.after});
+  assert.deepEqual(source.qualify(row.after),{path:row.path,...latest.after});
   assert.equal(source.ownsReference({...row.before,bytes:row.before.bytes+1}),false);
   assert.throws(()=>source.qualify({...row.before,bytes:row.before.bytes+1}));
   assert.equal(source.qualify({...row.before,sha256:'0'.repeat(64)}),null);

@@ -7,6 +7,7 @@
 /** Exact checker-reference proposal;canonical integration grants no native credit. */
 import assert from 'node:assert/strict';
 import {checkerOwnerSourceSubject} from './checker-owner-source.mjs';
+import {browserOwnerSourceSubject} from './browser-owner-source.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {readFileSync,realpathSync} from 'node:fs';
@@ -111,7 +112,9 @@ export function prepareCheckerReferenceSourceMetadata({root,read=path=>currentFi
  };
  const packet=JSON.parse(member(CHECKER_REFERENCE_PACKET,pin.packet));assert.equal(packet.line,line);assert.equal(packet.source_parent,pin.parent);
  member(SELF,hash(image));for(const ref of packet.source_members)member(ref.path,ref.sha256,ref.bytes);
- member(VERIFIER,pin.verifier);const checker=member(CHECKER_REFERENCE_PATH,pin.checker);
+ member(VERIFIER,pin.verifier);const currentChecker=member(CHECKER_REFERENCE_PATH,pin.checker);
+ // Historical derivation consumes the authenticated comparison image as data.
+ const checker=line==='main'?browserOwnerSourceSubject({root,read}).comparisonBytes({path:CHECKER_REFERENCE_PATH,sha256:pin.checker}):currentChecker;
  assert.equal(process.version,'v'+JSON.parse(read('toolchain-lock.json')).repository.node);
  const before=original(root,pin.parent,CHECKER_REFERENCE_LEDGER),result=deriveCheckerReferenceMetadata({before,packet,checker});
  const sourceInputs=JSON.parse(read(packet.qualified_source_inputs.path));

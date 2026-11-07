@@ -7,6 +7,7 @@
 /** Complete source transition proof only;never executes the historical checker. */
 import assert from 'node:assert/strict';
 import {checkerOwnerSourceSubject} from '../scripts/checker-owner-source.mjs';
+import {browserOwnerSourceSubject} from '../scripts/browser-owner-source.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {readFileSync,writeFileSync,mkdtempSync,mkdirSync,symlinkSync,rmSync,lstatSync} from 'node:fs';
@@ -39,7 +40,8 @@ export async function inspectCheckerSourceMetadata({read=disk}={}){
  for(const key of ['canonical_ledger_changed','root_checker_changed','old_checker_executed','actual_native_packed_browser_floor_or_full_audit_qualified'])assert.equal(packet[key],false);
  assert.equal(packet.g11_claim,'not-passed');member(SELF,hash(image));
  for(const ref of packet.source_members)member(ref.path,ref.sha256,ref.bytes);
- const current=member(CHECKER,packet.current_checker.sha256,packet.current_checker.bytes);
+ const physicalCurrent=member(CHECKER,packet.current_checker.sha256,packet.current_checker.bytes);
+ const current=line==='main'?browserOwnerSourceSubject({root:ROOT,read}).comparisonBytes(packet.current_checker):physicalCurrent;
  const cohortRaw=original(packet.source_parent,LEDGER);assert.equal(hash(cohortRaw),packet.protected_ledger.sha256);assert.equal(cohortRaw.length,packet.protected_ledger.bytes);
  const cohort=JSON.parse(cohortRaw),ledgerRaw=member(LEDGER),ledger=JSON.parse(ledgerRaw);
  const assertCurrent=()=>{tools.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late checker source input '+ref.path);assert.equal(raw.length,ref.bytes);assert.equal(hash(disk(ref.path)),ref.sha256,'late physical source '+ref.path);}};
@@ -59,6 +61,9 @@ export async function inspectCheckerSourceMetadata({read=disk}={}){
  const before=parse('old-data.mjs',old),after=parse('current.mjs',current);
  const functions=ast=>new Map(ast.statements.filter(ts.isFunctionDeclaration).map(node=>[node.name.text,node.getText(ast)]));
  const oldFns=functions(before),newFns=functions(after),changed=[];
+ // The only executed helper must also be identical in the authenticated physical image.
+ const physicalFns=functions(parse('physical-current.mjs',physicalCurrent));
+ assert.equal(physicalFns.get('readRegularRepoBytes'),newFns.get('readRegularRepoBytes'));
  for(const[name,text]of oldFns){assert.ok(newFns.has(name));if(newFns.get(name)!==text)changed.push(name);}
  assert.deepEqual(changed,['evidenceClass','individualPatchBound']);assert.deepEqual([...newFns.keys()].filter(name=>!oldFns.has(name)),['readRegularRepoBytes']);
  const policies=ast=>ast.statements.filter(ts.isVariableStatement).flatMap(node=>node.declarationList.declarations).filter(node=>['ALLOWED_FINAL','PENDING','INHERITED','BEHAVIOR','REVIEW_DEPTHS'].includes(node.name.getText(ast))).map(node=>node.getText(ast));
@@ -110,7 +115,7 @@ export async function inspectCheckerSourceMetadata({read=disk}={}){
   assert.throws(()=>reader('folder'),error=>error.message==='source member is not a regular file');readerCases++;
  }finally{rmSync(fixture,{recursive:true,force:true});}
  assertCurrent();assert.ok(disk(LEDGER).equals(ledgerRaw));
- return {bound:structuredClone([...bound.values()]),assertCurrent,protected_canonical_before:{...packet.protected_ledger},report:{schema_version:1,line,result:'pass',canonical_frame_admission_granted:false,current_ledger_sha256:hash(ledgerRaw),current_ledger_bytes:ledgerRaw.length,analysis_node:process.version,analysis_typescript:ts.version,old_checker_sha256:packet.old_checker.sha256,current_checker_sha256:packet.current_checker.sha256,
+ return {bound:structuredClone([...bound.values()]),assertCurrent,protected_canonical_before:{...packet.protected_ledger},report:{schema_version:1,line,result:'pass',canonical_frame_admission_granted:false,current_ledger_sha256:hash(ledgerRaw),current_ledger_bytes:ledgerRaw.length,analysis_node:process.version,analysis_typescript:ts.version,old_checker_sha256:packet.old_checker.sha256,current_checker_sha256:packet.current_checker.sha256,physical_checker_sha256:hash(physicalCurrent),historical_checker_comparison_only:true,
   complete_hunks:packet.hunk_reviews.length,original_functions_preserved:oldFns.size-2,changed_original_functions:changed,new_functions:['readRegularRepoBytes'],structural_policy_sets_preserved:5,
   selected_references:derived.length,per_row_guard_exclusions:exclusions,actual_guard_exclusion_checks:derived.length*predicates.length,positive_scope_routing_checks:positive.length,actual_current_reader_cases:readerCases,
   fixture_roots_removed:true,canonical_ledger_unchanged:true,root_checker_unchanged:true,old_checker_executed:false,canonical_decisions_changed:0,

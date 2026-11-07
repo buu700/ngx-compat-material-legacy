@@ -1,0 +1,1026 @@
+{
+  "schema_version": 4,
+  "role": "finite-current-sass-tool-reference-successor",
+  "source_parent": "7870ef230c0e980d8b58eab81374358142eca065",
+  "previous_epoch": {
+    "path": "compatibility/rc/parent-base-class-tool-successor-inputs-v3.json",
+    "sha256": "51dd68c4a501f1994e2db726abcac3844b08b27bec7cb076ec079c7193cb5c24",
+    "bytes": 606881
+  },
+  "product_paths": [],
+  "historical_programs_executed": false,
+  "historical_reports_rewritten": 0,
+  "artifact_or_audit_admission_granted": false,
+  "receipts": [
+    {
+      "path": "compatibility/rc/parent-main-typeahead-coordinator-qualification-v1.json",
+      "sha256": "6d0ee8e3cc3428c50268e8a05ed000b4db3a0358763243c07275c0ad4d30c9ec",
+      "bytes": 7756
+    },
+    {
+      "path": "compatibility/rc/parent-main-typeahead-coordinator-6655dd5324ca48647f1226c06d38677941832afb0324bff336cfef9e192d57c2.tar.gz",
+      "sha256": "6655dd5324ca48647f1226c06d38677941832afb0324bff336cfef9e192d57c2",
+      "bytes": 468958
+    },
+    {
+      "path": "compatibility/rc/parent-restored-select-dialog-source-qualification-v1.json",
+      "sha256": "9c0cab795011c92f9b34dd0340eb117daa469f66a328d24da25e7b4f928926d6",
+      "bytes": 4744
+    },
+    {
+      "path": "compatibility/rc/parent-restored-select-dialog-source-da085bb281039a058e0e4ae1632a67a4569a451fd132123d9cf28b14d8cdfa11.tar.gz",
+      "sha256": "da085bb281039a058e0e4ae1632a67a4569a451fd132123d9cf28b14d8cdfa11",
+      "bytes": 16443
+    },
+    {
+      "path": "compatibility/rc/parent-main-native-source-composition-qualification-v1.json",
+      "sha256": "2ebf7eec57bac73348bc458f4b1a857549f9b462ca6a086619ebb3ccc574683a",
+      "bytes": 3311
+    },
+    {
+      "path": "compatibility/rc/parent-main-native-source-composition-455bf9685bdbb093a9a702078639390477d8a7d1ee8508a40857fd54357bcc48.tar.gz",
+      "sha256": "455bf9685bdbb093a9a702078639390477d8a7d1ee8508a40857fd54357bcc48",
+      "bytes": 106395
+    },
+    {
+      "path": "compatibility/rc/parent-main-nine-spec-inventory-qualification-v1.json",
+      "sha256": "8ecc4e17d2e24dbac95d2f35855edf7f7e071cca860dfbd239735f1a580ea501",
+      "bytes": 2377
+    },
+    {
+      "path": "compatibility/rc/parent-main-nine-spec-inventory-qualification-c258c8ace1a24bcc1ac09258424aba1892690414624955b875c7e80f5818d63a.tar.gz",
+      "sha256": "c258c8ace1a24bcc1ac09258424aba1892690414624955b875c7e80f5818d63a",
+      "bytes": 37041
+    },
+    {
+      "path": "compatibility/rc/parent-inventory-rc-acceptance-finite-successor-v2.json",
+      "sha256": "a25921136321ab375b2f2afa71c9237e615c80bf8967562c8b544a297d461db1",
+      "bytes": 12887
+    }
+  ],
+  "updates": [
+    {
+      "path": "scripts/rc-verify.py",
+      "source_commit": "70fecd1e31cb0e2a881b3b3e803fae3fcbddefde",
+      "before": {
+        "path": "scripts/rc-verify.py",
+        "sha256": "d8132bc4e002745b4fca274e547388f199b1dad5dbdf66d99893dc63ebd7a8a5",
+        "bytes": 98721
+      },
+      "after": {
+        "path": "scripts/rc-verify.py",
+        "sha256": "d5689f5253abae336aff6d07c66c2c2453b292edc7816045343c16db5831f00b",
+        "bytes": 103860
+      },
+      "edits": [
+        {
+          "offset": 1045,
+          "before": "    assertion_directory, expected_cases, prepack_binding_for,\n",
+          "after": "    assertion_directory, expected_cases, prepack_binding_for, EvidenceSnapshot,\n    TYPEAHEAD_CASES, validate_typeahead_observation,\n"
+        },
+        {
+          "offset": 2198,
+          "before": "",
+          "after": "from sass_ordered_legacy_button_admission import ORDERED_LEGACY_BUTTON_CASES, ordered_legacy_button_envelope_ok\n"
+        },
+        {
+          "offset": 4514,
+          "before": "",
+          "after": "    \"scripts/run-typeahead-execution.py\": \"typeahead-execution\",\n"
+        },
+        {
+          "offset": 23780,
+          "before": "",
+          "after": "def typeahead_execution_attestation(active):\n    \"\"\"Forward only the actual coordinator child result and captured output identity.\"\"\"\n    outputs = active.outputs.get('typeahead-execution', [])\n    invocation = active.invocations.get('typeahead-execution')\n    expected = f'evidence/typeahead-execution/{invocation}/observation.json'\n    output = next((item for item in outputs if item.get('path') == expected), None)\n    return {'run_id': active.manifest['run_id'], 'invocation_id': invocation,\n            'exit_code': active.exit_codes.get('typeahead-execution'), 'output': output}\n\n\ndef write_typeahead_report(run_dir, run_id, line, exit_code):\n    \"\"\"Create a complete roster only from this child's retained selected results.\"\"\"\n    check_id = 'typeahead-execution'\n    ACTIVE_RUN.outputs.pop(check_id, None)\n    try:\n        if exit_code != 0 or line != 'main':\n            raise EvidenceError('typeahead child did not pass on main')\n        invocation = ACTIVE_RUN.invocation(check_id)\n        prefix = assertion_directory(check_id, invocation)\n        names = ['observation.json', 'raw-report.json', 'commands.json', 'inputs-before.json',\n                 'metafile.json', 'bundle.js', 'bundle-inputs.json', 'entry.generated.ts']\n        outputs = []\n        for name in names:\n            path = run_dir / prefix / name\n            if path.is_symlink() or not path.is_file() or path.stat().st_nlink != 1:\n                raise EvidenceError('missing or unsafe typeahead output')\n            outputs.append({'path': f'{prefix}/{name}', 'sha256': evidence_sha256(path), 'bytes': path.stat().st_size})\n        snapshot = EvidenceSnapshot(ROOT, run_dir)\n        validate_typeahead_observation(snapshot, ACTIVE_RUN.manifest, ACTIVE_RUN.binding, invocation,\n                                       {item['path'] for item in outputs})\n        snapshot.revalidate()\n        ACTIVE_RUN.outputs[check_id] = outputs\n        row = validate_matrix(read_json(MATRIX_PATH))[check_id]\n        artifacts = _contract_artifacts(row)\n        if artifacts is None:\n            raise EvidenceError('typeahead artifact unavailable')\n        cases = list(TYPEAHEAD_CASES)\n        report = {'schema_version': 1, 'template': False, 'run_id': run_id, 'check_id': check_id,\n                  'line': line, 'invocation_id': invocation, 'binding': ACTIVE_RUN.binding,\n                  'coverage': 'complete', 'result': 'pass', 'exit_code': 0,\n                  'subject_kind': 'artifact', 'subject_ids': ['library'], 'artifacts': artifacts,\n                  'expected_case_ids': cases, 'discovered_case_ids': cases, 'executed_case_ids': cases,\n                  'passed_case_ids': cases, 'failed_case_ids': [], 'skipped_case_ids': [],\n                  'unresolved_case_ids': [], 'exceptions': [], 'passed': len(cases), 'failed': 0, 'skipped': 0,\n                  'outputs': outputs, 'case_results': [{'case_id': case, 'result': 'pass', 'kind': 'assertion',\n                  'output_paths': [f'{prefix}/observation.json']} for case in cases],\n                  'command': ['rc-verify.py', check_id], 'limitations': ['Focused execution only; no G11 claim.']}\n        path = run_dir / 'reports' / f'{check_id}.json'\n        path.parent.mkdir(parents=True, exist_ok=True)\n        path.write_text(json.dumps(report, indent=2) + '\\n')\n        return True\n    except (EvidenceError, OSError, ValueError, KeyError, TypeError) as error:\n        print(f'verify: typeahead evidence incomplete: {error}', file=sys.stderr)\n        # This coordinator owns the report. A stale or child-written complete\n        # report must not survive a failed evidence validation.\n        path = run_dir / 'reports' / f'{check_id}.json'\n        path.parent.mkdir(parents=True, exist_ok=True)\n        path.write_text(json.dumps({'schema_version': 1, 'template': False, 'run_id': run_id,\n                                    'check_id': check_id, 'line': line, 'coverage': 'slice',\n                                    'result': 'fail', 'exit_code': exit_code or 1, 'outputs': [],\n                                    'limitations': ['Focused typeahead execution did not produce complete bound evidence.']}, indent=2) + '\\n')\n        return False\n\n\n"
+        },
+        {
+          "offset": 25971,
+          "before": "",
+          "after": "        env['RC_UPSTREAM_TYPEAHEAD'] = json.dumps(typeahead_execution_attestation(ACTIVE_RUN), sort_keys=True)\n"
+        },
+        {
+          "offset": 65224,
+          "before": "",
+          "after": "    if body.get('case_id') in ORDERED_LEGACY_BUTTON_CASES:\n        return 'current_companion' not in body and ordered_legacy_button_envelope_ok(ACTIVE_RUN,body,invocation)\n"
+        },
+        {
+          "offset": 90861,
+          "before": "",
+          "after": "    # Run the finite packed typeahead producer before the audit consumes its identity.\n    if line == 'main':\n        code = run_node('scripts/run-typeahead-execution.py', ['--run', str(run_path)])\n        complete = write_typeahead_report(out_dir, run_id, line, code)\n        results['typeahead-execution'] = 'pass' if code == 0 and complete else 'fail'\n        implemented_ran.append('typeahead-execution')\n\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/select-dialog-finite-source-successor.mjs",
+      "source_commit": "0da0a92934ffae20098de762d78c329dc932c04c",
+      "before": {
+        "path": "scripts/select-dialog-finite-source-successor.mjs",
+        "sha256": "775695fe8809f46768dbfb4eb454f54f4a806e095284e39d8932afff56ccf24c",
+        "bytes": 7856
+      },
+      "after": {
+        "path": "scripts/select-dialog-finite-source-successor.mjs",
+        "sha256": "1f58566ca39877ed180af58172aa040851a1f992f039f16ec9de7ea10809d929",
+        "bytes": 12305
+      },
+      "edits": [
+        {
+          "offset": 378,
+          "before": "",
+          "after": "import {types} from 'node:util';\n"
+        },
+        {
+          "offset": 449,
+          "before": "const SELF='scripts/select-dialog-finite-source-successor.mjs', PACKET='compatibility/rc/parent-select-dialog-menu-snack-d61-menu-finite-source-v4.json';\nconst PIN='f8f9423c7dff2ffd5ee72fa812f137bb5db8e59a4b88b7c1868086e3bdb28777';\nconst hash=bytes=>createHash('sha256').update(bytes).digest('hex'),eq=Buffer.prototype.equals,apply=Reflect.apply;\nconst same=(a,b)=>Buffer.isBuffer(b)&&apply(eq,a,[b]);\nconst image=readFileSync(fileURLToPath(import.meta.url));\nexport const selectDialogFiniteLoadedImage=Object.freeze({path:SELF,sha256:hash(image),bytes:image.length});\nfunction historical(root,commit,path){\n assert.match(commit,/^[0-9a-f]{40}$/);const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1',GIT_TERMINAL_PROMPT:'0'};\n for(const key of Object.keys(env))if(key.startsWith('GIT_')&&!['GIT_NO_LAZY_FETCH','GIT_NO_REPLACE_OBJECTS','GIT_TERMINAL_PROMPT'].includes(key))delete env[key];\n return execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',commit+':'+path],{cwd:root,env,maxBuffer:2*1024*1024});\n",
+          "after": "\nconst SELF = 'scripts/select-dialog-finite-source-successor.mjs';\nconst PACKETS = [\n  ['compatibility/rc/parent-select-dialog-finite-source-v1.json', 'fe029afba0dbf7b1d9ecf51661cdc98240b6b0c2ee70a352dfdf99fd48ce27a6', 17132],\n  ['compatibility/rc/parent-select-dialog-menu-finite-source-v2.json', '67f279d9631a48a4cf69ef41c3ae4c3ab3446bca457d023b7e22e323506c6d88', 34319],\n  ['compatibility/rc/parent-select-dialog-menu-snack-finite-source-v3.json', 'bb2be03706f10cc22029facdb916d3527bf40cef120f0746d4ddd8794371159d', 49370],\n  ['compatibility/rc/parent-select-dialog-menu-snack-d61-menu-finite-source-v4.json', 'f8f9423c7dff2ffd5ee72fa812f137bb5db8e59a4b88b7c1868086e3bdb28777', 112277],\n];\nconst RESTORED = ['compatibility/rc/parent-restored-select-dialog-test-source-v5.json', 'da132dcf22e68076a4378f5ed2bc3b67cfb4705764107530b40cfb6734b79186', 17761];\nconst TESTS = ['projects/ngx-material-legacy/legacy-select/select.spec.ts', 'projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts'];\nconst hash = bytes => createHash('sha256').update(bytes).digest('hex');\nconst blob = bytes => createHash('sha1').update('blob ' + bytes.length + '\\0').update(bytes).digest('hex');\nconst eq = Buffer.prototype.equals, apply = Reflect.apply;\nconst same = (a, b) => Buffer.isBuffer(b) && apply(eq, a, [b]);\nconst ref = (path, bytes) => ({path, sha256: hash(bytes), bytes: bytes.length});\nconst image = readFileSync(fileURLToPath(import.meta.url));\nexport const selectDialogFiniteLoadedImage = Object.freeze(ref(SELF, image));\n\nfunction historical(root, commit, path) {\n  assert.match(commit, /^[0-9a-f]{40}$/);\n  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_')));\n  Object.assign(env, {GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_TERMINAL_PROMPT: '0'});\n  return execFileSync('git', ['--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0', 'show', commit + ':' + path], {cwd: root, env, maxBuffer: 2 * 1024 * 1024});\n"
+        },
+        {
+          "offset": 1519,
+          "before": "export function selectDialogFiniteSuccessor({root,read,line}){\n assert.ok(line==='21.x'||line==='main');assert.equal(typeof read,'function');const physical=p=>readEvidenceMember(root,p);\n const version=JSON.parse(physical('projects/ngx-material-legacy/package.json')).version;\n assert.equal(line,version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null,'wrong select line');\n assert.ok(same(physical(SELF),image),'changed loaded select successor');const raw=physical(PACKET);assert.equal(hash(raw),PIN,'changed select successor packet');\n const packet=JSON.parse(raw);assert.equal(packet.schema_version,1);assert.equal(packet.role,'finite-select-dialog-menu-snack-d61-menu-current-source-successor');assert.equal(packet.source_scope_only,true);assert.equal(packet.historical_programs_executed,false);assert.equal(packet.canonical_admission_granted,false);assert.equal(packet.g11_claim,'not-passed');\n const preceding={path:'compatibility/rc/parent-select-dialog-menu-snack-finite-source-v3.json',sha256:'bb2be03706f10cc22029facdb916d3527bf40cef120f0746d4ddd8794371159d',bytes:49370};assert.deepEqual(packet.previous_packet,preceding);const precedingRaw=physical(preceding.path);assert.equal(hash(precedingRaw),preceding.sha256);assert.equal(precedingRaw.length,preceding.bytes);const precedingPacket=JSON.parse(precedingRaw);\n const previous={path:'compatibility/rc/parent-select-dialog-menu-finite-source-v2.json',sha256:'67f279d9631a48a4cf69ef41c3ae4c3ab3446bca457d023b7e22e323506c6d88',bytes:34319};assert.deepEqual(precedingPacket.previous_packet,previous);const previousRaw=physical(previous.path);assert.equal(hash(previousRaw),previous.sha256);assert.equal(previousRaw.length,previous.bytes);const old=JSON.parse(previousRaw);const older={path:'compatibility/rc/parent-select-dialog-finite-source-v1.json',sha256:'fe029afba0dbf7b1d9ecf51661cdc98240b6b0c2ee70a352dfdf99fd48ce27a6',bytes:17132};assert.deepEqual(old.previous_packet,older);const olderRaw=physical(older.path);assert.equal(hash(olderRaw),older.sha256);assert.equal(olderRaw.length,older.bytes);assert.deepEqual(old.branches[line].transitions.slice(0,3),JSON.parse(olderRaw).branches[line].transitions);\n const rows=packet.branches[line].transitions;assert.deepEqual(rows.slice(0,5),old.branches[line].transitions);assert.deepEqual(rows.map(x=>x.path),['projects/ngx-material-legacy/legacy-select/select.html','projects/ngx-material-legacy/legacy-select/select.spec.ts','projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts','projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts','projects/ngx-material-legacy/legacy-menu/menu.spec.ts','projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts','projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts','projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts']);\n assert.deepEqual(rows,precedingPacket.branches[line].transitions);const latest=packet.branches[line].d61_menu_transitions;assert.deepEqual(latest.map(x=>x.path),['projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts','projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts','projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts','projects/ngx-material-legacy/legacy-menu/menu.spec.ts']);for(const next of latest){const prior=rows.find(row=>row.path===next.path);if(prior)assert.deepEqual(next.before,prior.after);}const effective=rows.map(row=>{const next=latest.find(item=>item.path===row.path);return next?{...row,after:next.after}:row;}).concat(latest.filter(next=>!rows.some(row=>row.path===next.path)));\n const bound=[{path:SELF,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PIN,bytes:raw.length},preceding,previous,older,...effective.map(x=>({path:x.after.path,sha256:x.after.sha256,bytes:x.after.bytes}))];\n assert.equal(new Set(bound.map(x=>x.path)).size,bound.length);\n const sweep=()=>{for(const ref of bound){const value=physical(ref.path);assert.equal(hash(value),ref.sha256,'changed physical select successor '+ref.path);assert.equal(value.length,ref.bytes);}assert.ok(same(physical(SELF),image),'changed loaded select successor');};\n sweep();for(const row of [...rows,...latest]){\n  assert.equal(row.before.path,row.path);assert.equal(row.after.path,row.path);const before=historical(root,row.source_parent,row.path);assert.equal(hash(before),row.before.sha256);assert.equal(before.length,row.before.bytes);assert.equal(createHash('sha1').update('blob '+before.length+'\\0').update(before).digest('hex'),row.before.git_blob);\n  let cursor=0;const chunks=[];for(const edit of row.edits){assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor);const old=Buffer.from(edit.before);assert.ok(same(before.subarray(edit.offset,edit.offset+old.length),old));chunks.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+old.length;}chunks.push(before.subarray(cursor));const next=Buffer.concat(chunks);assert.equal(hash(next),row.after.sha256);assert.equal(next.length,row.after.bytes);assert.equal(createHash('sha1').update('blob '+next.length+'\\0').update(next).digest('hex'),row.after.git_blob);\n }\n let active=false;const idle=()=>assert.equal(active,false,'reentrant select successor consumption');\n const assertCurrent=()=>{idle();active=true;try{sweep();for(const ref of bound){const before=physical(ref.path);assert.equal(hash(before),ref.sha256);assert.equal(before.length,ref.bytes);assert.ok(same(before,read(ref.path)),'nonphysical select successor '+ref.path);assert.ok(same(before,physical(ref.path)),'select successor changed during callback '+ref.path);}sweep();}finally{active=false;}};\n const select=(ref,side)=>{const row=effective.find(x=>x.path===ref?.path);if(!row)return null;const intermediate=latest.find(x=>x.path===ref.path)?.before;const expected=[row.before,intermediate,row.after].find(candidate=>candidate?.sha256===ref.sha256);assert.ok(expected,'unknown select predecessor');if(ref.bytes!==undefined)assert.equal(ref.bytes,expected.bytes);return {...ref,sha256:row[side].sha256,...(ref.bytes===undefined?{}:{bytes:row[side].bytes})};};\n const qualify=ref=>select(ref,'after'),historicalReference=ref=>select(ref,'before');\n assertCurrent();return {bound:structuredClone(bound),qualify,historicalReference,assertCurrent,assertPhysical:sweep};\n",
+          "after": "\nfunction replay(row, before) {\n  assert.equal(row.before.path, row.path);\n  assert.equal(row.after.path, row.path);\n  assert.deepEqual(ref(row.path, before), {path: row.path, sha256: row.before.sha256, bytes: row.before.bytes});\n  assert.equal(blob(before), row.before.git_blob);\n  let cursor = 0;\n  const chunks = [];\n  for (const edit of row.edits) {\n    assert.deepEqual(Object.keys(edit).sort(), ['after', 'before', 'offset']);\n    assert.ok(Number.isSafeInteger(edit.offset) && edit.offset >= cursor && edit.offset <= before.length);\n    assert.equal(typeof edit.before, 'string');\n    assert.equal(typeof edit.after, 'string');\n    const old = Buffer.from(edit.before);\n    assert.ok(same(before.subarray(edit.offset, edit.offset + old.length), old));\n    chunks.push(before.subarray(cursor, edit.offset), Buffer.from(edit.after));\n    cursor = edit.offset + old.length;\n  }\n  chunks.push(before.subarray(cursor));\n  const after = Buffer.concat(chunks);\n  assert.deepEqual(ref(row.path, after), {path: row.path, sha256: row.after.sha256, bytes: row.after.bytes});\n  assert.equal(blob(after), row.after.git_blob);\n  return after;\n"
+        },
+        {
+          "offset": 7856,
+          "before": "",
+          "after": "\nexport function selectDialogFiniteSuccessor({root, read, line}) {\n  assert.ok(line === '21.x' || line === 'main');\n  assert.equal(typeof read, 'function');\n  const physical = path => readEvidenceMember(root, path);\n  const packagePath = 'projects/ngx-material-legacy/package.json', packageRaw = physical(packagePath);\n  const version = JSON.parse(packageRaw).version;\n  assert.equal(line, version.startsWith('21.') ? '21.x' : version.startsWith('22.') ? 'main' : null, 'wrong select line');\n  assert.ok(same(physical(SELF), image), 'changed loaded select successor');\n  const bound = [ref(SELF, image), ref(packagePath, packageRaw)];\n  const packetAt = ([path, sha256, bytes]) => {\n    const raw = physical(path);\n    assert.deepEqual(ref(path, raw), {path, sha256, bytes}, 'changed select successor packet');\n    bound.push({path, sha256, bytes});\n    return JSON.parse(raw);\n  };\n  const packets = PACKETS.map(packetAt), [older, old, preceding, packet] = packets;\n  const roles = ['finite-select-dialog-current-source-successor', 'finite-select-dialog-menu-current-source-successor', 'finite-select-dialog-menu-snack-current-source-successor', 'finite-select-dialog-menu-snack-d61-menu-current-source-successor'];\n  for (const [index, item] of packets.entries()) {\n    assert.equal(item.schema_version, 1);\n    assert.equal(item.role, roles[index]);\n    if (index) {\n      const [path, sha256, bytes] = PACKETS[index - 1];\n      assert.deepEqual(item.previous_packet, {path, sha256, bytes});\n    }\n  }\n  assert.equal(packet.source_scope_only, true);\n  assert.equal(packet.historical_programs_executed, false);\n  assert.equal(packet.canonical_admission_granted, false);\n  assert.equal(packet.g11_claim, 'not-passed');\n  const rows = packet.branches[line].transitions, latest = packet.branches[line].d61_menu_transitions;\n  assert.deepEqual(rows.map(x => x.path), ['projects/ngx-material-legacy/legacy-select/select.html', TESTS[0], 'projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts', 'projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts', 'projects/ngx-material-legacy/legacy-menu/menu.spec.ts', 'projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts', 'projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts', 'projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts']);\n  assert.deepEqual(rows.slice(0, 3), older.branches[line].transitions);\n  assert.deepEqual(rows.slice(0, 5), old.branches[line].transitions);\n  assert.deepEqual(rows, preceding.branches[line].transitions);\n  assert.deepEqual(latest.map(x => x.path), ['projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts', TESTS[1], 'projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts', 'projects/ngx-material-legacy/legacy-menu/menu.spec.ts']);\n  for (const next of latest) {\n    const prior = rows.find(row => row.path === next.path);\n    if (prior) assert.deepEqual(next.before, prior.after);\n  }\n  const rendered = new Map();\n  for (const row of [...rows, ...latest]) rendered.set(row.path, replay(row, historical(root, row.source_parent, row.path)));\n  const effective = rows.map(row => ({...row, after: latest.find(item => item.path === row.path)?.after ?? row.after})).concat(latest.filter(next => !rows.some(row => row.path === next.path)));\n  const intermediates = [...latest.map(row => row.before)];\n  // Accept only the frozen v4 shape or the exact paired, reviewed test restorations.\n  // Git programs are never loaded; their file bytes are comparison inputs to replay.\n  if (TESTS.some(path => hash(physical(path)) !== effective.find(row => row.path === path).after.sha256)) {\n    const restored = packetAt(RESTORED);\n    assert.equal(restored.schema_version, 1);\n    assert.equal(restored.role, 'finite-restored-select-dialog-test-source-v5');\n    assert.equal(restored.source_scope_only, true);\n    assert.equal(restored.historical_programs_executed, false);\n    assert.equal(restored.canonical_admission_granted, false);\n    assert.equal(restored.g11_claim, 'not-passed');\n    const [path, sha256, bytes] = PACKETS[3];\n    assert.deepEqual(restored.prior_packet, {path, sha256, bytes});\n    const branch = restored.branches[line];\n    assert.deepEqual(branch.repairs.map(row => row.path), TESTS);\n    for (const row of branch.repairs) {\n      const prior = effective.find(item => item.path === row.path);\n      assert.deepEqual(row.before, prior.after);\n      const after = replay(row, rendered.get(row.path));\n      assert.ok(same(after, historical(root, row.after_source_parent, row.path)), 'restored test Git source mismatch');\n      intermediates.push(prior.after);\n      prior.after = row.after;\n    }\n    assert.deepEqual(branch.receipts.map(row => row.path), ['compatibility/rc/parent-input-select-historical-repair-v1.json', 'compatibility/rc/parent-four-historical-fixture-repairs-v1.json']);\n    const receipts = branch.receipts.map(row => packetAt([row.path, row.sha256, row.bytes]));\n    const key = line === '21.x' ? '21' : 'main';\n    assert.equal(receipts[0].proposal_manifest.lines[key].original_spec_sha256.select, branch.repairs[0].before.sha256);\n    assert.equal(receipts[0].proposal_manifest.lines[key].patched_spec_sha256.select, branch.repairs[0].after.sha256);\n    assert.equal(receipts[1].source_afterimages[key][TESTS[1]], branch.repairs[1].after.sha256);\n  }\n  bound.push(...effective.map(row => ({path: row.path, sha256: row.after.sha256, bytes: row.after.bytes})));\n  assert.equal(new Set(bound.map(row => row.path)).size, bound.length);\n  let active = false, nestedAttempt = false;\n  const idle = () => {\n    if (active) { nestedAttempt = true; assert.fail('reentrant select successor consumption'); }\n  };\n  const sweep = () => {\n    for (const row of bound) assert.deepEqual(ref(row.path, physical(row.path)), row, 'changed physical select successor ' + row.path);\n    assert.ok(same(physical(SELF), image), 'changed loaded select successor');\n  };\n  const assertCurrent = () => {\n    idle(); active = true; nestedAttempt = false;\n    try {\n      sweep();\n      for (const row of bound) {\n        const before = physical(row.path);\n        assert.deepEqual(ref(row.path, before), row);\n        assert.ok(same(before, read(row.path)), 'nonphysical select successor ' + row.path);\n        assert.ok(same(before, physical(row.path)), 'select successor changed during callback ' + row.path);\n      }\n      assert.equal(nestedAttempt, false, 'reentrant select successor consumption');\n      sweep();\n    } finally { active = false; }\n  };\n  const select = (incoming, side) => {\n    idle();\n    if (incoming === null || typeof incoming !== 'object') return null;\n    assert.equal(types.isProxy(incoming), false, 'reference must not be a proxy');\n    const descriptors = Object.getOwnPropertyDescriptors(incoming);\n    if (!Object.hasOwn(descriptors, 'path')) return null;\n    assert.ok(Object.hasOwn(descriptors.path, 'value'), 'reference path must be data');\n    assert.equal(typeof descriptors.path.value, 'string');\n    const row = effective.find(item => item.path === descriptors.path.value);\n    // An unowned plain path consumes no reference. Data descriptors cannot\n    // invoke supplied getters or proxy traps while determining ownership.\n    if (!row) return null;\n    for (const descriptor of Object.values(descriptors)) assert.ok(Object.hasOwn(descriptor, 'value'), 'reference must contain data properties');\n    const value = Object.fromEntries(Object.entries(descriptors).map(([key, descriptor]) => [key, descriptor.value]));\n    active = true; nestedAttempt = false;\n    try {\n      sweep();\n      assert.deepEqual(Object.keys(value).sort(), value.bytes === undefined ? ['path', 'sha256'] : ['bytes', 'path', 'sha256']);\n      assert.equal(typeof value.sha256, 'string');\n      if (value.bytes !== undefined) assert.ok(Number.isSafeInteger(value.bytes));\n      const expected = [row.before, ...intermediates.filter(item => item.path === row.path), row.after].find(candidate => candidate.sha256 === value.sha256);\n      assert.ok(expected, 'unknown select predecessor');\n      if (value.bytes !== undefined) assert.equal(value.bytes, expected.bytes);\n      const result = {path: row.path, sha256: row[side].sha256, ...(value.bytes === undefined ? {} : {bytes: row[side].bytes})};\n      assert.equal(nestedAttempt, false, 'reentrant select successor consumption');\n      sweep();\n      return result;\n    } finally { active = false; }\n  };\n  assertCurrent();\n  return {bound: structuredClone(bound), qualify: incoming => select(incoming, 'after'), historicalReference: incoming => select(incoming, 'before'), assertCurrent, assertPhysical: () => {idle(); sweep();}};\n}\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/rc_acceptance.py",
+      "source_commit": "70fecd1e31cb0e2a881b3b3e803fae3fcbddefde",
+      "before": {
+        "path": "scripts/rc_acceptance.py",
+        "sha256": "22f63424d318d9aa184b139afbc99bcda2d08322c48292b20f57c66c6b240b72",
+        "bytes": 30941
+      },
+      "after": {
+        "path": "scripts/rc_acceptance.py",
+        "sha256": "19ed3f06e34178e6b31d1d88f92c33f74d1a1bd680477152c1a90e9685df3194",
+        "bytes": 40963
+      },
+      "edits": [
+        {
+          "offset": 380,
+          "before": "",
+          "after": "import subprocess\n"
+        },
+        {
+          "offset": 2115,
+          "before": "",
+          "after": "    \"typeahead-execution\": ((\"G11\",), \"artifact\", (\"library\",), (\"focused-typeahead\",)),\n"
+        },
+        {
+          "offset": 3285,
+          "before": "",
+          "after": "TYPEAHEAD_CASES = ('MatSelectionList without forms > with list option > should be able to jump focus down to an item by typing', 'MatSelectionList without forms > with list option > should not select items while using the typeahead', 'MatMenu > should route typeahead focus through the public menu keydown and skip disabled matches', 'MatMenu > should update menu typeahead targets after dynamic items change', 'MatSelect > core > accessibility > for select > should be able to select options by typing on a closed select', 'MatSelect > core > accessibility > for select > should skip a disabled option after the closed select options change during typeahead', 'MatSelect > core > accessibility > for select > should not open the select when pressing space while typing', 'MatSelect > core > accessibility > for select > should be able to customize the typeahead debounce interval', 'MatSelect > core > accessibility > for select > should cancel the typeahead selection on blur')\n\n"
+        },
+        {
+          "offset": 4563,
+          "before": "def parse_json(data: bytes, label: Any) -> dict[str, Any]:\n",
+          "after": "def parse_json_value(data: bytes, label: Any) -> Any:\n"
+        },
+        {
+          "offset": 4956,
+          "before": "",
+          "after": "    return value\n\n\ndef parse_json(data: bytes, label: Any) -> dict[str, Any]:\n    value = parse_json_value(data, label)\n"
+        },
+        {
+          "offset": 7556,
+          "before": "",
+          "after": "\n\nTYPEAHEAD_CHECKER_FILES = frozenset({\n    \"scripts/revalidate-typeahead.mjs\", \"scripts/upstream-typeahead-evidence.mjs\",\n    \"scripts/typeahead-run-projection.mjs\", \"scripts/upstream-packed-run-evidence.mjs\",\n    \"scripts/packed-consumer-evidence.mjs\", \"scripts/run-typeahead-execution.py\",\n    \"compatibility/rc/matrices/library-exports.json\",\n})\nTYPEAHEAD_SOURCE_PREFIXES = (\"projects/ngx-material-legacy/\", \"testing/legacy-runner/\",\n    \"compatibility/rc/typeahead-fixture/\", \"compatibility/rc/typeahead-runner/\", \"node_modules/\")\n\n\ndef register_typeahead_files(snapshot: EvidenceSnapshot, records: Any) -> None:\n    require(isinstance(records, list) and bool(records), \"typeahead: missing validated file inventory\")\n    seen = set()\n    for record in records:\n        require(isinstance(record, dict) and set(record) == {\"root\", \"path\", \"sha256\", \"bytes\"}, \"typeahead: invalid inventory record\")\n        path = record.get(\"path\")\n        require(record.get(\"root\") == \"repository\" and isinstance(path, str) and\n                (path in TYPEAHEAD_CHECKER_FILES or path.startswith(TYPEAHEAD_SOURCE_PREFIXES)),\n                \"typeahead: invalid inventory role/path\")\n        require(path not in seen, \"typeahead: duplicate inventory path\")\n        seen.add(path)\n        key = (\"repository\", path)\n        if key in snapshot.files:\n            require(snapshot.files[key] == record, \"typeahead: inconsistent existing identity\")\n            checked_file(snapshot.roots[\"repository\"], record, \"typeahead existing identity\")\n        else:\n            snapshot.checked(\"repository\", record, \"typeahead-input\")\n    require(TYPEAHEAD_CHECKER_FILES <= seen, \"typeahead: missing loaded checker identity\")\n"
+        },
+        {
+          "offset": 13105,
+          "before": "",
+          "after": "        if cid == \"typeahead-execution\":\n            require(cases[\"main\"][\"focused-typeahead\"] == list(TYPEAHEAD_CASES) and cases[\"21.x\"][\"focused-typeahead\"] is None, f\"{cid}: fixed main roster required\")\n"
+        },
+        {
+          "offset": 17093,
+          "before": "",
+          "after": "def validate_typeahead_observation(snapshot, run, binding, invocation, output_paths):\n    \"\"\"Bind the focused report to actual selected results and retained input bytes.\"\"\"\n    prefix = assertion_directory(\"typeahead-execution\", invocation)\n    observation_path = prefix + \"/observation.json\"\n    require(observation_path in output_paths, \"typeahead: observation is not an output\")\n    obs = snapshot.json(\"run\", observation_path, \"assertion-output\")\n    library = next(a for a in run[\"artifacts\"] if a[\"id\"] == \"library\")\n    require(obs.get(\"schema_version\") == 1 and obs.get(\"kind\") == \"typeahead-execution\" and obs.get(\"sha\") == \"ff36c80f9c7a14f0e9f36eafc3e1423d34e7c916\", \"typeahead: wrong observation identity\")\n    require(obs.get(\"run_id\") == run[\"run_id\"] and obs.get(\"line\") == \"main\" and obs.get(\"invocation_id\") == invocation and obs.get(\"binding\") == binding, \"typeahead: wrong execution binding\")\n    require(obs.get(\"library\") == {\"sha256\": library[\"sha256\"], \"bytes\": library[\"bytes\"]} and obs.get(\"inputs_unchanged\") is True, \"typeahead: wrong artifact or changed inputs\")\n    files = obs.get(\"files\")\n    required = {\"raw-report.json\", \"commands.json\", \"inputs-before.json\", \"metafile.json\", \"bundle.js\", \"bundle-inputs.json\", \"entry.generated.ts\"}\n    require(isinstance(files, dict) and set(files) == required, \"typeahead: missing or unknown support files\")\n    for name, identity in files.items():\n        path = prefix + \"/\" + name\n        require(path in output_paths and isinstance(identity, dict) and set(identity) == {\"sha256\", \"bytes\"}, \"typeahead: missing support output\")\n        snapshot.checked(\"run\", {\"path\": path, **identity}, \"assertion-output\")\n    raw = snapshot.json(\"run\", prefix + \"/raw-report.json\", \"assertion-output\")\n    specs = raw.get(\"specs\")\n    require(isinstance(specs, list) and all(isinstance(r, dict) and type(r.get(\"skipped\")) is bool for r in specs), \"typeahead: invalid spec statuses\")\n    selected = [r for r in specs if r[\"skipped\"] is False]\n    require(raw.get(\"subject_mode\") == \"artifact\" and raw.get(\"mode\") == \"normal\" and raw.get(\"run_id\") == run[\"run_id\"] and raw.get(\"artifact_sha256\") == library[\"sha256\"], \"typeahead: raw result binding mismatch\")\n    require(isinstance(raw.get(\"totals\"), dict) and all(type(v) is int for v in raw[\"totals\"].values()) and raw.get(\"totals\") == {\"executed\": 496, \"passed\": 9, \"failed\": 0, \"skipped\": 487} and obs.get(\"counts\") == raw[\"totals\"] and raw.get(\"failures\") == [] and len(raw.get(\"specs\", [])) == 496, \"typeahead: incomplete results\")\n    require(obs.get(\"selected_cases\") == selected and [r.get(\"full_name\") for r in selected] == list(TYPEAHEAD_CASES) and all(r.get(\"success\") is True for r in selected), \"typeahead: selected case results differ\")\n    require(all(sum(r.get(\"full_name\") == name for r in specs) == 1 for name in TYPEAHEAD_CASES), \"typeahead: duplicate case\")\n    peers = {\"fesm2022/_list-key-manager-chunk.mjs\": \"63042ad0a8264bfedfaac1c03d2b0eee450bcd7890a09792dc83256195e00057\", \"fesm2022/_typeahead-chunk.mjs\": \"c26eed04140a44b175020b75b3a16bf73c2913a064ae61c79dc744d5fa3e4622\"}\n    require(obs.get(\"peer_version\") == \"22.1.7\" and obs.get(\"peer_members\") == peers and type(obs.get(\"extracted_files\")) is int and obs[\"extracted_files\"] > 0, \"typeahead: invalid peer or extraction identity\")\n    initial = snapshot.json(\"run\", prefix + \"/inputs-before.json\", \"assertion-output\")\n    require(initial.get(\"artifact\") == library[\"sha256\"] and initial.get(\"peer\") == peers, \"typeahead: wrong input snapshot\")\n    _, log_bytes = snapshot.capture(\"run\", prefix + \"/commands.json\", \"assertion-output\")\n    log = parse_json_value(log_bytes, prefix + \"/commands.json\")\n    require(isinstance(log, list) and len(log) == 3, \"typeahead: incomplete command log\")\n    commands = [\"testing/legacy-runner/build.mjs\", \"testing/legacy-runner/build.mjs\", \"node_modules/karma/bin/karma\"]\n    require(all(isinstance(row, dict) and type(row.get(\"exit_code\")) is int and row[\"exit_code\"] == 0 and isinstance(row.get(\"command\"), list) and len(row[\"command\"]) >= 2 and row[\"command\"][1] == expected for row, expected in zip(log, commands)), \"typeahead: failed or unexpected command\")\n    meta = snapshot.json(\"run\", prefix + \"/metafile.json\", \"assertion-output\")\n    graph = snapshot.json(\"run\", prefix + \"/bundle-inputs.json\", \"assertion-output\")\n    require(isinstance(meta.get(\"inputs\"), dict) and isinstance(graph.get(\"inputs\"), list) and graph.get(\"schema_version\") == 1 and graph[\"inputs\"] and all(isinstance(row, dict) for row in graph[\"inputs\"]), \"typeahead: invalid bundle graph\")\n    rows = graph[\"inputs\"]\n    require([row.get(\"key\") for row in rows] == list(meta[\"inputs\"]) and any(row.get(\"origin\") == \"artifact\" for row in rows) and any(row.get(\"origin\") == \"generated\" and row.get(\"path\") == \"entry.generated.ts\" for row in rows), \"typeahead: incomplete bundle graph\")\n    require(all(any(row.get(\"origin\") == \"dependency\" and isinstance(row.get(\"path\"), str) and row[\"path\"].endswith(\"@angular/cdk/\" + path) and row.get(\"sha256\") == digest for row in rows) for path, digest in peers.items()), \"typeahead: missing peer inputs\")\n    return obs\n\n\n"
+        },
+        {
+          "offset": 17740,
+          "before": "",
+          "after": "    typeahead_files: list[dict[str, Any]] = []\n"
+        },
+        {
+          "offset": 27625,
+          "before": "",
+          "after": "            if cid == \"typeahead-execution\":\n                validate_typeahead_observation(snapshot, run, binding, invocation, output_paths)\n                # Replay the very same finite validator used by upstream admission,\n                # with identities from the coordinator, not from the child report.\n                observation = next(item for item in outputs if item[\"path\"] == assertion_directory(cid, invocation) + \"/observation.json\")\n                request = {\"line\": line, \"runId\": run_id, \"runDir\": str(run_path.parent), \"binding\": binding,\n                           \"packedConsumerExecution\": {\"run_id\": run_id, \"exit_code\": process_results.get(\"packed-consumer\"), \"invocation_id\": invocation_ids.get(\"packed-consumer\")},\n                           \"typeaheadExecution\": {\"run_id\": run_id, \"exit_code\": actual_exit, \"invocation_id\": invocation, \"output\": observation}}\n                completed = subprocess.run([\"node\", str(root / \"scripts/revalidate-typeahead.mjs\")], input=json.dumps({\"root\": str(root), \"request\": request}), text=True, capture_output=True, cwd=root)\n                require(completed.returncode == 0, f\"{cid}: shared finite validation failed: {completed.stderr.strip()}\")\n                outcome = parse_json_value(completed.stdout.encode(), \"typeahead shared validator\")\n                require(outcome.get(\"ok\") is True and outcome.get(\"invocation_id\") == invocation and outcome.get(\"output\") == observation, f\"{cid}: shared validator identity mismatch\")\n                register_typeahead_files(snapshot, outcome.get(\"validated_files\"))\n                typeahead_files = outcome[\"validated_files\"]\n"
+        },
+        {
+          "offset": 30095,
+          "before": "",
+          "after": "    summary[\"typeahead_validated_files\"] = typeahead_files\n"
+        }
+      ]
+    },
+    {
+      "path": "compatibility/rc/matrices/full-verify.json",
+      "source_commit": "70fecd1e31cb0e2a881b3b3e803fae3fcbddefde",
+      "before": {
+        "path": "compatibility/rc/matrices/full-verify.json",
+        "sha256": "fe88ccd67bd87d0d754e95997e95d7fc651c508443edf274548f835a79461b33",
+        "bytes": 621456
+      },
+      "after": {
+        "path": "compatibility/rc/matrices/full-verify.json",
+        "sha256": "bd234833108141eb7ee37b755b4cdd983e333bb2107da69e5542e2665789ad85",
+        "bytes": 623004
+      },
+      "edits": [
+        {
+          "offset": 545034,
+          "before": "",
+          "after": "      \"check_id\": \"typeahead-execution\",\n      \"required\": true,\n      \"implemented\": true,\n      \"acceptance\": {\n        \"gates\": [\n          \"G11\"\n        ],\n        \"subject_kind\": \"artifact\",\n        \"subject_ids\": [\n          \"library\"\n        ],\n        \"cases_by_line\": {\n          \"main\": {\n            \"focused-typeahead\": [\n              \"MatSelectionList without forms > with list option > should be able to jump focus down to an item by typing\",\n              \"MatSelectionList without forms > with list option > should not select items while using the typeahead\",\n              \"MatMenu > should route typeahead focus through the public menu keydown and skip disabled matches\",\n              \"MatMenu > should update menu typeahead targets after dynamic items change\",\n              \"MatSelect > core > accessibility > for select > should be able to select options by typing on a closed select\",\n              \"MatSelect > core > accessibility > for select > should skip a disabled option after the closed select options change during typeahead\",\n              \"MatSelect > core > accessibility > for select > should not open the select when pressing space while typing\",\n              \"MatSelect > core > accessibility > for select > should be able to customize the typeahead debounce interval\",\n              \"MatSelect > core > accessibility > for select > should cancel the typeahead selection on blur\"\n            ]\n          },\n          \"21.x\": {\n            \"focused-typeahead\": null\n          }\n        }\n      }\n    },\n    {\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_rc_acceptance.py",
+      "source_commit": "70fecd1e31cb0e2a881b3b3e803fae3fcbddefde",
+      "before": {
+        "path": "tests/test_rc_acceptance.py",
+        "sha256": "6bd29085455e62f10d896ca23819f80ca96a68f1c8792c7c9385e1a32ce760f2",
+        "bytes": 37745
+      },
+      "after": {
+        "path": "tests/test_rc_acceptance.py",
+        "sha256": "89a2e2cc0ad1b72fde88395fc9e9aabe8a83baf7102e6acaaadaab12ff1f357c",
+        "bytes": 43262
+      },
+      "edits": [
+        {
+          "offset": 216,
+          "before": "",
+          "after": "import hashlib\n"
+        },
+        {
+          "offset": 1721,
+          "before": "",
+          "after": "        typeahead = next(row for row in self.matrix[\"checks\"] if row[\"check_id\"] == \"typeahead-execution\")\n        typeahead[\"acceptance\"][\"cases_by_line\"] = {\"main\": {\"focused-typeahead\": list(acceptance.TYPEAHEAD_CASES)}, \"21.x\": {\"focused-typeahead\": None}}\n"
+        },
+        {
+          "offset": 3955,
+          "before": "",
+          "after": "            if cid == \"typeahead-execution\" and line == \"21.x\":\n                continue\n"
+        },
+        {
+          "offset": 5439,
+          "before": "",
+          "after": "            if cid == \"typeahead-execution\":\n                self.write_typeahead_evidence(cid, output.parent, cases, artifacts[0])\n"
+        },
+        {
+          "offset": 5628,
+          "before": "",
+          "after": "\n    def write_typeahead_evidence(self, cid, directory, cases, library):\n        # Synthetic bytes exercise evaluator contracts only; they are not product evidence.\n        peers = {\"fesm2022/_list-key-manager-chunk.mjs\": \"63042ad0a8264bfedfaac1c03d2b0eee450bcd7890a09792dc83256195e00057\", \"fesm2022/_typeahead-chunk.mjs\": \"c26eed04140a44b175020b75b3a16bf73c2913a064ae61c79dc744d5fa3e4622\"}\n        selected = [{\"full_name\": name, \"skipped\": False, \"success\": True} for name in cases]\n        totals = {\"executed\": 496, \"passed\": 9, \"failed\": 0, \"skipped\": 487}\n        raw = {\"subject_mode\": \"artifact\", \"mode\": \"normal\", \"run_id\": self.run[\"run_id\"], \"artifact_sha256\": library[\"sha256\"], \"totals\": totals, \"failures\": [], \"specs\": selected + [{\"full_name\": f\"other {i}\", \"skipped\": True} for i in range(487)]}\n        rows = [{\"key\": \"artifact/package/a\", \"origin\": \"artifact\"}, {\"key\": \"testing/legacy-runner/out/entry.generated.ts\", \"origin\": \"generated\", \"path\": \"entry.generated.ts\"}] + [{\"key\": \"node_modules/@angular/cdk/\" + path, \"origin\": \"dependency\", \"path\": \"node_modules/@angular/cdk/\" + path, \"sha256\": digest} for path, digest in peers.items()]\n        support = {\"raw-report.json\": raw, \"commands.json\": [{\"command\": [\"node\", name], \"exit_code\": 0} for name in (\"testing/legacy-runner/build.mjs\", \"testing/legacy-runner/build.mjs\", \"node_modules/karma/bin/karma\")], \"inputs-before.json\": {\"artifact\": library[\"sha256\"], \"peer\": peers}, \"metafile.json\": {\"inputs\": {row[\"key\"]: {} for row in rows}}, \"bundle-inputs.json\": {\"schema_version\": 1, \"inputs\": rows}}\n        files = {}\n        for name in (\"raw-report.json\", \"commands.json\", \"inputs-before.json\", \"metafile.json\", \"bundle.js\", \"bundle-inputs.json\", \"entry.generated.ts\"):\n            path = directory / name\n            if name in support: write_json(path, support[name])\n            else: path.write_text(\"synthetic \" + name)\n            files[name] = {\"sha256\": acceptance.sha256_file(path), \"bytes\": path.stat().st_size}\n        obs = {\"schema_version\": 1, \"kind\": \"typeahead-execution\", \"sha\": \"ff36c80f9c7a14f0e9f36eafc3e1423d34e7c916\", \"run_id\": self.run[\"run_id\"], \"line\": \"main\", \"invocation_id\": self.invocations[cid], \"binding\": self.binding, \"library\": {\"sha256\": library[\"sha256\"], \"bytes\": library[\"bytes\"]}, \"inputs_unchanged\": True, \"peer_version\": \"22.1.7\", \"peer_members\": peers, \"extracted_files\": 1, \"files\": files, \"selected_cases\": selected, \"counts\": totals}\n        write_json(directory / \"observation.json\", obs)\n        paths = [directory / \"observation.json\"] + [directory / name for name in files]\n        outputs = [{\"path\": str(path.relative_to(self.run_dir)), \"sha256\": acceptance.sha256_file(path), \"bytes\": path.stat().st_size} for path in paths]\n        self.reports[cid][\"outputs\"] = outputs\n        self.reports[cid][\"case_results\"] = [{\"case_id\": case, \"result\": \"pass\", \"kind\": \"assertion\", \"output_paths\": [outputs[0][\"path\"]]} for case in cases]\n"
+        },
+        {
+          "offset": 7760,
+          "before": "    def test_complete_synthetic_fixture_passes_evaluator_not_admission(self):\n",
+          "after": "    def test_synthetic_fixture_cannot_pass_shared_typeahead_validator(self):\n"
+        },
+        {
+          "offset": 7873,
+          "before": "        self.assertEqual(result[\"automatic_product_result\"], \"pass\", result)\n",
+          "after": "        self.assertEqual(result[\"automatic_product_result\"], \"incomplete\", result)\n        self.assertIn(\"shared finite validation failed\", json.dumps(result[\"incomplete_checks\"]))\n"
+        },
+        {
+          "offset": 8148,
+          "before": "        self.assertEqual(len(result[\"complete_checks\"]), len(acceptance.CHECK_CONTRACT))\n",
+          "after": "        self.assertEqual(len(result[\"complete_checks\"]), len(acceptance.CHECK_CONTRACT) - 1)\n\n    def test_shared_typeahead_replay_uses_coordinator_identity(self):\n        # Mock only the external validator in this plumbing test; the complete\n        # JS validator has its own realistic graph positive and negative suite.\n        inventory = []\n        for name in sorted(acceptance.TYPEAHEAD_CHECKER_FILES):\n            path = self.f.root / name\n            path.parent.mkdir(parents=True, exist_ok=True)\n            path.write_text('synthetic checker ' + name)\n            data = path.read_bytes()\n            inventory.append({\"root\": \"repository\", \"path\": name, \"sha256\": hashlib.sha256(data).hexdigest(), \"bytes\": len(data)})\n        def replay(command, *, input, **kwargs):\n            request = json.loads(input)[\"request\"]\n            actual = request[\"typeaheadExecution\"]\n            self.assertEqual(actual[\"invocation_id\"], self.f.invocations[\"typeahead-execution\"])\n            self.assertEqual(actual[\"exit_code\"], self.f.exits[\"typeahead-execution\"])\n            self.assertEqual(request[\"packedConsumerExecution\"][\"invocation_id\"], self.f.invocations[\"packed-consumer\"])\n            return acceptance.subprocess.CompletedProcess(command, 0, json.dumps({\"ok\": True, \"invocation_id\": actual[\"invocation_id\"], \"output\": actual[\"output\"], \"validated_files\": inventory}), \"\")\n        with patch.object(acceptance.subprocess, \"run\", side_effect=replay):\n            result = self.f.evaluate()\n        self.assertEqual(result[\"automatic_product_result\"], \"pass\", result)\n\n    def test_typeahead_output_tampering_rejects_whole_evaluation(self):\n        report = self.f.reports[\"typeahead-execution\"]\n        bundle = next(item for item in report[\"outputs\"] if item[\"path\"].endswith(\"/bundle.js\"))\n        (self.f.run_dir / bundle[\"path\"]).write_text(\"tampered\")\n        self.reject(\"bytes/hash mismatch\")\n"
+        },
+        {
+          "offset": 8444,
+          "before": "            self.assertEqual(result[\"automatic_product_result\"], \"pass\", result)\n",
+          "after": "            self.assertEqual(result[\"automatic_product_result\"], \"incomplete\", result)\n            self.assertIn(\"unresolved case roster\", json.dumps(result[\"incomplete_checks\"][\"typeahead-execution\"]))\n"
+        },
+        {
+          "offset": 35480,
+          "before": "        self.assertEqual(result['automatic_product_result'], 'pass', result)\n",
+          "after": "        self.assertEqual(result['automatic_product_result'], 'incomplete', result)\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/select_dialog_finite_source_successor_v4.py",
+      "source_commit": "0da0a92934ffae20098de762d78c329dc932c04c",
+      "before": {
+        "path": "scripts/select_dialog_finite_source_successor_v4.py",
+        "sha256": "3320f1c46f6614f7e87883df95f0c295716b829f911d52e750e4e351dd0e2116",
+        "bytes": 9989
+      },
+      "after": {
+        "path": "scripts/select_dialog_finite_source_successor_v4.py",
+        "sha256": "ddaaada77d28cdcfe7482770adf8eec3f1e47413de70b08ee8d98201768d6855",
+        "bytes": 13849
+      },
+      "edits": [
+        {
+          "offset": 147,
+          "before": "\"\"\"Finite v4 product successor for current source owners; Git bytes are comparison data only.\"\"\"\n",
+          "after": "\"\"\"Finite v1-v5 product successor for current source owners; Git bytes are comparison data only.\"\"\"\n"
+        },
+        {
+          "offset": 1035,
+          "before": "",
+          "after": "RESTORED = ('compatibility/rc/parent-restored-select-dialog-test-source-v5.json',\n            'da132dcf22e68076a4378f5ed2bc3b67cfb4705764107530b40cfb6734b79186', 17761)\nTESTS = ('projects/ngx-material-legacy/legacy-select/select.spec.ts',\n         'projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts')\n"
+        },
+        {
+          "offset": 3211,
+          "before": "",
+          "after": "def _replay(row, before):\n    path = row['path']\n    assert row['before']['path'] == row['after']['path'] == path\n    assert _ref(path, before) == {key: row['before'][key] for key in ('path', 'sha256', 'bytes')}\n    assert _blob(before) == row['before']['git_blob']\n    chunks, cursor = [], 0\n    for edit in row['edits']:\n        assert set(edit) == {'offset', 'before', 'after'}\n        offset, old_bytes = edit['offset'], edit['before'].encode()\n        assert type(offset) is int and cursor <= offset <= len(before)\n        assert before[offset:offset + len(old_bytes)] == old_bytes\n        chunks.extend((before[cursor:offset], edit['after'].encode()))\n        cursor = offset + len(old_bytes)\n    after = b''.join(chunks) + before[cursor:]\n    assert _ref(path, after) == {key: row['after'][key] for key in ('path', 'sha256', 'bytes')}\n    assert _blob(after) == row['after']['git_blob']\n    return after\n\n\n"
+        },
+        {
+          "offset": 3245,
+          "before": "    \"\"\"Authenticate v1-v4 exact edits and expose current references, never old product bytes.\"\"\"\n",
+          "after": "    \"\"\"Authenticate v1-v5 exact edits and expose current references, never old product bytes.\"\"\"\n"
+        },
+        {
+          "offset": 3646,
+          "before": "        version = json.loads(_physical(root, 'projects/ngx-material-legacy/package.json'))['version']\n",
+          "after": "        package_path = 'projects/ngx-material-legacy/package.json'\n        package_raw = _physical(root, package_path)\n        version = json.loads(package_raw)['version']\n"
+        },
+        {
+          "offset": 4024,
+          "before": "        packets, bound = [], [_ref(SELF, _IMAGE)]\n",
+          "after": "        packets, bound = [], [_ref(SELF, _IMAGE), _ref(package_path, package_raw)]\n"
+        },
+        {
+          "offset": 6183,
+          "before": "        for row in rows + latest:\n            path = row['path']\n            assert row['before']['path'] == row['after']['path'] == path\n            before = _historical(root, row['source_parent'], path)\n            assert _ref(path, before) == {key: row['before'][key] for key in ('path', 'sha256', 'bytes')}\n            assert _blob(before) == row['before']['git_blob']\n            chunks, cursor = [], 0\n            for edit in row['edits']:\n                assert set(edit) == {'offset', 'before', 'after'}\n                offset, old_bytes = edit['offset'], edit['before'].encode()\n                assert type(offset) is int and cursor <= offset <= len(before)\n                assert before[offset:offset + len(old_bytes)] == old_bytes\n                chunks.extend((before[cursor:offset], edit['after'].encode()))\n                cursor = offset + len(old_bytes)\n            after = b''.join(chunks) + before[cursor:]\n            assert _ref(path, after) == {key: row['after'][key] for key in ('path', 'sha256', 'bytes')}\n            assert _blob(after) == row['after']['git_blob']\n",
+          "after": "        rendered = {row['path']: _replay(row, _historical(root, row['source_parent'], row['path']))\n                    for row in rows + latest}\n        intermediates = [row['before'] for row in latest]\n        # Only frozen v4 or the complete paired reviewed test restorations qualify.\n        if any(_hash(_physical(root, path)) != next(row['after']['sha256'] for row in effective\n                                                  if row['path'] == path) for path in TESTS):\n            path, digest, size = RESTORED\n            raw = _physical(root, path)\n            assert (_hash(raw), len(raw)) == (digest, size), 'changed restored-test packet'\n            restored = json.loads(raw)\n            bound.append(dict(path=path, sha256=digest, bytes=size))\n            assert restored['schema_version'] == 1\n            assert restored['role'] == 'finite-restored-select-dialog-test-source-v5'\n            assert restored['source_scope_only'] is True\n            assert restored['historical_programs_executed'] is False\n            assert restored['canonical_admission_granted'] is False and restored['g11_claim'] == 'not-passed'\n            path, digest, size = PACKETS[-1]\n            assert restored['prior_packet'] == dict(path=path, sha256=digest, bytes=size)\n            branch = restored['branches'][actual_line]\n            assert [row['path'] for row in branch['repairs']] == list(TESTS)\n            for row in branch['repairs']:\n                prior = next(item for item in effective if item['path'] == row['path'])\n                assert row['before'] == prior['after']\n                after = _replay(row, rendered[row['path']])\n                assert after == _historical(root, row['after_source_parent'], row['path']), 'restored test Git source mismatch'\n                intermediates.append(prior['after'])\n                prior['after'] = row['after']\n            assert [row['path'] for row in branch['receipts']] == [\n                'compatibility/rc/parent-input-select-historical-repair-v1.json',\n                'compatibility/rc/parent-four-historical-fixture-repairs-v1.json']\n            receipts = []\n            for item in branch['receipts']:\n                raw = _physical(root, item['path'])\n                assert _ref(item['path'], raw) == item, 'changed restoration receipt'\n                bound.append(dict(item))\n                receipts.append(json.loads(raw))\n            key = '21' if actual_line == '21.x' else 'main'\n            original = receipts[0]['proposal_manifest']['lines'][key]\n            assert original['original_spec_sha256']['select'] == branch['repairs'][0]['before']['sha256']\n            assert original['patched_spec_sha256']['select'] == branch['repairs'][0]['after']['sha256']\n            assert receipts[1]['source_afterimages'][key][TESTS[1]] == branch['repairs'][1]['after']['sha256']\n"
+        },
+        {
+          "offset": 7595,
+          "before": "        self._root, self._read, self._bound, self._effective, self._latest = root, read, bound, effective, latest\n        self._active = False\n",
+          "after": "        self._root, self._read, self._bound, self._effective, self._intermediates = root, read, bound, effective, intermediates\n        self._active = self._nested_attempt = False\n"
+        },
+        {
+          "offset": 7847,
+          "before": "",
+          "after": "    def _idle(self):\n        if self._active:\n            self._nested_attempt = True\n            raise AssertionError('reentrant product successor')\n\n"
+        },
+        {
+          "offset": 7878,
+          "before": "",
+          "after": "        self._idle()\n        self._sweep()\n\n    def _sweep(self):\n"
+        },
+        {
+          "offset": 8150,
+          "before": "        assert not self._active, 'reentrant product successor'\n",
+          "after": "        self._idle()\n"
+        },
+        {
+          "offset": 8241,
+          "before": "",
+          "after": "        self._nested_attempt = False\n"
+        },
+        {
+          "offset": 8254,
+          "before": "            self.assert_physical()\n",
+          "after": "            self._sweep()\n"
+        },
+        {
+          "offset": 8756,
+          "before": "            self.assert_physical()\n",
+          "after": "            assert not self._nested_attempt, 'reentrant product successor'\n            self._sweep()\n"
+        },
+        {
+          "offset": 8881,
+          "before": "        assert type(incoming) is dict\n        path = incoming.get('path')\n        row = next((row for row in self._effective if row['path'] == path), None)\n        if row is None:\n            return None\n        assert set(incoming) in ({'path', 'sha256'}, {'path', 'sha256', 'bytes'})\n        intermediate = next((item['before'] for item in self._latest if item['path'] == path), None)\n        selected = next((ref for ref in (row['before'], intermediate, row['after'])\n                         if ref is not None and ref['sha256'] == incoming['sha256']), None)\n        assert selected is not None, 'unknown product predecessor ' + path\n        assert 'bytes' not in incoming or incoming['bytes'] == selected['bytes']\n        self.assert_physical()\n        target = row['after' if side == 'after' else 'before']\n        return dict(path=path, sha256=target['sha256'], **({'bytes': target['bytes']} if 'bytes' in incoming else {}))\n",
+          "after": "        self._idle()\n        self._active = True\n        self._nested_attempt = False\n        try:\n            self._sweep()\n            assert type(incoming) is dict\n            path = incoming.get('path')\n            assert type(path) is str\n            row = next((row for row in self._effective if row['path'] == path), None)\n            result = None\n            if row is not None:\n                assert set(incoming) in ({'path', 'sha256'}, {'path', 'sha256', 'bytes'})\n                assert type(incoming['sha256']) is str\n                assert 'bytes' not in incoming or type(incoming['bytes']) is int\n                candidates = [row['before'], *(item for item in self._intermediates if item['path'] == path), row['after']]\n                selected = next((ref for ref in candidates if ref['sha256'] == incoming['sha256']), None)\n                assert selected is not None, 'unknown product predecessor ' + path\n                assert 'bytes' not in incoming or incoming['bytes'] == selected['bytes']\n                target = row['after' if side == 'after' else 'before']\n                result = dict(path=path, sha256=target['sha256'], **({'bytes': target['bytes']} if 'bytes' in incoming else {}))\n            assert not self._nested_attempt, 'reentrant product successor'\n            self._sweep()\n            return result\n        finally:\n            self._active = False\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/remaining-native-tab-lifecycle-review.mjs",
+      "source_commit": "b30c40a7b58513047cdf453c28ae7e33cd40d5f3",
+      "before": {
+        "path": "scripts/remaining-native-tab-lifecycle-review.mjs",
+        "sha256": "59a1715ed67ddf5cb56bb51c6ff6b8af08dbd21e8a70259e032bef17d83b4f99",
+        "bytes": 12089
+      },
+      "after": {
+        "path": "scripts/remaining-native-tab-lifecycle-review.mjs",
+        "sha256": "dfa23b743bebc59f7a50c3ad80984d3cee4d939be7be360067646608f7cd91e1",
+        "bytes": 21514
+      },
+      "edits": [
+        {
+          "offset": 316,
+          "before": "import {zoneTabProducerSourceSuccessor} from './zone-tab-producer-source-successor.mjs';\n",
+          "after": "import {reviewCurrentNativeTabLifecycle} from './current-native-tab-lifecycle-source.mjs';\nimport {createCurrentNativeTabProductSource} from './current-native-tab-product-source.mjs';\nimport {createCurrentNativeTabDownstreamSource} from './current-native-tab-downstream-source.mjs';\nimport {readEvidenceMember} from './upstream-packed-run-evidence.mjs';\n"
+        },
+        {
+          "offset": 578,
+          "before": "import {readFileSync} from 'node:fs';\n",
+          "after": "import {readFileSync,lstatSync,realpathSync} from 'node:fs';\n"
+        },
+        {
+          "offset": 654,
+          "before": "import {dirname,resolve} from 'node:path';\n",
+          "after": "import {dirname,resolve,join,sep,parse} from 'node:path';\n"
+        },
+        {
+          "offset": 737,
+          "before": "const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..'),ts=createRequire(import.meta.url)('typescript');\n",
+          "after": "const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..'),tsRequire=createRequire(import.meta.url),ts=tsRequire('typescript');\nconst loadedReviewerImage=readFileSync(fileURLToPath(import.meta.url));\nconst loadedTypescriptPath=realpathSync(tsRequire.resolve('typescript')),loadedTypescriptImage=readFileSync(loadedTypescriptPath);\n"
+        },
+        {
+          "offset": 926,
+          "before": "",
+          "after": "const bufferEquals=Buffer.prototype.equals,apply=Reflect.apply;\nconst bytesEqual=(a,b)=>Buffer.isBuffer(b)&&apply(bufferEquals,a,[b]);\n"
+        },
+        {
+          "offset": 5916,
+          "before": "export function inspectTabLifecycleRepair({root=rootDefault,readMember}={}){\n",
+          "after": "/** Exact historical first-repair schema-1 inspection, for the authenticated 1141-member image only. */\nexport function inspectHistoricalTabLifecycleRepair({root=rootDefault,readMember}={}){\n"
+        },
+        {
+          "offset": 9300,
+          "before": " const zoneTab=zoneTabProducerSourceSuccessor({root,read,line:prior.line});zoneTab.assertCurrent();\n",
+          "after": " assert.equal(producer.source_sha256,hash(read('scripts/native-motion-consumer.ts')));assert.equal(producer.cases.length,29);assert.ok(producer.cases.every(row=>row.result==='pass'));assert.equal(producer.native_executed,false);\n"
+        },
+        {
+          "offset": 10993,
+          "before": " zoneTab.assertCurrent();\n const sourceMembers=[...before.keys(),'scripts/remaining-native-tab-lifecycle-review.mjs'].map(path=>({path,sha256:hash(read(path))}));\n zoneTab.assertCurrent();\n",
+          "after": ""
+        },
+        {
+          "offset": 11373,
+          "before": "  zone_tab_producer_source:zoneTab.bound,\n",
+          "after": ""
+        },
+        {
+          "offset": 11567,
+          "before": "  source_members:sourceMembers,\n",
+          "after": "  source_members:[...before.keys(),'scripts/remaining-native-tab-lifecycle-review.mjs'].map(path=>({path,sha256:hash(read(path))})),\n"
+        },
+        {
+          "offset": 11946,
+          "before": "",
+          "after": "/** Full current main source census composes three independently reviewed finite owners. */\nlet currentInspectionActive=false,currentInspectionNested=false;\nexport function inspectTabLifecycleRepair({root=rootDefault,readMember}={}){\n if(currentInspectionActive){currentInspectionNested=true;assert.fail('reentrant current tab lifecycle inspection');}\n currentInspectionActive=true;currentInspectionNested=false;\n try{\n  const physical=path=>{\n   const absolute=resolve(root),rootBase=parse(absolute).root;\n   let rootCursor=rootBase;assert.ok(lstatSync(rootCursor).isDirectory(),'invalid current source root');\n   for(const part of absolute.slice(rootBase.length).split(sep).filter(Boolean)){\n    rootCursor=join(rootCursor,part);const stat=lstatSync(rootCursor);\n    assert.ok(stat.isDirectory()&&!stat.isSymbolicLink(),'linked current source root ancestor');\n   }\n   if(!path.startsWith('node_modules/'))return readEvidenceMember(root,path);\n   const match=/^node_modules\\/(@angular\\/(?:cdk|material))\\/(.+)$/.exec(path);\n   assert.ok(match,'unowned current peer path '+path);\n   const nodeModules=join(root,'node_modules'),scope=join(nodeModules,'@angular');\n   assert.ok(lstatSync(nodeModules).isDirectory()&&!lstatSync(nodeModules).isSymbolicLink());\n   assert.ok(lstatSync(scope).isDirectory()&&!lstatSync(scope).isSymbolicLink());\n   const peer=join(nodeModules,match[1]),peerStat=lstatSync(peer),base=realpathSync(peer);\n   assert.ok(peerStat.isDirectory()||peerStat.isSymbolicLink(),'missing current peer');\n   if(peerStat.isSymbolicLink())assert.ok(base.startsWith(join(nodeModules,'.pnpm')+sep),'peer root outside pinned workspace');\n   assert.ok(lstatSync(base).isDirectory()&&!lstatSync(base).isSymbolicLink());\n   assert.equal(JSON.parse(readEvidenceMember(base,'package.json')).name,match[1]);\n   const relative=match[2].split('/');assert.ok(relative.every(part=>part&&part!=='.'&&part!=='..'));\n   let cursor=base;for(const part of relative){cursor=join(cursor,part);assert.ok(!lstatSync(cursor).isSymbolicLink(),'linked current peer descendant '+path);}\n   assert.ok(lstatSync(cursor).isFile(),'nonfile current peer '+path);\n   return readFileSync(cursor);\n  };\n  const read=path=>{\n   const before=physical(path),supplied=readMember?readMember(path):before;\n   assert.ok(bytesEqual(before,supplied),'nonphysical current tab source '+path);\n   assert.ok(bytesEqual(before,physical(path)),'current tab source changed during callback '+path);\n   return before;\n  };\n  const assertLoadedImages=()=>{\n   assert.ok(bytesEqual(physical('scripts/remaining-native-tab-lifecycle-review.mjs'),loadedReviewerImage),'changed loaded inspector image');\n   const rootRequire=createRequire(join(resolve(root),'package.json'));\n   assert.equal(realpathSync(rootRequire.resolve('typescript')),loadedTypescriptPath,'shadow TypeScript peer');\n   assert.ok(bytesEqual(readFileSync(loadedTypescriptPath),loadedTypescriptImage),'changed loaded TypeScript image');\n  };\n  assertLoadedImages();\n  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version;\n  const line=version.startsWith('22.')?'main':null;\n  assert.equal(line,'main','current T01/T02/T03 source composition is main-only');\n  const product=createCurrentNativeTabProductSource({root,line,read});\n  product.assertCurrent();\n  const lifecycle=reviewCurrentNativeTabLifecycle({root,line,read});\n  lifecycle.assertCurrent();product.assertCurrent();\n  const downstream=createCurrentNativeTabDownstreamSource({root,line,read});\n  downstream.assertCurrent();lifecycle.assertCurrent();product.assertCurrent();\n  assert.equal(product.changedProductRefs.length,55);\n  assert.equal(product.resourceChanges.length,15);\n  assert.equal(downstream.current_product_changed,55);\n  assert.equal(downstream.current_resource_changed,15);\n  const historicalReports={\n   reviewer:['compatibility/rc/remaining-native-admission-tab-repair-source-controls.json','actual_reviewer_controls',36],\n   admission:['compatibility/rc/remaining-native-admission-tab-repair-admission-controls.json','actual_reader_writer_controls',72],\n   dispatch:['compatibility/rc/remaining-native-admission-tab-repair-dispatch-controls.json','actual_root_cli_cases',25],\n   cyph:['compatibility/rc/remaining-native-admission-tab-repair-cyph-style.json','resources_checked',439],\n  };\n  const historicalNonLifecycle={stage:'first-repair-only',reviewer_source_sha256:'e8f6b630b140effe91788a35a61e3775f7a33fcadf8fdf2058c71ff2275821bb',reports:{}};\n  for(const [name,[path,field,expected]] of Object.entries(historicalReports)){\n   const bytes=read(path),report=JSON.parse(bytes);assert.equal(report[field],expected,'historical control count changed '+name);\n   historicalNonLifecycle.reports[name]={path,sha256:hash(bytes),bytes:bytes.length,[field]:expected};\n  }\n  assert.equal(JSON.parse(read(historicalReports.reviewer[0])).reviewer_sha256,historicalNonLifecycle.reviewer_source_sha256);\n  const ownerPaths=['scripts/current-native-tab-product-source.mjs','scripts/c03-t02-current-native-tab-product-source-packet-v1.json','scripts/c03-t02-current-native-tab-product-source-packet-v2.json','scripts/c03-t02-current-native-tab-product-source-packet-v3.json','scripts/c03-t02-current-native-tab-product-source-packet-v4.json'];\n  const productOwnerRefs=ownerPaths.map(path=>{const bytes=read(path);return {path,sha256:hash(bytes),bytes:bytes.length};});\n  const allRefs=[...lifecycle.bound,...product.bound,...productOwnerRefs,...product.successorEvidence,...product.inheritedOwnerSources,...product.currentOwnerSources,...product.peerDeclarations,...product.authorityInputs,...downstream.bound,...Object.values(historicalNonLifecycle.reports)];\n  if(product.radioEvidence)allRefs.push(product.radioEvidence);\n  if(product.formMotionEvidence)allRefs.push(product.formMotionEvidence);\n  const sourceMap=new Map();\n  for(const row of allRefs){\n   assert.ok(row&&typeof row.path==='string'&&/^[0-9a-f]{64}$/.test(row.sha256),'invalid current source reference');\n   const bytes=physical(row.path);assert.equal(hash(bytes),row.sha256,'changed current source '+row.path);\n   if(row.bytes!==undefined)assert.equal(bytes.length,row.bytes,'changed current source length '+row.path);\n   const prior=sourceMap.get(row.path),current={path:row.path,sha256:row.sha256,bytes:bytes.length};\n   if(prior)assert.deepEqual(prior,current,'conflicting current source owners '+row.path);\n   else sourceMap.set(row.path,current);\n  }\n  const sourceMembers=[...sourceMap.values()];\n  assertLoadedImages();\n  const finalPhysical=()=>{\n   for(const row of sourceMembers){const bytes=physical(row.path);assert.equal(hash(bytes),row.sha256,'late physical current source '+row.path);assert.equal(bytes.length,row.bytes);}\n  };\n  lifecycle.assertCurrent();product.assertCurrent();downstream.assertCurrent();assertLoadedImages();\n  assert.equal(currentInspectionNested,false,'reentrant current tab lifecycle inspection');\n  finalPhysical();\n  return {schema_version:3,line,source_parent:pins[line].parent,\n   lifecycle_source_epochs:{first_repair:lifecycle.first_review,detector:lifecycle.detector_review,reverse:lifecycle.reverse_source},\n   downstream_source_epochs:{changed:downstream.changed,old_bound:downstream.old_bound,current_product_changed:55,current_resource_changed:15},\n   historical_lifecycle_controls:lifecycle.historical_lifecycle_controls,\n   current_lifecycle_controls:lifecycle.current_lifecycle_controls,\n   historical_non_lifecycle_controls:historicalNonLifecycle,\n   current_non_lifecycle_controls:{stage:'current',source_sha256:lifecycle.current_public_import_source_sha256,reviewer_executed:false,admission_reader_writer_executed:false,dispatch_root_cli_executed:false,cyph_resource_sanity_executed:false},\n   current_public_import_roles:lifecycle.current_public_import_roles,\n   current_public_import_source_sha256:lifecycle.current_public_import_source_sha256,\n   current_nine_source_members:lifecycle.current_nine_source_members,\n   current_product_members:1143,historical_product_members:1141,resource_members:439,\n   changed_product:product.changedProductRefs,changed_resources:product.resourceChanges,\n   source_members:sourceMembers,\n   scope:'Authenticated first repair, explicit later tab source epochs, finite current product/resource identity and 41 downstream source references and the separately bound typeahead receipt closure. Historical lifecycle reports remain historical. Current synthetic controls run separately; packed/native/floor qualification remains pending.',\n   source_only:true,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};\n }finally{currentInspectionActive=false;}\n}\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/inventory-reference-owner.mjs",
+      "source_commit": "948e8290b74953c83d11268368f38952d0b51fd7",
+      "before": {
+        "path": "scripts/inventory-reference-owner.mjs",
+        "sha256": "7885af6e1cb5d94f488f2c8ef2895da38f9744aafda77819dbfb3d134d5c0365",
+        "bytes": 20829
+      },
+      "after": {
+        "path": "scripts/inventory-reference-owner.mjs",
+        "sha256": "531a7a6df67299e66b8502b9e5da1ca287b1247ac71bcaaa741455e293812b78",
+        "bytes": 20838
+      },
+      "edits": [
+        {
+          "offset": 18154,
+          "before": "pa",
+          "after": "sour"
+        },
+        {
+          "offset": 18157,
+          "before": "k",
+          "after": ""
+        },
+        {
+          "offset": 18159,
+          "before": "t",
+          "after": ".verifier"
+        },
+        {
+          "offset": 18178,
+          "before": ".",
+          "after": "_"
+        }
+      ]
+    },
+    {
+      "path": "scripts/inventory-reference-proposal.mjs",
+      "source_commit": "948e8290b74953c83d11268368f38952d0b51fd7",
+      "before": {
+        "path": "scripts/inventory-reference-proposal.mjs",
+        "sha256": "3386aaeadcf046749aa8372e1b1d71ffec4cead059846a1ba1cd9c68657e5a28",
+        "bytes": 13540
+      },
+      "after": {
+        "path": "scripts/inventory-reference-proposal.mjs",
+        "sha256": "3e721a23e4872954f94e259a5cf71e59cf178ecca07fc28f7945b9435ba5194e",
+        "bytes": 15349
+      },
+      "edits": [
+        {
+          "offset": 1172,
+          "before": "",
+          "after": "nextValidator='scripts/historical_inventory_nine_spec_successor.py',"
+        },
+        {
+          "offset": 1218,
+          "before": "",
+          "after": "';\nconst nextInventoryHash='a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403';\nconst nextValidatorHash='089c9136edf610560f183eb0d4c39c89a764d7d984a4e6afe250765367e943fd';\nconst epochHead='9665df520e4f8644422203b6cb82a5412a483a33"
+        },
+        {
+          "offset": 8741,
+          "before": "",
+          "after": "line==='main' && path===INVENTORY_REFERENCE_PATH && expected===pin.inventory ? {...ref,sha256:nextInventoryHash} : "
+        },
+        {
+          "offset": 9494,
+          "before": "",
+          "after": "line==='main' && ref.path===INVENTORY_REFERENCE_PATH ? member(INVENTORY_REFERENCE_PATH,nextInventoryHash).length : "
+        },
+        {
+          "offset": 9685,
+          "before": "i",
+          "after": "currentI"
+        },
+        {
+          "offset": 9727,
+          "before": "",
+          "after": "line==='main'?nextInventoryHash:"
+        },
+        {
+          "offset": 9741,
+          "before": "",
+          "after": ";\n const inventory=line==='main'?oldBytes(root"
+        },
+        {
+          "offset": 9742,
+          "before": "",
+          "after": "epochHead,INVENTORY_REFERENCE_PATH):currentInventory;assert.equal(hash(inventory),pin.inventory);\n const "
+        },
+        {
+          "offset": 9767,
+          "before": "i",
+          "after": "currentI"
+        },
+        {
+          "offset": 9776,
+          "before": "",
+          "after": ");\n if(line==='main') member(nextValidator,nextValidatorHash"
+        },
+        {
+          "offset": 10186,
+          "before": "",
+          "after": "let verifier;\n if(line==='main'){\n  "
+        },
+        {
+          "offset": 10191,
+          "before": "",
+          "after": " active=JSON.parse(execFileSync('python3',[nextValidator],{cwd:root,encoding:'utf8',maxBuffer:1024*1024}));\n  assert.equal(active.epoch,'main-nine-spec-source-identities');assert.equal(active.members,9);\n  assert.equal(active.execution_credit,false);assert.equal(active.source_behavior_admission,false);assert.equal(active.full_suite_pass,false);\n  const historical=JSON.parse(inventory).candidate_snapshot.source_binding_refreshes;\n  assert.equal(historical.length,1);const prior=historical[0];assert.equal(prior.current_source_bindings_changed,13);\n  assert.equal(prior.before_inventory_sha256,pin.priorInventory);assert.equal(prior.execution_claims_changed,0);\n  verifier={line,source_parent:prior.source_parent,before_inventory_sha256:prior.before_inventory_sha256,\n   historical_epoch_inventory_sha256:hash(inventory),historical_source_bindings_changed:13,\n   active_epoch:active,current_inventory_sha256:hash(currentInventory),g11_claim:'not-passed'};\n }else{\n "
+        },
+        {
+          "offset": 10304,
+          "before": "",
+          "after": " "
+        },
+        {
+          "offset": 10400,
+          "before": "",
+          "after": " "
+        },
+        {
+          "offset": 10509,
+          "before": "",
+          "after": " "
+        },
+        {
+          "offset": 10650,
+          "before": "",
+          "after": " "
+        },
+        {
+          "offset": 10696,
+          "before": "",
+          "after": "\n }"
+        }
+      ]
+    },
+    {
+      "path": "scripts/inventory-finite-tool-successor.mjs",
+      "source_commit": "948e8290b74953c83d11268368f38952d0b51fd7",
+      "before": {
+        "path": "scripts/inventory-finite-tool-successor.mjs",
+        "sha256": "58e3094ceadc518e4656d048dadb09b25b0f40daf93dd25caa6b43e2736e1066",
+        "bytes": 10560
+      },
+      "after": {
+        "path": "scripts/inventory-finite-tool-successor.mjs",
+        "sha256": "77eda6e85023e6a65a85d2d68e66636f2969f6036a678e9eec1bc554d715396c",
+        "bytes": 14359
+      },
+      "edits": [
+        {
+          "offset": 8591,
+          "before": "",
+          "after": "let ownerEpoch=null,ownerPacketRef=null;\n if(line==='main'){\n  const path='compatibility/rc/parent-main-nine-spec-inventory-owner-successor-v1.json',sha256='0cc73ad957f0b3a28ee3ac2f1b46bcdcf8f2d47f3399f9e0eb555c9a0af2e54b';\n  const raw=physical(path);assert.equal(hash(raw),sha256);assert.equal(raw.length,23206);ownerPacketRef={path,sha256,bytes:raw.length};\n  const packet=JSON.parse(raw);assert.equal(packet.schema_version,1);assert.equal(packet.role,'main-nine-spec-inventory-owner-finite-successor');\n  assert.equal(packet.source_scope_only,true);assert.equal(packet.historical_programs_executed,false);assert.equal(packet.g11_claim,'not-passed');\n  assert.equal(packet.source_parent,'9665df520e4f8644422203b6cb82a5412a483a33');assert.deepEqual(packet.before,rows[1].after);\n  const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet.source_parent+':'+packet.before.path],{cwd:root,env,maxBuffer:1024*1024});\n  assert.equal(hash(before),packet.before.sha256);assert.equal(before.length,packet.before.bytes);\n  const edit=packet.edit;assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=0);\n  const old=Buffer.from(edit.before);assert.ok(before.subarray(edit.offset,edit.offset+old.length).equals(old));\n  const after=Buffer.concat([before.subarray(0,edit.offset),Buffer.from(edit.after),before.subarray(edit.offset+old.length)]);\n  assert.equal(hash(after),packet.after.sha256);assert.equal(after.length,packet.after.bytes);assert.ok(physical(packet.after.path).equals(after));\n  for(const ref of [packet.new_validator,packet.current_inventory]){const bytes=physical(ref.path);assert.equal(hash(bytes),ref.sha256);assert.equal(bytes.length,ref.bytes);}\n  const terminal=packet.terminal_owner;assert.equal(terminal.before.path,'scripts/inventory-reference-owner.mjs');assert.equal(terminal.after.path,terminal.before.path);\n  const priorOwner=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet.source_parent+':'+terminal.before.path],{cwd:root,env,maxBuffer:1024*1024});\n  assert.equal(hash(priorOwner),terminal.before.sha256);assert.equal(priorOwner.length,terminal.before.bytes);\n  const {before:oldText,after:newText}=terminal.literal_edit;assert.equal(priorOwner.toString().split(oldText).length,2);\n  const updatedOwner=Buffer.from(priorOwner.toString().replace(oldText,newText));assert.equal(hash(updatedOwner),terminal.after.sha256);\n  assert.equal(updatedOwner.length,terminal.after.bytes);assert.ok(physical(terminal.after.path).equals(updatedOwner));\n  const oldInventory=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet.source_parent+':'+packet.current_inventory.path],{cwd:root,env,maxBuffer:2*1024*1024});\n  assert.equal(hash(oldInventory),'baecc3ac539fe5ade1796c8647089588daa23d43d426358bd17038cc3933561c');\n  ownerEpoch={...packet,priorInventory:{path:packet.current_inventory.path,sha256:hash(oldInventory),bytes:oldInventory.length}};\n }\n "
+        },
+        {
+          "offset": 8733,
+          "before": "",
+          "after": "((ownerEpoch&&row.path===ownerEpoch.after.path)?ownerEpoch.after:"
+        },
+        {
+          "offset": 8742,
+          "before": "",
+          "after": ")"
+        },
+        {
+          "offset": 8744,
+          "before": "",
+          "after": "),...(ownerEpoch?[ownerPacketRef,ownerEpoch.new_validator,ownerEpoch.current_inventory,ownerEpoch.terminal_owner.after]:[]"
+        },
+        {
+          "offset": 9576,
+          "before": "r",
+          "after": "baseR"
+        },
+        {
+          "offset": 9618,
+          "before": "",
+          "after": ";const row=baseRow && ownerEpoch && baseRow.path===ownerEpoch.after.path ? {before:baseRow.before,after:ownerEpoch.after} : baseRow"
+        },
+        {
+          "offset": 9621,
+          "before": "",
+          "after": "ownerEpoch&&ref?.path===ownerEpoch.current_inventory.path?{before:ownerEpoch.priorInventory,after:ownerEpoch.current_inventory}:ownerEpoch&&ref?.path===ownerEpoch.terminal_owner.after.path?ownerEpoch.terminal_owner:"
+        },
+        {
+          "offset": 9827,
+          "before": "",
+          "after": "const intermediate=ownerEpoch&&ref.path===ownerEpoch.after.path?ownerEpoch.before:null;"
+        },
+        {
+          "offset": 9891,
+          "before": "",
+          "after": ".sha256||ref.sha256===intermediate?"
+        },
+        {
+          "offset": 9993,
+          "before": "",
+          "after": "e:ref.sha256===intermediate?.sha256?intermediat"
+        }
+      ]
+    },
+    {
+      "path": "tests/inventory_finite_source_probe.mjs",
+      "source_commit": "948e8290b74953c83d11268368f38952d0b51fd7",
+      "before": {
+        "path": "tests/inventory_finite_source_probe.mjs",
+        "sha256": "66715ba1bbad3825cfeda8a2bc58f2ea5c1d0f2d66b587110cb63716c123c321",
+        "bytes": 1206
+      },
+      "after": {
+        "path": "tests/inventory_finite_source_probe.mjs",
+        "sha256": "8f4412661dfaf168a3bfeb34749222f8ef079fa040d6b7872fd9f85bb661c2d0",
+        "bytes": 1674
+      },
+      "edits": [
+        {
+          "offset": 549,
+          "before": "",
+          "after": "if(result.line==='main'){assert.equal(result.verifier.historical_source_bindings_changed,13);assert.equal(result.verifier.active_epoch.members,9);assert.equal(result.verifier.active_epoch.execution_credit,false);}else "
+        },
+        {
+          "offset": 625,
+          "before": "",
+          "after": "...(result.line==='main'?['scripts/historical_inventory_nine_spec_successor.py','compatibility/rc/parent-main-nine-spec-inventory-owner-successor-v1.json','testing/legacy-runner/historical-inventory.json','scripts/inventory-reference-owner.mjs']:[]),"
+        }
+      ]
+    },
+    {
+      "path": "scripts/inventory-rc-acceptance-source-successor.mjs",
+      "source_commit": "authored",
+      "before": {
+        "path": "scripts/inventory-rc-acceptance-source-successor.mjs",
+        "sha256": "443e2aeb42b92a300fcb91b3bda938c96c3b491e2e2d97b31e2f7406a55d0760",
+        "bytes": 4997
+      },
+      "after": {
+        "path": "scripts/inventory-rc-acceptance-source-successor.mjs",
+        "sha256": "0e50ea8885ee38e504d102c36899349eaedffd77e7fc0c11aacd1fd73d2b60e3",
+        "bytes": 6737
+      },
+      "edits": [
+        {
+          "offset": 749,
+          "before": "",
+          "after": "';\nconst V2='compatibility/rc/parent-inventory-rc-acceptance-finite-successor-v2.json',V2PIN='a25921136321ab375b2f2afa71c9237e615c80bf8967562c8b544a297d461db1"
+        },
+        {
+          "offset": 2708,
+          "before": "",
+          "after": "nextRaw=physical(V2);assert.equal(hash(nextRaw),V2PIN);const next=JSON.parse(nextRaw);\n assert.equal(next.schema_version,2);assert.equal(next.role,packet.role);assert.equal(next.line,'main');\n assert.deepEqual(next.previous_epoch,{path:PACKET,sha256:PIN,bytes:raw.length});assert.deepEqual(next.before,packet.after);\n assert.equal(next.old_commit,'7870ef230c0e980d8b58eab81374358142eca065');assert.equal(next.new_commit,'70fecd1e31cb0e2a881b3b3e803fae3fcbddefde');\n assert.equal(next.old_programs_executed,false);assert.equal(next.historical_packets_rewritten,false);assert.equal(next.g11_claim,'not-passed');\n const "
+        },
+        {
+          "offset": 2808,
+          "before": "",
+          "after": "path:V2,sha256:V2PIN,bytes:nextRaw.length},{"
+        },
+        {
+          "offset": 2826,
+          "before": "pack",
+          "after": "n"
+        },
+        {
+          "offset": 2831,
+          "before": "",
+          "after": "x"
+        },
+        {
+          "offset": 2839,
+          "before": "",
+          "after": ",...next.receipts"
+        },
+        {
+          "offset": 4336,
+          "before": "",
+          "after": "nextBefore=git(root,'show',next.old_commit+':'+next.before.path),nextAfter=git(root,'show',next.new_commit+':'+next.after.path);\n assert.ok(equal(nextBefore,after));assert.equal(hash(nextAfter),next.after.sha256);assert.equal(nextAfter.length,next.after.bytes);\n cursor=0;const nextParts=[];for(const edit of next.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=nextBefore.length);assert.equal(typeof edit.before,'string');assert.equal(typeof edit.after,'string');const old=Buffer.from(edit.before);assert.ok(equal(nextBefore.subarray(edit.offset,edit.offset+old.length),old));nextParts.push(nextBefore.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+old.length;}assert.ok(equal(Buffer.concat([...nextParts,nextBefore.subarray(cursor)]),nextAfter),'inventory rc v2 literal replay differs');\n const "
+        },
+        {
+          "offset": 4580,
+          "before": "",
+          "after": "[packet.before,packet.after,next.after].find(item=>"
+        },
+        {
+          "offset": 4593,
+          "before": "pack",
+          "after": "it"
+        },
+        {
+          "offset": 4598,
+          "before": "t.before",
+          "after": "m"
+        },
+        {
+          "offset": 4613,
+          "before": "?packet.before:ref.sha256===packet.after.sha256?packet.after:null",
+          "after": ")"
+        },
+        {
+          "offset": 4815,
+          "before": "pack",
+          "after": "n"
+        },
+        {
+          "offset": 4820,
+          "before": "",
+          "after": "x"
+        },
+        {
+          "offset": 4871,
+          "before": "pack",
+          "after": "n"
+        },
+        {
+          "offset": 4876,
+          "before": "",
+          "after": "x"
+        }
+      ]
+    },
+    {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "before": {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "sha256": "c47294c9947448ee832abfd98a44083ea0dcdae6ea9d20559c9282799c248488",
+        "bytes": 45777
+      },
+      "after": {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "sha256": "9daf8aa3b8843e2a746fe6bb0c3cd31af8bb4a53e424399ba75205cdd6a615c2",
+        "bytes": 46031
+      },
+      "source_commit": "70fecd1e31cb0e2a881b3b3e803fae3fcbddefde",
+      "edits": [
+        {
+          "offset": 38329,
+          "before": "",
+          "after": "let typeaheadExecution;\n  if (process.env.RC_UPSTREAM_TYPEAHEAD !== undefined) {\n    try { typeaheadExecution = JSON.parse(process.env.RC_UPSTREAM_TYPEAHEAD); }\n    catch { return {error: 'RC_UPSTREAM_TYPEAHEAD is not JSON'}; }\n  }\n  "
+        },
+        {
+          "offset": 38563,
+          "before": "",
+          "after": "Execution, typeahead"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_current_sass_tool_references.py",
+      "source_commit": "authored",
+      "before": {
+        "path": "tests/test_current_sass_tool_references.py",
+        "sha256": "b98d7ef23e4c6dc82cc7cd7997e768513c432f5621570f48ba0f29c766622a7f",
+        "bytes": 20093
+      },
+      "after": {
+        "path": "tests/test_current_sass_tool_references.py",
+        "sha256": "1bbdf9b7ddc3575a7555a199678f8a3c9ce0a90c971a40efc8fb4c8e91d0f79f",
+        "bytes": 24729
+      },
+      "edits": [
+        {
+          "offset": 524,
+          "before": "from current_sass_tool_references import CurrentSassToolReferences, CHECKPOINTS, INPUTS, PREVIOUS_INPUTS, V2_INPUTS, V3_CHECKPOINTS\n",
+          "after": "from current_sass_tool_references import CurrentSassToolReferences, CHECKPOINTS, INPUTS, PREVIOUS_INPUTS, V2_INPUTS, V3_CHECKPOINTS, V4_INPUTS\n"
+        },
+        {
+          "offset": 2002,
+          "before": "",
+          "after": "    if line == 'main':\n        v4 = json.loads((ROOT / V4_INPUTS['path']).read_bytes())\n        paths.add(V4_INPUTS['path'])\n        rc_packet = json.loads((ROOT / v4['receipts'][-1]['path']).read_bytes())\n        rc_previous = json.loads((ROOT / rc_packet['previous_epoch']['path']).read_bytes())\n        paths.add(rc_previous['inventory_source_packet']['path'])\n        paths.update(row['path'] for row in v4['updates'])\n        paths.update(row['path'] for row in v4['receipts'])\n        for index in (4, 6):\n            receipt = json.loads((ROOT / v4['receipts'][index]['path']).read_bytes())\n            paths.update(row['path'] for row in receipt['sources'])\n"
+        },
+        {
+          "offset": 2696,
+          "before": "",
+          "after": "            if line == 'main':\n                self._check_v4(root)\n"
+        },
+        {
+          "offset": 3033,
+          "before": "            self.assertEqual((result['line'], result['epoch']), (line, 3))\n",
+          "after": "            self.assertEqual((result['line'], result['epoch']), (line, 4 if line == 'main' else 3))\n"
+        },
+        {
+          "offset": 3705,
+          "before": "",
+          "after": "            if line == 'main':\n                expected_paths.update(row['path'] for row in json.loads((ROOT / V4_INPUTS['path']).read_bytes())['updates'])\n"
+        },
+        {
+          "offset": 4350,
+          "before": "            self.assertEqual(source.epoch, 3)\n",
+          "after": "            self.assertEqual(source.epoch, 4 if line == 'main' else 3)\n"
+        },
+        {
+          "offset": 10592,
+          "before": "                self.assertEqual(source.qualify(overlay['before']), overlay['after'])\n",
+          "after": "                latest = next(row for row in source.transitions if row['path'] == overlay['path'])\n                self.assertEqual(source.qualify(overlay['before']), dict(path=overlay['path'], **latest['after']))\n"
+        },
+        {
+          "offset": 13661,
+          "before": "",
+          "after": "    def _check_v4(self, root):\n        packet = json.loads((root / V4_INPUTS['path']).read_bytes())\n        source = CurrentSassToolReferences(root)\n        self.assertEqual(source.epoch, 4)\n        self.assertEqual({row['path'] for row in packet['updates']}, set(tool_module.V4_COMMITS))\n        for update in packet['updates']:\n            before, after = update['before'], update['after']\n            self.assertEqual(source.qualify(before), after)\n            self.assertEqual(source.qualify(after), after)\n            self.assertTrue(source.owns_reference(before))\n            self.assertEqual(hashlib.sha256(source.comparison_bytes(before)).hexdigest(), before['sha256'])\n            self.assertEqual(hashlib.sha256(source.comparison_bytes(after)).hexdigest(), after['sha256'])\n            self.assertIsNone(source.qualify(dict(before, sha256='0' * 64)))\n            with self.assertRaises(AssertionError):\n                source.qualify(dict(before, bytes=before['bytes'] + 1))\n            target = root / update['path']\n            saved = target.read_bytes()\n            try:\n                target.write_bytes(source.comparison_bytes(before))\n                with self.assertRaises(AssertionError): source.assert_current()\n                with self.assertRaises(AssertionError): CurrentSassToolReferences(root)\n            finally:\n                target.write_bytes(saved)\n        for ref in packet['receipts']:\n            target = root / ref['path']\n            saved = target.read_bytes()\n            try:\n                target.write_bytes(saved + b' ')\n                with self.assertRaises(AssertionError): source.assert_current()\n                with self.assertRaises(AssertionError): CurrentSassToolReferences(root)\n            finally:\n                target.write_bytes(saved)\n        source.assert_current()\n        child = subprocess.run([NODE, str(ROOT / 'tests/current_sass_tool_reference_v4_probe.mjs'), str(root)],\n                               cwd=ROOT, capture_output=True, text=True, timeout=300)\n        self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-6000:])\n        report = json.loads(child.stdout)\n        self.assertEqual(report['result'], 'pass')\n        self.assertEqual(report['transitions'], len(packet['updates']))\n        code = \"import {currentSassToolReferenceSubject as f} from './scripts/current-sass-tool-references.mjs'; const s=f({root:process.argv[1]}); console.log(JSON.stringify({epoch:s.epoch,transitions:s.transitions}));\"\n        result = subprocess.run([NODE, '--input-type=module', '-e', code, str(root)], cwd=ROOT, capture_output=True, text=True, timeout=300)\n        self.assertEqual(result.returncode, 0, result.stderr[-6000:])\n        js = json.loads(result.stdout)\n        self.assertEqual(js['epoch'], source.epoch)\n        self.assertEqual(js['transitions'], source.transitions)\n\n"
+        },
+        {
+          "offset": 15777,
+          "before": "",
+          "after": "            CurrentSassToolReferences(root).assert_current()\n"
+        },
+        {
+          "offset": 17544,
+          "before": "",
+          "after": "                    if line == 'main':\n                        self.assertNotEqual(json.loads((root / V4_INPUTS['path']).read_bytes())['previous_epoch']['sha256'], hashlib.sha256(raw).hexdigest(), kind)\n"
+        },
+        {
+          "offset": 17907,
+          "before": "            self.assertEqual(source.epoch, 3)\n",
+          "after": "            self.assertEqual(source.epoch, 4 if line == 'main' else 3)\n"
+        },
+        {
+          "offset": 18457,
+          "before": "",
+          "after": "            CurrentSassToolReferences(root).assert_current()\n"
+        },
+        {
+          "offset": 19211,
+          "before": "                source = CurrentSassToolReferences(root)\n                self.assertEqual(source.epoch, 3)\n                source.assert_current()\n",
+          "after": "                if line == 'main':\n                    self.assertNotEqual(json.loads((root / V4_INPUTS['path']).read_bytes())['previous_epoch']['sha256'], hashlib.sha256(raw).hexdigest())\n                    with self.assertRaises(AssertionError):\n                        CurrentSassToolReferences(root)\n                else:\n                    source = CurrentSassToolReferences(root)\n                    self.assertEqual(source.epoch, 3)\n                    source.assert_current()\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/checker-reference-proposal.mjs",
+      "source_commit": "authored",
+      "before": {
+        "path": "scripts/checker-reference-proposal.mjs",
+        "sha256": "71a74b6ab0e38219994eb3b6eaaf6828d0d997e648034732ae46bb39cb8b48bb",
+        "bytes": 13456
+      },
+      "after": {
+        "path": "scripts/checker-reference-proposal.mjs",
+        "sha256": "c7a3e8e5f9bb6698c53c8481ad47a9ca00e90613192f58350464d5dfe6fa6ead",
+        "bytes": 13762
+      },
+      "edits": [
+        {
+          "offset": 368,
+          "before": "",
+          "after": "import {browserOwnerSourceSubject} from './browser-owner-source.mjs';\n"
+        },
+        {
+          "offset": 8929,
+          "before": " member(VERIFIER,pin.verifier);const checker=member(CHECKER_REFERENCE_PATH,pin.checker);\n",
+          "after": " member(VERIFIER,pin.verifier);const currentChecker=member(CHECKER_REFERENCE_PATH,pin.checker);\n // Historical derivation consumes the authenticated comparison image as data.\n const checker=line==='main'?browserOwnerSourceSubject({root,read}).comparisonBytes({path:CHECKER_REFERENCE_PATH,sha256:pin.checker}):currentChecker;\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/checker_reference_source_probe.mjs",
+      "source_commit": "authored",
+      "before": {
+        "path": "tests/checker_reference_source_probe.mjs",
+        "sha256": "ec7ab8c7abfef0035994a3addba5ef094ddea0f7921eaf8e358da4888d1aa747",
+        "bytes": 15838
+      },
+      "after": {
+        "path": "tests/checker_reference_source_probe.mjs",
+        "sha256": "14f79ea6ef92bf8f76db642c4fa7a36b82049f4087e693d8a3e4e68989de203f",
+        "bytes": 16398
+      },
+      "edits": [
+        {
+          "offset": 374,
+          "before": "",
+          "after": "import {browserOwnerSourceSubject} from '../scripts/browser-owner-source.mjs';\n"
+        },
+        {
+          "offset": 3184,
+          "before": " const current=member(CHECKER,packet.current_checker.sha256,packet.current_checker.bytes);\n",
+          "after": " const physicalCurrent=member(CHECKER,packet.current_checker.sha256,packet.current_checker.bytes);\n const current=line==='main'?browserOwnerSourceSubject({root:ROOT,read}).comparisonBytes(packet.current_checker):physicalCurrent;\n"
+        },
+        {
+          "offset": 5983,
+          "before": "",
+          "after": " // The only executed helper must also be identical in the authenticated physical image.\n const physicalFns=functions(parse('physical-current.mjs',physicalCurrent));\n assert.equal(physicalFns.get('readRegularRepoBytes'),newFns.get('readRegularRepoBytes'));\n"
+        },
+        {
+          "offset": 12504,
+          "before": " return {bound:structuredClone([...bound.values()]),assertCurrent,protected_canonical_before:{...packet.protected_ledger},report:{schema_version:1,line,result:'pass',canonical_frame_admission_granted:false,current_ledger_sha256:hash(ledgerRaw),current_ledger_bytes:ledgerRaw.length,analysis_node:process.version,analysis_typescript:ts.version,old_checker_sha256:packet.old_checker.sha256,current_checker_sha256:packet.current_checker.sha256,\n",
+          "after": " return {bound:structuredClone([...bound.values()]),assertCurrent,protected_canonical_before:{...packet.protected_ledger},report:{schema_version:1,line,result:'pass',canonical_frame_admission_granted:false,current_ledger_sha256:hash(ledgerRaw),current_ledger_bytes:ledgerRaw.length,analysis_node:process.version,analysis_typescript:ts.version,old_checker_sha256:packet.old_checker.sha256,current_checker_sha256:packet.current_checker.sha256,physical_checker_sha256:hash(physicalCurrent),historical_checker_comparison_only:true,\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/browser-reference-source.mjs",
+      "source_commit": "authored",
+      "before": {
+        "path": "scripts/browser-reference-source.mjs",
+        "sha256": "161841bb8ead4efa8f8bb94f13d6f48552609c8ed03bc9737636464e23f86c21",
+        "bytes": 12843
+      },
+      "after": {
+        "path": "scripts/browser-reference-source.mjs",
+        "sha256": "f935c64f2d41e7cd02d3e5678ddb5af7b3598de1ac504c64ca99475c4f49e47b",
+        "bytes": 15925
+      },
+      "edits": [
+        {
+          "offset": 847,
+          "before": "",
+          "after": "import {inventoryFiniteToolSuccessor} from './inventory-finite-tool-successor.mjs';\n"
+        },
+        {
+          "offset": 2315,
+          "before": "",
+          "after": " const workflow=inventoryFiniteToolSuccessor({root,read,line});\n"
+        },
+        {
+          "offset": 2571,
+          "before": " const bound=new Map([...tools.bound,...zone.bound,...surface.bound,...formZone.bound].map(ref=>[ref.path,{...ref}])),member=ref=>{\n  if(ref.sha256!==undefined)ref=formZone.qualify(ref)??surface.qualify(ref)??tools.qualifyReference(ref);\n",
+          "after": " const bound=new Map([...tools.bound,...zone.bound,...surface.bound,...formZone.bound,...workflow.bound].map(ref=>[ref.path,{...ref}]));\n const slicePath='scripts/run-browser-matrix-slice.mjs';\n const sliceBefore={path:slicePath,sha256:'63129120785dbec5264198f0d1b8fadb7eb01b014040dc04e66c20872e46d610'};\n const sliceAfter={path:slicePath,sha256:'7be17c3f34fa5943fade75bfd4bb51b06e524bcf25049ab1a7d1f58549257a6a',bytes:19860};\n const dialogSliceQualify=ref=>{if(line!=='main'||ref.path!==slicePath)return null;const prior=ref.sha256===sliceBefore.sha256?sliceBefore:ref.sha256===sliceAfter.sha256?sliceAfter:null;assert.ok(prior,'unknown dialog slice source');if(ref.bytes!==undefined)assert.equal(ref.bytes,prior===sliceBefore?original(root,'36cc0feb5ff9fefe95d354b251ac8f6b37b067e2',slicePath).length:prior.bytes);return {...ref,sha256:sliceAfter.sha256,...(ref.bytes===undefined?{}:{bytes:sliceAfter.bytes})};};\n const peerPath='tests/browser_peer_versions_probe.mjs';\n const peerBefore={path:peerPath,sha256:'84d0d6dc654decb0352762e2cc57ccbd34723363ec314ad22b1a6839cb8457b9',bytes:3835};\n const peerAfter={path:peerPath,sha256:'0816108e3dbcfdb565acf53e2c4d584e17e5e71835b9eed594f743a91654d2e8',bytes:4719};\n const dialogPeerQualify=ref=>{if(line!=='main'||ref.path!==peerPath)return null;const prior=ref.sha256===peerBefore.sha256?peerBefore:ref.sha256===peerAfter.sha256?peerAfter:null;assert.ok(prior,'unknown browser peer test source');if(ref.bytes!==undefined)assert.equal(ref.bytes,prior.bytes);return {...ref,sha256:peerAfter.sha256,...(ref.bytes===undefined?{}:{bytes:peerAfter.bytes})};};\n const member=ref=>{\n  if(ref.sha256!==undefined)ref=dialogPeerQualify(ref)??dialogSliceQualify(ref)??workflow.qualify(ref)??formZone.qualify(ref)??surface.qualify(ref)??tools.qualifyReference(ref);\n"
+        },
+        {
+          "offset": 3344,
+          "before": "",
+          "after": " if(line==='main'){\n  const receipt=JSON.parse(member({path:'compatibility/rc/parent-dialog-focus-readiness-integration-v1.json',sha256:'08a872956a859beee736ec1aa1c1b01e3f7197ee36132c099b406ef918be16ab',bytes:3708}));\n  assert.equal(receipt.patch_sha256,'93869925718897ad5d1db3d93a8cbe16f41a8d4dc0d60790b52cc6218af4adca');\n  assert.equal(receipt.evidence_archive.sha256,'355eb1df48462280b0fc24599e01e26125b4df39395520a660884ef2d059bfb1');member({path:receipt.evidence_archive.path,sha256:receipt.evidence_archive.sha256,bytes:receipt.evidence_archive.bytes});\n  const peerOld=original(root,'feaa956a5d593aa73d41fc4160772fa82cdf8972',peerPath),peerCurrent=original(root,'0ca6505896139dab0643f91f4179c3b351b5c068',peerPath);\n  assert.equal(hash(peerOld),peerBefore.sha256);assert.equal(peerOld.length,peerBefore.bytes);assert.equal(hash(peerCurrent),peerAfter.sha256);assert.equal(peerCurrent.length,peerAfter.bytes);assert.ok(readCheckerOwnerMember(root,peerPath).equals(peerCurrent));\n  const before=original(root,'36cc0feb5ff9fefe95d354b251ac8f6b37b067e2',slicePath),after=original(root,'b8e00f603869daaabb72e5b5ee464ce510fe9b47',slicePath);\n  assert.equal(hash(before),sliceBefore.sha256);assert.equal(hash(after),sliceAfter.sha256);assert.equal(after.length,sliceAfter.bytes);assert.ok(readCheckerOwnerMember(root,slicePath).equals(after));\n }\n"
+        },
+        {
+          "offset": 11271,
+          "before": " const assertCurrent=()=>{zone.assertCurrent();surface.assertCurrent();formZone.assertCurrent();tools.assertCurrent();for(const ref of bound.values()){\n",
+          "after": " const assertCurrent=()=>{workflow.assertCurrent();zone.assertCurrent();surface.assertCurrent();formZone.assertCurrent();tools.assertCurrent();for(const ref of bound.values()){\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/current_sass_tool_reference_probe.mjs",
+      "source_commit": "authored",
+      "before": {
+        "path": "tests/current_sass_tool_reference_probe.mjs",
+        "sha256": "f1cd2398d7d0cd1b5abb061422841389a5b8d86e02cf72ef8d22a7a305a404d6",
+        "bytes": 14111
+      },
+      "after": {
+        "path": "tests/current_sass_tool_reference_probe.mjs",
+        "sha256": "fcc1d110a8379dcc300ee0083b9a74ab6267e12e29ec4cd7eb692e9850c1e23b",
+        "bytes": 14258
+      },
+      "edits": [
+        {
+          "offset": 1162,
+          "before": " assert.equal(source.epoch,3);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);\n",
+          "after": " assert.equal(source.epoch,source.line==='main'?4:3);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);\n"
+        },
+        {
+          "offset": 3905,
+          "before": "  assert.deepEqual(source.qualify(row.before),row.after);\n  assert.deepEqual(source.qualify(row.after),row.after);\n",
+          "after": "  const latest=source.transitions.find(r=>r.path===row.path);assert.ok(latest);\n  assert.deepEqual(source.qualify(row.before),{path:row.path,...latest.after});\n  assert.deepEqual(source.qualify(row.after),{path:row.path,...latest.after});\n"
+        }
+      ]
+    }
+  ]
+}
