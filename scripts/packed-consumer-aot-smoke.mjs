@@ -1969,7 +1969,7 @@ async function main() {
   }finally {win.history.replaceState(null,'',originalUrl);}
   const progressLocationAndDefaults=dynamicLocation&&pattern!==null&&rectangle!==null
     &&barNode.injector.get(MAT_LEGACY_PROGRESS_BAR_LOCATION)!==rootLocation
-    &&MAT_LEGACY_PROGRESS_BAR_DEFAULT_OPTIONS!==MAT_PROGRESS_BAR_DEFAULT_OPTIONS
+    &&MAT_LEGACY_PROGRESS_BAR_DEFAULT_OPTIONS===MAT_PROGRESS_BAR_DEFAULT_OPTIONS
     &&bar.color==='warn'&&bar.mode==='query'
     &&rectangle.getAttribute('fill')==="url('/legacy-location(path)?query=1#"+pattern.id+"')";
   // Real public constructor calls exercise the owned common module, not a dummy.

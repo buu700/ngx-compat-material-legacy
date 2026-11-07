@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "role": "Root integration of historical progress defaults token identity assertion",
+  "parent": "b6ef5d7d94a7a7a2b3d65beb8115ffd2e1223e5c",
+  "source_afterimage": {
+    "path": "scripts/packed-consumer-aot-smoke.mjs",
+    "sha256": "55e75a9d50255c7393008da3d2d4147b2db0ee50d6f9326d1b85fa967e046746"
+  },
+  "qualification": {
+    "base_commit": "b6ef5d7d94a7a7a2b3d65beb8115ffd2e1223e5c",
+    "candidate_source_sha256": "55e75a9d50255c7393008da3d2d4147b2db0ee50d6f9326d1b85fa967e046746",
+    "baseline_source_sha256": "01902ab394480c2c50ef11ea953ab49a1f0d4cf65484661b76688ff418074733",
+    "artifact_sha256": "08dae37e775e2ab50457d820b3c7ae98114059012125781378cd36f05d8990e5",
+    "original_16_reference": {
+      "tag": "16.2.14",
+      "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "source": "src/material/legacy-progress-bar/progress-bar.ts",
+      "public_api": "src/material/legacy-progress-bar/public-api.ts"
+    },
+    "tests": {
+      "same_case_ids_in_order": true,
+      "original_inequality": {
+        "passed": 104,
+        "failed": 2,
+        "exit": 1
+      },
+      "corrected_equality": {
+        "passed": 106,
+        "failed": 0,
+        "exit": 0
+      },
+      "distinct_token_mutation": {
+        "passed": 104,
+        "failed": 2,
+        "exit": 1,
+        "observed": {
+          "tokensEqual": false,
+          "color": "primary",
+          "mode": "determinate",
+          "locationScope": true
+        }
+      }
+    },
+    "limits": [
+      "Packed TestBed fixture uses JSDOM, not a native browser.",
+      "The distinct-token negative changes only the isolated consumer fixture and injects a synthetic separate token; it is not a rebuilt or altered library artifact.",
+      "Runs used --tarball in isolated worktree, not a coordinator-bound --run acceptance report.",
+      "Earlier progress family 31/31 used a different, explicitly identified candidate artifact and Chrome 149; it is historical support, not a combined-artifact rerun."
+    ],
+    "artifacts": {
+      "progress-token-fixture.patch": {
+        "sha256": "f8c426d3c0dc14bc46813b17435885b96488388d2ce6d5644ff36b7ac18e6157",
+        "bytes": 873
+      },
+      "baseline-result.json": {
+        "sha256": "663d0559889544a3abe650382b4c0d85084f39b73b708be9098d249f4896712e",
+        "bytes": 480503
+      },
+      "candidate-result.json": {
+        "sha256": "85914f1882d6566aedcfc5d98d67e6f468b3c32877e6d27853b2ee2744f40fd4",
+        "bytes": 480216
+      },
+      "negative-result.json": {
+        "sha256": "83b12b9ebcd104f5a49a4ef0e204aa71950ff8452ce511c928a0e9a47c79f633",
+        "bytes": 480667
+      },
+      "run-distinct-token-negative.py": {
+        "sha256": "bdc72b5cd82708aa0228ddf7832bd5fea1eb4e7b7e157a7b90d0ef39e19d2638",
+        "bytes": 2211
+      },
+      "baseline.log": {
+        "sha256": "2b48caaca4bd04bf6e56e4e6253a8af8afc8b4646d63d0eeff1cebe6b162c01b",
+        "bytes": 188828
+      },
+      "candidate.log": {
+        "sha256": "9c76ca079af995b8c7e78b877214156ca7ae20209607f0ff356fce1175af2f48",
+        "bytes": 314
+      },
+      "negative.log": {
+        "sha256": "a7ec8aaa3cd330dff361ffc962c5dedb899370105080913b89bbf2fa09306784",
+        "bytes": 188992
+      },
+      "negative-mutant-source-sha256.txt": {
+        "sha256": "2a3c245a9f41c80c36d447d52b7f48ed6433c6ad81654bb233c5992b4fa7c5a9",
+        "bytes": 65
+      }
+    }
+  },
+  "independent_review": {
+    "sha256": "5476d756b2ddae25dfc149a0684c055eaf9b9c5ad2235dcfe30c20b6b95b1aa5",
+    "text": "# Independent review: packed progress token fixture correction\n\nThe one-operator test-only patch is supported, subject to the integrating owner checking the current fixture source and re-running its intended current acceptance command. Patch SHA256 `f8c426d3c0dc14bc46813b17435885b96488388d2ce6d5644ff36b7ac18e6157`, qualification SHA256 `b81ae9387ba4ed3ec1d5090e17da73804706d69b5e5567a3be587e4734b50c31`, base `b6ef5d7d94a7a7a2b3d65beb8115ffd2e1223e5c`. The changed predicate asserts equality of legacy and current progress-bar default option token; it retains scoped location, consumer-provided color/mode, and escaped SVG location checks. The original Material 16.2.14 legacy progress-bar public API re-exports the current progress token, and the original legacy component injects that token. Equality therefore matches the historical identity restored by the already reviewed product change. The location check tests injection scope and is not a claim about location-token identity.\n\nI verified every recorded qualification artifact hash and byte count, the actual shared tarball SHA256 `08dae37e775e2ab50457d820b3c7ae98114059012125781378cd36f05d8990e5`, and the retained three result bodies. All have the same 106 ordered case IDs and the same reported tar. Original inequality yields 104/106, corrected equality 106/106, and the distinct-token negative 104/106; both failures in each negative are the targeted progress case and its aggregate standalone-harness consequence, not two separate product defects. The corrected result has `progressLocationAndDefaults: true`.\n\nThe negative is an isolated consumer-source mutation, not a changed packed library: it substitutes a synthetic `InjectionToken` for the fixture's legacy token and consequently provides defaults under the wrong token. Its actual record reports unequal tokens, legacy fallback `primary`/`determinate`, and location-scope control true. I reconstructed the changed consumer source and matched its recorded hash `a74c67fb7eb46461703a2a176e2c6f1f2256f007fe5625b44834819c80932bca`. The negative therefore exercises both the equality and provider/behavior portions of the conjunction; it does not isolate either subcondition alone.\n\nThe retained runs used the same `--tarball`, have null coordinator run IDs and use the packed TestBed/JSDOM fixture, not a native browser or sealed `--run` acceptance. The earlier 31/31 Chrome progress family used a different artifact and remains historical supporting evidence. No independent expensive rerun, product edit, 21.x/x64, full matrix, security or release qualification is claimed.\n"
+  },
+  "root_checks": [
+    "Verified every recorded qualification artifact hash and byte count.",
+    "Applied the exact one-operator reviewed patch to the clean reviewed base.",
+    "Verified whole producer afterimage equals reviewed candidate.",
+    "Scoped location, provided color/mode, escaped SVG location assertions and all 106 case IDs retained."
+  ],
+  "limits": [
+    "Same-artifact isolated JSDOM results support this fixture correction; they do not replace the original failed coordinator report.",
+    "The original b6ef run remains 104/106 and immutable; current source acceptance requires a new run.",
+    "No library, CSS, SCSS, HTML, historical golden, public API, inventory or peer dependency changed.",
+    "No full G01-G13, upstream audit, security, release, RxJS 6, 21.x or x64 qualification claimed."
+  ]
+}
