@@ -631,7 +631,12 @@ function coordinatorRequest() {
     try { nativeMotionExecution = JSON.parse(process.env.RC_UPSTREAM_NATIVE_MOTION); }
     catch { return {error: 'RC_UPSTREAM_NATIVE_MOTION is not JSON'}; }
   }
-  return {binding, invocation, runId: process.env.RC_RUN_ID, outputDir, runDir: resolve(outputDir, '..', '..', '..'), line: binding.source_line, packedConsumerExecution, sassExecution, historicalExecution, browserExecution, nativeMotionExecution};
+  let typeaheadExecution;
+  if (process.env.RC_UPSTREAM_TYPEAHEAD !== undefined) {
+    try { typeaheadExecution = JSON.parse(process.env.RC_UPSTREAM_TYPEAHEAD); }
+    catch { return {error: 'RC_UPSTREAM_TYPEAHEAD is not JSON'}; }
+  }
+  return {binding, invocation, runId: process.env.RC_RUN_ID, outputDir, runDir: resolve(outputDir, '..', '..', '..'), line: binding.source_line, packedConsumerExecution, sassExecution, historicalExecution, browserExecution, nativeMotionExecution, typeaheadExecution};
 }
 
 const dependencyGroups = request ? JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'))

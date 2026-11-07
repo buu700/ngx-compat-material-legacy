@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import subprocess
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -29,6 +30,7 @@ CHECK_CONTRACT = {
     "engine-free-consumer": (("G04",), "artifact", ("library",), ("engine-absence", "strict-consumer", "testing-entrypoints")),
     "source-contract-regressions": (("G11",), "source", ("source",), ("current-source-regressions",)),
     "upstream-audit-disposition": (("G03", "G08", "G11"), "source", ("source",), ("upstream-shas", "authored-symbols", "installed-peer-fixes", "current-advisories")),
+    "typeahead-execution": (("G11",), "artifact", ("library",), ("focused-typeahead",)),
     "source-policy": (("G03",), "source", ("source",), ("authored-boundary", "packed-boundary")),
     "companion-bridge-tokens": (("G07",), "source", ("source",), ("compiled-override-tokens",)),
     "companion-computed-styles": (("G07",), "artifact", ("library",), ("thirteen-companion-dimensions", "independent-peer-oracle")),
@@ -39,6 +41,8 @@ CHECK_CONTRACT = {
     "dependency-eligibility": (("G08", "G11", "G13"), "source", ("source",), ("locks-tools-maturity", "vendor-provenance-license")),
     "release-metadata": (("G01", "G13"), "artifact", ("library", "migrate-cli"), ("package-metadata-license", "instructions-provenance")),
 }
+TYPEAHEAD_CASES = ('MatSelectionList without forms > with list option > should be able to jump focus down to an item by typing', 'MatSelectionList without forms > with list option > should not select items while using the typeahead', 'MatMenu > should route typeahead focus through the public menu keydown and skip disabled matches', 'MatMenu > should update menu typeahead targets after dynamic items change', 'MatSelect > core > accessibility > for select > should be able to select options by typing on a closed select', 'MatSelect > core > accessibility > for select > should skip a disabled option after the closed select options change during typeahead', 'MatSelect > core > accessibility > for select > should not open the select when pressing space while typing', 'MatSelect > core > accessibility > for select > should be able to customize the typeahead debounce interval', 'MatSelect > core > accessibility > for select > should cancel the typeahead selection on blur')
+
 SOURCE_REGRESSION_CASES = (
     "source-contract-regressions/checker-source/full-fault-lifetimes",
     "source-contract-regressions/browser-source/full-fault-lifetimes",
@@ -79,12 +83,17 @@ def _pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     return obj
 
 
-def parse_json(data: bytes, label: Any) -> dict[str, Any]:
+def parse_json_value(data: bytes, label: Any) -> Any:
     try:
         value = json.loads(data.decode("utf-8"), object_pairs_hook=_pairs,
                            parse_constant=lambda text: require(False, f"non-finite JSON number: {text}"))
     except (OSError, UnicodeError, json.JSONDecodeError) as error:
         raise EvidenceError(f"cannot read JSON {label}: {error}") from error
+    return value
+
+
+def parse_json(data: bytes, label: Any) -> dict[str, Any]:
+    value = parse_json_value(data, label)
     require(isinstance(value, dict), f"{label}: expected a JSON object")
     return value
 
@@ -138,6 +147,36 @@ class EvidenceSnapshot:
 
     def inventory(self) -> list[dict[str, Any]]:
         return [self.files[key] for key in sorted(self.files)]
+
+
+TYPEAHEAD_CHECKER_FILES = frozenset({
+    "scripts/revalidate-typeahead.mjs", "scripts/upstream-typeahead-evidence.mjs",
+    "scripts/typeahead-run-projection.mjs", "scripts/upstream-packed-run-evidence.mjs",
+    "scripts/packed-consumer-evidence.mjs", "scripts/run-typeahead-execution.py",
+    "compatibility/rc/matrices/library-exports.json",
+})
+TYPEAHEAD_SOURCE_PREFIXES = ("projects/ngx-material-legacy/", "testing/legacy-runner/",
+    "compatibility/rc/typeahead-fixture/", "compatibility/rc/typeahead-runner/", "node_modules/")
+
+
+def register_typeahead_files(snapshot: EvidenceSnapshot, records: Any) -> None:
+    require(isinstance(records, list) and bool(records), "typeahead: missing validated file inventory")
+    seen = set()
+    for record in records:
+        require(isinstance(record, dict) and set(record) == {"root", "path", "sha256", "bytes"}, "typeahead: invalid inventory record")
+        path = record.get("path")
+        require(record.get("root") == "repository" and isinstance(path, str) and
+                (path in TYPEAHEAD_CHECKER_FILES or path.startswith(TYPEAHEAD_SOURCE_PREFIXES)),
+                "typeahead: invalid inventory role/path")
+        require(path not in seen, "typeahead: duplicate inventory path")
+        seen.add(path)
+        key = ("repository", path)
+        if key in snapshot.files:
+            require(snapshot.files[key] == record, "typeahead: inconsistent existing identity")
+            checked_file(snapshot.roots["repository"], record, "typeahead existing identity")
+        else:
+            snapshot.checked("repository", record, "typeahead-input")
+    require(TYPEAHEAD_CHECKER_FILES <= seen, "typeahead: missing loaded checker identity")
 
 
 def assertion_directory(check_id: str, invocation_id: str) -> str:
@@ -223,6 +262,8 @@ def validate_matrix(matrix: dict[str, Any]) -> dict[str, dict[str, Any]]:
                 listed = strings(ids, f"{cid}/{line}/{group}")
                 require(not seen.intersection(listed), f"{cid}/{line}: case occurs in multiple groups")
                 seen.update(listed)
+        if cid == "typeahead-execution":
+            require(cases["main"]["focused-typeahead"] == list(TYPEAHEAD_CASES) and cases["21.x"]["focused-typeahead"] is None, f"{cid}: fixed main roster required")
         if cid == "source-contract-regressions":
             for line, case_groups in cases.items():
                 require(case_groups["current-source-regressions"] == list(SOURCE_REGRESSION_CASES),
@@ -285,6 +326,49 @@ def binding_for(run: dict[str, Any], matrix_sha256: str) -> dict[str, Any]:
     }
 
 
+def validate_typeahead_observation(snapshot, run, binding, invocation, output_paths):
+    """Bind the focused report to actual selected results and retained input bytes."""
+    prefix = assertion_directory("typeahead-execution", invocation)
+    observation_path = prefix + "/observation.json"
+    require(observation_path in output_paths, "typeahead: observation is not an output")
+    obs = snapshot.json("run", observation_path, "assertion-output")
+    library = next(a for a in run["artifacts"] if a["id"] == "library")
+    require(obs.get("schema_version") == 1 and obs.get("kind") == "typeahead-execution" and obs.get("sha") == "ff36c80f9c7a14f0e9f36eafc3e1423d34e7c916", "typeahead: wrong observation identity")
+    require(obs.get("run_id") == run["run_id"] and obs.get("line") == "main" and obs.get("invocation_id") == invocation and obs.get("binding") == binding, "typeahead: wrong execution binding")
+    require(obs.get("library") == {"sha256": library["sha256"], "bytes": library["bytes"]} and obs.get("inputs_unchanged") is True, "typeahead: wrong artifact or changed inputs")
+    files = obs.get("files")
+    required = {"raw-report.json", "commands.json", "inputs-before.json", "metafile.json", "bundle.js", "bundle-inputs.json", "entry.generated.ts"}
+    require(isinstance(files, dict) and set(files) == required, "typeahead: missing or unknown support files")
+    for name, identity in files.items():
+        path = prefix + "/" + name
+        require(path in output_paths and isinstance(identity, dict) and set(identity) == {"sha256", "bytes"}, "typeahead: missing support output")
+        snapshot.checked("run", {"path": path, **identity}, "assertion-output")
+    raw = snapshot.json("run", prefix + "/raw-report.json", "assertion-output")
+    specs = raw.get("specs")
+    require(isinstance(specs, list) and all(isinstance(r, dict) and type(r.get("skipped")) is bool for r in specs), "typeahead: invalid spec statuses")
+    selected = [r for r in specs if r["skipped"] is False]
+    require(raw.get("subject_mode") == "artifact" and raw.get("mode") == "normal" and raw.get("run_id") == run["run_id"] and raw.get("artifact_sha256") == library["sha256"], "typeahead: raw result binding mismatch")
+    require(isinstance(raw.get("totals"), dict) and all(type(v) is int for v in raw["totals"].values()) and raw.get("totals") == {"executed": 496, "passed": 9, "failed": 0, "skipped": 487} and obs.get("counts") == raw["totals"] and raw.get("failures") == [] and len(raw.get("specs", [])) == 496, "typeahead: incomplete results")
+    require(obs.get("selected_cases") == selected and [r.get("full_name") for r in selected] == list(TYPEAHEAD_CASES) and all(r.get("success") is True for r in selected), "typeahead: selected case results differ")
+    require(all(sum(r.get("full_name") == name for r in specs) == 1 for name in TYPEAHEAD_CASES), "typeahead: duplicate case")
+    peers = {"fesm2022/_list-key-manager-chunk.mjs": "63042ad0a8264bfedfaac1c03d2b0eee450bcd7890a09792dc83256195e00057", "fesm2022/_typeahead-chunk.mjs": "c26eed04140a44b175020b75b3a16bf73c2913a064ae61c79dc744d5fa3e4622"}
+    require(obs.get("peer_version") == "22.1.7" and obs.get("peer_members") == peers and type(obs.get("extracted_files")) is int and obs["extracted_files"] > 0, "typeahead: invalid peer or extraction identity")
+    initial = snapshot.json("run", prefix + "/inputs-before.json", "assertion-output")
+    require(initial.get("artifact") == library["sha256"] and initial.get("peer") == peers, "typeahead: wrong input snapshot")
+    _, log_bytes = snapshot.capture("run", prefix + "/commands.json", "assertion-output")
+    log = parse_json_value(log_bytes, prefix + "/commands.json")
+    require(isinstance(log, list) and len(log) == 3, "typeahead: incomplete command log")
+    commands = ["testing/legacy-runner/build.mjs", "testing/legacy-runner/build.mjs", "node_modules/karma/bin/karma"]
+    require(all(isinstance(row, dict) and type(row.get("exit_code")) is int and row["exit_code"] == 0 and isinstance(row.get("command"), list) and len(row["command"]) >= 2 and row["command"][1] == expected for row, expected in zip(log, commands)), "typeahead: failed or unexpected command")
+    meta = snapshot.json("run", prefix + "/metafile.json", "assertion-output")
+    graph = snapshot.json("run", prefix + "/bundle-inputs.json", "assertion-output")
+    require(isinstance(meta.get("inputs"), dict) and isinstance(graph.get("inputs"), list) and graph.get("schema_version") == 1 and graph["inputs"] and all(isinstance(row, dict) for row in graph["inputs"]), "typeahead: invalid bundle graph")
+    rows = graph["inputs"]
+    require([row.get("key") for row in rows] == list(meta["inputs"]) and any(row.get("origin") == "artifact" for row in rows) and any(row.get("origin") == "generated" and row.get("path") == "entry.generated.ts" for row in rows), "typeahead: incomplete bundle graph")
+    require(all(any(row.get("origin") == "dependency" and isinstance(row.get("path"), str) and row["path"].endswith("@angular/cdk/" + path) and row.get("sha256") == digest for row in rows) for path, digest in peers.items()), "typeahead: missing peer inputs")
+    return obs
+
+
 def evaluate_run(
     root: Path,
     run_path: Path,
@@ -303,6 +387,7 @@ def evaluate_run(
     errors: dict[str, list[str]] = {}
     passed: list[str] = []
     validated_reports: dict[str, str] = {}
+    typeahead_files: list[dict[str, Any]] = []
     snapshot = EvidenceSnapshot(root, run_path.parent)
     assertion_paths: list[tuple[str, str]] = []
     run_id = None
@@ -417,6 +502,20 @@ def evaluate_run(
                 assertion_paths.append((cid, output["path"]))
                 require(output["path"] not in output_paths, f"{cid}: duplicate output")
                 output_paths.add(output["path"])
+            if cid == "typeahead-execution":
+                validate_typeahead_observation(snapshot, run, binding, invocation, output_paths)
+                # Replay the very same finite validator used by upstream admission,
+                # with identities from the coordinator, not from the child report.
+                observation = next(item for item in outputs if item["path"] == assertion_directory(cid, invocation) + "/observation.json")
+                request = {"line": line, "runId": run_id, "runDir": str(run_path.parent), "binding": binding,
+                           "packedConsumerExecution": {"run_id": run_id, "exit_code": process_results.get("packed-consumer"), "invocation_id": invocation_ids.get("packed-consumer")},
+                           "typeaheadExecution": {"run_id": run_id, "exit_code": actual_exit, "invocation_id": invocation, "output": observation}}
+                completed = subprocess.run(["node", str(root / "scripts/revalidate-typeahead.mjs")], input=json.dumps({"root": str(root), "request": request}), text=True, capture_output=True, cwd=root)
+                require(completed.returncode == 0, f"{cid}: shared finite validation failed: {completed.stderr.strip()}")
+                outcome = parse_json_value(completed.stdout.encode(), "typeahead shared validator")
+                require(outcome.get("ok") is True and outcome.get("invocation_id") == invocation and outcome.get("output") == observation, f"{cid}: shared validator identity mismatch")
+                register_typeahead_files(snapshot, outcome.get("validated_files"))
+                typeahead_files = outcome["validated_files"]
             cases = report.get("case_results")
             require(isinstance(cases, list) and len(cases) == len(expected), f"{cid}: missing per-case assertion results")
             case_ids: set[str] = set()
@@ -454,6 +553,7 @@ def evaluate_run(
     summary["validated_reports"] = validated_reports
     summary["validated_manifest_sha256"] = manifest_digest
     summary["validated_files"] = snapshot.inventory()
+    summary["typeahead_validated_files"] = typeahead_files
     return summary
 
 

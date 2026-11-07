@@ -29,7 +29,8 @@ if str(Path(__file__).resolve().parent) not in sys.path:
 from rc_acceptance import (
     CHECK_CONTRACT, EvidenceError, binding_for, evaluate_run, read_json,
     validate_matrix, checked_file, sha256_file as evidence_sha256,
-    assertion_directory, expected_cases, prepack_binding_for,
+    assertion_directory, expected_cases, prepack_binding_for, EvidenceSnapshot,
+    TYPEAHEAD_CASES, validate_typeahead_observation,
 )
 from archive_run_closure import ClosureError, write_closure
 from historical_inventory_source import check_inventory_source_bindings
@@ -76,6 +77,7 @@ SCRIPT_CHECKS = {
     "scripts/check-pack-library.mjs": "pack-library",
     "scripts/check-packed-exports.mjs": "packed-exports",
     "scripts/check-source-contract-regressions.py": "source-contract-regressions",
+    "scripts/run-typeahead-execution.py": "typeahead-execution",
     "scripts/check-upstream-audit-disposition.mjs": "upstream-audit-disposition",
     "scripts/check-source-policy.py": "source-policy",
     "scripts/check-dependency-eligibility.py": "dependency-eligibility",
@@ -489,6 +491,70 @@ def parse_args(argv: list[str]) -> tuple[Path, str]:
     return out, line
 
 
+def typeahead_execution_attestation(active):
+    """Forward only the actual coordinator child result and captured output identity."""
+    outputs = active.outputs.get('typeahead-execution', [])
+    invocation = active.invocations.get('typeahead-execution')
+    expected = f'evidence/typeahead-execution/{invocation}/observation.json'
+    output = next((item for item in outputs if item.get('path') == expected), None)
+    return {'run_id': active.manifest['run_id'], 'invocation_id': invocation,
+            'exit_code': active.exit_codes.get('typeahead-execution'), 'output': output}
+
+
+def write_typeahead_report(run_dir, run_id, line, exit_code):
+    """Create a complete roster only from this child's retained selected results."""
+    check_id = 'typeahead-execution'
+    ACTIVE_RUN.outputs.pop(check_id, None)
+    try:
+        if exit_code != 0 or line != 'main':
+            raise EvidenceError('typeahead child did not pass on main')
+        invocation = ACTIVE_RUN.invocation(check_id)
+        prefix = assertion_directory(check_id, invocation)
+        names = ['observation.json', 'raw-report.json', 'commands.json', 'inputs-before.json',
+                 'metafile.json', 'bundle.js', 'bundle-inputs.json', 'entry.generated.ts']
+        outputs = []
+        for name in names:
+            path = run_dir / prefix / name
+            if path.is_symlink() or not path.is_file() or path.stat().st_nlink != 1:
+                raise EvidenceError('missing or unsafe typeahead output')
+            outputs.append({'path': f'{prefix}/{name}', 'sha256': evidence_sha256(path), 'bytes': path.stat().st_size})
+        snapshot = EvidenceSnapshot(ROOT, run_dir)
+        validate_typeahead_observation(snapshot, ACTIVE_RUN.manifest, ACTIVE_RUN.binding, invocation,
+                                       {item['path'] for item in outputs})
+        snapshot.revalidate()
+        ACTIVE_RUN.outputs[check_id] = outputs
+        row = validate_matrix(read_json(MATRIX_PATH))[check_id]
+        artifacts = _contract_artifacts(row)
+        if artifacts is None:
+            raise EvidenceError('typeahead artifact unavailable')
+        cases = list(TYPEAHEAD_CASES)
+        report = {'schema_version': 1, 'template': False, 'run_id': run_id, 'check_id': check_id,
+                  'line': line, 'invocation_id': invocation, 'binding': ACTIVE_RUN.binding,
+                  'coverage': 'complete', 'result': 'pass', 'exit_code': 0,
+                  'subject_kind': 'artifact', 'subject_ids': ['library'], 'artifacts': artifacts,
+                  'expected_case_ids': cases, 'discovered_case_ids': cases, 'executed_case_ids': cases,
+                  'passed_case_ids': cases, 'failed_case_ids': [], 'skipped_case_ids': [],
+                  'unresolved_case_ids': [], 'exceptions': [], 'passed': len(cases), 'failed': 0, 'skipped': 0,
+                  'outputs': outputs, 'case_results': [{'case_id': case, 'result': 'pass', 'kind': 'assertion',
+                  'output_paths': [f'{prefix}/observation.json']} for case in cases],
+                  'command': ['rc-verify.py', check_id], 'limitations': ['Focused execution only; no G11 claim.']}
+        path = run_dir / 'reports' / f'{check_id}.json'
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(report, indent=2) + '\n')
+        return True
+    except (EvidenceError, OSError, ValueError, KeyError, TypeError) as error:
+        print(f'verify: typeahead evidence incomplete: {error}', file=sys.stderr)
+        # This coordinator owns the report. A stale or child-written complete
+        # report must not survive a failed evidence validation.
+        path = run_dir / 'reports' / f'{check_id}.json'
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({'schema_version': 1, 'template': False, 'run_id': run_id,
+                                    'check_id': check_id, 'line': line, 'coverage': 'slice',
+                                    'result': 'fail', 'exit_code': exit_code or 1, 'outputs': [],
+                                    'limitations': ['Focused typeahead execution did not produce complete bound evidence.']}, indent=2) + '\n')
+        return False
+
+
 def run_node(script: str, args: list[str], *, record: bool = True) -> int:
     if script.endswith(".py"):
         cmd = [sys.executable, str(ROOT / script), *args]
@@ -528,6 +594,7 @@ def run_node(script: str, args: list[str], *, record: bool = True) -> int:
             'invocation_id': ACTIVE_RUN.invocations.get('browser-matrix'),
             'exit_code': ACTIVE_RUN.exit_codes.get('browser-matrix'),
         }, sort_keys=True)
+        env['RC_UPSTREAM_TYPEAHEAD'] = json.dumps(typeahead_execution_attestation(ACTIVE_RUN), sort_keys=True)
         env['RC_UPSTREAM_NATIVE_MOTION'] = json.dumps({
             'run_id': ACTIVE_RUN.manifest['run_id'],
             'invocation_id': ACTIVE_RUN.invocations.get('native-motion'),
@@ -1880,6 +1947,13 @@ def main() -> int:
     implemented_ran.append("dependency-eligibility")
 
     run_source_contract_regressions(out_dir, run_id, line, results, implemented_ran)
+
+    # Run the finite packed typeahead producer before the audit consumes its identity.
+    if line == 'main':
+        code = run_node('scripts/run-typeahead-execution.py', ['--run', str(run_path)])
+        complete = write_typeahead_report(out_dir, run_id, line, code)
+        results['typeahead-execution'] = 'pass' if code == 0 and complete else 'fail'
+        implemented_ran.append('typeahead-execution')
 
     code = run_node(
         "scripts/check-upstream-audit-disposition.mjs",

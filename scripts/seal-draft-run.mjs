@@ -226,6 +226,30 @@ for (const check of required) {
   });
 }
 
+if (fullAcceptance && seen.has('typeahead-execution')) {
+  const fixed = new Set(['scripts/revalidate-typeahead.mjs', 'scripts/upstream-typeahead-evidence.mjs',
+    'scripts/typeahead-run-projection.mjs', 'scripts/upstream-packed-run-evidence.mjs',
+    'scripts/packed-consumer-evidence.mjs', 'scripts/run-typeahead-execution.py',
+    'compatibility/rc/matrices/library-exports.json']);
+  const prefixes = ['projects/ngx-material-legacy/', 'testing/legacy-runner/',
+    'compatibility/rc/typeahead-fixture/', 'compatibility/rc/typeahead-runner/', 'node_modules/'];
+  const rows = fullEvaluation.typeahead_validated_files;
+  if (!Array.isArray(rows) || !rows.length) fail(1, 'Missing typeahead validated inputs');
+  const paths = new Set();
+  for (const item of rows) {
+    if (!item || item.root !== 'repository' || typeof item.path !== 'string' ||
+        !(fixed.has(item.path) || prefixes.some(prefix => item.path.startsWith(prefix))) || paths.has(item.path)) {
+      fail(1, 'Invalid typeahead validated input');
+    }
+    evidencePath(root, item.path);
+    paths.add(item.path);
+    const match = fullEvaluation.validated_files.find(row => row.root === 'repository' && row.path === item.path);
+    if (!match || match.sha256 !== item.sha256 || match.bytes !== item.bytes) fail(1, 'Missing typeahead input from evidence inventory');
+    requiredEvidence.add(evidenceKey('repository', item.path));
+  }
+  if ([...fixed].some(path => !paths.has(path))) fail(1, 'Missing typeahead checker image');
+}
+
 if (sha256Text(readFileSync(runPath)) !== draftDigest) fail(1, 'Manifest changed during sealing');
 
 const sealed = {
@@ -258,7 +282,23 @@ process.on('exit', () => { if (existsSync(temporary)) unlinkSync(temporary); });
 // Rehash EVERY evaluator input/output immediately before publishing the sealed
 // manifest. Only an exclusively owned, trusted run may be finalized.
 try {
-  if (fullAcceptance) rehashEvidence(fullEvaluation.validated_files, requiredEvidence, runDir);
+  if (fullAcceptance) {
+    rehashEvidence(fullEvaluation.validated_files, requiredEvidence, runDir);
+    // Match observe_inputs and the packed-run validator: include untracked
+    // source but ignore generated compatibility reports and Git-ignored output.
+    const git = args => {
+      const result = spawnSync('git', ['-c', 'gc.auto=0', '-c', 'maintenance.auto=0', ...args],
+        {cwd: root, encoding: 'utf8', maxBuffer: 4 * 1024 * 1024});
+      if (result.status !== 0) fail(1, 'Cannot recheck source identity before sealing');
+      return result.stdout.trim();
+    };
+    if (draft.source?.clean !== true || draft.execution_inputs?.clean !== true ||
+        git(['rev-parse', 'HEAD']) !== draft.source?.commit ||
+        git(['rev-parse', 'HEAD^{tree}']) !== draft.source?.git_tree_sha ||
+        git(['status', '--porcelain', '--untracked-files=all', '--', '.', ':(exclude)compatibility/rc/reports']) !== '') {
+      fail(1, 'Source checkout changed before sealing');
+    }
+  }
   if (sha256Text(readFileSync(runPath)) !== draftDigest) fail(1, 'Manifest changed during sealing');
   renameSync(temporary, runPath);
 } catch (error) {

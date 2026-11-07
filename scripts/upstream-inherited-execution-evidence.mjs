@@ -13,6 +13,7 @@ import {TABLE_ONPUSH_SHA, validateArtifactBehavior} from './upstream-artifact-be
 import {TABLE_ONPUSH_CASE_ID} from './table-onpush-packed-contract.mjs';
 import {selectionBehaviorRequirements, validateSelectionBehavior} from './upstream-selection-evidence.mjs';
 import {bidiBehaviorRequirements, validateBidiBehavior} from './upstream-bidi-evidence.mjs';
+import {typeaheadBehaviorRequirements, validateTypeaheadBehavior} from './upstream-typeahead-evidence.mjs';
 import {inheritedHelperRequirements, validateInheritedHelperExecution} from './upstream-inherited-helper-evidence.mjs';
 
 // Independently authenticated minimum-peer bytes, rather than a ledger-selected
@@ -31,6 +32,7 @@ export function validateInheritedExecution({root, entry, proof, request, line}) 
   try {
     demand(tablePeers.has(line), 'unknown inherited execution branch');
     demand(!request || request.line === line, 'wrong inherited execution branch');
+    if (typeaheadBehaviorRequirements(entry?.sha, line)) return validateTypeaheadBehavior({root, entry, proof, request, line});
     if (line === '21.x' && entry?.sha === '4de7c0fb2d033bd81074764a52cc46edd02e6774')
       return validateTestingApi21xInheritedExecution({root,entry,proof,line});
     if (inheritedHelperRequirements(entry?.sha, line)) return validateInheritedHelperExecution({root, entry, proof, line});

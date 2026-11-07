@@ -47,7 +47,7 @@ def copy_verifier_fixture_scripts(root):
         for node in ast.walk(tree):
             if isinstance(node, ast.Constant) and isinstance(node.value, str):
                 value = node.value
-                if value.startswith(('fixtures/sass/', 'reference/material-16.2.14/', 'compatibility/rc/', 'projects/ngx-material-legacy/')):
+                if value.startswith(('fixtures/sass/', 'reference/material-16.2.14/', 'compatibility/rc/', 'projects/ngx-material-legacy/', 'tests/fixtures/stepper-material-16/')):
                     pending_paths.append(value)
     seen = set()
     while pending_paths:
@@ -68,7 +68,7 @@ def copy_verifier_fixture_scripts(root):
                     for item in value.values(): references(item)
                 elif isinstance(value, list):
                     for item in value: references(item)
-                elif isinstance(value, str) and value.startswith(('fixtures/sass/', 'reference/material-16.2.14/', 'compatibility/rc/', 'projects/ngx-material-legacy/')):
+                elif isinstance(value, str) and value.startswith(('fixtures/sass/', 'reference/material-16.2.14/', 'compatibility/rc/', 'projects/ngx-material-legacy/', 'tests/fixtures/stepper-material-16/')):
                     pending_paths.append(value)
             references(json.loads(source.read_bytes()))
 
@@ -81,7 +81,7 @@ def initialize_git(root):
     git('config', 'user.name', 'Synthetic verifier test')
     git('config', 'user.email', 'synthetic@example.invalid')
     git('config', 'core.hooksPath', '/dev/null')
-    (root / '.gitignore').write_text('/artifacts/\n__pycache__/\n')
+    (root / '.gitignore').write_text('/artifacts/\n/node_modules/\n__pycache__/\n')
     git('add', '.')
     git('commit', '-qm', 'Synthetic verifier fixture')
     return git
@@ -209,7 +209,8 @@ class FullSealerTests(unittest.TestCase):
         (self.root / 'scripts').mkdir()
         copy_verifier_fixture_scripts(self.root)
         shutil.copy2(ROOT / 'scripts/seal-draft-run.mjs', self.root / 'scripts/seal-draft-run.mjs')
-        write_json(self.root / 'projects/ngx-material-legacy/package.json', {'version': '22.0.0-rc.0'})
+        from typeahead_sealer_fixture import prepare
+        prepare(self.f)
         git = initialize_git(self.root)
         spec = importlib.util.spec_from_file_location('synthetic_verify_source', self.root / 'scripts/rc-verify.py')
         verify = importlib.util.module_from_spec(spec)
@@ -226,6 +227,9 @@ class FullSealerTests(unittest.TestCase):
                 report['prepack_binding'] = self.f.pack_record['binding']
             self.f.save_report(cid)
         self.record_path = self.f.run_dir / 'execution-record.json'
+        self.save_record()
+        from typeahead_sealer_fixture import complete
+        complete(self.f)
         self.save_record()
 
     def save_record(self):
@@ -307,6 +311,16 @@ class FullSealerTests(unittest.TestCase):
         self.assertFalse(Path(str(self.f.run_path) + '.sealing').exists())
         return result
 
+    def test_late_tracked_source_change_blocks_seal(self):
+        path = self.root / '.gitignore'
+        result = self.seal_with_post_evaluation_change(f'p=Path({str(path)!r}); p.write_text(p.read_text()+"# late tracked change\\n")')
+        self.assertIn('Source checkout changed before sealing', result.stderr)
+
+    def test_late_untracked_source_blocks_seal(self):
+        path = self.root / 'late-source.ts'
+        result = self.seal_with_post_evaluation_change(f'Path({str(path)!r}).write_text("late untracked source")')
+        self.assertIn('Source checkout changed before sealing', result.stderr)
+
     def test_assertion_mutation_after_evaluator_blocks_seal(self):
         path = self.f.run_dir / self.f.reports['packed-consumer']['outputs'][0]['path']
         result = self.seal_with_post_evaluation_change(f'p=Path({str(path)!r}); p.write_bytes(b"X" * p.stat().st_size)')
@@ -375,6 +389,39 @@ class CoordinatorEntryTests(WriterFixture):
             destination = self.root / relative
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(ROOT / relative, destination)
+        # Synthetic-only rebinding: the retained checkout inventory is not edited.
+        expected = {
+          'legacy-autocomplete/autocomplete.spec.ts': 'abc2ec1a6ceeb69b2410eb9827dabf3623e6592c035ec3b19f17321bf3b85a09',
+          'legacy-chips/chip-list.spec.ts': 'b41c1b2911e20ffa95853e5ec438b3c684919ce920129429f76dabadc206cbe2',
+          'legacy-dialog/dialog.spec.ts': 'd1938bb0ab51a94fc7dc1e4d0f28d9e08f5280492565a9577f0db08b39b4b985',
+          'legacy-input/input.spec.ts': '025f4fa2579ce0d93e95dc7cfe266081d3d0d771bb31c9ccc71ff8970c478eae',
+          'legacy-menu/menu.spec.ts': 'fefc0509a3c6597aa78b68ec885a14f9c4eae5f8d0742d8055b1fdc4e5f4ce0a',
+          'legacy-select/select.spec.ts': 'cad39a56a0e7843734ecfaf0454d6cbf91bba63501a09402cf9d6bcf31484cd7',
+          'legacy-snack-bar/snack-bar.spec.ts': '92425afa5ddcb406c75b4af69ea9dd795f3b3d10ef8898b909a7bd1ad69f7230',
+          'legacy-table/table.spec.ts': '6987ae268b614e3d445852fe9eb99e05d1f7c6c5669505079ed142586ab47d1e',
+          'legacy-tabs/tab-group.spec.ts': 'fbe51f8fd03841b2dbef0f5b814148edd97a7188a2de803835ce17064afc1145',
+        }
+        retained = {
+          'legacy-autocomplete/autocomplete.spec.ts': '2610d311569c9a6fdb063dc0652b423414622cf1370b2434f13ba86070293236',
+          'legacy-chips/chip-list.spec.ts': '26263b1efa46119fc7a8ea1b8693af78401cb2b78a3a4a6fb1dc7b0c78618750',
+          'legacy-dialog/dialog.spec.ts': 'dfc5961661c06ae15f186d25846f4a40f61880ac2c09e9975e0d9faabbbdea2b',
+          'legacy-input/input.spec.ts': 'ed4f565e8ee1b853e1f1d469468cd8db70730c7585693d654ada3f6f0cc394ba',
+          'legacy-menu/menu.spec.ts': '38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6',
+          'legacy-select/select.spec.ts': 'f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13',
+          'legacy-snack-bar/snack-bar.spec.ts': '15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3',
+          'legacy-table/table.spec.ts': 'f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad',
+          'legacy-tabs/tab-group.spec.ts': '4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e',
+        }
+        matched = set()
+        for row in inventory['rows']:
+            name = row['candidate'].removeprefix('projects/ngx-material-legacy/')
+            if name in expected:
+                assert row['candidate_sha256'] == retained[name]
+                assert acceptance.sha256_file(self.root / row['candidate']) == expected[name]
+                row['candidate_sha256'] = expected[name]
+                matched.add(name)
+        assert matched == set(expected)
+        write_json(self.root / 'testing/legacy-runner/historical-inventory.json', inventory)
         shutil.copy2(ROOT / 'compatibility/rc/matrices/full-verify.json',
                      self.root / 'compatibility/rc/matrices/full-verify.json')
         write_json(self.root / 'projects/ngx-material-legacy/package.json', {'version': '22.0.0-rc.0'})

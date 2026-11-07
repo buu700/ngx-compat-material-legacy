@@ -4,6 +4,7 @@ Passing these tests cannot certify Angular, browser, audit or release behavior.
 """
 from __future__ import annotations
 import copy
+import hashlib
 import importlib.util
 import json
 import os
@@ -39,6 +40,8 @@ class CompleteFixture:
                     "cases_by_line": {l: {g: (list(acceptance.SOURCE_REGRESSION_CASES) if cid == "source-contract-regressions"
                                               else [f"{l}/{cid}/{g}/synthetic-assertion"]) for g in groups} for l in ("main", "21.x")}},
             })
+        typeahead = next(row for row in self.matrix["checks"] if row["check_id"] == "typeahead-execution")
+        typeahead["acceptance"]["cases_by_line"] = {"main": {"focused-typeahead": list(acceptance.TYPEAHEAD_CASES)}, "21.x": {"focused-typeahead": None}}
         write_json(self.matrix_path, self.matrix)
         self.matrix_sha = acceptance.sha256_file(self.matrix_path)
         artifacts = []
@@ -70,6 +73,8 @@ class CompleteFixture:
         self.reports = {}
         for row in self.matrix["checks"]:
             cid = row["check_id"]
+            if cid == "typeahead-execution" and line == "21.x":
+                continue
             cases = acceptance.expected_cases(row, line)
             output = self.run_dir / acceptance.assertion_directory(cid, self.invocations[cid]) / "assertions.txt"
             output.parent.mkdir(parents=True, exist_ok=True)
@@ -84,9 +89,32 @@ class CompleteFixture:
                 "passed_case_ids": cases, "passed": len(cases), "failed": 0, "skipped": 0,
                 "failed_case_ids": [], "skipped_case_ids": [], "unresolved_case_ids": [], "exceptions": [],
                 "outputs": [record], "case_results": [{"case_id": c, "result": "pass", "kind": "assertion", "output_paths": [record["path"]]} for c in cases]}
+            if cid == "typeahead-execution":
+                self.write_typeahead_evidence(cid, output.parent, cases, artifacts[0])
             if cid == "pack-library":
                 self.reports[cid].update(evidence_origin="coordinator", prepack_binding=self.pack_record['binding'])
             self.save_report(cid)
+
+    def write_typeahead_evidence(self, cid, directory, cases, library):
+        # Synthetic bytes exercise evaluator contracts only; they are not product evidence.
+        peers = {"fesm2022/_list-key-manager-chunk.mjs": "63042ad0a8264bfedfaac1c03d2b0eee450bcd7890a09792dc83256195e00057", "fesm2022/_typeahead-chunk.mjs": "c26eed04140a44b175020b75b3a16bf73c2913a064ae61c79dc744d5fa3e4622"}
+        selected = [{"full_name": name, "skipped": False, "success": True} for name in cases]
+        totals = {"executed": 496, "passed": 9, "failed": 0, "skipped": 487}
+        raw = {"subject_mode": "artifact", "mode": "normal", "run_id": self.run["run_id"], "artifact_sha256": library["sha256"], "totals": totals, "failures": [], "specs": selected + [{"full_name": f"other {i}", "skipped": True} for i in range(487)]}
+        rows = [{"key": "artifact/package/a", "origin": "artifact"}, {"key": "testing/legacy-runner/out/entry.generated.ts", "origin": "generated", "path": "entry.generated.ts"}] + [{"key": "node_modules/@angular/cdk/" + path, "origin": "dependency", "path": "node_modules/@angular/cdk/" + path, "sha256": digest} for path, digest in peers.items()]
+        support = {"raw-report.json": raw, "commands.json": [{"command": ["node", name], "exit_code": 0} for name in ("testing/legacy-runner/build.mjs", "testing/legacy-runner/build.mjs", "node_modules/karma/bin/karma")], "inputs-before.json": {"artifact": library["sha256"], "peer": peers}, "metafile.json": {"inputs": {row["key"]: {} for row in rows}}, "bundle-inputs.json": {"schema_version": 1, "inputs": rows}}
+        files = {}
+        for name in ("raw-report.json", "commands.json", "inputs-before.json", "metafile.json", "bundle.js", "bundle-inputs.json", "entry.generated.ts"):
+            path = directory / name
+            if name in support: write_json(path, support[name])
+            else: path.write_text("synthetic " + name)
+            files[name] = {"sha256": acceptance.sha256_file(path), "bytes": path.stat().st_size}
+        obs = {"schema_version": 1, "kind": "typeahead-execution", "sha": "ff36c80f9c7a14f0e9f36eafc3e1423d34e7c916", "run_id": self.run["run_id"], "line": "main", "invocation_id": self.invocations[cid], "binding": self.binding, "library": {"sha256": library["sha256"], "bytes": library["bytes"]}, "inputs_unchanged": True, "peer_version": "22.1.7", "peer_members": peers, "extracted_files": 1, "files": files, "selected_cases": selected, "counts": totals}
+        write_json(directory / "observation.json", obs)
+        paths = [directory / "observation.json"] + [directory / name for name in files]
+        outputs = [{"path": str(path.relative_to(self.run_dir)), "sha256": acceptance.sha256_file(path), "bytes": path.stat().st_size} for path in paths]
+        self.reports[cid]["outputs"] = outputs
+        self.reports[cid]["case_results"] = [{"case_id": case, "result": "pass", "kind": "assertion", "output_paths": [outputs[0]["path"]]} for case in cases]
 
     def write_pack_record(self):
         self.pack_record = {
@@ -128,19 +156,48 @@ class AcceptanceTests(unittest.TestCase):
         self.assertEqual(result["automatic_product_result"], "incomplete", result)
         self.assertIn(fragment, json.dumps(result["incomplete_checks"]))
 
-    def test_complete_synthetic_fixture_passes_evaluator_not_admission(self):
+    def test_synthetic_fixture_cannot_pass_shared_typeahead_validator(self):
         result = self.f.evaluate()
-        self.assertEqual(result["automatic_product_result"], "pass", result)
+        self.assertEqual(result["automatic_product_result"], "incomplete", result)
+        self.assertIn("shared finite validation failed", json.dumps(result["incomplete_checks"]))
         self.assertEqual(result["required_review_state"], "pending")
         self.assertEqual(result["engineering_admission"], "not-decided")
         self.assertEqual(result["g_gates_claimed"], [])
-        self.assertEqual(len(result["complete_checks"]), len(acceptance.CHECK_CONTRACT))
+        self.assertEqual(len(result["complete_checks"]), len(acceptance.CHECK_CONTRACT) - 1)
+
+    def test_shared_typeahead_replay_uses_coordinator_identity(self):
+        # Mock only the external validator in this plumbing test; the complete
+        # JS validator has its own realistic graph positive and negative suite.
+        inventory = []
+        for name in sorted(acceptance.TYPEAHEAD_CHECKER_FILES):
+            path = self.f.root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('synthetic checker ' + name)
+            data = path.read_bytes()
+            inventory.append({"root": "repository", "path": name, "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)})
+        def replay(command, *, input, **kwargs):
+            request = json.loads(input)["request"]
+            actual = request["typeaheadExecution"]
+            self.assertEqual(actual["invocation_id"], self.f.invocations["typeahead-execution"])
+            self.assertEqual(actual["exit_code"], self.f.exits["typeahead-execution"])
+            self.assertEqual(request["packedConsumerExecution"]["invocation_id"], self.f.invocations["packed-consumer"])
+            return acceptance.subprocess.CompletedProcess(command, 0, json.dumps({"ok": True, "invocation_id": actual["invocation_id"], "output": actual["output"], "validated_files": inventory}), "")
+        with patch.object(acceptance.subprocess, "run", side_effect=replay):
+            result = self.f.evaluate()
+        self.assertEqual(result["automatic_product_result"], "pass", result)
+
+    def test_typeahead_output_tampering_rejects_whole_evaluation(self):
+        report = self.f.reports["typeahead-execution"]
+        bundle = next(item for item in report["outputs"] if item["path"].endswith("/bundle.js"))
+        (self.f.run_dir / bundle["path"]).write_text("tampered")
+        self.reject("bytes/hash mismatch")
 
     def test_complete_21x_fixture_uses_its_own_line(self):
         with tempfile.TemporaryDirectory() as td:
             other = CompleteFixture(Path(td), line="21.x")
             result = other.evaluate()
-            self.assertEqual(result["automatic_product_result"], "pass", result)
+            self.assertEqual(result["automatic_product_result"], "incomplete", result)
+            self.assertIn("unresolved case roster", json.dumps(result["incomplete_checks"]["typeahead-execution"]))
             self.assertEqual(result["line"], "21.x")
 
     def test_artifact_identity_cannot_be_rebound_after_execution(self):
@@ -659,7 +716,7 @@ class AcceptanceTests(unittest.TestCase):
 
     def test_complete_evaluation_inventories_every_consulted_file(self):
         result = self.f.evaluate()
-        self.assertEqual(result['automatic_product_result'], 'pass', result)
+        self.assertEqual(result['automatic_product_result'], 'incomplete', result)
         records = {(item['root'], item['path']): item for item in result['validated_files']}
         expected = {('run', 'run.json'), ('run', 'execution-record.json'), ('run', 'pack-execution.json'), ('run', 'pack-meta.json'),
                     ('run', 'library.tgz'), ('run', 'migrate-cli.tgz'),
