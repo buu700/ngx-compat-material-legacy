@@ -1056,9 +1056,9 @@ class RadiosInsidePreCheckedRadioGroup {}
   `,
 })
 class StandaloneRadioButtons {
-  ariaLabel: string = 'Banana';
-  ariaLabelledby: string = 'xyz';
-  ariaDescribedby: string = 'abc';
+  ariaLabel: string | null = 'Banana';
+  ariaLabelledby: string | null = 'xyz';
+  ariaDescribedby: string | null = 'abc';
 }
 
 @Component({
@@ -1333,5 +1333,21 @@ describe('radio required setter coercion scheduling', () => {
     radio.required = true; expect(mark).toHaveBeenCalledTimes(1);
     radio.required = 'false'; expect(radio.required as any).toBeNull(); expect(mark).toHaveBeenCalledTimes(2);
     fixture.destroy();
+  });
+});
+
+describe('packed radio nullable aria reset runtime observation', () => {
+  it('removes all three native attributes after null and undefined', () => {
+    TestBed.configureTestingModule({imports: [MatLegacyRadioModule, FormsModule, ReactiveFormsModule, CommonModule], declarations: [StandaloneRadioButtons]});
+    const fixture = TestBed.createComponent(StandaloneRadioButtons); fixture.detectChanges();
+    const inputs = fixture.nativeElement.querySelectorAll('input[name="fruit"]') as NodeListOf<HTMLInputElement>;
+    const input = inputs[0]; const names = ['aria-label', 'aria-labelledby', 'aria-describedby'];
+    expect(names.map(name => input.getAttribute(name))).toEqual(['Banana', 'xyz', 'abc']);
+    fixture.componentInstance.ariaLabel = null; fixture.componentInstance.ariaLabelledby = null; fixture.componentInstance.ariaDescribedby = null;
+    fixture.detectChanges(); expect(names.map(name => input.getAttribute(name))).toEqual([null, null, null]);
+    fixture.componentInstance.ariaLabel = 'again'; fixture.componentInstance.ariaLabelledby = 'next'; fixture.componentInstance.ariaDescribedby = 'more';
+    fixture.detectChanges(); expect(names.map(name => input.getAttribute(name))).toEqual(['again', 'next', 'more']);
+    fixture.componentInstance.ariaLabel = undefined as any; fixture.componentInstance.ariaLabelledby = undefined as any; fixture.componentInstance.ariaDescribedby = undefined as any;
+    fixture.detectChanges(); expect(names.map(name => input.getAttribute(name))).toEqual([null, null, null]); fixture.destroy();
   });
 });
