@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "role": "Root integration of maintained explicit MAIN historical epoch regression controls",
+  "parent": "ab3d9da89c9e2f5d27a4d530bc2a3412603f1ef5",
+  "patch_sha256": "77d64d5c8cd8688972e436c982932e5e830dd498631adc914cd5bc87e053f594",
+  "current_test_images": {
+    "tests/test_historical_main_epoch.py": "f0f1e8289cf6e5508093724742d92e72946b1f4579c9183d37675e0824db3c38",
+    "tests/upstream/current-historical-fixture-loader.mjs": "633021daa529c05e849ff492c8982ba97f6f03ff2bd2a181e8df1a1da05dbe2a",
+    "tests/upstream/historical-main-epoch-admission.mjs": "5fbf1fe2aee101a8d085cfc519381b5742ff66aa6891bc5ab13672b4a9724126"
+  },
+  "independent_review": {
+    "sha256": "3712426974133a6a1388ba3d236063d47438227993c50885236ae3ac90d98c04",
+    "text": "# Independent review: MAIN epoch maintained tests\n\nPatch SHA-256 `77d64d5c8cd8688972e436c982932e5e830dd498631adc914cd5bc87e053f594` adds three test-only files and applies cleanly to current canonical at review time. It leaves the archived fixture and existing tests untouched. No canonical source was edited.\n\nThe test derives the current roster, checks the 2,328 total and pointer name, and pins a digest of all archived requirement and regression definitions. For every registered subject it compares default and no-epoch MAIN/21.x definitions and rejects the MAIN epoch on 21.x and unknown epochs. Six named subjects use current `validateHistoricalBehavior` with synthetic packed and coordinator fixtures. The actual `writeAcceptance` function is AST-extracted from the current source and executed with explicit real roster helper dependencies and synthetic observations; this is a function-level harness, not a complete invoked coordinator process. Eleven controls per subject reject omission, duplication, failure, wrong name, absent/renamed pointer, missing coordinator, failed packed consumer, wrong line, wrong epoch and absent epoch. Each mutation has a fresh positive check; negatives assert rejection, not a specific error reason.\n\nThe in-memory fixture adapter preserves the archived fixture bytes and changes a single asserted guard to allow eight exact extra relative import targets. Import targets are resolved before comparison; no arbitrary compatibility or testing subtree is allowed. Independently exercised the same normalized guard against all eight paths and five unrelated, traversal, suffix or sibling examples; only the eight passed. This is a finite trusted-checkout test fixture, not a filesystem sandbox or production admission guard.\n\nIndependently ran `python3 -m unittest tests.test_historical_main_epoch` in the isolated test workspace with pinned Node 24.21.0, empty NODE_OPTIONS and a dedicated temporary directory: one test passed, executing six positives and 66 negative controls. Scope is synthetic only: no browser, real packed artifact, coordinator execution, 21.x runtime or admission claim.\n"
+  },
+  "root_test": {
+    "command": "python -m unittest tests.test_historical_main_epoch -v",
+    "python": "3.14.7",
+    "node": "24.21.0",
+    "exit_code": 0,
+    "tests": 1,
+    "elapsed_seconds": 8.923,
+    "synthetic_subjects": 6,
+    "negative_controls": 66
+  },
+  "limits": [
+    "Synthetic actual validator and extracted writer-function tests; no whole coordinator, real packed product, browser or 21.x runtime pass.",
+    "Archived fixture bytes unchanged; finite test-only import closure adapter does not broaden production policy."
+  ]
+}
