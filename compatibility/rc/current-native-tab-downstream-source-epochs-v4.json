@@ -1,0 +1,1144 @@
+{
+  "actual_native_packed_browser_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "lines": {
+    "main": {
+      "changed": [
+        {
+          "authority": "T01-current-tab",
+          "before_bytes": 14324,
+          "before_sha256": "9133c2404db7ef40b39819969e310a71caf660c9d9c05ecfd16a8a4fe6ea0154",
+          "current_bytes": 20364,
+          "current_sha256": "15d4c2d2daa1aafce8f6b263f9e2423742c3221af56954c829eea1ed693ea926",
+          "edits": [
+            {
+              "after": "// Capture the rendered transform before the group's active classes change layout.\n// Keys are pane elements, so nested groups and removed panes remain independent.\nconst pendingRenderedTransforms = new WeakMap<Element, string>();\n\nexport function captureActiveTabBodyTransforms(wrapper: HTMLElement | undefined): void {\n  if (!wrapper) return;\n  for (const body of Array.from(wrapper.children)) {\n    pendingRenderedTransforms.delete(body);\n    const content = body.firstElementChild;\n    const view = content?.ownerDocument.defaultView;\n    if (body.classList.contains('mat-tab-body-animating') &&\n        content?.classList.contains('mat-tab-body-content') && view) {\n      pendingRenderedTransforms.set(body, view.getComputedStyle(content).transform);\n    }\n  }\n}\n\n",
+              "before": "",
+              "offset": 1174
+            },
+            {
+              "after": "  private _ownedReverseTransform: string | undefined;\n  private _reverseEndNotBefore = 0;\n",
+              "before": "",
+              "offset": 2233
+            },
+            {
+              "after": "  private readonly _changeDetectorRef: ChangeDetectorRef;\n",
+              "before": "",
+              "offset": 2279
+            },
+            {
+              "after": "    this._changeDetectorRef = changeDetectorRef;\n",
+              "before": "",
+              "offset": 3857
+            },
+            {
+              "after": "    this._restoreReverseTransform();\n    pendingRenderedTransforms.delete(this._elementRef.nativeElement);\n",
+              "before": "",
+              "offset": 7706
+            },
+            {
+              "after": "    if (this._reverseEndNotBefore && this._transitionClock() < this._reverseEndNotBefore) {\n      return;\n    }\n",
+              "before": "",
+              "offset": 8755
+            },
+            {
+              "after": "  private _startTransition(fromOverride?: string): void {\n",
+              "before": "  private _startTransition(): void {\n",
+              "offset": 8813
+            },
+            {
+              "after": "    // A failed CSS restart can still leave an old end queued. Protect every\n    // replacement of a live phase, but keep disabled motion immediate.\n    const protectsReplacement = !!this._pendingTransition && !this._cssAnimationsDisabled();\n",
+              "before": "",
+              "offset": 9028
+            },
+            {
+              "after": "      fromState: fromOverride ?? (this._initialized ? this._previousPosition || 'void' : 'void'),\n",
+              "before": "      fromState: this._initialized ? this._previousPosition || 'void' : 'void',\n",
+              "offset": 9079
+            },
+            {
+              "after": "    // CSS events can be delivered around one frame early. The deadline filters\n    // obviously stale ends; native events do not carry a transition identity.\n    this._reverseEndNotBefore = protectsReplacement ?\n      this._transitionClock() + Math.max(0, this._durationMilliseconds() - 16) : 0;\n",
+              "before": "",
+              "offset": 9278
+            },
+            {
+              "after": "    this._reverseEndNotBefore = 0;\n    pendingRenderedTransforms.delete(this._elementRef.nativeElement);\n    this._restoreReverseTransform();\n",
+              "before": "",
+              "offset": 11018
+            },
+            {
+              "after": "    this._changeDetectorRef.markForCheck();\n",
+              "before": "",
+              "offset": 11243
+            },
+            {
+              "after": "    const milliseconds = this._durationMilliseconds();\n",
+              "before": "    const duration = this._animationDurationInput.trim().match(/^(\\d*\\.?\\d+)(ms|s)$/);\n    const milliseconds = duration ? Number(duration[1]) * (duration[2] === 's' ? 1000 : 1) : 500;\n",
+              "offset": 11669
+            },
+            {
+              "after": "  }\n\n  private _transitionClock(): number {\n    const view = this._elementRef.nativeElement.ownerDocument?.defaultView;\n    if (view?.performance) return view.performance.now();\n    if (typeof performance !== 'undefined') return performance.now();\n    // A server without a Performance API has no native transition events.\n    return Date.now();\n  }\n\n  private _durationMilliseconds(): number {\n    const duration = this._animationDurationInput.trim().match(/^(\\d*\\.?\\d+)(ms|s)$/);\n    return duration ? Number(duration[1]) * (duration[2] === 's' ? 1000 : 1) : 500;\n  }\n\n  private _restoreReverseTransform(): void {\n    const style = this._contentElement?.nativeElement.style;\n    if (style && this._ownedReverseTransform !== undefined &&\n        style.transform === this._ownedReverseTransform && !style.getPropertyPriority('transform')) {\n      style.removeProperty('transform');\n    }\n    this._ownedReverseTransform = undefined;\n  }\n\n  /** Restart a reversed CSS transition from its pre-layout rendered transform. */\n  private _restartReverseTransition(): boolean {\n    const host = this._elementRef.nativeElement;\n    const rendered = pendingRenderedTransforms.get(host);\n    pendingRenderedTransforms.delete(host);\n    const content = this._contentElement?.nativeElement;\n    const style = content?.style;\n    if (!this._pendingTransition || this._cssAnimationsDisabled() || rendered === undefined ||\n        !content || !style || style.transitionProperty || style.getPropertyPriority('transition-property') ||\n        style.getPropertyPriority('transform') ||\n        (style.transform && style.transform !== this._ownedReverseTransform)) {\n      return false;\n    }\n    const transition = this._pendingTransition;\n    const position = this._position;\n    const previousTransform = style.getPropertyValue('transform');\n    const previousOwned = this._ownedReverseTransform;\n    style.setProperty('transition-property', 'none');\n    style.setProperty('transform', rendered);\n    const temporaryTransform = style.transform;\n    let measured = false;\n    try {\n      content.getBoundingClientRect();\n      measured = true;\n    } catch {\n      // Restore only properties still owned by this interrupted attempt.\n    } finally {\n      if (style.transitionProperty === 'none' && !style.getPropertyPriority('transition-property')) {\n        style.removeProperty('transition-property');\n      }\n    }\n    if (!measured || this._destroyed || this._pendingTransition !== transition ||\n        this._position !== position || style.transform !== temporaryTransform ||\n        style.getPropertyPriority('transform') || style.transitionProperty) {\n      if (style.transform === temporaryTransform && !style.getPropertyPriority('transform')) {\n        if (previousTransform && !(this._destroyed && previousTransform === previousOwned)) {\n          style.setProperty('transform', previousTransform);\n        } else {\n          style.removeProperty('transform');\n        }\n      }\n      return false;\n    }\n    const target = this._isCenterPosition(this._position) ? 'none' :\n      this._position === 'left' ? 'translate3d(-100%, 0, 0)' : 'translate3d(100%, 0, 0)';\n    style.setProperty('transform', target);\n    this._ownedReverseTransform = style.transform;\n    return true;\n",
+              "before": "",
+              "offset": 12416
+            },
+            {
+              "after": "    const changesCenter = this._isCenterPosition(this._position) ||\n      this._isCenterPosition(this._previousPosition || '');\n    const priorTransition = this._pendingTransition;\n    const changesOwnedDeparture = !changesCenter && !!priorTransition &&\n      this._isCenterPosition(priorTransition.fromState) && this._ownedReverseTransform !== undefined;\n    const restarted = this._initialized && (changesCenter || changesOwnedDeparture) &&\n      this._restartReverseTransition();\n    // Layout can synchronously destroy the body or initiate a newer position.\n    if (this._destroyed || this._position !== position || this._pendingTransition !== priorTransition) {\n      return;\n    }\n    if (!restarted && this._ownedReverseTransform !== undefined) {\n      // A direction change or consumer style can prevent restarting. Release\n      // only our own target so it cannot override the newly selected class.\n      this._restoreReverseTransform();\n    }\n",
+              "before": "",
+              "offset": 13508
+            },
+            {
+              "after": "    if (this._cssAnimationsDisabled() || this._initialized && (changesCenter || changesOwnedDeparture)) {\n",
+              "before": "    if (this._cssAnimationsDisabled() || this._initialized &&\n      (this._isCenterPosition(this._position) || this._isCenterPosition(this._previousPosition || ''))) {\n",
+              "offset": 13671
+            },
+            {
+              "after": "      this._startTransition(changesOwnedDeparture ? priorTransition?.fromState : undefined);\n",
+              "before": "      this._startTransition();\n",
+              "offset": 14004
+            }
+          ],
+          "index": 0,
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+          "review": "9133 first repair advances through reviewed ChangeDetectorRef completion marking and reverse-transform capture/restart epochs; current roles differ and require T01 current-role output."
+        },
+        {
+          "index": 1,
+          "path": "scripts/check-upstream-audit-disposition.mjs",
+          "before_sha256": "5021aee6224fe16f9ff8030c9503e90c6359a4fd96cd3fe3d1ffdece41a0f4be",
+          "before_bytes": 37262,
+          "current_sha256": "9daf8aa3b8843e2a746fe6bb0c3cd31af8bb4a53e424399ba75205cdd6a615c2",
+          "current_bytes": 46031,
+          "authority": "reviewed-typeahead-coordinator-v1",
+          "review": "Exact predecessor-to-current byte edits; typeahead coordinator qualification receipt binds final source image.",
+          "edits": [
+            {
+              "offset": 1858,
+              "before": "candidate",
+              "after": ""
+            },
+            {
+              "offset": 1868,
+              "before": "ource",
+              "after": "LID"
+            },
+            {
+              "offset": 1874,
+              "before": "vidence",
+              "after": "R_RANGE_SHAS,SLIDER_RANGE_R"
+            },
+            {
+              "offset": 1882,
+              "before": "k, candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';\nimport {reviewMetadataComplete,individual",
+              "after": "LE,slider"
+            },
+            {
+              "offset": 2005,
+              "before": "eviewScop",
+              "after": "angeEvidenc"
+            },
+            {
+              "offset": 2036,
+              "before": "",
+              "after": "slider-range-followups.mjs';\nimport {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';\nimport {reviewMetadataComplete,individualReviewScopeOk} from './upstream-"
+            },
+            {
+              "offset": 2185,
+              "before": "",
+              "after": "validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';\nimport {"
+            },
+            {
+              "offset": 2193,
+              "before": "Historical",
+              "after": "RulesJs"
+            },
+            {
+              "offset": 2204,
+              "before": "ehavior,validateHistorical",
+              "after": "uild,rulesJs"
+            },
+            {
+              "offset": 2231,
+              "before": "ehavior",
+              "after": "uildEntryEvidenceOk,rulesJsBuildOriginalPatch"
+            },
+            {
+              "offset": 2257,
+              "before": "historical",
+              "after": "rules-js"
+            },
+            {
+              "offset": 2269,
+              "before": "ehavior",
+              "after": "uild"
+            },
+            {
+              "offset": 2277,
+              "before": "evidence",
+              "after": "admission.mjs';\nimport {requiresSassInspectionScope,sassInspectionEntryEvidenceOk} from './upstream-sass-inspection-admission.mjs';\nimport {requiresHistoricalBehavior,validateHistoricalBehavior,historicalBehaviorRequirements} from './upstream-historical-behavior-evidence.mjs';\nimport {CHIP_LIFECYCLE_SCOPE_ROLE,requiresChipLifecycleScope,chipLifecycleScopeEvidenceOk} from './upstream-chip-lifecycle-admission"
+            },
+            {
+              "offset": 2514,
+              "before": "",
+              "after": "NativeDate,validateNativeDate} from './upstream-native-date-evidence.mjs';\nimport {requiresOwnedStyle,validateOwnedStyle} from './upstream-owned-style-evidence.mjs';\nimport {requires"
+            },
+            {
+              "offset": 2974,
+              "before": "",
+              "after": "-evidence.mjs';\nimport {requiresContentObserver,validateContentObserver} from './upstream-content-observer-evidence.mjs';\nimport {requiresMediaMatcher,validateMediaMatcher} from './upstream-media-matcher"
+            },
+            {
+              "offset": 3488,
+              "before": "",
+              "after": "import {requiresBootstrapPreparation, bootstrapPreparationEntryOk} from './bootstrap-stability-evidence.mjs';\nimport {MODERN_CHIP_SCOPE_ROLE,requiresModernChipScope,modernChipScopeEvidenceOk} from './upstream-modern-chip-scope.mjs';\nimport {CHIP_EDIT_SCOPE_ROLE,requiresChipEditScope,chipEditScopeEvidenceOk} from './upstream-chip-edit-scope.mjs';\nimport {CHIP_INPUT_API_SCOPE_ROLE,requiresChipInputApiScope,chipInputApiScopeEvidenceOk} from './upstream-chip-input-api-scope.mjs';\nimport {CHIP_MODERNIZATION_SCOPE_ROLE,requiresChipModernizationScope,chipModernizationScopeEvidenceOk} from './upstream-chip-modernization-scope.mjs';\n"
+            },
+            {
+              "offset": 6557,
+              "before": "",
+              "after": "inheritedExecutionResults = new Map();\nconst "
+            },
+            {
+              "offset": 7631,
+              "before": "",
+              "after": "';\n  const rulesJsBuildScope = requiresRulesJsBuild(entry);\n  if (rulesJsBuildScope && !rel.endsWith('.json')) return 'invalid-rules-js-build-scope';\n  const sassInspectionScope = requiresSassInspectionScope(entry);\n  if (sassInspectionScope && !rel.endsWith('.json')) return 'invalid-sass-inspection-scope';\n  if (requiresModernChipScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-modern-chip-source-scope';\n  if (requiresChipEditScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-edit-source-scope';\n  if (requiresChipInputApiScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-input-api-source-scope';\n  if (requiresChipLifecycleScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-lifecycle-source-scope';\n  if (requiresChipModernizationScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-modernization-source-scope"
+            },
+            {
+              "offset": 8898,
+              "before": "",
+              "after": "rulesJsBuildScope && !rulesJsBuildEntryEvidenceOk({root,read:readRegularRepoBytes,entry,body,\n      line:line||body.line})) return 'invalid-rules-js-build-scope';\n    if (sassInspectionScope && !sassInspectionEntryEvidenceOk({root,read:readRegularRepoBytes,entry,body,\n      line:line||body.line})) return 'invalid-sass-inspection-scope';\n    if (requiresChipLifecycleScope(entry,entry.individual_proof) || body.role === CHIP_LIFECYCLE_SCOPE_ROLE) {\n      const readMember = rel => {const member=regularRepoMember(rel);return member?readFileSync(member):null;};\n      if (!chipLifecycleScopeEvidenceOk(body,entry,readMember,root,line || body.line,historicalBehaviorRequirements)) return 'invalid-chip-lifecycle-source-scope';\n    }\n    if (requiresChipModernizationScope(entry,entry.individual_proof) || body.role === CHIP_MODERNIZATION_SCOPE_ROLE) {\n      const readMember = rel => {const member=regularRepoMember(rel);return member?readFileSync(member):null;};\n      if (!chipModernizationScopeEvidenceOk(body,entry,readMember,candidateProductSourcePaths(root).sort(),line || body.line)) return 'invalid-chip-modernization-source-scope';\n    }\n    if (requiresChipInputApiScope(entry,entry.individual_proof) || body.role === CHIP_INPUT_API_SCOPE_ROLE) {\n      const readMember = rel => {const member=regularRepoMember(rel);return member?readFileSync(member):null;};\n      if (!chipInputApiScopeEvidenceOk(body,entry,readMember,candidateProductSourcePaths(root).sort(),line || body.line)) return 'invalid-chip-input-api-source-scope';\n    }\n    if (requiresChipEditScope(entry,entry.individual_proof) || body.role === CHIP_EDIT_SCOPE_ROLE) {\n      const readMember = rel => {const member=regularRepoMember(rel);return member?readFileSync(member):null;};\n      if (!chipEditScopeEvidenceOk(body,entry,readMember,candidateProductSourcePaths(root).sort(),line || body.line)) return 'invalid-chip-edit-source-scope';\n    }\n    if (requiresModernChipScope(entry,entry.individual_proof) || body.role === MODERN_CHIP_SCOPE_ROLE) {\n      const readMember = rel => {const member=regularRepoMember(rel);return member?readFileSync(member):null;};\n      if (!modernChipScopeEvidenceOk(body,entry,readMember,candidateProductSourcePaths(root).sort(),line || body.line)) return 'invalid-modern-chip-source-scope';\n    }\n    if ("
+            },
+            {
+              "offset": 10746,
+              "before": "",
+              "after": "(SLIDER_RANGE_SHAS.includes(entry.sha)||body.role===SLIDER_RANGE_ROLE){\n      const readMember=rel=>{const member=regularRepoMember(rel);return member?readFileSync(member):null;};\n      if(!sliderRangeEvidenceOk(body,entry,readMember,()=>candidateProductSourcePaths(root),line||body.line))return 'invalid-slider-range-followup-scope';\n    }\n    if"
+            },
+            {
+              "offset": 12981,
+              "before": "",
+              "after": "// Dependency graph resolvers distinguish an absent candidate (ENOENT) from an\n// unreadable or unsafe source. Preserve that filesystem contract for raw reads.\nfunction readRegularRepoBytes(rel) {\n  if (typeof rel !== 'string' || rel.includes('\\\\')) throw new Error('unsafe source member');\n  const parts = rel.split('/');\n  if (parts.some(part => !part || part === '.' || part === '..')) throw new Error('unsafe source member');\n  let file = root, stat;\n  for (const part of parts) {\n    file = join(file, part); stat = lstatSync(file);\n    if (stat.isSymbolicLink()) throw new Error('symlink in source member');\n  }\n  if (!stat.isFile()) throw new Error('source member is not a regular file');\n  return readFileSync(file);\n}\n\n"
+            },
+            {
+              "offset": 13571,
+              "before": "",
+              "after": ")||requiresChipLifecycleScope(entry,proof)||requiresChipModernizationScope(entry,proof)||requiresChipInputApiScope(entry,proof)||requiresChipEditScope(entry,proof)||requiresHistoricalBehavior(entry,proof)||requiresArtifactBehavior(entry,proof)||requiresOwnedStyle(entry,proof"
+            },
+            {
+              "offset": 13785,
+              "before": "",
+              "after": "requiresRulesJsBuild(entry)) {\n    bytes = rulesJsBuildOriginalPatch(readRegularRepoBytes,entry.sha);\n  } else if ("
+            },
+            {
+              "offset": 14333,
+              "before": "",
+              "after": ")) return false;\n  if ((requiresBootstrapPreparation(entry) || proof.current_bootstrap_preparation !== undefined) && !bootstrapPreparationEntryOk(entry, proof, rel => {\n    const member = regularRepoMember(rel);\n    return member ? readFileSync(member) : null;\n  }"
+            },
+            {
+              "offset": 15206,
+              "before": "",
+              "after": "NativeDate(entry, proof)) {\n    const result = validateNativeDate({root, entry, proof, request});\n    artifactBehaviorResults.set(entry.sha, result);\n    if (!result.ok) return false;\n  }\n  if (requiresOwnedStyle(entry, proof)) {\n    const result = validateOwnedStyle({root, entry, proof, request});\n    artifactBehaviorResults.set(entry.sha, result);\n    if (!result.ok) return false;\n  }\n  if (requires"
+            },
+            {
+              "offset": 17084,
+              "before": "",
+              "after": ";\n  }\n  if (requiresMediaMatcher(entry, proof)) {\n    const result = validateMediaMatcher({root, entry, proof, request});\n    artifactBehaviorResults.set(entry.sha, result);\n    inheritedExecutionResults.set(entry.sha, result);\n    return result.ok;\n  }\n  if (requiresContentObserver(entry, proof)) {\n    const result = validateContentObserver({root, entry, proof, request});\n    artifactBehaviorResults.set(entry.sha, result);\n    inheritedExecutionResults.set(entry.sha, result);\n    // This finite guard has verified the installed identity and complete\n    // per-SHA execution; generic inherited labels cannot substitute for it.\n    return result.ok"
+            },
+            {
+              "offset": 17148,
+              "before": "installed = proof.installed_member",
+              "after": "result = validateInheritedExecution({root, entry, proof, request, line})"
+            },
+            {
+              "offset": 17188,
+              "before": "const behavior = proof.reachable_behavior",
+              "after": "inheritedExecutionResults.set(entry.sha, result)"
+            },
+            {
+              "offset": 17240,
+              "before": "installed || typeof installed !== 'object' || !HEX64.test(installed.sha256 || '')",
+              "after": "result.ok"
+            },
+            {
+              "offset": 17336,
+              "before": "\n    if (!behavior || behavior.kind !== 'executed-delegation' || typeof behavior.id !== 'string' || !behavior.id.trim()) {\n      return false;\n    }",
+              "after": ""
+            },
+            {
+              "offset": 19096,
+              "before": "ProgressCsp",
+              "after": "HistoricalBehavior"
+            },
+            {
+              "offset": 19150,
+              "before": "GeneratedIdentity",
+              "after": "ArtifactBehavior"
+            },
+            {
+              "offset": 19210,
+              "before": "BidiBehavior",
+              "after": "OwnedStyle"
+            },
+            {
+              "offset": 19265,
+              "before": "SelectionBehavior",
+              "after": "NativeDate"
+            },
+            {
+              "offset": 19313,
+              "before": "\n   ",
+              "after": ""
+            },
+            {
+              "offset": 19329,
+              "before": "FormFieldHover",
+              "after": "ProgressCsp"
+            },
+            {
+              "offset": 19386,
+              "before": "",
+              "after": "GeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)\n    || requiresFormFieldHover(entry, entry.individual_proof) || requires"
+            },
+            {
+              "offset": 19454,
+              "before": "",
+              "after": "(entry, entry.individual_proof) || requiresContentObserver(entry, entry.individual_proof) || requiresMediaMatcher(entry, entry.individual_proof) || requiresChipEditScope(entry, entry.individual_proof) || requiresChipInputApiScope(entry, entry.individual_proof) || requiresChipModernizationScope(entry, entry.individual_proof) || requiresChipLifecycleScope"
+            },
+            {
+              "offset": 22507,
+              "before": "l => {const file = r",
+              "after": "adR"
+            },
+            {
+              "offset": 22537,
+              "before": "Member(rel); return file ? readFileSync(file) : null;}",
+              "after": "Bytes"
+            },
+            {
+              "offset": 24745,
+              "before": "",
+              "after": "Results].map(([sha, result]) => ({sha, ...result})),\n  inherited_execution_evidence: [...inheritedExecution"
+            },
+            {
+              "offset": 29407,
+              "before": "",
+              "after": "sassExecution;\n  if (process.env.RC_UPSTREAM_SASS_SEAL !== undefined) {\n    try { sassExecution = JSON.parse(process.env.RC_UPSTREAM_SASS_SEAL); }\n    catch { return {error: 'RC_UPSTREAM_SASS_SEAL is not JSON'}; }\n  }\n  let "
+            },
+            {
+              "offset": 29900,
+              "before": "",
+              "after": "let typeaheadExecution;\n  if (process.env.RC_UPSTREAM_TYPEAHEAD !== undefined) {\n    try { typeaheadExecution = JSON.parse(process.env.RC_UPSTREAM_TYPEAHEAD); }\n    catch { return {error: 'RC_UPSTREAM_TYPEAHEAD is not JSON'}; }\n  }\n  "
+            },
+            {
+              "offset": 30068,
+              "before": "historical",
+              "after": "sass"
+            },
+            {
+              "offset": 30089,
+              "before": "browser",
+              "after": "historical"
+            },
+            {
+              "offset": 30107,
+              "before": "",
+              "after": "browserExecution, "
+            },
+            {
+              "offset": 30119,
+              "before": "",
+              "after": "Execution, typeahead"
+            },
+            {
+              "offset": 32822,
+              "before": "",
+              "after": "inherited_execution_evidence: report.inherited_execution_evidence,\n    "
+            }
+          ]
+        },
+        {
+          "authority": "native-individual-zone+zone-tab-producer",
+          "before_bytes": 39130,
+          "before_sha256": "e9bf194677879f978ddbc574f33f13b0d709ade42d53dbb0542d1bb670a77e3a",
+          "current_bytes": 39181,
+          "current_sha256": "0fc93c9a430012883c2a00e7b68dad359ed826d71fb091b344035263fd62deb5",
+          "edits": [
+            {
+              "after": "/*ZONE_IMPORT*/import {Component, NgModule, NgZone, ViewChild, inject, signal/*ZONE_NAMED*/} from '@angular/core';\n",
+              "before": "/*ZONE_IMPORT*/import {Component, NgModule, ViewChild, signal/*ZONE_NAMED*/} from '@angular/core';\n",
+              "offset": 0
+            },
+            {
+              "after": "  private readonly closeoutZone = inject(NgZone);\n",
+              "before": "",
+              "offset": 5568
+            },
+            {
+              "after": "    const zone = this.closeoutZone;\n    (window as unknown as {__closeoutAngularZoneEntered: boolean}).__closeoutAngularZoneEntered = zone.run(() => NgZone.isInAngularZone());\n",
+              "before": "",
+              "offset": 5596
+            },
+            {
+              "after": "    let completions = 0;\n",
+              "before": "    // Disabled motion next()+complete()s _onEnter inside open(), before this\n    // subscribe. A Subject does not replay and complete() does not set closed,\n    // so the only public signal of that single next is a synchronous complete.\n",
+              "offset": 10837
+            },
+            {
+              "after": "      complete: () => { completions += 1; },\n",
+              "before": "      complete: () => { if (notifications === 0) notifications = 1; },\n",
+              "offset": 11152
+            },
+            {
+              "after": "      return !!el && completions >= 1;\n",
+              "before": "      return !!el && notifications >= 1;\n",
+              "offset": 11326
+            },
+            {
+              "after": "      completions,\n",
+              "before": "",
+              "offset": 11849
+            },
+            {
+              "after": "      notify: {key: `snack-bar/afterOpened/${mode}`, observation: {notifications, completions, detectChangesCalls: 0}},\n",
+              "before": "      notify: {key: `snack-bar/afterOpened/${mode}`, observation: {notifications, detectChangesCalls: 0}},\n",
+              "offset": 11994
+            },
+            {
+              "after": "platformBrowserDynamic().bootstrapModule(MotionModule/*ZONE_BOOTSTRAP*/).catch(err => {\n",
+              "before": "platformBrowserDynamic().bootstrapModule(MotionModule).catch(err => {\n",
+              "offset": 38910
+            }
+          ],
+          "index": 3,
+          "path": "scripts/native-motion-consumer.ts",
+          "review": "Adds Angular-zone observation/bootstrap marker and distinguishes snack completion from next notifications; existing exact seven-source and tab-producer successors authenticate the changed producer."
+        },
+        {
+          "index": 4,
+          "path": "scripts/rc-verify.py",
+          "before_sha256": "3e51512d06909dd6abcdef4df47dad431b5f82fd1ae607f362380132b8f57150",
+          "before_bytes": 94692,
+          "current_sha256": "d5689f5253abae336aff6d07c66c2c2453b292edc7816045343c16db5831f00b",
+          "current_bytes": 103860,
+          "authority": "reviewed-typeahead-coordinator-v1",
+          "review": "Exact predecessor-to-current byte edits; typeahead coordinator qualification receipt binds final source image.",
+          "edits": [
+            {
+              "offset": 1106,
+              "before": "\n)\nfrom archi",
+              "after": " E"
+            },
+            {
+              "offset": 1120,
+              "before": "e_run_closure import ",
+              "after": "idenceSnapshot,\n    TYPEAHEAD_"
+            },
+            {
+              "offset": 1142,
+              "before": "losure",
+              "after": "AS"
+            },
+            {
+              "offset": 1149,
+              "before": "",
+              "after": "S, validate_typeahead_observation,\n)\nfrom archive_run_closure import ClosureE"
+            },
+            {
+              "offset": 1592,
+              "before": "",
+              "after": "private_card_gate import private_card_assertion_ok\nfrom sass_"
+            },
+            {
+              "offset": 1638,
+              "before": "",
+              "after": "_assertion_ok\nfrom sass_ordinary_control_gate import ORDINARY_CONTROL_GATE_CASES, ordinary_control_gate_assertion_ok\nfrom sass_ordinary_card_gate import ORDINARY_CARD_GATE_CASES, ordinary_card_gate_assertion_ok\nfrom sass_spinner_snack_gate_integration import SPINNER_SNACK_GATE_CASES, spinner_snack_gate"
+            },
+            {
+              "offset": 1821,
+              "before": "",
+              "after": "_envelope_ok\nfrom sass_ordered_legacy_button_admission import ORDERED_LEGACY_BUTTON_CASES, ordered_legacy_button"
+            },
+            {
+              "offset": 2265,
+              "before": "",
+              "after": "stepper_historical_oracle import TOKENS as HISTORICAL_STEPPER_TOKENS, SCENARIOS as HISTORICAL_STEPPER_SCENARIOS, PROOF as HISTORICAL_STEPPER_PROOF, stepper_historical_value\nfrom sass_"
+            },
+            {
+              "offset": 3881,
+              "before": "",
+              "after": "\",\n    \"scripts/check-source-contract-regressions.py\": \"source-contract-regressions\",\n    \"scripts/run-typeahead-execution.py\": \"typeahead-execution"
+            },
+            {
+              "offset": 23154,
+              "before": "",
+              "after": "typeahead_execution_attestation(active):\n    \"\"\"Forward only the actual coordinator child result and captured output identity.\"\"\"\n    outputs = active.outputs.get('typeahead-execution', [])\n    invocation = active.invocations.get('typeahead-execution')\n    expected = f'evidence/typeahead-execution/{invocation}/observation.json'\n    output = next((item for item in outputs if item.get('path') == expected), None)\n    return {'run_id': active.manifest['run_id'], 'invocation_id': invocation,\n            'exit_code': active.exit_codes.get('typeahead-execution'), 'output': output}\n\n\ndef write_typeahead_report(run_dir, run_id, line, exit_code):\n    \"\"\"Create a complete roster only from this child's retained selected results.\"\"\"\n    check_id = 'typeahead-execution'\n    ACTIVE_RUN.outputs.pop(check_id, None)\n    try:\n        if exit_code != 0 or line != 'main':\n            raise EvidenceError('typeahead child did not pass on main')\n        invocation = ACTIVE_RUN.invocation(check_id)\n        prefix = assertion_directory(check_id, invocation)\n        names = ['observation.json', 'raw-report.json', 'commands.json', 'inputs-before.json',\n                 'metafile.json', 'bundle.js', 'bundle-inputs.json', 'entry.generated.ts']\n        outputs = []\n        for name in names:\n            path = run_dir / prefix / name\n            if path.is_symlink() or not path.is_file() or path.stat().st_nlink != 1:\n                raise EvidenceError('missing or unsafe typeahead output')\n            outputs.append({'path': f'{prefix}/{name}', 'sha256': evidence_sha256(path), 'bytes': path.stat().st_size})\n        snapshot = EvidenceSnapshot(ROOT, run_dir)\n        validate_typeahead_observation(snapshot, ACTIVE_RUN.manifest, ACTIVE_RUN.binding, invocation,\n                                       {item['path'] for item in outputs})\n        snapshot.revalidate()\n        ACTIVE_RUN.outputs[check_id] = outputs\n        row = validate_matrix(read_json(MATRIX_PATH))[check_id]\n        artifacts = _contract_artifacts(row)\n        if artifacts is None:\n            raise EvidenceError('typeahead artifact unavailable')\n        cases = list(TYPEAHEAD_CASES)\n        report = {'schema_version': 1, 'template': False, 'run_id': run_id, 'check_id': check_id,\n                  'line': line, 'invocation_id': invocation, 'binding': ACTIVE_RUN.binding,\n                  'coverage': 'complete', 'result': 'pass', 'exit_code': 0,\n                  'subject_kind': 'artifact', 'subject_ids': ['library'], 'artifacts': artifacts,\n                  'expected_case_ids': cases, 'discovered_case_ids': cases, 'executed_case_ids': cases,\n                  'passed_case_ids': cases, 'failed_case_ids': [], 'skipped_case_ids': [],\n                  'unresolved_case_ids': [], 'exceptions': [], 'passed': len(cases), 'failed': 0, 'skipped': 0,\n                  'outputs': outputs, 'case_results': [{'case_id': case, 'result': 'pass', 'kind': 'assertion',\n                  'output_paths': [f'{prefix}/observation.json']} for case in cases],\n                  'command': ['rc-verify.py', check_id], 'limitations': ['Focused execution only; no G11 claim.']}\n        path = run_dir / 'reports' / f'{check_id}.json'\n        path.parent.mkdir(parents=True, exist_ok=True)\n        path.write_text(json.dumps(report, indent=2) + '\\n')\n        return True\n    except (EvidenceError, OSError, ValueError, KeyError, TypeError) as error:\n        print(f'verify: typeahead evidence incomplete: {error}', file=sys.stderr)\n        # This coordinator owns the report. A stale or child-written complete\n        # report must not survive a failed evidence validation.\n        path = run_dir / 'reports' / f'{check_id}.json'\n        path.parent.mkdir(parents=True, exist_ok=True)\n        path.write_text(json.dumps({'schema_version': 1, 'template': False, 'run_id': run_id,\n                                    'check_id': check_id, 'line': line, 'coverage': 'slice',\n                                    'result': 'fail', 'exit_code': exit_code or 1, 'outputs': [],\n                                    'limitations': ['Focused typeahead execution did not produce complete bound evidence.']}, indent=2) + '\\n')\n        return False\n\n\ndef "
+            },
+            {
+              "offset": 24817,
+              "before": "BROW",
+              "after": "SASS_"
+            },
+            {
+              "offset": 24823,
+              "before": "R_M",
+              "after": ""
+            },
+            {
+              "offset": 24827,
+              "before": "TRIX",
+              "after": "L"
+            },
+            {
+              "offset": 24959,
+              "before": "browser",
+              "after": "sass"
+            },
+            {
+              "offset": 24967,
+              "before": "matrix",
+              "after": "seal"
+            },
+            {
+              "offset": 25029,
+              "before": "browser",
+              "after": "sass"
+            },
+            {
+              "offset": 25037,
+              "before": "matrix",
+              "after": "seal"
+            },
+            {
+              "offset": 25099,
+              "before": "",
+              "after": "BROWSER_MATRIX'] = json.dumps({\n            'run_id': ACTIVE_RUN.manifest['run_id'],\n            'invocation_id': ACTIVE_RUN.invocations.get('browser-matrix'),\n            'exit_code': ACTIVE_RUN.exit_codes.get('browser-matrix'),\n        }, sort_keys=True)\n        env['RC_UPSTREAM_TYPEAHEAD'] = json.dumps(typeahead_execution_attestation(ACTIVE_RUN), sort_keys=True)\n        env['RC_UPSTREAM_"
+            },
+            {
+              "offset": 26132,
+              "before": "",
+              "after": "\n\n\ndef run_source_contract_regressions(out_dir, run_id, line, results, implemented_ran):\n    \"\"\"Run complete source fault suites once for this RC invocation.\"\"\"\n    code = run_node(\"scripts/check-source-contract-regressions.py\", [])\n    write_check_report(\n        out_dir, run_id, line, \"source-contract-regressions\", exit_code=code,\n        limitations=[\"Source fault controls do not qualify product, browser, security, or full G11 acceptance.\"],\n    )\n    results[\"source-contract-regressions\"] = \"pass\" if code == 0 else \"fail\"\n    implemented_ran.append(\"source-contract-regressions\")"
+            },
+            {
+              "offset": 45641,
+              "before": "",
+              "after": ", except the six pinned Material-16 Stepper\n    values whose tagged-reference CSS and shape are independently checked"
+            },
+            {
+              "offset": 46786,
+              "before": " and candidate",
+              "after": "):\n        return False\n    historical"
+            },
+            {
+              "offset": 46802,
+              "before": "",
+              "after": " case_id in HISTORICAL_STEPPER_TOKENS\n    if historical:\n        line "
+            },
+            {
+              "offset": 46804,
+              "before": "e",
+              "after": "body.get(\"line\")\n        if (line not in (\"main\", \"21."
+            },
+            {
+              "offset": 46806,
+              "before": "pected)",
+              "after": "\") or\n            peer_version != {\"main\""
+            },
+            {
+              "offset": 46814,
+              "before": "\n        return ",
+              "after": " \"22.1.7\", \"21.x\": \"21.2.14\"}[line] or\n            body.get(\"historical_oracle\") != HISTORICAL_STEPPER_PROO"
+            },
+            {
+              "offset": 46831,
+              "before": "alse\n    scenarios ",
+              "after": " or\n            body.get(\"expected_historical\") !"
+            },
+            {
+              "offset": 46852,
+              "before": "",
+              "after": "stepper_historical_value(line, \"contract\", case_id) or\n            candidate != "
+            },
+            {
+              "offset": 46856,
+              "before": "",
+              "after": "[\"expected_historical\"]):\n            return False\n    elif (candidate != expected or \"historical_oracle\" in body or \"expected_historical\" in body):\n        return False\n    scenarios = body"
+            },
+            {
+              "offset": 46956,
+              "before": "for scenario in scenarios",
+              "after": "if historical and [s.get(\"id\") if isinstance(s, dict) else None for s in scenarios] != list(HISTORICAL_STEPPER_SCENARIOS)"
+            },
+            {
+              "offset": 46991,
+              "before": "",
+              "after": "return False\n    for scenario in scenarios:\n        "
+            },
+            {
+              "offset": 47197,
+              "before": "for ",
+              "after": "if historical and (len("
+            },
+            {
+              "offset": 47206,
+              "before": " in ",
+              "after": "s) != 1 or not isinstance("
+            },
+            {
+              "offset": 47216,
+              "before": "",
+              "after": "[0], dict) or checks[0].get(\"selector\") != \""
+            },
+            {
+              "offset": 47217,
+              "before": "\n            if not isinstance(",
+              "after": "root\"):\n            return False\n        for "
+            },
+            {
+              "offset": 47253,
+              "before": ", dict) or",
+              "after": " in"
+            },
+            {
+              "offset": 47269,
+              "before": "",
+              "after": "s:\n            if not isinstance(check, dict) or check"
+            },
+            {
+              "offset": 47424,
+              "before": " and",
+              "after": "):\n                return False\n            if historical:\n                historical_value = stepper_historical_value(body[\"line\"], scenario[\"id\"], case_id)\n                if"
+            },
+            {
+              "offset": 47440,
+              "before": "candidate\") ",
+              "after": "expected_historical\") !"
+            },
+            {
+              "offset": 47453,
+              "before": "",
+              "after": " historical_value or check.get(\"candidate\") !"
+            },
+            {
+              "offset": 47455,
+              "before": "",
+              "after": "historical_"
+            },
+            {
+              "offset": 47460,
+              "before": "",
+              "after": ":\n                    return False\n            elif (check.get(\"candidate\") != value or \"expected_historical\" in check"
+            },
+            {
+              "offset": 59626,
+              "before": "",
+              "after": "if body.get('case_id')=='mixin-css/private-check-duplicate-theme-styles':return private_card_assertion_ok(ROOT,ACTIVE_RUN,body,invocation)\n    if 'current_private_card' in body:return False\n    if body.get('case_id') in ORDINARY_CARD_GATE_CASES and str(body.get('case_id','')).startswith('mixin-css/'):\n        return ordinary_card_gate_assertion_ok(ROOT,ACTIVE_RUN,body,invocation)\n    if 'current_ordinary_card' in body and body.get('case_id') not in ORDINARY_CARD_GATE_CASES:return False\n    if body.get('case_id') in ORDINARY_CONTROL_GATE_CASES and str(body.get('case_id','')).startswith('mixin-css/'):\n        return ordinary_control_gate_assertion_ok(ROOT,ACTIVE_RUN,body,invocation)\n    if 'current_ordinary_controls' in body and body.get('case_id') not in ORDINARY_CONTROL_GATE_CASES:return False\n    if body.get('case_id') in SPINNER_SNACK_GATE_CASES and str(body.get('case_id','')).startswith('mixin-css/'):\n        return spinner_snack_gate_assertion_ok(ROOT,ACTIVE_RUN,body,invocation)\n    if 'current_spinner_snack_bridge' in body and body.get('case_id') not in SPINNER_SNACK_GATE_CASES:return False\n    "
+            },
+            {
+              "offset": 61240,
+              "before": "",
+              "after": "_envelope_ok(ACTIVE_RUN,body,invocation)\n    if body.get('case_id') in ORDERED_LEGACY_BUTTON_CASES:\n        return 'current_companion' not in body and ordered_legacy_button"
+            },
+            {
+              "offset": 86836,
+              "before": "",
+              "after": "run_source_contract_regressions(out_dir, run_id, line, results, implemented_ran)\n\n    # Run the finite packed typeahead producer before the audit consumes its identity.\n    if line == 'main':\n        code = run_node('scripts/run-typeahead-execution.py', ['--run', str(run_path)])\n        complete = write_typeahead_report(out_dir, run_id, line, code)\n        results['typeahead-execution'] = 'pass' if code == 0 and complete else 'fail'\n        implemented_ran.append('typeahead-execution')\n\n    "
+            }
+          ]
+        },
+        {
+          "authority": "native-individual-zone",
+          "before_bytes": 8230,
+          "before_sha256": "432231a645e5bc0ce8e375e9da9745177f7f1b577ac1ee0758913cdd5989a59f",
+          "current_bytes": 8418,
+          "current_sha256": "bb535b98b1aa50e3a8b67ab26934f0173638ccc0959aa8caac0384294f32f1d6",
+          "edits": [
+            {
+              "after": "  return ['zoneful', 'zoneless'].includes(row?.runtime)\n    && replay?.angular_zone_entered === (row.runtime === 'zoneful')\n    && live?.angular_zone_entered === (row.runtime === 'zoneful')\n    && publicRippleNativeEventsOkay(row?.native_peer_events, line)\n",
+              "before": "  return publicRippleNativeEventsOkay(row?.native_peer_events, line)\n",
+              "offset": 6831
+            }
+          ],
+          "index": 5,
+          "path": "scripts/ripple-hydration-application.mjs",
+          "review": "Requires explicit zoneful/zoneless runtime and matching replay/live Angular-zone observations in the public ripple route."
+        },
+        {
+          "authority": "native-individual-zone",
+          "before_bytes": 4146,
+          "before_sha256": "2518dfb938446f31a1ba614f4e5c89cae973fbb8d8f6742207665ad3a94a3169",
+          "current_bytes": 4215,
+          "current_sha256": "a3e4375a59cfe8946f4707163a845cdec45dc738de370eeb1960b30a0af24b7d",
+          "edits": [
+            {
+              "after": "  snapshot() {return {angular_zone_entered: this.zone.run(() => NgZone.isInAngularZone()), clicks: this.clicks(), deliveries: this.deliveries.map(row => ({...row})),\n",
+              "before": "  snapshot() {return {clicks: this.clicks(), deliveries: this.deliveries.map(row => ({...row})),\n",
+              "offset": 3573
+            }
+          ],
+          "index": 6,
+          "path": "scripts/ripple-hydration-component-fixture.mjs",
+          "review": "Records Angular-zone entry in the fixture snapshot from its injected zone."
+        },
+        {
+          "authority": "native-individual-zone",
+          "before_bytes": 12086,
+          "before_sha256": "59d499fa66c018456eca5b67e97dc3417854426d0733e01ba660a886bd77c605",
+          "current_bytes": 12100,
+          "current_sha256": "0e3f7262be5a7d337520799a3e35b25ae8e3028f9e48717bf5aeb53d1fd15b25",
+          "edits": [
+            {
+              "after": "          const observed = {...await observeHydrationReplay(driver), runtime};\n",
+              "before": "          const observed = await observeHydrationReplay(driver);\n",
+              "offset": 10383
+            }
+          ],
+          "index": 7,
+          "path": "scripts/ripple-hydration-replay.mjs",
+          "review": "Carries the selected runtime into the observed hydration-replay receipt."
+        },
+        {
+          "authority": "ripple-evidence-owner",
+          "before_bytes": 8843,
+          "before_sha256": "8e593f92633b986d7083761ce54e49f3ea5384537325df6deffbddf53e2b7ba1",
+          "current_bytes": 8993,
+          "current_sha256": "5e726337f025668551cd6413a183a76227d6da5a9d21d12819dfbf4abc650a99",
+          "edits": [
+            {
+              "after": "    demand(line !== '21.x' || entry.final_disposition !== 'inherited','21 public peer lacks the replay catch; inherited-fix disposition is invalid');\n",
+              "before": "",
+              "offset": 6360
+            }
+          ],
+          "index": 12,
+          "path": "scripts/upstream-ripple-replay-evidence.mjs",
+          "review": "Rejects an inherited-fix disposition on the 21.x public peer, which lacks the replay catch."
+        },
+        {
+          "authority": "tab-completion-owner",
+          "before_bytes": 11133,
+          "before_sha256": "558cfa249b8befa05b24387d22f09033208f09a0da76440be40c98cafe65d74a",
+          "current_bytes": 11223,
+          "current_sha256": "ea9c28d684464e0f751e4bd08a203a771b307d864d9d983371532a3c918eadf0",
+          "edits": [
+            {
+              "after": "  'projects/ngx-material-legacy/legacy-tabs/internal/tab-portal-construction-context.ts',\n",
+              "before": "",
+              "offset": 2209
+            }
+          ],
+          "index": 13,
+          "path": "scripts/upstream-tab-completion-evidence.mjs",
+          "review": "Adds the new owned tab portal construction context to the exact source member roster; must bind the T02 reviewed added product file."
+        },
+        {
+          "authority": "ripple-current-controls",
+          "before_bytes": 6047,
+          "before_sha256": "df541795d3bf17c3757b9487d2c515aa027c3c8a39996c94ef985f50785c9b85",
+          "current_bytes": 6735,
+          "current_sha256": "c8eea1548229008f1d7d76eb7a76ca3a543911a15ed8b9ccb6c5aa8b4f224f58",
+          "edits": [
+            {
+              "after": "const snapshot = replay => ({angular_zone_entered:true,clicks:replay?1:2,deliveries:replay?[event('mousedown',true),event('click',true)]\n",
+              "before": "const snapshot = replay => ({clicks:replay?1:2,deliveries:replay?[event('mousedown',true),event('click',true)]\n",
+              "offset": 2808
+            },
+            {
+              "after": "const positive = {runtime:'zoneful',server_hydration_metadata:true,before_bootstrap:true,\n",
+              "before": "const positive = {server_hydration_metadata:true,before_bootstrap:true,\n",
+              "offset": 3155
+            },
+            {
+              "after": "const zonelessPositive=structuredClone(positive);zonelessPositive.runtime='zoneless';zonelessPositive.replayed.angular_zone_entered=false;zonelessPositive.live.angular_zone_entered=false;zonelessPositive.native_peer_events=nativeEvents('main');assert.equal(rippleHydrationReplayOkay(zonelessPositive,'main'),true);\nconst wrongZoneless=structuredClone(zonelessPositive);wrongZoneless.replayed.angular_zone_entered=true;assert.equal(rippleHydrationReplayOkay(wrongZoneless,'main'),false);\n",
+              "before": "",
+              "offset": 4071
+            },
+            {
+              "after": "  row=>{delete row.runtime;}, row=>{row.runtime='zoneless';}, row=>{delete row.replayed.angular_zone_entered;}, row=>{row.live.angular_zone_entered=false;},\n",
+              "before": "",
+              "offset": 4139
+            }
+          ],
+          "index": 16,
+          "path": "tests/ripple_hydration_application_probe.mjs",
+          "review": "Adds zoneful and zoneless positive/negative source controls for both replay and live observations."
+        },
+        {
+          "authority": "ripple-current-controls",
+          "before_bytes": 6641,
+          "before_sha256": "eea69d93501e77df68ae47c12bc46774c5919b859783a1f7972e80ef2b5ea741",
+          "current_bytes": 6690,
+          "current_sha256": "6327895d7de90e15fb6930732759278127f69cf30d6d7faecca2e77b29ebdaec",
+          "edits": [
+            {
+              "after": "  const snapshot=()=>({angular_zone_entered:true,clicks,deliveries:clicks===1?[event('mousedown',true),event('click',true)]\n",
+              "before": "  const snapshot=()=>({clicks,deliveries:clicks===1?[event('mousedown',true),event('click',true)]\n",
+              "offset": 772
+            },
+            {
+              "after": "const positive=driver('live');assert.equal(rippleHydrationReplayOkay({...await observeHydrationReplay(positive),runtime:'zoneful'},'main'),true);\n",
+              "before": "const positive=driver('live');assert.equal(rippleHydrationReplayOkay(await observeHydrationReplay(positive),'main'),true);\n",
+              "offset": 5069
+            }
+          ],
+          "index": 17,
+          "path": "tests/ripple_hydration_observer_probe.mjs",
+          "review": "Fixture snapshot now carries Angular-zone entry and positive observation names its runtime."
+        },
+        {
+          "authority": "T01-current-tab-controls",
+          "before_bytes": 31418,
+          "before_sha256": "24b4ed06cb7a86ce5ecdfe79637a23fef082873a687a9cc2d170d314ae518eef",
+          "current_bytes": 31759,
+          "current_sha256": "55579e0c1f0791c738552f570493e401eca2335eb0124dfa0cebe7e14eedf32a",
+          "edits": [
+            {
+              "after": " check('departing-fallback-hides-with-preserved-content',()=>{const f=fixture(Type);try{f.body.preserveContent=true;f.body.position=0;f.body.ngOnInit();f.c.advance(0);f.body.position=1;assert.equal(f.body._contentIsVisible,true);const marks=f.detector.marks;let markedBeforeOutput=false;const sub=f.body._translateTabComplete.subscribe(()=>markedBeforeOutput=f.detector.marks===marks+1);f.c.advance(600);assert.equal(f.detector.marks,marks+1,'completion must notify its owning view');assert.equal(markedBeforeOutput,true,'view notification precedes completion output');sub.unsubscribe();assert.equal(f.body._contentIsVisible,false);assert.equal(f.content.style.visibility,'hidden');assert.deepEqual(f.left,['left']);}finally{f.close();}});\n",
+              "before": " check('departing-fallback-hides-with-preserved-content',()=>{const f=fixture(Type);try{f.body.preserveContent=true;f.body.position=0;f.body.ngOnInit();f.c.advance(0);f.body.position=1;assert.equal(f.body._contentIsVisible,true);f.c.advance(600);assert.equal(f.body._contentIsVisible,false);assert.equal(f.content.style.visibility,'hidden');assert.deepEqual(f.left,['left']);}finally{f.close();}});\n",
+              "offset": 16537
+            }
+          ],
+          "index": 20,
+          "path": "tests/tab_body_motion_runtime_probe.mjs",
+          "review": "Adds the markForCheck-before-completion assertion while preserving the other synthetic lifecycle checks; old 47/22 report stays tied to 9133."
+        },
+        {
+          "authority": "zone-tab-producer",
+          "before_bytes": 12946,
+          "before_sha256": "cfa7a52fa27906cd363f235403ffd7a812c4ca83b6f6e4e0cf6e3f66ee404cd9",
+          "current_bytes": 13031,
+          "current_sha256": "eb65f5c769c561f9ae61a755dcb7cdbd8c2e3e56d2d04ad8b7ee9bda8030814d",
+          "edits": [
+            {
+              "after": "    assert.deepEqual(assertCase(id,{...result.value.observation,angularZoneEntered:true}),[]);\n",
+              "before": "    assert.deepEqual(assertCase(id,result.value.observation),[]);\n",
+              "offset": 5876
+            },
+            {
+              "after": "assert.deepEqual(assertCase('native-motion/'+SOURCE_LINE+'/chromium/zoneful/exactly-once-notification/tabs/animationDone/enabled',{...duplicate.value.observation,angularZoneEntered:true}),['emitted more than once']);\n",
+              "before": "assert.ok(assertCase('native-motion/'+SOURCE_LINE+'/chromium/zoneful/exactly-once-notification/tabs/animationDone/enabled',duplicate.value.observation).length);\n",
+              "offset": 6108
+            }
+          ],
+          "index": 21,
+          "path": "tests/tab_completion_producer_probe.mjs",
+          "review": "Synthetic completion observations now carry Angular-zone entry; exact producer successor binds this probe."
+        },
+        {
+          "authority": "root-shared-sass-tool",
+          "before_bytes": 76586,
+          "before_sha256": "5b5fe1ca8f516cd7ad17edefccb9c7e6342d7198ee5672eade0503cd45b08be0",
+          "current_bytes": 78506,
+          "current_sha256": "79c930ae40db9642796648959aad7fd5c15e4caf5211bcc9b762063ef972548a",
+          "edits": [
+            {
+              "after": "import copy\nimport shutil\n",
+              "before": "",
+              "offset": 132
+            },
+            {
+              "after": "    def _current_sass_gate_bodies(self, invocation, tarball):\n        # Reuse the exact modeled envelopes and authenticated candidate fixture\n        # from the individual gate tests, then bind them to this synthetic run.\n        from test_sass_ordinary_control_gate import OrdinaryControlGateTests\n        from test_ordinary_card_gate import OrdinaryCardGateTests\n        from test_sass_ordinary_control_gate_owned import OwnedOrdinaryControlGateTests\n        from test_sass_spinner_snack_gate_integration import SpinnerSnackGateIntegrationTests\n        modeled = {}\n        for cls in (OrdinaryControlGateTests, OwnedOrdinaryControlGateTests, OrdinaryCardGateTests, SpinnerSnackGateIntegrationTests):\n            cls.setUpClass()\n            try:\n                if cls is OrdinaryCardGateTests:\n                    owner = cls()\n                    bodies = [owner.model(row)['body'] for row in cls.rows]\n                else:\n                    bodies = cls.bodies\n                for body in bodies:\n                    modeled[body['case_id']] = copy.deepcopy(body)\n                ignored = []\n                if (self.root / 'node_modules').exists():\n                    ignored.append('node_modules')\n                shutil.copytree(cls.root, self.root, dirs_exist_ok=True, symlinks=True,\n                                ignore=shutil.ignore_patterns(*ignored))\n            finally:\n                cls.tearDownClass()\n        for body in modeled.values():\n            body.update(line=self.run.binding['source_line'], run_id=self.run.manifest['run_id'],\n                        invocation_id=invocation, binding=copy.deepcopy(self.run.binding),\n                        tarball_sha256=tarball)\n        return modeled\n\n",
+              "before": "",
+              "offset": 23131
+            },
+            {
+              "after": "        modeled = self._current_sass_gate_bodies(invocation, tarball or library[\"sha256\"])\n",
+              "before": "",
+              "offset": 23587
+            },
+            {
+              "after": "            if case_id in modeled:\n                body=modeled[case_id]\n            elif case_id.startswith('owned-style/'):\n",
+              "before": "            if case_id.startswith('owned-style/'):\n",
+              "offset": 23714
+            }
+          ],
+          "index": 24,
+          "path": "tests/test_rc_verify_evidence_integration.py",
+          "review": "Main test fixture now models current Sass gate envelopes and binds them to the synthetic run; requires shared RC/Sass owner review."
+        },
+        {
+          "authority": "native-motion-controls-owner",
+          "before_bytes": 3560,
+          "before_sha256": "2a63276d6d1788e4500ef35fff00d7b0956aa6761eaacf1a191561cf3d3a8e17",
+          "current_bytes": 3617,
+          "current_sha256": "83e0acc1faed8a76e03c7cb070b06ae72f9cac39ce9b8ea207020be10853fc79",
+          "edits": [
+            {
+              "after": "    executeNativeMotion: async () => ({outcomes: ids.map(id => ({id, ok: true, observation: {...makeObservation(id), angularZoneEntered: id.split('/')[3] === 'zoneful'}, evidence: 'Synthetic native observation; no browser launched'})),\n",
+              "before": "    executeNativeMotion: async () => ({outcomes: ids.map(id => ({id, ok: true, observation: makeObservation(id), evidence: 'Synthetic native observation; no browser launched'})),\n",
+              "offset": 2279
+            }
+          ],
+          "index": 32,
+          "path": "tests/upstream/native-motion-run-fixture.mjs",
+          "review": "Synthetic native-motion outcomes now state zone entry for zoneful versus zoneless runtime; this is fixture evidence, not native execution."
+        },
+        {
+          "authority": "ripple-evidence-owner",
+          "before_bytes": 12017,
+          "before_sha256": "172d142856c3e87b2f726feae9e1213060d63cc0d491db390de338e55a37276e",
+          "current_bytes": 12158,
+          "current_sha256": "54360feca7873be4cab83cc5a916958db04805df2be5c7fe6899d9b38e4021db",
+          "edits": [
+            {
+              "after": "  if(line==='21.x')negative('false-inherited-peer-fix',()=>{f.entry.final_disposition='inherited';},/inherited-fix disposition is invalid/);\n",
+              "before": "",
+              "offset": 9694
+            }
+          ],
+          "index": 34,
+          "path": "tests/upstream/ripple-replay-admission.mjs",
+          "review": "Adds the 21.x false-inherited-peer-fix negative control for the public ripple helper gap."
+        },
+        {
+          "authority": "ripple-current-controls",
+          "before_bytes": 2786,
+          "before_sha256": "bc2d0ab9a5d4f7de8873e047c1702bfaf4c8b807593afa46dbbd793ef67ae9c9",
+          "current_bytes": 2853,
+          "current_sha256": "949cdfbbc21eb725f586d2b5e9d3b044db3957da04a4c8132863fcd5f620bb42",
+          "edits": [
+            {
+              "after": "const snapshot=(replay,runtime)=>({angular_zone_entered:runtime==='zoneful',clicks:replay?1:2,deliveries:replay?[delivery('mousedown',true),delivery('click',true)]\n",
+              "before": "const snapshot=replay=>({clicks:replay?1:2,deliveries:replay?[delivery('mousedown',true),delivery('click',true)]\n",
+              "offset": 886
+            },
+            {
+              "after": "    replayed:snapshot(true,runtime),live:snapshot(false,runtime),destroyed:true,remaining_ripple_nodes:0,public_peer_replay:publicRippleReplaySample(),\n",
+              "before": "    replayed:snapshot(true),live:snapshot(false),destroyed:true,remaining_ripple_nodes:0,public_peer_replay:publicRippleReplaySample(),\n",
+              "offset": 1804
+            }
+          ],
+          "index": 35,
+          "path": "tests/upstream/ripple-replay-fixture.mjs",
+          "review": "Supplies runtime-specific replay/live Angular-zone observations in the synthetic fixture."
+        },
+        {
+          "index": 37,
+          "path": "scripts/remaining-native-tab-lifecycle-review.mjs",
+          "before_sha256": "e8f6b630b140effe91788a35a61e3775f7a33fcadf8fdf2058c71ff2275821bb",
+          "before_bytes": 11999,
+          "current_sha256": "dfa23b743bebc59f7a50c3ad80984d3cee4d939be7be360067646608f7cd91e1",
+          "current_bytes": 21514,
+          "authority": "current-inspector-v4",
+          "review": "Exact predecessor-to-current byte edits; inspector composes current owners.",
+          "edits": [
+            {
+              "offset": 323,
+              "before": "",
+              "after": "{reviewCurrentNativeTabLifecycle} from './current-native-tab-lifecycle-source.mjs';\nimport {createCurrentNativeTabProductSource} from './current-native-tab-product-source.mjs';\nimport {createCurrentNativeTabDownstreamSource} from './current-native-tab-downstream-source.mjs';\nimport {readEvidenceMember} from './upstream-packed-run-evidence.mjs';\nimport "
+            },
+            {
+              "offset": 505,
+              "before": "",
+              "after": "Sync,lstatSync,realpath"
+            },
+            {
+              "offset": 587,
+              "before": "",
+              "after": "e,join,sep,pars"
+            },
+            {
+              "offset": 722,
+              "before": "=create",
+              "after": ""
+            },
+            {
+              "offset": 736,
+              "before": "(import.meta.url)('typescript'",
+              "after": "=createRequire(import.meta.url),ts=tsRequire('typescript');\nconst loadedReviewerImage=readFileSync(fileURLToPath(import.meta.url));\nconst loadedTypescriptPath=realpathSync(tsRequire.resolve('typescript')),loadedTypescriptImage=readFileSync(loadedTypescriptPath"
+            },
+            {
+              "offset": 834,
+              "before": "",
+              "after": ");\nconst bufferEquals=Buffer.prototype.equals,apply=Reflect.apply;\nconst bytesEqual=(a,b)=>Buffer.isBuffer(b)&&apply(bufferEquals,a,[b]"
+            },
+            {
+              "offset": 5827,
+              "before": "e",
+              "after": "/** E"
+            },
+            {
+              "offset": 5829,
+              "before": "port function inspect",
+              "after": "act historical first-repair schema-1 inspection, for the authenticated 1141-member image only. */\nexport function inspectHistorical"
+            },
+            {
+              "offset": 11853,
+              "before": "",
+              "after": "\n}\n/** Full current main source census composes three independently reviewed finite owners. */\nlet currentInspectionActive=false,currentInspectionNested=false;\nexport function inspectTabLifecycleRepair({root=rootDefault,readMember}={}){\n if(currentInspectionActive){currentInspectionNested=true;assert.fail('reentrant current tab lifecycle inspection');}\n currentInspectionActive=true;currentInspectionNested=false;\n try{\n  const physical=path=>{\n   const absolute=resolve(root),rootBase=parse(absolute).root;\n   let rootCursor=rootBase;assert.ok(lstatSync(rootCursor).isDirectory(),'invalid current source root');\n   for(const part of absolute.slice(rootBase.length).split(sep).filter(Boolean)){\n    rootCursor=join(rootCursor,part);const stat=lstatSync(rootCursor);\n    assert.ok(stat.isDirectory()&&!stat.isSymbolicLink(),'linked current source root ancestor');\n   }\n   if(!path.startsWith('node_modules/'))return readEvidenceMember(root,path);\n   const match=/^node_modules\\/(@angular\\/(?:cdk|material))\\/(.+)$/.exec(path);\n   assert.ok(match,'unowned current peer path '+path);\n   const nodeModules=join(root,'node_modules'),scope=join(nodeModules,'@angular');\n   assert.ok(lstatSync(nodeModules).isDirectory()&&!lstatSync(nodeModules).isSymbolicLink());\n   assert.ok(lstatSync(scope).isDirectory()&&!lstatSync(scope).isSymbolicLink());\n   const peer=join(nodeModules,match[1]),peerStat=lstatSync(peer),base=realpathSync(peer);\n   assert.ok(peerStat.isDirectory()||peerStat.isSymbolicLink(),'missing current peer');\n   if(peerStat.isSymbolicLink())assert.ok(base.startsWith(join(nodeModules,'.pnpm')+sep),'peer root outside pinned workspace');\n   assert.ok(lstatSync(base).isDirectory()&&!lstatSync(base).isSymbolicLink());\n   assert.equal(JSON.parse(readEvidenceMember(base,'package.json')).name,match[1]);\n   const relative=match[2].split('/');assert.ok(relative.every(part=>part&&part!=='.'&&part!=='..'));\n   let cursor=base;for(const part of relative){cursor=join(cursor,part);assert.ok(!lstatSync(cursor).isSymbolicLink(),'linked current peer descendant '+path);}\n   assert.ok(lstatSync(cursor).isFile(),'nonfile current peer '+path);\n   return readFileSync(cursor);\n  };\n  const read=path=>{\n   const before=physical(path),supplied=readMember?readMember(path):before;\n   assert.ok(bytesEqual(before,supplied),'nonphysical current tab source '+path);\n   assert.ok(bytesEqual(before,physical(path)),'current tab source changed during callback '+path);\n   return before;\n  };\n  const assertLoadedImages=()=>{\n   assert.ok(bytesEqual(physical('scripts/remaining-native-tab-lifecycle-review.mjs'),loadedReviewerImage),'changed loaded inspector image');\n   const rootRequire=createRequire(join(resolve(root),'package.json'));\n   assert.equal(realpathSync(rootRequire.resolve('typescript')),loadedTypescriptPath,'shadow TypeScript peer');\n   assert.ok(bytesEqual(readFileSync(loadedTypescriptPath),loadedTypescriptImage),'changed loaded TypeScript image');\n  };\n  assertLoadedImages();\n  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version;\n  const line=version.startsWith('22.')?'main':null;\n  assert.equal(line,'main','current T01/T02/T03 source composition is main-only');\n  const product=createCurrentNativeTabProductSource({root,line,read});\n  product.assertCurrent();\n  const lifecycle=reviewCurrentNativeTabLifecycle({root,line,read});\n  lifecycle.assertCurrent();product.assertCurrent();\n  const downstream=createCurrentNativeTabDownstreamSource({root,line,read});\n  downstream.assertCurrent();lifecycle.assertCurrent();product.assertCurrent();\n  assert.equal(product.changedProductRefs.length,55);\n  assert.equal(product.resourceChanges.length,15);\n  assert.equal(downstream.current_product_changed,55);\n  assert.equal(downstream.current_resource_changed,15);\n  const historicalReports={\n   reviewer:['compatibility/rc/remaining-native-admission-tab-repair-source-controls.json','actual_reviewer_controls',36],\n   admission:['compatibility/rc/remaining-native-admission-tab-repair-admission-controls.json','actual_reader_writer_controls',72],\n   dispatch:['compatibility/rc/remaining-native-admission-tab-repair-dispatch-controls.json','actual_root_cli_cases',25],\n   cyph:['compatibility/rc/remaining-native-admission-tab-repair-cyph-style.json','resources_checked',439],\n  };\n  const historicalNonLifecycle={stage:'first-repair-only',reviewer_source_sha256:'e8f6b630b140effe91788a35a61e3775f7a33fcadf8fdf2058c71ff2275821bb',reports:{}};\n  for(const [name,[path,field,expected]] of Object.entries(historicalReports)){\n   const bytes=read(path),report=JSON.parse(bytes);assert.equal(report[field],expected,'historical control count changed '+name);\n   historicalNonLifecycle.reports[name]={path,sha256:hash(bytes),bytes:bytes.length,[field]:expected};\n  }\n  assert.equal(JSON.parse(read(historicalReports.reviewer[0])).reviewer_sha256,historicalNonLifecycle.reviewer_source_sha256);\n  const ownerPaths=['scripts/current-native-tab-product-source.mjs','scripts/c03-t02-current-native-tab-product-source-packet-v1.json','scripts/c03-t02-current-native-tab-product-source-packet-v2.json','scripts/c03-t02-current-native-tab-product-source-packet-v3.json','scripts/c03-t02-current-native-tab-product-source-packet-v4.json'];\n  const productOwnerRefs=ownerPaths.map(path=>{const bytes=read(path);return {path,sha256:hash(bytes),bytes:bytes.length};});\n  const allRefs=[...lifecycle.bound,...product.bound,...productOwnerRefs,...product.successorEvidence,...product.inheritedOwnerSources,...product.currentOwnerSources,...product.peerDeclarations,...product.authorityInputs,...downstream.bound,...Object.values(historicalNonLifecycle.reports)];\n  if(product.radioEvidence)allRefs.push(product.radioEvidence);\n  if(product.formMotionEvidence)allRefs.push(product.formMotionEvidence);\n  const sourceMap=new Map();\n  for(const row of allRefs){\n   assert.ok(row&&typeof row.path==='string'&&/^[0-9a-f]{64}$/.test(row.sha256),'invalid current source reference');\n   const bytes=physical(row.path);assert.equal(hash(bytes),row.sha256,'changed current source '+row.path);\n   if(row.bytes!==undefined)assert.equal(bytes.length,row.bytes,'changed current source length '+row.path);\n   const prior=sourceMap.get(row.path),current={path:row.path,sha256:row.sha256,bytes:bytes.length};\n   if(prior)assert.deepEqual(prior,current,'conflicting current source owners '+row.path);\n   else sourceMap.set(row.path,current);\n  }\n  const sourceMembers=[...sourceMap.values()];\n  assertLoadedImages();\n  const finalPhysical=()=>{\n   for(const row of sourceMembers){const bytes=physical(row.path);assert.equal(hash(bytes),row.sha256,'late physical current source '+row.path);assert.equal(bytes.length,row.bytes);}\n  };\n  lifecycle.assertCurrent();product.assertCurrent();downstream.assertCurrent();assertLoadedImages();\n  assert.equal(currentInspectionNested,false,'reentrant current tab lifecycle inspection');\n  finalPhysical();\n  return {schema_version:3,line,source_parent:pins[line].parent,\n   lifecycle_source_epochs:{first_repair:lifecycle.first_review,detector:lifecycle.detector_review,reverse:lifecycle.reverse_source},\n   downstream_source_epochs:{changed:downstream.changed,old_bound:downstream.old_bound,current_product_changed:55,current_resource_changed:15},\n   historical_lifecycle_controls:lifecycle.historical_lifecycle_controls,\n   current_lifecycle_controls:lifecycle.current_lifecycle_controls,\n   historical_non_lifecycle_controls:historicalNonLifecycle,\n   current_non_lifecycle_controls:{stage:'current',source_sha256:lifecycle.current_public_import_source_sha256,reviewer_executed:false,admission_reader_writer_executed:false,dispatch_root_cli_executed:false,cyph_resource_sanity_executed:false},\n   current_public_import_roles:lifecycle.current_public_import_roles,\n   current_public_import_source_sha256:lifecycle.current_public_import_source_sha256,\n   current_nine_source_members:lifecycle.current_nine_source_members,\n   current_product_members:1143,historical_product_members:1141,resource_members:439,\n   changed_product:product.changedProductRefs,changed_resources:product.resourceChanges,\n   source_members:sourceMembers,\n   scope:'Authenticated first repair, explicit later tab source epochs, finite current product/resource identity and 41 downstream source references and the separately bound typeahead receipt closure. Historical lifecycle reports remain historical. Current synthetic controls run separately; packed/native/floor qualification remains pending.',\n   source_only:true,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};\n }finally{currentInspectionActive=false;}"
+            }
+          ]
+        }
+      ],
+      "current_product_changed": 55,
+      "current_resource_changed": 15,
+      "historical_controls": {
+        "lifecycle-controls": {
+          "bytes": 18673,
+          "path": "compatibility/rc/remaining-native-admission-tab-repair-lifecycle-controls.json",
+          "sha256": "7a855591fe8cc4bcb66c0b7c2900820fa54ac862d2168bf832d0859747a0c96d"
+        },
+        "producer-controls": {
+          "bytes": 3068,
+          "path": "compatibility/rc/remaining-native-admission-tab-repair-producer-controls.json",
+          "sha256": "e2d96d2d159ba09bc3599cc8600d4e337e3b0640445f1ba9400b7f71b5f3884e"
+        },
+        "source-controls": {
+          "bytes": 14897,
+          "path": "compatibility/rc/remaining-native-admission-tab-repair-source-controls.json",
+          "sha256": "0c9625aba2c20522df499d7263214efdfc85d9f8129c301cd23a1c2f84e6e98c"
+        }
+      },
+      "historical_inputs": {
+        "bytes": 8287,
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-source-inputs.json",
+        "sha256": "92a1e6c683bf36815471b90674b949f8972f1fbdc7c1d736c60ec79de7d1ce0e"
+      },
+      "predecessor_inspector_sha256": "9df265f61acfc8ea222c1cfd327d534f2df1774d9caea081eda3e970aa500a03",
+      "source_parent": "f1615ad0cbdfbc122e696421b4afd47ddb55c68f",
+      "typeahead_receipt": {
+        "path": "compatibility/rc/parent-main-typeahead-coordinator-qualification-v1.json",
+        "sha256": "6d0ee8e3cc3428c50268e8a05ed000b4db3a0358763243c07275c0ad4d30c9ec",
+        "bytes": 7756
+      },
+      "typeahead_sources": [
+        {
+          "path": "compatibility/rc/matrices/full-verify.json",
+          "sha256": "bd234833108141eb7ee37b755b4cdd983e333bb2107da69e5542e2665789ad85",
+          "bytes": 623004
+        },
+        {
+          "path": "compatibility/rc/typeahead-fixture/legacy-list/selection-list.spec.ts",
+          "sha256": "5f054aa0006cb252bec9e1a919d52d425a07a7845735f2b7b21f8e9f7316911d",
+          "bytes": 69078
+        },
+        {
+          "path": "compatibility/rc/typeahead-fixture/legacy-menu/menu.spec.ts",
+          "sha256": "5ac09824120ecdec80e24cee8597128576b56483a3029218fd2b2b010f77cacc",
+          "bytes": 129866
+        },
+        {
+          "path": "compatibility/rc/typeahead-fixture/legacy-select/select.spec.ts",
+          "sha256": "bfd20552594bda7081f024141ac2817f8fbe0a3a3dae07fd97aa4c2b3e4aa3f1",
+          "bytes": 227726
+        },
+        {
+          "path": "compatibility/rc/typeahead-runner/build.mjs",
+          "sha256": "d83279e8899b09cfe0241d5c392f71c452c99385db376e337e799ba8ffaec6a5",
+          "bytes": 8187
+        },
+        {
+          "path": "compatibility/rc/typeahead-runner/historical-specs.json",
+          "sha256": "4ab1f9572aeeb711a37cc7ce45ae58a4aabd018c95cabbaa14f34f292136e83c",
+          "bytes": 748
+        },
+        {
+          "path": "compatibility/rc/typeahead-runner/karma.conf.cjs",
+          "sha256": "2cd99b2ea37543f7ea741861c07bce5b57e5a65555458f83965527b4ee604439",
+          "bytes": 1980
+        },
+        {
+          "path": "scripts/check-upstream-audit-disposition.mjs",
+          "sha256": "9daf8aa3b8843e2a746fe6bb0c3cd31af8bb4a53e424399ba75205cdd6a615c2",
+          "bytes": 46031
+        },
+        {
+          "path": "scripts/rc-verify.py",
+          "sha256": "d5689f5253abae336aff6d07c66c2c2453b292edc7816045343c16db5831f00b",
+          "bytes": 103860
+        },
+        {
+          "path": "scripts/rc_acceptance.py",
+          "sha256": "19ed3f06e34178e6b31d1d88f92c33f74d1a1bd680477152c1a90e9685df3194",
+          "bytes": 40963
+        },
+        {
+          "path": "scripts/revalidate-typeahead.mjs",
+          "sha256": "07a2cc01841fc1807ce6f4c7ec2b8ddb1dfce41eb8d25f69518fd5f7d4042f1e",
+          "bytes": 969
+        },
+        {
+          "path": "scripts/run-typeahead-execution.py",
+          "sha256": "8881c99409fac3b0ef9f49b6b964c1b99b349d9ba907d9119564fda3d099ad44",
+          "bytes": 12863
+        },
+        {
+          "path": "scripts/seal-draft-run.mjs",
+          "sha256": "3085e19c3f89ca681434eab68c9a2ed09537b5154d2414121b7a47be1869383b",
+          "bytes": 13984
+        },
+        {
+          "path": "scripts/typeahead-run-projection.mjs",
+          "sha256": "ddb993502fcd9ccc8aed8256a9804851d099fb9cb4290b589f4ef5c0e6acbe95",
+          "bytes": 1884
+        },
+        {
+          "path": "scripts/upstream-inherited-execution-evidence.mjs",
+          "sha256": "03a5d7c4494c992df625738051d077fe568744e8b016ec74b8c0b01427c60409",
+          "bytes": 3983
+        },
+        {
+          "path": "scripts/upstream-typeahead-evidence.mjs",
+          "sha256": "2fcb3d54bf775e3b38ad1c8f4ae1db48725d591fb125449026b094a853c48b33",
+          "bytes": 14541
+        },
+        {
+          "path": "tests/test_rc_acceptance.py",
+          "sha256": "89a2e2cc0ad1b72fde88395fc9e9aabe8a83baf7102e6acaaadaab12ff1f357c",
+          "bytes": 43262
+        },
+        {
+          "path": "tests/test_rc_run_writer_and_sealer.py",
+          "sha256": "910e6484253d226ef7e38a2f9b7da5e447df2c849571d7ce0455e6973efaf754",
+          "bytes": 33383
+        },
+        {
+          "path": "tests/test_typeahead_inventory.py",
+          "sha256": "b8a306c631b6b580e7fb197b080c175dfce0a9b93dcbc3699565eccc999bc69a",
+          "bytes": 8565
+        },
+        {
+          "path": "tests/typeahead_coordinator_integration_test.py",
+          "sha256": "6414b4df25ec2c625c93ba693c098915a7c584ba9519f0354687293a4098f23a",
+          "bytes": 7378
+        },
+        {
+          "path": "tests/typeahead_execution_contract_test.mjs",
+          "sha256": "964835748a016f3bb69aede1e13ec02d12ef530a304d0f5a4a0201278ad078cc",
+          "bytes": 2161
+        },
+        {
+          "path": "tests/typeahead_full_validator_test.mjs",
+          "sha256": "a51237ee7841b34b4921dd9746298ed36cf49dd1cf01d29981e40328deae6c40",
+          "bytes": 13433
+        },
+        {
+          "path": "tests/typeahead_run_projection_test.mjs",
+          "sha256": "777e3409da3e218be69ff898b02a12ff87e23a42f24a06dc9773e4125c1ec7bd",
+          "bytes": 1361
+        },
+        {
+          "path": "tests/typeahead_sealer_fixture.py",
+          "sha256": "02339587e7a60711189bd5de89b66f988c5822ef1f74612ba001753062da1d9b",
+          "bytes": 7554
+        }
+      ],
+      "typeahead_archive": {
+        "path": "compatibility/rc/parent-main-typeahead-coordinator-6655dd5324ca48647f1226c06d38677941832afb0324bff336cfef9e192d57c2.tar.gz",
+        "sha256": "6655dd5324ca48647f1226c06d38677941832afb0324bff336cfef9e192d57c2",
+        "bytes": 468958
+      },
+      "v3_changed_paths": [
+        "scripts/check-upstream-audit-disposition.mjs",
+        "scripts/rc-verify.py",
+        "scripts/remaining-native-tab-lifecycle-review.mjs"
+      ]
+    }
+  },
+  "predecessor_packet_sha256": "0fb93cd9a5f3b6618e296a14c01c8098cbccc9610115e78c4bdddc564b1562b5",
+  "previous_packet": {
+    "path": "compatibility/rc/current-native-tab-downstream-source-epochs-v3.json",
+    "sha256": "0fb93cd9a5f3b6618e296a14c01c8098cbccc9610115e78c4bdddc564b1562b5",
+    "bytes": 54727
+  },
+  "role": "finite-current-native-tab-downstream-source",
+  "schema_version": 4,
+  "scope": "Finite main historical 41 source references and separate typeahead receipt source closure; source only.",
+  "source_scope_only": true
+}
