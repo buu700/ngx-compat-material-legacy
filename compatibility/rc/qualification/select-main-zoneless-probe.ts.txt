@@ -1,0 +1,36 @@
+@Component({standalone: false, template: `
+  <button id="probe-open" (click)="select.open()">Open</button>
+  <mat-select [disableRipple]="ripple()" value="a">
+    <mat-option value="a">A</mat-option><mat-option value="b">B</mat-option>
+  </mat-select>
+`})
+class AutoZonelessRippleProbe {
+  @ViewChild(MatLegacySelect) select: MatLegacySelect;
+  @ViewChildren(MatLegacyOption) options: QueryList<MatLegacyOption>;
+  ripple = signal<any>(false);
+}
+
+describe('packed select automatic zoneless ripple probe', () => {
+  it('updates real option ripple directives on public input transitions without manual detection', async () => {
+    TestBed.configureTestingModule({imports: [MatLegacySelectModule], declarations: [AutoZonelessRippleProbe],
+      providers: [provideZonelessChangeDetection(), LEGACY_NOOP_ANIMATIONS]});
+    const fixture = TestBed.createComponent(AutoZonelessRippleProbe);
+    fixture.autoDetectChanges();
+    await fixture.whenStable();
+    fixture.nativeElement.querySelector('#probe-open').click();
+    await fixture.whenStable();
+    expect(fixture.componentInstance.select.panelOpen).toBeTrue();
+    for (const [value, expected] of [[false, false], [true, true], ['false', false], ['', true], [null, false], [undefined, false], [true, true], [false, false]] as const) {
+      fixture.componentInstance.ripple.set(value);
+      await fixture.whenStable();
+      const options = fixture.componentInstance.options.toArray();
+      const ripples = fixture.debugElement.queryAll(By.css('.mat-option-ripple')).map(el => el.injector.get(MatRipple));
+      expect(options.length).withContext('two options').toBe(2);
+      expect(ripples.length).withContext('two real option ripples').toBe(2);
+      expect(fixture.componentInstance.select.disableRipple).withContext('select ' + String(value)).toBe(expected);
+      expect(options.map(option => option.disableRipple)).withContext('options ' + String(value)).toEqual([expected, expected]);
+      expect(ripples.map(ripple => ripple.disabled)).withContext('ripple directives ' + String(value)).toEqual([expected, expected]);
+    }
+    fixture.destroy();
+  });
+});
