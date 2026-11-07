@@ -1,0 +1,72 @@
+{
+  "sha": "8abb33d7dc1bd6e2064eec732aacdb8d3ed5f5ae",
+  "status": "reviewed",
+  "diff": "diff --git a/src/material/select/select.ts b/src/material/select/select.ts\nindex 81939bf89..18ac44d06 100644\n--- a/src/material/select/select.ts\n+++ b/src/material/select/select.ts\n@@ -8,8 +8,8 @@\n \n import {\n   ActiveDescendantKeyManager,\n-  LiveAnnouncer,\n   addAriaReferencedId,\n+  LiveAnnouncer,\n   removeAriaReferencedId,\n } from '@angular/cdk/a11y';\n import {Directionality} from '@angular/cdk/bidi';\n@@ -35,6 +35,7 @@ import {ViewportRuler} from '@angular/cdk/scrolling';\n import {\n   AfterContentInit,\n   Attribute,\n+  booleanAttribute,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n   Component,\n@@ -45,9 +46,11 @@ import {\n   ElementRef,\n   EventEmitter,\n   Inject,\n+  inject,\n   InjectionToken,\n   Input,\n   NgZone,\n+  numberAttribute,\n   OnChanges,\n   OnDestroy,\n   OnInit,\n@@ -58,9 +61,6 @@ import {\n   SimpleChanges,\n   ViewChild,\n   ViewEncapsulation,\n-  booleanAttribute,\n-  inject,\n-  numberAttribute,\n } from '@angular/core';\n import {\n   AbstractControl,\n@@ -71,17 +71,17 @@ import {\n   Validators,\n } from '@angular/forms';\n import {\n+  _countGroupLabelsBeforeOption,\n   _ErrorStateTracker,\n+  _getOptionScrollPosition,\n   ErrorStateMatcher,\n+  MAT_OPTGROUP,\n+  MAT_OPTION_PARENT_COMPONENT,\n   MatOptgroup,\n   MatOption,\n   MatOptionSelectionChange,\n-  MAT_OPTGROUP,\n-  MAT_OPTION_PARENT_COMPONENT,\n-  _countGroupLabelsBeforeOption,\n-  _getOptionScrollPosition,\n } from '@angular/material/core';\n-import {MatFormField, MatFormFieldControl, MAT_FORM_FIELD} from '@angular/material/form-field';\n+import {MAT_FORM_FIELD, MatFormField, MatFormFieldControl} from '@angular/material/form-field';\n import {defer, merge, Observable, Subject} from 'rxjs';\n import {\n   distinctUntilChanged,\n@@ -542,6 +542,8 @@ export class MatSelect\n       ? this._defaultOptions.panelWidth\n       : 'auto';\n \n+  private _initialized = new Subject();\n+\n   /** Combined stream of all of the child options' change events. */\n   readonly optionSelectionChanges: Observable<MatOptionSelectionChange> = defer(() => {\n     const options = this.options;\n@@ -553,11 +555,8 @@ export class MatSelect\n       );\n     }\n \n-    return this._ngZone.onStable.pipe(\n-      take(1),\n-      switchMap(() => this.optionSelectionChanges),\n-    );\n-  }) as Observable<MatOptionSelectionChange>;\n+    return this._initialized.pipe(switchMap(() => this.optionSelectionChanges));\n+  });\n \n   /** Event emitted when the select panel has been toggled. */\n   @Output() readonly openedChange: EventEmitter<boolean> = new EventEmitter<boolean>();\n@@ -587,7 +586,11 @@ export class MatSelect\n   constructor(\n     protected _viewportRuler: ViewportRuler,\n     protected _changeDetectorRef: ChangeDetectorRef,\n-    protected _ngZone: NgZone,\n+    /**\n+     * @deprecated Unused param, will be removed.\n+     * @breaking-change 19.0.0\n+     */\n+    _unusedNgZone: NgZone,\n     defaultErrorStateMatcher: ErrorStateMatcher,\n     readonly _elementRef: ElementRef,\n     @Optional() private _dir: Directionality,\n@@ -650,6 +653,9 @@ export class MatSelect\n   }\n \n   ngAfterContentInit() {\n+    this._initialized.next();\n+    this._initialized.complete();\n+\n     this._initKeyManager();\n \n     this._selectionModel.changed.pipe(takeUntil(this._destroy)).subscribe(event => {\ndiff --git a/tools/public_api_guard/material/select.md b/tools/public_api_guard/material/select.md\nindex 5687aa74f..425893c04 100644\n--- a/tools/public_api_guard/material/select.md\n+++ b/tools/public_api_guard/material/select.md\n@@ -86,7 +86,8 @@ export { MatPrefix }\n \n // @public (undocumented)\n export class MatSelect implements AfterContentInit, OnChanges, OnDestroy, OnInit, DoCheck, ControlValueAccessor, MatFormFieldControl<any> {\n-    constructor(_viewportRuler: ViewportRuler, _changeDetectorRef: ChangeDetectorRef, _ngZone: NgZone, defaultErrorStateMatcher: ErrorStateMatcher, _elementRef: ElementRef, _dir: Directionality, parentForm: NgForm, parentFormGroup: FormGroupDirective, _parentFormField: MatFormField, ngControl: NgControl, tabIndex: string, scrollStrategyFactory: any, _liveAnnouncer: LiveAnnouncer, _defaultOptions?: MatSelectConfig | undefined);\n+    constructor(_viewportRuler: ViewportRuler, _changeDetectorRef: ChangeDetectorRef,\n+    _unusedNgZone: NgZone, defaultErrorStateMatcher: ErrorStateMatcher, _elementRef: ElementRef, _dir: Directionality, parentForm: NgForm, parentFormGroup: FormGroupDirective, _parentFormField: MatFormField, ngControl: NgControl, tabIndex: string, scrollStrategyFactory: any, _liveAnnouncer: LiveAnnouncer, _defaultOptions?: MatSelectConfig | undefined);\n     ariaLabel: string;\n     ariaLabelledby: string;\n     protected _canOpen(): boolean;\n@@ -153,8 +154,6 @@ export class MatSelect implements AfterContentInit, OnChanges, OnDestroy, OnInit\n     ngOnDestroy(): void;\n     // (undocumented)\n     ngOnInit(): void;\n-    // (undocumented)\n-    protected _ngZone: NgZone;\n     _onAttached(): void;\n     _onBlur(): void;\n     _onChange: (value: any) => void;\n",
+  "diff_sha256": "bbf6b2ab898e6ad29b5613a84274a9d44fcf8de8d6fdcd9c5b71b6801df32ed4",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "120ab123d79e58ea256211cafa50268dba3ce26524426e88b0347a8624aee68d",
+      "bytes": 46730
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/after-select-render.ts",
+      "sha256": "10a2bbbe02fb0a4578646e802888a5e075bb909a36fd1c19049b5fa2d731e570",
+      "bytes": 1231
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+      "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739",
+      "bytes": 20032
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+      "sha256": "0026c159543c040dc5e8c85baf25f37ec12130cab91841ff651eb96c797940fc",
+      "bytes": 233115
+    }
+  ],
+  "decision": "The upstream replacement of the zone stability wait is not transplanted wholesale: owned legacy source retains its historical onStable ordering and adds initialized readiness guarded by isStable, with a destroy bound. This is an individually reviewed source decision about the owned legacy branch; no runtime execution or full timing equivalence is asserted.",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "do-not-adopt",
+  "previous_ledger_entry_complete": {
+    "sha": "8abb33d7dc1bd6e2064eec732aacdb8d3ed5f5ae",
+    "bucket": "needs-triage",
+    "subject": "refactor(material/select): Remove use of zone onStable to wait for options (#28637)",
+    "files": [
+      "src/material/select/select.ts",
+      "tools/public_api_guard/material/select.md"
+    ],
+    "diff_sha256": "3730baac1eefa67c9e75013efe8ba10a2c7ad0de59662b1fb4fe527d13a9c493",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/8abb33d7dc1bd6e2064eec732aacdb8d3ed5f5ae.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/material/select/select.ts changes `LiveAnnouncer,`. That line is not in the legacy sources. @angular/material/select is exercised by projects/ngx-material-legacy/legacy-select/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/select imported by projects/ngx-material-legacy/legacy-select/public-api.ts"
+    }
+  },
+  "historical_reference": {
+    "tag": "16.2.14",
+    "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "snapshot": {
+      "path": "compatibility/f10/disposition-ledger/evidence/select-five-main-v1/historical-tag16-sources-v1.json",
+      "sha256": "0df39ea621ff2a2599e68fd0cf5123f063f3df4301626fe040c80c279fba2f72"
+    },
+    "scope": "untouched 16.2.14 source snapshots; no runtime claim"
+  },
+  "review_basis": {
+    "path": "select-individual-five/decisions.json",
+    "scope": "prior technical source review plus committed 0d6fb option notification correction",
+    "limitations": "Execution receipts remain external and artifact-specific; this record claims no execution, no matrix, security, G11 or release pass."
+  }
+}

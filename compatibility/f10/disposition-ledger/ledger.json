@@ -59696,18 +59696,45 @@
         "tools/public_api_guard/material/select.md"
       ],
       "diff_sha256": "3730baac1eefa67c9e75013efe8ba10a2c7ad0de59662b1fb4fe527d13a9c493",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/8abb33d7dc1bd6e2064eec732aacdb8d3ed5f5ae.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/select-five-main-v1/8abb33d7dc1bd6e2064eec732aacdb8d3ed5f5ae.json",
+      "batch_id": "individual-source-review-main-select-five-v1",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/select/select.ts changes `LiveAnnouncer,`. That line is not in the legacy sources. @angular/material/select is exercised by projects/ngx-material-legacy/legacy-select/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/select imported by projects/ngx-material-legacy/legacy-select/public-api.ts"
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "do-not-adopt",
+      "reason": "The upstream replacement of the zone stability wait is not transplanted wholesale: owned legacy source retains its historical onStable ordering and adds initialized readiness guarded by isStable, with a destroy bound. This is an individually reviewed source decision about the owned legacy branch; no runtime execution or full timing equivalence is asserted.",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "120ab123d79e58ea256211cafa50268dba3ce26524426e88b0347a8624aee68d",
+            "bytes": 46730
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/after-select-render.ts",
+            "sha256": "10a2bbbe02fb0a4578646e802888a5e075bb909a36fd1c19049b5fa2d731e570",
+            "bytes": 1231
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+            "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739",
+            "bytes": 20032
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+            "sha256": "0026c159543c040dc5e8c85baf25f37ec12130cab91841ff651eb96c797940fc",
+            "bytes": 233115
+          }
+        ],
+        "diff_sha256": "bbf6b2ab898e6ad29b5613a84274a9d44fcf8de8d6fdcd9c5b71b6801df32ed4",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream replacement of the zone stability wait is not transplanted wholesale: owned legacy source retains its historical onStable ordering and adds initialized readiness guarded by isStable, with a destroy bound. This is an individually reviewed source decision about the owned legacy branch; no runtime execution or full timing equivalence is asserted."
       }
     },
     {
@@ -62771,18 +62798,55 @@
         "src/material/select/select.ts"
       ],
       "diff_sha256": "b452d1b038b3c04f2850b4bcaf6555b504796e15ed675f92c3c945e0e6a0561e",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/02f626d5aa5abe99b0304fe96175473d197016fb.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/select-five-main-v1/02f626d5aa5abe99b0304fe96175473d197016fb.json",
+      "batch_id": "individual-source-review-main-select-five-v1",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/core/option/option.ts changes `signal,`. That line is not in the legacy sources. @angular/material/core is exercised by projects/ngx-material-legacy/legacy-menu/menu-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/core imported by projects/ngx-material-legacy/legacy-menu/menu-module.ts"
+      "final_disposition": "already-adapted",
+      "read_note_disposition": "already-adapted",
+      "reason": "The owned select ripple and option-group disabled reads use locally introduced signal notifications, and the owned option disabled getter now reads a private signal notified by its coercing setter while retaining the original boolean field. This source adaptation addresses the reviewed bidirectional state path without importing modern option internals; the conclusion itself asserts no runtime execution or complete behavioral matrix.",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/option/option-base.ts",
+            "sha256": "ec787fa20e331afb90856d2f413ca3551396f3f6954b30cc6de762a6864c931c",
+            "bytes": 8353
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/option/optgroup-base.ts",
+            "sha256": "e3a31d60c8ab4215bd4ee8db280fc1c3b1c2820444102664f70019f4b51f0519",
+            "bytes": 3622
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/option/option.ts",
+            "sha256": "fc4bb9db4bbfb5ede0680b572cab060ad23b6f91d84791f69c09706dfd57db31",
+            "bytes": 1783
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/option/option.html",
+            "sha256": "3fcdf934481ed432bbb7555ba58f58cdd6295dc682925a2d0ebfe852468d279d",
+            "bytes": 555
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "120ab123d79e58ea256211cafa50268dba3ce26524426e88b0347a8624aee68d",
+            "bytes": 46730
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+            "sha256": "0026c159543c040dc5e8c85baf25f37ec12130cab91841ff651eb96c797940fc",
+            "bytes": 233115
+          }
+        ],
+        "diff_sha256": "61fc3d41886e94aed48ec776ec9b3072762d9f5112da152d8239fd23161cec81",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The owned select ripple and option-group disabled reads use locally introduced signal notifications, and the owned option disabled getter now reads a private signal notified by its coercing setter while retaining the original boolean field. This source adaptation addresses the reviewed bidirectional state path without importing modern option internals; the conclusion itself asserts no runtime execution or complete behavioral matrix."
       }
     },
     {
@@ -63891,18 +63955,45 @@
         "src/material/select/_select-theme.scss"
       ],
       "diff_sha256": "92903cca584cf8066d5a7d06e9b4f68cf66ccba9835ed38ecf39d291b1ad0d97",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/010122ff2adebb7f7b6aff330044591ff771a966.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/select-five-main-v1/010122ff2adebb7f7b6aff330044591ff771a966.json",
+      "batch_id": "individual-source-review-main-select-five-v1",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/select/_m2-select.scss changes `@function get-color-tokens($theme, $palette-name: primary) {`. That line is not in the legacy sources. @angular/material/select is exercised by projects/ngx-material-legacy/legacy-select/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/select imported by projects/ngx-material-legacy/legacy-select/public-api.ts"
+      "final_disposition": "not-applicable",
+      "read_note_disposition": "not-applicable",
+      "reason": "The upstream change alters modern MDC M2 system-token color variants. Owned legacy select themes use historical foreground and primary, accent and warn palette text entries with legacy arrow selectors; the upstream system-token emitter is not an owned legacy target. The decision preserves the historical M2 source contract and asserts no forced-colors or native M3 execution.",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/_select-theme.scss",
+            "sha256": "e9180b3c4147955567b531defd61f6746b39286bef827339699e411060bc9ec1",
+            "bytes": 3400
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/legacy-select/_select-theme.scss",
+            "sha256": "42f5d0d0aa21b2034cee66aa1b022ffd7b6d7f17ad7f636bc2490cd4ccbdccc8",
+            "bytes": 3365
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.scss",
+            "sha256": "7f8269121e0d449b08966ea8fcb2544e0866243851317f429cea745caa96a45f",
+            "bytes": 6064
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/theming/_theming.scss",
+            "sha256": "54d065537ee74a0def763b52f37cdabd792b4a29820b02d135d7daf4b05c06e6",
+            "bytes": 24061
+          }
+        ],
+        "diff_sha256": "9b15e1fa4af6c36e25f088cfe4330f8b682a25e3432f2952cad81f8870319cd0",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream change alters modern MDC M2 system-token color variants. Owned legacy select themes use historical foreground and primary, accent and warn palette text entries with legacy arrow selectors; the upstream system-token emitter is not an owned legacy target. The decision preserves the historical M2 source contract and asserts no forced-colors or native M3 execution."
       }
     },
     {
@@ -66988,18 +67079,50 @@
         "src/material/core/option/option.scss"
       ],
       "diff_sha256": "e283e8bdb51413efd5fc1a6cfb940df5f4e8309b72b88a48124ac54910d1fcd2",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/5a1a0ba4e68c40886505c8c096f6c1257b9edb7b.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/select-five-main-v1/5a1a0ba4e68c40886505c8c096f6c1257b9edb7b.json",
+      "batch_id": "individual-source-review-main-select-five-v1",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/core/option/option.scss changes `&:not(.mat-mdc-option-multiple) {`. That line is not in the legacy sources. @angular/material/core is exercised by projects/ngx-material-legacy/legacy-menu/menu-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/core imported by projects/ngx-material-legacy/legacy-menu/menu-module.ts"
+      "final_disposition": "not-applicable",
+      "read_note_disposition": "not-applicable",
+      "reason": "The upstream change modifies an MDC selected-option token selector. Owned legacy option markup and historical M2 option/select styles use distinct mat-option, mat-active and palette selectors; the specific MDC cascade has no target in these owned files. Historical legacy styling is retained and no computed-style execution or broad accessibility conclusion is asserted.",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/option/option.ts",
+            "sha256": "fc4bb9db4bbfb5ede0680b572cab060ad23b6f91d84791f69c09706dfd57db31",
+            "bytes": 1783
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/option/option.scss",
+            "sha256": "04b18cbb5bc0113ff8983ba97b37d35e10a3e47000cb59e940718345efd75680",
+            "bytes": 2917
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/legacy-core/option/_option-theme.scss",
+            "sha256": "5936d345e3c7004fce80de9f1ce3787edd892cebfc7464a1b3ae567cafc09d31",
+            "bytes": 2945
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/_select-theme.scss",
+            "sha256": "e9180b3c4147955567b531defd61f6746b39286bef827339699e411060bc9ec1",
+            "bytes": 3400
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.html",
+            "sha256": "9d895bf6cbf1b2da7063acedc1fed7ee4cf7f10ce25bc7a797e8ee32875feec2",
+            "bytes": 2843
+          }
+        ],
+        "diff_sha256": "d7b2a960115743a781bc7e8277db251b62d670bd2dc2ecdd65acdf5812e3eeb5",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream change modifies an MDC selected-option token selector. Owned legacy option markup and historical M2 option/select styles use distinct mat-option, mat-active and palette selectors; the specific MDC cascade has no target in these owned files. Historical legacy styling is retained and no computed-style execution or broad accessibility conclusion is asserted."
       }
     },
     {
@@ -71283,18 +71406,50 @@
         "src/material/select/select.scss"
       ],
       "diff_sha256": "3220acf1ab37212834ee3780254839e2b689ca873cb458c9e162de31229c1833",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/ab21f78b122e3478970ba1c5204469a7cb95f45e.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/select-five-main-v1/ab21f78b122e3478970ba1c5204469a7cb95f45e.json",
+      "batch_id": "individual-source-review-main-select-five-v1",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/select/select.scss changes `$border-radius: 4px;`. That line is not in the legacy sources. @angular/material/select is exercised by projects/ngx-material-legacy/legacy-select/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/select imported by projects/ngx-material-legacy/legacy-select/public-api.ts"
+      "final_disposition": "not-applicable",
+      "read_note_disposition": "not-applicable",
+      "reason": "The upstream fix changes a modern MDC outer-overlay CSS cascade. Owned legacy markup binds an inline geometry-derived transform origin and its above fallback sets a bottom origin; the offending MDC pane selector is absent from the reviewed owned select styles. This is a source distinction only and does not assert nested-overlay runtime equivalence.",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+            "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739",
+            "bytes": 20032
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.html",
+            "sha256": "9d895bf6cbf1b2da7063acedc1fed7ee4cf7f10ce25bc7a797e8ee32875feec2",
+            "bytes": 2843
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.scss",
+            "sha256": "7f8269121e0d449b08966ea8fcb2544e0866243851317f429cea745caa96a45f",
+            "bytes": 6064
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "120ab123d79e58ea256211cafa50268dba3ce26524426e88b0347a8624aee68d",
+            "bytes": 46730
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+            "sha256": "0026c159543c040dc5e8c85baf25f37ec12130cab91841ff651eb96c797940fc",
+            "bytes": 233115
+          }
+        ],
+        "diff_sha256": "a0a1849645b7abfc88c83e9f98a6b3dcbf3c7cb6711dfeb8b9a926af0531a233",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream fix changes a modern MDC outer-overlay CSS cascade. Owned legacy markup binds an inline geometry-derived transform origin and its above fallback sets a bottom origin; the offending MDC pane selector is absent from the reviewed owned select styles. This is a source distinction only and does not assert nested-overlay runtime equivalence."
       }
     },
     {

@@ -1,0 +1,84 @@
+{
+  "sha": "02f626d5aa5abe99b0304fe96175473d197016fb",
+  "status": "reviewed",
+  "diff": "diff --git a/goldens/material/select/index.api.md b/goldens/material/select/index.api.md\nindex 2f5bc1a33..f48ebd9d2 100644\n--- a/goldens/material/select/index.api.md\n+++ b/goldens/material/select/index.api.md\n@@ -270,7 +270,8 @@ export class MatSelect implements AfterContentInit, OnChanges, OnDestroy, OnInit\n     readonly disableAutomaticLabeling = true;\n     disabled: boolean;\n     disableOptionCentering: boolean;\n-    disableRipple: boolean;\n+    get disableRipple(): boolean;\n+    set disableRipple(value: boolean);\n     // (undocumented)\n     readonly _elementRef: ElementRef<any>;\n     get empty(): boolean;\ndiff --git a/src/material/core/option/option.ts b/src/material/core/option/option.ts\nindex 1edd22678..f28e15291 100644\n--- a/src/material/core/option/option.ts\n+++ b/src/material/core/option/option.ts\n@@ -25,6 +25,7 @@ import {\n   inject,\n   isSignal,\n   Signal,\n+  signal,\n } from '@angular/core';\n import {Subject} from 'rxjs';\n import {MAT_OPTGROUP, MatOptgroup} from './optgroup';\n@@ -87,7 +88,6 @@ export class MatOption<T = any> implements FocusableOption, AfterViewChecked, On\n   private _signalDisableRipple = false;\n   private _selected = false;\n   private _active = false;\n-  private _disabled = false;\n   private _mostRecentViewValue = '';\n \n   /** Whether the wrapping component is in multiple selection mode. */\n@@ -109,11 +109,12 @@ export class MatOption<T = any> implements FocusableOption, AfterViewChecked, On\n   /** Whether the option is disabled. */\n   @Input({transform: booleanAttribute})\n   get disabled(): boolean {\n-    return (this.group && this.group.disabled) || this._disabled;\n+    return (this.group && this.group.disabled) || this._disabled();\n   }\n   set disabled(value: boolean) {\n-    this._disabled = value;\n+    this._disabled.set(value);\n   }\n+  private _disabled = signal(false);\n \n   /** Whether ripples for the option are disabled. */\n   get disableRipple(): boolean {\ndiff --git a/src/material/select/select.spec.ts b/src/material/select/select.spec.ts\nindex 67252a588..67506d56e 100644\n--- a/src/material/select/select.spec.ts\n+++ b/src/material/select/select.spec.ts\n@@ -38,7 +38,6 @@ import {\n   ViewChildren,\n   WritableSignal,\n   inject,\n-  provideCheckNoChangesConfig,\n   signal,\n } from '@angular/core';\n import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';\n@@ -84,7 +83,6 @@ describe('MatSelect', () => {\n     dir = signal('ltr');\n     TestBed.configureTestingModule({\n       providers: [\n-        provideCheckNoChangesConfig({exhaustive: false}),\n         {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},\n         provideFakeDirectionality(dir),\n         {\ndiff --git a/src/material/select/select.ts b/src/material/select/select.ts\nindex 4179e0d22..daa407e43 100644\n--- a/src/material/select/select.ts\n+++ b/src/material/select/select.ts\n@@ -61,6 +61,7 @@ import {\n   HostAttributeToken,\n   Renderer2,\n   Injector,\n+  signal,\n } from '@angular/core';\n import {\n   AbstractControl,\n@@ -414,7 +415,13 @@ export class MatSelect\n \n   /** Whether ripples in the select are disabled. */\n   @Input({transform: booleanAttribute})\n-  disableRipple: boolean = false;\n+  get disableRipple() {\n+    return this._disableRipple();\n+  }\n+  set disableRipple(value: boolean) {\n+    this._disableRipple.set(value);\n+  }\n+  private _disableRipple = signal(false);\n \n   /** Tab index of the select. */\n   @Input({\n",
+  "diff_sha256": "61fc3d41886e94aed48ec776ec9b3072762d9f5112da152d8239fd23161cec81",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option-base.ts",
+      "sha256": "ec787fa20e331afb90856d2f413ca3551396f3f6954b30cc6de762a6864c931c",
+      "bytes": 8353
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/optgroup-base.ts",
+      "sha256": "e3a31d60c8ab4215bd4ee8db280fc1c3b1c2820444102664f70019f4b51f0519",
+      "bytes": 3622
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option.ts",
+      "sha256": "fc4bb9db4bbfb5ede0680b572cab060ad23b6f91d84791f69c09706dfd57db31",
+      "bytes": 1783
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option.html",
+      "sha256": "3fcdf934481ed432bbb7555ba58f58cdd6295dc682925a2d0ebfe852468d279d",
+      "bytes": 555
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "120ab123d79e58ea256211cafa50268dba3ce26524426e88b0347a8624aee68d",
+      "bytes": 46730
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+      "sha256": "0026c159543c040dc5e8c85baf25f37ec12130cab91841ff651eb96c797940fc",
+      "bytes": 233115
+    }
+  ],
+  "decision": "The owned select ripple and option-group disabled reads use locally introduced signal notifications, and the owned option disabled getter now reads a private signal notified by its coercing setter while retaining the original boolean field. This source adaptation addresses the reviewed bidirectional state path without importing modern option internals; the conclusion itself asserts no runtime execution or complete behavioral matrix.",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "already-adapted",
+  "previous_ledger_entry_complete": {
+    "sha": "02f626d5aa5abe99b0304fe96175473d197016fb",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/select): resolve change after checked errors",
+    "files": [
+      "goldens/material/select/index.api.md",
+      "src/material/core/option/option.ts",
+      "src/material/select/select.spec.ts",
+      "src/material/select/select.ts"
+    ],
+    "diff_sha256": "b452d1b038b3c04f2850b4bcaf6555b504796e15ed675f92c3c945e0e6a0561e",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/02f626d5aa5abe99b0304fe96175473d197016fb.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/material/core/option/option.ts changes `signal,`. That line is not in the legacy sources. @angular/material/core is exercised by projects/ngx-material-legacy/legacy-menu/menu-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/core imported by projects/ngx-material-legacy/legacy-menu/menu-module.ts"
+    }
+  },
+  "historical_reference": {
+    "tag": "16.2.14",
+    "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "snapshot": {
+      "path": "compatibility/f10/disposition-ledger/evidence/select-five-main-v1/historical-tag16-sources-v1.json",
+      "sha256": "0df39ea621ff2a2599e68fd0cf5123f063f3df4301626fe040c80c279fba2f72"
+    },
+    "scope": "untouched 16.2.14 source snapshots; no runtime claim"
+  },
+  "review_basis": {
+    "path": "select-individual-five/decisions.json",
+    "scope": "prior technical source review plus committed 0d6fb option notification correction",
+    "limitations": "Execution receipts remain external and artifact-specific; this record claims no execution, no matrix, security, G11 or release pass."
+  }
+}

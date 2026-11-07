@@ -1,0 +1,76 @@
+{
+  "sha": "ab21f78b122e3478970ba1c5204469a7cb95f45e",
+  "status": "reviewed",
+  "diff": "diff --git a/src/material/select/select.scss b/src/material/select/select.scss\nindex 960356863..62786f255 100644\n--- a/src/material/select/select.scss\n+++ b/src/material/select/select.scss\n@@ -151,35 +151,29 @@ div.mat-mdc-select-panel {\n // DOM for the Gmat versions to work. We need to bump up the specificity here\n // so that it's higher than MDC's styles.\n div.mat-mdc-select-panel {\n+  $border-radius: 4px;\n   width: 100%; // Ensures that the panel matches the overlay width.\n   max-height: $mat-select-panel-max-height;\n   outline: 0;\n   overflow: auto;\n   padding: 8px 0;\n-  border-radius: 4px;\n   box-sizing: border-box;\n+  transform-origin: top center;\n+  border-radius: 0 0 $border-radius $border-radius;\n \n   // Necessary so the `offsetParent` of the nested `mat-option` is the\n   // panel which is required for scroll calculations (see #30974).\n   position: relative;\n-\n   background-color: token-utils.slot(select-panel-background-color, $fallbacks);\n \n-  @include cdk.high-contrast {\n-    outline: solid 1px;\n-  }\n-\n-  .cdk-overlay-pane:not(.mat-mdc-select-panel-above) & {\n-    border-top-left-radius: 0;\n-    border-top-right-radius: 0;\n-    transform-origin: top center;\n-  }\n-\n   .mat-mdc-select-panel-above & {\n-    border-bottom-left-radius: 0;\n-    border-bottom-right-radius: 0;\n+    border-radius: $border-radius $border-radius 0 0;\n     transform-origin: bottom center;\n   }\n+\n+  @include cdk.high-contrast {\n+    outline: solid 1px;\n+  }\n }\n \n .mat-select-panel-animations-enabled {\n",
+  "diff_sha256": "a0a1849645b7abfc88c83e9f98a6b3dcbf3c7cb6711dfeb8b9a926af0531a233",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+      "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739",
+      "bytes": 20032
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.html",
+      "sha256": "9d895bf6cbf1b2da7063acedc1fed7ee4cf7f10ce25bc7a797e8ee32875feec2",
+      "bytes": 2843
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.scss",
+      "sha256": "7f8269121e0d449b08966ea8fcb2544e0866243851317f429cea745caa96a45f",
+      "bytes": 6064
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "120ab123d79e58ea256211cafa50268dba3ce26524426e88b0347a8624aee68d",
+      "bytes": 46730
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+      "sha256": "0026c159543c040dc5e8c85baf25f37ec12130cab91841ff651eb96c797940fc",
+      "bytes": 233115
+    }
+  ],
+  "decision": "The upstream fix changes a modern MDC outer-overlay CSS cascade. Owned legacy markup binds an inline geometry-derived transform origin and its above fallback sets a bottom origin; the offending MDC pane selector is absent from the reviewed owned select styles. This is a source distinction only and does not assert nested-overlay runtime equivalence.",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "not-applicable",
+  "previous_ledger_entry_complete": {
+    "sha": "ab21f78b122e3478970ba1c5204469a7cb95f45e",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/select): wrong transform origin when opening upwards inside another overlay (#33032)",
+    "files": [
+      "src/material/select/select.scss"
+    ],
+    "diff_sha256": "3220acf1ab37212834ee3780254839e2b689ca873cb458c9e162de31229c1833",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/ab21f78b122e3478970ba1c5204469a7cb95f45e.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/material/select/select.scss changes `$border-radius: 4px;`. That line is not in the legacy sources. @angular/material/select is exercised by projects/ngx-material-legacy/legacy-select/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/select imported by projects/ngx-material-legacy/legacy-select/public-api.ts"
+    }
+  },
+  "historical_reference": {
+    "tag": "16.2.14",
+    "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "snapshot": {
+      "path": "compatibility/f10/disposition-ledger/evidence/select-five-main-v1/historical-tag16-sources-v1.json",
+      "sha256": "0df39ea621ff2a2599e68fd0cf5123f063f3df4301626fe040c80c279fba2f72"
+    },
+    "scope": "untouched 16.2.14 source snapshots; no runtime claim"
+  },
+  "review_basis": {
+    "path": "select-individual-five/decisions.json",
+    "scope": "prior technical source review plus committed 0d6fb option notification correction",
+    "limitations": "Execution receipts remain external and artifact-specific; this record claims no execution, no matrix, security, G11 or release pass."
+  }
+}
