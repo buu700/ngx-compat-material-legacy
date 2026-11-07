@@ -43,6 +43,6 @@ export {
 
   MAT_MENU_CONTENT as MAT_LEGACY_MENU_CONTENT,
 } from '@angular/material/menu';
-export {MatCommonModule} from './internal/common-module';
+export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 export type {MatMenuPanel as MatLegacyMenuPanel} from './internal/menu-panel';
 export {MAT_MENU_PANEL as MAT_LEGACY_MENU_PANEL} from './internal/menu-panel-token';

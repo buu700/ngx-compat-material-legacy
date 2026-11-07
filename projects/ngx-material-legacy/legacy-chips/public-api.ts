@@ -24,4 +24,4 @@ export {
   MatLegacyChipsDefaultOptions,
   MAT_LEGACY_CHIPS_DEFAULT_OPTIONS,
 } from './chip-default-options';
-export {MatCommonModule} from './internal/common-module';
+export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';

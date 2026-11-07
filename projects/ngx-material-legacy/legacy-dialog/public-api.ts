@@ -56,4 +56,4 @@ export {
 
   MatDialogState as MatLegacyDialogState,
 } from '@angular/material/dialog';
-export {MatCommonModule} from './internal/common-module';
+export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';

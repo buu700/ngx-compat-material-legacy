@@ -9,7 +9,7 @@
 
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {MatCommonModule} from './internal/common-module';
+import {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
 import {MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';
 import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';

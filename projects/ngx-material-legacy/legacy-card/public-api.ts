@@ -23,4 +23,4 @@ export {
   MatLegacyCardTitleGroup,
 } from './card';
 export {MatLegacyCardModule} from './card-module';
-export {MatCommonModule} from './internal/common-module';
+export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';

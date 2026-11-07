@@ -29,7 +29,7 @@ import {
   MatLegacyNoDataRow,
 } from './row';
 import {MatLegacyTextColumn} from './text-column';
-import {MatCommonModule} from './internal/common-module';
+import {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 import {_LegacyTableOutlet} from './internal/table-outlet';
 import {_LegacyTableDefinitionOwner} from './internal/definition-owner';
 import {_LegacyTableColumnClasses} from './internal/column-classes';

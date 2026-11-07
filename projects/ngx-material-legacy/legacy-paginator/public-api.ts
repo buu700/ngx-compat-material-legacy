@@ -28,4 +28,4 @@ export {
 
   MatPaginatorSelectConfig as MatLegacyPaginatorSelectConfig,
 } from '@angular/material/paginator';
-export {MatCommonModule} from './internal/common-module';
+export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';

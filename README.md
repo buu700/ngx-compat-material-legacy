@@ -51,6 +51,8 @@ Derived from `angular/components` tag `16.2.14`, with history preserved (baselin
 
 Legacy and current radio buttons should be placed in separate groups for their respective generation. A current radio group is not a supported parent for a legacy radio button, or vice versa. The legacy radio group token retains its shared public identity.
 
+The root and family `MatCommonModule` exports share the class from `legacy-core`. Import it through Angular modules for shared initialization. Direct construction uses the historical three-argument constructor; the earlier add-on stubs' zero-argument constructor is no longer supported.
+
 ## Planned release/support model
 
 Package major follows Angular major. `main` tracks the active Angular line; a numbered maintenance branch tracks the immediately preceding supported/LTS major. Initial intended lines are 22.x (active) and 21.x (LTS), with RCs before stable releases. Exact peer minimums are published from the tested matrix and may be raised for security fixes.

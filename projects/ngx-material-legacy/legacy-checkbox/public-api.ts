@@ -34,7 +34,7 @@ export {
 
 export {MAT_CHECKBOX_DEFAULT_OPTIONS_FACTORY as MAT_LEGACY_CHECKBOX_DEFAULT_OPTIONS_FACTORY} from './internal/checkbox-base';
 export {_MatCheckboxBase as _MatLegacyCheckboxBase} from './internal/checkbox-base';
-export {MatCommonModule} from './internal/common-module';
+export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 
 export {
 

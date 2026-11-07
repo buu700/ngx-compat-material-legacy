@@ -22,4 +22,4 @@ export {
   MAT_SLIDE_TOGGLE_REQUIRED_VALIDATOR as MAT_LEGACY_SLIDE_TOGGLE_REQUIRED_VALIDATOR,
   MatSlideToggleRequiredValidator as MatLegacySlideToggleRequiredValidator,
 } from './internal/slide-toggle-required-validator';
-export {MatCommonModule} from './internal/common-module';
+export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';

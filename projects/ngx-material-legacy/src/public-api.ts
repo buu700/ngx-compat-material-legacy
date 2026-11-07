@@ -5,5 +5,5 @@
  */
 export const NGX_MATERIAL_LEGACY_PACKAGE = '@ngx-compat/material-legacy' as const;
 
-/** Shared NgModule stand-in used by legacy entry NgModules. */
-export {MatCommonModule} from './internal/common-module';
+/** Shared legacy NgModule. */
+export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';

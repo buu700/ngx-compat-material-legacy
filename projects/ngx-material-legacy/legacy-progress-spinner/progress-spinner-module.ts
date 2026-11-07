@@ -8,7 +8,7 @@
  */
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {MatCommonModule} from './internal/common-module';
+import {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 import {MatLegacyProgressSpinner} from './progress-spinner';
 
 

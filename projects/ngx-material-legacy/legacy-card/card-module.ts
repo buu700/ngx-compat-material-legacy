@@ -8,7 +8,7 @@
  */
 
 import {NgModule} from '@angular/core';
-import {MatCommonModule} from './internal/common-module';
+import {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 import {
   MatLegacyCard,
   MatLegacyCardActions,

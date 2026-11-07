@@ -10,7 +10,7 @@
 import {TextFieldModule} from '@angular/cdk/text-field';
 import {NgModule} from '@angular/core';
 import {ErrorStateMatcher} from '@angular/material/core';
-import {MatCommonModule} from './internal/common-module';
+import {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 import {MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
 import {MatLegacyInput} from './input';
 

@@ -11,7 +11,7 @@ import {DialogModule} from '@angular/cdk/dialog';
 import {OverlayModule} from '@angular/cdk/overlay';
 import {PortalModule} from '@angular/cdk/portal';
 import {NgModule} from '@angular/core';
-import {MatCommonModule} from './internal/common-module';
+import {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 import {MAT_LEGACY_DIALOG_SCROLL_STRATEGY_PROVIDER, MatLegacyDialog} from './dialog';
 import {MatLegacyDialogContainer} from './dialog-container';
 import {

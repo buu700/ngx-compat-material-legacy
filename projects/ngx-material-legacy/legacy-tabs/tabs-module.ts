@@ -13,7 +13,7 @@ import {PortalModule} from '@angular/cdk/portal';
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {MatRippleModule} from '@angular/material/core';
-import {MatCommonModule} from './internal/common-module';
+import {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 import {MatLegacyInkBar} from './ink-bar';
 import {MatLegacyTab} from './tab';
 import {MatLegacyTabBody, MatLegacyTabBodyPortal} from './tab-body';

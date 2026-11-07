@@ -25,4 +25,4 @@ export {
   _MatRadioGroupBase as _MatLegacyRadioGroupBase,
   _MatRadioButtonBase as _MatLegacyRadioButtonBase,
 } from './internal/radio-base';
-export {MatCommonModule} from './internal/common-module';
+export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';

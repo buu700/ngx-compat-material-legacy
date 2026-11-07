@@ -24,7 +24,7 @@ export {
   MAT_SELECT_TRIGGER as MAT_LEGACY_SELECT_TRIGGER,
 } from '@angular/material/select';
 
-export {MatCommonModule} from './internal/common-module';
+export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 
 export {
   MAT_SELECT_SCROLL_STRATEGY as MAT_LEGACY_SELECT_SCROLL_STRATEGY,

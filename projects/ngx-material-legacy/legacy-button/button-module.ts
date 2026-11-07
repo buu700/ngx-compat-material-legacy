@@ -9,7 +9,7 @@
 
 import {NgModule} from '@angular/core';
 import {MatRippleModule} from '@angular/material/core';
-import {MatCommonModule} from './internal/common-module';
+import {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 import {MatLegacyAnchor, MatLegacyButton} from './button';
 
 

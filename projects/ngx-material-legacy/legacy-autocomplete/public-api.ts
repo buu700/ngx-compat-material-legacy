@@ -37,7 +37,7 @@ export {
 
   MatAutocompleteDefaultOptions as MatLegacyAutocompleteDefaultOptions,
 } from '@angular/material/autocomplete';
-export {MatCommonModule} from './internal/common-module';
+export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 
 export {
 

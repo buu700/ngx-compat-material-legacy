@@ -8,4 +8,4 @@
 
 export {MatLegacySliderModule} from './slider-module';
 export {MAT_LEGACY_SLIDER_VALUE_ACCESSOR, MatLegacySliderChange, MatLegacySlider} from './slider';
-export {MatCommonModule} from './internal/common-module';
+export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';

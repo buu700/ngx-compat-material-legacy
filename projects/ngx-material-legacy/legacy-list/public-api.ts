@@ -31,4 +31,4 @@ export {
 
   MAT_NAV_LIST as MAT_LEGACY_NAV_LIST,
 } from '@angular/material/list';
-export {MatCommonModule} from './internal/common-module';
+export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
