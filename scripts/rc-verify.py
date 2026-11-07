@@ -1,7 +1,3 @@
-# @license
-# Copyright Google LLC All Rights Reserved.
-# Copyright (c) 2026 Ryan Lester.
-# Use of this source code is governed by the MIT license in LICENSE.
 #!/usr/bin/env python3
 """Finite RC automatic product gate (RC-02.04 incremental orchestration).
 
