@@ -1,8 +1,9 @@
 /** Validate every npm archive member before extracting into a fresh package root. */
 import {spawnSync} from 'node:child_process';
 import {join} from 'node:path';
-export function extractPackageArchive(tarball, destination, {maxFiles=20000,maxBytes=100*1024*1024} = {}) {
+export function extractPackageArchive(tarball, destination, {maxFiles=20000,maxBytes=100*1024*1024,pythonExecutable='python3',pythonIsolated=false} = {}) {
   if (!Number.isSafeInteger(maxFiles) || maxFiles<1 || !Number.isSafeInteger(maxBytes) || maxBytes<1) throw new Error('invalid archive limits');
+  if (typeof pythonIsolated !== 'boolean') throw new Error('invalid Python isolation option');
   const python = `import sys,tarfile,pathlib,gzip,io
 archive,destination=sys.argv[1:3]; limit_files,limit_bytes=map(int,sys.argv[3:])
 root=pathlib.Path(destination)
@@ -25,7 +26,7 @@ with tarfile.open(fileobj=io.BytesIO(data),mode='r:') as t:
  root.mkdir(parents=True,exist_ok=True)
  t.extractall(root,filter='data')
 `;
-  const result=spawnSync('python3',['-c',python,tarball,destination,String(maxFiles),String(maxBytes)],{encoding:'utf8',timeout:30000});
+  const result=spawnSync(pythonExecutable,[...(pythonIsolated?['-I']:[]),'-c',python,tarball,destination,String(maxFiles),String(maxBytes)],{encoding:'utf8',timeout:30000});
   if (result.status!==0 || result.error) throw new Error('package extraction refused: '+String(result.stderr || result.error?.message || result.stdout));
   return join(destination,'package');
 }
