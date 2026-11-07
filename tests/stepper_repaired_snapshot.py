@@ -44,6 +44,7 @@ assert _DARK == dict.fromkeys(_DARK, 'rgba(255, 255, 255, 0.04)')
 def repaired_stepper_css(css, line):
     """Project a frozen CSS sample through the four observed bridge edits."""
     assert line in ('main', '21.x') and isinstance(css, str)
+    if line == 'main': return css
     substitutions = []
     for name in ('header-focus-state-layer-shape', 'header-hover-state-layer-shape'):
         pattern = r'(?m)^  --mat-stepper-' + name + r': ([^;\n]+);$'

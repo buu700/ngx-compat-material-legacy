@@ -1,9 +1,8 @@
 /**
  * In-run current-peer M2 oracle for the thirteen companion bridges.
  *
- * Current peers supply the expectation for every rostered token except the
- * four owned Material-16 Stepper colors and two square state-layer shapes.
- * Those six values come from authenticated tagged-reference observations.
+ * Main uses current peer values for every rostered token. The 21.x historical
+ * Stepper interpretation remains unchanged pending its own backport review.
  *
  * Checker-only: the product bridges never call the peer's m2 Sass; this module
  * compiles the peer only to obtain the expected values and compares them with
@@ -251,8 +250,8 @@ export function peerSourceFor(materialRoot, component, key) {
 /**
  * Pure comparison. `peer`/`candidate` are maps scenarioId -> parsed custom
  * properties. The installed peer must emit every token. For six finite Stepper
- * fields, the candidate must instead equal the tagged historical value; all
- * other declarations must equal the peer in every selector and scenario.
+ * fields on 21.x, the candidate must instead equal the tagged historical value;
+ * main declarations must equal the peer in every selector and scenario.
  */
 export function compareTokens({caseIds, peer, candidate, sources, line}) {
   const cases = [];
@@ -261,7 +260,7 @@ export function compareTokens({caseIds, peer, candidate, sources, line}) {
     Object.keys(measurements).length === requiredScenarios.length
       && requiredScenarios.every(id => Object.hasOwn(measurements, id)));
   for (const token of caseIds) {
-    const historical = HISTORICAL_STEPPER_TOKENS.has(token);
+    const historical = line === '21.x' && HISTORICAL_STEPPER_TOKENS.has(token);
     const scenarios = [];
     let ok = Boolean(sources[token]) && complete;
     for (const scenarioId of requiredScenarios) {
@@ -393,11 +392,11 @@ export function writeAssertions(dir, oracle, {runId, invocationId, line} = {}) {
       peer_package_json_sha256: oracle.identity.package_json_sha256,
       peer_source_file: entry.peer_source_file,
       peer_source_sha256: entry.peer_source_sha256,
-      oracle: HISTORICAL_STEPPER_TOKENS.has(entry.token)
+      oracle: line === '21.x' && HISTORICAL_STEPPER_TOKENS.has(entry.token)
         ? 'tagged Material 16 Stepper CSS and shape; current peer measured in this invocation'
         : 'current-peer m2-define-*-theme + mat.<companion>-theme compiled in this invocation',
       expected_peer: entry.expected_peer,
-      ...(HISTORICAL_STEPPER_TOKENS.has(entry.token) ? {expected_historical: entry.expected_historical,
+      ...(line === '21.x' && HISTORICAL_STEPPER_TOKENS.has(entry.token) ? {expected_historical: entry.expected_historical,
         historical_oracle: entry.historical_oracle} : {}),
       candidate: entry.candidate,
       scenarios: entry.scenarios,

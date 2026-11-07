@@ -51,7 +51,6 @@ from sass_ordered_aggregate_admission import ORDERED_AGGREGATE_CASES, ordered_ag
 from sass_default_companion_admission import DEFAULT_COMPANION_CASES, default_companion_envelope_ok
 from sass_default_mapped_companion_admission import DEFAULT_MAPPED_COMPANION_CASES, default_mapped_companion_envelope_ok
 from sass_default_aggregate_admission import DEFAULT_AGGREGATE_CASES, default_aggregate_envelope_ok
-from sass_stepper_historical_oracle import TOKENS as HISTORICAL_STEPPER_TOKENS, SCENARIOS as HISTORICAL_STEPPER_SCENARIOS, PROOF as HISTORICAL_STEPPER_PROOF, stepper_historical_value
 from sass_form_field_state_admission import FORM_FIELD_STATE_DEFAULT_CASES, form_field_state_default_envelope_ok
 from sass_ripple_color_admission import RIPPLE_COLOR_DEFAULT_CASES, RIPPLE_COLOR_ORDERED_CASES, ripple_color_envelope_ok
 from m3_rendered_admission import complete_rendered_checks
@@ -1047,6 +1046,10 @@ def _roster_assertion_records(run_dir: Path, check_id: str, invocation: str, exp
 
 
 _PEER_SOURCE_FILE = re.compile(r"^([a-z0-9-]+)/_m2-\1\.scss$")
+_BRIDGE_TOKEN_SCENARIOS = (
+    "contract", "alternate", "closeout-custom-2018-light", "closeout-custom-2018-dark",
+    "closeout-custom-legacy-light", "closeout-custom-legacy-dark",
+)
 
 
 def _current_peer_version(package: str) -> str | None:
@@ -1063,9 +1066,12 @@ def _bridge_token_assertion_ok(body: dict, invocation: str) -> bool:
     It must name this run and invocation, the run's frozen @angular/material
     peer version, the peer M2 token source for its component, and carry a
     non-empty candidate value equal to the peer value in every selector of
-    every compared theme scenario, except the six pinned Material-16 Stepper
-    values whose tagged-reference CSS and shape are independently checked.
+    every compared theme scenario. This coordinator admits main only.
     """
+    if (body.get("check_id") != "companion-bridge-tokens" or
+            body.get("group") != "compiled-override-tokens" or
+            body.get("line") != "main" or ACTIVE_RUN.binding.get("source_line") != "main"):
+        return False
     case_id = body.get("case_id")
     component = body.get("component")
     key = body.get("allowed_key")
@@ -1089,27 +1095,20 @@ def _bridge_token_assertion_ok(body: dict, invocation: str) -> bool:
     expected, candidate = body.get("expected_peer"), body.get("candidate")
     if not (isinstance(expected, str) and expected):
         return False
-    historical = case_id in HISTORICAL_STEPPER_TOKENS
-    if historical:
-        line = body.get("line")
-        if (line not in ("main", "21.x") or
-            peer_version != {"main": "22.1.7", "21.x": "21.2.14"}[line] or
-            body.get("historical_oracle") != HISTORICAL_STEPPER_PROOF or
-            body.get("expected_historical") != stepper_historical_value(line, "contract", case_id) or
-            candidate != body["expected_historical"]):
-            return False
-    elif (candidate != expected or "historical_oracle" in body or "expected_historical" in body):
+    if candidate != expected or "historical_oracle" in body or "expected_historical" in body:
         return False
     scenarios = body.get("scenarios")
-    if not isinstance(scenarios, list) or not scenarios:
-        return False
-    if historical and [s.get("id") if isinstance(s, dict) else None for s in scenarios] != list(HISTORICAL_STEPPER_SCENARIOS):
+    if (not isinstance(scenarios, list) or
+            [scenario.get("id") if isinstance(scenario, dict) else None for scenario in scenarios]
+            != list(_BRIDGE_TOKEN_SCENARIOS)):
         return False
     for scenario in scenarios:
         checks = scenario.get("selector_checks") if isinstance(scenario, dict) else None
         if scenario.get("match") is not True or not isinstance(checks, list) or not checks:
             return False
-        if historical and (len(checks) != 1 or not isinstance(checks[0], dict) or checks[0].get("selector") != ":root"):
+        selectors = [check.get("selector") if isinstance(check, dict) else None for check in checks]
+        if (not all(isinstance(selector, str) and selector for selector in selectors) or
+                len(set(selectors)) != len(selectors) or ":root" not in selectors):
             return False
         for check in checks:
             if not isinstance(check, dict) or check.get("match") is not True:
@@ -1117,12 +1116,11 @@ def _bridge_token_assertion_ok(body: dict, invocation: str) -> bool:
             value = check.get("expected_peer")
             if not (isinstance(value, str) and value):
                 return False
-            if historical:
-                historical_value = stepper_historical_value(body["line"], scenario["id"], case_id)
-                if check.get("expected_historical") != historical_value or check.get("candidate") != historical_value:
-                    return False
-            elif (check.get("candidate") != value or "expected_historical" in check):
+            if check.get("candidate") != value or "expected_historical" in check:
                 return False
+            if scenario["id"] == "contract" and check["selector"] == ":root":
+                if value != expected or check["candidate"] != candidate:
+                    return False
     return True
 
 

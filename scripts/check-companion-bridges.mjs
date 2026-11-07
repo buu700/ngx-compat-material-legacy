@@ -12,8 +12,8 @@
  * (companion-bridge-peer-oracle.mjs): the installed @angular/material peer is
  * compiled with its own m2 theme constructors and companion theme mixins, and
  * every rostered allowed token (root and accent/warn variant declarations)
- * must equal its finite expected value. Six Stepper fields use tagged Material
- * 16 evidence; the other tokens use the installed peer. One assertion per
+ * must equal its finite expected value. Main uses the installed peer for all
+ * tokens; 21.x retains its six tagged Stepper expectations. One assertion per
  * token is written to RC_ASSERTION_OUTPUT_DIR.
  *
  * Does not render components or claim G06–G08 / RC-05-A02.
@@ -313,7 +313,7 @@ const report = {
   g06_g07_g08_claim: 'not-passed',
   limitations: [
     'Compiled CSS custom-property inventory against owned $*-allowed lists and public *-overrides forwards.',
-    'Expected values are current peer M2 output except six Stepper fields from authenticated tagged Material 16 CSS and shape.',
+    'Main expected values are current peer M2 output; 21.x retains six tagged Material 16 Stepper expectations.',
     'No browser/DOM computed-style rows were captured (not RC-05-A02 / G07).',
     'Does not claim ordered aggregate CSS parity or G06–G08.',
   ],
@@ -323,7 +323,7 @@ mkdirSync(path.dirname(reportPath), {recursive: true});
 writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n');
 
 // Refresh the lighter map report limitations so handoff points at token receipts.
-if (existsSync(mapReportPath)) {
+if (process.env.RC_CHECK_ID !== 'companion-bridge-tokens' && existsSync(mapReportPath)) {
   try {
     const map = JSON.parse(readFileSync(mapReportPath, 'utf8'));
     map.token_receipts = 'compatibility/rc/reports/companion-bridge-tokens.json';

@@ -42,30 +42,84 @@ $before: $cl;
 @if $cl != $before { @error 'consumer theme was mutated'; }
 `;
 const css = sass.compileString(source, {loadPaths:[resolve(root,'node_modules')], logger:{warn(){}}}).css;
-function declarations(cssText, selector) {
+function declarations(cssText, selector, first = false) {
  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
  const blocks = [...cssText.matchAll(new RegExp(`(?:^|\\n)${escaped} \\{([^{}]*)\\}`, 'g'))];
  assert.ok(blocks.length, `${selector} missing`);
  const values = new Map();
- for (const [,body] of blocks) for (const [,key,value] of body.matchAll(/(--mat-stepper-[\w-]+):\s*([^;]+);/g)) values.set(key,value.trim());
+ for (const [,body] of blocks) for (const [,key,value] of body.matchAll(/(--mat-stepper-[\w-]+):\s*([^;]+);/g)) { if (!first || !values.has(key)) values.set(key,value.trim()); }
  return values;
 }
 const colors = ['header-hover-state-layer-color','header-focus-state-layer-color','header-error-state-label-text-color','header-error-state-icon-foreground-color'];
+// The first emitted declarations retain the authenticated historical prefix;
+// the current-companion bridge follows it and is compared independently below.
 for (const name of ['light','dark','custom-light','custom-dark']) {
  const expected = declarations(golden.toString(), `.${name}`);
- for (const selector of [`.${name}`, `.color-${name}`, `.bridge-${name}`]) {
-  const actual = declarations(css, selector);
+ for (const selector of [`.${name}`, `.color-${name}`]) {
+  const historical = declarations(css, selector, true);
   for (const token of colors) {
    const key = `--mat-stepper-${token}`;
-   assert.ok(expected.has(key), `historical ${name} ${token} missing`);
-   assert.equal(actual.get(key), expected.get(key), `${selector} ${token}`);
+   assert.equal(historical.get(key), expected.get(key), `${selector} historical ${token}`);
   }
-  // Material 16's header has square state layers (observed before the public
-  // shape tokens existed); newer peers must be explicitly reset to zero.
-  for (const state of ['hover','focus']) {
-   const observed = shape.cases[name][state];
-   assert.equal(observed, '0px', `historical ${name} ${state} shape`);
-   assert.equal(actual.get(`--mat-stepper-header-${state}-state-layer-shape`), '0', `${selector} ${state} shape`);
+ }
+}
+// Full six-scenario comparison against independently compiled public peer themes.
+const {runPeerOracle, SCENARIOS, themeSass, compilePeer} = await import('../scripts/companion-bridge-peer-oracle.mjs');
+const oracle = runPeerOracle(root);
+for (const token of [...colors, 'header-focus-state-layer-shape', 'header-hover-state-layer-shape']) {
+ const row = oracle.cases.find(item => item.case_id === `--mat-stepper-${token}`);
+ assert.equal(row?.result, 'pass', token);
+}
+for (const scenario of SCENARIOS) {
+ const candidateProgram = `@use 'projects/ngx-material-legacy' as legacy;\n${themeSass('legacy', scenario, {m2Prefix: ''})}
+ .direct-theme { @include legacy.stepper-theme($theme); }
+ .direct-color { @include legacy.stepper-color($theme); }
+ .all-bridge { @include legacy.all-current-companion-bridges($theme); }`;
+ const candidateCss = sass.compileString(candidateProgram, {loadPaths:[root,resolve(root,'node_modules')], logger:{warn(){}}}).css;
+ const peer = declarations(compilePeer(root, scenario), '.peer');
+ for (const selector of ['.direct-theme', '.direct-color', '.all-bridge']) {
+  const current = declarations(candidateCss, selector);
+  for (const token of [...colors, 'header-focus-state-layer-shape', 'header-hover-state-layer-shape']) {
+   const key = `--mat-stepper-${token}`;
+   assert.ok(peer.has(key), `${scenario.id} peer missing ${key}`);
+   assert.equal(current.get(key), peer.get(key), `${scenario.id} ${selector} current ${key}`);
+  }
+ }
+}
+// A consumer may edit the nested owned M2 config after theme construction.
+// Reconstruct a fresh public peer theme from that effective config: replaying
+// the edit on a peer theme would retain the peer's constructor-time cache.
+const setup = input.toString().slice(0, input.toString().indexOf('.light {'))
+  .replace("'@angular/material'", JSON.stringify(entry));
+const postProgram = `@use '@angular/material' as peer;\n${setup}
+$cl-before: $cl; $cd-before: $cd;
+$peer-cl: peer.m2-define-light-theme((color: map.get($cl, color)));
+$peer-cd: peer.m2-define-dark-theme((color: map.get($cd, color)));
+.post-light-theme { @include m.stepper-theme($cl); }
+.post-light-color { @include m.stepper-color($cl); }
+.post-light-bridge { @include m.all-current-companion-bridges($cl); }
+.post-light-peer { @include peer.stepper-theme($peer-cl); }
+.post-dark-theme { @include m.stepper-theme($cd); }
+.post-dark-color { @include m.stepper-color($cd); }
+.post-dark-bridge { @include m.all-current-companion-bridges($cd); }
+.post-dark-peer { @include peer.stepper-theme($peer-cd); }
+@if $cl != $cl-before or $cd != $cd-before { @error 'consumer theme was mutated'; }`;
+const postCss = sass.compileString(postProgram, {loadPaths:[root,resolve(root,'node_modules')], logger:{warn(){}}}).css;
+for (const [variant, expectedCurrent, expectedHistorical] of [
+ ['light', '#8a1234', '#1166aa'], ['dark', '#d31862', '#f4c208'],
+]) {
+ const peer = declarations(postCss, `.post-${variant}-peer`);
+ assert.equal(peer.get('--mat-stepper-header-error-state-label-text-color'), expectedCurrent);
+ for (const route of ['theme', 'color', 'bridge']) {
+  const selector = `.post-${variant}-${route}`;
+  const current = declarations(postCss, selector);
+  for (const token of [...colors, 'header-focus-state-layer-shape', 'header-hover-state-layer-shape']) {
+   const key = `--mat-stepper-${token}`;
+   assert.ok(peer.has(key), `${selector} fresh peer missing ${key}`);
+   assert.equal(current.get(key), peer.get(key), `${selector} ${key}`);
+  }
+  if (route !== 'bridge') {
+   assert.equal(declarations(postCss, selector, true).get('--mat-stepper-header-error-state-label-text-color'), expectedHistorical);
   }
  }
 }

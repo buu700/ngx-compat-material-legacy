@@ -37,6 +37,7 @@ for (const name of names) {
 export function repairedStepperCss(css, line) {
   assert.ok(line === 'main' || line === '21.x');
   assert.equal(typeof css, 'string');
+  if (line === 'main') return css;
   const edits = [];
   for (const name of ['header-focus-state-layer-shape', 'header-hover-state-layer-shape']) {
     const pattern = new RegExp(`^  --mat-stepper-${name}: ([^;\\n]+);$`, 'gm');

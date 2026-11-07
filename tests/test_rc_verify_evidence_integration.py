@@ -713,6 +713,7 @@ class CoordinatorTests(unittest.TestCase):
             "schema_version": 1,
             "kind": "assertion",
             "check_id": "companion-bridge-tokens",
+            "group": "compiled-override-tokens",
             "line": "main",
             "case_id": case_id,
             "result": "pass",
@@ -727,8 +728,11 @@ class CoordinatorTests(unittest.TestCase):
             "peer_source_sha256": "a" * 64,
             "expected_peer": value,
             "candidate": value,
-            "scenarios": [{"id": "contract", "match": True, "selector_checks": [
-                {"selector": ":root", "expected_peer": value, "candidate": value, "match": True}]}],
+            "scenarios": [{"id": scenario, "match": True, "selector_checks": [
+                {"selector": ":root", "expected_peer": value, "candidate": value, "match": True}]}
+                for scenario in ("contract", "alternate", "closeout-custom-2018-light",
+                                 "closeout-custom-2018-dark", "closeout-custom-legacy-light",
+                                 "closeout-custom-legacy-dark")],
         }
         body.update(changes)
         return body
@@ -828,6 +832,47 @@ class CoordinatorTests(unittest.TestCase):
             with self.subTest(changes=changes):
                 self._write_bridge_assertions(ids, {token: changes})
                 self.assertEqual(self._bridge_report()[1]["coverage"], "slice")
+
+    def test_bridge_token_rejects_missing_or_foreign_identity(self):
+        self._bridge_peer()
+        invocation = self.run.invocation("companion-bridge-tokens")
+        token = "--mat-toolbar-container-background-color"
+        body = self._bridge_body(token, invocation)
+        self.assertTrue(verify._bridge_token_assertion_ok(body, invocation))
+        for key, wrong in [("line", "21.x"), ("check_id", "sass-seal"),
+                           ("group", "other-group")]:
+            for value in (None, wrong):
+                candidate = dict(body)
+                if value is None: candidate.pop(key)
+                else: candidate[key] = value
+                self.assertFalse(verify._bridge_token_assertion_ok(candidate, invocation), (key, value))
+
+    def test_bridge_token_requires_every_theme_and_unique_root_checks(self):
+        self._bridge_peer()
+        invocation = self.run.invocation("companion-bridge-tokens")
+        token = "--mat-toolbar-container-background-color"
+        body = self._bridge_body(token, invocation)
+        self.assertTrue(verify._bridge_token_assertion_ok(body, invocation))
+        mutations = []
+        for edit in (lambda rows: rows.pop(),
+                     lambda rows: rows.append(copy.deepcopy(rows[0])),
+                     lambda rows: rows[-1].update(id=rows[0]["id"]),
+                     lambda rows: rows[-1].update(id="unreviewed-theme"),
+                     lambda rows: rows[0]["selector_checks"].append(
+                         copy.deepcopy(rows[0]["selector_checks"][0])),
+                     lambda rows: rows[0]["selector_checks"][0].update(selector=".other")):
+            changed = copy.deepcopy(body)
+            edit(changed["scenarios"])
+            mutations.append(changed)
+        changed = copy.deepcopy(body)
+        changed.update(expected_peer="white", candidate="white")
+        mutations.append(changed)
+        for index, changed in enumerate(mutations):
+            self.assertFalse(verify._bridge_token_assertion_ok(changed, invocation), index)
+
+        _, ids = self._real_line_ids("companion-bridge-tokens")
+        self._write_bridge_assertions(ids, {token: {"scenarios": body["scenarios"][:1]}})
+        self.assertEqual(self._bridge_report()[1]["coverage"], "slice")
 
     def test_bridge_token_peer_version_comes_from_run_oracles(self):
         _, ids = self._real_line_ids("companion-bridge-tokens")

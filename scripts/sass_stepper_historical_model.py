@@ -13,6 +13,8 @@ def historical_stepper_peer_css(peer_css,historical_css,line,has_color):
     """Rewrite one Stepper peer member after its caller checks both source capsules."""
     if line not in ('main','21.x') or type(peer_css) is not str or type(historical_css) is not str or type(has_color) is not bool:
         return None
+    # Main's current companion addition uses the independently measured peer.
+    if line == 'main': return peer_css
     result=peer_css
     for name in _SHAPES+(_COLORS if has_color else ()):
         property='--mat-stepper-'+name

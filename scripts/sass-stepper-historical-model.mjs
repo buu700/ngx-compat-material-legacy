@@ -9,6 +9,8 @@
 export function historicalStepperPeerCss(peerCss, historicalCss, line, hasColor) {
   if (!['main','21.x'].includes(line) || typeof peerCss !== 'string' ||
       typeof historicalCss !== 'string' || typeof hasColor !== 'boolean') return null;
+  // The main ordinary companion uses its measured current peer unchanged.
+  if (line === 'main') return peerCss;
   const names = ['header-focus-state-layer-shape','header-hover-state-layer-shape'];
   if (hasColor) names.push('header-hover-state-layer-color','header-focus-state-layer-color',
     'header-error-state-label-text-color','header-error-state-icon-foreground-color');

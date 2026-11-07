@@ -42,6 +42,18 @@ console.log(JSON.stringify(compareTokens(input)));
         return node_json(self.SCRIPT, {"caseIds": [token], "peer": {name: peer for name in SCENARIO_IDS},
                                        "candidate": {name: candidate for name in SCENARIO_IDS}, "sources": sources})[0]
 
+    def test_main_stepper_rejects_wrong_shape_and_color(self):
+        for token, peer_value, wrong_value in [
+            ("--mat-stepper-header-hover-state-layer-shape", "4px", "0"),
+            ("--mat-stepper-header-focus-state-layer-color", "color-mix(in srgb, black 12%, transparent)", "rgba(0, 0, 0, 0.04)"),
+        ]:
+            peer = {name: {":root": {token: peer_value}} for name in SCENARIO_IDS}
+            args = {"caseIds": [token], "peer": peer, "candidate": peer,
+                    "sources": {token: {"file": "stepper/_m2-stepper.scss", "sha256": "a" * 64}}, "line": "main"}
+            self.assertEqual(node_json(self.SCRIPT, args)[0]["result"], "pass")
+            wrong = {**peer, SCENARIO_IDS[-1]: {":root": {token: wrong_value}}}
+            self.assertEqual(node_json(self.SCRIPT, {**args, "candidate": wrong})[0]["result"], "fail")
+
     def test_equal_value_passes(self):
         decls = {":root": {"--mat-toolbar-container-background-color": "white"}}
         self.assertEqual(self.compare(decls, decls)["result"], "pass")

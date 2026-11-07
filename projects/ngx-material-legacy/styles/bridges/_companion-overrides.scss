@@ -2,15 +2,14 @@
 // @angular/material *-overrides. Each bridged token takes the meaning the
 // current peer gives it in M2 (computed from the owned theme by
 // ./_m2-system.scss), so a different palette keeps the right meaning.
-// Four Stepper error and hover/focus colors retain their owned Material 16
-// meanings. Other bridged tokens follow the current peer M2 contract.
+// Stepper bridge tokens follow the current peer M2 contract; historical
+// declarations remain in the owned Stepper theme before this addition.
 @use 'sass:color';
 @use 'sass:list';
 @use 'sass:map';
 @use 'sass:meta';
 @use '@angular/material' as mat;
 @use '../core/theming/theming';
-@use '../core/tokens/m2/mat/stepper' as historical-stepper;
 @use './m2-system';
 @use '../legacy-button/button-theme' as legacy-button;
 @use '../legacy-card/card-theme' as legacy-card;
@@ -482,8 +481,8 @@ $_variants: (accent: secondary, warn: error);
   $scale: m2-system.density-scale($system, -4);
   @return (
     base: (
-      header-focus-state-layer-shape: 0,
-      header-hover-state-layer-shape: 0,
+      header-focus-state-layer-shape: 4px,
+      header-hover-state-layer-shape: 4px,
     ),
     color: map.merge(_stepper-palette-tokens($system), (
       container-color: map.get($system, surface),
@@ -697,14 +696,7 @@ $_variants: (accent: secondary, warn: error);
     $tail: map.merge($tail, _qualify(stepper, map.get($groups, density), $stepper-allowed));
   }
   @if theming.get-color-config($theme) != null {
-    $historical: historical-stepper.get-color-tokens(theming.get-color-config($theme));
-    $color: map.merge(map.get($groups, color), (
-      header-error-state-label-text-color: map.get($historical, header-error-state-label-text-color),
-      header-error-state-icon-foreground-color: map.get($historical, header-error-state-icon-foreground-color),
-      header-hover-state-layer-color: map.get($historical, header-hover-state-layer-color),
-      header-focus-state-layer-color: map.get($historical, header-focus-state-layer-color),
-    ));
-    $root: map.merge($root, _qualify(stepper, $color, $stepper-allowed));
+    $root: map.merge($root, _qualify(stepper, map.get($groups, color), $stepper-allowed));
   } @else {
     $root: map.merge($root, $tail);
     $tail: ();
