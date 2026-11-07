@@ -1,0 +1,38 @@
+{
+  "peer_versions": {
+    "core": "22.1.7",
+    "cdk": "22.1.7",
+    "material": "22.1.7"
+  },
+  "overlayRef_types_file": {
+    "path": "node_modules/@angular/cdk/types/_overlay-module-chunk.d.ts",
+    "sha256": "8f6af024f02ebd819c54fa1e5568d6992f4be9cda2f17b331cd7a765f04568ae"
+  },
+  "overlayElement": {
+    "declaration": "get overlayElement(): HTMLElement;",
+    "member_jsdoc_tags": [],
+    "containing_class": "OverlayRef",
+    "class_jsdoc_tags": [],
+    "declaration_sha256": "71b5ef8e89485788828710f793ea43dee09611cd4920df333ae9795c66eae461",
+    "public_root_reexport": [
+      "OverlayRef"
+    ]
+  },
+  "root_types_file": {
+    "path": "node_modules/@angular/cdk/types/overlay.d.ts",
+    "sha256": "0b85f5bf55a586129ab50acaf40d6c38616f84e49f6c1b73fb0b09600596b879"
+  },
+  "implementation_source_map": {
+    "path": "node_modules/@angular/cdk/fesm2022/_overlay-module-chunk.mjs.map",
+    "sha256": "8bb34137657fe763b4848de533341178989f13228e7e7fa5db6f94b9d5d279c3",
+    "embedded_overlay_ref_source": "../../../../../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/src/cdk/overlay/overlay-ref.ts",
+    "embedded_source_sha256": "5e3ddf75c846d2a83ddd3fed0a4badab6273fa45d167b3d81e843ca4ee987d9b",
+    "attach_enable_pointer_events": "= afterNextRender(\n      () => {\n        // The overlay could've been detached before the callback executed.\n        if (this.hasAttached()) {\n          this.updatePosition();\n        }\n      },\n      {injector: this._injector},\n    );\n\n    // Enable pointer events for the overlay pane element.\n    this._togglePointerEvents(true);\n\n    if (this._config.hasBackdrop) {\n      this._attachBackdrop();\n    }\n\n    if (this._config.panelClass) {\n      this._toggleClasses(this._pane, this._config.panelClass, true);\n    }\n\n    // Only emit the `attachments` event once all other setup is done.\n    this._attachments.next();\n    this._completeDetachContent();\n\n    // Track this overlay by the keyboard dispatcher\n    this._keyboardDispatcher.add(this);\n\n    if (this._config.disposeOnNavigation) {\n      ",
+    "detach_disable_pointer_events": ".detachBackdrop();\n\n    // When the overlay is detached, the pane element should disable pointer events.\n    // This is necessary because otherwise the pane element will cover the page and disable\n    // pointer events therefore. Depends on the position strategy and the applied pane boundaries.\n    this._togglePointerEvents(false);\n\n    if (this._positionStrategy && this._positionStrategy.detach) {\n      this._positionStrategy.detach();\n    }\n\n    if (this._scrollStrategy) {\n      this._scrollStrategy.disable();\n    }\n\n    const detachmentResult = this._portalOutlet.detach();\n\n    // Only emit after everything is detached.\n    this._detachments.next();\n    this._completeDetachContent();\n\n    // Remove this overlay from keyboard dispatcher tracking.\n    this._keyboardDispatcher.remove(this)",
+    "toggle_helper": "._config.minWidth);\n    style.minHeight = coerceCssPixelValue(this._config.minHeight);\n    style.maxWidth = coerceCssPixelValue(this._config.maxWidth);\n    style.maxHeight = coerceCssPixelValue(this._config.maxHeight);\n  }\n\n  /** Toggles the pointer events for the overlay pane element. */\n  private _togglePointerEvents(enablePointer: boolean) {\n    this._pane.style.pointerEvents = enablePointer ? '' : 'none';\n  }\n\n  private _attachHost() {\n    if (!this._host.parentElement) {\n      const customInsertionPoint = this._config.usePopover\n        ? this._positionStrategy?.getPopoverInsertionPoint?.()\n        : null;\n\n      if (isElement(customInsertionPoint)) {\n        customInsertionPoint.after(this._host);\n      } else if (customInsertionPoint?.type === 'parent') {\n        customInsertionPoin"
+  },
+  "limitations": [
+    "The implementation source-map snippets are context for the observed attach/detach ordering; the package contract used by production code is the public OverlayRef.overlayElement getter.",
+    "No claim beyond pinned installed CDK 22.1.7 declaration/runtime."
+  ]
+}

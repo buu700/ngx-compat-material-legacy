@@ -1,0 +1,11 @@
+# Independent source review: frozen 42 V4
+
+Supports the bounded V4 source packet `4050a7570eea08925e1ca3c03b9dfa3071563f019bbe8886a183f04628220fd0`, with manifest `c61488fea9a4eaeb4419d1454469fd95e2454808f23c45292167180c6329b71e`. This is source-review support, not integrated ledger or runtime admission.
+
+The unchanged V3 predecessor bytes hash to `ba178086f9677fa42ed313fb418186de8a5713918ace937953db0be9d162e868`. Comparing the exact packet objects shows V4 preserves the 42 rows and full predecessor records, with the OverlayRef row's current finding clarified; its top-level pointer policy now explicitly states that an external write of identical unprioritized `none` cannot be distinguished and may be restored over. The prior pointer review digest is now the complete `a4360582f4c41ed5f86121e4105efff0187c3b5f54037089bc65058633d81ba1`.
+
+At the observed current `8f9f724615ede1b0af0e2c4c347449c5952710e5`, all 42 exact frozen prior rows and full prior reviews match the live tree; current trigger bytes match SHA `058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798`, and all 29 distinct live predecessor evidence references match. The independently checked V3 report records the exact Git source transitions, the byte-equal archived historical producer, and separate retained lifecycle and pointer evidence. V4 does not alter those source assessments. The 37 retained peer imports include unused InjectionToken; five older peer routes are owned, and the two additional current imports remain separate.
+
+The manifest's `canonical_head` and packet's lineage both correctly state 8f9f, while one human-readable `changes_since_predecessor` item still says f522. This is a documentation inconsistency, not a source identity failure; composition should use the actual checked tree and correct that wording without rewriting the frozen packet.
+
+Schema-compliant review-document and ledger composition must preserve the exact predecessor history and current source/evidence bindings, with the two current-use additions handled separately. The unchanged production checker still needs the full-ledger exact relative 42-row delta and negative controls. No new runtime test, full peer floor, G11, security or release qualification was performed.

@@ -1,0 +1,20 @@
+diff --git a/projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts b/projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts
+index 5e59afcac..7cf50b8d4 100644
+--- a/projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts
++++ b/projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts
+@@ -585,8 +585,13 @@ export abstract class _MatAutocompleteTriggerBase
+    * stream every time the option list changes.
+    */
+   private _subscribeToClosingActions(): Subscription {
+-    const firstStable = afterLegacyRender(this._zone, this._viewContainerRef.injector);
+-    const optionChanges = this.autocomplete.options.changes.pipe(
++    const firstStable = afterLegacyRender(this._zone, this._viewContainerRef.injector).pipe(share());
++    const optionChanges = (
++      this.autocomplete.options?.changes ??
++      firstStable.pipe(
++        switchMap(() => this.autocomplete.options?.changes ?? observableOf()),
++      )
++    ).pipe(
+       tap(() => this._positionStrategy.reapplyLastPosition()),
+       // Defer emitting to the stream until the next tick, because changing
+       // bindings in here will cause "changed after checked" errors.
