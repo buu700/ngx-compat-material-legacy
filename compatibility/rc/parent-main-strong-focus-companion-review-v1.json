@@ -1,0 +1,2273 @@
+{
+  "schema_version": 1,
+  "role": "root technical review of historical strong-focus and public current-companion integration",
+  "source_parent": "d74c0d083077f227ea237aff33f42f6c75e76214",
+  "line": "main",
+  "upstream_subject": "14d896a9366bca6df253af2aade8de4c09f98ba7",
+  "decision": "Accept the public current-peer strong-focus appendix within the existing current-infrastructure contract. Preserve both historical includes in their exact order and merge the historical black/display defaults into a new map before invoking the stable public peer mixin. This removes the duplicate current sort underline while retaining historical configuration and tested owned legacy styles. No consumer HTML/CSS/SCSS edit is required. No frozen legacy component styling deviation or authority exception is granted.",
+  "product_file": {
+    "path": "projects/ngx-material-legacy/styles/core/focus-indicators/_focus-indicators.scss",
+    "sha256": "e2ad7e073a9dd1954dc85a5816cc5f9c05644b9d441abc1359847b31b30f7f73",
+    "bytes": 412
+  },
+  "minimum_public_api": {
+    "package": "@angular/material",
+    "version": "22.1.7",
+    "symbol": "strong-focus-indicators",
+    "public_index_forward_verified": true,
+    "current_m2_compatibility_call_through": false,
+    "sources": [
+      {
+        "path": "node_modules/@angular/material/package.json",
+        "sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+        "bytes": 11420
+      },
+      {
+        "path": "node_modules/@angular/material/_index.scss",
+        "sha256": "e3ad831c2e7679767b0c76d51cf37c455e8d14bf60c5920e53d95bcb762eb08b",
+        "bytes": 9712
+      },
+      {
+        "path": "node_modules/@angular/material/core/focus-indicators/_private.scss",
+        "sha256": "1c79b2b4d8691e59eab4135f116e707fe09899baabebd2bde1db7081f19ee560",
+        "bytes": 4300
+      },
+      {
+        "path": "node_modules/@angular/material/sort/_sort-theme.scss",
+        "sha256": "526fb2229a84a7449a9a4d57cd228089df1c403cdcebd0b84ebed54086636be0",
+        "bytes": 1977
+      }
+    ]
+  },
+  "artifact_member_comparison": {
+    "baseline_sha256": "770750703325dce13278c234eccbfaea0710fcf9c1a4ff98977ff122213e4139",
+    "candidate_sha256": "de6ffdb22268d884037f4661bf8972dc04531cbf0a5eb97f008728e57c54a840",
+    "members": 512,
+    "changed_members": [
+      "package/styles/core/focus-indicators/_focus-indicators.scss"
+    ],
+    "candidate_member_sha256": "e2ad7e073a9dd1954dc85a5816cc5f9c05644b9d441abc1359847b31b30f7f73"
+  },
+  "current_companion_effects": [
+    "Current sort strong focus uses its ring and suppresses its fallback underline in the tested default and custom contexts.",
+    "The public peer mixin intentionally makes current modern-chip labels overflow visible to accommodate focus indicators. The candidate matches the independent peer mixin in tested default, historical-M2-Sass-context and peer-M3 contexts; long text can extend beyond a constrained container. This applies to the current peer component, while the tested owned legacy chip remains unchanged.",
+    "display:none intentionally hides the strong ring while the peer fallback stays none, matching the public peer configuration semantics. display:false omits the display declaration and inherits."
+  ],
+  "preservation_evidence": [
+    "Root independently compared all512 package members: only this core focus mixin changes; all511 other members including component HTML, JS, CSS and SCSS remain byte-identical.",
+    "Default/custom, null/inherited, false and CSS-variable colors, null/none display, repeated calls and theme ordering retain the measured owned legacy option/chip styles; caller map remains unchanged.",
+    "The source-level7configuration integration regression passed independently on canonical source. It compares unchanged owned helper output plus independent public peer output; it is not an independent historical golden for those helper internals.",
+    "Read-only Cyph sanity check found legacy chip usage and no strong-focus-indicators use in searched source; root repeated the stylesheet search. No Cyph edits."
+  ],
+  "rejected_alternative": "Prepending only public strong-focus-indicators-color(black) avoids modern-chip overflow but changes inherited color when border-color:null; its failing baseline/candidate evidence is retained and this approach was not used.",
+  "qualification_manifest": {
+    "sha256": "e07cbc604663400fe41e0a6332242bdbeb25066037a8a3470fb1273b7e4d8660",
+    "content": {
+      "status": "isolated experimental fresh candidate; no canonical commit or gate claim",
+      "source_base": "b4f75d6044a61e28504afd9a018fdaf7dd2ca4b4",
+      "baseline_packed_sha256": "770750703325dce13278c234eccbfaea0710fcf9c1a4ff98977ff122213e4139",
+      "fresh_packed_sha256": "de6ffdb22268d884037f4661bf8972dc04531cbf0a5eb97f008728e57c54a840",
+      "artifact_comparison": {
+        "members_each": 512,
+        "different": [
+          "styles/core/focus-indicators/_focus-indicators.scss"
+        ],
+        "fresh_extracted_member_hashes_verified": 512
+      },
+      "files": {
+        "worktree/projects/ngx-material-legacy/styles/core/focus-indicators/_focus-indicators.scss": {
+          "sha256": "e2ad7e073a9dd1954dc85a5816cc5f9c05644b9d441abc1359847b31b30f7f73",
+          "bytes": 412
+        },
+        "worktree/tests/strong_focus_companion_probe.mjs": {
+          "sha256": "458185c4c0db1b37691a26ca9f1e32d977f9e9d956a99f568be1878f62011bac",
+          "bytes": 2770
+        },
+        "worktree/tests/test_strong_focus_companion.py": {
+          "sha256": "7e89ee3e419f3e9343ec2d3452bc7e4016b556e69a8be8210e5907cd45f0035d",
+          "bytes": 773
+        },
+        "focus-fresh-maintained.patch": {
+          "sha256": "27fff396b55f91176e1ee8d43f2ee66c454b1c5dba9195487363f22762e06f8c",
+          "bytes": 4868
+        },
+        "producer.mjs": {
+          "sha256": "b0d0ac047f7f9f697121a7cfa920e28886fd5a43bfa8484ab3740d1b5bb1b723",
+          "bytes": 4647
+        },
+        "fixture.ts": {
+          "sha256": "1d472cbda82cb90c6fe3432caf48ac30ab84d84f49c188779995608450280404",
+          "bytes": 12836
+        },
+        "karma.conf.cjs": {
+          "sha256": "620293a4e5d13d1017f4e01951482281da336a62aa6c871245220bfc9cae62d8",
+          "bytes": 639
+        },
+        "display-false-check.mjs": {
+          "sha256": "adb5ed5355f993c5dc8a087fc13d8504d22808a59e17a8afb1b7c593dc1a7626",
+          "bytes": 1279
+        }
+      },
+      "environment": {
+        "node": "24.21.0",
+        "npm": "11.19.0",
+        "sass": "1.104.1",
+        "angular_material_cdk": "22.1.7",
+        "chromium": "149.0.7827.0 custom"
+      },
+      "maintained_checks": {
+        "seven_configurations": [
+          "default",
+          "custom",
+          "border-color:null",
+          "border-color:false",
+          "CSS-var color",
+          "display:null",
+          "display:none"
+        ],
+        "source_unittest": "passed",
+        "fresh_extracted_package": "passed",
+        "baseline_negative": "failed as expected, code 1",
+        "scope": "integration invariant: byte-unchanged owned helper precedes independent public-peer output; not an independent historical golden for helper internals"
+      },
+      "browser_runs": {
+        "extended-baseline": {
+          "path": "extended-baseline.log",
+          "sha256": "d8c8d7c2f7bc2ce2362391d7a8c1cb1ba16cab8a8db72bb82f569b035644656d",
+          "result": "29 success",
+          "snapshots": [
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "none",
+                "origin": "program",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "ringDisplay": "none",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgba(0, 0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": ""
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "none",
+                "origin": "keyboard",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "ringDisplay": "none",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgba(0, 0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": ""
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "legacy",
+                "origin": "program",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": ""
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "legacy",
+                "origin": "keyboard",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": ""
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "custom",
+                "origin": "program",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "ringDisplay": "block",
+                "ringStyle": "dashed",
+                "ringWidth": "5px",
+                "ringColor": "rgb(255, 17, 0)",
+                "ringContent": "\"\"",
+                "margin": "-9px",
+                "variable": ""
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "custom",
+                "origin": "keyboard",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "ringDisplay": "block",
+                "ringStyle": "dashed",
+                "ringWidth": "5px",
+                "ringColor": "rgb(255, 17, 0)",
+                "ringContent": "\"\"",
+                "margin": "-9px",
+                "variable": ""
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "null",
+                "origin": "program",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(53, 160, 119)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": ""
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "null",
+                "origin": "keyboard",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(53, 160, 119)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": ""
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "var",
+                "origin": "program",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(20, 85, 170)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": ""
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "var",
+                "origin": "keyboard",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(20, 85, 170)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": ""
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "peer",
+                "origin": "program",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(100, 91, 112)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "peer",
+                "origin": "keyboard",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(100, 91, 112)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "legacy",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "custom",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "5px",
+                "style": "dashed",
+                "color": "rgb(255, 17, 0)",
+                "radius": "11px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "null",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(53, 160, 119)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "var",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(20, 85, 170)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "repeat",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "theme-before",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "theme-after",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(106, 59, 44)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "display-null",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "display-none",
+                "forced": false,
+                "focused": true,
+                "display": "none",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "border-false",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(53, 160, 119)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "default",
+                "scope": "legacy",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "hidden",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 134,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "default",
+                "scope": "peer",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "m2",
+                "scope": "legacy",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "hidden",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 134,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "m2",
+                "scope": "peer",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "m3",
+                "scope": "legacy",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "hidden",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 134,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "m3",
+                "scope": "peer",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "LEGACY_CHIP_RESULT",
+              "data": {
+                "focused": true,
+                "width": 445.640625,
+                "height": 32,
+                "overflow": "visible",
+                "display": "block",
+                "border": "solid",
+                "borderWidth": "3px",
+                "radius": "4px",
+                "color": "rgb(0, 0, 0)",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "CHIP_RESULT",
+              "data": {
+                "candidate": false,
+                "overflow": "hidden"
+              }
+            },
+            {
+              "kind": "THEME_RESULT",
+              "data": {
+                "color": "rgb(18, 52, 86)",
+                "peerArrow": "rgb(29, 27, 30)",
+                "panel": "rgb(209, 226, 243)",
+                "option": "rgb(18, 52, 86)",
+                "corner": "7px",
+                "oldCorner": "0px",
+                "m3": "#7d00fa"
+              }
+            }
+          ]
+        },
+        "extended-baseline-forced": {
+          "path": "extended-baseline-forced.log",
+          "sha256": "36871ac9ee06cfa38dd2cb39361aa3a7d89bb7990eca068f01d2c535d1ec8c02",
+          "result": "29 success",
+          "snapshots": [
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "none",
+                "origin": "program",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "none",
+                "origin": "keyboard",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "legacy",
+                "origin": "program",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "legacy",
+                "origin": "keyboard",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "custom",
+                "origin": "program",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "dashed",
+                "ringWidth": "5px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-9px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "custom",
+                "origin": "keyboard",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "dashed",
+                "ringWidth": "5px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-9px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "null",
+                "origin": "program",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "null",
+                "origin": "keyboard",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "var",
+                "origin": "program",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "var",
+                "origin": "keyboard",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "peer",
+                "origin": "program",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "peer",
+                "origin": "keyboard",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "legacy",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "custom",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "5px",
+                "style": "dashed",
+                "color": "rgb(0, 0, 0)",
+                "radius": "11px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "null",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "var",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "repeat",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "theme-before",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "theme-after",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "display-null",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "display-none",
+                "forced": true,
+                "focused": true,
+                "display": "none",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "border-false",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "default",
+                "scope": "legacy",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "hidden",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 134,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "default",
+                "scope": "peer",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "m2",
+                "scope": "legacy",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "hidden",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 134,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "m2",
+                "scope": "peer",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "m3",
+                "scope": "legacy",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "hidden",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 134,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "m3",
+                "scope": "peer",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "LEGACY_CHIP_RESULT",
+              "data": {
+                "focused": true,
+                "width": 445.640625,
+                "height": 32,
+                "overflow": "visible",
+                "display": "block",
+                "border": "solid",
+                "borderWidth": "3px",
+                "radius": "4px",
+                "color": "rgb(0, 0, 0)",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "CHIP_RESULT",
+              "data": {
+                "candidate": false,
+                "overflow": "hidden"
+              }
+            },
+            {
+              "kind": "THEME_RESULT",
+              "data": {
+                "color": "rgb(0, 0, 0)",
+                "peerArrow": "rgb(0, 0, 0)",
+                "panel": "rgb(255, 255, 255)",
+                "option": "rgb(0, 0, 0)",
+                "corner": "7px",
+                "oldCorner": "0px",
+                "m3": "#7d00fa"
+              }
+            }
+          ]
+        },
+        "fresh-candidate": {
+          "path": "fresh-candidate.log",
+          "sha256": "4d0b72e9b3a7a62470796612e4be3724f64282257976515b6e9fcd53bfcdaf14",
+          "result": "29 success",
+          "snapshots": [
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "none",
+                "origin": "program",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "ringDisplay": "none",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgba(0, 0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": ""
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "none",
+                "origin": "keyboard",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "ringDisplay": "none",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgba(0, 0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": ""
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "legacy",
+                "origin": "program",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "legacy",
+                "origin": "keyboard",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "custom",
+                "origin": "program",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "dashed",
+                "ringWidth": "5px",
+                "ringColor": "rgb(255, 17, 0)",
+                "ringContent": "\"\"",
+                "margin": "-9px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "custom",
+                "origin": "keyboard",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "dashed",
+                "ringWidth": "5px",
+                "ringColor": "rgb(255, 17, 0)",
+                "ringContent": "\"\"",
+                "margin": "-9px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "null",
+                "origin": "program",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(53, 160, 119)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "null",
+                "origin": "keyboard",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(53, 160, 119)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "var",
+                "origin": "program",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(20, 85, 170)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "var",
+                "origin": "keyboard",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(20, 85, 170)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "peer",
+                "origin": "program",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(100, 91, 112)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "peer",
+                "origin": "keyboard",
+                "forced": false,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(100, 91, 112)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "legacy",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "custom",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "5px",
+                "style": "dashed",
+                "color": "rgb(255, 17, 0)",
+                "radius": "11px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "null",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(53, 160, 119)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "var",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(20, 85, 170)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "repeat",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "theme-before",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "theme-after",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(106, 59, 44)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "display-null",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "display-none",
+                "forced": false,
+                "focused": true,
+                "display": "none",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "border-false",
+                "forced": false,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(53, 160, 119)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "default",
+                "scope": "legacy",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "default",
+                "scope": "peer",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "m2",
+                "scope": "legacy",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "m2",
+                "scope": "peer",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "m3",
+                "scope": "legacy",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "m3",
+                "scope": "peer",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "LEGACY_CHIP_RESULT",
+              "data": {
+                "focused": true,
+                "width": 445.640625,
+                "height": 32,
+                "overflow": "visible",
+                "display": "block",
+                "border": "solid",
+                "borderWidth": "3px",
+                "radius": "4px",
+                "color": "rgb(0, 0, 0)",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "CHIP_RESULT",
+              "data": {
+                "candidate": true,
+                "overflow": "visible"
+              }
+            },
+            {
+              "kind": "THEME_RESULT",
+              "data": {
+                "color": "rgb(18, 52, 86)",
+                "peerArrow": "rgb(29, 27, 30)",
+                "panel": "rgb(209, 226, 243)",
+                "option": "rgb(18, 52, 86)",
+                "corner": "7px",
+                "oldCorner": "0px",
+                "m3": "#7d00fa"
+              }
+            }
+          ]
+        },
+        "fresh-candidate-forced": {
+          "path": "fresh-candidate-forced.log",
+          "sha256": "1089356e7500129fd6bf0d1e467dd323d9c5290370af41e3ce2ed07f27a1a599",
+          "result": "29 success",
+          "snapshots": [
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "none",
+                "origin": "program",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "none",
+                "origin": "keyboard",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "legacy",
+                "origin": "program",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "legacy",
+                "origin": "keyboard",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "custom",
+                "origin": "program",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "dashed",
+                "ringWidth": "5px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-9px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "custom",
+                "origin": "keyboard",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "dashed",
+                "ringWidth": "5px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-9px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "null",
+                "origin": "program",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "null",
+                "origin": "keyboard",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "var",
+                "origin": "program",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "var",
+                "origin": "keyboard",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "peer",
+                "origin": "program",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-program-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "FOCUS_RESULT",
+              "data": {
+                "scope": "peer",
+                "origin": "keyboard",
+                "forced": true,
+                "focus": true,
+                "hostClass": "mat-sort-header cdk-focused cdk-keyboard-focused",
+                "borderStyle": "none",
+                "borderWidth": "0px",
+                "ringDisplay": "block",
+                "ringStyle": "solid",
+                "ringWidth": "3px",
+                "ringColor": "rgb(0, 0, 0)",
+                "ringContent": "\"\"",
+                "margin": "-7px",
+                "variable": "none"
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "legacy",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "custom",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "5px",
+                "style": "dashed",
+                "color": "rgb(0, 0, 0)",
+                "radius": "11px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "null",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "var",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "repeat",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "theme-before",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "theme-after",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "display-null",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "display-none",
+                "forced": true,
+                "focused": true,
+                "display": "none",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "OPTION_RESULT",
+              "data": {
+                "scope": "border-false",
+                "forced": true,
+                "focused": true,
+                "display": "block",
+                "width": "3px",
+                "style": "solid",
+                "color": "rgb(0, 0, 0)",
+                "radius": "4px",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "default",
+                "scope": "legacy",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "default",
+                "scope": "peer",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "m2",
+                "scope": "legacy",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "m2",
+                "scope": "peer",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "m3",
+                "scope": "legacy",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "CHIP_FOCUS_RESULT",
+              "data": {
+                "theme": "m3",
+                "scope": "peer",
+                "focused": true,
+                "hostClass": "mat-mdc-chip-action mdc-evolution-chip__action mdc-evolution-chip__action--primary",
+                "overflow": "visible",
+                "display": "block",
+                "content": "\"\"",
+                "border": "solid",
+                "borderWidth": "3px",
+                "ringWidth": "168px",
+                "ringHeight": "42px",
+                "boxWidth": 158,
+                "boxHeight": 32,
+                "labelWidth": 695,
+                "labelScroll": 695
+              }
+            },
+            {
+              "kind": "LEGACY_CHIP_RESULT",
+              "data": {
+                "focused": true,
+                "width": 445.640625,
+                "height": 32,
+                "overflow": "visible",
+                "display": "block",
+                "border": "solid",
+                "borderWidth": "3px",
+                "radius": "4px",
+                "color": "rgb(0, 0, 0)",
+                "content": "\"\""
+              }
+            },
+            {
+              "kind": "CHIP_RESULT",
+              "data": {
+                "candidate": true,
+                "overflow": "visible"
+              }
+            },
+            {
+              "kind": "THEME_RESULT",
+              "data": {
+                "color": "rgb(0, 0, 0)",
+                "peerArrow": "rgb(0, 0, 0)",
+                "panel": "rgb(255, 255, 255)",
+                "option": "rgb(0, 0, 0)",
+                "corner": "7px",
+                "oldCorner": "0px",
+                "m3": "#7d00fa"
+              }
+            }
+          ]
+        }
+      },
+      "limits": [
+        "FocusMonitor.focusVia keyboard/program origin, not trusted Tab key.",
+        "Forced colors via Chromium --force-high-contrast, not physical OS/browser matrix.",
+        "Peer-chip M2 context uses owned historical chips-color; modern peer M2 token consumption unproven.",
+        "Long-label modern chip overflow changes hidden to visible, matching independent public peer mixin in tested contexts; this is an explicit user-visible tradeoff.",
+        "No full historical/golden Sass gate, all-family, dark theme, security, or publication qualification."
+      ]
+    }
+  },
+  "qualification_notes": {
+    "sha256": "017a3b0f43a962d2c0533293ab64e43e4a3596c999e57a0680ffdc11f468ae94",
+    "content": "# Fresh packed strong-focus candidate\n\n`focus-fresh-maintained.patch` is the frozen isolated proposal. Product path is `projects/ngx-material-legacy/styles/core/focus-indicators/_focus-indicators.scss` (412 bytes, SHA-256 e2ad7e073a9dd1954dc85a5816cc5f9c05644b9d441abc1359847b31b30f7f73). It retains the two original owned historical mixin includes first, then uses the peer's public `mat.strong-focus-indicators` with the original historical black/display defaults merged before consumer config. No private peer symbol, direct private CSS variable, selector modification, consumer CSS change or current m2-* call is introduced. Peer public mixin's additional current chip overflow-visible behavior is intentional subject to review; it visibly unclamps a tested long label from 134px to 695px, matching an independently compiled/consumed public peer strong-focus control.\n\nFresh tarball SHA-256 de6ffdb22268d884037f4661bf8972dc04531cbf0a5eb97f008728e57c54a840, built from dirty isolated b4f worktree with pinned Node 24.21.0/npm 11.19.0. Its 512 extracted members were individually rehashed; compared with b4f baseline tarball 770750703325dce13278c234eccbfaea0710fcf9c1a4ff98977ff122213e4139, exactly one member differs, the product Sass file above. It is an experimental pack, not a sealed release receipt. The maintained tests `tests/strong_focus_companion_probe.mjs` and `tests/test_strong_focus_companion.py` compile seven configs, assert caller map unchanged, compare historical declarations first and the public current peer output thereafter, and pass on source and the fresh extracted package. The same check fails on the baseline as a negative control. No golden changed.\n\nPinned Chromium 149 normal and forced-colors each: 29/29 observational checks on both baseline and fresh pack. In normal colors baseline peer MatSortHeader has both 3px focus ring and 1px underline; fresh candidate has ring only for public FocusMonitor keyboard/program origins, default/custom config. Independent peer strong-focus control behaves the same as fresh candidate for actual modern long ChipOption focused ring geometry and visible overflow under default, owned historical M2 Sass context, and peer M3; this does not claim modern M2 token consumption. Actual legacy option snapshots match exactly for default/custom, null, false, CSS var, repeated, theme-before/after, display null/none and both media modes; actual legacy chip focus and selected mixed-theme snapshots match. The compiled baseline CSS is an unchanged ordered subsequence of candidate CSS in the bounded fixture. A public peer `display:none` config emits fallback suppression even while hiding the ring; with `display:false` both legacy and independent peer omit the display declaration, so it inherits rather than necessarily hiding the ring, while peer/fresh still emit fallback suppression. This reflects current companion behavior, not a claim that every such consumer intentionally wants hidden focus.\n\nFocusMonitor.focusVia simulates keyboard/program origins; no trusted Tab input. Forced-colors is Chromium emulation, not all OS/browsers. No full Sass/golden gate, all-family suite, dark theme, security or publication review was run. Earlier unconditional public-color prepend failed inherited null-color parity and is rejected. Prior 42d/ce13 artifacts are historical only. No canonical/source-tree/Cyph changes. A read-only Cyph scan found no `strong-focus-indicators` usage and found its MatLegacyChipsModule import and several legacy mat-chip-list templates; absence of a literal Sass mixin does not prove absence of indirect CSS configurations. Raw logs, scripts, compiled outputs, artifact hashes and limitations are in fresh-qualification-manifest.json.\n\nThe final test files carry the repository MIT Google and 2026 Ryan Lester notices. This Sass probe is an integration invariant: it compares the byte-unchanged owned helper's generated declarations with the full public peer mixin output and their order. It is not an independently sourced historical golden for the helper's internals. Final test files were rerun after the notice-only changes; packed product bytes and the fresh browser results were unchanged.\n"
+  },
+  "limits": [
+    "Keyboard/program origins supplied through public FocusMonitor; trusted Tab interaction not claimed.",
+    "Forced colors emulated with Chromium --force-high-contrast, not a complete OS/browser matrix.",
+    "The modern-chip historical M2 Sass context is not proof of current-peer M2 color-token consumption.",
+    "Fresh candidate is an isolated pack. Final committed artifact, full651/31 Sass checks, complete browser/floor and G11 qualification remain required."
+  ],
+  "required_consumer_style_changes": false,
+  "goldens_changed": false,
+  "actual_full_sass_or_g11_pass": false
+}

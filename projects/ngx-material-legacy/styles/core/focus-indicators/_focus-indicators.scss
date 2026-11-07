@@ -1,6 +1,11 @@
+@use 'sass:map';
 @use './private';
+@use '@angular/material' as mat;
 
 @mixin strong-focus-indicators($config: ()) {
   @include private.strong-focus-indicators($config);
   @include private.mdc-strong-focus-indicators($config);
+
+  // Match the historical defaults before adding the peer's public companion styles.
+  @include mat.strong-focus-indicators(map.merge((border-color: black, display: block), $config));
 }
