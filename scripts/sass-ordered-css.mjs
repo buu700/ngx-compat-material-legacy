@@ -21,8 +21,10 @@ import {dirname, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {ORDERED_CORE_CASES,ORDERED_CORE_CONTRACT,orderedCoreResultMatches} from './sass-ordered-core-contract.mjs';
 import {ORDERED_AGGREGATE_CASES,ORDERED_AGGREGATE_CONTRACT,orderedAggregateResultMatches} from './sass-ordered-aggregate-contract.mjs';
+import {ORDERED_LEGACY_BUTTON_CASES,ORDERED_LEGACY_BUTTON_CONTRACT,ORDERED_LEGACY_BUTTON_PEER_FILES,orderedLegacyButtonResultMatches} from './sass-ordered-legacy-button-contract.mjs';
 
 import {RIPPLE_COLOR_ORDERED_CASES,RIPPLE_COLOR_CONTRACT,orderedRippleColorResultsMatch} from './sass-ripple-color-contract.mjs';
+import {createHash} from 'node:crypto';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 export const ORDERED_CSS_FIXTURE_IDS = Object.freeze([
@@ -153,12 +155,27 @@ export function compareOrderedCss(referenceDir, candidateDir, reportPath) {
   return {status: run.status, stdout: run.stdout, stderr: run.stderr, report};
 }
 
-export function orderedCssResults(report, compiledReport = null) {
+export function orderedCssResults(report, compiledReport = null, candidateCss = {}, consumerPeerFiles = {}) {
   const files = new Map((report?.files || []).map(item => [item.file, item]));
   return ORDERED_CSS_FIXTURE_IDS.map(id => {
     const rows=(report?.files||[]).filter(item=>item.file===`${id}.css`);
     const row=rows.length===1?files.get(`${id}.css`):null;
     const exact = row?.status === 'exact';
+    if(Object.hasOwn(ORDERED_LEGACY_BUTTON_CASES,id)&&compiledReport!==null){
+      const records=(compiledReport?.fixtures||[]).filter(item=>item.id===id),record=records.length===1?records[0]:null;
+      const css=Object.hasOwn(candidateCss,id)?candidateCss[id]:null;
+      const conforming=rows.length===1&&compiledReport?.sass==='dart-sass\t1.104.1\t(Sass Compiler)\t[Dart]\ndart2js\t3.13.3\t(Dart Compiler)\t[Dart]'
+        &&compiledReport?.installed?.['@angular/material']?.version==='22.1.7'
+        &&compiledReport?.installed?.['@angular/material']?.manifest_sha256==='5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af'
+        &&orderedLegacyButtonResultMatches(id,row,record,css,consumerPeerFiles),entry=ORDERED_LEGACY_BUTTON_CASES[id];
+      return {case_id:id,result:conforming?'pass':'fail',kind:'assertion',status:conforming?'conforming-current-infrastructure':row?.status??'missing',
+        raw_status:row?.status??'missing',baseline_sha256:row?.baseline_sha256??null,candidate_sha256:row?.candidate_sha256??null,
+        fixture:`fixtures/sass/${id}.scss`,fixture_sha256:record?.fixture_sha256??null,
+        reference:`reference/material-16.2.14/sass-css/${id}.css`,reference_sha256:entry.reference_sha256,
+        comparison:ORDERED_LEGACY_BUTTON_CONTRACT,
+        actual_measurement:css===null?null:{css,css_sha256:record?.css_sha256??null,css_bytes:Buffer.byteLength(css),compiled_record:record,sass_version:compiledReport?.sass??null,installed_material:compiledReport?.installed?.['@angular/material']??null},
+        current_infrastructure:{classification:'conforming-current-infrastructure',contract:ORDERED_LEGACY_BUTTON_CONTRACT,peer_version:'22.1.7',consumer_peer_files:consumerPeerFiles}};
+    }
     if(Object.hasOwn(RIPPLE_COLOR_ORDERED_CASES,id)&&compiledReport!==null){
       const records=(compiledReport?.fixtures||[]).filter(item=>item.id===id),record=records.length===1?records[0]:null;
       const conforms=orderedRippleColorResultsMatch(row,record),entry=RIPPLE_COLOR_ORDERED_CASES[id];
@@ -207,7 +224,7 @@ export function writeOrderedCssAssertions(outputDir, results, identity = null) {
       status: item.status,
       baseline_sha256: item.baseline_sha256,
       candidate_sha256: item.candidate_sha256,
-      note: item.comparison===RIPPLE_COLOR_CONTRACT?'Complete historical ripple colors with the independently measured public color binding;raw golden difference retained.':item.comparison===ORDERED_AGGREGATE_CONTRACT?'Complete historical aggregate sequence with independently measured public contributions;raw golden difference retained.':item.comparison===ORDERED_CORE_CONTRACT?'Complete historical owned core CSS with independently measured public CDK contributions;raw golden difference retained.':'Exact ordered CSS against the sealed Material16.2.14 reference. Rendering is checked separately.',
+      note: item.comparison===RIPPLE_COLOR_CONTRACT?'Complete historical ripple colors with the independently measured public color binding;raw golden difference retained.':item.comparison===ORDERED_AGGREGATE_CONTRACT?'Complete historical aggregate sequence with independently measured public contributions;raw golden difference retained.':item.comparison===ORDERED_CORE_CONTRACT?'Complete historical owned core CSS with independently measured public CDK contributions;raw golden difference retained.':item.comparison===ORDERED_LEGACY_BUTTON_CONTRACT?'Complete historical legacy CSS with finite current public button tokens under datepicker scope;raw golden difference retained.':'Exact ordered CSS against the sealed Material16.2.14 reference. Rendering is checked separately.',
     }, null, 2)}\n`);
     const name = `${item.case_id}.json`;
     writeFileSync(join(outputDir, name), body);
@@ -246,7 +263,15 @@ export function runOrderedCss(environment, {line = 'main'} = {}) {
   const compared = compareOrderedCss(reference, candidate, reportPath);
   let compiledReport;
   try{compiledReport=JSON.parse(readFileSync(join(candidate,'compile-report.json'),'utf8'));}catch{compiledReport={fixtures:[]};}
-  const results = compared.report ? orderedCssResults(compared.report,compiledReport) : ORDERED_CSS_FIXTURE_IDS.map(id => ({
+  const candidateCss={};
+  const consumerPeerFiles={};
+  if(compiled.status===0)for(const id of Object.keys(ORDERED_LEGACY_BUTTON_CASES)){
+    try{candidateCss[id]=readFileSync(join(candidate,id+'.css'),'utf8');}catch{/* Missing CSS stays failed. */}
+  }
+  if(compiled.status===0)for(const path of Object.keys(ORDERED_LEGACY_BUTTON_PEER_FILES)){
+    try{consumerPeerFiles[path]=createHash('sha256').update(readFileSync(join(environment,path))).digest('hex');}catch{/* Missing peer source stays failed. */}
+  }
+  const results = compared.report ? orderedCssResults(compared.report,compiledReport,candidateCss,consumerPeerFiles) : ORDERED_CSS_FIXTURE_IDS.map(id => ({
     case_id: id,
     result: 'fail',
     kind: 'assertion',

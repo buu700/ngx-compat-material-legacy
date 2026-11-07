@@ -1,3 +1,7 @@
+# @license
+# Copyright Google LLC All Rights Reserved.
+# Copyright (c) 2026 Ryan Lester.
+# Use of this source code is governed by the MIT license in LICENSE.
 #!/usr/bin/env python3
 """Finite RC automatic product gate (RC-02.04 incremental orchestration).
 
@@ -45,6 +49,7 @@ from sass_ordinary_card_gate import ORDINARY_CARD_GATE_CASES, ordinary_card_gate
 from sass_spinner_snack_gate_integration import SPINNER_SNACK_GATE_CASES, spinner_snack_gate_assertion_ok
 from sass_default_core_cdk_admission import DEFAULT_CORE_CDK_CASES, default_core_cdk_envelope_ok
 from sass_ordered_core_admission import ORDERED_CORE_CASES, ordered_core_envelope_ok
+from sass_ordered_legacy_button_admission import ORDERED_LEGACY_BUTTON_CASES, ordered_legacy_button_envelope_ok
 from sass_ordered_aggregate_admission import ORDERED_AGGREGATE_CASES, ordered_aggregate_envelope_ok
 from sass_default_companion_admission import DEFAULT_COMPANION_CASES, default_companion_envelope_ok
 from sass_default_mapped_companion_admission import DEFAULT_MAPPED_COMPANION_CASES, default_mapped_companion_envelope_ok
@@ -1351,6 +1356,8 @@ def _sass_seal_assertion_ok(body: dict, invocation: str) -> bool:
         return default_companion_envelope_ok(ACTIVE_RUN,body,invocation)
     if body.get('case_id') in ORDERED_CORE_CASES:
         return 'current_companion' not in body and ordered_core_envelope_ok(ACTIVE_RUN,body,invocation)
+    if body.get('case_id') in ORDERED_LEGACY_BUTTON_CASES:
+        return 'current_companion' not in body and ordered_legacy_button_envelope_ok(ACTIVE_RUN,body,invocation)
     if body.get('case_id') in ORDERED_AGGREGATE_CASES:
         return ordered_aggregate_envelope_ok(ACTIVE_RUN,body,invocation)
     if body.get('case_id') in DEFAULT_CORE_CDK_CASES:
