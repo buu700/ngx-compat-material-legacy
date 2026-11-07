@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "sha": "a62e65971a379715b8bae2e437e67b62c113a263",
+  "subject": "fix(material/radio): avoid making the touch target a focus stop (#33558)",
+  "diff_sha256": "9abf7bbf3bff1541a177dfcb1ea85f72c598668125ca1d4f19ab47fd16e0d347",
+  "diff": "diff --git a/goldens/material/core/index.api.md b/goldens/material/core/index.api.md\nindex 6a1b9cd40..a5bd1221c 100644\n--- a/goldens/material/core/index.api.md\n+++ b/goldens/material/core/index.api.md\n@@ -162,7 +162,7 @@ export const MATERIAL_ANIMATIONS: InjectionToken<AnimationsConfig>;\n export class _MatInternalFormField {\n     labelPosition: 'before' | 'after';\n     // (undocumented)\n-    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<_MatInternalFormField, \"div[mat-internal-form-field]\", never, { \"labelPosition\": { \"alias\": \"labelPosition\"; \"required\": true; }; }, {}, never, [\"*\"], true, never>;\n+    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<_MatInternalFormField, \"[mat-internal-form-field]\", never, { \"labelPosition\": { \"alias\": \"labelPosition\"; \"required\": true; }; }, {}, never, [\"*\"], true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<_MatInternalFormField, never>;\n }\ndiff --git a/goldens/material/radio/index.api.md b/goldens/material/radio/index.api.md\nindex c3f04b0c9..8e9933b6f 100644\n--- a/goldens/material/radio/index.api.md\n+++ b/goldens/material/radio/index.api.md\n@@ -77,7 +77,6 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy\n     ngOnInit(): void;\n     _noopAnimations: boolean;\n     _onInputInteraction(event: Event): void;\n-    _onTouchTargetClick(event: Event): void;\n     radioGroup: MatRadioGroup;\n     get required(): boolean;\n     set required(value: boolean);\ndiff --git a/src/material/core/internal-form-field/internal-form-field.scss b/src/material/core/internal-form-field/internal-form-field.scss\nindex fb2191d05..d46f1d1b1 100644\n--- a/src/material/core/internal-form-field/internal-form-field.scss\n+++ b/src/material/core/internal-form-field/internal-form-field.scss\n@@ -6,7 +6,8 @@\n   align-items: center;\n   vertical-align: middle;\n \n-  & > label {\n+  & > label,\n+  & > .mat-internal-form-field-label {\n     margin-left: 0;\n     margin-right: auto;\n     padding-left: 4px;\n@@ -14,7 +15,8 @@\n     order: 0;\n   }\n \n-  [dir='rtl'] & > label {\n+  [dir='rtl'] & > label,\n+  [dir='rtl'] & > .mat-internal-form-field-label {\n     margin-left: auto;\n     margin-right: 0;\n     padding-left: 0;\n@@ -23,7 +25,8 @@\n }\n \n .mdc-form-field--align-end {\n-  & > label {\n+  & > label,\n+  & > .mat-internal-form-field-label {\n     margin-left: auto;\n     margin-right: 0;\n     padding-left: 0;\n@@ -31,7 +34,8 @@\n     order: -1;\n   }\n \n-  [dir='rtl'] .mdc-form-field--align-end & label {\n+  [dir='rtl'] .mdc-form-field--align-end & label,\n+  [dir='rtl'] .mdc-form-field--align-end & .mat-internal-form-field-label {\n     margin-left: 0;\n     margin-right: auto;\n     padding-left: 4px;\ndiff --git a/src/material/core/internal-form-field/internal-form-field.ts b/src/material/core/internal-form-field/internal-form-field.ts\nindex 5442c4f80..db494457d 100644\n--- a/src/material/core/internal-form-field/internal-form-field.ts\n+++ b/src/material/core/internal-form-field/internal-form-field.ts\n@@ -14,8 +14,7 @@ import {Component, Input, ViewEncapsulation} from '@angular/core';\n  * @docs-private\n  */\n @Component({\n-  // Use a `div` selector to match the old markup closer.\n-  selector: 'div[mat-internal-form-field]',\n+  selector: '[mat-internal-form-field]',\n   template: '<ng-content></ng-content>',\n   styleUrl: 'internal-form-field.css',\n   encapsulation: ViewEncapsulation.None,\ndiff --git a/src/material/radio/radio.html b/src/material/radio/radio.html\nindex 6067b2022..f7546b17e 100644\n--- a/src/material/radio/radio.html\n+++ b/src/material/radio/radio.html\n@@ -1,10 +1,7 @@\n-<div mat-internal-form-field [labelPosition]=\"labelPosition\" #formField>\n-  <div class=\"mdc-radio\" [class.mdc-radio--disabled]=\"disabled\">\n+<label mat-internal-form-field [labelPosition]=\"labelPosition\" [for]=\"inputId\" #formField>\n+  <span class=\"mdc-radio\" [class.mdc-radio--disabled]=\"disabled\">\n     <!-- Render this element first so the input is on top. -->\n-    <div\n-      class=\"mat-mdc-radio-touch-target\"\n-      (click)=\"_onTouchTargetClick($event)\"\n-      aria-hidden=\"true\"></div>\n+    <span class=\"mat-mdc-radio-touch-target\"></span>\n     <!--\n       Note that we set `aria-invalid=\"false\"` on the input, because otherwise some screen readers\n       will read out \"required, invalid data\" for each radio button that hasn't been checked.\n@@ -25,19 +22,19 @@\n            [attr.aria-describedby]=\"ariaDescribedby\"\n            [attr.aria-disabled]=\"disabled && disabledInteractive ? 'true' : null\"\n            (change)=\"_onInputInteraction($event)\">\n-    <div class=\"mdc-radio__background\" aria-hidden=\"true\">\n-      <div class=\"mdc-radio__outer-circle\"></div>\n-      <div class=\"mdc-radio__inner-circle\"></div>\n-    </div>\n-    <div mat-ripple class=\"mat-radio-ripple mat-focus-indicator\"\n+    <span class=\"mdc-radio__background\" aria-hidden=\"true\">\n+      <span class=\"mdc-radio__outer-circle\"></span>\n+      <span class=\"mdc-radio__inner-circle\"></span>\n+    </span>\n+    <span mat-ripple class=\"mat-radio-ripple mat-focus-indicator\"\n          [matRippleTrigger]=\"_rippleTrigger.nativeElement\"\n          [matRippleDisabled]=\"_isRippleDisabled()\"\n          [matRippleCentered]=\"true\"\n          aria-hidden=\"true\">\n-      <div class=\"mat-ripple-element mat-radio-persistent-ripple\"></div>\n-    </div>\n-  </div>\n-  <label class=\"mdc-label\" [for]=\"inputId\">\n+      <span class=\"mat-ripple-element mat-radio-persistent-ripple\"></span>\n+    </span>\n+  </span>\n+  <span class=\"mat-internal-form-field-label mdc-label\">\n     <ng-content></ng-content>\n-  </label>\n-</div>\n+  </span>\n+</label>\ndiff --git a/src/material/radio/radio.scss b/src/material/radio/radio.scss\nindex e5440a137..9aac73119 100644\n--- a/src/material/radio/radio.scss\n+++ b/src/material/radio/radio.scss\n@@ -12,14 +12,10 @@ $_is-external-build: true;\n   @include radio-common.radio-structure(true);\n   @include radio-common.radio-noop-animations();\n \n-  // Clicking the label toggles the radio, but MDC does not include any styles that inform the\n-  // user of this. Therefore we add the pointer cursor on top of MDC's styles.\n-  label {\n-    cursor: pointer;\n-\n-    // TODO(crisbeto): disable internally due to a large amount of breakages.\n-    // Prevent the label from taking up space when it's empty.\n-    @if ($_is-external-build) {\n+  // TODO(crisbeto): disable internally due to a large amount of breakages.\n+  // Prevent the label from taking up space when it's empty.\n+  @if ($_is-external-build) {\n+    .mat-internal-form-field-label {\n       &:empty {\n         display: none;\n       }\n@@ -51,9 +47,10 @@ $_is-external-build: true;\n     font-size: token-utils.slot(radio-label-text-size, $fallbacks);\n     letter-spacing: token-utils.slot(radio-label-text-tracking, $fallbacks);\n     font-weight: token-utils.slot(radio-label-text-weight, $fallbacks);\n+    cursor: pointer;\n   }\n \n-  .mdc-radio--disabled + label {\n+  .mdc-radio--disabled + .mat-internal-form-field-label {\n     color: token-utils.slot(radio-disabled-label-color, $fallbacks);\n   }\n \ndiff --git a/src/material/radio/radio.ts b/src/material/radio/radio.ts\nindex 911800951..b5cc58cb2 100644\n--- a/src/material/radio/radio.ts\n+++ b/src/material/radio/radio.ts\n@@ -709,17 +709,6 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy\n     }\n   }\n \n-  /** Triggered when the user clicks on the touch target. */\n-  _onTouchTargetClick(event: Event) {\n-    this._onInputInteraction(event);\n-\n-    if (!this.disabled || this.disabledInteractive) {\n-      // Normally the input should be focused already, but if the click\n-      // comes from the touch target, then we might have to focus it ourselves.\n-      this._inputElement?.nativeElement.focus();\n-    }\n-  }\n-\n   /** Sets the disabled state and marks for check if a change occurred. */\n   protected _setDisabled(value: boolean) {\n     if (this._disabled !== value) {\n",
+  "final_disposition": "not-applicable",
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "The upstream MDC touch target and its separately bound click listener are absent from the owned legacy radio template, which wraps the native input in its label; the retained legacy method is not bound by that template. This is a scoped source exclusion, not a screen-reader clearance.",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "individual_proof": {
+    "proof_kind": "whole-hunk-owned-and-package-boundary-review",
+    "source_conclusion_only": true,
+    "execution_claim": "not-claimed",
+    "source_evidence_scope": "current",
+    "source_evidence": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts",
+        "sha256": "8cdd88d202dce54dcde31ac0f9bda0f3e73726b8b611cab4fbcf7cbf4375a147",
+        "bytes": 21822
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-radio/radio.ts",
+        "sha256": "dffd3e4daf0d50d915303b2e3d13d26e8c97fb77756ccf8c618e34022f548f1e",
+        "bytes": 3762
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-radio/radio.html",
+        "sha256": "61b57e78e7c25bdae14c33027de26348f7238cc413405f65afdce84e2b5d6bbe",
+        "bytes": 1697
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-radio/radio.scss",
+        "sha256": "54e67218650eec5eb13b866d19bdbd9c1067204bea58fb5e4e1cfeb20d4eb718",
+        "bytes": 6022
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-radio/radio.spec.ts",
+        "sha256": "09f3b544934597caa7954eb922aaa7871d5e435786a99f199b50f1662a575bef",
+        "bytes": 54742
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/radio/_radio-theme.scss",
+        "sha256": "2d51f1d4eefc08228b284aea6f19f153772317434911cf79350924358eb21833",
+        "bytes": 3104
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/independent-source-review.md",
+        "sha256": "cb9477cbae9cfb781764c2704732e699ca58e5c2cac988f3641edd6e83b27131",
+        "bytes": 5700
+      }
+    ],
+    "diff_sha256": "9abf7bbf3bff1541a177dfcb1ea85f72c598668125ca1d4f19ab47fd16e0d347",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The upstream MDC touch target and its separately bound click listener are absent from the owned legacy radio template, which wraps the native input in its label; the retained legacy method is not bound by that template. This is a scoped source exclusion, not a screen-reader clearance."
+  },
+  "prior_complete_ledger_row": {
+    "sha": "a62e65971a379715b8bae2e437e67b62c113a263",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/radio): avoid making the touch target a focus stop (#33558)",
+    "files": [
+      "goldens/material/core/index.api.md",
+      "goldens/material/radio/index.api.md",
+      "src/material/core/internal-form-field/internal-form-field.scss",
+      "src/material/core/internal-form-field/internal-form-field.ts",
+      "src/material/radio/radio.html",
+      "src/material/radio/radio.scss",
+      "src/material/radio/radio.ts"
+    ],
+    "diff_sha256": "b4de2bfed761c89a24ced8d95a05b9cb7de1e92a051c7fbb9c35c86858b894a5",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/a62e65971a379715b8bae2e437e67b62c113a263.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/material/core/internal-form-field/internal-form-field.scss changes `& > label {`. That line is not in the legacy sources. @angular/material/core is exercised by projects/ngx-material-legacy/legacy-menu/menu-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/core imported by projects/ngx-material-legacy/legacy-menu/menu-module.ts"
+    }
+  },
+  "reviewed_upstream_paths": [
+    "goldens/material/core/index.api.md",
+    "goldens/material/radio/index.api.md",
+    "src/material/core/internal-form-field/internal-form-field.scss",
+    "src/material/core/internal-form-field/internal-form-field.ts",
+    "src/material/radio/radio.html",
+    "src/material/radio/radio.scss",
+    "src/material/radio/radio.ts"
+  ],
+  "upstream_path_accountability": [
+    {
+      "path": "goldens/material/core/index.api.md",
+      "hunks": [
+        "@@ -162,7 +162,7 @@ export const MATERIAL_ANIMATIONS: InjectionToken<AnimationsConfig>;"
+      ],
+      "judgment": "Current peer API surface or golden; retained legacy API is governed by the tagged contract and the separately documented nullable ARIA exception."
+    },
+    {
+      "path": "goldens/material/radio/index.api.md",
+      "hunks": [
+        "@@ -77,7 +77,6 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy"
+      ],
+      "judgment": "Current peer API surface or golden; retained legacy API is governed by the tagged contract and the separately documented nullable ARIA exception."
+    },
+    {
+      "path": "src/material/core/internal-form-field/internal-form-field.scss",
+      "hunks": [
+        "@@ -6,7 +6,8 @@",
+        "@@ -14,7 +15,8 @@",
+        "@@ -23,7 +25,8 @@",
+        "@@ -31,7 +34,8 @@"
+      ],
+      "judgment": "Current peer private form-field implementation; owned legacy radio uses its historical label and does not author this private component."
+    },
+    {
+      "path": "src/material/core/internal-form-field/internal-form-field.ts",
+      "hunks": [
+        "@@ -14,8 +14,7 @@ import {Component, Input, ViewEncapsulation} from '@angular/core';"
+      ],
+      "judgment": "Current peer private form-field implementation; owned legacy radio uses its historical label and does not author this private component."
+    },
+    {
+      "path": "src/material/radio/radio.html",
+      "hunks": [
+        "@@ -1,10 +1,7 @@",
+        "@@ -25,19 +22,19 @@"
+      ],
+      "judgment": "Current peer DOM and interaction markup; compare the owned historical template and do not import modern component structure."
+    },
+    {
+      "path": "src/material/radio/radio.scss",
+      "hunks": [
+        "@@ -12,14 +12,10 @@ $_is-external-build: true;",
+        "@@ -51,9 +47,10 @@ $_is-external-build: true;"
+      ],
+      "judgment": "Current peer styling; compare the owned historical style and bounded retained browser evidence, without claiming a universal visual or accessibility result."
+    },
+    {
+      "path": "src/material/radio/radio.ts",
+      "hunks": [
+        "@@ -709,17 +709,6 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy"
+      ],
+      "judgment": "Current peer component behavior and input surface; assess against the owned source and each explicitly stated source decision."
+    }
+  ],
+  "evidence_scope": "The referenced browser observations are retained historical receipts, not fresh execution in this checker invocation; broad accessibility, peer matrix and release claims are not made."
+}

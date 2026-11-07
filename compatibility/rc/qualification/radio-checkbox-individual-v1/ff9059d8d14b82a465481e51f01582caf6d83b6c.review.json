@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "sha": "ff9059d8d14b82a465481e51f01582caf6d83b6c",
+  "subject": "fix(material/checkbox): use GrayText for disabled colors in high contrast mode (#32066)",
+  "diff_sha256": "f92f220f3a57569423920b2ccd544e74b237d628982d286c618a2771a69a0980",
+  "diff": "diff --git a/src/material/checkbox/BUILD.bazel b/src/material/checkbox/BUILD.bazel\nindex 3e7309b54..5eb1f4c0f 100644\n--- a/src/material/checkbox/BUILD.bazel\n+++ b/src/material/checkbox/BUILD.bazel\n@@ -67,6 +67,7 @@ sass_binary(\n     deps = [\n         \":checkbox_common\",\n         \":m2\",\n+        \"//src/cdk:sass_lib\",\n         \"//src/material/core/style:layout_common\",\n         \"//src/material/core/tokens:token_utils\",\n     ],\ndiff --git a/src/material/checkbox/_checkbox-common.scss b/src/material/checkbox/_checkbox-common.scss\nindex 1c9a87d47..ccf505216 100644\n--- a/src/material/checkbox/_checkbox-common.scss\n+++ b/src/material/checkbox/_checkbox-common.scss\n@@ -63,10 +63,6 @@ $_fallback-size: 40px;\n   .mdc-checkbox--disabled {\n     cursor: default;\n     pointer-events: none;\n-\n-    @include cdk.high-contrast {\n-      opacity: 0.5;\n-    }\n   }\n \n   .mdc-checkbox__background {\n@@ -107,12 +103,20 @@ $_fallback-size: 40px;\n \n   .mdc-checkbox--disabled .mdc-checkbox__background {\n     border-color: token-utils.slot(checkbox-disabled-unselected-icon-color, $fallbacks);\n+\n+    @include cdk.high-contrast {\n+      border-color: GrayText;\n+    }\n   }\n \n   .mdc-checkbox__native-control:disabled:checked ~ .mdc-checkbox__background,\n   .mdc-checkbox__native-control:disabled:indeterminate ~ .mdc-checkbox__background {\n     background-color: token-utils.slot(checkbox-disabled-selected-icon-color, $fallbacks);\n     border-color: transparent;\n+\n+    @include cdk.high-contrast {\n+      border-color: GrayText;\n+    }\n   }\n \n   // stylelint-disable selector-combinator-space-before\n@@ -149,6 +153,10 @@ $_fallback-size: 40px;\n     .mdc-checkbox .mdc-checkbox__native-control:focus ~ .mdc-checkbox__background,\n     .mdc-checkbox__background {\n       border-color: token-utils.slot(checkbox-disabled-unselected-icon-color, $fallbacks);\n+\n+      @include cdk.high-contrast {\n+        border-color: GrayText;\n+      }\n     }\n \n     .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background,\n@@ -183,7 +191,7 @@ $_fallback-size: 40px;\n         color: token-utils.slot(checkbox-disabled-selected-checkmark-color, $fallbacks);\n \n         @include cdk.high-contrast {\n-          color: CanvasText;\n+          color: GrayText;\n         }\n       }\n     }\n@@ -220,6 +228,10 @@ $_fallback-size: 40px;\n     &, &.mat-mdc-checkbox-disabled-interactive {\n       .mdc-checkbox__mixedmark {\n         border-color: token-utils.slot(checkbox-disabled-selected-checkmark-color, $fallbacks);\n+\n+        @include cdk.high-contrast {\n+          border-color: GrayText;\n+        }\n       }\n     }\n   }\ndiff --git a/src/material/checkbox/checkbox.scss b/src/material/checkbox/checkbox.scss\nindex a8f7a7105..651656e8f 100644\n--- a/src/material/checkbox/checkbox.scss\n+++ b/src/material/checkbox/checkbox.scss\n@@ -1,3 +1,4 @@\n+@use '@angular/cdk';\n @use '../core/style/layout-common';\n @use './m3-checkbox';\n @use '../core/tokens/token-utils';\n@@ -44,6 +45,10 @@ $fallbacks: m3-checkbox.get-tokens();\n     label {\n       cursor: default;\n       color: token-utils.slot(checkbox-disabled-label-color, $fallbacks);\n+\n+      @include cdk.high-contrast {\n+        color: GrayText;\n+      }\n     }\n   }\n \n",
+  "final_disposition": "do-not-adopt",
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "The current peer GrayText and opacity changes target MDC checkbox styles; the retained earlier 2cf packed comparison found the four observed forced-colors states match tagged legacy controls in Chromium 156. Retain the historical treatment for this scope without asserting universal contrast or accessibility.",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "individual_proof": {
+    "proof_kind": "whole-hunk-owned-and-package-boundary-review",
+    "source_conclusion_only": true,
+    "execution_claim": "not-claimed",
+    "source_evidence_scope": "current",
+    "source_evidence": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-checkbox/internal/checkbox-base.ts",
+        "sha256": "e4e3aaa653750e7d9ce901e76c3ee0b9fe3f242439bbf0850ad1594503dd1437",
+        "bytes": 16642
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.ts",
+        "sha256": "774db12b55590d631d0a69c68a9aa7289adf600ac3fe62e288dd22fcf3c86766",
+        "bytes": 5525
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.html",
+        "sha256": "f630375b769dac8ba62c05c74d8f6abbb640bb9d6a9539ce01f220220f7b93b5",
+        "bytes": 2202
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.scss",
+        "sha256": "5bb880767ff062ead6604140938cd5d23136a135494e817291a81b13fc20d7b1",
+        "bytes": 13687
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.spec.ts",
+        "sha256": "c6c9f1bed9f75472644efa00d2e51a18f3bf85c461286b335ba35abe8bece7b7",
+        "bytes": 54168
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss",
+        "sha256": "97d4de28beacfa9229c148463b16436f5fdbf5e8905d9dc6c463c5e534da17a9",
+        "bytes": 7155
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/independent-source-review.md",
+        "sha256": "cb9477cbae9cfb781764c2704732e699ca58e5c2cac988f3641edd6e83b27131",
+        "bytes": 5700
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/comparison-review.md",
+        "sha256": "389799bae3722311882ef6746e9d295ca8e196f7ce66e85e6ded22c4b2d0efc7",
+        "bytes": 4085
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/comparison-observations.json",
+        "sha256": "a0a0414b94649637ca39fdefa965d7b0d76d50f819da59f74376a700cf009bbd",
+        "bytes": 101829
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/comparison-assertions.json",
+        "sha256": "31d3da9644e109aaa9ac712a4ac92fafdeba3218c823ad205adf733d19f6e451",
+        "bytes": 611
+      }
+    ],
+    "diff_sha256": "f92f220f3a57569423920b2ccd544e74b237d628982d286c618a2771a69a0980",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The current peer GrayText and opacity changes target MDC checkbox styles; the retained earlier 2cf packed comparison found the four observed forced-colors states match tagged legacy controls in Chromium 156. Retain the historical treatment for this scope without asserting universal contrast or accessibility."
+  },
+  "prior_complete_ledger_row": {
+    "sha": "ff9059d8d14b82a465481e51f01582caf6d83b6c",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/checkbox): use GrayText for disabled colors in high contrast mode (#32066)",
+    "files": [
+      "src/material/checkbox/BUILD.bazel",
+      "src/material/checkbox/_checkbox-common.scss",
+      "src/material/checkbox/checkbox.scss"
+    ],
+    "diff_sha256": "2f5cd2de8aabab99dc0c6d46da9ab4bc435a0152fa9cdacafa7e4ca49ea8c904",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/ff9059d8d14b82a465481e51f01582caf6d83b6c.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/material/checkbox/_checkbox-common.scss changes `@include cdk.high-contrast {`. That line is not in the legacy sources. @angular/material/checkbox is exercised by projects/ngx-material-legacy/legacy-checkbox/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/checkbox imported by projects/ngx-material-legacy/legacy-checkbox/public-api.ts"
+    }
+  },
+  "reviewed_upstream_paths": [
+    "src/material/checkbox/BUILD.bazel",
+    "src/material/checkbox/_checkbox-common.scss",
+    "src/material/checkbox/checkbox.scss"
+  ],
+  "upstream_path_accountability": [
+    {
+      "path": "src/material/checkbox/BUILD.bazel",
+      "hunks": [
+        "@@ -67,6 +67,7 @@ sass_binary("
+      ],
+      "judgment": "Upstream build dependency change; the legacy package does not adopt that upstream build rule."
+    },
+    {
+      "path": "src/material/checkbox/_checkbox-common.scss",
+      "hunks": [
+        "@@ -63,10 +63,6 @@ $_fallback-size: 40px;",
+        "@@ -107,12 +103,20 @@ $_fallback-size: 40px;",
+        "@@ -149,6 +153,10 @@ $_fallback-size: 40px;",
+        "@@ -183,7 +191,7 @@ $_fallback-size: 40px;",
+        "@@ -220,6 +228,10 @@ $_fallback-size: 40px;"
+      ],
+      "judgment": "Current peer styling; compare the owned historical style and bounded retained browser evidence, without claiming a universal visual or accessibility result."
+    },
+    {
+      "path": "src/material/checkbox/checkbox.scss",
+      "hunks": [
+        "@@ -1,3 +1,4 @@",
+        "@@ -44,6 +45,10 @@ $fallbacks: m3-checkbox.get-tokens();"
+      ],
+      "judgment": "Current peer styling; compare the owned historical style and bounded retained browser evidence, without claiming a universal visual or accessibility result."
+    }
+  ],
+  "evidence_scope": "The referenced browser observations are retained historical receipts, not fresh execution in this checker invocation; broad accessibility, peer matrix and release claims are not made."
+}

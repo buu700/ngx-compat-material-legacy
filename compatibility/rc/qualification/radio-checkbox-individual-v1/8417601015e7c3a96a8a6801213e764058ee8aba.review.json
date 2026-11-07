@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "sha": "8417601015e7c3a96a8a6801213e764058ee8aba",
+  "subject": "feat(material/checkbox): add the ability to interact with disabled checkboxes (#29474)",
+  "diff_sha256": "e161215c614c6cbc37e1c4af013738b14b8ce485eeba534b33e2d2ce97a026d2",
+  "diff": "diff --git a/src/dev-app/checkbox/BUILD.bazel b/src/dev-app/checkbox/BUILD.bazel\nindex 190471f72..8535517d8 100644\n--- a/src/dev-app/checkbox/BUILD.bazel\n+++ b/src/dev-app/checkbox/BUILD.bazel\n@@ -16,6 +16,7 @@ ng_module(\n         \"//src/material/form-field\",\n         \"//src/material/input\",\n         \"//src/material/select\",\n+        \"//src/material/tooltip\",\n         \"@npm//@angular/forms\",\n     ],\n )\ndiff --git a/src/dev-app/checkbox/checkbox-demo.html b/src/dev-app/checkbox/checkbox-demo.html\nindex 8bd338ef7..1c65e6746 100644\n--- a/src/dev-app/checkbox/checkbox-demo.html\n+++ b/src/dev-app/checkbox/checkbox-demo.html\n@@ -26,19 +26,20 @@\n                 (change)=\"isIndeterminate = false\"\n                 [indeterminate]=\"isIndeterminate\"\n                 [disabled]=\"isDisabled\"\n-                [labelPosition]=\"labelPosition\">\n+                [disabledInteractive]=\"isDisabledInteractive\"\n+                [labelPosition]=\"labelPosition\"\n+                [matTooltip]=\"isDisabled ? 'Tooltip that only shows up when disabled' : null\">\n     Do you want to <em>foobar</em> the <em>bazquux</em>?\n \n   </mat-checkbox> - <strong>{{printResult()}}</strong>\n </form>\n <div class=\"demo-checkbox\">\n-  <input id=\"indeterminate-toggle\"\n-         type=\"checkbox\"\n-         [(ngModel)]=\"isIndeterminate\"\n-         [disabled]=\"isDisabled\">\n+  <input id=\"indeterminate-toggle\" type=\"checkbox\" [(ngModel)]=\"isIndeterminate\">\n   <label for=\"indeterminate-toggle\">Toggle Indeterminate</label>\n   <input id=\"disabled-toggle\" type=\"checkbox\" [(ngModel)]=\"isDisabled\">\n   <label for=\"disabled-toggle\">Toggle Disabled</label>\n+  <input id=\"disabled-interactive-toggle\" type=\"checkbox\" [(ngModel)]=\"isDisabledInteractive\">\n+  <label for=\"disabled-interactive-toggle\">Toggle Disabled Interactive</label>\n   <input id=\"color-toggle\" type=\"checkbox\" [(ngModel)]=\"useAlternativeColor\">\n   <label for=\"color-toggle\">Toggle Color</label>\n </div>\ndiff --git a/src/dev-app/checkbox/checkbox-demo.ts b/src/dev-app/checkbox/checkbox-demo.ts\nindex 6d26783d4..873cb2720 100644\n--- a/src/dev-app/checkbox/checkbox-demo.ts\n+++ b/src/dev-app/checkbox/checkbox-demo.ts\n@@ -13,6 +13,7 @@ import {MAT_CHECKBOX_DEFAULT_OPTIONS, MatCheckboxModule} from '@angular/material\n import {MatPseudoCheckboxModule, ThemePalette} from '@angular/material/core';\n import {MatInputModule} from '@angular/material/input';\n import {MatSelectModule} from '@angular/material/select';\n+import {MatTooltip} from '@angular/material/tooltip';\n \n export interface Task {\n   name: string;\n@@ -114,15 +115,17 @@ export class MatCheckboxDemoNestedChecklist {\n     ClickActionNoop,\n     ClickActionCheck,\n     AnimationsNoop,\n+    MatTooltip,\n   ],\n   changeDetection: ChangeDetectionStrategy.OnPush,\n })\n export class CheckboxDemo {\n-  isIndeterminate: boolean = false;\n-  isChecked: boolean = false;\n-  isDisabled: boolean = false;\n+  isIndeterminate = false;\n+  isChecked = false;\n+  isDisabled = false;\n+  isDisabledInteractive = false;\n   labelPosition: 'before' | 'after' = 'after';\n-  useAlternativeColor: boolean = false;\n+  useAlternativeColor = false;\n \n   demoRequired = false;\n   demoLabelAfter = false;\ndiff --git a/src/material/checkbox/_checkbox-common.scss b/src/material/checkbox/_checkbox-common.scss\nindex 0a713417a..e17a06009 100644\n--- a/src/material/checkbox/_checkbox-common.scss\n+++ b/src/material/checkbox/_checkbox-common.scss\n@@ -138,6 +138,21 @@ $_fallback-size: 40px;\n       @include token-utils.create-token-slot(border-color, selected-focus-icon-color);\n       @include token-utils.create-token-slot(background-color, selected-focus-icon-color);\n     }\n+\n+    // Needs extra specificity to override the focus, hover, active states.\n+    .mdc-checkbox--disabled.mat-mdc-checkbox-disabled-interactive {\n+      .mdc-checkbox:hover .mdc-checkbox__native-control ~ .mdc-checkbox__background,\n+      .mdc-checkbox .mdc-checkbox__native-control:focus ~ .mdc-checkbox__background,\n+      .mdc-checkbox__background {\n+        @include token-utils.create-token-slot(border-color, disabled-unselected-icon-color);\n+      }\n+\n+      .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background,\n+      .mdc-checkbox__native-control:indeterminate ~ .mdc-checkbox__background {\n+        @include token-utils.create-token-slot(background-color, disabled-selected-icon-color);\n+        border-color: transparent;\n+      }\n+    }\n   }\n \n   .mdc-checkbox__checkmark {\n@@ -158,8 +173,12 @@ $_fallback-size: 40px;\n   }\n \n   @include token-utils.use-tokens($prefix, $slots) {\n-    .mdc-checkbox--disabled .mdc-checkbox__checkmark {\n-      @include token-utils.create-token-slot(color, disabled-selected-checkmark-color);\n+    .mdc-checkbox--disabled {\n+      &, &.mat-mdc-checkbox-disabled-interactive {\n+        .mdc-checkbox__checkmark {\n+          @include token-utils.create-token-slot(color, disabled-selected-checkmark-color);\n+        }\n+      }\n     }\n   }\n \n@@ -193,8 +212,12 @@ $_fallback-size: 40px;\n   }\n \n   @include token-utils.use-tokens($prefix, $slots) {\n-    .mdc-checkbox--disabled .mdc-checkbox__mixedmark {\n-      @include token-utils.create-token-slot(border-color, disabled-selected-checkmark-color);\n+    .mdc-checkbox--disabled {\n+      &, &.mat-mdc-checkbox-disabled-interactive {\n+        .mdc-checkbox__mixedmark {\n+          @include token-utils.create-token-slot(border-color, disabled-selected-checkmark-color);\n+        }\n+      }\n     }\n   }\n \n@@ -520,4 +543,15 @@ $_fallback-size: 40px;\n       );\n     }\n   }\n+\n+  // Needs extra specificity to override the focus, hover, active states.\n+  .mdc-checkbox--disabled.mat-mdc-checkbox-disabled-interactive & {\n+    .mdc-checkbox__native-control ~ .mat-mdc-checkbox-ripple .mat-ripple-element,\n+    .mdc-checkbox__native-control ~ .mdc-checkbox__ripple {\n+      @include token-utils.create-token-slot(\n+        background-color,\n+        unselected-hover-state-layer-color\n+      );\n+    }\n+  }\n }\ndiff --git a/src/material/checkbox/checkbox-config.ts b/src/material/checkbox/checkbox-config.ts\nindex bef49ab58..be9715448 100644\n--- a/src/material/checkbox/checkbox-config.ts\n+++ b/src/material/checkbox/checkbox-config.ts\n@@ -18,8 +18,12 @@ export interface MatCheckboxDefaultOptions {\n    * https://material.angular.io/guide/theming#using-component-color-variants\n    */\n   color?: ThemePalette;\n+\n   /** Default checkbox click action for checkboxes. */\n   clickAction?: MatCheckboxClickAction;\n+\n+  /** Whether disabled checkboxes should be interactive. */\n+  disabledInteractive?: boolean;\n }\n \n /** Injection token to be used to override the default options for `mat-checkbox`. */\n@@ -36,6 +40,7 @@ export function MAT_CHECKBOX_DEFAULT_OPTIONS_FACTORY(): MatCheckboxDefaultOption\n   return {\n     color: 'accent',\n     clickAction: 'check-indeterminate',\n+    disabledInteractive: false,\n   };\n }\n \ndiff --git a/src/material/checkbox/checkbox.html b/src/material/checkbox/checkbox.html\nindex 8378598df..045ee998e 100644\n--- a/src/material/checkbox/checkbox.html\n+++ b/src/material/checkbox/checkbox.html\n@@ -10,14 +10,15 @@\n            [attr.aria-labelledby]=\"ariaLabelledby\"\n            [attr.aria-describedby]=\"ariaDescribedby\"\n            [attr.aria-checked]=\"indeterminate ? 'mixed' : null\"\n+           [attr.aria-disabled]=\"disabled && disabledInteractive ? true : null\"\n            [attr.name]=\"name\"\n            [attr.value]=\"value\"\n            [checked]=\"checked\"\n            [indeterminate]=\"indeterminate\"\n-           [disabled]=\"disabled\"\n+           [disabled]=\"disabled && !disabledInteractive\"\n            [id]=\"inputId\"\n            [required]=\"required\"\n-           [tabIndex]=\"disabled ? -1 : tabIndex\"\n+           [tabIndex]=\"disabled && !disabledInteractive ? -1 : tabIndex\"\n            (blur)=\"_onBlur()\"\n            (click)=\"_onInputClick()\"\n            (change)=\"_onInteractionEvent($event)\"/>\n@@ -43,9 +44,7 @@\n     (#14385). Putting a click handler on the <label/> caused this bug because the browser produced\n     an unnecessary accessibility tree node.\n   -->\n-  <label class=\"mdc-label\"\n-         #label\n-         [for]=\"inputId\">\n+  <label class=\"mdc-label\" #label [for]=\"inputId\">\n     <ng-content></ng-content>\n   </label>\n </div>\ndiff --git a/src/material/checkbox/checkbox.scss b/src/material/checkbox/checkbox.scss\nindex e63f95417..e21fcfc69 100644\n--- a/src/material/checkbox/checkbox.scss\n+++ b/src/material/checkbox/checkbox.scss\n@@ -42,14 +42,24 @@\n     }\n   }\n \n-  &.mat-mdc-checkbox-disabled label {\n-    cursor: default;\n+  &.mat-mdc-checkbox-disabled {\n+    &.mat-mdc-checkbox-disabled-interactive {\n+      pointer-events: auto;\n \n-    @include token-utils.use-tokens(\n-      tokens-mat-checkbox.$prefix,\n-      tokens-mat-checkbox.get-token-slots()\n-    ) {\n-      @include token-utils.create-token-slot(color, disabled-label-color);\n+      input {\n+        cursor: default;\n+      }\n+    }\n+\n+    label {\n+      cursor: default;\n+\n+      @include token-utils.use-tokens(\n+        tokens-mat-checkbox.$prefix,\n+        tokens-mat-checkbox.get-token-slots()\n+      ) {\n+        @include token-utils.create-token-slot(color, disabled-label-color);\n+      }\n     }\n   }\n \ndiff --git a/src/material/checkbox/checkbox.spec.ts b/src/material/checkbox/checkbox.spec.ts\nindex d7efa1223..7d858e856 100644\n--- a/src/material/checkbox/checkbox.spec.ts\n+++ b/src/material/checkbox/checkbox.spec.ts\n@@ -444,6 +444,28 @@ describe('MDC-based MatCheckbox', () => {\n       expect(checkboxNativeElement.querySelector('svg')!.getAttribute('focusable')).toBe('false');\n     }));\n \n+    it('should be able to mark a checkbox as disabled while keeping it interactive', fakeAsync(() => {\n+      testComponent.isDisabled = true;\n+      fixture.changeDetectorRef.markForCheck();\n+      fixture.detectChanges();\n+\n+      expect(checkboxNativeElement.classList).not.toContain(\n+        'mat-mdc-checkbox-disabled-interactive',\n+      );\n+      expect(inputElement.hasAttribute('aria-disabled')).toBe(false);\n+      expect(inputElement.tabIndex).toBe(-1);\n+      expect(inputElement.disabled).toBe(true);\n+\n+      testComponent.disabledInteractive = true;\n+      fixture.changeDetectorRef.markForCheck();\n+      fixture.detectChanges();\n+\n+      expect(checkboxNativeElement.classList).toContain('mat-mdc-checkbox-disabled-interactive');\n+      expect(inputElement.getAttribute('aria-disabled')).toBe('true');\n+      expect(inputElement.tabIndex).toBe(0);\n+      expect(inputElement.disabled).toBe(false);\n+    }));\n+\n     describe('ripple elements', () => {\n       it('should show ripples on label mousedown', fakeAsync(() => {\n         const rippleSelector = '.mat-ripple-element:not(.mat-checkbox-persistent-ripple)';\n@@ -1111,6 +1133,7 @@ describe('MatCheckboxDefaultOptions', () => {\n         [color]=\"checkboxColor\"\n         [disableRipple]=\"disableRipple\"\n         [value]=\"checkboxValue\"\n+        [disabledInteractive]=\"disabledInteractive\"\n         (change)=\"onCheckboxChange($event)\">\n       Simple checkbox\n     </mat-checkbox>\n@@ -1120,13 +1143,14 @@ describe('MatCheckboxDefaultOptions', () => {\n })\n class SingleCheckbox {\n   labelPos: 'before' | 'after' = 'after';\n-  isChecked: boolean = false;\n-  isRequired: boolean = false;\n-  isIndeterminate: boolean = false;\n-  isDisabled: boolean = false;\n-  disableRipple: boolean = false;\n-  parentElementClicked: boolean = false;\n-  parentElementKeyedUp: boolean = false;\n+  isChecked = false;\n+  isRequired = false;\n+  isIndeterminate = false;\n+  isDisabled = false;\n+  disableRipple = false;\n+  parentElementClicked = false;\n+  parentElementKeyedUp = false;\n+  disabledInteractive = false;\n   checkboxId: string | null = 'simple-check';\n   checkboxColor: ThemePalette = 'primary';\n   checkboxValue: string = 'single_checkbox';\n@@ -1143,9 +1167,9 @@ class SingleCheckbox {\n   imports: [MatCheckbox, FormsModule],\n })\n class CheckboxWithNgModel {\n-  isGood: boolean = false;\n-  isRequired: boolean = true;\n-  isDisabled: boolean = false;\n+  isGood = false;\n+  isRequired = true;\n+  isDisabled = false;\n }\n \n @Component({\ndiff --git a/src/material/checkbox/checkbox.ts b/src/material/checkbox/checkbox.ts\nindex 58a588772..aee9aaac1 100644\n--- a/src/material/checkbox/checkbox.ts\n+++ b/src/material/checkbox/checkbox.ts\n@@ -98,6 +98,7 @@ const defaults = MAT_CHECKBOX_DEFAULT_OPTIONS_FACTORY();\n     // Add classes that users can use to more easily target disabled or checked checkboxes.\n     '[class.mat-mdc-checkbox-disabled]': 'disabled',\n     '[class.mat-mdc-checkbox-checked]': 'checked',\n+    '[class.mat-mdc-checkbox-disabled-interactive]': 'disabledInteractive',\n     '[class]': 'color ? \"mat-\" + color : \"mat-accent\"',\n   },\n   providers: [\n@@ -211,6 +212,10 @@ export class MatCheckbox\n    */\n   @Input() color: string | undefined;\n \n+  /** Whether the checkbox should remain interactive when it is disabled. */\n+  @Input({transform: booleanAttribute})\n+  disabledInteractive: boolean;\n+\n   /**\n    * Reference to the MatRipple instance of the checkbox.\n    * @deprecated Considered an implementation detail. To be removed.\n@@ -241,6 +246,7 @@ export class MatCheckbox\n     this.color = this._options.color || defaults.color;\n     this.tabIndex = parseInt(tabIndex) || 0;\n     this.id = this._uniqueId = `mat-mdc-checkbox-${++nextUniqueId}`;\n+    this.disabledInteractive = _options?.disabledInteractive ?? false;\n   }\n \n   ngOnChanges(changes: SimpleChanges) {\n@@ -422,7 +428,10 @@ export class MatCheckbox\n       // It is important to only emit it, if the native input triggered one, because\n       // we don't want to trigger a change event, when the `checked` variable changes for example.\n       this._emitChangeEvent();\n-    } else if (!this.disabled && clickAction === 'noop') {\n+    } else if (\n+      (this.disabled && this.disabledInteractive) ||\n+      (!this.disabled && clickAction === 'noop')\n+    ) {\n       // Reset native input when clicked with noop. The native checkbox becomes checked after\n       // click, reset it to be align with `checked` value of `mat-checkbox`.\n       this._inputElement.nativeElement.checked = this.checked;\ndiff --git a/tools/public_api_guard/material/checkbox.md b/tools/public_api_guard/material/checkbox.md\nindex a5978a62d..51621165f 100644\n--- a/tools/public_api_guard/material/checkbox.md\n+++ b/tools/public_api_guard/material/checkbox.md\n@@ -59,6 +59,7 @@ export class MatCheckbox implements AfterViewInit, OnChanges, ControlValueAccess\n     protected _createChangeEvent(isChecked: boolean): MatCheckboxChange;\n     get disabled(): boolean;\n     set disabled(value: boolean);\n+    disabledInteractive: boolean;\n     disableRipple: boolean;\n     // (undocumented)\n     _elementRef: ElementRef<HTMLElement>;\n@@ -82,6 +83,8 @@ export class MatCheckbox implements AfterViewInit, OnChanges, ControlValueAccess\n     // (undocumented)\n     static ngAcceptInputType_disabled: unknown;\n     // (undocumented)\n+    static ngAcceptInputType_disabledInteractive: unknown;\n+    // (undocumented)\n     static ngAcceptInputType_disableRipple: unknown;\n     // (undocumented)\n     static ngAcceptInputType_indeterminate: unknown;\n@@ -123,7 +126,7 @@ export class MatCheckbox implements AfterViewInit, OnChanges, ControlValueAccess\n     // (undocumented)\n     writeValue(value: any): void;\n     // (undocumented)\n-    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatCheckbox, \"mat-checkbox\", [\"matCheckbox\"], { \"ariaLabel\": { \"alias\": \"aria-label\"; \"required\": false; }; \"ariaLabelledby\": { \"alias\": \"aria-labelledby\"; \"required\": false; }; \"ariaDescribedby\": { \"alias\": \"aria-describedby\"; \"required\": false; }; \"id\": { \"alias\": \"id\"; \"required\": false; }; \"required\": { \"alias\": \"required\"; \"required\": false; }; \"labelPosition\": { \"alias\": \"labelPosition\"; \"required\": false; }; \"name\": { \"alias\": \"name\"; \"required\": false; }; \"value\": { \"alias\": \"value\"; \"required\": false; }; \"disableRipple\": { \"alias\": \"disableRipple\"; \"required\": false; }; \"tabIndex\": { \"alias\": \"tabIndex\"; \"required\": false; }; \"color\": { \"alias\": \"color\"; \"required\": false; }; \"checked\": { \"alias\": \"checked\"; \"required\": false; }; \"disabled\": { \"alias\": \"disabled\"; \"required\": false; }; \"indeterminate\": { \"alias\": \"indeterminate\"; \"required\": false; }; }, { \"change\": \"change\"; \"indeterminateChange\": \"indeterminateChange\"; }, never, [\"*\"], true, never>;\n+    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatCheckbox, \"mat-checkbox\", [\"matCheckbox\"], { \"ariaLabel\": { \"alias\": \"aria-label\"; \"required\": false; }; \"ariaLabelledby\": { \"alias\": \"aria-labelledby\"; \"required\": false; }; \"ariaDescribedby\": { \"alias\": \"aria-describedby\"; \"required\": false; }; \"id\": { \"alias\": \"id\"; \"required\": false; }; \"required\": { \"alias\": \"required\"; \"required\": false; }; \"labelPosition\": { \"alias\": \"labelPosition\"; \"required\": false; }; \"name\": { \"alias\": \"name\"; \"required\": false; }; \"value\": { \"alias\": \"value\"; \"required\": false; }; \"disableRipple\": { \"alias\": \"disableRipple\"; \"required\": false; }; \"tabIndex\": { \"alias\": \"tabIndex\"; \"required\": false; }; \"color\": { \"alias\": \"color\"; \"required\": false; }; \"disabledInteractive\": { \"alias\": \"disabledInteractive\"; \"required\": false; }; \"checked\": { \"alias\": \"checked\"; \"required\": false; }; \"disabled\": { \"alias\": \"disabled\"; \"required\": false; }; \"indeterminate\": { \"alias\": \"indeterminate\"; \"required\": false; }; }, { \"change\": \"change\"; \"indeterminateChange\": \"indeterminateChange\"; }, never, [\"*\"], true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCheckbox, [null, null, null, { attribute: \"tabindex\"; }, { optional: true; }, { optional: true; }]>;\n }\n@@ -141,6 +144,7 @@ export type MatCheckboxClickAction = 'noop' | 'check' | 'check-indeterminate' |\n export interface MatCheckboxDefaultOptions {\n     clickAction?: MatCheckboxClickAction;\n     color?: ThemePalette;\n+    disabledInteractive?: boolean;\n }\n \n // @public (undocumented)\n",
+  "final_disposition": "do-not-adopt",
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "The post-sixteen disabledInteractive checkbox option and focusable aria-disabled opt-in are outside the frozen legacy API; the owned legacy checkbox retains its native disabled input and does not borrow the current checkbox implementation.",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "individual_proof": {
+    "proof_kind": "whole-hunk-owned-and-package-boundary-review",
+    "source_conclusion_only": true,
+    "execution_claim": "not-claimed",
+    "source_evidence_scope": "current",
+    "source_evidence": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-checkbox/internal/checkbox-base.ts",
+        "sha256": "e4e3aaa653750e7d9ce901e76c3ee0b9fe3f242439bbf0850ad1594503dd1437",
+        "bytes": 16642
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.ts",
+        "sha256": "774db12b55590d631d0a69c68a9aa7289adf600ac3fe62e288dd22fcf3c86766",
+        "bytes": 5525
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.html",
+        "sha256": "f630375b769dac8ba62c05c74d8f6abbb640bb9d6a9539ce01f220220f7b93b5",
+        "bytes": 2202
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.scss",
+        "sha256": "5bb880767ff062ead6604140938cd5d23136a135494e817291a81b13fc20d7b1",
+        "bytes": 13687
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.spec.ts",
+        "sha256": "c6c9f1bed9f75472644efa00d2e51a18f3bf85c461286b335ba35abe8bece7b7",
+        "bytes": 54168
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss",
+        "sha256": "97d4de28beacfa9229c148463b16436f5fdbf5e8905d9dc6c463c5e534da17a9",
+        "bytes": 7155
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/independent-source-review.md",
+        "sha256": "cb9477cbae9cfb781764c2704732e699ca58e5c2cac988f3641edd6e83b27131",
+        "bytes": 5700
+      }
+    ],
+    "diff_sha256": "e161215c614c6cbc37e1c4af013738b14b8ce485eeba534b33e2d2ce97a026d2",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The post-sixteen disabledInteractive checkbox option and focusable aria-disabled opt-in are outside the frozen legacy API; the owned legacy checkbox retains its native disabled input and does not borrow the current checkbox implementation."
+  },
+  "prior_complete_ledger_row": {
+    "sha": "8417601015e7c3a96a8a6801213e764058ee8aba",
+    "bucket": "needs-triage",
+    "subject": "feat(material/checkbox): add the ability to interact with disabled checkboxes (#29474)",
+    "files": [
+      "src/dev-app/checkbox/BUILD.bazel",
+      "src/dev-app/checkbox/checkbox-demo.html",
+      "src/dev-app/checkbox/checkbox-demo.ts",
+      "src/material/checkbox/_checkbox-common.scss",
+      "src/material/checkbox/checkbox-config.ts",
+      "src/material/checkbox/checkbox.html",
+      "src/material/checkbox/checkbox.scss",
+      "src/material/checkbox/checkbox.spec.ts",
+      "src/material/checkbox/checkbox.ts",
+      "tools/public_api_guard/material/checkbox.md"
+    ],
+    "diff_sha256": "b7f898ddc017eda4c5f0458fc514397c6effa3401682407e37f840c7435be12a",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/8417601015e7c3a96a8a6801213e764058ee8aba.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/dev-app/checkbox/checkbox-demo.ts changes `MatTooltip,`. That line is not in the legacy sources. @angular/material/checkbox is exercised by projects/ngx-material-legacy/legacy-checkbox/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/checkbox imported by projects/ngx-material-legacy/legacy-checkbox/public-api.ts"
+    }
+  },
+  "reviewed_upstream_paths": [
+    "src/dev-app/checkbox/BUILD.bazel",
+    "src/dev-app/checkbox/checkbox-demo.html",
+    "src/dev-app/checkbox/checkbox-demo.ts",
+    "src/material/checkbox/_checkbox-common.scss",
+    "src/material/checkbox/checkbox-config.ts",
+    "src/material/checkbox/checkbox.html",
+    "src/material/checkbox/checkbox.scss",
+    "src/material/checkbox/checkbox.spec.ts",
+    "src/material/checkbox/checkbox.ts",
+    "tools/public_api_guard/material/checkbox.md"
+  ],
+  "upstream_path_accountability": [
+    {
+      "path": "src/dev-app/checkbox/BUILD.bazel",
+      "hunks": [
+        "@@ -16,6 +16,7 @@ ng_module("
+      ],
+      "judgment": "Demonstration or build wiring for the modern opt-in; not shipped as legacy product code."
+    },
+    {
+      "path": "src/dev-app/checkbox/checkbox-demo.html",
+      "hunks": [
+        "@@ -26,19 +26,20 @@"
+      ],
+      "judgment": "Demonstration or build wiring for the modern opt-in; not shipped as legacy product code."
+    },
+    {
+      "path": "src/dev-app/checkbox/checkbox-demo.ts",
+      "hunks": [
+        "@@ -13,6 +13,7 @@ import {MAT_CHECKBOX_DEFAULT_OPTIONS, MatCheckboxModule} from '@angular/material",
+        "@@ -114,15 +115,17 @@ export class MatCheckboxDemoNestedChecklist {"
+      ],
+      "judgment": "Demonstration or build wiring for the modern opt-in; not shipped as legacy product code."
+    },
+    {
+      "path": "src/material/checkbox/_checkbox-common.scss",
+      "hunks": [
+        "@@ -138,6 +138,21 @@ $_fallback-size: 40px;",
+        "@@ -158,8 +173,12 @@ $_fallback-size: 40px;",
+        "@@ -193,8 +212,12 @@ $_fallback-size: 40px;",
+        "@@ -520,4 +543,15 @@ $_fallback-size: 40px;"
+      ],
+      "judgment": "Current peer styling; compare the owned historical style and bounded retained browser evidence, without claiming a universal visual or accessibility result."
+    },
+    {
+      "path": "src/material/checkbox/checkbox-config.ts",
+      "hunks": [
+        "@@ -18,8 +18,12 @@ export interface MatCheckboxDefaultOptions {",
+        "@@ -36,6 +40,7 @@ export function MAT_CHECKBOX_DEFAULT_OPTIONS_FACTORY(): MatCheckboxDefaultOption"
+      ],
+      "judgment": "Current peer disabledInteractive option; absent from the historical legacy checkbox contract."
+    },
+    {
+      "path": "src/material/checkbox/checkbox.html",
+      "hunks": [
+        "@@ -10,14 +10,15 @@",
+        "@@ -43,9 +44,7 @@"
+      ],
+      "judgment": "Current peer DOM and interaction markup; compare the owned historical template and do not import modern component structure."
+    },
+    {
+      "path": "src/material/checkbox/checkbox.scss",
+      "hunks": [
+        "@@ -42,14 +42,24 @@"
+      ],
+      "judgment": "Current peer styling; compare the owned historical style and bounded retained browser evidence, without claiming a universal visual or accessibility result."
+    },
+    {
+      "path": "src/material/checkbox/checkbox.spec.ts",
+      "hunks": [
+        "@@ -444,6 +444,28 @@ describe('MDC-based MatCheckbox', () => {",
+        "@@ -1111,6 +1133,7 @@ describe('MatCheckboxDefaultOptions', () => {",
+        "@@ -1120,13 +1143,14 @@ describe('MatCheckboxDefaultOptions', () => {",
+        "@@ -1143,9 +1167,9 @@ class SingleCheckbox {"
+      ],
+      "judgment": "Upstream test or shared test setup; reviewed for the trigger and controls, with retained evidence scoped separately."
+    },
+    {
+      "path": "src/material/checkbox/checkbox.ts",
+      "hunks": [
+        "@@ -98,6 +98,7 @@ const defaults = MAT_CHECKBOX_DEFAULT_OPTIONS_FACTORY();",
+        "@@ -211,6 +212,10 @@ export class MatCheckbox",
+        "@@ -241,6 +246,7 @@ export class MatCheckbox",
+        "@@ -422,7 +428,10 @@ export class MatCheckbox"
+      ],
+      "judgment": "Current peer component behavior and input surface; assess against the owned source and each explicitly stated source decision."
+    },
+    {
+      "path": "tools/public_api_guard/material/checkbox.md",
+      "hunks": [
+        "@@ -59,6 +59,7 @@ export class MatCheckbox implements AfterViewInit, OnChanges, ControlValueAccess",
+        "@@ -82,6 +83,8 @@ export class MatCheckbox implements AfterViewInit, OnChanges, ControlValueAccess",
+        "@@ -123,7 +126,7 @@ export class MatCheckbox implements AfterViewInit, OnChanges, ControlValueAccess",
+        "@@ -141,6 +144,7 @@ export type MatCheckboxClickAction = 'noop' | 'check' | 'check-indeterminate' |"
+      ],
+      "judgment": "Current peer API surface or golden; retained legacy API is governed by the tagged contract and the separately documented nullable ARIA exception."
+    }
+  ],
+  "evidence_scope": "The referenced browser observations are retained historical receipts, not fresh execution in this checker invocation; broad accessibility, peer matrix and release claims are not made."
+}

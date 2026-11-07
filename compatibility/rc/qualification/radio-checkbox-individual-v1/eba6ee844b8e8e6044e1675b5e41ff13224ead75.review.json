@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "sha": "eba6ee844b8e8e6044e1675b5e41ff13224ead75",
+  "subject": "fix(material/radio): allow aria attributes to be reset (#32613)",
+  "diff_sha256": "356f52b02a7ba7207edd2fec6b7e1fd32e786d11025645850b1cea7505f97363",
+  "diff": "diff --git a/goldens/material/radio/index.api.md b/goldens/material/radio/index.api.md\nindex 77d240a65..2b741095c 100644\n--- a/goldens/material/radio/index.api.md\n+++ b/goldens/material/radio/index.api.md\n@@ -30,9 +30,9 @@ export const MAT_RADIO_GROUP_CONTROL_VALUE_ACCESSOR: any;\n // @public (undocumented)\n export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy {\n     constructor(...args: unknown[]);\n-    ariaDescribedby: string;\n-    ariaLabel: string;\n-    ariaLabelledby: string;\n+    ariaDescribedby: string | null;\n+    ariaLabel: string | null;\n+    ariaLabelledby: string | null;\n     readonly change: EventEmitter<MatRadioChange>;\n     get checked(): boolean;\n     set checked(value: boolean);\ndiff --git a/src/material/radio/radio.spec.ts b/src/material/radio/radio.spec.ts\nindex 8c03a5e50..63e346109 100644\n--- a/src/material/radio/radio.spec.ts\n+++ b/src/material/radio/radio.spec.ts\n@@ -816,8 +816,12 @@ describe('MatRadio', () => {\n       testComponent.ariaLabel = 'Pineapple';\n       fixture.changeDetectorRef.markForCheck();\n       fixture.detectChanges();\n-\n       expect(fruitRadioNativeInputs[0].getAttribute('aria-label')).toBe('Pineapple');\n+\n+      testComponent.ariaLabel = null;\n+      fixture.changeDetectorRef.markForCheck();\n+      fixture.detectChanges();\n+      expect(fruitRadioNativeInputs[0].hasAttribute('aria-label')).toBe(false);\n     });\n \n     it('should add aria-labelledby attribute to the underlying input element if defined', () => {\n@@ -834,8 +838,12 @@ describe('MatRadio', () => {\n       testComponent.ariaLabelledby = 'uvw';\n       fixture.changeDetectorRef.markForCheck();\n       fixture.detectChanges();\n-\n       expect(fruitRadioNativeInputs[0].getAttribute('aria-labelledby')).toBe('uvw');\n+\n+      testComponent.ariaLabelledby = null;\n+      fixture.changeDetectorRef.markForCheck();\n+      fixture.detectChanges();\n+      expect(fruitRadioNativeInputs[0].hasAttribute('aria-labelledby')).toBe(false);\n     });\n \n     it('should add aria-describedby attribute to the underlying input element if defined', () => {\n@@ -852,8 +860,12 @@ describe('MatRadio', () => {\n       testComponent.ariaDescribedby = 'uvw';\n       fixture.changeDetectorRef.markForCheck();\n       fixture.detectChanges();\n-\n       expect(fruitRadioNativeInputs[0].getAttribute('aria-describedby')).toBe('uvw');\n+\n+      testComponent.ariaDescribedby = null;\n+      fixture.changeDetectorRef.markForCheck();\n+      fixture.detectChanges();\n+      expect(fruitRadioNativeInputs[0].hasAttribute('aria-describedby')).toBe(false);\n     });\n \n     it('should focus on underlying input element when focus() is called', () => {\n@@ -1117,9 +1129,9 @@ class RadiosInsidePreCheckedRadioGroup {}\n   imports: [MatRadioModule, FormsModule, ReactiveFormsModule],\n })\n class StandaloneRadioButtons {\n-  ariaLabel: string = 'Banana';\n-  ariaLabelledby: string = 'xyz';\n-  ariaDescribedby: string = 'abc';\n+  ariaLabel: string | null = 'Banana';\n+  ariaLabelledby: string | null = 'xyz';\n+  ariaDescribedby: string | null = 'abc';\n }\n \n @Component({\ndiff --git a/src/material/radio/radio.ts b/src/material/radio/radio.ts\nindex b44a647c1..0e142fc33 100644\n--- a/src/material/radio/radio.ts\n+++ b/src/material/radio/radio.ts\n@@ -427,13 +427,13 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy\n   @Input() name!: string;\n \n   /** Used to set the 'aria-label' attribute on the underlying input element. */\n-  @Input('aria-label') ariaLabel!: string;\n+  @Input('aria-label') ariaLabel!: string | null;\n \n   /** The 'aria-labelledby' attribute takes precedence as the element's text alternative. */\n-  @Input('aria-labelledby') ariaLabelledby!: string;\n+  @Input('aria-labelledby') ariaLabelledby!: string | null;\n \n   /** The 'aria-describedby' attribute is read after the element's label and field type. */\n-  @Input('aria-describedby') ariaDescribedby!: string;\n+  @Input('aria-describedby') ariaDescribedby!: string | null;\n \n   /** Whether ripples are disabled inside the radio button */\n   @Input({transform: booleanAttribute})\n",
+  "final_disposition": "already-adapted",
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "The owned radio input declarations accept string or null for all three existing ARIA aliases; the tagged sixteen declarations were string-only, and the explicitly reviewed conservative TypeScript exception preserves existing native attribute removal and unchanged runtime template; the retained e066 packed radio run and strict AOT controls remain bound to their original artifacts.",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "individual_proof": {
+    "proof_kind": "whole-hunk-owned-and-package-boundary-review",
+    "source_conclusion_only": true,
+    "execution_claim": "not-claimed",
+    "source_evidence_scope": "current",
+    "source_evidence": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts",
+        "sha256": "8cdd88d202dce54dcde31ac0f9bda0f3e73726b8b611cab4fbcf7cbf4375a147",
+        "bytes": 21822
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-radio/radio.ts",
+        "sha256": "dffd3e4daf0d50d915303b2e3d13d26e8c97fb77756ccf8c618e34022f548f1e",
+        "bytes": 3762
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-radio/radio.html",
+        "sha256": "61b57e78e7c25bdae14c33027de26348f7238cc413405f65afdce84e2b5d6bbe",
+        "bytes": 1697
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-radio/radio.scss",
+        "sha256": "54e67218650eec5eb13b866d19bdbd9c1067204bea58fb5e4e1cfeb20d4eb718",
+        "bytes": 6022
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-radio/radio.spec.ts",
+        "sha256": "09f3b544934597caa7954eb922aaa7871d5e435786a99f199b50f1662a575bef",
+        "bytes": 54742
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/radio/_radio-theme.scss",
+        "sha256": "2d51f1d4eefc08228b284aea6f19f153772317434911cf79350924358eb21833",
+        "bytes": 3104
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/independent-source-review.md",
+        "sha256": "cb9477cbae9cfb781764c2704732e699ca58e5c2cac988f3641edd6e83b27131",
+        "bytes": 5700
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/aria-strict-baseline.json",
+        "sha256": "fd252c870bd236a88e5e623830598983b96752894db39f036a46ec966f70f8b0",
+        "bytes": 2944
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/aria-strict-number-negative.json",
+        "sha256": "327760d6721c33c70df7b84a062bb6a4a812aec1c929495948c406e3d1ba38df",
+        "bytes": 959
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/aria-candidate-report.json",
+        "sha256": "05685b9d0ff1a14c74b088f9a8bdcee86bcf500906909f481fcbfcb28266d66e",
+        "bytes": 21110
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/aria-baseline-report.json",
+        "sha256": "542c318ed445fcef5fd685bebb15ef7fbb794ba4ea7efd476c502fd0de9f38a8",
+        "bytes": 20912
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/aria-manifest.json",
+        "sha256": "97f1444a2c192e0b55beba2aae479023463ebe9321855cadd7ea075e4d57588c",
+        "bytes": 2250
+      },
+      {
+        "path": "compatibility/rc/parent-main-radio-nullable-aria-review-v1.json",
+        "sha256": "73b7be8e180f65b30b5219876a9b747b0ffc96f93a3dcfb9e09012979b639132",
+        "bytes": 7785
+      }
+    ],
+    "diff_sha256": "356f52b02a7ba7207edd2fec6b7e1fd32e786d11025645850b1cea7505f97363",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The owned radio input declarations accept string or null for all three existing ARIA aliases; the tagged sixteen declarations were string-only, and the explicitly reviewed conservative TypeScript exception preserves existing native attribute removal and unchanged runtime template; the retained e066 packed radio run and strict AOT controls remain bound to their original artifacts."
+  },
+  "prior_complete_ledger_row": {
+    "sha": "eba6ee844b8e8e6044e1675b5e41ff13224ead75",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/radio): allow aria attributes to be reset (#32613)",
+    "files": [
+      "goldens/material/radio/index.api.md",
+      "src/material/radio/radio.spec.ts",
+      "src/material/radio/radio.ts"
+    ],
+    "diff_sha256": "84d50c9a4845d0d2c6f5344b5abebb55040cd849ee28e22d29ee275a7d7b64b3",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/eba6ee844b8e8e6044e1675b5e41ff13224ead75.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/material/radio/radio.spec.ts changes `testComponent.ariaLabel = null;`. That line is not in the legacy sources. @angular/material/radio is exercised by projects/ngx-material-legacy/legacy-radio/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/radio imported by projects/ngx-material-legacy/legacy-radio/public-api.ts"
+    }
+  },
+  "reviewed_upstream_paths": [
+    "goldens/material/radio/index.api.md",
+    "src/material/radio/radio.spec.ts",
+    "src/material/radio/radio.ts"
+  ],
+  "upstream_path_accountability": [
+    {
+      "path": "goldens/material/radio/index.api.md",
+      "hunks": [
+        "@@ -30,9 +30,9 @@ export const MAT_RADIO_GROUP_CONTROL_VALUE_ACCESSOR: any;"
+      ],
+      "judgment": "Current peer API surface or golden; retained legacy API is governed by the tagged contract and the separately documented nullable ARIA exception."
+    },
+    {
+      "path": "src/material/radio/radio.spec.ts",
+      "hunks": [
+        "@@ -816,8 +816,12 @@ describe('MatRadio', () => {",
+        "@@ -834,8 +838,12 @@ describe('MatRadio', () => {",
+        "@@ -852,8 +860,12 @@ describe('MatRadio', () => {",
+        "@@ -1117,9 +1129,9 @@ class RadiosInsidePreCheckedRadioGroup {}"
+      ],
+      "judgment": "Upstream test or shared test setup; reviewed for the trigger and controls, with retained evidence scoped separately."
+    },
+    {
+      "path": "src/material/radio/radio.ts",
+      "hunks": [
+        "@@ -427,13 +427,13 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy"
+      ],
+      "judgment": "Current peer component behavior and input surface; assess against the owned source and each explicitly stated source decision."
+    }
+  ],
+  "evidence_scope": "The referenced browser observations are retained historical receipts, not fresh execution in this checker invocation; broad accessibility, peer matrix and release claims are not made."
+}

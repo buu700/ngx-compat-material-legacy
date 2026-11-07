@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "sha": "0af3b617505d5f39f2492ba4b7e3e7fd4b74f990",
+  "subject": "feat(material/radio): add the ability to interact with disabled radio buttons (#29490)",
+  "diff_sha256": "98173b112dcdb7d91f658091f1a98d4c3753c3c152a4bf9f91720a457f33cb1d",
+  "diff": "diff --git a/src/dev-app/radio/BUILD.bazel b/src/dev-app/radio/BUILD.bazel\nindex 426623bca..e820d2022 100644\n--- a/src/dev-app/radio/BUILD.bazel\n+++ b/src/dev-app/radio/BUILD.bazel\n@@ -13,6 +13,7 @@ ng_module(\n         \"//src/material/button\",\n         \"//src/material/checkbox\",\n         \"//src/material/radio\",\n+        \"//src/material/tooltip\",\n         \"@npm//@angular/forms\",\n     ],\n )\ndiff --git a/src/dev-app/radio/radio-demo.html b/src/dev-app/radio/radio-demo.html\nindex 35a4def52..fb0078229 100644\n--- a/src/dev-app/radio/radio-demo.html\n+++ b/src/dev-app/radio/radio-demo.html\n@@ -63,3 +63,21 @@\n   </mat-radio-group>\n   <p>Your favorite season is: {{favoriteSeason}}</p>\n </section>\n+\n+<h1>Disabled interactive group</h1>\n+<section class=\"demo-section\">\n+  <mat-radio-group\n+    disabled\n+    [disabledInteractive]=\"disabledInteractive\"\n+    [(ngModel)]=\"favoriteSeason\">\n+    @for (season of seasonOptions; track season) {\n+      <mat-radio-button [value]=\"season\" matTooltip=\"This is a tooltip\" matTooltipPosition=\"above\">\n+        {{season}}\n+      </mat-radio-button>\n+    }\n+  </mat-radio-group>\n+\n+  <div>\n+    <mat-checkbox [(ngModel)]=\"disabledInteractive\">Disabled interactive</mat-checkbox>\n+  </div>\n+</section>\ndiff --git a/src/dev-app/radio/radio-demo.ts b/src/dev-app/radio/radio-demo.ts\nindex ed450d3af..b907aeebd 100644\n--- a/src/dev-app/radio/radio-demo.ts\n+++ b/src/dev-app/radio/radio-demo.ts\n@@ -6,25 +6,34 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n-import {CommonModule} from '@angular/common';\n import {ChangeDetectionStrategy, Component} from '@angular/core';\n+import {CommonModule} from '@angular/common';\n import {FormsModule} from '@angular/forms';\n import {MatButtonModule} from '@angular/material/button';\n import {MatCheckboxModule} from '@angular/material/checkbox';\n import {MatRadioModule} from '@angular/material/radio';\n+import {MatTooltip} from '@angular/material/tooltip';\n \n @Component({\n   selector: 'radio-demo',\n   templateUrl: 'radio-demo.html',\n   styleUrl: 'radio-demo.css',\n   standalone: true,\n-  imports: [CommonModule, MatRadioModule, FormsModule, MatButtonModule, MatCheckboxModule],\n+  imports: [\n+    CommonModule,\n+    MatRadioModule,\n+    FormsModule,\n+    MatButtonModule,\n+    MatCheckboxModule,\n+    MatTooltip,\n+  ],\n   changeDetection: ChangeDetectionStrategy.OnPush,\n })\n export class RadioDemo {\n-  isAlignEnd: boolean = false;\n-  isDisabled: boolean = false;\n-  isRequired: boolean = false;\n-  favoriteSeason: string = 'Autumn';\n+  isAlignEnd = false;\n+  isDisabled = false;\n+  isRequired = false;\n+  disabledInteractive = true;\n+  favoriteSeason = 'Autumn';\n   seasonOptions = ['Winter', 'Spring', 'Summer', 'Autumn'];\n }\ndiff --git a/src/material/checkbox/checkbox.spec.ts b/src/material/checkbox/checkbox.spec.ts\nindex 7d858e856..dc751b271 100644\n--- a/src/material/checkbox/checkbox.spec.ts\n+++ b/src/material/checkbox/checkbox.spec.ts\n@@ -466,6 +466,19 @@ describe('MDC-based MatCheckbox', () => {\n       expect(inputElement.disabled).toBe(false);\n     }));\n \n+    it('should not change the checked state if disabled and interactive', fakeAsync(() => {\n+      testComponent.isDisabled = testComponent.disabledInteractive = true;\n+      fixture.changeDetectorRef.markForCheck();\n+      fixture.detectChanges();\n+\n+      expect(inputElement.checked).toBe(false);\n+\n+      inputElement.click();\n+      fixture.detectChanges();\n+\n+      expect(inputElement.checked).toBe(false);\n+    }));\n+\n     describe('ripple elements', () => {\n       it('should show ripples on label mousedown', fakeAsync(() => {\n         const rippleSelector = '.mat-ripple-element:not(.mat-checkbox-persistent-ripple)';\ndiff --git a/src/material/radio/_radio-common.scss b/src/material/radio/_radio-common.scss\nindex eeacd0a81..3367577e2 100644\n--- a/src/material/radio/_radio-common.scss\n+++ b/src/material/radio/_radio-common.scss\n@@ -219,9 +219,27 @@ $_icon-size: 20px;\n     }\n   }\n \n-  .mdc-radio--disabled {\n-    cursor: default;\n-    pointer-events: none;\n+  @if ($is-interactive) {\n+    &.mat-mdc-radio-disabled-interactive .mdc-radio--disabled {\n+      pointer-events: auto;\n+\n+      @include token-utils.use-tokens($tokens...) {\n+        .mdc-radio__native-control:not(:checked) + .mdc-radio__background .mdc-radio__outer-circle {\n+          @include token-utils.create-token-slot(border-color, disabled-unselected-icon-color);\n+          @include token-utils.create-token-slot(opacity, disabled-unselected-icon-opacity);\n+        }\n+\n+        &:hover .mdc-radio__native-control:checked + .mdc-radio__background,\n+        .mdc-radio__native-control:checked:focus + .mdc-radio__background,\n+        .mdc-radio__native-control + .mdc-radio__background {\n+          .mdc-radio__inner-circle,\n+          .mdc-radio__outer-circle {\n+            @include token-utils.create-token-slot(border-color, disabled-selected-icon-color);\n+            @include token-utils.create-token-slot(opacity, disabled-selected-icon-opacity);\n+          }\n+        }\n+      }\n+    }\n   }\n }\n \ndiff --git a/src/material/radio/radio.html b/src/material/radio/radio.html\nindex d86ba521e..b369b5bf6 100644\n--- a/src/material/radio/radio.html\n+++ b/src/material/radio/radio.html\n@@ -5,13 +5,14 @@\n     <input #input class=\"mdc-radio__native-control\" type=\"radio\"\n            [id]=\"inputId\"\n            [checked]=\"checked\"\n-           [disabled]=\"disabled\"\n+           [disabled]=\"disabled && !disabledInteractive\"\n            [attr.name]=\"name\"\n            [attr.value]=\"value\"\n            [required]=\"required\"\n            [attr.aria-label]=\"ariaLabel\"\n            [attr.aria-labelledby]=\"ariaLabelledby\"\n            [attr.aria-describedby]=\"ariaDescribedby\"\n+           [attr.aria-disabled]=\"disabled && disabledInteractive ? 'true' : null\"\n            (change)=\"_onInputInteraction($event)\">\n     <div class=\"mdc-radio__background\">\n       <div class=\"mdc-radio__outer-circle\"></div>\ndiff --git a/src/material/radio/radio.scss b/src/material/radio/radio.scss\nindex 1880b6677..f2ce51c31 100644\n--- a/src/material/radio/radio.scss\n+++ b/src/material/radio/radio.scss\n@@ -12,28 +12,22 @@\n     .mdc-radio__background::before {\n       @include token-utils.create-token-slot(background-color, ripple-color);\n     }\n-  }\n \n-  &.mat-mdc-radio-checked {\n-    @include token-utils.use-tokens(\n-      tokens-mat-radio.$prefix,\n-      tokens-mat-radio.get-token-slots()\n-    ) {\n+    &.mat-mdc-radio-checked {\n+      .mat-ripple-element,\n       .mdc-radio__background::before {\n         @include token-utils.create-token-slot(background-color, checked-ripple-color);\n       }\n+    }\n \n-      .mat-ripple-element {\n-        @include token-utils.create-token-slot(background-color, checked-ripple-color);\n+    &.mat-mdc-radio-disabled-interactive .mdc-radio--disabled {\n+      .mat-ripple-element,\n+      .mdc-radio__background::before {\n+        @include token-utils.create-token-slot(background-color, ripple-color);\n       }\n     }\n-  }\n \n-  .mat-internal-form-field {\n-    @include token-utils.use-tokens(\n-      tokens-mat-radio.$prefix,\n-      tokens-mat-radio.get-token-slots()\n-    ) {\n+    .mat-internal-form-field {\n       @include token-utils.create-token-slot(color, label-text-color);\n       @include token-utils.create-token-slot(font-family, label-text-font);\n       @include token-utils.create-token-slot(line-height, label-text-line-height);\n@@ -41,14 +35,8 @@\n       @include token-utils.create-token-slot(letter-spacing, label-text-tracking);\n       @include token-utils.create-token-slot(font-weight, label-text-weight);\n     }\n-  }\n \n-  // MDC should set the disabled color on the label, but doesn't, so we do it here instead.\n-  .mdc-radio--disabled + label {\n-    @include token-utils.use-tokens(\n-      tokens-mat-radio.$prefix,\n-      tokens-mat-radio.get-token-slots()\n-    ) {\n+    .mdc-radio--disabled + label {\n       @include token-utils.create-token-slot(color, disabled-label-color);\n     }\n   }\n@@ -84,6 +72,15 @@\n   }\n }\n \n+.mat-mdc-radio-disabled {\n+  cursor: default;\n+  pointer-events: none;\n+\n+  &.mat-mdc-radio-disabled-interactive {\n+    pointer-events: auto;\n+  }\n+}\n+\n // Element used to provide a larger tap target for users on touch devices.\n .mat-mdc-radio-touch-target {\n   position: absolute;\ndiff --git a/src/material/radio/radio.spec.ts b/src/material/radio/radio.spec.ts\nindex ff7b8ec89..55db22baf 100644\n--- a/src/material/radio/radio.spec.ts\n+++ b/src/material/radio/radio.spec.ts\n@@ -132,6 +132,29 @@ describe('MDC-based MatRadio', () => {\n       }\n     });\n \n+    it('should make all disabled buttons interactive if the group is marked as disabledInteractive', () => {\n+      testComponent.isGroupDisabledInteractive = true;\n+      fixture.changeDetectorRef.markForCheck();\n+      fixture.detectChanges();\n+      expect(radioInstances.every(radio => radio.disabledInteractive)).toBe(true);\n+    });\n+\n+    it('should prevent the click action when disabledInteractive and disabled', () => {\n+      testComponent.isGroupDisabled = true;\n+      testComponent.isGroupDisabledInteractive = true;\n+      fixture.changeDetectorRef.markForCheck();\n+      fixture.detectChanges();\n+\n+      // We can't monitor the `defaultPrevented` state on the\n+      // native `click` so we dispatch an extra one.\n+      const fakeEvent = dispatchFakeEvent(radioInputElements[0], 'click');\n+      radioInputElements[0].click();\n+      fixture.detectChanges();\n+\n+      expect(fakeEvent.defaultPrevented).toBe(true);\n+      expect(radioInstances[0].checked).toBe(false);\n+    });\n+\n     it('should set required to each radio button when the group is required', () => {\n       testComponent.isGroupRequired = true;\n       fixture.changeDetectorRef.markForCheck();\n@@ -675,6 +698,7 @@ describe('MDC-based MatRadio', () => {\n     let fixture: ComponentFixture<DisableableRadioButton>;\n     let radioInstance: MatRadioButton;\n     let radioNativeElement: HTMLInputElement;\n+    let radioHost: HTMLElement;\n     let testComponent: DisableableRadioButton;\n \n     beforeEach(() => {\n@@ -683,8 +707,9 @@ describe('MDC-based MatRadio', () => {\n \n       testComponent = fixture.debugElement.componentInstance;\n       const radioDebugElement = fixture.debugElement.query(By.directive(MatRadioButton))!;\n+      radioHost = radioDebugElement.nativeElement;\n       radioInstance = radioDebugElement.injector.get<MatRadioButton>(MatRadioButton);\n-      radioNativeElement = radioDebugElement.nativeElement.querySelector('input');\n+      radioNativeElement = radioHost.querySelector('input')!;\n     });\n \n     it('should toggle the disabled state', () => {\n@@ -703,6 +728,24 @@ describe('MDC-based MatRadio', () => {\n       expect(radioInstance.disabled).toBeFalsy();\n       expect(radioNativeElement.disabled).toBeFalsy();\n     });\n+\n+    it('should keep the button interactive if disabledInteractive is enabled', () => {\n+      testComponent.disabled = true;\n+      fixture.changeDetectorRef.markForCheck();\n+      fixture.detectChanges();\n+\n+      expect(radioNativeElement.disabled).toBe(true);\n+      expect(radioNativeElement.hasAttribute('aria-disabled')).toBe(false);\n+      expect(radioHost.classList).not.toContain('mat-mdc-radio-disabled-interactive');\n+\n+      testComponent.disabledInteractive = true;\n+      fixture.changeDetectorRef.markForCheck();\n+      fixture.detectChanges();\n+\n+      expect(radioNativeElement.disabled).toBe(false);\n+      expect(radioNativeElement.getAttribute('aria-disabled')).toBe('true');\n+      expect(radioHost.classList).toContain('mat-mdc-radio-disabled-interactive');\n+    });\n   });\n \n   describe('as standalone', () => {\n@@ -1031,11 +1074,13 @@ describe('MatRadioDefaultOverrides', () => {\n \n @Component({\n   template: `\n-  <mat-radio-group [disabled]=\"isGroupDisabled\"\n-                  [labelPosition]=\"labelPos\"\n-                  [required]=\"isGroupRequired\"\n-                  [value]=\"groupValue\"\n-                  name=\"test-name\">\n+  <mat-radio-group\n+    [disabled]=\"isGroupDisabled\"\n+    [labelPosition]=\"labelPos\"\n+    [required]=\"isGroupRequired\"\n+    [value]=\"groupValue\"\n+    [disabledInteractive]=\"isGroupDisabledInteractive\"\n+    name=\"test-name\">\n     @if (isFirstShown) {\n       <mat-radio-button value=\"fire\" [disableRipple]=\"disableRipple\" [disabled]=\"isFirstDisabled\"\n                       [color]=\"color\">\n@@ -1058,6 +1103,7 @@ class RadiosInsideRadioGroup {\n   isFirstDisabled = false;\n   isGroupDisabled = false;\n   isGroupRequired = false;\n+  isGroupDisabledInteractive = false;\n   groupValue: string | null = null;\n   disableRipple = false;\n   color: string | null;\n@@ -1130,16 +1176,18 @@ class RadioGroupWithNgModel {\n }\n \n @Component({\n-  template: `<mat-radio-button>One</mat-radio-button>`,\n+  template: `\n+    <mat-radio-button\n+      [disabled]=\"disabled\"\n+      [disabledInteractive]=\"disabledInteractive\">One</mat-radio-button>`,\n   standalone: true,\n   imports: [MatRadioModule, FormsModule, ReactiveFormsModule, CommonModule],\n })\n class DisableableRadioButton {\n-  @ViewChild(MatRadioButton) matRadioButton: MatRadioButton;\n+  disabled = false;\n+  disabledInteractive = false;\n \n-  set disabled(value: boolean) {\n-    this.matRadioButton.disabled = value;\n-  }\n+  @ViewChild(MatRadioButton) matRadioButton: MatRadioButton;\n }\n \n @Component({\ndiff --git a/src/material/radio/radio.ts b/src/material/radio/radio.ts\nindex 7a178900b..a913374f8 100644\n--- a/src/material/radio/radio.ts\n+++ b/src/material/radio/radio.ts\n@@ -25,6 +25,7 @@ import {\n   InjectionToken,\n   Injector,\n   Input,\n+  NgZone,\n   OnDestroy,\n   OnInit,\n   Optional,\n@@ -82,6 +83,9 @@ export interface MatRadioDefaultOptions {\n    * https://material.angular.io/guide/theming#using-component-color-variants.\n    */\n   color: ThemePalette;\n+\n+  /** Whether disabled radio buttons should be interactive. */\n+  disabledInteractive?: boolean;\n }\n \n export const MAT_RADIO_DEFAULT_OPTIONS = new InjectionToken<MatRadioDefaultOptions>(\n@@ -95,6 +99,7 @@ export const MAT_RADIO_DEFAULT_OPTIONS = new InjectionToken<MatRadioDefaultOptio\n export function MAT_RADIO_DEFAULT_OPTIONS_FACTORY(): MatRadioDefaultOptions {\n   return {\n     color: 'accent',\n+    disabledInteractive: false,\n   };\n }\n \n@@ -248,6 +253,17 @@ export class MatRadioGroup implements AfterContentInit, OnDestroy, ControlValueA\n     this._markRadiosForCheck();\n   }\n \n+  /** Whether buttons in the group should be interactive while they're disabled. */\n+  @Input({transform: booleanAttribute})\n+  get disabledInteractive(): boolean {\n+    return this._disabledInteractive;\n+  }\n+  set disabledInteractive(value: boolean) {\n+    this._disabledInteractive = value;\n+    this._markRadiosForCheck();\n+  }\n+  private _disabledInteractive = false;\n+\n   constructor(private _changeDetector: ChangeDetectorRef) {}\n \n   /**\n@@ -371,6 +387,8 @@ export class MatRadioGroup implements AfterContentInit, OnDestroy, ControlValueA\n     '[class.mat-accent]': 'color === \"accent\"',\n     '[class.mat-warn]': 'color === \"warn\"',\n     '[class.mat-mdc-radio-checked]': 'checked',\n+    '[class.mat-mdc-radio-disabled]': 'disabled',\n+    '[class.mat-mdc-radio-disabled-interactive]': 'disabledInteractive',\n     '[class._mat-animation-noopable]': '_noopAnimations',\n     // Needs to be removed since it causes some a11y issues (see #21266).\n     '[attr.tabindex]': 'null',\n@@ -389,6 +407,7 @@ export class MatRadioGroup implements AfterContentInit, OnDestroy, ControlValueA\n   imports: [MatRipple, _MatInternalFormField],\n })\n export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy {\n+  private _ngZone = inject(NgZone);\n   private _uniqueId: string = `mat-radio-${++nextUniqueId}`;\n \n   /** The unique ID for the radio button. */\n@@ -502,7 +521,7 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy\n     return (\n       this._color ||\n       (this.radioGroup && this.radioGroup.color) ||\n-      (this._providerOverride && this._providerOverride.color) ||\n+      (this._defaultOptions && this._defaultOptions.color) ||\n       'accent'\n     );\n   }\n@@ -511,6 +530,18 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy\n   }\n   private _color: ThemePalette;\n \n+  /** Whether the radio button should remain interactive when it is disabled. */\n+  @Input({transform: booleanAttribute})\n+  get disabledInteractive(): boolean {\n+    return (\n+      this._disabledInteractive || (this.radioGroup !== null && this.radioGroup.disabledInteractive)\n+    );\n+  }\n+  set disabledInteractive(value: boolean) {\n+    this._disabledInteractive = value;\n+  }\n+  private _disabledInteractive: boolean;\n+\n   /**\n    * Event emitted when the checked state of this radio button changes.\n    * Change events are only emitted when the value changes due to user interaction with\n@@ -565,13 +596,14 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy\n     @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n     @Optional()\n     @Inject(MAT_RADIO_DEFAULT_OPTIONS)\n-    private _providerOverride?: MatRadioDefaultOptions,\n+    private _defaultOptions?: MatRadioDefaultOptions,\n     @Attribute('tabindex') tabIndex?: string,\n   ) {\n     // Assertions. Ideally these should be stripped out by the compiler.\n     // TODO(jelbourn): Assert that there's no name binding AND a parent radio group.\n     this.radioGroup = radioGroup;\n     this._noopAnimations = animationMode === 'NoopAnimations';\n+    this._disabledInteractive = _defaultOptions?.disabledInteractive ?? false;\n \n     if (tabIndex) {\n       this.tabIndex = numberAttribute(tabIndex, 0);\n@@ -629,9 +661,17 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy\n         this.radioGroup._touch();\n       }\n     });\n+\n+    // We bind this outside of the zone, because:\n+    // 1. Its logic is completely DOM-related so we can avoid some change detections.\n+    // 2. There appear to be some internal tests that break when this triggers a change detection.\n+    this._ngZone.runOutsideAngular(() => {\n+      this._inputElement.nativeElement.addEventListener('click', this._onInputClick);\n+    });\n   }\n \n   ngOnDestroy() {\n+    this._inputElement.nativeElement.removeEventListener('click', this._onInputClick);\n     this._focusMonitor.stopMonitoring(this._elementRef);\n     this._removeUniqueSelectionListener();\n   }\n@@ -645,17 +685,6 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy\n     return this.disableRipple || this.disabled;\n   }\n \n-  _onInputClick(event: Event) {\n-    // We have to stop propagation for click events on the visual hidden input element.\n-    // By default, when a user clicks on a label element, a generated click event will be\n-    // dispatched on the associated input element. Since we are using a label element as our\n-    // root container, the click event on the `radio-button` will be executed twice.\n-    // The real click event will bubble up, and the generated click event also tries to bubble up.\n-    // This will lead to multiple click events.\n-    // Preventing bubbling for the second event will solve that issue.\n-    event.stopPropagation();\n-  }\n-\n   /** Triggered when the radio button receives an interaction from the user. */\n   _onInputInteraction(event: Event) {\n     // We always have to stop propagation on the change event.\n@@ -681,7 +710,7 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy\n   _onTouchTargetClick(event: Event) {\n     this._onInputInteraction(event);\n \n-    if (!this.disabled) {\n+    if (!this.disabled || this.disabledInteractive) {\n       // Normally the input should be focused already, but if the click\n       // comes from the touch target, then we might have to focus it ourselves.\n       this._inputElement.nativeElement.focus();\n@@ -696,6 +725,20 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy\n     }\n   }\n \n+  /** Called when the input is clicked. */\n+  private _onInputClick = (event: Event) => {\n+    // If the input is disabled while interactive, we need to prevent the\n+    // selection from happening in this event handler. Note that even though\n+    // this happens on `click` events, the logic applies when the user is\n+    // navigating with the keyboard as well. An alternative way of doing\n+    // this is by resetting the `checked` state in the `change` callback but\n+    // it isn't optimal, because it can allow a pre-checked disabled button\n+    // to be un-checked. This approach seems to cover everything.\n+    if (this.disabled && this.disabledInteractive) {\n+      event.preventDefault();\n+    }\n+  };\n+\n   /** Gets the tabindex for the underlying input element. */\n   private _updateTabIndex() {\n     const group = this.radioGroup;\ndiff --git a/tools/public_api_guard/material/radio.md b/tools/public_api_guard/material/radio.md\nindex f7083a615..3abddd720 100644\n--- a/tools/public_api_guard/material/radio.md\n+++ b/tools/public_api_guard/material/radio.md\n@@ -37,7 +37,7 @@ export const MAT_RADIO_GROUP_CONTROL_VALUE_ACCESSOR: any;\n \n // @public (undocumented)\n export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy {\n-    constructor(radioGroup: MatRadioGroup, _elementRef: ElementRef, _changeDetector: ChangeDetectorRef, _focusMonitor: FocusMonitor, _radioDispatcher: UniqueSelectionDispatcher, animationMode?: string, _providerOverride?: MatRadioDefaultOptions | undefined, tabIndex?: string);\n+    constructor(radioGroup: MatRadioGroup, _elementRef: ElementRef, _changeDetector: ChangeDetectorRef, _focusMonitor: FocusMonitor, _radioDispatcher: UniqueSelectionDispatcher, animationMode?: string, _defaultOptions?: MatRadioDefaultOptions | undefined, tabIndex?: string);\n     ariaDescribedby: string;\n     ariaLabel: string;\n     ariaLabelledby: string;\n@@ -48,6 +48,8 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy\n     set color(newValue: ThemePalette);\n     get disabled(): boolean;\n     set disabled(value: boolean);\n+    get disabledInteractive(): boolean;\n+    set disabledInteractive(value: boolean);\n     disableRipple: boolean;\n     // (undocumented)\n     protected _elementRef: ElementRef;\n@@ -66,6 +68,8 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy\n     // (undocumented)\n     static ngAcceptInputType_disabled: unknown;\n     // (undocumented)\n+    static ngAcceptInputType_disabledInteractive: unknown;\n+    // (undocumented)\n     static ngAcceptInputType_disableRipple: unknown;\n     // (undocumented)\n     static ngAcceptInputType_required: unknown;\n@@ -80,8 +84,6 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy\n     // (undocumented)\n     ngOnInit(): void;\n     _noopAnimations: boolean;\n-    // (undocumented)\n-    _onInputClick(event: Event): void;\n     _onInputInteraction(event: Event): void;\n     _onTouchTargetClick(event: Event): void;\n     radioGroup: MatRadioGroup;\n@@ -93,7 +95,7 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy\n     get value(): any;\n     set value(value: any);\n     // (undocumented)\n-    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatRadioButton, \"mat-radio-button\", [\"matRadioButton\"], { \"id\": { \"alias\": \"id\"; \"required\": false; }; \"name\": { \"alias\": \"name\"; \"required\": false; }; \"ariaLabel\": { \"alias\": \"aria-label\"; \"required\": false; }; \"ariaLabelledby\": { \"alias\": \"aria-labelledby\"; \"required\": false; }; \"ariaDescribedby\": { \"alias\": \"aria-describedby\"; \"required\": false; }; \"disableRipple\": { \"alias\": \"disableRipple\"; \"required\": false; }; \"tabIndex\": { \"alias\": \"tabIndex\"; \"required\": false; }; \"checked\": { \"alias\": \"checked\"; \"required\": false; }; \"value\": { \"alias\": \"value\"; \"required\": false; }; \"labelPosition\": { \"alias\": \"labelPosition\"; \"required\": false; }; \"disabled\": { \"alias\": \"disabled\"; \"required\": false; }; \"required\": { \"alias\": \"required\"; \"required\": false; }; \"color\": { \"alias\": \"color\"; \"required\": false; }; }, { \"change\": \"change\"; }, never, [\"*\"], true, never>;\n+    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatRadioButton, \"mat-radio-button\", [\"matRadioButton\"], { \"id\": { \"alias\": \"id\"; \"required\": false; }; \"name\": { \"alias\": \"name\"; \"required\": false; }; \"ariaLabel\": { \"alias\": \"aria-label\"; \"required\": false; }; \"ariaLabelledby\": { \"alias\": \"aria-labelledby\"; \"required\": false; }; \"ariaDescribedby\": { \"alias\": \"aria-describedby\"; \"required\": false; }; \"disableRipple\": { \"alias\": \"disableRipple\"; \"required\": false; }; \"tabIndex\": { \"alias\": \"tabIndex\"; \"required\": false; }; \"checked\": { \"alias\": \"checked\"; \"required\": false; }; \"value\": { \"alias\": \"value\"; \"required\": false; }; \"labelPosition\": { \"alias\": \"labelPosition\"; \"required\": false; }; \"disabled\": { \"alias\": \"disabled\"; \"required\": false; }; \"required\": { \"alias\": \"required\"; \"required\": false; }; \"color\": { \"alias\": \"color\"; \"required\": false; }; \"disabledInteractive\": { \"alias\": \"disabledInteractive\"; \"required\": false; }; }, { \"change\": \"change\"; }, never, [\"*\"], true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatRadioButton, [{ optional: true; }, null, null, null, null, { optional: true; }, { optional: true; }, { attribute: \"tabindex\"; }]>;\n }\n@@ -110,6 +112,7 @@ export class MatRadioChange {\n // @public (undocumented)\n export interface MatRadioDefaultOptions {\n     color: ThemePalette;\n+    disabledInteractive?: boolean;\n }\n \n // @public\n@@ -122,6 +125,8 @@ export class MatRadioGroup implements AfterContentInit, OnDestroy, ControlValueA\n     _controlValueAccessorChangeFn: (value: any) => void;\n     get disabled(): boolean;\n     set disabled(value: boolean);\n+    get disabledInteractive(): boolean;\n+    set disabledInteractive(value: boolean);\n     _emitChangeEvent(): void;\n     get labelPosition(): 'before' | 'after';\n     set labelPosition(v: 'before' | 'after');\n@@ -132,6 +137,8 @@ export class MatRadioGroup implements AfterContentInit, OnDestroy, ControlValueA\n     // (undocumented)\n     static ngAcceptInputType_disabled: unknown;\n     // (undocumented)\n+    static ngAcceptInputType_disabledInteractive: unknown;\n+    // (undocumented)\n     static ngAcceptInputType_required: unknown;\n     ngAfterContentInit(): void;\n     // (undocumented)\n@@ -150,7 +157,7 @@ export class MatRadioGroup implements AfterContentInit, OnDestroy, ControlValueA\n     set value(newValue: any);\n     writeValue(value: any): void;\n     // (undocumented)\n-    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatRadioGroup, \"mat-radio-group\", [\"matRadioGroup\"], { \"color\": { \"alias\": \"color\"; \"required\": false; }; \"name\": { \"alias\": \"name\"; \"required\": false; }; \"labelPosition\": { \"alias\": \"labelPosition\"; \"required\": false; }; \"value\": { \"alias\": \"value\"; \"required\": false; }; \"selected\": { \"alias\": \"selected\"; \"required\": false; }; \"disabled\": { \"alias\": \"disabled\"; \"required\": false; }; \"required\": { \"alias\": \"required\"; \"required\": false; }; }, { \"change\": \"change\"; }, [\"_radios\"], never, true, never>;\n+    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatRadioGroup, \"mat-radio-group\", [\"matRadioGroup\"], { \"color\": { \"alias\": \"color\"; \"required\": false; }; \"name\": { \"alias\": \"name\"; \"required\": false; }; \"labelPosition\": { \"alias\": \"labelPosition\"; \"required\": false; }; \"value\": { \"alias\": \"value\"; \"required\": false; }; \"selected\": { \"alias\": \"selected\"; \"required\": false; }; \"disabled\": { \"alias\": \"disabled\"; \"required\": false; }; \"required\": { \"alias\": \"required\"; \"required\": false; }; \"disabledInteractive\": { \"alias\": \"disabledInteractive\"; \"required\": false; }; }, { \"change\": \"change\"; }, [\"_radios\"], never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatRadioGroup, never>;\n }\n",
+  "final_disposition": "do-not-adopt",
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "The post-sixteen disabledInteractive input and defaults are outside the frozen legacy API; legacy disabled host hit-testing is retained as tagged and observed in a bounded earlier comparison. Unlike the new peer native listener, the owned input retains the tagged template-bound stopPropagation handler and Angular-managed listener lifecycle; the host-point test does not establish every enabled bubbling or destruction case.",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "individual_proof": {
+    "proof_kind": "whole-hunk-owned-and-package-boundary-review",
+    "source_conclusion_only": true,
+    "execution_claim": "not-claimed",
+    "source_evidence_scope": "current",
+    "source_evidence": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts",
+        "sha256": "8cdd88d202dce54dcde31ac0f9bda0f3e73726b8b611cab4fbcf7cbf4375a147",
+        "bytes": 21822
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-radio/radio.ts",
+        "sha256": "dffd3e4daf0d50d915303b2e3d13d26e8c97fb77756ccf8c618e34022f548f1e",
+        "bytes": 3762
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-radio/radio.html",
+        "sha256": "61b57e78e7c25bdae14c33027de26348f7238cc413405f65afdce84e2b5d6bbe",
+        "bytes": 1697
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-radio/radio.scss",
+        "sha256": "54e67218650eec5eb13b866d19bdbd9c1067204bea58fb5e4e1cfeb20d4eb718",
+        "bytes": 6022
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-radio/radio.spec.ts",
+        "sha256": "09f3b544934597caa7954eb922aaa7871d5e435786a99f199b50f1662a575bef",
+        "bytes": 54742
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/radio/_radio-theme.scss",
+        "sha256": "2d51f1d4eefc08228b284aea6f19f153772317434911cf79350924358eb21833",
+        "bytes": 3104
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/independent-source-review.md",
+        "sha256": "cb9477cbae9cfb781764c2704732e699ca58e5c2cac988f3641edd6e83b27131",
+        "bytes": 5700
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/tag16-radio.mjs.gz",
+        "sha256": "81e7c57dc7c6dff4e43bc5efde34171065ed8723b9fbf5c911d8362264747cf5",
+        "bytes": 9147
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/comparison-review.md",
+        "sha256": "389799bae3722311882ef6746e9d295ca8e196f7ce66e85e6ded22c4b2d0efc7",
+        "bytes": 4085
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/comparison-observations.json",
+        "sha256": "a0a0414b94649637ca39fdefa965d7b0d76d50f819da59f74376a700cf009bbd",
+        "bytes": 101829
+      },
+      {
+        "path": "compatibility/rc/qualification/radio-checkbox-individual-v1/comparison-assertions.json",
+        "sha256": "31d3da9644e109aaa9ac712a4ac92fafdeba3218c823ad205adf733d19f6e451",
+        "bytes": 611
+      }
+    ],
+    "diff_sha256": "98173b112dcdb7d91f658091f1a98d4c3753c3c152a4bf9f91720a457f33cb1d",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The post-sixteen disabledInteractive input and defaults are outside the frozen legacy API; legacy disabled host hit-testing is retained as tagged and observed in a bounded earlier comparison. Unlike the new peer native listener, the owned input retains the tagged template-bound stopPropagation handler and Angular-managed listener lifecycle; the host-point test does not establish every enabled bubbling or destruction case."
+  },
+  "prior_complete_ledger_row": {
+    "sha": "0af3b617505d5f39f2492ba4b7e3e7fd4b74f990",
+    "bucket": "needs-triage",
+    "subject": "feat(material/radio): add the ability to interact with disabled radio buttons (#29490)",
+    "files": [
+      "src/dev-app/radio/BUILD.bazel",
+      "src/dev-app/radio/radio-demo.html",
+      "src/dev-app/radio/radio-demo.ts",
+      "src/material/checkbox/checkbox.spec.ts",
+      "src/material/radio/_radio-common.scss",
+      "src/material/radio/radio.html",
+      "src/material/radio/radio.scss",
+      "src/material/radio/radio.spec.ts",
+      "src/material/radio/radio.ts",
+      "tools/public_api_guard/material/radio.md"
+    ],
+    "diff_sha256": "9cae6156e5bbb8fe033f51cebc3f75166d531bb868c4d8d80995aa3957b0dcd2",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/0af3b617505d5f39f2492ba4b7e3e7fd4b74f990.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/dev-app/radio/radio-demo.ts changes `imports: [CommonModule, MatRadioModule, FormsModule, MatButtonModule, MatCheckboxModule],`. That line is not in the legacy sources. @angular/material/radio is exercised by projects/ngx-material-legacy/legacy-radio/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/radio imported by projects/ngx-material-legacy/legacy-radio/public-api.ts"
+    }
+  },
+  "reviewed_upstream_paths": [
+    "src/dev-app/radio/BUILD.bazel",
+    "src/dev-app/radio/radio-demo.html",
+    "src/dev-app/radio/radio-demo.ts",
+    "src/material/checkbox/checkbox.spec.ts",
+    "src/material/radio/_radio-common.scss",
+    "src/material/radio/radio.html",
+    "src/material/radio/radio.scss",
+    "src/material/radio/radio.spec.ts",
+    "src/material/radio/radio.ts",
+    "tools/public_api_guard/material/radio.md"
+  ],
+  "upstream_path_accountability": [
+    {
+      "path": "src/dev-app/radio/BUILD.bazel",
+      "hunks": [
+        "@@ -13,6 +13,7 @@ ng_module("
+      ],
+      "judgment": "Demonstration or build wiring for the modern opt-in; not shipped as legacy product code."
+    },
+    {
+      "path": "src/dev-app/radio/radio-demo.html",
+      "hunks": [
+        "@@ -63,3 +63,21 @@"
+      ],
+      "judgment": "Demonstration or build wiring for the modern opt-in; not shipped as legacy product code."
+    },
+    {
+      "path": "src/dev-app/radio/radio-demo.ts",
+      "hunks": [
+        "@@ -6,25 +6,34 @@"
+      ],
+      "judgment": "Demonstration or build wiring for the modern opt-in; not shipped as legacy product code."
+    },
+    {
+      "path": "src/material/checkbox/checkbox.spec.ts",
+      "hunks": [
+        "@@ -466,6 +466,19 @@ describe('MDC-based MatCheckbox', () => {"
+      ],
+      "judgment": "Upstream test or shared test setup; reviewed for the trigger and controls, with retained evidence scoped separately."
+    },
+    {
+      "path": "src/material/radio/_radio-common.scss",
+      "hunks": [
+        "@@ -219,9 +219,27 @@ $_icon-size: 20px;"
+      ],
+      "judgment": "Current peer styling; compare the owned historical style and bounded retained browser evidence, without claiming a universal visual or accessibility result."
+    },
+    {
+      "path": "src/material/radio/radio.html",
+      "hunks": [
+        "@@ -5,13 +5,14 @@"
+      ],
+      "judgment": "Current peer DOM and interaction markup; compare the owned historical template and do not import modern component structure."
+    },
+    {
+      "path": "src/material/radio/radio.scss",
+      "hunks": [
+        "@@ -12,28 +12,22 @@",
+        "@@ -41,14 +35,8 @@",
+        "@@ -84,6 +72,15 @@"
+      ],
+      "judgment": "Current peer styling; compare the owned historical style and bounded retained browser evidence, without claiming a universal visual or accessibility result."
+    },
+    {
+      "path": "src/material/radio/radio.spec.ts",
+      "hunks": [
+        "@@ -132,6 +132,29 @@ describe('MDC-based MatRadio', () => {",
+        "@@ -675,6 +698,7 @@ describe('MDC-based MatRadio', () => {",
+        "@@ -683,8 +707,9 @@ describe('MDC-based MatRadio', () => {",
+        "@@ -703,6 +728,24 @@ describe('MDC-based MatRadio', () => {",
+        "@@ -1031,11 +1074,13 @@ describe('MatRadioDefaultOverrides', () => {",
+        "@@ -1058,6 +1103,7 @@ class RadiosInsideRadioGroup {",
+        "@@ -1130,16 +1176,18 @@ class RadioGroupWithNgModel {"
+      ],
+      "judgment": "Upstream test or shared test setup; reviewed for the trigger and controls, with retained evidence scoped separately."
+    },
+    {
+      "path": "src/material/radio/radio.ts",
+      "hunks": [
+        "@@ -25,6 +25,7 @@ import {",
+        "@@ -82,6 +83,9 @@ export interface MatRadioDefaultOptions {",
+        "@@ -95,6 +99,7 @@ export const MAT_RADIO_DEFAULT_OPTIONS = new InjectionToken<MatRadioDefaultOptio",
+        "@@ -248,6 +253,17 @@ export class MatRadioGroup implements AfterContentInit, OnDestroy, ControlValueA",
+        "@@ -371,6 +387,8 @@ export class MatRadioGroup implements AfterContentInit, OnDestroy, ControlValueA",
+        "@@ -389,6 +407,7 @@ export class MatRadioGroup implements AfterContentInit, OnDestroy, ControlValueA",
+        "@@ -502,7 +521,7 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy",
+        "@@ -511,6 +530,18 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy",
+        "@@ -565,13 +596,14 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy",
+        "@@ -629,9 +661,17 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy",
+        "@@ -645,17 +685,6 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy",
+        "@@ -681,7 +710,7 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy",
+        "@@ -696,6 +725,20 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy"
+      ],
+      "judgment": "Current peer component behavior and input surface; assess against the owned source and each explicitly stated source decision."
+    },
+    {
+      "path": "tools/public_api_guard/material/radio.md",
+      "hunks": [
+        "@@ -37,7 +37,7 @@ export const MAT_RADIO_GROUP_CONTROL_VALUE_ACCESSOR: any;",
+        "@@ -48,6 +48,8 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy",
+        "@@ -66,6 +68,8 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy",
+        "@@ -80,8 +84,6 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy",
+        "@@ -93,7 +95,7 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy",
+        "@@ -110,6 +112,7 @@ export class MatRadioChange {",
+        "@@ -122,6 +125,8 @@ export class MatRadioGroup implements AfterContentInit, OnDestroy, ControlValueA",
+        "@@ -132,6 +137,8 @@ export class MatRadioGroup implements AfterContentInit, OnDestroy, ControlValueA",
+        "@@ -150,7 +157,7 @@ export class MatRadioGroup implements AfterContentInit, OnDestroy, ControlValueA"
+      ],
+      "judgment": "Current peer API surface or golden; retained legacy API is governed by the tagged contract and the separately documented nullable ARIA exception."
+    }
+  ],
+  "evidence_scope": "The referenced browser observations are retained historical receipts, not fresh execution in this checker invocation; broad accessibility, peer matrix and release claims are not made."
+}
