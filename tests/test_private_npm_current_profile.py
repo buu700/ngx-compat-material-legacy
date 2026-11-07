@@ -197,11 +197,37 @@ class PrivateNpmCurrentProfileTests(unittest.TestCase):
         with patch.object(eligibility, 'NPM_CURRENT_PRIVATE_PROFILE_SHA256', self.pin), patch.object(eligibility, 'NPM_HISTORICAL_PRIVATE_PROFILE_SHA256', self.pin), \
              patch.object(eligibility, '_tool_proof_bytes', side_effect=read), \
              patch.object(eligibility.tarfile, 'open') as opened, \
-             patch.object(eligibility, 'private_npm_brace_validation', side_effect=brace) as reviewed:
+             patch.object(eligibility, 'private_npm_current_brace_validation', side_effect=brace) as reviewed:
             opened.return_value.__enter__.return_value.__iter__.return_value = iter(())
             with self.assertRaisesRegex(ValueError, 'source changed: support/helper.mjs'):
                 eligibility.private_npm_disposition_evidence(self.root, {'npm': archive})
             reviewed.assert_called_once()
+
+    def test_21_route_calls_historical_brace_reader(self):
+        self.write('projects/ngx-material-legacy/package.json', b'{"version":"21.0.0"}')
+        archive = b'synthetic archive DATA'
+        evidence = {'roots': {'21.x': {'revision': 'a' * 40}}, 'npm_archive_sha256': digest(archive),
+                    'source_excerpts': [], 'authenticated_archive_members': 0,
+                    'complete_selector_source_population': [], 'current_advisories': []}
+        manifests = {'lines': {'21.x': {'source_parent': 'a' * 40, 'source_files': []}}}
+        triage = {'findings': [{'triage_item_id': str(i), 'verdict': 'not_actionable', 'input_id': advisory}
+                   for i, advisory in enumerate(('GHSA-ch52-4w7c-c8xp', 'GHSA-rj75-hqrm-r3gf'))]}
+        docs = {'private-profile-source-manifests.json': manifests, 'private-profile-remaining-evidence.json': evidence,
+                'private-profile-remaining-result.json': triage}
+        original_read = eligibility._tool_proof_bytes
+        def read(root, relative, expected=None, **kwargs):
+            name = relative.removeprefix('compatibility/rc/tool-advisory-triage/')
+            return json.dumps(docs[name]).encode() if name in docs else original_read(root, relative, expected, **kwargs)
+        with patch.object(eligibility, '_tool_proof_bytes', side_effect=read), \
+             patch.object(eligibility, '_private_npm_current_profile', return_value=({}, lambda: None)), \
+             patch.object(eligibility.tarfile, 'open') as opened, \
+             patch.object(eligibility, 'private_npm_brace_validation', return_value={'findings': {}, 'binding': {}}) as historical, \
+             patch.object(eligibility, 'private_npm_current_brace_validation') as current:
+            opened.return_value.__enter__.return_value.__iter__.return_value = iter(())
+            result = eligibility.private_npm_disposition_evidence(self.root, {'npm': archive})
+            historical.assert_called_once_with(self.root, '21.x', triage)
+            current.assert_not_called()
+            self.assertEqual(result['binding']['line'], '21.x')
 
     def test_added_primary_and_both_discovery_group_members_fail(self):
         for name in ['scripts/nested/extra.py', 'tests/nested/extra.mjs',

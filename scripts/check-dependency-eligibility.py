@@ -596,6 +596,82 @@ def private_npm_brace_validation(root: Path, line: str, triage: dict) -> dict:
             "validation_candidates": len(findings), "runtime": "Node22.23.3 bounded diagnosis"}}
 
 
+# Intentionally unsealed until an independently reviewed current manifest is pinned.
+NPM_CURRENT_BRACE_MANIFEST_PATH = "compatibility/rc/main-brace-current-static-receipts-v1.json"
+NPM_CURRENT_BRACE_MANIFEST_SHA256 = "unsealed"
+NPM_CURRENT_BRACE_POLICY = {"SECURITY.md": "af7990d3225836d34c9f20085229b13d27ae36be76df6dd8d166df8994a35017",
+                            "scripts/npm-tooling-options.mjs": "cf285c2d3d81d5a51cddfafd03e8307741530224a6cfb94e175a7cdd2acf3e71"}
+NPM_CURRENT_BRACE_SCOPE = "Pinned npm11.19.0 private generated fixtures/local packs; current main static source-boundary review only."
+NPM_CURRENT_BRACE_IDS = {"triage-011": "GHSA-6j4f-fj2g-mc7p", "triage-012": "GHSA-mh99-v99m-4gvg",
+                         "triage-013": "GHSA-q2hr-2g5m-vwhr", "triage-014": "GHSA-qhr7-859c-m2p7",
+                         "triage-015": "GHSA-rgw5-rvv9-x895"}
+
+
+def private_npm_current_brace_validation(root: Path, triage: dict, current_binding: dict) -> dict:
+    """Exact main-only current static receipts; historical receipts remain counterevidence."""
+    if not re.fullmatch(r"[0-9a-f]{64}", NPM_CURRENT_BRACE_MANIFEST_SHA256):
+        raise ValueError("current main brace manifest is unsealed")
+    ref = {"path": NPM_CURRENT_BRACE_MANIFEST_PATH, "sha256": NPM_CURRENT_BRACE_MANIFEST_SHA256}
+    manifest = json.loads(_tool_proof_bytes(root, ref["path"], ref))
+    required = {"schema_version", "role", "line", "source_parent", "source_files_sha256", "support_files_sha256",
+                "input_files_sha256", "policy_sources", "boundary_review", "historical_manifest", "receipts"}
+    if type(manifest) is not dict or set(manifest) != required or manifest["schema_version"] != 1 or manifest["role"] != "current-main-brace-static-receipts" or manifest["line"] != "main":
+        raise ValueError("invalid current main brace manifest")
+    expected = current_binding.get("current_semantic_projection")
+    if type(expected) is not dict or any(manifest.get(k) != expected.get(k) for k in ("source_parent", "source_files_sha256", "support_files_sha256", "input_files_sha256")):
+        raise ValueError("current main brace profile projection changed")
+    policy = manifest["policy_sources"]
+    if type(policy) is not list or {x.get("path"): x.get("sha256") for x in policy if type(x) is dict} != NPM_CURRENT_BRACE_POLICY or len(policy) != len(NPM_CURRENT_BRACE_POLICY):
+        raise ValueError("current main brace policy inputs changed")
+    for item in policy:
+        if set(item) != {"path", "sha256", "bytes"} or type(item["bytes"]) is not int or item["bytes"] < 1: raise ValueError("invalid current brace policy input")
+        _tool_proof_bytes(root, item["path"], item)
+    def physical(item):
+        if type(item) is not dict or set(item) != {"path", "sha256", "bytes"} or type(item["bytes"]) is not int or item["bytes"] < 1: raise ValueError("invalid current brace receipt reference")
+        return _tool_proof_bytes(root, item["path"], item)
+    boundary = manifest["boundary_review"]
+    physical(boundary)
+    historical_ref = manifest["historical_manifest"]
+    historical_path = "compatibility/rc/tool-advisory-triage/brace-profile-validation/manifest.json"
+    if historical_ref.get("path") != historical_path or historical_ref.get("sha256") != NPM_BRACE_VALIDATION_MANIFEST: raise ValueError("historical brace counterevidence changed")
+    historical = json.loads(physical(historical_ref))
+    rows = historical["files"]
+    if type(rows) is not list or len(rows) != 25 or len({row["path"] for row in rows}) != 25: raise ValueError("historical brace evidence population changed")
+    for row in rows: _tool_proof_bytes(root, "compatibility/rc/tool-advisory-triage/brace-profile-validation/" + row["path"], row)
+    receipts = manifest["receipts"]
+    if type(receipts) is not list or len(receipts) != 5: raise ValueError("current brace receipt population changed")
+    originals = {row["triage_item_id"]: row for row in triage["findings"]}
+    if len(originals) != len(triage["findings"]): raise ValueError("duplicate historical triage")
+    findings, overrides = {}, {}
+    for item in receipts:
+        if type(item) is not dict or set(item) != {"triage_item_id", "advisory_id", "receipt", "record"}: raise ValueError("invalid current brace receipt")
+        ident, advisory = item["triage_item_id"], item["advisory_id"]
+        if ident in findings or NPM_CURRENT_BRACE_IDS.get(ident) != advisory: raise ValueError("current brace identity changed")
+        document = json.loads(physical(item["receipt"]))
+        candidates = document.get("findings")
+        if document.get("schema_version") != "triage-finding/v0" or type(candidates) is not list or len(candidates) != 1: raise ValueError("invalid individual current brace receipt")
+        finding = candidates[0]
+        if finding.get("triage_item_id") != ident or finding.get("input_id") != advisory or finding.get("verdict") != "not_actionable" or finding.get("normalized_input", {}).get("vulnerable_component") != "npm/brace-expansion@5.0.7": raise ValueError("current brace receipt identity changed")
+        old = originals[ident]
+        if old.get("input_id") != advisory or old.get("normalized_input", {}).get("vulnerable_component") != "npm/brace-expansion@5.0.7": raise ValueError("historical brace identity changed")
+        record = item["record"]
+        if type(record) is not dict or set(record) != {"subject_id", "advisory_id", "advisory_modified", "rule_id", "classification", "triage_item_id", "reason", "scope"} or record["subject_id"] != "npm/brace-expansion@5.0.7" or record["advisory_id"] != advisory or record["triage_item_id"] != ident or record["classification"] != "not-applicable" or record["rule_id"] != "npm-private-brace-inputs" or record["scope"] != NPM_CURRENT_BRACE_SCOPE or type(record["reason"]) is not str or len(record["reason"].strip()) < 40 or parse_time(record["advisory_modified"]) is None:
+            raise ValueError("invalid current static brace disposition")
+        findings[ident] = finding
+        overrides[(record["subject_id"], advisory)] = record
+    if set(findings) != set(NPM_CURRENT_BRACE_IDS): raise ValueError("incomplete current brace receipts")
+    # Re-read the exact current evidence after the caller's subsequent work too.
+    def assert_current():
+        _tool_proof_bytes(root, ref["path"], ref)
+        for item in [*policy, boundary, historical_ref, *(entry["receipt"] for entry in receipts)]: physical(item)
+        for row in rows: _tool_proof_bytes(root, "compatibility/rc/tool-advisory-triage/brace-profile-validation/" + row["path"], row)
+    assert_current()
+    return {"findings": findings, "overrides": overrides, "assert_current": assert_current,
+            "binding": {"manifest_sha256": NPM_CURRENT_BRACE_MANIFEST_SHA256, "reviewed_source_parent": manifest["source_parent"],
+                        "review_kind": "current-main-static", "runtime_validation_claimed": False,
+                        "historical_manifest_sha256": NPM_BRACE_VALIDATION_MANIFEST}}
+
+
 def private_npm_source_paths(root: Path) -> set[str]:
     """Complete maintained command source population, excluding this trusted checker."""
     names = set()
@@ -721,6 +797,7 @@ def _private_npm_current_profile(root: Path, line: str, manifests: dict, evidenc
         raise ValueError("current private npm review does not bind complete current inputs")
 
     semantic_refs = []
+    semantic_projection = None
     if profile["schema_version"] == 2:
         semantic_refs = review.get("semantic_review_refs")
         current = review.get("current_source_reviews")
@@ -753,6 +830,7 @@ def _private_npm_current_profile(root: Path, line: str, manifests: dict, evidenc
                 or [ref["path"] for ref in reviewed["evidence_refs"]] != sorted(set(ref["path"] for ref in reviewed["evidence_refs"]))
                 or any(reviewed.get(k) != v for k, v in expected_semantic.items())):
             raise ValueError("current semantic review does not bind main source projection")
+        semantic_projection = {key: reviewed[key] for key in ("source_parent", "source_files_sha256", "support_files_sha256", "input_files_sha256")}
 
     def assert_current():
         _tool_proof_bytes(root, profile_ref["path"], profile_ref)
@@ -784,6 +862,7 @@ def _private_npm_current_profile(root: Path, line: str, manifests: dict, evidenc
     binding = {"current_profile": profile_ref, "current_source_parent": branch["source_parent"],
                "current_source_files": len(primary), "current_support_files": len(support),
                "current_input_files": len(inputs), "current_scope": profile["scope"]}
+    if line == "main": binding["current_semantic_projection"] = semantic_projection
     return binding, assert_current
 
 
@@ -844,11 +923,14 @@ def private_npm_disposition_evidence(root: Path, archives: dict[str, bytes]) -> 
     findings = {row["triage_item_id"]: row for row in triage["findings"] if row["verdict"] == "not_actionable"}
     if {row["input_id"] for row in findings.values()} != {"GHSA-ch52-4w7c-c8xp", "GHSA-rj75-hqrm-r3gf"}:
         raise ValueError("private npm triage scope changed")
-    brace = private_npm_brace_validation(root, line, triage)
+    assert_current_profile()
+    brace = (private_npm_current_brace_validation(root, triage, current_binding) if line == "main"
+             else private_npm_brace_validation(root, line, triage))
     findings.update(brace["findings"])
     assert_current_profile()
+    if line == "main": brace["assert_current"]()
     details = {row["id"]: row["body"] for row in evidence["current_advisories"]}
-    return {"findings": findings, "details": details, "binding": {"line": line,
+    return {"findings": findings, "details": details, "brace_overrides": brace.get("overrides", {}), "binding": {"line": line,
             "reviewed_source_parent": subject["source_parent"], "source_files": len(rows),
             "artifacts": dict(NPM_PRIVATE_PROFILE_ARTIFACTS), "brace_validation": brace["binding"], **current_binding}}
 
@@ -1064,7 +1146,7 @@ def tool_disposition_evidence(root: Path, review: dict) -> dict:
     details = json.loads((root / "compatibility/rc/tool-advisory-details-diagnostic.json").read_text())["advisories"]
     details.update({row["input_id"]: private["details"][row["input_id"]] for row in private["findings"].values()})
     return {"graph": graph, "http3_disabled": http3_disabled, "findings": findings,
-            "details": details, "private_profile": private["binding"],
+            "details": details, "brace_overrides": private["brace_overrides"], "private_profile": private["binding"],
             "proof_sha256": proof_ref["sha256"]}
 
 
@@ -1095,6 +1177,15 @@ def classify_tool_findings(root: Path, observation: dict, now: datetime | None =
             records[key] = record
         if records.keys() != expected:
             raise ValueError("incomplete finite tool disposition roster")
+        if proof["private_profile"]["line"] == "main":
+            overrides = proof["brace_overrides"]
+            expected_brace = {( "npm/brace-expansion@5.0.7", advisory) for advisory in NPM_CURRENT_BRACE_IDS.values()}
+            if set(overrides) != expected_brace: raise ValueError("incomplete current static brace overrides")
+            for key, current in overrides.items():
+                historical = records[key]
+                if any(current[field] != historical[field] for field in ("subject_id", "advisory_id", "triage_item_id", "rule_id", "classification")) or parse_time(current["advisory_modified"]) != parse_time(historical["advisory_modified"]):
+                    raise ValueError("current static brace override differs from historical identity")
+                records[key] = current
         unresolved = []
         for row in observation["rows"]:
             if not row["vulns"]:
