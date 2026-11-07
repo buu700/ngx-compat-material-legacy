@@ -11,7 +11,7 @@ import {join} from 'node:path';
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 export async function observeChromium(origin,startPath,baseDir,bin) {
  mkdirSync(baseDir,{recursive:true});const profile=mkdtempSync(join(baseDir,'overlay-browser-'));
- const child=spawn(bin,['--headless=new','--remote-debugging-port=0',`--user-data-dir=${profile}`,'--no-sandbox','--disable-gpu','about:blank'],{stdio:['ignore','ignore','pipe']});let log='';child.stderr.on('data',d=>log+=d);child.on('error',()=>{});
+ const child=spawn(bin,['--headless=new','--remote-debugging-port=0',`--user-data-dir=${profile}`,'--disable-gpu','about:blank'],{stdio:['ignore','ignore','pipe']});let log='';child.stderr.on('data',d=>log+=d);child.on('error',()=>{});
  let socket;
  try {
   let endpoint;for(let i=0;i<100;i++){let m=log.match(/DevTools listening on (ws:\/\/127\.0\.0\.1:(\d+)\/devtools\/browser\/[a-f0-9-]+)/i);if(m){endpoint={url:m[1],port:+m[2]};break}if(child.exitCode!==null)throw Error('browser exited: '+log.slice(-500));await sleep(100)}

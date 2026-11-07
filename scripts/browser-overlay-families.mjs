@@ -283,7 +283,6 @@ const chrome = spawn(chromeBin, [
   '--headless=new',
   '--remote-debugging-port=' + String(requestedDebugPort),
   '--user-data-dir=' + chromeDir,
-  '--no-sandbox',
   '--disable-gpu',
   pageUrl,
 ], {stdio: ['ignore', 'ignore', 'pipe']});

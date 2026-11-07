@@ -177,7 +177,7 @@ async function withChromium(origin, visit) {
   const userData = mkdtempSync(join(tmpdir(), 'ngx-csp-chrome-'));
   const chrome = spawn(bin, [
     '--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${userData}`,
-    '--no-sandbox', '--disable-gpu', 'about:blank',
+    '--disable-gpu', 'about:blank',
   ], {stdio: ['ignore', 'ignore', 'pipe']});
   let log = '';
   chrome.stderr.on('data', chunk => { log += chunk; });

@@ -725,6 +725,12 @@ const INDEX_HTML = `<!doctype html><html><head>
 `;
 
 export async function withChromium(distDir, run, {debugPort: portOverride = null, responseHeaders = {}, chromiumArgs = null, requireAnnouncedEndpoint = false} = {}) {
+  // Caller-supplied display options must not weaken the browser's isolation.
+  if (chromiumArgs !== null && (!Array.isArray(chromiumArgs) || chromiumArgs.some(arg =>
+    typeof arg !== 'string' || /^--(?:no-sandbox|disable-sandbox|disable-setuid-sandbox|disable-namespace-sandbox|disable-seccomp-filter-sandbox|disable-gpu-sandbox|disable-web-security|disable-site-isolation-trials|single-process)(?:=|$)/i.test(arg) ||
+    /^--disable-features=.*(?:site[-_]?per[-_]?process|isolateorigins|networkservicesandbox)/i.test(arg)))) {
+    throw new Error('Chromium security-disabling arguments are not allowed');
+  }
   const server = createServer((req, res) => {
     const file = req.url === '/' ? 'index.html' : req.url.split('?')[0].replace(/^\//, '');
     try {
@@ -768,7 +774,7 @@ export async function withChromium(distDir, run, {debugPort: portOverride = null
     const chromeDir = mkdtempSync(join(tmpdir(), 'ngx-compat-chrome-companion-'));
     chrome = spawn(chromeBin, [
       '--headless=new', `--remote-debugging-port=${debugPort}`, `--user-data-dir=${chromeDir}`,
-      '--no-sandbox', '--disable-gpu', ...(chromiumArgs ?? [
+      '--disable-gpu', ...(chromiumArgs ?? [
         '--window-size=1280,1000', '--force-device-scale-factor=1',
         '--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4',
       ]),

@@ -58,7 +58,7 @@ async function collect() {
   const debugPort = 9333 + Math.floor(Math.random() * 500);
   const profile = mkdtempSync(join(tmpdir(), 'obs-chrome-'));
   const chromeBin = process.env.CHROME_BIN || '/usr/bin/google-chrome';
-  const chrome = spawn(chromeBin, ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage',
+  const chrome = spawn(chromeBin, ['--headless=new', '--disable-gpu', '--disable-dev-shm-usage',
     '--window-size=1400,1200', `--remote-debugging-port=${debugPort}`, `--user-data-dir=${profile}`, 'about:blank'], {stdio: 'ignore'});
   let targets = [];
   for (let i = 0; i < 100 && !targets.length; i++) {

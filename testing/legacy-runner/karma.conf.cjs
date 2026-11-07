@@ -31,12 +31,11 @@ module.exports = function (config) {
     browserNoActivityTimeout: 600000,
     browserDisconnectTimeout: 180000,
     pingTimeout: 120000,
-    browsers: ['ChromeHeadlessNoSandbox'],
+    browsers: ['ChromeHeadlessSandboxed'],
     customLaunchers: {
-      ChromeHeadlessNoSandbox: {
+      ChromeHeadlessSandboxed: {
         base: 'ChromeHeadless',
         flags: [
-          '--no-sandbox',
           '--disable-gpu',
           '--disable-dev-shm-usage',
           // Historical layout specs place a 500px trigger and read the tooltip

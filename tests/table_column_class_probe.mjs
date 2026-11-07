@@ -101,7 +101,7 @@ try {
       await new Promise(done => server.listen(0, '127.0.0.1', done));
       let html;
       try {html = await new Promise((done, reject) => {
-        const child = spawn(chrome, ['--headless', '--no-sandbox', '--disable-gpu', '--no-first-run', '--user-data-dir=' + join(model.root, 'chrome-' + variant), '--virtual-time-budget=1000', '--dump-dom', 'http://127.0.0.1:' + server.address().port], {stdio: ['ignore', 'pipe', 'pipe']});
+        const child = spawn(chrome, ['--headless', '--disable-gpu', '--no-first-run', '--user-data-dir=' + join(model.root, 'chrome-' + variant), '--virtual-time-budget=1000', '--dump-dom', 'http://127.0.0.1:' + server.address().port], {stdio: ['ignore', 'pipe', 'pipe']});
         let output = '', error = ''; child.stdout.on('data', b => output += b); child.stderr.on('data', b => error += b);
         const timer = setTimeout(() => {child.kill(); reject(Error('Chromium timeout'));}, 20000);
         child.on('error', reject); child.on('close', code => {clearTimeout(timer); code === 0 ? done(output) : reject(Error(error.slice(-1000)));});

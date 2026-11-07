@@ -737,7 +737,6 @@ export async function withChromium(origin, fn, options = {}) {
     '--headless=new',
     `--remote-debugging-port=${requestedPort}`,
     `--user-data-dir=${userDir}`,
-    '--no-sandbox',
     '--disable-gpu',
     'about:blank',
   ], {stdio: ['ignore', 'ignore', 'pipe']});
