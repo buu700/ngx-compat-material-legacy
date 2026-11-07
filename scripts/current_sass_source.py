@@ -14,9 +14,10 @@ from select_dialog_finite_source_successor_v4 import SelectDialogFiniteSourceV4
 
 ROOT = Path(__file__).resolve().parents[1]
 SELF = 'scripts/current_sass_source.py'
+FOCUS_STYLE_PACKET=dict(path='compatibility/rc/current-main-strong-focus-source-v1.json',sha256='e4f6c47d595edc21f102a756e3a827d077c0f717f1968b8672c691d4fb336ccb',bytes=1030)
 INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json'
 INPUTS_SHA = '46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9'
-SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='5422358f5dfda6cbcd6826fc1d3e887a294d9d5e34ea7093623d71dcb1087d15', bytes=19266)
+SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='357a76daa5221d9dc9da095e23f11be4d7a627ed102a2078eb079f25ec7fccf8', bytes=23987)
 ADDITIONAL = ['projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss',
               'projects/ngx-material-legacy/styles/button/_button-theme.scss',
               'projects/ngx-material-legacy/styles/card/_card-theme.scss']
@@ -136,18 +137,26 @@ class CurrentSassSource:
                 assert type(supplied) is bytes and actual == supplied, 'nonphysical current source ' + path
             assert _physical(root, path) == actual, 'source changed during read ' + path
             return actual
+        focus_style=None;git_style_before=None
         def member(row):
-            row = sixth.qualify(row) or focus.qualify(row) or product.qualify(row) or row
+            projected=focus_style is not None and row['path']==focus_style['before']['path'] and row['sha256']==focus_style['before']['sha256']
+            if projected:assert row['bytes']==focus_style['before']['bytes']
+            row = focus_style['after'] if projected else sixth.qualify(row) or focus.qualify(row) or product.qualify(row) or row
             raw = current(row['path'])
             assert _hash(raw) == row['sha256'] and len(raw) == row['bytes'], 'changed current Sass source ' + row['path']
             return raw
         initial_version = json.loads(_physical(root, 'projects/ngx-material-legacy/package.json'))['version']
         initial_line = '21.x' if initial_version.startswith('21.') else 'main' if initial_version.startswith('22.') else None
-        product = SelectDialogFiniteSourceV4(root, read=read, line=initial_line)
+        Product = (_verified_helper(root,'scripts/select_dialog_finite_source_successor_v6.py',
+                    'f93437e3315e03f8ae60944625f4ad46f60874f345d72b7f70afc3b195d85b31','SelectDialogFiniteSourceV6')
+                   if initial_line=='main' else SelectDialogFiniteSourceV4)
+        product = Product(root, read=read, line=initial_line)
         Focus = _verified_helper(root, 'scripts/dialog_focus_finite_source_successor_v5.py',
                                  '75b912981d5ea107b1b56736b26543601574cbf549bec19e667d4987afce5778', 'DialogFocusFiniteSourceV5')
-        Sixth = _verified_helper(root, 'scripts/stepper_sixth_source.py',
-                                 '3b6408d97f09d887686952600844c306ad434d1f626cc6a4b74701b536ce79d7', 'StepperSixthSource')
+        Sixth = (_verified_helper(root, 'scripts/stepper_current_peer_source_v5.py',
+                                  'f03cab7c899f19bb0f58189ea5355871c47cbe8773b4d6a9466204ca997273c7', 'StepperCurrentPeerSourceV4')
+                 if initial_line == 'main' else _verified_helper(root, 'scripts/stepper_sixth_source.py',
+                                  '3b6408d97f09d887686952600844c306ad434d1f626cc6a4b74701b536ce79d7', 'StepperSixthSource'))
         focus = Focus(root, read=read, line=initial_line)
         sixth = Sixth(root, read=read)
         for owner in (product, focus, sixth):
@@ -156,6 +165,24 @@ class CurrentSassSource:
                     assert bound[row['path']] == row
                 else:
                     bound[row['path']] = dict(row)
+        if initial_line == 'main':
+            for path,digest,size in [('scripts/select-dialog-finite-source-v6.mjs','4bd50817e745cf5c1e410a1a4c2b28726d95529f6d9df7a4d2bf953fddc8560a',15483),('scripts/select-dialog-finite-source-successor.mjs','1f58566ca39877ed180af58172aa040851a1f992f039f16ec9de7ea10809d929',12305)]:
+                helper_bytes=current(path);assert _hash(helper_bytes)==digest and len(helper_bytes)==size
+            helper = 'scripts/stepper-current-peer-source-v5.mjs'
+            helper_raw = current(helper)
+            assert _hash(helper_raw) == 'ed58eb7eabd2039a48321ec1c3037f42031dd68880795929a440283c5fbf659a' and len(helper_raw)==16963
+            old_js=current('scripts/stepper-current-peer-source-v4.mjs');assert _hash(old_js)=='9ed4857d9f5235f36d652284a3bf435dc8cf545500f314e3189f5f743c08d6a1' and len(old_js)==14887
+        if initial_line=='main':
+            packet_raw=current(FOCUS_STYLE_PACKET['path']);assert _ref(FOCUS_STYLE_PACKET['path'],packet_raw)==FOCUS_STYLE_PACKET;focus_style=json.loads(packet_raw)
+            assert focus_style['schema_version']==1 and focus_style['role']=='finite-current-main-strong-focus-source' and focus_style['source_scope_only'] is True
+            assert focus_style['parent']=='d74c0d083077f227ea237aff33f42f6c75e76214' and focus_style['commit']=='e1848d4e3a04b31cbb616f16b77d80525f6a7a5c'
+            assert focus_style['before']['path']=='projects/ngx-material-legacy/styles/core/focus-indicators/_focus-indicators.scss' and focus_style['after']['path']==focus_style['before']['path']
+            env=dict(PATH=os.environ.get('PATH',''),LANG='C',LC_ALL='C',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_SYSTEM='/dev/null',GIT_TERMINAL_PROMPT='0',GIT_NO_REPLACE_OBJECTS='1',GIT_NO_LAZY_FETCH='1')
+            def git(*args):return subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',*args],cwd=root,env=env)
+            assert git('rev-list','--parents','-n','1',focus_style['commit']).decode().strip()==focus_style['commit']+' '+focus_style['parent']
+            git_style_before=git('show',focus_style['parent']+':'+focus_style['before']['path']);after=git('show',focus_style['commit']+':'+focus_style['after']['path'])
+            assert _ref(focus_style['before']['path'],git_style_before)==focus_style['before'] and _ref(focus_style['after']['path'],after)==focus_style['after'] and current(focus_style['after']['path'])==after
+            assert _ref(focus_style['review']['path'],current(focus_style['review']['path']))==focus_style['review']
         assert current(SELF) == _IMAGE
         member(SOURCE_JS)
         raw = current(INPUTS)
@@ -208,6 +235,9 @@ class CurrentSassSource:
         sixth_transition = sixth.transition
         assert sixth_transition['path'] not in changes
         changes[sixth_transition['path']] = sixth_transition
+        if focus_style:
+            assert historical[focus_style['before']['path']]==git_style_before
+            changes[focus_style['before']['path']]=dict(path=focus_style['before']['path'],before=focus_style['before'],current=focus_style['after'])
         for row in source['inputs']:
             member(changes[row['path']]['current'] if row['path'] in changes else row)
         member(source['semantic_receipt'])
@@ -224,7 +254,7 @@ class CurrentSassSource:
         assert [row for row in graph['non_target_owned_style_template_graph'] if row['path'] == CARD] == [changes[CARD]['before']]
         for row in graph['non_target_owned_style_template_graph']:
             member(changes[CARD]['current'] if row['path'] == CARD else row)
-        transitions = [dict(path=row['path'], before=row['before'], current=row['current']) for row in source['modules'] + packet['additional_modules']] + [sixth_transition]
+        transitions = [dict(path=row['path'], before=row['before'], current=row['current']) for row in source['modules'] + packet['additional_modules']] + [sixth_transition] + ([dict(path=focus_style['before']['path'],before=focus_style['before'],current=focus_style['after'])] if focus_style else [])
         for row in transitions:
             member(row['current'])
         source_sets, source_set_successors = {}, []
@@ -232,21 +262,30 @@ class CurrentSassSource:
             assert _hash(json.dumps(rows, separators=(',', ':')).encode()) == key
             current_rows = []
             for row in rows:
-                changed = changes.get('projects/ngx-material-legacy/' + row['path']) if row['root'] == 0 else None
+                path='projects/ngx-material-legacy/' + row['path']
+                changed = changes.get(path) if row['root'] == 0 and (not focus_style or path!=focus_style['before']['path']) else None
                 current_rows.append(dict(row, sha256=changed['current']['sha256'], bytes=changed['current']['bytes']) if changed else dict(row))
             current_hash = _hash(json.dumps(current_rows, separators=(',', ':')).encode())
             assert key == sixth.source_set['historical_sha256']
-            assert current_hash == sixth.source_set['v3_current_sha256']
+            assert current_hash == sixth.source_set.get('current_sha256',sixth.source_set['v3_current_sha256'])
             assert current_rows == sixth.source_set['rows']
-            source_sets[current_hash] = current_rows
-            source_set_successors.append(dict(historical_sha256=key, current_sha256=current_hash))
+            final_rows,final_hash=current_rows,current_hash
+            if focus_style:
+                assert current_hash==focus_style['source_set_before'];seen=0;final_rows=[]
+                for row in current_rows:
+                    if row['root']==0 and 'projects/ngx-material-legacy/'+row['path']==focus_style['before']['path']:
+                        seen+=1;assert row['sha256']==focus_style['before']['sha256'] and row['bytes']==focus_style['before']['bytes'];row=dict(row,sha256=focus_style['after']['sha256'],bytes=focus_style['after']['bytes'])
+                    final_rows.append(row)
+                assert seen==1;final_hash=_hash(json.dumps(final_rows,separators=(',',':')).encode());assert final_hash==focus_style['source_set_after']
+            source_sets[final_hash] = final_rows
+            source_set_successors.append(dict(historical_sha256=key, current_sha256=final_hash))
         def assert_current():
             for row in list(bound.values()):
                 member(row)
             assert_physical()
         descriptor = dict(source_subject=dict(SOURCE_JS), source_packet=_ref(INPUTS, raw), source_modules=[row['current'] for row in transitions])
         _STATES[self] = dict(root=root, line=line, bound=bound, transitions=transitions, source_sets=source_sets, source_set_successors=source_set_successors,
-                             descriptor=descriptor, historical=historical, assert_current=assert_current, assert_physical=assert_physical)
+                             descriptor=descriptor, historical=historical, sixth=sixth, assert_current=assert_current, assert_physical=assert_physical)
         assert_current()
 
     @property
@@ -282,9 +321,10 @@ class CurrentSassSource:
         row = next((row for row in state['transitions'] if row['path'] == original['path']), None)
         if row is None:
             return None
-        selected = next((value for value in (row['before'], row['current']) if value['sha256'] == original['sha256']), None)
+        sixth_match = state['sixth'].qualify(original) if row['path'] == state['sixth'].transition['path'] else None
+        selected = sixth_match or next((value for value in (row['before'], row['current']) if value['sha256'] == original['sha256']), None)
         assert selected is not None, 'unknown owned source hash'
-        assert 'bytes' not in original or original['bytes'] == selected['bytes']
+        assert sixth_match is not None or 'bytes' not in original or original['bytes'] == selected['bytes']
         state['assert_current']()
         assert _metadata(incoming) == original, 'source reference mutated'
         result = dict(path=row['path'], sha256=row['current']['sha256'])

@@ -16,7 +16,12 @@
  */
 import assert from 'node:assert/strict';
 import {types} from 'node:util';
+import {createHash} from 'node:crypto';
+import {readFileSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
 
+const loadedSourceImage = readFileSync(fileURLToPath(import.meta.url));
+export const canonicalSourceGuardPlanLoadedImage = Object.freeze({path:'scripts/canonical-source-guard-plan.mjs',sha256:createHash('sha256').update(loadedSourceImage).digest('hex'),bytes:loadedSourceImage.length});
 const fields = ['dependencies', 'preflight', 'consume', 'final'];
 const descriptorFlags = ['enumerable', 'configurable', 'writable'];
 const apply = Reflect.apply;

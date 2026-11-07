@@ -5,6 +5,7 @@
 import hashlib,json,re,weakref,subprocess,shutil
 from pathlib import Path
 from current_sass_spinner_snack_admission import CurrentSpinnerSnackContract
+from select_program_transition_source import select_program_transitions
 _ROOT=Path(__file__).resolve().parents[1];_IMAGE=Path(__file__).read_bytes();_CONTEXTS=weakref.WeakKeyDictionary()
 _CASE='mixin-css/private-check-duplicate-theme-styles';_CONTRACT='historical-private-card-with-public-peer-overrides';_PROGRAM='f74770ded45c82a9caa9ae8b630ffb39aafa7a6bd1b2050004ba5e46a4776c7d';_ORIGINAL='b4e40842f13244e578d93b26919c69f5668e24a0736a46742c1d79cc747fe9ca'
 _PINS={'scripts/current_sass_spinner_snack_admission.py':'1af5a8902551ceddaf6d773d6b0abef10e2733ffa85ec5472bae0f6a9feb6c5b','scripts/current_sass_source.py':'1bf1bd2ff60bf3ee7b1aa44c7e0f443ae0642098cdac8f1d9d81f2aa0587bbbb','scripts/sass-private-card-gate.mjs':'46792f1e6f2b128c206c31d0f1edbfe9ca542c45ff1833bacd9da917cc8f6f5e','scripts/private-card-composition.mjs':'bde7f5ea938282acfcf98e5c8f03f9c9660650ddd815287b76a832dbeeb16d54','scripts/private-card-peer-check.mjs':'7f85cf94963c240325393367786faae1984a822000aa48935b77270c50b11bca','scripts/private_card_composition.py':'7adf1a44d80a49b2a61d197fd449e0218db1c391d7f6d8c9f44ce8e34b6eb810','fixtures/sass/private-card-peer-pins.json':'975904b6287c0be803cff023d58603fcc2a565be4515545718e60e604a6ea69c','fixtures/sass/private-card-peer.scss':'28bcb7a6c8c582ad187d46f9705ba6898aede018555f6088df6481487fad7ca5','compatibility/rc/original16-sass-source-diagnostic-identity.json':'324762d77a76762518b1a1b4328a4abaf2c388597fd03b1ef4323d736441ddbe','compatibility/rc/oracles/material-16.2.14-sass-api.json':'76908825fdbb55fc188f0add372d371f473cd7874cbf575894247231ab854e2d','compatibility/rc/oracles/material-16.2.14-sass-argument-cases.json':'8613cc1432b2ae351e655a59b3e39b2c48d80da12c875b5233f4fac2192d657a','reference/material-16.2.14/PROVENANCE.json':'d13d466669cbf96d386ceabfe3de0241b91bcbd3dce98ac70c31093609100f34','reference/material-16.2.14/environment-package-lock.json':'ad2f9d62bf04758f87650cae408f805e667236f992cd6d8e481c5577c939d130'}
@@ -54,14 +55,16 @@ class PrivateCardGateContext:
         oracle=json.loads(_read(root,'compatibility/rc/oracles/material-16.2.14-sass-api.json'));cases=json.loads(_read(root,'compatibility/rc/oracles/material-16.2.14-sass-argument-cases.json'));call=cases['mixins']['private-check-duplicate-theme-styles']['call'];program="@use '__entry__' as m;\n"+oracle['standard_theme']+'\n'+call+'\n'
         if _hash(program)!=_PROGRAM or oracle['members']['mixins']['private-check-duplicate-theme-styles']['invocation']['css_sha256']!=_ORIGINAL:raise ValueError('plan')
         prov=json.loads(_read(root,'reference/material-16.2.14/PROVENANCE.json'))['isolated_environment'];lock=json.loads(_read(root,'reference/material-16.2.14/environment-package-lock.json'));pins=json.loads(_read(root,'fixtures/sass/private-card-peer-pins.json'));branch=pins['branches']['21' if line=='21.x' else 'main'];info=branch['sass_info'];identity=dict(material_version='16.2.14',material_manifest_sha256=prov['material_manifest_sha256'],lock_sha256=prov['package_lock_sha256'],material_integrity=lock['packages']['node_modules/@angular/material']['integrity'],catalog='compatibility/rc/oracles/material-16.2.14-sass-api.json',catalog_sha256=_PINS['compatibility/rc/oracles/material-16.2.14-sass-api.json'],sass_version=info,expected_source='untouched-installed-material16',candidate_source='packed-facade')
-        _CONTEXTS[self]=dict(root=root,source=source,line=line,sources=_plain(sets[0]),original_sources=_plain(orig[0]),descriptor=_plain(dict(contract=_CONTRACT,source=source.descriptor)),identity=identity,call=call,info=info)
+        if line=='main' and _hash(_read(root,'scripts/select_program_transition_source.py'))!='a34b878e5ba2f15e5da293c7db48d019032b47192a82147648d0b1f5fc52ea59':raise ValueError('changed Stepper transition helper')
+        successor,successor_current=select_program_transitions(root,line,lambda path:_read(root,path),private=True)
+        _CONTEXTS[self]=dict(successor=successor,successor_current=successor_current,root=root,source=source,line=line,sources=_plain(sets[0]),original_sources=_plain(orig[0]),descriptor=_plain(dict(contract=_CONTRACT,source=source.descriptor)),identity=identity,call=call,info=info)
         self.assert_current()
     def assert_current(self):
         if not __debug__:raise RuntimeError('optimized mode cannot authenticate source')
-        s=_CONTEXTS[self];s['source'].assert_current()
+        s=_CONTEXTS[self];s['source'].assert_current();s['successor_current']()
         if Path(__file__).read_bytes()!=_IMAGE:raise ValueError('gate changed')
         for path,digest in _PINS.items():
-            if _hash(_read(s['root'],path))!=digest:raise ValueError('proof input changed')
+            if _hash(_read(s['root'],path))!=s['successor'].get(path,digest):raise ValueError('proof input changed')
         s['source'].assert_current()
 def private_card_gate_match(context,body):
     if not __debug__ or type(context) is not PrivateCardGateContext or context not in _CONTEXTS:return False

@@ -1,0 +1,70 @@
+{
+  "schema_version": 4,
+  "role": "finite-main-stepper-current-peer-source-successor",
+  "line": "main",
+  "previous_packet": {
+    "path": "compatibility/rc/current-sass-stepper-sixth-source-inputs-v1.json",
+    "sha256": "1d566395c25e3569cee1031526ec05508e40cb866d7d5fda008cb6a325a9caec",
+    "bytes": 7504
+  },
+  "source_parent": "42d02491648097656ccb3c590dbaaea066c3e603",
+  "transition": {
+    "before": {
+      "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+      "sha256": "fe42eacb9b974bd546b8ae7cb192bce3021fcc4c0a3828e3a765c745988cf161",
+      "bytes": 35593,
+      "git_blob": "7ce9353216a79dfefffad74973eb387f156f595a"
+    },
+    "after": {
+      "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+      "sha256": "3bd939280b1d80fd10f6c0ece8c434cfe2f0f369746cca7b2b3e9f8c153755ee",
+      "bytes": 35009,
+      "git_blob": "82456b11c41fa5fb69462b744e85bbd4c9f869a4"
+    },
+    "literal_edits": [
+      {
+        "offset": 278,
+        "before": "// Four Stepper error and hover/focus colors retain their owned Material 16\n// meanings. Other bridged tokens follow the current peer M2 contract.\n",
+        "after": "// Stepper bridge tokens follow the current peer M2 contract; historical\n// declarations remain in the owned Stepper theme before this addition.\n"
+      },
+      {
+        "offset": 562,
+        "before": "@use '../core/tokens/m2/mat/stepper' as historical-stepper;\n",
+        "after": ""
+      },
+      {
+        "offset": 21880,
+        "before": "      header-focus-state-layer-shape: 0,\n      header-hover-state-layer-shape: 0,\n",
+        "after": "      header-focus-state-layer-shape: 4px,\n      header-hover-state-layer-shape: 4px,\n"
+      },
+      {
+        "offset": 29990,
+        "before": "    $historical: historical-stepper.get-color-tokens(theming.get-color-config($theme));\n    $color: map.merge(map.get($groups, color), (\n      header-error-state-label-text-color: map.get($historical, header-error-state-label-text-color),\n      header-error-state-icon-foreground-color: map.get($historical, header-error-state-icon-foreground-color),\n      header-hover-state-layer-color: map.get($historical, header-hover-state-layer-color),\n      header-focus-state-layer-color: map.get($historical, header-focus-state-layer-color),\n    ));\n    $root: map.merge($root, _qualify(stepper, $color, $stepper-allowed));\n",
+        "after": "    $root: map.merge($root, _qualify(stepper, map.get($groups, color), $stepper-allowed));\n"
+      }
+    ]
+  },
+  "source_set": {
+    "v3_current_sha256": "fbea4c1a3c34a670abdd477ee3f4763c981974a6ccdb9f17d1e0247142073659",
+    "v4_current_sha256": "3a4ba16c62f61b000048ccf54ccc06e96c01222e05fc2c9ce3cf1cc61bbfb3c4",
+    "all_source_count": 472,
+    "changed_paths": [
+      "styles/bridges/_companion-overrides.scss"
+    ]
+  },
+  "semantic_scope": {
+    "historical_prefix": "unchanged-material-16",
+    "current_companion": "independent-current-peer-m2",
+    "stepper_tokens": [
+      "header-focus-state-layer-shape",
+      "header-hover-state-layer-shape",
+      "header-error-state-label-text-color",
+      "header-error-state-icon-foreground-color",
+      "header-hover-state-layer-color",
+      "header-focus-state-layer-color"
+    ]
+  },
+  "source_scope_only": true,
+  "css_or_artifact_admission_granted": false,
+  "historical_bytes_exposed_as_current": false
+}

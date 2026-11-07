@@ -7,6 +7,7 @@
 /** Finite gate composition. Candidate CSS is always compared in its original form. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
 import {readFileSync,lstatSync,realpathSync} from 'node:fs';
 import {isAbsolute,join,relative,resolve} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
@@ -91,7 +92,26 @@ function guarded(args,fields,operation,defaults={}){
 export function createSpinnerSnackGateContext(args={}){
  const captured=captureArgs(args,['root','read']);let {root=process.cwd(),read}=captured.values;
  root=resolve(root);const boundary=physicalBoundary(root,read);read=boundary.read;const source=createCurrentSpinnerSnackContract({root,read}),line=source.line,branch=packet.branches[line];
- const assertCurrent=()=>{source.assertCurrent();assert.ok(tool(root,SELF,read).equals(image));for(const[path,sha256]of dependencies)assert.equal(hash(tool(root,path,read)),sha256);source.assertCurrent();boundary.assertPhysical();};
+ let ownerSuccessor=null,selectOwnerSuccessor=null;
+ if(line==='main'){
+  const raw=read('compatibility/rc/current-sass-stepper-spinner-executables-v1.json');assert.equal(hash(raw),'2b2440b6f1b870e456d8585129e99270dffd90fc03842ab0944d555908b7b760');ownerSuccessor=JSON.parse(raw);
+  assert.equal(ownerSuccessor.schema_version,1);assert.equal(ownerSuccessor.role,'main-stepper-spinner-source-executable-successor');assert.equal(ownerSuccessor.line,'main');assert.equal(ownerSuccessor.source_parent,'42d02491648097656ccb3c590dbaaea066c3e603');assert.equal(ownerSuccessor.source_scope_only,true);assert.equal(ownerSuccessor.artifact_or_audit_admission_granted,false);
+  assert.deepEqual(ownerSuccessor.updates.map(r=>r.path),['scripts/current-sass-spinner-snack-contract.mjs','scripts/current_sass_spinner_snack_admission.py']);
+  const nextRaw=read('compatibility/rc/current-sass-select-spinner-executables-v2.json');assert.equal(hash(nextRaw),'76216b309c092dcf68f90c29f37450fe656638524add4cd305894ef3a08860a3');selectOwnerSuccessor=JSON.parse(nextRaw);
+  assert.equal(selectOwnerSuccessor.schema_version,2);assert.equal(selectOwnerSuccessor.role,'main-select-spinner-source-executable-successor');assert.equal(selectOwnerSuccessor.line,'main');assert.deepEqual(selectOwnerSuccessor.previous_packet,{path:'compatibility/rc/current-sass-stepper-spinner-executables-v1.json',sha256:hash(raw),bytes:raw.length});assert.equal(selectOwnerSuccessor.source_scope_only,true);assert.equal(selectOwnerSuccessor.artifact_or_audit_admission_granted,false);assert.deepEqual(selectOwnerSuccessor.updates.map(r=>r.path),ownerSuccessor.updates.map(r=>r.path));
+
+  const env={PATH:process.env.PATH,LANG:'C',LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1'};
+  for(const row of ownerSuccessor.updates){
+   const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',ownerSuccessor.source_parent+':'+row.path],{cwd:root,env});
+   assert.deepEqual({path:row.path,sha256:hash(before),bytes:before.length},row.before);let at=0;const parts=[];
+   for(const edit of row.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=at);const old=Buffer.from(edit.before),next=Buffer.from(edit.after);assert.ok(before.subarray(edit.offset,edit.offset+old.length).equals(old));parts.push(before.subarray(at,edit.offset),next);at=edit.offset+old.length;}
+   const after=Buffer.concat([...parts,before.subarray(at)]);assert.deepEqual({path:row.path,sha256:hash(after),bytes:after.length},row.after);
+   const next=selectOwnerSuccessor.updates.find(r=>r.path===row.path);assert.deepEqual(next.before,row.after);let cursor=0;const nextParts=[];
+   for(const edit of next.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor);const old=Buffer.from(edit.before),value=Buffer.from(edit.after);assert.ok(after.subarray(edit.offset,edit.offset+old.length).equals(old));nextParts.push(after.subarray(cursor,edit.offset),value);cursor=edit.offset+old.length;}
+   const physicalAfter=Buffer.concat([...nextParts,after.subarray(cursor)]);assert.deepEqual({path:row.path,sha256:hash(physicalAfter),bytes:physicalAfter.length},next.after);assert.ok(read(row.path).equals(physicalAfter));
+  }
+ }
+ const assertCurrent=()=>{source.assertCurrent();assert.ok(tool(root,SELF,read).equals(image));for(const[path,sha256]of dependencies){const next=selectOwnerSuccessor?.updates.find(row=>row.path===path);assert.equal(hash(tool(root,path,read)),next?next.after.sha256:sha256);}source.assertCurrent();boundary.assertPhysical();};
  const oracle=JSON.parse(readFileSync(join(root,packet.oracle.path))),catalog=JSON.parse(readFileSync(join(root,packet.catalog.path))),provenance=JSON.parse(readFileSync(join(root,packet.provenance.path))),lock=JSON.parse(readFileSync(join(root,packet.reference_lock.path)));
  const sets=Object.values(source.source_sets);assert.equal(sets.length,1);const currentSources=plain(sets[0]);
  const descriptor=plain(source.descriptor);

@@ -94,7 +94,10 @@ class OrdinaryCardGateTests(unittest.TestCase):
         return dict(root=self.root, context=self.context, body=body, active=SimpleNamespace(manifest=manifest, binding=binding), invocation=invocation)
 
     def test_01_all_twelve_actual_context_modeled_envelopes(self):
-        self.assertEqual(len(self.descriptor['source']['source_modules']), 6)
+        self.assertEqual(len(self.descriptor['source']['source_modules']), 7 if self.line == 'main' else 6)
+        if self.line == 'main':
+            focus=json.loads((self.root/'compatibility/rc/current-main-strong-focus-source-v1.json').read_bytes())
+            self.assertIn(focus['after'],self.descriptor['source']['source_modules'])
         self.assertEqual(len(self.rows), 12)
         self.assertEqual(sum(row['dimension'] in ('color', 'theme') for row in self.rows), 6)
         for row in self.rows:

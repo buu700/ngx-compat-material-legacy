@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "role": "main-select-spinner-source-executable-successor",
+  "line": "main",
+  "previous_packet": {
+    "path": "compatibility/rc/current-sass-stepper-spinner-executables-v1.json",
+    "sha256": "2b2440b6f1b870e456d8585129e99270dffd90fc03842ab0944d555908b7b760",
+    "bytes": 8879
+  },
+  "source_scope_only": true,
+  "artifact_or_audit_admission_granted": false,
+  "updates": [
+    {
+      "path": "scripts/current-sass-spinner-snack-contract.mjs",
+      "before": {
+        "path": "scripts/current-sass-spinner-snack-contract.mjs",
+        "sha256": "0f85650d7cb4f66275cf3f3663217adcd0f2694e1628e59744be358d954eef28",
+        "bytes": 18218
+      },
+      "after": {
+        "path": "scripts/current-sass-spinner-snack-contract.mjs",
+        "sha256": "21b211398260e1801cf02a72b139f5c9371482872763ca6168915377a5ea39c4",
+        "bytes": 20042
+      },
+      "edits": [
+        {
+          "offset": 7658,
+          "before": "  let successor=null,comparison=null;\n",
+          "after": "  let successor=null,selectSuccessor=null;\n"
+        },
+        {
+          "offset": 8409,
+          "before": "",
+          "after": "   const nextRaw=read('compatibility/rc/current-sass-select-source-executables-v2.json');assert.equal(hash(nextRaw),'ca173498329ead35221ef603bcb751699dd18e041cc002eca97c644f87e980a0');selectSuccessor=JSON.parse(nextRaw);\n   assert.equal(selectSuccessor.schema_version,2);assert.equal(selectSuccessor.role,'main-select-current-source-executable-successor');assert.equal(selectSuccessor.line,'main');assert.deepEqual(selectSuccessor.previous_packet,ref(path,raw));assert.equal(selectSuccessor.source_scope_only,true);assert.equal(selectSuccessor.artifact_or_audit_admission_granted,false);\n   assert.deepEqual(selectSuccessor.updates.map(row=>row.path),successor.updates.map(row=>row.path));assert.deepEqual(selectSuccessor.authored_support.map(row=>row.path),['scripts/select-dialog-finite-source-v6.mjs','scripts/select_dialog_finite_source_successor_v6.py','compatibility/rc/parent-select-dialog-menu-reviewed-repair-source-v6.json']);\n   for(const refValue of selectSuccessor.authored_support)assert.deepEqual(ref(refValue.path,read(refValue.path)),refValue);\n\n"
+        },
+        {
+          "offset": 9288,
+          "before": "    const after=Buffer.concat([...parts,before.subarray(cursor)]);assert.deepEqual(ref(row.path,after),row.after);assert.ok(equalBytes(read(row.path),after));if(row.path==='scripts/current-sass-source.mjs')comparison=before;\n",
+          "after": "    const after=Buffer.concat([...parts,before.subarray(cursor)]);assert.deepEqual(ref(row.path,after),row.after);\n    const next=selectSuccessor.updates.find(item=>item.path===row.path);assert.deepEqual(next.before,row.after);let nextCursor=0;const nextParts=[];\n    for(const edit of next.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=nextCursor);const old=Buffer.from(edit.before),value=Buffer.from(edit.after);assert.ok(equalBytes(after.subarray(edit.offset,edit.offset+old.length),old));nextParts.push(after.subarray(nextCursor,edit.offset),value);nextCursor=edit.offset+old.length;}\n    const physicalAfter=Buffer.concat([...nextParts,after.subarray(nextCursor)]);assert.deepEqual(ref(row.path,physicalAfter),next.after);assert.ok(equalBytes(read(row.path),physicalAfter));\n"
+        },
+        {
+          "offset": 9522,
+          "before": "  for (const [path, sha256, bytes] of PINS) {const update=successor?.updates.find(row=>row.path===path);member(update?update.after:{path, sha256, bytes});}\n",
+          "after": "  for (const [path, sha256, bytes] of PINS) {const update=selectSuccessor?.updates.find(row=>row.path===path);member(update?update.after:{path, sha256, bytes});}\n"
+        },
+        {
+          "offset": 10430,
+          "before": "  const expectedDescriptor = {source_subject: main?successor.updates[0].after:{path: PINS[0][0], sha256: PINS[0][1], bytes: PINS[0][2]}, source_packet: {path: SOURCE_INPUTS, sha256: PINS[1][1], bytes: PINS[1][2]}, source_modules: [...base.branches[line].modules.map(r => r.current), ...currentPacket.additional_modules.map(r => r.current), main?JSON.parse(read('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json')).transition.after:sixth.branches[line].reviewed_after]};\n",
+          "after": "  const expectedDescriptor = {source_subject: main?selectSuccessor.updates[0].after:{path: PINS[0][0], sha256: PINS[0][1], bytes: PINS[0][2]}, source_packet: {path: SOURCE_INPUTS, sha256: PINS[1][1], bytes: PINS[1][2]}, source_modules: [...base.branches[line].modules.map(r => r.current), ...currentPacket.additional_modules.map(r => r.current), main?JSON.parse(read('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json')).transition.after:sixth.branches[line].reviewed_after,...(main?[JSON.parse(read('compatibility/rc/current-main-strong-focus-source-v1.json')).after]:[])]};\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/current_sass_spinner_snack_admission.py",
+      "before": {
+        "path": "scripts/current_sass_spinner_snack_admission.py",
+        "sha256": "08a1b2e7a0c043deb9c8f6df08c714cbadaaae0e4695cf256a2ca43abde36345",
+        "bytes": 16516
+      },
+      "after": {
+        "path": "scripts/current_sass_spinner_snack_admission.py",
+        "sha256": "ea27e7956065d5be34a5306f55a8a4a891af70ecb21a145f4b20cc818493f15b",
+        "bytes": 18382
+      },
+      "edits": [
+        {
+          "offset": 5194,
+          "before": "        comparison = None\n",
+          "after": "        select_successor = None\n"
+        },
+        {
+          "offset": 5989,
+          "before": "",
+          "after": "            next_raw=current('compatibility/rc/current-sass-select-source-executables-v2.json');assert _hash(next_raw)=='ca173498329ead35221ef603bcb751699dd18e041cc002eca97c644f87e980a0';select_successor=json.loads(next_raw)\n            assert select_successor['schema_version']==2 and select_successor['role']=='main-select-current-source-executable-successor' and select_successor['line']=='main'\n            assert select_successor['previous_packet']==_ref(path,raw) and select_successor['source_scope_only'] is True and select_successor['artifact_or_audit_admission_granted'] is False\n            assert [r['path'] for r in select_successor['updates']]==[r['path'] for r in successor['updates']]\n            assert [r['path'] for r in select_successor['authored_support']]==['scripts/select-dialog-finite-source-v6.mjs','scripts/select_dialog_finite_source_successor_v6.py','compatibility/rc/parent-select-dialog-menu-reviewed-repair-source-v6.json']\n            for support in select_successor['authored_support']:assert _ref(support['path'],current(support['path']))==support\n\n"
+        },
+        {
+          "offset": 7000,
+          "before": "                assert _ref(row['path'],after)==row['after'] and current(row['path'])==after\n                if row['path']=='scripts/current-sass-source.mjs':comparison=before\n",
+          "after": "                assert _ref(row['path'],after)==row['after']\n                next_update=next(item for item in select_successor['updates'] if item['path']==row['path']);assert next_update['before']==row['after'];at=0;next_parts=[]\n                for edit in next_update['edits']:\n                    assert set(edit)=={'offset','before','after'} and type(edit['offset']) is int and edit['offset']>=at\n                    old=edit['before'].encode();value=edit['after'].encode();assert after[edit['offset']:edit['offset']+len(old)]==old\n                    next_parts.extend((after[at:edit['offset']],value));at=edit['offset']+len(old)\n                physical_after=b''.join([*next_parts,after[at:]])\n                assert _ref(row['path'],physical_after)==next_update['after'] and current(row['path'])==physical_after\n"
+        },
+        {
+          "offset": 7217,
+          "before": "            update = next((row for row in successor['updates'] if row['path']==path),None) if successor else None\n",
+          "after": "            update = next((row for row in select_successor['updates'] if row['path']==path),None) if select_successor else None\n"
+        },
+        {
+          "offset": 8072,
+          "before": "        canonical_source = dict(source_subject=successor['updates'][0]['after'] if main else dict(path=PINS[0][0], sha256=PINS[0][1], bytes=PINS[0][2]),\n",
+          "after": "        canonical_source = dict(source_subject=select_successor['updates'][0]['after'] if main else dict(path=PINS[0][0], sha256=PINS[0][1], bytes=PINS[0][2]),\n"
+        },
+        {
+          "offset": 8314,
+          "before": "            source_modules=[r['current'] for r in base['branches'][line]['modules'] + current_packet['additional_modules']] + [json.loads(current('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json'))['transition']['after'] if main else sixth['branches'][line]['reviewed_after']])\n",
+          "after": "            source_modules=[r['current'] for r in base['branches'][line]['modules'] + current_packet['additional_modules']] + [json.loads(current('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json'))['transition']['after'] if main else sixth['branches'][line]['reviewed_after']] + ([json.loads(current('compatibility/rc/current-main-strong-focus-source-v1.json'))['after']] if main else []))\n"
+        }
+      ]
+    }
+  ]
+}

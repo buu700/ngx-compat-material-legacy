@@ -17,7 +17,7 @@ const line=JSON.parse(read('projects/ngx-material-legacy/package.json')).version
 const oracle=JSON.parse(read(packet.oracle.path)),catalog=JSON.parse(read(packet.catalog.path)),provenance=JSON.parse(read(packet.provenance.path)),lock=JSON.parse(read(packet.reference_lock.path));
 let hook,target;const callback=p=>{if(hook){const action=hook;hook=null;action();}return p===target?Buffer.from('wrong'):read(p);};
 const context=createOrdinaryCardGateContext({root,read:callback}),descriptor=ordinaryCardGateDescriptor(context),modules=new Map(descriptor.source.source_modules.map(r=>[r.path,r]));
-assert.equal(modules.size,6);assert.equal(Object.hasOwn(context,'source_context'),false);
+assert.equal(modules.size,line==='main'?7:6);if(line==='main'){const focus=JSON.parse(read('compatibility/rc/current-main-strong-focus-source-v1.json'));assert.deepEqual(modules.get(focus.after.path),focus.after);}assert.equal(Object.hasOwn(context,'source_context'),false);
 const sources=Object.values(branch.source_sets)[0].map(r=>{const c=r.root===0&&modules.get('projects/ngx-material-legacy/'+r.path);return c?{...r,sha256:c.sha256,bytes:c.bytes}:{...r};});
 const retained=JSON.parse(readFileSync(new URL('../compatibility/rc/ordinary-card-public-bridge-qualification-v2.json',import.meta.url))).results.find(r=>r.line===line).actual.css;
 const checks=[],rejects=[],vectors=[];

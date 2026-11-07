@@ -4,6 +4,8 @@
 """Finite current source/metadata composition after unchanged historical models."""
 import hashlib
 import json
+import os
+import subprocess
 from pathlib import Path
 import re
 import weakref
@@ -111,6 +113,35 @@ class SpinnerSnackGateContext:
         read,assert_physical=_physical_boundary(root,read)
         source=CurrentSpinnerSnackContract(root,read=read)
         line=source.line
+        owner_successor=None;select_owner_successor=None
+        if line=='main':
+            raw=read('compatibility/rc/current-sass-stepper-spinner-executables-v1.json');assert _hash(raw)=='2b2440b6f1b870e456d8585129e99270dffd90fc03842ab0944d555908b7b760'
+            owner_successor=json.loads(raw)
+            assert owner_successor['schema_version']==1 and owner_successor['role']=='main-stepper-spinner-source-executable-successor' and owner_successor['line']=='main'
+            assert owner_successor['source_parent']=='42d02491648097656ccb3c590dbaaea066c3e603' and owner_successor['source_scope_only'] is True and owner_successor['artifact_or_audit_admission_granted'] is False
+            assert [r['path'] for r in owner_successor['updates']]==['scripts/current-sass-spinner-snack-contract.mjs','scripts/current_sass_spinner_snack_admission.py']
+            next_raw=read('compatibility/rc/current-sass-select-spinner-executables-v2.json');assert _hash(next_raw)=='76216b309c092dcf68f90c29f37450fe656638524add4cd305894ef3a08860a3';select_owner_successor=json.loads(next_raw)
+            assert select_owner_successor['schema_version']==2 and select_owner_successor['role']=='main-select-spinner-source-executable-successor' and select_owner_successor['line']=='main'
+            assert select_owner_successor['previous_packet']==dict(path='compatibility/rc/current-sass-stepper-spinner-executables-v1.json',sha256=_hash(raw),bytes=len(raw)) and select_owner_successor['source_scope_only'] is True and select_owner_successor['artifact_or_audit_admission_granted'] is False
+            assert [r['path'] for r in select_owner_successor['updates']]==[r['path'] for r in owner_successor['updates']]
+
+            env=dict(PATH=os.environ.get('PATH',''),LANG='C',LC_ALL='C',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_SYSTEM='/dev/null',GIT_TERMINAL_PROMPT='0',GIT_NO_REPLACE_OBJECTS='1',GIT_NO_LAZY_FETCH='1')
+            for row in owner_successor['updates']:
+                before=subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',owner_successor['source_parent']+':'+row['path']],cwd=root,env=env)
+                assert dict(path=row['path'],sha256=_hash(before),bytes=len(before))==row['before'];at=0;parts=[]
+                for edit in row['edits']:
+                    assert set(edit)=={'offset','before','after'} and type(edit['offset']) is int and edit['offset']>=at
+                    old=edit['before'].encode();next_bytes=edit['after'].encode();assert before[edit['offset']:edit['offset']+len(old)]==old
+                    parts.extend((before[at:edit['offset']],next_bytes));at=edit['offset']+len(old)
+                after=b''.join([*parts,before[at:]])
+                assert dict(path=row['path'],sha256=_hash(after),bytes=len(after))==row['after']
+                next_update=next(r for r in select_owner_successor['updates'] if r['path']==row['path']);assert next_update['before']==row['after'];cursor=0;next_parts=[]
+                for edit in next_update['edits']:
+                    assert set(edit)=={'offset','before','after'} and type(edit['offset']) is int and edit['offset']>=cursor
+                    old=edit['before'].encode();value=edit['after'].encode();assert after[edit['offset']:edit['offset']+len(old)]==old
+                    next_parts.extend((after[cursor:edit['offset']],value));cursor=edit['offset']+len(old)
+                physical_after=b''.join([*next_parts,after[cursor:]])
+                assert dict(path=row['path'],sha256=_hash(physical_after),bytes=len(physical_after))==next_update['after'] and read(row['path'])==physical_after
         branch=_PACKET['branches'][line]
         oracle=json.loads((root/_PACKET['oracle']['path']).read_bytes())
         catalog=json.loads((root/_PACKET['catalog']['path']).read_bytes())
@@ -119,7 +150,9 @@ class SpinnerSnackGateContext:
         def assert_current():
             source.assert_current()
             assert _tool(root,SELF,read)==_IMAGE
-            for path,sha in _DEPENDENCIES.items():assert _hash(_tool(root,path,read))==sha
+            for path,sha in _DEPENDENCIES.items():
+                update=next((r for r in select_owner_successor['updates'] if r['path']==path),None) if select_owner_successor else None
+                assert _hash(_tool(root,path,read))==(update['after']['sha256'] if update else sha)
             source.assert_current()
             assert_physical()
         sets=list(source.source_sets.values())

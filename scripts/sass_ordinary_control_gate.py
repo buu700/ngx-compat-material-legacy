@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import re
 import weakref
+from select_program_transition_source import select_program_transitions
 from current_sass_spinner_snack_admission import CurrentSpinnerSnackContract
 from sass_ordinary_control_css import (ORDINARY_CHECKBOX_BUTTON_CASES, LEGACY_DATEPICKER_BUTTON_CASES,
     ordinary_checkbox_button_expected_css, legacy_datepicker_button_expected_css)
@@ -131,6 +132,8 @@ class OrdinaryControlGateContext:
         read,assert_physical=_physical_boundary(root,read)
         source=CurrentSpinnerSnackContract(root,read=read)
         line=source.line
+        if line=='main':assert _hash(read('scripts/select_program_transition_source.py'))=='a34b878e5ba2f15e5da293c7db48d019032b47192a82147648d0b1f5fc52ea59'
+        successor,successor_current=select_program_transitions(root,line,read)
         branch=_PACKET['branches'][line]
         oracle=json.loads((root/_PACKET['oracle']['path']).read_bytes())
         catalog=json.loads((root/_PACKET['catalog']['path']).read_bytes())
@@ -138,8 +141,9 @@ class OrdinaryControlGateContext:
         lock=json.loads((root/_PACKET['reference_lock']['path']).read_bytes())
         def assert_current():
             source.assert_current()
+            successor_current()
             assert _tool(root,SELF,read)==_IMAGE
-            for path,sha in _DEPENDENCIES.items():assert _hash(_tool(root,path,read))==sha
+            for path,sha in _DEPENDENCIES.items():assert _hash(_tool(root,path,read))==successor.get(path,sha)
             source.assert_current()
             assert_physical()
         sets=list(source.source_sets.values())

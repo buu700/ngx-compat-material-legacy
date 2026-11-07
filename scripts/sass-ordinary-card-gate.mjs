@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Ryan Lester.
  * Use of this source code is governed by the MIT license in LICENSE.
  */
-/** Finite card12 admission over the six authenticated owned source successors. */
+/** Finite card12 admission over the authenticated owned source successors. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
@@ -95,8 +95,9 @@ export function createOrdinaryCardGateContext(args={}){
  for(const key of ['oracle','catalog','provenance','reference_lock'])member(packet[key]);for(const r of packet.compiler_inputs)member(r);
  const oracle=JSON.parse(read(packet.oracle.path)),catalog=JSON.parse(read(packet.catalog.path)),provenance=JSON.parse(read(packet.provenance.path)),lock=JSON.parse(read(packet.reference_lock.path));assert.equal(branch.compiler,provenance.sass_info);
  const sourceDescriptor=plain(source.descriptor);assert.equal(sourceDescriptor.source_subject.path,'scripts/current-sass-source.mjs');assert.equal(sourceDescriptor.source_packet.path,'compatibility/rc/current-sass-source-inputs-v2.json');member(sourceDescriptor.source_subject);member(sourceDescriptor.source_packet);
- const modules=sourceDescriptor.source_modules;assert.equal(modules.length,6);assert.equal(new Set(modules.map(r=>r.path)).size,6);
- assert.deepEqual(modules.map(r=>r.path).sort(),[...['progress-spinner','snack-bar','checkbox','button','card'].map(f=>'projects/ngx-material-legacy/styles/'+f+'/_'+f+'-theme.scss'),'projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss'].sort());
+ const modules=sourceDescriptor.source_modules,focusPath='projects/ngx-material-legacy/styles/core/focus-indicators/_focus-indicators.scss';assert.equal(modules.length,line==='main'?7:6);assert.equal(new Set(modules.map(r=>r.path)).size,modules.length);
+ assert.deepEqual(modules.map(r=>r.path).sort(),[...['progress-spinner','snack-bar','checkbox','button','card'].map(f=>'projects/ngx-material-legacy/styles/'+f+'/_'+f+'-theme.scss'),'projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss',...(line==='main'?[focusPath]:[])].sort());
+ if(line==='main'){const fp=JSON.parse(read('compatibility/rc/current-main-strong-focus-source-v1.json'));assert.deepEqual(modules.find(r=>r.path===focusPath),fp.after);}
  assert.deepEqual(modules.find(r=>r.path.endsWith('/card/_card-theme.scss')),{path:'projects/ngx-material-legacy/styles/card/_card-theme.scss',sha256:'dc5e055d95aabf5c8a8ae4ba70acee8a9a1315e6f46715e8846c932f79d51fbf',bytes:5349});
  const currentByPath=new Map(modules.map(r=>[r.path,r])),sets=plain(source.source_sets),successors=plain(source.source_set_successors);assert.equal(Object.keys(sets).length,1);assert.equal(successors.length,1);
  for(const [historical_sha256,rows]of Object.entries(branch.source_sets)){

@@ -16,8 +16,9 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 
 from current_sass_source import CurrentSassSource
 from select_dialog_finite_source_successor_v4 import PACKETS, PATHS, LATEST, SELF as PRODUCT_SUCCESSOR, SelectDialogFiniteSourceV4
+from select_dialog_finite_source_successor_v6 import SelectDialogFiniteSourceV6
 
-NODE = '/nix/store/w8jijs92barihdb0z54dsgq5szj2wd47-nodejs-24.21.0/bin/node'
+NODE = 'node'
 INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json'
 
 
@@ -33,6 +34,8 @@ def candidate_fixture(destination):
     paths = {INPUTS, 'scripts/current-sass-source.mjs', 'scripts/current_sass_source.py', 'scripts/canonical-source-guard-plan.mjs', 'scripts/select-dialog-finite-source-successor.mjs'}
     paths.update(row['path'] for row in CurrentSassSource(ROOT).bound)
     paths.update(('scripts/upstream-packed-run-evidence.mjs', 'scripts/dialog-focus-finite-source-successor.mjs', 'scripts/stepper-sixth-source.mjs'))
+    if line == 'main':
+        paths.update(('compatibility/rc/current-sass-stepper-source-executables-v1.json','compatibility/rc/current-sass-stepper-spinner-executables-v1.json','scripts/stepper-program-transition-source.mjs','scripts/stepper_program_transition_source.py','compatibility/rc/current-sass-stepper-private-gate-executable-v1.json','compatibility/rc/current-sass-select-source-executables-v2.json','compatibility/rc/current-sass-select-spinner-executables-v2.json','compatibility/rc/current-sass-select-private-gate-executable-v2.json','scripts/select-program-transition-source.mjs','scripts/select_program_transition_source.py'))
     paths.add(PRODUCT_SUCCESSOR)
     paths.update(row[0] for row in PACKETS)
     paths.update(PATHS)
@@ -77,7 +80,7 @@ class CurrentSassSourceTests(unittest.TestCase):
 
     def test_exact_six_modules_and_before_comparisons(self):
         self.assertEqual(self.context.line, self.line)
-        self.assertEqual(len(self.context.transitions), 6)
+        self.assertEqual(len(self.context.transitions), 7 if self.line == 'main' else 6)
         for row in self.context.transitions:
             with self.subTest(path=row['path']):
                 self.assertEqual(self.context.qualify(row['current']), {key: row['current'][key] for key in ('path', 'sha256', 'bytes')})
@@ -103,7 +106,10 @@ class CurrentSassSourceTests(unittest.TestCase):
             self.context.assert_current()
 
     def test_v4_product_predecessors_and_physical_controls(self):
-        successor = SelectDialogFiniteSourceV4(self.root, line=self.line)
+        if self.line == 'main':
+            with self.assertRaises(AssertionError):SelectDialogFiniteSourceV4(self.root, line=self.line)
+        successor_type = SelectDialogFiniteSourceV6 if self.line == 'main' else SelectDialogFiniteSourceV4
+        successor = successor_type(self.root, line=self.line)
         packet = json.loads((self.root / PACKETS[-1][0]).read_bytes())
         branch = packet['branches'][self.line]
         rows = branch['transitions']
@@ -125,7 +131,7 @@ class CurrentSassSourceTests(unittest.TestCase):
         try:
             target.write_bytes(original + b'\n// changed product\n')
             with self.assertRaises(AssertionError):
-                SelectDialogFiniteSourceV4(self.root, line=self.line)
+                successor_type(self.root, line=self.line)
             with self.assertRaises(AssertionError):
                 successor.assert_current()
         finally:
@@ -136,7 +142,7 @@ class CurrentSassSourceTests(unittest.TestCase):
         try:
             packet_file.write_bytes(packet_bytes + b'\n')
             with self.assertRaises(AssertionError):
-                SelectDialogFiniteSourceV4(self.root, line=self.line)
+                successor_type(self.root, line=self.line)
         finally:
             packet_file.write_bytes(packet_bytes)
         successor.assert_current()
@@ -153,7 +159,8 @@ class CurrentSassSourceTests(unittest.TestCase):
                 armed = False
                 target.write_bytes(original + b'\n<!-- changed -->\n')
             return raw
-        successor = SelectDialogFiniteSourceV4(self.root, read=callback, line=self.line)
+        successor_type = SelectDialogFiniteSourceV6 if self.line == 'main' else SelectDialogFiniteSourceV4
+        successor = successor_type(self.root, read=callback, line=self.line)
         try:
             armed = True
             with self.assertRaises(AssertionError):
@@ -257,7 +264,7 @@ class CurrentSassSourceTests(unittest.TestCase):
         self.assertEqual(len(self.context.source_set_successors), len(self.context.source_sets))
 
     def test_js_and_python_source_sets_match(self):
-        child = subprocess.run([NODE, str(ROOT / 'tests/current_sass_source_probe.mjs'), str(self.root)], cwd=ROOT,
+        child = subprocess.run([NODE, str(ROOT / ('tests/current_sass_focus_source_probe.mjs' if self.line == 'main' else 'tests/current_sass_source_probe.mjs')), str(self.root)], cwd=ROOT,
                                text=True, capture_output=True, timeout=30)
         self.assertEqual(child.returncode, 0, child.stderr)
         result = json.loads(child.stdout)

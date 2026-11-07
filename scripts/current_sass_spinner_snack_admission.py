@@ -7,6 +7,8 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import subprocess
+import os
 import weakref
 from current_sass_source import CurrentSassSource
 from sass_spinner_snack_bridge_admission import (SPINNER_SNACK_BRIDGE_CASES,
@@ -122,11 +124,50 @@ class CurrentSpinnerSnackContract:
             for r in bound.values():
                 assert _ref(r['path'], _physical(root, r['path'])) == r
         assert current(SELF) == _IMAGE
+        version = json.loads(current('projects/ngx-material-legacy/package.json'))['version']
+        main = version.startswith('22.')
+        successor = None
+        select_successor = None
+        if main:
+            path = 'compatibility/rc/current-sass-stepper-source-executables-v1.json'
+            raw = current(path)
+            assert _hash(raw) == '577ca8a935a6f431ed282769be29d84686c109a94faef9174de0091754e59d61'
+            successor = json.loads(raw)
+            assert successor['schema_version'] == 1 and successor['role'] == 'main-stepper-current-source-executable-successor' and successor['line'] == 'main'
+            assert successor['source_parent'] == '42d02491648097656ccb3c590dbaaea066c3e603' and successor['source_scope_only'] is True and successor['artifact_or_audit_admission_granted'] is False
+            assert [row['path'] for row in successor['updates']] == ['scripts/current-sass-source.mjs','scripts/current_sass_source.py']
+            next_raw=current('compatibility/rc/current-sass-select-source-executables-v2.json');assert _hash(next_raw)=='ca173498329ead35221ef603bcb751699dd18e041cc002eca97c644f87e980a0';select_successor=json.loads(next_raw)
+            assert select_successor['schema_version']==2 and select_successor['role']=='main-select-current-source-executable-successor' and select_successor['line']=='main'
+            assert select_successor['previous_packet']==_ref(path,raw) and select_successor['source_scope_only'] is True and select_successor['artifact_or_audit_admission_granted'] is False
+            assert [r['path'] for r in select_successor['updates']]==[r['path'] for r in successor['updates']]
+            assert [r['path'] for r in select_successor['authored_support']]==['scripts/select-dialog-finite-source-v6.mjs','scripts/select_dialog_finite_source_successor_v6.py','compatibility/rc/parent-select-dialog-menu-reviewed-repair-source-v6.json']
+            for support in select_successor['authored_support']:assert _ref(support['path'],current(support['path']))==support
+
+            env = dict(PATH=os.environ.get('PATH',''), LANG='C', LC_ALL='C', GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null', GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')
+            for row in successor['updates']:
+                before = subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',successor['source_parent']+':'+row['path']],cwd=root,env=env)
+                assert _ref(row['path'],before)==row['before']
+                cursor=0;parts=[]
+                for edit in row['edits']:
+                    assert set(edit)=={'offset','before','after'} and type(edit['offset']) is int and edit['offset']>=cursor
+                    old=edit['before'].encode();after=edit['after'].encode();assert before[edit['offset']:edit['offset']+len(old)]==old
+                    parts.extend((before[cursor:edit['offset']],after));cursor=edit['offset']+len(old)
+                after=b''.join([*parts,before[cursor:]])
+                assert _ref(row['path'],after)==row['after']
+                next_update=next(item for item in select_successor['updates'] if item['path']==row['path']);assert next_update['before']==row['after'];at=0;next_parts=[]
+                for edit in next_update['edits']:
+                    assert set(edit)=={'offset','before','after'} and type(edit['offset']) is int and edit['offset']>=at
+                    old=edit['before'].encode();value=edit['after'].encode();assert after[edit['offset']:edit['offset']+len(old)]==old
+                    next_parts.extend((after[at:edit['offset']],value));at=edit['offset']+len(old)
+                physical_after=b''.join([*next_parts,after[at:]])
+                assert _ref(row['path'],physical_after)==next_update['after'] and current(row['path'])==physical_after
         for path, sha256, size in PINS:
-            member(dict(path=path, sha256=sha256, bytes=size))
+            update = next((row for row in select_successor['updates'] if row['path']==path),None) if select_successor else None
+            member(update['after'] if update else dict(path=path, sha256=sha256, bytes=size))
         packet, current_packet = json.loads(current(INPUTS)), json.loads(current(SOURCE_INPUTS))
         source_context = CurrentSassSource(root, read=current)
         line, branch = source_context.line, packet['branches'][source_context.line]
+        assert main == (line == 'main')
         for key in ('oracle', 'catalog', 'provenance', 'reference_lock', 'source_subject', 'source_packet'):
             member(packet[key])
         for r in packet['compiler_inputs']:
@@ -134,9 +175,9 @@ class CurrentSpinnerSnackContract:
         member(branch['observation'])
         base = json.loads(current(packet['source_packet']['path']))
         sixth = json.loads(current(SIXTH_PACKET))
-        canonical_source = dict(source_subject=dict(path=PINS[0][0], sha256=PINS[0][1], bytes=PINS[0][2]),
+        canonical_source = dict(source_subject=select_successor['updates'][0]['after'] if main else dict(path=PINS[0][0], sha256=PINS[0][1], bytes=PINS[0][2]),
             source_packet=dict(path=SOURCE_INPUTS, sha256=PINS[2][1], bytes=PINS[2][2]),
-            source_modules=[r['current'] for r in base['branches'][line]['modules'] + current_packet['additional_modules']] + [sixth['branches'][line]['reviewed_after']])
+            source_modules=[r['current'] for r in base['branches'][line]['modules'] + current_packet['additional_modules']] + [json.loads(current('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json'))['transition']['after'] if main else sixth['branches'][line]['reviewed_after']] + ([json.loads(current('compatibility/rc/current-main-strong-focus-source-v1.json'))['after']] if main else []))
         assert source_context.descriptor == canonical_source
         oracle, catalog, provenance, lock = [json.loads(current(packet[k]['path'])) for k in ('oracle', 'catalog', 'provenance', 'reference_lock')]
         assert branch['compiler'] == provenance['sass_info']

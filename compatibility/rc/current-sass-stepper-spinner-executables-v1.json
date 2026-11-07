@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "role": "main-stepper-spinner-source-executable-successor",
+  "line": "main",
+  "source_parent": "42d02491648097656ccb3c590dbaaea066c3e603",
+  "source_scope_only": true,
+  "artifact_or_audit_admission_granted": false,
+  "updates": [
+    {
+      "path": "scripts/current-sass-spinner-snack-contract.mjs",
+      "before": {
+        "path": "scripts/current-sass-spinner-snack-contract.mjs",
+        "sha256": "1460552c5787a120e5f42c1cb2a85cedcd5cfeef25dc78a84daaceb09eb4c777",
+        "bytes": 15922
+      },
+      "after": {
+        "path": "scripts/current-sass-spinner-snack-contract.mjs",
+        "sha256": "0f85650d7cb4f66275cf3f3663217adcd0f2694e1628e59744be358d954eef28",
+        "bytes": 18218
+      },
+      "edits": [
+        {
+          "offset": 342,
+          "before": "",
+          "after": "import {execFileSync} from 'node:child_process';\n"
+        },
+        {
+          "offset": 7446,
+          "before": "  assert.ok(equalBytes(read(SELF), image)); for (const [path, sha256, bytes] of PINS) member({path, sha256, bytes});\n",
+          "after": "  assert.ok(equalBytes(read(SELF), image));\n  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version, main=version.startsWith('22.');\n  let successor=null,comparison=null;\n  if(main){\n   const path='compatibility/rc/current-sass-stepper-source-executables-v1.json',raw=read(path);\n   assert.equal(hash(raw),'577ca8a935a6f431ed282769be29d84686c109a94faef9174de0091754e59d61');successor=JSON.parse(raw);\n   assert.equal(successor.schema_version,1);assert.equal(successor.role,'main-stepper-current-source-executable-successor');assert.equal(successor.line,'main');assert.equal(successor.source_parent,'42d02491648097656ccb3c590dbaaea066c3e603');assert.equal(successor.source_scope_only,true);assert.equal(successor.artifact_or_audit_admission_granted,false);\n   assert.deepEqual(successor.updates.map(row=>row.path),['scripts/current-sass-source.mjs','scripts/current_sass_source.py']);\n   const env={PATH:process.env.PATH,LANG:'C',LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1'};\n   for(const row of successor.updates){\n    const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',successor.source_parent+':'+row.path],{cwd:root,env});\n    assert.deepEqual(ref(row.path,before),row.before);let cursor=0;const parts=[];\n    for(const edit of row.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor);const old=Buffer.from(edit.before),after=Buffer.from(edit.after);assert.ok(equalBytes(before.subarray(edit.offset,edit.offset+old.length),old));parts.push(before.subarray(cursor,edit.offset),after);cursor=edit.offset+old.length;}\n    const after=Buffer.concat([...parts,before.subarray(cursor)]);assert.deepEqual(ref(row.path,after),row.after);assert.ok(equalBytes(read(row.path),after));if(row.path==='scripts/current-sass-source.mjs')comparison=before;\n   }\n  }\n  for (const [path, sha256, bytes] of PINS) {const update=successor?.updates.find(row=>row.path===path);member(update?update.after:{path, sha256, bytes});}\n\n"
+        },
+        {
+          "offset": 7874,
+          "before": "  const line = source_context.line, branch = packet.branches[line]; assert.ok(branch);\n",
+          "after": "  const line = source_context.line, branch = packet.branches[line]; assert.ok(branch);assert.equal(main,line==='main');\n"
+        },
+        {
+          "offset": 8281,
+          "before": "  const expectedDescriptor = {source_subject: {path: PINS[0][0], sha256: PINS[0][1], bytes: PINS[0][2]}, source_packet: {path: SOURCE_INPUTS, sha256: PINS[1][1], bytes: PINS[1][2]}, source_modules: [...base.branches[line].modules.map(r => r.current), ...currentPacket.additional_modules.map(r => r.current), sixth.branches[line].reviewed_after]};\n",
+          "after": "  const expectedDescriptor = {source_subject: main?successor.updates[0].after:{path: PINS[0][0], sha256: PINS[0][1], bytes: PINS[0][2]}, source_packet: {path: SOURCE_INPUTS, sha256: PINS[1][1], bytes: PINS[1][2]}, source_modules: [...base.branches[line].modules.map(r => r.current), ...currentPacket.additional_modules.map(r => r.current), main?JSON.parse(read('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json')).transition.after:sixth.branches[line].reviewed_after]};\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/current_sass_spinner_snack_admission.py",
+      "before": {
+        "path": "scripts/current_sass_spinner_snack_admission.py",
+        "sha256": "1af5a8902551ceddaf6d773d6b0abef10e2733ffa85ec5472bae0f6a9feb6c5b",
+        "bytes": 13982
+      },
+      "after": {
+        "path": "scripts/current_sass_spinner_snack_admission.py",
+        "sha256": "08a1b2e7a0c043deb9c8f6df08c714cbadaaae0e4695cf256a2ca43abde36345",
+        "bytes": 16516
+      },
+      "edits": [
+        {
+          "offset": 312,
+          "before": "",
+          "after": "import subprocess\nimport os\n"
+        },
+        {
+          "offset": 5006,
+          "before": "",
+          "after": "        version = json.loads(current('projects/ngx-material-legacy/package.json'))['version']\n        main = version.startswith('22.')\n        successor = None\n        comparison = None\n        if main:\n            path = 'compatibility/rc/current-sass-stepper-source-executables-v1.json'\n            raw = current(path)\n            assert _hash(raw) == '577ca8a935a6f431ed282769be29d84686c109a94faef9174de0091754e59d61'\n            successor = json.loads(raw)\n            assert successor['schema_version'] == 1 and successor['role'] == 'main-stepper-current-source-executable-successor' and successor['line'] == 'main'\n            assert successor['source_parent'] == '42d02491648097656ccb3c590dbaaea066c3e603' and successor['source_scope_only'] is True and successor['artifact_or_audit_admission_granted'] is False\n            assert [row['path'] for row in successor['updates']] == ['scripts/current-sass-source.mjs','scripts/current_sass_source.py']\n            env = dict(PATH=os.environ.get('PATH',''), LANG='C', LC_ALL='C', GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null', GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')\n            for row in successor['updates']:\n                before = subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',successor['source_parent']+':'+row['path']],cwd=root,env=env)\n                assert _ref(row['path'],before)==row['before']\n                cursor=0;parts=[]\n                for edit in row['edits']:\n                    assert set(edit)=={'offset','before','after'} and type(edit['offset']) is int and edit['offset']>=cursor\n                    old=edit['before'].encode();after=edit['after'].encode();assert before[edit['offset']:edit['offset']+len(old)]==old\n                    parts.extend((before[cursor:edit['offset']],after));cursor=edit['offset']+len(old)\n                after=b''.join([*parts,before[cursor:]])\n                assert _ref(row['path'],after)==row['after'] and current(row['path'])==after\n                if row['path']=='scripts/current-sass-source.mjs':comparison=before\n"
+        },
+        {
+          "offset": 5046,
+          "before": "            member(dict(path=path, sha256=sha256, bytes=size))\n",
+          "after": "            update = next((row for row in successor['updates'] if row['path']==path),None) if successor else None\n            member(update['after'] if update else dict(path=path, sha256=sha256, bytes=size))\n"
+        },
+        {
+          "offset": 5353,
+          "before": "",
+          "after": "        assert main == (line == 'main')\n"
+        },
+        {
+          "offset": 5716,
+          "before": "        canonical_source = dict(source_subject=dict(path=PINS[0][0], sha256=PINS[0][1], bytes=PINS[0][2]),\n",
+          "after": "        canonical_source = dict(source_subject=successor['updates'][0]['after'] if main else dict(path=PINS[0][0], sha256=PINS[0][1], bytes=PINS[0][2]),\n"
+        },
+        {
+          "offset": 5912,
+          "before": "            source_modules=[r['current'] for r in base['branches'][line]['modules'] + current_packet['additional_modules']] + [sixth['branches'][line]['reviewed_after']])\n",
+          "after": "            source_modules=[r['current'] for r in base['branches'][line]['modules'] + current_packet['additional_modules']] + [json.loads(current('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json'))['transition']['after'] if main else sixth['branches'][line]['reviewed_after']])\n"
+        }
+      ]
+    }
+  ]
+}

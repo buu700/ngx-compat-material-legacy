@@ -7,6 +7,7 @@
 /** Finite gate composition. Candidate CSS is always compared in its original form. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
+import {selectProgramTransitions} from './select-program-transition-source.mjs';
 import {createRequire} from 'node:module';
 import {readFileSync,lstatSync,realpathSync} from 'node:fs';
 import {isAbsolute,join,relative,resolve} from 'node:path';
@@ -104,7 +105,9 @@ function guarded(args,fields,operation,defaults={}){
 export function createOrdinaryControlGateContext(args={}){
  const captured=captureArgs(args,['root','read']);let {root=process.cwd(),read}=captured.values;
  root=resolve(root);const boundary=physicalBoundary(root,read);read=boundary.read;const source=createCurrentSpinnerSnackContract({root,read}),line=source.line,branch=packet.branches[line];
- const assertCurrent=()=>{source.assertCurrent();assert.ok(tool(root,SELF,read).equals(image));for(const[path,sha256]of dependencies)assert.equal(hash(tool(root,path,read)),sha256);source.assertCurrent();boundary.assertPhysical();};
+ if(line==='main')assert.equal(hash(read('scripts/select-program-transition-source.mjs')),'4ea2edb6e3b55ec7ec3faa781097e76cbe029470d62f07d9bf8747468f4fa873');
+ const successor=selectProgramTransitions({root,line,read});
+ const assertCurrent=()=>{source.assertCurrent();successor.assertCurrent();assert.ok(tool(root,SELF,read).equals(image));for(const[path,sha256]of dependencies)assert.equal(hash(tool(root,path,read)),successor.refs.get(path)??sha256);source.assertCurrent();boundary.assertPhysical();};
  const oracle=JSON.parse(readFileSync(join(root,packet.oracle.path))),catalog=JSON.parse(readFileSync(join(root,packet.catalog.path))),provenance=JSON.parse(readFileSync(join(root,packet.provenance.path))),lock=JSON.parse(readFileSync(join(root,packet.reference_lock.path)));
  const sets=Object.values(source.source_sets);assert.equal(sets.length,1);const currentSources=plain(sets[0]);
  const descriptor=plain(source.descriptor);
