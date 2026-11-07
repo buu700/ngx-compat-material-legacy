@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "role": "individual original-hunk TypeScript definite-assignment source decision",
+  "line": "main",
+  "status": "reviewed",
+  "sha": "4c8928eb40b73e9d435a9c7a1fc91867d8831513",
+  "subject": "refactor(material/progress-spinner): fix strict property initialization errors",
+  "source_head": "53c0d2ac17c930d93b4dfe2b2b6ecf107155ce1e",
+  "parent_commit": "aaafad9918c2c0109130386fc60bc72f059ef188",
+  "upstream_commit_object_sha256": "762330cda21c5f945cbbcdae68b5bf6128fea20123b943564449a40bb19cc604",
+  "patch_bytes": 1731,
+  "patch_paths": [
+    "src/material/progress-spinner/progress-spinner.spec.ts",
+    "src/material/progress-spinner/progress-spinner.ts"
+  ],
+  "diff_sha256": "9b57031d348bca3b81531396aba8b09b4c27c73efc99ce85acb400729e238170",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts",
+      "sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+      "bytes": 12785
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.html",
+      "sha256": "df4e7c34e3434e3f99ea651f3aa4b46bcf3f09acebe73e281b24012f8b4c544e",
+      "bytes": 1932
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.scss",
+      "sha256": "c49e724b39ca30c472b418b644cd4c9da6893c74a0b0fa45518555b4672142f3",
+      "bytes": 3867
+    },
+    {
+      "path": "projects/ngx-material-legacy/_index.scss",
+      "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+      "bytes": 14151
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c",
+      "bytes": 1391
+    },
+    {
+      "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+      "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863",
+      "bytes": 1585
+    }
+  ],
+  "final_disposition": "do-not-adopt",
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "The complete modern progress-spinner patch changes only definite-assignment annotations on two production fields and two upstream test fixture fields, with no initializer or executable statement. The owned historical spinner is separately implemented: its bound progress-spinner.ts retains the historical private _strokeWidth field and SVG implementation, and its HTML and SCSS are bound as owned source context. Preserve its existing contract without copying the modern component annotations. This source-only review does not establish runtime, current-peer inheritance, styles, the 21.x line, security clearance or G11. The current owned library compiler configuration explicitly disables strictPropertyInitialization; this does not assert that another compiler configuration will accept unmodified sources.",
+  "reviewer": "Codex independent source analysis",
+  "previous_disposition_record": {
+    "sha": "4c8928eb40b73e9d435a9c7a1fc91867d8831513",
+    "bucket": "behavior-semantic",
+    "subject": "refactor(material/progress-spinner): fix strict property initialization errors",
+    "files": [
+      "src/material/progress-spinner/progress-spinner.spec.ts",
+      "src/material/progress-spinner/progress-spinner.ts"
+    ],
+    "diff_sha256": "e65a56c0f8ee31e2ae2445e10adf75a3494c64ac811ac33396c9696cfd919ba1",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/4c8928eb40b73e9d435a9c7a1fc91867d8831513.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "do-not-adopt",
+    "read_note_disposition": "retained-legacy-differs",
+    "reason": "The diff in src/material/progress-spinner/progress-spinner.spec.ts changes `strokeWidth: number;`. The owned legacy file still contains the previous line because this package keeps the Material 16 legacy contract (zone scheduling, factory providers, explicit change detection, or the pre-signal API). The current-component rewrite is not copied into the legacy sources. The commit is an ancestor of v22.1.7, so @angular/material@22.1.7 and @angular/cdk@22.1.7 already contain it for peer callers."
+  },
+  "previous_evidence_reference": {
+    "path": "compatibility/f10/disposition-ledger/evidence/mechanical/4c8928eb40b73e9d435a9c7a1fc91867d8831513.json",
+    "sha256": "5f25d3fc3299a97d882d251e53e9e59d5e16f5ad47620d41c597bd52525b8be4"
+  },
+  "limitations": [
+    "No whole-application, rendered, runtime or installed-peer execution is claimed.",
+    "The owned Sass companion remains separately qualified; these TS annotation changes are not a Sass or theme test.",
+    "The actual upstream TypeScript compiler configuration is not transplanted."
+  ],
+  "upstream_object_frame": {
+    "path": "compatibility/rc/c04-type-only-four/upstream-objects.json",
+    "sha256": "e40f9871cd201447cc392c748aebe172831af7403166c51a9278f7d582179f70",
+    "bytes": 480686
+  },
+  "individual_proof": {
+    "proof_kind": "whole-hunk-owned-and-package-boundary-review",
+    "source_conclusion_only": true,
+    "execution_claim": "not-claimed",
+    "diff_sha256": "9b57031d348bca3b81531396aba8b09b4c27c73efc99ce85acb400729e238170",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The complete modern progress-spinner patch changes only definite-assignment annotations on two production fields and two upstream test fixture fields, with no initializer or executable statement. The owned historical spinner is separately implemented: its bound progress-spinner.ts retains the historical private _strokeWidth field and SVG implementation, and its HTML and SCSS are bound as owned source context. Preserve its existing contract without copying the modern component annotations. This source-only review does not establish runtime, current-peer inheritance, styles, the 21.x line, security clearance or G11. The current owned library compiler configuration explicitly disables strictPropertyInitialization; this does not assert that another compiler configuration will accept unmodified sources.",
+    "source_evidence_scope": "current",
+    "source_evidence": [
+      {
+        "path": "compatibility/rc/c04-type-only-four/upstream-objects.json",
+        "sha256": "e40f9871cd201447cc392c748aebe172831af7403166c51a9278f7d582179f70",
+        "bytes": 480686
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts",
+        "sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+        "bytes": 12785
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.html",
+        "sha256": "df4e7c34e3434e3f99ea651f3aa4b46bcf3f09acebe73e281b24012f8b4c544e",
+        "bytes": 1932
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.scss",
+        "sha256": "c49e724b39ca30c472b418b644cd4c9da6893c74a0b0fa45518555b4672142f3",
+        "bytes": 3867
+      },
+      {
+        "path": "projects/ngx-material-legacy/_index.scss",
+        "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+        "bytes": 14151
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c",
+        "bytes": 1391
+      },
+      {
+        "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+        "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863",
+        "bytes": 1585
+      }
+    ]
+  },
+  "diff": "diff --git a/src/material/progress-spinner/progress-spinner.spec.ts b/src/material/progress-spinner/progress-spinner.spec.ts\nindex 26d010ac16a889eeed3a2e071b6739f4bcf40a0e..71b995aa057c8d5a710a1e644e3828ac852a29f7 100644\n--- a/src/material/progress-spinner/progress-spinner.spec.ts\n+++ b/src/material/progress-spinner/progress-spinner.spec.ts\n@@ -389,7 +389,7 @@ class BasicProgressSpinner {}\n   imports: [MatProgressSpinnerModule],\n })\n class ProgressSpinnerCustomStrokeWidth {\n-  strokeWidth: number;\n+  strokeWidth!: number;\n }\n \n @Component({\n@@ -397,7 +397,7 @@ class ProgressSpinnerCustomStrokeWidth {\n   imports: [MatProgressSpinnerModule],\n })\n class ProgressSpinnerCustomDiameter {\n-  diameter: number;\n+  diameter!: number;\n }\n \n @Component({\ndiff --git a/src/material/progress-spinner/progress-spinner.ts b/src/material/progress-spinner/progress-spinner.ts\nindex bd34cdb03811fb76ad28719ebce7fa49f588813d..d8c48f828a914d844b8fc3108173662ec1afe2c5 100644\n--- a/src/material/progress-spinner/progress-spinner.ts\n+++ b/src/material/progress-spinner/progress-spinner.ts\n@@ -113,7 +113,7 @@ export class MatProgressSpinner {\n   private _defaultColor: ThemePalette = 'primary';\n \n   /** The element of the determinate spinner. */\n-  @ViewChild('determinateSpinner') _determinateCircle: ElementRef<HTMLElement>;\n+  @ViewChild('determinateSpinner') _determinateCircle!: ElementRef<HTMLElement>;\n \n   constructor(...args: unknown[]);\n \n@@ -182,7 +182,7 @@ export class MatProgressSpinner {\n   set strokeWidth(value: number) {\n     this._strokeWidth = value || 0;\n   }\n-  private _strokeWidth: number;\n+  private _strokeWidth!: number;\n \n   /** The radius of the spinner, adjusted for stroke width. */\n   _circleRadius(): number {\n"
+}
