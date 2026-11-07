@@ -14,6 +14,8 @@ Prefer CSS transitions/keyframes for simple motion; use WAAPI or narrow imperati
 
 Each owned controller has explicit opening/open/closing/closed state, an operation generation/cancellation handle, exactly-once completion, filtered element/property events, cleanup, zero-duration behavior and a bounded fallback when browser events do not arrive. Preserve public event ordering and appropriate overlay/focus lifetime; test interrupted/reversed transitions, hidden content, detached nodes, reduced motion, invalid durations and zoneless scheduling. A fallback timer is not permission to guess all real timing.
 
+The initial `first-tabbable` dialog focus-readiness sequence is the sole scheduling exception recorded in [the dialog decision](../compatibility/rc/dialog-render-readiness-decision-v5.json); it does not waive the other event-ordering, focus-lifetime, and cancellation requirements above. Its two render callbacks address the tested initial `NgModel` update and do not wait for arbitrary future asynchronous updates.
+
 Old engine-generated trigger attributes/classes and inline end-state styles can be observed by application CSS. Inventory them in actual baseline renders. Preserve meaningful hooks or declare exact exceptions; checking only static HTML and `.mat-*` classes is not sufficient.
 
 ## Animation API exceptions

@@ -54,12 +54,14 @@ export function fixture(Base, autoFocus = 'first-tabbable', isBrowser = true, mo
   let anchorCreations = 0;
   const document = {ELEMENT_NODE: 1, activeElement: null, body: {},
     createElement(name) { anchorCreations++; return element(`anchor-${anchorCreations}`); },
-    querySelector() { return null; }};
+    querySelector() { return null; },
+    addEventListener(event, callback) {listeners.set('document:' + event, callback);},
+    removeEventListener(event) {listeners.delete('document:' + event);}};
   const hadDocument = Object.hasOwn(globalThis, 'document'), priorDocument = globalThis.document;
   globalThis.document = document;
   function element(name, focusable = false, tabbable = focusable) {
     const node = {name, nodeType: 1, children: [], focusable, tabbable, attributes: new Map(),
-      focus(options) { log.push({kind: 'focus', name, options}); document.activeElement = node; },
+      focus(options) { log.push({kind: 'focus', name, options}); document.activeElement = node; listeners.get('document:focusin')?.(); },
       contains(other) { return node.children.some(child => child === other || child.contains(other)); },
       querySelector(selector) {
         const visit = n => n.children.find(child =>
@@ -109,6 +111,7 @@ export function fixture(Base, autoFocus = 'first-tabbable', isBrowser = true, mo
     {provide: MatDialogConfig, useValue: config},
     {provide: InteractivityChecker, useValue: checker},
     {provide: core.NgZone, useValue: zone},
+    ...(mode.browserApp ? [{provide: core.ApplicationRef, useValue: Object.assign(Object.create(core.ApplicationRef.prototype), {ngOnDestroy() {}})}] : []),
     {provide: FocusMonitor, useValue: monitor},
     {provide: core.Renderer2, useValue: renderer},
     {provide: core.ChangeDetectorRef, useValue: {markForCheck() {}}},
@@ -164,6 +167,18 @@ async function observations(Base) {
       assert.equal(f.log.find(e => e.kind === 'create-selection').deferred, true);
     } finally { f.destroy(); }
   });
+  await check('stable-no-document-focus-and-opened-remain-direct', async () => {
+    const f = fixture(Base, 'first-tabbable', true, {browserApp: true, noDocument: true});
+    try {
+      const events = [];
+      f.instance._animationStateChanged.subscribe(e => events.push(e.state));
+      f.instance._trapFocus(true);
+      f.instance._openAnimationDone(0);
+      assert.equal(f.document.activeElement, f.first);
+      assert.equal(f.notifications(), 1);
+      assert.deepEqual(events, ['opened']);
+    } finally { f.destroy(); }
+  });
   await check('unstable-zone-waits-on-the-supplied-public-stability-event-once',async()=>{
     const f=fixture(Base,'first-tabbable',true,{unstableZone:true});
     try{f.instance._trapFocus();await Promise.resolve();assert.equal(f.log.length,0);
@@ -171,6 +186,223 @@ async function observations(Base) {
       assert.equal(f.document.activeElement,f.first);assert.equal(f.notifications(),1);
       assert.equal(f.stable.observers.length,0);f.stable.next();assert.equal(f.notifications(),1);
     }finally{f.destroy();}
+  });
+  for (const [name, isBrowser, options] of [
+    ['manual', true, {unstableZone: true, manual: true}],
+    ['nonbrowser', false, {unstableZone: true, browserApp: true}],
+    ['no-document', true, {unstableZone: true, browserApp: true, noDocument: true}],
+  ]) {
+    await check('unstable-uncoordinated-' + name + '-opened-remains-direct', async () => {
+      const f = fixture(Base, 'first-tabbable', isBrowser, options);
+      try {
+        const events = [];
+        f.instance._animationStateChanged.subscribe(e => events.push(e.state));
+        f.instance._trapFocus(true);
+        f.instance._openAnimationDone(0);
+        assert.deepEqual(events, ['opened']);
+      } finally { f.destroy(); }
+    });
+  }
+  await check('unstable-close-cancels-empty-focus-fallback', async () => {
+    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true});
+    try {
+      f.host.children = [];
+      const events = [];
+      f.instance._animationStateChanged.subscribe(e => events.push(e.state));
+      f.instance._trapFocus(true);
+      f.instance._openAnimationDone(0);
+      f.zone.isStable = true;
+      f.stable.next();
+      f.instance._cancelPendingInitialFocus();
+      await Promise.resolve();
+      assert.equal(f.document.activeElement, null);
+      assert.deepEqual(events, []);
+    } finally { f.destroy(); }
+  });
+  await check('unstable-opened-reentry-destroy-cleans-pending-work', async () => {
+    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true});
+    try {
+      let opened = 0;
+      f.instance._animationStateChanged.subscribe(e => {
+        if (e.state === 'opened') { opened++; f.instance.ngOnDestroy(); }
+      });
+      f.instance._trapFocus(true);
+      f.instance._openAnimationDone(0);
+      f.zone.isStable = true;
+      f.stable.next();
+      assert.equal(opened, 1);
+      assert.equal(f.stable.observers.length, 0);
+      assert.equal(f.listeners.size, 0);
+      assert.equal(f.selections.size, 0);
+      f.stable.next();
+      assert.equal(opened, 1);
+    } finally { f.destroy(); }
+  });
+  await check('pending-initial-empty-recapture-settles-before-opened', async () => {
+    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true, config: {disableClose: true}});
+    try {
+      f.host.children = []; const outside = f.element('outside', true), choice = f.element('choice', true), events = [];
+      f.instance._animationStateChanged.subscribe(e => { events.push({state: e.state, active: f.document.activeElement?.name}); if (e.state === 'opened') choice.focus(); });
+      f.instance._trapFocus(true); f.instance._openAnimationDone(0);
+      f.document.activeElement = outside; f.instance._recaptureFocus(); f.zone.isStable = true; f.stable.next();
+      assert.deepEqual(events, []); await Promise.resolve();
+      assert.deepEqual(events, [{state:'opened', active:'dialog'}]);
+      assert.equal(f.document.activeElement, choice); assert.equal(f.stable.observers.length, 0);
+      await Promise.resolve(); assert.equal(f.document.activeElement, choice);
+    } finally { f.destroy(); }
+  });
+  await check('pending-initial-empty-recapture-destroy-cancels-fallback', async () => {
+    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true, config: {disableClose: true}});
+    try {
+      f.host.children = []; const outside = f.element('outside', true), events = [];
+      f.instance._animationStateChanged.subscribe(e => events.push(e.state));
+      f.instance._trapFocus(true); f.instance._openAnimationDone(0); f.document.activeElement = outside;
+      f.instance._recaptureFocus(); f.zone.isStable = true; f.stable.next(); f.instance.ngOnDestroy();
+      await Promise.resolve(); assert.deepEqual(events, []); assert.equal(f.document.activeElement, outside);
+      assert.equal(f.stable.observers.length, 0);
+    } finally { f.destroy(); }
+  });
+  await check('pending-initial-empty-recapture-close-cancels-fallback', async () => {
+    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true, config: {disableClose: true}});
+    try {
+      f.host.children = []; const outside = f.element('outside', true), events = [];
+      f.instance._animationStateChanged.subscribe(e => events.push(e.state));
+      f.instance._trapFocus(true); f.instance._openAnimationDone(0); f.document.activeElement = outside;
+      f.instance._recaptureFocus(); f.zone.isStable = true; f.stable.next(); f.instance._cancelPendingInitialFocus();
+      await Promise.resolve(); assert.deepEqual(events, []); assert.equal(f.document.activeElement, outside);
+      assert.equal(f.stable.observers.length, 0);
+    } finally { f.destroy(); }
+  });
+  await check('pending-initial-empty-recapture-opened-destroy-reentry', async () => {
+    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true, config: {disableClose: true}});
+    try {
+      f.host.children = []; const events = [];
+      f.instance._animationStateChanged.subscribe(e => { events.push(e.state); f.instance.ngOnDestroy(); });
+      f.instance._trapFocus(true); f.instance._openAnimationDone(0); f.document.activeElement = f.element('outside');
+      f.instance._recaptureFocus(); f.zone.isStable = true; f.stable.next(); await Promise.resolve();
+      assert.deepEqual(events, ['opened']); assert.equal(f.document.activeElement, f.host);
+      assert.equal(f.stable.observers.length, 0); assert.equal(f.listeners.size, 0); assert.equal(f.selections.size, 0);
+    } finally { f.destroy(); }
+  });
+  await check('unstable-recapture-respects-focus-already-inside', async () => {
+    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, config: {disableClose: true}});
+    try {
+      f.instance._recaptureFocus();
+      assert.equal(f.stable.observers.length, 1);
+      f.second.focus();
+      f.zone.isStable = true;
+      f.stable.next();
+      assert.equal(f.document.activeElement, f.second);
+      assert.equal(f.notifications(), 0);
+    } finally { f.destroy(); }
+  });
+  await check('unstable-recapture-respects-in-dialog-shadow-focus', async () => {
+    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, config: {disableClose: true}});
+    try {
+      const host = f.element('shadow-host'), inner = f.element('shadow-inner', true);
+      host.shadowRoot = {activeElement: inner}; f.host.children.push(host);
+      f.instance._recaptureFocus();
+      f.document.activeElement = host;
+      f.zone.isStable = true; f.stable.next();
+      assert.equal(f.document.activeElement, host);
+      assert.equal(host.shadowRoot.activeElement, inner);
+      assert.equal(f.log.some(e => e.kind === 'focus'), false);
+      assert.equal(f.notifications(), 0);
+    } finally { f.destroy(); }
+  });
+  await check('unstable-recapture-returns-focus-from-outside-shadow', async () => {
+    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, config: {disableClose: true}});
+    try {
+      const host = f.element('outside-shadow'), inner = f.element('shadow-inner', true);
+      host.shadowRoot = {activeElement: inner};
+      f.instance._recaptureFocus(); f.document.activeElement = host;
+      f.zone.isStable = true; f.stable.next();
+      assert.equal(f.document.activeElement, f.first);
+      assert.equal(f.notifications(), 1);
+    } finally { f.destroy(); }
+  });
+  await check('unstable-pending-focusout-respects-user-blur', async () => {
+    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true});
+    try {
+      f.document.activeElement = f.second;
+      const events = [];
+      f.instance._animationStateChanged.subscribe(e => events.push(e.state));
+      f.instance._trapFocus(true);
+      f.instance._openAnimationDone(0);
+      f.document.activeElement = null;
+      f.listeners.get('document:focusout')?.();
+      await Promise.resolve();
+      assert.deepEqual(events, ['opened']);
+      assert.equal(f.stable.observers.length, 0);
+      f.zone.isStable = true;
+      f.stable.next();
+      assert.equal(f.document.activeElement, null);
+    } finally { f.destroy(); }
+  });
+  await check('unstable-empty-fallback-respects-user-focus', async () => {
+    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true});
+    try {
+      f.host.children = [];
+      const events = [];
+      f.instance._animationStateChanged.subscribe(e => events.push(e.state));
+      f.instance._trapFocus(true);
+      f.instance._openAnimationDone(0);
+      f.zone.isStable = true;
+      f.stable.next();
+      f.second.focus();
+      await Promise.resolve();
+      assert.equal(f.document.activeElement, f.second);
+      assert.deepEqual(events, ['opened']);
+    } finally { f.destroy(); }
+  });
+  await check('unstable-empty-fallback-settles-before-opened', async () => {
+    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true});
+    try {
+      f.host.children = [];
+      const events = [];
+      f.instance._animationStateChanged.subscribe(e => events.push(e.state));
+      f.instance._trapFocus(true);
+      f.instance._openAnimationDone(0);
+      f.zone.isStable = true;
+      f.stable.next();
+      assert.deepEqual(events, []);
+      assert.equal(f.document.activeElement, null);
+      await Promise.resolve();
+      assert.equal(f.document.activeElement, f.host);
+      assert.deepEqual(events, ['opened']);
+    } finally { f.destroy(); }
+  });
+  await check('unstable-initial-focus-settles-before-opened', async () => {
+    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true});
+    try {
+      const events = [];
+      f.instance._animationStateChanged.subscribe(e => events.push(e.state));
+      f.instance._trapFocus(true);
+      f.instance._openAnimationDone(0);
+      assert.deepEqual(events, []);
+      assert.equal(f.document.activeElement, null);
+      f.zone.isStable = true;
+      f.stable.next();
+      assert.equal(f.document.activeElement, f.first);
+      assert.deepEqual(events, ['opened']);
+      f.stable.next();
+      assert.deepEqual(events, ['opened']);
+    } finally { f.destroy(); }
+  });
+  await check('unstable-close-cancels-initial-focus-and-opened', async () => {
+    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true});
+    try {
+      const events = [];
+      f.instance._animationStateChanged.subscribe(e => events.push(e.state));
+      f.instance._trapFocus(true);
+      f.instance._openAnimationDone(0);
+      f.instance._cancelPendingInitialFocus();
+      assert.equal(f.stable.observers.length, 0);
+      f.zone.isStable = true;
+      f.stable.next();
+      assert.equal(f.document.activeElement, null);
+      assert.deepEqual(events, []);
+    } finally { f.destroy(); }
   });
   await check('destroy-unsubscribes-from-the-borrowed-unstable-zone',async()=>{
     const f=fixture(Base,'first-tabbable',true,{unstableZone:true});
@@ -340,6 +572,45 @@ const Base = await load(), cases = await observations(Base);
 assert.ok(cases.every(c => c.result === 'pass'), JSON.stringify(cases.filter(c => c.result !== 'pass')));
 const mutations = [];
 const mutants = [
+  ['pending-recapture-open-before-settlement', originalBase.replace(
+    '          onRecaptureSettled?.();\n          onSettled?.();',
+    '          onSettled?.();').replace(
+    '        this._legacyFocusCleanup = cleanup;\n        if (settledWhileInvoking)',
+    '        this._legacyFocusCleanup = cleanup;\n        onRecaptureSettled?.();\n        if (settledWhileInvoking)'), originalFocus,
+    'pending-initial-empty-recapture-settles-before-opened'],
+  ['recapture-composed-shadow-check-removed', originalBase.replace(
+    'if (recapture && legacyDialogContainsComposedFocus(this._elementRef.nativeElement))',
+    'if (recapture && legacyDialogContainsFocus(this._elementRef.nativeElement))'), originalFocus,
+    'unstable-recapture-respects-in-dialog-shadow-focus'],
+  ['stable-document-guard-removed', originalBase.replace(
+    '&& this._legacyRenderInjector && this._legacyApplicationRef instanceof ApplicationRef\n        && this._document && this._isBrowser();',
+    '&& this._legacyRenderInjector && this._legacyApplicationRef instanceof ApplicationRef\n        && this._isBrowser();'), originalFocus,
+    'stable-no-document-focus-and-opened-remain-direct'],
+  ['unstable-recapture-inside-focus-check-removed', originalBase.replace(
+    'if (recapture && legacyDialogContainsComposedFocus(this._elementRef.nativeElement))',
+    'if (false)'), originalFocus,
+    'unstable-recapture-respects-focus-already-inside'],
+  ['unstable-user-blur-listener-removed', originalBase.replace(
+    "root.addEventListener('focusout', onUserBlur, true);",
+    '/* user blur unobserved */'), originalFocus,
+    'unstable-pending-focusout-respects-user-blur'],
+  ['unstable-user-focus-listener-removed', originalBase.replace(
+    "root.addEventListener('focusin', onUserFocus, true);",
+    '/* user focus unobserved */'), originalFocus,
+    'unstable-empty-fallback-respects-user-focus'],
+  ['pending-fallback-not-cancelled', originalBase.replace(
+    '      this._legacyFocusCleanup?.();\n      this._legacyFocusCleanup = null;',
+    '      /* pending fallback left active */'), originalFocus,
+    'unstable-close-cancels-empty-focus-fallback'],
+  ['settlement-callback-removed', originalBase.replace('          onSettled?.();', '          /* settlement lost */'), originalFocus,
+    'unstable-empty-fallback-settles-before-opened'],
+  ['unstable-readiness-not-tracked', originalBase.replace(
+    '        this._legacyInitialFocusPending = true;\n        const activeRoots',
+    '        /* pending state removed */\n        const activeRoots'), originalFocus,
+    'unstable-initial-focus-settles-before-opened'],
+  ['unstable-initial-cancel-removed', originalBase.replace(
+    'this._legacyPendingInitialZoneSubscription?.unsubscribe();', '/* subscription leaked */'), originalFocus,
+    'unstable-close-cancels-initial-focus-and-opened'],
   ['destroy-guard-removed', originalBase.replaceAll('if (this._legacyFocusDestroyed)', 'if (false)'), originalFocus,
     'focus-request-after-destroy-is-inert'],
   ['anchors-enabled', originalBase, originalFocus.replace('factory.create(element, true)', 'factory.create(element, false)'),

@@ -1,0 +1,41 @@
+{
+  "status": "experimental, rejected; do not integrate",
+  "reason": [
+    "v9 public microtask classifier changes observable NgZone unstable/microtask-empty/stable lifecycle and is not shown behavior preserving.",
+    "v9-native-zoneless.json fails closed_after_opened: real closed-shadow subscriber choice subsequently loses focus.",
+    "v7 nonmutating zone classifier passes foreign-noop case but fails actual nested injected NgZone stable focus order.",
+    "v3 restored normal stable order but transiently focused wrong unchecked radio in zoneless; independently reproduced."
+  ],
+  "base": "7434b7e14d81c2cd6421fe3f760a123931450d1e",
+  "artifact_sha256": "8c4c92d6475b60f9634c68d7e7661ea2c349f69a9cfdddb38a8e48cca45c8689",
+  "artifact_source_map_current_bytes": {
+    "projects/ngx-material-legacy/legacy-dialog/dialog-container.ts": "7ee14249ddd7a64cf47aa71dbd6a0d7054266dac59f601f5d64ddcdfcd8137b4",
+    "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts": "6603336b504bad4a517e51999382e936b61d9b179c95d23fb4b052edd44deae3"
+  },
+  "files": {
+    "dialog-order-experimental-v9.patch": "84f87f71e1e0b34e25ef3192366110f9f0ac6700f4ce9f8e28e540edd376fac0",
+    "tag16/stable-trace.json": "15ae6d5879254deafa6f19da621713ce6d34145f9b542594b6585723551a9294",
+    "current22/stable-trace.json": "80bd1bd0e7dc74dba994929650bc67078a75a89afc2e7cae8736e05ccdb719c1",
+    "radio-tag16/trace.json": "28137a1ac7ff9285bb57e9ec1ee077d4c2556140e37cf7bdf6b88d4a6c7b3210",
+    "nested-patchedv7/trace.json": "540ce1e15099ad078083febb1e363cbe14f46a15e9fa9e433298ee877a815c96",
+    "nested-patchedv9/trace.json": "1622163d15898158a8dc7f9b04d0ce8c88bb8879d1173344a04120fc99364f14",
+    "patchedv9/trace.json": "c8fa9ac9e3ecd16047d03f4ebede8a2b2b1f676f438d5cbfa81f80aefffb66bb",
+    "v4-radio-zoneless.json": "306a07a3928cb274682516649249ccbbcb0ce5e8ea73d13985a7c5ca5118db69",
+    "v6-native-zoneless.json": "e59d87bce8b860786038716f300e290eb9650e796594c0f3eb07d275eb0a487d",
+    "v9-native-zoneful.json": "aa1ab462949c51b3ff236fcecb53aa478adbd684a82b160b77c445493e82bb3b",
+    "v9-native-zoneless.json": "8e092b8d200bf3caa38e254f07b54c01a41ad2a1973c1d3c85f101e7b59d2724",
+    "v9-native-motion.json": "b568cb3762c7802fdb8e0a2129be0fe9f429df18dd16b8c847bd7623376c3c77",
+    "v9-foreign-zoneless.json": "8d60cc2412f7f50523085870b5c99afa8d29f13b4e667781616f20e4983c7214",
+    "v7-policy-zoneful.json": "48ff3e6e06795364fcab1d3955da3495707064fff0ed7429f7855ee7ce626adb",
+    "v7-policy-zoneless.json": "406122d801f70cfe9f92893a3d53dac5944aeafc2b524dcf8e2ba2116add8cdd",
+    "policy-guard-result.json": "5ebe406c0363321daffd35cb4bd5e61453eae5512ff587722917219aeed2c4a3",
+    "v7-guard-negative.json": "fe24cde8282610ebe8bbcdd114809613c972886a821a49c0f335ffda218e6c72",
+    "candidate-focus-v9.json": "55fde62ff24245fa1f15004685301144b97af5db659e769c16e3d2670da4e530",
+    "pack-v9.log": "46479d91900a619327e9d88f0c8197da5893703bb0589f3ea2d62b4ff7a4a430",
+    "tag-inputs/forms-pack.json": "c26615fe92adf3ca2b35be555203c0870a6778492c58bafc9acee3ba2a379c21"
+  },
+  "tagged_baseline": "Angular Material/CDK 16.2.14, Angular framework/forms 16.2.12, Zone.js 0.13.3; stable initial radio delay=false focuses first unchecked before model; delay=true afterOpened then checked second focus.",
+  "candidate_env": "Angular/CDK/Material 22.1.7, Node 24.21.0, pnpm 12.4.2, Chrome 149, zoneful/zoneless and real foreign-zone case; no browser matrix or security clearance.",
+  "test_maintenance": "Original snack diagnostic still fails stale synchronous opening expectation; independent separate repair patch under dialog-snack-lifecycle/admission/v1 remains proposed, not applied.",
+  "next": "A nonmutating public API means of distinguishing stable zoneful from zoneless must be proved or the conflicting required behaviors explicitly resolved; do not admit stale dialog rows or treat this proof as approval."
+}

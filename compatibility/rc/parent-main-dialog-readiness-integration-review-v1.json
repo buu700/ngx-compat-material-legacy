@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "role": "Root integration of bounded dialog render readiness, focus settlement and cancellation",
+  "parent": "6597b9319ad7d0047e278046d35f60d3b5d271aa",
+  "proposal": {
+    "base": "6685300af7ebdc6be93ae1e1282ffe48293f25db",
+    "patch_sha256": "f5096e9d4ada62a1debdfdbb60f904665a9c1275f8ee700f41e80ff58dd9e444",
+    "snack_separate_patch_sha256": "1a6b30e059ff8984b391949a121507d453f547484446ae64d8869d298715a847",
+    "decision_sha256": "01d633d555718f8d57aa80ead47afa0cc48755c3c86f6928cee554a9b3aba725",
+    "artifact_sha256": "857779bc3d368d9230152c7097e505611c308fe9140a0b957bc12eee843f4399",
+    "baseline_artifact_sha256": "1bd04f3629f84af7b34eaaa981c561f8415919866512e004e0e130bd01beb9bf",
+    "tracked_changed": [
+      "docs/01-contract.md",
+      "docs/04-motion-and-interop.md",
+      "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+      "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+      "scripts/dialog-initial-focus-source-test.mjs"
+    ],
+    "files": {
+      "docs/01-contract.md": "0ee819672f180aeab50255edae5bb46caff8d7901048094d36d6f3f877562752",
+      "docs/04-motion-and-interop.md": "c5ddd3a9fbd19c6b1b36cc1f1121b08ea475705e51d741efdd23335684ec5f88",
+      "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts": "1e48dbcc48eb84b84f7721802d9d2d52549b5efe3fb1662c2f5045fd7a7c3c8e",
+      "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts": "c63b9af0076ce1ae261c0e8529b4c0f496c2b42b3b6edf1e270b3217fdea44e1",
+      "scripts/dialog-initial-focus-source-test.mjs": "4440a459ea519d4783ccf59c9f9e10cf70c648a40e588dd7109e0725eef2ac7d",
+      "compatibility/rc/dialog-render-readiness-decision-v5.json": "01d633d555718f8d57aa80ead47afa0cc48755c3c86f6928cee554a9b3aba725",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/canonical-custom.json": "25dfdeaedf668321df9d4651999bf182674d7dc66be076d66019a3e6e2b5237c",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/canonical-event-zoneless.json": "2e84ed464d0cf7b93746eb5271f47fe705ef3ff0cb4541c477e5eaf427921851",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/canonical-foreign.json": "ad754dbf7a10a8f0e987e0e87051d8a487d2e454205f464ff8dff79a63f40a9e",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/canonical-zoneful.json": "9110fe050ec1914176749795c3a8bbbed1edc3394afcf169d2c999ae635019a6",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/canonical-zoneless.json": "3afb7b2effbb7ab80e8471c9c26aac57aeeccd13526ddeb4a8fcf13de2e5909a",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/check-fix-v12-result.json": "b6a7ec605b97684b6d42c45377bc1f398bcdf459d9169669e0a5d2e50c3e5b74",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/check-fix-v12.mjs": "e06f2c87fe06d5ed96741768402b1c160139362118b58fc73da887b5f4314e2e",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/composed-v2-native.mjs": "fb00b65c0c25efb1bdaa6b93523056996d8226d88ad8f6f40d4113bc8d20162b",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/composed-v2-zoneful.json": "40b577d7f8a92e1ce1deea0522028233c0f40a20f35cca91abc0a89cde0da02e",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/composed-v4-guard-result.json": "eaacfc058940238967dc248052e98b304a4df27bb477e776c06415e24c178b01",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/composed-v4-guard.mjs": "ac61acabb8fb55396f32ba1f2c43c7ccf5cc8e0cd80ea84349fd2b0e7dbe7668",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/composed-v4-native.mjs": "e483b9b2df1fed4d0308b7df6fb70180088e5d14e212204a6bf16396ba102de6",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/composed-v4-zoneful.json": "f340bf4388c9e2dd7817b4e14f8d1618473fcbffa032b1e507b16930a73a4518",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/composed-v4-zoneless.json": "ed5114496df18ae9555da5fd3c254f57de2b13fddff652e974154e2e4e4bff92",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/de6-predecision-trace.json": "80bd1bd0e7dc74dba994929650bc67078a75a89afc2e7cae8736e05ccdb719c1",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/empty-v12-native.mjs": "8b8e48ebe7dad933da1f17a6e59b4192f5f5e33369beb439c15b7c63c04e4cda",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/empty-v12-zoneful.json": "99b73d06f814019c0f323ecca7cf64518cba164f032ed7829bbe3e456bf331a9",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/empty-v12-zoneless.json": "094663d49e94ecdda88381dec5318fc7beb6db0bdc5fd83021dd10512a382250",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/fix-v12-custom.json": "5266d987ad8f2f68523635d08b77dd04f326d65ee09ce6afa28d9c2884f75d84",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/fix-v12-foreign.json": "01597e5c8e0f114a7922a888e3f81d00e5a3624494b90741e316b55661cca895",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/fix-v12-motion.json": "6ba112c104f4e38ebacf47b343cf9295a4a49a553b9a35eb8750ecea7d16247a",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/fix-v12-native-custom.mjs": "e529d9d5674d877bf2092cc2698555602d3941f49b649947d977a34f0829d27e",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/fix-v12-native-foreign.mjs": "774a5fe36998595293ee300fd21ce61bcce4c4e27c3897c9b045ce9456d7a2e8",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/fix-v12-native-original.mjs": "135e52ed04d96fac805ace3608239c1158280d9d913db7d0d3afd1ed3955a882",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/fix-v12-zoneful.json": "f3a52882105d5c7ceb65c842f5ca57ff95982a4d35184aac3a2176d60fb2ea74",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/fix-v12-zoneless.json": "17f1dcc5fe6133477119fd1448b8e34d597281e6220efdf2e14523fc26619fa2",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/focus-pending-v4-final.json": "f90e65b1c9d7b7a3bb9298f015abb14cf6ed8f4eb68c9b0f588935f9a575b06e",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/gap-v12-native.mjs": "a65228564cba4b1873b3612df5e853d91fe0621b8c0968dadf59746ae15f3dd3",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/gap-v12-zoneful.json": "04932e71d57d2aa439b13520c7cb808b856e2b08706c9428a6db6f8ce44864b9",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/gap-v12-zoneless.json": "7bd0db341b0b7134697fa873abd99d3901f7c130ebb0d84c95dba6a0aa5fe3e9",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/motion-nodoc-v2.json": "8f57bdd44db2302f48263326be691880d12ad7fe3184c75d9c4499eea87f856a",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/pack-pending-v4.log.base64.json": "87fc4e6b09f96082b025b96d37976442bcdcfdd462004b65e3ce14f32eba3810",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/pending-recapture-v3-native.mjs": "e5f451cd18046d3da1c6e0b89247fd29ba0e7901f80e3a6d26568f7f47f1f5fb",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/pending-recapture-v3-source-failure.log": "709e43af0e25e9febdbeaa75483eeb66ffd2373d09635002c9632bb95e7898be",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/pending-recapture-v3-zoneful.json": "41762d48d197160055bc62da15e5808accdcde6a17d41372bd535445300fddbb",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/pending-recapture-v4-guard-result.json": "44357776b1a7ba53c06db7dabb93b2f8151cc406458a754541c28365352ec196",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/pending-recapture-v4-guard.mjs": "4347f1bacb048a391779ec40de046deb7ed45bc8823a594e20a55066e6d5b84d",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/pending-recapture-v4-native.mjs": "050105ff83810f390b2331e9e50213fc5bb7f2be87a4e33d503b45a6c991eee0",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/pending-recapture-v4-zoneful.json": "70c9601f90220b068f22e307d87a7a4fa8762bfca973bc08dabab1cc00d076f6",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/pending-recapture-v4-zoneless.json": "4f3b871cab785c8bab6cfe9a50592c18c583811666c928e57d10d0879476833a",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/policy-v12-guard-result.json": "5ebe406c0363321daffd35cb4bd5e61453eae5512ff587722917219aeed2c4a3",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/policy-v12-guard.mjs": "0ca8680b04eaa0dcf378ae4bafbcd17b9e4d4e8e82c910eb46466485e0e49142",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/policy-v12-zoneful.json": "9f8072afa0ed2b14e50cf968e33a0b2be1d9979b8464b04b876bbf3ecbb8624f",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/policy-v12-zoneless.json": "f18e7e0e9ab0c2336bb12bf45af4ffdaad5314dae3746f831bdeb154ca0fcfd0",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/policy-v12.mjs": "3f725b7823a760285856bb88e8ad88e9d97157e56c0464d4e405e622279923d7",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/rejected-experiment-v9.json": "4dbeb68df9024c87dfedcb71d284ade5ff9604fd77b6341db18c8be075ea478f",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/rejected-v3-radio-trace.json": "306a07a3928cb274682516649249ccbbcb0ce5e8ea73d13985a7c5ca5118db69",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/rejected-v9-closed-trace.json": "8e092b8d200bf3caa38e254f07b54c01a41ad2a1973c1d3c85f101e7b59d2724",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/stable-no-document-v1.log": "8072e64bda21a2d26f548aa5eb224b308df049aafbe573e58b5494f9bfad6967",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/tag16-closed-shadow-trace.json": "80be7d3be72ca7780667cb19b3a0333b22acd54aea2f862268355f14fd703843",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/tag16-focus-trace.json": "15ae6d5879254deafa6f19da621713ce6d34145f9b542594b6585723551a9294",
+      "compatibility/rc/dialog-render-readiness-evidence-v5/tag16-radio-trace.json": "28137a1ac7ff9285bb57e9ec1ee077d4c2556140e37cf7bdf6b88d4a6c7b3210"
+    },
+    "checks": {
+      "source_focus": "48 cases/17 mutants",
+      "source_motion": "20 cases/6 mutants",
+      "packed_native": "four modes plus empty/gap in zoneful/zoneless and zoneless enabled motion",
+      "expected_failure": "early closed-root focus before afterOpened is overwritten, raw native runner exits1; all other assertions validated by separate guard",
+      "guard_controls": "20 mutated observations rejected"
+    },
+    "limits": [
+      "Pre-afterOpened same-closed-root focus is unsupported; no private introspection, event fabrication or mode classifier.",
+      "Focus cleanup gap source test uses a public-trap wrapper to schedule an observable open-shadow choice; closed shadow remains unobservable.",
+      "When pending initial focus is replaced by empty-dialog backdrop recapture, opened waits for the replacement fallback to settle; close or destroy cancels it. Baseline packed v3 opened with focus still outside.",
+      "Open-shadow recapture checks walk visible active hosts and retain the selected in-dialog element; the packed v2 regression shows the previous late steal. Closed shadow descendants remain unobservable beyond their host.",
+      "No guarantee for arbitrary later asynchronous state.",
+      "Chrome149 only; no full historical family suite, release, G01-G13, browser matrix, security or G11 pass.",
+      "Original runner source and temp npm/bundle paths are recorded snapshots, not portable standalone replay assets.",
+      "Tag differential uses JIT; candidate browser fixtures use packed Angular AOT.",
+      "Exact pending author-use reviews must be requalified for source changes; this capsule does not update ledger.",
+      "The no-document eligibility controls execute the actual source class with a synthetic injected document in a source harness; they are not a native packed null-document application test.",
+      "HTML/CSS/SCSS unchanged; no golden changed."
+    ],
+    "review": "independent review pending"
+  },
+  "transport_receipt": {
+    "v4_patch_sha256": "d9fb5512750dac0a23d72d34a040a695917b0a5c286f7ee45ead47a011944c29",
+    "v5_patch_sha256": "f5096e9d4ada62a1debdfdbb60f904665a9c1275f8ee700f41e80ff58dd9e444",
+    "v5_manifest_sha256": "3cc76977190727fcf7690fd50ec38aa7cb81892135501294ae5cf60db3f12525",
+    "raw_log_sha256": "bdba5aa75d39e20b8834508e5f59a57da7603e3b8675bafbc2fc84094bb2495e",
+    "raw_log_bytes": 57838,
+    "encoded_wrapper_sha256": "87fc4e6b09f96082b025b96d37976442bcdcfdd462004b65e3ce14f32eba3810",
+    "raw_roundtrip_exact": true,
+    "other_evidence_files_byte_identical": true,
+    "decision_equal_after_rebinding": true,
+    "source_and_test_sha256": {
+      "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts": "1e48dbcc48eb84b84f7721802d9d2d52549b5efe3fb1662c2f5045fd7a7c3c8e",
+      "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts": "c63b9af0076ce1ae261c0e8529b4c0f496c2b42b3b6edf1e270b3217fdea44e1",
+      "scripts/dialog-initial-focus-source-test.mjs": "4440a459ea519d4783ccf59c9f9e10cf70c648a40e588dd7109e0725eef2ac7d"
+    },
+    "docs_only_reference_changes": true,
+    "strict_apply_check_passed_bases": [
+      "6685300af7ebdc6be93ae1e1282ffe48293f25db",
+      "0c25c56282d805aaed351b94a9729303462bfb2a"
+    ],
+    "native_rebuild": "not needed: source and tests byte-identical to reviewed v4"
+  },
+  "independent_reviews": [
+    {
+      "path": "readiness-v4-review.md",
+      "sha256": "462dcb1bdcbb2e806da9dac5b7f14e05732985bb4413be83f17f611ce9691531",
+      "text": "# Independent dialog readiness v4 review\n\nWithin the explicitly approved and documented first-tabbable timing and early closed-shadow exception, the v4 source proposal is supported by the bounded evidence inspected. This supersedes the v3 withdrawal only for the frozen v4 identities below. It is not exact Material 16 parity, a full browser or historical suite, a security clearance or a release/G11 pass.\n\nFrozen patch SHA-256 `d9fb5512750dac0a23d72d34a040a695917b0a5c286f7ee45ead47a011944c29`; manifest SHA-256 `efc8403f477891aa8ce77d676112af5840221f4a2c9bdecf77df46052ad6efd3`. All 58 manifest-listed candidate files have their recorded hashes and the patch reverse-applies in the isolated candidate. The packed artifact hashes to `857779bc3d368d9230152c7097e505611c308fe9140a0b957bc12eee843f4399`; its source map embeds exact container and focus-helper afterimages, `1e48dbcc48eb84b84f7721802d9d2d52549b5efe3fb1662c2f5045fd7a7c3c8e` and `c63b9af0076ce1ae261c0e8529b4c0f496c2b42b3b6edf1e270b3217fdea44e1` respectively.\n\nV3's pending-initial-focus recapture invoked its completion callback before an empty fallback settled, then cancelled that fallback and emitted opened with focus outside. V4 moves recapture completion to focus settlement. I independently reran the actual-source synthetic reproducer: before the Promise drain there was no opened event; after it, opened fired with the dialog container focused. The author also records a packed v3 failure and v4 zoneful and zoneless passes using a public backdrop click with forced opening completion while pending; ten trace mutants were rejected. The forced completion models the timing condition and does not establish its frequency under natural animation.\n\nThe earlier open-shadow containment and stable null-document findings remain addressed in the v4 source. The author records 48 focus cases/17 mutants, 20 motion cases/six mutants, custom-provider, focus-gap, empty-dialog and native mode controls. V4 preserves raw expected early closed-root failures; the separate guard checks the expressly accepted observation rather than claiming parity. I inspected those evidence records and source images, but did not independently rerun the full native matrix. Chromium 149, tagged JIT versus candidate AOT, synthetic null-document controls, cross-origin frames, arbitrary future async readiness, broader visual and family coverage, and final combined-artifact qualification remain limits. The exact 42 and 12 author-use reviews need new source-context qualification after integration.\n\nThe separate snack source-test repair remains supported only within its synthetic diagnostic scope as recorded in the prior review. No canonical files were edited for this review.\n"
+    },
+    {
+      "path": "readiness-v5-transport-review.md",
+      "sha256": "0f6785d5029425ce5251fc41e3a053a7efd7d2065d21e619971d5b205e0d689c",
+      "text": "# Dialog readiness v5 transport review\n\nThe v5 transport change is supported within the previously reviewed v4 behavior scope. The v5 patch SHA-256 is `f5096e9d4ada62a1debdfdbb60f904665a9c1275f8ee700f41e80ff58dd9e444`; manifest SHA-256 is `3cc76977190727fcf7690fd50ec38aa7cb81892135501294ae5cf60db3f12525`; transport receipt SHA-256 is `a594221e7e382791ef782f48c4539e0e50a9a27fe5f3c3b5eea260115ee78344`.\n\nIndependently extracted clean archives of both `6685300af7ebdc6be93ae1e1282ffe48293f25db` and `0c25c56282d805aaed351b94a9729303462bfb2a`; v5 passes `git apply --check --whitespace=error` on each. Source and test afterimage hashes match v4, as do all common evidence hashes. The removed raw pack log is represented by a base64 JSON wrapper. Decoding it yields 57,838 bytes with original SHA-256 `bdba5aa75d39e20b8834508e5f59a57da7603e3b8675bafbc2fc84094bb2495e`, matching the v4 manifest. The two docs differ only in the versioned decision link. After rebinding v4 evidence paths, the decision differs only in the wrapper's path/hash and added decoding metadata.\n\nThis was a transport-only review; no new native replay was run. The v4 review's timing exception, early closed-shadow limitation, forced-completion control and other qualification limits apply. No security, parity or G11 pass is implied.\n"
+    }
+  ],
+  "root_checks": {
+    "strict_whitespace_apply": true,
+    "all58_manifest_afterimages_verified": true,
+    "all52_decision_evidence_references_rehashed": true,
+    "raw_pack_log_wrapper_roundtrip_bytes": 57838,
+    "current_cyph_reviewed_files_unchanged": [
+      {
+        "path": "shared/js/cyph/services/material-dialog.service.ts",
+        "sha256": "d11742c45d78e36da36fcba72e9869571c28768fe8827208e066f87f98ecb9b1"
+      },
+      {
+        "path": "shared/js/cyph/components/dialog-media/dialog-media.component.ts",
+        "sha256": "43a4ff2190fd195ac2d4991a036c09294952f05cb00b20a1532cb22a155c8221"
+      }
+    ],
+    "actual_current_source_focus": {
+      "node": "v24.21.0",
+      "cases": 48,
+      "mutants_rejected": 17,
+      "exit": 0
+    },
+    "actual_current_source_motion": {
+      "cases": 20,
+      "mutants_rejected": 6,
+      "exit": 0
+    },
+    "packed_artifact_rehashed": "857779bc3d368d9230152c7097e505611c308fe9140a0b957bc12eee843f4399",
+    "packed_sourcemap_exact_current_source": {
+      "legacy-dialog/internal/dialog-initial-focus.ts": "c63b9af0076ce1ae261c0e8529b4c0f496c2b42b3b6edf1e270b3217fdea44e1",
+      "legacy-dialog/internal/dialog-container-base.ts": "1e48dbcc48eb84b84f7721802d9d2d52549b5efe3fb1662c2f5045fd7a7c3c8e"
+    }
+  },
+  "technical_decision": "Under the owner-delegated conservative TS judgment, preserve initial first-tabbable render readiness in qualifying browser applications and wait to emit afterOpened until focus settles or cancels. Exact timing differs from tagged Material16, including unobservable early choice inside a closed shadow root. No consumer CSS/SCSS/HTML change. Full explicit bounds are in dialog-render-readiness-decision-v5.json; all raw contrary traces remain retained.",
+  "limits": [
+    "No new native replay at root integration. Prior native packed artifact is a focused dirty draft with exact source map afterimages, not this combined branch tarball.",
+    "Manifest and decision retain their original independent-review-required statuses as historical images; linked immutable independent reviews and this integration record provide subsequent disposition.",
+    "The source suites exercise actual owned classes with synthetic DOM and public peers, not native/AOT/minimum/browser-matrix certification.",
+    "Closed-shadow early-focus exception and arbitrary future asynchronous readiness limits remain explicit.",
+    "42 dialog/snack and12 related leaf frozen-use records, actual current cutoff and current source/tool evidence must be refreshed.",
+    "No G11, full historical suite, G01-G13, security, or release pass."
+  ]
+}

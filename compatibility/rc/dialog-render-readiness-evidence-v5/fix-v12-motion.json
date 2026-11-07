@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "role": "Bounded native packed legacy dialog focus lifecycle",
+  "line": "main",
+  "zoneless": true,
+  "tarball_sha256": "857779bc3d368d9230152c7097e505611c308fe9140a0b957bc12eee843f4399",
+  "browser": "Chrome/149.0.7827.0",
+  "consumer": "/tmp/ngx-compat-dialog-browser-TIZjWe",
+  "cases": [
+    {
+      "kind": "exit-race",
+      "after": {
+        "active": "exit-race",
+        "anchors": 0,
+        "events": [
+          {
+            "type": "focus",
+            "id": "exit-race",
+            "radioHost": null,
+            "insideDialog": false,
+            "checked": null,
+            "trusted": true
+          },
+          {
+            "type": "click",
+            "kind": "exit-race",
+            "trusted": true,
+            "stable": true
+          },
+          {
+            "type": "opened",
+            "kind": "exit-race",
+            "stable": true,
+            "active": "exit-race",
+            "anchors": 2
+          },
+          {
+            "type": "race-close",
+            "kind": "exit-race",
+            "at": 943.5
+          },
+          {
+            "type": "afterOpenedComplete",
+            "kind": "exit-race"
+          },
+          {
+            "type": "container-event",
+            "state": "closing"
+          },
+          {
+            "type": "closed",
+            "kind": "exit-race",
+            "at": 1462.4000000022352,
+            "active": "exit-race",
+            "anchors": 0
+          },
+          {
+            "type": "container-event",
+            "state": "closed"
+          }
+        ],
+        "errors": []
+      }
+    },
+    {
+      "kind": "exit-join",
+      "after": {
+        "active": "exit-join",
+        "anchors": 0,
+        "events": [
+          {
+            "type": "focus",
+            "id": "exit-join",
+            "radioHost": null,
+            "insideDialog": false,
+            "checked": null,
+            "trusted": true
+          },
+          {
+            "type": "click",
+            "kind": "exit-join",
+            "trusted": true,
+            "stable": true
+          },
+          {
+            "type": "opened",
+            "kind": "exit-join",
+            "stable": true,
+            "active": "exit-join",
+            "anchors": 2
+          },
+          {
+            "type": "forced-open-completion"
+          },
+          {
+            "type": "race-close",
+            "kind": "exit-join",
+            "at": 1590.1000000014901
+          },
+          {
+            "type": "afterOpenedComplete",
+            "kind": "exit-join"
+          },
+          {
+            "type": "container-event",
+            "state": "closing"
+          },
+          {
+            "type": "closed",
+            "kind": "exit-join",
+            "at": 2092.5,
+            "active": "exit-join",
+            "anchors": 0
+          },
+          {
+            "type": "container-event",
+            "state": "closed"
+          }
+        ],
+        "errors": []
+      }
+    }
+  ],
+  "error": null,
+  "zone_global": "undefined",
+  "bundle_has_zone": false,
+  "assertions": {
+    "trusted_clicks": true,
+    "closed_during_pending_focus": true,
+    "pending_opened_join_cancelled": true,
+    "nonzero_exit": true,
+    "no_errors": true
+  },
+  "limitations": [
+    "Chromium packed-artifact focus lifecycle only; cross-origin frames and closed-shadow choices before afterOpened are not qualified."
+  ]
+}

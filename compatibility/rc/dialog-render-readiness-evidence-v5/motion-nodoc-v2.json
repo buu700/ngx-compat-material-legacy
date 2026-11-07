@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "role": "Owned dialog motion state/cancellation source diagnostic;not native/AOT/packed/minimum qualification",
+  "node": "v24.21.0",
+  "compiler": "6.0.3",
+  "runtime_peer": "22.1.7",
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.ts",
+      "sha256": "a2223c0bb364c1738d10eb40e2d776c00b6ef2375a673c164d18d6528debe3df",
+      "bytes": 10390
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+      "sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+      "bytes": 3438
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog-animation-params.ts",
+      "sha256": "8c0160584629786ab3f7babb1060d526952238c58455989c7b6ced6ef59a619f",
+      "bytes": 775
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+      "sha256": "115d89579d1c4b23962b28b70636e053bfc44540a4600b384720b83e4a3e154f",
+      "bytes": 21837
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+      "sha256": "453cbd352ff50197fb2ac7236ce56a84a9e73e367acfa309a9400050a91ef5ee",
+      "bytes": 3796
+    },
+    {
+      "path": "scripts/dialog-initial-focus-source-test.mjs",
+      "sha256": "58e057014a6037c2be9c0df65098c90607d7a6bf51ca9faa64e92a631389b2d6",
+      "bytes": 32706
+    },
+    {
+      "path": "scripts/dialog-motion-source-test.mjs",
+      "sha256": "29521bf81aeee61b019c499209f787b07d625e6843c0917f85d0be38bbc26ddf",
+      "bytes": 20723
+    }
+  ],
+  "cases": [
+    {
+      "id": "enabled-open-close-order-duration-and-css-state",
+      "result": "pass"
+    },
+    {
+      "id": "di-disabled-keeps-deferred-single-open-and-close",
+      "result": "pass"
+    },
+    {
+      "id": "reduced-motion-keeps-deferred-single-open-and-close",
+      "result": "pass"
+    },
+    {
+      "id": "noop-close-before-open-never-emits-opened",
+      "result": "pass"
+    },
+    {
+      "id": "noop-destroy-before-open-leaves-no-event-or-dom-work",
+      "result": "pass"
+    },
+    {
+      "id": "noop-destroy-before-close-never-emits-closed",
+      "result": "pass"
+    },
+    {
+      "id": "noop-old-phase-cannot-complete-reopened-phase-early",
+      "result": "pass"
+    },
+    {
+      "id": "exit-cancels-pending-initial-focus-before-closing-event",
+      "result": "pass"
+    },
+    {
+      "id": "unstable-zone-initial-focus-cancelled-on-exit:false",
+      "result": "pass"
+    },
+    {
+      "id": "unstable-zone-initial-focus-cancelled-on-exit:true",
+      "result": "pass"
+    },
+    {
+      "id": "unstable-zone-recapture-cancelled-on-exit",
+      "result": "pass"
+    },
+    {
+      "id": "enabled-destroy-cancels-timer-and-frame",
+      "result": "pass"
+    },
+    {
+      "id": "uncancellable-old-frame-cannot-reopen-closing-dialog",
+      "result": "pass"
+    },
+    {
+      "id": "close-during-opening-observer-keeps-only-exit-work",
+      "result": "pass"
+    },
+    {
+      "id": "destroy-during-opening-observer-schedules-nothing",
+      "result": "pass"
+    },
+    {
+      "id": "parent-restoration-failure-cannot-leak-animation-work",
+      "result": "pass"
+    },
+    {
+      "id": "zero-duration-before-first-frame-settles-visible-without-opening-class",
+      "result": "pass"
+    },
+    {
+      "id": "repeated-exit-request-does-not-duplicate-events-or-jobs",
+      "result": "pass"
+    },
+    {
+      "id": "missing-raf-preserves-immediate-class-and-duration-completion",
+      "result": "pass"
+    },
+    {
+      "id": "phase-request-after-destruction-is-inert",
+      "result": "pass"
+    }
+  ],
+  "mutations": [
+    {
+      "id": "exit-focus-cancellation-removed",
+      "rejected_by": "exit-cancels-pending-initial-focus-before-closing-event"
+    },
+    {
+      "id": "destroy-cancellation-removed",
+      "rejected_by": "enabled-destroy-cancels-timer-and-frame"
+    },
+    {
+      "id": "callback-phase-guard-removed",
+      "rejected_by": "uncancellable-old-frame-cannot-reopen-closing-dialog"
+    },
+    {
+      "id": "noop-phase-identity-removed",
+      "rejected_by": "noop-old-phase-cannot-complete-reopened-phase-early"
+    },
+    {
+      "id": "settled-visible-class-removed",
+      "rejected_by": "zero-duration-before-first-frame-settles-visible-without-opening-class"
+    },
+    {
+      "id": "reentrant-event-check-removed",
+      "rejected_by": "close-during-opening-observer-keeps-only-exit-work"
+    }
+  ],
+  "limits": [
+    "Actual owned leaf/base/focus helper/defaults and motion flag code execute;only the flag override provider is selected for these controlled states.",
+    "Deterministic timer/frame fixtures and synthetic class/style DOM are not native rendered transitions,SSR engine qualification or real browser scheduling.",
+    "Source fixture mostly disables browser focus to isolate motion;the separate focus/restoration source tests and native keyboard/focus/style suites remain required.",
+    "Read-only installed22.1.7/hostNode22.23.3/TS6.0.3 does not qualify actual21 minimum,canonical toolchain,AOT,packed artifacts or consumer floors."
+  ]
+}

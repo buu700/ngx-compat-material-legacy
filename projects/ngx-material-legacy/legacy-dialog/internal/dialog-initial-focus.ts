@@ -22,6 +22,7 @@ export interface LegacyDialogInitialFocusContext {
   isBrowser: boolean;
   isDestroyed: () => boolean;
   onFocusSettled: () => void;
+  beforeFallbackFocus?: () => void;
 }
 
 /** Resolve the active element through open shadow roots without private CDK helpers. */
@@ -40,6 +41,22 @@ export function legacyDialogActiveElement(): HTMLElement | null {
 export function legacyDialogContainsFocus(element: HTMLElement): boolean {
   const active = legacyDialogActiveElement();
   return element === active || !!active && element.contains(active);
+}
+
+/** Check each visible focus host so that a focused open shadow tree within the dialog is contained. */
+export function legacyDialogContainsComposedFocus(element: HTMLElement): boolean {
+  let active = typeof document !== 'undefined' && document ? document.activeElement : null;
+  while (active) {
+    if (element === active || element.contains(active)) {
+      return true;
+    }
+    const next = active.shadowRoot?.activeElement;
+    if (!next || next === active) {
+      return false;
+    }
+    active = next;
+  }
+  return false;
 }
 
 export function focusLegacyDialogInitially(context: LegacyDialogInitialFocusContext,
@@ -76,6 +93,7 @@ export function focusLegacyDialogInitially(context: LegacyDialogInitialFocusCont
       let canceled = false;
       Promise.resolve().then(() => {
         if (!canceled && !context.isDestroyed()) {
+          context.beforeFallbackFocus?.();
           element.focus(options);
           context.onFocusSettled();
         }

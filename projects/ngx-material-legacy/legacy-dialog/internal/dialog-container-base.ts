@@ -26,7 +26,7 @@ import {MatDialogConfig} from '@angular/material/dialog';
 import type {LegacyDialogRuntimeConfig} from '../dialog-config';
 import {Subject, Subscription} from 'rxjs';
 import {take} from 'rxjs/operators';
-import {focusLegacyDialogInitially, legacyDialogActiveElement, legacyDialogContainsFocus}
+import {focusLegacyDialogInitially, legacyDialogActiveElement, legacyDialogContainsFocus, legacyDialogContainsComposedFocus}
   from './dialog-initial-focus';
 import {destroyLegacyDialogContainerState, legacyDialogContainerPeer, registerLegacyDialogContainerState}
   from './dialog-container-state';
@@ -208,52 +208,79 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
               this._animationStateChanged.next({state: 'opened', totalTime: openedTime});
             }
           }
-        });
+        }, true);
       } else {
-        this._trapFocus();
+        this._trapFocus(false, undefined, true);
       }
     }
   }
 
-  /** Preserve the original direct-focus and public NgZone stability timing. */
-  protected _trapFocus(initial = false, onFocusInvoked?: () => void): void {
+  /** Select focus directly or after render readiness, using public NgZone stability. */
+  protected _trapFocus(initial = false, onRecaptureSettled?: () => void, recapture = false): void {
     if (this._legacyFocusDestroyed) {
       return;
     }
-    const focus = () => {
+    let selectingFocus = false;
+    const focus = (onSettled?: () => void) => {
       if (this._legacyFocusDestroyed) {
         return;
       }
-      if (onFocusInvoked) {
-        this._legacyPendingFocusListenerCleanup?.();
-        this._legacyPendingFocusListenerCleanup = null;
-      }
       this._legacyFocusCleanup?.();
-      const cleanup = focusLegacyDialogInitially({
-        element: this._elementRef.nativeElement,
-        config: this._config,
-        factory: this._focusTrapFactory,
-        checker: this._legacyFocusChecker,
-        renderer: this._legacyFocusRenderer || {
-          listen: (target: HTMLElement, event: string, callback: EventListener) => {
-            target.addEventListener(event, callback);
-            return () => target.removeEventListener(event, callback);
-          },
-        },
-        ngZone: this._ngZone,
-        isBrowser: this._isBrowser(),
-        isDestroyed: () => this._legacyFocusDestroyed,
-        onFocusSettled: () => {
-          if (!this._legacyFocusDestroyed) {
-            this._legacyFocusNotifications.next();
+      selectingFocus = true;
+      let invoking = true;
+      let settledWhileInvoking = false;
+      const notifySettled = () => {
+        if (!this._legacyFocusDestroyed) {
+          if (onSettled || onRecaptureSettled) {
+            this._legacyPendingFocusListenerCleanup?.();
+            this._legacyPendingFocusListenerCleanup = null;
           }
-        },
-      });
+          this._legacyFocusNotifications.next();
+          onRecaptureSettled?.();
+          onSettled?.();
+        }
+      };
+      let cleanup: (() => void) | null;
+      try {
+        cleanup = focusLegacyDialogInitially({
+          element: this._elementRef.nativeElement,
+          config: this._config,
+          factory: this._focusTrapFactory,
+          checker: this._legacyFocusChecker,
+          renderer: this._legacyFocusRenderer || {
+            listen: (target: HTMLElement, event: string, callback: EventListener) => {
+              target.addEventListener(event, callback);
+              return () => target.removeEventListener(event, callback);
+            },
+          },
+          ngZone: this._ngZone,
+          isBrowser: this._isBrowser(),
+          isDestroyed: () => this._legacyFocusDestroyed,
+          beforeFallbackFocus: () => {
+            if (onSettled || onRecaptureSettled) {
+              this._legacyPendingFocusListenerCleanup?.();
+              this._legacyPendingFocusListenerCleanup = null;
+            }
+          },
+          onFocusSettled: () => {
+            if (invoking) {
+              settledWhileInvoking = true;
+            } else {
+              notifySettled();
+            }
+          },
+        });
+      } finally {
+        selectingFocus = false;
+        invoking = false;
+      }
       if (this._legacyFocusDestroyed) {
         cleanup?.();
       } else {
         this._legacyFocusCleanup = cleanup;
-        onFocusInvoked?.();
+        if (settledWhileInvoking) {
+          notifySettled();
+        }
       }
     };
     const firstTabbable = this._config.autoFocus === true || this._config.autoFocus === 'first-tabbable';
@@ -261,7 +288,7 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
     // initial render and model update. Manual construction keeps the direct path.
     const deferInitialFocus = initial && firstTabbable && this._ngZone.isStable
         && this._legacyRenderInjector && this._legacyApplicationRef instanceof ApplicationRef
-        && this._isBrowser();
+        && this._document && this._isBrowser();
     if (deferInitialFocus) {
       this._cancelPendingInitialFocus();
       this._legacyInitialFocusPending = true;
@@ -293,7 +320,7 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
         }
       };
       const cancelOnFocus = () => {
-        if (activeRoots().active !== previousActiveElement) cancelPendingFocus();
+        if (!selectingFocus && activeRoots().active !== previousActiveElement) cancelPendingFocus();
       };
       const checkFocusOut = () => {
         if (activeRoots().active !== previousActiveElement) {
@@ -330,25 +357,91 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
               return;
             }
             this._legacyAfterRender = null;
+            focus(() => {
+              if (!this._legacyFocusDestroyed && epoch === this._legacyFocusEpoch) {
+                this._legacyInitialFocusPending = false;
+                if (this._legacyPendingOpenedTime !== null) {
+                  const totalTime = this._legacyPendingOpenedTime;
+                  this._legacyPendingOpenedTime = null;
+                  this._animationStateChanged.next({state: 'opened', totalTime});
+                }
+              }
+            });
+          }
+        }}, {injector, manualCleanup: true});
+      })}, {injector, manualCleanup: true});
+    } else if (firstTabbable && !this._ngZone.isStable) {
+      const epoch = this._legacyFocusEpoch;
+      const coordinateInitial = initial && this._legacyRenderInjector
+        && this._legacyApplicationRef instanceof ApplicationRef && this._document && this._isBrowser();
+      if (coordinateInitial) {
+        this._legacyInitialFocusPending = true;
+        const activeRoots = (): {roots: (Document | ShadowRoot)[], active: Element | null} => {
+          const roots: (Document | ShadowRoot)[] = [this._document];
+          let active: Element | null = this._document.activeElement;
+          while (active) {
+            let next: Document | ShadowRoot | null = active.shadowRoot;
+            if (!next && active.tagName === 'IFRAME') {
+              try {
+                next = (active as HTMLIFrameElement).contentDocument;
+              } catch {
+                next = null;
+              }
+            }
+            if (!next) break;
+            roots.push(next);
+            active = next.activeElement;
+          }
+          return {roots, active};
+        };
+        const {roots: focusRoots, active: previousFocus} = activeRoots();
+        const onUserFocus = () => {
+          if (!selectingFocus && activeRoots().active !== previousFocus) {
+            const openedTime = this._legacyPendingOpenedTime;
+            this._cancelPendingInitialFocus();
+            if (openedTime !== null && !this._legacyFocusDestroyed) {
+              this._animationStateChanged.next({state: 'opened', totalTime: openedTime});
+            }
+          }
+        };
+        const onUserBlur = () => queueMicrotask(() => {
+          if (this._legacyInitialFocusPending && epoch === this._legacyFocusEpoch) {
+            onUserFocus();
+          }
+        });
+        for (const root of focusRoots) {
+          root.addEventListener('focusin', onUserFocus, true);
+          root.addEventListener('focusout', onUserBlur, true);
+        }
+        this._legacyPendingFocusListenerCleanup = () => {
+          for (const root of focusRoots) {
+            root.removeEventListener('focusin', onUserFocus, true);
+            root.removeEventListener('focusout', onUserBlur, true);
+          }
+        };
+      }
+      const subscription = this._ngZone.onStable.pipe(take(1)).subscribe(() => {
+        if (recapture && legacyDialogContainsComposedFocus(this._elementRef.nativeElement)) {
+          this._legacyPendingRecapture = null;
+          onRecaptureSettled?.();
+          return;
+        }
+        focus(() => {
+          if (coordinateInitial && !this._legacyFocusDestroyed && epoch === this._legacyFocusEpoch) {
             this._legacyInitialFocusPending = false;
-            this._legacyPendingFocusListenerCleanup?.();
-            this._legacyPendingFocusListenerCleanup = null;
-            focus();
-            if (!this._legacyFocusDestroyed && epoch === this._legacyFocusEpoch
-                && this._legacyPendingOpenedTime !== null) {
+            this._legacyPendingInitialZoneSubscription = null;
+            if (this._legacyPendingOpenedTime !== null) {
               const totalTime = this._legacyPendingOpenedTime;
               this._legacyPendingOpenedTime = null;
               this._animationStateChanged.next({state: 'opened', totalTime});
             }
           }
-        }}, {injector, manualCleanup: true});
-      })}, {injector, manualCleanup: true});
-    } else if (firstTabbable && !this._ngZone.isStable) {
-      const subscription = this._ngZone.onStable.pipe(take(1)).subscribe(focus);
+        });
+      });
       this._legacyFocusStableSubscriptions.add(subscription);
       if (initial) {
         this._legacyPendingInitialZoneSubscription = subscription;
-      } else if (onFocusInvoked) {
+      } else if (onRecaptureSettled) {
         this._legacyPendingRecapture = subscription;
       }
     } else {
@@ -357,6 +450,10 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
   }
 
   protected _cancelPendingInitialFocus(): void {
+    if (this._legacyInitialFocusPending) {
+      this._legacyFocusCleanup?.();
+      this._legacyFocusCleanup = null;
+    }
     this._legacyFocusEpoch++;
     this._legacyPendingInitialZoneSubscription?.unsubscribe();
     this._legacyPendingInitialZoneSubscription = null;
