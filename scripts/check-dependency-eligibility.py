@@ -621,6 +621,9 @@ NPM_CURRENT_PRIVATE_PROFILE_PATH = "compatibility/rc/parent-private-npm-current-
 NPM_CURRENT_PRIVATE_PROFILE_SHA256 = "6ac4ca65451132227069b7c3f5b19bc6519832d8e7c86ff30c43a8460a06278f"
 
 
+NPM_HISTORICAL_PRIVATE_PROFILE_PATH = "compatibility/rc/parent-private-npm-current-profile-inputs-v1.json"
+NPM_HISTORICAL_PRIVATE_PROFILE_SHA256 = "6ac4ca65451132227069b7c3f5b19bc6519832d8e7c86ff30c43a8460a06278f"
+
 def _private_npm_current_profile(root: Path, line: str, manifests: dict, evidence: dict):
     """Authenticate one current source cut without changing historical verdicts.
 
@@ -634,7 +637,9 @@ def _private_npm_current_profile(root: Path, line: str, manifests: dict, evidenc
     profile_raw = _tool_proof_bytes(root, profile_ref["path"], profile_ref)
     profile_ref["bytes"] = len(profile_raw)
     profile = json.loads(profile_raw)
-    if (profile.get("schema_version") != 1
+    if (profile.get("schema_version") not in (1, 2)
+            or (profile.get("schema_version") == 1 and (profile_ref["path"] != NPM_HISTORICAL_PRIVATE_PROFILE_PATH
+                or profile_ref["sha256"] != NPM_HISTORICAL_PRIVATE_PROFILE_SHA256))
             or profile.get("scope") != "maintained-tool-owned-npm-invocations"
             or profile.get("historical_artifacts") != NPM_PRIVATE_PROFILE_ARTIFACTS):
         raise ValueError("foreign current private npm profile")
@@ -707,9 +712,45 @@ def _private_npm_current_profile(root: Path, line: str, manifests: dict, evidenc
             or review["lines"][line] != expected_review):
         raise ValueError("current private npm review does not bind complete current inputs")
 
+    semantic_refs = []
+    if profile["schema_version"] == 2:
+        semantic_refs = review.get("semantic_review_refs")
+        current = review.get("current_source_reviews")
+        if (type(semantic_refs) is not list or not semantic_refs
+                or type(current) is not dict or set(current) != {"main"}):
+            raise ValueError("invalid current semantic review references")
+        paths = []
+        for ref in semantic_refs:
+            if (type(ref) is not dict or set(ref) != {"path", "sha256", "bytes"}
+                    or type(ref["path"]) is not str or type(ref["bytes"]) is not int
+                    or ref["bytes"] < 1 or type(ref["sha256"]) is not str
+                    or re.fullmatch(r"[0-9a-f]{64}", ref["sha256"]) is None):
+                raise ValueError("invalid semantic review reference")
+            _tool_proof_bytes(root, ref["path"], ref)
+            paths.append(ref["path"])
+        if paths != sorted(set(paths)) or current["main"] not in semantic_refs:
+            raise ValueError("unbound or duplicate semantic review reference")
+        main = profile["lines"]["main"]
+        reviewed = json.loads(_tool_proof_bytes(root, current["main"]["path"], current["main"]))
+        expected_semantic = {"schema_version": 1, "role": "current-source-semantic-review",
+                             "line": "main", "preconditions": "unchanged-maintained-tool-owned-npm",
+                             **{name + "_sha256": hashlib.sha256(json.dumps(main[name], sort_keys=True,
+                                 separators=(",", ":")).encode()).hexdigest()
+                                for name in ("source_files", "support_files", "input_files")}}
+        if (type(reviewed) is not dict or set(reviewed) != set(expected_semantic) | {"source_parent", "evidence_refs"}
+                or type(reviewed.get("source_parent")) is not str
+                or re.fullmatch(r"[0-9a-f]{40}", reviewed["source_parent"]) is None
+                or type(reviewed.get("evidence_refs")) is not list or not reviewed["evidence_refs"]
+                or any(ref not in semantic_refs or ref == current["main"] for ref in reviewed["evidence_refs"])
+                or [ref["path"] for ref in reviewed["evidence_refs"]] != sorted(set(ref["path"] for ref in reviewed["evidence_refs"]))
+                or any(reviewed.get(k) != v for k, v in expected_semantic.items())):
+            raise ValueError("current semantic review does not bind main source projection")
+
     def assert_current():
         _tool_proof_bytes(root, profile_ref["path"], profile_ref)
         _tool_proof_bytes(root, review_ref["path"], review_ref)
+        for ref in semantic_refs:
+            _tool_proof_bytes(root, ref["path"], ref)
         if set(primary) != private_npm_source_paths(root):
             raise ValueError("current private npm command source population changed")
         for name, group in grouped.items():

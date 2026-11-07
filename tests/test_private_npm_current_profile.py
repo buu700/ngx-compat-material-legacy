@@ -84,7 +84,7 @@ class PrivateNpmCurrentProfileTests(unittest.TestCase):
         self.pin = digest(raw)
 
     def validate(self):
-        with patch.object(eligibility, 'NPM_CURRENT_PRIVATE_PROFILE_SHA256', self.pin):
+        with patch.object(eligibility, 'NPM_CURRENT_PRIVATE_PROFILE_SHA256', self.pin), patch.object(eligibility, 'NPM_HISTORICAL_PRIVATE_PROFILE_SHA256', self.pin):
             return eligibility._private_npm_current_profile(self.root, 'main', self.manifests, self.evidence)
 
     def test_exact_current_cut_and_repeated_physical_read(self):
@@ -155,7 +155,7 @@ class PrivateNpmCurrentProfileTests(unittest.TestCase):
         def brace(*args):
             self.write('support/helper.mjs', b'changed during brace stage\n')
             return {'findings': {}, 'binding': {}}
-        with patch.object(eligibility, 'NPM_CURRENT_PRIVATE_PROFILE_SHA256', self.pin), \
+        with patch.object(eligibility, 'NPM_CURRENT_PRIVATE_PROFILE_SHA256', self.pin), patch.object(eligibility, 'NPM_HISTORICAL_PRIVATE_PROFILE_SHA256', self.pin), \
              patch.object(eligibility, '_tool_proof_bytes', side_effect=read), \
              patch.object(eligibility.tarfile, 'open') as opened, \
              patch.object(eligibility, 'private_npm_brace_validation', side_effect=brace) as reviewed:
@@ -216,6 +216,57 @@ class PrivateNpmCurrentProfileTests(unittest.TestCase):
                 self.seal()  # A recomputed profile/review cannot bypass independent predicates.
                 with self.assertRaises(ValueError):
                     self.validate()
+
+    def seal_v2(self, fault=None):
+        self.seal()
+        review = json.loads((self.root / self.profile['review']['path']).read_bytes())
+        branch = self.profile['lines']['main']
+        evidence_raw = b'authored contextual review\n'; evidence_name = 'compatibility/rc/context-review.txt'
+        self.write(evidence_name, evidence_raw)
+        evidence_ref = {'path': evidence_name, 'sha256': digest(evidence_raw), 'bytes': len(evidence_raw)}
+        authored = {'evidence_refs': [evidence_ref], 'schema_version': 1, 'role': 'current-source-semantic-review', 'line': 'main',
+                    'source_parent': 'd' * 40, 'preconditions': 'unchanged-maintained-tool-owned-npm',
+                    **{name + '_sha256': roster_hash(branch[name]) for name in ('source_files', 'support_files', 'input_files')}}
+        if fault == 'no-evidence': authored['evidence_refs'] = []
+        if fault == 'unbound-evidence': authored['evidence_refs'][0]['sha256'] = '0' * 64
+        if fault == 'wrong-scope': authored['line'] = '21.x'
+        if fault == 'wrong-digest': authored['support_files_sha256'] = '0' * 64
+        if fault == 'preconditions': authored['preconditions'] = 'changed'
+        if fault == 'wrong-role': authored['role'] = 'other'
+        if fault == 'bad-source': authored['source_parent'] = 'bad'
+        raw = json.dumps(authored).encode(); name = 'compatibility/rc/authored-review.json'
+        self.write(name, raw)
+        ref = {'path': name, 'sha256': digest(raw), 'bytes': len(raw)}
+        review['semantic_review_refs'] = sorted([ref, evidence_ref], key=lambda r: r['path'])
+        review['current_source_reviews'] = {'main': ref.copy()}
+        if fault == 'missing': del review['current_source_reviews']
+        if fault == 'unbound': review['current_source_reviews']['main']['sha256'] = '0' * 64
+        if fault == 'duplicate': review['semantic_review_refs'].append(ref.copy())
+        if fault == 'unsafe': review['semantic_review_refs'][0]['path'] = '../review.json'
+        raw = json.dumps(review).encode(); self.write(self.profile['review']['path'], raw)
+        self.profile['review'].update(sha256=digest(raw), bytes=len(raw))
+        self.profile['schema_version'] = 2
+        raw = json.dumps(self.profile).encode(); self.write(eligibility.NPM_CURRENT_PRIVATE_PROFILE_PATH, raw)
+        self.pin = digest(raw)
+
+    def test_schema_two_positive_and_late_mutation(self):
+        self.seal_v2()
+        _, recheck = self.validate()
+        self.write('compatibility/rc/authored-review.json', b'changed')
+        with self.assertRaises(ValueError): recheck()
+
+    def test_schema_two_rejects_unbound_or_invalid_review(self):
+        for fault in ('no-evidence', 'unbound-evidence', 'missing', 'wrong-scope', 'wrong-digest', 'unbound', 'duplicate', 'unsafe',
+                      'wrong-role', 'bad-source', 'preconditions'):
+            with self.subTest(fault=fault):
+                self.seal_v2(fault)
+                with self.assertRaises((ValueError, KeyError)): self.validate()
+
+    def test_v1_new_authority_rejected(self):
+        self.seal()
+        with patch.object(eligibility, 'NPM_CURRENT_PRIVATE_PROFILE_SHA256', self.pin):
+            with self.assertRaisesRegex(ValueError, 'foreign current'):
+                eligibility._private_npm_current_profile(self.root, 'main', self.manifests, self.evidence)
 
 
 if __name__ == '__main__':
