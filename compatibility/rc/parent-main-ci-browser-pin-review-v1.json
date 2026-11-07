@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "role": "Root bounded CI Chromium pin integration review",
+  "parent": "8baa761eca624c9d71293c3d31750a2b3fdeebf0",
+  "proposal_sha256": "4b3f8146d95fe3414a4fe94cde9c24c9d5299c7ffc2f01a81aacc9d1a6e9ce06",
+  "reviewed_images": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "before_sha256": "19965edddfea0cfade7840d1a42d93b83fa7e606095501e63b130c7671087f73",
+      "before_bytes": 18346,
+      "after_sha256": "8ca1520dfe3ed7f0b475d2e660c26e90a6c720465a22942c41d5c0deecd9de9e",
+      "after_bytes": 20854
+    },
+    {
+      "path": "flake.nix",
+      "before_sha256": "b195fb256eb0749a06006cebcb2946459cc2cdddc2f44493788c08bad0101b9b",
+      "before_bytes": 2873,
+      "after_sha256": "a161c9773fdb018e4a1a7befdb5962c1f4e818d73ae259b4242673bad1115556",
+      "after_bytes": 3144
+    }
+  ],
+  "independent_review": {
+    "sha256": "17e30f3484ddb0eaad78c2502b06c6337229537a4d2d58ab1597c1318a36b972",
+    "report": {
+      "patch": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/ci-x64-toolchain-record/ci-browser-pin.patch",
+      "sha256": "4b3f8146d95fe3414a4fe94cde9c24c9d5299c7ffc2f01a81aacc9d1a6e9ce06",
+      "base": "8baa761eca624c9d71293c3d31750a2b3fdeebf0",
+      "result": "no concrete blocker within bounded CI pin scope; separate overlay producer profile extension required",
+      "checks": [
+        "Applied patch to isolated archive. Two browser jobs each use locked flake output, architecture-specific executable+wrapped ELF hashes, publish absolute path via GITHUB_ENV; five downstream consumers retain it and assert executable. Full coordinator inherits path. Firefox and WebKit packages remain.",
+        "Nix built .#ci-chromium arm64 to /nix/store/qhdnfx3ipfqcpjs1sywfc3iv7m2p5l62-playwright-browsers. Launcher 3a0b4b909e867cbd845162be0b67343c0d6bb03dbac8f2d410eec8fcc8913fe9; wrapped ELF eff7bad2ac10e1288fc52919ff9791a0d500a10c870c831ca8426b457a324d95; --version Chromium 149.0.7827.0.",
+        "CHROME_BIN transmitted unchanged through just chainman exec in isolated tree.",
+        "Bounded arm64 local HTTP/CDP smoke with selected chrome yielded {browser:{product:Chrome/149.0.7827.0,protocol:cdp},result:{ok:true}}. Initial independent --dump-dom attempt did not complete and was interrupted; CDP retry passed.",
+        "Separately reviewed overlay 0a7a producer pins old cfr0 browser hashes; newly selected arm launcher and wrapped ELF differ and would fail its profile until independently qualified. x64 record remains provisional."
+      ],
+      "limits": [
+        "No x64 execution or CI job, full browser matrix, overlay producer qualification, G11 or release claim."
+      ]
+    }
+  },
+  "root_checks": [
+    "Only workflow and flake source changed before adding this review.",
+    "Pinned nixpkgs input and flake.lock unchanged; private tool versions and consumer engines unchanged.",
+    "Both setup steps verify exact architecture-specific wrapper and ELF hashes before launch.",
+    "All five entry consumers inherit CHROME_BIN, require executable and export it; no Chromium apt install or command-v rediscovery remains.",
+    "Root separately rehashed all four actual arm64/x64 wrapper/ELF files and matched workflow literals.",
+    "Canonical patch application and whitespace check performed."
+  ],
+  "limits": [
+    "Native arm64 CDP smoke and Chainman environment transport only; no x64 browser or Actions runtime qualification.",
+    "Existing inherited-evidence producer profiles pin the earlier local browser and remain incompatible with the new CI selection pending separately reviewed and qualified profile extensions.",
+    "No claim of full verify, G01-G13, security clearance, complete audit or release readiness.",
+    "Firefox and WebKit package acquisition remains existing workflow scope and requires separate complete-audit review."
+  ]
+}

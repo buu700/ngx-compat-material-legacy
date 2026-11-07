@@ -281,18 +281,46 @@ jobs:
           RUN="${{ steps.pack.outputs.run_dir }}"
           just chainman exec -- node scripts/api-completeness.mjs --run "${RUN}/run.json"
 
-      - name: Install Chromium for rendered and historical checks
+      - name: Install flake-pinned Chromium for rendered and historical checks
         run: |
           set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium
+          CHROMIUM_STORE="$(nix build --no-link --print-out-paths .#ci-chromium)"
+          CHROME_BIN=""
+          for candidate in \
+            "$CHROMIUM_STORE/chromium-1228/chrome-linux64/chrome" \
+            "$CHROMIUM_STORE/chromium-1228/chrome-linux/chrome"; do
+            if [ -x "$candidate" ]; then CHROME_BIN="$candidate"; break; fi
+          done
+          test -n "$CHROME_BIN"
+          test -x "$CHROME_BIN"
+          CHROME_WRAPPED="$(dirname "$CHROME_BIN")/.chrome-wrapped"
+          test -x "$CHROME_WRAPPED"
+          case "$(uname -m)" in
+            x86_64)
+              expected_chrome_sha=dbc8b199f83056aba947868710648f61c1d23c3f64c6a491c6f72ef2ebaf3f60
+              expected_wrapped_sha=e8006643ad430fcf8b0545c5b68625d4525826916773c85cbf757c78d16b2ee0
+              ;;
+            aarch64|arm64)
+              expected_chrome_sha=3a0b4b909e867cbd845162be0b67343c0d6bb03dbac8f2d410eec8fcc8913fe9
+              expected_wrapped_sha=eff7bad2ac10e1288fc52919ff9791a0d500a10c870c831ca8426b457a324d95
+              ;;
+            *) echo "Unsupported Chromium runner architecture: $(uname -m)" >&2; exit 2 ;;
+          esac
+          actual_chrome_sha="$(sha256sum "$CHROME_BIN" | cut -d' ' -f1)"
+          actual_wrapped_sha="$(sha256sum "$CHROME_WRAPPED" | cut -d' ' -f1)"
+          test "$actual_chrome_sha" = "$expected_chrome_sha"
+          test "$actual_wrapped_sha" = "$expected_wrapped_sha"
+          printf 'CHROME_BIN_SHA256=%s\nCHROME_WRAPPED_SHA256=%s\n' "$actual_chrome_sha" "$actual_wrapped_sha"
+          "$CHROME_BIN" --version
+          nix path-info --json "$CHROMIUM_STORE"
+          echo "CHROME_BIN=$CHROME_BIN" >> "$GITHUB_ENV"
 
       - name: Sass seal against tip pack
         run: |
           set -euo pipefail
           RUN="${{ steps.pack.outputs.run_dir }}"
-          CHROME_BIN="$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)"
           test -n "$CHROME_BIN"
+          test -x "$CHROME_BIN"
           export CHROME_BIN
           just chainman exec -- node scripts/sass-seal.mjs --run "${RUN}/run.json"
 
@@ -305,8 +333,8 @@ jobs:
         run: |
           set -euo pipefail
           RUN="${{ steps.pack.outputs.run_dir }}"
-          CHROME_BIN="$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)"
           test -n "$CHROME_BIN"
+          test -x "$CHROME_BIN"
           export CHROME_BIN
           just chainman exec -- node scripts/check-companion-computed-styles.mjs --run "${RUN}/run.json"
 
@@ -314,8 +342,8 @@ jobs:
         run: |
           set -euo pipefail
           RUN="${{ steps.pack.outputs.run_dir }}"
-          CHROME_BIN="$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)"
           test -n "$CHROME_BIN"
+          test -x "$CHROME_BIN"
           export CHROME_BIN
           just chainman exec -- node scripts/run-browser-matrix-slice.mjs --run "${RUN}/run.json"
 
@@ -323,8 +351,8 @@ jobs:
         run: |
           set -euo pipefail
           RUN="${{ steps.pack.outputs.run_dir }}"
-          CHROME_BIN="$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)"
           test -n "$CHROME_BIN"
+          test -x "$CHROME_BIN"
           export CHROME_BIN
           just chainman exec -- node scripts/ripple-hydration-replay.mjs --run "${RUN}/run.json"
 
@@ -332,8 +360,8 @@ jobs:
         run: |
           set -euo pipefail
           RUN="${{ steps.pack.outputs.run_dir }}"
-          CHROME_BIN="$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)"
           test -n "$CHROME_BIN"
+          test -x "$CHROME_BIN"
           export CHROME_BIN
           # One extract + all inventory families; unselected families are not omitted.
           # Host Chrome with Chainman Node; absolute CHROME_BIN avoids flake PATH gaps.
@@ -382,7 +410,6 @@ jobs:
           echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee /etc/apt/sources.list.d/mozilla.list > /dev/null
           printf 'Package: *\nPin: origin packages.mozilla.org\nPin-Priority: 1000\n' | sudo tee /etc/apt/preferences.d/mozilla > /dev/null
           sudo apt-get update
-          sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium || true
           sudo apt-get install -y firefox
           sudo apt-get install -y python3-gi gir1.2-gtk-3.0 gir1.2-webkit2-4.1 xvfb bubblewrap xdg-dbus-proxy gsettings-desktop-schemas
           command -v bwrap
@@ -391,9 +418,35 @@ jobs:
           Xvfb :99 -screen 0 1280x900x24 >/tmp/xvfb.log 2>&1 &
           echo "DISPLAY=:99" >> "$GITHUB_ENV"
           echo "FIREFOX_BIN=$(command -v firefox)" >> "$GITHUB_ENV"
-          CHROME_BIN="$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)"
+          CHROMIUM_STORE="$(nix build --no-link --print-out-paths .#ci-chromium)"
+          CHROME_BIN=""
+          for candidate in \
+            "$CHROMIUM_STORE/chromium-1228/chrome-linux64/chrome" \
+            "$CHROMIUM_STORE/chromium-1228/chrome-linux/chrome"; do
+            if [ -x "$candidate" ]; then CHROME_BIN="$candidate"; break; fi
+          done
           test -n "$CHROME_BIN"
           test -x "$CHROME_BIN"
+          CHROME_WRAPPED="$(dirname "$CHROME_BIN")/.chrome-wrapped"
+          test -x "$CHROME_WRAPPED"
+          case "$(uname -m)" in
+            x86_64)
+              expected_chrome_sha=dbc8b199f83056aba947868710648f61c1d23c3f64c6a491c6f72ef2ebaf3f60
+              expected_wrapped_sha=e8006643ad430fcf8b0545c5b68625d4525826916773c85cbf757c78d16b2ee0
+              ;;
+            aarch64|arm64)
+              expected_chrome_sha=3a0b4b909e867cbd845162be0b67343c0d6bb03dbac8f2d410eec8fcc8913fe9
+              expected_wrapped_sha=eff7bad2ac10e1288fc52919ff9791a0d500a10c870c831ca8426b457a324d95
+              ;;
+            *) echo "Unsupported Chromium runner architecture: $(uname -m)" >&2; exit 2 ;;
+          esac
+          actual_chrome_sha="$(sha256sum "$CHROME_BIN" | cut -d' ' -f1)"
+          actual_wrapped_sha="$(sha256sum "$CHROME_WRAPPED" | cut -d' ' -f1)"
+          test "$actual_chrome_sha" = "$expected_chrome_sha"
+          test "$actual_wrapped_sha" = "$expected_wrapped_sha"
+          printf 'CHROME_BIN_SHA256=%s\nCHROME_WRAPPED_SHA256=%s\n' "$actual_chrome_sha" "$actual_wrapped_sha"
+          "$CHROME_BIN" --version
+          nix path-info --json "$CHROMIUM_STORE"
           echo "CHROME_BIN=$CHROME_BIN" >> "$GITHUB_ENV"
 
       - name: Run the full verifier

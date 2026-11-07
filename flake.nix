@@ -11,6 +11,12 @@
           fn (import nixpkgs { inherit system; }));
     in
     {
+      # CI browser input is resolved through this same flake.lock-pinned nixpkgs.
+      # This exposes only the pinned Chrome for Testing Chromium package.
+      packages = forAllSystems (pkgs: {
+        ci-chromium = pkgs.playwright-driver.browsers-chromium;
+      });
+
       devShells = forAllSystems (pkgs:
         let
           sources = builtins.fromJSON (builtins.readFile ./nix/tool-sources.json);
