@@ -24,6 +24,7 @@ import {
   patchElementFocus,
 } from '../internal/testing/owned-test-events';
 import {
+  ANIMATION_MODULE_TYPE,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
@@ -39,7 +40,7 @@ import {
   ViewChildren,
 } from '@angular/core';
 import {ComponentFixture, fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
-import {MatRipple} from '@angular/material/core';
+import {MATERIAL_ANIMATIONS, MatRipple} from '@angular/material/core';
 import {By} from '@angular/platform-browser';
 import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {Subject} from 'rxjs';
@@ -2033,6 +2034,89 @@ describe('MatMenu', () => {
     expect(closed).toBe(1); expect(trigger.menuOpen).toBeFalse();
     expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeFalsy();
     focused.remove(); sub.unsubscribe(); fixture.destroy(); tick(500);
+  }));
+
+  describe('opaque backdrop motion policy', () => {
+    const cases: Array<{
+      name: string; providers: Provider[]; noop: boolean;
+    }> = [
+      {
+        name: 'enabled animations',
+        providers: [
+          {provide: ANIMATION_MODULE_TYPE, useValue: 'BrowserAnimations'},
+          {provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'},
+        ],
+        noop: false,
+      },
+      {
+        name: 'disabled Material animations',
+        providers: [
+          {provide: ANIMATION_MODULE_TYPE, useValue: 'BrowserAnimations'},
+          {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+        ],
+        noop: true,
+      },
+      {
+        name: 'Noop animations',
+        providers: [{provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations'}],
+        noop: true,
+      },
+      {
+        name: 'reduced motion',
+        providers: [
+          {provide: ANIMATION_MODULE_TYPE, useValue: 'BrowserAnimations'},
+          {provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'reduced-motion'},
+        ],
+        noop: true,
+      },
+    ];
+
+    for (const motion of cases) {
+      it(`keeps backdrop policy and lifecycle coherent with ${motion.name}`, fakeAsync(() => {
+        const fixture = createComponent(SimpleMenu, motion.providers, [FakeIcon]);
+        fixture.detectChanges();
+        const {trigger, menu} = fixture.componentInstance;
+        menu.backdropClass = 'cdk-overlay-dark-backdrop';
+        menu.hasBackdrop = true;
+        const events: string[] = [];
+        trigger.menuOpened.subscribe(() => events.push('open'));
+        trigger.menuClosed.subscribe(() => events.push('close'));
+
+        trigger.openMenu(); fixture.detectChanges(); tick(500);
+        let backdrop = overlayContainerElement.querySelector('.cdk-overlay-backdrop') as HTMLElement;
+        expect(backdrop).withContext('opaque backdrop exists').toBeTruthy();
+        expect(backdrop.classList.contains('cdk-overlay-backdrop-noop-animation')).toBe(motion.noop);
+        backdrop.click(); fixture.detectChanges(); tick(500);
+        expect(trigger.menuOpen).toBeFalse();
+        expect(overlayContainerElement.querySelector('.cdk-overlay-backdrop')).toBeFalsy();
+        expect(events).toEqual(['open', 'close']);
+
+        trigger.openMenu(); fixture.detectChanges(); tick(500);
+        backdrop = overlayContainerElement.querySelector('.cdk-overlay-backdrop') as HTMLElement;
+        expect(backdrop).withContext('reopened backdrop exists').toBeTruthy();
+        expect(backdrop.classList.contains('cdk-overlay-backdrop-noop-animation')).toBe(motion.noop);
+        expect(events).toEqual(['open', 'close', 'open']);
+        fixture.destroy(); tick(500);
+        expect(overlayContainerElement.querySelector('.cdk-overlay-backdrop')).toBeFalsy();
+        // Destroying the trigger does not emit a second menuClosed output.
+        expect(events).toEqual(['open', 'close', 'open']);
+      }));
+    }
+  });
+
+  it('keeps peer backdrop defaults for a custom menu panel', fakeAsync(() => {
+    const fixture = createComponent(CustomMenu, [
+      {provide: ANIMATION_MODULE_TYPE, useValue: 'BrowserAnimations'},
+      {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+    ], [CustomMenuPanel]);
+    fixture.detectChanges();
+    fixture.componentInstance.trigger.openMenu(); fixture.detectChanges(); tick(500);
+    const backdrop = overlayContainerElement.querySelector('.cdk-overlay-backdrop') as HTMLElement;
+    expect(backdrop).toBeTruthy();
+    expect(backdrop.classList.contains('cdk-overlay-backdrop-noop-animation')).toBeFalse();
+    fixture.componentInstance.trigger.closeMenu(); fixture.detectChanges(); tick(500);
+    expect(overlayContainerElement.querySelector('.cdk-overlay-backdrop')).toBeFalsy();
+    fixture.destroy();
   }));
 
   describe('animations', () => {

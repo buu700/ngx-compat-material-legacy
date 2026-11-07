@@ -681,6 +681,9 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
         .withLockedPosition()
         .withGrowAfterOpen()
         .withTransformOriginOn('.mat-menu-panel, .mat-mdc-menu-panel'),
+      ...(menu instanceof _MatMenuBase && !menu._animationsEnabled
+        ? {disableAnimations: true}
+        : {}),
       backdropClass: menu.backdropClass || 'cdk-overlay-transparent-backdrop',
       panelClass: menu.overlayPanelClass,
       scrollStrategy: this._scrollStrategy(),
