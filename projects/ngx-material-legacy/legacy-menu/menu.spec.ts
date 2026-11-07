@@ -88,140 +88,6 @@ async function waitForMenuRemoval(container: HTMLElement): Promise<boolean> {
 }
 
 describe('MatMenu', () => {
-  it('keeps an empty panel visible through native CSS enter completion', async () => {
-    const fixture = createComponent(EmptySharedMenu, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}]);
-    fixture.autoDetectChanges();
-    fixture.componentInstance.first.openMenu(); fixture.detectChanges();
-    const panel = overlayContainerElement.querySelector('.mat-menu-panel') as HTMLElement | null;
-    expect(panel).toBeTruthy();
-    if (!panel) { fixture.destroy(); return; }
-    const started = waitForMenuAnimation(panel, 'animationstart', 'mat-legacy-menu-enter');
-    const ended = waitForMenuAnimation(panel, 'animationend', 'mat-legacy-menu-enter');
-    expect(await started).toBeTrue(); fixture.detectChanges();
-    expect(getComputedStyle(panel).display).not.toBe('none');
-    expect(await ended).toBeTrue(); fixture.detectChanges();
-    expect(panel.classList.contains('mat-menu-panel-animating')).toBeFalse();
-    expect(fixture.componentInstance.first.menuOpen).toBeTrue();
-    fixture.destroy();
-  });
-
-  for (const enabled of [true, false]) {
-    it(`completes real empty-menu exit and shared-trigger reopen (motion ${enabled})`, async () => {
-      const fixture = createComponent(EmptySharedMenu, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: enabled ? 'enabled' : 'disabled'}]);
-      fixture.autoDetectChanges();
-      const {first, second} = fixture.componentInstance;
-      first.openMenu(); fixture.detectChanges();
-      const firstPanel = overlayContainerElement.querySelector('.mat-menu-panel') as HTMLElement | null;
-      expect(firstPanel).toBeTruthy();
-      if (!firstPanel) { fixture.destroy(); return; }
-      if (enabled) {
-        const entered = await waitForMenuAnimation(firstPanel, 'animationend', 'mat-legacy-menu-enter');
-        expect(entered).toBeTrue();
-        if (!entered) { fixture.destroy(); return; }
-        fixture.detectChanges();
-      } else { await Promise.resolve(); fixture.detectChanges(); }
-      expect(first.menuOpen).toBeTrue();
-      const exitStart = enabled ? waitForMenuAnimation(firstPanel, 'animationstart', 'mat-legacy-menu-exit') : null;
-      first.closeMenu(); fixture.detectChanges();
-      if (exitStart) {
-        const exiting = await exitStart;
-        expect(exiting).toBeTrue();
-        if (!exiting) { fixture.destroy(); return; }
-        fixture.detectChanges();
-        expect(firstPanel.isConnected).toBeTrue();
-        expect(getComputedStyle(firstPanel).display).not.toBe('none');
-      }
-      second.openMenu(); fixture.detectChanges();
-      const current = overlayContainerElement.querySelector('.mat-menu-panel') as HTMLElement | null;
-      expect(current).toBeTruthy();
-      if (!current) { fixture.destroy(); return; }
-      if (enabled) {
-        const reopened = await waitForMenuAnimation(current, 'animationend', 'mat-legacy-menu-enter');
-        expect(reopened).toBeTrue();
-        if (!reopened) { fixture.destroy(); return; }
-        fixture.detectChanges();
-      } else { await Promise.resolve(); fixture.detectChanges(); }
-      expect(first.menuOpen).toBeFalse();
-      expect(second.menuOpen).toBeTrue();
-      expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);
-      expect(getComputedStyle(current).display).not.toBe('none');
-      expect(current.classList.contains('mat-menu-panel-animating')).toBeFalse();
-      second.closeMenu(); fixture.detectChanges();
-      expect(await waitForMenuRemoval(overlayContainerElement)).toBeTrue();
-      fixture.destroy();
-    });
-  }
-
-  for (const enabled of [true, false]) {
-    it(`transfers one populated lazy menu immediately without stale exit (motion ${enabled})`, fakeAsync(() => {
-      const fixture = createComponent(LazyMenuWithContext, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: enabled ? 'enabled' : 'disabled'}]);
-      fixture.detectChanges();
-      const {triggerOne, triggerTwo} = fixture.componentInstance;
-      triggerOne.openMenu(); fixture.detectChanges(); tick(0); fixture.detectChanges();
-      expect(overlayContainerElement.querySelector('.mat-menu-panel [mat-menu-item]')!.textContent!.trim()).toBe('one');
-      triggerTwo.openMenu(); fixture.detectChanges(); tick(0); fixture.detectChanges();
-      expect(triggerOne.menuOpen).toBeFalse();
-      expect(triggerTwo.menuOpen).toBeTrue();
-      expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);
-      expect(overlayContainerElement.querySelector('.mat-menu-panel [mat-menu-item]')!.textContent!.trim()).toBe('two');
-      tick(500); fixture.detectChanges();
-      expect(triggerTwo.menuOpen).toBeTrue();
-      expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);
-      triggerTwo.closeMenu(); fixture.detectChanges(); tick(500); fixture.detectChanges();
-      expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeFalsy();
-      fixture.destroy(); tick(500);
-    }));
-  }
-
-  for (const enabled of [true, false]) {
-    it(`keeps an empty shared menu rendered through enter, transfer and exit (motion ${enabled})`, fakeAsync(() => {
-      const fixture = createComponent(EmptySharedMenu, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: enabled ? 'enabled' : 'disabled'}]);
-      fixture.detectChanges();
-      const {first, second} = fixture.componentInstance;
-      first.openMenu(); fixture.detectChanges(); tick(0); fixture.detectChanges();
-      let panel = overlayContainerElement.querySelector('.mat-menu-panel') as HTMLElement;
-      expect(panel).toBeTruthy();
-      expect(panel.querySelector('.mat-menu-content')!.matches(':empty')).toBeTrue();
-      if (enabled) {
-        panel.dispatchEvent(new AnimationEvent('animationstart', {animationName: 'mat-legacy-menu-enter'}));
-        fixture.detectChanges();
-        expect(getComputedStyle(panel).display).not.toBe('none');
-        expect(getComputedStyle(panel).pointerEvents).toBe('none');
-        panel.classList.add('ng-animating');
-        expect(getComputedStyle(panel).display).not.toBe('none');
-        expect(getComputedStyle(panel).pointerEvents).toBe('none');
-        panel.classList.remove('ng-animating');
-        panel.dispatchEvent(new AnimationEvent('animationend', {animationName: 'mat-legacy-menu-enter'}));
-        fixture.detectChanges();
-      }
-      expect(first.menuOpen).toBeTrue();
-      first.closeMenu(); fixture.detectChanges();
-      if (enabled) {
-        panel.dispatchEvent(new AnimationEvent('animationstart', {animationName: 'mat-legacy-menu-exit'}));
-        fixture.detectChanges();
-        expect(getComputedStyle(panel).display).not.toBe('none');
-      }
-      second.openMenu(); fixture.detectChanges(); tick(0); fixture.detectChanges();
-      expect(first.menuOpen).toBeFalse();
-      expect(second.menuOpen).toBeTrue();
-      expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);
-      panel = overlayContainerElement.querySelector('.mat-menu-panel') as HTMLElement;
-      if (enabled) {
-        panel.dispatchEvent(new AnimationEvent('animationstart', {animationName: 'mat-legacy-menu-enter'}));
-        fixture.detectChanges();
-        expect(getComputedStyle(panel).display).not.toBe('none');
-        panel.dispatchEvent(new AnimationEvent('animationend', {animationName: 'mat-legacy-menu-enter'}));
-        fixture.detectChanges();
-      }
-      second.closeMenu(); fixture.detectChanges();
-      if (enabled) panel.dispatchEvent(new AnimationEvent('animationend', {animationName: 'mat-legacy-menu-exit'}));
-      tick(500); fixture.detectChanges();
-      expect(second.menuOpen).toBeFalse();
-      expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeFalsy();
-      fixture.destroy(); tick(500);
-    }));
-  }
-
   it('uses standard pressed-button masks in its mouse fixtures', () => {
     for (const [button, buttons] of [[0, 1], [1, 4], [2, 2], [3, 8], [4, 16]]) {
       const event = createMouseEvent('mousedown', 50, 100, undefined, undefined, button);
@@ -2274,8 +2140,7 @@ describe('MatMenu', () => {
       },
     ];
 
-    for (const motion of cases) {
-      it(`keeps backdrop policy and lifecycle coherent with ${motion.name}`, fakeAsync(() => {
+    function verifyBackdrop(motion: (typeof cases)[number]) {
         const fixture = createComponent(SimpleMenu, motion.providers, [FakeIcon]);
         fixture.detectChanges();
         const {trigger, menu} = fixture.componentInstance;
@@ -2303,8 +2168,11 @@ describe('MatMenu', () => {
         expect(overlayContainerElement.querySelector('.cdk-overlay-backdrop')).toBeFalsy();
         // Destroying the trigger does not emit a second menuClosed output.
         expect(events).toEqual(['open', 'close', 'open']);
-      }));
     }
+    it('keeps backdrop policy and lifecycle coherent with enabled animations', fakeAsync(() => verifyBackdrop(cases[0])));
+    it('keeps backdrop policy and lifecycle coherent with disabled Material animations', fakeAsync(() => verifyBackdrop(cases[1])));
+    it('keeps backdrop policy and lifecycle coherent with Noop animations', fakeAsync(() => verifyBackdrop(cases[2])));
+    it('keeps backdrop policy and lifecycle coherent with reduced motion', fakeAsync(() => verifyBackdrop(cases[3])));
   });
 
   it('keeps peer backdrop defaults for a custom menu panel', fakeAsync(() => {
@@ -3868,3 +3736,163 @@ class EmptySharedMenu {
  @ViewChild('first') first: MatLegacyMenuTrigger;
  @ViewChild('second') second: MatLegacyMenuTrigger;
 }
+
+describe('MatMenu', () => {
+  let overlayContainerElement: HTMLElement;
+  let focusMonitor: FocusMonitor;
+  let viewportRuler: ViewportRuler;
+
+  function createComponent<T>(
+    component: Type<T>,
+    providers: Provider[] = [],
+    declarations: any[] = [],
+  ): ComponentFixture<T> {
+    TestBed.configureTestingModule({
+      imports: [MatLegacyMenuModule],
+      declarations: [component, ...declarations],
+      providers: [LEGACY_NOOP_ANIMATIONS, ...providers],
+    }).compileComponents();
+
+    overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();
+    focusMonitor = TestBed.inject(FocusMonitor);
+    viewportRuler = TestBed.inject(ViewportRuler);
+    const fixture = TestBed.createComponent<T>(component);
+    window.scroll(0, 0);
+    return fixture;
+  }
+
+  it('keeps an empty panel visible through native CSS enter completion', async () => {
+    const fixture = createComponent(EmptySharedMenu, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}]);
+    fixture.autoDetectChanges();
+    fixture.componentInstance.first.openMenu(); fixture.detectChanges();
+    const panel = overlayContainerElement.querySelector('.mat-menu-panel') as HTMLElement | null;
+    expect(panel).toBeTruthy();
+    if (!panel) { fixture.destroy(); return; }
+    const started = waitForMenuAnimation(panel, 'animationstart', 'mat-legacy-menu-enter');
+    const ended = waitForMenuAnimation(panel, 'animationend', 'mat-legacy-menu-enter');
+    expect(await started).toBeTrue(); fixture.detectChanges();
+    expect(getComputedStyle(panel).display).not.toBe('none');
+    expect(await ended).toBeTrue(); fixture.detectChanges();
+    expect(panel.classList.contains('mat-menu-panel-animating')).toBeFalse();
+    expect(fixture.componentInstance.first.menuOpen).toBeTrue();
+    fixture.destroy();
+  });
+
+  for (const enabled of [true, false]) {
+    it(`completes real empty-menu exit and shared-trigger reopen (motion ${enabled})`, async () => {
+      const fixture = createComponent(EmptySharedMenu, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: enabled ? 'enabled' : 'disabled'}]);
+      fixture.autoDetectChanges();
+      const {first, second} = fixture.componentInstance;
+      first.openMenu(); fixture.detectChanges();
+      const firstPanel = overlayContainerElement.querySelector('.mat-menu-panel') as HTMLElement | null;
+      expect(firstPanel).toBeTruthy();
+      if (!firstPanel) { fixture.destroy(); return; }
+      if (enabled) {
+        const entered = await waitForMenuAnimation(firstPanel, 'animationend', 'mat-legacy-menu-enter');
+        expect(entered).toBeTrue();
+        if (!entered) { fixture.destroy(); return; }
+        fixture.detectChanges();
+      } else { await Promise.resolve(); fixture.detectChanges(); }
+      expect(first.menuOpen).toBeTrue();
+      const exitStart = enabled ? waitForMenuAnimation(firstPanel, 'animationstart', 'mat-legacy-menu-exit') : null;
+      first.closeMenu(); fixture.detectChanges();
+      if (exitStart) {
+        const exiting = await exitStart;
+        expect(exiting).toBeTrue();
+        if (!exiting) { fixture.destroy(); return; }
+        fixture.detectChanges();
+        expect(firstPanel.isConnected).toBeTrue();
+        expect(getComputedStyle(firstPanel).display).not.toBe('none');
+      }
+      second.openMenu(); fixture.detectChanges();
+      const current = overlayContainerElement.querySelector('.mat-menu-panel') as HTMLElement | null;
+      expect(current).toBeTruthy();
+      if (!current) { fixture.destroy(); return; }
+      if (enabled) {
+        const reopened = await waitForMenuAnimation(current, 'animationend', 'mat-legacy-menu-enter');
+        expect(reopened).toBeTrue();
+        if (!reopened) { fixture.destroy(); return; }
+        fixture.detectChanges();
+      } else { await Promise.resolve(); fixture.detectChanges(); }
+      expect(first.menuOpen).toBeFalse();
+      expect(second.menuOpen).toBeTrue();
+      expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);
+      expect(getComputedStyle(current).display).not.toBe('none');
+      expect(current.classList.contains('mat-menu-panel-animating')).toBeFalse();
+      second.closeMenu(); fixture.detectChanges();
+      expect(await waitForMenuRemoval(overlayContainerElement)).toBeTrue();
+      fixture.destroy();
+    });
+  }
+
+  for (const enabled of [true, false]) {
+    it(`transfers one populated lazy menu immediately without stale exit (motion ${enabled})`, fakeAsync(() => {
+      const fixture = createComponent(LazyMenuWithContext, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: enabled ? 'enabled' : 'disabled'}]);
+      fixture.detectChanges();
+      const {triggerOne, triggerTwo} = fixture.componentInstance;
+      triggerOne.openMenu(); fixture.detectChanges(); tick(0); fixture.detectChanges();
+      expect(overlayContainerElement.querySelector('.mat-menu-panel [mat-menu-item]')!.textContent!.trim()).toBe('one');
+      triggerTwo.openMenu(); fixture.detectChanges(); tick(0); fixture.detectChanges();
+      expect(triggerOne.menuOpen).toBeFalse();
+      expect(triggerTwo.menuOpen).toBeTrue();
+      expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);
+      expect(overlayContainerElement.querySelector('.mat-menu-panel [mat-menu-item]')!.textContent!.trim()).toBe('two');
+      tick(500); fixture.detectChanges();
+      expect(triggerTwo.menuOpen).toBeTrue();
+      expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);
+      triggerTwo.closeMenu(); fixture.detectChanges(); tick(500); fixture.detectChanges();
+      expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeFalsy();
+      fixture.destroy(); tick(500);
+    }));
+  }
+
+  for (const enabled of [true, false]) {
+    it(`keeps an empty shared menu rendered through enter, transfer and exit (motion ${enabled})`, fakeAsync(() => {
+      const fixture = createComponent(EmptySharedMenu, [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: enabled ? 'enabled' : 'disabled'}]);
+      fixture.detectChanges();
+      const {first, second} = fixture.componentInstance;
+      first.openMenu(); fixture.detectChanges(); tick(0); fixture.detectChanges();
+      let panel = overlayContainerElement.querySelector('.mat-menu-panel') as HTMLElement;
+      expect(panel).toBeTruthy();
+      expect(panel.querySelector('.mat-menu-content')!.matches(':empty')).toBeTrue();
+      if (enabled) {
+        panel.dispatchEvent(new AnimationEvent('animationstart', {animationName: 'mat-legacy-menu-enter'}));
+        fixture.detectChanges();
+        expect(getComputedStyle(panel).display).not.toBe('none');
+        expect(getComputedStyle(panel).pointerEvents).toBe('none');
+        panel.classList.add('ng-animating');
+        expect(getComputedStyle(panel).display).not.toBe('none');
+        expect(getComputedStyle(panel).pointerEvents).toBe('none');
+        panel.classList.remove('ng-animating');
+        panel.dispatchEvent(new AnimationEvent('animationend', {animationName: 'mat-legacy-menu-enter'}));
+        fixture.detectChanges();
+      }
+      expect(first.menuOpen).toBeTrue();
+      first.closeMenu(); fixture.detectChanges();
+      if (enabled) {
+        panel.dispatchEvent(new AnimationEvent('animationstart', {animationName: 'mat-legacy-menu-exit'}));
+        fixture.detectChanges();
+        expect(getComputedStyle(panel).display).not.toBe('none');
+      }
+      second.openMenu(); fixture.detectChanges(); tick(0); fixture.detectChanges();
+      expect(first.menuOpen).toBeFalse();
+      expect(second.menuOpen).toBeTrue();
+      expect(overlayContainerElement.querySelectorAll('.mat-menu-panel').length).toBe(1);
+      panel = overlayContainerElement.querySelector('.mat-menu-panel') as HTMLElement;
+      if (enabled) {
+        panel.dispatchEvent(new AnimationEvent('animationstart', {animationName: 'mat-legacy-menu-enter'}));
+        fixture.detectChanges();
+        expect(getComputedStyle(panel).display).not.toBe('none');
+        panel.dispatchEvent(new AnimationEvent('animationend', {animationName: 'mat-legacy-menu-enter'}));
+        fixture.detectChanges();
+      }
+      second.closeMenu(); fixture.detectChanges();
+      if (enabled) panel.dispatchEvent(new AnimationEvent('animationend', {animationName: 'mat-legacy-menu-exit'}));
+      tick(500); fixture.detectChanges();
+      expect(second.menuOpen).toBeFalse();
+      expect(overlayContainerElement.querySelector('.mat-menu-panel')).toBeFalsy();
+      fixture.destroy(); tick(500);
+    }));
+  }
+
+});

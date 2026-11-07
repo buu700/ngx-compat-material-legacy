@@ -1,0 +1,271 @@
+{
+  "schema_version": 1,
+  "role": "Root integration of static new test registration and unique new radio titles",
+  "parent": "1bebeb934f5aee90e29a002f097e610ce6b4cdda",
+  "manifest_sha256": "053d7c62ebda47c4c16b67d47ad6aeeb85c54f1d55edc9ddb12b7743c2c821d0",
+  "manifest": {
+    "status": "proposed-test-only-independent-review-pending",
+    "base": "0d7ca9de354a974520a7ecc76607a2827befa57d",
+    "post_base_shared_changes": "canonical HEAD may have advanced; all 3 input spec bytes and runner inputs compared unchanged at proposal generation",
+    "patch_sha256": "aa65a0cf95904fc8603079f0cf0321b722e58bd614aa39f45662d3b0074a08eb",
+    "files": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+        "before_sha256": "1839ef39b9d26b5880e11e29eeb6fe7b755390de73cf8c4bc71b8590875ae2ff",
+        "after_sha256": "1f6c9025f1b04dc994e5e77247399546a2464c2281a01a46adeb50c828322321"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-radio/radio.spec.ts",
+        "before_sha256": "bb7915b4ba5e8572812c3666574393e8e702c8e22e0f085df97e01aa419f573b",
+        "after_sha256": "4897dbf9ce0d43529ab63be314d9454363d030a7e2f8f2fafea5119b30088959"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.spec.ts",
+        "before_sha256": "1ebd053b92ac0942eb718f8e437c784bf68368d815d4ae02fabe48f961f9c653",
+        "after_sha256": "6acb9f051a7bb4426f130e90e09f675348b8ed4027a64ec5985d8c8378a34a75"
+      }
+    ],
+    "runner_sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e",
+    "baseline_failure": {
+      "path": "baseline-failure.log",
+      "sha256": "db79d0dc66d0dbe3c71c640cf1b98f9c57f0fe1633a596faf5dd3d99aea48c9f",
+      "result": "non-static registration loop: opaque backdrop case objects"
+    },
+    "baseline_comparison": {
+      "reference_commit": "782197ecc",
+      "cases": 2292,
+      "method": "782 spec snapshots, solely opaque backdrop loop expressed as four same-name same-body static registrations because untouched baseline cannot be statically derived; other 54 spec paths unchanged since 782",
+      "original_ids_and_names_changed": 0,
+      "candidate_cases": 2315,
+      "candidate_unique_ids": 2315,
+      "inventory_paths": 57
+    },
+    "changes": [
+      "Move seven new menu tests to a second same-name suite after all historical suites, preserving their full names and original test bodies.",
+      "Replace the pre-existing backdrop object-array registration with four static exact-name cases calling the identical body.",
+      "Move seven new progress default-token cases after historical registrations; replace token tuple loop with four exact-name static cases and identical helper bodies.",
+      "Replace two identically titled new radio host cases with distinct static names while retaining both host inputs and same assertion body."
+    ],
+    "assertion_ast_comparison": {
+      "method": "TypeScript AST multiset of expect(...) expression text, whitespace ignored",
+      "menu": {
+        "before": 405,
+        "after": 405,
+        "equal": true
+      },
+      "radio": {
+        "before": 206,
+        "after": 206,
+        "equal": true
+      },
+      "progress_bar": {
+        "before": 58,
+        "after": 58,
+        "equal": true
+      }
+    },
+    "preexisting_duplicate_full_names": [
+      {
+        "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "full_name": "MatAutocomplete > keyboard events > should set the active item properly after filtering",
+        "count": 2
+      },
+      {
+        "candidate": "projects/ngx-material-legacy/legacy-autocomplete/testing/autocomplete-harness.spec.ts",
+        "full_name": "Non-MDC-based MatAutocompleteHarness > should be able to get the autocomplete panel groups",
+        "count": 2
+      },
+      {
+        "candidate": "projects/ngx-material-legacy/legacy-button/testing/button-harness.spec.ts",
+        "full_name": "Non-MDC-based MatLegacyButtonHarness > should load all button harnesses",
+        "count": 2
+      },
+      {
+        "candidate": "projects/ngx-material-legacy/legacy-list/selection-list.spec.ts",
+        "full_name": "MatSelectionList with forms > and ngModel > should not dispatch the model change event if nothing changed using selectAll",
+        "count": 2
+      }
+    ],
+    "duplicate_note": "Four repeated full names existed in the compared baseline; preserved unchanged. Case IDs remain unique by path/index, and reporter sequence is matched, not deduplicated. The new radio duplicate is removed.",
+    "negative_controls": {
+      "positive": true,
+      "negatives": [
+        {
+          "case_id": "historical-legacy-artifact/discovery-negatives/missing-path",
+          "result": "pass",
+          "rejection": "missing-path",
+          "observed_reasons": [
+            "missing-path"
+          ]
+        },
+        {
+          "case_id": "historical-legacy-artifact/discovery-negatives/forged-id",
+          "result": "pass",
+          "rejection": "forged-id",
+          "observed_reasons": [
+            "forged-id",
+            "missing-path"
+          ]
+        },
+        {
+          "case_id": "historical-legacy-artifact/discovery-negatives/aggregate-only-success",
+          "result": "pass",
+          "rejection": "aggregate-only-success",
+          "observed_reasons": [
+            "aggregate-only-success",
+            "missing-path"
+          ]
+        },
+        {
+          "case_id": "historical-legacy-artifact/discovery-negatives/dirty-source",
+          "result": "pass",
+          "rejection": "dirty-source",
+          "observed_reasons": [
+            "dirty-source"
+          ]
+        },
+        {
+          "case_id": "historical-legacy-artifact/discovery-negatives/unbound-artifact",
+          "result": "pass",
+          "rejection": "unbound-artifact",
+          "observed_reasons": [
+            "unbound-artifact"
+          ]
+        }
+      ],
+      "duplicate_observation_rejection": [
+        "missing-path"
+      ]
+    },
+    "duplicate_id_negative": {
+      "exit_code": 1,
+      "observed": "derived historical case ids are not unique",
+      "log_sha256": "a4a99d544da41780007abe31a4b2ec55dbd2721da044c7ddf7ba564b0084a1b5"
+    },
+    "packed_test_subject": "2cf96975b6f6adaa83a8bf42f99a756f34bbdd7166ea899120f5605c66f8bffb",
+    "targeted_family_reports": [
+      {
+        "family": "menu",
+        "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/test-registry-static-v1/tree/artifacts/main/copied-broad/reports/legacy-menu-20261107T173401Z.json",
+        "sha256": "f58186376eab3fa3fde1d072b2bfc87fbfa6b1a777b067dc782a11ce258c70bf",
+        "artifact_sha256": "2cf96975b6f6adaa83a8bf42f99a756f34bbdd7166ea899120f5605c66f8bffb",
+        "totals": {
+          "executed": 176,
+          "passed": 176,
+          "failed": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "family": "radio",
+        "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/test-registry-static-v1/tree/artifacts/main/copied-broad/reports/legacy-radio-20261107T173419Z.json",
+        "sha256": "649c5930a0a91e0389bf06187af9794b2c3c669951255ec7a27a56b69e471c63",
+        "artifact_sha256": "2cf96975b6f6adaa83a8bf42f99a756f34bbdd7166ea899120f5605c66f8bffb",
+        "totals": {
+          "executed": 99,
+          "passed": 99,
+          "failed": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "family": "progress-bar",
+        "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/test-registry-static-v1/tree/artifacts/main/copied-broad/reports/legacy-progress-bar-20261107T173434Z.json",
+        "sha256": "0a496684524e990858177e495a949e112a1a083b494635d09928deb07e155b26",
+        "artifact_sha256": "2cf96975b6f6adaa83a8bf42f99a756f34bbdd7166ea899120f5605c66f8bffb",
+        "totals": {
+          "executed": 31,
+          "passed": 31,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    ],
+    "reporter_comparison": "Derived names/order exactly match fresh menu 174, radio 97 and progress-bar 29 non-control reporter cases; multiset comparison vs original broad observations differs only in two newly unique radio names.",
+    "limits": [
+      "Derivation and synthetic binder negative controls do not establish a full artifact suite pass.",
+      "Three family reruns use copied frozen broad artifact, not current HEAD pack.",
+      "Source test hashes changed; any bound inventory/source proof must be separately succeeded by its owner.",
+      "Original baseline failure retained; parser, original oracles, inventory and historical case goldens unchanged."
+    ]
+  },
+  "independent_review": {
+    "sha256": "ed30c26749d538901d59e7947d2cc148d0a99080a5f681c0de6e23a5bff57ea2",
+    "text": "# Independent test-integrity review\n\nReviewed `../static-registrations-v1.patch` SHA-256 `aa65a0cf95904fc8603079f0cf0321b722e58bd614aa39f45662d3b0074a08eb` and `../manifest-v1.json` SHA-256 `053d7c62ebda47c4c16b67d47ad6aeeb85c54f1d55edc9ddb12b7743c2c821d0`, against canonical source `1bebeb934f5aee90e29a002f097e610ce6b4cdda`. No canonical writes or remote operations.\n\nNo blocking finding in the bounded review. Patch touches only menu, radio, and progress-bar specs. It relocates newer suites to preserve historical index order and turns opaque registration loops into static cases calling the same bodies; radio's two new identical names become distinct while both host inputs remain. Inspection of the extracted body transformations and independent TypeScript AST comparison of all `expect(...)` expressions found equal multisets: menu 405, radio 206, progress 58. This comparison alone cannot prove semantic equivalence; the code and helper arguments were also inspected.\n\nIndependently derived the candidate roster using isolated copies of scripts and fixture source: 2,315 cases, 2,315 distinct IDs, 57 inventory paths; exact case records matched the frozen candidate roster. All 2,292 IDs and names from the comparison baseline were preserved, and the 54 other inventory paths were byte-identical to commit `782197ecc`. The three baseline files match `782197ecc` except the menu's one opaque backdrop loop, normalized only in the comparison to four same-order same-name static helper calls; the original baseline failure is retained and a direct untouched-baseline static roster was not available. Four duplicate names predate the proposal and were preserved; unique IDs are path/index based.\n\nRe-ran synthetic positive and all five discovery negatives, plus duplicate observation rejection; all behaved as reported. Verified report hashes, copied-artifact SHA `2cf96975b6f6adaa83a8bf42f99a756f34bbdd7166ea899120f5605c66f8bffb`, and all-pass totals 176/99/31 for menu/radio/progress. Their non-control reporter sequences exactly match corresponding derived roster names in order (174/97/29). These are author-produced copied-artifact reports, not independent browser reruns or a current-HEAD pack.\n\nStrict application succeeded to current source, followed by ARIA patch `../../radio-aria-eba6/radio-aria-fix.patch`, SHA-256 `ec6e838c8083b6086c2b9e889073e35c8fec25d97a70b7adde0707988353030d`. Re-derivation of combined source yielded 2,316 unique IDs across 57 paths and no changed pre-existing ID/name. Combined type check was not run. Source binding refresh, full artifact suite, and independent browser execution remain outside this review.\n"
+  },
+  "root_checks": {
+    "strict_whitespace_apply": true,
+    "all3afterimages_match": true,
+    "retained_3_family_report_hashes_match": true,
+    "actual_current_static_derivation": {
+      "node": "v24.21.0",
+      "cases": 2315,
+      "unique_ids": 2315,
+      "paths": 57
+    },
+    "actual_registration_oracle_probe": {
+      "genuine_jasmine_registration_fixtures": 9,
+      "registered_names": 20,
+      "negative_controls": 14,
+      "exit": 0
+    },
+    "actual_synthetic_binder_controls": {
+      "role": "Synthetic binder controls, no browser/artifact execution",
+      "cases": 2315,
+      "paths": 57,
+      "ids_unique": true,
+      "negatives": [
+        {
+          "case_id": "historical-legacy-artifact/discovery-negatives/missing-path",
+          "result": "pass",
+          "rejection": "missing-path",
+          "observed_reasons": [
+            "missing-path"
+          ]
+        },
+        {
+          "case_id": "historical-legacy-artifact/discovery-negatives/forged-id",
+          "result": "pass",
+          "rejection": "forged-id",
+          "observed_reasons": [
+            "forged-id",
+            "missing-path"
+          ]
+        },
+        {
+          "case_id": "historical-legacy-artifact/discovery-negatives/aggregate-only-success",
+          "result": "pass",
+          "rejection": "aggregate-only-success",
+          "observed_reasons": [
+            "aggregate-only-success",
+            "missing-path"
+          ]
+        },
+        {
+          "case_id": "historical-legacy-artifact/discovery-negatives/dirty-source",
+          "result": "pass",
+          "rejection": "dirty-source",
+          "observed_reasons": [
+            "dirty-source"
+          ]
+        },
+        {
+          "case_id": "historical-legacy-artifact/discovery-negatives/unbound-artifact",
+          "result": "pass",
+          "rejection": "unbound-artifact",
+          "observed_reasons": [
+            "unbound-artifact"
+          ]
+        }
+      ]
+    }
+  },
+  "limits": [
+    "No parser/product implementation/golden/original registry edit. Four preexisting repeated full names preserved; path/index case IDs remain unique.",
+    "2292 baseline case-name/ID comparison is against782 source with one opaque preexisting menu loop normalized solely for comparison, not untouched-tag execution or completion of A03 audit.",
+    "Actual affected-family menu176/radio99/progress31 retained prior runs on frozen2cf; root did not rerun browser families at this integration.",
+    "Three source/spec hashes change; bound candidate inventory/source reviews and full current roster evidence must be refreshed.",
+    "Existing historical_roster_reconciliation_probe has an older fixed2228 requirement and is not claimed passing; its finite current-source successor remains separate.",
+    "Pending ARIA/option/autocomplete test additions may increase currentderivedcasepopulation; no G01-G13/full historical reconciliation or release claim."
+  ]
+}

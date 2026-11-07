@@ -1209,7 +1209,7 @@ class RadioTouchOnPush {
 })
 class RadioTouchOnPushHost {}
 
-import {Directive, ElementRef, ChangeDetectorRef, forwardRef} from '@angular/core';
+import {Directive, ElementRef, ChangeDetectorRef, Type, forwardRef} from '@angular/core';
 import {FocusMonitor} from '@angular/cdk/a11y';
 import {UniqueSelectionDispatcher} from '@angular/cdk/collections';
 import {MAT_RADIO_GROUP, MatRadioButton as CurrentRadioButton, MatRadioGroup as CurrentRadioGroup, MatRadioModule as CurrentRadioModule} from '@angular/material/radio';
@@ -1243,8 +1243,7 @@ describe('legacy radio group ownership boundary', () => {
   it('retains the public shared token identity', () => {
     expect(MAT_LEGACY_RADIO_GROUP).toBe(MAT_RADIO_GROUP);
   });
-  for (const Host of [ForeignBoundaryHost, NestedBoundaryHost]) {
-    it('does not invoke a nearer current group or associate with an outer legacy group', fakeAsync(() => {
+  function verifyForeignGroupBoundary(Host: Type<any>) {
       TestBed.configureTestingModule({imports: [Host]});
       const fixture = TestBed.createComponent(Host); fixture.detectChanges(); tick(); fixture.detectChanges();
       const group = fixture.debugElement.query(By.directive(CurrentRadioGroup)).injector.get(CurrentRadioGroup) as any;
@@ -1258,8 +1257,9 @@ describe('legacy radio group ownership boundary', () => {
       expect(cva).not.toHaveBeenCalled(); expect(emit).not.toHaveBeenCalled(); expect(touch).not.toHaveBeenCalled();
       expect(buttons.map(node => node.componentInstance.radioGroup)).toEqual([null, null]);
       fixture.destroy();
-    }));
   }
+  it('ignores a nearer current group', fakeAsync(() => verifyForeignGroupBoundary(ForeignBoundaryHost)));
+  it('ignores a nearer current group and an outer legacy group', fakeAsync(() => verifyForeignGroupBoundary(NestedBoundaryHost)));
   it('preserves owned subclass grouping, CVA, change and touch through the historic token', fakeAsync(() => {
     TestBed.configureTestingModule({imports: [OwnedCustomGroupHost]});
     const fixture = TestBed.createComponent(OwnedCustomGroupHost); fixture.detectChanges();
