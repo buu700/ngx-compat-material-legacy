@@ -12,7 +12,6 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  HostListener,
   Inject,
   InjectionToken,
   Optional,
@@ -65,6 +64,7 @@ export const MAT_LEGACY_PAGINATOR_DEFAULT_OPTIONS =
   host: {
     'class': 'mat-paginator',
     'role': 'group',
+    '(click)': '_handlePageSizeTargetClick($event)',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
@@ -77,7 +77,6 @@ export class MatLegacyPaginator extends _MatPaginatorBase<MatLegacyPaginatorDefa
   @ViewChild(MatLegacySelect, {read: ElementRef}) private _pageSizeSelectElement?: ElementRef<HTMLElement>;
 
   /** Extend the page-size pointer target without changing the historical field layout. */
-  @HostListener('click', ['$event'])
   protected _handlePageSizeTargetClick(event: MouseEvent): void {
     const select = this._pageSizeSelect;
     const element = this._pageSizeSelectElement?.nativeElement;
