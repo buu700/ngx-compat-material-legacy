@@ -36,6 +36,21 @@ const isBazel=path=>path.endsWith('.bazel')||path.endsWith('.bzl')||path==='.baz
 export function buildScopeEvidenceOk(body,entry,readRepo,currentProductPaths) {
   try {
     assert.equal(body.role,BUILD_SCOPE_ROLE);assert.equal(body.g11_claim,'not-passed');
+    const mainOnly=body.scope_format==='main-source-scope-v1';
+    if(mainOnly){
+      assert.equal(body.line,'main');assert.equal(body.sealed,true);
+      assert.equal(entry.evidence_report,'compatibility/rc/packed-upstream-source-build-main-e184.json');
+      const reportBytes=readRepo(entry.evidence_report);assert.equal(hash(reportBytes),'ffe8ee63051473d9adf28142e30dcbaddb5ed156f71de92a8e1dc2e43efbed6d');
+      assert.deepEqual(body,JSON.parse(reportBytes));
+      assert.equal(hash(readRepo(body.focus_source_review.path)),body.focus_source_review.sha256);
+      for(const record of body.additional_graph_context.files){const bytes=readRepo(record.path);assert.equal(hash(bytes),record.sha256);assert.equal(bytes.length,record.bytes);}
+      assert.equal(hash(readRepo('compatibility/rc/packed-upstream-source-build.json')),'6f3aba8e78c495c6e95250736f1b70e87c896938973410a6604dc3ed43678be8');
+      assert.equal(hash(readRepo('compatibility/rc/packed-upstream-source-build-main-e184-prior-rows.json')),'2b5cba41846e6685a18a1a130f6ad083251b5e2124e58079047ecd1786145d07');
+      const deltaBytes=readRepo('compatibility/rc/packed-upstream-source-build-main-e184-ledger-delta.json');assert.equal(hash(deltaBytes),'964baf4c85bc75e5cd33962482911776e3d7277bc882f7d2921cc76322cd7b62');
+      const registered=JSON.parse(deltaBytes).rows.filter(row=>row.sha===entry.sha);
+      assert.equal(registered.length,1);assert.deepEqual(entry,registered[0]);
+    } else assert.equal(body.scope_format,undefined);
+    const branches=mainOnly?['main']:['main','21.x'];
     assert.equal(hash(readRepo(entry.evidence_report)),entry.source_check.evidence_report_sha256);
     assert.deepEqual([...body.scope_sha_ids].sort(),Object.keys(BUILD_SCOPE_PATCHES).sort());
     assert.equal(body.reviews.length,14);assert.equal(new Set(body.reviews.map(r=>r.sha)).size,14);
@@ -70,8 +85,8 @@ export function buildScopeEvidenceOk(body,entry,readRepo,currentProductPaths) {
     assert.equal(hash(commit),review.upstream_commit_object_sha256);
     assert.equal(createHash('sha1').update(Buffer.from('commit '+commit.length+'\0')).update(commit).digest('hex'),entry.sha);
     assert.equal(entry.final_disposition,'not-applicable');assert.equal(review.final_disposition,entry.final_disposition);
-    assert.deepEqual(entry.files,paths);assert.deepEqual(review.affected_branches,['main','21.x']);
-    assert.deepEqual(entry.individual_proof,{diff_sha256:review.diff_sha256,review_depth:'individual-compatibility',proof_kind:'individual-source-scope',affected_branches:['main','21.x'],decision:review.decision});
+    assert.deepEqual(entry.files,paths);assert.deepEqual(review.affected_branches,branches);
+    assert.deepEqual(entry.individual_proof,{diff_sha256:review.diff_sha256,review_depth:'individual-compatibility',proof_kind:'individual-source-scope',affected_branches:branches,decision:review.decision});
     assert.equal(entry.reason,review.decision);assert.equal(entry.source_check.patch_path,review.patch_file);
     assert.equal(entry.source_check.review_membership,entry.sha);
     return true;
