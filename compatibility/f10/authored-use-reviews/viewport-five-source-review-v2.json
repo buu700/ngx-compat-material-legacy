@@ -1,0 +1,450 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "recorded_at_utc": "2026-11-07T19:10:45Z",
+  "source_checkpoint": "73bc0ee8c6f26d4f2a6b906109faecefcbd67dcf",
+  "scope": "Five frozen authored-use keys for @angular/cdk/scrolling:ViewportRuler. Current owned binding/source review plus narrowly relevant packed viewport context; no all-use or G11 claim.",
+  "criteria": "Exact source binding and constructor role for each key; preserve prior per-use judgment; qualify fixture delta as unrelated to viewport semantics; use only actual viewport assertions and same-artifact RxJS 6.5.3 receipt.",
+  "predecessor": {
+    "path": "compatibility/f10/authored-use-reviews/dialog-snack-current-source-successor-v1.json",
+    "sha256": "ae745097bef50138fb988e96d9d7bc905144c1312931a8fec81cbd2c3ea75176",
+    "unchanged": true
+  },
+  "reviews": [
+    {
+      "file": "legacy-tabs/tab-header.ts",
+      "module": "@angular/cdk/scrolling",
+      "symbol": "ViewportRuler",
+      "candidate_source_sha256": "650d50f3007c67c0c4aa9fa6e63b0fe6f246d7443fcb9967d5943c1fd7e90f9a",
+      "conclusion": "owned-replacement",
+      "reviewer": "Codex primary source reviewer",
+      "source_binding": {
+        "module": "@angular/cdk/scrolling",
+        "symbol": "ViewportRuler",
+        "file": "legacy-tabs/tab-header.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "650d50f3007c67c0c4aa9fa6e63b0fe6f246d7443fcb9967d5943c1fd7e90f9a",
+        "references": [
+          {
+            "line": 67,
+            "parameter": "viewportRuler"
+          }
+        ],
+        "forwarding": [
+          {
+            "argument_index": 2,
+            "expression": "super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode)"
+          }
+        ],
+        "owner_class": "MatLegacyTabHeader",
+        "local_name": "ViewportRuler",
+        "replacement": "_LegacyViewport",
+        "replacement_module": "@ngx-compat/material-legacy/legacy-core"
+      },
+      "predecessor": {
+        "path": "compatibility/f10/authored-use-reviews/dialog-snack-current-source-successor-v1.json",
+        "sha256": "ae745097bef50138fb988e96d9d7bc905144c1312931a8fec81cbd2c3ea75176",
+        "key": [
+          "legacy-tabs/tab-header.ts",
+          "@angular/cdk/scrolling",
+          "ViewportRuler"
+        ],
+        "prior_conclusion": "owned-replacement",
+        "prior_source_sha256": "650d50f3007c67c0c4aa9fa6e63b0fe6f246d7443fcb9967d5943c1fd7e90f9a"
+      },
+      "decision": "The local identifier `ViewportRuler` in this source is bound to the imported `_LegacyViewport` alias from the package-owned `legacy-core` entry point. The maintained TypeScript source helper confirms one alias, one constructor type reference, the expected supplied-instance forwarding position where applicable, and no peer `@angular/cdk/scrolling:ViewportRuler` import. The installed peer symbol is documented `@docs-private` in the retained prior source review; this row does not claim it as a stable public API. The fixture correction is an unrelated progress-bar default-token identity assertion (`!==` to `===`) in the packed-consumer producer. It does not alter any viewport source, viewport fixture setup, or viewport assertion semantics. The corrected consumer harness checks that `mat-select` and `mat-tab-header` injector lookups share the same owned `_LegacyViewport` instance and that its width/height match `window.innerWidth`/`window.innerHeight`. The same packed artifact has a retained RxJS 6.5.3 minimum consumer receipt with 106/106 consumer cases. These receipts support only those actual harness observations and do not make a complete `ViewportRuler` behavioral, platform, or G11 claim.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/legacy-viewport-current-structural-diagnostic.json",
+          "sha256": "7e95967e3d959b2a1520b30d83253253dce06d0f304d59d7efffed2e0ceda42f"
+        },
+        {
+          "path": "compatibility/rc/legacy-viewport-declaration-subjects.json",
+          "sha256": "4605caf754661eaa482d5fa640840a021600272244b718fbdf7ab5cd331e65e9"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+          "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+          "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d"
+        },
+        {
+          "path": "scripts/legacy-viewport-use-review.mjs",
+          "sha256": "05f794182f54c2baa80d1198280f80f6638b9430588459be0bb08a6568b3a286"
+        },
+        {
+          "path": "scripts/packed-consumer-aot-smoke.mjs",
+          "sha256": "55e75a9d50255c7393008da3d2d4147b2db0ee50d6f9326d1b85fa967e046746"
+        },
+        {
+          "path": "compatibility/rc/parent-main-progress-token-fixture-review-v1.json",
+          "sha256": "67accae20c6ddce4b2be954a2b22d315332c256bb40dbadba8d0f797524a9340"
+        },
+        {
+          "path": "compatibility/rc/parent-main-rxjs6-floor-qualification-v1.json",
+          "sha256": "2ce57a79790323641a92d68ee75b3fba49c7104b0e5b50f43404af66c17b02ef"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/dialog-snack-current-source-successor-v1.json",
+          "sha256": "ae745097bef50138fb988e96d9d7bc905144c1312931a8fec81cbd2c3ea75176"
+        }
+      ],
+      "source_only_review": true,
+      "fresh_execution_claim": false,
+      "g11_claim": "not-passed"
+    },
+    {
+      "file": "legacy-progress-spinner/progress-spinner.ts",
+      "module": "@angular/cdk/scrolling",
+      "symbol": "ViewportRuler",
+      "candidate_source_sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+      "conclusion": "owned-replacement",
+      "reviewer": "Codex primary source reviewer",
+      "source_binding": {
+        "module": "@angular/cdk/scrolling",
+        "symbol": "ViewportRuler",
+        "file": "legacy-progress-spinner/progress-spinner.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+        "references": [
+          {
+            "line": 195,
+            "parameter": "viewportRuler"
+          }
+        ],
+        "forwarding": [],
+        "owner_class": "MatLegacyProgressSpinner",
+        "local_name": "ViewportRuler",
+        "replacement": "_LegacyViewport",
+        "replacement_module": "@ngx-compat/material-legacy/legacy-core"
+      },
+      "predecessor": {
+        "path": "compatibility/f10/authored-use-reviews/dialog-snack-current-source-successor-v1.json",
+        "sha256": "ae745097bef50138fb988e96d9d7bc905144c1312931a8fec81cbd2c3ea75176",
+        "key": [
+          "legacy-progress-spinner/progress-spinner.ts",
+          "@angular/cdk/scrolling",
+          "ViewportRuler"
+        ],
+        "prior_conclusion": "owned-replacement",
+        "prior_source_sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c"
+      },
+      "decision": "The local identifier `ViewportRuler` in this source is bound to the imported `_LegacyViewport` alias from the package-owned `legacy-core` entry point. The maintained TypeScript source helper confirms one alias, one constructor type reference, the expected supplied-instance forwarding position where applicable, and no peer `@angular/cdk/scrolling:ViewportRuler` import. The installed peer symbol is documented `@docs-private` in the retained prior source review; this row does not claim it as a stable public API. The fixture correction is an unrelated progress-bar default-token identity assertion (`!==` to `===`) in the packed-consumer producer. It does not alter any viewport source, viewport fixture setup, or viewport assertion semantics. The corrected consumer harness checks that `mat-select` and `mat-tab-header` injector lookups share the same owned `_LegacyViewport` instance and that its width/height match `window.innerWidth`/`window.innerHeight`. The same packed artifact has a retained RxJS 6.5.3 minimum consumer receipt with 106/106 consumer cases. These receipts support only those actual harness observations and do not make a complete `ViewportRuler` behavioral, platform, or G11 claim.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/legacy-viewport-current-structural-diagnostic.json",
+          "sha256": "7e95967e3d959b2a1520b30d83253253dce06d0f304d59d7efffed2e0ceda42f"
+        },
+        {
+          "path": "compatibility/rc/legacy-viewport-declaration-subjects.json",
+          "sha256": "4605caf754661eaa482d5fa640840a021600272244b718fbdf7ab5cd331e65e9"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+          "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+          "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d"
+        },
+        {
+          "path": "scripts/legacy-viewport-use-review.mjs",
+          "sha256": "05f794182f54c2baa80d1198280f80f6638b9430588459be0bb08a6568b3a286"
+        },
+        {
+          "path": "scripts/packed-consumer-aot-smoke.mjs",
+          "sha256": "55e75a9d50255c7393008da3d2d4147b2db0ee50d6f9326d1b85fa967e046746"
+        },
+        {
+          "path": "compatibility/rc/parent-main-progress-token-fixture-review-v1.json",
+          "sha256": "67accae20c6ddce4b2be954a2b22d315332c256bb40dbadba8d0f797524a9340"
+        },
+        {
+          "path": "compatibility/rc/parent-main-rxjs6-floor-qualification-v1.json",
+          "sha256": "2ce57a79790323641a92d68ee75b3fba49c7104b0e5b50f43404af66c17b02ef"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/dialog-snack-current-source-successor-v1.json",
+          "sha256": "ae745097bef50138fb988e96d9d7bc905144c1312931a8fec81cbd2c3ea75176"
+        }
+      ],
+      "source_only_review": true,
+      "fresh_execution_claim": false,
+      "g11_claim": "not-passed"
+    },
+    {
+      "file": "legacy-tabs/internal/tab-nav-bar-base.ts",
+      "module": "@angular/cdk/scrolling",
+      "symbol": "ViewportRuler",
+      "candidate_source_sha256": "9205bb2a5b3573e8f21161b03baa04e4b3e868e72d70e06c5dcdf96d2439af36",
+      "conclusion": "owned-replacement",
+      "reviewer": "Codex primary source reviewer",
+      "source_binding": {
+        "module": "@angular/cdk/scrolling",
+        "symbol": "ViewportRuler",
+        "file": "legacy-tabs/internal/tab-nav-bar-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "9205bb2a5b3573e8f21161b03baa04e4b3e868e72d70e06c5dcdf96d2439af36",
+        "references": [
+          {
+            "line": 111,
+            "parameter": "viewportRuler"
+          }
+        ],
+        "forwarding": [
+          {
+            "argument_index": 2,
+            "expression": "super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode)"
+          }
+        ],
+        "owner_class": "_MatTabNavBase",
+        "local_name": "ViewportRuler",
+        "replacement": "_LegacyViewport",
+        "replacement_module": "@ngx-compat/material-legacy/legacy-core"
+      },
+      "predecessor": {
+        "path": "compatibility/f10/authored-use-reviews/dialog-snack-current-source-successor-v1.json",
+        "sha256": "ae745097bef50138fb988e96d9d7bc905144c1312931a8fec81cbd2c3ea75176",
+        "key": [
+          "legacy-tabs/internal/tab-nav-bar-base.ts",
+          "@angular/cdk/scrolling",
+          "ViewportRuler"
+        ],
+        "prior_conclusion": "owned-replacement",
+        "prior_source_sha256": "9205bb2a5b3573e8f21161b03baa04e4b3e868e72d70e06c5dcdf96d2439af36"
+      },
+      "decision": "The local identifier `ViewportRuler` in this source is bound to the imported `_LegacyViewport` alias from the package-owned `legacy-core` entry point. The maintained TypeScript source helper confirms one alias, one constructor type reference, the expected supplied-instance forwarding position where applicable, and no peer `@angular/cdk/scrolling:ViewportRuler` import. The installed peer symbol is documented `@docs-private` in the retained prior source review; this row does not claim it as a stable public API. The fixture correction is an unrelated progress-bar default-token identity assertion (`!==` to `===`) in the packed-consumer producer. It does not alter any viewport source, viewport fixture setup, or viewport assertion semantics. The corrected consumer harness checks that `mat-select` and `mat-tab-header` injector lookups share the same owned `_LegacyViewport` instance and that its width/height match `window.innerWidth`/`window.innerHeight`. The same packed artifact has a retained RxJS 6.5.3 minimum consumer receipt with 106/106 consumer cases. These receipts support only those actual harness observations and do not make a complete `ViewportRuler` behavioral, platform, or G11 claim.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/legacy-viewport-current-structural-diagnostic.json",
+          "sha256": "7e95967e3d959b2a1520b30d83253253dce06d0f304d59d7efffed2e0ceda42f"
+        },
+        {
+          "path": "compatibility/rc/legacy-viewport-declaration-subjects.json",
+          "sha256": "4605caf754661eaa482d5fa640840a021600272244b718fbdf7ab5cd331e65e9"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+          "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+          "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d"
+        },
+        {
+          "path": "scripts/legacy-viewport-use-review.mjs",
+          "sha256": "05f794182f54c2baa80d1198280f80f6638b9430588459be0bb08a6568b3a286"
+        },
+        {
+          "path": "scripts/packed-consumer-aot-smoke.mjs",
+          "sha256": "55e75a9d50255c7393008da3d2d4147b2db0ee50d6f9326d1b85fa967e046746"
+        },
+        {
+          "path": "compatibility/rc/parent-main-progress-token-fixture-review-v1.json",
+          "sha256": "67accae20c6ddce4b2be954a2b22d315332c256bb40dbadba8d0f797524a9340"
+        },
+        {
+          "path": "compatibility/rc/parent-main-rxjs6-floor-qualification-v1.json",
+          "sha256": "2ce57a79790323641a92d68ee75b3fba49c7104b0e5b50f43404af66c17b02ef"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/dialog-snack-current-source-successor-v1.json",
+          "sha256": "ae745097bef50138fb988e96d9d7bc905144c1312931a8fec81cbd2c3ea75176"
+        }
+      ],
+      "source_only_review": true,
+      "fresh_execution_claim": false,
+      "g11_claim": "not-passed"
+    },
+    {
+      "file": "legacy-tabs/internal/tab-header-base.ts",
+      "module": "@angular/cdk/scrolling",
+      "symbol": "ViewportRuler",
+      "candidate_source_sha256": "eb75b2bf760e70744c3c85fee76dd2164cbb6b3242cb47f023300ebad0ce2b7e",
+      "conclusion": "owned-replacement",
+      "reviewer": "Codex primary source reviewer",
+      "source_binding": {
+        "module": "@angular/cdk/scrolling",
+        "symbol": "ViewportRuler",
+        "file": "legacy-tabs/internal/tab-header-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "eb75b2bf760e70744c3c85fee76dd2164cbb6b3242cb47f023300ebad0ce2b7e",
+        "references": [
+          {
+            "line": 53,
+            "parameter": "viewportRuler"
+          }
+        ],
+        "forwarding": [
+          {
+            "argument_index": 2,
+            "expression": "super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode)"
+          }
+        ],
+        "owner_class": "_MatTabHeaderBase",
+        "local_name": "ViewportRuler",
+        "replacement": "_LegacyViewport",
+        "replacement_module": "@ngx-compat/material-legacy/legacy-core"
+      },
+      "predecessor": {
+        "path": "compatibility/f10/authored-use-reviews/dialog-snack-current-source-successor-v1.json",
+        "sha256": "ae745097bef50138fb988e96d9d7bc905144c1312931a8fec81cbd2c3ea75176",
+        "key": [
+          "legacy-tabs/internal/tab-header-base.ts",
+          "@angular/cdk/scrolling",
+          "ViewportRuler"
+        ],
+        "prior_conclusion": "owned-replacement",
+        "prior_source_sha256": "eb75b2bf760e70744c3c85fee76dd2164cbb6b3242cb47f023300ebad0ce2b7e"
+      },
+      "decision": "The local identifier `ViewportRuler` in this source is bound to the imported `_LegacyViewport` alias from the package-owned `legacy-core` entry point. The maintained TypeScript source helper confirms one alias, one constructor type reference, the expected supplied-instance forwarding position where applicable, and no peer `@angular/cdk/scrolling:ViewportRuler` import. The installed peer symbol is documented `@docs-private` in the retained prior source review; this row does not claim it as a stable public API. The fixture correction is an unrelated progress-bar default-token identity assertion (`!==` to `===`) in the packed-consumer producer. It does not alter any viewport source, viewport fixture setup, or viewport assertion semantics. The corrected consumer harness checks that `mat-select` and `mat-tab-header` injector lookups share the same owned `_LegacyViewport` instance and that its width/height match `window.innerWidth`/`window.innerHeight`. The same packed artifact has a retained RxJS 6.5.3 minimum consumer receipt with 106/106 consumer cases. These receipts support only those actual harness observations and do not make a complete `ViewportRuler` behavioral, platform, or G11 claim.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/legacy-viewport-current-structural-diagnostic.json",
+          "sha256": "7e95967e3d959b2a1520b30d83253253dce06d0f304d59d7efffed2e0ceda42f"
+        },
+        {
+          "path": "compatibility/rc/legacy-viewport-declaration-subjects.json",
+          "sha256": "4605caf754661eaa482d5fa640840a021600272244b718fbdf7ab5cd331e65e9"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+          "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+          "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d"
+        },
+        {
+          "path": "scripts/legacy-viewport-use-review.mjs",
+          "sha256": "05f794182f54c2baa80d1198280f80f6638b9430588459be0bb08a6568b3a286"
+        },
+        {
+          "path": "scripts/packed-consumer-aot-smoke.mjs",
+          "sha256": "55e75a9d50255c7393008da3d2d4147b2db0ee50d6f9326d1b85fa967e046746"
+        },
+        {
+          "path": "compatibility/rc/parent-main-progress-token-fixture-review-v1.json",
+          "sha256": "67accae20c6ddce4b2be954a2b22d315332c256bb40dbadba8d0f797524a9340"
+        },
+        {
+          "path": "compatibility/rc/parent-main-rxjs6-floor-qualification-v1.json",
+          "sha256": "2ce57a79790323641a92d68ee75b3fba49c7104b0e5b50f43404af66c17b02ef"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/dialog-snack-current-source-successor-v1.json",
+          "sha256": "ae745097bef50138fb988e96d9d7bc905144c1312931a8fec81cbd2c3ea75176"
+        }
+      ],
+      "source_only_review": true,
+      "fresh_execution_claim": false,
+      "g11_claim": "not-passed"
+    },
+    {
+      "file": "legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+      "module": "@angular/cdk/scrolling",
+      "symbol": "ViewportRuler",
+      "candidate_source_sha256": "89e91390739e518a2a3e9dbdd8d75ff09dfcaa94bfe4bccc73d86f1e577c206c",
+      "conclusion": "owned-replacement",
+      "reviewer": "Codex primary source reviewer",
+      "source_binding": {
+        "module": "@angular/cdk/scrolling",
+        "symbol": "ViewportRuler",
+        "file": "legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "89e91390739e518a2a3e9dbdd8d75ff09dfcaa94bfe4bccc73d86f1e577c206c",
+        "references": [
+          {
+            "line": 79,
+            "parameter": "viewportRuler"
+          }
+        ],
+        "forwarding": [
+          {
+            "argument_index": 4,
+            "expression": "super(elementRef, dir, ngZone, changeDetectorRef, viewportRuler, platform, animationMode)"
+          }
+        ],
+        "owner_class": "MatLegacyTabNav",
+        "local_name": "ViewportRuler",
+        "replacement": "_LegacyViewport",
+        "replacement_module": "@ngx-compat/material-legacy/legacy-core"
+      },
+      "predecessor": {
+        "path": "compatibility/f10/authored-use-reviews/dialog-snack-current-source-successor-v1.json",
+        "sha256": "ae745097bef50138fb988e96d9d7bc905144c1312931a8fec81cbd2c3ea75176",
+        "key": [
+          "legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+          "@angular/cdk/scrolling",
+          "ViewportRuler"
+        ],
+        "prior_conclusion": "owned-replacement",
+        "prior_source_sha256": "89e91390739e518a2a3e9dbdd8d75ff09dfcaa94bfe4bccc73d86f1e577c206c"
+      },
+      "decision": "The local identifier `ViewportRuler` in this source is bound to the imported `_LegacyViewport` alias from the package-owned `legacy-core` entry point. The maintained TypeScript source helper confirms one alias, one constructor type reference, the expected supplied-instance forwarding position where applicable, and no peer `@angular/cdk/scrolling:ViewportRuler` import. The installed peer symbol is documented `@docs-private` in the retained prior source review; this row does not claim it as a stable public API. The fixture correction is an unrelated progress-bar default-token identity assertion (`!==` to `===`) in the packed-consumer producer. It does not alter any viewport source, viewport fixture setup, or viewport assertion semantics. The corrected consumer harness checks that `mat-select` and `mat-tab-header` injector lookups share the same owned `_LegacyViewport` instance and that its width/height match `window.innerWidth`/`window.innerHeight`. The same packed artifact has a retained RxJS 6.5.3 minimum consumer receipt with 106/106 consumer cases. These receipts support only those actual harness observations and do not make a complete `ViewportRuler` behavioral, platform, or G11 claim.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/legacy-viewport-current-structural-diagnostic.json",
+          "sha256": "7e95967e3d959b2a1520b30d83253253dce06d0f304d59d7efffed2e0ceda42f"
+        },
+        {
+          "path": "compatibility/rc/legacy-viewport-declaration-subjects.json",
+          "sha256": "4605caf754661eaa482d5fa640840a021600272244b718fbdf7ab5cd331e65e9"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+          "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+          "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d"
+        },
+        {
+          "path": "scripts/legacy-viewport-use-review.mjs",
+          "sha256": "05f794182f54c2baa80d1198280f80f6638b9430588459be0bb08a6568b3a286"
+        },
+        {
+          "path": "scripts/packed-consumer-aot-smoke.mjs",
+          "sha256": "55e75a9d50255c7393008da3d2d4147b2db0ee50d6f9326d1b85fa967e046746"
+        },
+        {
+          "path": "compatibility/rc/parent-main-progress-token-fixture-review-v1.json",
+          "sha256": "67accae20c6ddce4b2be954a2b22d315332c256bb40dbadba8d0f797524a9340"
+        },
+        {
+          "path": "compatibility/rc/parent-main-rxjs6-floor-qualification-v1.json",
+          "sha256": "2ce57a79790323641a92d68ee75b3fba49c7104b0e5b50f43404af66c17b02ef"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/dialog-snack-current-source-successor-v1.json",
+          "sha256": "ae745097bef50138fb988e96d9d7bc905144c1312931a8fec81cbd2c3ea75176"
+        }
+      ],
+      "source_only_review": true,
+      "fresh_execution_claim": false,
+      "g11_claim": "not-passed"
+    }
+  ],
+  "source_helper": {
+    "path": "scripts/legacy-viewport-use-review.mjs",
+    "sha256": "05f794182f54c2baa80d1198280f80f6638b9430588459be0bb08a6568b3a286",
+    "selected_cases": 5,
+    "output_path_external": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/viewport-five-current-context/viewport-five-source-helper-output-v1.json",
+    "output_sha256": "79c565b3469b2805e0457284761e14aeb1337d2c30460be2f27aca2f1b548722"
+  },
+  "limitations": [
+    "This capsule does not rerun tests or builds.",
+    "The packed evidence is the named fixture and viewport assertions only; it is not a complete viewport contract suite.",
+    "The RxJS 6.5.3 evidence is one main configuration on Node 24.15.0 linux-arm64 and Angular/CDK/Material 22.1.7; it does not qualify every platform, compiler/runtime combination, 21.x, G01-G13, security, release, or all historical families.",
+    "The original 54-row predecessor remains unchanged and retains unrelated review history; only these five rows are proposed here."
+  ],
+  "g11_claim": "not-passed"
+}
