@@ -4418,3 +4418,65 @@ describe('autocomplete content-query lifecycle', () => {
     fixture.destroy();
   });
 });
+
+describe('autocomplete hidden overlay pointer state', () => {
+  let overlayContainerElement: HTMLElement;
+  let zone: MockNgZone;
+
+  function createComponent<T>(component: Type<T>) {
+    TestBed.configureTestingModule({
+      imports: [MatLegacyAutocompleteModule, MatLegacyFormFieldModule, MatLegacyInputModule,
+        FormsModule, ReactiveFormsModule],
+      declarations: [component],
+      providers: [LEGACY_NOOP_ANIMATIONS, {provide: NgZone, useFactory: () => (zone = new MockNgZone())}],
+    });
+    TestBed.compileComponents();
+    overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();
+    return TestBed.createComponent<T>(component);
+  }
+
+  it('should release an empty group pane and restore inline pointer policy when options return', fakeAsync(() => {
+    const fixture = createComponent(AutocompleteWithGroups);
+    fixture.componentInstance.stateGroups = [{label: 'Empty', states: []}];
+    fixture.detectChanges();
+    fixture.componentInstance.trigger.openPanel();
+    fixture.detectChanges();
+    zone.simulateZoneExit();
+    fixture.detectChanges();
+    const pane = overlayContainerElement.querySelector('.cdk-overlay-pane') as HTMLElement;
+    expect(pane.style.getPropertyValue('pointer-events')).toBe('none');
+
+    fixture.componentInstance.stateGroups[0].states = ['One'];
+    fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
+    expect(pane.style.getPropertyValue('pointer-events')).toBe('');
+
+    pane.style.setProperty('pointer-events', 'auto', 'important');
+    fixture.componentInstance.stateGroups[0].states = [];
+    fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
+    expect(pane.style.getPropertyValue('pointer-events')).toBe('none');
+    fixture.componentInstance.stateGroups[0].states = ['One'];
+    fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
+    expect(pane.style.getPropertyValue('pointer-events')).toBe('auto');
+    expect(pane.style.getPropertyPriority('pointer-events')).toBe('important');
+
+    fixture.componentInstance.stateGroups[0].states = [];
+    fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
+    pane.style.setProperty('pointer-events', 'none', 'important');
+    fixture.componentInstance.stateGroups[0].states = ['One'];
+    fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
+    expect(pane.style.getPropertyValue('pointer-events')).toBe('none');
+    expect(pane.style.getPropertyPriority('pointer-events')).toBe('important');
+    fixture.componentInstance.trigger.closePanel();
+    fixture.destroy();
+  }));
+});

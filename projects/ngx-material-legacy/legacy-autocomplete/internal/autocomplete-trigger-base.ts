@@ -77,6 +77,9 @@ export const MAT_AUTOCOMPLETE_SCROLL_STRATEGY_FACTORY_PROVIDER = {
   useFactory: MAT_AUTOCOMPLETE_SCROLL_STRATEGY_FACTORY,
 };
 
+// Preserve any inline pointer policy while the attached pane is temporarily hidden.
+const hiddenPanePointerState = new WeakMap<OverlayRef, {value: string; priority: string}>();
+
 /** Base class with all of the `MatAutocompleteTrigger` functionality. */
 @Directive({standalone: false})
 export abstract class _MatAutocompleteTriggerBase
@@ -839,6 +842,33 @@ export abstract class _MatAutocompleteTriggerBase
   /** Updates the panel's visibility state and any trigger state tied to id. */
   private _updatePanelState() {
     this.autocomplete._setVisibility();
+
+    const pane = this._overlayRef;
+    if (pane) {
+      const style = pane.overlayElement.style;
+      const previous = hiddenPanePointerState.get(pane);
+      if (!this._overlayAttached) {
+        hiddenPanePointerState.delete(pane);
+      } else if (!this.panelOpen && !previous) {
+        hiddenPanePointerState.set(pane, {
+          value: style.getPropertyValue('pointer-events'),
+          priority: style.getPropertyPriority('pointer-events'),
+        });
+        // Empty option groups can give an invisible panel a clickable overlay pane.
+        style.setProperty('pointer-events', 'none');
+      } else if (this.panelOpen && previous) {
+        // A consumer may have changed the pane style while it was hidden.
+        if (style.getPropertyValue('pointer-events') === 'none' &&
+            !style.getPropertyPriority('pointer-events')) {
+          if (previous.value) {
+            style.setProperty('pointer-events', previous.value, previous.priority);
+          } else {
+            style.removeProperty('pointer-events');
+          }
+        }
+        hiddenPanePointerState.delete(pane);
+      }
+    }
 
     // Note that here we subscribe and unsubscribe based on the panel's visiblity state,
     // because the act of subscribing will prevent events from reaching other overlays and

@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "role": "Root TS-only repair of invisible autocomplete overlay intercepting clicks",
+  "parent": "d648f9de6d325aab1f858130d0cb8d93e5e5adaa",
+  "manifest": {
+    "role": "Recovered environment successor to independently reviewed pointer V3",
+    "predecessor_manifest_sha256": "8e75500ad1f564f3d21d30000e7bf163818d04669929aad57abc4162fd493e65",
+    "source_base_commit": "4c29be143432bcb5b2ca99d4f83ca6ff162b4554",
+    "environment_recovery_sha256": "a2d59ec028a87744a2d9213401a1516a5105f3840842396fb9f84caf40f01ee2",
+    "files": [
+      {
+        "path": "overlay-pointer-fix-v3.patch",
+        "sha256": "a10272d4d2120c0929aa3e73d4b4eab67dea7a56e8db6ef1a26598874e3aadc8"
+      },
+      {
+        "path": "overlay-pointer-regression-v3.patch",
+        "sha256": "c0464d97bb84ad90c494e1a655f821575b1ec574143d825ade0618bc49e96f31"
+      },
+      {
+        "path": "candidate-v3/README-recovered.md",
+        "sha256": "75f9bf23fe6e5bd7915e087f5a2aa0e04b3c851590fab56578a0a5f4936ebf6d"
+      },
+      {
+        "path": "candidate-v3/confirmed-artifact/ngx-compat-material-legacy-22.0.0-rc.0.tgz",
+        "sha256": "d24d26758d34b6a68693b71f1cf38f037c5d9d5d18bc4466dfe15118477781da"
+      },
+      {
+        "path": "candidate-v3/artifact-delta.json",
+        "sha256": "0e7ca0bad27e50279c7bd93773b861b1e8afdafc5191ab69e6ee20fb39c51116"
+      },
+      {
+        "path": "candidate-v3/roster-before.json",
+        "sha256": "a7200440fd1f6c8391e25d0b326a4809ef3c2ff11d118247e662214778f0967d"
+      },
+      {
+        "path": "candidate-v3/roster-after.json",
+        "sha256": "adee60dffdf44a0887150cc5dabd6f289de783e59dca4ef0d91d12656c426e35"
+      },
+      {
+        "path": "candidate-v3/roster-delta.json",
+        "sha256": "ed6751862c3d417518e6055757d4b7ce9cfa256d514a671d36cd4a53590541b1"
+      },
+      {
+        "path": "candidate-v3/workspace/derive-rosters.mjs",
+        "sha256": "bbf6be5796f9a3ca22c6920206d8e077fa1ddf2213aa833f66200d9d5984110e"
+      },
+      {
+        "path": "candidate-v3/autocomplete-regression-v3-recovered.json",
+        "sha256": "b20920626c66594ba0d855cd6bda5beb20761bcd278142900d13df1af3137538"
+      },
+      {
+        "path": "candidate-v3/autocomplete-baseline-v3-recovered.json",
+        "sha256": "adb9d940e891eca51e424091b752be59d04c5a1ceaa2f695c8d4c32c28480670"
+      },
+      {
+        "path": "candidate-v3/native-recovered/run-recovered.mjs",
+        "sha256": "c56db117ca5b4c48a711e6182ef030ff10e79fd5e220dd45ea235901462420bd"
+      },
+      {
+        "path": "candidate-v3/native-recovered/results-recovered.json",
+        "sha256": "e8db40c6b1544d80a3b223cbc05a03df7a1dd9b9a2f3f4051f376a4868a72c95"
+      },
+      {
+        "path": "candidate-v3/native-recovered/input-verification-recovered.json",
+        "sha256": "67161692b7126dc798bef73cf1056ca9a814714ce1cd6098faa38a2ae07508a9"
+      }
+    ],
+    "g11_claim": "not-passed"
+  },
+  "product_source_sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798",
+  "maintained_spec_sha256": "c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683",
+  "candidate_artifact_sha256": "d24d26758d34b6a68693b71f1cf38f037c5d9d5d18bc4466dfe15118477781da",
+  "independent_recovered_review": {
+    "sha256": "a4360582f4c41ed5f86121e4105efff0187c3b5f54037089bc65058633d81ba1",
+    "text": "# Independent review: recovered autocomplete pointer evidence\n\nSupports the recovered successor within the same bounded scope as independent `../v3/review-v3.md`. The frozen manifest SHA-256 is `197497771093eeb920ff648989d178129640e96ee59f5800ca5bb9a064273c70`; every listed file hash independently matches. Product patch `a10272d4d2120c0929aa3e73d4b4eab67dea7a56e8db6ef1a26598874e3aadc8` and candidate tar `d24d26758d34b6a68693b71f1cf38f037c5d9d5d18bc4466dfe15118477781da` are unchanged from the reviewed V3. The new standalone maintained test patch is `c0464d97bb84ad90c494e1a655f821575b1ec574143d825ade0618bc49e96f31`. Strict whitespace application of product and spec patches succeeds against the base fixture.\n\nIndependent comparison of the retained production-derived roster records finds 2,322 before and 2,323 after: no removals or changed prior complete records, prior relative ordering preserved, and exactly `src/material/legacy-autocomplete/autocomplete.spec.ts#179` added. The retained packed selected-family results identify 08dae baseline with 197/198 passing and d24d candidate with 198/198 passing; no skips. I did not independently rerun that family.\n\nFor all four recovered AOT consumers I independently rehashed all 512 extracted package members against their respective baseline/candidate archives, and verified the emitted bundle hash. I also rehashed all 311 zoneless or 312 zoneful recorded bundle inputs against current source bytes; all match, and the only baseline/candidate input difference in either mode is the autocomplete FESM. This is input identity evidence; it is not a claim that all dependencies or future environments are qualified.\n\nAn independent native-browser replay of these recovered bundles in Chromium 149 yielded 19/19 candidate checks in both modes. Baseline fails the same four hidden-pane click-through checks in each. Zone is absent in the zoneless fixture. Raw independent output is `replay-results.json` here. The finite checks cover actual physical clicks, asynchronous transitions, priority and changed inline policy, close/reopen, pending destroy/recreate and early subscription. The predecessor V3 review documents the same-value inline-write ambiguity. No full browser, injector, historical inventory, G11 or release qualification is claimed; failed/interruptive predecessor runs remain separately retained by the author.\n"
+  },
+  "independent_style_and_lifecycle_review": {
+    "sha256": "1b6f2b7afcdae5443a40f0524470b86838588470fee72b92f57c31d074923c84",
+    "text": "# Independent review: autocomplete pointer V3\n\nSupports source patch `a10272d4d2120c0929aa3e73d4b4eab67dea7a56e8db6ef1a26598874e3aadc8` and separately proposed regression spec `f559297707d36530f5f188ec742f4908e95f778ace42a192d6472571844827c6` within the following bounded scope. The submitted V3 manifest SHA-256 is `8e75500ad1f564f3d21d30000e7bf163818d04669929aad57abc4162fd493e65`. Both patches passed strict whitespace application checks against the base fixture. No canonical edits were made.\n\nThe candidate uses the public minimum-peer `OverlayRef.overlayElement` getter. It saves the inline pointer value and priority on first entering the attached hidden state and temporarily sets `none`. When the panel becomes visible it restores the saved value only if the unprioritized `none` remains, leaving distinguishable external writes intact; it discards its bookkeeping on detach. An external write of the same unprioritized `none` is indistinguishable from the trigger's own value, as the packet states. A consumer policy that overrides the hidden-pane policy can itself change hit testing; no universal precedence is claimed. This narrowly scoped style manipulation uses no current private CDK method.\n\nIndependently rehashed baseline `08dae37e775e2ab50457d820b3c7ae98114059012125781378cd36f05d8990e5` and candidate `d24d26758d34b6a68693b71f1cf38f037c5d9d5d18bc4466dfe15118477781da`. The direct archive comparison yielded exactly 512 members each and changed only autocomplete FESM, its source map, and its declaration map; declarations and all HTML/CSS/SCSS are byte-identical. Applying the product patch to base `4c29be143432bcb5b2ca99d4f83ca6ff162b4554` yields trigger-source SHA-256 `058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798`, matching the source embedded in the candidate FESM map. From the older b6ef baseline source to 4c29 the only project change is a chip-list spec.\n\nAn independent replay of the retained four AOT consumer bundles with Chromium 149 and actual CDP pointer clicks observed 19/19 candidate checks passing in both zone modes. Baseline fails the same four hidden-pane click-through checks in each. Zone is undefined in the zoneless fixture. Observations include empty group, asynchronous options, preexisting `auto !important` restoration, external `none !important` and `all !important` while hidden, repeated hidden updates, close/reopen and physical selection, same-turn pending destroy/recreate, and an early subscription. Exact results and replay command are retained beside this report. These are bounded fixture observations, not a whole browser or injector matrix.\n\nThe author retained selected packed-family reports of 197/197 historical cases and 198/198 with the new spec on candidate, versus 197/198 with that spec on baseline. I inspected their artifact identities and counts but did not independently rerun that family. Before integration, the maintainer must reconcile the new maintained test with the shared case registry and affected source-bound evidence. This review does not claim full release or G11 qualification.\n\nV1's reproduced loss of consumer inline priority and V2's failed build/partial artifact remain excluded, as documented in the V3 packet and predecessor independent review.\n"
+  },
+  "root_checks": [
+    "All14recoveredmanifest files rehashed.",
+    "Current source/spec whole files equal declaredbase;strict exact source and appendedspec patches applied.",
+    "All512candidate members enumerated;packed autocomplete sourceContent equals exact appliedTS afterimage.",
+    "Actual current static registry2322to2323;every prior complete record/order retained, exactlyautocomplete#179 added.",
+    "No publicconstructor/input/API requirement, HTML/CSS/SCSS or publicDTS member changed."
+  ],
+  "registry": {
+    "before_sha256": "95570be816d45166cbabfe555176d33a5c72fe10ffe0b9abbba48dae63f4a9ac",
+    "after_sha256": "171d6e2707eb997d168baf0c5bda2efb19ed5b9a5be2a23aaa96716519f29b3e",
+    "added": [
+      {
+        "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#179",
+        "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+        "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "adaptation": "adapted",
+        "shared": null,
+        "full_name": "autocomplete hidden overlay pointer state > should release an empty group pane and restore inline pointer policy when options return",
+        "index": 179,
+        "kind": "direct"
+      }
+    ]
+  },
+  "runtime_observations": {
+    "recovered_family_candidate": "198/198",
+    "recovered_family_baseline": "197/198, new regression fails",
+    "recovered_native_candidate": "19/19 each zoneful and actual Zoneundefined",
+    "recovered_native_baseline": "same4hiddenpane failures each mode",
+    "ownership": "Save prior inlinevalue+priority, restore only still-owned unprioritizednone, preserve distinct intervening writes;moduleWeakMap adds no classfield collision."
+  },
+  "preserved_failures": [
+    "V1candidate fixedclicks but erased consumerinlinepolicy;rejected.",
+    "V2decorator-placement buildfailed;partial51bartifactinvalid andexcluded.",
+    "Pre-recovery zero/interrupted runs unqualified.",
+    "Same-value unprioritizedexternalstylewrite indistinguishable;documented limitation."
+  ],
+  "pending": [
+    "Current331trigger use hashes/occurrences and frozen42source reviews need finite context successor for this new source.",
+    "Singlehistoricalinventory row/currentMAINepoch+979eindividualproof requalification required;oldgoldens unchanged.",
+    "Packedconsumer/enginefree/newsourcecoordinator and fullrelease gates notyet rerun."
+  ],
+  "limits": [
+    "Focused Linuxarm64Chromium149/Angular-CDK-Material22.1.7 evidence only;not fullmatrix,21.x,allinjectorcases,security,G11 orrelease readiness."
+  ]
+}
