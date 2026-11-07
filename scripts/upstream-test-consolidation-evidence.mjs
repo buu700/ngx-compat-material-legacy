@@ -111,18 +111,49 @@ export function analyzeConsolidationSubjects(bytes,readRepo) {
   return results;
 }
 
+// A finite main-only successor; historical reports and their 21.x route remain unchanged.
+const MAIN_REPORT='compatibility/rc/c04-main32-consolidation-source-v1.json';
+const MAIN_REPORT_SHA='ac2ed346e6b1cb72ed27529a356a3e18b85e7a2f5b6c74d2d3db29e814b0f082';
+const MAIN_PRIOR='compatibility/rc/packed-upstream-source-test-consolidation.json';
+const MAIN_PRIOR_SHA='075244bfbac4d46cca909863054578ec44cfd2775dc74d407d18bd73379a0755';
+const MAIN_ARCHIVE='compatibility/rc/c04-main32-consolidation-prior-rows-v1.json';
+const MAIN_ARCHIVE_SHA='953da7d42d8cba426ece39fbdc9d6b15d581549974d32c84e3fa1be13a32ca05';
+const MAIN_DELTA='compatibility/rc/c04-main32-consolidation-ledger-delta-v1.json';
+const MAIN_DELTA_SHA='fd35ea81eb923efaf5b906cbe7ed0ac74d0d711e5e4d4c423c1ea1b4826841e1';
+const MAIN_BUILD='compatibility/rc/packed-upstream-source-build-main-e184.json';
+const MAIN_BUILD_SHA='ffe8ee63051473d9adf28142e30dcbaddb5ed156f71de92a8e1dc2e43efbed6d';
+function mainSuccessorBound(body,readRepo,entry){
+ try{
+  const product=JSON.parse(readRepo('projects/ngx-material-legacy/package.json'));assert.ok(product.version.startsWith('22.'));
+  const bytes=readRepo(MAIN_REPORT),priorBytes=readRepo(MAIN_PRIOR),archiveBytes=readRepo(MAIN_ARCHIVE),deltaBytes=readRepo(MAIN_DELTA);
+  assert.equal(hash(bytes),MAIN_REPORT_SHA);assert.equal(hash(priorBytes),MAIN_PRIOR_SHA);assert.equal(hash(archiveBytes),MAIN_ARCHIVE_SHA);assert.equal(hash(deltaBytes),MAIN_DELTA_SHA);
+  assert.deepEqual(body,JSON.parse(bytes));const prior=JSON.parse(priorBytes);const {main_current_context:context,...unchanged}=body;assert.deepEqual(unchanged,prior);
+  assert.deepEqual(Object.keys(context).sort(),['build_report','g11_claim','historical_inventory_is_capture_not_current_execution','historical_runner_inputs','line','previous_report','role','runtime_or_floor_qualified','source_only'].sort());
+  assert.equal(context.role,'main-only current source context, not historic test execution');assert.equal(context.line,'main');assert.equal(context.source_only,true);assert.equal(context.runtime_or_floor_qualified,false);assert.equal(context.g11_claim,'not-passed');assert.equal(context.historical_inventory_is_capture_not_current_execution,true);
+  assert.deepEqual(context.previous_report,{path:MAIN_PRIOR,sha256:MAIN_PRIOR_SHA,bytes:priorBytes.length});const build=readRepo(MAIN_BUILD);assert.equal(hash(build),MAIN_BUILD_SHA);assert.deepEqual(context.build_report,{path:MAIN_BUILD,sha256:MAIN_BUILD_SHA,bytes:build.length});
+  assert.deepEqual(context.historical_runner_inputs.map(r=>r.path).sort(),[...historicalContextPaths].sort());for(const r of context.historical_runner_inputs){const raw=readRepo(r.path);assert.equal(hash(raw),r.sha256);assert.equal(raw.length,r.bytes);}
+  const archive=JSON.parse(archiveBytes),delta=JSON.parse(deltaBytes);assert.equal(archive.schema_version,1);assert.equal(archive.line,'main');assert.equal(archive.source_head,'9be00b7baf32477b8e521305efa36273589566b9');assert.equal(delta.schema_version,1);assert.equal(delta.line,'main');
+  assert.equal(archive.rows.length,32);assert.equal(delta.rows.length,32);assert.deepEqual(archive.rows.map(r=>r.sha).sort(),body.scope_sha_ids);assert.deepEqual(delta.rows.map(r=>r.sha).sort(),body.scope_sha_ids);
+  for(const old of archive.rows){const next=delta.rows.find(r=>r.sha===old.sha);assert.ok(next);const expected=structuredClone(old);expected.evidence_report=MAIN_REPORT;expected.source_check.evidence_report_sha256=MAIN_REPORT_SHA;expected.affected_branches=['main'];expected.prior_disposition_record=structuredClone(old);assert.deepEqual(next,expected);}
+  if(entry){const matches=delta.rows.filter(r=>r.sha===entry.sha);assert.equal(matches.length,1);assert.deepEqual(entry,matches[0]);}
+  return true;
+ }catch{return false;}
+}
+
 /** Authenticate the complete batch and both-line ownership context once per invocation. */
 export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
   try{
     assert.equal(body.role,TEST_CONSOLIDATION_ROLE);assert.equal(body.g11_claim,'not-passed');
+    const mainSuccessor=Object.hasOwn(body,'main_current_context');if(mainSuccessor)assert.ok(mainSuccessorBound(body,readRepo));
     const product=JSON.parse(readRepo('projects/ngx-material-legacy/package.json'));
     const line=product.version.startsWith('21.')?'21.x':'main';assert.equal(body.line,line);
     assert.deepEqual(body.scope_sha_ids,Object.keys(TEST_CONSOLIDATION_PATCHES).sort());
     assert.equal(body.reviews.length,32);assert.deepEqual(body.reviews.map(r=>r.sha).sort(),body.scope_sha_ids);
     // The current copy preserves the original review and rebinds its complete
     // product snapshot. Both paths still require the same strict build proof.
-    const contextPath=body.candidate_context.path;
-    if(contextPath==='compatibility/rc/snack-dom-source-context-build.json'||contextPath==='compatibility/rc/packed-upstream-source-build.json'){
+    const contextPath=mainSuccessor?body.main_current_context.build_report.path:body.candidate_context.path;
+    if(mainSuccessor){assert.equal(contextPath,MAIN_BUILD);}
+    else if(contextPath==='compatibility/rc/snack-dom-source-context-build.json'||contextPath==='compatibility/rc/packed-upstream-source-build.json'){
       // A separately qualified successor still passes the same complete build
       // and historical-suite checks below; this grants no alternate predicate.
       const qualified=qualifyIndependentSnackProductDelta({read:readRepo});
@@ -130,14 +161,15 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
     }else assert.ok(['compatibility/f10/disposition-ledger/evidence/closeout-fourteen-build-scope-review.json',
       'compatibility/rc/chip-source-scope-requalification-build.json',
       'compatibility/rc/tab-adapter-product-inventory-build.json'].includes(contextPath));
-    const contextBytes=readRepo(contextPath);assert.equal(hash(contextBytes),body.candidate_context.sha256);
+    const contextBytes=readRepo(contextPath);assert.equal(hash(contextBytes),mainSuccessor?body.main_current_context.build_report.sha256:body.candidate_context.sha256);
     const context=JSON.parse(contextBytes),ledger=JSON.parse(readRepo('compatibility/f10/disposition-ledger/ledger.json'));
     const contextEntry=ledger.entries.find(e=>e.sha===context.scope_sha_ids[0]);assert.ok(contextEntry);
     assert.ok(buildScopeEvidenceOk(context,contextEntry,readRepo,currentProductPaths),'current complete product/build context invalid');
+    if(mainSuccessor)for(const sha of context.scope_sha_ids){const buildEntry=ledger.entries.find(e=>e.sha===sha);assert.ok(buildEntry&&buildScopeEvidenceOk(context,buildEntry,readRepo,currentProductPaths),'current individual build proof invalid');}
     const compilerConfig=JSON.parse(readRepo('projects/ngx-material-legacy/tsconfig.lib.json'));
     assert.ok(compilerConfig.exclude.includes('**/*.spec.ts'));
     assert.deepEqual(body.historical_suite_context.map(r=>r.path).sort(),[...historicalContextPaths].sort());
-    for(const ref of body.historical_suite_context){const bytes=readRepo(ref.path);assert.ok(Buffer.isBuffer(bytes));assert.equal(hash(bytes),ref.sha256);}
+    for(const ref of (mainSuccessor?body.main_current_context.historical_runner_inputs:body.historical_suite_context)){const bytes=readRepo(ref.path);assert.ok(Buffer.isBuffer(bytes));assert.equal(hash(bytes),ref.sha256);}
     const inventory=JSON.parse(readRepo('testing/legacy-runner/historical-inventory.json'));
     assert.equal(inventory.denominator,57);assert.equal(inventory.historical_tag,'16.2.14');
     assert.equal(body.subject_capsule.path,TEST_CONSOLIDATION_CAPSULE);assert.equal(body.subject_capsule.sha256,TEST_CONSOLIDATION_CAPSULE_SHA256);
@@ -165,10 +197,10 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
 /** Row labels cannot bypass immutable scope or pending residuals. */
 export function testConsolidationEntryOk(body,entry,readRepo,batchValid){
   try{
-    assert.equal(batchValid,true);assert.equal(hash(readRepo(entry.evidence_report)),entry.source_check.evidence_report_sha256);
+    assert.equal(batchValid,true);if(entry.evidence_report===MAIN_REPORT)assert.ok(mainSuccessorBound(body,readRepo,entry));assert.equal(hash(readRepo(entry.evidence_report)),entry.source_check.evidence_report_sha256);
     const row=body.reviews.find(r=>r.sha===entry.sha);assert.ok(row);
     assert.equal(entry.final_disposition,row.final_disposition);assert.equal(entry.reason,row.decision);assert.deepEqual(entry.files,row.patch_paths);
-    assert.deepEqual(entry.affected_branches,row.affected_branches);assert.equal(entry.review_depth,row.review_depth);
+    assert.deepEqual(entry.affected_branches,entry.evidence_report===MAIN_REPORT?['main']:row.affected_branches);assert.equal(entry.review_depth,row.review_depth);
     assert.equal(entry.source_check.diff_sha256,row.diff_sha256);assert.equal(entry.source_check.patch_path,row.patch_file);
     assert.equal(entry.source_check.review_membership,row.sha);return true;
   }catch{return false;}
