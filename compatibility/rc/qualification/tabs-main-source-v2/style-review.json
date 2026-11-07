@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "role": "targeted source and rendered-style review for focused legacy tab lifecycle; artifact/runtime scoped",
+  "source_epoch": {
+    "packet_head": "509c6dbad5437d2fdea1c4ceaea6fd1c9b30b407",
+    "current_checkout_head": "6685300af7ebdc6be93ae1e1282ffe48293f25db",
+    "source_sha256": {
+      "group": "339cd7dee4e6431d4a603b215bf5a78fb654b23dfb49bfe50246cb44af17515e",
+      "body": "15d4c2d2daa1aafce8f6b263f9e2423742c3221af56954c829eea1ed693ea926",
+      "styles": "7fedca13e121d806da356e39836d1abb3353c62a3a54745790c9cdaa50e07d5a",
+      "reversal_spec": "edd9e7149268ad22888e28f8ffa6ed27ce5683b15e28022a3c13b844fbbd9c54"
+    }
+  },
+  "source_relationships": [
+    {
+      "file": "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+      "sha256": "339cd7dee4e6431d4a603b215bf5a78fb654b23dfb49bfe50246cb44af17515e",
+      "lines": "258-294",
+      "observation": "On selection change, group captures direct active/animating body transforms at line 266 before it schedules active-tab mutations and before it assigns each tab position later in the hook. This binds the intended capture-before-body-position/layout ordering."
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+      "sha256": "15d4c2d2daa1aafce8f6b263f9e2423742c3221af56954c829eea1ed693ea926",
+      "lines": "44-59, 265-279, 392-449",
+      "observation": "Capture stores computed transform by body. Reversal restart sets transition-property none, restores the captured transform, forces layout, then restores the state target if no newer lifecycle or consumer style supersedes it. Completion guards stale transitionend by a monotonic deadline and clears only owned transforms; transform/transition-property consumer overrides prevent restart."
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-tabs/tab-body.scss",
+      "sha256": "7fedca13e121d806da356e39836d1abb3353c62a3a54745790c9cdaa50e07d5a",
+      "lines": "34-59",
+      "observation": "Body-content transitions only transform using inherited duration; left/right states use +/-100% translate and hidden visibility. Active or animating content is visible."
+    }
+  ],
+  "rendered_style_observations": {
+    "report_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/tabs-authored-main/focused-packed-v1/consumer/evidence/chrome149-frozen-logged/report.json",
+    "report_sha256": "ffe14270f1ef65f7a9cdbe5842afc185969d57ca35bf277d63079e395f165740",
+    "native_css": "At A\u2192B\u2192A reversal under 700ms duration, both body transforms are at non-endpoint values immediately before retarget (-54.8797 px and +693.12 px for 748 px bodies) and remain unchanged at the synchronous selection/layout boundary (0 px delta). Final active A is centered and outgoing B is hidden/unattached; temporary package-owned inline body transforms are removed.",
+    "content_width_boundary": "During the separate same-pass active/inactive content-width swap, baseline widths change 716\u2194812 px with transform deltas 0/0 px. With only computed-transform storage disabled in the FESM, the same width change yields transform deltas 7.03/88.97 px. The two measurements are from separate baseline and mutant reports; the mutant was deliberately identified as a mutation.",
+    "consumer_style": "Actual body-content `transform: scale(.9)` and `transition-property: opacity` persist through a mid-transition A\u2192B\u2192A reversal. The implementation declines to override these consumer-owned styles; test also checks final lifecycle state.",
+    "rtl_dynamic": "RTL B entry starts at -748 px for 748 px wrapper. Dynamic-height case changes measured wrapper height 120\u2192188 px and settles selected B.",
+    "no_motion": "0ms duration and MATERIAL_ANIMATIONS animationsDisabled true each settle selected pane and emit one completion."
+  },
+  "controls": {
+    "product_path_mutants": [
+      {
+        "mutation": "capture-disabled active-body FESM storage",
+        "report": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/tabs-authored-main/focused-packed-v1/capture-disabled-mutant-final/consumer/evidence/capture-disabled-logged/report.json",
+        "sha256": "b8f652d4901515a9e854afefa42ae05c89bd0681415ff490ca628e1124acc09a",
+        "result": "6/7; fails same-pass active width-layout continuity; original FESM passes 7/7."
+      },
+      {
+        "mutation": "stale transitionend monotonic deadline guard disabled",
+        "report": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/tabs-authored-main/focused-packed-v1/stale-end-guard-mutant-v2/consumer/evidence/stale-end-guard-logged/report.json",
+        "sha256": "e6081af7e1a059329fbabb38a230d1c4f34153a1c41374c5b7b7cfe5ff6dedbd",
+        "result": "6/7; fails stale transitionend lifecycle because B detaches early; original FESM passes 7/7."
+      }
+    ],
+    "assertion_unit_controls": "The report includes synthetic transform-jump, extra-active-body and fabricated-completion predicate checks; these are assertion-unit controls, not product-path mutants."
+  },
+  "limits": [
+    "No tagged upstream computed-style or screenshot golden comparison.",
+    "No nested groups or complete CSS matrix.",
+    "Computed styles, panel visibility and content geometry are local to pinned Chromium/Angular22.1.7 only."
+  ]
+}
