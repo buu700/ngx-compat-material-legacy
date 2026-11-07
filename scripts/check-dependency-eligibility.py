@@ -768,7 +768,7 @@ def _private_npm_current_profile(root: Path, line: str, manifests: dict, evidenc
             if found != set(group["paths"]):
                 raise ValueError("current private npm discovered source population changed")
         for path, row in all_rows.items():
-            raw = _tool_proof_bytes(root, path, row)
+            raw = _current_profile_source_bytes(root, path, row)
             if hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest() != row["git_blob"]:
                 raise ValueError("current private npm source Git blob changed")
 
@@ -845,7 +845,19 @@ def private_npm_disposition_evidence(root: Path, archives: dict[str, bytes]) -> 
             "artifacts": dict(NPM_PRIVATE_PROFILE_ARTIFACTS), "brace_validation": brace["binding"], **current_binding}}
 
 
+TOOL_PROOF_MAX_BYTES = 3_000_000
+NPM_CURRENT_PROFILE_SOURCE_MAX_BYTES = 4_000_000
+
+
 def _tool_proof_bytes(root: Path, relative: str, expected: dict | None = None) -> bytes:
+    return _checked_tool_bytes(root, relative, expected, TOOL_PROOF_MAX_BYTES)
+
+
+def _current_profile_source_bytes(root: Path, relative: str, expected: dict | None = None) -> bytes:
+    return _checked_tool_bytes(root, relative, expected, NPM_CURRENT_PROFILE_SOURCE_MAX_BYTES)
+
+
+def _checked_tool_bytes(root: Path, relative: str, expected: dict | None, max_bytes: int) -> bytes:
     path = PurePosixPath(relative)
     if path.is_absolute() or not path.parts or any(part in {"", ".", ".."} for part in relative.split("/")):
         raise ValueError("invalid tool proof path")
@@ -854,7 +866,7 @@ def _tool_proof_bytes(root: Path, relative: str, expected: dict | None = None) -
         current = current / part
         if current.is_symlink():
             raise ValueError("tool proof path is a symlink")
-    if not current.is_file() or current.stat().st_size > 3_000_000:
+    if not current.is_file() or current.stat().st_size > max_bytes:
         raise ValueError("tool proof is missing or oversized")
     raw = current.read_bytes()
     if expected and (hashlib.sha256(raw).hexdigest() != expected["sha256"] or

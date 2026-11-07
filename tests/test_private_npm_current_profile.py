@@ -87,6 +87,38 @@ class PrivateNpmCurrentProfileTests(unittest.TestCase):
         with patch.object(eligibility, 'NPM_CURRENT_PRIVATE_PROFILE_SHA256', self.pin), patch.object(eligibility, 'NPM_HISTORICAL_PRIVATE_PROFILE_SHA256', self.pin):
             return eligibility._private_npm_current_profile(self.root, 'main', self.manifests, self.evidence)
 
+    def _bind_large_maintained_source(self, raw):
+        name = 'support/helper.mjs'
+        self.write(name, raw)
+        branch = self.profile['lines']['main']
+        row = next(row for row in branch['support_files'] if row['path'] == name)
+        row.update(sha256=digest(raw), bytes=len(raw),
+                   git_blob=hashlib.sha1(b'blob ' + str(len(raw)).encode() + b'\0' + raw).hexdigest())
+        self.seal()
+        return row
+
+    def test_large_authenticated_source_rows_use_only_bounded_source_limit(self):
+        maintained = (ROOT / 'fixtures/sass/ripple-color-contracts.json').read_bytes()
+        self.assertGreater(len(maintained), eligibility.TOOL_PROOF_MAX_BYTES)
+        self.assertLessEqual(len(maintained), eligibility.NPM_CURRENT_PROFILE_SOURCE_MAX_BYTES)
+        row = self._bind_large_maintained_source(maintained)
+
+        _, recheck = self.validate()
+        proof_document = 'compatibility/rc/oversized-proof-fixture.json'
+        self.write(proof_document, maintained)
+        with self.assertRaisesRegex(ValueError, 'missing or oversized'):
+            eligibility._tool_proof_bytes(self.root, proof_document, {'sha256': digest(maintained)})
+        recheck()
+
+        self.write(row['path'], maintained + b'\n')
+        with self.assertRaisesRegex(ValueError, 'source changed: support/helper.mjs'):
+            recheck()
+
+        too_large = maintained + (b'x' * (eligibility.NPM_CURRENT_PROFILE_SOURCE_MAX_BYTES + 1 - len(maintained)))
+        self._bind_large_maintained_source(too_large)
+        with self.assertRaisesRegex(ValueError, 'missing or oversized'):
+            self.validate()
+
     def test_exact_current_cut_and_repeated_physical_read(self):
         binding, recheck = self.validate()
         self.assertEqual(binding['current_source_parent'], 'c' * 40)
@@ -147,11 +179,11 @@ class PrivateNpmCurrentProfileTests(unittest.TestCase):
                      'private-profile-remaining-evidence.json': evidence,
                      'private-profile-remaining-result.json': triage}
         original_read = eligibility._tool_proof_bytes
-        def read(root, relative, expected=None):
+        def read(root, relative, expected=None, **kwargs):
             prefix = 'compatibility/rc/tool-advisory-triage/'
             if relative.startswith(prefix) and relative[len(prefix):] in documents:
                 return json.dumps(documents[relative[len(prefix):]]).encode()
-            return original_read(root, relative, expected)
+            return original_read(root, relative, expected, **kwargs)
         def brace(*args):
             self.write('support/helper.mjs', b'changed during brace stage\n')
             return {'findings': {}, 'binding': {}}

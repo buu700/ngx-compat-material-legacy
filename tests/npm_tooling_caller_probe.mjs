@@ -25,13 +25,15 @@ const rosterPath = 'compatibility/rc/npm-tooling-isolation-callers.json';
 const currentRosterPath = 'compatibility/rc/npm-tooling-current-callers-v2.json';
 const codeSuffixes = ['.cjs', '.js', '.mjs', '.py', '.sh', '.ts'];
 const jsSuffixes = new Set(['.cjs', '.js', '.mjs', '.ts']);
+const proofMaxBytes = 3000000;
+const currentProfileRowMaxBytes = 4000000;
 const historicalArtifacts = {
   'private-profile-source-manifests.json': '08f1feb3a2186f6bb0bd9e36af7462e2c752c7a344632b37c44e8bb194b0b3a4',
   'private-profile-remaining-evidence.json': 'f944d76dfb5ea39bf4f7743ea377c5112218efcef4c42af465eb59437bcb82fb',
   'private-profile-remaining-result.json': '54bd6cf921745b848f05fb1d2eaea6339b870bf53ce431e9e5eaad606a390dc0',
 };
 
-function physical(path, expected) {
+function physical(path, expected, maxBytes = proofMaxBytes) {
   assert.equal(typeof path, 'string');
   assert.ok(path && !path.includes('\\') && !posix.isAbsolute(path) && posix.normalize(path) === path
     && path.split('/').every(part => part && part !== '.' && part !== '..'), 'invalid source path');
@@ -42,7 +44,7 @@ function physical(path, expected) {
   }
   assert.ok(lstatSync(target).isFile(), 'non-file source ' + path);
   const raw = readFileSync(target);
-  assert.ok(raw.length <= 3000000, 'oversized source ' + path);
+  assert.ok(raw.length <= maxBytes, 'oversized source ' + path);
   if (expected) {
     assert.equal(hash(raw), expected.sha256, 'current source SHA changed: ' + path);
     if ('bytes' in expected) assert.equal(raw.length, expected.bytes, 'current source size changed: ' + path);
@@ -215,7 +217,7 @@ function checkPhysical() {
     physical('compatibility/rc/tool-advisory-triage/' + name, {sha256});
   }
   checkPopulation();
-  for (const row of [...sourceRows.values(), ...inputRows.values()]) physical(row.path, row);
+  for (const row of [...sourceRows.values(), ...inputRows.values()]) physical(row.path, row, currentProfileRowMaxBytes);
   for (const [path, pair] of Object.entries(subject.historical_source_hashes)) {
     assert.ok(sourceRows.has(path) || inputRows.has(path), 'unbound historical/current source ' + path);
     assert.equal(pair.current_sha256, (sourceRows.get(path) ?? inputRows.get(path)).sha256);
@@ -322,7 +324,7 @@ function auditCurrent(overrides = new Map()) {
   const names = [...new Set([...sourceRows.keys(), ...overrides.keys()])].filter(path => jsSuffixes.has(extname(path))).sort();
   const found = [];
   for (const path of names) {
-    const source = overrides.get(path) ?? physical(path, sourceRows.get(path)).toString('utf8');
+    const source = overrides.get(path) ?? physical(path, sourceRows.get(path), currentProfileRowMaxBytes).toString('utf8');
     found.push(...currentCalls(path, source));
   }
   const expected = currentRoster.callers.map(row => {
@@ -342,7 +344,7 @@ function auditCurrent(overrides = new Map()) {
 
 const positive = auditCurrent();
 const first = roster.callers[0].path;
-const current = physical(first).toString('utf8');
+const current = physical(first, undefined, currentProfileRowMaxBytes).toString('utf8');
 const support = subject.support_files.find(row => jsSuffixes.has(extname(row.path)) && row.path !== 'tests/npm_tooling_caller_probe.mjs');
 assert.ok(support, 'missing JavaScript support scope');
 const negatives = [
@@ -351,8 +353,8 @@ const negatives = [
   new Map([[first, current.replace('npmToolingOptions(', 'unownedNpmOptions(')]]),
   new Map([[first, current + '\nthrow new Error("unrelated behavior change");\n']]),
   new Map([['tests/nested/added-unwrapped-npm.ts', "spawnSync('npm', ['install'], {cwd: '/tmp'});\n"]]),
-  new Map([[support.path, physical(support.path).toString('utf8') + "\nspawnSync('npm', ['install'], {cwd: '/tmp'});\n"]]),
-  new Map([[support.path, physical(support.path).toString('utf8') + '\nvoid "unrelated support behavior change";\n']]),
+  new Map([[support.path, physical(support.path, undefined, currentProfileRowMaxBytes).toString('utf8') + "\nspawnSync('npm', ['install'], {cwd: '/tmp'});\n"]]),
+  new Map([[support.path, physical(support.path, undefined, currentProfileRowMaxBytes).toString('utf8') + '\nvoid "unrelated support behavior change";\n']]),
 ];
 for (const negative of negatives) assert.throws(() => auditCurrent(negative));
 checkPhysical();
