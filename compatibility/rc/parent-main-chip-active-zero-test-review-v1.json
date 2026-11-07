@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "role": "Root restoration of the distinct historical active-zero chip refocus regression test",
+  "parent": "f6f850f973083bd7905c212a4f4bfdca3e4d6c31",
+  "proposal": {
+    "scope": "Isolated investigation and additive test proposal for historical chip focus conditions; no canonical edits",
+    "upstream_commits": [
+      "e69b2b09efaf577cd5fe92b70808479f975913af",
+      "2861a306aebc54eafe4a72b4a53860d8612af5d4"
+    ],
+    "changed_test_commit": "fdb32c2dd48e489c1cfeec297cb791a87169069a",
+    "tagged_material_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "tagged_chip_list_sha256": "83c17cd61f9ecb8cc4dcc7947a493a78a93a6b880d3c69f9284eb39106662414",
+    "findings": [
+      "Natural blur normally clears the manager index to -1 in untouched tagged source and current packed candidate; fdb changed the test to assert that distinct normal behavior.",
+      "The old registered index-zero case tests a stronger different state, lost by the edit. Existing CDK16 and CDK22 FocusKeyManager implementations call activeItem.focus even when selecting the same item.",
+      "The proposed restored case explicitly reconstructs index zero with updateActiveItem after natural blur and asserts DOM focus remains outside before invoking public list.focus. The index-zero state is constructed, not asserted to persist naturally.",
+      "Packed baseline passes the restored case. Separately repacked one-line mutant changes list.focus to skip setFirstItemActive if index is already zero; only restored case fails, proving sensitivity to the relevant regression."
+    ],
+    "proposal": {
+      "path": "chip-active-zero-v2.patch",
+      "sha256": "24cdc218daecd1f6dbdbf45c91e41fa61bff68358346a6c673a2cd568afd81e3",
+      "base_commit": "b6ef5d7d94a7a7a2b3d65beb8115ffd2e1223e5c",
+      "base_spec_sha256": "b41c1b2911e20ffa95853e5ec438b3c684919ce920129429f76dabadc206cbe2",
+      "candidate_spec_sha256": "0493c16b0d5cf24ec65916b109df2ea7823b3ab3472c2f1de4d4498fbc42108b",
+      "strict_whitespace_apply_check": "passed",
+      "case_registry": "2321 to 2322; no removed IDs; #90 original title restored, old natural-blur case appended #92, all other prior case records unchanged"
+    },
+    "baseline": {
+      "artifact_sha256": "08dae37e775e2ab50457d820b3c7ae98114059012125781378cd36f05d8990e5",
+      "report": "run/reports/legacy-chips-20261107T190038Z.json",
+      "sha256": "4d61600246ae6010ac75feb965b58660817d445ae7d27218cb81fb99f67fbaf2",
+      "executed": 184,
+      "passed": 184
+    },
+    "mutant": {
+      "artifact_sha256": "be5b44bcffe0d0ea1d6292db5e7237e360cf64c55a8f34015230a47776a9b7b7",
+      "report": "mutant/run/reports/legacy-chips-20261107T190021Z.json",
+      "sha256": "2a5d7c3572bcdf6c776d0a94022931a209e0b95ebb6778ac10b9de1e58af479f",
+      "executed": 184,
+      "passed": 183,
+      "failed": 1,
+      "expected_failure": "restored active-index-zero refocus test"
+    },
+    "limits": [
+      "No actual untouched tagged16 browser execution; tagged claims are source-based.",
+      "Chromium149 packed baseline only; no broader platform or full suite claim.",
+      "Initial separate test run executed 0 because Chromium temporary socket path was too long; retried with /tmp and retained log.",
+      "Synthetic mutant tarball is deliberately modified and never identified as original artifact.",
+      "Historical requirement accounting/integration remains with separate owner; no ledger/golden changes."
+    ]
+  },
+  "independent_review": {
+    "sha256": "af4042ab6715653ae3eff81e6b58e97625a9d8169fdce45dccb6a8d8af623507",
+    "text": "# Independent historical projection and chip counterfactual review\n\nThe seven-row inventory projection and exact additive chip test are supported **as a conditional current-source reconciliation**, not as a historical admission or a fresh coordinator run. Projection manifest SHA-256 `eeb12399d57b8977200f4afc6f12c6bad7c38bc270618d4d41ec8044aafaeca9`; inventory patch `0d1b4b797b05841c7809206feebd6b826caf02c571711521f4565c72f29adcf9`; chip patch `24cdc218daecd1f6dbdbf45c91e41fa61bff68358346a6c673a2cd568afd81e3`. Each patch passed `--whitespace=error-all` apply-check on b6ef in isolated indexes. The inventory projection is conditional on applying precisely that chip patch and verifying the seven previous row images; it is not independent evidence that the current coordinator, matrix, or artifact gates pass.\n\nAll 57 historical source hashes were independently matched to the untouched Material 16.2.14 commit `df60e733c60e572ba538f6ad0ceff3e63e527b53` via Git object bytes. Historical identifiers, candidate paths and golden hashes remain unchanged. Exactly seven candidate inventory rows change; the prior full seven rows match b6ef and each prior candidate hash, adaptation and execution state is retained in the successor history. Six replacement hashes match their b6ef source bytes; the seventh matches the patched chip spec `0493c16b0d5cf24ec65916b109df2ea7823b3ab3472c2f1de4d4498fbc42108b`.\n\nThe declared old registry contains 2,231 case identities. An independent comparison verified that all 2,231 old occurrences can be paired one-to-one with current cases by historical path, shared origin, kind and complete full name, with 91 additional occurrences and 2,322 proposed positive cases; 329 positional IDs move. This matching preserves name multiplicity, **not** arbitrary old callback-body equivalence. Of 44 named upstream requirements, 19 references change positional ID. They all resolve uniquely to autocomplete; an independent TypeScript AST check using complete nested suite names verified each moved callback body against the a712 source and the b6ef source, covering 19 references and 11 distinct names. The overall source diff contains no removed old lines. The separate `named-rebinding-source.json` SHA-256 is `5ba36f7e3ea809c54b649cedd510ccd92dd51e84a9080bdf4ff9dc62c043ba15`; it is not included in the projection manifest and must be explicitly bound in the future current-epoch successor. Old positional IDs must not be silently reused.\n\nI examined the complete upstream chip diffs. `e69b2b09efaf577cd5fe92b70808479f975913af` adds an `activeItemIndex !== 0` guard that skips first-item focus. `2861a306aebc54eafe4a72b4a53860d8612af5d4` later removes that guard and refocuses the currently active item, or selects the first when none exists. Both registered legacy dispositions are `do-not-adopt`: tagged Material 16 and current owned legacy chip-list source call `setFirstItemActive` for nonempty lists. The current minimum peer and tagged 16 CDK FocusKeyManager source both call `activeItem.focus()` after setting the active item, including when it was already active. The #88/#89 tests cover legacy first-enabled behavior rather than retaining a later or disabled active item; the #90 test constructs index zero while DOM focus is outside, then verifies public list focus returns focus to the first chip. It is a valid counterfactual *against adopting e69's skip* and covers the stale-active-zero refocus scenario motivating 2861. It does not claim that the opposing literal e69 guard is executed or that every modern chip-grid case matches legacy behavior.\n\nThe original #90 callback was not preserved byte-for-byte: after natural blur it expected active index zero. The new test first observes the distinct real blur-cleared state `-1`, explicitly reconstructs zero using `updateActiveItem(0)` while asserting DOM focus stays outside, then checks refocus. The normal blur-clearing case remains separately registered. Do not describe this as proof that natural blur retains zero or as an untouched tagged browser replay; no tagged browser execution was performed.\n\nThe recorded packed Chrome149 chip result rehashes to artifact `08dae37e775e2ab50457d820b3c7ae98114059012125781378cd36f05d8990e5`, with 184/184 passing and the four relevant names observed. A deliberately altered, separately rehashed artifact `be5b44bcffe0d0ea1d6292db5e7237e360cf64c55a8f34015230a47776a9b7b7` yielded 183/184, failing the reconstructed #90 case. Independent FESM comparison found the one changed line inserts the e69-style `activeItemIndex !== 0` guard. The mutant's `.mjs.map` still embeds the original TypeScript, so this is a JS-only repacked counterfactual with a stale sourcemap, **not** a fresh source build; its failure establishes sensitivity to that FESM change only. I did not rerun Chrome.\n\nI independently rehashed the 22 family reports, confirmed their common 08dae artifact hash, zero failed/skipped records, all 2,320 non-shared expected name occurrences and 44 extra runner-control occurrences. The 21 original family reports and the separate patched-chip report use different source snapshots, not one coordinator invocation; two shared-export IDs have no separate executable name. The archived 2,228-probe log still fails on the fixed validator source snapshot (`unreviewed native validator delta`): it must not be updated or treated as passed. A separately reviewed current-epoch matrix, validator/source guards and single bound coordinator execution remain required; the b6ef packed-consumer report also retains two failed harness checks. No tagged browser, 21.x, security, G09/G11 or release pass follows.\n"
+  },
+  "root_checks": [
+    "Verified unchanged original source hash and exact reviewed afterimage.",
+    "Verified both184case report hashes; positive08dae184/184 and separately JS-mutated negative183/184.",
+    "Actual pinnedNode24 static derivation2321to2322,57paths,2320existing records unchanged; only#90name restored and prior normalblur name separately appended#92.",
+    "No product, historical tagged source/golden, selector/style/template or peer change."
+  ],
+  "registry_results": {
+    "before_sha256": "9c634471e8453994a103a61db24b03f3a4b5789c7b3a24f1176408c1e792ca68",
+    "after_sha256": "95570be816d45166cbabfe555176d33a5c72fe10ffe0b9abbba48dae63f4a9ac",
+    "changed_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip-list.spec.ts#90",
+    "new_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip-list.spec.ts#92"
+  },
+  "limits": [
+    "Normal blur clears active index; stronger state explicitly reconstructed, no natural retention claim.",
+    "Both upstream chip decisions remain do-not-adopt; test rejects e69skip and preserves legacy firstenabled over modern active retention.",
+    "Mutant sourcemap still embeds original source; JS-only sensitivity counterfactual, not source rebuild.",
+    "No tagged16browser replay, current coordinator admission, fullscope G11, security,21.x or release claim."
+  ]
+}

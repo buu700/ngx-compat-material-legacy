@@ -1647,7 +1647,7 @@ describe('MatChipList', () => {
       expect(document.activeElement).toBe(chipArray[2]._elementRef.nativeElement);
     });
 
-    it('should refocus the first chip after focus leaves and active index clears', fakeAsync(() => {
+    it('should refocus the first chip after focus leaves while index zero remains active', fakeAsync(() => {
       setupStandardList();
       const keyManager = chipListInstance._keyManager;
       const outside = document.createElement('button');
@@ -1659,16 +1659,16 @@ describe('MatChipList', () => {
         tick();
         fixture.detectChanges();
         expect(document.activeElement).toBe(outside);
-        // The tagged chip list clears the active item when focus leaves.
         expect(keyManager.activeItemIndex).toBe(-1);
-
+        // Natural blur clears the index; recreate the separate active-zero state.
+        keyManager.updateActiveItem(0);
+        expect(keyManager.activeItemIndex).toBe(0);
+        expect(document.activeElement).toBe(outside);
         chipListInstance.focus();
         fixture.detectChanges();
+        expect(keyManager.activeItemIndex).toBe(0);
         expect(document.activeElement).toBe(chips.first._elementRef.nativeElement);
-        expect(keyManager.activeItem).toBe(chips.first);
-      } finally {
-        outside.remove();
-      }
+      } finally { outside.remove(); }
     }));
 
     it('should notify disabled state after propagating it to chips and render the form field state', () => {
@@ -1696,6 +1696,30 @@ describe('MatChipList', () => {
         subscription.unsubscribe();
       }
     });
+    it('should refocus the first chip after focus leaves and active index clears', fakeAsync(() => {
+      setupStandardList();
+      const keyManager = chipListInstance._keyManager;
+      const outside = document.createElement('button');
+      document.body.appendChild(outside);
+      try {
+        chipListInstance.focus();
+        outside.focus();
+        zone.simulateZoneExit();
+        tick();
+        fixture.detectChanges();
+        expect(document.activeElement).toBe(outside);
+        // The tagged chip list clears the active item when focus leaves.
+        expect(keyManager.activeItemIndex).toBe(-1);
+
+        chipListInstance.focus();
+        fixture.detectChanges();
+        expect(document.activeElement).toBe(chips.first._elementRef.nativeElement);
+        expect(keyManager.activeItem).toBe(chips.first);
+      } finally {
+        outside.remove();
+      }
+    }));
+
   });
 
 });
