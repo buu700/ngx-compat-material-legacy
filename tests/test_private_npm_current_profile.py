@@ -8,6 +8,7 @@ from pathlib import Path
 import hashlib
 import importlib.util
 import json
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -256,6 +257,20 @@ class PrivateNpmCurrentProfileTests(unittest.TestCase):
                     self.validate()
 
     def seal_v2(self, fault=None):
+        if self.profile['schema_version'] == 1:
+            for name in ('compatibility/rc/typeahead-fixture', 'compatibility/rc/typeahead-runner'):
+                (self.root / name).mkdir(parents=True, exist_ok=True)
+                self.profile['lines']['main']['support_discovery'].append(
+                    {'root': name, 'suffixes': SUFFIXES.copy(), 'paths': []})
+            rows = self.profile['lines']['main']['support_files']
+            for path in ('compatibility/rc/typeahead-runner/historical-specs.json',
+                         'testing/legacy-runner/historical-inventory.json',
+                         'testing/legacy-runner/historical-specs.json'):
+                raw = b'{"specs":[]}\n'
+                self.write(path, raw)
+                rows.append({'path': path, 'sha256': digest(raw), 'bytes': len(raw),
+                             'git_blob': hashlib.sha1(b'blob ' + str(len(raw)).encode() + b'\0' + raw).hexdigest()})
+            rows.sort(key=lambda row: row['path'])
         self.seal()
         review = json.loads((self.root / self.profile['review']['path']).read_bytes())
         branch = self.profile['lines']['main']
@@ -299,6 +314,187 @@ class PrivateNpmCurrentProfileTests(unittest.TestCase):
             with self.subTest(fault=fault):
                 self.seal_v2(fault)
                 with self.assertRaises((ValueError, KeyError)): self.validate()
+
+    def _add_v2_discovered_file(self, root_name, relative, raw=b'export const fixture = true;\n'):
+        path = root_name + '/' + relative
+        self.write(path, raw)
+        branch = self.profile['lines']['main']
+        branch['support_files'].append({'path': path, 'sha256': digest(raw), 'bytes': len(raw),
+            'git_blob': hashlib.sha1(b'blob ' + str(len(raw)).encode() + b'\0' + raw).hexdigest()})
+        branch['support_files'].sort(key=lambda row: row['path'])
+        next(group for group in branch['support_discovery'] if group['root'] == root_name)['paths'].append(path)
+        next(group for group in branch['support_discovery'] if group['root'] == root_name)['paths'].sort()
+        return path
+
+    def test_v2_typeahead_roots_bind_files_and_recheck_membership(self):
+        self.seal_v2()
+        roots = ('compatibility/rc/typeahead-fixture', 'compatibility/rc/typeahead-runner')
+        files = [self._add_v2_discovered_file(roots[0], 'nested/probe.ts'),
+                 self._add_v2_discovered_file(roots[1], 'karma.conf.cjs')]
+        self.seal_v2()
+        _, recheck = self.validate()
+        recheck()
+        for name in files:
+            path = self.root / name
+            raw = path.read_bytes()
+            try:
+                path.write_bytes(raw + b'changed')
+                with self.assertRaises(ValueError): self.validate()
+                with self.assertRaises(ValueError): recheck()
+            finally: path.write_bytes(raw)
+        for name in roots:
+            extra = name + '/new.mjs'
+            self.write(extra, b'export {};\n')
+            try:
+                with self.assertRaises(ValueError): self.validate()
+                with self.assertRaises(ValueError): recheck()
+            finally: (self.root / extra).unlink()
+        recheck()
+
+    def test_v2_exact_runner_json_inputs_are_required_and_current(self):
+        names = ('compatibility/rc/typeahead-runner/historical-specs.json',
+                 'testing/legacy-runner/historical-inventory.json',
+                 'testing/legacy-runner/historical-specs.json')
+        self.seal_v2()
+        original = json.loads(json.dumps(self.profile))
+        for name in names:
+            with self.subTest(path=name):
+                self.profile = json.loads(json.dumps(original))
+                self.seal_v2()
+                _, recheck = self.validate()
+                path = self.root / name
+                raw = path.read_bytes()
+                try:
+                    path.write_bytes(raw + b' ')
+                    with self.assertRaises(ValueError): self.validate()
+                    with self.assertRaises(ValueError): recheck()
+                    path.unlink()
+                    with self.assertRaises((ValueError, OSError)): self.validate()
+                    with self.assertRaises((ValueError, OSError)): recheck()
+                finally:
+                    path.write_bytes(raw)
+                _, recheck = self.validate()
+                branch = self.profile['lines']['main']
+                branch['support_files'] = [row for row in branch['support_files'] if row['path'] != name]
+                self.seal_v2()
+                with self.assertRaisesRegex(ValueError, 'missing current private npm typeahead runner input'):
+                    self.validate()
+                with self.assertRaises(ValueError): recheck()
+
+    def test_v2_typeahead_roots_reject_missing_and_symlinks(self):
+        self.seal_v2()
+        roots = ('compatibility/rc/typeahead-fixture', 'compatibility/rc/typeahead-runner')
+        for name in roots:
+            with self.subTest(root=name):
+                _, recheck = self.validate()
+                target = self.root / name
+                relocated = target.with_name(target.name + '-saved')
+                target.rename(relocated)
+                try:
+                    with self.assertRaises(ValueError): self.validate()
+                    with self.assertRaises(ValueError): recheck()
+                    target.symlink_to(relocated, target_is_directory=True)
+                    with self.assertRaises(ValueError): self.validate()
+                    with self.assertRaises(ValueError): recheck()
+                    target.unlink()
+                finally:
+                    if target.is_symlink(): target.unlink()
+                    relocated.rename(target)
+                child = target / 'linked.ts'
+                child.symlink_to(self.root / 'scripts/command.mjs')
+                try:
+                    with self.assertRaises(ValueError): self.validate()
+                    with self.assertRaises(ValueError): recheck()
+                finally: child.unlink()
+
+    def test_v2_typeahead_discovery_rejects_resealed_bad_groups_and_rows(self):
+        self.seal_v2()
+        roots = ('compatibility/rc/typeahead-fixture', 'compatibility/rc/typeahead-runner')
+        self._add_v2_discovered_file(roots[0], 'case.ts')
+        self._add_v2_discovered_file(roots[1], 'karma.conf.cjs')
+        self.seal_v2()
+        original = json.loads(json.dumps(self.profile))
+        for fault in ('missing', 'duplicate', 'unknown', 'suffix', 'unbound', 'missing-member', 'bad-hash', 'bad-blob'):
+            with self.subTest(fault=fault):
+                self.profile = json.loads(json.dumps(original))
+                self.seal_v2()
+                _, recheck = self.validate()
+                branch = self.profile['lines']['main']
+                groups = branch['support_discovery']
+                group = next(row for row in groups if row['root'] == roots[0])
+                item = next(row for row in branch['support_files'] if row['path'].startswith(roots[0] + '/'))
+                if fault == 'missing': groups.remove(group)
+                if fault == 'duplicate': groups[-1] = group.copy()
+                if fault == 'unknown': group['root'] = 'compatibility/rc/other'
+                if fault == 'suffix': group['suffixes'].remove('.ts')
+                if fault == 'unbound': branch['support_files'].remove(item)
+                if fault == 'missing-member': group['paths'].clear()
+                if fault == 'bad-hash': item['sha256'] = '0' * 64
+                if fault == 'bad-blob': item['git_blob'] = '0' * 40
+                self.seal_v2()
+                with self.assertRaises(ValueError): self.validate()
+                with self.assertRaises(ValueError): recheck()
+
+    def test_schema_two_21x_retains_two_historical_roots(self):
+        old_branch = json.loads(json.dumps(self.profile['lines']['main']))
+        self.seal_v2()
+        self.profile['lines']['21.x'] = old_branch
+        self.manifests['lines']['21.x'] = json.loads(json.dumps(self.manifests['lines']['main']))
+        self.evidence['roots']['21.x'] = json.loads(json.dumps(self.evidence['roots']['main']))
+        self.seal_v2()
+        review_path = self.profile['review']['path']
+        review = json.loads((self.root / review_path).read_bytes())
+        branch = self.profile['lines']['21.x']
+        review['lines']['21.x'] = {'source_parent': branch['source_parent'],
+            **{name + '_sha256': roster_hash(branch[name]) for name in ('source_files', 'support_files', 'input_files')},
+            'preconditions': 'unchanged-maintained-tool-owned-npm'}
+        raw = json.dumps(review).encode(); self.write(review_path, raw)
+        self.profile['review'].update(sha256=digest(raw), bytes=len(raw))
+        raw = json.dumps(self.profile).encode(); self.write(eligibility.NPM_CURRENT_PRIVATE_PROFILE_PATH, raw)
+        self.pin = digest(raw)
+        with patch.object(eligibility, 'NPM_CURRENT_PRIVATE_PROFILE_SHA256', self.pin):
+            _, recheck = eligibility._private_npm_current_profile(self.root, '21.x', self.manifests, self.evidence)
+            recheck()
+        branch['support_discovery'].append({'root': 'compatibility/rc/typeahead-fixture', 'suffixes': SUFFIXES.copy(), 'paths': []})
+        raw = json.dumps(self.profile).encode(); self.write(eligibility.NPM_CURRENT_PRIVATE_PROFILE_PATH, raw)
+        with patch.object(eligibility, 'NPM_CURRENT_PRIVATE_PROFILE_SHA256', digest(raw)):
+            with self.assertRaises(ValueError):
+                eligibility._private_npm_current_profile(self.root, '21.x', self.manifests, self.evidence)
+        with self.assertRaises(ValueError): recheck()
+
+    def test_caller_probe_enumeration_rejects_linked_ancestors_and_growth(self):
+        # Exercise the actual Node enumeration function without running the
+        # complete caller probe against a stale production profile.
+        code = r"""
+const assert=require('node:assert/strict'),fs=require('node:fs'),p=require('node:path');
+const source=fs.readFileSync(process.argv[1],'utf8');
+const blockStart=source.indexOf('const discoveryRoots ='),blockEnd=source.indexOf('\nfunction checkPopulation()',blockStart);
+assert.ok(blockStart>=0&&blockEnd>blockStart);
+const check=new Function('assert','profile','line','subject','codeSuffixes',source.slice(blockStart,blockEnd));
+const roots=['tests','compatibility/handoff/codex-closeout/tools','compatibility/rc/typeahead-fixture','compatibility/rc/typeahead-runner'];
+const suffix=['.cjs','.js','.mjs','.py','.sh','.ts'];
+const groups=roots.map(root=>({root,suffixes:suffix,paths:[]}));
+const names=['compatibility/rc/typeahead-runner/historical-specs.json','testing/legacy-runner/historical-inventory.json','testing/legacy-runner/historical-specs.json'];
+const files=names.map(path=>({path}));
+check(assert,{schema_version:2},'main',{support_discovery:groups,support_files:files},suffix);
+for(const name of names)assert.throws(()=>check(assert,{schema_version:2},'main',{support_discovery:groups,support_files:files.filter(row=>row.path!==name)},suffix));
+const start=source.indexOf('function enumerate('),end=source.indexOf('\nfunction primaryPaths()',start);
+assert.ok(start>=0&&end>start);
+const f=new Function('assert','lstatSync','readdirSync','join','extname','root',source.slice(start,end)+'\nreturn enumerate;');
+const root=process.argv[2],dir='compatibility/rc/typeahead-fixture',folder=p.join(root,dir);
+fs.mkdirSync(folder,{recursive:true});fs.writeFileSync(p.join(folder,'one.ts'),'fixture');
+const scan=f(assert,fs.lstatSync,fs.readdirSync,p.join,p.extname,root),suffixes=['.cjs','.js','.mjs','.py','.sh','.ts'];
+const expected=[dir+'/one.ts'];assert.deepEqual(scan(dir,suffixes),expected);
+fs.writeFileSync(p.join(folder,'new.mjs'),'new');assert.notDeepEqual(scan(dir,suffixes),expected);fs.unlinkSync(p.join(folder,'new.mjs'));
+fs.symlinkSync(p.join(folder,'one.ts'),p.join(folder,'link.ts'));assert.throws(()=>scan(dir,suffixes));fs.unlinkSync(p.join(folder,'link.ts'));
+const parent=p.join(root,'compatibility/rc'),saved=p.join(root,'compatibility/rc-saved');fs.renameSync(parent,saved);
+assert.throws(()=>scan(dir,suffixes));fs.symlinkSync(saved,parent,'dir');assert.throws(()=>scan(dir,suffixes));
+fs.unlinkSync(parent);fs.renameSync(saved,parent);assert.deepEqual(scan(dir,suffixes),expected);
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            child = subprocess.run(['node', '-e', code, str(ROOT / 'tests/npm_tooling_caller_probe.mjs'), directory],
+                                   capture_output=True, text=True, timeout=30)
+            self.assertEqual(child.returncode, 0, child.stderr)
 
     def test_v1_new_authority_rejected(self):
         self.seal()

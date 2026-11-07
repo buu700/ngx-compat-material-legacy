@@ -668,6 +668,12 @@ def _private_npm_current_profile(root: Path, line: str, manifests: dict, evidenc
         return rows
 
     primary, support, inputs = (source_rows(name) for name in ("source_files", "support_files", "input_files"))
+    if profile["schema_version"] == 2 and line == "main":
+        typeahead_inputs = {"compatibility/rc/typeahead-runner/historical-specs.json",
+                            "testing/legacy-runner/historical-inventory.json",
+                            "testing/legacy-runner/historical-specs.json"}
+        if not typeahead_inputs.issubset(support):
+            raise ValueError("missing current private npm typeahead runner input")
     all_rows = {**primary, **support, **inputs}
     if len(all_rows) != len(primary) + len(support) + len(inputs):
         raise ValueError("overlapping current private npm input populations")
@@ -676,6 +682,8 @@ def _private_npm_current_profile(root: Path, line: str, manifests: dict, evidenc
     groups = branch["support_discovery"]
     suffixes = [".cjs", ".js", ".mjs", ".py", ".sh", ".ts"]
     discovery_roots = {"tests", "compatibility/handoff/codex-closeout/tools"}
+    if profile["schema_version"] == 2 and line == "main":
+        discovery_roots.update({"compatibility/rc/typeahead-fixture", "compatibility/rc/typeahead-runner"})
     if type(groups) is not list or len(groups) != len(discovery_roots):
         raise ValueError("current private npm discovery scope changed")
     grouped = {}

@@ -62,7 +62,12 @@ function enumerate(directory, suffixes) {
       for (const name of readdirSync(join(root, path)).sort()) walk(path + '/' + name);
     } else if (stat.isFile() && suffixes.includes(extname(path))) names.push(path);
   }
-  assert.ok(lstatSync(join(root, directory)).isDirectory(), 'missing source directory');
+  let parent = root;
+  for (const part of directory.split('/')) {
+    parent = join(parent, part);
+    const stat = lstatSync(parent);
+    assert.ok(!stat.isSymbolicLink() && stat.isDirectory(), 'missing or linked source directory');
+  }
   walk(directory);
   return names.sort();
 }
@@ -197,9 +202,16 @@ if (line === 'main') {
   assert.deepEqual(currentRoster.callers, [...roster.callers, added].sort((a, b) => a.path.localeCompare(b.path)),
     'current caller successor must preserve the historical roster and add only the reviewed caller');
 }
-assert.ok(Array.isArray(subject.support_discovery) && subject.support_discovery.length === 2);
-assert.deepEqual(subject.support_discovery.map(group => group.root).sort(),
-  ['compatibility/handoff/codex-closeout/tools', 'tests']);
+const discoveryRoots = ['compatibility/handoff/codex-closeout/tools', 'tests'];
+if (profile.schema_version === 2 && line === 'main') {
+  discoveryRoots.push('compatibility/rc/typeahead-fixture', 'compatibility/rc/typeahead-runner');
+  for (const path of ['compatibility/rc/typeahead-runner/historical-specs.json',
+    'testing/legacy-runner/historical-inventory.json', 'testing/legacy-runner/historical-specs.json']) {
+    assert.ok(subject.support_files.some(row => row.path === path), 'missing current typeahead runner input: ' + path);
+  }
+}
+assert.ok(Array.isArray(subject.support_discovery) && subject.support_discovery.length === discoveryRoots.length);
+assert.deepEqual(subject.support_discovery.map(group => group.root).sort(), discoveryRoots.sort());
 for (const group of subject.support_discovery) assert.deepEqual(group.suffixes, codeSuffixes);
 
 function checkPopulation() {
