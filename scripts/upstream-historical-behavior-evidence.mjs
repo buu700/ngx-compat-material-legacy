@@ -46,8 +46,8 @@ const retainedRegressionCases = [
   nativeCase('legacy-chips/chip.spec.ts', 36, "MatChip > owned blur lifecycle > should cancel pending blur and notify destruction before ripple cleanup"),
   nativeCase('legacy-chips/chip.spec.ts', 37, "MatChip > owned blur lifecycle > should notify programmatic focus once during synchronous host reentry"),
 ];
-export function historicalRegressionRequirements() {
-  return structuredClone(retainedRegressionCases);
+export function historicalRegressionRequirements(options = {}) {
+  return structuredClone(scopeForEpoch(options.epoch, options.line).regressions);
 }
 // This finite registry is owned by individual whole-patch source reviews.
 // Names are checked in addition to indexed ids: an inserted test cannot silently
@@ -179,9 +179,73 @@ const sameIds = (actual, expected) => Array.isArray(actual) && actual.length ===
   && new Set(actual).size === actual.length && actual.every(id => expected.includes(id));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 
+
+// Explicit, source-reviewed MAIN successor. Unspecified epoch remains historical.
+export const CURRENT_MAIN_HISTORICAL_EPOCH = 'main-pointer-regression-v2';
+export const POINTER_REGRESSION_SUBJECT = Object.freeze({sha: '979e903020ec8e23747fa35414708be2c99e7e99', intended_disposition: 'already-adapted', case_id: casePrefix + 'src/material/legacy-autocomplete/autocomplete.spec.ts#179'});
+const currentMainIndexByName = new Map(Object.entries({
+  "MatAutocomplete > should not throw errors when closing without options": [
+    172,
+    174
+  ],
+  "MatAutocomplete > Fallback positions > should fit an above-position panel inside the handset landscape viewport": [
+    105,
+    106
+  ],
+  "MatAutocomplete > Fallback positions > should reset landscape configuration and unsubscribe without destroying the observer": [
+    106,
+    107
+  ],
+  "MatAutocomplete > Fallback positions > should reuse one handset subscription across panel close and reopen": [
+    107,
+    108
+  ],
+  "MatAutocomplete > Fallback positions > should allow the panel to expand when the number of results increases": [
+    108,
+    109
+  ],
+  "MatAutocomplete > Fallback positions > should fall back to above position when requested if options are added while the panel is open": [
+    110,
+    111
+  ],
+  "MatAutocomplete > forms integration > should retain the selected model while typing when selection is required": [
+    37,
+    38
+  ],
+  "MatAutocomplete > forms integration > should publish the chosen option once after required-selection typing": [
+    38,
+    39
+  ],
+  "MatAutocomplete > forms integration > should reset unmatched required-selection text once on outside click": [
+    39,
+    40
+  ],
+  "MatAutocomplete > forms integration > should clear the text field if value is reset programmatically": [
+    46,
+    47
+  ],
+  "MatAutocomplete > forms integration > should update the control back to a string if user types after an option is selected": [
+    42,
+    43
+  ]
+}));
+function scopeForEpoch(epoch, line) {
+  if (epoch === undefined) return {scopes, regressions: retainedRegressionCases, count: requiredCaseCount};
+  if (epoch !== CURRENT_MAIN_HISTORICAL_EPOCH || line !== 'main') throw new Error('unsupported historical roster epoch');
+  const rebind = row => {
+    const pair = currentMainIndexByName.get(row.full_name);
+    if (!pair) return structuredClone(row);
+    const suffix = '#' + pair[0];
+    if (!row.case_id.endsWith(suffix) || row.historical_path !== 'src/material/legacy-autocomplete/autocomplete.spec.ts') throw new Error('wrong historical epoch mapping');
+    return {...row, case_id: row.case_id.slice(0, -suffix.length) + '#' + pair[1]};
+  };
+  return {scopes: new Map([...scopes].map(([sha, row]) => [sha, {...row, cases: row.cases.map(rebind)}])),
+    regressions: [...retainedRegressionCases.map(rebind), nativeCase('legacy-autocomplete/autocomplete.spec.ts', 179, 'autocomplete hidden overlay pointer state > should release an empty group pane and restore inline pointer policy when options return')], count: 2328};
+}
+
 export const HISTORICAL_BEHAVIOR_SHAS = Object.freeze([...scopes.keys()]);
-export function historicalBehaviorRequirements(sha) {
-  return structuredClone(scopes.get(sha) ?? null);
+export function historicalBehaviorRequirements(sha, options = {}) {
+  return structuredClone(scopeForEpoch(options.epoch, options.line).scopes.get(sha) ?? null);
 }
 
 export function requiresHistoricalBehavior(entry, proof) {
@@ -194,7 +258,9 @@ export function requiresHistoricalBehavior(entry, proof) {
  */
 export function validateHistoricalBehavior({root, entry, proof, request}) {
   try {
-    const registered = scopes.get(entry?.sha);
+    const epoch = proof?.historical_behavior?.roster_epoch;
+    const selected = scopeForEpoch(epoch, request?.binding?.source_line);
+    const registered = selected.scopes.get(entry?.sha);
     demand(registered && proof?.proof_kind === HISTORICAL_BEHAVIOR_KIND
       && proof.diff_sha256 === registered.patch, 'unregistered historical behavior subject');
     if (registered.source_contract === 'classic-chip-list-focus-and-state') {
@@ -226,9 +292,9 @@ export function validateHistoricalBehavior({root, entry, proof, request}) {
     const groups = matrix.checks.find(row => row.check_id === checkId)?.acceptance?.cases_by_line?.[binding.source_line];
     demand(object(groups) && Object.values(groups).every(Array.isArray), 'missing full historical matrix roster');
     const expected = Object.values(groups).flat();
-    demand(expected.length === requiredCaseCount && new Set(expected).size === expected.length
+    demand(expected.length === selected.count && new Set(expected).size === expected.length
       && registered.cases.every(row => expected.includes(row.case_id))
-      && retainedRegressionCases.every(row => expected.includes(row.case_id)), 'incomplete full historical matrix roster');
+      && selected.regressions.every(row => expected.includes(row.case_id)), 'incomplete full historical matrix roster');
     const report = JSON.parse(readEvidenceMember(runDir, 'reports/' + checkId + '.json'));
     demand(report.schema_version === 1 && report.template === false && report.check_id === checkId
       && report.line === binding.source_line && report.run_id === binding.run_id
@@ -258,7 +324,7 @@ export function validateHistoricalBehavior({root, entry, proof, request}) {
     demand(Array.isArray(observation.cases) && sameIds(observation.cases.map(row => row?.case_id), expected)
       && observation.cases.every(row => row.result === 'pass')
       && isDeepStrictEqual(observation.rejection_reasons, []), 'incomplete historical observed cases');
-    for (const required of [...registered.cases, ...retainedRegressionCases]) {
+    for (const required of [...registered.cases, ...selected.regressions]) {
       const selected = observation.cases.find(row => row.case_id === required.case_id);
       demand(Object.entries(required).every(([key, value]) => selected[key] === value)
         && selected.executed_full_name === required.full_name, 'wrong required historical test identity');
@@ -272,7 +338,7 @@ export function validateHistoricalBehavior({root, entry, proof, request}) {
       invocation_id: execution.invocation_id, output, library: packed.library,
       packed_consumer: {invocation_id: packed.invocation_id, output: packed.output},
       required_cases: registered.cases.map(row => row.case_id),
-      retained_regression_cases: retainedRegressionCases.map(row => row.case_id)};
+      retained_regression_cases: selected.regressions.map(row => row.case_id)};
   } catch (error) {
     return {ok: false, detail: error.message};
   }
