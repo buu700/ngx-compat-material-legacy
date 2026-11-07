@@ -140,9 +140,40 @@ export function testImportOwnershipContext(readMember, line) {
     source_only: true, upstream_standalone_setup_or_product_runtime_executed: false};
 }
 
+// This successor is deliberately finite. Historical reports keep their own route.
+const ROSTER_SUCCESSOR = 'compatibility/rc/c04-b4-test-import-roster-source-v1.json';
+const ROSTER_SUCCESSOR_SHA = '938b5fbb5151ad8fa2037f955ef26972404d0085060773182e29b529fd216eea';
+const ROSTER_PREDECESSOR = 'compatibility/rc/chip-source-scope-requalification-test-import.json';
+const ROSTER_PREDECESSOR_SHA = 'f356923cce2f46158d6fb2a6ec3a9e066044b6b1e8f0664a392b3f0f6bdbde12';
+function rosterSuccessorBound(body, readMember, line) {
+  try {
+    assert.equal(line, 'main');
+    const currentRaw = readMember(ROSTER_SUCCESSOR), priorRaw = readMember(ROSTER_PREDECESSOR);
+    assert.equal(hash(currentRaw), ROSTER_SUCCESSOR_SHA);
+    assert.equal(hash(priorRaw), ROSTER_PREDECESSOR_SHA);
+    assert.deepEqual(body, JSON.parse(currentRaw));
+    const prior = JSON.parse(priorRaw);
+    const {ownership_context: currentContext, current_roster_context_successor: metadata, ...unchanged} = body;
+    const {ownership_context: priorContext, ...priorUnchanged} = prior;
+    assert.deepEqual(unchanged, priorUnchanged);
+    assert.deepEqual(currentContext, testImportOwnershipContext(readMember, line));
+    assert.deepEqual(metadata, {
+      role: 'main-only source roster context successor; historical inventory candidate and execution data are retained capture, not current source proof',
+      previous_report: {path: ROSTER_PREDECESSOR, sha256: ROSTER_PREDECESSOR_SHA, bytes: priorRaw.length},
+      source_commit: 'b4f75d6044a61e28504afd9a018fdaf7dd2ca4b4',
+      historical_inventory_capture_not_current_source_authority: true,
+      current_historical_candidate_bytes_or_runtime_execution_qualified: false,
+      source_only: true, g11_claim: 'not-passed',
+    });
+    assert.ok(priorContext);
+    return true;
+  } catch { return false; }
+}
+
 export function testImportBatchOk(body, readMember, line) {
   try {
     assert.equal(body.role, TEST_IMPORT_ROLE); assert.equal(body.line, line); assert.equal(body.g11_claim, 'not-passed');
+    if (Object.hasOwn(body, 'current_roster_context_successor')) assert.ok(rosterSuccessorBound(body, readMember, line));
     assert.deepEqual(body.scope_sha_ids, TEST_IMPORT_SHAS);
     assert.deepEqual(body.ownership_context, testImportOwnershipContext(readMember, line));
     const actual = analyzeTestImportSubjects(readMember);
@@ -178,6 +209,7 @@ export function testImportBatchOk(body, readMember, line) {
 export function testImportEntryOk(body, entry, readMember, batchValid) {
   try {
     assert.equal(batchValid, true);
+    if (entry.evidence_report === ROSTER_SUCCESSOR) assert.ok(rosterSuccessorBound(body, readMember, body.line));
     const review = body.reviews.find(r => r.sha === entry.sha); assert.ok(review);
     assert.equal(entry.final_disposition, review.final_disposition); assert.equal(entry.reason, review.decision);
     assert.deepEqual(entry.files, review.paths); assert.deepEqual(entry.affected_branches, review.affected_branches);
