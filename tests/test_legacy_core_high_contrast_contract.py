@@ -12,7 +12,8 @@ import {assessLegacyCoreHighContrast,legacyCoreHighContrastOkay} from './scripts
 const life={lifecycle:['FADING_IN','VISIBLE','FADING_OUT','HIDDEN'],connected:[true,true,true,false]};
 const wrong={found:true,ripple_display:'block',focus_display:'none',submenu_fill:'rgb(8, 9, 10)'};
 const positive={found:true,ripple_display:'none',focus_display:'block',submenu_fill:'rgb(0, 0, 0)',canvas_color:'rgb(0, 0, 0)',negative:wrong,...life,
- fallback:{initial_state:'FADING_IN',initial_connected:true,final_state:'HIDDEN',final_connected:false,wait_completed:true}};
+ fallback:{initial_state:'FADING_IN',initial_connected:true,final_state:'HIDDEN',final_connected:false,wait_completed:true},
+ persistent:{initial_state:'FADING_IN',initial_connected:true,visible_state:'VISIBLE',visible_connected:true,visible_wait_completed:true,dismissed_state:'FADING_OUT',dismissed_connected:true,final_state:'HIDDEN',final_connected:false,hidden_wait_completed:true}};
 const body={normal:{found:true,media_active:false,class_active:false,ripple_display:'block',focus_display:'none',submenu_fill:'rgb(1, 2, 3)',...life},
  historical_class:{...structuredClone(positive),media_active:false,class_active:true},
  forced_colors:{...structuredClone(positive),media_active:true,class_active:false}};
@@ -27,7 +28,9 @@ for(const mutate of [b=>delete b.normal,b=>delete b.historical_class,b=>delete b
  b=>b.forced_colors.lifecycle=['FADING_IN','VISIBLE','FADING_OUT','VISIBLE'],
  b=>delete b.historical_class.fallback,b=>b.forced_colors.fallback.final_connected=true,
  b=>b.historical_class.fallback.wait_completed=false,b=>b.forced_colors.fallback.initial_state='HIDDEN',
- b=>b.error='media emulation failed']){
+ b=>delete b.forced_colors.persistent,b=>b.historical_class.persistent.visible_state='HIDDEN',
+ b=>b.forced_colors.persistent.dismissed_state='VISIBLE',b=>b.historical_class.persistent.final_connected=true,
+ b=>b.forced_colors.persistent.hidden_wait_completed=false,b=>b.error='media emulation failed']){
  const b=structuredClone(body);mutate(b);assert.equal(legacyCoreHighContrastOkay(b),false);
 }
 assert.deepEqual(assessLegacyCoreHighContrast(body).map(r=>r.case_id),['legacy-core/high-contrast/historical-class','legacy-core/high-contrast/forced-colors','legacy-core/ripple/high-contrast-lifecycle']);

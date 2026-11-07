@@ -242,11 +242,12 @@ export class LabRoot {
     (window as any).__closeoutAngularZoneEntered=ngZone.run(() => NgZone.isInAngularZone());
     const refs: LegacyRippleRef[]=[];
     let fallback: LegacyRippleRef | null=null;
-    const launch=() => {
+    let persistentRef: LegacyRippleRef | null=null;
+    const launch=(persistent=true) => {
       const host=document.getElementById('core-contrast-ripple');
       if(!host)throw Error('core contrast ripple host missing');
       const renderer=new LegacyRippleRenderer({rippleDisabled:false,rippleConfig:{}},ngZone,host,platform);
-      const ref=renderer.fadeInRipple(0,0,{centered:true,radius:12,persistent:true,animation:{enterDuration:60,exitDuration:60}});
+      const ref=renderer.fadeInRipple(0,0,{centered:true,radius:12,persistent,animation:{enterDuration:60,exitDuration:60}});
       refs.push(ref);return ref;
     };
     const snapshot=(ref:LegacyRippleRef) => ({state:LegacyRippleState[ref.state],connected:ref.element.isConnected});
@@ -266,8 +267,11 @@ export class LabRoot {
         ref.element.dispatchEvent(new Event('transitionend'));steps.push(snapshot(ref));
         return {...styles,lifecycle:steps.map(s=>s.state),connected:steps.map(s=>s.connected)};
       },
-      startFallback:() => {fallback=launch();return {initial_state:LegacyRippleState[fallback.state],initial_connected:fallback.element.isConnected};},
+      startFallback:() => {fallback=launch(false);return {initial_state:LegacyRippleState[fallback.state],initial_connected:fallback.element.isConnected};},
       readFallback:() => ({final_state:fallback?LegacyRippleState[fallback.state]:null,final_connected:fallback?.element.isConnected??null}),
+      startPersistent:() => {persistentRef=launch();return snapshot(persistentRef);},
+      readPersistent:() => persistentRef?snapshot(persistentRef):null,
+      fadePersistent:() => {persistentRef?.fadeOut();return persistentRef?snapshot(persistentRef):null;},
       cleanup:() => {for(const ref of refs){ref.fadeOut();ref.element.dispatchEvent(new Event('transitioncancel'));}}
     };
     (window as any).__closeoutRippleColor={

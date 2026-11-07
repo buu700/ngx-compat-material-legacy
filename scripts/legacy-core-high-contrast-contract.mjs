@@ -19,6 +19,11 @@ const negative=mode=>mode?.found===true && mode.ripple_display==='block'
 const fallback=mode=>mode?.initial_state==='FADING_IN' && mode.initial_connected===true
   && mode.final_state==='HIDDEN' && mode.final_connected===false && mode.wait_completed===true;
 
+const persistent=mode=>mode?.initial_state==='FADING_IN' && mode.initial_connected===true
+  && mode.visible_state==='VISIBLE' && mode.visible_connected===true && mode.visible_wait_completed===true
+  && mode.dismissed_state==='FADING_OUT' && mode.dismissed_connected===true
+  && mode.final_state==='HIDDEN' && mode.final_connected===false && mode.hidden_wait_completed===true;
+
 export function assessLegacyCoreHighContrast(observations){
   const o=observations||{},normal=o.normal,historic=o.historical_class,forced=o.forced_colors;
   const classOk=!o.error && normal?.found===true && control(normal)
@@ -28,7 +33,8 @@ export function assessLegacyCoreHighContrast(observations){
     && forced?.media_active===true && forced?.class_active===false
     && positive(forced) && negative(forced.negative);
   const motionOk=classOk && forcedOk && [normal,historic,forced].every(lifecycle)
-    && fallback(historic.fallback) && fallback(forced.fallback);
+    && fallback(historic.fallback) && fallback(forced.fallback)
+    && persistent(historic.persistent) && persistent(forced.persistent);
   return LEGACY_CORE_HIGH_CONTRAST_CASES.map((case_id,i)=>({case_id,
     result:[classOk,forcedOk,motionOk][i]?'pass':'fail',
     role:'Required supplemental native guard;no extra browser matrix acceptance credit.',
@@ -66,6 +72,17 @@ export async function observeLegacyCoreHighContrast({send,evaluate,waitFor}){
       const initial=await evaluate('window.__closeoutCoreContrast.startFallback()');
       const wait_completed=await waitFor('window.__closeoutCoreContrast.readFallback().final_state === "HIDDEN"',20,50);
       observations[key].fallback={...initial,...await evaluate('window.__closeoutCoreContrast.readFallback()'),wait_completed};
+      const start=await evaluate('window.__closeoutCoreContrast.startPersistent()');
+      const visible_wait_completed=await waitFor('window.__closeoutCoreContrast.readPersistent()?.state === "VISIBLE"',20,50);
+      await send('Runtime.evaluate',{expression:'new Promise(r=>setTimeout(r,250))',awaitPromise:true,returnByValue:true});
+      const visible=await evaluate('window.__closeoutCoreContrast.readPersistent()');
+      const dismissed=await evaluate('window.__closeoutCoreContrast.fadePersistent()');
+      const hidden_wait_completed=await waitFor('window.__closeoutCoreContrast.readPersistent()?.state === "HIDDEN"',20,50);
+      const final=await evaluate('window.__closeoutCoreContrast.readPersistent()');
+      observations[key].persistent={initial_state:start.state,initial_connected:start.connected,
+        visible_state:visible.state,visible_connected:visible.connected,visible_wait_completed,
+        dismissed_state:dismissed.state,dismissed_connected:dismissed.connected,
+        final_state:final.state,final_connected:final.connected,hidden_wait_completed};
     }
   }catch(error){observations.error=String(error.message||error);}
   finally{
