@@ -56,14 +56,14 @@
       "bucket": "docs-build-batch-candidate",
       "subject": "docs: mat-error can only rendered if the input has touched and is invalid state (#27752)",
       "final_disposition": "not-applicable",
-      "reason": "Changes one unshipped input documentation sentence from either-the-user wording to the actual invalid AND (touched OR submitted) description. No directive, ErrorStateMatcher or owned legacy input code is changed. That upstream markdown is absent from both add-on checkouts and the ng-packagr asset/entry closure; no library patch is warranted.",
+      "reason": "The only upstream hunk removes \u201ceither\u201d from the sentence describing invalid plus touched-or-parent-form-submitted error display. Owned MatLegacyInput extends MatInput and wires the legacy form-field control; its local spec contains invalid/touched and submitted cases. The patch contains no implementation/API hunk. Exact upstream src/material/input/input.md is absent from both line trees and is not in ng-packagr assets. The packed library contains component README.md files, so this is an exact-path/configured-assets judgment, not a claim that the package contains no Markdown.",
       "read_note_disposition": "not-owned",
       "files": [
         "src/material/input/input.md"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-docs-source-review.json",
-      "batch_id": "closeout-three-documentation-dev-app-reviews",
-      "recorded_at_utc": "2026-10-06T20:10:33.448419+00:00",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/docs-current-individual-review-v1.json",
+      "batch_id": "docs-current-individual-review-2026-11-07",
+      "recorded_at_utc": "2026-11-07T00:00:00Z",
       "g11_claim": "not-passed",
       "affected_branches": [
         "main",
@@ -84,8 +84,100 @@
           "batch_id": "docs-build-final-2026-10-01-a",
           "recorded_at_utc": "2026-10-01T16:10:09Z",
           "g11_claim": "not-passed"
+        },
+        {
+          "sha": "bae953999407fd385b1d571e04350bf0f28abf05",
+          "bucket": "docs-build-batch-candidate",
+          "subject": "docs: mat-error can only rendered if the input has touched and is invalid state (#27752)",
+          "final_disposition": "not-applicable",
+          "reason": "Changes one unshipped input documentation sentence from either-the-user wording to the actual invalid AND (touched OR submitted) description. No directive, ErrorStateMatcher or owned legacy input code is changed. That upstream markdown is absent from both add-on checkouts and the ng-packagr asset/entry closure; no library patch is warranted.",
+          "read_note_disposition": "not-owned",
+          "files": [
+            "src/material/input/input.md"
+          ],
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-docs-source-review.json",
+          "batch_id": "closeout-three-documentation-dev-app-reviews",
+          "recorded_at_utc": "2026-10-06T20:10:33.448419+00:00",
+          "g11_claim": "not-passed",
+          "affected_branches": [
+            "main",
+            "21.x"
+          ],
+          "prior_dispositions": [
+            {
+              "sha": "bae953999407fd385b1d571e04350bf0f28abf05",
+              "bucket": "docs-build-batch-candidate",
+              "subject": "docs: mat-error can only rendered if the input has touched and is invalid state (#27752)",
+              "final_disposition": "irrelevant",
+              "reason": "The patch removes the word either from Material's input.md. The sentence still says an error shows when the control is invalid and touched, or the parent form is submitted. This package does not contain that markdown.",
+              "read_note_disposition": "not-owned",
+              "files": [
+                "src/material/input/input.md"
+              ],
+              "evidence_report": "compatibility/rc/reports/docs-build-one-diff.json",
+              "batch_id": "docs-build-final-2026-10-01-a",
+              "recorded_at_utc": "2026-10-01T16:10:09Z",
+              "g11_claim": "not-passed"
+            }
+          ]
         }
-      ]
+      ],
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "complete-syntax-and-documentation-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_evidence": [
+          {
+            "path": "projects/ngx-material-legacy/ng-package.json",
+            "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33",
+            "bytes": 492
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-input/input.ts",
+            "sha256": "bfa91322a82df274acedc1eee030f03083470f254cee0e0f49207c11ef4db550",
+            "bytes": 2826
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+            "sha256": "025f4fa2579ce0d93e95dc7cfe266081d3d0d771bb31c9ccc71ff8970c478eae",
+            "bytes": 83537
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/error-state.ts",
+            "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+            "bytes": 2623
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-input/README.md",
+            "sha256": "18657b3cfba261f543702fe10e875a7bf17bcba8a8d97d1293742ebe7efab45a",
+            "bytes": 96
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/docs-current-source-context-v1.json",
+            "sha256": "1740145557bd0337e1b4fd9c92b8bc113ee7c85e2804090c60e36ae77c98654d",
+            "bytes": 22557
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/docs-primary-upstream-v1.json",
+            "sha256": "60d56a9287dc58c00d7feeeec6ab06e4b49e05e68e5182d5978df1eb8add5a1d",
+            "bytes": 77137
+          }
+        ],
+        "source_evidence_scope": "current",
+        "diff_sha256": "6c2fcc633556cd35bd07e59f1c4c14c3dc708fcc3352bbf3c28d6dfebbe25931",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "decision": "The only upstream hunk removes \u201ceither\u201d from the sentence describing invalid plus touched-or-parent-form-submitted error display. Owned MatLegacyInput extends MatInput and wires the legacy form-field control; its local spec contains invalid/touched and submitted cases. The patch contains no implementation/API hunk. Exact upstream src/material/input/input.md is absent from both line trees and is not in ng-packagr assets. The packed library contains component README.md files, so this is an exact-path/configured-assets judgment, not a claim that the package contains no Markdown."
+      },
+      "source_check": {
+        "diff_sha256": "6c2fcc633556cd35bd07e59f1c4c14c3dc708fcc3352bbf3c28d6dfebbe25931",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/docs-current-individual-review-v1.json",
+        "review_membership": "bae953999407fd385b1d571e04350bf0f28abf05"
+      }
     },
     {
       "sha": "891e3a0db1f571e9dfae2d9a0a3df1d4f4faa92a",
@@ -313,14 +405,14 @@
       "bucket": "docs-build-batch-candidate",
       "subject": "docs(cdk/scrolling): fix typo (#28549)",
       "final_disposition": "not-applicable",
-      "reason": "Adds the missing word is to CDK window-scrolling prose. The add-on does not own or distribute CDK scrolling documentation or code.",
+      "reason": "The only hunk inserts \u201cis\u201d in CDK window-scrolling prose. Owned _LegacyViewport is a historical helper and its main public-api export is internal cross-family infrastructure, not the documented CDK virtual-scroll component. Exact upstream src/cdk/scrolling/scrolling.md is absent from both line trees and excluded by ng-packagr asset globs. The packed library contains README.md files; this is exact-path/configured-assets scope only.",
       "read_note_disposition": "not-owned",
       "files": [
         "src/cdk/scrolling/scrolling.md"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-docs-source-review.json",
-      "batch_id": "closeout-docs-source-review",
-      "recorded_at_utc": "2026-10-06T18:19:43.542048+00:00",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/docs-current-individual-review-v1.json",
+      "batch_id": "docs-current-individual-review-2026-11-07",
+      "recorded_at_utc": "2026-11-07T00:00:00Z",
       "g11_claim": "not-passed",
       "prior_dispositions": [
         {
@@ -337,17 +429,104 @@
           "batch_id": "docs-build-final-2026-10-01-a",
           "recorded_at_utc": "2026-10-01T16:10:09Z",
           "g11_claim": "not-passed"
+        },
+        {
+          "sha": "22bd09a0e6cb156d3dfefc89f1d3a06afecea4b6",
+          "bucket": "docs-build-batch-candidate",
+          "subject": "docs(cdk/scrolling): fix typo (#28549)",
+          "final_disposition": "not-applicable",
+          "reason": "Adds the missing word is to CDK window-scrolling prose. The add-on does not own or distribute CDK scrolling documentation or code.",
+          "read_note_disposition": "not-owned",
+          "files": [
+            "src/cdk/scrolling/scrolling.md"
+          ],
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-docs-source-review.json",
+          "batch_id": "closeout-docs-source-review",
+          "recorded_at_utc": "2026-10-06T18:19:43.542048+00:00",
+          "g11_claim": "not-passed",
+          "prior_dispositions": [
+            {
+              "sha": "22bd09a0e6cb156d3dfefc89f1d3a06afecea4b6",
+              "bucket": "docs-build-batch-candidate",
+              "subject": "docs(cdk/scrolling): fix typo (#28549)",
+              "final_disposition": "irrelevant",
+              "reason": "The patch inserts the word is in CDK scrolling.md. This package does not contain that markdown.",
+              "read_note_disposition": "not-owned",
+              "files": [
+                "src/cdk/scrolling/scrolling.md"
+              ],
+              "evidence_report": "compatibility/rc/reports/docs-build-one-diff.json",
+              "batch_id": "docs-build-final-2026-10-01-a",
+              "recorded_at_utc": "2026-10-01T16:10:09Z",
+              "g11_claim": "not-passed"
+            }
+          ],
+          "affected_branches": [
+            "main",
+            "21.x"
+          ],
+          "review_depth": "bounded-documentation-source-review",
+          "source_check": {
+            "diff_sha256": "bf5d40be29ed52378b04f45855b33b3050c3c3a99ff87aaa3fc5c91fff952e64",
+            "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-docs-source-review.json",
+            "review_membership": "22bd09a0e6cb156d3dfefc89f1d3a06afecea4b6"
+          }
         }
       ],
       "affected_branches": [
         "main",
         "21.x"
       ],
-      "review_depth": "bounded-documentation-source-review",
+      "review_depth": "individual-compatibility",
       "source_check": {
         "diff_sha256": "bf5d40be29ed52378b04f45855b33b3050c3c3a99ff87aaa3fc5c91fff952e64",
-        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-docs-source-review.json",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/docs-current-individual-review-v1.json",
         "review_membership": "22bd09a0e6cb156d3dfefc89f1d3a06afecea4b6"
+      },
+      "individual_proof": {
+        "proof_kind": "complete-syntax-and-documentation-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_evidence": [
+          {
+            "path": "projects/ngx-material-legacy/ng-package.json",
+            "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33",
+            "bytes": 492
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+            "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0",
+            "bytes": 3744
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+            "sha256": "3d56b9e01f502995bd25dea21be8bee5713596655f5d159899858b58b4ffccf2",
+            "bytes": 3442
+          },
+          {
+            "path": "projects/ngx-material-legacy/README.md",
+            "sha256": "ce71e994ada2503788d3e3c07769d7f9406f0cb604b7ce4c50a11e6ea903a447",
+            "bytes": 412
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/docs-current-source-context-v1.json",
+            "sha256": "1740145557bd0337e1b4fd9c92b8bc113ee7c85e2804090c60e36ae77c98654d",
+            "bytes": 22557
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/docs-primary-upstream-v1.json",
+            "sha256": "60d56a9287dc58c00d7feeeec6ab06e4b49e05e68e5182d5978df1eb8add5a1d",
+            "bytes": 77137
+          }
+        ],
+        "source_evidence_scope": "current",
+        "diff_sha256": "bf5d40be29ed52378b04f45855b33b3050c3c3a99ff87aaa3fc5c91fff952e64",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "decision": "The only hunk inserts \u201cis\u201d in CDK window-scrolling prose. Owned _LegacyViewport is a historical helper and its main public-api export is internal cross-family infrastructure, not the documented CDK virtual-scroll component. Exact upstream src/cdk/scrolling/scrolling.md is absent from both line trees and excluded by ng-packagr asset globs. The packed library contains README.md files; this is exact-path/configured-assets scope only."
       }
     },
     {
@@ -3054,14 +3233,14 @@
       "bucket": "docs-build-batch-candidate",
       "subject": "docs: fix typo in autocomplete by removing redundant word (#30644)",
       "final_disposition": "not-applicable",
-      "reason": "Removes a duplicated instead in modern autocomplete requireSelection prose. This is a wording change and does not introduce requireSelection into the frozen legacy surface.",
+      "reason": "The only hunk removes the duplicated word \u201cinstead\u201d from modern requireSelection prose. The legacy autocomplete source already exposes/inherits requireSelection behavior and its spec uses the input; this upstream wording change neither introduces nor alters that behavior. Exact upstream src/material/autocomplete/autocomplete.md is absent from both line trees and excluded by ng-packagr asset globs. The packed library contains component README.md files; exact-path scope only.",
       "read_note_disposition": "docs-only",
       "files": [
         "src/material/autocomplete/autocomplete.md"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-docs-source-review.json",
-      "batch_id": "closeout-docs-source-review",
-      "recorded_at_utc": "2026-10-06T18:19:43.542048+00:00",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/docs-current-individual-review-v1.json",
+      "batch_id": "docs-current-individual-review-2026-11-07",
+      "recorded_at_utc": "2026-11-07T00:00:00Z",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
       "prior_dispositions": [
@@ -3080,17 +3259,111 @@
           "recorded_at_utc": "2026-10-01T16:46:41Z",
           "g11_claim": "not-passed",
           "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        },
+        {
+          "sha": "e482240fc857e034e08af38fcfe7d6d5857c3aa7",
+          "bucket": "docs-build-batch-candidate",
+          "subject": "docs: fix typo in autocomplete by removing redundant word (#30644)",
+          "final_disposition": "not-applicable",
+          "reason": "Removes a duplicated instead in modern autocomplete requireSelection prose. This is a wording change and does not introduce requireSelection into the frozen legacy surface.",
+          "read_note_disposition": "docs-only",
+          "files": [
+            "src/material/autocomplete/autocomplete.md"
+          ],
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-docs-source-review.json",
+          "batch_id": "closeout-docs-source-review",
+          "recorded_at_utc": "2026-10-06T18:19:43.542048+00:00",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "prior_dispositions": [
+            {
+              "sha": "e482240fc857e034e08af38fcfe7d6d5857c3aa7",
+              "bucket": "docs-build-batch-candidate",
+              "subject": "docs: fix typo in autocomplete by removing redundant word (#30644)",
+              "final_disposition": "irrelevant",
+              "reason": "The patch removes a repeated instead from autocomplete.md. The requireSelection sentence is otherwise unchanged. This package does not contain that markdown.",
+              "read_note_disposition": "docs-only",
+              "files": [
+                "src/material/autocomplete/autocomplete.md"
+              ],
+              "evidence_report": "compatibility/rc/reports/docs-build-one-diff.json",
+              "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+              "recorded_at_utc": "2026-10-01T16:46:41Z",
+              "g11_claim": "not-passed",
+              "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+            }
+          ],
+          "affected_branches": [
+            "main",
+            "21.x"
+          ],
+          "review_depth": "bounded-documentation-source-review",
+          "source_check": {
+            "diff_sha256": "aafa8d07d296fcd59f21927972c42cd0457e5adebe620a2d67d9262a9fc998c1",
+            "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-docs-source-review.json",
+            "review_membership": "e482240fc857e034e08af38fcfe7d6d5857c3aa7"
+          }
         }
       ],
       "affected_branches": [
         "main",
         "21.x"
       ],
-      "review_depth": "bounded-documentation-source-review",
+      "review_depth": "individual-compatibility",
       "source_check": {
         "diff_sha256": "aafa8d07d296fcd59f21927972c42cd0457e5adebe620a2d67d9262a9fc998c1",
-        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-docs-source-review.json",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/docs-current-individual-review-v1.json",
         "review_membership": "e482240fc857e034e08af38fcfe7d6d5857c3aa7"
+      },
+      "individual_proof": {
+        "proof_kind": "complete-syntax-and-documentation-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_evidence": [
+          {
+            "path": "projects/ngx-material-legacy/ng-package.json",
+            "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33",
+            "bytes": 492
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.ts",
+            "sha256": "d82ab521b1dcc519af77a894adc679f66d34328eb5e257b40eb92b416a981e2b",
+            "bytes": 1596
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+            "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319",
+            "bytes": 11316
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "sha256": "c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683",
+            "bytes": 165528
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/README.md",
+            "sha256": "c04a6da49a5a818cc5db7f9d504311f426d4fca6c81d84e17bdcb70c5835cf31",
+            "bytes": 73
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/docs-current-source-context-v1.json",
+            "sha256": "1740145557bd0337e1b4fd9c92b8bc113ee7c85e2804090c60e36ae77c98654d",
+            "bytes": 22557
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/docs-primary-upstream-v1.json",
+            "sha256": "60d56a9287dc58c00d7feeeec6ab06e4b49e05e68e5182d5978df1eb8add5a1d",
+            "bytes": 77137
+          }
+        ],
+        "source_evidence_scope": "current",
+        "diff_sha256": "aafa8d07d296fcd59f21927972c42cd0457e5adebe620a2d67d9262a9fc998c1",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "decision": "The only hunk removes the duplicated word \u201cinstead\u201d from modern requireSelection prose. The legacy autocomplete source already exposes/inherits requireSelection behavior and its spec uses the input; this upstream wording change neither introduces nor alters that behavior. Exact upstream src/material/autocomplete/autocomplete.md is absent from both line trees and excluded by ng-packagr asset globs. The packed library contains component README.md files; exact-path scope only."
       }
     },
     {
@@ -5732,14 +6005,14 @@
       "bucket": "docs-build-batch-candidate",
       "subject": "docs(material/button): variants table not rendering (#31274)",
       "final_disposition": "not-applicable",
-      "reason": "Adds a blank line before the modern matButton variant table so Markdown renders it. The upstream Markdown table is not maintained here and no implementation changes occur.",
+      "reason": "The only hunk inserts a blank line so a table of modern matButton variants renders in upstream docs. Owned legacy button host selectors retain historical mat-button/mat-raised-button/mat-stroked-button/mat-flat-button/mat-icon-button/fab names; no button code or API changes occur. Exact upstream src/material/button/button.md is absent from both line trees and is not an ng-packagr asset. The packed library contains README.md files; no package-wide no-Markdown claim is made.",
       "read_note_disposition": "docs-only",
       "files": [
         "src/material/button/button.md"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-docs-source-review.json",
-      "batch_id": "closeout-docs-source-review",
-      "recorded_at_utc": "2026-10-06T18:19:43.542048+00:00",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/docs-current-individual-review-v1.json",
+      "batch_id": "docs-current-individual-review-2026-11-07",
+      "recorded_at_utc": "2026-11-07T00:00:00Z",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
       "prior_dispositions": [
@@ -5758,17 +6031,106 @@
           "recorded_at_utc": "2026-10-01T16:46:41Z",
           "g11_claim": "not-passed",
           "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        },
+        {
+          "sha": "01ec1e0e1e0a9d62c1f7d294bc91ed9e0e3c7e7d",
+          "bucket": "docs-build-batch-candidate",
+          "subject": "docs(material/button): variants table not rendering (#31274)",
+          "final_disposition": "not-applicable",
+          "reason": "Adds a blank line before the modern matButton variant table so Markdown renders it. The upstream Markdown table is not maintained here and no implementation changes occur.",
+          "read_note_disposition": "docs-only",
+          "files": [
+            "src/material/button/button.md"
+          ],
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-docs-source-review.json",
+          "batch_id": "closeout-docs-source-review",
+          "recorded_at_utc": "2026-10-06T18:19:43.542048+00:00",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "prior_dispositions": [
+            {
+              "sha": "01ec1e0e1e0a9d62c1f7d294bc91ed9e0e3c7e7d",
+              "bucket": "docs-build-batch-candidate",
+              "subject": "docs(material/button): variants table not rendering (#31274)",
+              "final_disposition": "irrelevant",
+              "reason": "The patch inserts a blank line before the button variants table in button.md so the table renders. This package does not contain that markdown.",
+              "read_note_disposition": "docs-only",
+              "files": [
+                "src/material/button/button.md"
+              ],
+              "evidence_report": "compatibility/rc/reports/docs-build-one-diff.json",
+              "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+              "recorded_at_utc": "2026-10-01T16:46:41Z",
+              "g11_claim": "not-passed",
+              "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+            }
+          ],
+          "affected_branches": [
+            "main",
+            "21.x"
+          ],
+          "review_depth": "bounded-documentation-source-review",
+          "source_check": {
+            "diff_sha256": "9cdfb70b8fad763b62a0effe241e82a88c4467224d225fd86969fcaea30748f6",
+            "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-docs-source-review.json",
+            "review_membership": "01ec1e0e1e0a9d62c1f7d294bc91ed9e0e3c7e7d"
+          }
         }
       ],
       "affected_branches": [
         "main",
         "21.x"
       ],
-      "review_depth": "bounded-documentation-source-review",
+      "review_depth": "individual-compatibility",
       "source_check": {
         "diff_sha256": "9cdfb70b8fad763b62a0effe241e82a88c4467224d225fd86969fcaea30748f6",
-        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-docs-source-review.json",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/docs-current-individual-review-v1.json",
         "review_membership": "01ec1e0e1e0a9d62c1f7d294bc91ed9e0e3c7e7d"
+      },
+      "individual_proof": {
+        "proof_kind": "complete-syntax-and-documentation-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_evidence": [
+          {
+            "path": "projects/ngx-material-legacy/ng-package.json",
+            "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33",
+            "bytes": 492
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-button/button.ts",
+            "sha256": "6d37f01619672b62496d5ffb8bec6df6dfe32214893191644d46012424ff5bb4",
+            "bytes": 6700
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-button/button-module.ts",
+            "sha256": "2764eab335357258b27424986419a951408b6e00a09f5d8d73002fe1b953da89",
+            "bytes": 709
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-button/README.md",
+            "sha256": "f483be59db8b7ad36b2358a14294478d25713d310a4b1e249cc785d10cb253ee",
+            "bytes": 96
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/docs-current-source-context-v1.json",
+            "sha256": "1740145557bd0337e1b4fd9c92b8bc113ee7c85e2804090c60e36ae77c98654d",
+            "bytes": 22557
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/docs-primary-upstream-v1.json",
+            "sha256": "60d56a9287dc58c00d7feeeec6ab06e4b49e05e68e5182d5978df1eb8add5a1d",
+            "bytes": 77137
+          }
+        ],
+        "source_evidence_scope": "current",
+        "diff_sha256": "9cdfb70b8fad763b62a0effe241e82a88c4467224d225fd86969fcaea30748f6",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "decision": "The only hunk inserts a blank line so a table of modern matButton variants renders in upstream docs. Owned legacy button host selectors retain historical mat-button/mat-raised-button/mat-stroked-button/mat-flat-button/mat-icon-button/fab names; no button code or API changes occur. Exact upstream src/material/button/button.md is absent from both line trees and is not an ng-packagr asset. The packed library contains README.md files; no package-wide no-Markdown claim is made."
       }
     },
     {
