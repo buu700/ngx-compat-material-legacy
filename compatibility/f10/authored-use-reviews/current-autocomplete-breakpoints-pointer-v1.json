@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "scope": "Two unchanged public breakpoint-use roles on exact current trigger source; no full runtime, frozen roster, or G11 admission.",
+  "reviews": [
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "module": "@angular/cdk/layout",
+      "symbol": "BreakpointObserver",
+      "candidate_source_sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "Borrow the framework-provided public BreakpointObserver. The trigger observes handset landscape and sets/resets flexible dimensions, grow-after-open, and viewport margin; it does not construct the service. stable-public-peer; source binding refreshed at current checkpoint. The decision remains limited to this public dependency role. Unit cases supply controlled observer streams; they do not establish native browser media matching or actual viewport geometry.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-autocomplete-breakpoints-pointer-source-v1.json",
+          "sha256": "f3b0ccab8785e54c2e222a0116b0f6b5c0d10a022b62c1cccbb3b1d69cd88e03"
+        },
+        {
+          "path": "compatibility/rc/current-autocomplete-breakpoints-pointer-independent-v1.json",
+          "sha256": "1ac0bdce966484fcc854ec829d5309dcc2e5e323e654a93de68fbb3aedd17346"
+        },
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-public-main.json",
+          "sha256": "c2383daa41d69efd107ea3b300b0fef97f15694de2a3735e6e3e0872113b8f35"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/current-authored-use-autocomplete-v1.json",
+          "sha256": "2a3155d1eb51436f01bd0cda63af1b42fe9ce8124aafe26b806e86a3ed819a61"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "module": "@angular/cdk/layout",
+      "symbol": "Breakpoints",
+      "candidate_source_sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "Uses the public HandsetLandscape query constant; the existing 8px/0px viewport-margin and flexible/grow policy remains based on result.matches. stable-public-peer; source binding refreshed at current checkpoint. The decision remains limited to this public dependency role. The query result is controlled by a BehaviorSubject; no native browser media/geometry claim.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-autocomplete-breakpoints-pointer-source-v1.json",
+          "sha256": "f3b0ccab8785e54c2e222a0116b0f6b5c0d10a022b62c1cccbb3b1d69cd88e03"
+        },
+        {
+          "path": "compatibility/rc/current-autocomplete-breakpoints-pointer-independent-v1.json",
+          "sha256": "1ac0bdce966484fcc854ec829d5309dcc2e5e323e654a93de68fbb3aedd17346"
+        },
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-public-main.json",
+          "sha256": "c2383daa41d69efd107ea3b300b0fef97f15694de2a3735e6e3e0872113b8f35"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/current-authored-use-autocomplete-v1.json",
+          "sha256": "2a3155d1eb51436f01bd0cda63af1b42fe9ce8124aafe26b806e86a3ed819a61"
+        }
+      ]
+    }
+  ]
+}
