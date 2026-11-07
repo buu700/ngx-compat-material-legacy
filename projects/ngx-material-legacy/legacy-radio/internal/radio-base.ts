@@ -502,7 +502,9 @@ export abstract class _MatRadioButtonBase
 
     // Assertions. Ideally these should be stripped out by the compiler.
     // TODO(jelbourn): Assert that there's no name binding AND a parent radio group.
-    this.radioGroup = radioGroup;
+    // The shared public token can resolve a current-peer group. Only the
+    // owned group implements the internal callbacks used by this base.
+    this.radioGroup = radioGroup instanceof _MatRadioGroupBase ? radioGroup : null!;
     this._noopAnimations = animationMode === 'NoopAnimations';
 
     if (tabIndex) {
@@ -663,7 +665,7 @@ export abstract class _MatRadioButtonBase
             group.selected !== this &&
             input.ownerDocument.activeElement === input
           ) {
-            group.selected._inputElement.nativeElement.focus();
+            group.selected.focus();
             if (input.ownerDocument.activeElement === input) {
               this._inputElement.nativeElement.blur();
             }

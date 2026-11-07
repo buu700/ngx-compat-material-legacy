@@ -49,6 +49,8 @@ Support only version combinations published in the tested matrix once that matri
 
 Derived from `angular/components` tag `16.2.14`, with history preserved (baseline tag `baseline/angular-components-16.2.x`). MIT licensed. Google copyright is retained, followed by Copyright (c) 2026 Ryan Lester. See `LICENSE`. This community continuation is not an official Angular/Google release or endorsement.
 
+Legacy and current radio buttons should be placed in separate groups for their respective generation. A current radio group is not a supported parent for a legacy radio button, or vice versa. The legacy radio group token retains its shared public identity.
+
 ## Planned release/support model
 
 Package major follows Angular major. `main` tracks the active Angular line; a numbered maintenance branch tracks the immediately preceding supported/LTS major. Initial intended lines are 22.x (active) and 21.x (LTS), with RCs before stable releases. Exact peer minimums are published from the tested matrix and may be raised for security fixes.

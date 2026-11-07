@@ -1208,3 +1208,96 @@ class RadioTouchOnPush {
   template: '<test-radio-touch-onpush></test-radio-touch-onpush>',
 })
 class RadioTouchOnPushHost {}
+
+import {Directive, ElementRef, ChangeDetectorRef, forwardRef} from '@angular/core';
+import {FocusMonitor} from '@angular/cdk/a11y';
+import {UniqueSelectionDispatcher} from '@angular/cdk/collections';
+import {MAT_RADIO_GROUP, MatRadioButton as CurrentRadioButton, MatRadioGroup as CurrentRadioGroup, MatRadioModule as CurrentRadioModule} from '@angular/material/radio';
+import {MAT_LEGACY_RADIO_GROUP} from './public-api';
+
+@Component({standalone: true, selector: 'legacy-boundary-child', imports: [MatLegacyRadioModule],
+  template: '<mat-radio-button value="a">A</mat-radio-button><mat-radio-button value="b">B</mat-radio-button>'})
+class LegacyBoundaryChild {}
+@Component({standalone: true, selector: 'current-boundary-child', imports: [CurrentRadioModule],
+  template: '<mat-radio-button value="c">C</mat-radio-button>'})
+class CurrentBoundaryChild {}
+@Component({standalone: true, selector: 'current-boundary-group', imports: [CurrentRadioModule, LegacyBoundaryChild],
+  template: '<mat-radio-group value="a"><legacy-boundary-child /></mat-radio-group>'})
+class CurrentBoundaryGroup {}
+@Component({standalone: true, imports: [CurrentBoundaryGroup], template: '<current-boundary-group />'})
+class ForeignBoundaryHost {}
+@Component({standalone: true, imports: [MatLegacyRadioModule, CurrentBoundaryGroup],
+  template: '<mat-radio-group><current-boundary-group /></mat-radio-group>'})
+class NestedBoundaryHost {}
+@Component({standalone: true, imports: [MatLegacyRadioModule, CurrentBoundaryChild],
+  template: '<mat-radio-group><mat-radio-button value="a">A</mat-radio-button><current-boundary-child /></mat-radio-group>'})
+class OwnedGroupCurrentSelectedHost {}
+@Directive({standalone: true, selector: 'owned-custom-group',
+  providers: [{provide: MAT_RADIO_GROUP, useExisting: forwardRef(() => OwnedCustomGroup)}]})
+class OwnedCustomGroup extends MatLegacyRadioGroup {}
+@Component({standalone: true, imports: [OwnedCustomGroup, MatLegacyRadioModule],
+  template: '<owned-custom-group><mat-radio-button value="a">A</mat-radio-button></owned-custom-group>'})
+class OwnedCustomGroupHost {}
+
+describe('legacy radio group ownership boundary', () => {
+  it('retains the public shared token identity', () => {
+    expect(MAT_LEGACY_RADIO_GROUP).toBe(MAT_RADIO_GROUP);
+  });
+  for (const Host of [ForeignBoundaryHost, NestedBoundaryHost]) {
+    it('does not invoke a nearer current group or associate with an outer legacy group', fakeAsync(() => {
+      TestBed.configureTestingModule({imports: [Host]});
+      const fixture = TestBed.createComponent(Host); fixture.detectChanges(); tick(); fixture.detectChanges();
+      const group = fixture.debugElement.query(By.directive(CurrentRadioGroup)).injector.get(CurrentRadioGroup) as any;
+      const buttons = fixture.debugElement.queryAll(By.directive(MatLegacyRadioButton));
+      expect(buttons.length).toBe(2);
+      const cva = spyOn(group, '_controlValueAccessorChangeFn').and.callThrough();
+      const emit = spyOn(group, '_emitChangeEvent').and.callThrough();
+      const touch = spyOn(group, '_touch').and.callThrough();
+      const input = buttons[1].nativeElement.querySelector('input') as HTMLInputElement;
+      input.click(); input.focus(); tick(); input.blur(); tick();
+      expect(cva).not.toHaveBeenCalled(); expect(emit).not.toHaveBeenCalled(); expect(touch).not.toHaveBeenCalled();
+      expect(buttons.map(node => node.componentInstance.radioGroup)).toEqual([null, null]);
+      fixture.destroy();
+    }));
+  }
+  it('preserves owned subclass grouping, CVA, change and touch through the historic token', fakeAsync(() => {
+    TestBed.configureTestingModule({imports: [OwnedCustomGroupHost]});
+    const fixture = TestBed.createComponent(OwnedCustomGroupHost); fixture.detectChanges();
+    const group = fixture.debugElement.query(By.directive(OwnedCustomGroup)).injector.get(OwnedCustomGroup);
+    const buttonNode = fixture.debugElement.query(By.directive(MatLegacyRadioButton));
+    const button = buttonNode.componentInstance as MatLegacyRadioButton;
+    expect(button.radioGroup).toBe(group); expect(group._radios.length).toBe(1);
+    group.name = 'owned-custom'; fixture.detectChanges();
+    const input = buttonNode.nativeElement.querySelector('input') as HTMLInputElement;
+    expect(input.name).toBe('owned-custom');
+    const cva = jasmine.createSpy('cva'); const touched = jasmine.createSpy('touched'); const changed = jasmine.createSpy('changed');
+    group.registerOnChange(cva); group.registerOnTouched(touched); group.change.subscribe(changed);
+    input.click(); fixture.detectChanges(); expect(group.selected).toBe(button); expect(group.value).toBe('a');
+    expect(cva).toHaveBeenCalledWith('a'); expect(changed).toHaveBeenCalledTimes(1);
+    input.focus(); tick(); input.blur(); tick(); expect(touched).toHaveBeenCalled();
+    fixture.destroy();
+  }));
+  it('retains manual construction with an owned group', () => {
+    TestBed.configureTestingModule({imports: [OwnedCustomGroupHost]});
+    const fixture = TestBed.createComponent(OwnedCustomGroupHost); fixture.detectChanges();
+    const group = fixture.debugElement.query(By.directive(OwnedCustomGroup)).injector.get(OwnedCustomGroup);
+    const node = fixture.debugElement.query(By.directive(MatLegacyRadioButton));
+    const manual = new MatLegacyRadioButton(group, node.injector.get(ElementRef), node.injector.get(ChangeDetectorRef),
+      TestBed.inject(FocusMonitor), TestBed.inject(UniqueSelectionDispatcher));
+    expect(manual.radioGroup).toBe(group); fixture.destroy();
+  });
+  it('uses a current selected button public focus method', fakeAsync(() => {
+    TestBed.configureTestingModule({imports: [OwnedGroupCurrentSelectedHost]});
+    const fixture = TestBed.createComponent(OwnedGroupCurrentSelectedHost); fixture.detectChanges(); tick(); fixture.detectChanges();
+    const group = fixture.debugElement.query(By.directive(MatLegacyRadioGroup)).injector.get(MatLegacyRadioGroup);
+    const legacy = fixture.debugElement.query(By.directive(MatLegacyRadioButton));
+    const current = fixture.debugElement.query(By.directive(CurrentRadioButton)).componentInstance as CurrentRadioButton;
+    const input = legacy.nativeElement.querySelector('input') as HTMLInputElement;
+    input.focus(); expect(input.ownerDocument.activeElement).toBe(input);
+    group.selected = current as any; const focus = spyOn(current, 'focus').and.callThrough();
+    legacy.componentInstance.ngDoCheck(); tick();
+    expect(focus).toHaveBeenCalledWith();
+    expect(input.ownerDocument.activeElement).toBe(fixture.debugElement.query(By.directive(CurrentRadioButton)).nativeElement.querySelector('input'));
+    fixture.destroy();
+  }));
+});

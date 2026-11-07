@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "role": "Root integration review of owned radio group boundary and public selected focus",
+  "parent": "0c25c56282d805aaed351b94a9729303462bfb2a",
+  "proposal": {
+    "base": "0c25c56282d805aaed351b94a9729303462bfb2a",
+    "candidate": "a9656b608469ffed5b167cb12263d5ca29ff627d",
+    "patch_sha256": "3aa2d83db7baa3c93669277f5a96a084a100626b5b7d00300214b22952ab0f12",
+    "tree": "b393d87e13cc21b4a812c32a83fa9128f1df0921",
+    "alternate_index_tree_match": true,
+    "packed_tar_sha256": "4148c2edd526dbac802ddc6f48c620534b2262400f141f072555b2f5396cadfd",
+    "artifact_radio": "96/96",
+    "old_bdc_fixture_negative": "93/96; three expected failures",
+    "source_unchanged": true,
+    "token_identity": "retained",
+    "cross_generation": "separate groups required",
+    "unqualified": "28 radio import source epochs; x64, 21.x, full suite and release"
+  },
+  "source_afterimages": [
+    {
+      "path": "README.md",
+      "sha256": "a247f2ef4ed3e62f447f9b5771e4370e9fb2be14d16e3c7f845594d83855ca82"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts",
+      "sha256": "e3365e7b338c80cb0b539fb19cb1c8c20d0741f37d4c11f2f46f8620aaec3fbf"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/radio.spec.ts",
+      "sha256": "9cf2cd366c2b9fd146a3cae9a8a41724bb6283ce81e233e7e5e00ca68a919396"
+    }
+  ],
+  "independent_reviews": [
+    {
+      "name": "review-858-v1.md",
+      "sha256": "c92908179df5cb2dee2f5132d85ccb62209f6c087643b1686fc1698531325987",
+      "text": "# Independent review: radio ownership and focus change\n\nThe narrow source change is supported subject to the explicitly documented separate-generation group contract and separate requalification of the 28 radio authored-use records after the source change. Reviewed candidate `858fea121db4c61e10fff77b66b163b39f45dbe6`, base `0c25`, patch SHA256 `f751b9b273313f5c8245aaaf2c01398106ee56c2675cd209635483610268ce9d`.\n\nThe existing shared `MAT_RADIO_GROUP` identity and legacy provider are unchanged. Injection resolves the nearest provider first; the new `instanceof _MatRadioGroupBase` accepts the owned class and its subclasses, and rejects a foreign nearest provider as null without searching past it for an outer legacy provider. This intentionally changes the prior behavior of a legacy button under a current group and also rejects non-subclass duck-typed custom group providers. README scopes mixed-generation parent/child groups as unsupported; separate same-generation groups and the historic public token are preserved. Duplicate independently loaded copies of the legacy class would also fail this nominal identity check; no claim is made that duplicate-package group instances interoperate.\n\nThe selected button now receives the public `focus()` call. On the owned implementation with no arguments this still calls the underlying input's native `focus()`; it also avoids reading a current peer button's private input field. The focused test supplies a current button as `selected` manually to exercise that method: it does not establish supported cross-generation group membership. Subclass overrides of `focus()` can now observe or customize this invocation, a consequence of calling the public method.\n\nReviewed the actual fresh artifact-bound radio report/log: 95 executed, 95 passed, none skipped. The retained old extracted product with candidate tests has 92/95: the two foreign nearest-provider sentinels and public-focus invocation fail as expected. Its report has `artifact_sha256: null` because the negative uses an extracted package; its source bytes and prior tarball were independently reviewed in the earlier radio packet, but this negative is not itself a tarball-bound run. The candidate's tests check token equality, nearest foreign group with and without an outer owned group, custom owned subclass association, and public focus on a manually selected peer. The fixture checks selected use, not all cross-document, disabled-target, group lifecycle, or listener-disposal behavior.\n\nNo independent browser replay was performed for this review. This is neither release, full matrix, security, nor 21.x runtime clearance. The product-source change invalidates the previous source-epoch binding for the 28 radio records and requires separate exact requalification. Preserve the previous observations and avoid representing this candidate run as proof of the excluded mixed parent/child association.\n"
+    },
+    {
+      "name": "review-a965-v1.md",
+      "sha256": "ffd4f3db59f084a88ed063aa310704b3ff0a97cc483cf81c089496611fa40f77",
+      "text": "# Independent successor review: a965\n\nThe earlier source review `review-858-v1.md`, SHA256 `c92908179df5cb2dee2f5132d85ccb62209f6c087643b1686fc1698531325987`, applies to the byte-identical product and README in candidate `a9656b608469ffed5b167cb12263d5ca29ff627d`, tree `b393d87e13cc21b4a812c32a83fa9128f1df0921`. The only delta from 858 is the radio spec: the owned-subclass test now exercises query membership, propagated name, selection, CVA change, change output and touch; a new manual-construction test checks ownership association. The latter is not a full manual lifecycle test.\n\nInspected the retained clean fresh artifact run. Tarball SHA256 `4148c2edd526dbac802ddc6f48c620534b2262400f141f072555b2f5396cadfd` matches the recorded report; radio totals 96/96, no skips, report SHA256 `5027c02099cfd28ae9eae528070dd0f7af9133af1a3a7d83a5c5964be88433c7`. Its environment records linux-arm64 and `unqualified-host`; it is focused execution, not platform qualification. State records source unchanged. The retained extracted-old-product negative reports 93/96, failing the same two nearest foreign-group checks and public-focus check; report SHA256 `79527589a687a85a9f24d189bde0aa399872884c5f32e9a1813a1e12b7e0861e`, artifact SHA null. No independent replay was performed. All limitations and the need for separate 28-row radio source-epoch requalification in the earlier review remain.\n"
+    }
+  ],
+  "root_checks": [
+    "Strict whitespace apply passed; all three applied files equal reviewed candidate Git blobs.",
+    "Rehashed actual candidate tarball and 96-case report. Retained 93/96 old-product negative was reviewed; no new browser replay.",
+    "Owned group/subclasses and shared token retained; foreign nearest token becomes existing runtime-null state; selected button uses public focus().",
+    "No HTML/CSS/SCSS change; no golden change."
+  ],
+  "limits": [
+    "Nominal owned group identity excludes foreign, duck-typed and separately loaded duplicate class instances.",
+    "Subclass focus overrides can observe public method call.",
+    "Current selected-button fixture is a defensive boundary test, not supported mixed-generation membership.",
+    "Radio authored-use source bindings must be refreshed; full qualification, both-line and release gates remain incomplete."
+  ]
+}
