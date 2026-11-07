@@ -42,7 +42,13 @@ function bodyProgram(text) {
     const visit = node => ts.isDecorator(node) ? undefined : ts.visitEachChild(node, visit, context);
     return ts.visitNode(node, visit);
   }]);
-  try { return emit(ts.createPrinter().printNode(ts.EmitHint.Unspecified, transformed.transformed[0], source)); }
+  try {
+    const state = source.statements.filter(node => ts.isVariableStatement(node) &&
+      node.declarationList.declarations.some(decl => decl.name.getText(source) === 'hiddenPanePointerState'));
+    assert.ok(state.length <= 1, 'ambiguous owned hidden-pane pointer state');
+    return emit(state.map(node => node.getText(source)).join('\n') + '\n' +
+      ts.createPrinter().printNode(ts.EmitHint.Unspecified, transformed.transformed[0], source));
+  }
   finally { transformed.dispose(); }
 }
 const eventSource = parse(read(eventPath));
@@ -57,6 +63,7 @@ const noInitializer = candidate.replace('    this._initialized.next();\n', ''); 
 const noDestroyCancel = candidate.replace('    this._closingActionsSubscription?.unsubscribe();\n', ''); assert.notEqual(noDestroyCancel, candidate);
 const noErrorCleanup = helper.replace('      stable.unsubscribe();\n      throw error;', '      throw error;'); assert.notEqual(noErrorCleanup, helper);
 const noInitCompletion = candidate.replaceAll('    this._initialized.complete();\n', ''); assert.notEqual(noInitCompletion, candidate);
+const noPointerState = candidate.replace('const hiddenPanePointerState = new WeakMap<OverlayRef, {value: string; priority: string}>();', ''); assert.notEqual(noPointerState, candidate);
 
 const loaded = prepareMaterialPublicSubjects(root), results = [];
 try {
@@ -98,7 +105,7 @@ zone.isStable=true;
     const zoneSubject = installNgZonePublicSubject(model, root);
     const payload = {original: bodyProgram(original), candidate: bodyProgram(candidate), helper: helperProgram(helper), event: eventProgram,
       mutations: {priorWait: bodyProgram(priorWait), noInitializer: bodyProgram(noInitializer),
-        noDestroyCancel: bodyProgram(noDestroyCancel), leakedRender: helperProgram(leakedRender),
+        noDestroyCancel: bodyProgram(noDestroyCancel), noPointerState: bodyProgram(noPointerState), leakedRender: helperProgram(leakedRender),
         premature: helperProgram(premature), noErrorCleanup: helperProgram(noErrorCleanup), noInitCompletion: bodyProgram(noInitCompletion)}};
     writeFileSync(join(model.root, 'autocomplete-render-payload.json'), JSON.stringify(payload));
     for (const mode of model.line === 'original' ? ['zoneful'] : ['zoneful', 'zoneless']) for (const production of [false, true]) {
@@ -118,13 +125,13 @@ zone=app.injector.get(core.NgZone);${mode === 'zoneless' ? "assert.equal(typeof 
 `}
 let renders=0,registrations=0;const trackedAfterNextRender=(callback,options)=>{registrations++;return core.afterNextRender(()=>{renders++;callback();},options);};
 function helper(js){const exports={};new Function('exports','afterNextRender','ApplicationRef','Observable','take',js)(exports,trackedAfterNextRender,core.ApplicationRef,rx.Observable,ops.take);return exports.afterLegacyRender;}
-function replay(js,renderHelper){const exports={};const values={defer:rx.defer,fromEvent:rx.fromEvent,merge:rx.merge,
+function replay(js,renderHelper,omitShare=false){const exports={};const values={defer:rx.defer,fromEvent:rx.fromEvent,merge:rx.merge,
  Observable:rx.Observable,observableOf:rx.of,Subject:rx.Subject,Subscription:rx.Subscription,
- delay:ops.delay,filter:ops.filter,map:ops.map,switchMap:ops.switchMap,take:ops.take,tap:ops.tap,startWith:ops.startWith,
+ delay:ops.delay,filter:ops.filter,map:ops.map,share:ops.share,switchMap:ops.switchMap,take:ops.take,tap:ops.tap,startWith:ops.startWith,
  MatOptionSelectionChange,afterLegacyRender:renderHelper,
  legacyGetEventTarget:event=>event.target,_getEventTarget:event=>event.target,focusedElementPierceShadowDom:()=>null,
  coerceBooleanProperty:value=>value!=null&&String(value)!=='false'};
-new Function('exports',...Object.keys(values),js)(exports,...Object.values(values));return exports.Replay;}
+if(omitShare)delete values.share;new Function('exports',...Object.keys(values),js)(exports,...Object.values(values));return exports.Replay;}
 const drain=()=>new Promise(resolve=>setTimeout(resolve,10));
 function fixture(Type){
  const instance=new Type(),query=new core.QueryList(),selected=[],models=[],keys=new rx.Subject(),pointer=new rx.Subject(),detachments=new rx.Subject();
@@ -137,15 +144,17 @@ function fixture(Type){
   _keyManager:{tabOut:new rx.Subject(),setActiveItem(value){active=value;}},
   opened:new core.EventEmitter(),closed:new core.EventEmitter(),_isOpen:true,_latestOpeningTrigger:instance,
   _setVisibility(){this.showPanel=this.options.length>0;},_emitSelectEvent(option){selected.push(option.value);}};
+ const pointerProperties=new Map(),style={getPropertyValue:name=>pointerProperties.get(name)?.value??'',getPropertyPriority:name=>pointerProperties.get(name)?.priority??'',
+  setProperty(name,value,priority=''){pointerProperties.set(name,{value,priority});},removeProperty(name){pointerProperties.delete(name);}};
  const overlay={hasAttached:()=>attached,detach(){attached=false;detachments.next();},dispose(){disposed++;attached=false;},
   updatePosition(){positions++;},keydownEvents:()=>keys,outsidePointerEvents:()=>pointer,detachments:()=>detachments,
-  overlayElement:{contains:()=>false}};
+  overlayElement:{contains:()=>false,style}};
  Object.assign(instance,{autocomplete:panel,_zone:zone,_viewContainerRef:{injector:app?.injector??manual},
   _element:new core.ElementRef(native),_document:document,_formField:null,_overlayAttached:true,_overlayRef:overlay,
   _pendingAutoselectedOption:null,_trackedModal:null,_componentDestroyed:false,
   _changeDetectorRef:{detectChanges(){detects++;}},_positionStrategy:{reapplyLastPosition(){reapplied++;}}});
  control.valueChanges.subscribe(value=>models.push(value));instance.registerOnChange(value=>control.setValue(value));
- return{instance,panel,first,second,query,control,native,document,selected,models,
+ return{instance,panel,first,second,query,control,native,document,selected,models,style,
   counts:()=>({detects,positions,disposed,focused,active,reapplied}),snapshot:()=>({value:control.value,input:native.value,models:[...models],selected:[...selected],open:instance.panelOpen,attached,focused,active,reapplied})};
 }
 function start(f){zone.run(()=>{f.instance._closingActionsSubscription=f.instance._subscribeToClosingActions();
@@ -181,7 +190,16 @@ async function errorCleanup(helperJs){const stable=zone.onStable,subscribe=stabl
  const injector=core.Injector.create({providers:[{provide:core.ApplicationRef,useFactory:()=>{throw Error('diagnostic application lookup failure');}}]});
  try{let error;const sub=helper(helperJs)(zone,injector).subscribe({error:value=>error=value});assert.equal(sub.closed,true);assert.match(error.message,/diagnostic application lookup failure/);assert.equal(held,0,'application-lookup-error-cleans-stable-subscription');}
  finally{stable.subscribe=subscribe;injector.destroy();}}
+function pointerState(js){const f=fixture(replay(js,helper(payload.helper)));f.instance._closingActionsSubscription=new rx.Subscription();try{
+ f.style.setProperty('pointer-events','auto','important');f.query.reset([]);f.instance._updatePanelState();
+ assert.equal(f.style.getPropertyValue('pointer-events'),'none','owned-hidden-pane-pointer');
+ f.query.reset([f.first]);f.instance._updatePanelState();assert.equal(f.style.getPropertyValue('pointer-events'),'auto','owned-pointer-restore');
+ assert.equal(f.style.getPropertyPriority('pointer-events'),'important','owned-pointer-priority');return true;
+ }finally{f.instance.ngOnDestroy();}}
 try{
+ const pointerStateRestored=pointerState(payload.candidate);
+ assert.throws(()=>pointerState(payload.mutations.noPointerState),error=>error instanceof ReferenceError&&String(error.message).includes('hiddenPanePointerState'));
+ assert.throws(()=>fixture(replay(payload.candidate,helper(payload.helper),true)),error=>error instanceof ReferenceError&&String(error.message).includes('share'));
  const candidate=await selected(payload.candidate),original=await selected(payload.original);
  assert.equal(candidate.value,'alpha','selection-is-wired');assert.deepEqual(candidate.models,['alpha']);assert.equal(candidate.open,false);assert.equal(candidate.focused,1);
  ${mode === 'zoneful' ? 'assert.deepEqual(candidate,original);' : "assert.equal(original.value,'initial');assert.equal(original.open,true);"}
@@ -203,7 +221,7 @@ try{
  }
  await assert.rejects(()=>errorCleanup(payload.mutations.noErrorCleanup),error=>error.code==='ERR_ASSERTION'&&error.message.startsWith('application-lookup-error'));mutations.push({id:'lookup-failure-leaks-stable-subscription',rejected:true});
  ` : ''}
- console.log(JSON.stringify({candidate,original,changed,initialized,originalInitialized,canceled,destroyed,destroyedBeforeInit,registrations,renders,mutations,
+ console.log(JSON.stringify({candidate,original,changed,initialized,originalInitialized,canceled,destroyed,destroyedBeforeInit,pointerStateRestored,missingShareRejected:true,missingPointerStateRejected:true,registrations,renders,mutations,
  genuine_public_application:!!app,genuine_public_zone:true,legacy_constructor_and_decorators_executed:false,native_executed:false}));
 }finally{app?.destroy();manual?.destroy();core.destroyPlatform();}
 `;
@@ -218,9 +236,10 @@ try{
     reference: {path: originalPath, sha256: hash(original)}, node: process.version, binding_parser: ts.version,
     namespace_capsule_sha256: loaded.capsule_hash, results, public_contracts: contracts,
     type_compilation: {compiler: compiler.version, compiler_source_sha256: hash(readFileSync(compilerPath)), subjects: types},
-    scope: 'All trigger source members replayed except original constructor/decorators/heritage, with actual field initializers. Genuine public core QueryList/EventEmitter/FormControl/NgZone and current public application/render-hook APIs. Input/options/overlay/document/position/change-detector/view-injector containers are protocols; no actual legacy class node DI, packed/AOT/native view or Rx/Node floor qualification.',
+    scope: 'All trigger source members replayed except original constructor/decorators/heritage, with actual field initializers and the owned hidden-pane WeakMap. Public RxJS share is supplied; omission of share or the WeakMap is rejected, and the pointer state uses a style protocol. Genuine public core QueryList/EventEmitter/FormControl/NgZone and current public application/render-hook APIs. Input/options/overlay/document/position/change-detector/view-injector containers are protocols; no actual legacy class node DI, packed/AOT/native view or Rx/Node floor qualification.',
     native_or_actual_legacy_instances_qualified: false, g11_claim: 'not-passed'};
   assert.equal(results.length, 10);
+  assert.ok(results.every(row => row.pointerStateRestored && row.missingShareRejected && row.missingPointerStateRejected));
   if (process.argv[2]) writeFileSync(process.argv[2], JSON.stringify(report, null, 2) + '\n', {flag: 'wx'});
   console.log(JSON.stringify({line: report.line, subjects: 10, mutation_rejections: results.flatMap(row => row.mutations).length,
     compiler: compiler.version, native_executed: false, actual_legacy_instances_qualified: false}));

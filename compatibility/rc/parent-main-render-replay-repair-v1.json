@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "role": "Root integration of maintained autocomplete/select source replay collaborator repairs",
+  "parent": "767bcbcc484722759f667dbe709ade31f5040b82",
+  "qualification_sha256": "8801fb5bc4afac8a4b0c75a6371100e1d36147ef2cb42b106719da0547260418",
+  "qualification": {
+    "schema_version": 1,
+    "base": "aec05d8f6baf3dfdd92581504291309992abcb89",
+    "patch_sha256": "9d8274dc3fa4c36afe79e5ba64545e736e8c4b05d95386a3bf2ec2b4b2681462",
+    "tested_probes": {
+      "autocomplete": "edfd9d8babe253e758b46a443ecc52442fcc1e43244c9a96a3306cfa1ababb30",
+      "select": "3c2ba1c5de71ca34a532d7b440ea96bc9428eac0fdcc610f982ec5e4350a5910"
+    },
+    "source_images": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/after-legacy-render.ts",
+        "sha256": "444f4817504fa96c727631c2d6c815949b44e99328fa195d37ccdd59dace0dd3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/option/option-base.ts",
+        "sha256": "ec787fa20e331afb90856d2f413ca3551396f3f6954b30cc6de762a6864c931c"
+      },
+      {
+        "role": "base",
+        "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+        "sha256": "120ab123d79e58ea256211cafa50268dba3ce26524426e88b0347a8624aee68d"
+      },
+      {
+        "role": "select",
+        "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+        "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+      },
+      {
+        "role": "helper",
+        "path": "projects/ngx-material-legacy/legacy-select/internal/after-select-render.ts",
+        "sha256": "10a2bbbe02fb0a4578646e802888a5e075bb909a36fd1c19049b5fa2d731e570"
+      },
+      {
+        "role": "optionHelper",
+        "path": "projects/ngx-material-legacy/legacy-core/option/option-helpers.ts",
+        "sha256": "3c7a654a4f14e5ec3157efcc4dde4bf94825c14f8c150a6b8b2285c54269e568"
+      }
+    ],
+    "toolchain": {
+      "node": "24.21.0",
+      "node_binary_sha256": "0f8949d1028f6d61506b2d5bc57e7e6fe893d7b1997509b7847294fc9c616584",
+      "typescript": "6.0.3",
+      "rxjs": "7.8.2",
+      "node_options": "",
+      "node_path": "unset"
+    },
+    "results": {
+      "autocomplete_subjects": 10,
+      "autocomplete_existing_mutations_rejected": 16,
+      "autocomplete_pointer_state_successes": 10,
+      "autocomplete_missing_share_and_map_rejections": 20,
+      "select_subjects": 10,
+      "select_mutations_rejected": 48,
+      "select_wrong_coercion_rejections": 8,
+      "select_owned_signal_checks": 10
+    },
+    "scope": "Maintained source replay only. Real owned hidden-pane WeakMap and reactive select mixin are extracted from current source; public RxJS share, Angular signal and CDK boolean coercion are used. Existing mixed trait parent and DOM/overlay/test services remain explicit protocols. No actual component node DI, browser, AOT, packed, full floor, coordinator or release/G11 claim.",
+    "retained_failures": "Original unmodified probes fail with missing share and missing reactive mixin. First autocomplete repair exposed missing owned WeakMap; further test fixture iteration exposed missing protocol subscription; all raw logs preserved.",
+    "files": {
+      "render-replay-repair-v1.patch": "9d8274dc3fa4c36afe79e5ba64545e736e8c4b05d95386a3bf2ec2b4b2681462",
+      "baseline-autocomplete.log": "d8441277fc91b3680877a44173273ebfb25993b0672ba337e317d90c5fd0aaef",
+      "baseline-autocomplete-exit.txt": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "baseline-select.log": "3327b6364125c7be67acf37f19c505c408ba71597c53b8266188ec60335a292b",
+      "baseline-select-exit.txt": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "candidate-autocomplete-v1.log": "bd9e76c2afdaf2c08354f12155906a792ee8d6d6a6da618916969fffec5897d8",
+      "candidate-autocomplete-v1-exit.txt": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "candidate-autocomplete-v3.log": "aabfb5e2625c39702583584765bd4c855043743a26902d4fdd3a72a2892ce724",
+      "candidate-autocomplete-v3-exit.txt": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "final-autocomplete.json": "9f42d47cd30b90b040e9648f472926f68fdb79575414c1a01be4e441bf369ab8",
+      "final-autocomplete.log": "7304d2d153b3f7bead8e3aff7a5244153102763645b5a10ffa923d600f8a53b9",
+      "final-autocomplete-exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "final-select.json": "3a3952061b9f9449198faa50f2d100f869f8e866781fa5f5ff58f031634b28b2",
+      "final-select.log": "b59037276a7a7b5c4f653c2c3c251e7b18cf8afdf41f3a85658c190dba2352ef",
+      "final-select-exit.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    }
+  },
+  "independent_review": {
+    "sha256": "66d4bc7a1b39b586ba1a5d2cdfc778c0d8234759131aaaf77259981d7dd308c5",
+    "text": "# Independent review: render replay repair\n\nThe harness-only patch SHA-256 `9d8274dc3fa4c36afe79e5ba64545e736e8c4b05d95386a3bf2ec2b4b2681462` is supported within its source-replay scope. Qualification SHA-256 `8801fb5bc4afac8a4b0c75a6371100e1d36147ef2cb42b106719da0547260418` and all listed evidence members rehashed; the seven recorded owned source images and both tested probe files match. The patch applies cleanly to the current canonical checkout at review time.\n\nThe autocomplete probe extracts the owned `hiddenPanePointerState` declaration and supplies actual RxJS `share`, then exercises the owned replayed methods against an explicit style/overlay protocol. Its baseline missing-share and intermediate missing-WeakMap failures are retained. New checks exercise restoring the previous inline pointer value and priority, and reject absent `share` and absent owned map. These are protocol-backed tests, not browser or real legacy component tests.\n\nThe select probe extracts the owned `_MatSelectReactiveMixinBase` declaration, and supplies Angular's public `signal` and CDK's public `coerceBooleanProperty`. It verifies signal identity and true/empty-string/false-string/null inputs; the deliberately wrong `!!value` coercion is rejected. The mixed trait parent, DOM and overlay services remain explicit protocols; constructors and members are replayed after decorators are stripped.\n\nIndependently reran both modified probes under pinned Node 24.21.0 with NODE_PATH unset and NODE_OPTIONS empty. Autocomplete passed 10 subjects and 16 existing mutation rejections; select passed 10 subjects and 48 mutation rejections, including wrong coercion in eight current-line combinations. The tests themselves assert the new per-subject pointer/map/share and reactive checks. No packed consumer, browser, real legacy node DI, floor, coordinator, security, or G11 qualification follows from this result.\n"
+  },
+  "root_verification": [
+    "Current seven product source inputs match tested images.",
+    "All retained packet files and failed-run logs match qualification digests.",
+    "Strict patch application; both current probe images equal independently tested images."
+  ],
+  "limits": [
+    "Replay retains explicit trait, DOM and overlay protocols; no actual component DI, browser, packed or release qualification.",
+    "Existing old producer hash pins and source epochs remain stale until separately reviewed successors. No pin was silently refreshed."
+  ]
+}

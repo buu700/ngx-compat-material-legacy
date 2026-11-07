@@ -36,7 +36,10 @@ function program(text,name,base=false){
   undefined,node.heritageClauses,node.members);
  const stripped=ts.transform(cls,[context=>node=>{const visit=node=>ts.isDecorator(node)?undefined:ts.visitEachChild(node,visit,context);return ts.visitNode(node,visit);}]);
  try{
-  const constants=base?'let nextUniqueId=0;':source.statements.filter(node=>ts.isVariableStatement(node)&&
+  const reactive=base?source.statements.filter(node=>ts.isVariableStatement(node)&&
+   node.declarationList.declarations.some(decl=>decl.name.text==='_MatSelectReactiveMixinBase')):[];
+  assert.ok(reactive.length<=1,'ambiguous owned reactive select base');
+  const constants=base?'let nextUniqueId=0;\n'+reactive.map(node=>node.getText(source)).join('\n'):source.statements.filter(node=>ts.isVariableStatement(node)&&
    node.declarationList.declarations.some(decl=>decl.name.text?.startsWith('SELECT_'))).map(node=>node.getText(source)).join('\n');
   return emit(constants+'\n'+printer.printNode(ts.EmitHint.Unspecified,stripped.transformed[0],source));
  }finally{stripped.dispose();}
@@ -70,6 +73,7 @@ const mutations={
  premature:helperProgram(changed(candidate.helper,'if (zone.isStable)','if (true)')),
  noOnce:helperProgram(changed(candidate.helper,'  }).pipe(take(1));','  });')),
  noErrorCleanup:helperProgram(changed(candidate.helper,'      stable.unsubscribe();\n      throw error;','      throw error;')),
+ badRippleCoercion:program(changed(candidate.base,'this._selectDisableRipple.set(coerceBooleanProperty(value))','this._selectDisableRipple.set(!!value)'),'_MatSelectBase',true),
 };
 const loaded=prepareMaterialPublicSubjects(root),results=[];
 try{
@@ -120,7 +124,7 @@ zone.isStable=true;
    const script=`${production?'globalThis.ngDevMode=false;':''}
 import assert from 'node:assert/strict';import{readFileSync}from'node:fs';
 ${mode==='zoneful'?"await import('zone.js/node');":''}
-await import('@angular/compiler');const core=await import('@angular/core'),rx=await import('rxjs'),ops=await import('rxjs/operators'),forms=await import('@angular/forms');
+await import('@angular/compiler');const core=await import('@angular/core'),rx=await import('rxjs'),ops=await import('rxjs/operators'),forms=await import('@angular/forms'),coercion=await import('@angular/cdk/coercion');
 const payload=JSON.parse(readFileSync(new URL('./select-render-payload.json',import.meta.url))),group={},events={},selectEvents={};
 new Function('exports',payload.group)(group);new Function('exports',payload.event)(events);new Function('exports',payload.selectChange)(selectEvents);
 let app,zone,manual;
@@ -135,7 +139,7 @@ let renders=0;const trackedRender=(callback,options)=>core.afterNextRender(()=>{
 function helper(js){const exports={};new Function('exports','afterNextRender','ApplicationRef','Observable','take',js)(exports,trackedRender,core.ApplicationRef,rx.Observable,ops.take);return exports.afterSelectRender;}
 function replay(sources,helperJs){const base={},select={},common={Subject:rx.Subject,Observable:rx.Observable,defer:rx.defer,merge:rx.merge,
  afterSelectRender:helper(helperJs),
- EventEmitter:core.EventEmitter,filter:ops.filter,map:ops.map,startWith:ops.startWith,switchMap:ops.switchMap,take:ops.take,takeUntil:ops.takeUntil,distinctUntilChanged:ops.distinctUntilChanged};
+ EventEmitter:core.EventEmitter,signal:core.signal,coerceBooleanProperty:coercion.coerceBooleanProperty,filter:ops.filter,map:ops.map,startWith:ops.startWith,switchMap:ops.switchMap,take:ops.take,takeUntil:ops.takeUntil,distinctUntilChanged:ops.distinctUntilChanged};
  class ProtocolTraits{constructor(element,matcher,parent,group,ngControl){this._elementRef=element;this.ngControl=ngControl;this.stateChanges=new rx.Subject();this.disabled=false;}}
  new Function('exports','_MatSelectMixinBase',...Object.keys(common),sources.base)(base,ProtocolTraits,...Object.values(common));
  new Function('exports','_MatSelectBase','take','takeUntil','afterSelectRender','getComputedStyle','_countGroupLabelsBeforeLegacyOption','legacyAnimationsDisabled','MatLegacySelectChange',sources.select)
@@ -156,7 +160,10 @@ function fixture(sources=payload.candidate,helperJs=payload.helper,injector=app?
  const args=[viewport,cdr,zone,{},element,dir,null,null,null,ngControl,'0',()=>({}),{},undefined];
  if(injector!=null)args.push(injector);
  const instance=new Type(...args);assert.equal(ngControl.valueAccessor,instance,'historical-manual-value-accessor-registration');
- if(sources.base===payload.candidate.base){assert.equal(instance._injector,injector??undefined,'optional-injector-parameter-property');}
+ if(sources.base===payload.candidate.base||sources.base===payload.mutations.badRippleCoercion){assert.equal(instance._injector,injector??undefined,'optional-injector-parameter-property');
+  assert.equal(core.isSignal(instance._selectDisableRipple),true,'owned-reactive-ripple-signal');
+  for(const [input,expected] of [[true,true],['',true],['false',false],[null,false]]){instance.disableRipple=input;assert.equal(instance.disableRipple,expected,'owned-reactive-ripple-coercion');}}
+
  Object.assign(instance,{_selectionModel:selection,_keyManager:key,_initKeyManager(){},trigger:element,options,optionGroups:groups,
   _overlayDir:{overlayRef:{overlayElement:{style}},positionChange:new rx.Subject()}});
  instance.registerOnChange(value=>control.setValue(value));const emitted=[];instance.selectionChange.subscribe(event=>emitted.push(event.value));
@@ -200,6 +207,7 @@ try{
  const mutations=[];
  ${model.line!=='original'?`
  const reject=async(id,op,message)=>{await assert.rejects(op,error=>error.code==='ERR_ASSERTION'&&error.message.startsWith(message));mutations.push({id,rejected:true});};
+ await reject('wrong-ripple-coercion',()=>opened({...payload.candidate,base:payload.mutations.badRippleCoercion}),'owned-reactive-ripple-coercion');
  if(${mode==='zoneless'}){
   await reject('prior-zone-only-font-wait',()=>opened({...payload.candidate,select:payload.mutations.priorWait}),'panel-inherits-trigger-font');
   await reject('missing-zoneless-content-readiness',()=>initialized({...payload.candidate,base:payload.mutations.earlyPriorWait}),'initialized-option-stream');
@@ -213,7 +221,7 @@ try{
  }
  await reject('lookup-error-leaks-zone-subscription',()=>errorCleanup(payload.mutations.noErrorCleanup),'lookup-error-cleans-zone-subscription');
  `:''}
- console.log(JSON.stringify({old,candidate,originalInitialized,ready,manualResult,manualEarly,renders,mutations,genuine_public_application:!!app,
+ console.log(JSON.stringify({old,candidate,originalInitialized,ready,manualResult,manualEarly,ownedReactiveRippleVerified:true,renders,mutations,genuine_public_application:!!app,
   whole_source_constructors_replayed:true,angular_decorators_traits_or_node_DI_executed:false,native_executed:false}));
 }finally{app?.destroy();manual?.destroy();core.destroyPlatform();}
 `;
@@ -227,8 +235,8 @@ try{
   node:process.version,binding_parser:ts.version,namespace_capsule_sha256:loaded.capsule_hash,results,public_contracts:contracts,
   constructor_change:{historical_parameters:14,current_parameters:15,historical_14_parameters_and_authored_body_identical:true,new_optional_trailing_public_Injector:true,whole_source_constructor_bodies_replayed_with_protocol_trait_parent:true,actual_legacy_traits_or_node_DI_executed:false},
   type_compilation:{compiler:compiler.version,compiler_source_sha256:hash(readFileSync(compilerPath)),subjects:types},
-  scope:'Complete original/owned select-base and derived constructors, members and field initializers with derived inheritance. The mixed trait parent is a protocol and Angular decorators are removed. Genuine public NgZone, QueryList, EventEmitter, FormControl and current public application/render hooks. Old 14-argument construction and new 15th injector assignment execute. Option/selection model/key manager, DOM geometry/styles, view/overlay/change-detector/direction/viewport services are protocols; _initKeyManager and disabled-motion policy are protocols. Actual legacy traits/node DI/AOT/packed/native geometry, consumer builds and Rx/Node floors remain unqualified.',
+  scope:'Complete original/owned select-base and derived constructors, members and field initializers with derived inheritance, including the exact owned reactive mixin declaration and genuine public signal/coercion functions. The mixed trait parent is a protocol and Angular decorators are removed. Genuine public NgZone, QueryList, EventEmitter, FormControl and current public application/render hooks. Old 14-argument construction and new 15th injector assignment execute. Option/selection model/key manager, DOM geometry/styles, view/overlay/change-detector/direction/viewport services are protocols; _initKeyManager and disabled-motion policy are protocols. Actual legacy traits/node DI/AOT/packed/native geometry, consumer builds and Rx/Node floors remain unqualified.',
   native_or_actual_legacy_instances_qualified:false,g11_claim:'not-passed'};
- assert.equal(results.length,10);if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});
+ assert.equal(results.length,10);assert.ok(results.every(row=>row.ownedReactiveRippleVerified));if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});
  console.log(JSON.stringify({line:report.line,subjects:10,mutation_rejections:results.flatMap(row=>row.mutations).length,compiler:compiler.version,native_executed:false,actual_legacy_instances_qualified:false}));
 }finally{loaded.dispose();}
