@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "role": "Bounded exact current planner transition; full current TOOL remains incomplete",
+  "parent": "37cb9800bdc62ef717fd6a5e8be9d20f80e5db96",
+  "patch_sha256": "0f625093e1dcf0866bc782b9aed42cb3d5c2af2e7fdf335cb148790bad9bb36f",
+  "afterimages": {
+    "scripts/current-sass-tool-references.mjs": "c4fbbd54200432a75380c0f1829c87c63de56e5a9dafb9389ad42c5fbfd1bc80",
+    "scripts/current_sass_tool_references.py": "3c569505d2ae89652b3fa65b9c2925bde00792ff8122e802e2c5a29041518d71",
+    "compatibility/rc/current-tool-planner-source-successor-v1.json": "7a986f7e700c45cc7137432e0573705f6aed6245c3963e9aa8953f93f8eec7fb",
+    "tests/current_tool_planner_successor_probe.mjs": "89b24acc4f22a9c0884c13cb9fa33c4970baa909fc9e7ea4300884d46f4f506d",
+    "tests/test_current_tool_planner_successor.py": "c8f8484e5fef2ea0d3e0fd9c3079cd29766d125613222287518ce9ee958124f9"
+  },
+  "independent_review": {
+    "sha256": "2f376dc35c85a677f19fa1261a20a48f9557ee6e253fdb1596e34dbd08a92756",
+    "review": {
+      "scope": "Bounded independent source review of planner-only successor; no canonical edits",
+      "patch_sha256": "0f625093e1dcf0866bc782b9aed42cb3d5c2af2e7fdf335cb148790bad9bb36f",
+      "base": "62ccd28cbfb78f2ba39f64d2adcb34bc379ed8cb",
+      "result": "Narrow planner transition supported; current main TOOL remains fail-closed on a separate stale rc-verify authority.",
+      "observations": [
+        "Three production images unchanged from v2; v3 adds provided-reader late mutation and recovery controls.",
+        "Independently replayed exact 2fbecd1b2687e26515c205cbd5c0024e9474b4b8\u21928baa761eca624c9d71293c3d31750a2b3fdeebf0, authentic direct parent, 4609 bytes 4f632a\u2026 to physical 5014 bytes 3a3663\u2026.",
+        "JS checks loaded planner function fingerprint and frozen descriptor and current physical image on main; Python validates physical input and finite exact replay without executing historical code. Package line read is physically bound. Old bytes only used internally for explicit historical comparison.",
+        "Independent v3 controlled V5 fixture test passed JS/Python concordance, cold/late drift, wrong supplied reader, recovery and 21.x old-planner preflight. Controlled fixture Python bound current planner 5014-byte image and did not qualify old or new planner as public rows.",
+        "Actual clean base 62ccd plus exact patch fails current-main constructors in both languages: inherited V5 authority expects scripts/rc-verify.py SHA 3a3a68dd67abf6b0c535853beea818f003867b5a1a1734e6bea683c82b51521c but physical image is 92b12b9f95207d32160a6a8df98e09a1ac9ee5264fdaf6a2f9057ff8bc3deadd. No stale check was waived.",
+        "Strict whitespace apply check against current checkout and reverse-check of isolated applied image passed."
+      ],
+      "limits": "Controlled V5 reconstruction is not actual current main construction; no full 21.x constructor or browser/runtime/release qualification. No continuous privileged-writer protection claim."
+    }
+  },
+  "root_controlled_test": {
+    "command": "python -m unittest tests.test_current_tool_planner_successor -v",
+    "node": "24.21.0",
+    "python": "3.14.7",
+    "exit_code": 0,
+    "tests": 1,
+    "elapsed_seconds": 1.48,
+    "scope": "Controlled historical V5 fixture, exact Git transition, JS/Python parity, cold/late physical and supplied-reader mutations; limited21 preflight only."
+  },
+  "root_actual_current_constructors": {
+    "node": {
+      "exit_code": 1,
+      "stderr_sha256": "be86cb3bda6df5cd9daefe5971d2aedf5c1672f6413249c404661901c4c035d8",
+      "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '92b12b9f95207d32160a6a8df98e09a1ac9ee5264fdaf6a2f9057ff8bc3deadd'\n- '3a3a68dd67abf6b0c535853beea818f003867b5a1a1734e6bea683c82b51521c'\n\n    at matches (file:///home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/current-sass-tool-references.mjs:90:34)\n    at member (file:///home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/current-sass-tool-references.mjs:138:46)\n    at currentSassToolReferenceSubject (file:///home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/current-sass-tool-references.mjs:187:25)\n    at file:///home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/[eval1]:1:92\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)\n    at async node:internal/modules/esm/loader:223:26\n    at async ModuleLoader.executeModuleJob (node:internal/modules/esm/loader:220:20)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '92b12b9f95207d32160a6a8df98e09a1ac9ee5264fdaf6a2f9057ff8bc3deadd',\n  expected: '3a3a68dd67abf6b0c535853beea818f003867b5a1a1734e6bea683c82b51521c',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.21.0\n"
+    },
+    "python": {
+      "exit_code": 1,
+      "stderr_sha256": "a44e3d9fc22243a2e77c6e61dc6102c283ff3d308a470ec3ee7ef3284fdcce49",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    from pathlib import Path; from scripts.current_sass_tool_references import CurrentSassToolReferences; CurrentSassToolReferences(Path.cwd())\n                                                                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\n  File \"/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/current_sass_tool_references.py\", line 237, in __init__\n    assert after == images[(V5_COMMIT, path)] and self._member(update['after']) == after\n                                                  ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^\n  File \"/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/current_sass_tool_references.py\", line 521, in _member\n    _matches(raw, ref)\n    ~~~~~~~~^^^^^^^^^^\n  File \"/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/current_sass_tool_references.py\", line 104, in _matches\n    assert _hash(raw) == ref['sha256']\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+    },
+    "reason": "Both advance past authenticated planner transition and reject stale inherited rc-verify.py V5 afterimage (expected3a3a68dd, actual92b12b9f). No current constructor pass."
+  },
+  "limits": [
+    "Historical planner bytes are explicit comparison data, never executed; startup/quiescent-writer trust remains.",
+    "No performance optimization or watchdog change was integrated.",
+    "Other current source owners and TOOL references need individual finite reviewed transitions; no wholesale repin.",
+    "No full actual21 constructor, browser, coordinator, G11 or release qualification."
+  ]
+}

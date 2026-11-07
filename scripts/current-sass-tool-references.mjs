@@ -13,10 +13,14 @@ import {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {types} from 'node:util';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
-import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
+import * as planner from './canonical-source-guard-plan.mjs';
+const {composeCanonicalSourceGuards}=planner;
 
 const SELF='scripts/current-sass-tool-references.mjs';
 const GUARD_PLAN=Object.freeze({path:'scripts/canonical-source-guard-plan.mjs',sha256:'4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f',bytes:4609});
+const CURRENT_GUARD_PLAN=Object.freeze({path:'scripts/canonical-source-guard-plan.mjs',sha256:'3a3663ce06af2107f55c410fff458100a808593fa9a968e18a94d8490c7fc664',bytes:5014});
+const PLANNER_PACKET=Object.freeze({path:'compatibility/rc/current-tool-planner-source-successor-v1.json',sha256:'7a986f7e700c45cc7137432e0573705f6aed6245c3963e9aa8953f93f8eec7fb',bytes:1162});
+const PLANNER_PARENT='2fbecd1b2687e26515c205cbd5c0024e9474b4b8',PLANNER_COMMIT='8baa761eca624c9d71293c3d31750a2b3fdeebf0';
 const GUARD_PLAN_FUNCTION_SHA256='fecc474c121931506ce1f0f97e176886957f1504da46e74a085a068910ff9947';
 const loadedComposeCanonicalSourceGuards=composeCanonicalSourceGuards, functionToString=Function.prototype.toString;
 const INPUTS='compatibility/rc/parent-base-class-tool-successor-inputs-v3.json';
@@ -133,13 +137,25 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
  };
  const member=ref=>{const raw=read(ref.path);matches(raw,ref);return raw;};
  const assertPhysical=()=>{for(const ref of bound.values())assert.deepEqual(reference(ref.path,readEvidenceMember(root,ref.path)),ref,'late physical current tool input '+ref.path);};
+ const packagePath='projects/ngx-material-legacy/package.json',packageImage=readEvidenceMember(root,packagePath);
+ const version=JSON.parse(packageImage).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
+ const activePlanner=line==='main'?CURRENT_GUARD_PLAN:GUARD_PLAN;
  const assertPlanner=()=>{
   assert.equal(composeCanonicalSourceGuards,loadedComposeCanonicalSourceGuards,'changed current tool guard planner');
   assert.equal(hash(functionToString.call(loadedComposeCanonicalSourceGuards)),GUARD_PLAN_FUNCTION_SHA256,'unauthenticated current tool guard planner');
-  const raw=readEvidenceMember(root,GUARD_PLAN.path);matches(raw,GUARD_PLAN);
+  const raw=readEvidenceMember(root,activePlanner.path);matches(raw,activePlanner);
+  if(line==='main'){assert.ok(Object.isFrozen(planner.canonicalSourceGuardPlanLoadedImage));assert.deepEqual(planner.canonicalSourceGuardPlanLoadedImage,activePlanner);}
  };
  // Authenticate the loaded planner and its physical image before caller reads.
  assertPlanner();
+ if(line==='main')assert.ok(equalBytes(read(packagePath),packageImage),'package line changed during planner selection');
+ let plannerBefore;
+ if(line==='main'){
+  const plan=JSON.parse(member(PLANNER_PACKET));assert.equal(plan.schema_version,1);assert.equal(plan.role,'current-tool-planner-source-successor');assert.equal(plan.source_parent,PLANNER_PARENT);assert.equal(plan.source_commit,PLANNER_COMMIT);assert.equal(plan.historical_programs_executed,false);assert.deepEqual(plan.before,GUARD_PLAN);assert.deepEqual(plan.after,CURRENT_GUARD_PLAN);
+  const env={PATH:process.env.PATH,LANG:'C',LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1'};
+  assert.equal(execFileSync('git',['--no-replace-objects','rev-list','--parents','-n','1',PLANNER_COMMIT],{cwd:root,env,encoding:'utf8'}).trim(),PLANNER_COMMIT+' '+PLANNER_PARENT);
+  const images=gitImages(root,[{commit:PLANNER_PARENT,path:GUARD_PLAN.path},{commit:PLANNER_COMMIT,path:GUARD_PLAN.path}]);plannerBefore=images.get(PLANNER_PARENT+':'+GUARD_PLAN.path);matches(plannerBefore,GUARD_PLAN);const after=edited(plannerBefore,plan.edits);matches(after,CURRENT_GUARD_PLAN);assert.ok(equalBytes(after,images.get(PLANNER_COMMIT+':'+GUARD_PLAN.path)));assert.ok(equalBytes(member(CURRENT_GUARD_PLAN),after));assertPlanner();
+ }
  assert.ok(equalBytes(read(SELF),image));const successor=JSON.parse(member({path:INPUTS,sha256:INPUTS_SHA}));
  assert.equal(successor.schema_version,3);assert.equal(successor.role,'finite-current-sass-tool-reference-successor');
  assert.deepEqual(successor.previous_epoch,V2_INPUTS);assert.deepEqual(successor.product_paths,[]);
@@ -149,7 +165,7 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
  assert.deepEqual(packet.previous_epoch,PREVIOUS_INPUTS);const previousRaw=member(PREVIOUS_INPUTS),previous=JSON.parse(previousRaw);
  assert.equal(previous.schema_version,1);assert.equal(previous.role,packet.role);
  assert.deepEqual(packet.product_paths,[]);assert.equal(packet.historical_programs_executed,false);assert.equal(packet.historical_reports_rewritten,0);assert.equal(packet.artifact_or_audit_admission_granted,false);
- const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
+ assert.ok(equalBytes(read(packagePath),packageImage),'package line changed');
  const v5Overlays=new Map();
  if(line==='main'){
   const v5=JSON.parse(member(V5_INPUTS));
@@ -181,6 +197,7 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
  // This function is only for verifying a historical identity as comparison data.
  // It always binds and reads the actual current member before returning old bytes.
  const v4Comparison=ref=>{
+  if(line==='main'&&ref.path===GUARD_PLAN.path){assert.deepEqual(metadata(ref),GUARD_PLAN,'unknown planner predecessor');member(CURRENT_GUARD_PLAN);assertPlanner();return Buffer.from(plannerBefore);}
   const overlay=v5Overlays.get(ref.path);if(!overlay)return member(ref);
   assert.deepEqual(metadata(ref),overlay.update.before,'unknown V4 comparison identity '+ref.path);
   assert.ok(equalBytes(member(overlay.update.after),overlay.after));return Buffer.from(overlay.before);
@@ -331,7 +348,7 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
   addIdentity(row,update.before,before);addIdentity(row,update.after,after);row.after={sha256:update.after.sha256,bytes:update.after.bytes};
  }
  for(const row of rows.values())member({path:row.path,...row.after});
- assert.deepEqual(bound.get(GUARD_PLAN.path),GUARD_PLAN,'current tool guard planner missing from finite bound');
+ assert.deepEqual(bound.get(GUARD_PLAN.path),activePlanner,'current tool guard planner missing from finite bound');
  let consuming=false,batching=false;
  const assertIdle=()=>{assert.equal(consuming,false,'reentrant current tool guard consumption');assert.equal(batching,false,'reentrant current tool reference batch');};
  const guardNode=Object.freeze({
