@@ -1301,3 +1301,37 @@ describe('legacy radio group ownership boundary', () => {
     fixture.destroy();
   }));
 });
+
+import {provideZonelessChangeDetection, NgZone} from '@angular/core';
+@Component({standalone: true, imports: [MatLegacyRadioModule], changeDetection: ChangeDetectionStrategy.OnPush,
+  template: '<mat-radio-button>Required probe</mat-radio-button>'})
+class RequiredSetterProbe {}
+for (const zoneless of [false, true]) {
+  describe(`packed required setter automatic rendering (${zoneless ? 'zoneless provider' : 'zoneful'})`, () => {
+    it('updates the native required state after public property writes without manual detectChanges', async () => {
+      TestBed.configureTestingModule({imports: [RequiredSetterProbe], providers: zoneless ? [provideZonelessChangeDetection()] : []});
+      const fixture = TestBed.createComponent(RequiredSetterProbe); fixture.autoDetectChanges(); await fixture.whenStable();
+      const radio = fixture.debugElement.query(By.directive(MatLegacyRadioButton)).componentInstance as MatLegacyRadioButton;
+      const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+      const zone = TestBed.inject(NgZone); expect(input.required).toBe(false);
+      zone.run(() => { radio.required = true; queueMicrotask(() => {}); }); await fixture.whenStable();
+      expect(input.required).withContext('true is rendered automatically').toBe(true);
+      zone.run(() => { radio.required = false; queueMicrotask(() => {}); }); await fixture.whenStable();
+      expect(input.required).withContext('false is rendered automatically').toBe(false);
+      fixture.destroy();
+    });
+  });
+}
+
+describe('radio required setter coercion scheduling', () => {
+  it('marks for check only when the coerced required value changes', () => {
+    TestBed.configureTestingModule({imports: [RequiredSetterProbe]});
+    const fixture = TestBed.createComponent(RequiredSetterProbe); fixture.detectChanges();
+    const radio = fixture.debugElement.query(By.directive(MatLegacyRadioButton)).componentInstance as MatLegacyRadioButton;
+    const mark = spyOn((radio as any)._changeDetector, 'markForCheck').and.callThrough();
+    radio.required = ''; expect(radio.required).toBe(true); expect(mark).toHaveBeenCalledTimes(1);
+    radio.required = true; expect(mark).toHaveBeenCalledTimes(1);
+    radio.required = 'false'; expect(radio.required as any).toBeNull(); expect(mark).toHaveBeenCalledTimes(2);
+    fixture.destroy();
+  });
+});

@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "role": "Root integration of radio required-property OnPush notification repair",
+  "parent": "e588978f3aa2d6c9cfa5306f4bcfe08e867201e7",
+  "proposal": {
+    "base": "5ddd6f98b9af8c4b4f7bee619eb291c2a9950b1c",
+    "candidate": "68d2f3450dbe80890f5dfaa2bda90b567e36febf",
+    "patch_sha256": "3e8830aeb3535bf16729b2c39c14b0383f6c0d667eb686daad482d8afcae7650",
+    "tree": "7e658fc6f9066d6df01330a2f04039c675d89c18",
+    "alternate_index_tree_match": true,
+    "upstream_commit": "fc36e668fb72aa4f4798ea5fb09acdbce9c906c4",
+    "upstream_full_diff_sha256": "dc13efeb7421d0bb3d6162e6fb54781a01f8fa81b6b42e670fd740bfba4f3dd3",
+    "candidate_tar_sha256": "2cf96975b6f6adaa83a8bf42f99a756f34bbdd7166ea899120f5605c66f8bffb",
+    "candidate_report": {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/radio-required-fc36/worktree/artifacts/main/required-68d2-v1/reports/legacy-radio-20261107T171737Z.json",
+      "sha256": "aba0f8c0f08c78de31e85af283524a3f6e3766a9d4bdb8fcff27e20c3c92cfa8",
+      "totals": {
+        "executed": 99,
+        "passed": 99,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    "baseline_tar_sha256": "4148c2edd526dbac802ddc6f48c620534b2262400f141f072555b2f5396cadfd",
+    "baseline_report": {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/radio-required-fc36/baseline-negative.json",
+      "sha256": "3d1210ebe98404802c8aaaca7e6c5914f31ed88ed45587705d25350698ee9799",
+      "totals": {
+        "executed": 99,
+        "passed": 96,
+        "failed": 3,
+        "skipped": 0
+      },
+      "artifact_report_sha_field": null
+    },
+    "source_unchanged": true,
+    "historical": "Tagged16 radio button setter coerces/assigns; this scheduling fix intentionally improves OnPush automatic rendering while retaining coercion and getter behavior.",
+    "limitations": [
+      "Zoneless provider tested with Zone.js present, not strict no-Zone application.",
+      "Old baseline tar source-map radio-base image matches 5ddd; other packed files differ from current source.",
+      "No x64/21.x/full suite/release claim; 28 authored-use source epochs require new successor."
+    ]
+  },
+  "source_afterimages": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts",
+      "sha256": "3302e2532bd8fde74d6965c8cf3000345b8e61e85ee2f04ef7efc88fda3422f8"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/radio.spec.ts",
+      "sha256": "bb7915b4ba5e8572812c3666574393e8e702c8e22e0f085df97e01aa419f573b"
+    }
+  ],
+  "independent_review": {
+    "sha256": "c2d023269ed150bd20bb7830ea15544e860d7ead60cb5886eb9335e8166858e4",
+    "text": "# Independent review: radio required scheduling fc36\n\nThe bounded required-setter change is supported for integration, subject to a current-tree source comparison and a separate successor for the 28 radio authored-use source epochs. Candidate `68d2f3450dbe80890f5dfaa2bda90b567e36febf` on `5ddd6f98b9af8c4b4f7bee619eb291c2a9950b1c`, patch SHA256 `3e8830aeb3535bf16729b2c39c14b0383f6c0d667eb686daad482d8afcae7650`. No HTML, CSS or Sass changes occur.\n\nThe complete upstream `fc36e668fb72aa4f4798ea5fb09acdbce9c906c4` patch marks a changed radio required property for OnPush checking and removes an upstream test configuration suppressing exhaustive change checks. The tagged 16 legacy setter only coerces and assigns. This candidate retains legacy `BooleanInput` coercion and the existing group-fallback getter, and adds `markForCheck()` after the coerced internal value changes. Identical subsequent coerced values do not mark again. The field initially has value `undefined`, so its first explicit false is a distinct internal transition and can mark despite the same effective native false state; the new test establishes subsequent equal-value suppression, not zero marks for every semantically equivalent initial or group-inherited state. The existing OnPush component is the relevant rendering boundary; this is an intentional scheduling improvement over the reference, not a claim that the reference already performed it.\n\nVerified retained candidate tar SHA256 `2cf96975b6f6adaa83a8bf42f99a756f34bbdd7166ea899120f5605c66f8bffb`, report SHA256 `aba0f8c0f08c78de31e85af283524a3f6e3766a9d4bdb8fcff27e20c3c92cfa8`, 99/99 passed and none skipped, artifact-bound report SHA matches. Independently compared all 512 regular tar members to the extracted test package, with no differences. The retained old tar `4148c2edd526dbac802ddc6f48c620534b2262400f141f072555b2f5396cadfd` also matches all 512 extracted members; its radio source map embeds the exact baseline radio-base SHA256 `e3365e7b338c80cb0b539fb19cb1c8c20d0741f37d4c11f2f46f8620aaec3fbf`. Its direct negative report SHA256 `3d1210ebe98404802c8aaaca7e6c5914f31ed88ed45587705d25350698ee9799` has 96/99: both zoneful and zoneless-provider automatic true-render tests and the coercion/mark-count test fail as intended. That direct report has null artifact hash and the old pack differs from current source elsewhere; it is not a whole-current-product baseline. The retained state records clean candidate source and no source changes during the run.\n\nThe automatic-render tests write the public property, await stabilization and inspect native `required` without manual detectChanges, and the targeted spy checks coercion and redundant marks. Zone.js remains loaded during the zoneless-provider test; it is not strict no-Zone coverage. No independent browser replay was performed. This review grants no x64, 21.x, full suite, security or release qualification.\n"
+  },
+  "root_checks": {
+    "strict_whitespace_apply": true,
+    "exact_both_candidate_afterimages": true,
+    "all_current_tracked_project_files_equal_reviewed_candidate": 1120,
+    "actual_tar_and_both_reports_rehashed": true,
+    "packed_radio_sourcemap_exact_current_source": true
+  },
+  "behavior": "Coerce required input as before and mark for check on internal state change, fixing stale automatic native required rendering. Repeated equal coerced writes remain unmarked after initial assignment. Existing getter including standalone null result is preserved. No template/style change.",
+  "limits": [
+    "Focused actual packed99/99 vs old96/99; no root browser replay. Zoneless provider fixture still has Zone.js loaded, so strict no-Zone qualification remains separate.",
+    "Original16 setter only coerces/assigns; scheduling is an intentional narrow improvement matching applicable upstream fc36 intent, not peer inheritance.",
+    "Old packednegative report has null artifact field; source-map/source identity separately verified.",
+    "The28 frozen radio source-use bindings reopen on this source image and need a successor; fc36 upstream individual ledger correction still pending existing generic source-proof admission fix.",
+    "No full historical suite, final combined metadata matrix, G11/security/full audit/release qualification claimed."
+  ]
+}

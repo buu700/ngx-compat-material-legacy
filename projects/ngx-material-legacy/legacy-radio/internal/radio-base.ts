@@ -426,7 +426,11 @@ export abstract class _MatRadioButtonBase
     return this._required || (this.radioGroup && this.radioGroup.required);
   }
   set required(value: BooleanInput) {
-    this._required = coerceBooleanProperty(value);
+    const required = coerceBooleanProperty(value);
+    if (required !== this._required) {
+      this._required = required;
+      this._changeDetector.markForCheck();
+    }
   }
 
   /** Theme color of the radio button. */
