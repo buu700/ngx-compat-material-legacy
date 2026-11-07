@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "role": "finite-fixed-report-capture-packed-source-successor",
+  "line": "main",
+  "source_parent": "c72d88c74944463d1fea960ae718fb30944818c9",
+  "source_commit": "5b09618cde44725b8723fe4f6c63c3a4c35ad7e5",
+  "update": {
+    "path": "scripts/packed-consumer-evidence.mjs",
+    "before": {
+      "path": "scripts/packed-consumer-evidence.mjs",
+      "sha256": "1f58b3ce058288910b0887d02692b4d0595daa0f50365216c467600102940a62",
+      "bytes": 14947
+    },
+    "after": {
+      "path": "scripts/packed-consumer-evidence.mjs",
+      "sha256": "c277cc4d4e3c3d5afb706ed9872cf0a5da453cbd470d9d7be0c2a6f02e6b28a3",
+      "bytes": 17593
+    },
+    "edits": [
+      {
+        "offset": 295,
+        "before": "import {existsSync, lstatSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';\n",
+        "after": "import {existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync} from 'node:fs';\n"
+      },
+      {
+        "offset": 6386,
+        "before": "",
+        "after": "// Only the verifier's exact fixed-report capture transition is admissible.\nfunction isFixedReportCapture(checkId, status) {\n  try {\n    const catalog = JSON.parse(readFileSync(new URL('../compatibility/rc/fixed-report-catalog.json', import.meta.url), 'utf8'));\n    const rows = catalog.reports;\n    if (!Array.isArray(rows) || rows.some(row => !row || typeof row.script !== 'string' ||\n        typeof row.check_id !== 'string' || typeof row.path !== 'string') ||\n        ['script', 'check_id', 'path'].some(key => new Set(rows.map(row => row[key])).size !== rows.length)) return false;\n    const row = rows.find(item => item.check_id === checkId);\n    if (!row || !/^compatibility\\/rc\\/reports\\/[a-z0-9-]+\\.json$/.test(row.path) ||\n        !/^[a-z0-9-]+$/.test(checkId)) return false;\n    const entries = status.split('\\0').filter(Boolean);\n    const namePrefix = `.saved-${checkId}-`;\n    const names = readdirSync(join(root, 'compatibility/rc/reports')).filter(name => name.startsWith(namePrefix));\n    if (names.length !== 1 || !/^[0-9a-f]{32}\\.json$/.test(names[0].slice(namePrefix.length))) return false;\n    const backup = `compatibility/rc/reports/${names[0]}`;\n    if (!entries.includes(` D ${row.path}`)) return false;\n    if (entries.length === 1) {\n      // The user's Git excludes may hide the actual backup from porcelain.\n      const ignored = spawnSync('git', ['check-ignore', '-q', '--', backup], {cwd: root});\n      if (ignored.status !== 0) return false;\n    } else if (entries.length !== 2 || !entries.includes(`?? ${backup}`)) {\n      return false;\n    }\n    // Every component must be real, and the backup must not share an inode.\n    for (const path of ['compatibility', 'compatibility/rc', 'compatibility/rc/reports', backup]) {\n      const st = lstatSync(join(root, path));\n      if (st.isSymbolicLink() || (path === backup ? !st.isFile() || st.nlink !== 1 : !st.isDirectory())) return false;\n    }\n    if (existsSync(join(root, row.path))) return false;\n    const index = gitValue(['ls-files', '--stage', '--', row.path]);\n    if (!/^100644 [0-9a-f]+ 0\\t/.test(index ?? '')) return false;\n    const diff = spawnSync('git', ['diff', '--cached', '--quiet', 'HEAD', '--', row.path], {cwd: root});\n    if (diff.status !== 0) return false;\n    const head = spawnSync('git', ['show', `HEAD:${row.path}`], {cwd: root, maxBuffer: 16 * 1024 * 1024});\n    return head.status === 0 && head.stdout.equals(readFileSync(join(root, backup)));\n  } catch {\n    return false;\n  }\n}\n\n"
+      },
+      {
+        "offset": 8696,
+        "before": "  const status = gitValue(['status', '--porcelain', '--untracked-files=normal']);\n  if (status === null) return {error: 'checkout clean source state is unknown'};\n  if (status !== '') return {error: 'checkout source is dirty'};\n",
+        "after": ""
+      },
+      {
+        "offset": 9499,
+        "before": "",
+        "after": "  const statusResult = spawnSync('git', ['status', '--porcelain', '-z', '--untracked-files=all', '--no-renames'], {cwd: root, encoding: 'utf8'});\n  if (statusResult.status !== 0) return {error: 'checkout clean source state is unknown'};\n  if (statusResult.stdout !== '' && !isFixedReportCapture(checkId, statusResult.stdout)) return {error: 'checkout source is dirty'};\n"
+      }
+    ]
+  },
+  "additional_inputs": [
+    {
+      "path": "compatibility/rc/fixed-report-catalog.json",
+      "sha256": "8ad19c8e668860c33207f1c40a3d4a0aac4a13b5316982a534645cefac96e4c8",
+      "bytes": 1171
+    }
+  ],
+  "historical_programs_executed": false,
+  "historical_reports_rewritten": 0,
+  "artifact_or_audit_admission_granted": false
+}

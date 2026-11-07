@@ -13,6 +13,10 @@ import subprocess
 SELF = 'scripts/current_sass_tool_references.py'
 INPUTS = 'compatibility/rc/parent-base-class-tool-successor-inputs-v3.json'
 V4_INPUTS = dict(path='compatibility/rc/parent-base-class-tool-successor-inputs-v4.json', sha256='60088525932c75c41782874396eb72f8bcec479ec2ad4d911090e1e2b3964b24', bytes=109915)
+V5_INPUTS = dict(path='compatibility/rc/parent-base-class-tool-successor-inputs-v5.json', sha256='365ffeba024c5bc28705c1bc42127e2491fadcf0d76ed90bef686a83757e91af', bytes=19314)
+V5_PARENT = 'c72d88c74944463d1fea960ae718fb30944818c9'
+V5_COMMIT = '5b09618cde44725b8723fe4f6c63c3a4c35ad7e5'
+V5_PATHS = ['scripts/rc-verify.py', 'scripts/packed-consumer-evidence.mjs']
 V4_PARENT = '7870ef230c0e980d8b58eab81374358142eca065'
 V4_COMMITS = {'tests/current_sass_tool_reference_probe.mjs': 'authored', 'scripts/browser-reference-source.mjs': 'authored', 'scripts/checker-reference-proposal.mjs': 'authored', 'tests/checker_reference_source_probe.mjs': 'authored', 'scripts/check-upstream-audit-disposition.mjs':'70fecd1e31cb0e2a881b3b3e803fae3fcbddefde','scripts/rc-verify.py':'70fecd1e31cb0e2a881b3b3e803fae3fcbddefde','scripts/rc_acceptance.py':'70fecd1e31cb0e2a881b3b3e803fae3fcbddefde','compatibility/rc/matrices/full-verify.json':'70fecd1e31cb0e2a881b3b3e803fae3fcbddefde','tests/test_rc_acceptance.py':'70fecd1e31cb0e2a881b3b3e803fae3fcbddefde','scripts/select-dialog-finite-source-successor.mjs':'0da0a92934ffae20098de762d78c329dc932c04c','scripts/select_dialog_finite_source_successor_v4.py':'0da0a92934ffae20098de762d78c329dc932c04c','scripts/remaining-native-tab-lifecycle-review.mjs':'b30c40a7b58513047cdf453c28ae7e33cd40d5f3','scripts/inventory-reference-owner.mjs':'948e8290b74953c83d11268368f38952d0b51fd7','scripts/inventory-reference-proposal.mjs':'948e8290b74953c83d11268368f38952d0b51fd7','scripts/inventory-finite-tool-successor.mjs':'948e8290b74953c83d11268368f38952d0b51fd7','tests/inventory_finite_source_probe.mjs':'948e8290b74953c83d11268368f38952d0b51fd7','scripts/inventory-rc-acceptance-source-successor.mjs':'authored','tests/test_current_sass_tool_references.py':'authored'}
 V2_INPUTS = dict(path='compatibility/rc/current-sass-tool-reference-inputs-v2.json', sha256='d25ef6684992ececd518f7932bc68f5d43d433df23868d7a376ebf0a9e56a770', bytes=625566)
@@ -185,6 +189,55 @@ class CurrentSassToolReferences:
         version = json.loads(self._read('projects/ngx-material-legacy/package.json'))['version']
         self.line = '21.x' if version.startswith('21.') else 'main' if version.startswith('22.') else None
         assert self.line is not None
+        v5_overlays = {}
+        if self.line == 'main':
+            v5 = json.loads(self._member(V5_INPUTS))
+            assert v5['schema_version'] == 5 and v5['role'] == successor['role'] and v5['previous_epoch'] == V4_INPUTS
+            assert v5['source_parent'] == V5_PARENT and v5['source_commit'] == V5_COMMIT and v5['product_paths'] == []
+            assert v5['historical_programs_executed'] is False and v5['historical_reports_rewritten'] == 0 and v5['artifact_or_audit_admission_granted'] is False
+            assert [u['path'] for u in v5['updates']] == V5_PATHS
+            assert len(v5['additional_inputs']) == 1 and v5['additional_inputs'][0]['path'] == 'compatibility/rc/fixed-report-catalog.json'
+            env = dict(PATH=os.environ['PATH'], LANG='C', LC_ALL='C', GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null', GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')
+            ancestry = subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0', 'rev-list', '--parents', '-n', '1', V5_COMMIT], cwd=self.root, env=env, text=True).strip()
+            assert ancestry == V5_COMMIT + ' ' + V5_PARENT, 'V5 source commit has unexpected parent'
+            requests = [dict(commit=commit, path=u['path']) for u in v5['updates'] for commit in (V5_PARENT, V5_COMMIT)]
+            assert [u['path'] for u in v5['authored_updates']] == ['tests/test_current_sass_tool_references.py', 'tests/current_sass_tool_reference_probe.mjs', 'scripts/current-native-tab-downstream-source.mjs']
+            requests.extend(dict(commit=V5_COMMIT, path=u['path']) for u in v5['authored_updates'])
+            requests.append(dict(commit=V5_COMMIT, path=v5['additional_inputs'][0]['path']))
+            images = _git_images(self.root, requests)
+            for update in v5['updates']:
+                path = update['path']
+                assert set(update) == {'path', 'before', 'after', 'edits'} and update['before']['path'] == update['after']['path'] == path
+                before = images[(V5_PARENT, path)]
+                _matches(before, update['before'])
+                after = _edited(before, update['edits'])
+                _matches(after, update['after'])
+                assert after == images[(V5_COMMIT, path)] and self._member(update['after']) == after
+                v5_overlays[path] = (update, before, after)
+            for update in v5['authored_updates']:
+                path = update['path']
+                assert set(update) == {'path', 'before', 'after', 'edits'} and update['before']['path'] == update['after']['path'] == path
+                before = images[(V5_COMMIT, path)]
+                _matches(before, update['before'])
+                after = _edited(before, update['edits'])
+                _matches(after, update['after'])
+                assert self._member(update['after']) == after
+                v5_overlays[path] = (update, before, after)
+            assert len(v5['authored_support']) == 1 and v5['authored_support'][0]['path'] == 'compatibility/rc/current-native-tab-downstream-source-epochs-v5.json'
+            self._member(v5['authored_support'][0])
+            ref = v5['additional_inputs'][0]
+            assert self._member(ref) == images[(V5_COMMIT, ref['path'])]
+
+        # Historical comparison bytes are never returned by the physical reader.
+        def v4_comparison(ref):
+            overlay = v5_overlays.get(ref['path'])
+            if overlay is None:
+                return self._member(ref)
+            update, before, after = overlay
+            assert _metadata(ref) == update['before'], 'unknown V4 comparison identity'
+            assert self._member(update['after']) == after
+            return before
+
         v4_overlays = {}
         if self.line == 'main':
             v4 = json.loads(self._member(V4_INPUTS))
@@ -208,7 +261,7 @@ class CurrentSassToolReferences:
                 _matches(after, update['after'])
                 if update['source_commit'] != 'authored':
                     assert images[(update['source_commit'], path)] == after
-                assert self._member(update['after']) == after
+                assert v4_comparison(update['after']) == after
                 v4_overlays[path] = (update, before, after)
             browser = json.loads(self._member(dict(path='compatibility/rc/c04-browser-owner-inputs.json', sha256='d22d4c657197ee2640dd1079861e54fde35e55b9091b7d44f4e024d4b37b46cb', bytes=15192)))
             audit = next(row for row in v4['updates'] if row['path'] == 'scripts/check-upstream-audit-disposition.mjs')
@@ -221,7 +274,7 @@ class CurrentSassToolReferences:
             assert native['sources'][0] == next(row['after'] for row in v4['updates'] if row['path'] == 'scripts/remaining-native-tab-lifecycle-review.mjs')
             assert native['archive'] == v4['receipts'][5]
             for ref in native['sources']:
-                self._member(ref)
+                v4_comparison(ref)
             inventory = json.loads(self._member(v4['receipts'][6]))
             assert inventory['role'] == 'main-nine-spec-inventory-source-qualification'
             assert inventory['source_parent'] == '70fecd1e31cb0e2a881b3b3e803fae3fcbddefde'
@@ -230,15 +283,15 @@ class CurrentSassToolReferences:
                 update = next ( (row for row in v4['updates'] if row['path'] == ref['path']), None)
                 if update is not None:
                     assert update['after'] == ref
-                self._member(ref)
+                v4_comparison(ref)
 
         def v3_member(ref):
             overlay = v4_overlays.get(ref['path'])
             if overlay is None:
-                return self._member(ref)
+                return v4_comparison(ref)
             update, before, after = overlay
             assert _metadata(ref) == update['before'], 'unknown V3 predecessor identity'
-            assert self._member(update['after']) == after
+            assert v4_comparison(update['after']) == after
             return before
 
         branch = packet['branches'][self.line]
@@ -398,9 +451,24 @@ class CurrentSassToolReferences:
             self._add(row, update['before'], before)
             self._add(row, update['after'], after)
             row['after'] = dict(sha256=update['after']['sha256'], bytes=update['after']['bytes'])
+        for update, before, after in v5_overlays.values():
+            path = update['path']
+            row = self._rows.get(path)
+            if row is not None:
+                assert update['before'] == dict(path=path, **row['after']), 'V5 overlay does not follow exact V4 current row'
+            else:
+                if path == 'scripts/current-native-tab-downstream-source.mjs':
+                    assert update['before'] == dict(path=path, sha256='86e46cca50f8c3658cfaf12bdd94f0475452ce8e5e1f4da35d953f81e72f21fa', bytes=12850)
+                else:
+                    assert path == 'scripts/packed-consumer-evidence.mjs'
+                row = dict(path=path, before=dict(sha256=update['before']['sha256'], bytes=update['before']['bytes']), identities={})
+                self._rows[path] = row
+            self._add(row, update['before'], before)
+            self._add(row, update['after'], after)
+            row['after'] = dict(sha256=update['after']['sha256'], bytes=update['after']['bytes'])
         for row in self._rows.values():
             self._member(dict(path=row['path'], **row['after']))
-        self.epoch = 4 if self.line == 'main' else 3
+        self.epoch = 5 if self.line == 'main' else 3
         self.assert_current()
 
     def _add(self, row, ref, raw):

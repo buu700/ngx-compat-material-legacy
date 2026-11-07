@@ -20,10 +20,13 @@ const V1='compatibility/rc/current-native-tab-downstream-source-epochs-v1.json';
 const V2='compatibility/rc/current-native-tab-downstream-source-epochs-v2.json';
 const V3='compatibility/rc/current-native-tab-downstream-source-epochs-v3.json';
 const V4='compatibility/rc/current-native-tab-downstream-source-epochs-v4.json';
+const V5='compatibility/rc/current-native-tab-downstream-source-epochs-v5.json';
 const V1_SHA='ec6359421bcc2c4638e13bdcfdf9743c3ad5f7ad59d5d51b59c744ce843bccaa';
 const V2_SHA='c814f18b33bd5fc99060bddacc26123b180119f77c64ce838281a4ac9e955c73';
 const V3_SHA='0fb93cd9a5f3b6618e296a14c01c8098cbccc9610115e78c4bdddc564b1562b5';
 const V4_SHA='6af0e27ebe658249e80a4bf047f0f7ce862fdddea11f07de16e4512953bea442';
+const V5_SHA='dcaafd6cbaf736ff085b18fea39a1ba49ac075bee8d49b289785ef42c27f7d33';
+const V5_PARENT='c72d88c74944463d1fea960ae718fb30944818c9',V5_COMMIT='5b09618cde44725b8723fe4f6c63c3a4c35ad7e5';
 const INPUTS='compatibility/rc/remaining-native-admission-tab-repair-source-inputs.json';
 const INPUT_SHA='92a1e6c683bf36815471b90674b949f8972f1fbdc7c1d736c60ec79de7d1ce0e';
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
@@ -62,11 +65,11 @@ export function createCurrentNativeTabDownstreamSource({root=process.cwd(),line,
  };
  assert.ok(read===undefined||typeof read==='function');
  const supplied=read??physical;
- const images=[[V1,V1_SHA],[V2,V2_SHA],[V3,V3_SHA],[V4,V4_SHA]].map(([path,expected])=>{
+ const images=[[V1,V1_SHA],[V2,V2_SHA],[V3,V3_SHA],[V4,V4_SHA],[V5,V5_SHA]].map(([path,expected])=>{
   const bytes=physical(path);assert.equal(sha(bytes),expected,'changed T03 packet '+path);
   return {path,bytes,packet:JSON.parse(bytes)};
  });
- const [v1,v2,v3,v4]=images.map(item=>item.packet);
+ const [v1,v2,v3,v4,v5]=images.map(item=>item.packet);
  assert.equal(v1.schema_version,1);assert.equal(v2.schema_version,2);assert.equal(v3.schema_version,3);
  assert.equal(v2.predecessor_packet_sha256,V1_SHA);
  assert.deepEqual(v3.previous_packet,{path:V2,sha256:V2_SHA,bytes:images[1].bytes.length});
@@ -77,6 +80,23 @@ export function createCurrentNativeTabDownstreamSource({root=process.cwd(),line,
  assert.deepEqual(v4.previous_packet,{path:V3,sha256:V3_SHA,bytes:images[2].bytes.length});
  assert.equal(v4.role,v3.role);assert.equal(v4.source_scope_only,true);assert.equal(v4.actual_native_packed_browser_floor_qualified,false);assert.equal(v4.g11_claim,'not-passed');
  assert.deepEqual(Object.keys(v4.lines),['main']);
+ assert.equal(v5.schema_version,5);assert.equal(v5.role,v3.role);assert.deepEqual(v5.previous_packet,{path:V4,sha256:V4_SHA,bytes:images[3].bytes.length});
+ assert.equal(v5.source_parent,V5_PARENT);assert.equal(v5.source_commit,V5_COMMIT);assert.equal(v5.source_scope_only,true);assert.equal(v5.actual_native_packed_browser_floor_qualified,false);assert.equal(v5.g11_claim,'not-passed');
+ const transition=v5.update;assert.equal(transition.path,'scripts/rc-verify.py');assert.equal(transition.before.path,transition.path);assert.equal(transition.after.path,transition.path);
+ assert.equal(v5.additional_inputs.length,1);assert.equal(v5.additional_inputs[0].path,'compatibility/rc/fixed-report-catalog.json');
+ const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!key.startsWith('GIT_')));
+ Object.assign(env,{GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1',GIT_TERMINAL_PROMPT:'0',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null'});
+ const ancestry=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','rev-list','--parents','-n','1',V5_COMMIT],{cwd:root,env,encoding:'utf8'}).trim();
+ assert.equal(ancestry,V5_COMMIT+' '+V5_PARENT,'T03 V5 source parent mismatch');
+ const predecessor=git(root,V5_PARENT,transition.path),postimage=git(root,V5_COMMIT,transition.path);
+ assert.deepEqual(ref(transition.path,predecessor),transition.before);assert.deepEqual(ref(transition.path,postimage),transition.after);
+ assert.ok(same(replay(predecessor,transition.edits),postimage),'T03 V5 replay mismatch');
+ const catalog=v5.additional_inputs[0],catalogGit=git(root,V5_COMMIT,catalog.path);assert.deepEqual(ref(catalog.path,catalogGit),catalog);
+ const closure=v5.closure_update;assert.equal(closure.path,'tests/test_rc_run_writer_and_sealer.py');assert.equal(closure.before.path,closure.path);assert.equal(closure.after.path,closure.path);
+ const closureBefore=git(root,V5_PARENT,closure.path),closureAfter=git(root,V5_COMMIT,closure.path);
+ assert.deepEqual(ref(closure.path,closureBefore),closure.before);assert.deepEqual(ref(closure.path,closureAfter),closure.after);
+ assert.ok(same(replay(closureBefore,closure.edits),closureAfter),'T03 V5 closure replay mismatch');
+
  const branch=v4.lines.main,prior=v3.lines.main,earliest=v2.lines.main;
  assert.equal(branch.source_parent,prior.source_parent);
  assert.equal(branch.current_product_changed,55);assert.equal(branch.current_resource_changed,15);
@@ -126,8 +146,10 @@ export function createCurrentNativeTabDownstreamSource({root=process.cwd(),line,
     assert.equal(sha(previous),oldRow.current_sha256);assert.equal(previous.length,oldRow.current_bytes);
     if(priorRef.path===inspector)assert.equal(sha(previous),branch.predecessor_inspector_sha256);
    }
-   assert.ok(same(replay(before,changed.edits),current),'unreviewed downstream delta '+priorRef.path);
-   assert.equal(changed.current_sha256,sha(current));assert.equal(changed.current_bytes,current.length);
+   const historicalCurrent=replay(before,changed.edits);
+   assert.equal(changed.current_sha256,sha(historicalCurrent));assert.equal(changed.current_bytes,historicalCurrent.length);
+   if(priorRef.path===transition.path){assert.ok(same(historicalCurrent,predecessor),'T03 V5 does not follow V4');assert.ok(same(current,postimage),'unreviewed T03 V5 source');}
+   else assert.ok(same(historicalCurrent,current),'unreviewed downstream delta '+priorRef.path);
   }else assert.ok(same(before,current),'unreviewed downstream source change '+priorRef.path);
   bound.push(ref(priorRef.path,current));
  }
@@ -138,11 +160,18 @@ export function createCurrentNativeTabDownstreamSource({root=process.cwd(),line,
   historicalControls.push({...priorRef,name,status:'historical-only'});
  }
  assert.equal(historicalControls.length,3);
- bound.push(ref(INPUTS,inputBytes),...historicalControls.map(({path,sha256,bytes})=>({path,sha256,bytes})),ref(SELF,loadedImage),...images.map(({path,bytes})=>ref(path,bytes)));
+ const catalogBytes=checked(catalog.path);assert.deepEqual(ref(catalog.path,catalogBytes),catalog);assert.ok(same(catalogBytes,catalogGit));
+ bound.push(catalog,ref(INPUTS,inputBytes),...historicalControls.map(({path,sha256,bytes})=>({path,sha256,bytes})),ref(SELF,loadedImage),...images.map(({path,bytes})=>ref(path,bytes)));
  const receiptBytes=checked(branch.typeahead_receipt.path);assert.deepEqual(ref(branch.typeahead_receipt.path,receiptBytes),branch.typeahead_receipt);
  const receipt=JSON.parse(receiptBytes);assert.equal(receipt.source_parent,'7e1b3f7d463c6d0955540c770009383735834507');
  assert.deepEqual(receipt.sources,branch.typeahead_sources);assert.deepEqual(receipt.archive,branch.typeahead_archive);assert.equal(receipt.sources.length,24);
- for(const item of [branch.typeahead_receipt,...branch.typeahead_sources,branch.typeahead_archive]){const bytes=checked(item.path);assert.deepEqual(ref(item.path,bytes),item,'changed typeahead closure '+item.path);const existing=bound.find(row=>row.path===item.path);if(existing)assert.deepEqual(existing,item);else bound.push(item);}
+ for(const item of [branch.typeahead_receipt,...branch.typeahead_sources,branch.typeahead_archive]){
+  const bytes=checked(item.path);let currentRef=item;
+  if(item.path===transition.path){assert.deepEqual(item,transition.before,'unknown typeahead predecessor');assert.ok(same(bytes,postimage));currentRef=transition.after;}
+  else if(item.path===closure.path){assert.deepEqual(item,closure.before,'unknown typeahead test predecessor');assert.ok(same(bytes,closureAfter));currentRef=closure.after;}
+  else assert.deepEqual(ref(item.path,bytes),item,'changed typeahead closure '+item.path);
+  const existing=bound.find(row=>row.path===item.path);if(existing)assert.deepEqual(existing,currentRef);else bound.push(currentRef);
+ }
  const map=new Map(bound.map(row=>[row.path,row]));assert.equal(map.size,bound.length);
  const sweep=()=>{checkImages();for(const item of bound)assert.deepEqual(ref(item.path,physical(item.path)),item,'changed physical T03 source '+item.path);checkImages();};
  const assertCurrent=()=>{
@@ -172,7 +201,7 @@ export function createCurrentNativeTabDownstreamSource({root=process.cwd(),line,
    assert.deepEqual(keys.sort(),value.bytes===undefined?['path','sha256']:['bytes','path','sha256']);
    assert.equal(typeof value.sha256,'string');
    const priorRef=beforeBound.find(item=>item.path===path),current=map.get(path);
-   const epoch=value.sha256===priorRef?.sha256?priorRef:value.sha256===current.sha256?current:null;
+   const epoch=value.sha256===priorRef?.sha256?priorRef:value.path===transition.path&&value.sha256===transition.before.sha256?transition.before:value.path===closure.path&&value.sha256===closure.before.sha256?closure.before:value.sha256===current.sha256?current:null;
    assert.ok(epoch,'unknown T03 source epoch '+path);
    if(value.bytes!==undefined){assert.ok(Number.isSafeInteger(value.bytes));assert.equal(value.bytes,epoch.bytes);}
    const result={path,sha256:current.sha256,...(value.bytes===undefined?{}:{bytes:current.bytes})};
@@ -181,5 +210,5 @@ export function createCurrentNativeTabDownstreamSource({root=process.cwd(),line,
   }finally{active=false;}
  };
  assertCurrent();
- return {line,bound:structuredClone(bound),old_bound:structuredClone(beforeBound),changed:branch.changed.map(({path,before_sha256,current_sha256,authority})=>({path,before_sha256,current_sha256,authority})),historical_controls:historicalControls,current_product_changed:branch.current_product_changed,current_resource_changed:branch.current_resource_changed,qualify,assertCurrent,assertPhysical:()=>{idle();sweep();},source_only:true,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};
+ return {line,bound:structuredClone(bound),old_bound:structuredClone(beforeBound),changed:branch.changed.map(({path,before_sha256,current_sha256,authority})=>({path,before_sha256,current_sha256:path===transition.path?transition.after.sha256:current_sha256,authority:path===transition.path?'fixed-report-capture-v5-source-transition':authority})),historical_controls:historicalControls,current_product_changed:branch.current_product_changed,current_resource_changed:branch.current_resource_changed,qualify,assertCurrent,assertPhysical:()=>{idle();sweep();},source_only:true,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};
 }

@@ -14,10 +14,11 @@ const root=process.argv[2], disk=p=>readFileSync(join(root,p));
 const packet=JSON.parse(disk('compatibility/rc/parent-base-class-tool-successor-inputs-v4.json'));
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const source=currentSassToolReferenceSubject({root});
-assert.equal(source.epoch,4);assert.equal(packet.updates.length,18);
+assert.equal(source.epoch,5);assert.equal(packet.updates.length,18);
 for(const {path,before,after} of packet.updates){
- assert.deepEqual(source.qualify(before),after);
- assert.deepEqual(source.qualify(after),after);
+ const current={path,...source.transitions.find(row=>row.path===path).after};
+ assert.deepEqual(source.qualify(before),current);
+ assert.deepEqual(source.qualify(after),current);
  assert.equal(hash(source.comparisonBytes(before)),before.sha256);
  assert.equal(hash(source.comparisonBytes(after)),after.sha256);
  assert.equal(source.qualify({...before,sha256:'0'.repeat(64)}),null);
@@ -45,7 +46,7 @@ for(const ref of [packet.receipts.at(-1),...rcPacket.receipts]){
 }
 rc.assertCurrent();
 // Exercise public operations with exact V4 metadata, without evaluating getters or proxies.
-const ref=packet.updates[0].before, after=packet.updates[0].after;
+const ref=packet.updates[0].before, after={path:ref.path,...source.transitions.find(row=>row.path===ref.path).after};
 assert.deepEqual(source.referenceBatch([{kind:'qualify',reference:ref},{kind:'comparison',reference:ref}]),[after,source.comparisonBytes(ref)]);
 assert.throws(()=>source.referenceBatch([{kind:'comparison',reference:{...ref,sha256:'0'.repeat(64)}}]));
 assert.throws(()=>source.qualify({...ref,bytes:ref.bytes+1}));

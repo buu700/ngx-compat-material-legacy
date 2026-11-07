@@ -1,0 +1,61 @@
+{
+  "schema_version": 5,
+  "role": "finite-current-native-tab-downstream-source",
+  "previous_packet": {
+    "path": "compatibility/rc/current-native-tab-downstream-source-epochs-v4.json",
+    "sha256": "6af0e27ebe658249e80a4bf047f0f7ce862fdddea11f07de16e4512953bea442",
+    "bytes": 80672
+  },
+  "source_parent": "c72d88c74944463d1fea960ae718fb30944818c9",
+  "source_commit": "5b09618cde44725b8723fe4f6c63c3a4c35ad7e5",
+  "source_scope_only": true,
+  "actual_native_packed_browser_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "update": {
+    "path": "scripts/rc-verify.py",
+    "before": {
+      "path": "scripts/rc-verify.py",
+      "sha256": "d5689f5253abae336aff6d07c66c2c2453b292edc7816045343c16db5831f00b",
+      "bytes": 103860
+    },
+    "after": {
+      "path": "scripts/rc-verify.py",
+      "sha256": "3a3a68dd67abf6b0c535853beea818f003867b5a1a1734e6bea683c82b51521c",
+      "bytes": 103517
+    },
+    "edits": [
+      {
+        "offset": 3486,
+        "before": "# Explicit legacy output locations. Capturing these preserves existing domain\n# runners while preventing any old fixed-path report from becoming fresh proof.\nFIXED_DETAILS = {\n    \"scripts/engine-free-consumer.mjs\": (\"engine-free-consumer\", \"compatibility/rc/reports/engine-free-consumer.json\"),\n    \"scripts/sass-seal.mjs\": (\"sass-seal\", \"compatibility/rc/reports/sass-seal.json\"),\n    \"scripts/check-companion-bridges.mjs\": (\"companion-bridge-tokens\", \"compatibility/rc/reports/companion-bridge-tokens.json\"),\n    \"scripts/check-companion-computed-styles.mjs\": (\"companion-computed-styles\", \"compatibility/rc/reports/companion-computed-styles.json\"),\n    \"scripts/run-browser-matrix-slice.mjs\": (\"browser-matrix\", \"compatibility/rc/reports/browser-matrix-slice.json\"),\n    \"scripts/api-completeness.mjs\": (\"api-completeness\", \"compatibility/rc/reports/api-completeness.json\"),\n}\n",
+        "after": "# Shared finite list of legacy fixed outputs; capture requires fresh child output.\n_fixed_reports = read_json(ROOT / \"compatibility/rc/fixed-report-catalog.json\")[\"reports\"]\nFIXED_DETAILS = {row[\"script\"]: (row[\"check_id\"], row[\"path\"]) for row in _fixed_reports}\nif (len(FIXED_DETAILS) != len(_fixed_reports)\n        or len({row[\"check_id\"] for row in _fixed_reports}) != len(_fixed_reports)\n        or len({row[\"path\"] for row in _fixed_reports}) != len(_fixed_reports)):\n    raise EvidenceError(\"duplicate fixed report catalog entry\")\n"
+      }
+    ]
+  },
+  "additional_inputs": [
+    {
+      "path": "compatibility/rc/fixed-report-catalog.json",
+      "sha256": "8ad19c8e668860c33207f1c40a3d4a0aac4a13b5316982a534645cefac96e4c8",
+      "bytes": 1171
+    }
+  ],
+  "closure_update": {
+    "path": "tests/test_rc_run_writer_and_sealer.py",
+    "before": {
+      "path": "tests/test_rc_run_writer_and_sealer.py",
+      "sha256": "910e6484253d226ef7e38a2f9b7da5e447df2c849571d7ce0455e6973efaf754",
+      "bytes": 33383
+    },
+    "after": {
+      "path": "tests/test_rc_run_writer_and_sealer.py",
+      "sha256": "5e1c79508572ff3ae17fa5c45077ab7d2d4fead08a3e4ff1f595d08ce783906a",
+      "bytes": 33582
+    },
+    "edits": [
+      {
+        "offset": 598,
+        "before": "",
+        "after": "    catalog = root / 'compatibility/rc/fixed-report-catalog.json'\n    catalog.parent.mkdir(parents=True, exist_ok=True)\n    shutil.copy2(ROOT / 'compatibility/rc/fixed-report-catalog.json', catalog)\n"
+      }
+    ]
+  }
+}

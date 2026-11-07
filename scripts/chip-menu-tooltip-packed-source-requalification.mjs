@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {reverseFixedReportCapturePackedSource} from './fixed-report-capture-packed-source-successor.mjs';
 import {reverseBidiIsolatedPackedSource} from './bidi-isolated-packed-source-requalification.mjs';
 import assert from 'node:assert/strict';
 import {reverseNativeDatePackedSource} from './native-date-packed-source-context.mjs';
@@ -20,12 +21,12 @@ const pins={main:'4147ee11af9affe20cf5611544bada1d3e0181310d31bf17b9d21de779bc96
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 let cached;
 /** Compose before the unchanged earlier guards; never admit a runtime result. */
-export function reverseChipMenuTooltipPackedSource(member,raw,line,{readMember}={}){
+export function reverseChipMenuTooltipPackedSource(member,raw,line,{readMember,root:providedRoot=root}={}){
  assert.ok(Object.hasOwn(pins,line),'unknown packed observation source line');
- const read=readMember||((p)=>readFileSync(resolve(root,p)));
+ const read=readMember||((p)=>readFileSync(resolve(providedRoot,p)));
  const input=read(path);assert.equal(hash(input),pins[line],'packed observation source inputs changed');
  let capsule;
- if(!readMember&&cached)capsule=cached;
+ if(!readMember&&resolve(providedRoot)===root&&cached)capsule=cached;
  else{
   capsule=JSON.parse(input);assert.equal(capsule.schema_version,1);assert.equal(capsule.line,line);assert.equal(capsule.members.length,17);
   const stored=read(capsule.preimages.path);assert.equal(hash(stored),capsule.preimages.sha256,'packed observation preimages changed');
@@ -34,9 +35,10 @@ export function reverseChipMenuTooltipPackedSource(member,raw,line,{readMember}=
   assert.equal(new Set(capsule.members.map(m=>m.path)).size,capsule.members.length);
   for(const record of prior.members){assert.equal(hash(record.text),record.sha256);
    assert.equal(capsule.members.find(m=>m.path===record.path)?.before_sha256,record.sha256);}
-  if(!readMember)cached=capsule;
+  if(!readMember&&resolve(providedRoot)===root)cached=capsule;
  }
  const record=capsule.members.find(m=>m.path===member);assert.ok(record,'foreign packed observation source path');
+ raw=reverseFixedReportCapturePackedSource(member,raw,line,{readMember,root:providedRoot});
  if(hash(raw)!==record.current_sha256){raw=reverseNativeDatePackedSource(member,raw,{readMember});raw=reverseBidiIsolatedPackedSource(member,raw,line,{readMember});}
  assert.equal(typeof raw,'string');assert.equal(hash(raw),record.current_sha256,'unreviewed packed observation source change');
  let restored=raw;

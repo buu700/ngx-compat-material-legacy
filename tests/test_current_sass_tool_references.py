@@ -15,7 +15,7 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import current_sass_tool_references as tool_module
-from current_sass_tool_references import CurrentSassToolReferences, CHECKPOINTS, INPUTS, PREVIOUS_INPUTS, V2_INPUTS, V3_CHECKPOINTS, V4_INPUTS
+from current_sass_tool_references import CurrentSassToolReferences, CHECKPOINTS, INPUTS, PREVIOUS_INPUTS, V2_INPUTS, V3_CHECKPOINTS, V4_INPUTS, V5_INPUTS
 NODE = 'node'
 
 
@@ -39,6 +39,12 @@ def current_tool_fixture(destination):
     if line == 'main':
         v4 = json.loads((ROOT / V4_INPUTS['path']).read_bytes())
         paths.add(V4_INPUTS['path'])
+        v5 = json.loads((ROOT / V5_INPUTS['path']).read_bytes())
+        paths.add(V5_INPUTS['path'])
+        paths.update(row['path'] for row in v5['updates'])
+        paths.update(row['path'] for row in v5['additional_inputs'])
+        paths.update(row['path'] for row in v5['authored_updates'])
+        paths.update(row['path'] for row in v5['authored_support'])
         rc_packet = json.loads((ROOT / v4['receipts'][-1]['path']).read_bytes())
         rc_previous = json.loads((ROOT / rc_packet['previous_epoch']['path']).read_bytes())
         paths.add(rc_previous['inventory_source_packet']['path'])
@@ -67,7 +73,7 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
                                    cwd=ROOT, capture_output=True, text=True, timeout=90)
             self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-6000:])
             result = json.loads(child.stdout)
-            self.assertEqual((result['line'], result['epoch']), (line, 4 if line == 'main' else 3))
+            self.assertEqual((result['line'], result['epoch']), (line, 5 if line == 'main' else 3))
             successor = json.loads((ROOT / INPUTS).read_bytes())
             next_branch = successor['branches'][line]
             packet = json.loads((ROOT / V2_INPUTS['path']).read_bytes())
@@ -77,6 +83,9 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
             expected_paths = {r['path'] for r in historical['tool_transitions']} | {r['path'] for r in branch['updates']} | {r['path'] for r in next_branch['updates']}
             if line == 'main':
                 expected_paths.update(row['path'] for row in json.loads((ROOT / V4_INPUTS['path']).read_bytes())['updates'])
+                v5_packet = json.loads((ROOT / V5_INPUTS['path']).read_bytes())
+                expected_paths.update(row['path'] for row in v5_packet['updates'])
+                expected_paths.update(row['path'] for row in v5_packet['authored_updates'])
             self.assertEqual(result['transitions'], len(expected_paths))
             self.assertEqual(result['v1_current_identities'], 95 if line == '21.x' else 19)
             self.assertEqual(len(result['checks']), 24)
@@ -86,7 +95,7 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
             self.assertFalse(result['old_constructor_executed'])
             self.assertFalse(result['artifact_or_audit_admission_granted'])
             source = CurrentSassToolReferences(root)
-            self.assertEqual(source.epoch, 4 if line == 'main' else 3)
+            self.assertEqual(source.epoch, 5 if line == 'main' else 3)
             self.assertEqual(source.transitions, result['transition_rows'])
             for row in source.transitions:
                 before, after = dict(path=row['path'], **row['before']), dict(path=row['path'], **row['after'])
@@ -245,12 +254,14 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
     def _check_v4(self, root):
         packet = json.loads((root / V4_INPUTS['path']).read_bytes())
         source = CurrentSassToolReferences(root)
-        self.assertEqual(source.epoch, 4)
+        self.assertEqual(source.epoch, 5)
         self.assertEqual({row['path'] for row in packet['updates']}, set(tool_module.V4_COMMITS))
         for update in packet['updates']:
             before, after = update['before'], update['after']
-            self.assertEqual(source.qualify(before), after)
-            self.assertEqual(source.qualify(after), after)
+            latest = next(row for row in source.transitions if row['path'] == update['path'])
+            current = dict(path=update['path'], **latest['after'])
+            self.assertEqual(source.qualify(before), current)
+            self.assertEqual(source.qualify(after), current)
             self.assertTrue(source.owns_reference(before))
             self.assertEqual(hashlib.sha256(source.comparison_bytes(before)).hexdigest(), before['sha256'])
             self.assertEqual(hashlib.sha256(source.comparison_bytes(after)).hexdigest(), after['sha256'])
@@ -353,7 +364,7 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
                 finally:
                     path.write_bytes(original)
             source = CurrentSassToolReferences(root)
-            self.assertEqual(source.epoch, 4 if line == 'main' else 3)
+            self.assertEqual(source.epoch, 5 if line == 'main' else 3)
             self.assertEqual(baseline['branches'][line]['source_parent'], V3_CHECKPOINTS[line])
 
     def test_no_overlay_branch_preserves_exact_v2_physical_subject(self):

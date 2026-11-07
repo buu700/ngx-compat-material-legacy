@@ -1,0 +1,228 @@
+{
+  "schema_version": 5,
+  "role": "finite-current-sass-tool-reference-successor",
+  "source_parent": "c72d88c74944463d1fea960ae718fb30944818c9",
+  "source_commit": "5b09618cde44725b8723fe4f6c63c3a4c35ad7e5",
+  "product_paths": [],
+  "historical_reports_rewritten": 0,
+  "artifact_or_audit_admission_granted": false,
+  "updates": [
+    {
+      "path": "scripts/rc-verify.py",
+      "before": {
+        "path": "scripts/rc-verify.py",
+        "sha256": "d5689f5253abae336aff6d07c66c2c2453b292edc7816045343c16db5831f00b",
+        "bytes": 103860
+      },
+      "after": {
+        "path": "scripts/rc-verify.py",
+        "sha256": "3a3a68dd67abf6b0c535853beea818f003867b5a1a1734e6bea683c82b51521c",
+        "bytes": 103517
+      },
+      "edits": [
+        {
+          "offset": 3486,
+          "before": "# Explicit legacy output locations. Capturing these preserves existing domain\n# runners while preventing any old fixed-path report from becoming fresh proof.\nFIXED_DETAILS = {\n    \"scripts/engine-free-consumer.mjs\": (\"engine-free-consumer\", \"compatibility/rc/reports/engine-free-consumer.json\"),\n    \"scripts/sass-seal.mjs\": (\"sass-seal\", \"compatibility/rc/reports/sass-seal.json\"),\n    \"scripts/check-companion-bridges.mjs\": (\"companion-bridge-tokens\", \"compatibility/rc/reports/companion-bridge-tokens.json\"),\n    \"scripts/check-companion-computed-styles.mjs\": (\"companion-computed-styles\", \"compatibility/rc/reports/companion-computed-styles.json\"),\n    \"scripts/run-browser-matrix-slice.mjs\": (\"browser-matrix\", \"compatibility/rc/reports/browser-matrix-slice.json\"),\n    \"scripts/api-completeness.mjs\": (\"api-completeness\", \"compatibility/rc/reports/api-completeness.json\"),\n}\n",
+          "after": "# Shared finite list of legacy fixed outputs; capture requires fresh child output.\n_fixed_reports = read_json(ROOT / \"compatibility/rc/fixed-report-catalog.json\")[\"reports\"]\nFIXED_DETAILS = {row[\"script\"]: (row[\"check_id\"], row[\"path\"]) for row in _fixed_reports}\nif (len(FIXED_DETAILS) != len(_fixed_reports)\n        or len({row[\"check_id\"] for row in _fixed_reports}) != len(_fixed_reports)\n        or len({row[\"path\"] for row in _fixed_reports}) != len(_fixed_reports)):\n    raise EvidenceError(\"duplicate fixed report catalog entry\")\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/packed-consumer-evidence.mjs",
+      "before": {
+        "path": "scripts/packed-consumer-evidence.mjs",
+        "sha256": "1f58b3ce058288910b0887d02692b4d0595daa0f50365216c467600102940a62",
+        "bytes": 14947
+      },
+      "after": {
+        "path": "scripts/packed-consumer-evidence.mjs",
+        "sha256": "c277cc4d4e3c3d5afb706ed9872cf0a5da453cbd470d9d7be0c2a6f02e6b28a3",
+        "bytes": 17593
+      },
+      "edits": [
+        {
+          "offset": 295,
+          "before": "import {existsSync, lstatSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';\n",
+          "after": "import {existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync} from 'node:fs';\n"
+        },
+        {
+          "offset": 6386,
+          "before": "",
+          "after": "// Only the verifier's exact fixed-report capture transition is admissible.\nfunction isFixedReportCapture(checkId, status) {\n  try {\n    const catalog = JSON.parse(readFileSync(new URL('../compatibility/rc/fixed-report-catalog.json', import.meta.url), 'utf8'));\n    const rows = catalog.reports;\n    if (!Array.isArray(rows) || rows.some(row => !row || typeof row.script !== 'string' ||\n        typeof row.check_id !== 'string' || typeof row.path !== 'string') ||\n        ['script', 'check_id', 'path'].some(key => new Set(rows.map(row => row[key])).size !== rows.length)) return false;\n    const row = rows.find(item => item.check_id === checkId);\n    if (!row || !/^compatibility\\/rc\\/reports\\/[a-z0-9-]+\\.json$/.test(row.path) ||\n        !/^[a-z0-9-]+$/.test(checkId)) return false;\n    const entries = status.split('\\0').filter(Boolean);\n    const namePrefix = `.saved-${checkId}-`;\n    const names = readdirSync(join(root, 'compatibility/rc/reports')).filter(name => name.startsWith(namePrefix));\n    if (names.length !== 1 || !/^[0-9a-f]{32}\\.json$/.test(names[0].slice(namePrefix.length))) return false;\n    const backup = `compatibility/rc/reports/${names[0]}`;\n    if (!entries.includes(` D ${row.path}`)) return false;\n    if (entries.length === 1) {\n      // The user's Git excludes may hide the actual backup from porcelain.\n      const ignored = spawnSync('git', ['check-ignore', '-q', '--', backup], {cwd: root});\n      if (ignored.status !== 0) return false;\n    } else if (entries.length !== 2 || !entries.includes(`?? ${backup}`)) {\n      return false;\n    }\n    // Every component must be real, and the backup must not share an inode.\n    for (const path of ['compatibility', 'compatibility/rc', 'compatibility/rc/reports', backup]) {\n      const st = lstatSync(join(root, path));\n      if (st.isSymbolicLink() || (path === backup ? !st.isFile() || st.nlink !== 1 : !st.isDirectory())) return false;\n    }\n    if (existsSync(join(root, row.path))) return false;\n    const index = gitValue(['ls-files', '--stage', '--', row.path]);\n    if (!/^100644 [0-9a-f]+ 0\\t/.test(index ?? '')) return false;\n    const diff = spawnSync('git', ['diff', '--cached', '--quiet', 'HEAD', '--', row.path], {cwd: root});\n    if (diff.status !== 0) return false;\n    const head = spawnSync('git', ['show', `HEAD:${row.path}`], {cwd: root, maxBuffer: 16 * 1024 * 1024});\n    return head.status === 0 && head.stdout.equals(readFileSync(join(root, backup)));\n  } catch {\n    return false;\n  }\n}\n\n"
+        },
+        {
+          "offset": 8696,
+          "before": "  const status = gitValue(['status', '--porcelain', '--untracked-files=normal']);\n  if (status === null) return {error: 'checkout clean source state is unknown'};\n  if (status !== '') return {error: 'checkout source is dirty'};\n",
+          "after": ""
+        },
+        {
+          "offset": 9499,
+          "before": "",
+          "after": "  const statusResult = spawnSync('git', ['status', '--porcelain', '-z', '--untracked-files=all', '--no-renames'], {cwd: root, encoding: 'utf8'});\n  if (statusResult.status !== 0) return {error: 'checkout clean source state is unknown'};\n  if (statusResult.stdout !== '' && !isFixedReportCapture(checkId, statusResult.stdout)) return {error: 'checkout source is dirty'};\n"
+        }
+      ]
+    }
+  ],
+  "additional_inputs": [
+    {
+      "path": "compatibility/rc/fixed-report-catalog.json",
+      "sha256": "8ad19c8e668860c33207f1c40a3d4a0aac4a13b5316982a534645cefac96e4c8",
+      "bytes": 1171
+    }
+  ],
+  "previous_epoch": {
+    "path": "compatibility/rc/parent-base-class-tool-successor-inputs-v4.json",
+    "sha256": "60088525932c75c41782874396eb72f8bcec479ec2ad4d911090e1e2b3964b24",
+    "bytes": 109915
+  },
+  "historical_programs_executed": false,
+  "authored_updates": [
+    {
+      "path": "tests/test_current_sass_tool_references.py",
+      "before": {
+        "path": "tests/test_current_sass_tool_references.py",
+        "sha256": "1bbdf9b7ddc3575a7555a199678f8a3c9ce0a90c971a40efc8fb4c8e91d0f79f",
+        "bytes": 24729
+      },
+      "after": {
+        "path": "tests/test_current_sass_tool_references.py",
+        "sha256": "96031119cfc0c466c4be6e514c2e36da8f67043d1ac37af617674e099430ea7f",
+        "bytes": 25526
+      },
+      "edits": [
+        {
+          "offset": 524,
+          "before": "from current_sass_tool_references import CurrentSassToolReferences, CHECKPOINTS, INPUTS, PREVIOUS_INPUTS, V2_INPUTS, V3_CHECKPOINTS, V4_INPUTS\n",
+          "after": "from current_sass_tool_references import CurrentSassToolReferences, CHECKPOINTS, INPUTS, PREVIOUS_INPUTS, V2_INPUTS, V3_CHECKPOINTS, V4_INPUTS, V5_INPUTS\n"
+        },
+        {
+          "offset": 2138,
+          "before": "",
+          "after": "        v5 = json.loads((ROOT / V5_INPUTS['path']).read_bytes())\n        paths.add(V5_INPUTS['path'])\n        paths.update(row['path'] for row in v5['updates'])\n        paths.update(row['path'] for row in v5['additional_inputs'])\n        paths.update(row['path'] for row in v5['authored_updates'])\n        paths.update(row['path'] for row in v5['authored_support'])\n"
+        },
+        {
+          "offset": 3778,
+          "before": "            self.assertEqual((result['line'], result['epoch']), (line, 4 if line == 'main' else 3))\n",
+          "after": "            self.assertEqual((result['line'], result['epoch']), (line, 5 if line == 'main' else 3))\n"
+        },
+        {
+          "offset": 4631,
+          "before": "",
+          "after": "                v5_packet = json.loads((ROOT / V5_INPUTS['path']).read_bytes())\n                expected_paths.update(row['path'] for row in v5_packet['updates'])\n                expected_paths.update(row['path'] for row in v5_packet['authored_updates'])\n"
+        },
+        {
+          "offset": 5276,
+          "before": "            self.assertEqual(source.epoch, 4 if line == 'main' else 3)\n",
+          "after": "            self.assertEqual(source.epoch, 5 if line == 'main' else 3)\n"
+        },
+        {
+          "offset": 14889,
+          "before": "        self.assertEqual(source.epoch, 4)\n",
+          "after": "        self.assertEqual(source.epoch, 5)\n"
+        },
+        {
+          "offset": 15132,
+          "before": "            self.assertEqual(source.qualify(before), after)\n            self.assertEqual(source.qualify(after), after)\n",
+          "after": "            latest = next(row for row in source.transitions if row['path'] == update['path'])\n            current = dict(path=update['path'], **latest['after'])\n            self.assertEqual(source.qualify(before), current)\n            self.assertEqual(source.qualify(after), current)\n"
+        },
+        {
+          "offset": 22118,
+          "before": "            self.assertEqual(source.epoch, 4 if line == 'main' else 3)\n",
+          "after": "            self.assertEqual(source.epoch, 5 if line == 'main' else 3)\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/current_sass_tool_reference_probe.mjs",
+      "before": {
+        "path": "tests/current_sass_tool_reference_probe.mjs",
+        "sha256": "fcc1d110a8379dcc300ee0083b9a74ab6267e12e29ec4cd7eb692e9850c1e23b",
+        "bytes": 14258
+      },
+      "after": {
+        "path": "tests/current_sass_tool_reference_probe.mjs",
+        "sha256": "812eceedc2671845a672cb86d9addfd675e037b8176936ce6abf7fbe9e84172f",
+        "bytes": 14258
+      },
+      "edits": [
+        {
+          "offset": 1162,
+          "before": " assert.equal(source.epoch,source.line==='main'?4:3);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);\n",
+          "after": " assert.equal(source.epoch,source.line==='main'?5:3);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/current-native-tab-downstream-source.mjs",
+      "before": {
+        "path": "scripts/current-native-tab-downstream-source.mjs",
+        "sha256": "86e46cca50f8c3658cfaf12bdd94f0475452ce8e5e1f4da35d953f81e72f21fa",
+        "bytes": 12850
+      },
+      "after": {
+        "path": "scripts/current-native-tab-downstream-source.mjs",
+        "sha256": "a58113af6affb84f6aaae84b6663707cc2b022c20535c3700d92f774757c5228",
+        "bytes": 16465
+      },
+      "edits": [
+        {
+          "offset": 1093,
+          "before": "",
+          "after": "const V5='compatibility/rc/current-native-tab-downstream-source-epochs-v5.json';\n"
+        },
+        {
+          "offset": 1417,
+          "before": "",
+          "after": "const V5_SHA='dcaafd6cbaf736ff085b18fea39a1ba49ac075bee8d49b289785ef42c27f7d33';\nconst V5_PARENT='c72d88c74944463d1fea960ae718fb30944818c9',V5_COMMIT='5b09618cde44725b8723fe4f6c63c3a4c35ad7e5';\n"
+        },
+        {
+          "offset": 3700,
+          "before": " const images=[[V1,V1_SHA],[V2,V2_SHA],[V3,V3_SHA],[V4,V4_SHA]].map(([path,expected])=>{\n",
+          "after": " const images=[[V1,V1_SHA],[V2,V2_SHA],[V3,V3_SHA],[V4,V4_SHA],[V5,V5_SHA]].map(([path,expected])=>{\n"
+        },
+        {
+          "offset": 3933,
+          "before": " const [v1,v2,v3,v4]=images.map(item=>item.packet);\n",
+          "after": " const [v1,v2,v3,v4,v5]=images.map(item=>item.packet);\n"
+        },
+        {
+          "offset": 4863,
+          "before": "",
+          "after": " assert.equal(v5.schema_version,5);assert.equal(v5.role,v3.role);assert.deepEqual(v5.previous_packet,{path:V4,sha256:V4_SHA,bytes:images[3].bytes.length});\n assert.equal(v5.source_parent,V5_PARENT);assert.equal(v5.source_commit,V5_COMMIT);assert.equal(v5.source_scope_only,true);assert.equal(v5.actual_native_packed_browser_floor_qualified,false);assert.equal(v5.g11_claim,'not-passed');\n const transition=v5.update;assert.equal(transition.path,'scripts/rc-verify.py');assert.equal(transition.before.path,transition.path);assert.equal(transition.after.path,transition.path);\n assert.equal(v5.additional_inputs.length,1);assert.equal(v5.additional_inputs[0].path,'compatibility/rc/fixed-report-catalog.json');\n const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!key.startsWith('GIT_')));\n Object.assign(env,{GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1',GIT_TERMINAL_PROMPT:'0',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null'});\n const ancestry=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','rev-list','--parents','-n','1',V5_COMMIT],{cwd:root,env,encoding:'utf8'}).trim();\n assert.equal(ancestry,V5_COMMIT+' '+V5_PARENT,'T03 V5 source parent mismatch');\n const predecessor=git(root,V5_PARENT,transition.path),postimage=git(root,V5_COMMIT,transition.path);\n assert.deepEqual(ref(transition.path,predecessor),transition.before);assert.deepEqual(ref(transition.path,postimage),transition.after);\n assert.ok(same(replay(predecessor,transition.edits),postimage),'T03 V5 replay mismatch');\n const catalog=v5.additional_inputs[0],catalogGit=git(root,V5_COMMIT,catalog.path);assert.deepEqual(ref(catalog.path,catalogGit),catalog);\n const closure=v5.closure_update;assert.equal(closure.path,'tests/test_rc_run_writer_and_sealer.py');assert.equal(closure.before.path,closure.path);assert.equal(closure.after.path,closure.path);\n const closureBefore=git(root,V5_PARENT,closure.path),closureAfter=git(root,V5_COMMIT,closure.path);\n assert.deepEqual(ref(closure.path,closureBefore),closure.before);assert.deepEqual(ref(closure.path,closureAfter),closure.after);\n assert.ok(same(replay(closureBefore,closure.edits),closureAfter),'T03 V5 closure replay mismatch');\n\n"
+        },
+        {
+          "offset": 8360,
+          "before": "   assert.ok(same(replay(before,changed.edits),current),'unreviewed downstream delta '+priorRef.path);\n   assert.equal(changed.current_sha256,sha(current));assert.equal(changed.current_bytes,current.length);\n",
+          "after": "   const historicalCurrent=replay(before,changed.edits);\n   assert.equal(changed.current_sha256,sha(historicalCurrent));assert.equal(changed.current_bytes,historicalCurrent.length);\n   if(priorRef.path===transition.path){assert.ok(same(historicalCurrent,predecessor),'T03 V5 does not follow V4');assert.ok(same(current,postimage),'unreviewed T03 V5 source');}\n   else assert.ok(same(historicalCurrent,current),'unreviewed downstream delta '+priorRef.path);\n"
+        },
+        {
+          "offset": 9147,
+          "before": " bound.push(ref(INPUTS,inputBytes),...historicalControls.map(({path,sha256,bytes})=>({path,sha256,bytes})),ref(SELF,loadedImage),...images.map(({path,bytes})=>ref(path,bytes)));\n",
+          "after": " const catalogBytes=checked(catalog.path);assert.deepEqual(ref(catalog.path,catalogBytes),catalog);assert.ok(same(catalogBytes,catalogGit));\n bound.push(catalog,ref(INPUTS,inputBytes),...historicalControls.map(({path,sha256,bytes})=>({path,sha256,bytes})),ref(SELF,loadedImage),...images.map(({path,bytes})=>ref(path,bytes)));\n"
+        },
+        {
+          "offset": 9756,
+          "before": " for(const item of [branch.typeahead_receipt,...branch.typeahead_sources,branch.typeahead_archive]){const bytes=checked(item.path);assert.deepEqual(ref(item.path,bytes),item,'changed typeahead closure '+item.path);const existing=bound.find(row=>row.path===item.path);if(existing)assert.deepEqual(existing,item);else bound.push(item);}\n",
+          "after": " for(const item of [branch.typeahead_receipt,...branch.typeahead_sources,branch.typeahead_archive]){\n  const bytes=checked(item.path);let currentRef=item;\n  if(item.path===transition.path){assert.deepEqual(item,transition.before,'unknown typeahead predecessor');assert.ok(same(bytes,postimage));currentRef=transition.after;}\n  else if(item.path===closure.path){assert.deepEqual(item,closure.before,'unknown typeahead test predecessor');assert.ok(same(bytes,closureAfter));currentRef=closure.after;}\n  else assert.deepEqual(ref(item.path,bytes),item,'changed typeahead closure '+item.path);\n  const existing=bound.find(row=>row.path===item.path);if(existing)assert.deepEqual(existing,currentRef);else bound.push(currentRef);\n }\n"
+        },
+        {
+          "offset": 11831,
+          "before": "   const epoch=value.sha256===priorRef?.sha256?priorRef:value.sha256===current.sha256?current:null;\n",
+          "after": "   const epoch=value.sha256===priorRef?.sha256?priorRef:value.path===transition.path&&value.sha256===transition.before.sha256?transition.before:value.path===closure.path&&value.sha256===closure.before.sha256?closure.before:value.sha256===current.sha256?current:null;\n"
+        },
+        {
+          "offset": 12343,
+          "before": " return {line,bound:structuredClone(bound),old_bound:structuredClone(beforeBound),changed:branch.changed.map(({path,before_sha256,current_sha256,authority})=>({path,before_sha256,current_sha256,authority})),historical_controls:historicalControls,current_product_changed:branch.current_product_changed,current_resource_changed:branch.current_resource_changed,qualify,assertCurrent,assertPhysical:()=>{idle();sweep();},source_only:true,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};\n",
+          "after": " return {line,bound:structuredClone(bound),old_bound:structuredClone(beforeBound),changed:branch.changed.map(({path,before_sha256,current_sha256,authority})=>({path,before_sha256,current_sha256:path===transition.path?transition.after.sha256:current_sha256,authority:path===transition.path?'fixed-report-capture-v5-source-transition':authority})),historical_controls:historicalControls,current_product_changed:branch.current_product_changed,current_resource_changed:branch.current_resource_changed,qualify,assertCurrent,assertPhysical:()=>{idle();sweep();},source_only:true,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};\n"
+        }
+      ]
+    }
+  ],
+  "authored_support": [
+    {
+      "path": "compatibility/rc/current-native-tab-downstream-source-epochs-v5.json",
+      "sha256": "dcaafd6cbaf736ff085b18fea39a1ba49ac075bee8d49b289785ef42c27f7d33",
+      "bytes": 3474
+    }
+  ]
+}
