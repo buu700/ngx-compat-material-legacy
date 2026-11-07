@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by the MIT license in LICENSE.
+ */
 /** Build and interact with the application that the packed CLI migrated. */
 import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {createRequire} from 'node:module';
@@ -80,7 +86,7 @@ export async function proveMigratedConsumer(work, application, styles, input) {
     const after=await evaluate('({value:window.__migratedApp.control.value,valid:window.__migratedApp.control.valid,panelOpen:window.__migratedApp.select.panelOpen})');
     if(after.value!=='yes'||after.valid!==true||after.panelOpen!==false)throw new Error('migrated select interaction/form update failed');
     return {browser,before,after,result:'pass'};
-  },{debugPort:9346});
+  },{debugPort:0,requireAnnouncedEndpoint:true});
   const lock=readFileSync(join(work,'package-lock.json'));
   const support = retainMigratedConsumer(work, input, bundle);
   return {result:'pass',line:input.line,versions,node:process.version,strict_templates:true,skip_lib_check:false,
