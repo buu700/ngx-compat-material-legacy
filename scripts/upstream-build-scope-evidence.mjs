@@ -41,8 +41,8 @@ const loadedBuildSource=readFileSync(fileURLToPath(import.meta.url));
 // member. Re-read all callback observations physically after the last callback.
 export function ciCaptureReader(delegate) {
   const seen=new Map();
-  return {read(path){const bytes=delegate(path);assert.ok(Buffer.isBuffer(bytes));const previous=seen.get(path);if(previous)assert.deepEqual(bytes,previous);else seen.set(path,Buffer.from(bytes));return bytes;},
-    close(){for(const [path,expected] of seen){assert.equal(typeof path,'string');assert.ok(!path.includes('\\'));const parts=path.split('/');assert.ok(parts.every(part=>part&&part!=='.'&&part!=='..'));let member=sourceRoot;for(const part of parts){member=join(member,part);assert.ok(!lstatSync(member).isSymbolicLink());}assert.ok(lstatSync(member).isFile());assert.deepEqual(readFileSync(member),expected);}}};
+  return {read(path){const bytes=delegate(path);assert.ok(Buffer.isBuffer(bytes));const image={sha256:hash(bytes),bytes:bytes.length};const previous=seen.get(path);if(previous)assert.deepEqual(image,previous);else seen.set(path,image);return bytes;},
+    close(){for(const [path,expected] of seen){assert.equal(typeof path,'string');assert.ok(!path.includes('\\'));const parts=path.split('/');assert.ok(parts.every(part=>part&&part!=='.'&&part!=='..'));let member=sourceRoot;for(const part of parts){member=join(member,part);assert.ok(!lstatSync(member).isSymbolicLink());}assert.ok(lstatSync(member).isFile());const bytes=readFileSync(member);assert.equal(bytes.length,expected.bytes);assert.equal(hash(bytes),expected.sha256);}}};
 }
 
 const isBazel=path=>path.endsWith('.bazel')||path.endsWith('.bzl')||path==='.bazelrc';
@@ -84,6 +84,42 @@ function ciContextSuccessor(readRepo,context) {
   return {frame,frameBytes,reviewBytes:raw};
 }
 
+// The committed 38e -> 30d source change is a separate finite product
+// successor. The e184 report remains a historical before-image record.
+const MENU_FRAME='compatibility/rc/parent-main-menu-context46-source-v1.json';
+const MENU_FRAME_SHA='3b69b25f3ae43e0f7285551e180769eec4306a06aa1ff32327e3fefff4ff2264';
+function menuContextSuccessor(readRepo,context){
+  const frameBytes=readRepo(MENU_FRAME);assert.equal(hash(frameBytes),MENU_FRAME_SHA);
+  const frame=JSON.parse(frameBytes);assert.equal(frame.schema_version,1);
+  assert.equal(frame.role,'main-only finite menu DI product source continuation; historical product source records remain unchanged');
+  assert.equal(frame.base,'38e1ed8d076d4b45727f4feab7270c873f3adf68');
+  assert.equal(frame.after,'30d1c0f647321896e01b6694d4860da1401cbee2');
+  assert.deepEqual(frame.paths,['projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts','projects/ngx-material-legacy/legacy-menu/menu.spec.ts']);
+  const lookup=(item,path)=>{
+    const commit=Buffer.from(item.commit_base64,'base64');
+    const text=commit.toString('utf8'), root=/^tree ([0-9a-f]{40})$/m.exec(text);assert.ok(root);
+    let oid=root[1];const names=path.split('/');
+    for(const name of names){
+      const tree=Buffer.from(item.trees[oid]||'', 'base64');assert.ok(tree.length);assert.equal(gitOid('tree',tree),oid);
+      let pos=0,found=null;while(pos<tree.length){const zero=tree.indexOf(0,pos);assert.ok(zero>=pos);const header=tree.subarray(pos,zero).toString('utf8');const space=header.indexOf(' ');assert.ok(space>0&&zero+21<=tree.length);const child=tree.subarray(zero+1,zero+21).toString('hex');if(header.slice(space+1)===name){assert.equal(found,null);found=child;}pos=zero+21;}
+      assert.ok(found);oid=found;
+    }return oid;
+  };
+  const before=frame.git[frame.base],after=frame.git[frame.after];
+  for(const [id,item] of [[frame.base,before],[frame.after,after]])assert.equal(gitOid('commit',Buffer.from(item.commit_base64,'base64')),id);
+  assert.match(Buffer.from(after.commit_base64,'base64').toString('utf8'),new RegExp(`^parent ${frame.base}$`,'m'));
+  for(const path of frame.paths){
+    const old=before.blobs[path],next=after.blobs[path],records=context.product_members.filter(r=>r.path===path);assert.equal(records.length,1);const record=records[0];
+    assert.equal(lookup(before,path),old.oid);assert.equal(lookup(after,path),next.oid);assert.equal(record.sha256,old.sha256);assert.equal(record.bytes,old.bytes);
+    const actual=readRepo(path);assert.equal(actual.length,next.bytes);assert.equal(hash(actual),next.sha256);assert.equal(gitOid('blob',actual),next.oid);
+  }
+  assert.equal(frame.review_path,'compatibility/rc/parent-main-menu-item-di-ownership-review-v1.json');
+  const rr=after.blobs[frame.review_path],raw=readRepo(frame.review_path);assert.equal(lookup(after,frame.review_path),rr.oid);assert.equal(gitOid('blob',raw),rr.oid);assert.equal(hash(raw),rr.sha256);assert.equal(raw.length,rr.bytes);
+  const review=JSON.parse(raw);assert.equal(review.parent,frame.base);assert.equal(review.independent_review.sha256,'264c8694acfea14b4f68310d51d65bb4c571cbf6546708493b3b280cbecc2e23');
+  assert.equal(review.qualified_isolated_source.line,'main');
+  return {frame,frameBytes,reviewBytes:raw};
+}
+
 export function buildScopeEvidenceOk(body,entry,readRepo,currentProductPaths) {
   try {
     const captured=ciCaptureReader(readRepo);readRepo=captured.read;
@@ -118,8 +154,11 @@ export function buildScopeEvidenceOk(body,entry,readRepo,currentProductPaths) {
       const current=readRepo('flake.nix');
       if(hash(current)!==context.files.find(r=>r.path==='flake.nix').sha256)ciSuccessor=ciContextSuccessor(readRepo,context);
     }
+    let menuSuccessor=null;
+    const menuPath='projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts';
+    if(mainOnly&&ciSuccessor&&hash(readRepo(menuPath))!==context.product_members.find(r=>r.path===menuPath).sha256)menuSuccessor=menuContextSuccessor(readRepo,context);
     const sourceRecords=[...context.files,...context.product_members,...(mainOnly?body.additional_graph_context.files:[])];
-    const currentRecord=record=>ciSuccessor&&ciSuccessor.frame.paths.includes(record.path)?ciSuccessor.frame.git[ciSuccessor.frame.after].blobs[record.path]:record;
+    const currentRecord=record=>menuSuccessor&&menuSuccessor.frame.paths.includes(record.path)?menuSuccessor.frame.git[menuSuccessor.frame.after].blobs[record.path]:ciSuccessor&&ciSuccessor.frame.paths.includes(record.path)?ciSuccessor.frame.git[ciSuccessor.frame.after].blobs[record.path]:record;
     for(const record of sourceRecords) {
       const expected=currentRecord(record),bytes=readRepo(record.path);assert.ok(Buffer.isBuffer(bytes));
       assert.equal(hash(bytes),expected.sha256);assert.equal(bytes.length,expected.bytes);
@@ -154,6 +193,7 @@ export function buildScopeEvidenceOk(body,entry,readRepo,currentProductPaths) {
       for(const record of sourceRecords){const expected=currentRecord(record),bytes=readRepo(record.path);assert.equal(hash(bytes),expected.sha256);assert.equal(bytes.length,expected.bytes);}
       assert.deepEqual(readRepo(CI_FRAME),ciSuccessor.frameBytes);
       assert.deepEqual(readRepo(ciSuccessor.frame.review_path),ciSuccessor.reviewBytes);
+      if(menuSuccessor){assert.deepEqual(readRepo(MENU_FRAME),menuSuccessor.frameBytes);assert.deepEqual(readRepo(menuSuccessor.frame.review_path),menuSuccessor.reviewBytes);}
       assert.deepEqual(readRepo('scripts/upstream-build-scope-evidence.mjs'),loadedBuildSource);
       captured.close();
     }

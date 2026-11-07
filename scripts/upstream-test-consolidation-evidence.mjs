@@ -169,8 +169,8 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
     // scope, not a general override for an old or substituted build helper.
     const ciCurrent=mainSuccessor && hash(readRepo('flake.nix'))==='a161c9773fdb018e4a1a7befdb5962c1f4e818d73ae259b4242673bad1115556';
     const checkCiBuildImage=()=>{
-      assert.equal(hash(readRepo('scripts/upstream-build-scope-evidence.mjs')),'396e117e2581c239a98c850891ee6c3c499b888b2edc6c24ade15a30a6ac8850');
-      assert.equal(hash(Buffer.from(buildScopeEvidenceOk.toString())),'ca2ac9c2afa6c7e7e94c0b9cfe3a770fcf59046feb975d7afe9a031cc254a7b6');
+      assert.equal(hash(readRepo('scripts/upstream-build-scope-evidence.mjs')),'3c67251388f98f563dcfe43adb5083da0880279855c6eab135840e98c5b81168');
+      assert.equal(hash(Buffer.from(buildScopeEvidenceOk.toString())),'f914bdafd30e0d5b7f1d74ef1b58a1c3e17adf38a69100cac44a97f552d99665');
     };
     if(ciCurrent)checkCiBuildImage();
     const contextBytes=readRepo(contextPath);assert.equal(hash(contextBytes),mainSuccessor?body.main_current_context.build_report.sha256:body.candidate_context.sha256);
