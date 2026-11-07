@@ -7,7 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {InjectionToken} from '@angular/core';
+import type {InjectionToken} from '@angular/core';
+import {MAT_PROGRESS_BAR_DEFAULT_OPTIONS as PEER_PROGRESS_BAR_DEFAULT_OPTIONS} from '@angular/material/progress-bar';
 import type {ThemePalette} from '@angular/material/core';
 import type {ProgressBarMode} from '@angular/material/progress-bar';
 
@@ -21,6 +22,5 @@ export interface MatProgressBarDefaultOptions {
 }
 
 /** Injection token to be used to override the default options for `mat-progress-bar`. */
-export const MAT_PROGRESS_BAR_DEFAULT_OPTIONS = new InjectionToken<MatProgressBarDefaultOptions>(
-  'MAT_PROGRESS_BAR_DEFAULT_OPTIONS',
-);
+export const MAT_PROGRESS_BAR_DEFAULT_OPTIONS: InjectionToken<MatProgressBarDefaultOptions> =
+  PEER_PROGRESS_BAR_DEFAULT_OPTIONS;

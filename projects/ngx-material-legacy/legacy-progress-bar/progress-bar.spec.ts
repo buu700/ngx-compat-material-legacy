@@ -1,6 +1,7 @@
 import {TestBed, ComponentFixture} from '@angular/core/testing';
-import {ApplicationRef, Component, DebugElement, NgZone, Provider, Type} from '@angular/core';
+import {ApplicationRef, Component, DebugElement, InjectionToken, NgZone, Provider, Type} from '@angular/core';
 import {By} from '@angular/platform-browser';
+import {MAT_PROGRESS_BAR_DEFAULT_OPTIONS, MatProgressBar} from '@angular/material/progress-bar';
 import {dispatchFakeEvent} from '../../cdk/testing/private';
 import {
   MatLegacyProgressBarModule,
@@ -32,6 +33,63 @@ describe('MatProgressBar', () => {
 
     return TestBed.createComponent<T>(componentType);
   }
+
+  describe('shared default options token', () => {
+    it('is the current peer token', () => {
+      expect(MAT_LEGACY_PROGRESS_BAR_DEFAULT_OPTIONS).toBe(MAT_PROGRESS_BAR_DEFAULT_OPTIONS);
+    });
+
+    for (const [label, token] of [
+      ['peer', MAT_PROGRESS_BAR_DEFAULT_OPTIONS],
+      ['legacy', MAT_LEGACY_PROGRESS_BAR_DEFAULT_OPTIONS],
+    ] as const) {
+      it(`configures a legacy bar through the ${label} token`, () => {
+        const fixture = createComponent(BasicProgressBar, [
+          {provide: token, useValue: {mode: 'buffer', color: 'warn'}},
+        ]);
+        fixture.detectChanges();
+        const bar = fixture.debugElement.query(By.directive(MatLegacyProgressBar)).componentInstance as MatLegacyProgressBar;
+        expect(bar.mode).toBe('buffer');
+        expect(bar.color).toBe('warn');
+      });
+
+      it(`configures a current peer bar through the ${label} token`, () => {
+        TestBed.configureTestingModule({
+          imports: [MatProgressBar],
+          declarations: [BasicProgressBar],
+          providers: [{provide: token, useValue: {mode: 'buffer', color: 'warn'}}],
+        });
+        const fixture = TestBed.createComponent(BasicProgressBar);
+        fixture.detectChanges();
+        const bar = fixture.debugElement.query(By.directive(MatProgressBar)).componentInstance as MatProgressBar;
+        expect(bar.mode).toBe('buffer');
+        expect(bar.color).toBe('warn');
+      });
+    }
+
+    it('keeps legacy fallbacks and numeric value coercion for an unrelated token', () => {
+      const other = new InjectionToken('MAT_PROGRESS_BAR_DEFAULT_OPTIONS');
+      const fixture = createComponent(BasicProgressBar, [
+        {provide: other, useValue: {mode: 'buffer', color: 'warn'}},
+      ]);
+      fixture.detectChanges();
+      const bar = fixture.debugElement.query(By.directive(MatLegacyProgressBar)).componentInstance as MatLegacyProgressBar;
+      expect(bar.mode).toBe('determinate');
+      expect(bar.color).toBe('primary');
+      bar.value = '42';
+      expect(bar.value).toBe(42);
+    });
+
+    it('keeps the legacy fallback for empty default values', () => {
+      const fixture = createComponent(BasicProgressBar, [
+        {provide: MAT_PROGRESS_BAR_DEFAULT_OPTIONS, useValue: {mode: '', color: ''}},
+      ]);
+      fixture.detectChanges();
+      const bar = fixture.debugElement.query(By.directive(MatLegacyProgressBar)).componentInstance as MatLegacyProgressBar;
+      expect(bar.mode).toBe('determinate');
+      expect(bar.color).toBe('primary');
+    });
+  });
 
   // All children need to be hidden for screen readers in order to support ChromeVox.
   // More context in the issue: https://github.com/angular/components/issues/22165.

@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "role": "Root integration of historical progress-bar default-token alias restoration",
+  "parent": "fd372025ef5c37f523ef222a84e4a1c3a0f640ef",
+  "qualification_sha256": "340c628fd116e1626f5f38d73e37871f0461985edb8f9fa0e9019390884141e1",
+  "qualification": {
+    "base_commit": "0c25c56282d805aaed351b94a9729303462bfb2a",
+    "reference_tag": "16.2.14",
+    "reference_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "peer": "Angular/Material/CDK 22.1.7",
+    "patch": {
+      "path": "../progress-bar-default-token.patch",
+      "sha256": "cb824888aae78011e7274546d7e40ae1dbee0f899966bf3dfc73f85e18c82c8c",
+      "bytes": 5072
+    },
+    "changed": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/progress-bar-defaults.ts",
+        "sha256": "4d4b8301985a5fc14e8b71d05b51616d4791960f05dc5d8d1f7cf8dba2245297",
+        "bytes": 1011
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.spec.ts",
+        "sha256": "1ebd053b92ac0942eb718f8e437c784bf68368d815d4ae02fabe48f961f9c653",
+        "bytes": 17528
+      }
+    ],
+    "baseline_tarball": {
+      "path": "../baseline-pack/ngx-compat-material-legacy-22.0.0-rc.0.tgz",
+      "sha256": "1bd04f3629f84af7b34eaaa981c561f8415919866512e004e0e130bd01beb9bf",
+      "bytes": 1153355
+    },
+    "candidate_tarball": {
+      "path": "../candidate-pack/ngx-compat-material-legacy-22.0.0-rc.0.tgz",
+      "sha256": "48a20a314c30c9a2dcf659b680d9e91b73a935f5fb5f63955b284f3af0f72615",
+      "bytes": 1153398
+    },
+    "baseline_results": {
+      "path": "../baseline-results-final.json",
+      "sha256": "fc7672634d830678d47a2115fbb9e75c73504d7ad89b4c1775ae4b2654cc1775",
+      "bytes": 12216
+    },
+    "candidate_results": {
+      "path": "../candidate-results-final.json",
+      "sha256": "86c299060465510b4aa284bdd56af517da4578be0182d710698ba2cabe47d817",
+      "bytes": 8101
+    },
+    "dts": "45/45 identical declaration files across baseline and candidate packs; progress-bar declaration SHA-256 17e59f68b46468fb5fdfd919b8e8b39f810dc55f368dd10826f2087aa9f856da",
+    "tests": "ChromeHeadless 149; Node 24.21.0/npm 11.19/pnpm 12.4.2; historical runner with zone.js, exact extracted pack roots, no automated artifact hash binding in direct standalone runner. Manual tarball hashes and extraction recorded. Baseline 28/31, candidate 31/31.",
+    "baseline_failed": [
+      "identity",
+      "peer token to legacy component",
+      "legacy token to peer component"
+    ],
+    "limits": [
+      "No zoneless, full artifact suite, security, full browser matrix or release claim.",
+      "Historical runner standalone artifact mode references extracted root directly; recorded hashes verified separately; not a --run sealed result.",
+      "Both packs built with original code base; baseline has test-only uncommitted changes and original production source.",
+      "Peer and legacy controls rendered in separate TestBed scopes.",
+      "Candidate pack precedes final test-only description labels; product bytes unchanged."
+    ]
+  },
+  "independent_review": {
+    "sha256": "91239ac606890246029d7b628bdd056f57428cbd700a53019b02e1f87a0cfe51",
+    "text": "# Independent progress-bar default-token review\n\nThe bounded patch is supported for integration, subject to the integrator checking its base against the current tree and preserving unrelated concurrent changes. Reviewed patch SHA256 `cb824888aae78011e7274546d7e40ae1dbee0f899966bf3dfc73f85e18c82c8c`, qualification JSON SHA256 `340c628fd116e1626f5f38d73e37871f0461985edb8f9fa0e9019390884141e1`, base `0c25c56282d805aaed351b94a9729303462bfb2a`. No production template, stylesheet, public declaration text, or other component is changed.\n\nThe untouched Material 16.2.14 reference commit `df60e733c60e572ba538f6ad0ceff3e63e527b53` imports the current progress-bar default token into its legacy component and re-exports that same token under the legacy name. The patch restores that identity with the installed peer's exported `MAT_PROGRESS_BAR_DEFAULT_OPTIONS`; it intentionally changes DI so either public alias configures both generations, as in the reference. The minimum peer is 22.1.7: its package publicly exports `@angular/material/progress-bar`, whose declaration exports the token and structurally matching optional `color` and `mode` fields without a deprecation annotation on this token. Peer M3 color support has its own documented limitation; this review does not assert M3 styling behavior.\n\nI independently checked the full 512 regular members of each retained tarball against its extracted package: no differences. Baseline SHA256 `1bd04f3629f84af7b34eaaa981c561f8415919866512e004e0e130bd01beb9bf`; candidate `48a20a314c30c9a2dcf659b680d9e91b73a935f5fb5f63955b284f3af0f72615`. Across packages only the progress-bar FESM, its source map and its declaration map differ; the FESM change is the new public peer import and alias in place of the independent token. All 45 `.d.ts` files are byte-identical. Both candidate source member hashes match the qualification.\n\nThe retained same-fixture ChromeHeadless baseline report SHA256 `fc7672634d830678d47a2115fbb9e75c73504d7ad89b4c1775ae4b2654cc1775` has 28/31 passing: identity, peer-token-to-legacy, and legacy-token-to-peer tests fail. Candidate report SHA256 `86c299060465510b4aa284bdd56af517da4578be0182d710698ba2cabe47d817` has 31/31, none skipped. The tests check both aliases in separate TestBed scopes, unrelated token isolation, legacy empty-option fallback and numeric value coercion. Reports identify extracted roots and have null artifact hashes; the independent tarball/member comparisons provide file identity but these are not sealed `--run` reports. Candidate pack predates final test-only description labels, with production source unchanged.\n\nThis is a focused review of retained evidence; no independent browser rerun was performed. It does not grant zoneless, full artifact suite, browser matrix, 21.x, security or release qualification. Any related authored-use source epoch must be independently updated where applicable rather than treated as automatically qualified by this change.\n"
+  },
+  "root_checks": [
+    "Strict whitespace apply and exact two reviewed source afterimages checked on current parent.",
+    "Actual baseline and candidate tarballs and reports rehashed; only progress-bar FESM and two maps change across512 package members.",
+    "All45 declaration texts identical; packed source map contains exact current defaults source.",
+    "No markup/style/golden change; no new root browser run."
+  ],
+  "artifact_delta": [
+    "package/types/ngx-compat-material-legacy-legacy-progress-bar.d.ts.map",
+    "package/fesm2022/ngx-compat-material-legacy-legacy-progress-bar.mjs.map",
+    "package/fesm2022/ngx-compat-material-legacy-legacy-progress-bar.mjs"
+  ],
+  "limits": [
+    "Historical token identity restored using minimum22.1.7 stable public token.",
+    "Direct extracted-package tests have null report artifact hashes; retained tarball identity verified separately, not sealed run.",
+    "Source/API/cutoff evidence affected by this source image must be refreshed; final combined artifact qualification remains open."
+  ]
+}
