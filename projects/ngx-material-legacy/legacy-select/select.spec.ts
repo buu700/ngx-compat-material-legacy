@@ -25,6 +25,7 @@ import {
   wrappedErrorMessage,
 } from '../internal/testing/owned-test-events';
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   DebugElement,
@@ -33,6 +34,9 @@ import {
   ViewChild,
   ViewChildren,
   Provider,
+  provideZoneChangeDetection,
+  provideZonelessChangeDetection,
+  signal,
 } from '@angular/core';
 import {
   waitForAsync,
@@ -54,7 +58,7 @@ import {
   Validators,
   FormBuilder,
 } from '@angular/forms';
-import {ErrorStateMatcher} from '@angular/material/core';
+import {ErrorStateMatcher, MatRipple} from '@angular/material/core';
 import {MatLegacyOption, MatLegacyOptionSelectionChange} from '@ngx-compat/material-legacy/legacy-core';
 import {
   LegacyFloatLabelType,
@@ -6232,4 +6236,105 @@ describe('legacy select overlay navigation', () => {
     fixture.destroy();
     tick(500);
   }));
+});
+
+
+@Component({
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.Default,
+  template: `
+    <mat-select [formControl]="control" [disableRipple]="ripple()" multiple>
+      <mat-option [disabled]="disabled()" value="a">A</mat-option>
+      <mat-optgroup label="Group" [disabled]="groupDisabled()">
+        <mat-option [disabled]="nestedDisabled()" value="b">B</mat-option>
+      </mat-optgroup>
+    </mat-select>
+  `,
+})
+class ParentStateSelectFixture {
+  @ViewChild(MatLegacySelect) select: MatLegacySelect;
+  @ViewChildren(MatLegacyOption) options: QueryList<MatLegacyOption>;
+  control = new FormControl<string[]>(['b'], {nonNullable: true});
+  disabled = signal(false);
+  groupDisabled = signal(false);
+  nestedDisabled = signal(false);
+  ripple = signal(false);
+}
+
+@Component({standalone: false, template: '<span>{{value}}</span>'})
+class UnstableSelectFixture implements AfterViewInit {
+  value = 'before';
+  ngAfterViewInit() { this.value = 'after'; }
+}
+
+describe('legacy select parent state propagation', () => {
+  for (const mode of ['zoneful', 'zoneless'] as const) {
+    const providers = () => [
+      mode === 'zoneful' ? provideZoneChangeDetection() : provideZonelessChangeDetection(),
+      LEGACY_NOOP_ANIMATIONS,
+    ];
+
+    it(`${mode}: detects a real changed-after-checked expression`, () => {
+      TestBed.configureTestingModule({declarations: [UnstableSelectFixture], providers: providers()});
+      const fixture = TestBed.createComponent(UnstableSelectFixture);
+      expect(() => fixture.detectChanges()).toThrowError(/ExpressionChangedAfterItHasBeenCheckedError|NG0100/);
+      fixture.destroy();
+    });
+
+    for (const open of [false, true]) {
+      for (const field of ['disabled', 'groupDisabled', 'nestedDisabled', 'ripple'] as const) {
+        it(`${mode}: updates ${field} while the panel is ${open ? 'open' : 'closed'}`, async () => {
+          TestBed.configureTestingModule({
+            imports: [MatLegacySelectModule, ReactiveFormsModule],
+            declarations: [ParentStateSelectFixture],
+            providers: providers(),
+          });
+          const fixture = TestBed.createComponent(ParentStateSelectFixture);
+          const host = fixture.componentInstance;
+          fixture.detectChanges();
+          expect(host.options.length).toBe(2);
+          await fixture.whenStable();
+          fixture.detectChanges();
+          expect(host.select.triggerValue).toBe('B');
+          if (open) { host.select.open(); fixture.detectChanges(); }
+          const options = host.options.toArray();
+          const verify = () => {
+            expect(options[0].disabled).toBe(host.disabled());
+            expect(options[1].disabled).toBe(host.groupDisabled() || host.nestedDisabled());
+            expect(options[0].disableRipple).toBe(host.ripple());
+            expect(options[1].disableRipple).toBe(host.ripple());
+            expect(host.control.value).toEqual(['b']);
+            expect(host.select.triggerValue).toBe('B');
+            if (open) {
+              const nodes = TestBed.inject(OverlayContainer).getContainerElement().querySelectorAll('mat-option');
+              expect(nodes.length).toBe(2);
+              expect(nodes[0].getAttribute('aria-disabled')).toBe(String(host.disabled()));
+              expect(nodes[1].getAttribute('aria-disabled')).toBe(String(host.groupDisabled() || host.nestedDisabled()));
+              const ripples = fixture.debugElement.queryAll(By.css('.mat-option-ripple'))
+                .map(element => element.injector.get(MatRipple));
+              expect(ripples.length).toBe(2);
+              expect(ripples[0].disabled).withContext('first option ripple').toBe(host.disabled() || host.ripple());
+              expect(ripples[1].disabled).withContext('grouped option ripple')
+                .toBe(host.groupDisabled() || host.nestedDisabled() || host.ripple());
+            }
+          };
+          verify();
+          host[field].set(true);
+          fixture.detectChanges();
+          verify();
+          host[field].set(false);
+          fixture.detectChanges();
+          verify();
+          if (open) {
+            host.select.close(); fixture.detectChanges();
+            expect(host.select.panelOpen).toBe(false);
+            host.select.open(); fixture.detectChanges();
+            expect(host.select.panelOpen).toBe(true);
+            verify();
+          }
+          fixture.destroy();
+        });
+      }
+    }
+  }
 });

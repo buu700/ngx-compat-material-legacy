@@ -13,7 +13,9 @@ import {
   Optional,
   InjectionToken,
   Directive,
+  signal,
 } from '@angular/core';
+import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import {CanDisable, mixinDisabled} from '../internal/common-behaviors';
 import {MatOptionParentComponent, MAT_OPTION_PARENT_COMPONENT} from './option-parent';
 
@@ -41,11 +43,20 @@ import {MatOptionParentComponent, MAT_OPTION_PARENT_COMPONENT} from './option-pa
 /** @docs-private */
 const _MatOptgroupMixinBase = mixinDisabled(class {});
 
+// Keep the historical boolean-property contract of the mixin while notifying option views.
+const _MatReactiveOptgroupMixinBase: typeof _MatOptgroupMixinBase = class extends _MatOptgroupMixinBase {
+  private readonly _groupDisabled = signal(false);
+
+  override get disabled(): boolean { return this._groupDisabled(); }
+  override set disabled(value: boolean) { this._groupDisabled.set(coerceBooleanProperty(value)); }
+};
+
 // Counter for unique group ids.
 let _uniqueOptgroupIdCounter = 0;
 
 @Directive({standalone: false})
-export class _MatOptgroupBase extends _MatOptgroupMixinBase implements CanDisable {
+export class _MatOptgroupBase extends _MatReactiveOptgroupMixinBase implements CanDisable {
+
   /** Label for the option group. */
   @Input() label: string;
 

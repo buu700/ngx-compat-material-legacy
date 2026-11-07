@@ -62,6 +62,7 @@ import {
   QueryList,
   Self,
   SimpleChanges,
+  signal,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -204,10 +205,18 @@ const _MatSelectMixinBase = mixinDisableRipple(
   ),
 );
 
+// Keep the historical boolean-property contract while notifying option views.
+const _MatSelectReactiveMixinBase: typeof _MatSelectMixinBase = class extends _MatSelectMixinBase {
+  private readonly _selectDisableRipple = signal(false);
+
+  override get disableRipple(): boolean { return this._selectDisableRipple(); }
+  override set disableRipple(value: boolean) { this._selectDisableRipple.set(coerceBooleanProperty(value)); }
+};
+
 /** Base class with all of the `MatSelect` functionality. */
 @Directive({standalone: false})
 export abstract class _MatSelectBase<C>
-  extends _MatSelectMixinBase
+  extends _MatSelectReactiveMixinBase
   implements
     AfterContentInit,
     OnChanges,
