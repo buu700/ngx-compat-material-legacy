@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "role": "28 radio authored-use current source successor; bounded evidence only",
+  "base": "b6ef5d7d94a7a7a2b3d65beb8115ffd2e1223e5c",
+  "previous_radio_source_sha256": "e3365e7b338c80cb0b539fb19cb1c8c20d0741f37d4c11f2f46f8620aaec3fbf",
+  "current_radio_source_sha256": "8cdd88d202dce54dcde31ac0f9bda0f3e73726b8b611cab4fbcf7cbf4375a147",
+  "complete_radio_base_diff": "diff --git a/projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts b/projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts\nindex 35c8affd9..2548d02b9 100644\n--- a/projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts\n+++ b/projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts\n@@ -348,13 +348,13 @@ export abstract class _MatRadioButtonBase\n   @Input() name: string;\n \n   /** Used to set the 'aria-label' attribute on the underlying input element. */\n-  @Input('aria-label') ariaLabel: string;\n+  @Input('aria-label') ariaLabel: string | null;\n \n   /** The 'aria-labelledby' attribute takes precedence as the element's text alternative. */\n-  @Input('aria-labelledby') ariaLabelledby: string;\n+  @Input('aria-labelledby') ariaLabelledby: string | null;\n \n   /** The 'aria-describedby' attribute is read after the element's label and field type. */\n-  @Input('aria-describedby') ariaDescribedby: string;\n+  @Input('aria-describedby') ariaDescribedby: string | null;\n \n   /** Whether this radio button is checked. */\n   @Input()\n@@ -426,7 +426,11 @@ export abstract class _MatRadioButtonBase\n     return this._required || (this.radioGroup && this.radioGroup.required);\n   }\n   set required(value: BooleanInput) {\n-    this._required = coerceBooleanProperty(value);\n+    const required = coerceBooleanProperty(value);\n+    if (required !== this._required) {\n+      this._required = required;\n+      this._changeDetector.markForCheck();\n+    }\n   }\n \n   /** Theme color of the radio button. */\n",
+  "receipts": [
+    {
+      "path": "compatibility/rc/parent-main-radio-required-integration-review-v1.json",
+      "sha256": "16b734ad6f203d073701a8ea19b12bc4e3178cf8b40fe5df60d02f10d56ce59c"
+    },
+    {
+      "path": "compatibility/rc/parent-main-radio-nullable-aria-review-v1.json",
+      "sha256": "73b7be8e180f65b30b5219876a9b747b0ffc96f93a3dcfb9e09012979b639132"
+    },
+    {
+      "path": "compatibility/rc/parent-main-radio-public-observer-review-v1.json",
+      "sha256": "1105863b090588e8d6f87cc8b6cbe978991dd8aa3655ef5c9a81eb9fdd5bdd47"
+    },
+    {
+      "path": "compatibility/rc/parent-main-radio-boundary-integration-review-v1.json",
+      "sha256": "5563955ea49bb98673b6f9884a364a9f262c8e591cff97329e19d5b3a42ee2da"
+    },
+    {
+      "path": "compatibility/f10/authored-use-reviews/radio-boundary-main-28-v2.json",
+      "sha256": "89178a07384104b91b9504742f05a7f41e843fd9d144a21522f45c927708a319"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/radio.spec.ts",
+      "sha256": "09f3b544934597caa7954eb922aaa7871d5e435786a99f199b50f1662a575bef"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/radio.ts",
+      "sha256": "dffd3e4daf0d50d915303b2e3d13d26e8c97fb77756ccf8c618e34022f548f1e"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/public-api.ts",
+      "sha256": "872e60ac80caa006d380fb3e7884c62138842fa4f2ef5b77f72a1fc5efafa37b"
+    },
+    {
+      "path": "README.md",
+      "sha256": "5286ab3fb73f3f4ea3a52fc7ad0906a0d950175ab020ddd562eef883047a46cd"
+    },
+    {
+      "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/required-candidate.json",
+      "sha256": "aba0f8c0f08c78de31e85af283524a3f6e3766a9d4bdb8fcff27e20c3c92cfa8"
+    },
+    {
+      "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/required-negative.json",
+      "sha256": "3d1210ebe98404802c8aaaca7e6c5914f31ed88ed45587705d25350698ee9799"
+    },
+    {
+      "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/aria-candidate.json",
+      "sha256": "05685b9d0ff1a14c74b088f9a8bdcee86bcf500906909f481fcbfcb28266d66e"
+    },
+    {
+      "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/aria-baseline.json",
+      "sha256": "542c318ed445fcef5fd685bebb15ef7fbb794ba4ea7efd476c502fd0de9f38a8"
+    },
+    {
+      "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/observer-candidate.json",
+      "sha256": "d1289492b7495ecbffb3b08ad5b425b60740dd3fa0868a357edd149bb0108e88"
+    },
+    {
+      "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/observer-negative.json",
+      "sha256": "97c149503ce60f0fbe898f970ee208e1f7cbb3a762c4ef16efe939a9e5a38264"
+    }
+  ],
+  "runtime_scope": [
+    "required 99/99 candidate, old 96/99; zoneless provider with Zone.js loaded",
+    "nullable ARIA 100/100, strict nullable AOT passes vs three baseline TS2322, numeric binding rejected; radio runtime FESM identical",
+    "public observer 100/100; old baseline target failures plus unrelated old focus/required failures; public observations not proof of internal non-invocation"
+  ],
+  "limits": [
+    "Evidence belongs to its original artifact/source epoch; no relabeling as combined current run.",
+    "Source presence and identity do not establish semantic truth.",
+    "No strict no-Zone, x64, 21.x, full suite or release claim."
+  ],
+  "minimum_peer_declarations": {
+    "installed_version": "22.1.7",
+    "records": [
+      {
+        "installed_path": "node_modules/.pnpm/@angular+cdk@22.1.7_506c899cb52967ef73296071e7e2b29a/node_modules/@angular/cdk/types/_focus-monitor-chunk.d.ts",
+        "raw_sha256": "18c9c9b202cd4f2bc6ce1794266a578517cde96dc46fc1807171a6d22365a5d3",
+        "archive_path": "compatibility/rc/qualification/radio-boundary-main-28-v3/declarations/18c9c9b202cd4f2bc6ce1794266a578517cde96dc46fc1807171a6d22365a5d3.d.ts.gz",
+        "archive_sha256": "3b33112db1b78e7b2fa151321c0eb812073ddd031342868e6240c0f100b4b852",
+        "bytes": 9497
+      },
+      {
+        "installed_path": "node_modules/.pnpm/@angular+cdk@22.1.7_506c899cb52967ef73296071e7e2b29a/node_modules/@angular/cdk/types/coercion.d.ts",
+        "raw_sha256": "1aa6bcf3982760e6fb605975f64b28374b608256baf9c0730140a3697de1a4c9",
+        "archive_path": "compatibility/rc/qualification/radio-boundary-main-28-v3/declarations/1aa6bcf3982760e6fb605975f64b28374b608256baf9c0730140a3697de1a4c9.d.ts.gz",
+        "archive_sha256": "ecd1808cd4cebb4561d752558a3b8db4e8468d3e2dc0e56d172e611e4e106872",
+        "bytes": 1894
+      },
+      {
+        "installed_path": "node_modules/.pnpm/@angular+cdk@22.1.7_506c899cb52967ef73296071e7e2b29a/node_modules/@angular/cdk/types/_number-property-chunk.d.ts",
+        "raw_sha256": "dc18d006527854eccef7394cfef826eb78bf2d98952401df0b94da286f7b11c6",
+        "archive_path": "compatibility/rc/qualification/radio-boundary-main-28-v3/declarations/dc18d006527854eccef7394cfef826eb78bf2d98952401df0b94da286f7b11c6.d.ts.gz",
+        "archive_sha256": "7178cc4867fd69cdeabfb11229eb8314b6967ef71b75e945bcec3be9853da987",
+        "bytes": 555
+      },
+      {
+        "installed_path": "node_modules/.pnpm/@angular+cdk@22.1.7_506c899cb52967ef73296071e7e2b29a/node_modules/@angular/cdk/types/_unique-selection-dispatcher-chunk.d.ts",
+        "raw_sha256": "9d6a5b625752af00cccc5dbcd1df2a65c2a5b6791b2543a7cae6121bede71952",
+        "archive_path": "compatibility/rc/qualification/radio-boundary-main-28-v3/declarations/9d6a5b625752af00cccc5dbcd1df2a65c2a5b6791b2543a7cae6121bede71952.d.ts.gz",
+        "archive_sha256": "b2588d58d0a2e30320deb78b89eec93e92df7b254385beab40808ceb28871cd5",
+        "bytes": 1348
+      },
+      {
+        "installed_path": "node_modules/.pnpm/@angular+core@22.1.7_@angular+compiler@22.1.7_rxjs@7.8.2_zone.js@0.16.3/node_modules/@angular/core/types/core.d.ts",
+        "raw_sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84",
+        "archive_path": "compatibility/rc/qualification/radio-boundary-main-28-v3/declarations/7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84.d.ts.gz",
+        "archive_sha256": "133b6d2c710abe30239dabec4ec8443e6f380befc0edc06a753ee179decd46ba",
+        "bytes": 379836
+      },
+      {
+        "installed_path": "node_modules/.pnpm/@angular+core@22.1.7_@angular+compiler@22.1.7_rxjs@7.8.2_zone.js@0.16.3/node_modules/@angular/core/types/_debug_node-chunk.d.ts",
+        "raw_sha256": "359fdc800f92be1be371c69aa3a01c902976e8de13520eaf03dd5c85160e628b",
+        "archive_path": "compatibility/rc/qualification/radio-boundary-main-28-v3/declarations/359fdc800f92be1be371c69aa3a01c902976e8de13520eaf03dd5c85160e628b.d.ts.gz",
+        "archive_sha256": "e17d7272027d77ff4f582c5131c4d3b4c9a23e462f7843687b9aed5672678c74",
+        "bytes": 287071
+      },
+      {
+        "installed_path": "node_modules/.pnpm/@angular+forms@22.1.7_@angular+common@22.1.7_@angular+core@22.1.7_@angular+compiler@22._e3e723341194c55038638507329095c3/node_modules/@angular/forms/types/forms.d.ts",
+        "raw_sha256": "cf463d1a3f5fdd8383eaed5a8c50b7f5803b4d5bda23e92306dd5aa830ee3dc7",
+        "archive_path": "compatibility/rc/qualification/radio-boundary-main-28-v3/declarations/cf463d1a3f5fdd8383eaed5a8c50b7f5803b4d5bda23e92306dd5aa830ee3dc7.d.ts.gz",
+        "archive_sha256": "d252a2ac8e6535adbc3cedb183826e878eb9be353cbc851a5376d60b1d3d34ca",
+        "bytes": 215640
+      },
+      {
+        "installed_path": "node_modules/.pnpm/@angular+material@22.1.7_94bd345d55a01d565780699f5d2b5992/node_modules/@angular/material/types/_ripple-chunk.d.ts",
+        "raw_sha256": "d492d47f9af7fd5e78c645d64618d712b3ebd265c8b8d7f7ea5609996001609e",
+        "archive_path": "compatibility/rc/qualification/radio-boundary-main-28-v3/declarations/d492d47f9af7fd5e78c645d64618d712b3ebd265c8b8d7f7ea5609996001609e.d.ts.gz",
+        "archive_sha256": "2958335b7b6293b300f0881a4bc75783efb8e701db909f7a498a0ab965a95033",
+        "bytes": 11072
+      },
+      {
+        "installed_path": "node_modules/.pnpm/@angular+material@22.1.7_94bd345d55a01d565780699f5d2b5992/node_modules/@angular/material/types/_palette-chunk.d.ts",
+        "raw_sha256": "9b81bb792ae111bfe0e15bea0c137743ab5aca49ebb60575690e2dbc8c6142a9",
+        "archive_path": "compatibility/rc/qualification/radio-boundary-main-28-v3/declarations/9b81bb792ae111bfe0e15bea0c137743ab5aca49ebb60575690e2dbc8c6142a9.d.ts.gz",
+        "archive_sha256": "9caea8027ac8b3abc7aa747baa3dae44cb133c641c73df3342b1bd6b284063b2",
+        "bytes": 132
+      },
+      {
+        "installed_path": "node_modules/.pnpm/@angular+material@22.1.7_94bd345d55a01d565780699f5d2b5992/node_modules/@angular/material/types/radio.d.ts",
+        "raw_sha256": "e5566d2e63f8663a1838f1f956f87b6d818481936ee263bfaaeb929182002102",
+        "archive_path": "compatibility/rc/qualification/radio-boundary-main-28-v3/declarations/e5566d2e63f8663a1838f1f956f87b6d818481936ee263bfaaeb929182002102.d.ts.gz",
+        "archive_sha256": "45581da4002a4bf99559e5fcba0e34cec62937106f4627def7a974eba0eef9fa",
+        "bytes": 14449
+      }
+    ],
+    "limitation": "Snapshot of pinned installed declarations; archived bytes and prior per-use declarations are checked, not a full live peer qualification."
+  }
+}
