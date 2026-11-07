@@ -41,6 +41,8 @@ def current_tool_fixture(destination):
         paths.add(V4_INPUTS['path'])
         v5 = json.loads((ROOT / V5_INPUTS['path']).read_bytes())
         paths.add(V5_INPUTS['path'])
+        paths.add('compatibility/rc/current-tool-planner-source-successor-v1.json')
+        paths.add('compatibility/rc/current-tool-rc-verify-source-successor-v1.json')
         paths.update(row['path'] for row in v5['updates'])
         paths.update(row['path'] for row in v5['additional_inputs'])
         paths.update(row['path'] for row in v5['authored_updates'])
@@ -73,7 +75,7 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
                                    cwd=ROOT, capture_output=True, text=True, timeout=90)
             self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-6000:])
             result = json.loads(child.stdout)
-            self.assertEqual((result['line'], result['epoch']), (line, 5 if line == 'main' else 3))
+            self.assertEqual((result['line'], result['epoch']), (line, 6 if line == 'main' else 3))
             successor = json.loads((ROOT / INPUTS).read_bytes())
             next_branch = successor['branches'][line]
             packet = json.loads((ROOT / V2_INPUTS['path']).read_bytes())
@@ -95,7 +97,7 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
             self.assertFalse(result['old_constructor_executed'])
             self.assertFalse(result['artifact_or_audit_admission_granted'])
             source = CurrentSassToolReferences(root)
-            self.assertEqual(source.epoch, 5 if line == 'main' else 3)
+            self.assertEqual(source.epoch, 6 if line == 'main' else 3)
             self.assertEqual(source.transitions, result['transition_rows'])
             for row in source.transitions:
                 before, after = dict(path=row['path'], **row['before']), dict(path=row['path'], **row['after'])
@@ -254,7 +256,7 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
     def _check_v4(self, root):
         packet = json.loads((root / V4_INPUTS['path']).read_bytes())
         source = CurrentSassToolReferences(root)
-        self.assertEqual(source.epoch, 5)
+        self.assertEqual(source.epoch, 6)
         self.assertEqual({row['path'] for row in packet['updates']}, set(tool_module.V4_COMMITS))
         for update in packet['updates']:
             before, after = update['before'], update['after']
@@ -364,7 +366,7 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
                 finally:
                     path.write_bytes(original)
             source = CurrentSassToolReferences(root)
-            self.assertEqual(source.epoch, 5 if line == 'main' else 3)
+            self.assertEqual(source.epoch, 6 if line == 'main' else 3)
             self.assertEqual(baseline['branches'][line]['source_parent'], V3_CHECKPOINTS[line])
 
     def test_no_overlay_branch_preserves_exact_v2_physical_subject(self):

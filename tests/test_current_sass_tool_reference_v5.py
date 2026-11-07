@@ -32,11 +32,12 @@ class CaptureV5Tests(unittest.TestCase):
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 dest.write_bytes((ROOT / path).read_bytes())
             source = CurrentSassToolReferences(root)
-            self.assertEqual(source.epoch, 5)
+            self.assertEqual(source.epoch, 6)
             for row in packet['updates']:
-                self.assertEqual(source.qualify(row['before']), row['after'])
+                latest = next(item for item in source.transitions if item['path'] == row['path'])
+                self.assertEqual(source.qualify(row['before']), dict(path=row['path'], **latest['after']))
                 self.assertEqual(hashlib.sha256(source.comparison_bytes(row['before'])).hexdigest(), row['before']['sha256'])
-                self.assertEqual(source.comparison_bytes(row['after']), (root / row['path']).read_bytes())
+                self.assertEqual(hashlib.sha256(source.comparison_bytes(row['after'])).hexdigest(), row['after']['sha256'])
                 self.assertIsNone(source.qualify(dict(row['before'], sha256='0'*64)))
                 def wrong(path):
                     return source.comparison_bytes(row['before']) if path == row['path'] else (root / path).read_bytes()

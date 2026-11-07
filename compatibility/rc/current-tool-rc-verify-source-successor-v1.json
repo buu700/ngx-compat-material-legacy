@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "role": "current-tool-rc-verify-source-successor",
+  "source_parent": "dfa4dfe18a17a117aaae3af1a8089f4615840cb0",
+  "source_commit": "33d7d9e31fd96cbfa6c4e1f592c0bade985c0878",
+  "before": {
+    "path": "scripts/rc-verify.py",
+    "sha256": "3a3a68dd67abf6b0c535853beea818f003867b5a1a1734e6bea683c82b51521c",
+    "bytes": 103517
+  },
+  "after": {
+    "path": "scripts/rc-verify.py",
+    "sha256": "92b12b9f95207d32160a6a8df98e09a1ac9ee5264fdaf6a2f9057ff8bc3deadd",
+    "bytes": 103230
+  },
+  "edits": [
+    {
+      "offset": 2802,
+      "before": "from sass_stepper_historical_oracle import TOKENS as HISTORICAL_STEPPER_TOKENS, SCENARIOS as HISTORICAL_STEPPER_SCENARIOS, PROOF as HISTORICAL_STEPPER_PROOF, stepper_historical_value\n",
+      "after": ""
+    },
+    {
+      "offset": 50589,
+      "before": "",
+      "after": "_BRIDGE_TOKEN_SCENARIOS = (\n    \"contract\", \"alternate\", \"closeout-custom-2018-light\", \"closeout-custom-2018-dark\",\n    \"closeout-custom-legacy-light\", \"closeout-custom-legacy-dark\",\n)\n"
+    },
+    {
+      "offset": 51308,
+      "before": "    every compared theme scenario, except the six pinned Material-16 Stepper\n    values whose tagged-reference CSS and shape are independently checked.\n",
+      "after": "    every compared theme scenario. This coordinator admits main only.\n"
+    },
+    {
+      "offset": 51468,
+      "before": "",
+      "after": "    if (body.get(\"check_id\") != \"companion-bridge-tokens\" or\n            body.get(\"group\") != \"compiled-override-tokens\" or\n            body.get(\"line\") != \"main\" or ACTIVE_RUN.binding.get(\"source_line\") != \"main\"):\n        return False\n"
+    },
+    {
+      "offset": 52627,
+      "before": "    historical = case_id in HISTORICAL_STEPPER_TOKENS\n    if historical:\n        line = body.get(\"line\")\n        if (line not in (\"main\", \"21.x\") or\n            peer_version != {\"main\": \"22.1.7\", \"21.x\": \"21.2.14\"}[line] or\n            body.get(\"historical_oracle\") != HISTORICAL_STEPPER_PROOF or\n            body.get(\"expected_historical\") != stepper_historical_value(line, \"contract\", case_id) or\n            candidate != body[\"expected_historical\"]):\n            return False\n    elif (candidate != expected or \"historical_oracle\" in body or \"expected_historical\" in body):\n",
+      "after": "    if candidate != expected or \"historical_oracle\" in body or \"expected_historical\" in body:\n"
+    },
+    {
+      "offset": 53263,
+      "before": "    if not isinstance(scenarios, list) or not scenarios:\n        return False\n    if historical and [s.get(\"id\") if isinstance(s, dict) else None for s in scenarios] != list(HISTORICAL_STEPPER_SCENARIOS):\n",
+      "after": "    if (not isinstance(scenarios, list) or\n            [scenario.get(\"id\") if isinstance(scenario, dict) else None for scenario in scenarios]\n            != list(_BRIDGE_TOKEN_SCENARIOS)):\n"
+    },
+    {
+      "offset": 53726,
+      "before": "        if historical and (len(checks) != 1 or not isinstance(checks[0], dict) or checks[0].get(\"selector\") != \":root\"):\n",
+      "after": "        selectors = [check.get(\"selector\") if isinstance(check, dict) else None for check in checks]\n        if (not all(isinstance(selector, str) and selector for selector in selectors) or\n                len(set(selectors)) != len(selectors) or \":root\" not in selectors):\n"
+    },
+    {
+      "offset": 54139,
+      "before": "            if historical:\n                historical_value = stepper_historical_value(body[\"line\"], scenario[\"id\"], case_id)\n                if check.get(\"expected_historical\") != historical_value or check.get(\"candidate\") != historical_value:\n",
+      "after": "            if check.get(\"candidate\") != value or \"expected_historical\" in check:\n                return False\n            if scenario[\"id\"] == \"contract\" and check[\"selector\"] == \":root\":\n                if value != expected or check[\"candidate\"] != candidate:\n"
+    },
+    {
+      "offset": 54417,
+      "before": "            elif (check.get(\"candidate\") != value or \"expected_historical\" in check):\n                return False\n",
+      "after": ""
+    }
+  ],
+  "historical_programs_executed": false,
+  "authored_updates": [
+    {
+      "path": "tests/test_current_sass_tool_references.py",
+      "before": {
+        "path": "tests/test_current_sass_tool_references.py",
+        "sha256": "96031119cfc0c466c4be6e514c2e36da8f67043d1ac37af617674e099430ea7f",
+        "bytes": 25526
+      },
+      "after": {
+        "path": "tests/test_current_sass_tool_references.py",
+        "sha256": "434fc0dcc796d4ac5dafc10dfc8d7acea0523ec333b4635f36dc7421ad13b51b",
+        "bytes": 25696
+      },
+      "edits": [
+        {
+          "offset": 2251,
+          "before": "",
+          "after": "        paths.add('compatibility/rc/current-tool-planner-source-successor-v1.json')\n        paths.add('compatibility/rc/current-tool-rc-verify-source-successor-v1.json')\n"
+        },
+        {
+          "offset": 4155,
+          "before": "            self.assertEqual((result['line'], result['epoch']), (line, 5 if line == 'main' else 3))\n",
+          "after": "            self.assertEqual((result['line'], result['epoch']), (line, 6 if line == 'main' else 3))\n"
+        },
+        {
+          "offset": 5908,
+          "before": "            self.assertEqual(source.epoch, 5 if line == 'main' else 3)\n",
+          "after": "            self.assertEqual(source.epoch, 6 if line == 'main' else 3)\n"
+        },
+        {
+          "offset": 15521,
+          "before": "        self.assertEqual(source.epoch, 5)\n",
+          "after": "        self.assertEqual(source.epoch, 6)\n"
+        },
+        {
+          "offset": 22915,
+          "before": "            self.assertEqual(source.epoch, 5 if line == 'main' else 3)\n",
+          "after": "            self.assertEqual(source.epoch, 6 if line == 'main' else 3)\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/current_sass_tool_reference_probe.mjs",
+      "before": {
+        "path": "tests/current_sass_tool_reference_probe.mjs",
+        "sha256": "812eceedc2671845a672cb86d9addfd675e037b8176936ce6abf7fbe9e84172f",
+        "bytes": 14258
+      },
+      "after": {
+        "path": "tests/current_sass_tool_reference_probe.mjs",
+        "sha256": "a6c63e5e5297be7d4583b8b91ebb7acea67f8b247c3fc6953c10bdeed55d0640",
+        "bytes": 14258
+      },
+      "edits": [
+        {
+          "offset": 1162,
+          "before": " assert.equal(source.epoch,source.line==='main'?5:3);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);\n",
+          "after": " assert.equal(source.epoch,source.line==='main'?6:3);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);\n"
+        }
+      ]
+    }
+  ]
+}

@@ -14,7 +14,7 @@ const root=process.argv[2], disk=p=>readFileSync(join(root,p));
 const packet=JSON.parse(disk('compatibility/rc/parent-base-class-tool-successor-inputs-v4.json'));
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const source=currentSassToolReferenceSubject({root});
-assert.equal(source.epoch,5);assert.equal(packet.updates.length,18);
+assert.equal(source.epoch,6);assert.equal(packet.updates.length,18);
 for(const {path,before,after} of packet.updates){
  const current={path,...source.transitions.find(row=>row.path===path).after};
  assert.deepEqual(source.qualify(before),current);

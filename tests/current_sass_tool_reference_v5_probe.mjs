@@ -11,11 +11,11 @@ import {join} from 'node:path';
 import {currentSassToolReferenceSubject} from '../scripts/current-sass-tool-references.mjs';
 const root=process.argv[2], packet=JSON.parse(readFileSync(join(root,'compatibility/rc/parent-base-class-tool-successor-inputs-v5.json')));
 const current=()=>currentSassToolReferenceSubject({root});
-const subject=current();assert.equal(subject.epoch,5);
+const subject=current();assert.equal(subject.epoch,6);
 for(const row of packet.updates){
- assert.deepEqual(subject.qualify(row.before),row.after);
+ const latest=subject.transitions.find(item=>item.path===row.path);assert.deepEqual(subject.qualify(row.before),{path:row.path,...latest.after});
  assert.equal(createHash('sha256').update(subject.comparisonBytes(row.before)).digest('hex'),row.before.sha256);
- assert.deepEqual(subject.comparisonBytes(row.after),readFileSync(join(root,row.path)));
+ assert.equal(createHash('sha256').update(subject.comparisonBytes(row.after)).digest('hex'),row.after.sha256);
  assert.equal(subject.qualify({...row.before,sha256:'0'.repeat(64)}),null);
  assert.throws(()=>currentSassToolReferenceSubject({root,read:path=>path===row.path?subject.comparisonBytes(row.before):readFileSync(join(root,path))}));
 }

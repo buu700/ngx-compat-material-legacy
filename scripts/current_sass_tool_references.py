@@ -211,6 +211,41 @@ class CurrentSassToolReferences:
         assert packet['product_paths'] == [] and packet['historical_programs_executed'] is False
         assert packet['historical_reports_rewritten'] == 0 and packet['artifact_or_audit_admission_granted'] is False
         assert self._read(package_path) == package_image
+        rc_successors = {}
+        if self.line == 'main':
+            rc_packet = dict(path='compatibility/rc/current-tool-rc-verify-source-successor-v1.json', sha256='35834cc2d98bb4a05e4bae35f3a1f51199ab81e86027858214a0144e911d2826', bytes=6911)
+            data = json.loads(self._member(rc_packet))
+            parent, commit, path = 'dfa4dfe18a17a117aaae3af1a8089f4615840cb0', '33d7d9e31fd96cbfa6c4e1f592c0bade985c0878', 'scripts/rc-verify.py'
+            assert data['schema_version'] == 1 and data['role'] == 'current-tool-rc-verify-source-successor' and data['source_parent'] == parent and data['source_commit'] == commit and data['historical_programs_executed'] is False
+            assert data['before'] == dict(path=path, sha256='3a3a68dd67abf6b0c535853beea818f003867b5a1a1734e6bea683c82b51521c', bytes=103517)
+            assert data['after'] == dict(path=path, sha256='92b12b9f95207d32160a6a8df98e09a1ac9ee5264fdaf6a2f9057ff8bc3deadd', bytes=103230)
+            env = dict(PATH=os.environ['PATH'], LANG='C', LC_ALL='C', GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null', GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')
+            ancestry = subprocess.check_output(['git', '--no-replace-objects', 'rev-list', '--parents', '-n', '1', commit], cwd=self.root, env=env, text=True).strip()
+            assert ancestry == commit + ' ' + parent
+            images = _git_images(self.root, [dict(commit=c, path=path) for c in (parent, commit)])
+            before = images[(parent, path)]; _matches(before, data['before'])
+            after = _edited(before, data['edits']); _matches(after, data['after'])
+            assert after == images[(commit, path)] and self._member(data['after']) == after
+            rc_successors[path] = (data, before, after)
+            assert [row['path'] for row in data['authored_updates']] == ['tests/test_current_sass_tool_references.py', 'tests/current_sass_tool_reference_probe.mjs']
+            v5 = json.loads(self._member(V5_INPUTS))
+            for update in data['authored_updates']:
+                assert update['before']['path'] == update['after']['path'] == update['path']
+                v5update = next(row for row in v5['authored_updates'] if row['path'] == update['path'])
+                assert v5update['after'] == update['before']
+                base = _git_images(self.root, [dict(commit=V5_COMMIT, path=update['path'])])[(V5_COMMIT, update['path'])]
+                _matches(base, v5update['before'])
+                historical = _edited(base, v5update['edits']); _matches(historical, update['before'])
+                current = _edited(historical, update['edits']); _matches(current, update['after'])
+                assert self._member(update['after']) == current
+                rc_successors[update['path']] = (update, historical, current)
+        def v5_member(ref):
+            if ref['path'] in rc_successors:
+                data, before, after = rc_successors[ref['path']]
+                assert _metadata(ref) == data['before'], 'unknown rc predecessor'
+                assert self._member(data['after']) == after
+                return before
+            return self._member(ref)
         v5_overlays = {}
         if self.line == 'main':
             v5 = json.loads(self._member(V5_INPUTS))
@@ -234,7 +269,7 @@ class CurrentSassToolReferences:
                 _matches(before, update['before'])
                 after = _edited(before, update['edits'])
                 _matches(after, update['after'])
-                assert after == images[(V5_COMMIT, path)] and self._member(update['after']) == after
+                assert after == images[(V5_COMMIT, path)] and v5_member(update['after']) == after
                 v5_overlays[path] = (update, before, after)
             for update in v5['authored_updates']:
                 path = update['path']
@@ -243,7 +278,7 @@ class CurrentSassToolReferences:
                 _matches(before, update['before'])
                 after = _edited(before, update['edits'])
                 _matches(after, update['after'])
-                assert self._member(update['after']) == after
+                assert v5_member(update['after']) == after
                 v5_overlays[path] = (update, before, after)
             assert len(v5['authored_support']) == 1 and v5['authored_support'][0]['path'] == 'compatibility/rc/current-native-tab-downstream-source-epochs-v5.json'
             self._member(v5['authored_support'][0])
@@ -261,7 +296,7 @@ class CurrentSassToolReferences:
                 return self._member(ref)
             update, before, after = overlay
             assert _metadata(ref) == update['before'], 'unknown V4 comparison identity'
-            assert self._member(update['after']) == after
+            assert v5_member(update['after']) == after
             return before
 
         v4_overlays = {}
@@ -492,9 +527,15 @@ class CurrentSassToolReferences:
             self._add(row, update['before'], before)
             self._add(row, update['after'], after)
             row['after'] = dict(sha256=update['after']['sha256'], bytes=update['after']['bytes'])
+        for update, before, after in rc_successors.values():
+            row = self._rows[update['before']['path']]
+            assert dict(path=row['path'], **row['after']) == update['before'], 'rc successor must follow V5'
+            self._add(row, update['before'], before)
+            self._add(row, update['after'], after)
+            row['after'] = dict(sha256=update['after']['sha256'], bytes=update['after']['bytes'])
         for row in self._rows.values():
             self._member(dict(path=row['path'], **row['after']))
-        self.epoch = 5 if self.line == 'main' else 3
+        self.epoch = 6 if self.line == 'main' else 3
         self.assert_current()
 
     def _add(self, row, ref, raw):

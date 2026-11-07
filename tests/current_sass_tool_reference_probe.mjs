@@ -19,7 +19,7 @@ const packet=JSON.parse(readFileSync(join(root,successor.previous_epoch.path)));
 const previous=JSON.parse(readFileSync(join(root,packet.previous_epoch.path)));
 const source=currentSassToolReferenceSubject({root}),branch=packet.branches[source.line];
 check('V3 current maintained dispatch',()=>{
- assert.equal(source.epoch,source.line==='main'?5:3);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);
+ assert.equal(source.epoch,source.line==='main'?6:3);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);
 });
 check('all original and latest identities qualify with exact comparison bytes',()=>{
  for(const row of source.transitions){

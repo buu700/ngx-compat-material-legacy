@@ -5,10 +5,14 @@ import {readFileSync,writeFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {currentSassToolReferenceSubject} from '../scripts/current-sass-tool-references.mjs';
-const root=resolve(process.argv[2]), planner='scripts/canonical-source-guard-plan.mjs', packet='compatibility/rc/current-tool-planner-source-successor-v1.json';
-const subject=currentSassToolReferenceSubject({root});assert.equal(subject.epoch,5);subject.assertCurrent();
+const root=resolve(process.argv[2]), planner='scripts/canonical-source-guard-plan.mjs', packet='compatibility/rc/current-tool-planner-source-successor-v1.json', rc='scripts/rc-verify.py', rcPacket='compatibility/rc/current-tool-rc-verify-source-successor-v1.json';
+const subject=currentSassToolReferenceSubject({root});assert.equal(subject.epoch,6);subject.assertCurrent();
 assert.equal(subject.qualify({path:planner,sha256:'0'.repeat(64)}),null);
-for(const path of [planner,packet]){
+const oldRc={path:rc,sha256:'3a3a68dd67abf6b0c535853beea818f003867b5a1a1734e6bea683c82b51521c',bytes:103517},newRc={path:rc,sha256:'92b12b9f95207d32160a6a8df98e09a1ac9ee5264fdaf6a2f9057ff8bc3deadd',bytes:103230};
+assert.deepEqual(subject.qualify(oldRc),newRc);assert.equal(subject.comparisonBytes(oldRc).length,oldRc.bytes);
+assert.equal(subject.qualify({...oldRc,sha256:'0'.repeat(64)}),null);
+assert.throws(()=>currentSassToolReferenceSubject({root,read:path=>path===rc?subject.comparisonBytes(oldRc):readFileSync(resolve(root,path))}));
+for(const path of [planner,packet,rc,rcPacket]){
  const f=resolve(root,path),original=readFileSync(f);
  try {writeFileSync(f,Buffer.concat([original,Buffer.from('\n')]));assert.throws(()=>currentSassToolReferenceSubject({root}));assert.throws(()=>subject.assertCurrent());}
  finally {writeFileSync(f,original);}
@@ -31,7 +35,7 @@ try {
  writeFileSync(plannerFile,old);writeFileSync(packageFile,JSON.stringify({...JSON.parse(packageRaw),version:'21.0.0'}));
  try {currentSassToolReferenceSubject({root,read:path=>{seen.push(path);return readFileSync(resolve(root,path));}});}catch{}
  assert.ok(seen.includes('compatibility/rc/parent-base-class-tool-successor-inputs-v3.json'));
- assert.ok(!seen.includes(packet));
+ assert.ok(!seen.includes(packet));assert.ok(!seen.includes(rcPacket));
 } finally {writeFileSync(packageFile,packageRaw);writeFileSync(plannerFile,plannerRaw);}
 subject.assertCurrent();
 console.log(JSON.stringify({result:'pass',epoch:subject.epoch,bound:subject.bound}));

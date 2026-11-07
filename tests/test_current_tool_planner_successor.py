@@ -19,6 +19,8 @@ NODE = 'node'
 V5 = '5b09618cde44725b8723fe4f6c63c3a4c35ad7e5'
 PLANNER = 'scripts/canonical-source-guard-plan.mjs'
 PACKET = 'compatibility/rc/current-tool-planner-source-successor-v1.json'
+RC = 'scripts/rc-verify.py'
+RC_PACKET = 'compatibility/rc/current-tool-rc-verify-source-successor-v1.json'
 
 
 def controlled_fixture(root):
@@ -34,7 +36,7 @@ def controlled_fixture(root):
     for path in (root / 'compatibility').rglob('*.json'):
         try: collect(json.loads(path.read_bytes()))
         except (ValueError, UnicodeDecodeError): pass
-    exceptions = {PLANNER, 'scripts/current-sass-tool-references.mjs',
+    exceptions = {PLANNER, RC, 'scripts/current-sass-tool-references.mjs',
                   'scripts/current_sass_tool_references.py', 'projects/ngx-material-legacy/package.json'}
     for path in root.rglob('*'):
         if not path.is_file() or path.name == '.git': continue
@@ -44,6 +46,8 @@ def controlled_fixture(root):
         if old.returncode == 0 and hashlib.sha256(old.stdout).hexdigest() in refs[rel] and hashlib.sha256(path.read_bytes()).hexdigest() not in refs[rel]:
             path.write_bytes(old.stdout)
     shutil.copyfile(ROOT / PACKET, root / PACKET)
+    shutil.copyfile(ROOT / RC_PACKET, root / RC_PACKET)
+    return 'main'
 
 
 class PlannerSuccessorTest(unittest.TestCase):
@@ -52,10 +56,18 @@ class PlannerSuccessorTest(unittest.TestCase):
             root = Path(temp)
             controlled_fixture(root)
             subject = CurrentSassToolReferences(root)
-            self.assertEqual(subject.epoch, 5)
+            self.assertEqual(subject.epoch, 6)
             subject.assert_current()
             self.assertIsNone(subject.qualify(dict(path=PLANNER, sha256='0'*64)))
-            for rel in (PLANNER, PACKET):
+            old_rc = dict(path=RC, sha256='3a3a68dd67abf6b0c535853beea818f003867b5a1a1734e6bea683c82b51521c', bytes=103517)
+            new_rc = dict(path=RC, sha256='92b12b9f95207d32160a6a8df98e09a1ac9ee5264fdaf6a2f9057ff8bc3deadd', bytes=103230)
+            self.assertEqual(subject.qualify(old_rc), new_rc)
+            self.assertEqual(len(subject.comparison_bytes(old_rc)), old_rc['bytes'])
+            self.assertIsNone(subject.qualify(dict(old_rc, sha256='0'*64)))
+            def historical_rc(path):
+                return subject.comparison_bytes(old_rc) if path == RC else (root / path).read_bytes()
+            with self.assertRaises(AssertionError): CurrentSassToolReferences(root, read=historical_rc)
+            for rel in (PLANNER, PACKET, RC, RC_PACKET):
                 path = root / rel
                 raw = path.read_bytes()
                 try:
@@ -107,6 +119,7 @@ class PlannerSuccessorTest(unittest.TestCase):
                 except AssertionError: pass
                 self.assertIn('compatibility/rc/parent-base-class-tool-successor-inputs-v3.json', seen)
                 self.assertNotIn(PACKET, seen)
+                self.assertNotIn(RC_PACKET, seen)
             finally:
                 package.write_bytes(package_raw)
                 planner.write_bytes(planner_raw)
