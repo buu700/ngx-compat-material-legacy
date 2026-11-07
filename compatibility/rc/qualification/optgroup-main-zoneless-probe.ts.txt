@@ -1,0 +1,26 @@
+
+@Component({standalone: false, template: '<button id="group-open" (click)="select.open()">Open</button><mat-select><mat-optgroup label="Group" [disabled]="groupDisabled()"><mat-option value="a">A</mat-option></mat-optgroup></mat-select>'})
+class AutoZonelessGroupProbe {
+  @ViewChild(MatLegacySelect) select: MatLegacySelect;
+  @ViewChildren(MatLegacyOption) options: QueryList<MatLegacyOption>;
+  groupDisabled = signal<any>(false);
+}
+describe('packed optgroup automatic zoneless probe', () => {
+  it('updates grouped option and actual ripple without manual change detection', async () => {
+    TestBed.configureTestingModule({imports:[MatLegacySelectModule], declarations:[AutoZonelessGroupProbe], providers:[provideZonelessChangeDetection(), LEGACY_NOOP_ANIMATIONS]});
+    const fixture=TestBed.createComponent(AutoZonelessGroupProbe); fixture.autoDetectChanges(); await fixture.whenStable();
+    fixture.nativeElement.querySelector('#group-open').click(); await fixture.whenStable();
+    expect(fixture.componentInstance.select.panelOpen).toBeTrue();
+    for (const [value, expected] of [[false,false],[true,true],['false',false],['',true],[null,false],[true,true],[false,false]] as const) {
+      fixture.componentInstance.groupDisabled.set(value); await fixture.whenStable();
+      const options=fixture.componentInstance.options.toArray();
+      const ripples=fixture.debugElement.queryAll(By.css('.mat-option-ripple')).map(x=>x.injector.get(MatRipple));
+      expect(options.length).toBe(1); expect(ripples.length).toBe(1);
+      expect(options[0].disabled).withContext('option '+String(value)).toBe(expected);
+      expect(ripples[0].disabled).withContext('ripple '+String(value)).toBe(expected);
+      const optionNode=TestBed.inject(OverlayContainer).getContainerElement().querySelector('mat-option');
+      expect(optionNode?.getAttribute('aria-disabled')).withContext('aria '+String(value)).toBe(String(expected));
+    }
+    fixture.destroy();
+  });
+});

@@ -1,0 +1,35 @@
+
+import {MatRadioModule as PeerRadioModule, MatRadioButton as PeerRadioButton, MatRadioGroup as PeerRadioGroup} from '@angular/material/radio';
+import {flushMicrotasks} from '@angular/core/testing';
+@Component({standalone:true,selector:'probe-legacy-child',imports:[MatLegacyRadioModule],template:'<mat-radio-button value="a">A</mat-radio-button><mat-radio-button value="b">B</mat-radio-button>'}) class ProbeLegacyChild {}
+@Component({standalone:true,selector:'probe-peer-child',imports:[PeerRadioModule],template:'<mat-radio-button value="a">A</mat-radio-button><mat-radio-button value="b">B</mat-radio-button>'}) class ProbePeerChild {}
+@Component({standalone:true,imports:[MatLegacyRadioModule,ProbeLegacyChild],template:'<mat-radio-group value="a"><probe-legacy-child /></mat-radio-group>'}) class ProbeLegacyLegacy {}
+@Component({standalone:true,imports:[MatLegacyRadioModule,ProbePeerChild],template:'<mat-radio-group value="a"><probe-peer-child /></mat-radio-group>'}) class ProbeLegacyPeer {}
+@Component({standalone:true,imports:[PeerRadioModule,ProbeLegacyChild],template:'<mat-radio-group value="a"><probe-legacy-child /></mat-radio-group>'}) class ProbePeerLegacy {}
+@Component({standalone:true,imports:[PeerRadioModule,ProbePeerChild],template:'<mat-radio-group value="a"><probe-peer-child /></mat-radio-group>'}) class ProbePeerPeer {}
+@Component({standalone:true,imports:[MatLegacyRadioModule],template:'<mat-radio-group><mat-radio-button value="a">A</mat-radio-button><mat-radio-button value="b">B</mat-radio-button></mat-radio-group>'}) class ProbeDestroyFocus {}
+describe('packed radio boundary and pending-focus probes', () => {
+ for (const [name, Host, Group, Button] of [
+  ['legacy-legacy',ProbeLegacyLegacy,MatLegacyRadioGroup,MatLegacyRadioButton], ['legacy-peer',ProbeLegacyPeer,MatLegacyRadioGroup,PeerRadioButton],
+  ['peer-legacy',ProbePeerLegacy,PeerRadioGroup,MatLegacyRadioButton], ['peer-peer',ProbePeerPeer,PeerRadioGroup,PeerRadioButton],
+ ] as const) {
+  it(name+': records real nested group association and value behavior',async()=>{
+   TestBed.configureTestingModule({imports:[Host]});const fixture=TestBed.createComponent(Host);fixture.detectChanges();await fixture.whenStable();fixture.detectChanges();
+   const g=fixture.debugElement.query(By.directive(Group)).injector.get(Group) as any; const nodes=fixture.debugElement.queryAll(By.directive(Button));const radios=nodes.map(x=>x.componentInstance as any);
+   expect(radios.length).toBe(2);expect(radios.map(r=>r.radioGroup===g)).toEqual([true,true]);expect(radios.map(r=>r.checked)).toEqual([true,false]);
+   const before={query:g._radios.length,value:g.value,checked:radios.map(r=>r.checked)};g.value='b';fixture.detectChanges();await fixture.whenStable();fixture.detectChanges();
+   const after={query:g._radios.length,value:g.value,checked:radios.map(r=>r.checked)};nodes[1].nativeElement.querySelector('input').click();fixture.detectChanges();await fixture.whenStable();fixture.detectChanges();
+   const clicked={value:g.value,checked:radios.map(r=>r.checked)};console.log('RADIO_NESTED_PROBE '+JSON.stringify({name,before,after,clicked}));expect(after.value).toBe('b');fixture.destroy();
+  });
+ }
+ it('guards pending focus after lifecycle destruction while the input remains active',fakeAsync(()=>{
+  TestBed.configureTestingModule({imports:[ProbeDestroyFocus]});const fixture=TestBed.createComponent(ProbeDestroyFocus);fixture.detectChanges();const nodes=fixture.debugElement.queryAll(By.directive(MatLegacyRadioButton));
+  const a=nodes[0].componentInstance as MatLegacyRadioButton,b=nodes[1].componentInstance as MatLegacyRadioButton;const inputA=a._inputElement.nativeElement,inputB=b._inputElement.nativeElement;
+  inputA.focus();expect(inputA.ownerDocument.activeElement).toBe(inputA);const focusB=spyOn(inputB,'focus').and.callThrough();a.radioGroup.selected=b;a.ngDoCheck();a.ngOnDestroy();flushMicrotasks();expect(focusB).not.toHaveBeenCalled();fixture.destroy();
+ }));
+ it('does not move focus from queued work after radio destruction',fakeAsync(()=>{
+  TestBed.configureTestingModule({imports:[ProbeDestroyFocus]});const fixture=TestBed.createComponent(ProbeDestroyFocus);fixture.detectChanges();const nodes=fixture.debugElement.queryAll(By.directive(MatLegacyRadioButton));
+  const a=nodes[0].componentInstance as MatLegacyRadioButton,b=nodes[1].componentInstance as MatLegacyRadioButton;const inputA=a._inputElement.nativeElement,inputB=b._inputElement.nativeElement;
+  inputA.focus();expect(inputA.ownerDocument.activeElement).toBe(inputA);const focusB=spyOn(inputB,'focus').and.callThrough();a.radioGroup.selected=b;a.ngDoCheck();fixture.destroy();flushMicrotasks();expect(focusB).not.toHaveBeenCalled();
+ }));
+});
