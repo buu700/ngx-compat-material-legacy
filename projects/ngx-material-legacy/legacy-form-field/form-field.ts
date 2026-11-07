@@ -213,6 +213,7 @@ export class MatLegacyFormField
 
   /** State of the mat-hint and mat-error animations. */
   _subscriptAnimationState: string = '';
+  private _previousMessageKind: 'error' | 'hint' | undefined;
 
 
 
@@ -422,6 +423,22 @@ export class MatLegacyFormField
     if (this._outlineGapCalculationNeededImmediately) {
       this.updateOutlineGap();
     }
+
+    const messageKind = this._getDisplayedMessages();
+    if (this._previousMessageKind !== undefined && this._previousMessageKind !== messageKind &&
+        this._platform.isBrowser && this._animationsEnabled && this._subscriptAnimationState === 'enter') {
+      const message: HTMLElement | null = this._elementRef.nativeElement.querySelector(
+        ':scope > .mat-form-field-wrapper > .mat-form-field-subscript-wrapper > ' +
+          '.mat-form-field-subscript-message',
+      );
+      if (message) {
+        message.classList.remove('mat-form-field-subscript-message-enter');
+        // Establish the initial style before restarting the existing CSS transition.
+        message.getBoundingClientRect();
+        message.classList.add('mat-form-field-subscript-message-enter');
+      }
+    }
+    this._previousMessageKind = messageKind;
   }
 
   ngAfterViewInit() {
