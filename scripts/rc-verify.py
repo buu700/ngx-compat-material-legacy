@@ -61,16 +61,13 @@ ROOT = Path(__file__).resolve().parents[1]
 MATRIX_PATH = ROOT / "compatibility/rc/matrices/full-verify.json"
 ACTIVE_RUN = None
 
-# Explicit legacy output locations. Capturing these preserves existing domain
-# runners while preventing any old fixed-path report from becoming fresh proof.
-FIXED_DETAILS = {
-    "scripts/engine-free-consumer.mjs": ("engine-free-consumer", "compatibility/rc/reports/engine-free-consumer.json"),
-    "scripts/sass-seal.mjs": ("sass-seal", "compatibility/rc/reports/sass-seal.json"),
-    "scripts/check-companion-bridges.mjs": ("companion-bridge-tokens", "compatibility/rc/reports/companion-bridge-tokens.json"),
-    "scripts/check-companion-computed-styles.mjs": ("companion-computed-styles", "compatibility/rc/reports/companion-computed-styles.json"),
-    "scripts/run-browser-matrix-slice.mjs": ("browser-matrix", "compatibility/rc/reports/browser-matrix-slice.json"),
-    "scripts/api-completeness.mjs": ("api-completeness", "compatibility/rc/reports/api-completeness.json"),
-}
+# Shared finite list of legacy fixed outputs; capture requires fresh child output.
+_fixed_reports = read_json(ROOT / "compatibility/rc/fixed-report-catalog.json")["reports"]
+FIXED_DETAILS = {row["script"]: (row["check_id"], row["path"]) for row in _fixed_reports}
+if (len(FIXED_DETAILS) != len(_fixed_reports)
+        or len({row["check_id"] for row in _fixed_reports}) != len(_fixed_reports)
+        or len({row["path"] for row in _fixed_reports}) != len(_fixed_reports)):
+    raise EvidenceError("duplicate fixed report catalog entry")
 SCRIPT_CHECKS = {
     **{script: item[0] for script, item in FIXED_DETAILS.items()},
     "scripts/pack-draft-run.mjs": "pack-library",

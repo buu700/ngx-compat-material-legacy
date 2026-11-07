@@ -19,7 +19,7 @@ const cwd=join(scratch,'source');
 const git=args=>{const r=spawnSync('git',['-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd,encoding:'utf8'});assert.equal(r.status,0,r.stderr);return r.stdout.trim();};
 const report={schema_version:1,role:'Real shared coordinator-request helper with a tiny committed copied-source Git fixture; no Angular install/build/interaction/packed product qualification.',cases:[],native_executed:false};
 try{
- for(const p of ['scripts/packed-consumer-evidence.mjs','projects/ngx-material-legacy/package.json']){const dest=join(cwd,p);mkdirSync(dirname(dest),{recursive:true});copyFileSync(join(root,p),dest);}
+ for(const p of ['scripts/packed-consumer-evidence.mjs','projects/ngx-material-legacy/package.json','compatibility/rc/fixed-report-catalog.json']){const dest=join(cwd,p);mkdirSync(dirname(dest),{recursive:true});copyFileSync(join(root,p),dest);}
  const manifest=JSON.parse(readFileSync(join(cwd,'projects/ngx-material-legacy/package.json'))),line=manifest.version.startsWith('21.')?'21.x':'main';report.line=line;
  writeFileSync(join(cwd,'scripts/request.mjs'),`import {coordinatorRequest} from './packed-consumer-evidence.mjs';import {writeFileSync} from 'node:fs';const request=coordinatorRequest(process.argv[2]);if(request?.error){console.error(request.error);process.exit(2);}if(request){writeFileSync(request.outputDir+'/producer-reached.txt','Valid request reached downstream producer');}console.log(JSON.stringify(request));`);
  git(['init','--quiet']);git(['add','.']);git(['-c','user.name=Fixture','-c','user.email=fixture@example.invalid','-c','commit.gpgsign=false','commit','--quiet','-m','Synthetic consumer coordinator fixture']);

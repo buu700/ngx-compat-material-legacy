@@ -5,7 +5,7 @@
  */
 import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
-import {existsSync, lstatSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
+import {existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync} from 'node:fs';
 import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
@@ -155,6 +155,47 @@ function gitValue(args) {
   return result.stdout.trim();
 }
 
+// Only the verifier's exact fixed-report capture transition is admissible.
+function isFixedReportCapture(checkId, status) {
+  try {
+    const catalog = JSON.parse(readFileSync(new URL('../compatibility/rc/fixed-report-catalog.json', import.meta.url), 'utf8'));
+    const rows = catalog.reports;
+    if (!Array.isArray(rows) || rows.some(row => !row || typeof row.script !== 'string' ||
+        typeof row.check_id !== 'string' || typeof row.path !== 'string') ||
+        ['script', 'check_id', 'path'].some(key => new Set(rows.map(row => row[key])).size !== rows.length)) return false;
+    const row = rows.find(item => item.check_id === checkId);
+    if (!row || !/^compatibility\/rc\/reports\/[a-z0-9-]+\.json$/.test(row.path) ||
+        !/^[a-z0-9-]+$/.test(checkId)) return false;
+    const entries = status.split('\0').filter(Boolean);
+    const namePrefix = `.saved-${checkId}-`;
+    const names = readdirSync(join(root, 'compatibility/rc/reports')).filter(name => name.startsWith(namePrefix));
+    if (names.length !== 1 || !/^[0-9a-f]{32}\.json$/.test(names[0].slice(namePrefix.length))) return false;
+    const backup = `compatibility/rc/reports/${names[0]}`;
+    if (!entries.includes(` D ${row.path}`)) return false;
+    if (entries.length === 1) {
+      // The user's Git excludes may hide the actual backup from porcelain.
+      const ignored = spawnSync('git', ['check-ignore', '-q', '--', backup], {cwd: root});
+      if (ignored.status !== 0) return false;
+    } else if (entries.length !== 2 || !entries.includes(`?? ${backup}`)) {
+      return false;
+    }
+    // Every component must be real, and the backup must not share an inode.
+    for (const path of ['compatibility', 'compatibility/rc', 'compatibility/rc/reports', backup]) {
+      const st = lstatSync(join(root, path));
+      if (st.isSymbolicLink() || (path === backup ? !st.isFile() || st.nlink !== 1 : !st.isDirectory())) return false;
+    }
+    if (existsSync(join(root, row.path))) return false;
+    const index = gitValue(['ls-files', '--stage', '--', row.path]);
+    if (!/^100644 [0-9a-f]+ 0\t/.test(index ?? '')) return false;
+    const diff = spawnSync('git', ['diff', '--cached', '--quiet', 'HEAD', '--', row.path], {cwd: root});
+    if (diff.status !== 0) return false;
+    const head = spawnSync('git', ['show', `HEAD:${row.path}`], {cwd: root, maxBuffer: 16 * 1024 * 1024});
+    return head.status === 0 && head.stdout.equals(readFileSync(join(root, backup)));
+  } catch {
+    return false;
+  }
+}
+
 export function coordinatorRequest(checkId) {
   const names = ['RC_CHECK_ID', 'RC_RUN_ID', 'RC_INVOCATION_ID', 'RC_EVIDENCE_BINDING', 'RC_ASSERTION_OUTPUT_DIR'];
   const present = names.filter(name => process.env[name]);
@@ -195,9 +236,6 @@ export function coordinatorRequest(checkId) {
   const sourceLine = major === '21' ? '21.x' : 'main';
   if (binding.source_line !== sourceLine) return {error: 'binding source line does not match this checkout'};
   if (binding.source_clean !== true) return {error: 'binding source must be clean'};
-  const status = gitValue(['status', '--porcelain', '--untracked-files=normal']);
-  if (status === null) return {error: 'checkout clean source state is unknown'};
-  if (status !== '') return {error: 'checkout source is dirty'};
   const outputDir = process.env.RC_ASSERTION_OUTPUT_DIR;
   if (!outputDir || !existsSync(outputDir)) return {error: 'assertion output directory is missing'};
   let stat;
@@ -209,6 +247,9 @@ export function coordinatorRequest(checkId) {
   if (!stat.isDirectory() || stat.isSymbolicLink()) return {error: 'assertion output directory is not a real directory'};
   const expectedSuffix = join('evidence', checkId, invocation);
   if (!outputDir.endsWith(expectedSuffix)) return {error: 'assertion directory is not check-owned'};
+  const statusResult = spawnSync('git', ['status', '--porcelain', '-z', '--untracked-files=all', '--no-renames'], {cwd: root, encoding: 'utf8'});
+  if (statusResult.status !== 0) return {error: 'checkout clean source state is unknown'};
+  if (statusResult.stdout !== '' && !isFixedReportCapture(checkId, statusResult.stdout)) return {error: 'checkout source is dirty'};
   const runDir = resolve(outputDir, '..', '..', '..');
   return {binding, invocation, runId, outputDir, runDir, line: binding.source_line, checkId};
 }

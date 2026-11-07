@@ -20,6 +20,9 @@ from test_rc_acceptance import CompleteFixture, write_json
 
 def copy_verifier_fixture_scripts(root):
     """Copy the real local Python import closure needed by the copied coordinator."""
+    catalog = root / 'compatibility/rc/fixed-report-catalog.json'
+    catalog.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(ROOT / 'compatibility/rc/fixed-report-catalog.json', catalog)
     pending = ['rc-verify.py']
     copied = set()
     while pending:
