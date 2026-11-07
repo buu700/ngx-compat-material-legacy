@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "scope": "Finite current use roles; original reviews remain historical and no broader runtime or G11 admission is claimed.",
+  "reviews": [
+    {
+      "file": "legacy-autocomplete/internal/after-legacy-render.ts",
+      "module": "@angular/core",
+      "symbol": "AfterRenderRef",
+      "candidate_source_sha256": "444f4817504fa96c727631c2d6c815949b44e99328fa195d37ccdd59dace0dd3",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "type annotation `rendered: AfterRenderRef | null` at line 19; its public `destroy()` method is invoked at line 35. Core22.1.7 render-registration-public-source-proof: public interface `AfterRenderRef`, `destroy(): void`; type-only import. tests/render_registration_type_probe.mjs; tests/test_render_registration_types.py; tests/autocomplete_render_runtime_probe.mjs. Retained helper-specific callback/cancellation/destruction evidence; does not establish native paint or the entire trigger.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-autocomplete-source-evidence-v1.json",
+          "sha256": "2d4087ca06ae35b0ccd9e5a51fa831bcbc8f705e13c1b3aabdafb5decb44c724"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/current-render-registration-boundary.json",
+          "sha256": "a9949ef6a5ec8bb7cf2456dd35726c2c12bf4de54e6e33d2d936fa5c0fab9906"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/internal/after-legacy-render.ts",
+      "module": "@angular/core",
+      "symbol": "ApplicationRef",
+      "candidate_source_sha256": "444f4817504fa96c727631c2d6c815949b44e99328fa195d37ccdd59dace0dd3",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "runtime token in `injector.get(ApplicationRef, null)` at line 21, only deciding whether to register a render callback. Core22.1.7 render-registration-public-source-proof: root token declaration and successful helper compile. Same helper type/runtime probes cover app-present and no-app/manual route. Does not prove complete legacy node DI.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-autocomplete-source-evidence-v1.json",
+          "sha256": "2d4087ca06ae35b0ccd9e5a51fa831bcbc8f705e13c1b3aabdafb5decb44c724"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/current-render-registration-boundary.json",
+          "sha256": "a9949ef6a5ec8bb7cf2456dd35726c2c12bf4de54e6e33d2d936fa5c0fab9906"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/internal/after-legacy-render.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "444f4817504fa96c727631c2d6c815949b44e99328fa195d37ccdd59dace0dd3",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "type-only parameter at line 14; `get(ApplicationRef, null)` line 21; same borrowed object forwarded in `{injector}` line 26. Core22.1.7 injector-render-type-current-diagnostic: public generic get overload, main diagnostics 0, negative types; exact helper semantics. tests/injector_render_type_probe.mjs; tests/test_injector_render_current.py; tests/autocomplete_render_runtime_probe.mjs. Borrow/forward/cleanup path; not actual full trigger DI.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-autocomplete-source-evidence-v1.json",
+          "sha256": "2d4087ca06ae35b0ccd9e5a51fa831bcbc8f705e13c1b3aabdafb5decb44c724"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/current-render-injector-boundary.json",
+          "sha256": "7b2c412b298e45d3adea727632eeb9f51d737fb5532e13c1e8b8939a9d1d373d"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/internal/after-legacy-render.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "candidate_source_sha256": "444f4817504fa96c727631c2d6c815949b44e99328fa195d37ccdd59dace0dd3",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "type-only parameter line 14; subscribes to public `onStable` line 16 and checks `isStable` line 23. Core22.1.7 render-registration-public-source-proof: current Core declaration; public nondeprecated members. helper runtime receipt has zoneful and zoneless callback behavior and cleanup under a real ApplicationRef but controlled legacy-facing protocol.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-autocomplete-source-evidence-v1.json",
+          "sha256": "2d4087ca06ae35b0ccd9e5a51fa831bcbc8f705e13c1b3aabdafb5decb44c724"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/current-render-registration-boundary.json",
+          "sha256": "a9949ef6a5ec8bb7cf2456dd35726c2c12bf4de54e6e33d2d936fa5c0fab9906"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/internal/after-legacy-render.ts",
+      "module": "@angular/core",
+      "symbol": "afterNextRender",
+      "candidate_source_sha256": "444f4817504fa96c727631c2d6c815949b44e99328fa195d37ccdd59dace0dd3",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "called with callback and exact `{injector}` options at lines 22\u201326; stores returned registration and calls destroy at line 35. Core22.1.7 render-registration-public-source-proof: callback overload and AfterRenderRef declarations; 21.x line also in record. tests/render_registration_type_probe.mjs; tests/test_render_registration_types.py; tests/autocomplete_render_runtime_probe.mjs. Registration/callback/cancel/failure scope, not native paint or full trigger integration.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-autocomplete-source-evidence-v1.json",
+          "sha256": "2d4087ca06ae35b0ccd9e5a51fa831bcbc8f705e13c1b3aabdafb5decb44c724"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/current-render-registration-boundary.json",
+          "sha256": "a9949ef6a5ec8bb7cf2456dd35726c2c12bf4de54e6e33d2d936fa5c0fab9906"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "module": "@angular/cdk/layout",
+      "symbol": "BreakpointObserver",
+      "candidate_source_sha256": "79f14a12676f6835602cf2f66b4650817e15a944ed8555cb3281231abcc8f8f0",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "resolved from borrowed `_viewContainerRef.injector.get(BreakpointObserver)` at line 214. CDK22.1.7 `layout-service-caller-roles-public-main.json`: stable root export, exact call compiled, strict/noLibCheck false and zero diagnostics. autocomplete.spec.ts landscape policy and teardown tests at lines 2155\u20132241 use controlled observer results; not real media matching/viewport geometry.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-autocomplete-source-evidence-v1.json",
+          "sha256": "2d4087ca06ae35b0ccd9e5a51fa831bcbc8f705e13c1b3aabdafb5decb44c724"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/layout-service-callers.json",
+          "sha256": "eadab12d75a4a2c78c937707cf283b43bb1b07d4146db679be3111ce2d92cb68"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "module": "@angular/cdk/layout",
+      "symbol": "Breakpoints",
+      "candidate_source_sha256": "79f14a12676f6835602cf2f66b4650817e15a944ed8555cb3281231abcc8f8f0",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "query constant `Breakpoints.HandsetLandscape` passed to `.observe(...)` at lines 772\u2013774. CDK22.1.7 `layout-service-caller-roles-public-main.json`: stable root export; exact query identity and hash retained. Same landscape tests at lines 2155\u20132241 exercise true/false policy and unsubscribe; no native browser media/geometry claim.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-autocomplete-source-evidence-v1.json",
+          "sha256": "2d4087ca06ae35b0ccd9e5a51fa831bcbc8f705e13c1b3aabdafb5decb44c724"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/layout-service-callers.json",
+          "sha256": "eadab12d75a4a2c78c937707cf283b43bb1b07d4146db679be3111ce2d92cb68"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/public-api.ts",
+      "module": "@angular/material/autocomplete",
+      "symbol": "MAT_AUTOCOMPLETE_DEFAULT_OPTIONS",
+      "candidate_source_sha256": "ffe296c2fde2638c4473a5f91c5688f057667af8085f7cca0e95a455fa0aadae",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "public re-export at line 32 under `MAT_LEGACY_AUTOCOMPLETE_DEFAULT_OPTIONS`; same public peer token is consumed by owned autocomplete-base/trigger injection. Material22.1.7 `component-config-caller-public-types-main.json`: public token export has no tags; public-api, autocomplete-base and trigger bindings resolve to same peer declaration hash `39a77cb0\u2026`. autocomplete.spec.ts:2615, 2826\u20132846; public configuration caller/type evidence. Does not establish generated legacy factories/templates.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-autocomplete-source-evidence-v1.json",
+          "sha256": "2d4087ca06ae35b0ccd9e5a51fa831bcbc8f705e13c1b3aabdafb5decb44c724"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/component-config-callers.json",
+          "sha256": "24cb5555d22af0f57332d6c1eb236c6afb30aaaf12dfe884d54009b5c5ee097e"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/public-api.ts",
+      "module": "@angular/material/autocomplete",
+      "symbol": "MAT_AUTOCOMPLETE_SCROLL_STRATEGY",
+      "candidate_source_sha256": "ffe296c2fde2638c4473a5f91c5688f057667af8085f7cca0e95a455fa0aadae",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "public re-export at line 35 under legacy alias; owned trigger injection and finite factory/provider consume same token. Material22.1.7 component config public types: stable export/no tags, declaration SHA `5f93a9f0\u2026`; public-api and trigger bindings match. autocomplete.spec.ts:3017 and component-config callers review. Does not establish full generated overlay lifecycle/native reposition timing.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-autocomplete-source-evidence-v1.json",
+          "sha256": "2d4087ca06ae35b0ccd9e5a51fa831bcbc8f705e13c1b3aabdafb5decb44c724"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/component-config-callers.json",
+          "sha256": "24cb5555d22af0f57332d6c1eb236c6afb30aaaf12dfe884d54009b5c5ee097e"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/public-api.ts",
+      "module": "@angular/material/autocomplete",
+      "symbol": "MatAutocompleteDefaultOptions",
+      "candidate_source_sha256": "ffe296c2fde2638c4473a5f91c5688f057667af8085f7cca0e95a455fa0aadae",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "public type re-export at line 38 under `MatLegacyAutocompleteDefaultOptions`; owned autocomplete base and trigger use this peer shape for existing fields. Material22.1.7 component config public types: public type, no tags, exact declaration SHA `8e30e65f\u2026`; full current 200-file type check has zero diagnostics. component config type/caller evidence covers consumed legacy fields; `hasBackdrop` peer addition is not read. Does not prove all option behavior, CVA, native overlay or AOT.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-autocomplete-source-evidence-v1.json",
+          "sha256": "2d4087ca06ae35b0ccd9e5a51fa831bcbc8f705e13c1b3aabdafb5decb44c724"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/component-config-callers.json",
+          "sha256": "24cb5555d22af0f57332d6c1eb236c6afb30aaaf12dfe884d54009b5c5ee097e"
+        }
+      ]
+    }
+  ]
+}

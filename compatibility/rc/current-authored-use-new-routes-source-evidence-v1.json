@@ -1,0 +1,533 @@
+{
+  "schema_version": 1,
+  "status": "source review proposal only; no roster edits or admissions",
+  "canonical_head": "4066c4e87072ddd3b06a1669c20bc64586c859ec",
+  "scope": "14 exact live additional authored import triples from the b6ef census; six dialog routes reuse independent review; eight non-dialog routes source-reviewed here.",
+  "source_census": {
+    "producer": "scripts/authored-current-use-inventory.mjs::scanCurrentAuthoredUses",
+    "typescript": "6.0.3",
+    "source_files": 509,
+    "live_use_keys": 1931,
+    "source_population_sha256": "2dd49b38a0951b6d59867798e1ff9597c88de3b9d1e7c1bff744c02e2753f6d2",
+    "frozen_seed_use_keys": 1736,
+    "all_14_current_and_absent_from_frozen_seed": true,
+    "product_source_cutoff_relationship": "Compared to b6ef census HEAD, this 53c0 cutoff changes only compatibility/rc evidence and scripts/packed-consumer-aot-smoke.mjs; the six referenced source files and full authored TS population hash are unchanged.",
+    "scanner_sha256": "41d662ab92853a6ca25a2d487d0301f7aa986edfb80c919a7beafc08a252f7a9",
+    "scanner_path": "scripts/authored-current-use-inventory.mjs",
+    "peer_classification_tool": "TypeScript 6.0.3 checker via classify.mjs; no compiler emit",
+    "node_version": "v24.21.0",
+    "api_classification_artifact_sha256": "63dc6bcec04def9b99b871b4005c5ed1afd48f0c83eeed46bbb97b2b0bdf76b1"
+  },
+  "minimum_peer_versions": {
+    "@angular/core": "22.1.7",
+    "@angular/cdk": "22.1.7",
+    "@angular/material": "22.1.7"
+  },
+  "reviews": [
+    {
+      "file": "legacy-core/option/optgroup-base.ts",
+      "module": "@angular/cdk/coercion",
+      "symbol": "coerceBooleanProperty",
+      "local_name": "coerceBooleanProperty",
+      "line": 18,
+      "type_only": false,
+      "current_source_sha256": "e3a31d60c8ab4215bd4ee8db280fc1c3b1c2820444102664f70019f4b51f0519",
+      "live_scan_candidate_sha256": "e3a31d60c8ab4215bd4ee8db280fc1c3b1c2820444102664f70019f4b51f0519",
+      "current_declaration": "node_modules/.pnpm/@angular+cdk@22.1.7_506c899cb52967ef73296071e7e2b29a/node_modules/@angular/cdk/types/coercion.d.ts",
+      "current_declaration_line": 10,
+      "current_declaration_sha256": "1aa6bcf3982760e6fb605975f64b28374b608256baf9c0730140a3697de1a4c9",
+      "peer_version": "22.1.7",
+      "public_entrypoint": "@angular/cdk/coercion",
+      "jsdoc_tags": [],
+      "explicit_deprecated_tag": false,
+      "tag16_source": {
+        "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+        "tag_path": "src/material/legacy-core/option/optgroup.ts",
+        "git_blob": "602ac8540fdbc7f61edf0047ae16f5864d742903"
+      },
+      "tag16_source_sha256": "ebb8b8c7744d06111f10080325bcadd4b97b4bd5e5891a16029cefa2683af9f4",
+      "source_judgment": "supported-source-contract",
+      "behavior_role_and_limit": "Setter delegates to the public CDK boolean coercer. The Material-16 optgroup inherited `mixinDisabled`, whose setter used this same public helper; the current owned disabled mixin also uses it, and the signal wrapper calls it before storing. This preserves string/boolean/null coercion and replaces only storage/reactivity.",
+      "current_call_sites": [
+        "projects/ngx-material-legacy/legacy-core/option/optgroup-base.ts:47-51"
+      ],
+      "test_source_refs": [
+        "projects/ngx-material-legacy/legacy-select/select.spec.ts:6246-6330"
+      ]
+    },
+    {
+      "file": "legacy-core/option/optgroup-base.ts",
+      "module": "@angular/core",
+      "symbol": "signal",
+      "local_name": "signal",
+      "line": 16,
+      "type_only": false,
+      "current_source_sha256": "e3a31d60c8ab4215bd4ee8db280fc1c3b1c2820444102664f70019f4b51f0519",
+      "live_scan_candidate_sha256": "e3a31d60c8ab4215bd4ee8db280fc1c3b1c2820444102664f70019f4b51f0519",
+      "current_declaration": "node_modules/.pnpm/@angular+core@22.1.7_@angular+compiler@22.1.7_rxjs@7.8.2_zone.js@0.16.3/node_modules/@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+      "current_declaration_line": 60,
+      "current_declaration_sha256": "1ac581e22272aa978a1d265ddd1d49b82883c1faafe13b6d6ad3329a1dff3a58",
+      "peer_version": "22.1.7",
+      "public_entrypoint": "@angular/core",
+      "jsdoc_tags": [
+        {
+          "name": "see",
+          "text": "[Angular Signals](guide/signals)"
+        }
+      ],
+      "explicit_deprecated_tag": false,
+      "tag16_source": {
+        "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+        "tag_path": "src/material/legacy-core/option/optgroup.ts",
+        "git_blob": "602ac8540fdbc7f61edf0047ae16f5864d742903"
+      },
+      "tag16_source_sha256": "ebb8b8c7744d06111f10080325bcadd4b97b4bd5e5891a16029cefa2683af9f4",
+      "source_judgment": "supported-source-contract",
+      "behavior_role_and_limit": "Private `_groupDisabled` signal backs the same public boolean disabled property. Its setter stores the CDK-coerced value; its getter is consumed by the optgroup host ARIA bindings and by child option disabled checks. The added signal read lets those OnPush views observe disabled changes. No signal is exposed as a component input/output.",
+      "current_call_sites": [
+        "projects/ngx-material-legacy/legacy-core/option/optgroup-base.ts:47-51"
+      ],
+      "test_source_refs": [
+        "projects/ngx-material-legacy/legacy-select/select.spec.ts:6246-6330",
+        "projects/ngx-material-legacy/legacy-select/select.spec.ts:1319-1321"
+      ]
+    },
+    {
+      "file": "legacy-core/option/option-base.ts",
+      "module": "@angular/core",
+      "symbol": "signal",
+      "local_name": "signal",
+      "line": 30,
+      "type_only": false,
+      "current_source_sha256": "ec787fa20e331afb90856d2f413ca3551396f3f6954b30cc6de762a6864c931c",
+      "live_scan_candidate_sha256": "ec787fa20e331afb90856d2f413ca3551396f3f6954b30cc6de762a6864c931c",
+      "current_declaration": "node_modules/.pnpm/@angular+core@22.1.7_@angular+compiler@22.1.7_rxjs@7.8.2_zone.js@0.16.3/node_modules/@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+      "current_declaration_line": 60,
+      "current_declaration_sha256": "1ac581e22272aa978a1d265ddd1d49b82883c1faafe13b6d6ad3329a1dff3a58",
+      "peer_version": "22.1.7",
+      "public_entrypoint": "@angular/core",
+      "jsdoc_tags": [
+        {
+          "name": "see",
+          "text": "[Angular Signals](guide/signals)"
+        }
+      ],
+      "explicit_deprecated_tag": false,
+      "tag16_source": {
+        "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+        "tag_path": "src/material/legacy-core/option/option.ts",
+        "git_blob": "c2ab6d03f9f9061f31266c34b582d9748b8c1d53"
+      },
+      "tag16_source_sha256": "18f70080a1b20c2372d13929807217e23d7f6b9ad9aefa547ac35e009db702df",
+      "source_judgment": "supported-source-contract",
+      "behavior_role_and_limit": "Private `#legacyDisabledState` is read by the disabled getter (template/host consumers) and set after the public input is coerced. It is a dependency marker for views, leaving selected/group-disabled/input value semantics unchanged. Current template uses disabled for aria-disabled, disabled styling and ripple suppression.",
+      "current_call_sites": [
+        "projects/ngx-material-legacy/legacy-core/option/option-base.ts:57",
+        "projects/ngx-material-legacy/legacy-core/option/option-base.ts:77-85",
+        "projects/ngx-material-legacy/legacy-core/option/option-base.ts:233-250"
+      ],
+      "test_source_refs": [
+        "projects/ngx-material-legacy/legacy-select/select.spec.ts:6246-6330"
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/core",
+      "symbol": "assertInInjectionContext",
+      "local_name": "assertInInjectionContext",
+      "current_source_sha256": "4926702c9f5aaafa17c7489692da5b67dcdde261d79cafd0628f95a4134ea61a",
+      "current_declaration": "node_modules/.pnpm/@angular+core@22.1.7_@angular+compiler@22.1.7_rxjs@7.8.2_zone.js@0.16.3/node_modules/@angular/core/types/core.d.ts",
+      "current_declaration_line": 613,
+      "current_declaration_sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84",
+      "peer_version": "@angular/core 22.1.7",
+      "public_entrypoint": "@angular/core",
+      "explicit_deprecated_tag": false,
+      "source_judgment": "reused-independent-dialog-source-review",
+      "behavior_role_and_limit": "At construction the guarded public assertion records whether injection context exists; failure preserves the explicit manual-constructor fallback instead of performing ambient lookup.",
+      "independent_evidence": {
+        "source_evidence_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/source-evidence.json",
+        "source_evidence_sha256": "7576fc09d77c7ffdf1160d964a5be5225b1f83fe74337a9e07a5315d33c102a2",
+        "candidate_review_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/candidate-source-review.json",
+        "candidate_review_sha256": "f3b71798d49d114a4a587e281420c5430578c25a4f2d2aac6552e978b2211388",
+        "proposed_rows_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/proposed-rows.json",
+        "proposed_rows_sha256": "45328a28056943dd3f6488306e083bac2b73c89506630c90525e3ade2e0f4eef"
+      }
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/core",
+      "symbol": "runInInjectionContext",
+      "local_name": "runInInjectionContext",
+      "current_source_sha256": "4926702c9f5aaafa17c7489692da5b67dcdde261d79cafd0628f95a4134ea61a",
+      "current_declaration": "node_modules/.pnpm/@angular+core@22.1.7_@angular+compiler@22.1.7_rxjs@7.8.2_zone.js@0.16.3/node_modules/@angular/core/types/core.d.ts",
+      "current_declaration_line": 602,
+      "current_declaration_sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84",
+      "peer_version": "@angular/core 22.1.7",
+      "public_entrypoint": "@angular/core",
+      "explicit_deprecated_tag": false,
+      "source_judgment": "reused-independent-dialog-source-review",
+      "behavior_role_and_limit": "For a service constructed in an injection context, each open runs the existing legacy animation policy function with config.injector, then viewContainerRef.injector, then service injector precedence; manually constructed service uses the supplied animation mode instead.",
+      "independent_evidence": {
+        "source_evidence_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/source-evidence.json",
+        "source_evidence_sha256": "7576fc09d77c7ffdf1160d964a5be5225b1f83fe74337a9e07a5315d33c102a2",
+        "candidate_review_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/candidate-source-review.json",
+        "candidate_review_sha256": "f3b71798d49d114a4a587e281420c5430578c25a4f2d2aac6552e978b2211388",
+        "proposed_rows_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/proposed-rows.json",
+        "proposed_rows_sha256": "45328a28056943dd3f6488306e083bac2b73c89506630c90525e3ade2e0f4eef"
+      }
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "AfterRenderRef",
+      "local_name": "AfterRenderRef",
+      "current_source_sha256": "1e48dbcc48eb84b84f7721802d9d2d52549b5efe3fb1662c2f5045fd7a7c3c8e",
+      "current_declaration": "node_modules/.pnpm/@angular+core@22.1.7_@angular+compiler@22.1.7_rxjs@7.8.2_zone.js@0.16.3/node_modules/@angular/core/types/_debug_node-chunk.d.ts",
+      "current_declaration_line": 3195,
+      "current_declaration_sha256": "359fdc800f92be1be371c69aa3a01c902976e8de13520eaf03dd5c85160e628b",
+      "peer_version": "@angular/core 22.1.7",
+      "public_entrypoint": "@angular/core",
+      "explicit_deprecated_tag": false,
+      "source_judgment": "reused-independent-dialog-source-review",
+      "behavior_role_and_limit": "Type-only handle stores the cancellable afterNextRender registration; cancellation, close and destroy call its public destroy method before stale callbacks can act.",
+      "independent_evidence": {
+        "source_evidence_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/source-evidence.json",
+        "source_evidence_sha256": "7576fc09d77c7ffdf1160d964a5be5225b1f83fe74337a9e07a5315d33c102a2",
+        "candidate_review_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/candidate-source-review.json",
+        "candidate_review_sha256": "f3b71798d49d114a4a587e281420c5430578c25a4f2d2aac6552e978b2211388",
+        "proposed_rows_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/proposed-rows.json",
+        "proposed_rows_sha256": "45328a28056943dd3f6488306e083bac2b73c89506630c90525e3ade2e0f4eef"
+      }
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "ApplicationRef",
+      "local_name": "ApplicationRef",
+      "current_source_sha256": "1e48dbcc48eb84b84f7721802d9d2d52549b5efe3fb1662c2f5045fd7a7c3c8e",
+      "current_declaration": "node_modules/.pnpm/@angular+core@22.1.7_@angular+compiler@22.1.7_rxjs@7.8.2_zone.js@0.16.3/node_modules/@angular/core/types/_debug_node-chunk.d.ts",
+      "current_declaration_line": 5801,
+      "current_declaration_sha256": "359fdc800f92be1be371c69aa3a01c902976e8de13520eaf03dd5c85160e628b",
+      "peer_version": "@angular/core 22.1.7",
+      "public_entrypoint": "@angular/core",
+      "explicit_deprecated_tag": false,
+      "source_judgment": "reused-independent-dialog-source-review",
+      "behavior_role_and_limit": "Optional application reference is resolved through the ambient injector and checked with instanceof to restrict coordinated initial-focus readiness to a real application context; manual and no-document construction retain the direct path.",
+      "independent_evidence": {
+        "source_evidence_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/source-evidence.json",
+        "source_evidence_sha256": "7576fc09d77c7ffdf1160d964a5be5225b1f83fe74337a9e07a5315d33c102a2",
+        "candidate_review_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/candidate-source-review.json",
+        "candidate_review_sha256": "f3b71798d49d114a4a587e281420c5430578c25a4f2d2aac6552e978b2211388",
+        "proposed_rows_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/proposed-rows.json",
+        "proposed_rows_sha256": "45328a28056943dd3f6488306e083bac2b73c89506630c90525e3ade2e0f4eef"
+      }
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "local_name": "Injector",
+      "current_source_sha256": "1e48dbcc48eb84b84f7721802d9d2d52549b5efe3fb1662c2f5045fd7a7c3c8e",
+      "current_declaration": "node_modules/.pnpm/@angular+core@22.1.7_@angular+compiler@22.1.7_rxjs@7.8.2_zone.js@0.16.3/node_modules/@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+      "current_declaration_line": 695,
+      "current_declaration_sha256": "1ac581e22272aa978a1d265ddd1d49b82883c1faafe13b6d6ad3329a1dff3a58",
+      "peer_version": "@angular/core 22.1.7",
+      "public_entrypoint": "@angular/core",
+      "explicit_deprecated_tag": false,
+      "source_judgment": "reused-independent-dialog-source-review",
+      "behavior_role_and_limit": "The ambient public injector is captured only in injection context and passed as the explicit afterNextRender injector; its presence gates browser application readiness and does not classify zone mode.",
+      "independent_evidence": {
+        "source_evidence_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/source-evidence.json",
+        "source_evidence_sha256": "7576fc09d77c7ffdf1160d964a5be5225b1f83fe74337a9e07a5315d33c102a2",
+        "candidate_review_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/candidate-source-review.json",
+        "candidate_review_sha256": "f3b71798d49d114a4a587e281420c5430578c25a4f2d2aac6552e978b2211388",
+        "proposed_rows_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/proposed-rows.json",
+        "proposed_rows_sha256": "45328a28056943dd3f6488306e083bac2b73c89506630c90525e3ade2e0f4eef"
+      }
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "afterNextRender",
+      "local_name": "afterNextRender",
+      "current_source_sha256": "1e48dbcc48eb84b84f7721802d9d2d52549b5efe3fb1662c2f5045fd7a7c3c8e",
+      "current_declaration": "node_modules/.pnpm/@angular+core@22.1.7_@angular+compiler@22.1.7_rxjs@7.8.2_zone.js@0.16.3/node_modules/@angular/core/types/core.d.ts",
+      "current_declaration_line": 2720,
+      "current_declaration_sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84",
+      "peer_version": "@angular/core 22.1.7",
+      "public_entrypoint": "@angular/core",
+      "explicit_deprecated_tag": false,
+      "source_judgment": "reused-independent-dialog-source-review",
+      "behavior_role_and_limit": "Two public mixedReadWrite registrations, bound to the captured injector, defer initial first-tabbable selection across the observed initial NgModel update; epochs, active focus observation and destroyable handles cancel stale work. This is the narrowly authorized timing adjustment, not a guarantee for arbitrary future asynchronous model updates.",
+      "independent_evidence": {
+        "source_evidence_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/source-evidence.json",
+        "source_evidence_sha256": "7576fc09d77c7ffdf1160d964a5be5225b1f83fe74337a9e07a5315d33c102a2",
+        "candidate_review_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/candidate-source-review.json",
+        "candidate_review_sha256": "f3b71798d49d114a4a587e281420c5430578c25a4f2d2aac6552e978b2211388",
+        "proposed_rows_path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-current-import-38/v1/proposed-rows.json",
+        "proposed_rows_sha256": "45328a28056943dd3f6488306e083bac2b73c89506630c90525e3ade2e0f4eef"
+      }
+    },
+    {
+      "file": "legacy-form-field/form-field.ts",
+      "module": "@angular/core",
+      "symbol": "AfterViewChecked",
+      "local_name": "AfterViewChecked",
+      "line": 17,
+      "type_only": false,
+      "current_source_sha256": "ea2bcd2a85cb1511cfa57a7d68d2edd45757ecd703df0ebfa0d613e3f4b79ccd",
+      "live_scan_candidate_sha256": "ea2bcd2a85cb1511cfa57a7d68d2edd45757ecd703df0ebfa0d613e3f4b79ccd",
+      "current_declaration": "node_modules/.pnpm/@angular+core@22.1.7_@angular+compiler@22.1.7_rxjs@7.8.2_zone.js@0.16.3/node_modules/@angular/core/types/core.d.ts",
+      "current_declaration_line": 3344,
+      "current_declaration_sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84",
+      "peer_version": "22.1.7",
+      "public_entrypoint": "@angular/core",
+      "jsdoc_tags": [
+        {
+          "name": "description",
+          "text": "A lifecycle hook that is called after the default change detector has\ncompleted checking a component's view for changes."
+        },
+        {
+          "name": "see",
+          "text": "{@link AfterContentChecked}"
+        },
+        {
+          "name": "see",
+          "text": "[Lifecycle hooks guide](guide/components/lifecycle)"
+        },
+        {
+          "name": "usageNotes",
+          "text": "The following snippet shows how a component can implement this interface to\ndefine its own after-check functionality.\n\n{@example core/ts/metadata/lifecycle_hooks_spec.ts region='AfterViewChecked'}"
+        },
+        {
+          "name": "publicApi",
+          "text": ""
+        }
+      ],
+      "explicit_deprecated_tag": false,
+      "tag16_source": {
+        "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+        "tag_path": "src/material/legacy-form-field/form-field.ts",
+        "git_blob": "b988d8dade9c580166d14b995dd8938c381e5673"
+      },
+      "tag16_source_sha256": "c32e86f1be87568387a09abcd7e6c47e6cb33fd63ea0cff8b224e98073dd1726",
+      "source_judgment": "bounded-independent-motion-review; imported lifecycle API is public and the current behavior has source-bound browser/SSR/style review",
+      "behavior_role_and_limit": "AfterViewChecked drives the current subscript-message enter path: it detects message-kind changes, cancels a superseded WAAPI animation, restores the tagged inline resting opacity/translateY, animates only in browser with motion enabled and Element.animate support (300 ms with tagged easing), and cancels on destroy. The Material 16 lifecycle used Angular animation triggers; current code is an owned engine-free equivalent. Independent review found no additional blocker within this finite scope. Do not infer generated Angular animation marker parity or complete clean packed/floor/hydration/G11 clearance.",
+      "current_call_sites": [
+        "projects/ngx-material-legacy/legacy-form-field/form-field.ts:430-455",
+        "projects/ngx-material-legacy/legacy-form-field/form-field.ts:463-471"
+      ],
+      "test_source_refs": [
+        "tests/form-field-subscript-motion/motion-probe.mjs",
+        "tests/form-field-subscript-motion/boundary-probe.mjs",
+        "tests/form-field-subscript-motion/nested-probe.mjs",
+        "tests/form-field-subscript-motion/token-policy-probe.mjs",
+        "compatibility/rc/parent-main-form-field-dom-motion-integration-review-v1.json"
+      ],
+      "existing_independent_review": {
+        "artifacts": {
+          "integration": {
+            "path": "compatibility/rc/parent-main-form-field-dom-motion-integration-review-v1.json",
+            "sha256": "6c389691a6d7e7428c76ca2665512bc83273d4943b99d2c826023007046a9e7d"
+          },
+          "context": {
+            "path": "compatibility/f10/authored-use-reviews/form-field-main-668-motion-context.json",
+            "sha256": "09dbdc3713abfa4c02958e4649cb4e077673cb7b2f392afdd6ab14aff4f423b1"
+          },
+          "qualification": {
+            "path": "compatibility/rc/parent-main-form-field-subscript-motion-qualification-v1.json",
+            "sha256": "ff566c14bddae70dc836b3f38ada45675d4e202216add2644c57068202dae793"
+          },
+          "independent_review_text_sha256": "7a3a9dbbadbb345488ac79b3f79a0f7697aea5a80105096d60441ec85a6b8e1d",
+          "motion_probe": {
+            "path": "tests/form-field-subscript-motion/motion-probe.mjs",
+            "sha256": "fa72e5b1c7e4c0e99ca4a074d40c42ff0d2543e4db77bf3478bce4b462199776"
+          },
+          "boundary_probe": {
+            "path": "tests/form-field-subscript-motion/boundary-probe.mjs",
+            "sha256": "4555215de5283fd143433465e0ab777dfa03db954f3c7d829472665531ce7d39"
+          },
+          "nested_probe": {
+            "path": "tests/form-field-subscript-motion/nested-probe.mjs",
+            "sha256": "ac29db41c21294e1ac2cee2c705f32d734dcae70bdbd48df9cf3150738597cfd"
+          },
+          "token_policy_probe": {
+            "path": "tests/form-field-subscript-motion/token-policy-probe.mjs",
+            "sha256": "0f3fab2f83e4557d1bf10dff5c9f42c6c39d5ecacae00eb85b3fedac72cc1afe"
+          },
+          "source_hash": "ea2bcd2a85cb1511cfa57a7d68d2edd45757ecd703df0ebfa0d613e3f4b79ccd",
+          "historical_candidate_pack_sha256": "539c472f5207e7d4f5be84dd18547c22265ac6845dfef55914429844e3b2c714",
+          "integration_patch_sha256": "35c6b6c0370af33e5e6d8dccc7ae05fa74cabee53cbb2024dec3e5b0268edcbc"
+        },
+        "bounded_results": "8 actual Chromium149 motion/boundary/nested cases; 4 token-policy cases; 6 native motion cells; candidate SSR states/accessibility/teardown with zero server geometry calls; 12 style observations and 22 mutations rejected; independent reviewer replayed two visual fault controls. Root checked exact current source images and all 12 style image identities.",
+        "explicit_limits": "The tested artifact was an older isolated candidate pack (539c472f\u2026); it predates the later menu fix and is not a fresh combined artifact. No complete browser matrix, hydration, tagged SSR parity, 21.x floor, clean final pack, full release or G11 claim. Generated animation-engine markers are intentionally absent; arbitrary consumer selector compatibility is not established."
+      },
+      "coverage_gap_correction": "No direct component `form-field.spec.ts` exists in the family; however, separate authored motion probes and independent source/style review do exist and bind to the current form-field TS/HTML/SCSS source images."
+    },
+    {
+      "file": "legacy-paginator/paginator.ts",
+      "module": "@angular/core",
+      "symbol": "ElementRef",
+      "local_name": "ElementRef",
+      "line": 14,
+      "type_only": false,
+      "current_source_sha256": "4f050bc5f5818f13d33c7428bdd9d7a8a36b4bf70dbb77ac12e088002bbd9540",
+      "live_scan_candidate_sha256": "4f050bc5f5818f13d33c7428bdd9d7a8a36b4bf70dbb77ac12e088002bbd9540",
+      "current_declaration": "node_modules/.pnpm/@angular+core@22.1.7_@angular+compiler@22.1.7_rxjs@7.8.2_zone.js@0.16.3/node_modules/@angular/core/types/_debug_node-chunk.d.ts",
+      "current_declaration_line": 5109,
+      "current_declaration_sha256": "359fdc800f92be1be371c69aa3a01c902976e8de13520eaf03dd5c85160e628b",
+      "peer_version": "22.1.7",
+      "public_entrypoint": "@angular/core",
+      "jsdoc_tags": [
+        {
+          "name": "security",
+          "text": "Permitting direct access to the DOM can make your application more vulnerable to\nXSS attacks. Carefully review any use of `ElementRef` in your code. For more detail, see the\n[Security Guide](https://g.co/ng/security)."
+        },
+        {
+          "name": "see",
+          "text": "[Using DOM APIs](guide/components/dom-apis)"
+        },
+        {
+          "name": "publicApi",
+          "text": ""
+        }
+      ],
+      "explicit_deprecated_tag": false,
+      "tag16_source": {
+        "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+        "tag_path": "src/material/legacy-paginator/paginator.ts",
+        "git_blob": "41e293f4b5d5d855c54775300f556c2a90b09ac1"
+      },
+      "tag16_source_sha256": "4383049196f4a2b078e0d48c3cabce73b1b2c031023d348311a269f9eb31603f",
+      "source_judgment": "api-valid-behavior-reviewed-source-only",
+      "behavior_role_and_limit": "Used only with the MatLegacySelect ViewChild to read its host layout/visibility and confirm the pointer target. Handler queries geometry/styles and calls the select container-click method; it does not write HTML or styles. This is a new page-size pointer-target extension relative to the tagged legacy paginator. Existing focused spec states flex clicks retain their original handler and enumerates pointer/visibility/disabled guards; source only, not executed.",
+      "current_call_sites": [
+        "projects/ngx-material-legacy/legacy-paginator/paginator.ts:76-77",
+        "projects/ngx-material-legacy/legacy-paginator/paginator.ts:80-103"
+      ],
+      "test_source_refs": [
+        "projects/ngx-material-legacy/legacy-paginator/paginator.spec.ts:25-70"
+      ]
+    },
+    {
+      "file": "legacy-paginator/paginator.ts",
+      "module": "@angular/core",
+      "symbol": "ViewChild",
+      "local_name": "ViewChild",
+      "line": 19,
+      "type_only": false,
+      "current_source_sha256": "4f050bc5f5818f13d33c7428bdd9d7a8a36b4bf70dbb77ac12e088002bbd9540",
+      "live_scan_candidate_sha256": "4f050bc5f5818f13d33c7428bdd9d7a8a36b4bf70dbb77ac12e088002bbd9540",
+      "current_declaration": "node_modules/.pnpm/@angular+core@22.1.7_@angular+compiler@22.1.7_rxjs@7.8.2_zone.js@0.16.3/node_modules/@angular/core/types/core.d.ts",
+      "current_declaration_line": 8536,
+      "current_declaration_sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84",
+      "peer_version": "22.1.7",
+      "public_entrypoint": "@angular/core",
+      "jsdoc_tags": [
+        {
+          "name": "publicApi",
+          "text": ""
+        },
+        {
+          "name": "Annotation",
+          "text": ""
+        },
+        {
+          "name": "publicApi",
+          "text": ""
+        }
+      ],
+      "explicit_deprecated_tag": false,
+      "tag16_source": {
+        "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+        "tag_path": "src/material/legacy-paginator/paginator.ts",
+        "git_blob": "41e293f4b5d5d855c54775300f556c2a90b09ac1"
+      },
+      "tag16_source_sha256": "4383049196f4a2b078e0d48c3cabce73b1b2c031023d348311a269f9eb31603f",
+      "source_judgment": "api-valid-behavior-reviewed-source-only",
+      "behavior_role_and_limit": "Resolves the legacy select instance and its host ElementRef used by `_handlePageSizeTargetClick`; the change extends only clicks inside the paginator page-size region outside `.mat-form-field-flex`. Current spec source covers extension and preserved flex path; no execution claim.",
+      "current_call_sites": [
+        "projects/ngx-material-legacy/legacy-paginator/paginator.ts:76-77",
+        "projects/ngx-material-legacy/legacy-paginator/paginator.ts:80-103"
+      ],
+      "test_source_refs": [
+        "projects/ngx-material-legacy/legacy-paginator/paginator.spec.ts:25-70"
+      ]
+    },
+    {
+      "file": "legacy-progress-bar/internal/progress-bar-defaults.ts",
+      "module": "@angular/material/progress-bar",
+      "symbol": "MAT_PROGRESS_BAR_DEFAULT_OPTIONS",
+      "local_name": "PEER_PROGRESS_BAR_DEFAULT_OPTIONS",
+      "line": 11,
+      "type_only": false,
+      "current_source_sha256": "4d4b8301985a5fc14e8b71d05b51616d4791960f05dc5d8d1f7cf8dba2245297",
+      "live_scan_candidate_sha256": "4d4b8301985a5fc14e8b71d05b51616d4791960f05dc5d8d1f7cf8dba2245297",
+      "current_declaration": "node_modules/.pnpm/@angular+material@22.1.7_94bd345d55a01d565780699f5d2b5992/node_modules/@angular/material/types/progress-bar.d.ts",
+      "current_declaration_line": 24,
+      "current_declaration_sha256": "c452f0420889ab1565ac815c660b5e3d87a057365c5a7d5f2a1f1701343c3e06",
+      "peer_version": "22.1.7",
+      "public_entrypoint": "@angular/material/progress-bar",
+      "jsdoc_tags": [],
+      "explicit_deprecated_tag": false,
+      "tag16_source": {
+        "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+        "tag_path": "src/material/legacy-progress-bar/progress-bar.ts",
+        "git_blob": "a83ed64dce7549e303c0c15646ecaf3be8a1c22b"
+      },
+      "tag16_source_sha256": "f95101f7f7c782afe1c652054f59f686bb163e2fa83c7fe76ab27ee249d5dfc7",
+      "source_judgment": "supported-identity-restoration",
+      "behavior_role_and_limit": "Tag 16 legacy progress bar injected the same public Material progress-bar token as the modern bar. Current local `MAT_LEGACY_PROGRESS_BAR_DEFAULT_OPTIONS` aliases this peer token; the component injects the alias and spec source asserts token identity plus provider configuration via both legacy and peer aliases. Public peer token remains in 22.1.7 declarations without deprecation. Existing spec source only; not run.",
+      "current_call_sites": [
+        "projects/ngx-material-legacy/legacy-progress-bar/internal/progress-bar-defaults.ts:11-25",
+        "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts:91",
+        "projects/ngx-material-legacy/legacy-progress-bar/public-api.ts:26"
+      ],
+      "test_source_refs": [
+        "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.spec.ts:371-425"
+      ]
+    },
+    {
+      "file": "legacy-select/internal/select-base.ts",
+      "module": "@angular/core",
+      "symbol": "signal",
+      "local_name": "signal",
+      "line": 65,
+      "type_only": false,
+      "current_source_sha256": "120ab123d79e58ea256211cafa50268dba3ce26524426e88b0347a8624aee68d",
+      "live_scan_candidate_sha256": "120ab123d79e58ea256211cafa50268dba3ce26524426e88b0347a8624aee68d",
+      "current_declaration": "node_modules/.pnpm/@angular+core@22.1.7_@angular+compiler@22.1.7_rxjs@7.8.2_zone.js@0.16.3/node_modules/@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+      "current_declaration_line": 60,
+      "current_declaration_sha256": "1ac581e22272aa978a1d265ddd1d49b82883c1faafe13b6d6ad3329a1dff3a58",
+      "peer_version": "22.1.7",
+      "public_entrypoint": "@angular/core",
+      "jsdoc_tags": [
+        {
+          "name": "see",
+          "text": "[Angular Signals](guide/signals)"
+        }
+      ],
+      "explicit_deprecated_tag": false,
+      "tag16_source": {
+        "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+        "tag_path": "src/material/legacy-select/select.ts",
+        "git_blob": "c9a407b720f17d9730e2b3e26c7fe581e78c0825"
+      },
+      "tag16_source_sha256": "f75594460cc49d590a74643ce2888990f498262d83c63d907966d5095ee0098d",
+      "source_judgment": "supported-source-contract",
+      "behavior_role_and_limit": "Private `_selectDisableRipple` signal backs the existing boolean `disableRipple` property. Setter applies the same CDK boolean coercion; option getter/template reads parent disableRipple and signal tracking lets option views reflect later changes. Current select spec source includes signal-driven host changes for disabled/group-disabled/nested-disabled/ripple values, checking option properties, ARIA and ripple-disabled state; not executed.",
+      "current_call_sites": [
+        "projects/ngx-material-legacy/legacy-select/internal/select-base.ts:208-213"
+      ],
+      "test_source_refs": [
+        "projects/ngx-material-legacy/legacy-select/select.spec.ts:6246-6330"
+      ]
+    }
+  ],
+  "limits": [
+    "All 14 imported symbols resolve at installed 22.1.7; the source/import JSDoc has no explicit deprecated tag. This does not claim API semantics beyond the specific code path described.",
+    "No tests, builds, runtime, browser, packed artifact, security, minimum floor matrix, or G11 claim.",
+    "Paginator click target is a new consumer interaction; existing spec source is cited but not run.",
+    "AfterViewChecked has bounded, independently reviewed motion evidence bound to exact current source; broader clean pack/floor/hydration/generated-marker compatibility remain unclaimed."
+  ]
+}

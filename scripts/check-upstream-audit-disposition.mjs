@@ -513,7 +513,7 @@ if (existsSync(symbolsPath)) {
 const currentAuthoredSource = scanCurrentAuthoredUses({root});
 let currentSymbols = null;
 try { currentSymbols = JSON.parse(readFileSync(currentSymbolsPath, 'utf8')); } catch { /* Missing/unreadable is incomplete. */ }
-const currentSymbolAdmission = currentAuthoredUseAdmission({current: currentAuthoredSource,
+const currentSymbolAdmission = currentAuthoredUseAdmission({root,current: currentAuthoredSource,
   frozen: authoredReference.symbol_uses, candidate: currentSymbols, line: reviewLine,
   readMember: readRegularRepoBytes});
 

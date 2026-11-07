@@ -114,12 +114,12 @@ export function scanCurrentAuthoredUses({root = defaultRoot, files, readSource} 
 /** Review new routes with the same per-caller evidence rules as frozen routes.
  * Removed seed uses remain obligations of the frozen ledger, never automatic passes.
  */
-export function currentAuthoredUseAdmission({current, frozen, candidate, line, readMember, additionalBaseline}) {
+export function currentAuthoredUseAdmission({root = defaultRoot, current, frozen, candidate, line, readMember, additionalBaseline}) {
   const frozenKeys = new Set(frozen.map(key));
   const currentKeys = new Set(current.symbol_uses.map(key));
   const additions = current.symbol_uses.filter(row => !frozenKeys.has(key(row)));
   const removed = frozen.filter(row => !currentKeys.has(key(row)));
-  const baseline = additionalUseBaseline({current, additions, candidate, line, readMember, provided: additionalBaseline});
+  const baseline = additionalUseBaseline({root, current, additions, candidate, line, readMember, provided: additionalBaseline});
   const obligations = new Map(baseline.entries.map(row => [key(row), row]));
   for (const row of additions) obligations.set(key(row), row);
   const baselineOverlapsFrozen = baseline.entries.some(row => frozenKeys.has(key(row)));

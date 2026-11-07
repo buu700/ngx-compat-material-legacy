@@ -219,7 +219,7 @@ export function inspectSelectionComparatorJudgments({root = rootDefault, readMem
   }
   const afterRead = path => writes.get(path) || read(path), frozen = JSON.parse(writes.get(stores[0].path)), current = JSON.parse(writes.get(stores[1].path));
   const frozenEvidence = authoredUseReviewEvidence(frozen, line, afterRead, hash); assert.equal(frozenEvidence.reviewed, 1446); assert.equal(frozenEvidence.insufficient, 0);
-  const currentAdmission = currentAuthoredUseAdmission({current: scanCurrentAuthoredUses({root, readSource: read}), frozen: frozen.symbol_uses, candidate: current, line, readMember: afterRead});
+  const currentAdmission = currentAuthoredUseAdmission({root,current: scanCurrentAuthoredUses({root, readSource: read}), frozen: frozen.symbol_uses, candidate: current, line, readMember: afterRead});
   assert.equal(currentAdmission.source_snapshot_valid, true); assert.equal(currentAdmission.review_evidence.reviewed, 178); assert.equal(currentAdmission.review_evidence.insufficient, 0);
   return {proof, writes, entries, frozenEvidence, currentAdmission};
 }

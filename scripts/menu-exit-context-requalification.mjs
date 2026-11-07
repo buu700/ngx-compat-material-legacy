@@ -266,7 +266,7 @@ export async function inspectMenuExitContext({root=defaultRoot,readMember}={}){
  assert.deepEqual(current.source_files.filter(r=>r.path!==trigger),oldScan.source_files.filter(r=>r.path!==trigger));
  nextDocs.set(currentPath,Buffer.from(patchJson(prior.current_before_text,{current_source_population_sha256:current.source_population_sha256})));
  const authoredRead=path=>nextDocs.get(path)||read(path);
- const admitted=currentAuthoredUseAdmission({current,frozen:oldFrozen.symbol_uses,candidate:JSON.parse(nextDocs.get(currentPath)),line,readMember:authoredRead});
+ const admitted=currentAuthoredUseAdmission({root,current,frozen:oldFrozen.symbol_uses,candidate:JSON.parse(nextDocs.get(currentPath)),line,readMember:authoredRead});
  assert.equal(admitted.source_snapshot_valid,true);assert.equal(admitted.inventory.complete,true);assert.equal(admitted.additional_uses,308);assert.equal(admitted.removed_seed_uses,86);
  assert.equal(admitted.review_evidence.reviewed,178);assert.equal(admitted.inventory.open,130);assert.equal(admitted.review_evidence.insufficient,0);assert.equal(admitted.ready,false);
  const reviewed=authoredUseReviewEvidence(frozen,line,authoredRead,hash);assert.equal(reviewed.reviewed,1446);assert.equal(reviewed.insufficient,0);

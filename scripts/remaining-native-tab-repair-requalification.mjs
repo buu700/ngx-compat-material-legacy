@@ -229,7 +229,7 @@ export function inspectTabRepairSourceRequalification({root=rootDefault,readMemb
   writes.set(ledgerPath,patchRows(oldRead(ledgerPath).toString(),'entries',entries));
   validateScopes(scopePaths.map(path=>JSON.parse(writes.get(path))),sourceEntries.map(row=>entries.get(row.sha)),reader);
   const frozenEvidence=authoredUseReviewEvidence(JSON.parse(writes.get(frozenPath)),line,reader,hash);assert.equal(frozenEvidence.insufficient,0);assert.equal(frozenEvidence.reviewed,1446);
-  const admission=currentAuthoredUseAdmission({current:active,frozen:JSON.parse(read('compatibility/f10/authored-dependency-inventory-seed.json')).symbol_uses,
+  const admission=currentAuthoredUseAdmission({root,current:active,frozen:JSON.parse(read('compatibility/f10/authored-dependency-inventory-seed.json')).symbol_uses,
     candidate:JSON.parse(writes.get(currentPath)),line,readMember:reader});assert.equal(admission.source_snapshot_valid,true);assert.equal(admission.review_evidence.insufficient,0);assert.equal(admission.review_evidence.reviewed,178);
   assertRemainingNativeMetadataState({root,previous,writes,read});
   return {schema_version:1,line,proof,roles,source_scope_rows:52,authored_rows:13,runtime_contexts:17,frozenEvidence,currentAdmission:admission,writes,

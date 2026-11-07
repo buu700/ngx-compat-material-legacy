@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "independently reviewed, bounded source-use support",
+  "proposal": {
+    "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/current-roster-20-independent/review-v1.json",
+    "sha256": "0f3f4a74d7be507bb64ba8d76750e2872e8dd4b2582efd8a74ad2f2ea2252a4e"
+  },
+  "independent_analysis": {
+    "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-snack-current20/source-judgments.json",
+    "sha256": "57c973c60142cb28c06da6dc4bc93fb3770b66cd35a76a00fe087fcd5577237a"
+  },
+  "minimum_peer_declarations": {
+    "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/dialog-snack-current20/peer-declarations.json",
+    "sha256": "39470d9fed11bb7d919d6973c1aef9426199bab16b56694f3ee76a7cd5f4d5f5",
+    "angular_core_cdk_material": "22.1.7",
+    "public_symbols_resolved": 19,
+    "deprecated_tags_observed": 0
+  },
+  "checks": {
+    "exact_20_triples": true,
+    "each_old_complete_ledger_and_prior_review_preserved": true,
+    "old_and_new_source_hashes_and_complete_four_diffs": true,
+    "prior_review_and_evidence_hashes_match": true,
+    "current_occurrences_match_census": true,
+    "named_current_roles_reviewed": true,
+    "peer_declarations_resolved": true
+  },
+  "clarifications": [
+    "OverlayRef was required and lacked @Optional in both sources. Prior complete review incorrectly called it optional; proposed current role does not repeat that error, but downstream successor should explicitly correct the preserved historical wording.",
+    "FocusMonitor has an optional TypeScript parameter (`?`) and no @Optional decorator; do not infer Angular optional injection from its TypeScript syntax.",
+    "Dialog exit now cancels pending owned initial-focus work; the three other files redirect shared MatCommonModule and therefore carry the separately reviewed high-contrast/sanity/constructor implications. No blanket behavioral identity.",
+    "Prior standalone review-report references omit an optional bytes property for three rows; the complete prior ledger rows preserve that property exactly."
+  ],
+  "limits": [
+    "Static peer/source-use review, not new runtime qualification.",
+    "No admission, full security review, 21.x, full matrix or release/G11 claim."
+  ]
+}

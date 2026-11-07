@@ -168,7 +168,7 @@ export function inspectSpecContextRequalification({root=rootDefault,readMember}=
  for(const row of afterLedger.entries)if(!updates.has(row.sha))assert.deepEqual(row,beforeLedger.entries.find(old=>old.sha===row.sha));
  const frozen=JSON.parse(read('compatibility/f10/authored-dependency-dispositions.json')),current=JSON.parse(read('compatibility/f10/authored-dependency-current-dispositions.json'));
  const frozenEvidence=authoredUseReviewEvidence(frozen,line,reader,hash);assert.equal(frozenEvidence.reviewed,1446);assert.equal(frozenEvidence.insufficient,0);
- const active=scanCurrentAuthoredUses({root}),admission=currentAuthoredUseAdmission({current:active,frozen:JSON.parse(read('compatibility/f10/authored-dependency-inventory-seed.json')).symbol_uses,candidate:current,line,readMember:reader});
+ const active=scanCurrentAuthoredUses({root}),admission=currentAuthoredUseAdmission({root,current:active,frozen:JSON.parse(read('compatibility/f10/authored-dependency-inventory-seed.json')).symbol_uses,candidate:current,line,readMember:reader});
  assert.equal(admission.source_snapshot_valid,true);assert.equal(admission.review_evidence.reviewed,178);assert.equal(admission.review_evidence.insufficient,0);
  assertSpecContextMetadataState({previous,writes,read,has:path=>existsSync(resolve(root,path))});
  return {line,proof,inputs,previous,writes,beforeLedger,updates,productPaths,source_scope_rows:83,native_source_bindings:20,frozenEvidence,currentAdmission:admission,

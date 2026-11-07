@@ -316,7 +316,7 @@ export function preparePackedCvaSourceRequalification({root = process.cwd(), rea
   const proposed=historicalTitleMetadata?dialogTitlePriorMetadataRead({root,read,metadataOverlay:proposedBase}):proposedBase;
   const reviews = [frozen, added].map(doc => authoredUseReviewEvidence(doc, line, proposed, hash));
   assert.deepEqual(reviews.map(r => [r.reviewed, r.insufficient]), [[1736, 0], [315, 0]]);
-  const admission = currentAuthoredUseAdmission({current: live, frozen: frozen.symbol_uses, candidate: added, line, readMember: proposed});
+  const admission = currentAuthoredUseAdmission({root,current: live, frozen: frozen.symbol_uses, candidate: added, line, readMember: proposed});
   assert.equal(admission.ready, true, JSON.stringify(admission)); assert.equal(admission.additional_obligations, 315);
   assert.equal(admission.retained_removed_additional_obligations, 2);
   for (const path of [frozenPath, addedPath]) {

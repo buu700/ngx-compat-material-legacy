@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "scope": "Seven current public uses; source review and stated motion evidence only, no full runtime or G11 admission.",
+  "reviews": [
+    {
+      "file": "legacy-core/option/optgroup-base.ts",
+      "module": "@angular/cdk/coercion",
+      "symbol": "coerceBooleanProperty",
+      "candidate_source_sha256": "e3a31d60c8ab4215bd4ee8db280fc1c3b1c2820444102664f70019f4b51f0519",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "Setter delegates to the public CDK boolean coercer. The Material-16 optgroup inherited `mixinDisabled`, whose setter used this same public helper; the current owned disabled mixin also uses it, and the signal wrapper calls it before storing. This preserves string/boolean/null coercion and replaces only storage/reactivity. This is a bounded current public-use source judgment; broader artifact, runtime and floor claims remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-new-routes-source-evidence-v1.json",
+          "sha256": "ce4d574f99338b535e596c84564f88bf49d994139fe298c3b5820ef020eb618e"
+        }
+      ]
+    },
+    {
+      "file": "legacy-core/option/optgroup-base.ts",
+      "module": "@angular/core",
+      "symbol": "signal",
+      "candidate_source_sha256": "e3a31d60c8ab4215bd4ee8db280fc1c3b1c2820444102664f70019f4b51f0519",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "Private `_groupDisabled` signal backs the same public boolean disabled property. Its setter stores the CDK-coerced value; its getter is consumed by the optgroup host ARIA bindings and by child option disabled checks. The added signal read lets those OnPush views observe disabled changes. No signal is exposed as a component input/output. This is a bounded current public-use source judgment; broader artifact, runtime and floor claims remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-new-routes-source-evidence-v1.json",
+          "sha256": "ce4d574f99338b535e596c84564f88bf49d994139fe298c3b5820ef020eb618e"
+        }
+      ]
+    },
+    {
+      "file": "legacy-core/option/option-base.ts",
+      "module": "@angular/core",
+      "symbol": "signal",
+      "candidate_source_sha256": "ec787fa20e331afb90856d2f413ca3551396f3f6954b30cc6de762a6864c931c",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "Private `#legacyDisabledState` is read by the disabled getter (template/host consumers) and set after the public input is coerced. It is a dependency marker for views, leaving selected/group-disabled/input value semantics unchanged. Current template uses disabled for aria-disabled, disabled styling and ripple suppression. This is a bounded current public-use source judgment; broader artifact, runtime and floor claims remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-new-routes-source-evidence-v1.json",
+          "sha256": "ce4d574f99338b535e596c84564f88bf49d994139fe298c3b5820ef020eb618e"
+        }
+      ]
+    },
+    {
+      "file": "legacy-form-field/form-field.ts",
+      "module": "@angular/core",
+      "symbol": "AfterViewChecked",
+      "candidate_source_sha256": "ea2bcd2a85cb1511cfa57a7d68d2edd45757ecd703df0ebfa0d613e3f4b79ccd",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "AfterViewChecked drives the current subscript-message enter path: it detects message-kind changes, cancels a superseded WAAPI animation, restores the tagged inline resting opacity/translateY, animates only in browser with motion enabled and Element.animate support (300 ms with tagged easing), and cancels on destroy. The Material 16 lifecycle used Angular animation triggers; current code is an owned engine-free equivalent. Independent review found no additional blocker within this finite scope. Do not infer generated Angular animation marker parity or complete clean packed/floor/hydration/G11 clearance. This is a bounded current public-use source judgment; broader artifact, runtime and floor claims remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-new-routes-source-evidence-v1.json",
+          "sha256": "ce4d574f99338b535e596c84564f88bf49d994139fe298c3b5820ef020eb618e"
+        }
+      ]
+    },
+    {
+      "file": "legacy-paginator/paginator.ts",
+      "module": "@angular/core",
+      "symbol": "ElementRef",
+      "candidate_source_sha256": "4f050bc5f5818f13d33c7428bdd9d7a8a36b4bf70dbb77ac12e088002bbd9540",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "Used only with the MatLegacySelect ViewChild to read its host layout/visibility and confirm the pointer target. Handler queries geometry/styles and calls the select container-click method; it does not write HTML or styles. This is a new page-size pointer-target extension relative to the tagged legacy paginator. Existing focused spec states flex clicks retain their original handler and enumerates pointer/visibility/disabled guards; source only, not executed. This is a bounded current public-use source judgment; broader artifact, runtime and floor claims remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-new-routes-source-evidence-v1.json",
+          "sha256": "ce4d574f99338b535e596c84564f88bf49d994139fe298c3b5820ef020eb618e"
+        }
+      ]
+    },
+    {
+      "file": "legacy-paginator/paginator.ts",
+      "module": "@angular/core",
+      "symbol": "ViewChild",
+      "candidate_source_sha256": "4f050bc5f5818f13d33c7428bdd9d7a8a36b4bf70dbb77ac12e088002bbd9540",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "Resolves the legacy select instance and its host ElementRef used by `_handlePageSizeTargetClick`; the change extends only clicks inside the paginator page-size region outside `.mat-form-field-flex`. Current spec source covers extension and preserved flex path; no execution claim. This is a bounded current public-use source judgment; broader artifact, runtime and floor claims remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-new-routes-source-evidence-v1.json",
+          "sha256": "ce4d574f99338b535e596c84564f88bf49d994139fe298c3b5820ef020eb618e"
+        }
+      ]
+    },
+    {
+      "file": "legacy-select/internal/select-base.ts",
+      "module": "@angular/core",
+      "symbol": "signal",
+      "candidate_source_sha256": "120ab123d79e58ea256211cafa50268dba3ce26524426e88b0347a8624aee68d",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex source-use reviewer",
+      "decision": "Private `_selectDisableRipple` signal backs the existing boolean `disableRipple` property. Setter applies the same CDK boolean coercion; option getter/template reads parent disableRipple and signal tracking lets option views reflect later changes. Current select spec source includes signal-driven host changes for disabled/group-disabled/nested-disabled/ripple values, checking option properties, ARIA and ripple-disabled state; not executed. This is a bounded current public-use source judgment; broader artifact, runtime and floor claims remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-authored-use-new-routes-source-evidence-v1.json",
+          "sha256": "ce4d574f99338b535e596c84564f88bf49d994139fe298c3b5820ef020eb618e"
+        }
+      ]
+    }
+  ]
+}
