@@ -9,7 +9,7 @@
 
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
+import {MatLegacyCommonModule as MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 import {MatLegacySlider} from './slider';
 
 

@@ -8,4 +8,3 @@
 
 export {MatLegacyButtonModule} from './button-module';
 export {MatLegacyButton, MatLegacyAnchor} from './button';
-export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';

@@ -11,7 +11,7 @@ import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {MatRippleModule, MatLineModule} from '@angular/material/core';
 import {MatLegacyPseudoCheckboxModule as MatPseudoCheckboxModule} from '@ngx-compat/material-legacy/legacy-core';
-import {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
+import {MatLegacyCommonModule as MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 import {
   MatLegacyList,
   MatLegacyNavList,

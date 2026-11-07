@@ -10,7 +10,7 @@
 import {ObserversModule} from '@angular/cdk/observers';
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
+import {MatLegacyCommonModule as MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 import {MatLegacyError} from './error';
 import {MatLegacyFormField} from './form-field';
 import {MatLegacyHint} from './hint';

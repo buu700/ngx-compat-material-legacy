@@ -30,7 +30,6 @@ export {MAT_LEGACY_FORM_FIELD, MAT_LEGACY_SUFFIX, MAT_LEGACY_ERROR, MAT_LEGACY_P
 
 // Historical `/animations` recipe secondary removed (F04); use CSS/Web Animations via MATERIAL_ANIMATIONS.
 
-export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 
 export {
 

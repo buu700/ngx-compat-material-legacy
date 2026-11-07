@@ -11,7 +11,7 @@ import {OverlayModule} from '@angular/cdk/overlay';
 import {A11yModule} from '@angular/cdk/a11y';
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
+import {MatLegacyCommonModule as MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 import {CdkScrollableModule} from '@angular/cdk/scrolling';
 import {MatLegacyTooltip, LegacyTooltipComponent} from './tooltip';
 import {MAT_TOOLTIP_SCROLL_STRATEGY_FACTORY_PROVIDER} from './internal/tooltip-base';

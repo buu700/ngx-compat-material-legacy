@@ -11,7 +11,7 @@ import {OverlayModule} from '@angular/cdk/overlay';
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {MatRippleModule} from '@angular/material/core';
-import {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
+import {MatLegacyCommonModule as MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 import {CdkScrollableModule} from '@angular/cdk/scrolling';
 import {MAT_MENU_SCROLL_STRATEGY_FACTORY_PROVIDER} from './internal/menu-trigger-base';
 import {MatLegacyMenu} from './menu';

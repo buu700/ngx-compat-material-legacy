@@ -1,32 +1,32 @@
 /** @license Copyright Google LLC All Rights Reserved. Copyright (c) 2026 Ryan Lester. MIT. */
 import 'zone.js';
-import {Component, NgModule, ViewChild} from '@angular/core';
+import type {} from './api-surface';
+import {Component, createNgModule, NgModule, ViewChild} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {Dir} from '@angular/cdk/bidi';
-import {MatCommonModule as Core, MATERIAL_LEGACY_SANITY_CHECKS} from '@ngx-compat/material-legacy/legacy-core';
-import {MatLegacyCardModule, MatCommonModule as Card} from '@ngx-compat/material-legacy/legacy-card';
-import {MatLegacyProgressBarModule, MatCommonModule as Bar} from '@ngx-compat/material-legacy/legacy-progress-bar';
-import {MatLegacyProgressSpinnerModule, MatCommonModule as Spinner} from '@ngx-compat/material-legacy/legacy-progress-spinner';
-import {MatCommonModule as Root} from '@ngx-compat/material-legacy';
-import {MatCommonModule as M0} from '@ngx-compat/material-legacy/legacy-autocomplete';
-import {MatCommonModule as M1} from '@ngx-compat/material-legacy/legacy-button';
-import {MatCommonModule as M2} from '@ngx-compat/material-legacy/legacy-checkbox';
-import {MatCommonModule as M3} from '@ngx-compat/material-legacy/legacy-chips';
-import {MatCommonModule as M4} from '@ngx-compat/material-legacy/legacy-dialog';
-import {MatCommonModule as M5} from '@ngx-compat/material-legacy/legacy-form-field';
-import {MatCommonModule as M6} from '@ngx-compat/material-legacy/legacy-input';
-import {MatCommonModule as M7} from '@ngx-compat/material-legacy/legacy-list';
-import {MatCommonModule as M8} from '@ngx-compat/material-legacy/legacy-menu';
-import {MatCommonModule as M9} from '@ngx-compat/material-legacy/legacy-paginator';
-import {MatCommonModule as M10} from '@ngx-compat/material-legacy/legacy-radio';
-import {MatCommonModule as M11} from '@ngx-compat/material-legacy/legacy-select';
-import {MatCommonModule as M12} from '@ngx-compat/material-legacy/legacy-slide-toggle';
-import {MatCommonModule as M13} from '@ngx-compat/material-legacy/legacy-slider';
-import {MatCommonModule as M14} from '@ngx-compat/material-legacy/legacy-snack-bar';
-import {MatCommonModule as M15} from '@ngx-compat/material-legacy/legacy-table';
-import {MatCommonModule as M16} from '@ngx-compat/material-legacy/legacy-tabs';
-import {MatCommonModule as M17} from '@ngx-compat/material-legacy/legacy-tooltip';
+import {MatLegacyCommonModule as Core, MATERIAL_LEGACY_SANITY_CHECKS} from '@ngx-compat/material-legacy/legacy-core';
+import {MatLegacyAutocompleteModule} from '@ngx-compat/material-legacy/legacy-autocomplete';
+import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
+import {MatLegacyCardModule} from '@ngx-compat/material-legacy/legacy-card';
+import {MatLegacyCheckboxModule} from '@ngx-compat/material-legacy/legacy-checkbox';
+import {MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
+import {MatLegacyDialogModule} from '@ngx-compat/material-legacy/legacy-dialog';
+import {MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
+import {MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';
+import {MatLegacyListModule} from '@ngx-compat/material-legacy/legacy-list';
+import {MatLegacyMenuModule} from '@ngx-compat/material-legacy/legacy-menu';
+import {MatLegacyPaginatorModule} from '@ngx-compat/material-legacy/legacy-paginator';
+import {MatLegacyProgressBarModule} from '@ngx-compat/material-legacy/legacy-progress-bar';
+import {MatLegacyProgressSpinnerModule} from '@ngx-compat/material-legacy/legacy-progress-spinner';
+import {MatLegacyRadioModule} from '@ngx-compat/material-legacy/legacy-radio';
+import {MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';
+import {MatLegacySlideToggleModule} from '@ngx-compat/material-legacy/legacy-slide-toggle';
+import {MatLegacySliderModule} from '@ngx-compat/material-legacy/legacy-slider';
+import {MatLegacySnackBarModule} from '@ngx-compat/material-legacy/legacy-snack-bar';
+import {MatLegacyTableModule} from '@ngx-compat/material-legacy/legacy-table';
+import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
+import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
 import {MatButtonModule} from '@angular/material/button';
 @Component({selector:'lab-root',standalone:false,template:'<div dir="rtl">OK</div>'}) class App0 { @ViewChild(Dir) dir!:Dir; ngAfterViewInit(){(window as any).bidi=this.dir.value;} }
 @Component({selector:'lab-root',standalone:false,template:'<div dir="rtl">OK</div>'}) class App1 { @ViewChild(Dir) dir!:Dir; ngAfterViewInit(){(window as any).bidi=this.dir.value;} }
@@ -42,4 +42,53 @@ const on={provide:MATERIAL_LEGACY_SANITY_CHECKS,useValue:true}, off={provide:MAT
 @NgModule({imports:[BrowserModule,MatLegacyProgressBarModule,MatLegacyCardModule,MatLegacyProgressSpinnerModule,MatButtonModule],declarations:[App4],bootstrap:[App4],providers:[on]}) class LegacyFirst {}
 @NgModule({imports:[BrowserModule,MatButtonModule,MatLegacyProgressSpinnerModule,MatLegacyCardModule,MatLegacyProgressBarModule],declarations:[App5],bootstrap:[App5],providers:[on]}) class ModernFirst {}
 const modules:any={card:CardOn,bar:BarOn,spinner:SpinnerOn,disabled:CardOff,legacyFirst:LegacyFirst,modernFirst:ModernFirst};
-(window as any).start=async (which:string)=>{const warnings:string[]=[];const old=console.warn;console.warn=(...x:unknown[])=>{warnings.push(x.map(String).join(' '));};try{const mod=await platformBrowserDynamic().bootstrapModule(modules[which]);return {same:[Root,Card,Bar,Spinner,M0,M1,M2,M3,M4,M5,M6,M7,M8,M9,M10,M11,M12,M13,M14,M15,M16,M17].every(module => (module as unknown) === Core),instance:mod.injector.get(Core,null) instanceof Core,bidi:(window as any).bidi,warnings,classes:Array.from(document.body.classList),userAgent:navigator.userAgent};}finally{console.warn=old;}};
+@NgModule({}) class MissingCommonModule {}
+class ForeignCommonModule {}
+@NgModule({providers:[{provide:Core,useClass:ForeignCommonModule}]}) class ForeignCommonProvider {}
+@NgModule({providers:[{provide:Core,useValue:{constructor:Core}}]}) class SameConstructorProvider {}
+function isOwnedCommon(instance: Core | null): boolean {
+  return instance instanceof Core && instance.constructor === Core;
+}
+const familyModules = [MatLegacyAutocompleteModule, MatLegacyButtonModule, MatLegacyCardModule,
+  MatLegacyCheckboxModule, MatLegacyChipsModule, MatLegacyDialogModule, MatLegacyFormFieldModule,
+  MatLegacyInputModule, MatLegacyListModule, MatLegacyMenuModule, MatLegacyPaginatorModule,
+  MatLegacyProgressBarModule, MatLegacyProgressSpinnerModule, MatLegacyRadioModule,
+  MatLegacySelectModule, MatLegacySlideToggleModule, MatLegacySliderModule,
+  MatLegacySnackBarModule, MatLegacyTableModule, MatLegacyTabsModule, MatLegacyTooltipModule];
+(window as any).start=async (which:string)=>{
+  const warnings:string[]=[];
+  const old=console.warn;
+  console.warn=(...x:unknown[])=>{warnings.push(x.map(String).join(' '));};
+  try {
+    const mod=await platformBrowserDynamic().bootstrapModule(modules[which]);
+    const bootstrapWarnings=warnings.slice();
+    const missing:string[]=[];
+    for (const family of familyModules) {
+      const ref=createNgModule(family,mod.injector);
+      try {
+        const instance=ref.injector.get(Core,null,{self:true});
+        if (!isOwnedCommon(instance)) missing.push(family.name);
+      } finally { ref.destroy(); }
+    }
+    const empty=createNgModule(MissingCommonModule,mod.injector);
+    let missingRejected=false;
+    try { missingRejected=empty.injector.get(Core,null,{self:true}) === null; }
+    finally { empty.destroy(); }
+    const foreign=createNgModule(ForeignCommonProvider,mod.injector);
+    let foreignRejected=false;
+    try {
+      const instance=foreign.injector.get(Core,null,{self:true});
+      foreignRejected=instance instanceof ForeignCommonModule && !isOwnedCommon(instance);
+    } finally { foreign.destroy(); }
+    const spoof=createNgModule(SameConstructorProvider,mod.injector);
+    let spoofRejected=false;
+    try {
+      const instance=spoof.injector.get(Core,null,{self:true});
+      spoofRejected=!!instance && instance.constructor === Core && !isOwnedCommon(instance);
+    } finally { spoof.destroy(); }
+    return {missing,same:missing.length===0 && missingRejected && foreignRejected && spoofRejected,
+      missingRejected,foreignRejected,spoofRejected,instance:mod.injector.get(Core,null) instanceof Core,
+      bidi:(window as any).bidi,warnings:bootstrapWarnings,classes:Array.from(document.body.classList),
+      userAgent:navigator.userAgent};
+  } finally { console.warn=old; }
+};

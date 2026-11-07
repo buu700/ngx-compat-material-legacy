@@ -19,7 +19,6 @@ export {
   MatProgressBarLocation as MatLegacyProgressBarLocation,
   MAT_PROGRESS_BAR_LOCATION_FACTORY as MAT_LEGACY_PROGRESS_BAR_LOCATION_FACTORY,
 } from './internal/progress-bar-location';
-export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 
 export {
   MatProgressBarDefaultOptions as MatLegacyProgressBarDefaultOptions,

@@ -15,7 +15,6 @@ export {
 
 } from '@angular/material/input';
 
-export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 
 export {
 

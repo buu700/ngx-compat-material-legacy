@@ -10,7 +10,7 @@
 import {ObserversModule} from '@angular/cdk/observers';
 import {NgModule} from '@angular/core';
 import {MatRippleModule} from '@angular/material/core';
-import {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
+import {MatLegacyCommonModule as MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 import {MatLegacySlideToggle} from './slide-toggle';
 import {_MatSlideToggleRequiredValidatorModule} from './internal/slide-toggle-required-validator';
 

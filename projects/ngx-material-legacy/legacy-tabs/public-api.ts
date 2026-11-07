@@ -52,5 +52,4 @@ export {
   _MAT_INK_BAR_POSITIONER as _MAT_LEGACY_INK_BAR_POSITIONER,
   _MAT_INK_BAR_POSITIONER_FACTORY as _MAT_LEGACY_INK_BAR_POSITIONER_FACTORY,
 } from './internal/ink-bar-shared';
-export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 export {MAT_TAB as MAT_LEGACY_TAB} from './internal/tab-token';

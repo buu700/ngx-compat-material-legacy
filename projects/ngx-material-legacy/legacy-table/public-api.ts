@@ -42,4 +42,3 @@ export {
 
   _MatTableDataSource as _MatLegacyTableDataSource,
 } from './internal/table-data-source-base';
-export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';

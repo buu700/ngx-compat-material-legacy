@@ -28,4 +28,3 @@ export {
  */
 // tslint:disable-next-line:variable-name
 export const MatLegacySpinner = MatLegacyProgressSpinner;
-export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';

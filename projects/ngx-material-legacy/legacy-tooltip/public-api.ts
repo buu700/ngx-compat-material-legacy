@@ -40,7 +40,6 @@ export {
 
   MAT_TOOLTIP_DEFAULT_OPTIONS as MAT_LEGACY_TOOLTIP_DEFAULT_OPTIONS,
 } from '@angular/material/tooltip';
-export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 
 export {
 

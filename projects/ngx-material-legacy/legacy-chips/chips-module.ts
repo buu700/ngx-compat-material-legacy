@@ -10,7 +10,7 @@
 import {ENTER} from '@angular/cdk/keycodes';
 import {NgModule} from '@angular/core';
 import {ErrorStateMatcher} from '@angular/material/core';
-import {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
+import {MatLegacyCommonModule as MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 import {
   MatLegacyChip,
   MatLegacyChipAvatar,

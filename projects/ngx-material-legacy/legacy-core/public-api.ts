@@ -7,7 +7,7 @@
  */
 
 export * from './option/index';
-export {MatCommonModule, MatCommonModule as MatLegacyCommonModule} from './internal/common-module';
+export {MatCommonModule as MatLegacyCommonModule} from './internal/common-module';
 
 export {
   MATERIAL_ANIMATIONS,

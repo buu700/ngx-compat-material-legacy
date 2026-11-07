@@ -40,4 +40,3 @@ export {
 
 } from '@angular/material/snack-bar';
 export {MatLegacySnackBarConfig} from './snack-bar-config';
-export {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';

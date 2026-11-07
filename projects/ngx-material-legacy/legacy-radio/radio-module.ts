@@ -9,7 +9,7 @@
 
 import {NgModule} from '@angular/core';
 import {MatRippleModule} from '@angular/material/core';
-import {MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
+import {MatLegacyCommonModule as MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';
 import {MatLegacyRadioButton, MatLegacyRadioGroup} from './radio';
 
 
