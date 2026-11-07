@@ -22,6 +22,49 @@ describe('MatPaginator', () => {
     return fixture;
   }
 
+  it('extends only the page-size pointer target and leaves existing flex clicks alone', () => {
+    const fixture = createComponent(MatPaginatorApp);
+    const select = fixture.debugElement.query(By.directive(MatLegacySelect)).componentInstance as MatLegacySelect;
+    const element = fixture.nativeElement.querySelector('mat-select') as HTMLElement;
+    const container = fixture.nativeElement.querySelector('.mat-paginator-page-size') as HTMLElement;
+    const wrapper = fixture.nativeElement.querySelector('.mat-form-field-wrapper') as HTMLElement;
+    const flex = fixture.nativeElement.querySelector('.mat-form-field-flex') as HTMLElement;
+    spyOn(element, 'getBoundingClientRect').and.returnValue({left: 100, right: 156, top: 20,
+      bottom: 34, width: 56, height: 14, x: 100, y: 20, toJSON: () => ({})} as DOMRect);
+    const clientRects = spyOn(element, 'getClientRects').and.returnValue([{}] as unknown as DOMRectList);
+    const opened = spyOn(select, 'onContainerClick');
+    const click = (target: Element, x: number, y: number, detail = 1, button = 0) =>
+      target.dispatchEvent(new MouseEvent('click', {bubbles: true, detail, button, clientX: x, clientY: y}));
+
+    click(container, 128, 4); // Inside the expanded rectangle, outside the field flex.
+    expect(opened).toHaveBeenCalledTimes(1);
+    click(wrapper, 128, 50);
+    expect(opened).toHaveBeenCalledTimes(2);
+    click(container, 99, 27); // Outside natural width.
+    click(container, 128, 52); // Outside 48 px height.
+    click(container, 128, 4, 0); // Keyboard/synthetic click.
+    click(container, 128, 4, -1); // Non-pointer synthetic click.
+    click(container, 128, 4, 1, 2); // Non-primary button.
+    expect(opened).toHaveBeenCalledTimes(2);
+    click(flex, 128, 27);
+    expect(opened).toHaveBeenCalledTimes(3); // Existing form-field handler only.
+    clientRects.and.returnValue([] as unknown as DOMRectList);
+    click(container, 128, 4);
+    clientRects.and.returnValue([{}] as unknown as DOMRectList);
+    element.style.visibility = 'hidden';
+    click(container, 128, 4);
+    element.style.visibility = '';
+    const panelOpen = spyOnProperty(select, 'panelOpen', 'get').and.returnValue(true);
+    click(container, 128, 4);
+    panelOpen.and.returnValue(false);
+    expect(opened).toHaveBeenCalledTimes(3);
+    fixture.componentInstance.disabled = true;
+    fixture.detectChanges();
+    click(container, 128, 4);
+    expect(opened).toHaveBeenCalledTimes(3);
+    fixture.destroy();
+  });
+
   describe('with the default internationalization provider', () => {
     describe('showing the right range text', () => {
       it('should show second page of list of 100, each page contains 10 items', () => {

@@ -11,11 +11,15 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
+  HostListener,
   Inject,
   InjectionToken,
   Optional,
   ViewEncapsulation,
+  ViewChild,
 } from '@angular/core';
+import {MatLegacySelect} from '@ngx-compat/material-legacy/legacy-select';
 import {MatLegacyFormFieldAppearance} from '@ngx-compat/material-legacy/legacy-form-field';
 import {MatPaginatorIntl} from '@angular/material/paginator';
 import {_MatPaginatorBase} from './internal/paginator-base';
@@ -68,6 +72,40 @@ export const MAT_LEGACY_PAGINATOR_DEFAULT_OPTIONS =
 export class MatLegacyPaginator extends _MatPaginatorBase<MatLegacyPaginatorDefaultOptions> {
   /** If set, styles the "page size" form field with the designated style. */
   _formFieldAppearance?: MatLegacyFormFieldAppearance;
+
+  @ViewChild(MatLegacySelect) private _pageSizeSelect?: MatLegacySelect;
+  @ViewChild(MatLegacySelect, {read: ElementRef}) private _pageSizeSelectElement?: ElementRef<HTMLElement>;
+
+  /** Extend the page-size pointer target without changing the historical field layout. */
+  @HostListener('click', ['$event'])
+  protected _handlePageSizeTargetClick(event: MouseEvent): void {
+    const select = this._pageSizeSelect;
+    const element = this._pageSizeSelectElement?.nativeElement;
+    const target = event.target as Element | null;
+    if (event.detail <= 0 || event.button !== 0 || this.disabled || this.hidePageSize ||
+        !select || select.disabled || select.panelOpen || !element || !target || target.nodeType !== 1) {
+      return;
+    }
+
+    const container = element.closest('.mat-paginator-page-size');
+    // The form-field already forwards these clicks to the select. Preserve that path exactly.
+    if (!container || !container.contains(target) || target.closest('.mat-form-field-flex')) {
+      return;
+    }
+    const rect = element.getBoundingClientRect();
+    const style = element.ownerDocument.defaultView?.getComputedStyle(element);
+    if (!element.getClientRects().length || !rect.width || !rect.height ||
+        !style || style.display === 'none' || style.visibility !== 'visible') {
+      return;
+    }
+    const centerY = (rect.top + rect.bottom) / 2;
+    // Pointer click coordinates are integer CSS pixels in Chromium even when layout is fractional.
+    // Include the pixel cells that intersect the visual rectangle.
+    if (event.clientX >= Math.floor(rect.left) && event.clientX < Math.ceil(rect.right) &&
+        event.clientY >= Math.floor(centerY - 24) && event.clientY < Math.ceil(centerY + 24)) {
+      select.onContainerClick();
+    }
+  }
 
   constructor(
     intl: MatPaginatorIntl,
