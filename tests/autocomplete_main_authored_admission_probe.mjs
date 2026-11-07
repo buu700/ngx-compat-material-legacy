@@ -16,7 +16,7 @@ const hash=x=>createHash('sha256').update(x).digest('hex'), base=p=>readFileSync
 const read=p=>existsSync(join(candidate,p))?readFileSync(join(candidate,p)):base(p);
 const fresh=JSON.parse(read(path)), review=JSON.parse(read(reviewPath));
 const old=structuredClone(fresh);for(let i=0;i<old.symbol_uses.length;i++){const row=old.symbol_uses[i];if(row.file===target){const original=review.reviews.find(r=>r.file===row.file&&r.module===row.module&&r.symbol===row.symbol);assert.ok(original);old.symbol_uses[i]=structuredClone(original.previous_ledger_record_complete);}}
-if(candidate!==root) assert.deepEqual(old,JSON.parse(base(path))); 
+if(candidate!==root) assert.deepEqual(old,JSON.parse(base(path)));
 const key=r=>JSON.stringify([r.file,r.module,r.symbol]);
 assert.equal(old.symbol_uses.length,1736);assert.equal(fresh.symbol_uses.length,1736);
 assert.deepEqual(fresh.symbol_uses.map(key),old.symbol_uses.map(key));
