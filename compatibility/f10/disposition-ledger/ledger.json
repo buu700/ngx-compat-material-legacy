@@ -70746,18 +70746,94 @@
         "src/material/table/table.spec.ts"
       ],
       "diff_sha256": "0d427c825fb9c6d46dfeedb49aeb164e5ec51b801b97f454d790a9ae4786fab5",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/dabbf3e97b65f06832995b217f3c680d89675515.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/rc/c04-table-type-erasure/review.json",
+      "batch_id": "main-c04-table-type-erasure-individual-source",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/table/table-data-source.spec.ts changes `@ViewChild(MatSort, {static: true}) sort: MatSort;`. That line is not in the legacy sources. @angular/material/table is exercised by projects/ngx-material-legacy/legacy-table/testing/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/table imported by projects/ngx-material-legacy/legacy-table/testing/public-api.ts"
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "complete-type-only-upstream-source-review",
+      "reason": "The complete upstream patch adds the TypeScript definite-assignment marker to the public filteredData field of the current Material table data source and to fourteen upstream test fixture query fields; it changes no initializer, executable statement, template, style or build configuration. The exported legacy data source instead extends the separately owned _MatTableDataSource, whose filteredData declaration and actual filter assignment are bound in this review; an import of the current peer testing entry does not establish inheritance for that owned implementation. Preserve the historical source contract without copying the type-only current peer annotation. The owned library tsconfig explicitly sets strictPropertyInitialization to false; other compiler configurations are not qualified. This is a main-only source decision and claims no native execution, installed-peer behavioral inheritance, security clearance, 21.x, or G11.",
+      "affected_branches": [
+        "main"
+      ],
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "whole-hunk-owned-and-package-boundary-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_evidence_scope": "current",
+        "source_evidence": [
+          {
+            "path": "compatibility/rc/c04-table-type-erasure/upstream-objects.json",
+            "sha256": "afd459c6b4e6d90324ae03df9cc5d93dc3e6404b6483aa1fe9bb8a902e8aaad3",
+            "bytes": 171515
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+            "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374",
+            "bytes": 16475
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table-data-source.ts",
+            "sha256": "b8c35487e4234549a48563b64665b9d38e0ac0f90310d3957b7f31e8084f7904",
+            "bytes": 1231
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/public-api.ts",
+            "sha256": "005de0b1fc6edec1d34bf322eb029aa2b127bd59bb5fef03ed20602c291676e2",
+            "bytes": 1401
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+            "sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5",
+            "bytes": 3464
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+            "sha256": "6987ae268b614e3d445852fe9eb99e05d1f7c6c5669505079ed142586ab47d1e",
+            "bytes": 48314
+          },
+          {
+            "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+            "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863",
+            "bytes": 1585
+          }
+        ],
+        "diff_sha256": "6ea94991e1d0eab0b018ad13d88faf61764e11decf75b9b070dd07b03ae0339b",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete upstream patch adds the TypeScript definite-assignment marker to the public filteredData field of the current Material table data source and to fourteen upstream test fixture query fields; it changes no initializer, executable statement, template, style or build configuration. The exported legacy data source instead extends the separately owned _MatTableDataSource, whose filteredData declaration and actual filter assignment are bound in this review; an import of the current peer testing entry does not establish inheritance for that owned implementation. Preserve the historical source contract without copying the type-only current peer annotation. The owned library tsconfig explicitly sets strictPropertyInitialization to false; other compiler configurations are not qualified. This is a main-only source decision and claims no native execution, installed-peer behavioral inheritance, security clearance, 21.x, or G11."
+      },
+      "source_check": {
+        "diff_sha256": "6ea94991e1d0eab0b018ad13d88faf61764e11decf75b9b070dd07b03ae0339b",
+        "patch_path": "compatibility/rc/c04-table-type-erasure/review.json",
+        "review_membership": "dabbf3e97b65f06832995b217f3c680d89675515"
+      },
+      "prior_disposition_record": {
+        "sha": "dabbf3e97b65f06832995b217f3c680d89675515",
+        "bucket": "behavior-semantic",
+        "subject": "refactor(material/table): fix strict property initialization errors",
+        "files": [
+          "src/material/table/table-data-source.spec.ts",
+          "src/material/table/table-data-source.ts",
+          "src/material/table/table.spec.ts"
+        ],
+        "diff_sha256": "0d427c825fb9c6d46dfeedb49aeb164e5ec51b801b97f454d790a9ae4786fab5",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/dabbf3e97b65f06832995b217f3c680d89675515.json",
+        "batch_id": "unread-seed-content-review-2026-10-02",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "inherited",
+        "read_note_disposition": "inherited",
+        "reason": "The diff in src/material/table/table-data-source.spec.ts changes `@ViewChild(MatSort, {static: true}) sort: MatSort;`. That line is not in the legacy sources. @angular/material/table is exercised by projects/ngx-material-legacy/legacy-table/testing/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+        "peer_floor": {
+          "package": "@angular/material",
+          "installed": "22.1.7",
+          "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+          "delegation": "@angular/material/table imported by projects/ngx-material-legacy/legacy-table/testing/public-api.ts"
+        }
       }
     },
     {
