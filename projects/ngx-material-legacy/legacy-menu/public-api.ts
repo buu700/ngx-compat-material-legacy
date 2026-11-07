@@ -14,14 +14,6 @@ export {MatLegacyMenuModule} from './menu-module';
 export {MatLegacyMenuContent} from './menu-content';
 // Historical AnimationTriggerMetadata recipes moved to
 // native CSS motion (historical `/animations` recipe secondary removed in F04).
-export {_MatMenuBase as _MatLegacyMenuBase} from './internal/menu-base';
-export {_MatMenuTriggerBase as _MatLegacyMenuTriggerBase} from './internal/menu-trigger-base';
-export {_MatMenuContentBase as _MatLegacyMenuContentBase} from './internal/menu-content-base';
-export {
-  MAT_MENU_SCROLL_STRATEGY_FACTORY as MAT_LEGACY_MENU_SCROLL_STRATEGY_FACTORY,
-  MAT_MENU_SCROLL_STRATEGY_FACTORY_PROVIDER as MAT_LEGACY_MENU_SCROLL_STRATEGY_FACTORY_PROVIDER,
-  MENU_PANEL_TOP_PADDING as LEGACY_MENU_PANEL_TOP_PADDING,
-} from './internal/menu-trigger-base';
 export {
 
   MAT_MENU_DEFAULT_OPTIONS as MAT_LEGACY_MENU_DEFAULT_OPTIONS,

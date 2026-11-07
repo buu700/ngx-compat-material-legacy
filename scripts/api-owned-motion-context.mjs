@@ -30,7 +30,7 @@ const ownedMotionProfiles=Object.freeze({
  [FORM_FIELD_MOTION_SYMBOL]:Object.freeze({family:'legacy-form-field',property:'_animationsEnabled',enabled:true,
   constructorOwnerExport:'MatLegacyFormField',constructorOwnerDepth:0,constructorAnimationIndex:6,constructorArity:7}),
  [MENU_MOTION_SYMBOL]:Object.freeze({family:'legacy-menu',property:'_animationsEnabled',enabled:true,
-  constructorOwnerExport:'_MatLegacyMenuBase',constructorOwnerDepth:1}),
+  constructorOwnerExport:'MatLegacyMenu',constructorOwnerDepth:1,constructorOwnerViaPublicSubclass:true}),
  [TOOLTIP_MOTION_SYMBOL]:Object.freeze({family:'legacy-tooltip',property:'_animationsDisabled',enabled:false,
   constructorOwnerExport:'_LegacyTooltipComponentBase',constructorOwnerDepth:1,constructorAnimationIndex:2,constructorArity:3}),
  [DIALOG_MOTION_SYMBOL]:Object.freeze({family:'legacy-dialog',property:'_animationsEnabled',enabled:true,
@@ -127,12 +127,16 @@ export function partitionOwnedSelectMotion(requests,core,owned,layout,material,T
  const disabledScope=sourceScope(files.core,owned.legacyAnimationsDisabled);
  let callerType=Type,constructorOwner,constructorAnimationMode;
  if(profile.constructorOwnerExport){
-  const owner=familyExports?.[profile.constructorOwnerExport];
+  const exported=familyExports?.[profile.constructorOwnerExport];
+  const owner=profile.constructorOwnerViaPublicSubclass?Object.getPrototypeOf(exported):exported;
+  if(profile.constructorOwnerViaPublicSubclass&&(exported!==Type||Object.getPrototypeOf(Type.prototype)!==owner?.prototype))
+   throw Error('owned motion public subclass identity differs');
   if(typeof owner!=='function'||profile.constructorOwnerDepth===0&&owner!==Type
    ||profile.constructorOwnerDepth===1&&(Object.getPrototypeOf(Type)!==owner||!(Type.prototype instanceof owner)))
    throw Error('owned motion constructor owner is not the exact public owned export');
   callerType=owner;
-  constructorOwner={public_export:profile.constructorOwnerExport,depth:profile.constructorOwnerDepth,owned_class_identity_matched:true};
+  constructorOwner={...(profile.constructorOwnerViaPublicSubclass?{public_subclass_export:profile.constructorOwnerExport}:{public_export:profile.constructorOwnerExport}),
+   depth:profile.constructorOwnerDepth,owned_class_identity_matched:true};
  }
  if(profile.constructorAnimationIndex!==undefined){
   if(originalSymbol?.symbol_id!==symbolId)throw Error('original motion-mode constructor owner missing');
@@ -212,7 +216,7 @@ export function partitionOwnedSelectMotion(requests,core,owned,layout,material,T
 export function ownedSelectMotionProblems(observation,symbolId=SELECT_MOTION_SYMBOL){
  const x=observation,problems=[],profile=ownedMotionProfile(symbolId);
  if(profile?.constructorOwnerExport){
-  if(!isDeepStrictEqual(x?.constructor_owner,{public_export:profile.constructorOwnerExport,depth:profile.constructorOwnerDepth,owned_class_identity_matched:true}))
+  if(!isDeepStrictEqual(x?.constructor_owner,{...(profile.constructorOwnerViaPublicSubclass?{public_subclass_export:profile.constructorOwnerExport}:{public_export:profile.constructorOwnerExport}),depth:profile.constructorOwnerDepth,owned_class_identity_matched:true}))
    problems.push('owned motion constructor owner identity evidence incomplete');
   if(x?.caller?.file!==x?.sources?.caller?.file
    ||!x?.sources?.caller?.file?.endsWith('/fesm2022/ngx-compat-material-legacy-'+profile.family+'.mjs'))
