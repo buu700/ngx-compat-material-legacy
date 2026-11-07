@@ -16,6 +16,9 @@ import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
 import {selectDialogFiniteSuccessor} from './select-dialog-finite-source-successor.mjs';
 import {selectDialogFiniteSuccessor as selectDialogV6,selectDialogFiniteLoadedImage as selectV6Image} from './select-dialog-finite-source-v6.mjs';
 import {dialogFocusFiniteSourceSuccessor} from './dialog-focus-finite-source-successor.mjs';
+import {selectDialogFiniteSuccessor as selectDialogV7,selectDialogFiniteLoadedImage as selectV7Image} from './select-dialog-finite-source-v7.mjs';
+import {dialogFocusFiniteSourceSuccessor as dialogFocusV6,dialogFocusFiniteLoadedImage as focusV6Image} from './dialog-focus-finite-source-v6.mjs';
+import {mainSassGraphSuccessor} from './main-sass-graph-successor.mjs';
 
 const SELF = 'scripts/current-sass-source.mjs';
 const FOCUS_STYLE_PACKET=Object.freeze({path:'compatibility/rc/current-main-strong-focus-source-v1.json',sha256:'e4f6c47d595edc21f102a756e3a827d077c0f717f1968b8672c691d4fb336ccb',bytes:1030});
@@ -174,11 +177,13 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   };
   // Authenticate executable policy before the first supplied callback.
   assertPlanner();
+  let graphSuccessor=null;
   const assertPhysical = () => {
     for (const row of bound.values()) assert.deepEqual(reference(row.path, physical(root, row.path)), row, 'changed final physical source ' + row.path);
     product.assertPhysical();
     focus.assertPhysical();
     sixth.assertPhysical();
+    graphSuccessor?.assertPhysical();
   };
   const read = path => {
     const actual = physical(root, path);
@@ -194,22 +199,24 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   const productRead=providedRead ?? (path => physical(root,path));
   let product;
   if(initialLine==='main'){
-    assert.deepEqual(selectV6Image,{path:'scripts/select-dialog-finite-source-v6.mjs',sha256:'4bd50817e745cf5c1e410a1a4c2b28726d95529f6d9df7a4d2bf953fddc8560a',bytes:15483});
-    assert.deepEqual(reference(selectV6Image.path,physical(root,selectV6Image.path)),selectV6Image);
-    product=selectDialogV6({root,read:productRead,line:initialLine});
+    assert.deepEqual(selectV7Image,{path:'scripts/select-dialog-finite-source-v7.mjs',sha256:'87155482dbaa488a0e72ae0ba75c3edfe370bc11fcfc2ddd1ce3f0190a5609a6',bytes:17719});
+    assert.deepEqual(reference(selectV7Image.path,physical(root,selectV7Image.path)),selectV7Image);
+    product=selectDialogV7({root,read:productRead,line:initialLine});
   }else product=selectDialogFiniteSuccessor({root,read:productRead,line:initialLine});
   assert.equal(hash(physical(root, FOCUS_HELPER.path)), FOCUS_HELPER.sha256);
-  const focus = dialogFocusFiniteSourceSuccessor({root, read: providedRead ?? (path => physical(root,path)), line: initialLine});
+  if(initialLine==='main')assert.deepEqual(focusV6Image,{path:'scripts/dialog-focus-finite-source-v6.mjs',sha256:'c40a155191130898771839bf761183f850d3582fa2298fe2d9b197567c672f56',bytes:13030});
+  const focus = (initialLine==='main'?dialogFocusV6:dialogFocusFiniteSourceSuccessor)({root, read: providedRead ?? (path => physical(root,path)), line: initialLine});
   const sixth = stepperFactory(root,initialLine)({root, read: providedRead});
   for (const owner of [product, focus, sixth]) for (const ref of owner.bound) {
     if (bound.has(ref.path)) assert.deepEqual(bound.get(ref.path), ref);
     else bound.set(ref.path, {...ref});
   }
+  if(initialLine==='main'){assert.equal(hash(physical(root,'scripts/main-sass-graph-successor.mjs')),'cd00dd3ea8af9f0ef5a62d6ed3e5190147aaa9a6206693e9cebc72c0040016b5');read('scripts/main-sass-graph-successor.mjs');graphSuccessor=mainSassGraphSuccessor({root,read:providedRead});for(const r of graphSuccessor.bound){if(bound.has(r.path))assert.deepEqual(bound.get(r.path),r);else bound.set(r.path,r);}}
   let focusStyle=null,gitStyleBefore=null;
   const member = row => {
     const projected=focusStyle && row.path===focusStyle.before.path && row.sha256===focusStyle.before.sha256;
     if(projected)assert.equal(row.bytes,focusStyle.before.bytes);
-    const expected = projected ? focusStyle.after : sixth.qualify(row) ?? focus.qualify(row) ?? product.qualify(row) ?? row;
+    const expected = projected ? focusStyle.after : sixth.qualify(row) ?? focus.qualify(row) ?? product.qualify(row) ?? graphSuccessor?.qualify(row) ?? row;
     const bytes = read(row.path);
     assert.equal(hash(bytes), expected.sha256, 'changed current Sass source ' + row.path);
     assert.equal(bytes.length, expected.bytes);
@@ -290,13 +297,13 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   assert.ok(!changes.has(sixth.transition.path));
   changes.set(sixth.transition.path, structuredClone(sixth.transition));
   if(focusStyle){assert.ok(equalBytes(historical.get(focusStyle.before.path),gitStyleBefore));changes.set(focusStyle.before.path,{path:focusStyle.before.path,before:focusStyle.before,current:focusStyle.after});}
-  for (const row of source.inputs) member(changes.get(row.path)?.current ?? row);
+  for (const row of source.inputs) if(!graphSuccessor?.removed.includes(row.path)) member(changes.get(row.path)?.current ?? row);
   member(source.semantic_receipt);
   for (const row of source.unchanged_owned_sass_before_inputs) {
     const actual = member(changes.get(row.path)?.current ?? row);
     if (!changes.has(row.path)) assert.ok(equalBytes(actual, historical.get(row.path)));
   }
-  for (const row of protectedPacket.branches[line].protected_inputs) member(row);
+  for (const row of protectedPacket.branches[line].protected_inputs) if(!graphSuccessor?.removed.includes(row.path)) member(row);
   const graph = census.lines.find(row => row.line === line);
   assert.ok(graph);
   assert.equal(graph.non_target_owned_style_template_graph.length, graph.non_target_graph_count);

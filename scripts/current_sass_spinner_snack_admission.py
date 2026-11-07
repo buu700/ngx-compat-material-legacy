@@ -128,6 +128,7 @@ class CurrentSpinnerSnackContract:
         main = version.startswith('22.')
         successor = None
         select_successor = None
+        domain_successor = None
         if main:
             path = 'compatibility/rc/current-sass-stepper-source-executables-v1.json'
             raw = current(path)
@@ -143,6 +144,12 @@ class CurrentSpinnerSnackContract:
             assert [r['path'] for r in select_successor['authored_support']]==['scripts/select-dialog-finite-source-v6.mjs','scripts/select_dialog_finite_source_successor_v6.py','compatibility/rc/parent-select-dialog-menu-reviewed-repair-source-v6.json']
             for support in select_successor['authored_support']:assert _ref(support['path'],current(support['path']))==support
 
+            dp='compatibility/rc/current-sass-domain-source-executables-v1.json';draw=current(dp);assert (_hash(draw),len(draw))==('0567094315d8816f0d9205ce62a200a5dd0ac18ac10f335f5837a6441054092c',70524);domain_successor=json.loads(draw)
+            assert domain_successor['schema_version']==1 and domain_successor['role']=='main-current-sass-domain-executable-successor' and domain_successor['line']=='main' and domain_successor['source_scope_only'] is True and domain_successor['artifact_or_audit_admission_granted'] is False
+            assert domain_successor['previous_packet']==_ref('compatibility/rc/current-sass-select-source-executables-v2.json',next_raw)
+            assert [r['path'] for r in domain_successor['updates']]==[r['path'] for r in successor['updates']]
+            assert [r['path'] for r in domain_successor['authored_support']]==['scripts/select-dialog-finite-source-v7.mjs','scripts/select_dialog_finite_source_successor_v7.py','scripts/dialog-focus-finite-source-v6.mjs','scripts/dialog_focus_finite_source_successor_v6.py','scripts/main-sass-graph-successor.mjs','scripts/main_sass_graph_successor.py','compatibility/rc/parent-main-select-menu-sass-source-v7.json','compatibility/rc/parent-main-dialog-focus-sass-source-v6.json','compatibility/rc/parent-main-sass-domain-source-successor-v1.json']
+            for support in domain_successor['authored_support']:assert _ref(support['path'],current(support['path']))==support
             env = dict(PATH=os.environ.get('PATH',''), LANG='C', LC_ALL='C', GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null', GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')
             for row in successor['updates']:
                 before = subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',successor['source_parent']+':'+row['path']],cwd=root,env=env)
@@ -160,9 +167,14 @@ class CurrentSpinnerSnackContract:
                     old=edit['before'].encode();value=edit['after'].encode();assert after[edit['offset']:edit['offset']+len(old)]==old
                     next_parts.extend((after[at:edit['offset']],value));at=edit['offset']+len(old)
                 physical_after=b''.join([*next_parts,after[at:]])
-                assert _ref(row['path'],physical_after)==next_update['after'] and current(row['path'])==physical_after
+                assert _ref(row['path'],physical_after)==next_update['after']
+                end=next(item for item in domain_successor['updates'] if item['path']==row['path']);assert end['before']==next_update['after'];at=0;parts=[]
+                for edit in end['edits']:
+                    assert set(edit)=={'offset','before','after'} and type(edit['offset']) is int and edit['offset']>=at
+                    old=edit['before'].encode();assert physical_after[edit['offset']:edit['offset']+len(old)]==old;parts.extend((physical_after[at:edit['offset']],edit['after'].encode()));at=edit['offset']+len(old)
+                final=b''.join([*parts,physical_after[at:]]);assert _ref(row['path'],final)==end['after'] and current(row['path'])==final
         for path, sha256, size in PINS:
-            update = next((row for row in select_successor['updates'] if row['path']==path),None) if select_successor else None
+            update = next((row for row in domain_successor['updates'] if row['path']==path),None) if domain_successor else None
             member(update['after'] if update else dict(path=path, sha256=sha256, bytes=size))
         packet, current_packet = json.loads(current(INPUTS)), json.loads(current(SOURCE_INPUTS))
         source_context = CurrentSassSource(root, read=current)
@@ -175,7 +187,7 @@ class CurrentSpinnerSnackContract:
         member(branch['observation'])
         base = json.loads(current(packet['source_packet']['path']))
         sixth = json.loads(current(SIXTH_PACKET))
-        canonical_source = dict(source_subject=select_successor['updates'][0]['after'] if main else dict(path=PINS[0][0], sha256=PINS[0][1], bytes=PINS[0][2]),
+        canonical_source = dict(source_subject=domain_successor['updates'][0]['after'] if main else dict(path=PINS[0][0], sha256=PINS[0][1], bytes=PINS[0][2]),
             source_packet=dict(path=SOURCE_INPUTS, sha256=PINS[2][1], bytes=PINS[2][2]),
             source_modules=[r['current'] for r in base['branches'][line]['modules'] + current_packet['additional_modules']] + [json.loads(current('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json'))['transition']['after'] if main else sixth['branches'][line]['reviewed_after']] + ([json.loads(current('compatibility/rc/current-main-strong-focus-source-v1.json'))['after']] if main else []))
         assert source_context.descriptor == canonical_source

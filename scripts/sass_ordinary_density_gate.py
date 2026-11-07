@@ -37,6 +37,8 @@ def _density_successors(root,line,files):
     assert _hash(raw)=='d85c0dca28dbc166e3566eb3b173917c1524c68f5116a490826748ce4876ab2a' and len(raw)==34446;p=json.loads(raw)
     names=['scripts/companion-bridge-peer-oracle.mjs','scripts/current-sass-source.mjs','scripts/current-sass-spinner-snack-contract.mjs','scripts/current_sass_source.py','scripts/current_sass_spinner_snack_admission.py']
     assert p['schema_version']==1 and p['role']=='main-ordinary-density-exact-source-successor' and p['source_parent']=='42d02491648097656ccb3c590dbaaea066c3e603' and p['oracle_commit']=='33d7d9e31fd96cbfa6c4e1f592c0bade985c0878' and p['source_scope_only'] is True and [r['path'] for r in p['updates']]==names
+    vraw=_read(root,'compatibility/rc/current-main-density-input-successor-v2.json');assert (_hash(vraw),len(vraw))==('e6e385dde92ed1cdcc65998bdb6c9433458ed275572e528973e67a195b8c545f',92667);v2=json.loads(vraw)
+    assert v2['schema_version']==1 and v2['role']=='main-ordinary-density-current-source-successor' and v2['line']=='main' and v2['source_scope_only'] is True and v2['artifact_or_audit_admission_granted'] is False and v2['previous_packet']==dict(path=path,sha256=_hash(raw),bytes=len(raw)) and [r['path'] for r in v2['updates']]==names[1:]
     env=dict(PATH=os.environ.get('PATH',''),LANG='C',LC_ALL='C',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_SYSTEM='/dev/null',GIT_TERMINAL_PROMPT='0',GIT_NO_REPLACE_OBJECTS='1',GIT_NO_LAZY_FETCH='1')
     def git(commit,path):return subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',commit+':'+path],cwd=root,env=env)
     refs={}
@@ -44,9 +46,15 @@ def _density_successors(root,line,files):
         old=git(p['source_parent'],row['path']);manifest=next(r for r in files if r['path']==row['path']);assert manifest==row['before'] and _hash(old)==row['before']['sha256'] and len(old)==row['before']['bytes'];cursor=0;parts=[]
         for edit in row['edits']:
             assert set(edit)=={'offset','before','after'} and type(edit['offset']) is int and edit['offset']>=cursor;before=edit['before'].encode();after=edit['after'].encode();assert old[edit['offset']:edit['offset']+len(before)]==before;parts.extend((old[cursor:edit['offset']],after));cursor=edit['offset']+len(before)
-        after=b''.join([*parts,old[cursor:]]);assert row['after']['path']==row['path'] and _hash(after)==row['after']['sha256'] and len(after)==row['after']['bytes'] and _read(root,row['path'])==after
+        after=b''.join([*parts,old[cursor:]]);assert row['after']['path']==row['path'] and _hash(after)==row['after']['sha256'] and len(after)==row['after']['bytes']
         if row['path']==names[0]:assert git(p['oracle_commit'],row['path'])==after
-        refs[row['path']]=row['after']
+        update=next((x for x in v2['updates'] if x['path']==row['path']),None);final=after;final_ref=row['after']
+        if update:
+            assert update['before']==row['after'];at=0;parts=[]
+            for edit in update['edits']:
+                assert set(edit)=={'offset','before','after'} and type(edit['offset']) is int and edit['offset']>=at;old=edit['before'].encode();assert after[edit['offset']:edit['offset']+len(old)]==old;parts.extend((after[at:edit['offset']],edit['after'].encode()));at=edit['offset']+len(old)
+            final=b''.join([*parts,after[at:]]);final_ref=update['after'];assert _hash(final)==final_ref['sha256'] and len(final)==final_ref['bytes']
+        assert _read(root,row['path'])==final;refs[row['path']]=final_ref
     return refs
 
 class OrdinaryDensityGateContext:
@@ -78,14 +86,14 @@ class OrdinaryDensityGateContext:
         if m['schema_version']!=1 or type(rows) is not list or not rows or len({r['path'] for r in rows})!=len(rows):raise ValueError('proof manifest')
         if 'successors' not in state:state['successors']=_density_successors(root,line,rows)
         elif line=='main':
-            packet=_read(root,'compatibility/rc/current-main-density-input-successor-v1.json');assert _hash(packet)=='d85c0dca28dbc166e3566eb3b173917c1524c68f5116a490826748ce4876ab2a' and len(packet)==34446
+            packet=_read(root,'compatibility/rc/current-main-density-input-successor-v1.json');assert _hash(packet)=='d85c0dca28dbc166e3566eb3b173917c1524c68f5116a490826748ce4876ab2a' and len(packet)==34446;v=_read(root,'compatibility/rc/current-main-density-input-successor-v2.json');assert (_hash(v),len(v))==('e6e385dde92ed1cdcc65998bdb6c9433458ed275572e528973e67a195b8c545f',92667)
         successors=state['successors']
         for _ in range(2):
             for r in rows:
                 expected=successors.get(r['path'],r);b=_read(root,r['path'])
                 if _hash(b)!=expected['sha256'] or len(b)!=expected['bytes']:raise ValueError('dependency changed')
             if line=='main':
-                packet=_read(root,'compatibility/rc/current-main-density-input-successor-v1.json');assert _hash(packet)=='d85c0dca28dbc166e3566eb3b173917c1524c68f5116a490826748ce4876ab2a' and len(packet)==34446
+                packet=_read(root,'compatibility/rc/current-main-density-input-successor-v1.json');assert _hash(packet)=='d85c0dca28dbc166e3566eb3b173917c1524c68f5116a490826748ce4876ab2a' and len(packet)==34446;v=_read(root,'compatibility/rc/current-main-density-input-successor-v2.json');assert (_hash(v),len(v))==('e6e385dde92ed1cdcc65998bdb6c9433458ed275572e528973e67a195b8c545f',92667)
         source.assert_current()
 def ordinary_density_gate_descriptor(context,peer):
     if not __debug__ or type(context) is not OrdinaryDensityGateContext or context not in _CONTEXTS:raise ValueError('unknown context')

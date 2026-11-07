@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 from current_sass_source import CurrentSassSource
 from select_dialog_finite_source_successor_v4 import PACKETS, PATHS, LATEST, SELF as PRODUCT_SUCCESSOR, SelectDialogFiniteSourceV4
 from select_dialog_finite_source_successor_v6 import SelectDialogFiniteSourceV6
+from select_dialog_finite_source_successor_v7 import SelectDialogFiniteSourceV7
 
 NODE = 'node'
 INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json'
@@ -35,6 +36,7 @@ def candidate_fixture(destination):
     paths.update(row['path'] for row in CurrentSassSource(ROOT).bound)
     paths.update(('scripts/upstream-packed-run-evidence.mjs', 'scripts/dialog-focus-finite-source-successor.mjs', 'scripts/stepper-sixth-source.mjs'))
     if line == 'main':
+        paths.update(('scripts/select-dialog-finite-source-v7.mjs','scripts/dialog-focus-finite-source-v6.mjs','scripts/main-sass-graph-successor.mjs','scripts/select_dialog_finite_source_successor_v6.py'))
         paths.update(('compatibility/rc/current-sass-stepper-source-executables-v1.json','compatibility/rc/current-sass-stepper-spinner-executables-v1.json','scripts/stepper-program-transition-source.mjs','scripts/stepper_program_transition_source.py','compatibility/rc/current-sass-stepper-private-gate-executable-v1.json','compatibility/rc/current-sass-select-source-executables-v2.json','compatibility/rc/current-sass-select-spinner-executables-v2.json','compatibility/rc/current-sass-select-private-gate-executable-v2.json','scripts/select-program-transition-source.mjs','scripts/select_program_transition_source.py'))
     paths.add(PRODUCT_SUCCESSOR)
     paths.update(row[0] for row in PACKETS)
@@ -50,7 +52,11 @@ def candidate_fixture(destination):
     paths.update(row['path'] for row in protected['branches'][line]['protected_inputs'])
     paths.update(row['path'] for row in next(row for row in census['lines'] if row['line'] == line)['non_target_owned_style_template_graph'])
     paths.update(row['afterimage']['path'] for row in packet['additional_modules'])
+    removed = {'projects/ngx-material-legacy/legacy-progress-spinner/internal/common-module.ts', 'projects/ngx-material-legacy/legacy-snack-bar/internal/common-module.ts'} if line == 'main' else set()
+    assert all(not (ROOT / path).exists() and not (ROOT / path).is_symlink() for path in removed)
     for path in sorted(paths):
+        if path in removed:
+            continue
         if path.startswith('node_modules/'):
             continue
         target = destination / path
@@ -108,7 +114,9 @@ class CurrentSassSourceTests(unittest.TestCase):
     def test_v4_product_predecessors_and_physical_controls(self):
         if self.line == 'main':
             with self.assertRaises(AssertionError):SelectDialogFiniteSourceV4(self.root, line=self.line)
-        successor_type = SelectDialogFiniteSourceV6 if self.line == 'main' else SelectDialogFiniteSourceV4
+        successor_type = SelectDialogFiniteSourceV7 if self.line == 'main' else SelectDialogFiniteSourceV4
+        if self.line == 'main':
+            with self.assertRaises(AssertionError): SelectDialogFiniteSourceV6(self.root, line=self.line)
         successor = successor_type(self.root, line=self.line)
         packet = json.loads((self.root / PACKETS[-1][0]).read_bytes())
         branch = packet['branches'][self.line]
@@ -159,7 +167,7 @@ class CurrentSassSourceTests(unittest.TestCase):
                 armed = False
                 target.write_bytes(original + b'\n<!-- changed -->\n')
             return raw
-        successor_type = SelectDialogFiniteSourceV6 if self.line == 'main' else SelectDialogFiniteSourceV4
+        successor_type = SelectDialogFiniteSourceV7 if self.line == 'main' else SelectDialogFiniteSourceV4
         successor = successor_type(self.root, read=callback, line=self.line)
         try:
             armed = True

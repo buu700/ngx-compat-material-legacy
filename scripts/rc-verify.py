@@ -45,6 +45,7 @@ from sass_ordinary_control_gate import ORDINARY_CONTROL_GATE_CASES, ordinary_con
 from sass_ordinary_card_gate import ORDINARY_CARD_GATE_CASES, ordinary_card_gate_assertion_ok
 from sass_spinner_snack_gate_integration import SPINNER_SNACK_GATE_CASES, spinner_snack_gate_assertion_ok
 from sass_default_core_cdk_admission import DEFAULT_CORE_CDK_CASES, default_core_cdk_envelope_ok
+from sass_strong_focus_infrastructure import CASE as STRONG_FOCUS_CASE, focus_envelope_ok
 from sass_ordered_core_admission import ORDERED_CORE_CASES, ordered_core_envelope_ok
 from sass_ordered_legacy_button_admission import ORDERED_LEGACY_BUTTON_CASES, ordered_legacy_button_envelope_ok
 from sass_ordered_aggregate_admission import ORDERED_AGGREGATE_CASES, ordered_aggregate_envelope_ok
@@ -1418,6 +1419,8 @@ def _sass_seal_assertion_ok(body: dict, invocation: str) -> bool:
         return 'current_companion' not in body and ordered_legacy_button_envelope_ok(ACTIVE_RUN,body,invocation)
     if body.get('case_id') in ORDERED_AGGREGATE_CASES:
         return ordered_aggregate_envelope_ok(ACTIVE_RUN,body,invocation)
+    if body.get('case_id')==STRONG_FOCUS_CASE and body.get('line')=='main':
+        return SASS_API_ORACLE.is_file() and focus_envelope_ok(ACTIVE_RUN,body,invocation,evidence_sha256(SASS_API_ORACLE))
     if body.get('case_id') in DEFAULT_CORE_CDK_CASES:
         return 'current_companion' not in body and default_core_cdk_envelope_ok(ACTIVE_RUN,body,invocation)
     if 'current_infrastructure' in body or 'current_companion' in body:return False

@@ -29,18 +29,29 @@ def _isolated_expected_computation(root,line,operation,value):
     return out
 
 def _isolated_aggregate_matches(line,sources,peers,actual_css):
-    out=_isolated_expected_computation(ROOT,line,'ordered-aggregate-06',dict(peers=peers))
+    if line == 'main':
+        helper=ROOT/'scripts/sass-aggregate-source-successor.mjs';raw_helper=helper.read_bytes()
+        if hashlib.sha256(raw_helper).hexdigest()!='7a8d81b439bf0c3677e8be8fbfc710c68b449fdee717c38dba9cf67905f99c0c':return False
+        code=raw_helper.decode()+"\nconst __root=process.argv[1],__input=JSON.parse(readFileSync(0,'utf8'));process.stdout.write(JSON.stringify({result:aggregateExpectedSuccessor(__root,'main',__input),sources:aggregateProjectedSources(__root)}));"
+        node=shutil.which('node')
+        if not node:return False
+        result=subprocess.run([node,'--input-type=module','-e',code,str(ROOT)],input=json.dumps(peers,separators=(',',':'),ensure_ascii=False),text=True,capture_output=True,cwd=ROOT,env={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','LC_ALL':'C.UTF-8','TZ':'UTC'},timeout=150)
+        if result.returncode!=0 or helper.read_bytes()!=raw_helper:return False
+        projected=json.loads(result.stdout);out=projected['result'];expected=projected['sources']
+    else:
+        out=_isolated_expected_computation(ROOT,line,'ordered-aggregate-06',dict(peers=peers))
+        raw=(ROOT/'fixtures/sass/expected-isolation-inputs.json').read_bytes()
+        if hashlib.sha256(raw).hexdigest()!=out['closure_sha256']:return False
+        roots=('projects/ngx-material-legacy/','node_modules/@angular/material/','node_modules/@angular/cdk/')
+        expected=[]
+        for row in json.loads(raw)['files']:
+            for index,prefix in enumerate(roots):
+                if row['path'].startswith(prefix) and row['path'].endswith('.scss'):
+                    expected.append(dict(root=index,path=row['path'][len(prefix):],sha256=row['sha256'],bytes=row['bytes']))
+        expected.sort(key=lambda row:(row['root'],row['path']))
     if out['css']!=actual_css:return False
-    raw=(ROOT/'fixtures/sass/expected-isolation-inputs.json').read_bytes()
-    if hashlib.sha256(raw).hexdigest()!=out['closure_sha256']:return False
-    roots=('projects/ngx-material-legacy/','node_modules/@angular/material/','node_modules/@angular/cdk/')
-    expected=[]
-    for row in json.loads(raw)['files']:
-        for index,prefix in enumerate(roots):
-            if row['path'].startswith(prefix) and row['path'].endswith('.scss'):
-                expected.append(dict(root=index,path=row['path'][len(prefix):],sha256=row['sha256'],bytes=row['bytes']))
-    expected.sort(key=lambda row:(row['root'],row['path']))
     return bool(expected) and expected==sources
+
 
 
 _CATALOG=json.loads((ROOT/'fixtures/sass/ordered-aggregate-contracts.json').read_bytes())

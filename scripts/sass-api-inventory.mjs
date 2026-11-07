@@ -23,6 +23,7 @@ import {dirname, join, relative, resolve, isAbsolute} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 
 import {DEFAULT_CORE_CDK_CASES,defaultCoreCdkResultsMatch,defaultCoreCdkMeasurementOk,DEFAULT_CORE_CDK_CONTRACT} from './sass-default-core-cdk-contract.mjs';
+import {STRONG_FOCUS_CASE,STRONG_FOCUS_CONTRACT,focusResultsMatch} from './sass-strong-focus-infrastructure.mjs';
 import {PRIVATE_CARD_CASE,PRIVATE_CARD_CONTRACT,privateCardGateMatch} from './sass-private-card-gate.mjs';
 import {ORDINARY_DENSITY_CASES} from './sass-ordinary-density-peer.mjs';
 import {ordinaryDensityGateMatch} from './sass-ordinary-density-gate.mjs';
@@ -446,9 +447,9 @@ export function compareInventory(oracle, candidate, candidateCss,{spinnerSnackCo
           ? (spinnerSnackContext&&spinnerSnackGateDefaultMatch({context:spinnerSnackContext,caseId:`mixin-css/${name}`,got})?null:'finite spinner/snack default contract differs')
         : Object.hasOwn(got,'current_companion')&&Object.hasOwn(got,'current_infrastructure') ? 'conflicting default contracts'
         : Object.hasOwn(got,'current_infrastructure')
-          ? (!Object.hasOwn(DEFAULT_CORE_CDK_CASES,`mixin-css/${name}`)
+          ? (`mixin-css/${name}`===STRONG_FOCUS_CASE && got.current_infrastructure?.contract===STRONG_FOCUS_CONTRACT ? (focusResultsMatch(got,got.current_infrastructure)?null:'finite strong focus contract differs') : (!Object.hasOwn(DEFAULT_CORE_CDK_CASES,`mixin-css/${name}`)
             || !defaultCoreCdkMeasurementOk(`mixin-css/${name}`,got.actual_measurement,got.actual_measurement?.line)
-            || !defaultCoreCdkResultsMatch(`mixin-css/${name}`,got,got.current_infrastructure) ? 'finite current CDK contract differs' : null)
+            || !defaultCoreCdkResultsMatch(`mixin-css/${name}`,got,got.current_infrastructure) ? 'finite current CDK contract differs' : null))
           : Object.hasOwn(got,'current_companion')
             ? companionFailure(`mixin-css/${name}`,got,spinnerSnackContext)
             : got.sha256 !== invocation.css_sha256 ? 'compiled CSS differs' : null;
@@ -460,7 +461,7 @@ export function compareInventory(oracle, candidate, candidateCss,{spinnerSnackCo
       ...(got&&ORDINARY_CONTROL_DEFAULT_CASES.includes(`mixin-css/${name}`)?{current_ordinary_controls:got.current_ordinary_controls,error:got.error??null,actual_measurement:got.actual_measurement,expected:got.expected,actual:got.actual_measurement,identity:got.identity,mixin:got.mixin,variant:got.variant,call:got.call,comparison:got.comparison,mutation:got.mutation,mutation_rejected:got.mutation_rejected}:{}),
       ...(got&&Object.hasOwn(got,'current_spinner_snack_bridge')?{current_spinner_snack_bridge:got.current_spinner_snack_bridge,error:null,actual_measurement:got.actual_measurement}:{}),
       ...(got&&SPINNER_SNACK_DEFAULT_CASES.includes(`mixin-css/${name}`)?{expected:got.expected,actual:got.actual_measurement,identity:got.identity,mixin:got.mixin,variant:got.variant,call:got.call,comparison:got.comparison,mutation:got.mutation,mutation_rejected:got.mutation_rejected}:{}),
-      ...(got&&Object.hasOwn(got,'current_infrastructure')?{current_infrastructure:got.current_infrastructure,actual_measurement:got.actual_measurement,comparison:DEFAULT_CORE_CDK_CONTRACT}:{}),
+      ...(got&&Object.hasOwn(got,'current_infrastructure')?{current_infrastructure:got.current_infrastructure,actual_measurement:got.actual_measurement,comparison:got.current_infrastructure.contract===STRONG_FOCUS_CONTRACT?STRONG_FOCUS_CONTRACT:DEFAULT_CORE_CDK_CONTRACT}:{}),
       ...(got&&Object.hasOwn(got,'current_ordinary_density')?{current_ordinary_density:got.current_ordinary_density}:{}),
       ...(got&&Object.hasOwn(got,'current_companion')?{current_companion:got.current_companion,actual_measurement:got.actual_measurement,comparison:ORDINARY_CONTROL_DEFAULT_CASES.includes(`mixin-css/${name}`)?got.comparison:companionType(`mixin-css/${name}`)?.contract??DEFAULT_COMPANION_CONTRACT}:{}),
     });

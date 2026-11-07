@@ -36,14 +36,26 @@ function isolatedExpectedComputation(root,line,operation,input){
  return out;
 }
 
+function mainSuccessor(root,peers){
+ const path=join(root,'scripts/sass-aggregate-source-successor.mjs'),raw=readFileSync(path),digest='7a8d81b439bf0c3677e8be8fbfc710c68b449fdee717c38dba9cf67905f99c0c';
+ if(expectedSha(raw)!==digest)throw Error('aggregate successor changed');
+ const suffix="\nconst __root=process.argv[1],__input=JSON.parse(readFileSync(0,'utf8'));process.stdout.write(JSON.stringify({result:aggregateExpectedSuccessor(__root,'main',__input),sources:aggregateProjectedSources(__root)}));";
+ const result=spawnSync(process.execPath,['--input-type=module','--eval',raw.toString('utf8')+suffix,root],{cwd:root,env:{PATH:'/usr/bin:/bin',LANG:'C.UTF-8',LC_ALL:'C.UTF-8',TZ:'UTC'},input:JSON.stringify(expectedPlain(peers)),encoding:'utf8',timeout:150000,maxBuffer:20*1024*1024});
+ if(result.error||result.status!==0||result.signal||expectedSha(readFileSync(path))!==digest)throw Error('aggregate successor failed: '+String(result.stderr).slice(0,1000));
+ return expectedPlain(JSON.parse(result.stdout));
+}
 function isolatedAggregateMatches(line,sources,peers,actualCss){
- const root=dirname(dirname(fileURLToPath(import.meta.url))),out=isolatedExpectedComputation(root,line,'ordered-aggregate-06',{peers});
- if(out.css!==actualCss)return false;
- const raw=readFileSync(join(root,'fixtures/sass/expected-isolation-inputs.json'));
- if(expectedSha(raw)!==out.closure_sha256)return false;
- const files=JSON.parse(raw).files,roots=['projects/ngx-material-legacy/','node_modules/@angular/material/','node_modules/@angular/cdk/'];
- const expected=files.flatMap(row=>roots.flatMap((prefix,index)=>row.path.startsWith(prefix)&&row.path.endsWith('.scss')?[{root:index,path:row.path.slice(prefix.length),sha256:row.sha256,bytes:row.bytes}]:[])).sort((a,b)=>a.root-b.root||a.path.localeCompare(b.path));
- return expected.length>0&&isDeepStrictEqual(expected,expectedPlain(sources));
+ const root=dirname(dirname(fileURLToPath(import.meta.url)));
+ let out,expected;
+ if(line==='main'){const projection=mainSuccessor(root,peers);out=projection.result;expected=projection.sources;}
+ else{
+  out=isolatedExpectedComputation(root,line,'ordered-aggregate-06',{peers});
+  const raw=readFileSync(join(root,'fixtures/sass/expected-isolation-inputs.json'));
+  if(expectedSha(raw)!==out.closure_sha256)return false;
+  const files=JSON.parse(raw).files,roots=['projects/ngx-material-legacy/','node_modules/@angular/material/','node_modules/@angular/cdk/'];
+  expected=files.flatMap(row=>roots.flatMap((prefix,index)=>row.path.startsWith(prefix)&&row.path.endsWith('.scss')?[{root:index,path:row.path.slice(prefix.length),sha256:row.sha256,bytes:row.bytes}]:[])).sort((a,b)=>a.root-b.root||a.path.localeCompare(b.path));
+ }
+ return out.css===actualCss&&expected.length>0&&isDeepStrictEqual(expected,expectedPlain(sources));
 }
 
 const entry=ORDERED_AGGREGATE_CASES['06-aggregate-and-companions'];

@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "role": "finite-current-main-sass-graph-source-successor",
+  "line": "main",
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "canonical_admission_granted": false,
+  "g11_claim": "not-passed",
+  "before_commit": "8baa761eca624c9d71293c3d31750a2b3fdeebf0",
+  "after_commit": "8f9f724615ede1b0af0e2c4c347449c5952710e5",
+  "transitions": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+        "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67",
+        "bytes": 4574,
+        "git_blob": "b3b1c4a0768bef270ffb1a90e4b5836e05c74bbe"
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+        "sha256": "2dd63d98dcc0a2305b34df9c07d67e0329ae911a97a417a6738952ca3d76c93c",
+        "bytes": 3980,
+        "git_blob": "b500aedeb3a8cb7f95587e96861919cdc3ecf030"
+      },
+      "edits": [
+        {
+          "offset": 3318,
+          "before": "<!--\n      Single permanent wrapper for hints and errors so aria-live works reliably.\n      Setting aria-live only on errors that appear after render is inconsistent.\n    -->\n    <div aria-atomic=\"true\"\n      aria-live=\"polite\"\n      class=\"mat-form-field-subscript-message\"\n      [class.mat-form-field-hint-wrapper]=\"_getDisplayedMessages() === 'hint'\"\n      [class.mat-form-field-subscript-message-enter]=\"_subscriptAnimationState === 'enter'\"\n      [class.mat-form-field-subscript-animations-enabled]=\"_animationsEnabled\">\n      @switch (_getDisplayedMessages()) {\n        @case ('error') {\n          <ng-container>\n            <ng-content select=\"mat-error\"></ng-content>\n          </ng-container>\n        }\n\n        @case ('hint') {\n          <ng-container>\n        <!-- TODO(mmalerba): use an actual <mat-hint> once all selectors are switched to mat-* -->\n            @if (hintLabel) {\n              <div [id]=\"_hintLabelId\" class=\"mat-hint\">{{hintLabel}}</div>\n            }\n            <ng-content select=\"mat-hint:not([align='end'])\"></ng-content>\n            <div class=\"mat-form-field-hint-spacer\"></div>\n            <ng-content select=\"mat-hint[align='end']\"></ng-content>\n          </ng-container>\n        }\n      }\n    </div>",
+          "after": "@switch (_getDisplayedMessages()) {\n      @case ('error') {\n        <div><ng-content select=\"mat-error\"></ng-content></div>\n      }\n      @case ('hint') {\n        <div class=\"mat-form-field-hint-wrapper\">\n          <!-- TODO(mmalerba): use an actual <mat-hint> once all selectors are switched to mat-* -->\n          @if (hintLabel) {\n            <div [id]=\"_hintLabelId\" class=\"mat-hint\">{{hintLabel}}</div>\n          }\n          <ng-content select=\"mat-hint:not([align='end'])\"></ng-content>\n          <div class=\"mat-form-field-hint-spacer\"></div>\n          <ng-content select=\"mat-hint[align='end']\"></ng-content>\n        </div>\n      }\n    }"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.scss",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.scss",
+        "sha256": "d77ca5a115ac70fbd9eb2cc37f73ccb3fe86c16f3318749883f68f9e1182d26b",
+        "bytes": 8698,
+        "git_blob": "8b001de028d57af4f67beac2d07292ffd6dca01a"
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.scss",
+        "sha256": "1b80f7d539c8bea5647377e10fd380f03239e1d7ed7c101052b9b26f4c45cee8",
+        "bytes": 8224,
+        "git_blob": "100ad4aa6e50032330b3840a4c5d76a6679eb49a"
+      },
+      "edits": [
+        {
+          "offset": 8224,
+          "before": "\n\n.mat-form-field-subscript-message.mat-form-field-subscript-animations-enabled {\n  opacity: 0;\n  transform: translateY(-5px);\n\n  &.mat-form-field-subscript-message-enter {\n    opacity: 1;\n    transform: translateY(0%);\n    transition:\n      opacity 300ms cubic-bezier(0.55, 0, 0.55, 0.2),\n      transform 300ms cubic-bezier(0.55, 0, 0.55, 0.2);\n  }\n}\n\n.mat-form-field-subscript-message:not(.mat-form-field-subscript-animations-enabled) {\n  opacity: 1;\n  transform: none;\n}\n",
+          "after": ""
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu.scss",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-menu/menu.scss",
+        "sha256": "12060fcd8ce36c824a71fd9ecaaa801ab381d0a56158ed7bcbf4a85e29ebdc75",
+        "bytes": 3845,
+        "git_blob": "035bf54444c5c248a0218e41645876030013a35e"
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-menu/menu.scss",
+        "sha256": "87cfc81cd06a7a90e77336384372953cfeff27f038533b2c9c62dd024ba2c571",
+        "bytes": 3623,
+        "git_blob": "27a41870898ddfb1c283f496ca2a2333139c1eb7"
+      },
+      "edits": [
+        {
+          "offset": 1462,
+          "before": "\n    // Hide empty panels while animating away when the same menu is reused across triggers.\n    &:has(.mat-menu-content:empty) {\n      display: none;\n    }\n  }\n\n  @include cdk.high-contrast(active) {\n    outline: solid 1px;\n  }\n}\n\n// `:not(:empty)` allows for the menu to collapse to 0x0 when it doesn't have content.\n.mat-menu-content:not(:empty) {\n  padding-top: $vertical-padding;\n  padding-bottom: $vertical-padding;\n}\n\n.mat-menu-item {\n  @include button-common.reset();\n  @include menu-common.item-base();\n  position: relative;\n\n  // The browser prevents clicks on disabled buttons from propagating which prevents the menu\n  // from closing, but clicks on child nodes still propagate which is inconsistent (see #16694).\n  // In order to keep the behavior consistent and prevent the menu from closing, we add an overlay\n  // on top of the content that will catch all the clicks while disabled.\n  &[disabled]::after {\n    display: block;\n    position: absolute;\n    content: '';\n    top: 0;\n    left: 0;\n    bottom: 0;\n    right: 0;\n  }\n\n  @include cdk.high-contrast(active) {\n    $outline-width: 1px;\n\n    // We need to move the item 1px down, because Firefox seems to have\n    // an issue rendering the top part of the outline (see #21524).\n    margin-top: $outline-width;\n  }\n}\n\n.mat-menu-item-submenu-trigger {\n  @include menu-common.item-submenu-trigger(menu-common.$side-padding);\n}\n\n.mat-menu-submenu-icon {\n  @include menu-common.item-submenu-icon(menu-common.$side-padding);\n}\n\nbutton.mat-menu-item {\n  width: 100%;\n}\n\n// Increase specificity because ripple styles are part of the `mat-core` mixin and can\n// potentially overwrite the absolute position of the container.\n.mat-menu-item .mat-menu-ripple {\n  @include menu-common.item-ripple;\n}\n\n\n@keyframes mat-legacy-menu-enter {\n  from {\n    opacity: 0;\n    transform: scale(0.8);\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n\n@keyframes mat-legacy-menu-exit {\n  from {\n    opacity: 1;\n  }\n  to {\n    opacity: 0;\n  }\n}\n\n.mat-menu-panel.mat-menu-panel-animations-enabled {\n  animation: mat-legacy-menu-enter 120ms cubic-bezier(0, 0, 0.2, 1);\n  will-change: transform, opacity;\n\n  &.mat-menu-panel-exit-animation {\n    animation: mat-legacy-menu-exit 100ms 25ms linear forwards;\n  }\n\n  &.mat-menu-panel-animating {\n    pointer-events: none;\n\n    &:has(.mat-menu-content:empty) {\n      display: none;\n    }",
+          "after": "  }\n\n  @include cdk.high-contrast(active) {\n    outline: solid 1px;\n  }\n}\n\n// `:not(:empty)` allows for the menu to collapse to 0x0 when it doesn't have content.\n.mat-menu-content:not(:empty) {\n  padding-top: $vertical-padding;\n  padding-bottom: $vertical-padding;\n}\n\n.mat-menu-item {\n  @include button-common.reset();\n  @include menu-common.item-base();\n  position: relative;\n\n  // The browser prevents clicks on disabled buttons from propagating which prevents the menu\n  // from closing, but clicks on child nodes still propagate which is inconsistent (see #16694).\n  // In order to keep the behavior consistent and prevent the menu from closing, we add an overlay\n  // on top of the content that will catch all the clicks while disabled.\n  &[disabled]::after {\n    display: block;\n    position: absolute;\n    content: '';\n    top: 0;\n    left: 0;\n    bottom: 0;\n    right: 0;\n  }\n\n  @include cdk.high-contrast(active) {\n    $outline-width: 1px;\n\n    // We need to move the item 1px down, because Firefox seems to have\n    // an issue rendering the top part of the outline (see #21524).\n    margin-top: $outline-width;\n  }\n}\n\n.mat-menu-item-submenu-trigger {\n  @include menu-common.item-submenu-trigger(menu-common.$side-padding);\n}\n\n.mat-menu-submenu-icon {\n  @include menu-common.item-submenu-icon(menu-common.$side-padding);\n}\n\nbutton.mat-menu-item {\n  width: 100%;\n}\n\n// Increase specificity because ripple styles are part of the `mat-core` mixin and can\n// potentially overwrite the absolute position of the container.\n.mat-menu-item .mat-menu-ripple {\n  @include menu-common.item-ripple;\n}\n\n\n@keyframes mat-legacy-menu-enter {\n  from {\n    opacity: 0;\n    transform: scale(0.8);\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n\n@keyframes mat-legacy-menu-exit {\n  from {\n    opacity: 1;\n  }\n  to {\n    opacity: 0;\n  }\n}\n\n.mat-menu-panel.mat-menu-panel-animations-enabled {\n  animation: mat-legacy-menu-enter 120ms cubic-bezier(0, 0, 0.2, 1);\n  will-change: transform, opacity;\n\n  &.mat-menu-panel-exit-animation {\n    animation: mat-legacy-menu-exit 100ms 25ms linear forwards;\n  }\n\n  &.mat-menu-panel-animating {\n    pointer-events: none;"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-module.ts",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-module.ts",
+        "sha256": "a36d4381d828eccbf40815dcac053048a054b3fa6ce90f6fb41b58b04183c8ee",
+        "bytes": 374,
+        "git_blob": "3403ce1e93485fd9fbac97aac4ee63bd2f71beed"
+      },
+      "after": null,
+      "edits": []
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner-module.ts",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner-module.ts",
+        "sha256": "602539c21983cab5c23e541e6474595e9cb36012efc4522e9acdba4f001ac5fb",
+        "bytes": 650,
+        "git_blob": "601179247b7038fb981a8e7a5cbe27d514b0eee3"
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner-module.ts",
+        "sha256": "5b7fd2922503c446a9ba0d7d8b4399ad4171fdea7405f4d80d204431d411893c",
+        "bytes": 665,
+        "git_blob": "db74e3c9fea6204e2f27ab0e65c8239bffe79b0e"
+      },
+      "edits": [
+        {
+          "offset": 354,
+          "before": "./internal/common-modul",
+          "after": "@ngx-compat/material-legacy/legacy-cor"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/public-api.ts",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-progress-spinner/public-api.ts",
+        "sha256": "d9b92e443700fd4281c307096f49a7a6e9a3fd521c9c9c55f3313de18a951e82",
+        "bytes": 1134,
+        "git_blob": "7c14d3071defc187c6ed75b8cf31f18b8432752a"
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-progress-spinner/public-api.ts",
+        "sha256": "113a7cfbecacdc8fdc2f3df18f9a327c73bd6a0d11b6a878ec4e26ea615c4a7d",
+        "bytes": 1149,
+        "git_blob": "0525d09502958ce13495cf6fd8c585bcd1b447f5"
+      },
+      "edits": [
+        {
+          "offset": 1107,
+          "before": "./internal/common-modul",
+          "after": "@ngx-compat/material-legacy/legacy-cor"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-module.ts",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/common-module.ts",
+        "sha256": "a36d4381d828eccbf40815dcac053048a054b3fa6ce90f6fb41b58b04183c8ee",
+        "bytes": 374,
+        "git_blob": "3403ce1e93485fd9fbac97aac4ee63bd2f71beed"
+      },
+      "after": null,
+      "edits": []
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-module.ts",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-module.ts",
+        "sha256": "6ad8d8687288b979759b12456189c1dac16ca9caa1970787bf16692c78ebd68f",
+        "bytes": 1329,
+        "git_blob": "1afb3ceff913a3d6821750b4791ad6fdf4940e99"
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-module.ts",
+        "sha256": "29848fe850aedcd648ff49987e5869fcf7db16eedb344aadf7844c05841b5770",
+        "bytes": 1344,
+        "git_blob": "252a2778e838d24de96b4746352737703d3d4df8"
+      },
+      "edits": [
+        {
+          "offset": 532,
+          "before": "./internal/common-modul",
+          "after": "@ngx-compat/material-legacy/legacy-cor"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/public-api.ts",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/public-api.ts",
+        "sha256": "b9bae79b1440bfd2bfc1f713b7e16057af43ab06099083ecec49d4a47b35b421",
+        "bytes": 1502,
+        "git_blob": "dfb0ddd487065bea0d6958911b4ebceeb637896f"
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/public-api.ts",
+        "sha256": "6a6cd5e50deb3a7fe00453dc59a200ea48d4d7110b0b0f41e7aac4a874fdb513",
+        "bytes": 1517,
+        "git_blob": "153ae60aa32ce47776358f8b8aadf81d87423d04"
+      },
+      "edits": [
+        {
+          "offset": 1475,
+          "before": "./internal/common-modul",
+          "after": "@ngx-compat/material-legacy/legacy-cor"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/public-api.ts",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-menu/public-api.ts",
+        "sha256": "c4bca65483346670fb0dbdf03abe4655d45ce0a60a4f4600de32e6ee93112856",
+        "bytes": 1749,
+        "git_blob": "497413cf4f1843a994a316f26aaba98ab9a2c59f"
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-menu/public-api.ts",
+        "sha256": "420497e6eb235cf1ccd3509c6c6b3880d021226db9f5a3f1ea017e6b7fb39fa4",
+        "bytes": 1218,
+        "git_blob": "9b50bcc520dd75db2837616ad6cc015174953872"
+      },
+      "edits": [
+        {
+          "offset": 625,
+          "before": "_MatMenuBase as _MatLegacyMenuBase} from './internal/menu-base';\nexport {_MatMenuTriggerBase as _MatLegacyMenuTriggerBase} from './internal/menu-trigger-base';\nexport {_MatMenuContentBase as _MatLegacyMenuContentBase} from './internal/menu-content-base';\nexport {\n  MAT_MENU_SCROLL_STRATEGY_FACTORY as MAT_LEGACY_MENU_SCROLL_STRATEGY_FACTORY,\n  MAT_MENU_SCROLL_STRATEGY_FACTORY_PROVIDER as MAT_LEGACY_MENU_SCROLL_STRATEGY_FACTORY_PROVIDER,\n  MENU_PANEL_TOP_PADDING as LEGACY_MENU_PANEL_TOP_PADDING,\n} from './internal/menu-trigger-base';\nexport {\n\n  MAT_MENU_DEFAULT_OPTIONS as MAT_LEGACY_MENU_DEFAULT_OPTIONS,\n\n\n  MAT_MENU_SCROLL_STRATEGY as MAT_LEGACY_MENU_SCROLL_STRATEGY,\n\n\n  MatMenuDefaultOptions as MatLegacyMenuDefaultOptions,\n\n\n\n\n  MenuPositionX as LegacyMenuPositionX,\n\n\n  MenuPositionY as LegacyMenuPositionY,\n\n\n  MAT_MENU_CONTENT as MAT_LEGACY_MENU_CONTENT,\n} from '@angular/material/menu';\nexport {MatCommonModule} from './internal/common-modul",
+          "after": "\n\n  MAT_MENU_DEFAULT_OPTIONS as MAT_LEGACY_MENU_DEFAULT_OPTIONS,\n\n\n  MAT_MENU_SCROLL_STRATEGY as MAT_LEGACY_MENU_SCROLL_STRATEGY,\n\n\n  MatMenuDefaultOptions as MatLegacyMenuDefaultOptions,\n\n\n\n\n  MenuPositionX as LegacyMenuPositionX,\n\n\n  MenuPositionY as LegacyMenuPositionY,\n\n\n  MAT_MENU_CONTENT as MAT_LEGACY_MENU_CONTENT,\n} from '@angular/material/menu';\nexport {MatCommonModule} from '@ngx-compat/material-legacy/legacy-cor"
+        }
+      ]
+    }
+  ],
+  "support": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+      "sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+      "bytes": 4603,
+      "git_blob": "cde8981de7e5ecf8f38f5ae85b78200bff720424"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d",
+      "bytes": 3459,
+      "git_blob": "f6f53a872065ef7f5141525e936b65ff9bfde5eb"
+    },
+    {
+      "path": "compatibility/rc/parent-main-common-module-integration-review-v1.json",
+      "sha256": "ee2e21f5718fbeb84f2d138c56ea4b50d13bb008f346520ff470b09c96260a66",
+      "bytes": 22200,
+      "git_blob": "46119ab45ca1daab361be5fd9ee18cf2174450ac"
+    },
+    {
+      "path": "compatibility/rc/parent-main-form-field-dom-motion-integration-review-v1.json",
+      "sha256": "6c389691a6d7e7428c76ca2665512bc83273d4943b99d2c826023007046a9e7d",
+      "bytes": 16292,
+      "git_blob": "470d0632851d58296790f3c4bc524e085b053b90"
+    },
+    {
+      "path": "compatibility/rc/parent-main-menu-empty-motion-integration-review-v1.json",
+      "sha256": "2611636e4883e37419f1f32e194f23da8eec33ad8d562d2cf19ba854ae0bcbf4",
+      "bytes": 12084,
+      "git_blob": "bf890a42edffd9b1aef0f1d1704a7c6692194312"
+    },
+    {
+      "path": "compatibility/rc/parent-main-menu-six-export-repair-v1.json",
+      "sha256": "3d7687190d295435d0d3f4bfaf98c11debe881e77136e21c797d129f8b9def02",
+      "bytes": 14323,
+      "git_blob": "77dd96ffb4858e0509cfc92c1189c89c32b822a1"
+    }
+  ]
+}

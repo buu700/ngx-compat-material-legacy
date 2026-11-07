@@ -38,6 +38,7 @@ import {createOrdinaryControlGateContext,ordinaryControlGateDescriptor,ordinaryC
 import {createOrdinaryCardGateContext,ordinaryCardGateDescriptor,ordinaryCardGateMeasurementOk,ORDINARY_CARD_GATE_CASES,ORDINARY_CARD_DEFAULT_CASES,measureOrdinaryCardDefaultReferences,attachOrdinaryCardDefaultReferences} from './sass-ordinary-card-gate.mjs';
 import {createSpinnerSnackGateContext,spinnerSnackGateDescriptor,spinnerSnackGateMeasurementOk,SPINNER_SNACK_GATE_CASES,SPINNER_SNACK_DEFAULT_CASES,measureSpinnerSnackDefaultReferences,attachSpinnerSnackDefaultReferences} from './sass-spinner-snack-gate-integration.mjs';
 import {DEFAULT_CORE_CDK_CASES,DEFAULT_CORE_CDK_CONTRACT,measureDefaultCoreCdkPeer,defaultCoreCdkMeasurementOk} from './sass-default-core-cdk-contract.mjs';
+import {STRONG_FOCUS_CASE,STRONG_FOCUS_CALL,STRONG_FOCUS_CASES,STRONG_FOCUS_CONTRACT,measureFocusPeers} from './sass-strong-focus-infrastructure.mjs';
 import {DEFAULT_COMPANION_CASES,DEFAULT_COMPANION_CONTRACT,measureDefaultCompanionPeer,defaultCompanionMeasurementOk} from './sass-default-companion-contract.mjs';
 import {DEFAULT_MAPPED_COMPANION_CASES,DEFAULT_MAPPED_COMPANION_CONTRACT,measureDefaultMappedCompanionPeer,defaultMappedCompanionMeasurementOk} from './sass-default-mapped-companion-contract.mjs';
 import {DEFAULT_AGGREGATE_CASES,DEFAULT_AGGREGATE_CONTRACT,measureDefaultAggregatePeer,defaultAggregateMeasurementOk} from './sass-default-aggregate-contract.mjs';
@@ -357,7 +358,7 @@ export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line 
     if(foreign.length){css[name]={error:`loaded outside the packed package and peers: ${foreign[0]}`};continue;}
     css[name]={css:compiled.css,sha256:sha256Text(compiled.css)};
     const caseId=`mixin-css/${name}`;
-    const defaultEntry=DEFAULT_CORE_CDK_CASES[caseId]||DEFAULT_COMPANION_CASES[caseId]||DEFAULT_MAPPED_COMPANION_CASES[caseId]||DEFAULT_AGGREGATE_CASES[caseId]||FORM_FIELD_STATE_DEFAULT_CASES[caseId]||RIPPLE_COLOR_DEFAULT_CASES[caseId]||((SPINNER_SNACK_DEFAULT_CASES.includes(caseId)||ORDINARY_CONTROL_DEFAULT_CASES.includes(caseId)||ORDINARY_CARD_DEFAULT_CASES.includes(caseId)||caseId===PRIVATE_CARD_CASE)?plan:null);
+    const defaultEntry=(line==='main'&&caseId===STRONG_FOCUS_CASE?{call:STRONG_FOCUS_CALL}:null)||DEFAULT_CORE_CDK_CASES[caseId]||DEFAULT_COMPANION_CASES[caseId]||DEFAULT_MAPPED_COMPANION_CASES[caseId]||DEFAULT_AGGREGATE_CASES[caseId]||FORM_FIELD_STATE_DEFAULT_CASES[caseId]||RIPPLE_COLOR_DEFAULT_CASES[caseId]||((SPINNER_SNACK_DEFAULT_CASES.includes(caseId)||ORDINARY_CONTROL_DEFAULT_CASES.includes(caseId)||ORDINARY_CARD_DEFAULT_CASES.includes(caseId)||caseId===PRIVATE_CARD_CASE)?plan:null);
     if(defaultEntry){
       try{
         if(plan.call!==defaultEntry.call)throw Error('default invocation changed');
@@ -393,6 +394,15 @@ export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line 
           if(!formFieldStateDefaultMeasurementOk(caseId,actual_measurement,line))throw Error('form-field state measurement incomplete');
           const peer=measureFormFieldStatePeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line,caseId});
           css[name]={...css[name],actual_measurement,current_companion:{classification:'conforming-current-companion',contract:FORM_FIELD_STATE_CONTRACT,peer}};
+        }else if(line==='main'&&caseId===STRONG_FOCUS_CASE){
+          const variants=STRONG_FOCUS_CASES.map(c=>{
+            const item=compileInvocation(sass,moduleUrl,loadPaths,c.call,{importers:[importer]});
+            if(item.error||foreignLoads(item.loaded,allowedRoots).length)throw Error('focus variant compile failed');
+            const itemSources=item.loaded.map(url=>{const path=realpathSync(fileURLToPath(url)),index=bases.findIndex(base=>path===base||path.startsWith(base+'/'));if(index<0)throw Error('focus variant foreign source');const bytes=readFileSync(path);return {root:index,path:relative(bases[index],path).replaceAll('\\','/'),sha256:sha256Text(bytes),bytes:bytes.length};}).sort((a,b)=>a.root-b.root||a.path.localeCompare(b.path));
+            return {name:c.name,measurement:{line,css:item.css,css_sha256:sha256Text(item.css),css_bytes:Buffer.byteLength(item.css),program_sha256:sha256Text("@use '__entry__' as m;\n"+standardThemeSource()+'\n'+c.call+'\n'),sass_version:sass.info,sources:itemSources}};
+          });
+          const peers=measureFocusPeers({sass,materialRoot:bases[1],cdkRoot:bases[2]});
+          css[name]={...css[name],actual_measurement,current_infrastructure:{classification:'conforming-current-infrastructure',contract:STRONG_FOCUS_CONTRACT,variants,peers}};
         }else if(Object.hasOwn(DEFAULT_CORE_CDK_CASES,caseId)){
           if(!defaultCoreCdkMeasurementOk(caseId,actual_measurement,line))throw Error('default core measurement incomplete');
           coreCdkPeer??=measureDefaultCoreCdkPeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line});

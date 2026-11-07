@@ -17,7 +17,7 @@ SELF = 'scripts/current_sass_source.py'
 FOCUS_STYLE_PACKET=dict(path='compatibility/rc/current-main-strong-focus-source-v1.json',sha256='e4f6c47d595edc21f102a756e3a827d077c0f717f1968b8672c691d4fb336ccb',bytes=1030)
 INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json'
 INPUTS_SHA = '46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9'
-SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='357a76daa5221d9dc9da095e23f11be4d7a627ed102a2078eb079f25ec7fccf8', bytes=23987)
+SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='7bb757ac9558bceb3280fa439d43c382c603540f4c5a534c4043db9d6c071192', bytes=25182)
 ADDITIONAL = ['projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss',
               'projects/ngx-material-legacy/styles/button/_button-theme.scss',
               'projects/ngx-material-legacy/styles/card/_card-theme.scss']
@@ -119,12 +119,14 @@ class CurrentSassSource:
         assert root.is_dir() and not root.is_symlink()
         assert read is None or callable(read)
         bound = {}
+        graph_successor = None
         def assert_physical():
             for row in bound.values():
                 assert _ref(row['path'], _physical(root, row['path'])) == row, 'changed final physical source ' + row['path']
             product.assert_physical()
             focus.assert_physical()
             sixth.assert_physical()
+            if graph_successor is not None: graph_successor.assert_physical()
         def current(path):
             actual = _physical(root, path)
             row = _ref(path, actual)
@@ -141,18 +143,17 @@ class CurrentSassSource:
         def member(row):
             projected=focus_style is not None and row['path']==focus_style['before']['path'] and row['sha256']==focus_style['before']['sha256']
             if projected:assert row['bytes']==focus_style['before']['bytes']
-            row = focus_style['after'] if projected else sixth.qualify(row) or focus.qualify(row) or product.qualify(row) or row
+            row = focus_style['after'] if projected else sixth.qualify(row) or focus.qualify(row) or product.qualify(row) or (graph_successor.qualify(row) if graph_successor is not None else None) or row
             raw = current(row['path'])
             assert _hash(raw) == row['sha256'] and len(raw) == row['bytes'], 'changed current Sass source ' + row['path']
             return raw
         initial_version = json.loads(_physical(root, 'projects/ngx-material-legacy/package.json'))['version']
         initial_line = '21.x' if initial_version.startswith('21.') else 'main' if initial_version.startswith('22.') else None
-        Product = (_verified_helper(root,'scripts/select_dialog_finite_source_successor_v6.py',
-                    'f93437e3315e03f8ae60944625f4ad46f60874f345d72b7f70afc3b195d85b31','SelectDialogFiniteSourceV6')
+        Product = (_verified_helper(root,'scripts/select_dialog_finite_source_successor_v7.py',
+                    'a2c48f99f36b027c9a90ae1fdd8348f507c98b538df8f9426b096de1d5d16ae4','SelectDialogFiniteSourceV7')
                    if initial_line=='main' else SelectDialogFiniteSourceV4)
         product = Product(root, read=read, line=initial_line)
-        Focus = _verified_helper(root, 'scripts/dialog_focus_finite_source_successor_v5.py',
-                                 '75b912981d5ea107b1b56736b26543601574cbf549bec19e667d4987afce5778', 'DialogFocusFiniteSourceV5')
+        Focus = (_verified_helper(root, 'scripts/dialog_focus_finite_source_successor_v6.py', '9fad0c4fe637b283fa7dee92335271b1e06a393573ab634995b408807e3bf45a', 'DialogFocusFiniteSourceV6') if initial_line=='main' else _verified_helper(root, 'scripts/dialog_focus_finite_source_successor_v5.py', '75b912981d5ea107b1b56736b26543601574cbf549bec19e667d4987afce5778', 'DialogFocusFiniteSourceV5'))
         Sixth = (_verified_helper(root, 'scripts/stepper_current_peer_source_v5.py',
                                   'f03cab7c899f19bb0f58189ea5355871c47cbe8773b4d6a9466204ca997273c7', 'StepperCurrentPeerSourceV4')
                  if initial_line == 'main' else _verified_helper(root, 'scripts/stepper_sixth_source.py',
@@ -165,6 +166,13 @@ class CurrentSassSource:
                     assert bound[row['path']] == row
                 else:
                     bound[row['path']] = dict(row)
+        if initial_line=='main':
+            Graph=_verified_helper(root,'scripts/main_sass_graph_successor.py','164986a1d3bb0d3f753b7e8102dcb718811d74684cb298d23b3ae0f12a67ee4e','MainSassGraphSuccessor')
+            current('scripts/main_sass_graph_successor.py')
+            graph_successor=Graph(root,read)
+            for row in graph_successor.bound.values():
+                if row['path'] in bound: assert bound[row['path']]==row
+                else: bound[row['path']]=dict(row)
         if initial_line == 'main':
             for path,digest,size in [('scripts/select-dialog-finite-source-v6.mjs','4bd50817e745cf5c1e410a1a4c2b28726d95529f6d9df7a4d2bf953fddc8560a',15483),('scripts/select-dialog-finite-source-successor.mjs','1f58566ca39877ed180af58172aa040851a1f992f039f16ec9de7ea10809d929',12305)]:
                 helper_bytes=current(path);assert _hash(helper_bytes)==digest and len(helper_bytes)==size
@@ -239,14 +247,14 @@ class CurrentSassSource:
             assert historical[focus_style['before']['path']]==git_style_before
             changes[focus_style['before']['path']]=dict(path=focus_style['before']['path'],before=focus_style['before'],current=focus_style['after'])
         for row in source['inputs']:
-            member(changes[row['path']]['current'] if row['path'] in changes else row)
+            if graph_successor is None or row['path'] not in graph_successor.removed: member(changes[row['path']]['current'] if row['path'] in changes else row)
         member(source['semantic_receipt'])
         for row in source['unchanged_owned_sass_before_inputs']:
             actual = member(changes[row['path']]['current'] if row['path'] in changes else row)
             if row['path'] not in changes:
                 assert actual == historical[row['path']]
         for row in protected_packet['branches'][line]['protected_inputs']:
-            member(row)
+            if graph_successor is None or row['path'] not in graph_successor.removed: member(row)
         graph = next(row for row in census['lines'] if row['line'] == line)
         assert len(graph['non_target_owned_style_template_graph']) == graph['non_target_graph_count']
         assert graph['non_target_graph_count'] == branch['historical_non_target_graph_count']
