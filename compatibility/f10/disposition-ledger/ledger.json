@@ -23415,19 +23415,185 @@
       "sha": "3550a8798a5aa51e945121c0fcf4e17b4e882faa",
       "bucket": "behavior-semantic",
       "subject": "fix(material/menu): animation issue when same menu is used for multiple nested triggers (#29280)",
-      "final_disposition": "already-adapted",
-      "reason": "Hide animating menu panels whose .mat-menu-content is empty when the menu is reused across triggers.",
-      "read_note_disposition": "owned-retained",
+      "final_disposition": "do-not-adopt",
+      "reason": "The modern hunk hides empty animating MDC panels with :has and display:none. The owned legacy menu retains the historical pointer-event rule and no empty-panel hide; that added selector conflicts with the tagged legacy empty-panel motion contract. Owned trigger ownership/generation guards separately address transfer lifecycle. This is a source decision, not a current artifact or all-browser claim.",
+      "read_note_disposition": "individual-source-reviewed-on-main",
       "files": [
         "src/material/menu/menu.scss"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/menu-eight-contextual-v1/3550a8798a5aa51e945121c0fcf4e17b4e882faa.json",
       "source_check": "legacy-menu/menu.scss :has(.mat-menu-content:empty)",
       "batch_id": "product-adapt-priority-2026-10-01-j",
       "recorded_at_utc": "2026-10-01T17:22:07Z",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "product_adaptation": true
+      "product_adaptation": true,
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.ts",
+            "sha256": "e53577eef744606d3368bf4fa61cc49f669ea945b64f26e411c113ba572f2877",
+            "bytes": 1885
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-trigger.ts",
+            "sha256": "351e11291617ea3462025710b31621f9441ac341c99158b771798d4875dc9ab6",
+            "bytes": 662
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-module.ts",
+            "sha256": "b963626178cfa7cbf9a01c87189233c7efa15cc58c69c99af9d5459ff6e3f427",
+            "bytes": 1285
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+            "sha256": "82aaefb570df0953de0051aca4b3a987106b8ff3ea27e56d2e4c55fe75b461b4",
+            "bytes": 1809
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-content.ts",
+            "sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af",
+            "bytes": 1163
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+            "sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47",
+            "bytes": 710
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.scss",
+            "sha256": "87cfc81cd06a7a90e77336384372953cfeff27f038533b2c9c62dd024ba2c571",
+            "bytes": 3623
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "1f6c9025f1b04dc994e5e77247399546a2464c2281a01a46adeb50c828322321",
+            "bytes": 144721
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/public-api.ts",
+            "sha256": "a70a8f0d0dae829fa21c4a752ece2ee3e03ae63f400d4c87e9f7161a79f4b7a7",
+            "bytes": 1764
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/_menu-theme.scss",
+            "sha256": "f99c0b7612cd47f7329f3de712253e696bd3dc52d4449e2f4e1e50e744b0c72c",
+            "bytes": 2647
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "5f9b5fbe09d5bdc50bcb937e458ffb83bd49dddca1b0c0c64fadb5d267cfe6a3",
+            "bytes": 30731
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+            "sha256": "a498fd55553577bc81f285f36cf2822866d17b9bed8bb572c14bf78df21eed0d",
+            "bytes": 21858
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts",
+            "sha256": "f2d261227d8fa8e04a8773d57373ca6c78ffe20081bff8a0c809991969fba368",
+            "bytes": 5380
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+            "sha256": "3598e6ccf4761bd9777dafaca271cd896dc8f694ec39e9e46c37f593a8c307af",
+            "bytes": 1504
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel-token.ts",
+            "sha256": "3463226c000f63d599639bd1c400d744c9e02417bd9c57fe46e53827706180cd",
+            "bytes": 502
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts",
+            "sha256": "f5da44d00af909e5da4dc80453796857d22ab4f323c5db5d793d002d8e72cfd8",
+            "bytes": 3038
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-errors.ts",
+            "sha256": "adf746c2d91f6f86c6495d49e869ffba310eabf8e12bbca36cb33a7277d408fc",
+            "bytes": 1278
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/disabled.ts",
+            "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+            "bytes": 1073
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/constructor.ts",
+            "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+            "bytes": 450
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness.ts",
+            "sha256": "8a5e3af02e255c572bb0d5380c8e9be1ef22700a7c79f921875049af8d2ed6ea",
+            "bytes": 1912
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-base.ts",
+            "sha256": "559477ca79dff7fa492526a9c1e040fff9fdd019339ff0fb0da7268c49ca7479",
+            "bytes": 4638
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-filters.ts",
+            "sha256": "f8e844a0895303f41fcd80307323f490c7994e73ca0faa64e9e4651beafae360",
+            "bytes": 518
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/public-api.ts",
+            "sha256": "d0ca66da4e63a90ccdd6189c23354b7af6060fcd203a0c72db762d447bc9bbf9",
+            "bytes": 485
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+            "sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+            "bytes": 4603
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+            "sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+            "bytes": 3438
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/motion-event.ts",
+            "sha256": "8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667",
+            "bytes": 896
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+            "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d",
+            "bytes": 3459
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/divider/_divider-theme.scss",
+            "sha256": "15a6239799cd29263ad2e336205bbebe4d31c9997464aa041483e0856e420361",
+            "bytes": 2087
+          }
+        ],
+        "diff_sha256": "96f8fd285ee9c332025254bc853c3b5e4ec607e071ce5cf3ede637805ee783eb",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The modern hunk hides empty animating MDC panels with :has and display:none. The owned legacy menu retains the historical pointer-event rule and no empty-panel hide; that added selector conflicts with the tagged legacy empty-panel motion contract. Owned trigger ownership/generation guards separately address transfer lifecycle. This is a source decision, not a current artifact or all-browser claim."
+      },
+      "prior_dispositions": [
+        {
+          "source_parent": "4c29be143432bcb5b2ca99d4f83ca6ff162b4554",
+          "source_entry_sha256": "47de510352b985588db36b03966bc885374ab26380ab767709b410167e087397",
+          "source_line": "main",
+          "final_disposition": "already-adapted",
+          "prior_evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json"
+        }
+      ]
     },
     {
       "sha": "46bcc21cbc19ff8ec946485febf70a85146f1026",
@@ -66101,19 +66267,179 @@
         "src/material/menu/menu-trigger-base.ts"
       ],
       "diff_sha256": "1ba963fd47b20fa12c01e92fcac0754c97767b0ad0489885fc48174855c2cedb",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/b1514c4b1867e45a5ff85d95ee3892b6a1b1f99c.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/menu-eight-contextual-v1/b1514c4b1867e45a5ff85d95ee3892b6a1b1f99c.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/menu/menu-trigger-base.ts changes `menu.lazyContent?.detach();`. That line is not in the legacy sources. @angular/material/menu is exercised by projects/ngx-material-legacy/legacy-menu/menu.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/menu imported by projects/ngx-material-legacy/legacy-menu/menu.ts"
-      }
+      "final_disposition": "already-adapted",
+      "read_note_disposition": "individual-source-reviewed-on-main",
+      "reason": "The modern patch guards lazy-content detach when another trigger owns the menu. Owned MENU_PANEL_OWNERS and generation checks guard removal; _detachMenu detaches lazy content only when the closing trigger owned it and no newer owner exists. The bounded legacy implementation addresses the transfer ownership risk through owned code, without borrowing modern private state or claiming all possible reentrant scenarios.",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.ts",
+            "sha256": "e53577eef744606d3368bf4fa61cc49f669ea945b64f26e411c113ba572f2877",
+            "bytes": 1885
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-trigger.ts",
+            "sha256": "351e11291617ea3462025710b31621f9441ac341c99158b771798d4875dc9ab6",
+            "bytes": 662
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-module.ts",
+            "sha256": "b963626178cfa7cbf9a01c87189233c7efa15cc58c69c99af9d5459ff6e3f427",
+            "bytes": 1285
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+            "sha256": "82aaefb570df0953de0051aca4b3a987106b8ff3ea27e56d2e4c55fe75b461b4",
+            "bytes": 1809
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-content.ts",
+            "sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af",
+            "bytes": 1163
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+            "sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47",
+            "bytes": 710
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.scss",
+            "sha256": "87cfc81cd06a7a90e77336384372953cfeff27f038533b2c9c62dd024ba2c571",
+            "bytes": 3623
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "1f6c9025f1b04dc994e5e77247399546a2464c2281a01a46adeb50c828322321",
+            "bytes": 144721
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/public-api.ts",
+            "sha256": "a70a8f0d0dae829fa21c4a752ece2ee3e03ae63f400d4c87e9f7161a79f4b7a7",
+            "bytes": 1764
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/_menu-theme.scss",
+            "sha256": "f99c0b7612cd47f7329f3de712253e696bd3dc52d4449e2f4e1e50e744b0c72c",
+            "bytes": 2647
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "5f9b5fbe09d5bdc50bcb937e458ffb83bd49dddca1b0c0c64fadb5d267cfe6a3",
+            "bytes": 30731
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+            "sha256": "a498fd55553577bc81f285f36cf2822866d17b9bed8bb572c14bf78df21eed0d",
+            "bytes": 21858
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts",
+            "sha256": "f2d261227d8fa8e04a8773d57373ca6c78ffe20081bff8a0c809991969fba368",
+            "bytes": 5380
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+            "sha256": "3598e6ccf4761bd9777dafaca271cd896dc8f694ec39e9e46c37f593a8c307af",
+            "bytes": 1504
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel-token.ts",
+            "sha256": "3463226c000f63d599639bd1c400d744c9e02417bd9c57fe46e53827706180cd",
+            "bytes": 502
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts",
+            "sha256": "f5da44d00af909e5da4dc80453796857d22ab4f323c5db5d793d002d8e72cfd8",
+            "bytes": 3038
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-errors.ts",
+            "sha256": "adf746c2d91f6f86c6495d49e869ffba310eabf8e12bbca36cb33a7277d408fc",
+            "bytes": 1278
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/disabled.ts",
+            "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+            "bytes": 1073
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/constructor.ts",
+            "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+            "bytes": 450
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness.ts",
+            "sha256": "8a5e3af02e255c572bb0d5380c8e9be1ef22700a7c79f921875049af8d2ed6ea",
+            "bytes": 1912
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-base.ts",
+            "sha256": "559477ca79dff7fa492526a9c1e040fff9fdd019339ff0fb0da7268c49ca7479",
+            "bytes": 4638
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-filters.ts",
+            "sha256": "f8e844a0895303f41fcd80307323f490c7994e73ca0faa64e9e4651beafae360",
+            "bytes": 518
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/public-api.ts",
+            "sha256": "d0ca66da4e63a90ccdd6189c23354b7af6060fcd203a0c72db762d447bc9bbf9",
+            "bytes": 485
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+            "sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+            "bytes": 4603
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+            "sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+            "bytes": 3438
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/motion-event.ts",
+            "sha256": "8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667",
+            "bytes": 896
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+            "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d",
+            "bytes": 3459
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/divider/_divider-theme.scss",
+            "sha256": "15a6239799cd29263ad2e336205bbebe4d31c9997464aa041483e0856e420361",
+            "bytes": 2087
+          }
+        ],
+        "diff_sha256": "ec47efaa6f780d3e288da98503b8305b009ef72a62d811ffe5ad479135f11311",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The modern patch guards lazy-content detach when another trigger owns the menu. Owned MENU_PANEL_OWNERS and generation checks guard removal; _detachMenu detaches lazy content only when the closing trigger owned it and no newer owner exists. The bounded legacy implementation addresses the transfer ownership risk through owned code, without borrowing modern private state or claiming all possible reentrant scenarios."
+      },
+      "prior_dispositions": [
+        {
+          "source_parent": "4c29be143432bcb5b2ca99d4f83ca6ff162b4554",
+          "source_entry_sha256": "89caa82b702a108315956a5e5ff118b518e3be7168394f82e732762908f7ea09",
+          "source_line": "main",
+          "final_disposition": "inherited",
+          "prior_evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/b1514c4b1867e45a5ff85d95ee3892b6a1b1f99c.json"
+        }
+      ]
     },
     {
       "sha": "5b45df30ca60b75b27313d3b1b52c42ac037eb4f",
@@ -66961,13 +67287,179 @@
         "src/material/menu/public-api.ts"
       ],
       "diff_sha256": "e0791dcc38eb7794b3532564f16258eadd5405ae07e5cf23b6f3e55569be2feb",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/4b06a1a64b0ab6d73e33b546079bde9ace6050ae.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/menu-eight-contextual-v1/4b06a1a64b0ab6d73e33b546079bde9ace6050ae.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
       "final_disposition": "do-not-adopt",
-      "read_note_disposition": "retained-legacy-differs",
-      "reason": "The diff in src/material/menu/menu-module.ts changes `providers: [MAT_MENU_SCROLL_STRATEGY_FACTORY_PROVIDER],`. The owned legacy file still contains the previous line because this package keeps the Material 16 legacy contract (zone scheduling, factory providers, explicit change detection, or the pre-signal API). The current-component rewrite is not copied into the legacy sources. The commit is an ancestor of v22.1.7, so @angular/material@22.1.7 and @angular/cdk@22.1.7 already contain it for peer callers."
+      "read_note_disposition": "individual-source-reviewed-on-main",
+      "reason": "The upstream patch removes a modern deprecated scroll-strategy factory/provider and inlines its modern default-options factory, including module and export changes. Tagged16 legacy module used the scroll-strategy provider and legacy public-api exported the scroll token, but did not export legacy-named factory/provider aliases. The current addon retains a locally owned Overlay-based factory/provider and module provider and additionally exposes legacy-named factory/provider aliases; those aliases are current addon exports, not claimed as tagged16 exports. The legacy default-options token remains the public peer token with minimum-peer default values; no removed upstream factory is called, and no modern default factory is claimed as a legacy export.",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.ts",
+            "sha256": "e53577eef744606d3368bf4fa61cc49f669ea945b64f26e411c113ba572f2877",
+            "bytes": 1885
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-trigger.ts",
+            "sha256": "351e11291617ea3462025710b31621f9441ac341c99158b771798d4875dc9ab6",
+            "bytes": 662
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-module.ts",
+            "sha256": "b963626178cfa7cbf9a01c87189233c7efa15cc58c69c99af9d5459ff6e3f427",
+            "bytes": 1285
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+            "sha256": "82aaefb570df0953de0051aca4b3a987106b8ff3ea27e56d2e4c55fe75b461b4",
+            "bytes": 1809
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-content.ts",
+            "sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af",
+            "bytes": 1163
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+            "sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47",
+            "bytes": 710
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.scss",
+            "sha256": "87cfc81cd06a7a90e77336384372953cfeff27f038533b2c9c62dd024ba2c571",
+            "bytes": 3623
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "1f6c9025f1b04dc994e5e77247399546a2464c2281a01a46adeb50c828322321",
+            "bytes": 144721
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/public-api.ts",
+            "sha256": "a70a8f0d0dae829fa21c4a752ece2ee3e03ae63f400d4c87e9f7161a79f4b7a7",
+            "bytes": 1764
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/_menu-theme.scss",
+            "sha256": "f99c0b7612cd47f7329f3de712253e696bd3dc52d4449e2f4e1e50e744b0c72c",
+            "bytes": 2647
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "5f9b5fbe09d5bdc50bcb937e458ffb83bd49dddca1b0c0c64fadb5d267cfe6a3",
+            "bytes": 30731
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+            "sha256": "a498fd55553577bc81f285f36cf2822866d17b9bed8bb572c14bf78df21eed0d",
+            "bytes": 21858
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts",
+            "sha256": "f2d261227d8fa8e04a8773d57373ca6c78ffe20081bff8a0c809991969fba368",
+            "bytes": 5380
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+            "sha256": "3598e6ccf4761bd9777dafaca271cd896dc8f694ec39e9e46c37f593a8c307af",
+            "bytes": 1504
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel-token.ts",
+            "sha256": "3463226c000f63d599639bd1c400d744c9e02417bd9c57fe46e53827706180cd",
+            "bytes": 502
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts",
+            "sha256": "f5da44d00af909e5da4dc80453796857d22ab4f323c5db5d793d002d8e72cfd8",
+            "bytes": 3038
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-errors.ts",
+            "sha256": "adf746c2d91f6f86c6495d49e869ffba310eabf8e12bbca36cb33a7277d408fc",
+            "bytes": 1278
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/disabled.ts",
+            "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+            "bytes": 1073
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/constructor.ts",
+            "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+            "bytes": 450
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness.ts",
+            "sha256": "8a5e3af02e255c572bb0d5380c8e9be1ef22700a7c79f921875049af8d2ed6ea",
+            "bytes": 1912
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-base.ts",
+            "sha256": "559477ca79dff7fa492526a9c1e040fff9fdd019339ff0fb0da7268c49ca7479",
+            "bytes": 4638
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-filters.ts",
+            "sha256": "f8e844a0895303f41fcd80307323f490c7994e73ca0faa64e9e4651beafae360",
+            "bytes": 518
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/public-api.ts",
+            "sha256": "d0ca66da4e63a90ccdd6189c23354b7af6060fcd203a0c72db762d447bc9bbf9",
+            "bytes": 485
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+            "sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+            "bytes": 4603
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+            "sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+            "bytes": 3438
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/motion-event.ts",
+            "sha256": "8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667",
+            "bytes": 896
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+            "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d",
+            "bytes": 3459
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/divider/_divider-theme.scss",
+            "sha256": "15a6239799cd29263ad2e336205bbebe4d31c9997464aa041483e0856e420361",
+            "bytes": 2087
+          }
+        ],
+        "diff_sha256": "e728742751c9cc8cf3c21f110ceb769b4f0807d62ca839deb8b5b79b57f3699c",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream patch removes a modern deprecated scroll-strategy factory/provider and inlines its modern default-options factory, including module and export changes. Tagged16 legacy module used the scroll-strategy provider and legacy public-api exported the scroll token, but did not export legacy-named factory/provider aliases. The current addon retains a locally owned Overlay-based factory/provider and module provider and additionally exposes legacy-named factory/provider aliases; those aliases are current addon exports, not claimed as tagged16 exports. The legacy default-options token remains the public peer token with minimum-peer default values; no removed upstream factory is called, and no modern default factory is claimed as a legacy export."
+      },
+      "prior_dispositions": [
+        {
+          "source_parent": "4c29be143432bcb5b2ca99d4f83ca6ff162b4554",
+          "source_entry_sha256": "4cc3ba3cf2538f2d8dcb67c2a3e03631c72b133aa2ce27eeeaea2f55f7748253",
+          "source_line": "main",
+          "final_disposition": "do-not-adopt",
+          "prior_evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/4b06a1a64b0ab6d73e33b546079bde9ace6050ae.json"
+        }
+      ]
     },
     {
       "sha": "6d26c0fc1a382c6f4cd5f24761b93944ec3a0966",
@@ -68070,19 +68562,179 @@
         "src/material/menu/menu.scss"
       ],
       "diff_sha256": "f36d9c52c38dfdac62e557d100ac7b2374aeab7b374dfbda3b8533eb4fd0684f",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/05d71e53a16f7cdb19b96e208601a64e1389fa8a.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/menu-eight-contextual-v1/05d71e53a16f7cdb19b96e208601a64e1389fa8a.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/menu/menu.scss changes `color: token-utils.slot(menu-divider-color, $fallbacks);`. That line is not in the legacy sources. @angular/material/menu is exercised by projects/ngx-material-legacy/legacy-menu/menu.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/menu imported by projects/ngx-material-legacy/legacy-menu/menu.ts"
-      }
+      "final_disposition": "not-applicable",
+      "read_note_disposition": "individual-source-reviewed-on-main",
+      "reason": "The upstream hunk replaces the modern menu divider token slot from color to border-top-color. The legacy menu stylesheet and historical 16 stylesheet have no corresponding menu-scoped divider token declaration; legacy divider theming remains separately owned. No modern menu M3 slot is adopted, and this source review does not establish actual divider color across themes.",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.ts",
+            "sha256": "e53577eef744606d3368bf4fa61cc49f669ea945b64f26e411c113ba572f2877",
+            "bytes": 1885
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-trigger.ts",
+            "sha256": "351e11291617ea3462025710b31621f9441ac341c99158b771798d4875dc9ab6",
+            "bytes": 662
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-module.ts",
+            "sha256": "b963626178cfa7cbf9a01c87189233c7efa15cc58c69c99af9d5459ff6e3f427",
+            "bytes": 1285
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+            "sha256": "82aaefb570df0953de0051aca4b3a987106b8ff3ea27e56d2e4c55fe75b461b4",
+            "bytes": 1809
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-content.ts",
+            "sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af",
+            "bytes": 1163
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+            "sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47",
+            "bytes": 710
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.scss",
+            "sha256": "87cfc81cd06a7a90e77336384372953cfeff27f038533b2c9c62dd024ba2c571",
+            "bytes": 3623
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "1f6c9025f1b04dc994e5e77247399546a2464c2281a01a46adeb50c828322321",
+            "bytes": 144721
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/public-api.ts",
+            "sha256": "a70a8f0d0dae829fa21c4a752ece2ee3e03ae63f400d4c87e9f7161a79f4b7a7",
+            "bytes": 1764
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/_menu-theme.scss",
+            "sha256": "f99c0b7612cd47f7329f3de712253e696bd3dc52d4449e2f4e1e50e744b0c72c",
+            "bytes": 2647
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "5f9b5fbe09d5bdc50bcb937e458ffb83bd49dddca1b0c0c64fadb5d267cfe6a3",
+            "bytes": 30731
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+            "sha256": "a498fd55553577bc81f285f36cf2822866d17b9bed8bb572c14bf78df21eed0d",
+            "bytes": 21858
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts",
+            "sha256": "f2d261227d8fa8e04a8773d57373ca6c78ffe20081bff8a0c809991969fba368",
+            "bytes": 5380
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+            "sha256": "3598e6ccf4761bd9777dafaca271cd896dc8f694ec39e9e46c37f593a8c307af",
+            "bytes": 1504
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel-token.ts",
+            "sha256": "3463226c000f63d599639bd1c400d744c9e02417bd9c57fe46e53827706180cd",
+            "bytes": 502
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts",
+            "sha256": "f5da44d00af909e5da4dc80453796857d22ab4f323c5db5d793d002d8e72cfd8",
+            "bytes": 3038
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-errors.ts",
+            "sha256": "adf746c2d91f6f86c6495d49e869ffba310eabf8e12bbca36cb33a7277d408fc",
+            "bytes": 1278
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/disabled.ts",
+            "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+            "bytes": 1073
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/constructor.ts",
+            "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+            "bytes": 450
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness.ts",
+            "sha256": "8a5e3af02e255c572bb0d5380c8e9be1ef22700a7c79f921875049af8d2ed6ea",
+            "bytes": 1912
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-base.ts",
+            "sha256": "559477ca79dff7fa492526a9c1e040fff9fdd019339ff0fb0da7268c49ca7479",
+            "bytes": 4638
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-filters.ts",
+            "sha256": "f8e844a0895303f41fcd80307323f490c7994e73ca0faa64e9e4651beafae360",
+            "bytes": 518
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/public-api.ts",
+            "sha256": "d0ca66da4e63a90ccdd6189c23354b7af6060fcd203a0c72db762d447bc9bbf9",
+            "bytes": 485
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+            "sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+            "bytes": 4603
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+            "sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+            "bytes": 3438
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/motion-event.ts",
+            "sha256": "8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667",
+            "bytes": 896
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+            "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d",
+            "bytes": 3459
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/divider/_divider-theme.scss",
+            "sha256": "15a6239799cd29263ad2e336205bbebe4d31c9997464aa041483e0856e420361",
+            "bytes": 2087
+          }
+        ],
+        "diff_sha256": "7962ea26af28e098350f3deec1006eebc078eaabf76020dc91771c59dbf81214",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream hunk replaces the modern menu divider token slot from color to border-top-color. The legacy menu stylesheet and historical 16 stylesheet have no corresponding menu-scoped divider token declaration; legacy divider theming remains separately owned. No modern menu M3 slot is adopted, and this source review does not establish actual divider color across themes."
+      },
+      "prior_dispositions": [
+        {
+          "source_parent": "4c29be143432bcb5b2ca99d4f83ca6ff162b4554",
+          "source_entry_sha256": "af193bd7ce7efae941aca4198701c1ef687eed5ab9b9b2d28d5dd0bfabc63599",
+          "source_line": "main",
+          "final_disposition": "inherited",
+          "prior_evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/05d71e53a16f7cdb19b96e208601a64e1389fa8a.json"
+        }
+      ]
     },
     {
       "sha": "2d5942cb0fe86f9c3d26b1925b1d4390cfc6613b",
@@ -68356,13 +69008,179 @@
         "src/material/menu/testing/menu-harness.ts"
       ],
       "diff_sha256": "7251312b179c3537591c3296cd0286e328c7931755adf0c62f521f7973edc8fa",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/c9289b5c59775ab6223c16b6c8afaa1ddcf6f54f.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/menu-eight-contextual-v1/c9289b5c59775ab6223c16b6c8afaa1ddcf6f54f.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "do-not-adopt",
-      "read_note_disposition": "retained-legacy-differs",
-      "reason": "The diff in src/material/menu/testing/menu-harness-filters.ts changes `triggerIconName?: string | RegExp;`. The owned legacy file still contains the previous line because this package keeps the Material 16 legacy contract (zone scheduling, factory providers, explicit change detection, or the pre-signal API). The current-component rewrite is not copied into the legacy sources. The commit is an ancestor of v22.1.7, so @angular/material@22.1.7 and @angular/cdk@22.1.7 already contain it for peer callers."
+      "final_disposition": "not-applicable",
+      "read_note_disposition": "individual-source-reviewed-on-main",
+      "reason": "The upstream change adds a new triggerIconName option to the modern menu harness interface and predicate, plus modern icon test fixtures, API golden and build dependencies. The tagged16 legacy harness accepted triggerText and its own legacy harness retains that finite option; it does not expose or implement the new modern-only icon filter. This is not a claim that legacy triggerText filtering is delegated to the modern harness.",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.ts",
+            "sha256": "e53577eef744606d3368bf4fa61cc49f669ea945b64f26e411c113ba572f2877",
+            "bytes": 1885
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-trigger.ts",
+            "sha256": "351e11291617ea3462025710b31621f9441ac341c99158b771798d4875dc9ab6",
+            "bytes": 662
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-module.ts",
+            "sha256": "b963626178cfa7cbf9a01c87189233c7efa15cc58c69c99af9d5459ff6e3f427",
+            "bytes": 1285
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+            "sha256": "82aaefb570df0953de0051aca4b3a987106b8ff3ea27e56d2e4c55fe75b461b4",
+            "bytes": 1809
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-content.ts",
+            "sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af",
+            "bytes": 1163
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+            "sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47",
+            "bytes": 710
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.scss",
+            "sha256": "87cfc81cd06a7a90e77336384372953cfeff27f038533b2c9c62dd024ba2c571",
+            "bytes": 3623
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "1f6c9025f1b04dc994e5e77247399546a2464c2281a01a46adeb50c828322321",
+            "bytes": 144721
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/public-api.ts",
+            "sha256": "a70a8f0d0dae829fa21c4a752ece2ee3e03ae63f400d4c87e9f7161a79f4b7a7",
+            "bytes": 1764
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/_menu-theme.scss",
+            "sha256": "f99c0b7612cd47f7329f3de712253e696bd3dc52d4449e2f4e1e50e744b0c72c",
+            "bytes": 2647
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "5f9b5fbe09d5bdc50bcb937e458ffb83bd49dddca1b0c0c64fadb5d267cfe6a3",
+            "bytes": 30731
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+            "sha256": "a498fd55553577bc81f285f36cf2822866d17b9bed8bb572c14bf78df21eed0d",
+            "bytes": 21858
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts",
+            "sha256": "f2d261227d8fa8e04a8773d57373ca6c78ffe20081bff8a0c809991969fba368",
+            "bytes": 5380
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+            "sha256": "3598e6ccf4761bd9777dafaca271cd896dc8f694ec39e9e46c37f593a8c307af",
+            "bytes": 1504
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel-token.ts",
+            "sha256": "3463226c000f63d599639bd1c400d744c9e02417bd9c57fe46e53827706180cd",
+            "bytes": 502
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts",
+            "sha256": "f5da44d00af909e5da4dc80453796857d22ab4f323c5db5d793d002d8e72cfd8",
+            "bytes": 3038
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-errors.ts",
+            "sha256": "adf746c2d91f6f86c6495d49e869ffba310eabf8e12bbca36cb33a7277d408fc",
+            "bytes": 1278
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/disabled.ts",
+            "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+            "bytes": 1073
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/constructor.ts",
+            "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+            "bytes": 450
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness.ts",
+            "sha256": "8a5e3af02e255c572bb0d5380c8e9be1ef22700a7c79f921875049af8d2ed6ea",
+            "bytes": 1912
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-base.ts",
+            "sha256": "559477ca79dff7fa492526a9c1e040fff9fdd019339ff0fb0da7268c49ca7479",
+            "bytes": 4638
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-filters.ts",
+            "sha256": "f8e844a0895303f41fcd80307323f490c7994e73ca0faa64e9e4651beafae360",
+            "bytes": 518
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/public-api.ts",
+            "sha256": "d0ca66da4e63a90ccdd6189c23354b7af6060fcd203a0c72db762d447bc9bbf9",
+            "bytes": 485
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+            "sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+            "bytes": 4603
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+            "sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+            "bytes": 3438
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/motion-event.ts",
+            "sha256": "8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667",
+            "bytes": 896
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+            "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d",
+            "bytes": 3459
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/divider/_divider-theme.scss",
+            "sha256": "15a6239799cd29263ad2e336205bbebe4d31c9997464aa041483e0856e420361",
+            "bytes": 2087
+          }
+        ],
+        "diff_sha256": "0f383f8dd32a0fbe2ed2f16d9431a5ff063c79b13ffb86842025c1e43c164b5b",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream change adds a new triggerIconName option to the modern menu harness interface and predicate, plus modern icon test fixtures, API golden and build dependencies. The tagged16 legacy harness accepted triggerText and its own legacy harness retains that finite option; it does not expose or implement the new modern-only icon filter. This is not a claim that legacy triggerText filtering is delegated to the modern harness."
+      },
+      "prior_dispositions": [
+        {
+          "source_parent": "4c29be143432bcb5b2ca99d4f83ca6ff162b4554",
+          "source_entry_sha256": "8602d5d17577cf64a198eeee50e6e33ea357b1508eb4c867f5cb35d01850fbb3",
+          "source_line": "main",
+          "final_disposition": "do-not-adopt",
+          "prior_evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/c9289b5c59775ab6223c16b6c8afaa1ddcf6f54f.json"
+        }
+      ]
     },
     {
       "sha": "1fb58e94615143f9e6758f79d51c9a8dcb9d7726",
@@ -71920,19 +72738,179 @@
         "src/material/menu/menu.md"
       ],
       "diff_sha256": "3c10c49a7c6f676a75ad492cdc64ec5d826d42ee691bc3ee121a0d9c809905bf",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/3670e0f6c59e5c78a421658b99da07f15c3a1388.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/menu-eight-contextual-v1/3670e0f6c59e5c78a421658b99da07f15c3a1388.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/menu/context-menu-trigger.spec.ts changes `function getBackdrop(): HTMLElement | null {`. That line is not in the legacy sources. @angular/material/menu is exercised by projects/ngx-material-legacy/legacy-menu/menu.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/menu imported by projects/ngx-material-legacy/legacy-menu/menu.ts"
-      }
+      "final_disposition": "not-applicable",
+      "read_note_disposition": "individual-source-reviewed-on-main",
+      "reason": "The upstream condition, specification and documentation concern the modern MatContextMenuTrigger no-default-backdrop path, which the historical legacy menu does not implement or export. The separate legacy trigger already computes explicit menu.hasBackdrop versus root/submenu defaults; this judgment does not assert context-menu feature equivalence or any unseen M3 behavior.",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.ts",
+            "sha256": "e53577eef744606d3368bf4fa61cc49f669ea945b64f26e411c113ba572f2877",
+            "bytes": 1885
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-trigger.ts",
+            "sha256": "351e11291617ea3462025710b31621f9441ac341c99158b771798d4875dc9ab6",
+            "bytes": 662
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-module.ts",
+            "sha256": "b963626178cfa7cbf9a01c87189233c7efa15cc58c69c99af9d5459ff6e3f427",
+            "bytes": 1285
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+            "sha256": "82aaefb570df0953de0051aca4b3a987106b8ff3ea27e56d2e4c55fe75b461b4",
+            "bytes": 1809
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-content.ts",
+            "sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af",
+            "bytes": 1163
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+            "sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47",
+            "bytes": 710
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.scss",
+            "sha256": "87cfc81cd06a7a90e77336384372953cfeff27f038533b2c9c62dd024ba2c571",
+            "bytes": 3623
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "1f6c9025f1b04dc994e5e77247399546a2464c2281a01a46adeb50c828322321",
+            "bytes": 144721
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/public-api.ts",
+            "sha256": "a70a8f0d0dae829fa21c4a752ece2ee3e03ae63f400d4c87e9f7161a79f4b7a7",
+            "bytes": 1764
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/_menu-theme.scss",
+            "sha256": "f99c0b7612cd47f7329f3de712253e696bd3dc52d4449e2f4e1e50e744b0c72c",
+            "bytes": 2647
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "5f9b5fbe09d5bdc50bcb937e458ffb83bd49dddca1b0c0c64fadb5d267cfe6a3",
+            "bytes": 30731
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+            "sha256": "a498fd55553577bc81f285f36cf2822866d17b9bed8bb572c14bf78df21eed0d",
+            "bytes": 21858
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts",
+            "sha256": "f2d261227d8fa8e04a8773d57373ca6c78ffe20081bff8a0c809991969fba368",
+            "bytes": 5380
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+            "sha256": "3598e6ccf4761bd9777dafaca271cd896dc8f694ec39e9e46c37f593a8c307af",
+            "bytes": 1504
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel-token.ts",
+            "sha256": "3463226c000f63d599639bd1c400d744c9e02417bd9c57fe46e53827706180cd",
+            "bytes": 502
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts",
+            "sha256": "f5da44d00af909e5da4dc80453796857d22ab4f323c5db5d793d002d8e72cfd8",
+            "bytes": 3038
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-errors.ts",
+            "sha256": "adf746c2d91f6f86c6495d49e869ffba310eabf8e12bbca36cb33a7277d408fc",
+            "bytes": 1278
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/disabled.ts",
+            "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+            "bytes": 1073
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/constructor.ts",
+            "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+            "bytes": 450
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness.ts",
+            "sha256": "8a5e3af02e255c572bb0d5380c8e9be1ef22700a7c79f921875049af8d2ed6ea",
+            "bytes": 1912
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-base.ts",
+            "sha256": "559477ca79dff7fa492526a9c1e040fff9fdd019339ff0fb0da7268c49ca7479",
+            "bytes": 4638
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-filters.ts",
+            "sha256": "f8e844a0895303f41fcd80307323f490c7994e73ca0faa64e9e4651beafae360",
+            "bytes": 518
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/public-api.ts",
+            "sha256": "d0ca66da4e63a90ccdd6189c23354b7af6060fcd203a0c72db762d447bc9bbf9",
+            "bytes": 485
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+            "sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+            "bytes": 4603
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+            "sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+            "bytes": 3438
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/motion-event.ts",
+            "sha256": "8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667",
+            "bytes": 896
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+            "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d",
+            "bytes": 3459
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/divider/_divider-theme.scss",
+            "sha256": "15a6239799cd29263ad2e336205bbebe4d31c9997464aa041483e0856e420361",
+            "bytes": 2087
+          }
+        ],
+        "diff_sha256": "ba690541a178d73fd9445d094ae41083aed45a0dc2c26a23364d1822b5b1598f",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream condition, specification and documentation concern the modern MatContextMenuTrigger no-default-backdrop path, which the historical legacy menu does not implement or export. The separate legacy trigger already computes explicit menu.hasBackdrop versus root/submenu defaults; this judgment does not assert context-menu feature equivalence or any unseen M3 behavior."
+      },
+      "prior_dispositions": [
+        {
+          "source_parent": "4c29be143432bcb5b2ca99d4f83ca6ff162b4554",
+          "source_entry_sha256": "71ae9087efeb08759448b1218ed3a56bc42338baeb7b789edbfdae3d1682b1c8",
+          "source_line": "main",
+          "final_disposition": "inherited",
+          "prior_evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/3670e0f6c59e5c78a421658b99da07f15c3a1388.json"
+        }
+      ]
     },
     {
       "sha": "936f1148b3d6951bcfa1ce5e05538e8b746b677c",
@@ -73066,19 +74044,179 @@
         "src/material/menu/menu.ts"
       ],
       "diff_sha256": "a54eda990f1529d94386c68f2d562e32c24c013a370e253b1ce547fb4e895be7",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/9d73c98b57d46454d51344bbd59055bc06dabc6b.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/menu-eight-contextual-v1/9d73c98b57d46454d51344bbd59055bc06dabc6b.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/menu/menu.spec.ts changes `it('should expose the configured classes via the getter', () => {`. That line is not in the legacy sources. @angular/material/menu is exercised by projects/ngx-material-legacy/legacy-menu/menu.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/menu imported by projects/ngx-material-legacy/legacy-menu/menu.ts"
-      }
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "individual-source-reviewed-on-main",
+      "reason": "The upstream patch adds a readable modern panelClass accessor and initializes its prior-class field, with matching public API and test. Tagged16 legacy inherited a setter-only panelClass and its classList getter read that property; the owned legacy base retains those historical source roles. This is a reachable legacy-versus-modern accessor difference, not a peer-inherited fix. No modern API mirror or untested legacy behavior change is proposed.",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.ts",
+            "sha256": "e53577eef744606d3368bf4fa61cc49f669ea945b64f26e411c113ba572f2877",
+            "bytes": 1885
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-trigger.ts",
+            "sha256": "351e11291617ea3462025710b31621f9441ac341c99158b771798d4875dc9ab6",
+            "bytes": 662
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-module.ts",
+            "sha256": "b963626178cfa7cbf9a01c87189233c7efa15cc58c69c99af9d5459ff6e3f427",
+            "bytes": 1285
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+            "sha256": "82aaefb570df0953de0051aca4b3a987106b8ff3ea27e56d2e4c55fe75b461b4",
+            "bytes": 1809
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-content.ts",
+            "sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af",
+            "bytes": 1163
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+            "sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47",
+            "bytes": 710
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.scss",
+            "sha256": "87cfc81cd06a7a90e77336384372953cfeff27f038533b2c9c62dd024ba2c571",
+            "bytes": 3623
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "1f6c9025f1b04dc994e5e77247399546a2464c2281a01a46adeb50c828322321",
+            "bytes": 144721
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/public-api.ts",
+            "sha256": "a70a8f0d0dae829fa21c4a752ece2ee3e03ae63f400d4c87e9f7161a79f4b7a7",
+            "bytes": 1764
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/_menu-theme.scss",
+            "sha256": "f99c0b7612cd47f7329f3de712253e696bd3dc52d4449e2f4e1e50e744b0c72c",
+            "bytes": 2647
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "5f9b5fbe09d5bdc50bcb937e458ffb83bd49dddca1b0c0c64fadb5d267cfe6a3",
+            "bytes": 30731
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+            "sha256": "a498fd55553577bc81f285f36cf2822866d17b9bed8bb572c14bf78df21eed0d",
+            "bytes": 21858
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts",
+            "sha256": "f2d261227d8fa8e04a8773d57373ca6c78ffe20081bff8a0c809991969fba368",
+            "bytes": 5380
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+            "sha256": "3598e6ccf4761bd9777dafaca271cd896dc8f694ec39e9e46c37f593a8c307af",
+            "bytes": 1504
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel-token.ts",
+            "sha256": "3463226c000f63d599639bd1c400d744c9e02417bd9c57fe46e53827706180cd",
+            "bytes": 502
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts",
+            "sha256": "f5da44d00af909e5da4dc80453796857d22ab4f323c5db5d793d002d8e72cfd8",
+            "bytes": 3038
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-errors.ts",
+            "sha256": "adf746c2d91f6f86c6495d49e869ffba310eabf8e12bbca36cb33a7277d408fc",
+            "bytes": 1278
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/disabled.ts",
+            "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+            "bytes": 1073
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/constructor.ts",
+            "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+            "bytes": 450
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness.ts",
+            "sha256": "8a5e3af02e255c572bb0d5380c8e9be1ef22700a7c79f921875049af8d2ed6ea",
+            "bytes": 1912
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-base.ts",
+            "sha256": "559477ca79dff7fa492526a9c1e040fff9fdd019339ff0fb0da7268c49ca7479",
+            "bytes": 4638
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-filters.ts",
+            "sha256": "f8e844a0895303f41fcd80307323f490c7994e73ca0faa64e9e4651beafae360",
+            "bytes": 518
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/public-api.ts",
+            "sha256": "d0ca66da4e63a90ccdd6189c23354b7af6060fcd203a0c72db762d447bc9bbf9",
+            "bytes": 485
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+            "sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+            "bytes": 4603
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+            "sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+            "bytes": 3438
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/motion-event.ts",
+            "sha256": "8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667",
+            "bytes": 896
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+            "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d",
+            "bytes": 3459
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/divider/_divider-theme.scss",
+            "sha256": "15a6239799cd29263ad2e336205bbebe4d31c9997464aa041483e0856e420361",
+            "bytes": 2087
+          }
+        ],
+        "diff_sha256": "7bd77f204c08789516dafeebfcdde1d322de13ea0d10188b3b5822d4bef13932",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream patch adds a readable modern panelClass accessor and initializes its prior-class field, with matching public API and test. Tagged16 legacy inherited a setter-only panelClass and its classList getter read that property; the owned legacy base retains those historical source roles. This is a reachable legacy-versus-modern accessor difference, not a peer-inherited fix. No modern API mirror or untested legacy behavior change is proposed."
+      },
+      "prior_dispositions": [
+        {
+          "source_parent": "4c29be143432bcb5b2ca99d4f83ca6ff162b4554",
+          "source_entry_sha256": "1d4c4db46de2095ded3a6e58d1f8afae4ee6b6cf27b1372d1e87f55ab647c5c5",
+          "source_line": "main",
+          "final_disposition": "inherited",
+          "prior_evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/9d73c98b57d46454d51344bbd59055bc06dabc6b.json"
+        }
+      ]
     },
     {
       "sha": "24115c02189ca0b1b3f09a909b8962d330f55f91",
@@ -73306,13 +74444,179 @@
         "src/material/menu/menu.ts"
       ],
       "diff_sha256": "8e743212830618af9577ca0796c9de9660860800cc5392641d6629dd38e99d6d",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/4d52c9ff0ef5e7a2fdf9a7fa778733b3a02971de.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/menu-eight-contextual-v1/4d52c9ff0ef5e7a2fdf9a7fa778733b3a02971de.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
       "final_disposition": "do-not-adopt",
-      "read_note_disposition": "retained-legacy-differs",
-      "reason": "The diff in src/material/menu/menu-item.ts changes `ChangeDetectionStrategy,`. The owned legacy file still contains the previous line because this package keeps the Material 16 legacy contract (zone scheduling, factory providers, explicit change detection, or the pre-signal API). The current-component rewrite is not copied into the legacy sources. The commit is an ancestor of v22.1.7, so @angular/material@22.1.7 and @angular/cdk@22.1.7 already contain it for peer callers."
+      "read_note_disposition": "individual-source-reviewed-on-main",
+      "reason": "The upstream patch removes explicit OnPush metadata from modern menu and menu-item components and two modern test hosts. Owned legacy MatLegacyMenu and MatLegacyMenuItem retain their historical explicit OnPush metadata and owned markForCheck paths. Keep historical change-detection behavior; no conclusion is drawn that the modern peer default executes equivalently.",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.ts",
+            "sha256": "e53577eef744606d3368bf4fa61cc49f669ea945b64f26e411c113ba572f2877",
+            "bytes": 1885
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-trigger.ts",
+            "sha256": "351e11291617ea3462025710b31621f9441ac341c99158b771798d4875dc9ab6",
+            "bytes": 662
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-module.ts",
+            "sha256": "b963626178cfa7cbf9a01c87189233c7efa15cc58c69c99af9d5459ff6e3f427",
+            "bytes": 1285
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+            "sha256": "82aaefb570df0953de0051aca4b3a987106b8ff3ea27e56d2e4c55fe75b461b4",
+            "bytes": 1809
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu-content.ts",
+            "sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af",
+            "bytes": 1163
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+            "sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47",
+            "bytes": 710
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.scss",
+            "sha256": "87cfc81cd06a7a90e77336384372953cfeff27f038533b2c9c62dd024ba2c571",
+            "bytes": 3623
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "1f6c9025f1b04dc994e5e77247399546a2464c2281a01a46adeb50c828322321",
+            "bytes": 144721
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/public-api.ts",
+            "sha256": "a70a8f0d0dae829fa21c4a752ece2ee3e03ae63f400d4c87e9f7161a79f4b7a7",
+            "bytes": 1764
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/_menu-theme.scss",
+            "sha256": "f99c0b7612cd47f7329f3de712253e696bd3dc52d4449e2f4e1e50e744b0c72c",
+            "bytes": 2647
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "5f9b5fbe09d5bdc50bcb937e458ffb83bd49dddca1b0c0c64fadb5d267cfe6a3",
+            "bytes": 30731
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+            "sha256": "a498fd55553577bc81f285f36cf2822866d17b9bed8bb572c14bf78df21eed0d",
+            "bytes": 21858
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts",
+            "sha256": "f2d261227d8fa8e04a8773d57373ca6c78ffe20081bff8a0c809991969fba368",
+            "bytes": 5380
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+            "sha256": "3598e6ccf4761bd9777dafaca271cd896dc8f694ec39e9e46c37f593a8c307af",
+            "bytes": 1504
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel-token.ts",
+            "sha256": "3463226c000f63d599639bd1c400d744c9e02417bd9c57fe46e53827706180cd",
+            "bytes": 502
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts",
+            "sha256": "f5da44d00af909e5da4dc80453796857d22ab4f323c5db5d793d002d8e72cfd8",
+            "bytes": 3038
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-errors.ts",
+            "sha256": "adf746c2d91f6f86c6495d49e869ffba310eabf8e12bbca36cb33a7277d408fc",
+            "bytes": 1278
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/disabled.ts",
+            "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+            "bytes": 1073
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/constructor.ts",
+            "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+            "bytes": 450
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness.ts",
+            "sha256": "8a5e3af02e255c572bb0d5380c8e9be1ef22700a7c79f921875049af8d2ed6ea",
+            "bytes": 1912
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-base.ts",
+            "sha256": "559477ca79dff7fa492526a9c1e040fff9fdd019339ff0fb0da7268c49ca7479",
+            "bytes": 4638
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-filters.ts",
+            "sha256": "f8e844a0895303f41fcd80307323f490c7994e73ca0faa64e9e4651beafae360",
+            "bytes": 518
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/testing/public-api.ts",
+            "sha256": "d0ca66da4e63a90ccdd6189c23354b7af6060fcd203a0c72db762d447bc9bbf9",
+            "bytes": 485
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+            "sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+            "bytes": 4603
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+            "sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+            "bytes": 3438
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/motion-event.ts",
+            "sha256": "8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667",
+            "bytes": 896
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+            "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d",
+            "bytes": 3459
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/divider/_divider-theme.scss",
+            "sha256": "15a6239799cd29263ad2e336205bbebe4d31c9997464aa041483e0856e420361",
+            "bytes": 2087
+          }
+        ],
+        "diff_sha256": "a68567ca45423125eb54ba14997fb946e58e0c4fd7574bcbc948ca1db38c3ad6",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream patch removes explicit OnPush metadata from modern menu and menu-item components and two modern test hosts. Owned legacy MatLegacyMenu and MatLegacyMenuItem retain their historical explicit OnPush metadata and owned markForCheck paths. Keep historical change-detection behavior; no conclusion is drawn that the modern peer default executes equivalently."
+      },
+      "prior_dispositions": [
+        {
+          "source_parent": "4c29be143432bcb5b2ca99d4f83ca6ff162b4554",
+          "source_entry_sha256": "c382841fbaab710f4cde01244ffc3dd26f4d3ac38e9363a83ef36df21e935c94",
+          "source_line": "main",
+          "final_disposition": "do-not-adopt",
+          "prior_evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/4d52c9ff0ef5e7a2fdf9a7fa778733b3a02971de.json"
+        }
+      ]
     },
     {
       "sha": "b13a3977aa356d4b9e164f656487c04d7becf3e9",
