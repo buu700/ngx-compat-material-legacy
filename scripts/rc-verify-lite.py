@@ -138,6 +138,7 @@ CHECKS = (
     ["node", "--check", "scripts/rc-test-legacy-family.mjs"],
     ["node", "--check", "scripts/run-legacy-tests.mjs"],
     ["node", "--check", "scripts/run-legacy-artifact-suite.mjs"],
+    ["node", "tests/legacy_external_artifact_resolution.mjs"],
     ["node", "scripts/fresh-artifact-negative-tests.mjs"],
     ["node", "--experimental-strip-types", "tests/motion/host-motion-event.test.mjs"],
     ["node", "scripts/motion-smoke-regressions.mjs"],

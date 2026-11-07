@@ -184,6 +184,9 @@ await esbuild.build({
   bundle: true,
   format: 'iife',
   platform: 'browser',
+  // Packed artifacts can be extracted outside this workspace. Resolve their
+  // bare peer imports against the same pinned dependencies as the runner.
+  nodePaths: [path.join(root, 'node_modules')],
   target: ['es2022'],
   outfile: path.join(outDir, 'legacy-tests.iife.js'),
   sourcemap: true,
