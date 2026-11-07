@@ -1,0 +1,2107 @@
+{
+  "schema_version": 1,
+  "role": "finite-current-native-tab-product-source",
+  "source_scope_only": true,
+  "actual_native_packed_browser_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "input_map_sha256": "c000e7495fa1aa81d875140cf317bb4f2731b8708e976bc1deaeb8d60b6c04bf",
+  "worksheet_sha256": "0a3295c600ef1467162617afba04d91609dad6fd0eb6edd8226b63d72233ab41",
+  "lines": {
+    "21.x": {
+      "peer_minimum": {
+        "cdk": "21.2.14",
+        "material": "21.2.14",
+        "declarations": [
+          {
+            "path": "node_modules/@angular/cdk/package.json",
+            "sha256": "10c398ae1ae4854e4c98b3715f8e0f225e34b7773fa3c582f11d67852a003ea9",
+            "bytes": 5041
+          },
+          {
+            "path": "node_modules/@angular/material/package.json",
+            "sha256": "26af34e77987b55564689c8eb7b5352db661d6a737fdec2160417ae42114f355",
+            "bytes": 11422
+          },
+          {
+            "path": "node_modules/@angular/cdk/types/dialog.d.ts",
+            "sha256": "5d9ab0026ebe92d3607fecb58df3721106f8c63534f2601fc3c387c2e2245d97",
+            "bytes": 19836
+          },
+          {
+            "path": "node_modules/@angular/cdk/types/portal.d.ts",
+            "sha256": "17f59b700249a0ee761c3ac50d34415c7118eba48e26b8928e87d530fc4a4a64",
+            "bytes": 2269
+          },
+          {
+            "path": "node_modules/@angular/cdk/types/overlay.d.ts",
+            "sha256": "e15e46ec3d671453aa3be897938cf04b0c29dbdd20480def6d57ebfae53c2499",
+            "bytes": 14625
+          },
+          {
+            "path": "node_modules/@angular/cdk/types/scrolling.d.ts",
+            "sha256": "3c1a2af7d34c2d2cd6760d8d4b574fa4ecc40bab8c6e10bc0e804287259ed340",
+            "bytes": 2768
+          },
+          {
+            "path": "node_modules/@angular/cdk/types/_portal-directives-chunk.d.ts",
+            "sha256": "8bf59f01d49417cba2bb4b8eba6ba9a03f33976950bc369865070d17be684cb7",
+            "bytes": 8958
+          },
+          {
+            "path": "node_modules/@angular/cdk/types/_overlay-module-chunk.d.ts",
+            "sha256": "7d89742d60a006d1ccf044a451c774f6baf4f54f41b61c7f309346b9ce84f6cf",
+            "bytes": 45193
+          },
+          {
+            "path": "node_modules/@angular/cdk/types/_scrolling-module-chunk.d.ts",
+            "sha256": "e4aeb44b011913d186f8ebfe4bdfe20880ae4125d0628991e973d2d6ea29c506",
+            "bytes": 27982
+          },
+          {
+            "path": "node_modules/@angular/material/types/form-field-testing.d.ts",
+            "sha256": "a5e98005062b8ef2be2e5c014353f65bbb28ad723512d7d521ef4829cfdd261a",
+            "bytes": 6042
+          }
+        ]
+      },
+      "frozen_parent": "9d7f09cc55d85979272f0e42aaad564ad3ec1fd6",
+      "frozen_members": 1141,
+      "current_members": 1143,
+      "resource_members": 439,
+      "expected_changed_existing": 40,
+      "expected_resource_changes": 8,
+      "changed_existing": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+          "before_git_blob": "634482f0645c96d7bce3cf852ef29a18d896d6fa",
+          "before_sha256": "84e5ca0c5060c756ac186c409097556315882a88b280a12e34def1080e5a1dcf",
+          "before_bytes": 145237,
+          "current_git_blob": "3cf88c0545ae1b5ab9b0a58f45e658bf8164e725",
+          "current_sha256": "2610d311569c9a6fdb063dc0652b423414622cf1370b2434f13ba86070293236",
+          "current_bytes": 152212,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "autocomplete selection and empty-panel tests",
+            "reason": "Added required/optional selection, reset, and empty-panel assertions; one fixture property title→label follows the group template. No production code.",
+            "prior_evidence_path": "compatibility/rc/autocomplete-selection-native-contract-proposal.json",
+            "prior_evidence_sha256": "9807d4a66c303445a1af43a2c4bb66217b7391af9ee62ab33f290c3b9bb066ba",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 26047,
+              "before": "",
+              "after": "      const selectedElement = overlayContainerElement.querySelectorAll(\n        'mat-option',\n      )[1] as HTMLElement;\n      expect(selectedElement).toBeTruthy();\n      selectedElement.click();\n      fixture.detectChanges();\n      tick();\n      fixture.componentInstance.filteredStates = fixture.componentInstance.states;\n      fixture.detectChanges();\n      fixture.componentInstance.trigger.openPanel();\n      fixture.detectChanges();\n      zone.simulateZoneExit();\n      expect(\n        fixture.componentInstance.options.find(option => option.value === selected)?.selected,\n      ).toBe(true);\n"
+            },
+            {
+              "offset": 26674,
+              "before": "",
+              "after": "      expect(\n        fixture.componentInstance.options.find(option => option.value === selected)?.selected,\n      ).toBe(true);\n"
+            },
+            {
+              "offset": 28618,
+              "before": "",
+              "after": "\n      const filteredSelected = prepareRequiredSelection();\n      const filteredChanges = jasmine.createSpy('filtered required selection model changes');\n      const filteredSubscription =\n        fixture.componentInstance.stateCtrl.valueChanges.subscribe(filteredChanges);\n      input.value = 'Cali';\n      dispatchFakeEvent(input, 'input');\n      fixture.detectChanges();\n      tick();\n      expect(filteredChanges).not.toHaveBeenCalled();\n      fixture.componentInstance.filteredStates = [];\n      fixture.detectChanges();\n      tick();\n      fixture.detectChanges();\n      expect(fixture.componentInstance.trigger.panelOpen).toBe(false);\n      expect(fixture.componentInstance.stateCtrl.value).toBe(filteredSelected);\n      fixture.componentInstance.filteredStates = [fixture.componentInstance.states[1]];\n      fixture.detectChanges();\n      tick();\n      fixture.detectChanges();\n      expect(fixture.componentInstance.options.length).toBe(1);\n      expect(fixture.componentInstance.trigger.panelOpen).toBe(true);\n      expect(input.value).toBe('Cali');\n      expect(filteredChanges).not.toHaveBeenCalled();\n      dispatchFakeEvent(document, 'click');\n      fixture.detectChanges();\n      tick();\n      expect(fixture.componentInstance.stateCtrl.value).toBeNull();\n      expect(input.value).toBe('');\n      expect(filteredChanges).toHaveBeenCalledTimes(1);\n      expect(filteredChanges).toHaveBeenCalledWith(null);\n      expect(fixture.componentInstance.trigger.panelOpen).toBe(false);\n      filteredSubscription.unsubscribe();\n"
+            },
+            {
+              "offset": 30478,
+              "before": "",
+              "after": "\n      const component = fixture.componentInstance;\n      const display = spyOn(component, 'displayFn').and.callThrough();\n      component.filteredStates = component.states;\n      fixture.detectChanges();\n      component.trigger.openPanel();\n      fixture.detectChanges();\n      zone.simulateZoneExit();\n      const selectedOption = component.options.toArray()[1];\n      (overlayContainerElement.querySelectorAll('mat-option')[1] as HTMLElement).click();\n      fixture.detectChanges();\n      tick();\n      component.filteredStates = component.states;\n      fixture.detectChanges();\n      component.trigger.openPanel();\n      fixture.detectChanges();\n      zone.simulateZoneExit();\n      expect(selectedOption.selected).toBe(true);\n      const selectionEvents = jasmine.createSpy('optional typing selection events');\n      const selectionSubscription = component.trigger.optionSelections.subscribe(selectionEvents);\n      const modelChanges = jasmine.createSpy('optional typing model changes');\n      const modelSubscription = component.stateCtrl.valueChanges.subscribe(modelChanges);\n      display.calls.reset();\n      input.value = 'Californi';\n      dispatchFakeEvent(input, 'input');\n      expect(display).toHaveBeenCalledWith(selectedOption.value);\n      expect(selectedOption.selected).toBe(false);\n      fixture.detectChanges();\n      tick();\n      expect(component.stateCtrl.value).toBe('Californi');\n      expect(modelChanges).toHaveBeenCalledTimes(1);\n      expect(modelChanges).toHaveBeenCalledWith('Californi');\n      expect(selectionEvents).not.toHaveBeenCalled();\n      selectionSubscription.unsubscribe();\n      modelSubscription.unsubscribe();\n"
+            },
+            {
+              "offset": 32532,
+              "before": "",
+              "after": "\n      const component = fixture.componentInstance;\n      component.trigger.openPanel();\n      fixture.detectChanges();\n      zone.simulateZoneExit();\n      const selectedOption = component.options.first;\n      (overlayContainerElement.querySelector('mat-option') as HTMLElement).click();\n      fixture.detectChanges();\n      tick();\n      expect(selectedOption.selected).toBe(true);\n      expect(component.stateCtrl.value).toBe(component.states[0]);\n      const selections = jasmine.createSpy('programmatic reset selection events');\n      const selectionSubscription = component.trigger.optionSelections.subscribe(selections);\n      const resets = jasmine.createSpy('programmatic reset model changes');\n      const valueSubscription = component.stateCtrl.valueChanges.subscribe(resets);\n      component.stateCtrl.reset();\n      fixture.detectChanges();\n      tick();\n      fixture.detectChanges();\n      expect(component.stateCtrl.value).toBeNull();\n      expect(input.value).toBe('');\n      expect(selectedOption.selected).toBe(false);\n      expect(selections).not.toHaveBeenCalled();\n      expect(resets).toHaveBeenCalledTimes(1);\n      expect(resets).toHaveBeenCalledWith(null);\n      selectionSubscription.unsubscribe();\n      valueSubscription.unsubscribe();\n"
+            },
+            {
+              "offset": 132429,
+              "before": "",
+              "after": "\n  it('should not throw errors when closing without options', fakeAsync(() => {\n    const fixture = createComponent(SimpleAutocomplete);\n    fixture.detectChanges();\n    const component = fixture.componentInstance;\n    const selected = component.states[1];\n    component.panel.requireSelection = true;\n    component.stateCtrl.setValue(selected);\n    tick();\n    component.filteredStates = component.states = [];\n    fixture.detectChanges();\n    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;\n    expect(input.value).toBe('California');\n    expect(component.stateCtrl.value).toBe(selected);\n    expect(fixture.componentInstance.options.length).toBe(0);\n    const trigger = fixture.componentInstance.trigger;\n\n    trigger.openPanel();\n    expect(trigger.panelOpen).toBe(false);\n    expect(() => trigger.closePanel()).not.toThrow();\n\n    const changes = jasmine.createSpy('empty panel model changes');\n    const selections = jasmine.createSpy('empty panel option selections');\n    const valueSubscription = component.stateCtrl.valueChanges.subscribe(changes);\n    const selectionSubscription = trigger.optionSelections.subscribe(selections);\n    const close = spyOn(trigger, 'closePanel').and.callThrough();\n    trigger.openPanel();\n    fixture.detectChanges();\n    zone.simulateZoneExit();\n    expect(trigger.panelOpen).toBe(false);\n    dispatchFakeEvent(document, 'click');\n    fixture.detectChanges();\n    tick();\n\n    expect(close).toHaveBeenCalledTimes(1);\n    expect(input.value).toBe('California');\n    expect(component.stateCtrl.value).toBe(selected);\n    expect(changes).not.toHaveBeenCalled();\n    expect(selections).not.toHaveBeenCalled();\n    valueSubscription.unsubscribe();\n    selectionSubscription.unsubscribe();\n    fixture.destroy();\n  }));\n"
+            },
+            {
+              "offset": 140895,
+              "before": "      title: 'One',\n",
+              "after": "      label: 'One',\n"
+            },
+            {
+              "offset": 140990,
+              "before": "      title: 'Two',\n",
+              "after": "      label: 'Two',\n"
+            },
+            {
+              "offset": 141094,
+              "before": "      title: 'Three',\n",
+              "after": "      label: 'Three',\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+          "before_git_blob": "aab5cfc2c3522b2b5efb6725148a8e32d77e2960",
+          "before_sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80",
+          "before_bytes": 66462,
+          "current_git_blob": "b00b908ce3b52fbaed88b72ae95c16a0969bf2bc",
+          "current_sha256": "26263b1efa46119fc7a8ea1b8693af78401cb2b78a3a4a6fb1dc7b0c78618750",
+          "current_bytes": 71076,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "chip focus and destroyed-list tests",
+            "reason": "Adds DOM tabIndex timing, removed-chip active index, first enabled chip focus, and disabled child/form-field state assertions.",
+            "prior_evidence_path": "compatibility/rc/chip-focus-source-qualification-modern-chip.json",
+            "prior_evidence_sha256": "9e3e66b3bfc2653d1de5ba09df12a58d4ebf6a1838f5ec970e46cc68ec5a10bf",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 595,
+              "before": "import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';\n",
+              "after": "import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';\n"
+            },
+            {
+              "offset": 16707,
+              "before": "",
+              "after": "          expect(chipListNativeElement.tabIndex).toBe(-1);\n          flushMicrotasks();\n          expect(chipListNativeElement.tabIndex).toBe(-1);\n\n"
+            },
+            {
+              "offset": 16861,
+              "before": "",
+              "after": "          expect(chipListNativeElement.tabIndex).toBe(0);\n"
+            },
+            {
+              "offset": 17399,
+              "before": "",
+              "after": "          expect(chipListNativeElement.tabIndex).toBe(-1);\n          flushMicrotasks();\n          expect(chipListNativeElement.tabIndex).toBe(-1);\n\n"
+            },
+            {
+              "offset": 17553,
+              "before": "",
+              "after": "          expect(chipListNativeElement.tabIndex).toBe(4);\n"
+            },
+            {
+              "offset": 56302,
+              "before": "",
+              "after": "\n  it('should clear a destroyed active chip when the list becomes empty', () => {\n    setupStandardList();\n    const keyManager = chipListInstance._keyManager;\n    const removedChip = chips.last;\n\n    removedChip.focus();\n    fixture.detectChanges();\n    expect(keyManager.activeItem).toBe(removedChip);\n\n    testComponent.chips = [];\n    fixture.detectChanges();\n    expect(chips.length).toBe(0);\n    expect(keyManager.activeItemIndex).toBe(-1);\n    expect(keyManager.activeItem).toBeNull();\n\n    testComponent.chips = [10, 11];\n    fixture.detectChanges();\n    expect(keyManager.activeItemIndex).toBe(-1);\n    expect(keyManager.activeItem).toBeNull();\n\n    chips.first.focus();\n    fixture.detectChanges();\n    expect(keyManager.activeItemIndex).toBe(0);\n    expect(keyManager.activeItem).toBe(chips.first);\n    expect(keyManager.activeItem).not.toBe(removedChip);\n  });\n  describe('classic focus and state contract', () => {\n    it('should focus the first enabled chip when a later chip was active', () => {\n      setupStandardList();\n      const keyManager = chipListInstance._keyManager;\n      chips.last.focus();\n      fixture.detectChanges();\n      expect(keyManager.activeItem).toBe(chips.last);\n\n      chipListInstance.focus();\n      fixture.detectChanges();\n      expect(keyManager.activeItem).toBe(chips.first);\n      expect(document.activeElement).toBe(chips.first._elementRef.nativeElement);\n    });\n\n    it('should skip the disabled first and active chips when focusing', () => {\n      setupStandardList();\n      const keyManager = chipListInstance._keyManager;\n      const chipArray = chips.toArray();\n      chipArray[0].disabled = chipArray[1].disabled = true;\n      keyManager.updateActiveItem(1);\n      fixture.detectChanges();\n\n      chipListInstance.focus();\n      fixture.detectChanges();\n      expect(keyManager.activeItem).toBe(chipArray[2]);\n      expect(document.activeElement).toBe(chipArray[2]._elementRef.nativeElement);\n    });\n\n    it('should refocus the first chip after focus leaves while index zero remains active', fakeAsync(() => {\n      setupStandardList();\n      const keyManager = chipListInstance._keyManager;\n      const outside = document.createElement('button');\n      document.body.appendChild(outside);\n      try {\n        chipListInstance.focus();\n        outside.focus();\n        zone.simulateZoneExit();\n        tick();\n        fixture.detectChanges();\n        expect(document.activeElement).toBe(outside);\n        expect(keyManager.activeItemIndex).toBe(0);\n\n        chipListInstance.focus();\n        fixture.detectChanges();\n        expect(document.activeElement).toBe(chips.first._elementRef.nativeElement);\n        expect(keyManager.activeItem).toBe(chips.first);\n      } finally {\n        outside.remove();\n      }\n    }));\n\n    it('should notify disabled state after propagating it to chips and render the form field state', () => {\n      setupInputList();\n      const states: {disabled: boolean; children: boolean[]}[] = [];\n      const subscription = chipListInstance.stateChanges.subscribe(() => {\n        states.push({disabled: chipListInstance.disabled, children: chips.map(chip => chip.disabled)});\n      });\n      const formField: HTMLElement = fixture.nativeElement.querySelector('.mat-form-field');\n      const renderedChips: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('mat-chip'));\n      try {\n        chipListInstance.disabled = true;\n        expect(states).toEqual([{disabled: true, children: [true, true, true]}]);\n        fixture.detectChanges();\n        expect(formField.classList).toContain('mat-form-field-disabled');\n        expect(renderedChips.map(chip => chip.getAttribute('aria-disabled'))).toEqual(['true', 'true', 'true']);\n\n        states.length = 0;\n        chipListInstance.disabled = false;\n        expect(states).toEqual([{disabled: false, children: [false, false, false]}]);\n        fixture.detectChanges();\n        expect(formField.classList).not.toContain('mat-form-field-disabled');\n        expect(renderedChips.map(chip => chip.getAttribute('aria-disabled'))).toEqual(['false', 'false', 'false']);\n      } finally {\n        subscription.unsubscribe();\n      }\n    });\n  });\n\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+          "before_git_blob": "3d7db420a4ffe296f29517cbe8e328e2ac7aae72",
+          "before_sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2",
+          "before_bytes": 26422,
+          "current_git_blob": "44aaa47f4f85e838db4d97535f3eff7231dea290",
+          "current_sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151",
+          "current_bytes": 26446,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "owned chip-list focus and removal behavior",
+            "reason": "Replaces active-chip refocus with first enabled active and clears key-manager item on empty list; restores classic list focus and prevents stale destroyed chip.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 16388,
+              "before": "      const activeItem = this._keyManager.activeItem;\n      if (activeItem) {\n        activeItem.focus();\n      } else {\n        this._keyManager.setFirstItemActive();\n      }\n",
+              "after": "      this._keyManager.setFirstItemActive();\n"
+            },
+            {
+              "offset": 17606,
+              "before": "",
+              "after": "    // Empty lists must not retain a reference to a destroyed chip.\n    if (this.chips.length === 0) {\n      this._keyManager.updateActiveItem(-1);\n    }\n\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-chips/chip.spec.ts",
+          "before_git_blob": "7fe0684438504d7b7f6e8583a7239a47e481418c",
+          "before_sha256": "dde78ea65e4351f5fcbb066cc259c5c6202e9942998f08125a2394188c8a9f35",
+          "before_bytes": 16400,
+          "current_git_blob": "64b5e314df7d9d4047c301b349f7c0a5433f6457",
+          "current_sha256": "54a0155a6498645f599e40fe1d4ba787647de68e888141eb9e69e923a99523ac",
+          "current_bytes": 21277,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "chip blur lifecycle tests",
+            "reason": "Adds pending blur, reentry, destruction ordering, and focus notification cases using owned MockNgZone.",
+            "prior_evidence_path": "compatibility/rc/chip-focus-source-qualification-modern-chip.json",
+            "prior_evidence_sha256": "9e3e66b3bfc2653d1de5ba09df12a58d4ebf6a1838f5ec970e46cc68ec5a10bf",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 196,
+              "before": "import {Component, DebugElement, ViewChild} from '@angular/core';\nimport {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';\n",
+              "after": "import {Component, DebugElement, NgZone, ViewChild} from '@angular/core';\nimport {waitForAsync, ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';\n"
+            },
+            {
+              "offset": 504,
+              "before": "",
+              "after": "import {MockNgZone} from '../internal/testing/owned-test-events';\n"
+            },
+            {
+              "offset": 14944,
+              "before": "",
+              "after": "    });\n  });\n\n  describe('owned blur lifecycle', () => {\n    let lifecycleZone: MockNgZone;\n\n    beforeEach(() => {\n      lifecycleZone = new MockNgZone();\n      Object.defineProperty(lifecycleZone, 'isStable', {\n        value: false,\n        writable: true,\n        configurable: true,\n      });\n      TestBed.overrideProvider(NgZone, {useValue: lifecycleZone});\n      fixture = TestBed.createComponent(SingleChip);\n      fixture.detectChanges();\n      chipDebugElement = fixture.debugElement.query(By.directive(MatLegacyChip))!;\n      chipNativeElement = chipDebugElement.nativeElement;\n      chipInstance = chipDebugElement.injector.get(MatLegacyChip);\n    });\n\n    it('should restore DOM focus while an earlier blur is pending', fakeAsync(() => {\n      const outside = document.createElement('button');\n      document.body.appendChild(outside);\n      let blurs = 0;\n      const subscription = chipInstance._onBlur.subscribe(() => blurs++);\n      try {\n        chipNativeElement.focus();\n        outside.focus();\n        expect(document.activeElement).toBe(outside);\n        expect(chipInstance._hasFocus).toBe(true);\n\n        chipInstance.focus();\n        expect(document.activeElement).toBe(chipNativeElement);\n        expect(chipInstance._hasFocus).toBe(true);\n        lifecycleZone.simulateZoneExit();\n        flushMicrotasks();\n        expect(document.activeElement).toBe(chipNativeElement);\n        expect(chipInstance._hasFocus).toBe(true);\n        expect(blurs).toBe(0);\n      } finally {\n        subscription.unsubscribe();\n        outside.remove();\n      }\n    }));\n\n    it('should emit one blur for repeated requests and racing stability', fakeAsync(() => {\n      Object.defineProperty(lifecycleZone, 'isStable', {value: true});\n      let blurs = 0;\n      const subscription = chipInstance._onBlur.subscribe(() => blurs++);\n      try {\n        chipNativeElement.focus();\n        chipInstance._blur();\n        chipInstance._blur();\n        expect(blurs).toBe(0);\n        expect(chipInstance._hasFocus).toBe(true);\n        flushMicrotasks();\n        expect(blurs).toBe(1);\n        expect(chipInstance._hasFocus).toBe(false);\n\n        chipInstance.focus();\n        chipInstance._blur();\n        chipInstance._blur();\n        lifecycleZone.simulateZoneExit();\n        expect(blurs).toBe(2);\n        flushMicrotasks();\n        lifecycleZone.simulateZoneExit();\n        expect(blurs).toBe(2);\n        expect(chipInstance._hasFocus).toBe(false);\n      } finally {\n        subscription.unsubscribe();\n      }\n    }));\n\n    it('should cancel pending blur and notify destruction before ripple cleanup', fakeAsync(() => {\n      Object.defineProperty(lifecycleZone, 'isStable', {value: true});\n      const ripple = (chipInstance as unknown as {\n        _chipRipple: {_removeTriggerEvents(): void};\n      })._chipRipple;\n      const cleanup = spyOn(ripple, '_removeTriggerEvents').and.callThrough();\n      const events: string[] = [];\n      const blurSubscription = chipInstance._onBlur.subscribe(() => events.push('blur'));\n      const destroySubscription = chipInstance.destroyed.subscribe(() => {\n        expect(cleanup).not.toHaveBeenCalled();\n        expect(chipInstance._hasFocus).toBe(true);\n        events.push('destroyed');\n      });\n      try {\n        chipNativeElement.focus();\n        chipInstance._blur();\n        fixture.componentInstance.shouldShow = false;\n        fixture.detectChanges();\n        lifecycleZone.simulateZoneExit();\n        flushMicrotasks();\n        chipInstance.ngOnDestroy();\n        chipInstance.focus();\n        expect(events).toEqual(['destroyed']);\n        expect(cleanup).toHaveBeenCalledTimes(1);\n      } finally {\n        blurSubscription.unsubscribe();\n        destroySubscription.unsubscribe();\n      }\n    }));\n\n    it('should notify programmatic focus once during synchronous host reentry', () => {\n      const outside = document.createElement('button');\n      document.body.appendChild(outside);\n      const observations: {focused: boolean; active: Element | null}[] = [];\n      const nativeFocus = spyOn(chipNativeElement, 'focus').and.callThrough();\n      const subscription = chipInstance._onFocus.subscribe(() => observations.push({\n        focused: chipInstance._hasFocus,\n        active: document.activeElement,\n      }));\n      try {\n        outside.focus();\n        chipInstance.focus();\n        expect(nativeFocus).toHaveBeenCalledTimes(1);\n        expect(observations).toEqual([{focused: true, active: chipNativeElement}]);\n        chipInstance.focus();\n        expect(nativeFocus).toHaveBeenCalledTimes(1);\n        chipNativeElement.focus();\n        expect(observations).toEqual([{focused: true, active: chipNativeElement}]);\n      } finally {\n        subscription.unsubscribe();\n        outside.remove();\n      }\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+          "before_git_blob": "4dd1e600f28db70711ea8b1adcd0535ed6b3be82",
+          "before_sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15",
+          "before_bytes": 16824,
+          "current_git_blob": "9c7bb1edbc65c9730bf9cdb14bc41b79f9ef20a8",
+          "current_sha256": "73aea18bc4f77958bc69229ea4954a688d92913bbc59fb52e28f342c2d42a5ae",
+          "current_bytes": 17085,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "owned chip focus lifecycle",
+            "reason": "Cancels pending blur, publishes focus before synchronous native callback, then notifies once; preserves destroyed guard.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 12639,
+              "before": "",
+              "after": "    const wasBlurPending = !!this._blurSubscription && !this._blurSubscription.closed;\n"
+            },
+            {
+              "offset": 12682,
+              "before": "    if (!this._hasFocus) {\n",
+              "after": "\n    if (!this._hasFocus || wasBlurPending) {\n      // Native focus dispatches the host focus handler synchronously. Publish the\n      // state first so reentry cannot focus or notify a second time.\n      this._hasFocus = true;\n"
+            },
+            {
+              "offset": 12801,
+              "before": "    this._hasFocus = true;\n",
+              "after": ""
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/dialog-config.ts",
+          "before_git_blob": "0a189c17a35b717b534640c7db6d57b17712da88",
+          "before_sha256": "73a0631f279f6770d7f033b021ae1864cbe830c6bea8bfc45a7810cd4417daff",
+          "before_bytes": 1123,
+          "current_git_blob": "020ad2f9d914c6dff9893879881ae4a04a94a4e3",
+          "current_sha256": "74f93ae9a4e82f27f12ff7edee36dd3eb1783cbf70b49f4b3cd72f613a0aec05",
+          "current_bytes": 1780,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "legacy dialog config type",
+            "reason": "Adds owned legacy runtime config for historical autofocus/durations and explicit autofocus default. CDK DialogConfig public declaration remains peer-minimum.",
+            "prior_evidence_path": "compatibility/rc/dialog-caller-config-overlay-types-21.json",
+            "prior_evidence_sha256": "867d1b296044b19494d608990598b0f825618ad3445cad9a1a012c4cc6e80934",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 376,
+              "before": "",
+              "after": "/**\n * Historical focus and animation values are interpreted by the owned legacy\n * container. Keep their contract independent of upstream removal annotations.\n * All other configuration fields retain the public peer contract.\n */\nexport type LegacyDialogRuntimeConfig<D = any> = Omit<DialogConfigBase<D>,\n  'autoFocus' | 'enterAnimationDuration' | 'exitAnimationDuration'> & {\n  autoFocus?: string | boolean;\n  enterAnimationDuration?: string | number;\n  exitAnimationDuration?: string | number;\n};\n\n"
+            },
+            {
+              "offset": 774,
+              "before": "",
+              "after": "  /** Historical autofocus policy, including boolean values handled by the owned container. */\n  override autoFocus?: string | boolean = 'first-tabbable';\n\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.ts",
+          "before_git_blob": "f5d5e5554599932f72addd7f1587b43b5b292320",
+          "before_sha256": "0495cc891e7e1578d05d9679fe61acf155c9bdb47b31032d53c324bc201616ac",
+          "before_bytes": 10351,
+          "current_git_blob": "df18554a5b15e979b366c7bdb5c3ba34346ee8fd",
+          "current_sha256": "a2223c0bb364c1738d10eb40e2d776c00b6ef2375a673c164d18d6528debe3df",
+          "current_bytes": 10390,
+          "authority": "dialog-focus-v5"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/dialog-content-directives.ts",
+          "before_git_blob": "b7ab76be970bbce9ada6116445b4661ead077ee9",
+          "before_sha256": "698b2fea49964c4cea0cfa07b0847ada413130055c032de94d16df3cc4b59ca5",
+          "before_bytes": 6504,
+          "current_git_blob": "c57aa2a8c0c82345d9df726cd439396dd9517a6a",
+          "current_sha256": "07b539ec15bdf207e3db563651f2c0e4875bb63f44f90963c304ca0dcc6eac2a",
+          "current_bytes": 6651,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "dialog title destruction queue",
+            "reason": "Captures queue at destruction before deferred removal, guarding absent container/queue.",
+            "prior_evidence_path": "scripts/dialog-title-source-context.mjs",
+            "prior_evidence_sha256": "5586ab7c886f8a4ff91c1788144e6f8c099f587cc2586bc53855b2dee7328439",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 4654,
+              "before": "\n    if (instance) {\n",
+              "after": "    // Match the tagged lifetime: remove from the queue captured at destruction.\n    const queue = instance?._ariaLabelledByQueue;\n\n    if (instance && queue) {\n"
+            },
+            {
+              "offset": 4712,
+              "before": "        removeLegacyDialogTitle(instance, this.id);\n",
+              "after": "        removeLegacyDialogTitle(instance, this.id, queue);\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/dialog-ref.ts",
+          "before_git_blob": "300e41963155cd3f9ba2b7bd42c0b8c8b8ddbc5d",
+          "before_sha256": "93cf4e88a9971a01b2572c0491142351c4598a4b325760733111266b4a10a071",
+          "before_bytes": 9280,
+          "current_git_blob": "2972360ec209d0a35d4069da576b2e35f9c29ece",
+          "current_sha256": "5807dd454c82b5b328166da9dbf1a165dc7c2743c6c15737571694e2fe475b3c",
+          "current_bytes": 9377,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "dialog ref event and peer lifecycle",
+            "reason": "Uses nonreplaying Subjects for open/close streams, aligns undefined template ComponentRef, registers owned container peer.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 747,
+              "before": "import {Observable, ReplaySubject, Subscription, merge} from 'rxjs';\n",
+              "after": "import {Observable, Subject, Subscription, merge} from 'rxjs';\n"
+            },
+            {
+              "offset": 861,
+              "before": "import {_MatDialogContainerBase} from './internal/dialog-container-base';\n",
+              "after": "import {_MatDialogContainerBase, registerLegacyDialogContainerPeer} from './internal/dialog-container-base';\n"
+            },
+            {
+              "offset": 1208,
+              "before": "   * null when the dialog is opened using a `TemplateRef`.\n",
+              "after": "   * undefined when the dialog is opened using a `TemplateRef`.\n"
+            },
+            {
+              "offset": 1273,
+              "before": "  readonly componentRef: ComponentRef<T> | null;\n",
+              "after": "  readonly componentRef: ComponentRef<T> | null | undefined;\n"
+            },
+            {
+              "offset": 1547,
+              "before": "  private readonly _afterOpened = new ReplaySubject<void>(1);\n",
+              "after": "  private readonly _afterOpened = new Subject<void>();\n"
+            },
+            {
+              "offset": 1687,
+              "before": "  private readonly _beforeClosed = new ReplaySubject<R | undefined>(1);\n",
+              "after": "  private readonly _beforeClosed = new Subject<R | undefined>();\n"
+            },
+            {
+              "offset": 2613,
+              "before": "",
+              "after": "    registerLegacyDialogContainerPeer(_containerInstance, _ref);\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+          "before_git_blob": "a9b710ad36c22af45c2cb5ff0ca82b17df8b2458",
+          "before_sha256": "dfc5961661c06ae15f186d25846f4a40f61880ac2c09e9975e0d9faabbbdea2b",
+          "before_bytes": 94027,
+          "current_git_blob": "07a15a2147ea5f0d2724977b1e88d7efdc6ad9cd",
+          "current_sha256": "c95640a45f9f029e818bcd9c1510337b1952a7164393aa8cc56f85cd188d783d",
+          "current_bytes": 97904,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "before_git_blob": "cf868a759ec6be29a50d78995de11c695ed518d4",
+          "before_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+          "before_bytes": 7030,
+          "current_git_blob": "19222ce80ae8a58bcaaa8f606967dd8ce573ae5f",
+          "current_sha256": "4926702c9f5aaafa17c7489692da5b67dcdde261d79cafd0628f95a4134ea61a",
+          "current_bytes": 8226,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "before_git_blob": "1bbbf9ed5c9dab44d39f62eb5ee6a0e2bf7b76e7",
+          "before_sha256": "752582e2bf49bc2f11431fa7bf35941f381a830dc5d837e14246a40ef010c01c",
+          "before_bytes": 9985,
+          "current_git_blob": "7a38f04c79ecb0c9d6fd783ac5e79927b280071c",
+          "current_sha256": "c413b76dfa611d3eaabcc38446861161f134d63f9427f29a61fc175963827fdd",
+          "current_bytes": 17839,
+          "authority": "dialog-focus-v5"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-state.ts",
+          "before_git_blob": "78b5c69f529a6e2466d5f0391056ad63eb4a3cd5",
+          "before_sha256": "34bfc27d4dddea4f71f8afc9fc589723461a4706f88c208c754314aa25d710e6",
+          "before_bytes": 2437,
+          "current_git_blob": "aa71b5e4004b2e2271998764b99989120d19fce8",
+          "current_sha256": "cefcbfb0ad5bb9e695fcfac03afa66d59c2f89709d686b59ee3edd3005812141",
+          "current_bytes": 3193,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "dialog container state",
+            "reason": "Adds owned peer state and destroys it; title removal uses captured queue only while live.",
+            "prior_evidence_path": "scripts/dialog-title-source-context.mjs",
+            "prior_evidence_sha256": "5586ab7c886f8a4ff91c1788144e6f8c099f587cc2586bc53855b2dee7328439",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 451,
+              "before": "",
+              "after": "interface LegacyDialogContainerPeer {\n  readonly overlayRef: object;\n  containerInstance: object | null | undefined;\n  disableClose: boolean | undefined;\n}\n\n"
+            },
+            {
+              "offset": 590,
+              "before": "",
+              "after": "  peer: LegacyDialogContainerPeer | null;\n"
+            },
+            {
+              "offset": 1119,
+              "before": "  states.set(container, {focusTrapped, changeDetector, destroyed: false});\n",
+              "after": "  states.set(container, {focusTrapped, changeDetector, destroyed: false, peer: null});\n}\n\n/** Bind an actual owned ref without requiring Angular injection during manual construction. */\nexport function registerLegacyDialogContainerPeer(\n  container: LegacyDialogTitleContainer, peer: LegacyDialogContainerPeer,\n): void {\n  const state = states.get(container);\n  if (state && !state.destroyed) {\n    state.peer = peer;\n  }\n}\n\nexport function legacyDialogContainerPeer(container: LegacyDialogTitleContainer): LegacyDialogContainerPeer | null {\n  return states.get(container)?.peer ?? null;\n"
+            },
+            {
+              "offset": 1409,
+              "before": "",
+              "after": "    state.peer = null;\n"
+            },
+            {
+              "offset": 2069,
+              "before": "export function removeLegacyDialogTitle(container: LegacyDialogTitleContainer, id: string): void {\n",
+              "after": "export function removeLegacyDialogTitle(\n  container: LegacyDialogTitleContainer, id: string,\n  queue: string[] | undefined = container._ariaLabelledByQueue,\n): void {\n"
+            },
+            {
+              "offset": 2207,
+              "before": "  const queue = container._ariaLabelledByQueue;\n",
+              "after": ""
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+          "before_git_blob": "4aba452e51a465f83f83a86f111c0a42bd94882f",
+          "before_sha256": "81ac34fa547b5ecf0607bad40eb0302fc97a98859b360f94164832f3dfb41624",
+          "before_bytes": 3691,
+          "current_git_blob": "44e2d4763ffbc64c57befe1878ea2bf4bdc6fcd3",
+          "current_sha256": "994576f436b45a1d3d1f132db793a2b3668e581637f06279e2200065cea319a5",
+          "current_bytes": 3717,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "owned dialog focus type",
+            "reason": "Imports owned LegacyDialogRuntimeConfig type instead of current Material config; no executable change.",
+            "prior_evidence_path": "compatibility/rc/dialog-caller-config-overlay-types-21.json",
+            "prior_evidence_sha256": "867d1b296044b19494d608990598b0f825618ad3445cad9a1a012c4cc6e80934",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 361,
+              "before": "import {MatDialogConfig} from '@angular/material/dialog';\n",
+              "after": "import type {LegacyDialogRuntimeConfig as MatDialogConfig} from '../dialog-config';\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/testing/error-harness.ts",
+          "before_git_blob": "dd9518a3dd6c63ff4672d5c35539b62b190ff57c",
+          "before_sha256": "7d259447752aea972328fcc9f5c3c126893720ffab84bc4ea755b38cd4c0848f",
+          "before_bytes": 1007,
+          "current_git_blob": "340f4ec8493986629e68c5ee5eb6bf8512ea0c37",
+          "current_sha256": "0df6fc9bad1331a8ceb0ace31f1c4d1318d830b096e9911b3bc57cf59cb9e14d",
+          "current_bytes": 1271,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "legacy error harness predicate",
+            "reason": "Adds owned protected predicate helper with public MatErrorHarness type; retains same text-matching predicate.",
+            "prior_evidence_path": "compatibility/rc/historical-contract-repair-source-v2-qualified.json",
+            "prior_evidence_sha256": "43c234c456c421e9475752d014ae243f226d22983a2e9a49fabbd09d420769cc",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 349,
+              "before": "import {ErrorHarnessFilters} from '@angular/material/form-field/testing';\n",
+              "after": "import {ErrorHarnessFilters, type MatErrorHarness} from '@angular/material/form-field/testing';\n"
+            },
+            {
+              "offset": 752,
+              "before": "    return new HarnessPredicate(this, options).addOption('text', options.text, (harness, text) =>\n",
+              "after": "    return MatLegacyErrorHarness._getErrorPredicate(this, options);\n  }\n\n  protected static _getErrorPredicate<T extends MatErrorHarness>(\n    type: ComponentHarnessConstructor<T>,\n    options: ErrorHarnessFilters,\n  ): HarnessPredicate<T> {\n    return new HarnessPredicate(type, options).addOption('text', options.text, (harness, text) =>\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+          "before_git_blob": "e55fbb2480b753ff80379e1c1724bf1707aecdf8",
+          "before_sha256": "bb843faad6ffcb93ce8f7469bcff85546728a9ae6e3fa48646c558ee661cb945",
+          "before_bytes": 21830,
+          "current_git_blob": "10ce08dbf2d1c4999ba26babb0a7b804c18802bc",
+          "current_sha256": "a498fd55553577bc81f285f36cf2822866d17b9bed8bb572c14bf78df21eed0d",
+          "current_bytes": 21858,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "menu keyboard propagation",
+            "reason": "Initializes animation state false; stops propagation after handled key cases, preserving return for unhandled cases.",
+            "prior_evidence_path": "compatibility/rc/historical-contract-repair-source-v2-qualified.json",
+            "prior_evidence_sha256": "43c234c456c421e9475752d014ae243f226d22983a2e9a49fabbd09d420769cc",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 3768,
+              "before": "  _isAnimating: boolean;\n",
+              "after": "  _isAnimating = false;\n"
+            },
+            {
+              "offset": 13577,
+              "before": "",
+              "after": "    event.stopPropagation();\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts",
+          "before_git_blob": "8d69bd9ef0588dd6fd75e74bd6f96506fee83e72",
+          "before_sha256": "b0118e2200c6cf629bf5ca181277fb4e08d381c595aacc528d6f5724f416503f",
+          "before_bytes": 2880,
+          "current_git_blob": "7f9fdafd11613d9a158a12c953437ae22a8db5fa",
+          "current_sha256": "f5da44d00af909e5da4dc80453796857d22ab4f323c5db5d793d002d8e72cfd8",
+          "current_bytes": 3038,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "menu content detach",
+            "reason": "Adds required Ryan notice and markForCheck after detach to refresh content query.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 61,
+              "before": "",
+              "after": " * Copyright (c) 2026 Ryan Lester.\n"
+            },
+            {
+              "offset": 2766,
+              "before": "",
+              "after": "      // Refresh content queries after the embedded view has been destroyed.\n      this._changeDetectorRef.markForCheck();\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+          "before_git_blob": "94e84cc582e949c35978390a53b7de8f14dede56",
+          "before_sha256": "4212186406b92fc485c050ffae7a8fd7b1f8e7af855bfd0133b018435834018a",
+          "before_bytes": 1443,
+          "current_git_blob": "fa58a3b6ef765424a35df39448efa4468b39119f",
+          "current_sha256": "3598e6ccf4761bd9777dafaca271cd896dc8f694ec39e9e46c37f593a8c307af",
+          "current_bytes": 1504,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "owned menu content type",
+            "reason": "Replaces upstream content type with owned MatLegacyMenuContent type; no executable change.",
+            "prior_evidence_path": "scripts/menu-panel-content-boundary.mjs",
+            "prior_evidence_sha256": "bdab684180a316bdd9da65163f3c10bea8073f647c2495afaccc19dea6286ea3",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 402,
+              "before": "import type {MatMenuContent, MenuPositionX, MenuPositionY} from '@angular/material/menu';\n",
+              "after": "import type {MenuPositionX, MenuPositionY} from '@angular/material/menu';\nimport type {MatLegacyMenuContent as MatMenuContent} from '../menu-content';\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "before_git_blob": "5c3987ceefcc5f6ec7f5869ca46e7c5537068680",
+          "before_sha256": "f1e499dae58e12e8333ef81e480d069d93599cadda29ed2df32262e44d6c45a8",
+          "before_bytes": 26780,
+          "current_git_blob": "777ccf29403ab133d3ba1e923a622abab089b81b",
+          "current_sha256": "e4ecb1452e92a1cc30fb1ebc97c6e24244b432dade5f30b6c58855d8e10cc5b2",
+          "current_bytes": 30651,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+          "before_git_blob": "f6d79ccdb48d4520e4d5bba2a0871a1a5c5d0b05",
+          "before_sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6",
+          "before_bytes": 112600,
+          "current_git_blob": "100a4b09fa8027c1befac7a904c8272f90b71e8c",
+          "current_sha256": "fefc0509a3c6597aa78b68ec885a14f9c4eae5f8d0742d8055b1fdc4e5f4ce0a",
+          "current_bytes": 127882,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/select.html",
+          "before_git_blob": "05679478af008a3400afb40af289560b233ca799",
+          "before_sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da",
+          "before_bytes": 2792,
+          "current_git_blob": "e12daf48f7b4e94a6dd303e54982cac3859276d7",
+          "current_sha256": "9d895bf6cbf1b2da7063acedc1fed7ee4cf7f10ce25bc7a797e8ee32875feec2",
+          "current_bytes": 2843,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+          "before_git_blob": "793a2e11658933fb6e7d496e969228d210e351cc",
+          "before_sha256": "d45d31bba50e87a53d614ef018e5105efac589c45e98b70bbceb9f269228b483",
+          "before_bytes": 223517,
+          "current_git_blob": "835eb4c60c86bd379f8b23ae3552d2f602f81d71",
+          "current_sha256": "7cf9610d306941613ae22a4615121a67a5328b82da2b5f768c7382cee6b8c3dc",
+          "current_bytes": 226954,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+          "before_git_blob": "5f7403f1698102fb0ccda8367728baae65616780",
+          "before_sha256": "1faece639aa44d426b249e15a3a3cca82ae6291371102ce88d8e3ef02baef38c",
+          "before_bytes": 10948,
+          "current_git_blob": "ffc030e3530abf873e5edce6bdadf056421013fb",
+          "current_sha256": "2064e816539a77a2749ab9d2141721a40ab27e3dfbf4edafa1f5b9afedfc453b",
+          "current_bytes": 11168,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+          "before_git_blob": "4358bb513e4eaac933e5201e1be6694554f781e1",
+          "before_sha256": "d9ddfcf0a2f5a27a17670b9c4f382b2739c9a4f9ff5baffaef542cd866ecddab",
+          "before_bytes": 13320,
+          "current_git_blob": "2620262347b8e8b76897d2e806a86a2c4b008d63",
+          "current_sha256": "1b673f43bacbcf47ea0e504ff3f191d84289e7c7337b20b93e8b5b98e833eb08",
+          "current_bytes": 13945,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "snack DOM portal exception path",
+            "reason": "Uses public generic portal attach; on failure detaches outlet and restores attached host according to pre-attach state before rethrow.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 4534,
+              "before": "    const result = this._portalOutlet.attachDomPortal(portal);\n",
+              "after": "    // Development validation can fail before the child takes portal ownership.\n    const preserveContainerHost =\n      (typeof ngDevMode === 'undefined' || ngDevMode) && !portal.element.parentNode;\n    let result: void;\n    try {\n      result = this._portalOutlet.attach(portal) as void;\n    } catch (error) {\n      // Generic dispatch records the portal before entering the DOM hook.\n      // Keep the historical hook's observable flags when the hook throws.\n      const portalAttached = portal.isAttached;\n      this._portalOutlet.detach();\n      if (portalAttached) {\n        portal.setAttachedHost(preserveContainerHost ? this : this._portalOutlet);\n      }\n      throw error;\n    }\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+          "before_git_blob": "80c5bc255ca477299b3852da074757e04d00ff3c",
+          "before_sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5",
+          "before_bytes": 4650,
+          "current_git_blob": "cd0cff189e3a69689e62b143eb95112bbe485b3b",
+          "current_sha256": "a35d7e06fb778203478236024a6137e34624f0ed7f10fabcc7ac3bd9aaf4a510",
+          "current_bytes": 4960,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+          "before_git_blob": "d532ca11d2f6a679581b05a7b934b9888715db20",
+          "before_sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3",
+          "before_bytes": 45763,
+          "current_git_blob": "ccfad7a95a4a27682be77a2af23c4556b8cfeba2",
+          "current_sha256": "92425afa5ddcb406c75b4af69ea9dd795f3b3d10ef8898b909a7bd1ad69f7230",
+          "current_bytes": 49266,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/public-api.ts",
+          "before_git_blob": "464da0a6519a311349e630d815132ebb2e39d97a",
+          "before_sha256": "7ceedeead81ba11dac5f14536e155db4175e8161b5964eaaa8eacd7b1ff8ec81",
+          "before_bytes": 1202,
+          "current_git_blob": "889bd9a47f3890f496b89ba475532a8d62805cdd",
+          "current_sha256": "ff9e95bd86923239f7072a38b3a47c00e490410f54490df1f3075c1329ef9efb",
+          "current_bytes": 1386,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "table partial compiler export",
+            "reason": "Exports owned column class directive under private-name alias for partial compiler scope.",
+            "prior_evidence_path": "compatibility/rc/21x-table-local-compilation-source-current.json",
+            "prior_evidence_sha256": "e6746247cfbc087ca360e78ee950f9770f3f5ea444f9ec455c3c6fceb56ab0cb",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 364,
+              "before": "",
+              "after": "// Angular's partial compiler needs NgModule-exported directives at this entrypoint.\nexport {_LegacyTableColumnClasses as ɵLegacyTableColumnClasses} from './internal/column-classes';\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+          "before_git_blob": "2bc95de3673183d11aa39227a9c2a63e026d3a99",
+          "before_sha256": "8ca96a3436189c60c375b15bc12dc6c2c36e07f18e8a6cdad5062b5b019285bb",
+          "before_bytes": 3171,
+          "current_git_blob": "642ec20734a1a84c1c5dc6ab4fb9dde5ece2f418",
+          "current_sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5",
+          "current_bytes": 3464,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "table sort regression test",
+            "reason": "Adds zero-prefixed numeric string sorting case; no production code.",
+            "prior_evidence_path": "compatibility/rc/parent-base-class-composed-owner-attempt-v9.json",
+            "prior_evidence_sha256": "219a0fc12ddb34e07d232e9af2973f5b494f618adefeb2e726d6a5cc38452a35",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 3028,
+              "before": "",
+              "after": "\n    it('should be able to correctly sort an array of strings and numbers with left zero', () => {\n      testSortWithValues([\n        '001',\n        '2',\n        3,\n        4,\n        'apples',\n        'bananas',\n        'cherries',\n        'lemons',\n        'strawberries',\n      ]);\n    });\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+          "before_git_blob": "bc2c5a572f214007279086b333f95cd78275e8d5",
+          "before_sha256": "7a84291a13db6e907e84b42a581f993d81e6da1f28966696861d0b325e6def14",
+          "before_bytes": 10948,
+          "current_git_blob": "2b20bbbd5e7dfdd10c3c4fab9311758a936f62e6",
+          "current_sha256": "15d4c2d2daa1aafce8f6b263f9e2423742c3221af56954c829eea1ed693ea926",
+          "current_bytes": 20364,
+          "authority": "tabs-finite-v1"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+          "before_git_blob": "d9ebe3480cfa2dd445dc7e4f8f8537010b6442cc",
+          "before_sha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "before_bytes": 18122,
+          "current_git_blob": "ce4b225d6a8da845d41a21de8954a92b6f44c256",
+          "current_sha256": "339cd7dee4e6431d4a603b215bf5a78fb654b23dfb49bfe50246cb44af17515e",
+          "current_bytes": 18261,
+          "authority": "tabs-finite-v1"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+          "before_git_blob": "9bf9a1f353fbe35bbf83b49c4d53102b08dbb522",
+          "before_sha256": "dd193a5f4cdef0ee0be3c993474efa482229854d33b4853c6d5dd519d21a6fd0",
+          "before_bytes": 9016,
+          "current_git_blob": "985eab29a412b7482f1259c3bb74fc1de2828e49",
+          "current_sha256": "9205bb2a5b3573e8f21161b03baa04e4b3e868e72d70e06c5dcdf96d2439af36",
+          "current_bytes": 9041,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "tab nav bar deactivation",
+            "reason": "Hides ink bar when selected index resets to -1.",
+            "prior_evidence_path": "compatibility/rc/historical-contract-repair-source-v2-qualified.json",
+            "prior_evidence_sha256": "43c234c456c421e9475752d014ae243f226d22983a2e9a49fabbd09d420769cc",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 4677,
+              "before": "",
+              "after": "    this._inkBar.hide();\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.html",
+          "before_git_blob": "710328c16971abdce10955b939745a6db1be7d22",
+          "before_sha256": "fb4e59b10d5d2f72cf8aa00688a67ad21a415928e588957d9e5ae0b00782aa53",
+          "before_bytes": 663,
+          "current_git_blob": "210ea563be38a9cc9e75dfe4f2ebd3e9dd6080f0",
+          "current_sha256": "c4d86c99bfeed0a10d6451e034ade808bfb52b4240471e1aef5ccd47e3f124f1",
+          "current_bytes": 652,
+          "authority": "prior-tab-template-expression"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.ts",
+          "before_git_blob": "4f8b2a175191f6808f72e43f7b37f68d4eb936b4",
+          "before_sha256": "7560de8c08198b04eddb701df4008225bbaa1f93847de7a17439295fec85fd80",
+          "before_bytes": 2564,
+          "current_git_blob": "897401c583f3e34d405f8e0cf839e8e414a2d0b4",
+          "current_sha256": "bb9cbef0831ea50ebe4577e4bc50b5ea4d0e9b25f332aad6d872a7fdc5cec004",
+          "current_bytes": 3207,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "tab portal constructor identity",
+            "reason": "Uses owned construction helper to supply public CdkPortalOutlet constructor dependencies and initialize derived object fields.",
+            "prior_evidence_path": "compatibility/rc/tab-adapter-product-inventory-inputs.json",
+            "prior_evidence_sha256": "bed96c448dca6fa0f28e9e55e6c7348090c41cb62ae171081307146056b3d603",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 504,
+              "before": "",
+              "after": "import {constructLegacyTabBodyPortal} from './internal/tab-portal-construction-context';\n"
+            },
+            {
+              "offset": 951,
+              "before": "  private _centeringSub = Subscription.EMPTY;\n  private _leavingSub = Subscription.EMPTY;\n",
+              "after": "  // The public parent is constructed with the original caller's dependencies.\n  // Initialize every own field explicitly on that returned derived object.\n  declare private _centeringSub: Subscription;\n  declare private _leavingSub: Subscription;\n  declare private _host: MatLegacyTabBody;\n"
+            },
+            {
+              "offset": 1042,
+              "before": "",
+              "after": "  // @ts-expect-error TS2377: derived constructor deliberately returns its object.\n"
+            },
+            {
+              "offset": 1057,
+              "before": "    viewContainerRef: ViewContainerRef,\n    @Inject(forwardRef(() => MatLegacyTabBody)) private _host: MatLegacyTabBody,\n",
+              "after": "    @Inject(ViewContainerRef) viewContainerRef: ViewContainerRef,\n    @Inject(forwardRef(() => MatLegacyTabBody)) _host: MatLegacyTabBody,\n"
+            },
+            {
+              "offset": 1222,
+              "before": "    super();\n",
+              "after": "    const outlet = constructLegacyTabBodyPortal(\n      new.target, viewContainerRef, _document,\n    ) as MatLegacyTabBodyPortal;\n    outlet._host = _host;\n    outlet._centeringSub = Subscription.EMPTY;\n    outlet._leavingSub = Subscription.EMPTY;\n    return outlet;\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+          "before_git_blob": "dab26353d3e382151fcdff6f73a56d4180e9f961",
+          "before_sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d",
+          "before_bytes": 34707,
+          "current_git_blob": "9de37584a46e0073f14bf80643e3df03934bda59",
+          "current_sha256": "fc29490be443cdb544e553f762be572fb4e6635216ad47dbb492a5dffa113aad",
+          "current_bytes": 35820,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "tooltip scroll clipping",
+            "reason": "Computes clipping locally from fresh overlay and ancestor rectangles before position classes mutate layout; removes dependency on docs-private CDK event visibility.",
+            "prior_evidence_path": "compatibility/rc/21x-base-class-removal-source-final-review-qualified.json",
+            "prior_evidence_sha256": "c43ae750c53036cc7ce134e0870977f599af8f7790a4223ad5e4b685fdb985ca",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 14502,
+              "before": "",
+              "after": "      // Capture the same fresh pane/ancestor rectangles used by the tagged strategy,\n      // before position classes can change a consumer's styles.\n      const overlayElement = this._overlayRef?.overlayElement;\n      const isClipped = !!overlayElement && isTooltipOverlayClipped(\n        overlayElement.getBoundingClientRect(),\n        scrollableAncestors.map(scrollable =>\n          scrollable.getElementRef().nativeElement.getBoundingClientRect()),\n      );\n"
+            },
+            {
+              "offset": 14601,
+              "before": "        if (change.scrollableViewProperties.isOverlayClipped && this._tooltipInstance.isVisible()) {\n",
+              "after": "        if (isClipped && this._tooltipInstance.isVisible()) {\n"
+            },
+            {
+              "offset": 34707,
+              "before": "",
+              "after": "\n/** Owned tagged16 clipping predicate; current CDK event visibility is docs-private. */\nfunction isTooltipOverlayClipped(\n  element: Pick<DOMRect, 'top' | 'bottom' | 'left' | 'right'>,\n  scrollContainers: ReadonlyArray<Pick<DOMRect, 'top' | 'bottom' | 'left' | 'right'>>,\n): boolean {\n  return scrollContainers.some(scrollContainerRect => {\n    const clippedAbove = element.top < scrollContainerRect.top;\n    const clippedBelow = element.bottom > scrollContainerRect.bottom;\n    const clippedLeft = element.left < scrollContainerRect.left;\n    const clippedRight = element.right > scrollContainerRect.right;\n    return clippedAbove || clippedBelow || clippedLeft || clippedRight;\n  });\n}\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+          "before_git_blob": "0c3fde3231fc8cf5322fb7ba700e52639984a52e",
+          "before_sha256": "64c427d112619d01c45815a9b401323e09b2767076a9d1371ee27333d7384382",
+          "before_bytes": 34929,
+          "current_git_blob": "87aefa7df962bd67c808017000ab989c017e5b9d",
+          "current_sha256": "2695f9fa42c4291f8fb4c6f26c7d4bdc4c798ae92cd90db19b4871efc290a1c9",
+          "current_bytes": 35593,
+          "authority": "current-sass-sixth-source"
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/button/_button-theme.scss",
+          "before_git_blob": "524d8e2813e4e1c5411d4bd165fe30cfd3e903a9",
+          "before_sha256": "5af18a9384b617116ebdf30ff9ebc18f6844208aa4b6b3f958a43a022d8d499d",
+          "before_bytes": 7303,
+          "current_git_blob": "38ee5e3628a8c71f3a9681948fdd173273913296",
+          "current_sha256": "6fa8ecaf9a0816a2a6b5602b33b23b256b201ad64cdb6cde67833a4f16fd7c96",
+          "current_bytes": 13341,
+          "authority": "current-sass-sixth-source"
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/card/_card-theme.scss",
+          "before_git_blob": "5a785368fe558862919560c2b77cb78801fbdfe3",
+          "before_sha256": "639fbbeab9868e1ba7f9f2f9ce4ec062496b722844943025bfe18e46418ccd74",
+          "before_bytes": 4273,
+          "current_git_blob": "4931166a3a3065f44567e8445e58f2de7965f96d",
+          "current_sha256": "dc5e055d95aabf5c8a8ae4ba70acee8a9a1315e6f46715e8846c932f79d51fbf",
+          "current_bytes": 5349,
+          "authority": "current-sass-sixth-source"
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss",
+          "before_git_blob": "b6036dd589855261fa48859873a77cfe68bde094",
+          "before_sha256": "df6de506e004cd540ccbcd35683e9bdf034366137eeeda07e8f4e1b7e233eeb4",
+          "before_bytes": 3364,
+          "current_git_blob": "d6b2c7f7949e17c0bf0a2c91486708f03cf3e240",
+          "current_sha256": "97d4de28beacfa9229c148463b16436f5fdbf5e8905d9dc6c463c5e534da17a9",
+          "current_bytes": 7155,
+          "authority": "current-sass-sixth-source"
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/progress-spinner/_progress-spinner-theme.scss",
+          "before_git_blob": "37549ba544a83b4bd1857849616b7ffdab2ca4fa",
+          "before_sha256": "5644d8e6c8e74ec610371384ca33b60e41af97a4ed07d0027e41125c4d53bb9c",
+          "before_bytes": 1528,
+          "current_git_blob": "a8c5d4984b14f916481f567789dedf3ee01e7a6c",
+          "current_sha256": "94c7e633dce64a7acfeb05d8d93106df127bbc02049f59d7e55cf5783a2cb659",
+          "current_bytes": 1805,
+          "authority": "current-sass-sixth-source"
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/snack-bar/_snack-bar-theme.scss",
+          "before_git_blob": "7ca8975d8f44f8e701d574d8e31e4468e37a4b77",
+          "before_sha256": "29ca545098f2b8eb81fbf7f311b5dac5fda4986f641d39ac23ca01eb7a547906",
+          "before_bytes": 1536,
+          "current_git_blob": "d648f0f91ea359c41a9c5b07bad9855a1211657a",
+          "current_sha256": "df7b902f582feca85cd5190bc2183d36a61605a5d20969e515c275d298b5e2c7",
+          "current_bytes": 1746,
+          "authority": "current-sass-sixth-source"
+        }
+      ],
+      "added": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-portal-construction-context.ts",
+          "current_sha256": "6e2047cb3efe6a8a26db692928c0f9f97d4cbc5fb701ae275ee23ad3850221d2",
+          "current_git_blob": "caedf72c9e77dee4bc8f2dc38dec379e819524cf",
+          "current_bytes": 1468,
+          "authority": "tab-adapter-product-inventory",
+          "judgment": "Owned public CdkPortalOutlet constructor identity helper with explicit dependencies."
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-body-reversal.spec.ts",
+          "current_sha256": "edd9e7149268ad22888e28f8ffa6ed27ce5683b15e28022a3c13b844fbbd9c54",
+          "current_git_blob": "bc5be01a4d6af6946067d0d470680ad509dc1d4f",
+          "current_bytes": 9127,
+          "authority": "tabs-finite-v1",
+          "judgment": "Added reverse-transform and transition lifecycle source spec bound by tabs finite evidence."
+        }
+      ]
+    },
+    "main": {
+      "peer_minimum": {
+        "cdk": "22.1.7",
+        "material": "22.1.7",
+        "declarations": [
+          {
+            "path": "node_modules/@angular/cdk/package.json",
+            "sha256": "ec60a5803a214c9b9d8bcdc2de0b0c294ecdd420d680d0e95e686f7aa4d46933",
+            "bytes": 5084
+          },
+          {
+            "path": "node_modules/@angular/material/package.json",
+            "sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+            "bytes": 11420
+          },
+          {
+            "path": "node_modules/@angular/cdk/types/dialog.d.ts",
+            "sha256": "8dd71a94aa0b86f248133bbc5855fea745edc5531dd616758824f9914a01e3d0",
+            "bytes": 19947
+          },
+          {
+            "path": "node_modules/@angular/cdk/types/portal.d.ts",
+            "sha256": "17f59b700249a0ee761c3ac50d34415c7118eba48e26b8928e87d530fc4a4a64",
+            "bytes": 2269
+          },
+          {
+            "path": "node_modules/@angular/cdk/types/overlay.d.ts",
+            "sha256": "0b85f5bf55a586129ab50acaf40d6c38616f84e49f6c1b73fb0b09600596b879",
+            "bytes": 14509
+          },
+          {
+            "path": "node_modules/@angular/cdk/types/scrolling.d.ts",
+            "sha256": "0752df6c36c6a809b8a33f9c1d6e99fbf88fbff3db68f54a2c93d7dbf4c8422a",
+            "bytes": 2764
+          },
+          {
+            "path": "node_modules/@angular/cdk/types/_portal-directives-chunk.d.ts",
+            "sha256": "f8b81020a222fc8f1d47c7e1497595e534e4d4a98d28e46e9cfe19aeb84b9b88",
+            "bytes": 9150
+          },
+          {
+            "path": "node_modules/@angular/cdk/types/_overlay-module-chunk.d.ts",
+            "sha256": "8f6af024f02ebd819c54fa1e5568d6992f4be9cda2f17b331cd7a765f04568ae",
+            "bytes": 45138
+          },
+          {
+            "path": "node_modules/@angular/cdk/types/_scrolling-module-chunk.d.ts",
+            "sha256": "4388c498f32f5870a49edfbecd90a1ffe4ad6ad04ec03ef393a161b21518d81a",
+            "bytes": 28143
+          },
+          {
+            "path": "node_modules/@angular/material/types/form-field-testing.d.ts",
+            "sha256": "a5e98005062b8ef2be2e5c014353f65bbb28ad723512d7d521ef4829cfdd261a",
+            "bytes": 6042
+          }
+        ]
+      },
+      "frozen_parent": "960d98d87aeac3a24b312cf9112abc6d6383a7fd",
+      "frozen_members": 1141,
+      "current_members": 1143,
+      "resource_members": 439,
+      "expected_changed_existing": 47,
+      "expected_resource_changes": 15,
+      "changed_existing": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+          "before_git_blob": "634482f0645c96d7bce3cf852ef29a18d896d6fa",
+          "before_sha256": "84e5ca0c5060c756ac186c409097556315882a88b280a12e34def1080e5a1dcf",
+          "before_bytes": 145237,
+          "current_git_blob": "3cf88c0545ae1b5ab9b0a58f45e658bf8164e725",
+          "current_sha256": "2610d311569c9a6fdb063dc0652b423414622cf1370b2434f13ba86070293236",
+          "current_bytes": 152212,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "autocomplete selection and empty-panel tests",
+            "reason": "Added required/optional selection, reset, and empty-panel assertions; one fixture property title→label follows the group template. No production code.",
+            "prior_evidence_path": "compatibility/rc/autocomplete-selection-native-contract-proposal.json",
+            "prior_evidence_sha256": "f53ca24623f8876b28f6af99a4e2ad80ecc3934073aed5931fb59aa641a7d0e7",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 26047,
+              "before": "",
+              "after": "      const selectedElement = overlayContainerElement.querySelectorAll(\n        'mat-option',\n      )[1] as HTMLElement;\n      expect(selectedElement).toBeTruthy();\n      selectedElement.click();\n      fixture.detectChanges();\n      tick();\n      fixture.componentInstance.filteredStates = fixture.componentInstance.states;\n      fixture.detectChanges();\n      fixture.componentInstance.trigger.openPanel();\n      fixture.detectChanges();\n      zone.simulateZoneExit();\n      expect(\n        fixture.componentInstance.options.find(option => option.value === selected)?.selected,\n      ).toBe(true);\n"
+            },
+            {
+              "offset": 26674,
+              "before": "",
+              "after": "      expect(\n        fixture.componentInstance.options.find(option => option.value === selected)?.selected,\n      ).toBe(true);\n"
+            },
+            {
+              "offset": 28618,
+              "before": "",
+              "after": "\n      const filteredSelected = prepareRequiredSelection();\n      const filteredChanges = jasmine.createSpy('filtered required selection model changes');\n      const filteredSubscription =\n        fixture.componentInstance.stateCtrl.valueChanges.subscribe(filteredChanges);\n      input.value = 'Cali';\n      dispatchFakeEvent(input, 'input');\n      fixture.detectChanges();\n      tick();\n      expect(filteredChanges).not.toHaveBeenCalled();\n      fixture.componentInstance.filteredStates = [];\n      fixture.detectChanges();\n      tick();\n      fixture.detectChanges();\n      expect(fixture.componentInstance.trigger.panelOpen).toBe(false);\n      expect(fixture.componentInstance.stateCtrl.value).toBe(filteredSelected);\n      fixture.componentInstance.filteredStates = [fixture.componentInstance.states[1]];\n      fixture.detectChanges();\n      tick();\n      fixture.detectChanges();\n      expect(fixture.componentInstance.options.length).toBe(1);\n      expect(fixture.componentInstance.trigger.panelOpen).toBe(true);\n      expect(input.value).toBe('Cali');\n      expect(filteredChanges).not.toHaveBeenCalled();\n      dispatchFakeEvent(document, 'click');\n      fixture.detectChanges();\n      tick();\n      expect(fixture.componentInstance.stateCtrl.value).toBeNull();\n      expect(input.value).toBe('');\n      expect(filteredChanges).toHaveBeenCalledTimes(1);\n      expect(filteredChanges).toHaveBeenCalledWith(null);\n      expect(fixture.componentInstance.trigger.panelOpen).toBe(false);\n      filteredSubscription.unsubscribe();\n"
+            },
+            {
+              "offset": 30478,
+              "before": "",
+              "after": "\n      const component = fixture.componentInstance;\n      const display = spyOn(component, 'displayFn').and.callThrough();\n      component.filteredStates = component.states;\n      fixture.detectChanges();\n      component.trigger.openPanel();\n      fixture.detectChanges();\n      zone.simulateZoneExit();\n      const selectedOption = component.options.toArray()[1];\n      (overlayContainerElement.querySelectorAll('mat-option')[1] as HTMLElement).click();\n      fixture.detectChanges();\n      tick();\n      component.filteredStates = component.states;\n      fixture.detectChanges();\n      component.trigger.openPanel();\n      fixture.detectChanges();\n      zone.simulateZoneExit();\n      expect(selectedOption.selected).toBe(true);\n      const selectionEvents = jasmine.createSpy('optional typing selection events');\n      const selectionSubscription = component.trigger.optionSelections.subscribe(selectionEvents);\n      const modelChanges = jasmine.createSpy('optional typing model changes');\n      const modelSubscription = component.stateCtrl.valueChanges.subscribe(modelChanges);\n      display.calls.reset();\n      input.value = 'Californi';\n      dispatchFakeEvent(input, 'input');\n      expect(display).toHaveBeenCalledWith(selectedOption.value);\n      expect(selectedOption.selected).toBe(false);\n      fixture.detectChanges();\n      tick();\n      expect(component.stateCtrl.value).toBe('Californi');\n      expect(modelChanges).toHaveBeenCalledTimes(1);\n      expect(modelChanges).toHaveBeenCalledWith('Californi');\n      expect(selectionEvents).not.toHaveBeenCalled();\n      selectionSubscription.unsubscribe();\n      modelSubscription.unsubscribe();\n"
+            },
+            {
+              "offset": 32532,
+              "before": "",
+              "after": "\n      const component = fixture.componentInstance;\n      component.trigger.openPanel();\n      fixture.detectChanges();\n      zone.simulateZoneExit();\n      const selectedOption = component.options.first;\n      (overlayContainerElement.querySelector('mat-option') as HTMLElement).click();\n      fixture.detectChanges();\n      tick();\n      expect(selectedOption.selected).toBe(true);\n      expect(component.stateCtrl.value).toBe(component.states[0]);\n      const selections = jasmine.createSpy('programmatic reset selection events');\n      const selectionSubscription = component.trigger.optionSelections.subscribe(selections);\n      const resets = jasmine.createSpy('programmatic reset model changes');\n      const valueSubscription = component.stateCtrl.valueChanges.subscribe(resets);\n      component.stateCtrl.reset();\n      fixture.detectChanges();\n      tick();\n      fixture.detectChanges();\n      expect(component.stateCtrl.value).toBeNull();\n      expect(input.value).toBe('');\n      expect(selectedOption.selected).toBe(false);\n      expect(selections).not.toHaveBeenCalled();\n      expect(resets).toHaveBeenCalledTimes(1);\n      expect(resets).toHaveBeenCalledWith(null);\n      selectionSubscription.unsubscribe();\n      valueSubscription.unsubscribe();\n"
+            },
+            {
+              "offset": 132429,
+              "before": "",
+              "after": "\n  it('should not throw errors when closing without options', fakeAsync(() => {\n    const fixture = createComponent(SimpleAutocomplete);\n    fixture.detectChanges();\n    const component = fixture.componentInstance;\n    const selected = component.states[1];\n    component.panel.requireSelection = true;\n    component.stateCtrl.setValue(selected);\n    tick();\n    component.filteredStates = component.states = [];\n    fixture.detectChanges();\n    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;\n    expect(input.value).toBe('California');\n    expect(component.stateCtrl.value).toBe(selected);\n    expect(fixture.componentInstance.options.length).toBe(0);\n    const trigger = fixture.componentInstance.trigger;\n\n    trigger.openPanel();\n    expect(trigger.panelOpen).toBe(false);\n    expect(() => trigger.closePanel()).not.toThrow();\n\n    const changes = jasmine.createSpy('empty panel model changes');\n    const selections = jasmine.createSpy('empty panel option selections');\n    const valueSubscription = component.stateCtrl.valueChanges.subscribe(changes);\n    const selectionSubscription = trigger.optionSelections.subscribe(selections);\n    const close = spyOn(trigger, 'closePanel').and.callThrough();\n    trigger.openPanel();\n    fixture.detectChanges();\n    zone.simulateZoneExit();\n    expect(trigger.panelOpen).toBe(false);\n    dispatchFakeEvent(document, 'click');\n    fixture.detectChanges();\n    tick();\n\n    expect(close).toHaveBeenCalledTimes(1);\n    expect(input.value).toBe('California');\n    expect(component.stateCtrl.value).toBe(selected);\n    expect(changes).not.toHaveBeenCalled();\n    expect(selections).not.toHaveBeenCalled();\n    valueSubscription.unsubscribe();\n    selectionSubscription.unsubscribe();\n    fixture.destroy();\n  }));\n"
+            },
+            {
+              "offset": 140895,
+              "before": "      title: 'One',\n",
+              "after": "      label: 'One',\n"
+            },
+            {
+              "offset": 140990,
+              "before": "      title: 'Two',\n",
+              "after": "      label: 'Two',\n"
+            },
+            {
+              "offset": 141094,
+              "before": "      title: 'Three',\n",
+              "after": "      label: 'Three',\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+          "before_git_blob": "aab5cfc2c3522b2b5efb6725148a8e32d77e2960",
+          "before_sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80",
+          "before_bytes": 66462,
+          "current_git_blob": "b00b908ce3b52fbaed88b72ae95c16a0969bf2bc",
+          "current_sha256": "26263b1efa46119fc7a8ea1b8693af78401cb2b78a3a4a6fb1dc7b0c78618750",
+          "current_bytes": 71076,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "chip focus and destroyed-list tests",
+            "reason": "Adds DOM tabIndex timing, removed-chip active index, first enabled chip focus, and disabled child/form-field state assertions.",
+            "prior_evidence_path": "compatibility/rc/chip-focus-source-qualification-modern-chip.json",
+            "prior_evidence_sha256": "98a0547798bd72672dd0a27cfe1084e3531c06f292ca94a3444991503d45228a",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 595,
+              "before": "import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';\n",
+              "after": "import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';\n"
+            },
+            {
+              "offset": 16707,
+              "before": "",
+              "after": "          expect(chipListNativeElement.tabIndex).toBe(-1);\n          flushMicrotasks();\n          expect(chipListNativeElement.tabIndex).toBe(-1);\n\n"
+            },
+            {
+              "offset": 16861,
+              "before": "",
+              "after": "          expect(chipListNativeElement.tabIndex).toBe(0);\n"
+            },
+            {
+              "offset": 17399,
+              "before": "",
+              "after": "          expect(chipListNativeElement.tabIndex).toBe(-1);\n          flushMicrotasks();\n          expect(chipListNativeElement.tabIndex).toBe(-1);\n\n"
+            },
+            {
+              "offset": 17553,
+              "before": "",
+              "after": "          expect(chipListNativeElement.tabIndex).toBe(4);\n"
+            },
+            {
+              "offset": 56302,
+              "before": "",
+              "after": "\n  it('should clear a destroyed active chip when the list becomes empty', () => {\n    setupStandardList();\n    const keyManager = chipListInstance._keyManager;\n    const removedChip = chips.last;\n\n    removedChip.focus();\n    fixture.detectChanges();\n    expect(keyManager.activeItem).toBe(removedChip);\n\n    testComponent.chips = [];\n    fixture.detectChanges();\n    expect(chips.length).toBe(0);\n    expect(keyManager.activeItemIndex).toBe(-1);\n    expect(keyManager.activeItem).toBeNull();\n\n    testComponent.chips = [10, 11];\n    fixture.detectChanges();\n    expect(keyManager.activeItemIndex).toBe(-1);\n    expect(keyManager.activeItem).toBeNull();\n\n    chips.first.focus();\n    fixture.detectChanges();\n    expect(keyManager.activeItemIndex).toBe(0);\n    expect(keyManager.activeItem).toBe(chips.first);\n    expect(keyManager.activeItem).not.toBe(removedChip);\n  });\n  describe('classic focus and state contract', () => {\n    it('should focus the first enabled chip when a later chip was active', () => {\n      setupStandardList();\n      const keyManager = chipListInstance._keyManager;\n      chips.last.focus();\n      fixture.detectChanges();\n      expect(keyManager.activeItem).toBe(chips.last);\n\n      chipListInstance.focus();\n      fixture.detectChanges();\n      expect(keyManager.activeItem).toBe(chips.first);\n      expect(document.activeElement).toBe(chips.first._elementRef.nativeElement);\n    });\n\n    it('should skip the disabled first and active chips when focusing', () => {\n      setupStandardList();\n      const keyManager = chipListInstance._keyManager;\n      const chipArray = chips.toArray();\n      chipArray[0].disabled = chipArray[1].disabled = true;\n      keyManager.updateActiveItem(1);\n      fixture.detectChanges();\n\n      chipListInstance.focus();\n      fixture.detectChanges();\n      expect(keyManager.activeItem).toBe(chipArray[2]);\n      expect(document.activeElement).toBe(chipArray[2]._elementRef.nativeElement);\n    });\n\n    it('should refocus the first chip after focus leaves while index zero remains active', fakeAsync(() => {\n      setupStandardList();\n      const keyManager = chipListInstance._keyManager;\n      const outside = document.createElement('button');\n      document.body.appendChild(outside);\n      try {\n        chipListInstance.focus();\n        outside.focus();\n        zone.simulateZoneExit();\n        tick();\n        fixture.detectChanges();\n        expect(document.activeElement).toBe(outside);\n        expect(keyManager.activeItemIndex).toBe(0);\n\n        chipListInstance.focus();\n        fixture.detectChanges();\n        expect(document.activeElement).toBe(chips.first._elementRef.nativeElement);\n        expect(keyManager.activeItem).toBe(chips.first);\n      } finally {\n        outside.remove();\n      }\n    }));\n\n    it('should notify disabled state after propagating it to chips and render the form field state', () => {\n      setupInputList();\n      const states: {disabled: boolean; children: boolean[]}[] = [];\n      const subscription = chipListInstance.stateChanges.subscribe(() => {\n        states.push({disabled: chipListInstance.disabled, children: chips.map(chip => chip.disabled)});\n      });\n      const formField: HTMLElement = fixture.nativeElement.querySelector('.mat-form-field');\n      const renderedChips: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('mat-chip'));\n      try {\n        chipListInstance.disabled = true;\n        expect(states).toEqual([{disabled: true, children: [true, true, true]}]);\n        fixture.detectChanges();\n        expect(formField.classList).toContain('mat-form-field-disabled');\n        expect(renderedChips.map(chip => chip.getAttribute('aria-disabled'))).toEqual(['true', 'true', 'true']);\n\n        states.length = 0;\n        chipListInstance.disabled = false;\n        expect(states).toEqual([{disabled: false, children: [false, false, false]}]);\n        fixture.detectChanges();\n        expect(formField.classList).not.toContain('mat-form-field-disabled');\n        expect(renderedChips.map(chip => chip.getAttribute('aria-disabled'))).toEqual(['false', 'false', 'false']);\n      } finally {\n        subscription.unsubscribe();\n      }\n    });\n  });\n\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+          "before_git_blob": "3d7db420a4ffe296f29517cbe8e328e2ac7aae72",
+          "before_sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2",
+          "before_bytes": 26422,
+          "current_git_blob": "44aaa47f4f85e838db4d97535f3eff7231dea290",
+          "current_sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151",
+          "current_bytes": 26446,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "owned chip-list focus and removal behavior",
+            "reason": "Replaces active-chip refocus with first enabled active and clears key-manager item on empty list; restores classic list focus and prevents stale destroyed chip.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 16388,
+              "before": "      const activeItem = this._keyManager.activeItem;\n      if (activeItem) {\n        activeItem.focus();\n      } else {\n        this._keyManager.setFirstItemActive();\n      }\n",
+              "after": "      this._keyManager.setFirstItemActive();\n"
+            },
+            {
+              "offset": 17606,
+              "before": "",
+              "after": "    // Empty lists must not retain a reference to a destroyed chip.\n    if (this.chips.length === 0) {\n      this._keyManager.updateActiveItem(-1);\n    }\n\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-chips/chip.spec.ts",
+          "before_git_blob": "7fe0684438504d7b7f6e8583a7239a47e481418c",
+          "before_sha256": "dde78ea65e4351f5fcbb066cc259c5c6202e9942998f08125a2394188c8a9f35",
+          "before_bytes": 16400,
+          "current_git_blob": "64b5e314df7d9d4047c301b349f7c0a5433f6457",
+          "current_sha256": "54a0155a6498645f599e40fe1d4ba787647de68e888141eb9e69e923a99523ac",
+          "current_bytes": 21277,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "chip blur lifecycle tests",
+            "reason": "Adds pending blur, reentry, destruction ordering, and focus notification cases using owned MockNgZone.",
+            "prior_evidence_path": "compatibility/rc/chip-focus-source-qualification-modern-chip.json",
+            "prior_evidence_sha256": "98a0547798bd72672dd0a27cfe1084e3531c06f292ca94a3444991503d45228a",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 196,
+              "before": "import {Component, DebugElement, ViewChild} from '@angular/core';\nimport {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';\n",
+              "after": "import {Component, DebugElement, NgZone, ViewChild} from '@angular/core';\nimport {waitForAsync, ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';\n"
+            },
+            {
+              "offset": 504,
+              "before": "",
+              "after": "import {MockNgZone} from '../internal/testing/owned-test-events';\n"
+            },
+            {
+              "offset": 14944,
+              "before": "",
+              "after": "    });\n  });\n\n  describe('owned blur lifecycle', () => {\n    let lifecycleZone: MockNgZone;\n\n    beforeEach(() => {\n      lifecycleZone = new MockNgZone();\n      Object.defineProperty(lifecycleZone, 'isStable', {\n        value: false,\n        writable: true,\n        configurable: true,\n      });\n      TestBed.overrideProvider(NgZone, {useValue: lifecycleZone});\n      fixture = TestBed.createComponent(SingleChip);\n      fixture.detectChanges();\n      chipDebugElement = fixture.debugElement.query(By.directive(MatLegacyChip))!;\n      chipNativeElement = chipDebugElement.nativeElement;\n      chipInstance = chipDebugElement.injector.get(MatLegacyChip);\n    });\n\n    it('should restore DOM focus while an earlier blur is pending', fakeAsync(() => {\n      const outside = document.createElement('button');\n      document.body.appendChild(outside);\n      let blurs = 0;\n      const subscription = chipInstance._onBlur.subscribe(() => blurs++);\n      try {\n        chipNativeElement.focus();\n        outside.focus();\n        expect(document.activeElement).toBe(outside);\n        expect(chipInstance._hasFocus).toBe(true);\n\n        chipInstance.focus();\n        expect(document.activeElement).toBe(chipNativeElement);\n        expect(chipInstance._hasFocus).toBe(true);\n        lifecycleZone.simulateZoneExit();\n        flushMicrotasks();\n        expect(document.activeElement).toBe(chipNativeElement);\n        expect(chipInstance._hasFocus).toBe(true);\n        expect(blurs).toBe(0);\n      } finally {\n        subscription.unsubscribe();\n        outside.remove();\n      }\n    }));\n\n    it('should emit one blur for repeated requests and racing stability', fakeAsync(() => {\n      Object.defineProperty(lifecycleZone, 'isStable', {value: true});\n      let blurs = 0;\n      const subscription = chipInstance._onBlur.subscribe(() => blurs++);\n      try {\n        chipNativeElement.focus();\n        chipInstance._blur();\n        chipInstance._blur();\n        expect(blurs).toBe(0);\n        expect(chipInstance._hasFocus).toBe(true);\n        flushMicrotasks();\n        expect(blurs).toBe(1);\n        expect(chipInstance._hasFocus).toBe(false);\n\n        chipInstance.focus();\n        chipInstance._blur();\n        chipInstance._blur();\n        lifecycleZone.simulateZoneExit();\n        expect(blurs).toBe(2);\n        flushMicrotasks();\n        lifecycleZone.simulateZoneExit();\n        expect(blurs).toBe(2);\n        expect(chipInstance._hasFocus).toBe(false);\n      } finally {\n        subscription.unsubscribe();\n      }\n    }));\n\n    it('should cancel pending blur and notify destruction before ripple cleanup', fakeAsync(() => {\n      Object.defineProperty(lifecycleZone, 'isStable', {value: true});\n      const ripple = (chipInstance as unknown as {\n        _chipRipple: {_removeTriggerEvents(): void};\n      })._chipRipple;\n      const cleanup = spyOn(ripple, '_removeTriggerEvents').and.callThrough();\n      const events: string[] = [];\n      const blurSubscription = chipInstance._onBlur.subscribe(() => events.push('blur'));\n      const destroySubscription = chipInstance.destroyed.subscribe(() => {\n        expect(cleanup).not.toHaveBeenCalled();\n        expect(chipInstance._hasFocus).toBe(true);\n        events.push('destroyed');\n      });\n      try {\n        chipNativeElement.focus();\n        chipInstance._blur();\n        fixture.componentInstance.shouldShow = false;\n        fixture.detectChanges();\n        lifecycleZone.simulateZoneExit();\n        flushMicrotasks();\n        chipInstance.ngOnDestroy();\n        chipInstance.focus();\n        expect(events).toEqual(['destroyed']);\n        expect(cleanup).toHaveBeenCalledTimes(1);\n      } finally {\n        blurSubscription.unsubscribe();\n        destroySubscription.unsubscribe();\n      }\n    }));\n\n    it('should notify programmatic focus once during synchronous host reentry', () => {\n      const outside = document.createElement('button');\n      document.body.appendChild(outside);\n      const observations: {focused: boolean; active: Element | null}[] = [];\n      const nativeFocus = spyOn(chipNativeElement, 'focus').and.callThrough();\n      const subscription = chipInstance._onFocus.subscribe(() => observations.push({\n        focused: chipInstance._hasFocus,\n        active: document.activeElement,\n      }));\n      try {\n        outside.focus();\n        chipInstance.focus();\n        expect(nativeFocus).toHaveBeenCalledTimes(1);\n        expect(observations).toEqual([{focused: true, active: chipNativeElement}]);\n        chipInstance.focus();\n        expect(nativeFocus).toHaveBeenCalledTimes(1);\n        chipNativeElement.focus();\n        expect(observations).toEqual([{focused: true, active: chipNativeElement}]);\n      } finally {\n        subscription.unsubscribe();\n        outside.remove();\n      }\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+          "before_git_blob": "4dd1e600f28db70711ea8b1adcd0535ed6b3be82",
+          "before_sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15",
+          "before_bytes": 16824,
+          "current_git_blob": "9c7bb1edbc65c9730bf9cdb14bc41b79f9ef20a8",
+          "current_sha256": "73aea18bc4f77958bc69229ea4954a688d92913bbc59fb52e28f342c2d42a5ae",
+          "current_bytes": 17085,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "owned chip focus lifecycle",
+            "reason": "Cancels pending blur, publishes focus before synchronous native callback, then notifies once; preserves destroyed guard.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 12639,
+              "before": "",
+              "after": "    const wasBlurPending = !!this._blurSubscription && !this._blurSubscription.closed;\n"
+            },
+            {
+              "offset": 12682,
+              "before": "    if (!this._hasFocus) {\n",
+              "after": "\n    if (!this._hasFocus || wasBlurPending) {\n      // Native focus dispatches the host focus handler synchronously. Publish the\n      // state first so reentry cannot focus or notify a second time.\n      this._hasFocus = true;\n"
+            },
+            {
+              "offset": 12801,
+              "before": "    this._hasFocus = true;\n",
+              "after": ""
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/dialog-config.ts",
+          "before_git_blob": "0a189c17a35b717b534640c7db6d57b17712da88",
+          "before_sha256": "73a0631f279f6770d7f033b021ae1864cbe830c6bea8bfc45a7810cd4417daff",
+          "before_bytes": 1123,
+          "current_git_blob": "020ad2f9d914c6dff9893879881ae4a04a94a4e3",
+          "current_sha256": "74f93ae9a4e82f27f12ff7edee36dd3eb1783cbf70b49f4b3cd72f613a0aec05",
+          "current_bytes": 1780,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "legacy dialog config type",
+            "reason": "Adds owned legacy runtime config for historical autofocus/durations and explicit autofocus default. CDK DialogConfig public declaration remains peer-minimum.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 376,
+              "before": "",
+              "after": "/**\n * Historical focus and animation values are interpreted by the owned legacy\n * container. Keep their contract independent of upstream removal annotations.\n * All other configuration fields retain the public peer contract.\n */\nexport type LegacyDialogRuntimeConfig<D = any> = Omit<DialogConfigBase<D>,\n  'autoFocus' | 'enterAnimationDuration' | 'exitAnimationDuration'> & {\n  autoFocus?: string | boolean;\n  enterAnimationDuration?: string | number;\n  exitAnimationDuration?: string | number;\n};\n\n"
+            },
+            {
+              "offset": 774,
+              "before": "",
+              "after": "  /** Historical autofocus policy, including boolean values handled by the owned container. */\n  override autoFocus?: string | boolean = 'first-tabbable';\n\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.ts",
+          "before_git_blob": "f5d5e5554599932f72addd7f1587b43b5b292320",
+          "before_sha256": "0495cc891e7e1578d05d9679fe61acf155c9bdb47b31032d53c324bc201616ac",
+          "before_bytes": 10351,
+          "current_git_blob": "df18554a5b15e979b366c7bdb5c3ba34346ee8fd",
+          "current_sha256": "a2223c0bb364c1738d10eb40e2d776c00b6ef2375a673c164d18d6528debe3df",
+          "current_bytes": 10390,
+          "authority": "dialog-focus-v5"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/dialog-content-directives.ts",
+          "before_git_blob": "b7ab76be970bbce9ada6116445b4661ead077ee9",
+          "before_sha256": "698b2fea49964c4cea0cfa07b0847ada413130055c032de94d16df3cc4b59ca5",
+          "before_bytes": 6504,
+          "current_git_blob": "c57aa2a8c0c82345d9df726cd439396dd9517a6a",
+          "current_sha256": "07b539ec15bdf207e3db563651f2c0e4875bb63f44f90963c304ca0dcc6eac2a",
+          "current_bytes": 6651,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "dialog title destruction queue",
+            "reason": "Captures queue at destruction before deferred removal, guarding absent container/queue.",
+            "prior_evidence_path": "scripts/dialog-title-source-context.mjs",
+            "prior_evidence_sha256": "5586ab7c886f8a4ff91c1788144e6f8c099f587cc2586bc53855b2dee7328439",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 4654,
+              "before": "\n    if (instance) {\n",
+              "after": "    // Match the tagged lifetime: remove from the queue captured at destruction.\n    const queue = instance?._ariaLabelledByQueue;\n\n    if (instance && queue) {\n"
+            },
+            {
+              "offset": 4712,
+              "before": "        removeLegacyDialogTitle(instance, this.id);\n",
+              "after": "        removeLegacyDialogTitle(instance, this.id, queue);\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/dialog-ref.ts",
+          "before_git_blob": "300e41963155cd3f9ba2b7bd42c0b8c8b8ddbc5d",
+          "before_sha256": "93cf4e88a9971a01b2572c0491142351c4598a4b325760733111266b4a10a071",
+          "before_bytes": 9280,
+          "current_git_blob": "2972360ec209d0a35d4069da576b2e35f9c29ece",
+          "current_sha256": "5807dd454c82b5b328166da9dbf1a165dc7c2743c6c15737571694e2fe475b3c",
+          "current_bytes": 9377,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "dialog ref event and peer lifecycle",
+            "reason": "Uses nonreplaying Subjects for open/close streams, aligns undefined template ComponentRef, registers owned container peer.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 747,
+              "before": "import {Observable, ReplaySubject, Subscription, merge} from 'rxjs';\n",
+              "after": "import {Observable, Subject, Subscription, merge} from 'rxjs';\n"
+            },
+            {
+              "offset": 861,
+              "before": "import {_MatDialogContainerBase} from './internal/dialog-container-base';\n",
+              "after": "import {_MatDialogContainerBase, registerLegacyDialogContainerPeer} from './internal/dialog-container-base';\n"
+            },
+            {
+              "offset": 1208,
+              "before": "   * null when the dialog is opened using a `TemplateRef`.\n",
+              "after": "   * undefined when the dialog is opened using a `TemplateRef`.\n"
+            },
+            {
+              "offset": 1273,
+              "before": "  readonly componentRef: ComponentRef<T> | null;\n",
+              "after": "  readonly componentRef: ComponentRef<T> | null | undefined;\n"
+            },
+            {
+              "offset": 1547,
+              "before": "  private readonly _afterOpened = new ReplaySubject<void>(1);\n",
+              "after": "  private readonly _afterOpened = new Subject<void>();\n"
+            },
+            {
+              "offset": 1687,
+              "before": "  private readonly _beforeClosed = new ReplaySubject<R | undefined>(1);\n",
+              "after": "  private readonly _beforeClosed = new Subject<R | undefined>();\n"
+            },
+            {
+              "offset": 2613,
+              "before": "",
+              "after": "    registerLegacyDialogContainerPeer(_containerInstance, _ref);\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+          "before_git_blob": "a9b710ad36c22af45c2cb5ff0ca82b17df8b2458",
+          "before_sha256": "dfc5961661c06ae15f186d25846f4a40f61880ac2c09e9975e0d9faabbbdea2b",
+          "before_bytes": 94027,
+          "current_git_blob": "07a15a2147ea5f0d2724977b1e88d7efdc6ad9cd",
+          "current_sha256": "c95640a45f9f029e818bcd9c1510337b1952a7164393aa8cc56f85cd188d783d",
+          "current_bytes": 97904,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "before_git_blob": "cf868a759ec6be29a50d78995de11c695ed518d4",
+          "before_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+          "before_bytes": 7030,
+          "current_git_blob": "19222ce80ae8a58bcaaa8f606967dd8ce573ae5f",
+          "current_sha256": "4926702c9f5aaafa17c7489692da5b67dcdde261d79cafd0628f95a4134ea61a",
+          "current_bytes": 8226,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "before_git_blob": "1bbbf9ed5c9dab44d39f62eb5ee6a0e2bf7b76e7",
+          "before_sha256": "752582e2bf49bc2f11431fa7bf35941f381a830dc5d837e14246a40ef010c01c",
+          "before_bytes": 9985,
+          "current_git_blob": "7a38f04c79ecb0c9d6fd783ac5e79927b280071c",
+          "current_sha256": "c413b76dfa611d3eaabcc38446861161f134d63f9427f29a61fc175963827fdd",
+          "current_bytes": 17839,
+          "authority": "dialog-focus-v5"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-state.ts",
+          "before_git_blob": "78b5c69f529a6e2466d5f0391056ad63eb4a3cd5",
+          "before_sha256": "34bfc27d4dddea4f71f8afc9fc589723461a4706f88c208c754314aa25d710e6",
+          "before_bytes": 2437,
+          "current_git_blob": "aa71b5e4004b2e2271998764b99989120d19fce8",
+          "current_sha256": "cefcbfb0ad5bb9e695fcfac03afa66d59c2f89709d686b59ee3edd3005812141",
+          "current_bytes": 3193,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "dialog container state",
+            "reason": "Adds owned peer state and destroys it; title removal uses captured queue only while live.",
+            "prior_evidence_path": "scripts/dialog-title-source-context.mjs",
+            "prior_evidence_sha256": "5586ab7c886f8a4ff91c1788144e6f8c099f587cc2586bc53855b2dee7328439",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 451,
+              "before": "",
+              "after": "interface LegacyDialogContainerPeer {\n  readonly overlayRef: object;\n  containerInstance: object | null | undefined;\n  disableClose: boolean | undefined;\n}\n\n"
+            },
+            {
+              "offset": 590,
+              "before": "",
+              "after": "  peer: LegacyDialogContainerPeer | null;\n"
+            },
+            {
+              "offset": 1119,
+              "before": "  states.set(container, {focusTrapped, changeDetector, destroyed: false});\n",
+              "after": "  states.set(container, {focusTrapped, changeDetector, destroyed: false, peer: null});\n}\n\n/** Bind an actual owned ref without requiring Angular injection during manual construction. */\nexport function registerLegacyDialogContainerPeer(\n  container: LegacyDialogTitleContainer, peer: LegacyDialogContainerPeer,\n): void {\n  const state = states.get(container);\n  if (state && !state.destroyed) {\n    state.peer = peer;\n  }\n}\n\nexport function legacyDialogContainerPeer(container: LegacyDialogTitleContainer): LegacyDialogContainerPeer | null {\n  return states.get(container)?.peer ?? null;\n"
+            },
+            {
+              "offset": 1409,
+              "before": "",
+              "after": "    state.peer = null;\n"
+            },
+            {
+              "offset": 2069,
+              "before": "export function removeLegacyDialogTitle(container: LegacyDialogTitleContainer, id: string): void {\n",
+              "after": "export function removeLegacyDialogTitle(\n  container: LegacyDialogTitleContainer, id: string,\n  queue: string[] | undefined = container._ariaLabelledByQueue,\n): void {\n"
+            },
+            {
+              "offset": 2207,
+              "before": "  const queue = container._ariaLabelledByQueue;\n",
+              "after": ""
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+          "before_git_blob": "4aba452e51a465f83f83a86f111c0a42bd94882f",
+          "before_sha256": "81ac34fa547b5ecf0607bad40eb0302fc97a98859b360f94164832f3dfb41624",
+          "before_bytes": 3691,
+          "current_git_blob": "44e2d4763ffbc64c57befe1878ea2bf4bdc6fcd3",
+          "current_sha256": "994576f436b45a1d3d1f132db793a2b3668e581637f06279e2200065cea319a5",
+          "current_bytes": 3717,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "owned dialog focus type",
+            "reason": "Imports owned LegacyDialogRuntimeConfig type instead of current Material config; no executable change.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 361,
+              "before": "import {MatDialogConfig} from '@angular/material/dialog';\n",
+              "after": "import type {LegacyDialogRuntimeConfig as MatDialogConfig} from '../dialog-config';\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/testing/error-harness.ts",
+          "before_git_blob": "dd9518a3dd6c63ff4672d5c35539b62b190ff57c",
+          "before_sha256": "7d259447752aea972328fcc9f5c3c126893720ffab84bc4ea755b38cd4c0848f",
+          "before_bytes": 1007,
+          "current_git_blob": "340f4ec8493986629e68c5ee5eb6bf8512ea0c37",
+          "current_sha256": "0df6fc9bad1331a8ceb0ace31f1c4d1318d830b096e9911b3bc57cf59cb9e14d",
+          "current_bytes": 1271,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "legacy error harness predicate",
+            "reason": "Adds owned protected predicate helper with public MatErrorHarness type; retains same text-matching predicate.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 349,
+              "before": "import {ErrorHarnessFilters} from '@angular/material/form-field/testing';\n",
+              "after": "import {ErrorHarnessFilters, type MatErrorHarness} from '@angular/material/form-field/testing';\n"
+            },
+            {
+              "offset": 752,
+              "before": "    return new HarnessPredicate(this, options).addOption('text', options.text, (harness, text) =>\n",
+              "after": "    return MatLegacyErrorHarness._getErrorPredicate(this, options);\n  }\n\n  protected static _getErrorPredicate<T extends MatErrorHarness>(\n    type: ComponentHarnessConstructor<T>,\n    options: ErrorHarnessFilters,\n  ): HarnessPredicate<T> {\n    return new HarnessPredicate(type, options).addOption('text', options.text, (harness, text) =>\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+          "before_git_blob": "e55fbb2480b753ff80379e1c1724bf1707aecdf8",
+          "before_sha256": "bb843faad6ffcb93ce8f7469bcff85546728a9ae6e3fa48646c558ee661cb945",
+          "before_bytes": 21830,
+          "current_git_blob": "10ce08dbf2d1c4999ba26babb0a7b804c18802bc",
+          "current_sha256": "a498fd55553577bc81f285f36cf2822866d17b9bed8bb572c14bf78df21eed0d",
+          "current_bytes": 21858,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "menu keyboard propagation",
+            "reason": "Initializes animation state false; stops propagation after handled key cases, preserving return for unhandled cases.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 3768,
+              "before": "  _isAnimating: boolean;\n",
+              "after": "  _isAnimating = false;\n"
+            },
+            {
+              "offset": 13577,
+              "before": "",
+              "after": "    event.stopPropagation();\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts",
+          "before_git_blob": "8d69bd9ef0588dd6fd75e74bd6f96506fee83e72",
+          "before_sha256": "b0118e2200c6cf629bf5ca181277fb4e08d381c595aacc528d6f5724f416503f",
+          "before_bytes": 2880,
+          "current_git_blob": "7f9fdafd11613d9a158a12c953437ae22a8db5fa",
+          "current_sha256": "f5da44d00af909e5da4dc80453796857d22ab4f323c5db5d793d002d8e72cfd8",
+          "current_bytes": 3038,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "menu content detach",
+            "reason": "Adds required Ryan notice and markForCheck after detach to refresh content query.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 61,
+              "before": "",
+              "after": " * Copyright (c) 2026 Ryan Lester.\n"
+            },
+            {
+              "offset": 2766,
+              "before": "",
+              "after": "      // Refresh content queries after the embedded view has been destroyed.\n      this._changeDetectorRef.markForCheck();\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+          "before_git_blob": "94e84cc582e949c35978390a53b7de8f14dede56",
+          "before_sha256": "4212186406b92fc485c050ffae7a8fd7b1f8e7af855bfd0133b018435834018a",
+          "before_bytes": 1443,
+          "current_git_blob": "fa58a3b6ef765424a35df39448efa4468b39119f",
+          "current_sha256": "3598e6ccf4761bd9777dafaca271cd896dc8f694ec39e9e46c37f593a8c307af",
+          "current_bytes": 1504,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "owned menu content type",
+            "reason": "Replaces upstream content type with owned MatLegacyMenuContent type; no executable change.",
+            "prior_evidence_path": "scripts/menu-panel-content-boundary.mjs",
+            "prior_evidence_sha256": "bdab684180a316bdd9da65163f3c10bea8073f647c2495afaccc19dea6286ea3",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 402,
+              "before": "import type {MatMenuContent, MenuPositionX, MenuPositionY} from '@angular/material/menu';\n",
+              "after": "import type {MenuPositionX, MenuPositionY} from '@angular/material/menu';\nimport type {MatLegacyMenuContent as MatMenuContent} from '../menu-content';\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "before_git_blob": "5c3987ceefcc5f6ec7f5869ca46e7c5537068680",
+          "before_sha256": "f1e499dae58e12e8333ef81e480d069d93599cadda29ed2df32262e44d6c45a8",
+          "before_bytes": 26780,
+          "current_git_blob": "777ccf29403ab133d3ba1e923a622abab089b81b",
+          "current_sha256": "e4ecb1452e92a1cc30fb1ebc97c6e24244b432dade5f30b6c58855d8e10cc5b2",
+          "current_bytes": 30651,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+          "before_git_blob": "f6d79ccdb48d4520e4d5bba2a0871a1a5c5d0b05",
+          "before_sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6",
+          "before_bytes": 112600,
+          "current_git_blob": "100a4b09fa8027c1befac7a904c8272f90b71e8c",
+          "current_sha256": "fefc0509a3c6597aa78b68ec885a14f9c4eae5f8d0742d8055b1fdc4e5f4ce0a",
+          "current_bytes": 127882,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/select.html",
+          "before_git_blob": "05679478af008a3400afb40af289560b233ca799",
+          "before_sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da",
+          "before_bytes": 2792,
+          "current_git_blob": "e12daf48f7b4e94a6dd303e54982cac3859276d7",
+          "current_sha256": "9d895bf6cbf1b2da7063acedc1fed7ee4cf7f10ce25bc7a797e8ee32875feec2",
+          "current_bytes": 2843,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+          "before_git_blob": "d13e227562379bb37ae72a2599e279cffbb16f79",
+          "before_sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13",
+          "before_bytes": 223507,
+          "current_git_blob": "b1473b5585ec363d8a53b139bf934e87aa0c1ec4",
+          "current_sha256": "ac1f5c3cfe7efedfbe4ca4eb86452fccada944ce1ead224e9779bd9d28f1c499",
+          "current_bytes": 226944,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+          "before_git_blob": "5f7403f1698102fb0ccda8367728baae65616780",
+          "before_sha256": "1faece639aa44d426b249e15a3a3cca82ae6291371102ce88d8e3ef02baef38c",
+          "before_bytes": 10948,
+          "current_git_blob": "ffc030e3530abf873e5edce6bdadf056421013fb",
+          "current_sha256": "2064e816539a77a2749ab9d2141721a40ab27e3dfbf4edafa1f5b9afedfc453b",
+          "current_bytes": 11168,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+          "before_git_blob": "4358bb513e4eaac933e5201e1be6694554f781e1",
+          "before_sha256": "d9ddfcf0a2f5a27a17670b9c4f382b2739c9a4f9ff5baffaef542cd866ecddab",
+          "before_bytes": 13320,
+          "current_git_blob": "2620262347b8e8b76897d2e806a86a2c4b008d63",
+          "current_sha256": "1b673f43bacbcf47ea0e504ff3f191d84289e7c7337b20b93e8b5b98e833eb08",
+          "current_bytes": 13945,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "snack DOM portal exception path",
+            "reason": "Uses public generic portal attach; on failure detaches outlet and restores attached host according to pre-attach state before rethrow.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 4534,
+              "before": "    const result = this._portalOutlet.attachDomPortal(portal);\n",
+              "after": "    // Development validation can fail before the child takes portal ownership.\n    const preserveContainerHost =\n      (typeof ngDevMode === 'undefined' || ngDevMode) && !portal.element.parentNode;\n    let result: void;\n    try {\n      result = this._portalOutlet.attach(portal) as void;\n    } catch (error) {\n      // Generic dispatch records the portal before entering the DOM hook.\n      // Keep the historical hook's observable flags when the hook throws.\n      const portalAttached = portal.isAttached;\n      this._portalOutlet.detach();\n      if (portalAttached) {\n        portal.setAttachedHost(preserveContainerHost ? this : this._portalOutlet);\n      }\n      throw error;\n    }\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+          "before_git_blob": "80c5bc255ca477299b3852da074757e04d00ff3c",
+          "before_sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5",
+          "before_bytes": 4650,
+          "current_git_blob": "cd0cff189e3a69689e62b143eb95112bbe485b3b",
+          "current_sha256": "a35d7e06fb778203478236024a6137e34624f0ed7f10fabcc7ac3bd9aaf4a510",
+          "current_bytes": 4960,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+          "before_git_blob": "d532ca11d2f6a679581b05a7b934b9888715db20",
+          "before_sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3",
+          "before_bytes": 45763,
+          "current_git_blob": "ccfad7a95a4a27682be77a2af23c4556b8cfeba2",
+          "current_sha256": "92425afa5ddcb406c75b4af69ea9dd795f3b3d10ef8898b909a7bd1ad69f7230",
+          "current_bytes": 49266,
+          "authority": "select-dialog-v4"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/public-api.ts",
+          "before_git_blob": "464da0a6519a311349e630d815132ebb2e39d97a",
+          "before_sha256": "7ceedeead81ba11dac5f14536e155db4175e8161b5964eaaa8eacd7b1ff8ec81",
+          "before_bytes": 1202,
+          "current_git_blob": "889bd9a47f3890f496b89ba475532a8d62805cdd",
+          "current_sha256": "ff9e95bd86923239f7072a38b3a47c00e490410f54490df1f3075c1329ef9efb",
+          "current_bytes": 1386,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "table partial compiler export",
+            "reason": "Exports owned column class directive under private-name alias for partial compiler scope.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 364,
+              "before": "",
+              "after": "// Angular's partial compiler needs NgModule-exported directives at this entrypoint.\nexport {_LegacyTableColumnClasses as ɵLegacyTableColumnClasses} from './internal/column-classes';\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+          "before_git_blob": "2bc95de3673183d11aa39227a9c2a63e026d3a99",
+          "before_sha256": "8ca96a3436189c60c375b15bc12dc6c2c36e07f18e8a6cdad5062b5b019285bb",
+          "before_bytes": 3171,
+          "current_git_blob": "642ec20734a1a84c1c5dc6ab4fb9dde5ece2f418",
+          "current_sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5",
+          "current_bytes": 3464,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "table sort regression test",
+            "reason": "Adds zero-prefixed numeric string sorting case; no production code.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 3028,
+              "before": "",
+              "after": "\n    it('should be able to correctly sort an array of strings and numbers with left zero', () => {\n      testSortWithValues([\n        '001',\n        '2',\n        3,\n        4,\n        'apples',\n        'bananas',\n        'cherries',\n        'lemons',\n        'strawberries',\n      ]);\n    });\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+          "before_git_blob": "bc2c5a572f214007279086b333f95cd78275e8d5",
+          "before_sha256": "7a84291a13db6e907e84b42a581f993d81e6da1f28966696861d0b325e6def14",
+          "before_bytes": 10948,
+          "current_git_blob": "2b20bbbd5e7dfdd10c3c4fab9311758a936f62e6",
+          "current_sha256": "15d4c2d2daa1aafce8f6b263f9e2423742c3221af56954c829eea1ed693ea926",
+          "current_bytes": 20364,
+          "authority": "tabs-finite-v1"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+          "before_git_blob": "d9ebe3480cfa2dd445dc7e4f8f8537010b6442cc",
+          "before_sha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b",
+          "before_bytes": 18122,
+          "current_git_blob": "ce4b225d6a8da845d41a21de8954a92b6f44c256",
+          "current_sha256": "339cd7dee4e6431d4a603b215bf5a78fb654b23dfb49bfe50246cb44af17515e",
+          "current_bytes": 18261,
+          "authority": "tabs-finite-v1"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+          "before_git_blob": "9bf9a1f353fbe35bbf83b49c4d53102b08dbb522",
+          "before_sha256": "dd193a5f4cdef0ee0be3c993474efa482229854d33b4853c6d5dd519d21a6fd0",
+          "before_bytes": 9016,
+          "current_git_blob": "985eab29a412b7482f1259c3bb74fc1de2828e49",
+          "current_sha256": "9205bb2a5b3573e8f21161b03baa04e4b3e868e72d70e06c5dcdf96d2439af36",
+          "current_bytes": 9041,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "tab nav bar deactivation",
+            "reason": "Hides ink bar when selected index resets to -1.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 4677,
+              "before": "",
+              "after": "    this._inkBar.hide();\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.html",
+          "before_git_blob": "710328c16971abdce10955b939745a6db1be7d22",
+          "before_sha256": "fb4e59b10d5d2f72cf8aa00688a67ad21a415928e588957d9e5ae0b00782aa53",
+          "before_bytes": 663,
+          "current_git_blob": "210ea563be38a9cc9e75dfe4f2ebd3e9dd6080f0",
+          "current_sha256": "c4d86c99bfeed0a10d6451e034ade808bfb52b4240471e1aef5ccd47e3f124f1",
+          "current_bytes": 652,
+          "authority": "prior-tab-template-expression"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.ts",
+          "before_git_blob": "4f8b2a175191f6808f72e43f7b37f68d4eb936b4",
+          "before_sha256": "7560de8c08198b04eddb701df4008225bbaa1f93847de7a17439295fec85fd80",
+          "before_bytes": 2564,
+          "current_git_blob": "897401c583f3e34d405f8e0cf839e8e414a2d0b4",
+          "current_sha256": "bb9cbef0831ea50ebe4577e4bc50b5ea4d0e9b25f332aad6d872a7fdc5cec004",
+          "current_bytes": 3207,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "tab portal constructor identity",
+            "reason": "Uses owned construction helper to supply public CdkPortalOutlet constructor dependencies and initialize derived object fields.",
+            "prior_evidence_path": "compatibility/rc/tab-adapter-product-inventory-inputs.json",
+            "prior_evidence_sha256": "effc6e56f3e85f7a214e9ff5cd8487c9c919e565b6ec2d92bf9da6c9995328ac",
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 504,
+              "before": "",
+              "after": "import {constructLegacyTabBodyPortal} from './internal/tab-portal-construction-context';\n"
+            },
+            {
+              "offset": 951,
+              "before": "  private _centeringSub = Subscription.EMPTY;\n  private _leavingSub = Subscription.EMPTY;\n",
+              "after": "  // The public parent is constructed with the original caller's dependencies.\n  // Initialize every own field explicitly on that returned derived object.\n  declare private _centeringSub: Subscription;\n  declare private _leavingSub: Subscription;\n  declare private _host: MatLegacyTabBody;\n"
+            },
+            {
+              "offset": 1042,
+              "before": "",
+              "after": "  // @ts-expect-error TS2377: derived constructor deliberately returns its object.\n"
+            },
+            {
+              "offset": 1057,
+              "before": "    viewContainerRef: ViewContainerRef,\n    @Inject(forwardRef(() => MatLegacyTabBody)) private _host: MatLegacyTabBody,\n",
+              "after": "    @Inject(ViewContainerRef) viewContainerRef: ViewContainerRef,\n    @Inject(forwardRef(() => MatLegacyTabBody)) _host: MatLegacyTabBody,\n"
+            },
+            {
+              "offset": 1222,
+              "before": "    super();\n",
+              "after": "    const outlet = constructLegacyTabBodyPortal(\n      new.target, viewContainerRef, _document,\n    ) as MatLegacyTabBodyPortal;\n    outlet._host = _host;\n    outlet._centeringSub = Subscription.EMPTY;\n    outlet._leavingSub = Subscription.EMPTY;\n    return outlet;\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+          "before_git_blob": "dab26353d3e382151fcdff6f73a56d4180e9f961",
+          "before_sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d",
+          "before_bytes": 34707,
+          "current_git_blob": "9de37584a46e0073f14bf80643e3df03934bda59",
+          "current_sha256": "fc29490be443cdb544e553f762be572fb4e6635216ad47dbb492a5dffa113aad",
+          "current_bytes": 35820,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "tooltip scroll clipping",
+            "reason": "Computes clipping locally from fresh overlay and ancestor rectangles before position classes mutate layout; removes dependency on docs-private CDK event visibility.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 14502,
+              "before": "",
+              "after": "      // Capture the same fresh pane/ancestor rectangles used by the tagged strategy,\n      // before position classes can change a consumer's styles.\n      const overlayElement = this._overlayRef?.overlayElement;\n      const isClipped = !!overlayElement && isTooltipOverlayClipped(\n        overlayElement.getBoundingClientRect(),\n        scrollableAncestors.map(scrollable =>\n          scrollable.getElementRef().nativeElement.getBoundingClientRect()),\n      );\n"
+            },
+            {
+              "offset": 14601,
+              "before": "        if (change.scrollableViewProperties.isOverlayClipped && this._tooltipInstance.isVisible()) {\n",
+              "after": "        if (isClipped && this._tooltipInstance.isVisible()) {\n"
+            },
+            {
+              "offset": 34707,
+              "before": "",
+              "after": "\n/** Owned tagged16 clipping predicate; current CDK event visibility is docs-private. */\nfunction isTooltipOverlayClipped(\n  element: Pick<DOMRect, 'top' | 'bottom' | 'left' | 'right'>,\n  scrollContainers: ReadonlyArray<Pick<DOMRect, 'top' | 'bottom' | 'left' | 'right'>>,\n): boolean {\n  return scrollContainers.some(scrollContainerRect => {\n    const clippedAbove = element.top < scrollContainerRect.top;\n    const clippedBelow = element.bottom > scrollContainerRect.bottom;\n    const clippedLeft = element.left < scrollContainerRect.left;\n    const clippedRight = element.right > scrollContainerRect.right;\n    return clippedAbove || clippedBelow || clippedLeft || clippedRight;\n  });\n}\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/bottom-sheet/_bottom-sheet-theme.scss",
+          "before_git_blob": "a35da3c4c37e1ec30e628dcb0ba8052860d279de",
+          "before_sha256": "53f9fd5f7ecb4355080a72380697ca9c2c5b4471205fc56c4925e34691ae3503",
+          "before_bytes": 2511,
+          "current_git_blob": "2c48313da6f46d1d5ccbbd174a828d1f6267e734",
+          "current_sha256": "aeb42e3336cc18305160180a602c5ce50e92135d42d08444fc133b9c4647255b",
+          "current_bytes": 2662,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "Sass notice only",
+            "reason": "Exact four-line Google/Ryan/MIT notice prepended; entire Sass body byte-identical.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 0,
+              "before": "",
+              "after": "// Copyright Google LLC All Rights Reserved.\n// Copyright (c) 2026 Ryan Lester.\n// Use of this source code is governed by the MIT license in LICENSE.\n\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+          "before_git_blob": "804b9ba4839b78877993653aa0c867aa82d95502",
+          "before_sha256": "aaa2dd4dfbd9442349523e8ce34164c5c053cd511b975fad2385bdd97f9c7c9c",
+          "before_bytes": 34933,
+          "current_git_blob": "7ce9353216a79dfefffad74973eb387f156f595a",
+          "current_sha256": "fe42eacb9b974bd546b8ae7cb192bce3021fcc4c0a3828e3a765c745988cf161",
+          "current_bytes": 35593,
+          "authority": "current-sass-sixth-source"
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/button-toggle/_button-toggle-theme.scss",
+          "before_git_blob": "ab6f262042e745117498820c645eb0dec2d59a72",
+          "before_sha256": "5ad5a3b1a9dcdeefd5804ff7a9fa4f22d39f732a14e126630430914c42a549ae",
+          "before_bytes": 3599,
+          "current_git_blob": "b30640c0e01cbb90196ae336af2961ebe46c997d",
+          "current_sha256": "3dfc8f81fa358b147d86fbc1fba409eec4409a9a80cc741f8e9d93b2c5894728",
+          "current_bytes": 3750,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "Sass notice only",
+            "reason": "Exact four-line Google/Ryan/MIT notice prepended; entire Sass body byte-identical.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 0,
+              "before": "",
+              "after": "// Copyright Google LLC All Rights Reserved.\n// Copyright (c) 2026 Ryan Lester.\n// Use of this source code is governed by the MIT license in LICENSE.\n\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/button/_button-theme.scss",
+          "before_git_blob": "524d8e2813e4e1c5411d4bd165fe30cfd3e903a9",
+          "before_sha256": "5af18a9384b617116ebdf30ff9ebc18f6844208aa4b6b3f958a43a022d8d499d",
+          "before_bytes": 7303,
+          "current_git_blob": "38ee5e3628a8c71f3a9681948fdd173273913296",
+          "current_sha256": "6fa8ecaf9a0816a2a6b5602b33b23b256b201ad64cdb6cde67833a4f16fd7c96",
+          "current_bytes": 13341,
+          "authority": "current-sass-sixth-source"
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/card/_card-theme.scss",
+          "before_git_blob": "5a785368fe558862919560c2b77cb78801fbdfe3",
+          "before_sha256": "639fbbeab9868e1ba7f9f2f9ce4ec062496b722844943025bfe18e46418ccd74",
+          "before_bytes": 4273,
+          "current_git_blob": "4931166a3a3065f44567e8445e58f2de7965f96d",
+          "current_sha256": "dc5e055d95aabf5c8a8ae4ba70acee8a9a1315e6f46715e8846c932f79d51fbf",
+          "current_bytes": 5349,
+          "authority": "current-sass-sixth-source"
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss",
+          "before_git_blob": "b6036dd589855261fa48859873a77cfe68bde094",
+          "before_sha256": "df6de506e004cd540ccbcd35683e9bdf034366137eeeda07e8f4e1b7e233eeb4",
+          "before_bytes": 3364,
+          "current_git_blob": "d6b2c7f7949e17c0bf0a2c91486708f03cf3e240",
+          "current_sha256": "97d4de28beacfa9229c148463b16436f5fdbf5e8905d9dc6c463c5e534da17a9",
+          "current_bytes": 7155,
+          "authority": "current-sass-sixth-source"
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/divider/_divider-theme.scss",
+          "before_git_blob": "4649c933495ac567499f333035923d76f80a6eb7",
+          "before_sha256": "7c9acfae0e2485a425c52819a6b2e635a2990b4263f29d3913544dbbbd38cd50",
+          "before_bytes": 1936,
+          "current_git_blob": "ab4eac48c538a3d4ef39e690dfafc7d650b5b2d5",
+          "current_sha256": "15a6239799cd29263ad2e336205bbebe4d31c9997464aa041483e0856e420361",
+          "current_bytes": 2087,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "Sass notice only",
+            "reason": "Exact four-line Google/Ryan/MIT notice prepended; entire Sass body byte-identical.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 0,
+              "before": "",
+              "after": "// Copyright Google LLC All Rights Reserved.\n// Copyright (c) 2026 Ryan Lester.\n// Use of this source code is governed by the MIT license in LICENSE.\n\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/expansion/_expansion-theme.scss",
+          "before_git_blob": "d3359cc45b83e8255acdf5eb1456b93645bdd37e",
+          "before_sha256": "6eb8124c3d5b81dc8df3ef265f1c46de2a3e513bb2096392b4399e1b2057e8d6",
+          "before_bytes": 2919,
+          "current_git_blob": "5a4fe98d5704b510b69335eaddcc8a24356a08e8",
+          "current_sha256": "e47d0786961bf4cd1365c795f159151a412c43e1f1566bf928be040f34f63cec",
+          "current_bytes": 3070,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "Sass notice only",
+            "reason": "Exact four-line Google/Ryan/MIT notice prepended; entire Sass body byte-identical.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 0,
+              "before": "",
+              "after": "// Copyright Google LLC All Rights Reserved.\n// Copyright (c) 2026 Ryan Lester.\n// Use of this source code is governed by the MIT license in LICENSE.\n\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/progress-spinner/_progress-spinner-theme.scss",
+          "before_git_blob": "37549ba544a83b4bd1857849616b7ffdab2ca4fa",
+          "before_sha256": "5644d8e6c8e74ec610371384ca33b60e41af97a4ed07d0027e41125c4d53bb9c",
+          "before_bytes": 1528,
+          "current_git_blob": "a8c5d4984b14f916481f567789dedf3ee01e7a6c",
+          "current_sha256": "94c7e633dce64a7acfeb05d8d93106df127bbc02049f59d7e55cf5783a2cb659",
+          "current_bytes": 1805,
+          "authority": "current-sass-sixth-source"
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/sidenav/_sidenav-theme.scss",
+          "before_git_blob": "125b82bb31278a5891f264aac6e7862ffa05df8b",
+          "before_sha256": "0feb1e09e960858f0b9cf52ab128a706abf144c19703e88824a0362eece45f7c",
+          "before_bytes": 1930,
+          "current_git_blob": "51ecd490c983f0a65eaa2b35b109a2c27266f972",
+          "current_sha256": "1fe76bf969a400b9cd6f5be7e58e1bf997f496a8d5beaa755882b9a6340e58f8",
+          "current_bytes": 2081,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "Sass notice only",
+            "reason": "Exact four-line Google/Ryan/MIT notice prepended; entire Sass body byte-identical.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 0,
+              "before": "",
+              "after": "// Copyright Google LLC All Rights Reserved.\n// Copyright (c) 2026 Ryan Lester.\n// Use of this source code is governed by the MIT license in LICENSE.\n\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/snack-bar/_snack-bar-theme.scss",
+          "before_git_blob": "7ca8975d8f44f8e701d574d8e31e4468e37a4b77",
+          "before_sha256": "29ca545098f2b8eb81fbf7f311b5dac5fda4986f641d39ac23ca01eb7a547906",
+          "before_bytes": 1536,
+          "current_git_blob": "d648f0f91ea359c41a9c5b07bad9855a1211657a",
+          "current_sha256": "df7b902f582feca85cd5190bc2183d36a61605a5d20969e515c275d298b5e2c7",
+          "current_bytes": 1746,
+          "authority": "current-sass-sixth-source"
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/sort/_sort-theme.scss",
+          "before_git_blob": "15429f407efc83de78bb4885eb45c5023d2de884",
+          "before_sha256": "42d8fc6ecb90375e3e12d4b1d2148575e037487cd09377800b0bd90d4dd68b9b",
+          "before_bytes": 2831,
+          "current_git_blob": "886d99d2539c4a3b9ec148818ee34d2fc802a4a0",
+          "current_sha256": "e94e25372f4e17bfa41069cfdb59176da580f1ee92dc6e825b2559d264fd9bd7",
+          "current_bytes": 2982,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "Sass notice only",
+            "reason": "Exact four-line Google/Ryan/MIT notice prepended; entire Sass body byte-identical.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 0,
+              "before": "",
+              "after": "// Copyright Google LLC All Rights Reserved.\n// Copyright (c) 2026 Ryan Lester.\n// Use of this source code is governed by the MIT license in LICENSE.\n\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/tree/_tree-theme.scss",
+          "before_git_blob": "ed0e66ccfbffcc3f20d10f5a218bf79e12d7e77f",
+          "before_sha256": "54283a1a49b2342b168bab18d1c8ec9940f0c3e3924c3c3f87ba86c0c9f91830",
+          "before_bytes": 3311,
+          "current_git_blob": "c489dfe33818f3509fb2b78201989cc4b2f90d65",
+          "current_sha256": "c0a0cd154c469d3cf16fa60fa964808dfe054a647344683173c3b88f1c4e92ed",
+          "current_bytes": 3462,
+          "authority": "additional-source-judgment-required",
+          "judgment": {
+            "scope": "Sass notice only",
+            "reason": "Exact four-line Google/Ryan/MIT notice prepended; entire Sass body byte-identical.",
+            "prior_evidence_path": null,
+            "prior_evidence_sha256": null,
+            "actual_current_tests_executed": false
+          },
+          "edits": [
+            {
+              "offset": 0,
+              "before": "",
+              "after": "// Copyright Google LLC All Rights Reserved.\n// Copyright (c) 2026 Ryan Lester.\n// Use of this source code is governed by the MIT license in LICENSE.\n\n"
+            }
+          ]
+        }
+      ],
+      "added": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-portal-construction-context.ts",
+          "current_sha256": "6e2047cb3efe6a8a26db692928c0f9f97d4cbc5fb701ae275ee23ad3850221d2",
+          "current_git_blob": "caedf72c9e77dee4bc8f2dc38dec379e819524cf",
+          "current_bytes": 1468,
+          "authority": "tab-adapter-product-inventory",
+          "judgment": "Owned public CdkPortalOutlet constructor identity helper with explicit dependencies."
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-body-reversal.spec.ts",
+          "current_sha256": "edd9e7149268ad22888e28f8ffa6ed27ce5683b15e28022a3c13b844fbbd9c54",
+          "current_git_blob": "bc5be01a4d6af6946067d0d470680ad509dc1d4f",
+          "current_bytes": 9127,
+          "authority": "tabs-finite-v1",
+          "judgment": "Added reverse-transform and transition lifecycle source spec bound by tabs finite evidence."
+        }
+      ]
+    }
+  }
+}
