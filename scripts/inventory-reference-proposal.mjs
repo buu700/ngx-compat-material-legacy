@@ -17,7 +17,10 @@ import {inventoryFiniteToolSuccessor} from './inventory-finite-tool-successor.mj
 export const INVENTORY_REFERENCE_PACKET='compatibility/rc/c04-inventory-reference-proposal.json';
 export const INVENTORY_REFERENCE_LEDGER='compatibility/f10/disposition-ledger/ledger.json';
 export const INVENTORY_REFERENCE_PATH='testing/legacy-runner/historical-inventory.json';
-const sourceValidator='scripts/historical_inventory_rebinding.py',self='scripts/inventory-reference-proposal.mjs';
+const sourceValidator='scripts/historical_inventory_rebinding.py',nextValidator='scripts/historical_inventory_nine_spec_successor.py',self='scripts/inventory-reference-proposal.mjs';
+const nextInventoryHash='a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403';
+const nextValidatorHash='089c9136edf610560f183eb0d4c39c89a764d7d984a4e6afe250765367e943fd';
+const epochHead='9665df520e4f8644422203b6cb82a5412a483a33';
 const validatorHash='1014fae26c962bf8934d93bca44d30dfe49575b2b9e23288e8eb930323f48ce1';
 const pins={
   "main": {
@@ -116,25 +119,41 @@ export function prepareInventoryReferenceSourceMetadata({root,read=path=>readEvi
  let active=false;const idle=()=>assert.equal(active,false,'reentrant inventory reference consumption');
  const member=(path,expected)=>{
   idle();const actual=readEvidenceMember(root,path),raw=read(path);assert.ok(Buffer.isBuffer(raw));assert.ok(actual.equals(raw),'nonphysical inventory proposal input '+path);assert.ok(actual.equals(readEvidenceMember(root,path)),'inventory proposal input changed during callback '+path);
-  if(expected){const ref={path,sha256:expected};const selected=tool.qualify(product.qualify(ref)??ref)??product.qualify(ref)??ref;assert.equal(hash(raw),selected.sha256,'unqualified inventory proposal input '+path);}
+  if(expected){const ref={path,sha256:expected};const selected=line==='main' && path===INVENTORY_REFERENCE_PATH && expected===pin.inventory ? {...ref,sha256:nextInventoryHash} : tool.qualify(product.qualify(ref)??ref)??product.qualify(ref)??ref;assert.equal(hash(raw),selected.sha256,'unqualified inventory proposal input '+path);}
   const current={path,sha256:hash(raw),bytes:raw.length},prior=bound.get(path);if(prior)assert.deepEqual(current,prior,'changed repeated inventory proposal input '+path);else bound.set(path,current);return raw;
  };
  const packetRaw=member(INVENTORY_REFERENCE_PACKET,pin.packet),packet=JSON.parse(packetRaw);
  assert.equal(packet.line,line);assert.equal(packet.source_parent,pin.parent);
  member(self,hash(image));
- for(const ref of packet.source_members){const selected=tool.qualify(product.qualify(ref)??ref)??product.qualify(ref)??ref;const raw=member(ref.path,ref.sha256);assert.equal(raw.length,selected.bytes);}
+ for(const ref of packet.source_members){const selected=tool.qualify(product.qualify(ref)??ref)??product.qualify(ref)??ref;const raw=member(ref.path,ref.sha256);assert.equal(raw.length,line==='main' && ref.path===INVENTORY_REFERENCE_PATH ? member(INVENTORY_REFERENCE_PATH,nextInventoryHash).length : selected.bytes);}
  member(sourceValidator,validatorHash);member('scripts/select_dialog_finite_source_successor.py','d5cb25d0908f93fb0d8e8d4701f2db0ec9a0726df8133dabe45906372b17fda7');
- const inventory=member(INVENTORY_REFERENCE_PATH,pin.inventory),inventoryData=JSON.parse(inventory);
+ const currentInventory=member(INVENTORY_REFERENCE_PATH,line==='main'?nextInventoryHash:pin.inventory);
+ const inventory=line==='main'?oldBytes(root,epochHead,INVENTORY_REFERENCE_PATH):currentInventory;assert.equal(hash(inventory),pin.inventory);
+ const inventoryData=JSON.parse(currentInventory);
+ if(line==='main') member(nextValidator,nextValidatorHash);
  assert.equal(inventoryData.rows.length,57);assert.equal(inventoryData.shared_suite_shims.length,21);
  for(const row of inventoryData.rows)member(row.candidate,row.candidate_sha256);
  for(const row of inventoryData.shared_suite_shims)member(row.path,row.sha256);
  const before=oldBytes(root,pin.parent,INVENTORY_REFERENCE_LEDGER);
  const result=deriveInventoryReferenceMetadata({before,packet,inventory});
- const verifier=JSON.parse(execFileSync('python3',[sourceValidator],{cwd:root,encoding:'utf8',maxBuffer:1024*1024}));
- assert.equal(verifier.line,line);assert.equal(verifier.current_inventory_sha256,pin.inventory);
- assert.equal(verifier.source_bindings_changed,13);assert.equal(verifier.derived_summary_scalars_changed,2);
- assert.equal(verifier.execution_claims_changed,0);assert.equal(verifier.actual_native_packed_browser_floor_or_full_audit_qualified,false);
- assert.equal(verifier.g11_claim,'not-passed');
+ let verifier;
+ if(line==='main'){
+  const active=JSON.parse(execFileSync('python3',[nextValidator],{cwd:root,encoding:'utf8',maxBuffer:1024*1024}));
+  assert.equal(active.epoch,'main-nine-spec-source-identities');assert.equal(active.members,9);
+  assert.equal(active.execution_credit,false);assert.equal(active.source_behavior_admission,false);assert.equal(active.full_suite_pass,false);
+  const historical=JSON.parse(inventory).candidate_snapshot.source_binding_refreshes;
+  assert.equal(historical.length,1);const prior=historical[0];assert.equal(prior.current_source_bindings_changed,13);
+  assert.equal(prior.before_inventory_sha256,pin.priorInventory);assert.equal(prior.execution_claims_changed,0);
+  verifier={line,source_parent:prior.source_parent,before_inventory_sha256:prior.before_inventory_sha256,
+   historical_epoch_inventory_sha256:hash(inventory),historical_source_bindings_changed:13,
+   active_epoch:active,current_inventory_sha256:hash(currentInventory),g11_claim:'not-passed'};
+ }else{
+  verifier=JSON.parse(execFileSync('python3',[sourceValidator],{cwd:root,encoding:'utf8',maxBuffer:1024*1024}));
+  assert.equal(verifier.line,line);assert.equal(verifier.current_inventory_sha256,pin.inventory);
+  assert.equal(verifier.source_bindings_changed,13);assert.equal(verifier.derived_summary_scalars_changed,2);
+  assert.equal(verifier.execution_claims_changed,0);assert.equal(verifier.actual_native_packed_browser_floor_or_full_audit_qualified,false);
+  assert.equal(verifier.g11_claim,'not-passed');
+ }
  const sweep=()=>{for(const ref of bound.values()){const actual=readEvidenceMember(root,ref.path);assert.equal(hash(actual),ref.sha256,'physical inventory reference input change '+ref.path);assert.equal(actual.length,ref.bytes);}};
  const assertCurrent=()=>{idle();active=true;try{sweep();product.assertCurrent();tool.assertCurrent();for(const ref of bound.values()){
   const actual=readEvidenceMember(root,ref.path),raw=read(ref.path);assert.ok(Buffer.isBuffer(raw)&&actual.equals(raw),'nonphysical inventory reference input '+ref.path);assert.ok(actual.equals(readEvidenceMember(root,ref.path)),'inventory reference input changed during callback '+ref.path);assert.equal(hash(actual),ref.sha256,'late inventory reference input change '+ref.path);assert.equal(actual.length,ref.bytes);
