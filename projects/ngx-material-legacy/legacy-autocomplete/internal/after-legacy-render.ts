@@ -10,7 +10,7 @@ import {afterNextRender, ApplicationRef, type AfterRenderRef, type Injector, typ
 import {Observable} from 'rxjs';
 import {take} from 'rxjs/operators';
 
-/** Keep zoneful stability timing and allow a stable zoneless view to finish rendering. */
+/** Notify on zone stability or a stable completed render, whichever arrives first. */
 export function afterLegacyRender(zone: NgZone, injector: Injector): Observable<void> {
   return new Observable<void>(subscriber => {
     const stable = zone.onStable.subscribe(() => subscriber.next());

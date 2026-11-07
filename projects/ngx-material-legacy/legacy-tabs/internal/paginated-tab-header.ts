@@ -240,7 +240,7 @@ export abstract class MatPaginatedTabHeader
 
     // Defer the first call in order to allow for slower browsers to lay out the elements.
     // This helps in cases where the user lands directly on a page with paginated tabs.
-    // Keep zoneful stability timing and wait for a zoneless view to render. Avoid animation
+    // Wait for zone stability or a stable completed render, whichever arrives first. Avoid animation
     // frames here, since they can hold up tests that are in a background tab.
     afterTabHeaderRender(this._ngZone, this._renderInjector)
       .pipe(takeUntil(this._destroyed)).subscribe(realign);
