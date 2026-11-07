@@ -32,6 +32,7 @@ import {COMMENT_SCOPE_ROLE,COMMENT_SHAS,commentScopeEvidenceOk} from './upstream
 import {SLIDER_TOKEN_SHA,SLIDER_TOKEN_ROLE,sliderTokenEvidenceOk} from './upstream-slider-token-evidence.mjs';
 import {SLIDER_RANGE_SHAS,SLIDER_RANGE_ROLE,sliderRangeEvidenceOk} from './upstream-slider-range-followups.mjs';
 import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';
+import {c04FirstIndividualEvidenceClass} from './upstream-c04-first-individual-evidence.mjs';
 import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';
 import {requiresArtifactBehavior,validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';
 import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';
@@ -166,6 +167,10 @@ function evidenceJson(file) {
 // batch report must list it among its reviews, and a per-SHA JSON record must
 // carry the same sha. A file that merely exists is not evidence for the row.
 function evidenceClass(entry) {
+  const c04 = c04FirstIndividualEvidenceClass(entry, line, rel => {
+    const member = regularRepoMember(rel); return member ? readFileSync(member) : null;
+  });
+  if (c04) return c04;
   const rel = entry.evidence_report;
   if (typeof rel !== 'string' || !rel.trim()) return 'missing';
   const rulesJsBuildScope = requiresRulesJsBuild(entry);

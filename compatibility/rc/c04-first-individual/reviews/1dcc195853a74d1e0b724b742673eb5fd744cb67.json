@@ -1,0 +1,59 @@
+{
+  "sha": "1dcc195853a74d1e0b724b742673eb5fd744cb67",
+  "subject": "fix(material/core): ensure that option inherits container background",
+  "diff_sha256": "506645ee4a7817485b7ddaac13db108fbf0ecccd6b78dae79f9500c3819023c6",
+  "patch_file": "compatibility/rc/c04-first-individual/patches/1dcc195853a74d1e0b724b742673eb5fd744cb67.diff",
+  "review_depth": "individual-compatibility",
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "The upstream hunk adds transparent background specifically on the MDC list-item class. The owned option host is mat-option and its base uses legacy menu-common; its theme explicitly supplies hover and selected single backgrounds. Preserve the historical legacy backgrounds; the MDC selector change has no direct matching owned host. This source decision does not establish cascade behavior in a mixed application.",
+  "current_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option.ts",
+      "sha256": "fc4bb9db4bbfb5ede0680b572cab060ad23b6f91d84791f69c09706dfd57db31",
+      "tagged_path": "src/material/legacy-core/option/option.ts",
+      "tagged_blob": "c2ab6d03f9f9061f31266c34b582d9748b8c1d53",
+      "tagged_sha256": "18f70080a1b20c2372d13929807217e23d7f6b9ad9aefa547ac35e009db702df",
+      "tagged_snapshot": "tagged/18f70080a1b20c2372d13929807217e23d7f6b9ad9aefa547ac35e009db702df"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option.html",
+      "sha256": "3fcdf934481ed432bbb7555ba58f58cdd6295dc682925a2d0ebfe852468d279d",
+      "tagged_path": "src/material/legacy-core/option/option.html",
+      "tagged_blob": "747ddf2b598746c746fe4f790678fa667a158a4c",
+      "tagged_sha256": "5ffcf936ce83a2313b753c2697cad5906762f0ac9cc4e8065fe19ce1aa428712",
+      "tagged_snapshot": "tagged/5ffcf936ce83a2313b753c2697cad5906762f0ac9cc4e8065fe19ce1aa428712"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option.scss",
+      "sha256": "04b18cbb5bc0113ff8983ba97b37d35e10a3e47000cb59e940718345efd75680",
+      "tagged_path": "src/material/legacy-core/option/option.scss",
+      "tagged_blob": "b3e963e72c77b05e1628b5f55465bd75fb8e37d1",
+      "tagged_sha256": "656b9f27dfb8cc4438fa769bae396b125163970faef98736c57897cdaeee40be",
+      "tagged_snapshot": "tagged/656b9f27dfb8cc4438fa769bae396b125163970faef98736c57897cdaeee40be"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-core/option/_option-theme.scss",
+      "sha256": "5936d345e3c7004fce80de9f1ce3787edd892cebfc7464a1b3ae567cafc09d31",
+      "tagged_path": "src/material/legacy-core/option/_option-theme.scss",
+      "tagged_blob": "1e71d1dabc636c0a492c3868f6ab33b0f8dc745d",
+      "tagged_sha256": "5936d345e3c7004fce80de9f1ce3787edd892cebfc7464a1b3ae567cafc09d31",
+      "tagged_snapshot": "tagged/5936d345e3c7004fce80de9f1ce3787edd892cebfc7464a1b3ae567cafc09d31"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/style/_menu-common.scss",
+      "sha256": "656f7685cad1e990c4035ee1605acc005b15986a397003169d5424426de8d470",
+      "tagged_path": "src/material/core/style/_menu-common.scss",
+      "tagged_blob": "78888ac4da3b0b67bba92d428af30ea0f5617eb2",
+      "tagged_sha256": "afe406f8797c8d3154b16b2ec2681fd90c3604761013b6e92631d852bf658f5e",
+      "tagged_snapshot": "tagged/afe406f8797c8d3154b16b2ec2681fd90c3604761013b6e92631d852bf658f5e"
+    }
+  ],
+  "upstream_changed_paths": [
+    "src/material/core/option/option.scss"
+  ],
+  "tagged_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+  "review_scope": "original changed hunks and named candidate and original16 files; no rendered, packed, floor or G11 qualification",
+  "qualification_remaining": "Test modern list and legacy select/autocomplete coexistence and CSS ordering with a custom panel background before declaring leak impossible; retain legacy state backgrounds."
+}

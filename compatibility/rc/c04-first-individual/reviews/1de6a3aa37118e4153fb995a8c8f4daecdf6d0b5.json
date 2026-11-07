@@ -1,0 +1,44 @@
+{
+  "sha": "1de6a3aa37118e4153fb995a8c8f4daecdf6d0b5",
+  "subject": "fix(material/button): fix color tokens of raised buttons (#27904)",
+  "diff_sha256": "579d7b3012bf959150020a1095e0e656c0ce3d22fc9d04064e0f6a3a3684b7ad",
+  "patch_file": "compatibility/rc/c04-first-individual/patches/1de6a3aa37118e4153fb995a8c8f4daecdf6d0b5.diff",
+  "review_depth": "individual-compatibility",
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "The upstream patch changes three protected MDC token generators and dark disabled label alpha. The owned legacy raised-button theme uses historical palette foreground and background disabled-button values and raised-button palette values. Preserve this distinct historical palette model; the modern protected token generator has no direct legacy selector or token route. Compiled output and rendered colors remain separate.",
+  "current_members": [
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-button/_button-theme.scss",
+      "sha256": "dbeccc67f7538f9e9b7529dd3226a45b0a8b3ad7079970fd553dcb25c067c3d0",
+      "tagged_path": "src/material/legacy-button/_button-theme.scss",
+      "tagged_blob": "548e1b5c7334c2cc9c39e569726a4eb99ba66b20",
+      "tagged_sha256": "dbeccc67f7538f9e9b7529dd3226a45b0a8b3ad7079970fd553dcb25c067c3d0",
+      "tagged_snapshot": "tagged/dbeccc67f7538f9e9b7529dd3226a45b0a8b3ad7079970fd553dcb25c067c3d0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-button/button.ts",
+      "sha256": "6d37f01619672b62496d5ffb8bec6df6dfe32214893191644d46012424ff5bb4",
+      "tagged_path": "src/material/legacy-button/button.ts",
+      "tagged_blob": "d75802dc4f72a0d6ea8ca6f2983f1977ea3a5df6",
+      "tagged_sha256": "b89780acb117b89f60930c81fe0e2809f7ffa561529ff72d2021b718b41e018a",
+      "tagged_snapshot": "tagged/b89780acb117b89f60930c81fe0e2809f7ffa561529ff72d2021b718b41e018a"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-button/button.scss",
+      "sha256": "9e25ef35b4bbdbeca4c6514a25b50aeb4658cf33fe2a9a3683537c5bb5baaa02",
+      "tagged_path": "src/material/legacy-button/button.scss",
+      "tagged_blob": "05c24bfcd2081b00c5d063e21c964326668bc60f",
+      "tagged_sha256": "7dfee0803148390d10aa6bc7d8b8f4469cd916b723159df074c33490e91570fe",
+      "tagged_snapshot": "tagged/7dfee0803148390d10aa6bc7d8b8f4469cd916b723159df074c33490e91570fe"
+    }
+  ],
+  "upstream_changed_paths": [
+    "src/material/button/_button-theme.scss",
+    "src/material/core/tokens/m2/mdc/_button-protected.scss"
+  ],
+  "tagged_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+  "review_scope": "original changed hunks and named candidate and original16 files; no rendered, packed, floor or G11 qualification",
+  "qualification_remaining": "Verify raised/flat disabled and enabled dark/light palette output against untouched historical goldens; no evidence that copying modern tokens preserves legacy values."
+}

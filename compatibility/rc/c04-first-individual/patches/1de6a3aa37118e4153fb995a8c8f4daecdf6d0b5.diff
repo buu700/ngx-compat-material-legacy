@@ -1,0 +1,34 @@
+diff --git a/src/material/button/_button-theme.scss b/src/material/button/_button-theme.scss
+index e4932052b..2f3e4e187 100644
+--- a/src/material/button/_button-theme.scss
++++ b/src/material/button/_button-theme.scss
+@@ -155,9 +155,13 @@
+       $surface,
+       $on-surface
+     );
+-    $primary-color-tokens: tokens-mdc-button-filled.get-color-tokens($theme, $primary, $on-primary);
+-    $accent-color-tokens: tokens-mdc-button-filled.get-color-tokens($theme, $accent, $on-accent);
+-    $warn-color-tokens: tokens-mdc-button-filled.get-color-tokens($theme, $error, $on-error);
++    $primary-color-tokens: tokens-mdc-button-protected.get-color-tokens(
++      $theme,
++      $primary,
++      $on-primary
++    );
++    $accent-color-tokens: tokens-mdc-button-protected.get-color-tokens($theme, $accent, $on-accent);
++    $warn-color-tokens: tokens-mdc-button-protected.get-color-tokens($theme, $error, $on-error);
+ 
+     &.mat-unthemed {
+       @include mdc-button-protected-theme.theme($default-color-tokens);
+diff --git a/src/material/core/tokens/m2/mdc/_button-protected.scss b/src/material/core/tokens/m2/mdc/_button-protected.scss
+index 4fe73d9c6..46363de7c 100644
+--- a/src/material/core/tokens/m2/mdc/_button-protected.scss
++++ b/src/material/core/tokens/m2/mdc/_button-protected.scss
+@@ -69,7 +69,7 @@ $prefix: (mdc, button-protected);
+     pressed-state-layer-color: $on-primary,
+     label-text-color: if($on-color, $on-color, inherit),
+     disabled-container-color: rgba($on-surface, 0.12),
+-    disabled-label-text-color: rgba($on-surface, 0.38)
++    disabled-label-text-color: rgba($on-surface, if($is-dark, 0.5, 0.38))
+   );
+ }
+ 

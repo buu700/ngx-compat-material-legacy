@@ -2027,19 +2027,44 @@
       "sha": "1de6a3aa37118e4153fb995a8c8f4daecdf6d0b5",
       "bucket": "behavior-semantic",
       "subject": "fix(material/button): fix color tokens of raised buttons (#27904)",
-      "final_disposition": "already-adapted",
-      "reason": "styles/button/_button-theme.scss already themes .mat-mdc-raised-button with protected tokens and dark disabled ink at 0.5 opacity.",
-      "read_note_disposition": "already-present",
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "_button-theme.scss raised-button + disabled-ink 0.5 dark",
+      "final_disposition": "not-applicable",
+      "reason": "The upstream patch changes three protected MDC token generators and dark disabled label alpha. The owned legacy raised-button theme uses historical palette foreground and background disabled-button values and raised-button palette values. Preserve this distinct historical palette model; the modern protected token generator has no direct legacy selector or token route. Compiled output and rendered colors remain separate.",
+      "read_note_disposition": "source-reviewed-not-applicable",
+      "evidence_report": "compatibility/rc/c04-first-individual/reviews/1de6a3aa37118e4153fb995a8c8f4daecdf6d0b5.json",
+      "source_check": "Owned source review: projects/ngx-material-legacy/styles/legacy-button/_button-theme.scss, projects/ngx-material-legacy/legacy-button/button.ts, projects/ngx-material-legacy/legacy-button/button.scss",
       "files": [
         "src/material/button/_button-theme.scss",
         "src/material/core/tokens/m2/mdc/_button-protected.scss"
       ],
-      "batch_id": "security-already-present-2026-10-01-b",
-      "recorded_at_utc": "2026-10-01T16:30:02Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "prior_disposition_record": {
+        "sha": "1de6a3aa37118e4153fb995a8c8f4daecdf6d0b5",
+        "bucket": "behavior-semantic",
+        "subject": "fix(material/button): fix color tokens of raised buttons (#27904)",
+        "final_disposition": "already-adapted",
+        "reason": "styles/button/_button-theme.scss already themes .mat-mdc-raised-button with protected tokens and dark disabled ink at 0.5 opacity.",
+        "read_note_disposition": "already-present",
+        "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+        "source_check": "_button-theme.scss raised-button + disabled-ink 0.5 dark",
+        "files": [
+          "src/material/button/_button-theme.scss",
+          "src/material/core/tokens/m2/mdc/_button-protected.scss"
+        ],
+        "batch_id": "security-already-present-2026-10-01-b",
+        "recorded_at_utc": "2026-10-01T16:30:02Z",
+        "g11_claim": "not-passed",
+        "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      },
+      "individual_proof": {
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream patch changes three protected MDC token generators and dark disabled label alpha. The owned legacy raised-button theme uses historical palette foreground and background disabled-button values and raised-button palette values. Preserve this distinct historical palette model; the modern protected token generator has no direct legacy selector or token route. Compiled output and rendered colors remain separate.",
+        "diff_sha256": "579d7b3012bf959150020a1095e0e656c0ce3d22fc9d04064e0f6a3a3684b7ad",
+        "proof_kind": "individual-legacy-structure-source-review",
+        "review_depth": "individual-compatibility"
+      }
     },
     {
       "sha": "8a5302a5f942144a83d8b0336262e7559f0eef6f",
@@ -22989,37 +23014,87 @@
       "sha": "1dcc195853a74d1e0b724b742673eb5fd744cb67",
       "bucket": "behavior-semantic",
       "subject": "fix(material/core): ensure that option inherits container background",
-      "final_disposition": "already-adapted",
-      "reason": "Owned MDC option list-item rule sets background transparent to match container.",
-      "read_note_disposition": "owned-retained",
+      "final_disposition": "not-applicable",
+      "reason": "The upstream hunk adds transparent background specifically on the MDC list-item class. The owned option host is mat-option and its base uses legacy menu-common; its theme explicitly supplies hover and selected single backgrounds. Preserve the historical legacy backgrounds; the MDC selector change has no direct matching owned host. This source decision does not establish cascade behavior in a mixed application.",
+      "read_note_disposition": "source-reviewed-not-applicable",
       "files": [
         "src/material/core/option/option.scss"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "styles/core/option/option.scss mdc-list-item background transparent",
-      "batch_id": "product-adapt-residual-2026-10-01-k",
-      "recorded_at_utc": "2026-10-01T17:45:00Z",
+      "evidence_report": "compatibility/rc/c04-first-individual/reviews/1dcc195853a74d1e0b724b742673eb5fd744cb67.json",
+      "source_check": "Owned source review: projects/ngx-material-legacy/legacy-core/option/option.ts, projects/ngx-material-legacy/legacy-core/option/option.html, projects/ngx-material-legacy/legacy-core/option/option.scss, projects/ngx-material-legacy/styles/legacy-core/option/_option-theme.scss, projects/ngx-material-legacy/styles/core/style/_menu-common.scss",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "product_adaptation": true
+      "product_adaptation": false,
+      "prior_disposition_record": {
+        "sha": "1dcc195853a74d1e0b724b742673eb5fd744cb67",
+        "bucket": "behavior-semantic",
+        "subject": "fix(material/core): ensure that option inherits container background",
+        "final_disposition": "already-adapted",
+        "reason": "Owned MDC option list-item rule sets background transparent to match container.",
+        "read_note_disposition": "owned-retained",
+        "files": [
+          "src/material/core/option/option.scss"
+        ],
+        "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+        "source_check": "styles/core/option/option.scss mdc-list-item background transparent",
+        "batch_id": "product-adapt-residual-2026-10-01-k",
+        "recorded_at_utc": "2026-10-01T17:45:00Z",
+        "g11_claim": "not-passed",
+        "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+        "product_adaptation": true
+      },
+      "individual_proof": {
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream hunk adds transparent background specifically on the MDC list-item class. The owned option host is mat-option and its base uses legacy menu-common; its theme explicitly supplies hover and selected single backgrounds. Preserve the historical legacy backgrounds; the MDC selector change has no direct matching owned host. This source decision does not establish cascade behavior in a mixed application.",
+        "diff_sha256": "506645ee4a7817485b7ddaac13db108fbf0ecccd6b78dae79f9500c3819023c6",
+        "proof_kind": "individual-legacy-structure-source-review",
+        "review_depth": "individual-compatibility"
+      }
     },
     {
       "sha": "6962c858378b52e0a90f7e2cada0f71c297840ed",
       "bucket": "behavior-semantic",
       "subject": "fix(material/core): optgroup label color not inferred correctly (#30085)",
-      "final_disposition": "already-adapted",
-      "reason": "Optgroup label sets color:inherit in legacy and styles/core so list color does not win.",
-      "read_note_disposition": "owned-retained",
+      "final_disposition": "not-applicable",
+      "reason": "The upstream rule adds inherited color to the nested MDC primary-text element. The owned optgroup template has a direct mat-optgroup-label span, and its legacy theme supplies secondary-text or disabled hint-text. The new nested MDC selector has no corresponding owned structure. Mixed CSS cascade and rendered projected content remain separate.",
+      "read_note_disposition": "source-reviewed-not-applicable",
       "files": [
         "src/material/core/option/optgroup.scss"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "legacy-core/option/optgroup.scss and styles/core/option/optgroup.scss color inherit",
-      "batch_id": "product-adapt-residual-2026-10-01-k",
-      "recorded_at_utc": "2026-10-01T17:45:00Z",
+      "evidence_report": "compatibility/rc/c04-first-individual/reviews/6962c858378b52e0a90f7e2cada0f71c297840ed.json",
+      "source_check": "Owned source review: projects/ngx-material-legacy/legacy-core/option/optgroup.ts, projects/ngx-material-legacy/legacy-core/option/optgroup.html, projects/ngx-material-legacy/legacy-core/option/optgroup.scss, projects/ngx-material-legacy/styles/legacy-core/option/_optgroup-theme.scss",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "product_adaptation": true
+      "product_adaptation": false,
+      "prior_disposition_record": {
+        "sha": "6962c858378b52e0a90f7e2cada0f71c297840ed",
+        "bucket": "behavior-semantic",
+        "subject": "fix(material/core): optgroup label color not inferred correctly (#30085)",
+        "final_disposition": "already-adapted",
+        "reason": "Optgroup label sets color:inherit in legacy and styles/core so list color does not win.",
+        "read_note_disposition": "owned-retained",
+        "files": [
+          "src/material/core/option/optgroup.scss"
+        ],
+        "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+        "source_check": "legacy-core/option/optgroup.scss and styles/core/option/optgroup.scss color inherit",
+        "batch_id": "product-adapt-residual-2026-10-01-k",
+        "recorded_at_utc": "2026-10-01T17:45:00Z",
+        "g11_claim": "not-passed",
+        "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+        "product_adaptation": true
+      },
+      "individual_proof": {
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream rule adds inherited color to the nested MDC primary-text element. The owned optgroup template has a direct mat-optgroup-label span, and its legacy theme supplies secondary-text or disabled hint-text. The new nested MDC selector has no corresponding owned structure. Mixed CSS cascade and rendered projected content remain separate.",
+        "diff_sha256": "a490ee4975d409aad60d621956e986235829bb57916d27f3dc9106eee5b66d63",
+        "proof_kind": "individual-legacy-structure-source-review",
+        "review_depth": "individual-compatibility"
+      }
     },
     {
       "sha": "e61d152e002937f4bc9df96851c2932e15ce7461",
@@ -23501,39 +23576,91 @@
       "sha": "ef14c286986f9451addeada26ab7b51402aa143f",
       "bucket": "behavior-semantic",
       "subject": "fix(material/core): option showing double selected indicator in high contrast mode",
-      "final_disposition": "already-adapted",
-      "reason": "Owned MDC and legacy option HC selected marks use :has(.\u2026-pseudo-checkbox) instead of the multiple-option class so a checkmark and dot do not both show.",
-      "read_note_disposition": "owned-retained",
+      "final_disposition": "not-applicable",
+      "reason": "The upstream patch changes the modern forced-colors selected circle selector to test for its modern pseudo-checkbox. The owned template creates its built-in checkbox only in multiple selection, while its legacy forced-colors circle selector applies to selected non-multiple options, with an RTL counterpart. These built-in conditions are disjoint and match the historical structural contract; this source fact does not prove rendered forced-colors output or projected-content edge cases.",
+      "read_note_disposition": "source-reviewed-not-applicable",
       "files": [
         "src/material/core/option/option.scss"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "styles/core/option/option.scss and legacy-core/option/option.scss :has",
-      "batch_id": "product-adapt-residual-2026-10-01-l",
-      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "evidence_report": "compatibility/rc/c04-first-individual/reviews/ef14c286986f9451addeada26ab7b51402aa143f.json",
+      "source_check": "Owned source review: projects/ngx-material-legacy/legacy-core/option/option.ts, projects/ngx-material-legacy/legacy-core/option/option.html, projects/ngx-material-legacy/legacy-core/option/option.scss, projects/ngx-material-legacy/styles/legacy-core/option/_option-theme.scss, projects/ngx-material-legacy/styles/core/style/_menu-common.scss, projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.ts, projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.scss, projects/ngx-material-legacy/styles/core/selection/pseudo-checkbox/_pseudo-checkbox-theme.scss",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
       "category": "option-hc-has-pseudo",
-      "product_adaptation": true
+      "product_adaptation": false,
+      "prior_disposition_record": {
+        "sha": "ef14c286986f9451addeada26ab7b51402aa143f",
+        "bucket": "behavior-semantic",
+        "subject": "fix(material/core): option showing double selected indicator in high contrast mode",
+        "final_disposition": "already-adapted",
+        "reason": "Owned MDC and legacy option HC selected marks use :has(.…-pseudo-checkbox) instead of the multiple-option class so a checkmark and dot do not both show.",
+        "read_note_disposition": "owned-retained",
+        "files": [
+          "src/material/core/option/option.scss"
+        ],
+        "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+        "source_check": "styles/core/option/option.scss and legacy-core/option/option.scss :has",
+        "batch_id": "product-adapt-residual-2026-10-01-l",
+        "recorded_at_utc": "2026-10-01T18:30:00Z",
+        "g11_claim": "not-passed",
+        "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+        "category": "option-hc-has-pseudo",
+        "product_adaptation": true
+      },
+      "individual_proof": {
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream patch changes the modern forced-colors selected circle selector to test for its modern pseudo-checkbox. The owned template creates its built-in checkbox only in multiple selection, while its legacy forced-colors circle selector applies to selected non-multiple options, with an RTL counterpart. These built-in conditions are disjoint and match the historical structural contract; this source fact does not prove rendered forced-colors output or projected-content edge cases.",
+        "diff_sha256": "a63ed9fa6cab5c73170b823dc78f4816d35ffa0fd54b54d9fdd9636b00ac526f",
+        "proof_kind": "individual-legacy-structure-source-review",
+        "review_depth": "individual-compatibility"
+      }
     },
     {
       "sha": "4d0a3eff7c5d5186516fe5c8f1af8c003d02882d",
       "bucket": "behavior-semantic",
       "subject": "fix(material/select): Update checkbox color to match the selected label text color (#29684)",
-      "final_disposition": "already-adapted",
-      "reason": "Selected option sets the minimal pseudo-checkbox checkmark color from the selected label text token.",
-      "read_note_disposition": "owned-retained",
+      "final_disposition": "not-applicable",
+      "reason": "The upstream hunk feeds the modern minimal pseudo-checkbox checkmark from the selected-label token. The owned option template places its full legacy pseudo-checkbox only for multiple selection, with a separate legacy theme. Preserve that distinct historical indicator and palette path. The source decision does not establish rendered contrast.",
+      "read_note_disposition": "source-reviewed-not-applicable",
       "files": [
         "src/material/core/option/option.scss"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "styles/core/option/option.scss --mat-minimal-pseudo-checkbox-selected-checkmark-color",
-      "batch_id": "product-adapt-residual-2026-10-01-l",
-      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "evidence_report": "compatibility/rc/c04-first-individual/reviews/4d0a3eff7c5d5186516fe5c8f1af8c003d02882d.json",
+      "source_check": "Owned source review: projects/ngx-material-legacy/legacy-core/option/option.ts, projects/ngx-material-legacy/legacy-core/option/option.html, projects/ngx-material-legacy/legacy-core/option/option.scss, projects/ngx-material-legacy/styles/legacy-core/option/_option-theme.scss, projects/ngx-material-legacy/styles/core/style/_menu-common.scss, projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.ts, projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.scss, projects/ngx-material-legacy/styles/core/selection/pseudo-checkbox/_pseudo-checkbox-theme.scss",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
       "category": "option-pseudo-checkbox-color",
-      "product_adaptation": true
+      "product_adaptation": false,
+      "prior_disposition_record": {
+        "sha": "4d0a3eff7c5d5186516fe5c8f1af8c003d02882d",
+        "bucket": "behavior-semantic",
+        "subject": "fix(material/select): Update checkbox color to match the selected label text color (#29684)",
+        "final_disposition": "already-adapted",
+        "reason": "Selected option sets the minimal pseudo-checkbox checkmark color from the selected label text token.",
+        "read_note_disposition": "owned-retained",
+        "files": [
+          "src/material/core/option/option.scss"
+        ],
+        "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+        "source_check": "styles/core/option/option.scss --mat-minimal-pseudo-checkbox-selected-checkmark-color",
+        "batch_id": "product-adapt-residual-2026-10-01-l",
+        "recorded_at_utc": "2026-10-01T18:30:00Z",
+        "g11_claim": "not-passed",
+        "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+        "category": "option-pseudo-checkbox-color",
+        "product_adaptation": true
+      },
+      "individual_proof": {
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream hunk feeds the modern minimal pseudo-checkbox checkmark from the selected-label token. The owned option template places its full legacy pseudo-checkbox only for multiple selection, with a separate legacy theme. Preserve that distinct historical indicator and palette path. The source decision does not establish rendered contrast.",
+        "diff_sha256": "3260d6478269f9342b532fd39d2f8d916caff16fcd069abfc535fb1d789b6c6f",
+        "proof_kind": "individual-legacy-structure-source-review",
+        "review_depth": "individual-compatibility"
+      }
     },
     {
       "sha": "d0cf8bfe8bc476145984e0f8f3ab7d18eea36f1a",
