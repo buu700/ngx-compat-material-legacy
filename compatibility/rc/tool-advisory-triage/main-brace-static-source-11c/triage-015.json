@@ -1,0 +1,86 @@
+{
+  "schema_version": "triage-finding/v0",
+  "repository": {
+    "path": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+    "revision": "11c12bac09ba63f8d1c9170a24d06a8bd530c9c4"
+  },
+  "findings": [
+    {
+      "triage_item_id": "triage-015",
+      "input_id": "GHSA-rgw5-rvv9-x895",
+      "source_type": "advisory",
+      "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+      "normalized_input": {
+        "vulnerable_component": "npm/brace-expansion@5.0.7",
+        "claimed_source": "Glob expression supplied through tool arguments or a package/workspace manifest",
+        "claimed_sink": "brace-expansion expansion/recursive parsing",
+        "claimed_control": "minimatch64KiB length check and expansion limits",
+        "affected_version_or_path": "npm/brace-expansion@5.0.7",
+        "preconditions": [
+          "A supported lower-trust source must reach enabled brace expansion.",
+          "The crafted pattern must fit caller limits while triggering the exact advisory mechanism."
+        ],
+        "impact": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-rgw5-rvv9-x895"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "supplied mechanism, current local pinned tool source inspected",
+          "path": "external/npm-11.19.0/package/node_modules/brace-expansion/dist/commonjs/index.js",
+          "lines": "195-201",
+          "detail": "Intermediate child expansions accumulate through push.apply before the final expansion-count admission."
+        },
+        {
+          "label": "current private process boundary",
+          "path": "scripts/npm-tooling-options.mjs",
+          "lines": "31-79",
+          "detail": "Finite private commands/options, explicit local pack destination, fresh cache/config, npm auth environment removed; this does not alone prove every generated manifest has no lower-trust packaging source."
+        },
+        {
+          "label": "new caller reviewed",
+          "path": "scripts/browser-dialog-focus-reinsert.mjs",
+          "lines": "61-102",
+          "detail": "Caller copies supplied library tarball into a fresh consumer. Exact browser peers come from reviewed floor configuration; npm install receives only fixed private flags."
+        }
+      ],
+      "reachable_path": [
+        "The supplied advisory mechanism is present in npm11.19.0 bundled brace-expansion5.0.7: Intermediate child expansions accumulate through push.apply before the final expansion-count admission.",
+        "The reviewed maintained npm entrypoints select only fixed private install/ci and owned local-pack inputs. None accepts a lower-trust pattern argument; the only pack sources are repository-owned generated packages.",
+        "The added focus-reinsert route retains the same owned package/tarball builder and helper flags. The floor-plan change selects verified runtime archives rather than package/workspace/ignore patterns.",
+        "Arbitrary operator/compiler/dependency code-selection seams retain their intentional same-privilege execution model; no supplied brace-pattern-only claim crosses a supported additional boundary there. PR code already executes in its own read-only, ref/SHA-scoped job.",
+        "Consequently the upstream mechanism does not establish this repository vulnerability within the exact maintained developer/CI profile. Generic npm services or new lower-trust packaging inputs require a new review."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "trusted_developer_config",
+        "boundary_crossed": false,
+        "policy_basis": "Root SECURITY.md requires a reachable path and impact and distinguishes build tooling from shipped runtime. Resolved policy is identical for all reviewed scopes. Package manifest, fixed pack/input construction and actual read-only CI deployment establish this bounded developer/CI surface; arbitrary operator code execution and shared npm services are not being certified."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "not actionable within the exact reviewed maintained private npm profile",
+        "drivers": []
+      },
+      "evidence": [
+        "Intermediate child expansions accumulate through push.apply before the final expansion-count admission.",
+        "Current source profile f16b82348f90185cd5acd79d8367adb4d4dd55554e5aa9198dab955b70138045 binds778 source,1931 support,10 inputs, including the separately enumerated current caller roster. Context reviews v3/v4 substantively assess command/input and actual executable-helper routes; the ordinary real physical validator/recheck and caller probe passed before this triage.",
+        "The npm helper remains SHA256 cf285c2d3d81d5a51cddfafd03e8307741530224a6cfb94e175a7cdd2acf3e71. Only the two fixed owned sources are passed to npm pack. Source/manifest/config ownership and CI permissions were read directly in this static phase.",
+        "Five historical brace source input byte identities are unchanged. consumer-floor-plan.json SHA256 bb37da61635c041f703397d6d2c369df2c750c1f84d1bec99b13f3d9da63ce88 adds verified Node platform archive metadata; it supplies no new package/workspace/ignore selector.",
+        "Per-finding current boundary reasoning and inherited mechanism limitations are retained at artifacts/main-brace-current-source-successors-v3/boundary-review.json. Historical validation remains separately attributed, with no new dynamic validation claimed."
+      ],
+      "counterevidence": [
+        "Affected upstream code remains present; controls are not an upstream patch. The decision concerns the absence of a supported lower-trust glob-selection boundary in the exact maintained source-owned commands.",
+        "The installed dependency/peer/compiler code and arbitrary operator hooks are intentionally executable under the caller's privilege and are not pronounced safe by this review.",
+        "Prior historical mechanism experiments remain counterevidence to a false-positive claim, not a current runtime pass."
+      ],
+      "proof_gaps": [],
+      "recommended_next_step": "Retain a separate individually attributable current-source applicability receipt for this advisory and integrate only through exact reviewed source/profile bindings. Revalidate on new lower-trust packaging inputs, npm command/tool changes or CI privilege/concurrency changes. No runtime fix or publication is authorized by this static verdict.",
+      "fix_finding_handoff": null
+    }
+  ]
+}
