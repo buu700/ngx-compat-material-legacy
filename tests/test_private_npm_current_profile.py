@@ -32,6 +32,12 @@ class PrivateNpmCurrentProfileTests(unittest.TestCase):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
+        # Both fixture authorities belong to this temporary root. Production
+        # current/historical profile paths can diverge when a successor is sealed.
+        for name in ('NPM_CURRENT_PRIVATE_PROFILE_PATH', 'NPM_HISTORICAL_PRIVATE_PROFILE_PATH'):
+            fixture_path = patch.object(eligibility, name, 'compatibility/rc/current-profile-fixture.json')
+            fixture_path.start()
+            self.addCleanup(fixture_path.stop)
         files = {name: b'owned fixture\n' for name in (
             '.npmrc', 'chainman.toml', 'chainman.lock', 'justfile', 'package.json',
             'projects/ngx-material-legacy/package.json', 'pnpm-lock.yaml',
