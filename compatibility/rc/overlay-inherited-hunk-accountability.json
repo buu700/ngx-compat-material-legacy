@@ -1,0 +1,293 @@
+{
+  "role": "independent per-hunk source and runtime scope notes; no admission",
+  "items": [
+    {
+      "sha": "01cc6f3265903cc6c3a58ea4ae5e03c917597e8f",
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -115,6 +115,9 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "accounting": "Adds cached scroll-visibility state; peer initializes and retains it."
+    },
+    {
+      "sha": "01cc6f3265903cc6c3a58ea4ae5e03c917597e8f",
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -710,18 +713,28 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "accounting": "Changes emission to compare selected position and visibility; browser exercises unchanged and clipped transitions."
+    },
+    {
+      "sha": "01cc6f3265903cc6c3a58ea4ae5e03c917597e8f",
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -1289,6 +1302,20 @@ function getRoundedBoundingClientRect(clientRect: Dimensions): Dimensions {",
+      "accounting": "Adds comparator across origin/overlay clipped/outside flags; source comparison confirms all four current flags, while native geometry covers bottom clipping."
+    },
+    {
+      "sha": "09df51d8ebb86a3ee76614b6775dd62136660567",
+      "path": "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.ts",
+      "header": "@@ -21,7 +21,7 @@ import type {OverlayRef} from '../overlay-ref';",
+      "accounting": "Narrow pointerdown target type to HTMLElement; peer obtains composed event target."
+    },
+    {
+      "sha": "09df51d8ebb86a3ee76614b6775dd62136660567",
+      "path": "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.ts",
+      "header": "@@ -89,12 +89,12 @@ export class OverlayOutsideClickDispatcher extends BaseOverlayDispatcher {",
+      "accounting": "Apply HTMLElement generic to pointerdown origin and click target; source identity only."
+    },
+    {
+      "sha": "09df51d8ebb86a3ee76614b6775dd62136660567",
+      "path": "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.ts",
+      "header": "@@ -128,8 +128,8 @@ export class OverlayOutsideClickDispatcher extends BaseOverlayDispatcher {",
+      "accounting": "Replace native contains for both origin and target with shadow-aware traversal; browser measures inside, cross, and outside paths."
+    },
+    {
+      "sha": "09df51d8ebb86a3ee76614b6775dd62136660567",
+      "path": "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.ts",
+      "header": "@@ -144,3 +144,20 @@ export class OverlayOutsideClickDispatcher extends BaseOverlayDispatcher {",
+      "accounting": "Add traversal through ShadowRoot.host and parentNode; actual synthetic shadow-root fixture exercises the behavior; tooltip body interaction is separately exercised."
+    },
+    {
+      "sha": "0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af",
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -378,6 +378,9 @@ export class Overlay {",
+      "accounting": "API golden adds public configuration token; peer exports token."
+    },
+    {
+      "sha": "0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af",
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -428,6 +431,12 @@ export class OverlayContainer implements OnDestroy {",
+      "accounting": "API golden adds usePopover option; public peer declarations checked."
+    },
+    {
+      "sha": "0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af",
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "header": "@@ -29,7 +29,7 @@ import {",
+      "accounting": "Imports the token into directive; peer code source-checked."
+    },
+    {
+      "sha": "0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af",
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "header": "@@ -253,7 +253,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "accounting": "Replaces hardcoded global initial value with initialized field; peer source-checked."
+    },
+    {
+      "sha": "0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af",
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "header": "@@ -293,7 +293,9 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "accounting": "Injects global config and chooses null when false; real packed select under scoped false provider tested."
+    },
+    {
+      "sha": "0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af",
+      "path": "src/cdk/overlay/overlay.ts",
+      "header": "@@ -20,6 +20,7 @@ import {",
+      "accounting": "Adds InjectionToken import, no separate runtime condition."
+    },
+    {
+      "sha": "0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af",
+      "path": "src/cdk/overlay/overlay.ts",
+      "header": "@@ -31,6 +32,16 @@ import {OverlayRef} from './overlay-ref';",
+      "accounting": "Defines configuration interface and token; source and public types checked."
+    },
+    {
+      "sha": "0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af",
+      "path": "src/cdk/overlay/overlay.ts",
+      "header": "@@ -52,12 +63,15 @@ export function createOverlayRef(injector: Injector, config?: OverlayConfig): Ov",
+      "accounting": "Resolves default and preserves explicit config precedence with browser support fallback; false vs true provider tested, explicit override and unsupported browser remain source-only."
+    },
+    {
+      "sha": "0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af",
+      "path": "src/cdk/overlay/public-api.ts",
+      "header": "@@ -11,7 +11,7 @@ export * from './position/connected-position';",
+      "accounting": "Reexports public types/token; installed public API checked."
+    },
+    {
+      "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -77,8 +77,6 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "accounting": "Golden removes boolean coercion input marker; API source review only."
+    },
+    {
+      "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -98,7 +96,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "accounting": "Golden makes directive field location-or-null; runtime directive variants tested."
+    },
+    {
+      "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -150,7 +148,7 @@ export interface CdkConnectedOverlayConfig {",
+      "accounting": "Golden changes config field to location-or-null; input types source-only."
+    },
+    {
+      "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -286,7 +284,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "accounting": "Golden allows null insertion point; current strategy global placement observed."
+    },
+    {
+      "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -298,6 +296,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "accounting": "Golden exposes location method; actual public method exercised."
+    },
+    {
+      "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -311,6 +310,9 @@ export type FlexibleConnectedPositionStrategyOrigin = ElementRef | Element | (Po",
+      "accounting": "Golden adds location type; types inspected."
+    },
+    {
+      "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "header": "@@ -38,6 +38,7 @@ import {",
+      "accounting": "Imports location type for directive; source-only."
+    },
+    {
+      "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "header": "@@ -127,7 +128,7 @@ export interface CdkConnectedOverlayConfig {",
+      "accounting": "Broadens directive config type; source-only."
+    },
+    {
+      "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "header": "@@ -251,8 +252,8 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "accounting": "Changes directive input from boolean transform to location-or-null; global, inline, null and default variants exercised."
+    },
+    {
+      "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "header": "@@ -377,7 +378,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "accounting": "Converts location/null to boolean usePopover; actual inline/global/null observed."
+    },
+    {
+      "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "header": "@@ -423,7 +424,8 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "accounting": "Supplies chosen location to position strategy; current peer evolved code observed."
+    },
+    {
+      "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+      "header": "@@ -2964,17 +2964,16 @@ describe('FlexibleConnectedPositionStrategy', () => {",
+      "accounting": "Adjusts positioning test to request inline; upstream test read, not executed."
+    },
+    {
+      "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -63,6 +63,9 @@ export function createFlexibleConnectedPositionStrategy(",
+      "accounting": "Defines location union; source/type check."
+    },
+    {
+      "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -158,6 +161,9 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "accounting": "Initializes strategy location to global; explicit global and default directive observed."
+    },
+    {
+      "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -511,8 +517,24 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "accounting": "Adds location method and insertion-point null fallback; direct strategy and directive placement observed."
+    },
+    {
+      "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+      "path": "src/cdk/overlay/public-api.ts",
+      "header": "@@ -32,6 +32,7 @@ export {",
+      "accounting": "Reexports location type; public declarations checked."
+    },
+    {
+      "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -168,7 +168,7 @@ export class CdkOverlayOrigin {",
+      "accounting": "Overlay API golden records CdkScrollable implementing interface; source/type check."
+    },
+    {
+      "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -302,7 +302,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "accounting": "Overlay API golden broadens strategy parameter; custom target runtime exercises the call."
+    },
+    {
+      "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -562,14 +562,14 @@ export interface RepositionScrollStrategyConfig {",
+      "accounting": "Overlay API golden broadens dispatcher signatures; runtime register/event/deregister observed."
+    },
+    {
+      "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+      "path": "goldens/cdk/scrolling/index.api.md",
+      "header": "@@ -53,7 +53,7 @@ export class CdkFixedSizeVirtualScroll implements OnChanges {",
+      "accounting": "Scrolling API golden records implements interface; source/type check."
+    },
+    {
+      "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+      "path": "goldens/cdk/scrolling/index.api.md",
+      "header": "@@ -257,20 +257,26 @@ export type _Right = {",
+      "accounting": "Scrolling API golden introduces structural interface and broadens dispatcher signatures; source/type check and runtime custom target."
+    },
+    {
+      "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -8,7 +8,7 @@",
+      "accounting": "Strategy imports new target type; source-only."
+    },
+    {
+      "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -117,7 +117,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "accounting": "Strategy field becomes target array; source-only."
+    },
+    {
+      "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -416,7 +416,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "accounting": "Strategy accepts target array; native custom target used for clipping."
+    },
+    {
+      "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+      "path": "src/cdk/scrolling/scroll-dispatcher.ts",
+      "header": "@@ -11,14 +11,22 @@ import {Platform} from '../platform';",
+      "accounting": "Dispatcher adds elementScrolled/getElementRef interface and documentation; custom structural object exercises both."
+    },
+    {
+      "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+      "path": "src/cdk/scrolling/scroll-dispatcher.ts",
+      "header": "@@ -27,42 +35,42 @@ export class ScrollDispatcher implements OnDestroy {",
+      "accounting": "Dispatcher broadens subject/map/register/deregister and renames references, maintaining subscription semantics; registration, event and cleanup observed."
+    },
+    {
+      "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+      "path": "src/cdk/scrolling/scroll-dispatcher.ts",
+      "header": "@@ -76,12 +84,12 @@ export class ScrollDispatcher implements OnDestroy {",
+      "accounting": "Broadens scrolled observable typing; event delivery observed."
+    },
+    {
+      "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+      "path": "src/cdk/scrolling/scroll-dispatcher.ts",
+      "header": "@@ -125,7 +133,7 @@ export class ScrollDispatcher implements OnDestroy {",
+      "accounting": "Broadens ancestorScrolled return typing; no direct ancestorScrolled execution."
+    },
+    {
+      "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+      "path": "src/cdk/scrolling/scroll-dispatcher.ts",
+      "header": "@@ -133,13 +141,15 @@ export class ScrollDispatcher implements OnDestroy {",
+      "accounting": "Broadens ancestor container list and target iteration; tooltip ancestor discovery tested."
+    },
+    {
+      "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+      "path": "src/cdk/scrolling/scroll-dispatcher.ts",
+      "header": "@@ -147,17 +157,17 @@ export class ScrollDispatcher implements OnDestroy {",
+      "accounting": "Renames containment helper and local variable; ancestor chain matching exercised for one parent."
+    },
+    {
+      "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+      "path": "src/cdk/scrolling/scrollable.ts",
+      "header": "@@ -10,7 +10,7 @@ import {Directionality} from '../bidi';",
+      "accounting": "Imports target interface in scrollable module; source-only."
+    },
+    {
+      "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+      "path": "src/cdk/scrolling/scrollable.ts",
+      "header": "@@ -39,7 +39,7 @@ export type ExtendedScrollToOptions = _XAxis & _YAxis & ScrollOptions;",
+      "accounting": "CdkScrollable declares implementation of interface; source-only, custom target tested instead."
+    }
+  ]
+}

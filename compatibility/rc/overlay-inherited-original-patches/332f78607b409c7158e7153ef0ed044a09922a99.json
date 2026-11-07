@@ -1,0 +1,349 @@
+{
+  "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+  "status": "reviewed",
+  "final_disposition": "inherited",
+  "diff_sha256": "1a463d477de46328dd43376f37836e6fe86063ecf98509f8b4cb8757b16d9b30",
+  "patch_file": "compatibility/rc/overlay-inherited-original-patches/332f78607b409c7158e7153ef0ed044a09922a99.patch",
+  "files_and_hunks": [
+    {
+      "path": "goldens/cdk/overlay/index.api.md",
+      "hunks": [
+        "@@ -168,7 +168,7 @@ export class CdkOverlayOrigin {",
+        "@@ -302,7 +302,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+        "@@ -562,14 +562,14 @@ export interface RepositionScrollStrategyConfig {"
+      ]
+    },
+    {
+      "path": "goldens/cdk/scrolling/index.api.md",
+      "hunks": [
+        "@@ -53,7 +53,7 @@ export class CdkFixedSizeVirtualScroll implements OnChanges {",
+        "@@ -257,20 +257,26 @@ export type _Right = {"
+      ]
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "hunks": [
+        "@@ -8,7 +8,7 @@",
+        "@@ -117,7 +117,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+        "@@ -416,7 +416,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {"
+      ]
+    },
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.ts",
+      "hunks": [
+        "@@ -11,14 +11,22 @@ import {Platform} from '../platform';",
+        "@@ -27,42 +35,42 @@ export class ScrollDispatcher implements OnDestroy {",
+        "@@ -76,12 +84,12 @@ export class ScrollDispatcher implements OnDestroy {",
+        "@@ -125,7 +133,7 @@ export class ScrollDispatcher implements OnDestroy {",
+        "@@ -133,13 +141,15 @@ export class ScrollDispatcher implements OnDestroy {",
+        "@@ -147,17 +157,17 @@ export class ScrollDispatcher implements OnDestroy {"
+      ]
+    },
+    {
+      "path": "src/cdk/scrolling/scrollable.ts",
+      "hunks": [
+        "@@ -10,7 +10,7 @@ import {Directionality} from '../bidi';",
+        "@@ -39,7 +39,7 @@ export type ExtendedScrollToOptions = _XAxis & _YAxis & ScrollOptions;"
+      ]
+    }
+  ],
+  "whole_patch_accounting": [
+    "Changes overlay and scrolling API goldens to ScrollDispatcherTarget; broadens strategy scrollables typing; adds structural interface and updates dispatcher registration, events, ancestry and names; CdkScrollable implements interface. Current peer uses structural calls; owned tooltip consumes registered ancestor target."
+  ],
+  "owned_and_peer_reachability": "A structural custom target registers as ancestor, emits exactly once through ScrollDispatcher, deregisters, and drives actual packed tooltip from visible to hidden after clipping.",
+  "runtime_scope": "One target and one scroll route only; not a full scroll API or cross-browser claim.",
+  "source_only_boundaries": "Nonexecuted branches remain source inspection; no G11, complete browser, or security clearance.",
+  "role": "main-only individual overlay source review",
+  "hunk_accounting": [
+    {
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -168,7 +168,7 @@ export class CdkOverlayOrigin {",
+      "added_lines": [
+        "export class CdkScrollable implements ScrollDispatcherTarget, OnInit, OnDestroy {"
+      ],
+      "removed_lines": [
+        "export class CdkScrollable implements OnInit, OnDestroy {"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -302,7 +302,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "added_lines": [
+        "    withScrollableContainers(scrollables: ScrollDispatcherTarget[]): this;"
+      ],
+      "removed_lines": [
+        "    withScrollableContainers(scrollables: CdkScrollable[]): this;"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -562,14 +562,14 @@ export interface RepositionScrollStrategyConfig {",
+      "added_lines": [
+        "    ancestorScrolled(elementOrElementRef: ElementRef | HTMLElement, auditTimeInMs?: number): Observable<ScrollDispatcherTarget | void>;",
+        "    deregister(target: ScrollDispatcherTarget): void;",
+        "    getAncestorScrollContainers(elementOrElementRef: ElementRef | HTMLElement): ScrollDispatcherTarget[];",
+        "    register(target: ScrollDispatcherTarget): void;",
+        "    readonly scrollContainers: Map<ScrollDispatcherTarget, Subscription>;",
+        "    scrolled(auditTimeInMs?: number): Observable<ScrollDispatcherTarget | void>;"
+      ],
+      "removed_lines": [
+        "    ancestorScrolled(elementOrElementRef: ElementRef | HTMLElement, auditTimeInMs?: number): Observable<CdkScrollable | void>;",
+        "    deregister(scrollable: CdkScrollable): void;",
+        "    getAncestorScrollContainers(elementOrElementRef: ElementRef | HTMLElement): CdkScrollable[];",
+        "    register(scrollable: CdkScrollable): void;",
+        "    scrollContainers: Map<CdkScrollable, Subscription>;",
+        "    scrolled(auditTimeInMs?: number): Observable<CdkScrollable | void>;"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "goldens/cdk/scrolling/index.api.md",
+      "header": "@@ -53,7 +53,7 @@ export class CdkFixedSizeVirtualScroll implements OnChanges {",
+      "added_lines": [
+        "export class CdkScrollable implements ScrollDispatcherTarget, OnInit, OnDestroy {"
+      ],
+      "removed_lines": [
+        "export class CdkScrollable implements OnInit, OnDestroy {"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "goldens/cdk/scrolling/index.api.md",
+      "header": "@@ -257,20 +257,26 @@ export type _Right = {",
+      "added_lines": [
+        "    ancestorScrolled(elementOrElementRef: ElementRef | HTMLElement, auditTimeInMs?: number): Observable<ScrollDispatcherTarget | void>;",
+        "    deregister(target: ScrollDispatcherTarget): void;",
+        "    getAncestorScrollContainers(elementOrElementRef: ElementRef | HTMLElement): ScrollDispatcherTarget[];",
+        "    register(target: ScrollDispatcherTarget): void;",
+        "    readonly scrollContainers: Map<ScrollDispatcherTarget, Subscription>;",
+        "    scrolled(auditTimeInMs?: number): Observable<ScrollDispatcherTarget | void>;",
+        "// @public",
+        "export interface ScrollDispatcherTarget {",
+        "    elementScrolled(): Observable<Event>;",
+        "    getElementRef(): ElementRef<HTMLElement>;",
+        "}",
+        ""
+      ],
+      "removed_lines": [
+        "    ancestorScrolled(elementOrElementRef: ElementRef | HTMLElement, auditTimeInMs?: number): Observable<CdkScrollable | void>;",
+        "    deregister(scrollable: CdkScrollable): void;",
+        "    getAncestorScrollContainers(elementOrElementRef: ElementRef | HTMLElement): CdkScrollable[];",
+        "    register(scrollable: CdkScrollable): void;",
+        "    scrollContainers: Map<CdkScrollable, Subscription>;",
+        "    scrolled(auditTimeInMs?: number): Observable<CdkScrollable | void>;"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -8,7 +8,7 @@",
+      "added_lines": [
+        "import {ViewportRuler, ScrollDispatcherTarget, ViewportScrollPosition} from '../../scrolling';"
+      ],
+      "removed_lines": [
+        "import {ViewportRuler, CdkScrollable, ViewportScrollPosition} from '../../scrolling';"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -117,7 +117,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "added_lines": [
+        "  private _scrollables: ScrollDispatcherTarget[] = [];"
+      ],
+      "removed_lines": [
+        "  private _scrollables: CdkScrollable[] = [];"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -416,7 +416,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "added_lines": [
+        "  withScrollableContainers(scrollables: ScrollDispatcherTarget[]): this {"
+      ],
+      "removed_lines": [
+        "  withScrollableContainers(scrollables: CdkScrollable[]): this {"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.ts",
+      "header": "@@ -11,14 +11,22 @@ import {Platform} from '../platform';",
+      "added_lines": [
+        "/** Scrollable instance that can be registered with the `ScrollDispatcher`. */",
+        "export interface ScrollDispatcherTarget {",
+        "  /** Observable that emits when the element is scrolled. */",
+        "  elementScrolled(): Observable<Event>;",
+        "",
+        "  /** Gets the `ElementRef` representing the scrollable element. */",
+        "  getElementRef(): ElementRef<HTMLElement>;",
+        "}",
+        "",
+        " * Service contained all registered scroll targets and emits",
+        " * an event when any one of them emits a scrolled event."
+      ],
+      "removed_lines": [
+        "import type {CdkScrollable} from './scrollable';",
+        " * Service contained all registered Scrollable references and emits an event when any one of the",
+        " * Scrollable references emit a scrolled event."
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.ts",
+      "header": "@@ -27,42 +35,42 @@ export class ScrollDispatcher implements OnDestroy {",
+      "added_lines": [
+        "  /** Subject for notifying that a registered element has been scrolled. */",
+        "  private readonly _scrolled = new Subject<ScrollDispatcherTarget | void>();",
+        "   * Map of all the scrollable targets that are registered with the service and their",
+        "  readonly scrollContainers: Map<ScrollDispatcherTarget, Subscription> = new Map();",
+        "   * @param target Scrollable instance to be registered.",
+        "  register(target: ScrollDispatcherTarget): void {",
+        "    if (!this.scrollContainers.has(target)) {",
+        "        target,",
+        "        target.elementScrolled().subscribe(() => this._scrolled.next(target)),",
+        "   * @param target Scrollable instance to be deregistered.",
+        "  deregister(target: ScrollDispatcherTarget): void {",
+        "    const ref = this.scrollContainers.get(target);",
+        "    if (ref) {",
+        "      ref.unsubscribe();",
+        "      this.scrollContainers.delete(target);"
+      ],
+      "removed_lines": [
+        "  /** Subject for notifying that a registered scrollable reference element has been scrolled. */",
+        "  private readonly _scrolled = new Subject<CdkScrollable | void>();",
+        "   * Map of all the scrollable references that are registered with the service and their",
+        "  scrollContainers: Map<CdkScrollable, Subscription> = new Map();",
+        "   * @param scrollable Scrollable instance to be registered.",
+        "  register(scrollable: CdkScrollable): void {",
+        "    if (!this.scrollContainers.has(scrollable)) {",
+        "        scrollable,",
+        "        scrollable.elementScrolled().subscribe(() => this._scrolled.next(scrollable)),",
+        "   * @param scrollable Scrollable instance to be deregistered.",
+        "  deregister(scrollable: CdkScrollable): void {",
+        "    const scrollableReference = this.scrollContainers.get(scrollable);",
+        "    if (scrollableReference) {",
+        "      scrollableReference.unsubscribe();",
+        "      this.scrollContainers.delete(scrollable);"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.ts",
+      "header": "@@ -76,12 +84,12 @@ export class ScrollDispatcher implements OnDestroy {",
+      "added_lines": [
+        "  scrolled(auditTimeInMs: number = DEFAULT_SCROLL_TIME): Observable<ScrollDispatcherTarget | void> {",
+        "    return new Observable((observer: Observer<ScrollDispatcherTarget | void>) => {"
+      ],
+      "removed_lines": [
+        "  scrolled(auditTimeInMs: number = DEFAULT_SCROLL_TIME): Observable<CdkScrollable | void> {",
+        "    return new Observable((observer: Observer<CdkScrollable | void>) => {"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.ts",
+      "header": "@@ -125,7 +133,7 @@ export class ScrollDispatcher implements OnDestroy {",
+      "added_lines": [
+        "  ): Observable<ScrollDispatcherTarget | void> {"
+      ],
+      "removed_lines": [
+        "  ): Observable<CdkScrollable | void> {"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.ts",
+      "header": "@@ -133,13 +141,15 @@ export class ScrollDispatcher implements OnDestroy {",
+      "added_lines": [
+        "  /** Returns all registered containers that contain the provided element. */",
+        "  getAncestorScrollContainers(",
+        "    elementOrElementRef: ElementRef | HTMLElement,",
+        "  ): ScrollDispatcherTarget[] {",
+        "    const scrollingContainers: ScrollDispatcherTarget[] = [];",
+        "    this.scrollContainers.forEach((_, target: ScrollDispatcherTarget) => {",
+        "      if (this._targetContainsElement(target, elementOrElementRef)) {",
+        "        scrollingContainers.push(target);"
+      ],
+      "removed_lines": [
+        "  /** Returns all registered Scrollables that contain the provided element. */",
+        "  getAncestorScrollContainers(elementOrElementRef: ElementRef | HTMLElement): CdkScrollable[] {",
+        "    const scrollingContainers: CdkScrollable[] = [];",
+        "    this.scrollContainers.forEach((_subscription: Subscription, scrollable: CdkScrollable) => {",
+        "      if (this._scrollableContainsElement(scrollable, elementOrElementRef)) {",
+        "        scrollingContainers.push(scrollable);"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.ts",
+      "header": "@@ -147,17 +157,17 @@ export class ScrollDispatcher implements OnDestroy {",
+      "added_lines": [
+        "  private _targetContainsElement(",
+        "    scrollable: ScrollDispatcherTarget,",
+        "    let targetElement = scrollable.getElementRef().nativeElement;",
+        "      if (element == targetElement) {"
+      ],
+      "removed_lines": [
+        "  private _scrollableContainsElement(",
+        "    scrollable: CdkScrollable,",
+        "    let scrollableElement = scrollable.getElementRef().nativeElement;",
+        "      if (element == scrollableElement) {"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/scrolling/scrollable.ts",
+      "header": "@@ -10,7 +10,7 @@ import {Directionality} from '../bidi';",
+      "added_lines": [
+        "import {ScrollDispatcher, ScrollDispatcherTarget} from './scroll-dispatcher';"
+      ],
+      "removed_lines": [
+        "import {ScrollDispatcher} from './scroll-dispatcher';"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/scrolling/scrollable.ts",
+      "header": "@@ -39,7 +39,7 @@ export type ExtendedScrollToOptions = _XAxis & _YAxis & ScrollOptions;",
+      "added_lines": [
+        "export class CdkScrollable implements ScrollDispatcherTarget, OnInit, OnDestroy {"
+      ],
+      "removed_lines": [
+        "export class CdkScrollable implements OnInit, OnDestroy {"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    }
+  ],
+  "prior_disposition_source": {
+    "base_commit": "9be00b7baf32477b8e521305efa36273589566b9",
+    "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+    "prior_entry_canonical_sha256": "2251eb4f0bea36ed8fa722052761434f3da8efb44bbf34c21a670708cb842bac",
+    "prior_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/mechanical/332f78607b409c7158e7153ef0ed044a09922a99.json",
+      "sha256": "d613860761b355b4b1e72581471c6feb02ced6b9da1d83094029d98dab9d77c2",
+      "archive_path": "compatibility/rc/overlay-inherited-prior/d613860761b355b4b1e72581471c6feb02ced6b9da1d83094029d98dab9d77c2.json.gz",
+      "archive_sha256": "fccd0a767f936703fc10714fe9f6caf0aab352771a4b0cf17c28ce501fdac071",
+      "compression": "gzip"
+    }
+  },
+  "digest_provenance": {
+    "current_complete_patch": {
+      "sha256": "1a463d477de46328dd43376f37836e6fe86063ecf98509f8b4cb8757b16d9b30",
+      "format": "git show --format=fuller --no-ext-diff --no-renames; full changed paths; commit metadata included"
+    },
+    "prior_top_level_ledger_diff": {
+      "sha256": "847fee0d58541d35e8c63e3dbb451ae98f36192e449b32e15084022569272a80",
+      "format_or_scope": "unknown; retained verbatim in prior_disposition_record; equivalence not claimed"
+    },
+    "prior_mechanical_join_diff": {
+      "sha256": "d9d7ddeaadbedb1893fe74224c0d3f93737773409d18f7b4a003e74a83a6caef",
+      "path": "compatibility/rc/overlay-inherited-prior/332f78607b409c7158e7153ef0ed044a09922a99.full-index.diff",
+      "format": "git show --format= --no-color --full-index --no-renames; full changed paths; no commit metadata"
+    }
+  },
+  "source_correction": "Preserves the complete prior disposition and prior report without endorsing or overwriting its historical opinion; the current whole-patch review and live contract are separate evidence."
+}

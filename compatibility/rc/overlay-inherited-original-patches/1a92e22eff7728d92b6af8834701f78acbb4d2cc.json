@@ -1,0 +1,294 @@
+{
+  "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+  "status": "reviewed",
+  "final_disposition": "inherited",
+  "diff_sha256": "34aee1bf21f21f4db87cbb3990b91ea085aefe5f1994feeee78de05ebd6cb125",
+  "patch_file": "compatibility/rc/overlay-inherited-original-patches/1a92e22eff7728d92b6af8834701f78acbb4d2cc.patch",
+  "files_and_hunks": [
+    {
+      "path": "goldens/cdk/overlay/index.api.md",
+      "hunks": [
+        "@@ -77,8 +77,6 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+        "@@ -98,7 +96,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+        "@@ -150,7 +148,7 @@ export interface CdkConnectedOverlayConfig {",
+        "@@ -286,7 +284,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+        "@@ -298,6 +296,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+        "@@ -311,6 +310,9 @@ export type FlexibleConnectedPositionStrategyOrigin = ElementRef | Element | (Po"
+      ]
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "hunks": [
+        "@@ -38,6 +38,7 @@ import {",
+        "@@ -127,7 +128,7 @@ export interface CdkConnectedOverlayConfig {",
+        "@@ -251,8 +252,8 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+        "@@ -377,7 +378,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+        "@@ -423,7 +424,8 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {"
+      ]
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+      "hunks": [
+        "@@ -2964,17 +2964,16 @@ describe('FlexibleConnectedPositionStrategy', () => {"
+      ]
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "hunks": [
+        "@@ -63,6 +63,9 @@ export function createFlexibleConnectedPositionStrategy(",
+        "@@ -158,6 +161,9 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+        "@@ -511,8 +517,24 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {"
+      ]
+    },
+    {
+      "path": "src/cdk/overlay/public-api.ts",
+      "hunks": [
+        "@@ -32,6 +32,7 @@ export {"
+      ]
+    }
+  ],
+  "whole_patch_accounting": [
+    "Updates API golden boolean to location-or-null; changes directive input and maps null/global/inline to config and strategy; alters tests; adds strategy location and origin-adjacent insertion behavior and exports type. Current peer evolved implementation is tested for global, default, null and inline."
+  ],
+  "owned_and_peer_reachability": "Global and inline strategy and directive inline/default/global/null are observed with actual peer API. Packed select uses connected overlay; no owned source uses inline input.",
+  "runtime_scope": "Chromium placement only; no Safari, positioning geometry, or all overlay cases.",
+  "source_only_boundaries": "Nonexecuted branches remain source inspection; no G11, complete browser, or security clearance.",
+  "role": "main-only individual overlay source review",
+  "hunk_accounting": [
+    {
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -77,8 +77,6 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "added_lines": [],
+      "removed_lines": [
+        "    static ngAcceptInputType_usePopover: unknown;",
+        "    // (undocumented)"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -98,7 +96,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "added_lines": [
+        "    usePopover: FlexibleOverlayPopoverLocation | null;"
+      ],
+      "removed_lines": [
+        "    usePopover: boolean;"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -150,7 +148,7 @@ export interface CdkConnectedOverlayConfig {",
+      "added_lines": [
+        "    usePopover?: FlexibleOverlayPopoverLocation | null;"
+      ],
+      "removed_lines": [
+        "    usePopover?: boolean;"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -286,7 +284,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "added_lines": [
+        "    getPopoverInsertionPoint(): Element | null;"
+      ],
+      "removed_lines": [
+        "    getPopoverInsertionPoint(): Element;"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -298,6 +296,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "added_lines": [
+        "    withPopoverLocation(location: FlexibleOverlayPopoverLocation): this;"
+      ],
+      "removed_lines": [],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -311,6 +310,9 @@ export type FlexibleConnectedPositionStrategyOrigin = ElementRef | Element | (Po",
+      "added_lines": [
+        "// @public",
+        "export type FlexibleOverlayPopoverLocation = 'global' | 'inline';",
+        ""
+      ],
+      "removed_lines": [],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "header": "@@ -38,6 +38,7 @@ import {",
+      "added_lines": [
+        "  FlexibleOverlayPopoverLocation,"
+      ],
+      "removed_lines": [],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "header": "@@ -127,7 +128,7 @@ export interface CdkConnectedOverlayConfig {",
+      "added_lines": [
+        "  usePopover?: FlexibleOverlayPopoverLocation | null;"
+      ],
+      "removed_lines": [
+        "  usePopover?: boolean;"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "header": "@@ -251,8 +252,8 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "added_lines": [
+        "  @Input({alias: 'cdkConnectedOverlayUsePopover'})",
+        "  usePopover: FlexibleOverlayPopoverLocation | null = null;"
+      ],
+      "removed_lines": [
+        "  @Input({alias: 'cdkConnectedOverlayUsePopover', transform: booleanAttribute})",
+        "  usePopover: boolean = false;"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "header": "@@ -377,7 +378,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "added_lines": [
+        "      usePopover: !!this.usePopover,"
+      ],
+      "removed_lines": [
+        "      usePopover: this.usePopover,"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "header": "@@ -423,7 +424,8 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "added_lines": [
+        "      .withTransformOriginOn(this.transformOriginSelector)",
+        "      .withPopoverLocation(this.usePopover === 'global' ? 'global' : 'inline');"
+      ],
+      "removed_lines": [
+        "      .withTransformOriginOn(this.transformOriginSelector);"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+      "header": "@@ -2964,17 +2964,16 @@ describe('FlexibleConnectedPositionStrategy', () => {",
+      "added_lines": [
+        "      positionStrategy = createFlexibleConnectedPositionStrategy(injector, originElement)",
+        "        .withPopoverLocation('inline')",
+        "        .withPositions([",
+        "          {",
+        "            overlayX: 'start',",
+        "            overlayY: 'top',",
+        "            originX: 'start',",
+        "            originY: 'bottom',",
+        "          },",
+        "        ]);"
+      ],
+      "removed_lines": [
+        "      positionStrategy = createFlexibleConnectedPositionStrategy(",
+        "        injector,",
+        "        originElement,",
+        "      ).withPositions([",
+        "        {",
+        "          overlayX: 'start',",
+        "          overlayY: 'top',",
+        "          originX: 'start',",
+        "          originY: 'bottom',",
+        "        },",
+        "      ]);"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -63,6 +63,9 @@ export function createFlexibleConnectedPositionStrategy(",
+      "added_lines": [
+        "/** Supported locations in the DOM for connected overlays. */",
+        "export type FlexibleOverlayPopoverLocation = 'global' | 'inline';",
+        ""
+      ],
+      "removed_lines": [],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -158,6 +161,9 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "added_lines": [
+        "  /** Configures where in the DOM to insert the overlay when popovers are enabled. */",
+        "  private _popoverLocation: FlexibleOverlayPopoverLocation = 'global';",
+        ""
+      ],
+      "removed_lines": [],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -511,8 +517,24 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "added_lines": [
+        "  /**",
+        "   * Determines where in the DOM the overlay will be rendered when popover mode is enabled.",
+        "   * @param location Configures the location in the DOM. Supports the following values:",
+        "   *  - `global` - The default which inserts the overlay inside the overlay container.",
+        "   *  - `inline` - Inserts the overlay next to the trigger.",
+        "   */",
+        "  withPopoverLocation(location: FlexibleOverlayPopoverLocation): this {",
+        "    this._popoverLocation = location;",
+        "    return this;",
+        "  }",
+        "",
+        "  getPopoverInsertionPoint(): Element | null {",
+        "    // Return null so it falls back to inserting into the overlay container.",
+        "    if (this._popoverLocation === 'global') {",
+        "      return null;",
+        "    }",
+        ""
+      ],
+      "removed_lines": [
+        "  getPopoverInsertionPoint(): Element {"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/public-api.ts",
+      "header": "@@ -32,6 +32,7 @@ export {",
+      "added_lines": [
+        "  FlexibleOverlayPopoverLocation,"
+      ],
+      "removed_lines": [],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    }
+  ],
+  "prior_disposition_source": {
+    "base_commit": "9be00b7baf32477b8e521305efa36273589566b9",
+    "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+    "prior_entry_canonical_sha256": "1b11eeae192974d074caa048ff39712f3e9251b9d0f42259610900e0fa6f3a83",
+    "prior_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/mechanical/1a92e22eff7728d92b6af8834701f78acbb4d2cc.json",
+      "sha256": "a9007f8ef7362456ae03f36040a306c4ebf8602780a5a3cf15c9b1275939fed7",
+      "archive_path": "compatibility/rc/overlay-inherited-prior/a9007f8ef7362456ae03f36040a306c4ebf8602780a5a3cf15c9b1275939fed7.json.gz",
+      "archive_sha256": "5530ec4c4f0b21e1511ddffe79d0239b89f2af666f4ffc3ce9e305a533683b07",
+      "compression": "gzip"
+    }
+  },
+  "digest_provenance": {
+    "current_complete_patch": {
+      "sha256": "34aee1bf21f21f4db87cbb3990b91ea085aefe5f1994feeee78de05ebd6cb125",
+      "format": "git show --format=fuller --no-ext-diff --no-renames; full changed paths; commit metadata included"
+    },
+    "prior_top_level_ledger_diff": {
+      "sha256": "0a838c33d30887139eaa5354f72dddd6c10f917e1b11f2503341ec99d4c9ea05",
+      "format_or_scope": "unknown; retained verbatim in prior_disposition_record; equivalence not claimed"
+    },
+    "prior_mechanical_join_diff": {
+      "sha256": "7f40795487c54605b6d5d8ce79c18b91f85a35e9685f1550b5920f586dc81ae5",
+      "path": "compatibility/rc/overlay-inherited-prior/1a92e22eff7728d92b6af8834701f78acbb4d2cc.full-index.diff",
+      "format": "git show --format= --no-color --full-index --no-renames; full changed paths; no commit metadata"
+    }
+  },
+  "source_correction": "Preserves the complete prior disposition and prior report without endorsing or overwriting its historical opinion; the current whole-patch review and live contract are separate evidence."
+}

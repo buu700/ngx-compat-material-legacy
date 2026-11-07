@@ -1,0 +1,298 @@
+diff --git a/goldens/cdk/overlay/index.api.md b/goldens/cdk/overlay/index.api.md
+index 1b84e43d9ae3d39746d48ae798e77f7299117236..d310084625c499ea438229e5ee5dd2a8f829361c 100644
+--- a/goldens/cdk/overlay/index.api.md
++++ b/goldens/cdk/overlay/index.api.md
+@@ -168,7 +168,7 @@ export class CdkOverlayOrigin {
+ }
+ 
+ // @public
+-export class CdkScrollable implements OnInit, OnDestroy {
++export class CdkScrollable implements ScrollDispatcherTarget, OnInit, OnDestroy {
+     // (undocumented)
+     protected readonly _destroyed: Subject<void>;
+     // (undocumented)
+@@ -302,7 +302,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {
+     withPopoverLocation(location: FlexibleOverlayPopoverLocation): this;
+     withPositions(positions: ConnectedPosition[]): this;
+     withPush(canPush?: boolean): this;
+-    withScrollableContainers(scrollables: CdkScrollable[]): this;
++    withScrollableContainers(scrollables: ScrollDispatcherTarget[]): this;
+     withTransformOriginOn(selector: string): this;
+     withViewportMargin(margin: ViewportMargin): this;
+ }
+@@ -562,14 +562,14 @@ export interface RepositionScrollStrategyConfig {
+ 
+ // @public
+ export class ScrollDispatcher implements OnDestroy {
+-    ancestorScrolled(elementOrElementRef: ElementRef | HTMLElement, auditTimeInMs?: number): Observable<CdkScrollable | void>;
+-    deregister(scrollable: CdkScrollable): void;
+-    getAncestorScrollContainers(elementOrElementRef: ElementRef | HTMLElement): CdkScrollable[];
++    ancestorScrolled(elementOrElementRef: ElementRef | HTMLElement, auditTimeInMs?: number): Observable<ScrollDispatcherTarget | void>;
++    deregister(target: ScrollDispatcherTarget): void;
++    getAncestorScrollContainers(elementOrElementRef: ElementRef | HTMLElement): ScrollDispatcherTarget[];
+     // (undocumented)
+     ngOnDestroy(): void;
+-    register(scrollable: CdkScrollable): void;
+-    scrollContainers: Map<CdkScrollable, Subscription>;
+-    scrolled(auditTimeInMs?: number): Observable<CdkScrollable | void>;
++    register(target: ScrollDispatcherTarget): void;
++    readonly scrollContainers: Map<ScrollDispatcherTarget, Subscription>;
++    scrolled(auditTimeInMs?: number): Observable<ScrollDispatcherTarget | void>;
+     // (undocumented)
+     static ɵfac: i0.ɵɵFactoryDeclaration<ScrollDispatcher, never>;
+     // (undocumented)
+diff --git a/goldens/cdk/scrolling/index.api.md b/goldens/cdk/scrolling/index.api.md
+index 6329b30634cb22777934d1cc20f36454746695cb..fc7f4f015fe4d45170ee7b759629dec13046273b 100644
+--- a/goldens/cdk/scrolling/index.api.md
++++ b/goldens/cdk/scrolling/index.api.md
+@@ -53,7 +53,7 @@ export class CdkFixedSizeVirtualScroll implements OnChanges {
+ }
+ 
+ // @public
+-export class CdkScrollable implements OnInit, OnDestroy {
++export class CdkScrollable implements ScrollDispatcherTarget, OnInit, OnDestroy {
+     // (undocumented)
+     protected readonly _destroyed: Subject<void>;
+     // (undocumented)
+@@ -257,20 +257,26 @@ export type _Right = {
+ 
+ // @public
+ export class ScrollDispatcher implements OnDestroy {
+-    ancestorScrolled(elementOrElementRef: ElementRef | HTMLElement, auditTimeInMs?: number): Observable<CdkScrollable | void>;
+-    deregister(scrollable: CdkScrollable): void;
+-    getAncestorScrollContainers(elementOrElementRef: ElementRef | HTMLElement): CdkScrollable[];
++    ancestorScrolled(elementOrElementRef: ElementRef | HTMLElement, auditTimeInMs?: number): Observable<ScrollDispatcherTarget | void>;
++    deregister(target: ScrollDispatcherTarget): void;
++    getAncestorScrollContainers(elementOrElementRef: ElementRef | HTMLElement): ScrollDispatcherTarget[];
+     // (undocumented)
+     ngOnDestroy(): void;
+-    register(scrollable: CdkScrollable): void;
+-    scrollContainers: Map<CdkScrollable, Subscription>;
+-    scrolled(auditTimeInMs?: number): Observable<CdkScrollable | void>;
++    register(target: ScrollDispatcherTarget): void;
++    readonly scrollContainers: Map<ScrollDispatcherTarget, Subscription>;
++    scrolled(auditTimeInMs?: number): Observable<ScrollDispatcherTarget | void>;
+     // (undocumented)
+     static ɵfac: i0.ɵɵFactoryDeclaration<ScrollDispatcher, never>;
+     // (undocumented)
+     static ɵprov: i0.ɵɵInjectableDeclaration<ScrollDispatcher>;
+ }
+ 
++// @public
++export interface ScrollDispatcherTarget {
++    elementScrolled(): Observable<Event>;
++    getElementRef(): ElementRef<HTMLElement>;
++}
++
+ // @public
+ export class ScrollingModule {
+     // (undocumented)
+diff --git a/src/cdk/overlay/position/flexible-connected-position-strategy.ts b/src/cdk/overlay/position/flexible-connected-position-strategy.ts
+index 3f1c84631fc602868436c9594aba580bbdd09901..897e205915dc80a0b193aa0b02240a5980e3150a 100644
+--- a/src/cdk/overlay/position/flexible-connected-position-strategy.ts
++++ b/src/cdk/overlay/position/flexible-connected-position-strategy.ts
+@@ -8,7 +8,7 @@
+ 
+ import {PositionStrategy} from './position-strategy';
+ import {DOCUMENT, ElementRef, Injector} from '@angular/core';
+-import {ViewportRuler, CdkScrollable, ViewportScrollPosition} from '../../scrolling';
++import {ViewportRuler, ScrollDispatcherTarget, ViewportScrollPosition} from '../../scrolling';
+ import {
+   ConnectedOverlayPositionChange,
+   ConnectionPositionPair,
+@@ -117,7 +117,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {
+   private _viewportMargin: ViewportMargin = 0;
+ 
+   /** The Scrollable containers used to check scrollable view properties on position change. */
+-  private _scrollables: CdkScrollable[] = [];
++  private _scrollables: ScrollDispatcherTarget[] = [];
+ 
+   /** Ordered list of preferred positions, from most to least desirable. */
+   _preferredPositions: ConnectionPositionPair[] = [];
+@@ -416,7 +416,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {
+    * on reposition we can evaluate if it or the overlay has been clipped or outside view. Every
+    * Scrollable must be an ancestor element of the strategy's origin element.
+    */
+-  withScrollableContainers(scrollables: CdkScrollable[]): this {
++  withScrollableContainers(scrollables: ScrollDispatcherTarget[]): this {
+     this._scrollables = scrollables;
+     return this;
+   }
+diff --git a/src/cdk/scrolling/scroll-dispatcher.ts b/src/cdk/scrolling/scroll-dispatcher.ts
+index ad5876fe669d2167a552b24f76a6df11fcca5fa2..af87faff7be70dcfefc652f518433efc93d2cfea 100644
+--- a/src/cdk/scrolling/scroll-dispatcher.ts
++++ b/src/cdk/scrolling/scroll-dispatcher.ts
+@@ -11,14 +11,22 @@ import {Platform} from '../platform';
+ import {ElementRef, Service, NgZone, OnDestroy, RendererFactory2, inject} from '@angular/core';
+ import {of as observableOf, Subject, Subscription, Observable, Observer} from 'rxjs';
+ import {auditTime, filter} from 'rxjs/operators';
+-import type {CdkScrollable} from './scrollable';
+ 
+ /** Time in ms to throttle the scrolling events by default. */
+ export const DEFAULT_SCROLL_TIME = 20;
+ 
++/** Scrollable instance that can be registered with the `ScrollDispatcher`. */
++export interface ScrollDispatcherTarget {
++  /** Observable that emits when the element is scrolled. */
++  elementScrolled(): Observable<Event>;
++
++  /** Gets the `ElementRef` representing the scrollable element. */
++  getElementRef(): ElementRef<HTMLElement>;
++}
++
+ /**
+- * Service contained all registered Scrollable references and emits an event when any one of the
+- * Scrollable references emit a scrolled event.
++ * Service contained all registered scroll targets and emits
++ * an event when any one of them emits a scrolled event.
+  */
+ @Service()
+ export class ScrollDispatcher implements OnDestroy {
+@@ -27,42 +35,42 @@ export class ScrollDispatcher implements OnDestroy {
+   private _renderer = inject(RendererFactory2).createRenderer(null, null);
+   private _cleanupGlobalListener: (() => void) | undefined;
+ 
+-  /** Subject for notifying that a registered scrollable reference element has been scrolled. */
+-  private readonly _scrolled = new Subject<CdkScrollable | void>();
++  /** Subject for notifying that a registered element has been scrolled. */
++  private readonly _scrolled = new Subject<ScrollDispatcherTarget | void>();
+ 
+   /** Keeps track of the amount of subscriptions to `scrolled`. Used for cleaning up afterwards. */
+   private _scrolledCount = 0;
+ 
+   /**
+-   * Map of all the scrollable references that are registered with the service and their
++   * Map of all the scrollable targets that are registered with the service and their
+    * scroll event subscriptions.
+    */
+-  scrollContainers: Map<CdkScrollable, Subscription> = new Map();
++  readonly scrollContainers: Map<ScrollDispatcherTarget, Subscription> = new Map();
+ 
+   /**
+    * Registers a scrollable instance with the service and listens for its scrolled events. When the
+    * scrollable is scrolled, the service emits the event to its scrolled observable.
+-   * @param scrollable Scrollable instance to be registered.
++   * @param target Scrollable instance to be registered.
+    */
+-  register(scrollable: CdkScrollable): void {
+-    if (!this.scrollContainers.has(scrollable)) {
++  register(target: ScrollDispatcherTarget): void {
++    if (!this.scrollContainers.has(target)) {
+       this.scrollContainers.set(
+-        scrollable,
+-        scrollable.elementScrolled().subscribe(() => this._scrolled.next(scrollable)),
++        target,
++        target.elementScrolled().subscribe(() => this._scrolled.next(target)),
+       );
+     }
+   }
+ 
+   /**
+    * De-registers a Scrollable reference and unsubscribes from its scroll event observable.
+-   * @param scrollable Scrollable instance to be deregistered.
++   * @param target Scrollable instance to be deregistered.
+    */
+-  deregister(scrollable: CdkScrollable): void {
+-    const scrollableReference = this.scrollContainers.get(scrollable);
++  deregister(target: ScrollDispatcherTarget): void {
++    const ref = this.scrollContainers.get(target);
+ 
+-    if (scrollableReference) {
+-      scrollableReference.unsubscribe();
+-      this.scrollContainers.delete(scrollable);
++    if (ref) {
++      ref.unsubscribe();
++      this.scrollContainers.delete(target);
+     }
+   }
+ 
+@@ -76,12 +84,12 @@ export class ScrollDispatcher implements OnDestroy {
+    * If you need to update any data bindings as a result of a scroll event, you have
+    * to run the callback using `NgZone.run`.
+    */
+-  scrolled(auditTimeInMs: number = DEFAULT_SCROLL_TIME): Observable<CdkScrollable | void> {
++  scrolled(auditTimeInMs: number = DEFAULT_SCROLL_TIME): Observable<ScrollDispatcherTarget | void> {
+     if (!this._platform.isBrowser) {
+       return observableOf<void>();
+     }
+ 
+-    return new Observable((observer: Observer<CdkScrollable | void>) => {
++    return new Observable((observer: Observer<ScrollDispatcherTarget | void>) => {
+       if (!this._cleanupGlobalListener) {
+         this._cleanupGlobalListener = this._ngZone.runOutsideAngular(() =>
+           this._renderer.listen('document', 'scroll', () => this._scrolled.next()),
+@@ -125,7 +133,7 @@ export class ScrollDispatcher implements OnDestroy {
+   ancestorScrolled(
+     elementOrElementRef: ElementRef | HTMLElement,
+     auditTimeInMs?: number,
+-  ): Observable<CdkScrollable | void> {
++  ): Observable<ScrollDispatcherTarget | void> {
+     const ancestors = this.getAncestorScrollContainers(elementOrElementRef);
+ 
+     return this.scrolled(auditTimeInMs).pipe(
+@@ -133,13 +141,15 @@ export class ScrollDispatcher implements OnDestroy {
+     );
+   }
+ 
+-  /** Returns all registered Scrollables that contain the provided element. */
+-  getAncestorScrollContainers(elementOrElementRef: ElementRef | HTMLElement): CdkScrollable[] {
+-    const scrollingContainers: CdkScrollable[] = [];
++  /** Returns all registered containers that contain the provided element. */
++  getAncestorScrollContainers(
++    elementOrElementRef: ElementRef | HTMLElement,
++  ): ScrollDispatcherTarget[] {
++    const scrollingContainers: ScrollDispatcherTarget[] = [];
+ 
+-    this.scrollContainers.forEach((_subscription: Subscription, scrollable: CdkScrollable) => {
+-      if (this._scrollableContainsElement(scrollable, elementOrElementRef)) {
+-        scrollingContainers.push(scrollable);
++    this.scrollContainers.forEach((_, target: ScrollDispatcherTarget) => {
++      if (this._targetContainsElement(target, elementOrElementRef)) {
++        scrollingContainers.push(target);
+       }
+     });
+ 
+@@ -147,17 +157,17 @@ export class ScrollDispatcher implements OnDestroy {
+   }
+ 
+   /** Returns true if the element is contained within the provided Scrollable. */
+-  private _scrollableContainsElement(
+-    scrollable: CdkScrollable,
++  private _targetContainsElement(
++    scrollable: ScrollDispatcherTarget,
+     elementOrElementRef: ElementRef | HTMLElement,
+   ): boolean {
+     let element: HTMLElement | null = coerceElement(elementOrElementRef);
+-    let scrollableElement = scrollable.getElementRef().nativeElement;
++    let targetElement = scrollable.getElementRef().nativeElement;
+ 
+     // Traverse through the element parents until we reach null, checking if any of the elements
+     // are the scrollable's element.
+     do {
+-      if (element == scrollableElement) {
++      if (element == targetElement) {
+         return true;
+       }
+     } while ((element = element!.parentElement));
+diff --git a/src/cdk/scrolling/scrollable.ts b/src/cdk/scrolling/scrollable.ts
+index f1e675d825f6af31ef569fcddda643d0cf3205b1..b18844eba9ea9b1ae5363a4746ab39537b8562f4 100644
+--- a/src/cdk/scrolling/scrollable.ts
++++ b/src/cdk/scrolling/scrollable.ts
+@@ -10,7 +10,7 @@ import {Directionality} from '../bidi';
+ import {getRtlScrollAxisType, RtlScrollAxisType, supportsScrollBehavior} from '../platform';
+ import {Directive, ElementRef, NgZone, OnDestroy, OnInit, Renderer2, inject} from '@angular/core';
+ import {Observable, Subject} from 'rxjs';
+-import {ScrollDispatcher} from './scroll-dispatcher';
++import {ScrollDispatcher, ScrollDispatcherTarget} from './scroll-dispatcher';
+ 
+ export type _Without<T> = {[P in keyof T]?: never};
+ export type _XOR<T, U> = (_Without<T> & U) | (_Without<U> & T);
+@@ -39,7 +39,7 @@ export type ExtendedScrollToOptions = _XAxis & _YAxis & ScrollOptions;
+ @Directive({
+   selector: '[cdk-scrollable], [cdkScrollable]',
+ })
+-export class CdkScrollable implements OnInit, OnDestroy {
++export class CdkScrollable implements ScrollDispatcherTarget, OnInit, OnDestroy {
+   protected elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+   protected scrollDispatcher = inject(ScrollDispatcher);
+   protected ngZone = inject(NgZone);

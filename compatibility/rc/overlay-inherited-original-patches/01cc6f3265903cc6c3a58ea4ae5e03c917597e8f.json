@@ -1,0 +1,113 @@
+{
+  "sha": "01cc6f3265903cc6c3a58ea4ae5e03c917597e8f",
+  "status": "reviewed",
+  "final_disposition": "inherited",
+  "diff_sha256": "8f6e7ec15882069bba4b10e5ab483b61c6a4b73098cc43100000d36830c4c964",
+  "patch_file": "compatibility/rc/overlay-inherited-original-patches/01cc6f3265903cc6c3a58ea4ae5e03c917597e8f.patch",
+  "files_and_hunks": [
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "hunks": [
+        "@@ -115,6 +115,9 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+        "@@ -710,18 +713,28 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+        "@@ -1289,6 +1302,20 @@ function getRoundedBoundingClientRect(clientRect: Dimensions): Dimensions {"
+      ]
+    }
+  ],
+  "whole_patch_accounting": [
+    "Adds last scroll visibility, gates emission on position or any changed visibility flag, and compares four origin/overlay clipped/outside booleans. The current peer keeps that predicate; tagged-16 and owned tooltip clipping helpers use identical strict edge comparisons."
+  ],
+  "owned_and_peer_reachability": "Fixture sees 1/1/2 position events for initial/unchanged/clipped geometry. Independent fresh rects prove first fits then clips; packed tooltip goes visible to absent after registered scroll event.",
+  "runtime_scope": "Single bottom-edge native clipping; source comparison establishes current CDK and tagged/owned strict clipping predicates equal for all four edges, and current CDK comparison retains all four visibility booleans for stable synchronous reads.",
+  "source_only_boundaries": "Nonexecuted branches remain source inspection; no G11, complete browser, or security clearance.",
+  "role": "main-only individual overlay source review",
+  "hunk_accounting": [
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -115,6 +115,9 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "added_lines": [
+        "  /** The last calculated scroll visibility. Only tracked  */",
+        "  private _lastScrollVisibility: ScrollingVisibility | null;",
+        ""
+      ],
+      "removed_lines": [],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -710,18 +713,28 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {",
+      "added_lines": [
+        "      const scrollVisibility = this._getScrollVisibility();",
+        "",
+        "      // We're recalculating on scroll, but we only want to emit if anything",
+        "      // changed since downstream code might be hitting the `NgZone`.",
+        "      if (",
+        "        position !== this._lastPosition ||",
+        "        !this._lastScrollVisibility ||",
+        "        !compareScrollVisibility(this._lastScrollVisibility, scrollVisibility)",
+        "      ) {",
+        "        const changeEvent = new ConnectedOverlayPositionChange(position, scrollVisibility);",
+        "        this._positionChanges.next(changeEvent);",
+        "      }",
+        "",
+        "      this._lastScrollVisibility = scrollVisibility;",
+        "    // Save the last connected position in case the position needs to be re-calculated.",
+        "    this._lastPosition = position;"
+      ],
+      "removed_lines": [
+        "    // Save the last connected position in case the position needs to be re-calculated.",
+        "    this._lastPosition = position;",
+        "",
+        "      const scrollableViewProperties = this._getScrollVisibility();",
+        "      const changeEvent = new ConnectedOverlayPositionChange(position, scrollableViewProperties);",
+        "      this._positionChanges.next(changeEvent);"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+      "header": "@@ -1289,6 +1302,20 @@ function getRoundedBoundingClientRect(clientRect: Dimensions): Dimensions {",
+      "added_lines": [
+        "/** Returns whether two `ScrollingVisibility` objects are identical. */",
+        "function compareScrollVisibility(a: ScrollingVisibility, b: ScrollingVisibility): boolean {",
+        "  if (a === b) {",
+        "    return true;",
+        "  }",
+        "",
+        "  return (",
+        "    a.isOriginClipped === b.isOriginClipped &&",
+        "    a.isOriginOutsideView === b.isOriginOutsideView &&",
+        "    a.isOverlayClipped === b.isOverlayClipped &&",
+        "    a.isOverlayOutsideView === b.isOverlayOutsideView",
+        "  );",
+        "}",
+        ""
+      ],
+      "removed_lines": [],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    }
+  ],
+  "prior_disposition_source": {
+    "base_commit": "9be00b7baf32477b8e521305efa36273589566b9",
+    "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+    "prior_entry_canonical_sha256": "11708f4e0ba678f56a04bb5364a2548089a579cbdf069b2305257834152fbbc1",
+    "prior_source_review": {
+      "path": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "sha256": "e407a0c71f67a8a85a8dc7b887a5e37349915549e34ac720783072fa7729be19",
+      "archive_path": "compatibility/rc/overlay-inherited-prior/e407a0c71f67a8a85a8dc7b887a5e37349915549e34ac720783072fa7729be19.json.gz",
+      "archive_sha256": "3ba3a7488795236f95fe099ec9b6c8dbe9445546e36e06073e1c8396b6391286",
+      "compression": "gzip"
+    }
+  },
+  "digest_provenance": {
+    "current_complete_patch": {
+      "sha256": "8f6e7ec15882069bba4b10e5ab483b61c6a4b73098cc43100000d36830c4c964",
+      "format": "git show --format=fuller --no-ext-diff --no-renames; full changed paths; commit metadata included"
+    },
+    "prior_top_level_ledger_diff": {
+      "sha256": null,
+      "format_or_scope": "unknown; retained verbatim in prior_disposition_record; equivalence not claimed"
+    }
+  },
+  "source_correction": "Preserves the complete prior disposition and prior report without endorsing or overwriting its historical opinion; the current whole-patch review and live contract are separate evidence."
+}

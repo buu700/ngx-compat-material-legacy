@@ -1,0 +1,28 @@
+diff --git a/goldens/cdk/table/index.api.md b/goldens/cdk/table/index.api.md
+index 04402f70d..4a6d4cba4 100644
+--- a/goldens/cdk/table/index.api.md
++++ b/goldens/cdk/table/index.api.md
+@@ -346,6 +346,7 @@ export class CdkTable<T> implements AfterContentInit, AfterContentChecked, Colle
+     removeHeaderRowDef(headerRowDef: CdkHeaderRowDef): void;
+     removeRowDef(rowDef: CdkRowDef<T>): void;
+     protected _renderedRange?: ListRange;
++    get renderedRows(): readonly RenderRow<T>[];
+     renderRows(): void;
+     // (undocumented)
+     _rowOutlet: DataRowOutlet;
+diff --git a/src/cdk/table/table.ts b/src/cdk/table/table.ts
+index 00a97f70f..0818d1ef9 100644
+--- a/src/cdk/table/table.ts
++++ b/src/cdk/table/table.ts
+@@ -634,6 +634,11 @@ export class CdkTable<T>
+   /** Row definition that will only be rendered if there's no data in the table. */
+   @ContentChild(CdkNoDataRow) _noDataRow!: CdkNoDataRow;
+ 
++  /** Returns the currently-rendered rows in the table. */
++  get renderedRows(): readonly RenderRow<T>[] {
++    return this._renderRows;
++  }
++
+   constructor() {
+     const role = inject(new HostAttributeToken('role'), {optional: true});
+ 

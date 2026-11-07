@@ -1,0 +1,112 @@
+{
+  "sha": "09df51d8ebb86a3ee76614b6775dd62136660567",
+  "status": "reviewed",
+  "final_disposition": "inherited",
+  "diff_sha256": "d1395fc1c377a2483bddef9d3c3f37d22d5bc39b8947c214bfb0e0b39f69fce3",
+  "patch_file": "compatibility/rc/overlay-inherited-original-patches/09df51d8ebb86a3ee76614b6775dd62136660567.patch",
+  "files_and_hunks": [
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.ts",
+      "hunks": [
+        "@@ -21,7 +21,7 @@ import type {OverlayRef} from '../overlay-ref';",
+        "@@ -89,12 +89,12 @@ export class OverlayOutsideClickDispatcher extends BaseOverlayDispatcher {",
+        "@@ -128,8 +128,8 @@ export class OverlayOutsideClickDispatcher extends BaseOverlayDispatcher {",
+        "@@ -144,3 +144,20 @@ export class OverlayOutsideClickDispatcher extends BaseOverlayDispatcher {"
+      ]
+    }
+  ],
+  "whole_patch_accounting": [
+    "Uses composed target typing and traverses shadow-root host boundaries for both click target and pointerdown origin. Current peer implements same traversal; actual owned tooltip consumes the outside stream for body interaction."
+  ],
+  "owned_and_peer_reachability": "Inside shadow root and crossing pointerdown/click do not dispatch; outside click does. Packed tooltip actual body interaction closes it; no claim that tooltip itself contains shadow DOM.",
+  "runtime_scope": "Control tests assertion sensitivity, not a mutation of CDK containment code; other roots and stacked-overlay cases untested.",
+  "source_only_boundaries": "Nonexecuted branches remain source inspection; no G11, complete browser, or security clearance.",
+  "role": "main-only individual overlay source review",
+  "hunk_accounting": [
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.ts",
+      "header": "@@ -21,7 +21,7 @@ import type {OverlayRef} from '../overlay-ref';",
+      "added_lines": [
+        "  private _pointerDownEventTarget: HTMLElement | null;"
+      ],
+      "removed_lines": [
+        "  private _pointerDownEventTarget: EventTarget | null;"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.ts",
+      "header": "@@ -89,12 +89,12 @@ export class OverlayOutsideClickDispatcher extends BaseOverlayDispatcher {",
+      "added_lines": [
+        "    this._pointerDownEventTarget = _getEventTarget<HTMLElement>(event);",
+        "    const target = _getEventTarget<HTMLElement>(event);"
+      ],
+      "removed_lines": [
+        "    this._pointerDownEventTarget = _getEventTarget(event);",
+        "    const target = _getEventTarget(event);"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.ts",
+      "header": "@@ -128,8 +128,8 @@ export class OverlayOutsideClickDispatcher extends BaseOverlayDispatcher {",
+      "added_lines": [
+        "        containsPierceShadowDom(overlayRef.overlayElement, target) ||",
+        "        containsPierceShadowDom(overlayRef.overlayElement, origin)"
+      ],
+      "removed_lines": [
+        "        overlayRef.overlayElement.contains(target as Node) ||",
+        "        overlayRef.overlayElement.contains(origin as Node)"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.ts",
+      "header": "@@ -144,3 +144,20 @@ export class OverlayOutsideClickDispatcher extends BaseOverlayDispatcher {",
+      "added_lines": [
+        "",
+        "/** Version of `Element.contains` that transcends shadow DOM boundaries. */",
+        "function containsPierceShadowDom(parent: HTMLElement, child: HTMLElement | null): boolean {",
+        "  const supportsShadowRoot = typeof ShadowRoot !== 'undefined' && ShadowRoot;",
+        "  let current: Node | null = child;",
+        "",
+        "  while (current) {",
+        "    if (current === parent) {",
+        "      return true;",
+        "    }",
+        "",
+        "    current =",
+        "      supportsShadowRoot && current instanceof ShadowRoot ? current.host : current.parentNode;",
+        "  }",
+        "",
+        "  return false;",
+        "}"
+      ],
+      "removed_lines": [],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    }
+  ],
+  "prior_disposition_source": {
+    "base_commit": "9be00b7baf32477b8e521305efa36273589566b9",
+    "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+    "prior_entry_canonical_sha256": "be751701969bcf447ecc9cbeca97b35d1e36dd7f3ed045092c4494cba9cad450",
+    "prior_source_review": {
+      "path": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "sha256": "e407a0c71f67a8a85a8dc7b887a5e37349915549e34ac720783072fa7729be19",
+      "archive_path": "compatibility/rc/overlay-inherited-prior/e407a0c71f67a8a85a8dc7b887a5e37349915549e34ac720783072fa7729be19.json.gz",
+      "archive_sha256": "3ba3a7488795236f95fe099ec9b6c8dbe9445546e36e06073e1c8396b6391286",
+      "compression": "gzip"
+    }
+  },
+  "digest_provenance": {
+    "current_complete_patch": {
+      "sha256": "d1395fc1c377a2483bddef9d3c3f37d22d5bc39b8947c214bfb0e0b39f69fce3",
+      "format": "git show --format=fuller --no-ext-diff --no-renames; full changed paths; commit metadata included"
+    },
+    "prior_top_level_ledger_diff": {
+      "sha256": null,
+      "format_or_scope": "unknown; retained verbatim in prior_disposition_record; equivalence not claimed"
+    }
+  },
+  "source_correction": "Preserves the complete prior disposition and prior report without endorsing or overwriting its historical opinion; the current whole-patch review and live contract are separate evidence."
+}

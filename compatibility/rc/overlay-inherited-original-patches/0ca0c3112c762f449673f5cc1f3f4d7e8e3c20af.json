@@ -1,0 +1,184 @@
+{
+  "sha": "0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af",
+  "status": "reviewed",
+  "final_disposition": "inherited",
+  "diff_sha256": "541e6727c4a5a503e9428fcfbef77b4328548432af9e8e8c64991b6c75f7ed62",
+  "patch_file": "compatibility/rc/overlay-inherited-original-patches/0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af.patch",
+  "files_and_hunks": [
+    {
+      "path": "goldens/cdk/overlay/index.api.md",
+      "hunks": [
+        "@@ -378,6 +378,9 @@ export class Overlay {",
+        "@@ -428,6 +431,12 @@ export class OverlayContainer implements OnDestroy {"
+      ]
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "hunks": [
+        "@@ -29,7 +29,7 @@ import {",
+        "@@ -253,7 +253,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+        "@@ -293,7 +293,9 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {"
+      ]
+    },
+    {
+      "path": "src/cdk/overlay/overlay.ts",
+      "hunks": [
+        "@@ -20,6 +20,7 @@ import {",
+        "@@ -31,6 +32,16 @@ import {OverlayRef} from './overlay-ref';",
+        "@@ -52,12 +63,15 @@ export function createOverlayRef(injector: Injector, config?: OverlayConfig): Ov"
+      ]
+    },
+    {
+      "path": "src/cdk/overlay/public-api.ts",
+      "hunks": [
+        "@@ -11,7 +11,7 @@ export * from './position/connected-position';"
+      ]
+    }
+  ],
+  "whole_patch_accounting": [
+    "Declares public config token/shape, changes directive default from fixed global to token-dependent null/global, makes overlay factory honor global default unless per-config overrides, and exports API. The current peer retains those routes."
+  ],
+  "owned_and_peer_reachability": "Direct overlay default opt-out and packed select connected-overlay provider false both omit popover; switching token true provides a failing control.",
+  "runtime_scope": "One direct overlay and packed select with one option, Chromium only; per-overlay override and other engines untested.",
+  "source_only_boundaries": "Nonexecuted branches remain source inspection; no G11, complete browser, or security clearance.",
+  "role": "main-only individual overlay source review",
+  "hunk_accounting": [
+    {
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -378,6 +378,9 @@ export class Overlay {",
+      "added_lines": [
+        "// @public",
+        "export const OVERLAY_DEFAULT_CONFIG: InjectionToken<OverlayDefaultConfig>;",
+        ""
+      ],
+      "removed_lines": [],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "goldens/cdk/overlay/index.api.md",
+      "header": "@@ -428,6 +431,12 @@ export class OverlayContainer implements OnDestroy {",
+      "added_lines": [
+        "// @public",
+        "export interface OverlayDefaultConfig {",
+        "    // (undocumented)",
+        "    usePopover?: boolean;",
+        "}",
+        ""
+      ],
+      "removed_lines": [],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "header": "@@ -29,7 +29,7 @@ import {",
+      "added_lines": [
+        "import {createOverlayRef, OVERLAY_DEFAULT_CONFIG} from './overlay';"
+      ],
+      "removed_lines": [
+        "import {createOverlayRef} from './overlay';"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "header": "@@ -253,7 +253,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "added_lines": [
+        "  usePopover: FlexibleOverlayPopoverLocation | null;"
+      ],
+      "removed_lines": [
+        "  usePopover: FlexibleOverlayPopoverLocation | null = 'global';"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.ts",
+      "header": "@@ -293,7 +293,9 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {",
+      "added_lines": [
+        "    const globalConfig = inject(OVERLAY_DEFAULT_CONFIG, {optional: true});",
+        "    this.usePopover = globalConfig?.usePopover === false ? null : 'global';"
+      ],
+      "removed_lines": [],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.ts",
+      "header": "@@ -20,6 +20,7 @@ import {",
+      "added_lines": [
+        "  InjectionToken,"
+      ],
+      "removed_lines": [],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.ts",
+      "header": "@@ -31,6 +32,16 @@ import {OverlayRef} from './overlay-ref';",
+      "added_lines": [
+        "/** Object used to configure the default options for overlays. */",
+        "export interface OverlayDefaultConfig {",
+        "  usePopover?: boolean;",
+        "}",
+        "",
+        "/** Injection token used to configure the default options for CDK overlays. */",
+        "export const OVERLAY_DEFAULT_CONFIG = new InjectionToken<OverlayDefaultConfig>(",
+        "  'OVERLAY_DEFAULT_CONFIG',",
+        ");",
+        ""
+      ],
+      "removed_lines": [],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.ts",
+      "header": "@@ -52,12 +63,15 @@ export function createOverlayRef(injector: Injector, config?: OverlayConfig): Ov",
+      "added_lines": [
+        "  const defaultUsePopover =",
+        "    injector.get(OVERLAY_DEFAULT_CONFIG, null, {optional: true})?.usePopover ?? true;",
+        "",
+        "    overlayConfig.usePopover = config?.usePopover ?? defaultUsePopover;"
+      ],
+      "removed_lines": [
+        "    overlayConfig.usePopover = config?.usePopover ?? true;"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    },
+    {
+      "path": "src/cdk/overlay/public-api.ts",
+      "header": "@@ -11,7 +11,7 @@ export * from './position/connected-position';",
+      "added_lines": [
+        "export {Overlay, createOverlayRef, OverlayDefaultConfig, OVERLAY_DEFAULT_CONFIG} from './overlay';"
+      ],
+      "removed_lines": [
+        "export {Overlay, createOverlayRef} from './overlay';"
+      ],
+      "accounting": "Considered within the whole-patch change description and branch-specific reachability and limits below."
+    }
+  ],
+  "prior_disposition_source": {
+    "base_commit": "9be00b7baf32477b8e521305efa36273589566b9",
+    "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+    "prior_entry_canonical_sha256": "1f5b32698194e39c9515bb202abde49459c9bc32ada5ffd88ba0da8da395f3ce",
+    "prior_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/mechanical/0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af.json",
+      "sha256": "39eb2ef1d85fe7d60a05839efccfc812fa3aec79c78d587d74f582da29a8acb6",
+      "archive_path": "compatibility/rc/overlay-inherited-prior/39eb2ef1d85fe7d60a05839efccfc812fa3aec79c78d587d74f582da29a8acb6.json.gz",
+      "archive_sha256": "13df1f786fb1276427d44eca1a061bd09d55235b68f03161526e9b6e4a6984bc",
+      "compression": "gzip"
+    }
+  },
+  "digest_provenance": {
+    "current_complete_patch": {
+      "sha256": "541e6727c4a5a503e9428fcfbef77b4328548432af9e8e8c64991b6c75f7ed62",
+      "format": "git show --format=fuller --no-ext-diff --no-renames; full changed paths; commit metadata included"
+    },
+    "prior_top_level_ledger_diff": {
+      "sha256": "d58d4d9fa8a8db8611af5730071960127c3f80153ab605fe88e5da3ff6c758e0",
+      "format_or_scope": "unknown; retained verbatim in prior_disposition_record; equivalence not claimed"
+    },
+    "prior_mechanical_join_diff": {
+      "sha256": "5b8935eaf66f279b4b8900a56261fa633f169567834ed73de6f4ddb695aa64b8",
+      "path": "compatibility/rc/overlay-inherited-prior/0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af.full-index.diff",
+      "format": "git show --format= --no-color --full-index --no-renames; full changed paths; no commit metadata"
+    }
+  },
+  "source_correction": "Preserves the complete prior disposition and prior report without endorsing or overwriting its historical opinion; the current whole-patch review and live contract are separate evidence."
+}

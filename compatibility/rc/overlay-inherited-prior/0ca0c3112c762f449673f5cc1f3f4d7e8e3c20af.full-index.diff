@@ -1,0 +1,118 @@
+diff --git a/goldens/cdk/overlay/index.api.md b/goldens/cdk/overlay/index.api.md
+index bfca45f81adfe57d20e6c87973eb9c55ec45a372..855db513f679f0ee7ab7f7a64a7c65c47112d76c 100644
+--- a/goldens/cdk/overlay/index.api.md
++++ b/goldens/cdk/overlay/index.api.md
+@@ -378,6 +378,9 @@ export class Overlay {
+     static ɵprov: i0.ɵɵInjectableDeclaration<Overlay>;
+ }
+ 
++// @public
++export const OVERLAY_DEFAULT_CONFIG: InjectionToken<OverlayDefaultConfig>;
++
+ // @public
+ export class OverlayConfig {
+     constructor(config?: OverlayConfig);
+@@ -428,6 +431,12 @@ export class OverlayContainer implements OnDestroy {
+     static ɵprov: i0.ɵɵInjectableDeclaration<OverlayContainer>;
+ }
+ 
++// @public
++export interface OverlayDefaultConfig {
++    // (undocumented)
++    usePopover?: boolean;
++}
++
+ // @public
+ export class OverlayKeyboardDispatcher extends BaseOverlayDispatcher {
+     add(overlayRef: OverlayRef): void;
+diff --git a/src/cdk/overlay/overlay-directives.ts b/src/cdk/overlay/overlay-directives.ts
+index 9cb58cc99700652daf5371cf7eedf1cd601043a7..4fe99f3768b004568fbbec16866f3f426c13e2f9 100644
+--- a/src/cdk/overlay/overlay-directives.ts
++++ b/src/cdk/overlay/overlay-directives.ts
+@@ -29,7 +29,7 @@ import {
+ import {_getEventTarget} from '../platform';
+ import {Subscription} from 'rxjs';
+ import {takeWhile} from 'rxjs/operators';
+-import {createOverlayRef} from './overlay';
++import {createOverlayRef, OVERLAY_DEFAULT_CONFIG} from './overlay';
+ import {OverlayConfig} from './overlay-config';
+ import {OverlayRef} from './overlay-ref';
+ import {ConnectedOverlayPositionChange, ViewportMargin} from './position/connected-position';
+@@ -253,7 +253,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+ 
+   /** Whether the connected overlay should be rendered inside a popover element or the overlay container. */
+   @Input({alias: 'cdkConnectedOverlayUsePopover'})
+-  usePopover: FlexibleOverlayPopoverLocation | null = 'global';
++  usePopover: FlexibleOverlayPopoverLocation | null;
+ 
+   /** Whether the overlay should match the trigger's width. */
+   @Input({alias: 'cdkConnectedOverlayMatchWidth', transform: booleanAttribute})
+@@ -293,7 +293,9 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+     const templateRef = inject<TemplateRef<any>>(TemplateRef);
+     const viewContainerRef = inject(ViewContainerRef);
+     const defaultConfig = inject(CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG, {optional: true});
++    const globalConfig = inject(OVERLAY_DEFAULT_CONFIG, {optional: true});
+ 
++    this.usePopover = globalConfig?.usePopover === false ? null : 'global';
+     this._templatePortal = new TemplatePortal(templateRef, viewContainerRef);
+     this.scrollStrategy = this._scrollStrategyFactory();
+ 
+diff --git a/src/cdk/overlay/overlay.ts b/src/cdk/overlay/overlay.ts
+index 3a909dfdb442a57b1b13e502544ab56fef854d3d..6d0176fdc25cfcb86b7ff3dcd75f2d6434c7f3dc 100644
+--- a/src/cdk/overlay/overlay.ts
++++ b/src/cdk/overlay/overlay.ts
+@@ -20,6 +20,7 @@ import {
+   RendererFactory2,
+   DOCUMENT,
+   Renderer2,
++  InjectionToken,
+ } from '@angular/core';
+ import {_IdGenerator} from '../a11y';
+ import {_CdkPrivateStyleLoader} from '../private';
+@@ -31,6 +32,16 @@ import {OverlayRef} from './overlay-ref';
+ import {OverlayPositionBuilder} from './position/overlay-position-builder';
+ import {ScrollStrategyOptions} from './scroll/index';
+ 
++/** Object used to configure the default options for overlays. */
++export interface OverlayDefaultConfig {
++  usePopover?: boolean;
++}
++
++/** Injection token used to configure the default options for CDK overlays. */
++export const OVERLAY_DEFAULT_CONFIG = new InjectionToken<OverlayDefaultConfig>(
++  'OVERLAY_DEFAULT_CONFIG',
++);
++
+ /**
+  * Creates an overlay.
+  * @param injector Injector to use when resolving the overlay's dependencies.
+@@ -52,12 +63,15 @@ export function createOverlayRef(injector: Injector, config?: OverlayConfig): Ov
+     injector.get(RendererFactory2).createRenderer(null, null);
+ 
+   const overlayConfig = new OverlayConfig(config);
++  const defaultUsePopover =
++    injector.get(OVERLAY_DEFAULT_CONFIG, null, {optional: true})?.usePopover ?? true;
++
+   overlayConfig.direction = overlayConfig.direction || directionality.value;
+ 
+   if (!('showPopover' in doc.body)) {
+     overlayConfig.usePopover = false;
+   } else {
+-    overlayConfig.usePopover = config?.usePopover ?? true;
++    overlayConfig.usePopover = config?.usePopover ?? defaultUsePopover;
+   }
+ 
+   const pane = doc.createElement('div');
+diff --git a/src/cdk/overlay/public-api.ts b/src/cdk/overlay/public-api.ts
+index 729dee69c4650e1ff32c0990747f45702a28349f..95819b1ce4ead444e88bee17bb14a6e96a858836 100644
+--- a/src/cdk/overlay/public-api.ts
++++ b/src/cdk/overlay/public-api.ts
+@@ -11,7 +11,7 @@ export * from './position/connected-position';
+ export * from './scroll/index';
+ export * from './overlay-module';
+ export * from './dispatchers/index';
+-export {Overlay, createOverlayRef} from './overlay';
++export {Overlay, createOverlayRef, OverlayDefaultConfig, OVERLAY_DEFAULT_CONFIG} from './overlay';
+ export {OverlayContainer} from './overlay-container';
+ export {
+   CdkOverlayOrigin,

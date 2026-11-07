@@ -9531,7 +9531,7 @@
       "bucket": "behavior-semantic",
       "subject": "docs(material/list): fix grammar in MAT_LIST_CONFIG token description (#28284)",
       "final_disposition": "not-applicable",
-      "reason": "Only the MAT_LIST_CONFIG description adds the missing word \u201cfor\u201d. The complete token declaration, import, options interface and all executable/type syntax are unchanged. This is documentation grammar, not a token-identity or default-options fix to adopt.",
+      "reason": "Only the MAT_LIST_CONFIG description adds the missing word “for”. The complete token declaration, import, options interface and all executable/type syntax are unchanged. This is documentation grammar, not a token-identity or default-options fix to adopt.",
       "read_note_disposition": "complete-documentation-source-identity",
       "evidence_report": "compatibility/rc/packed-upstream-source-comment.json",
       "files": [
@@ -9569,7 +9569,7 @@
         "affected_branches": [
           "main"
         ],
-        "decision": "Only the MAT_LIST_CONFIG description adds the missing word \u201cfor\u201d. The complete token declaration, import, options interface and all executable/type syntax are unchanged. This is documentation grammar, not a token-identity or default-options fix to adopt.",
+        "decision": "Only the MAT_LIST_CONFIG description adds the missing word “for”. The complete token declaration, import, options interface and all executable/type syntax are unchanged. This is documentation grammar, not a token-identity or default-options fix to adopt.",
         "proof_kind": "complete-syntax-and-documentation-review"
       }
     },
@@ -9988,7 +9988,7 @@
     {
       "sha": "46db6a6ba5619cddffc1dbf7a78696d5249abf50",
       "bucket": "behavior-semantic",
-      "subject": "fix(material/button-toggle): standard button toggle strong focus bord\u2026 (#28790)",
+      "subject": "fix(material/button-toggle): standard button toggle strong focus bord… (#28790)",
       "final_disposition": "irrelevant",
       "reason": "The patch rounds the standard button toggle focus indicator to the toggle shape. The package does not define that structural stylesheet. The focus-indicator radius slots were not added.",
       "read_note_disposition": "not-owned",
@@ -10733,7 +10733,7 @@
     {
       "sha": "d7fc5601405f83e5418121382b7647d4dcc7793c",
       "bucket": "behavior-semantic",
-      "subject": "fix(docs): add example for adding icon in meta section using matListI\u2026 (#30068)",
+      "subject": "fix(docs): add example for adding icon in meta section using matListI… (#30068)",
       "final_disposition": "not-applicable",
       "reason": "The sole list.md hunk adds a modern matListItemMeta example with title/line directives and @for syntax. It changes no component/directive implementation. Those modern meta/title directives are not the historical owned list API, and the upstream overview is neither maintained nor packaged here. No modern list API mirror or ordinary component fork should be introduced for this example.",
       "read_note_disposition": "individually-reviewed-upstream-guidance",
@@ -10749,7 +10749,7 @@
         {
           "sha": "d7fc5601405f83e5418121382b7647d4dcc7793c",
           "bucket": "behavior-semantic",
-          "subject": "fix(docs): add example for adding icon in meta section using matListI\u2026 (#30068)",
+          "subject": "fix(docs): add example for adding icon in meta section using matListI… (#30068)",
           "final_disposition": "irrelevant",
           "reason": "The patch adds a matListItemMeta example to the list guide. This package does not ship that guide and does not define matListItemMeta. That example was not added.",
           "read_note_disposition": "not-owned",
@@ -12605,7 +12605,7 @@
       "files": [
         "src/cdk/overlay/position/flexible-connected-position-strategy.ts"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "evidence_report": "compatibility/rc/overlay-inherited-original-patches/01cc6f3265903cc6c3a58ea4ae5e03c917597e8f.json",
       "peer_floor": {
         "package": "@angular/cdk",
         "advertised_range": "^22.1.7",
@@ -12622,7 +12622,50 @@
       "batch_id": "cdk-inherited-not-owned-retain-2026-10-01-d",
       "recorded_at_utc": "2026-10-01T16:49:17Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "individual_proof": {
+        "proof_kind": "main-overlay-inherited-native",
+        "diff_sha256": "8f6e7ec15882069bba4b10e5ab483b61c6a4b73098cc43100000d36830c4c964",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Complete upstream diff and current peer/caller source reviewed; focused live packed Chromium behavior and explicit fixture-fault controls are required.",
+        "reachable_behavior": {
+          "kind": "executed-delegation",
+          "id": "overlay-inherited-native/01cc6f3265903cc6c3a58ea4ae5e03c917597e8f"
+        }
+      },
+      "prior_disposition_record": {
+        "sha": "01cc6f3265903cc6c3a58ea4ae5e03c917597e8f",
+        "bucket": "behavior-semantic",
+        "subject": "fix(cdk/overlay): only emit positionChanges when position is different",
+        "final_disposition": "inherited",
+        "reason": "The patch emits the CDK overlay position change only when the position or scroll visibility differs. The package does not define FlexibleConnectedPositionStrategy. The owned menu and tooltip subscribe to the peer strategy. The emit guard was not added. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+        "read_note_disposition": "not-owned",
+        "files": [
+          "src/cdk/overlay/position/flexible-connected-position-strategy.ts"
+        ],
+        "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+        "peer_floor": {
+          "package": "@angular/cdk",
+          "advertised_range": "^22.1.7",
+          "installed_version": "22.1.7",
+          "contains_fix_tag": "v22.1.7",
+          "sha_is_ancestor_of_tag": true,
+          "cdk_modules": [
+            "overlay"
+          ],
+          "owned_import_intersection": [
+            "overlay"
+          ]
+        },
+        "batch_id": "cdk-inherited-not-owned-retain-2026-10-01-d",
+        "recorded_at_utc": "2026-10-01T16:49:17Z",
+        "g11_claim": "not-passed",
+        "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      },
+      "diff_sha256": "8f6e7ec15882069bba4b10e5ab483b61c6a4b73098cc43100000d36830c4c964"
     },
     {
       "sha": "b513b50bb44fc17d28e9d022f9eba609d5e4b509",
@@ -13106,7 +13149,7 @@
       "files": [
         "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.ts"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "evidence_report": "compatibility/rc/overlay-inherited-original-patches/09df51d8ebb86a3ee76614b6775dd62136660567.json",
       "peer_floor": {
         "package": "@angular/cdk",
         "advertised_range": "^22.1.7",
@@ -13123,7 +13166,50 @@
       "batch_id": "cdk-inherited-not-owned-retain-2026-10-01-d",
       "recorded_at_utc": "2026-10-01T16:49:17Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "individual_proof": {
+        "proof_kind": "main-overlay-inherited-native",
+        "diff_sha256": "d1395fc1c377a2483bddef9d3c3f37d22d5bc39b8947c214bfb0e0b39f69fce3",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Complete upstream diff and current peer/caller source reviewed; focused live packed Chromium behavior and explicit fixture-fault controls are required.",
+        "reachable_behavior": {
+          "kind": "executed-delegation",
+          "id": "overlay-inherited-native/09df51d8ebb86a3ee76614b6775dd62136660567"
+        }
+      },
+      "prior_disposition_record": {
+        "sha": "09df51d8ebb86a3ee76614b6775dd62136660567",
+        "bucket": "behavior-semantic",
+        "subject": "fix(cdk/overlay): incorrectly dispatching outside click for shadow DOM (#29249)",
+        "final_disposition": "inherited",
+        "reason": "The patch treats clicks inside a shadow root as inside the overlay. The package does not define the overlay outside-click dispatcher. The shadow-root walk was not added. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+        "read_note_disposition": "not-owned",
+        "files": [
+          "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.ts"
+        ],
+        "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+        "peer_floor": {
+          "package": "@angular/cdk",
+          "advertised_range": "^22.1.7",
+          "installed_version": "22.1.7",
+          "contains_fix_tag": "v22.1.7",
+          "sha_is_ancestor_of_tag": true,
+          "cdk_modules": [
+            "overlay"
+          ],
+          "owned_import_intersection": [
+            "overlay"
+          ]
+        },
+        "batch_id": "cdk-inherited-not-owned-retain-2026-10-01-d",
+        "recorded_at_utc": "2026-10-01T16:49:17Z",
+        "g11_claim": "not-passed",
+        "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      },
+      "diff_sha256": "d1395fc1c377a2483bddef9d3c3f37d22d5bc39b8947c214bfb0e0b39f69fce3"
     },
     {
       "sha": "5f7680f76f0c6c5d81f4159fb1d103e8801f2b94",
@@ -14357,7 +14443,7 @@
       "bucket": "behavior-semantic",
       "subject": "fix(cdk/overlay): ensure re-exported transitive `Dir` directive can be imported (#30679)",
       "final_disposition": "inherited",
-      "reason": "The patch re-exports Dir as \u0275\u0275Dir from the CDK overlay module so the compiler can import it. This package does not define OverlayModule. That re-export was not added. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+      "reason": "The patch re-exports Dir as ɵɵDir from the CDK overlay module so the compiler can import it. This package does not define OverlayModule. That re-export was not added. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
       "read_note_disposition": "not-owned",
       "files": [
         "src/cdk/overlay/overlay-module.ts"
@@ -17719,7 +17805,7 @@
       "bucket": "behavior-semantic",
       "subject": "docs: fix whether typos",
       "final_disposition": "not-applicable",
-      "reason": "Four component comments correct \u201cWheter\u201d to \u201cWhether\u201d. The hideSingleSelectionIndicator declarations and all complete option/select/list/selectable-list code remain identical. This neither adds the modern input to the owned frozen API nor changes selection, icon visibility or styling.",
+      "reason": "Four component comments correct “Wheter” to “Whether”. The hideSingleSelectionIndicator declarations and all complete option/select/list/selectable-list code remain identical. This neither adds the modern input to the owned frozen API nor changes selection, icon visibility or styling.",
       "read_note_disposition": "complete-documentation-source-identity",
       "files": [
         "src/material/autocomplete/autocomplete.ts",
@@ -17762,7 +17848,7 @@
         "affected_branches": [
           "main"
         ],
-        "decision": "Four component comments correct \u201cWheter\u201d to \u201cWhether\u201d. The hideSingleSelectionIndicator declarations and all complete option/select/list/selectable-list code remain identical. This neither adds the modern input to the owned frozen API nor changes selection, icon visibility or styling.",
+        "decision": "Four component comments correct “Wheter” to “Whether”. The hideSingleSelectionIndicator declarations and all complete option/select/list/selectable-list code remain identical. This neither adds the modern input to the owned frozen API nor changes selection, icon visibility or styling.",
         "proof_kind": "complete-syntax-and-documentation-review"
       }
     },
@@ -21206,7 +21292,7 @@
         "src/material/core/tokens/m3/mat/_badge.scss"
       ],
       "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "glob projects/ngx-material-legacy/*badge* \u2192 empty; badge not in 22-family surface",
+      "source_check": "glob projects/ngx-material-legacy/*badge* → empty; badge not in 22-family surface",
       "batch_id": "sensitive-owned-retain-2026-10-01-h",
       "recorded_at_utc": "2026-10-01T17:05:21Z",
       "g11_claim": "not-passed",
@@ -21224,7 +21310,7 @@
         "src/material/core/tokens/m3/mat/_badge.scss"
       ],
       "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "glob projects/ngx-material-legacy/*badge* \u2192 empty; badge not in 22-family surface",
+      "source_check": "glob projects/ngx-material-legacy/*badge* → empty; badge not in 22-family surface",
       "batch_id": "sensitive-owned-retain-2026-10-01-h",
       "recorded_at_utc": "2026-10-01T17:05:21Z",
       "g11_claim": "not-passed",
@@ -21314,7 +21400,7 @@
       "bucket": "behavior-semantic",
       "subject": "fix(multiple): ensure mat-option parents are the offsetParent (#30977)",
       "final_disposition": "already-adapted",
-      "reason": "The patch changes MDC autocomplete/select panels from position static to relative so nested options use the panel as offsetParent. Owned autocomplete panel already sets position: relative (legacy-autocomplete/autocomplete.scss). Owned select panel uses menu-common.base(), which sets position: absolute \u2014 also a non-static containing block for offsetParent. Neither owned panel uses the pre-fix static positioning the patch addressed. Already adapted for offsetParent purposes.",
+      "reason": "The patch changes MDC autocomplete/select panels from position static to relative so nested options use the panel as offsetParent. Owned autocomplete panel already sets position: relative (legacy-autocomplete/autocomplete.scss). Owned select panel uses menu-common.base(), which sets position: absolute — also a non-static containing block for offsetParent. Neither owned panel uses the pre-fix static positioning the patch addressed. Already adapted for offsetParent purposes.",
       "read_note_disposition": "owned-retained",
       "files": [
         "src/material/select/select.scss"
@@ -25089,7 +25175,7 @@
         "bucket": "behavior-semantic",
         "subject": "fix(material/core): option showing double selected indicator in high contrast mode",
         "final_disposition": "already-adapted",
-        "reason": "Owned MDC and legacy option HC selected marks use :has(.\u2026-pseudo-checkbox) instead of the multiple-option class so a checkmark and dot do not both show.",
+        "reason": "Owned MDC and legacy option HC selected marks use :has(.…-pseudo-checkbox) instead of the multiple-option class so a checkmark and dot do not both show.",
         "read_note_disposition": "owned-retained",
         "files": [
           "src/material/core/option/option.scss"
@@ -44827,7 +44913,7 @@
           "bucket": "needs-triage",
           "subject": "docs(material/datepicker): fixed typo in ssrSafeIsHTMLTextAreaElement function description (#33107)",
           "final_disposition": "irrelevant",
-          "reason": "Inspected upstream patch content (sha256=b3f7e90980bf3b0cfc4847ce53c25880f96a34e0778d12999f42cd05a02e0148, bytes=684). Changed paths: src/material/datepicker/aria-accessible-name.ts. Comment-only typo fix (funciton\u2192function) in current Material datepicker aria helper. This package does not ship that TypeScript source; companion datepicker coverage is Sass bridge/theme only. Irrelevant to retained legacy product behavior.",
+          "reason": "Inspected upstream patch content (sha256=b3f7e90980bf3b0cfc4847ce53c25880f96a34e0778d12999f42cd05a02e0148, bytes=684). Changed paths: src/material/datepicker/aria-accessible-name.ts. Comment-only typo fix (funciton→function) in current Material datepicker aria helper. This package does not ship that TypeScript source; companion datepicker coverage is Sass bridge/theme only. Irrelevant to retained legacy product behavior.",
           "read_note_disposition": "not-owned",
           "files": [
             "src/material/datepicker/aria-accessible-name.ts"
@@ -54684,7 +54770,7 @@
     {
       "sha": "54d514df66b9a1ea544df0aacc7069defcd78dcd",
       "bucket": "test-only-batch-candidate",
-      "subject": "feat(material/testing): Add 'type' attribute filter and getter to Mat\u2026 (#31657)",
+      "subject": "feat(material/testing): Add 'type' attribute filter and getter to Mat… (#31657)",
       "final_disposition": "irrelevant",
       "reason": "Inspected upstream patch content (sha256=200b997cfd71ad91b4ff7ad5e44638a09ffc4e09ab2f39b76b4d8ab07a480a95, bytes=6284). Changed paths: goldens/material/button/testing/index.api.md, src/material/button/testing/button-harness-filters.ts, src/material/button/testing/button-harness.spec.ts, src/material/button/testing/button-harness.ts. modern Material harness/testing API change; legacy harness ports are separate and were not updated by this patch. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
       "batch_id": "needs-triage-experimental-m3-build-docs-harness-input-transform-2026-10-01",
@@ -57178,7 +57264,7 @@
     {
       "sha": "b01f682c93601b5cbf076829c52addf46f2fa0da",
       "bucket": "needs-triage",
-      "subject": "Revert \"refactor(material/table): remove use of zone onStable for style sched\u2026\" (#28777)",
+      "subject": "Revert \"refactor(material/table): remove use of zone onStable for style sched…\" (#28777)",
       "final_disposition": "irrelevant",
       "reason": "Inspected upstream patch content (sha256=2e0fddd73e33abbc4fd65ebded9607bf7f8cc66d301b0051e538cc158611f4d7, bytes=25076). Changed paths: src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts, src/cdk/table/coalesced-style-scheduler.ts, src/cdk/table/table.spec.ts, src/material-experimental/column-resize/column-resize.spec.ts, tools/public_api_guard/cdk/table.md, tslint.json. material-experimental only; not a retained legacy product family in this package. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
       "batch_id": "needs-triage-surface-m3-nonshipped-cdk-2026-10-01",
@@ -58698,8 +58784,8 @@
         "src/cdk/table/text-column.ts",
         "tools/public_api_guard/cdk/table.md"
       ],
-      "diff_sha256": "a80f7b08c16f0718ba1da2b233f658e3dccd2d7171aa6d6c296139c5160ce3b2",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/3b6ca5c9880996b57e08caffb408f6c12ed78de4.json",
+      "diff_sha256": "041149dad79ac5c7e41b02607b5474178d87096024a4df965a53dd36cdc633bb",
+      "evidence_report": "compatibility/rc/table-inherited-review/3b6ca5c9880996b57e08caffb408f6c12ed78de4.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
@@ -58711,6 +58797,47 @@
         "installed": "22.1.7",
         "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
         "delegation": "@angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts"
+      },
+      "individual_proof": {
+        "proof_kind": "main-table-inherited-native",
+        "diff_sha256": "041149dad79ac5c7e41b02607b5474178d87096024a4df965a53dd36cdc633bb",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "All 22 converted declarations compiled as standalone imports; actual packed legacy module rendered rows and public CDK injection matched. Most standalone declarations were unused by the fixture and therefore have compilation rather than individual runtime coverage. Qualification is limited to the main peer floor, packed artifact and named observations; it does not claim 21.x, complete table behavior, security or G11.",
+        "reachable_behavior": {
+          "kind": "executed-delegation",
+          "id": "table-inherited-native/3b6ca5c9880996b57e08caffb408f6c12ed78de4"
+        }
+      },
+      "prior_disposition_record": {
+        "sha": "3b6ca5c9880996b57e08caffb408f6c12ed78de4",
+        "bucket": "needs-triage",
+        "subject": "refactor(cdk/table): convert to standalone",
+        "files": [
+          "src/cdk/table/cell.ts",
+          "src/cdk/table/row.ts",
+          "src/cdk/table/table-module.ts",
+          "src/cdk/table/table.ts",
+          "src/cdk/table/text-column.spec.ts",
+          "src/cdk/table/text-column.ts",
+          "tools/public_api_guard/cdk/table.md"
+        ],
+        "diff_sha256": "a80f7b08c16f0718ba1da2b233f658e3dccd2d7171aa6d6c296139c5160ce3b2",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/3b6ca5c9880996b57e08caffb408f6c12ed78de4.json",
+        "batch_id": "unread-seed-content-review-2026-10-02",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "inherited",
+        "read_note_disposition": "inherited",
+        "reason": "The diff in src/cdk/table/cell.ts changes `@Directive({selector: '[cdkCellDef]'})`. That line is not in the legacy sources. @angular/cdk/table is exercised by projects/ngx-material-legacy/legacy-table/table.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/cdk@22.1.7 supplies the change.",
+        "peer_floor": {
+          "package": "@angular/cdk",
+          "installed": "22.1.7",
+          "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+          "delegation": "@angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts"
+        }
       }
     },
     {
@@ -59904,7 +60031,7 @@
     {
       "sha": "8583ca661ded3d7e6b7d2053c84678a6c9b23a69",
       "bucket": "needs-triage",
-      "subject": "Revert \"refactor(material/tabs): Remove use of zone onStable for aligning tab\u2026\" (#28764)",
+      "subject": "Revert \"refactor(material/tabs): Remove use of zone onStable for aligning tab…\" (#28764)",
       "files": [
         "src/material/tabs/paginated-tab-header.ts"
       ],
@@ -63865,7 +63992,7 @@
     {
       "sha": "9ce023d9771b07229df59c6aa360ae0462980b60",
       "bucket": "behavior-semantic",
-      "subject": "fix(material/slider): ensure disabled slider thumb input has 'auto' c\u2026 (#31311)",
+      "subject": "fix(material/slider): ensure disabled slider thumb input has 'auto' c… (#31311)",
       "files": [
         "src/material/slider/slider.scss",
         "src/material/slider/slider.spec.ts"
@@ -64897,8 +65024,8 @@
       "files": [
         "src/cdk/table/table-errors.ts"
       ],
-      "diff_sha256": "61cd9fe4f894dd5f39891dac17fdd5bed44e38d243d21f0776ad01eb1a6825fc",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/27dae25a420e76817a1209f373326084ae6dd11c.json",
+      "diff_sha256": "47e892b47ed2aa20c923cfffd2d16678db74f658c41b8c03914178560d5a4945",
+      "evidence_report": "compatibility/rc/table-inherited-review/27dae25a420e76817a1209f373326084ae6dd11c.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
@@ -64910,6 +65037,41 @@
         "installed": "22.1.7",
         "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
         "delegation": "@angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts"
+      },
+      "individual_proof": {
+        "proof_kind": "main-table-inherited-native",
+        "diff_sha256": "47e892b47ed2aa20c923cfffd2d16678db74f658c41b8c03914178560d5a4945",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Both changed error messages were observed with duplicate default and two conditional no-match row definitions; controls enabled multi-template or matching row. Qualification is limited to the main peer floor, packed artifact and named observations; it does not claim 21.x, complete table behavior, security or G11.",
+        "reachable_behavior": {
+          "kind": "executed-delegation",
+          "id": "table-inherited-native/27dae25a420e76817a1209f373326084ae6dd11c"
+        }
+      },
+      "prior_disposition_record": {
+        "sha": "27dae25a420e76817a1209f373326084ae6dd11c",
+        "bucket": "behavior-semantic",
+        "subject": "fix(cdk/table): improve error message (#31545)",
+        "files": [
+          "src/cdk/table/table-errors.ts"
+        ],
+        "diff_sha256": "61cd9fe4f894dd5f39891dac17fdd5bed44e38d243d21f0776ad01eb1a6825fc",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/27dae25a420e76817a1209f373326084ae6dd11c.json",
+        "batch_id": "unread-seed-content-review-2026-10-02",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "inherited",
+        "read_note_disposition": "inherited",
+        "reason": "The diff in src/cdk/table/table-errors.ts changes `return Error(`There can only be one default row without a when predicate function.`);`. That line is not in the legacy sources. @angular/cdk/table is exercised by projects/ngx-material-legacy/legacy-table/table.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/cdk@22.1.7 supplies the change.",
+        "peer_floor": {
+          "package": "@angular/cdk",
+          "installed": "22.1.7",
+          "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+          "delegation": "@angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts"
+        }
       }
     },
     {
@@ -67523,7 +67685,7 @@
       "g11_claim": "not-passed",
       "final_disposition": "inherited",
       "read_note_disposition": "inherited",
-      "reason": "The diff in src/cdk/dialog/dialog-module.ts changes `CdkPortal as \u0275\u0275CdkPortal,`. That line is not in the legacy sources. @angular/cdk/dialog is exercised by projects/ngx-material-legacy/legacy-dialog/dialog-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/cdk@22.1.7 supplies the change.",
+      "reason": "The diff in src/cdk/dialog/dialog-module.ts changes `CdkPortal as ɵɵCdkPortal,`. That line is not in the legacy sources. @angular/cdk/dialog is exercised by projects/ngx-material-legacy/legacy-dialog/dialog-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/cdk@22.1.7 supplies the change.",
       "peer_floor": {
         "package": "@angular/cdk",
         "installed": "22.1.7",
@@ -67880,8 +68042,8 @@
         "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
         "src/cdk/overlay/public-api.ts"
       ],
-      "diff_sha256": "0a838c33d30887139eaa5354f72dddd6c10f917e1b11f2503341ec99d4c9ea05",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/1a92e22eff7728d92b6af8834701f78acbb4d2cc.json",
+      "diff_sha256": "34aee1bf21f21f4db87cbb3990b91ea085aefe5f1994feeee78de05ebd6cb125",
+      "evidence_report": "compatibility/rc/overlay-inherited-original-patches/1a92e22eff7728d92b6af8834701f78acbb4d2cc.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
@@ -67893,6 +68055,45 @@
         "installed": "22.1.7",
         "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
         "delegation": "@angular/cdk/overlay imported by projects/ngx-material-legacy/legacy-menu/menu-module.ts"
+      },
+      "individual_proof": {
+        "proof_kind": "main-overlay-inherited-native",
+        "diff_sha256": "34aee1bf21f21f4db87cbb3990b91ea085aefe5f1994feeee78de05ebd6cb125",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Complete upstream diff and current peer/caller source reviewed; focused live packed Chromium behavior and explicit fixture-fault controls are required.",
+        "reachable_behavior": {
+          "kind": "executed-delegation",
+          "id": "overlay-inherited-native/1a92e22eff7728d92b6af8834701f78acbb4d2cc"
+        }
+      },
+      "prior_disposition_record": {
+        "sha": "1a92e22eff7728d92b6af8834701f78acbb4d2cc",
+        "bucket": "behavior-semantic",
+        "subject": "refactor(cdk/overlay): allow connected overlays to stay in the overlay container",
+        "files": [
+          "goldens/cdk/overlay/index.api.md",
+          "src/cdk/overlay/overlay-directives.ts",
+          "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+          "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+          "src/cdk/overlay/public-api.ts"
+        ],
+        "diff_sha256": "0a838c33d30887139eaa5354f72dddd6c10f917e1b11f2503341ec99d4c9ea05",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/1a92e22eff7728d92b6af8834701f78acbb4d2cc.json",
+        "batch_id": "unread-seed-content-review-2026-10-02",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "inherited",
+        "read_note_disposition": "inherited",
+        "reason": "The diff in src/cdk/overlay/overlay-directives.ts changes `FlexibleOverlayPopoverLocation,`. That line is not in the legacy sources. @angular/cdk/overlay is exercised by projects/ngx-material-legacy/legacy-menu/menu-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/cdk@22.1.7 supplies the change.",
+        "peer_floor": {
+          "package": "@angular/cdk",
+          "installed": "22.1.7",
+          "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+          "delegation": "@angular/cdk/overlay imported by projects/ngx-material-legacy/legacy-menu/menu-module.ts"
+        }
       }
     },
     {
@@ -67972,8 +68173,8 @@
         "src/cdk/overlay/overlay.ts",
         "src/cdk/overlay/public-api.ts"
       ],
-      "diff_sha256": "d58d4d9fa8a8db8611af5730071960127c3f80153ab605fe88e5da3ff6c758e0",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af.json",
+      "diff_sha256": "541e6727c4a5a503e9428fcfbef77b4328548432af9e8e8c64991b6c75f7ed62",
+      "evidence_report": "compatibility/rc/overlay-inherited-original-patches/0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
@@ -67985,6 +68186,44 @@
         "installed": "22.1.7",
         "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
         "delegation": "@angular/cdk/overlay imported by projects/ngx-material-legacy/legacy-menu/menu-module.ts"
+      },
+      "individual_proof": {
+        "proof_kind": "main-overlay-inherited-native",
+        "diff_sha256": "541e6727c4a5a503e9428fcfbef77b4328548432af9e8e8c64991b6c75f7ed62",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Complete upstream diff and current peer/caller source reviewed; focused live packed Chromium behavior and explicit fixture-fault controls are required.",
+        "reachable_behavior": {
+          "kind": "executed-delegation",
+          "id": "overlay-inherited-native/0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af"
+        }
+      },
+      "prior_disposition_record": {
+        "sha": "0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af",
+        "bucket": "behavior-semantic",
+        "subject": "fix(cdk/overlay): add DI token to opt out of popovers (#32306)",
+        "files": [
+          "goldens/cdk/overlay/index.api.md",
+          "src/cdk/overlay/overlay-directives.ts",
+          "src/cdk/overlay/overlay.ts",
+          "src/cdk/overlay/public-api.ts"
+        ],
+        "diff_sha256": "d58d4d9fa8a8db8611af5730071960127c3f80153ab605fe88e5da3ff6c758e0",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/0ca0c3112c762f449673f5cc1f3f4d7e8e3c20af.json",
+        "batch_id": "unread-seed-content-review-2026-10-02",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "inherited",
+        "read_note_disposition": "inherited",
+        "reason": "The diff in src/cdk/overlay/overlay-directives.ts changes `usePopover: FlexibleOverlayPopoverLocation | null = 'global';`. That line is not in the legacy sources. @angular/cdk/overlay is exercised by projects/ngx-material-legacy/legacy-menu/menu-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/cdk@22.1.7 supplies the change.",
+        "peer_floor": {
+          "package": "@angular/cdk",
+          "installed": "22.1.7",
+          "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+          "delegation": "@angular/cdk/overlay imported by projects/ngx-material-legacy/legacy-menu/menu-module.ts"
+        }
       }
     },
     {
@@ -70882,7 +71121,7 @@
       "g11_claim": "not-passed",
       "final_disposition": "not-applicable",
       "read_note_disposition": "complete-documentation-source-identity",
-      "reason": "The datepicker input-element helper comment corrects \u201cfunciton\u201d to \u201cfunction\u201d; complete SSR checks, node-name predicate, signatures and metadata are unchanged. Main previously labeled this typo inherited without behavior proof. It is a documentation-only patch, not an inherited runtime repair or SSR compatibility qualification.",
+      "reason": "The datepicker input-element helper comment corrects “funciton” to “function”; complete SSR checks, node-name predicate, signatures and metadata are unchanged. Main previously labeled this typo inherited without behavior proof. It is a documentation-only patch, not an inherited runtime repair or SSR compatibility qualification.",
       "peer_floor": {
         "package": "@angular/material",
         "installed": "22.1.7",
@@ -70923,7 +71162,7 @@
         "affected_branches": [
           "main"
         ],
-        "decision": "The datepicker input-element helper comment corrects \u201cfunciton\u201d to \u201cfunction\u201d; complete SSR checks, node-name predicate, signatures and metadata are unchanged. Main previously labeled this typo inherited without behavior proof. It is a documentation-only patch, not an inherited runtime repair or SSR compatibility qualification.",
+        "decision": "The datepicker input-element helper comment corrects “funciton” to “function”; complete SSR checks, node-name predicate, signatures and metadata are unchanged. Main previously labeled this typo inherited without behavior proof. It is a documentation-only patch, not an inherited runtime repair or SSR compatibility qualification.",
         "proof_kind": "complete-syntax-and-documentation-review"
       }
     },
@@ -72149,8 +72388,8 @@
         "src/cdk/scrolling/scroll-dispatcher.ts",
         "src/cdk/scrolling/scrollable.ts"
       ],
-      "diff_sha256": "847fee0d58541d35e8c63e3dbb451ae98f36192e449b32e15084022569272a80",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/332f78607b409c7158e7153ef0ed044a09922a99.json",
+      "diff_sha256": "1a463d477de46328dd43376f37836e6fe86063ecf98509f8b4cb8757b16d9b30",
+      "evidence_report": "compatibility/rc/overlay-inherited-original-patches/332f78607b409c7158e7153ef0ed044a09922a99.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
@@ -72162,6 +72401,45 @@
         "installed": "22.1.7",
         "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
         "delegation": "@angular/cdk/overlay imported by projects/ngx-material-legacy/legacy-menu/menu-module.ts"
+      },
+      "individual_proof": {
+        "proof_kind": "main-overlay-inherited-native",
+        "diff_sha256": "1a463d477de46328dd43376f37836e6fe86063ecf98509f8b4cb8757b16d9b30",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Complete upstream diff and current peer/caller source reviewed; focused live packed Chromium behavior and explicit fixture-fault controls are required.",
+        "reachable_behavior": {
+          "kind": "executed-delegation",
+          "id": "overlay-inherited-native/332f78607b409c7158e7153ef0ed044a09922a99"
+        }
+      },
+      "prior_disposition_record": {
+        "sha": "332f78607b409c7158e7153ef0ed044a09922a99",
+        "bucket": "behavior-semantic",
+        "subject": "fix(cdk/scrolling): make it easier to provide custom scrollable (#33269)",
+        "files": [
+          "goldens/cdk/overlay/index.api.md",
+          "goldens/cdk/scrolling/index.api.md",
+          "src/cdk/overlay/position/flexible-connected-position-strategy.ts",
+          "src/cdk/scrolling/scroll-dispatcher.ts",
+          "src/cdk/scrolling/scrollable.ts"
+        ],
+        "diff_sha256": "847fee0d58541d35e8c63e3dbb451ae98f36192e449b32e15084022569272a80",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/332f78607b409c7158e7153ef0ed044a09922a99.json",
+        "batch_id": "unread-seed-content-review-2026-10-02",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "inherited",
+        "read_note_disposition": "inherited",
+        "reason": "The diff in src/cdk/overlay/position/flexible-connected-position-strategy.ts changes `private _scrollables: CdkScrollable[] = [];`. That line is not in the legacy sources. @angular/cdk/overlay is exercised by projects/ngx-material-legacy/legacy-menu/menu-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/cdk@22.1.7 supplies the change.",
+        "peer_floor": {
+          "package": "@angular/cdk",
+          "installed": "22.1.7",
+          "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+          "delegation": "@angular/cdk/overlay imported by projects/ngx-material-legacy/legacy-menu/menu-module.ts"
+        }
       }
     },
     {
@@ -72212,8 +72490,8 @@
         "goldens/cdk/table/index.api.md",
         "src/cdk/table/table.ts"
       ],
-      "diff_sha256": "304a6d456e14c969bb390c7814cef76a0b17124627a7fda1cfc9a84b7bcc1ca8",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/59b8f433c28e81c213668ccf7d220f12e3524635.json",
+      "diff_sha256": "7535ba9015a99e689cb727af4826a91674fae7fdc530d00d000b61292306a6b8",
+      "evidence_report": "compatibility/rc/table-inherited-review/59b8f433c28e81c213668ccf7d220f12e3524635.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
@@ -72225,6 +72503,42 @@
         "installed": "22.1.7",
         "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
         "delegation": "@angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts"
+      },
+      "individual_proof": {
+        "proof_kind": "main-table-inherited-native",
+        "diff_sha256": "7535ba9015a99e689cb727af4826a91674fae7fdc530d00d000b61292306a6b8",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The inherited public renderedRows getter exposed the first, empty and restored row data and indices corresponding to native DOM; no virtual scrolling or OnPush claim. Qualification is limited to the main peer floor, packed artifact and named observations; it does not claim 21.x, complete table behavior, security or G11.",
+        "reachable_behavior": {
+          "kind": "executed-delegation",
+          "id": "table-inherited-native/59b8f433c28e81c213668ccf7d220f12e3524635"
+        }
+      },
+      "prior_disposition_record": {
+        "sha": "59b8f433c28e81c213668ccf7d220f12e3524635",
+        "bucket": "behavior-semantic",
+        "subject": "fix(cdk/table): expose rendered rows (#33304)",
+        "files": [
+          "goldens/cdk/table/index.api.md",
+          "src/cdk/table/table.ts"
+        ],
+        "diff_sha256": "304a6d456e14c969bb390c7814cef76a0b17124627a7fda1cfc9a84b7bcc1ca8",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/59b8f433c28e81c213668ccf7d220f12e3524635.json",
+        "batch_id": "unread-seed-content-review-2026-10-02",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "inherited",
+        "read_note_disposition": "inherited",
+        "reason": "The diff in src/cdk/table/table.ts changes `get renderedRows(): readonly RenderRow<T>[] {`. That line is not in the legacy sources. @angular/cdk/table is exercised by projects/ngx-material-legacy/legacy-table/table.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/cdk@22.1.7 supplies the change.",
+        "peer_floor": {
+          "package": "@angular/cdk",
+          "installed": "22.1.7",
+          "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+          "delegation": "@angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts"
+        }
       }
     },
     {

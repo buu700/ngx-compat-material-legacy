@@ -1,0 +1,203 @@
+diff --git a/goldens/cdk/overlay/index.api.md b/goldens/cdk/overlay/index.api.md
+index b042d46583461bf60b6901652a6dc3e57d51bf77..bfca45f81adfe57d20e6c87973eb9c55ec45a372 100644
+--- a/goldens/cdk/overlay/index.api.md
++++ b/goldens/cdk/overlay/index.api.md
+@@ -77,8 +77,6 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+     // (undocumented)
+     static ngAcceptInputType_push: unknown;
+     // (undocumented)
+-    static ngAcceptInputType_usePopover: unknown;
+-    // (undocumented)
+     ngOnChanges(changes: SimpleChanges): void;
+     // (undocumented)
+     ngOnDestroy(): void;
+@@ -98,7 +96,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+     push: boolean;
+     scrollStrategy: ScrollStrategy;
+     transformOriginSelector: string;
+-    usePopover: boolean;
++    usePopover: FlexibleOverlayPopoverLocation | null;
+     viewportMargin: ViewportMargin;
+     width: number | string;
+     // (undocumented)
+@@ -150,7 +148,7 @@ export interface CdkConnectedOverlayConfig {
+     // (undocumented)
+     transformOriginSelector?: string;
+     // (undocumented)
+-    usePopover?: boolean;
++    usePopover?: FlexibleOverlayPopoverLocation | null;
+     // (undocumented)
+     viewportMargin?: ViewportMargin;
+     // (undocumented)
+@@ -286,7 +284,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {
+     // (undocumented)
+     detach(): void;
+     dispose(): void;
+-    getPopoverInsertionPoint(): Element;
++    getPopoverInsertionPoint(): Element | null;
+     _origin: FlexibleConnectedPositionStrategyOrigin;
+     positionChanges: Observable<ConnectedOverlayPositionChange>;
+     get positions(): ConnectionPositionPair[];
+@@ -298,6 +296,7 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {
+     withFlexibleDimensions(flexibleDimensions?: boolean): this;
+     withGrowAfterOpen(growAfterOpen?: boolean): this;
+     withLockedPosition(isLocked?: boolean): this;
++    withPopoverLocation(location: FlexibleOverlayPopoverLocation): this;
+     withPositions(positions: ConnectedPosition[]): this;
+     withPush(canPush?: boolean): this;
+     withScrollableContainers(scrollables: CdkScrollable[]): this;
+@@ -311,6 +310,9 @@ export type FlexibleConnectedPositionStrategyOrigin = ElementRef | Element | (Po
+     height?: number;
+ });
+ 
++// @public
++export type FlexibleOverlayPopoverLocation = 'global' | 'inline';
++
+ // @public
+ export class FullscreenOverlayContainer extends OverlayContainer implements OnDestroy {
+     constructor(...args: unknown[]);
+diff --git a/src/cdk/overlay/overlay-directives.ts b/src/cdk/overlay/overlay-directives.ts
+index 83ccf2a008c92088c5a9e19d9d0be7221f64df4a..15bb05889834ff2fbcdfb11d72f5ed658a1c727a 100644
+--- a/src/cdk/overlay/overlay-directives.ts
++++ b/src/cdk/overlay/overlay-directives.ts
+@@ -38,6 +38,7 @@ import {
+   createFlexibleConnectedPositionStrategy,
+   FlexibleConnectedPositionStrategy,
+   FlexibleConnectedPositionStrategyOrigin,
++  FlexibleOverlayPopoverLocation,
+ } from './position/flexible-connected-position-strategy';
+ import {createRepositionScrollStrategy, ScrollStrategy} from './scroll/index';
+ 
+@@ -127,7 +128,7 @@ export interface CdkConnectedOverlayConfig {
+   growAfterOpen?: boolean;
+   push?: boolean;
+   disposeOnNavigation?: boolean;
+-  usePopover?: boolean;
++  usePopover?: FlexibleOverlayPopoverLocation | null;
+   matchWidth?: boolean;
+ }
+ 
+@@ -251,8 +252,8 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+   disposeOnNavigation: boolean = false;
+ 
+   /** Whether the connected overlay should be rendered inside a popover element or the overlay container. */
+-  @Input({alias: 'cdkConnectedOverlayUsePopover', transform: booleanAttribute})
+-  usePopover: boolean = false;
++  @Input({alias: 'cdkConnectedOverlayUsePopover'})
++  usePopover: FlexibleOverlayPopoverLocation | null = null;
+ 
+   /** Whether the overlay should match the trigger's width. */
+   @Input({alias: 'cdkConnectedOverlayMatchWidth', transform: booleanAttribute})
+@@ -377,7 +378,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+       scrollStrategy: this.scrollStrategy,
+       hasBackdrop: this.hasBackdrop,
+       disposeOnNavigation: this.disposeOnNavigation,
+-      usePopover: this.usePopover,
++      usePopover: !!this.usePopover,
+     });
+ 
+     if (this.height || this.height === 0) {
+@@ -423,7 +424,8 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+       .withGrowAfterOpen(this.growAfterOpen)
+       .withViewportMargin(this.viewportMargin)
+       .withLockedPosition(this.lockPosition)
+-      .withTransformOriginOn(this.transformOriginSelector);
++      .withTransformOriginOn(this.transformOriginSelector)
++      .withPopoverLocation(this.usePopover === 'global' ? 'global' : 'inline');
+   }
+ 
+   /** Returns the position strategy of the overlay to be set on the overlay config */
+diff --git a/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts b/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts
+index bfb472aff4d63b060e5254efddcb62b6ff608950..4a49f6b30f2b9c4175de0c238c4ffcae24d1cba4 100644
+--- a/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts
++++ b/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts
+@@ -2964,17 +2964,16 @@ describe('FlexibleConnectedPositionStrategy', () => {
+       originElement = createPositionedBlockElement();
+       document.body.appendChild(originElement);
+ 
+-      positionStrategy = createFlexibleConnectedPositionStrategy(
+-        injector,
+-        originElement,
+-      ).withPositions([
+-        {
+-          overlayX: 'start',
+-          overlayY: 'top',
+-          originX: 'start',
+-          originY: 'bottom',
+-        },
+-      ]);
++      positionStrategy = createFlexibleConnectedPositionStrategy(injector, originElement)
++        .withPopoverLocation('inline')
++        .withPositions([
++          {
++            overlayX: 'start',
++            overlayY: 'top',
++            originX: 'start',
++            originY: 'bottom',
++          },
++        ]);
+     });
+ 
+     afterEach(() => {
+diff --git a/src/cdk/overlay/position/flexible-connected-position-strategy.ts b/src/cdk/overlay/position/flexible-connected-position-strategy.ts
+index 7816b5f0c86b232aa53b5f1322268ce51c964ddf..8381a415d568938c48b54074a92a304b811ceb57 100644
+--- a/src/cdk/overlay/position/flexible-connected-position-strategy.ts
++++ b/src/cdk/overlay/position/flexible-connected-position-strategy.ts
+@@ -63,6 +63,9 @@ export function createFlexibleConnectedPositionStrategy(
+   );
+ }
+ 
++/** Supported locations in the DOM for connected overlays. */
++export type FlexibleOverlayPopoverLocation = 'global' | 'inline';
++
+ /**
+  * A strategy for positioning overlays. Using this strategy, an overlay is given an
+  * implicit position relative some origin element. The relative position is defined in terms of
+@@ -158,6 +161,9 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {
+   /** Amount by which the overlay was pushed in each axis during the last time it was positioned. */
+   private _previousPushAmount: {x: number; y: number} | null;
+ 
++  /** Configures where in the DOM to insert the overlay when popovers are enabled. */
++  private _popoverLocation: FlexibleOverlayPopoverLocation = 'global';
++
+   /** Observable sequence of position changes. */
+   positionChanges: Observable<ConnectedOverlayPositionChange> = this._positionChanges;
+ 
+@@ -511,8 +517,24 @@ export class FlexibleConnectedPositionStrategy implements PositionStrategy {
+     return this;
+   }
+ 
++  /**
++   * Determines where in the DOM the overlay will be rendered when popover mode is enabled.
++   * @param location Configures the location in the DOM. Supports the following values:
++   *  - `global` - The default which inserts the overlay inside the overlay container.
++   *  - `inline` - Inserts the overlay next to the trigger.
++   */
++  withPopoverLocation(location: FlexibleOverlayPopoverLocation): this {
++    this._popoverLocation = location;
++    return this;
++  }
++
+   /** @docs-private */
+-  getPopoverInsertionPoint(): Element {
++  getPopoverInsertionPoint(): Element | null {
++    // Return null so it falls back to inserting into the overlay container.
++    if (this._popoverLocation === 'global') {
++      return null;
++    }
++
+     const origin = this._origin;
+ 
+     if (origin instanceof ElementRef) {
+diff --git a/src/cdk/overlay/public-api.ts b/src/cdk/overlay/public-api.ts
+index b76ed82361ae78739422861f8f4c997e8f4734e3..729dee69c4650e1ff32c0990747f45702a28349f 100644
+--- a/src/cdk/overlay/public-api.ts
++++ b/src/cdk/overlay/public-api.ts
+@@ -32,6 +32,7 @@ export {
+   createGlobalPositionStrategy,
+ } from './position/global-position-strategy';
+ export {
++  FlexibleOverlayPopoverLocation,
+   ConnectedPosition,
+   FlexibleConnectedPositionStrategy,
+   FlexibleConnectedPositionStrategyOrigin,
