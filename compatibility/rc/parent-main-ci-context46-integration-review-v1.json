@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "role": "Root finite main CI context source integration review",
+  "parent": "6cce5a4079990ec09859c57f597771168cb3f5a0",
+  "proposal_sha256": "797ac9f3dfb584774927a8bb99592dcd8612734469bf47c8fc0484c0e2170927",
+  "afterimages": {
+    "compatibility/rc/parent-main-ci-context46-source-v1.json": "b330d049619a767f53695af50539e48f0be7d0d5235e4cf148fe91f626c68db6",
+    "tests/upstream_main_ci_context46_probe.mjs": "8862d63b24ae38adbd69af1ec3a35bae00837e81a004a1f4442069f36c049056",
+    "tests/test_upstream_main_ci_context46.py": "4641d9b5ca27c0efd515b1799975dde3ce7a8d60981f45c8ba167e6005eb9184",
+    "scripts/upstream-build-scope-evidence.mjs": "396e117e2581c239a98c850891ee6c3c499b888b2edc6c24ade15a30a6ac8850",
+    "scripts/upstream-test-consolidation-evidence.mjs": "23c38302e8d475d34f78105b2819b50036fd708930f294baa401b23b9eba049b"
+  },
+  "immutable_protected_before_and_after": {
+    "compatibility/rc/packed-upstream-source-build-main-e184.json": "ffe8ee63051473d9adf28142e30dcbaddb5ed156f71de92a8e1dc2e43efbed6d",
+    "compatibility/rc/c04-main32-consolidation-source-v1.json": "ac2ed346e6b1cb72ed27529a356a3e18b85e7a2f5b6c74d2d3db29e814b0f082",
+    "compatibility/f10/disposition-ledger/ledger.json": "fcc693c9773513666c0e9b487507613eb59cb6786bc7db364e46699fecf5cbc4"
+  },
+  "independent_review": {
+    "sha256": "0b5369d6e26720b7a7263138e876219593fb15f35ff6f8592a9dacd20fe68cdf",
+    "text": "# Independent CI context 46 review\n\nBase 6cce5a4079990ec09859c57f597771168cb3f5a0; original v2 patch SHA-256 0246469e2aabc3814e02f1d5b5990ff8c9985ccb1bd2b383c6020fc92f8138f1 was held pending correction. Independently confirmed the old report, consolidation report and current ledger hashes in the author fixture match manifest and were not modified. Git 8baa761eca624c9d71293c3d31750a2b3fdeebf0 -> 4b4893f56cbb5ce91cf698ec75449ba5e5e10943 changes the workflow, flake, and new CI review. Actual Git old flake and workflow hashes equal the historical report; the proposed Git commit/tree/blob frame verifies old and current identities. It is a source-context proof, not execution of Chromium CI, product/runtime, advisory, security or G11.\n\nTwo v2 deficiencies were reproduced and reported before integration: (1) a reader returning the legitimate second CI-review read while changing an already-swept flake source made the 14-entry predicate return true; (2) a forged own build-helper source via reader was not checked by the direct 14-entry route, although the 32-entry path checked helper image. The author is preparing a successor with callback-free final physical sweeps and helper-image binding. No v2 admission is recommended.\n\nFinal v4 patch SHA-256 797ac9f3dfb584774927a8bb99592dcd8612734469bf47c8fc0484c0e2170927; manifest 267a1b1bc47a74ff57cfd7249df635f9d3b55b048d5ccba9b7667c9572cc8679. Independently verified its five source images match the manifest and reverse apply check passes. Original build report ffe8ee63051473d9adf28142e30dcbaddb5ed156f71de92a8e1dc2e43efbed6d, consolidation report ac2ed346e6b1cb72ed27529a356a3e18b85e7a2f5b6c74d2d3db29e814b0f082, and canonical ledger fcc693c9773513666c0e9b487507613eb59cb6786bc7db364e46699fecf5cbc4 remain untouched. The new frame authenticates current CI afterimages against commit/tree/blob identities; other 68 context inputs and 1,143 product files remain matched to their existing source context.\n\nV3 corrected the two v2 issues by capturing reader observations and sweeping them from physical regular files after all callbacks, with import-time loaded image comparison for the build helper. Independent disposable physical tests confirmed rejection of both the original late write during the final CI-review callback and forged direct build-helper input. A further v3 test exposed that mutating the consolidation helper's physical bytes after import still passed because that image was first read at the end. V4 adds its own import-time image comparison and the actual disposable mutation now fails. These observations are source-freshness controls, not a concurrency or security certification.\n\nIndependently ran pinned Node 24.21.0 `python3 -m unittest tests.test_upstream_main_ci_context46 tests.test_upstream_test_consolidation_main_successor` on exact v4 source: two tests passed in 56.324 s. The first covers 14 build and 32 consolidation positive entries and 15 reported negative controls. Also tested that the old main flake/workflow images still validate under v3's unchanged build helper. On the available actual 21.x checkout, both pre-change and candidate build predicates returned false against its current context, so that comparison is not a positive 21.x qualification. The shared reader now also rejects inconsistent repeated callback returns on older routes, so avoid claiming the historical code path is literally unmodified.\n\nNo remaining material blocker identified for this finite main CI source-context transition. No CI Actions, actual packed/native/runtime, security/advisory, 21.x or G11 pass is claimed.\n"
+  },
+  "full_checker_comparison": {
+    "sha256": "e4196f450f71f3642d6a42533a030647d062acf0a0e2495527ac03ddb6850b32",
+    "data": {
+      "baseline_exit": 1,
+      "proposed_exit": 1,
+      "baseline_evidence_failures": 85,
+      "proposed_evidence_failures": 39,
+      "evidence_failures_removed": [
+        "032c2e194d0fc8d1f30a2962fe85baf406a6c1db",
+        "126e4ec8869507ca449db1365a0b061c8713f9d8",
+        "12df13a5432992934b7a20a1e5d9f3c45e11e862",
+        "1c223d9ebff38a9fca38af554b601f121df7d99e",
+        "207bc6cd48279538c58f6e275f5e758f940dee9e",
+        "24c7435e91ede859d4edb60fe2c27dd7e874c13f",
+        "2c08c6cded0cd623502c0665ed99353bd62289da",
+        "30905b6bf15d61d525800244059a16083ceb31cc",
+        "33ba7d4dde614b7d40ad6a57d9aefd16555e3d7b",
+        "473113e151f7e11ee9617a788958ee70b5ac6fed",
+        "5050b3e2c564cba10f45b836eb51746399507206",
+        "518ac69a7e0f787327e971c710a13bb2da6461cc",
+        "5373ced467ba58315abf22bc96c0c24583467776",
+        "543abe24e4c78bcfafa3d2b36868f45e51d57b82",
+        "5d27e7c0b454ef721b7a4dfdf99e18884f690378",
+        "69a2ea8d0ac2eed1e6e7135b5f063c034578a1df",
+        "6a1fa58ffda06c908ba3df0f74c299cdd545f4b9",
+        "6e859d35c690e9a66ab90571f7a31d43bce1cce1",
+        "6fa655c99756abcd7e7c80040cc72e4aa98a4df5",
+        "74ef04bf050475a3bb62824f977d11e8492d7263",
+        "7af0f92fc5dd112933f096c18d3f1dfea4b8f052",
+        "7c1fbf0bd7771fc738dc85e075457abf3f551514",
+        "7c7a1df02470b6333a9423d7a294e76fdb9f67b3",
+        "7ca079a3f6d8a873c3d657b7eb8155435cd65be2",
+        "7da89fd27bea769716add8aa36f7907bd72c516d",
+        "8648903a22f1f013448bf4285e61e9a08b5c0383",
+        "8c35b62f65ed6cb9f56d9ad32ca558bb482c1e12",
+        "90db7c6b751e3a8954c231b2c055e5f52e0fd580",
+        "a41ce098b0eb4e56c05f3ac596aa97fd5a5d53ab",
+        "ae9678df4b22be90ae27cec25224e364e91963f5",
+        "b5d4de9794cd6c826a9a2d4fb27e7e9e3cb884ac",
+        "bff5283469258fc90ad9eddbd31cab829d7ebfdf",
+        "c1b6e3fc9df114ee5c5588b0f9aa1abb30ecf08d",
+        "c5df291f42379617afe038f0d50449a3c97633ed",
+        "c9a9dc8127acebe83f1ae592a9725e753de85bbf",
+        "cf4e16b03e0f3474e4a2343c03413b271936aa65",
+        "d2e154c60cc124b882d0afd26256034bd3e22489",
+        "d4243ac081e963ad12da002388245abdc129e18e",
+        "d52f04127f5931d9b0587ca129b02ad0a4fd41c4",
+        "d67ac1f67efab6460f7a9544cb423aac5d6cd325",
+        "e1514fbe829af2a0630db7223bad2268dd0da407",
+        "e500a8ea9ad5043dd2775b39e395204b5cbdb78b",
+        "eab085a2d80124c201405530d51df148db44d8b9",
+        "efea6041e057607efbfa4ec7caf0d2952150038f",
+        "fb6e6614d9ba22afd96e683f76a7300a563036d6",
+        "ff4f9a093715b9552f2c2dfa1cb69656c70db182"
+      ],
+      "evidence_failures_added": [],
+      "removed_equals_exact_14_plus_32": true,
+      "review_categories": {
+        "sensitive": {
+          "removed": [
+            "5d27e7c0b454ef721b7a4dfdf99e18884f690378",
+            "ae9678df4b22be90ae27cec25224e364e91963f5",
+            "b5d4de9794cd6c826a9a2d4fb27e7e9e3cb884ac",
+            "e500a8ea9ad5043dd2775b39e395204b5cbdb78b"
+          ],
+          "added": []
+        },
+        "inherited": {
+          "removed": [],
+          "added": []
+        },
+        "behavior": {
+          "removed": [],
+          "added": []
+        },
+        "branch_applicability": {
+          "removed": [],
+          "added": []
+        }
+      },
+      "artifact_behavior_evidence_unchanged": true,
+      "inherited_execution_evidence_unchanged": true,
+      "interpretation": "Four source-review-sensitive deficiency labels clear because their source evidence returns; no security clearance or runtime qualification."
+    }
+  },
+  "root_canonical_probe": {
+    "builds": 14,
+    "consolidations": 32,
+    "context_records": 70,
+    "product_paths": 1143,
+    "negative_controls": 15,
+    "source_only": true,
+    "security_runtime_g11": false
+  },
+  "technical_scope": [
+    "Authenticate exact Git8baa-to4b Chromium CI change for two changed members among70 context records; remaining68 context records and all1143 project paths stay exact.",
+    "Keep original14buildscope and32consolidation reports and ledger byte-identical.",
+    "Both helper routes recheck supplied-reader observations using a final callback-free physical regular-member sweep; loaded helper source images are checked.",
+    "Independent reviewer reproduced/rejected late physical flake mutation on final review callback, forged direct helper image and physical consolidation-source drift after module import.",
+    "Root ran maintained46subject/15negative probe on canonical source and rehashed every new/changed and protected file against reviewed manifest."
+  ],
+  "limits": [
+    "Full checker pair remained exit1; exact46evidence failures removed, no new evidence failures. Material behavior and inherited execution evidence unchanged.",
+    "Four sensitive source-label deficiencies clear as a consequence of these source reviews; this is not security clearance.",
+    "No runtime, packed current-source verifier, Actions,21.x,G11 or release-readiness claim.",
+    "Future project-source changes require their own finite source qualification; this authenticates only the reviewed CI delta."
+  ]
+}

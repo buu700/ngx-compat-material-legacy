@@ -9,6 +9,9 @@
  */
 import {createHash} from 'node:crypto';
 import assert from 'node:assert/strict';
+import {lstatSync, readFileSync} from 'node:fs';
+import {dirname, join, resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
 
 export const BUILD_SCOPE_ROLE = 'C04 finite individual source-scope reviews of fourteen upstream build SHAs';
 export const BUILD_SCOPE_PATCHES = Object.freeze({
@@ -31,10 +34,59 @@ const contextPaths=['package.json','pnpm-lock.yaml','pnpm-workspace.yaml','proje
   'projects/ngx-material-legacy/ng-package.json','projects/ngx-material-legacy/tsconfig.lib.json','scripts/pack-library.mjs',
   'chainman.toml','chainman.lock','flake.nix','.github/workflows/ci.yml'];
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+const sourceRoot=resolve(dirname(fileURLToPath(import.meta.url)),'..');
+const loadedBuildSource=readFileSync(fileURLToPath(import.meta.url));
+
+// A callback may mutate an earlier member while returning an authentic later
+// member. Re-read all callback observations physically after the last callback.
+export function ciCaptureReader(delegate) {
+  const seen=new Map();
+  return {read(path){const bytes=delegate(path);assert.ok(Buffer.isBuffer(bytes));const previous=seen.get(path);if(previous)assert.deepEqual(bytes,previous);else seen.set(path,Buffer.from(bytes));return bytes;},
+    close(){for(const [path,expected] of seen){assert.equal(typeof path,'string');assert.ok(!path.includes('\\'));const parts=path.split('/');assert.ok(parts.every(part=>part&&part!=='.'&&part!=='..'));let member=sourceRoot;for(const part of parts){member=join(member,part);assert.ok(!lstatSync(member).isSymbolicLink());}assert.ok(lstatSync(member).isFile());assert.deepEqual(readFileSync(member),expected);}}};
+}
+
 const isBazel=path=>path.endsWith('.bazel')||path.endsWith('.bzl')||path==='.bazelrc';
+
+// Immutable Git objects bind the reviewed 8baa -> 4b CI change. Historical
+// reports retain their old context; only these two current afterimages project
+// into the pre-existing finite build predicate.
+const CI_FRAME='compatibility/rc/parent-main-ci-context46-source-v1.json';
+const CI_FRAME_SHA='b330d049619a767f53695af50539e48f0be7d0d5235e4cf148fe91f626c68db6';
+const gitOid=(kind,bytes)=>createHash('sha1').update(Buffer.from(`${kind} ${bytes.length}\0`)).update(bytes).digest('hex');
+function ciContextSuccessor(readRepo,context) {
+  const frameBytes=readRepo(CI_FRAME);assert.equal(hash(frameBytes),CI_FRAME_SHA);
+  const frame=JSON.parse(frameBytes);assert.equal(frame.schema_version,1);
+  assert.equal(frame.base,'8baa761eca624c9d71293c3d31750a2b3fdeebf0');
+  assert.equal(frame.after,'4b4893f56cbb5ce91cf698ec75449ba5e5e10943');
+  assert.deepEqual(frame.paths,['flake.nix','.github/workflows/ci.yml']);
+  const lookup=(item,path)=>{
+    const commit=Buffer.from(item.commit_base64,'base64');
+    const text=commit.toString('utf8'), root=/^tree ([0-9a-f]{40})$/m.exec(text);assert.ok(root);
+    let oid=root[1];const names=path.split('/');
+    for(const name of names){
+      const tree=Buffer.from(item.trees[oid]||'', 'base64');assert.ok(tree.length);assert.equal(gitOid('tree',tree),oid);
+      let pos=0,found=null;while(pos<tree.length){const zero=tree.indexOf(0,pos);assert.ok(zero>=pos);const header=tree.subarray(pos,zero).toString('utf8');const space=header.indexOf(' ');assert.ok(space>0&&zero+21<=tree.length);const child=tree.subarray(zero+1,zero+21).toString('hex');if(header.slice(space+1)===name){assert.equal(found,null);found=child;}pos=zero+21;}
+      assert.ok(found);oid=found;
+    }return oid;
+  };
+  const before=frame.git[frame.base],after=frame.git[frame.after];
+  for(const [id,item] of [[frame.base,before],[frame.after,after]])assert.equal(gitOid('commit',Buffer.from(item.commit_base64,'base64')),id);
+  assert.match(Buffer.from(after.commit_base64,'base64').toString('utf8'),new RegExp(`^parent ${frame.base}$`,'m'));
+  for(const path of frame.paths){
+    const old=before.blobs[path],next=after.blobs[path],record=context.files.find(r=>r.path===path);
+    assert.ok(record);assert.equal(lookup(before,path),old.oid);assert.equal(lookup(after,path),next.oid);
+    assert.equal(record.sha256,old.sha256);assert.equal(record.bytes,old.bytes);
+    const actual=readRepo(path);assert.equal(actual.length,next.bytes);assert.equal(hash(actual),next.sha256);assert.equal(gitOid('blob',actual),next.oid);
+  }
+  assert.equal(frame.review_path,'compatibility/rc/parent-main-ci-browser-pin-review-v1.json');
+  const rr=after.blobs[frame.review_path],raw=readRepo(frame.review_path);assert.equal(lookup(after,frame.review_path),rr.oid);assert.equal(gitOid('blob',raw),rr.oid);assert.equal(hash(raw),rr.sha256);assert.equal(raw.length,rr.bytes);
+  const review=JSON.parse(raw);assert.equal(review.parent,frame.base);assert.equal(review.independent_review.sha256,'17e30f3484ddb0eaad78c2502b06c6337229537a4d2d58ab1597c1318a36b972');
+  return {frame,frameBytes,reviewBytes:raw};
+}
 
 export function buildScopeEvidenceOk(body,entry,readRepo,currentProductPaths) {
   try {
+    const captured=ciCaptureReader(readRepo);readRepo=captured.read;
     assert.equal(body.role,BUILD_SCOPE_ROLE);assert.equal(body.g11_claim,'not-passed');
     const mainOnly=body.scope_format==='main-source-scope-v1';
     if(mainOnly){
@@ -61,9 +113,16 @@ export function buildScopeEvidenceOk(body,entry,readRepo,currentProductPaths) {
     assert.ok(line);assert.equal(body.line,line);assert.equal(context.line,line);
     assert.deepEqual(context.files.map(r=>r.path).sort(),[...contextPaths].sort());
     assert.equal(new Set(context.files.map(r=>r.path)).size,contextPaths.length);
-    for(const record of [...context.files,...context.product_members]) {
-      const bytes=readRepo(record.path);assert.ok(Buffer.isBuffer(bytes));
-      assert.equal(hash(bytes),record.sha256);assert.equal(bytes.length,record.bytes);
+    let ciSuccessor=null;
+    if(mainOnly) {
+      const current=readRepo('flake.nix');
+      if(hash(current)!==context.files.find(r=>r.path==='flake.nix').sha256)ciSuccessor=ciContextSuccessor(readRepo,context);
+    }
+    const sourceRecords=[...context.files,...context.product_members,...(mainOnly?body.additional_graph_context.files:[])];
+    const currentRecord=record=>ciSuccessor&&ciSuccessor.frame.paths.includes(record.path)?ciSuccessor.frame.git[ciSuccessor.frame.after].blobs[record.path]:record;
+    for(const record of sourceRecords) {
+      const expected=currentRecord(record),bytes=readRepo(record.path);assert.ok(Buffer.isBuffer(bytes));
+      assert.equal(hash(bytes),expected.sha256);assert.equal(bytes.length,expected.bytes);
     }
     assert.deepEqual(context.tracked_product_paths,currentProductPaths);
     assert.equal(hash(Buffer.from(currentProductPaths.join('\n')+'\n')),context.tracked_product_paths_sha256);
@@ -89,6 +148,15 @@ export function buildScopeEvidenceOk(body,entry,readRepo,currentProductPaths) {
     assert.deepEqual(entry.individual_proof,{diff_sha256:review.diff_sha256,review_depth:'individual-compatibility',proof_kind:'individual-source-scope',affected_branches:branches,decision:review.decision});
     assert.equal(entry.reason,review.decision);assert.equal(entry.source_check.patch_path,review.patch_file);
     assert.equal(entry.source_check.review_membership,entry.sha);
+    // Recheck after every producer callback, so a late source change cannot
+    // leave a mixed before/after image qualified by the earlier sweep.
+    if(ciSuccessor){
+      for(const record of sourceRecords){const expected=currentRecord(record),bytes=readRepo(record.path);assert.equal(hash(bytes),expected.sha256);assert.equal(bytes.length,expected.bytes);}
+      assert.deepEqual(readRepo(CI_FRAME),ciSuccessor.frameBytes);
+      assert.deepEqual(readRepo(ciSuccessor.frame.review_path),ciSuccessor.reviewBytes);
+      assert.deepEqual(readRepo('scripts/upstream-build-scope-evidence.mjs'),loadedBuildSource);
+      captured.close();
+    }
     return true;
   } catch { return false; }
 }

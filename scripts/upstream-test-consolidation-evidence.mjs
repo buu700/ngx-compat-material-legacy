@@ -8,12 +8,15 @@
 import assert from 'node:assert/strict';
 import {qualifyIndependentSnackProductDelta} from './snack-dom-source-context.mjs';
 import {createHash} from 'node:crypto';
+import {readFileSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
 import {gunzipSync} from 'node:zlib';
 import {analyzeSharedTestMove,bazelProductionCalls} from './upstream-test-consolidation-analysis.mjs';
-import {buildScopeEvidenceOk} from './upstream-build-scope-evidence.mjs';
+import {buildScopeEvidenceOk,ciCaptureReader} from './upstream-build-scope-evidence.mjs';
 import {qualifiedCurrentConsolidationSources} from './harness-animation-preparation-evidence.mjs';
 import {HISTORICAL_CONSOLIDATION_CAPSULE, retainedConsolidationSources,
   individualConsolidationScope} from './upstream-test-consolidation-historical.mjs';
+const loadedConsolidationSource=readFileSync(fileURLToPath(import.meta.url));
 export const TEST_CONSOLIDATION_ROLE='C04 finite original32 shared harness consolidation source review';
 export const TEST_CONSOLIDATION_CAPSULE='compatibility/rc/upstream-test-consolidation-subjects.json';
 export const TEST_CONSOLIDATION_CAPSULE_SHA256='5fd4dc58c2365c659696d4e9f6927a02184f868db043a7055a3bf1afcdebf989';
@@ -143,6 +146,7 @@ function mainSuccessorBound(body,readRepo,entry){
 /** Authenticate the complete batch and both-line ownership context once per invocation. */
 export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
   try{
+    const captured=ciCaptureReader(readRepo);readRepo=captured.read;
     assert.equal(body.role,TEST_CONSOLIDATION_ROLE);assert.equal(body.g11_claim,'not-passed');
     const mainSuccessor=Object.hasOwn(body,'main_current_context');if(mainSuccessor)assert.ok(mainSuccessorBound(body,readRepo));
     const product=JSON.parse(readRepo('projects/ngx-material-legacy/package.json'));
@@ -161,6 +165,14 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
     }else assert.ok(['compatibility/f10/disposition-ledger/evidence/closeout-fourteen-build-scope-review.json',
       'compatibility/rc/chip-source-scope-requalification-build.json',
       'compatibility/rc/tab-adapter-product-inventory-build.json'].includes(contextPath));
+    // The CI afterimage transition is a finite successor of the original 14
+    // scope, not a general override for an old or substituted build helper.
+    const ciCurrent=mainSuccessor && hash(readRepo('flake.nix'))==='a161c9773fdb018e4a1a7befdb5962c1f4e818d73ae259b4242673bad1115556';
+    const checkCiBuildImage=()=>{
+      assert.equal(hash(readRepo('scripts/upstream-build-scope-evidence.mjs')),'396e117e2581c239a98c850891ee6c3c499b888b2edc6c24ade15a30a6ac8850');
+      assert.equal(hash(Buffer.from(buildScopeEvidenceOk.toString())),'ca2ac9c2afa6c7e7e94c0b9cfe3a770fcf59046feb975d7afe9a031cc254a7b6');
+    };
+    if(ciCurrent)checkCiBuildImage();
     const contextBytes=readRepo(contextPath);assert.equal(hash(contextBytes),mainSuccessor?body.main_current_context.build_report.sha256:body.candidate_context.sha256);
     const context=JSON.parse(contextBytes),ledger=JSON.parse(readRepo('compatibility/f10/disposition-ledger/ledger.json'));
     const contextEntry=ledger.entries.find(e=>e.sha===context.scope_sha_ids[0]);assert.ok(contextEntry);
@@ -189,6 +201,14 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
       }
       assert.equal(row.review_depth,result.exact_test_body_and_fixture_relocation?'bounded-exact-test-relocation':'individual-compatibility');
       assert.ok(typeof row.decision==='string'&&row.decision.length>=120);
+    }
+    if(ciCurrent){
+      checkCiBuildImage();
+      assert.ok(buildScopeEvidenceOk(context,contextEntry,readRepo,currentProductPaths),
+        'CI successor changed during consolidation callbacks');
+      checkCiBuildImage();
+      assert.deepEqual(readRepo('scripts/upstream-test-consolidation-evidence.mjs'),loadedConsolidationSource);
+      captured.close();
     }
     return true;
   }catch{return false;}
