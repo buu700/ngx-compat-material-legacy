@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "role": "Current menu caller strict source-emission runtime observation; no generic admission",
+  "source_commit": "fdcdadee28c4552e3500b5099de9f42e456adb5c",
+  "integration_record": {
+    "path": "compatibility/rc/parent-main-common-module-surface-review-v1.json",
+    "sha256": "54b03be88958c17a3dc7653b4e9ad4fef0fe4dac653fbf6b3f0317c7fd9fc6e6"
+  },
+  "tarball_sha256": "2828f71233d13791de86971a6d18bdc35d88d8285a9c0ed30ad624a8dff9fbe1",
+  "producer_and_output": [
+    {
+      "role": "emitter",
+      "sha256": "8c43f3401706bbd267172cf0240b404cee3d13a13a8a0ca8c760b47cb5861e5b",
+      "exact_bytes_utf8": "/** @license Copyright Google LLC All Rights Reserved. Copyright (c) 2026 Ryan Lester. MIT license in LICENSE. */\nimport ts from './workspace/node_modules/typescript/lib/typescript.js';import{readFileSync,writeFileSync,mkdirSync,copyFileSync}from'node:fs';import{createHash}from'node:crypto';import{resolve,dirname,relative}from'node:path';import{pathToFileURL}from'node:url';\nconst root=resolve('.'),dest=resolve(root,'worker-semantic'),sourceRoot=resolve(root,'projects/ngx-material-legacy');\nconst options={target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,moduleResolution:ts.ModuleResolutionKind.Bundler,experimentalDecorators:true,strict:true,strictPropertyInitialization:false,noImplicitOverride:true,skipLibCheck:false,types:[],rootDir:root,outDir:dest,paths:{'@ngx-compat/material-legacy/*':[sourceRoot+'/*/public-api.ts']}};\nconst program=ts.createProgram([sourceRoot+'/legacy-menu/public-api.ts'],options);const diagnostics=ts.getPreEmitDiagnostics(program);if(diagnostics.length)throw Error(ts.formatDiagnostics(diagnostics,{getCanonicalFileName:x=>x,getCurrentDirectory:()=>root,getNewLine:()=> '\\n'}));let emitted=0;\nconst result=program.emit(undefined,(filename,text,bom,error,sources)=>{if(!filename.endsWith('.js'))return;const path=sources[0].fileName;const rewritten=text.replace(/(from\\s+[\"'])([^\"']+)([\"'])/g,(_,prefix,spec,suffix)=>{if(!spec.startsWith('.')&&!spec.startsWith('@ngx-compat/material-legacy/'))return prefix+spec+suffix;const target=ts.resolveModuleName(spec,path,options,ts.sys).resolvedModule?.resolvedFileName;if(!target?.startsWith(sourceRoot)||!target.endsWith('.ts'))throw Error('unresolved '+path+' '+spec);return prefix+pathToFileURL(resolve(dest,relative(root,target).replace(/\\.ts$/,'.mjs'))).href+suffix;});const out=resolve(dest,relative(root,path).replace(/\\.ts$/,'.mjs'));mkdirSync(dirname(out),{recursive:true});writeFileSync(out,rewritten);emitted++;});if(result.emitSkipped)throw Error('emit skipped');copyFileSync(resolve(root,'tests/menu_caller_subject.mjs'),resolve(dest,'menu-worker.mjs'));const sources=program.getSourceFiles().filter(f=>f.fileName.startsWith(sourceRoot+'/')).map(f=>({path:relative(root,f.fileName),sha256:createHash('sha256').update(readFileSync(f.fileName)).digest('hex')})).sort((a,b)=>a.path.localeCompare(b.path));console.log(JSON.stringify({emitted,diagnostics:diagnostics.length,sources,scope:'test-only complete semantic TypeScript program, no Angular AOT or native browser'}));\n"
+    },
+    {
+      "role": "worker",
+      "sha256": "6f34ea04850d5a733b3151da62e7efe713243a2d2947074be5896deb9c1ee15a",
+      "exact_bytes_utf8": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n/** Actual owned/tagged constructors and decorator objects; node/CDR/zone payloads are protocols. */\nimport assert from 'node:assert/strict';\nconst [line,mode]=process.argv.slice(2);\nawait import('@angular/compiler');\nconst core=await import('@angular/core'),peer=await import('@angular/material/menu'),a11y=await import('@angular/cdk/a11y');\nif(mode==='production')core.enableProdMode();\nconst api=line==='original'?await import('@angular/material/legacy-menu'):await import('./projects/ngx-material-legacy/legacy-menu/public-api.mjs');\nconst Menu=api.MatLegacyMenu,Item=api.MatLegacyMenuItem,Content=api.MatLegacyMenuContent,Trigger=api.MatLegacyMenuTrigger;\nconst cases=[],observations={configs:[],items:[],content:[],tokens:[]},classes=new Set();\nconst host={className:'',classList:{add(...v){v.forEach(x=>classes.add(x));},remove(...v){v.forEach(x=>classes.delete(x));}},getAttribute(){return null;},setAttribute(){},removeAttribute(){},addEventListener(){},removeEventListener(){},focus(){},cloneNode(){return{textContent:' Label ',querySelectorAll(){return[];}};}};\nconst element=new core.ElementRef(host),detector={markForCheck(){},detectChanges(){}},zone={run:f=>f(),runOutsideAngular:f=>f(),onStable:new core.EventEmitter()};\nconst configs=[{xPosition:'after',yPosition:'below',overlapTrigger:true},{xPosition:'before',yPosition:'above',overlapTrigger:false,hasBackdrop:false,backdropClass:'backdrop',overlayPanelClass:['one','two']},{xPosition:'after',yPosition:'above',overlapTrigger:false,hasBackdrop:true,overlayPanelClass:'pane'},{xPosition:'before',yPosition:'below',overlapTrigger:true,overlayPanelClass:''}];\nfor(let i=0;i<configs.length;i++){\n const config=Object.freeze(configs[i]),menu=new Menu(element,zone,config,detector);assert.equal(menu.xPosition,config.xPosition);assert.equal(menu.yPosition,config.yPosition);assert.equal(menu.overlapTrigger,config.overlapTrigger);assert.equal(menu.hasBackdrop,config.hasBackdrop);assert.equal(menu.backdropClass,config.backdropClass);assert.equal(menu.overlayPanelClass,config.overlayPanelClass||'');assert.equal(menu.close,menu.closed);menu.ngOnInit();\n observations.configs.push({index:i,x:menu.xPosition,y:menu.yPosition,overlap:menu.overlapTrigger,backdrop:menu.hasBackdrop,backdropClass:menu.backdropClass,panelClass:menu.overlayPanelClass});cases.push('actual-manual-menu-config-'+i);\n}\nconst menu=new Menu(element,zone,configs[0],detector),monitor={focusVia(){},monitor(){},stopMonitoring(){}},document={activeElement:host};\nfor(const args of [[element],[element,document,monitor,menu,detector]]){\n const item=new Item(...args);assert.equal(item._getHostElement(),host);assert.equal(item.role,'menuitem');assert.equal(item._parentMenu,args.length===1?undefined:menu);item.disabled=true;assert.equal(item._getTabIndex(),'-1');item.disabled=false;assert.equal(item.getLabel(),'Label');item.ngOnDestroy();observations.items.push({args:args.length,hostIdentity:true,parentIdentity:true,manualOutsideDI:true});cases.push('actual-manual-item-'+args.length);\n}\nconst payload={template:{},resolver:{},app:{},injector:{},view:{},document:{},detector};const contentArgs=[payload.template,...(line==='original'?[payload.resolver]:[]),payload.app,payload.injector,payload.view,payload.document,payload.detector],content=new Content(...contentArgs);if(line==='original')assert.throws(()=>content.detach(),TypeError);else content.detach();content.ngOnDestroy();observations.content.push({manualOutsideDI:true,constructorArguments:contentArgs.length,unattachedDetachThrows:line==='original',unattachedDestroySafe:true});cases.push('actual-manual-unattached-content');\nfor(const [legacy,current]of [['MAT_LEGACY_MENU_CONTENT','MAT_MENU_CONTENT'],['MAT_LEGACY_MENU_DEFAULT_OPTIONS','MAT_MENU_DEFAULT_OPTIONS'],['MAT_LEGACY_MENU_SCROLL_STRATEGY','MAT_MENU_SCROLL_STRATEGY']]){assert.equal(api[legacy],peer[current]);observations.tokens.push({legacy,current,same:true});cases.push('public-alias-'+current);}\n// Test-only reflection reads the real decorator objects. It does not render or\n// execute generated template/content-query instructions; packed native gates do that.\nif(line!=='original'){\n const { _LegacyMenuItemBase:ItemBase }=await import('./projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.mjs');\n const {_MatMenuBase:MenuBase}=await import('./projects/ngx-material-legacy/legacy-menu/internal/menu-base.mjs');\n const {_MatMenuTriggerBase:TriggerBase}=await import('./projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.mjs');\n const annotation=Class=>{const values=Object.getOwnPropertyDescriptor(Class,'__annotations__')?.value;assert.ok(Array.isArray(values));return values.at(-1);};\n const item=new Item(element,document,monitor,menu,detector);\n const itemProviders=annotation(Item).providers;assert.ok(itemProviders.some(p=>p.provide===peer.MatMenuItem&&p.useExisting===Item));assert.ok(itemProviders.some(p=>p.provide===ItemBase&&p.useExisting===Item));\n const itemInjector=core.Injector.create({providers:[...itemProviders,{provide:Item,useValue:item}]});try{assert.equal(itemInjector.get(peer.MatMenuItem),item);assert.equal(itemInjector.get(ItemBase),item);}finally{itemInjector.destroy();}\n const contentProviders=annotation(Content).providers;assert.ok(contentProviders.some(p=>p.provide===peer.MAT_MENU_CONTENT&&p.useExisting===Content));const contentInjector=core.Injector.create({providers:[...contentProviders,{provide:Content,useValue:content}]});try{assert.equal(contentInjector.get(peer.MAT_MENU_CONTENT),content);}finally{contentInjector.destroy();}\n const panel=api.MAT_LEGACY_MENU_PANEL;assert.notEqual(panel,peer.MAT_MENU_PANEL);assert.ok(annotation(Menu).providers.some(p=>p.provide===panel&&p.useExisting===Menu));const panelInjector=core.Injector.create({providers:[...annotation(Menu).providers,{provide:Menu,useValue:menu},{provide:peer.MAT_MENU_PANEL,useValue:{modern:true}}]});try{assert.equal(panelInjector.get(panel),menu);assert.notEqual(panelInjector.get(peer.MAT_MENU_PANEL),menu);}finally{panelInjector.destroy();}\n const prop=Object.getOwnPropertyDescriptor(MenuBase,'__prop__metadata__').value;assert.ok(prop._allItems.some(q=>q.selector===peer.MatMenuItem&&q.descendants===true));assert.ok(prop.items.some(q=>q.selector===peer.MatMenuItem&&q.descendants===false));assert.ok(prop.lazyContent.some(q=>q.selector===peer.MAT_MENU_CONTENT));\n const params=Object.getOwnPropertyDescriptor(TriggerBase,'__parameters__').value;assert.ok(params[4].some(p=>p.token===panel));assert.ok(params[5].some(p=>p.token===ItemBase));\n // Test-only JIT decorator reflection: this source-emission fixture has unresolved\n // component resources. A packed successor separately executes public module DI.\n const {Overlay}=await import('@angular/cdk/overlay');const providers=annotation(api.MatLegacyMenuModule).providers;const provider=providers.find(p=>p.provide===peer.MAT_MENU_SCROLL_STRATEGY);assert.ok(provider);assert.equal(typeof provider.useFactory,'function');assert.deepEqual(provider.deps,[Overlay]);let calls=0;const strategy={reposition(){calls++;return{strategy:calls};},noop(){return{strategy:'noop'};}};const injector=core.Injector.create({providers:[provider,{provide:Overlay,useValue:{scrollStrategies:strategy}}]});try{const closure=injector.get(api.MAT_LEGACY_MENU_SCROLL_STRATEGY);assert.equal(typeof closure,'function');assert.deepEqual(closure(),{strategy:1});assert.deepEqual(closure(),{strategy:2});}finally{injector.destroy();}\n cases.push('actual-item-useExisting-provider-array','actual-content-useExisting-provider-array','distinct-panel-provider-with-modern-adversary','actual-query-decorator-selectors','actual-trigger-injection-decorators','actual-owned-scroll-factory-provider');\n assert.equal(item instanceof peer.MatMenuItem,false);assert.ok(item instanceof ItemBase); // approved owned historical-item boundary.\n observations.ownedProviderQueries={peerItemProvider:true,ownedItemProvider:true,contentProvider:true,distinctPanel:true,descendantQueryToken:true,directQueryToken:true,lazyQueryToken:true,triggerTokens:true,generatedQueriesExecuted:false};\n}\nconsole.log(JSON.stringify({line,mode,cases,observations,actual_tagged_or_owned_constructors:true,test_only_decorator_metadata_reflection:line!=='original',native_nodes_queries_or_templates_executed:false,actual_native_packed_AOT_or_full_floor_qualified:false}));\n"
+    },
+    {
+      "role": "emission",
+      "sha256": "780e2e7718619d22cdfd40bb94349cc808af580d2415bc9c0d2c63477be36b27",
+      "exact_bytes_utf8": "{\"emitted\":52,\"diagnostics\":0,\"sources\":[{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/animation/animation-constants.ts\",\"sha256\":\"9c5b272e2ac9bc44fbe6cfa2d2741e3a11a8d0fe786e54ddfdb9d1dfacb7133e\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/coercion/number-property.ts\",\"sha256\":\"d2aabb3342afa87eeb9a032597404a7009347668f73baca8cd65b66a8d7401ef\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/common-behaviors/color.ts\",\"sha256\":\"1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/common-behaviors/constructor.ts\",\"sha256\":\"41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/common-behaviors/disable-ripple.ts\",\"sha256\":\"c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/common-behaviors/disabled.ts\",\"sha256\":\"15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/common-behaviors/error-state.ts\",\"sha256\":\"f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/common-behaviors/index.ts\",\"sha256\":\"888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/common-behaviors/initialized.ts\",\"sha256\":\"3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/common-behaviors/tabindex.ts\",\"sha256\":\"694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/common-module.ts\",\"sha256\":\"8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/datetime/date-locale.ts\",\"sha256\":\"82e40a57157919c44fe1bdc46bbe45758565a8c889fd256c87079ec70d99d837\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-adapter.ts\",\"sha256\":\"b69f5c2bbc12deb6ff4c420252733f51742616e016b2a6193de066cf4eecade5\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-module.ts\",\"sha256\":\"ea7b50c1618c5631f6dddb395461a144fb2d9448d2e1cb05222664ade19b23c1\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/dom/shadow-dom.ts\",\"sha256\":\"39a8a95c574620b4aa4ef50a30b86eba359c793d69d504b53fb98d4962c4119e\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts\",\"sha256\":\"203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts\",\"sha256\":\"522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/line/line.ts\",\"sha256\":\"dce137354958eb1710088a405c12816777d6f2f1949c67061929aef29230a115\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/motion-event.ts\",\"sha256\":\"8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/sanity-checks.ts\",\"sha256\":\"8756b0495ab4f02518887dff55ab844ff433a267c5e899a9b6abfe005863e9d7\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/internal/test-environment.ts\",\"sha256\":\"83f0fb37e81c2e5294719bac3b337f1fa7983152ae9693ff8c9d4459e66b0408\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/option/index.ts\",\"sha256\":\"8401473eb98adbdbdda06e00a47720894812c29e91f43a2faeccdef702ac5616\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/option/optgroup-base.ts\",\"sha256\":\"e3a31d60c8ab4215bd4ee8db280fc1c3b1c2820444102664f70019f4b51f0519\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/option/optgroup.ts\",\"sha256\":\"f9a203ff1766b9ef0e4f67a68e3cd7c92d55b980066e0aab761d1de590f72727\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/option/option-base.ts\",\"sha256\":\"ec787fa20e331afb90856d2f413ca3551396f3f6954b30cc6de762a6864c931c\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/option/option-helpers.ts\",\"sha256\":\"3c7a654a4f14e5ec3157efcc4dde4bf94825c14f8c150a6b8b2285c54269e568\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/option/option-parent.ts\",\"sha256\":\"66b28658db553b2acab126ee730e688ef926abb09a74e79364a0cd5f081671e0\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/option/option.ts\",\"sha256\":\"fc4bb9db4bbfb5ede0680b572cab060ad23b6f91d84791f69c09706dfd57db31\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/pseudo-checkbox/index.ts\",\"sha256\":\"d99fa8684192aefe15472cd683390d9d4677fe84ec03fde4b2d00beaf07d496c\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox-module.ts\",\"sha256\":\"11512cc4728417252cb1d24b98be7e9e11992d90817e2f9da64cf54f20b2e48b\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.ts\",\"sha256\":\"7c6cbffc3f95b6f30b0f599f781d2fcb882b75c308f5cadbffa8107a9fd20758\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/public-api.ts\",\"sha256\":\"3d56b9e01f502995bd25dea21be8bee5713596655f5d159899858b58b4ffccf2\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/ripple/index.ts\",\"sha256\":\"bb1177a1a13bc75224e27d6f41cecb9f82b80db8bcf05c3577eecf9458641e0c\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/ripple/ripple-event-manager.ts\",\"sha256\":\"2cb38621b0481e8745d306422dca5eba1ad4dce31f3e86931680feaf4f2fe0be\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/ripple/ripple-ref.ts\",\"sha256\":\"4821492afe8b8f13782032fee0e16886fe002d8c79f33bc1332fd4813d91edd2\"},{\"path\":\"projects/ngx-material-legacy/legacy-core/ripple/ripple-renderer.ts\",\"sha256\":\"e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b\"},{\"path\":\"projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/constructor.ts\",\"sha256\":\"41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a\"},{\"path\":\"projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/disable-ripple.ts\",\"sha256\":\"c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53\"},{\"path\":\"projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/disabled.ts\",\"sha256\":\"15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5\"},{\"path\":\"projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts\",\"sha256\":\"a498fd55553577bc81f285f36cf2822866d17b9bed8bb572c14bf78df21eed0d\"},{\"path\":\"projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts\",\"sha256\":\"f5da44d00af909e5da4dc80453796857d22ab4f323c5db5d793d002d8e72cfd8\"},{\"path\":\"projects/ngx-material-legacy/legacy-menu/internal/menu-errors.ts\",\"sha256\":\"adf746c2d91f6f86c6495d49e869ffba310eabf8e12bbca36cb33a7277d408fc\"},{\"path\":\"projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts\",\"sha256\":\"f2d261227d8fa8e04a8773d57373ca6c78ffe20081bff8a0c809991969fba368\"},{\"path\":\"projects/ngx-material-legacy/legacy-menu/internal/menu-panel-token.ts\",\"sha256\":\"3463226c000f63d599639bd1c400d744c9e02417bd9c57fe46e53827706180cd\"},{\"path\":\"projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts\",\"sha256\":\"3598e6ccf4761bd9777dafaca271cd896dc8f694ec39e9e46c37f593a8c307af\"},{\"path\":\"projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts\",\"sha256\":\"5f9b5fbe09d5bdc50bcb937e458ffb83bd49dddca1b0c0c64fadb5d267cfe6a3\"},{\"path\":\"projects/ngx-material-legacy/legacy-menu/menu-content.ts\",\"sha256\":\"f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af\"},{\"path\":\"projects/ngx-material-legacy/legacy-menu/menu-item.ts\",\"sha256\":\"82aaefb570df0953de0051aca4b3a987106b8ff3ea27e56d2e4c55fe75b461b4\"},{\"path\":\"projects/ngx-material-legacy/legacy-menu/menu-module.ts\",\"sha256\":\"b6abee38aef5338433dd6c6e009f8adce40b7316a9c4fa1bf2d2a6482e2599ad\"},{\"path\":\"projects/ngx-material-legacy/legacy-menu/menu-trigger.ts\",\"sha256\":\"351e11291617ea3462025710b31621f9441ac341c99158b771798d4875dc9ab6\"},{\"path\":\"projects/ngx-material-legacy/legacy-menu/menu.ts\",\"sha256\":\"e53577eef744606d3368bf4fa61cc49f669ea945b64f26e411c113ba572f2877\"},{\"path\":\"projects/ngx-material-legacy/legacy-menu/public-api.ts\",\"sha256\":\"51d663658af24850b661d700fef1e6e1362b1fc975009dc0e680a0a92659567d\"}],\"scope\":\"test-only complete semantic TypeScript program, no Angular AOT or native browser\"}\n"
+    },
+    {
+      "role": "development",
+      "sha256": "734ab91fd4e4353afe51509ab7c458a11682c389bf8ce8b1555f8d9ad3c4fc2f",
+      "exact_bytes_utf8": "{\"line\":\"main\",\"mode\":\"development\",\"cases\":[\"actual-manual-menu-config-0\",\"actual-manual-menu-config-1\",\"actual-manual-menu-config-2\",\"actual-manual-menu-config-3\",\"actual-manual-item-1\",\"actual-manual-item-5\",\"actual-manual-unattached-content\",\"public-alias-MAT_MENU_CONTENT\",\"public-alias-MAT_MENU_DEFAULT_OPTIONS\",\"public-alias-MAT_MENU_SCROLL_STRATEGY\",\"actual-item-useExisting-provider-array\",\"actual-content-useExisting-provider-array\",\"distinct-panel-provider-with-modern-adversary\",\"actual-query-decorator-selectors\",\"actual-trigger-injection-decorators\",\"actual-owned-scroll-factory-provider\"],\"observations\":{\"configs\":[{\"index\":0,\"x\":\"after\",\"y\":\"below\",\"overlap\":true,\"panelClass\":\"\"},{\"index\":1,\"x\":\"before\",\"y\":\"above\",\"overlap\":false,\"backdrop\":false,\"backdropClass\":\"backdrop\",\"panelClass\":[\"one\",\"two\"]},{\"index\":2,\"x\":\"after\",\"y\":\"above\",\"overlap\":false,\"backdrop\":true,\"panelClass\":\"pane\"},{\"index\":3,\"x\":\"before\",\"y\":\"below\",\"overlap\":true,\"panelClass\":\"\"}],\"items\":[{\"args\":1,\"hostIdentity\":true,\"parentIdentity\":true,\"manualOutsideDI\":true},{\"args\":5,\"hostIdentity\":true,\"parentIdentity\":true,\"manualOutsideDI\":true}],\"content\":[{\"manualOutsideDI\":true,\"constructorArguments\":6,\"unattachedDetachThrows\":false,\"unattachedDestroySafe\":true}],\"tokens\":[{\"legacy\":\"MAT_LEGACY_MENU_CONTENT\",\"current\":\"MAT_MENU_CONTENT\",\"same\":true},{\"legacy\":\"MAT_LEGACY_MENU_DEFAULT_OPTIONS\",\"current\":\"MAT_MENU_DEFAULT_OPTIONS\",\"same\":true},{\"legacy\":\"MAT_LEGACY_MENU_SCROLL_STRATEGY\",\"current\":\"MAT_MENU_SCROLL_STRATEGY\",\"same\":true}],\"ownedProviderQueries\":{\"peerItemProvider\":true,\"ownedItemProvider\":true,\"contentProvider\":true,\"distinctPanel\":true,\"descendantQueryToken\":true,\"directQueryToken\":true,\"lazyQueryToken\":true,\"triggerTokens\":true,\"generatedQueriesExecuted\":false}},\"actual_tagged_or_owned_constructors\":true,\"test_only_decorator_metadata_reflection\":true,\"native_nodes_queries_or_templates_executed\":false,\"actual_native_packed_AOT_or_full_floor_qualified\":false}\n"
+    },
+    {
+      "role": "production",
+      "sha256": "cb67b6fc89666b44dbe72c2cdaa0ef5f8d50826dcf92e5467a0b945dcd229a59",
+      "exact_bytes_utf8": "{\"line\":\"main\",\"mode\":\"production\",\"cases\":[\"actual-manual-menu-config-0\",\"actual-manual-menu-config-1\",\"actual-manual-menu-config-2\",\"actual-manual-menu-config-3\",\"actual-manual-item-1\",\"actual-manual-item-5\",\"actual-manual-unattached-content\",\"public-alias-MAT_MENU_CONTENT\",\"public-alias-MAT_MENU_DEFAULT_OPTIONS\",\"public-alias-MAT_MENU_SCROLL_STRATEGY\",\"actual-item-useExisting-provider-array\",\"actual-content-useExisting-provider-array\",\"distinct-panel-provider-with-modern-adversary\",\"actual-query-decorator-selectors\",\"actual-trigger-injection-decorators\",\"actual-owned-scroll-factory-provider\"],\"observations\":{\"configs\":[{\"index\":0,\"x\":\"after\",\"y\":\"below\",\"overlap\":true,\"panelClass\":\"\"},{\"index\":1,\"x\":\"before\",\"y\":\"above\",\"overlap\":false,\"backdrop\":false,\"backdropClass\":\"backdrop\",\"panelClass\":[\"one\",\"two\"]},{\"index\":2,\"x\":\"after\",\"y\":\"above\",\"overlap\":false,\"backdrop\":true,\"panelClass\":\"pane\"},{\"index\":3,\"x\":\"before\",\"y\":\"below\",\"overlap\":true,\"panelClass\":\"\"}],\"items\":[{\"args\":1,\"hostIdentity\":true,\"parentIdentity\":true,\"manualOutsideDI\":true},{\"args\":5,\"hostIdentity\":true,\"parentIdentity\":true,\"manualOutsideDI\":true}],\"content\":[{\"manualOutsideDI\":true,\"constructorArguments\":6,\"unattachedDetachThrows\":false,\"unattachedDestroySafe\":true}],\"tokens\":[{\"legacy\":\"MAT_LEGACY_MENU_CONTENT\",\"current\":\"MAT_MENU_CONTENT\",\"same\":true},{\"legacy\":\"MAT_LEGACY_MENU_DEFAULT_OPTIONS\",\"current\":\"MAT_MENU_DEFAULT_OPTIONS\",\"same\":true},{\"legacy\":\"MAT_LEGACY_MENU_SCROLL_STRATEGY\",\"current\":\"MAT_MENU_SCROLL_STRATEGY\",\"same\":true}],\"ownedProviderQueries\":{\"peerItemProvider\":true,\"ownedItemProvider\":true,\"contentProvider\":true,\"distinctPanel\":true,\"descendantQueryToken\":true,\"directQueryToken\":true,\"lazyQueryToken\":true,\"triggerTokens\":true,\"generatedQueriesExecuted\":false}},\"actual_tagged_or_owned_constructors\":true,\"test_only_decorator_metadata_reflection\":true,\"native_nodes_queries_or_templates_executed\":false,\"actual_native_packed_AOT_or_full_floor_qualified\":false}\n"
+    },
+    {
+      "role": "negative_control",
+      "sha256": "321751918e9e08c6c4ae065e540ecfe674bcabae70b50d37efb3a42c92bc3b92",
+      "exact_bytes_utf8": "wrong emitted scroll strategy rejected: exit 1\n"
+    }
+  ],
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/animation/animation-constants.ts",
+      "sha256": "9c5b272e2ac9bc44fbe6cfa2d2741e3a11a8d0fe786e54ddfdb9d1dfacb7133e"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/coercion/number-property.ts",
+      "sha256": "d2aabb3342afa87eeb9a032597404a7009347668f73baca8cd65b66a8d7401ef"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/color.ts",
+      "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/constructor.ts",
+      "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/disable-ripple.ts",
+      "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/disabled.ts",
+      "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/error-state.ts",
+      "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/index.ts",
+      "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/initialized.ts",
+      "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/tabindex.ts",
+      "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+      "sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/date-locale.ts",
+      "sha256": "82e40a57157919c44fe1bdc46bbe45758565a8c889fd256c87079ec70d99d837"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-adapter.ts",
+      "sha256": "b69f5c2bbc12deb6ff4c420252733f51742616e016b2a6193de066cf4eecade5"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-module.ts",
+      "sha256": "ea7b50c1618c5631f6dddb395461a144fb2d9448d2e1cb05222664ade19b23c1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/dom/shadow-dom.ts",
+      "sha256": "39a8a95c574620b4aa4ef50a30b86eba359c793d69d504b53fb98d4962c4119e"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+      "sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+      "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/line/line.ts",
+      "sha256": "dce137354958eb1710088a405c12816777d6f2f1949c67061929aef29230a115"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/motion-event.ts",
+      "sha256": "8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/sanity-checks.ts",
+      "sha256": "8756b0495ab4f02518887dff55ab844ff433a267c5e899a9b6abfe005863e9d7"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/test-environment.ts",
+      "sha256": "83f0fb37e81c2e5294719bac3b337f1fa7983152ae9693ff8c9d4459e66b0408"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/index.ts",
+      "sha256": "8401473eb98adbdbdda06e00a47720894812c29e91f43a2faeccdef702ac5616"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/optgroup-base.ts",
+      "sha256": "e3a31d60c8ab4215bd4ee8db280fc1c3b1c2820444102664f70019f4b51f0519"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/optgroup.ts",
+      "sha256": "f9a203ff1766b9ef0e4f67a68e3cd7c92d55b980066e0aab761d1de590f72727"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option-base.ts",
+      "sha256": "ec787fa20e331afb90856d2f413ca3551396f3f6954b30cc6de762a6864c931c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option-helpers.ts",
+      "sha256": "3c7a654a4f14e5ec3157efcc4dde4bf94825c14f8c150a6b8b2285c54269e568"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option-parent.ts",
+      "sha256": "66b28658db553b2acab126ee730e688ef926abb09a74e79364a0cd5f081671e0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option.ts",
+      "sha256": "fc4bb9db4bbfb5ede0680b572cab060ad23b6f91d84791f69c09706dfd57db31"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/index.ts",
+      "sha256": "d99fa8684192aefe15472cd683390d9d4677fe84ec03fde4b2d00beaf07d496c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox-module.ts",
+      "sha256": "11512cc4728417252cb1d24b98be7e9e11992d90817e2f9da64cf54f20b2e48b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.ts",
+      "sha256": "7c6cbffc3f95b6f30b0f599f781d2fcb882b75c308f5cadbffa8107a9fd20758"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "sha256": "3d56b9e01f502995bd25dea21be8bee5713596655f5d159899858b58b4ffccf2"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/ripple/index.ts",
+      "sha256": "bb1177a1a13bc75224e27d6f41cecb9f82b80db8bcf05c3577eecf9458641e0c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-event-manager.ts",
+      "sha256": "2cb38621b0481e8745d306422dca5eba1ad4dce31f3e86931680feaf4f2fe0be"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-ref.ts",
+      "sha256": "4821492afe8b8f13782032fee0e16886fe002d8c79f33bc1332fd4813d91edd2"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-renderer.ts",
+      "sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/constructor.ts",
+      "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/disable-ripple.ts",
+      "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/common-behaviors/disabled.ts",
+      "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+      "sha256": "a498fd55553577bc81f285f36cf2822866d17b9bed8bb572c14bf78df21eed0d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts",
+      "sha256": "f5da44d00af909e5da4dc80453796857d22ab4f323c5db5d793d002d8e72cfd8"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-errors.ts",
+      "sha256": "adf746c2d91f6f86c6495d49e869ffba310eabf8e12bbca36cb33a7277d408fc"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts",
+      "sha256": "f2d261227d8fa8e04a8773d57373ca6c78ffe20081bff8a0c809991969fba368"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel-token.ts",
+      "sha256": "3463226c000f63d599639bd1c400d744c9e02417bd9c57fe46e53827706180cd"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+      "sha256": "3598e6ccf4761bd9777dafaca271cd896dc8f694ec39e9e46c37f593a8c307af"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+      "sha256": "5f9b5fbe09d5bdc50bcb937e458ffb83bd49dddca1b0c0c64fadb5d267cfe6a3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu-content.ts",
+      "sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+      "sha256": "82aaefb570df0953de0051aca4b3a987106b8ff3ea27e56d2e4c55fe75b461b4"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu-module.ts",
+      "sha256": "b6abee38aef5338433dd6c6e009f8adce40b7316a9c4fa1bf2d2a6482e2599ad"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu-trigger.ts",
+      "sha256": "351e11291617ea3462025710b31621f9441ac341c99158b771798d4875dc9ab6"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu.ts",
+      "sha256": "e53577eef744606d3368bf4fa61cc49f669ea945b64f26e411c113ba572f2877"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/public-api.ts",
+      "sha256": "51d663658af24850b661d700fef1e6e1362b1fc975009dc0e680a0a92659567d"
+    }
+  ],
+  "historical_f4": {
+    "scope": "previous observations remain historical and are not relabeled to this source",
+    "development_sha256": "734ab91fd4e4353afe51509ab7c458a11682c389bf8ce8b1555f8d9ad3c4fc2f",
+    "production_sha256": "cb67b6fc89666b44dbe72c2cdaa0ef5f8d50826dcf92e5467a0b945dcd229a59",
+    "integration_record_path": "compatibility/rc/parent-main-menu-six-export-repair-v1.json",
+    "integration_record_sha256": "3d7687190d295435d0d3f4bfaf98c11debe881e77136e21c797d129f8b9def02"
+  },
+  "limits": "JIT metadata reflection is test-only; synthetic constructor/decorator behavior does not execute generated queries, AOT, full browser, 21.x, or historical suite. The 2828 package is an isolated candidate and is not relabeled as a release pack.",
+  "g02_claim": "not-passed",
+  "g11_claim": "not-passed"
+}

@@ -9,14 +9,30 @@ ROOT = Path(__file__).resolve().parents[1]
 class OwnedMotionEvidenceTests(unittest.TestCase):
     def test_owned_constructor_roles_preserve_original_noop_and_reject_forged_or_missing_evidence(self):
         script = r"""
-import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
+import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {createHash} from 'node:crypto';
 import {ownedSelectMotionProblems} from './scripts/api-owned-motion-context.mjs';
 const proof=JSON.parse(readFileSync('compatibility/rc/constructor-motion-context-source-proof.json'));
+const menuSuccessor=JSON.parse(readFileSync('compatibility/rc/menu-motion-packed-successor-v2.json'));
+const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
+assert.equal(sha(readFileSync('compatibility/rc/menu-motion-packed-successor-v2.json')),'f4158e053cbedcbe3ecace6416229232b923c27a180f85c25d65d012463e9fc8');
+const integrationBytes=readFileSync('compatibility/rc/parent-main-common-module-surface-review-v1.json');
+assert.equal(sha(integrationBytes),'54b03be88958c17a3dc7653b4e9ad4fef0fe4dac653fbf6b3f0317c7fd9fc6e6');
+const integration=JSON.parse(integrationBytes);assert.ok(Object.values(integration.manifest.files).includes(menuSuccessor.artifact.sha256));
+assert.equal(menuSuccessor.prior_f4_receipt.sha256,'83d0b7798b9d849a931c8a356fadb84324d8ac6f0a5da31d1001922752f27438');
+assert.equal(sha(JSON.stringify(menuSuccessor.prior_f4_receipt.body_complete,null,2)+'\n'),menuSuccessor.prior_f4_receipt.sha256);
+assert.equal(sha(readFileSync(menuSuccessor.historical_proof.path)),menuSuccessor.historical_proof.sha256);
+for(const source of menuSuccessor.source_members)assert.equal(sha(readFileSync(source.path)),source.sha256);
+assert.equal(sha(menuSuccessor.producer.exact_source),menuSuccessor.producer.source_sha256);
+assert.equal(sha(menuSuccessor.producer.exact_raw_output),menuSuccessor.producer.raw_observation_sha256);
+assert.deepEqual(JSON.parse(menuSuccessor.producer.exact_raw_output).observation,menuSuccessor.observation);
+assert.equal(menuSuccessor.artifact.sha256,'2828f71233d13791de86971a6d18bdc35d88d8285a9c0ed30ad624a8dff9fbe1');
 let rejected=0;
 for(const control of proof.default_constructor_motion_contexts){
- const observation=control.evidence,id=control.symbol_id;
+ const id=control.symbol_id,isMenu=id==='legacy-menu/primary/MatLegacyMenu';
+ if(isMenu)assert.ok(ownedSelectMotionProblems(control.evidence,id).length,'historical menu receipt must remain rejected');
+ const observation=isMenu?menuSuccessor.observation:control.evidence;
  assert.deepEqual(ownedSelectMotionProblems(observation,id),[]);
- for(const change of [x=>delete x.constructor_owner,x=>x.constructor_owner.public_export='Foreign',x=>x.constructor_owner.depth++,x=>x.constructor_owner.owned_class_identity_matched=false,x=>x.constructor_owner.extra='waiver',x=>x.caller.file='foreign',x=>x.sources.caller.file='foreign',x=>x.component_enabled=!x.component_enabled,x=>x.requests[0].self=true,x=>x.control_requests[0].identity_matched=false,x=>x.cases.pop()]){
+ for(const change of [x=>delete x.constructor_owner,x=>x.constructor_owner[isMenu?'public_subclass_export':'public_export']='Foreign',x=>x.constructor_owner.depth++,x=>x.constructor_owner.owned_class_identity_matched=false,x=>x.constructor_owner.extra='waiver',x=>x.caller.file='foreign',x=>x.sources.caller.file='foreign',x=>x.component_enabled=!x.component_enabled,x=>x.requests[0].self=true,x=>x.control_requests[0].identity_matched=false,x=>x.cases.pop()]){
   const bad=structuredClone(observation);change(bad);assert.ok(ownedSelectMotionProblems(bad,id).length);rejected++;
  }
  if(observation.constructor_animation_mode)for(const change of [x=>delete x.constructor_animation_mode,x=>x.constructor_animation_mode.original_parameter_index++,x=>x.constructor_animation_mode.original_constructor_arity++,x=>x.constructor_animation_mode.optional=false,x=>x.constructor_animation_mode.actual_input_identical=false,x=>x.constructor_animation_mode.constructor_calls=0,x=>x.constructor_animation_mode.mode_was_noop=true,x=>x.constructor_animation_mode.extra='waiver']){
