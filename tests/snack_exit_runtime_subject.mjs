@@ -110,6 +110,10 @@ async function motionExit(kind,js=payload.candidate) {
   try {
     zone.run(()=>f.instance.enter());
     if(kind!=='disabled') {zone.run(()=>f.instance.onAnimationEnd(f.event('mat-legacy-snack-bar-enter')));assert.equal(f.timers.has(f.instance._enterFallback),false);}
+    if (kind === 'disabled') {
+      assert.equal(f.counts().enters, 0, 'noop-enter-not-synchronous');
+      await drain();
+    }
     assert.equal(f.counts().enters,1,'enter-notifies');
     zone.run(()=>f.ref.dismissWithAction());
     assert.equal(f.attributes.get('mat-exit'),'','exit-attribute-retained');
