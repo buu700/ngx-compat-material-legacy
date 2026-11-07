@@ -7,7 +7,8 @@
  */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {readFileSync, writeFileSync} from 'node:fs';
+import {readFileSync, writeFileSync, existsSync, mkdtempSync, rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
 import {execFileSync, spawnSync} from 'node:child_process';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -17,23 +18,35 @@ import {reviewBidiModuleUses} from '../scripts/bidi-module-use-review.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const ts = createRequire(import.meta.url)('typescript');
-const review = reviewBidiModuleUses({root});
 const sourcePath = 'projects/ngx-material-legacy/internal/common-module.ts';
-const source = readFileSync(join(root,sourcePath),'utf8');
-const sourceNegatives = [
-  source.replace("from '@angular/cdk/bidi'", "from '@angular/cdk/private'"),
-  source.replace('import {BidiModule}', 'import type {BidiModule}'),
-  source.replace('imports: [BidiModule]', 'imports: []'),
-  source.replace('exports: [BidiModule]', 'exports: []'),
-  source.replace('exports: [BidiModule]', 'providers: [BidiModule]'),
-  source.replace('exports: [BidiModule]', 'exports: [...[BidiModule]]'),
-  source + '\nconst unexpected = BidiModule;\n',
-  source + '\nfunction shadow(BidiModule: any) {return BidiModule;}\n',
-  source.replace("import {NgModule} from '@angular/core';", "function NgModule(_: any): any {return () => {};}"),
-];
-for (const text of sourceNegatives) {
-  assert.notEqual(text,source);
-  assert.throws(() => reviewBidiModuleUses({root,readSource:path=>path===sourcePath?text:readFileSync(join(root,path),'utf8')}));
+let review, sourceNegatives;
+if (existsSync(join(root, sourcePath))) {
+  review = reviewBidiModuleUses({root});
+  const source = readFileSync(join(root,sourcePath),'utf8');
+  sourceNegatives = [
+    source.replace("from '@angular/cdk/bidi'", "from '@angular/cdk/private'"),
+    source.replace('import {BidiModule}', 'import type {BidiModule}'),
+    source.replace('imports: [BidiModule]', 'imports: []'),
+    source.replace('exports: [BidiModule]', 'exports: []'),
+    source.replace('exports: [BidiModule]', 'providers: [BidiModule]'),
+    source.replace('exports: [BidiModule]', 'exports: [...[BidiModule]]'),
+    source + '\nconst unexpected = BidiModule;\n',
+    source + '\nfunction shadow(BidiModule: any) {return BidiModule;}\n',
+    source.replace("import {NgModule} from '@angular/core';", "function NgModule(_: any): any {return () => {};}")
+  ];
+  for (const text of sourceNegatives) {
+    assert.notEqual(text,source);
+    assert.throws(() => reviewBidiModuleUses({root,readSource:path=>path===sourcePath?text:readFileSync(join(root,path),'utf8')}));
+  }
+} else {
+  const temp=mkdtempSync(join(tmpdir(),'shared-bidi-review-'));
+  try {
+    const output=join(temp,'review.json');
+    execFileSync(process.execPath,[join(root,'tests/common-module-evidence/bidi-source-successor.mjs'),root,output],{cwd:root,stdio:'pipe'});
+    const successor=JSON.parse(readFileSync(output,'utf8'));
+    assert.equal(successor.line,'main');assert.equal(successor.old_uses.length,25);
+    review={...successor,cases:successor.old_uses};sourceNegatives=successor.negative_controls;
+  } finally {rmSync(temp,{recursive:true,force:true});}
 }
 const loaded = prepareMaterialPublicSubjects(root), results = [], declarations = [], mutations = [];
 const worker = readFileSync(join(root,'tests/bidi_module_public_subject.mjs'),'utf8');
@@ -95,7 +108,7 @@ try {
     line:review.line,node:process.version,compiler:ts.version,source_review:review,source_negative_controls:sourceNegatives.length,
     public_namespace_capsule_sha256:loaded.capsule_hash,declarations,results,mutations,
     producer_sha256:hash(readFileSync(fileURLToPath(import.meta.url))),worker_sha256:hash(worker),
-    scope:'Whole SRI-authenticated original16/current22/current21 public modules and Angular compiler/Core, with genuine Injector and EventEmitter/signal. Scope limited to 25 BidiModule metadata bindings; compiler metadata introspection is diagnostic-only. No native DOM/AOT/packed, full runtime floors, component Directionality callers, complete MatCommonModule parity, security or G11 qualification.',
+    scope:'Whole SRI-authenticated original16/current22/current21 public modules and Angular compiler/Core, with genuine Injector and EventEmitter/signal. Scope limited to 25 historical BidiModule uses and the explicitly identified current module graph; compiler metadata introspection is diagnostic-only. No native DOM/AOT/packed, full runtime floors, component Directionality callers, complete MatCommonModule parity, security or G11 qualification.',
     g11_claim:'not-passed'};
   if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});
   console.log(JSON.stringify({uses:review.cases.length,subjects:results.length,cases:results.reduce((n,r)=>n+r.cases.length,0),source_negative_controls:sourceNegatives.length,runtime_mutation_rejections:mutations.length,native_or_packed_qualified:false}));
