@@ -152,6 +152,36 @@ class DependencyReportFidelityTests(unittest.TestCase):
             (self.root / "pnpm-lock.yaml").write_bytes(original)
             source.unlink(missing_ok=True)
 
+    def test_active_successor_profile_drift_invalidates_lookup_binding(self):
+        # Use a different filename while v1 remains present: this fails if the
+        # binding accidentally tracks the historical file rather than the active one.
+        from contextlib import ExitStack
+        active = self.root / "compatibility/rc/fidelity-active-profile-fixture.json"
+        active.write_bytes((self.root / eligibility.NPM_CURRENT_PRIVATE_PROFILE_PATH).read_bytes())
+        original = active.read_bytes()
+        try:
+            with patch.object(eligibility, "NPM_CURRENT_PRIVATE_PROFILE_PATH", str(active.relative_to(self.root))):
+                before = eligibility.physical_subject_binding(self.root)
+                self.assertIn(str(active.relative_to(self.root)), {row["path"] for row in before["members"]})
+                def changed_batch(packages, capture=None):
+                    active.write_bytes(original + b"\n ")
+                    if capture is not None:
+                        capture.update(queries=[{"package": {"name": name, "ecosystem": "npm"}, "version": version}
+                                                for name, version in packages], parsed_response={"results": [{} for _ in packages]},
+                                       http_status=200, response_sha256="fixture-only", response_bytes=1)
+                    return 200, [{} for _ in packages], ""
+                with ExitStack() as stack:
+                    for item in self.no_network_context(): stack.enter_context(item)
+                    stack.enter_context(patch.object(eligibility, "_osv_batch", side_effect=changed_batch))
+                    live = eligibility.perform_lookup(self.root, self.now())
+                self.assertFalse(live["subject_binding_valid"])
+                observed = eligibility.evaluate(self.root, self.now(), lookup_performed=True, lookup=live)
+                self.assertFalse(observed["source_binding_valid"])
+                direct = next(row for row in observed["cases"] if row["case_id"].endswith("/direct-pin-shape"))
+                self.assertEqual(direct["result"], "fail")
+        finally:
+            active.unlink(missing_ok=True)
+
     def test_lookup_callback_lock_drift_rejects_existing_direct_pin_case(self):
         from contextlib import ExitStack
         now = self.now()

@@ -1552,7 +1552,7 @@ def physical_subject_binding(root: Path) -> dict:
         "compatibility/vendored-sass-manifest.json", f"compatibility/peers-{package['version'].split('.')[0]}.proposed.json",
         "compatibility/toolchain-advisory-subjects.json", "compatibility/tooling-release-evidence.json",
         "chainman/minimum-age-exceptions.toml",
-        "compatibility/rc/parent-private-npm-current-profile-inputs-v1.json",
+        NPM_CURRENT_PRIVATE_PROFILE_PATH,
         "scripts/check-dependency-eligibility.py", "SECURITY.md",
         "compatibility/rc/tool-advisory-dispositions.json",
         "compatibility/rc/tool-advisory-details-diagnostic.json",

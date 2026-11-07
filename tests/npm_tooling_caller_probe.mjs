@@ -21,8 +21,8 @@ const blob = raw => createHash('sha1').update(Buffer.concat([Buffer.from('blob '
 const parse = (path, text) => ts.createSourceFile(path, text, ts.ScriptTarget.Latest, true,
   path.endsWith('.ts') ? ts.ScriptKind.TS : ts.ScriptKind.JS);
 const line = JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'))).version.startsWith('21.') ? '21.x' : 'main';
-const profilePath = 'compatibility/rc/parent-private-npm-current-profile-inputs-v1.json';
 const rosterPath = 'compatibility/rc/npm-tooling-isolation-callers.json';
+const currentRosterPath = 'compatibility/rc/npm-tooling-current-callers-v2.json';
 const codeSuffixes = ['.cjs', '.js', '.mjs', '.py', '.sh', '.ts'];
 const jsSuffixes = new Set(['.cjs', '.js', '.mjs', '.ts']);
 const historicalArtifacts = {
@@ -72,12 +72,100 @@ function primaryPaths() {
     .filter(path => path !== 'scripts/check-dependency-eligibility.py').sort();
 }
 
-// Recover exactly one literal from trusted verifier text; never import/execute it.
-const checker = physical('scripts/check-dependency-eligibility.py').toString('utf8');
-const pins = [...checker.matchAll(/^NPM_CURRENT_PRIVATE_PROFILE_SHA256\s*=\s*["']([a-f0-9]{64})["']\s*$/gm)];
-assert.equal(pins.length, 1, 'missing or ambiguous current profile trust anchor');
-assert.notEqual(pins[0][1], '0'.repeat(64), 'current profile is not sealed');
-const profile = JSON.parse(physical(profilePath, {sha256: pins[0][1]}));
+// Parse source as data; never import or execute the checker. Require the only
+// direct binding of each name to be a simple top-level string assignment. This
+// finite syntax check trusts the checker source; dynamic mutation is out of scope.
+function checkerLiteral(checkerText, name) {
+  const code = `import ast, json, sys
+name = sys.argv[1]
+tree = ast.parse(sys.stdin.read())
+stores = [n for n in ast.walk(tree) if isinstance(n, ast.Name) and n.id == name and isinstance(n.ctx, (ast.Store, ast.Del))]
+def extra_binding(n):
+    if isinstance(n, ast.alias):
+        return n.name == "*" or (n.asname or n.name.split(".")[0]) == name
+    if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.ExceptHandler)):
+        return n.name == name
+    if isinstance(n, ast.arg):
+        return n.arg == name
+    if isinstance(n, (ast.MatchAs, ast.MatchStar)):
+        return n.name == name
+    if isinstance(n, ast.MatchMapping):
+        return n.rest == name
+    if isinstance(n, (ast.TypeVar, ast.ParamSpec, ast.TypeVarTuple)):
+        return n.name == name
+    return False
+extras = [n for n in ast.walk(tree) if extra_binding(n)]
+assignments = [n for n in tree.body if isinstance(n, ast.Assign) and len(n.targets) == 1 and isinstance(n.targets[0], ast.Name) and n.targets[0].id == name and isinstance(n.value, ast.Constant) and isinstance(n.value.value, str)]
+if extras or len(stores) != 1 or len(assignments) != 1 or assignments[0].targets[0] is not stores[0]:
+    raise ValueError("binding must have one simple top-level string assignment")
+print(json.dumps(assignments[0].value.value))`;
+  const parsed = spawnSync('python3', ['-c', code, name], {input: checkerText, encoding: 'utf8', maxBuffer: 4 * 1024 * 1024});
+  assert.equal(parsed.status, 0, 'invalid checker binding: ' + name + ': ' + parsed.stderr);
+  return JSON.parse(parsed.stdout);
+}
+function activeProfilePath(checkerText) {
+  const path = checkerLiteral(checkerText, 'NPM_CURRENT_PRIVATE_PROFILE_PATH');
+  assert.match(path, /^compatibility\/rc\/parent-private-npm-current-profile-inputs-v[1-9][0-9]*\.json$/,
+    'invalid current profile path');
+  return path;
+}
+function readActiveProfile(checkerText, reader = physical) {
+  const path = activeProfilePath(checkerText);
+  const pin = checkerLiteral(checkerText, 'NPM_CURRENT_PRIVATE_PROFILE_SHA256');
+  assert.match(pin, /^[a-f0-9]{64}$/, 'invalid current profile trust anchor');
+  assert.notEqual(pin, '0'.repeat(64), 'current profile is not sealed');
+  return {path, sha256: pin, raw: reader(path, {sha256: pin})};
+}
+const checkerRaw = physical('scripts/check-dependency-eligibility.py');
+const checker = checkerRaw.toString('utf8');
+const distinctProfile = 'compatibility/rc/parent-private-npm-current-profile-inputs-v987.json';
+assert.equal(activeProfilePath('NPM_CURRENT_PRIVATE_PROFILE_PATH = "' + distinctProfile + '"\n'), distinctProfile);
+for (const invalid of [
+  'NPM_CURRENT_PRIVATE_PROFILE_PATH = "../foreign.json"\n',
+  'NPM_CURRENT_PRIVATE_PROFILE_PATH = "compatibility/rc/../foreign.json"\n',
+  'NPM_CURRENT_PRIVATE_PROFILE_PATH = "' + distinctProfile + '"\nNPM_CURRENT_PRIVATE_PROFILE_PATH = "' + distinctProfile + '"\n',
+  'NPM_CURRENT_PRIVATE_PROFILE_PATH = make_path()\n',
+  'NPM_CURRENT_PRIVATE_PROFILE_PATH = "' + distinctProfile + '"; NPM_CURRENT_PRIVATE_PROFILE_PATH = "other"\n',
+  'NPM_CURRENT_PRIVATE_PROFILE_PATH = "' + distinctProfile + '"\nNPM_CURRENT_PRIVATE_PROFILE_PATH += "x"\n',
+  'NPM_CURRENT_PRIVATE_PROFILE_PATH = "' + distinctProfile + '"\n(NPM_CURRENT_PRIVATE_PROFILE_PATH, other) = ("x", 1)\n',
+  'NPM_CURRENT_PRIVATE_PROFILE_PATH = "' + distinctProfile + '"\ndef mutate():\n    global NPM_CURRENT_PRIVATE_PROFILE_PATH\n    NPM_CURRENT_PRIVATE_PROFILE_PATH = "x"\n',
+  'NPM_CURRENT_PRIVATE_PROFILE_PATH = "' + distinctProfile + '"\nNPM_CURRENT_PRIVATE_PROFILE_PATH: str = "' + distinctProfile + '"\n',
+]) assert.throws(() => activeProfilePath(invalid));
+// Test every non-Name binding field against both guarded constants. Import-star
+// is rejected because it can bind either name without naming it in the AST.
+const extraBindings = [
+  n => `import module as ${n}`, n => `import ${n}`, n => `from module import item as ${n}`,
+  () => 'from module import *', n => `def ${n}(): pass`, n => `async def ${n}(): pass`,
+  n => `class ${n}: pass`, n => `try:\n    pass\nexcept Exception as ${n}:\n    pass`,
+  n => `match value:\n    case ${n}: pass`, n => `match value:\n    case [*${n}]: pass`,
+  n => `match value:\n    case {**${n}}: pass`, n => `def f(${n}): pass`,
+  n => `def f[${n}](): pass`,
+];
+for (const name of ['NPM_CURRENT_PRIVATE_PROFILE_PATH', 'NPM_CURRENT_PRIVATE_PROFILE_SHA256']) {
+  assert.equal(checkerLiteral(`${name} = "value"\n`, name), 'value');
+  for (const binding of extraBindings) {
+    const source = `${name} = "value"\n${binding(name)}\n`;
+    const syntax = spawnSync('python3', ['-c', 'import ast, sys; ast.parse(sys.stdin.read())'],
+      {input: source, encoding: 'utf8'});
+    assert.equal(syntax.status, 0, 'control must be valid Python: ' + syntax.stderr);
+    assert.throws(() => checkerLiteral(source, name));
+  }
+}
+// Exercise the same selection/read path using distinct bytes and filename.
+const controlRaw = Buffer.from('{"fixture":"successor"}');
+let controlReads = 0;
+const control = readActiveProfile('NPM_CURRENT_PRIVATE_PROFILE_PATH = "' + distinctProfile + '"\n' +
+  'NPM_CURRENT_PRIVATE_PROFILE_SHA256 = "' + hash(controlRaw) + '"\n', (path, expected) => {
+    controlReads++;
+    assert.equal(path, distinctProfile);
+    assert.equal(expected.sha256, hash(controlRaw));
+    return controlRaw;
+  });
+assert.equal(controlReads, 1);
+assert.deepEqual(JSON.parse(control.raw), {fixture: 'successor'});
+const active = readActiveProfile(checker);
+const profilePath = active.path;
+const profile = JSON.parse(active.raw);
 assert.deepEqual(profile.historical_artifacts, historicalArtifacts, 'historical artifact identities changed');
 const subject = profile.lines[line];
 assert.ok(subject && /^[a-f0-9]{40}$/.test(subject.source_parent), 'missing current source parent');
@@ -95,6 +183,18 @@ for (const [kind, destination] of [['source_files', sourceRows], ['support_files
 assert.ok(!sourceRows.has('scripts/check-dependency-eligibility.py'), 'circular trusted checker binding');
 assert.ok(inputRows.has(rosterPath), 'original caller roster is not bound');
 const roster = JSON.parse(physical(rosterPath, inputRows.get(rosterPath)));
+let currentRoster = roster;
+if (line === 'main') {
+  assert.ok(inputRows.has(currentRosterPath), 'successor current caller roster is not bound');
+  currentRoster = JSON.parse(physical(currentRosterPath, inputRows.get(currentRosterPath)));
+  assert.equal(currentRoster.schema_version, 1);
+  assert.equal(currentRoster.historical_roster, rosterPath);
+  assert.ok(Array.isArray(currentRoster.callers));
+  const added = {path: 'scripts/browser-dialog-focus-reinsert.mjs', callee: 'spawnSync',
+    argv: "['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock']"};
+  assert.deepEqual(currentRoster.callers, [...roster.callers, added].sort((a, b) => a.path.localeCompare(b.path)),
+    'current caller successor must preserve the historical roster and add only the reviewed caller');
+}
 assert.ok(Array.isArray(subject.support_discovery) && subject.support_discovery.length === 2);
 assert.deepEqual(subject.support_discovery.map(group => group.root).sort(),
   ['compatibility/handoff/codex-closeout/tools', 'tests']);
@@ -109,7 +209,8 @@ function checkPopulation() {
   }
 }
 function checkPhysical() {
-  physical(profilePath, {sha256: pins[0][1]});
+  assert.deepEqual(physical('scripts/check-dependency-eligibility.py'), checkerRaw, 'checker changed during probe');
+  physical(profilePath, {sha256: active.sha256});
   for (const [name, sha256] of Object.entries(historicalArtifacts)) {
     physical('compatibility/rc/tool-advisory-triage/' + name, {sha256});
   }
@@ -224,7 +325,7 @@ function auditCurrent(overrides = new Map()) {
     const source = overrides.get(path) ?? physical(path, sourceRows.get(path)).toString('utf8');
     found.push(...currentCalls(path, source));
   }
-  const expected = roster.callers.map(row => {
+  const expected = currentRoster.callers.map(row => {
     const sf = parse('argv.js', row.argv);
     return {path: row.path, callee: row.callee, argv: printer.printNode(ts.EmitHint.Unspecified, sf.statements[0].expression, sf)};
   });
@@ -258,4 +359,4 @@ checkPhysical();
 console.log(JSON.stringify({result: 'pass', ...positive, negative_controls: negatives.length,
   historical_normalization: 'authenticated old Git source DATA only',
   current_source_identity: 'complete pinned raw programs; no historical projection',
-  typescript: ts.version, node: process.version, execution: 'static AST and Git data reads only'}));
+  typescript: ts.version, node: process.version, profile_path_controls: 11, extra_binding_controls: extraBindings.length * 2, execution: 'static AST and Git data reads only'}));

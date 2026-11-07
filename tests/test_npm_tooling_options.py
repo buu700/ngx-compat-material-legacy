@@ -28,8 +28,10 @@ class NpmToolingOptionsTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         report = json.loads(result.stdout)
         version = json.loads((ROOT / 'projects/ngx-material-legacy/package.json').read_text())['version']
-        self.assertEqual(report['calls'], 19 if version.startswith('21.') else 21)
+        self.assertEqual(report['calls'], 19 if version.startswith('21.') else 22)
         self.assertEqual(report['negative_controls'], 7)
+        self.assertEqual(report['profile_path_controls'], 11)
+        self.assertEqual(report['extra_binding_controls'], 26)
         self.assertEqual(report['historical_normalization'], 'authenticated old Git source DATA only')
         self.assertEqual(report['current_source_identity'], 'complete pinned raw programs; no historical projection')
 
