@@ -1772,7 +1772,53 @@ def physical_subject_binding(root: Path) -> dict:
     catalog = json.loads((root / "compatibility/toolchain-advisory-subjects.json").read_text())
     paths.update(catalog["pnpm_source"][key]["path"] for key in ("cargo_lock", "registry_attestations"))
     profile = json.loads((root / NPM_CURRENT_PRIVATE_PROFILE_PATH).read_text())["lines"][line]
-    paths.update(row["path"] for group in ("source_files", "support_files", "input_files") for row in profile[group])
+    profile_paths = {row["path"] for group in ("source_files", "support_files", "input_files") for row in profile[group]}
+    # Historical profile bytes remain the authority for their original evaluation.
+    # This finite MAIN physical-subject successor only replaces the 23 deleted
+    # common stubs after the complete reviewed integration afterimage is verified.
+    successor_path = "compatibility/rc/parent-main-common-module-integration-review-v1.json"
+    successor_invalid = False
+    if line == "main":
+        paths.add(successor_path)
+        try:
+            if hashlib.sha256((root / NPM_CURRENT_PRIVATE_PROFILE_PATH).read_bytes()).hexdigest() != NPM_CURRENT_PRIVATE_PROFILE_SHA256:
+                raise ValueError("changed historical private npm profile")
+            if any(package.get("peerDependencies", {}).get(name) != "^22.1.7" for name in ("@angular/core", "@angular/cdk", "@angular/material")):
+                raise ValueError("changed main peer floor")
+            proof_path = root / successor_path
+            proof_bytes = proof_path.read_bytes()
+            if hashlib.sha256(proof_bytes).hexdigest() != "ee2e21f5718fbeb84f2d138c56ea4b50d13bb008f346520ff470b09c96260a66":
+                raise ValueError("changed common integration proof")
+            proof = json.loads(proof_bytes)
+            rows = proof["source_afterimages"]
+            removed = sorted(row["path"] for row in rows if row["sha256"] is None)
+            if len(removed) != 23 or hashlib.sha256(("\n".join(removed) + "\n").encode()).hexdigest() != "c80274870cceb114b44ec733b7d705dceeb183fcbff46365aa29b425c2ba4797":
+                raise ValueError("changed common stub population")
+            if not set(removed).issubset(profile_paths):
+                raise ValueError("common stub profile membership changed")
+            current = {row["path"]: row["sha256"] for row in rows if row["sha256"] is not None}
+            current.update({
+                "projects/ngx-material-legacy/legacy-core/internal/common-module.ts": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+                "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox-module.ts": "11512cc4728417252cb1d24b98be7e9e11992d90817e2f9da64cf54f20b2e48b",
+            })
+            paths.update(current)
+            for name in removed:
+                parts = PurePosixPath(name).parts
+                p = root.joinpath(*parts)
+                if any(root.joinpath(*parts[:i]).is_symlink() for i in range(1, len(parts) + 1)) or p.exists():
+                    raise ValueError("historical common stub returned or linked")
+            for name, expected in current.items():
+                parts = PurePosixPath(name).parts
+                p = root.joinpath(*parts)
+                if any(root.joinpath(*parts[:i]).is_symlink() for i in range(1, len(parts) + 1)) or not p.is_file() or hashlib.sha256(p.read_bytes()).hexdigest() != expected:
+                    raise ValueError("common integration afterimage changed: " + name)
+            profile_paths.difference_update(removed)
+        except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError):
+            # Do not silently waive physical obligations when the finite proof
+            # or any subject drifts, including a tampered profile that omits
+            # those paths. Never infer validity from its remaining population.
+            successor_invalid = True
+    paths.update(profile_paths)
     # These are the complete retained proof/source populations consumed by tool dispositions.
     # Discovery records additions/removals as well as changes to existing members.
     groups = [
@@ -1819,7 +1865,7 @@ def physical_subject_binding(root: Path) -> dict:
         commit = tree = None
     return {"line": line, "source_commit": commit, "source_tree": tree,
             "population_sha256": hashlib.sha256(population).hexdigest(), "members": members,
-            "physical_inputs_valid": not any(row.get("missing_or_linked") for row in members)}
+            "physical_inputs_valid": not successor_invalid and not any(row.get("missing_or_linked") for row in members)}
 
 
 def perform_lookup(root: Path, now: datetime) -> dict:
