@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "role": "Root integration of autocomplete absent-query guards and deferred live option changes",
+  "parent": "0a0ced0d07f06b561a8970cc7db80ed3a389f9e9",
+  "investigation_sha256": "2b6b8003378ae2015b375061ff8574cc5a04a40ff9b4500d72fa3420709c2c6c",
+  "investigation": {
+    "schema": 6,
+    "scope": "bounded autocomplete options lifecycle investigation, isolated candidate",
+    "historical_contract": {
+      "source": "reference/material-16.2.14/component-behavior-sources/autocomplete/autocomplete-trigger.ts",
+      "finding": "Material 16.2.14 directly reads autocomplete.options.changes; its tests call openPanel after fixture.detectChanges. Early open before ContentChildren initialization is not promised by the tagged contract. A consumer directive calling public openPanel from ngOnChanges is reachable while autocomplete.options is still undefined.",
+      "upstream_guard_limit": "The current peer's optional query guard with an empty observable avoids a throw, but the early subscription completes before the QueryList exists and loses subsequent option updates. A packed-artifact run reproduced the gap: 196/197 passed, with the dynamic lifecycle case failing visibility and opened/closed updates."
+    },
+    "candidate": {
+      "base": "5ddd6f98b9af8c4b4f7bee619eb291c2a9950b1c",
+      "commit": "b2250b30af51a062ef82339e1b5b8bac8483e5d4",
+      "patch": "autocomplete-options-lifecycle-v7.patch",
+      "patch_sha256": "6d2b3f3612f8697c9669cf482d3bedccdeab2fa41d2d1897a0fb51b23711d054",
+      "changes": "Guard pre-query option accesses. If options.changes is initially unavailable, share firstStable and then subscribe to the initialized QueryList.changes, retaining delayed position reapplication. Four lifecycle tests are direct registrations in the existing autocomplete.spec.ts. No helper import, inventory, roster, oracle or golden edits.",
+      "no_css_html_or_other_production_changes": true
+    },
+    "packed_family": {
+      "artifact_sha256": "e86794d9bdfa818067fbeb82f8a2b3a5fcc497ddaaca2f6bc995941b3f34e080",
+      "run": "worktree/artifacts/main/autocomplete-lifecycle-cleanup-v22/run.json",
+      "run_sha256": "2e803147e234a561275b156e15c1ccb47dd8f7627fe2e6df8ef85611cb2ea127",
+      "report": "worktree/artifacts/main/autocomplete-lifecycle-cleanup-v22/reports/legacy-autocomplete-20261107T181749Z.json",
+      "report_sha256": "468af3757dc3a1e2793e745e7b4e490dae3a4b0d30c20b79e78e38abf3bd7736",
+      "result": "197/197 passed in packed autocomplete family mode using Chrome Headless 149.0.0.0 and Node 24.21.0.",
+      "cleanup_evidence": "The pre-stable case asserts ComponentFixture.isStable() is false, captures the owned trigger's _closingActionsSubscription as RxJS Subscription, closes the panel, and asserts Subscription.closed transitions false to true before releasing stability. The destruction case captures the same owned composite while active, destroys the fixture and asserts closed changes false to true. Post-close option changes do not reposition/reopen. No Subject.observers access or QueryList.changes mutation is used."
+    },
+    "static_registry": {
+      "base": "107ccae1864dc4cbc56c4af1b8e70983a1fe947f",
+      "overlay": "registry-overlay-v7",
+      "evidence": "registry-derived-v7.json",
+      "evidence_sha256": "5e68d2b67581231c1cdf863a7693672358c77f7ae8fa8e2fbfe84cca41e28960",
+      "result": "2320 total cases; 179 autocomplete; all four lifecycle case IDs #175 through #178 are present under the registered autocomplete.spec.ts."
+    },
+    "typing": {
+      "probe_manifest": "typing-controls/typecheck-v7.json",
+      "probe_manifest_sha256": "bafb8d7399b4949101e94b6a3cb271dd6a984d7f4d8b41b377a2dc386e4b7516",
+      "result": "Focused valid type probe passes using QueryList.changes as Observable and Subscription.closed. A preserved invalid v6 `.next()` control fails with TS2339: Property 'next' does not exist on type Observable<any>."
+    },
+    "rxjs": {
+      "peer_range": "^6.5.3 || ^7.5.5",
+      "operators": "share and switchMap are existing public rxjs/operators imports already used in this file. No new RxJS operator/API was introduced.",
+      "runtime_limit": "Runtime qualification used RxJS 7 only; RxJS 6 was not executed."
+    },
+    "review": "review_osv_batch reported TS2339 for v6's attempted QueryList.changes.next. That call was removed; v7 uses the owned trigger Subscription.closed (public RxJS API), and a focused valid/invalid TS control is saved. Independent v7 review pending.",
+    "canonical_state": "All v7 source, packaging and registry work is isolated. The earlier v4 canonical patch incident was preserved/reversed by root; no later canonical writes were attempted."
+  },
+  "source_afterimages": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "1eaace45b9f3f144c3f8b2dd845e826a19e616ee4bb31d3923a545fda353cc7c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+      "sha256": "e5be9250343342b6994e1b0308282ac0de71aceddcddb9e535c73607dd7fb319"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "79f14a12676f6835602cf2f66b4650817e15a944ed8555cb3281231abcc8f8f0"
+    }
+  ],
+  "independent_review": {
+    "sha256": "d8fa306ec2e799d066b5fd4356b760a42dcb38ec3341cc390b64b0aab1830a87",
+    "text": "# Independent autocomplete lifecycle v7 review\n\nReviewed frozen patch SHA-256 `6d2b3f3612f8697c9669cf482d3bedccdeab2fa41d2d1897a0fb51b23711d054`, investigation SHA `2b6b8003378ae2015b375061ff8574cc5a04a40ff9b4500d72fa3420709c2c6c`, against source `107ccae1864dc4cbc56c4af1b8e70983a1fe947f`, in an isolated small tree. No canonical writes.\n\nNo remaining blocking finding within bounded lifecycle, registration and cleanup review. The v6 `Observable.next()` type error and v4 deprecated Subject observer access are removed. Cleanup tests inspect the locally owned trigger's closing subscription and the public RxJS `Subscription.closed`: before first stability, close transitions it to closed and later options do not reopen; on fixture destruction an active subscription transitions to closed. Late add/remove/re-add/select, event counts and reposition are covered. Initialized queries retain their immediate changes subscription. Early opening is a bounded improvement, not a promised Material 16 behavior. A focused independent TypeScript probe for `QueryList.changes.subscribe` and `Subscription.closed` passed; this is not a full spec or consumer typecheck.\n\nStrict isolated apply succeeded. Independent derivation yielded 2,320 unique IDs across 57 paths and lifecycle case IDs #175\u2013178. The supplied report's 195 non-control names exactly match the derived mapped names and order. Run SHA `2e803147e234a561275b156e15c1ccb47dd8f7627fe2e6df8ef85611cb2ea127`, report SHA `468af3757dc3a1e2793e745e7b4e490dae3a4b0d30c20b79e78e38abf3bd7736`, and tar SHA `e86794d9bdfa818067fbeb82f8a2b3a5fcc497ddaaca2f6bc995941b3f34e080` verified; the author report records 197/197. No independent browser replay, full historical matrix, packed consumer AOT, or RxJS 6 runtime was executed. `share` and `switchMap` are existing public operator imports; RxJS 6 compatibility remains source-based evidence only.\n"
+  },
+  "root_checks": [
+    "Strictwhitespaceapplypassed;all3currentfilesexactlyequalreviewedb225candidateGitblobs.",
+    "Actualtar/run/report/registry/typeprobemanifesthashesverified;packedsource-mapembedsexactbothproductionafterimages.",
+    "Combinedcurrentstaticderivation2321uniqueIDs/57pathswithall4directlifecyclecases;no side-effecttesthelper/no parser/golden/originalinventoryedit."
+  ],
+  "technical_decision": "BoundedrobustnessimprovementforpublicopenPanelduringAngularngOnChangesafterinputassignmentbutbeforeContentChildreninitialization;tagged16didnotpromiseearlyopen. Preserveinitializedquerypath;defermissingquerysubscriptionthroughfirststableinsteadofemptypermanentfallback,thenretainnormaldynamicvisibility/position/events/selection. NoHTML/CSS/SCSSorpublicsymbolchange.",
+  "limits": [
+    "Focused197/197actualpackedfamilyandindependentregistry/hash/typeprobe;nofreshindependentbrowserrunorfullspectypecheck/consumerAOT.",
+    "RxJS7runtimeonly;6publicoperatorssourcecompatiblebutnotexecutedhere. Needfinalfloorqualification.",
+    "BareinitialprebindingngOnInitmissing-panelerrorisexistingexpectedbehavior;notthereachableproof. EarlyngOnChangeswithboundautocompleteistestedpath.",
+    "Earlierv1queryfallbacklostfutureupdates;v2side-effecttestswereunregistered;v4Subject.observersdeprecated;v6Observable.nextinvalid. Allrejectedrecordsretained;onlyv7admitted.",
+    "Candidatepackpredateslatestcombinedrootoption/radioAPIcompositionandtooling;freshcombinedartifactandcurrent-sourceevidencerequired.",
+    "42autocompletefrozenuses/currentcutoff/source-speccontextsreopen;individualupstreamfebcdecisionstillrequiresseparateledgerreview.",
+    "No fullbrowser/floors/21security/G11/full-audit/releaseclaim."
+  ]
+}

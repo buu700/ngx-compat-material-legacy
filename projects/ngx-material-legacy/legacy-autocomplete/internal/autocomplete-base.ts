@@ -286,7 +286,7 @@ export abstract class _MatAutocompleteBase
 
   /** Panel should hide itself when the option list is empty. */
   _setVisibility() {
-    this.showPanel = !!this.options.length;
+    this.showPanel = !!this.options?.length;
     this._setVisibilityClasses(this._classList);
     this._changeDetectorRef.markForCheck();
   }

@@ -2,6 +2,7 @@ import {Directionality} from '@angular/cdk/bidi';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {DOWN_ARROW, ENTER, ESCAPE, SPACE, TAB, UP_ARROW} from '@angular/cdk/keycodes';
 import {Overlay, OverlayContainer} from '@angular/cdk/overlay';
+import {CommonModule} from '@angular/common';
 import {supportsShadowDom} from '../internal/owned-shadow-dom';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
 import {
@@ -17,14 +18,19 @@ import {
 import {
   ChangeDetectionStrategy,
   Component,
+  Directive,
+  Input,
   NgZone,
+  OnChanges,
   OnDestroy,
   OnInit,
   Provider,
   QueryList,
+  Self,
   Type,
   ViewChild,
   ViewChildren,
+  ViewContainerRef,
   ViewEncapsulation,
 } from '@angular/core';
 import {
@@ -41,6 +47,7 @@ import {MatLegacyOption, MatLegacyOptionSelectionChange} from '@ngx-compat/mater
 import {MatLegacyFormField, MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
 import {By} from '@angular/platform-browser';
 import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {BehaviorSubject, EMPTY, Observable, of, Subject, Subscription} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 
@@ -4183,3 +4190,231 @@ class AutocompleteWithActivatedEvent {
   @ViewChild(MatLegacyAutocomplete) autocomplete: MatLegacyAutocomplete;
   @ViewChildren(MatLegacyOption) options: QueryList<MatLegacyOption>;
 }
+
+
+@Component({
+  standalone: false,
+  template: `
+    <input [matAutocomplete]="auto">
+    <mat-autocomplete #auto="matAutocomplete"></mat-autocomplete>
+  `,
+})
+class LifecycleHost implements OnInit {
+  @ViewChild(MatLegacyAutocomplete, {static: true}) autocomplete!: MatLegacyAutocomplete;
+  @ViewChild(MatLegacyAutocompleteTrigger, {static: true}) trigger!: MatLegacyAutocompleteTrigger;
+  optionsAtOnInit: unknown;
+  openError: string | null = null;
+
+  ngOnInit(): void {
+    this.optionsAtOnInit = this.autocomplete.options;
+    try {
+      this.trigger.openPanel();
+    } catch (error) {
+      this.openError = String(error);
+    }
+  }
+}
+
+@Component({standalone: false, template: ''})
+class DynamicHost {
+  constructor(public viewContainerRef: ViewContainerRef) {}
+}
+
+@Directive({selector: 'input[openDuringChanges]', standalone: false})
+class OpenDuringChangesDirective implements OnChanges {
+  @Input() openDuringChanges!: MatLegacyAutocomplete;
+  optionsUndefinedAtChanges: boolean | null = null;
+  triggerAutocompleteUndefinedAtChanges: boolean | null = null;
+  openError: string | null = null;
+
+  constructor(@Self() private trigger: MatLegacyAutocompleteTrigger) {}
+
+  ngOnChanges(): void {
+    this.optionsUndefinedAtChanges = this.openDuringChanges.options === undefined;
+    this.triggerAutocompleteUndefinedAtChanges = this.trigger.autocomplete === undefined;
+    try {
+      this.trigger.openPanel();
+    } catch (error) {
+      this.openError = String(error);
+    }
+  }
+}
+
+@Component({
+  standalone: false,
+  template: `
+    <input [matAutocomplete]="auto" [openDuringChanges]="auto">
+    <mat-autocomplete #auto="matAutocomplete"></mat-autocomplete>
+  `,
+})
+class OpenDuringChangesHost {
+  @ViewChild(OpenDuringChangesDirective, {static: true}) probe!: OpenDuringChangesDirective;
+}
+
+@Component({
+  standalone: false,
+  template: `
+    <input [matAutocomplete]="auto" [openDuringChanges]="auto">
+    <mat-autocomplete #auto="matAutocomplete" (opened)="recordOpened()" (closed)="recordClosed()">
+      <mat-option *ngFor="let label of labels" [value]="label">{{label}}</mat-option>
+    </mat-autocomplete>
+  `,
+})
+class EarlyOpenOptionsHost {
+  labels: string[] = [];
+  openedCount = 0;
+  closedCount = 0;
+  @ViewChild(MatLegacyAutocomplete, {static: true}) autocomplete!: MatLegacyAutocomplete;
+  @ViewChild(MatLegacyAutocompleteTrigger, {static: true}) trigger!: MatLegacyAutocompleteTrigger;
+
+  recordOpened(): void {
+    this.openedCount++;
+  }
+
+  recordClosed(): void {
+    this.closedCount++;
+  }
+}
+
+describe('autocomplete content-query lifecycle', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [CommonModule, MatLegacyAutocompleteModule, NoopAnimationsModule],
+      declarations: [LifecycleHost, DynamicHost, OpenDuringChangesDirective, OpenDuringChangesHost, EarlyOpenOptionsHost],
+    }).compileComponents();
+  });
+
+  it('observes openPanel during host ngOnInit before content-query completion', () => {
+    const fixture = TestBed.createComponent(LifecycleHost);
+    fixture.detectChanges();
+    expect(fixture.componentInstance.optionsAtOnInit).toBeUndefined();
+    expect(fixture.componentInstance.trigger.autocomplete).toBe(
+      fixture.componentInstance.autocomplete,
+    );
+    expect(fixture.componentInstance.openError).toContain('undefined instance');
+    expect(fixture.componentInstance.autocomplete.options?.length).toBe(0);
+    fixture.destroy();
+  });
+
+  it('observes a consumer calling openPanel from an input directive change hook', () => {
+    const fixture = TestBed.createComponent(OpenDuringChangesHost);
+    fixture.detectChanges();
+    const probe = fixture.componentInstance.probe;
+    expect(probe.optionsUndefinedAtChanges).toBe(true);
+    expect(probe.triggerAutocompleteUndefinedAtChanges).toBe(false);
+    expect(probe.openError).toBeNull();
+    expect(fixture.debugElement.query(By.directive(MatLegacyAutocomplete))
+      ?.componentInstance.options?.length).toBe(0);
+    fixture.destroy();
+  });
+
+  it('continues observing options after opening before the initial content query', async () => {
+    const fixture = TestBed.createComponent(EarlyOpenOptionsHost);
+    fixture.detectChanges();
+    const host = fixture.componentInstance;
+    await fixture.whenStable();
+    const overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();
+    const positionStrategy = (host.trigger as any)._positionStrategy;
+    const reapplyPosition = spyOn(positionStrategy, 'reapplyLastPosition').and.callThrough();
+    expect(host.autocomplete.options.length).toBe(0);
+    expect(host.trigger.panelOpen).toBe(false);
+
+    host.labels = ['first'];
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(host.autocomplete.options.length).toBe(1);
+    expect(host.trigger.panelOpen).toBe(true);
+    expect(host.openedCount).toBe(1);
+    expect(reapplyPosition).toHaveBeenCalled();
+
+    host.labels = ['first', 'second'];
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(host.autocomplete.options.length).toBe(2);
+    expect(host.trigger.panelOpen).toBe(true);
+    expect(host.openedCount).toBe(1);
+
+    host.labels = [];
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(host.autocomplete.options.length).toBe(0);
+    expect(host.trigger.panelOpen).toBe(false);
+    expect(host.closedCount).toBe(1);
+
+    host.labels = ['third'];
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(host.autocomplete.options.length).toBe(1);
+    expect(host.trigger.panelOpen).toBe(true);
+    expect(host.openedCount).toBe(2);
+
+    const option = overlayContainerElement.querySelector('mat-option') as HTMLElement;
+    option.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(host.autocomplete.options.first.selected).toBe(true);
+    expect(host.trigger.panelOpen).toBe(false);
+    expect(host.closedCount).toBe(2);
+    const reapplyCountAfterClose = reapplyPosition.calls.count();
+    host.labels = ['after-close'];
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(host.trigger.panelOpen).toBe(false);
+    expect(host.openedCount).toBe(2);
+    expect(reapplyPosition.calls.count()).toBe(reapplyCountAfterClose);
+    fixture.destroy();
+
+    const preStableCloseFixture = TestBed.createComponent(EarlyOpenOptionsHost);
+    let releaseStabilityGate!: () => void;
+    preStableCloseFixture.ngZone!.run(() => {
+      void new Promise<void>(resolve => {
+        releaseStabilityGate = resolve;
+      }).then(() => undefined);
+    });
+    preStableCloseFixture.detectChanges();
+    const preStableCloseHost = preStableCloseFixture.componentInstance;
+    const preStableClosingActions =
+      (preStableCloseHost.trigger as any)._closingActionsSubscription as Subscription;
+    expect(preStableClosingActions.closed).toBe(false);
+    expect(preStableCloseFixture.isStable()).toBe(false);
+    preStableCloseHost.trigger.closePanel();
+    expect(preStableClosingActions.closed).toBe(true);
+    releaseStabilityGate();
+    await preStableCloseFixture.whenStable();
+    preStableCloseHost.labels = ['late'];
+    preStableCloseFixture.detectChanges();
+    await preStableCloseFixture.whenStable();
+    expect(preStableCloseHost.trigger.panelOpen).toBe(false);
+    expect(preStableCloseHost.openedCount).toBe(0);
+    preStableCloseFixture.destroy();
+
+    const destroyFixture = TestBed.createComponent(EarlyOpenOptionsHost);
+    destroyFixture.detectChanges();
+    const destroyHost = destroyFixture.componentInstance;
+    await destroyFixture.whenStable();
+    const destroyPositionStrategy = (destroyHost.trigger as any)._positionStrategy;
+    const reapplyAfterDestroy = spyOn(destroyPositionStrategy, 'reapplyLastPosition').and.callThrough();
+    destroyHost.labels = ['destroyed'];
+    destroyFixture.detectChanges();
+    await destroyFixture.whenStable();
+    expect(destroyHost.trigger.panelOpen).toBe(true);
+    const reapplyCountBeforeDestroy = reapplyAfterDestroy.calls.count();
+    const destroyClosingActions =
+      (destroyHost.trigger as any)._closingActionsSubscription as Subscription;
+    expect(destroyClosingActions.closed).toBe(false);
+    destroyFixture.destroy();
+    expect(destroyClosingActions.closed).toBe(true);
+    expect(reapplyAfterDestroy.calls.count()).toBe(reapplyCountBeforeDestroy);
+  });
+
+  it('destroys a dynamic public autocomplete component before its first query refresh', () => {
+    const destroySpy = spyOn(MatLegacyAutocomplete.prototype, 'ngOnDestroy').and.callThrough();
+    const fixture = TestBed.createComponent(DynamicHost);
+    const ref = fixture.componentInstance.viewContainerRef.createComponent(MatLegacyAutocomplete);
+    const autocomplete = ref.instance;
+    expect(autocomplete.options).toBeUndefined();
+    ref.destroy();
+    expect(destroySpy.calls.count()).toBeGreaterThan(0);
+    fixture.destroy();
+  });
+});
