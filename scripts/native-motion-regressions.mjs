@@ -105,6 +105,19 @@ const wrapper = observationProblems({
 });
 expect('wrapper background', wrapper.problems.some(item => item.includes('wrapper background is not component motion')));
 
+const fieldEnabled = roster.ids.find(id => id.endsWith('/enabled-disabled-reduced/form-field/enabled'));
+const fieldDisabled = roster.ids.find(id => id.endsWith('/enabled-disabled-reduced/form-field/provider-disabled'));
+const wrongFieldWrapper = observationProblems({requiredIds: roster.ids,
+  outcomes: withOne(fieldEnabled, () => ({selector: '.mat-form-field-subscript-message'})),
+  engines: goodEngines, sourceClean: true, artifactSha: 'abc', boundSha: 'abc'});
+expect('form-field obsolete wrapper rejected', wrongFieldWrapper.problems.some(item => item.includes('wrapper background is not component motion')));
+for (const [label, id, value] of [['missing enter effect', fieldEnabled, 0], ['disabled effect', fieldDisabled, 1]]) {
+  const rejected = observationProblems({requiredIds: roster.ids,
+    outcomes: withOne(id, () => ({animationCount: value})), engines: goodEngines,
+    sourceClean: true, artifactSha: 'abc', boundSha: 'abc'});
+  expect('form-field ' + label, rejected.problems.some(item => item.includes('wrong native form-field animation count')));
+}
+
 const missing = observationProblems({
   requiredIds: roster.ids, outcomes: goodOutcomes,
   engines: {chromium: goodEngines.chromium, webkit: goodEngines.webkit},

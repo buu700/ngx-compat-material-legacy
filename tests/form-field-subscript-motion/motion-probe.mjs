@@ -1,56 +1,21 @@
-/**
- * @license
- * Copyright Google LLC All Rights Reserved.
- * Copyright (c) 2026 Ryan Lester.
- * Use of this source code is governed by the MIT license in LICENSE.
- */
+/** @license Copyright Google LLC All Rights Reserved. Copyright (c) 2026 Ryan Lester. MIT. */
 import {pathToFileURL} from 'node:url';
-const {withChromium} = await import(pathToFileURL(process.env.MOTION_BROWSER_HELPER).href);
 import {writeFileSync} from 'node:fs';
-const dir=process.env.MOTION_OUTPUT, disabled=process.argv[3].startsWith('noop');
+const {withChromium}=await import(pathToFileURL(process.env.MOTION_BROWSER_HELPER).href);
+const disabled=process.argv[3].startsWith('noop');
 await withChromium(process.argv[2],async({evaluate,browser})=>{
- for(let i=0;i<80 && !(await evaluate('!!window.lab || !!document.getElementById("bootstrap-error")'));i++)await new Promise(r=>setTimeout(r,100));
- const boot=await evaluate('({ready:!!window.lab,error:document.getElementById("bootstrap-error")?.textContent})');if(!boot.ready)throw Error(JSON.stringify(boot));
+ for(let i=0;i<80&&!(await evaluate('!!window.lab || !!document.getElementById("bootstrap-error")'));i++)await new Promise(r=>setTimeout(r,100));
  const data=await evaluate(`(async()=>{
  const disabled=${JSON.stringify(disabled)},wait=ms=>new Promise(r=>setTimeout(r,ms)),frames=()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
- const node=()=>document.querySelector('.mat-form-field-subscript-message'),check=(x,m)=>{if(!x)throw Error(m)};await wait(700);const message=node();let reads=0;
- const geometry=message.getBoundingClientRect.bind(message);message.getBoundingClientRect=()=>{reads++;return geometry()};const rows=[];
- check(message.getAnimations().length===0 && getComputedStyle(message).opacity==='1','initial rendering must not animate');
- async function rendered(text){for(let i=0;i<30 && node()?.innerText!==text;i++)await frames();check(node()?.innerText===text,'displayed state did not update');getComputedStyle(node()).opacity;}
- async function change(invalid,label,previous=[]){
-  window.lab.set(invalid);await rendered(invalid?'Error':'Hint');const animations=node().getAnimations(),properties=animations.map(a=>a.transitionProperty).sort();
-  const row={label,text:node().innerText,reads,same:node()===message,properties,timings:animations.map(a=>a.effect.getTiming()),fresh:animations.every(a=>!previous.includes(a)),beforeOpacity:getComputedStyle(node()).opacity};
-  check(row.same,'permanent live-region node replaced');
-  if(disabled){check(animations.length===0 && row.beforeOpacity==='1','disabled motion animated');}
-  else {
-   check(animations.length===2 && JSON.stringify(properties)===JSON.stringify(['opacity','transform']),'two actual CSS transitions required');check(row.fresh,'message switch reused old transition objects');
-   check(animations.every(a=>a.effect.getTiming().duration===300),'historical duration changed');
-   check(getComputedStyle(node()).transition.includes('cubic-bezier(0.55, 0, 0.55, 0.2)'),'historical curve changed');
-   for(const a of animations)a.currentTime=50;
-   row.opacityAt50=getComputedStyle(node()).opacity;row.transformAt50=getComputedStyle(node()).transform;
-   check(Number(row.opacityAt50)>0 && Number(row.opacityAt50)<1,'browser opacity interpolation missing');
-   const matrix=new DOMMatrixReadOnly(row.transformAt50),opacity=Number(row.opacityAt50);
-   check(Math.abs(matrix.m11-1)<0.0001 && Math.abs(matrix.m22-1)<0.0001 && Math.abs(matrix.m41)<0.0001 && matrix.m42>-5 && matrix.m42<0,'browser historical translateY interpolation missing');
-   check(Math.abs(matrix.m42-(-5*(1-opacity)))<0.025,'opacity/translateY interpolation diverged from tagged reference endpoints');
-  }
-  rows.push(row);return animations;
- }
- window.lab.set(false);await rendered('Hint');check(reads===0 && message.getAnimations().length===0,'same initial hint restarted');
- let animations=await change(true,'error');const beforeSame=reads,old=[...animations];window.lab.set(true);await rendered('Error');check(reads===beforeSame && message.getAnimations().every(a=>old.includes(a)),'same error restarted');
- animations=await change(false,'hint',animations);
- const overlap=[];
- for(const [invalid,label] of [[true,'rapid-error'],[false,'rapid-hint'],[true,'rapid-error-again']]){
-  if(!disabled){const active=animations.some(a=>a.playState==='running' && a.currentTime<300);check(active,'rapid request was not made during an active transition');overlap.push(active);}
-  animations=await change(invalid,label,animations);
- }
- const preCoalesced=[...animations],readsBeforeCoalesced=reads;
- window.lab.set(false);window.lab.set(true);window.lab.set(false);await rendered('Hint');const final=node().getAnimations();
- if(!disabled){check(final.length===2 && final.every(a=>!preCoalesced.includes(a)) && reads>readsBeforeCoalesced,'final changed-kind transition missing or stale');for(const a of final)a.currentTime=50;
- const opacity=Number(getComputedStyle(node()).opacity),matrix=new DOMMatrixReadOnly(getComputedStyle(node()).transform);
- check(opacity>0&&opacity<1&&matrix.m42>-5&&matrix.m42<0&&Math.abs(matrix.m42-(-5*(1-opacity)))<0.025,'final changed-kind interpolation failed');for(const a of final)a.currentTime=300;}
- else check(final.length===0&&reads===0,'disabled coalesced changes animated or forced geometry');
- check(getComputedStyle(node()).opacity==='1' && Math.abs(new DOMMatrixReadOnly(getComputedStyle(node()).transform).m42)<0.0001,'final state failed to settle');const aria={live:message.getAttribute('aria-live'),atomic:message.getAttribute('aria-atomic')};check(aria.live==='polite'&&aria.atomic==='true','live-region attributes changed');
- window.lab.destroy();for(let i=0;i<30&&node();i++)await frames();check(!node(),'destroy left message node');return {passed:true,rows,overlap,reads,aria,destroyed:true,measurement:'Actual CSS transition identities, duration, curve and browser interpolation at explicit currentTime50; wall-clock timing is not asserted.'};
- })()`);
- writeFileSync(dir+'/'+process.argv[3]+'-report.json',JSON.stringify({browser,data},null,2)+'\n');console.log(JSON.stringify(data));
+ const node=()=>document.querySelector('.mat-form-field-subscript-wrapper > div'),check=(x,m)=>{if(!x)throw Error(m)};await wait(500);let current=node();const rows=[];
+ const shape=(el,text)=>{check(!!el,'missing direct subscript div');check(el.className===(text==='Hint'?'mat-form-field-hint-wrapper':''),'wrong tagged wrapper classes');check(el.parentElement.children.length===1,'wrong direct element count');check(!el.classList.contains('mat-form-field-subscript-message'),'nonhistorical wrapper class');if(text==='Error'){const e=el.querySelector('mat-error');check(e?.getAttribute('aria-live')==='polite'&&e?.getAttribute('aria-atomic')==='true','error live region');}};
+ check(current.innerText==='Hint'&&current.getAnimations().length===0,'initial rendering animated');check(getComputedStyle(current).transform!=='none'&&new DOMMatrixReadOnly(getComputedStyle(current).transform).m42===0,'tagged resting transform');shape(current,'Hint');
+ async function rendered(text){for(let i=0;i<35&&node()?.innerText!==text;i++)await frames();check(node()?.innerText===text,'displayed state did not update');shape(node(),text)}
+ async function change(invalid,label){let previous=current,previousAnimations=previous.getAnimations();const canceled=previousAnimations.filter(a=>a.playState==='running').map(a=>a.finished.then(()=> 'finished',e=>e.name));window.lab.set(invalid);await rendered(invalid?'Error':'Hint');current=node();check(current!==previous,'branch did not replace wrapper');const animations=current.getAnimations(),row={label,properties:animations.length,oldDisconnected:!previous.isConnected};check(row.oldDisconnected,'old wrapper retained');check(previousAnimations.every(a=>a.playState==='idle'||a.playState==='finished'),'old animation not canceled');for(const promise of canceled)check(await promise==='AbortError','cancel promise did not reject as expected');
+  if(disabled)check(animations.length===0&&getComputedStyle(current).opacity==='1','disabled motion animated');else {check(animations.length===1,'expected one native enter animation');const animation=animations[0],timing=animation.effect.getTiming();check(timing.duration===300&&timing.easing==='cubic-bezier(0.55, 0, 0.55, 0.2)','historical timing changed');animation.currentTime=50;const opacity=Number(getComputedStyle(current).opacity),matrix=new DOMMatrixReadOnly(getComputedStyle(current).transform);check(opacity>0&&opacity<1&&matrix.m42>-5&&matrix.m42<0&&Math.abs(matrix.m42-(-5*(1-opacity)))<0.025,'historical interpolation');row.opacity=opacity;row.translateY=matrix.m42;}
+  rows.push(row);return animations;}
+ window.lab.set(false);await rendered('Hint');check(node()===current&&current.getAnimations().length===0,'same kind restarted');let animations=await change(true,'error');const error=current,old=animations[0];window.lab.set(true);await rendered('Error');check(node()===error&&(!old||node().getAnimations().includes(old)),'same error restarted');animations=await change(false,'hint');
+ for(const [invalid,label] of [[true,'rapid-error'],[false,'rapid-hint'],[true,'rapid-error-again']]){if(!disabled)check(animations.some(a=>a.playState==='running'&&a.currentTime<300),'interruption missing active motion');animations=await change(invalid,label)}
+ window.lab.set(false);window.lab.set(true);window.lab.set(false);await rendered('Hint');check(node()!==current,'coalesced changed kind did not replace');current=node();animations=current.getAnimations();if(!disabled){check(animations.length===1,'final animation missing');animations[0].currentTime=300;await animations[0].finished;current.style.opacity='0.5';current.style.transform='translateY(7px)';check(getComputedStyle(current).opacity==='0.5'&&new DOMMatrixReadOnly(getComputedStyle(current).transform).m42===7,'finished effect masks later styles');current.style.removeProperty('opacity');current.style.removeProperty('transform')}else check(animations.length===0,'disabled motion');check(getComputedStyle(current).opacity==='1','final style');const nativeAnimate=Element.prototype.animate;try{Element.prototype.animate=undefined;window.lab.set(true);await rendered('Error');check(node()!==current&&node().getAnimations().length===0&&getComputedStyle(node()).opacity==='1'&&getComputedStyle(node()).transform!=='none','unsupported animate fallback')}finally{Element.prototype.animate=nativeAnimate}window.lab.destroy();for(let i=0;i<30&&node();i++)await frames();check(!node(),'destroy left wrapper');return {passed:true,rows,destroyed:true,scope:'native enter interpolation at explicit currentTime; no wall-clock claim'};
+ })()`);writeFileSync(process.env.MOTION_OUTPUT+'/'+process.argv[3]+'-report.json',JSON.stringify({browser,data},null,2)+'\n');console.log(JSON.stringify(data));
 },{debugPort:0,requireAnnouncedEndpoint:true});

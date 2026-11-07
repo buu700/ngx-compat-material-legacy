@@ -31,7 +31,7 @@ function cleanFixture() {
     select: 'legacyAnimationsDisabled()\n',
     selectHtml: '[class.mat-select-panel-animations-enabled]\n',
     formField: 'legacyAnimationsDisabled()\n',
-    formFieldHtml: 'class="mat-form-field-subscript-message"\n',
+    formFieldHtml: 'class="mat-form-field-hint-wrapper"\n',
     snackBar: "'[class.mat-snack-bar-container-enter]'\n",
     tabs: '_onContentTransitionEnd()\n',
     tabBody: 'class TabBody {}\n',

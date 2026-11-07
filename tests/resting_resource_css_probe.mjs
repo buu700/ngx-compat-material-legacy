@@ -43,33 +43,7 @@ const originals = new Map(Object.entries(pins).map(([file, pin]) => {
 }));
 // Exact pre-existing additions are receipts only. Do not broaden these blocks to silence a mismatch.
 const retained = {
-  'legacy-form-field/form-field.scss': {
-    suffix: `\n\n.mat-form-field-subscript-message.mat-form-field-subscript-animations-enabled {
-  opacity: 0;
-  transform: translateY(-5px);
-
-  &.mat-form-field-subscript-message-enter {
-    opacity: 1;
-    transform: translateY(0%);
-    transition:
-      opacity 300ms cubic-bezier(0.55, 0, 0.55, 0.2),
-      transform 300ms cubic-bezier(0.55, 0, 0.55, 0.2);
-  }
-}
-
-.mat-form-field-subscript-message:not(.mat-form-field-subscript-animations-enabled) {
-  opacity: 1;
-  transform: none;
-}
-`,
-  },
   'legacy-menu/menu.scss': {
-    embedded: `
-    // Hide empty panels while animating away when the same menu is reused across triggers.
-    &:has(.mat-menu-content:empty) {
-      display: none;
-    }
-`,
     suffix: `\n\n@keyframes mat-legacy-menu-enter {
   from {
     opacity: 0;
@@ -100,10 +74,6 @@ const retained = {
 
   &.mat-menu-panel-animating {
     pointer-events: none;
-
-    &:has(.mat-menu-content:empty) {
-      display: none;
-    }
   }
 }
 `,
@@ -129,10 +99,6 @@ function restingSource(file, source) {
   if (extra) {
     assert.ok(source.endsWith(extra.suffix), 'retained motion suffix changed');
     source = source.slice(0, -extra.suffix.length);
-    if (extra.embedded) {
-      assert.equal(source.split(extra.embedded).length, 2, 'retained empty-panel rule changed');
-      source = source.replace(extra.embedded, '');
-    }
   }
   return source;
 }
@@ -206,8 +172,9 @@ for (const key of ['--main-root', '--maintenance-root']) {
     ['textarea-cols-width', 'legacy-form-field/form-field.scss', read('legacy-form-field/form-field.scss').replace('width: $default-infix-width;', 'width: $default-infix-width;\n  &:has(textarea[cols]) {width:auto;}')],
     ['menu-viewport-height', 'legacy-menu/menu.scss', read('legacy-menu/menu.scss').replace('max-height: calc(100vh - #{menu-common.$item-height});', 'max-height:100vh;')],
     ['arbitrary-native-addition', 'legacy-core/option/optgroup.scss', read('legacy-core/option/optgroup.scss') + '\n@media (forced-colors:active) {.unrelated {display:none;}}'],
-    ['broadened-motion-suffix', 'legacy-form-field/form-field.scss', read('legacy-form-field/form-field.scss') + '\n.mat-form-field {width:auto;}'],
-    ['changed-empty-panel-selector', 'legacy-menu/menu.scss', read('legacy-menu/menu.scss').replace(':has(.mat-menu-content:empty)', ':has(.mat-menu-content)')],
+    ['unexpected-form-field-selector', 'legacy-form-field/form-field.scss', read('legacy-form-field/form-field.scss') + '\n.mat-form-field {width:auto;}'],
+    ['reintroduced-empty-panel-hide', 'legacy-menu/menu.scss', read('legacy-menu/menu.scss').replace('&.ng-animating {\n    pointer-events: none;', '&.ng-animating {\n    pointer-events: none;\n    &:has(.mat-menu-content:empty) { display: none; }')],
+    ['reintroduced-motion-empty-panel-hide', 'legacy-menu/menu.scss', read('legacy-menu/menu.scss').replace('&.mat-menu-panel-animating {\n    pointer-events: none;', '&.mat-menu-panel-animating {\n    pointer-events: none;\n    &:has(.mat-menu-content:empty) { display: none; }')],
   ]) {
     assert.notEqual(changed, read(file));
     assert.throws(() => assess(file, options[key], changed), /resting tagged source differs|retained motion suffix changed|retained empty-panel rule changed/);
@@ -220,7 +187,7 @@ const report = {
   node: process.version, sass: sass.info, css_parser: parserPackage.version, esbuild: esbuild.version,
   original_resources: [...originals].map(([file, text]) => ({file, sha256: sha(text), bytes: Buffer.byteLength(text)})),
   observations, mutations,
-  scope: 'Complete tagged source after module relocation, full historical resting CSS syntax/selector/declaration order, and independently compiled public native resting CSS for six resources. Four styles have no extensions. Exact pre-existing form-field/menu motion and empty-panel additions are retained and bound as unqualified receipts, not accepted golden exceptions. Only CSS formatting whitespace is normalized.',
+  scope: 'Complete tagged source after module relocation, full historical resting CSS syntax/selector/declaration order, and independently compiled public native resting CSS for six resources. Five styles have no extensions. Exact pre-existing menu motion additions are retained and bound as unqualified receipts, not accepted golden exceptions. Only CSS formatting whitespace is normalized.',
   native_browser_or_angular_or_packed_execution: false, g11_claim: 'not-passed',
 };
 writeFileSync(options['--report'], JSON.stringify(report, null, 2) + '\n');

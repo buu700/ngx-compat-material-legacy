@@ -14,6 +14,7 @@ import {
   AfterContentChecked,
   AfterContentInit,
   AfterViewInit,
+  AfterViewChecked,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -157,7 +158,7 @@ export const MAT_LEGACY_FORM_FIELD_DEFAULT_OPTIONS =
 })
 export class MatLegacyFormField
   extends _MatFormFieldBase
-  implements AfterContentInit, AfterContentChecked, AfterViewInit, OnDestroy, CanColor
+  implements AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked, OnDestroy, CanColor
 {
   /**
    * Whether the outline gap needs to be calculated
@@ -214,6 +215,7 @@ export class MatLegacyFormField
   /** State of the mat-hint and mat-error animations. */
   _subscriptAnimationState: string = '';
   private _previousMessageKind: 'error' | 'hint' | undefined;
+  private _messageAnimation: Animation | null = null;
 
 
 
@@ -423,19 +425,30 @@ export class MatLegacyFormField
     if (this._outlineGapCalculationNeededImmediately) {
       this.updateOutlineGap();
     }
+  }
 
+  ngAfterViewChecked() {
     const messageKind = this._getDisplayedMessages();
-    if (this._previousMessageKind !== undefined && this._previousMessageKind !== messageKind &&
-        this._platform.isBrowser && this._animationsEnabled && this._subscriptAnimationState === 'enter') {
+    const changed = this._previousMessageKind !== undefined && this._previousMessageKind !== messageKind;
+    if (changed) {
+      this._messageAnimation?.cancel();
+      this._messageAnimation = null;
+    }
+    if ((changed || this._previousMessageKind === undefined) && this._platform.isBrowser &&
+        this._subscriptAnimationState === 'enter') {
       const message: HTMLElement | null = this._elementRef.nativeElement.querySelector(
-        ':scope > .mat-form-field-wrapper > .mat-form-field-subscript-wrapper > ' +
-          '.mat-form-field-subscript-message',
+        ':scope > .mat-form-field-wrapper > .mat-form-field-subscript-wrapper > div',
       );
       if (message) {
-        message.classList.remove('mat-form-field-subscript-message-enter');
-        // Establish the initial style before restarting the existing CSS transition.
-        message.getBoundingClientRect();
-        message.classList.add('mat-form-field-subscript-message-enter');
+        // Match the historical enter state's resting inline styles without retaining an effect.
+        message.style.opacity = '1';
+        message.style.transform = 'translateY(0%)';
+        if (changed && this._animationsEnabled && typeof message.animate === 'function') {
+          this._messageAnimation = message.animate(
+            [{opacity: 0, transform: 'translateY(-5px)'}, {opacity: 1, transform: 'translateY(0%)'}],
+            {duration: 300, easing: 'cubic-bezier(0.55, 0, 0.55, 0.2)'},
+          );
+        }
       }
     }
     this._previousMessageKind = messageKind;
@@ -449,6 +462,8 @@ export class MatLegacyFormField
 
   ngOnDestroy() {
     this._formFieldDestroyed = true;
+    this._messageAnimation?.cancel();
+    this._messageAnimation = null;
     if (typeof cancelAnimationFrame === 'function') {
       this._directionFrames.forEach(frameId => cancelAnimationFrame(frameId));
     }

@@ -545,15 +545,22 @@ export class MotionRoot {
     await this.ensureSurfaces();
     this.name.setErrors({required: true});
     this.name.markAsTouched();
-    await this.waitFor(() => (document.querySelector('.mat-form-field-subscript-message')?.textContent || '').includes('Required'));
-    await this.wait(this.mode() === 'enabled' ? 400 : 40);
-    const el = document.querySelector('.mat-form-field-subscript-message') as HTMLElement;
+    const selector = '.mat-form-field-subscript-wrapper > div';
+    await this.waitFor(() => (document.querySelector(selector)?.textContent || '').includes('Required'));
+    const el = document.querySelector(selector) as HTMLElement;
     const mode = this.mode();
+    const animations = el.getAnimations();
+    const durationMs = animations.reduce((max, animation) => {
+      const duration = animation.effect?.getTiming().duration;
+      return typeof duration === 'number' ? Math.max(max, duration) : max;
+    }, 0);
+    await this.wait(mode === 'enabled' ? 400 : 40);
     const text = el.textContent || '';
     const observation = {
-      selector: el.classList.contains('mat-form-field-subscript-message') ? '.mat-form-field-subscript-message' : '',
-      selectorMatches: el.classList.contains('mat-form-field-subscript-message') && !!el.closest('mat-form-field'),
-      durationMs: this.duration(el, 'transition-duration'),
+      selector,
+      selectorMatches: el.matches(selector) && el.className === '' && !!el.querySelector('mat-error') && !!el.closest('mat-form-field'),
+      durationMs,
+      animationCount: animations.length,
       finalState: text.includes('Required') && this.visible(el) ? 'visible' : 'hidden',
       notifications: 0,
       detectChangesCalls: 0,

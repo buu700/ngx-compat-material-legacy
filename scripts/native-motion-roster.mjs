@@ -48,7 +48,7 @@ export const SELECTORS = {
   select: '.mat-select-panel',
   tooltip: '.mat-tooltip',
   tabs: '.mat-tab-body-content',
-  'form-field': '.mat-form-field-subscript-message',
+  'form-field': '.mat-form-field-subscript-wrapper > div',
 };
 export const MIN_ENABLED_MS = {
   dialog: 100,
@@ -154,6 +154,7 @@ function enabledProblem(component, mode, obs) {
   if (obs.detectChangesCalls !== 0) return 'detectChanges stand-in';
   if (obs.selector !== SELECTORS[component] || obs.selectorMatches !== true) return 'wrapper background is not component motion';
   if (obs.finalState !== 'visible') return 'missing final state';
+  if (component === 'form-field' && obs.animationCount !== (mode === 'enabled' ? 1 : 0)) return 'wrong native form-field animation count';
   if (mode === 'enabled') {
     if (!(typeof obs.durationMs === 'number' && obs.durationMs >= MIN_ENABLED_MS[component])) return 'zero-duration CSS fake';
   } else if (obs.durationMs !== 0) {
@@ -267,6 +268,7 @@ function samplePassBody(caseId) {
       selector: SELECTORS[component],
       selectorMatches: true,
       durationMs: mode === 'enabled' ? MIN_ENABLED_MS[component] : 0,
+      ...(component === 'form-field' ? {animationCount: mode === 'enabled' ? 1 : 0} : {}),
       finalState: 'visible',
       notifications: NOTIFICATION_CONTRACT.has(component) ? 1 : 0,
       ...(component === 'menu' ? {exit: {
