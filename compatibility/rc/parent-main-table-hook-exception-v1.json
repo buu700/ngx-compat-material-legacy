@@ -1,0 +1,22 @@
+{
+  "role": "Maintainer-authorized narrow table implementation-hook exception",
+  "authorized_on": "2026-11-08",
+  "authority": "User in this Codex thread: Sounds good, I'm fine with it as-is as long as it works but feel free to try out anything that might be an improvement.",
+  "scope": {
+    "outlet_bridge": ["_headerRowOutlet", "_rowOutlet", "_footerRowOutlet", "_noDataRowOutlet", "_outletAssigned"],
+    "no_data_adapter": ["_contentClassNames", "_cellClassNames", "_cellSelector"]
+  },
+  "rationale": "Tagged16 table behavior already depended on CDK outlet fields and an internal no-data root-class override within the matching Material/CDK implementation. The add-on adapts that wiring to current peers. A real Angular public-module-only outlet substitution fails because the upstream directives require private CDK_TABLE. The simple public contentChanged cleanup alternative loses the distinction between authored and injected CDK classes, so it cannot preserve both legitimate historical outcomes.",
+  "alternative_evidence": {
+    "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/no-data-event-alternative-v1/RESULT.md",
+    "producer_sha256": "4ea55fb580a656d20d8f49daef240b3d701a7b5318338e74468e9eff52194bf9"
+  },
+  "required_invariants": [
+    "Preserve Material 16 rendered HTML, CSS, SCSS and authored classes without consumer changes",
+    "Authenticate actual peer implementation and requalify when it changes",
+    "Exercise real outlet ownership, initialization, destruction, native/flex and nested tables, and no-data lifecycle behavior",
+    "Do not extend this exception to unrelated private dependencies or a CDK fork"
+  ],
+  "qualification_status": "Current bounded cell/no-data replays passed in separately retained receipts. Complete packed Angular table and release-matrix qualification remains required.",
+  "g11_claim": "not-passed"
+}
