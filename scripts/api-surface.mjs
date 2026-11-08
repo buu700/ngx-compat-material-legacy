@@ -17,6 +17,7 @@ import {INPUT_SYMBOL,approvedInputSignatureRecord} from './api-input-context.mjs
 import {RIPPLE_SYMBOL,rippleReexportSignatureProblems} from './ripple-construction-contract.mjs';
 import {originalCompilerFactoryContext, originalPublishedJitFactory} from './api-original-factory-contexts.mjs';
 import {settleInputHarness} from './api-input-harness-contract.mjs';
+import {historicalMenuFilter,settleMenuHarness,MENU_HARNESS} from './api-menu-harness-contract.mjs';
 
 const require = createRequire(import.meta.url);
 let typescriptModule;
@@ -947,6 +948,7 @@ export function deriveSurface(refRoot) {
         if (removals.has(`${entry}#${name}`)) continue;
         const found = followExports(refPath, name, new Set(), refRoot);
         const shape = shapeFromFound(found, refRoot);
+        if (`${entry}/${name}` === MENU_HARNESS) shape.historicalMenuFilter = historicalMenuFilter(refRoot);
         if (found && found.reexport) shape.reexport = found.reexport;
         symbols.push({
           family,
@@ -1727,6 +1729,8 @@ export function observeDeclarations(surface, dtsFiles, differences, allowlist) {
       let signature = compareSignatures(symbol, packed, differences);
       if (symbol.symbol_id === 'legacy-input/testing/MatLegacyInputHarness' && sourceFile)
         signature = settleInputHarness(symbol, sourceFile, signature);
+      if (symbol.symbol_id === MENU_HARNESS && sourceFile)
+        signature = settleMenuHarness(symbol, sourceFile, signature);
       const exportIssue = exportProblems(symbol, present);
       const shapeIssue = shapeProblems(signature);
       observations.push({

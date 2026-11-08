@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "role": "Finite public menu-harness historical filter declaration proof",
+  "parent": "6b88db228feff1f1598b50fbc00bc17e45d6c899",
+  "patch_sha256": "a33c4bf14a021cac551c8034f3a3c0ae004aeefc0038067ba313767681c41d2c",
+  "manifest_sha256": "961e6800233ff167a93cbf335221f805749196a02a1675a3d0e5102a732ff611",
+  "afterimages": {
+    "scripts/api-surface.mjs": "ad45a83ee18c72d7bb7bc8157bc1916c1c2c3d76d227a803536ac25c6c1d797f",
+    "scripts/api-menu-harness-contract.mjs": "8513455658c1fba0ce3825491e96cf6c198b352cc69893e9e1abd4cb0236e706",
+    "scripts/api-menu-harness-regressions.mjs": "7e4c0f83afd8963fa77f7dad1339aada3ba78765b63459744bc3bdb324530127",
+    "testing/menu-harness-api/consumer.mts": "4bb7fb89bb7166375fcb1d8d4ea0c49c63c381c79c1dcdae207cf12082cb0ce2"
+  },
+  "independent_review": {
+    "sha256": "19c9834e365edfd7e278e0a553fce91c3798bb4df1abac67a60e7928d65994be",
+    "text": "# Independent finite menu-harness review: v2\n\nFrozen core `../menu-harness-patch-v2.patch` SHA-256 `a33c4bf14a021cac551c8034f3a3c0ae004aeefc0038067ba313767681c41d2c`, manifest `../manifest-v2.json` `961e6800233ff167a93cbf335221f805749196a02a1675a3d0e5102a732ff611`. V2 supersedes v1's incomplete direct-public-symbol census; v1 remains historical, not an integration recommendation. Core apply check succeeds on clean canonical HEAD `04daa4f8c0617be2ea1a93cbfca06cedf30da3ab`; packet row evidence was produced from source `5b36c449ea6d950ba7317cd0696cd3da1632f44d`. The separate workflow patch is not reviewed or approved here.\n\nCompared the v2 diff with v1 and the exact packed declaration's imports. Its census resolves all six direct `@angular/cdk/testing` imports and the one direct `@angular/material/menu/testing` import to their public exports and actual targets, rejects deprecated/docs-private/experimental declarations, and checks the public predicate's class constraint and returned generic argument identity. The fixed candidate declaration hash constrains this census to the reviewed actual file; changed imports require requalification. The added deprecation controls are identity-drift negatives: transformations are rejected by the fixed source-byte boundary, not independently proved by every subsequent public-symbol check.\n\nIndependently ran v2's packed `--run` regression with pinned Node 24.21.0, using the unchanged CI run manifest and exact 4a tar: strict consumer and all controls passed, exit 0. A copy of that run with a forged library hash was rejected before extraction, exit 1. The v1 independent report established the authenticated tagged Material/CDK filter sources, actual tar declaration, 67-entry path-bound fingerprint and two-row-only 39\u219237 before/after comparison; these recorded v2 inputs and row files are byte-identical. V2's expanded census and new controls were inspected, and the actual positive proof was executed, but this is not a general upstream API or class identity proof. Transitive internal chunks are read as evidence through public exports, not authored private imports.\n\nThis is finite declaration-only evidence at the 22.1.7 minimum peer. The retained CI artifact predates current HEAD and no new CI-tar menu runtime test was executed. Menu behavior, other API rows, DI, other peer versions, full suite, workflow and release remain unqualified. No canonical edits, push or Actions.\n"
+  },
+  "root_checks": [
+    {
+      "name": "root-menu-harness-v2-ci-run.log",
+      "exit_code": 0,
+      "sha256": "beddb98da9e2ee93a8476239b16c9c85b14d3d215bf78a1299f90141bec4e0a4",
+      "log": "menu harness public contract regressions passed; artifact sha256 4a34df4d024f923dd8e701b9f1ed3b63f8f23fe2dc035cc6b5a1793e0cbf9a0e\n"
+    },
+    {
+      "name": "root-menu-harness-v2-combined-run.log",
+      "exit_code": 0,
+      "sha256": "ce840e86df5c9b569e606f5d0bdf940f8c93c61bae7fc83f4f3e8c602fa90d80",
+      "log": "menu harness public contract regressions passed; artifact sha256 a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2\n"
+    },
+    {
+      "name": "root-menu-harness-v2-wronghash.log",
+      "exit_code": 1,
+      "sha256": "854495318df8c3eb1770169a0ecf6722ae6b55e7b876a1976ac5f04b75e8b418",
+      "log": "Tarball bytes do not match the draft library artifact. Not repacking.\n"
+    },
+    {
+      "name": "root-menu-harness-v2-api-regressions.log",
+      "exit_code": 0,
+      "sha256": "0a70e2f85827dd0bdf995f2786222c7d0eb58e714d9e81d1e25f526b6f33624f",
+      "log": "api-completeness regressions passed\n"
+    }
+  ],
+  "retained_CI_declaration_delta": {
+    "before_open": 39,
+    "after_open": 37,
+    "removed_open": [
+      {
+        "status": "mismatch",
+        "historical": null,
+        "owned": "public static method with(LegacyMenuHarnessFilters?):HarnessPredicate<MatLegacyMenuHarness>",
+        "symbol_id": "legacy-menu/testing/MatLegacyMenuHarness"
+      },
+      {
+        "status": "mismatch",
+        "historical": "public static method with(MenuHarnessFilters?):HarnessPredicate<MatLegacyMenuHarness>",
+        "owned": null,
+        "symbol_id": "legacy-menu/testing/MatLegacyMenuHarness"
+      }
+    ],
+    "added_open": [],
+    "before_sha256": "84a4eeacfd9fed5d9d83b8f7224659c08f55e079d4ec7e739219cab7bf363953",
+    "after_sha256": "4e6c79e9de8be92a241b80438ed1441efba9631d484b7162c27d3f0d34aff904"
+  },
+  "combined_diagnostic": {
+    "tarball_sha256": "a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2",
+    "report_sha256": "6882bd67deee4c70f02616f56b137985a12cd28b656e592a2c9503967f5d0557",
+    "open": 40,
+    "new_input_rows_remain_open": [
+      {
+        "status": "mismatch",
+        "historical": null,
+        "owned": "protected prop _legacyAriaDisabled:string|null",
+        "symbol_id": "legacy-input/primary/MatLegacyInput"
+      },
+      {
+        "status": "mismatch",
+        "historical": null,
+        "owned": "public method ngDoCheck():void",
+        "symbol_id": "legacy-input/primary/MatLegacyInput"
+      },
+      {
+        "status": "mismatch",
+        "historical": null,
+        "owned": "protected method _legacyReadonlyAttribute():string|null",
+        "symbol_id": "legacy-input/primary/MatLegacyInput"
+      }
+    ],
+    "scope": "Fresh untouched tag material source extracted from pinned df60e733; exact packed combined declarations with explicit pinned-peer resolution. Not runtime/DI/fullAPI admission. First55-row diagnostic lacked peer resolution and is preserved as failed configuration; adding explicit peer node_modules link yields40open (prior37 plus3 intentional new input rows still unqualified)."
+  },
+  "contract": "Tag-derived historical filter fields and writable semantics, exact packed declaration, minimum22.1.7 publicexports ofall7direct symbols/predicateconstraint,67pathboundcompilerinputs, strictconsumer+finite driftcontrols. This is not generic TS equivalence.",
+  "workflow": "Separate164a1026 workflow patch remains unapplied pending reviewed CI source-frame continuation; no live gate inferred.",
+  "limits": [
+    "Root actual --run regressions pass for retained genuineCI4a and combineddiagnostica488; forgedrunhash rejects beforeextraction.",
+    "No menu runtime, DI, broaderpeer range or G02/G11/release pass. Remaining40combineddeclarationrows and12oldDI failures needindividual work.",
+    "Input primary helper additions are not cleared by this menu type proof; explicit scoped API qualification remains required.",
+    "No product/HTML/CSS/SCSS/oracle edits, pushes, Actions, credentials or publication."
+  ]
+}
