@@ -70335,19 +70335,92 @@
         "src/material/core/tokens/_classes.scss"
       ],
       "diff_sha256": "ae5fa892d0865dddfdf5ea64573b543e3f79a125cdd7b9b1343b9e1f9daff65a",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/18cedc7375bf0ab0590c9a984e5d380d52610ccc.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-core-corner-18ced-source-review-v5.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/core/tokens/_classes.scss changes `.mat-corner-extra-sm {`. That line is not in the legacy sources. @angular/material/core is exercised by projects/ngx-material-legacy/legacy-menu/menu-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+      "final_disposition": "not-applicable",
+      "read_note_disposition": "not-applicable",
+      "reason": "Not applicable to this add-on: the complete upstream patch renames one selector emitted by the peer Material system-classes Sass mixin and updates only its demo. The legacy package ships its finite owned Sass facade and styles, does not ship or forward peer core/tokens/classes or system-classes, and has no matching old/new selector references. The CSS variable in the peer rule is unchanged. This is a source/package-boundary conclusion only; no packed output or runtime behavior is claimed.",
       "peer_floor": {
         "package": "@angular/material",
         "installed": "22.1.7",
         "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
         "delegation": "@angular/material/core imported by projects/ngx-material-legacy/legacy-menu/menu-module.ts"
-      }
+      },
+      "individual_proof": {
+        "proof_kind": "whole-sha-unshipped-source-and-package-closure",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_evidence_scope": "current",
+        "source_evidence": [
+          {
+            "path": "projects/ngx-material-legacy/ng-package.json",
+            "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33",
+            "bytes": 492
+          },
+          {
+            "path": "projects/ngx-material-legacy/_index.scss",
+            "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+            "bytes": 14151
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/tokens/m2/_index.scss",
+            "sha256": "a28e7498f3e8ee4c7f6644c2bcb3dce3f99710d11764e12a53a98b7a776f41d4",
+            "bytes": 4183
+          },
+          {
+            "path": "node_modules/.pnpm/@angular+material@22.1.7_94bd345d55a01d565780699f5d2b5992/node_modules/@angular/material/package.json",
+            "sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+            "bytes": 11420
+          },
+          {
+            "path": "node_modules/.pnpm/@angular+material@22.1.7_94bd345d55a01d565780699f5d2b5992/node_modules/@angular/material/_index.scss",
+            "sha256": "e3ad831c2e7679767b0c76d51cf37c455e8d14bf60c5920e53d95bcb762eb08b",
+            "bytes": 9712
+          },
+          {
+            "path": "node_modules/.pnpm/@angular+material@22.1.7_94bd345d55a01d565780699f5d2b5992/node_modules/@angular/material/core/tokens/_classes.scss",
+            "sha256": "ad418d669c6f997ba08c971375750d2489a93ae06ddc678e9b20a85b9b8e056d",
+            "bytes": 15963
+          }
+        ],
+        "diff_sha256": "ae5fa892d0865dddfdf5ea64573b543e3f79a125cdd7b9b1343b9e1f9daff65a",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Not applicable to this add-on: the complete upstream patch renames one selector emitted by the peer Material system-classes Sass mixin and updates only its demo. The legacy package ships its finite owned Sass facade and styles, does not ship or forward peer core/tokens/classes or system-classes, and has no matching old/new selector references. The CSS variable in the peer rule is unchanged. This is a source/package-boundary conclusion only; no packed output or runtime behavior is claimed."
+      },
+      "prior_dispositions": [
+        {
+          "sha": "18cedc7375bf0ab0590c9a984e5d380d52610ccc",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/core): rename corner extra-small to xs (#32101)",
+          "files": [
+            "src/dev-app/system-classes-demo/system-classes-demo.html",
+            "src/material/core/tokens/_classes.scss"
+          ],
+          "diff_sha256": "ae5fa892d0865dddfdf5ea64573b543e3f79a125cdd7b9b1343b9e1f9daff65a",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/18cedc7375bf0ab0590c9a984e5d380d52610ccc.json",
+          "batch_id": "unread-seed-content-review-2026-10-02",
+          "recorded_at_utc": "2026-10-02T18:49:16Z",
+          "g11_claim": "not-passed",
+          "final_disposition": "inherited",
+          "read_note_disposition": "inherited",
+          "reason": "The diff in src/material/core/tokens/_classes.scss changes `.mat-corner-extra-sm {`. That line is not in the legacy sources. @angular/material/core is exercised by projects/ngx-material-legacy/legacy-menu/menu-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+          "peer_floor": {
+            "package": "@angular/material",
+            "installed": "22.1.7",
+            "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+            "delegation": "@angular/material/core imported by projects/ngx-material-legacy/legacy-menu/menu-module.ts"
+          }
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ]
     },
     {
       "sha": "03c5d34dbd684a37a608cf9d33e20c293163919c",
