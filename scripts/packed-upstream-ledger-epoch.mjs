@@ -14,6 +14,7 @@ import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {gunzipSync} from 'node:zlib';
 import {join} from 'node:path';
+import {types} from 'node:util';
 import {testingApi21xEntryEvidenceOk} from './upstream-testing-api-21x-admission.mjs';
 import {sassInspectionEntrySourceOk} from './upstream-sass-inspection-admission.mjs';
 import {rulesJsBuildEntrySourceOk,rulesJsBuildBoundInputs} from './upstream-rules-js-build-admission.mjs';
@@ -95,11 +96,27 @@ function selectionReaders(root,read,line){
   if(cached){assert.equal(cached.root,root);assert.equal(cached.scope.spec.line,line);return cached.scope;}
   const scope=autocompleteSelectionReaderSubject({root,read:currentSourceRead(root,read),line});selectionReaderCache.set(read,{root,scope});return scope;
 }
+/** Select only file identity from an annotated retained evidence record. Scope
+ * and capture metadata remain owned by its original report, not source selectors.
+ * This pure conversion grants no qualification, source reader or admission. */
+export function retainedSourceIdentity(ref){
+  assert.ok(ref&&typeof ref==='object'&&!types.isProxy(ref)&&Object.getPrototypeOf(ref)===Object.prototype);
+  const fields=Object.getOwnPropertyDescriptors(ref),identity={};
+  for(const key of ['path','sha256',...(Object.hasOwn(fields,'bytes')?['bytes']:[])]){
+    assert.ok(fields[key]&&Object.hasOwn(fields[key],'value')&&fields[key].enumerable,'invalid retained identity '+key);
+    identity[key]=fields[key].value;
+  }
+  assert.ok(typeof identity.path==='string'&&!identity.path.startsWith('/')&&!identity.path.includes('\\')&&identity.path.split('/').every(part=>part&&part!=='.'&&part!=='..'));
+  assert.match(identity.sha256,/^[a-f0-9]{64}$/);
+  if(Object.hasOwn(identity,'bytes'))assert.ok(Number.isSafeInteger(identity.bytes)&&identity.bytes>=0);
+  return identity;
+}
 function selectionMember({root,read,line,ref,bound}){
   const scope=selectionReaders(root,read,line),native=ref.path===SELECTION_NATIVE_REGISTRY?selectionNative(root,read,line):null;
   const tools=ref.path===testingApiChecker?retainedTools(root,read,line):null;
   const later=retainedLaterProgramPaths.has(ref.path)?retainedLaterPrograms(root,read,line):null;
-  const qualified=later?.qualifyMetadata(ref)??tools?.qualify(ref)??native?.qualify(ref)??scope.qualify(ref),current=qualified??ref;
+  const identity=retainedSourceIdentity(ref);
+  const qualified=later?.qualifyMetadata(identity)??tools?.qualify(identity)??native?.qualify(identity)??scope.qualify(identity),current=qualified??identity;
   const raw=(qualified?currentSourceRead(root,read):read)(ref.path);
   assert.equal(hash(raw),current.sha256,'changed qualified source subject '+ref.path);
   if(current.bytes!==undefined)assert.equal(raw.length,current.bytes);

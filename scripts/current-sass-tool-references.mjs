@@ -256,7 +256,7 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
   const routing=JSON.parse(member({path:'compatibility/rc/main-current-inventory-source-routing-v2.json',sha256:'3815beb1e21779e54deaee5da2bf7bb316732e98a3dc9938ef6d2fdf18707280',bytes:24306}));
   assert.equal(routing.schema_version,1);assert.equal(routing.role,'main-current-inventory-source-routing');assert.equal(routing.base_head,'54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0');assert.equal(routing.source_scope_only,true);assert.equal(routing.historical_programs_executed,false);assert.equal(routing.historical_packets_rewritten,false);assert.equal(routing.artifact_or_audit_admission_granted,false);assert.equal(routing.g11_claim,'not-passed');
   const paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];assert.deepEqual(routing.updates.map(row=>row.path),paths);
-  member({path:'scripts/current-inventory-source-subject.mjs',sha256:'0202ac2c13775bbfae212ae5362669ccae5f7778c556c13b78c7103c2a8bda07',bytes:10540});
+  member({path:'scripts/current-inventory-source-subject.mjs',sha256:'956901bb308f50a73c9a99902d01e4fa6827d16fc40b73f98be2ffc362f33c97',bytes:12882});
   const env={PATH:process.env.PATH,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1',GIT_TERMINAL_PROMPT:'0'};execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',routing.base_head,'HEAD'],{cwd:root,env});const originals=gitImages(root,paths.map(path=>({commit:routing.base_head,path})));
   const next=JSON.parse(member({path:'compatibility/rc/main-current-inventory-source-routing-v3.json',sha256:'d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b',bytes:13219}));
   assert.equal(next.schema_version,1);assert.equal(next.role,'main-current-inventory-retained-source-routing');assert.equal(next.base_head,'b7ad00c881420e8621f23d77ab2feba7a3475e78');assert.equal(next.support_commit,next.base_head);
@@ -272,12 +272,21 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
   assert.deepEqual(late.updates.map(row=>row.path),[paths[0]]);assert.equal(late.support.length,84);execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',late.base_head,'HEAD'],{cwd:root,env});
   const lateImages=gitImages(root,[...late.updates.map(row=>({commit:late.base_head,path:row.path})),...late.support.map(ref=>({commit:late.support_commit,path:ref.path}))]);
   for(const ref of late.support){const committed=lateImages.get(late.support_commit+':'+ref.path);matches(committed,ref);assert.ok(equalBytes(member(ref),committed));}
+  const identity=JSON.parse(member({path:'compatibility/rc/main-current-inventory-source-routing-v5.json',sha256:'47061b1a2794efe6c735d5bf7805ae79f00e96eb1454918bbf27555d4202616c',bytes:3548}));
+  assert.equal(identity.schema_version,1);assert.equal(identity.role,'main-current-inventory-retained-source-routing');assert.equal(identity.base_head,'97e568a761396b22efb63630b8c50a62fe2be8db');assert.equal(identity.support_commit,identity.base_head);
+  assert.deepEqual(identity.previous_packet,{path:'compatibility/rc/main-current-inventory-source-routing-v4.json',sha256:'b4d4fc742323ec0bb6858a5b6165dc0c1307d0d0a1d4c3f49b6ef017df97ab1c',bytes:32578});
+  for(const[key,value]of Object.entries({source_scope_only:true,historical_programs_executed:false,historical_packets_rewritten:false,original_ledger_metadata_recipe_changed:false,source_judgments_changed:0,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(identity[key],value);
+  assert.deepEqual(identity.updates.map(row=>row.path),[paths[0]]);assert.equal(identity.support.length,3);execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',identity.base_head,'HEAD'],{cwd:root,env});
+  const identityImages=gitImages(root,[...identity.updates.map(row=>({commit:identity.base_head,path:row.path})),...identity.support.map(ref=>({commit:identity.support_commit,path:ref.path}))]);
+  for(const ref of identity.support){const committed=identityImages.get(identity.support_commit+':'+ref.path);matches(committed,ref);assert.ok(equalBytes(member(ref),committed));}
   for(const update of routing.updates){
     assert.equal(update.before.path,update.path);assert.equal(update.after.path,update.path);const before=originals.get(routing.base_head+':'+update.path);matches(before,update.before);const after=edited(before,update.edits);matches(after,update.after);
     const identities=[{ref:update.before,bytes:before},{ref:update.after,bytes:after}],continuation=next.updates.find(row=>row.path===update.path);let current=update,actual=after;
     if(continuation){assert.deepEqual(continuation.before,update.after);assert.equal(continuation.after.path,update.path);assert.ok(equalBytes(continuations.get(next.base_head+':'+update.path),actual));actual=edited(actual,continuation.edits);matches(actual,continuation.after);identities.push({ref:continuation.after,bytes:actual});current={...update,after:continuation.after};}
     const further=late.updates.find(row=>row.path===update.path);
     if(further){assert.deepEqual(further.before,current.after);assert.equal(further.after.path,update.path);assert.ok(equalBytes(lateImages.get(late.base_head+':'+update.path),actual));actual=edited(actual,further.edits);matches(actual,further.after);identities.push({ref:further.after,bytes:actual});current={...update,after:further.after};}
+    const normalized=identity.updates.find(row=>row.path===update.path);
+    if(normalized){assert.deepEqual(normalized.before,current.after);assert.equal(normalized.after.path,update.path);assert.ok(equalBytes(identityImages.get(identity.base_head+':'+update.path),actual));actual=edited(actual,normalized.edits);matches(actual,normalized.after);identities.push({ref:normalized.after,bytes:actual});current={...update,after:normalized.after};}
     assert.ok(equalBytes(member(current.after),actual));
     routingImages.set(update.path,{update:current,identities});
   }

@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "role": "main-current-inventory-retained-source-routing",
+  "base_head": "97e568a761396b22efb63630b8c50a62fe2be8db",
+  "previous_packet": {
+    "path": "compatibility/rc/main-current-inventory-source-routing-v4.json",
+    "sha256": "b4d4fc742323ec0bb6858a5b6165dc0c1307d0d0a1d4c3f49b6ef017df97ab1c",
+    "bytes": 32578
+  },
+  "support_commit": "97e568a761396b22efb63630b8c50a62fe2be8db",
+  "updates": [
+    {
+      "path": "scripts/packed-upstream-ledger-epoch.mjs",
+      "before": {
+        "path": "scripts/packed-upstream-ledger-epoch.mjs",
+        "sha256": "9013d801d3ef8bc84e828cdf323ec45108ffda8de5132082675d0f5b08b1800d",
+        "bytes": 90576
+      },
+      "after": {
+        "path": "scripts/packed-upstream-ledger-epoch.mjs",
+        "sha256": "0b78c24696b746c9b309b33ac12c71789558e1754777c6dff2735451eb170af3",
+        "bytes": 91746
+      },
+      "edits": [
+        {
+          "offset": 694,
+          "before": "",
+          "after": "import {types} from 'node:util';\n"
+        },
+        {
+          "offset": 6612,
+          "before": "",
+          "after": "/** Select only file identity from an annotated retained evidence record. Scope\n * and capture metadata remain owned by its original report, not source selectors.\n * This pure conversion grants no qualification, source reader or admission. */\nexport function retainedSourceIdentity(ref){\n  assert.ok(ref&&typeof ref==='object'&&!types.isProxy(ref)&&Object.getPrototypeOf(ref)===Object.prototype);\n  const fields=Object.getOwnPropertyDescriptors(ref),identity={};\n  for(const key of ['path','sha256',...(Object.hasOwn(fields,'bytes')?['bytes']:[])]){\n    assert.ok(fields[key]&&Object.hasOwn(fields[key],'value')&&fields[key].enumerable,'invalid retained identity '+key);\n    identity[key]=fields[key].value;\n  }\n  assert.ok(typeof identity.path==='string'&&!identity.path.startsWith('/')&&!identity.path.includes('\\\\')&&identity.path.split('/').every(part=>part&&part!=='.'&&part!=='..'));\n  assert.match(identity.sha256,/^[a-f0-9]{64}$/);\n  if(Object.hasOwn(identity,'bytes'))assert.ok(Number.isSafeInteger(identity.bytes)&&identity.bytes>=0);\n  return identity;\n}\n"
+        },
+        {
+          "offset": 6972,
+          "before": "  const qualified=later?.qualifyMetadata(ref)??tools?.qualify(ref)??native?.qualify(ref)??scope.qualify(ref),current=qualified??ref;\n",
+          "after": "  const identity=retainedSourceIdentity(ref);\n  const qualified=later?.qualifyMetadata(identity)??tools?.qualify(identity)??native?.qualify(identity)??scope.qualify(identity),current=qualified??identity;\n"
+        }
+      ]
+    }
+  ],
+  "support": [
+    {
+      "path": "compatibility/rc/upstream-sass-inspection-ledger-transition.json.gz",
+      "sha256": "922c6f5ef0f7635db93e694931a9aa7e54762479418ed5b1330b27adf12cebc4",
+      "bytes": 3068
+    },
+    {
+      "path": "compatibility/rc/upstream-sass-inspection-individual-review.json",
+      "sha256": "365e3b6177017f35a8bc073ff999723fcf189bebf2dbf8bb01e521fc552df79f",
+      "bytes": 95987
+    },
+    {
+      "path": "compatibility/rc/upstream-sass-inspection-21x-subjects.json.gz",
+      "sha256": "f1b87f0f3f9a88263641767bd350a7c8b79998199a2235a92b5e53f50c450e5b",
+      "bytes": 41502
+    }
+  ],
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "original_ledger_metadata_recipe_changed": false,
+  "source_judgments_changed": 0,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed"
+}
