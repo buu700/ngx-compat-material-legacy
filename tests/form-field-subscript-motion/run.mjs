@@ -24,17 +24,20 @@ mkdirSync(out);const extracted=join(out,'artifact');mkdirSync(extracted);run('ta
 const pkg=join(extracted,'package');
 if(JSON.parse(readFileSync(join(pkg,'package.json'),'utf8')).name!=='@ngx-compat/material-legacy') throw Error('Unexpected packed package');
 symlinkSync(peer,join(pkg,'node_modules'),'dir');
-const cases=[...['zoneful','zoneless','noop'].map(v=>['motion',v]),...['zoneful','zoneless','noop','initial-error'].map(v=>['boundary',v]),['nested','main']];
+run(process.execPath,[join(here,'manual-probe.mjs'),pkg,workspace],out);
+const cases=[...['zoneful','zoneless','noop'].map(v=>['motion',v]),...['zoneful','zoneless','noop','initial-error'].map(v=>['boundary',v]),['nested','main'],...['zoneful','zoneless','noop'].map(v=>['subclass',v])];
 for(const [kind,variant] of cases){
  const root=join(out,kind+'-'+variant);mkdirSync(root);mkdirSync(join(root,'src'));mkdirSync(join(root,'dist'));mkdirSync(join(root,'node_modules'));
  for(const name of readdirSync(peer)){if(name==='@ngx-compat' || name==='.bin') continue;symlinkSync(join(peer,name),join(root,'node_modules',name));}
  mkdirSync(join(root,'node_modules/@ngx-compat'));symlinkSync(pkg,join(root,'node_modules/@ngx-compat/material-legacy'),'dir');
  copyFileSync(join(here,'fixtures',kind,variant+'.ts'),join(root,'src/main.ts'));copyFileSync(join(here,'tsconfig.json'),join(root,'tsconfig.json'));copyFileSync(join(here,'index.html'),join(root,'dist/index.html'));
+ if(kind==='subclass'){const config=JSON.parse(readFileSync(join(root,'tsconfig.json'),'utf8'));config.compilerOptions.noImplicitOverride=true;writeFileSync(join(root,'tsconfig.json'),JSON.stringify(config,null,2)+'\n');}
  run(process.execPath,[join(peer,'@angular/compiler-cli/bundles/src/bin/ngc.js'),'-p','tsconfig.json'],root);
  run(process.execPath,[join(here,'build.mjs'),root,workspace,peer],root);
  const probe=join(here,kind+'-probe.mjs');
  if(kind==='motion') run(process.execPath,[probe,join(root,'dist'),variant+'-motion'],root);
  else if(kind==='boundary') run(process.execPath,[probe,root,variant],root);
+ else if(kind==='subclass') run(process.execPath,[probe,join(root,'dist'),variant],root);
  else run(process.execPath,[probe,join(root,'dist'),'nested'],root);
  if(hash()!==options['--sha256']) throw Error('Packed artifact changed during test');
 }

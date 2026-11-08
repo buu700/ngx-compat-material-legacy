@@ -14,7 +14,7 @@ import {
   AfterContentChecked,
   AfterContentInit,
   AfterViewInit,
-  AfterViewChecked,
+  assertInInjectionContext,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -22,6 +22,7 @@ import {
   ContentChildren,
   ElementRef,
   Inject,
+  inject,
   Injector,
   Input,
   NgZone,
@@ -61,6 +62,16 @@ import {
 let nextUniqueId = 0;
 const floatingLabelScale = 0.75;
 const outlineGapPadding = 5;
+
+/** Captures the active host injector when a legacy subclass omits the optional argument. */
+function legacyFormFieldInjector(): Injector | undefined {
+  try {
+    assertInInjectionContext(legacyFormFieldInjector);
+  } catch {
+    return undefined;
+  }
+  return inject(Injector);
+}
 
 /**
  * Boilerplate for applying mixins to MatFormField.
@@ -158,7 +169,7 @@ export const MAT_LEGACY_FORM_FIELD_DEFAULT_OPTIONS =
 })
 export class MatLegacyFormField
   extends _MatFormFieldBase
-  implements AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked, OnDestroy, CanColor
+  implements AfterContentInit, AfterContentChecked, AfterViewInit, OnDestroy, CanColor
 {
   /**
    * Whether the outline gap needs to be calculated
@@ -309,6 +320,9 @@ export class MatLegacyFormField
   ) {
     super(elementRef);
 
+    if (this._injector === undefined) {
+      this._injector = legacyFormFieldInjector();
+    }
     this.floatLabel = this._getDefaultFloatLabelState();
     this._legacyAnimationsDisabled = legacyAnimationsDisabled();
     this._animationsEnabled =
@@ -353,6 +367,7 @@ export class MatLegacyFormField
           if (this._outlineGapCalculationNeededOnStable) {
             this.updateOutlineGap();
           }
+          this.#updateSubscriptMotion();
         });
     });
 
@@ -426,7 +441,7 @@ export class MatLegacyFormField
     }
   }
 
-  ngAfterViewChecked() {
+  #updateSubscriptMotion() {
     const messageKind = this._getDisplayedMessages();
     const changed = this._previousMessageKind !== undefined && this._previousMessageKind !== messageKind;
     if (changed) {

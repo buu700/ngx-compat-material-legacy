@@ -33,7 +33,14 @@ const baseline=execFileSync('git',['-c','gc.auto=0','-c','maintenance.auto=0','s
 const before=owner(baseline),after=owner(candidate),ctor=subject=>subject.node.members.find(ts.isConstructorDeclaration),oldCtor=ctor(before),newCtor=ctor(after);
 assert.equal(oldCtor.parameters.length,7);assert.equal(newCtor.parameters.length,8);
 assert.deepEqual(newCtor.parameters.slice(0,7).map(n=>print(n,after.source)),oldCtor.parameters.map(n=>print(n,before.source)));
-assert.equal(print(oldCtor.body,before.source),print(newCtor.body,after.source));
+const fallback=ts.createSourceFile('fallback.ts','function f(){if (this._injector === undefined) { this._injector = legacyFormFieldInjector(); }}',ts.ScriptTarget.Latest,true);
+assert.equal(print(newCtor.body.statements[1],after.source),print(fallback.statements[0].body.statements[0],fallback),'exact-trailing-injector-fallback');
+const normalizedCtor=ts.factory.updateBlock(newCtor.body,[newCtor.body.statements[0],...newCtor.body.statements.slice(2)]);
+assert.equal(print(oldCtor.body,before.source),print(normalizedCtor,after.source),'original-constructor-body-otherwise-identical');
+const fallbackHelper=after.source.statements.filter(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='legacyFormFieldInjector');
+assert.equal(fallbackHelper.length,1);const helperText=print(fallbackHelper[0],after.source);
+assert.ok(helperText.includes('assertInInjectionContext(legacyFormFieldInjector)')&&helperText.includes('return undefined')&&helperText.includes('return inject(Injector)'));
+
 assert.equal(newCtor.parameters[7].name.text,'_injector');assert.equal(newCtor.parameters[7].type.getText(after.source),'Injector');assert.ok(newCtor.parameters[7].questionToken);assert.equal(ts.getDecorators(newCtor.parameters[7]),undefined);
 const tagged=owner(original);
 assert.equal(print(after.node.members.find(node=>node.name?.text==='_shouldLabelFloat').body,after.source),
@@ -138,7 +145,7 @@ function fixture(js=payload.candidate,helperJs=payload.helper,injector=app?.inje
  class ProtocolColor{constructor(element){this._elementRef=element;this.color=this.defaultColor='primary';}}
  const exports={},values={_MatFormFieldBase:ProtocolColor,Subject:rx.Subject,Subscription:rx.Subscription,merge:rx.merge,fromEvent:rx.fromEvent,
  filter:ops.filter,map:ops.map,pairwise:ops.pairwise,startWith:ops.startWith,take:ops.take,takeUntil:ops.takeUntil,
- afterFormFieldRender:helper(helperJs),legacyAnimationsDisabled:()=>true,document:doc,
+ afterFormFieldRender:helper(helperJs),legacyFormFieldInjector:()=>undefined,legacyAnimationsDisabled:()=>true,document:doc,
  getShadowRoot:()=>currentRoot??null,requestAnimationFrame:boundary.frames?callback=>{const id=frameId++;frames.set(id,callback);capturedFrames.push(callback);return id;}:undefined,
  cancelAnimationFrame:boundary.frames&&!boundary.noCancel?id=>{canceledFrames++;frames.delete(id);}:undefined};
  new Function('exports',...Object.keys(values),js)(exports,...Object.values(values));
@@ -290,7 +297,7 @@ try{
  }
  const report={schema_version:1,line:JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main',sources:Object.values(paths).map(path=>({path,sha256:hash(read(path))})),
   reference:{path:originalPath,sha256:hash(original)},node:process.version,binding_parser:ts.version,namespace_capsule_sha256:loaded.capsule_hash,results,public_contracts:contracts,
-  constructor_change:{original_parameters:7,current_parameters:8,old_parameters_and_authored_body_identical:true,new_optional_trailing_Injector:true,actual_node_DI_compiled_or_executed:false},
+  constructor_change:{original_parameters:7,current_parameters:8,old_parameters_and_other_authored_body_identical:true,reviewed_optional_injector_fallback:true,new_optional_trailing_Injector:true,actual_node_DI_compiled_or_executed:false},
   geometry_methods_equal_immutable_tag:true,label_decision_matches_tagged_body:true,type_compilation:{compiler:compiler.version,compiler_source_sha256:hash(readFileSync(compilerPath)),subjects:types},
   scope:'Complete original/owned field constructor and members with a protocol color-trait parent; Angular decorators removed. Genuine public NgZone/QueryList/FormControl and current public application/continuous render hook. A real Angular OnPush shell/view and ChangeDetectorRef drive current render cycles with a protocol renderer; this is not a legacy field Angular view. Control wrapper, DOM geometry/styles/document attachment, direction and disabled-motion policy are protocols; original uses a change-detector protocol. Original standard geometry is exercised independently; candidate geometry methods match the immutable tagged methods; long-label/prefix/suffix, fixed offset-parent, document fallback, detachment and shadow reparenting are protocol observations, not native DOM qualification. No actual legacy traits/node DI/AOT/packed/native geometry, consumer builds or Rx/Node floor qualification.',
   native_or_actual_legacy_instances_qualified:false,g11_claim:'not-passed'};assert.equal(results.length,10);

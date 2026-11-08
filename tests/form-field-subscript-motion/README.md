@@ -17,3 +17,5 @@ node tests/form-field-subscript-motion/run-ssr.mjs --tarball /path/to/package.tg
 ```
 
 It runs a strict AOT application on Angular platform-server, checks hint/error changes, removal/recreation, accessibility relationships and teardown, and traps geometry reads. Partially compiled dependencies use Angular JIT. Neither command qualifies hydration or a complete release gate.
+
+The runner also checks three strict AOT seven-argument subclass cases (zoneful, zoneless and NoopAnimations). Each subclass has its own historical `ngAfterViewChecked` hook without calling the base; the checks require the hook to run while the field still animates the message, avoids same-kind restarts, and cancels on destruction. A separate controlled manual-construction probe uses the historical seven arguments and checks enabled and NoopAnimations states, interruption and teardown. It also checks node injector scope, explicit eighth-argument identity, outside-injection-context behavior, and lookup-error propagation. The manual probe uses synthetic Angular node and DOM protocols and is not a native browser test.
