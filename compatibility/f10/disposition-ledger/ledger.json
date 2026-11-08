@@ -9438,14 +9438,14 @@
       "bucket": "behavior-semantic",
       "subject": "fix(material/tooltip): regression when injecting ViewContainerRef (#30500)",
       "final_disposition": "already-present",
-      "reason": "The complete one-file/two-hunk tooltip fix restores eager ViewContainerRef acquisition after a modern late-injector regression. Untouched Material16 and the owned tooltip already receive and store ViewContainerRef in the constructor, and show passes that same field to ComponentPortal. This is the same root mechanism through the historical public constructor, not an ancestry or import-only argument. The required actual packed case checks eager node/container identity before any show, genuine public portal/component instances and logical container view counts through two show/hide/reopen cycles, retaining the old disabled-empty/manual-constructor dependency checks. Both advertised minimum public portal declarations and implementations support this route. Hydration remains unclaimed: neither source inspection, synthetic validator input nor client TestBed observations certify server/client hydration. Full browser/SSR/floor and release gates remain independent of this finite runtime-required source decision.",
+      "reason": "The complete one-file/two-hunk tooltip fix restores eager ViewContainerRef acquisition after a modern late-injector regression. Untouched Material16 and the owned tooltip already receive and store ViewContainerRef in the constructor, and show passes that same field to ComponentPortal. This is the same root mechanism through the historical public constructor, not an ancestry or import-only argument. The required actual packed case checks eager node/container identity before any show, genuine public portal/component instances and logical container view counts through two show/hide/reopen cycles, retaining the old disabled-empty/manual-constructor dependency checks. Both advertised minimum public portal declarations and implementations support this route. Hydration remains unclaimed: neither source inspection, synthetic validator input nor client TestBed observations certify server/client hydration. Full browser/SSR/floor and release gates remain independent of this finite runtime-required source decision. The restored original tooltip selector is source-reviewed separately; the required packed case has not been rerun for these source bytes.",
       "read_note_disposition": "already-present",
-      "evidence_report": "compatibility/rc/snack-dom-source-context-native-68b267dd59f3addf92a3b9f8ce9e8baa479df7f4.json",
+      "evidence_report": "compatibility/rc/tooltip-selector-source-context-68b267dd59f3addf92a3b9f8ce9e8baa479df7f4.json",
       "source_check": {
         "kind": "individual-source-reviewed-runtime-required",
         "diff_sha256": "18b8d7b47b2f26e04cf1d50df6cc26d773af0cb8760c9f1015487e4af356cd90",
         "patch_path": "compatibility/f10/disposition-ledger/evidence/patches/68b267dd59f3addf92a3b9f8ce9e8baa479df7f4-tooltip-view-container-full.patch",
-        "evidence_report_sha256": "ec08e07afee518f604c520421a54e5dd40bf8c0b93039fcabca1dc7c7c6da254"
+        "evidence_report_sha256": "0699bd488930c307084a550cd34eee9b335744b5c65994a3c89fdb8a525fa343"
       },
       "files": [
         "src/material/tooltip/tooltip.ts"
@@ -9679,7 +9679,7 @@
         "affected_branches": [
           "main"
         ],
-        "decision": "The complete one-file/two-hunk tooltip fix restores eager ViewContainerRef acquisition after a modern late-injector regression. Untouched Material16 and the owned tooltip already receive and store ViewContainerRef in the constructor, and show passes that same field to ComponentPortal. This is the same root mechanism through the historical public constructor, not an ancestry or import-only argument. The required actual packed case checks eager node/container identity before any show, genuine public portal/component instances and logical container view counts through two show/hide/reopen cycles, retaining the old disabled-empty/manual-constructor dependency checks. Both advertised minimum public portal declarations and implementations support this route. Hydration remains unclaimed: neither source inspection, synthetic validator input nor client TestBed observations certify server/client hydration. Full browser/SSR/floor and release gates remain independent of this finite runtime-required source decision.",
+        "decision": "The complete one-file/two-hunk tooltip fix restores eager ViewContainerRef acquisition after a modern late-injector regression. Untouched Material16 and the owned tooltip already receive and store ViewContainerRef in the constructor, and show passes that same field to ComponentPortal. This is the same root mechanism through the historical public constructor, not an ancestry or import-only argument. The required actual packed case checks eager node/container identity before any show, genuine public portal/component instances and logical container view counts through two show/hide/reopen cycles, retaining the old disabled-empty/manual-constructor dependency checks. Both advertised minimum public portal declarations and implementations support this route. Hydration remains unclaimed: neither source inspection, synthetic validator input nor client TestBed observations certify server/client hydration. Full browser/SSR/floor and release gates remain independent of this finite runtime-required source decision. The restored original tooltip selector is source-reviewed separately; the required packed case has not been rerun for these source bytes.",
         "artifact_behavior": {
           "kind": "tooltip-eager-view-container",
           "case_ids": [
@@ -9700,7 +9700,7 @@
             },
             {
               "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.scss",
-              "sha256": "692e27d01ea6a8deb1502c3f6d143f7ca868368655126d4ac8f6958eb6179458"
+              "sha256": "b737238c2f356a3672c21dc03864e06beb4451053b71e02202b4509cd1503bee"
             },
             {
               "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
@@ -9800,6 +9800,25 @@
           "path": "compatibility/rc/selection-comparator-packed-source-proof.json",
           "sha256": "4eb8d490f7bbaf7ccc842e492e68e93c46680f75d4cf7e3bc39a0a13d7f268b7"
         }
+      },
+      "tooltip_selector_source_context": {
+        "source_checkpoint": "c394ef616bfae381e0676c8f84af01e0553cad1d",
+        "prior_report": {
+          "path": "compatibility/rc/snack-dom-source-context-native-68b267dd59f3addf92a3b9f8ce9e8baa479df7f4.json",
+          "sha256": "ec08e07afee518f604c520421a54e5dd40bf8c0b93039fcabca1dc7c7c6da254"
+        },
+        "selector_source": {
+          "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.scss",
+          "prior_sha256": "692e27d01ea6a8deb1502c3f6d143f7ca868368655126d4ac8f6958eb6179458",
+          "current_sha256": "b737238c2f356a3672c21dc03864e06beb4451053b71e02202b4509cd1503bee"
+        },
+        "css_review": {
+          "path": "compatibility/rc/parent-main-tooltip-original-selector-todo-v1.json",
+          "sha256": "7b4d6b6ab858f8baaa3a14c6e4da2e3f34fb2bb4c209452efce032d699a59d0f"
+        },
+        "upstream_scope": "Both authenticated hunks concern ViewContainerRef acquisition and its ComponentPortal argument; neither changes Sass. Historical and current owned constructor/portal source is unchanged by this selector decision. Eager constructor acquisition remains already present; upstream modern field injection need not be copied.",
+        "css_decision": "Restore the Material 16 single-class selector and retain the non-emitting documented TODO. The historical cascade remains sensitive to later equal-specificity CDK pane styles; a later authored single-class override is preserved. A separate CDK22 two-app automatic injection can cause non-interactive panes to intercept pointer events; the original16 two-app probe did not reproduce that automatic trigger.",
+        "evidence_boundary": "Source-only requalification. Prior native and packed observations remain bound to their original artifact and source bytes, including the previous doubled selector. No current-style packed, native, hydration, browser-matrix, release or G11 pass is claimed. The registered packed case remains required against a fresh matching artifact."
       }
     },
     {
