@@ -8,6 +8,7 @@ import {mkdtempSync, rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {createRequire} from 'node:module';
 import {readFileSync} from 'node:fs';
 import {
   caseGroups,
@@ -17,6 +18,8 @@ import {
   bindingProblems,
   NEGATIVE_IDS,
   negativeResults,
+  packedShape,
+  compareSignatures,
 } from './api-surface.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -32,6 +35,31 @@ try {
   const extracted = spawnSync('tar', ['-x', '-C', scratch], {input: archived.stdout});
   if (extracted.status !== 0) throw new Error('extract failed');
   const surface = deriveSurface(join(scratch, 'src/material'));
+  // Use the tagged historical barrel/type as the oracle and the actual shape
+  // emitted by the packed tab entry, including its named local type export.
+  const ts = createRequire(import.meta.url)('typescript');
+  const tabPosition = surface.symbols.find(item => item.symbol_id === 'legacy-tabs/primary/MatLegacyTabBodyPositionState');
+  if (!tabPosition) throw new Error('tagged tab position type missing');
+  const typeUnion = "'left' | 'center' | 'right' | 'left-origin-center' | 'right-origin-center'";
+  function compareTab(declarations) {
+    const file = ts.createSourceFile('packed-tab.d.ts', declarations, ts.ScriptTarget.Latest, true);
+    const packed = packedShape(file, tabPosition.name);
+    return shapeProblems(compareSignatures(tabPosition, packed, []));
+  }
+  const namedExport = 'export type {MatTabBodyPositionState as MatLegacyTabBodyPositionState};';
+  const actual = `type MatTabBodyPositionState = ${typeUnion};\n${namedExport}`;
+  expect('tagged tab position matches packed local alias and all five literals', compareTab(actual).length === 0);
+  expect('tab position mutated union rejected', compareTab(actual.replace(" | 'right-origin-center'", '')).length > 0);
+  expect('tab position missing export rejected', compareTab(`type MatTabBodyPositionState = ${typeUnion};`).length > 0);
+  expect('tab position missing local declaration rejected', compareTab(namedExport).length > 0);
+  const wrongBinding = `type MatTabBodyPositionState = ${typeUnion};\ntype Wrong = 'left';\n` +
+    'export type {Wrong as MatLegacyTabBodyPositionState};';
+  expect('tab position wrong export binding rejected', compareTab(wrongBinding).length > 0);
+  const decoy = `type MatLegacyTabBodyPositionState = ${typeUnion};\ntype Wrong = 'left';\n` +
+    'export type {Wrong as MatLegacyTabBodyPositionState};';
+  expect('unexported matching decoy cannot hide wrong binding', compareTab(decoy).length > 0);
+  expect('external alias cannot masquerade as local binding', compareTab(
+    `export type {MatTabBodyPositionState as MatLegacyTabBodyPositionState} from '@angular/material/tabs';`).length > 0);
   const groups = caseGroups(surface);
   const matrix = JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'));
   const row = matrix.checks.find(item => item.check_id === 'api-completeness');

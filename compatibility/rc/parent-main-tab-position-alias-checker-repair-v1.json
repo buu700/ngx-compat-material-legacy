@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "role": "Resolve the actual local tab-position type export against the untouched historical API",
+  "parent": "c5291e184fa524327366a5abb9d8ec612a24c186",
+  "patch_sha256": "8a6f755d36db437f386eeb5dc6f0077af6899d166b6827046425e2544e9e493c",
+  "manifest_sha256": "a40f5564534cb68f1ba5d1b7906b6934b1287dd831288ed48fd1cb1fbbf0132f",
+  "afterimages": [
+    {
+      "path": "scripts/api-surface.mjs",
+      "sha256": "00413a75e343368fa330b1801b8bbd775551ce6be4cbf1923ba78e0fd6a6e008"
+    },
+    {
+      "path": "scripts/api-completeness-regressions.mjs",
+      "sha256": "8a79437f5aa759a459c81655ce33633e7d8527e5f80eba71b25121fc969c505e"
+    }
+  ],
+  "independent_review": {
+    "sha256": "d127578e5bb42ccc0784084b8ee7275c2c5cc2fa821a8229030d3cd1d7fe3f72",
+    "text": "# Independent tab position alias checker review\n\nSubject: canonical clean `0aaa2c137c14e43f8cdc9d34bfd10690e63c5c70`, test/tooling-only patch `../tab-position-alias.patch` SHA-256 `8a6f755d36db437f386eeb5dc6f0077af6899d166b6827046425e2544e9e493c` (supersedes earlier `c439...`). `git apply --check` succeeds; the external overlay's two changed script contents match the patch. The owner manifest `../tab-position-manifest.json` hashes to `a40f5564534cb68f1ba5d1b7906b6934b1287dd831288ed48fd1cb1fbbf0132f`.\n\nThe patch narrowly resolves the named local export for `MatLegacyTabBodyPositionState`, requires exactly one binding to a local `MatTabBodyPositionState` type alias, and feeds the actual declared union into the existing signature comparison. It does not add an allowlist waiver or bypass a mismatch. Its local-name requirement is intentionally conservative: a future equivalent alias with a different private local name would fail until the checker is adapted; this cannot turn a changed union or alternate binding into a pass. Union order/text comparison is likewise stricter than TypeScript semantic equivalence, not a false-green relaxation.\n\nThe immutable `baseline/angular-components-16.2.x` commit is `df60e733c60e572ba538f6ad0ceff3e63e527b53`; its legacy barrel exports the type under the legacy name and its tabs source declares the five historical literals. The two cache files used by the actual-pack control hash identically to `git show` of the tag: barrel `f6a4dd305258afa9706c958c06f6260baec6258731f2fa9dba91667faa43b62c`, type file `b8cae68f00521586ecf1b69d3bce277c3e1eeba35997b05b91223b1ffcbdfaf7`. The regression derives the expected type through the tagged source graph; its positive fixture is literal sample text, not an extracted package. I independently ran the full `api-completeness-regressions.mjs` on the patched overlay with pinned Node 24.21.0; exit 0. It rejects missing export, missing local type, mutated union, wrong local binding, unexported decoy, and external alias. The separately retained actual-pack control uses the complete extracted tabs declaration and the existing difference records; I independently reran it: positive matches, and actual declaration union/binding mutations fail. The package tarball hashes to `4a34df4d024f923dd8e701b9f1ed3b63f8f23fe2dc035cc6b5a1793e0cbf9a0e`; the member bytes extracted directly from it and the control's declaration both hash to `1bfc9ca71821299ca40ecff4fe35faeabb18e2569a6d2e3d2fd13c9a9141b334`.\n\nIndependently compared the before/after retained row arrays. Open rows change 53 to 52, deleting only this historical missing-declaration row, with no added rows; recorded rows change 144 to 143, removing only the former accepted extra candidate-type row. This is a targeted checker resolution, not a declaration-wide pass or DI pass. The packed subject came from source `8a0c4866dba602bd1f9c9916128f7537d986e0b9`, not a new current-head pack. No product tests, peer floor matrix, DI or full release verification were run; evidence is bounded to these scripts, tagged oracle, controls and the stated packed declaration. Canonical source was not edited, and no push or Actions occurred.\n"
+  },
+  "root_checks": [
+    {
+      "name": "root-c529-tab-alias-tagged-regressions-v1.log",
+      "sha256": "0a70e2f85827dd0bdf995f2786222c7d0eb58e714d9e81d1e25f526b6f33624f",
+      "log": "api-completeness regressions passed\n"
+    },
+    {
+      "name": "root-c529-tab-alias-packed-control-v1.log",
+      "sha256": "6fcb08d434f18fef1b1f328d054a54a65ea79d7c52aedbbe7b9a1c87be75aa31",
+      "log": "{\n  \"source_sha256\": \"1bfc9ca71821299ca40ecff4fe35faeabb18e2569a6d2e3d2fd13c9a9141b334\",\n  \"historical\": [\n    \"type MatTabBodyPositionState='left'|'center'|'right'|'left-origin-center'|'right-origin-center'\"\n  ],\n  \"positive\": [],\n  \"mutated_union\": [\n    \"signature-mismatch type MatTabBodyPositionState='left'|'center'|'right'|'left-origin-center'|'right-origin-center'\",\n    \"signature-mismatch type MatTabBodyPositionState='left'|'center'|'right'|'left-origin-center'\"\n  ],\n  \"mutated_binding\": [\n    \"signature-mismatch missing declaration legacy-tabs/primary/MatLegacyTabBodyPositionState\"\n  ]\n}\n"
+    }
+  ],
+  "oracle": "Authentic Material16.2.14 tag/barrel/type; expectedfive-literalunion remainsunchanged. ActualCI8a0packedtabsdeclaration separatelytested.",
+  "effect": "Independentlycompared declarationrows53\u219252open and144\u2192143recorded, removingonlythefalsemissing-type/obsoleteacceptedextra pair; nootherrowadded. This isatargetedcheckerrepair, notfullAPIpass.",
+  "limits": [
+    "No library/product/types/CSS/SCSS/golden/allowlist changes.",
+    "Localexportname/binding/unionarechecked; missing,decoy,external,wrongbindingandmutatedunionnegativesreject.",
+    "RootpinnedNode24.21.0ranfulltaggedAPIregressionsandactualpackeddeclcontrols; noDIrerunorcurrentHEADpack.",
+    "The52remainingdeclarationrowsand12DI failuresremainunderindividualreview,notautomaticallyimplementationbugsorcleared.",
+    "Earlierunversionedc439draftwasoverwritten; ownerreconstructedbyteidenticalpatchandverifiedoriginalhash, labelledreconstruction. Acceptedsubjectisuniquelynamed8a6f755dwithfreshindependentreview; no oldapprovalinferred.",
+    "NoG02/G11/finalauditorreleasepass."
+  ]
+}

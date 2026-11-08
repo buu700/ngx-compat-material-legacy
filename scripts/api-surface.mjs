@@ -1096,6 +1096,25 @@ function publicReexportConstructor(spec,name,containing){
 
 export function packedShape(sourceFile, name) {
   const index = indexFile(sourceFile);
+  // This historical alias is exported under a legacy name from a local type.
+  // Resolve the actual named export before looking up the declaration: a local
+  // unexported decoy must not mask a changed export binding.
+  if (name === 'MatLegacyTabBodyPositionState') {
+    const bindings = sourceFile.statements.flatMap(statement =>
+      ts.isExportDeclaration(statement) && !statement.moduleSpecifier && statement.exportClause
+        && ts.isNamedExports(statement.exportClause)
+        ? statement.exportClause.elements.filter(element => element.name.text === name)
+        : []);
+    if (bindings.length !== 1) return null;
+    const localName = (bindings[0].propertyName || bindings[0].name).text;
+    const declaration = index.get(localName);
+    if (localName !== 'MatTabBodyPositionState' || !declaration || !ts.isTypeAliasDeclaration(declaration)) return null;
+    return {
+      kind: 'type',
+      signatures: [`type ${localName}${typeParamText(declaration, sourceFile)}=${aliasTypeText(declaration.type, sourceFile)}`],
+      requiredProtected: [], requiredConstructor: false, comparison: 'signature',
+    };
+  }
   let declarationName = name;
   let node = index.get(name);
   if (!node) {
