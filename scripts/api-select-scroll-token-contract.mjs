@@ -68,9 +68,10 @@ export function selectScrollTokenProof(symbol,file,context){
  try{
   const ts=require('typescript');
   if(symbol?.symbol_id!==ID||symbol.family!=='legacy-select'||symbol.kind!=='primary'||symbol.name!=='MAT_LEGACY_SELECT_SCROLL_STRATEGY'||hash(JSON.stringify(symbol.shape))!=='e3b6b99fa399ec13430c53cd0376baca01ea5ac94aa39d94f3dfe3e7a6a9888d'||!file?.fileName||!context?.tarball||!context?.packageRoot||!context?.referenceRoot||process.versions.node!=='24.21.0'||ts.version!=='6.0.3'||hash(file.text)!==D)return null;
-  if(hash(readFileSync(join(ROOT,'scripts/api-select-scroll-token-evidence.json')))!=='5220d60832bf5a336bfa14dfb6b74d090d1cef319662bf7897bc129d4533084c'||hash(readFileSync(join(ROOT,'tests/api_select_scroll_token_probe.mjs')))!=='3b0e5b7fdf55a9ff191380d26888e7ab0cfe390c3a536a2a4aca3e4ad7997cf3')return null;
+  if(hash(readFileSync(join(ROOT,'scripts/api-select-scroll-token-evidence.json')))!=='5220d60832bf5a336bfa14dfb6b74d090d1cef319662bf7897bc129d4533084c'||hash(readFileSync(join(ROOT,'tests/api_select_scroll_token_probe.mjs')))!=='fb25c5d64671c4cdc0b0d3e71d1dd867d98bca48f8290cf2f426b2c8610043eb')return null;
   const archive=readFileSync(context.tarball);
-  if(hash(archive)!=='a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2'||!exactExtractedImage(archive,context.packageRoot)||realpathSync(file.fileName)!==realpathSync(join(context.packageRoot,'types/ngx-compat-material-legacy-legacy-select.d.ts')))return null;
+  const image=hash(archive),old='a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2',v7='66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca';
+  if(![old,v7].includes(image)||!exactExtractedImage(archive,context.packageRoot)||realpathSync(file.fileName)!==realpathSync(join(context.packageRoot,'types/ngx-compat-material-legacy-legacy-select.d.ts')))return null;
   const reference={'legacy-select/public-api.ts':'f10853ac2d70d8e905e1872eefec3d2158594b81932ec92a1c7d67c16cc71064','legacy-select/select-module.ts':'1010d90c2d4bd39265fc4f29a729e9e5ab876b2944c7911eed90f373cb4faf79','legacy-select/select.ts':'f75594460cc49d590a74643ce2888990f498262d83c63d907966d5095ee0098d','select/select.ts':'ba939bcc724eab50cc71c628c3977ddd68f052bfb265a77de8793ec09562cd73'};
   for(const [path,digest] of Object.entries(reference))if(hash(readFileSync(join(context.referenceRoot,path)))!==digest)return null;
   const owned={'legacy-select/public-api.ts':'2aa2c6b377d8bcdb6fb635293e53fdf723a48c1dd107d8487c148ddd9a806889','legacy-select/select-module.ts':'2934c344b72d6cbddb0356dfcd28b452909c657349c6e9156dd9bc6c25ac81cc','legacy-select/internal/select-base.ts':'120ab123d79e58ea256211cafa50268dba3ce26524426e88b0347a8624aee68d','legacy-select/select.ts':'8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739'};
@@ -90,7 +91,7 @@ export function selectScrollTokenProof(symbol,file,context){
   host.getSourceFile=(name,...args)=>name===fixture?ts.createSourceFile(name,text,ts.ScriptTarget.Latest,true):original(name,...args);
   const program=ts.createProgram([file.fileName,fixture],options,host);
   if(ts.getPreEmitDiagnostics(program).length)return null;
-  const sources=closure(program,fixture);if(sources.length!==322||inputHarnessClosureFingerprint(sources)!=='953707f96efd47d6f7ec3918116add10af211a7c4278bf7489c4d08269717252')return null;
+  const sources=closure(program,fixture);if(sources.length!==322||inputHarnessClosureFingerprint(sources)!==(image===old?'953707f96efd47d6f7ec3918116add10af211a7c4278bf7489c4d08269717252':'db4bc7ab37ceb69301a8d32d628cf40be7f003143444f449211215ea75e6d761'))return null;
   const source=program.getSourceFile(file.fileName);if(!source||hash(source.text)!==D||file.text!==source.text)return null;
   const checker=program.getTypeChecker(),module=checker.getSymbolAtLocation(source);
   const exported=checker.getExportsOfModule(module).filter(s=>s.name==='MAT_LEGACY_SELECT_SCROLL_STRATEGY');

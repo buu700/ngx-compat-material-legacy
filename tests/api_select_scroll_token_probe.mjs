@@ -1,6 +1,6 @@
 /** @license Copyright Google LLC All Rights Reserved. Copyright (c) 2026 Ryan Lester. */
 import assert from 'node:assert/strict';
-import {mkdtempSync,cpSync,mkdirSync,symlinkSync,readdirSync,realpathSync,appendFileSync,rmSync,unlinkSync} from 'node:fs';import {tmpdir} from 'node:os';
+import {mkdtempSync,cpSync,mkdirSync,symlinkSync,readdirSync,realpathSync,appendFileSync,rmSync,unlinkSync,existsSync} from 'node:fs';import {tmpdir} from 'node:os';
 import {createRequire} from 'node:module';import {join} from 'node:path';import {pathToFileURL} from 'node:url';
 import {deriveSurface,readDts} from '../scripts/api-surface.mjs';
 import {selectScrollTokenProof,settleSelectScrollToken} from '../scripts/api-select-scroll-token-contract.mjs';
@@ -13,7 +13,9 @@ assert.equal(settleSelectScrollToken(symbol,file,raw,context).blocking.length,0)
 const tmp=mkdtempSync(join(tmpdir(),'select-scroll-proof-'));
 try {
  const copy=join(tmp,'package');cpSync(root,copy,{recursive:true});const mods=join(tmp,'node_modules'),angular=join(mods,'@angular');mkdirSync(mods);mkdirSync(angular);
- const actual=realpathSync(join(root,'../../../node_modules'));
+ const peerRequire=createRequire(file.fileName),material=peerRequire.resolve('@angular/material/package.json');
+ const actual=peerRequire.resolve.paths('@angular/material').find(dir=>existsSync(join(dir,'@angular/material/package.json'))&&realpathSync(join(dir,'@angular/material/package.json'))===realpathSync(material));
+ assert.ok(actual,'cannot locate the resolved Material dependency directory');
  for(const e of readdirSync(actual))if(e!=='@angular')symlinkSync(join(actual,e),join(mods,e),'dir');
  for(const e of readdirSync(join(actual,'@angular')))if(e!=='material')symlinkSync(join(actual,'@angular',e),join(angular,e),'dir');
  cpSync(realpathSync(join(actual,'@angular/material')),join(angular,'material'),{recursive:true});
