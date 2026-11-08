@@ -39,6 +39,8 @@ Legacy Angular Animations is not part of the target runtime. Component behavior 
 
 MatLegacyMenuItem preserves the original one-argument and five-argument manual constructors as well as Angular node DI. Its historical behavior is owned locally, so it no longer extends the current Material MatMenuItem class; its public Material provider token remains available for queries and injection. MatLegacyTable uses zero-argument construction through Angular node DI. Its old manual dependency arguments are unsupported and reject at compile time and runtime. In particular, the original table constructor's supplied repeater, viewport and style scheduler are retired; use the supported Angular table inputs and providers. Table data-source and row/column definition constructors are separate APIs. This construction change requires no consumer template or stylesheet edits.
 
+MatLegacyInput also uses a zero-argument constructor through Angular node DI. Code that supplies the historical dependency arguments must move construction into Angular DI; those arguments are rejected at compile time and runtime. This construction change requires no consumer template or stylesheet edits.
+
 MatLegacyRipple and MatLegacyRippleModule retain the shared public Material identities. Construct MatLegacyRipple with no arguments through Angular DI; the original five manual dependency arguments no longer supply its services. Angular 21 still declares ignored rest arguments, while Angular 22 declares no arguments. Existing ripple inputs and templates remain supported. The owned theme binds the public ripple color token to the historical foreground and opacity at the existing theme scope, requiring no consumer stylesheet edits.
 
 Dialog containers support content attachment during their lifetime. Calling `dispose()` or `ngOnDestroy()` ends that lifetime; attaching content afterward is unsupported. This includes direct typed portal methods that could bypass the generic disposal guard in the historical implementation.
@@ -51,7 +53,7 @@ Derived from `angular/components` tag `16.2.14`, with history preserved (baselin
 
 Legacy and current radio buttons should be placed in separate groups for their respective generation. A current radio group is not a supported parent for a legacy radio button, or vice versa. The legacy radio group token retains its shared public identity.
 
-The root and family `MatCommonModule` exports share the class from `legacy-core`. Import it through Angular modules for shared initialization. Direct construction uses the historical three-argument constructor; the earlier add-on stubs' zero-argument constructor is no longer supported.
+Import `MatLegacyCommonModule` from `@ngx-compat/material-legacy/legacy-core` for shared initialization. Legacy family NgModules re-export this shared class through their Angular module scopes. Direct construction uses the historical three-argument constructor; the earlier add-on stubs' zero-argument constructor is no longer supported.
 
 ## Planned release/support model
 
