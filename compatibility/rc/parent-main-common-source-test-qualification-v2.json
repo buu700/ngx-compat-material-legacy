@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "role": "Current common-module source test repairs after reviewed API cleanup",
+  "source_parent": "acf6c99719b4f3cf151a41a1222901e1dd9c5538",
+  "worksheet": {
+    "path": "compatibility/rc/parent-main-common-source-test-worksheet-v2.json",
+    "sha256": "001624135eb2e3e95b0bf94fa50b9d0ba69a0488aa4db046ed7bdfa5a13b9368",
+    "bytes": 2367
+  },
+  "authority": [
+    {
+      "path": "compatibility/rc/parent-main-common-module-surface-review-v1.json",
+      "sha256": "54b03be88958c17a3dc7653b4e9ad4fef0fe4dac653fbf6b3f0317c7fd9fc6e6",
+      "bytes": 15577
+    },
+    {
+      "path": "compatibility/rc/parent-main-common-bidi-table-probes-review-v1.json",
+      "sha256": "3953bef5a3298361503ab84b5a55b49f2ed0d14033b7206fdec93790410f7d76",
+      "bytes": 10587
+    }
+  ],
+  "source_afterimages": [
+    {
+      "path": "tests/common-module-evidence/bidi-source-successor.mjs",
+      "sha256": "a4970fd86dd7b3e769aaac118dc8c5f513164a492e0ff11629ee45091dd784ee",
+      "bytes": 8223
+    },
+    {
+      "path": "tests/common-module-evidence/table-source-successor.mjs",
+      "sha256": "946e1d77046b88fa62a0bd64ad3e1293b152bb3c75635d5422ad61166f4a69a6",
+      "bytes": 7814
+    },
+    {
+      "path": "tests/test_bidi_module_public.py",
+      "sha256": "e30990e27e26489b3b4df01588d4abad5eacfd4cb0e974f78f40ce46bd7a6b6e",
+      "bytes": 3877
+    }
+  ],
+  "checks": [
+    {
+      "command": "python3 -m unittest discover -s tests -p test_bidi_module_public.py",
+      "exit_code": 0,
+      "seconds": 10.824,
+      "tests": 2,
+      "actual_public_namespace_cases": 36,
+      "actual_runtime_mutations_rejected": 17,
+      "current_source_mutations_rejected": 73,
+      "frozen_use_keys_retained": 25,
+      "removed_stubs": 23,
+      "retained_callers": 2,
+      "exact_family_modules": 21,
+      "historical_fixture_commit": "ad6423dedecd68d323e61d7fbeefc96fdaf300b5",
+      "historical_review_bindings": 25,
+      "current_old_reviews_rejected": 25
+    },
+    {
+      "command": "node tests/common-module-evidence/table-source-successor.mjs <root> <fresh-report>",
+      "exit_code": 0,
+      "historical_roles": 26,
+      "source_mutations_rejected": 12
+    },
+    {
+      "command": "node tests/table_caller_roles_probe.mjs --source-successor --out <fresh-report>",
+      "exit_code": 0,
+      "historical_roles": 26,
+      "source_and_evidence_corruptions_rejected": 43,
+      "late_changes_rejected": 2,
+      "canonical_ledger_checked": false,
+      "new_runtime_cases_executed": 0,
+      "retained_historical_runtime_case_metadata": 148
+    }
+  ],
+  "product_sources_changed": 0,
+  "material16_goldens_or_exceptions_changed": 0,
+  "canonical_dispositions_or_reviews_changed": 0,
+  "toolchain": {
+    "node": "24.21.0",
+    "python": "3.14.7"
+  },
+  "limits": [
+    "The 36 Bidi cases execute authentic original/main/21 namespace capsules under workspace Node24 with borrowed RxJS/tslib; this is not a complete published peer/runtime floor matrix.",
+    "The table source-successor run rechecks old proof metadata; 148 recorded runtime cases were not re-executed by this command. Default canonical table admission and its old CVA ledger requirement remain unchanged and were not claimed green.",
+    "The historical Bidi review fixture is explicit Git data, never executed old program code or source supplied as current. Current old reviews still fail; retired-source/current-evidence admission remains required.",
+    "No production TS/HTML/CSS/SCSS or golden changed. These diagnostic repairs do not close any frozen use, upstream SHA, audit, artifact coordinator or G11 obligation."
+  ],
+  "g11_claim": "not-passed"
+}
