@@ -55,6 +55,12 @@ def current_tool_fixture(destination):
         for index in (4, 6):
             receipt = json.loads((ROOT / v4['receipts'][index]['path']).read_bytes())
             paths.update(row['path'] for row in receipt['sources'])
+    if line == 'main':
+        # Copy the actual finite bound, including the matrix and domain successors.
+        paths.update(ref['path'] for ref in CurrentSassToolReferences(ROOT).bound)
+        code = "import {currentSassToolReferenceSubject as make} from './scripts/current-sass-tool-references.mjs'; console.log(JSON.stringify(make({root:process.cwd()}).bound));"
+        js_bound = json.loads(subprocess.check_output([NODE, '--input-type=module', '-e', code], cwd=ROOT, text=True))
+        paths.update(ref['path'] for ref in js_bound)
     for path in sorted(paths):
         target = destination / path
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -71,11 +77,36 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
             line = current_tool_fixture(root)
             if line == 'main':
                 self._check_v4(root)
-            child = subprocess.run([NODE, str(ROOT / 'tests/current_sass_tool_reference_probe.mjs'), str(root)],
-                                   cwd=ROOT, capture_output=True, text=True, timeout=90)
-            self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-6000:])
-            result = json.loads(child.stdout)
-            self.assertEqual((result['line'], result['epoch']), (line, 6 if line == 'main' else 3))
+            # Each original check runs in exactly one bounded child. Fail closed
+            # if a cohort fails, skips/duplicates a named check, or differs in
+            # any source metadata. The existing per-child timeout is unchanged.
+            reports = []
+            for cohort in range(7):
+                child = subprocess.run([NODE, str(ROOT / 'tests/current_sass_tool_reference_probe.mjs'), str(root), str(cohort)],
+                                       cwd=ROOT, capture_output=True, text=True, timeout=90)
+                self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-6000:])
+                reports.append(json.loads(child.stdout))
+            expected_checks = [
+                'V3 current maintained dispatch', 'all original and latest identities qualify with exact comparison bytes',
+                'all original 45/17 BEFORE and AFTER identities remain comparison data', 'all committed V1 current identities registered after latest rows',
+                'checkpoint-parent tools and unchanged recipes are finite', 'all V2 current identities remain exact comparison data',
+                'each V3 predecessor and literal successor is exact', 'floor data successor stays exact and physically guarded',
+                'floor roster predecessor remains data with physical guards', 'new table stage predecessor is the frozen owner packet identity',
+                'historical callback cannot stand in for physical overlay source', 'new support bytes reject cold and late physical change',
+                'unknown hash and byte length rejected', 'public metadata cannot alter authority', 'no accessor or proxy evaluation',
+                'nonphysical callback rejected', 'caller-owned equals is never invoked', 'late physical mutation rejected and restored',
+                'last callback cannot change earlier bound file', 'callback cannot mutate incoming metadata',
+                'V1 comparison packet cannot change cold or late', 'V2 comparison packet cannot change cold or late',
+                'installed V3 cannot downgrade when V2 predecessor is absent', 'V1-only data never selects current maintained factory',
+            ]
+            common = [{key: value for key, value in report.items() if key not in ('checks', 'cohort', 'frozen_dispatch_stopped_before_evaluation')} for report in reports]
+            for report in common[1:]: self.assertEqual(common[0], report)
+            for cohort, report in enumerate(reports):
+                self.assertEqual(report['cohort'], str(cohort)); self.assertEqual(report['roster'], expected_checks)
+                self.assertEqual(report['checks'], expected_checks[cohort::7])
+                self.assertEqual(report['frozen_dispatch_stopped_before_evaluation'], expected_checks[-1] in report['checks'])
+            result = {**common[0], 'checks': expected_checks, 'frozen_dispatch_stopped_before_evaluation': True}
+            self.assertEqual((result['line'], result['epoch']), (line, 7 if line == 'main' else 3))
             successor = json.loads((ROOT / INPUTS).read_bytes())
             next_branch = successor['branches'][line]
             packet = json.loads((ROOT / V2_INPUTS['path']).read_bytes())
@@ -88,6 +119,10 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
                 v5_packet = json.loads((ROOT / V5_INPUTS['path']).read_bytes())
                 expected_paths.update(row['path'] for row in v5_packet['updates'])
                 expected_paths.update(row['path'] for row in v5_packet['authored_updates'])
+                domain = json.loads((ROOT / tool_module.DOMAIN_PACKET['path']).read_bytes())
+                expected_paths.update(row['path'] for row in domain['updates'])
+                expected_paths.add('scripts/check-upstream-audit-disposition.mjs')
+                expected_paths.add('scripts/packed-cva-source-requalification.mjs')
             self.assertEqual(result['transitions'], len(expected_paths))
             self.assertEqual(result['v1_current_identities'], 95 if line == '21.x' else 19)
             self.assertEqual(len(result['checks']), 24)
@@ -97,7 +132,7 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
             self.assertFalse(result['old_constructor_executed'])
             self.assertFalse(result['artifact_or_audit_admission_granted'])
             source = CurrentSassToolReferences(root)
-            self.assertEqual(source.epoch, 6 if line == 'main' else 3)
+            self.assertEqual(source.epoch, 7 if line == 'main' else 3)
             self.assertEqual(source.transitions, result['transition_rows'])
             for row in source.transitions:
                 before, after = dict(path=row['path'], **row['before']), dict(path=row['path'], **row['after'])
@@ -256,7 +291,7 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
     def _check_v4(self, root):
         packet = json.loads((root / V4_INPUTS['path']).read_bytes())
         source = CurrentSassToolReferences(root)
-        self.assertEqual(source.epoch, 6)
+        self.assertEqual(source.epoch, 7)
         self.assertEqual({row['path'] for row in packet['updates']}, set(tool_module.V4_COMMITS))
         for update in packet['updates']:
             before, after = update['before'], update['after']
@@ -366,7 +401,7 @@ class CurrentSassToolReferenceTests(unittest.TestCase):
                 finally:
                     path.write_bytes(original)
             source = CurrentSassToolReferences(root)
-            self.assertEqual(source.epoch, 6 if line == 'main' else 3)
+            self.assertEqual(source.epoch, 7 if line == 'main' else 3)
             self.assertEqual(baseline['branches'][line]['source_parent'], V3_CHECKPOINTS[line])
 
     def test_no_overlay_branch_preserves_exact_v2_physical_subject(self):

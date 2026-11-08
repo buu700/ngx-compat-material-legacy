@@ -1,17 +1,18 @@
 /** @license Copyright Google LLC All Rights Reserved.
  * Copyright (c) 2026 Ryan Lester. Use of this source code is governed by the MIT license in LICENSE. */
 import assert from 'node:assert/strict';
-import {readFileSync,writeFileSync} from 'node:fs';
+import fs,{readFileSync,writeFileSync} from 'node:fs';
+import {syncBuiltinESMExports} from 'node:module';
 import {resolve} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {currentSassToolReferenceSubject} from '../scripts/current-sass-tool-references.mjs';
 const root=resolve(process.argv[2]), planner='scripts/canonical-source-guard-plan.mjs', packet='compatibility/rc/current-tool-planner-source-successor-v1.json', rc='scripts/rc-verify.py', rcPacket='compatibility/rc/current-tool-rc-verify-source-successor-v1.json';
-const subject=currentSassToolReferenceSubject({root});assert.equal(subject.epoch,6);subject.assertCurrent();
+const subject=currentSassToolReferenceSubject({root});assert.equal(subject.epoch,7);subject.assertCurrent();
 assert.equal(subject.qualify({path:planner,sha256:'0'.repeat(64)}),null);
 const oldRc={path:rc,sha256:'3a3a68dd67abf6b0c535853beea818f003867b5a1a1734e6bea683c82b51521c',bytes:103517},newRc={path:rc,sha256:'92b12b9f95207d32160a6a8df98e09a1ac9ee5264fdaf6a2f9057ff8bc3deadd',bytes:103230};
-assert.deepEqual(subject.qualify(oldRc),newRc);assert.equal(subject.comparisonBytes(oldRc).length,oldRc.bytes);
+const latestRc=subject.transitions.find(row=>row.path===rc);assert.deepEqual(subject.qualify(oldRc),{path:rc,...latestRc.after});assert.equal(subject.comparisonBytes(newRc).length,newRc.bytes);assert.equal(subject.comparisonBytes(oldRc).length,oldRc.bytes);
 assert.equal(subject.qualify({...oldRc,sha256:'0'.repeat(64)}),null);
-assert.throws(()=>currentSassToolReferenceSubject({root,read:path=>path===rc?subject.comparisonBytes(oldRc):readFileSync(resolve(root,path))}));
+const oldRcBytes=subject.comparisonBytes(oldRc);assert.throws(()=>currentSassToolReferenceSubject({root,read:path=>path===rc?oldRcBytes:readFileSync(resolve(root,path))}),/nonphysical current tool input/);
 for(const path of [planner,packet,rc,rcPacket]){
  const f=resolve(root,path),original=readFileSync(f);
  try {writeFileSync(f,Buffer.concat([original,Buffer.from('\n')]));assert.throws(()=>currentSassToolReferenceSubject({root}));assert.throws(()=>subject.assertCurrent());}
@@ -29,13 +30,15 @@ const savedPlanner=readFileSync(resolve(root,planner));
 try {armed=true;assert.throws(()=>watched.assertCurrent());assert.ok(changed);} finally {writeFileSync(resolve(root,planner),savedPlanner);}
 armed=false;watched.assertCurrent();
 
-const packagePath='projects/ngx-material-legacy/package.json',packageFile=resolve(root,packagePath),plannerFile=resolve(root,planner),packageRaw=readFileSync(packageFile),plannerRaw=readFileSync(plannerFile),seen=[];
+const packagePath='projects/ngx-material-legacy/package.json',packageFile=resolve(root,packagePath),plannerFile=resolve(root,planner),packageRaw=readFileSync(packageFile),plannerRaw=readFileSync(plannerFile),seen=[],physicalSeen=[];
+const originalRead=fs.readFileSync;
 try {
  const old=execFileSync('git',['show','2fbecd1b2687e26515c205cbd5c0024e9474b4b8:'+planner],{cwd:root});
  writeFileSync(plannerFile,old);writeFileSync(packageFile,JSON.stringify({...JSON.parse(packageRaw),version:'21.0.0'}));
+ fs.readFileSync=function(path,...args){if(typeof path==='string'&&path.startsWith(root+'/'))physicalSeen.push(path.slice(root.length+1));return Reflect.apply(originalRead,fs,[path,...args]);};syncBuiltinESMExports();
  try {currentSassToolReferenceSubject({root,read:path=>{seen.push(path);return readFileSync(resolve(root,path));}});}catch{}
- assert.ok(seen.includes('compatibility/rc/parent-base-class-tool-successor-inputs-v3.json'));
- assert.ok(!seen.includes(packet));assert.ok(!seen.includes(rcPacket));
-} finally {writeFileSync(packageFile,packageRaw);writeFileSync(plannerFile,plannerRaw);}
+ assert.deepEqual(seen,[],'incoherent 21.x fixture must fail before callback');
+ assert.ok(physicalSeen.includes('compatibility/rc/parent-base-class-tool-successor-inputs-v3.json'));assert.ok(!physicalSeen.includes(packet));assert.ok(!physicalSeen.includes(rcPacket));
+} finally {fs.readFileSync=originalRead;syncBuiltinESMExports();writeFileSync(packageFile,packageRaw);writeFileSync(plannerFile,plannerRaw);}
 subject.assertCurrent();
 console.log(JSON.stringify({result:'pass',epoch:subject.epoch,bound:subject.bound}));

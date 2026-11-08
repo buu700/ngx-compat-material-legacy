@@ -8,15 +8,22 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
-import {readFileSync,lstatSync,realpathSync} from 'node:fs';
-import {resolve} from 'node:path';
+import {readFileSync,lstatSync,realpathSync,openSync,closeSync,readSync,fstatSync,constants} from 'node:fs';
+import {resolve,join,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {createRequire} from 'node:module';
 import {types} from 'node:util';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import * as planner from './canonical-source-guard-plan.mjs';
 const {composeCanonicalSourceGuards}=planner;
 
 const SELF='scripts/current-sass-tool-references.mjs';
+const requireLocal=createRequire(import.meta.url);
+const DOMAIN_PACKET=Object.freeze({path:'compatibility/rc/current-tool-domain-source-successor-v1.json',sha256:'8995184d9e73a6a9aaaebd4c17df00913f12f59ba19a8b1ef3c639777d32d18b',bytes:158538});
+const CHECKER_PACKET=Object.freeze({path:'compatibility/rc/current-tool-checker-source-successor-v1.json',sha256:'f295a815a7723fba08656833fe4b2796fd9ce6e126ee2a245c54dc96bdded517',bytes:9056});
+const MATRIX_OWNER=Object.freeze({path:'scripts/current-tool-matrix-source.mjs',sha256:'62cca2d43de7d8c2497b95b703a7ae8ff38f3045848c25f718d7af8d0f65ca27',bytes:21212});
+const MATRIX_FACTORY_SHA256='9fc754b24dbd64976f38458286e23085ea9806c9f9392082f3f2c8c10403a223';
+
 const GUARD_PLAN=Object.freeze({path:'scripts/canonical-source-guard-plan.mjs',sha256:'4f632a3fe97975804edf5b89c1cc5abadc002ef78fe16c3a40edbadde460fc9f',bytes:4609});
 const CURRENT_GUARD_PLAN=Object.freeze({path:'scripts/canonical-source-guard-plan.mjs',sha256:'3a3663ce06af2107f55c410fff458100a808593fa9a968e18a94d8490c7fc664',bytes:5014});
 const PLANNER_PACKET=Object.freeze({path:'compatibility/rc/current-tool-planner-source-successor-v1.json',sha256:'7a986f7e700c45cc7137432e0573705f6aed6245c3963e9aa8953f93f8eec7fb',bytes:1162});
@@ -87,7 +94,7 @@ function metadata(value){
  if(Object.hasOwn(out,'bytes'))assert.ok(Number.isSafeInteger(out.bytes)&&out.bytes>=0);
  return out;
 }
-function matches(raw,ref){assert.equal(hash(raw),ref.sha256);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}
+function matches(raw,ref){assert.equal(hash(raw),ref.sha256,ref.path);if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);}
 // Process-local authenticated immutable Git blobs only; current inputs are never cached.
 const immutableGitImages=new Map();
 function gitImages(root,requests){
@@ -127,16 +134,58 @@ function edited(before,edits){
  parts.push(before.subarray(cursor));return Buffer.concat(parts);
 }
 
-export function currentSassToolReferenceSubject({root=process.cwd(),read:providedRead}={}){
- root=resolve(root);assert.ok(lstatSync(root).isDirectory()&&!lstatSync(root).isSymbolicLink());assert.ok(providedRead===undefined||typeof providedRead==='function');const bound=new Map();
+// A failed nested entry poisons the enclosing transaction, even if caught by a reader.
+const toolRegistryKey=Symbol.for('ngx-compat-material-legacy.current-tool-root-transactions.v1');
+function createToolTransaction(){
+ const roots=new Map(),keyOf=root=>realpathSync(resolve(root));
+ const transact=(root,fn)=>{
+  const key=keyOf(root),active=roots.get(key);
+  if(active){active.poisoned=true;throw new Error('reentrant current tool root transaction');}
+  const state={poisoned:false};roots.set(key,state);
+  try{const result=fn();assert.equal(state.poisoned,false,'reentrant current tool root transaction');return result;}
+  finally{roots.delete(key);}
+ };
+ Object.defineProperty(transact,'check',{value:root=>{const state=roots.get(keyOf(root));assert.ok(state&&!state.poisoned,'reentrant current tool root transaction');}});
+ return Object.freeze(transact);
+}
+if(!Object.hasOwn(globalThis,toolRegistryKey))Object.defineProperty(globalThis,toolRegistryKey,{value:createToolTransaction(),writable:false,configurable:false});
+const toolTransaction=globalThis[toolRegistryKey],registryDescriptor=Object.getOwnPropertyDescriptor(globalThis,toolRegistryKey);
+assert.ok(typeof toolTransaction==='function'&&Object.isFrozen(toolTransaction)&&typeof toolTransaction.check==='function'&&!registryDescriptor.writable&&!registryDescriptor.configurable,'invalid current tool root registry');
+export function currentSassToolReferenceSubject(options={}){
+ return toolTransaction(options.root??process.cwd(),()=>{
+  if(options.read===undefined)return constructToolSubject(options);
+  let frame;constructToolSubject({...options,read:undefined},undefined,refs=>{frame=refs;});
+  return constructToolSubject(options,frame);
+ });
+}
+function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound,captureBound){
+ root=resolve(root);assert.ok(lstatSync(root).isDirectory()&&!lstatSync(root).isSymbolicLink());assert.ok(providedRead===undefined||typeof providedRead==='function');const bound=new Map(prebound?.bound??[]),images=new Map(prebound?.images??[]);let scratch=Buffer.allocUnsafe(1);
  const read=path=>{
   const actual=readEvidenceMember(root,path),ref=reference(path,actual);
-  if(bound.has(path))assert.deepEqual(ref,bound.get(path));else bound.set(path,ref);
-  if(providedRead!==undefined)assert.ok(equalBytes(actual,providedRead(path)),'nonphysical current tool input '+path);
+  if(bound.has(path)){assert.deepEqual(ref,bound.get(path));assert.ok(equalBytes(actual,images.get(path)),'changed current tool image '+path);}else{assert.equal(prebound,undefined,'unbound current tool input '+path);bound.set(path,ref);images.set(path,Buffer.from(actual));}
+  if(providedRead!==undefined){assertPhysical();assert.ok(equalBytes(actual,providedRead(path)),'nonphysical current tool input '+path);toolTransaction.check(root);assertPhysical();}
   assert.ok(equalBytes(actual,readEvidenceMember(root,path)),'current tool changed during callback '+path);return actual;
  };
  const member=ref=>{const raw=read(ref.path);matches(raw,ref);return raw;};
- const assertPhysical=()=>{for(const ref of bound.values())assert.deepEqual(reference(ref.path,readEvidenceMember(root,ref.path)),ref,'late physical current tool input '+ref.path);};
+ // Every sweep opens and fully rereads each physical member. Scratch and
+ // directory deduplication save allocation/syscalls; no validity is retained.
+ const assertPhysical=()=>{
+  const rootStat=lstatSync(root);assert.ok(rootStat.isDirectory()&&!rootStat.isSymbolicLink());const checked=new Set();
+  for(const [relative,image] of images){
+   assert.ok(typeof relative==='string'&&!relative.includes('\\'));const parts=relative.split('/');assert.ok(parts.length&&parts.every(part=>part&&part!=='.'&&part!=='..'));
+   const path=resolve(root,...parts);assert.ok(path.startsWith(root+sep));let cursor=root;
+   for(let i=0;i<parts.length-1;i++){cursor=join(cursor,parts[i]);if(checked.has(cursor))continue;const st=lstatSync(cursor);assert.ok(st.isDirectory()&&!st.isSymbolicLink(),'invalid current tool directory '+relative);checked.add(cursor);}
+   const last=lstatSync(path);assert.ok(last.isFile()&&!last.isSymbolicLink(),'invalid current tool member '+relative);
+   if(scratch.length<image.length+1)scratch=Buffer.allocUnsafe(image.length+1);
+   const fd=openSync(path,constants.O_RDONLY|(constants.O_NOFOLLOW??0));
+   try{const st=fstatSync(fd);assert.ok(st.isFile()&&st.size===image.length,'late physical current tool input '+relative);let pos=0;
+    while(pos<image.length){const count=readSync(fd,scratch,pos,image.length-pos,null);assert.ok(count>0,'short current tool input '+relative);pos+=count;}
+    assert.ok(equalBytes(scratch.subarray(0,image.length),image),'late physical current tool input '+relative);
+    assert.equal(readSync(fd,scratch,image.length,1,null),0,'extra current tool input '+relative);
+    const final=fstatSync(fd);assert.ok(final.isFile()&&final.size===image.length,'late physical current tool input '+relative);
+   }finally{closeSync(fd);}
+  }
+ };
  const packagePath='projects/ngx-material-legacy/package.json',packageImage=readEvidenceMember(root,packagePath);
  const version=JSON.parse(packageImage).version,line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
  const activePlanner=line==='main'?CURRENT_GUARD_PLAN:GUARD_PLAN;
@@ -166,6 +215,84 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
  assert.equal(previous.schema_version,1);assert.equal(previous.role,packet.role);
  assert.deepEqual(packet.product_paths,[]);assert.equal(packet.historical_programs_executed,false);assert.equal(packet.historical_reports_rewritten,0);assert.equal(packet.artifact_or_audit_admission_granted,false);
  assert.ok(equalBytes(read(packagePath),packageImage),'package line changed');
+ let matrixOwner;const domainOverlays=new Map();
+ if(line==='main'){
+  const ownerRaw=readEvidenceMember(root,MATRIX_OWNER.path);matches(ownerRaw,MATRIX_OWNER);
+  const ownFile=readFileSync(fileURLToPath(new URL('./current-tool-matrix-source.mjs',import.meta.url)));matches(ownFile,MATRIX_OWNER);
+  const loaded=requireLocal('./current-tool-matrix-source.mjs');assert.ok(Object.isFrozen(loaded.currentToolMatrixSourceLoadedImage));assert.deepEqual(loaded.currentToolMatrixSourceLoadedImage,MATRIX_OWNER);assert.equal(hash(functionToString.call(loaded.currentToolMatrixSource)),MATRIX_FACTORY_SHA256);
+  assert.ok(equalBytes(member(MATRIX_OWNER),ownerRaw));matrixOwner=loaded.currentToolMatrixSource({root,read});assert.equal(matrixOwner.line,'main');
+  const domain=JSON.parse(member(DOMAIN_PACKET));assert.equal(domain.schema_version,1);assert.equal(domain.role,'current-tool-domain-source-successor');assert.equal(domain.line,'main');assert.equal(domain.source_scope_only,true);assert.equal(domain.historical_programs_executed,false);assert.equal(domain.artifact_or_audit_admission_granted,false);
+  assert.deepEqual(domain.domain_counts,{'Sass gate and source-authentication frame':10,'Sass graph, focus infrastructure and seal frame':14,'sandboxed browser launcher cells':1,'stepper peer-output and historical-model source':5});assert.equal(domain.updates.length,30);assert.equal(new Set(domain.updates.map(row=>row.path)).size,30);assert.equal(domain.supports.length,7);
+  const supports=domain.supports.map(ref=>JSON.parse(member(ref)));const [sassReview,domainReview,browserReview,densityV1,densityV2,domainExecutable,stepperObservation]=supports;
+  assert.equal(sassReview.line,'main');assert.equal(sassReview.source_parent,'2fbecd1b2687e26515c205cbd5c0024e9474b4b8');assert.equal(sassReview.actual_full_sass_pass,false);assert.equal(sassReview.g11_claim,'not-passed');
+  assert.equal(domainReview.parent,'5f93a4dd74f3fc58a529ce9999abc3143405c300');assert.equal(browserReview.parent,'fdcdadee28c4552e3500b5099de9f42e456adb5c');
+  assert.equal(densityV1.role,'main-ordinary-density-exact-source-successor');assert.equal(densityV2.line,'main');assert.equal(domainExecutable.line,'main');assert.equal(stepperObservation.line,'main');assert.equal(stepperObservation.focused_tests.count,11);assert.equal(stepperObservation.focused_tests.result,'pass');assert.equal(stepperObservation.artifact_or_audit_admission_granted,false);
+  const allowedParents=new Map([['33d7d9e31fd96cbfa6c4e1f592c0bade985c0878','dfa4dfe18a17a117aaae3af1a8089f4615840cb0'],['8baa761eca624c9d71293c3d31750a2b3fdeebf0','2fbecd1b2687e26515c205cbd5c0024e9474b4b8'],['19ee6343365c391deb97362caec413b113665e1b','5f93a4dd74f3fc58a529ce9999abc3143405c300'],['8e9e7316806fe9266373865b0784e9917659e5e8','fdcdadee28c4552e3500b5099de9f42e456adb5c']]);
+  const env={PATH:process.env.PATH,LANG:'C',LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1'};
+  for(const [commit,parent] of allowedParents)assert.equal(execFileSync('git',['--no-replace-objects','rev-list','--parents','-n','1',commit],{cwd:root,env,encoding:'utf8'}).trim(),commit+' '+parent);
+  const requests=domain.updates.flatMap(row=>row.steps.flatMap(step=>[{commit:step.parent,path:row.path},{commit:step.commit,path:row.path}])),images=gitImages(root,requests);
+  for(const row of domain.updates){
+   assert.ok(toolPath(row.path));assert.equal(row.before.path,row.path);assert.equal(row.after.path,row.path);assert.ok(Array.isArray(row.steps)&&row.steps.length>=1&&row.steps.length<=2);
+   let expected=row.before,priorBytes;const identities=[];
+   for(const step of row.steps){assert.equal(allowedParents.get(step.commit),step.parent);assert.deepEqual(step.before,{sha256:expected.sha256,bytes:expected.bytes});const old=images.get(step.parent+':'+row.path),after=edited(old,step.edits);matches(old,step.before);matches(after,step.after);assert.ok(equalBytes(after,images.get(step.commit+':'+row.path)));if(priorBytes)assert.ok(equalBytes(priorBytes,old));identities.push({ref:{path:row.path,...step.before},bytes:old},{ref:{path:row.path,...step.after},bytes:after});priorBytes=after;expected={path:row.path,...step.after};if(step.commit==='8baa761eca624c9d71293c3d31750a2b3fdeebf0')assert.ok(sassReview.patch.paths.includes(row.path));}
+   assert.deepEqual(expected,row.after);assert.ok(equalBytes(member(row.after),priorBytes));
+   if(row.domain==='Sass graph, focus infrastructure and seal frame'){const e=domainReview.afterimages_verified.find(x=>x.path===row.path);assert.ok(e);assert.equal(e.sha256,row.after.sha256);assert.equal(e.bytes,row.after.bytes);}
+   else if(row.domain==='Sass gate and source-authentication frame')assert.ok(sassReview.patch.paths.includes(row.path));
+   else if(row.domain==='sandboxed browser launcher cells'){const e=browserReview.sources.find(x=>x.path===row.path);assert.ok(e);assert.equal(e.before_sha256,row.before.sha256);assert.equal(e.after_sha256,row.after.sha256);}
+   else if(row.domain==='stepper peer-output and historical-model source'){const e=stepperObservation.paths.find(x=>x.path===row.path);assert.ok(e);assert.deepEqual(e.before,row.before);assert.deepEqual(e.after,row.after);}
+   else assert.fail('unknown current tool domain');
+   domainOverlays.set(row.path,{update:row,identities});
+  }
+  // Checker dispatch is a separately reviewed source domain, not a Sass batch.
+  const checker=JSON.parse(member(CHECKER_PACKET));assert.equal(checker.schema_version,1);assert.equal(checker.role,'current-tool-individual-checker-source-successor');assert.equal(checker.line,'main');assert.equal(checker.source_scope_only,true);assert.equal(checker.historical_programs_executed,false);assert.equal(checker.artifact_or_audit_admission_granted,false);
+  const checkerPath='scripts/check-upstream-audit-disposition.mjs',checkerCommits=['8647ee8a69167ae432313bda47e502f2416c450d','6c5d7a2ba37204074d7d212f8e839621d2a4988d','547abe83d86c4682a173a6e01d2c783b6bb1d855'];assert.equal(checker.before.path,checkerPath);assert.equal(checker.after.path,checkerPath);assert.equal(checker.steps.length,3);assert.equal(checker.supports.length,7);
+  const reviews=checker.supports.map(ref=>JSON.parse(member(ref))),ids=['1dcc195853a74d1e0b724b742673eb5fd744cb67','1de6a3aa37118e4153fb995a8c8f4daecdf6d0b5','4d0a3eff7c5d5186516fe5c8f1af8c003d02882d','6962c858378b52e0a90f7e2cada0f71c297840ed','ef14c286986f9451addeada26ab7b51402aa143f'];
+  for(let i=0;i<5;i++){assert.equal(reviews[i].sha,ids[i]);assert.equal(reviews[i].review_depth,'individual-compatibility');assert.equal(typeof reviews[i].decision,'string');assert.ok(reviews[i].decision.length>0);}assert.equal(reviews[5].parent,'107ccae1864dc4cbc56c4af1b8e70983a1fe947f');assert.equal(reviews[6].parent,'4c29be143432bcb5b2ca99d4f83ca6ff162b4554');
+  const checkerImages=gitImages(root,checker.steps.flatMap(step=>[{commit:step.parent,path:checkerPath},{commit:step.commit,path:checkerPath}]));let expected=checker.before,priorBytes;const checkerIdentities=[];
+  for(let i=0;i<checker.steps.length;i++){const step=checker.steps[i];assert.equal(step.commit,checkerCommits[i]);assert.equal(execFileSync('git',['--no-replace-objects','rev-list','--parents','-n','1',step.commit],{cwd:root,env,encoding:'utf8'}).trim(),step.commit+' '+step.parent);assert.deepEqual(step.before,{sha256:expected.sha256,bytes:expected.bytes});const old=checkerImages.get(step.parent+':'+checkerPath),after=edited(old,step.edits);matches(old,step.before);matches(after,step.after);assert.ok(equalBytes(after,checkerImages.get(step.commit+':'+checkerPath)));if(priorBytes)assert.ok(equalBytes(priorBytes,old));checkerIdentities.push({ref:{path:checkerPath,...step.before},bytes:old},{ref:{path:checkerPath,...step.after},bytes:after});expected={path:checkerPath,...step.after};priorBytes=after;}
+  assert.deepEqual(expected,checker.after);assert.ok(equalBytes(member(checker.after),priorBytes));domainOverlays.set(checkerPath,{update:{...checker,path:checkerPath,domain:'reviewed checker dispatch source'},identities:checkerIdentities});
+  // The independently reviewed root propagation changes this one call site.
+  const cvaPath='scripts/packed-cva-source-requalification.mjs',cvaBefore={path:cvaPath,sha256:'be8c26049e58848d0b7b0ac1e1dba78151d3d8e867ec49b9dc523f28cb304e33',bytes:27417},cvaAfter={path:cvaPath,sha256:'ac955ef53f1c530572d82d6b58f2e736787b04757a72a498a3a77bbcdcad3ad5',bytes:27422};
+  const review=reviews[6].root_forwarding_manifest.callsite_changes.find(x=>x.path===cvaPath);assert.deepEqual(review,{path:cvaPath,calls:1,before_sha256:cvaBefore.sha256,after_sha256:cvaAfter.sha256});
+  const cvaImages=gitImages(root,[{commit:'4c29be143432bcb5b2ca99d4f83ca6ff162b4554',path:cvaPath},{commit:'547abe83d86c4682a173a6e01d2c783b6bb1d855',path:cvaPath}]),cvaOld=cvaImages.get('4c29be143432bcb5b2ca99d4f83ca6ff162b4554:'+cvaPath),cvaNew=cvaImages.get('547abe83d86c4682a173a6e01d2c783b6bb1d855:'+cvaPath);matches(cvaOld,cvaBefore);matches(cvaNew,cvaAfter);
+  const beforeCall='currentAuthoredUseAdmission({current: live, frozen: frozen.symbol_uses, candidate: added, line, readMember: proposed})',afterCall='currentAuthoredUseAdmission({root,current: live, frozen: frozen.symbol_uses, candidate: added, line, readMember: proposed})';assert.equal(cvaOld.toString().split(beforeCall).length,2);assert.equal(cvaOld.toString().replace(beforeCall,afterCall),cvaNew.toString());const cvaNext=JSON.parse(member({path:'compatibility/rc/current-tool-retired-adapter-checker-source-successor-v1.json',sha256:'c15eb5d8be6bed62d9dfe3476b16fdf2a4eee6e9d4a337cee551848fe7a9c62a',bytes:2094}));
+  assert.equal(cvaNext.schema_version,1);assert.equal(cvaNext.role,'current-tool-retired-adapter-checker-source-successor');assert.equal(cvaNext.source_parent,'3be4d6b7aa54e97ee6622bc869d564313f1f7743');assert.equal(cvaNext.source_commit,'df6213c96e19af5c4a0c68f49e010d89e15f0c2c');assert.equal(cvaNext.historical_programs_executed,false);assert.equal(cvaNext.artifact_or_audit_admission_granted,false);assert.deepEqual(cvaNext.before,cvaAfter);
+  assert.equal(execFileSync('git',['--no-replace-objects','rev-list','--parents','-n','1',cvaNext.source_commit],{cwd:root,env,encoding:'utf8'}).trim(),cvaNext.source_commit+' '+cvaNext.source_parent);
+  const cvaReview=JSON.parse(member(cvaNext.review));assert.equal(cvaReview.base_head,cvaNext.source_parent);assert.equal(cvaReview.independent_review.sha256,'a015a5f5570d98557454eee86bfbed635edc1f4fc9a586885a3d12085f3c63f2');
+  const cvaNextImages=gitImages(root,[{commit:cvaNext.source_parent,path:cvaPath},{commit:cvaNext.source_commit,path:cvaPath}]),cvaBase=cvaNextImages.get(cvaNext.source_parent+':'+cvaPath),cvaFinal=edited(cvaBase,cvaNext.edits);assert.ok(equalBytes(cvaBase,cvaNew));matches(cvaFinal,cvaNext.after);assert.ok(equalBytes(cvaFinal,cvaNextImages.get(cvaNext.source_commit+':'+cvaPath)));assert.ok(equalBytes(member(cvaNext.after),cvaFinal));domainOverlays.set(cvaPath,{update:{path:cvaPath,before:cvaBefore,after:cvaNext.after},identities:[{ref:cvaBefore,bytes:cvaOld},{ref:cvaAfter,bytes:cvaNew},{ref:cvaNext.after,bytes:cvaFinal}]});
+  const testPacket=JSON.parse(member({path:'compatibility/rc/current-tool-maintained-test-source-successor-v1.json',sha256:'bc88fc8797fe8f96a8d97077c6f6945c013394087bcec9d2e70cfaae51b14c27',bytes:5156}));
+  assert.equal(testPacket.schema_version,1);assert.equal(testPacket.role,'current-tool-maintained-test-source-successor');assert.equal(testPacket.source_parent,'1cb122d2d4ee39949d0be4203aedea0131c20f75');assert.equal(testPacket.historical_programs_executed,false);assert.equal(testPacket.artifact_or_audit_admission_granted,false);
+  const testPath='tests/test_current_sass_tool_references.py';assert.equal(testPacket.before.path,testPath);assert.equal(testPacket.after.path,testPath);const testOld=gitImages(root,[{commit:testPacket.source_parent,path:testPath}]).get(testPacket.source_parent+':'+testPath),testNew=edited(testOld,testPacket.edits);matches(testOld,testPacket.before);matches(testNew,testPacket.after);assert.ok(equalBytes(member(testPacket.after),testNew));domainOverlays.set(testPath,{update:{path:testPath,before:testPacket.before,after:testPacket.after},identities:[{ref:testPacket.before,bytes:testOld},{ref:testPacket.after,bytes:testNew}]});
+  const mainProbe=JSON.parse(member({path:'compatibility/rc/current-tool-maintained-main-probe-source-successor-v1.json',sha256:'c0c575f6295fa85d0bf4236b8f9a246e917651e64ef38b1afa80bf0b8466ae16',bytes:10547}));assert.equal(mainProbe.schema_version,1);assert.equal(mainProbe.role,'current-tool-maintained-main-probe-source-successor');assert.equal(mainProbe.source_parent,testPacket.source_parent);assert.equal(mainProbe.historical_programs_executed,false);assert.equal(mainProbe.artifact_or_audit_admission_granted,false);
+  const mainPath='tests/current_sass_tool_reference_probe.mjs';assert.equal(mainProbe.before.path,mainPath);assert.equal(mainProbe.after.path,mainPath);const mainOld=gitImages(root,[{commit:mainProbe.source_parent,path:mainPath}]).get(mainProbe.source_parent+':'+mainPath),mainNew=edited(mainOld,mainProbe.edits);matches(mainOld,mainProbe.before);matches(mainNew,mainProbe.after);assert.ok(equalBytes(member(mainProbe.after),mainNew));domainOverlays.set(mainPath,{update:{path:mainPath,before:mainProbe.before,after:mainProbe.after},identities:[{ref:mainProbe.before,bytes:mainOld},{ref:mainProbe.after,bytes:mainNew}]});
+  const probe=JSON.parse(member({path:'compatibility/rc/current-tool-maintained-probe-source-successor-v1.json',sha256:'b1809b6d89c9cdbd29f9355ed11d82e995d77a8f549be7f69bca0e785b8b428f',bytes:1924}));assert.equal(probe.schema_version,1);assert.equal(probe.role,'current-tool-maintained-probe-source-successor');assert.equal(probe.source_parent,testPacket.source_parent);assert.equal(probe.historical_programs_executed,false);assert.equal(probe.artifact_or_audit_admission_granted,false);
+  const probePath='tests/current_sass_tool_reference_v4_probe.mjs';assert.equal(probe.before.path,probePath);assert.equal(probe.after.path,probePath);const probeOld=gitImages(root,[{commit:probe.source_parent,path:probePath}]).get(probe.source_parent+':'+probePath),probeNew=edited(probeOld,probe.edits);matches(probeOld,probe.before);matches(probeNew,probe.after);assert.ok(equalBytes(member(probe.after),probeNew));
+  const v5Tests=JSON.parse(member({path:'compatibility/rc/current-tool-maintained-v5-tests-source-successor-v1.json',sha256:'61b144081fd0aa72065962b283110951c4f9af54a359c4887191938b4513d444',bytes:6833}));assert.equal(v5Tests.schema_version,1);assert.equal(v5Tests.role,'current-tool-maintained-v5-tests-source-successor');assert.equal(v5Tests.source_parent,testPacket.source_parent);assert.equal(v5Tests.historical_programs_executed,false);assert.equal(v5Tests.artifact_or_audit_admission_granted,false);assert.deepEqual(v5Tests.updates.map(x=>x.path),['tests/test_current_sass_tool_reference_v5.py','tests/current_sass_tool_reference_v5_probe.mjs']);
+  const v5TestImages=gitImages(root,v5Tests.updates.map(x=>({commit:v5Tests.source_parent,path:x.path})));for(const update of v5Tests.updates){assert.equal(update.before.path,update.path);assert.equal(update.after.path,update.path);const old=v5TestImages.get(v5Tests.source_parent+':'+update.path),next=edited(old,update.edits);matches(old,update.before);matches(next,update.after);assert.ok(equalBytes(member(update.after),next));}
+  const plannerTests=JSON.parse(member({path:'compatibility/rc/current-tool-maintained-planner-tests-source-successor-v1.json',sha256:'92e8b053bab86a45ccad938be30a81678be921ae5dbfbd48e89059b605cf9379',bytes:15282}));assert.equal(plannerTests.schema_version,1);assert.equal(plannerTests.role,'current-tool-maintained-planner-tests-source-successor');assert.equal(plannerTests.source_parent,testPacket.source_parent);assert.equal(plannerTests.historical_programs_executed,false);assert.equal(plannerTests.artifact_or_audit_admission_granted,false);assert.deepEqual(plannerTests.updates.map(x=>x.path),['tests/test_current_tool_planner_successor.py','tests/current_tool_planner_successor_probe.mjs']);
+  const plannerTestImages=gitImages(root,plannerTests.updates.map(x=>({commit:plannerTests.source_parent,path:x.path})));for(const update of plannerTests.updates){assert.equal(update.before.path,update.path);assert.equal(update.after.path,update.path);const old=plannerTestImages.get(plannerTests.source_parent+':'+update.path),next=edited(old,update.edits);matches(old,update.before);matches(next,update.after);assert.ok(equalBytes(member(update.after),next));}
+  // Individually reviewed historical-repair helper plus its exact table data.
+  const repair=JSON.parse(member({path:'compatibility/rc/current-tool-historical-repair-source-successor-v1.json',sha256:'6b036e7da92ffa3046aaf575ee487253c51508a50c12d3655257b479a3a11473',bytes:15104}));
+  assert.equal(repair.schema_version,1);assert.equal(repair.role,'current-tool-historical-repair-source-successor');assert.equal(repair.source_parent,'68606c1ee64a6f529ef71b4576cc13c7863dbc85');assert.equal(repair.historical_programs_executed,false);assert.equal(repair.artifact_or_audit_admission_granted,false);
+  const repairPath='scripts/historical-contract-repair-source.mjs';assert.deepEqual(repair.before,{path:repairPath,sha256:'bd7cfbf2235438c604fdc6bc7c4b37e7c365c755d1f8287ce51393389ce6f78d',bytes:22621});assert.deepEqual(repair.after,{path:repairPath,sha256:'00beaadf9fb7dac4ce3981c60d04cadc84b7d23607ffcbc47c4b3d764b9f20cd',bytes:31620});
+  assert.deepEqual(repair.supports.map(ref=>ref.path),['compatibility/rc/historical-repair-table-signature-source-successor-v1.json','compatibility/rc/parent-main-table-column-diagnostic-v1.json','compatibility/rc/api/signature-differences.json','tests/historical_repair_table_planner_successor_probe.mjs','compatibility/rc/current-tool-historical-repair-source-review-v1.json']);
+  const repairOld=gitImages(root,[{commit:repair.source_parent,path:repairPath}]).get(repair.source_parent+':'+repairPath),repairNew=edited(repairOld,repair.edits);matches(repairOld,repair.before);matches(repairNew,repair.after);assert.ok(equalBytes(member(repair.after),repairNew));
+  const support=repair.supports.map(member),table=JSON.parse(support[0]),receipt=JSON.parse(support[1]),independent=JSON.parse(support[4]);
+  assert.equal(table.schema_version,1);assert.equal(table.role,'historical-repair-table-signature-source-successor');assert.equal(table.source_parent,'c394ef616bfae381e0676c8f84af01e0553cad1d');assert.equal(table.source_commit,'68606c1ee64a6f529ef71b4576cc13c7863dbc85');assert.equal(table.historical_programs_executed,false);assert.equal(table.artifact_or_audit_admission_granted,false);assert.deepEqual(table.review,repair.supports[1]);assert.deepEqual(table.after,repair.supports[2]);
+  assert.equal(receipt.base_head,table.source_parent);assert.equal(receipt.independent_review.sha256,'e9bb997595db0a8d165a30fbf38c54ddb4e572402f27d9cb842d4aae8714fe85');assert.equal(receipt.root_preflight.before[table.before.path],table.before.sha256);assert.equal(receipt.root_preflight.after[table.after.path],table.after.sha256);
+  assert.equal(independent.schema_version,1);assert.equal(independent.role,'embedded-independent-historical-repair-table-planner-review');assert.equal(independent.historical_programs_executed,false);assert.equal(independent.artifact_or_audit_admission_granted,false);assert.equal(independent.original_sha256,'3f37b9ad190072bebc30e198b06ad7d49fc09f05a9183f22c58ae8240c6617e4');assert.equal(Buffer.byteLength(independent.text),independent.original_bytes);assert.equal(hash(independent.text),independent.original_sha256);
+  assert.equal(execFileSync('git',['--no-replace-objects','rev-list','--parents','-n','1',table.source_commit],{cwd:root,env,encoding:'utf8'}).trim(),table.source_commit+' '+table.source_parent);const tableImages=gitImages(root,[{commit:table.source_parent,path:table.before.path},{commit:table.source_commit,path:table.after.path}]),tableOld=tableImages.get(table.source_parent+':'+table.before.path),tableNew=edited(tableOld,table.edits);matches(tableOld,table.before);matches(tableNew,table.after);assert.ok(equalBytes(tableNew,tableImages.get(table.source_commit+':'+table.after.path)));assert.ok(equalBytes(tableNew,support[2]));
+  const oldTable=JSON.parse(tableOld),newTable=JSON.parse(tableNew);assert.equal(oldTable.differences.length,113);assert.equal(newTable.differences.length,114);assert.equal(newTable.differences[0].symbol_id,'legacy-table/primary/MatLegacyColumnDef');assert.equal(newTable.differences[0].historical_signature,'protected method _updateColumnCssClassName():*');assert.equal(newTable.differences[0].owned_signature,null);assert.deepEqual({...newTable,differences:newTable.differences.slice(1)},oldTable);
+  domainOverlays.set(repairPath,{update:{path:repairPath,before:repair.before,after:repair.after},identities:[{ref:repair.before,bytes:repairOld},{ref:repair.after,bytes:repairNew}]});
+ }
+ const sameReference=(a,b)=>Object.keys(a).length===3&&a.path===b.path&&a.sha256===b.sha256&&a.bytes===b.bytes;
+ const inventoryPrior=Object.freeze({path:'testing/legacy-runner/historical-inventory.json',sha256:'a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403',bytes:106309});
+ const inventoryCurrent=Object.freeze({path:inventoryPrior.path,sha256:'912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15',bytes:113388});
+ const currentComparison=ref=>{
+  if(matrixOwner&&ref.path===inventoryPrior.path){assert.deepEqual(metadata(ref),inventoryPrior);matrixOwner.assertCurrent();member(inventoryCurrent);const old=gitImages(root,[{commit:'948e8290b74953c83d11268368f38952d0b51fd7',path:inventoryPrior.path}]).get('948e8290b74953c83d11268368f38952d0b51fd7:'+inventoryPrior.path);matches(old,inventoryPrior);return Buffer.from(old);}
+  if(matrixOwner&&ref.path===matrixOwner.after.path){const meta=metadata(ref);if(sameReference(meta,matrixOwner.after))return member(matrixOwner.after);return matrixOwner.comparisonBytes(meta);}
+  const overlay=domainOverlays.get(ref.path);if(!overlay)return member(ref);const meta=metadata(ref),identity=overlay.identities.find(x=>sameReference(x.ref,meta));assert.ok(identity,'unknown current domain comparison '+ref.path);member(overlay.update.after);return Buffer.from(identity.bytes);
+ };
  const rcSuccessors=new Map();
  if(line==='main'){
   const rcPacket={path:'compatibility/rc/current-tool-rc-verify-source-successor-v1.json',sha256:'35834cc2d98bb4a05e4bae35f3a1f51199ab81e86027858214a0144e911d2826',bytes:6911};
@@ -174,13 +301,13 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
   assert.deepEqual(data.before,{path,sha256:'3a3a68dd67abf6b0c535853beea818f003867b5a1a1734e6bea683c82b51521c',bytes:103517});assert.deepEqual(data.after,{path,sha256:'92b12b9f95207d32160a6a8df98e09a1ac9ee5264fdaf6a2f9057ff8bc3deadd',bytes:103230});
   const env={PATH:process.env.PATH,LANG:'C',LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1'};
   assert.equal(execFileSync('git',['--no-replace-objects','rev-list','--parents','-n','1',commit],{cwd:root,env,encoding:'utf8'}).trim(),commit+' '+parent);
-  const images=gitImages(root,[{commit:parent,path},{commit,path}]),before=images.get(parent+':'+path),after=edited(before,data.edits);matches(before,data.before);matches(after,data.after);assert.ok(equalBytes(after,images.get(commit+':'+path)));assert.ok(equalBytes(member(data.after),after));rcSuccessors.set(path,{update:data,before,after});
+  const images=gitImages(root,[{commit:parent,path},{commit,path}]),before=images.get(parent+':'+path),after=edited(before,data.edits);matches(before,data.before);matches(after,data.after);assert.ok(equalBytes(after,images.get(commit+':'+path)));assert.ok(equalBytes(currentComparison(data.after),after));rcSuccessors.set(path,{update:data,before,after});
   assert.deepEqual(data.authored_updates.map(row=>row.path),['tests/test_current_sass_tool_references.py','tests/current_sass_tool_reference_probe.mjs']);
   const v5=JSON.parse(member(V5_INPUTS));for(const update of data.authored_updates){assert.equal(update.before.path,update.path);assert.equal(update.after.path,update.path);const v5update=v5.authored_updates.find(row=>row.path===update.path);assert.ok(v5update);assert.deepEqual(v5update.after,update.before);
   const base=gitImages(root,[{commit:V5_COMMIT,path:update.path}]).get(V5_COMMIT+':'+update.path),historical=edited(base,v5update.edits);matches(base,v5update.before);matches(historical,update.before);
-  const current=edited(historical,update.edits);matches(current,update.after);assert.ok(equalBytes(member(update.after),current));rcSuccessors.set(update.path,{update,before:historical,after:current});}
+  const current=edited(historical,update.edits);matches(current,update.after);assert.ok(equalBytes(currentComparison(update.after),current));rcSuccessors.set(update.path,{update,before:historical,after:current});}
  }
- const v5Member=ref=>{const row=rcSuccessors.get(ref.path);if(row){assert.deepEqual(metadata(ref),row.update.before,'unknown source predecessor');assert.ok(equalBytes(member(row.update.after),row.after));return Buffer.from(row.before);}return member(ref);};
+ const v5Member=ref=>{const row=rcSuccessors.get(ref.path);if(row){assert.deepEqual(metadata(ref),row.update.before,'unknown source predecessor');assert.ok(equalBytes(currentComparison(row.update.after),row.after));return Buffer.from(row.before);}return currentComparison(ref);};
  const v5Overlays=new Map();
  if(line==='main'){
   const v5=JSON.parse(member(V5_INPUTS));
@@ -213,7 +340,7 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
  // It always binds and reads the actual current member before returning old bytes.
  const v4Comparison=ref=>{
   if(line==='main'&&ref.path===GUARD_PLAN.path){assert.deepEqual(metadata(ref),GUARD_PLAN,'unknown planner predecessor');member(CURRENT_GUARD_PLAN);assertPlanner();return Buffer.from(plannerBefore);}
-  const overlay=v5Overlays.get(ref.path);if(!overlay)return member(ref);
+  const overlay=v5Overlays.get(ref.path);if(!overlay)return currentComparison(ref);
   assert.deepEqual(metadata(ref),overlay.update.before,'unknown V4 comparison identity '+ref.path);
   assert.ok(equalBytes(v5Member(overlay.update.after),overlay.after));return Buffer.from(overlay.before);
  };
@@ -363,18 +490,24 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
   addIdentity(row,update.before,before);addIdentity(row,update.after,after);row.after={sha256:update.after.sha256,bytes:update.after.bytes};
  }
  for(const {update,before,after} of rcSuccessors.values()){const row=rows.get(update.before.path);assert.ok(row);assert.deepEqual({path:row.path,...row.after},update.before,'source successor must follow V5');addIdentity(row,update.before,before);addIdentity(row,update.after,after);row.after={sha256:update.after.sha256,bytes:update.after.bytes};}
+ if(matrixOwner){const row=rows.get(matrixOwner.after.path);assert.ok(row);assert.deepEqual({path:row.path,...row.after},matrixOwner.before);addIdentity(row,matrixOwner.before,matrixOwner.comparisonBytes(matrixOwner.before));addIdentity(row,matrixOwner.intermediate,matrixOwner.comparisonBytes(matrixOwner.intermediate));addIdentity(row,matrixOwner.after,member(matrixOwner.after));row.after={sha256:matrixOwner.after.sha256,bytes:matrixOwner.after.bytes};}
+ for(const {update,identities} of domainOverlays.values()){let row=rows.get(update.path);if(row)assert.deepEqual({path:row.path,...row.after},update.before,'domain successor must follow previous frame');else{assert.ok(nextBranch.additional_inputs.some(ref=>JSON.stringify(ref)===JSON.stringify(update.before)),'domain predecessor is not an existing input');row={path:update.path,before:{sha256:update.before.sha256,bytes:update.before.bytes},identities:new Map()};rows.set(update.path,row);}for(const identity of identities)addIdentity(row,identity.ref,identity.bytes);row.after={sha256:update.after.sha256,bytes:update.after.bytes};}
  for(const row of rows.values())member({path:row.path,...row.after});
  assert.deepEqual(bound.get(GUARD_PLAN.path),activePlanner,'current tool guard planner missing from finite bound');
  let consuming=false,batching=false;
  const assertIdle=()=>{assert.equal(consuming,false,'reentrant current tool guard consumption');assert.equal(batching,false,'reentrant current tool reference batch');};
- const guardNode=Object.freeze({
+ const internalNode=Object.freeze({
   dependencies:Object.freeze([]),
-  preflight:()=>{assertIdle();assertPlanner();assertPhysical();},
+  preflight:()=>{assertIdle();assertPlanner();assertPhysical();if(matrixOwner)matrixOwner.assertCurrent();},
   consume:()=>{assertIdle();consuming=true;try{for(const ref of [...bound.values()])member(ref);}finally{consuming=false;}},
-  final:()=>{assertPhysical();assertPlanner();},
+  final:()=>{assertPhysical();assertPlanner();if(matrixOwner)matrixOwner.assertCurrent();},
  });
- const composedGuard=loadedComposeCanonicalSourceGuards(Object.freeze([guardNode]));
- const assertCurrent=()=>{assertIdle();composedGuard();};
+ const composedGuard=loadedComposeCanonicalSourceGuards(Object.freeze([internalNode]));
+ const transact=fn=>toolTransaction(root,fn);
+ const guardNode=Object.freeze({dependencies:Object.freeze([]),
+  preflight:()=>transact(internalNode.preflight),consume:()=>transact(internalNode.consume),final:()=>transact(internalNode.final)});
+ const assertCurrentCore=()=>{assertIdle();composedGuard();};
+ const assertCurrent=()=>transact(assertCurrentCore);
  const guardPlan=Object.freeze({assertCurrent,node:guardNode});
  const ownsReference=incoming=>{try{const ref=metadata(incoming),row=rows.get(ref.path),raw=row?.identities.get(ref.sha256);return Boolean(raw&&(ref.bytes===undefined||ref.bytes===raw.length));}catch{return false;}};
  const sideCore=(incoming,target)=>{
@@ -415,7 +548,7 @@ export function currentSassToolReferenceSubject({root=process.cwd(),read:provide
   }finally{batching=false;}
  };
  const transitions=[...rows.values()].map(r=>({path:r.path,before:{...r.before},after:{...r.after}}));
- const result=Object.freeze({line,epoch:line==='main'?6:3,get bound(){return structuredClone([...bound.values()]);},get transitions(){return structuredClone(transitions);},ownsReference,qualify:ref=>side(ref,'after'),predecessorReference:ref=>side(ref,'before'),comparisonBytes,referenceBatch,assertCurrent,guardNode,guardPlan,
+ const result=Object.freeze({line,epoch:line==='main'?7:3,get bound(){return transact(()=>structuredClone([...bound.values()]));},get transitions(){return transact(()=>structuredClone(transitions));},ownsReference:ref=>transact(()=>ownsReference(ref)),qualify:ref=>transact(()=>side(ref,'after')),predecessorReference:ref=>transact(()=>side(ref,'before')),comparisonBytes:ref=>transact(()=>comparisonBytes(ref)),referenceBatch:refs=>transact(()=>referenceBatch(refs)),assertCurrent,guardNode,guardPlan,
   old_code_executed:false,old_product_bytes_exposed:false,old_tool_bytes_exposed_as_current:false,current_read_route_returned:false,canonical_admission_granted:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'});
- assertCurrent();return result;
+ assertCurrentCore();if(captureBound)captureBound({bound:[...bound.entries()],images:[...images.entries()]});return result;
 }

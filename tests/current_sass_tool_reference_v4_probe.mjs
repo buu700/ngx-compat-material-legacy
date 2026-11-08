@@ -14,7 +14,9 @@ const root=process.argv[2], disk=p=>readFileSync(join(root,p));
 const packet=JSON.parse(disk('compatibility/rc/parent-base-class-tool-successor-inputs-v4.json'));
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const source=currentSassToolReferenceSubject({root});
-assert.equal(source.epoch,6);assert.equal(packet.updates.length,18);
+assert.equal(source.epoch,7);assert.equal(packet.updates.length,18);
+let armedV4=false,last,targetOld;
+const liveV4=currentSassToolReferenceSubject({root,read:p=>{const bytes=disk(p);if(armedV4&&p===last){armedV4=false;writeFileSync(join(root,last),targetOld);}return bytes;}});
 for(const {path,before,after} of packet.updates){
  const current={path,...source.transitions.find(row=>row.path===path).after};
  assert.deepEqual(source.qualify(before),current);
@@ -25,10 +27,8 @@ for(const {path,before,after} of packet.updates){
  const target=join(root,path),saved=disk(path),old=source.comparisonBytes(before);
  try{writeFileSync(target,old);assert.throws(()=>source.assertCurrent());assert.throws(()=>currentSassToolReferenceSubject({root}));}
  finally{writeFileSync(target,saved);}
- let armed=false;
- const last=path;
- const live=currentSassToolReferenceSubject({root,read:p=>{const bytes=disk(p);if(armed&&p===last){armed=false;writeFileSync(target,old);}return bytes;}});
- try{armed=true;assert.throws(()=>live.assertCurrent(),/current tool changed during callback/);assert.equal(armed,false);}finally{writeFileSync(target,saved);}
+ last=path;targetOld=old;
+ try{armedV4=true;assert.throws(()=>liveV4.assertCurrent(),/late physical current tool input/);assert.equal(armedV4,false);}finally{writeFileSync(target,saved);}
 }
 for(const ref of [...packet.receipts,...JSON.parse(disk(packet.receipts[4].path)).sources,...JSON.parse(disk(packet.receipts[6].path)).sources]){
  const path=join(root,ref.path),saved=disk(ref.path);

@@ -4,12 +4,22 @@
 """Independent finite current tool references; historical programs remain data."""
 import copy
 import hashlib
+import hmac
+import importlib.util
 import json
 import os
 from pathlib import Path
 import re
 import subprocess
+import stat
+import functools
+import threading
+import sys
+from contextlib import contextmanager
 
+DOMAIN_PACKET = dict(path='compatibility/rc/current-tool-domain-source-successor-v1.json', sha256='8995184d9e73a6a9aaaebd4c17df00913f12f59ba19a8b1ef3c639777d32d18b', bytes=158538)
+CHECKER_PACKET = dict(path='compatibility/rc/current-tool-checker-source-successor-v1.json', sha256='f295a815a7723fba08656833fe4b2796fd9ce6e126ee2a245c54dc96bdded517', bytes=9056)
+MATRIX_OWNER = dict(path='scripts/current_tool_matrix_source.py', sha256='f512cb5bb0e4cbe441f3971673930ae74873994f4163b11a4eb9e809b490898a', bytes=22953)
 SELF = 'scripts/current_sass_tool_references.py'
 INPUTS = 'compatibility/rc/parent-base-class-tool-successor-inputs-v3.json'
 V4_INPUTS = dict(path='compatibility/rc/parent-base-class-tool-successor-inputs-v4.json', sha256='60088525932c75c41782874396eb72f8bcec479ec2ad4d911090e1e2b3964b24', bytes=109915)
@@ -165,12 +175,116 @@ def _edited(before, edits):
     return b''.join([*parts, before[cursor:]])
 
 
+# Module aliases share closure-owned transaction state within this interpreter.
+def _new_tool_registry():
+    roots = {}
+    lock = threading.RLock()
+    @contextmanager
+    def transaction(root):
+        key = os.path.realpath(root)
+        with lock:
+            active = roots.get(key)
+            if active is not None:
+                active['poisoned'] = True
+                raise RuntimeError('reentrant current tool root transaction')
+            state = {'poisoned': False}
+            roots[key] = state
+        try:
+            yield
+            if state['poisoned']:
+                raise RuntimeError('reentrant current tool root transaction')
+        finally:
+            with lock:
+                del roots[key]
+    def check(root):
+        with lock:
+            state = roots.get(os.path.realpath(root))
+            if state is None or state['poisoned']:
+                raise RuntimeError('reentrant current tool root transaction')
+    return transaction, check
+
+_registry_key = '_ngx_compat_material_legacy_current_tool_root_transactions_v1'
+_registry = sys.modules.setdefault(_registry_key, _new_tool_registry())
+if type(_registry) is not tuple or len(_registry) != 2 or not all(callable(item) for item in _registry):
+    raise RuntimeError('invalid current tool root registry')
+_tool_transaction, _check_tool_transaction = _registry
+
+def _public_tool_method(fn):
+    @functools.wraps(fn)
+    def wrapped(self, *args, **kwargs):
+        with _tool_transaction(self.root):
+            return fn(self, *args, **kwargs)
+    return wrapped
+
 class CurrentSassToolReferences:
     def __init__(self, root, *, read=None):
+        if not __debug__:
+            raise RuntimeError('current tool source guards require Python assertions enabled')
+        with _tool_transaction(root):
+            if read is None:
+                self._construct(root)
+            else:
+                self._construct(root)
+                frame = self._snapshot_frame()
+                self._construct(root, read=read, prebound=frame)
+
+    def _construct(self, root, *, read=None, prebound=None):
+        if not __debug__:
+            raise RuntimeError('current tool source guards require Python assertions enabled')
         self.root = Path(root).absolute()
         assert self.root.is_dir() and not self.root.is_symlink()
         assert read is None or callable(read)
-        self._provided, self._bound, self._rows = read, {}, {}
+        self._provided, self._bound, self._rows = read, ({} if prebound is None else prebound[0]), {}
+        self._prebound = prebound is not None
+        frame_images = {} if prebound is None else prebound[1]
+        scratch = bytearray(1)
+        def bind_image(path, raw):
+            if path in frame_images:
+                assert frame_images[path] == raw, 'changed current tool image ' + path
+            else:
+                assert not self._prebound, 'unbound current tool input ' + path
+                frame_images[path] = raw
+        def sweep_physical():
+            nonlocal scratch
+            root_stat = os.lstat(self.root)
+            assert stat.S_ISDIR(root_stat.st_mode) and not stat.S_ISLNK(root_stat.st_mode)
+            checked = set()
+            for relative, image in frame_images.items():
+                assert type(relative) is str and relative and '\\' not in relative and '\x00' not in relative, repr(relative)
+                parts = relative.split('/')
+                assert all(part and part not in ('.', '..') for part in parts)
+                cursor = self.root
+                for part in parts[:-1]:
+                    cursor = cursor / part
+                    if cursor in checked: continue
+                    mode = os.lstat(cursor).st_mode
+                    assert stat.S_ISDIR(mode) and not stat.S_ISLNK(mode), 'invalid current tool directory ' + relative
+                    checked.add(cursor)
+                path = cursor / parts[-1]
+                mode = os.lstat(path).st_mode
+                assert stat.S_ISREG(mode) and not stat.S_ISLNK(mode), 'invalid current tool member ' + relative
+                if len(scratch) < len(image) + 1: scratch = bytearray(len(image) + 1)
+                fd = os.open(path, os.O_RDONLY | getattr(os, 'O_NOFOLLOW', 0) | getattr(os, 'O_BINARY', 0))
+                try:
+                    current = os.fstat(fd)
+                    assert stat.S_ISREG(current.st_mode) and current.st_size == len(image), 'late physical current tool input ' + relative
+                    pos = 0
+                    while pos < len(image):
+                        if hasattr(os, 'readv'):
+                            count = os.readv(fd, [memoryview(scratch)[pos:len(image)]])
+                        else:
+                            part = os.read(fd, len(image) - pos); count = len(part); scratch[pos:pos+count] = part
+                        assert count > 0, 'short current tool input ' + relative
+                        pos += count
+                    assert hmac.compare_digest(memoryview(scratch)[:len(image)], image), 'late physical current tool input ' + relative
+                    assert not os.read(fd, 1), 'extra current tool input ' + relative
+                    current = os.fstat(fd)
+                    assert stat.S_ISREG(current.st_mode) and current.st_size == len(image), 'late physical current tool input ' + relative
+                finally:
+                    os.close(fd)
+        self._bind_image = bind_image
+        self._sweep_physical = sweep_physical
+        self._snapshot_frame = lambda: (copy.deepcopy(self._bound), frame_images.copy())
         package_path = 'projects/ngx-material-legacy/package.json'
         package_image = _physical(self.root, package_path)
         version = json.loads(package_image)['version']
@@ -211,6 +325,170 @@ class CurrentSassToolReferences:
         assert packet['product_paths'] == [] and packet['historical_programs_executed'] is False
         assert packet['historical_reports_rewritten'] == 0 and packet['artifact_or_audit_admission_granted'] is False
         assert self._read(package_path) == package_image
+        domain_overlays = {}
+        self._matrix_owner = None
+        if self.line == 'main':
+            owner_raw = _physical(self.root, MATRIX_OWNER['path']); _matches(owner_raw, MATRIX_OWNER)
+            local_path = Path(__file__).with_name('current_tool_matrix_source.py'); local_raw = local_path.read_bytes(); _matches(local_raw, MATRIX_OWNER)
+            spec = importlib.util.spec_from_file_location('_current_tool_matrix_source_guard', local_path)
+            if spec is None or spec.loader is None: raise RuntimeError('missing current matrix source loader')
+            module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+            assert module._IMAGE == local_raw and self._member(MATRIX_OWNER) == owner_raw
+            self._matrix_owner = module.CurrentToolMatrixSource(self.root, read=self._read)
+            domain = json.loads(self._member(DOMAIN_PACKET))
+            assert domain['schema_version'] == 1 and domain['role'] == 'current-tool-domain-source-successor' and domain['line'] == 'main'
+            assert domain['source_scope_only'] is True and domain['historical_programs_executed'] is False and domain['artifact_or_audit_admission_granted'] is False
+            assert domain['domain_counts'] == {'Sass gate and source-authentication frame':10, 'Sass graph, focus infrastructure and seal frame':14, 'sandboxed browser launcher cells':1, 'stepper peer-output and historical-model source':5}
+            assert len(domain['updates']) == len({row['path'] for row in domain['updates']}) == 30 and len(domain['supports']) == 7
+            sass_review, domain_review, browser_review, density_v1, density_v2, domain_executable, stepper = [json.loads(self._member(ref)) for ref in domain['supports']]
+            assert sass_review['line'] == 'main' and sass_review['source_parent'] == '2fbecd1b2687e26515c205cbd5c0024e9474b4b8' and sass_review['actual_full_sass_pass'] is False and sass_review['g11_claim'] == 'not-passed'
+            assert domain_review['parent'] == '5f93a4dd74f3fc58a529ce9999abc3143405c300' and browser_review['parent'] == 'fdcdadee28c4552e3500b5099de9f42e456adb5c'
+            assert density_v1['role'] == 'main-ordinary-density-exact-source-successor' and density_v2['line'] == domain_executable['line'] == stepper['line'] == 'main'
+            assert stepper['focused_tests']['count'] == 11 and stepper['focused_tests']['result'] == 'pass' and stepper['artifact_or_audit_admission_granted'] is False
+            parents = {'33d7d9e31fd96cbfa6c4e1f592c0bade985c0878':'dfa4dfe18a17a117aaae3af1a8089f4615840cb0', '8baa761eca624c9d71293c3d31750a2b3fdeebf0':'2fbecd1b2687e26515c205cbd5c0024e9474b4b8', '19ee6343365c391deb97362caec413b113665e1b':'5f93a4dd74f3fc58a529ce9999abc3143405c300', '8e9e7316806fe9266373865b0784e9917659e5e8':'fdcdadee28c4552e3500b5099de9f42e456adb5c'}
+            env = dict(PATH=os.environ['PATH'], LANG='C', LC_ALL='C', GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null', GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')
+            for commit, parent in parents.items():
+                assert subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',commit],cwd=self.root,env=env,text=True).strip() == commit + ' ' + parent
+            requests = [dict(commit=commit,path=row['path']) for row in domain['updates'] for step in row['steps'] for commit in (step['parent'],step['commit'])]
+            images = _git_images(self.root, requests)
+            for row in domain['updates']:
+                path = row['path']; assert _tool_path(path) and row['before']['path'] == row['after']['path'] == path and 1 <= len(row['steps']) <= 2
+                expected, prior, identities = row['before'], None, []
+                for step in row['steps']:
+                    assert parents.get(step['commit']) == step['parent'] and step['before'] == dict(sha256=expected['sha256'],bytes=expected['bytes'])
+                    old = images[(step['parent'],path)]; after = _edited(old,step['edits']); _matches(old,step['before']); _matches(after,step['after'])
+                    assert after == images[(step['commit'],path)] and (prior is None or prior == old)
+                    identities.extend([(dict(path=path,**step['before']),old),(dict(path=path,**step['after']),after)])
+                    prior, expected = after, dict(path=path,**step['after'])
+                    if step['commit'] == '8baa761eca624c9d71293c3d31750a2b3fdeebf0': assert path in sass_review['patch']['paths']
+                assert expected == row['after'] and self._member(row['after']) == prior
+                if row['domain'] == 'Sass graph, focus infrastructure and seal frame':
+                    found = [x for x in domain_review['afterimages_verified'] if x['path'] == path]; assert len(found) == 1 and found[0]['sha256'] == row['after']['sha256'] and found[0]['bytes'] == row['after']['bytes']
+                elif row['domain'] == 'Sass gate and source-authentication frame': assert path in sass_review['patch']['paths']
+                elif row['domain'] == 'sandboxed browser launcher cells':
+                    found = [x for x in browser_review['sources'] if x['path'] == path]; assert len(found) == 1 and found[0]['before_sha256'] == row['before']['sha256'] and found[0]['after_sha256'] == row['after']['sha256']
+                elif row['domain'] == 'stepper peer-output and historical-model source':
+                    found = [x for x in stepper['paths'] if x['path'] == path]; assert len(found) == 1 and found[0]['before'] == row['before'] and found[0]['after'] == row['after']
+                else: raise AssertionError('unknown current tool domain')
+                domain_overlays[path] = (row, identities)
+            checker = json.loads(self._member(CHECKER_PACKET))
+            assert checker['schema_version'] == 1 and checker['role'] == 'current-tool-individual-checker-source-successor' and checker['line'] == 'main' and checker['source_scope_only'] is True and checker['historical_programs_executed'] is False and checker['artifact_or_audit_admission_granted'] is False
+            checker_path = 'scripts/check-upstream-audit-disposition.mjs'; checker_commits=['8647ee8a69167ae432313bda47e502f2416c450d','6c5d7a2ba37204074d7d212f8e839621d2a4988d','547abe83d86c4682a173a6e01d2c783b6bb1d855']
+            assert checker['before']['path'] == checker['after']['path'] == checker_path and len(checker['steps']) == 3 and len(checker['supports']) == 7
+            reviews = [json.loads(self._member(ref)) for ref in checker['supports']]
+            ids = ['1dcc195853a74d1e0b724b742673eb5fd744cb67','1de6a3aa37118e4153fb995a8c8f4daecdf6d0b5','4d0a3eff7c5d5186516fe5c8f1af8c003d02882d','6962c858378b52e0a90f7e2cada0f71c297840ed','ef14c286986f9451addeada26ab7b51402aa143f']
+            for review, sha in zip(reviews[:5], ids): assert review['sha'] == sha and review['review_depth'] == 'individual-compatibility' and type(review['decision']) is str and bool(review['decision'])
+            assert reviews[5]['parent'] == '107ccae1864dc4cbc56c4af1b8e70983a1fe947f' and reviews[6]['parent'] == '4c29be143432bcb5b2ca99d4f83ca6ff162b4554'
+            images = _git_images(self.root, [dict(commit=c,path=checker_path) for step in checker['steps'] for c in (step['parent'],step['commit'])])
+            expected, prior, identities = checker['before'], None, []
+            for index, step in enumerate(checker['steps']):
+                assert step['commit'] == checker_commits[index] and subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',step['commit']],cwd=self.root,env=env,text=True).strip() == step['commit'] + ' ' + step['parent']
+                assert step['before'] == dict(sha256=expected['sha256'],bytes=expected['bytes'])
+                old = images[(step['parent'],checker_path)]; after = _edited(old,step['edits']); _matches(old,step['before']); _matches(after,step['after'])
+                assert after == images[(step['commit'],checker_path)] and (prior is None or prior == old)
+                identities.extend([(dict(path=checker_path,**step['before']),old),(dict(path=checker_path,**step['after']),after)]); expected, prior = dict(path=checker_path,**step['after']), after
+            assert expected == checker['after'] and self._member(checker['after']) == prior
+            domain_overlays[checker_path] = ({**checker,'path':checker_path,'domain':'reviewed checker dispatch source'}, identities)
+            cva_path = 'scripts/packed-cva-source-requalification.mjs'
+            cva_before = dict(path=cva_path, sha256='be8c26049e58848d0b7b0ac1e1dba78151d3d8e867ec49b9dc523f28cb304e33', bytes=27417)
+            cva_after = dict(path=cva_path, sha256='ac955ef53f1c530572d82d6b58f2e736787b04757a72a498a3a77bbcdcad3ad5', bytes=27422)
+            matches = [x for x in reviews[6]['root_forwarding_manifest']['callsite_changes'] if x['path'] == cva_path]
+            assert matches == [dict(path=cva_path, calls=1, before_sha256=cva_before['sha256'], after_sha256=cva_after['sha256'])]
+            parent, commit = '4c29be143432bcb5b2ca99d4f83ca6ff162b4554', '547abe83d86c4682a173a6e01d2c783b6bb1d855'
+            images = _git_images(self.root, [dict(commit=c,path=cva_path) for c in (parent,commit)])
+            old, new = images[(parent,cva_path)], images[(commit,cva_path)]
+            _matches(old,cva_before); _matches(new,cva_after)
+            before_call = b'currentAuthoredUseAdmission({current: live, frozen: frozen.symbol_uses, candidate: added, line, readMember: proposed})'
+            after_call = b'currentAuthoredUseAdmission({root,current: live, frozen: frozen.symbol_uses, candidate: added, line, readMember: proposed})'
+            assert old.count(before_call) == 1 and old.replace(before_call,after_call) == new
+            cva_next = json.loads(self._member(dict(path='compatibility/rc/current-tool-retired-adapter-checker-source-successor-v1.json', sha256='c15eb5d8be6bed62d9dfe3476b16fdf2a4eee6e9d4a337cee551848fe7a9c62a', bytes=2094)))
+            assert cva_next['schema_version'] == 1 and cva_next['role'] == 'current-tool-retired-adapter-checker-source-successor' and cva_next['source_parent'] == '3be4d6b7aa54e97ee6622bc869d564313f1f7743' and cva_next['source_commit'] == 'df6213c96e19af5c4a0c68f49e010d89e15f0c2c' and cva_next['historical_programs_executed'] is False and cva_next['artifact_or_audit_admission_granted'] is False and cva_next['before'] == cva_after
+            assert subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',cva_next['source_commit']],cwd=self.root,env=env,text=True).strip() == cva_next['source_commit'] + ' ' + cva_next['source_parent']
+            review = json.loads(self._member(cva_next['review']))
+            assert review['base_head'] == cva_next['source_parent'] and review['independent_review']['sha256'] == 'a015a5f5570d98557454eee86bfbed635edc1f4fc9a586885a3d12085f3c63f2'
+            next_images = _git_images(self.root, [dict(commit=c,path=cva_path) for c in (cva_next['source_parent'],cva_next['source_commit'])])
+            base = next_images[(cva_next['source_parent'],cva_path)]; final = _edited(base,cva_next['edits'])
+            assert base == new; _matches(final,cva_next['after']); assert final == next_images[(cva_next['source_commit'],cva_path)] and self._member(cva_next['after']) == final
+            domain_overlays[cva_path] = (dict(path=cva_path,before=cva_before,after=cva_next['after']), [(cva_before,old),(cva_after,new),(cva_next['after'],final)])
+            test_packet = json.loads(self._member(dict(path='compatibility/rc/current-tool-maintained-test-source-successor-v1.json', sha256='bc88fc8797fe8f96a8d97077c6f6945c013394087bcec9d2e70cfaae51b14c27', bytes=5156)))
+            assert test_packet['schema_version'] == 1 and test_packet['role'] == 'current-tool-maintained-test-source-successor' and test_packet['source_parent'] == '1cb122d2d4ee39949d0be4203aedea0131c20f75' and test_packet['historical_programs_executed'] is False and test_packet['artifact_or_audit_admission_granted'] is False
+            test_path = 'tests/test_current_sass_tool_references.py'
+            assert test_packet['before']['path'] == test_packet['after']['path'] == test_path
+            old = _git_images(self.root, [dict(commit=test_packet['source_parent'],path=test_path)])[(test_packet['source_parent'],test_path)]
+            new = _edited(old,test_packet['edits']); _matches(old,test_packet['before']); _matches(new,test_packet['after'])
+            assert self._member(test_packet['after']) == new
+            domain_overlays[test_path] = (dict(path=test_path,before=test_packet['before'],after=test_packet['after']), [(test_packet['before'],old),(test_packet['after'],new)])
+            main_probe = json.loads(self._member(dict(path='compatibility/rc/current-tool-maintained-main-probe-source-successor-v1.json', sha256='c0c575f6295fa85d0bf4236b8f9a246e917651e64ef38b1afa80bf0b8466ae16', bytes=10547)))
+            assert main_probe['schema_version'] == 1 and main_probe['role'] == 'current-tool-maintained-main-probe-source-successor' and main_probe['source_parent'] == test_packet['source_parent'] and main_probe['historical_programs_executed'] is False and main_probe['artifact_or_audit_admission_granted'] is False
+            main_path = 'tests/current_sass_tool_reference_probe.mjs'
+            assert main_probe['before']['path'] == main_probe['after']['path'] == main_path
+            old = _git_images(self.root, [dict(commit=main_probe['source_parent'],path=main_path)])[(main_probe['source_parent'],main_path)]
+            new = _edited(old,main_probe['edits']); _matches(old,main_probe['before']); _matches(new,main_probe['after'])
+            assert self._member(main_probe['after']) == new
+            domain_overlays[main_path] = (dict(path=main_path,before=main_probe['before'],after=main_probe['after']), [(main_probe['before'],old),(main_probe['after'],new)])
+            probe = json.loads(self._member(dict(path='compatibility/rc/current-tool-maintained-probe-source-successor-v1.json', sha256='b1809b6d89c9cdbd29f9355ed11d82e995d77a8f549be7f69bca0e785b8b428f', bytes=1924)))
+            assert probe['schema_version'] == 1 and probe['role'] == 'current-tool-maintained-probe-source-successor' and probe['source_parent'] == test_packet['source_parent'] and probe['historical_programs_executed'] is False and probe['artifact_or_audit_admission_granted'] is False
+            probe_path = 'tests/current_sass_tool_reference_v4_probe.mjs'
+            assert probe['before']['path'] == probe['after']['path'] == probe_path
+            old = _git_images(self.root, [dict(commit=probe['source_parent'],path=probe_path)])[(probe['source_parent'],probe_path)]
+            new = _edited(old,probe['edits']); _matches(old,probe['before']); _matches(new,probe['after'])
+            assert self._member(probe['after']) == new
+            v5_tests = json.loads(self._member(dict(path='compatibility/rc/current-tool-maintained-v5-tests-source-successor-v1.json', sha256='61b144081fd0aa72065962b283110951c4f9af54a359c4887191938b4513d444', bytes=6833)))
+            assert v5_tests['schema_version'] == 1 and v5_tests['role'] == 'current-tool-maintained-v5-tests-source-successor' and v5_tests['source_parent'] == test_packet['source_parent'] and v5_tests['historical_programs_executed'] is False and v5_tests['artifact_or_audit_admission_granted'] is False
+            assert [update['path'] for update in v5_tests['updates']] == ['tests/test_current_sass_tool_reference_v5.py','tests/current_sass_tool_reference_v5_probe.mjs']
+            images = _git_images(self.root, [dict(commit=v5_tests['source_parent'],path=update['path']) for update in v5_tests['updates']])
+            for update in v5_tests['updates']:
+                assert update['before']['path'] == update['after']['path'] == update['path']
+                old = images[(v5_tests['source_parent'],update['path'])]; new = _edited(old,update['edits']); _matches(old,update['before']); _matches(new,update['after']); assert self._member(update['after']) == new
+            planner_tests = json.loads(self._member(dict(path='compatibility/rc/current-tool-maintained-planner-tests-source-successor-v1.json', sha256='92e8b053bab86a45ccad938be30a81678be921ae5dbfbd48e89059b605cf9379', bytes=15282)))
+            assert planner_tests['schema_version'] == 1 and planner_tests['role'] == 'current-tool-maintained-planner-tests-source-successor' and planner_tests['source_parent'] == test_packet['source_parent'] and planner_tests['historical_programs_executed'] is False and planner_tests['artifact_or_audit_admission_granted'] is False
+            assert [update['path'] for update in planner_tests['updates']] == ['tests/test_current_tool_planner_successor.py','tests/current_tool_planner_successor_probe.mjs']
+            images = _git_images(self.root, [dict(commit=planner_tests['source_parent'],path=update['path']) for update in planner_tests['updates']])
+            for update in planner_tests['updates']:
+                assert update['before']['path'] == update['after']['path'] == update['path']
+                old = images[(planner_tests['source_parent'],update['path'])]; new = _edited(old,update['edits']); _matches(old,update['before']); _matches(new,update['after']); assert self._member(update['after']) == new
+            repair = json.loads(self._member(dict(path='compatibility/rc/current-tool-historical-repair-source-successor-v1.json', sha256='6b036e7da92ffa3046aaf575ee487253c51508a50c12d3655257b479a3a11473', bytes=15104)))
+            assert repair['schema_version'] == 1 and repair['role'] == 'current-tool-historical-repair-source-successor' and repair['source_parent'] == '68606c1ee64a6f529ef71b4576cc13c7863dbc85' and repair['historical_programs_executed'] is False and repair['artifact_or_audit_admission_granted'] is False
+            repair_path='scripts/historical-contract-repair-source.mjs'
+            assert repair['before'] == dict(path=repair_path,sha256='bd7cfbf2235438c604fdc6bc7c4b37e7c365c755d1f8287ce51393389ce6f78d',bytes=22621)
+            assert repair['after'] == dict(path=repair_path,sha256='00beaadf9fb7dac4ce3981c60d04cadc84b7d23607ffcbc47c4b3d764b9f20cd',bytes=31620)
+            assert [ref['path'] for ref in repair['supports']] == ['compatibility/rc/historical-repair-table-signature-source-successor-v1.json','compatibility/rc/parent-main-table-column-diagnostic-v1.json','compatibility/rc/api/signature-differences.json','tests/historical_repair_table_planner_successor_probe.mjs','compatibility/rc/current-tool-historical-repair-source-review-v1.json']
+            images = _git_images(self.root,[dict(commit=repair['source_parent'],path=repair_path)])
+            old = images[(repair['source_parent'],repair_path)]; new = _edited(old,repair['edits']); _matches(old,repair['before']); _matches(new,repair['after']); assert self._member(repair['after']) == new
+            supports = [self._member(ref) for ref in repair['supports']]; table, receipt, independent = json.loads(supports[0]), json.loads(supports[1]), json.loads(supports[4])
+            assert table['schema_version'] == 1 and table['role'] == 'historical-repair-table-signature-source-successor' and table['source_parent'] == 'c394ef616bfae381e0676c8f84af01e0553cad1d' and table['source_commit'] == '68606c1ee64a6f529ef71b4576cc13c7863dbc85' and table['historical_programs_executed'] is False and table['artifact_or_audit_admission_granted'] is False
+            assert table['review'] == repair['supports'][1] and table['after'] == repair['supports'][2]
+            assert receipt['base_head'] == table['source_parent'] and receipt['independent_review']['sha256'] == 'e9bb997595db0a8d165a30fbf38c54ddb4e572402f27d9cb842d4aae8714fe85' and receipt['root_preflight']['before'][table['before']['path']] == table['before']['sha256'] and receipt['root_preflight']['after'][table['after']['path']] == table['after']['sha256']
+            assert independent['schema_version'] == 1 and independent['role'] == 'embedded-independent-historical-repair-table-planner-review' and independent['historical_programs_executed'] is False and independent['artifact_or_audit_admission_granted'] is False
+            assert independent['original_sha256'] == '3f37b9ad190072bebc30e198b06ad7d49fc09f05a9183f22c58ae8240c6617e4' and len(independent['text'].encode()) == independent['original_bytes'] and _hash(independent['text'].encode()) == independent['original_sha256']
+            assert subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',table['source_commit']],cwd=self.root,env=env,text=True).strip() == table['source_commit'] + ' ' + table['source_parent']
+            table_images = _git_images(self.root,[dict(commit=table['source_parent'],path=table['before']['path']),dict(commit=table['source_commit'],path=table['after']['path'])])
+            table_old = table_images[(table['source_parent'],table['before']['path'])]; table_new = _edited(table_old,table['edits']); _matches(table_old,table['before']); _matches(table_new,table['after']); assert table_new == table_images[(table['source_commit'],table['after']['path'])] == supports[2]
+            old_table, new_table = json.loads(table_old), json.loads(table_new); assert len(old_table['differences']) == 113 and len(new_table['differences']) == 114
+            first = new_table['differences'][0]; assert first['symbol_id'] == 'legacy-table/primary/MatLegacyColumnDef' and first['historical_signature'] == 'protected method _updateColumnCssClassName():*' and first['owned_signature'] is None
+            assert {**new_table,'differences':new_table['differences'][1:]} == old_table
+            domain_overlays[repair_path] = (dict(path=repair_path,before=repair['before'],after=repair['after']), [(repair['before'],old),(repair['after'],new)])
+        inventory_prior = dict(path='testing/legacy-runner/historical-inventory.json', sha256='a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403', bytes=106309)
+        inventory_current = dict(path=inventory_prior['path'], sha256='912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15', bytes=113388)
+        def current_comparison(ref):
+            if self._matrix_owner and ref['path'] == inventory_prior['path']:
+                assert _metadata(ref) == inventory_prior
+                self._matrix_owner.assert_current()
+                self._member(inventory_current)
+                commit = '948e8290b74953c83d11268368f38952d0b51fd7'
+                old = _git_images(self.root, [dict(commit=commit, path=inventory_prior['path'])])[(commit, inventory_prior['path'])]
+                _matches(old, inventory_prior)
+                return old
+            if self._matrix_owner and ref['path'] == self._matrix_owner.after['path']:
+                meta = _metadata(ref)
+                if meta == self._matrix_owner.after: return self._member(self._matrix_owner.after)
+                return self._matrix_owner.comparison_bytes(meta)
+            overlay = domain_overlays.get(ref['path'])
+            if overlay is None: return self._member(ref)
+            row, identities = overlay; meta = _metadata(ref)
+            matches = [data for identity, data in identities if identity == meta]
+            assert matches and all(data == matches[0] for data in matches), 'unknown current domain comparison'
+            self._member(row['after']); return bytes(matches[0])
         rc_successors = {}
         if self.line == 'main':
             rc_packet = dict(path='compatibility/rc/current-tool-rc-verify-source-successor-v1.json', sha256='35834cc2d98bb4a05e4bae35f3a1f51199ab81e86027858214a0144e911d2826', bytes=6911)
@@ -225,7 +503,7 @@ class CurrentSassToolReferences:
             images = _git_images(self.root, [dict(commit=c, path=path) for c in (parent, commit)])
             before = images[(parent, path)]; _matches(before, data['before'])
             after = _edited(before, data['edits']); _matches(after, data['after'])
-            assert after == images[(commit, path)] and self._member(data['after']) == after
+            assert after == images[(commit, path)] and current_comparison(data['after']) == after
             rc_successors[path] = (data, before, after)
             assert [row['path'] for row in data['authored_updates']] == ['tests/test_current_sass_tool_references.py', 'tests/current_sass_tool_reference_probe.mjs']
             v5 = json.loads(self._member(V5_INPUTS))
@@ -237,15 +515,15 @@ class CurrentSassToolReferences:
                 _matches(base, v5update['before'])
                 historical = _edited(base, v5update['edits']); _matches(historical, update['before'])
                 current = _edited(historical, update['edits']); _matches(current, update['after'])
-                assert self._member(update['after']) == current
+                assert current_comparison(update['after']) == current
                 rc_successors[update['path']] = (update, historical, current)
         def v5_member(ref):
             if ref['path'] in rc_successors:
                 data, before, after = rc_successors[ref['path']]
                 assert _metadata(ref) == data['before'], 'unknown rc predecessor'
-                assert self._member(data['after']) == after
+                assert current_comparison(data['after']) == after
                 return before
-            return self._member(ref)
+            return current_comparison(ref)
         v5_overlays = {}
         if self.line == 'main':
             v5 = json.loads(self._member(V5_INPUTS))
@@ -293,7 +571,7 @@ class CurrentSassToolReferences:
                 return planner_before
             overlay = v5_overlays.get(ref['path'])
             if overlay is None:
-                return self._member(ref)
+                return current_comparison(ref)
             update, before, after = overlay
             assert _metadata(ref) == update['before'], 'unknown V4 comparison identity'
             assert v5_member(update['after']) == after
@@ -533,10 +811,22 @@ class CurrentSassToolReferences:
             self._add(row, update['before'], before)
             self._add(row, update['after'], after)
             row['after'] = dict(sha256=update['after']['sha256'], bytes=update['after']['bytes'])
+        if self._matrix_owner:
+            matrix = self._matrix_owner; row = self._rows[matrix.after['path']]
+            assert dict(path=row['path'],**row['after']) == matrix.before
+            self._add(row,matrix.before,matrix.comparison_bytes(matrix.before)); self._add(row,matrix.intermediate,matrix.comparison_bytes(matrix.intermediate)); self._add(row,matrix.after,self._member(matrix.after)); row['after'] = dict(sha256=matrix.after['sha256'],bytes=matrix.after['bytes'])
+        for update, identities in domain_overlays.values():
+            path=update['path']; row=self._rows.get(path)
+            if row is not None: assert dict(path=path,**row['after']) == update['before'], 'domain successor must follow previous frame'
+            else:
+                assert update['before'] in next_branch['additional_inputs'], 'domain predecessor is not an existing input'
+                row=dict(path=path,before=dict(sha256=update['before']['sha256'],bytes=update['before']['bytes']),identities={}); self._rows[path]=row
+            for ref, raw in identities: self._add(row,ref,raw)
+            row['after']=dict(sha256=update['after']['sha256'],bytes=update['after']['bytes'])
         for row in self._rows.values():
             self._member(dict(path=row['path'], **row['after']))
-        self.epoch = 6 if self.line == 'main' else 3
-        self.assert_current()
+        self.epoch = 7 if self.line == 'main' else 3
+        self._assert_current_core()
 
     def _add(self, row, ref, raw):
         _matches(raw, ref)
@@ -550,10 +840,15 @@ class CurrentSassToolReferences:
         if path in self._bound:
             assert self._bound[path] == ref
         else:
+            assert not self._prebound, 'unbound current tool input ' + path
             self._bound[path] = ref
+        self._bind_image(path, raw)
         if self._provided is not None:
+            self._assert_physical()
             provided = self._provided(path)
+            _check_tool_transaction(self.root)
             assert type(provided) is bytes and provided == raw
+            self._assert_physical()
         assert _physical(self.root, path) == raw
         return raw
 
@@ -563,22 +858,30 @@ class CurrentSassToolReferences:
         return raw
 
     def _assert_physical(self):
-        for ref in self._bound.values():
-            assert _ref(ref['path'], _physical(self.root, ref['path'])) == ref
+        self._sweep_physical()
 
     @property
+    @_public_tool_method
     def bound(self):
         return copy.deepcopy(list(self._bound.values()))
 
     @property
+    @_public_tool_method
     def transitions(self):
         return [dict(path=row['path'], before=dict(row['before']), after=dict(row['after'])) for row in self._rows.values()]
 
+    @_public_tool_method
     def assert_current(self):
+        return self._assert_current_core()
+
+    def _assert_current_core(self):
+        if self._matrix_owner: self._matrix_owner.assert_current()
         for ref in list(self._bound.values()):
             self._member(ref)
         self._assert_physical()
+        if self._matrix_owner: self._matrix_owner.assert_current()
 
+    @_public_tool_method
     def owns_reference(self, incoming):
         try:
             ref = _metadata(incoming)
@@ -600,12 +903,15 @@ class CurrentSassToolReferences:
         self._assert_physical()
         return result
 
+    @_public_tool_method
     def qualify(self, ref):
         return self._side(ref, 'after')
 
+    @_public_tool_method
     def predecessor_reference(self, ref):
         return self._side(ref, 'before')
 
+    @_public_tool_method
     def comparison_bytes(self, incoming):
         snapshot = _metadata(incoming)
         row = self._rows[snapshot['path']]

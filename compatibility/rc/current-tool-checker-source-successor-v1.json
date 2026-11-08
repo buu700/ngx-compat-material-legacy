@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "role": "current-tool-individual-checker-source-successor",
+  "line": "main",
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "before": {
+    "path": "scripts/check-upstream-audit-disposition.mjs",
+    "sha256": "9daf8aa3b8843e2a746fe6bb0c3cd31af8bb4a53e424399ba75205cdd6a615c2",
+    "bytes": 46031
+  },
+  "after": {
+    "path": "scripts/check-upstream-audit-disposition.mjs",
+    "sha256": "45fb5bb25d8c068c4ef180d74193d0b99f53eb2f34739c47d6aef70716a1ced9",
+    "bytes": 48391
+  },
+  "steps": [
+    {
+      "parent": "8b2a15c38e124b274f8ad627964437d2414e32ae",
+      "commit": "8647ee8a69167ae432313bda47e502f2416c450d",
+      "before": {
+        "sha256": "9daf8aa3b8843e2a746fe6bb0c3cd31af8bb4a53e424399ba75205cdd6a615c2",
+        "bytes": 46031
+      },
+      "after": {
+        "sha256": "3643563c489a64efad09d032d5118fa01581491e58c13d4bd090e6c6bbd803fb",
+        "bytes": 46310
+      },
+      "edits": [
+        {
+          "offset": 2076,
+          "before": "",
+          "after": "import {c04FirstIndividualEvidenceClass} from './upstream-c04-first-individual-evidence.mjs';\n"
+        },
+        {
+          "offset": 9214,
+          "before": "",
+          "after": "  const c04 = c04FirstIndividualEvidenceClass(entry, line, rel => {\n    const member = regularRepoMember(rel); return member ? readFileSync(member) : null;\n  });\n  if (c04) return c04;\n"
+        }
+      ]
+    },
+    {
+      "parent": "107ccae1864dc4cbc56c4af1b8e70983a1fe947f",
+      "commit": "6c5d7a2ba37204074d7d212f8e839621d2a4988d",
+      "before": {
+        "sha256": "3643563c489a64efad09d032d5118fa01581491e58c13d4bd090e6c6bbd803fb",
+        "bytes": 46310
+      },
+      "after": {
+        "sha256": "414ce3b3117a76734735bba4d4480bb4a5ff6c9c5cd4634427f93d31c1c40b1c",
+        "bytes": 48386
+      },
+      "edits": [
+        {
+          "offset": 2076,
+          "before": "import {c04FirstIndividualEvidenceClass} from './upstream-c04-first-individual-evidence.mjs';\n",
+          "after": "import {C04_FIRST_SHAS,c04FirstIndividualEvidenceClass} from './upstream-c04-first-individual-evidence.mjs';\nimport {requiresTestingApi21xProof} from './upstream-testing-api-21x-admission.mjs';\n"
+        },
+        {
+          "offset": 19845,
+          "before": "    requiresIndividual:Boolean(sensitiveClass(entry))||requiresChipLifecycleScope(entry,proof)||requiresChipModernizationScope(entry,proof)||requiresChipInputApiScope(entry,proof)||requiresChipEditScope(entry,proof)||requiresHistoricalBehavior(entry,proof)||requiresArtifactBehavior(entry,proof)||requiresOwnedStyle(entry,proof)||INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition),\n    claimsBehavior:INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition)}))return false;\n",
+          "after": "    requiresIndividual:Object.hasOwn(entry,'individual_proof')||Boolean(sensitiveClass(entry))||requiresChipLifecycleScope(entry,proof)||requiresChipModernizationScope(entry,proof)||requiresChipInputApiScope(entry,proof)||requiresChipEditScope(entry,proof)||requiresHistoricalBehavior(entry,proof)||requiresArtifactBehavior(entry,proof)||requiresOwnedStyle(entry,proof)||INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition)||(entry.final_disposition==='do-not-adopt'&&entry.bucket==='behavior-semantic'),\n    claimsBehavior:INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition),\n    specialized: INHERITED.has(entry.final_disposition)||C04_FIRST_SHAS.includes(entry.sha)\n      ||requiresTestingApi21xProof(proof,rel=>{const f=regularRepoMember(rel);return f?readFileSync(f):null;})\n      ||requiresBootstrapPreparation(entry)||requiresRulesJsBuild(entry)||requiresSassInspectionScope(entry)\n      ||requiresChipLifecycleScope(entry,proof)||requiresChipModernizationScope(entry,proof)\n      ||requiresChipInputApiScope(entry,proof)||requiresChipEditScope(entry,proof)||requiresModernChipScope(entry,proof)\n      ||requiresHistoricalBehavior(entry,proof)||requiresArtifactBehavior(entry,proof)||requiresOwnedStyle(entry,proof)\n      ||requiresNativeDate(entry,proof)||requiresProgressCsp(entry,proof)||requiresGeneratedIdentity(entry,proof)\n      ||requiresBidiBehavior(entry,proof)||requiresSelectionBehavior(entry,proof)||requiresFormFieldHover(entry,proof)\n      ||requiresTabCompletion(entry,proof)||requiresRippleReplay(entry,proof)||requiresContentObserver(entry,proof)\n      ||requiresMediaMatcher(entry,proof)||SLIDER_INPUT_SHAS.includes(entry.sha)||SLIDER_RANGE_SHAS.includes(entry.sha)\n      ||entry.sha===SLIDER_TOKEN_SHA||entry.sha===SLIDER_THUMB_DESTROY_SHA||BAZEL_BUILD_SHAS.includes(entry.sha)\n      ||COMMENT_SHAS.includes(entry.sha)||TEST_IMPORT_SHAS.includes(entry.sha)||Object.hasOwn(TEST_CONSOLIDATION_PATCHES,entry.sha)\n      ||Object.hasOwn(BUILD_SCOPE_PATCHES,entry.sha)}))return false;\n"
+        },
+        {
+          "offset": 26351,
+          "before": "",
+          "after": "const insufficientIndividual = [];\n"
+        },
+        {
+          "offset": 27930,
+          "before": "  const needsIndividual = Boolean(sensitive) || INHERITED.has(disposition) || BEHAVIOR.has(disposition);\n",
+          "after": "  const needsIndividual = Boolean(sensitive) || INHERITED.has(disposition) || BEHAVIOR.has(disposition)\n    || (disposition === 'do-not-adopt' && entry.bucket === 'behavior-semantic')\n    || Object.hasOwn(entry, 'individual_proof');\n"
+        },
+        {
+          "offset": 28089,
+          "before": "",
+          "after": "    insufficientIndividual.push(entry.sha);\n"
+        },
+        {
+          "offset": 31389,
+          "before": "  && insufficientBehavior.length === 0 && missingBranch.length === 0\n",
+          "after": "  && insufficientBehavior.length === 0 && insufficientIndividual.length === 0 && missingBranch.length === 0\n"
+        },
+        {
+          "offset": 32391,
+          "before": "",
+          "after": "  insufficient_individual: insufficientIndividual.length,\n"
+        },
+        {
+          "offset": 33427,
+          "before": "",
+          "after": "    individual: insufficientIndividual,\n"
+        },
+        {
+          "offset": 34045,
+          "before": "",
+          "after": "  insufficient_individual: insufficientIndividual.length,\n"
+        },
+        {
+          "offset": 39986,
+          "before": "  ['upstream-shas', 'upstream-audit/upstream-shas/sensitive-individual-proof', insufficientSensitive.length === 0],\n",
+          "after": "  ['upstream-shas', 'upstream-audit/upstream-shas/sensitive-individual-proof', insufficientSensitive.length === 0 && insufficientIndividual.length === 0],\n"
+        }
+      ]
+    },
+    {
+      "parent": "4c29be143432bcb5b2ca99d4f83ca6ff162b4554",
+      "commit": "547abe83d86c4682a173a6e01d2c783b6bb1d855",
+      "before": {
+        "sha256": "414ce3b3117a76734735bba4d4480bb4a5ff6c9c5cd4634427f93d31c1c40b1c",
+        "bytes": 48386
+      },
+      "after": {
+        "sha256": "45fb5bb25d8c068c4ef180d74193d0b99f53eb2f34739c47d6aef70716a1ced9",
+        "bytes": 48391
+      },
+      "edits": [
+        {
+          "offset": 32598,
+          "before": "const currentSymbolAdmission = currentAuthoredUseAdmission({current: currentAuthoredSource,\n",
+          "after": "const currentSymbolAdmission = currentAuthoredUseAdmission({root,current: currentAuthoredSource,\n"
+        }
+      ]
+    }
+  ],
+  "supports": [
+    {
+      "path": "compatibility/rc/c04-first-individual/reviews/1dcc195853a74d1e0b724b742673eb5fd744cb67.json",
+      "sha256": "bf1f2d6b33a880a012b1d90de2c892b93801540b0d827bd770b07dcb7455a42c",
+      "bytes": 3868
+    },
+    {
+      "path": "compatibility/rc/c04-first-individual/reviews/1de6a3aa37118e4153fb995a8c8f4daecdf6d0b5.json",
+      "sha256": "49fefb8816c00adae4589018c2e89a0c84e322d6641ba6da9dff1ec90dfb314b",
+      "bytes": 2905
+    },
+    {
+      "path": "compatibility/rc/c04-first-individual/reviews/4d0a3eff7c5d5186516fe5c8f1af8c003d02882d.json",
+      "sha256": "37c395308fef80881147e621fd08f029e41fbf503267debb6f89433c7f3e9e0b",
+      "bytes": 5465
+    },
+    {
+      "path": "compatibility/rc/c04-first-individual/reviews/6962c858378b52e0a90f7e2cada0f71c297840ed.json",
+      "sha256": "35627c8ee068efb1b31d400c0d470e0069e852e9d310e63c3b6f36d5bdac6b8a",
+      "bytes": 3315
+    },
+    {
+      "path": "compatibility/rc/c04-first-individual/reviews/ef14c286986f9451addeada26ab7b51402aa143f.json",
+      "sha256": "cc84233b3810fe7830329e9f62c5e24cf7df7ab1c46517889b32f5a1278d00cb",
+      "bytes": 5615
+    },
+    {
+      "path": "compatibility/rc/parent-main-individual-proof-dispatch-review-v1.json",
+      "sha256": "dcfb2e90df08b0c8ec6ada980064136bf6b55aa319926afdedec7d0f6d848982",
+      "bytes": 8915
+    },
+    {
+      "path": "compatibility/rc/parent-main-current-authored-roster-review-v1.json",
+      "sha256": "9e1b2e0d5e8e0118ccdaf63192acbfff64e48e649af48b597e0f0b0abfbd1a9e",
+      "bytes": 29560
+    }
+  ]
+}

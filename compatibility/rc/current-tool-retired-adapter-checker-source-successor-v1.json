@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "role": "current-tool-retired-adapter-checker-source-successor",
+  "source_parent": "3be4d6b7aa54e97ee6622bc869d564313f1f7743",
+  "source_commit": "df6213c96e19af5c4a0c68f49e010d89e15f0c2c",
+  "before": {
+    "path": "scripts/packed-cva-source-requalification.mjs",
+    "sha256": "ac955ef53f1c530572d82d6b58f2e736787b04757a72a498a3a77bbcdcad3ad5",
+    "bytes": 27422
+  },
+  "after": {
+    "path": "scripts/packed-cva-source-requalification.mjs",
+    "sha256": "45e19876c0b49599e97824589b4534b30b828ad833b5900d57cd47e71e0eb6b8",
+    "bytes": 28158
+  },
+  "edits": [
+    {
+      "offset": 3818,
+      "before": "assert.ok",
+      "after": "if "
+    },
+    {
+      "offset": 3837,
+      "before": "=",
+      "after": "!"
+    },
+    {
+      "offset": 3861,
+      "before": "||",
+      "after": "&&"
+    },
+    {
+      "offset": 3873,
+      "before": "=",
+      "after": "!"
+    },
+    {
+      "offset": 3889,
+      "before": "",
+      "after": ") {\n    // The main-line current-dialog continuation changed this adapter after the\n    // original type receipt. Authenticate that exact committed successor; the\n    // projection below still supplies only the receipt's original bytes.\n    assert.equal(inputs.line, 'main'"
+    },
+    {
+      "offset": 3934,
+      "before": "",
+      "after": "\n    const predecessor = '3b9f3d37d73f3731e09fd4a04fdb53419d560933';\n    const successor = '547abe83d86c4682a173a6e01d2c783b6bb1d855';\n    assert.equal(hash(original(root, predecessor, delta.path)), delta.sha256);\n    const current = original(root, successor, delta.path);\n    assert.equal(hash(current), '34250fbc33217cd572fcb0380221f057b56117aa832e05aa3cb22cf8cc3afb66');\n    assert.ok(current.equals(read(delta.path)), 'changed retired-role type proof adapter');\n  }"
+    }
+  ],
+  "review": {
+    "path": "compatibility/rc/parent-main-retired-adapter-successor-v1.json",
+    "sha256": "4a8c206ebfaed9951c3d8a919e42dfdaad94f17874d5fe3ea127fe37d9177818",
+    "bytes": 2455
+  },
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false
+}

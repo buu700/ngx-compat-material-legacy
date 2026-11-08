@@ -10,38 +10,52 @@ import {join} from 'node:path';
 import {createHash} from 'node:crypto';
 import {currentSassToolReferenceSubject} from '../scripts/current-sass-tool-references.mjs';
 import {historicalContractRepairReaderSubject} from '../scripts/historical-contract-repair-readers.mjs';
-const root=process.argv[2],checks=[];
+const root=process.argv[2],checks=[],roster=[],cohort=process.argv[3]??'all';
+assert.ok(['all','0','1','2','3','4','5','6'].includes(cohort),'unknown tool probe cohort');
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
-const check=(name,operation)=>{operation();checks.push(name);};
+const check=(name,operation)=>{const index=roster.length;roster.push(name);if(cohort!=='all'&&index%7!==Number(cohort))return;operation();checks.push(name);};
+const verifyCurrentReferences=items=>{
+ for(let start=0;start<items.length;start+=16){const group=items.slice(start,start+16),requests=[];
+  for(const item of group)requests.push({kind:'qualify',reference:item.reference},{kind:'comparison',reference:item.reference});
+  const results=source.referenceBatch(requests);assert.equal(results.length,requests.length);
+  group.forEach((item,index)=>{assert.deepEqual(results[index*2],item.expected);assert.equal(hash(results[index*2+1]),item.reference.sha256);});
+ }
+};
 const successorPath='compatibility/rc/parent-base-class-tool-successor-inputs-v3.json';
 const successor=JSON.parse(readFileSync(join(root,successorPath)));
 const packet=JSON.parse(readFileSync(join(root,successor.previous_epoch.path)));
 const previous=JSON.parse(readFileSync(join(root,packet.previous_epoch.path)));
 const source=currentSassToolReferenceSubject({root}),branch=packet.branches[source.line];
 check('V3 current maintained dispatch',()=>{
- assert.equal(source.epoch,source.line==='main'?6:3);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);
+ assert.equal(source.epoch,source.line==='main'?7:3);assert.deepEqual(historicalContractRepairReaderSubject({root}).transitions,source.transitions);
 });
 check('all original and latest identities qualify with exact comparison bytes',()=>{
- for(const row of source.transitions){
-  const before={path:row.path,...row.before},after={path:row.path,...row.after};
-  assert.deepEqual(source.qualify(before),after);assert.deepEqual(source.qualify(after),after);
-  assert.deepEqual(source.predecessorReference(after),before);
-  assert.equal(hash(source.comparisonBytes(before)),before.sha256);
-  assert.equal(hash(source.comparisonBytes(after)),after.sha256);
+ // Exercise every identity and output; group finite requests to share only
+ // the enclosing physical sweep. Other checks below retain direct entrypoints.
+ const rows=source.transitions;
+ for(let start=0;start<rows.length;start+=12){
+  const group=rows.slice(start,start+12),requests=[];
+  for(const row of group){const before={path:row.path,...row.before},after={path:row.path,...row.after};requests.push(
+   {kind:'qualify',reference:before},{kind:'qualify',reference:after},
+   {kind:'predecessor',reference:after},{kind:'comparison',reference:before},{kind:'comparison',reference:after});}
+  const results=source.referenceBatch(requests);assert.equal(results.length,requests.length);
+  group.forEach((row,index)=>{const before={path:row.path,...row.before},after={path:row.path,...row.after},offset=index*5;
+   assert.deepEqual(results[offset],after);assert.deepEqual(results[offset+1],after);assert.deepEqual(results[offset+2],before);
+   assert.equal(hash(results[offset+3]),before.sha256);assert.equal(hash(results[offset+4]),after.sha256);
+  });
  }
 });
 check('all original 45/17 BEFORE and AFTER identities remain comparison data',()=>{
  const historical=JSON.parse(readFileSync(join(root,branch.historical_registry.path)));assert.equal(historical.tool_transitions.length,source.line==='21.x'?45:17);
- for(const old of historical.tool_transitions){
-  const latest=source.transitions.find(r=>r.path===old.path);for(const side of ['before','after']){const value={path:old.path,...old[side]};assert.deepEqual(source.qualify(value),{path:old.path,...latest.after});assert.equal(hash(source.comparisonBytes(value)),value.sha256);}
- }
+ const items=[];for(const old of historical.tool_transitions){
+  const latest=source.transitions.find(r=>r.path===old.path);for(const side of ['before','after'])items.push({reference:{path:old.path,...old[side]},expected:{path:old.path,...latest.after}});
+ }verifyCurrentReferences(items);
 });
 check('all committed V1 current identities registered after latest rows',()=>{
- for(const old of previous.branches[source.line].updates){
+ const items=[];for(const old of previous.branches[source.line].updates){
   const latest=source.transitions.find(r=>r.path===old.path);assert.ok(latest);
-  assert.deepEqual(source.qualify(old.after),{path:latest.path,...latest.after});
-  assert.equal(hash(source.comparisonBytes(old.after)),old.after.sha256);
- }
+  items.push({reference:old.after,expected:{path:latest.path,...latest.after}});
+ }verifyCurrentReferences(items);
 });
 check('checkpoint-parent tools and unchanged recipes are finite',()=>{
  const selected=branch.updates.filter(r=>r.source_parent===branch.previous_epoch_source_parent);assert.ok(selected.length);
@@ -50,24 +64,20 @@ check('checkpoint-parent tools and unchanged recipes are finite',()=>{
  assert.deepEqual(source.qualify(first.before),{path:first.path,...latest.after});
 });
 check('all V2 current identities remain exact comparison data',()=>{
- for(const old of branch.updates){
+ const items=[];for(const old of branch.updates){
   const latest=source.transitions.find(r=>r.path===old.path);assert.ok(latest);
-  assert.deepEqual(source.qualify(old.after),{path:latest.path,...latest.after});
-  assert.equal(hash(source.comparisonBytes(old.after)),old.after.sha256);
- }
+  items.push({reference:old.after,expected:{path:latest.path,...latest.after}});
+ }verifyCurrentReferences(items);
 });
 const nextBranch=successor.branches[source.line];
 check('each V3 predecessor and literal successor is exact',()=>{
- for(const row of nextBranch.updates){
-  assert.equal(hash(source.comparisonBytes(row.before)),row.before.sha256);
-  assert.equal(hash(source.comparisonBytes(row.after)),row.after.sha256);
+ const items=[];for(const row of nextBranch.updates){
   const latest=source.transitions.find(r=>r.path===row.path);assert.ok(latest);
-  assert.deepEqual(source.qualify(row.before),{path:row.path,...latest.after});
-  assert.deepEqual(source.qualify(row.after),{path:row.path,...latest.after});
+  items.push({reference:row.before,expected:{path:row.path,...latest.after}},{reference:row.after,expected:{path:row.path,...latest.after}});
   assert.equal(source.ownsReference({...row.before,bytes:row.before.bytes+1}),false);
   assert.throws(()=>source.qualify({...row.before,bytes:row.before.bytes+1}));
   assert.equal(source.qualify({...row.before,sha256:'0'.repeat(64)}),null);
- }
+ }verifyCurrentReferences(items);
 });
 check('floor data successor stays exact and physically guarded',()=>{
  const path='compatibility/rc/consumer-floor-plan.json', row=nextBranch.updates.find(r=>r.path===path);assert.ok(row);
@@ -173,4 +183,4 @@ check('V1-only data never selects current maintained factory',()=>{
  try{for(const path of paths)unlinkSync(join(root,path));assert.throws(()=>historicalContractRepairReaderSubject({root,read:name=>{visited.push(name);throw sentinel;}}),error=>error===sentinel);assert.deepEqual(visited,['projects/ngx-material-legacy/package.json']);assert.throws(()=>currentSassToolReferenceSubject({root}));}finally{paths.forEach((path,index)=>writeFileSync(join(root,path),saved[index]));}
  source.assertCurrent();
 });
-console.log(JSON.stringify({line:source.line,epoch:source.epoch,transitions:source.transitions.length,transition_rows:source.transitions,bound:source.bound.length,v1_current_identities:previous.branches[source.line].updates.length,v2_current_identities:branch.updates.length,v3_overlay_count:nextBranch.updates.length,checkpoint_parent_updates:branch.updates.filter(r=>r.source_parent).length,checks,compiler_calls:0,old_constructor_executed:false,frozen_dispatch_stopped_before_evaluation:true,historical_programs_executed:false,artifact_or_audit_admission_granted:false}));
+console.log(JSON.stringify({line:source.line,epoch:source.epoch,transitions:source.transitions.length,transition_rows:source.transitions,bound:source.bound.length,v1_current_identities:previous.branches[source.line].updates.length,v2_current_identities:branch.updates.length,v3_overlay_count:nextBranch.updates.length,checkpoint_parent_updates:branch.updates.filter(r=>r.source_parent).length,cohort,roster,checks,compiler_calls:0,old_constructor_executed:false,frozen_dispatch_stopped_before_evaluation:checks.includes('V1-only data never selects current maintained factory'),historical_programs_executed:false,artifact_or_audit_admission_granted:false}));
