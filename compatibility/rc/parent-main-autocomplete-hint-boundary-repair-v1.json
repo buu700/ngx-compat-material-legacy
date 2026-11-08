@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "role": "Restore historical whole form-field outside-click boundary for autocomplete hint actions",
+  "parent": "04daa4f8c0617be2ea1a93cbfca06cedf30da3ab",
+  "patch_sha256": "b128fd37b744227dd3b32bfc9406f9aa82ad2a1df2f0f9fd8f5984aec3920fcb",
+  "manifest_sha256": "21d6c9ecc0db3b5821d49d9efd165311346069b4458d214efc9d8586f091199d",
+  "afterimages": {
+    "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts": "803e95c96c22e5a6863a5f353f0485ec5a0431d04c9fe0b987031083ed7afaa9",
+    "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts": "b831b4d3ac6f17f0a9de9d0cd5594f6154ab5fe2b479e9a3b5289dbc1aeed1b6"
+  },
+  "independent_review": {
+    "sha256": "f9cc3d2b78bc978a7ff973b1dab5caa28dc30ec8d266eb8d7a5997a79e797ec9",
+    "text": "# Independent autocomplete hint-boundary review\n\nConclusion: the isolated proposal is supported for the owned legacy form-field outside-click boundary. The tagged source, existing DOM and focused before/after tests support retaining the open panel for a focused click on the form-field hint while preserving outside-click closure. This conclusion is limited to the exact patch and evidence; the separate tooltip selector/cascade tradeoff remains unresolved and is not approved by this review.\n\n## Subjects and original contract\n\nCanonical clean HEAD was 5b36c449ea6d950ba7317cd0696cd3da1632f44d. The packet manifest SHA-256 is 21d6c9ecc0db3b5821d49d9efd165311346069b4458d214efc9d8586f091199d; the patch is b128fd37b744227dd3b32bfc9406f9aa82ad2a1df2f0f9fd8f5984aec3920fcb. All 28 manifest-listed file hashes independently matched; `git apply --check` passed on the clean current canonical tree without writing. The isolated 747 worktree diff matched the frozen patch byte-for-byte. Candidate source SHA-256 803e95c96c22e5a6863a5f353f0485ec5a0431d04c9fe0b987031083ed7afaa9; candidate spec b831b4d3ac6f17f0a9de9d0cd5594f6154ab5fe2b479e9a3b5289dbc1aeed1b6. The original spec is a byte-for-byte prefix of candidate spec; only the new fixture and case were appended. Packet roster comparison reports all 2324 old entries unchanged and one direct case #180 added; I inspected its comparison algorithm, but did not rerun it since it temporarily mutates its isolated input checkout.\n\nThe untouched tag `baseline/angular-components-16.2.x` legacy trigger extends the Material autocomplete base. That base's `_getOutsideClickStream` uses `_formField._elementRef.nativeElement` as the entire form-field containment boundary for click, auxclick and touchend; `_getConnectedElement` independently uses `getConnectedOverlayOrigin()` for positioning. Current legacy form field owns `_elementRef` on its own mixin class, and the autocomplete injects the owned `MAT_LEGACY_FORM_FIELD`/`MatLegacyFormField`, not a modern peer private member. Its `getConnectedOverlayOrigin()` resolves to the `#connectionContainer` in `.mat-form-field-flex`; form-field template places the subscript/hint as a sibling outside flex but inside the host. The proposed one-line behavioral change selects the owned host in the outside-click filter; the positioning method and other custom-origin, input-focus and overlay exclusions are untouched. No selector, HTML, SCSS, golden or tooltip change is in the patch.\n\n## Evidence and independent checks\n\nThe new test focuses the input, opens the panel, verifies input/pane clicks retain it, asserts the hint is inside the host but outside flex, focuses and clicks the hint, checks open/no close emission, then focuses and clicks an outside button and checks one close. It exercises the needed focus change that makes the original failure observable. The supplied artifact-bound historical family reports show baseline 198/199, with only that new case failing its panel-open and no-close assertions; candidate 199/199 and no skipped cases. Their run records bind the baseline 4a34df4d024f923dd8e701b9f1ed3b63f8f23fe2dc035cc6b5a1793e0cbf9a0e and candidate b4fe3042041a6ce44d9d1a5350cb4c95a765e2b3d9994f2c6c9e15f7055d6b26 tarballs. These supplied family runs used Angular/CDK/Material 22.1.7 and Chromium 149; I did not rerun the family suite.\n\nIndependently repeated the packet's actual physical pointer comparison with its prebuilt apps in Chromium 156.0.8078.79: hint press focused hint and closed baseline once, while candidate stayed open with no close. Both apps retained open state for input and pane synthetic click controls, could reopen, and physically clicking the outside button closed once after reopening. The record is `chromium-156-result.json`; input/pane controls were dispatched events, not physical clicks. The metafiles list the four legacy fesm entries from each unpacked package; I verified all eight used core/form-field/input/autocomplete module files byte-for-byte against their corresponding tarballs. This is a focused rerun of supplied built apps, not an independently rebuilt bundle.\n\nIndependently checked every real source-map image against 747 Git bytes, except that the candidate trigger must match the separately frozen fixed source: 398/398 per tarball, with 45 non-files excluded in each. Archive content hashes show only the autocomplete JS and its source map differ. The maps are useful source-provenance evidence, not a separate semantic proof that a build faithfully implements every source line. Both are fresh dirty isolated 747 builds; neither is a sealed coordinator release artifact. No standalone broad typecheck, cross-browser, minimum-peer, all-family, final product gate, or tooltip result is claimed. The supplied case count includes controller/shared identities and is not a full historical or release audit.\n"
+  },
+  "root_checks": {
+    "all_manifest_members_verified": 28,
+    "roster_sha256": "ea6a85cfdf43876f05d01385ebdaf32ac8f18efc3479695e05af84476ec40f74",
+    "roster": {
+      "before": 2324,
+      "after": 2325,
+      "added": [
+        {
+          "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#180",
+          "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+          "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+          "adaptation": "adapted",
+          "shared": null,
+          "full_name": "autocomplete legacy form-field outside boundary > keeps the panel open for input, overlay and hint clicks but closes for outside clicks",
+          "index": 180,
+          "kind": "direct"
+        }
+      ],
+      "changed": [],
+      "removed": []
+    },
+    "physical_pointer_probe_exit_code": 0,
+    "native_result_sha256": "73258b63a0f1ed26fb2631e9a5603e6db65c09d9a5be5e4b07630e2dec54352a",
+    "native_result": {
+      "baseline": {
+        "browser": "Chrome/149.0.7827.0",
+        "controls": {
+          "inputOpen": true,
+          "overlayOpen": true,
+          "closed": 0
+        },
+        "hint": {
+          "panelOpen": false,
+          "active": "hint",
+          "closed": 1
+        },
+        "reopened": true,
+        "outside": {
+          "panelOpen": false,
+          "active": "outside",
+          "closed": 2
+        }
+      },
+      "candidate": {
+        "browser": "Chrome/149.0.7827.0",
+        "controls": {
+          "inputOpen": true,
+          "overlayOpen": true,
+          "closed": 0
+        },
+        "hint": {
+          "panelOpen": true,
+          "active": "hint",
+          "closed": 0
+        },
+        "reopened": true,
+        "outside": {
+          "panelOpen": false,
+          "active": "outside",
+          "closed": 1
+        }
+      }
+    },
+    "driver_sha256": "cb37cf5462f855af56e0137cd74b04ea041cf356355cb12d9941f7b392b5d2f6",
+    "driver_changes": "Frozen owned native driver assertions unchanged; only asset/output paths redirected to own external output. Pinned raw Chrome149, CDP ephemeral endpoints."
+  },
+  "artifact_test_results": {
+    "baseline": {
+      "sha256": "4a34df4d024f923dd8e701b9f1ed3b63f8f23fe2dc035cc6b5a1793e0cbf9a0e",
+      "passed": 198,
+      "total": 199,
+      "failed": "Only appended new hint-boundary regression."
+    },
+    "candidate": {
+      "sha256": "b4fe3042041a6ce44d9d1a5350cb4c95a765e2b3d9994f2c6c9e15f7055d6b26",
+      "passed": 199,
+      "total": 199,
+      "skipped": 0
+    },
+    "scope": "Fresh dirty isolated747 packs, authenticated398source-mapimages and runtime JS. Baseline pack bytes equal earlier CI4a but independent new diagnostic source context; old CI run not relabeled."
+  },
+  "contract": "Use owned MatLegacyFormField host containment for clicks; keep connected overlay flex origin for positioning. No private current peer import or new DI, public API, HTML/CSS/SCSS/golden change.",
+  "limits": [
+    "Root real pointer comparison reproduces baseline hint closure and candidate staying open; input/pane controls and outside-close behavior retained. No individual sandbox-state measurement claimed.",
+    "Root AST derives2324to2325, every priorcaseobject/ID/order preserved withoneappendedcase; matrix/inventory/source-role successors remain separate required work.",
+    "No current canonical pack/coordinator/fullbrowser/floor/G11 or release clearance; fresh final artifact must qualify all integrated changes.",
+    "Unresolved tooltip selector tradeoff is separate and untouched.",
+    "No push, Actions, credentials or publication changes."
+  ]
+}

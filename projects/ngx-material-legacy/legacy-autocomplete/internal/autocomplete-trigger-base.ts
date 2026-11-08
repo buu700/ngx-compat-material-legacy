@@ -399,9 +399,9 @@ export abstract class _MatAutocompleteTriggerBase
         // If we're in the Shadow DOM, the event target will be the shadow root, so we have to
         // fall back to check the first element in the path of the click event.
         const clickTarget = legacyGetEventTarget<HTMLElement>(event)!;
-        const formField = this._formField
-          ? this._formField.getConnectedOverlayOrigin().nativeElement
-          : null;
+        // The connected overlay origin is the flex container, but the historical
+        // outside-click boundary is the entire owned legacy form-field host.
+        const formField = this._formField ? this._formField._elementRef.nativeElement : null;
         const customOrigin = this.connectedTo ? this.connectedTo.elementRef.nativeElement : null;
 
         return (

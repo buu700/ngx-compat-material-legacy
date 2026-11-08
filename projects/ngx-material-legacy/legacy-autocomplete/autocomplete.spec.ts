@@ -4480,3 +4480,61 @@ describe('autocomplete hidden overlay pointer state', () => {
     fixture.destroy();
   }));
 });
+
+@Component({
+  template: `
+    <mat-form-field>
+      <input matInput [matAutocomplete]="auto" matAutocompletePosition="above">
+      <mat-hint><button type="button" class="hint-action">Hint action</button></mat-hint>
+    </mat-form-field>
+    <mat-autocomplete #auto="matAutocomplete"><mat-option value="one">One</mat-option></mat-autocomplete>
+    <button type="button" class="outside-action">Outside</button>
+  `,
+})
+class AutocompleteWithInteractiveHint {
+  @ViewChild(MatLegacyAutocompleteTrigger) trigger!: MatLegacyAutocompleteTrigger;
+}
+
+describe('autocomplete legacy form-field outside boundary', () => {
+  it('keeps the panel open for input, overlay and hint clicks but closes for outside clicks', fakeAsync(() => {
+    let zone!: MockNgZone;
+    TestBed.configureTestingModule({
+      imports: [MatLegacyAutocompleteModule, MatLegacyFormFieldModule, MatLegacyInputModule],
+      declarations: [AutocompleteWithInteractiveHint],
+      providers: [LEGACY_NOOP_ANIMATIONS, {provide: NgZone, useFactory: () => (zone = new MockNgZone())}],
+    });
+    TestBed.compileComponents();
+    const fixture = TestBed.createComponent(AutocompleteWithInteractiveHint);
+    fixture.detectChanges();
+    const trigger = fixture.componentInstance.trigger;
+    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    const hint = fixture.nativeElement.querySelector('.hint-action') as HTMLButtonElement;
+    const outside = fixture.nativeElement.querySelector('.outside-action') as HTMLButtonElement;
+    const field = fixture.nativeElement.querySelector('mat-form-field') as HTMLElement;
+    const closed = jasmine.createSpy('closed');
+    trigger.autocomplete.closed.subscribe(closed);
+    input.focus();
+    trigger.openPanel();
+    fixture.detectChanges();
+    zone.simulateZoneExit();
+    tick();
+    expect(trigger.panelOpen).toBe(true);
+    dispatchMouseEvent(input, 'click');
+    expect(trigger.panelOpen).toBe(true);
+    const pane = TestBed.inject(OverlayContainer).getContainerElement().querySelector('.cdk-overlay-pane') as HTMLElement;
+    dispatchMouseEvent(pane, 'click');
+    expect(trigger.panelOpen).toBe(true);
+    expect(field.contains(hint)).toBe(true);
+    expect(field.querySelector('.mat-form-field-flex')!.contains(hint)).toBe(false);
+    hint.focus();
+    dispatchMouseEvent(hint, 'click');
+    expect(document.activeElement).toBe(hint);
+    expect(trigger.panelOpen).toBe(true);
+    expect(closed).not.toHaveBeenCalled();
+    outside.focus();
+    dispatchMouseEvent(outside, 'click');
+    expect(trigger.panelOpen).toBe(false);
+    expect(closed).toHaveBeenCalledTimes(1);
+    fixture.destroy();
+  }));
+});
