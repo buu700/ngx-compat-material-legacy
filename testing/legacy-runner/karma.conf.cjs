@@ -38,6 +38,7 @@ module.exports = function (config) {
         flags: [
           '--disable-gpu',
           '--disable-dev-shm-usage',
+          '--remote-debugging-port=0',
           // Historical layout specs place a 500px trigger and read the tooltip
           // below it. The default headless viewport clips that trigger.
           '--window-size=1400,1200',

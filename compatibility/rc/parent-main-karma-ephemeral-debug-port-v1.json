@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "role": "isolate historical test launcher DevTools port; preserve Karma server and assertions",
+  "base_head": "197d8ebb6527dff53e716bc08c63bb5afab8d054",
+  "change": {
+    "path": "testing/legacy-runner/karma.conf.cjs",
+    "before_sha256": "fd9b5c1e77c928f4cb1b5e41be908ffa57e9ce4cf4570c2dfcbe403fac6be447",
+    "after_sha256": "7412ad8ed75d858a13d912720a47522c0b3a73f2165046b60c0bea94efe1b952",
+    "patch_sha256": "8b8cbe44ef8f4c8a92c0cf37ff77c95e8e758f5b7791fd147ba4389945e90815"
+  },
+  "reason": "Historical completed table/select runs logged DevTools address-in-use errors with old orphan browsers on9222. Ask Chrome for an ephemeral debugging port instead of the launcher default; keep Karma server9887 and all existing launcher flags.",
+  "primary_local_evidence": {
+    "karma_chrome_launcher_version": "3.2.0",
+    "launcher_source_sha256": "981fa5602a8120ebb09f267eb14d1a57c8bd668581b7e15001b5062cc0a1fc35",
+    "behavior": "headlessGetOptions adds9222 only when no explicit remote-debugging-port flag exists; installed jsflags test covers explicit customport precedence."
+  },
+  "executed_external_fixture": {
+    "node": "24.21.0",
+    "chrome": "149.0.7827.0",
+    "pass": "Tiny real Karma spec reports1SUCCESS and exits0 without DevTools bind/crash message.",
+    "negative": "Real failed assertion reports1FAILED and exits1 without bind/crash message.",
+    "occupied_port": "Existing IPv4/IPv6 9222 listeners left untouched.",
+    "limits": "Baseline pinned149 also passed despite listeners; the old156environment bind failure was not reproduced in the new fixture. Other fixture flags/ports differ from full historical runner; no full family or matrix rerun."
+  },
+  "retained_external_evidence": [
+    {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/root-karma-ephemeral-debug-port-v1/baseline.karma.conf.cjs",
+      "sha256": "d3d1974b76191a00ed9855069b6c795c5fb24cd6de6dbe3b12f9efe2d621b177"
+    },
+    {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/root-karma-ephemeral-debug-port-v1/baseline.log",
+      "sha256": "23503b497167613c8622c8ed73cb7d8a5ea2fb9a9c536be03083849da2ad46fc"
+    },
+    {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/root-karma-ephemeral-debug-port-v1/fail.log",
+      "sha256": "ccb8f231770816aa916d7ccef5cbb71f15f217a7dcbffaec39c836f8c3d13109"
+    },
+    {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/root-karma-ephemeral-debug-port-v1/fail.spec.js",
+      "sha256": "6710b1dba127c845674d0572870f96fbc2ca5f9541eb84834dc75854f65a074a"
+    },
+    {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/root-karma-ephemeral-debug-port-v1/fail2.karma.conf.cjs",
+      "sha256": "cd979760b260132bd19a8e8cfc6cf8f37359a58279d81916aebdcb9a1a958ce4"
+    },
+    {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/root-karma-ephemeral-debug-port-v1/fail2.log",
+      "sha256": "67ae08799581b0435695a0ec640674f3a6aecf8b4ab2331d37bc6a0156168b74"
+    },
+    {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/root-karma-ephemeral-debug-port-v1/karma.conf.cjs",
+      "sha256": "3538a54ff1914c142f64f46d66d5a8f4595db0b446d6b2de32dd55c3473427c6"
+    },
+    {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/root-karma-ephemeral-debug-port-v1/pass.log",
+      "sha256": "46ec2c94404c97602665619bf1803519ba98099d232868870ed8045b49046e36"
+    },
+    {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/root-karma-ephemeral-debug-port-v1/pass.spec.js",
+      "sha256": "ad4d6bd74f0275b86d5d176b1a46596f91706579e881a2add41a875e01890a78"
+    },
+    {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/root-karma-ephemeral-debug-port-v1/pass2.karma.conf.cjs",
+      "sha256": "99cde1b42719020736ba2e1df3f9a34eedc7d628f8a05a8449bbc05801bebfdc"
+    },
+    {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/root-karma-ephemeral-debug-port-v1/pass2.log",
+      "sha256": "41467271a18d641dc5292d8289b16f55081ad0570dff62b01e6f6fd81583a3db"
+    },
+    {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/root-karma-ephemeral-debug-port-v1/proposed.patch",
+      "sha256": "8b8cbe44ef8f4c8a92c0cf37ff77c95e8e758f5b7791fd147ba4389945e90815"
+    }
+  ],
+  "limits": [
+    "No product source, HTML, CSS, SCSS, test oracle or assertion changes.",
+    "Original historical table51/51 andselect293/293 assertion evidence remains valid; post-result launcher errors are a distinct environment issue.",
+    "No orphan processes killed, machine limits changed, Actions run, browser matrix or final qualification claimed."
+  ]
+}
