@@ -70828,13 +70828,206 @@
         "src/material/dialog/dialog.spec.ts"
       ],
       "diff_sha256": "382c4f8ab35d00d0131ba6717b1d4a1004d174e649d45224cfc28adba1306cc2",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/3362836779d5b87400bcdce513f0c3d016294014.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-dialog-32211-hot-stream-v1.json",
+      "batch_id": "closeout-dialog-32211-hot-stream-v1",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "adapt",
-      "read_note_disposition": "owned-retained",
-      "reason": "Upstream MatDialogRef switches _afterOpened and _beforeClosed from Subject to ReplaySubject(1) so a subscriber that arrives after the disabled-animation open still receives the event. legacy-dialog/dialog-ref.ts had the same Subject fields and the same _animationStateChanged subscription. Those two fields are now ReplaySubject(1). dialog.spec.ts still expects afterOpened to emit when the open animation completes."
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "individual-historical-contract",
+      "reason": "Retain the Material 16 hot Subject streams: do not adopt either upstream ReplaySubject conversion, which changes late afterOpened and beforeClosed subscribers. The initial disabled-animation OnPush AsyncPipe symptom is addressed in the specific packed 22.1.7 Chromium observations through the owned queued-opening path; this is not a claim of replay equivalence or complete dialog lifecycle qualification. Preserve the original ledger reason as historical provenance.",
+      "individual_proof": {
+        "proof_kind": "individual-source-scope",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_evidence_scope": "current",
+        "source_evidence": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-dialog/dialog-ref.ts",
+            "sha256": "5807dd454c82b5b328166da9dbf1a165dc7c2743c6c15737571694e2fe475b3c",
+            "bytes": 9377
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.ts",
+            "sha256": "a2223c0bb364c1738d10eb40e2d776c00b6ef2375a673c164d18d6528debe3df",
+            "bytes": 10390
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+            "sha256": "1e48dbcc48eb84b84f7721802d9d2d52549b5efe3fb1662c2f5045fd7a7c3c8e",
+            "bytes": 21797
+          },
+          {
+            "path": "reference/material-16.2.14/dialog-focus-sources/material-dialog-ref.ts",
+            "sha256": "381c4255f6329e44e015949bf14da4cb2e51985b4ae9a5e5e25716ff6c5ea336",
+            "bytes": 8239
+          },
+          {
+            "path": "tests/dialog_ref_runtime_probe.mjs",
+            "sha256": "9858c337cc51af54b458e2895a15bd81e3a34ce5bac5a8cbdf7708fa6e80d022",
+            "bytes": 21614
+          },
+          {
+            "path": "tests/dialog_caller_owned_contract_subject.mjs",
+            "sha256": "8fa3b55b2fa4f5879f1127382e38e534c075ff9cdff4adac456635a92888badb",
+            "bytes": 21129
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/REVIEW.md",
+            "sha256": "2625165aa8dd648dfbba5acc19108f905865079ee56deb08ffd513725e1c2de3",
+            "bytes": 5836
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/closure.json",
+            "sha256": "9614e45f3b7331cec36b52e62aa72bfb54f170dd44a4b42501dfd38ff0b33c57",
+            "bytes": 3701
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/full-index.diff",
+            "sha256": "67a365925bbd839ce7ff46bde6039c42d09fa3452154adbb649b5317e95badc5",
+            "bytes": 3234
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/mapping-receipt.json",
+            "sha256": "3f9a45471dffc02af9b71115320673d8933709665f392d51048bc1c67a310bb7",
+            "bytes": 8223
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/microtask-native.mjs",
+            "sha256": "22d2b616c0261a5be44bdcc6ea43ad5208175ab8b947d345afe023c437d81fd5",
+            "bytes": 24192
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/microtask-normal-zoneful.json",
+            "sha256": "e4efb81db5347fd6b3dbd6bb766b964d47f975f8980ad2fa3de938f977b38439",
+            "bytes": 3280
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/microtask-normal-zoneless.json",
+            "sha256": "ec7de92c53081348234fc80d44752003f1fd94f7c58996c719925277abd244d3",
+            "bytes": 3290
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/mutant-before-normal-zoneful.json",
+            "sha256": "5abb2cfe410e6c2a7b49a61db9584ce4c4ed05f064836027d25336169b2b2769",
+            "bytes": 3284
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/mutant-open-normal-zoneful.json",
+            "sha256": "f6d58b16b30f3415bb5381e437e822a6d51cc6bc0512cab914bd1b832a119af9",
+            "bytes": 3304
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/native-delayed-zoneful.json",
+            "sha256": "1064040b6e210cc072dbcd92ac72792e3bab9c6751b6d828926d718791570352",
+            "bytes": 3256
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/native-delayed-zoneless.json",
+            "sha256": "99ae9265a4efc79aa808c108e6cf1ab0f7b67e3fb6061e5a283e8c398f3be093",
+            "bytes": 3253
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/native-normal-zoneful.json",
+            "sha256": "ee339ea89acea2ff94a102f225913a819e4c06ea9b323015ec2f75c8a6c0a724",
+            "bytes": 3257
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/native-normal-zoneless.json",
+            "sha256": "b192fdbbd5ce572c1558424b2a766dca2ddfd2a4d9bc0855b509fd0f262dbcf0",
+            "bytes": 3242
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/onpush-mutant.mjs",
+            "sha256": "1125a674629e4e5344a635a020fbcef306fc1a1c8ff5b867fb8e536b31a55c4a",
+            "bytes": 24689
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/onpush-native.mjs",
+            "sha256": "e1937b773fcacc92b2d4dc33eceb9039acb3bf365ae9b3a1e99e5698a7d96e75",
+            "bytes": 23972
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/prior-assessment.md",
+            "sha256": "3f2d96255d49d34e723c7aeed9535fd0e971a2c1cbb642077e2b11fa3f9844eb",
+            "bytes": 3898
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/prior-open-replay-mutant.json",
+            "sha256": "f076fcb21f4be7cc2c5c81a4cfb9e752401c5fbaca3ec88b8f5dd8537bd5ccd8",
+            "bytes": 12200
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/prior-ref-baseline.json",
+            "sha256": "53ce28b578b96d51e9afd5899e39153307e080012e49873bb5e757cd5ac453ce",
+            "bytes": 12031
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/producers.json",
+            "sha256": "21d6e20592c2bdbd519b754d4cf0af38949f32d8bc627ae612f928c6d2aaa1c2",
+            "bytes": 3050
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/recorded.diff",
+            "sha256": "382c4f8ab35d00d0131ba6717b1d4a1004d174e649d45224cfc28adba1306cc2",
+            "bytes": 2000
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/tagged-dialog-ref.ts",
+            "sha256": "381c4255f6329e44e015949bf14da4cb2e51985b4ae9a5e5e25716ff6c5ea336",
+            "bytes": 8239
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/tagged-legacy-dialog-ref.ts",
+            "sha256": "fd0d9c49c183b452420d52b1cfc73ce66ace01e98641fc0fdc28b15554a62403",
+            "bytes": 603
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/v7-image-controls.json",
+            "sha256": "ff6eccef801ba968175687132cb3200485b99962979edd30cacf4d828035a737",
+            "bytes": 2831
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/v7-image-controls.py",
+            "sha256": "d6d0ae5d16f18c6fa2b6ac20303c512a43ba5784a02ff362de91b711718ada45",
+            "bytes": 3190
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/v7-member-diff.json",
+            "sha256": "1e154f094a120b2f969d6096275c0bc5662ce2d52da6bab383b7e8eae0adc361",
+            "bytes": 3825
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/dialog-32211-historical-v1/verify-results.py",
+            "sha256": "476e8a69c4df312b9a7dc1c2dd83d8d4f662ab6865a7722e14c42466a8302dfb",
+            "bytes": 2394
+          }
+        ],
+        "diff_sha256": "382c4f8ab35d00d0131ba6717b1d4a1004d174e649d45224cfc28adba1306cc2",
+        "review_depth": "individual-semantic",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Retain the Material 16 hot Subject streams: do not adopt either upstream ReplaySubject conversion, which changes late afterOpened and beforeClosed subscribers. The initial disabled-animation OnPush AsyncPipe symptom is addressed in the specific packed 22.1.7 Chromium observations through the owned queued-opening path; this is not a claim of replay equivalence or complete dialog lifecycle qualification. Preserve the original ledger reason as historical provenance."
+      },
+      "prior_dispositions": [
+        {
+          "sha": "3362836779d5b87400bcdce513f0c3d016294014",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/dialog): afterOpened emitting too early when animations are disabled (#32211)",
+          "files": [
+            "src/material/dialog/dialog-ref.ts",
+            "src/material/dialog/dialog.spec.ts"
+          ],
+          "diff_sha256": "382c4f8ab35d00d0131ba6717b1d4a1004d174e649d45224cfc28adba1306cc2",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/3362836779d5b87400bcdce513f0c3d016294014.json",
+          "batch_id": "unread-seed-content-review-2026-10-02",
+          "recorded_at_utc": "2026-10-02T18:49:16Z",
+          "g11_claim": "not-passed",
+          "final_disposition": "adapt",
+          "read_note_disposition": "owned-retained",
+          "reason": "Upstream MatDialogRef switches _afterOpened and _beforeClosed from Subject to ReplaySubject(1) so a subscriber that arrives after the disabled-animation open still receives the event. legacy-dialog/dialog-ref.ts had the same Subject fields and the same _animationStateChanged subscription. Those two fields are now ReplaySubject(1). dialog.spec.ts still expects afterOpened to emit when the open animation completes."
+        }
+      ]
     },
     {
       "sha": "fab9dd315ebb4016302be5f2fedc4050d64d11ae",

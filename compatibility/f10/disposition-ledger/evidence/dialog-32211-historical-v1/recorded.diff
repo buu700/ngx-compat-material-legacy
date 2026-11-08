@@ -1,0 +1,44 @@
+diff --git a/src/material/dialog/dialog-ref.ts b/src/material/dialog/dialog-ref.ts
+index c247fad81..21a048acd 100644
+--- a/src/material/dialog/dialog-ref.ts
++++ b/src/material/dialog/dialog-ref.ts
+@@ -11 +11 @@ import {FocusOrigin} from '@angular/cdk/a11y';
+-import {merge, Observable, Subject} from 'rxjs';
++import {merge, Observable, ReplaySubject} from 'rxjs';
+@@ -46 +46 @@ export class MatDialogRef<T, R = any> {
+-  private readonly _afterOpened = new Subject<void>();
++  private readonly _afterOpened = new ReplaySubject<void>(1);
+@@ -49 +49 @@ export class MatDialogRef<T, R = any> {
+-  private readonly _beforeClosed = new Subject<R | undefined>();
++  private readonly _beforeClosed = new ReplaySubject<R | undefined>(1);
+diff --git a/src/material/dialog/dialog.spec.ts b/src/material/dialog/dialog.spec.ts
+index d68cc19fe..1b7951423 100644
+--- a/src/material/dialog/dialog.spec.ts
++++ b/src/material/dialog/dialog.spec.ts
+@@ -14 +14 @@ import {
+-import {Location} from '@angular/common';
++import {AsyncPipe, Location} from '@angular/common';
+@@ -41,0 +42 @@ import {Subject} from 'rxjs';
++import {map} from 'rxjs/operators';
+@@ -1242,0 +1244,8 @@ describe('MatDialog', () => {
++  it('should be able to use afterOpened in the template while animations are disabled', async () => {
++    const ref = dialog.open(DialogWithAfterOpenSubscription);
++    await new Promise(resolve => setTimeout(resolve, 10));
++
++    expect(ref.componentInstance.animations.animationsDisabled).toBe(true);
++    expect(overlayContainerElement.textContent).toContain('The dialog is now open!');
++  });
++
+@@ -2452,0 +2462,12 @@ class ModuleBoundDialogModule {}
++
++@Component({
++  template: `{{message | async}}`,
++  imports: [AsyncPipe],
++  changeDetection: ChangeDetectionStrategy.OnPush,
++})
++class DialogWithAfterOpenSubscription {
++  dialogRef = inject(MatDialogRef);
++  animations = inject(MATERIAL_ANIMATIONS);
++
++  protected message = this.dialogRef.afterOpened().pipe(map(() => 'The dialog is now open!'));
++}

@@ -1,0 +1,78 @@
+diff --git a/src/material/dialog/dialog-ref.ts b/src/material/dialog/dialog-ref.ts
+index c247fad81cb1bb3bb3bf11a9461900b770dd0c9a..21a048acdd7d1e72af4c7615fbc0ef900fe3da39 100644
+--- a/src/material/dialog/dialog-ref.ts
++++ b/src/material/dialog/dialog-ref.ts
+@@ -8,7 +8,7 @@
+ 
+ /** Possible states of the lifecycle of a dialog. */
+ import {FocusOrigin} from '@angular/cdk/a11y';
+-import {merge, Observable, Subject} from 'rxjs';
++import {merge, Observable, ReplaySubject} from 'rxjs';
+ import {DialogRef} from '@angular/cdk/dialog';
+ import {DialogPosition, MatDialogConfig} from './dialog-config';
+ import {MatDialogContainer} from './dialog-container';
+@@ -43,10 +43,10 @@ export class MatDialogRef<T, R = any> {
+   id: string;
+ 
+   /** Subject for notifying the user that the dialog has finished opening. */
+-  private readonly _afterOpened = new Subject<void>();
++  private readonly _afterOpened = new ReplaySubject<void>(1);
+ 
+   /** Subject for notifying the user that the dialog has started closing. */
+-  private readonly _beforeClosed = new Subject<R | undefined>();
++  private readonly _beforeClosed = new ReplaySubject<R | undefined>(1);
+ 
+   /** Result to be passed to afterClosed. */
+   private _result: R | undefined;
+diff --git a/src/material/dialog/dialog.spec.ts b/src/material/dialog/dialog.spec.ts
+index d68cc19fe3516cad04e81a27144e0fad28ba5921..1b79514231fe9ff6507ceaabe8630756dcbd8801 100644
+--- a/src/material/dialog/dialog.spec.ts
++++ b/src/material/dialog/dialog.spec.ts
+@@ -11,7 +11,7 @@ import {
+   dispatchMouseEvent,
+   patchElementFocus,
+ } from '@angular/cdk/testing/private';
+-import {Location} from '@angular/common';
++import {AsyncPipe, Location} from '@angular/common';
+ import {SpyLocation} from '@angular/common/testing';
+ import {
+   ChangeDetectionStrategy,
+@@ -39,6 +39,7 @@ import {
+ } from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {Subject} from 'rxjs';
++import {map} from 'rxjs/operators';
+ import {CLOSE_ANIMATION_DURATION, OPEN_ANIMATION_DURATION} from './dialog-container';
+ import {
+   MAT_DIALOG_DATA,
+@@ -1240,6 +1241,14 @@ describe('MatDialog', () => {
+     }),
+   );
+ 
++  it('should be able to use afterOpened in the template while animations are disabled', async () => {
++    const ref = dialog.open(DialogWithAfterOpenSubscription);
++    await new Promise(resolve => setTimeout(resolve, 10));
++
++    expect(ref.componentInstance.animations.animationsDisabled).toBe(true);
++    expect(overlayContainerElement.textContent).toContain('The dialog is now open!');
++  });
++
+   describe('hasBackdrop option', () => {
+     it('should have a backdrop', () => {
+       dialog.open(PizzaMsg, {hasBackdrop: true, viewContainerRef: testViewContainerRef});
+@@ -2450,3 +2459,15 @@ class ModuleBoundDialogChildComponent {
+   providers: [ModuleBoundDialogService],
+ })
+ class ModuleBoundDialogModule {}
++
++@Component({
++  template: `{{message | async}}`,
++  imports: [AsyncPipe],
++  changeDetection: ChangeDetectionStrategy.OnPush,
++})
++class DialogWithAfterOpenSubscription {
++  dialogRef = inject(MatDialogRef);
++  animations = inject(MATERIAL_ANIMATIONS);
++
++  protected message = this.dialogRef.afterOpened().pipe(map(() => 'The dialog is now open!'));
++}
