@@ -31,7 +31,7 @@ export class MatLegacyTabLabel extends MatNonLegacyTabLabel {
     const label = constructWithPublicDependencies(MatNonLegacyTabLabel, new.target, [
       {provide: TemplateRef, useValue: templateRef},
       {provide: ViewContainerRef, useValue: viewContainerRef},
-    ]);
+    ]) as MatLegacyTabLabel;
     label._closestTab = closestTab;
     return label;
   }

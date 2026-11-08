@@ -160,7 +160,7 @@ export class _MatTabBase
     // user may have manually set `templateLabel` during creation mode, which would then get
     // clobbered by `undefined` when the query resolves. Also note that we check that the closest
     // tab matches the current one so that we don't pick up labels from nested tabs.
-    if (value && value._closestTab === this) {
+    if (value && (value as MatTabLabel & {_closestTab?: unknown})._closestTab === this) {
       this._templateLabel = value;
     }
   }
