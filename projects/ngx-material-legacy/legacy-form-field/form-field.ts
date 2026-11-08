@@ -282,7 +282,7 @@ export class MatLegacyFormField
   private _stateChanges: Subscription | undefined;
   private _valueChanges: Subscription | undefined;
   /** Hint/error IDs last assigned by `_syncDescribedByIds`. */
-  private _describedByIds: string[] | undefined;
+  private readonly _describedByIds = new WeakMap<MatFormFieldControl<unknown>, string[]>();
 
   @ContentChild(MatLegacyLabel) _labelChildNonStatic: MatLegacyLabel;
   @ContentChild(MatLegacyLabel, {static: true}) _labelChildStatic: MatLegacyLabel;
@@ -628,14 +628,14 @@ export class MatLegacyFormField
 
       // Preserve aria-describedby IDs assigned outside the form field (e.g. AriaDescriber).
       if (existingDescribedBy) {
-        const exclude = this._describedByIds || ids;
+        const exclude = this._describedByIds.get(this._control) || ids;
         toAssign = ids.concat(existingDescribedBy.filter(id => id && !exclude.includes(id)));
       } else {
         toAssign = ids;
       }
 
       this._control.setDescribedByIds(toAssign);
-      this._describedByIds = ids;
+      this._describedByIds.set(this._control, ids);
     }
   }
 

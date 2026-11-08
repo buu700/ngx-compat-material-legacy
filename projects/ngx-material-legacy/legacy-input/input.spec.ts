@@ -9,6 +9,7 @@ import {
 import {
   ChangeDetectionStrategy,
   Component,
+  Input,
   ViewChild,
   Type,
   Provider,
@@ -16,6 +17,11 @@ import {
   Directive,
   ViewEncapsulation,
   ElementRef,
+  EmbeddedViewRef,
+  OnChanges,
+  OnDestroy,
+  TemplateRef,
+  ViewContainerRef,
 } from '@angular/core';
 import {ComponentFixture, fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
 import {
@@ -2487,4 +2493,132 @@ describe('MatInput dynamic descriptions', () => {
     expect(inputs[1].getAttribute('aria-describedby')).toBe('new-error external-error');
   }));
 
+});
+
+@Directive({selector: '[externalDescription]'})
+class ExternalDescriptionDirective {
+  constructor(element: ElementRef<HTMLInputElement>) {
+    element.nativeElement.setAttribute('aria-describedby', 'outside');
+  }
+}
+
+@Component({
+  template: `
+    <span id="outside">External text</span>
+    <mat-form-field>
+      @if (swap) {
+        <input matInput #control="matInput" externalDescription>
+      } @else {
+        <input matInput #control="matInput" aria-describedby="outside">
+      }
+      @if (swap && changeHint) {
+        <mat-hint id="hint-two">Hint two</mat-hint>
+      } @else {
+        <mat-hint id="hint">Hint</mat-hint>
+      }
+    </mat-form-field>`,
+})
+class MatInputSwappedDescriptionControl {
+  swap = false;
+  changeHint = false;
+  @ViewChild('control') control: MatLegacyInput;
+}
+
+describe('MatInput description ownership on control replacement', () => {
+  it('retains the new control external ID when it matches the old control user ID', () => {
+    const fixture = createComponent(MatInputSwappedDescriptionControl, [], [],
+      [ExternalDescriptionDirective]);
+    fixture.detectChanges();
+    const previous = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    expect(previous.getAttribute('aria-describedby')).toBe('outside hint');
+    fixture.componentInstance.swap = true;
+    fixture.componentInstance.control.stateChanges.next();
+    fixture.detectChanges();
+    const current = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    expect(current).not.toBe(previous);
+    expect(current.getAttribute('aria-describedby')).toBe('hint outside');
+  });
+
+  it('preserves the new control external ID when the hint also changes', () => {
+    const fixture = createComponent(MatInputSwappedDescriptionControl, [], [],
+      [ExternalDescriptionDirective]);
+    fixture.detectChanges();
+    const previous = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    expect(previous.getAttribute('aria-describedby')).toBe('outside hint');
+    fixture.componentInstance.swap = true;
+    fixture.componentInstance.changeHint = true;
+    fixture.componentInstance.control.stateChanges.next();
+    fixture.detectChanges();
+    const current = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    expect(current).not.toBe(previous);
+    expect(current.getAttribute('aria-describedby')).toBe('hint-two outside');
+  });
+});
+
+@Directive({selector: '[cacheFirst]'})
+class CachedInputViews implements OnChanges, OnDestroy {
+  @Input() cacheFirst: TemplateRef<unknown>;
+  @Input() cacheSecond: TemplateRef<unknown>;
+  @Input() cacheActive = 'a';
+  private readonly _views = new Map<string, EmbeddedViewRef<unknown>>();
+  private _active = '';
+
+  constructor(private _container: ViewContainerRef) {}
+
+  ngOnChanges() {
+    if (!this.cacheFirst || !this.cacheSecond || this._active === this.cacheActive) return;
+    if (this._container.length) this._container.detach(0);
+    let view = this._views.get(this.cacheActive);
+    if (view) {
+      this._container.insert(view);
+    } else {
+      view = this._container.createEmbeddedView(
+        this.cacheActive === 'a' ? this.cacheFirst : this.cacheSecond,
+      );
+      this._views.set(this.cacheActive, view);
+    }
+    this._active = this.cacheActive;
+  }
+
+  ngOnDestroy() {
+    this._views.forEach(view => view.destroy());
+  }
+}
+
+@Component({
+  template: `
+    <mat-form-field>
+      <ng-container [cacheFirst]="first" [cacheSecond]="second" [cacheActive]="which"></ng-container>
+      <mat-hint [id]="hint">Hint</mat-hint>
+      <ng-template #first><input matInput #control="matInput" data-name="A"></ng-template>
+      <ng-template #second><input matInput #control="matInput" data-name="B"></ng-template>
+    </mat-form-field>`,
+})
+class MatInputReusedDescriptionControl {
+  which = 'a';
+  hint = 'hint-a';
+  @ViewChild('control') control: MatLegacyInput;
+}
+
+describe('MatInput description ownership on view reuse', () => {
+  it('removes the former owned hint when a detached control is reinserted', () => {
+    const fixture = createComponent(MatInputReusedDescriptionControl, [], [], [CachedInputViews]);
+    fixture.detectChanges();
+    const first = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    expect(first.getAttribute('aria-describedby')).toBe('hint-a');
+    fixture.componentInstance.which = 'b';
+    fixture.componentInstance.hint = 'hint-b';
+    fixture.componentInstance.control.stateChanges.next();
+    fixture.detectChanges();
+    const second = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    expect(second).not.toBe(first);
+    expect(second.getAttribute('aria-describedby')).toBe('hint-b');
+    fixture.componentInstance.which = 'a';
+    fixture.componentInstance.hint = 'hint-c';
+    fixture.componentInstance.control.stateChanges.next();
+    fixture.detectChanges();
+    const again = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    expect(again).toBe(first);
+    expect(again.getAttribute('aria-describedby')).toBe('hint-c');
+  });
 });

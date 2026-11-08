@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "role": "Keep description-ID ownership per projected control across replacement and view reuse",
+  "parent": "c051c2d66d97969d9ecd31e01c4103a10e1f4bb3",
+  "patch_sha256": "faa76a6013667828a6924d279c74a852a642d77d6cccb2f642eb493d10e86175",
+  "afterimages": {
+    "projects/ngx-material-legacy/legacy-form-field/form-field.ts": "a0ed827e6ac47802a886d87ab1c1c270c952c6a8fa45f65c5fdfc0f7472fabff",
+    "projects/ngx-material-legacy/legacy-input/input.spec.ts": "adaa537dbaf11af77b3526d6abfd5cb6950979e727bf9a170ff40fc74859bd31"
+  },
+  "independent_reviews": [
+    {
+      "sha256": "70cb7b0213a1bbb785e49d7467749830d185145f7aedfcb0d55ff7ac40d75e70",
+      "text": "Independent bounded product patch review \u2014 no blocker found\n\nReviewed control-swap-fix-v3.patch SHA-256 a4a41e94d55fb422606c1df74cded70a971dd2fa205b0d3eaed2c034dd44a1ee and report SHA-256 8ef3a03a05da91f38a8cd44d1f0ac7f8975aa652ee4225de8425bd6f0c70d3a3. Canonical clean HEAD 04daa4f8c0617be2ea1a93cbfca06cedf30da3ab; git apply --check passes. Standalone source behavior only; no canonical write or composition.\n\nThe WeakMap records the list assigned during sync against each projected MatFormFieldControl, so an unvisited replacement does not inherit another control's exclusions and a reused control retains its own prior exclusions. Synchronization retains current userAriaDescribedBy and current hint/error IDs, and continues preserving other existing IDs while excluding the same control's prior assigned IDs. The same-control path remains as before. WeakMap keys do not by themselves keep removed controls alive; this does not establish actual garbage-collection timing or object lifetime elsewhere. It uses existing control contract and built-in language features and introduces no CSS or HTML production changes. Material 16 did not implement this later replacement policy; the claim is about the current accessibility/ownership contract rather than identical original replacement internals. Unrelated longstanding ambiguities remain if an externally owned ID collides with an ID previously assigned by this same control; moving one control between two different form-field owners is not established by the presented tests.\n\nIndependently compared complete before and after roster records: all 2324 retained records match in order, three additional direct input cases #113\u2013115 are present. The suite reports' independently checked SHA-256 values are baseline 7b44a9a560a43c9453f5e1d3b576435401ec7db2098b423b4cfbc230b234c98d, single-owner mutant 25749f9aa5041ca88c7b9106437fdfeef6c8b7be7c9cf93be024de6eb4b667a1, and WeakMap fix 250ba9c8f7712a5fd109fd57c98708482e068892e7c6263b0566baecf0c42692. The reported results are 152/155, 154/155 and 155/155 respectively. The family report's artifact hash is null; do not treat it as a run.json sealed artifact identity. I independently matched all 512 tar members and extracted bytes against additional-fix-artifact-manifest.json SHA 9ac98a6ef85573983ecbdde516ae190af99ff8e5694b56e34d3d1823b8f5685b, with tar SHA a6e92d9d5ee7123026a99a5485dbcf7b54f84adc8f993252011b992cd6dc6e69. The reported DOM result SHA cad6877ede7084ac7e66817f479ff9c990feef2b6db8806ce70d5e4448fbe06e confirms same A reused and hint-c only. I did not independently rerun browser or family tests.\n\nThis review does not authorize or validate composition with the other input-spec patch, which overlaps its EOF. No full legacy suite, all controls, SSR, zoneless, other browsers, 21.x, teardown/GC or release admission is established.\n"
+    },
+    {
+      "sha256": "a68bd7b890ce7bc00f2c0ba0e991bf04b1d76ef343fa7ae7e6db462a7be34d6c",
+      "text": "Independent V4 addendum to control-swap V3 review \u2014 no new blocker\n\nV4 patch SHA-256 faa76a6013667828a6924d279c74a852a642d77d6cccb2f642eb493d10e86175. Direct diff against reviewed V3 confirms the only semantic delta is in the reuse test fixture: import OnDestroy, implement it, and destroy cached embedded views in ngOnDestroy. The production WeakMap patch is unchanged. Applying V4 to external copies of the 04daa product sources produced final input spec SHA-256 adaa537dbaf11af77b3526d6abfd5cb6950979e727bf9a170ff40fc74859bd31. V4 and V3 derived roster files are byte-identical, SHA-256 e2f53d7a2219a6ddb462d6220942df5b935bdb61eff5cb7f5d55fe1f3140d220, preserving the previously verified 2324 records and three additions. Cleanup is fixture lifecycle only, not a test of product GC.\n\nIndependently checked owner addendum SHA-256 b05b204cd176ecbc9d8e15c483a33bdfd4aa0069d67ffb4199f0a46b0cab539d and final family report/log hashes: baseline JSON 25fcf0b9fbf12d799893e6703b02438f02b0b63ed4c293e56ba96e352562522c and log e1b3e10540ea7ff0add7a8fea02423ad3f826a841d7caa57defa844ef91177fb; fixed JSON 69dc5d0470416daf633bcfcc2f599c8a5583b10cff7ecfe66de9aa9dc99065bf and log 50d7c1c801b7f6e6086bf20e8a7aa05c745bd02a42c4d03ca790c57a311a58d7. Baseline totals 152 pass/3 fail/0 skipped, exactly the three added replacement/reuse tests; fixed totals 155 pass/0 fail/0 skipped. Both reports have null artifact_sha256; the previously reviewed separate tar/member evidence and limitations apply. I did not rerun tests.\n\nPrior V3 review SHA-256 70cb7b0213a1bbb785e49d7467749830d185145f7aedfcb0d55ff7ac40d75e70 remains unchanged. This covers the standalone patch only. Overlapping input patch composition and combined roster require independent freeze/review; no packed release admission or full matrix coverage inferred.\n"
+    }
+  ],
+  "root_checks": {
+    "command": "node scripts/rc-test-legacy-family.mjs --family input --run <root-control-swap-v4-run/run.json>",
+    "node": "24.21.0",
+    "browser": "Chromium149",
+    "exit_code": 0,
+    "result": {
+      "executed": 155,
+      "passed": 155,
+      "failed": 0,
+      "skipped": 0
+    },
+    "artifact_sha256": "a6e92d9d5ee7123026a99a5485dbcf7b54f84adc8f993252011b992cd6dc6e69",
+    "report_sha256": "c2454a75ed9e437d15b28b3b5647e5eb45a6e6182a905c599e0f1080740d464d",
+    "log_sha256": "cb08a2b4b3a74228d1425db96dd8b3f0ccd8bc12191069d0bb166e07e936b567",
+    "all512TarAndExtractedMembersVerified": true,
+    "packedFormFieldSourceMatchesCurrent": true,
+    "roster_sha256": "bdab3e6a7438440022fd81760ab369d9b52a2e7ac7aa54e1020ef3770c071d03",
+    "roster": {
+      "before": 2325,
+      "after": 2328,
+      "all2324OriginalRecordsIdentical": true,
+      "previousHintCaseIdentical": true,
+      "added": [
+        {
+          "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#113",
+          "historical_path": "src/material/legacy-input/input.spec.ts",
+          "candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+          "adaptation": "adapted",
+          "shared": null,
+          "full_name": "MatInput description ownership on control replacement > retains the new control external ID when it matches the old control user ID",
+          "index": 113,
+          "kind": "direct"
+        },
+        {
+          "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#114",
+          "historical_path": "src/material/legacy-input/input.spec.ts",
+          "candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+          "adaptation": "adapted",
+          "shared": null,
+          "full_name": "MatInput description ownership on control replacement > preserves the new control external ID when the hint also changes",
+          "index": 114,
+          "kind": "direct"
+        },
+        {
+          "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#115",
+          "historical_path": "src/material/legacy-input/input.spec.ts",
+          "candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+          "adaptation": "adapted",
+          "shared": null,
+          "full_name": "MatInput description ownership on view reuse > removes the former owned hint when a detached control is reinserted",
+          "index": 115,
+          "kind": "direct"
+        }
+      ],
+      "removed": [],
+      "changed": []
+    }
+  },
+  "baseline_and_mutant": "Owner baseline152/155 fails exactly3new cases; identity-reset-only mutant154/155 fails returning cached control. WeakMap155/155, actual Angular detach/insert reuses same input and removes oldhint. V4 testfixture destroyscachedviews; originaltestoraclesunchanged.",
+  "limits": [
+    "Actual root artifact-bound candidate family run includes correct nonnull tar hash; retained independent/owner older family reports had null artifact hash and rely on separate member verification.",
+    "Artifact is isolated747 WeakMap candidate a6e, not fresh current canonical combined artifact; autocomplete fix c051 and future disabledinput fix need final combined qualification.",
+    "Root AST2325to2328 preserves original2324records/order and priorhintcase, appends3inputcases. Matrix/inventory/source-role successors remain required.",
+    "No HTML/CSS/SCSS/publicAPI/oracle changes. WeakMap does not strongly retain removed controls; no GC measurement.",
+    "No fullA01, coordinator/G11/release pass, push, Actions, publication or credential changes."
+  ]
+}
