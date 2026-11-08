@@ -170,10 +170,28 @@ async function observe(source = raw.trigger, only = null) {
     t.openMenu(); const sub = t.menuClosed.subscribe(() => t.openMenu()); t.closeMenu(); sub.unsubscribe();
     assert.equal(t.menuOpen, true); assert.equal(highlighted, true);
   });
-  await check('focus-listener-reopens-before-exit-start', f => {
-    const t = f.owner.instance; t.openMenu(); t.focus = () => t.openMenu(); t.closeMenu();
-    assert.equal(t.menuOpen, true); assert.equal(f.owner.overlay.hasAttached(), true);
-    assert.equal(f.panel.instance._panelAnimationState, 'enter');
+  await check('focus-listener-open-during-close-is-noop', f => {
+    const t = f.owner.instance, m = f.panel.instance, overlay = f.owner.overlay;
+    const sequence = [], focus = []; t.openMenu();
+    t.menuClosed.subscribe(() => sequence.push('closed'));
+    t.focus = origin => {
+      sequence.push('focus');
+      const before = {origin, open: t.menuOpen, attached: overlay.hasAttached()};
+      t.openMenu();
+      focus.push({...before, afterOpen: t.menuOpen, attachCount: overlay.attachCount});
+    };
+    t.closeMenu();
+    assert.deepEqual(sequence, ['focus', 'closed']);
+    assert.deepEqual(focus, [{origin: 'program', open: true, attached: true, afterOpen: true, attachCount: 1}],
+      'focus restoration precedes semantic close and opening an already-open menu is a no-op');
+    assert.equal(t.menuOpen, false);
+    assert.equal(overlay.hasAttached(), true, 'exit retains the overlay');
+    assert.equal(f.panel.state.destroyed, 0);
+    assert.equal(m._panelAnimationState, 'void');
+    m._onCssAnimationDone('mat-legacy-menu-exit');
+    assert.equal(overlay.hasAttached(), false);
+    assert.equal(overlay.detachCount, 1);
+    assert.equal(f.panel.state.destroyed, 2);
   });
   await check('destroy-cancels-removal-and-prevents-reopen', f => {
     const t = f.owner.instance; t.openMenu(); t.closeMenu(); const stale = [...f.timer.timers.values()].map(t => t.run);
@@ -231,10 +249,11 @@ if (!baseline && cases.every(row => row.result === 'pass')) {
   const file = ts.createSourceFile('trigger.ts', raw.trigger, ts.ScriptTarget.Latest, true);
   const cls = file.statements.find(node => ts.isClassDeclaration(node) && node.name?.text === '_MatMenuTriggerBase');
   for (const [id, method, before, after, intended] of [
+    ['close-before-focus', '_destroyMenu', '      // Always restore focus if', '      this._setIsMenuOpen(false);\n      // Always restore focus if', 'focus-listener-open-during-close-is-noop'],
     ['early-overlay-detach', '_destroyMenu', '    overlayRef.detachBackdrop();', '    overlayRef.detach();', 'owned-exit-retains-overlay-and-lazy-until-void'],
     ['early-lazy-detach', '_destroyMenu', '    overlayRef.detachBackdrop();', '    overlayRef.detachBackdrop(); menu?.lazyContent?.detach();', 'owned-exit-retains-overlay-and-lazy-until-void'],
     ['retain-reopen-subscription', 'openMenu', '    this._pendingRemoval.unsubscribe();', '', 'reopen-cancels-old-removal'],
-    ['old-close-clobbers-new-open', '_destroyMenu', /    if \(this\._destroyed \|\| generation !== this\._menuGeneration\) \{\n      return;\n    \}/g, '', 'close-listener-reopens-before-exit-start'],
+    ['old-close-clobbers-new-open', '_destroyMenu', /      if \(this\._destroyed \|\| generation !== this\._menuGeneration\) \{\n        return;\n      \}/g, '', 'close-listener-reopens-before-exit-start'],
     ['old-owner-detaches-new-lazy', '_detachMenu', 'if (owned && !MENU_PANEL_OWNERS.has(menu))', 'if (owned)', 'detach-callback-opens-new-owner-without-destroying-new-content'],
     ['missing-owner-transfer', 'openMenu', 'const previousOwner = MENU_PANEL_OWNERS.get(menu);', 'const previousOwner = undefined;', 'shared-menu-transfers-owner'],
     ['enter-removes-exiting-panel', '_destroyMenu', "event.toState === 'void'", 'true', 'owned-exit-retains-overlay-and-lazy-until-void'],
@@ -244,7 +263,7 @@ if (!baseline && cases.every(row => row.result === 'pass')) {
     ['reopen-destroyed-panel', 'openMenu', ' || this._closedMenus.has(menu)', '', 'panel-completion-observer-cannot-reopen-destroyed-panel'],
     ['closed-menu-keeps-keyboard', '_destroyMenu', '    this._keydownSubscription.unsubscribe();', '', 'closed-overlay-releases-keyboard-and-pointer-input'],
     ['closed-menu-keeps-pointer-input', '_destroyMenu', "    overlayRef.overlayElement.style.pointerEvents = 'none';", '', 'closed-overlay-releases-keyboard-and-pointer-input'],
-    ['late-enter-after-open-observer-closes', 'openMenu', '    if (this._destroyed || generation !== this._menuGeneration || !this.menuOpen) {\n      return;\n    }', '', 'open-listener-closes-before-enter-start'],
+    ['late-enter-after-open-observer-closes', 'openMenu', '      if (this._destroyed || generation !== this._menuGeneration || !this.menuOpen) {', '      if (false) {', 'open-listener-closes-before-enter-start'],
   ]) {
     const node = cls.members.find(node => node.name?.getText(file) === method), text = node.getText(file);
     const changed = text.replace(before, after); assert.notEqual(changed, text, id);

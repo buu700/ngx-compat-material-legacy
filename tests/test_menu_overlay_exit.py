@@ -23,7 +23,7 @@ class MenuOverlayExitTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         observed = json.loads(result.stdout.strip().splitlines()[-1])
         self.assertEqual(observed['cases'], 18)
-        self.assertEqual(observed['mutants_rejected'], 14)
+        self.assertEqual(observed['mutants_rejected'], 15)
         self.assertEqual(observed['failures'], [])
         self.assertFalse(observed['native_or_packed_or_floor_qualified'])
 

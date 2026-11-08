@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "role": "Restore tagged menu focus-ordering expectation and retain owned exit-lifetime assertions",
+  "parent": "f3f6a0c064b912b73ef7ae330884349225786622",
+  "patch_sha256": "718e5e754a503e6e628eac357037b2c12d636f7e3d94fb6cd597eb4cfd45e700",
+  "independent_review": {
+    "sha256": "cdb30e16b7176883ecd212ee0396f9489fa19c6d32afaade12f9af7a381463fd",
+    "text": "# Independent menu exit fixture review\n\nVerdict: the v2 fixture is a defensible correction of the stale focus-reopen oracle, bounded to synthetic protocol evidence. No product or CSS change is reviewed or required by this conclusion. Two historical evidence consumers require separately scoped successor evidence if the proposal is accepted; preserve their historical 14-mutant evidence rather than relabel it.\n\n## Subjects and source oracle\n\n- Canonical checkout HEAD c2caa3fc40ff68ebe3c7d690ed2a7aaa66fd5963; `git apply --check` of proposal v2 passed without changes. Proposal SHA-256 718e5e754a503e6e628eac357037b2c12d636f7e3d94fb6cd597eb4cfd45e700. Candidate report 9312db881405d2bc63af9ec8fbf5cc9cf6bb1bf00d878da6437198b5dd53495f; supplied two-test log 3641db75088eddc525a8cf57d01685d3752a84ec16839d3ecca29aa3e88bef9f. Superseded v1 was not used as the candidate.\n- Independently downloaded https://raw.githubusercontent.com/angular/components/16.2.14/src/material/menu/menu-trigger.ts, SHA-256 9d63af3639404dcfde6550810de47b624ed6f8930660709214a552cdaf33ee06, identical to packet reference/material16-base-trigger.ts. The packet's legacy trigger extends this base. In the tagged base `openMenu()` immediately returns when `_menuOpen` is true; `_destroyMenu` restores focus before `_setIsMenuOpen(false)` and the close emission. Consequently a synchronous open during focus is a no-op, contrary to the old focus-reopens assertion. This ordering is also present in current production source. Tagged code detaches the overlay before focus, so the candidate's attached-during-focus and exit retention checks are current owned-contract assertions, not direct Material 16 overlay-timing equivalence.\n- The proposed focus test records callback state, checks focus then close, open state and attach count, and verifies retained view, `void` state and one detach after exit completion. Current HTML binds `void` to the exit class and animationend to the completion callback; current SCSS applies `mat-legacy-menu-exit 100ms 25ms linear forwards`. This is source inspection, not proof of rendering or visual timing.\n\n## Independent controls\n\nCreated a minimal external fixture using exact current trigger/menu/helper, package metadata, native roster files and symlinked existing workspace dependencies; copied proposal-after tests and the supplied diagnostic producer. No canonical files changed. Ran Python unittest discovery: both tests passed. Separately ran the diagnostic producer: 18 unmodified actual-source protocol cases passed, 15 named mutations applied, parsed, transpiled without error diagnostics and each produced `ERR_ASSERTION` in its intended named case. `audit.json` retains every case, mutation, assertion detail and identity. Diagnostic source differs from the candidate producer only in error recording and added parse/transpile and assertion-code checks. Its mutation target and case code match the candidate. The `reopen-destroyed-panel` mutant additionally raised `object unsubscribed` during cleanup after its intended assertion; cleanup was not counted as the rejection.\n\nRan the native validator probe independently: 18 synthetic roster cases and 210 synthetic corruption controls, recorded in `native.json`. Python and Node use existing local dependencies, not the CI environment; no semantic TypeScript typecheck, real Angular view, browser, CSS paint, actual native execution, packed artifact or minimum-peer test was performed. This is not G11 qualification and no broader release gate is claimed.\n\n## Historical consumers\n\n`scripts/menu-exit-context-requalification.mjs` lines 174\u2013180 checks historical evidence hashes, 14 mutations and producer hash. `scripts/packed-product-source-recovery.mjs` lines 101\u2013102 and 120\u2013121 also binds the historical 14-mutant report and producer. The proposed test producer changes those bytes, so historical guard checks cannot be presumed to describe this successor and may already have drift from earlier changes. No old report, hash, or guard was rewritten; separate successor review/evidence is needed. This review does not assert these guards currently pass.\n"
+  },
+  "root_checks": {
+    "wrapper_exit_code": 0,
+    "wrapper_log_sha256": "e109af9cc57c81046e3a2e3c24f19738b842fa0cd5c3f4d08c8516e4a52f6e9a",
+    "wrapper_log": "test_real_exit_observation_required_by_existing_native_cases (test_menu_overlay_exit.MenuOverlayExitTests.test_real_exit_observation_required_by_existing_native_cases) ... ok\ntest_whole_constructor_lifetimes_and_specific_corruptions (test_menu_overlay_exit.MenuOverlayExitTests.test_whole_constructor_lifetimes_and_specific_corruptions) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 1.301s\n\nOK\n",
+    "protocol_report_sha256": "9312db881405d2bc63af9ec8fbf5cc9cf6bb1bf00d878da6437198b5dd53495f",
+    "protocol_report": {
+      "schema_version": 1,
+      "line": "main",
+      "baseline": false,
+      "cases": [
+        {
+          "id": "owned-exit-retains-overlay-and-lazy-until-void",
+          "result": "pass"
+        },
+        {
+          "id": "closed-overlay-releases-keyboard-and-pointer-input",
+          "result": "pass"
+        },
+        {
+          "id": "fallback-detaches-once",
+          "result": "pass"
+        },
+        {
+          "id": "disabled-exit-completes-in-microtask",
+          "result": "pass"
+        },
+        {
+          "id": "reopen-cancels-old-removal",
+          "result": "pass"
+        },
+        {
+          "id": "shared-menu-transfers-owner",
+          "result": "pass"
+        },
+        {
+          "id": "close-listener-reopens-before-exit-start",
+          "result": "pass"
+        },
+        {
+          "id": "reentrant-submenu-close-retains-latest-highlight",
+          "result": "pass"
+        },
+        {
+          "id": "focus-listener-open-during-close-is-noop",
+          "result": "pass"
+        },
+        {
+          "id": "destroy-cancels-removal-and-prevents-reopen",
+          "result": "pass"
+        },
+        {
+          "id": "panel-destroyed-during-exit-releases-overlay",
+          "result": "pass"
+        },
+        {
+          "id": "panel-destroyed-while-open-releases-trigger",
+          "result": "pass"
+        },
+        {
+          "id": "panel-completion-observer-cannot-reopen-destroyed-panel",
+          "result": "pass"
+        },
+        {
+          "id": "input-replacement-does-not-borrow-new-lazy-content",
+          "result": "pass"
+        },
+        {
+          "id": "detach-callback-opens-new-owner-without-destroying-new-content",
+          "result": "pass"
+        },
+        {
+          "id": "close-listener-destroys-trigger-without-late-motion",
+          "result": "pass"
+        },
+        {
+          "id": "open-listener-closes-before-enter-start",
+          "result": "pass"
+        },
+        {
+          "id": "generic-panel-detaches-immediately",
+          "result": "pass"
+        }
+      ],
+      "failures": [],
+      "mutations": [
+        {
+          "id": "close-before-focus",
+          "intended_case": "focus-listener-open-during-close-is-noop",
+          "rejected": true,
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'closed',\n    'focus',\n-   'closed'\n  ]\n"
+        },
+        {
+          "id": "early-overlay-detach",
+          "intended_case": "owned-exit-retains-overlay-and-lazy-until-void",
+          "rejected": true,
+          "error": "overlay detached before CSS exit\n\nfalse !== true\n"
+        },
+        {
+          "id": "early-lazy-detach",
+          "intended_case": "owned-exit-retains-overlay-and-lazy-until-void",
+          "rejected": true,
+          "error": "Expected values to be strictly equal:\n\n2 !== 0\n"
+        },
+        {
+          "id": "retain-reopen-subscription",
+          "intended_case": "reopen-cancels-old-removal",
+          "rejected": true,
+          "error": "old removal subscription retained\n\n1 !== 0\n"
+        },
+        {
+          "id": "old-close-clobbers-new-open",
+          "intended_case": "close-listener-reopens-before-exit-start",
+          "rejected": true,
+          "error": "Expected values to be strictly equal:\n\n'void' !== 'enter'\n"
+        },
+        {
+          "id": "old-owner-detaches-new-lazy",
+          "intended_case": "detach-callback-opens-new-owner-without-destroying-new-content",
+          "rejected": true,
+          "error": "Expected values to be strictly equal:\n\n4 !== 2\n"
+        },
+        {
+          "id": "missing-owner-transfer",
+          "intended_case": "shared-menu-transfers-owner",
+          "rejected": true,
+          "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+        },
+        {
+          "id": "enter-removes-exiting-panel",
+          "intended_case": "owned-exit-retains-overlay-and-lazy-until-void",
+          "rejected": true,
+          "error": "Expected values to be strictly equal:\n\nfalse !== true\n"
+        },
+        {
+          "id": "retain-completed-subscription",
+          "intended_case": "owned-exit-retains-overlay-and-lazy-until-void",
+          "rejected": true,
+          "error": "completed removal subscription retained\n\n1 !== 0\n"
+        },
+        {
+          "id": "late-submenu-highlight-write",
+          "intended_case": "reentrant-submenu-close-retains-latest-highlight",
+          "rejected": true,
+          "error": "Expected values to be strictly equal:\n\nfalse !== true\n"
+        },
+        {
+          "id": "lost-animation-source-completion",
+          "intended_case": "panel-destroyed-during-exit-releases-overlay",
+          "rejected": true,
+          "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+        },
+        {
+          "id": "reopen-destroyed-panel",
+          "intended_case": "panel-completion-observer-cannot-reopen-destroyed-panel",
+          "rejected": true,
+          "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+        },
+        {
+          "id": "closed-menu-keeps-keyboard",
+          "intended_case": "closed-overlay-releases-keyboard-and-pointer-input",
+          "rejected": true,
+          "error": "Expected values to be strictly equal:\n\n2 !== 1\n"
+        },
+        {
+          "id": "closed-menu-keeps-pointer-input",
+          "intended_case": "closed-overlay-releases-keyboard-and-pointer-input",
+          "rejected": true,
+          "error": "Expected values to be strictly equal:\n\n'auto' !== 'none'\n"
+        },
+        {
+          "id": "late-enter-after-open-observer-closes",
+          "intended_case": "open-listener-closes-before-enter-start",
+          "rejected": true,
+          "error": "Expected values to be strictly equal:\n\n'enter' !== 'void'\n"
+        }
+      ],
+      "node": "v24.21.0",
+      "typescript": "6.0.3",
+      "borrowed_core": "22.1.7",
+      "borrowed_rxjs": "7.8.2",
+      "source_members": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "sha256": "5f9b5fbe09d5bdc50bcb937e458ffb83bd49dddca1b0c0c64fadb5d267cfe6a3"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+          "sha256": "a498fd55553577bc81f285f36cf2822866d17b9bed8bb572c14bf78df21eed0d"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/internal/motion-event.ts",
+          "sha256": "8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667"
+        }
+      ],
+      "scope": "Complete actual owned menu and trigger constructors/methods with genuine public Core environment injection, EventEmitter/QueryList and RxJS; protocol overlays/lazy views/layout/focus/animation policy and deterministic timers. No Angular view, browser/CSS paint, artifact or floor qualification.",
+      "producer_sha256": "30253d0e3a58a775d41bcf3c6e72946929a30a0191430f36e3738ecebab945f8",
+      "native_or_packed_or_floor_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "afterimages": [
+    {
+      "path": "tests/menu_overlay_exit_probe.mjs",
+      "sha256": "30253d0e3a58a775d41bcf3c6e72946929a30a0191430f36e3738ecebab945f8"
+    },
+    {
+      "path": "tests/test_menu_overlay_exit.py",
+      "sha256": "ff6df22a41edc78f64f580654d70760c2dcd48e9fd17fd2397d6058bf526d35b"
+    }
+  ],
+  "historical_evidence": "Existing18-case/14-mutant receipts remain unchanged. Two historical consumer guards require separate successors, including preexisting trigger and planner source drift. No current guard pass inferred.",
+  "limits": [
+    "Test-only correction; no product/HTML/CSS/SCSS/golden changes.",
+    "Tagged Material16 focus-before-semantic-close ordering is preserved. Current overlay exit retention is an owned contract, not exact upstream overlay-detach timing.",
+    "Root actual-source protocol suite18cases/15mutants and synthetic native-validator wrapper passed. No actual native/browser/packed/floor qualification.",
+    "Independent mutation audit verified all15 edits parse/transpile and fail intended assertions; one existing mutant also yields documented cleanup error after intended assertion.",
+    "No push, Actions, credential change, full audit/G11/release clearance."
+  ]
+}
