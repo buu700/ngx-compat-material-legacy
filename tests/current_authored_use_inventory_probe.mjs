@@ -67,7 +67,15 @@ assert.equal(hidden.symbol_uses.length, discovered.symbol_uses.length);
 const temporary = mkdtempSync(join(tmpdir(), 'current-authored-discovery-controls-'));
 let discoveryMutants = 0;
 try {
-  const producer = readFileSync(join(root, 'scripts/authored-current-use-inventory.mjs'), 'utf8');
+  const producerPath = join(root, 'scripts/authored-current-use-inventory.mjs');
+  const producer = readFileSync(producerPath, 'utf8');
+  const replaceOnce = (text, before, after) => {
+    assert.equal(text.split(before).length, 2, 'missing or ambiguous mutant transformation');
+    return text.replace(before, after);
+  };
+  // The temporary mutant must use the same TypeScript resolution origin as
+  // the actual producer, not whatever packages happen to exist under /tmp.
+  const workspaceRequire = `createRequire(${JSON.stringify(pathToFileURL(producerPath).href)})`;
   writeFileSync(join(temporary, 'authored-use-inventory.mjs'), readFileSync(join(root, 'scripts/authored-use-inventory.mjs')));
   const edits = [
     ['ts.isExportDeclaration(node) && node.moduleSpecifier', 'false && ts.isExportDeclaration(node) && node.moduleSpecifier'],
@@ -75,7 +83,9 @@ try {
     ["} else add('<computed-module>', '<unresolved>', node, 'computed-dynamic-import');", '}'],
   ];
   for (const [index, [before, after]] of edits.entries()) {
-    const changed = producer.replace(before, after).replace("from './authored-additional-use-baseline.mjs'", 'from '+JSON.stringify(pathToFileURL(join(root,'scripts/authored-additional-use-baseline.mjs')).href)); assert.notEqual(changed, producer);
+    let changed = replaceOnce(producer, before, after);
+    changed = replaceOnce(changed, 'createRequire(import.meta.url)', workspaceRequire);
+    changed = replaceOnce(changed, "from './authored-additional-use-baseline.mjs'", 'from '+JSON.stringify(pathToFileURL(join(root,'scripts/authored-additional-use-baseline.mjs')).href));
     const path = join(temporary, `mutant-${index}.mjs`); writeFileSync(path, changed);
     const mutated = await import(pathToFileURL(path).href);
     assert.throws(() => checkDiscovery(mutated.scanCurrentAuthoredUses), /AssertionError/);
@@ -141,7 +151,7 @@ const cases = declaration('CASE_RESULTS').initializer.getText(checker);
 const actualCall=declaration('currentSymbolAdmission').initializer;assert.ok(ts.isCallExpression(actualCall));assert.equal(actualCall.arguments[0].properties.some(p=>p.name?.getText(checker)==='additionalBaseline'),false,'shipped admission must use repository baseline,not a caller-provided fixture roster');
 const context = {structuralOk: true, missing: [], conflicts: [], outside: [], unresolved: [], unknown: [],
   forgedClearance: false, missingEvidence: [], circularEvidence: [], insufficientSensitive: [],
-  insufficientInherited: [], insufficientBehavior: [], missingBranch: [], symbolInventory: {complete: true},
+  insufficientInherited: [], insufficientBehavior: [], insufficientIndividual: [], missingBranch: [], symbolInventory: {complete: true},
   symbolUsesOpen: 0, symbolStatus: 'closed', symbolReviewEvidence: {insufficient: 0}, advisory: {ok: true}};
 const evaluate = (source, ready) => vm.runInNewContext(source, {...context, currentSymbolAdmission: {ready}});
 const authoredCase = rows => rows.find(row => row[0] === 'authored-symbols')[2];
