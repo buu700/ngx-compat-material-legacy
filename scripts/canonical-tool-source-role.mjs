@@ -12,6 +12,7 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync,lstatSync} from 'node:fs';
 import {dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {currentInventorySourceSubject} from './current-inventory-source-subject.mjs';
 const ROLE='scripts/canonical-tool-source-role.mjs',OWNER='scripts/packed-upstream-ledger-epoch.mjs';
 const INVENTORY='compatibility/rc/c04-inventory-owner-inputs.json';
 const INVENTORY_MAIN='97db675e4fda1c6dd4a7f056159bd47e2aa963dddb9dff3da1af537ae062d15a';
@@ -46,10 +47,16 @@ export function qualifyMainInventoryToolReference({root,read,prior}={}){
  let expected=before.toString();assert.ok(packet.owner_literal_edits.length>0);
  for(const edit of packet.owner_literal_edits){assert.equal(expected.split(edit.before).length,2,'ambiguous main inventory tool edit');expected=expected.replace(edit.before,edit.after);}
  assert.equal(hash(expected),packet.after_owner.sha256);assert.equal(Buffer.byteLength(expected),packet.after_owner.bytes);
- const actual=member(OWNER);assert.equal(actual.toString(),expected,'unqualified main inventory tool successor');
+ // Preserve the original inventory recipe as comparison data. The finite
+ // routing subject separately authenticates the actual current owner image.
+ const routing=currentInventorySourceSubject({root,read}),historical={path:OWNER,...packet.after_owner};
+ assert.equal(routing.comparisonBytes(historical).toString(),expected,'changed historical main inventory tool recipe');
+ const current=routing.qualify(historical);assert.ok(current);
+ const actual=member(OWNER);assert.equal(hash(actual),current.sha256,'unqualified main inventory tool successor');assert.equal(actual.length,current.bytes);
+ for(const ref of routing.bound)member(ref.path);
  assert.ok(member(ROLE).equals(roleImage),'loaded and actual main tool-reference helper differ');
- const assertCurrent=()=>{for(const ref of bound){const actual=physical(root,ref.path),provided=read(ref.path);assert.ok(Buffer.isBuffer(provided)&&provided.equals(actual),'nonphysical or late main inventory tool input '+ref.path);assert.equal(hash(actual),ref.sha256,'late main inventory tool change '+ref.path);assert.equal(actual.length,ref.bytes);}};
- assertCurrent();return {reference:{path:OWNER,sha256:packet.after_owner.sha256,bytes:packet.after_owner.bytes},bound,assertCurrent,
+ const assertCurrent=()=>{routing.assertCurrent();for(const ref of bound){const actual=physical(root,ref.path),provided=read(ref.path);assert.ok(Buffer.isBuffer(provided)&&provided.equals(actual),'nonphysical or late main inventory tool input '+ref.path);assert.equal(hash(actual),ref.sha256,'late main inventory tool change '+ref.path);assert.equal(actual.length,ref.bytes);}routing.assertCurrent();};
+ assertCurrent();return {reference:{...current},bound:bound.map(ref=>({...ref})),assertCurrent,
   literal_tool_transition_only:true,historical_code_executed:false,old_tool_bytes_exposed:false,old_product_bytes_exposed:false,
   canonical_metadata_admission_granted:false,canonical_dispositions_changed:0,current_native_or_packed_qualified:false,g11_claim:'not-passed'};
 }
