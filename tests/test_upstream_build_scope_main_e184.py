@@ -16,5 +16,7 @@ class UpstreamBuildScopeMainE184Tests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         result_data = json.loads(result.stdout)
         self.assertEqual(result_data['cases'], 15)
-        self.assertEqual(result_data['negative_controls'], 17)
+        self.assertEqual(result_data['negative_controls'], 23)
         self.assertEqual(result_data['line'], 'main')
+        self.assertEqual(result_data['historical_product_paths'], 1143)
+        self.assertEqual(result_data['current_product_paths'], 1120)

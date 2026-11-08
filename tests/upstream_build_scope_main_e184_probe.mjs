@@ -19,6 +19,7 @@ const read=path=>readFileSync(join(root,path));
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const reportPath='compatibility/rc/packed-upstream-source-build-main-e184.json';
 const report=JSON.parse(read(reportPath));
+assert.equal(report.candidate_context.product_members.length,1143,'historical report stays unchanged');
 const ledger=JSON.parse(read('compatibility/f10/disposition-ledger/ledger.json'));
 const git=spawnSync('git',['-c','gc.auto=0','-c','maintenance.auto=0','ls-files','projects/ngx-material-legacy'],{cwd:root,encoding:'utf8'});
 assert.equal(git.status,0,git.stderr);
@@ -42,6 +43,11 @@ changed=structuredClone(entry);changed.reason+=' changed';check('changed ledger 
 for(const path of [reportPath,'compatibility/rc/packed-upstream-source-build.json','compatibility/rc/packed-upstream-source-build-main-e184-prior-rows.json','compatibility/rc/packed-upstream-source-build-main-e184-ledger-delta.json',entry.source_check.patch_path,'scripts/npm-tooling-options.mjs','testing/legacy-runner/karma.conf.cjs','compatibility/rc/parent-main-strong-focus-companion-review-v1.json','projects/ngx-material-legacy/styles/core/focus-indicators/_focus-indicators.scss','package.json']) {
   check(`changed ${path}`,report,entry,false,{[path]:Buffer.from('changed')});
 }
+for(const path of ['scripts/retained-current-build-context.mjs','scripts/retained-current-context-identity.mjs',
+ 'compatibility/rc/main-retained-current-context-v1.json','compatibility/rc/main-retained-build-scope-current-review-v1.json',
+ 'compatibility/rc/parent-main-ci-browser-pin-review-v1.json'])check('changed current scope '+path,report,entry,false,{[path]:Buffer.from('changed')});
+let late=false;const trigger='compatibility/rc/packed-upstream-source-build-main-e184-ledger-delta.json',target=paths[0];
+assert.equal(buildScopeEvidenceOk(report,entry,path=>{if(path===trigger)late=true;return path===target&&late?Buffer.from('late current source'):read(path);},paths),false,'late current source after context construction');negatives++;
 check('missing product roster member',report,entry,false,{},paths.slice(1));
 // Exercise the untouched historical route using a synthetic current-context
 // fixture. It does not claim that the real 21.x line was tested.
@@ -53,4 +59,4 @@ historical.candidate_context.tracked_product_paths=paths;
 historical.candidate_context.tracked_product_paths_sha256=hash(Buffer.from(paths.join('\n')+'\n'));
 const historicBytes=Buffer.from(JSON.stringify(historical));prior.source_check.evidence_report_sha256=hash(historicBytes);
 check('historical route fixture',historical,prior,true,{[prior.evidence_report]:historicBytes});
-console.log(JSON.stringify({cases,negative_controls:negatives,line:'main',scope:'finite source-scope evidence only; no G11, security, runtime or 21.x qualification'}));
+console.log(JSON.stringify({cases,negative_controls:negatives,line:'main',historical_product_paths:1143,current_product_paths:paths.length,scope:'finite source-scope evidence only; no G11, security, runtime or 21.x qualification'}));

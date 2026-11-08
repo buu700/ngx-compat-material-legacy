@@ -12,6 +12,7 @@ import assert from 'node:assert/strict';
 import {lstatSync, readFileSync} from 'node:fs';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {retainedCurrentBuildContext} from './retained-current-build-context.mjs';
 
 export const BUILD_SCOPE_ROLE = 'C04 finite individual source-scope reviews of fourteen upstream build SHAs';
 export const BUILD_SCOPE_PATCHES = Object.freeze({
@@ -125,13 +126,15 @@ export function buildScopeEvidenceOk(body,entry,readRepo,currentProductPaths) {
     const captured=ciCaptureReader(readRepo);readRepo=captured.read;
     assert.equal(body.role,BUILD_SCOPE_ROLE);assert.equal(body.g11_claim,'not-passed');
     const mainOnly=body.scope_format==='main-source-scope-v1';
+    let retainedContext=null;
     if(mainOnly){
       assert.equal(body.line,'main');assert.equal(body.sealed,true);
       assert.equal(entry.evidence_report,'compatibility/rc/packed-upstream-source-build-main-e184.json');
       const reportBytes=readRepo(entry.evidence_report);assert.equal(hash(reportBytes),'ffe8ee63051473d9adf28142e30dcbaddb5ed156f71de92a8e1dc2e43efbed6d');
       assert.deepEqual(body,JSON.parse(reportBytes));
+      retainedContext=retainedCurrentBuildContext({root:sourceRoot,read:readRepo,body,currentProductPaths});
       assert.equal(hash(readRepo(body.focus_source_review.path)),body.focus_source_review.sha256);
-      for(const record of body.additional_graph_context.files){const bytes=readRepo(record.path);assert.equal(hash(bytes),record.sha256);assert.equal(bytes.length,record.bytes);}
+      for(const record of body.additional_graph_context.files){const selected=retainedContext.resolveReference(record);assert.equal(selected?.kind,'current');const expected=selected.reference,bytes=readRepo(expected.path);assert.equal(hash(bytes),expected.sha256);assert.equal(bytes.length,expected.bytes);}
       assert.equal(hash(readRepo('compatibility/rc/packed-upstream-source-build.json')),'6f3aba8e78c495c6e95250736f1b70e87c896938973410a6604dc3ed43678be8');
       assert.equal(hash(readRepo('compatibility/rc/packed-upstream-source-build-main-e184-prior-rows.json')),'2b5cba41846e6685a18a1a130f6ad083251b5e2124e58079047ecd1786145d07');
       const deltaBytes=readRepo('compatibility/rc/packed-upstream-source-build-main-e184-ledger-delta.json');assert.equal(hash(deltaBytes),'964baf4c85bc75e5cd33962482911776e3d7277bc882f7d2921cc76322cd7b62');
@@ -150,22 +153,24 @@ export function buildScopeEvidenceOk(body,entry,readRepo,currentProductPaths) {
     assert.deepEqual(context.files.map(r=>r.path).sort(),[...contextPaths].sort());
     assert.equal(new Set(context.files.map(r=>r.path)).size,contextPaths.length);
     let ciSuccessor=null;
-    if(mainOnly) {
+    if(mainOnly&&!retainedContext) {
       const current=readRepo('flake.nix');
       if(hash(current)!==context.files.find(r=>r.path==='flake.nix').sha256)ciSuccessor=ciContextSuccessor(readRepo,context);
     }
     let menuSuccessor=null;
     const menuPath='projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts';
     if(mainOnly&&ciSuccessor&&hash(readRepo(menuPath))!==context.product_members.find(r=>r.path===menuPath).sha256)menuSuccessor=menuContextSuccessor(readRepo,context);
-    const sourceRecords=[...context.files,...context.product_members,...(mainOnly?body.additional_graph_context.files:[])];
+    const sourceRecords=retainedContext?retainedContext.records:[...context.files,...context.product_members,...(mainOnly?body.additional_graph_context.files:[])];
     const currentRecord=record=>menuSuccessor&&menuSuccessor.frame.paths.includes(record.path)?menuSuccessor.frame.git[menuSuccessor.frame.after].blobs[record.path]:ciSuccessor&&ciSuccessor.frame.paths.includes(record.path)?ciSuccessor.frame.git[ciSuccessor.frame.after].blobs[record.path]:record;
     for(const record of sourceRecords) {
       const expected=currentRecord(record),bytes=readRepo(record.path);assert.ok(Buffer.isBuffer(bytes));
       assert.equal(hash(bytes),expected.sha256);assert.equal(bytes.length,expected.bytes);
     }
-    assert.deepEqual(context.tracked_product_paths,currentProductPaths);
-    assert.equal(hash(Buffer.from(currentProductPaths.join('\n')+'\n')),context.tracked_product_paths_sha256);
-    assert.deepEqual(context.product_members.map(r=>r.path),currentProductPaths);
+    if(!retainedContext){
+      assert.deepEqual(context.tracked_product_paths,currentProductPaths);
+      assert.equal(hash(Buffer.from(currentProductPaths.join('\n')+'\n')),context.tracked_product_paths_sha256);
+      assert.deepEqual(context.product_members.map(r=>r.path),currentProductPaths);
+    }
     assert.ok(currentProductPaths.every(path=>path.startsWith('projects/ngx-material-legacy/')&&!isBazel(path)&&!['WORKSPACE','.bazelrc'].includes(path.split('/').at(-1))));
     assert.deepEqual(context.bazel_product_members,[]);
     assert.equal(pkg.scripts['build:lib'],'node scripts/pack-library.mjs');assert.ok(!pkg.pnpm?.patchedDependencies);
@@ -189,12 +194,13 @@ export function buildScopeEvidenceOk(body,entry,readRepo,currentProductPaths) {
     assert.equal(entry.source_check.review_membership,entry.sha);
     // Recheck after every producer callback, so a late source change cannot
     // leave a mixed before/after image qualified by the earlier sweep.
-    if(ciSuccessor){
+    if(ciSuccessor||retainedContext){
       for(const record of sourceRecords){const expected=currentRecord(record),bytes=readRepo(record.path);assert.equal(hash(bytes),expected.sha256);assert.equal(bytes.length,expected.bytes);}
-      assert.deepEqual(readRepo(CI_FRAME),ciSuccessor.frameBytes);
-      assert.deepEqual(readRepo(ciSuccessor.frame.review_path),ciSuccessor.reviewBytes);
+      if(ciSuccessor){assert.deepEqual(readRepo(CI_FRAME),ciSuccessor.frameBytes);
+      assert.deepEqual(readRepo(ciSuccessor.frame.review_path),ciSuccessor.reviewBytes);}
       if(menuSuccessor){assert.deepEqual(readRepo(MENU_FRAME),menuSuccessor.frameBytes);assert.deepEqual(readRepo(menuSuccessor.frame.review_path),menuSuccessor.reviewBytes);}
       assert.deepEqual(readRepo('scripts/upstream-build-scope-evidence.mjs'),loadedBuildSource);
+      retainedContext?.assertCurrent();
       captured.close();
     }
     return true;
