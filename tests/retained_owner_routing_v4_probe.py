@@ -13,23 +13,32 @@ physical=lambda path:(ROOT/path).read_bytes()
 v2=json.loads(physical('compatibility/rc/main-current-inventory-source-routing-v2.json'))['updates'][0]
 v3=json.loads(physical('compatibility/rc/main-current-inventory-source-routing-v3.json'))['updates'][0]
 v4=json.loads(physical('compatibility/rc/main-current-inventory-source-routing-v4.json'))['updates'][0]
-packet=json.loads(physical('compatibility/rc/main-current-inventory-source-routing-v5.json'));update=packet['updates'][0]
+v5=json.loads(physical('compatibility/rc/main-current-inventory-source-routing-v5.json'))['updates'][0]
+packet=json.loads(physical('compatibility/rc/main-current-inventory-source-routing-v6.json'));update=packet['updates'][0]
 scope=CurrentSassToolReferences(ROOT)
-for ref in [v2['before'],v2['after'],v3['after'],v4['after'],update['after']]:
+for ref in [v2['before'],v2['after'],v3['after'],v4['after'],v5['after'],update['after']]:
     assert scope.qualify(ref)==update['after']
     assert hashlib.sha256(scope.comparison_bytes(ref)).hexdigest()==ref['sha256']
 assert scope.qualify(dict(update['before'],sha256='0'*64)) is None
 try:scope.qualify(dict(update['before'],bytes=update['before']['bytes']+1))
 except AssertionError:pass
 else:raise AssertionError('wrong owner length qualified')
-targets=['compatibility/rc/main-current-inventory-source-routing-v5.json','compatibility/rc/main-current-inventory-source-routing-v4.json',update['path'],
+for row in packet['updates'][1:]:
+    for ref in [row['before'],row['after']]:
+        assert scope.qualify(ref)==row['after'] and scope.predecessor_reference(row['after'])==row['before']
+        assert hashlib.sha256(scope.comparison_bytes(ref)).hexdigest()==ref['sha256']
+        assert scope.qualify(dict(ref,sha256='0'*64)) is None
+        try:scope.qualify(dict(ref,bytes=ref['bytes']+1))
+        except AssertionError:pass
+        else:raise AssertionError('wrong metadata program length qualified')
+targets=['compatibility/rc/main-current-inventory-source-routing-v6.json',*[row['path'] for row in packet['updates'][1:]],'compatibility/rc/main-current-inventory-source-routing-v5.json','compatibility/rc/main-current-inventory-source-routing-v4.json',update['path'],
  'scripts/current-inventory-source-subject.mjs','scripts/retained-later-stage-program-source.mjs',
  'compatibility/rc/main-retained-later-stage-programs-v1.json','scripts/retained-selection-metadata-context.mjs',
  'compatibility/rc/main-retained-selection-metadata-context-v1.json','scripts/retained-landscape-program-source.mjs',
  'compatibility/rc/main-retained-landscape-program-source-v1.json','compatibility/rc/main-retained-landscape-current-prototype-v1.json.gz',
  'scripts/autocomplete-selection-native-subject.mjs','scripts/upstream-candidate-source-evidence.mjs',
  'compatibility/rc/autocomplete-selection-ledger-successor.json']
-assert len(set(targets))==14 and set(targets)<={ref['path'] for ref in scope.bound}
+assert len(set(targets))==17 and set(targets)<={ref['path'] for ref in scope.bound}
 bad=False;target=None
 def read(path):
     raw=physical(path)
@@ -42,8 +51,8 @@ for target in targets:
         except (AssertionError,ValueError):pass
         else:raise AssertionError('changed retained owner input accepted: '+target)
     bad=False;live.assert_current()
-result=dict(result='pass',bound=scope.bound,transitions=scope.transitions,targets=targets,cold_rejections=14,late_rejections=14,
-            recoveries=14,owner_images_preserved=5,unknown_hash_not_qualified=True,wrong_length_rejected=True,
+result=dict(result='pass',bound=scope.bound,transitions=scope.transitions,targets=targets,cold_rejections=17,late_rejections=17,
+            recoveries=17,owner_images_preserved=6,wrapper_images_preserved=4,unknown_hash_not_qualified=True,wrong_length_rejected=True,
             historical_programs_executed=False,artifact_or_audit_admission_granted=False)
 if len(sys.argv)>1:
     with Path(sys.argv[1]).open('x') as output:json.dump(result,output,indent=2);output.write('\n')

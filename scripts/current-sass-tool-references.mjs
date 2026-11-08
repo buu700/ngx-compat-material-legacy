@@ -256,7 +256,7 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
   const routing=JSON.parse(member({path:'compatibility/rc/main-current-inventory-source-routing-v2.json',sha256:'3815beb1e21779e54deaee5da2bf7bb316732e98a3dc9938ef6d2fdf18707280',bytes:24306}));
   assert.equal(routing.schema_version,1);assert.equal(routing.role,'main-current-inventory-source-routing');assert.equal(routing.base_head,'54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0');assert.equal(routing.source_scope_only,true);assert.equal(routing.historical_programs_executed,false);assert.equal(routing.historical_packets_rewritten,false);assert.equal(routing.artifact_or_audit_admission_granted,false);assert.equal(routing.g11_claim,'not-passed');
   const paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];assert.deepEqual(routing.updates.map(row=>row.path),paths);
-  member({path:'scripts/current-inventory-source-subject.mjs',sha256:'956901bb308f50a73c9a99902d01e4fa6827d16fc40b73f98be2ffc362f33c97',bytes:12882});
+  member({path:'scripts/current-inventory-source-subject.mjs',sha256:'30be6c61df2253756dbf0cc66641ecf6fa8414bbbfc20f0257f67ddef2a7f1b9',bytes:16520});
   const env={PATH:process.env.PATH,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1',GIT_TERMINAL_PROMPT:'0'};execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',routing.base_head,'HEAD'],{cwd:root,env});const originals=gitImages(root,paths.map(path=>({commit:routing.base_head,path})));
   const next=JSON.parse(member({path:'compatibility/rc/main-current-inventory-source-routing-v3.json',sha256:'d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b',bytes:13219}));
   assert.equal(next.schema_version,1);assert.equal(next.role,'main-current-inventory-retained-source-routing');assert.equal(next.base_head,'b7ad00c881420e8621f23d77ab2feba7a3475e78');assert.equal(next.support_commit,next.base_head);
@@ -279,6 +279,15 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
   assert.deepEqual(identity.updates.map(row=>row.path),[paths[0]]);assert.equal(identity.support.length,3);execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',identity.base_head,'HEAD'],{cwd:root,env});
   const identityImages=gitImages(root,[...identity.updates.map(row=>({commit:identity.base_head,path:row.path})),...identity.support.map(ref=>({commit:identity.support_commit,path:ref.path}))]);
   for(const ref of identity.support){const committed=identityImages.get(identity.support_commit+':'+ref.path);matches(committed,ref);assert.ok(equalBytes(member(ref),committed));}
+  const wrapper=JSON.parse(member({path:'compatibility/rc/main-current-inventory-source-routing-v6.json',sha256:'233fa6a574a7124c0e1cc41bec2b307ae5d7517ae1e6e3f09e1b614e9c05f9a1',bytes:8161}));
+  const wrapperBefore=[{path:'scripts/sass-wrapper-notice-metadata.mjs',sha256:'624093a294bbfaf06b66eeb54a81fb10c71140624d80e82620c1210586aa89aa',bytes:8020},{path:'scripts/historical-chip-wrapper-metadata.mjs',sha256:'f9e5fa9808a1553c216a95de42d6a3d251aac01d0066b87c8e630cb2d7d34a0e',bytes:11824}];
+  const wrapperAnchors=[{path:wrapperBefore[0].path,packet:{path:'compatibility/rc/sass-wrapper-notice-ledger-successor.json',sha256:'7f5f042a3c45b96c3f128c454d71acc9bc059d96be8d5cc927b99296ed5d565e',bytes:144768}},{path:wrapperBefore[1].path,packet:{path:'compatibility/rc/historical-chip-source-wrapper-ledger-successor.json',sha256:'3e8a3e66ae603768d60d22f646b19ec283e6c599b0df5274363533a7d70efd30',bytes:57256}}];
+  assert.equal(wrapper.schema_version,1);assert.equal(wrapper.role,'main-current-inventory-retained-source-routing');assert.equal(wrapper.base_head,'646cc5ff7701db3455929a1af7325c928bd54cad');assert.equal(wrapper.support_commit,wrapper.base_head);
+  assert.deepEqual(wrapper.previous_packet,{path:'compatibility/rc/main-current-inventory-source-routing-v5.json',sha256:'47061b1a2794efe6c735d5bf7805ae79f00e96eb1454918bbf27555d4202616c',bytes:3548});
+  for(const[key,value]of Object.entries({source_scope_only:true,historical_programs_executed:false,historical_packets_rewritten:false,original_ledger_metadata_recipe_changed:false,source_judgments_changed:0,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(wrapper[key],value);
+  assert.deepEqual(wrapper.updates.map(row=>row.path),[paths[0],...wrapperBefore.map(row=>row.path)]);assert.deepEqual(wrapper.support,[]);assert.deepEqual(wrapper.code_subject_anchors,wrapperAnchors);execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',wrapper.base_head,'HEAD'],{cwd:root,env});
+  const wrapperImages=gitImages(root,[...wrapper.updates.map(row=>({commit:wrapper.base_head,path:row.path})),...wrapperAnchors.map(row=>({commit:wrapper.base_head,path:row.packet.path}))]);
+  for(const[index,anchor]of wrapperAnchors.entries()){const raw=wrapperImages.get(wrapper.base_head+':'+anchor.packet.path);matches(raw,anchor.packet);assert.deepEqual(JSON.parse(raw).code_subject,wrapperBefore[index]);}
   for(const update of routing.updates){
     assert.equal(update.before.path,update.path);assert.equal(update.after.path,update.path);const before=originals.get(routing.base_head+':'+update.path);matches(before,update.before);const after=edited(before,update.edits);matches(after,update.after);
     const identities=[{ref:update.before,bytes:before},{ref:update.after,bytes:after}],continuation=next.updates.find(row=>row.path===update.path);let current=update,actual=after;
@@ -287,8 +296,15 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
     if(further){assert.deepEqual(further.before,current.after);assert.equal(further.after.path,update.path);assert.ok(equalBytes(lateImages.get(late.base_head+':'+update.path),actual));actual=edited(actual,further.edits);matches(actual,further.after);identities.push({ref:further.after,bytes:actual});current={...update,after:further.after};}
     const normalized=identity.updates.find(row=>row.path===update.path);
     if(normalized){assert.deepEqual(normalized.before,current.after);assert.equal(normalized.after.path,update.path);assert.ok(equalBytes(identityImages.get(identity.base_head+':'+update.path),actual));actual=edited(actual,normalized.edits);matches(actual,normalized.after);identities.push({ref:normalized.after,bytes:actual});current={...update,after:normalized.after};}
+    const finalized=wrapper.updates.find(row=>row.path===update.path);
+    if(finalized){assert.deepEqual(finalized.before,current.after);assert.equal(finalized.after.path,update.path);assert.ok(equalBytes(wrapperImages.get(wrapper.base_head+':'+update.path),actual));actual=edited(actual,finalized.edits);matches(actual,finalized.after);identities.push({ref:finalized.after,bytes:actual});current={...update,after:finalized.after};}
     assert.ok(equalBytes(member(current.after),actual));
     routingImages.set(update.path,{update:current,identities});
+  }
+  for(const[index,update]of wrapper.updates.slice(1).entries()){
+    assert.deepEqual(update.before,wrapperBefore[index]);assert.equal(update.path,update.before.path);assert.equal(update.after.path,update.path);
+    const before=wrapperImages.get(wrapper.base_head+':'+update.path);matches(before,update.before);const after=edited(before,update.edits);matches(after,update.after);assert.ok(equalBytes(member(update.after),after));
+    assert.ok(!routingImages.has(update.path));routingImages.set(update.path,{update,identities:[{ref:update.before,bytes:before},{ref:update.after,bytes:after}]});
   }
  }
  const routingComparison=ref=>{const overlay=routingImages.get(ref.path);if(!overlay)return member(ref);const meta=metadata(ref),identity=overlay.identities.find(row=>row.ref.path===meta.path&&row.ref.sha256===meta.sha256&&row.ref.bytes===meta.bytes);assert.ok(identity,'unknown current inventory routing comparison');member(overlay.update.after);return Buffer.from(identity.bytes);};

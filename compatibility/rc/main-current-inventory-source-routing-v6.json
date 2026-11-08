@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "role": "main-current-inventory-retained-source-routing",
+  "base_head": "646cc5ff7701db3455929a1af7325c928bd54cad",
+  "previous_packet": {
+    "path": "compatibility/rc/main-current-inventory-source-routing-v5.json",
+    "sha256": "47061b1a2794efe6c735d5bf7805ae79f00e96eb1454918bbf27555d4202616c",
+    "bytes": 3548
+  },
+  "support_commit": "646cc5ff7701db3455929a1af7325c928bd54cad",
+  "updates": [
+    {
+      "path": "scripts/packed-upstream-ledger-epoch.mjs",
+      "before": {
+        "path": "scripts/packed-upstream-ledger-epoch.mjs",
+        "sha256": "0b78c24696b746c9b309b33ac12c71789558e1754777c6dff2735451eb170af3",
+        "bytes": 91746
+      },
+      "after": {
+        "path": "scripts/packed-upstream-ledger-epoch.mjs",
+        "sha256": "a4c89ec1730feb09977f6c681b646113be9c21cf3e73e5ce4c92db6ed74b0e5c",
+        "bytes": 92356
+      },
+      "edits": [
+        {
+          "offset": 7894,
+          "before": "  const tools=ref.path===testingApiChecker?retainedTools(root,read,line):null;\n",
+          "after": "  const tools=ref.path===testingApiChecker||['scripts/sass-wrapper-notice-metadata.mjs','scripts/historical-chip-wrapper-metadata.mjs'].includes(ref.path)?retainedTools(root,read,line):null;\n"
+        },
+        {
+          "offset": 28377,
+          "before": "  const notices=sassWrapperNoticeSubject({root,read,line});\n",
+          "after": "  const notices=sassWrapperNoticeSubject({root,read:currentSourceRead(root,read),line});\n"
+        },
+        {
+          "offset": 30604,
+          "before": "    assert.equal(sassInspectionEntrySourceOk({root,read,entry:current,body:review,line}),true,'unqualified individual Sass source decision');\n",
+          "after": "    assert.equal(sassInspectionEntrySourceOk({root,read:currentSourceRead(root,read),entry:current,body:review,line}),true,'unqualified individual Sass source decision');\n"
+        },
+        {
+          "offset": 65558,
+          "before": "  const source=sassWrapperNoticeMetadata({root,read});assert.equal(source.before.equals(before),true);\n",
+          "after": "  const source=sassWrapperNoticeMetadata({root,read:currentSourceRead(root,read)});assert.equal(source.before.equals(before),true);\n"
+        },
+        {
+          "offset": 67517,
+          "before": "function prepareHistoricalWrapperMetadataStage({root,read,line,before,bound}){\n",
+          "after": "function prepareHistoricalWrapperMetadataStage({root,read,line,before,bound,currentSourceContext}){\n"
+        },
+        {
+          "offset": 68765,
+          "before": "  const source=selectionReaders(root,read,line).titleReaders.withHistoricalToolMetadata(metadata=>historicalChipWrapperMetadata({root,read:metadata,line}));assert.equal(source.before.equals(before),true);\n  assert.deepEqual(packet.qualification_members,source.bound);assert.deepEqual(packet.entries,source.entries);\n",
+          "after": "  const source=selectionReaders(root,read,line).titleReaders.withHistoricalToolMetadata(metadata=>historicalChipWrapperMetadata({root,read:metadata,line,currentSourceContext}));assert.equal(source.before.equals(before),true);\n  const qualifiedMembers=packet.qualification_members.map(ref=>{\n    if(!currentSourceContext||!ref.path.startsWith('projects/ngx-material-legacy/'))return ref;\n    const resolved=currentSourceContext.resolveReference(ref);assert.equal(resolved?.kind,'current','wrapper qualification requires a current product');return resolved.reference;\n  });\n  assert.deepEqual(qualifiedMembers,source.bound);assert.deepEqual(packet.entries,source.entries);\n"
+        },
+        {
+          "offset": 82756,
+          "before": "  const historicalWrapper=prepareHistoricalWrapperMetadataStage({root,read,line,before:noticeMetadata?.after??nativeSelection.after,bound});\n",
+          "after": "  const historicalWrapper=prepareHistoricalWrapperMetadataStage({root,read,line,before:noticeMetadata?.after??nativeSelection.after,bound,currentSourceContext:contextSource});\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/sass-wrapper-notice-metadata.mjs",
+      "before": {
+        "path": "scripts/sass-wrapper-notice-metadata.mjs",
+        "sha256": "624093a294bbfaf06b66eeb54a81fb10c71140624d80e82620c1210586aa89aa",
+        "bytes": 8020
+      },
+      "after": {
+        "path": "scripts/sass-wrapper-notice-metadata.mjs",
+        "sha256": "4f9c1dfd9a9c637c1b0e781a3464b5488c0d0b65072abf9a32795c5b9f47a33b",
+        "bytes": 8387
+      },
+      "edits": [
+        {
+          "offset": 5068,
+          "before": "      assert.equal(ref.sha256,row.before.sha256);const current=notices.qualify(ref);\n",
+          "after": "      // Descriptor-only refresh within the already verified finite notice frame.\n      // Opening and closing guards still consume current bytes; this lookup\n      // grants no reader, source, cached verdict or admission authority.\n      assert.equal(ref.sha256,row.before.sha256);\n      if(ref.bytes!==undefined)assert.equal(ref.bytes,row.before.bytes);\n      const current=bound.get(ref.path);assert.deepEqual(current,{path:row.path,...row.after});\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/historical-chip-wrapper-metadata.mjs",
+      "before": {
+        "path": "scripts/historical-chip-wrapper-metadata.mjs",
+        "sha256": "f9e5fa9808a1553c216a95de42d6a3d251aac01d0066b87c8e630cb2d7d34a0e",
+        "bytes": 11824
+      },
+      "after": {
+        "path": "scripts/historical-chip-wrapper-metadata.mjs",
+        "sha256": "8012936162abe817cc1bbc80e1778e1a7eed3ca8571581f9463edd71113700ed",
+        "bytes": 12199
+      },
+      "edits": [
+        {
+          "offset": 2097,
+          "before": "export function historicalChipWrapperMetadata({root,read=p=>readEvidenceMember(root,p),line}={}){\n",
+          "after": "export function historicalChipWrapperMetadata({root,read=p=>readEvidenceMember(root,p),line,currentSourceContext}={}){\n  currentSourceContext?.assertCurrent();\n"
+        },
+        {
+          "offset": 7485,
+          "before": "  for(const ref of [current.current_subject.actual_chip_source,current.current_subject.actual_chip_spec])assert.deepEqual(retained(ref.path).ref,ref);\n",
+          "after": "  for(const ref of [current.current_subject.actual_chip_source,current.current_subject.actual_chip_spec]){\n    const resolved=currentSourceContext?.resolveReference(ref);\n    assert.ok(!resolved||resolved.kind==='current','historical wrapper source cannot be retired');\n    const expected=resolved?.reference??ref;\n    assert.deepEqual(member(ref.path,expected.sha256).ref,expected);\n  }\n"
+        },
+        {
+          "offset": 11241,
+          "before": "  const assertCurrent=()=>{for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late historical wrapper metadata subject '+ref.path);assert.equal(raw.length,ref.bytes);}};\n",
+          "after": "  const assertCurrent=()=>{currentSourceContext?.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late historical wrapper metadata subject '+ref.path);assert.equal(raw.length,ref.bytes);}currentSourceContext?.assertCurrent();};\n"
+        }
+      ]
+    }
+  ],
+  "code_subject_anchors": [
+    {
+      "path": "scripts/sass-wrapper-notice-metadata.mjs",
+      "packet": {
+        "path": "compatibility/rc/sass-wrapper-notice-ledger-successor.json",
+        "sha256": "7f5f042a3c45b96c3f128c454d71acc9bc059d96be8d5cc927b99296ed5d565e",
+        "bytes": 144768
+      }
+    },
+    {
+      "path": "scripts/historical-chip-wrapper-metadata.mjs",
+      "packet": {
+        "path": "compatibility/rc/historical-chip-source-wrapper-ledger-successor.json",
+        "sha256": "3e8a3e66ae603768d60d22f646b19ec283e6c599b0df5274363533a7d70efd30",
+        "bytes": 57256
+      }
+    }
+  ],
+  "support": [],
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "original_ledger_metadata_recipe_changed": false,
+  "source_judgments_changed": 0,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed"
+}

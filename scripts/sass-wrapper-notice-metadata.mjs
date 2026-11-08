@@ -68,7 +68,12 @@ export function sassWrapperNoticeMetadata({root,read=p=>readEvidenceMember(root,
     assert.deepEqual(affected.map(ref=>({path:ref.path,before_sha256:ref.sha256,after_sha256:changed.get(ref.path).after.sha256})),subject.affected_notice_references);
     function refresh(ref){
       const row=changed.get(ref.path);if(!row)return structuredClone(ref);
-      assert.equal(ref.sha256,row.before.sha256);const current=notices.qualify(ref);
+      // Descriptor-only refresh within the already verified finite notice frame.
+      // Opening and closing guards still consume current bytes; this lookup
+      // grants no reader, source, cached verdict or admission authority.
+      assert.equal(ref.sha256,row.before.sha256);
+      if(ref.bytes!==undefined)assert.equal(ref.bytes,row.before.bytes);
+      const current=bound.get(ref.path);assert.deepEqual(current,{path:row.path,...row.after});
       return {...ref,sha256:current.sha256,...(ref.bytes===undefined?{}:{bytes:current.bytes})};
     }
     const current=structuredClone(prior),review=structuredClone(body);

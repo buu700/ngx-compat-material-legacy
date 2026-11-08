@@ -372,7 +372,7 @@ class CurrentSassToolReferences:
             assert routing_packet['schema_version']==1 and routing_packet['role']=='main-current-inventory-source-routing' and routing_packet['base_head']=='54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0'
             assert routing_packet['source_scope_only'] is True and routing_packet['historical_programs_executed'] is False and routing_packet['historical_packets_rewritten'] is False and routing_packet['artifact_or_audit_admission_granted'] is False and routing_packet['g11_claim']=='not-passed'
             routing_paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];assert [row['path'] for row in routing_packet['updates']]==routing_paths
-            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='956901bb308f50a73c9a99902d01e4fa6827d16fc40b73f98be2ffc362f33c97',bytes=12882))
+            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='30be6c61df2253756dbf0cc66641ecf6fa8414bbbfc20f0257f67ddef2a7f1b9',bytes=16520))
             routing_env=dict(PATH=os.environ['PATH'],GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0');subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',routing_packet['base_head'],'HEAD'],cwd=self.root,env=routing_env)
             routing_originals=_git_images(self.root,[dict(commit=routing_packet['base_head'],path=routing_path) for routing_path in routing_paths])
             routing_next=json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v3.json',sha256='d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b',bytes=13219)))
@@ -403,6 +403,17 @@ class CurrentSassToolReferences:
             identity_images=_git_images(self.root,[dict(commit=routing_identity['base_head'],path=row['path']) for row in routing_identity['updates']]+[dict(commit=routing_identity['support_commit'],path=ref['path']) for ref in routing_identity['support']])
             for ref in routing_identity['support']:
                 committed=identity_images[(routing_identity['support_commit'],ref['path'])];_matches(committed,ref);assert self._member(ref)==committed
+            routing_wrapper=json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v6.json',sha256='233fa6a574a7124c0e1cc41bec2b307ae5d7517ae1e6e3f09e1b614e9c05f9a1',bytes=8161)))
+            wrapper_before=[dict(path='scripts/sass-wrapper-notice-metadata.mjs',sha256='624093a294bbfaf06b66eeb54a81fb10c71140624d80e82620c1210586aa89aa',bytes=8020),dict(path='scripts/historical-chip-wrapper-metadata.mjs',sha256='f9e5fa9808a1553c216a95de42d6a3d251aac01d0066b87c8e630cb2d7d34a0e',bytes=11824)]
+            wrapper_anchors=[dict(path=wrapper_before[0]['path'],packet=dict(path='compatibility/rc/sass-wrapper-notice-ledger-successor.json',sha256='7f5f042a3c45b96c3f128c454d71acc9bc059d96be8d5cc927b99296ed5d565e',bytes=144768)),dict(path=wrapper_before[1]['path'],packet=dict(path='compatibility/rc/historical-chip-source-wrapper-ledger-successor.json',sha256='3e8a3e66ae603768d60d22f646b19ec283e6c599b0df5274363533a7d70efd30',bytes=57256))]
+            assert routing_wrapper['schema_version']==1 and routing_wrapper['role']=='main-current-inventory-retained-source-routing' and routing_wrapper['base_head']=='646cc5ff7701db3455929a1af7325c928bd54cad' and routing_wrapper['support_commit']==routing_wrapper['base_head']
+            assert routing_wrapper['previous_packet']==dict(path='compatibility/rc/main-current-inventory-source-routing-v5.json',sha256='47061b1a2794efe6c735d5bf7805ae79f00e96eb1454918bbf27555d4202616c',bytes=3548)
+            for key,value in dict(source_scope_only=True,historical_programs_executed=False,historical_packets_rewritten=False,original_ledger_metadata_recipe_changed=False,source_judgments_changed=0,artifact_or_audit_admission_granted=False,g11_claim='not-passed').items():assert routing_wrapper[key]==value
+            assert [row['path'] for row in routing_wrapper['updates']]==[routing_paths[0]]+[row['path'] for row in wrapper_before] and routing_wrapper['support']==[] and routing_wrapper['code_subject_anchors']==wrapper_anchors
+            subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',routing_wrapper['base_head'],'HEAD'],cwd=self.root,env=routing_env)
+            wrapper_images=_git_images(self.root,[dict(commit=routing_wrapper['base_head'],path=row['path']) for row in routing_wrapper['updates']]+[dict(commit=routing_wrapper['base_head'],path=row['packet']['path']) for row in wrapper_anchors])
+            for index,anchor in enumerate(wrapper_anchors):
+                raw=wrapper_images[(routing_wrapper['base_head'],anchor['packet']['path'])];_matches(raw,anchor['packet']);assert json.loads(raw)['code_subject']==wrapper_before[index]
             for routing_update in routing_packet['updates']:
                 assert routing_update['before']['path']==routing_update['after']['path']==routing_update['path']
                 routing_before=routing_originals[(routing_packet['base_head'],routing_update['path'])];_matches(routing_before,routing_update['before']);routing_after=_edited(routing_before,routing_update['edits']);_matches(routing_after,routing_update['after'])
@@ -424,8 +435,18 @@ class CurrentSassToolReferences:
                     assert normalized['before']==current['after'] and normalized['after']['path']==routing_update['path']
                     assert identity_images[(routing_identity['base_head'],routing_update['path'])]==actual
                     actual=_edited(actual,normalized['edits']);_matches(actual,normalized['after']);identities.append((normalized['after'],actual));current={**routing_update,'after':normalized['after']}
+                finalized=next((row for row in routing_wrapper['updates'] if row['path']==routing_update['path']),None)
+                if finalized:
+                    assert finalized['before']==current['after'] and finalized['after']['path']==routing_update['path']
+                    assert wrapper_images[(routing_wrapper['base_head'],routing_update['path'])]==actual
+                    actual=_edited(actual,finalized['edits']);_matches(actual,finalized['after']);identities.append((finalized['after'],actual));current={**routing_update,'after':finalized['after']}
                 assert self._member(current['after'])==actual
                 routing_images[routing_update['path']]=(current,identities)
+            for index,update in enumerate(routing_wrapper['updates'][1:]):
+                assert update['before']==wrapper_before[index] and update['path']==update['before']['path']==update['after']['path']
+                before=wrapper_images[(routing_wrapper['base_head'],update['path'])];_matches(before,update['before']);after=_edited(before,update['edits']);_matches(after,update['after']);assert self._member(update['after'])==after
+                assert update['path'] not in routing_images
+                routing_images[update['path']]=(update,[(update['before'],before),(update['after'],after)])
         def routing_comparison(ref):
             overlay=routing_images.get(ref['path'])
             if overlay is None:return self._member(ref)

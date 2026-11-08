@@ -30,7 +30,8 @@ function original(root,parent,path){
   return Buffer.from(objects.get(key));
 }
 
-export function historicalChipWrapperMetadata({root,read=p=>readEvidenceMember(root,p),line}={}){
+export function historicalChipWrapperMetadata({root,read=p=>readEvidenceMember(root,p),line,currentSourceContext}={}){
+  currentSourceContext?.assertCurrent();
   const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version;
   const actual=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;line??=actual;assert.equal(line,actual);
   assert.ok(Object.hasOwn(subjects,line));assert.equal(process.versions.node,JSON.parse(read('toolchain-lock.json')).repository.node);
@@ -84,7 +85,12 @@ export function historicalChipWrapperMetadata({root,read=p=>readEvidenceMember(r
   assert.equal(hash(original(root,subject.parent,previousCoordinator.path)),previousCoordinator.sha256);
   // This is the authenticated pre-metadata qualification. Current product bytes
   // remain checked by the shared source owner; no old coordinator is replayed.
-  for(const ref of [current.current_subject.actual_chip_source,current.current_subject.actual_chip_spec])assert.deepEqual(retained(ref.path).ref,ref);
+  for(const ref of [current.current_subject.actual_chip_source,current.current_subject.actual_chip_spec]){
+    const resolved=currentSourceContext?.resolveReference(ref);
+    assert.ok(!resolved||resolved.kind==='current','historical wrapper source cannot be retired');
+    const expected=resolved?.reference??ref;
+    assert.deepEqual(member(ref.path,expected.sha256).ref,expected);
+  }
   const before=original(root,subject.parent,HISTORICAL_WRAPPER_LEDGER);assert.equal(hash(before),subject.before);
   assert.deepEqual(transport.ledger_before_reference_refresh,{path:HISTORICAL_WRAPPER_LEDGER,sha256:hash(before),bytes:before.length});
   const ledger=JSON.parse(before),nav=transport.wrappers[2];assert.equal(ledger.entries.length,1697);
@@ -117,7 +123,7 @@ export function historicalChipWrapperMetadata({root,read=p=>readEvidenceMember(r
     reports.push({sha:prior.sha,path,raw,body:review,ref});entries.push({sha:prior.sha,before_entry_sha256:hash(json(prior)),prior_review:priorReview.ref,current_review:ref,after_entry:entry});
   }
   assert.equal(hunks,198);
-  const assertCurrent=()=>{for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late historical wrapper metadata subject '+ref.path);assert.equal(raw.length,ref.bytes);}};
+  const assertCurrent=()=>{currentSourceContext?.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late historical wrapper metadata subject '+ref.path);assert.equal(raw.length,ref.bytes);}currentSourceContext?.assertCurrent();};
   assertCurrent();return {line,before:Buffer.from(before),entries,reports,bound:structuredClone([...bound.values()]),assertCurrent,
     metadata_entries:4,source_reference_updates:4,report_reference_updates:4,report_digest_updates:4,original_hunks_preserved:198,
     original_dispositions_or_hunk_judgments_changed:0,current_native_artifact_floor_or_G11_credit:false};

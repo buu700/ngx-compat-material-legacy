@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Ryan Lester.
  * Use of this source code is governed by the MIT license in LICENSE.
  */
-/** Four finite routing paths; before-images are comparison data only. */
+/** Finite routing paths; before-images are comparison data only. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
@@ -17,6 +17,9 @@ const PACKET={path:'compatibility/rc/main-current-inventory-source-routing-v2.js
 const CONTINUATION={path:'compatibility/rc/main-current-inventory-source-routing-v3.json',sha256:'d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b',bytes:13219};
 const LATE_CONTINUATION={path:'compatibility/rc/main-current-inventory-source-routing-v4.json',sha256:'b4d4fc742323ec0bb6858a5b6165dc0c1307d0d0a1d4c3f49b6ef017df97ab1c',bytes:32578};
 const IDENTITY_CONTINUATION={path:'compatibility/rc/main-current-inventory-source-routing-v5.json',sha256:'47061b1a2794efe6c735d5bf7805ae79f00e96eb1454918bbf27555d4202616c',bytes:3548};
+const WRAPPER_CONTINUATION={path:'compatibility/rc/main-current-inventory-source-routing-v6.json',sha256:'233fa6a574a7124c0e1cc41bec2b307ae5d7517ae1e6e3f09e1b614e9c05f9a1',bytes:8161};
+const wrapperBefore=[{path:'scripts/sass-wrapper-notice-metadata.mjs',sha256:'624093a294bbfaf06b66eeb54a81fb10c71140624d80e82620c1210586aa89aa',bytes:8020},{path:'scripts/historical-chip-wrapper-metadata.mjs',sha256:'f9e5fa9808a1553c216a95de42d6a3d251aac01d0066b87c8e630cb2d7d34a0e',bytes:11824}];
+const wrapperAnchors=[{path:wrapperBefore[0].path,packet:{path:'compatibility/rc/sass-wrapper-notice-ledger-successor.json',sha256:'7f5f042a3c45b96c3f128c454d71acc9bc059d96be8d5cc927b99296ed5d565e',bytes:144768}},{path:wrapperBefore[1].path,packet:{path:'compatibility/rc/historical-chip-source-wrapper-ledger-successor.json',sha256:'3e8a3e66ae603768d60d22f646b19ec283e6c599b0df5274363533a7d70efd30',bytes:57256}}];
 const paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 export function currentInventorySourceSubject({root,read=p=>readEvidenceMember(root,p)}){
@@ -32,7 +35,7 @@ export function currentInventorySourceSubject({root,read=p=>readEvidenceMember(r
   let cursor=0;const parts=[];assert.ok(Array.isArray(row.edits)&&row.edits.length>0);
   for(const edit of row.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=before.length);assert.equal(typeof edit.before,'string');assert.equal(typeof edit.after,'string');assert.notEqual(edit.before,edit.after);const prior=Buffer.from(edit.before);assert.ok(before.subarray(edit.offset,edit.offset+prior.length).equals(prior));parts.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+prior.length;}
   parts.push(before.subarray(cursor));const current=Buffer.concat(parts);check(current,row.after);
-  // The packed owner has two further exact continuations below. Other routing
+  // The packed owner has further exact continuations below. Other routing
   // images must still match this untouched v2 afterimage directly.
   if(row.path!==paths[0])assert.ok(current.equals(physical(row.path)));
   rows.set(row.path,{before:{...row.before},after:{...row.after},images:new Map([[row.before.sha256,{ref:{...row.before},bytes:Buffer.from(before)}],[row.after.sha256,{ref:{...row.after},bytes:Buffer.from(current)}]])});
@@ -67,11 +70,31 @@ export function currentInventorySourceSubject({root,read=p=>readEvidenceMember(r
   const row=rows.get(update.path);assert.deepEqual(update.before,row.after);assert.equal(update.after.path,update.path);
   const before=git(['show',identity.base_head+':'+update.path]);check(before,update.before);assert.ok(before.equals(row.images.get(update.before.sha256).bytes));
   let cursor=0;const parts=[];for(const edit of update.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=before.length);const old=Buffer.from(edit.before);assert.ok(before.subarray(edit.offset,edit.offset+old.length).equals(old));parts.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+old.length;}
-  parts.push(before.subarray(cursor));const after=Buffer.concat(parts);check(after,update.after);assert.ok(after.equals(physical(update.path)));row.after={...update.after};row.images.set(update.after.sha256,{ref:{...update.after},bytes:Buffer.from(after)});
+  parts.push(before.subarray(cursor));const after=Buffer.concat(parts);check(after,update.after);row.after={...update.after};row.images.set(update.after.sha256,{ref:{...update.after},bytes:Buffer.from(after)});
  }
  for(const ref of identity.support){check(physical(ref.path),ref);const committed=git(['show',identity.support_commit+':'+ref.path]);check(committed,ref);assert.ok(committed.equals(physical(ref.path)));}
+ const wrapperRaw=physical(WRAPPER_CONTINUATION.path);check(wrapperRaw,WRAPPER_CONTINUATION);const wrapper=JSON.parse(wrapperRaw);
+ assert.equal(wrapper.schema_version,1);assert.equal(wrapper.role,'main-current-inventory-retained-source-routing');assert.equal(wrapper.base_head,'646cc5ff7701db3455929a1af7325c928bd54cad');assert.equal(wrapper.support_commit,wrapper.base_head);assert.deepEqual(wrapper.previous_packet,IDENTITY_CONTINUATION);
+ for(const[key,value]of Object.entries({source_scope_only:true,historical_programs_executed:false,historical_packets_rewritten:false,original_ledger_metadata_recipe_changed:false,source_judgments_changed:0,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(wrapper[key],value);
+ assert.deepEqual(wrapper.updates.map(row=>row.path),[paths[0],...wrapperBefore.map(row=>row.path)]);assert.deepEqual(wrapper.support,[]);assert.deepEqual(wrapper.code_subject_anchors,wrapperAnchors);git(['merge-base','--is-ancestor',wrapper.base_head,'HEAD']);
+ for(const [index,anchor]of wrapperAnchors.entries()){
+  // Immutable Git DATA anchors the accepted old code identity. The live
+  // reference packets are consumed separately by their owning stages.
+  const raw=git(['show',wrapper.base_head+':'+anchor.packet.path]);check(raw,anchor.packet);assert.deepEqual(JSON.parse(raw).code_subject,wrapperBefore[index]);
+ }
+ for(const update of wrapper.updates){
+  let row=rows.get(update.path);
+  if(row)assert.deepEqual(update.before,row.after);
+  else{assert.deepEqual(update.before,wrapperBefore.find(ref=>ref.path===update.path));row={before:{...update.before},after:{...update.before},images:new Map()};rows.set(update.path,row);}
+  assert.equal(update.after.path,update.path);const before=git(['show',wrapper.base_head+':'+update.path]);check(before,update.before);
+  if(row.images.has(update.before.sha256))assert.ok(before.equals(row.images.get(update.before.sha256).bytes));
+  else row.images.set(update.before.sha256,{ref:{...update.before},bytes:Buffer.from(before)});
+  let cursor=0;const parts=[];assert.ok(update.edits.length>0);
+  for(const edit of update.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=before.length);const old=Buffer.from(edit.before);assert.ok(before.subarray(edit.offset,edit.offset+old.length).equals(old));parts.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+old.length;}
+  parts.push(before.subarray(cursor));const after=Buffer.concat(parts);check(after,update.after);assert.ok(after.equals(physical(update.path)));row.after={...update.after};row.images.set(update.after.sha256,{ref:{...update.after},bytes:Buffer.from(after)});
+ }
  const unique=new Map();
- for(const ref of [{path:SELF,sha256:hash(image),bytes:image.length},{...PACKET},{...CONTINUATION},{...LATE_CONTINUATION},{...IDENTITY_CONTINUATION},...[...rows.values()].map(row=>({...row.after})),...next.support,...late.support,...identity.support]){
+ for(const ref of [{path:SELF,sha256:hash(image),bytes:image.length},{...PACKET},{...CONTINUATION},{...LATE_CONTINUATION},{...IDENTITY_CONTINUATION},{...WRAPPER_CONTINUATION},...[...rows.values()].map(row=>({...row.after})),...next.support,...late.support,...identity.support]){
   const prior=unique.get(ref.path);if(prior)assert.deepEqual(prior,ref);else unique.set(ref.path,{...ref});
  }
  const bound=[...unique.values()];

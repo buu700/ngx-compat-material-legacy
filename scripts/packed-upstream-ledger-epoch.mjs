@@ -113,7 +113,7 @@ export function retainedSourceIdentity(ref){
 }
 function selectionMember({root,read,line,ref,bound}){
   const scope=selectionReaders(root,read,line),native=ref.path===SELECTION_NATIVE_REGISTRY?selectionNative(root,read,line):null;
-  const tools=ref.path===testingApiChecker?retainedTools(root,read,line):null;
+  const tools=ref.path===testingApiChecker||['scripts/sass-wrapper-notice-metadata.mjs','scripts/historical-chip-wrapper-metadata.mjs'].includes(ref.path)?retainedTools(root,read,line):null;
   const later=retainedLaterProgramPaths.has(ref.path)?retainedLaterPrograms(root,read,line):null;
   const identity=retainedSourceIdentity(ref);
   const qualified=later?.qualifyMetadata(identity)??tools?.qualify(identity)??native?.qualify(identity)??scope.qualify(identity),current=qualified??identity;
@@ -386,7 +386,7 @@ function prepareSassStage({root,read,line,before,bound}){
   for(const ref of packet.code_subjects)member(ref);
   const review=JSON.parse(member(packet.review));assert.equal(review.line,line);assert.equal(review.reviews.length,6);
   for(const ref of [review.upstream_originals,review.source_census,review.current_compiler_scope])member(ref);
-  const notices=sassWrapperNoticeSubject({root,read,line});
+  const notices=sassWrapperNoticeSubject({root,read:currentSourceRead(root,read),line});
   const scope=notices.qualifySassScope(JSON.parse(gunzipSync(member(review.current_compiler_scope))).actual);member(scope.producer);member(scope.oracle);
   const peerRoots=[realpathSync(join(root,'node_modules/@angular/material')),realpathSync(join(root,'node_modules/@angular/cdk'))];
   const external=new Map();
@@ -411,7 +411,7 @@ function prepareSassStage({root,read,line,before,bound}){
     const allowedFields=new Set(['final_disposition','reason','review_depth','affected_branches','evidence_report','individual_proof','patch_sha256']);
     for(const key of new Set([...Object.keys(previous),...Object.keys(current)]))
       if(!allowedFields.has(key))assert.deepEqual(current[key],previous[key],'changed unrelated Sass entry field '+key);
-    assert.equal(sassInspectionEntrySourceOk({root,read,entry:current,body:review,line}),true,'unqualified individual Sass source decision');
+    assert.equal(sassInspectionEntrySourceOk({root,read:currentSourceRead(root,read),entry:current,body:review,line}),true,'unqualified individual Sass source decision');
     const node=bySha.get(change.sha);edits.push({start:node.getStart(source),end:node.end,text:JSON.stringify(current,null,2).replace(/\n/g,'\n    ')});
     expected.entries[index]=current;
   }
@@ -773,7 +773,7 @@ function prepareSassNoticeMetadataStage({root,read,line,before,bound}){
   assert.equal(packet.actual_native_artifact_floor_or_G11_qualified,false);assert.equal(packet.g11_claim,'not-passed');
   assert.equal(packet.code_subject.path,'scripts/sass-wrapper-notice-metadata.mjs');
   selectionMember({root,read,line,ref:packet.code_subject,bound});
-  const source=sassWrapperNoticeMetadata({root,read});assert.equal(source.before.equals(before),true);
+  const source=sassWrapperNoticeMetadata({root,read:currentSourceRead(root,read)});assert.equal(source.before.equals(before),true);
   const titleReaders=selectionReaders(root,read,line).titleReaders;
   const historicalMembers=source.bound.map(ref=>titleReaders.historicalReference(ref)??ref);
   assert.deepEqual(packet.qualification_members,historicalMembers);assert.deepEqual(packet.entries,source.entries);
@@ -797,7 +797,7 @@ function prepareSassNoticeMetadataStage({root,read,line,before,bound}){
 
 // Finite wrapper transport metadata; original source reviews remain untouched.
 const historicalWrapperPins={main:'3e8a3e66ae603768d60d22f646b19ec283e6c599b0df5274363533a7d70efd30','21.x':'a2d4e3cebf6306041a79336ccc9643f0b67a8fc3924fafbfb7ce60f393c80ead'};
-function prepareHistoricalWrapperMetadataStage({root,read,line,before,bound}){
+function prepareHistoricalWrapperMetadataStage({root,read,line,before,bound,currentSourceContext}){
   const raw=read(HISTORICAL_WRAPPER_PACKET);assert.equal(hash(raw),historicalWrapperPins[line]);bound.set(HISTORICAL_WRAPPER_PACKET,hash(raw));
   const packet=JSON.parse(raw);assert.equal(packet.schema_version,1);assert.equal(packet.line,line);assert.equal(packet.before.path,ledgerPath);
   assert.equal(packet.before.entries,1697);assert.equal(packet.before.sha256,hash(before));assert.equal(packet.before.bytes,before.length);
@@ -807,8 +807,12 @@ function prepareHistoricalWrapperMetadataStage({root,read,line,before,bound}){
   assert.equal(packet.original_dispositions_or_hunk_judgments_changed,0);assert.equal(packet.unrelated_entry_or_byte_changes,0);
   assert.equal(packet.actual_native_artifact_floor_or_G11_qualified,false);assert.equal(packet.g11_claim,'not-passed');
   assert.equal(packet.code_subject.path,'scripts/historical-chip-wrapper-metadata.mjs');selectionMember({root,read,line,ref:packet.code_subject,bound});
-  const source=selectionReaders(root,read,line).titleReaders.withHistoricalToolMetadata(metadata=>historicalChipWrapperMetadata({root,read:metadata,line}));assert.equal(source.before.equals(before),true);
-  assert.deepEqual(packet.qualification_members,source.bound);assert.deepEqual(packet.entries,source.entries);
+  const source=selectionReaders(root,read,line).titleReaders.withHistoricalToolMetadata(metadata=>historicalChipWrapperMetadata({root,read:metadata,line,currentSourceContext}));assert.equal(source.before.equals(before),true);
+  const qualifiedMembers=packet.qualification_members.map(ref=>{
+    if(!currentSourceContext||!ref.path.startsWith('projects/ngx-material-legacy/'))return ref;
+    const resolved=currentSourceContext.resolveReference(ref);assert.equal(resolved?.kind,'current','wrapper qualification requires a current product');return resolved.reference;
+  });
+  assert.deepEqual(qualifiedMembers,source.bound);assert.deepEqual(packet.entries,source.entries);
   for(const ref of source.bound)selectionMember({root,read,line,ref,bound});
   for(const report of source.reports)assert.equal(selectionMember({root,read,line,ref:report.ref,bound}).equals(report.raw),true);
   const original=JSON.parse(before),expected=structuredClone(original);let text=before.toString();
@@ -965,7 +969,7 @@ function prepareBeforeInventoryReferenceLedger({root = process.cwd(), read = dis
   const nativeSpec=prepareSelectionSpecMetadata({root,read,line,before:landscape.after,bound,currentSource:landscape.current_source,metadataContext});
   const nativeSelection=prepareSelectionNativeStage({root,read,line,before:nativeSpec.after,bound,metadataContext,bindCurrent});
   const noticeMetadata=line==='main'?prepareSassNoticeMetadataStage({root,read,line,before:nativeSelection.after,bound}):null;
-  const historicalWrapper=prepareHistoricalWrapperMetadataStage({root,read,line,before:noticeMetadata?.after??nativeSelection.after,bound});
+  const historicalWrapper=prepareHistoricalWrapperMetadataStage({root,read,line,before:noticeMetadata?.after??nativeSelection.after,bound,currentSourceContext:contextSource});
   const consumerWrapper=prepareHistoricalConsumerWrapperMetadataStage({root,read,line,before:historicalWrapper.after,bound});
   specReaders.assertCurrent();assertRetainedCurrent();
   return {line, before, after, canonical_after:consumerWrapper.after,historical_consumer_wrapper_metadata_stage:consumerWrapper,historical_wrapper_metadata_stage:historicalWrapper,sass_notice_metadata_stage:noticeMetadata, selection_native_stage:nativeSelection, testing_api_stage: next, sass_stage: sass, rules_js_stage:rulesJs, summary_stage:summary, autocomplete_landscape_stage:landscape, native_spec_source:{assertCurrent:specReaders.assertCurrent,bound:structuredClone(specReaders.bound),spec:{path:specReaders.spec.path,line,before:{...specReaders.spec.before},after:{...specReaders.spec.after}}}, native_spec_metadata_stage:nativeSpec, bound, population, analysis_python_version: syntax.current_pinned_python,
