@@ -3,6 +3,13 @@
   "role": "Exact historical/owned signature pairs that are intentional legacy differences. They are not matches. An unlisted pair still fails.",
   "differences": [
     {
+      "symbol_id": "legacy-table/primary/MatLegacyColumnDef",
+      "classification": "intentional-legacy-difference",
+      "historical_signature": "protected method _updateColumnCssClassName():*",
+      "owned_signature": null,
+      "rationale": "The historical class declared this protected override; the owned class delegates class application to its cells and does not declare the override. At the 22.1.7 minimum peer the hook remains inherited and a strict subclass calling super compiled and dispatched; rendered legacy and mixed CDK cells retained both historical class prefixes. This records only the missing own declaration and does not introduce reliance on a private peer API."
+    },
+    {
       "symbol_id": "legacy-chips/primary/MatLegacyChipInput",
       "classification": "intentional-legacy-difference",
       "historical_signature": "public method _keyup(KeyboardEvent):*",

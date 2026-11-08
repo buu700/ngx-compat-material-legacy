@@ -69,8 +69,16 @@ export function observeTableDefinitionInputs(state,capture,Type){
  if(contract.table_index===2)assert.ok(manual.template===capture.inputs[0]&&consumer.template===capture.inputs[0]&&manual._differs===capture.inputs[1]&&consumer._differs===capture.inputs[1],'table definition manual/subclass borrowed dependencies differ');
  const checks=[];
  if(contract.table_index===0){
-  value.name='alpha/$ Beta';assert.equal(value.name,'alpha/$ Beta');assert.equal(value.cssClassFriendlyName,'alpha---Beta');assert.deepEqual(value._columnCssClassName,['cdk-column-alpha---Beta','mat-column-alpha---Beta']);
-  value.name='';assert.equal(value.name,'alpha/$ Beta');assert.deepEqual(value._columnCssClassName,['cdk-column-alpha---Beta','mat-column-alpha---Beta']);checks.push('historical-name-sanitization-dual-class-prefix-and-empty-write');
+  value.name='alpha/$ Beta';assert.equal(value.name,'alpha/$ Beta');assert.equal(value.cssClassFriendlyName,'alpha---Beta');
+  // Observe all three actual owned cell constructors on fresh synthetic nodes.
+  // Real rendered and mixed-CDK cells are covered separately by the packed browser fixture.
+  const cellClasses=(column,types)=>types.map(Type=>{const element=fixture.document.createElement('td');
+   const ref=new core.ElementRef(element);new Type(column,ref);
+   return ['cdk-column-alpha---Beta','mat-column-alpha---Beta'].map(name=>element.classList.contains(name));});
+  assert.deepEqual(cellClasses(value,[owned.MatLegacyHeaderCell,owned.MatLegacyCell,owned.MatLegacyFooterCell]),[[true,true],[true,true],[true,true]]);
+  value.name='';assert.equal(value.name,'alpha/$ Beta');assert.equal(value.cssClassFriendlyName,'alpha---Beta');
+  assert.deepEqual(cellClasses(value,[owned.MatLegacyHeaderCell,owned.MatLegacyCell,owned.MatLegacyFooterCell]),[[true,true],[true,true],[true,true]]);
+  checks.push('historical-name-sanitization-dual-class-prefix-and-empty-write');
  }else{
   value.columns=['first','second'];value.ngOnChanges({columns:new core.SimpleChange(undefined,value.columns,true)});assert.equal(value.getColumnsDiff(),null);
   value.columns=['second','third'];const diff=value.getColumnsDiff(),added=[],removed=[];assert.ok(diff);diff.forEachAddedItem(r=>added.push(r.item));diff.forEachRemovedItem(r=>removed.push(r.item));assert.deepEqual(added,['third']);assert.deepEqual(removed,['first']);assert.equal(value.getColumnsDiff(),null);checks.push('actual-public-iterable-differ-add-remove-and-stable-repeat');
