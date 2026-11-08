@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "role": "Repair isolated select probe bindings and enforce named render mutation roster while preserving diagnostic paths",
+  "parent": "5b36c449ea6d950ba7317cd0696cd3da1632f44d",
+  "patch_sha256": "7e33dc53dd3bc942022a06616e80d243692510ba788b8b781bb6235b29d246ab",
+  "manifest_sha256": "9e861eb6b017ed8ea742b3cf494cc4f5089e935ff3d12de42a8fdfb599e6d70e",
+  "afterimages": {
+    "tests/menu_select_motion_runtime_probe.mjs": "6306ff2e14368c6aeb2b9071ad078f1391eee9cf7ad00380da84ae6e0b5625a3",
+    "tests/select_public_open_lifetime_probe.mjs": "e69ebc735fb3565715d0894318d19f924ceb892f48a66673a8d718674887d412",
+    "tests/test_select_render_runtime.py": "c5a95f8cd6f5490a893fdd20a2252524518445fcc60d57a1669af5561c448f08"
+  },
+  "independent_review": {
+    "sha256": "cab6b31f7723aa17e72019640b44fe50227a91a343cd67ed9b2d04b7d10909f2",
+    "text": "# Independent helper follow-up V3 review\n\nDisposition: no blocking finding in the bounded helper repair. V3 fixes the cross-working-directory relative-report regression from V2, preserves absolute requested outputs and exclusive creation, cleans up its default temporary output, and retains the exact per-line/per-mode mutation checks. Stale downstream source-evidence records and Group 036 remain separate owner work, not waived by this review.\n\nThe frozen patch and isolated owner-worktree diff both have SHA-256 `7e33dc53dd3bc942022a06616e80d243692510ba788b8b781bb6235b29d246ab`. The three beforeimages match the canonical checkout as observed for this review; no canonical file was edited. V3 changes the V2 wrapper to pass the caller's argument unchanged to the producer while resolving a relative output under `ROOT` for the wrapper's read/check. The superclass-protocol changes and mutation roster are unchanged from the V1/V2 review. Their stub does not exercise the actual Angular trait, constructors, node DI, browser, packed artifact or minimum-peer legacy component.\n\nIndependent controls used Node 24.21.0 and Python 3.14.7 in the owner's isolated worktree:\n\n- `tests.test_menu_select_motion_runtime` and `tests.test_select_render_runtime`: three focused tests passed (`focused.log`).\n- A fresh absolute `CLOSEOUT_SELECT_RENDER_REPORT` path passed and persisted a report (`absolute.log`, `absolute.json`).\n- From `/tmp`, with the worktree on `PYTHONPATH`, a relative requested path passed and persisted the report at its worktree-relative destination (`relative.log`, `relative.json`). This is the V2 failure reproduced in the prior independent report.\n- With the variable absent, a dedicated `TMPDIR` was empty after the passing run. V3 also explicitly asserts that its temporary report directory was removed.\n- An existing requested path produced `EEXIST`, failed the test as expected, and left the sentinel bytes unchanged (`existing.log`, `existing.json`).\n\nBoth retained full reports have ten rows: original zoneful development/production, main and 21.x each zoneful and zoneless in development/production. Four current zoneful rows contain five rejected named mutations and four current zoneless rows contain seven, for 48 total; the original rows contain none. The V3 test checks the exact names/order and rejection bits. The unchanged producer parses altered source and accepts only the targeted assertion error and message prefix; see the V1 report for the detailed producer review. `git diff --check` passed.\n\nEvidence SHA-256: `focused.log` `213b346ac4f1a33b73a455c4a8da2bba8046aafd5ca6fd12d46a2b1f9aebb709`; `absolute.log` `616f192f7825804a7d595c020a7e9b03a543ac3d1ca82c691d4e12ce99e95b56`; `relative.log` `dcc63d6a19e4b6ad8cc6605d886e419ebc80855d0dbb1ea539c8e3c3e036f7a3`; `existing.log` `d77b22e04bf671cf7b4807af30761cb2846845de1eb18387fd118bf8acdd79fe`; each retained full report `3a3952061b9f9449198faa50f2d100f869f8e866781fa5f5ff58f031634b28b2`. No full CI, native runtime, policy/guard requalification, Group 036 closure or release pass is claimed. The V1 report records the changed source-bound inputs and pre-existing earlier failures in the separate tooltip/select and focus evidence tests; those evidence owners must requalify their subjects rather than repin blindly.\n"
+  },
+  "root_check": {
+    "node": "24.21.0",
+    "python": "3.14.7",
+    "tests": 3,
+    "exit_code": 0,
+    "elapsed_seconds": 6.699,
+    "log_sha256": "5a670578b6b173db0452b7a5ab0f4df78d2c19810e795e6221b286f874b9b1e4",
+    "log": "test_public_select_open_and_stable_callback_lifetime (tests.test_menu_select_motion_runtime.MenuSelectMotionTests.test_public_select_open_and_stable_callback_lifetime) ... ok\ntest_real_owned_prototype_methods_and_specific_corruptions (tests.test_menu_select_motion_runtime.MenuSelectMotionTests.test_real_owned_prototype_methods_and_specific_corruptions) ... ok\ntest_content_initialization_font_transfer_and_teardown (tests.test_select_render_runtime.SelectRenderRuntimeTests.test_content_initialization_font_transfer_and_teardown) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 6.699s\n\nOK\n",
+    "explicit_report_persisted": true,
+    "report_sha256": "3a3952061b9f9449198faa50f2d100f869f8e866781fa5f5ff58f031634b28b2",
+    "subjects": 10,
+    "named_mutation_rejections": 48
+  },
+  "limits": [
+    "The two stripped select probe parents are explicit protocols, not actual Angular trait/DI/packed/floor qualification.",
+    "No product, style, golden or guard/ledger changes. Existing source-evidence consumers must qualify these new test images separately; their earlier stale frames remain open.",
+    "Group036 evidence coverage gap remains; no expected3-to2 waiver.",
+    "V1 diagnostic output regression and V2 relative-path regression are preserved as held versions; onlyV3 accepted.",
+    "No fullCI, G11, runtime/release clearance, push, Actions or credential changes."
+  ]
+}

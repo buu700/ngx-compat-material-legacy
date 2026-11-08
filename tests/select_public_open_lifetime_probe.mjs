@@ -47,8 +47,12 @@ function prototype(sources) {
   new Function('exports', 'Observable', 'take', ts.transpileModule(helperText, {compilerOptions: {
     target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS,
   }}).outputText)(helper, Observable, take);
-  new Function('exports', '_MatSelectMixinBase', 'take', 'takeUntil', declaration(sources.base, '_MatSelectBase'))(
-    base, class {}, take, takeUntil);
+  // This probe removes decorators and the owned class declaration's
+  // separate reactive trait implementation; retain a minimal superclass with
+  // the exact name referenced by _MatSelectBase.
+  new Function('exports', '_MatSelectMixinBase', 'take', 'takeUntil',
+    'const _MatSelectReactiveMixinBase = class extends _MatSelectMixinBase {};\n' +
+      declaration(sources.base, '_MatSelectBase'))(base, class {}, take, takeUntil);
   new Function('exports', '_MatSelectBase', 'take', 'takeUntil', 'getComputedStyle', 'afterSelectRender', declaration(sources.public, 'MatLegacySelect'))(
     derived, base._MatSelectBase, take, takeUntil, () => ({fontSize: '16px'}), helper.afterSelectRender);
   return derived.MatLegacySelect.prototype;

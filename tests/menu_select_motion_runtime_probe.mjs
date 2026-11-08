@@ -37,7 +37,12 @@ export function ownedPrototype(family, source = raw[family]) {
   }]);
   const stripped = transformed.transformed[0], printed = ts.createPrinter().printNode(ts.EmitHint.Unspecified, stripped, file);
   transformed.dispose();
-  const exports = {}, definitions = family === 'menu' ? "const ENTER_ANIMATION='mat-legacy-menu-enter',EXIT_ANIMATION='mat-legacy-menu-exit';" : 'class _MatSelectMixinBase {}';
+  const exports = {}, definitions = family === 'menu'
+    ? "const ENTER_ANIMATION='mat-legacy-menu-enter',EXIT_ANIMATION='mat-legacy-menu-exit';"
+    // The selected _MatSelectBase declaration extends a separately declared
+    // reactive mixin. Keep both inheritance names as protocols here; the test
+    // measures the owned prototype methods, not either mixin implementation.
+    : 'class _MatSelectMixinBase {}\nclass _MatSelectReactiveMixinBase extends _MatSelectMixinBase {}';
   new Function('exports', 'legacyHostMotionEvent', 'legacyNextMotionCompletion', 'take', 'takeUntil', emit(definitions + '\n' + printed))(exports, helperExports.legacyHostMotionEvent, helperExports.legacyNextMotionCompletion, take, takeUntil);
   return exports[name].prototype;
 }
