@@ -1,0 +1,314 @@
+{
+  "schema_version": 1,
+  "role": "current-tool-matrix-final-product-successor",
+  "base_commit": "04daa4f8c",
+  "source_commit": "6b88db228feff1f1598b50fbc00bc17e45d6c899",
+  "predecessor_packet": {
+    "path": "compatibility/rc/current-tool-matrix-input-successor-v1.json",
+    "sha256": "df06856c53ceedd1c3700e2e5b372e34442f04d82438c940fefebb8fe3c9381b",
+    "bytes": 14712
+  },
+  "predecessor_registry": {
+    "path": "compatibility/rc/final-product-prior-registry-v1.json",
+    "sha256": "9ea6a63cec33d906e2ccea1d5d0b32b9dc5582691adde4d48387b5ae9766de37",
+    "bytes": 1276085
+  },
+  "current_registry": {
+    "path": "compatibility/rc/final-product-registry-v1.json",
+    "sha256": "a9f85d57848d59e587711deb23c1b0cc066fa8a15b69c3443fb12eb5600ba8b8",
+    "bytes": 1278888
+  },
+  "new_cases": [
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#180",
+      "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "adaptation": "adapted",
+      "shared": null,
+      "full_name": "autocomplete legacy form-field outside boundary > keeps the panel open for input, overlay and hint clicks but closes for outside clicks",
+      "index": 180,
+      "kind": "direct"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#113",
+      "historical_path": "src/material/legacy-input/input.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "adaptation": "adapted",
+      "shared": null,
+      "full_name": "MatInput description ownership on control replacement > retains the new control external ID when it matches the old control user ID",
+      "index": 113,
+      "kind": "direct"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#114",
+      "historical_path": "src/material/legacy-input/input.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "adaptation": "adapted",
+      "shared": null,
+      "full_name": "MatInput description ownership on control replacement > preserves the new control external ID when the hint also changes",
+      "index": 114,
+      "kind": "direct"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#115",
+      "historical_path": "src/material/legacy-input/input.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "adaptation": "adapted",
+      "shared": null,
+      "full_name": "MatInput description ownership on view reuse > removes the former owned hint when a detached control is reinserted",
+      "index": 115,
+      "kind": "direct"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#116",
+      "historical_path": "src/material/legacy-input/input.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "adaptation": "adapted",
+      "shared": null,
+      "full_name": "MatInput legacy disabled behavior with current peer config > keeps native controls disabled and readonly independent of interactive-disabled config",
+      "index": 116,
+      "kind": "direct"
+    }
+  ],
+  "source_transitions": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683",
+        "bytes": 165528
+      },
+      "archive": {
+        "path": "compatibility/rc/final-matrix-prior-v1/projects__ngx-material-legacy__legacy-autocomplete__autocomplete.spec.ts.txt",
+        "sha256": "c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683",
+        "bytes": 165528
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "b831b4d3ac6f17f0a9de9d0cd5594f6154ab5fe2b479e9a3b5289dbc1aeed1b6",
+        "bytes": 168183
+      },
+      "edits": [
+        {
+          "offset": 165528,
+          "before": "",
+          "after": "\n@Component({\n  template: `\n    <mat-form-field>\n      <input matInput [matAutocomplete]=\"auto\" matAutocompletePosition=\"above\">\n      <mat-hint><button type=\"button\" class=\"hint-action\">Hint action</button></mat-hint>\n    </mat-form-field>\n    <mat-autocomplete #auto=\"matAutocomplete\"><mat-option value=\"one\">One</mat-option></mat-autocomplete>\n    <button type=\"button\" class=\"outside-action\">Outside</button>\n  `,\n})\nclass AutocompleteWithInteractiveHint {\n  @ViewChild(MatLegacyAutocompleteTrigger) trigger!: MatLegacyAutocompleteTrigger;\n}\n\ndescribe('autocomplete legacy form-field outside boundary', () => {\n  it('keeps the panel open for input, overlay and hint clicks but closes for outside clicks', fakeAsync(() => {\n    let zone!: MockNgZone;\n    TestBed.configureTestingModule({\n      imports: [MatLegacyAutocompleteModule, MatLegacyFormFieldModule, MatLegacyInputModule],\n      declarations: [AutocompleteWithInteractiveHint],\n      providers: [LEGACY_NOOP_ANIMATIONS, {provide: NgZone, useFactory: () => (zone = new MockNgZone())}],\n    });\n    TestBed.compileComponents();\n    const fixture = TestBed.createComponent(AutocompleteWithInteractiveHint);\n    fixture.detectChanges();\n    const trigger = fixture.componentInstance.trigger;\n    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;\n    const hint = fixture.nativeElement.querySelector('.hint-action') as HTMLButtonElement;\n    const outside = fixture.nativeElement.querySelector('.outside-action') as HTMLButtonElement;\n    const field = fixture.nativeElement.querySelector('mat-form-field') as HTMLElement;\n    const closed = jasmine.createSpy('closed');\n    trigger.autocomplete.closed.subscribe(closed);\n    input.focus();\n    trigger.openPanel();\n    fixture.detectChanges();\n    zone.simulateZoneExit();\n    tick();\n    expect(trigger.panelOpen).toBe(true);\n    dispatchMouseEvent(input, 'click');\n    expect(trigger.panelOpen).toBe(true);\n    const pane = TestBed.inject(OverlayContainer).getContainerElement().querySelector('.cdk-overlay-pane') as HTMLElement;\n    dispatchMouseEvent(pane, 'click');\n    expect(trigger.panelOpen).toBe(true);\n    expect(field.contains(hint)).toBe(true);\n    expect(field.querySelector('.mat-form-field-flex')!.contains(hint)).toBe(false);\n    hint.focus();\n    dispatchMouseEvent(hint, 'click');\n    expect(document.activeElement).toBe(hint);\n    expect(trigger.panelOpen).toBe(true);\n    expect(closed).not.toHaveBeenCalled();\n    outside.focus();\n    dispatchMouseEvent(outside, 'click');\n    expect(trigger.panelOpen).toBe(false);\n    expect(closed).toHaveBeenCalledTimes(1);\n    fixture.destroy();\n  }));\n});\n"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798",
+        "bytes": 43007
+      },
+      "archive": {
+        "path": "compatibility/rc/final-matrix-prior-v1/projects__ngx-material-legacy__legacy-autocomplete__internal__autocomplete-trigger-base.ts.txt",
+        "sha256": "058cfeaafc5f02799bbab843de7529f7e50eea6bd7fdd00cfb3692e2cea71798",
+        "bytes": 43007
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "803e95c96c22e5a6863a5f353f0485ec5a0431d04c9fe0b987031083ed7afaa9",
+        "bytes": 43131
+      },
+      "edits": [
+        {
+          "offset": 15153,
+          "before": "        const formField = this._formField\n          ? this._formField.getConnectedOverlayOrigin().nativeElement\n          : null;\n",
+          "after": "        // The connected overlay origin is the flex container, but the historical\n        // outside-click boundary is the entire owned legacy form-field host.\n        const formField = this._formField ? this._formField._elementRef.nativeElement : null;\n"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+        "sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+        "bytes": 27981
+      },
+      "archive": {
+        "path": "compatibility/rc/final-matrix-prior-v1/projects__ngx-material-legacy__legacy-form-field__form-field.ts.txt",
+        "sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+        "bytes": 27981
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+        "sha256": "a0ed827e6ac47802a886d87ab1c1c270c952c6a8fa45f65c5fdfc0f7472fabff",
+        "bytes": 28061
+      },
+      "edits": [
+        {
+          "offset": 10295,
+          "before": "  private _describedByIds: string[] | undefined;\n",
+          "after": "  private readonly _describedByIds = new WeakMap<MatFormFieldControl<unknown>, string[]>();\n"
+        },
+        {
+          "offset": 22147,
+          "before": "        const exclude = this._describedByIds || ids;\n",
+          "after": "        const exclude = this._describedByIds.get(this._control) || ids;\n"
+        },
+        {
+          "offset": 22391,
+          "before": "      this._describedByIds = ids;\n",
+          "after": "      this._describedByIds.set(this._control, ids);\n"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+        "sha256": "ab1073120be461d9451eaed8bc3c83768d3c5a60f8ca55c854ae471f7e19e289",
+        "bytes": 85103
+      },
+      "archive": {
+        "path": "compatibility/rc/final-matrix-prior-v1/projects__ngx-material-legacy__legacy-input__input.spec.ts.txt",
+        "sha256": "ab1073120be461d9451eaed8bc3c83768d3c5a60f8ca55c854ae471f7e19e289",
+        "bytes": 85103
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+        "sha256": "b6698d0bc2d680b0d2732736d2386199b1c499693fbc1c645350ab29d5036a33",
+        "bytes": 93349
+      },
+      "edits": [
+        {
+          "offset": 297,
+          "before": "",
+          "after": "  Input,\n"
+        },
+        {
+          "offset": 388,
+          "before": "",
+          "after": "  EmbeddedViewRef,\n  OnChanges,\n  OnDestroy,\n  TemplateRef,\n  ViewContainerRef,\n"
+        },
+        {
+          "offset": 1107,
+          "before": "",
+          "after": "import {MAT_INPUT_CONFIG} from '@angular/material/input';\n"
+        },
+        {
+          "offset": 85103,
+          "before": "",
+          "after": "\n@Directive({selector: '[externalDescription]'})\nclass ExternalDescriptionDirective {\n  constructor(element: ElementRef<HTMLInputElement>) {\n    element.nativeElement.setAttribute('aria-describedby', 'outside');\n  }\n}\n\n@Component({\n  template: `\n    <span id=\"outside\">External text</span>\n    <mat-form-field>\n      @if (swap) {\n        <input matInput #control=\"matInput\" externalDescription>\n      } @else {\n        <input matInput #control=\"matInput\" aria-describedby=\"outside\">\n      }\n      @if (swap && changeHint) {\n        <mat-hint id=\"hint-two\">Hint two</mat-hint>\n      } @else {\n        <mat-hint id=\"hint\">Hint</mat-hint>\n      }\n    </mat-form-field>`,\n})\nclass MatInputSwappedDescriptionControl {\n  swap = false;\n  changeHint = false;\n  @ViewChild('control') control: MatLegacyInput;\n}\n\ndescribe('MatInput description ownership on control replacement', () => {\n  it('retains the new control external ID when it matches the old control user ID', () => {\n    const fixture = createComponent(MatInputSwappedDescriptionControl, [], [],\n      [ExternalDescriptionDirective]);\n    fixture.detectChanges();\n    const previous = fixture.nativeElement.querySelector('input') as HTMLInputElement;\n    expect(previous.getAttribute('aria-describedby')).toBe('outside hint');\n    fixture.componentInstance.swap = true;\n    fixture.componentInstance.control.stateChanges.next();\n    fixture.detectChanges();\n    const current = fixture.nativeElement.querySelector('input') as HTMLInputElement;\n    expect(current).not.toBe(previous);\n    expect(current.getAttribute('aria-describedby')).toBe('hint outside');\n  });\n\n  it('preserves the new control external ID when the hint also changes', () => {\n    const fixture = createComponent(MatInputSwappedDescriptionControl, [], [],\n      [ExternalDescriptionDirective]);\n    fixture.detectChanges();\n    const previous = fixture.nativeElement.querySelector('input') as HTMLInputElement;\n    expect(previous.getAttribute('aria-describedby')).toBe('outside hint');\n    fixture.componentInstance.swap = true;\n    fixture.componentInstance.changeHint = true;\n    fixture.componentInstance.control.stateChanges.next();\n    fixture.detectChanges();\n    const current = fixture.nativeElement.querySelector('input') as HTMLInputElement;\n    expect(current).not.toBe(previous);\n    expect(current.getAttribute('aria-describedby')).toBe('hint-two outside');\n  });\n});\n\n@Directive({selector: '[cacheFirst]'})\nclass CachedInputViews implements OnChanges, OnDestroy {\n  @Input() cacheFirst: TemplateRef<unknown>;\n  @Input() cacheSecond: TemplateRef<unknown>;\n  @Input() cacheActive = 'a';\n  private readonly _views = new Map<string, EmbeddedViewRef<unknown>>();\n  private _active = '';\n\n  constructor(private _container: ViewContainerRef) {}\n\n  ngOnChanges() {\n    if (!this.cacheFirst || !this.cacheSecond || this._active === this.cacheActive) return;\n    if (this._container.length) this._container.detach(0);\n    let view = this._views.get(this.cacheActive);\n    if (view) {\n      this._container.insert(view);\n    } else {\n      view = this._container.createEmbeddedView(\n        this.cacheActive === 'a' ? this.cacheFirst : this.cacheSecond,\n      );\n      this._views.set(this.cacheActive, view);\n    }\n    this._active = this.cacheActive;\n  }\n\n  ngOnDestroy() {\n    this._views.forEach(view => view.destroy());\n  }\n}\n\n@Component({\n  template: `\n    <mat-form-field>\n      <ng-container [cacheFirst]=\"first\" [cacheSecond]=\"second\" [cacheActive]=\"which\"></ng-container>\n      <mat-hint [id]=\"hint\">Hint</mat-hint>\n      <ng-template #first><input matInput #control=\"matInput\" data-name=\"A\"></ng-template>\n      <ng-template #second><input matInput #control=\"matInput\" data-name=\"B\"></ng-template>\n    </mat-form-field>`,\n})\nclass MatInputReusedDescriptionControl {\n  which = 'a';\n  hint = 'hint-a';\n  @ViewChild('control') control: MatLegacyInput;\n}\n\ndescribe('MatInput description ownership on view reuse', () => {\n  it('removes the former owned hint when a detached control is reinserted', () => {\n    const fixture = createComponent(MatInputReusedDescriptionControl, [], [], [CachedInputViews]);\n    fixture.detectChanges();\n    const first = fixture.nativeElement.querySelector('input') as HTMLInputElement;\n    expect(first.getAttribute('aria-describedby')).toBe('hint-a');\n    fixture.componentInstance.which = 'b';\n    fixture.componentInstance.hint = 'hint-b';\n    fixture.componentInstance.control.stateChanges.next();\n    fixture.detectChanges();\n    const second = fixture.nativeElement.querySelector('input') as HTMLInputElement;\n    expect(second).not.toBe(first);\n    expect(second.getAttribute('aria-describedby')).toBe('hint-b');\n    fixture.componentInstance.which = 'a';\n    fixture.componentInstance.hint = 'hint-c';\n    fixture.componentInstance.control.stateChanges.next();\n    fixture.detectChanges();\n    const again = fixture.nativeElement.querySelector('input') as HTMLInputElement;\n    expect(again).toBe(first);\n    expect(again.getAttribute('aria-describedby')).toBe('hint-c');\n  });\n});\n\n@Component({\n  template: `\n    <mat-form-field><input matInput [disabled]=\"disabled\" [readonly]=\"readonly\"></mat-form-field>\n    <mat-form-field><textarea matInput [disabled]=\"disabled\" [readonly]=\"readonly\"></textarea></mat-form-field>\n    <mat-form-field><select matNativeControl [disabled]=\"disabled\" [readonly]=\"readonly\">\n      <option>One</option><option>Two</option>\n    </select></mat-form-field>\n    <mat-form-field><input matInput [formControl]=\"control\"></mat-form-field>\n    <mat-form-field><input matInput [disabled]=\"disabled\" aria-disabled=\"false\"></mat-form-field>\n    <mat-form-field><input matInput [disabled]=\"disabled\" [attr.aria-disabled]=\"ariaDisabled\"></mat-form-field>\n    <mat-form-field><input matInput [disabled]=\"disabled\" [disabledInteractive]=\"true\"></mat-form-field>`,\n})\nclass MatInputDisabledPeerConfig {\n  control = new FormControl({value: '', disabled: true});\n  ariaDisabled: string | null = 'false';\n  disabled = true;\n  readonly = false;\n}\n\ndescribe('MatInput legacy disabled behavior with current peer config', () => {\n  it('keeps native controls disabled and readonly independent of interactive-disabled config', () => {\n    const fixture = createComponent(MatInputDisabledPeerConfig, [\n      {provide: MAT_INPUT_CONFIG, useValue: {disabledInteractive: true}},\n    ]);\n    fixture.detectChanges();\n    const elements = Array.from(fixture.nativeElement.querySelectorAll('input, textarea, select')) as\n      (HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement)[];\n    expect(elements.length).toBe(7);\n    elements.forEach(element => {\n      expect(element.disabled).toBe(true);\n      expect(element.classList.contains('mat-mdc-input-disabled-interactive')).toBe(false);\n    });\n    expect((elements[0] as HTMLInputElement).readOnly).toBe(false);\n    expect((elements[1] as HTMLTextAreaElement).readOnly).toBe(false);\n    expect(elements[0].getAttribute('aria-disabled')).toBeNull();\n    expect(elements[2].getAttribute('aria-disabled')).toBeNull();\n    expect(elements[4].getAttribute('aria-disabled')).toBe('false');\n    expect(elements[5].getAttribute('aria-disabled')).toBe('false');\n    fixture.componentInstance.ariaDisabled = 'true';\n    fixture.componentInstance.disabled = false;\n    fixture.componentInstance.readonly = true;\n    fixture.componentInstance.control.enable();\n    fixture.detectChanges();\n    elements.forEach(element => expect(element.disabled).toBe(false));\n    expect((elements[0] as HTMLInputElement).readOnly).toBe(true);\n    expect((elements[1] as HTMLTextAreaElement).readOnly).toBe(true);\n    expect(elements[2].hasAttribute('readonly')).toBe(false);\n    expect(elements[4].getAttribute('aria-disabled')).toBe('false');\n    expect(elements[5].getAttribute('aria-disabled')).toBe('true');\n    fixture.componentInstance.ariaDisabled = null;\n    fixture.detectChanges();\n    expect(elements[5].getAttribute('aria-disabled')).toBeNull();\n    fixture.componentInstance.control.disable();\n    fixture.detectChanges();\n    expect(elements[3].disabled).toBe(true);\n  });\n});\n"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/input.ts",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-input/input.ts",
+        "sha256": "bfa91322a82df274acedc1eee030f03083470f254cee0e0f49207c11ef4db550",
+        "bytes": 2826
+      },
+      "archive": {
+        "path": "compatibility/rc/final-matrix-prior-v1/projects__ngx-material-legacy__legacy-input__input.ts.txt",
+        "sha256": "bfa91322a82df274acedc1eee030f03083470f254cee0e0f49207c11ef4db550",
+        "bytes": 2826
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-input/input.ts",
+        "sha256": "aaa55d58b06ef58c6dfca26053854696526e3529e7ed15ba3ef382ec323e8532",
+        "bytes": 3997
+      },
+      "edits": [
+        {
+          "offset": 238,
+          "before": "import {Directive, inject} from '@angular/core';\n",
+          "after": "import {Directive, ElementRef, inject} from '@angular/core';\n"
+        },
+        {
+          "offset": 1353,
+          "before": "",
+          "after": "    '[class.mat-mdc-input-disabled-interactive]': 'false',\n    // Preserve native disabled/readonly behavior even when the current peer enables\n    // interactive-disabled controls globally.\n    '[disabled]': 'disabled',\n    '[attr.readonly]': '_legacyReadonlyAttribute()',\n    '[attr.aria-disabled]': '_legacyAriaDisabled',\n"
+        },
+        {
+          "offset": 1993,
+          "before": "",
+          "after": "  private readonly _legacyElement = inject<ElementRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>>(ElementRef);\n  /** @docs-private Host binding preserves the consumer-supplied aria-disabled value. */\n  protected _legacyAriaDisabled: string | null = null;\n\n  override ngDoCheck() {\n    // The frozen legacy control has always been natively disabled.\n    this.disabledInteractive = false;\n    super.ngDoCheck();\n    this._legacyAriaDisabled = this._legacyElement.nativeElement.getAttribute('aria-disabled');\n  }\n\n  /** @docs-private Host binding preserves the historical native readonly behavior. */\n  protected _legacyReadonlyAttribute(): string | null {\n    return this.readonly && this._legacyElement.nativeElement.nodeName.toLowerCase() !== 'select'\n      ? 'true' : null;\n  }\n"
+        },
+        {
+          "offset": 2241,
+          "before": "",
+          "after": "    this.disabledInteractive = false;\n"
+        }
+      ]
+    }
+  ],
+  "structural_transitions": [
+    {
+      "path": "compatibility/rc/matrices/full-verify.json",
+      "before": {
+        "path": "compatibility/rc/matrices/full-verify.json",
+        "sha256": "031ce547200b182c743daa9d1640645b39fe35d07f9eb327af0366d0e7356d92",
+        "bytes": 633834
+      },
+      "archive": {
+        "path": "compatibility/rc/final-matrix-prior-v1/compatibility__rc__matrices__full-verify.json.txt",
+        "sha256": "031ce547200b182c743daa9d1640645b39fe35d07f9eb327af0366d0e7356d92",
+        "bytes": 633834
+      },
+      "after": {
+        "path": "compatibility/rc/matrices/full-verify.json",
+        "sha256": "3aa514861b6965e6188b5126b4316847d5fc49e64da0a9fb38f3864870c362b6",
+        "bytes": 634418
+      },
+      "edits": [
+        {
+          "offset": 43553,
+          "before": "",
+          "after": "              \"historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#180\",\n"
+        },
+        {
+          "offset": 123391,
+          "before": "",
+          "after": "              \"historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#113\",\n              \"historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#114\",\n              \"historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#115\",\n              \"historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#116\",\n"
+        }
+      ]
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "before": {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "317aca2c5f660f038a5bad085d772b73c43aa05f600e821a70a737f333f80409",
+        "bytes": 112206
+      },
+      "archive": {
+        "path": "compatibility/rc/final-matrix-prior-v1/testing__legacy-runner__historical-inventory.json.txt",
+        "sha256": "317aca2c5f660f038a5bad085d772b73c43aa05f600e821a70a737f333f80409",
+        "bytes": 112206
+      },
+      "after": {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15",
+        "bytes": 113388
+      },
+      "edits": [
+        {
+          "offset": 791,
+          "before": "      \"candidate_sha256\": \"c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683\",\n",
+          "after": "      \"candidate_sha256\": \"b831b4d3ac6f17f0a9de9d0cd5594f6154ab5fe2b479e9a3b5289dbc1aeed1b6\",\n"
+        },
+        {
+          "offset": 5144,
+          "before": "",
+          "after": "        },\n        {\n          \"candidate_sha256\": \"c049c617e9a3dc7f59c6383d0391e6d59813f5b6ca72374db3c3082e1f8b1683\",\n          \"adaptation\": \"adapted\",\n          \"execution\": {\n            \"state\": \"not-executed\",\n            \"bound_to_current_head\": false,\n            \"receipt\": null,\n            \"note\": \"Source identity refreshed; no current-HEAD execution receipt.\"\n          },\n          \"current_source_binding\": false,\n          \"reason\": \"Prior complete candidate identity and execution state retained before the final reviewed product regression additions; no execution credit.\"\n"
+        },
+        {
+          "offset": 33342,
+          "before": "      \"candidate_sha256\": \"ab1073120be461d9451eaed8bc3c83768d3c5a60f8ca55c854ae471f7e19e289\",\n",
+          "after": "      \"candidate_sha256\": \"b6698d0bc2d680b0d2732736d2386199b1c499693fbc1c645350ab29d5036a33\",\n"
+        },
+        {
+          "offset": 35283,
+          "before": "",
+          "after": "        },\n        {\n          \"candidate_sha256\": \"ab1073120be461d9451eaed8bc3c83768d3c5a60f8ca55c854ae471f7e19e289\",\n          \"adaptation\": \"adapted\",\n          \"execution\": {\n            \"state\": \"not-executed\",\n            \"bound_to_current_head\": false,\n            \"receipt\": null,\n            \"note\": \"Source identity refreshed; no current-HEAD execution receipt.\"\n          },\n          \"current_source_binding\": false,\n          \"reason\": \"Prior complete candidate identity and execution state retained before the final reviewed product regression additions; no execution credit.\"\n"
+        }
+      ]
+    }
+  ],
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false
+}

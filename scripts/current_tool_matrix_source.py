@@ -13,6 +13,7 @@ SELF = 'scripts/current_tool_matrix_source.py'
 _IMAGE = Path(__file__).read_bytes()
 PACKET = dict(path='compatibility/rc/current-tool-matrix-source-successor-v1.json', sha256='c549c141764d499b30cd46fede7138ea89903a6d7e709f144ed5eb528fcd3e10', bytes=14943)
 INPUT_PACKET = dict(path='compatibility/rc/current-tool-matrix-input-successor-v1.json', sha256='df06856c53ceedd1c3700e2e5b372e34442f04d82438c940fefebb8fe3c9381b', bytes=14712)
+FINAL_PACKET = dict(path='compatibility/rc/current-tool-matrix-final-product-v1.json', sha256='ddb70c833108cd3e446a46b29561b7d3ca89f7a50bfe18acad931a83ebc2d077', bytes=26543)
 PARENT, COMMIT = ('aec05d8f6baf3dfdd92581504291309992abcb89', '1e26eefba6fa380b520ae05cb6f9ff3ea734545a')
 POINTER_PARENT, POINTER_COMMIT = ('d648f9de6d325aab1f858130d0cb8d93e5e5adaa', '45bbb3016f631296c08cf0eaa5f54a0e61455cf1')
 NEW_CASE = 'historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#179'
@@ -101,6 +102,27 @@ class CurrentToolMatrixSource:
 
         def git(*args):
             return subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0', *args], cwd=self.root, env=env)
+        final = json.loads(self._member(FINAL_PACKET))
+        _require(final['schema_version'] == 1 and final['role'] == 'current-tool-matrix-final-product-successor' and final['base_commit'] == '04daa4f8c' and final['source_commit'] == '6b88db228feff1f1598b50fbc00bc17e45d6c899' and final['historical_programs_executed'] is False and final['artifact_or_audit_admission_granted'] is False and final['predecessor_packet'] == INPUT_PACKET)
+        git('merge-base', '--is-ancestor', final['base_commit'], final['source_commit'])
+        transitions = final['source_transitions'] + final['structural_transitions']; _require(len(final['source_transitions']) == 5 and len(final['structural_transitions']) == 2)
+        for t in transitions:
+            _require(t['before']['path'] == t['after']['path'] == t['path']); old = self._member(t['archive']); now = self._member(t['after']); _match(old,t['before']); _require(_replay(old,t['edits']) == now)
+            if t in final['source_transitions']: _require(git('show',final['base_commit']+':'+t['path']) == old and git('show',final['source_commit']+':'+t['path']) == now)
+        def old_member(ref):
+            t = next((x for x in transitions if x['path'] == ref['path'] and x['before']['sha256'] == ref['sha256'] and x['before']['bytes'] == ref['bytes']), None)
+            return self._member(t['archive']) if t is not None else self._member(ref)
+        old_roster = json.loads(self._member(final['predecessor_registry'])); new_roster = json.loads(self._member(final['current_registry']))
+        _require(final['predecessor_registry']['sha256'] == '9ea6a63cec33d906e2ccea1d5d0b32b9dc5582691adde4d48387b5ae9766de37' and len(old_roster['cases']) == 2324 and len(new_roster['cases']) == 2329 and len(final['new_cases']) == 5)
+        add_ids = [x['case_id'] for x in final['new_cases']]; _require([x.split('/')[-1] for x in add_ids] == ['autocomplete.spec.ts#180','input.spec.ts#113','input.spec.ts#114','input.spec.ts#115','input.spec.ts#116'] and len(set(add_ids)) == 5)
+        for row in final['new_cases']: _require(next(x for x in new_roster['cases'] if x['case_id'] == row['case_id']) == row)
+        restored = copy.deepcopy(new_roster); restored['cases'] = [x for x in restored['cases'] if x['case_id'] not in add_ids]; restored['ids'] = [x for x in restored['ids'] if x not in add_ids]; restored['direct_cases'] -= 5; _require(restored == old_roster)
+        mt,it = final['structural_transitions']; _require(mt['path'] == 'compatibility/rc/matrices/full-verify.json' and it['path'] == 'testing/legacy-runner/historical-inventory.json')
+        old_m,new_m = json.loads(self._member(mt['archive'])),json.loads(self._member(mt['after'])); ids=lambda x:x['checks'][4]['acceptance']['cases_by_line']['main']['original-and-shared-cases']; _require(ids(old_m) == old_roster['ids'] and ids(new_m) == new_roster['ids']); restored_m=copy.deepcopy(new_m); restored_m['checks'][4]['acceptance']['cases_by_line']['main']['original-and-shared-cases']=ids(old_m); _require(restored_m == old_m)
+        old_i,new_i=json.loads(self._member(it['archive'])),json.loads(self._member(it['after'])); restored_i=copy.deepcopy(new_i); _require(len(old_i['rows']) == 57 and len(old_i['shared_suite_shims']) == 21)
+        for path in ('projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts','projects/ngx-material-legacy/legacy-input/input.spec.ts'):
+            a=[x for x in old_i['rows'] if x['candidate'] == path]; b=[x for x in restored_i['rows'] if x['candidate'] == path]; t=next(x for x in final['source_transitions'] if x['path'] == path); _require(len(a) == len(b) == 1 and a[0]['candidate_sha256'] == t['before']['sha256'] and b[0]['candidate_sha256'] == t['after']['sha256']); snapshot=b[0]['prior_candidate_snapshots'].pop(); _require(snapshot['candidate_sha256'] == a[0]['candidate_sha256'] and snapshot['adaptation'] == a[0]['adaptation'] and snapshot['execution'] == a[0]['execution'] and snapshot['current_source_binding'] is False and bool(snapshot['reason'])); b[0]['candidate_sha256']=a[0]['candidate_sha256']
+        _require(restored_i == old_i)
         for parent, commit in ((PARENT, COMMIT), (POINTER_PARENT, POINTER_COMMIT)):
             if not git('rev-list', '--parents', '-n', '1', commit).decode().strip() == commit + ' ' + parent:
                 raise AssertionError()
@@ -129,7 +151,7 @@ class CurrentToolMatrixSource:
         edit = input['matrix_edit']; _require(set(edit) == {'offset', 'before', 'after'} and edit['before'] == '')
         _require(type(edit['offset']) is int and 0 <= edit['offset'] <= len(after) and type(edit['after']) is str)
         pos = edit['offset']; latest = after[:pos] + edit['after'].encode() + after[pos:]
-        _match(latest, input['matrix_after']); _require(self._member(input['matrix_after']) == latest)
+        _match(latest, input['matrix_after']); _require(old_member(input['matrix_after']) == latest)
         edges = [('95ae89744396d3071b386058c85ba388f0301020','8a0c4866dba602bd1f9c9916128f7537d986e0b9','projects/ngx-material-legacy/legacy-input/input.spec.ts'), ('8a0c4866dba602bd1f9c9916128f7537d986e0b9','313984c7fe1a2d13bccd0afc33ac17d66cc1d8c5','projects/ngx-material-legacy/legacy-input/input.spec.ts'), ('95ae89744396d3071b386058c85ba388f0301020','8a0c4866dba602bd1f9c9916128f7537d986e0b9','projects/ngx-material-legacy/legacy-form-field/form-field.ts')]
         _require(len(input['product_transitions']) == len(edges))
         for (parent, commit, path), transition in zip(edges, input['product_transitions']):
@@ -138,7 +160,7 @@ class CurrentToolMatrixSource:
             a, b = git('show', parent + ':' + path), git('show', commit + ':' + path)
             _match(a, transition['before']); _match(b, transition['after']); _require(_replay(a, transition['edits']) == b)
         _require(input['current_product_refs'] == [input['product_transitions'][1]['after'], input['product_transitions'][2]['after']])
-        for ref in input['current_product_refs']: self._member(ref)
+        for ref in input['current_product_refs']: old_member(ref)
         _require(len(input['reviews']) == 2)
         repair_review, input_review = [json.loads(self._member(ref)) for ref in input['reviews']]
         _require(repair_review['parent'] == edges[0][0] and input_review['parent'] == edges[1][0])
@@ -153,7 +175,7 @@ class CurrentToolMatrixSource:
         _require(input['inventory_before']['path'] == input['inventory_after']['path'] == 'testing/legacy-runner/historical-inventory.json')
         _require(input['inventory_candidate'] == input['product_transitions'][1]['path'])
         old_inventory = git('show', COMMIT + ':' + input['inventory_before']['path']); _match(old_inventory, input['inventory_before'])
-        new_inventory = _replay(old_inventory, input['inventory_edits']); _match(new_inventory, input['inventory_after']); _require(self._member(input['inventory_after']) == new_inventory)
+        new_inventory = _replay(old_inventory, input['inventory_edits']); _match(new_inventory, input['inventory_after']); _require(old_member(input['inventory_after']) == new_inventory)
         old_inventory_data, new_inventory_data = json.loads(old_inventory), json.loads(new_inventory)
         matches_old = [row for row in old_inventory_data['rows'] if row['candidate'] == input['inventory_candidate']]
         matches_new = [row for row in new_inventory_data['rows'] if row['candidate'] == input['inventory_candidate']]
@@ -173,7 +195,7 @@ class CurrentToolMatrixSource:
         current_spec = git('show', POINTER_COMMIT + ':' + pointer['after']['path'])
         _match(prior_spec, pointer['before'])
         _match(current_spec, pointer['after'])
-        if not (current_spec.startswith(prior_spec) and _hash(current_spec[len(prior_spec):]) == pointer['append_sha256'] and (self._member(pointer['after']) == current_spec)):
+        if not (current_spec.startswith(prior_spec) and _hash(current_spec[len(prior_spec):]) == pointer['append_sha256'] and (old_member(pointer['after']) == current_spec)):
             raise AssertionError()
         if not len(packet['reviews']) == 2:
             raise AssertionError()
@@ -225,12 +247,12 @@ class CurrentToolMatrixSource:
                 raise AssertionError()
         for path, sha256 in review['current_files'].items():
             if path == packet['after']['path']:
-                _require(sha256 == packet['after']['sha256']); self._member(input['matrix_after'])
+                _require(sha256 == packet['after']['sha256']); old_member(input['matrix_after'])
             elif path == input['inventory_before']['path']:
-                _require(sha256 == input['inventory_before']['sha256']); self._member(input['inventory_after'])
+                _require(sha256 == input['inventory_before']['sha256']); old_member(input['inventory_after'])
             else:
                 _require(_hash(self._read(path)) == sha256)
-        self._before_ref, self._intermediate_ref, self._after_ref, self._before, self._intermediate = (tuple(sorted(packet['before'].items())), tuple(sorted(packet['after'].items())), tuple(sorted(input['matrix_after'].items())), before, after)
+        self._before_ref, self._intermediate_ref, self._after_ref, self._before, self._intermediate = (tuple(sorted(packet['before'].items())), tuple(sorted(packet['after'].items())), tuple(sorted(final['structural_transitions'][0]['after'].items())), before, after)
         self._sweep()
 
     def _read(self, path):
