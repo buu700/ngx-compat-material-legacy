@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {Directive, inject} from '@angular/core';
+import {Directive, ElementRef, inject} from '@angular/core';
 import {MatInput as BaseMatInput} from '@angular/material/input';
 import {
   MatLegacyFormFieldControl,
@@ -35,6 +35,12 @@ import {
     '[class.mat-mdc-form-field-input-control]': 'false',
     '[class.mdc-text-field__input]': 'false',
     '[class.mat-mdc-native-select-inline]': 'false',
+    '[class.mat-mdc-input-disabled-interactive]': 'false',
+    // Preserve native disabled/readonly behavior even when the current peer enables
+    // interactive-disabled controls globally.
+    '[disabled]': 'disabled',
+    '[attr.readonly]': '_legacyReadonlyAttribute()',
+    '[attr.aria-disabled]': '_legacyAriaDisabled',
     // At the time of writing, we have a lot of customer tests that look up the input based on its
     // placeholder. Since we sometimes omit the placeholder attribute from the DOM to prevent screen
     // readers from reading it twice, we have to keep it somewhere in the DOM for the lookup.
@@ -45,6 +51,22 @@ import {
 })
 export class MatLegacyInput extends BaseMatInput {
   private _legacyFormField = inject<MatLegacyFormField>(MAT_LEGACY_FORM_FIELD, {optional: true});
+  private readonly _legacyElement = inject<ElementRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>>(ElementRef);
+  /** @docs-private Host binding preserves the consumer-supplied aria-disabled value. */
+  protected _legacyAriaDisabled: string | null = null;
+
+  override ngDoCheck() {
+    // The frozen legacy control has always been natively disabled.
+    this.disabledInteractive = false;
+    super.ngDoCheck();
+    this._legacyAriaDisabled = this._legacyElement.nativeElement.getAttribute('aria-disabled');
+  }
+
+  /** @docs-private Host binding preserves the historical native readonly behavior. */
+  protected _legacyReadonlyAttribute(): string | null {
+    return this.readonly && this._legacyElement.nativeElement.nodeName.toLowerCase() !== 'select'
+      ? 'true' : null;
+  }
 
   /** Construct through Angular node DI; retired dependency arguments must not be ignored. */
   constructor() {
@@ -52,6 +74,7 @@ export class MatLegacyInput extends BaseMatInput {
       throw new Error('MatLegacyInput manual dependency arguments are not supported.');
     }
     super();
+    this.disabledInteractive = false;
   }
 
   protected override _getPlaceholder() {

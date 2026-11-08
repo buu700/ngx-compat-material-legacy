@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "role": "Restore Material16 native disabled and readonly behavior under current Material configuration",
+  "parent": "fd1c105ec8d049f02b8c2240fb7e6b5cfd98efe0",
+  "incremental_patch_sha256": "a48c105cf5cb86860eb33944d2467504669afd5ffbfe1bf938be7ce1be9c114e",
+  "composition_manifest_sha256": "8a99150f3bbc92454f60273f627a16bd119e701cc8864e9b1668e1e97232ae6a",
+  "standalone_patch_sha256": "5b6c4c34229b5b162b19f50649f1921f76e944014c90f0ebffc8581b040b36d3",
+  "afterimages": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/input.ts",
+      "before_sha256": "bfa91322a82df274acedc1eee030f03083470f254cee0e0f49207c11ef4db550",
+      "after_sha256": "aaa55d58b06ef58c6dfca26053854696526e3529e7ed15ba3ef382ec323e8532",
+      "bytes": 3997
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "before_sha256": "adaa537dbaf11af77b3526d6abfd5cb6950979e727bf9a170ff40fc74859bd31",
+      "after_sha256": "b6698d0bc2d680b0d2732736d2386199b1c499693fbc1c645350ab29d5036a33",
+      "bytes": 93349
+    }
+  ],
+  "standalone_independent_review": {
+    "sha256": "23b88058baad0a6e07c66ad9a43064ba00c7c0ff207702100f358f79c01874c2",
+    "text": "# Independent legacy native-input disabled fix V6 review\n\nDisposition: no blocking behavioral finding in the bounded tests and source review. This approves the standalone V6 repair for consideration, subject to a specific API disposition for the added protected members and requalification of any later composition with the separately owned control-swap patch. No canonical source was changed.\n\nThe exact patch SHA-256 is `5b6c4c34229b5b162b19f50649f1921f76e944014c90f0ebffc8581b040b36d3`. It applied cleanly to independent copies of the two current canonical input files. The resulting product `input.ts` SHA-256 `aaa55d58b06ef58c6dfca26053854696526e3529e7ed15ba3ef382ec323e8532` equals the source content in the candidate package source map; resulting spec SHA-256 `7dd6b5e59fa76619c7b3fcaa81cc34853fef8ce6ed9622bfe52a2e93ce637280` matches the owner's reported family test source. The baseline package's mapped input source hash `bfa91322a82df274acedc1eee030f03083470f254cee0e0f49207c11ef4db550` matches canonical input source at 04daa4f8c. The baseline and candidate are diagnostic synthetic packs, not newly produced coordinator-bound artifacts.\n\nTagged 16.2.14 `src/material/input/input.ts` binds native `disabled` to its disabled state and readonly only for a readonly non-select. Current peer 22.1.7 exposes public `disabledInteractive` and `ngDoCheck()` with no deprecation/docs-private tags. The patch forces the inherited interactive setting false after parent construction and before parent `ngDoCheck`, supplies native disabled and non-select readonly bindings, suppresses the peer interactive MDC class, and snapshots the current authored `aria-disabled` attribute for the owned host binding. It imports no peer private symbols and makes no consumer HTML/CSS/SCSS change. It intentionally neutralizes the inherited `disabledInteractive` input at check time: this is behaviorally conservative relative to Material 16, but consumers can still see that inherited input in the current Angular declaration. The API owner agrees this should not be advertised as a supported legacy feature. The candidate declaration also adds protected `@docs-private` `_legacyAriaDisabled` and `_legacyReadonlyAttribute`, as required by strict Angular host-template compilation; these need a specific proof-backed API disposition and must not be silently ignored as a blanket docs-private exception.\n\nIndependent actual AOT browser test used the owner candidate tar SHA-256 `b06a4e25f73c262f5cd7824de705a5591f1e4026ea4895ce4e2a5b29a34efe31` and baseline tar `fbea62412013d2915c27801117dfda44ff550a0c392d599b4846c46719dd6a8c`, Angular/CDK/Material 22.1.7, Node 24.21.0 and Chrome/149.0.7827.0 via the existing raw helper; no browser-disabling flags were supplied and sandbox state was not queried. In a separate zoneless strict-template standalone app with global peer config `disabledInteractive:true`, plus one explicit `[disabledInteractive]=\"true\"`, initial input, textarea, select, reactive form control and static/dynamic ARIA controls all had native disabled true and no interactive MDC class on candidate. The baseline produced native disabled false on all six; input and textarea acquired readonly and the select was interactive. Candidate enable/readonly and subsequent disable/reactive-control transitions were correct; authored static `aria-disabled=\"false\"` survived, dynamic null\u2192true\u2192false\u2192null was preserved, and external attribute add/remove was reflected. The public inherited property read false after checking. `assert-results.mjs` accepts candidate, rejects the baseline, and rejects four deliberately altered observation objects; those are assertion controls, not mutated library runtimes.\n\nA separate Angular 22.1.7 `renderApplication` SSR test with strict full-AOT app compilation and the same candidate package rendered disabled input, textarea and native select; all serialized the disabled attribute without readonly or interactive MDC class, and the author's `aria-disabled=\"false\"` survived. The library's partial code was handled at runtime with the Angular compiler/JIT fallback, not a fully linked production SSR bundle. The first SSR attempt failed the platform's host validation before rendering; a rerun explicitly allowed only localhost and passed. This does not qualify hydration or arbitrary server/custom renderers.\n\nThe owner reports strict AOT packing and an artifact-mode input family result of 152/153 baseline versus 153/153 candidate, with the one appended regression failing only on baseline. I inspected the retained totals and source-map identity; I did not independently rerun that family suite. Owner's earlier Chromium keyboard observation and roster comparison are retained in `input-disabled-fix-v6-report.md`. The family reports do not self-bind an artifact hash, so they are not coordinator-bound release evidence.\n\nEvidence SHA-256: `fixture/main.ts` `357cfd29f3bd47d2db7d1c65fa1938e90886b333bc010593fdc4cf9bfbc5cf61`; `baseline/result.json` `061418a4661789d9c30502353f155923f86fe8eb31ce15cee50af75c3d058dcf`; `fixed/result.json` `7b06e53dc904e13b0e3ae032f9702d2d4ef7efde10fb8be5a0063e79d664ac66`; `assert-results.mjs` `35bf9d26f6687683ae0a50c78efb31c522efc0074424339936ca0c442a18ddaf`; `ssr/src/main.ts` `f4ecca0bf18953a08ec027544ca2c5ef98ac749c1040667ba68f566b7da628db`; `ssr/result.html` `1f55931bf77131a1249663fed520f28955e8fffc81bd564eea50c6f6a934afdc`; `assert-ssr.py` `7778972af4a5040881aae4d63a188231283e498d6cc453db8feeba0e3f694ff0`.\n\nNot qualified: full peer range, 21.x, all native input types, arbitrary lifecycle/subclass interactions, accessibility technology, full SSR/hydration, broader browser matrix, or any release/G11 gate. Existing disabledInteractive consumers knowingly relying on the newer peer feature will see it neutralized; that is an explicit legacy-contract decision rather than a general API-equivalence finding.\n"
+  },
+  "composition_independent_review": {
+    "sha256": "cfcce820268cc1c4c8fae7b5a170ed850d8f61a06c876bff973fd82f31c261bd",
+    "text": "# Independent composition review\n\nDisposition: no blocking finding in this bounded composition review. The disabled repair retains its standalone reviewed product image, and the previously reviewed control ownership product image is unchanged. This disposition remains conditional on the specific API decision for the two added protected host-binding helpers and the inherited `disabledInteractive` input being deliberately neutralized. It is not a generic docs-private waiver, G11, full API or release pass.\n\nThe canonical HEAD is fd1c105ec8d049f02b8c2240fb7e6b5cfd98efe0 and exactly two input files are dirty. The frozen incremental patch SHA-256 a48c105cf5cb86860eb33944d2467504669afd5ffbfe1bf938be7ce1be9c114e passes `git apply --reverse --check` against those files; HEAD input and spec hashes are respectively bfa91322a82df274acedc1eee030f03083470f254cee0e0f49207c11ef4db550 and adaa537dbaf11af77b3526d6abfd5cb6950979e727bf9a170ff40fc74859bd31. Current input is aaa55d58b06ef58c6dfca26053854696526e3529e7ed15ba3ef382ec323e8532, exactly the standalone V6 reviewed product image, and current spec is b6698d0bc2d680b0d2732736d2386199b1c499693fbc1c645350ab29d5036a33. The incremental spec diff adds only the peer config import and one disabled fixture/case after the already committed three reuse/replacement cases. The frozen patch differs in textual diff ordering and headers from git's output; reverse applicability and file images establish the substantive match.\n\nCurrent and HEAD form-field source hash a0ed827e6ac47802a886d87ab1c1c270c952c6a8fa45f65c5fdfc0f7472fabff matches the retained V4 source image. Current and HEAD autocomplete trigger source hash 803e95c96c22e5a6863a5f353f0485ec5a0431d04c9fe0b987031083ed7afaa9 match the combined manifest. Disabled code changes only native disabled/readonly and aria-disabled host bindings and its lifecycle; it does not touch the per-control WeakMap or described-by lifecycle. The map remains keyed per control, with its previous IDs recorded on synchronization; the disabled lifecycle invokes the parent check before reading aria-disabled and does not modify described-by IDs. Standalone V6's AOT browser and SSR observations, V3/V4 WeakMap review, and their stated limitations remain applicable to their exact code images; they are not a new independent execution of these behaviors in all combinations. In particular, authored aria-disabled preservation depends on DOM/check ordering, and arbitrary renderers, subclass interactions and hydration are not qualified.\n\nI independently derived 2,329 current roster cases using the repository roster module. The owner manifest reports the corresponding prior 2,328 objects and their order unchanged, with only the direct disabled case #116 added. I inspected the actual diff and confirm the three existing appended cases are unchanged; I did not independently regenerate the full prior roster comparison, so the complete 2,328-record equivalence remains owner evidence rather than an independently reproduced assertion.\n\nI independently hashed the combined tar as a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2 and compared all 512 file members' bytes, sizes and hashes with member-identities.json (SHA-256 381a6d17f73835b35bf62ab2cfd1fd0e744c2ac78ec785d68cc0f5e27a2a9f40). I independently checked all 398 inventoried existing product source-map contents against the tar map entries and current source files: zero discrepancies. The remaining 45 listed generated non-file source names are not source-file identity evidence. Source-map matches do not by themselves prove compiler output or non-mapped source inputs. The owner's 1,120-product-input fixture comparison is retained in the manifest, not independently rerun here.\n\nThe completed retained input-family report SHA-256 34a836e7986a42e09c2c732a7cce32b876dcedee0412757b831df7212a1c1122 records artifact mode, the same non-null tar hash, and 156 passed, zero failed or skipped. It includes all three ownership cases and the disabled case. Its log SHA-256 e4397b64d30e73fb01e9a5b213f6189d2d6467445ba403f76c24ed5ad9f2f4a3 records 156 successes. I inspected this report and did not rerun Karma. This diagnostic tar is not a final HEAD/coordinator artifact; no full family suite, floor-peer matrix, full API check, assistive technology, SSR hydration, cross-browser or release qualification is claimed.\n"
+  },
+  "root_checks": {
+    "node": "24.21.0",
+    "browser": "Chromium149",
+    "family_reports": [
+      {
+        "family": "input",
+        "artifact_sha256": "a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2",
+        "totals": {
+          "executed": 156,
+          "passed": 156,
+          "failed": 0,
+          "skipped": 0
+        },
+        "report_sha256": "34a836e7986a42e09c2c732a7cce32b876dcedee0412757b831df7212a1c1122",
+        "log_sha256": "e4397b64d30e73fb01e9a5b213f6189d2d6467445ba403f76c24ed5ad9f2f4a3"
+      },
+      {
+        "family": "autocomplete",
+        "artifact_sha256": "a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2",
+        "totals": {
+          "executed": 199,
+          "passed": 199,
+          "failed": 0,
+          "skipped": 0
+        },
+        "report_sha256": "e94e51828a7b7afadef068757ab16933091a4b0b59d9f5352ef965bd7b347460",
+        "log_sha256": "0338578d4d1f35c2cbeaf24c7f8209b152b2eaaa1086374bf1f3b0974fb28978"
+      }
+    ],
+    "members": 512,
+    "all_product_source_images": 398,
+    "explicit_generated_non_file_source_names": 45,
+    "source_images_report_sha256": "a8af98c902e4f36f1bcb2246c34f28fbe9dacb3ba36fe67fbead4db7eb55e2c9",
+    "roster": {
+      "before": 2328,
+      "after": 2329,
+      "added": [
+        {
+          "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#116",
+          "historical_path": "src/material/legacy-input/input.spec.ts",
+          "candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+          "adaptation": "adapted",
+          "shared": null,
+          "full_name": "MatInput legacy disabled behavior with current peer config > keeps native controls disabled and readonly independent of interactive-disabled config",
+          "index": 116,
+          "kind": "direct"
+        }
+      ],
+      "changed": [],
+      "removed": [],
+      "note": "Each roster derived through identical tool bytes loaded from its own root; canonical module root parameter alone does not relocate shared helper imports."
+    },
+    "roster_sha256": "dfbc0b6b441cb008c768d8dfd84a10ee9138f5e7531219bdd62a7a8b3fd7edd5"
+  },
+  "contract_decision": {
+    "authority": "User delegates conservative TypeScript API decisions while preserving Material16 legacy HTML/CSS/SCSS and avoiding required consumer styling changes.",
+    "decision": "Native disabled inputs/textarea/select cannot become focusable/editable through newer Material interactive-disabled configuration. Preserve native readonly only for input/textarea, and preserve authored aria-disabled. No current-private upstream symbols or config token import in production.",
+    "public_peer_dependency": "Exact advertised minimum22.1.7 exposes nondeprecated public disabledInteractive and ngDoCheck; parent lifecycle still called.",
+    "owned_helper_additions": "Two protected docs-private host helpers are required by strict Angular AOT host-expression checks; private variants failed. They only track authored ARIA and compute historical readonly. Narrow owned implementation accepted under delegated TS scope; specific source-bound API checker disposition remains mandatory, not a general docs-private waiver.",
+    "inherited_feature": "Inherited disabledInteractive remains visible in declarations but is neutralized at construction/check; README explicitly documents unsupported incidental feature.",
+    "consumer_compatibility": "No consumer template or CSS/SCSS edits; Material16 disabled/readonly contract restored. Current-parent subtype and zero-argument node-DI construction retained."
+  },
+  "limits": [
+    "Diagnostic combined tar a488b8... originates from isolateddirtyc051plusreviewedfixes; exact398mappedproductimages and512members checked, but not finalHEAD/coordinator pack or fulltransitivecompilerproof.",
+    "Root355cases executed as two affectedfamilies withsameartifacthash; no wholehistorical/browser/floor/G11/release pass.",
+    "Full2328previouscaseobjects/order remain unchanged withoneappendeddisabledcase,2329current. Source-role/matrix/inventory successors remain required.",
+    "Standalone independent zonelessAOT andSSR observations use exactdisabledproductimage; composed family runs do not qualify arbitraryrenderers/subclass/hydration/AT/fullpeer-range.",
+    "SpecificAPIhelperqualification andotherremainingdeclaration/DIrows remainopen; no acceptancewaiver from sourcecomment/docs-private.",
+    "No publication, push, Actions, credential changes or tooltip selector change."
+  ]
+}

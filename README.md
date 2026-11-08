@@ -41,6 +41,8 @@ MatLegacyMenuItem preserves the original one-argument and five-argument manual c
 
 MatLegacyInput also uses a zero-argument constructor through Angular node DI. Code that supplies the historical dependency arguments must move construction into Angular DI; those arguments are rejected at compile time and runtime. This construction change requires no consumer template or stylesheet edits.
 
+Disabled legacy inputs, textareas and native selects retain native disabled behavior, including when application-wide Material settings enable interaction with disabled controls. The inherited `disabledInteractive` input is neutralized to preserve this historical contract and is not a supported legacy feature.
+
 MatLegacyRipple and MatLegacyRippleModule retain the shared public Material identities. Construct MatLegacyRipple with no arguments through Angular DI; the original five manual dependency arguments no longer supply its services. Angular 21 still declares ignored rest arguments, while Angular 22 declares no arguments. Existing ripple inputs and templates remain supported. The owned theme binds the public ripple color token to the historical foreground and opacity at the existing theme scope, requiring no consumer stylesheet edits.
 
 Dialog containers support content attachment during their lifetime. Calling `dispose()` or `ngOnDestroy()` ends that lifetime; attaching content afterward is unsupported. This includes direct typed portal methods that could bypass the generic disposal guard in the historical implementation.

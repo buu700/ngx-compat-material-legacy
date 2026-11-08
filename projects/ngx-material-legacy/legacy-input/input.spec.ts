@@ -48,6 +48,7 @@ import {
   MatLegacyFormFieldModule,
   LegacyFloatLabelType,
 } from '@ngx-compat/material-legacy/legacy-form-field';
+import {MAT_INPUT_CONFIG} from '@angular/material/input';
 import {By} from '@angular/platform-browser';
 import {LEGACY_ENABLED_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {Directionality, Direction} from '@angular/cdk/bidi';
@@ -2620,5 +2621,63 @@ describe('MatInput description ownership on view reuse', () => {
     const again = fixture.nativeElement.querySelector('input') as HTMLInputElement;
     expect(again).toBe(first);
     expect(again.getAttribute('aria-describedby')).toBe('hint-c');
+  });
+});
+
+@Component({
+  template: `
+    <mat-form-field><input matInput [disabled]="disabled" [readonly]="readonly"></mat-form-field>
+    <mat-form-field><textarea matInput [disabled]="disabled" [readonly]="readonly"></textarea></mat-form-field>
+    <mat-form-field><select matNativeControl [disabled]="disabled" [readonly]="readonly">
+      <option>One</option><option>Two</option>
+    </select></mat-form-field>
+    <mat-form-field><input matInput [formControl]="control"></mat-form-field>
+    <mat-form-field><input matInput [disabled]="disabled" aria-disabled="false"></mat-form-field>
+    <mat-form-field><input matInput [disabled]="disabled" [attr.aria-disabled]="ariaDisabled"></mat-form-field>
+    <mat-form-field><input matInput [disabled]="disabled" [disabledInteractive]="true"></mat-form-field>`,
+})
+class MatInputDisabledPeerConfig {
+  control = new FormControl({value: '', disabled: true});
+  ariaDisabled: string | null = 'false';
+  disabled = true;
+  readonly = false;
+}
+
+describe('MatInput legacy disabled behavior with current peer config', () => {
+  it('keeps native controls disabled and readonly independent of interactive-disabled config', () => {
+    const fixture = createComponent(MatInputDisabledPeerConfig, [
+      {provide: MAT_INPUT_CONFIG, useValue: {disabledInteractive: true}},
+    ]);
+    fixture.detectChanges();
+    const elements = Array.from(fixture.nativeElement.querySelectorAll('input, textarea, select')) as
+      (HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement)[];
+    expect(elements.length).toBe(7);
+    elements.forEach(element => {
+      expect(element.disabled).toBe(true);
+      expect(element.classList.contains('mat-mdc-input-disabled-interactive')).toBe(false);
+    });
+    expect((elements[0] as HTMLInputElement).readOnly).toBe(false);
+    expect((elements[1] as HTMLTextAreaElement).readOnly).toBe(false);
+    expect(elements[0].getAttribute('aria-disabled')).toBeNull();
+    expect(elements[2].getAttribute('aria-disabled')).toBeNull();
+    expect(elements[4].getAttribute('aria-disabled')).toBe('false');
+    expect(elements[5].getAttribute('aria-disabled')).toBe('false');
+    fixture.componentInstance.ariaDisabled = 'true';
+    fixture.componentInstance.disabled = false;
+    fixture.componentInstance.readonly = true;
+    fixture.componentInstance.control.enable();
+    fixture.detectChanges();
+    elements.forEach(element => expect(element.disabled).toBe(false));
+    expect((elements[0] as HTMLInputElement).readOnly).toBe(true);
+    expect((elements[1] as HTMLTextAreaElement).readOnly).toBe(true);
+    expect(elements[2].hasAttribute('readonly')).toBe(false);
+    expect(elements[4].getAttribute('aria-disabled')).toBe('false');
+    expect(elements[5].getAttribute('aria-disabled')).toBe('true');
+    fixture.componentInstance.ariaDisabled = null;
+    fixture.detectChanges();
+    expect(elements[5].getAttribute('aria-disabled')).toBeNull();
+    fixture.componentInstance.control.disable();
+    fixture.detectChanges();
+    expect(elements[3].disabled).toBe(true);
   });
 });
