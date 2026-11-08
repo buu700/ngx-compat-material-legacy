@@ -52,6 +52,22 @@ class CurrentReaderSourceSuccessorsTests(unittest.TestCase):
                       'forged_raw_property_rejected']:
             self.assertTrue(report[field], field)
 
+    def test_canonical_inventory_source_routing(self):
+        report = self.run_probe('node', 'canonical_inventory_routing_probe.mjs')
+        self.assertEqual(report['cold_rejections'], 9)
+        for field in ['unknown_predecessor_rejected', 'wrong_length_rejected',
+                      'public_metadata_isolated']:
+            self.assertTrue(report[field], field)
+
+    def test_selection_native_current_source(self):
+        report = self.run_probe('node', 'selection_native_current_source_probe.mjs')
+        self.assertEqual(report['cold_rejections'], 21)
+        self.assertEqual(report['default_selection_scopes_preserved'], 3)
+        for field in ['historical_after_preserved', 'current_registry_bound',
+                      'public_metadata_isolated', 'unknown_hash_rejected',
+                      'wrong_length_rejected', 'accessor_not_invoked']:
+            self.assertTrue(report[field], field)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -10,9 +10,13 @@ import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {gunzipSync} from 'node:zlib';
+import {readFileSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {autocompleteSelectionSpecSubject} from './autocomplete-selection-spec-subject.mjs';
 import {autocompleteSelectionHistoricalScopes} from './autocomplete-selection-native-scopes.mjs';
+import {selectionNativeRegistrySourceSuccessor} from './selection-native-registry-source-successor.mjs';
+import {historicalBehaviorRequirements} from './upstream-historical-behavior-evidence.mjs';
 
 export const SELECTION_NATIVE_PACKET='compatibility/rc/autocomplete-selection-native-contract-proposal.json';
 export const SELECTION_NATIVE_REGISTRY='scripts/upstream-historical-behavior-evidence.mjs';
@@ -25,6 +29,7 @@ const pins={main:'f53ca24623f8876b28f6af99a4e2ad80ecc3934073aed5931fb59aa641a7d0
   '21.x':'9807d4a66c303445a1af43a2c4bb66217b7391af9ee62ab33f290c3b9bb066ba'};
 const harnessPins={main:'c0857010621e8db535417b52bb5876d9a927708f0aee2dce8d28e8755990eb69','21.x':'aaa534b6523e7865b3d0725b2781541b61dc607068b384e1be8db4aa9c3196f8'};
 const hash=value=>createHash('sha256').update(value).digest('hex');
+const SELF='scripts/autocomplete-selection-native-subject.mjs',image=readFileSync(fileURLToPath(import.meta.url));
 const objectHash=(kind,value)=>createHash('sha1').update(kind+' '+Buffer.byteLength(value)+'\0').update(value).digest('hex');
 const ts=createRequire(import.meta.url)('typescript');
 const nativeCase=(p,index,full_name)=>({case_id:'historical-legacy-artifact/original-and-shared-cases/src/material/'+p+'#'+index,
@@ -32,11 +37,17 @@ const nativeCase=(p,index,full_name)=>({case_id:'historical-legacy-artifact/orig
 
 export function autocompleteSelectionNativeSubject({root,read=p=>readEvidenceMember(root,p),line}={}){
   const spec=autocompleteSelectionSpecSubject({root,read,line});line=spec.line;
-  const bound=new Map(spec.bound.map(ref=>[ref.path,{...ref}]));
+  const registry=line==='main'?selectionNativeRegistrySourceSuccessor({root,read}):null;
+  const bound=new Map([...spec.bound,...(registry?.bound??[])].map(ref=>[ref.path,{...ref}]));
+  assert.ok(readEvidenceMember(root,SELF).equals(image));assert.ok(read(SELF).equals(image));bound.set(SELF,{path:SELF,sha256:hash(image),bytes:image.length});
   function member(ref){
-    readEvidenceMember(root,ref.path);
-    const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed selection native subject '+ref.path);
-    if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);
+    let current;
+    if(ref.path===spec.path){
+      const prior=[spec.before,spec.after,spec.current_after].find(value=>value.sha256===ref.sha256);assert.ok(prior,'unknown native spec reference');if(ref.bytes!==undefined)assert.equal(ref.bytes,prior.bytes);current=spec.current_after;
+    }else current=registry?.qualify(ref)??ref;
+    const actual=readEvidenceMember(root,ref.path),raw=read(ref.path);assert.ok(Buffer.isBuffer(raw)&&raw.equals(actual),'nonphysical selection native subject '+ref.path);assert.equal(hash(raw),current.sha256,'changed selection native subject '+ref.path);
+    if(current.bytes!==undefined)assert.equal(raw.length,current.bytes);
+    assert.ok(actual.equals(readEvidenceMember(root,ref.path)),'selection native subject changed during callback '+ref.path);
     bound.set(ref.path,{path:ref.path,sha256:hash(raw),bytes:raw.length});return raw;
   }
   const raw=read(SELECTION_NATIVE_PACKET);assert.equal(hash(raw),pins[line]);
@@ -63,6 +74,7 @@ export function autocompleteSelectionNativeSubject({root,read=p=>readEvidenceMem
   assert.equal(hash(after),packet.registry.after_sha256);assert.equal(Buffer.byteLength(after),packet.registry.after_bytes);
   const registryAfter={sha256:hash(after),bytes:Buffer.byteLength(after)};
   const registryBefore={sha256:hash(before),bytes:before.length};
+  if(registry)assert.deepEqual(registry.before,{path:SELECTION_NATIVE_REGISTRY,...registryAfter});
   member({path:SELECTION_NATIVE_REGISTRY,...registryAfter});
   member(packet.scope_module);assert.equal(packet.scope_module.path,'scripts/autocomplete-selection-native-scopes.mjs');
   assert.deepEqual(packet.current_product_subjects.map(ref=>ref.path),[
@@ -81,6 +93,7 @@ export function autocompleteSelectionNativeSubject({root,read=p=>readEvidenceMem
   assert.ok(common&&ts.isArrayLiteralExpression(common));assert.ok(common.elements.every(ts.isStringLiteral));
   const requirements=autocompleteSelectionHistoricalScopes(Object.freeze(common.elements.map(row=>row.text)),nativeCase);
   assert.deepEqual(requirements.map(([sha])=>sha),SELECTION_NATIVE_SHAS);
+  if(registry)for(const [sha,definition]of requirements)assert.deepEqual(historicalBehaviorRequirements(sha),definition,'current registry must preserve the original default selection scope');
   for(const [i,subject]of packet.subjects.entries()){
     const source=originals.commits.find(row=>row.sha===subject.sha),review=proposals.reviews[i],definition=requirements[i][1];
     assert.equal(objectHash('commit',source.raw_commit),subject.sha);assert.equal(hash(source.diff),definition.patch);
@@ -117,12 +130,12 @@ export function autocompleteSelectionNativeSubject({root,read=p=>readEvidenceMem
   }
   const qualify=ref=>{
     if(ref.path!==SELECTION_NATIVE_REGISTRY)return null;
-    assert.ok([registryBefore.sha256,registryAfter.sha256].includes(ref.sha256),'unqualified earlier native registry reference');
-    if(ref.bytes!==undefined)assert.equal(ref.bytes,ref.sha256===registryBefore.sha256?registryBefore.bytes:registryAfter.bytes);
-    return {path:ref.path,...registryAfter};
+    const known=[registryBefore,registryAfter,...(registry?[registry.after]:[])].find(value=>value.sha256===ref.sha256);assert.ok(known,'unqualified earlier native registry reference');
+    if(ref.bytes!==undefined)assert.equal(ref.bytes,known.bytes);
+    registry?.assertCurrent();return {path:ref.path,...(registry?.after??registryAfter)};
   };
-  const assertCurrent=()=>{spec.assertCurrent();for(const ref of bound.values()){const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'late selection native subject '+ref.path);assert.equal(bytes.length,ref.bytes);}};
-  assertCurrent();return {line,packet:structuredClone(packet),before:{...registryBefore},after:{...registryAfter},
+  const assertCurrent=()=>{assert.ok(readEvidenceMember(root,SELF).equals(image));spec.assertCurrent();registry?.assertCurrent();for(const ref of bound.values()){const actual=readEvidenceMember(root,ref.path),bytes=read(ref.path);assert.ok(Buffer.isBuffer(bytes)&&bytes.equals(actual),'nonphysical late selection native subject '+ref.path);assert.equal(hash(bytes),ref.sha256,'late selection native subject '+ref.path);assert.equal(bytes.length,ref.bytes);assert.ok(actual.equals(readEvidenceMember(root,ref.path)));}registry?.assertCurrent();assert.ok(readEvidenceMember(root,SELF).equals(image));};
+  assertCurrent();return {line,packet:structuredClone(packet),before:{...registryBefore},after:{...registryAfter},current_after:{...(registry?.after??registryAfter)},
     requirements:structuredClone(requirements),proposals:structuredClone(proposals),originals:structuredClone(originals),
     bound:structuredClone([...bound.values()]),qualify,assertCurrent,native_artifact_floor_or_G11_credit:false};
 }
