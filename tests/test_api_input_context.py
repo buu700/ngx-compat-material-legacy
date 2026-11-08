@@ -48,6 +48,13 @@ function challenge(value,path=[]){
  if(!Array.isArray(value)){const bad=structuredClone(row),parent=path.reduce((v,k)=>v[k],bad.factory_input_context);parent.extra='waiver';assert.ok(inputObservationProblems(bad).length,'extra '+path.join('.'));receiptMutants++;}
 }
 challenge(x);
+const qualified=structuredClone(row);qualified.factory_input_context.total_requests=16;qualified.factory_input_context.sources.parent.sha256='8310dfca1200ffd7e426ff64641e1794a2af9a4f1c1860a44a51ac8c6d638b69';qualified.factory_input_context.sources.parent.class_text_sha256='ee7f5ec23a123c1fbf0a90e6a44ff5b1ce82e42d4e2617ed5defdbe5737cdc69';qualified.factory_input_context.sources.owned.sha256='9d1ccb5328d4e8c430874b0547717bc57c8cc069d461e274e7a2f74f6cb573c1';qualified.factory_input_context.sources.owned.class_text_sha256='3be742f8ab06b844294554e93ab3af355d5628a6979c9b3e18638efe47d881ca';
+qualified.factory_input_context.owned_element_ref={token:'@angular/core:ElementRef',identity_matched:true,optional:false,self:false,skipSelf:false,host:false,unresolved:false,owned_field_origin:true,native_node_identical:true,artifact_sha256:'a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2',owned_source_sha256:'aaa55d58b06ef58c6dfca26053854696526e3529e7ed15ba3ef382ec323e8532',helper_collision_risk:'Exact protected helper additions can break subclasses declaring incompatible private members; accepted only for these two names and types.'};
+qualified.factory_input_context.behavior_checks.push({id:'owned-native-node-aria-readonly-and-parent-check',result:'pass'});
+assert.deepEqual(inputObservationProblems(qualified),[]);
+for(const key of Object.keys(qualified.factory_input_context.owned_element_ref)){
+ const bad=structuredClone(qualified),v=bad.factory_input_context.owned_element_ref[key];bad.factory_input_context.owned_element_ref[key]=typeof v==='boolean'?!v:'foreign';assert.ok(inputObservationProblems(bad).length,key);receiptMutants++;
+}
 for(const change of [r=>delete r.factory_input_context,r=>r.factory_outcome='threw',r=>r.factory_input_context.parent_requests.reverse(),r=>r.factory_input_context.behavior_checks.reverse(),r=>r.factory_input_context.control_requests[0].optional=true]){
  const bad=structuredClone(row);change(bad);assert.ok(inputObservationProblems(bad).length);receiptMutants++;
 }
