@@ -448,7 +448,8 @@ if (isMain) {
   const extracted = extractLibraryPackage(tarball, {parentDir: join(root, 'artifacts/local/api-di-consumer')});
   const differences = loadDifferences();
   const allowlist = JSON.parse(readFileSync(allowlistPath, 'utf8'));
-  const declared = observeDeclarations(surface, readDts(extracted.packageRoot), differences, allowlist);
+  const declared = observeDeclarations(surface, readDts(extracted.packageRoot), differences, allowlist,
+    {tarball, packageRoot: extracted.packageRoot, referenceRoot: refRoot});
   const diRows = await observeRuntimeDi(extracted.packageRoot, surface.symbols);
   const diRecords = JSON.parse(readFileSync(join(root, 'compatibility/rc/api/di-differences.json'), 'utf8')).differences || [];
   const diSettled = diRows.map(row => settleDi(row, diRecords));

@@ -6,6 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+export {settleInputDisabled} from './api-input-disabled-contract.mjs';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {readFileSync,readdirSync} from 'node:fs';

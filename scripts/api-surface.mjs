@@ -13,7 +13,7 @@ import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
 import {MENU_ITEM_SYMBOL, approvedMenuItemContract, approvedMenuItemSignatureRecord} from './menu-item-construction-contract.mjs';
 import {TABLE_SYMBOL, approvedTableSignatureRecord} from './table-construction-contract.mjs';
-import {INPUT_SYMBOL,approvedInputSignatureRecord} from './api-input-context.mjs';
+import {INPUT_SYMBOL,approvedInputSignatureRecord,settleInputDisabled} from './api-input-context.mjs';
 import {RIPPLE_SYMBOL,rippleReexportSignatureProblems} from './ripple-construction-contract.mjs';
 import {originalCompilerFactoryContext, originalPublishedJitFactory} from './api-original-factory-contexts.mjs';
 import {settleInputHarness} from './api-input-harness-contract.mjs';
@@ -1691,7 +1691,7 @@ function exportedNames(sourceFile) {
   return names;
 }
 
-export function observeDeclarations(surface, dtsFiles, differences, allowlist) {
+export function observeDeclarations(surface, dtsFiles, differences, allowlist, inputArtifactContext = null) {
   const observations = [];
   const byEntry = new Map();
   for (const symbol of surface.symbols) {
@@ -1727,6 +1727,8 @@ export function observeDeclarations(surface, dtsFiles, differences, allowlist) {
       const present = names.has(symbol.name);
       const packed = sourceFile ? packedShape(sourceFile, symbol.name) : null;
       let signature = compareSignatures(symbol, packed, differences);
+      if (symbol.symbol_id === INPUT_SYMBOL && sourceFile)
+        signature = settleInputDisabled(symbol, sourceFile, signature, inputArtifactContext);
       if (symbol.symbol_id === 'legacy-input/testing/MatLegacyInputHarness' && sourceFile)
         signature = settleInputHarness(symbol, sourceFile, signature);
       if (symbol.symbol_id === MENU_HARNESS && sourceFile)
