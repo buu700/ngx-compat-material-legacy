@@ -25,6 +25,8 @@ const PRIOR_LIVE='e2f367003f429748f30ba24d20f23b06e9cde705c5ff55c80e0494adbfe411
 const TOOLTIP_LIVE='4a59fbfc14cc0f11c1563f5b4de51adc8cd0a58bfca186069ffc25b03635f068';
 const DIALOG_LIVE='fcb3e8c2493d1379a998ab58d7f31c7f214a73a3aafacb1df15d323a7b085024';
 const LIVE='955335c70ea8eff6cc1abf3d6397daf66a20684762a28db79a815d56f4c03647';
+const CURRENT_LIVE='a68b0f204ce42e475162f629d85e728436d6a2300920d47f2641fb75b3804e21';
+const OWNED_RECEIPT='compatibility/rc/parent-main-owned-metadata-six-v1.json',OWNED_RECEIPT_SHA='7055e24ce83c7dcd48d71b743324787ac182c6837b20cf46e10f26deda8b772e';
 const EXCLUSION_RECEIPT='compatibility/rc/parent-main-95f2-source-exclusion-v2.json',EXCLUSION_RECEIPT_SHA='415d6847ad6abfe742c8be55519a39b2258c3bdc013a93b6f96d640801f83d03';
 const EXCLUSION_PRIOR='compatibility/f10/disposition-ledger/evidence/95f2de4adae1811836c461e8bf4ffdcec2e81677-original-row.raw.json',EXCLUSION_PRIOR_SHA='e88515524354d71ee937939828d5ec555831f4bf3a8c5a040ea0ba44aa30d18e';
 const DIALOG_RECEIPT='compatibility/rc/parent-main-dialog-hot-stream-ledger-v1.json',DIALOG_RECEIPT_SHA='76affccc7d3d52953f6ec8e2942e35611739ef5e7bb5ecd16b7c1b6074f64afd';
@@ -181,6 +183,23 @@ function validateExclusionSuccessor(root,prior,live,receiptBytes,priorBytes){
  return {transitions:21,changed_entry_identities:155,tooltip_source_only:true,dialog_source_only:true,exclusion_source_only:true};
 }
 
+function validateOwnedMetadataSuccessor(root,prior,live,receiptBytes){
+ const commit='0feac873886782da408d5894bbf1bb26862ec45c',parent='f569667b366b23b36280c5c2a10e9f87351472bd';
+ const ids=['af42dd6be9b094865ffcb3e7ad4aa03135ed6322','824e035e64eeab825c24c7e74e05702fbe2fe8fa','6f1e66f762a3807c67eb377f35ff0b096f769822','367f868c829ef0a31f2b816b1d2401d979e15415','8bc38ae9d49ec8839629f161521563d34acaacb6','36b4f18dd7ebe5e7d4efb661a9cdf99f30ceb852'];
+ assert.equal(git(root,['rev-parse',commit+'^']).toString().trim(),parent);
+ git(root,['merge-base','--is-ancestor','252689f364aee65c5d755d4b16e91987f6e305a5',parent]);git(root,['merge-base','--is-ancestor',commit,'HEAD']);
+ const before=git(root,['show',parent+':'+LEDGER]),after=git(root,['show',commit+':'+LEDGER]);assert.equal(hash(before),LIVE);assert.equal(hash(after),CURRENT_LIVE);assert.ok(before.equals(prior));assert.ok(after.equals(live));
+ assert.equal(hash(receiptBytes),OWNED_RECEIPT_SHA);assert.ok(git(root,['show',commit+':'+OWNED_RECEIPT]).equals(receiptBytes));
+ const a=decode(before),b=decode(after),receipt=JSON.parse(receiptBytes),changed=[],rawOnly=[];
+ assert.deepEqual([...a.entries.keys()],[...b.entries.keys()]);const meta=x=>Object.fromEntries(Object.entries(x).filter(([key])=>key!=='entries'));assert.deepEqual(meta(a.data),meta(b.data));
+ for(const [sha,row] of a.entries){if(!isDeepStrictEqual(row,b.entries.get(sha)))changed.push(sha);else if(a.rawEntries.get(sha)!==b.rawEntries.get(sha))rawOnly.push(sha);}
+ assert.deepEqual(changed.sort(),[...ids].sort());assert.deepEqual(rawOnly,[]);
+ let reconstructed=before.toString('utf8');for(const id of ids){const old=a.rawEntries.get(id),replacement=b.rawEntries.get(id),index=reconstructed.indexOf(old);assert.ok(index>=0);assert.equal(reconstructed.indexOf(old,index+old.length),-1);reconstructed=reconstructed.slice(0,index)+replacement+reconstructed.slice(index+old.length);}
+ assert.ok(Buffer.from(reconstructed).equals(after),'bytes outside six raw rows changed');
+ assert.equal(receipt.base_head,parent);assert.equal(receipt.ledger_before_sha256,LIVE);assert.equal(receipt.ledger_after_sha256,CURRENT_LIVE);assert.deepEqual(receipt.rows,ids);assert.equal(receipt.other_raw_rows_unchanged,1691);
+ return {transitions:22,changed_entry_identities:161,tooltip_source_only:true,dialog_source_only:true,exclusion_source_only:true,owned_metadata_source_only:true};
+}
+
 /** Authenticates a current physical source epoch; does not approve audit rows or replace any ledger image. */
 export function prepareInventoryReferenceLiveSourceEpoch({root,read=path=>readEvidenceMember(root,path),additionalPaths=[]}={}){
  assert.equal(typeof root,'string');return epochTransaction(root,()=>buildLiveSourceEpoch({root,read,additionalPaths}));
@@ -188,12 +207,12 @@ export function prepareInventoryReferenceLiveSourceEpoch({root,read=path=>readEv
 function buildLiveSourceEpoch({root,read,additionalPaths}){
  assert.equal(typeof read,'function');assert.ok(Array.isArray(additionalPaths));
  assert.ok(additionalPaths.every(path=>typeof path==='string'));assert.equal(new Set(additionalPaths).size,additionalPaths.length);
- assert.ok(additionalPaths.every(path=>![SELF,PACKET,NEXT,RECEIPT,TOOLTIP_RECEIPT,TOOLTIP_REPORT,TOOLTIP_STYLE,DIALOG_RECEIPT,EXCLUSION_RECEIPT,EXCLUSION_PRIOR,LEDGER].includes(path)));
+ assert.ok(additionalPaths.every(path=>![SELF,PACKET,NEXT,RECEIPT,TOOLTIP_RECEIPT,TOOLTIP_REPORT,TOOLTIP_STYLE,DIALOG_RECEIPT,EXCLUSION_RECEIPT,EXCLUSION_PRIOR,OWNED_RECEIPT,LEDGER].includes(path)));
  const initialPacket=readEvidenceMember(root,PACKET),nextBytes=readEvidenceMember(root,NEXT);assert.equal(hash(initialPacket),PACKET_SHA);assert.equal(hash(nextBytes),NEXT_SHA);
  const loadedGuard=readFileSync(fileURLToPath(new URL('./inventory-reference-proposal.mjs',import.meta.url)));
  assert.equal(hash(loadedGuard),GUARD_SHA);assert.equal(hash(readEvidenceMember(root,GUARD)),GUARD_SHA);
  assert.equal(hash(Buffer.from(Function.prototype.toString.call(prepareSource))),GUARD_FUNCTION_SHA);
- const source=prepareSource({root,read,prebindPaths:[SELF,PACKET,NEXT,RECEIPT,TOOLTIP_RECEIPT,TOOLTIP_REPORT,TOOLTIP_STYLE,DIALOG_RECEIPT,EXCLUSION_RECEIPT,EXCLUSION_PRIOR,LEDGER,...additionalPaths]});assert.equal(source.line,'main');
+ const source=prepareSource({root,read,prebindPaths:[SELF,PACKET,NEXT,RECEIPT,TOOLTIP_RECEIPT,TOOLTIP_REPORT,TOOLTIP_STYLE,DIALOG_RECEIPT,EXCLUSION_RECEIPT,EXCLUSION_PRIOR,OWNED_RECEIPT,LEDGER,...additionalPaths]});assert.equal(source.line,'main');
  assert.equal(source.verifier.current_inventory_sha256,INVENTORY);
  const physical=path=>readEvidenceMember(root,path),initialLedger=physical(LEDGER);
  const fixed=[{path:SELF,sha256:hash(IMAGE),bytes:IMAGE.length},{path:PACKET,sha256:PACKET_SHA,bytes:initialPacket.length},
@@ -201,13 +220,14 @@ function buildLiveSourceEpoch({root,read,additionalPaths}){
   {path:TOOLTIP_RECEIPT,sha256:TOOLTIP_RECEIPT_SHA,bytes:physical(TOOLTIP_RECEIPT).length},{path:TOOLTIP_REPORT,sha256:TOOLTIP_REPORT_SHA,bytes:physical(TOOLTIP_REPORT).length},{path:TOOLTIP_STYLE,sha256:TOOLTIP_STYLE_SHA,bytes:physical(TOOLTIP_STYLE).length},
   {path:DIALOG_RECEIPT,sha256:DIALOG_RECEIPT_SHA,bytes:physical(DIALOG_RECEIPT).length},
   {path:EXCLUSION_RECEIPT,sha256:EXCLUSION_RECEIPT_SHA,bytes:physical(EXCLUSION_RECEIPT).length},{path:EXCLUSION_PRIOR,sha256:EXCLUSION_PRIOR_SHA,bytes:physical(EXCLUSION_PRIOR).length},
-  {path:LEDGER,sha256:LIVE,bytes:initialLedger.length},
+  {path:OWNED_RECEIPT,sha256:OWNED_RECEIPT_SHA,bytes:physical(OWNED_RECEIPT).length},
+  {path:LEDGER,sha256:CURRENT_LIVE,bytes:initialLedger.length},
   ...additionalPaths.map(path=>{const raw=physical(path);return {path,sha256:hash(raw),bytes:raw.length};})];
  const checkPhysical=()=>{for(const ref of fixed)match(physical(ref.path),ref);assert.ok(physical(SELF).equals(IMAGE));assert.ok(physical(LEDGER).equals(initialLedger));};
  const checkInputs=()=>{checkPhysical();for(const ref of fixed){checkPhysical();const raw=read(ref.path);checkPhysical();assert.ok(Buffer.isBuffer(raw));match(raw,ref);}checkPhysical();};
  checkInputs();const receiptBytes=physical(RECEIPT),receipt=JSON.parse(receiptBytes);assert.equal(receipt.selected_sha,'18cedc7375bf0ab0590c9a984e5d380d52610ccc');assert.equal(receipt.ledger_before_sha256,'bf569445a6013f402c44252ddf1afb2de803e6a0a5c9f9ccf1a6f322fd251544');assert.equal(receipt.ledger_after_sha256,PRIOR_LIVE);assert.equal(receipt.unselected_raw_entries,1696);assert.equal(receipt.unselected_concatenated_raw_sha256,'ce89d5c3a00ec4e06a1ceaee910d3c7c6bf140913592e07be07bc7dbf05a3c19');
  const packet=JSON.parse(initialPacket),next=JSON.parse(nextBytes),tooltipReceipt=physical(TOOLTIP_RECEIPT),tooltipReport=physical(TOOLTIP_REPORT),tooltipStyle=physical(TOOLTIP_STYLE);let lineage;
- const check=()=>{source.assertCurrent();checkInputs();const prior=validateLineage(root,packet,source.after,receiptBytes);const tooltipImage=git(root,['show','e28364f10bc9c1f9219c9a18f0dbf9cffb267f57:'+LEDGER]);validateTooltipSuccessor(root,next,prior.prior,tooltipImage,tooltipReceipt,tooltipReport,tooltipStyle);const dialogImage=git(root,['show','64f87978200b2f9e75da7dd6eafc2c81e0f2ff49:'+LEDGER]);validateDialogSuccessor(root,tooltipImage,dialogImage,physical(DIALOG_RECEIPT));const terminal=validateExclusionSuccessor(root,dialogImage,initialLedger,physical(EXCLUSION_RECEIPT),physical(EXCLUSION_PRIOR));checkInputs();source.assertCurrent();checkPhysical();return {...terminal,raw_only_formatting:prior.summary.raw_only_formatting};};
+ const check=()=>{source.assertCurrent();checkInputs();const prior=validateLineage(root,packet,source.after,receiptBytes);const tooltipImage=git(root,['show','e28364f10bc9c1f9219c9a18f0dbf9cffb267f57:'+LEDGER]);validateTooltipSuccessor(root,next,prior.prior,tooltipImage,tooltipReceipt,tooltipReport,tooltipStyle);const dialogImage=git(root,['show','64f87978200b2f9e75da7dd6eafc2c81e0f2ff49:'+LEDGER]);validateDialogSuccessor(root,tooltipImage,dialogImage,physical(DIALOG_RECEIPT));const exclusionImage=git(root,['show','252689f364aee65c5d755d4b16e91987f6e305a5:'+LEDGER]);validateExclusionSuccessor(root,dialogImage,exclusionImage,physical(EXCLUSION_RECEIPT),physical(EXCLUSION_PRIOR));const terminal=validateOwnedMetadataSuccessor(root,exclusionImage,initialLedger,physical(OWNED_RECEIPT));checkInputs();source.assertCurrent();checkPhysical();return {...terminal,raw_only_formatting:prior.summary.raw_only_formatting};};
  const assertCurrent=()=>epochTransaction(root,check);lineage=check();const bound=new Map(source.bound.map(ref=>[ref.path,{...ref}]));
  for(const ref of fixed){const prior=bound.get(ref.path);if(prior)assert.deepEqual(prior,ref);else bound.set(ref.path,{...ref});}
  return {line:'main',liveLedger:Buffer.from(initialLedger),bound:structuredClone([...bound.values()]),lineage:structuredClone(lineage),assertCurrent,

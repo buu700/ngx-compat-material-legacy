@@ -394,18 +394,25 @@ class CurrentSassToolReferences:
             assert epoch['schema_version']==1 and epoch['role']=='current-tool-ledger-source-epoch-21-successor' and epoch['source_only'] is True and epoch['historical_programs_executed'] is False and epoch['artifact_or_audit_admission_granted'] is False and epoch['g11_claim']=='not-passed'
             assert epoch['before']==dict(path='scripts/inventory-reference-live-source-epoch.mjs',sha256='3836c4358edc6c5a15d0578f5df06b19beed563fbd4b094d694cfa9e5cc1175e',bytes=18156)
             assert epoch['after']==dict(path=epoch['before']['path'],sha256='bbb222bf919e88e294f70d4d1b94caa1934a8a0e36303fd6a42d08e0197bc6bc',bytes=24685)
-            old_epoch=self._member(epoch['archive']); _matches(old_epoch,epoch['before']); new_epoch=_edited(old_epoch,epoch['edits']); _matches(new_epoch,epoch['after']); assert self._member(epoch['after'])==new_epoch
+            old_epoch=self._member(epoch['archive']); _matches(old_epoch,epoch['before']); new_epoch=_edited(old_epoch,epoch['edits']); _matches(new_epoch,epoch['after'])
+            epoch22=json.loads(self._member(dict(path='compatibility/rc/current-tool-ledger-source-epoch-22-successor-v1.json',sha256='5ac3931ad65636fc9fdfff84c05172860cd0017d3cb8b0bdca0d44f91a69a071',bytes=5558)))
+            assert epoch22['schema_version']==1 and epoch22['role']=='current-tool-ledger-source-epoch-22-successor' and epoch22['source_only'] is True and epoch22['historical_programs_executed'] is False and epoch22['artifact_or_audit_admission_granted'] is False and epoch22['g11_claim']=='not-passed' and epoch22['before']==epoch['after']
+            assert epoch22['base_head']=='a796c018da3023e916b37088917f6adca56fbc9d' and epoch22['source_commit']=='0feac873886782da408d5894bbf1bb26862ec45c' and epoch22['source_parent']=='f569667b366b23b36280c5c2a10e9f87351472bd'
+            assert subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',epoch22['source_commit']],cwd=self.root,env=env,text=True).strip()==epoch22['source_commit']+' '+epoch22['source_parent']
+            subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',epoch22['base_head'],'HEAD'],cwd=self.root,env=env)
+            epoch22_bytes=_edited(new_epoch,epoch22['edits']); _matches(epoch22_bytes,epoch22['after']); assert self._member(epoch22['after'])==epoch22_bytes and epoch22['ledger_before']==epoch['ledger_after']
+            epoch22_images=_git_images(self.root,[dict(commit=epoch22['source_parent'],path=epoch22['ledger_before']['path']),dict(commit=epoch22['source_commit'],path=epoch22['ledger_after']['path'])]); _matches(epoch22_images[(epoch22['source_parent'],epoch22['ledger_before']['path'])],epoch22['ledger_before']); _matches(epoch22_images[(epoch22['source_commit'],epoch22['ledger_after']['path'])],epoch22['ledger_after']); assert self._member(epoch22['ledger_after'])==epoch22_images[(epoch22['source_commit'],epoch22['ledger_after']['path'])]; self._member(epoch22['receipt'])
             assert epoch['source_commit']=='252689f364aee65c5d755d4b16e91987f6e305a5' and epoch['source_parent']=='862f511840c7bbeb81236ac6d74ba1a8a2d5f7a7'
             assert subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',epoch['source_commit']],cwd=self.root,env=env,text=True).strip()==epoch['source_commit']+' '+epoch['source_parent']
             subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',epoch['source_commit'],'HEAD'],cwd=self.root,env=env)
             assert epoch['ledger_before']==dict(path='compatibility/f10/disposition-ledger/ledger.json',sha256='4a59fbfc14cc0f11c1563f5b4de51adc8cd0a58bfca186069ffc25b03635f068',bytes=5068290)
-            ledger_images=_git_images(self.root,[dict(commit=c,path=epoch['ledger_before']['path']) for c in ('e28364f10bc9c1f9219c9a18f0dbf9cffb267f57',epoch['source_commit'])]); _matches(ledger_images[('e28364f10bc9c1f9219c9a18f0dbf9cffb267f57',epoch['ledger_before']['path'])],epoch['ledger_before']); live_ledger=ledger_images[(epoch['source_commit'],epoch['ledger_after']['path'])]; _matches(live_ledger,epoch['ledger_after']); assert self._member(epoch['ledger_after'])==live_ledger
+            ledger_images=_git_images(self.root,[dict(commit=c,path=epoch['ledger_before']['path']) for c in ('e28364f10bc9c1f9219c9a18f0dbf9cffb267f57',epoch['source_commit'])]); _matches(ledger_images[('e28364f10bc9c1f9219c9a18f0dbf9cffb267f57',epoch['ledger_before']['path'])],epoch['ledger_before']); live_ledger=ledger_images[(epoch['source_commit'],epoch['ledger_after']['path'])]; _matches(live_ledger,epoch['ledger_after']); assert epoch22_images[(epoch22['source_parent'],epoch22['ledger_before']['path'])]==live_ledger
             for ref in epoch['receipts']: self._member(ref)
             def epoch_member(ref):
                 if ref['path']==epoch['before']['path']:
-                    assert ref==epoch['before']; return self._member(epoch['after'])
+                    assert ref==epoch['before']; return self._member(epoch22['after'])
                 if ref['path']==epoch['ledger_before']['path']:
-                    assert ref==epoch['ledger_before']; return self._member(epoch['ledger_after'])
+                    assert ref==epoch['ledger_before']; return self._member(epoch22['ledger_after'])
                 return self._member(ref)
             live_checker = json.loads(self._member(dict(path='compatibility/rc/current-tool-live-checker-source-successor-v1.json',sha256='639574a3836d851ba8917db3091cc62e819951f80b1f92190cd6002c39bfc4a1',bytes=2481)))
             assert expected == checker['after'] == live_checker['before']
@@ -501,7 +508,29 @@ class CurrentSassToolReferences:
             assert repair_composition['intermediate']==dict(path=repair_path,sha256='bc58e869db60240b973094b985f64ee0feda29ff0935b7fab9d5f3ae7134bce7',bytes=36206) and repair_composition['after']==dict(path=repair_path,sha256='b63c419933c0015c8ac7b9fb6238ad3c14a43a384af29a4f346954ac75900855',bytes=37024) and repair_composition['focus_patch']['sha256']=='cb287796debf160898772f625c1d194dd8424511b52b6f425e3c45107bdc613d'
             assert self._member(repair_composition['archive'])==final_repair; self._member(repair_composition['focus_patch']); self._member(repair_composition['independent_review'])
             focused_repair=_edited(final_repair,repair_composition['focus_edits']); _matches(focused_repair,repair_composition['intermediate']); composed_repair=_edited(focused_repair,repair_composition['composition_edits']); _matches(composed_repair,repair_composition['after']); assert self._member(repair_composition['after'])==composed_repair
-            for ref in repair_composition['supports']: self._member(ref)
+            for ref in repair_composition['supports']:
+                if ref['path'] != 'compatibility/f10/authored-dependency-current-dispositions.json': self._member(ref); continue
+                assert ref==dict(path=ref['path'],sha256='460262e16c118c495e37b56c5218f0c2eadfd7bad0a71cf62fddccba05b130f4',bytes=718774)
+                parent='0feac873886782da408d5894bbf1bb26862ec45c'; commit='a796c018da3023e916b37088917f6adca56fbc9d'
+                assert subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',commit],cwd=self.root,env=env,text=True).strip()==commit+' '+parent
+                roster_images=_git_images(self.root,[dict(commit=c,path=ref['path']) for c in (parent,commit)]); roster_old=roster_images[(parent,ref['path'])]; next_bytes=roster_images[(commit,ref['path'])]; _matches(roster_old,ref)
+                current=dict(path=ref['path'],sha256='dede4ab944da8fee8881644e27c0b2224c70e4120246c54e99976c48084ab2a5',bytes=720149); _matches(next_bytes,current); assert self._member(current)==next_bytes
+                a=json.loads(roster_old); b=json.loads(next_bytes); changed=[]; assert len(a['symbol_uses'])==len(b['symbol_uses'])==336
+                for x,y in zip(a['symbol_uses'],b['symbol_uses']):
+                    assert [x[k] for k in ('file','module','symbol')]==[y[k] for k in ('file','module','symbol')]
+                    if x!=y:
+                        changed.append([x[k] for k in ('file','module','symbol')]); z=dict(y); z['source_review']=x['source_review']
+                        if x['file']=='legacy-tabs/tab-label.ts': z['candidate_source_sha256']=x['candidate_source_sha256']
+                        assert z==x
+                assert changed==[['legacy-tabs/internal/public-constructor-context.ts','@angular/core',x] for x in ('Injector','ProviderToken','runInInjectionContext')]+[['legacy-tabs/tab-label.ts','@angular/core',x] for x in ('Inject','Optional','TemplateRef','ViewContainerRef')]
+                normalized=dict(b); normalized['symbol_uses']=a['symbol_uses']; normalized['current_source_population_sha256']=a['current_source_population_sha256']; normalized['source_snapshot_history']=a['source_snapshot_history']; assert normalized==a
+                for path,sha,size in [('compatibility/rc/parent-main-tab-label-source-context-v1.json','a2810e63d5761d88639e2cbbd42ad3356a104d18c1a4493bee47cd3ccae72431',4191),('compatibility/rc/tab-owned-label-field-context-proof-v1.json','a22145ce4008bd7efc79e1651e95d547877d16753fe7ecd352ef1595fb8d0de0',16382),('compatibility/f10/authored-use-reviews/tab-owned-label-field-context-v1.json','77f1d0aca087662c5ffc135fb636a15a74cef549e0ba800da507fae511acca52',117149),('projects/ngx-material-legacy/legacy-tabs/tab-label.ts','db06eed7f8ceb42cecfcd9242d44a9cff315a59285c262cbdc2e101a339969ad',1514),('projects/ngx-material-legacy/legacy-tabs/internal/tab-base.ts','880575b7a0c3a6b30bfb363c68e3a574fcb585e11e4b10d362eeea5731785639',4870)]: self._member(dict(path=path,sha256=sha,bytes=size))
+                type_parent='d809eb8ab440a0fc0a7b8fe65423016255cbed0e'; type_commit='f569667b366b23b36280c5c2a10e9f87351472bd'
+                assert subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',type_commit],cwd=self.root,env=env,text=True).strip()==type_commit+' '+type_parent
+                type_changes=[('projects/ngx-material-legacy/legacy-tabs/tab-label.ts','5ff08854377bb33070d69ee6fb4f7a346d37bebf4aefb6f0fd7a48f6a98621ff','db06eed7f8ceb42cecfcd9242d44a9cff315a59285c262cbdc2e101a339969ad',b']);\n    label._closestTab',b']) as MatLegacyTabLabel;\n    label._closestTab'),('projects/ngx-material-legacy/legacy-tabs/internal/tab-base.ts','c2c5c4a69762261f8e8241e1325f381d6ad2c431a2734d354c85c84244d3291a','880575b7a0c3a6b30bfb363c68e3a574fcb585e11e4b10d362eeea5731785639',b'value && value._closestTab === this',b'value && (value as MatTabLabel & {_closestTab?: unknown})._closestTab === this')]
+                type_images=_git_images(self.root,[dict(commit=c,path=path) for path,_,_,_,_ in type_changes for c in (type_parent,type_commit)])
+                for path,prior_sha,current_sha,before_text,after_text in type_changes:
+                    prior=type_images[(type_parent,path)];current_bytes=type_images[(type_commit,path)];assert _hash(prior)==prior_sha and _hash(current_bytes)==current_sha and prior.count(before_text)==1 and prior.replace(before_text,after_text)==current_bytes and self._read(path)==current_bytes
             # Keep table support as historical Git evidence; bind the separately
             # reviewed successor's physical final source and receipts.
             sig = json.loads(self._member(dict(path='compatibility/rc/current-tool-signature-differences-live-source-successor-v1.json',sha256='d27970b1fd18bd836dc9dcb0e0382fbc7fde0f568ab3f1738049364925519efa',bytes=8907)))

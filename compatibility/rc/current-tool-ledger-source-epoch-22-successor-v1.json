@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "role": "current-tool-ledger-source-epoch-22-successor",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "base_head": "a796c018da3023e916b37088917f6adca56fbc9d",
+  "source_commit": "0feac873886782da408d5894bbf1bb26862ec45c",
+  "source_parent": "f569667b366b23b36280c5c2a10e9f87351472bd",
+  "before": {
+    "path": "scripts/inventory-reference-live-source-epoch.mjs",
+    "sha256": "bbb222bf919e88e294f70d4d1b94caa1934a8a0e36303fd6a42d08e0197bc6bc",
+    "bytes": 24685
+  },
+  "after": {
+    "path": "scripts/inventory-reference-live-source-epoch.mjs",
+    "sha256": "dd0d4350b46a1540f4426e1121f1327e02763b23b2e89e2af4f3001ad538990c",
+    "bytes": 27639
+  },
+  "edits": [
+    {
+      "offset": 1698,
+      "before": "",
+      "after": "';\nconst CURRENT_LIVE='a68b0f204ce42e475162f629d85e728436d6a2300920d47f2641fb75b3804e21';\nconst OWNED_RECEIPT='compatibility/rc/parent-main-owned-metadata-six-v1.json',OWNED_RECEIPT_SHA='7055e24ce83c7dcd48d71b743324787ac182c6837b20cf46e10f26deda8b772e"
+    },
+    {
+      "offset": 19695,
+      "before": "",
+      "after": "function validateOwnedMetadataSuccessor(root,prior,live,receiptBytes){\n const commit='0feac873886782da408d5894bbf1bb26862ec45c',parent='f569667b366b23b36280c5c2a10e9f87351472bd';\n const ids=['af42dd6be9b094865ffcb3e7ad4aa03135ed6322','824e035e64eeab825c24c7e74e05702fbe2fe8fa','6f1e66f762a3807c67eb377f35ff0b096f769822','367f868c829ef0a31f2b816b1d2401d979e15415','8bc38ae9d49ec8839629f161521563d34acaacb6','36b4f18dd7ebe5e7d4efb661a9cdf99f30ceb852'];\n assert.equal(git(root,['rev-parse',commit+'^']).toString().trim(),parent);\n git(root,['merge-base','--is-ancestor','252689f364aee65c5d755d4b16e91987f6e305a5',parent]);git(root,['merge-base','--is-ancestor',commit,'HEAD']);\n const before=git(root,['show',parent+':'+LEDGER]),after=git(root,['show',commit+':'+LEDGER]);assert.equal(hash(before),LIVE);assert.equal(hash(after),CURRENT_LIVE);assert.ok(before.equals(prior));assert.ok(after.equals(live));\n assert.equal(hash(receiptBytes),OWNED_RECEIPT_SHA);assert.ok(git(root,['show',commit+':'+OWNED_RECEIPT]).equals(receiptBytes));\n const a=decode(before),b=decode(after),receipt=JSON.parse(receiptBytes),changed=[],rawOnly=[];\n assert.deepEqual([...a.entries.keys()],[...b.entries.keys()]);const meta=x=>Object.fromEntries(Object.entries(x).filter(([key])=>key!=='entries'));assert.deepEqual(meta(a.data),meta(b.data));\n for(const [sha,row] of a.entries){if(!isDeepStrictEqual(row,b.entries.get(sha)))changed.push(sha);else if(a.rawEntries.get(sha)!==b.rawEntries.get(sha))rawOnly.push(sha);}\n assert.deepEqual(changed.sort(),[...ids].sort());assert.deepEqual(rawOnly,[]);\n let reconstructed=before.toString('utf8');for(const id of ids){const old=a.rawEntries.get(id),replacement=b.rawEntries.get(id),index=reconstructed.indexOf(old);assert.ok(index>=0);assert.equal(reconstructed.indexOf(old,index+old.length),-1);reconstructed=reconstructed.slice(0,index)+replacement+reconstructed.slice(index+old.length);}\n assert.ok(Buffer.from(reconstructed).equals(after),'bytes outside six raw rows changed');\n assert.equal(receipt.base_head,parent);assert.equal(receipt.ledger_before_sha256,LIVE);assert.equal(receipt.ledger_after_sha256,CURRENT_LIVE);assert.deepEqual(receipt.rows,ids);assert.equal(receipt.other_raw_rows_unchanged,1691);\n return {transitions:22,changed_entry_identities:161,tooltip_source_only:true,dialog_source_only:true,exclusion_source_only:true,owned_metadata_source_only:true};\n}\n\n"
+    },
+    {
+      "offset": 20491,
+      "before": "",
+      "after": "OWNED_RECEIPT,"
+    },
+    {
+      "offset": 21184,
+      "before": "",
+      "after": ",OWNED_RECEIPT"
+    },
+    {
+      "offset": 22187,
+      "before": "",
+      "after": "OWNED_RECEIPT,sha256:OWNED_RECEIPT_SHA,bytes:physical(OWNED_RECEIPT).length},\n  {path:"
+    },
+    {
+      "offset": 22201,
+      "before": "",
+      "after": "CURRENT_"
+    },
+    {
+      "offset": 23891,
+      "before": "",
+      "after": "exclusionImage=gi"
+    },
+    {
+      "offset": 23892,
+      "before": "",
+      "after": "(root,['show','252689f364a"
+    },
+    {
+      "offset": 23893,
+      "before": "rmin",
+      "after": "e65c5d755d4b16e91987f6e305"
+    },
+    {
+      "offset": 23898,
+      "before": "l=",
+      "after": "5:'+LEDGER]);"
+    },
+    {
+      "offset": 23944,
+      "before": "",
+      "after": "exclus"
+    },
+    {
+      "offset": 23945,
+      "before": "",
+      "after": "o"
+    },
+    {
+      "offset": 23946,
+      "before": "iti",
+      "after": "Im"
+    },
+    {
+      "offset": 23950,
+      "before": "lLed",
+      "after": ""
+    },
+    {
+      "offset": 23956,
+      "before": "r",
+      "after": ""
+    },
+    {
+      "offset": 24010,
+      "before": "",
+      "after": "));const terminal=validateOwnedMetadataSuccessor(root,exclusionImage,initialLedger,physical(OWNED_RECEIPT"
+    }
+  ],
+  "ledger_before": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "955335c70ea8eff6cc1abf3d6397daf66a20684762a28db79a815d56f4c03647",
+    "bytes": 5080309
+  },
+  "ledger_after": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "a68b0f204ce42e475162f629d85e728436d6a2300920d47f2641fb75b3804e21",
+    "bytes": 5102892
+  },
+  "receipt": {
+    "path": "compatibility/rc/parent-main-owned-metadata-six-v1.json",
+    "sha256": "7055e24ce83c7dcd48d71b743324787ac182c6837b20cf46e10f26deda8b772e",
+    "bytes": 2091
+  }
+}
