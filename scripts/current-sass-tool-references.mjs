@@ -216,7 +216,21 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
  assert.deepEqual(packet.product_paths,[]);assert.equal(packet.historical_programs_executed,false);assert.equal(packet.historical_reports_rewritten,0);assert.equal(packet.artifact_or_audit_admission_granted,false);
  assert.ok(equalBytes(read(packagePath),packageImage),'package line changed');
  let matrixOwner;const domainOverlays=new Map();
- const routingImages=new Map();
+ const routingImages=new Map(),retainedRulesJsPath='scripts/upstream-rules-js-build-admission.mjs';
+ if(line==='main'){
+  const program=JSON.parse(member({path:'compatibility/rc/main-retained-rules-js-program-source-v1.json',sha256:'dea173286cd6de2dddb4bc932a83fdb6a26ec788cea9e098ef2e66b76894708d',bytes:4229}));
+  assert.equal(program.schema_version,1);assert.equal(program.role,'main-retained-rules-js-program-source');assert.equal(program.base_head,'0f2c3373afd5d6c917b4d47f874da31a26df2551');
+  for(const[key,value]of Object.entries({source_scope_only:true,historical_programs_executed:false,historical_packets_rewritten:false,original_source_judgments_changed:false,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(program[key],value);
+  const update=program.update;assert.equal(update.path,retainedRulesJsPath);assert.equal(update.before.path,update.path);assert.equal(update.after.path,update.path);assert.equal(program.support.length,9);
+  assert.equal(program.usage.path,'compatibility/rc/sass-wrapper-notice-reader-successors.json');const usage=JSON.parse(member(program.usage));assert.equal(usage.line,'main');
+  const hook=usage.code_subjects.find(row=>row.path===update.path);assert.deepEqual({path:hook.path,...hook.after},update.before);
+  const env={PATH:process.env.PATH,LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1',GIT_TERMINAL_PROMPT:'0'};
+  execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',program.base_head,'HEAD'],{cwd:root,env});
+  const images=gitImages(root,[{commit:program.base_head,path:update.path},...program.support.map(ref=>({commit:program.base_head,path:ref.path}))]);
+  for(const ref of program.support){const committed=images.get(program.base_head+':'+ref.path);matches(committed,ref);assert.ok(equalBytes(member(ref),committed));}
+  const before=images.get(program.base_head+':'+update.path);matches(before,update.before);const after=edited(before,update.edits);matches(after,update.after);assert.ok(equalBytes(member(update.after),after));
+  domainOverlays.set(update.path,{update,identities:[{ref:update.before,bytes:before},{ref:update.after,bytes:after}]});
+ }
  if(line==='main'){
   const routing=JSON.parse(member({path:'compatibility/rc/main-current-inventory-source-routing-v2.json',sha256:'3815beb1e21779e54deaee5da2bf7bb316732e98a3dc9938ef6d2fdf18707280',bytes:24306}));
   assert.equal(routing.schema_version,1);assert.equal(routing.role,'main-current-inventory-source-routing');assert.equal(routing.base_head,'54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0');assert.equal(routing.source_scope_only,true);assert.equal(routing.historical_programs_executed,false);assert.equal(routing.historical_packets_rewritten,false);assert.equal(routing.artifact_or_audit_admission_granted,false);assert.equal(routing.g11_claim,'not-passed');
@@ -593,7 +607,7 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
  }
  for(const {update,before,after} of rcSuccessors.values()){const row=rows.get(update.before.path);assert.ok(row);assert.deepEqual({path:row.path,...row.after},update.before,'source successor must follow V5');addIdentity(row,update.before,before);addIdentity(row,update.after,after);row.after={sha256:update.after.sha256,bytes:update.after.bytes};}
  if(matrixOwner){const row=rows.get(matrixOwner.after.path);assert.ok(row);assert.deepEqual({path:row.path,...row.after},matrixOwner.before);addIdentity(row,matrixOwner.before,matrixOwner.comparisonBytes(matrixOwner.before));addIdentity(row,matrixOwner.intermediate,matrixOwner.comparisonBytes(matrixOwner.intermediate));addIdentity(row,matrixOwner.after,member(matrixOwner.after));row.after={sha256:matrixOwner.after.sha256,bytes:matrixOwner.after.bytes};}
- for(const {update,identities} of domainOverlays.values()){let row=rows.get(update.path);if(row)assert.deepEqual({path:row.path,...row.after},update.before,'domain successor must follow previous frame');else{assert.ok(retainedReaderPaths.has(update.path)||routingImages.has(update.path)||nextBranch.additional_inputs.some(ref=>JSON.stringify(ref)===JSON.stringify(update.before))||(update.path==='scripts/authored-current-use-inventory.mjs'&&checkerSourceAnchor?.source_members.some(ref=>JSON.stringify(ref)===JSON.stringify(update.before))),'domain predecessor is not an existing input');row={path:update.path,before:{sha256:update.before.sha256,bytes:update.before.bytes},identities:new Map()};rows.set(update.path,row);}for(const identity of identities)addIdentity(row,identity.ref,identity.bytes);row.after={sha256:update.after.sha256,bytes:update.after.bytes};}
+ for(const {update,identities} of domainOverlays.values()){let row=rows.get(update.path);if(row)assert.deepEqual({path:row.path,...row.after},update.before,'domain successor must follow previous frame');else{assert.ok((line==='main'&&update.path===retainedRulesJsPath)||retainedReaderPaths.has(update.path)||routingImages.has(update.path)||nextBranch.additional_inputs.some(ref=>JSON.stringify(ref)===JSON.stringify(update.before))||(update.path==='scripts/authored-current-use-inventory.mjs'&&checkerSourceAnchor?.source_members.some(ref=>JSON.stringify(ref)===JSON.stringify(update.before))),'domain predecessor is not an existing input');row={path:update.path,before:{sha256:update.before.sha256,bytes:update.before.bytes},identities:new Map()};rows.set(update.path,row);}for(const identity of identities)addIdentity(row,identity.ref,identity.bytes);row.after={sha256:update.after.sha256,bytes:update.after.bytes};}
  for(const row of rows.values())member({path:row.path,...row.after});
  assert.deepEqual(bound.get(GUARD_PLAN.path),activePlanner,'current tool guard planner missing from finite bound');
  let consuming=false,batching=false;

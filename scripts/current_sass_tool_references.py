@@ -328,6 +328,22 @@ class CurrentSassToolReferences:
         assert self._read(package_path) == package_image
         domain_overlays = {}
         routing_images={}
+        retained_rules_js_path='scripts/upstream-rules-js-build-admission.mjs'
+        if self.line=='main':
+            program=json.loads(self._member(dict(path='compatibility/rc/main-retained-rules-js-program-source-v1.json',sha256='dea173286cd6de2dddb4bc932a83fdb6a26ec788cea9e098ef2e66b76894708d',bytes=4229)))
+            assert program['schema_version']==1 and program['role']=='main-retained-rules-js-program-source' and program['base_head']=='0f2c3373afd5d6c917b4d47f874da31a26df2551'
+            for key,value in dict(source_scope_only=True,historical_programs_executed=False,historical_packets_rewritten=False,original_source_judgments_changed=False,artifact_or_audit_admission_granted=False,g11_claim='not-passed').items():assert program[key]==value
+            update=program['update'];assert update['path']==retained_rules_js_path and update['before']['path']==update['path']==update['after']['path'] and len(program['support'])==9
+            assert program['usage']['path']=='compatibility/rc/sass-wrapper-notice-reader-successors.json'
+            usage=json.loads(self._member(program['usage']));assert usage['line']=='main'
+            hook=next(row for row in usage['code_subjects'] if row['path']==update['path']);assert dict(path=hook['path'],**hook['after'])==update['before']
+            program_env=dict(PATH=os.environ['PATH'],LC_ALL='C',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_SYSTEM='/dev/null',GIT_NO_REPLACE_OBJECTS='1',GIT_NO_LAZY_FETCH='1',GIT_TERMINAL_PROMPT='0')
+            subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',program['base_head'],'HEAD'],cwd=self.root,env=program_env)
+            program_images=_git_images(self.root,[dict(commit=program['base_head'],path=update['path'])]+[dict(commit=program['base_head'],path=ref['path']) for ref in program['support']])
+            for ref in program['support']:
+                committed=program_images[(program['base_head'],ref['path'])];_matches(committed,ref);assert self._member(ref)==committed
+            before=program_images[(program['base_head'],update['path'])];_matches(before,update['before']);after=_edited(before,update['edits']);_matches(after,update['after']);assert self._member(update['after'])==after
+            domain_overlays[update['path']]=(update,[(update['before'],before),(update['after'],after)])
         if self.line=='main':
             routing_packet=json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v2.json',sha256='3815beb1e21779e54deaee5da2bf7bb316732e98a3dc9938ef6d2fdf18707280',bytes=24306)))
             assert routing_packet['schema_version']==1 and routing_packet['role']=='main-current-inventory-source-routing' and routing_packet['base_head']=='54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0'
@@ -1010,7 +1026,7 @@ class CurrentSassToolReferences:
             path=update['path']; row=self._rows.get(path)
             if row is not None: assert dict(path=path,**row['after']) == update['before'], 'domain successor must follow previous frame'
             else:
-                assert path in retained_reader_paths or path in routing_images or update['before'] in next_branch['additional_inputs'] or (path=='scripts/authored-current-use-inventory.mjs' and checker_source_anchor is not None and update['before'] in checker_source_anchor['source_members']), 'domain predecessor is not an existing input'
+                assert (self.line=='main' and path==retained_rules_js_path) or path in retained_reader_paths or path in routing_images or update['before'] in next_branch['additional_inputs'] or (path=='scripts/authored-current-use-inventory.mjs' and checker_source_anchor is not None and update['before'] in checker_source_anchor['source_members']), 'domain predecessor is not an existing input'
                 row=dict(path=path,before=dict(sha256=update['before']['sha256'],bytes=update['before']['bytes']),identities={}); self._rows[path]=row
             for ref, raw in identities: self._add(row,ref,raw)
             row['after']=dict(sha256=update['after']['sha256'],bytes=update['after']['bytes'])

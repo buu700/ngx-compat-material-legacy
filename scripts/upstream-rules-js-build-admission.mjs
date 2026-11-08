@@ -13,6 +13,10 @@ import {join} from 'node:path';
 import {gunzipSync} from 'node:zlib';
 import {isDeepStrictEqual} from 'node:util';
 import {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';
+import {retainedRulesJsBuildCurrentSource} from './retained-rules-js-current-source.mjs';
+import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
+
+const ownPath='scripts/upstream-rules-js-build-admission.mjs',ownImage=readFileSync(new URL(import.meta.url));
 
 export const RULES_JS_BUILD_SHAS=Object.freeze(['3b9854e97a6ff942241ef3b233939f7bd1cfd22d',
  '9ae960d9dabf045b1fe14a7afe0cc6ef6c6c1b7b','fba42e30c3dfe3711b8d53dc7eeda1e28ad4e301']);
@@ -62,6 +66,14 @@ export function rulesJsBuildOriginalPatch(read,sha){
  return Buffer.from(row.patch);
 }
 export function rulesJsBuildBoundInputs({root,read,line}){
+ if(line==='main'){
+  const ownRef={path:ownPath,sha256:hash(ownImage),bytes:ownImage.length};
+  const assertOwn=()=>{const actual=readEvidenceMember(root,ownPath);assert.ok(actual.equals(ownImage),'changed loaded rules-js admission');assert.ok(actual.equals(read(ownPath)),'nonphysical rules-js admission');assert.ok(actual.equals(readEvidenceMember(root,ownPath)));};
+  assertOwn();const current=retainedRulesJsBuildCurrentSource({root,read,line});
+  const assertExternal=()=>{assertOwn();current.assertCurrent();assert.ok(readEvidenceMember(root,ownPath).equals(ownImage),'late physical rules-js admission change');};
+  assertExternal();return {refs:[...current.refs,ownRef],proposal:current.proposal,assertExternal,
+   assertFresh:()=>{assertOwn();current.assertFresh();assertExternal();}};
+ }
  const proposal=JSON.parse(member(read,{path:proposalPath,sha256:proposals[line]}));
  assert.equal(proposal.line,line);assert.equal(proposal.canonical_ledger_changes,0);
  assert.equal(proposal.current_runtime_or_packed_or_floor_qualified,false);
@@ -104,6 +116,8 @@ function validate({root,read,line,entry,body},fresh){
   const checked=rulesJsBuildBoundInputs({root,read,line});
   const rootId=realpathSync(root),previous=measured.get(read);
   if(fresh&&(!previous||previous.root!==rootId||previous.line!==line)){
+   if(line==='main')checked.assertFresh();
+   else{
    const code='import json,pathlib,sys;sys.path.insert(0,str(pathlib.Path(sys.argv[1])/"scripts"));from upstream_rules_js_build_scope import review;print(json.dumps({"body":review(pathlib.Path(sys.argv[1])),"python":sys.version.split()[0]}))';
    const child=spawnSync('python3',['-I','-c',code,rootId],{cwd:rootId,encoding:'utf8',timeout:20000,maxBuffer:2*1024*1024});
    assert.equal(child.status,0,child.stderr);const actual=JSON.parse(child.stdout);assert.equal(actual.python,'3.14.7');
@@ -111,6 +125,7 @@ function validate({root,read,line,entry,body},fresh){
    expected.candidate_context.product_members=expected.candidate_context.product_members.map(ref=>readers.qualify(ref)??ref);
    assert.equal(isDeepStrictEqual(actual.body,expected),true,'fresh full build-source facts changed beyond independently qualified source deltas');
    readers.assertCurrent();
+   }
    measured.set(read,{root:rootId,line});
   }
   return true;

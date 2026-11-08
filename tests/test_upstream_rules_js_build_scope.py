@@ -4,6 +4,7 @@
 # Use of this source code is governed by the MIT license in LICENSE.
 """Complete original source reconstruction and conservative proposal controls."""
 import copy
+import json
 from pathlib import Path
 import sys
 import unittest
@@ -62,7 +63,9 @@ class RulesJsBuildScopeTests(unittest.TestCase):
     def test_source_matched_proposal_and_false_claim_controls(self):
         body = review(ROOT)
         self.assertTrue(verify_review(ROOT, body))
-        self.assertEqual(body['candidate_context']['product_member_count'], 1142)
+        self.assertEqual(body['candidate_context']['product_member_count'], 1120 if body['line'] == 'main' else 1142)
+        original = json.loads((ROOT / 'compatibility/rc/upstream-rules-js-build-individual-review.json').read_text())
+        self.assertEqual(original['candidate_context']['product_member_count'], 1142)
         self.assertEqual(len(body['candidate_context']['retained_historical_root_Bazel_members']), 3)
         self.assertEqual(len(body['individual_decisions']), 3)
         for mutation in ('wrong-line', 'inherited-runtime', 'source-digest', 'hidden-root-Bazel',

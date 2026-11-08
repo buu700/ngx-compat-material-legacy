@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "role": "main-retained-rules-js-program-source",
+  "base_head": "0f2c3373afd5d6c917b4d47f874da31a26df2551",
+  "usage": {
+    "path": "compatibility/rc/sass-wrapper-notice-reader-successors.json",
+    "sha256": "9ca055d63bd19e5ef82d3c0894683190522aadb60d3bc959ef0565f788395919",
+    "bytes": 11846
+  },
+  "update": {
+    "path": "scripts/upstream-rules-js-build-admission.mjs",
+    "before": {
+      "path": "scripts/upstream-rules-js-build-admission.mjs",
+      "sha256": "37a6c7d37d456d9c2a32fb9db07e37353b8170b4d231a026cb28992596cf1578",
+      "bytes": 9376
+    },
+    "after": {
+      "path": "scripts/upstream-rules-js-build-admission.mjs",
+      "sha256": "2c87f60d6bc76933fce2edcb5d429846896cb2babbe3b2269fd34f76b2f182ff",
+      "bytes": 10504
+    },
+    "edits": [
+      {
+        "offset": 649,
+        "before": "",
+        "after": "import {retainedRulesJsBuildCurrentSource} from './retained-rules-js-current-source.mjs';\nimport {readEvidenceMember} from './upstream-packed-run-evidence.mjs';\n\nconst ownPath='scripts/upstream-rules-js-build-admission.mjs',ownImage=readFileSync(new URL(import.meta.url));\n"
+      },
+      {
+        "offset": 4605,
+        "before": "",
+        "after": " if(line==='main'){\n  const ownRef={path:ownPath,sha256:hash(ownImage),bytes:ownImage.length};\n  const assertOwn=()=>{const actual=readEvidenceMember(root,ownPath);assert.ok(actual.equals(ownImage),'changed loaded rules-js admission');assert.ok(actual.equals(read(ownPath)),'nonphysical rules-js admission');assert.ok(actual.equals(readEvidenceMember(root,ownPath)));};\n  assertOwn();const current=retainedRulesJsBuildCurrentSource({root,read,line});\n  const assertExternal=()=>{assertOwn();current.assertCurrent();assert.ok(readEvidenceMember(root,ownPath).equals(ownImage),'late physical rules-js admission change');};\n  assertExternal();return {refs:[...current.refs,ownRef],proposal:current.proposal,assertExternal,\n   assertFresh:()=>{assertOwn();current.assertFresh();assertExternal();}};\n }\n"
+      },
+      {
+        "offset": 8142,
+        "before": "",
+        "after": "   if(line==='main')checked.assertFresh();\n   else{\n"
+      },
+      {
+        "offset": 9049,
+        "before": "",
+        "after": "   }\n"
+      }
+    ]
+  },
+  "support": [
+    {
+      "path": "scripts/retained-rules-js-current-source.mjs",
+      "sha256": "26a6132ded62073a55ecbdb14983d1224a302257f5e533339d4cf050f61fb1a5",
+      "bytes": 8073
+    },
+    {
+      "path": "compatibility/rc/main-retained-rules-js-current-review-v1.json",
+      "sha256": "818c4156e9ee49b30ee5da096404fa7a550728a22c1b390d9456dc4ce36e021a",
+      "bytes": 2901
+    },
+    {
+      "path": "compatibility/rc/parent-main-retained-rules-js-current-source-v1.json",
+      "sha256": "ec894210d36ee67d78bc0ec9cc0eb13e41de2f0bd271c44e0827a7a260d0a9b2",
+      "bytes": 3339
+    },
+    {
+      "path": "tests/retained_rules_js_current_source_probe.mjs",
+      "sha256": "588f38d120eeba3ca97e5ab135180cbe4455c3303259d32df429f52c5f8903a1",
+      "bytes": 5242
+    },
+    {
+      "path": "tests/test_retained_rules_js_current_source.py",
+      "sha256": "d8021a4bd07d3b32a7d2943b37841b11343fa3d535f7096cbe9ccb64827796ae",
+      "bytes": 1533
+    },
+    {
+      "path": "scripts/retained-current-context-identity.mjs",
+      "sha256": "f31427e4aab15bff12a2003931d1ef881fdf9c78d7139cc3473326dbc0f7a067",
+      "bytes": 9540
+    },
+    {
+      "path": "compatibility/rc/main-retained-current-context-v1.json",
+      "sha256": "d47e05229546ccceec4e84d6cdffc5a430a2db2a0b019094b491878a8645af60",
+      "bytes": 1351942
+    },
+    {
+      "path": "compatibility/rc/upstream-rules-js-build-individual-review.json",
+      "sha256": "825ed4a139ab452b1b919b4e2c3524db787bc2d30507345a748cfcc6728c0c44",
+      "bytes": 340290
+    },
+    {
+      "path": "scripts/upstream_rules_js_build_scope.py",
+      "sha256": "00edc202e524ecab1507da51f1c2809ea2cb6a334ca948d8102c1b157b17504e",
+      "bytes": 16448
+    }
+  ],
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "original_source_judgments_changed": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed"
+}
