@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "scope": "One current select helper Injector source-use role; the prior review and wrapper are preserved as historical evidence.",
+  "source_epoch": {
+    "parent": "5b36c449ea6d950ba7317cd0696cd3da1632f44d",
+    "commit": "04daa4f8c0617be2ea1a93cbfca06cedf30da3ab",
+    "path": "tests/test_select_render_runtime.py",
+    "before_sha256": "ffa4cb27f5c41371cd46c239cb742ece200bc3cda8715e7d547b0fb39e9eaeeb",
+    "after_sha256": "c5a95f8cd6f5490a893fdd20a2252524518445fcc60d57a1669af5561c448f08"
+  },
+  "semantic_review": "The old wrapper checked only summary counts and nonqualification flags. The successor always captures a report, validates all ten expected line/mode/production rows and every expected mutation ID and rejection, checks aggregate counts against the report, preserves the nonqualification checks, and cleans up a temporary report when one is not requested. It adds no product behavior or public API claim.",
+  "source_role": {
+    "file": "legacy-select/internal/after-select-render.ts",
+    "module": "@angular/core",
+    "symbol": "Injector",
+    "sha256": "10a2bbbe02fb0a4578646e802888a5e075bb909a36fd1c19049b5fa2d731e570"
+  },
+  "tests": {
+    "injector_type": {
+      "command": "node tests/injector_render_type_probe.mjs",
+      "result": {
+        "path": "compatibility/rc/current-select-injector-type-result-v1.json",
+        "sha256": "80cb7d96b925fb50955b211303dfadb9c220576674b2aa7457c92ffa8f9530a3"
+      }
+    },
+    "select_wrapper": {
+      "command": "CLOSEOUT_SELECT_RENDER_REPORT=<external report> python3 -m unittest discover -s tests -p test_select_render_runtime.py",
+      "outcome": "passed; 10 rows, 48 named rejected mutations",
+      "report": {
+        "path": "compatibility/rc/current-select-injector-runtime-replay-v1.json",
+        "sha256": "412a18fd8afcf40af36dd7179a88187cd6e3210315f75d0327b17525ad111594"
+      }
+    }
+  },
+  "limits": [
+    "The test is a source-member replay with protocol collaborators; it does not qualify actual legacy component DI, native browser rendering, packed artifacts, supported runtime floors or G11.",
+    "Other source-use roles, security holds and the global TOOL planner are not qualified by this successor."
+  ],
+  "g11_claim": "not-passed"
+}
