@@ -1,0 +1,24 @@
+{
+  "role": "Preserve the table import-cycle regression after the unrelated common-module move",
+  "source_parent": "de5fafbe1",
+  "producer": "tests/table_outlet_aot_source_probe.mjs",
+  "producer_sha256": "b0d66999682ad04a1084b1997e82215128dc136bbbf382c1687d377d885a9d51",
+  "fixture_sha256_unchanged": "5a3f3cb9a9be6fb88c9de742fd02ce120aae9ca7cc98cf5c2b65b3d8650a5000",
+  "observed_before": "The current separated-directive entry compiled, but the retained negative fixture produced two TS2307 missing-module diagnostics because table-module.ts and public-api.ts still referenced the removed ./internal/common-module. It did not reach the intended cycle assertion.",
+  "repair": "Adapt only the retained fixture's obsolete common-module import to the current public legacy-core alias and omit its obsolete barrel re-export. Assert each old line occurs exactly once and leave the complete retained outlet/definition-owner module byte-identical. Preserve the exact one-diagnostic, NG3003, affected-path and outlet-name assertions; improve diagnostic output on failure. Do not modify the immutable fixture or product sources.",
+  "actual_compiler_replay": {
+    "node": "24.21.0",
+    "typescript": "6.0.3",
+    "current_source_files": 131,
+    "current_diagnostics": 0,
+    "current_emit_skipped": false,
+    "retained_cycle_diagnostics": 1,
+    "retained_code": -993003,
+    "retained_path": "projects/ngx-material-legacy/legacy-table/table.ts",
+    "report": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/table-outlet-aot-current-root-v2.json",
+    "report_sha256": "f3db2c9fab88971e2d2e4d1222c75e185f1fff2e4819a2de87cbf2436a29937c"
+  },
+  "separate_runtime_replay": "Current table_outlet_runtime_probe passed 12 tagged outlet/ownership cases and rejected 10 mutants under Node 24.21.0. Its explicit synthetic context does not qualify full packed/native integration.",
+  "limits": "Current source partial compilation and a retained negative fixture only. No final packed application, browser matrix, consumer floor or release gate pass.",
+  "g11_claim": "not-passed"
+}

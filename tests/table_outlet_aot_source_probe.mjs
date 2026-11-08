@@ -22,6 +22,15 @@ const sha=b=>createHash('sha256').update(b).digest('hex');assert.equal(sha(readF
 const fixture=JSON.parse(readFileSync(fixtureFile));
 const expected=['internal/table-outlet.ts','public-api.ts','table-module.ts'].map(p=>'projects/ngx-material-legacy/legacy-table/'+p).sort();
 assert.deepEqual(Object.keys(fixture.files).sort(),expected);
+// Keep the retained cycle intact while resolving the unrelated common-module
+// move through today's public entry point. The immutable fixture stays unchanged.
+const retainedFiles={...fixture.files},modulePath='projects/ngx-material-legacy/legacy-table/table-module.ts',barrelPath='projects/ngx-material-legacy/legacy-table/public-api.ts';
+const oldImport="import {MatCommonModule} from './internal/common-module';",oldExport="export {MatCommonModule} from './internal/common-module';\n";
+assert.equal(retainedFiles[modulePath].split(oldImport).length,2);
+assert.equal(retainedFiles[barrelPath].split(oldExport).length,2);
+retainedFiles[modulePath]=retainedFiles[modulePath].replace(oldImport,"import {MatLegacyCommonModule as MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';");
+retainedFiles[barrelPath]=retainedFiles[barrelPath].replace(oldExport,'');
+assert.equal(retainedFiles['projects/ngx-material-legacy/legacy-table/internal/table-outlet.ts'],fixture.files['projects/ngx-material-legacy/legacy-table/internal/table-outlet.ts']);
 const config=JSON.parse(readFileSync(join(sourceRoot,'tsconfig.lib.json'),'utf8'));
 const configured=ts.convertCompilerOptionsFromJson(config.compilerOptions,sourceRoot);assert.deepEqual(configured.errors,[]);
 const temp=mkdtempSync(join(tmpdir(),'table-outlet-aot-source-'));
@@ -29,7 +38,7 @@ try{
  const options={...configured.options,rootDir:sourceRoot,outDir:temp,declaration:false,declarationMap:false,sourceMap:false,inlineSources:false,
   paths:{'@ngx-compat/material-legacy/*':[join(sourceRoot,'*/public-api.ts')]},...config.angularCompilerOptions};
  const runs=[];
- for(const [id,overrides]of [['current-separated-directives',{}],['retained-import-cycle',fixture.files]]){
+ for(const [id,overrides]of [['current-separated-directives',{}],['retained-import-cycle',retainedFiles]]){
   const host=cli.createCompilerHost({options}),read=host.readFile.bind(host),loaded=new Set();
   host.readFile=file=>{if(file.startsWith(sourceRoot+'/'))loaded.add(file);return overrides[file.slice(root.length+1)]??read(file);};
   host.resolveModuleNames=(names,from)=>names.map(spec=>ts.resolveModuleName(spec,
@@ -37,7 +46,7 @@ try{
   const program=cli.createProgram({rootNames:[join(sourceRoot,'legacy-table/public-api.ts')],options,host});
   const diagnostics=cli.defaultGatherDiagnostics(program).map(d=>({code:d.code,path:d.file?.fileName.slice(root.length+1),message:ts.flattenDiagnosticMessageText(d.messageText,'\n'),related:(d.relatedInformation||[]).map(r=>({path:r.file?.fileName.slice(root.length+1),message:ts.flattenDiagnosticMessageText(r.messageText,'\n')}))}));
   if(id==='current-separated-directives'){assert.deepEqual(diagnostics,[]);assert.equal(program.emit().emitSkipped,false);}
-  else{assert.equal(diagnostics.length,1);assert.equal(diagnostics[0].code,-993003);assert.match(diagnostics[0].message,/import cycles/);assert.match(diagnostics[0].related.map(r=>r.message).join('\n'),/_LegacyTableOutlet/);assert.equal(diagnostics[0].path,'projects/ngx-material-legacy/legacy-table/table.ts');}
+  else{assert.equal(diagnostics.length,1,JSON.stringify(diagnostics,null,2));assert.equal(diagnostics[0].code,-993003);assert.match(diagnostics[0].message,/import cycles/);assert.match(diagnostics[0].related.map(r=>r.message).join('\n'),/_LegacyTableOutlet/);assert.equal(diagnostics[0].path,'projects/ngx-material-legacy/legacy-table/table.ts');}
   runs.push({id,diagnostics,source_caps:[...loaded].filter(p=>!p.endsWith('.ngtypecheck.ts')&&read(p)!==undefined).sort().map(p=>({path:p.slice(root.length+1),sha256:sha(overrides[p.slice(root.length+1)]??read(p))}))});
  }
  const result={role:'Angular partial compiler regression on source table entry;not packed/native/floor qualification',node:process.version,typescript:ts.version,
