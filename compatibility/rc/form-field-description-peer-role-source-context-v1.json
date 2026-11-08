@@ -1,0 +1,1711 @@
+{
+  "schema_version": 1,
+  "status": "source-context-only",
+  "root_review": {
+    "path": "compatibility/rc/parent-main-form-field-description-repair-v1.json",
+    "sha256": "7008271d1d1320cd30c9e1397850a92a521f0032f97e84d20ea3201a5badb88a"
+  },
+  "prior_source_data": {
+    "path": "compatibility/rc/form-field-description-prior-source-v1.ts.txt",
+    "sha256": "ea2bcd2a85cb1511cfa57a7d68d2edd45757ecd703df0ebfa0d613e3f4b79ccd"
+  },
+  "current_source": {
+    "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+    "sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927"
+  },
+  "source_transition": {
+    "old_source_sha256": "ea2bcd2a85cb1511cfa57a7d68d2edd45757ecd703df0ebfa0d613e3f4b79ccd",
+    "current_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+    "source_diff": "diff --git a/projects/ngx-material-legacy/legacy-form-field/form-field.ts b/projects/ngx-material-legacy/legacy-form-field/form-field.ts\nindex dda4b47f4..66e28a0ed 100644\n--- a/projects/ngx-material-legacy/legacy-form-field/form-field.ts\n+++ b/projects/ngx-material-legacy/legacy-form-field/form-field.ts\n@@ -35,7 +35,7 @@ import {\n import {ThemePalette} from '@angular/material/core';\n import {CanColor, mixinColor} from './internal/common-behaviors';\n import {fromEvent, merge, Subject, Subscription} from 'rxjs';\n-import {filter, map, pairwise, startWith, take, takeUntil} from 'rxjs/operators';\n+import {startWith, take, takeUntil} from 'rxjs/operators';\n import {MatLegacyError} from './error';\n import {_MAT_LEGACY_HINT, MatLegacyHint} from './hint';\n import {MatLegacyLabel} from './label';\n@@ -281,7 +281,6 @@ export class MatLegacyFormField\n   private _previousControlValidatorFn: ValidatorFn | null = null;\n   private _stateChanges: Subscription | undefined;\n   private _valueChanges: Subscription | undefined;\n-  private _describedByChanges: Subscription | undefined;\n   /** Hint/error IDs last assigned by `_syncDescribedByIds`. */\n   private _describedByIds: string[] | undefined;\n \n@@ -470,7 +469,6 @@ export class MatLegacyFormField\n     this._directionFrames.clear();\n     this._stateChanges?.unsubscribe();\n     this._valueChanges?.unsubscribe();\n-    this._describedByChanges?.unsubscribe();\n     this._destroyed.next();\n     this._destroyed.complete();\n   }\n@@ -659,22 +657,11 @@ export class MatLegacyFormField\n     this._stateChanges?.unsubscribe();\n     this._stateChanges = control.stateChanges.subscribe(() => {\n       this._validatePlaceholders();\n+      this._syncDescribedByIds();\n       this._changeDetectorRef.markForCheck();\n     });\n     this._validatePlaceholders();\n \n-    // Updating aria-describedby touches the DOM. Only do it when error/user ids change.\n-    this._describedByChanges?.unsubscribe();\n-    this._describedByChanges = control.stateChanges\n-      .pipe(\n-        startWith([undefined, undefined] as const),\n-        map(() => [control.errorState, control.userAriaDescribedBy] as const),\n-        pairwise(),\n-        filter(([[prevErrorState, prevDescribedBy], [currentErrorState, currentDescribedBy]]) => {\n-          return prevErrorState !== currentErrorState || prevDescribedBy !== currentDescribedBy;\n-        }),\n-      )\n-      .subscribe(() => this._syncDescribedByIds());\n     this._syncDescribedByIds();\n \n     this._valueChanges?.unsubscribe();\n",
+    "root_review": {
+      "path": "compatibility/rc/parent-main-form-field-description-repair-v1.json",
+      "sha256": "7008271d1d1320cd30c9e1397850a92a521f0032f97e84d20ea3201a5badb88a"
+    },
+    "source_roles": [
+      {
+        "kind": "current",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "Injector"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 25,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "Injector"
+          },
+          {
+            "line": 309,
+            "parent_kind": "TypeReference",
+            "parent_text": "Injector"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 25,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "Injector"
+          },
+          {
+            "line": 308,
+            "parent_kind": "TypeReference",
+            "parent_text": "Injector"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "Injector",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "Injector",
+              "type_only": false,
+              "line": 25
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "Optional trailing constructor Injector is forwarded to afterFormFieldRender; the new subscript animation lifecycle does not alter the slot, receiver, helper call or imported token. The exact peer-use role and binding are unchanged under the specifically reviewed source delta; prior peer-use evidence may be referenced as historical evidence, subject to new source/context binding and its original scope."
+      },
+      {
+        "kind": "current",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/forms",
+          "ValidatorFn"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 47,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ValidatorFn"
+          },
+          {
+            "line": 281,
+            "parent_kind": "TypeReference",
+            "parent_text": "ValidatorFn"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 47,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ValidatorFn"
+          },
+          {
+            "line": 281,
+            "parent_kind": "TypeReference",
+            "parent_text": "ValidatorFn"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/forms",
+          "symbol": "ValidatorFn",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "ValidatorFn",
+              "type_only": false,
+              "line": 47
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "Type annotation of cached previous control validator; ngAfterContentChecked still obtains and compares the control validator and marks the field for check. The exact peer-use role and binding are unchanged under the specifically reviewed source delta; prior peer-use evidence may be referenced as historical evidence, subject to new source/context binding and its original scope."
+      },
+      {
+        "kind": "current",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "AfterViewChecked"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 17,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "AfterViewChecked"
+          },
+          {
+            "line": 161,
+            "parent_kind": "ExpressionWithTypeArguments",
+            "parent_text": "AfterViewChecked"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 17,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "AfterViewChecked"
+          },
+          {
+            "line": 161,
+            "parent_kind": "ExpressionWithTypeArguments",
+            "parent_text": "AfterViewChecked"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "AfterViewChecked",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "AfterViewChecked",
+              "type_only": false,
+              "line": 17
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "AfterViewChecked drives the current subscript-message enter path: it detects message-kind changes, cancels a superseded WAAPI animation, restores the tagged inline resting opacity/translateY, animates only in browser with motion enabled and Element.animate support (300 ms with tagged easing), and cancels on destroy. The Material 16 lifecycle used Angular animation triggers; current code is an owned engine-free equivalent. Independent review found no additional blocker within this finite scope. Do not infer generated Angular animation marker parity or complete clean packed/floor/hydration/G11 clearance. This is a bounded current public-use source judgment; broader artifact, runtime and floor claims remain separate."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/cdk/bidi",
+          "Directionality"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 10,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "Directionality"
+          },
+          {
+            "line": 302,
+            "parent_kind": "TypeReference",
+            "parent_text": "Directionality"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 10,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "Directionality"
+          },
+          {
+            "line": 301,
+            "parent_kind": "TypeReference",
+            "parent_text": "Directionality"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/cdk/bidi",
+          "symbol": "Directionality",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "Directionality",
+              "type_only": false,
+              "line": 10
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "Optional DI supplies direction and change stream; the owned field uses its value for label geometry and cancels owned direction frames on destruction. Current source identifier lines: 10, 302. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/cdk/coercion",
+          "BooleanInput"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 12,
+            "parent_kind": "TypeAliasDeclaration",
+            "parent_text": "type BooleanInput = string | boolean | null | undefined;"
+          },
+          {
+            "line": 197,
+            "parent_kind": "TypeReference",
+            "parent_text": "BooleanInput"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 12,
+            "parent_kind": "TypeAliasDeclaration",
+            "parent_text": "type BooleanInput = string | boolean | null | undefined;"
+          },
+          {
+            "line": 197,
+            "parent_kind": "TypeReference",
+            "parent_text": "BooleanInput"
+          }
+        ],
+        "current_scanner_use": null,
+        "retired_from_current_peer_scanner": true,
+        "prior_decision": "The frozen CDK type import is replaced by a local unexported primitive union. The hideRequiredMarker input still delegates runtime coercion separately. Current source identifier lines: 12, 197. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/cdk/coercion",
+          "coerceBooleanProperty"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 11,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "coerceBooleanProperty"
+          },
+          {
+            "line": 198,
+            "parent_kind": "CallExpression",
+            "parent_text": "coerceBooleanProperty(value)"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 11,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "coerceBooleanProperty"
+          },
+          {
+            "line": 198,
+            "parent_kind": "CallExpression",
+            "parent_text": "coerceBooleanProperty(value)"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/cdk/coercion",
+          "symbol": "coerceBooleanProperty",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "coerceBooleanProperty",
+              "type_only": false,
+              "line": 11
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "The hideRequiredMarker setter uses public CDK coercion; pinned implementation treats null/undefined and string false as false and other values as true. Current source identifier lines: 11, 198. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "AfterContentChecked"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 14,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "AfterContentChecked"
+          },
+          {
+            "line": 161,
+            "parent_kind": "ExpressionWithTypeArguments",
+            "parent_text": "AfterContentChecked"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 14,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "AfterContentChecked"
+          },
+          {
+            "line": 161,
+            "parent_kind": "ExpressionWithTypeArguments",
+            "parent_text": "AfterContentChecked"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "AfterContentChecked",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "AfterContentChecked",
+              "type_only": false,
+              "line": 14
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "The content hook validates and updates the control and outline; the new rendered-branch animation moved to AfterViewChecked. Current source identifier lines: 14, 161. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "AfterContentInit"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 15,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "AfterContentInit"
+          },
+          {
+            "line": 161,
+            "parent_kind": "ExpressionWithTypeArguments",
+            "parent_text": "AfterContentInit"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 15,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "AfterContentInit"
+          },
+          {
+            "line": 161,
+            "parent_kind": "ExpressionWithTypeArguments",
+            "parent_text": "AfterContentInit"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "AfterContentInit",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "AfterContentInit",
+              "type_only": false,
+              "line": 15
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "Type-only lifecycle interface; the owned hook binds control/query/direction subscriptions. Full teardown and scheduling remain distinct runtime obligations. Current source identifier lines: 15, 161. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "AfterViewInit"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 16,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "AfterViewInit"
+          },
+          {
+            "line": 161,
+            "parent_kind": "ExpressionWithTypeArguments",
+            "parent_text": "AfterViewInit"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 16,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "AfterViewInit"
+          },
+          {
+            "line": 161,
+            "parent_kind": "ExpressionWithTypeArguments",
+            "parent_text": "AfterViewInit"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "AfterViewInit",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "AfterViewInit",
+              "type_only": false,
+              "line": 16
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "The initial hook sets the enter state and triggers initial view checking, so first content is not animated. Current source identifier lines: 16, 161. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "ChangeDetectionStrategy"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 18,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ChangeDetectionStrategy"
+          },
+          {
+            "line": 156,
+            "parent_kind": "PropertyAccessExpression",
+            "parent_text": "ChangeDetectionStrategy.OnPush"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 18,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ChangeDetectionStrategy"
+          },
+          {
+            "line": 156,
+            "parent_kind": "PropertyAccessExpression",
+            "parent_text": "ChangeDetectionStrategy.OnPush"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "ChangeDetectionStrategy",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "ChangeDetectionStrategy",
+              "type_only": false,
+              "line": 18
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "OnPush component metadata is unchanged; the new post-view motion is qualified only by the named focused observations. Current source identifier lines: 18, 156. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "ChangeDetectorRef"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 19,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ChangeDetectorRef"
+          },
+          {
+            "line": 301,
+            "parent_kind": "TypeReference",
+            "parent_text": "ChangeDetectorRef"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 19,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ChangeDetectorRef"
+          },
+          {
+            "line": 300,
+            "parent_kind": "TypeReference",
+            "parent_text": "ChangeDetectorRef"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "ChangeDetectorRef",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "ChangeDetectorRef",
+              "type_only": false,
+              "line": 19
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "Constructor dependency for markForCheck and detectChanges in lifecycle and control handling; no new direct call was introduced by this delta. Current source identifier lines: 19, 301. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "Component"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 20,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "Component"
+          },
+          {
+            "line": 114,
+            "parent_kind": "CallExpression",
+            "parent_text": "Component({\n  standalone: false,\n  selector: 'mat-form-field',\n  exportAs: 'matFormField',\n  templateUrl: 'form-field.html',\n  // MatInput is a directive and can't have styles, so we need to include its styles here\n  // in form-field-input.css. The MatInput styles are fairly minimal so it shouldn't be a\n  // big deal for people who aren't using MatInput.\n  styleUrls: [\n    'form-field.scss',\n    'form-field-fill.scss',\n    'form-field-input.scss',\n    'form-field-legacy.scss',\n    'form-field-outline.scss',\n    'form-field-standard.scss',\n  ],\n  host: {\n    'class': 'mat-form-field',\n    '[class.mat-form-field-appearance-standard]': 'appearance == \"standard\"',\n    '[class.mat-form-field-appearance-fill]': 'appearance == \"fill\"',\n    '[class.mat-form-field-appearance-outline]': 'appearance == \"outline\"',\n    '[class.mat-form-field-appearance-legacy]': 'appearance == \"legacy\"',\n    '[class.mat-form-field-invalid]': '_control.errorState',\n    '[class.mat-form-field-can-float]': '_canLabelFloat()',\n    '[class.mat-form-field-should-float]': '_shouldLabelFloat()',\n    '[class.mat-form-field-has-label]': '_hasFloatingLabel()',\n    '[class.mat-form-field-hide-placeholder]': '_hideControlPlaceholder()',\n    '[class.mat-form-field-disabled]': '_control.disabled',\n    '[class.mat-form-field-autofilled]': '_control.autofilled',\n    '[class.mat-focused]': '_control.focused',\n    '[class.ng-untouched]': '_shouldForward(\"untouched\")',\n    '[class.ng-touched]': '_shouldForward(\"touched\")',\n    '[class.ng-pristine]': '_shouldForward(\"pristine\")',\n    '[class.ng-dirty]': '_shouldForward(\"dirty\")',\n    '[class.ng-valid]': '_shouldForward(\"valid\")',\n    '[class.ng-invalid]': '_shouldForward(\"invalid\")',\n    '[class.ng-pending]': '_shouldForward(\"pending\")',\n    '[class._mat-animation-noopable]': '!_animationsEnabled',\n    'ngSkipHydration': '',\n  },\n  inputs: ['color'],\n  encapsulation: ViewEncapsulation.None,\n  changeDetection: ChangeDetectionStrategy.OnPush,\n  providers: [{provide: MAT_FORM_FIELD, useExisting: MatLegacyFormField}],\n})"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 20,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "Component"
+          },
+          {
+            "line": 114,
+            "parent_kind": "CallExpression",
+            "parent_text": "Component({\n  standalone: false,\n  selector: 'mat-form-field',\n  exportAs: 'matFormField',\n  templateUrl: 'form-field.html',\n  // MatInput is a directive and can't have styles, so we need to include its styles here\n  // in form-field-input.css. The MatInput styles are fairly minimal so it shouldn't be a\n  // big deal for people who aren't using MatInput.\n  styleUrls: [\n    'form-field.scss',\n    'form-field-fill.scss',\n    'form-field-input.scss',\n    'form-field-legacy.scss',\n    'form-field-outline.scss',\n    'form-field-standard.scss',\n  ],\n  host: {\n    'class': 'mat-form-field',\n    '[class.mat-form-field-appearance-standard]': 'appearance == \"standard\"',\n    '[class.mat-form-field-appearance-fill]': 'appearance == \"fill\"',\n    '[class.mat-form-field-appearance-outline]': 'appearance == \"outline\"',\n    '[class.mat-form-field-appearance-legacy]': 'appearance == \"legacy\"',\n    '[class.mat-form-field-invalid]': '_control.errorState',\n    '[class.mat-form-field-can-float]': '_canLabelFloat()',\n    '[class.mat-form-field-should-float]': '_shouldLabelFloat()',\n    '[class.mat-form-field-has-label]': '_hasFloatingLabel()',\n    '[class.mat-form-field-hide-placeholder]': '_hideControlPlaceholder()',\n    '[class.mat-form-field-disabled]': '_control.disabled',\n    '[class.mat-form-field-autofilled]': '_control.autofilled',\n    '[class.mat-focused]': '_control.focused',\n    '[class.ng-untouched]': '_shouldForward(\"untouched\")',\n    '[class.ng-touched]': '_shouldForward(\"touched\")',\n    '[class.ng-pristine]': '_shouldForward(\"pristine\")',\n    '[class.ng-dirty]': '_shouldForward(\"dirty\")',\n    '[class.ng-valid]': '_shouldForward(\"valid\")',\n    '[class.ng-invalid]': '_shouldForward(\"invalid\")',\n    '[class.ng-pending]': '_shouldForward(\"pending\")',\n    '[class._mat-animation-noopable]': '!_animationsEnabled',\n    'ngSkipHydration': '',\n  },\n  inputs: ['color'],\n  encapsulation: ViewEncapsulation.None,\n  changeDetection: ChangeDetectionStrategy.OnPush,\n  providers: [{provide: MAT_FORM_FIELD, useExisting: MatLegacyFormField}],\n})"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "Component",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "Component",
+              "type_only": false,
+              "line": 20
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "The public component decorator and host metadata remain, while native enter behavior and conditional wrapper source are separately reviewed. Current source identifier lines: 20, 114. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "ContentChild"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 21,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ContentChild"
+          },
+          {
+            "line": 269,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChild(MatFormFieldControl)"
+          },
+          {
+            "line": 270,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChild(MatFormFieldControl, {static: true})"
+          },
+          {
+            "line": 288,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChild(MatLegacyLabel)"
+          },
+          {
+            "line": 289,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChild(MatLegacyLabel, {static: true})"
+          },
+          {
+            "line": 290,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChild(MatLegacyPlaceholder)"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 21,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ContentChild"
+          },
+          {
+            "line": 269,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChild(MatFormFieldControl)"
+          },
+          {
+            "line": 270,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChild(MatFormFieldControl, {static: true})"
+          },
+          {
+            "line": 287,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChild(MatLegacyLabel)"
+          },
+          {
+            "line": 288,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChild(MatLegacyLabel, {static: true})"
+          },
+          {
+            "line": 289,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChild(MatLegacyPlaceholder)"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "ContentChild",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "ContentChild",
+              "type_only": false,
+              "line": 21
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "Public query decorators select the public MatFormFieldControl token and owned label/placeholder directives; old and new source declarations are unchanged. Current source identifier lines: 21, 269, 270, 288, 289, 290. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "ContentChildren"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 22,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ContentChildren"
+          },
+          {
+            "line": 292,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChildren(MAT_ERROR, {descendants: true})"
+          },
+          {
+            "line": 293,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChildren(_MAT_LEGACY_HINT, {descendants: true})"
+          },
+          {
+            "line": 294,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChildren(MAT_PREFIX, {descendants: true})"
+          },
+          {
+            "line": 296,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChildren(MAT_SUFFIX, {descendants: true})"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 22,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ContentChildren"
+          },
+          {
+            "line": 291,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChildren(MAT_ERROR, {descendants: true})"
+          },
+          {
+            "line": 292,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChildren(_MAT_LEGACY_HINT, {descendants: true})"
+          },
+          {
+            "line": 293,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChildren(MAT_PREFIX, {descendants: true})"
+          },
+          {
+            "line": 295,
+            "parent_kind": "CallExpression",
+            "parent_text": "ContentChildren(MAT_SUFFIX, {descendants: true})"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "ContentChildren",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "ContentChildren",
+              "type_only": false,
+              "line": 22
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "The owned error query influences displayed message kind; hint and error now occupy separate tagged direct wrappers. Current source identifier lines: 22, 292, 293, 294, 296. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "ElementRef"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 23,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ElementRef"
+          },
+          {
+            "line": 71,
+            "parent_kind": "TypeReference",
+            "parent_text": "ElementRef"
+          },
+          {
+            "line": 265,
+            "parent_kind": "TypeReference",
+            "parent_text": "ElementRef"
+          },
+          {
+            "line": 266,
+            "parent_kind": "TypeReference",
+            "parent_text": "ElementRef"
+          },
+          {
+            "line": 267,
+            "parent_kind": "TypeReference",
+            "parent_text": "ElementRef<HTMLElement>"
+          },
+          {
+            "line": 300,
+            "parent_kind": "TypeReference",
+            "parent_text": "ElementRef"
+          },
+          {
+            "line": 339,
+            "parent_kind": "TypeReference",
+            "parent_text": "ElementRef"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 23,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ElementRef"
+          },
+          {
+            "line": 71,
+            "parent_kind": "TypeReference",
+            "parent_text": "ElementRef"
+          },
+          {
+            "line": 265,
+            "parent_kind": "TypeReference",
+            "parent_text": "ElementRef"
+          },
+          {
+            "line": 266,
+            "parent_kind": "TypeReference",
+            "parent_text": "ElementRef"
+          },
+          {
+            "line": 267,
+            "parent_kind": "TypeReference",
+            "parent_text": "ElementRef<HTMLElement>"
+          },
+          {
+            "line": 299,
+            "parent_kind": "TypeReference",
+            "parent_text": "ElementRef"
+          },
+          {
+            "line": 338,
+            "parent_kind": "TypeReference",
+            "parent_text": "ElementRef"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "ElementRef",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "ElementRef",
+              "type_only": false,
+              "line": 23
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "The host element queries the direct rendered subscript child; current native animation writes its historical resting inline styles. Current source identifier lines: 23, 71, 265, 266, 267, 300, 336, 339. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "Inject"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 24,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "Inject"
+          },
+          {
+            "line": 304,
+            "parent_kind": "CallExpression",
+            "parent_text": "Inject(MAT_LEGACY_FORM_FIELD_DEFAULT_OPTIONS)"
+          },
+          {
+            "line": 308,
+            "parent_kind": "CallExpression",
+            "parent_text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 24,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "Inject"
+          },
+          {
+            "line": 303,
+            "parent_kind": "CallExpression",
+            "parent_text": "Inject(MAT_LEGACY_FORM_FIELD_DEFAULT_OPTIONS)"
+          },
+          {
+            "line": 307,
+            "parent_kind": "CallExpression",
+            "parent_text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "Inject",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "Inject",
+              "type_only": false,
+              "line": 24
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "Public parameter decorator selects the owned default-options token and the public animation-mode token; no decorator shape changed. Current source identifier lines: 24, 304, 308. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "Input"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 26,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "Input"
+          },
+          {
+            "line": 177,
+            "parent_kind": "CallExpression",
+            "parent_text": "Input()"
+          },
+          {
+            "line": 193,
+            "parent_kind": "CallExpression",
+            "parent_text": "Input()"
+          },
+          {
+            "line": 223,
+            "parent_kind": "CallExpression",
+            "parent_text": "Input()"
+          },
+          {
+            "line": 247,
+            "parent_kind": "CallExpression",
+            "parent_text": "Input()"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 26,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "Input"
+          },
+          {
+            "line": 177,
+            "parent_kind": "CallExpression",
+            "parent_text": "Input()"
+          },
+          {
+            "line": 193,
+            "parent_kind": "CallExpression",
+            "parent_text": "Input()"
+          },
+          {
+            "line": 223,
+            "parent_kind": "CallExpression",
+            "parent_text": "Input()"
+          },
+          {
+            "line": 247,
+            "parent_kind": "CallExpression",
+            "parent_text": "Input()"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "Input",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "Input",
+              "type_only": false,
+              "line": 26
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "Public decorator exposes owned appearance, required marker, label and hint settings; coercion and view effects remain separate. Current source identifier lines: 26, 177, 193, 223, 247. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "NgZone"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 27,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "NgZone"
+          },
+          {
+            "line": 307,
+            "parent_kind": "TypeReference",
+            "parent_text": "NgZone"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 27,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "NgZone"
+          },
+          {
+            "line": 306,
+            "parent_kind": "TypeReference",
+            "parent_text": "NgZone"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "NgZone",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "NgZone",
+              "type_only": false,
+              "line": 27
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "Existing public zone work and scheduling remain; the new native motion runs after view check and scoped zoneful/zoneless cases were exercised. Current source identifier lines: 27, 307, 348. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "Optional"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 28,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "Optional"
+          },
+          {
+            "line": 302,
+            "parent_kind": "CallExpression",
+            "parent_text": "Optional()"
+          },
+          {
+            "line": 303,
+            "parent_kind": "CallExpression",
+            "parent_text": "Optional()"
+          },
+          {
+            "line": 308,
+            "parent_kind": "CallExpression",
+            "parent_text": "Optional()"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 28,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "Optional"
+          },
+          {
+            "line": 301,
+            "parent_kind": "CallExpression",
+            "parent_text": "Optional()"
+          },
+          {
+            "line": 302,
+            "parent_kind": "CallExpression",
+            "parent_text": "Optional()"
+          },
+          {
+            "line": 307,
+            "parent_kind": "CallExpression",
+            "parent_text": "Optional()"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "Optional",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "Optional",
+              "type_only": false,
+              "line": 28
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "Public DI metadata marks Directionality, owned defaults and animation mode optional. No automatic provider or fabricated token identity is assumed. Current source identifier lines: 28, 302, 303, 308. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "QueryList"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 29,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "QueryList"
+          },
+          {
+            "line": 292,
+            "parent_kind": "TypeReference",
+            "parent_text": "QueryList<MatLegacyError>"
+          },
+          {
+            "line": 293,
+            "parent_kind": "TypeReference",
+            "parent_text": "QueryList<MatLegacyHint>"
+          },
+          {
+            "line": 295,
+            "parent_kind": "TypeReference",
+            "parent_text": "QueryList<MatLegacyPrefix>"
+          },
+          {
+            "line": 297,
+            "parent_kind": "TypeReference",
+            "parent_text": "QueryList<MatLegacySuffix>"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 29,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "QueryList"
+          },
+          {
+            "line": 291,
+            "parent_kind": "TypeReference",
+            "parent_text": "QueryList<MatLegacyError>"
+          },
+          {
+            "line": 292,
+            "parent_kind": "TypeReference",
+            "parent_text": "QueryList<MatLegacyHint>"
+          },
+          {
+            "line": 294,
+            "parent_kind": "TypeReference",
+            "parent_text": "QueryList<MatLegacyPrefix>"
+          },
+          {
+            "line": 296,
+            "parent_kind": "TypeReference",
+            "parent_text": "QueryList<MatLegacySuffix>"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "QueryList",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "QueryList",
+              "type_only": false,
+              "line": 29
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "The queried error collection supplies length and change notifications used to select the rendered message. Current source identifier lines: 29, 292, 293, 295, 297. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "ViewChild"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 30,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ViewChild"
+          },
+          {
+            "line": 265,
+            "parent_kind": "CallExpression",
+            "parent_text": "ViewChild('connectionContainer', {static: true})"
+          },
+          {
+            "line": 266,
+            "parent_kind": "CallExpression",
+            "parent_text": "ViewChild('inputContainer')"
+          },
+          {
+            "line": 267,
+            "parent_kind": "CallExpression",
+            "parent_text": "ViewChild('label')"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 30,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ViewChild"
+          },
+          {
+            "line": 265,
+            "parent_kind": "CallExpression",
+            "parent_text": "ViewChild('connectionContainer', {static: true})"
+          },
+          {
+            "line": 266,
+            "parent_kind": "CallExpression",
+            "parent_text": "ViewChild('inputContainer')"
+          },
+          {
+            "line": 267,
+            "parent_kind": "CallExpression",
+            "parent_text": "ViewChild('label')"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "ViewChild",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "ViewChild",
+              "type_only": false,
+              "line": 30
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "Public view queries provide container and label ElementRef values used by owned layout; no query declaration changed. Current source identifier lines: 30, 265, 266, 267. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "ViewEncapsulation"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 31,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ViewEncapsulation"
+          },
+          {
+            "line": 155,
+            "parent_kind": "PropertyAccessExpression",
+            "parent_text": "ViewEncapsulation.None"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 31,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ViewEncapsulation"
+          },
+          {
+            "line": 155,
+            "parent_kind": "PropertyAccessExpression",
+            "parent_text": "ViewEncapsulation.None"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "ViewEncapsulation",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "ViewEncapsulation",
+              "type_only": false,
+              "line": 31
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "Public None metadata preserves global historical styling; this review does not qualify cascade or style output. Current source identifier lines: 31, 155. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "OnDestroy"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 32,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "OnDestroy"
+          },
+          {
+            "line": 161,
+            "parent_kind": "ExpressionWithTypeArguments",
+            "parent_text": "OnDestroy"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 32,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "OnDestroy"
+          },
+          {
+            "line": 161,
+            "parent_kind": "ExpressionWithTypeArguments",
+            "parent_text": "OnDestroy"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "OnDestroy",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "OnDestroy",
+              "type_only": false,
+              "line": 32
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "Owned teardown now cancels the current native animation and existing frame/subscription cleanup. Current source identifier lines: 32, 161. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "InjectionToken"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 33,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "InjectionToken"
+          },
+          {
+            "line": 109,
+            "parent_kind": "NewExpression",
+            "parent_text": "new InjectionToken<MatLegacyFormFieldDefaultOptions>('MAT_FORM_FIELD_DEFAULT_OPTIONS')"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 33,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "InjectionToken"
+          },
+          {
+            "line": 109,
+            "parent_kind": "NewExpression",
+            "parent_text": "new InjectionToken<MatLegacyFormFieldDefaultOptions>('MAT_FORM_FIELD_DEFAULT_OPTIONS')"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "InjectionToken",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "InjectionToken",
+              "type_only": false,
+              "line": 33
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "Public opaque DI token constructor creates owned MAT_LEGACY_FORM_FIELD_DEFAULT_OPTIONS, not a substitution for Material token identity. Current source identifier lines: 33, 109. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/material/core",
+          "ThemePalette"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 35,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ThemePalette"
+          },
+          {
+            "line": 94,
+            "parent_kind": "TypeReference",
+            "parent_text": "ThemePalette"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 35,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ThemePalette"
+          },
+          {
+            "line": 94,
+            "parent_kind": "TypeReference",
+            "parent_text": "ThemePalette"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/material/core",
+          "symbol": "ThemePalette",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "ThemePalette",
+              "type_only": false,
+              "line": 35
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "Public Material type re-export is primary/accent/warn/undefined; it labels historical M2 color options, not native M3 theming or a call to m2 compatibility Sass. Current source identifier lines: 35, 94. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/cdk/platform",
+          "Platform"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 45,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "Platform"
+          },
+          {
+            "line": 306,
+            "parent_kind": "TypeReference",
+            "parent_text": "Platform"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 45,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "Platform"
+          },
+          {
+            "line": 305,
+            "parent_kind": "TypeReference",
+            "parent_text": "Platform"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/cdk/platform",
+          "symbol": "Platform",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "Platform",
+              "type_only": false,
+              "line": 45
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "The browser guard prevents server DOM styling and animation calls in the new view-checked hook. Current source identifier lines: 45, 306. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/forms",
+          "AbstractControlDirective"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 47,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "AbstractControlDirective"
+          },
+          {
+            "line": 482,
+            "parent_kind": "TypeReference",
+            "parent_text": "AbstractControlDirective"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 47,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "AbstractControlDirective"
+          },
+          {
+            "line": 480,
+            "parent_kind": "TypeReference",
+            "parent_text": "AbstractControlDirective"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/forms",
+          "symbol": "AbstractControlDirective",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "AbstractControlDirective",
+              "type_only": false,
+              "line": 47
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "Public forms abstract directive type is used through keyof to forward validity/touch/dirty state; no new dependency use was introduced. Current source identifier lines: 47, 479, 482. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/core",
+          "ANIMATION_MODULE_TYPE"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 48,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "line": 308,
+            "parent_kind": "CallExpression",
+            "parent_text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 48,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "line": 307,
+            "parent_kind": "CallExpression",
+            "parent_text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "current_scanner_use": {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "ANIMATION_MODULE_TYPE",
+          "candidate_source_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+          "occurrences": [
+            {
+              "kind": "named-import",
+              "local_name": "ANIMATION_MODULE_TYPE",
+              "type_only": false,
+              "line": 48
+            }
+          ]
+        },
+        "retired_from_current_peer_scanner": false,
+        "prior_decision": "The public core token remains optional; NoopAnimations and owned Material policy prevent native enter effect in the focused provider cases. Current source identifier lines: 48, 308. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/material/form-field",
+          "getMatFormFieldDuplicatedHintError"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 56,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "getMatFormFieldDuplicatedHintError"
+          },
+          {
+            "line": 573,
+            "parent_kind": "CallExpression",
+            "parent_text": "getMatFormFieldDuplicatedHintError('start')"
+          },
+          {
+            "line": 578,
+            "parent_kind": "CallExpression",
+            "parent_text": "getMatFormFieldDuplicatedHintError('end')"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 56,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "getMatFormFieldDuplicatedHintError"
+          },
+          {
+            "line": 571,
+            "parent_kind": "CallExpression",
+            "parent_text": "getMatFormFieldDuplicatedHintError('start')"
+          },
+          {
+            "line": 576,
+            "parent_kind": "CallExpression",
+            "parent_text": "getMatFormFieldDuplicatedHintError('end')"
+          }
+        ],
+        "current_scanner_use": null,
+        "retired_from_current_peer_scanner": true,
+        "prior_decision": "Frozen Material helper import is absent; local owned-errors factory supplies the historical duplicate-hint message and is a distinct owned implementation. Current source identifier lines: 56, 573, 578. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/material/form-field",
+          "getMatFormFieldMissingControlError"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 56,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "getMatFormFieldMissingControlError"
+          },
+          {
+            "line": 691,
+            "parent_kind": "CallExpression",
+            "parent_text": "getMatFormFieldMissingControlError()"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 56,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "getMatFormFieldMissingControlError"
+          },
+          {
+            "line": 678,
+            "parent_kind": "CallExpression",
+            "parent_text": "getMatFormFieldMissingControlError()"
+          }
+        ],
+        "current_scanner_use": null,
+        "retired_from_current_peer_scanner": true,
+        "prior_decision": "Frozen Material helper import is absent; local owned-errors factory supplies the historical missing-control error without importing a current private helper. Current source identifier lines: 56, 691. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      },
+      {
+        "kind": "frozen",
+        "key": [
+          "legacy-form-field/form-field.ts",
+          "@angular/material/form-field",
+          "getMatFormFieldPlaceholderConflictError"
+        ],
+        "prior_identifiers": [
+          {
+            "line": 56,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "getMatFormFieldPlaceholderConflictError"
+          },
+          {
+            "line": 552,
+            "parent_kind": "CallExpression",
+            "parent_text": "getMatFormFieldPlaceholderConflictError()"
+          }
+        ],
+        "current_identifiers": [
+          {
+            "line": 56,
+            "parent_kind": "ImportSpecifier",
+            "parent_text": "getMatFormFieldPlaceholderConflictError"
+          },
+          {
+            "line": 550,
+            "parent_kind": "CallExpression",
+            "parent_text": "getMatFormFieldPlaceholderConflictError()"
+          }
+        ],
+        "current_scanner_use": null,
+        "retired_from_current_peer_scanner": true,
+        "prior_decision": "Frozen Material helper import is absent; local owned-errors factory supplies the historical placeholder conflict error. Current source identifier lines: 56, 552. The exact complete prior use and its evidence are preserved; the native-motion and structural successor is bounded by the new context and integration receipt. No security, 21.x, full runtime or release qualification is implied."
+      }
+    ],
+    "scope": [
+      "Exact reviewed identifier AST parent text retained; four historical peer imports are absent and their local replacement identifiers remain local. Line positions may move.",
+      "The described-by synchronization lifecycle itself changed: one state-change subscription now synchronizes IDs on each emission, and its separate subscription/cleanup was removed.",
+      "Historical runtime reports are not presented as reruns; root repair record supplies separately scoped packed and maintained-input-family execution.",
+      "No full autocomplete, complete admission, browser-floor, G11 or release claim."
+    ]
+  },
+  "autocomplete_scope": "All 42 prior autocomplete reviews refer to the old form-field image as historical evidence; their trigger source, unchanged peer-use roles and prior runtime receipts retain their original scope. No new autocomplete runtime claim.",
+  "g11_claim": "not-passed"
+}

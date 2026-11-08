@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "role": "Qualify finite source-role and context changes after historical form-field description repair",
+  "parent": "9cd54f7a01645c64395e98e6c128e37d9133882c",
+  "base_product_commit": "8a0c4866dba602bd1f9c9916128f7537d986e0b9",
+  "manifest_sha256": "f89675283f5f3d235a1d8a9147969ea65da9459c620ee0574754988dce210872",
+  "patches": [
+    {
+      "name": "form-field-support-successor-v3.patch",
+      "sha256": "7501d93fe5781bb015c387feffb100c0fce8088c7ade1d8891fadf781161afcd"
+    },
+    {
+      "name": "form-field-current-successor-v3.patch",
+      "sha256": "7dc9e2d4f463cd4c8adf6841fd0d86b41f8ae31b99dc02d2b4058e34195f8ed8"
+    },
+    {
+      "name": "form-field-frozen-successor-v3.patch",
+      "sha256": "702f994dd8e78f7646a8d0e64d64314674b958aa4ba16174795756739c47c08e"
+    }
+  ],
+  "afterimages": [
+    {
+      "path": "compatibility/rc/form-field-description-peer-role-source-context-v1.json",
+      "sha256": "e2482313625cef94e19a5c61eb8ccdbaf0ef24866914f109f170ef457ac0710a"
+    },
+    {
+      "path": "compatibility/rc/form-field-description-prior-source-v1.ts.txt",
+      "sha256": "ea2bcd2a85cb1511cfa57a7d68d2edd45757ecd703df0ebfa0d613e3f4b79ccd"
+    },
+    {
+      "path": "compatibility/f10/authored-dependency-current-dispositions.json",
+      "sha256": "a17c7d3dbb90ab4d98a1012bde80f46f0b0af5abb2f75552c6380aec9a66f3cd"
+    },
+    {
+      "path": "compatibility/f10/authored-use-reviews/form-field-description-current-form-field-v1.json",
+      "sha256": "1fa8271df7460be7a3f82ebe89904076462fd60f3653745514f2c01b617c2674"
+    },
+    {
+      "path": "compatibility/rc/form-field-description-prior-current-ledger-v1.json",
+      "sha256": "136db952e84b89c22569eec31e4b861a11aeba8d9cf2923246199918dc7bfee9"
+    },
+    {
+      "path": "compatibility/f10/authored-dependency-dispositions.json",
+      "sha256": "ba0bf7e0b92d1add59ebe1bebab3cd624e26efd8f88675427ca885df0a784271"
+    },
+    {
+      "path": "compatibility/f10/authored-use-reviews/form-field-description-frozen-autocomplete-v1.json",
+      "sha256": "c5ca923d4188b333302bd0828118bc940f5c6a0c4d87be28201b2a7f6e203709"
+    },
+    {
+      "path": "compatibility/f10/authored-use-reviews/form-field-description-frozen-form-field-v1.json",
+      "sha256": "3699ca4373e18b203d0a66e60470419889dcde6cf9e933f4eeee7c867befaa8d"
+    },
+    {
+      "path": "compatibility/rc/form-field-description-prior-frozen-ledger-v1.json",
+      "sha256": "adadabd5097a800d2313b2e1056afa7fccc1ab42c3a6cc42f1b00e409e73b3b0"
+    }
+  ],
+  "independent_review": {
+    "sha256": "4bd95012f34024e1be5d1526785f13cc983e75b9fcaaeb168bb58aacaa400e49",
+    "text": "# Independent review: form-field description source-role successor v3\n\nReviewed frozen stage SHA-256 `176cd97d24c1281ec4e3778bcdad366765a1a6caad88834440e62bd86f1d210c`, manifest SHA `f89675283f5f3d235a1d8a9147969ea65da9459c620ee0574754988dce210872`, and shared/current/frozen patches `7501d93fe5781bb015c387feffb100c0fce8088c7ade1d8891fadf781161afcd`, `7dc9e2d4f463cd4c8adf6841fd0d86b41f8ae31b99dc02d2b4058e34195f8ed8`, and `702f994dd8e78f7646a8d0e64d64314674b958aa4ba16174795756739c47c08e`, respectively, against base `8a0c4866dba602bd1f9c9916128f7537d986e0b9`. Strict isolated application yielded nine files matching the frozen stage. No canonical edits or installation.\n\nNo remaining blocking finding in this bounded source-role review. The earlier v2 stage was invalid: its 3+70 ledger rows referenced old review hashes despite updated review files; v3 corrects this. Independently checked each selected v3 row equals its frozen row-update candidate and each review reference equals the staged bytes. All 73 complete previous rows and previous reviews are retained; old evidence is retained, with the historical form-field image archived as Git-identical parent bytes where needed. The 42 autocomplete trigger roles retain their unchanged trigger source and historical runtime scope.\n\nThe actual 8a0 form-field Git diff removes a separate filtered described-by subscription and its cleanup and synchronizes IDs on each existing control state notification. Independently compared all 31 reviewed form-field identifier AST parent contexts before/after. Four historical peer roles are absent as current peer imports: BooleanInput is a local union and the three error helpers come from owned-errors; v3 explicitly preserves their prior owned-replacement decisions and does not misidentify them as live peer bindings. Source-role identity is not a claim that the changed lifecycle has no behavior impact. The committed repair record separately documents narrow packed and maintained-input-family observations, including prior limitations; the input-family execution predates the later input test relocation and is not represented as a rerun.\n\nIndependent real scanner observed 509 production files and 1,931 uses; the staged current population hash matches. Byte comparison outside 3 current and 70 frozen row nodes plus the declared current population/history values passed. Replayed the actual evidence evaluator on frozen v3 rows: current 328/3 to 331/0, frozen 1362/374 to 1432/304, exactly 3+70 resolved, no added insufficiencies, targeted source/context/root/archived-image/trigger mutations rejected; all 46 blocked removed-use rows remain unchanged and insufficient. The independent driver (`evidence-controls-v3.mjs` SHA `4caf2d80d8d30070131d6aa2ec9cc778703f1205bad43173c3bfb278b9b4d082`) explicitly loads v3 row files and its input hashes were identical before and after. Its `replay.log` SHA `72c0a7b6aae8af2199e6d5743c5178e452bee9b7836295b1c92299b4e772d149` records these results.\n\nAt review time HEAD advanced to `313984c7fe1a2d13bccd0afc33ac17d66cc1d8c5`; its only delta from base is the input test relocation/restoration and its review record, with no production-source change. No browser replay, full autocomplete or input family rerun, 21.x floor, production baseline, security, G11 or release qualification is claimed.\n"
+  },
+  "root_checks": [
+    {
+      "name": "root-9cd-scanner-controls-v1.log",
+      "sha256": "16ae7d347486e468bc09121c35e2db5f7efaa76621ce522317955b95756dbcb3",
+      "log": "{\"files\":509,\"uses\":1931,\"unchanged_key_set\":true,\"changed_scan_rows\":28,\"source_population\":\"de4c33ed4d356bf827c97662a93fa17da826cfff34b75d6718496542bad547b0\"}\n"
+    },
+    {
+      "name": "root-9cd-evidence-controls-v3.log",
+      "sha256": "72c0a7b6aae8af2199e6d5743c5178e452bee9b7836295b1c92299b4e772d149",
+      "log": "{\"kind\":\"current\",\"before\":[328,3],\"after\":[331,0],\"exact_resolved\":3,\"no_added\":true,\"mutations_rejected\":true,\"blocked46_unchanged\":false,\"production_admission\":false}\n{\"kind\":\"frozen\",\"before\":[1362,374],\"after\":[1432,304],\"exact_resolved\":70,\"no_added\":true,\"mutations_rejected\":true,\"blocked46_unchanged\":true,\"production_admission\":false}\n"
+    },
+    {
+      "name": "root-9cd-byte-preservation-v5.log",
+      "sha256": "84329b3f0a4f469ced5d44c7c744aca6b7435b4107c45af7dde617fc168aa13e",
+      "log": "{\"kind\":\"current\",\"allowed_row_nodes\":3,\"other_bytes_identical\":true}\n{\"kind\":\"frozen\",\"allowed_row_nodes\":70,\"other_bytes_identical\":true}\n"
+    }
+  ],
+  "source_changes_after_review": "Input test relocation/original aria-live assertion restoration and README guidance only; production form-field/trigger bytes, role-ledger preimages and repair-record bytes unchanged. The later relocated input test was separately executed/reviewed in parent-main-input-test-integrity-v2.json; this source-review packet does not claim that execution as its own.",
+  "limits": [
+    "Exactly3current/70frozenrolebindings resolved, noaddedinsufficiencies. All46blockedremoved-use rowsremainunchangedandinsufficient.",
+    "Actualscanner509productionfiles/1931keysunchanged; updatedsourcepopulation only.",
+    "31reviewedidentifierASTcontextsunchanged; fourhistoricalpeerimportsareabsentandretainlocalowned-replacementjudgments.",
+    "Changeddescribed-bybehaviorseparatelyreproduced; unchangedidentifiercontextdoesnotprovebehavioralequivalence.",
+    "Oldform-fieldsourcebytes/receiptsremainhistorical;42autocomplete triggerrolesrebindsourcecontextwithoutnewautocompleteruntimeclaim.",
+    "InvalidV2packagingfailedclosedandwasretained; V3explicitrowupdates/stagehashesreviewedandactualrootreplaypassed.",
+    "No productionadmission,fullinput/autocomplete/browser/floor/Sass/G11/finalauditorreleasepass."
+  ]
+}
