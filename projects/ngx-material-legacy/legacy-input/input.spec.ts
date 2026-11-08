@@ -646,28 +646,6 @@ describe('MatInput without forms', () => {
     expect(input.getAttribute('aria-describedby')).toBe('start end');
   }));
 
-  it('updates descriptions when existing hint and error IDs change on a state notification', fakeAsync(() => {
-    const fixture = createComponent(MatInputDynamicDescriptionIds);
-    fixture.detectChanges();
-    const controls = fixture.debugElement.queryAll(By.directive(MatLegacyInput))
-      .map(node => node.injector.get(MatLegacyInput));
-    controls[1].errorState = true;
-    controls[1].stateChanges.next();
-    fixture.detectChanges();
-    const inputs: HTMLInputElement[] = Array.from(fixture.nativeElement.querySelectorAll('input'));
-    inputs[0].setAttribute('aria-describedby', 'old-hint external-hint');
-    inputs[1].setAttribute('aria-describedby', 'old-error external-error');
-    fixture.componentInstance.hintId = 'new-hint';
-    fixture.componentInstance.errorId = 'new-error';
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('mat-hint').id).toBe('new-hint');
-    expect(fixture.nativeElement.querySelector('mat-error').id).toBe('new-error');
-    controls.forEach(control => control.stateChanges.next());
-    fixture.detectChanges();
-    expect(inputs[0].getAttribute('aria-describedby')).toBe('new-hint external-hint');
-    expect(inputs[1].getAttribute('aria-describedby')).toBe('new-error external-error');
-  }));
-
   it('should set a class on the hint element based on its alignment', fakeAsync(() => {
     const fixture = createComponent(MatInputMultipleHintTestController);
 
@@ -1288,12 +1266,11 @@ describe('MatInput with forms', () => {
         .toBe(1);
     }));
 
-    it('should be in a parent element with an aria-live attribute to announce the error', fakeAsync(() => {
+    it('should set the proper aria-live attribute on the error messages', fakeAsync(() => {
       testComponent.formControl.markAsTouched();
       fixture.detectChanges();
 
-      const error = containerEl.querySelector('mat-error')!;
-      expect(error.closest('[aria-live]')!.getAttribute('aria-live')).toBe('polite');
+      expect(containerEl.querySelector('mat-error')!.getAttribute('aria-live')).toBe('polite');
     }));
 
     it('sets the aria-describedby to reference errors when in error state', fakeAsync(() => {
@@ -2486,3 +2463,28 @@ class MatInputWithColor {
 class MatInputWithRequiredFormControl {
   formControl = new FormControl('', [Validators.required]);
 }
+
+describe('MatInput dynamic descriptions', () => {
+  it('updates descriptions when existing hint and error IDs change on a state notification', fakeAsync(() => {
+    const fixture = createComponent(MatInputDynamicDescriptionIds);
+    fixture.detectChanges();
+    const controls = fixture.debugElement.queryAll(By.directive(MatLegacyInput))
+      .map(node => node.injector.get(MatLegacyInput));
+    controls[1].errorState = true;
+    controls[1].stateChanges.next();
+    fixture.detectChanges();
+    const inputs: HTMLInputElement[] = Array.from(fixture.nativeElement.querySelectorAll('input'));
+    inputs[0].setAttribute('aria-describedby', 'old-hint external-hint');
+    inputs[1].setAttribute('aria-describedby', 'old-error external-error');
+    fixture.componentInstance.hintId = 'new-hint';
+    fixture.componentInstance.errorId = 'new-error';
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('mat-hint').id).toBe('new-hint');
+    expect(fixture.nativeElement.querySelector('mat-error').id).toBe('new-error');
+    controls.forEach(control => control.stateChanges.next());
+    fixture.detectChanges();
+    expect(inputs[0].getAttribute('aria-describedby')).toBe('new-hint external-hint');
+    expect(inputs[1].getAttribute('aria-describedby')).toBe('new-error external-error');
+  }));
+
+});

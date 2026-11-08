@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "role": "Preserve historical input case identities and restore original direct error aria-live assertion",
+  "parent": "8a0c4866dba602bd1f9c9916128f7537d986e0b9",
+  "patch_sha256": "7b2d76ad3a0ab3e6afff27b9c27870881d8f800fccdae7b5c833518e1c533ab8",
+  "source": {
+    "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+    "before_sha256": "39a618496b90a1d860e05ee54a611f47274d7045122380edd26f6ee9dcec716a",
+    "after_sha256": "ab1073120be461d9451eaed8bc3c83768d3c5a60f8ca55c854ae471f7e19e289"
+  },
+  "independent_review": {
+    "sha256": "3e5ffb01621ad7058e4d651d3467b1eb0b4ac99bedfe622e7fe91e70ec126fa0",
+    "text": "# Independent review of test roster follow-up\n\nReviewed `../roster-move-v2.patch` SHA-256 `7b2d76ad3a0ab3e6afff27b9c27870881d8f800fccdae7b5c833518e1c533ab8`, based on `8a0c4866dba602bd1f9c9916128f7537d986e0b9`. It changes only input.spec.ts: moves the dynamic described-by regression byte-for-byte into a separate EOF describe and restores the reference error-element `aria-live` test, including its title and assertion. The restored block matches Material 16.2.14 `src/material/legacy-input/input.spec.ts` lines 1265\u20131270. The original surrounding describe has no setup hook; the case uses its own fixture. The v2 source tree's spec diff hashes to the reviewed patch and its postimage hashes to `ab1073120be461d9451eaed8bc3c83768d3c5a60f8ca55c854ae471f7e19e289`. Reverse apply check succeeds. The present external tree also reports two deleted compatibility/rc tar files; those are outside this patch and this review makes no claim about their presence when runs occurred.\n\nIndependently compared the `cases` arrays of `roster-before-v1.json` SHA-256 `adee60dffdf44a0887150cc5dabd6f289de783e59dca4ef0d91d12656c426e35` and `roster-after-v2.json` `4c71148f3fce9079454bdfd5a414902fe04895a1dc73b762c099bc5e9532a851`. There are no duplicate IDs or removed IDs; all old ID order is preserved. Exactly 2322 old records are unchanged, #82 changes only its full name back to the reference title, and new #112 is added. The comparison matches `../roster-move-comparison-v2.json` SHA-256 `46aa2fe11a981216f2ee52d2a45109eca9faac76f7ac06765c7e20561b97dc37`. This checks the retained generated roster, not independent completeness of the generator.\n\nRaw maintained input-family JSON baseline SHA-256 `e526b616b34e76765b35a444692237248a97fa8950c88ff41f59e2ccd9139038` records 151/152 with zero skips; only the moved regression fails, with both old hint and old error IDs in the assertion logs. Fixed JSON SHA-256 `3b026919588130c81589293b6a4ef53df1d219a803adbe254fff7df5e6c39c1f` records 152/152 and zero skips. Both record the restored exact error-element assertion passing. Corresponding logs SHA-256 `0c253100a0af61bb88cbbb122ef43a0d90ba8c975130d670a0ff3191fb1132bb` and `4e7683a4e6fed7d010132fdcc71c4d46ab3daee4dbe0b825306bcd5cee91a693` corroborate counts and `expectFail=false`. Artifact roots are the earlier independently checked extracted baseline and fixed packs; direct result `artifact_sha256` is null and the prior quiescent-workspace qualification remains. No browser was rerun in this review. These are input-family observations, not full historical suite or release qualification; control replacement and destroy remain source-only.\n"
+  },
+  "owner_receipt": {
+    "sha256": "e069a74b7f69a9096b7ab356b42a3f8d7834d1991a40ff16429501839f60d821",
+    "text": "# Input regression placement and historical assertion restoration\n\nTest-only patch `roster-move-v2.patch`, SHA-256 `7b2d76ad3a0ab3e6afff27b9c27870881d8f800fccdae7b5c833518e1c533ab8`, applies to committed main `8a0c4866dba602bd1f9c9916128f7537d986e0b9`. It moves the unchanged owned regression from the existing `MatInput without forms` suite to a final top-level `MatInput dynamic descriptions` suite and restores the complete original Material 16.2.14 direct-element aria-live case, including its title and assertion. It changes only `projects/ngx-material-legacy/legacy-input/input.spec.ts`; resulting SHA-256 `ab1073120be461d9451eaed8bc3c83768d3c5a60f8ca55c854ae471f7e19e289`. No product, template or stylesheet changes. The original suite has no beforeEach; `createComponent` configures its own module. The moved `it` block's bytes SHA-256 `f1a20d5eaa120de740919d682137c21a992a6a19b673b62a896ad8682bac6c63`; exact upstream aria-live test block `3ae63252a3470b2a7c07bd757949d7371870807c394b5b45e85842fc8094b9f5` from tag 16.2.14 commit `df60e733c60e572ba538f6ad0ceff3e63e527b53`. A direct byte comparison confirms that removing the owned fixture and final describe from V2 produces the 87d spec with exactly the old weakened test replaced by the authenticated original block; all remaining historical spec bytes match.\n\nActual `deriveHistoricalRoster` runs against old commit `87d381f56b545081bfb87b1d5f1a1e1e9941d2eb` and V2 give 2,323 and 2,324 cases. All old IDs and order persist; 2,322 complete old records are identical, and input case #82 retains its ID but restores its historical full name. New input case #112 is appended within its spec. Full comparison and records: `roster-move-comparison-v2.json` SHA-256 `46aa2fe11a981216f2ee52d2a45109eca9faac76f7ac06765c7e20561b97dc37`; original roster `roster-before-v1.json` `adee60dffdf44a0887150cc5dabd6f289de783e59dca4ef0d91d12656c426e35`; V2 `roster-after-v2.json` `4c71148f3fce9079454bdfd5a414902fe04895a1dc73b762c099bc5e9532a851`. There are no removed, reordered or otherwise changed old records.\n\nActual `node scripts/run-legacy-tests.mjs` runs in external V2 tree with `LEGACY_SPEC_FAMILY=input`, `LEGACY_SUBJECT_MODE=artifact`, unique absolute `LEGACY_RESULTS_PATH`, and package roots `baseline-dom-v4/artifact/package` and `fixed-dom-v2/artifact/package`. Node 24.21.0, Python 3.14.7, installed Angular/CDK/Material 22.1.7 and pinned Chrome/149 (binary SHA-256 `3a0b4b909e867cbd845162be0b67343c0d6bb03dbac8f2d410eec8fcc8913fe9`); `NODE_OPTIONS`, `NODE_PATH`, `NODE_V8_COVERAGE` unset; sandbox-enabled Karma launcher. Refer to `dom-manifest.json` for previous 512-member extraction and tar identity verification. Direct runner reports artifact SHA as null because package paths were passed without a run identity; it did not independently rehash the artifact in these invocations.\n\nBaseline: 151/152, sole failure owned dynamic-description case on both old hint/error IDs; restored historical aria-live case passed; 0 skipped. Raw JSON SHA-256 `e526b616b34e76765b35a444692237248a97fa8950c88ff41f59e2ccd9139038`, log `0c253100a0af61bb88cbbb122ef43a0d90ba8c975130d670a0ff3191fb1132bb`. Fixed: 152/152, including both cases, 0 skipped; JSON `3b026919588130c81589293b6a4ef53df1d219a803adbe254fff7df5e6c39c1f`, log `4e7683a4e6fed7d010132fdcc71c4d46ab3daee4dbe0b825306bcd5cee91a693`. No retries. A test-family result, not full release qualification.\n\nENOSPC interrupted the first V2 apply and yielded an empty spec/patch; neither was evidence. Restored the spec from immutable V1, then applied the assertion restoration. Two unrelated duplicate archives were removed only from this incomplete V2 scratch copy before root's stop instruction, after byte comparison with V1; canonical and V1 copies remain. The V2 scratch worktree therefore has those two unrelated tracked deletions, but the submitted patch is explicitly path-scoped to the sole test file. V1 evidence and baseline/reference bytes remain intact. No canonical edits, push or Actions. Independent review is pending.\n"
+  },
+  "root_actual_roster": {
+    "report_sha256": "12bb0075006e29e9cfc032f2475fb7718ac7b37db9bd010ad023ead8119048c3",
+    "report": {
+      "actual_cases": 2324,
+      "unchanged_complete_records": 2322,
+      "changed_records": [
+        {
+          "before": {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#82",
+            "historical_path": "src/material/legacy-input/input.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+            "adaptation": "adapted",
+            "shared": null,
+            "full_name": "MatInput with forms > error messages > should be in a parent element with an aria-live attribute to announce the error",
+            "index": 82,
+            "kind": "direct"
+          },
+          "after": {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#82",
+            "historical_path": "src/material/legacy-input/input.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+            "adaptation": "adapted",
+            "shared": null,
+            "full_name": "MatInput with forms > error messages > should set the proper aria-live attribute on the error messages",
+            "index": 82,
+            "kind": "direct"
+          }
+        }
+      ],
+      "added_records": [
+        {
+          "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#112",
+          "historical_path": "src/material/legacy-input/input.spec.ts",
+          "candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+          "adaptation": "adapted",
+          "shared": null,
+          "full_name": "MatInput dynamic descriptions > updates descriptions when existing hint and error IDs change on a state notification",
+          "index": 112,
+          "kind": "direct"
+        }
+      ],
+      "old_ids_order_preserved": true,
+      "actual_roster_sha256": "9ea6a63cec33d906e2ccea1d5d0b32b9dc5582691adde4d48387b5ae9766de37"
+    },
+    "method": "Derive currentphysicalsource with maintained AST generator; compare complete result to retained2324-case candidate and everyoldrecord/order, notsourcehashalone."
+  },
+  "input_family_runs": [
+    {
+      "name": "roster-move-baseline-v2.json",
+      "sha256": "e526b616b34e76765b35a444692237248a97fa8950c88ff41f59e2ccd9139038",
+      "totals": {
+        "executed": 152,
+        "passed": 151,
+        "failed": 1,
+        "skipped": 0
+      },
+      "failures": [
+        {
+          "suite": "MatInput dynamic descriptions",
+          "description": "updates descriptions when existing hint and error IDs change on a state notification",
+          "log": [
+            "Expected 'old-hint external-hint' to be 'new-hint external-hint'.\n    at <Jasmine>\n    at UserContext.<anonymous> (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?133778f30ac9cf98757807b6ebe39df83b2f4e6e:97507:62)\n    at UserContext.fakeAsyncFn (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?133778f30ac9cf98757807b6ebe39df83b2f4e6e:32050:27)\n    at _ZoneDelegate2.invoke (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?133778f30ac9cf98757807b6ebe39df83b2f4e6e:27918:168)\n    at _ProxyZoneSpec.onInvoke (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?133778f30ac9cf98757807b6ebe39df83b2f4e6e:31234:43)",
+            "Expected 'old-error external-error' to be 'new-error external-error'.\n    at <Jasmine>\n    at UserContext.<anonymous> (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?133778f30ac9cf98757807b6ebe39df83b2f4e6e:97508:62)\n    at UserContext.fakeAsyncFn (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?133778f30ac9cf98757807b6ebe39df83b2f4e6e:32050:27)\n    at _ZoneDelegate2.invoke (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?133778f30ac9cf98757807b6ebe39df83b2f4e6e:27918:168)\n    at _ProxyZoneSpec.onInvoke (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?133778f30ac9cf98757807b6ebe39df83b2f4e6e:31234:43)"
+          ]
+        }
+      ],
+      "artifact_sha256": null,
+      "package_root": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/proactive-input-form-field-review-v1/baseline-dom-v4/artifact/package"
+    },
+    {
+      "name": "roster-move-fixed-v2.json",
+      "sha256": "3b026919588130c81589293b6a4ef53df1d219a803adbe254fff7df5e6c39c1f",
+      "totals": {
+        "executed": 152,
+        "passed": 152,
+        "failed": 0,
+        "skipped": 0
+      },
+      "failures": [],
+      "artifact_sha256": null,
+      "package_root": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/proactive-input-form-field-review-v1/fixed-dom-v2/artifact/package"
+    }
+  ],
+  "limits": [
+    "Only testsource changes; product, templates,CSS,SCSS andoriginalgoldens unchanged.",
+    "Existing2323caseIDs/order retained;2322complete records identical, #82title restored toauthenticatedMaterial16identity, ownednewregression #112 appended.",
+    "Directrunnerartifact hash remainsnull; earlier512-file extraction/tar verification and quiescentworkspaceassumption apply.",
+    "The two missing unrelated archive copies were confined toexternalV2scratch tree, notthisonefilepatch orcanonicalsource.",
+    "No freshcanonicalpackage/fullhistoricalsuite/peerfloor/browsermatrix/G11/finalaudit/releasepass.",
+    "Knownnewcase+title restoration require explicitmatrix/registry sourcequalification; no oldreceipt isreattributed."
+  ]
+}
