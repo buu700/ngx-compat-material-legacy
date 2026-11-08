@@ -19,6 +19,7 @@ import {RIPPLE_SYMBOL,rippleReexportSignatureProblems} from './ripple-constructi
 import {originalCompilerFactoryContext, originalPublishedJitFactory} from './api-original-factory-contexts.mjs';
 import {settleInputHarness} from './api-input-harness-contract.mjs';
 import {settleTabToken} from './api-tab-token-contract.mjs';
+import {settleSelectScrollToken} from './api-select-scroll-token-contract.mjs';
 import {historicalMenuFilter,settleMenuHarness,MENU_HARNESS} from './api-menu-harness-contract.mjs';
 
 const require = createRequire(import.meta.url);
@@ -1739,6 +1740,8 @@ export function observeDeclarations(surface, dtsFiles, differences, allowlist, i
         signature = settleMenuHarness(symbol, sourceFile, signature);
       if (symbol.symbol_id === 'legacy-tabs/primary/MAT_LEGACY_TAB' && sourceFile)
         signature = settleTabToken(symbol, sourceFile, signature, inputArtifactContext);
+      if (symbol.symbol_id === 'legacy-select/primary/MAT_LEGACY_SELECT_SCROLL_STRATEGY' && sourceFile)
+        signature = settleSelectScrollToken(symbol, sourceFile, signature, inputArtifactContext);
       const exportIssue = exportProblems(symbol, present);
       const shapeIssue = shapeProblems(signature);
       observations.push({
