@@ -4,6 +4,7 @@ from pathlib import Path
 root=Path.cwd();sys.path.insert(0,str(root/'scripts'))
 from current_sass_tool_references import CurrentSassToolReferences
 targets=['scripts/historical-repair-live-source-successor.mjs','scripts/autocomplete-selection-spec-subject.mjs','scripts/current-authored-tab-source-successor.mjs','scripts/autocomplete-current-spec-source-successor.mjs','compatibility/rc/main-retained-current-reader-source-successors-v1.json','compatibility/rc/main-autocomplete-current-spec-source-successor-v1.json','scripts/current-inventory-source-subject.mjs','compatibility/rc/main-current-inventory-source-routing-v2.json','scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs']
+targets+=['compatibility/rc/main-current-inventory-source-routing-v3.json','scripts/retained-validator-program-source.mjs','compatibility/rc/main-retained-validator-programs-v1.json']
 bad=False;target=None
 def read(path):
     raw=(root/path).read_bytes()

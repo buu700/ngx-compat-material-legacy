@@ -35,26 +35,26 @@ class CurrentReaderSourceSuccessorsTests(unittest.TestCase):
 
     def test_javascript_reader_owner(self):
         report = self.run_probe('node', 'current_reader_source_successor_probe.mjs')
-        self.assertEqual(report['cold_rejections'], 11)
+        self.assertEqual(report['cold_rejections'], 14)
         self.assertEqual(report['unknown_references_rejected'], 2)
 
     def test_python_reader_owner(self):
         report = self.run_probe(sys.executable, 'current_reader_source_successor_probe.py')
-        self.assertEqual(report['cold_rejections'], 11)
+        self.assertEqual(report['cold_rejections'], 14)
         self.assertEqual(report['unknown_references_rejected'], 2)
 
     def test_current_inventory_source_routing(self):
         report = self.run_probe('node', 'current_inventory_source_routing_probe.mjs')
-        self.assertEqual(report['cold_rejections'], 6)
+        self.assertEqual(report['cold_rejections'], 30)
         for field in ['old_source_substitution_rejected', 'unknown_hash_rejected',
                       'wrong_length_rejected', 'accessor_not_invoked',
                       'public_metadata_isolated', 'comparison_copy_isolated',
-                      'forged_raw_property_rejected']:
+                      'forged_raw_property_rejected', 'intermediate_owner_preserved']:
             self.assertTrue(report[field], field)
 
     def test_canonical_inventory_source_routing(self):
         report = self.run_probe('node', 'canonical_inventory_routing_probe.mjs')
-        self.assertEqual(report['cold_rejections'], 9)
+        self.assertEqual(report['cold_rejections'], 33)
         for field in ['unknown_predecessor_rejected', 'wrong_length_rejected',
                       'public_metadata_isolated']:
             self.assertTrue(report[field], field)

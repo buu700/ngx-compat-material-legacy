@@ -25,6 +25,10 @@ import {historicalChipWrapperMetadata,HISTORICAL_WRAPPER_PACKET} from './histori
 import {historicalConsumerWrapperMetadata,CONSUMER_WRAPPER_PACKET} from './historical-consumer-wrapper-metadata.mjs';
 import {sassWrapperNoticeSubject} from './sass-wrapper-notice-subject.mjs';
 import {sassWrapperNoticeMetadata,SASS_NOTICE_METADATA_PACKET,SASS_NOTICE_METADATA_LEDGER} from './sass-wrapper-notice-metadata.mjs';
+import {retainedValidatorProgramSource} from './retained-validator-program-source.mjs';
+import {retainedCurrentContextIdentity} from './retained-current-context-identity.mjs';
+import {currentSassToolReferenceSubject} from './current-sass-tool-references.mjs';
+import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 
 const ts = createRequire(import.meta.url)('typescript');
 const inputPath = 'compatibility/rc/packed-upstream-source-inputs.json';
@@ -51,6 +55,7 @@ const disk = root => path => readFileSync(join(root, path));
 const readers = new WeakMap();
 const selectionReaderCache=new WeakMap();
 const selectionNativeCache=new WeakMap();
+const retainedToolCache=new WeakMap();
 // Only this module registers the inventory owner's qualified metadata reader.
 // Its older JSON images remain available to metadata replay, while live source
 // guards receive the exact underlying current reader, never those projections.
@@ -58,6 +63,11 @@ const inventorySourceReaders=new WeakMap();
 function currentSourceRead(root,read){const source=inventorySourceReaders.get(read);if(!source)return read;assert.equal(source.root,root,'cross-root inventory source reader');return source.raw;}
 function bindInventorySourceRead(root,read,inventory){inventorySourceReaders.set(inventory.metadataRead,{root,raw:read});}
 function metadataDigest(root,read,ref){const source=currentSourceRead(root,read);if(source===read)return ref.sha256;return hash(read(ref.path));}
+function retainedTools(root,read,line){
+  if(line!=='main')return null;
+  const cached=retainedToolCache.get(read);if(cached){assert.equal(cached.root,root);return cached.scope;}
+  const scope=currentSassToolReferenceSubject({root,read:currentSourceRead(root,read)});retainedToolCache.set(read,{root,scope});return scope;
+}
 function selectionNative(root,read,line){
   const cached=selectionNativeCache.get(read);
   if(cached){assert.equal(cached.root,root);assert.equal(cached.scope.line,line);cached.scope.assertCurrent();return cached.scope;}
@@ -76,7 +86,8 @@ function selectionReaders(root,read,line){
 }
 function selectionMember({root,read,line,ref,bound}){
   const scope=selectionReaders(root,read,line),native=ref.path===SELECTION_NATIVE_REGISTRY?selectionNative(root,read,line):null;
-  const qualified=native?.qualify(ref)??scope.qualify(ref),current=qualified??ref;
+  const tools=ref.path===testingApiChecker?retainedTools(root,read,line):null;
+  const qualified=tools?.qualify(ref)??native?.qualify(ref)??scope.qualify(ref),current=qualified??ref;
   const raw=(qualified?currentSourceRead(root,read):read)(ref.path);
   assert.equal(hash(raw),current.sha256,'changed qualified source subject '+ref.path);
   if(current.bytes!==undefined)assert.equal(raw.length,current.bytes);
@@ -84,6 +95,7 @@ function selectionMember({root,read,line,ref,bound}){
   // reader. Physical source bindings are checked by each scope's own guard.
   for(const member of scope.bound)bound.set(member.path,metadataDigest(root,read,member));
   if(native)for(const member of native.bound)bound.set(member.path,metadataDigest(root,read,member));
+  if(tools)for(const member of tools.bound)bound.set(member.path,metadataDigest(root,read,member));
   bound.set(ref.path,metadataDigest(root,read,current));return raw;
 }
 
@@ -291,7 +303,13 @@ const sassTransitions={
 function prepareSassStage({root,read,line,before,bound}){
   const member=ref=>{const raw=read(ref.path);
     if(ref.path===testingApiChecker){const original=gitBytes(root,rulesJsParents[line],ref.path);
-      assert.equal(hash(original),ref.sha256);assert.equal(raw.toString(),rulesJsCheckerSuccessor(original.toString()),'unqualified rules_js checker successor');
+      assert.equal(hash(original),ref.sha256);const expected=rulesJsCheckerSuccessor(original.toString());
+      if(line==='main'){
+        const tools=retainedTools(root,read,line),comparison={path:ref.path,sha256:hash(expected),bytes:Buffer.byteLength(expected)};
+        assert.equal(tools.comparisonBytes(comparison).toString(),expected,'changed historical rules_js checker comparison');
+        return selectionMember({root,read,line,ref:comparison,bound});
+      }
+      assert.equal(raw.toString(),expected,'unqualified rules_js checker successor');
     }else return selectionMember({root,read,line,ref,bound});
     bound.set(ref.path,hash(raw));return raw;};
   const packet=JSON.parse(gunzipSync(member(sassTransitions[line])));
@@ -387,7 +405,9 @@ function prepareRulesJsStage({root,read,line,before,bound}){
   }
   const native=['8e1711216f7d07324e311e0f6ada3d2426c7891e','7c9c898faac8daac1bbb20a0807168a74360760d','20bf71c40f565c59101b63b5a878d2ddb7fe251d'];
   assert.deepEqual(packet.source_digest_updates.map(row=>row.sha).sort(),native.sort());
-  const oldChecker=hash(gitBytes(root,rulesJsParents[line],testingApiChecker)),newChecker=hash(read(testingApiChecker));
+  // This is the preserved ledger metadata recipe, not a current source read.
+  // The actual checker was qualified above through its exact finite successor.
+  const oldChecker=hash(gitBytes(root,rulesJsParents[line],testingApiChecker)),newChecker=line==='main'?packet.code_subjects.find(ref=>ref.path===testingApiChecker).sha256:hash(read(testingApiChecker));
   for(const update of packet.source_digest_updates){
     assert.deepEqual(update.path.slice(0,3),['individual_proof','historical_behavior','source_members']);
     assert.equal(update.path.length,5);assert.equal(update.path[4],'sha256');
@@ -459,7 +479,8 @@ function qualifyAutocompleteRegistry({root,read,line,ref,bound}){
   const after=Buffer.from(text.replace(marker,addition+marker));assert.equal(hash(after),packet.registry.after_sha256);
   assert.equal(after.length,packet.registry.after_bytes);
   const native=selectionNative(root,read,line);assert.equal(hash(after),native.before.sha256);
-  assert.equal(hash(read(ref.path)),native.after.sha256);bound.set(ref.path,native.after.sha256);
+  const current=native.qualify({path:ref.path,...native.after}),actual=currentSourceRead(root,read)(ref.path);assert.ok(current);
+  assert.equal(hash(actual),current.sha256);assert.equal(actual.length,current.bytes);bound.set(ref.path,metadataDigest(root,read,current));
   for(const checkpoint of [packet.current_source_inspection,packet.current_source_inspector,packet.complete_originals]){
     const bytes=read(checkpoint.path);assert.equal(hash(bytes),checkpoint.sha256);assert.equal(bytes.length,checkpoint.bytes);
     bound.set(checkpoint.path,checkpoint.sha256);
@@ -753,8 +774,24 @@ function prepareBeforeInventoryReferenceLedger({root = process.cwd(), read = dis
   // own digest, and returned epoch readers retain their full late-change gate.
   const specReaders=selectionReaders(root,read,line);specReaders.assertCurrent();for(const ref of specReaders.bound)bound.set(ref.path,metadataDigest(root,read,ref));
   const nativeSubjects=selectionNative(root,read,line);for(const ref of nativeSubjects.bound)bound.set(ref.path,metadataDigest(root,read,ref));
+  const rawSource=currentSourceRead(root,read),programs=line==='main'?retainedValidatorProgramSource({root,read:rawSource}):null;
+  const contextSource=line==='main'?retainedCurrentContextIdentity({root,read:rawSource}):null,tools=retainedTools(root,read,line);
+  const retainedPhysical=new Map();
+  for(const ref of [...(programs?.bound??[]),...(contextSource?.bound??[]),...(tools?.bound??[])]){
+    const prior=retainedPhysical.get(ref.path);if(prior)assert.deepEqual(prior,ref);else retainedPhysical.set(ref.path,{...ref});
+    bound.set(ref.path,metadataDigest(root,read,ref));
+  }
+  const assertRetainedCurrent=()=>{
+    programs?.assertCurrent();contextSource?.assertCurrent();tools?.assertCurrent();
+    // The last guard callback can change an earlier domain. Close the complete
+    // finite union physically, without invoking the caller again.
+    for(const ref of retainedPhysical.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,ref.path);assert.equal(raw.length,ref.bytes,ref.path);}
+  };
+  assertRetainedCurrent();
   function member(ref, authenticate = false) {
-    const raw=selectionMember({root,read,line,ref,bound});
+    const current=programs?.qualifyMetadata(ref);let raw;
+    if(current){raw=rawSource(current.path);assert.equal(hash(raw),current.sha256);if(current.bytes!==undefined)assert.equal(raw.length,current.bytes);bound.set(current.path,metadataDigest(root,read,current));}
+    else raw=selectionMember({root,read,line,ref,bound});
     if (authenticate) assert.equal(hash(gitBytes(root, authority, ref.path)), ref.sha256);
     return raw;
   }
@@ -783,8 +820,11 @@ function prepareBeforeInventoryReferenceLedger({root = process.cwd(), read = dis
       let checker = gitBytes(root, authority, ref.path).toString(); assert.equal(hash(checker), ref.sha256);
       if (line === '21.x') for (const [from, to] of testingApiCheckerEdits) {assert.equal(checker.split(from).length, 2); checker = checker.replace(from, to);}
       checker = rulesJsCheckerSuccessor(sassCheckerSuccessor(checker));
-      assert.equal(read(ref.path).toString(), checker, 'unqualified finite source-decision checker integration');
-      bound.set(ref.path, hash(checker));
+      if(tools){
+        const comparison={path:ref.path,sha256:hash(checker),bytes:Buffer.byteLength(checker)};
+        assert.equal(tools.comparisonBytes(comparison).toString(),checker,'changed original checker literal recipe');
+        selectionMember({root,read,line,ref:comparison,bound});
+      }else{assert.equal(read(ref.path).toString(),checker,'unqualified finite source-decision checker integration');bound.set(ref.path,hash(checker));}
     } else if(ref.path===autocompleteRegistryPath) {
       qualifyAutocompleteRegistry({root,read,line,ref,bound});
     } else member(ref);
@@ -800,12 +840,15 @@ function prepareBeforeInventoryReferenceLedger({root = process.cwd(), read = dis
   const bazel = reports.get('compatibility/rc/packed-upstream-source-bazel.json');
   assert.equal(bazel.source_analysis.compiler, ts.version, 'changed source-analysis compiler');
   assert.equal(context.product_members.length, 1142);
-  for (const ref of [...context.product_members, ...context.files, ...bazel.candidate_context.files]) {
-    const raw = member(ref); assert.equal(raw.length,(specReaders.qualify(ref)??ref).bytes);
-  }
+  if(contextSource){
+    // Keep the old1142 report as data. Every descriptor must resolve to an exact
+    // current identity or explicit retirement; only actual1120 source is read.
+    for(const ref of [...context.product_members,...context.files,...bazel.candidate_context.files])assert.ok(contextSource.resolveReference(ref));
+    for(const ref of [...contextSource.products,...contextSource.inputs]){const raw=rawSource(ref.path);assert.equal(hash(raw),ref.sha256,ref.path);assert.equal(raw.length,ref.bytes);bound.set(ref.path,metadataDigest(root,read,ref));}
+  }else for(const ref of [...context.product_members,...context.files,...bazel.candidate_context.files]){const raw=member(ref);assert.equal(raw.length,(specReaders.qualify(ref)??ref).bytes);}
   const population = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '--',
     'projects/ngx-material-legacy'], {cwd: root, encoding: 'utf8'}).trim().split('\n').sort();
-  assert.deepEqual(population, context.product_members.map(ref => ref.path).sort());
+  assert.deepEqual(population,(contextSource?contextSource.products:context.product_members).map(ref=>ref.path).sort());
   const expected = JSON.parse(before);
   for (const change of packet.entries) {
     const index = expected.entries.findIndex(entry => entry.sha === change.sha); assert.ok(index >= 0);
@@ -828,9 +871,9 @@ function prepareBeforeInventoryReferenceLedger({root = process.cwd(), read = dis
   const noticeMetadata=line==='main'?prepareSassNoticeMetadataStage({root,read,line,before:nativeSelection.after,bound}):null;
   const historicalWrapper=prepareHistoricalWrapperMetadataStage({root,read,line,before:noticeMetadata?.after??nativeSelection.after,bound});
   const consumerWrapper=prepareHistoricalConsumerWrapperMetadataStage({root,read,line,before:historicalWrapper.after,bound});
-  specReaders.assertCurrent();
+  specReaders.assertCurrent();assertRetainedCurrent();
   return {line, before, after, canonical_after:consumerWrapper.after,historical_consumer_wrapper_metadata_stage:consumerWrapper,historical_wrapper_metadata_stage:historicalWrapper,sass_notice_metadata_stage:noticeMetadata, selection_native_stage:nativeSelection, testing_api_stage: next, sass_stage: sass, rules_js_stage:rulesJs, summary_stage:summary, autocomplete_landscape_stage:landscape, native_spec_source:{assertCurrent:specReaders.assertCurrent,bound:structuredClone(specReaders.bound),spec:{path:specReaders.spec.path,line,before:{...specReaders.spec.before},after:{...specReaders.spec.after}}}, native_spec_metadata_stage:nativeSpec, bound, population, analysis_python_version: syntax.current_pinned_python,
-    input_sha256: hash(input),
+    input_sha256: hash(input),retained_current_source_guard:assertRetainedCurrent,
     entries_changed: 85, scalar_tokens_changed: 179, source_scope_only: true,
     current_native_packed_or_floor_qualified: false};
 }
@@ -868,6 +911,7 @@ function epochBeforeInventoryReferenceLedger({root = process.cwd(), read = disk(
     assert.deepEqual(population, prepared.population, 'late current product population change');
     assert.equal(pythonVersion(), prepared.analysis_python_version, 'late source-analysis Python change');
     assert.equal(hash(read(ledgerPath)), current, 'late canonical upstream ledger change');
+    prepared.retained_current_source_guard();
   };
   const historical = path => {
     if (path !== ledgerPath) return read(path);

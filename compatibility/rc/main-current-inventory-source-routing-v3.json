@@ -1,0 +1,232 @@
+{
+  "schema_version": 1,
+  "role": "main-current-inventory-retained-source-routing",
+  "base_head": "b7ad00c881420e8621f23d77ab2feba7a3475e78",
+  "previous_packet": {
+    "path": "compatibility/rc/main-current-inventory-source-routing-v2.json",
+    "sha256": "3815beb1e21779e54deaee5da2bf7bb316732e98a3dc9938ef6d2fdf18707280",
+    "bytes": 24306
+  },
+  "support_commit": "b7ad00c881420e8621f23d77ab2feba7a3475e78",
+  "updates": [
+    {
+      "path": "scripts/packed-upstream-ledger-epoch.mjs",
+      "before": {
+        "path": "scripts/packed-upstream-ledger-epoch.mjs",
+        "sha256": "5ce8390b5e3fdbb9bdbdfa28da9b2a7112dabd8af83249d8d2298ee166294ad0",
+        "bytes": 80107
+      },
+      "after": {
+        "path": "scripts/packed-upstream-ledger-epoch.mjs",
+        "sha256": "0568d19d90985cfc7bd66bb72f4bc9db031c542d4214a91b68012056568ed18d",
+        "bytes": 84153
+      },
+      "edits": [
+        {
+          "offset": 1906,
+          "before": "",
+          "after": "import {retainedValidatorProgramSource} from './retained-validator-program-source.mjs';\nimport {retainedCurrentContextIdentity} from './retained-current-context-identity.mjs';\nimport {currentSassToolReferenceSubject} from './current-sass-tool-references.mjs';\nimport {readEvidenceMember} from './upstream-packed-run-evidence.mjs';\n"
+        },
+        {
+          "offset": 3207,
+          "before": "",
+          "after": "const retainedToolCache=new WeakMap();\n"
+        },
+        {
+          "offset": 3954,
+          "before": "",
+          "after": "function retainedTools(root,read,line){\n  if(line!=='main')return null;\n  const cached=retainedToolCache.get(read);if(cached){assert.equal(cached.root,root);return cached.scope;}\n  const scope=currentSassToolReferenceSubject({root,read:currentSourceRead(root,read)});retainedToolCache.set(read,{root,scope});return scope;\n}\n"
+        },
+        {
+          "offset": 5237,
+          "before": "  const qualified=native?.qualify(ref)??scope.qualify(ref),current=qualified??ref;\n",
+          "after": "  const tools=ref.path===testingApiChecker?retainedTools(root,read,line):null;\n  const qualified=tools?.qualify(ref)??native?.qualify(ref)??scope.qualify(ref),current=qualified??ref;\n"
+        },
+        {
+          "offset": 5893,
+          "before": "",
+          "after": "  if(tools)for(const member of tools.bound)bound.set(member.path,metadataDigest(root,read,member));\n"
+        },
+        {
+          "offset": 20920,
+          "before": "      assert.equal(hash(original),ref.sha256);assert.equal(raw.toString(),rulesJsCheckerSuccessor(original.toString()),'unqualified rules_js checker successor');\n",
+          "after": "      assert.equal(hash(original),ref.sha256);const expected=rulesJsCheckerSuccessor(original.toString());\n      if(line==='main'){\n        const tools=retainedTools(root,read,line),comparison={path:ref.path,sha256:hash(expected),bytes:Buffer.byteLength(expected)};\n        assert.equal(tools.comparisonBytes(comparison).toString(),expected,'changed historical rules_js checker comparison');\n        return selectionMember({root,read,line,ref:comparison,bound});\n      }\n      assert.equal(raw.toString(),expected,'unqualified rules_js checker successor');\n"
+        },
+        {
+          "offset": 29973,
+          "before": "  const oldChecker=hash(gitBytes(root,rulesJsParents[line],testingApiChecker)),newChecker=hash(read(testingApiChecker));\n",
+          "after": "  // This is the preserved ledger metadata recipe, not a current source read.\n  // The actual checker was qualified above through its exact finite successor.\n  const oldChecker=hash(gitBytes(root,rulesJsParents[line],testingApiChecker)),newChecker=line==='main'?packet.code_subjects.find(ref=>ref.path===testingApiChecker).sha256:hash(read(testingApiChecker));\n"
+        },
+        {
+          "offset": 36568,
+          "before": "  assert.equal(hash(read(ref.path)),native.after.sha256);bound.set(ref.path,native.after.sha256);\n",
+          "after": "  const current=native.qualify({path:ref.path,...native.after}),actual=currentSourceRead(root,read)(ref.path);assert.ok(current);\n  assert.equal(hash(actual),current.sha256);assert.equal(actual.length,current.bytes);bound.set(ref.path,metadataDigest(root,read,current));\n"
+        },
+        {
+          "offset": 65782,
+          "before": "",
+          "after": "  const rawSource=currentSourceRead(root,read),programs=line==='main'?retainedValidatorProgramSource({root,read:rawSource}):null;\n  const contextSource=line==='main'?retainedCurrentContextIdentity({root,read:rawSource}):null,tools=retainedTools(root,read,line);\n  const retainedPhysical=new Map();\n  for(const ref of [...(programs?.bound??[]),...(contextSource?.bound??[]),...(tools?.bound??[])]){\n    const prior=retainedPhysical.get(ref.path);if(prior)assert.deepEqual(prior,ref);else retainedPhysical.set(ref.path,{...ref});\n    bound.set(ref.path,metadataDigest(root,read,ref));\n  }\n  const assertRetainedCurrent=()=>{\n    programs?.assertCurrent();contextSource?.assertCurrent();tools?.assertCurrent();\n    // The last guard callback can change an earlier domain. Close the complete\n    // finite union physically, without invoking the caller again.\n    for(const ref of retainedPhysical.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,ref.path);assert.equal(raw.length,ref.bytes,ref.path);}\n  };\n  assertRetainedCurrent();\n"
+        },
+        {
+          "offset": 65829,
+          "before": "    const raw=selectionMember({root,read,line,ref,bound});\n",
+          "after": "    const current=programs?.qualifyMetadata(ref);let raw;\n    if(current){raw=rawSource(current.path);assert.equal(hash(raw),current.sha256);if(current.bytes!==undefined)assert.equal(raw.length,current.bytes);bound.set(current.path,metadataDigest(root,read,current));}\n    else raw=selectionMember({root,read,line,ref,bound});\n"
+        },
+        {
+          "offset": 68056,
+          "before": "      assert.equal(read(ref.path).toString(), checker, 'unqualified finite source-decision checker integration');\n      bound.set(ref.path, hash(checker));\n",
+          "after": "      if(tools){\n        const comparison={path:ref.path,sha256:hash(checker),bytes:Buffer.byteLength(checker)};\n        assert.equal(tools.comparisonBytes(comparison).toString(),checker,'changed original checker literal recipe');\n        selectionMember({root,read,line,ref:comparison,bound});\n      }else{assert.equal(read(ref.path).toString(),checker,'unqualified finite source-decision checker integration');bound.set(ref.path,hash(checker));}\n"
+        },
+        {
+          "offset": 69146,
+          "before": "  for (const ref of [...context.product_members, ...context.files, ...bazel.candidate_context.files]) {\n    const raw = member(ref); assert.equal(raw.length,(specReaders.qualify(ref)??ref).bytes);\n  }\n",
+          "after": "  if(contextSource){\n    // Keep the old1142 report as data. Every descriptor must resolve to an exact\n    // current identity or explicit retirement; only actual1120 source is read.\n    for(const ref of [...context.product_members,...context.files,...bazel.candidate_context.files])assert.ok(contextSource.resolveReference(ref));\n    for(const ref of [...contextSource.products,...contextSource.inputs]){const raw=rawSource(ref.path);assert.equal(hash(raw),ref.sha256,ref.path);assert.equal(raw.length,ref.bytes);bound.set(ref.path,metadataDigest(root,read,ref));}\n  }else for(const ref of [...context.product_members,...context.files,...bazel.candidate_context.files]){const raw=member(ref);assert.equal(raw.length,(specReaders.qualify(ref)??ref).bytes);}\n"
+        },
+        {
+          "offset": 69548,
+          "before": "  assert.deepEqual(population, context.product_members.map(ref => ref.path).sort());\n",
+          "after": "  assert.deepEqual(population,(contextSource?contextSource.products:context.product_members).map(ref=>ref.path).sort());\n"
+        },
+        {
+          "offset": 71506,
+          "before": "  specReaders.assertCurrent();\n",
+          "after": "  specReaders.assertCurrent();assertRetainedCurrent();\n"
+        },
+        {
+          "offset": 72255,
+          "before": "    input_sha256: hash(input),\n",
+          "after": "    input_sha256: hash(input),retained_current_source_guard:assertRetainedCurrent,\n"
+        },
+        {
+          "offset": 75082,
+          "before": "",
+          "after": "    prepared.retained_current_source_guard();\n"
+        }
+      ]
+    }
+  ],
+  "support": [
+    {
+      "path": "scripts/upstream-build-scope-evidence.mjs",
+      "sha256": "6136c1ec1a83b93086b056c2f73cd533f6f0abab59dd50b642b0579f1b7ad1c8",
+      "bytes": 18011
+    },
+    {
+      "path": "scripts/upstream-test-consolidation-evidence.mjs",
+      "sha256": "a4e483bae45ff473c13fdd2a4d0fbfe655b8d05d4950c899e584d9dd47ecaca7",
+      "bytes": 20564
+    },
+    {
+      "path": "scripts/upstream-bazel-build-scope.mjs",
+      "sha256": "e66cc437f96d1e8e31ea45574730ac8578d0f6c7df1c604c1e0b92d1a0787798",
+      "bytes": 19014
+    },
+    {
+      "path": "scripts/retained-current-context-identity.mjs",
+      "sha256": "f31427e4aab15bff12a2003931d1ef881fdf9c78d7139cc3473326dbc0f7a067",
+      "bytes": 9540
+    },
+    {
+      "path": "scripts/retained-current-build-context.mjs",
+      "sha256": "e45168bb5c73f85bfd0ce02318da9099c3f97e950daebec80e36908de8c3294d",
+      "bytes": 6752
+    },
+    {
+      "path": "scripts/retained-current-consolidation-context.mjs",
+      "sha256": "be5f8df637a46932d8200796a97704e888d183a076563ab8621aff66a217377e",
+      "bytes": 7490
+    },
+    {
+      "path": "compatibility/rc/main-retained-current-context-v1.json",
+      "sha256": "d47e05229546ccceec4e84d6cdffc5a430a2db2a0b019094b491878a8645af60",
+      "bytes": 1351942
+    },
+    {
+      "path": "compatibility/rc/main-retained-build-scope-current-review-v1.json",
+      "sha256": "5d248bc8b3b90dda544f083c1db3437b6e7aec310eaf600580db638088190a15",
+      "bytes": 8121
+    },
+    {
+      "path": "compatibility/rc/main-retained-consolidation-current-review-v1.json",
+      "sha256": "7cb43710d9b172892311ce378ae0a6813f0fe928870f7696b725776e5c66fb3d",
+      "bytes": 4591
+    },
+    {
+      "path": "compatibility/rc/main-retained-bazel-current-review-v1.json",
+      "sha256": "c5c646996bbd9ebf6e78fcc8046509daafaf8e9f30cba899edf80b25080cfd6c",
+      "bytes": 2818
+    },
+    {
+      "path": "compatibility/rc/parent-main-retained-context-identity-v1.json",
+      "sha256": "92f3822422e71060d11d466090865461c3328db664b5e9492fbac215d95277f2",
+      "bytes": 2262
+    },
+    {
+      "path": "compatibility/rc/parent-main-retained-current-build-scope-v1.json",
+      "sha256": "48cc778ddc5ef2ab241f50e9efbd1b2fea79ce986fdfa98943e42732bf7f46c2",
+      "bytes": 2706
+    },
+    {
+      "path": "compatibility/rc/parent-main-retained-current-consolidation-v1.json",
+      "sha256": "83e52bcc5d062d705ec822aff21324a80997443c3a3f91708cc0e728286246e4",
+      "bytes": 2701
+    },
+    {
+      "path": "compatibility/rc/parent-main-retained-current-bazel-v1.json",
+      "sha256": "67c74abd9995a20b6be23efb06d900e5a635b270513c38fcfb55ae77ffc25455",
+      "bytes": 2910
+    },
+    {
+      "path": "tests/upstream_build_scope_main_e184_probe.mjs",
+      "sha256": "e50ed96e2b3e1b5774db5e1da70a28daeffbcb7547b06ff94a69a4eeba29e75b",
+      "bytes": 5203
+    },
+    {
+      "path": "tests/upstream_test_consolidation_main_successor_probe.mjs",
+      "sha256": "fed0dd35d3d8e8e77c145eacb4c6c2cc219166bdc9a49e2ba639db0da4f20fa9",
+      "bytes": 3985
+    },
+    {
+      "path": "tests/retained_current_bazel_context_probe.mjs",
+      "sha256": "9da0deb985cc37d7000c8792a70dfd9d52e526a718a07a6aa3fba320fd00710c",
+      "bytes": 4097
+    },
+    {
+      "path": "compatibility/rc/packed-upstream-source-inputs.json",
+      "sha256": "971a35dd5a3f6007b419e333f7972ba676635822a833f5445021aa58445e2b27",
+      "bytes": 11692
+    },
+    {
+      "path": "scripts/retained-validator-program-source.mjs",
+      "sha256": "44b23734f83f81ef11477eb27494523e46ee9fff50776d2835c236ef4cc773c0",
+      "bytes": 7313
+    },
+    {
+      "path": "compatibility/rc/main-retained-validator-programs-v1.json",
+      "sha256": "e26a11ac20146aa41e5b2a540606cf659c627b5235ae09687a0bb3cea4b2780d",
+      "bytes": 6968
+    },
+    {
+      "path": "compatibility/rc/parent-main-retained-validator-programs-v1.json",
+      "sha256": "a0c8a58dd19a93cd7cd8fad78eafde1f39303d8a492719dbc44db47a3054cff5",
+      "bytes": 2326
+    },
+    {
+      "path": "tests/retained_validator_program_source_probe.mjs",
+      "sha256": "83e00aa3af601fcdbb9d3906fb0a31f044b43bd79deacf46fb90f6bc2eab2273",
+      "bytes": 3621
+    },
+    {
+      "path": "tests/test_retained_validator_program_source.py",
+      "sha256": "8e7fff6e19b6a8098d3b4ab9c88ea95544c34988ce0391fb22e3dc300fa3fbc8",
+      "bytes": 1246
+    }
+  ],
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "original_ledger_metadata_recipe_changed": false,
+  "source_judgments_changed": 0,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed"
+}
