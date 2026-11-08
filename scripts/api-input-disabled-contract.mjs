@@ -14,7 +14,7 @@ import {fileURLToPath} from 'node:url';
 import {inputHarnessClosureFingerprint} from './api-input-harness-contract.mjs';
 const require=createRequire(import.meta.url),sha=x=>createHash('sha256').update(x).digest('hex');
 const ROOT=join(dirname(fileURLToPath(import.meta.url)),'..');
-const TAR='a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2';
+const OLD='a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2', NEW='66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca';
 const ROWS=['protected prop _legacyAriaDisabled:string|null','public method ngDoCheck():void','protected method _legacyReadonlyAttribute():string|null'];
 const IMAGES={
  'types/ngx-compat-material-legacy-legacy-input.d.ts':'bb09da130738d54ec2e33a23c8323da3b5598ab4045917779681f98ceab640a7',
@@ -22,7 +22,7 @@ const IMAGES={
  'fesm2022/ngx-compat-material-legacy-legacy-input.mjs.map':'a909c2865fb75d36865ec0d60be37372d1329acf1376d3d109945b696151aa68',
 };
 const SOURCE='aaa55d58b06ef58c6dfca26053854696526e3529e7ed15ba3ef382ec323e8532';
-const CLOSURE='20852ae05049bbe4ef6df9029ce3962bbbbd2a2ac726825ee37e3b7d78166547';
+const CLOSURES=Object.freeze({[OLD]:'20852ae05049bbe4ef6df9029ce3962bbbbd2a2ac726825ee37e3b7d78166547',[NEW]:'2647a33d15a914c6e9b3bbfddbb29cbac74892b5f053aba6dfb45840318ce914'});
 function closure(program,virtual){
  return program.getSourceFiles().filter(f=>f.fileName!==virtual).map(file=>{
   const real=realpathSync(file.fileName);let dir=dirname(real);
@@ -61,7 +61,7 @@ export function inputDisabledProof(symbol,sourceFile,context){
  try{
   if(symbol?.symbol_id!=='legacy-input/primary/MatLegacyInput'||symbol.family!=='legacy-input'||symbol.kind!=='primary'||symbol.name!=='MatLegacyInput'||!sourceFile?.fileName||!context?.tarball||!context?.packageRoot||!context?.referenceRoot)return null;
   const archive=readFileSync(context.tarball);
-  if(sha(archive)!==TAR||sha(readFileSync(join(ROOT,'compatibility/rc/parent-main-native-disabled-input-repair-v1.json')))!=='837337ed99743946ccecffd57fd4453a0455694ed8235f882bf9b62e4f201d9e')return null;
+  const TAR=sha(archive);if(![OLD,NEW].includes(TAR)||sha(readFileSync(join(ROOT,'compatibility/rc/parent-main-native-disabled-input-repair-v1.json')))!=='837337ed99743946ccecffd57fd4453a0455694ed8235f882bf9b62e4f201d9e')return null;
   if(!exactExtractedImage(archive,context.packageRoot))return null;
   if(realpathSync(sourceFile.fileName)!==realpathSync(join(context.packageRoot,Object.keys(IMAGES)[0]))||sha(sourceFile.text)!==IMAGES[Object.keys(IMAGES)[0]])return null;
   if(sha(readFileSync(join(ROOT,'projects/ngx-material-legacy/legacy-input/input.ts')))!==SOURCE||sha(readFileSync(join(context.referenceRoot,'legacy-input/input.ts')))!=='cd42800ed6494be21256031f724f8059894be709ffa798bcf97103a7bcd90b90'||sha(readFileSync(join(context.referenceRoot,'input/input.ts')))!=='42b930c769cf58cdaf03e76f58ac7d6a2837cc63a56905ade099a9ac1646a116')return null;
@@ -77,7 +77,7 @@ export function inputDisabledProof(symbol,sourceFile,context){
   const host=ts.createCompilerHost(options),get=host.getSourceFile.bind(host),exists=host.fileExists.bind(host),read=host.readFile.bind(host);
   host.fileExists=f=>f===virtual||exists(f);host.readFile=f=>f===virtual?text:read(f);host.getSourceFile=(f,v,...args)=>f===virtual?ts.createSourceFile(f,text,v,true):get(f,v,...args);
   const program=ts.createProgram([virtual],options,host);if(ts.getPreEmitDiagnostics(program).length)return null;
-  const sources=closure(program,virtual);if(sources.length!==312||inputHarnessClosureFingerprint(sources)!==CLOSURE)return null;
+  const sources=closure(program,virtual),CLOSURE=CLOSURES[TAR];if(sources.length!==312||inputHarnessClosureFingerprint(sources)!==CLOSURE)return null;
   const checker=program.getTypeChecker(),file=program.getSourceFile(sourceFile.fileName),cls=file?.statements.find(n=>ts.isClassDeclaration(n)&&n.name?.text==='MatLegacyInput');
   const base=cls?.heritageClauses?.flatMap(h=>[...h.types]);if(base?.length!==1||!ts.isIdentifier(base[0].expression))return null;
   const alias=checker.getSymbolAtLocation(base[0].expression),parent=alias&&(alias.flags&ts.SymbolFlags.Alias)&&checker.getAliasedSymbol(alias);
