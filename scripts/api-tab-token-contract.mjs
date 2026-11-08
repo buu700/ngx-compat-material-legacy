@@ -70,7 +70,8 @@ export function tabTokenProof(symbol,file,context){
   if(symbol?.symbol_id!==ID||symbol.family!=='legacy-tabs'||symbol.kind!=='primary'||symbol.name!=='MAT_LEGACY_TAB'||hash(JSON.stringify(symbol.shape))!=='975cc7c901bfe9454bdc37720b6f2364f4239b17f0a30a70974d410a75591f53'||!file?.fileName||!context?.tarball||!context?.packageRoot||!context?.referenceRoot||process.versions.node!=='24.21.0'||ts.version!=='6.0.3'||hash(file.text)!==D)return null;
   if(hash(readFileSync(join(ROOT,'scripts/api-tab-token-evidence.json')))!=='f695f63ad931a06a98608abdfa389754a01a4a8afa321a76af3a490252ae8eab'||hash(readFileSync(join(ROOT,'tests/api_tab_token_probe.mjs')))!=='ce0649440de5a58f39ba3599be4526d628e3f2087c9d709371cbfba5e16e6a78')return null;
   const archive=readFileSync(context.tarball);
-  if(hash(archive)!=='a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2'||!exactExtractedImage(archive,context.packageRoot)||realpathSync(file.fileName)!==realpathSync(join(context.packageRoot,'types/ngx-compat-material-legacy-legacy-tabs.d.ts')))return null;
+  const artifact=hash(archive), oldArtifact='a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2', v7Artifact='66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca';
+  if(![oldArtifact,v7Artifact].includes(artifact)||!exactExtractedImage(archive,context.packageRoot)||realpathSync(file.fileName)!==realpathSync(join(context.packageRoot,'types/ngx-compat-material-legacy-legacy-tabs.d.ts')))return null;
   const reference={'legacy-tabs/public-api.ts':'f6a4dd305258afa9706c958c06f6260baec6258731f2fa9dba91667faa43b62c','legacy-tabs/tab.ts':'0fc0c91e7916d16fd6fe6a82356b6c5f8890e34958483e960f784412978e0970','tabs/tab.ts':'081213228a7964df7e4d6396e1503a1ee396b6722f8cb58baaa2a51c2baae43a'};
   for(const [path,sha] of Object.entries(reference))if(hash(readFileSync(join(context.referenceRoot,path)))!==sha)return null;
   const owned={'legacy-tabs/public-api.ts':'6ed79724ae52eb970bbd081180257b7b1e31b442a1ed27bfb2bef48f78b20edd','legacy-tabs/tab.ts':'e58220c6f0e19f4f6395bd13756926d6cd140ad9c1bcc38877c011a353b61fae','legacy-tabs/internal/tab-token.ts':'8b4148fb7e16dbe43712b0de95e078c1b2aad5e60b27621141d3ff2b6682d90b'};
@@ -79,7 +80,9 @@ export function tabTokenProof(symbol,file,context){
   for(const path of ['legacy-tabs/tab.ts','legacy-tabs/internal/tab-token.ts']){const i=map.sources.findIndex(x=>x.endsWith('/'+path));if(i<0||hash(map.sourcesContent[i])!==owned[path])return null;}
 
   const bundle=join(dirname(dirname(file.fileName)),'fesm2022/ngx-compat-material-legacy-legacy-tabs.mjs');
-  if(hash(readFileSync(bundle))!==B)return null;
+  const bundleHash=hash(readFileSync(bundle));
+  if(bundleHash!==(artifact===oldArtifact?B:'ab6891ffa20dfd036d6f5ff7d81925df754bed95fc0ca3953a04fec0e3c098ac'))return null;
+  if(artifact===v7Artifact&&hash(readFileSync(join(ROOT,'scripts/api-tab-token-v7-evidence.json')))!=='269e9ac195aeb1282ad82da2011a2d1a143afa1913cda01d88173f7172e63b7a')return null;
   const peerRequire=createRequire(file.fileName);
   if(peerRequire('@angular/core/package.json').version!=='22.1.7'||peerRequire('@angular/material/package.json').version!=='22.1.7')return null;
   for(const [name,sha] of Object.entries(peers))if(peerImage(peerRequire,name)!==sha)return null;
@@ -90,14 +93,14 @@ export function tabTokenProof(symbol,file,context){
   host.getSourceFile=(name,...args)=>name===fixture?ts.createSourceFile(name,text,ts.ScriptTarget.Latest,true):original(name,...args);
   const program=ts.createProgram([file.fileName,fixture],options,host);
   if(ts.getPreEmitDiagnostics(program).length)return null;
-  const sources=closure(program,fixture);if(sources.length!==307||inputHarnessClosureFingerprint(sources)!=='f445d9c82890f13bb412f77e24605478ae6ca3e53766af0583e8a94f54a3d1f6')return null;
+  const sources=closure(program,fixture); if(sources.length!==307||inputHarnessClosureFingerprint(sources)!=='f445d9c82890f13bb412f77e24605478ae6ca3e53766af0583e8a94f54a3d1f6')return null;
   const source=program.getSourceFile(file.fileName);if(!source||hash(source.text)!==D)return null;
   const checker=program.getTypeChecker(),module=checker.getSymbolAtLocation(source);
   const exported=checker.getExportsOfModule(module).filter(s=>s.name==='MAT_LEGACY_TAB');
   if(exported.length!==1||!(exported[0].flags&ts.SymbolFlags.Alias))return null;
   const token=checker.getAliasedSymbol(exported[0]),decl=token.valueDeclaration;
   if(token.name!=='MAT_TAB'||!decl||!ts.isVariableDeclaration(decl)||!decl.type||checker.typeToString(checker.getTypeAtLocation(decl))!=='InjectionToken<any>')return null;
-  return {tarball_sha256:hash(archive),extracted_files:512,peer_images:peers,program_sources:sources.length,program_closure_sha256:inputHarnessClosureFingerprint(sources),declaration_sha256:D,bundle_sha256:B,typescript:ts.version,scope:'exact packed token declaration and independently executed provider identity receipt; intentional divergence from historical shared token'};
+  return {tarball_sha256:hash(archive),extracted_files:512,peer_images:peers,program_sources:sources.length,program_closure_sha256:inputHarnessClosureFingerprint(sources),declaration_sha256:D,bundle_sha256:bundleHash,typescript:ts.version,scope:'exact packed token declaration and independently executed provider identity receipt; intentional divergence from historical shared token'};
  }catch{return null;}
 }
 export function settleTabToken(symbol,file,signature,context){
