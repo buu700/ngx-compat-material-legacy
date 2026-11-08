@@ -21,6 +21,7 @@ import {settleInputHarness} from './api-input-harness-contract.mjs';
 import {settleOwnedMenuSignatures} from './api-menu-owned-signatures.mjs';
 import {settleTabToken} from './api-tab-token-contract.mjs';
 import {settlePaginatorTabBody} from './api-paginator-tabbody-contract.mjs';
+import {settleFormConstructor} from './api-form-constructor-contract.mjs';
 import {settleSpinnerViewport} from './api-spinner-viewport-contract.mjs';
 import {settleSelectScrollToken} from './api-select-scroll-token-contract.mjs';
 import {historicalMenuFilter,settleMenuHarness,MENU_HARNESS} from './api-menu-harness-contract.mjs';
@@ -1735,6 +1736,8 @@ export function observeDeclarations(surface, dtsFiles, differences, allowlist, i
       const present = names.has(symbol.name);
       const packed = sourceFile ? packedShape(sourceFile, symbol.name) : null;
       let signature = compareSignatures(symbol, packed, differences);
+      if (symbol.symbol_id === 'legacy-form-field/primary/MatLegacyFormField' && sourceFile)
+        signature = settleFormConstructor(symbol, sourceFile, signature, inputArtifactContext);
       if (symbol.symbol_id === INPUT_SYMBOL && sourceFile)
         signature = settleInputDisabled(symbol, sourceFile, signature, inputArtifactContext);
       if (symbol.symbol_id === 'legacy-input/testing/MatLegacyInputHarness' && sourceFile)
