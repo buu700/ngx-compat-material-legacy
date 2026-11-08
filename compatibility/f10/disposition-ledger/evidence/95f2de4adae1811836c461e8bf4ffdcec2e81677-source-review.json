@@ -1,0 +1,63 @@
+{
+  "sha": "95f2de4adae1811836c461e8bf4ffdcec2e81677",
+  "diff_sha256": "ed022d65d47c88e1e3f080c92d82e6d6b348fa4ca19f40ec9385d2bb2dfc7cfe",
+  "diff": "diff --git a/src/material/core/tokens/BUILD.bazel b/src/material/core/tokens/BUILD.bazel\nindex 2a5ba76e40be108b7906704b2b7f05c2e80bebc4..a669dcabbc846af7a789d52a5894ee272e9a0db8 100644\n--- a/src/material/core/tokens/BUILD.bazel\n+++ b/src/material/core/tokens/BUILD.bazel\n@@ -2,11 +2,6 @@ load(\"//tools:defaults.bzl\", \"sass_library\")\n \n package(default_visibility = [\"//visibility:public\"])\n \n-sass_library(\n-    name = \"format_tokens\",\n-    srcs = [\"_format-tokens.scss\"],\n-)\n-\n sass_library(\n     name = \"m3_utils\",\n     srcs = [\"_m3-utils.scss\"],\n@@ -47,7 +42,6 @@ sass_library(\n     name = \"m3_tokens\",\n     srcs = [\"_m3-tokens.scss\"],\n     deps = [\n-        \":format_tokens\",\n         \"//src/material/autocomplete:m3\",\n         \"//src/material/badge:m3\",\n         \"//src/material/bottom-sheet:m3\",\ndiff --git a/src/material/core/tokens/_format-tokens.scss b/src/material/core/tokens/_format-tokens.scss\ndeleted file mode 100644\nindex f395f654eef12830b8099a59c98a36a40dad3f38..0000000000000000000000000000000000000000\n--- a/src/material/core/tokens/_format-tokens.scss\n+++ /dev/null\n@@ -1,5 +0,0 @@\n-// DO NOT REMOVE\n-// This function is used internally.\n-@function private-format-tokens($systems) {\n-  @return $systems;\n-}\n",
+  "final_disposition": "not-applicable",
+  "decision": "The complete original patch deletes an internal identity Sass helper and its unused Bazel target and dependency. The owned package and installed minimum Material source contain no helper, filename, or target references; the minimum token source equals the tagged peer image. This source exclusion makes the change not applicable to the owned legacy package; it does not establish a Sass or browser runtime result.",
+  "affected_branches": [
+    "main"
+  ],
+  "individual_proof": {
+    "proof_kind": "individual-historical-sass-api-exclusion",
+    "source_conclusion_only": true,
+    "execution_claim": "not-claimed",
+    "source_evidence": [
+      {
+        "path": "projects/ngx-material-legacy/_index.scss",
+        "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+        "bytes": 14151
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c",
+        "bytes": 1391
+      },
+      {
+        "path": "compatibility/f10/disposition-ledger/evidence/95f2de4adae1811836c461e8bf4ffdcec2e81677-source-inventory.json",
+        "sha256": "7cf65cbd52ace94648274f1f8fd6c9e8d3a8d4e09a12a5bab6f9a42343f9003e",
+        "bytes": 292760
+      },
+      {
+        "path": "compatibility/f10/disposition-ledger/evidence/95f2de4adae1811836c461e8bf4ffdcec2e81677-original-row.raw.json",
+        "sha256": "e88515524354d71ee937939828d5ec555831f4bf3a8c5a040ea0ba44aa30d18e",
+        "bytes": 1430
+      }
+    ],
+    "source_evidence_scope": "current",
+    "diff_sha256": "ed022d65d47c88e1e3f080c92d82e6d6b348fa4ca19f40ec9385d2bb2dfc7cfe",
+    "review_depth": "individual-semantic",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The complete original patch deletes an internal identity Sass helper and its unused Bazel target and dependency. The owned package and installed minimum Material source contain no helper, filename, or target references; the minimum token source equals the tagged peer image. This source exclusion makes the change not applicable to the owned legacy package; it does not establish a Sass or browser runtime result."
+  },
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "original_parent": "5f4fa621894c7eff6a4d78b6ed9ea2c9ce0f7920",
+  "original_helper_sha256": "69cf6309a3bfa37c441be9871ee5df8549369614250d1f9c2b7d59839358f4f0",
+  "minimum_material_version": "22.1.7",
+  "minimum_m3_tokens_sha256": "c06914420cd7e1d1a3f1eaa391ebc5d8bae26368adf650f7916ab9a942e513c3",
+  "source_inventory_path": "compatibility/f10/disposition-ledger/evidence/95f2de4adae1811836c461e8bf4ffdcec2e81677-source-inventory.json",
+  "source_inventory_sha256": "7cf65cbd52ace94648274f1f8fd6c9e8d3a8d4e09a12a5bab6f9a42343f9003e",
+  "parent_token_matches": [
+    "5f4fa621894c7eff6a4d78b6ed9ea2c9ce0f7920:src/material/core/tokens/BUILD.bazel:6:    name = \"format_tokens\",",
+    "5f4fa621894c7eff6a4d78b6ed9ea2c9ce0f7920:src/material/core/tokens/BUILD.bazel:7:    srcs = [\"_format-tokens.scss\"],",
+    "5f4fa621894c7eff6a4d78b6ed9ea2c9ce0f7920:src/material/core/tokens/BUILD.bazel:50:        \":format_tokens\",",
+    "5f4fa621894c7eff6a4d78b6ed9ea2c9ce0f7920:src/material/core/tokens/_format-tokens.scss:3:@function private-format-tokens($systems) {"
+  ],
+  "scope_limits": "Owned package and installed minimum peer source; no external private-internal users, compiled Sass, browsers, 21.x or full C04 qualification.",
+  "historical_ledger_diff_sha256": "74080603cf762248d604251a77cd2c8e037ce4aa9a27b1ec8206e90cc601d84e",
+  "historical_serialization_provenance": "Unresolved: no authenticated mapping from the historical ledger digest to the authenticated full-index patch is claimed. The original row is preserved verbatim in original-row.raw.json; the frozen seed remains unchanged.",
+  "original_ledger_row_raw_path": "compatibility/f10/disposition-ledger/evidence/95f2de4adae1811836c461e8bf4ffdcec2e81677-original-row.raw.json",
+  "original_ledger_row_raw_sha256": "e88515524354d71ee937939828d5ec555831f4bf3a8c5a040ea0ba44aa30d18e"
+}
