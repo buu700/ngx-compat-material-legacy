@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import {tablinkViewportObservationProblems} from './api-tablink-viewport-contract.mjs';
+import {autocompleteViewportObservationProblems} from './api-autocomplete-viewport-contract.mjs';
 import {spinnerViewportObservationProblems} from './api-spinner-viewport-contract.mjs';
 /**
  * Packed primary/testing export completeness vs authentic Material 16.2.14
@@ -519,7 +521,7 @@ if (isMain) {
 }
 
 export function settleDi(row, records) {
-  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...ownedDialogFocusObservationProblems(row),...menuContentObservationProblems(row),...simpleSnackObservationProblems(row),...dialogOpenerObservationProblems(row),...autocompleteObservationProblems(row),...tabBodyObservationProblems(row),...tabHeaderObservationProblems(row),...tabPortalObservationProblems(row),...tableDefinitionObservationProblems(row),...inputObservationProblems(row),...menuTriggerObservationProblems(row),...spinnerViewportObservationProblems(row)]};
+  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...ownedDialogFocusObservationProblems(row),...menuContentObservationProblems(row),...simpleSnackObservationProblems(row),...dialogOpenerObservationProblems(row),...autocompleteObservationProblems(row),...tabBodyObservationProblems(row),...tabHeaderObservationProblems(row),...tabPortalObservationProblems(row),...tableDefinitionObservationProblems(row),...inputObservationProblems(row),...menuTriggerObservationProblems(row),...spinnerViewportObservationProblems(row),...autocompleteViewportObservationProblems(row),...tablinkViewportObservationProblems(row)]};
   if(row.symbol.symbol_id===RIPPLE_SYMBOL){
     const contract=approvedRippleContract(row.symbol),problems=[...row.problems,...rippleFactoryObservationProblems(row,contract)];
     return {...row,problems,result:problems.length?'fail':'pass',status:problems.length?'mismatch':'intentional-legacy-difference',
@@ -552,6 +554,8 @@ export function settleDi(row, records) {
         : (row.symbol.shape.diParams || []).filter(param=>!param.attribute))
         .map(param => `${param.ident}${param.optional ? '?' : ''}`).join('|');
   const owned = row.observed.join('|');
+  if(['legacy-tabs/primary/MatLegacyTabLink','legacy-tabs/primary/_MatLegacyTabLinkBase'].includes(row.symbol.symbol_id)&&!row.problems.length)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'The actual parent node receives a distinct owned docs-private viewport token, not the historical or minimum peer token; artifact, parent binding, source and provider evidence apply only to the two recorded link contexts.'};
+  if(row.symbol.symbol_id==='legacy-autocomplete/primary/MatLegacyAutocompleteTrigger'&&!row.problems.length)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'The actual node uses an independently owned docs-private viewport token, distinct from the historical and minimum-peer tokens; exact source, artifact, type and provider evidence are bounded to the recorded images.'};
   if(row.symbol.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'&&!row.problems.length)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'The owned docs-private viewport is a distinct injection token; exact artifact, source, actual node, historical provider negative, and manual type evidence are bounded to the recorded minimum peer.'};
   if (row.symbol.symbol_id===TABLE_SYMBOL) {
     const contract=approvedTableContract(row.symbol);

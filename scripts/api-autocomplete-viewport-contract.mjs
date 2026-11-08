@@ -1,0 +1,54 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Finite autocomplete viewport replacement evidence; not token identity.
+ */
+import {createRequire} from 'node:module';
+import {createHash} from 'node:crypto';
+import {readFileSync,existsSync,realpathSync} from 'node:fs';
+import {dirname,join,relative,isAbsolute} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {isDeepStrictEqual} from 'node:util';
+import {inputHarnessClosureFingerprint} from './api-input-harness-contract.mjs';
+import {compilerConstructorContract} from './api-compiler-constructor-contract.mjs';
+import {spinnerViewportProof} from './api-spinner-viewport-contract.mjs';
+const require=createRequire(import.meta.url),hash=x=>createHash('sha256').update(x).digest('hex'),sha=hash,ROOT=join(dirname(fileURLToPath(import.meta.url)),'..');
+function closure(program,virtual){
+ return program.getSourceFiles().filter(f=>f.fileName!==virtual).map(file=>{
+  const real=realpathSync(file.fileName);let dir=dirname(real);
+  while(dir!==dirname(dir)&&!existsSync(join(dir,'package.json')))dir=dirname(dir);
+  const packageBytes=readFileSync(join(dir,'package.json')),pkg=JSON.parse(packageBytes),path=relative(dir,real).split('\\').join('/'),bytes=readFileSync(real);
+  if(!pkg.name||!pkg.version||!path||path.startsWith('../')||isAbsolute(path)||!bytes.equals(Buffer.from(file.text,'utf8')))throw Error('unbound input program source');
+  return {package:pkg.name,version:pkg.version,package_sha256:sha(packageBytes),path,bytes:bytes.length,sha256:sha(bytes)};
+ });
+}
+const ID='legacy-autocomplete/primary/MatLegacyAutocompleteTrigger';
+const D='5b81821cc64e58a013329c473b7d5f3335c2ceae2b9d9b08218f29c269689743',B='e8f100eab8ca3c036f23c46452edc35962dc44cf0141f1f972abbabf30df55e6';
+export function autocompleteViewportProof(symbol,spinner,context){try{
+ const ts=require('typescript');if(symbol?.symbol_id!==ID||hash(JSON.stringify(symbol.shape))!=='7657129de95cf09f009981c4f716443a25cc67d4653a68737d50fdbb4b279af7'||!context?.packageRoot||!context?.referenceRoot)return null;
+ const commonPath=join(context.packageRoot,'types/ngx-compat-material-legacy-legacy-progress-spinner.d.ts'),common=spinnerViewportProof(spinner,{fileName:commonPath,text:readFileSync(commonPath,'utf8')},context);if(!common)return null;
+ const decl=join(context.packageRoot,'types/ngx-compat-material-legacy-legacy-autocomplete.d.ts'),bundlePath=join(context.packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-autocomplete.mjs'),bundle=readFileSync(bundlePath,'utf8');if(hash(readFileSync(decl))!==D||hash(bundle)!==B)return null;
+ for(const [path,digest] of Object.entries({'autocomplete/autocomplete-trigger.ts':'b69decaf81ef29dd665a0b267f3a121837212157b31ddd02c3b617fa958844f2','legacy-autocomplete/autocomplete-trigger.ts':'1eff015d7da17574535f894323a2c2fe9d36f207d90aa9e33503620cd6f10414','legacy-autocomplete/public-api.ts':'7a5d27cce0019a36d57af541ea1301331d3d4909cd91fc112ed89ad007eeba42'}))if(hash(readFileSync(join(context.referenceRoot,path)))!==digest)return null;
+ const paths={'legacy-autocomplete/autocomplete-trigger.ts':'6b9c00dbf365e6b6ea9b2b65eb7e67911775322c78848b996d3590f8fded3d58','legacy-autocomplete/internal/autocomplete-trigger-base.ts':'803e95c96c22e5a6863a5f353f0485ec5a0431d04c9fe0b987031083ed7afaa9'},map=JSON.parse(readFileSync(bundlePath+'.map'));for(const [path,digest] of Object.entries(paths)){if(hash(readFileSync(join(ROOT,'projects/ngx-material-legacy',path)))!==digest)return null;const i=map.sources.findIndex(x=>x.endsWith('/'+path));if(i<0||hash(map.sourcesContent[i])!==digest)return null;}
+ if(hash(readFileSync(join(ROOT,'tests/api_autocomplete_viewport_provider_probe.mjs')))!=='73fc817e2067b635d9bbb1347dd162bbf6973c74af78876773f803eee9244f8d'||hash(readFileSync(join(ROOT,'scripts/api-autocomplete-viewport-provider-evidence.json')))!=='2f8c18da6b23ae13765262b28d831ffb3c2d07259308490db4f56f5cef448326')return null;
+ const parsed=ts.createSourceFile('autocomplete.mjs',bundle,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS),classes=parsed.statements.filter(n=>ts.isClassDeclaration(n)&&['MatLegacyAutocompleteTrigger','_MatAutocompleteTriggerBase'].includes(n.name?.text)),exports=parsed.statements.filter(n=>ts.isExportDeclaration(n)&&!n.moduleSpecifier&&n.exportClause&&ts.isNamedExports(n.exportClause)).flatMap(n=>n.exportClause.elements);if(parsed.parseDiagnostics.length||classes.length!==2)return null;
+ const cls=classes.find(n=>n.name.text==='MatLegacyAutocompleteTrigger'),base=classes.find(n=>n.name.text==='_MatAutocompleteTriggerBase');if(!cls||!base||cls.heritageClauses?.length!==1||cls.heritageClauses[0].types.length!==1||cls.heritageClauses[0].types[0].expression.getText(parsed)!=='_MatAutocompleteTriggerBase'||exports.filter(e=>e.name.text==='MatLegacyAutocompleteTrigger'&&(e.propertyName||e.name).text==='MatLegacyAutocompleteTrigger').length!==1||exports.filter(e=>e.name.text==='_MatLegacyAutocompleteTriggerBase'&&e.propertyName?.text==='_MatAutocompleteTriggerBase').length!==1||base.members.filter(ts.isConstructorDeclaration).length!==1||base.members.find(ts.isConstructorDeclaration).parameters.length!==11)return null;
+ const compiled=compilerConstructorContract(bundle,'MatLegacyAutocompleteTrigger',{resolveInherited:true});if(compiled.parameters.length!==11||compiled.parameters[9].token_expression!=='@ngx-compat/material-legacy/legacy-core#_LegacyViewport'||['optional','self','skipSelf','host'].some(f=>compiled.parameters[9][f]!==false))return null;
+ const model=JSON.parse(readFileSync(join(ROOT,'compatibility/rc/legacy-viewport-source-proof.json'))),entry=Object.values(model).find(x=>x&&typeof x==='object'&&typeof x.positive_fixture==='string'),original=entry?.positive_fixture.match(/declare namespace Subject0\{[\s\S]*?\}\}\n(?=declare const supplied0)/)?.[0];if(!original)return null;
+ const fixture=join(dirname(decl),'__autocomplete_viewport_probe__.ts'),text=`import {MatLegacyAutocompleteTrigger} from './ngx-compat-material-legacy-legacy-autocomplete';import {ViewportRuler} from '@angular/cdk/scrolling';import {Platform} from '@angular/cdk/platform';import {NgZone,OnDestroy} from '@angular/core';import {Observable} from 'rxjs';${original} declare const old:Subject0.ViewportRuler,current:ViewportRuler;let args:ConstructorParameters<typeof MatLegacyAutocompleteTrigger>;args![9]=old;args![9]=current;`;
+ const options={strict:true,skipLibCheck:false,noEmit:true,types:[],module:ts.ModuleKind.ESNext,moduleResolution:ts.ModuleResolutionKind.Bundler,target:ts.ScriptTarget.ES2022};function compile(text){const host=ts.createCompilerHost(options),get=host.getSourceFile.bind(host);host.getSourceFile=(name,...args)=>name===fixture?ts.createSourceFile(name,text,ts.ScriptTarget.Latest,true):get(name,...args);const program=ts.createProgram([decl,fixture],options,host);return {program,diagnostics:ts.getPreEmitDiagnostics(program)};}
+ const positive=compile(text);if(positive.diagnostics.length)return null;const bad=compile(text+'\nold.change("slow");');if(bad.diagnostics.length!==1||bad.diagnostics[0].code!==2345)return null;
+ const sources=closure(positive.program,fixture),fingerprint=inputHarnessClosureFingerprint(sources);if(sources.length!==318||fingerprint!=='b396700f5b191bdff637986773080a1817071ccd23d2b29383ee0153e85273df'||hash(JSON.stringify(common))!=='adbfc914d036f7f40c45dfd8ef0c1bd2efc2479e946fb58b085a08ce4107ff97')return null;
+ return {common:hash(JSON.stringify(common)),declaration_sha256:D,bundle_sha256:B,program_sources:sources.length,program_closure_sha256:fingerprint,historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee'};
+}catch{return null;}}
+export function autocompleteViewportObservationProblems(row){
+ if(row?.symbol?.symbol_id!==ID)return [];const bad=['autocomplete viewport replacement receipt incomplete'];
+ if(hash(JSON.stringify(row.symbol.shape))!=='7657129de95cf09f009981c4f716443a25cc67d4653a68737d50fdbb4b279af7'||row.factory_outcome!=='returned'||row.factory_returned_owned_instance!==true||row.factory_node_kind!=='element'||!isDeepStrictEqual(row.factory_context_modules,['legacy-autocomplete/primary/MatLegacyAutocompleteModule'])||row.factory_context!=='actual Angular element/template nodes and public application providers with synthetic Renderer2/server DOM and public MockPlatformLocation URL backend; native/browser/AOT/packed/floors separate; explicit synthetic defaultView EventTarget, no browser geometry')return bad;
+ const src=row.factory_autocomplete_context?.source;if(!src?.file?.endsWith('/fesm2022/ngx-compat-material-legacy-legacy-autocomplete.mjs')||src.sha256!==B||src.owner_text_sha256!=='3e8da6367151eec7cc39097111b1c836bf88abb8a7a43157064f742783b61abd'||src.lookup_text_sha256!=='75f7a9bcd231685bc0d440c2f823c0e01db5ab34c8fe4be96f2de6ab3dee705d')return bad;
+ const req=row.runtime_requests,ps=row.symbol.shape.originalFactoryContext?.factory_parameters,labels=['ElementRef','Overlay','ViewContainerRef','NgZone','ChangeDetectorRef','mat-autocomplete-scroll-strategy','Directionality','MatFormField','DocumentToken','_LegacyViewport','mat-autocomplete-default-options'];if(!Array.isArray(req)||req.length!==11||!Array.isArray(ps)||ps.length!==11)return bad;
+ for(let i=0;i<11;i++){const r=req[i],p=ps[i];if(r.expected_ident!==p.ident||r.expected_spec!==p.spec||r.observed_label!==labels[i]||r.identity_matched!==(i!==9)||r.unresolved!==false||r.observation_evidence!=='public Injector request trace'||['optional','self','skipSelf','host'].some(f=>r[f]!==Boolean(p[f])||r['expected_'+f]!==Boolean(p[f])))return bad;}
+ const proof={common:'adbfc914d036f7f40c45dfd8ef0c1bd2efc2479e946fb58b085a08ce4107ff97',declaration_sha256:D,bundle_sha256:B,program_sources:318,program_closure_sha256:'b396700f5b191bdff637986773080a1817071ccd23d2b29383ee0153e85273df',historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee'};
+ const expected={historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee',proof,node:{constructor_calls:1,constructor_arity:11,viewport_index:9,actual_node_element:true,owned_input_matches_node_provider:true,owned_metadata_token:true,stored_input_matches:true}};
+ return isDeepStrictEqual(req[9].intentional_token_difference,expected)?[]:bad;
+}
