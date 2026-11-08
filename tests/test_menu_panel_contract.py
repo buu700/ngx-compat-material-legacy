@@ -58,13 +58,15 @@ const fixtures=[['positive','',[]],
 const temp=mkdtempSync(join(tmpdir(),'closeout-menu-panel-types-'));
 try {
  const peerRoot=join(temp,'node_modules/@angular');mkdirSync(peerRoot,{recursive:true});
- for(const name of ['core','cdk','material']) {
+ for(const name of ['common','core','cdk','material']) {
   symlinkSync(dirname(require.resolve('@angular/'+name+'/package.json')),join(peerRoot,name),'dir');
  }
  const names=fixtures.map(([name,body])=>{const file=join(temp,name+'.ts');writeFileSync(file,common+body);return file;});
- const options={strict:true,noEmit:true,skipLibCheck:true,types:[],target:ts.ScriptTarget.ES2022,
-  module:ts.ModuleKind.ESNext,moduleResolution:ts.ModuleResolutionKind.Bundler,
-  allowImportingTsExtensions:true};
+ const configPath=resolve('projects/ngx-material-legacy/tsconfig.lib.json');
+ const config=ts.readConfigFile(configPath,ts.sys.readFile);assert.equal(config.error,undefined);
+ const parsed=ts.parseJsonConfigFileContent(config.config,ts.sys,dirname(configPath));
+ assert.deepEqual(parsed.errors,[]);
+ const options={...parsed.options,strict:true,noEmit:true,types:[],allowImportingTsExtensions:true};
  const host=ts.createCompilerHost(options);
  host.resolveModuleNames=(names,containing)=>names.map(name=>ts.resolveModuleName(name,
   name.startsWith('@angular/')?join(temp,'peer-resolution.ts'):containing,options,host).resolvedModule);
