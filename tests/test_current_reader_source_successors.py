@@ -45,16 +45,16 @@ class CurrentReaderSourceSuccessorsTests(unittest.TestCase):
 
     def test_current_inventory_source_routing(self):
         report = self.run_probe('node', 'current_inventory_source_routing_probe.mjs')
-        self.assertEqual(report['cold_rejections'], 30)
+        self.assertEqual(report['cold_rejections'], 115)
         for field in ['old_source_substitution_rejected', 'unknown_hash_rejected',
                       'wrong_length_rejected', 'accessor_not_invoked',
                       'public_metadata_isolated', 'comparison_copy_isolated',
-                      'forged_raw_property_rejected', 'intermediate_owner_preserved']:
+                      'forged_raw_property_rejected', 'intermediate_owner_preserved', 'retained_owner_preserved']:
             self.assertTrue(report[field], field)
 
     def test_canonical_inventory_source_routing(self):
         report = self.run_probe('node', 'canonical_inventory_routing_probe.mjs')
-        self.assertEqual(report['cold_rejections'], 33)
+        self.assertEqual(report['cold_rejections'], 117)
         for field in ['unknown_predecessor_rejected', 'wrong_length_rejected',
                       'public_metadata_isolated']:
             self.assertTrue(report[field], field)

@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Ryan Lester.
  * Use of this source code is governed by the MIT license in LICENSE.
  */
-/** Four finite current routing images; before-images are comparison data only. */
+/** Four finite routing paths; before-images are comparison data only. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
@@ -15,6 +15,7 @@ import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 const SELF='scripts/current-inventory-source-subject.mjs',image=readFileSync(fileURLToPath(import.meta.url));
 const PACKET={path:'compatibility/rc/main-current-inventory-source-routing-v2.json',sha256:'3815beb1e21779e54deaee5da2bf7bb316732e98a3dc9938ef6d2fdf18707280',bytes:24306};
 const CONTINUATION={path:'compatibility/rc/main-current-inventory-source-routing-v3.json',sha256:'d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b',bytes:13219};
+const LATE_CONTINUATION={path:'compatibility/rc/main-current-inventory-source-routing-v4.json',sha256:'b4d4fc742323ec0bb6858a5b6165dc0c1307d0d0a1d4c3f49b6ef017df97ab1c',bytes:32578};
 const paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 export function currentInventorySourceSubject({root,read=p=>readEvidenceMember(root,p)}){
@@ -30,7 +31,7 @@ export function currentInventorySourceSubject({root,read=p=>readEvidenceMember(r
   let cursor=0;const parts=[];assert.ok(Array.isArray(row.edits)&&row.edits.length>0);
   for(const edit of row.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=before.length);assert.equal(typeof edit.before,'string');assert.equal(typeof edit.after,'string');assert.notEqual(edit.before,edit.after);const prior=Buffer.from(edit.before);assert.ok(before.subarray(edit.offset,edit.offset+prior.length).equals(prior));parts.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+prior.length;}
   parts.push(before.subarray(cursor));const current=Buffer.concat(parts);check(current,row.after);
-  // The packed owner has one further exact continuation below. Other routing
+  // The packed owner has two further exact continuations below. Other routing
   // images must still match this untouched v2 afterimage directly.
   if(row.path!==paths[0])assert.ok(current.equals(physical(row.path)));
   rows.set(row.path,{before:{...row.before},after:{...row.after},images:new Map([[row.before.sha256,{ref:{...row.before},bytes:Buffer.from(before)}],[row.after.sha256,{ref:{...row.after},bytes:Buffer.from(current)}]])});
@@ -43,11 +44,25 @@ export function currentInventorySourceSubject({root,read=p=>readEvidenceMember(r
   const row=rows.get(update.path);assert.deepEqual(update.before,row.after);assert.equal(update.after.path,update.path);
   const before=git(['show',next.base_head+':'+update.path]);check(before,update.before);assert.ok(before.equals(row.images.get(update.before.sha256).bytes));
   let cursor=0;const parts=[];for(const edit of update.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=before.length);const old=Buffer.from(edit.before);assert.ok(before.subarray(edit.offset,edit.offset+old.length).equals(old));parts.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+old.length;}
-  parts.push(before.subarray(cursor));const after=Buffer.concat(parts);check(after,update.after);assert.ok(after.equals(physical(update.path)));row.after={...update.after};row.images.set(update.after.sha256,{ref:{...update.after},bytes:Buffer.from(after)});
+  parts.push(before.subarray(cursor));const after=Buffer.concat(parts);check(after,update.after);row.after={...update.after};row.images.set(update.after.sha256,{ref:{...update.after},bytes:Buffer.from(after)});
  }
  for(const ref of next.support){check(physical(ref.path),ref);const committed=git(['show',next.support_commit+':'+ref.path]);check(committed,ref);assert.ok(committed.equals(physical(ref.path)));}
- const bound=[{path:SELF,sha256:hash(image),bytes:image.length},{...PACKET},{...CONTINUATION},...[...rows.values()].map(row=>({...row.after})),...next.support.map(ref=>({...ref}))];
- assert.equal(new Set(bound.map(ref=>ref.path)).size,bound.length);
+ const lateRaw=physical(LATE_CONTINUATION.path);check(lateRaw,LATE_CONTINUATION);const late=JSON.parse(lateRaw);
+ assert.equal(late.schema_version,1);assert.equal(late.role,'main-current-inventory-retained-source-routing');assert.equal(late.base_head,'9f794fdbe4ab6787a632193dec5c4650672bfec1');assert.equal(late.support_commit,late.base_head);assert.deepEqual(late.previous_packet,CONTINUATION);
+ for(const[key,value]of Object.entries({source_scope_only:true,historical_programs_executed:false,historical_packets_rewritten:false,original_ledger_metadata_recipe_changed:false,source_judgments_changed:0,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(late[key],value);
+ assert.deepEqual(late.updates.map(row=>row.path),[paths[0]]);assert.equal(late.support.length,84);git(['merge-base','--is-ancestor',late.base_head,'HEAD']);
+ for(const update of late.updates){
+  const row=rows.get(update.path);assert.deepEqual(update.before,row.after);assert.equal(update.after.path,update.path);
+  const before=git(['show',late.base_head+':'+update.path]);check(before,update.before);assert.ok(before.equals(row.images.get(update.before.sha256).bytes));
+  let cursor=0;const parts=[];for(const edit of update.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=before.length);const old=Buffer.from(edit.before);assert.ok(before.subarray(edit.offset,edit.offset+old.length).equals(old));parts.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+old.length;}
+  parts.push(before.subarray(cursor));const after=Buffer.concat(parts);check(after,update.after);assert.ok(after.equals(physical(update.path)));row.after={...update.after};row.images.set(update.after.sha256,{ref:{...update.after},bytes:Buffer.from(after)});
+ }
+ for(const ref of late.support){check(physical(ref.path),ref);const committed=git(['show',late.support_commit+':'+ref.path]);check(committed,ref);assert.ok(committed.equals(physical(ref.path)));}
+ const unique=new Map();
+ for(const ref of [{path:SELF,sha256:hash(image),bytes:image.length},{...PACKET},{...CONTINUATION},{...LATE_CONTINUATION},...[...rows.values()].map(row=>({...row.after})),...next.support,...late.support]){
+  const prior=unique.get(ref.path);if(prior)assert.deepEqual(prior,ref);else unique.set(ref.path,{...ref});
+ }
+ const bound=[...unique.values()];
  const assertCurrent=()=>{assert.ok(physical(SELF).equals(image));for(const ref of bound){const before=physical(ref.path),provided=read(ref.path);check(before,ref);assert.ok(Buffer.isBuffer(provided)&&before.equals(provided),'nonphysical current inventory source '+ref.path);assert.ok(before.equals(physical(ref.path)));}for(const ref of bound)check(physical(ref.path),ref);};
  const select=ref=>{
   assert.ok(ref&&typeof ref==='object'&&!types.isProxy(ref)&&Object.getPrototypeOf(ref)===Object.prototype);const fields=Object.getOwnPropertyDescriptors(ref),keys=Reflect.ownKeys(fields);assert.ok(keys.every(key=>typeof key==='string'));assert.deepEqual(keys.sort(),Object.hasOwn(fields,'bytes')?['bytes','path','sha256']:['path','sha256']);for(const field of Object.values(fields))assert.ok(Object.hasOwn(field,'value')&&field.enumerable);

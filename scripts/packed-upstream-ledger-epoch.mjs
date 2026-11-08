@@ -27,6 +27,9 @@ import {sassWrapperNoticeSubject} from './sass-wrapper-notice-subject.mjs';
 import {sassWrapperNoticeMetadata,SASS_NOTICE_METADATA_PACKET,SASS_NOTICE_METADATA_LEDGER} from './sass-wrapper-notice-metadata.mjs';
 import {retainedValidatorProgramSource} from './retained-validator-program-source.mjs';
 import {retainedCurrentContextIdentity} from './retained-current-context-identity.mjs';
+import {retainedLaterStageProgramSource} from './retained-later-stage-program-source.mjs';
+import {retainedSelectionMetadataContext} from './retained-selection-metadata-context.mjs';
+import {retainedLandscapeProgramSource} from './retained-landscape-program-source.mjs';
 import {currentSassToolReferenceSubject} from './current-sass-tool-references.mjs';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 
@@ -56,6 +59,9 @@ const readers = new WeakMap();
 const selectionReaderCache=new WeakMap();
 const selectionNativeCache=new WeakMap();
 const retainedToolCache=new WeakMap();
+const retainedLaterProgramCache=new WeakMap();
+const retainedLaterProgramPaths=new Set(['scripts/upstream-candidate-source-evidence.mjs',
+  'scripts/autocomplete-selection-spec-subject.mjs','scripts/autocomplete-selection-native-subject.mjs']);
 // Only this module registers the inventory owner's qualified metadata reader.
 // Its older JSON images remain available to metadata replay, while live source
 // guards receive the exact underlying current reader, never those projections.
@@ -67,6 +73,11 @@ function retainedTools(root,read,line){
   if(line!=='main')return null;
   const cached=retainedToolCache.get(read);if(cached){assert.equal(cached.root,root);return cached.scope;}
   const scope=currentSassToolReferenceSubject({root,read:currentSourceRead(root,read)});retainedToolCache.set(read,{root,scope});return scope;
+}
+function retainedLaterPrograms(root,read,line){
+  if(line!=='main')return null;
+  const cached=retainedLaterProgramCache.get(read);if(cached){assert.equal(cached.root,root);return cached.scope;}
+  const scope=retainedLaterStageProgramSource({root,read:currentSourceRead(root,read)});retainedLaterProgramCache.set(read,{root,scope});return scope;
 }
 function selectionNative(root,read,line){
   const cached=selectionNativeCache.get(read);
@@ -87,7 +98,8 @@ function selectionReaders(root,read,line){
 function selectionMember({root,read,line,ref,bound}){
   const scope=selectionReaders(root,read,line),native=ref.path===SELECTION_NATIVE_REGISTRY?selectionNative(root,read,line):null;
   const tools=ref.path===testingApiChecker?retainedTools(root,read,line):null;
-  const qualified=tools?.qualify(ref)??native?.qualify(ref)??scope.qualify(ref),current=qualified??ref;
+  const later=retainedLaterProgramPaths.has(ref.path)?retainedLaterPrograms(root,read,line):null;
+  const qualified=later?.qualifyMetadata(ref)??tools?.qualify(ref)??native?.qualify(ref)??scope.qualify(ref),current=qualified??ref;
   const raw=(qualified?currentSourceRead(root,read):read)(ref.path);
   assert.equal(hash(raw),current.sha256,'changed qualified source subject '+ref.path);
   if(current.bytes!==undefined)assert.equal(raw.length,current.bytes);
@@ -96,7 +108,41 @@ function selectionMember({root,read,line,ref,bound}){
   for(const member of scope.bound)bound.set(member.path,metadataDigest(root,read,member));
   if(native)for(const member of native.bound)bound.set(member.path,metadataDigest(root,read,member));
   if(tools)for(const member of tools.bound)bound.set(member.path,metadataDigest(root,read,member));
+  if(later)for(const member of later.bound)bound.set(member.path,metadataDigest(root,read,member));
   bound.set(ref.path,metadataDigest(root,read,current));return raw;
+}
+
+// Current consumption and historical metadata digests have separate owners.
+// No old source body is returned by these descriptor comparisons.
+function consumeRetainedCurrentInputs({root,read,refs,bound,bindCurrent}){
+  const source=currentSourceRead(root,read);bindCurrent?.(refs);
+  for(const ref of refs){
+    const actual=readEvidenceMember(root,ref.path);assert.equal(hash(actual),ref.sha256,ref.path);assert.equal(actual.length,ref.bytes,ref.path);
+    const raw=source(ref.path);assert.ok(Buffer.isBuffer(raw)&&raw.equals(actual),'nonphysical retained source '+ref.path);
+    assert.ok(actual.equals(readEvidenceMember(root,ref.path)));bound.set(ref.path,metadataDigest(root,read,ref));
+  }
+}
+function retainedHistoricalReference({root,read,line,ref,context}){
+  const readers=selectionReaders(root,read,line),spec=readers.spec;let current;
+  if(ref.path===spec.path){
+    const prior=[spec.before,spec.after,spec.current_after].find(row=>row.sha256===ref.sha256);assert.ok(prior,'unknown retained spec metadata');
+    if(ref.bytes!==undefined)assert.equal(ref.bytes,prior.bytes);current={path:ref.path,...spec.current_after};
+  }else if(ref.path===SELECTION_NATIVE_REGISTRY)current=selectionNative(root,read,line).qualify(ref);
+  else current=retainedTools(root,read,line)?.qualify(ref)??context?.qualifyMetadata(ref)??readers.qualify(ref)??ref;
+  return {path:current.path,sha256:current.sha256,...(ref.bytes===undefined?{}:{bytes:current.bytes})};
+}
+/** Pure comparison-data projection. The caller owns authenticated source
+ * descriptors and the qualifier; this function grants no source admission. */
+export function projectRetainedHistoricalProof({current,expected,qualify}){
+  assert.equal(typeof qualify,'function');const result=structuredClone(current);
+  const actual=result.historical_behavior?.source_members,original=expected.historical_behavior?.source_members;
+  assert.ok(Array.isArray(actual)&&Array.isArray(original)&&original.length>0);
+  assert.deepEqual(actual.map(ref=>ref.path),original.map(ref=>ref.path));assert.equal(new Set(original.map(ref=>ref.path)).size,original.length);
+  for(const[index,ref]of original.entries()){
+    const selected=qualify(ref);assert.ok(selected);assert.equal(selected.path,ref.path);assert.match(selected.sha256,/^[a-f0-9]{64}$/);
+    assert.deepEqual(actual[index],{path:selected.path,sha256:selected.sha256,...(actual[index].bytes===undefined?{}:{bytes:selected.bytes})});
+  }
+  result.historical_behavior.source_members=structuredClone(original);assert.deepEqual(result,expected);return result;
 }
 
 const pythonVersion = () => execFileSync('python3', ['-c', 'import sys;print(sys.version.split()[0])'],
@@ -373,7 +419,7 @@ const rulesJsTransitions={
   main:{path:'compatibility/rc/upstream-rules-js-build-ledger-transition.json.gz',sha256:'c9a98435c6c654996955d808a8ea2717f5f4d89f8eb360c0fd4df7854712b975'},
   '21.x':{path:'compatibility/rc/upstream-rules-js-build-ledger-transition.json.gz',sha256:'c0e61d07aecb56a56c6c3b1d70d836c28edcfccbb36967f28460921037894191'},
 };
-function prepareRulesJsStage({root,read,line,before,bound}){
+function prepareRulesJsStage({root,read,line,before,bound,bindCurrent}){
   const member=ref=>selectionMember({root,read,line,ref,bound});
   const packet=JSON.parse(gunzipSync(member(rulesJsTransitions[line])));
   assert.equal(packet.line,line);assert.equal(packet.decisions_changed,3);
@@ -384,7 +430,9 @@ function prepareRulesJsStage({root,read,line,before,bound}){
   assert.deepEqual(packet.code_subjects.map(ref=>ref.path),[testingApiChecker,'scripts/upstream-rules-js-build-admission.mjs','scripts/upstream_rules_js_build_scope.py']);
   for(const ref of packet.code_subjects)member(ref);
   const review=JSON.parse(member(packet.review));assert.equal(review.line,line);assert.equal(review.reviews.length,3);
-  const scope=rulesJsBuildBoundInputs({root,read,line});for(const ref of scope.refs)member(ref);
+  const actualRead=line==='main'?currentSourceRead(root,read):read;
+  const scope=rulesJsBuildBoundInputs({root,read:actualRead,line});
+  if(line==='main')consumeRetainedCurrentInputs({root,read,refs:scope.refs,bound,bindCurrent});else for(const ref of scope.refs)member(ref);
   const text=before.toString(),source=ledgerSyntax('rules-js-ledger.json',text);assert.equal(source.parseDiagnostics.length,0);
   const nodes=property(source.statements[0].expression,'entries');assert.equal(nodes.elements.length,1697);
   const bySha=new Map(nodes.elements.map(node=>[JSON.parse(property(node,'sha').getText(source)),node]));
@@ -399,7 +447,7 @@ function prepareRulesJsStage({root,read,line,before,bound}){
     for(const key of new Set([...Object.keys(previous),...Object.keys(current)]))
       if(!allowedFields.has(key))assert.deepEqual(current[key],previous[key],'changed unrelated build entry field '+key);
     assert.equal(current.batch_id,'closeout-three-rules-js-build-individual-reviews');
-    assert.equal(rulesJsBuildEntrySourceOk({root,read,entry:current,body:review,line}),true,'unqualified individual build source decision');
+    assert.equal(rulesJsBuildEntrySourceOk({root,read:actualRead,entry:current,body:review,line}),true,'unqualified individual build source decision');
     const node=bySha.get(change.sha);edits.push({start:node.getStart(source),end:node.end,text:JSON.stringify(current,null,2).replace(/\n/g,'\n    ')});
     expected.entries[index]=current;
   }
@@ -491,7 +539,7 @@ const autocompleteLedgerTransitions={
   main:'823684fe3cb4a30ec4ef012c742df3dc140f010c1aa43f5407c4cd1c2266a6c8',
   '21.x':'d8de61098c5eb4fba574da97b1e6d582f13a3a3be3332bdb83ad00aa9c0f64ba',
 };
-function prepareAutocompleteLandscapeStage({root,read,line,before,bound}){
+function prepareAutocompleteLandscapeStage({root,read,line,before,bound,metadataContext,bindCurrent}){
   const path='compatibility/rc/autocomplete-landscape-ledger-transition.json.gz',raw=read(path);
   assert.equal(hash(raw),autocompleteLedgerTransitions[line]);bound.set(path,hash(raw));
   const packet=JSON.parse(gunzipSync(raw));assert.equal(packet.schema_version,1);assert.equal(packet.line,line);
@@ -502,7 +550,8 @@ function prepareAutocompleteLandscapeStage({root,read,line,before,bound}){
   const member=ref=>selectionMember({root,read,line,ref,bound});
   assert.deepEqual(packet.code_subjects.map(ref=>ref.path),['scripts/autocomplete-landscape-source-judgment.mjs',autocompleteRegistryPath,testingApiChecker]);
   for(const ref of packet.code_subjects)member(ref);
-  const currentSource=autocompleteLandscapeSourceJudgment({root,read,line}),review=JSON.parse(member(packet.review));
+  const currentSource=autocompleteLandscapeSourceJudgment({root,read:line==='main'?currentSourceRead(root,read):read,line}),review=JSON.parse(member(packet.review));
+  if(metadataContext)assert.equal(currentSource.body_is_historical_metadata,true);
   // Reconstruct only this earlier review's metadata image. Current readers
   // retain the actual source; the native ledger receives its new hash below.
   const spec=selectionReaders(root,read,line).spec,originalBody=structuredClone(currentSource.body);
@@ -510,14 +559,24 @@ function prepareAutocompleteLandscapeStage({root,read,line,before,bound}){
   const ownedSpec=originalBody.current_owned_sources.filter(ref=>ref.path===spec.path);assert.equal(ownedSpec.length,1);
   assert.equal(ownedSpec[0].sha256,spec.after.sha256);Object.assign(ownedSpec[0],spec.before);
   assert.deepEqual(review,originalBody);
-  const priorPaths=new Set(packet.qualification_members.map(ref=>ref.path));
-  const originalMembers=currentSource.bound.filter(ref=>priorPaths.has(ref.path)).map(ref=>registryBeforeMetadata(root,read,line,ref.path===spec.path?{...ref,...spec.before}:ref));
-  assert.deepEqual(packet.qualification_members,originalMembers);
-  for(const ref of currentSource.bound)member(ref);
-  const originalProof=structuredClone(currentSource.proof);
-  originalProof.historical_behavior.source_members=originalProof.historical_behavior.source_members.map(ref=>registryBeforeMetadata(root,read,line,ref));
-  const nativeSpec=originalProof.historical_behavior.source_members.filter(ref=>ref.path===spec.path);assert.equal(nativeSpec.length,1);
-  assert.equal(nativeSpec[0].sha256,spec.after.sha256);nativeSpec[0].sha256=spec.before.sha256;
+  const qualify=ref=>retainedHistoricalReference({root,read,line,ref,context:metadataContext});
+  let originalProof;
+  if(metadataContext){
+    const actual=new Map(currentSource.bound.map(ref=>[ref.path,ref]));assert.equal(actual.size,currentSource.bound.length);
+    // Preserve the authenticated old order; current support insertion order is
+    // deliberately independent. Every old descriptor must resolve exactly.
+    for(const ref of packet.qualification_members)assert.deepEqual(actual.get(ref.path),qualify(ref),'changed landscape qualification '+ref.path);
+    consumeRetainedCurrentInputs({root,read,refs:currentSource.bound,bound,bindCurrent});
+    originalProof=projectRetainedHistoricalProof({current:currentSource.proof,expected:packet.entry.after_entry.individual_proof,qualify});
+  }else{
+    const priorPaths=new Set(packet.qualification_members.map(ref=>ref.path));
+    const originalMembers=currentSource.bound.filter(ref=>priorPaths.has(ref.path)).map(ref=>registryBeforeMetadata(root,read,line,ref.path===spec.path?{...ref,...spec.before}:ref));
+    assert.deepEqual(packet.qualification_members,originalMembers);for(const ref of currentSource.bound)member(ref);
+    originalProof=structuredClone(currentSource.proof);
+    originalProof.historical_behavior.source_members=originalProof.historical_behavior.source_members.map(ref=>registryBeforeMetadata(root,read,line,ref));
+    const nativeSpec=originalProof.historical_behavior.source_members.filter(ref=>ref.path===spec.path);assert.equal(nativeSpec.length,1);
+    assert.equal(nativeSpec[0].sha256,spec.after.sha256);nativeSpec[0].sha256=spec.before.sha256;
+  }
   const text=before.toString(),syntax=ledgerSyntax('landscape-ledger.json',text);assert.equal(syntax.parseDiagnostics.length,0);
   const nodes=property(syntax.statements[0].expression,'entries');assert.equal(nodes.elements.length,1697);
   const data=JSON.parse(before),expected=structuredClone(data),index=data.entries.findIndex(row=>row.sha===AUTOCOMPLETE_LANDSCAPE_SHA);
@@ -566,7 +625,7 @@ const selectionSpecLedgerPins={
   main:'25e1e6731fa14c62a976dc9c04389f89d57b27b9d80742f44e97fdd18946adce',
   '21.x':'46338d4f9dc08c0e93a22611352cbbcb9170baa98b58323d1ffed4252963dac4',
 };
-function prepareSelectionSpecMetadata({root,read,line,before,bound,currentSource}){
+function prepareSelectionSpecMetadata({root,read,line,before,bound,currentSource,metadataContext}){
   const path='compatibility/rc/autocomplete-selection-spec-ledger-successor.json',raw=read(path);
   assert.equal(hash(raw),selectionSpecLedgerPins[line]);bound.set(path,hash(raw));
   const packet=JSON.parse(raw);assert.equal(packet.schema_version,1);assert.equal(packet.line,line);
@@ -602,14 +661,19 @@ function prepareSelectionSpecMetadata({root,read,line,before,bound,currentSource
   }
   let end=0;const chunks=[];for(const edit of edits.sort((a,b)=>a.start-b.start)){assert.ok(edit.start>=end);chunks.push(text.slice(end,edit.start),edit.text);end=edit.end;}chunks.push(text.slice(end));
   const after=Buffer.from(chunks.join(''));assert.equal(hash(after),packet.after_sha256);assert.deepEqual(JSON.parse(after),expected);
-  const historicalProof=structuredClone(currentSource.proof);
-  historicalProof.historical_behavior.source_members=historicalProof.historical_behavior.source_members.map(ref=>registryBeforeMetadata(root,read,line,ref));
-  assert.deepEqual(expected.entries.find(row=>row.sha===AUTOCOMPLETE_LANDSCAPE_SHA).individual_proof,historicalProof);
+  const expectedProof=expected.entries.find(row=>row.sha===AUTOCOMPLETE_LANDSCAPE_SHA).individual_proof;
+  if(metadataContext)projectRetainedHistoricalProof({current:currentSource.proof,expected:expectedProof,
+    qualify:ref=>retainedHistoricalReference({root,read,line,ref,context:metadataContext})});
+  else{
+    const historicalProof=structuredClone(currentSource.proof);
+    historicalProof.historical_behavior.source_members=historicalProof.historical_behavior.source_members.map(ref=>registryBeforeMetadata(root,read,line,ref));
+    assert.deepEqual(expectedProof,historicalProof);
+  }
   return {before,after,source_proof_digests:3,source_review_pointers:2};
 }
 
 const selectionLedgerPins={main:'dbee1262ff90ad59e8242b128c54a6f8d25de400ce26764d16043bb1ef3fa1c3','21.x':'c47ae399ecd8426ca2d20e6561ea3e37bb94084bce1e850c22d50065a63eb512'};
-function prepareSelectionNativeStage({root,read,line,before,bound}){
+function prepareSelectionNativeStage({root,read,line,before,bound,metadataContext,bindCurrent}){
   const path='compatibility/rc/autocomplete-selection-ledger-successor.json',raw=read(path);
   assert.equal(hash(raw),selectionLedgerPins[line]);bound.set(path,hash(raw));
   const packet=JSON.parse(raw);assert.equal(packet.schema_version,1);assert.equal(packet.line,line);
@@ -621,10 +685,15 @@ function prepareSelectionNativeStage({root,read,line,before,bound}){
   assert.deepEqual(packet.code_subjects.map(ref=>ref.path),[
     'scripts/autocomplete-selection-native-subject.mjs','scripts/autocomplete-selection-source-judgment.mjs','scripts/autocomplete-selection-native-scopes.mjs',
   ]);
-  for(const ref of packet.code_subjects){const value=read(ref.path);assert.equal(hash(value),ref.sha256);assert.equal(value.length,ref.bytes);bound.set(ref.path,ref.sha256);}
-  const source=autocompleteSelectionSourceJudgments({root,read,line}),native=selectionNative(root,read,line);
-  assert.deepEqual(packet.qualification_members,source.bound);
-  for(const ref of source.bound)bound.set(ref.path,ref.sha256);
+  for(const ref of packet.code_subjects){
+    if(metadataContext)selectionMember({root,read,line,ref,bound});
+    else{const value=read(ref.path);assert.equal(hash(value),ref.sha256);assert.equal(value.length,ref.bytes);bound.set(ref.path,ref.sha256);}
+  }
+  const source=autocompleteSelectionSourceJudgments({root,read:metadataContext?currentSourceRead(root,read):read,line}),native=selectionNative(root,read,line);
+  if(metadataContext){
+    assert.deepEqual(packet.qualification_members,metadataContext.historicalMembers);assert.deepEqual(source.bound,metadataContext.currentMembers);
+    consumeRetainedCurrentInputs({root,read,refs:source.bound,bound,bindCurrent});
+  }else{assert.deepEqual(packet.qualification_members,source.bound);for(const ref of source.bound)bound.set(ref.path,ref.sha256);}
   assert.deepEqual(packet.entries.map(row=>row.sha),SELECTION_NATIVE_SHAS);
   const text=before.toString(),syntax=ledgerSyntax('selection-ledger.json',text);assert.equal(syntax.parseDiagnostics.length,0);
   const nodes=property(syntax.statements[0].expression,'entries');assert.equal(nodes.elements.length,1697);
@@ -639,7 +708,9 @@ function prepareSelectionNativeStage({root,read,line,before,bound}){
     const current={...prior,final_disposition:'already-adapted',reason:judgment.body.decision,read_note_disposition:'individual-source-reviewed-on-'+line,
       evidence_report:judgment.path,source_check:{kind:'individual-source-reviewed-runtime-required',diff_sha256:judgment.body.diff_sha256,
         patch_archive:judgment.body.original_source_archive,original_patch_member:change.sha,evidence_report_sha256:reviewRef.sha256},
-      files:judgment.original_paths,review_depth:'individual-compatibility',affected_branches:[line],individual_proof:judgment.proof,
+      files:judgment.original_paths,review_depth:'individual-compatibility',affected_branches:[line],
+      individual_proof:metadataContext?projectRetainedHistoricalProof({current:judgment.proof,expected:change.after_entry.individual_proof,
+        qualify:ref=>metadataContext.qualifyMetadata(ref)}):judgment.proof,
       prior_dispositions:[...(prior.prior_dispositions??[]),{source_parent:packet.before.source_parent,source_entry_sha256:hash(json(prior)),source_line:line,final_disposition:prior.final_disposition}]};
     assert.deepEqual(change.after_entry,current);expected.entries[i]=current;
     edits.push({start:nodes.elements[i].getStart(syntax),end:nodes.elements[i].end,text:JSON.stringify(current,null,2).replace(/\n/g,'\n    ')});
@@ -665,7 +736,8 @@ function prepareSelectionNativeStage({root,read,line,before,bound}){
   assert.equal(edits.length,line==='21.x'?16:14);let end=0;const chunks=[];
   for(const edit of edits.sort((a,b)=>a.start-b.start)){assert.ok(edit.start>=end);chunks.push(text.slice(end,edit.start),edit.text);end=edit.end;}chunks.push(text.slice(end));
   const after=Buffer.from(chunks.join(''));assert.equal(hash(after),packet.after_sha256);assert.deepEqual(JSON.parse(after),expected);assert.equal(expected.g11_claim,'not-passed');
-  source.assertCurrent();return {before,after,individual_decisions:3,registry_digest_updates:11,summary_scalar_updates:summary.length,assertCurrent:source.assertCurrent};
+  const assertCurrent=()=>{source.assertCurrent();metadataContext?.assertCurrent();};
+  assertCurrent();return {before,after,individual_decisions:3,registry_digest_updates:11,summary_scalar_updates:summary.length,assertCurrent};
 }
 
 // Only the twelve enumerated source-metadata records succeed this epoch.
@@ -776,13 +848,20 @@ function prepareBeforeInventoryReferenceLedger({root = process.cwd(), read = dis
   const nativeSubjects=selectionNative(root,read,line);for(const ref of nativeSubjects.bound)bound.set(ref.path,metadataDigest(root,read,ref));
   const rawSource=currentSourceRead(root,read),programs=line==='main'?retainedValidatorProgramSource({root,read:rawSource}):null;
   const contextSource=line==='main'?retainedCurrentContextIdentity({root,read:rawSource}):null,tools=retainedTools(root,read,line);
+  const laterPrograms=retainedLaterPrograms(root,read,line);
+  const metadataContext=line==='main'?retainedSelectionMetadataContext({root,read:rawSource}):null;
+  const landscapePrograms=line==='main'?retainedLandscapeProgramSource({root,read:rawSource}):null;
   const retainedPhysical=new Map();
-  for(const ref of [...(programs?.bound??[]),...(contextSource?.bound??[]),...(tools?.bound??[])]){
-    const prior=retainedPhysical.get(ref.path);if(prior)assert.deepEqual(prior,ref);else retainedPhysical.set(ref.path,{...ref});
-    bound.set(ref.path,metadataDigest(root,read,ref));
-  }
+  const bindCurrent=refs=>{for(const ref of refs){
+    const value={path:ref.path,sha256:ref.sha256,bytes:ref.bytes},prior=retainedPhysical.get(ref.path);
+    if(prior)assert.deepEqual(prior,value);else retainedPhysical.set(ref.path,value);
+    bound.set(ref.path,metadataDigest(root,read,value));
+  }};
+  bindCurrent([...(programs?.bound??[]),...(contextSource?.bound??[]),...(tools?.bound??[]),
+    ...(laterPrograms?.bound??[]),...(metadataContext?.bound??[]),...(landscapePrograms?.bound??[])]);
   const assertRetainedCurrent=()=>{
     programs?.assertCurrent();contextSource?.assertCurrent();tools?.assertCurrent();
+    laterPrograms?.assertCurrent();metadataContext?.assertCurrent();landscapePrograms?.assertCurrent();
     // The last guard callback can change an earlier domain. Close the complete
     // finite union physically, without invoking the caller again.
     for(const ref of retainedPhysical.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,ref.path);assert.equal(raw.length,ref.bytes,ref.path);}
@@ -863,11 +942,11 @@ function prepareBeforeInventoryReferenceLedger({root = process.cwd(), read = dis
   assert.equal(hash(after), data.after_ledger_sha256); assert.deepEqual(JSON.parse(after), expected);
   const next = line === '21.x' ? prepareTestingApiStage({root, read, before: after, bound, population}) : null;
   const sass = prepareSassStage({root,read,line,before:next?.after??after,bound});
-  const rulesJs = prepareRulesJsStage({root,read,line,before:sass.after,bound});
+  const rulesJs = prepareRulesJsStage({root,read,line,before:sass.after,bound,bindCurrent});
   const summary = prepareSummaryStage({root,read,line,before:rulesJs.after,bound});
-  const landscape=prepareAutocompleteLandscapeStage({root,read,line,before:summary.after,bound});
-  const nativeSpec=prepareSelectionSpecMetadata({root,read,line,before:landscape.after,bound,currentSource:landscape.current_source});
-  const nativeSelection=prepareSelectionNativeStage({root,read,line,before:nativeSpec.after,bound});
+  const landscape=prepareAutocompleteLandscapeStage({root,read,line,before:summary.after,bound,metadataContext,bindCurrent});
+  const nativeSpec=prepareSelectionSpecMetadata({root,read,line,before:landscape.after,bound,currentSource:landscape.current_source,metadataContext});
+  const nativeSelection=prepareSelectionNativeStage({root,read,line,before:nativeSpec.after,bound,metadataContext,bindCurrent});
   const noticeMetadata=line==='main'?prepareSassNoticeMetadataStage({root,read,line,before:nativeSelection.after,bound}):null;
   const historicalWrapper=prepareHistoricalWrapperMetadataStage({root,read,line,before:noticeMetadata?.after??nativeSelection.after,bound});
   const consumerWrapper=prepareHistoricalConsumerWrapperMetadataStage({root,read,line,before:historicalWrapper.after,bound});

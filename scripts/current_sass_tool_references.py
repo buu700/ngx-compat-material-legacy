@@ -372,7 +372,7 @@ class CurrentSassToolReferences:
             assert routing_packet['schema_version']==1 and routing_packet['role']=='main-current-inventory-source-routing' and routing_packet['base_head']=='54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0'
             assert routing_packet['source_scope_only'] is True and routing_packet['historical_programs_executed'] is False and routing_packet['historical_packets_rewritten'] is False and routing_packet['artifact_or_audit_admission_granted'] is False and routing_packet['g11_claim']=='not-passed'
             routing_paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];assert [row['path'] for row in routing_packet['updates']]==routing_paths
-            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='b87d99a5ea5482218b70c2e27f01d7821d44a2699b4e9500423aad6453f7dabe',bytes=8213))
+            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='0202ac2c13775bbfae212ae5362669ccae5f7778c556c13b78c7103c2a8bda07',bytes=10540))
             routing_env=dict(PATH=os.environ['PATH'],GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0');subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',routing_packet['base_head'],'HEAD'],cwd=self.root,env=routing_env)
             routing_originals=_git_images(self.root,[dict(commit=routing_packet['base_head'],path=routing_path) for routing_path in routing_paths])
             routing_next=json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v3.json',sha256='d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b',bytes=13219)))
@@ -385,18 +385,32 @@ class CurrentSassToolReferences:
             continuations=_git_images(self.root,[dict(commit=routing_next['base_head'],path=row['path']) for row in routing_next['updates']]+[dict(commit=routing_next['support_commit'],path=ref['path']) for ref in routing_next['support']])
             for ref in routing_next['support']:
                 committed=continuations[(routing_next['support_commit'],ref['path'])];_matches(committed,ref);assert self._member(ref)==committed
+            routing_late=json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v4.json',sha256='b4d4fc742323ec0bb6858a5b6165dc0c1307d0d0a1d4c3f49b6ef017df97ab1c',bytes=32578)))
+            assert routing_late['schema_version']==1 and routing_late['role']=='main-current-inventory-retained-source-routing' and routing_late['base_head']=='9f794fdbe4ab6787a632193dec5c4650672bfec1' and routing_late['support_commit']==routing_late['base_head']
+            assert routing_late['previous_packet']==dict(path='compatibility/rc/main-current-inventory-source-routing-v3.json',sha256='d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b',bytes=13219)
+            for key,value in dict(source_scope_only=True,historical_programs_executed=False,historical_packets_rewritten=False,original_ledger_metadata_recipe_changed=False,source_judgments_changed=0,artifact_or_audit_admission_granted=False,g11_claim='not-passed').items():assert routing_late[key]==value
+            assert [row['path'] for row in routing_late['updates']]==[routing_paths[0]] and len(routing_late['support'])==84
+            subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',routing_late['base_head'],'HEAD'],cwd=self.root,env=routing_env)
+            late_images=_git_images(self.root,[dict(commit=routing_late['base_head'],path=row['path']) for row in routing_late['updates']]+[dict(commit=routing_late['support_commit'],path=ref['path']) for ref in routing_late['support']])
+            for ref in routing_late['support']:
+                committed=late_images[(routing_late['support_commit'],ref['path'])];_matches(committed,ref);assert self._member(ref)==committed
             for routing_update in routing_packet['updates']:
                 assert routing_update['before']['path']==routing_update['after']['path']==routing_update['path']
                 routing_before=routing_originals[(routing_packet['base_head'],routing_update['path'])];_matches(routing_before,routing_update['before']);routing_after=_edited(routing_before,routing_update['edits']);_matches(routing_after,routing_update['after'])
                 identities=[(routing_update['before'],routing_before),(routing_update['after'],routing_after)]
                 continuation=next((row for row in routing_next['updates'] if row['path']==routing_update['path']),None)
-                current=routing_update
+                current=routing_update;actual=routing_after
                 if continuation:
                     assert continuation['before']==routing_update['after'] and continuation['after']['path']==routing_update['path']
                     assert continuations[(routing_next['base_head'],routing_update['path'])]==routing_after
-                    actual=_edited(routing_after,continuation['edits']);_matches(actual,continuation['after']);assert self._member(continuation['after'])==actual
+                    actual=_edited(actual,continuation['edits']);_matches(actual,continuation['after'])
                     identities.append((continuation['after'],actual));current={**routing_update,'after':continuation['after']}
-                else:assert self._member(routing_update['after'])==routing_after
+                further=next((row for row in routing_late['updates'] if row['path']==routing_update['path']),None)
+                if further:
+                    assert further['before']==current['after'] and further['after']['path']==routing_update['path']
+                    assert late_images[(routing_late['base_head'],routing_update['path'])]==actual
+                    actual=_edited(actual,further['edits']);_matches(actual,further['after']);identities.append((further['after'],actual));current={**routing_update,'after':further['after']}
+                assert self._member(current['after'])==actual
                 routing_images[routing_update['path']]=(current,identities)
         def routing_comparison(ref):
             overlay=routing_images.get(ref['path'])

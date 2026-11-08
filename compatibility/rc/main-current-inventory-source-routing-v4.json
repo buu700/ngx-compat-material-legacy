@@ -1,0 +1,572 @@
+{
+  "schema_version": 1,
+  "role": "main-current-inventory-retained-source-routing",
+  "base_head": "9f794fdbe4ab6787a632193dec5c4650672bfec1",
+  "previous_packet": {
+    "path": "compatibility/rc/main-current-inventory-source-routing-v3.json",
+    "sha256": "d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b",
+    "bytes": 13219
+  },
+  "support_commit": "9f794fdbe4ab6787a632193dec5c4650672bfec1",
+  "updates": [
+    {
+      "path": "scripts/packed-upstream-ledger-epoch.mjs",
+      "before": {
+        "path": "scripts/packed-upstream-ledger-epoch.mjs",
+        "sha256": "0568d19d90985cfc7bd66bb72f4bc9db031c542d4214a91b68012056568ed18d",
+        "bytes": 84153
+      },
+      "after": {
+        "path": "scripts/packed-upstream-ledger-epoch.mjs",
+        "sha256": "9013d801d3ef8bc84e828cdf323ec45108ffda8de5132082675d0f5b08b1800d",
+        "bytes": 90576
+      },
+      "edits": [
+        {
+          "offset": 2082,
+          "before": "",
+          "after": "import {retainedLaterStageProgramSource} from './retained-later-stage-program-source.mjs';\nimport {retainedSelectionMetadataContext} from './retained-selection-metadata-context.mjs';\nimport {retainedLandscapeProgramSource} from './retained-landscape-program-source.mjs';\n"
+        },
+        {
+          "offset": 3577,
+          "before": "",
+          "after": "const retainedLaterProgramCache=new WeakMap();\nconst retainedLaterProgramPaths=new Set(['scripts/upstream-candidate-source-evidence.mjs',\n  'scripts/autocomplete-selection-spec-subject.mjs','scripts/autocomplete-selection-native-subject.mjs']);\n"
+        },
+        {
+          "offset": 4646,
+          "before": "",
+          "after": "}\nfunction retainedLaterPrograms(root,read,line){\n  if(line!=='main')return null;\n  const cached=retainedLaterProgramCache.get(read);if(cached){assert.equal(cached.root,root);return cached.scope;}\n  const scope=retainedLaterStageProgramSource({root,read:currentSourceRead(root,read)});retainedLaterProgramCache.set(read,{root,scope});return scope;\n"
+        },
+        {
+          "offset": 6010,
+          "before": "  const qualified=tools?.qualify(ref)??native?.qualify(ref)??scope.qualify(ref),current=qualified??ref;\n",
+          "after": "  const later=retainedLaterProgramPaths.has(ref.path)?retainedLaterPrograms(root,read,line):null;\n  const qualified=later?.qualifyMetadata(ref)??tools?.qualify(ref)??native?.qualify(ref)??scope.qualify(ref),current=qualified??ref;\n"
+        },
+        {
+          "offset": 6787,
+          "before": "",
+          "after": "  if(later)for(const member of later.bound)bound.set(member.path,metadataDigest(root,read,member));\n"
+        },
+        {
+          "offset": 6855,
+          "before": "",
+          "after": "}\n\n// Current consumption and historical metadata digests have separate owners.\n// No old source body is returned by these descriptor comparisons.\nfunction consumeRetainedCurrentInputs({root,read,refs,bound,bindCurrent}){\n  const source=currentSourceRead(root,read);bindCurrent?.(refs);\n  for(const ref of refs){\n    const actual=readEvidenceMember(root,ref.path);assert.equal(hash(actual),ref.sha256,ref.path);assert.equal(actual.length,ref.bytes,ref.path);\n    const raw=source(ref.path);assert.ok(Buffer.isBuffer(raw)&&raw.equals(actual),'nonphysical retained source '+ref.path);\n    assert.ok(actual.equals(readEvidenceMember(root,ref.path)));bound.set(ref.path,metadataDigest(root,read,ref));\n  }\n}\nfunction retainedHistoricalReference({root,read,line,ref,context}){\n  const readers=selectionReaders(root,read,line),spec=readers.spec;let current;\n  if(ref.path===spec.path){\n    const prior=[spec.before,spec.after,spec.current_after].find(row=>row.sha256===ref.sha256);assert.ok(prior,'unknown retained spec metadata');\n    if(ref.bytes!==undefined)assert.equal(ref.bytes,prior.bytes);current={path:ref.path,...spec.current_after};\n  }else if(ref.path===SELECTION_NATIVE_REGISTRY)current=selectionNative(root,read,line).qualify(ref);\n  else current=retainedTools(root,read,line)?.qualify(ref)??context?.qualifyMetadata(ref)??readers.qualify(ref)??ref;\n  return {path:current.path,sha256:current.sha256,...(ref.bytes===undefined?{}:{bytes:current.bytes})};\n}\n/** Pure comparison-data projection. The caller owns authenticated source\n * descriptors and the qualifier; this function grants no source admission. */\nexport function projectRetainedHistoricalProof({current,expected,qualify}){\n  assert.equal(typeof qualify,'function');const result=structuredClone(current);\n  const actual=result.historical_behavior?.source_members,original=expected.historical_behavior?.source_members;\n  assert.ok(Array.isArray(actual)&&Array.isArray(original)&&original.length>0);\n  assert.deepEqual(actual.map(ref=>ref.path),original.map(ref=>ref.path));assert.equal(new Set(original.map(ref=>ref.path)).size,original.length);\n  for(const[index,ref]of original.entries()){\n    const selected=qualify(ref);assert.ok(selected);assert.equal(selected.path,ref.path);assert.match(selected.sha256,/^[a-f0-9]{64}$/);\n    assert.deepEqual(actual[index],{path:selected.path,sha256:selected.sha256,...(actual[index].bytes===undefined?{}:{bytes:selected.bytes})});\n  }\n  result.historical_behavior.source_members=structuredClone(original);assert.deepEqual(result,expected);return result;\n"
+        },
+        {
+          "offset": 28190,
+          "before": "function prepareRulesJsStage({root,read,line,before,bound}){\n",
+          "after": "function prepareRulesJsStage({root,read,line,before,bound,bindCurrent}){\n"
+        },
+        {
+          "offset": 29279,
+          "before": "  const scope=rulesJsBuildBoundInputs({root,read,line});for(const ref of scope.refs)member(ref);\n",
+          "after": "  const actualRead=line==='main'?currentSourceRead(root,read):read;\n  const scope=rulesJsBuildBoundInputs({root,read:actualRead,line});\n  if(line==='main')consumeRetainedCurrentInputs({root,read,refs:scope.refs,bound,bindCurrent});else for(const ref of scope.refs)member(ref);\n"
+        },
+        {
+          "offset": 30691,
+          "before": "    assert.equal(rulesJsBuildEntrySourceOk({root,read,entry:current,body:review,line}),true,'unqualified individual build source decision');\n",
+          "after": "    assert.equal(rulesJsBuildEntrySourceOk({root,read:actualRead,entry:current,body:review,line}),true,'unqualified individual build source decision');\n"
+        },
+        {
+          "offset": 38866,
+          "before": "function prepareAutocompleteLandscapeStage({root,read,line,before,bound}){\n",
+          "after": "function prepareAutocompleteLandscapeStage({root,read,line,before,bound,metadataContext,bindCurrent}){\n"
+        },
+        {
+          "offset": 39991,
+          "before": "  const currentSource=autocompleteLandscapeSourceJudgment({root,read,line}),review=JSON.parse(member(packet.review));\n",
+          "after": "  const currentSource=autocompleteLandscapeSourceJudgment({root,read:line==='main'?currentSourceRead(root,read):read,line}),review=JSON.parse(member(packet.review));\n  if(metadataContext)assert.equal(currentSource.body_is_historical_metadata,true);\n"
+        },
+        {
+          "offset": 40747,
+          "before": "  const priorPaths=new Set(packet.qualification_members.map(ref=>ref.path));\n  const originalMembers=currentSource.bound.filter(ref=>priorPaths.has(ref.path)).map(ref=>registryBeforeMetadata(root,read,line,ref.path===spec.path?{...ref,...spec.before}:ref));\n  assert.deepEqual(packet.qualification_members,originalMembers);\n  for(const ref of currentSource.bound)member(ref);\n  const originalProof=structuredClone(currentSource.proof);\n  originalProof.historical_behavior.source_members=originalProof.historical_behavior.source_members.map(ref=>registryBeforeMetadata(root,read,line,ref));\n  const nativeSpec=originalProof.historical_behavior.source_members.filter(ref=>ref.path===spec.path);assert.equal(nativeSpec.length,1);\n  assert.equal(nativeSpec[0].sha256,spec.after.sha256);nativeSpec[0].sha256=spec.before.sha256;\n",
+          "after": "  const qualify=ref=>retainedHistoricalReference({root,read,line,ref,context:metadataContext});\n  let originalProof;\n  if(metadataContext){\n    const actual=new Map(currentSource.bound.map(ref=>[ref.path,ref]));assert.equal(actual.size,currentSource.bound.length);\n    // Preserve the authenticated old order; current support insertion order is\n    // deliberately independent. Every old descriptor must resolve exactly.\n    for(const ref of packet.qualification_members)assert.deepEqual(actual.get(ref.path),qualify(ref),'changed landscape qualification '+ref.path);\n    consumeRetainedCurrentInputs({root,read,refs:currentSource.bound,bound,bindCurrent});\n    originalProof=projectRetainedHistoricalProof({current:currentSource.proof,expected:packet.entry.after_entry.individual_proof,qualify});\n  }else{\n    const priorPaths=new Set(packet.qualification_members.map(ref=>ref.path));\n    const originalMembers=currentSource.bound.filter(ref=>priorPaths.has(ref.path)).map(ref=>registryBeforeMetadata(root,read,line,ref.path===spec.path?{...ref,...spec.before}:ref));\n    assert.deepEqual(packet.qualification_members,originalMembers);for(const ref of currentSource.bound)member(ref);\n    originalProof=structuredClone(currentSource.proof);\n    originalProof.historical_behavior.source_members=originalProof.historical_behavior.source_members.map(ref=>registryBeforeMetadata(root,read,line,ref));\n    const nativeSpec=originalProof.historical_behavior.source_members.filter(ref=>ref.path===spec.path);assert.equal(nativeSpec.length,1);\n    assert.equal(nativeSpec[0].sha256,spec.after.sha256);nativeSpec[0].sha256=spec.before.sha256;\n  }\n"
+        },
+        {
+          "offset": 46164,
+          "before": "function prepareSelectionSpecMetadata({root,read,line,before,bound,currentSource}){\n",
+          "after": "function prepareSelectionSpecMetadata({root,read,line,before,bound,currentSource,metadataContext}){\n"
+        },
+        {
+          "offset": 50228,
+          "before": "  const historicalProof=structuredClone(currentSource.proof);\n  historicalProof.historical_behavior.source_members=historicalProof.historical_behavior.source_members.map(ref=>registryBeforeMetadata(root,read,line,ref));\n  assert.deepEqual(expected.entries.find(row=>row.sha===AUTOCOMPLETE_LANDSCAPE_SHA).individual_proof,historicalProof);\n",
+          "after": "  const expectedProof=expected.entries.find(row=>row.sha===AUTOCOMPLETE_LANDSCAPE_SHA).individual_proof;\n  if(metadataContext)projectRetainedHistoricalProof({current:currentSource.proof,expected:expectedProof,\n    qualify:ref=>retainedHistoricalReference({root,read,line,ref,context:metadataContext})});\n  else{\n    const historicalProof=structuredClone(currentSource.proof);\n    historicalProof.historical_behavior.source_members=historicalProof.historical_behavior.source_members.map(ref=>registryBeforeMetadata(root,read,line,ref));\n    assert.deepEqual(expectedProof,historicalProof);\n  }\n"
+        },
+        {
+          "offset": 50818,
+          "before": "function prepareSelectionNativeStage({root,read,line,before,bound}){\n",
+          "after": "function prepareSelectionNativeStage({root,read,line,before,bound,metadataContext,bindCurrent}){\n"
+        },
+        {
+          "offset": 51896,
+          "before": "  for(const ref of packet.code_subjects){const value=read(ref.path);assert.equal(hash(value),ref.sha256);assert.equal(value.length,ref.bytes);bound.set(ref.path,ref.sha256);}\n  const source=autocompleteSelectionSourceJudgments({root,read,line}),native=selectionNative(root,read,line);\n  assert.deepEqual(packet.qualification_members,source.bound);\n  for(const ref of source.bound)bound.set(ref.path,ref.sha256);\n",
+          "after": "  for(const ref of packet.code_subjects){\n    if(metadataContext)selectionMember({root,read,line,ref,bound});\n    else{const value=read(ref.path);assert.equal(hash(value),ref.sha256);assert.equal(value.length,ref.bytes);bound.set(ref.path,ref.sha256);}\n  }\n  const source=autocompleteSelectionSourceJudgments({root,read:metadataContext?currentSourceRead(root,read):read,line}),native=selectionNative(root,read,line);\n  if(metadataContext){\n    assert.deepEqual(packet.qualification_members,metadataContext.historicalMembers);assert.deepEqual(source.bound,metadataContext.currentMembers);\n    consumeRetainedCurrentInputs({root,read,refs:source.bound,bound,bindCurrent});\n  }else{assert.deepEqual(packet.qualification_members,source.bound);for(const ref of source.bound)bound.set(ref.path,ref.sha256);}\n"
+        },
+        {
+          "offset": 53777,
+          "before": "      files:judgment.original_paths,review_depth:'individual-compatibility',affected_branches:[line],individual_proof:judgment.proof,\n",
+          "after": "      files:judgment.original_paths,review_depth:'individual-compatibility',affected_branches:[line],\n      individual_proof:metadataContext?projectRetainedHistoricalProof({current:judgment.proof,expected:change.after_entry.individual_proof,\n        qualify:ref=>metadataContext.qualifyMetadata(ref)}):judgment.proof,\n"
+        },
+        {
+          "offset": 56926,
+          "before": "  source.assertCurrent();return {before,after,individual_decisions:3,registry_digest_updates:11,summary_scalar_updates:summary.length,assertCurrent:source.assertCurrent};\n",
+          "after": "  const assertCurrent=()=>{source.assertCurrent();metadataContext?.assertCurrent();};\n  assertCurrent();return {before,after,individual_decisions:3,registry_digest_updates:11,summary_scalar_updates:summary.length,assertCurrent};\n"
+        },
+        {
+          "offset": 67746,
+          "before": "",
+          "after": "  const laterPrograms=retainedLaterPrograms(root,read,line);\n  const metadataContext=line==='main'?retainedSelectionMetadataContext({root,read:rawSource}):null;\n  const landscapePrograms=line==='main'?retainedLandscapeProgramSource({root,read:rawSource}):null;\n"
+        },
+        {
+          "offset": 67782,
+          "before": "  for(const ref of [...(programs?.bound??[]),...(contextSource?.bound??[]),...(tools?.bound??[])]){\n    const prior=retainedPhysical.get(ref.path);if(prior)assert.deepEqual(prior,ref);else retainedPhysical.set(ref.path,{...ref});\n    bound.set(ref.path,metadataDigest(root,read,ref));\n  }\n",
+          "after": "  const bindCurrent=refs=>{for(const ref of refs){\n    const value={path:ref.path,sha256:ref.sha256,bytes:ref.bytes},prior=retainedPhysical.get(ref.path);\n    if(prior)assert.deepEqual(prior,value);else retainedPhysical.set(ref.path,value);\n    bound.set(ref.path,metadataDigest(root,read,value));\n  }};\n  bindCurrent([...(programs?.bound??[]),...(contextSource?.bound??[]),...(tools?.bound??[]),\n    ...(laterPrograms?.bound??[]),...(metadataContext?.bound??[]),...(landscapePrograms?.bound??[])]);\n"
+        },
+        {
+          "offset": 68192,
+          "before": "",
+          "after": "    laterPrograms?.assertCurrent();metadataContext?.assertCurrent();landscapePrograms?.assertCurrent();\n"
+        },
+        {
+          "offset": 74537,
+          "before": "  const rulesJs = prepareRulesJsStage({root,read,line,before:sass.after,bound});\n",
+          "after": "  const rulesJs = prepareRulesJsStage({root,read,line,before:sass.after,bound,bindCurrent});\n"
+        },
+        {
+          "offset": 74702,
+          "before": "  const landscape=prepareAutocompleteLandscapeStage({root,read,line,before:summary.after,bound});\n  const nativeSpec=prepareSelectionSpecMetadata({root,read,line,before:landscape.after,bound,currentSource:landscape.current_source});\n  const nativeSelection=prepareSelectionNativeStage({root,read,line,before:nativeSpec.after,bound});\n",
+          "after": "  const landscape=prepareAutocompleteLandscapeStage({root,read,line,before:summary.after,bound,metadataContext,bindCurrent});\n  const nativeSpec=prepareSelectionSpecMetadata({root,read,line,before:landscape.after,bound,currentSource:landscape.current_source,metadataContext});\n  const nativeSelection=prepareSelectionNativeStage({root,read,line,before:nativeSpec.after,bound,metadataContext,bindCurrent});\n"
+        }
+      ]
+    }
+  ],
+  "support": [
+    {
+      "path": "scripts/retained-later-stage-program-source.mjs",
+      "sha256": "7c9023233f873ad7a5a34764900d01f2ea5bb25ba28663fbad57035ac331be3c",
+      "bytes": 8937
+    },
+    {
+      "path": "compatibility/rc/main-retained-later-stage-programs-v1.json",
+      "sha256": "364c06bcc14b5b5128b4d6cb7a88fb375f13aad4acbac10e75be08c46c503777",
+      "bytes": 26250
+    },
+    {
+      "path": "scripts/upstream-candidate-source-evidence.mjs",
+      "sha256": "128d26d6c5a4e485abac1dd6589e14976ef2691d256d9f3896167b071a9a01de",
+      "bytes": 5382
+    },
+    {
+      "path": "compatibility/rc/upstream-sass-inspection-ledger-transition.json.gz",
+      "sha256": "922c6f5ef0f7635db93e694931a9aa7e54762479418ed5b1330b27adf12cebc4",
+      "bytes": 3068
+    },
+    {
+      "path": "scripts/autocomplete-selection-spec-subject.mjs",
+      "sha256": "c49c1f6aa605524f40f28a14279c66ba13fa5090047b5baa36a07c12366c9376",
+      "bytes": 11465
+    },
+    {
+      "path": "compatibility/rc/autocomplete-selection-spec-ledger-successor.json",
+      "sha256": "25e1e6731fa14c62a976dc9c04389f89d57b27b9d80742f44e97fdd18946adce",
+      "bytes": 3747
+    },
+    {
+      "path": "scripts/autocomplete-selection-native-subject.mjs",
+      "sha256": "409ba33d4c14ff61d352e263e0c1b0ae984eee0066a40e6d3ccb70cc11b8912c",
+      "bytes": 12879
+    },
+    {
+      "path": "compatibility/rc/autocomplete-selection-ledger-successor.json",
+      "sha256": "dbee1262ff90ad59e8242b128c54a6f8d25de400ce26764d16043bb1ef3fa1c3",
+      "bytes": 40949
+    },
+    {
+      "path": "compatibility/rc/parent-main-individual-proof-dispatch-review-v1.json",
+      "sha256": "dcfb2e90df08b0c8ec6ada980064136bf6b55aa319926afdedec7d0f6d848982",
+      "bytes": 8915
+    },
+    {
+      "path": "scripts/upstream-individual-evidence-scope.mjs",
+      "sha256": "aedc1ad2fce5320e868d7271f1af9ff107c849af4ad005c2eb9b8ac630d91eb0",
+      "bytes": 9228
+    },
+    {
+      "path": "tests/test_upstream_contextual_proof_hardening.py",
+      "sha256": "4027130f182ca49e0ff5bb1936403169541e90d2672c28dd5cc09081d49c1ea4",
+      "bytes": 8514
+    },
+    {
+      "path": "compatibility/rc/parent-main-current-source-readers-integration-v1.json",
+      "sha256": "05c890d390591494fb3b937a7207ef8a5dcc4c61e3bf8e5438d2c141865dc9f8",
+      "bytes": 10107
+    },
+    {
+      "path": "compatibility/rc/main-retained-current-reader-source-successors-v1.json",
+      "sha256": "1c0ccfdd33c5f264960cb598c74f4a4f7aea3ffb8779570b47182ea660dd589d",
+      "bytes": 8704
+    },
+    {
+      "path": "scripts/autocomplete-current-spec-source-successor.mjs",
+      "sha256": "1679a61ffc4ec0ce385a689574be5b997037ab87a61d735bf42a0e0304375225",
+      "bytes": 4028
+    },
+    {
+      "path": "compatibility/rc/main-autocomplete-current-spec-source-successor-v1.json",
+      "sha256": "507db85b892cb051ebbaee3214a48b275bae5be1a03234f53692966f47b1607d",
+      "bytes": 4231
+    },
+    {
+      "path": "compatibility/rc/parent-main-selection-native-current-source-v1.json",
+      "sha256": "4fc87f0d0f734b6eaf70a295efa9bd2b26ea30e651219620280b3dd1b983b472",
+      "bytes": 3962
+    },
+    {
+      "path": "scripts/selection-native-registry-source-successor.mjs",
+      "sha256": "db4609415a96c859288f3bb924b915d08ceacea534bbb7556ad73b15e3708ab9",
+      "bytes": 6003
+    },
+    {
+      "path": "compatibility/rc/parent-main-historical-pointer-epoch-review-v1.json",
+      "sha256": "dac9b4aa338be698a2faf555a9aff8c33c9c2c0e102248134839b1126032c222",
+      "bytes": 38008
+    },
+    {
+      "path": "tests/selection_native_current_source_probe.mjs",
+      "sha256": "e6cca2dfb34b027ad7e2ea7a8ff1e947d77e495930523fec1c359b0824dd8f92",
+      "bytes": 2201
+    },
+    {
+      "path": "tests/autocomplete_current_spec_source_successor_probe.mjs",
+      "sha256": "4f9767bb2ddbbeb9463a6fcfc4c045db896af3cbf59364ad1c29aa59e9d94b42",
+      "bytes": 1969
+    },
+    {
+      "path": "scripts/retained-selection-metadata-context.mjs",
+      "sha256": "7a0a43356d08f4ed5708782dd5c53b2a39f87d8fa338356e8b09fa8ec81e68d4",
+      "bytes": 9559
+    },
+    {
+      "path": "compatibility/rc/main-retained-selection-metadata-context-v1.json",
+      "sha256": "a34a3706be3bc0ef6a8a6ac79d3e74da4df1a7526b70a537717a6552f4cdab0d",
+      "bytes": 25013
+    },
+    {
+      "path": "compatibility/rc/autocomplete-selection-spec-successor.json",
+      "sha256": "bf629b45cf65bc93a98a43a9f7fc2d0fb9cf720cc72c07d9c8545c60ee1e10a3",
+      "bytes": 6934
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "b831b4d3ac6f17f0a9de9d0cd5594f6154ab5fe2b479e9a3b5289dbc1aeed1b6",
+      "bytes": 168183
+    },
+    {
+      "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+      "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863",
+      "bytes": 1585
+    },
+    {
+      "path": "scripts/upstream-historical-behavior-evidence.mjs",
+      "sha256": "b4267df0a78789777bcea4943f6d1371239e94c51d32055ecdcfe818e4743eaa",
+      "bytes": 23393
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c",
+      "bytes": 1391
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "803e95c96c22e5a6863a5f353f0485ec5a0431d04c9fe0b987031083ed7afaa9",
+      "bytes": 43131
+    },
+    {
+      "path": "compatibility/rc/autocomplete-selection-native-contract-proposal.json",
+      "sha256": "f53ca24623f8876b28f6af99a4e2ad80ecc3934073aed5931fb59aa641a7d0e7",
+      "bytes": 9149
+    },
+    {
+      "path": "scripts/autocomplete-selection-native-scopes.mjs",
+      "sha256": "f38714dcb7c77e4804e18f9faf51d5ae9bcb87ee437965c234b3bee76807c888",
+      "bytes": 2891
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete-trigger.ts",
+      "sha256": "6b9c00dbf365e6b6ea9b2b65eb7e67911775322c78848b996d3590f8fded3d58",
+      "bytes": 1975
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.html",
+      "sha256": "8fae4afdffea376599d694a16698ee1a9502097cc9819ec2766a4a5d55b418ae",
+      "bytes": 325
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.scss",
+      "sha256": "9fbb5eb60784e41f97296c9fd958871dfa4cee3975f0c4bcd3cfe54f6ec6aae4",
+      "bytes": 1171
+    },
+    {
+      "path": "compatibility/rc/autocomplete-selection-individual-source-proposals.json",
+      "sha256": "138fa74613e691949cc64da0a45850337716c1911146a33f252982eecf8d0fd1",
+      "bytes": 15067
+    },
+    {
+      "path": "compatibility/rc/autocomplete-selection-originals.json.gz",
+      "sha256": "ddb8eeefba441568d46b9107a88889553320ce2e841c3fdc90a29b3f518aeebc",
+      "bytes": 105021
+    },
+    {
+      "path": "compatibility/rc/autocomplete-selection-native-contract-controls.json",
+      "sha256": "bd843d0df70036f9cf8670588e6b9e539e565b3ab97e140c5ea3c8ac13289a3d",
+      "bytes": 14759
+    },
+    {
+      "path": "compatibility/rc/autocomplete-selection-native-harness-successor.json",
+      "sha256": "c0857010621e8db535417b52bb5876d9a927708f0aee2dce8d28e8755990eb69",
+      "bytes": 1286
+    },
+    {
+      "path": "tests/autocomplete_selection_native_contract_probe.mjs",
+      "sha256": "402ff922abb68ac96a1268297abab58e86d25e4ad20a20903522926512b53500",
+      "bytes": 19475
+    },
+    {
+      "path": "compatibility/rc/autocomplete-selection-source-diagnostics.json.gz",
+      "sha256": "a78a63d1abf66d23afe1367d9a4130ff04775a7ec137a0a2a31e11cb75fcef4f",
+      "bytes": 3918
+    },
+    {
+      "path": "tests/autocomplete_selection_state_probe.mjs",
+      "sha256": "a9646b53b47ea4156394a9f55352c01ce9832c020360ee828e3c5e2fa442cd72",
+      "bytes": 18397
+    },
+    {
+      "path": "scripts/inspect-autocomplete-selection-originals.py",
+      "sha256": "178d1735fda09ae8ddeb655734eade8ad4c2681ece709c5a0775e42f57fa6d10",
+      "bytes": 4119
+    },
+    {
+      "path": "scripts/rc-test-legacy-family.mjs",
+      "sha256": "9b74c408227c3c24307342fb2e4729f09cd685830d58ccc29b4bf1711a2e9642",
+      "bytes": 12819
+    },
+    {
+      "path": "scripts/historical-case-roster.mjs",
+      "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e",
+      "bytes": 20145
+    },
+    {
+      "path": "scripts/resolve-run-library.mjs",
+      "sha256": "9a14ee847112104772c5bfc1b85a21698af755150ed36b73660aa113f0ac1b81",
+      "bytes": 5553
+    },
+    {
+      "path": "scripts/rc-verify.py",
+      "sha256": "58799e570aeb8959c34cd7cb8d67d8fa41177f3a4a0e92346c925846105e0604",
+      "bytes": 103520
+    },
+    {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "sha256": "179e3bae4e253ab354b33e5759802e8f88aa3bd038a6009e10412710fb29885b",
+      "bytes": 49657
+    },
+    {
+      "path": "testing/legacy-runner/build.mjs",
+      "sha256": "d2ad861fa584e7d0ba57aab60101cef46dfe2be5828f0f3df1dc8cd0e3bebb94",
+      "bytes": 8080
+    },
+    {
+      "path": "testing/legacy-runner/adapt-spec.mjs",
+      "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3",
+      "bytes": 13813
+    },
+    {
+      "path": "testing/legacy-runner/entry.ts",
+      "sha256": "cade24c6482f39757e1f5f004b2dd48f22dc4426258131a948376bf6b84539a9",
+      "bytes": 258
+    },
+    {
+      "path": "testing/legacy-runner/init-test-env.ts",
+      "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c",
+      "bytes": 2827
+    },
+    {
+      "path": "testing/legacy-runner/karma.conf.cjs",
+      "sha256": "7412ad8ed75d858a13d912720a47522c0b3a73f2165046b60c0bea94efe1b952",
+      "bytes": 1723
+    },
+    {
+      "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+      "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426",
+      "bytes": 3986
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "sha256": "912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15",
+      "bytes": 113388
+    },
+    {
+      "path": "testing/legacy-runner/historical-specs.json",
+      "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d",
+      "bytes": 15304
+    },
+    {
+      "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+      "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212",
+      "bytes": 6182
+    },
+    {
+      "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+      "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500",
+      "bytes": 845
+    },
+    {
+      "path": "compatibility/rc/matrices/full-verify.json",
+      "sha256": "3aa514861b6965e6188b5126b4316847d5fc49e64da0a9fb38f3864870c362b6",
+      "bytes": 634418
+    },
+    {
+      "path": "scripts/autocomplete-selection-source-judgment.mjs",
+      "sha256": "ef36edc08ecd485a93dafe6876e07b137c0af83526697aeb20f262283c16ec7c",
+      "bytes": 7812
+    },
+    {
+      "path": "scripts/retained-landscape-program-source.mjs",
+      "sha256": "fbe4525cba1f99c772455b92d92662920a2a84da0c524c51c0fe7c2f610af352",
+      "bytes": 7975
+    },
+    {
+      "path": "compatibility/rc/main-retained-landscape-program-source-v1.json",
+      "sha256": "3e0db22fc8764f8b82afeb5f99251cc6f86ebe0f7cf49a4906730041e63a3354",
+      "bytes": 11763
+    },
+    {
+      "path": "scripts/autocomplete-landscape-source-judgment.mjs",
+      "sha256": "09c9acedcd23eb549956359375802b4f05aede6b277bd790b2d5b9b0ad8d4e71",
+      "bytes": 14981
+    },
+    {
+      "path": "tests/autocomplete_landscape_probe.mjs",
+      "sha256": "e1d31eacf5910a957a43a48d6772ac266fb4c09a98480621cf5128f64b6a822e",
+      "bytes": 16384
+    },
+    {
+      "path": "compatibility/rc/parent-main-retained-selection-metadata-context-v1.json",
+      "sha256": "ba5b4947b59ba10eb4dedc92152502ee4b2dde86b64eb6b59012ebf33e181306",
+      "bytes": 3222
+    },
+    {
+      "path": "compatibility/rc/parent-main-retained-selection-metadata-rosters-v1.json",
+      "sha256": "70d699db615b12a6acfe116333444b3a0aad5c4163ed0a5fea7a85527e4e88c6",
+      "bytes": 2107
+    },
+    {
+      "path": "compatibility/rc/main-retained-landscape-current-prototype-v1.json.gz",
+      "sha256": "3c6386af49c6bf3c6fb48bcb0eaafc9ae64d565b6ec42989c198c23afebd1951",
+      "bytes": 1775
+    },
+    {
+      "path": "compatibility/rc/parent-main-landscape-current-prototype-v1.json",
+      "sha256": "143a33f29db0591b905908247b8c6bc8f4838139fdeb82134ac2277853e6c201",
+      "bytes": 2893
+    },
+    {
+      "path": "compatibility/rc/autocomplete-selection-source-reader-successors.json",
+      "sha256": "bf806c5628500798e6045d40858b0523b6744656cf582ee1d263847d4f1cdcf3",
+      "bytes": 18619
+    },
+    {
+      "path": "compatibility/rc/autocomplete-landscape-current-source-review.json",
+      "sha256": "7a542de44d39dce6b6c81bfac4bcd4c503452de06f4329fb72a505f8e44b9925",
+      "bytes": 8872
+    },
+    {
+      "path": "compatibility/rc/autocomplete-landscape-current-diagnostics.json.gz",
+      "sha256": "72e4b7580c5ac065ea63f39c267044683a4a2482f2b87a9663e1f676a34a1e13",
+      "bytes": 1774
+    },
+    {
+      "path": "compatibility/rc/parent-main-retained-later-stage-programs-v1.json",
+      "sha256": "11015d1ca3ac423586556c6294558479f7c1f29ccc4e8d35c13458b323aa5532",
+      "bytes": 2966
+    },
+    {
+      "path": "tests/retained_later_stage_program_source_probe.mjs",
+      "sha256": "89aedd1f15b0f9f857497623e9a4405223356033b6e002354070b61871b088a3",
+      "bytes": 4339
+    },
+    {
+      "path": "tests/test_retained_later_stage_program_source.py",
+      "sha256": "13e41829747d04674ec84049c84b35d830094b36917451d339ef214eaa13379d",
+      "bytes": 1333
+    },
+    {
+      "path": "tests/retained_selection_metadata_context_probe.mjs",
+      "sha256": "27e7febdc2b4c2b7f1eef2b4a3d8e73dc024373828bd9a118f89d3473eaffc91",
+      "bytes": 5310
+    },
+    {
+      "path": "tests/test_retained_selection_metadata_context.py",
+      "sha256": "ba223c1f9a447b90e0aed5b8bc1e62275843fd5786bef6514650bd53294ff440",
+      "bytes": 1706
+    },
+    {
+      "path": "compatibility/rc/parent-main-landscape-current-source-v1.json",
+      "sha256": "e14feb03d8640255af5ee3c5f1cadd62383627b004db5431318b7f72da26d933",
+      "bytes": 4731
+    },
+    {
+      "path": "tests/retained_landscape_current_source_probe.mjs",
+      "sha256": "c7e55924a5769406e375784c4f032fe364f280a58af49ba7ea412e9226edaa4d",
+      "bytes": 6692
+    },
+    {
+      "path": "tests/test_retained_landscape_current_source.py",
+      "sha256": "6c073cc5c8e3399eb8ae7e5b603a3d1382abbfd1fdabbef3c4a2c19f89ae9baf",
+      "bytes": 1804
+    },
+    {
+      "path": "compatibility/rc/parent-main-landscape-tool-replay-v1.json",
+      "sha256": "18b6ef5e483fdabfdba88d3517fb15107380291ed044d2c2a7bf44468ff2a63c",
+      "bytes": 3426
+    },
+    {
+      "path": "tests/retained_landscape_tool_replay_probe.mjs",
+      "sha256": "db56353a90a8422ada76bec20b6f6f78bc792968eb4625c384eb490179d731e4",
+      "bytes": 2463
+    },
+    {
+      "path": "tests/retained_landscape_tool_replay_probe.py",
+      "sha256": "5197e8d81afa63da91e954b2755b9a51158d347b7908bd5ef4b75dbf16417604",
+      "bytes": 2455
+    },
+    {
+      "path": "tests/test_retained_landscape_tool_replay.py",
+      "sha256": "2382c654902d5f4b28f8a091496c758a4a6ab148f9955c3d56361a0f1a0c134a",
+      "bytes": 2059
+    },
+    {
+      "path": "scripts/retained-rules-js-current-source.mjs",
+      "sha256": "26a6132ded62073a55ecbdb14983d1224a302257f5e533339d4cf050f61fb1a5",
+      "bytes": 8073
+    },
+    {
+      "path": "compatibility/rc/main-retained-rules-js-current-review-v1.json",
+      "sha256": "818c4156e9ee49b30ee5da096404fa7a550728a22c1b390d9456dc4ce36e021a",
+      "bytes": 2901
+    },
+    {
+      "path": "compatibility/rc/parent-main-retained-rules-js-admission-current-v1.json",
+      "sha256": "d38c2777fb5996dda1674e27355bdc4eb96f07cbec753827b798584141ba2b1d",
+      "bytes": 4436
+    }
+  ],
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "original_ledger_metadata_recipe_changed": false,
+  "source_judgments_changed": 0,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed"
+}
