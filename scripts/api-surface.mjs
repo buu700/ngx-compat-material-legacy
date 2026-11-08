@@ -20,6 +20,7 @@ import {originalCompilerFactoryContext, originalPublishedJitFactory} from './api
 import {settleInputHarness} from './api-input-harness-contract.mjs';
 import {settleOwnedMenuSignatures} from './api-menu-owned-signatures.mjs';
 import {settleTabToken} from './api-tab-token-contract.mjs';
+import {settlePaginatorTabBody} from './api-paginator-tabbody-contract.mjs';
 import {settleSpinnerViewport} from './api-spinner-viewport-contract.mjs';
 import {settleSelectScrollToken} from './api-select-scroll-token-contract.mjs';
 import {historicalMenuFilter,settleMenuHarness,MENU_HARNESS} from './api-menu-harness-contract.mjs';
@@ -1742,6 +1743,8 @@ export function observeDeclarations(surface, dtsFiles, differences, allowlist, i
         signature = settleMenuHarness(symbol, sourceFile, signature);
       if (symbol.symbol_id === 'legacy-tabs/primary/MAT_LEGACY_TAB' && sourceFile)
         signature = settleTabToken(symbol, sourceFile, signature, inputArtifactContext);
+      if (sourceFile && ['legacy-paginator/primary/MatLegacyPaginator','legacy-tabs/primary/_MatLegacyTabBodyBase'].includes(symbol.symbol_id))
+        signature = settlePaginatorTabBody(symbol, sourceFile, signature, inputArtifactContext);
       if (symbol.symbol_id === 'legacy-select/primary/MAT_LEGACY_SELECT_SCROLL_STRATEGY' && sourceFile)
         signature = settleSelectScrollToken(symbol, sourceFile, signature, inputArtifactContext);
       if (sourceFile) signature = settleOwnedMenuSignatures(symbol, sourceFile, signature, inputArtifactContext);

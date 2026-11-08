@@ -1,0 +1,11 @@
+import {readFileSync,writeFileSync,copyFileSync,mkdirSync} from 'node:fs';
+import {join} from 'node:path';
+import {buildLab} from '/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/check-companion-computed-styles.mjs';
+const out='/home/parallels/.codex/closeout-state/2026-11-07-recovery/paginator-tabbody-contract-a488-v1', info=JSON.parse(readFileSync(out+'/runtime.json'));
+const {consumer,versions}=info;const backup=join(out,'paginator-dist');mkdirSync(backup,{recursive:true});for(const f of ['app.js','theme.css','index.html'])copyFileSync(join(consumer,'dist',f),join(backup,f));
+let source=readFileSync('/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/tests/legacy-tabs-motion/src/main.ts','utf8');
+source=source.replace("import {provideAnimations} from '@angular/platform-browser/animations';\n",'').replace('[provideAnimations(), ...policyProviders]','[...policyProviders]');
+source=source.replace('  <mat-tab-group [selectedIndex]', '  @if (show) { <mat-tab-group [selectedIndex]').replace('  </mat-tab-group>\n`})','  </mat-tab-group> }\n`})').replace("  selected = 0;","  show = true;\n  selected = 0;").replace("      select: (index: number)","      destroy: () => this.zone.run(() => { this.show = false; this.cdr.detectChanges(); }),\n      select: (index: number)");
+await buildLab(consumer,{...process.env,NODE_OPTIONS:''},versions,source);
+writeFileSync(join(consumer,'dist/index.html'),'<html><head><link rel="stylesheet" href="/theme.css"><style>body{margin:0}</style></head><body><tabs-root></tabs-root><script src="/app.js"></script></body></html>');
+writeFileSync(out+'/tab-fixture.ts',source);

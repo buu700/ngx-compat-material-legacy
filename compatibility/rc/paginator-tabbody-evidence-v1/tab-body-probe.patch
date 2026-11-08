@@ -1,0 +1,11 @@
+--- a/tests/tab_body_motion_runtime_probe.mjs
++++ b/tests/tab_body_motion_runtime_probe.mjs
+@@ -122,7 +122,7 @@
+  ['drop-historical-completion-filter',"      .pipe(distinctUntilChanged((a, b) => a.fromState === b.fromState && a.toState === b.toState))\n",""],
+  ['early-fallback',"milliseconds + 100","100"],
+  ['accept-stale-completion',"this._pendingTransition !== transition","false"],
+- ['keep-completed-phase',"    this._pendingTransition = undefined;\n    this._deferredCentering = undefined;\n    this._originTransition = undefined;\n    if (!this._isCenterPosition(transition.toState))","    if (!this._isCenterPosition(transition.toState))"],
++ ['keep-completed-phase',"    this._pendingTransition = undefined;\n    this._deferredCentering = undefined;\n    this._originTransition = undefined;\n    this._reverseEndNotBefore = 0;","    this._deferredCentering = undefined;\n    this._originTransition = undefined;\n    this._reverseEndNotBefore = 0;"],
+  ['repeat-position-overwrites-prior-state',"    if (position === this._position) {\n      return;\n    }",""],
+  ['accept-events-after-destroy',"this._destroyed || !this._pendingTransition ||\n      event.target","event.target"],
+  ['ignore-noop-duration',"this._cssAnimationsDisabled() || initialCenter ? 0 : milliseconds + 100","milliseconds + 100"],
