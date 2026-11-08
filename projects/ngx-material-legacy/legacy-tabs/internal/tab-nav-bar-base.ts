@@ -25,6 +25,8 @@ import {
   OnDestroy,
   Optional,
   QueryList,
+  signal,
+  WritableSignal,
   ViewChild,
 } from '@angular/core';
 import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions, ThemePalette} from '@angular/material/core';
@@ -46,6 +48,17 @@ import {startWith, takeUntil} from 'rxjs/operators';
 import {ENTER, SPACE} from '@angular/cdk/keycodes';
 import {MAT_TABS_CONFIG, MatTabsConfig} from '@angular/material/tabs';
 import {MatPaginatedTabHeader, MatPaginatedTabHeaderItem} from './paginated-tab-header';
+
+// Focus state stays local to the owned implementation and does not add a public API.
+const focusedItems = new WeakMap<_MatTabNavBase, WritableSignal<MatPaginatedTabHeaderItem | null>>();
+function focusedItemFor(nav: _MatTabNavBase): WritableSignal<MatPaginatedTabHeaderItem | null> {
+  let value = focusedItems.get(nav);
+  if (!value) {
+    value = signal<MatPaginatedTabHeaderItem | null>(null);
+    focusedItems.set(nav, value);
+  }
+  return value;
+}
 
 // Increasing integer for generating unique ids for tab nav components.
 let nextUniqueId = 0;
@@ -127,6 +140,9 @@ export abstract class _MatTabNavBase
     });
 
     super.ngAfterContentInit();
+    this.indexFocused.pipe(startWith(null), takeUntil(this._destroyed)).subscribe(() => {
+      focusedItemFor(this).set(this._items?.get(this.focusIndex) || null);
+    });
   }
 
   /** Notifies the component that the active link has been changed. */
@@ -140,6 +156,7 @@ export abstract class _MatTabNavBase
     for (let i = 0; i < items.length; i++) {
       if (items[i].active) {
         this.selectedIndex = i;
+        focusedItemFor(this).set(items[i]);
         this._changeDetectorRef.markForCheck();
 
         if (this.tabPanel) {
@@ -151,6 +168,12 @@ export abstract class _MatTabNavBase
     }
 
     this.selectedIndex = -1;
+    if (this.tabPanel) {
+      // Provide an entry point only when an enabled link is available.
+      const firstEnabled = items.find(item => !item.disabled);
+      focusedItemFor(this).set(firstEnabled || null);
+      this._changeDetectorRef.markForCheck();
+    }
     this._inkBar.hide();
   }
 
@@ -294,7 +317,14 @@ export class _MatTabLinkBase
 
   _getTabIndex(): number {
     if (this._tabNavBar.tabPanel) {
-      return this._isActive && !this.disabled ? 0 : -1;
+      if (this.disabled) {
+        return -1;
+      }
+      const focused = focusedItemFor(this._tabNavBar)();
+      const target = focused && !focused.disabled
+        ? focused
+        : this._tabNavBar._items?.find(item => !item.disabled);
+      return target === this ? 0 : -1;
     } else {
       return this.tabIndex;
     }
