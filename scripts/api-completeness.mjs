@@ -9,6 +9,7 @@
  * Applies F04 recipe-removal exceptions and the reviewed export-name allowlist.
  * Does not claim G02.
  */
+import {menuTriggerObservationProblems} from './api-menu-trigger-token.mjs';
 import {existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, rmSync, lstatSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
@@ -451,7 +452,7 @@ if (isMain) {
   const allowlist = JSON.parse(readFileSync(allowlistPath, 'utf8'));
   const declared = observeDeclarations(surface, readDts(extracted.packageRoot), differences, allowlist,
     {tarball, packageRoot: extracted.packageRoot, referenceRoot: refRoot});
-  const diRows = await observeRuntimeDi(extracted.packageRoot, surface.symbols, [], undefined, {tarball, referenceRoot: refRoot});
+  const diRows = await observeRuntimeDi(extracted.packageRoot, surface.symbols, [], undefined, {tarball, packageRoot: extracted.packageRoot, referenceRoot: refRoot});
   const diRecords = JSON.parse(readFileSync(join(root, 'compatibility/rc/api/di-differences.json'), 'utf8')).differences || [];
   const diSettled = diRows.map(row => settleDi(row, diRecords));
   const summary = summarizeDiscrepancies(declared.observations);
@@ -517,7 +518,7 @@ if (isMain) {
 }
 
 export function settleDi(row, records) {
-  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...ownedDialogFocusObservationProblems(row),...menuContentObservationProblems(row),...simpleSnackObservationProblems(row),...dialogOpenerObservationProblems(row),...autocompleteObservationProblems(row),...tabBodyObservationProblems(row),...tabHeaderObservationProblems(row),...tabPortalObservationProblems(row),...tableDefinitionObservationProblems(row),...inputObservationProblems(row)]};
+  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...ownedDialogFocusObservationProblems(row),...menuContentObservationProblems(row),...simpleSnackObservationProblems(row),...dialogOpenerObservationProblems(row),...autocompleteObservationProblems(row),...tabBodyObservationProblems(row),...tabHeaderObservationProblems(row),...tabPortalObservationProblems(row),...tableDefinitionObservationProblems(row),...inputObservationProblems(row),...menuTriggerObservationProblems(row)]};
   if(row.symbol.symbol_id===RIPPLE_SYMBOL){
     const contract=approvedRippleContract(row.symbol),problems=[...row.problems,...rippleFactoryObservationProblems(row,contract)];
     return {...row,problems,result:problems.length?'fail':'pass',status:problems.length?'mismatch':'intentional-legacy-difference',
@@ -583,6 +584,7 @@ export function settleDi(row, records) {
       rationale: 'Owner explicitly approved the historical item implementation and current-parent subtype change. Original one/five-argument manual construction and inherited five-service factory execute without an application; exact public/owned token objects, flags, missing required providers, optional panel, behavior, subclassing and borrowed lifetime remain enforced. Native/AOT/packed and unchanged Material16 markup/styles are separate gates.'};
   }
   if (!row.problems.length) {
+    if(row.symbol.symbol_id==='legacy-menu/primary/MatLegacyMenuTrigger')return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'The authenticated historical optional self MatMenuItem token is replaced by the approved owned item base token. Runtime token objects and flags remain separately recorded; exact packed source binds both item providers. Nested menu node behavior is qualified independently.'};
     if(tabHeaderProfile(row.symbol))return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'The original seven constructor inputs remain; the upstream docs-private viewport token is replaced with the owned docs-private helper, so historical ViewportRuler providers do not select it. One source-scoped Injector request supports owned render scheduling. Node scope and token controls execute under a synthetic server renderer; native rendering and packed lifecycle remain separate.'};
     if(row.symbol.symbol_id===MENU_CONTENT_SYMBOL)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'Maintainer delegated conservative TypeScript changes with unchanged required consumer styles and Cyph sanity. Only the authenticated unused resolver slot is removed; all other token objects/options remain checked. Actual public template/outlet identities, contexts, reattachment, movement, detach, owned teardown and borrowed caller view/lifetime execute. Original seven dependencies remain visible.'};
     if(row.symbol.symbol_id===INPUT_SYMBOL)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:row.factory_input_context?.owned_element_ref ? 'The current public parent requests are replayed by object, flags and source identity. The original owned legacy token remains distinct; the separately reported owned ElementRef is an additional required public-core request for the reviewed native-disabled repair, bound to the actual native node and exact artifact. Historical manual construction is retired; native browser/AOT and broader API/peer qualification remain separate.' : 'The historical inherited ten-argument dependency path is retired in favor of the genuine current public MatInput parent. Every parent request is independently replayed by object/flag/source identity, the original owned legacy token stays distinct and checked, and native-node behavior/teardown execute. No stylesheet changes; complete signatures/native/packed/floors remain separate.'};

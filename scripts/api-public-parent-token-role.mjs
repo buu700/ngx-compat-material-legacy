@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import assert from 'node:assert/strict';
+import {MENU_TRIGGER_REFERENCE} from './api-menu-reference.mjs';
 import {originalCompilerFactoryContext,originalContextDi} from './api-original-factory-contexts.mjs';
 
 // Published16 factories refer to classes/tokens declared in the same FESM by
@@ -46,7 +47,7 @@ export function originalPublicParentTokenRole(symbol,param){
  assert.equal(expected.ident,profile.name);assert.equal(expected.imported,profile.name);assert.equal(expected.spec,null);
  assert.deepEqual(param,expected,'public parent parameter differs from original factory');
  const ancestor=context.ancestry.find(a=>a.key===profile.factory);assert.ok(ancestor);
- return {role:'authenticated-unchanged-public-parent-token',symbol_id:symbol.symbol_id,
+ return {role:symbol.symbol_id==='legacy-menu/primary/MatLegacyMenuTrigger'?'authenticated-historical-public-parent-token':'authenticated-unchanged-public-parent-token',symbol_id:symbol.symbol_id,
   parameter_factory_key:profile.factory,parameter_index:profile.index,original_source_sha256:ancestor.source_sha256,
   original_ident:profile.name,original_spec:null,public_spec:profile.spec,public_export:profile.name};
 }
@@ -60,7 +61,12 @@ export function publicParentTokenRoleObservationProblems(row){
    const role=originalPublicParentTokenRole(row.symbol,param);if(!role)continue;
    const observed=row.runtime_requests?.[index];assert.ok(observed,'public parent request evidence missing');
    assert.deepEqual(observed.public_parent_token_role,role,'public parent role receipt differs');
-   assert.equal(observed.identity_matched,true);assert.equal(observed.unresolved,false);
+   if(row.symbol.symbol_id==='legacy-menu/primary/MatLegacyMenuTrigger'){
+    const replacement=observed.owned_menu_item_replacement;
+    assert.deepEqual(replacement,{role:'approved-owned-menu-item-token-replacement',source_sha256:'214c9acfb791619edd0c61c78bf95848a936b2c5f1d9cb707b27112c2bcec926',historical_public_token:'@angular/material/menu#MatMenuItem',historical_reference:MENU_TRIGGER_REFERENCE,observed_owned_token:'_LegacyMenuItemBase',historical_identity_matched:false,owned_identity_matched:true,public_peer_distinct:true,legacy_panel_token_distinct:true,provider_aliases:['MatMenuItem','_LegacyMenuItemBase'],optional:true,self:true,skipSelf:false,host:false});
+    assert.equal(observed.identity_matched,false);assert.equal(observed.observed_label,'_LegacyMenuItemBase');
+   }else assert.equal(observed.identity_matched,true);
+   assert.equal(observed.unresolved,false);
    assert.equal(observed.expected_ident,param.ident);assert.equal(observed.expected_spec,param.spec);
    for(const flag of ['optional','self','skipSelf','host']){
     assert.equal(observed[flag],Boolean(param[flag]));assert.equal(observed['expected_'+flag],Boolean(param[flag]));

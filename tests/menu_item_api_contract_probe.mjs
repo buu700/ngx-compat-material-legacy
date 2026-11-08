@@ -48,9 +48,10 @@ assert.equal(expectedFactoryDi(symbol.shape).length, 5);
 assert.equal(contract.runtime_requests.length, 5);
 assert.ok(!differences.some(row => row.construction_contract === 'menu-item-angular-di-construction-v1'));
 const source = read(path), base = read(basePath);
-// TypeScript emits declarations from the actual owned source and actual public peers.
+// TypeScript emits declarations from actual owned source and public peers.
+// Match the library project's strictPropertyInitialization setting for its source closure.
 const options = {target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext,
-  moduleResolution: ts.ModuleResolutionKind.Bundler, strict: true, experimentalDecorators: true,
+  moduleResolution: ts.ModuleResolutionKind.Bundler, strict: true, strictPropertyInitialization: false, experimentalDecorators: true,
   skipLibCheck: false, declaration: true, emitDeclarationOnly: true, noEmitOnError: true,
   lib: ['lib.es2022.d.ts', 'lib.dom.d.ts']};
 const host = ts.createCompilerHost(options), declarations = new Map();

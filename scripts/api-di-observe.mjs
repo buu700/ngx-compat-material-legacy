@@ -1,3 +1,4 @@
+import {menuTriggerOwnedToken} from './api-menu-trigger-token.mjs';
 import {existsSync,readFileSync} from 'node:fs';
 import {createRequire} from 'node:module';
 import {pathToFileURL} from 'node:url';
@@ -647,7 +648,9 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         }
         const same = tabReplacement ? false : ownedViewport !== null ? ownedViewport : await runtimeTokenIdentity(symbol.family, param, exports,
           originalRuntimeAliases(symbols, symbol.family), got.token, importModule,packageRoot,symbol);
-        runtimeRequests.push({expected_ident:param.ident,expected_spec:param.spec,identity_matched:same,
+        const menuReplacement=symbol.symbol_id==='legacy-menu/primary/MatLegacyMenuTrigger'&&param.ident==='MatMenuItem'
+          ? await menuTriggerOwnedToken(symbol,param,exports,await importModule('@angular/material/menu'),got.token,packageRoot,{artifactContext:inputArtifactContext}) : null;
+        runtimeRequests.push({expected_ident:param.ident,expected_spec:param.spec,identity_matched:same,...(menuReplacement?{owned_menu_item_replacement:menuReplacement}:{}),
           ...(tabReplacement ? {intentional_token_difference:{historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',classification:'owned replacement for upstream docs-private helper',historical_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee'}} : {}),
           expected_optional:Boolean(param.optional),expected_self:Boolean(param.self),
           expected_skipSelf:Boolean(param.skipSelf),expected_host:Boolean(param.host),
@@ -656,7 +659,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         if (symbol.symbol_id===TABLE_SYMBOL) publicNodeRequests.push({ident:param.ident,spec:param.spec,
           observed_label:got.label+(got.optional?'?':''),identity_matched:same,
           optional:Boolean(got.optional),self:Boolean(got.self),skipSelf:Boolean(got.skipSelf),host:Boolean(got.host)});
-        if (!same && !tabReplacement) problems.push(`token ${symbol.symbol_id}[${index}] expected ${param.ident} observed ${got.label}`);
+        if (!same && !tabReplacement && !menuReplacement) problems.push(`token ${symbol.symbol_id}[${index}] expected ${param.ident} observed ${got.label}`);
         for (const flag of ['self','skipSelf','host']) if (Boolean(param[flag])!==Boolean(got[flag]))
           problems.push(`injection flag ${symbol.symbol_id}[${index}] ${flag} differs`);
         if (Boolean(param.optional) !== Boolean(got.optional)) {

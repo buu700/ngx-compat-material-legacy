@@ -12,7 +12,7 @@ import {originalPublicParentTokenRole,publicParentTokenRoleObservationProblems} 
 import {expectedFactoryDi} from './scripts/api-di-observe.mjs';import {settleDi} from './scripts/api-completeness.mjs';
 import {requiredParentFactoryProfile} from './scripts/api-required-parent-context.mjs';
 let rejected=0;
-for(const [family,name,file]of [['legacy-menu','MatLegacyMenuTrigger','menu-trigger'],['legacy-table','MatLegacyTextColumn','text-column'],...['MatLegacyCell','MatLegacyHeaderCell','MatLegacyFooterCell'].map(n=>['legacy-table',n,'cell'])]){
+for(const [family,name,file]of [['legacy-table','MatLegacyTextColumn','text-column'],...['MatLegacyCell','MatLegacyHeaderCell','MatLegacyFooterCell'].map(n=>['legacy-table',n,'cell'])]){
  const originalFactory=originalFactoryContract('/original/src/material/'+family+'/'+file+'.ts',name),symbol={symbol_id:family+'/primary/'+name,family,name,kind:'primary',shape:{originalFactory,originalFactoryContext:originalCompilerFactoryContext(originalFactory)}};
  const params=expectedFactoryDi(symbol.shape),row={symbol,problems:[],observed:params.map(p=>p.ident),factory_outcome:'returned',runtime_requests:params.map(p=>({expected_ident:p.ident,expected_spec:p.spec,identity_matched:true,unresolved:false,...Object.fromEntries(['optional','self','skipSelf','host'].flatMap(f=>[[f,Boolean(p[f])],['expected_'+f,Boolean(p[f])]])),public_parent_token_role:originalPublicParentTokenRole(symbol,p)}))};
  const parent=requiredParentFactoryProfile(symbol);
@@ -27,7 +27,7 @@ for(const [family,name,file]of [['legacy-menu','MatLegacyMenuTrigger','menu-trig
   }
  }
 }
-assert.equal(rejected,60);
+assert.equal(rejected,50);
 '''
         done=subprocess.run(['node','--input-type=module','-e',code],cwd=ROOT,capture_output=True,text=True)
         self.assertEqual(done.returncode,0,done.stderr)
