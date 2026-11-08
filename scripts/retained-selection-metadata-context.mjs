@@ -41,14 +41,16 @@ export function retainedSelectionMetadataContext({root=process.cwd(),read}={}){
     const key=ref.commit+':'+ref.path,prior=requests.get(key);if(prior)assert.deepEqual(prior,ref);else requests.set(key,ref);
   }
   for(const commit of commits)git(['merge-base','--is-ancestor',commit,BASE]);
-  const bodies=git(['cat-file','--batch'],Buffer.from([...requests.keys()].join('\n')+'\n'));let offset=0;
+  const bodies=git(['cat-file','--batch'],Buffer.from([...requests.keys()].join('\n')+'\n')),matrixImages=new Map();let offset=0;
   // Git bodies are authenticated data only and stay private to this factory.
   // They are never imported, executed, or returned through a source reader.
   for(const ref of requests.values()){
     const end=bodies.indexOf(10,offset);assert.ok(end>=offset);const fields=bodies.subarray(offset,end).toString().split(' ');offset=end+1;
     assert.equal(fields.length,3);assert.equal(fields[0],ref.blob_oid);assert.equal(fields[1],'blob');assert.match(fields[2],/^\d+$/);
     const size=Number(fields[2]);assert.ok(Number.isSafeInteger(size)&&size>=0&&offset+size<bodies.length);
-    check(bodies.subarray(offset,offset+size),ref);offset+=size;assert.equal(bodies[offset++],10);
+    const body=bodies.subarray(offset,offset+size);check(body,ref);
+    if(ref.path==='compatibility/rc/matrices/full-verify.json')matrixImages.set(ref.sha256,JSON.parse(body));
+    offset+=size;assert.equal(bodies[offset++],10);
   }
   assert.equal(offset,bodies.length);
   const before=new Map(),current=new Map(),known=new Map(),bound=new Map();
@@ -65,6 +67,15 @@ export function retainedSelectionMetadataContext({root=process.cwd(),read}={}){
     'projects/ngx-material-legacy/package.json','scripts/autocomplete-selection-native-subject.mjs',
   ]);
   for(const ref of packet.support){assert.equal(ref.commit,BASE);add(ref);}
+  const caseIds=which=>{
+    const ref=which.get('compatibility/rc/matrices/full-verify.json'),matrix=matrixImages.get(ref.sha256);
+    const checks=matrix.checks.filter(row=>row.check_id==='historical-legacy-artifact');assert.equal(checks.length,1);
+    const groups=checks[0].acceptance.cases_by_line.main;assert.deepEqual(Object.keys(groups),['original-and-shared-cases','discovery-negatives']);
+    const ids=Object.values(groups).flat();assert.ok(ids.every(id=>typeof id==='string'&&id));assert.equal(new Set(ids).size,ids.length);return ids;
+  };
+  const historicalCaseIds=caseIds(before),currentCaseIds=caseIds(current);
+  assert.equal(historicalCaseIds.length,2236);assert.equal(currentCaseIds.length,2334);
+  const required=new Set(currentCaseIds);assert.ok(historicalCaseIds.every(id=>required.has(id)),'historical native matrix obligation dropped');
   const assertLoaded=()=>{assert.equal(judgments.autocompleteSelectionSourceJudgments,loaded);assert.equal(hash(toString.call(loaded)),FUNCTION_SHA);};
   const assertCurrent=()=>{
     assertLoaded();
@@ -89,6 +100,7 @@ export function retainedSelectionMetadataContext({root=process.cwd(),read}={}){
   assertCurrent();
   return Object.freeze({get bound(){return structuredClone([...bound.values()]);},get currentMembers(){return structuredClone([...current.values()]);},
     get historicalMembers(){return structuredClone([...before.values()]);},
+    get historicalCaseIds(){return [...historicalCaseIds];},get currentCaseIds(){return [...currentCaseIds];},
     // These pure selectors provide descriptors only. Callers must bracket
     // actual current consumption with assertCurrent and their own scope guard.
     qualifyMetadata:value=>project(value,current),historicalMetadata:value=>project(value,before),assertCurrent,

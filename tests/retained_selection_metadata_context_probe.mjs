@@ -8,6 +8,10 @@ import {retainedSelectionMetadataContext as make} from '../scripts/retained-sele
 import {autocompleteSelectionSourceJudgments} from '../scripts/autocomplete-selection-source-judgment.mjs';
 const root=process.cwd(),physical=path=>readFileSync(join(root,path)),live=make({root,read:physical});
 assert.equal(live.bound.length,45);assert.equal(live.historicalMembers.length,34);assert.equal(live.currentMembers.length,40);
+assert.equal(live.historicalCaseIds.length,2236);assert.equal(live.currentCaseIds.length,2334);
+assert.ok(live.historicalCaseIds.every(id=>live.currentCaseIds.includes(id)));
+live.historicalCaseIds.length=0;live.currentCaseIds.length=0;
+assert.equal(live.historicalCaseIds.length,2236);assert.equal(live.currentCaseIds.length,2334);
 for(const ref of live.historicalMembers){
  const current=live.currentMembers.find(row=>row.path===ref.path);assert.deepEqual(live.qualifyMetadata(ref),current);
  assert.deepEqual(live.historicalMetadata(current),ref);
@@ -49,6 +53,7 @@ try{
 assert.equal(live.historical_code_executed_or_exposed,false);assert.equal(live.source_judgments_changed,0);
 assert.equal(live.artifact_or_audit_admission_granted,false);assert.equal(live.g11_claim,'not-passed');
 console.log(JSON.stringify({result:'pass',historical_members:34,current_members:40,bound:45,cold_rejections:45,late_rejections:45,recoveries:45,
+ historical_matrix_obligations:2236,current_matrix_obligations:2334,all_historical_matrix_obligations_retained:true,
  actual_source_bound_equal:true,unchanged_report_bodies:3,exact_historical_proof_projections:3,projected_member_occurrences:proofMembers,
  unknown_hash_rejected:true,wrong_length_rejected:true,accessor_not_invoked:true,proxy_not_invoked:true,public_metadata_isolated:true,
  physical_cross_member_mutation_rejected:true,historical_code_executed_or_exposed:false,artifact_or_audit_admission_granted:false}));

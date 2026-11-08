@@ -16,6 +16,8 @@ class RetainedSelectionMetadataContextTests(unittest.TestCase):
         row = json.loads(child.stdout)
         self.assertEqual((row['historical_members'], row['current_members'], row['bound']), (34, 40, 45))
         self.assertEqual((row['cold_rejections'], row['late_rejections'], row['recoveries']), (45, 45, 45))
+        self.assertEqual((row['historical_matrix_obligations'], row['current_matrix_obligations']), (2236, 2334))
+        self.assertTrue(row['all_historical_matrix_obligations_retained'])
         self.assertEqual((row['unchanged_report_bodies'], row['exact_historical_proof_projections'], row['projected_member_occurrences']), (3, 3, 69))
         for field in ['actual_source_bound_equal', 'unknown_hash_rejected', 'wrong_length_rejected',
                       'accessor_not_invoked', 'proxy_not_invoked', 'public_metadata_isolated',
