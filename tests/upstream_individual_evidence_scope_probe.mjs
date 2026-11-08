@@ -9,8 +9,8 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
-import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync,existsSync} from 'node:fs';
-import {dirname,join,resolve} from 'node:path';
+import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync,existsSync,lstatSync,realpathSync,symlinkSync} from 'node:fs';
+import {dirname,join,resolve,relative,isAbsolute,extname,sep} from 'node:path';
 import {tmpdir} from 'node:os';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
@@ -22,7 +22,17 @@ const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),read=p=>readFil
 const hash=b=>createHash('sha256').update(b).digest('hex'),ts=createRequire(import.meta.url)('typescript');
 const line=JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main';
 const clone=value=>structuredClone(value);
-const base={entry:{final_disposition:'already-adapted'},proof:{proof_kind:'whole-input-transform-hunk-and-original-native-behavior'},body:{status:'reviewed'},review:{status:'reviewed'},requiresIndividual:true,claimsBehavior:true};
+// A complete synthetic source-only proof for helper scope controls. Its source
+// references identify fixture inputs and make no product qualification claim.
+const helperSourceMembers=[{path:'fixtures/scope-proof/owned-source.ts',sha256:hash('export const fixtureOnly = true;\n')}];
+const helperDecision='Synthetic complete source-only review bound to explicit fixture source bytes; no runtime or product claim.';
+const helperProof={proof_kind:'individual-contextual-source-review',source_conclusion_only:true,execution_claim:'not-claimed',
+ source_members:helperSourceMembers,diff_sha256:hash('synthetic complete patch\n'),review_depth:'individual-compatibility',
+ affected_branches:[line],decision:helperDecision};
+const base={entry:{final_disposition:'already-adapted',reason:helperDecision},proof:helperProof,body:{status:'reviewed'},
+ review:{status:'reviewed',final_disposition:'already-adapted',decision:helperDecision,affected_branches:[line],
+  source_conclusion_only:true,execution_claim:'not-claimed',source_members:helperSourceMembers,individual_proof:clone(helperProof)},
+ requiresIndividual:true,claimsBehavior:true};
 assert.equal(individualReviewScopeOk(base),true);
 let helperPositive=1,helperNegative=0;
 const accept=value=>{assert.equal(individualReviewScopeOk(value),true);helperPositive++;};
@@ -55,17 +65,59 @@ const fixture=mkdtempSync(join(tmpdir(),'individual-review-scope-validator-'));
 const put=(path,body)=>{const target=join(fixture,path);mkdirSync(dirname(target),{recursive:true});writeFileSync(target,typeof body==='string'||Buffer.isBuffer(body)?body:JSON.stringify(body,null,2)+'\n');};
 let cliCases=0,checkerMutants=0;const observations=[];
 try{
- // Copy the actual checker and its complete relative-import closure, never a rewritten validator.
+ // Copy exact bytes for the checker's complete static .mjs import closure.
+ // Relative imports must remain inside this canonical repository, resolve to
+ // regular non-symlink .mjs files, and never pass through an unreviewed path.
+ const checkerInputAllowed=(target,base=root)=>{const rel=relative(base,target);
+  if(!rel||rel==='..'||rel.startsWith('..'+sep)||isAbsolute(rel)||extname(target)!=='.mjs')return false;
+  try{
+   if(lstatSync(base).isSymbolicLink()||!lstatSync(base).isDirectory())return false;
+   const parts=rel.split(sep);let current=base;
+   for(let i=0;i<parts.length;i++){current=join(current,parts[i]);const stat=lstatSync(current);
+    if(stat.isSymbolicLink()||(i===parts.length-1?!stat.isFile():!stat.isDirectory()))return false;}
+   return realpathSync(target)===target&&realpathSync(base)===base;
+  }catch{return false;}
+ };
+ assert.equal(checkerInputAllowed(resolve(root,'..','outside.mjs')),false,'reject repository escape');
+ assert.equal(checkerInputAllowed(resolve(root,'README.md')),false,'reject unknown source extension');
+ assert.equal(checkerInputAllowed(resolve(root,'testing/table-inherited/contracts.mjs')),true,'allow owned in-repository checker contract');
+ const pathControls=join(fixture,'checker-path-controls'),outsideControls=join(fixture,'checker-path-outside');
+ mkdirSync(join(pathControls,'inside'),{recursive:true});mkdirSync(outsideControls);
+ writeFileSync(join(pathControls,'inside/valid.mjs'),'export const fixture=true;\n');
+ writeFileSync(join(outsideControls,'escape.mjs'),'export const outside=true;\n');
+ symlinkSync(outsideControls,join(pathControls,'linked-parent'),'dir');
+ symlinkSync(join(pathControls,'inside/valid.mjs'),join(pathControls,'linked-leaf.mjs'));
+ symlinkSync(join(pathControls,'inside'),join(pathControls,'linked-inside-parent'),'dir');
+ assert.equal(checkerInputAllowed(join(pathControls,'inside/valid.mjs'),pathControls),true,'regular nested source accepted');
+ assert.equal(checkerInputAllowed(join(pathControls,'linked-parent/escape.mjs'),pathControls),false,'reject escaping symlink parent');
+ assert.equal(checkerInputAllowed(join(pathControls,'linked-inside-parent/valid.mjs'),pathControls),false,'reject internal symlink parent');
+ assert.equal(checkerInputAllowed(join(pathControls,'linked-leaf.mjs'),pathControls),false,'reject symlink leaf');
+ assert.equal(checkerInputAllowed(join(pathControls,'inside/missing.mjs'),pathControls),false,'reject missing source');
  const copied=new Set();
- const copyModule=path=>{if(copied.has(path))return;copied.add(path);const bytes=read(path);put(path,bytes);const sf=ts.createSourceFile(path,bytes.toString(),ts.ScriptTarget.Latest,true);assert.equal(sf.parseDiagnostics.length,0);
+ const copyModule=path=>{if(copied.has(path))return;const source=resolve(root,path);assert.ok(checkerInputAllowed(source),'disallowed checker input '+path);copied.add(path);const bytes=read(path);put(path,bytes);const sf=ts.createSourceFile(path,bytes.toString(),ts.ScriptTarget.Latest,true);assert.equal(sf.parseDiagnostics.length,0);
   for(const node of sf.statements)if((ts.isImportDeclaration(node)||ts.isExportDeclaration(node))&&node.moduleSpecifier?.text.startsWith('.')){
-   const target=resolve(root,dirname(path),node.moduleSpecifier.text);assert.ok(target.startsWith(root+'/scripts/'));copyModule(target.slice(root.length+1));
+   const target=resolve(root,dirname(path),node.moduleSpecifier.text);assert.ok(checkerInputAllowed(target),'disallowed static import '+path+' -> '+node.moduleSpecifier.text);copyModule(relative(root,target));
   }
  };
  copyModule('scripts/check-upstream-audit-disposition.mjs');
  // Sass validators authenticate these data assets when their modules load.
  // Copy their exact bytes too; these are fixture inputs, never replacements
  // for the original catalogs, CSS expectations or validator assertions.
+ // Additional files read by imported checker modules at load time. The
+ // expected hashes are the modules' own embedded provenance pins.
+ const checkerInputs=[
+  ['scripts/revalidate-typeahead.mjs','07a2cc01841fc1807ce6f4c7ec2b8ddb1dfce41eb8d25f69518fd5f7d4042f1e'],
+  ['compatibility/rc/matrices/library-exports.json','f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f'],
+  ['compatibility/rc/parallel-spinner-snack-css-contract-inputs-v1.json','fd78f8c7f6e072fb7393c61aef782ccdf3a1c8d009227d08b29921ea2809e0a8'],
+  ['compatibility/rc/parallel-spinner-snack-public-bridge-integration-source-inputs.json','52cb87f967965026ef0056a9d8c36a11a54f36b6d9efab1d235cb3e89c30d64f'],
+  ['compatibility/rc/ordinary-checkbox-button-legacy-composition-cases-v1.json','8f4186d34848a0f298170c2124bbb727ff31a3995a1e8f041ab05476ffe1125d'],
+  ['compatibility/rc/ordinary-checkbox-button-legacy-composition-known-before-v1.json','3e96bf8c73dc35d1cb9d132c74f69b6f91ee7d22b19b185cf3540d68d3cb9f43'],
+  ['compatibility/rc/ordinary-card-c04-successor-inputs-v1.json','0ebb1f81be067cee2bbc2149dd9fd4e9188c4129d1482b40145a1a4893ad9634'],
+  ['compatibility/rc/ordinary-card-public-bridge-original-cases-v1.json','59e47c924f0f541b7b262a9ee31f6e55bc4160c1c420f683247a1703be470bbf'],
+  ['compatibility/rc/ordinary-card-public-bridge-model-v1.mjs','0286969a007029a3628d8a56fb17c0ee2bbfecec735abdf5d95911ac7c709a83'],
+  ['compatibility/rc/current-sass-legacy-retention-reference-v1.json','38ff89f3707c959c91e9fe2da922c4d8bba29b41756350cc0238ea946f9c4342'],
+ ];
+ for(const [path,expectedHash] of checkerInputs){const bytes=read(path);assert.equal(hash(bytes),expectedHash,path+' provenance');put(path,bytes);assert.equal(hash(readFileSync(join(fixture,path))),expectedHash,path+' copied provenance');}
  const sassInputs=[
   'compatibility/rc/oracles/material-16.2.14-sass-api.json',
   'compatibility/rc/original16-sass-source-diagnostic-identity.json',
@@ -114,16 +166,38 @@ try{
  put('symbols.json',{schema_version:1,line,status:'closed',symbol_uses:seed.symbol_uses.map(closed),fixture_only:true});
  put('current.json',{schema_version:1,line,status:'closed',current_uses:active.symbol_uses.length,current_source_files:active.source_files.length,
   current_source_population_sha256:active.source_population_sha256,symbol_use_count:additional.length,symbol_uses:additional.map(closed),fixture_only:true});
- const actual=JSON.parse(read('compatibility/f10/disposition-ledger/ledger.json'));
- const positive=clone(actual.entries.find(row=>row.sha==='dd04fe910c4587f11cd37b1d0b216e4a56cac2e3'));
- const positiveReview=JSON.parse(read(positive.evidence_report));assert.equal(positiveReview.final_disposition,'already-adapted');
- const positivePatch=read(positiveReview.patch_file);assert.equal(hash(positivePatch),positiveReview.diff_sha256);
- put(positiveReview.patch_file,positivePatch);positive.evidence_report='compatibility/f10/disposition-ledger/evidence/scope-positive-fixture.json';
+ // Synthetic complete behavior-disposition input. The current source bytes,
+ // source-evidence reference, proof, review and patch are all explicitly bound;
+ // no real product or runtime qualification is represented by this fixture.
+ const behaviorSourcePath='projects/ngx-material-legacy/__individual_scope_fixture__.ts';
+ const behaviorSource=Buffer.from("import {InjectionToken} from '@angular/core';\n// Synthetic discovery route only.\n"),behaviorDecision='Synthetic source-bound admission fixture only; no product API or behavior qualification is claimed.';
+ const behaviorPatch=[
+  'diff --git a/'+behaviorSourcePath+' b/'+behaviorSourcePath,
+  '--- a/'+behaviorSourcePath,'+++ b/'+behaviorSourcePath,'@@ -1 +1,2 @@',
+  '-old synthetic fixture source',...behaviorSource.toString().trimEnd().split('\n').map(text=>'+'+text),
+ ].join('\n')+'\n';
+ const behaviorProof={proof_kind:'whole-input-transform-hunk-and-original-native-behavior',source_conclusion_only:true,execution_claim:'not-claimed',
+  source_evidence_scope:'current',source_evidence:[{path:behaviorSourcePath,sha256:hash(behaviorSource),bytes:behaviorSource.length}],
+  diff_sha256:hash(behaviorPatch),review_depth:'individual-compatibility',affected_branches:[line],decision:behaviorDecision};
+ const positive={sha:'d'.repeat(40),subject:'synthetic fixture: individual behavior proof shape',files:[behaviorSourcePath],bucket:'behavior-semantic',
+  final_disposition:'already-adapted',reason:behaviorDecision,evidence_report:'compatibility/f10/disposition-ledger/evidence/scope-positive-fixture.json',individual_proof:behaviorProof};
+ const positiveReview={sha:positive.sha,status:'reviewed',final_disposition:positive.final_disposition,decision:behaviorDecision,
+  affected_branches:[line],source_conclusion_only:true,execution_claim:'not-claimed',source_evidence:behaviorProof.source_evidence,
+  individual_proof:clone(behaviorProof),diff_sha256:behaviorProof.diff_sha256,diff:behaviorPatch,fixture_only:true};
+ const docsPath='docs/scope-fixture.md',docsSource=Buffer.from('Synthetic fixture documentation only\n');put(docsPath,docsSource);
  const docsPatch='diff --git a/docs/scope-fixture.md b/docs/scope-fixture.md\n--- a/docs/scope-fixture.md\n+++ b/docs/scope-fixture.md\n@@ -1 +1 @@\n-old documentation\n+Synthetic fixture documentation only\n';
+ const docsApplyRoot=join(fixture,'docs-patch-control');mkdirSync(join(docsApplyRoot,'docs'),{recursive:true});
+ writeFileSync(join(docsApplyRoot,docsPath),'old documentation\n');
+ const docsApply=spawnSync('git',['apply','-'],{cwd:docsApplyRoot,input:docsPatch,encoding:'utf8'});
+ assert.equal(docsApply.status,0,docsApply.stderr);
+ assert.ok(readFileSync(join(docsApplyRoot,docsPath)).equals(docsSource),'documentation patch produces exact source');
  const docsDecision='Synthetic complete documentation applicability review. This fixture has no executable or packaged behavior change and provides no real product qualification.';
- const docs={sha:'1'.repeat(40),subject:'docs: a11y fixture',files:['docs/scope-fixture.md'],bucket:'docs-build-batch-candidate',final_disposition:'not-applicable',reason:docsDecision,
-  evidence_report:'compatibility/f10/disposition-ledger/evidence/scope-docs-fixture.json',individual_proof:{proof_kind:'complete-syntax-and-documentation-review',diff_sha256:hash(docsPatch),review_depth:'individual-compatibility',affected_branches:[line],decision:docsDecision}};
- const docsReview={sha:docs.sha,status:'reviewed',final_disposition:'not-applicable',diff_sha256:hash(docsPatch),diff:docsPatch,fixture_only:true};
+ const docsProof={proof_kind:'complete-syntax-and-documentation-review',source_conclusion_only:true,execution_claim:'not-claimed',source_evidence_scope:'current',
+  source_evidence:[{path:docsPath,sha256:hash(docsSource),bytes:docsSource.length}],diff_sha256:hash(docsPatch),review_depth:'individual-compatibility',affected_branches:[line],decision:docsDecision};
+ const docs={sha:'1'.repeat(40),subject:'docs: a11y fixture',files:[docsPath],bucket:'docs-build-batch-candidate',final_disposition:'not-applicable',reason:docsDecision,
+  evidence_report:'compatibility/f10/disposition-ledger/evidence/scope-docs-fixture.json',individual_proof:docsProof};
+ const docsReview={sha:docs.sha,status:'reviewed',final_disposition:'not-applicable',decision:docsDecision,affected_branches:[line],source_conclusion_only:true,
+  execution_claim:'not-claimed',source_evidence:docsProof.source_evidence,individual_proof:clone(docsProof),diff_sha256:docsProof.diff_sha256,diff:docsPatch,fixture_only:true};
  const pending=JSON.parse(read('compatibility/f10/disposition-ledger/evidence/closeout-select-detach-review.json'));
  const pendingPatch=read(pending.patch_file);assert.equal(hash(pendingPatch),pending.diff_sha256);put(pending.patch_file,pendingPatch);
  const htmlBytes=read(html),coordinate=htmlBytes.toString().split('\n').findIndex(text=>text.includes('(detach)="close()"'))+1;assert.ok(coordinate>0);
@@ -161,7 +235,9 @@ try{
  run('actual-pending-select-review',weak,pending,false);
  row=clone(weak);row.final_disposition='inherited';row.individual_proof.installed_member={sha256:'a'.repeat(64)};row.individual_proof.reachable_behavior={kind:'executed-delegation',id:'synthetic-marker-only'};
  assert.equal(run('source-only-inherited-marker',row,{...weakCompleted,final_disposition:'inherited'},false).insufficient_inherited,1);
- const lowRisk=clone(docs);lowRisk.subject='docs: general fixture';
+ const lowRisk=clone(docs);lowRisk.subject='docs: general fixture';delete lowRisk.individual_proof;
+ // Keep this mutant control on the top-level final-state guard; an individual
+ // proof would correctly reject the pending body again through scope binding.
  assert.equal(run('pending-nonsensitive-final',lowRisk,{...docsReview,status:'pending'},false).evidence_failures[0].reason,'unfinished-review');
  // Execute weakened copies of the shipped checker: each real CLI control must catch its guard.
  // The real select SHA now also has an independent artifact guard. Isolate the
