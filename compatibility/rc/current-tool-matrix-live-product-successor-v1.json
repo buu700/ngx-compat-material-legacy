@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "role": "current-tool-matrix-reviewed-live-product-source-successor",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "historical_cases_changed": false,
+  "receipt": {
+    "path": "compatibility/rc/parent-main-form-field-render-subclass-v2.json",
+    "sha256": "24fd486804e95e8201f158573fa259c59560a9f5420fd826c45bd545c8b31b79",
+    "bytes": 6388
+  },
+  "form_field": {
+    "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+    "parent": "d0b99b5b6975859ca4eff8aa55dd97e4dfeb4749",
+    "commit": "a798ff9c58cdd539f115eda00b7cdd898d035353",
+    "before": {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "sha256": "a0ed827e6ac47802a886d87ab1c1c270c952c6a8fa45f65c5fdfc0f7472fabff",
+      "bytes": 28061
+    },
+    "after": {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "sha256": "e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657",
+      "bytes": 28485
+    },
+    "edits": [
+      {
+        "offset": 475,
+        "before": "  AfterViewChecked,\n",
+        "after": "  assertInInjectionContext,\n"
+      },
+      {
+        "offset": 615,
+        "before": "",
+        "after": "  inject,\n"
+      },
+      {
+        "offset": 2078,
+        "before": "",
+        "after": "\n/** Captures the active host injector when a legacy subclass omits the optional argument. */\nfunction legacyFormFieldInjector(): Injector | undefined {\n  try {\n    assertInInjectionContext(legacyFormFieldInjector);\n  } catch {\n    return undefined;\n  }\n  return inject(Injector);\n}\n"
+      },
+      {
+        "offset": 5643,
+        "before": "  implements AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked, OnDestroy, CanColor\n",
+        "after": "  implements AfterContentInit, AfterContentChecked, AfterViewInit, OnDestroy, CanColor\n"
+      },
+      {
+        "offset": 11476,
+        "before": "",
+        "after": "    if (this._injector === undefined) {\n      this._injector = legacyFormFieldInjector();\n    }\n"
+      },
+      {
+        "offset": 13114,
+        "before": "",
+        "after": "          this.#updateSubscriptMotion();\n"
+      },
+      {
+        "offset": 15388,
+        "before": "  ngAfterViewChecked() {\n",
+        "after": "  #updateSubscriptMotion() {\n"
+      }
+    ]
+  },
+  "support": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "sha256": "e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657",
+      "bytes": 28485
+    },
+    {
+      "path": "tests/form_field_render_runtime_probe.mjs",
+      "sha256": "c908c15f85722e0f92d76a929fe25000b3e8f4cca095c09d15f4cbd45486034c",
+      "bytes": 32975
+    },
+    {
+      "path": "tests/form-field-subscript-motion/run.mjs",
+      "sha256": "1ae9f1969226343b6728acc4e896c0f6a8210bd3693861228fc8086b1d3425c0",
+      "bytes": 4058
+    },
+    {
+      "path": "tests/form-field-subscript-motion/README.md",
+      "sha256": "2fa30098c1d7c0a2f345f7e89c932da7fd8d2b28ecb86ebe581de0e4d686622b",
+      "bytes": 2670
+    },
+    {
+      "path": "tests/form-field-subscript-motion/manual-probe.mjs",
+      "sha256": "9b72a9a6d88938b346b62f301fa8927c631fbe0153ec591bed047193c591692f",
+      "bytes": 5507
+    },
+    {
+      "path": "tests/form-field-subscript-motion/subclass-probe.mjs",
+      "sha256": "09927afeb0de61ee888bf14d2d0f88b1eea7b8e782f8c7006021657d4f69cc0e",
+      "bytes": 2250
+    },
+    {
+      "path": "tests/form-field-subscript-motion/fixtures/subclass/zoneful.ts",
+      "sha256": "aa829663f8256f0414bc237966875bf2a51f79b4c89ebd880aa9a73f0500cb83",
+      "bytes": 2876
+    },
+    {
+      "path": "tests/form-field-subscript-motion/fixtures/subclass/zoneless.ts",
+      "sha256": "4f2e98c5a36f625194ddc927c7f4e727e81804007e7dc8ee67de2681fa7d7bf6",
+      "bytes": 2934
+    },
+    {
+      "path": "tests/form-field-subscript-motion/fixtures/subclass/noop.ts",
+      "sha256": "55ba917be39c8d946216dbda30794503e6471302ea98b457ca9cfb5d5d87d427",
+      "bytes": 2992
+    }
+  ],
+  "reviewed_scope": {
+    "candidate_motion_cells": 11,
+    "ssr_states": 4,
+    "strict_type_cases": 27,
+    "root_source_mutation_rejections": 120,
+    "current_canonical_packed_run": false,
+    "complete_motion_matrix": false
+  },
+  "frame_roster": {
+    "path": "compatibility/rc/current-tool-matrix-live-frame-roster-v1.json",
+    "sha256": "a96a3921bbf2e553cdf94f0cc4c9a66390ccd537fcb80b8255e3afc0ceea5ba4",
+    "bytes": 7180
+  }
+}

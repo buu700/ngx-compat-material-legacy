@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "role": "current-tool-tab-nav-live-source-successor",
+  "source_parent": "66875e0e810e0b2b7173c05fe4597a1809e57374",
+  "source_commit": "35807fe63d87c22bd18d04ac406cb457d9058645",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "before": {
+    "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+    "sha256": "9205bb2a5b3573e8f21161b03baa04e4b3e868e72d70e06c5dcdf96d2439af36",
+    "bytes": 9041
+  },
+  "after": {
+    "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+    "sha256": "daf7d6f4c83292e7d3bf24eaf675b5cfc6c3fe341b779c5e801c23ef49d30f7f",
+    "bytes": 10233
+  },
+  "receipt": {
+    "path": "compatibility/rc/parent-main-tab-nav-enabled-focus-v1.json",
+    "sha256": "5f0a255187640f84f8b20c44d0e7526342ef03979264decab28d41e2fc2a38eb",
+    "bytes": 6034
+  },
+  "support": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+      "sha256": "daf7d6f4c83292e7d3bf24eaf675b5cfc6c3fe341b779c5e801c23ef49d30f7f",
+      "bytes": 10233
+    },
+    {
+      "path": "tests/tab_nav_focus/subject.mjs",
+      "sha256": "f321daa3f43e59b68af6aa2a954a0b213071c2f5421387a42b0314bce50f10bd",
+      "bytes": 2284
+    },
+    {
+      "path": "tests/tab_nav_focus/native_probe.mjs",
+      "sha256": "fb70d2addd448a81d6af11c24cb40a3fe961e02d788259c993acdadccbde2abb",
+      "bytes": 8729
+    },
+    {
+      "path": "tests/tab_nav_focus/source_probe.mjs",
+      "sha256": "075a1c8f9bc9d5305bcbd5cebf8dea4d66568d6a502b4d73890ac90d66952c95",
+      "bytes": 5887
+    }
+  ],
+  "edits": [
+    {
+      "offset": 531,
+      "before": "",
+      "after": "  signal,\n  WritableSignal,\n"
+    },
+    {
+      "offset": 1746,
+      "before": "",
+      "after": "\n// Focus state stays local to the owned implementation and does not add a public API.\nconst focusedItems = new WeakMap<_MatTabNavBase, WritableSignal<MatPaginatedTabHeaderItem | null>>();\nfunction focusedItemFor(nav: _MatTabNavBase): WritableSignal<MatPaginatedTabHeaderItem | null> {\n  let value = focusedItems.get(nav);\n  if (!value) {\n    value = signal<MatPaginatedTabHeaderItem | null>(null);\n    focusedItems.set(nav, value);\n  }\n  return value;\n}\n"
+    },
+    {
+      "offset": 4184,
+      "before": "",
+      "after": "    this.indexFocused.pipe(startWith(null), takeUntil(this._destroyed)).subscribe(() => {\n      focusedItemFor(this).set(this._items?.get(this.focusIndex) || null);\n    });\n"
+    },
+    {
+      "offset": 4476,
+      "before": "",
+      "after": "        focusedItemFor(this).set(items[i]);\n"
+    },
+    {
+      "offset": 4677,
+      "before": "",
+      "after": "    if (this.tabPanel) {\n      // Provide an entry point only when an enabled link is available.\n      const firstEnabled = items.find(item => !item.disabled);\n      focusedItemFor(this).set(firstEnabled || null);\n      this._changeDetectorRef.markForCheck();\n    }\n"
+    },
+    {
+      "offset": 8650,
+      "before": "      return this._isActive && !this.disabled ? 0 : -1;\n",
+      "after": "      if (this.disabled) {\n        return -1;\n      }\n      const focused = focusedItemFor(this._tabNavBar)();\n      const target = focused && !focused.disabled\n        ? focused\n        : this._tabNavBar._items?.find(item => !item.disabled);\n      return target === this ? 0 : -1;\n"
+    }
+  ]
+}

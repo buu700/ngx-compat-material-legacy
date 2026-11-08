@@ -195,6 +195,12 @@ class HelperCiTests(unittest.TestCase):
             current = ast.parse((ROOT / path).read_bytes())
             moved = next(n for n in current.body if isinstance(n, ast.FunctionDef) and n.name == 'check_coherence')
             self.assertEqual([ast.dump(n) for n in moved.body], [ast.dump(n) for n in old_main.body[1:stop]])
+        if coherence:
+            added = ['node', 'tests/legacy_external_artifact_resolution.mjs']
+            anchor = ['node', 'scripts/fresh-artifact-negative-tests.mjs']
+            self.assertEqual(expected.count(anchor), 1)
+            self.assertNotIn(added, expected)
+            expected.insert(expected.index(anchor), added)
         self.assertEqual(actual, expected)
         self.assertFalse(any(command in ci.DISCOVERY_COMMANDS for command in actual))
 
@@ -219,8 +225,13 @@ class HelperCiTests(unittest.TestCase):
             '\n'
         )
         self.assertEqual(current.count(source_regressions), 1)
-        self.assertEqual(current.split('  packed-consumer-aot:\n')[1].replace(source_regressions, ''),
-                         original.split('  packed-consumer-aot:\n')[1])
+        if (ROOT / 'scripts/run-helper-checks.py').exists():
+            self.assertEqual(current.split('  packed-consumer-aot:\n')[1].replace(source_regressions, ''),
+                             original.split('  packed-consumer-aot:\n')[1])
+        else:
+            reviewed = subprocess.check_output(['git', '--no-replace-objects', 'show',
+                '4b4893f56cbb5ce91cf698ec75449ba5e5e10943:.github/workflows/ci.yml'], cwd=ROOT, text=True)
+            self.assertEqual(current.split('  packed-consumer-aot:\n')[1], reviewed.split('  packed-consumer-aot:\n')[1])
         helper = current.split('  packed-consumer-aot:\n')[0]
         old_required = original.split('  helper-checks:\n')[1].split('    name: ')[1].splitlines()[0]
         gate = helper.split('  helper-checks:\n')[1]

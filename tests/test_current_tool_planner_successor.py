@@ -119,7 +119,7 @@ class PlannerSuccessorTest(unittest.TestCase):
             js = json.loads(child.stdout)
             self.assertEqual(js['result'], 'pass')
             self.assertEqual(next(x for x in subject.bound if x['path'] == tool_module.MATRIX_OWNER['path']), tool_module.MATRIX_OWNER)
-            self.assertEqual(next(x for x in js['bound'] if x['path'] == 'scripts/current-tool-matrix-source.mjs'), dict(path='scripts/current-tool-matrix-source.mjs', sha256='62cca2d43de7d8c2497b95b703a7ae8ff38f3045848c25f718d7af8d0f65ca27', bytes=21212))
+            self.assertEqual(next(x for x in js['bound'] if x['path'] == 'scripts/current-tool-matrix-source.mjs'), dict(path='scripts/current-tool-matrix-source.mjs', sha256='42d5d1251e8cacf69f0d1519bd6ba9a356c9c9eaac0bf5c5af1eb8aba5b20f1c', bytes=24939))
             py_bound = {x['path']: x for x in subject.bound if x['path'] not in ('scripts/current_sass_tool_references.py', 'scripts/current_tool_matrix_source.py')}
             js_bound = {x['path']: x for x in js['bound'] if x['path'] not in ('scripts/current-sass-tool-references.mjs', 'scripts/current-tool-matrix-source.mjs')}
             self.assertEqual(py_bound, js_bound)

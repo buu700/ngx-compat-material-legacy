@@ -42,6 +42,39 @@ try{
  try{writeFileSync(workflowPath,Buffer.concat([before,Buffer.from('\n')]));assert.throws(()=>isolated.assertCurrent());}
  finally{writeFileSync(workflowPath,before);}
  isolated.assertCurrent();
+ if(line==='main'){
+  const inventoryFrame=JSON.parse(tempRead('compatibility/rc/parent-main-inventory-reference-current-source-v1.json'));
+  const finalInventory=JSON.parse(tempRead('compatibility/rc/current-tool-matrix-final-product-v1.json')).structural_transitions[1];
+  assert.deepEqual(finalInventory.before,inventoryFrame.inventory_transitions.at(-1).after);
+  for(const transition of inventoryFrame.inventory_transitions){
+   const old=isolated.inventoryHistoricalBytes(transition.before);assert.equal(sha(old),transition.before.sha256);assert.equal(old.length,transition.before.bytes);
+   assert.deepEqual(isolated.qualify(transition.before),finalInventory.after);
+  }
+  const historicalRef=inventoryFrame.inventory_transitions[0].before;
+  assert.throws(()=>isolated.inventoryHistoricalBytes({...historicalRef,bytes:historicalRef.bytes+1}));
+  let getterCalled=false;const forged={path:historicalRef.path,bytes:historicalRef.bytes,get sha256(){getterCalled=true;return historicalRef.sha256;}};
+  assert.throws(()=>isolated.inventoryHistoricalBytes(forged));assert.equal(getterCalled,false);
+  const inventoryPath=join(temp,historicalRef.path),inventoryBytes=readFileSync(inventoryPath);
+  try{writeFileSync(inventoryPath,Buffer.concat([inventoryBytes,Buffer.from('\n')]));assert.throws(()=>inventoryFiniteToolSuccessor({root:temp,line,read:tempRead}));assert.throws(()=>isolated.inventoryHistoricalBytes(historicalRef));}
+  finally{writeFileSync(inventoryPath,inventoryBytes);}isolated.assertCurrent();
+  let reentered=false;assert.throws(()=>inventoryFiniteToolSuccessor({root:temp,line,read:path=>{if(!reentered){reentered=true;try{inventoryFiniteToolSuccessor({root:temp,line,read:tempRead});}catch{}}return tempRead(path);}}));assert.equal(reentered,true);
+  let mutated=false;try{assert.throws(()=>inventoryFiniteToolSuccessor({root:temp,line,read:path=>{if(!mutated){mutated=true;writeFileSync(inventoryPath,Buffer.concat([inventoryBytes,Buffer.from('\n')]));}return tempRead(path);}}));assert.equal(mutated,true);}finally{writeFileSync(inventoryPath,inventoryBytes);}isolated.assertCurrent();
+  assert.throws(()=>inventoryFiniteToolSuccessor({root:temp,line:'21.x',read:tempRead}));
+  for(const [path,change] of [
+   [workflow.current.path,s=>s.replace('          just chainman exec -- node scripts/dialog-motion-source-test.mjs\n','')],
+   [workflow.current.path,s=>s.replace('expected_chrome_sha=dbc8b199','expected_chrome_sha=00000000')],
+   [workflow.targets[0].path,s=>s+'\n// wrong source\n'],
+   ['compatibility/rc/parent-main-inventory-reference-current-source-v1.json',s=>s.replace('a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403','0'.repeat(64))],
+   ['compatibility/rc/parent-main-ci-browser-pin-source-successor-v1.json',s=>s.replace('"source_scope_only": true','"source_scope_only": false')],
+   ['compatibility/rc/parent-main-ci-browser-pin-source-successor-v1.json',s=>s.replace('4b4893f56cbb5ce91cf698ec75449ba5e5e10943','0000000000000000000000000000000000000000')],
+  ]){
+   const target=join(temp,path),original=readFileSync(target),changed=Buffer.from(change(original.toString()));
+   assert.ok(!changed.equals(original));
+   try{writeFileSync(target,changed);assert.throws(()=>inventoryFiniteToolSuccessor({root:temp,line,read:tempRead}));assert.throws(()=>isolated.assertCurrent());}
+   finally{writeFileSync(target,original);}
+   isolated.assertCurrent();
+  }
+ }
  let touched=false;
  assert.throws(()=>inventoryFiniteToolSuccessor({root:temp,line,read:path=>{
   if(!touched){writeFileSync(workflowPath,Buffer.concat([before,Buffer.from('\n')]));touched=true;}

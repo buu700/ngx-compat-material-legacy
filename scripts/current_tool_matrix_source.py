@@ -11,9 +11,12 @@ from pathlib import Path
 import subprocess
 SELF = 'scripts/current_tool_matrix_source.py'
 _IMAGE = Path(__file__).read_bytes()
+_GIT_PATH = os.environ.get('PATH')
+if type(_GIT_PATH) is not str: raise RuntimeError('missing Git path')
 PACKET = dict(path='compatibility/rc/current-tool-matrix-source-successor-v1.json', sha256='c549c141764d499b30cd46fede7138ea89903a6d7e709f144ed5eb528fcd3e10', bytes=14943)
 INPUT_PACKET = dict(path='compatibility/rc/current-tool-matrix-input-successor-v1.json', sha256='df06856c53ceedd1c3700e2e5b372e34442f04d82438c940fefebb8fe3c9381b', bytes=14712)
 FINAL_PACKET = dict(path='compatibility/rc/current-tool-matrix-final-product-v1.json', sha256='ddb70c833108cd3e446a46b29561b7d3ca89f7a50bfe18acad931a83ebc2d077', bytes=26543)
+LIVE_PACKET = dict(path='compatibility/rc/current-tool-matrix-live-product-successor-v1.json', sha256='5a3b9139f2916d38c8bce7d3305c284abd501df137ddec7c2d469d78ce17c268', bytes=4563)
 PARENT, COMMIT = ('aec05d8f6baf3dfdd92581504291309992abcb89', '1e26eefba6fa380b520ae05cb6f9ff3ea734545a')
 POINTER_PARENT, POINTER_COMMIT = ('d648f9de6d325aab1f858130d0cb8d93e5e5adaa', '45bbb3016f631296c08cf0eaa5f54a0e61455cf1')
 NEW_CASE = 'historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#179'
@@ -87,6 +90,13 @@ class CurrentToolMatrixSource:
         if not (read is None or callable(read)):
             raise AssertionError()
         self._provided, self._bound = (read, {})
+        # Prebind the whole named frame before the first supplied callback.
+        roster_ref = dict(path='compatibility/rc/current-tool-matrix-live-frame-roster-v1.json', sha256='a96a3921bbf2e553cdf94f0cc4c9a66390ccd537fcb80b8255e3afc0ceea5ba4', bytes=7180)
+        roster_raw = _physical(self.root, roster_ref['path']); _match(roster_raw, roster_ref); roster = json.loads(roster_raw)
+        _require(roster['schema_version'] == 1 and roster['role'] == 'current-tool-matrix-live-frame-roster' and roster['source_only'] is True and len(roster['refs']) == 35 and len({x['path'] for x in roster['refs']}) == 35)
+        self_ref = dict(path=SELF, sha256=_hash(_IMAGE), bytes=len(_IMAGE))
+        for ref in [self_ref, LIVE_PACKET, roster_ref, *roster['refs']]:
+            _require(ref['path'] not in self._bound); _match(_physical(self.root,ref['path']),ref); self._bound[ref['path']] = dict(ref)
         if not json.loads(self._read('projects/ngx-material-legacy/package.json'))['version'].startswith('22.'):
             raise AssertionError()
         if not self._read(SELF) == _IMAGE:
@@ -98,20 +108,36 @@ class CurrentToolMatrixSource:
             raise AssertionError()
         if not (packet['historical_programs_executed'] is False and packet['artifact_or_audit_admission_granted'] is False):
             raise AssertionError()
-        env = dict(PATH=os.environ['PATH'], LANG='C', LC_ALL='C', GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null', GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')
+        env = dict(PATH=_GIT_PATH, LANG='C', LC_ALL='C', GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null', GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')
 
         def git(*args):
             return subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0', *args], cwd=self.root, env=env)
         final = json.loads(self._member(FINAL_PACKET))
         _require(final['schema_version'] == 1 and final['role'] == 'current-tool-matrix-final-product-successor' and final['base_commit'] == '04daa4f8c' and final['source_commit'] == '6b88db228feff1f1598b50fbc00bc17e45d6c899' and final['historical_programs_executed'] is False and final['artifact_or_audit_admission_granted'] is False and final['predecessor_packet'] == INPUT_PACKET)
         git('merge-base', '--is-ancestor', final['base_commit'], final['source_commit'])
+        # Historical bytes support only the earlier replay, never the live binding.
+        live = json.loads(self._member(LIVE_PACKET)); _require(live['frame_roster'] == roster_ref); _require(live['schema_version'] == 1 and live['role'] == 'current-tool-matrix-reviewed-live-product-source-successor' and live['source_only'] is True and live['historical_programs_executed'] is False and live['artifact_or_audit_admission_granted'] is False and live['historical_cases_changed'] is False)
+        form = live['form_field']; _require(form['path'] == 'projects/ngx-material-legacy/legacy-form-field/form-field.ts' and form['parent'] == 'd0b99b5b6975859ca4eff8aa55dd97e4dfeb4749' and form['commit'] == 'a798ff9c58cdd539f115eda00b7cdd898d035353' and form['before']['path'] == form['after']['path'] == form['path'])
+        _require(git('rev-list','--parents','-n','1',form['commit']).decode().strip() == form['commit'] + ' ' + form['parent'])
+        git('merge-base','--is-ancestor',form['commit'],'HEAD')
+        old_form,new_form = git('show',form['parent']+':'+form['path']),git('show',form['commit']+':'+form['path']); _match(old_form,form['before']); _match(new_form,form['after']); _require(_replay(old_form,form['edits']) == new_form and self._member(form['after']) == new_form)
+        receipt=json.loads(self._member(live['receipt'])); _require(receipt['base_head'] == form['parent'] and receipt['root_executed']['source_replay_exit_code'] == 0 and receipt['root_executed']['mutation_rejections'] == 120 and receipt['reviewed_native_and_ssr_evidence']['candidate_motion_cells'] == 11 and receipt['reviewed_native_and_ssr_evidence']['ssr_four_states_equal_to_a488'] is True and receipt['reviewed_native_and_ssr_evidence']['root_repeated_native_suite'] is False)
+        _require(len(live['support']) == 9 and len({x['path'] for x in live['support']}) == 9)
+        _require(len(receipt['changes']) == 9)
+        for ref in live['support']:
+            rows=[row for row in receipt['changes'] if row['path'].endswith('/'+ref['path'])]; _require(len(rows) == 1 and rows[0]['sha256'] == ref['sha256'] and rows[0]['bytes'] == ref['bytes']); self._member(ref)
+        _require(next(x for x in live['support'] if x['path'] == form['path']) == form['after'])
+        def historical_member(ref):
+            if ref['path'] == form['path'] and ref['sha256'] == form['before']['sha256']:
+                _require(ref == form['before']); return bytes(old_form)
+            return self._member(ref)
         transitions = final['source_transitions'] + final['structural_transitions']; _require(len(final['source_transitions']) == 5 and len(final['structural_transitions']) == 2)
         for t in transitions:
-            _require(t['before']['path'] == t['after']['path'] == t['path']); old = self._member(t['archive']); now = self._member(t['after']); _match(old,t['before']); _require(_replay(old,t['edits']) == now)
+            _require(t['before']['path'] == t['after']['path'] == t['path']); old = self._member(t['archive']); now = historical_member(t['after']); _match(old,t['before']); _require(_replay(old,t['edits']) == now)
             if t in final['source_transitions']: _require(git('show',final['base_commit']+':'+t['path']) == old and git('show',final['source_commit']+':'+t['path']) == now)
         def old_member(ref):
             t = next((x for x in transitions if x['path'] == ref['path'] and x['before']['sha256'] == ref['sha256'] and x['before']['bytes'] == ref['bytes']), None)
-            return self._member(t['archive']) if t is not None else self._member(ref)
+            return self._member(t['archive']) if t is not None else historical_member(ref)
         old_roster = json.loads(self._member(final['predecessor_registry'])); new_roster = json.loads(self._member(final['current_registry']))
         _require(final['predecessor_registry']['sha256'] == '9ea6a63cec33d906e2ccea1d5d0b32b9dc5582691adde4d48387b5ae9766de37' and len(old_roster['cases']) == 2324 and len(new_roster['cases']) == 2329 and len(final['new_cases']) == 5)
         add_ids = [x['case_id'] for x in final['new_cases']]; _require([x.split('/')[-1] for x in add_ids] == ['autocomplete.spec.ts#180','input.spec.ts#113','input.spec.ts#114','input.spec.ts#115','input.spec.ts#116'] and len(set(add_ids)) == 5)
@@ -258,11 +284,8 @@ class CurrentToolMatrixSource:
     def _read(self, path):
         raw = _physical(self.root, path)
         ref = dict(path=path, sha256=_hash(raw), bytes=len(raw))
-        if path in self._bound:
-            if not self._bound[path] == ref:
-                raise AssertionError()
-        else:
-            self._bound[path] = ref
+        if not (path in self._bound and self._bound[path] == ref):
+            raise AssertionError('unregistered or changed matrix frame path')
         if self._provided is not None:
             provided = self._provided(path)
             if not (type(provided) is bytes and provided == raw):

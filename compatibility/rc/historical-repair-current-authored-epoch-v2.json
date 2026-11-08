@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "role": "historical-repair-current-authored-epoch-v2-successor",
+  "source_parent": "252689f364aee65c5d755d4b16e91987f6e305a5",
+  "source_commit": "197d8ebb6527dff53e716bc08c63bb5afab8d054",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "transitions": [
+    {
+      "path": "scripts/authored-additional-use-baseline.mjs",
+      "before": {
+        "path": "scripts/authored-additional-use-baseline.mjs",
+        "sha256": "34250fbc33217cd572fcb0380221f057b56117aa832e05aa3cb22cf8cc3afb66",
+        "bytes": 6359
+      },
+      "after": {
+        "path": "scripts/authored-additional-use-baseline.mjs",
+        "sha256": "aebb00f26d2cdc77b0e0d23814fc59d5ce7ad5616f88992cc60c1da7996de325",
+        "bytes": 8149
+      },
+      "edits": [
+        {
+          "offset": 978,
+          "before": "",
+          "after": "import {qualifyCurrentMenuRetirementReceipt} from './current-menu-retirement-receipt.mjs';\nimport {qualifyFormFieldRetiredUse,formFieldRetirementHistory,FORM_FIELD_RETIRED_ROLE} from './form-field-retired-use.mjs';\n"
+        },
+        {
+          "offset": 3717,
+          "before": "  const live=new Set(additions.map(key)),missing=rows.filter(r=>!live.has(key(r)));const dialogRemoved=missing.some(row=>key(row)===key(DIALOG_CONFIG_RETIRED_ROLE));assert.deepEqual(missing.map(key).sort(),[key(target),...(dialogRemoved?[key(DIALOG_CONFIG_RETIRED_ROLE)]:[])].sort(),'unqualified removed additional route');\n",
+          "after": "  const live=new Set(additions.map(key));\n  const fieldSource=current.source_files.find(m=>m.path==='projects/ngx-material-legacy/legacy-form-field/form-field.ts');\n  const historical=line==='main'&&!live.has(key(FORM_FIELD_RETIRED_ROLE))?formFieldRetirementHistory({root}):null;\n  let field=null;\n  if(historical){assert.ok(!rows.some(r=>key(r)===key(historical)));result.entries=[...rows,historical];\n   // The obligation remains expected even when the unknown source epoch is rejected.\n   result.retired.push({...FORM_FIELD_RETIRED_ROLE,candidate_source_sha256:fieldSource?.sha256,occurrences:[]});\n   assert.equal(fieldSource?.sha256,'e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657','unqualified form-field retirement source epoch');\n   field=qualifyFormFieldRetiredUse({root,current,readMember});assert.deepEqual(field.original,historical);result.retired=[];\n  }\n  const missing=rows.filter(r=>!live.has(key(r)));const dialogRemoved=missing.some(row=>key(row)===key(DIALOG_CONFIG_RETIRED_ROLE));assert.deepEqual(missing.map(key).sort(),[key(target),...(dialogRemoved?[key(DIALOG_CONFIG_RETIRED_ROLE)]:[])].sort(),'unqualified removed additional route');\n"
+        },
+        {
+          "offset": 4450,
+          "before": "  const proofRead=packedRepairTypeEvidenceRead({read:readMember});\n  const qualification=qualifiedMenuContentTypeBoundary({line,readMember:proofRead});result.qualification=qualification.ref;\n",
+          "after": "  const currentMain=line==='main'&&current.source_files.find(m=>m.path==='projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts')?.sha256==='c63b9af0076ce1ae261c0e8529b4c0f496c2b42b3b6edf1e270b3217fdea44e1';\n  const proofRead=currentMain?null:packedRepairTypeEvidenceRead({root,read:readMember});\n  const qualification=currentMain?qualifyCurrentMenuRetirementReceipt({root,readMember,current}):qualifiedMenuContentTypeBoundary({line,readMember:proofRead});result.qualification=qualification.ref;\n"
+        },
+        {
+          "offset": 5887,
+          "before": "   expected.push({...DIALOG_CONFIG_RETIRED_ROLE,qualification:dialogQualification});result.mode='owned-menu-and-dialog-config-type-removals';result.qualification=[qualification.ref,dialogQualification];}assert.ok(isDeepStrictEqual(candidate?.retained_removed_additional_uses,expected),'missing or changed retained-removed obligation qualification');\n",
+          "after": "   expected.push({...DIALOG_CONFIG_RETIRED_ROLE,qualification:dialogQualification});result.mode='owned-menu-and-dialog-config-type-removals';result.qualification=[qualification.ref,dialogQualification];}\n  if(field){assert.ok(!live.has(key(field.original)));result.retired.push(field.retired);expected.push({file:field.original.file,module:field.original.module,symbol:field.original.symbol,qualification:field.qualification});result.mode='owned-menu-dialog-and-form-field-removals';result.qualification=[qualification.ref,...(dialogRemoved?[expected[1].qualification]:[]),field.qualification];}\n  assert.ok(isDeepStrictEqual(candidate?.retained_removed_additional_uses,expected),'missing or changed retained-removed obligation qualification');\n"
+        }
+      ]
+    },
+    {
+      "path": "compatibility/f10/authored-dependency-current-dispositions.json",
+      "before": {
+        "path": "compatibility/f10/authored-dependency-current-dispositions.json",
+        "sha256": "9b625006744787437a812822650612387c22fe2b4dbb9c808275bf3faa2b926f",
+        "bytes": 717900
+      },
+      "after": {
+        "path": "compatibility/f10/authored-dependency-current-dispositions.json",
+        "sha256": "460262e16c118c495e37b56c5218f0c2eadfd7bad0a71cf62fddccba05b130f4",
+        "bytes": 718774
+      },
+      "edits": [
+        {
+          "offset": 519,
+          "before": "  \"current_source_population_sha256\": \"c03bd0653fa8a66869e17a702fb6da9a10989a1aee2ef8d163be3f579e0d6e7e\",\n  \"current_uses\": 1932,\n",
+          "after": "  \"current_source_population_sha256\": \"118a005194a717d837fd9727cd8d2362e71714638000c04b4b417bcc9e4c6f2d\",\n  \"current_uses\": 1935,\n"
+        },
+        {
+          "offset": 680,
+          "before": "  \"symbol_use_count\": 332,\n",
+          "after": "  \"symbol_use_count\": 336,\n"
+        },
+        {
+          "offset": 364980,
+          "before": "        \"path\": \"compatibility/f10/authored-use-reviews/current-render-registration-boundary.json\",\n        \"sha256\": \"a9949ef6a5ec8bb7cf2456dd35726c2c12bf4de54e6e33d2d936fa5c0fab9906\"\n",
+          "after": "        \"path\": \"compatibility/f10/authored-use-reviews/form-field-render-helper-current-v1.json\",\n        \"sha256\": \"62649e1fbc0e48075e899946994373717b72b7b52aefea0b833ae9ac51fc3b7b\"\n"
+        },
+        {
+          "offset": 365824,
+          "before": "        \"path\": \"compatibility/f10/authored-use-reviews/current-render-registration-boundary.json\",\n        \"sha256\": \"a9949ef6a5ec8bb7cf2456dd35726c2c12bf4de54e6e33d2d936fa5c0fab9906\"\n",
+          "after": "        \"path\": \"compatibility/f10/authored-use-reviews/form-field-render-helper-current-v1.json\",\n        \"sha256\": \"62649e1fbc0e48075e899946994373717b72b7b52aefea0b833ae9ac51fc3b7b\"\n"
+        },
+        {
+          "offset": 366655,
+          "before": "        \"path\": \"compatibility/f10/authored-use-reviews/current-render-injector-boundary.json\",\n        \"sha256\": \"7b2c412b298e45d3adea727632eeb9f51d737fb5532e13c1e8b8939a9d1d373d\"\n",
+          "after": "        \"path\": \"compatibility/f10/authored-use-reviews/form-field-render-helper-current-v1.json\",\n        \"sha256\": \"62649e1fbc0e48075e899946994373717b72b7b52aefea0b833ae9ac51fc3b7b\"\n"
+        },
+        {
+          "offset": 367478,
+          "before": "        \"path\": \"compatibility/f10/authored-use-reviews/current-render-registration-boundary.json\",\n        \"sha256\": \"a9949ef6a5ec8bb7cf2456dd35726c2c12bf4de54e6e33d2d936fa5c0fab9906\"\n",
+          "after": "        \"path\": \"compatibility/f10/authored-use-reviews/form-field-render-helper-current-v1.json\",\n        \"sha256\": \"62649e1fbc0e48075e899946994373717b72b7b52aefea0b833ae9ac51fc3b7b\"\n"
+        },
+        {
+          "offset": 368326,
+          "before": "        \"path\": \"compatibility/f10/authored-use-reviews/current-render-registration-boundary.json\",\n        \"sha256\": \"a9949ef6a5ec8bb7cf2456dd35726c2c12bf4de54e6e33d2d936fa5c0fab9906\"\n",
+          "after": "        \"path\": \"compatibility/f10/authored-use-reviews/form-field-render-helper-current-v1.json\",\n        \"sha256\": \"62649e1fbc0e48075e899946994373717b72b7b52aefea0b833ae9ac51fc3b7b\"\n"
+        },
+        {
+          "offset": 717130,
+          "before": "",
+          "after": "    },\n    {\n      \"ledger_sha256\": \"9b625006744787437a812822650612387c22fe2b4dbb9c808275bf3faa2b926f\",\n      \"source_population_sha256\": \"c03bd0653fa8a66869e17a702fb6da9a10989a1aee2ef8d163be3f579e0d6e7e\",\n      \"symbol_use_count\": 332,\n      \"reason\": \"Preserve all existing rows and prior source decisions. Reconcile the actual scanner source epoch and explicitly retain the qualified removed form-field AfterViewChecked role; separately review five exact current helper uses. No runtime, DI, full audit or G11 admission.\"\n"
+        },
+        {
+          "offset": 717141,
+          "before": "  \"live_symbol_use_count\": 330,\n",
+          "after": "  \"live_symbol_use_count\": 333,\n"
+        },
+        {
+          "offset": 717888,
+          "before": "",
+          "after": "    },\n    {\n      \"file\": \"legacy-form-field/form-field.ts\",\n      \"module\": \"@angular/core\",\n      \"symbol\": \"AfterViewChecked\",\n      \"qualification\": {\n        \"path\": \"compatibility/f10/authored-use-reviews/form-field-render-subclass-current-v2.json\",\n        \"sha256\": \"92516f5b8162ec646914eba916c3a33e001a4541b90ae6d7ad90c2317d448a63\"\n      }\n"
+        }
+      ]
+    }
+  ],
+  "support": [
+    {
+      "path": "scripts/form-field-retired-use.mjs",
+      "sha256": "0ecd8632e541baeec296d649505e816e2910db85b2ebf1b6740260df4210f916",
+      "bytes": 5627
+    },
+    {
+      "path": "scripts/current-menu-retirement-receipt.mjs",
+      "sha256": "6064708d31865951c7b101ba70f94f4f03484cf85edb4708864becce429e1913",
+      "bytes": 4758
+    },
+    {
+      "path": "compatibility/f10/authored-use-reviews/form-field-render-helper-current-v1.json",
+      "sha256": "62649e1fbc0e48075e899946994373717b72b7b52aefea0b833ae9ac51fc3b7b",
+      "bytes": 15506
+    },
+    {
+      "path": "compatibility/rc/parent-main-current-authored-epoch-v2.json",
+      "sha256": "5cf26d357af275727201eabf8de7b6e43a9ab66f263eb31a95bcf51d5678a8af",
+      "bytes": 6557
+    }
+  ]
+}

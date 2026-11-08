@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "role": "current-tool-ledger-source-epoch-21-successor",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "before": {
+    "path": "scripts/inventory-reference-live-source-epoch.mjs",
+    "sha256": "3836c4358edc6c5a15d0578f5df06b19beed563fbd4b094d694cfa9e5cc1175e",
+    "bytes": 18156
+  },
+  "after": {
+    "path": "scripts/inventory-reference-live-source-epoch.mjs",
+    "sha256": "bbb222bf919e88e294f70d4d1b94caa1934a8a0e36303fd6a42d08e0197bc6bc",
+    "bytes": 24685
+  },
+  "archive": {
+    "path": "compatibility/rc/current-tool-ledger-epoch-predecessor-v1.txt",
+    "sha256": "3836c4358edc6c5a15d0578f5df06b19beed563fbd4b094d694cfa9e5cc1175e",
+    "bytes": 18156
+  },
+  "edits": [
+    {
+      "offset": 1455,
+      "before": "",
+      "after": "TOOLTIP_"
+    },
+    {
+      "offset": 1525,
+      "before": "",
+      "after": "';\nconst DIALOG_LIVE='fcb3e8c2493d1379a998ab58d7f31c7f214a73a3aafacb1df15d323a7b085024';\nconst LIVE='955335c70ea8eff6cc1abf3d6397daf66a20684762a28db79a815d56f4c03647';\nconst EXCLUSION_RECEIPT='compatibility/rc/parent-main-95f2-source-exclusion-v2.json',EXCLUSION_RECEIPT_SHA='415d6847ad6abfe742c8be55519a39b2258c3bdc013a93b6f96d640801f83d03';\nconst EXCLUSION_PRIOR='compatibility/f10/disposition-ledger/evidence/95f2de4adae1811836c461e8bf4ffdcec2e81677-original-row.raw.json',EXCLUSION_PRIOR_SHA='e88515524354d71ee937939828d5ec555831f4bf3a8c5a040ea0ba44aa30d18e';\nconst DIALOG_RECEIPT='compatibility/rc/parent-main-dialog-hot-stream-ledger-v1.json',DIALOG_RECEIPT_SHA='76affccc7d3d52953f6ec8e2942e35611739ef5e7bb5ecd16b7c1b6074f64afd"
+    },
+    {
+      "offset": 10305,
+      "before": "",
+      "after": "TOOLTIP_"
+    },
+    {
+      "offset": 13613,
+      "before": "",
+      "after": "TOOLTIP_"
+    },
+    {
+      "offset": 14084,
+      "before": "",
+      "after": "_source_only:true};\n}\n\nfunction validateDialogSuccessor(root,prior,live,receiptBytes){\n const commit='64f87978200b2f9e75da7dd6eafc2c81e0f2ff49',parent='a7cfa6dcd9eb77507057555238ee737cd04c1642',id='3362836779d5b87400bcdce513f0c3d016294014';\n assert.equal(git(root,['rev-parse',commit+'^']).toString().trim(),parent);\n git(root,['merge-base','--is-ancestor','e28364f10bc9c1f9219c9a18f0dbf9cffb267f57',parent]);\n git(root,['merge-base','--is-ancestor',commit,'HEAD']);\n const before=git(root,['show',parent+':'+LEDGER]),after=git(root,['show',commit+':'+LEDGER]);\n assert.equal(hash(before),TOOLTIP_LIVE);assert.equal(hash(after),DIALOG_LIVE);assert.ok(before.equals(prior));assert.ok(after.equals(live));\n assert.ok(git(root,['show',commit+':'+DIALOG_RECEIPT]).equals(receiptBytes));assert.equal(hash(receiptBytes),DIALOG_RECEIPT_SHA);\n const a=decode(before),b=decode(after),changed=[],rawOnly=[];\n assert.deepEqual([...a.entries.keys()],[...b.entries.keys()]);\n const meta=x=>Object.fromEntries(Object.entries(x).filter(([key])=>key!=='entries'));assert.deepEqual(meta(a.data),meta(b.data));\n for(const [sha,row] of a.entries){if(!isDeepStrictEqual(row,b.entries.get(sha)))changed.push(sha);else if(a.rawEntries.get(sha)!==b.rawEntries.get(sha))rawOnly.push(sha);}\n assert.deepEqual(changed,[id]);assert.deepEqual(rawOnly,[]);assertSingleRawReplacement(before,after,a,b,id);\n const old=a.entries.get(id),current=b.entries.get(id),receipt=JSON.parse(receiptBytes);\n assert.deepEqual(current.prior_dispositions,[old]);assert.equal(current.final_disposition,'do-not-adopt');assert.equal(current.g11_claim,'not-passed');\n for(const key of ['sha','bucket','subject','files','diff_sha256'])assert.deepEqual(current[key],old[key]);\n assert.equal(receipt.upstream_sha,id);assert.equal(receipt.base_head,parent);assert.equal(receipt.ledger_before_sha256,TOOLTIP_LIVE);assert.equal(receipt.ledger_after_sha256,DIALOG_LIVE);assert.equal(receipt.row_preservation.other_rows,1696);assert.equal(receipt.row_preservation.top_metadata,'unchanged');assert.equal(receipt.row_preservation.prior_row,'retained verbatim in prior_dispositions');\n return {transitions:20,changed_entry_identities:154,tooltip_source_only:true,dialog_source_only:true};\n}\n\nfunction validateExclusionSuccessor(root,prior,live,receiptBytes,priorBytes){\n const commit='252689f364aee65c5d755d4b16e91987f6e305a5',parent='862f511840c7bbeb81236ac6d74ba1a8a2d5f7a7',id='95f2de4adae1811836c461e8bf4ffdcec2e81677';\n assert.equal(git(root,['rev-parse',commit+'^']).toString().trim(),parent);git(root,['merge-base','--is-ancestor','64f87978200b2f9e75da7dd6eafc2c81e0f2ff49',parent]);git(root,['merge-base','--is-ancestor',commit,'HEAD']);\n const before=git(root,['show',parent+':'+LEDGER]),after=git(root,['show',commit+':'+LEDGER]);assert.equal(hash(before),DIALOG_LIVE);assert.equal(hash(after),LIVE);assert.ok(before.equals(prior));assert.ok(after.equals(live));\n for(const [path,raw,digest] of [[EXCLUSION_RECEIPT,receiptBytes,EXCLUSION_RECEIPT_SHA],[EXCLUSION_PRIOR,priorBytes,EXCLUSION_PRIOR_SHA]]){assert.equal(hash(raw),digest);assert.ok(git(root,['show',commit+':'+path]).equals(raw));}\n const a=decode(before),b=decode(after),changed=[],rawOnly=[];assert.deepEqual([...a.entries.keys()],[...b.entries.keys()]);const meta=x=>Object.fromEntries(Object.entries(x).filter(([key])=>key!=='entries'));assert.deepEqual(meta(a.data),meta(b.data));\n for(const [sha,row] of a.entries){if(!isDeepStrictEqual(row,b.entries.get(sha)))changed.push(sha);else if(a.rawEntries.get(sha)!==b.rawEntries.get(sha))rawOnly.push(sha);}\n assert.deepEqual(changed,[id]);assert.deepEqual(rawOnly,[]);assertSingleRawReplacement(before,after,a,b,id);\n const old=a.entries.get(id),current=b.entries.get(id),receipt=JSON.parse(receiptBytes);assert.deepEqual(JSON.parse(priorBytes),old);assert.ok(Buffer.from(a.rawEntries.get(id)).equals(Buffer.concat([Buffer.from('    '),priorBytes,Buffer.from(',\\n')])),'saved prior raw row differs');assert.equal(old.diff_sha256,'74080603cf762248d604251a77cd2c8e037ce4aa9a27b1ec8206e90cc601d84e');assert.equal(current.diff_sha256,old.diff_sha256);assert.equal(current.final_disposition,'not-applicable');assert.equal(current.g11_claim,'not-passed');for(const key of ['sha','bucket','subject','files'])assert.deepEqual(current[key],old[key]);\n assert.equal(receipt.sha,id);assert.equal(receipt.base_head,parent);assert.equal(receipt.ledger_before_sha256,DIALOG_LIVE);assert.equal(receipt.ledger_after_sha256,LIVE);assert.equal(receipt.preserved.other_raw_rows,1696);assert.equal(receipt.preserved.top_metadata,'unchanged');assert.equal(receipt.preserved.historical_diff_sha256,old.diff_sha256);assert.equal(receipt.preserved.prior_row_path,EXCLUSION_PRIOR);\n return {transitions:21,changed_entry_identities:155,tooltip_source_only:true,dialog_source_only:true,exclusion"
+    },
+    {
+      "offset": 14854,
+      "before": "",
+      "after": "DIALOG_RECEIPT,EXCLUSION_RECEIPT,EXCLUSION_PRIOR,"
+    },
+    {
+      "offset": 15498,
+      "before": "",
+      "after": ",DIALOG_RECEIPT,EXCLUSION_RECEIPT,EXCLUSION_PRIOR"
+    },
+    {
+      "offset": 16225,
+      "before": "",
+      "after": "DIALOG_RECEIPT,sha256:DIALOG_RECEIPT_SHA,bytes:physical(DIALOG_RECEIPT).length},\n  {path:EXCLUSION_RECEIPT,sha256:EXCLUSION_RECEIPT_SHA,bytes:physical(EXCLUSION_RECEIPT).length},{path:EXCLUSION_PRIOR,sha256:EXCLUSION_PRIOR_SHA,bytes:physical(EXCLUSION_PRIOR).length},\n  {path:"
+    },
+    {
+      "offset": 16557,
+      "before": "",
+      "after": "onst checkInputs=()=>{c"
+    },
+    {
+      "offset": 16569,
+      "before": "",
+      "after": "();for(const ref of fixed){checkPhysical();const raw=read(ref.path);checkPhysical();assert.ok(Buffer.isBuffer(raw));match(raw,ref);}checkPhysical();};\n checkInputs"
+    },
+    {
+      "offset": 17301,
+      "before": "Phy",
+      "after": "Input"
+    },
+    {
+      "offset": 17305,
+      "before": "ical",
+      "after": ""
+    },
+    {
+      "offset": 17386,
+      "before": "",
+      "after": "ooltipImag"
+    },
+    {
+      "offset": 17387,
+      "before": "",
+      "after": "=git("
+    },
+    {
+      "offset": 17388,
+      "before": "min",
+      "after": "oot,['show','e28364f10bc9c1f9219c9"
+    },
+    {
+      "offset": 17392,
+      "before": "l=",
+      "after": "18f0dbf9cffb267f57:'+LEDGER]);"
+    },
+    {
+      "offset": 17441,
+      "before": "ini",
+      "after": "tool"
+    },
+    {
+      "offset": 17446,
+      "before": "",
+      "after": "pIm"
+    },
+    {
+      "offset": 17447,
+      "before": "lLed",
+      "after": ""
+    },
+    {
+      "offset": 17453,
+      "before": "r",
+      "after": ""
+    },
+    {
+      "offset": 17499,
+      "before": "",
+      "after": "onst dialogImage=git(root,['s"
+    },
+    {
+      "offset": 17500,
+      "before": "",
+      "after": "ow','64f87978200b2f9"
+    },
+    {
+      "offset": 17501,
+      "before": "",
+      "after": "75da7dd6eaf"
+    },
+    {
+      "offset": 17502,
+      "before": "kP",
+      "after": "2c81e0f2ff49:'+LEDGER]);validateDialogSuccessor(root,tooltipImage,dialogImage,p"
+    },
+    {
+      "offset": 17511,
+      "before": "",
+      "after": "(DIALOG_RECEIPT));const terminal=validateExclusionSuccessor(root,dialogImage,initialLedger,physical(EXCLUSION_RECEIPT),physical(EXCLUSION_PRIOR));checkInputs"
+    },
+    {
+      "offset": 17534,
+      "before": "",
+      "after": "();checkPhysical"
+    }
+  ],
+  "ledger_before": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "4a59fbfc14cc0f11c1563f5b4de51adc8cd0a58bfca186069ffc25b03635f068",
+    "bytes": 5068290
+  },
+  "ledger_after": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "955335c70ea8eff6cc1abf3d6397daf66a20684762a28db79a815d56f4c03647",
+    "bytes": 5080309
+  },
+  "source_commit": "252689f364aee65c5d755d4b16e91987f6e305a5",
+  "source_parent": "862f511840c7bbeb81236ac6d74ba1a8a2d5f7a7",
+  "receipts": [
+    {
+      "path": "compatibility/rc/parent-main-dialog-hot-stream-ledger-v1.json",
+      "sha256": "76affccc7d3d52953f6ec8e2942e35611739ef5e7bb5ecd16b7c1b6074f64afd",
+      "bytes": 10653
+    },
+    {
+      "path": "compatibility/rc/parent-main-95f2-source-exclusion-v2.json",
+      "sha256": "415d6847ad6abfe742c8be55519a39b2258c3bdc013a93b6f96d640801f83d03",
+      "bytes": 4509
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/95f2de4adae1811836c461e8bf4ffdcec2e81677-original-row.raw.json",
+      "sha256": "e88515524354d71ee937939828d5ec555831f4bf3a8c5a040ea0ba44aa30d18e",
+      "bytes": 1430
+    }
+  ]
+}

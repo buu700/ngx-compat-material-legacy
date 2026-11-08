@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "role": "current-tool-historical-repair-live-source-successor",
+  "source_parent": "1c8111243f93811083c8490d9fdf260a80a29a86",
+  "source_commit": "a5aa2d7f08ec6e01f3d24fe0a0a23c9187c851d4",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "before": {
+    "path": "scripts/historical-contract-repair-source.mjs",
+    "sha256": "00beaadf9fb7dac4ce3981c60d04cadc84b7d23607ffcbc47c4b3d764b9f20cd",
+    "bytes": 31620
+  },
+  "after": {
+    "path": "scripts/historical-contract-repair-source.mjs",
+    "sha256": "06151314440af79f2ae72d0704d399458224ed95db1f3e5eb3dc5411ec1b2c44",
+    "bytes": 33011
+  },
+  "edits": [
+    {
+      "offset": 527,
+      "before": "",
+      "after": "import {createRequire} from 'node:module';\n"
+    },
+    {
+      "offset": 1510,
+      "before": "",
+      "after": "const requireLocal=createRequire(import.meta.url);\n"
+    },
+    {
+      "offset": 12289,
+      "before": "",
+      "after": "/** Select the already reviewed source owner for this physical package line. */\nexport function historicalRepairSelectSourceOwner({root=process.cwd(),read,line}={}){\n root=resolve(root);assert.ok(line==='21.x'||line==='main');const physical=path=>readEvidenceMember(root,path);if(read===undefined)read=physical;assert.equal(typeof read,'function');let select;\n if(line==='main'){\n  // The reviewed V7 owner composes the retained V1–V6 source identities and\n  // exact current select/menu source epoch. The old owner remains 21.x-only.\n  const source={path:'scripts/select-dialog-finite-source-v7.mjs',sha256:'87155482dbaa488a0e72ae0ba75c3edfe370bc11fcfc2ddd1ce3f0190a5609a6',bytes:17719};\n  const raw=physical(source.path);exact(raw,source);const module=requireLocal('./select-dialog-finite-source-v7.mjs');\n  assert.ok(Object.isFrozen(module.selectDialogFiniteLoadedImage));assert.deepEqual(module.selectDialogFiniteLoadedImage,source);\n  assert.equal(hash(functionToString.call(module.selectDialogFiniteSuccessor)),'e6ab419874774e5d1878257c001d4bc24ea298d28072de22134ad0831895eef1','unauthenticated current select source successor');\n  select=module.selectDialogFiniteSuccessor({root,read:read,line:line});\n }else select=selectDialogFiniteSuccessor({root,read,line});\n return select;\n}\n\n"
+    },
+    {
+      "offset": 17887,
+      "before": " const select=selectDialogFiniteSuccessor({root,read:providedRead??physical,line:physicalLine});\n",
+      "after": " const select=historicalRepairSelectSourceOwner({root,read:providedRead??physical,line:physicalLine});\n"
+    }
+  ]
+}

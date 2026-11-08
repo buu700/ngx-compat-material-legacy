@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "role": "current-tool-live-checker-source-successor",
+  "base_head": "a798ff9c58cdd539f115eda00b7cdd898d035353",
+  "before": {
+    "path": "scripts/check-upstream-audit-disposition.mjs",
+    "sha256": "45fb5bb25d8c068c4ef180d74193d0b99f53eb2f34739c47d6aef70716a1ced9",
+    "bytes": 48391
+  },
+  "after": {
+    "path": "scripts/check-upstream-audit-disposition.mjs",
+    "sha256": "179e3bae4e253ab354b33e5759802e8f88aa3bd038a6009e10412710fb29885b",
+    "bytes": 49657
+  },
+  "helper": {
+    "path": "scripts/inventory-reference-live-source-epoch.mjs",
+    "sha256": "3836c4358edc6c5a15d0578f5df06b19beed563fbd4b094d694cfa9e5cc1175e",
+    "bytes": 18156
+  },
+  "edits": [
+    {
+      "offset": 27307,
+      "before": "",
+      "after": "// Main coordinator admission authenticates the exact live ledger as source\n// evidence. This does not approve any individual row or security decision.\nlet sourceEpoch;\nlet ledgerBytes;\nif (request && request.line === 'main') {\n  if (resolve(ledgerPath) !== join(root, 'compatibility/f10/disposition-ledger/ledger.json'))\n    fail(2, 'upstream-audit-disposition: coordinated main requires the live ledger');\n  try {\n    const {prepareInventoryReferenceLiveSourceEpoch} = await import('./inventory-reference-live-source-epoch.mjs');\n    sourceEpoch = prepareInventoryReferenceLiveSourceEpoch({root, additionalPaths: ['scripts/check-upstream-audit-disposition.mjs']});\n    ledgerBytes = readFileSync(ledgerPath);\n    if (!ledgerBytes.equals(sourceEpoch.liveLedger)) throw new Error('authenticated live ledger changed');\n  } catch (error) {\n    fail(2, `upstream-audit-disposition: source epoch rejected: ${error.message}`);\n  }\n} else {\n  ledgerBytes = readFileSync(ledgerPath);\n}\n"
+    },
+    {
+      "offset": 27364,
+      "before": "const ledger = JSON.parse(readFileSync(ledgerPath, 'utf8'));\n",
+      "after": "const ledger = JSON.parse(ledgerBytes.toString('utf8'));\n"
+    },
+    {
+      "offset": 46842,
+      "before": "",
+      "after": "if (sourceEpoch) {\n  try {\n    sourceEpoch.assertCurrent();\n    if (!readFileSync(ledgerPath).equals(ledgerBytes)) throw new Error('live ledger changed during semantic validation');\n  } catch (error) {\n    fail(2, `upstream-audit-disposition: source epoch changed: ${error.message}`);\n  }\n}\n"
+    }
+  ],
+  "source_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed"
+}

@@ -76,7 +76,7 @@ class CaptureV5Tests(unittest.TestCase):
             self.assertEqual(js['epoch'], source.epoch)
             self.assertEqual(js['transitions'], source.transitions)
             self.assertEqual(next(r for r in source.bound if r['path'] == MATRIX_OWNER['path']), MATRIX_OWNER)
-            self.assertEqual(next(r for r in js['bound'] if r['path'] == 'scripts/current-tool-matrix-source.mjs'), dict(path='scripts/current-tool-matrix-source.mjs', sha256='62cca2d43de7d8c2497b95b703a7ae8ff38f3045848c25f718d7af8d0f65ca27', bytes=21212))
+            self.assertEqual(next(r for r in js['bound'] if r['path'] == 'scripts/current-tool-matrix-source.mjs'), dict(path='scripts/current-tool-matrix-source.mjs', sha256='42d5d1251e8cacf69f0d1519bd6ba9a356c9c9eaac0bf5c5af1eb8aba5b20f1c', bytes=24939))
             js_bound = {r['path']: r for r in js['bound'] if r['path'] not in ('scripts/current-sass-tool-references.mjs', 'scripts/current-tool-matrix-source.mjs')}
             py_bound = {r['path']: r for r in source.bound if r['path'] not in ('scripts/current_sass_tool_references.py', 'scripts/current_tool_matrix_source.py')}
             self.assertEqual(js_bound, py_bound)

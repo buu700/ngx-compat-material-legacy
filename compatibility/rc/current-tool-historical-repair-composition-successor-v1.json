@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "role": "current-tool-historical-repair-composition-successor",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "before": {
+    "path": "scripts/historical-contract-repair-source.mjs",
+    "sha256": "06151314440af79f2ae72d0704d399458224ed95db1f3e5eb3dc5411ec1b2c44",
+    "bytes": 33011
+  },
+  "intermediate": {
+    "path": "scripts/historical-contract-repair-source.mjs",
+    "sha256": "bc58e869db60240b973094b985f64ee0feda29ff0935b7fab9d5f3ae7134bce7",
+    "bytes": 36206
+  },
+  "after": {
+    "path": "scripts/historical-contract-repair-source.mjs",
+    "sha256": "b63c419933c0015c8ac7b9fb6238ad3c14a43a384af29a4f346954ac75900855",
+    "bytes": 37024
+  },
+  "archive": {
+    "path": "compatibility/rc/current-tool-repair-predecessor-v1.txt",
+    "sha256": "06151314440af79f2ae72d0704d399458224ed95db1f3e5eb3dc5411ec1b2c44",
+    "bytes": 33011
+  },
+  "focus_patch": {
+    "path": "compatibility/rc/current-tool-focus-owner-review-v2.patch",
+    "sha256": "cb287796debf160898772f625c1d194dd8424511b52b6f425e3c45107bdc613d",
+    "bytes": 10881
+  },
+  "independent_review": {
+    "path": "compatibility/rc/current-tool-focus-owner-independent-v2.md",
+    "sha256": "9a5e05126f0f47829d25cd5b389c36ef67419fa20df49caf2ff47c2441729862",
+    "bytes": 1747
+  },
+  "focus_edits": [
+    {
+      "offset": 13675,
+      "before": "",
+      "after": "/** Select the reviewed dialog-focus source owner for this package line. */\nexport function historicalRepairFocusSourceOwner({root=process.cwd(),read,line}={}){\n root=resolve(root);assert.ok(line==='21.x'||line==='main');\n const physical=path=>readHistoricalContractRepairMember(root,path);\n if(read===undefined)read=physical;\n assert.equal(typeof read,'function');\n // Authenticate the finite declaration roster before any supplied callback.\n const rosterPath='compatibility/rc/parent-dialog-focus-authored-use-successor-v5.json';\n const rosterRaw=physical(rosterPath),rosterHash={'21.x':'9c967f9246bf68cc5e599e6a4fc12c3d8cce40018fe426f1d8db53127f01d956',main:'d244b2cacae1ac2c90898ab76f2f399eb734d2b49c07759ff14424df0cf2d3d4'};\n assert.equal(hash(rosterRaw),rosterHash[line]);\n const declarations=JSON.parse(rosterRaw).branches[line].core_declarations;\n const prefix='node_modules/@angular/core/types/';\n assert.deepEqual(declarations.map(r=>r.path).sort(),[prefix+'_chrome_dev_tools_performance-chunk.d.ts',prefix+(line==='main'?'_debug_node-chunk.d.ts':'_discovery-chunk.d.ts'),prefix+'core.d.ts'].sort());\n const packagePaths=['projects/ngx-material-legacy/package.json','node_modules/@angular/core/package.json'];\n const packages=packagePaths.map(path=>{const bytes=physical(path);return {path,sha256:hash(bytes),bytes:bytes.length};});\n const sweep=()=>{assert.equal(hash(physical(rosterPath)),rosterHash[line]);for(const ref of [...declarations,...packages])exact(physical(ref.path),ref);};\n const guardedRead=path=>{sweep();const value=read(path);sweep();return value;};\n sweep();\n let selected;\n if(line==='21.x')selected=dialogFocusFiniteSourceSuccessor({root,read:guardedRead,line});\n else {\n  const source={path:'scripts/dialog-focus-finite-source-v6.mjs',sha256:'c40a155191130898771839bf761183f850d3582fa2298fe2d9b197567c672f56',bytes:13030};\n  const raw=physical(source.path);exact(raw,source);\n  const module=requireLocal('./dialog-focus-finite-source-v6.mjs');\n  assert.ok(Object.isFrozen(module.dialogFocusFiniteLoadedImage));\n  assert.deepEqual(module.dialogFocusFiniteLoadedImage,source);\n  assert.equal(hash(functionToString.call(module.dialogFocusFiniteSourceSuccessor)),'d1f0240417a224d4a35ac711fbabdfa578e497916119b42ee5b7c9ea02d5da42','unauthenticated current dialog focus source successor');\n  selected=module.dialogFocusFiniteSourceSuccessor({root,read:guardedRead,line});\n }\n sweep();\n const bound=new Map(selected.bound.map(ref=>[ref.path,ref]));\n for(const ref of packages){const prior=bound.get(ref.path);if(prior)assert.deepEqual(prior,ref);else bound.set(ref.path,ref);}\n let active=false,violated=false;\n const wrap=fn=>(...args)=>{\n  if(active){violated=true;assert.fail('reentrant historical focus source consumption');}\n  active=true;violated=false;\n  try{sweep();const result=fn(...args);sweep();assert.equal(violated,false,'swallowed historical focus source reentry');return result;}finally{active=false;}\n };\n return {...selected,bound:[...bound.values()].map(ref=>({...ref})),qualify:wrap(selected.qualify),historicalReference:wrap(selected.historicalReference),assertCurrent:wrap(selected.assertCurrent),assertPhysical:wrap(selected.assertPhysical)};\n}\n"
+    },
+    {
+      "offset": 19375,
+      "before": " const focus=dialogFocusFiniteSourceSuccessor({root,read:providedRead??physical,line:physicalLine});\n",
+      "after": " const focus=historicalRepairFocusSourceOwner({root,read:providedRead??physical,line:physicalLine});\n"
+    }
+  ],
+  "composition_edits": [
+    {
+      "offset": 674,
+      "before": "",
+      "after": "import {historicalRepairLiveSourceSuccessor} from './historical-repair-live-source-successor.mjs';\n"
+    },
+    {
+      "offset": 7516,
+      "before": "export function historicalRepairTableSourceProof({root=process.cwd()}={}){\n",
+      "after": "export function historicalRepairTableSourceProof({root=process.cwd(),live=historicalRepairLiveSourceSuccessor({root})}={}){\n"
+    },
+    {
+      "offset": 9459,
+      "before": "  const actual=read(path);exact(actual,packet.after);assert.ok(equal(actual,after),'changed current table signature source');\n",
+      "after": "  assert.deepEqual(packet.after,live.signatureBefore);const actual=read(path);exact(actual,live.signatureAfter);live.assertPhysical();\n"
+    },
+    {
+      "offset": 11102,
+      "before": "   const sha256=descriptors.sha256.value,hasBytes=Object.hasOwn(descriptors,'bytes'),bytes=descriptors.bytes?.value;assert.match(sha256,/^[0-9a-f]{64}$/);if(hasBytes)assert.ok(Number.isSafeInteger(bytes)&&bytes>=0);const prior=sha256===packet.before.sha256?packet.before:sha256===packet.after.sha256?packet.after:null;assert.ok(prior,'unknown historical-repair table source identity');if(bytes!==undefined)assert.equal(bytes,prior.bytes);\n   const fresh=read(path);exact(fresh,packet.after);assert.ok(equal(fresh,after),'late current table signature source');return {path,sha256:packet.after.sha256,...(bytes===undefined?{}:{bytes:packet.after.bytes})};\n",
+      "after": "   const sha256=descriptors.sha256.value,hasBytes=Object.hasOwn(descriptors,'bytes'),bytes=descriptors.bytes?.value;assert.match(sha256,/^[0-9a-f]{64}$/);if(hasBytes)assert.ok(Number.isSafeInteger(bytes)&&bytes>=0);const prior=sha256===packet.before.sha256?packet.before:sha256===packet.after.sha256?packet.after:sha256===live.signatureAfter.sha256?live.signatureAfter:null;assert.ok(prior,'unknown historical-repair table source identity');if(bytes!==undefined)assert.equal(bytes,prior.bytes);\n   const fresh=read(path);exact(fresh,live.signatureAfter);live.assertPhysical();return {path,sha256:live.signatureAfter.sha256,...(bytes===undefined?{}:{bytes:live.signatureAfter.bytes})};\n"
+    },
+    {
+      "offset": 11761,
+      "before": "  const assertImage=(prior,current)=>{assert.ok(Buffer.isBuffer(prior)&&Buffer.isBuffer(current));exact(prior,packet.before);assert.ok(equal(prior,before),'changed historical table signature comparison');const selected=qualify(packet.before);assert.equal(selected.sha256,packet.after.sha256);assert.equal(selected.bytes,packet.after.bytes);exact(current,packet.after);assert.ok(equal(current,after),'changed current historical-repair table image');};\n  return Object.freeze({before:Object.freeze({...packet.before}),after:Object.freeze({...packet.after}),review:Object.freeze({...packet.review}),qualify,assertImage});\n",
+      "after": "  const assertImage=(prior,current)=>{assert.ok(Buffer.isBuffer(prior)&&Buffer.isBuffer(current));exact(prior,packet.before);assert.ok(equal(prior,before),'changed historical table signature comparison');const selected=qualify(packet.before);assert.equal(selected.sha256,live.signatureAfter.sha256);assert.equal(selected.bytes,live.signatureAfter.bytes);exact(current,live.signatureAfter);live.assertPhysical();};\n  return Object.freeze({before:Object.freeze({...packet.before}),after:Object.freeze({...live.signatureAfter}),review:Object.freeze({...packet.review}),qualify,assertImage});\n"
+    },
+    {
+      "offset": 21922,
+      "before": "export function historicalContractRepairSourceSubject({root=process.cwd(),read:providedRead}={}){\n",
+      "after": "export function historicalContractRepairSourceSubject({root=process.cwd(),read:providedReadRaw}={}){\n"
+    },
+    {
+      "offset": 22144,
+      "before": "",
+      "after": " const initialVersion=JSON.parse(physical('projects/ngx-material-legacy/package.json')).version;const live=initialVersion.startsWith('22.')?historicalRepairLiveSourceSuccessor({root}):null;\n const providedRead=providedReadRaw===undefined?undefined:path=>{live?.assertPhysical();const value=providedReadRaw(path);live?.assertPhysical();return value;};if(providedReadRaw!==undefined)assert.equal(typeof providedReadRaw,'function');\n if(live)for(const ref of live.bound)bound.set(ref.path,ref);\n"
+    },
+    {
+      "offset": 22995,
+      "before": " const currentSuccessor=ref=>focus.qualify(ref)??select.qualify(ref)??tableCurrent(ref);\n",
+      "after": " const currentSuccessor=ref=>focus.qualify(ref)??select.qualify(ref)??tableCurrent(ref)??live?.qualify(ref)??null;\n"
+    },
+    {
+      "offset": 24548,
+      "before": " if(line==='main'){tableTransition=historicalRepairTableSourceProof({root});exact(read(TABLE_PACKET.path),TABLE_PACKET);exact(read(tableTransition.review.path),tableTransition.review);exact(read(tableTransition.after.path),tableTransition.after);}\n const member=ref=>{const prior=currentProducerReference(root,line,ref),tab=tabs.qualify(prior)??prior,selected=select.qualify(tab)??tab,focused=focus.qualify(selected)??selected,expected=tableCurrent(focused)??focused;const bytes=read(ref.path);assert.equal(hash(bytes),expected.sha256,'changed historical-repair evidence '+ref.path);if(expected.bytes!==undefined)assert.equal(bytes.length,expected.bytes);return bytes;};\n",
+      "after": " if(line==='main'){tableTransition=historicalRepairTableSourceProof({root,live});exact(read(TABLE_PACKET.path),TABLE_PACKET);exact(read(tableTransition.review.path),tableTransition.review);exact(read(tableTransition.after.path),tableTransition.after);}\n const member=ref=>{const prior=currentProducerReference(root,line,ref),tab=tabs.qualify(prior)??prior,selected=select.qualify(tab)??tab,focused=focus.qualify(selected)??selected,expected=tableCurrent(focused)??live?.qualify(focused)??focused;const bytes=read(ref.path);assert.equal(hash(bytes),expected.sha256,'changed historical-repair evidence '+ref.path);if(expected.bytes!==undefined)assert.equal(bytes.length,expected.bytes);return bytes;};\n"
+    },
+    {
+      "offset": 28170,
+      "before": "  else{const successor=select.qualify({path:row.path,...row.after});if(successor){assert.equal(hash(current),successor.sha256);assert.equal(current.length,successor.bytes);}else assert.equal(current.toString(),expected,'current historical repair exceeds its exact reviewed delta');}\n",
+      "after": "  else{const successor=select.qualify({path:row.path,...row.after})??live?.qualify({path:row.path,...row.after});if(successor){assert.equal(hash(current),successor.sha256);assert.equal(current.length,successor.bytes);}else assert.equal(current.toString(),expected,'current historical repair exceeds its exact reviewed delta');}\n"
+    },
+    {
+      "offset": 31538,
+      "before": "  const base={path:ref.path,...row.after},successor=focus.qualify(base)??select.qualify(base)??tableCurrent(base);const current=successor??row.after;\n",
+      "after": "  const base={path:ref.path,...row.after},successor=focus.qualify(base)??select.qualify(base)??tableCurrent(base)??live?.qualify(base);const current=successor??row.after;\n"
+    },
+    {
+      "offset": 32580,
+      "before": "  if(!images.has(ref.path)&&!select.qualify(ref)&&!focus.qualify(ref))return null;\n",
+      "after": "  if(!images.has(ref.path)&&!select.qualify(ref)&&!focus.qualify(ref)&&!live?.qualify(ref))return null;\n"
+    },
+    {
+      "offset": 34395,
+      "before": " const sweep=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);}tabs.assertPhysical();select.assertPhysical();focus.assertPhysical();};\n",
+      "after": " const sweep=()=>{for(const ref of bound.values()){const actual=physical(ref.path);assert.equal(hash(actual),ref.sha256,'late historical-repair subject input '+ref.path);assert.equal(actual.length,ref.bytes);}tabs.assertPhysical();select.assertPhysical();focus.assertPhysical();live?.assertPhysical();};\n"
+    }
+  ],
+  "supports": [
+    {
+      "path": "scripts/historical-repair-live-source-successor.mjs",
+      "sha256": "d08f0b0e30c2e42b671943fc267a90425b91710c3523190f26d9970e58162bbb",
+      "bytes": 11527
+    },
+    {
+      "path": "compatibility/rc/historical-repair-live-signature-v1.json",
+      "sha256": "d27970b1fd18bd836dc9dcb0e0382fbc7fde0f568ab3f1738049364925519efa",
+      "bytes": 8907
+    },
+    {
+      "path": "compatibility/rc/historical-repair-live-tab-v1.json",
+      "sha256": "0bc2de86807a4a84e2309e89bd8e9bac2111586fe2ddb8bc6780fa77c4c45a72",
+      "bytes": 3444
+    },
+    {
+      "path": "compatibility/rc/historical-repair-live-form-v1.json",
+      "sha256": "5a3b9139f2916d38c8bce7d3305c284abd501df137ddec7c2d469d78ce17c268",
+      "bytes": 4563
+    },
+    {
+      "path": "compatibility/rc/historical-repair-live-authored-v1.json",
+      "sha256": "e0b1e0c866e73f4f4c9913a9bfe6c464570fa3e59baa4de64b6bb8d2f0bd6dfe",
+      "bytes": 1350
+    },
+    {
+      "path": "compatibility/rc/historical-repair-live-support-v1.json",
+      "sha256": "56143085774346f181a39979548a161cf5a046df09a8ad293d4ef4d90349f70c",
+      "bytes": 10894
+    },
+    {
+      "path": "compatibility/rc/historical-repair-current-authored-epoch-v2.json",
+      "sha256": "e2eac35640d71702061190150125e0ec149d02c88ea520e23dba37813e568f31",
+      "bytes": 10342
+    },
+    {
+      "path": "scripts/authored-additional-use-baseline.mjs",
+      "sha256": "aebb00f26d2cdc77b0e0d23814fc59d5ce7ad5616f88992cc60c1da7996de325",
+      "bytes": 8149
+    },
+    {
+      "path": "compatibility/f10/authored-dependency-current-dispositions.json",
+      "sha256": "460262e16c118c495e37b56c5218f0c2eadfd7bad0a71cf62fddccba05b130f4",
+      "bytes": 718774
+    },
+    {
+      "path": "scripts/form-field-retired-use.mjs",
+      "sha256": "0ecd8632e541baeec296d649505e816e2910db85b2ebf1b6740260df4210f916",
+      "bytes": 5627
+    },
+    {
+      "path": "scripts/current-menu-retirement-receipt.mjs",
+      "sha256": "6064708d31865951c7b101ba70f94f4f03484cf85edb4708864becce429e1913",
+      "bytes": 4758
+    },
+    {
+      "path": "compatibility/f10/authored-use-reviews/form-field-render-helper-current-v1.json",
+      "sha256": "62649e1fbc0e48075e899946994373717b72b7b52aefea0b833ae9ac51fc3b7b",
+      "bytes": 15506
+    },
+    {
+      "path": "compatibility/rc/parent-main-current-authored-epoch-v2.json",
+      "sha256": "5cf26d357af275727201eabf8de7b6e43a9ab66f263eb31a95bcf51d5678a8af",
+      "bytes": 6557
+    }
+  ]
+}

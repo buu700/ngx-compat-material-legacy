@@ -437,8 +437,26 @@ if (request && request.error) fail(2, `upstream-audit-disposition: refusing acce
 if (!existsSync(seedPath)) fail(2, `Missing seed: ${seedPath}`);
 if (!existsSync(ledgerPath)) fail(1, `Missing disposition ledger: ${ledgerPath}`);
 
+// Main coordinator admission authenticates the exact live ledger as source
+// evidence. This does not approve any individual row or security decision.
+let sourceEpoch;
+let ledgerBytes;
+if (request && request.line === 'main') {
+  if (resolve(ledgerPath) !== join(root, 'compatibility/f10/disposition-ledger/ledger.json'))
+    fail(2, 'upstream-audit-disposition: coordinated main requires the live ledger');
+  try {
+    const {prepareInventoryReferenceLiveSourceEpoch} = await import('./inventory-reference-live-source-epoch.mjs');
+    sourceEpoch = prepareInventoryReferenceLiveSourceEpoch({root, additionalPaths: ['scripts/check-upstream-audit-disposition.mjs']});
+    ledgerBytes = readFileSync(ledgerPath);
+    if (!ledgerBytes.equals(sourceEpoch.liveLedger)) throw new Error('authenticated live ledger changed');
+  } catch (error) {
+    fail(2, `upstream-audit-disposition: source epoch rejected: ${error.message}`);
+  }
+} else {
+  ledgerBytes = readFileSync(ledgerPath);
+}
 const seed = JSON.parse(readFileSync(seedPath, 'utf8'));
-const ledger = JSON.parse(readFileSync(ledgerPath, 'utf8'));
+const ledger = JSON.parse(ledgerBytes.toString('utf8'));
 const seedShas = new Set(seed.commits.map(commit => commit.sha));
 const ledgerBySha = new Map();
 const conflicts = [];
@@ -765,6 +783,14 @@ function writeAcceptance(request) {
   return failed.length === 0;
 }
 
+if (sourceEpoch) {
+  try {
+    sourceEpoch.assertCurrent();
+    if (!readFileSync(ledgerPath).equals(ledgerBytes)) throw new Error('live ledger changed during semantic validation');
+  } catch (error) {
+    fail(2, `upstream-audit-disposition: source epoch changed: ${error.message}`);
+  }
+}
 mkdirSync(dirname(reportPath), {recursive: true});
 writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
 console.log(JSON.stringify(summary, null, 2));

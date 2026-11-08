@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "role": "current-tool-inventory-guard-live-source-successor",
+  "source_parent": "a798ff9c58cdd539f115eda00b7cdd898d035353",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "reviewed_guard_patch_sha256": "72929e7e09239b984e1ccf827657d4d6ad9e832a7816dec8ce3873dcf2c4964d",
+  "reviewed_guard_manifest_sha256": "06c42bd8f805755cd869214302a15c5dd51f9c79083b3c1934ce2e8cc65795e2",
+  "independent_review_sha256": "5b6bea0ae60ff8c15435dd610ed5aeb8e0b2685d387d50620d2c03f473d11247",
+  "transitions": [
+    {
+      "path": "scripts/inventory-reference-proposal.mjs",
+      "before": {
+        "path": "scripts/inventory-reference-proposal.mjs",
+        "sha256": "3e721a23e4872954f94e259a5cf71e59cf178ecca07fc28f7945b9435ba5194e",
+        "bytes": 15349
+      },
+      "after": {
+        "path": "scripts/inventory-reference-proposal.mjs",
+        "sha256": "9d460ad966ad9d9aa46ee8057c2ca85ab14d9ecdef6b2437b0f38a924a3876d6",
+        "bytes": 23989
+      },
+      "edits": [
+        {
+          "offset": 323,
+          "before": "",
+          "after": "import {createRequire} from 'node:module';\nconst require=createRequire(import.meta.url);\nconst functionToString=Function.prototype.toString,apply=Reflect.apply;\n"
+        },
+        {
+          "offset": 412,
+          "before": "import {readFileSync} from 'node:fs';\n",
+          "after": "import {readFileSync,readdirSync,realpathSync,lstatSync,openSync,closeSync,fstatSync,readSync,constants} from 'node:fs';\nimport {resolve,join,sep} from 'node:path';\n"
+        },
+        {
+          "offset": 1289,
+          "before": "const nextInventoryHash='a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403';\n",
+          "after": "const nextInventoryHash='912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15';\n"
+        },
+        {
+          "offset": 3013,
+          "before": "",
+          "after": "const readerModules=[\n {path:'scripts/upstream-packed-run-evidence.mjs',sha256:'4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac'},\n {path:'scripts/packed-consumer-evidence.mjs',sha256:'c277cc4d4e3c3d5afb706ed9872cf0a5da453cbd470d9d7be0c2a6f02e6b28a3'},\n];\nconst readerImageHash='ba09dbebba1cd94786b5f75563528bfe875d833b9db2de73e6d8c4628a39fe3c';\n\n"
+        },
+        {
+          "offset": 7954,
+          "before": "",
+          "after": "// One transaction spans each public operation, including every supplied reader\n// callback. A caught nested failure still invalidates the outer operation.\nconst activeRoots=new Map(),sourceChecks=new WeakMap();\nfunction transaction(root,operation){\n const key=realpathSync(root),prior=activeRoots.get(key);\n if(prior){prior.violation=true;throw Error('reentrant inventory reference consumption');}\n const state={violation:false};activeRoots.set(key,state);\n try{const result=operation();assert.equal(state.violation,false,'swallowed inventory reference reentry');return result;}\n finally{activeRoots.delete(key);}\n}\n"
+        },
+        {
+          "offset": 8062,
+          "before": "export function prepareInventoryReferenceSourceMetadata({root,read=path=>readEvidenceMember(root,path)}={}){\n const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version;\n",
+          "after": "export function prepareInventoryReferenceSourceMetadata(options={}){\n return transaction(options.root,()=>buildInventoryReferenceSourceMetadata(options));\n}\nfunction buildInventoryReferenceSourceMetadata({root,read:suppliedRead=path=>readEvidenceMember(root,path),prebindPaths=[]}={}){\n assert.equal(typeof suppliedRead,'function');\n // A reader callback is untrusted input: every observed source is swept before\n // and after each callback, and the returned bytes must be the physical member.\n const observed=new Map();\n // Scratch storage is reused but is fully refreshed on every sweep. Directory\n // checks are scoped to one sweep; no bytes or stat results are cached.\n let scratch=Buffer.allocUnsafe(1),expectedShimPaths=null;\n const sweepShimNamespace=()=>{\n  if(expectedShimPaths===null)return;\n  const found=[],base='testing/legacy-runner/shims/harness';\n  const visit=relative=>{for(const entry of readdirSync(resolve(root,relative),{withFileTypes:true})){\n   const path=relative+'/'+entry.name;if(entry.name.endsWith('.spec.ts'))found.push(path);\n   if(entry.isDirectory())visit(path);\n  }};\n  visit(base);found.sort();assert.deepEqual(found,expectedShimPaths,'historical shim namespace changed');\n };\n const sweepObserved=()=>{\n  sweepShimNamespace();\n  const rootStat=lstatSync(root);assert.ok(rootStat.isDirectory()&&!rootStat.isSymbolicLink());\n  const checkedDirs=new Set();\n  for(const [relative,image] of observed){\n   assert.ok(typeof relative==='string'&&!relative.includes('\\\\'));const parts=relative.split('/');assert.ok(parts.length&&parts.every(part=>part&&part!=='.'&&part!=='..'));\n   const path=resolve(root,...parts);assert.ok(path.startsWith(resolve(root)+sep));let cursor=root;\n   // Parent components are checked on every sweep. The final component is\n   // opened with O_NOFOLLOW and checked as a regular file by fstat below.\n   for(let i=0;i<parts.length-1;i++){cursor=join(cursor,parts[i]);if(checkedDirs.has(cursor))continue;\n    const st=lstatSync(cursor);assert.ok(st.isDirectory()&&!st.isSymbolicLink(),'invalid inventory directory');checkedDirs.add(cursor);\n   }\n   if(!constants.O_NOFOLLOW){const st=lstatSync(path);assert.ok(st.isFile()&&!st.isSymbolicLink(),'invalid inventory member');}\n   if(scratch.length<image.length+1)scratch=Buffer.allocUnsafe(image.length+1);\n   const fd=openSync(path,constants.O_RDONLY|(constants.O_NOFOLLOW??0));\n   try{const st=fstatSync(fd);assert.ok(st.isFile()&&st.size===image.length,'physical inventory read frame changed '+relative);let pos=0;\n    while(pos<image.length){const count=readSync(fd,scratch,pos,image.length-pos,null);assert.ok(count>0,'short inventory member');pos+=count;}\n    assert.ok(scratch.subarray(0,image.length).equals(image),'physical inventory read frame changed '+relative);\n    assert.equal(readSync(fd,scratch,image.length,1,null),0,'extra inventory member bytes');\n    assert.equal(fstatSync(fd).size,image.length,'physical inventory member changed size');\n   }finally{closeSync(fd);}\n  }\n };\n const read=path=>{\n  const actual=readEvidenceMember(root,path),previous=observed.get(path);\n  if(previous)assert.ok(actual.equals(previous),'changed repeated inventory read '+path);else observed.set(path,Buffer.from(actual));\n  sweepObserved();const supplied=suppliedRead(path);sweepObserved();\n  assert.ok(Buffer.isBuffer(supplied)&&actual.equals(supplied),'nonphysical inventory reader '+path);\n  return Buffer.from(actual);\n };\n const physical=path=>readEvidenceMember(root,path);\n const packagePath='projects/ngx-material-legacy/package.json',packageBytes=physical(packagePath),version=JSON.parse(packageBytes).version;\n"
+        },
+        {
+          "offset": 8357,
+          "before": " const product=selectDialogFiniteSuccessor({root,line,read}),tool=inventoryFiniteToolSuccessor({root,line,read}),pin=pins[line],bound=new Map([...product.bound,...tool.bound].map(ref=>[ref.path,{...ref}]));\n let active=false;const idle=()=>assert.equal(active,false,'reentrant inventory reference consumption');\n",
+          "after": " let product;\n if(line==='main'){\n  const physicalPackage=readEvidenceMember(root,packagePath);assert.ok(Buffer.isBuffer(packageBytes)&&physicalPackage.equals(packageBytes),'nonphysical inventory proposal package');\n  const owner={path:'scripts/select-dialog-finite-source-v7.mjs',sha256:'87155482dbaa488a0e72ae0ba75c3edfe370bc11fcfc2ddd1ce3f0190a5609a6',bytes:17719};\n  const physicalOwner=readEvidenceMember(root,owner.path),loadedPath=readFileSync(fileURLToPath(new URL('./select-dialog-finite-source-v7.mjs',import.meta.url)));assert.equal(hash(physicalOwner),owner.sha256);assert.equal(physicalOwner.length,owner.bytes);assert.equal(hash(loadedPath),owner.sha256);assert.equal(loadedPath.length,owner.bytes);\n  const loaded=require('./select-dialog-finite-source-v7.mjs');assert.ok(Object.isFrozen(loaded.selectDialogFiniteLoadedImage));assert.deepEqual(loaded.selectDialogFiniteLoadedImage,owner);assert.equal(hash(apply(functionToString,loaded.selectDialogFiniteSuccessor,[])),'e6ab419874774e5d1878257c001d4bc24ea298d28072de22134ad0831895eef1');\n  product=loaded.selectDialogFiniteSuccessor({root,line,read:physical});\n }else product=selectDialogFiniteSuccessor({root,line,read:physical});\n const tool=inventoryFiniteToolSuccessor({root,line,read:physical}),pin=pins[line],bound=new Map();\n const matrixOwner=line==='main'?require('./current-tool-matrix-source.mjs').currentToolMatrixSource({root,read:physical}):null;\n const prebind=(path,expected)=>{const raw=physical(path),previous=observed.get(path);if(previous)assert.ok(raw.equals(previous));else observed.set(path,Buffer.from(raw));if(expected){assert.equal(hash(raw),expected.sha256);assert.equal(raw.length,expected.bytes);}return raw;};\n for(const ref of [...product.bound,...tool.bound,...(matrixOwner?matrixOwner.bound:[])]){prebind(ref.path,ref);const prior=bound.get(ref.path);if(prior)assert.deepEqual(prior,ref);else bound.set(ref.path,{...ref});}\n // Assemble the complete finite callback frame before the first supplied read.\n const packetPre=prebind(INVENTORY_REFERENCE_PACKET);assert.equal(hash(packetPre),pin.packet);\n const inventoryPre=prebind(INVENTORY_REFERENCE_PATH);assert.equal(hash(inventoryPre),line==='main'?nextInventoryHash:pin.inventory);\n const packetData=JSON.parse(packetPre),inventoryPreData=JSON.parse(inventoryPre);\n expectedShimPaths=inventoryPreData.shared_suite_shims.map(row=>row.path).sort();assert.equal(expectedShimPaths.length,21);assert.equal(new Set(expectedShimPaths).size,21);sweepShimNamespace();\n if(line==='main'){assert.equal(hash(apply(functionToString,readEvidenceMember,[])),readerImageHash,'loaded physical reader changed');\n  for(const ref of readerModules){const loaded=readFileSync(fileURLToPath(new URL('../'+ref.path,import.meta.url)));assert.equal(hash(loaded),ref.sha256);const raw=prebind(ref.path);assert.equal(hash(raw),ref.sha256);}}\n for(const ref of packetData.source_members)prebind(ref.path);\n for(const path of [packagePath,self,sourceValidator,'scripts/select_dialog_finite_source_successor.py',...(line==='main'?[nextValidator,'scripts/historical_inventory_source.py']:[]),...prebindPaths])prebind(path);\n for(const row of inventoryPreData.rows)prebind(row.candidate);\n for(const row of inventoryPreData.shared_suite_shims)prebind(row.path);\n assert.ok(read(packagePath).equals(packageBytes));\n"
+        },
+        {
+          "offset": 8702,
+          "before": "  idle();const actual=readEvidenceMember(root,path),raw=read(path);assert.ok(Buffer.isBuffer(raw));assert.ok(actual.equals(raw),'nonphysical inventory proposal input '+path);assert.ok(actual.equals(readEvidenceMember(root,path)),'inventory proposal input changed during callback '+path);\n",
+          "after": "  const actual=readEvidenceMember(root,path),raw=read(path);assert.ok(Buffer.isBuffer(raw));assert.ok(actual.equals(raw),'nonphysical inventory proposal input '+path);assert.ok(actual.equals(readEvidenceMember(root,path)),'inventory proposal input changed during callback '+path);\n"
+        },
+        {
+          "offset": 9736,
+          "before": "",
+          "after": " if(line==='main')for(const ref of readerModules)member(ref.path,ref.sha256);\n"
+        },
+        {
+          "offset": 11019,
+          "before": "  const active=JSON.parse(execFileSync('python3',[nextValidator],{cwd:root,encoding:'utf8',maxBuffer:1024*1024}));\n  assert.equal(active.epoch,'main-nine-spec-source-identities');assert.equal(active.members,9);\n  assert.equal(active.execution_credit,false);assert.equal(active.source_behavior_admission,false);assert.equal(active.full_suite_pass,false);\n",
+          "after": "  // The nine-spec image is historical comparison data. The live scanner reads\n  // the physical current inventory and current candidate/shim sources.\n  const nineSpec=oldBytes(root,'948e8290b74953c83d11268368f38952d0b51fd7',INVENTORY_REFERENCE_PATH);\n  assert.equal(hash(nineSpec),'a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403');\n  member('scripts/historical_inventory_source.py','ea001a53909ab5f7227814b8690f62e5c9e22ce847888db5ebb349c599f0c8cf');\n  const scan=execFileSync('python3',['-B','scripts/historical_inventory_source.py'],{cwd:root,encoding:'utf8',maxBuffer:1024*1024});\n  assert.equal(scan.trim(),'historical-inventory: 57 current candidate and 21 shim identities match; execution not qualified');\n  matrixOwner.assertCurrent();\n"
+        },
+        {
+          "offset": 11888,
+          "before": "   active_epoch:active,current_inventory_sha256:hash(currentInventory),g11_claim:'not-passed'};\n",
+          "after": "   historical_nine_spec_inventory_sha256:hash(nineSpec),current_source_scan:{candidates:57,shims:21,execution_qualified:false},current_matrix_owner_bound:true,current_inventory_sha256:hash(currentInventory),g11_claim:'not-passed'};\n"
+        },
+        {
+          "offset": 12738,
+          "before": " const assertCurrent=()=>{idle();active=true;try{sweep();product.assertCurrent();tool.assertCurrent();for(const ref of bound.values()){\n",
+          "after": " const check=()=>{sweep();product.assertCurrent();tool.assertCurrent();if(matrixOwner)matrixOwner.assertCurrent();for(const ref of bound.values()){\n"
+        },
+        {
+          "offset": 13293,
+          "before": " }product.assertCurrent();tool.assertCurrent();sweep();}finally{active=false;}};\n const verifyAfter=candidate=>{assertCurrent();assert.ok(Buffer.isBuffer(candidate)&&candidate.equals(result.after),'not the exact inventory metadata after-image');assertCurrent();return {metadata_only:true,native_or_full_audit_credit:false};};\n assertCurrent();\n return {line,before:Buffer.from(before),after:Buffer.from(result.after),updates:structuredClone(result.updates),\n",
+          "after": " }product.assertCurrent();tool.assertCurrent();if(matrixOwner)matrixOwner.assertCurrent();sweep();};\n const verify=candidate=>{assert.ok(Buffer.isBuffer(candidate)&&candidate.equals(result.after),'not the exact inventory metadata after-image');check();return {metadata_only:true,native_or_full_audit_credit:false};};\n const assertCurrent=()=>transaction(root,check),verifyAfter=candidate=>transaction(root,()=>verify(candidate));\n check();\n const source={line,before:Buffer.from(before),after:Buffer.from(result.after),updates:structuredClone(result.updates),\n"
+        },
+        {
+          "offset": 14124,
+          "before": "",
+          "after": " sourceChecks.set(source,{check,verify,read,sweepObserved});return source;\n"
+        },
+        {
+          "offset": 14356,
+          "before": "export function prepareInventoryReferenceMetadata({root,read=path=>readEvidenceMember(root,path)}={}){\n const source=prepareInventoryReferenceSourceMetadata({root,read});\n readEvidenceMember(root,INVENTORY_REFERENCE_LEDGER);\n const current=read(INVENTORY_REFERENCE_LEDGER);\n assert.ok(current.equals(source.before)||current.equals(source.after),'unregistered current canonical image');\n const ledgerRef={path:INVENTORY_REFERENCE_LEDGER,sha256:hash(current),bytes:current.length};\n const assertCurrent=()=>{source.assertCurrent();const raw=read(INVENTORY_REFERENCE_LEDGER);assert.equal(hash(raw),ledgerRef.sha256,'late canonical ledger proposal change');assert.equal(raw.length,ledgerRef.bytes);};\n const verifyAfter=candidate=>{assertCurrent();const result=source.verifyAfter(candidate);assertCurrent();return result;};\n assertCurrent();return {...source,current_canonical_state:current.equals(source.before)?'before':'after',\n  bound:[...source.bound,ledgerRef],assertCurrent,verifyAfter};\n",
+          "after": "export function prepareInventoryReferenceMetadata(options={}){\n const {root,read=path=>readEvidenceMember(root,path)}=options;\n return transaction(root,()=>{\n  const source=buildInventoryReferenceSourceMetadata({root,read,prebindPaths:[INVENTORY_REFERENCE_LEDGER]}),checks=sourceChecks.get(source);\n  const current=checks.read(INVENTORY_REFERENCE_LEDGER);\n  assert.ok(current.equals(source.before)||current.equals(source.after),'unregistered current canonical image');\n  const ledgerRef={path:INVENTORY_REFERENCE_LEDGER,sha256:hash(current),bytes:current.length};\n  const check=()=>{checks.check();const raw=checks.read(INVENTORY_REFERENCE_LEDGER);assert.equal(hash(raw),ledgerRef.sha256,'late canonical ledger proposal change');assert.equal(raw.length,ledgerRef.bytes);};\n  const assertCurrent=()=>transaction(root,check);\n  const verifyAfter=candidate=>transaction(root,()=>{const result=checks.verify(candidate);check();return result;});\n  check();return {...source,current_canonical_state:current.equals(source.before)?'before':'after',\n   bound:[...source.bound,ledgerRef],assertCurrent,verifyAfter};\n });\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/inventory-finite-tool-successor.mjs",
+      "before": {
+        "path": "scripts/inventory-finite-tool-successor.mjs",
+        "sha256": "77eda6e85023e6a65a85d2d68e66636f2969f6036a678e9eec1bc554d715396c",
+        "bytes": 14359
+      },
+      "after": {
+        "path": "scripts/inventory-finite-tool-successor.mjs",
+        "sha256": "a55dd2d7e6c605060f9dc4e47018251cbbf6eca8bb8077d01307723932dfc5e4",
+        "bytes": 26164
+      },
+      "edits": [
+        {
+          "offset": 300,
+          "before": "import {readFileSync} from 'node:fs';\n",
+          "after": "import {readFileSync,realpathSync} from 'node:fs';\nimport {types} from 'node:util';\n"
+        },
+        {
+          "offset": 449,
+          "before": "",
+          "after": "import {createRequire} from 'node:module';\nconst require=createRequire(import.meta.url);\n"
+        },
+        {
+          "offset": 1018,
+          "before": "",
+          "after": "const activeRoots=new Map();\n"
+        },
+        {
+          "offset": 5515,
+          "before": " assert.equal(hash(expected),workflow.current.sha256);assert.equal(expected.length,workflow.current.bytes);assert.ok(physical(workflow.current.path).equals(expected),'unreviewed CI workflow change');\n",
+          "after": " assert.equal(hash(expected),workflow.current.sha256);assert.equal(expected.length,workflow.current.bytes);\n"
+        },
+        {
+          "offset": 6044,
+          "before": " for(const target of workflow.targets){const raw=physical(target.path);assert.equal(hash(raw),target.sha256,'changed CI source test '+target.path);assert.equal(raw.length,target.bytes);}\n",
+          "after": " for(const target of workflow.targets){const raw=line==='main'&&target.path===workflow.targets[0].path?execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show','6597b9319ad7d0047e278046d35f60d3b5d271aa:'+target.path],{cwd:root,env,maxBuffer:1024*1024}):physical(target.path);assert.equal(hash(raw),target.sha256,'changed CI source test '+target.path);assert.equal(raw.length,target.bytes);}\n"
+        },
+        {
+          "offset": 8372,
+          "before": " assert.equal(hash(currentTest),helperTest.current.sha256);assert.equal(currentTest.length,helperTest.current.bytes);assert.ok(physical(helperTest.current.path).equals(currentTest),'unreviewed helper CI test change');\n let ownerEpoch=null,ownerPacketRef=null;\n",
+          "after": " assert.equal(hash(currentTest),helperTest.current.sha256);assert.equal(currentTest.length,helperTest.current.bytes);\n let ciFrameRef=null,ciFrame=null;\n if(line==='main'){\n  const path='compatibility/rc/parent-main-ci-browser-pin-source-successor-v1.json',sha256='567130b191bff118cfb255fdf9aa068be7f7972f708401ebbabd6dd0f2781f10';\n  const raw=physical(path);assert.equal(hash(raw),sha256);assert.equal(raw.length,24727);ciFrameRef={path,sha256,bytes:raw.length};\n  const frame=JSON.parse(raw);assert.equal(frame.schema_version,1);assert.equal(frame.role,'main-ci-browser-pin-and-helper-test-finite-successor');assert.equal(frame.source_scope_only,true);assert.equal(frame.historical_programs_executed,false);assert.equal(frame.full_Actions_execution_qualified,false);assert.equal(frame.g11_claim,'not-passed');\n  assert.equal(frame.workflow_commit,'4b4893f56cbb5ce91cf698ec75449ba5e5e10943');assert.equal(frame.workflow_parent,'8baa761eca624c9d71293c3d31750a2b3fdeebf0');\n  assert.equal(execFileSync('git',['--no-replace-objects','rev-parse',frame.workflow_commit+'^'],{cwd:root,env,encoding:'utf8'}).trim(),frame.workflow_parent);\n  assert.equal(execFileSync('git',['--no-replace-objects','rev-parse','d2c7f4bda075385d0ca9df0e9251f35cf3a6745a^'],{cwd:root,env,encoding:'utf8'}).trim(),'6597b9319ad7d0047e278046d35f60d3b5d271aa');\n  assert.deepEqual(frame.transitions.map(row=>row.path),[workflow.current.path,helperTest.current.path,workflow.targets[0].path]);\n  for(const [row,priorImage,priorRef] of [[frame.transitions[0],expected,workflow.current],[frame.transitions[1],currentTest,helperTest.current],[frame.transitions[2],execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show','6597b9319ad7d0047e278046d35f60d3b5d271aa:'+workflow.targets[0].path],{cwd:root,env,maxBuffer:1024*1024}),workflow.targets[0]]]){\n   assert.deepEqual(row.before,priorRef);assert.equal(row.after.path,row.path);let pos=0,parts=[];\n   for(const e of row.edits){assert.deepEqual(Object.keys(e).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(e.offset)&&e.offset>=pos);const old=Buffer.from(e.before);assert.ok(priorImage.subarray(e.offset,e.offset+old.length).equals(old));parts.push(priorImage.subarray(pos,e.offset),Buffer.from(e.after));pos=e.offset+old.length;}\n   const after=Buffer.concat([...parts,priorImage.subarray(pos)]);assert.equal(hash(after),row.after.sha256);assert.equal(after.length,row.after.bytes);assert.ok(physical(row.path).equals(after),'unreviewed CI source change');\n   if(row.path===workflow.targets[0].path){const source=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show','d2c7f4bda075385d0ca9df0e9251f35cf3a6745a:'+row.path],{cwd:root,env,maxBuffer:1024*1024});assert.ok(source.equals(after),'dialog source commit mismatch');}\n   if(row.path===workflow.current.path){for(const [commit,bytes] of [[frame.workflow_parent,priorImage],[frame.workflow_commit,after]]){const source=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',commit+':'+row.path],{cwd:root,env,maxBuffer:1024*1024});assert.ok(source.equals(bytes),'workflow source commit mismatch');}}\n  }\n  ciFrame=frame.transitions;\n }else{assert.ok(physical(workflow.current.path).equals(expected),'unreviewed CI workflow change');assert.ok(physical(helperTest.current.path).equals(currentTest),'unreviewed helper CI test change');}\n let ownerEpoch=null,ownerPacketRef=null,inventoryFrame=null,inventoryFrameRef=null,ownerMatrix=null,finalInventory=null;\n"
+        },
+        {
+          "offset": 10058,
+          "before": "  assert.equal(hash(after),packet.after.sha256);assert.equal(after.length,packet.after.bytes);assert.ok(physical(packet.after.path).equals(after));\n  for(const ref of [packet.new_validator,packet.current_inventory]){const bytes=physical(ref.path);assert.equal(hash(bytes),ref.sha256);assert.equal(bytes.length,ref.bytes);}\n",
+          "after": "  assert.equal(hash(after),packet.after.sha256);assert.equal(after.length,packet.after.bytes);\n  const framePath='compatibility/rc/parent-main-inventory-reference-current-source-v1.json',frameHash='71c71088cea9e10c539f2adac039da49eb6b341a573d4e74641ef481ee5599c8';\n  const frameRaw=physical(framePath);assert.equal(hash(frameRaw),frameHash);assert.equal(frameRaw.length,29204);inventoryFrameRef={path:framePath,sha256:frameHash,bytes:frameRaw.length};\n  const frame=JSON.parse(frameRaw);assert.equal(frame.schema_version,1);assert.equal(frame.role,'main-inventory-historical-reference-current-source-successor');assert.equal(frame.source_scope_only,true);assert.equal(frame.historical_programs_executed,false);assert.equal(frame.full_Actions_execution_qualified,false);assert.equal(frame.g11_claim,'not-passed');\n  const show=(commit,path)=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',commit+':'+path],{cwd:root,env,maxBuffer:2*1024*1024});\n  const replay=(prior,transition)=>{let pos=0,parts=[];for(const e of transition.edits){assert.deepEqual(Object.keys(e).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(e.offset)&&e.offset>=pos);const old=Buffer.from(e.before);assert.ok(prior.subarray(e.offset,e.offset+old.length).equals(old));parts.push(prior.subarray(pos,e.offset),Buffer.from(e.after));pos=e.offset+old.length;}return Buffer.concat([...parts,prior.subarray(pos)]);};\n  const reviewPins=[['compatibility/rc/parent-main-historical-seven-inventory-review-v1.json','dd7b30fc32b97b0a7f7df9fd4ea8190de4fe2a8d41e799bb4ea09331d94d9796',10532],['compatibility/rc/parent-main-historical-pointer-epoch-review-v1.json','dac9b4aa338be698a2faf555a9aff8c33c9c2c0e102248134839b1126032c222',38008],['compatibility/rc/parent-main-matrix-input-source-integration-v3.json','2059ff8cb96face8a6becd2f56fce25cb2fb311b2c89a2e0184f217d76099efb',7309],['compatibility/rc/current-tool-matrix-input-successor-v1.json','df06856c53ceedd1c3700e2e5b372e34442f04d82438c940fefebb8fe3c9381b',14712]];\n  assert.deepEqual(frame.review_members,reviewPins.map(([path,sha256,bytes])=>({path,sha256,bytes})));for(const ref of frame.review_members){const raw=physical(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}\n  const edges=[['0465e0a95b9912e6785fb0bc9fb243c5272e13e1','7f1d3095c5867e55fe72f9a4e2c47cdf33d47531'],['aec05d8f6baf3dfdd92581504291309992abcb89','1e26eefba6fa380b520ae05cb6f9ff3ea734545a'],['0aaa2c137c14e43f8cdc9d34bfd10690e63c5c70','c5291e184fa524327366a5abb9d8ec612a24c186']];\n  const candidates=[['legacy-autocomplete/autocomplete','legacy-chips/chip-list','legacy-menu/menu','legacy-paginator/paginator','legacy-progress-bar/progress-bar','legacy-radio/radio','legacy-select/select'],['legacy-autocomplete/autocomplete'],['legacy-input/input']].map(group=>group.map(x=>'projects/ngx-material-legacy/'+x+'.spec.ts'));\n  assert.equal(frame.inventory_transitions.length,edges.length);let priorRef=packet.current_inventory;\n  for(let i=0;i<edges.length;i++){\n   const [parent,commit]=edges[i],t=frame.inventory_transitions[i];assert.equal(t.parent,parent);assert.equal(t.commit,commit);assert.deepEqual(t.before,priorRef);assert.equal(t.path,packet.current_inventory.path);assert.equal(t.after.path,t.path);\n   assert.equal(execFileSync('git',['--no-replace-objects','rev-parse',commit+'^'],{cwd:root,env,encoding:'utf8'}).trim(),parent);\n   const old=show(parent,t.path),next=show(commit,t.path);assert.equal(hash(old),t.before.sha256);assert.equal(old.length,t.before.bytes);assert.equal(hash(next),t.after.sha256);assert.equal(next.length,t.after.bytes);assert.ok(replay(old,t).equals(next));\n   const a=JSON.parse(old),b=JSON.parse(next);assert.equal(a.rows.length,57);assert.equal(b.rows.length,57);const normalized=structuredClone(b),changed=[];\n   for(let n=0;n<a.rows.length;n++){const x=a.rows[n],y=normalized.rows[n];assert.equal(x.candidate,y.candidate);if(JSON.stringify(x)===JSON.stringify(y))continue;changed.push(x.candidate);const snapshot=y.prior_candidate_snapshots.pop();for(const key of ['candidate_sha256','adaptation','execution'])assert.deepEqual(snapshot[key],x[key]);assert.equal(snapshot.current_source_binding,false);assert.equal(typeof snapshot.reason,'string');assert.ok(snapshot.reason.length);y.candidate_sha256=x.candidate_sha256;}\n   assert.deepEqual(changed,candidates[i]);assert.deepEqual(normalized,a,'inventory transition changed unreviewed fields');priorRef=t.after;\n  }\n  const input=JSON.parse(physical(frame.review_members[3].path));assert.deepEqual(frame.inventory_transitions[2].before,input.inventory_before);assert.deepEqual(frame.inventory_transitions[2].after,input.inventory_after);assert.deepEqual(frame.inventory_transitions[2].edits,input.inventory_edits);\n  // The matrix authority validates the full final-product transition from the\n  // historical inventory image to the current one, including all byte edits.\n  const matrix=require('./current-tool-matrix-source.mjs').currentToolMatrixSource({root,read:physical});\n  const finalRaw=physical('compatibility/rc/current-tool-matrix-final-product-v1.json');\n  assert.equal(hash(finalRaw),'ddb70c833108cd3e446a46b29561b7d3ca89f7a50bfe18acad931a83ebc2d077');\n  const final=JSON.parse(finalRaw),transition=final.structural_transitions[1];\n  assert.deepEqual(transition.before,priorRef);const archived=physical(transition.archive.path);\n  assert.equal(hash(archived),priorRef.sha256);assert.equal(archived.length,priorRef.bytes);\n  const current=replay(archived,transition);assert.equal(hash(current),transition.after.sha256);assert.equal(current.length,transition.after.bytes);\n  assert.ok(physical(priorRef.path).equals(current));matrix.assertCurrent();\n  ownerMatrix=matrix;finalInventory=transition.after;\n  assert.deepEqual(frame.proposal_transition.before,packet.after);const proposal=replay(after,frame.proposal_transition);assert.equal(hash(proposal),frame.proposal_transition.after.sha256);assert.equal(proposal.length,frame.proposal_transition.after.bytes);assert.ok(physical(packet.after.path).equals(proposal));\n  const validatorBytes=physical(packet.new_validator.path);assert.equal(hash(validatorBytes),packet.new_validator.sha256);assert.equal(validatorBytes.length,packet.new_validator.bytes);\n  inventoryFrame=frame;\n"
+        },
+        {
+          "offset": 11549,
+          "before": "  ownerEpoch={...packet,priorInventory:{path:packet.current_inventory.path,sha256:hash(oldInventory),bytes:oldInventory.length}};\n",
+          "after": "  ownerEpoch={...packet,after:inventoryFrame.proposal_transition.after,current_inventory:finalInventory,priorInventory:{path:packet.current_inventory.path,sha256:hash(oldInventory),bytes:oldInventory.length}};\n"
+        },
+        {
+          "offset": 11682,
+          "before": " const bound=[{path:SELF,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PIN,bytes:packetRaw.length},previous,...rows.map(row=>({...((ownerEpoch&&row.path===ownerEpoch.after.path)?ownerEpoch.after:row.after)})),...(ownerEpoch?[ownerPacketRef,ownerEpoch.new_validator,ownerEpoch.current_inventory,ownerEpoch.terminal_owner.after]:[]),{path:WORKFLOW_PACKET,sha256:WORKFLOW_PIN,bytes:workflowRaw.length},{...workflow.current},...workflow.targets.map(ref=>({...ref})),{path:HELPER_TEST_PACKET,sha256:HELPER_TEST_PIN,bytes:helperTestRaw.length},{...helperTest.current}];let active=false;const sweep=()=>{for(const ref of bound){const raw=physical(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}assert.ok(physical(SELF).equals(image));};const assertCurrent=()=>{assert.equal(active,false,'reentrant inventory successor');active=true;try{sweep();for(const ref of bound){const raw=physical(ref.path);const supplied=read(ref.path);assert.ok(Buffer.isBuffer(supplied));assert.ok(raw.equals(supplied),'nonphysical inventory successor');assert.ok(raw.equals(physical(ref.path)));}sweep();}finally{active=false;}};\n const qualify=ref=>{const baseRow=rows.find(item=>item.path===ref?.path);const row=baseRow && ownerEpoch && baseRow.path===ownerEpoch.after.path ? {before:baseRow.before,after:ownerEpoch.after} : baseRow??(ownerEpoch&&ref?.path===ownerEpoch.current_inventory.path?{before:ownerEpoch.priorInventory,after:ownerEpoch.current_inventory}:ownerEpoch&&ref?.path===ownerEpoch.terminal_owner.after.path?ownerEpoch.terminal_owner:ref?.path===workflow.current.path?{before:workflow.historical_after,after:workflow.current}:ref?.path===helperTest.current.path?{before:helperTest.before,after:helperTest.current}:null);if(!row)return null;const intermediate=ownerEpoch&&ref.path===ownerEpoch.after.path?ownerEpoch.before:null;assert.ok(ref.sha256===row.before.sha256||ref.sha256===row.after.sha256||ref.sha256===intermediate?.sha256,'unknown inventory verifier predecessor');const prior=ref.sha256===row.before.sha256?row.before:ref.sha256===intermediate?.sha256?intermediate:row.after;if(ref.bytes!==undefined)assert.equal(ref.bytes,prior.bytes);return {...ref,sha256:row.after.sha256,...(ref.bytes===undefined?{}:{bytes:row.after.bytes})};};assertCurrent();return{bound:structuredClone(bound),qualify,assertCurrent,workflow:{before:{...workflow.historical_after},current:{...workflow.current},targets:structuredClone(workflow.targets),source_test_expectations:structuredClone(workflow.current_source_test_expectations),helper_test:{before:{...helperTest.before},current:{...helperTest.current}},full_Actions_execution_qualified:false}};\n",
+          "after": " const bound=[{path:SELF,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PIN,bytes:packetRaw.length},previous,...rows.map(row=>({...((ownerEpoch&&row.path===ownerEpoch.after.path)?ownerEpoch.after:row.after)})),...(ownerEpoch?[ownerPacketRef,ownerEpoch.new_validator,ownerEpoch.current_inventory,ownerEpoch.terminal_owner.after,inventoryFrameRef,...inventoryFrame.review_members,...ownerMatrix.bound]:[]),{path:WORKFLOW_PACKET,sha256:WORKFLOW_PIN,bytes:workflowRaw.length},{...(ciFrame?ciFrame[0].after:workflow.current)},...workflow.targets.map((ref,i)=>({...((ciFrame&&i===0)?ciFrame[2].after:ref)})),{path:HELPER_TEST_PACKET,sha256:HELPER_TEST_PIN,bytes:helperTestRaw.length},{...(ciFrame?ciFrame[1].after:helperTest.current)},...(ciFrame?[ciFrameRef]:[])];const rootKey=realpathSync(root);const sweep=()=>{for(const ref of bound){const raw=physical(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}assert.ok(physical(SELF).equals(image));};const assertCurrent=()=>{const existing=activeRoots.get(rootKey);if(existing){existing.violation=true;throw Error('reentrant inventory successor');}const state={violation:false};activeRoots.set(rootKey,state);try{sweep();for(const ref of bound){const raw=physical(ref.path);const supplied=read(ref.path);assert.ok(Buffer.isBuffer(supplied));assert.ok(raw.equals(supplied),'nonphysical inventory successor');assert.ok(raw.equals(physical(ref.path)));}sweep();assert.equal(state.violation,false,'swallowed reentrant inventory successor');}finally{activeRoots.delete(rootKey);}};\n const qualify=ref=>{const baseRow=rows.find(item=>item.path===ref?.path);const row=baseRow && ownerEpoch && baseRow.path===ownerEpoch.after.path ? {before:baseRow.before,after:ownerEpoch.after} : baseRow??(ownerEpoch&&ref?.path===ownerEpoch.current_inventory.path?{before:ownerEpoch.priorInventory,after:ownerEpoch.current_inventory}:ownerEpoch&&ref?.path===ownerEpoch.terminal_owner.after.path?ownerEpoch.terminal_owner:ref?.path===workflow.current.path?{before:workflow.historical_after,after:ciFrame?ciFrame[0].after:workflow.current}:ref?.path===helperTest.current.path?{before:helperTest.before,after:ciFrame?ciFrame[1].after:helperTest.current}:null);if(!row)return null;const intermediates=ownerEpoch&&ref.path===ownerEpoch.after.path?[ownerEpoch.before,inventoryFrame.proposal_transition.before]:ownerEpoch&&ref.path===ownerEpoch.current_inventory.path?[...inventoryFrame.inventory_transitions.map(t=>t.before),inventoryFrame.inventory_transitions.at(-1).after]:ciFrame&&ref.path===workflow.current.path?[workflow.current]:ciFrame&&ref.path===helperTest.current.path?[helperTest.current]:[];const prior=[row.before,...intermediates,row.after].find(item=>item.sha256===ref.sha256);assert.ok(prior,'unknown inventory verifier predecessor');if(ref.bytes!==undefined)assert.equal(ref.bytes,prior.bytes);return {...ref,sha256:row.after.sha256,...(ref.bytes===undefined?{}:{bytes:row.after.bytes})};};const inventoryHistoricalBytes=ref=>{assert.ok(inventoryFrame,'historical inventory comparisons require main');assert.ok(ref&&typeof ref==='object'&&!types.isProxy(ref)&&Object.getPrototypeOf(ref)===Object.prototype);const descriptors=Object.getOwnPropertyDescriptors(ref);assert.deepEqual(Reflect.ownKeys(descriptors).sort(),['bytes','path','sha256']);for(const d of Object.values(descriptors))assert.ok(Object.hasOwn(d,'value')&&d.enumerable);ref={path:descriptors.path.value,sha256:descriptors.sha256.value,bytes:descriptors.bytes.value};assert.equal(typeof ref.path,'string');assert.equal(typeof ref.sha256,'string');assert.ok(Number.isSafeInteger(ref.bytes)&&ref.bytes>=0);const transition=inventoryFrame.inventory_transitions.find(t=>t.before.path===ref.path&&t.before.sha256===ref.sha256&&t.before.bytes===ref.bytes);assert.ok(transition,'unknown historical inventory image');assertCurrent();const raw=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',transition.parent+':'+ref.path],{cwd:root,env,maxBuffer:2*1024*1024});assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);assertCurrent();return Buffer.from(raw);};assertCurrent();return{bound:structuredClone(bound),qualify,assertCurrent,inventoryHistoricalBytes,workflow:{before:{...workflow.historical_after},current:{...(ciFrame?ciFrame[0].after:workflow.current)},targets:structuredClone(ciFrame?[ciFrame[2].after,workflow.targets[1]]:workflow.targets),source_test_expectations:structuredClone(ciFrame?[{path:workflow.targets[0].path,cases:48,mutants_rejected:17},workflow.current_source_test_expectations[1]]:workflow.current_source_test_expectations),helper_test:{before:{...helperTest.before},current:{...(ciFrame?ciFrame[1].after:helperTest.current)}},full_Actions_execution_qualified:false}};\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/inventory_finite_source_probe.mjs",
+      "before": {
+        "path": "tests/inventory_finite_source_probe.mjs",
+        "sha256": "8f4412661dfaf168a3bfeb34749222f8ef079fa040d6b7872fd9f85bb661c2d0",
+        "bytes": 1674
+      },
+      "after": {
+        "path": "tests/inventory_finite_source_probe.mjs",
+        "sha256": "b2d3d634f321ce165ab43e8b69711a41f04d0a7af46a5a701e80ee1e95fa14ba",
+        "bytes": 1979
+      },
+      "edits": [
+        {
+          "offset": 281,
+          "before": "const root=resolve(process.argv[2]);const {prepareInventoryReferenceSourceMetadata:make}=await import(root+'/scripts/inventory-reference-proposal.mjs');let bad=null;const read=p=>p===bad?Buffer.from('corrupt'):readFileSync(join(root,p));const result=make({root,read});if(result.line==='main'){assert.equal(result.verifier.historical_source_bindings_changed,13);assert.equal(result.verifier.active_epoch.members,9);assert.equal(result.verifier.active_epoch.execution_credit,false);}else assert.equal(result.verifier.source_bindings_changed,13);for(const path of [...(result.line==='main'?['scripts/historical_inventory_nine_spec_successor.py','compatibility/rc/parent-main-nine-spec-inventory-owner-successor-v1.json','testing/legacy-runner/historical-inventory.json','scripts/inventory-reference-owner.mjs']:[]),'scripts/historical_inventory_rebinding.py','scripts/select_dialog_finite_source_successor.py','compatibility/rc/parent-inventory-python-product-successor-v1.json','projects/ngx-material-legacy/legacy-select/select.spec.ts','projects/ngx-material-legacy/legacy-menu/menu.spec.ts','projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts']){bad=path;assert.throws(()=>result.assertCurrent(),undefined,'late '+path);assert.throws(()=>make({root,read}),undefined,'cold '+path);}bad=null;result.assertCurrent();console.log('PASS inventory old cohort plus cold/late controls');\n",
+          "after": "const root=resolve(process.argv[2]);const {prepareInventoryReferenceSourceMetadata:make}=await import(root+'/scripts/inventory-reference-proposal.mjs');let bad=null;const read=p=>p===bad?Buffer.from('corrupt'):readFileSync(join(root,p));const result=make({root,read});if(result.line==='main'){assert.equal(result.verifier.historical_source_bindings_changed,13);assert.equal(result.verifier.historical_nine_spec_inventory_sha256,'a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403');assert.deepEqual(result.verifier.current_source_scan,{candidates:57,shims:21,execution_qualified:false});assert.equal(result.verifier.current_matrix_owner_bound,true);assert.equal(result.verifier.current_inventory_sha256,'912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15');}else assert.equal(result.verifier.source_bindings_changed,13);for(const path of [...(result.line==='main'?['scripts/historical_inventory_nine_spec_successor.py','compatibility/rc/parent-main-nine-spec-inventory-owner-successor-v1.json','testing/legacy-runner/historical-inventory.json','scripts/inventory-reference-owner.mjs']:[]),'scripts/historical_inventory_rebinding.py','scripts/select_dialog_finite_source_successor.py','compatibility/rc/parent-inventory-python-product-successor-v1.json','projects/ngx-material-legacy/legacy-select/select.spec.ts','projects/ngx-material-legacy/legacy-menu/menu.spec.ts','projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts']){bad=path;assert.throws(()=>result.assertCurrent(),undefined,'late '+path);assert.throws(()=>make({root,read}),undefined,'cold '+path);}bad=null;result.assertCurrent();console.log('PASS inventory old cohort plus cold/late controls');\n"
+        }
+      ]
+    }
+  ],
+  "support": [
+    {
+      "path": "compatibility/rc/parent-main-ci-browser-pin-source-successor-v1.json",
+      "sha256": "567130b191bff118cfb255fdf9aa068be7f7972f708401ebbabd6dd0f2781f10",
+      "bytes": 24727
+    },
+    {
+      "path": "compatibility/rc/parent-main-inventory-reference-current-source-v1.json",
+      "sha256": "71c71088cea9e10c539f2adac039da49eb6b341a573d4e74641ef481ee5599c8",
+      "bytes": 29204
+    },
+    {
+      "path": "compatibility/rc/parent-main-ledger-source-epoch-v1.json",
+      "sha256": "b222f47db598e2052357824e90c91bedbaebb5cea21a7a092e431b4749e5c4d7",
+      "bytes": 19731
+    },
+    {
+      "path": "compatibility/rc/parent-main-ledger-source-epoch-v2.json",
+      "sha256": "b3d0a565dc4ea9de8e742a55db0419c5306838dd0063ad4320b74e4a8df34da0",
+      "bytes": 1601
+    },
+    {
+      "path": "scripts/inventory-reference-live-source-epoch.mjs",
+      "sha256": "3836c4358edc6c5a15d0578f5df06b19beed563fbd4b094d694cfa9e5cc1175e",
+      "bytes": 18156
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/ledger.json",
+      "sha256": "4a59fbfc14cc0f11c1563f5b4de51adc8cd0a58bfca186069ffc25b03635f068",
+      "bytes": 5068290
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "sha256": "912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15",
+      "bytes": 113388
+    }
+  ]
+}

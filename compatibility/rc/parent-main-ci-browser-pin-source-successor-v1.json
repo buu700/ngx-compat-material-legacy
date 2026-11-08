@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "role": "main-ci-browser-pin-and-helper-test-finite-successor",
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "full_Actions_execution_qualified": false,
+  "g11_claim": "not-passed",
+  "workflow_commit": "4b4893f56cbb5ce91cf698ec75449ba5e5e10943",
+  "workflow_parent": "8baa761eca624c9d71293c3d31750a2b3fdeebf0",
+  "transitions": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "before": {
+        "path": ".github/workflows/ci.yml",
+        "sha256": "19965edddfea0cfade7840d1a42d93b83fa7e606095501e63b130c7671087f73",
+        "bytes": 18346
+      },
+      "after": {
+        "path": ".github/workflows/ci.yml",
+        "sha256": "8ca1520dfe3ed7f0b475d2e660c26e90a6c720465a22942c41d5c0deecd9de9e",
+        "bytes": 20854
+      },
+      "edits": [
+        {
+          "offset": 11074,
+          "before": "      - name: Install Chromium for rendered and historical checks\n",
+          "after": "      - name: Install flake-pinned Chromium for rendered and historical checks\n"
+        },
+        {
+          "offset": 11183,
+          "before": "          sudo apt-get update\n          sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium\n",
+          "after": "          CHROMIUM_STORE=\"$(nix build --no-link --print-out-paths .#ci-chromium)\"\n          CHROME_BIN=\"\"\n          for candidate in \\\n            \"$CHROMIUM_STORE/chromium-1228/chrome-linux64/chrome\" \\\n            \"$CHROMIUM_STORE/chromium-1228/chrome-linux/chrome\"; do\n            if [ -x \"$candidate\" ]; then CHROME_BIN=\"$candidate\"; break; fi\n          done\n          test -n \"$CHROME_BIN\"\n          test -x \"$CHROME_BIN\"\n          CHROME_WRAPPED=\"$(dirname \"$CHROME_BIN\")/.chrome-wrapped\"\n          test -x \"$CHROME_WRAPPED\"\n          case \"$(uname -m)\" in\n            x86_64)\n              expected_chrome_sha=dbc8b199f83056aba947868710648f61c1d23c3f64c6a491c6f72ef2ebaf3f60\n              expected_wrapped_sha=e8006643ad430fcf8b0545c5b68625d4525826916773c85cbf757c78d16b2ee0\n              ;;\n            aarch64|arm64)\n              expected_chrome_sha=3a0b4b909e867cbd845162be0b67343c0d6bb03dbac8f2d410eec8fcc8913fe9\n              expected_wrapped_sha=eff7bad2ac10e1288fc52919ff9791a0d500a10c870c831ca8426b457a324d95\n              ;;\n            *) echo \"Unsupported Chromium runner architecture: $(uname -m)\" >&2; exit 2 ;;\n          esac\n          actual_chrome_sha=\"$(sha256sum \"$CHROME_BIN\" | cut -d' ' -f1)\"\n          actual_wrapped_sha=\"$(sha256sum \"$CHROME_WRAPPED\" | cut -d' ' -f1)\"\n          test \"$actual_chrome_sha\" = \"$expected_chrome_sha\"\n          test \"$actual_wrapped_sha\" = \"$expected_wrapped_sha\"\n          printf 'CHROME_BIN_SHA256=%s\\nCHROME_WRAPPED_SHA256=%s\\n' \"$actual_chrome_sha\" \"$actual_wrapped_sha\"\n          \"$CHROME_BIN\" --version\n          nix path-info --json \"$CHROMIUM_STORE\"\n          echo \"CHROME_BIN=$CHROME_BIN\" >> \"$GITHUB_ENV\"\n"
+        },
+        {
+          "offset": 11435,
+          "before": "          CHROME_BIN=\"$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)\"\n",
+          "after": ""
+        },
+        {
+          "offset": 11580,
+          "before": "",
+          "after": "          test -x \"$CHROME_BIN\"\n"
+        },
+        {
+          "offset": 12011,
+          "before": "          CHROME_BIN=\"$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)\"\n",
+          "after": ""
+        },
+        {
+          "offset": 12156,
+          "before": "",
+          "after": "          test -x \"$CHROME_BIN\"\n"
+        },
+        {
+          "offset": 12492,
+          "before": "          CHROME_BIN=\"$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)\"\n",
+          "after": ""
+        },
+        {
+          "offset": 12637,
+          "before": "",
+          "after": "          test -x \"$CHROME_BIN\"\n"
+        },
+        {
+          "offset": 12932,
+          "before": "          CHROME_BIN=\"$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)\"\n",
+          "after": ""
+        },
+        {
+          "offset": 13077,
+          "before": "",
+          "after": "          test -x \"$CHROME_BIN\"\n"
+        },
+        {
+          "offset": 13354,
+          "before": "          CHROME_BIN=\"$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)\"\n",
+          "after": ""
+        },
+        {
+          "offset": 13499,
+          "before": "",
+          "after": "          test -x \"$CHROME_BIN\"\n"
+        },
+        {
+          "offset": 15717,
+          "before": "          sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium || true\n",
+          "after": ""
+        },
+        {
+          "offset": 16435,
+          "before": "          CHROME_BIN=\"$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)\"\n",
+          "after": "          CHROMIUM_STORE=\"$(nix build --no-link --print-out-paths .#ci-chromium)\"\n          CHROME_BIN=\"\"\n          for candidate in \\\n            \"$CHROMIUM_STORE/chromium-1228/chrome-linux64/chrome\" \\\n            \"$CHROMIUM_STORE/chromium-1228/chrome-linux/chrome\"; do\n            if [ -x \"$candidate\" ]; then CHROME_BIN=\"$candidate\"; break; fi\n          done\n"
+        },
+        {
+          "offset": 16612,
+          "before": "",
+          "after": "          CHROME_WRAPPED=\"$(dirname \"$CHROME_BIN\")/.chrome-wrapped\"\n          test -x \"$CHROME_WRAPPED\"\n          case \"$(uname -m)\" in\n            x86_64)\n              expected_chrome_sha=dbc8b199f83056aba947868710648f61c1d23c3f64c6a491c6f72ef2ebaf3f60\n              expected_wrapped_sha=e8006643ad430fcf8b0545c5b68625d4525826916773c85cbf757c78d16b2ee0\n              ;;\n            aarch64|arm64)\n              expected_chrome_sha=3a0b4b909e867cbd845162be0b67343c0d6bb03dbac8f2d410eec8fcc8913fe9\n              expected_wrapped_sha=eff7bad2ac10e1288fc52919ff9791a0d500a10c870c831ca8426b457a324d95\n              ;;\n            *) echo \"Unsupported Chromium runner architecture: $(uname -m)\" >&2; exit 2 ;;\n          esac\n          actual_chrome_sha=\"$(sha256sum \"$CHROME_BIN\" | cut -d' ' -f1)\"\n          actual_wrapped_sha=\"$(sha256sum \"$CHROME_WRAPPED\" | cut -d' ' -f1)\"\n          test \"$actual_chrome_sha\" = \"$expected_chrome_sha\"\n          test \"$actual_wrapped_sha\" = \"$expected_wrapped_sha\"\n          printf 'CHROME_BIN_SHA256=%s\\nCHROME_WRAPPED_SHA256=%s\\n' \"$actual_chrome_sha\" \"$actual_wrapped_sha\"\n          \"$CHROME_BIN\" --version\n          nix path-info --json \"$CHROMIUM_STORE\"\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_helper_ci.py",
+      "before": {
+        "path": "tests/test_helper_ci.py",
+        "sha256": "ba422a6ac11a29a8cd8ee8b9f1de8e03fa77e4edd2d809bc73a76a9d1a203f44",
+        "bytes": 17957
+      },
+      "after": {
+        "path": "tests/test_helper_ci.py",
+        "sha256": "1082cf4cedc101faa2657771b1536c6aae3fc1802618e1d849125f446324cfcb",
+        "bytes": 18692
+      },
+      "edits": [
+        {
+          "offset": 11659,
+          "before": "",
+          "after": "        if coherence:\n            added = ['node', 'tests/legacy_external_artifact_resolution.mjs']\n            anchor = ['node', 'scripts/fresh-artifact-negative-tests.mjs']\n            self.assertEqual(expected.count(anchor), 1)\n            self.assertNotIn(added, expected)\n            expected.insert(expected.index(anchor), added)\n"
+        },
+        {
+          "offset": 13154,
+          "before": "        self.assertEqual(current.split('  packed-consumer-aot:\\n')[1].replace(source_regressions, ''),\n                         original.split('  packed-consumer-aot:\\n')[1])\n",
+          "after": "        if (ROOT / 'scripts/run-helper-checks.py').exists():\n            self.assertEqual(current.split('  packed-consumer-aot:\\n')[1].replace(source_regressions, ''),\n                             original.split('  packed-consumer-aot:\\n')[1])\n        else:\n            reviewed = subprocess.check_output(['git', '--no-replace-objects', 'show',\n                '4b4893f56cbb5ce91cf698ec75449ba5e5e10943:.github/workflows/ci.yml'], cwd=ROOT, text=True)\n            self.assertEqual(current.split('  packed-consumer-aot:\\n')[1], reviewed.split('  packed-consumer-aot:\\n')[1])\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/dialog-initial-focus-source-test.mjs",
+      "before": {
+        "path": "scripts/dialog-initial-focus-source-test.mjs",
+        "sha256": "9266281794977eb2a165d713eac8cf1a3b20ee495ff64cec66eccd44e1351803",
+        "bytes": 23770
+      },
+      "after": {
+        "path": "scripts/dialog-initial-focus-source-test.mjs",
+        "sha256": "4440a459ea519d4783ccf59c9f9e10cf70c648a40e588dd7109e0725eef2ac7d",
+        "bytes": 38286
+      },
+      "edits": [
+        {
+          "offset": 3203,
+          "before": "    querySelector() { return null; }};\n",
+          "after": "    querySelector() { return null; },\n    addEventListener(event, callback) {listeners.set('document:' + event, callback);},\n    removeEventListener(event) {listeners.delete('document:' + event);}};\n"
+        },
+        {
+          "offset": 3537,
+          "before": "      focus(options) { log.push({kind: 'focus', name, options}); document.activeElement = node; },\n",
+          "after": "      focus(options) { log.push({kind: 'focus', name, options}); document.activeElement = node; listeners.get('document:focusin')?.(); },\n"
+        },
+        {
+          "offset": 6642,
+          "before": "",
+          "after": "    ...(mode.browserApp ? [{provide: core.ApplicationRef, useValue: Object.assign(Object.create(core.ApplicationRef.prototype), {ngOnDestroy() {}})}] : []),\n"
+        },
+        {
+          "offset": 9698,
+          "before": "",
+          "after": "  await check('stable-no-document-focus-and-opened-remain-direct', async () => {\n    const f = fixture(Base, 'first-tabbable', true, {browserApp: true, noDocument: true});\n    try {\n      const events = [];\n      f.instance._animationStateChanged.subscribe(e => events.push(e.state));\n      f.instance._trapFocus(true);\n      f.instance._openAnimationDone(0);\n      assert.equal(f.document.activeElement, f.first);\n      assert.equal(f.notifications(), 1);\n      assert.deepEqual(events, ['opened']);\n    } finally { f.destroy(); }\n  });\n"
+        },
+        {
+          "offset": 10244,
+          "before": "",
+          "after": "  });\n  for (const [name, isBrowser, options] of [\n    ['manual', true, {unstableZone: true, manual: true}],\n    ['nonbrowser', false, {unstableZone: true, browserApp: true}],\n    ['no-document', true, {unstableZone: true, browserApp: true, noDocument: true}],\n  ]) {\n    await check('unstable-uncoordinated-' + name + '-opened-remains-direct', async () => {\n      const f = fixture(Base, 'first-tabbable', isBrowser, options);\n      try {\n        const events = [];\n        f.instance._animationStateChanged.subscribe(e => events.push(e.state));\n        f.instance._trapFocus(true);\n        f.instance._openAnimationDone(0);\n        assert.deepEqual(events, ['opened']);\n      } finally { f.destroy(); }\n    });\n  }\n  await check('unstable-close-cancels-empty-focus-fallback', async () => {\n    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true});\n    try {\n      f.host.children = [];\n      const events = [];\n      f.instance._animationStateChanged.subscribe(e => events.push(e.state));\n      f.instance._trapFocus(true);\n      f.instance._openAnimationDone(0);\n      f.zone.isStable = true;\n      f.stable.next();\n      f.instance._cancelPendingInitialFocus();\n      await Promise.resolve();\n      assert.equal(f.document.activeElement, null);\n      assert.deepEqual(events, []);\n    } finally { f.destroy(); }\n  });\n  await check('unstable-opened-reentry-destroy-cleans-pending-work', async () => {\n    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true});\n    try {\n      let opened = 0;\n      f.instance._animationStateChanged.subscribe(e => {\n        if (e.state === 'opened') { opened++; f.instance.ngOnDestroy(); }\n      });\n      f.instance._trapFocus(true);\n      f.instance._openAnimationDone(0);\n      f.zone.isStable = true;\n      f.stable.next();\n      assert.equal(opened, 1);\n      assert.equal(f.stable.observers.length, 0);\n      assert.equal(f.listeners.size, 0);\n      assert.equal(f.selections.size, 0);\n      f.stable.next();\n      assert.equal(opened, 1);\n    } finally { f.destroy(); }\n  });\n  await check('pending-initial-empty-recapture-settles-before-opened', async () => {\n    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true, config: {disableClose: true}});\n    try {\n      f.host.children = []; const outside = f.element('outside', true), choice = f.element('choice', true), events = [];\n      f.instance._animationStateChanged.subscribe(e => { events.push({state: e.state, active: f.document.activeElement?.name}); if (e.state === 'opened') choice.focus(); });\n      f.instance._trapFocus(true); f.instance._openAnimationDone(0);\n      f.document.activeElement = outside; f.instance._recaptureFocus(); f.zone.isStable = true; f.stable.next();\n      assert.deepEqual(events, []); await Promise.resolve();\n      assert.deepEqual(events, [{state:'opened', active:'dialog'}]);\n      assert.equal(f.document.activeElement, choice); assert.equal(f.stable.observers.length, 0);\n      await Promise.resolve(); assert.equal(f.document.activeElement, choice);\n    } finally { f.destroy(); }\n  });\n  await check('pending-initial-empty-recapture-destroy-cancels-fallback', async () => {\n    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true, config: {disableClose: true}});\n    try {\n      f.host.children = []; const outside = f.element('outside', true), events = [];\n      f.instance._animationStateChanged.subscribe(e => events.push(e.state));\n      f.instance._trapFocus(true); f.instance._openAnimationDone(0); f.document.activeElement = outside;\n      f.instance._recaptureFocus(); f.zone.isStable = true; f.stable.next(); f.instance.ngOnDestroy();\n      await Promise.resolve(); assert.deepEqual(events, []); assert.equal(f.document.activeElement, outside);\n      assert.equal(f.stable.observers.length, 0);\n    } finally { f.destroy(); }\n  });\n  await check('pending-initial-empty-recapture-close-cancels-fallback', async () => {\n    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true, config: {disableClose: true}});\n    try {\n      f.host.children = []; const outside = f.element('outside', true), events = [];\n      f.instance._animationStateChanged.subscribe(e => events.push(e.state));\n      f.instance._trapFocus(true); f.instance._openAnimationDone(0); f.document.activeElement = outside;\n      f.instance._recaptureFocus(); f.zone.isStable = true; f.stable.next(); f.instance._cancelPendingInitialFocus();\n      await Promise.resolve(); assert.deepEqual(events, []); assert.equal(f.document.activeElement, outside);\n      assert.equal(f.stable.observers.length, 0);\n    } finally { f.destroy(); }\n  });\n  await check('pending-initial-empty-recapture-opened-destroy-reentry', async () => {\n    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true, config: {disableClose: true}});\n    try {\n      f.host.children = []; const events = [];\n      f.instance._animationStateChanged.subscribe(e => { events.push(e.state); f.instance.ngOnDestroy(); });\n      f.instance._trapFocus(true); f.instance._openAnimationDone(0); f.document.activeElement = f.element('outside');\n      f.instance._recaptureFocus(); f.zone.isStable = true; f.stable.next(); await Promise.resolve();\n      assert.deepEqual(events, ['opened']); assert.equal(f.document.activeElement, f.host);\n      assert.equal(f.stable.observers.length, 0); assert.equal(f.listeners.size, 0); assert.equal(f.selections.size, 0);\n    } finally { f.destroy(); }\n  });\n  await check('unstable-recapture-respects-focus-already-inside', async () => {\n    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, config: {disableClose: true}});\n    try {\n      f.instance._recaptureFocus();\n      assert.equal(f.stable.observers.length, 1);\n      f.second.focus();\n      f.zone.isStable = true;\n      f.stable.next();\n      assert.equal(f.document.activeElement, f.second);\n      assert.equal(f.notifications(), 0);\n    } finally { f.destroy(); }\n  });\n  await check('unstable-recapture-respects-in-dialog-shadow-focus', async () => {\n    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, config: {disableClose: true}});\n    try {\n      const host = f.element('shadow-host'), inner = f.element('shadow-inner', true);\n      host.shadowRoot = {activeElement: inner}; f.host.children.push(host);\n      f.instance._recaptureFocus();\n      f.document.activeElement = host;\n      f.zone.isStable = true; f.stable.next();\n      assert.equal(f.document.activeElement, host);\n      assert.equal(host.shadowRoot.activeElement, inner);\n      assert.equal(f.log.some(e => e.kind === 'focus'), false);\n      assert.equal(f.notifications(), 0);\n    } finally { f.destroy(); }\n  });\n  await check('unstable-recapture-returns-focus-from-outside-shadow', async () => {\n    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, config: {disableClose: true}});\n    try {\n      const host = f.element('outside-shadow'), inner = f.element('shadow-inner', true);\n      host.shadowRoot = {activeElement: inner};\n      f.instance._recaptureFocus(); f.document.activeElement = host;\n      f.zone.isStable = true; f.stable.next();\n      assert.equal(f.document.activeElement, f.first);\n      assert.equal(f.notifications(), 1);\n    } finally { f.destroy(); }\n  });\n  await check('unstable-pending-focusout-respects-user-blur', async () => {\n    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true});\n    try {\n      f.document.activeElement = f.second;\n      const events = [];\n      f.instance._animationStateChanged.subscribe(e => events.push(e.state));\n      f.instance._trapFocus(true);\n      f.instance._openAnimationDone(0);\n      f.document.activeElement = null;\n      f.listeners.get('document:focusout')?.();\n      await Promise.resolve();\n      assert.deepEqual(events, ['opened']);\n      assert.equal(f.stable.observers.length, 0);\n      f.zone.isStable = true;\n      f.stable.next();\n      assert.equal(f.document.activeElement, null);\n    } finally { f.destroy(); }\n  });\n  await check('unstable-empty-fallback-respects-user-focus', async () => {\n    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true});\n    try {\n      f.host.children = [];\n      const events = [];\n      f.instance._animationStateChanged.subscribe(e => events.push(e.state));\n      f.instance._trapFocus(true);\n      f.instance._openAnimationDone(0);\n      f.zone.isStable = true;\n      f.stable.next();\n      f.second.focus();\n      await Promise.resolve();\n      assert.equal(f.document.activeElement, f.second);\n      assert.deepEqual(events, ['opened']);\n    } finally { f.destroy(); }\n  });\n  await check('unstable-empty-fallback-settles-before-opened', async () => {\n    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true});\n    try {\n      f.host.children = [];\n      const events = [];\n      f.instance._animationStateChanged.subscribe(e => events.push(e.state));\n      f.instance._trapFocus(true);\n      f.instance._openAnimationDone(0);\n      f.zone.isStable = true;\n      f.stable.next();\n      assert.deepEqual(events, []);\n      assert.equal(f.document.activeElement, null);\n      await Promise.resolve();\n      assert.equal(f.document.activeElement, f.host);\n      assert.deepEqual(events, ['opened']);\n    } finally { f.destroy(); }\n  });\n  await check('unstable-initial-focus-settles-before-opened', async () => {\n    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true});\n    try {\n      const events = [];\n      f.instance._animationStateChanged.subscribe(e => events.push(e.state));\n      f.instance._trapFocus(true);\n      f.instance._openAnimationDone(0);\n      assert.deepEqual(events, []);\n      assert.equal(f.document.activeElement, null);\n      f.zone.isStable = true;\n      f.stable.next();\n      assert.equal(f.document.activeElement, f.first);\n      assert.deepEqual(events, ['opened']);\n      f.stable.next();\n      assert.deepEqual(events, ['opened']);\n    } finally { f.destroy(); }\n  });\n  await check('unstable-close-cancels-initial-focus-and-opened', async () => {\n    const f = fixture(Base, 'first-tabbable', true, {unstableZone: true, browserApp: true});\n    try {\n      const events = [];\n      f.instance._animationStateChanged.subscribe(e => events.push(e.state));\n      f.instance._trapFocus(true);\n      f.instance._openAnimationDone(0);\n      f.instance._cancelPendingInitialFocus();\n      assert.equal(f.stable.observers.length, 0);\n      f.zone.isStable = true;\n      f.stable.next();\n      assert.equal(f.document.activeElement, null);\n      assert.deepEqual(events, []);\n    } finally { f.destroy(); }\n"
+        },
+        {
+          "offset": 20584,
+          "before": "",
+          "after": "  ['pending-recapture-open-before-settlement', originalBase.replace(\n    '          onRecaptureSettled?.();\\n          onSettled?.();',\n    '          onSettled?.();').replace(\n    '        this._legacyFocusCleanup = cleanup;\\n        if (settledWhileInvoking)',\n    '        this._legacyFocusCleanup = cleanup;\\n        onRecaptureSettled?.();\\n        if (settledWhileInvoking)'), originalFocus,\n    'pending-initial-empty-recapture-settles-before-opened'],\n  ['recapture-composed-shadow-check-removed', originalBase.replace(\n    'if (recapture && legacyDialogContainsComposedFocus(this._elementRef.nativeElement))',\n    'if (recapture && legacyDialogContainsFocus(this._elementRef.nativeElement))'), originalFocus,\n    'unstable-recapture-respects-in-dialog-shadow-focus'],\n  ['stable-document-guard-removed', originalBase.replace(\n    '&& this._legacyRenderInjector && this._legacyApplicationRef instanceof ApplicationRef\\n        && this._document && this._isBrowser();',\n    '&& this._legacyRenderInjector && this._legacyApplicationRef instanceof ApplicationRef\\n        && this._isBrowser();'), originalFocus,\n    'stable-no-document-focus-and-opened-remain-direct'],\n  ['unstable-recapture-inside-focus-check-removed', originalBase.replace(\n    'if (recapture && legacyDialogContainsComposedFocus(this._elementRef.nativeElement))',\n    'if (false)'), originalFocus,\n    'unstable-recapture-respects-focus-already-inside'],\n  ['unstable-user-blur-listener-removed', originalBase.replace(\n    \"root.addEventListener('focusout', onUserBlur, true);\",\n    '/* user blur unobserved */'), originalFocus,\n    'unstable-pending-focusout-respects-user-blur'],\n  ['unstable-user-focus-listener-removed', originalBase.replace(\n    \"root.addEventListener('focusin', onUserFocus, true);\",\n    '/* user focus unobserved */'), originalFocus,\n    'unstable-empty-fallback-respects-user-focus'],\n  ['pending-fallback-not-cancelled', originalBase.replace(\n    '      this._legacyFocusCleanup?.();\\n      this._legacyFocusCleanup = null;',\n    '      /* pending fallback left active */'), originalFocus,\n    'unstable-close-cancels-empty-focus-fallback'],\n  ['settlement-callback-removed', originalBase.replace('          onSettled?.();', '          /* settlement lost */'), originalFocus,\n    'unstable-empty-fallback-settles-before-opened'],\n  ['unstable-readiness-not-tracked', originalBase.replace(\n    '        this._legacyInitialFocusPending = true;\\n        const activeRoots',\n    '        /* pending state removed */\\n        const activeRoots'), originalFocus,\n    'unstable-initial-focus-settles-before-opened'],\n  ['unstable-initial-cancel-removed', originalBase.replace(\n    'this._legacyPendingInitialZoneSubscription?.unsubscribe();', '/* subscription leaked */'), originalFocus,\n    'unstable-close-cancels-initial-focus-and-opened'],\n"
+        }
+      ]
+    }
+  ]
+}

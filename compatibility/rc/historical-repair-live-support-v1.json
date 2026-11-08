@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "role": "historical-repair-live-support-source-successor",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "transitions": [
+    {
+      "path": "scripts/authored-additional-use-baseline.mjs",
+      "steps": [
+        {
+          "source_parent": "4c29be143432bcb5b2ca99d4f83ca6ff162b4554",
+          "source_commit": "547abe83d86c4682a173a6e01d2c783b6bb1d855",
+          "before": {
+            "path": "scripts/authored-additional-use-baseline.mjs",
+            "sha256": "bf7b887600e644d8794e08756710248322e440f3e37bcf655a6896867b4893cb",
+            "bytes": 5592
+          },
+          "after": {
+            "path": "scripts/authored-additional-use-baseline.mjs",
+            "sha256": "34250fbc33217cd572fcb0380221f057b56117aa832e05aa3cb22cf8cc3afb66",
+            "bytes": 6359
+          },
+          "edits": [
+            {
+              "offset": 488,
+              "before": "",
+              "after": "import {dirname,resolve} from 'node:path';\nimport {fileURLToPath} from 'node:url';\n"
+            },
+            {
+              "offset": 895,
+              "before": "",
+              "after": "import {qualifyCurrentDialogRetiredUse} from './current-dialog-retired-use-source.mjs';\n"
+            },
+            {
+              "offset": 1547,
+              "before": "export function additionalUseBaseline({current,additions,candidate,line,readMember,provided}){\n",
+              "after": "export function additionalUseBaseline({root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),current,additions,candidate,line,readMember,provided}){\n"
+            },
+            {
+              "offset": 4475,
+              "before": "  if(dialogRemoved){result.retired.push({...DIALOG_CONFIG_RETIRED_ROLE,candidate_source_sha256:'994576f436b45a1d3d1f132db793a2b3668e581637f06279e2200065cea319a5',occurrences:[]});const boundary=inspectDialogOwnedContracts({read:proofRead,requireApplied:true}).defaults.configuration;assert.equal(boundary.line,line);const path='projects/ngx-material-legacy/'+DIALOG_CONFIG_RETIRED_ROLE.file,member=boundary.targets.find(m=>m.path===path);assert.equal(member.sha256,result.retired.at(-1).candidate_source_sha256);assert.equal(current.source_files.find(m=>m.path===path)?.sha256,member.sha256,'mixed dialog source graph and historical reader');expected.push({...DIALOG_CONFIG_RETIRED_ROLE,qualification:boundary.qualification});result.mode='owned-menu-and-dialog-config-type-removals';result.qualification=[qualification.ref,boundary.qualification];}assert.ok(isDeepStrictEqual(candidate?.retained_removed_additional_uses,expected),'missing or changed retained-removed obligation qualification');\n",
+              "after": "  if(dialogRemoved){const path='projects/ngx-material-legacy/'+DIALOG_CONFIG_RETIRED_ROLE.file,source=current.source_files.find(m=>m.path===path);let dialogQualification;\n   if(line==='main'&&source?.sha256==='c63b9af0076ce1ae261c0e8529b4c0f496c2b42b3b6edf1e270b3217fdea44e1'){\n    const continuation=qualifyCurrentDialogRetiredUse({root,readMember,current});assert.deepEqual(continuation.role,DIALOG_CONFIG_RETIRED_ROLE);result.retired.push({...continuation.role,candidate_source_sha256:continuation.candidate_source_sha256,occurrences:continuation.occurrences});dialogQualification=continuation.qualification;\n   }else{result.retired.push({...DIALOG_CONFIG_RETIRED_ROLE,candidate_source_sha256:'994576f436b45a1d3d1f132db793a2b3668e581637f06279e2200065cea319a5',occurrences:[]});const boundary=inspectDialogOwnedContracts({read:proofRead,requireApplied:true}).defaults.configuration;assert.equal(boundary.line,line);const member=boundary.targets.find(m=>m.path===path);assert.equal(member.sha256,result.retired.at(-1).candidate_source_sha256);assert.equal(source?.sha256,member.sha256,'mixed dialog source graph and historical reader');dialogQualification=boundary.qualification;}\n   expected.push({...DIALOG_CONFIG_RETIRED_ROLE,qualification:dialogQualification});result.mode='owned-menu-and-dialog-config-type-removals';result.qualification=[qualification.ref,dialogQualification];}assert.ok(isDeepStrictEqual(candidate?.retained_removed_additional_uses,expected),'missing or changed retained-removed obligation qualification');\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-evidence-requalification.mjs",
+      "steps": [
+        {
+          "source_parent": "4c29be143432bcb5b2ca99d4f83ca6ff162b4554",
+          "source_commit": "547abe83d86c4682a173a6e01d2c783b6bb1d855",
+          "before": {
+            "path": "scripts/bidi-isolated-packed-evidence-requalification.mjs",
+            "sha256": "cfe4a91ab31cb5c3db1db81648ccd5b57623cba736745ea4abb25a8b85b59794",
+            "bytes": 16904
+          },
+          "after": {
+            "path": "scripts/bidi-isolated-packed-evidence-requalification.mjs",
+            "sha256": "78c95f9fa130adc675e1400462ea429562031edc1f57ddb5b04f6c19965f13d1",
+            "bytes": 16909
+          },
+          "edits": [
+            {
+              "offset": 15637,
+              "before": "  const currentAdmission = currentAuthoredUseAdmission({current: scanCurrentAuthoredUses({root, readSource: read}),\n",
+              "after": "  const currentAdmission = currentAuthoredUseAdmission({root,current: scanCurrentAuthoredUses({root, readSource: read}),\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/snack_exit_runtime_subject.mjs",
+      "steps": [
+        {
+          "source_parent": "9a4b48c95d5574c963d5dfb3df1695eab4999a25",
+          "source_commit": "fd372025ef5c37f523ef222a84e4a1c3a0f640ef",
+          "before": {
+            "path": "tests/snack_exit_runtime_subject.mjs",
+            "sha256": "3c6000fcd516246f4ddc5e14d6a570e92090847c111c5ef985c4eeb849b78ce4",
+            "bytes": 13856
+          },
+          "after": {
+            "path": "tests/snack_exit_runtime_subject.mjs",
+            "sha256": "44358ef76650c8955f630eec84e1056165a73f5648334cd6090a43ff5f6a1c7d",
+            "bytes": 13986
+          },
+          "edits": [
+            {
+              "offset": 7626,
+              "before": "",
+              "after": "    if (kind === 'disabled') {\n      assert.equal(f.counts().enters, 0, 'noop-enter-not-synchronous');\n      await drain();\n    }\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "compatibility/rc/api/export-name-allowlist.json",
+      "steps": [
+        {
+          "source_parent": "f522ad64ac3b487425f4beb0dbdc65891f4d5505",
+          "source_commit": "8f9f724615ede1b0af0e2c4c347449c5952710e5",
+          "before": {
+            "path": "compatibility/rc/api/export-name-allowlist.json",
+            "sha256": "2bb2a862bc3f502d1799cb18e6b4cfd841773b6698df3bca5073acb5718fcffd",
+            "bytes": 13539
+          },
+          "after": {
+            "path": "compatibility/rc/api/export-name-allowlist.json",
+            "sha256": "e41f921c3c399470af36b22e3c4b0f79042bc90120f89750e0c04f6c39166510",
+            "bytes": 12077
+          },
+          "edits": [
+            {
+              "offset": 2769,
+              "before": "      ]\n    },\n    {\n      \"name\": \"_MatLegacyMenuBase\",\n      \"category\": \"owned-underscore-base\",\n      \"reason\": \"Owned menu base retained after peer removed legacy menu bases.\",\n      \"entries\": [\n        \"legacy-menu/primary\"\n      ]\n    },\n    {\n      \"name\": \"_MatLegacyMenuContentBase\",\n      \"category\": \"owned-underscore-base\",\n      \"reason\": \"Owned menu content base retained for lazy content.\",\n      \"entries\": [\n        \"legacy-menu/primary\"\n      ]\n    },\n    {\n      \"name\": \"_MatLegacyMenuTriggerBase\",\n      \"category\": \"owned-underscore-base\",\n      \"reason\": \"Owned menu trigger base with scroll-strategy factory provider.\",\n      \"entries\": [\n        \"legacy-menu/primary\"\n",
+              "after": ""
+            },
+            {
+              "offset": 9575,
+              "before": "      \"name\": \"LEGACY_MENU_PANEL_TOP_PADDING\",\n      \"category\": \"owned-constant\",\n      \"reason\": \"Owned menu panel padding constant used by the trigger positioning path.\",\n      \"entries\": [\n        \"legacy-menu/primary\"\n      ]\n    },\n    {\n      \"name\": \"MAT_LEGACY_MENU_SCROLL_STRATEGY_FACTORY\",\n      \"category\": \"owned-factory\",\n      \"reason\": \"Owned menu scroll-strategy factory; historical name kept on the primary entry.\",\n      \"entries\": [\n        \"legacy-menu/primary\"\n      ]\n    },\n    {\n      \"name\": \"MAT_LEGACY_MENU_SCROLL_STRATEGY_FACTORY_PROVIDER\",\n      \"category\": \"owned-factory\",\n      \"reason\": \"Owned menu scroll-strategy factory provider used by MatLegacyMenuModule.\",\n      \"entries\": [\n        \"legacy-menu/primary\"\n      ]\n    },\n    {\n",
+              "after": ""
+            }
+          ]
+        },
+        {
+          "source_parent": "a98b0a91011a00887462a89011516f39b3bf663f",
+          "source_commit": "fdcdadee28c4552e3500b5099de9f42e456adb5c",
+          "before": {
+            "path": "compatibility/rc/api/export-name-allowlist.json",
+            "sha256": "e41f921c3c399470af36b22e3c4b0f79042bc90120f89750e0c04f6c39166510",
+            "bytes": 12077
+          },
+          "after": {
+            "path": "compatibility/rc/api/export-name-allowlist.json",
+            "sha256": "abec8f2e624ba5ce54d24746821755c9b9fb8d7af5cafc6012e159ed08935967",
+            "bytes": 11038
+          },
+          "edits": [
+            {
+              "offset": 211,
+              "before": "    {\n      \"name\": \"MatCommonModule\",\n      \"category\": \"owned-common-module\",\n      \"reason\": \"Owned MatCommonModule is re-exported from each primary family so historical NgModule imports keep resolving without @angular/material/core private paths.\",\n      \"entries\": [\n        \"legacy-autocomplete/primary\",\n        \"legacy-button/primary\",\n        \"legacy-card/primary\",\n        \"legacy-checkbox/primary\",\n        \"legacy-chips/primary\",\n        \"legacy-core/primary\",\n        \"legacy-dialog/primary\",\n        \"legacy-form-field/primary\",\n        \"legacy-input/primary\",\n        \"legacy-list/primary\",\n        \"legacy-menu/primary\",\n        \"legacy-paginator/primary\",\n        \"legacy-progress-bar/primary\",\n        \"legacy-progress-spinner/primary\",\n        \"legacy-radio/primary\",\n        \"legacy-select/primary\",\n        \"legacy-slide-toggle/primary\",\n        \"legacy-slider/primary\",\n        \"legacy-snack-bar/primary\",\n        \"legacy-table/primary\",\n        \"legacy-tabs/primary\",\n        \"legacy-tooltip/primary\"\n      ]\n    },\n",
+              "after": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

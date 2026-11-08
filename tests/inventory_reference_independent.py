@@ -3,7 +3,7 @@
 # Use of this source code is governed by the MIT license in LICENSE.
 """Independent byte-token inventory metadata derivation; no Node producer or canonical writes."""
 from pathlib import Path
-import copy,gzip,hashlib,importlib.util,json,os,re,subprocess
+import copy,gzip,hashlib,importlib.util,json,os,re,subprocess,sys
 ROOT=Path(__file__).resolve().parents[1]
 PINS={'main':('a0015ca03a0cd65405df754fdee30cfe95cbafac','121fa2c930784575a0ead888fb6d5caa03a4511aa5b90f7d88e69450df5a6da0',20),
       '21.x':('3aefef647f2237cca488d0b5de62cd2981f3dc7e','cc74f78b748c9b1226338b96a979558510ab72e50fea4c223cae45a76f4980a1',19)}
@@ -13,9 +13,23 @@ line='21.x'if json.loads((ROOT/'projects/ngx-material-legacy/package.json').read
 parent,before_sha,count=PINS[line];env=dict(os.environ,GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1')
 for key in ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES']:env.pop(key,None)
 before=subprocess.check_output(['git','--no-replace-objects','show',parent+':'+ledger_path],cwd=ROOT,env=env);assert sha(before)==before_sha
-module=importlib.util.spec_from_file_location('independent_inventory_auth',ROOT/'scripts/historical_inventory_rebinding.py');owner=importlib.util.module_from_spec(module);module.loader.exec_module(owner);source=owner.verify_inventory_successor(ROOT)
+sys.path.insert(0,str(ROOT/'scripts'))
+if line=='main':
+ from current_tool_matrix_source import CurrentToolMatrixSource
+ from select_dialog_finite_source_successor_v7 import SelectDialogFiniteSourceV7
+ matrix=CurrentToolMatrixSource(ROOT);product=SelectDialogFiniteSourceV7(ROOT,line='main')
+ current=sha((ROOT/inventory_path).read_bytes());assert current=='912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15'
+ assert any(r['path']==inventory_path and r['sha256']==current for r in matrix.bound)
+ historical=subprocess.check_output(['git','--no-replace-objects','show','9665df520e4f8644422203b6cb82a5412a483a33:'+inventory_path],cwd=ROOT,env=env)
+ old_inventory='89e7770f51357cd8544c7df10a3ba9c538bcc66f3040e3d45434634308616832';new_inventory=sha(historical)
+ assert new_inventory=='baecc3ac539fe5ade1796c8647089588daa23d43d426358bd17038cc3933561c'
+ scan=subprocess.check_output([sys.executable,'-B','scripts/historical_inventory_source.py'],cwd=ROOT,env=env,text=True)
+ assert scan.strip()=='historical-inventory: 57 current candidate and 21 shim identities match; execution not qualified'
+ matrix.assert_current();product.assert_current()
+else:
+ module=importlib.util.spec_from_file_location('independent_inventory_auth',ROOT/'scripts/historical_inventory_rebinding.py');owner=importlib.util.module_from_spec(module);module.loader.exec_module(owner);source=owner.verify_inventory_successor(ROOT)
+ old_inventory=source['before_inventory_sha256'];new_inventory=sha((ROOT/inventory_path).read_bytes());assert source['current_inventory_sha256']==new_inventory
 live_canonical_before=(ROOT/ledger_path).read_bytes()
-old_inventory=source['before_inventory_sha256'];new_inventory=sha((ROOT/inventory_path).read_bytes());assert source['current_inventory_sha256']==new_inventory
 expected=json.loads(before);updates={};old_refs=[]
 for row in expected['entries']:
  for kind in ['historical_behavior','progress_csp_behavior','media_matcher_behavior','form_field_hover_behavior','content_observer_behavior','ripple_replay_behavior']:
