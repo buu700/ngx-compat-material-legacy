@@ -14,24 +14,37 @@ import {fileURLToPath} from 'node:url';
 import {gunzipSync} from 'node:zlib';
 import {historicalBehaviorRequirements,HISTORICAL_BEHAVIOR_KIND} from './upstream-historical-behavior-evidence.mjs';
 import {autocompleteSelectionSpecSubject} from './autocomplete-selection-spec-subject.mjs';
+import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
+import {retainedSelectionMetadataContext} from './retained-selection-metadata-context.mjs';
+import {retainedLandscapeProgramSource} from './retained-landscape-program-source.mjs';
 
 export const AUTOCOMPLETE_LANDSCAPE_SHA='008212a9807fd01fd32fe136a075763b7b2c854d';
 export const AUTOCOMPLETE_LANDSCAPE_REVIEW='compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-landscape-selection-spec-source-judgment.json';
 const prefix='compatibility/rc/autocomplete-landscape-',hash=raw=>createHash('sha256').update(raw).digest('hex');
 const ts=createRequire(import.meta.url)('typescript');
 const objectHash=(kind,text)=>createHash('sha1').update(kind+' '+Buffer.byteLength(text)+'\0').update(text).digest('hex');
+const SELF='scripts/autocomplete-landscape-source-judgment.mjs',ownImage=readFileSync(fileURLToPath(import.meta.url));
 const checkpointPins={main:'7a542de44d39dce6b6c81bfac4bcd4c503452de06f4329fb72a505f8e44b9925',
   '21.x':'4bc5e982d8ca9c65ae8ec6be23fdc9b0e5b19ed3dc4cb50bf4581f59c6747c18'};
 
 export function autocompleteLandscapeSourceJudgment({root,read=path=>readFileSync(join(root,path)),line}={}){
+  let context=null,programs=null;
   const bound=new Map(),member=(path,expected)=>{
-    const raw=read(path),ref={path,sha256:hash(raw),bytes:raw.length};
-    if(expected)assert.equal(ref.sha256,expected,'changed landscape source subject '+path);
-    bound.set(path,ref);return raw;
+    const actual=readEvidenceMember(root,path),raw=read(path),ref={path,sha256:hash(actual),bytes:actual.length};
+    assert.ok(Buffer.isBuffer(raw)&&raw.equals(actual),'nonphysical landscape source subject '+path);
+    assert.ok(actual.equals(readEvidenceMember(root,path)),'landscape source changed during callback '+path);
+    if(expected){const requested={path,sha256:expected},current=programs?.qualifyMetadata(requested)??context?.qualifyMetadata(requested)??requested;
+      assert.equal(ref.sha256,current.sha256,'changed landscape source subject '+path);}
+    const prior=bound.get(path);if(prior)assert.deepEqual(prior,ref);else bound.set(path,ref);return raw;
   },ref=path=>{member(path);return bound.get(path);};
   const manifest=JSON.parse(member('projects/ngx-material-legacy/package.json'));
   const actualLine=manifest.version.startsWith('21.')?'21.x':'main';
   line??=actualLine;assert.equal(line,actualLine);
+  if(line==='main'){
+    context=retainedSelectionMetadataContext({root,read});programs=retainedLandscapeProgramSource({root,read});
+    for(const ref of [...context.bound,...programs.bound]){const prior=bound.get(ref.path);if(prior)assert.deepEqual(prior,ref);else bound.set(ref.path,{...ref});}
+  }
+  member(SELF,hash(ownImage));assert.ok(readEvidenceMember(root,SELF).equals(ownImage),'changed loaded landscape source judgment');
   assert.equal(process.versions.node,JSON.parse(member('toolchain-lock.json')).repository.node);
   assert.equal(ts.version,JSON.parse(member('package.json')).devDependencies.typescript);
   const checkpointPath=prefix+'current-source-review.json';
@@ -53,7 +66,8 @@ export function autocompleteLandscapeSourceJudgment({root,read=path=>readFileSyn
   const currentOwnedSources=checkpoint.current_sources.map(row=>{
     const current=row.path===specSource.path?{...row,...specSource.after}:row;
     if(row.path===specSource.path){assert.equal(row.sha256,specSource.before.sha256);assert.equal(row.bytes,specSource.before.bytes);}
-    const raw=member(current.path,current.sha256);assert.equal(raw.length,current.bytes);return current;
+    const physical=context?.qualifyMetadata(current)??current;
+    const raw=member(current.path,current.sha256);assert.equal(raw.length,physical.bytes);return current;
   });
   for(const row of specSource.bound)member(row.path,row.sha256);
   const diagnostic=JSON.parse(gunzipSync(member(checkpoint.diagnostic.path,checkpoint.diagnostic.sha256)));
@@ -62,6 +76,15 @@ export function autocompleteLandscapeSourceJudgment({root,read=path=>readFileSyn
   assert.equal(diagnostic.node,process.version);assert.equal(diagnostic.typescript,ts.version);assert.equal(diagnostic.line,line);
   assert.equal(diagnostic.floors.length,2);assert.ok(diagnostic.floors.every(row=>row.cases.length===7&&row.cases.every(c=>c.result==='pass')));
   assert.equal(diagnostic.mutants.length,6);assert.ok(diagnostic.mutants.every(row=>row.result==='rejected'&&row.failed_case_ids.length));
+  let currentDiagnostic=null;
+  if(context){
+    currentDiagnostic=JSON.parse(gunzipSync(member('compatibility/rc/main-retained-landscape-current-prototype-v1.json.gz',
+      '3c6386af49c6bf3c6fb48bcb0eaafc9ae64d565b6ec42989c198c23afebd1951')));
+    const actual=context.qualifyMetadata(checkpoint.current_sources[0]);assert.ok(actual);
+    assert.equal(currentDiagnostic.source.path,actual.path);assert.equal(currentDiagnostic.source.sha256,actual.sha256);
+    const expected=structuredClone(diagnostic);expected.source.sha256=actual.sha256;
+    assert.deepEqual(currentDiagnostic,expected,'fresh landscape prototype differs beyond the authenticated current source identity');
+  }
   const minimums=JSON.parse(member(prefix+'cdk-sources/identities.json')),minimum=minimums.find(row=>row.line===line);
   assert.ok(minimum);assert.equal(manifest.peerDependencies['@angular/cdk'],'^'+minimum.version);
   const peer=realpathSync(join(root,'node_modules/@angular/cdk')),external=[];
@@ -73,7 +96,18 @@ export function autocompleteLandscapeSourceJudgment({root,read=path=>readFileSyn
   assert.equal(JSON.parse(externalManifest).version,minimum.version);
   external.push({path:join(peer,'package.json'),sha256:hash(externalManifest)});
   const assertExternal=()=>{assert.equal(realpathSync(join(root,'node_modules/@angular/cdk')),peer);
-    specSource.assertCurrent();for(const row of external)assert.equal(hash(readFileSync(row.path)),row.sha256,'changed installed landscape peer member');};
+    context?.assertCurrent();programs?.assertCurrent();specSource.assertCurrent();
+    for(const row of bound.values()){
+      const actual=readEvidenceMember(root,row.path);assert.equal(hash(actual),row.sha256);assert.equal(actual.length,row.bytes);
+      const supplied=read(row.path);assert.ok(Buffer.isBuffer(supplied)&&supplied.equals(actual),'nonphysical late landscape source '+row.path);
+      assert.ok(actual.equals(readEvidenceMember(root,row.path)));
+    }
+    // Final callbacks can alter an earlier domain. Close all current source,
+    // program and report bindings physically, without another caller callback.
+    for(const row of bound.values()){const actual=readEvidenceMember(root,row.path);assert.equal(hash(actual),row.sha256);assert.equal(actual.length,row.bytes);}
+    assert.equal(realpathSync(join(root,'node_modules/@angular/cdk')),peer,'late installed landscape peer resolution change');
+    for(const row of external)assert.equal(hash(readFileSync(row.path)),row.sha256,'changed installed landscape peer member');
+    assert.ok(readEvidenceMember(root,SELF).equals(ownImage));};
   assertExternal();
   const layout=ts.createSourceFile('layout.d.ts',readFileSync(join(peer,'types/layout.d.ts')).toString(),ts.ScriptTarget.Latest,true);
   const observer=layout.statements.find(node=>ts.isClassDeclaration(node)&&node.name?.text==='BreakpointObserver');assert.ok(observer);
@@ -96,7 +130,8 @@ export function autocompleteLandscapeSourceJudgment({root,read=path=>readFileSyn
   assert.equal(controls.actual_browser_artifact_or_floor_executed,false);
   const matrix=JSON.parse(member('compatibility/rc/matrices/full-verify.json'));
   const ids=Object.values(matrix.checks.find(row=>row.check_id==='historical-legacy-artifact').acceptance.cases_by_line[line]).flat();
-  assert.equal(ids.length,2236);assert.equal(new Set(ids).size,2236);assert.ok(definition.cases.every(row=>ids.includes(row.case_id)));
+  if(context)assert.deepEqual(ids,context.currentCaseIds);else assert.equal(ids.length,2236);
+  assert.equal(new Set(ids).size,ids.length);assert.ok(definition.cases.every(row=>ids.includes(row.case_id)));
   const decision='The complete two-file/six-hunk patch is adapted in the owned legacy trigger. Its supplied public view injector resolves the nondeprecated public BreakpointObserver at the advertised CDK '+minimum.version+' minimum while retaining the historical eleven-argument constructor. One fixed HandsetLandscape subscription is created before first overlay attachment and reused across close/reopen. It sets flexible dimensions/growth/margin to true/true/8 in landscape and false/false/0 otherwise, and teardown unsubscribes without completing the borrowed observer. The original comment adds no behavior. The sole upstream MDC spec offset change does not replace the legacy75px selector/geometry assertion. Five exact existing native tests are mandatory in the complete same-run packed/historical suite. Current source-protocol/lifetime diagnostics and corruption controls support this source decision; actual Angular geometry, artifact behavior and runtime/peer floors require their separate executions. No product API, HTML, CSS or SCSS change is required.';
   const body={schema_version:1,line,sha:AUTOCOMPLETE_LANDSCAPE_SHA,status:'reviewed',final_disposition:'already-adapted',
     review_depth:'individual-compatibility',reviewer:'Codex primary implementer; independent complete audit remains separate',
@@ -110,9 +145,11 @@ export function autocompleteLandscapeSourceJudgment({root,read=path=>readFileSyn
     native_contract_controls:bound.get(controlsPath),required_named_native_cases:definition.cases,complete_historical_case_count:2236,
     public_layout_exports_non_deprecated:true,original_legacy75px_assertion_retained:true,
     consumer_TS_HTML_CSS_SCSS_changes_required:false,actual_native_browser_artifact_or_floor_executed:false,g11_claim:'not-passed'};
-  return {body,proof:{proof_kind:HISTORICAL_BEHAVIOR_KIND,review_depth:'individual-compatibility',diff_sha256:definition.patch,
+  assertExternal();return {body:structuredClone(body),body_is_historical_metadata:Boolean(context),current_diagnostic:structuredClone(currentDiagnostic),
+    current_matrix_obligation_count:ids.length,
+    proof:{proof_kind:HISTORICAL_BEHAVIOR_KIND,review_depth:'individual-compatibility',diff_sha256:definition.patch,
     affected_branches:[line],decision,historical_behavior:{kind:definition.kind,case_ids:definition.cases.map(row=>row.case_id),source_members:sourceMembers}},
-    bound:[...bound.values()],assertExternal};
+    bound:structuredClone([...bound.values()]),assertExternal};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   assert.equal(process.argv.length,4);assert.equal(process.argv[2],'--out');

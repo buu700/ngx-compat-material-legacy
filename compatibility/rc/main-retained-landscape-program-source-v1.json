@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "role": "finite-main-retained-landscape-program-source",
+  "base_head": "62e961dd19e519ad47220a9a36c5d8c9e60fd18c",
+  "updates": [
+    {
+      "path": "scripts/autocomplete-landscape-source-judgment.mjs",
+      "before_commit": "62e961dd19e519ad47220a9a36c5d8c9e60fd18c",
+      "before": {
+        "path": "scripts/autocomplete-landscape-source-judgment.mjs",
+        "sha256": "6b3a8bc73f78d8ca8cf79a8d33965ccb9f068cc1048773f4704775873dfe1fb3",
+        "bytes": 11696,
+        "blob_oid": "413629c6a6a229d4ab66b9915630dad81e818e9a"
+      },
+      "after": {
+        "path": "scripts/autocomplete-landscape-source-judgment.mjs",
+        "sha256": "09c9acedcd23eb549956359375802b4f05aede6b277bd790b2d5b9b0ad8d4e71",
+        "bytes": 14981
+      },
+      "edits": [
+        {
+          "offset": 778,
+          "before": "",
+          "after": "import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';\nimport {retainedSelectionMetadataContext} from './retained-selection-metadata-context.mjs';\nimport {retainedLandscapeProgramSource} from './retained-landscape-program-source.mjs';\n"
+        },
+        {
+          "offset": 1315,
+          "before": "",
+          "after": "const SELF='scripts/autocomplete-landscape-source-judgment.mjs',ownImage=readFileSync(fileURLToPath(import.meta.url));\n"
+        },
+        {
+          "offset": 1599,
+          "before": "",
+          "after": "  let context=null,programs=null;\n"
+        },
+        {
+          "offset": 1649,
+          "before": "    const raw=read(path),ref={path,sha256:hash(raw),bytes:raw.length};\n    if(expected)assert.equal(ref.sha256,expected,'changed landscape source subject '+path);\n    bound.set(path,ref);return raw;\n",
+          "after": "    const actual=readEvidenceMember(root,path),raw=read(path),ref={path,sha256:hash(actual),bytes:actual.length};\n    assert.ok(Buffer.isBuffer(raw)&&raw.equals(actual),'nonphysical landscape source subject '+path);\n    assert.ok(actual.equals(readEvidenceMember(root,path)),'landscape source changed during callback '+path);\n    if(expected){const requested={path,sha256:expected},current=programs?.qualifyMetadata(requested)??context?.qualifyMetadata(requested)??requested;\n      assert.equal(ref.sha256,current.sha256,'changed landscape source subject '+path);}\n    const prior=bound.get(path);if(prior)assert.deepEqual(prior,ref);else bound.set(path,ref);return raw;\n"
+        },
+        {
+          "offset": 2104,
+          "before": "",
+          "after": "  if(line==='main'){\n    context=retainedSelectionMetadataContext({root,read});programs=retainedLandscapeProgramSource({root,read});\n    for(const ref of [...context.bound,...programs.bound]){const prior=bound.get(ref.path);if(prior)assert.deepEqual(prior,ref);else bound.set(ref.path,{...ref});}\n  }\n  member(SELF,hash(ownImage));assert.ok(readEvidenceMember(root,SELF).equals(ownImage),'changed loaded landscape source judgment');\n"
+        },
+        {
+          "offset": 3979,
+          "before": "    const raw=member(current.path,current.sha256);assert.equal(raw.length,current.bytes);return current;\n",
+          "after": "    const physical=context?.qualifyMetadata(current)??current;\n    const raw=member(current.path,current.sha256);assert.equal(raw.length,physical.bytes);return current;\n"
+        },
+        {
+          "offset": 4842,
+          "before": "",
+          "after": "  let currentDiagnostic=null;\n  if(context){\n    currentDiagnostic=JSON.parse(gunzipSync(member('compatibility/rc/main-retained-landscape-current-prototype-v1.json.gz',\n      '3c6386af49c6bf3c6fb48bcb0eaafc9ae64d565b6ec42989c198c23afebd1951')));\n    const actual=context.qualifyMetadata(checkpoint.current_sources[0]);assert.ok(actual);\n    assert.equal(currentDiagnostic.source.path,actual.path);assert.equal(currentDiagnostic.source.sha256,actual.sha256);\n    const expected=structuredClone(diagnostic);expected.source.sha256=actual.sha256;\n    assert.deepEqual(currentDiagnostic,expected,'fresh landscape prototype differs beyond the authenticated current source identity');\n  }\n"
+        },
+        {
+          "offset": 5729,
+          "before": "    specSource.assertCurrent();for(const row of external)assert.equal(hash(readFileSync(row.path)),row.sha256,'changed installed landscape peer member');};\n",
+          "after": "    context?.assertCurrent();programs?.assertCurrent();specSource.assertCurrent();\n    for(const row of bound.values()){\n      const actual=readEvidenceMember(root,row.path);assert.equal(hash(actual),row.sha256);assert.equal(actual.length,row.bytes);\n      const supplied=read(row.path);assert.ok(Buffer.isBuffer(supplied)&&supplied.equals(actual),'nonphysical late landscape source '+row.path);\n      assert.ok(actual.equals(readEvidenceMember(root,row.path)));\n    }\n    // Final callbacks can alter an earlier domain. Close all current source,\n    // program and report bindings physically, without another caller callback.\n    for(const row of bound.values()){const actual=readEvidenceMember(root,row.path);assert.equal(hash(actual),row.sha256);assert.equal(actual.length,row.bytes);}\n    assert.equal(realpathSync(join(root,'node_modules/@angular/cdk')),peer,'late installed landscape peer resolution change');\n    for(const row of external)assert.equal(hash(readFileSync(row.path)),row.sha256,'changed installed landscape peer member');\n    assert.ok(readEvidenceMember(root,SELF).equals(ownImage));};\n"
+        },
+        {
+          "offset": 8188,
+          "before": "  assert.equal(ids.length,2236);assert.equal(new Set(ids).size,2236);assert.ok(definition.cases.every(row=>ids.includes(row.case_id)));\n",
+          "after": "  if(context)assert.deepEqual(ids,context.currentCaseIds);else assert.equal(ids.length,2236);\n  assert.equal(new Set(ids).size,ids.length);assert.ok(definition.cases.every(row=>ids.includes(row.case_id)));\n"
+        },
+        {
+          "offset": 10759,
+          "before": "  return {body,proof:{proof_kind:HISTORICAL_BEHAVIOR_KIND,review_depth:'individual-compatibility',diff_sha256:definition.patch,\n",
+          "after": "  assertExternal();return {body:structuredClone(body),body_is_historical_metadata:Boolean(context),current_diagnostic:structuredClone(currentDiagnostic),\n    current_matrix_obligation_count:ids.length,\n    proof:{proof_kind:HISTORICAL_BEHAVIOR_KIND,review_depth:'individual-compatibility',diff_sha256:definition.patch,\n"
+        },
+        {
+          "offset": 11047,
+          "before": "    bound:[...bound.values()],assertExternal};\n",
+          "after": "    bound:structuredClone([...bound.values()]),assertExternal};\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/autocomplete_landscape_probe.mjs",
+      "before_commit": "95308794d6388ac3b5b93da55efe1fda40d4075f",
+      "before": {
+        "path": "tests/autocomplete_landscape_probe.mjs",
+        "sha256": "573d339c35ab64b9b3b735c8546eee17cf509953f98cf0533ef99c8b3c57d733",
+        "bytes": 16351,
+        "blob_oid": "7774b813010b1dffcd960b6bf3a79cb3633da21a"
+      },
+      "after": {
+        "path": "tests/autocomplete_landscape_probe.mjs",
+        "sha256": "e1d31eacf5910a957a43a48d6772ac266fb4c09a98480621cf5128f64b6a822e",
+        "bytes": 16384
+      },
+      "edits": [
+        {
+          "offset": 10451,
+          "before": " const instance=Object.create(Type.prototype);Object.assign(instance,{autocomplete:panel,_viewContainerRef:{},_element:host,_overlayRef:null,_overlayAttached:false,_componentDestroyed:false,_viewportSubscription:Subscription.EMPTY,_handsetLandscapeSubscription:Subscription.EMPTY,_initialized:new Subject(),_closeKeyEventStream:new Subject(),_zone:{run:fn=>fn()},_changeDetectorRef:{detectChanges(){}},_defaults:null,position:'auto',_aboveClass:'mat-autocomplete-panel-above',_scrollStrategy:()=>({}),_document:{defaultView:new EventTarget()},_windowBlurHandler:()=>{},\n",
+          "after": " const instance=Object.create(Type.prototype);Object.assign(instance,{autocomplete:panel,_viewContainerRef:{},_element:host,_overlayRef:null,_overlayRefChanges:new Subject(),_overlayAttached:false,_componentDestroyed:false,_viewportSubscription:Subscription.EMPTY,_handsetLandscapeSubscription:Subscription.EMPTY,_initialized:new Subject(),_closeKeyEventStream:new Subject(),_zone:{run:fn=>fn()},_changeDetectorRef:{detectChanges(){}},_defaults:null,position:'auto',_aboveClass:'mat-autocomplete-panel-above',_scrollStrategy:()=>({}),_document:{defaultView:new EventTarget()},_windowBlurHandler:()=>{},\n"
+        }
+      ]
+    }
+  ],
+  "support": [
+    {
+      "path": "scripts/retained-selection-metadata-context.mjs",
+      "sha256": "7a0a43356d08f4ed5708782dd5c53b2a39f87d8fa338356e8b09fa8ec81e68d4",
+      "bytes": 9559,
+      "blob_oid": "72af032fce24b7fe7a33c388ed1ebf9632f432f4"
+    },
+    {
+      "path": "compatibility/rc/main-retained-selection-metadata-context-v1.json",
+      "sha256": "a34a3706be3bc0ef6a8a6ac79d3e74da4df1a7526b70a537717a6552f4cdab0d",
+      "bytes": 25013,
+      "blob_oid": "2b29da67f52e5db58ee5114ab15ae086bb356a72"
+    },
+    {
+      "path": "compatibility/rc/parent-main-retained-selection-metadata-context-v1.json",
+      "sha256": "ba5b4947b59ba10eb4dedc92152502ee4b2dde86b64eb6b59012ebf33e181306",
+      "bytes": 3222,
+      "blob_oid": "e53ad8fe4ba3d8e53705dceba3d5ce035822908a"
+    },
+    {
+      "path": "compatibility/rc/parent-main-retained-selection-metadata-rosters-v1.json",
+      "sha256": "70d699db615b12a6acfe116333444b3a0aad5c4163ed0a5fea7a85527e4e88c6",
+      "bytes": 2107,
+      "blob_oid": "1e694497f1a756684c39aa0ee8ecb286e2878eed"
+    },
+    {
+      "path": "compatibility/rc/main-retained-landscape-current-prototype-v1.json.gz",
+      "sha256": "3c6386af49c6bf3c6fb48bcb0eaafc9ae64d565b6ec42989c198c23afebd1951",
+      "bytes": 1775,
+      "blob_oid": "88bc6d1cb1bec862a4de5fc2dbd061b43317081b"
+    },
+    {
+      "path": "compatibility/rc/parent-main-landscape-current-prototype-v1.json",
+      "sha256": "143a33f29db0591b905908247b8c6bc8f4838139fdeb82134ac2277853e6c201",
+      "bytes": 2893,
+      "blob_oid": "321b66d462d710f40303e55aa0d114a0436d6c59"
+    },
+    {
+      "path": "compatibility/rc/autocomplete-selection-source-reader-successors.json",
+      "sha256": "bf806c5628500798e6045d40858b0523b6744656cf582ee1d263847d4f1cdcf3",
+      "bytes": 18619,
+      "blob_oid": "c12d3fb12c95b5f2e01c822e9f7a51698809d565"
+    },
+    {
+      "path": "compatibility/rc/autocomplete-landscape-current-source-review.json",
+      "sha256": "7a542de44d39dce6b6c81bfac4bcd4c503452de06f4329fb72a505f8e44b9925",
+      "bytes": 8872,
+      "blob_oid": "1e159708448a5dcb28d576a450487c50eda8bef6"
+    },
+    {
+      "path": "compatibility/rc/autocomplete-landscape-current-diagnostics.json.gz",
+      "sha256": "72e4b7580c5ac065ea63f39c267044683a4a2482f2b87a9663e1f676a34a1e13",
+      "bytes": 1774,
+      "blob_oid": "eb5022bfda88151b4f96c3aebde9a9a0f95ba2b5"
+    }
+  ],
+  "usages": [
+    {
+      "path": "compatibility/rc/autocomplete-selection-source-reader-successors.json",
+      "sha256": "bf806c5628500798e6045d40858b0523b6744656cf582ee1d263847d4f1cdcf3",
+      "bytes": 18619
+    },
+    {
+      "path": "compatibility/rc/autocomplete-landscape-current-source-review.json",
+      "sha256": "7a542de44d39dce6b6c81bfac4bcd4c503452de06f4329fb72a505f8e44b9925",
+      "bytes": 8872
+    }
+  ],
+  "loaded_function_sha256": "db951752d675bf74361db59fe385cc5a0900b8dc7356a6b6980a16375682e59e",
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "original_report_bodies_changed": false,
+  "source_judgments_changed": 0,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed"
+}
