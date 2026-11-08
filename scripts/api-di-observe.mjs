@@ -296,7 +296,7 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
     }
     if(tabPortal&&factory.outcome==='returned'){
       const observed=observeTabPortalContext(tabPortal,{...requiredParentCapture,requests:factory.requests},fixture,value,
-        await loadRuntimeModule(packageRoot,'legacy-tabs','primary'),await importModule('@angular/cdk/portal'),core,runFactory);
+        await loadRuntimeModule(packageRoot,'legacy-tabs','primary'),await importModule('@angular/cdk/portal'),core,runFactory,resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-tabs.mjs'));
       factory.requests=observed.requests;factory.tabPortalContext=observed.observation;tabPortalState=observed.state;
     }
     if(menuContent&&factory.outcome==='returned')menuContentState=observeMenuContentContext(menuContent,requiredParentCapture,fixture,core,await importModule('@angular/cdk/portal'));
