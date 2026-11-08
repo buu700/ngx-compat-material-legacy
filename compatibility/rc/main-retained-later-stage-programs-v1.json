@@ -1,0 +1,404 @@
+{
+  "schema_version": 1,
+  "role": "finite-main-retained-later-stage-programs",
+  "base_head": "44bff3e976968eb2316a26a9735e217107864785",
+  "programs": [
+    {
+      "path": "scripts/upstream-candidate-source-evidence.mjs",
+      "usage": {
+        "path": "compatibility/rc/upstream-sass-inspection-ledger-transition.json.gz",
+        "sha256": "922c6f5ef0f7635db93e694931a9aa7e54762479418ed5b1330b27adf12cebc4",
+        "bytes": 3068
+      },
+      "usage_pointer": [
+        "code_subjects",
+        3
+      ],
+      "steps": [
+        {
+          "parent": "107ccae1864dc4cbc56c4af1b8e70983a1fe947f",
+          "commit": "6c5d7a2ba37204074d7d212f8e839621d2a4988d",
+          "before": {
+            "path": "scripts/upstream-candidate-source-evidence.mjs",
+            "sha256": "c40eed4ebaa6492abd92bbe9676e3b256fc7d0c2661336b8b97e005f0ff8a078",
+            "bytes": 3518,
+            "blob_oid": "6b775a442bbd65acdb38d24542e746100dcc6ce7"
+          },
+          "after": {
+            "path": "scripts/upstream-candidate-source-evidence.mjs",
+            "sha256": "128d26d6c5a4e485abac1dd6589e14976ef2691d256d9f3896167b071a9a01de",
+            "bytes": 5382,
+            "blob_oid": "6932ab34b096c1fe1605a5a0d2424fc97c6d799c"
+          },
+          "edits": [
+            {
+              "offset": 469,
+              "before": "",
+              "after": "import {knownIndividualProofKind} from './upstream-individual-evidence-scope.mjs';\n"
+            },
+            {
+              "offset": 1417,
+              "before": "",
+              "after": "  try {\n    if (!proof || typeof proof !== 'object' || Array.isArray(proof)) return false;\n    if (Object.hasOwn(proof, 'proof_kind') && !knownIndividualProofKind(proof.proof_kind)) return false;\n    for (const field of ['source_members', 'source_evidence']) {\n      if (!Object.hasOwn(proof, field)) continue;\n      // Historical source_evidence lists may denote earlier snapshots. Do not\n      // reinterpret them as current bytes without an explicit reviewed scope.\n      if (field === 'source_evidence' && proof.source_evidence_scope !== 'current') return false;\n      const refs = proof[field];\n      if (!Array.isArray(refs) || !refs.length) return false;\n      const seen = new Set();\n      for (const ref of refs) {\n        if (!ref || typeof ref !== 'object' || Array.isArray(ref) ||\n            Object.keys(ref).some(key => !['path', 'sha256', 'bytes'].includes(key)) || typeof ref.path !== 'string' ||\n            !ref.path || ref.path.startsWith('/') || ref.path.includes('\\\\') ||\n            ref.path.split('/').some(part => !part || part === '.' || part === '..') ||\n            (field === 'source_members' && !ref.path.startsWith('projects/ngx-material-legacy/')) ||\n            !/^[0-9a-f]{64}$/.test(ref.sha256 || '') || seen.has(ref.path)) return false;\n        const bytes = readMember(ref.path);\n        if (!Buffer.isBuffer(bytes) || createHash('sha256').update(bytes).digest('hex') !== ref.sha256 ||\n            (Object.hasOwn(ref, 'bytes') && (!Number.isSafeInteger(ref.bytes) || ref.bytes !== bytes.length))) return false;\n        seen.add(ref.path);\n      }\n    }\n    if (proof.proof_kind === 'individual-contextual-source-review' &&\n        (!Array.isArray(proof.source_members) || !proof.source_members.length)) return false;\n  } catch { return false; }\n"
+            }
+          ]
+        }
+      ],
+      "loaded_symbol": "candidateSourceEvidenceOk",
+      "loaded_function_sha256": "255c12b35a6ae984652129553481307055dd17617e8b0c02735b370b2c571cd0"
+    },
+    {
+      "path": "scripts/autocomplete-selection-spec-subject.mjs",
+      "usage": {
+        "path": "compatibility/rc/autocomplete-selection-spec-ledger-successor.json",
+        "sha256": "25e1e6731fa14c62a976dc9c04389f89d57b27b9d80742f44e97fdd18946adce",
+        "bytes": 3747
+      },
+      "usage_pointer": [
+        "code_subject"
+      ],
+      "steps": [
+        {
+          "parent": "8dccb816e63c1f417ac6f1d5b502b8ea43aae2d0",
+          "commit": "a9976c96ba09af54754f1e3ec4cb4a98cd5ba49b",
+          "before": {
+            "path": "scripts/autocomplete-selection-spec-subject.mjs",
+            "sha256": "6dfd283b57fc9c2f96b87f634dcdb5f2dc41755469f228bb5efc8cf49bcbafde",
+            "bytes": 9292,
+            "blob_oid": "c814e591db51e843de8d066d7716e55ead9d702b"
+          },
+          "after": {
+            "path": "scripts/autocomplete-selection-spec-subject.mjs",
+            "sha256": "c57e09c9649666999fa4ee4ff8ae3aa2c6462e450e1d3b0257ccedb5d6b2bded",
+            "bytes": 9965,
+            "blob_oid": "0d3363c64dac89b3b09dcbfe5ed16b11abac4aa4"
+          },
+          "edits": [
+            {
+              "offset": 498,
+              "before": "",
+              "after": "import {sassWrapperNoticeSubject} from './sass-wrapper-notice-subject.mjs';\n"
+            },
+            {
+              "offset": 1375,
+              "before": "",
+              "after": "const gitObjects=new Map();\nfunction originalBytes(root,env,parent,path){\n  const key=JSON.stringify([root,parent,path]);\n  if(!gitObjects.has(key))gitObjects.set(key,execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',parent+':'+path],\n    {cwd:root,env,maxBuffer:1024*1024}));\n  return Buffer.from(gitObjects.get(key));\n}\n"
+            },
+            {
+              "offset": 3295,
+              "before": "  const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet.source_parent+':'+packet.path],\n    {cwd:root,env,maxBuffer:1024*1024});\n",
+              "after": "  const before=originalBytes(root,env,packet.source_parent,packet.path);\n"
+            },
+            {
+              "offset": 5849,
+              "before": "",
+              "after": "  const notices=sassWrapperNoticeSubject({root,read,line});\n"
+            },
+            {
+              "offset": 7026,
+              "before": "  const bound=[...spec.bound,{path:readersPath,sha256:hash(raw),bytes:raw.length}];\n",
+              "after": "  const bound=[...spec.bound,{path:readersPath,sha256:hash(raw),bytes:raw.length},...notices.bound];\n"
+            },
+            {
+              "offset": 7152,
+              "before": "    let text=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet.source_parent+':'+row.path],\n      {cwd:root,env,maxBuffer:1024*1024}).toString();\n",
+              "after": "    let text=originalBytes(root,env,packet.source_parent,row.path).toString();\n"
+            },
+            {
+              "offset": 7723,
+              "before": "    assert.equal(hash(read(row.path)),row.after.sha256,'unqualified native spec source-reader change');\n    bound.push({path:row.path,...row.after});\n",
+              "after": "    const current=notices.qualify({path:row.path,...row.after})??{path:row.path,...row.after};\n    assert.equal(hash(read(row.path)),current.sha256,'unqualified native spec source-reader change');\n    const existing=bound.find(ref=>ref.path===current.path);\n    if(existing)assert.deepEqual(existing,current);else bound.push(current);\n"
+            },
+            {
+              "offset": 8181,
+              "before": "    const row=packet.code_subjects.find(row=>row.path===ref.path);if(!row)return null;\n",
+              "after": "    const row=packet.code_subjects.find(row=>row.path===ref.path);if(!row)return notices.qualify(ref);\n    const notice=notices.qualify({path:row.path,...row.after});\n    if(notice?.sha256===ref.sha256){if(ref.bytes!==undefined)assert.equal(ref.bytes,notice.bytes);return notice;}\n"
+            },
+            {
+              "offset": 8460,
+              "before": "    return {path:ref.path,...row.after};\n",
+              "after": "    return notice??{path:ref.path,...row.after};\n"
+            }
+          ]
+        },
+        {
+          "parent": "db7bafefe20a15bf370a9fe72e283dcbaec8e0dc",
+          "commit": "bcec8ca77e8c9c440eaa2440414b0d6bd85a56bb",
+          "before": {
+            "path": "scripts/autocomplete-selection-spec-subject.mjs",
+            "sha256": "c57e09c9649666999fa4ee4ff8ae3aa2c6462e450e1d3b0257ccedb5d6b2bded",
+            "bytes": 9965,
+            "blob_oid": "0d3363c64dac89b3b09dcbfe5ed16b11abac4aa4"
+          },
+          "after": {
+            "path": "scripts/autocomplete-selection-spec-subject.mjs",
+            "sha256": "4738487c1bfe99e291864f7ffe09e60fea06575fda724bf238f0ba1055117049",
+            "bytes": 10716,
+            "blob_oid": "b9b29f6e35c49765a79ccf34b1bc11f9f20d9938"
+          },
+          "edits": [
+            {
+              "offset": 574,
+              "before": "",
+              "after": "import {dialogTitleProductSubject,dialogTitleReaderSubject} from './dialog-title-source-context.mjs';\n"
+            },
+            {
+              "offset": 6175,
+              "before": "",
+              "after": "  const title=dialogTitleProductSubject({root,read,line}),titleReaders=dialogTitleReaderSubject({root,read,line});\n"
+            },
+            {
+              "offset": 7412,
+              "before": "  const bound=[...spec.bound,{path:readersPath,sha256:hash(raw),bytes:raw.length},...notices.bound];\n",
+              "after": "  const bound=[...spec.bound,{path:readersPath,sha256:hash(raw),bytes:raw.length},...notices.bound,...title.bound,...titleReaders.bound];\n"
+            },
+            {
+              "offset": 8009,
+              "before": "    const current=notices.qualify({path:row.path,...row.after})??{path:row.path,...row.after};\n",
+              "after": "    const current=notices.qualify({path:row.path,...row.after})??titleReaders.qualify({path:row.path,...row.after})??{path:row.path,...row.after};\n"
+            },
+            {
+              "offset": 8371,
+              "before": "",
+              "after": "    const product=title.qualify(ref);if(product)return product;\n"
+            },
+            {
+              "offset": 8652,
+              "before": "    const row=packet.code_subjects.find(row=>row.path===ref.path);if(!row)return notices.qualify(ref);\n    const notice=notices.qualify({path:row.path,...row.after});\n",
+              "after": "    const row=packet.code_subjects.find(row=>row.path===ref.path);if(!row)return notices.qualify(ref)??titleReaders.qualify(ref);\n    const notice=notices.qualify({path:row.path,...row.after})??titleReaders.qualify({path:row.path,...row.after});\n"
+            },
+            {
+              "offset": 8933,
+              "before": "",
+              "after": "    const beforeTitle=notice&&titleReaders.historicalReference(notice);\n    if(beforeTitle?.sha256===ref.sha256){if(ref.bytes!==undefined)assert.equal(ref.bytes,beforeTitle.bytes);return notice;}\n"
+            },
+            {
+              "offset": 9179,
+              "before": "  const assertCurrent=()=>{spec.assertCurrent();for(const ref of bound){const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'late native source-reader change');assert.equal(bytes.length,ref.bytes);}};\n",
+              "after": "  const assertCurrent=()=>{spec.assertCurrent();title.assertCurrent();titleReaders.assertCurrent();notices.assertCurrent();for(const ref of bound){const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'late native source-reader change');assert.equal(bytes.length,ref.bytes);}};\n"
+            },
+            {
+              "offset": 9795,
+              "before": "  assertCurrent();return {spec:publicSpec,bound:structuredClone(bound),qualify,assertCurrent,historicalMetadataReference,native_or_full_source_admission_credit:false};\n",
+              "after": "  assertCurrent();return {spec:publicSpec,bound:structuredClone(bound),qualify,assertCurrent,historicalMetadataReference,titleSource:title,titleReaders,native_or_full_source_admission_credit:false};\n"
+            }
+          ]
+        },
+        {
+          "parent": "bf093fc9e835eacd4d29a06667a2958a38cd698e",
+          "commit": "54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0",
+          "before": {
+            "path": "scripts/autocomplete-selection-spec-subject.mjs",
+            "sha256": "4738487c1bfe99e291864f7ffe09e60fea06575fda724bf238f0ba1055117049",
+            "bytes": 10716,
+            "blob_oid": "b9b29f6e35c49765a79ccf34b1bc11f9f20d9938"
+          },
+          "after": {
+            "path": "scripts/autocomplete-selection-spec-subject.mjs",
+            "sha256": "c49c1f6aa605524f40f28a14279c66ba13fa5090047b5baa36a07c12366c9376",
+            "bytes": 11465,
+            "blob_oid": "0c69c0fbcb3c1e4135e8a49bb21dba1d60b8e770"
+          },
+          "edits": [
+            {
+              "offset": 676,
+              "before": "",
+              "after": "import {autocompleteCurrentSpecSourceSuccessor} from './autocomplete-current-spec-source-successor.mjs';\n"
+            },
+            {
+              "offset": 4771,
+              "before": "  assert.equal(hash(read(AUTOCOMPLETE_SELECTION_SPEC)),packet.after.sha256,'unqualified autocomplete native test source');\n",
+              "after": "  const successor=line==='main'?autocompleteCurrentSpecSourceSuccessor({root,read,line}):null;\n  if(successor)assert.deepEqual(successor.before,{path:packet.path,...packet.after});\n  const currentAfter=successor?.after??{path:packet.path,...packet.after},currentSource=read(AUTOCOMPLETE_SELECTION_SPEC);\n  assert.equal(hash(currentSource),currentAfter.sha256,'unqualified autocomplete native test source');\n"
+            },
+            {
+              "offset": 4990,
+              "before": "",
+              "after": "  assert.ok(Buffer.isBuffer(configRaw)&&configRaw.equals(readEvidenceMember(root,configPath)),'nonphysical native test compilation config');\n"
+            },
+            {
+              "offset": 5258,
+              "before": "    {path:AUTOCOMPLETE_SELECTION_SPEC,sha256:packet.after.sha256,bytes:packet.after.bytes},\n    {path:configPath,sha256:hash(configRaw),bytes:configRaw.length}];\n  const assertCurrent=()=>{for(const ref of bound){const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'late native test source change '+ref.path);assert.equal(bytes.length,ref.bytes);}};\n  assertCurrent();return {line,path:AUTOCOMPLETE_SELECTION_SPEC,before:{...packet.before},after:{...packet.after},\n",
+              "after": "    {...currentAfter},\n    {path:configPath,sha256:hash(configRaw),bytes:configRaw.length},...(successor?.bound??[])];\n  const assertCurrent=()=>{successor?.assertCurrent();for(const ref of bound){const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'late native test source change '+ref.path);assert.equal(bytes.length,ref.bytes);}successor?.assertCurrent();};\n  // before/after describe the unchanged historical additive packet, consumed\n  // by retained report metadata. current_after/current_source bind live bytes.\n  assertCurrent();return {line,path:AUTOCOMPLETE_SELECTION_SPEC,before:{...packet.before},after:{...packet.after},current_after:{...currentAfter},\n"
+            },
+            {
+              "offset": 5813,
+              "before": "    original_source:Buffer.from(before),current_source:Buffer.from(after),native_or_full_source_admission_credit:false};\n",
+              "after": "    original_source:Buffer.from(before),current_source:Buffer.from(currentSource),native_or_full_source_admission_credit:false};\n"
+            },
+            {
+              "offset": 8771,
+              "before": "      assert.ok([spec.before.sha256,spec.after.sha256].includes(ref.sha256));\n      if(ref.bytes!==undefined)assert.equal(ref.bytes,ref.sha256===spec.before.sha256?spec.before.bytes:spec.after.bytes);\n      return {path:ref.path,...spec.after};\n",
+              "after": "      const found=[spec.before,spec.after,spec.current_after].find(r=>r.sha256===ref.sha256);assert.ok(found);\n      if(ref.bytes!==undefined)assert.equal(ref.bytes,found.bytes);\n      return {...spec.current_after};\n"
+            },
+            {
+              "offset": 10111,
+              "before": "  const publicSpec={...spec,before:{...spec.before},after:{...spec.after},packet:structuredClone(spec.packet),bound:structuredClone(spec.bound)};\n",
+              "after": "  const publicSpec={...spec,before:{...spec.before},after:{...spec.after},current_after:{...spec.current_after},packet:structuredClone(spec.packet),bound:structuredClone(spec.bound)};\n"
+            }
+          ]
+        }
+      ],
+      "loaded_symbol": "autocompleteSelectionReaderSubject",
+      "loaded_function_sha256": "a7ac0d7d37ee7cc71a51c55dca6e45818f4a6613bb1851129646f75de3f3180b"
+    },
+    {
+      "path": "scripts/autocomplete-selection-native-subject.mjs",
+      "usage": {
+        "path": "compatibility/rc/autocomplete-selection-ledger-successor.json",
+        "sha256": "dbee1262ff90ad59e8242b128c54a6f8d25de400ce26764d16043bb1ef3fa1c3",
+        "bytes": 40949
+      },
+      "usage_pointer": [
+        "code_subjects",
+        0
+      ],
+      "steps": [
+        {
+          "parent": "8840fa4e70849d8400b668c90dc44e24d7c2adfb",
+          "commit": "9f0fa17cc739db44aa68efda6f5e1028d4afd0e1",
+          "before": {
+            "path": "scripts/autocomplete-selection-native-subject.mjs",
+            "sha256": "f92545cb986d9e456491068a1e291e761239e82d0259a0db5eeed681ac2ad440",
+            "bytes": 10883,
+            "blob_oid": "9870624d06951e97b1cf12fd8088ffbbb50f23c4"
+          },
+          "after": {
+            "path": "scripts/autocomplete-selection-native-subject.mjs",
+            "sha256": "409ba33d4c14ff61d352e263e0c1b0ae984eee0066a40e6d3ccb70cc11b8912c",
+            "bytes": 12879,
+            "blob_oid": "b8d0abb36e5d4f5f4659d9c6e487e44b01c72ed4"
+          },
+          "edits": [
+            {
+              "offset": 461,
+              "before": "",
+              "after": "import {readFileSync} from 'node:fs';\nimport {fileURLToPath} from 'node:url';\n"
+            },
+            {
+              "offset": 722,
+              "before": "",
+              "after": "import {selectionNativeRegistrySourceSuccessor} from './selection-native-registry-source-successor.mjs';\nimport {historicalBehaviorRequirements} from './upstream-historical-behavior-evidence.mjs';\n"
+            },
+            {
+              "offset": 1516,
+              "before": "",
+              "after": "const SELF='scripts/autocomplete-selection-native-subject.mjs',image=readFileSync(fileURLToPath(import.meta.url));\n"
+            },
+            {
+              "offset": 2104,
+              "before": "  const bound=new Map(spec.bound.map(ref=>[ref.path,{...ref}]));\n",
+              "after": "  const registry=line==='main'?selectionNativeRegistrySourceSuccessor({root,read}):null;\n  const bound=new Map([...spec.bound,...(registry?.bound??[])].map(ref=>[ref.path,{...ref}]));\n  assert.ok(readEvidenceMember(root,SELF).equals(image));assert.ok(read(SELF).equals(image));bound.set(SELF,{path:SELF,sha256:hash(image),bytes:image.length});\n"
+            },
+            {
+              "offset": 2193,
+              "before": "    readEvidenceMember(root,ref.path);\n    const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed selection native subject '+ref.path);\n    if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);\n",
+              "after": "    let current;\n    if(ref.path===spec.path){\n      const prior=[spec.before,spec.after,spec.current_after].find(value=>value.sha256===ref.sha256);assert.ok(prior,'unknown native spec reference');if(ref.bytes!==undefined)assert.equal(ref.bytes,prior.bytes);current=spec.current_after;\n    }else current=registry?.qualify(ref)??ref;\n    const actual=readEvidenceMember(root,ref.path),raw=read(ref.path);assert.ok(Buffer.isBuffer(raw)&&raw.equals(actual),'nonphysical selection native subject '+ref.path);assert.equal(hash(raw),current.sha256,'changed selection native subject '+ref.path);\n    if(current.bytes!==undefined)assert.equal(raw.length,current.bytes);\n    assert.ok(actual.equals(readEvidenceMember(root,ref.path)),'selection native subject changed during callback '+ref.path);\n"
+            },
+            {
+              "offset": 4770,
+              "before": "",
+              "after": "  if(registry)assert.deepEqual(registry.before,{path:SELECTION_NATIVE_REGISTRY,...registryAfter});\n"
+            },
+            {
+              "offset": 6480,
+              "before": "",
+              "after": "  if(registry)for(const [sha,definition]of requirements)assert.deepEqual(historicalBehaviorRequirements(sha),definition,'current registry must preserve the original default selection scope');\n"
+            },
+            {
+              "offset": 9993,
+              "before": "    assert.ok([registryBefore.sha256,registryAfter.sha256].includes(ref.sha256),'unqualified earlier native registry reference');\n    if(ref.bytes!==undefined)assert.equal(ref.bytes,ref.sha256===registryBefore.sha256?registryBefore.bytes:registryAfter.bytes);\n    return {path:ref.path,...registryAfter};\n",
+              "after": "    const known=[registryBefore,registryAfter,...(registry?[registry.after]:[])].find(value=>value.sha256===ref.sha256);assert.ok(known,'unqualified earlier native registry reference');\n    if(ref.bytes!==undefined)assert.equal(ref.bytes,known.bytes);\n    registry?.assertCurrent();return {path:ref.path,...(registry?.after??registryAfter)};\n"
+            },
+            {
+              "offset": 10303,
+              "before": "  const assertCurrent=()=>{spec.assertCurrent();for(const ref of bound.values()){const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'late selection native subject '+ref.path);assert.equal(bytes.length,ref.bytes);}};\n  assertCurrent();return {line,packet:structuredClone(packet),before:{...registryBefore},after:{...registryAfter},\n",
+              "after": "  const assertCurrent=()=>{assert.ok(readEvidenceMember(root,SELF).equals(image));spec.assertCurrent();registry?.assertCurrent();for(const ref of bound.values()){const actual=readEvidenceMember(root,ref.path),bytes=read(ref.path);assert.ok(Buffer.isBuffer(bytes)&&bytes.equals(actual),'nonphysical late selection native subject '+ref.path);assert.equal(hash(bytes),ref.sha256,'late selection native subject '+ref.path);assert.equal(bytes.length,ref.bytes);assert.ok(actual.equals(readEvidenceMember(root,ref.path)));}registry?.assertCurrent();assert.ok(readEvidenceMember(root,SELF).equals(image));};\n  assertCurrent();return {line,packet:structuredClone(packet),before:{...registryBefore},after:{...registryAfter},current_after:{...(registry?.after??registryAfter)},\n"
+            }
+          ]
+        }
+      ],
+      "loaded_symbol": "autocompleteSelectionNativeSubject",
+      "loaded_function_sha256": "1a3683e6239bd28e280a5ef1dab5348413641249a064c477a9ba981debda0207"
+    }
+  ],
+  "support": [
+    {
+      "path": "compatibility/rc/parent-main-individual-proof-dispatch-review-v1.json",
+      "sha256": "dcfb2e90df08b0c8ec6ada980064136bf6b55aa319926afdedec7d0f6d848982",
+      "bytes": 8915,
+      "blob_oid": "accadd92d12341ba6d1592c2cb48f21420099d07"
+    },
+    {
+      "path": "scripts/upstream-individual-evidence-scope.mjs",
+      "sha256": "aedc1ad2fce5320e868d7271f1af9ff107c849af4ad005c2eb9b8ac630d91eb0",
+      "bytes": 9228,
+      "blob_oid": "0030ccc7a77c4f7f4e9fc66beb85c64f7441aa93"
+    },
+    {
+      "path": "tests/test_upstream_contextual_proof_hardening.py",
+      "sha256": "4027130f182ca49e0ff5bb1936403169541e90d2672c28dd5cc09081d49c1ea4",
+      "bytes": 8514,
+      "blob_oid": "abc0199d4a0fcdaeff45315f006a649e00fbf5bb"
+    },
+    {
+      "path": "compatibility/rc/parent-main-current-source-readers-integration-v1.json",
+      "sha256": "05c890d390591494fb3b937a7207ef8a5dcc4c61e3bf8e5438d2c141865dc9f8",
+      "bytes": 10107,
+      "blob_oid": "576991babb324598ce7daefaf6993b426b409023"
+    },
+    {
+      "path": "compatibility/rc/main-retained-current-reader-source-successors-v1.json",
+      "sha256": "1c0ccfdd33c5f264960cb598c74f4a4f7aea3ffb8779570b47182ea660dd589d",
+      "bytes": 8704,
+      "blob_oid": "c20a1b897b93cab1dfac616abbf43fb28b390bf8"
+    },
+    {
+      "path": "scripts/autocomplete-current-spec-source-successor.mjs",
+      "sha256": "1679a61ffc4ec0ce385a689574be5b997037ab87a61d735bf42a0e0304375225",
+      "bytes": 4028,
+      "blob_oid": "710585dc2dc26038e14bdb4f79dafab1c3295427"
+    },
+    {
+      "path": "compatibility/rc/main-autocomplete-current-spec-source-successor-v1.json",
+      "sha256": "507db85b892cb051ebbaee3214a48b275bae5be1a03234f53692966f47b1607d",
+      "bytes": 4231,
+      "blob_oid": "dc6665a96d2747da00eeae0928023b0acca5f278"
+    },
+    {
+      "path": "compatibility/rc/parent-main-selection-native-current-source-v1.json",
+      "sha256": "4fc87f0d0f734b6eaf70a295efa9bd2b26ea30e651219620280b3dd1b983b472",
+      "bytes": 3962,
+      "blob_oid": "4dc0685b0b226ead72a643c41cffc72507ba9cfb"
+    },
+    {
+      "path": "scripts/selection-native-registry-source-successor.mjs",
+      "sha256": "db4609415a96c859288f3bb924b915d08ceacea534bbb7556ad73b15e3708ab9",
+      "bytes": 6003,
+      "blob_oid": "6db1943e666da9508836866d3d934f1c04cf9f43"
+    },
+    {
+      "path": "compatibility/rc/parent-main-historical-pointer-epoch-review-v1.json",
+      "sha256": "dac9b4aa338be698a2faf555a9aff8c33c9c2c0e102248134839b1126032c222",
+      "bytes": 38008,
+      "blob_oid": "6ee730c4286326b187b52c066b8159f289097b25"
+    },
+    {
+      "path": "tests/selection_native_current_source_probe.mjs",
+      "sha256": "e6cca2dfb34b027ad7e2ea7a8ff1e947d77e495930523fec1c359b0824dd8f92",
+      "bytes": 2201,
+      "blob_oid": "d9deb8fd4e928727934afbc3e807ef93dd3380c9"
+    },
+    {
+      "path": "tests/autocomplete_current_spec_source_successor_probe.mjs",
+      "sha256": "4f9767bb2ddbbeb9463a6fcfc4c045db896af3cbf59364ad1c29aa59e9d94b42",
+      "bytes": 1969,
+      "blob_oid": "f50ae72a2a55d45019e1b127101c2c1bffc67176"
+    }
+  ],
+  "historical_programs_executed": false,
+  "historical_program_bytes_returned_as_current": false,
+  "original_usage_packets_rewritten": false,
+  "source_judgments_changed": 0,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed"
+}
