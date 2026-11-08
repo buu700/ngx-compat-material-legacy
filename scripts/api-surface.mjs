@@ -16,6 +16,7 @@ import {TABLE_SYMBOL, approvedTableSignatureRecord} from './table-construction-c
 import {INPUT_SYMBOL,approvedInputSignatureRecord} from './api-input-context.mjs';
 import {RIPPLE_SYMBOL,rippleReexportSignatureProblems} from './ripple-construction-contract.mjs';
 import {originalCompilerFactoryContext, originalPublishedJitFactory} from './api-original-factory-contexts.mjs';
+import {settleInputHarness} from './api-input-harness-contract.mjs';
 
 const require = createRequire(import.meta.url);
 let typescriptModule;
@@ -1723,7 +1724,9 @@ export function observeDeclarations(surface, dtsFiles, differences, allowlist) {
     for (const symbol of symbols) {
       const present = names.has(symbol.name);
       const packed = sourceFile ? packedShape(sourceFile, symbol.name) : null;
-      const signature = compareSignatures(symbol, packed, differences);
+      let signature = compareSignatures(symbol, packed, differences);
+      if (symbol.symbol_id === 'legacy-input/testing/MatLegacyInputHarness' && sourceFile)
+        signature = settleInputHarness(symbol, sourceFile, signature);
       const exportIssue = exportProblems(symbol, present);
       const shapeIssue = shapeProblems(signature);
       observations.push({

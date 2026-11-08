@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "role": "Finite historical input-harness declaration qualification on exact packed/public minimum-peer inputs",
+  "parent": "747e86a3e111292659963bed764605f0e1df5302",
+  "patch_sha256": "e70227f940ade60cd75a0769a5d75e68582e0a1fa12828b55a255da65a4f9a9a",
+  "manifest_sha256": "bafbce9486ccc1a41baaa162b05d82a7c3b521a33813df91be6883fa60677f41",
+  "artifact": {
+    "source_commit": "8a0c4866dba602bd1f9c9916128f7537d986e0b9",
+    "tarball_sha256": "4a34df4d024f923dd8e701b9f1ed3b63f8f23fe2dc035cc6b5a1793e0cbf9a0e",
+    "original_run_sha256": "162230acd0beb6a6cc25e17a68f9dcdea6857f1f015ebe14118a16b15f5593a9"
+  },
+  "afterimages": [
+    {
+      "path": "scripts/api-surface.mjs",
+      "sha256": "f759f0a43df04b0e32c18caab80a3c34ef37e115ace65f27ee32b08c7fe297a2"
+    },
+    {
+      "path": "scripts/api-input-harness-contract.mjs",
+      "sha256": "10d26f92e574267aa8541d6f1259605766ed797694a63cb0a027a35568eab8b2"
+    },
+    {
+      "path": "scripts/api-input-harness-regressions.mjs",
+      "sha256": "aa91426ca4649149bdc248a993871fe70597b6509436bdc51280d0df711a0dc9"
+    },
+    {
+      "path": "testing/input-harness-api/consumer.mts",
+      "sha256": "f0474a408f6abf7574beba8bc784beed2c4aea23074798ad39a2b1cabb7a7163"
+    }
+  ],
+  "independent_review": {
+    "sha256": "e85b93477e62c5c8b6f0b79e161c14c88bcfb2bced8d6610b58b02477f956ae0",
+    "text": "# Independent finite input-harness declaration review: v9\n\nReviewed frozen core patch `../input-harness-patch-v9.patch` SHA-256 `e70227f940ade60cd75a0769a5d75e68582e0a1fa12828b55a255da65a4f9a9a` and manifest `../manifest-v9.json` `bafbce9486ccc1a41baaa162b05d82a7c3b521a33813df91be6883fa60677f41`, against clean canonical `747e86a3e111292659963bed764605f0e1df5302`. Core patch apply check passes. This supersedes the v8 path-binding qualification only; v2\u2013v6 hold records remain historical. The separate CI wiring patch was not reviewed or approved here.\n\nV9 addresses v8's content-multiset limitation: each program source is realpath-resolved, located beneath its nearest package root, read as raw bytes and checked against compiler text; each record binds package name/version, package.json hash, normalized relative path, byte length and SHA-256. Duplicate package/version/path keys reject. The sorted JSON mapping is hashed and source count must be 70. Independently recomputed fingerprint `63959e2f4f016c60a1e13cf52a52fe53bee436f1b84ec786774faeb2ba05fbe7` from retained proof entries: 70 records for TypeScript 6.0.3, Material and CDK 22.1.7, and the candidate package. Included path-swap, duplicate and missing-record controls exercise the fingerprint function; transformed peer files/candidate declarations reject at the raw-byte or fixed-image boundary. These are finite drift controls, not independent proofs of general semantic equivalence. Exact byte/version policy makes later changes fail closed and require evidence-based requalification.\n\nIndependently copied the retained CI run manifest and exact tar to this directory and ran the patched script with `--run`: strict NodeNext packed consumer and all included drift/mutation controls pass, exit 0. Manifest SHA-256 `162230acd0beb6a6cc25e17a68f9dcdea6857f1f015ebe14118a16b15f5593a9` and tar SHA-256 `4a34df4d024f923dd8e701b9f1ed3b63f8f23fe2dc035cc6b5a1793e0cbf9a0e` match the retained originals. A copied manifest with library SHA changed to zeros is rejected with exit 1 before extraction. This uses retained files under a quiescent-workspace assumption, not a transaction against a privileged concurrent writer. The packed artifact is from `8a0c4866dba602bd1f9c9916128f7537d986e0b9`, not a new pack of canonical HEAD.\n\nIndependent row-array comparison confirms 52\u219239 open rows, exactly the 13 input-harness entries changed to recorded differences, no other row changes. Material/CDK 22.1.7 are declared minimum peers; v8 review independently checked the reference tag, actual tar declaration, public package resolution and static consumer scope. Transitive underscored declaration chunks are provenance reached through public exports, not authored private API imports, although the finite checker intentionally depends on their current paths and bytes. The qualification covers only these declaration rows and the tested minimum peer; it does not settle menu, DI, product behavior, or a broader peer range. Earlier 19 runtime cases used a different synthetic tar and do not establish full CI-artifact runtime behavior. No release or full gate claim, canonical writes, push or Actions.\n"
+  },
+  "root_checks": [
+    {
+      "name": "root-input-harness-v9-regressions.log",
+      "exit_code": 0,
+      "sha256": "3e31d8cbe37232369b11aba0d96e66a10b4ae4a868d5af7803625ef1a13db3f3",
+      "log": "input harness public contract regressions passed; artifact sha256 4a34df4d024f923dd8e701b9f1ed3b63f8f23fe2dc035cc6b5a1793e0cbf9a0e\n"
+    },
+    {
+      "name": "root-input-harness-v9-api-regressions.log",
+      "exit_code": 0,
+      "sha256": "0a70e2f85827dd0bdf995f2786222c7d0eb58e714d9e81d1e25f526b6f33624f",
+      "log": "api-completeness regressions passed\n"
+    },
+    {
+      "name": "root-input-harness-v9-wronghash.log",
+      "exit_code": 1,
+      "sha256": "854495318df8c3eb1770169a0ecf6722ae6b55e7b876a1976ac5f04b75e8b418",
+      "log": "Tarball bytes do not match the draft library artifact. Not repacking.\n"
+    }
+  ],
+  "root_row_delta": {
+    "before_open": 52,
+    "after_open": 39,
+    "removed_open": [
+      {
+        "status": "mismatch",
+        "historical": "public static method with(InputHarnessFilters?):HarnessPredicate<MatInputHarness>",
+        "owned": null,
+        "symbol_id": "legacy-input/testing/MatLegacyInputHarness"
+      },
+      {
+        "status": "mismatch",
+        "historical": "public method focus():Promise<void>",
+        "owned": null,
+        "symbol_id": "legacy-input/testing/MatLegacyInputHarness"
+      },
+      {
+        "status": "mismatch",
+        "historical": "public method isReadonly():Promise<boolean>",
+        "owned": null,
+        "symbol_id": "legacy-input/testing/MatLegacyInputHarness"
+      },
+      {
+        "status": "mismatch",
+        "historical": "public method getId():Promise<string>",
+        "owned": null,
+        "symbol_id": "legacy-input/testing/MatLegacyInputHarness"
+      },
+      {
+        "status": "mismatch",
+        "historical": "public method getValue():Promise<string>",
+        "owned": null,
+        "symbol_id": "legacy-input/testing/MatLegacyInputHarness"
+      },
+      {
+        "status": "mismatch",
+        "historical": "public method setValue(string):Promise<void>",
+        "owned": null,
+        "symbol_id": "legacy-input/testing/MatLegacyInputHarness"
+      },
+      {
+        "status": "mismatch",
+        "historical": "public method isFocused():Promise<boolean>",
+        "owned": null,
+        "symbol_id": "legacy-input/testing/MatLegacyInputHarness"
+      },
+      {
+        "status": "mismatch",
+        "historical": null,
+        "owned": "public static method with(InputHarnessFilters?):HarnessPredicate<MatLegacyInputHarness>",
+        "symbol_id": "legacy-input/testing/MatLegacyInputHarness"
+      },
+      {
+        "status": "mismatch",
+        "historical": "public method getPlaceholder():Promise<string>",
+        "owned": null,
+        "symbol_id": "legacy-input/testing/MatLegacyInputHarness"
+      },
+      {
+        "status": "mismatch",
+        "historical": "public method getType():Promise<string>",
+        "owned": null,
+        "symbol_id": "legacy-input/testing/MatLegacyInputHarness"
+      },
+      {
+        "status": "mismatch",
+        "historical": "public method isRequired():Promise<boolean>",
+        "owned": null,
+        "symbol_id": "legacy-input/testing/MatLegacyInputHarness"
+      },
+      {
+        "status": "mismatch",
+        "historical": "public method blur():Promise<void>",
+        "owned": null,
+        "symbol_id": "legacy-input/testing/MatLegacyInputHarness"
+      },
+      {
+        "status": "mismatch",
+        "historical": "public method getName():Promise<string>",
+        "owned": null,
+        "symbol_id": "legacy-input/testing/MatLegacyInputHarness"
+      }
+    ],
+    "added_open": [],
+    "before_rows_sha256": "31f93cb35658b1c0600d0a523401410f51db3ebebbc16fc9d5b5bfc578c91175",
+    "after_rows_sha256": "84a4eeacfd9fed5d9d83b8f7224659c08f55e079d4ec7e739219cab7bf363953"
+  },
+  "qualification": "Exact candidate declaration; pinned Node24.21/TS6.0.3/public Material+CDK22.1.7 declarations, package exports/metadata,70package-relative path/bytes/hash source records. Changed inputs remain open. Strict historical consumer/subclass and finite identity mutation controls, not generic semantic type equivalence.",
+  "workflow": "Separate233435 workflow patch not applied. CI owner must qualify durable post-peer gate and workflow source frame together.",
+  "limits": [
+    "No runtime identity/DI, broader peer range, product semantics or G02/G11/release pass.",
+    "Old held V2-V6 and V8 caveat reports preserved; no approval inferred from those versions.",
+    "No fresh canonical artifact; actual root --run rehashes retained genuine CI4a tar, wronghash rejects beforeextraction.",
+    "No product/library/public API/style/golden/allowlist edits; this is a bounded audit-check repair.",
+    "No push, Actions, publication or credential changes."
+  ]
+}
