@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "scope": "Exact tab-nav source role continuation; prior runtime evidence is historical. No global source epoch, API audit, security or G11 admission.",
+  "before_source_sha256": "9205bb2a5b3573e8f21161b03baa04e4b3e868e72d70e06c5dcdf96d2439af36",
+  "after_source_sha256": "daf7d6f4c83292e7d3bf24eaf675b5cfc6c3fe341b779c5e801c23ef49d30f7f",
+  "source_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts b/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts\nindex 985eab29a..d8a470384 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts\n@@ -25,6 +25,8 @@ import {\n   OnDestroy,\n   Optional,\n   QueryList,\n+  signal,\n+  WritableSignal,\n   ViewChild,\n } from '@angular/core';\n import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions, ThemePalette} from '@angular/material/core';\n@@ -47,6 +49,17 @@ import {ENTER, SPACE} from '@angular/cdk/keycodes';\n import {MAT_TABS_CONFIG, MatTabsConfig} from '@angular/material/tabs';\n import {MatPaginatedTabHeader, MatPaginatedTabHeaderItem} from './paginated-tab-header';\n \n+// Focus state stays local to the owned implementation and does not add a public API.\n+const focusedItems = new WeakMap<_MatTabNavBase, WritableSignal<MatPaginatedTabHeaderItem | null>>();\n+function focusedItemFor(nav: _MatTabNavBase): WritableSignal<MatPaginatedTabHeaderItem | null> {\n+  let value = focusedItems.get(nav);\n+  if (!value) {\n+    value = signal<MatPaginatedTabHeaderItem | null>(null);\n+    focusedItems.set(nav, value);\n+  }\n+  return value;\n+}\n+\n // Increasing integer for generating unique ids for tab nav components.\n let nextUniqueId = 0;\n \n@@ -127,6 +140,9 @@ export abstract class _MatTabNavBase\n     });\n \n     super.ngAfterContentInit();\n+    this.indexFocused.pipe(startWith(null), takeUntil(this._destroyed)).subscribe(() => {\n+      focusedItemFor(this).set(this._items?.get(this.focusIndex) || null);\n+    });\n   }\n \n   /** Notifies the component that the active link has been changed. */\n@@ -140,6 +156,7 @@ export abstract class _MatTabNavBase\n     for (let i = 0; i < items.length; i++) {\n       if (items[i].active) {\n         this.selectedIndex = i;\n+        focusedItemFor(this).set(items[i]);\n         this._changeDetectorRef.markForCheck();\n \n         if (this.tabPanel) {\n@@ -151,6 +168,12 @@ export abstract class _MatTabNavBase\n     }\n \n     this.selectedIndex = -1;\n+    if (this.tabPanel) {\n+      // Provide an entry point only when an enabled link is available.\n+      const firstEnabled = items.find(item => !item.disabled);\n+      focusedItemFor(this).set(firstEnabled || null);\n+      this._changeDetectorRef.markForCheck();\n+    }\n     this._inkBar.hide();\n   }\n \n@@ -294,7 +317,14 @@ export class _MatTabLinkBase\n \n   _getTabIndex(): number {\n     if (this._tabNavBar.tabPanel) {\n-      return this._isActive && !this.disabled ? 0 : -1;\n+      if (this.disabled) {\n+        return -1;\n+      }\n+      const focused = focusedItemFor(this._tabNavBar)();\n+      const target = focused && !focused.disabled\n+        ? focused\n+        : this._tabNavBar._items?.find(item => !item.disabled);\n+      return target === this ? 0 : -1;\n     } else {\n       return this.tabIndex;\n     }\n",
+  "role_ast_parent_contexts": {
+    "MAT_RIPPLE_GLOBAL_OPTIONS": [
+      {
+        "kind": "ImportSpecifier",
+        "text": "MAT_RIPPLE_GLOBAL_OPTIONS"
+      },
+      {
+        "kind": "CallExpression",
+        "text": "Inject(MAT_RIPPLE_GLOBAL_OPTIONS)"
+      }
+    ],
+    "RippleGlobalOptions": [
+      {
+        "kind": "ImportSpecifier",
+        "text": "RippleGlobalOptions"
+      },
+      {
+        "kind": "TypeReference",
+        "text": "RippleGlobalOptions"
+      },
+      {
+        "kind": "TypeReference",
+        "text": "RippleGlobalOptions"
+      }
+    ],
+    "signal": [
+      {
+        "kind": "ImportSpecifier",
+        "text": "signal"
+      },
+      {
+        "kind": "CallExpression",
+        "text": "signal<MatPaginatedTabHeaderItem | null>(null)"
+      }
+    ],
+    "WritableSignal": [
+      {
+        "kind": "ImportSpecifier",
+        "text": "WritableSignal"
+      },
+      {
+        "kind": "TypeReference",
+        "text": "WritableSignal<MatPaginatedTabHeaderItem | null>"
+      },
+      {
+        "kind": "TypeReference",
+        "text": "WritableSignal<MatPaginatedTabHeaderItem | null>"
+      }
+    ]
+  },
+  "prior_import_count": 29,
+  "current_import_count": 31,
+  "only_added_symbols": [
+    "signal",
+    "WritableSignal"
+  ],
+  "no_removed_imports": true,
+  "root_product_receipt": {
+    "path": "compatibility/rc/parent-main-tab-nav-enabled-focus-v1.json",
+    "sha256": "5f0a255187640f84f8b20c44d0e7526342ef03979264decab28d41e2fc2a38eb"
+  },
+  "historical_identity_review": {
+    "path": "compatibility/f10/authored-use-reviews/ripple-global-options-boundary.json",
+    "sha256": "c65106282db1779dab3349d3c4fe0e0f18f2b7bc2448eeca5f27bd23939267c5"
+  },
+  "public_peer_export": {
+    "path": "compatibility/rc/final-product-evidence-v1/angular-core-public.d.ts",
+    "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+  },
+  "peer_package": {
+    "path": "compatibility/rc/final-product-evidence-v1/angular-core-package.json",
+    "sha256": "fd7e79e557a78aa4ac6617a6056dbb461b07286ee5915bceec9af9e07742acbf"
+  },
+  "peer_declarations": {
+    "path": "compatibility/rc/angular-core-22-1-7-signal-declarations-v1.d.ts.txt",
+    "sha256": "1ac581e22272aa978a1d265ddd1d49b82883c1faafe13b6d6ad3329a1dff3a58"
+  },
+  "native_test_source": {
+    "path": "tests/tab_nav_focus/native_probe.mjs",
+    "sha256": "fb70d2addd448a81d6af11c24cb40a3fe961e02d788259c993acdadccbde2abb"
+  },
+  "source_test": {
+    "path": "tests/tab_nav_focus/source_probe.mjs",
+    "sha256": "075a1c8f9bc9d5305bcbd5cebf8dea4d66568d6a502b4d73890ac90d66952c95"
+  }
+}
