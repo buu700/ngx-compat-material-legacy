@@ -1,0 +1,34 @@
+{
+  "role": "Root table review correction and current cell producer replay",
+  "source_head": "732c60b2c",
+  "historical_reference": {
+    "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "path": "src/cdk/table/table.ts",
+    "sha256": "a192133a11a131d340c3acfab9461f5b0f19f1c0c1788edfeb42dedd81aabafd",
+    "finding": "Material 16 ngOnInit invokes _applyNativeTableSections for native tables. That method creates thead, tbody, tfoot in order, assigns role=rowgroup to each, moves the four outlet anchors into them, and appends the sections. The bare historical template alone does not describe the final DOM."
+  },
+  "correction": "The earlier external table-public-roles-a796-v1 worksheet inferred a possible native row-group structure difference from the template alone. Its bare-template observation is accurate, but that inference omitted the historical initialization path. Current explicit row-group elements and role attributes reproduce those historical sections at the source level. Do not remove them merely to copy the historical template. This correction does not prove complete DOM, SSR, projection or lifecycle equivalence.",
+  "current_cell_probe": {
+    "command": "node tests/table_column_class_probe.mjs <fresh-external-report>",
+    "node": "24.21.0",
+    "chromium": "149 pinned workspace executable",
+    "producer_sha256": "022bbbe27e6abe00e3b4a311c3117dd0241f301161b229a398d42afcba2dee2f",
+    "launcher_sha256": "bcc2808b58064868e366c8cdcb7cbb4d80724e178579b924a1062b7e688b561c",
+    "report": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/table-column-classes-current-root-v1.json",
+    "report_sha256": "3574bf2bc6f81f6e5a3e6f1b2341d864ea2c0b44d1b155286dd7f86cdfa2ba67",
+    "exit_code": 0,
+    "models": 3,
+    "native_class_cases": 288,
+    "original_class_equivalence": true,
+    "negative_controls": 6,
+    "actual_complete_table": false,
+    "producer_review": "Compared the old producer at c82118a07d with the current producer. The changed path replaces dump-dom HTML extraction and manual entity decoding with the shared Chromium launcher and direct report.textContent retrieval. The original source selection, archive authentication, strict type checks, public-parent construction, browser worker and class comparison assertions remain. The replay exercises all original/main/21.x model and mutation branches with the current producer."
+  },
+  "cyph_sanity": "Read-only search found flex mat-table consumers in account-wallets and account-base-file-list. This is scope evidence only; no Cyph build was run.",
+  "remaining": [
+    "Substantiate the stable public status or repair the current outlet and no-data peer field protocols",
+    "Reconcile individual table review evidence with this replay in a bounded inventory update",
+    "Qualify actual packed Angular tables, nested definitions, native/flex DOM, no-data transitions, SSR and consumer floors"
+  ],
+  "g11_claim": "not-passed"
+}
