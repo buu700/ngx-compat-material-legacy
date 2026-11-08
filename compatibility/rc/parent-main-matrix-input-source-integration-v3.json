@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "role": "Authenticate finite historical matrix/input-inventory source transitions and current owned regression case",
+  "parent": "0aaa2c137c14e43f8cdc9d34bfd10690e63c5c70",
+  "patch_sha256": "9abc5b3328a8a7b3156cfcc26c6d746cbdf1ae28eb9044c69faeb7387f581a5e",
+  "manifest_sha256": "b4fe9aecb99eedd50eedf64a9ccd1fc9be017de43d21f9d1b3b5b7f7b4134fed",
+  "afterimages": [
+    {
+      "path": "compatibility/rc/current-tool-matrix-input-successor-v1.json",
+      "sha256": "df06856c53ceedd1c3700e2e5b372e34442f04d82438c940fefebb8fe3c9381b",
+      "bytes": 14712
+    },
+    {
+      "path": "compatibility/rc/current-tool-matrix-source-successor-v1.json",
+      "sha256": "c549c141764d499b30cd46fede7138ea89903a6d7e709f144ed5eb528fcd3e10",
+      "bytes": 14943
+    },
+    {
+      "path": "compatibility/rc/historical-registry-before-pointer-v1.json",
+      "sha256": "95570be816d45166cbabfe555176d33a5c72fe10ffe0b9abbba48dae63f4a9ac",
+      "bytes": 1274957
+    },
+    {
+      "path": "compatibility/rc/matrices/full-verify.json",
+      "sha256": "031ce547200b182c743daa9d1640645b39fe35d07f9eb327af0366d0e7356d92",
+      "bytes": 633834
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "sha256": "317aca2c5f660f038a5bad085d772b73c43aa05f600e821a70a737f333f80409",
+      "bytes": 112206
+    },
+    {
+      "path": "scripts/current-tool-matrix-source.mjs",
+      "sha256": "98b9bd4cccf377e752fe340210ff6c2d91d6255e4915238aa61f2006e75a90ae",
+      "bytes": 16557
+    },
+    {
+      "path": "scripts/current_tool_matrix_source.py",
+      "sha256": "b37398f88fc6593e14d9c7e229dcc90f9d5f476dd171d49d45fb8a48c9110740",
+      "bytes": 18645
+    },
+    {
+      "path": "tests/current_tool_matrix_source_probe.mjs",
+      "sha256": "42d5271289b9025c1c513e951d237ebc2c387f1bab8b3b80ad48b0e00409e327",
+      "bytes": 5440
+    },
+    {
+      "path": "tests/test_current_tool_matrix_source.py",
+      "sha256": "0b240acb59aa531b43c67b38f72ffcb5b4a1523ec36332691e06c2f4c2515c11",
+      "bytes": 13052
+    }
+  ],
+  "independent_review": {
+    "sha256": "6152f13e3939b53cc9d45b37f7acc5e69bfeba31a9cf0a1f2ba2f859f61076ee",
+    "text": "Independent composite V3 review \u2014 bounded source-role acceptance\n\nPatch SHA-256 9abc5b3328a8a7b3156cfcc26c6d746cbdf1ae28eb9044c69faeb7387f581a5e; manifest SHA-256 b4fe9aecb99eedd50eedf64a9ccd1fc9be017de43d21f9d1b3b5b7f7b4134fed; source base 313984c7fe1a2d13bccd0afc33ac17d66cc1d8c5; canonical clean HEAD 0aaa2c137c14e43f8cdc9d34bfd10690e63c5c70 and git apply --check pass at review. All nine patch image byte counts and hashes independently matched the manifest after application to an external local clone. No canonical changes were made.\n\nIndependent V1 exploit rerun: JS comparisonBytes rejected an object-valued sha256 with a toJSON hook without calling the hook. Independent V2 cross-callback control: changing already-bound input.spec during the first supplied-reader callback and intending restoration in the next was rejected after callback one; the file was restored in finally. Python -O rejected an entirely forged reader and mutated exposed before metadata. The full focused suite independently passed in the external patched clone, 1 test in 3.450s (using the canonical node_modules). Supplied composite-v9-test.log SHA 8cff7c8dfc02096d1cc8fc0454cb8757313abdf30ea920b7508525467f382800 records 1 test pass in 2.846s; supplied inventory-controls-v1.log SHA 492a24904a497ea0642c9eb297597d4478c04a760ec6681e393624ee80149115 records positive 57-source inventory check and three negative identity/adaptation controls.\n\nInspected the inventory diff: only the input row changes; its candidate hash moves from 025f4fa2579ce0d93e95dc7cfe266081d3d0d771bb31c9ccc71ff8970c478eae to ab1073120be461d9451eaed8bc3c83768d3c5a60f8ca55c854ae471f7e19e289 and its previous candidate hash, adapted label and full not-executed/unbound/null-receipt execution snapshot are retained as a non-current prior identity. Current row remains not-executed and no execution credit is added. Existing historical tag hash and adaptation remain intact.\n\nThe previous independent V1 report describes the transition replay, full matrix normalization and registry reconstruction; V3 preserves those proof paths with the amended inventory binding. The separate 313 AST log SHA e8a1ac688a9f03c0f1bf76c81a1e5bc083de9e43b173c3a06a14885171e0c106 is point-in-time evidence, not a live full-registry scan at each call. Post-callback sweep covers already-bound physical members, not a transient change fully restored within one callback or unbound members; physical checks assume quiescent external writers between observations. Loaded-file hashing is not attestation of already-loaded or cached executing code. Source proof does not continuously bind all 57 historical source specs. Prior capped test remains inconclusive.\n\nNo new blocker was found in this bounded review. This is not a full security or audit pass and does not establish TOOL wiring, final product registry freshness, packed artifact, browser execution, release admission, or 21.x coverage.\n"
+  },
+  "root_checks": {
+    "source_suite": {
+      "command": "python -m unittest tests.test_current_tool_matrix_source -v",
+      "python": "3.14.7",
+      "node": "24.21.0",
+      "log_sha256": "a9860e9ad1bb1f4084ef512759740a5ae19abafb846843e236389482bfcb5e31",
+      "log": "test_ast_retained_records_and_adversarial_physical_guards (tests.test_current_tool_matrix_source.CurrentToolMatrixSourceTest.test_ast_retained_records_and_adversarial_physical_guards) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 3.046s\n\nOK\n"
+    },
+    "actual_inventory": {
+      "command": "python scripts/historical_inventory_source.py",
+      "log_sha256": "55e0b8307c395d327ac9ebdc5fa4fa24945e42fa728b4e6325f6cbb121665d3f",
+      "log": "historical-inventory: 57 current candidate and 21 shim identities match; execution not qualified\n"
+    }
+  },
+  "changes": [
+    "Preserve authenticated2322-case predecessor pluspointercase#179 andexactcurrent2323\u21922324rostertransition withownedinput#112 andoriginal#82title restoration.",
+    "Changeonlycurrentinputinventorycandidateidentity; retainoriginaltagandfullprioradaptation/executionmetadataasnon-current snapshot.",
+    "RejectoptimizedPythonforged readers, mutablecomparisonmetadata, JavaScriptserialization hooks andcross-callbacktransientdrift; preservefailedV1evidence."
+  ],
+  "limits": [
+    "Notwiredinto globalTOOLyet; doesnotqualifyfullcurrentcoordinator, packedartifact/browser/floormatrix orrelease.",
+    "ActualAST2324reconciliationand57candidate/21shimsourceidentitycheckarepoint-in-timeobservations, nothistoricaltestexecution.",
+    "assertCurrentauthenticatesfiniteboundmembers, notcontinuouscontentofall57specfiles; historicalcallbackbooleansarehash-boundreviewdata,noteach-invocationsemanticrecomputation.",
+    "Loaded-codeidentityandquiescentexternal-writerassumptionsremain; privateimplementationfieldtampering/fullyhiddenwithin-one-callbackwrite-restoreareoutsideclaimedprotection.",
+    "PriorrejectedPythonassert/aliasandJSserialization/cross-callbackcontrolsremainretained; nofailedattemptrelabeledpass.",
+    "21.x/defaultmatrixfieldsandoriginaloraclevaluesunchanged."
+  ]
+}

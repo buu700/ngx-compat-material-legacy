@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "role": "current-tool-matrix-input-source-successor",
+  "historical_base_packet": {
+    "path": "compatibility/rc/current-tool-matrix-source-successor-v1.json",
+    "sha256": "c549c141764d499b30cd46fede7138ea89903a6d7e709f144ed5eb528fcd3e10",
+    "bytes": 14943
+  },
+  "matrix_before": {
+    "path": "compatibility/rc/matrices/full-verify.json",
+    "sha256": "3c0f30bc7ec3bedfed4ac267d3a085e206ede4d8b17700e82a124a2e8ecaac3e",
+    "bytes": 633720
+  },
+  "matrix_after": {
+    "path": "compatibility/rc/matrices/full-verify.json",
+    "sha256": "031ce547200b182c743daa9d1640645b39fe35d07f9eb327af0366d0e7356d92",
+    "bytes": 633834
+  },
+  "matrix_edit": {
+    "offset": 123277,
+    "before": "",
+    "after": "              \"historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#112\",\n"
+  },
+  "product_transitions": [
+    {
+      "parent": "95ae89744396d3071b386058c85ba388f0301020",
+      "commit": "8a0c4866dba602bd1f9c9916128f7537d986e0b9",
+      "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+        "sha256": "025f4fa2579ce0d93e95dc7cfe266081d3d0d771bb31c9ccc71ff8970c478eae",
+        "bytes": 83537
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+        "sha256": "39a618496b90a1d860e05ee54a611f47274d7045122380edd26f6ee9dcec716a",
+        "bytes": 85115
+      },
+      "edits": [
+        {
+          "offset": 23229,
+          "before": "",
+          "after": "  }));\n\n  it('updates descriptions when existing hint and error IDs change on a state notification', fakeAsync(() => {\n    const fixture = createComponent(MatInputDynamicDescriptionIds);\n    fixture.detectChanges();\n    const controls = fixture.debugElement.queryAll(By.directive(MatLegacyInput))\n      .map(node => node.injector.get(MatLegacyInput));\n    controls[1].errorState = true;\n    controls[1].stateChanges.next();\n    fixture.detectChanges();\n    const inputs: HTMLInputElement[] = Array.from(fixture.nativeElement.querySelectorAll('input'));\n    inputs[0].setAttribute('aria-describedby', 'old-hint external-hint');\n    inputs[1].setAttribute('aria-describedby', 'old-error external-error');\n    fixture.componentInstance.hintId = 'new-hint';\n    fixture.componentInstance.errorId = 'new-error';\n    fixture.detectChanges();\n    expect(fixture.nativeElement.querySelector('mat-hint').id).toBe('new-hint');\n    expect(fixture.nativeElement.querySelector('mat-error').id).toBe('new-error');\n    controls.forEach(control => control.stateChanges.next());\n    fixture.detectChanges();\n    expect(inputs[0].getAttribute('aria-describedby')).toBe('new-hint external-hint');\n    expect(inputs[1].getAttribute('aria-describedby')).toBe('new-error external-error');\n"
+        },
+        {
+          "offset": 73675,
+          "before": "",
+          "after": "    <mat-form-field><input matInput><mat-hint [id]=\"hintId\">Hint</mat-hint></mat-form-field>\n    <mat-form-field><input matInput><mat-error [id]=\"errorId\">Error</mat-error></mat-form-field>`,\n})\nclass MatInputDynamicDescriptionIds {\n  hintId = 'old-hint';\n  errorId = 'old-error';\n}\n\n@Component({\n  template: `\n"
+        }
+      ]
+    },
+    {
+      "parent": "8a0c4866dba602bd1f9c9916128f7537d986e0b9",
+      "commit": "313984c7fe1a2d13bccd0afc33ac17d66cc1d8c5",
+      "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+        "sha256": "39a618496b90a1d860e05ee54a611f47274d7045122380edd26f6ee9dcec716a",
+        "bytes": 85115
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+        "sha256": "ab1073120be461d9451eaed8bc3c83768d3c5a60f8ca55c854ae471f7e19e289",
+        "bytes": 85103
+      },
+      "edits": [
+        {
+          "offset": 23237,
+          "before": "  it('updates descriptions when existing hint and error IDs change on a state notification', fakeAsync(() => {\n    const fixture = createComponent(MatInputDynamicDescriptionIds);\n    fixture.detectChanges();\n    const controls = fixture.debugElement.queryAll(By.directive(MatLegacyInput))\n      .map(node => node.injector.get(MatLegacyInput));\n    controls[1].errorState = true;\n    controls[1].stateChanges.next();\n    fixture.detectChanges();\n    const inputs: HTMLInputElement[] = Array.from(fixture.nativeElement.querySelectorAll('input'));\n    inputs[0].setAttribute('aria-describedby', 'old-hint external-hint');\n    inputs[1].setAttribute('aria-describedby', 'old-error external-error');\n    fixture.componentInstance.hintId = 'new-hint';\n    fixture.componentInstance.errorId = 'new-error';\n    fixture.detectChanges();\n    expect(fixture.nativeElement.querySelector('mat-hint').id).toBe('new-hint');\n    expect(fixture.nativeElement.querySelector('mat-error').id).toBe('new-error');\n    controls.forEach(control => control.stateChanges.next());\n    fixture.detectChanges();\n    expect(inputs[0].getAttribute('aria-describedby')).toBe('new-hint external-hint');\n    expect(inputs[1].getAttribute('aria-describedby')).toBe('new-error external-error');\n  }));\n\n",
+          "after": ""
+        },
+        {
+          "offset": 49057,
+          "before": "    it('should be in a parent element with an aria-live attribute to announce the error', fakeAsync(() => {\n",
+          "after": "    it('should set the proper aria-live attribute on the error messages', fakeAsync(() => {\n"
+        },
+        {
+          "offset": 49246,
+          "before": "      const error = containerEl.querySelector('mat-error')!;\n      expect(error.closest('[aria-live]')!.getAttribute('aria-live')).toBe('polite');\n",
+          "after": "      expect(containerEl.querySelector('mat-error')!.getAttribute('aria-live')).toBe('polite');\n"
+        },
+        {
+          "offset": 85115,
+          "before": "",
+          "after": "\ndescribe('MatInput dynamic descriptions', () => {\n  it('updates descriptions when existing hint and error IDs change on a state notification', fakeAsync(() => {\n    const fixture = createComponent(MatInputDynamicDescriptionIds);\n    fixture.detectChanges();\n    const controls = fixture.debugElement.queryAll(By.directive(MatLegacyInput))\n      .map(node => node.injector.get(MatLegacyInput));\n    controls[1].errorState = true;\n    controls[1].stateChanges.next();\n    fixture.detectChanges();\n    const inputs: HTMLInputElement[] = Array.from(fixture.nativeElement.querySelectorAll('input'));\n    inputs[0].setAttribute('aria-describedby', 'old-hint external-hint');\n    inputs[1].setAttribute('aria-describedby', 'old-error external-error');\n    fixture.componentInstance.hintId = 'new-hint';\n    fixture.componentInstance.errorId = 'new-error';\n    fixture.detectChanges();\n    expect(fixture.nativeElement.querySelector('mat-hint').id).toBe('new-hint');\n    expect(fixture.nativeElement.querySelector('mat-error').id).toBe('new-error');\n    controls.forEach(control => control.stateChanges.next());\n    fixture.detectChanges();\n    expect(inputs[0].getAttribute('aria-describedby')).toBe('new-hint external-hint');\n    expect(inputs[1].getAttribute('aria-describedby')).toBe('new-error external-error');\n  }));\n\n});\n"
+        }
+      ]
+    },
+    {
+      "parent": "95ae89744396d3071b386058c85ba388f0301020",
+      "commit": "8a0c4866dba602bd1f9c9916128f7537d986e0b9",
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+        "sha256": "ea2bcd2a85cb1511cfa57a7d68d2edd45757ecd703df0ebfa0d613e3f4b79ccd",
+        "bytes": 28690
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+        "sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+        "bytes": 27981
+      },
+      "edits": [
+        {
+          "offset": 941,
+          "before": "import {filter, map, pairwise, startWith, take, takeUntil} from 'rxjs/operators';\n",
+          "after": "import {startWith, take, takeUntil} from 'rxjs/operators';\n"
+        },
+        {
+          "offset": 10254,
+          "before": "  private _describedByChanges: Subscription | undefined;\n",
+          "after": ""
+        },
+        {
+          "offset": 17182,
+          "before": "    this._describedByChanges?.unsubscribe();\n",
+          "after": ""
+        },
+        {
+          "offset": 23414,
+          "before": "",
+          "after": "      this._syncDescribedByIds();\n"
+        },
+        {
+          "offset": 23503,
+          "before": "    // Updating aria-describedby touches the DOM. Only do it when error/user ids change.\n    this._describedByChanges?.unsubscribe();\n    this._describedByChanges = control.stateChanges\n      .pipe(\n        startWith([undefined, undefined] as const),\n        map(() => [control.errorState, control.userAriaDescribedBy] as const),\n        pairwise(),\n        filter(([[prevErrorState, prevDescribedBy], [currentErrorState, currentDescribedBy]]) => {\n          return prevErrorState !== currentErrorState || prevDescribedBy !== currentDescribedBy;\n        }),\n      )\n      .subscribe(() => this._syncDescribedByIds());\n",
+          "after": ""
+        }
+      ]
+    }
+  ],
+  "current_product_refs": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "sha256": "ab1073120be461d9451eaed8bc3c83768d3c5a60f8ca55c854ae471f7e19e289",
+      "bytes": 85103
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927",
+      "bytes": 27981
+    }
+  ],
+  "reviews": [
+    {
+      "path": "compatibility/rc/parent-main-form-field-description-repair-v1.json",
+      "sha256": "7008271d1d1320cd30c9e1397850a92a521f0032f97e84d20ea3201a5badb88a",
+      "bytes": 93807
+    },
+    {
+      "path": "compatibility/rc/parent-main-input-test-integrity-v2.json",
+      "sha256": "c494741d8610a1f11a3561776bd91044e73e1e13267cf0b992d4d23e83a50003",
+      "bytes": 13187
+    }
+  ],
+  "pointer_case": {
+    "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#179",
+    "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+    "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+    "adaptation": "adapted",
+    "shared": null,
+    "full_name": "autocomplete hidden overlay pointer state > should release an empty group pane and restore inline pointer policy when options return",
+    "index": 179,
+    "kind": "direct"
+  },
+  "changed_case": {
+    "before": {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#82",
+      "historical_path": "src/material/legacy-input/input.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "adaptation": "adapted",
+      "shared": null,
+      "full_name": "MatInput with forms > error messages > should be in a parent element with an aria-live attribute to announce the error",
+      "index": 82,
+      "kind": "direct"
+    },
+    "after": {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#82",
+      "historical_path": "src/material/legacy-input/input.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "adaptation": "adapted",
+      "shared": null,
+      "full_name": "MatInput with forms > error messages > should set the proper aria-live attribute on the error messages",
+      "index": 82,
+      "kind": "direct"
+    }
+  },
+  "new_case": {
+    "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-input/input.spec.ts#112",
+    "historical_path": "src/material/legacy-input/input.spec.ts",
+    "candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+    "adaptation": "adapted",
+    "shared": null,
+    "full_name": "MatInput dynamic descriptions > updates descriptions when existing hint and error IDs change on a state notification",
+    "index": 112,
+    "kind": "direct"
+  },
+  "predecessor_registry_sha256": "171d6e2707eb997d168baf0c5bda2efb19ed5b9a5be2a23aaa96716519f29b3e",
+  "current_registry_sha256": "9ea6a63cec33d906e2ccea1d5d0b32b9dc5582691adde4d48387b5ae9766de37",
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "inventory_before": {
+    "path": "testing/legacy-runner/historical-inventory.json",
+    "sha256": "1f9c82d0dc6560eee416661faa2ecc0732c7e9ece34b323645371bfa1ee5f2f1",
+    "bytes": 111642
+  },
+  "inventory_after": {
+    "path": "testing/legacy-runner/historical-inventory.json",
+    "sha256": "317aca2c5f660f038a5bad085d772b73c43aa05f600e821a70a737f333f80409",
+    "bytes": 112206
+  },
+  "inventory_edits": [
+    {
+      "offset": 33342,
+      "before": "      \"candidate_sha256\": \"025f4fa2579ce0d93e95dc7cfe266081d3d0d771bb31c9ccc71ff8970c478eae\",\n",
+      "after": "      \"candidate_sha256\": \"ab1073120be461d9451eaed8bc3c83768d3c5a60f8ca55c854ae471f7e19e289\",\n"
+    },
+    {
+      "offset": 34719,
+      "before": "",
+      "after": "        },\n        {\n          \"candidate_sha256\": \"025f4fa2579ce0d93e95dc7cfe266081d3d0d771bb31c9ccc71ff8970c478eae\",\n          \"adaptation\": \"adapted\",\n          \"execution\": {\n            \"state\": \"not-executed\",\n            \"bound_to_current_head\": false,\n            \"receipt\": null,\n            \"note\": \"Source identity refreshed; no current-HEAD execution receipt.\"\n          },\n          \"current_source_binding\": false,\n          \"reason\": \"Prior candidate identity retained before the individually reviewed input source transition; no execution credit.\"\n"
+    }
+  ],
+  "inventory_candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+  "inventory_previous_snapshot": {
+    "candidate_sha256": "025f4fa2579ce0d93e95dc7cfe266081d3d0d771bb31c9ccc71ff8970c478eae",
+    "adaptation": "adapted",
+    "execution": {
+      "state": "not-executed",
+      "bound_to_current_head": false,
+      "receipt": null,
+      "note": "Source identity refreshed; no current-HEAD execution receipt."
+    },
+    "current_source_binding": false,
+    "reason": "Prior candidate identity retained before the individually reviewed input source transition; no execution credit."
+  }
+}
