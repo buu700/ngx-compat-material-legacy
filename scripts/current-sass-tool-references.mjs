@@ -217,6 +217,7 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
  assert.ok(equalBytes(read(packagePath),packageImage),'package line changed');
  let matrixOwner;const domainOverlays=new Map();
  const routingImages=new Map(),retainedRulesJsPath='scripts/upstream-rules-js-build-admission.mjs';
+ const retainedLandscapePaths=['scripts/autocomplete-landscape-source-judgment.mjs','tests/autocomplete_landscape_probe.mjs'];
  if(line==='main'){
   const program=JSON.parse(member({path:'compatibility/rc/main-retained-rules-js-program-source-v1.json',sha256:'dea173286cd6de2dddb4bc932a83fdb6a26ec788cea9e098ef2e66b76894708d',bytes:4229}));
   assert.equal(program.schema_version,1);assert.equal(program.role,'main-retained-rules-js-program-source');assert.equal(program.base_head,'0f2c3373afd5d6c917b4d47f874da31a26df2551');
@@ -230,6 +231,26 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
   for(const ref of program.support){const committed=images.get(program.base_head+':'+ref.path);matches(committed,ref);assert.ok(equalBytes(member(ref),committed));}
   const before=images.get(program.base_head+':'+update.path);matches(before,update.before);const after=edited(before,update.edits);matches(after,update.after);assert.ok(equalBytes(member(update.after),after));
   domainOverlays.set(update.path,{update,identities:[{ref:update.before,bytes:before},{ref:update.after,bytes:after}]});
+ }
+ if(line==='main'){
+  member({path:'scripts/retained-landscape-program-source.mjs',sha256:'fbe4525cba1f99c772455b92d92662920a2a84da0c524c51c0fe7c2f610af352',bytes:7975});
+  const program=JSON.parse(member({path:'compatibility/rc/main-retained-landscape-program-source-v1.json',sha256:'3e0db22fc8764f8b82afeb5f99251cc6f86ebe0f7cf49a4906730041e63a3354',bytes:11763}));
+  assert.equal(program.schema_version,1);assert.equal(program.role,'finite-main-retained-landscape-program-source');assert.equal(program.base_head,'62e961dd19e519ad47220a9a36c5d8c9e60fd18c');
+  for(const[key,value]of Object.entries({source_scope_only:true,historical_programs_executed:false,historical_packets_rewritten:false,original_report_bodies_changed:false,source_judgments_changed:0,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(program[key],value);
+  assert.equal(program.loaded_function_sha256,'db951752d675bf74361db59fe385cc5a0900b8dc7356a6b6980a16375682e59e');
+  assert.deepEqual(program.updates.map(row=>row.path),retainedLandscapePaths);assert.equal(program.support.length,9);
+  assert.deepEqual(program.usages.map(ref=>ref.path),['compatibility/rc/autocomplete-selection-source-reader-successors.json','compatibility/rc/autocomplete-landscape-current-source-review.json']);
+  const usages=program.usages.map(ref=>JSON.parse(member(ref)));assert.ok(usages.every(row=>row.line==='main'));
+  const clean=ref=>({path:ref.path,sha256:ref.sha256,bytes:ref.bytes});
+  const hook=usages[0].code_subjects.find(row=>row.path===retainedLandscapePaths[0]);assert.deepEqual({path:hook.path,...hook.after},clean(program.updates[0].before));assert.deepEqual(usages[1].diagnostic_producer,clean(program.updates[1].before));
+  const env={PATH:process.env.PATH,LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1',GIT_TERMINAL_PROMPT:'0'};
+  for(const commit of new Set([program.base_head,...program.updates.map(row=>row.before_commit)])){assert.match(commit,/^[a-f0-9]{40}$/);execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',commit,program.base_head],{cwd:root,env});}
+  execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',program.base_head,'HEAD'],{cwd:root,env});
+  const images=gitImages(root,[...program.updates.map(row=>({commit:row.before_commit,path:row.path})),...program.support.map(ref=>({commit:program.base_head,path:ref.path}))]);
+  for(const ref of program.support){const raw=images.get(program.base_head+':'+ref.path);matches(raw,ref);assert.ok(equalBytes(member(ref),raw));}
+  for(const row of program.updates){const before=images.get(row.before_commit+':'+row.path);assert.equal(row.before.path,row.path);assert.equal(row.after.path,row.path);matches(before,row.before);
+    const after=edited(before,row.edits);matches(after,row.after);assert.ok(equalBytes(member(row.after),after));const update={...row,before:clean(row.before),after:clean(row.after)};
+    assert.ok(!domainOverlays.has(row.path));domainOverlays.set(row.path,{update,identities:[{ref:update.before,bytes:before},{ref:update.after,bytes:after}]});}
  }
  if(line==='main'){
   const routing=JSON.parse(member({path:'compatibility/rc/main-current-inventory-source-routing-v2.json',sha256:'3815beb1e21779e54deaee5da2bf7bb316732e98a3dc9938ef6d2fdf18707280',bytes:24306}));
@@ -607,7 +628,7 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
  }
  for(const {update,before,after} of rcSuccessors.values()){const row=rows.get(update.before.path);assert.ok(row);assert.deepEqual({path:row.path,...row.after},update.before,'source successor must follow V5');addIdentity(row,update.before,before);addIdentity(row,update.after,after);row.after={sha256:update.after.sha256,bytes:update.after.bytes};}
  if(matrixOwner){const row=rows.get(matrixOwner.after.path);assert.ok(row);assert.deepEqual({path:row.path,...row.after},matrixOwner.before);addIdentity(row,matrixOwner.before,matrixOwner.comparisonBytes(matrixOwner.before));addIdentity(row,matrixOwner.intermediate,matrixOwner.comparisonBytes(matrixOwner.intermediate));addIdentity(row,matrixOwner.after,member(matrixOwner.after));row.after={sha256:matrixOwner.after.sha256,bytes:matrixOwner.after.bytes};}
- for(const {update,identities} of domainOverlays.values()){let row=rows.get(update.path);if(row)assert.deepEqual({path:row.path,...row.after},update.before,'domain successor must follow previous frame');else{assert.ok((line==='main'&&update.path===retainedRulesJsPath)||retainedReaderPaths.has(update.path)||routingImages.has(update.path)||nextBranch.additional_inputs.some(ref=>JSON.stringify(ref)===JSON.stringify(update.before))||(update.path==='scripts/authored-current-use-inventory.mjs'&&checkerSourceAnchor?.source_members.some(ref=>JSON.stringify(ref)===JSON.stringify(update.before))),'domain predecessor is not an existing input');row={path:update.path,before:{sha256:update.before.sha256,bytes:update.before.bytes},identities:new Map()};rows.set(update.path,row);}for(const identity of identities)addIdentity(row,identity.ref,identity.bytes);row.after={sha256:update.after.sha256,bytes:update.after.bytes};}
+ for(const {update,identities} of domainOverlays.values()){let row=rows.get(update.path);if(row)assert.deepEqual({path:row.path,...row.after},update.before,'domain successor must follow previous frame');else{assert.ok((line==='main'&&(update.path===retainedRulesJsPath||retainedLandscapePaths.includes(update.path)))||retainedReaderPaths.has(update.path)||routingImages.has(update.path)||nextBranch.additional_inputs.some(ref=>JSON.stringify(ref)===JSON.stringify(update.before))||(update.path==='scripts/authored-current-use-inventory.mjs'&&checkerSourceAnchor?.source_members.some(ref=>JSON.stringify(ref)===JSON.stringify(update.before))),'domain predecessor is not an existing input');row={path:update.path,before:{sha256:update.before.sha256,bytes:update.before.bytes},identities:new Map()};rows.set(update.path,row);}for(const identity of identities)addIdentity(row,identity.ref,identity.bytes);row.after={sha256:update.after.sha256,bytes:update.after.bytes};}
  for(const row of rows.values())member({path:row.path,...row.after});
  assert.deepEqual(bound.get(GUARD_PLAN.path),activePlanner,'current tool guard planner missing from finite bound');
  let consuming=false,batching=false;

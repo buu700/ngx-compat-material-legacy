@@ -329,6 +329,7 @@ class CurrentSassToolReferences:
         domain_overlays = {}
         routing_images={}
         retained_rules_js_path='scripts/upstream-rules-js-build-admission.mjs'
+        retained_landscape_paths=['scripts/autocomplete-landscape-source-judgment.mjs','tests/autocomplete_landscape_probe.mjs']
         if self.line=='main':
             program=json.loads(self._member(dict(path='compatibility/rc/main-retained-rules-js-program-source-v1.json',sha256='dea173286cd6de2dddb4bc932a83fdb6a26ec788cea9e098ef2e66b76894708d',bytes=4229)))
             assert program['schema_version']==1 and program['role']=='main-retained-rules-js-program-source' and program['base_head']=='0f2c3373afd5d6c917b4d47f874da31a26df2551'
@@ -344,6 +345,28 @@ class CurrentSassToolReferences:
                 committed=program_images[(program['base_head'],ref['path'])];_matches(committed,ref);assert self._member(ref)==committed
             before=program_images[(program['base_head'],update['path'])];_matches(before,update['before']);after=_edited(before,update['edits']);_matches(after,update['after']);assert self._member(update['after'])==after
             domain_overlays[update['path']]=(update,[(update['before'],before),(update['after'],after)])
+        if self.line=='main':
+            self._member(dict(path='scripts/retained-landscape-program-source.mjs',sha256='fbe4525cba1f99c772455b92d92662920a2a84da0c524c51c0fe7c2f610af352',bytes=7975))
+            program=json.loads(self._member(dict(path='compatibility/rc/main-retained-landscape-program-source-v1.json',sha256='3e0db22fc8764f8b82afeb5f99251cc6f86ebe0f7cf49a4906730041e63a3354',bytes=11763)))
+            assert program['schema_version']==1 and program['role']=='finite-main-retained-landscape-program-source' and program['base_head']=='62e961dd19e519ad47220a9a36c5d8c9e60fd18c'
+            for key,value in dict(source_scope_only=True,historical_programs_executed=False,historical_packets_rewritten=False,original_report_bodies_changed=False,source_judgments_changed=0,artifact_or_audit_admission_granted=False,g11_claim='not-passed').items():assert program[key]==value
+            assert program['loaded_function_sha256']=='db951752d675bf74361db59fe385cc5a0900b8dc7356a6b6980a16375682e59e'
+            assert [row['path'] for row in program['updates']]==retained_landscape_paths and len(program['support'])==9
+            assert [ref['path'] for ref in program['usages']]==['compatibility/rc/autocomplete-selection-source-reader-successors.json','compatibility/rc/autocomplete-landscape-current-source-review.json']
+            usages=[json.loads(self._member(ref)) for ref in program['usages']];assert all(row['line']=='main' for row in usages)
+            clean=lambda ref:{key:ref[key] for key in ('path','sha256','bytes')}
+            hook=next(row for row in usages[0]['code_subjects'] if row['path']==retained_landscape_paths[0]);assert dict(path=hook['path'],**hook['after'])==clean(program['updates'][0]['before']);assert usages[1]['diagnostic_producer']==clean(program['updates'][1]['before'])
+            program_env=dict(PATH=os.environ['PATH'],LC_ALL='C',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_SYSTEM='/dev/null',GIT_NO_REPLACE_OBJECTS='1',GIT_NO_LAZY_FETCH='1',GIT_TERMINAL_PROMPT='0')
+            for commit in {program['base_head'],*[row['before_commit'] for row in program['updates']]}:
+                assert re.fullmatch(r'[a-f0-9]{40}',commit);subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',commit,program['base_head']],cwd=self.root,env=program_env)
+            subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',program['base_head'],'HEAD'],cwd=self.root,env=program_env)
+            program_images=_git_images(self.root,[dict(commit=row['before_commit'],path=row['path']) for row in program['updates']]+[dict(commit=program['base_head'],path=ref['path']) for ref in program['support']])
+            for ref in program['support']:
+                raw=program_images[(program['base_head'],ref['path'])];_matches(raw,ref);assert self._member(ref)==raw
+            for row in program['updates']:
+                before=program_images[(row['before_commit'],row['path'])];assert row['before']['path']==row['path']==row['after']['path'];_matches(before,row['before'])
+                after=_edited(before,row['edits']);_matches(after,row['after']);assert self._member(row['after'])==after;update={**row,'before':clean(row['before']),'after':clean(row['after'])}
+                assert row['path'] not in domain_overlays;domain_overlays[row['path']]=(update,[(update['before'],before),(update['after'],after)])
         if self.line=='main':
             routing_packet=json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v2.json',sha256='3815beb1e21779e54deaee5da2bf7bb316732e98a3dc9938ef6d2fdf18707280',bytes=24306)))
             assert routing_packet['schema_version']==1 and routing_packet['role']=='main-current-inventory-source-routing' and routing_packet['base_head']=='54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0'
@@ -1026,7 +1049,7 @@ class CurrentSassToolReferences:
             path=update['path']; row=self._rows.get(path)
             if row is not None: assert dict(path=path,**row['after']) == update['before'], 'domain successor must follow previous frame'
             else:
-                assert (self.line=='main' and path==retained_rules_js_path) or path in retained_reader_paths or path in routing_images or update['before'] in next_branch['additional_inputs'] or (path=='scripts/authored-current-use-inventory.mjs' and checker_source_anchor is not None and update['before'] in checker_source_anchor['source_members']), 'domain predecessor is not an existing input'
+                assert (self.line=='main' and (path==retained_rules_js_path or path in retained_landscape_paths)) or path in retained_reader_paths or path in routing_images or update['before'] in next_branch['additional_inputs'] or (path=='scripts/authored-current-use-inventory.mjs' and checker_source_anchor is not None and update['before'] in checker_source_anchor['source_members']), 'domain predecessor is not an existing input'
                 row=dict(path=path,before=dict(sha256=update['before']['sha256'],bytes=update['before']['bytes']),identities={}); self._rows[path]=row
             for ref, raw in identities: self._add(row,ref,raw)
             row['after']=dict(sha256=update['after']['sha256'],bytes=update['after']['bytes'])
