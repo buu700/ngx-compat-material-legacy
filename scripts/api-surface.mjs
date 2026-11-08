@@ -6,6 +6,7 @@
  * removal records. Callers must derive this surface before reading a packed
  * tarball. A name-only or key-presence observation is not acceptance.
  */
+import {tabHeaderProfile,approvedTabHeaderSignatureRecord} from './api-tab-header-context.mjs';
 import {existsSync, readFileSync, readdirSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {dirname, join, resolve} from 'node:path';
@@ -1582,6 +1583,8 @@ function differenceRow(record) {
 function constructionDifferenceAllowed(symbol, packed, record) {
   const constructor = [record.historical_signature, record.owned_signature]
     .some(signature => signature?.includes(' constructor('));
+  if (constructor && tabHeaderProfile(symbol))
+    return approvedTabHeaderSignatureRecord(symbol,packed,record);
   if (symbol.symbol_id === MENU_ITEM_SYMBOL && constructor)
     return approvedMenuItemSignatureRecord(symbol, packed, record);
   if (symbol.symbol_id === TABLE_SYMBOL && constructor)
