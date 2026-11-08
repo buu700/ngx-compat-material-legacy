@@ -7,8 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {createRequire} from 'node:module';
-import {readFileSync,existsSync} from 'node:fs';
-import {dirname,join} from 'node:path';
+import {readFileSync,existsSync,realpathSync} from 'node:fs';
+import {dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 const require=createRequire(import.meta.url),cache=new WeakMap();
@@ -23,27 +23,74 @@ function frames(stack){
 }
 
 /** Read-only correlation with the actual exported public constructor's code. No private symbol imports. */
-function emitterScope(core,frame){
- const Type=core.EventEmitter;
- let files=cache.get(Type);if(!files){files=new Map();cache.set(Type,files);}
- if(files.has(frame.file))return files.get(frame.file);
- const pkg=join(dirname(frame.file),'../package.json');
+export function emitterScope(core,frame){
+ const Type=core.EventEmitter,pkg=join(dirname(frame.file),'../package.json');
  if(!existsSync(pkg)||!existsSync(frame.file))return null;
- const metadata=JSON.parse(readFileSync(pkg,'utf8'));
+ const metadataRaw=readFileSync(pkg,'utf8'),metadata=JSON.parse(metadataRaw);
  if(metadata.name!=='@angular/core'||metadata.version!==core.VERSION.full)return null;
- const source=readFileSync(frame.file,'utf8'),text=Function.prototype.toString.call(Type),start=source.indexOf(text);
- if(start<0||source.indexOf(text,start+1)>=0){files.set(frame.file,null);return null;}
- const ts=require('typescript'),parsed=ts.createSourceFile('public-constructor.js',text,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
- if(parsed.parseDiagnostics.length||parsed.statements.length!==1||!ts.isClassDeclaration(parsed.statements[0]))
-  throw Error('public EventEmitter constructor source is unsupported');
- const cls=parsed.statements[0];
- const ranges=cls.members.filter(member=>ts.isConstructorDeclaration(member)
-  ||ts.isPropertyDeclaration(member)&&member.initializer&&!member.modifiers?.some(m=>m.kind===ts.SyntaxKind.StaticKeyword))
-  .map(member=>[start+member.getStart(parsed),start+member.end]);
+ const source=readFileSync(frame.file,'utf8'),text=Function.prototype.toString.call(Type);
+ if(!source.includes(text))return null;
+ // Resolve the public entry from the physical peer containing the caller. Read
+ // both files on every call; a parsed result is reusable only for identical bytes.
+ const localRequire=createRequire(frame.file);let entry;
+ try{entry=localRequire.resolve('@angular/core');if(realpathSync(entry)!==realpathSync(require.resolve('@angular/core')))return null;}catch{return null;}
+ const entrySource=readFileSync(entry,'utf8'),key=createHash('sha256').update(metadataRaw).update('\0').update(entrySource).update('\0').update(source).update('\0').update(text).digest('hex');
+ let files=cache.get(Type);if(!files){files=new Map();cache.set(Type,files);}
+ const prior=files.get(frame.file);if(prior?.key===key)return prior.result;
+ const ts=require('typescript'),parse=(name,content)=>ts.createSourceFile(name,content,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
+ const entryAst=parse(entry,entrySource);if(entryAst.parseDiagnostics.length)return null;
+ const reexports=entryAst.statements.flatMap(n=>ts.isExportDeclaration(n)&&n.moduleSpecifier&&ts.isStringLiteral(n.moduleSpecifier)&&n.exportClause&&ts.isNamedExports(n.exportClause)?[...n.exportClause.elements].filter(e=>e.name.text==='EventEmitter').map(e=>({local:(e.propertyName||e.name).text,spec:n.moduleSpecifier.text})):[]);
+ const entryNamed=entryAst.statements.flatMap(n=>ts.isExportDeclaration(n)&&n.exportClause&&ts.isNamedExports(n.exportClause)?[...n.exportClause.elements].filter(e=>e.name.text==='EventEmitter'):[]);
+ const entryDirect=entryAst.statements.flatMap(n=>n.modifiers?.some(m=>m.kind===ts.SyntaxKind.ExportKeyword)?(ts.isClassDeclaration(n)&&n.name?.text==='EventEmitter'?[n]:ts.isVariableStatement(n)?[...n.declarationList.declarations].filter(d=>ts.isIdentifier(d.name)&&d.name.text==='EventEmitter'):[]):[]);
+ if(entryAst.statements.some(n=>ts.isExportDeclaration(n)&&!n.exportClause))return null;
+ let exported='EventEmitter';
+ if(realpathSync(entry)!==realpathSync(frame.file)){
+  if(entryNamed.length!==1||entryDirect.length||reexports.length!==1||!reexports[0].spec.startsWith('./'))return null;
+  let target;try{target=realpathSync(resolve(dirname(entry),reexports[0].spec));}catch{return null;}
+  if(target!==realpathSync(frame.file))return null;exported=reexports[0].local;
+ }else if(reexports.length)return null;
+ const options={allowJs:true,noResolve:true,noLib:true,module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022};
+ const host=ts.createCompilerHost(options),get=host.getSourceFile.bind(host);
+ host.getSourceFile=(f,v,...args)=>f===frame.file?parse(f,source):get(f,v,...args);
+ const program=ts.createProgram([frame.file],options,host),parsed=program.getSourceFile(frame.file);
+ if(!parsed||parsed.parseDiagnostics.length)return null;
+ const checker=program.getTypeChecker(),mod=checker.getSymbolAtLocation(parsed),entries=mod?checker.getExportsOfModule(mod).filter(x=>x.name===exported):[];
+ const named=parsed.statements.flatMap(n=>ts.isExportDeclaration(n)&&!n.moduleSpecifier&&n.exportClause&&ts.isNamedExports(n.exportClause)?[...n.exportClause.elements].filter(e=>e.name.text===exported):[]);
+ const direct=parsed.statements.flatMap(n=>n.modifiers?.some(m=>m.kind===ts.SyntaxKind.ExportKeyword)?(ts.isClassDeclaration(n)&&n.name?.text===exported?[n]:ts.isVariableStatement(n)?[...n.declarationList.declarations].filter(d=>ts.isIdentifier(d.name)&&d.name.text===exported):[]):[]);
+ if(entries.length!==1||named.length+direct.length!==1)return null;
+ let symbol=entries[0].flags&ts.SymbolFlags.Alias?checker.getAliasedSymbol(entries[0]):entries[0],cls=null;const bindings=new Set();
+ for(let i=0;i<5;i++){
+  if(symbol?.declarations?.length!==1)return null;bindings.add(symbol);const d=symbol.declarations[0];
+  if(ts.isClassDeclaration(d)&&d.parent===parsed){cls=d;break;}
+  if(!ts.isVariableDeclaration(d)||d.parent?.parent?.parent!==parsed||!(d.parent.flags&ts.NodeFlags.Const)||!d.initializer)return null;
+  if(ts.isClassExpression(d.initializer)){cls=d.initializer;break;}
+  if(!ts.isIdentifier(d.initializer))return null;symbol=checker.getSymbolAtLocation(d.initializer);
+ }
+ if(!cls||cls.getText(parsed)!==text)return null;
+ // Lexical bindings used by the export must never be assigned, incremented,
+ // destructured or replaced by a for-in/of target anywhere in the module.
+ // Direct eval can write lexical bindings without a statically visible target.
+ let unsafe=false;
+ function targetHasBinding(node){
+  if(ts.isIdentifier(node)){
+   const symbol=checker.getSymbolAtLocation(node);
+   if(bindings.has(symbol))return true;
+   if(ts.isShorthandPropertyAssignment(node.parent)&&checker.getShorthandAssignmentValueSymbol(node.parent)&&bindings.has(checker.getShorthandAssignmentValueSymbol(node.parent)))return true;
+  }
+  return ts.forEachChild(node,targetHasBinding)||false;
+ }
+ function scan(node){
+  if(ts.isCallExpression(node)){let callee=node.expression;while(ts.isParenthesizedExpression(callee))callee=callee.expression;if(ts.isIdentifier(callee)&&callee.text==='eval')unsafe=true;}
+  if(ts.isBinaryExpression(node)&&node.operatorToken.kind>=ts.SyntaxKind.FirstAssignment&&node.operatorToken.kind<=ts.SyntaxKind.LastAssignment&&targetHasBinding(node.left))unsafe=true;
+  if((ts.isPrefixUnaryExpression(node)||ts.isPostfixUnaryExpression(node))&&(node.operator===ts.SyntaxKind.PlusPlusToken||node.operator===ts.SyntaxKind.MinusMinusToken)&&targetHasBinding(node.operand))unsafe=true;
+  if((ts.isForInStatement(node)||ts.isForOfStatement(node))&&!ts.isVariableDeclarationList(node.initializer)&&targetHasBinding(node.initializer))unsafe=true;
+  if(!unsafe)ts.forEachChild(node,scan);
+ }
+ scan(parsed);if(unsafe)return null;
+ const ranges=cls.members.filter(member=>ts.isConstructorDeclaration(member)||ts.isPropertyDeclaration(member)&&member.initializer&&!member.modifiers?.some(m=>m.kind===ts.SyntaxKind.StaticKeyword)).map(member=>[member.getStart(parsed),member.end]);
  const lineStarts=[0];for(let index=source.indexOf('\n');index>=0;index=source.indexOf('\n',index+1))lineStarts.push(index+1);
- const result={ranges,lineStarts,proof:{api:'@angular/core#EventEmitter',peer_version:metadata.version,file:frame.file,
-  sha256:createHash('sha256').update(source).digest('hex'),constructor_text_sha256:createHash('sha256').update(text).digest('hex')}};
- files.set(frame.file,result);return result;
+ const result={ranges,lineStarts,proof:{api:'@angular/core#EventEmitter',peer_version:metadata.version,file:frame.file,sha256:createHash('sha256').update(source).digest('hex'),constructor_text_sha256:createHash('sha256').update(text).digest('hex')}};
+ files.set(frame.file,{key,result});return result;
 }
 
 function origin(request,core){
