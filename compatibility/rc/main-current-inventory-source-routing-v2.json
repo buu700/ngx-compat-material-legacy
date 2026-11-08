@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "role": "main-current-inventory-source-routing",
+  "base_head": "54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0",
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "updates": [
+    {
+      "path": "scripts/packed-upstream-ledger-epoch.mjs",
+      "before": {
+        "path": "scripts/packed-upstream-ledger-epoch.mjs",
+        "sha256": "a86be06d36ef009f29e8ca7c87c272a413f4a8d942de4b9cf736daac88532e2b",
+        "bytes": 78890
+      },
+      "after": {
+        "path": "scripts/packed-upstream-ledger-epoch.mjs",
+        "sha256": "5ce8390b5e3fdbb9bdbdfa28da9b2a7112dabd8af83249d8d2298ee166294ad0",
+        "bytes": 80107
+      },
+      "edits": [
+        {
+          "offset": 3207,
+          "before": "",
+          "after": "// Only this module registers the inventory owner's qualified metadata reader.\n// Its older JSON images remain available to metadata replay, while live source\n// guards receive the exact underlying current reader, never those projections.\nconst inventorySourceReaders=new WeakMap();\nfunction currentSourceRead(root,read){const source=inventorySourceReaders.get(read);if(!source)return read;assert.equal(source.root,root,'cross-root inventory source reader');return source.raw;}\nfunction bindInventorySourceRead(root,read,inventory){inventorySourceReaders.set(inventory.metadataRead,{root,raw:read});}\nfunction metadataDigest(root,read,ref){const source=currentSourceRead(root,read);if(source===read)return ref.sha256;return hash(read(ref.path));}\n"
+        },
+        {
+          "offset": 3428,
+          "before": "  const scope=autocompleteSelectionNativeSubject({root,read,line});selectionNativeCache.set(read,{root,scope});return scope;\n",
+          "after": "  const scope=autocompleteSelectionNativeSubject({root,read:currentSourceRead(root,read),line});selectionNativeCache.set(read,{root,scope});return scope;\n"
+        },
+        {
+          "offset": 4122,
+          "before": "  const scope=autocompleteSelectionReaderSubject({root,read,line});selectionReaderCache.set(read,{root,scope});return scope;\n",
+          "after": "  const scope=autocompleteSelectionReaderSubject({root,read:currentSourceRead(root,read),line});selectionReaderCache.set(read,{root,scope});return scope;\n"
+        },
+        {
+          "offset": 4432,
+          "before": "  const current=native?.qualify(ref)??scope.qualify(ref)??ref,raw=read(ref.path);\n",
+          "after": "  const qualified=native?.qualify(ref)??scope.qualify(ref),current=qualified??ref;\n  const raw=(qualified?currentSourceRead(root,read):read)(ref.path);\n"
+        },
+        {
+          "offset": 4672,
+          "before": "  for(const member of scope.bound)bound.set(member.path,member.sha256);\n  if(native)for(const member of native.bound)bound.set(member.path,member.sha256);\n  bound.set(ref.path,current.sha256);return raw;\n",
+          "after": "  // The enclosing historical epoch's bound map is consumed by its metadata\n  // reader. Physical source bindings are checked by each scope's own guard.\n  for(const member of scope.bound)bound.set(member.path,metadataDigest(root,read,member));\n  if(native)for(const member of native.bound)bound.set(member.path,metadataDigest(root,read,member));\n  bound.set(ref.path,metadataDigest(root,read,current));return raw;\n"
+        },
+        {
+          "offset": 64386,
+          "before": "  const specReaders=selectionReaders(root,read,line);specReaders.assertCurrent();for(const ref of specReaders.bound)bound.set(ref.path,ref.sha256);\n  const nativeSubjects=selectionNative(root,read,line);for(const ref of nativeSubjects.bound)bound.set(ref.path,ref.sha256);\n",
+          "after": "  const specReaders=selectionReaders(root,read,line);specReaders.assertCurrent();for(const ref of specReaders.bound)bound.set(ref.path,metadataDigest(root,read,ref));\n  const nativeSubjects=selectionNative(root,read,line);for(const ref of nativeSubjects.bound)bound.set(ref.path,metadataDigest(root,read,ref));\n"
+        },
+        {
+          "offset": 77817,
+          "before": "",
+          "after": " bindInventorySourceRead(root,read,inventory);\n"
+        },
+        {
+          "offset": 78140,
+          "before": "",
+          "after": " bindInventorySourceRead(root,read,inventory);\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/inventory-reference-owner.mjs",
+      "before": {
+        "path": "scripts/inventory-reference-owner.mjs",
+        "sha256": "9edbc8bd75f797605dd51b9f8eb14d0f0eacb096157bb6511bb05c0b9aa66d39",
+        "bytes": 23040
+      },
+      "after": {
+        "path": "scripts/inventory-reference-owner.mjs",
+        "sha256": "5d2cebb84686155173cdd8e653aa4743acdecffc4fd71d14cdd8f927e555b319",
+        "bytes": 23445
+      },
+      "edits": [
+        {
+          "offset": 1223,
+          "before": "",
+          "after": "import {currentInventorySourceSubject} from './current-inventory-source-subject.mjs';\n"
+        },
+        {
+          "offset": 9189,
+          "before": "",
+          "after": " const sourceRouting=line==='main'?currentInventorySourceSubject({root,read}):null;\n"
+        },
+        {
+          "offset": 13543,
+          "before": " const owner=member(OWNER,packet.after_owner.sha256);assert.equal(owner.toString(),ownerExpected);\n assert.equal(hash(readEvidenceMember(root,OWNER)),packet.after_owner.sha256,'actual loaded owner path differs from qualified code');\n",
+          "after": " const ownerReference=sourceRouting?.qualify({path:OWNER,...packet.after_owner})??{path:OWNER,...packet.after_owner};\n const owner=member(OWNER,ownerReference.sha256);\n if(sourceRouting)assert.equal(sourceRouting.comparisonBytes({path:OWNER,...packet.after_owner}).toString(),ownerExpected);else assert.equal(owner.toString(),ownerExpected);\n assert.equal(hash(readEvidenceMember(root,OWNER)),ownerReference.sha256,'actual loaded owner path differs from qualified code');\n"
+        },
+        {
+          "offset": 20615,
+          "before": "  if(path===OWNER&&line==='main'){const current=read(path);assert.equal(hash(current),packet.after_owner.sha256,'changed current owner code');return current;}\n",
+          "after": "  if(path===OWNER&&line==='main'){const current=read(path);assert.equal(hash(current),ownerReference.sha256,'changed current owner code');return current;}\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/inventory-finite-tool-successor.mjs",
+      "before": {
+        "path": "scripts/inventory-finite-tool-successor.mjs",
+        "sha256": "b43cfc96aa309ea6a12e5cb7035793bbbe19bcd5772d0a685d7ce7e96889808c",
+        "bytes": 27659
+      },
+      "after": {
+        "path": "scripts/inventory-finite-tool-successor.mjs",
+        "sha256": "9bb76dc5767dade03703ae4147ac8e34295ac92a53d3be7fbfd082709c05378c",
+        "bytes": 28000
+      },
+      "edits": [
+        {
+          "offset": 495,
+          "before": "",
+          "after": "import {currentInventorySourceSubject} from './current-inventory-source-subject.mjs';\n"
+        },
+        {
+          "offset": 1521,
+          "before": "",
+          "after": " const sourceRouting=line==='main'?currentInventorySourceSubject({root,read}):null;\n"
+        },
+        {
+          "offset": 21242,
+          "before": "  assert.equal(ownerProgram.schema_version,1);assert.equal(ownerProgram.role,'main-inventory-owner-verify-lite-source-successor');assert.equal(ownerProgram.source_scope_only,true);assert.equal(ownerProgram.historical_programs_executed,false);assert.equal(ownerProgram.full_Actions_execution_qualified,false);assert.equal(ownerProgram.g11_claim,'not-passed');assert.equal(ownerProgram.base_head,'a796c018da3023e916b37088917f6adca56fbc9d');execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',ownerProgram.base_head,'HEAD'],{cwd:root,env});assert.deepEqual(ownerProgram.before,terminal.after);const nextOwner=replay(updatedOwner,ownerProgram);assert.equal(hash(nextOwner),ownerProgram.after.sha256);assert.equal(nextOwner.length,ownerProgram.after.bytes);assert.equal(ownerProgram.after.path,terminal.after.path);assert.ok(physical(ownerProgram.after.path).equals(nextOwner));\n",
+          "after": "  assert.equal(ownerProgram.schema_version,1);assert.equal(ownerProgram.role,'main-inventory-owner-verify-lite-source-successor');assert.equal(ownerProgram.source_scope_only,true);assert.equal(ownerProgram.historical_programs_executed,false);assert.equal(ownerProgram.full_Actions_execution_qualified,false);assert.equal(ownerProgram.g11_claim,'not-passed');assert.equal(ownerProgram.base_head,'a796c018da3023e916b37088917f6adca56fbc9d');execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',ownerProgram.base_head,'HEAD'],{cwd:root,env});assert.deepEqual(ownerProgram.before,terminal.after);const nextOwner=replay(updatedOwner,ownerProgram);assert.equal(hash(nextOwner),ownerProgram.after.sha256);assert.equal(nextOwner.length,ownerProgram.after.bytes);assert.equal(ownerProgram.after.path,terminal.after.path);assert.ok(sourceRouting.comparisonBytes(ownerProgram.after).equals(nextOwner));const currentOwnerReference=sourceRouting.qualify(ownerProgram.after);assert.ok(currentOwnerReference);\n"
+        },
+        {
+          "offset": 22448,
+          "before": "  ownerEpoch={...packet,terminal_owner:{...terminal,after:ownerProgram.after},terminal_owner_previous:terminal.after,after:inventoryFrame.proposal_transition.after,current_inventory:finalInventory,priorInventory:{path:packet.current_inventory.path,sha256:hash(oldInventory),bytes:oldInventory.length}};\n",
+          "after": "  ownerEpoch={...packet,terminal_owner:{...terminal,after:currentOwnerReference},terminal_owner_previous:[terminal.after,ownerProgram.after],after:inventoryFrame.proposal_transition.after,current_inventory:finalInventory,priorInventory:{path:packet.current_inventory.path,sha256:hash(oldInventory),bytes:oldInventory.length}};\n"
+        },
+        {
+          "offset": 22754,
+          "before": " const bound=[{path:SELF,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PIN,bytes:packetRaw.length},previous,...rows.map(row=>({...((ownerEpoch&&row.path===ownerEpoch.after.path)?ownerEpoch.after:row.after)})),...(ownerEpoch?[ownerPacketRef,ownerEpoch.new_validator,ownerEpoch.current_inventory,ownerEpoch.terminal_owner.after,ownerProgramRef,inventoryFrameRef,...inventoryFrame.review_members,...ownerMatrix.bound]:[]),{path:WORKFLOW_PACKET,sha256:WORKFLOW_PIN,bytes:workflowRaw.length},{...(ciFrame?ciFrame[0].after:workflow.current)},...workflow.targets.map((ref,i)=>({...((ciFrame&&i===0)?ciFrame[2].after:ref)})),{path:HELPER_TEST_PACKET,sha256:HELPER_TEST_PIN,bytes:helperTestRaw.length},{...(ciFrame?ciFrame[1].after:helperTest.current)},...(ciFrame?[ciFrameRef]:[])];const rootKey=realpathSync(root);const sweep=()=>{for(const ref of bound){const raw=physical(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}assert.ok(physical(SELF).equals(image));};const assertCurrent=()=>{const existing=activeRoots.get(rootKey);if(existing){existing.violation=true;throw Error('reentrant inventory successor');}const state={violation:false};activeRoots.set(rootKey,state);try{sweep();for(const ref of bound){const raw=physical(ref.path);const supplied=read(ref.path);assert.ok(Buffer.isBuffer(supplied));assert.ok(raw.equals(supplied),'nonphysical inventory successor');assert.ok(raw.equals(physical(ref.path)));}sweep();assert.equal(state.violation,false,'swallowed reentrant inventory successor');}finally{activeRoots.delete(rootKey);}};\n const qualify=ref=>{const baseRow=rows.find(item=>item.path===ref?.path);const row=baseRow && ownerEpoch && baseRow.path===ownerEpoch.after.path ? {before:baseRow.before,after:ownerEpoch.after} : baseRow??(ownerEpoch&&ref?.path===ownerEpoch.current_inventory.path?{before:ownerEpoch.priorInventory,after:ownerEpoch.current_inventory}:ownerEpoch&&ref?.path===ownerEpoch.terminal_owner.after.path?ownerEpoch.terminal_owner:ref?.path===workflow.current.path?{before:workflow.historical_after,after:ciFrame?ciFrame[0].after:workflow.current}:ref?.path===helperTest.current.path?{before:helperTest.before,after:ciFrame?ciFrame[1].after:helperTest.current}:null);if(!row)return null;const intermediates=ownerEpoch&&ref.path===ownerEpoch.terminal_owner.after.path?[ownerEpoch.terminal_owner_previous]:ownerEpoch&&ref.path===ownerEpoch.after.path?[ownerEpoch.before,inventoryFrame.proposal_transition.before]:ownerEpoch&&ref.path===ownerEpoch.current_inventory.path?[...inventoryFrame.inventory_transitions.map(t=>t.before),inventoryFrame.inventory_transitions.at(-1).after]:ciFrame&&ref.path===workflow.current.path?[workflow.current]:ciFrame&&ref.path===helperTest.current.path?[helperTest.current]:[];const prior=[row.before,...intermediates,row.after].find(item=>item.sha256===ref.sha256);assert.ok(prior,'unknown inventory verifier predecessor');if(ref.bytes!==undefined)assert.equal(ref.bytes,prior.bytes);return {...ref,sha256:row.after.sha256,...(ref.bytes===undefined?{}:{bytes:row.after.bytes})};};const inventoryHistoricalBytes=ref=>{assert.ok(inventoryFrame,'historical inventory comparisons require main');assert.ok(ref&&typeof ref==='object'&&!types.isProxy(ref)&&Object.getPrototypeOf(ref)===Object.prototype);const descriptors=Object.getOwnPropertyDescriptors(ref);assert.deepEqual(Reflect.ownKeys(descriptors).sort(),['bytes','path','sha256']);for(const d of Object.values(descriptors))assert.ok(Object.hasOwn(d,'value')&&d.enumerable);ref={path:descriptors.path.value,sha256:descriptors.sha256.value,bytes:descriptors.bytes.value};assert.equal(typeof ref.path,'string');assert.equal(typeof ref.sha256,'string');assert.ok(Number.isSafeInteger(ref.bytes)&&ref.bytes>=0);const transition=inventoryFrame.inventory_transitions.find(t=>t.before.path===ref.path&&t.before.sha256===ref.sha256&&t.before.bytes===ref.bytes);assert.ok(transition,'unknown historical inventory image');assertCurrent();const raw=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',transition.parent+':'+ref.path],{cwd:root,env,maxBuffer:2*1024*1024});assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);assertCurrent();return Buffer.from(raw);};assertCurrent();return{bound:structuredClone(bound),qualify,assertCurrent,inventoryHistoricalBytes,workflow:{before:{...workflow.historical_after},current:{...(ciFrame?ciFrame[0].after:workflow.current)},targets:structuredClone(ciFrame?[ciFrame[2].after,workflow.targets[1]]:workflow.targets),source_test_expectations:structuredClone(ciFrame?[{path:workflow.targets[0].path,cases:48,mutants_rejected:17},workflow.current_source_test_expectations[1]]:workflow.current_source_test_expectations),helper_test:{before:{...helperTest.before},current:{...(ciFrame?ciFrame[1].after:helperTest.current)}},full_Actions_execution_qualified:false}};\n",
+          "after": " const bound=[{path:SELF,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PIN,bytes:packetRaw.length},previous,...rows.map(row=>({...((ownerEpoch&&row.path===ownerEpoch.after.path)?ownerEpoch.after:row.after)})),...(ownerEpoch?[ownerPacketRef,ownerEpoch.new_validator,ownerEpoch.current_inventory,ownerEpoch.terminal_owner.after,ownerProgramRef,inventoryFrameRef,...inventoryFrame.review_members,...ownerMatrix.bound]:[]),{path:WORKFLOW_PACKET,sha256:WORKFLOW_PIN,bytes:workflowRaw.length},{...(ciFrame?ciFrame[0].after:workflow.current)},...workflow.targets.map((ref,i)=>({...((ciFrame&&i===0)?ciFrame[2].after:ref)})),{path:HELPER_TEST_PACKET,sha256:HELPER_TEST_PIN,bytes:helperTestRaw.length},{...(ciFrame?ciFrame[1].after:helperTest.current)},...(ciFrame?[ciFrameRef]:[]),...(sourceRouting?.bound??[])];const rootKey=realpathSync(root);const sweep=()=>{for(const ref of bound){const raw=physical(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}assert.ok(physical(SELF).equals(image));};const assertCurrent=()=>{const existing=activeRoots.get(rootKey);if(existing){existing.violation=true;throw Error('reentrant inventory successor');}const state={violation:false};activeRoots.set(rootKey,state);try{sweep();for(const ref of bound){const raw=physical(ref.path);const supplied=read(ref.path);assert.ok(Buffer.isBuffer(supplied));assert.ok(raw.equals(supplied),'nonphysical inventory successor');assert.ok(raw.equals(physical(ref.path)));}sweep();assert.equal(state.violation,false,'swallowed reentrant inventory successor');}finally{activeRoots.delete(rootKey);}};\n const qualify=ref=>{const baseRow=rows.find(item=>item.path===ref?.path);const row=baseRow && ownerEpoch && baseRow.path===ownerEpoch.after.path ? {before:baseRow.before,after:ownerEpoch.after} : baseRow??(ownerEpoch&&ref?.path===ownerEpoch.current_inventory.path?{before:ownerEpoch.priorInventory,after:ownerEpoch.current_inventory}:ownerEpoch&&ref?.path===ownerEpoch.terminal_owner.after.path?ownerEpoch.terminal_owner:ref?.path===workflow.current.path?{before:workflow.historical_after,after:ciFrame?ciFrame[0].after:workflow.current}:ref?.path===helperTest.current.path?{before:helperTest.before,after:ciFrame?ciFrame[1].after:helperTest.current}:null);if(!row)return null;const intermediates=ownerEpoch&&ref.path===ownerEpoch.terminal_owner.after.path?ownerEpoch.terminal_owner_previous:ownerEpoch&&ref.path===ownerEpoch.after.path?[ownerEpoch.before,inventoryFrame.proposal_transition.before]:ownerEpoch&&ref.path===ownerEpoch.current_inventory.path?[...inventoryFrame.inventory_transitions.map(t=>t.before),inventoryFrame.inventory_transitions.at(-1).after]:ciFrame&&ref.path===workflow.current.path?[workflow.current]:ciFrame&&ref.path===helperTest.current.path?[helperTest.current]:[];const prior=[row.before,...intermediates,row.after].find(item=>item.sha256===ref.sha256);assert.ok(prior,'unknown inventory verifier predecessor');if(ref.bytes!==undefined)assert.equal(ref.bytes,prior.bytes);return {...ref,sha256:row.after.sha256,...(ref.bytes===undefined?{}:{bytes:row.after.bytes})};};const inventoryHistoricalBytes=ref=>{assert.ok(inventoryFrame,'historical inventory comparisons require main');assert.ok(ref&&typeof ref==='object'&&!types.isProxy(ref)&&Object.getPrototypeOf(ref)===Object.prototype);const descriptors=Object.getOwnPropertyDescriptors(ref);assert.deepEqual(Reflect.ownKeys(descriptors).sort(),['bytes','path','sha256']);for(const d of Object.values(descriptors))assert.ok(Object.hasOwn(d,'value')&&d.enumerable);ref={path:descriptors.path.value,sha256:descriptors.sha256.value,bytes:descriptors.bytes.value};assert.equal(typeof ref.path,'string');assert.equal(typeof ref.sha256,'string');assert.ok(Number.isSafeInteger(ref.bytes)&&ref.bytes>=0);const transition=inventoryFrame.inventory_transitions.find(t=>t.before.path===ref.path&&t.before.sha256===ref.sha256&&t.before.bytes===ref.bytes);assert.ok(transition,'unknown historical inventory image');assertCurrent();const raw=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',transition.parent+':'+ref.path],{cwd:root,env,maxBuffer:2*1024*1024});assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);assertCurrent();return Buffer.from(raw);};assertCurrent();return{bound:structuredClone(bound),qualify,assertCurrent,inventoryHistoricalBytes,workflow:{before:{...workflow.historical_after},current:{...(ciFrame?ciFrame[0].after:workflow.current)},targets:structuredClone(ciFrame?[ciFrame[2].after,workflow.targets[1]]:workflow.targets),source_test_expectations:structuredClone(ciFrame?[{path:workflow.targets[0].path,cases:48,mutants_rejected:17},workflow.current_source_test_expectations[1]]:workflow.current_source_test_expectations),helper_test:{before:{...helperTest.before},current:{...(ciFrame?ciFrame[1].after:helperTest.current)}},full_Actions_execution_qualified:false}};\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/historical-repair-live-source-successor.mjs",
+      "before": {
+        "path": "scripts/historical-repair-live-source-successor.mjs",
+        "sha256": "8e2c9dadced1b3a7188576566b667ddc87db2eb100b1121a97d4a4366f817f80",
+        "bytes": 11967
+      },
+      "after": {
+        "path": "scripts/historical-repair-live-source-successor.mjs",
+        "sha256": "8a850621667de632c95a5f27dca2a13f3d300639e77a53d1b60f124817e1e21e",
+        "bytes": 12215
+      },
+      "edits": [
+        {
+          "offset": 659,
+          "before": "",
+          "after": "import {currentInventorySourceSubject} from './current-inventory-source-subject.mjs';\n"
+        },
+        {
+          "offset": 2520,
+          "before": " const physical=p=>readEvidenceMember(root,p),bound=new Map(),authoredTab=currentAuthoredTabSourceSuccessor({root});\n",
+          "after": " const physical=p=>readEvidenceMember(root,p),bound=new Map(),authoredTab=currentAuthoredTabSourceSuccessor({root}),sourceRouting=currentInventorySourceSubject({root});\n"
+        },
+        {
+          "offset": 2873,
+          "before": " add({path:SELF,sha256:hash(image),bytes:image.length});for(const r of refs)add(r);add(authoredEpochRef);for(const ref of authoredTab.bound)add(ref);\n",
+          "after": " add({path:SELF,sha256:hash(image),bytes:image.length});for(const r of refs)add(r);add(authoredEpochRef);for(const ref of [...authoredTab.bound,...sourceRouting.bound])add(ref);\n"
+        },
+        {
+          "offset": 9998,
+          "before": " const transitions=[{before:signature.steps[0].before,after:signature.steps[1].after,accepted:[signature.steps[0].before,signature.steps[0].after,signature.steps[1].after]},{before:tab.before,after:tab.after,accepted:[tab.before,tab.after]},{before:f.before,after:f.after,accepted:[f.before,f.after]},{before:authored.before,after:authored.after,accepted:[authored.before,authored.after]},...support.transitions.map(row=>{const successor=authoredEpoch.transitions.find(x=>x.path===row.path);return {before:row.steps[0].before,after:successor?.after??row.steps.at(-1).after,accepted:[row.steps[0].before,...row.steps.map(step=>step.after),...(successor?[successor.after]:[])]};}),{before:authoredEpoch.transitions[1].before,after:authoredTab.after,accepted:[authoredEpoch.transitions[1].before,authoredEpoch.transitions[1].after,authoredTab.after]}];\n",
+          "after": " const transitions=[{before:signature.steps[0].before,after:signature.steps[1].after,accepted:[signature.steps[0].before,signature.steps[0].after,signature.steps[1].after]},{before:tab.before,after:tab.after,accepted:[tab.before,tab.after]},{before:f.before,after:f.after,accepted:[f.before,f.after]},{before:authored.before,after:authored.after,accepted:[authored.before,authored.after]},...support.transitions.map(row=>{const successor=authoredEpoch.transitions.find(x=>x.path===row.path);return {before:row.steps[0].before,after:successor?.after??row.steps.at(-1).after,accepted:[row.steps[0].before,...row.steps.map(step=>step.after),...(successor?[successor.after]:[])]};}),{before:authoredEpoch.transitions[1].before,after:authoredTab.after,accepted:[authoredEpoch.transitions[1].before,authoredEpoch.transitions[1].after,authoredTab.after]},...sourceRouting.transitions.map(row=>({...row,accepted:[row.before,row.after]}))];\n"
+        }
+      ]
+    }
+  ],
+  "decisions": [
+    "Only the packed owner associates its verified inventory metadata reader with the original current source reader. Live selection scopes and qualified source reads use the latter; historical inventory/workflow/ledger JSON remain metadata only.",
+    "Source scopes retain their real physical binding guards, while the historical prepared.bound map records digests consumed by the historical metadata reader.",
+    "The inventory owner preserves its old compiled-function recipe as authenticated data, then checks the separately owned current packed source image. The finite tool owner accepts only the exact current inventory owner successor and retains both prior identities.",
+    "The retained historical live-source helper must also qualify these exact current tool references when validating its original implementation report. Keep that report and its historical source descriptors unchanged."
+  ]
+}

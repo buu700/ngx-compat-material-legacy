@@ -35,13 +35,22 @@ class CurrentReaderSourceSuccessorsTests(unittest.TestCase):
 
     def test_javascript_reader_owner(self):
         report = self.run_probe('node', 'current_reader_source_successor_probe.mjs')
-        self.assertEqual(report['cold_rejections'], 6)
+        self.assertEqual(report['cold_rejections'], 11)
         self.assertEqual(report['unknown_references_rejected'], 2)
 
     def test_python_reader_owner(self):
         report = self.run_probe(sys.executable, 'current_reader_source_successor_probe.py')
-        self.assertEqual(report['cold_rejections'], 6)
+        self.assertEqual(report['cold_rejections'], 11)
         self.assertEqual(report['unknown_references_rejected'], 2)
+
+    def test_current_inventory_source_routing(self):
+        report = self.run_probe('node', 'current_inventory_source_routing_probe.mjs')
+        self.assertEqual(report['cold_rejections'], 6)
+        for field in ['old_source_substitution_rejected', 'unknown_hash_rejected',
+                      'wrong_length_rejected', 'accessor_not_invoked',
+                      'public_metadata_isolated', 'comparison_copy_isolated',
+                      'forged_raw_property_rejected']:
+            self.assertTrue(report[field], field)
 
 
 if __name__ == '__main__':

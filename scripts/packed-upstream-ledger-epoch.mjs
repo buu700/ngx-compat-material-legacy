@@ -51,10 +51,17 @@ const disk = root => path => readFileSync(join(root, path));
 const readers = new WeakMap();
 const selectionReaderCache=new WeakMap();
 const selectionNativeCache=new WeakMap();
+// Only this module registers the inventory owner's qualified metadata reader.
+// Its older JSON images remain available to metadata replay, while live source
+// guards receive the exact underlying current reader, never those projections.
+const inventorySourceReaders=new WeakMap();
+function currentSourceRead(root,read){const source=inventorySourceReaders.get(read);if(!source)return read;assert.equal(source.root,root,'cross-root inventory source reader');return source.raw;}
+function bindInventorySourceRead(root,read,inventory){inventorySourceReaders.set(inventory.metadataRead,{root,raw:read});}
+function metadataDigest(root,read,ref){const source=currentSourceRead(root,read);if(source===read)return ref.sha256;return hash(read(ref.path));}
 function selectionNative(root,read,line){
   const cached=selectionNativeCache.get(read);
   if(cached){assert.equal(cached.root,root);assert.equal(cached.scope.line,line);cached.scope.assertCurrent();return cached.scope;}
-  const scope=autocompleteSelectionNativeSubject({root,read,line});selectionNativeCache.set(read,{root,scope});return scope;
+  const scope=autocompleteSelectionNativeSubject({root,read:currentSourceRead(root,read),line});selectionNativeCache.set(read,{root,scope});return scope;
 }
 // Historical metadata only. Actual registry bytes never pass through this map.
 function registryBeforeMetadata(root,read,line,ref){
@@ -65,16 +72,19 @@ function registryBeforeMetadata(root,read,line,ref){
 function selectionReaders(root,read,line){
   const cached=selectionReaderCache.get(read);
   if(cached){assert.equal(cached.root,root);assert.equal(cached.scope.spec.line,line);return cached.scope;}
-  const scope=autocompleteSelectionReaderSubject({root,read,line});selectionReaderCache.set(read,{root,scope});return scope;
+  const scope=autocompleteSelectionReaderSubject({root,read:currentSourceRead(root,read),line});selectionReaderCache.set(read,{root,scope});return scope;
 }
 function selectionMember({root,read,line,ref,bound}){
   const scope=selectionReaders(root,read,line),native=ref.path===SELECTION_NATIVE_REGISTRY?selectionNative(root,read,line):null;
-  const current=native?.qualify(ref)??scope.qualify(ref)??ref,raw=read(ref.path);
+  const qualified=native?.qualify(ref)??scope.qualify(ref),current=qualified??ref;
+  const raw=(qualified?currentSourceRead(root,read):read)(ref.path);
   assert.equal(hash(raw),current.sha256,'changed qualified source subject '+ref.path);
   if(current.bytes!==undefined)assert.equal(raw.length,current.bytes);
-  for(const member of scope.bound)bound.set(member.path,member.sha256);
-  if(native)for(const member of native.bound)bound.set(member.path,member.sha256);
-  bound.set(ref.path,current.sha256);return raw;
+  // The enclosing historical epoch's bound map is consumed by its metadata
+  // reader. Physical source bindings are checked by each scope's own guard.
+  for(const member of scope.bound)bound.set(member.path,metadataDigest(root,read,member));
+  if(native)for(const member of native.bound)bound.set(member.path,metadataDigest(root,read,member));
+  bound.set(ref.path,metadataDigest(root,read,current));return raw;
 }
 
 const pythonVersion = () => execFileSync('python3', ['-c', 'import sys;print(sys.version.split()[0])'],
@@ -741,8 +751,8 @@ function prepareBeforeInventoryReferenceLedger({root = process.cwd(), read = dis
   // Scope checks bracket the complete preparation instead of rereading every
   // scope member for each unrelated member. Individual reads still check their
   // own digest, and returned epoch readers retain their full late-change gate.
-  const specReaders=selectionReaders(root,read,line);specReaders.assertCurrent();for(const ref of specReaders.bound)bound.set(ref.path,ref.sha256);
-  const nativeSubjects=selectionNative(root,read,line);for(const ref of nativeSubjects.bound)bound.set(ref.path,ref.sha256);
+  const specReaders=selectionReaders(root,read,line);specReaders.assertCurrent();for(const ref of specReaders.bound)bound.set(ref.path,metadataDigest(root,read,ref));
+  const nativeSubjects=selectionNative(root,read,line);for(const ref of nativeSubjects.bound)bound.set(ref.path,metadataDigest(root,read,ref));
   function member(ref, authenticate = false) {
     const raw=selectionMember({root,read,line,ref,bound});
     if (authenticate) assert.equal(hash(gitBytes(root, authority, ref.path)), ref.sha256);
@@ -891,12 +901,14 @@ function epochBeforeInventoryReferenceLedger({root = process.cwd(), read = disk(
 export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){
  read=packedUpstreamLedgerRawRead({root,read});
  const inventory=inventoryReferenceOwnerContext({root,read});
+ bindInventorySourceRead(root,read,inventory);
  const prior=prepareBeforeInventoryReferenceLedger({root,read:inventory.metadataRead});
  return inventory.wrapPrepared(prior);
 }
 export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={}){
  read=packedUpstreamLedgerRawRead({root,read});
  const inventory=inventoryReferenceOwnerContext({root,read});
+ bindInventorySourceRead(root,read,inventory);
  const prior=epochBeforeInventoryReferenceLedger({root,read:inventory.metadataRead});
  const assertCurrent=()=>{inventory.assertCurrent();prior.assertCurrent();inventory.assertCurrent();};
  const historical=path=>{if(path!==ledgerPath)return read(path);assertCurrent();const value=prior.read(path);assertCurrent();return value;};

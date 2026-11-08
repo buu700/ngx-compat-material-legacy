@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 const root=process.cwd(),{currentSassToolReferenceSubject:make}=await import(pathToFileURL(root+'/scripts/current-sass-tool-references.mjs'));
-const targets=['scripts/historical-repair-live-source-successor.mjs','scripts/autocomplete-selection-spec-subject.mjs','scripts/current-authored-tab-source-successor.mjs','scripts/autocomplete-current-spec-source-successor.mjs','compatibility/rc/main-retained-current-reader-source-successors-v1.json','compatibility/rc/main-autocomplete-current-spec-source-successor-v1.json'];
+const targets=['scripts/historical-repair-live-source-successor.mjs','scripts/autocomplete-selection-spec-subject.mjs','scripts/current-authored-tab-source-successor.mjs','scripts/autocomplete-current-spec-source-successor.mjs','compatibility/rc/main-retained-current-reader-source-successors-v1.json','compatibility/rc/main-autocomplete-current-spec-source-successor-v1.json','scripts/current-inventory-source-subject.mjs','compatibility/rc/main-current-inventory-source-routing-v2.json','scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs'];
 let bad=false,target=null;
 const read=path=>{const raw=readFileSync(root+'/'+path);return bad&&path===target?Buffer.concat([raw,Buffer.from(' ')]):raw;};
 const live=make({root,read});

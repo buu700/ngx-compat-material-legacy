@@ -18,6 +18,7 @@ import {prepareInventoryReferenceSourceMetadata,INVENTORY_REFERENCE_LEDGER as LE
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {readHistoricalContractRepairOwnerMember} from './historical-contract-repair-readers.mjs';
 import {inventoryFiniteToolSuccessor} from './inventory-finite-tool-successor.mjs';
+import {currentInventorySourceSubject} from './current-inventory-source-subject.mjs';
 const PATH='scripts/inventory-reference-owner.mjs',OWNER='scripts/packed-upstream-ledger-epoch.mjs';
 const PACKET='compatibility/rc/c04-inventory-owner-inputs.json';
 const PINS={"main":"97db675e4fda1c6dd4a7f056159bd47e2aa963dddb9dff3da1af537ae062d15a","21.x":"0d9dfac3813a6dc60644a090a2173ce56eaed1bcbdb32c2be29ce53f32413cdc"};
@@ -124,6 +125,7 @@ if report['result']!='pass':sys.stderr.write(log.getvalue());sys.exit(1)
 export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwnerMember(root,path)}={}){
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version;
  const line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
+ const sourceRouting=line==='main'?currentInventorySourceSubject({root,read}):null;
  const rc=inventoryRcAcceptanceSourceSuccessor({root,read});
  const tool=inventoryFiniteToolSuccessor({root,line,read});
  const bound=new Map([...rc.bound,...tool.bound].map(ref=>[ref.path,{...ref}]));
@@ -158,8 +160,10 @@ export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwner
  let ownerExpected=oldOwner.toString();
  for(const edit of packet.owner_literal_edits){assert.equal(ownerExpected.split(edit.before).length,2,'ambiguous owner edit');ownerExpected=ownerExpected.replace(edit.before,edit.after);}
  assert.equal(hash(ownerExpected),packet.after_owner.sha256);assert.equal(Buffer.byteLength(ownerExpected),packet.after_owner.bytes);
- const owner=member(OWNER,packet.after_owner.sha256);assert.equal(owner.toString(),ownerExpected);
- assert.equal(hash(readEvidenceMember(root,OWNER)),packet.after_owner.sha256,'actual loaded owner path differs from qualified code');
+ const ownerReference=sourceRouting?.qualify({path:OWNER,...packet.after_owner})??{path:OWNER,...packet.after_owner};
+ const owner=member(OWNER,ownerReference.sha256);
+ if(sourceRouting)assert.equal(sourceRouting.comparisonBytes({path:OWNER,...packet.after_owner}).toString(),ownerExpected);else assert.equal(owner.toString(),ownerExpected);
+ assert.equal(hash(readEvidenceMember(root,OWNER)),ownerReference.sha256,'actual loaded owner path differs from qualified code');
  for(const prior of packet.source_members){const first=rc.qualify(prior)??prior,ref=qualifyLite(tool.qualify(first)??first),raw=member(ref.path,ref.sha256);assert.equal(raw.length,ref.bytes);}
  const historicalHandlers=new Map();
  for(const transition of packet.historical_handler_metadata){
@@ -222,7 +226,7 @@ export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwner
   const handler=historicalHandlers.get(path);if(handler){assert.equal(hash(read(path)),handler.after.sha256,'changed current title handler');return Buffer.from(handler.before);}
   if(path===INVENTORY){assert.equal(hash(read(path)),source.verifier.current_inventory_sha256,'changed current inventory metadata');return Buffer.from(oldInventory);}
   if(path===workflow.path){assert.equal(hash(read(path)),currentWorkflowRef.sha256,'changed current workflow');return Buffer.from(oldWorkflow);}
-  if(path===OWNER&&line==='main'){const current=read(path);assert.equal(hash(current),packet.after_owner.sha256,'changed current owner code');return current;}
+  if(path===OWNER&&line==='main'){const current=read(path);assert.equal(hash(current),ownerReference.sha256,'changed current owner code');return current;}
   if(path===LEDGER){const raw=read(path);assert.equal(hash(raw),hash(currentLedger),'late canonical metadata image change');return applied?Buffer.from(source.before):raw;}
   return read(path);
  };

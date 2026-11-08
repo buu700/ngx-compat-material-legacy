@@ -327,6 +327,24 @@ class CurrentSassToolReferences:
         assert packet['historical_reports_rewritten'] == 0 and packet['artifact_or_audit_admission_granted'] is False
         assert self._read(package_path) == package_image
         domain_overlays = {}
+        routing_images={}
+        if self.line=='main':
+            routing_packet=json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v2.json',sha256='3815beb1e21779e54deaee5da2bf7bb316732e98a3dc9938ef6d2fdf18707280',bytes=24306)))
+            assert routing_packet['schema_version']==1 and routing_packet['role']=='main-current-inventory-source-routing' and routing_packet['base_head']=='54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0'
+            assert routing_packet['source_scope_only'] is True and routing_packet['historical_programs_executed'] is False and routing_packet['historical_packets_rewritten'] is False and routing_packet['artifact_or_audit_admission_granted'] is False and routing_packet['g11_claim']=='not-passed'
+            routing_paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];assert [row['path'] for row in routing_packet['updates']]==routing_paths
+            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='d56f5c9624821d36917d282bea0f4a166099abd4218861236dcc8cc86e549506',bytes=5689))
+            routing_env=dict(PATH=os.environ['PATH'],GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0');subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',routing_packet['base_head'],'HEAD'],cwd=self.root,env=routing_env)
+            routing_originals=_git_images(self.root,[dict(commit=routing_packet['base_head'],path=routing_path) for routing_path in routing_paths])
+            for routing_update in routing_packet['updates']:
+                assert routing_update['before']['path']==routing_update['after']['path']==routing_update['path']
+                routing_before=routing_originals[(routing_packet['base_head'],routing_update['path'])];_matches(routing_before,routing_update['before']);routing_after=_edited(routing_before,routing_update['edits']);_matches(routing_after,routing_update['after']);assert self._member(routing_update['after'])==routing_after
+                routing_images[routing_update['path']]=(routing_update,[(routing_update['before'],routing_before),(routing_update['after'],routing_after)])
+        def routing_comparison(ref):
+            overlay=routing_images.get(ref['path'])
+            if overlay is None:return self._member(ref)
+            update,identities=overlay;meta=_metadata(ref);matches=[raw for identity,raw in identities if identity==meta];assert len(matches)==1,'unknown current inventory routing comparison'
+            self._member(update['after']);return bytes(matches[0])
         retained_reader_paths=set();retained_reader_images={}
         if self.line=='main':
             retained_packet=json.loads(self._member(dict(path='compatibility/rc/main-retained-current-reader-source-successors-v1.json',sha256='1c0ccfdd33c5f264960cb598c74f4a4f7aea3ffb8779570b47182ea660dd589d',bytes=8704)))
@@ -340,13 +358,13 @@ class CurrentSassToolReferences:
             retained_originals=_git_images(self.root,[dict(commit=retained_packet['base_head'],path=path) for path in retained_paths])
             for retained_update in retained_packet['updates']:
                 assert retained_update['before']['path']==retained_update['after']['path']==retained_update['path']
-                before=retained_originals[(retained_packet['base_head'],retained_update['path'])];_matches(before,retained_update['before']);after=_edited(before,retained_update['edits']);_matches(after,retained_update['after']);assert self._member(retained_update['after'])==after and retained_update['path'] not in domain_overlays
+                before=retained_originals[(retained_packet['base_head'],retained_update['path'])];_matches(before,retained_update['before']);after=_edited(before,retained_update['edits']);_matches(after,retained_update['after']);assert routing_comparison(retained_update['after'])==after and retained_update['path'] not in domain_overlays
                 retained_overlay=(retained_update,[(retained_update['before'],before),(retained_update['after'],after)]);domain_overlays[retained_update['path']]=retained_overlay;retained_reader_images[retained_update['path']]=retained_overlay;retained_reader_paths.add(retained_update['path'])
         def retained_reader_comparison(ref):
             overlay=retained_reader_images.get(ref['path'])
             if overlay is None:return self._member(ref)
             update,identities=overlay;meta=_metadata(ref);matches=[raw for identity,raw in identities if identity==meta];assert len(matches)==1,'unknown retained reader comparison'
-            self._member(update['after']);return bytes(matches[0])
+            routing_comparison(update['after']);return bytes(matches[0])
         self._matrix_owner = None
         if self.line == 'main':
             owner_raw = _physical(self.root, MATRIX_OWNER['path']); _matches(owner_raw, MATRIX_OWNER)
@@ -588,14 +606,14 @@ class CurrentSassToolReferences:
                 if update['path']=='scripts/inventory-finite-tool-successor.mjs':
                     tool_successor=json.loads(self._member(dict(path='compatibility/rc/main-retained-ci-tool-source-successor-v1.json',sha256='04a71083f8185094f496ffe6f110298177a7a1515d6e77c5d922212d96733d49',bytes=3133)))
                     assert tool_successor['schema_version']==1 and tool_successor['role']=='main-retained-ci-tool-source-successor' and tool_successor['source_scope_only'] is True and tool_successor['historical_programs_executed'] is False and tool_successor['full_Actions_execution_qualified'] is False and tool_successor['g11_claim']=='not-passed' and tool_successor['base_head']=='a796c018da3023e916b37088917f6adca56fbc9d' and tool_successor['before']==update['after']
-                    subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',tool_successor['base_head'],'HEAD'],cwd=self.root,env=env);next_tool=_edited(after,tool_successor['edits']);_matches(next_tool,tool_successor['after']);assert self._member(tool_successor['after'])==next_tool
+                    subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',tool_successor['base_head'],'HEAD'],cwd=self.root,env=env);next_tool=_edited(after,tool_successor['edits']);_matches(next_tool,tool_successor['after']);assert routing_comparison(tool_successor['after'])==next_tool
                     domain_overlays[update['path']] = ({**update,'after':tool_successor['after']},[(update['before'],before),(update['after'],after),(tool_successor['after'],next_tool)])
                 else:
                     assert self._member(update['after']) == after; domain_overlays[update['path']] = (update,[(update['before'],before),(update['after'],after)])
         if self.line=='main':
             owner=json.loads(self._member(dict(path='compatibility/rc/main-inventory-owner-verify-lite-source-successor-v1.json',sha256='b802918f6d264ea0f85e132a36830f2ea706d4e1e6036346e01ab87276baa20c',bytes=3256)))
             assert owner['schema_version']==1 and owner['role']=='main-inventory-owner-verify-lite-source-successor' and owner['source_scope_only'] is True and owner['historical_programs_executed'] is False and owner['full_Actions_execution_qualified'] is False and owner['g11_claim']=='not-passed' and owner['base_head']=='a796c018da3023e916b37088917f6adca56fbc9d'
-            subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',owner['base_head'],'HEAD'],cwd=self.root,env=env);owner_old=_git_images(self.root,[dict(commit=owner['base_head'],path=owner['before']['path'])])[(owner['base_head'],owner['before']['path'])];_matches(owner_old,owner['before']);owner_new=_edited(owner_old,owner['edits']);_matches(owner_new,owner['after']);assert self._member(owner['after'])==owner_new and owner['before']['path'] not in domain_overlays
+            subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',owner['base_head'],'HEAD'],cwd=self.root,env=env);owner_old=_git_images(self.root,[dict(commit=owner['base_head'],path=owner['before']['path'])])[(owner['base_head'],owner['before']['path'])];_matches(owner_old,owner['before']);owner_new=_edited(owner_old,owner['edits']);_matches(owner_new,owner['after']);assert routing_comparison(owner['after'])==owner_new and owner['before']['path'] not in domain_overlays
             domain_overlays[owner['before']['path']]=(dict(path=owner['before']['path'],before=owner['before'],after=owner['after']),[(owner['before'],owner_old),(owner['after'],owner_new)])
         checker_source_anchor=json.loads(self._member(dict(path='compatibility/rc/c04-checker-reference-proposal.json',sha256='fe1a877f6d427b0eb598391ee11502b49c65d0242c55956f25bd5284314d71db',bytes=16215))) if self.line=='main' else None
         if self.line=='main':
@@ -616,6 +634,12 @@ class CurrentSassToolReferences:
                 assert update['before']['path']==update['path']==update['after']['path']
                 before=zone_images[(zone_packet['base_head'],update['path'])];_matches(before,update['before']);after=_edited(before,update['edits']);_matches(after,update['after']);assert self._member(update['after'])==after and update['path'] not in domain_overlays
                 domain_overlays[update['path']]=(update,[(update['before'],before),(update['after'],after)])
+        for routing_path,(routing_update,routing_identities) in routing_images.items():
+            routing_prior=domain_overlays.get(routing_path)
+            if routing_prior is not None:
+                assert routing_prior[0]['after']==routing_update['before'],'routing successor must follow the exact previous source'
+                domain_overlays[routing_path]=({**routing_prior[0],'after':routing_update['after']},routing_prior[1]+routing_identities)
+            else:domain_overlays[routing_path]=(routing_update,routing_identities)
         inventory_prior = dict(path='testing/legacy-runner/historical-inventory.json', sha256='a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403', bytes=106309)
         inventory_current = dict(path=inventory_prior['path'], sha256='912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15', bytes=113388)
         def current_comparison(ref):
@@ -967,7 +991,7 @@ class CurrentSassToolReferences:
             path=update['path']; row=self._rows.get(path)
             if row is not None: assert dict(path=path,**row['after']) == update['before'], 'domain successor must follow previous frame'
             else:
-                assert path in retained_reader_paths or update['before'] in next_branch['additional_inputs'] or (path=='scripts/authored-current-use-inventory.mjs' and checker_source_anchor is not None and update['before'] in checker_source_anchor['source_members']), 'domain predecessor is not an existing input'
+                assert path in retained_reader_paths or path in routing_images or update['before'] in next_branch['additional_inputs'] or (path=='scripts/authored-current-use-inventory.mjs' and checker_source_anchor is not None and update['before'] in checker_source_anchor['source_members']), 'domain predecessor is not an existing input'
                 row=dict(path=path,before=dict(sha256=update['before']['sha256'],bytes=update['before']['bytes']),identities={}); self._rows[path]=row
             for ref, raw in identities: self._add(row,ref,raw)
             row['after']=dict(sha256=update['after']['sha256'],bytes=update['after']['bytes'])
