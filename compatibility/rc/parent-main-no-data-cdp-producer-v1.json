@@ -1,0 +1,872 @@
+{
+  "schema_version": 1,
+  "role": "No-data-cell probe CDP driver repair and bounded source-model observation",
+  "parent": "aed0b63c5c336dc788813cae95c25be225b36eb6",
+  "patch_sha256": "e761d493f198abdb2e817deb62d0e253fe0ba5a53a003cf5c6a896113f3dd3a6",
+  "source": {
+    "path": "tests/table_no_data_cell_probe.mjs",
+    "before_sha256": "4c49b5e20554da1771350b81fb2921f1de2ce294a79877679f5e78f8e210fc58",
+    "after_sha256": "ddeceabd18cbe49af0730eb08448c4cf2bf823ac0bb2034300455561425a75bb"
+  },
+  "independent_review": {
+    "sha256": "2a8a6ece625ca9a0cd386af995774c84f95ffff0d4eaf3847ad3d25c11ab5b36",
+    "text": "# Independent no-data CDP repair review\n\nThe one-file test producer patch SHA-256 `e761d493f198abdb2e817deb62d0e253fe0ba5a53a003cf5c6a896113f3dd3a6` is supported within its bounded no-data probe scope. It applies cleanly at canonical `b27a11f9ad7edbbb9484659d2ab430bd16ec545c`; preimage SHA-256 `4c49b5e20554da1771350b81fb2921f1de2ce294a79877679f5e78f8e210fc58` and isolated afterimage `ddeceabd18cbe49af0730eb08448c4cf2bf823ac0bb2034300455561425a75bb` match. The patch replaces only browser launch, server and DOM-result retrieval, preserving subject selection, all observation comparisons, source/type assertions, variants and fault controls.\n\nThe owned helper is used with ephemeral debug port and required announced endpoint; its existing lifecycle checks authenticate the endpoint and require cleanup. Polling the report's actual `textContent` retains error and timeout handling while avoiding HTML entity re-decoding. The prior direct dump-dom attempt retained a 20-second timeout; its cause is not established.\n\nThe actual retained report SHA-256 `4017219e035402f3cdb4d56e589e8d16334cb8ea02b6cd43f1d3201e41035136` records original, MAIN and 21.x source models, seven DOM/lifecycle cases each, and six rejected fault variants. The run manifest SHA-256 `909242c120ee33f60d61d1eda9aedde61ab282b8ed7f7ddc0703bbdec907194f` records the exact command, zero exit, Node 24.21, pinned ARM Chromium 149 and isolated copied probe; report, log and recorded binary hashes match. Tool version and hash checks were recorded after execution, and this particular run did not query browser sandbox state. Inputs outside the copied probe are symlinked to the canonical source tree by convention. No browser rerun by this reviewer.\n\nThe observed renderer and view/outlet machinery are replayed with explicit protocols; this is not a complete CdkTable, actual compiled owned node, packed application, browser/floor matrix, source-proof admission, security or G11 qualification. No canonical files were changed.\n"
+  },
+  "actual_isolated_run": {
+    "manifest_sha256": "909242c120ee33f60d61d1eda9aedde61ab282b8ed7f7ddc0703bbdec907194f",
+    "manifest": {
+      "scope": "isolated no-data producer test; no full table or packed qualification",
+      "cwd": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/current-roster-table-successor",
+      "node": {
+        "path": "/nix/store/w8jijs92barihdb0z54dsgq5szj2wd47-nodejs-24.21.0/bin/node",
+        "version": "v24.21.0",
+        "sha256": "0f8949d1028f6d61506b2d5bc57e7e6fe893d7b1997509b7847294fc9c616584"
+      },
+      "chrome": {
+        "path": "/nix/store/xwgjkr6hdj8600wf25pnrb0hsx352qr2-playwright-chromium/chrome-linux/chrome",
+        "version": "Chromium 149.0.7827.0",
+        "sha256": "3a0b4b909e867cbd845162be0b67343c0d6bb03dbac8f2d410eec8fcc8913fe9"
+      },
+      "python_path": "/nix/store/lfh101cfjj8p8npcari9hk0lbqi33yvh-python3-3.14.7/bin/python3",
+      "path_environment": "/nix/store/w8jijs92barihdb0z54dsgq5szj2wd47-nodejs-24.21.0/bin:/nix/store/lfh101cfjj8p8npcari9hk0lbqi33yvh-python3-3.14.7/bin:/usr/bin:/bin",
+      "node_options": "",
+      "node_path": "unset",
+      "chrome_bin": "/nix/store/xwgjkr6hdj8600wf25pnrb0hsx352qr2-playwright-chromium/chrome-linux/chrome",
+      "command": "env -u NODE_PATH NODE_OPTIONS= PATH=<recorded> CHROME_BIN=<recorded> timeout 240s node no-data-fixture-v1/tests/table_no_data_cell_probe.mjs /home/parallels/.codex/closeout-state/2026-11-07-recovery/current-roster-table-successor/no-data-cdp-v1-report.json",
+      "exit_code": 0,
+      "fixture": "no-data-fixture-v1; only candidate probe copied; other inputs symlinked read-only by convention to canonical b27a",
+      "candidate_sha256": "ddeceabd18cbe49af0730eb08448c4cf2bf823ac0bb2034300455561425a75bb",
+      "patch_sha256": "e761d493f198abdb2e817deb62d0e253fe0ba5a53a003cf5c6a896113f3dd3a6",
+      "report_sha256": "4017219e035402f3cdb4d56e589e8d16334cb8ea02b6cd43f1d3201e41035136",
+      "log_sha256": "574bd92c248a47253dd2bac646789d2c99f0649ec1a5f8b09e62f7677c19f0b5",
+      "baseline_dump_dom_exit_code": 1,
+      "baseline_log_sha256": "4a27fc1395aad38e59c70cf08f9d6630340440ecb2eee18e6d7eabf0a2a7f9cd",
+      "notes": [
+        "Real process preflight version/hash checks recorded after completion; same pinned explicit executable paths were passed to the test.",
+        "Real Chromium sandbox state was not queried in this run; launcher source avoids security-disabling flags.",
+        "Results: three models, 21 cases and six negative controls; no full table, packed or floor claim."
+      ]
+    },
+    "report_sha256": "4017219e035402f3cdb4d56e589e8d16334cb8ea02b6cd43f1d3201e41035136",
+    "report": {
+      "schema_version": 1,
+      "line": "main",
+      "source_parent": "67176aa69fcb815e6bcc92477a4b976158aa8f08",
+      "source": {
+        "path": "projects/ngx-material-legacy/legacy-table/row.ts",
+        "before_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+        "candidate_sha256": "b57c2be6361b4caf802e9e13759f3bdebab413cd0a903f37ebf6e6443cf4f37d"
+      },
+      "helper": {
+        "path": "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+        "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef"
+      },
+      "original": {
+        "path": "reference/material-16.2.14/table-no-data-cells/row.ts",
+        "sha256": "265fcf16aea55c41b1968456ebb4ebeace0b0d5ff519f4995aca8946d6ec9992",
+        "renderer_path": "reference/material-16.2.14/table-outlet-sources/cdk-table.ts",
+        "renderer_sha256": "a192133a11a131d340c3acfab9461f5b0f19f1c0c1788edfeb42dedd81aabafd"
+      },
+      "public_subject_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+      "archiveProofs": [
+        {
+          "line": "original",
+          "version": "16.2.14",
+          "archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+          "archive_sri": "sha512-n6PrGdiVeSTEmM/HEiwIyg6YQUUymZrb5afaNLGFRM5YL0Y8OBqd+XhCjb0OfD/AfgCUtedVEPwNqrfW8KzgGw==",
+          "public_route": "@angular/cdk/table",
+          "public_entry_sha256": "5970be112e4a2e41c48316120a1695fef3be7ca0c91507ff1d2dec1e724e508e",
+          "renderer_sha256": "508aecf91280ebe631be0c06974383e08579bf9e1366dd0681784f89348ede51",
+          "renderer_method": "private _updateNoDataRow() {\n    const noDataRow = this._customNoDataRow || this._noDataRow;\n\n    if (!noDataRow) {\n      return;\n    }\n\n    const shouldShow = this._rowOutlet.viewContainer.length === 0;\n\n    if (shouldShow === this._isShowingNoDataRow) {\n      return;\n    }\n\n    const container = this._noDataRowOutlet.viewContainer;\n\n    if (shouldShow) {\n      const view = container.createEmbeddedView(noDataRow.templateRef);\n      const rootNode: HTMLElement | undefined = view.rootNodes[0];\n\n      // Only add the attributes if we have a single root node since it's hard\n      // to figure out which one to add it to when there are multiple.\n      if (view.rootNodes.length === 1 && rootNode?.nodeType === this._document.ELEMENT_NODE) {\n        rootNode.setAttribute('role', 'row');\n        rootNode.classList.add(noDataRow._contentClassName);\n      }\n    } else {\n      container.clear();\n    }\n\n    this._isShowingNoDataRow = shouldShow;\n\n    this._changeDetectorRef.markForCheck();\n  }"
+        },
+        {
+          "line": "main",
+          "version": "22.1.7",
+          "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+          "archive_sri": "sha512-TN4pPExBZ6ZbxWnfVb77M/0cL83eRY3qpHv/R9Y1KhkNXlxdocd0My7wiueWBBimYacSpBnfHrIRNmHgX7Pc4Q==",
+          "public_route": "@angular/cdk/table",
+          "public_entry_sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4",
+          "renderer_sha256": "f8d51c0877f69ef7bf3d1237d39f910a4f70c226f6afa01470cfeee75d33db3a",
+          "renderer_method": "_updateNoDataRow() {\n    const noDataRow = this._customNoDataRow || this._noDataRow;\n    if (!noDataRow) {\n      return;\n    }\n    const shouldShow = this._rowOutlet.viewContainer.length === 0;\n    if (shouldShow === this._isShowingNoDataRow) {\n      return;\n    }\n    const container = this._noDataRowOutlet.viewContainer;\n    if (shouldShow) {\n      const view = container.createEmbeddedView(noDataRow.templateRef);\n      const rootNode = view.rootNodes[0];\n      if (view.rootNodes.length === 1 && rootNode?.nodeType === this._document.ELEMENT_NODE) {\n        rootNode.setAttribute('role', 'row');\n        rootNode.classList.add(...noDataRow._contentClassNames);\n        const cells = rootNode.querySelectorAll(noDataRow._cellSelector);\n        for (let i = 0; i < cells.length; i++) {\n          cells[i].classList.add(...noDataRow._cellClassNames);\n        }\n      }\n    } else {\n      container.clear();\n    }\n    this._isShowingNoDataRow = shouldShow;\n    this._changeDetectorRef.markForCheck();\n  }"
+        },
+        {
+          "line": "21.x",
+          "version": "21.2.14",
+          "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+          "archive_sri": "sha512-806REq/CLf37nEhmmd8Q+ILN8z/RVG2vk2n8YZ/4TdHpcBCi5ux4AxLbpMmduLwGPOzPagJ6ggRzE5fnX0rmcQ==",
+          "public_route": "@angular/cdk/table",
+          "public_entry_sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11",
+          "renderer_sha256": "f8d51c0877f69ef7bf3d1237d39f910a4f70c226f6afa01470cfeee75d33db3a",
+          "renderer_method": "_updateNoDataRow() {\n    const noDataRow = this._customNoDataRow || this._noDataRow;\n    if (!noDataRow) {\n      return;\n    }\n    const shouldShow = this._rowOutlet.viewContainer.length === 0;\n    if (shouldShow === this._isShowingNoDataRow) {\n      return;\n    }\n    const container = this._noDataRowOutlet.viewContainer;\n    if (shouldShow) {\n      const view = container.createEmbeddedView(noDataRow.templateRef);\n      const rootNode = view.rootNodes[0];\n      if (view.rootNodes.length === 1 && rootNode?.nodeType === this._document.ELEMENT_NODE) {\n        rootNode.setAttribute('role', 'row');\n        rootNode.classList.add(...noDataRow._contentClassNames);\n        const cells = rootNode.querySelectorAll(noDataRow._cellSelector);\n        for (let i = 0; i < cells.length; i++) {\n          cells[i].classList.add(...noDataRow._cellClassNames);\n        }\n      }\n    } else {\n      container.clear();\n    }\n    this._isShowingNoDataRow = shouldShow;\n    this._changeDetectorRef.markForCheck();\n  }"
+        }
+      ],
+      "types": [
+        {
+          "line": "main",
+          "public_export_and_members_stable": true,
+          "strict": true,
+          "skipLibCheck": false,
+          "diagnostics": 0,
+          "compiler": "6.0.3",
+          "compiler_floor_qualified": false
+        },
+        {
+          "line": "21.x",
+          "public_export_and_members_stable": true,
+          "strict": true,
+          "skipLibCheck": false,
+          "diagnostics": 0,
+          "compiler": "6.0.3",
+          "compiler_floor_qualified": false
+        }
+      ],
+      "results": [
+        {
+          "line": "original",
+          "variant": "original",
+          "observations": [
+            {
+              "id": "native-cell",
+              "html": "<tr role=\"row\" class=\"mat-no-data-row\"><td>No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "native-custom-cell",
+              "html": "<tr class=\"application-row mat-no-data-row\" role=\"row\"><td class=\"application-cell\">No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "flex-custom-cell",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><span class=\"cdk-cell\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "custom-cdk-selector",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><cdk-cell class=\"application-cell\">No data</cdk-cell><span cdk-cell=\"\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "legacy-flex-cell",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><mat-cell class=\"mat-cell\">No data</mat-cell></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "multiple-roots",
+              "html": "<div>First</div><div>Second</div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "text-root",
+              "html": "No data",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            }
+          ],
+          "native_DOM": true,
+          "genuine_public_CdkNoDataRow": true,
+          "actual_owned_constructor": true,
+          "renderer_scope": "Whole authentic CdkTable renderer method replayed with explicit embedded-view/outlet/change-detector protocols; not an actual complete CdkTable or Angular node/AOT/packed instance."
+        },
+        {
+          "line": "main",
+          "variant": "before",
+          "observations": [
+            {
+              "id": "native-cell",
+              "html": "<tr role=\"row\" class=\"mat-no-data-row\"><td class=\"cdk-cell cdk-no-data-cell\">No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "native-custom-cell",
+              "html": "<tr class=\"application-row mat-no-data-row\" role=\"row\"><td class=\"application-cell cdk-cell cdk-no-data-cell\">No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "flex-custom-cell",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><span class=\"cdk-cell cdk-no-data-cell\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "custom-cdk-selector",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><cdk-cell class=\"application-cell cdk-cell cdk-no-data-cell\">No data</cdk-cell><span cdk-cell=\"\" class=\"cdk-cell cdk-no-data-cell\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "legacy-flex-cell",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><mat-cell class=\"mat-cell\">No data</mat-cell></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "multiple-roots",
+              "html": "<div>First</div><div>Second</div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "text-root",
+              "html": "No data",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            }
+          ],
+          "native_DOM": true,
+          "genuine_public_CdkNoDataRow": true,
+          "actual_owned_constructor": true,
+          "renderer_scope": "Whole authentic CdkTable renderer method replayed with explicit embedded-view/outlet/change-detector protocols; not an actual complete CdkTable or Angular node/AOT/packed instance."
+        },
+        {
+          "line": "main",
+          "variant": "after",
+          "observations": [
+            {
+              "id": "native-cell",
+              "html": "<tr role=\"row\" class=\"mat-no-data-row\"><td>No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "native-custom-cell",
+              "html": "<tr class=\"application-row mat-no-data-row\" role=\"row\"><td class=\"application-cell\">No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "flex-custom-cell",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><span class=\"cdk-cell\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "custom-cdk-selector",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><cdk-cell class=\"application-cell\">No data</cdk-cell><span cdk-cell=\"\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "legacy-flex-cell",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><mat-cell class=\"mat-cell\">No data</mat-cell></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "multiple-roots",
+              "html": "<div>First</div><div>Second</div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "text-root",
+              "html": "No data",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            }
+          ],
+          "native_DOM": true,
+          "genuine_public_CdkNoDataRow": true,
+          "actual_owned_constructor": true,
+          "renderer_scope": "Whole authentic CdkTable renderer method replayed with explicit embedded-view/outlet/change-detector protocols; not an actual complete CdkTable or Angular node/AOT/packed instance."
+        },
+        {
+          "line": "main",
+          "variant": "wrong-root-class",
+          "observations": [
+            {
+              "id": "native-cell",
+              "html": "<tr role=\"row\" class=\"cdk-no-data-row\"><td>No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "native-custom-cell",
+              "html": "<tr class=\"application-row cdk-no-data-row\" role=\"row\"><td class=\"application-cell\">No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "flex-custom-cell",
+              "html": "<div role=\"row\" class=\"cdk-no-data-row\"><span class=\"cdk-cell\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "custom-cdk-selector",
+              "html": "<div role=\"row\" class=\"cdk-no-data-row\"><cdk-cell class=\"application-cell\">No data</cdk-cell><span cdk-cell=\"\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "legacy-flex-cell",
+              "html": "<div role=\"row\" class=\"cdk-no-data-row\"><mat-cell class=\"mat-cell\">No data</mat-cell></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "multiple-roots",
+              "html": "<div>First</div><div>Second</div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "text-root",
+              "html": "No data",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            }
+          ],
+          "native_DOM": true,
+          "genuine_public_CdkNoDataRow": true,
+          "actual_owned_constructor": true,
+          "renderer_scope": "Whole authentic CdkTable renderer method replayed with explicit embedded-view/outlet/change-detector protocols; not an actual complete CdkTable or Angular node/AOT/packed instance."
+        },
+        {
+          "line": "main",
+          "variant": "missing-selector-guard",
+          "observations": [
+            {
+              "id": "native-cell",
+              "html": "<tr role=\"row\" class=\"mat-no-data-row\"><td class=\"\">No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "native-custom-cell",
+              "html": "<tr class=\"application-row mat-no-data-row\" role=\"row\"><td class=\"application-cell\">No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "flex-custom-cell",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><span class=\"cdk-cell\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "custom-cdk-selector",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><cdk-cell class=\"application-cell\">No data</cdk-cell><span cdk-cell=\"\" class=\"\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "legacy-flex-cell",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><mat-cell class=\"mat-cell\">No data</mat-cell></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "multiple-roots",
+              "html": "<div>First</div><div>Second</div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "text-root",
+              "html": "No data",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            }
+          ],
+          "native_DOM": true,
+          "genuine_public_CdkNoDataRow": true,
+          "actual_owned_constructor": true,
+          "renderer_scope": "Whole authentic CdkTable renderer method replayed with explicit embedded-view/outlet/change-detector protocols; not an actual complete CdkTable or Angular node/AOT/packed instance."
+        },
+        {
+          "line": "21.x",
+          "variant": "before",
+          "observations": [
+            {
+              "id": "native-cell",
+              "html": "<tr role=\"row\" class=\"mat-no-data-row\"><td class=\"cdk-cell cdk-no-data-cell\">No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "native-custom-cell",
+              "html": "<tr class=\"application-row mat-no-data-row\" role=\"row\"><td class=\"application-cell cdk-cell cdk-no-data-cell\">No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "flex-custom-cell",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><span class=\"cdk-cell cdk-no-data-cell\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "custom-cdk-selector",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><cdk-cell class=\"application-cell cdk-cell cdk-no-data-cell\">No data</cdk-cell><span cdk-cell=\"\" class=\"cdk-cell cdk-no-data-cell\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "legacy-flex-cell",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><mat-cell class=\"mat-cell\">No data</mat-cell></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "multiple-roots",
+              "html": "<div>First</div><div>Second</div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "text-root",
+              "html": "No data",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            }
+          ],
+          "native_DOM": true,
+          "genuine_public_CdkNoDataRow": true,
+          "actual_owned_constructor": true,
+          "renderer_scope": "Whole authentic CdkTable renderer method replayed with explicit embedded-view/outlet/change-detector protocols; not an actual complete CdkTable or Angular node/AOT/packed instance."
+        },
+        {
+          "line": "21.x",
+          "variant": "after",
+          "observations": [
+            {
+              "id": "native-cell",
+              "html": "<tr role=\"row\" class=\"mat-no-data-row\"><td>No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "native-custom-cell",
+              "html": "<tr class=\"application-row mat-no-data-row\" role=\"row\"><td class=\"application-cell\">No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "flex-custom-cell",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><span class=\"cdk-cell\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "custom-cdk-selector",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><cdk-cell class=\"application-cell\">No data</cdk-cell><span cdk-cell=\"\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "legacy-flex-cell",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><mat-cell class=\"mat-cell\">No data</mat-cell></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "multiple-roots",
+              "html": "<div>First</div><div>Second</div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "text-root",
+              "html": "No data",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            }
+          ],
+          "native_DOM": true,
+          "genuine_public_CdkNoDataRow": true,
+          "actual_owned_constructor": true,
+          "renderer_scope": "Whole authentic CdkTable renderer method replayed with explicit embedded-view/outlet/change-detector protocols; not an actual complete CdkTable or Angular node/AOT/packed instance."
+        },
+        {
+          "line": "21.x",
+          "variant": "wrong-root-class",
+          "observations": [
+            {
+              "id": "native-cell",
+              "html": "<tr role=\"row\" class=\"cdk-no-data-row\"><td>No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "native-custom-cell",
+              "html": "<tr class=\"application-row cdk-no-data-row\" role=\"row\"><td class=\"application-cell\">No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "flex-custom-cell",
+              "html": "<div role=\"row\" class=\"cdk-no-data-row\"><span class=\"cdk-cell\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "custom-cdk-selector",
+              "html": "<div role=\"row\" class=\"cdk-no-data-row\"><cdk-cell class=\"application-cell\">No data</cdk-cell><span cdk-cell=\"\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "legacy-flex-cell",
+              "html": "<div role=\"row\" class=\"cdk-no-data-row\"><mat-cell class=\"mat-cell\">No data</mat-cell></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "multiple-roots",
+              "html": "<div>First</div><div>Second</div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "text-root",
+              "html": "No data",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            }
+          ],
+          "native_DOM": true,
+          "genuine_public_CdkNoDataRow": true,
+          "actual_owned_constructor": true,
+          "renderer_scope": "Whole authentic CdkTable renderer method replayed with explicit embedded-view/outlet/change-detector protocols; not an actual complete CdkTable or Angular node/AOT/packed instance."
+        },
+        {
+          "line": "21.x",
+          "variant": "missing-selector-guard",
+          "observations": [
+            {
+              "id": "native-cell",
+              "html": "<tr role=\"row\" class=\"mat-no-data-row\"><td class=\"\">No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "native-custom-cell",
+              "html": "<tr class=\"application-row mat-no-data-row\" role=\"row\"><td class=\"application-cell\">No data</td></tr>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "flex-custom-cell",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><span class=\"cdk-cell\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "custom-cdk-selector",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><cdk-cell class=\"application-cell\">No data</cdk-cell><span cdk-cell=\"\" class=\"\">No data</span></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "legacy-flex-cell",
+              "html": "<div role=\"row\" class=\"mat-no-data-row\"><mat-cell class=\"mat-cell\">No data</mat-cell></div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "multiple-roots",
+              "html": "<div>First</div><div>Second</div>",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            },
+            {
+              "id": "text-root",
+              "html": "No data",
+              "creations": 2,
+              "clears": 1,
+              "marks": 3,
+              "manual_template_and_public_parent": true,
+              "public_peer_defaults_unchanged": true
+            }
+          ],
+          "native_DOM": true,
+          "genuine_public_CdkNoDataRow": true,
+          "actual_owned_constructor": true,
+          "renderer_scope": "Whole authentic CdkTable renderer method replayed with explicit embedded-view/outlet/change-detector protocols; not an actual complete CdkTable or Angular node/AOT/packed instance."
+        }
+      ],
+      "controls": [
+        {
+          "line": "main",
+          "variant": "before",
+          "rejected": true,
+          "mismatched_cases": [
+            "native-cell",
+            "native-custom-cell",
+            "flex-custom-cell",
+            "custom-cdk-selector"
+          ]
+        },
+        {
+          "line": "main",
+          "variant": "wrong-root-class",
+          "rejected": true,
+          "mismatched_cases": [
+            "native-cell",
+            "native-custom-cell",
+            "flex-custom-cell",
+            "custom-cdk-selector",
+            "legacy-flex-cell"
+          ]
+        },
+        {
+          "line": "main",
+          "variant": "missing-selector-guard",
+          "rejected": true,
+          "mismatched_cases": [
+            "native-cell",
+            "custom-cdk-selector"
+          ]
+        },
+        {
+          "line": "21.x",
+          "variant": "before",
+          "rejected": true,
+          "mismatched_cases": [
+            "native-cell",
+            "native-custom-cell",
+            "flex-custom-cell",
+            "custom-cdk-selector"
+          ]
+        },
+        {
+          "line": "21.x",
+          "variant": "wrong-root-class",
+          "rejected": true,
+          "mismatched_cases": [
+            "native-cell",
+            "native-custom-cell",
+            "flex-custom-cell",
+            "custom-cdk-selector",
+            "legacy-flex-cell"
+          ]
+        },
+        {
+          "line": "21.x",
+          "variant": "missing-selector-guard",
+          "rejected": true,
+          "mismatched_cases": [
+            "native-cell",
+            "custom-cdk-selector"
+          ]
+        }
+      ],
+      "producer_sha256": "ddeceabd18cbe49af0730eb08448c4cf2bf823ac0bb2034300455561425a75bb",
+      "worker_sha256": "8774bce05838798c72eac8adbce835d35f4c2ba5c884a6c71d25b1e996754a99",
+      "scope": "Actual public original/current CdkNoDataRow namespaces, complete actual owned constructors and borrower helper execute in Chromium with native DOM. Whole immutable original/current table renderer methods are replayed with explicit embedded-view/outlet/change-detector protocols. Seven DOM cases and empty/data/empty lifecycle match Original16. The genuine complete CdkTable, actual owned node/compiled component and exact packed application remain final Actions obligations; compiler/runtime floors and G11 are not qualified.",
+      "g11_claim": "not-passed"
+    },
+    "log": "{\"models\":3,\"native_cases\":21,\"original_dom_equivalence\":true,\"negative_controls\":6,\"actual_complete_table\":false}\n"
+  },
+  "prior_failure": {
+    "sha256": "4a27fc1395aad38e59c70cf08f9d6630340440ecb2eee18e6d7eabf0a2a7f9cd",
+    "log": "file:///home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/tests/table_no_data_cell_probe.mjs:95\n        const timer = setTimeout(() => {child.kill(); reject(Error('Chromium timeout'));}, 20000);\n                                                             ^\n\nError: Chromium timeout\n    at Timeout._onTimeout (file:///home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/tests/table_no_data_cell_probe.mjs:95:62)\n    at listOnTimeout (node:internal/timers:685:17)\n    at process.processTimers (node:internal/timers:618:7)\n\nNode.js v24.21.0\n",
+    "meaning": "Actual direct dump-dom driver timed out at20seconds; cause not independently established."
+  },
+  "root_checks": [
+    "Exact patch/review/run-manifest/report/log/baseline and canonical beforeimage hashes checked.",
+    "Strict patch apply, exact afterimage, report producer identity and pinned Node24 syntax check passed.",
+    "The previously reviewed CDP driver pattern preserves subject selection, observations and fault controls. Root did not repeat the independently reviewed browser run."
+  ],
+  "limits": [
+    "Tool version/hash measurements were made after the recorded run. Sandbox state was not queried during this particular run; owned launcher avoids security-disabling flags.",
+    "Three source models,21native DOM/lifecycle cases and6fault controls, using explicit renderer/view/outlet protocols.",
+    "No genuine complete CdkTable, packed application, full browser/peer floor matrix, source-role admission, security, G11 or release pass.",
+    "21.x model observations do not qualify the parked branch.",
+    "No product template, CSS, SCSS or original golden changes."
+  ]
+}

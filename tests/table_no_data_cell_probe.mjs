@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';
 import {readFileSync, writeFileSync, mkdirSync, existsSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
-import {execFileSync, spawn} from 'node:child_process';
-import {createServer} from 'node:http';
+import {execFileSync} from 'node:child_process';
+import {withChromium} from '../scripts/check-companion-computed-styles.mjs';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {prepareMaterialPublicSubjects} from '../scripts/material-public-subjects.mjs';
@@ -38,6 +38,8 @@ const originalRenderer = renderer(rendererPath, read(rendererPath));
 assert.doesNotMatch(originalRenderer.source, /_cellClassNames|querySelectorAll/);
 const worker = read('tests/table_no_data_cell_subject.mjs'), loaded = prepareMaterialPublicSubjects(root), results = [], types = [], archiveProofs = [];
 const chrome = [process.env.CHROME_BIN, '/usr/bin/chromium-browser', '/snap/bin/chromium'].find(p => p && existsSync(p)); assert.ok(chrome);
+// Keep the original executable selection when delegating launch and cleanup.
+process.env.CHROME_BIN = chrome;
 try {
   for (const model of loaded.models) {
     const metadata = model.subject.packages.find(p => p.name === '@angular/cdk');
@@ -86,17 +88,17 @@ try {
       writeFileSync(join(model.root, 'subject.mjs'), worker);
       await esbuild.build({entryPoints: [join(model.root, 'subject.mjs')], bundle: true, format: 'iife', platform: 'browser', outfile: join(model.root, 'bundle.js'), logLevel: 'silent'});
       writeFileSync(join(model.root, 'index.html'), '<pre id="report">pending</pre><script>window.addEventListener("error",function(e){document.getElementById("report").textContent=JSON.stringify({error:String(e.message)});});</script><script src="bundle.js"></script>');
-      const server = createServer((request, response) => {const name = request.url === '/bundle.js' ? 'bundle.js' : 'index.html'; response.setHeader('Content-Type', name.endsWith('.js') ? 'application/javascript' : 'text/html'); response.end(readFileSync(join(model.root, name)));});
-      await new Promise(done => server.listen(0, '127.0.0.1', done));
-      let html;
-      try {html = await new Promise((done, reject) => {
-        const child = spawn(chrome, ['--headless', '--disable-gpu', '--no-first-run', '--user-data-dir=' + join(model.root, 'chrome-' + variant), '--virtual-time-budget=1000', '--dump-dom', 'http://127.0.0.1:' + server.address().port], {stdio: ['ignore', 'pipe', 'pipe']});
-        let output = '', error = ''; child.stdout.on('data', b => output += b); child.stderr.on('data', b => error += b);
-        const timer = setTimeout(() => {child.kill(); reject(Error('Chromium timeout'));}, 20000);
-        child.on('error', reject); child.on('close', code => {clearTimeout(timer); code === 0 ? done(output) : reject(Error(error.slice(-1000)));});
-      });} finally {server.close();}
-      const text = html.match(/<pre id="report">([\s\S]*?)<\/pre>/)?.[1]; assert.ok(text && text !== 'pending', html.slice(-1500));
-      const observation = JSON.parse(text.replaceAll('&amp;', '&').replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"'));
+      const text = await withChromium(model.root, async ({evaluate}) => {
+        const deadline = Date.now() + 20000;
+        while (Date.now() < deadline) {
+          const value = await evaluate("document.querySelector('#report')?.textContent ?? ''");
+          if (value && value !== 'pending') return value;
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+        throw Error('Chromium report timeout');
+      }, {debugPort: 0, requireAnnouncedEndpoint: true});
+      assert.ok(text && text !== 'pending', 'Chromium did not produce a report');
+      const observation = JSON.parse(text);
       assert.ok(!observation.error, observation.error); results.push({line: model.line, variant, ...observation});
     }
   }
