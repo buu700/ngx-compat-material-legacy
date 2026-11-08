@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/** Full original overlay resource CSS with one explicit non-interactive pane specificity repair. */
+/** Compare complete historical overlay resource CSS against the untouched tagged source. */
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {readFileSync, writeFileSync, existsSync} from 'node:fs';
@@ -37,18 +37,6 @@ for (const [key, pin] of [
 ]) assert.equal(sha(readFileSync(join(options[key], '@angular/cdk/a11y/_index.scss'))), pin);
 const originalPointerSelector = '.mat-tooltip-panel-non-interactive';
 const adaptedPointerSelector = '.mat-tooltip-panel.mat-tooltip-panel-non-interactive';
-function pointerAdaptation(css) {
-  const tree = postcss.parse(css), rules = [];
-  tree.walkRules(rule => {if (rule.selector === originalPointerSelector) rules.push(rule);});
-  assert.equal(rules.length, 1, 'exact original non-interactive selector missing');
-  assert.equal(rules[0].nodes.length, 1);
-  assert.equal(rules[0].nodes[0].type, 'decl');
-  assert.equal(rules[0].nodes[0].prop, 'pointer-events');
-  assert.equal(rules[0].nodes[0].value, 'none');
-  assert.equal(rules[0].nodes[0].important, undefined);
-  rules[0].selector = adaptedPointerSelector;
-  return tree.toString();
-}
 function partition(css) {
   const tree = postcss.parse(css), native = [];
   tree.walkAtRules('media', rule => {if (rule.params === '(forced-colors: active)') {native.push(rule.toString()); rule.remove();}});
@@ -74,15 +62,15 @@ for (const [file, pin] of Object.entries(pins)) {
     assert.ok(member, 'unknown original member ' + relative); assert.equal(sha(bytes), member.sha256); assert.equal(bytes.length, member.bytes);
     return {path, sha256: member.sha256, bytes: member.bytes};
   });
-  models.set(file, {source, virtual, original, historical: file.startsWith('legacy-tooltip/') ? pointerAdaptation(parts.historical) : parts.historical, loaded});
+  models.set(file, {source, virtual, original, historical: parts.historical, loaded});
 }
 function assess(file, peer, override) {
   const model = models.get(file), path = join(root, 'projects/ngx-material-legacy', file), source = override ?? readFileSync(path, 'utf8');
   const candidate = compile(source, path, [peer]), parts = partition(candidate.css);
-  assert.equal(sha(syntax(parts.historical)), sha(syntax(model.historical)), 'complete historical overlay CSS differs beyond exact pane specificity repair');
+  assert.equal(sha(syntax(parts.historical)), sha(syntax(model.historical)), 'complete historical overlay CSS differs');
   const native = compile(model.source.replaceAll('cdk.high-contrast(active, off)', 'cdk.high-contrast(active)'), model.virtual, [peer, options['--original-root']]);
   assert.equal(sha(syntax(parts.native)), sha(syntax(partition(native.css).native)), 'complete independent native overlay CSS differs');
-  return {file, candidate_source_sha256: sha(source), original_source_sha256: sha(model.source), original_css_sha256: sha(model.original.css), candidate_css_sha256: sha(candidate.css), public_native_css_sha256: sha(partition(native.css).native), full_historical_css_equal_with_exact_pointer_rule_adaptation: true, full_public_native_css_equal: true, original_loaded_urls: model.loaded, candidate_loaded_urls: candidate.loadedUrls.map(url => ({path: fileURLToPath(url), sha256: sha(readFileSync(url))}))};
+  return {file, candidate_source_sha256: sha(source), original_source_sha256: sha(model.source), original_css_sha256: sha(model.original.css), candidate_css_sha256: sha(candidate.css), public_native_css_sha256: sha(partition(native.css).native), full_historical_css_equal: true, full_public_native_css_equal: true, original_loaded_urls: model.loaded, candidate_loaded_urls: candidate.loadedUrls.map(url => ({path: fileURLToPath(url), sha256: sha(readFileSync(url))}))};
 }
 const observations = [], mutations = [], tooltip = 'legacy-tooltip/tooltip.scss', autocomplete = 'legacy-autocomplete/autocomplete.scss';
 const read = file => readFileSync(join(root, 'projects/ngx-material-legacy', file), 'utf8');
@@ -91,7 +79,7 @@ for (const key of ['--main-root', '--maintenance-root']) {
   for (const [id, file, changed] of [
     ['tooltip-line-height-reset', tooltip, read(tooltip) + '\n.mat-tooltip-panel {line-height:normal;}'],
     ['tooltip-gap-change', tooltip, read(tooltip).replace('$margin: 14px;', '$margin: 10px;')],
-    ['tooltip-pointer-specificity-loss', tooltip, read(tooltip).replace(adaptedPointerSelector, originalPointerSelector)],
+    ['tooltip-pointer-specificity-increase', tooltip, read(tooltip).replace(originalPointerSelector, adaptedPointerSelector)],
     ['tooltip-native-addition', tooltip, read(tooltip) + '\n@media (forced-colors:active) {.mat-tooltip {height:40px;}}'],
     ['autocomplete-child-pointer-copy', autocomplete, read(autocomplete) + '\n.mat-autocomplete-panel.mat-autocomplete-hidden {pointer-events:none;}'],
     ['autocomplete-height-change', autocomplete, read(autocomplete).replace('$panel-max-height: 256px', '$panel-max-height: 300px')],
@@ -101,6 +89,6 @@ for (const key of ['--main-root', '--maintenance-root']) {
     mutations.push({peer: key, id, rejected: true});
   }
 }
-const report = {schema_version: 1, line: JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'))).version.startsWith('21.') ? '21.x' : 'main', node: process.version, sass: sass.info, css_parser: parserPackage.version, esbuild: esbuild.version, observations, mutations, reviewed_pointer_rule: {original_selector: originalPointerSelector, candidate_selector: adaptedPointerSelector, declaration: 'pointer-events:none', scope: 'One exact non-interactive pane rule; same pane carries both classes from the historical owned tooltip base. Isolated browser tests separately prove intended click-through under either current-CDK stylesheet loading order.'}, limits: 'Whole authentic historical structural CSS including tooltip keyframes and independent native emission. Formatting whitespace only normalized. No native Angular component, OverlayRef runtime, real-user, packed-artifact, full matrix or G11 clearance.', g11_claim: 'not-passed'};
+const report = {schema_version: 1, line: JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'))).version.startsWith('21.') ? '21.x' : 'main', node: process.version, sass: sass.info, css_parser: parserPackage.version, esbuild: esbuild.version, observations, mutations, limits: 'Whole authentic historical structural CSS including tooltip keyframes and independent native emission. Formatting whitespace only normalized. No native Angular component, OverlayRef runtime, real-user, packed-artifact, full matrix or G11 clearance.', g11_claim: 'not-passed'};
 writeFileSync(options['--report'], JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify({line: report.line, whole_styles: observations.length, negative_controls: mutations.length}));

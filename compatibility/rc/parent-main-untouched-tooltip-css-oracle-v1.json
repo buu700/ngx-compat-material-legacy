@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "role": "parent correction of historical CSS oracle; product mismatch remains open",
+  "base_head": "df6213c96e19af5c4a0c68f49e010d89e15f0c2c",
+  "patch": {
+    "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/tooltip-style-resolution-v1/correct-oracle.patch",
+    "bytes": 6979,
+    "sha256": "695b38d8415b7a2709afd161c91f7fe75f998148b5756a4969480bf1a26dc6b6"
+  },
+  "independent_review": {
+    "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/tooltip-style-resolution-v1/independent-oracle-review-20261107-v1.md",
+    "bytes": 2710,
+    "sha256": "f6f5750cab5144eb4c07d2a45708af67cd8602ebd84c36e7bd47ce69ef98a504"
+  },
+  "current_test": {
+    "path": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/tests/overlay_resource_css_probe.mjs",
+    "bytes": 7614,
+    "sha256": "d6032391dac068907c51f43dd1c623218d088afb75e19a2306c8087f675234cd"
+  },
+  "root_actual_probe": {
+    "command": [
+      "/nix/store/w8jijs92barihdb0z54dsgq5szj2wd47-nodejs-24.21.0/bin/node",
+      "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/tests/overlay_resource_css_probe.mjs",
+      "--original-root",
+      "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-qualification/form-field-dom-reference16/node_modules",
+      "--main-root",
+      "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/node_modules",
+      "--maintenance-root",
+      "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/node_modules",
+      "--parser-root",
+      "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/node_modules/.pnpm/postcss@8.5.28/node_modules/postcss",
+      "--report",
+      "/home/parallels/.codex/closeout-state/2026-11-07-recovery/root-tooltip-oracle-v1/report.json"
+    ],
+    "exit_code": 1,
+    "observed": "Current product fails untouched historical CSS comparison at exact known doubled-selector mismatch",
+    "log_sha256": "2fe3f34ef58af878d740e86480e3320fc255c0d5086ef20c89b64a693632863b",
+    "result": "Product check failed; oracle correction integration verified, no product pass claimed"
+  },
+  "decision": "Remove rewriting of the compiled tagged selector. Original historical CSS is immutable; the doubled-selector mutant must be rejected rather than accepted as a golden adaptation. The same source inventories and separate public-native high-contrast comparison remain.",
+  "historical_evidence": "compatibility/rc/overlay-resource-css-source-proof.json is retained byte-for-byte as an earlier comparison with explicit pointer-rule adaptation. It is not evidence of equality under the corrected oracle.",
+  "independent_fixture_result": "Restoring only the original selector in an external fixture passed four whole-style comparisons and all twelve mutations; this is an experiment, not a runtime fix or current product pass.",
+  "open_contract": "Current stronger selector violates the untouched historical comparison. Restoring it exposes the reproduced late CDK style loading conflict across two Angular applications sharing one document. A prepared one-selector change awaits the user support-scope decision; no product stylesheet changed by this commit.",
+  "limits": [
+    "Current CSS comparison fails. No current CSS/source-proof requalification is asserted.",
+    "No browser runtime, packed artifact, Sass seal, G11, complete audit or release pass.",
+    "No source inventory, reference bytes, golden, prior report, or product stylesheet changed."
+  ]
+}
