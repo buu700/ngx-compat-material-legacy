@@ -646,6 +646,28 @@ describe('MatInput without forms', () => {
     expect(input.getAttribute('aria-describedby')).toBe('start end');
   }));
 
+  it('updates descriptions when existing hint and error IDs change on a state notification', fakeAsync(() => {
+    const fixture = createComponent(MatInputDynamicDescriptionIds);
+    fixture.detectChanges();
+    const controls = fixture.debugElement.queryAll(By.directive(MatLegacyInput))
+      .map(node => node.injector.get(MatLegacyInput));
+    controls[1].errorState = true;
+    controls[1].stateChanges.next();
+    fixture.detectChanges();
+    const inputs: HTMLInputElement[] = Array.from(fixture.nativeElement.querySelectorAll('input'));
+    inputs[0].setAttribute('aria-describedby', 'old-hint external-hint');
+    inputs[1].setAttribute('aria-describedby', 'old-error external-error');
+    fixture.componentInstance.hintId = 'new-hint';
+    fixture.componentInstance.errorId = 'new-error';
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('mat-hint').id).toBe('new-hint');
+    expect(fixture.nativeElement.querySelector('mat-error').id).toBe('new-error');
+    controls.forEach(control => control.stateChanges.next());
+    fixture.detectChanges();
+    expect(inputs[0].getAttribute('aria-describedby')).toBe('new-hint external-hint');
+    expect(inputs[1].getAttribute('aria-describedby')).toBe('new-error external-error');
+  }));
+
   it('should set a class on the hint element based on its alignment', fakeAsync(() => {
     const fixture = createComponent(MatInputMultipleHintTestController);
 
@@ -2037,6 +2059,16 @@ class MatInputInvalidHintTestController {}
 class MatInputMultipleHintTestController {
   startId: string;
   endId: string;
+}
+
+@Component({
+  template: `
+    <mat-form-field><input matInput><mat-hint [id]="hintId">Hint</mat-hint></mat-form-field>
+    <mat-form-field><input matInput><mat-error [id]="errorId">Error</mat-error></mat-form-field>`,
+})
+class MatInputDynamicDescriptionIds {
+  hintId = 'old-hint';
+  errorId = 'old-error';
 }
 
 @Component({

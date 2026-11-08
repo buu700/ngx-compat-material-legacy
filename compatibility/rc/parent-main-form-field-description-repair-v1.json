@@ -1,0 +1,1827 @@
+{
+  "schema_version": 1,
+  "role": "Restore historical form-field description synchronization and add meaningful hint/error regression",
+  "parent": "95ae89744396d3071b386058c85ba388f0301020",
+  "patch_sha256": "1e773596c989c36e376615c74fcb86ab220169d45d3cfefc2b46489a485aee70",
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "before_sha256": "ea2bcd2a85cb1511cfa57a7d68d2edd45757ecd703df0ebfa0d613e3f4b79ccd",
+      "after_sha256": "a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "before_sha256": "025f4fa2579ce0d93e95dc7cfe266081d3d0d771bb31c9ccc71ff8970c478eae",
+      "after_sha256": "39a618496b90a1d860e05ee54a611f47274d7045122380edd26f6ee9dcec716a"
+    }
+  ],
+  "behavior": "Each control state notification now re-synchronizes current hint/error description IDs before marking for check, preserving external description IDs. Removes separate filtered description subscription; existing control replacement/destroy unsubscription remains. Initial synchronization retained.",
+  "independent_reviews": [
+    {
+      "name": "report.md",
+      "sha256": "5edc8ec17512264c563073aa66e46be2950eec58f5d7d64b2b8fa84bd2e7f2db",
+      "text": "# Independent described-by patch review\n\nReviewed 2026-11-07 against canonical clean HEAD `87d381f56b545081bfb87b1d5f1a1e1e9941d2eb`; patch SHA-256 `1e773596c989c36e376615c74fcb86ab220169d45d3cfefc2b46489a485aee70`. The retained `reviewed.patch` is byte-identical. `git apply --check` succeeds. Preimages retained here: `form-field.preimage.ts` SHA-256 `ea2bcd2a85cb1511cfa57a7d68d2edd45757ecd703df0ebfa0d613e3f4b79ccd` (Git blob `dda4b47f4b06f5f354f23b90a799794c5c47b02c`); `input-spec.preimage.ts` SHA-256 `025f4fa2579ce0d93e95dc7cfe266081d3d0d771bb31c9ccc71ff8970c478eae` (blob `92f54815f50962f0038fd98aa5880f4bdd685ce7`). The external candidate's exact diff hashes to the reviewed patch; postimages hash to `a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927` and `39a618496b90a1d860e05ee54a611f47274d7045122380edd26f6ee9dcec716a` respectively. No canonical edits or remote actions.\n\n## Assessment\n\nThe production change is a narrow, reasonable repair of the confirmed stale description case. Material 16.2.14 reference `src/material/legacy-form-field/form-field.ts` lines 337\u2013342 calls validation, description synchronization and markForCheck for every state notification. The candidate's filtered pairwise subscription only reacts to error state or user description changes; it misses changed IDs on existing hint/error objects. The patch restores the reference ordering on the already-owned state subscription and removes the redundant filtered subscriber. Initial synchronization remains explicit. No template, CSS, Sass or selector changes are present.\n\nThe existing sync logic collects user IDs and current hint/error IDs, then retains externally assigned IDs except IDs last assigned by the form field. Installed MatInput reads current DOM IDs and writes the combined list. The proposed assertion checks exactly one current ID, removal of the old ID, and preservation of a separate external ID for each visible hint and error. In the patch the ID bindings are rendered before the discriminating state emissions; error visibility is explicitly established. Actual execution of this repository spec is still needed: `fixture.detectChanges()` and the AOT browser fixture use different notification/change-detection sequences, and the former has not been executed at this review cutoff. Do not claim the added regression passes or discriminates until run against baseline and fix.\n\nOn control replacement, `_initializeControl` unsubscribes the previous `_stateChanges` before subscribing to the new control; destruction unsubscribes it. Deleting the second subscription removes its teardown with it. This is sound by source inspection; neither replacement nor destruction has a targeted runtime regression in this patch or the provided browser fixture. Those lifecycle checks remain open. `_describedByIds` persistence across replacement predates this change and was not broadly requalified here.\n\nEvery state event now writes the description attribute and scans the hints/errors, increasing DOM work compared with the filtered pipeline; this restores the original behavior, and no perf measurement was performed. Installed MatInput's `setDescribedByIds` performs DOM reads/writes without notifying state. A custom control that synchronously emits `stateChanges` from `setDescribedByIds` could recurse; the reference also synchronizes in the notification callback, but this risk was not runtime tested and no general safety claim is made.\n\n## Browser evidence and identity\n\nReviewed owner addendum `../dom-addendum.md` SHA-256 `d0e937888b6888e621ee274b0c3fb975025215b5e1a3bb0cc0f0a114d2feea14` and runtime manifest `../dom-manifest.json` SHA-256 `199625649f535833cd7071a1b3b45e51208024866d71eea63b8d3fdeb3cb56c1`. Independently rehashed both tarballs and all 512 regular members per tarball against their extracted counterparts and the manifest: no mismatches. Tar hashes: baseline `2828f71233d13791de86971a6d18bdc35d88d8285a9c0ed30ad624a8dff9fbe1`, fixed `fbea62412013d2915c27801117dfda44ff550a0c392d599b4846c46719dd6a8c`. Both esbuild metafiles identify the extracted artifact's form-field and input modules; fixture links partially compiled Angular code and uses strict AOT compilation. Source applies no test-only private override.\n\nRaw command logs show baseline probe exit 1, fixed exit 0, and results show Chrome 149 with old IDs remaining on baseline and new IDs plus external IDs on fix. The fixture marks the views, sends one state notification, ticks to render the new IDs, then sends a second notification; unchanged error/user-description fields make the second notification discriminate the filter. This is credible narrow packed-artifact behavioral evidence, not proof that IDs update without a subsequent state notification. The baseline and fixed packs are based on a synthetic common-barrel source commit, not a new pack of canonical HEAD; the relevant preimage matches canonical and the fixed external source diff exactly matches the reviewed patch. I inspected the retained evidence and independently checked identities; I did not execute the browser or product tests.\n\nThis review neither establishes full source/audit coverage nor G11 or release qualification. Browser, peer version, error-state setup, and lifecycle limitations in the addendum apply; cross-version behavior, SSR, zoneless, full historical family and broader regression checks are unexecuted here. Final integration should run the new repository regression and affected family tests on the actual integrated candidate and perform the outstanding lifecycle check.\n"
+    },
+    {
+      "name": "runner-review-addendum.md",
+      "sha256": "99539f3380947c426bf5a8eee403c91fd08ceb81364bd7a5361521798f9196c4",
+      "text": "# Independent maintained-runner evidence review\n\nThis addendum supplements `report.md` SHA-256 `5edc8ec17512264c563073aa66e46be2950eec58f5d7d64b2b8fa84bd2e7f2db`. It supersedes only that report's statement that the added repository spec had not been run.\n\nReviewed owner `../runner-addendum.md` SHA-256 `6e58f6ffd7d531d11da6833c9f6a2e8ec4ce52c40fb0ed40f65261efab087b09`; independently rehashed raw JSON baseline `f5588eee4065f37116de416a2c78c0803589faaa6a1bcd0a0ffd28ee14dd03e7`, fixed `f9c46c995a52355c8adb62c9996e609a3822bc7a3eb604696d2e5f97a4fa0331`, and logs `eded1594e3f263760cc40c8afe00595876119d961bbf81455b667361551cd0b4` and `52c14517120a65bcbbefd6147bfd86a60a30c9f65360e32886879817f559cd2a`. Each report lists 152 executed cases, with no skips. The specific added case appears once in each: baseline fails with both stale hint and stale error expectations; fixed succeeds. Baseline has one failure record, fixed none; the Karma logs corroborate totals and show normal `expectFail=false`, so the retained records show no suppressed failure. This is a targeted review of the retained evidence and runner paths, not an exhaustive runner integrity audit.\n\nThe external runner tree is detached at `87d381f56b545081bfb87b1d5f1a1e1e9941d2eb`, with only the two reviewed files modified. Both postimage SHA-256 values match the earlier independent review. The byte-different generated diff has only abbreviated Git index hashes differing; reviewed patch remains `1e773596c989c36e376615c74fcb86ab220169d45d3cfefc2b46489a485aee70`. The fixed bundle SHA-256 is `239f5b7a4c5876e95a3270df07a182838b56767b831bf274457732414e0d064e`; baseline bundle was overwritten. Source and log inspection shows the maintained wrapper building in artifact mode, specifying each external package root, then executing the Karma/Jasmine browser test, with normal failure handling. The alias resolves package exports to the supplied root; artifact-mode guards prohibit ordinary workspace component/module and dist imports, while permitting specs and helper files. The runner uses the 87d source and linked canonical dependencies. Its sandboxed Chrome launcher has no sandbox-disabling flag; sandbox enforcement itself was not independently measured in this run.\n\nThe JSON's `artifact_sha256` field is null: direct package-root invocation does not bind it itself. Package-root paths agree with the previously independently checked extraction manifest, whose 512 files per tarball were byte-compared to their respective tarball, and the two tarball hashes are recorded in the earlier report. This binding relies on the retained files and a quiescent workspace between verification and execution; it is not a transactional artifact receipt. Baseline and fixed tarballs are the earlier synthetic common-barrel packs, not a fresh pack of canonical HEAD. The earlier independent AOT packed-browser observation and this maintained runner provide complementary evidence of the same bounded regression.\n\nThe new repository test is therefore observed failing against baseline and passing against the fixed packed candidate; the fixed input family reports 152/152. Control replacement/destroy remains source-reviewed only, with no targeted runtime test. No broader family suite, other peer line/browser, zoneless, SSR, audit or release qualification follows. I did not rerun the browser or modify canonical source.\n"
+    }
+  ],
+  "runtime_evidence": {
+    "aot_dom_addendum": {
+      "sha256": "d0e937888b6888e621ee274b0c3fb975025215b5e1a3bb0cc0f0a114d2feea14",
+      "text": "# Described-by DOM reproduction and proposed patch\n\nThis addendum does not alter `report.md`, `inventory.json`, the prior source diffs, or the original finding record. The finding is now reproduced in a real browser for the specific sequence below. The patch remains a proposal for independent review; canonical was not edited.\n\n## Result\n\nA strict-template, `skipLibCheck:false`, AOT consumer compiled and linked the actual extracted packed package, then ran in sandbox-enabled Chrome/149.0.7827.0 using the existing repository browser helper and pinned Chrome binary SHA-256 `3a0b4b909e867cbd845162be0b67343c0d6bb03dbac8f2d410eec8fcc8913fe9`. Node was 24.21.0, Python 3.14.8, installed Angular/CDK/Material 22.1.7. Browser sandbox enabled follows the retained same-binary/helper smoke record, not a separate sandbox measurement in this fixture.\n\n| Packed subject | Hint after notification | Error after notification | Result |\n|---|---|---|---|\n| Baseline `2828f71233d13791de86971a6d18bdc35d88d8285a9c0ed30ad624a8dff9fbe1` | `old-hint external-hint` | `old-error external-error` | fail (probe exit 1) |\n| Fresh fix `fbea62412013d2915c27801117dfda44ff550a0c392d599b4846c46719dd6a8c` | `new-hint external-hint` | `new-error external-error` | pass (probe exit 0) |\n\nFor both, the preceding recorded snapshot confirms rendered hint/error IDs already read `new-hint`/`new-error` before the final notification, and unchanged control fields are `[false,null]` and `[true,null]` for error state and userAriaDescribedBy, respectively. The initial snapshot confirms both old IDs and outside IDs are present. A first public `stateChanges.next()` marks the OnPush views so the bound IDs render; after that render, the second public state notification is the discriminating check. It does not establish a guarantee that description IDs update immediately without a subsequent state notification. The test sets the public input error state to display an error and writes the outside described-by IDs to the native elements as an external DOM describer would; it does not mutate private implementation or inject candidate source into the test. No test changes the hint/error QueryList membership during the check. The source analysis in the original report establishes why no other query/hintLabel path updates these IDs in this scenario.\n\nRaw retained observations: `baseline-dom-v4/result.json` SHA-256 `438d9a874c226f8ef7504cbb4f8549036be240960fd289e7652af8fea4acb9fb`, commands `f4acdbed184d4cdea4c2d086d873cc576f9cf72ebbc4df21e3a70a17314eac4d`; `fixed-dom-v2/result.json` SHA-256 `82106928ac9071ce3726ada66b61a80f6bcfba70da4360cda7ccba3b095812e4`, commands `48b45c5d9ccdf7608f8c1fe4d12adde94de228016ae350e75f9ad88d6f1b477e`. Commands record tar extraction, ngc, linking/bundling, browser and exit status. Both esbuild metafiles list the three owned modules exclusively under `../artifact/package/fesm2022/` (core, form field, input), not workspace library sources. Baseline/fixed metafile SHA-256 values are `810d1335bd104861f6110af7b53cfe3edc86de107a89a3e05fac955a5e55d74c` / `0a0e58d0d26ba18c4ff19065463e68362311d97dc888b8ab22110d7c0825f3d6`.\n\n## Source and fixture identity\n\nThe baseline is the synthetic isolated common-barrel pack described in `compatibility/rc/parent-main-common-module-sandboxed-observation-v1.json`, not a pack of current canonical HEAD. Fresh fix pack built from an external copy of its synthetic source commit `8d268a3d456a606a8363cc546642e2e0f68f452d` with a dirty product + spec patch, Node 24.21.0, pnpm 12.4.2 and npm 11.19.0; see `fixed-pack-v1.log` and `fixed-pack-v1/pack-meta.json`. Baseline source `form-field.ts` SHA-256 is `ea2bcd2a85cb1511cfa57a7d68d2edd45757ecd703df0ebfa0d613e3f4b79ccd` (also matches reviewed `19ee63433` and the synthetic pack source); fixed file `a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927`. Fixed spec SHA-256 `39a618496b90a1d860e05ee54a611f47274d7045122380edd26f6ee9dcec716a`.\n\nThe proposed patch `described-by-fix.patch` SHA-256 `1e773596c989c36e376615c74fcb86ab220169d45d3cfefc2b46489a485aee70` restores description synchronization in the existing state subscription, retains its explicit replacement/destroy unsubscription and removes the separate filtered subscription. It also adds a source regression case covering dynamically bound hint and error IDs and external IDs. It changes no HTML, CSS or SCSS. The fixture independently verifies the behavior against the actual package, but the new repository spec itself has **not** been executed; its adaptation/compilation and target-family result remain required at integration. In particular, fixture lifecycle differs from the proposed spec's explicit `fixture.detectChanges()` sequence. Control swaps, cleanup, custom controls whose `setDescribedByIds` emits synchronously, and broader suite regressions remain to be tested/reviewed.\n\nFixture SHA-256: `main.ts` `d852e49e65d51c17ee88c0b29e841ff27818512eeb0f63173051e79348758b4d`; `probe.mjs` `6ee7a163c4402ad461078ecf79a9b28c284ac7a979e1893ce698c7e2b3475f0f`; `run.mjs` `dd92687d7810eac6162126ea6c6b8eb263f17a38f76cea8afe522c0e1d35f20a`; `build.mjs` `eea38d2b39e536615d1172f85915f2cbad520573d410fbf8785b0a3b22b3c02d`; `tsconfig.json` `8bb67cce342fbe67fd6b619322aa78541e9e29c9d33573629563319e79e46f49`; `index.html` `6ebc48082b355b6dd1c7dfd85abe69a68b7545ee460e69c3fdf0ddf630953fa7`. `baseline-dom-v1` and `v2` were intermediate attempts before correcting change detection; `v3` is the first discriminating baseline and v4 adds explicit snapshot/state predicates. `fixed-dom-v1` predates those added predicates; v2 uses the same fixture as v4.\n\nNo current HEAD package, other browser, zoneless mode, 21.x peer, SSR, style equality, full historical family or release gate is claimed. Any integration intentionally changes source-bound evidence; this work does not re-stamp it.\n"
+    },
+    "extraction_manifest_sha256": "199625649f535833cd7071a1b3b45e51208024866d71eea63b8d3fdeb3cb56c1",
+    "maintained_runner_addendum": {
+      "sha256": "6e58f6ffd7d531d11da6833c9f6a2e8ec4ce52c40fb0ed40f65261efab087b09",
+      "text": "# Maintained historical runner check\n\nAt external detached source commit `87d381f56b545081bfb87b1d5f1a1e1e9941d2eb`, applied unchanged `described-by-fix.patch` SHA-256 `1e773596c989c36e376615c74fcb86ab220169d45d3cfefc2b46489a485aee70`; the two resulting files hash to `a9ef781d59ac8bf11374ad0cc903b379cbfd8b8e19643c06a8e2df0808a12927` (product) and `39a618496b90a1d860e05ee54a611f47274d7045122380edd26f6ee9dcec716a` (spec), identical to the fix candidate. `runner-applied.patch` differs bytewise only in Git's abbreviated `index` hash lengths (SHA-256 `88b39207615c3beb632dc66ebec7247080dd6122424134aaaddd9be564b549e3`). Node modules symlink points to canonical peer dependencies; the only tracked source changes in the detached tree are the two patch files.\n\nRan `node scripts/run-legacy-tests.mjs` with `LEGACY_SPEC_FAMILY=input`, `LEGACY_SUBJECT_MODE=artifact`, unique absolute `LEGACY_RESULTS_PATH`, and `LEGACY_PACKAGE_ROOT` set first to `baseline-dom-v4/artifact/package`, then `fixed-dom-v2/artifact/package`. `NODE_OPTIONS`, `NODE_PATH` and `NODE_V8_COVERAGE` were unset; PATH began Node 24.21.0 and Python 3.14.7; `CHROME_BIN` was `/nix/store/xwgjkr6hdj8600wf25pnrb0hsx352qr2-playwright-chromium/chrome-linux/chrome`, SHA-256 `3a0b4b909e867cbd845162be0b67343c0d6bb03dbac8f2d410eec8fcc8913fe9`. The Karma launcher uses ChromeHeadlessSandboxed, no sandbox-disabling flags; independent same-binary sandbox smoke is referenced in the DOM addendum, not directly measured by these runs. No retries were made.\n\nBaseline: 152 executed, 151 passed, 1 failed, 0 skipped. The sole failed case was `MatInput without forms > updates descriptions when existing hint and error IDs change on a state notification`, with both old hint and error description values remaining; raw `runner-baseline-v1.json` SHA-256 `f5588eee4065f37116de416a2c78c0803589faaa6a1bcd0a0ffd28ee14dd03e7`, log `eded1594e3f263760cc40c8afe00595876119d961bbf81455b667361551cd0b4`. Fixed: 152 executed and passed, 0 failed or skipped, including the same case; `runner-fixed-v1.json` SHA-256 `f9c46c995a52355c8adb62c9996e609a3822bc7a3eb604696d2e5f97a4fa0331`, log `52c14517120a65bcbbefd6147bfd86a60a30c9f65360e32886879817f559cd2a`. Runner result `artifact_sha256` is null because this direct invocation supplied package roots, not `LEGACY_ARTIFACT_SHA256`; the byte-level extraction-to-tar verification and independent tar hashes are preserved in `dom-manifest.json`, rather than implied by that field.\n\nBuild alias logic resolves legacy package subpaths against `LEGACY_PACKAGE_ROOT` and refuses component/module workspace imports in artifact mode. The fixed run's generated bundle SHA-256 `239f5b7a4c5876e95a3270df07a182838b56767b831bf274457732414e0d064e`, source map `9dd3f0f31ddc645b14ea191949f0234da20c6c84d1656440e837f7e9a8b60790`, and bundled-spec roster `fc4c0ce5d205bdc6887d570312be749911372f38c1476768e2fb05ce89fe29ac` remain under `runner-source-v1/testing/legacy-runner/out/`; those paths are generated output for the *fixed* run only, baseline bundle was overwritten by the runner. Source-map names are provenance metadata and not independent proof of resolution. `scripts/run-legacy-tests.mjs` SHA-256 `b5e4072a685bddb7c738f0c3d9fe830ebf4ae06a499bf4a5783aab7354bd2fbc`; `testing/legacy-runner/build.mjs` `d2ad861fa584e7d0ba57aab60101cef46dfe2be5828f0f3df1dc8cd0e3bebb94`; `adapt-spec.mjs` `668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3`; Karma config `fd9b5c1e77c928f4cb1b5e41be908ffa57e9ce4cf4570c2dfcbe403fac6be447`.\n\nThis is a single artifact-bound input family observation, not a full suite, fresh canonical pack, acceptance gate, 21.x, cross-browser, zoneless, or style compatibility result. The maintained spec's `fixture.detectChanges()` sequence differs from the independent DOM fixture's two notifications but both baseline-fail/fixed-pass results are retained. Replacement/destroy handling remains source-reviewed but untested here. No canonical edits, push, or Actions.\n"
+    },
+    "maintained_runner_reports": [
+      {
+        "name": "runner-baseline-v1.json",
+        "sha256": "f5588eee4065f37116de416a2c78c0803589faaa6a1bcd0a0ffd28ee14dd03e7",
+        "report": {
+          "schema_version": 1,
+          "runner": "karma+jasmine+esbuild",
+          "mode": "normal",
+          "subject_mode": "artifact",
+          "package_root": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/proactive-input-form-field-review-v1/baseline-dom-v4/artifact/package",
+          "run_id": null,
+          "artifact_sha256": null,
+          "totals": {
+            "executed": 152,
+            "passed": 151,
+            "failed": 1,
+            "skipped": 0
+          },
+          "by_suite": [
+            {
+              "executed": 77,
+              "passed": 76,
+              "failed": 1,
+              "skipped": 0,
+              "description_path": "MatInput without forms"
+            },
+            {
+              "executed": 9,
+              "passed": 9,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "MatInput with forms > error messages"
+            },
+            {
+              "executed": 3,
+              "passed": 3,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "MatInput with forms > custom error behavior"
+            },
+            {
+              "executed": 4,
+              "passed": 4,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "MatInput with forms"
+            },
+            {
+              "executed": 14,
+              "passed": 14,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "MatInput with appearance"
+            },
+            {
+              "executed": 6,
+              "passed": 6,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "MatFormField default options"
+            },
+            {
+              "executed": 19,
+              "passed": 19,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "Non-MDC-based MatInputHarness"
+            },
+            {
+              "executed": 2,
+              "passed": 2,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "Native legacy input harness contract"
+            },
+            {
+              "executed": 16,
+              "passed": 16,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "Non-MDC-based MatNativeSelectHarness"
+            },
+            {
+              "executed": 1,
+              "passed": 1,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "legacy-runner discovery"
+            },
+            {
+              "executed": 1,
+              "passed": 1,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "legacy-runner deliberate fail probe"
+            }
+          ],
+          "specs": [
+            {
+              "full_name": "MatInput without forms > should default to floating labels",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should default to floating label type provided by global default options",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not be treated as empty if type is date",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should be treated as empty if type is date on unsupported browser",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should treat text input type as empty at init",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should treat password input type as empty at init",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should treat number input type as empty at init",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not be empty after input entered",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should update the placeholder when input entered",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not be empty when the value set before view init",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should add id",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should add aria-owns to the label for the associated control",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should add aria-required reflecting the required state",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not overwrite existing id",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > validates there's only one hint label per side",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > validates there's only one hint label per side (attribute)",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > validates there's only one placeholder",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > validates that matInput child is present",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > validates that matInput child is present after initialization",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > validates the type",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports hint labels attribute",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > sets an id on hint labels",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports hint labels elements",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > sets an id on the hint element",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports placeholder attribute",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not render the native placeholder when its value is mirrored in the label",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports placeholder element",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports placeholder required star",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should show the required star when using a FormControl",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should hide the required star if input is disabled",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should hide the required star from screen readers",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > hide placeholder required star when set to hide the required marker",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports the disabled attribute as binding",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports the disabled attribute as binding for select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should add a class to the form field if it has a native select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports the required attribute as binding",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports the required attribute as binding for select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports the type attribute as binding",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports textarea",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > sets the aria-describedby when a hintLabel is set",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports user binding to aria-describedby",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > sets the aria-describedby to the id of the mat-hint",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > sets the aria-describedby with multiple mat-hint instances",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > updates descriptions when existing hint and error IDs change on a state notification",
+              "success": false,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should set a class on the hint element based on its alignment",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > sets the aria-describedby when a hintLabel is set, in addition to a mat-hint",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should float when floatLabel is set to default and text is entered",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should always float the label when floatLabel is set to true",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should float labels when select has value",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should mark a multi-select as being inline",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should mark a select with a size as being inline",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not float the label if the selectedIndex is negative",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not float labels when select has no value, no option label, no option innerHtml",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should floating labels when select has no value but has option label",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should floating labels when select has no value but has option innerHTML",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not throw if a native select does not have options",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should never float the label when floatLabel is set to false",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should be able to toggle the floating label programmatically",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not have prefix and suffix elements when none are specified",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should add prefix and suffix elements when specified",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should update empty class when value changes programmatically and OnPush",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should set the focused class when the input is focused",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should remove the focused class if the input becomes disabled while focused",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should be able to animate the label up and lock it in position",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not throw when trying to animate and lock too early",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should only show the native placeholder, when there is a label, on focus",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should always show the native placeholder when floatLabel is set to \"always\"",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not add the `placeholder` attribute if there is no placeholder",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not show the native placeholder when floatLabel is set to \"never\"",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should preserve the native placeholder on a non-legacy appearance",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not add the native select class if the control is not a native select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should use the native input value when determining whether the element is empty with a custom accessor",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not throw when there is a default ngIf on the label element",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not throw when there is a default ngIf on the input element",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should default the form field color to primary",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should be able to change the form field color",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > should not show any errors if the user has not interacted",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > should display an error message when the input is touched and invalid",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > should display an error message when the parent form is submitted",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > should display an error message when the parent form group is submitted",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > should hide the errors and show the hints once the input becomes valid",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > should not hide the hint if there are no error messages",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > should be in a parent element with an aria-live attribute to announce the error",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > sets the aria-describedby to reference errors when in error state",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > should set `aria-invalid` to true if the input is empty",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > custom error behavior > should display an error message when a custom error matcher returns true",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > custom error behavior > should display an error message when global error matcher returns true",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > custom error behavior > should display an error message when using ShowOnDirtyErrorStateMatcher",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > should update the value when using FormControl.setValue",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > should display disabled styles when using FormControl.disable()",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > should not treat the number 0 as empty",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > should update when the form field value is patched without emitting",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > legacy appearance should promote placeholder to label",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > non-legacy appearances should not promote placeholder to label",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > legacy appearance should respect float never",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > non-legacy appearances should not respect float never",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should recalculate gaps when switching to outline appearance after init",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should calculate the gap when starting off in RTL",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should not set an outline gap if the label is empty",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should calculate the gaps if the default appearance is provided through DI",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should update the outline gap when the prefix/suffix is added or removed",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should calculate the outline gaps if the element starts off invisible",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should update the outline gap if the direction changes",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should update the outline gap correctly if the direction changes multiple times",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should calculate the outline gaps inside the shadow DOM",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should recalculate the outline gap when the label changes to empty after init",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatFormField default options > should be legacy appearance if no default options provided",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatFormField default options > should be legacy appearance if empty default options provided",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatFormField default options > should be able to change the default appearance",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatFormField default options > should default hideRequiredMarker to false",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatFormField default options > should be able to change the default value of hideRequiredMarker and appearance",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatFormField default options > should be able to change the default color",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should load all input harnesses",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should load input with specific id",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should load input with specific name",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should load input with a specific value",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should load input with a value that matches a regex",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should load input with a specific placeholder",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should load input with a placeholder that matches a regex",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to get id of input",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to get name of input",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to get value of input",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to set value of input",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to get disabled state",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to get readonly state",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to get required state",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to get placeholder of input",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to get type of input",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to focus input",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to blur input",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to set the value of a control that cannot be typed in",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Native legacy input harness contract > reads native disabled state through both constructor and filtered factory routes",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Native legacy input harness contract > applies optional public label filters to the legacy input and native select markup",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should load all select harnesses",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get the id of a select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get the name of a select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get whether a select is disabled",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get whether the select is in multi-selection mode",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get whether a select is required",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should be able to focus a select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should be able to blur a select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get the options of a select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should select an option inside of a single-selection select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should select an option inside of a multi-selection select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get the text of select options",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get the index of select options",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get the disabled state of select options",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get the selected state of an option in a single-selection list",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get the selected state of an option in a multi-selection list",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "legacy-runner discovery > evaluated every mapped historical spec module",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "legacy-runner deliberate fail probe > is skipped unless deliberate-fail mode is enabled",
+              "success": true,
+              "skipped": false
+            }
+          ],
+          "failures": [
+            {
+              "suite": "MatInput without forms",
+              "description": "updates descriptions when existing hint and error IDs change on a state notification",
+              "log": [
+                "Expected 'old-hint external-hint' to be 'new-hint external-hint'.\n    at <Jasmine>\n    at UserContext.<anonymous> (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?481c7d5d3cfa9338c710065c222b336f71577ffa:95891:62)\n    at UserContext.fakeAsyncFn (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?481c7d5d3cfa9338c710065c222b336f71577ffa:32050:27)\n    at _ZoneDelegate2.invoke (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?481c7d5d3cfa9338c710065c222b336f71577ffa:27918:168)\n    at _ProxyZoneSpec.onInvoke (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?481c7d5d3cfa9338c710065c222b336f71577ffa:31234:43)",
+                "Expected 'old-error external-error' to be 'new-error external-error'.\n    at <Jasmine>\n    at UserContext.<anonymous> (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?481c7d5d3cfa9338c710065c222b336f71577ffa:95892:62)\n    at UserContext.fakeAsyncFn (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?481c7d5d3cfa9338c710065c222b336f71577ffa:32050:27)\n    at _ZoneDelegate2.invoke (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?481c7d5d3cfa9338c710065c222b336f71577ffa:27918:168)\n    at _ProxyZoneSpec.onInvoke (http://127.0.0.1:9887/base/testing/legacy-runner/out/legacy-tests.iife.js?481c7d5d3cfa9338c710065c222b336f71577ffa:31234:43)"
+              ]
+            }
+          ],
+          "deliberate_fail_observed": false,
+          "mapped_specs": [
+            {
+              "historical_path": "src/material/legacy-input/input.spec.ts",
+              "candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+              "disposition": "executed"
+            },
+            {
+              "historical_path": "src/material/legacy-input/testing/input-harness.spec.ts",
+              "candidate": "projects/ngx-material-legacy/legacy-input/testing/input-harness.spec.ts",
+              "disposition": "executed"
+            },
+            {
+              "historical_path": "src/material/legacy-input/testing/native-select-harness.spec.ts",
+              "candidate": "projects/ngx-material-legacy/legacy-input/testing/native-select-harness.spec.ts",
+              "disposition": "executed"
+            }
+          ],
+          "timestamp": "2026-11-08T00:08:11.961Z"
+        }
+      },
+      {
+        "name": "runner-fixed-v1.json",
+        "sha256": "f9c46c995a52355c8adb62c9996e609a3822bc7a3eb604696d2e5f97a4fa0331",
+        "report": {
+          "schema_version": 1,
+          "runner": "karma+jasmine+esbuild",
+          "mode": "normal",
+          "subject_mode": "artifact",
+          "package_root": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/proactive-input-form-field-review-v1/fixed-dom-v2/artifact/package",
+          "run_id": null,
+          "artifact_sha256": null,
+          "totals": {
+            "executed": 152,
+            "passed": 152,
+            "failed": 0,
+            "skipped": 0
+          },
+          "by_suite": [
+            {
+              "executed": 77,
+              "passed": 77,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "MatInput without forms"
+            },
+            {
+              "executed": 9,
+              "passed": 9,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "MatInput with forms > error messages"
+            },
+            {
+              "executed": 3,
+              "passed": 3,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "MatInput with forms > custom error behavior"
+            },
+            {
+              "executed": 4,
+              "passed": 4,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "MatInput with forms"
+            },
+            {
+              "executed": 14,
+              "passed": 14,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "MatInput with appearance"
+            },
+            {
+              "executed": 6,
+              "passed": 6,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "MatFormField default options"
+            },
+            {
+              "executed": 19,
+              "passed": 19,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "Non-MDC-based MatInputHarness"
+            },
+            {
+              "executed": 2,
+              "passed": 2,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "Native legacy input harness contract"
+            },
+            {
+              "executed": 16,
+              "passed": 16,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "Non-MDC-based MatNativeSelectHarness"
+            },
+            {
+              "executed": 1,
+              "passed": 1,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "legacy-runner discovery"
+            },
+            {
+              "executed": 1,
+              "passed": 1,
+              "failed": 0,
+              "skipped": 0,
+              "description_path": "legacy-runner deliberate fail probe"
+            }
+          ],
+          "specs": [
+            {
+              "full_name": "MatInput without forms > should default to floating labels",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should default to floating label type provided by global default options",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not be treated as empty if type is date",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should be treated as empty if type is date on unsupported browser",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should treat text input type as empty at init",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should treat password input type as empty at init",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should treat number input type as empty at init",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not be empty after input entered",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should update the placeholder when input entered",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not be empty when the value set before view init",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should add id",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should add aria-owns to the label for the associated control",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should add aria-required reflecting the required state",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not overwrite existing id",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > validates there's only one hint label per side",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > validates there's only one hint label per side (attribute)",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > validates there's only one placeholder",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > validates that matInput child is present",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > validates that matInput child is present after initialization",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > validates the type",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports hint labels attribute",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > sets an id on hint labels",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports hint labels elements",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > sets an id on the hint element",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports placeholder attribute",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not render the native placeholder when its value is mirrored in the label",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports placeholder element",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports placeholder required star",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should show the required star when using a FormControl",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should hide the required star if input is disabled",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should hide the required star from screen readers",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > hide placeholder required star when set to hide the required marker",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports the disabled attribute as binding",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports the disabled attribute as binding for select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should add a class to the form field if it has a native select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports the required attribute as binding",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports the required attribute as binding for select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports the type attribute as binding",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports textarea",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > sets the aria-describedby when a hintLabel is set",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > supports user binding to aria-describedby",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > sets the aria-describedby to the id of the mat-hint",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > sets the aria-describedby with multiple mat-hint instances",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > updates descriptions when existing hint and error IDs change on a state notification",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should set a class on the hint element based on its alignment",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > sets the aria-describedby when a hintLabel is set, in addition to a mat-hint",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should float when floatLabel is set to default and text is entered",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should always float the label when floatLabel is set to true",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should float labels when select has value",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should mark a multi-select as being inline",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should mark a select with a size as being inline",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not float the label if the selectedIndex is negative",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not float labels when select has no value, no option label, no option innerHtml",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should floating labels when select has no value but has option label",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should floating labels when select has no value but has option innerHTML",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not throw if a native select does not have options",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should never float the label when floatLabel is set to false",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should be able to toggle the floating label programmatically",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not have prefix and suffix elements when none are specified",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should add prefix and suffix elements when specified",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should update empty class when value changes programmatically and OnPush",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should set the focused class when the input is focused",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should remove the focused class if the input becomes disabled while focused",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should be able to animate the label up and lock it in position",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not throw when trying to animate and lock too early",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should only show the native placeholder, when there is a label, on focus",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should always show the native placeholder when floatLabel is set to \"always\"",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not add the `placeholder` attribute if there is no placeholder",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not show the native placeholder when floatLabel is set to \"never\"",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should preserve the native placeholder on a non-legacy appearance",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not add the native select class if the control is not a native select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should use the native input value when determining whether the element is empty with a custom accessor",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not throw when there is a default ngIf on the label element",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should not throw when there is a default ngIf on the input element",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should default the form field color to primary",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput without forms > should be able to change the form field color",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > should not show any errors if the user has not interacted",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > should display an error message when the input is touched and invalid",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > should display an error message when the parent form is submitted",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > should display an error message when the parent form group is submitted",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > should hide the errors and show the hints once the input becomes valid",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > should not hide the hint if there are no error messages",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > should be in a parent element with an aria-live attribute to announce the error",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > sets the aria-describedby to reference errors when in error state",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > error messages > should set `aria-invalid` to true if the input is empty",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > custom error behavior > should display an error message when a custom error matcher returns true",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > custom error behavior > should display an error message when global error matcher returns true",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > custom error behavior > should display an error message when using ShowOnDirtyErrorStateMatcher",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > should update the value when using FormControl.setValue",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > should display disabled styles when using FormControl.disable()",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > should not treat the number 0 as empty",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with forms > should update when the form field value is patched without emitting",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > legacy appearance should promote placeholder to label",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > non-legacy appearances should not promote placeholder to label",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > legacy appearance should respect float never",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > non-legacy appearances should not respect float never",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should recalculate gaps when switching to outline appearance after init",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should calculate the gap when starting off in RTL",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should not set an outline gap if the label is empty",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should calculate the gaps if the default appearance is provided through DI",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should update the outline gap when the prefix/suffix is added or removed",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should calculate the outline gaps if the element starts off invisible",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should update the outline gap if the direction changes",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should update the outline gap correctly if the direction changes multiple times",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should calculate the outline gaps inside the shadow DOM",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatInput with appearance > should recalculate the outline gap when the label changes to empty after init",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatFormField default options > should be legacy appearance if no default options provided",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatFormField default options > should be legacy appearance if empty default options provided",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatFormField default options > should be able to change the default appearance",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatFormField default options > should default hideRequiredMarker to false",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatFormField default options > should be able to change the default value of hideRequiredMarker and appearance",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "MatFormField default options > should be able to change the default color",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should load all input harnesses",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should load input with specific id",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should load input with specific name",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should load input with a specific value",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should load input with a value that matches a regex",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should load input with a specific placeholder",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should load input with a placeholder that matches a regex",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to get id of input",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to get name of input",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to get value of input",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to set value of input",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to get disabled state",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to get readonly state",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to get required state",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to get placeholder of input",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to get type of input",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to focus input",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to blur input",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatInputHarness > should be able to set the value of a control that cannot be typed in",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Native legacy input harness contract > reads native disabled state through both constructor and filtered factory routes",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Native legacy input harness contract > applies optional public label filters to the legacy input and native select markup",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should load all select harnesses",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get the id of a select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get the name of a select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get whether a select is disabled",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get whether the select is in multi-selection mode",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get whether a select is required",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should be able to focus a select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should be able to blur a select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get the options of a select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should select an option inside of a single-selection select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should select an option inside of a multi-selection select",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get the text of select options",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get the index of select options",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get the disabled state of select options",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get the selected state of an option in a single-selection list",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "Non-MDC-based MatNativeSelectHarness > should get the selected state of an option in a multi-selection list",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "legacy-runner discovery > evaluated every mapped historical spec module",
+              "success": true,
+              "skipped": false
+            },
+            {
+              "full_name": "legacy-runner deliberate fail probe > is skipped unless deliberate-fail mode is enabled",
+              "success": true,
+              "skipped": false
+            }
+          ],
+          "failures": [],
+          "deliberate_fail_observed": false,
+          "mapped_specs": [
+            {
+              "historical_path": "src/material/legacy-input/input.spec.ts",
+              "candidate": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+              "disposition": "executed"
+            },
+            {
+              "historical_path": "src/material/legacy-input/testing/input-harness.spec.ts",
+              "candidate": "projects/ngx-material-legacy/legacy-input/testing/input-harness.spec.ts",
+              "disposition": "executed"
+            },
+            {
+              "historical_path": "src/material/legacy-input/testing/native-select-harness.spec.ts",
+              "candidate": "projects/ngx-material-legacy/legacy-input/testing/native-select-harness.spec.ts",
+              "disposition": "executed"
+            }
+          ],
+          "timestamp": "2026-11-08T00:08:29.086Z"
+        }
+      }
+    ]
+  },
+  "root_checks": [
+    "Reviewed exact2filepatch, currentcanonicalpreimages and resultingafterimages; fullrawrunnerreports/hashes and bothindependentreviews match.",
+    "Baseline solefailedcase isnewownedregression, bothhint/erroroldID assertionsfail; fixedinputfamily152/152zeroskips.",
+    "Productchange restoresper-state-notificationbehavior fromMaterial16.2.14; no HTML/CSS/SCSS/selector/publicAPI changes.",
+    "Originalhistoricalassertionsandgoldens retained; oneownedregression added."
+  ],
+  "limits": [
+    "The packedsubjects are independently verified synthetic common-barrel baseline/fix artifacts, not a freshpack ofthiscanonicalcommit. Exactrelevantproduct/specimages match.",
+    "Directhistoricalrunnerpackage-root invocation reports artifact_sha256:null; binding uses independent512memberextraction checks andretainedtar hashes underquiescentworkspaceassumption, not a transactionalcoordinatorreceipt.",
+    "BrowserlaunchersusethecurrentrawChromebinarywithoutdisablingflags; individualrunsdidnotquerysandboxstate.",
+    "Controlreplacement/destroy aresource-reviewedonly; customcontrolreentrancy/performance notbroadlytested.",
+    "No fullhistoricalsuite, peerfloors, otherbrowser, zoneless,SSR,Sass/style equality,G11, finalaudit orreleasequalification.",
+    "Source-boundevidence andcurrentcasepopulationmustbequalifiedafterthislegitimateproduct/testchange; no oldreceiptisreattributed."
+  ]
+}

@@ -35,7 +35,7 @@ import {
 import {ThemePalette} from '@angular/material/core';
 import {CanColor, mixinColor} from './internal/common-behaviors';
 import {fromEvent, merge, Subject, Subscription} from 'rxjs';
-import {filter, map, pairwise, startWith, take, takeUntil} from 'rxjs/operators';
+import {startWith, take, takeUntil} from 'rxjs/operators';
 import {MatLegacyError} from './error';
 import {_MAT_LEGACY_HINT, MatLegacyHint} from './hint';
 import {MatLegacyLabel} from './label';
@@ -281,7 +281,6 @@ export class MatLegacyFormField
   private _previousControlValidatorFn: ValidatorFn | null = null;
   private _stateChanges: Subscription | undefined;
   private _valueChanges: Subscription | undefined;
-  private _describedByChanges: Subscription | undefined;
   /** Hint/error IDs last assigned by `_syncDescribedByIds`. */
   private _describedByIds: string[] | undefined;
 
@@ -470,7 +469,6 @@ export class MatLegacyFormField
     this._directionFrames.clear();
     this._stateChanges?.unsubscribe();
     this._valueChanges?.unsubscribe();
-    this._describedByChanges?.unsubscribe();
     this._destroyed.next();
     this._destroyed.complete();
   }
@@ -659,22 +657,11 @@ export class MatLegacyFormField
     this._stateChanges?.unsubscribe();
     this._stateChanges = control.stateChanges.subscribe(() => {
       this._validatePlaceholders();
+      this._syncDescribedByIds();
       this._changeDetectorRef.markForCheck();
     });
     this._validatePlaceholders();
 
-    // Updating aria-describedby touches the DOM. Only do it when error/user ids change.
-    this._describedByChanges?.unsubscribe();
-    this._describedByChanges = control.stateChanges
-      .pipe(
-        startWith([undefined, undefined] as const),
-        map(() => [control.errorState, control.userAriaDescribedBy] as const),
-        pairwise(),
-        filter(([[prevErrorState, prevDescribedBy], [currentErrorState, currentDescribedBy]]) => {
-          return prevErrorState !== currentErrorState || prevDescribedBy !== currentDescribedBy;
-        }),
-      )
-      .subscribe(() => this._syncDescribedByIds());
     this._syncDescribedByIds();
 
     this._valueChanges?.unsubscribe();
