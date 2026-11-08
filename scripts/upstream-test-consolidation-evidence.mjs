@@ -10,6 +10,8 @@ import {qualifyIndependentSnackProductDelta} from './snack-dom-source-context.mj
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
+import {dirname,resolve} from 'node:path';
+import {retainedCurrentConsolidationContext} from './retained-current-consolidation-context.mjs';
 import {gunzipSync} from 'node:zlib';
 import {analyzeSharedTestMove,bazelProductionCalls} from './upstream-test-consolidation-analysis.mjs';
 import {buildScopeEvidenceOk,ciCaptureReader} from './upstream-build-scope-evidence.mjs';
@@ -17,6 +19,7 @@ import {qualifiedCurrentConsolidationSources} from './harness-animation-preparat
 import {HISTORICAL_CONSOLIDATION_CAPSULE, retainedConsolidationSources,
   individualConsolidationScope} from './upstream-test-consolidation-historical.mjs';
 const loadedConsolidationSource=readFileSync(fileURLToPath(import.meta.url));
+const sourceRoot=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 export const TEST_CONSOLIDATION_ROLE='C04 finite original32 shared harness consolidation source review';
 export const TEST_CONSOLIDATION_CAPSULE='compatibility/rc/upstream-test-consolidation-subjects.json';
 export const TEST_CONSOLIDATION_CAPSULE_SHA256='5fd4dc58c2365c659696d4e9f6927a02184f868db043a7055a3bf1afcdebf989';
@@ -133,13 +136,14 @@ function mainSuccessorBound(body,readRepo,entry){
   assert.deepEqual(body,JSON.parse(bytes));const prior=JSON.parse(priorBytes);const {main_current_context:context,...unchanged}=body;assert.deepEqual(unchanged,prior);
   assert.deepEqual(Object.keys(context).sort(),['build_report','g11_claim','historical_inventory_is_capture_not_current_execution','historical_runner_inputs','line','previous_report','role','runtime_or_floor_qualified','source_only'].sort());
   assert.equal(context.role,'main-only current source context, not historic test execution');assert.equal(context.line,'main');assert.equal(context.source_only,true);assert.equal(context.runtime_or_floor_qualified,false);assert.equal(context.g11_claim,'not-passed');assert.equal(context.historical_inventory_is_capture_not_current_execution,true);
+  const retainedContext=retainedCurrentConsolidationContext({root:sourceRoot,read:readRepo,body});
   assert.deepEqual(context.previous_report,{path:MAIN_PRIOR,sha256:MAIN_PRIOR_SHA,bytes:priorBytes.length});const build=readRepo(MAIN_BUILD);assert.equal(hash(build),MAIN_BUILD_SHA);assert.deepEqual(context.build_report,{path:MAIN_BUILD,sha256:MAIN_BUILD_SHA,bytes:build.length});
-  assert.deepEqual(context.historical_runner_inputs.map(r=>r.path).sort(),[...historicalContextPaths].sort());for(const r of context.historical_runner_inputs){const raw=readRepo(r.path);assert.equal(hash(raw),r.sha256);assert.equal(raw.length,r.bytes);}
+  assert.deepEqual(context.historical_runner_inputs.map(r=>r.path).sort(),[...historicalContextPaths].sort());for(const r of context.historical_runner_inputs){const expected=retainedContext.runnerReference(r),raw=readRepo(expected.path);assert.equal(hash(raw),expected.sha256);assert.equal(raw.length,expected.bytes);}
   const archive=JSON.parse(archiveBytes),delta=JSON.parse(deltaBytes);assert.equal(archive.schema_version,1);assert.equal(archive.line,'main');assert.equal(archive.source_head,'9be00b7baf32477b8e521305efa36273589566b9');assert.equal(delta.schema_version,1);assert.equal(delta.line,'main');
   assert.equal(archive.rows.length,32);assert.equal(delta.rows.length,32);assert.deepEqual(archive.rows.map(r=>r.sha).sort(),body.scope_sha_ids);assert.deepEqual(delta.rows.map(r=>r.sha).sort(),body.scope_sha_ids);
   for(const old of archive.rows){const next=delta.rows.find(r=>r.sha===old.sha);assert.ok(next);const expected=structuredClone(old);expected.evidence_report=MAIN_REPORT;expected.source_check.evidence_report_sha256=MAIN_REPORT_SHA;expected.affected_branches=['main'];expected.prior_disposition_record=structuredClone(old);assert.deepEqual(next,expected);}
   if(entry){const matches=delta.rows.filter(r=>r.sha===entry.sha);assert.equal(matches.length,1);assert.deepEqual(entry,matches[0]);}
-  return true;
+  retainedContext.assertCurrent();return retainedContext;
  }catch{return false;}
 }
 
@@ -148,7 +152,7 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
   try{
     const captured=ciCaptureReader(readRepo);readRepo=captured.read;
     assert.equal(body.role,TEST_CONSOLIDATION_ROLE);assert.equal(body.g11_claim,'not-passed');
-    const mainSuccessor=Object.hasOwn(body,'main_current_context');if(mainSuccessor)assert.ok(mainSuccessorBound(body,readRepo));
+    const mainSuccessor=Object.hasOwn(body,'main_current_context'),mainContext=mainSuccessor?mainSuccessorBound(body,readRepo):null;if(mainSuccessor)assert.ok(mainContext);
     const product=JSON.parse(readRepo('projects/ngx-material-legacy/package.json'));
     const line=product.version.startsWith('21.')?'21.x':'main';assert.equal(body.line,line);
     assert.deepEqual(body.scope_sha_ids,Object.keys(TEST_CONSOLIDATION_PATCHES).sort());
@@ -169,6 +173,7 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
     // scope, not a general override for an old or substituted build helper.
     const ciCurrent=mainSuccessor && hash(readRepo('flake.nix'))==='a161c9773fdb018e4a1a7befdb5962c1f4e818d73ae259b4242673bad1115556';
     const checkCiBuildImage=()=>{
+      if(mainContext){mainContext.assertBuildChecker();return;}
       assert.equal(hash(readRepo('scripts/upstream-build-scope-evidence.mjs')),'3c67251388f98f563dcfe43adb5083da0880279855c6eab135840e98c5b81168');
       assert.equal(hash(Buffer.from(buildScopeEvidenceOk.toString())),'f914bdafd30e0d5b7f1d74ef1b58a1c3e17adf38a69100cac44a97f552d99665');
     };
@@ -181,7 +186,7 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
     const compilerConfig=JSON.parse(readRepo('projects/ngx-material-legacy/tsconfig.lib.json'));
     assert.ok(compilerConfig.exclude.includes('**/*.spec.ts'));
     assert.deepEqual(body.historical_suite_context.map(r=>r.path).sort(),[...historicalContextPaths].sort());
-    for(const ref of (mainSuccessor?body.main_current_context.historical_runner_inputs:body.historical_suite_context)){const bytes=readRepo(ref.path);assert.ok(Buffer.isBuffer(bytes));assert.equal(hash(bytes),ref.sha256);}
+    for(const ref of (mainSuccessor?body.main_current_context.historical_runner_inputs:body.historical_suite_context)){const expected=mainContext?mainContext.runnerReference(ref):ref,bytes=readRepo(expected.path);assert.ok(Buffer.isBuffer(bytes));assert.equal(hash(bytes),expected.sha256);}
     const inventory=JSON.parse(readRepo('testing/legacy-runner/historical-inventory.json'));
     assert.equal(inventory.denominator,57);assert.equal(inventory.historical_tag,'16.2.14');
     assert.equal(body.subject_capsule.path,TEST_CONSOLIDATION_CAPSULE);assert.equal(body.subject_capsule.sha256,TEST_CONSOLIDATION_CAPSULE_SHA256);
@@ -202,12 +207,13 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
       assert.equal(row.review_depth,result.exact_test_body_and_fixture_relocation?'bounded-exact-test-relocation':'individual-compatibility');
       assert.ok(typeof row.decision==='string'&&row.decision.length>=120);
     }
-    if(ciCurrent){
+    if(ciCurrent||mainContext){
       checkCiBuildImage();
       assert.ok(buildScopeEvidenceOk(context,contextEntry,readRepo,currentProductPaths),
         'CI successor changed during consolidation callbacks');
       checkCiBuildImage();
       assert.deepEqual(readRepo('scripts/upstream-test-consolidation-evidence.mjs'),loadedConsolidationSource);
+      mainContext?.assertCurrent();
       captured.close();
     }
     return true;
@@ -217,11 +223,11 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
 /** Row labels cannot bypass immutable scope or pending residuals. */
 export function testConsolidationEntryOk(body,entry,readRepo,batchValid){
   try{
-    assert.equal(batchValid,true);if(entry.evidence_report===MAIN_REPORT)assert.ok(mainSuccessorBound(body,readRepo,entry));assert.equal(hash(readRepo(entry.evidence_report)),entry.source_check.evidence_report_sha256);
+    assert.equal(batchValid,true);const mainContext=entry.evidence_report===MAIN_REPORT?mainSuccessorBound(body,readRepo,entry):null;if(entry.evidence_report===MAIN_REPORT)assert.ok(mainContext);assert.equal(hash(readRepo(entry.evidence_report)),entry.source_check.evidence_report_sha256);
     const row=body.reviews.find(r=>r.sha===entry.sha);assert.ok(row);
     assert.equal(entry.final_disposition,row.final_disposition);assert.equal(entry.reason,row.decision);assert.deepEqual(entry.files,row.patch_paths);
     assert.deepEqual(entry.affected_branches,entry.evidence_report===MAIN_REPORT?['main']:row.affected_branches);assert.equal(entry.review_depth,row.review_depth);
     assert.equal(entry.source_check.diff_sha256,row.diff_sha256);assert.equal(entry.source_check.patch_path,row.patch_file);
-    assert.equal(entry.source_check.review_membership,row.sha);return true;
+    assert.equal(entry.source_check.review_membership,row.sha);mainContext?.assertCurrent();return true;
   }catch{return false;}
 }

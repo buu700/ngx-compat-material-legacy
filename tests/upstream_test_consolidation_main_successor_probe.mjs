@@ -27,6 +27,13 @@ for(const [name,path] of [
  ['owned harness shim','testing/legacy-runner/shims/harness/dialog/shared.spec.ts'],
  ['preparation qualification','compatibility/rc/harness-animation-preparation-current-qualification.json'],
  ['current runner roster','testing/legacy-runner/historical-specs.json'],
+ ['current inventory','testing/legacy-runner/historical-inventory.json'],
+ ['current context packet','compatibility/rc/main-retained-current-context-v1.json'],
+ ['current consolidation review','compatibility/rc/main-retained-consolidation-current-review-v1.json'],
+ ['current consolidation guard','scripts/retained-current-consolidation-context.mjs'],
+ ['current build guard','scripts/retained-current-build-context.mjs'],
+ ['current build checker','scripts/upstream-build-scope-evidence.mjs'],
+ ['loaded consolidation checker','scripts/upstream-test-consolidation-evidence.mjs'],
 ]){assert.equal(testConsolidationBatchOk(body,mutate(path),paths),false,name);negatives++;}
 const wrongLine=p=>{if(p!=='projects/ngx-material-legacy/package.json')return read(p);const x=JSON.parse(read(p));x.version='21.0.0';return Buffer.from(JSON.stringify(x));};
 assert.equal(testConsolidationBatchOk(body,wrongLine,paths),false,'wrong line');negatives++;
@@ -35,4 +42,7 @@ assert.equal(testConsolidationEntryOk(omitted,delta.rows[0],read,true),false,'ne
 const badEntry=structuredClone(delta.rows[0]);badEntry.reason+=' altered';assert.equal(testConsolidationEntryOk(body,badEntry,read,true),false,'changed ledger row');negatives++;
 const missing=structuredClone(body);missing.reviews.pop();assert.equal(testConsolidationBatchOk(missing,read,paths),false,'missing review');negatives++;
 const dup=structuredClone(body);dup.reviews[1]=dup.reviews[0];assert.equal(testConsolidationBatchOk(dup,read,paths),false,'duplicate review');negatives++;
-console.log(JSON.stringify({positive_entries:delta.rows.length,negative_controls:negatives}));
+let late=false;const target=paths[0];
+const lateRead=path=>{if(path==='compatibility/rc/upstream-test-consolidation-subjects.json')late=true;return late&&path===target?Buffer.from('late source after build proof'):read(path);};
+assert.equal(testConsolidationBatchOk(body,lateRead,paths),false,'late current source after build proof');negatives++;
+console.log(JSON.stringify({positive_entries:delta.rows.length,negative_controls:negatives,current_product_paths:paths.length,historical_testing_files_retained:163,execution_claims_changed:false}));
