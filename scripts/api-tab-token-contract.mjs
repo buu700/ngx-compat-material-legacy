@@ -8,6 +8,7 @@
  */
 import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
+import {qualifyApiV8Archive} from './api-v8-artifact-successor.mjs';
 import {readFileSync,existsSync,realpathSync,readdirSync,lstatSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
 import {inputHarnessClosureFingerprint} from './api-input-harness-contract.mjs';
@@ -71,7 +72,7 @@ export function tabTokenProof(symbol,file,context){
   if(hash(readFileSync(join(ROOT,'scripts/api-tab-token-evidence.json')))!=='f695f63ad931a06a98608abdfa389754a01a4a8afa321a76af3a490252ae8eab'||hash(readFileSync(join(ROOT,'tests/api_tab_token_probe.mjs')))!=='ce0649440de5a58f39ba3599be4526d628e3f2087c9d709371cbfba5e16e6a78')return null;
   const archive=readFileSync(context.tarball);
   const artifact=hash(archive), oldArtifact='a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2', v7Artifact='66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca';
-  if(![oldArtifact,v7Artifact].includes(artifact)||!exactExtractedImage(archive,context.packageRoot)||realpathSync(file.fileName)!==realpathSync(join(context.packageRoot,'types/ngx-compat-material-legacy-legacy-tabs.d.ts')))return null;
+  if((![oldArtifact,v7Artifact].includes(artifact)&&!qualifyApiV8Archive(archive))||!exactExtractedImage(archive,context.packageRoot)||realpathSync(file.fileName)!==realpathSync(join(context.packageRoot,'types/ngx-compat-material-legacy-legacy-tabs.d.ts')))return null;
   const reference={'legacy-tabs/public-api.ts':'f6a4dd305258afa9706c958c06f6260baec6258731f2fa9dba91667faa43b62c','legacy-tabs/tab.ts':'0fc0c91e7916d16fd6fe6a82356b6c5f8890e34958483e960f784412978e0970','tabs/tab.ts':'081213228a7964df7e4d6396e1503a1ee396b6722f8cb58baaa2a51c2baae43a'};
   for(const [path,sha] of Object.entries(reference))if(hash(readFileSync(join(context.referenceRoot,path)))!==sha)return null;
   const owned={'legacy-tabs/public-api.ts':'6ed79724ae52eb970bbd081180257b7b1e31b442a1ed27bfb2bef48f78b20edd','legacy-tabs/tab.ts':'e58220c6f0e19f4f6395bd13756926d6cd140ad9c1bcc38877c011a353b61fae','legacy-tabs/internal/tab-token.ts':'8b4148fb7e16dbe43712b0de95e078c1b2aad5e60b27621141d3ff2b6682d90b'};

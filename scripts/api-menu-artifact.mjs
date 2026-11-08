@@ -10,15 +10,16 @@ import {gunzipSync} from 'node:zlib';
 import {readFileSync,readdirSync,lstatSync,realpathSync} from 'node:fs';
 import {join} from 'node:path';
 import {createRequire} from 'node:module';
+import {qualifyApiV8Archive} from './api-v8-artifact-successor.mjs';
 const sha=x=>createHash('sha256').update(x).digest('hex');
-// Preserve the original reviewed image and admit only the separately reviewed v7 image.
+// Preserve earlier profiles; the v8 successor separately proves its exact image.
 export const MENU_TAR_SHA='a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2';
 export const MENU_V7_TAR_SHA='66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca';
 /** Every regular archive member must equal the corresponding physical file. */
 export function exactMenuArtifact(context,packageRoot){
  try{
   if(!context?.tarball||!context.packageRoot||realpathSync(context.packageRoot)!==realpathSync(packageRoot))return false;
-  const archive=readFileSync(context.tarball);if(![MENU_TAR_SHA, MENU_V7_TAR_SHA].includes(sha(archive)))return false;
+  const archive=readFileSync(context.tarball);if(![MENU_TAR_SHA, MENU_V7_TAR_SHA].includes(sha(archive))&&!qualifyApiV8Archive(archive))return false;
   const bytes=gunzipSync(archive,{maxOutputLength:100*1024*1024}),files=new Map();let offset=0;
   const field=(h,a,b)=>h.subarray(a,b).toString('utf8').replace(/\0.*$/s,'');
   while(offset+512<=bytes.length){const h=bytes.subarray(offset,offset+512);offset+=512;if(h.every(x=>x===0))break;

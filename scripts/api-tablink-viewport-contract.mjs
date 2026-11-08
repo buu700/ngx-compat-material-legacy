@@ -29,7 +29,10 @@ const D='1bfc9ca71821299ca40ecff4fe35faeabb18e2569a6d2e3d2fd13c9a9141b334';
 // Artifact, authored source, scope and shared proof travel as one finite profile.
 const versions={
  'a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2':{bundle:'6da280036d123a97c111549e054ca67903c68600f1cc261424f39b356be763a1',navSource:'9205bb2a5b3573e8f21161b03baa04e4b3e868e72d70e06c5dcdf96d2439af36',common:'adbfc914d036f7f40c45dfd8ef0c1bd2efc2479e946fb58b085a08ce4107ff97',offset:0},
- '66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca':{bundle:'ab6891ffa20dfd036d6f5ff7d81925df754bed95fc0ca3953a04fec0e3c098ac',navSource:'daf7d6f4c83292e7d3bf24eaf675b5cfc6c3fe341b779c5e801c23ef49d30f7f',common:'89cd46c3a6936097b9425d41ceb3905f2cc7e23730c71bf6ab36a93edb0a1fb5',offset:8}
+ '66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca':{bundle:'ab6891ffa20dfd036d6f5ff7d81925df754bed95fc0ca3953a04fec0e3c098ac',navSource:'daf7d6f4c83292e7d3bf24eaf675b5cfc6c3fe341b779c5e801c23ef49d30f7f',common:'89cd46c3a6936097b9425d41ceb3905f2cc7e23730c71bf6ab36a93edb0a1fb5',offset:8},
+ // spinnerViewportProof authenticates v8 before this exact profile is selected.
+ // Its receipt retains the actual v8 archive identity; executable tabs are equal.
+ 'fd5b57f85aaa7b61f82f15a0dfb9ef12e65e6c80bdc47984d6917f0a517c3ce5':{bundle:'ab6891ffa20dfd036d6f5ff7d81925df754bed95fc0ca3953a04fec0e3c098ac',navSource:'daf7d6f4c83292e7d3bf24eaf675b5cfc6c3fe341b779c5e801c23ef49d30f7f',common:'024a5038754a3beb5ebad9a34cec9aa7e07b2aaf1b2aa9fad2fec7064e41e725',offset:8}
 };
 function sourceScope(profile){const n=profile.offset;return {file:'fesm2022/ngx-compat-material-legacy-legacy-tabs.mjs',sha256:profile.bundle,owner_text_sha256:'5e9b4f6e16a70d3385259a45b6c1a587435f5e5d09dce244867e1bbfbbf81b19',helper_text_sha256:'240504b1d61cc7feee5cf56873f53f4c6f8132f4b49282c73508ca51fe7f06d4',owner_export:'MatLegacyPaginatedTabHeader',owner_local:'MatPaginatedTabHeader',selected_export:'MatLegacyTabNav',selected_local:'MatLegacyTabNav',owner_start:83493+n,owner_end:109635+n,field_start:83664+n,field_end:83689+n};}
 

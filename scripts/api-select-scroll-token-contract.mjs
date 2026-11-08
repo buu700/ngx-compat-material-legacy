@@ -8,6 +8,7 @@
  */
 import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
+import {qualifyApiV8Archive} from './api-v8-artifact-successor.mjs';
 import {readFileSync,existsSync,realpathSync,readdirSync,lstatSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
 import {inputHarnessClosureFingerprint} from './api-input-harness-contract.mjs';
@@ -71,7 +72,7 @@ export function selectScrollTokenProof(symbol,file,context){
   if(hash(readFileSync(join(ROOT,'scripts/api-select-scroll-token-evidence.json')))!=='5220d60832bf5a336bfa14dfb6b74d090d1cef319662bf7897bc129d4533084c'||hash(readFileSync(join(ROOT,'tests/api_select_scroll_token_probe.mjs')))!=='fb25c5d64671c4cdc0b0d3e71d1dd867d98bca48f8290cf2f426b2c8610043eb')return null;
   const archive=readFileSync(context.tarball);
   const image=hash(archive),old='a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2',v7='66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca';
-  if(![old,v7].includes(image)||!exactExtractedImage(archive,context.packageRoot)||realpathSync(file.fileName)!==realpathSync(join(context.packageRoot,'types/ngx-compat-material-legacy-legacy-select.d.ts')))return null;
+  if((![old,v7].includes(image)&&!qualifyApiV8Archive(archive))||!exactExtractedImage(archive,context.packageRoot)||realpathSync(file.fileName)!==realpathSync(join(context.packageRoot,'types/ngx-compat-material-legacy-legacy-select.d.ts')))return null;
   const reference={'legacy-select/public-api.ts':'f10853ac2d70d8e905e1872eefec3d2158594b81932ec92a1c7d67c16cc71064','legacy-select/select-module.ts':'1010d90c2d4bd39265fc4f29a729e9e5ab876b2944c7911eed90f373cb4faf79','legacy-select/select.ts':'f75594460cc49d590a74643ce2888990f498262d83c63d907966d5095ee0098d','select/select.ts':'ba939bcc724eab50cc71c628c3977ddd68f052bfb265a77de8793ec09562cd73'};
   for(const [path,digest] of Object.entries(reference))if(hash(readFileSync(join(context.referenceRoot,path)))!==digest)return null;
   const owned={'legacy-select/public-api.ts':'2aa2c6b377d8bcdb6fb635293e53fdf723a48c1dd107d8487c148ddd9a806889','legacy-select/select-module.ts':'2934c344b72d6cbddb0356dfcd28b452909c657349c6e9156dd9bc6c25ac81cc','legacy-select/internal/select-base.ts':'120ab123d79e58ea256211cafa50268dba3ce26524426e88b0347a8624aee68d','legacy-select/select.ts':'8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739'};

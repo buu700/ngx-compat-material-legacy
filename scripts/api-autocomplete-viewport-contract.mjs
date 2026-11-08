@@ -25,7 +25,9 @@ function closure(program,virtual){
 }
 const ID='legacy-autocomplete/primary/MatLegacyAutocompleteTrigger';
 const D='5b81821cc64e58a013329c473b7d5f3335c2ceae2b9d9b08218f29c269689743',B='e8f100eab8ca3c036f23c46452edc35962dc44cf0141f1f972abbabf30df55e6';
-const PROFILES=Object.freeze({'adbfc914d036f7f40c45dfd8ef0c1bd2efc2479e946fb58b085a08ce4107ff97':'b396700f5b191bdff637986773080a1817071ccd23d2b29383ee0153e85273df','89cd46c3a6936097b9425d41ceb3905f2cc7e23730c71bf6ab36a93edb0a1fb5':'e850f81126a771f120b7aacb610cb45a801260c92042958e59ad590b586e286f'});
+// The third receipt hashes the actual v8 artifact identity after the spinner
+// producer's finite image proof; the compiler closure remains independently checked.
+const PROFILES=Object.freeze({'adbfc914d036f7f40c45dfd8ef0c1bd2efc2479e946fb58b085a08ce4107ff97':'b396700f5b191bdff637986773080a1817071ccd23d2b29383ee0153e85273df','89cd46c3a6936097b9425d41ceb3905f2cc7e23730c71bf6ab36a93edb0a1fb5':'e850f81126a771f120b7aacb610cb45a801260c92042958e59ad590b586e286f','024a5038754a3beb5ebad9a34cec9aa7e07b2aaf1b2aa9fad2fec7064e41e725':'e850f81126a771f120b7aacb610cb45a801260c92042958e59ad590b586e286f'});
 export function autocompleteViewportProof(symbol,spinner,context){try{
  const ts=require('typescript');if(symbol?.symbol_id!==ID||hash(JSON.stringify(symbol.shape))!=='7657129de95cf09f009981c4f716443a25cc67d4653a68737d50fdbb4b279af7'||!context?.packageRoot||!context?.referenceRoot)return null;
  const commonPath=join(context.packageRoot,'types/ngx-compat-material-legacy-legacy-progress-spinner.d.ts'),common=spinnerViewportProof(spinner,{fileName:commonPath,text:readFileSync(commonPath,'utf8')},context);if(!common)return null;

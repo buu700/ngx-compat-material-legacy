@@ -11,6 +11,7 @@ import {readFileSync,existsSync,realpathSync,lstatSync} from 'node:fs';
 import {dirname,join,relative,isAbsolute,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {exactMenuArtifact} from './api-menu-artifact.mjs';
+import {qualifyApiV8Archive} from './api-v8-artifact-successor.mjs';
 import {inputHarnessClosureFingerprint} from './api-input-harness-contract.mjs';
 const require=createRequire(import.meta.url),ROOT=join(dirname(fileURLToPath(import.meta.url)),'..');
 const hash=x=>createHash('sha256').update(x).digest('hex');
@@ -37,7 +38,7 @@ function strict(ts,file){
 export function settleFormConstructor(symbol,file,signature,context){
  try{
   const ts=require('typescript');if(symbol?.symbol_id!==SYMBOL||symbol.family!=='legacy-form-field'||symbol.kind!=='primary'||symbol.name!=='MatLegacyFormField'||hash(JSON.stringify(symbol.shape))!=='e205167b693101e4f7f2ed409f996aa72735202f4e5bc58e31a73151b8f64aca'||hash(JSON.stringify(signature))!=='02aa6cd890968a2101b6d7793e4ad767ee6d75ec8e3f04afd0fe9f654859e00f'||process.versions.node!=='24.21.0'||ts.version!=='6.0.3'||!file?.fileName||!context?.tarball||!context?.packageRoot||!context?.referenceRoot)return signature;
-  const tar=readFileSync(context.tarball);if(hash(tar)!=='66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca'||lstatSync(context.packageRoot).isSymbolicLink()||realpathSync(context.packageRoot)!==resolve(context.packageRoot)||!exactMenuArtifact(context,context.packageRoot))return signature;
+  const tar=readFileSync(context.tarball);if((hash(tar)!=='66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca'&&!qualifyApiV8Archive(tar))||lstatSync(context.packageRoot).isSymbolicLink()||realpathSync(context.packageRoot)!==resolve(context.packageRoot)||!exactMenuArtifact(context,context.packageRoot))return signature;
   const members={'types/ngx-compat-material-legacy-legacy-form-field.d.ts':'dc344ae48c84272a89a404bc1170af22f1849086261b4a9c1da2a0f5955f0ac3','fesm2022/ngx-compat-material-legacy-legacy-form-field.mjs':'d77d13c903ecb0f982e76ad2e082a46e2bfd9c5e61b291d65a919adefb489eee','fesm2022/ngx-compat-material-legacy-legacy-form-field.mjs.map':'15417c384c5def420170a097793a1c9ec22b721dba87d6639eb1f25041010bff'};
   for(const [path,sha] of Object.entries(members))if(hash(readFileSync(join(context.packageRoot,path)))!==sha)return signature;
   const dts=join(context.packageRoot,Object.keys(members)[0]);if(realpathSync(file.fileName)!==realpathSync(dts)||hash(file.text)!==members[Object.keys(members)[0]])return signature;

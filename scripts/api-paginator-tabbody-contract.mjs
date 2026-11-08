@@ -7,6 +7,7 @@
  */
 import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
+import {qualifyApiV8Archive} from './api-v8-artifact-successor.mjs';
 import {readFileSync,existsSync,realpathSync,readdirSync,lstatSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
 import {inputHarnessClosureFingerprint} from './api-input-harness-contract.mjs';
@@ -74,8 +75,9 @@ export function paginatorTabBodyProof(symbol,file,context){
   const ts=require('typescript'),p=profiles[symbol?.symbol_id];if(!p||symbol.family!==p.family||symbol.kind!=='primary'||symbol.name!==p.name||hash(JSON.stringify(symbol.shape))!==p.shape||process.versions.node!=='24.21.0'||ts.version!=='6.0.3'||!file?.fileName||!context?.tarball||!context?.packageRoot||!context?.referenceRoot)return null;
   if(hash(readFileSync(join(ROOT,'scripts/api-paginator-tabbody-evidence.json')))!=='f674dd6a96e055c7c1b0e74b8450faa781c62a67700fbc668174fdd8590b3ebc')return null;
   const evidence=JSON.parse(readFileSync(join(ROOT,'scripts/api-paginator-tabbody-evidence.json')));for(const [name,sha] of Object.entries(evidence.artifacts)){if(!/^[a-zA-Z0-9_.-]+$/.test(name)||hash(readFileSync(join(ROOT,'compatibility/rc/paginator-tabbody-evidence-v1',name)))!==sha)return null;}
-  const tar=readFileSync(context.tarball);const image=hash(tar);if(![OLD,V7].includes(image)||!exactExtractedImage(tar,context.packageRoot))return null;
-  const dts=join(context.packageRoot,`types/ngx-compat-material-legacy-${p.family}.d.ts`),bundle=join(context.packageRoot,`fesm2022/ngx-compat-material-legacy-${p.family}.mjs`),mapfile=bundle+'.map';if(realpathSync(file.fileName)!==realpathSync(dts)||hash(file.text)!==p.dts||hash(readFileSync(dts))!==p.dts||hash(readFileSync(bundle))!==(image===V7&&p.family==='legacy-tabs'?'ab6891ffa20dfd036d6f5ff7d81925df754bed95fc0ca3953a04fec0e3c098ac':p.bundle)||hash(readFileSync(mapfile))!==(image===V7&&p.family==='legacy-tabs'?'45bfae6e4d4c7d48035347b2a43e65ea3256338f3d95382f8432059c1e272194':p.map))return null;
+  const tar=readFileSync(context.tarball),image=hash(tar),v8=qualifyApiV8Archive(tar),v7Profile=image===V7||v8;if((![OLD,V7].includes(image)&&!v8)||!exactExtractedImage(tar,context.packageRoot))return null;
+  const tabMap=v8?'ce099ab085e59d48108c8259c7f4a576d6f50f4a11e6db4ebdd78d79a4a292c4':'45bfae6e4d4c7d48035347b2a43e65ea3256338f3d95382f8432059c1e272194';
+  const dts=join(context.packageRoot,`types/ngx-compat-material-legacy-${p.family}.d.ts`),bundle=join(context.packageRoot,`fesm2022/ngx-compat-material-legacy-${p.family}.mjs`),mapfile=bundle+'.map';if(realpathSync(file.fileName)!==realpathSync(dts)||hash(file.text)!==p.dts||hash(readFileSync(dts))!==p.dts||hash(readFileSync(bundle))!==(v7Profile&&p.family==='legacy-tabs'?'ab6891ffa20dfd036d6f5ff7d81925df754bed95fc0ca3953a04fec0e3c098ac':p.bundle)||hash(readFileSync(mapfile))!==(v7Profile&&p.family==='legacy-tabs'?tabMap:p.map))return null;
   for(const [path,sha] of Object.entries(refs))if(hash(readFileSync(join(context.referenceRoot,path)))!==sha)return null;
   for(const [path,sha] of Object.entries(owned))if(hash(readFileSync(join(ROOT,'projects/ngx-material-legacy',path)))!==sha)return null;
   const source=readFileSync(join(ROOT,'projects/ngx-material-legacy',p.source));if(hash(source)!==p.sourceHash)return null;

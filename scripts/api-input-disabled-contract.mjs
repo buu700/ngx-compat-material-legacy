@@ -6,6 +6,7 @@
  * Finite qualification of the reviewed native-disabled input repair.
  */
 import {createHash} from 'node:crypto';
+import {qualifyApiV8Archive} from './api-v8-artifact-successor.mjs';
 import {createRequire} from 'node:module';
 import {gunzipSync} from 'node:zlib';
 import {existsSync,readFileSync,realpathSync,readdirSync,lstatSync} from 'node:fs';
@@ -61,7 +62,7 @@ export function inputDisabledProof(symbol,sourceFile,context){
  try{
   if(symbol?.symbol_id!=='legacy-input/primary/MatLegacyInput'||symbol.family!=='legacy-input'||symbol.kind!=='primary'||symbol.name!=='MatLegacyInput'||!sourceFile?.fileName||!context?.tarball||!context?.packageRoot||!context?.referenceRoot)return null;
   const archive=readFileSync(context.tarball);
-  const TAR=sha(archive);if(![OLD,NEW].includes(TAR)||sha(readFileSync(join(ROOT,'compatibility/rc/parent-main-native-disabled-input-repair-v1.json')))!=='837337ed99743946ccecffd57fd4453a0455694ed8235f882bf9b62e4f201d9e')return null;
+  const TAR=sha(archive),v8=qualifyApiV8Archive(archive);if((![OLD,NEW].includes(TAR)&&!v8)||sha(readFileSync(join(ROOT,'compatibility/rc/parent-main-native-disabled-input-repair-v1.json')))!=='837337ed99743946ccecffd57fd4453a0455694ed8235f882bf9b62e4f201d9e')return null;
   if(!exactExtractedImage(archive,context.packageRoot))return null;
   if(realpathSync(sourceFile.fileName)!==realpathSync(join(context.packageRoot,Object.keys(IMAGES)[0]))||sha(sourceFile.text)!==IMAGES[Object.keys(IMAGES)[0]])return null;
   if(sha(readFileSync(join(ROOT,'projects/ngx-material-legacy/legacy-input/input.ts')))!==SOURCE||sha(readFileSync(join(context.referenceRoot,'legacy-input/input.ts')))!=='cd42800ed6494be21256031f724f8059894be709ffa798bcf97103a7bcd90b90'||sha(readFileSync(join(context.referenceRoot,'input/input.ts')))!=='42b930c769cf58cdaf03e76f58ac7d6a2837cc63a56905ade099a9ac1646a116')return null;
@@ -77,7 +78,7 @@ export function inputDisabledProof(symbol,sourceFile,context){
   const host=ts.createCompilerHost(options),get=host.getSourceFile.bind(host),exists=host.fileExists.bind(host),read=host.readFile.bind(host);
   host.fileExists=f=>f===virtual||exists(f);host.readFile=f=>f===virtual?text:read(f);host.getSourceFile=(f,v,...args)=>f===virtual?ts.createSourceFile(f,text,v,true):get(f,v,...args);
   const program=ts.createProgram([virtual],options,host);if(ts.getPreEmitDiagnostics(program).length)return null;
-  const sources=closure(program,virtual),CLOSURE=CLOSURES[TAR];if(sources.length!==312||inputHarnessClosureFingerprint(sources)!==CLOSURE)return null;
+  const sources=closure(program,virtual),CLOSURE=CLOSURES[v8?NEW:TAR];if(sources.length!==312||inputHarnessClosureFingerprint(sources)!==CLOSURE)return null;
   const checker=program.getTypeChecker(),file=program.getSourceFile(sourceFile.fileName),cls=file?.statements.find(n=>ts.isClassDeclaration(n)&&n.name?.text==='MatLegacyInput');
   const base=cls?.heritageClauses?.flatMap(h=>[...h.types]);if(base?.length!==1||!ts.isIdentifier(base[0].expression))return null;
   const alias=checker.getSymbolAtLocation(base[0].expression),parent=alias&&(alias.flags&ts.SymbolFlags.Alias)&&checker.getAliasedSymbol(alias);
