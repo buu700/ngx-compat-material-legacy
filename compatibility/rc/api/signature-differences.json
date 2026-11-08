@@ -3,6 +3,41 @@
   "role": "Exact historical/owned signature pairs that are intentional legacy differences. They are not matches. An unlisted pair still fails.",
   "differences": [
     {
+      "symbol_id": "legacy-dialog/primary/MatLegacyDialogConfig",
+      "classification": "intentional-legacy-difference",
+      "historical_signature": null,
+      "owned_signature": "public prop autoFocus:string|boolean?",
+      "rationale": "The explicit owned property retains historical boolean and string focus settings without depending on the peer planned-removal signature. Packed strict consumer compilation, owned focus code and native focus controls are in this packet."
+    },
+    {
+      "symbol_id": "legacy-dialog/primary/_MatLegacyDialogContainerBase",
+      "classification": "intentional-legacy-difference",
+      "historical_signature": "protected method _trapFocus():void",
+      "owned_signature": "protected method _trapFocus(boolean?,()=>void?,boolean?):void",
+      "rationale": "Owned optional parameters coordinate initial focus and recapture. No-argument invocation and dynamic no-argument subclass override were exercised with inherited capture and completion in the packed native consumer."
+    },
+    {
+      "symbol_id": "legacy-dialog/primary/_MatLegacyDialogContainerBase",
+      "classification": "intentional-legacy-difference",
+      "historical_signature": "public constructor(ElementRef,FocusTrapFactory,any,MatDialogConfig,InteractivityChecker,NgZone,OverlayRef,FocusMonitor?)",
+      "owned_signature": "public constructor(ElementRef,FocusTrapFactory,any,LegacyDialogRuntimeConfig,InteractivityChecker,NgZone,OverlayRef,FocusMonitor?)",
+      "rationale": "The owned runtime configuration retains historical focus and duration inputs independently of peer planned-removal annotations. Exact constructor argument count, caller config identity, public token and strict packed consumer assignments were checked."
+    },
+    {
+      "symbol_id": "legacy-dialog/primary/_MatLegacyDialogContainerBase",
+      "classification": "intentional-legacy-difference",
+      "historical_signature": "public readonly prop _config:MatDialogConfig",
+      "owned_signature": "public readonly prop _config:LegacyDialogRuntimeConfig",
+      "rationale": "The owned runtime configuration retains historical focus and duration inputs independently of peer planned-removal annotations. The actual caller configuration identity and scope and strict packed consumer assignments were checked."
+    },
+    {
+      "symbol_id": "legacy-dialog/primary/_MatLegacyDialogContainerBase",
+      "classification": "intentional-legacy-difference",
+      "historical_signature": null,
+      "owned_signature": "protected method _cancelPendingInitialFocus():void",
+      "rationale": "The owned container exposes an additional protected cancellation method. Exact a488 Chromium 149 controls observed pending focus cleared after quick close and destruction in zoneful and zoneless modes, and during a zoneless enabled-motion exit race; this is bounded lifecycle evidence, not full peer or browser qualification."
+    },
+    {
       "symbol_id": "legacy-table/primary/MatLegacyColumnDef",
       "classification": "intentional-legacy-difference",
       "historical_signature": "protected method _updateColumnCssClassName():*",

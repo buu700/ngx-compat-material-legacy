@@ -76,7 +76,7 @@ export function runFactory(factory, Injector, runInInjectionContext, options = {
   try{value=runInInjectionContext(tracing,()=>factory());}
   catch(caught){outcome='threw';error=String(caught?.message||caught);errorStack=String(caught?.stack||caught);}
   finally{if(!borrowed)base.destroy?.();}
-  return {requests,outcome,error,errorStack,value,context:borrowed?'caller-supplied public injector context':'empty-injector diagnostic; not node/application qualification'};
+  return {requests,outcome,error,errorStack,value,tracing,context:borrowed?'caller-supplied public injector context':'empty-injector diagnostic; not node/application qualification'};
 }
 
 /** Original module ownership selects caller providers before the owned factory executes. */
@@ -298,11 +298,27 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
       }
     }
     if(ownedDialogFocusProfile(symbol.symbol_id)&&factory.outcome==='returned'){
-      const partition=await partitionOwnedDialogFocus(factory.requests,core,
-        await loadRuntimeModule(packageRoot,'legacy-dialog','primary'),value,symbol,
-        resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-dialog.mjs'),runFactory,
-        fixture.element.injector,factory.value,importModule);
+      const dialogOwned=await loadRuntimeModule(packageRoot,'legacy-dialog','primary');
+      const dialogFile=resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-dialog.mjs');
+      const invoke=(requests=factory.requests,owner=dialogOwned,node=fixture,file=dialogFile)=>partitionOwnedDialogFocus(requests,core,owner,value,symbol,file,runFactory,fixture.element.injector,factory.value,importModule,node,factory.tracing);
+      const snapshot=factory.requests.map(r=>({...r}));
+      const appIndex=snapshot.findIndex(r=>r.token===core.ApplicationRef&&r.optional);
+      if(appIndex<0)throw Error('actual optional ApplicationRef request missing from control');
+      const wrongToken=snapshot.map(r=>({...r}));wrongToken[appIndex].token=core.Injector;
+      const wrongFlags=snapshot.map(r=>({...r}));wrongFlags[appIndex].optional=false;
+      const mutantCases=[['wrong-token',()=>invoke(wrongToken)],['wrong-flags',()=>invoke(wrongFlags)],
+        ['forged-owner',()=>invoke(snapshot,{...dialogOwned,_MatLegacyDialogContainerBase:class Forged{}})],
+        ['copied-node-scope',()=>invoke(snapshot,dialogOwned,{...fixture,childValue:{scope:'forged'}})],
+        ['wrong-artifact',()=>invoke(snapshot,dialogOwned,fixture,resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-core.mjs'))]];
+      for(const [name,probe] of mutantCases){let rejected=false;try{await probe()}catch{rejected=true}if(!rejected)throw Error('dialog negative control was not rejected: '+name)}
+      const partition=await invoke(snapshot);
+      partition.observation.actual_negative_controls=mutantCases.map(([name])=>name);
       factory.requests=partition.requests;factory.ownedDialogFocusContext=partition.observation;
+      const manual=new value(...requiredParentCapture.inputs);
+      if(manual._legacyRenderInjector!==null||manual._legacyApplicationRef!==null)throw Error('manual constructor ambient render fields must be null');
+      manual.ngOnDestroy();
+      if(!manual._legacyFocusDestroyed||fixture.element.destroyed||fixture.environment.destroyed)throw Error('manual constructor teardown corrupted borrowed fixture');
+      factory.ownedDialogFocusContext.manual_constructor_verified=true;
     }
     if(ownedMotionProfile(symbol.symbol_id)&&factory.outcome==='returned'){
       const owned=await loadRuntimeModule(packageRoot,'legacy-core','primary');

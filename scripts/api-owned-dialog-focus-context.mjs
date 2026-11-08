@@ -18,6 +18,8 @@ const profiles={
  'legacy-dialog/primary/_MatLegacyDialogContainerBase':{depth:0,arity:8},
 };
 const fields=[
+ {field:'_legacyRenderInjector',name:'Injector',spec:'@angular/core'},
+ {field:'_legacyApplicationRef',name:'ApplicationRef',spec:'@angular/core'},
  {field:'_legacyChangeDetector',name:'ChangeDetectorRef',spec:'@angular/core'},
  {field:'_legacyDialogRef',name:'DialogRef',spec:'@angular/cdk/dialog'},
  {field:'_legacyFocusPlatform',name:'Platform',spec:'@angular/cdk/platform'},
@@ -34,17 +36,20 @@ function scopes(file,Owner){
  const ts=require('typescript'),source=readFileSync(file,'utf8'),parsed=ts.createSourceFile(file,source,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
  if(parsed.parseDiagnostics.length)throw Error('owned dialog FESM syntax unavailable');
  const imports=new Map();for(const statement of parsed.statements)if(ts.isImportDeclaration(statement)&&statement.importClause?.namedBindings&&ts.isNamedImports(statement.importClause.namedBindings))for(const item of statement.importClause.namedBindings.elements)imports.set(item.name.text,{name:item.propertyName?.text||item.name.text,spec:statement.moduleSpecifier.text});
- const text=Function.prototype.toString.call(Owner),start=source.indexOf(text);
- if(start<0||source.indexOf(text,start+1)>=0)throw Error('owned dialog constructor source absent/ambiguous');
- const clsFile=ts.createSourceFile('owner.js','('+text+')',ts.ScriptTarget.Latest,true,ts.ScriptKind.JS),cls=clsFile.statements[0]?.expression?.expression;
- if(clsFile.parseDiagnostics.length||!cls||!ts.isClassExpression(cls))throw Error('owned dialog constructor AST unavailable');
+ const classes=parsed.statements.filter(n=>ts.isClassDeclaration(n)&&n.name?.text==='_MatDialogContainerBase');
+ if(classes.length!==1)throw Error('top-level dialog class absent/ambiguous');
+ const cls=classes[0],clsFile=parsed,text=cls.getText(parsed),start=cls.getStart(parsed);
+ const exports=parsed.statements.filter(n=>ts.isExportDeclaration(n)&&!n.moduleSpecifier&&n.exportClause&&ts.isNamedExports(n.exportClause)).flatMap(n=>n.exportClause.elements);
+ const ownerExports=exports.filter(e=>(e.propertyName?.text||e.name.text)==='_MatDialogContainerBase'&&e.name.text==='_MatLegacyDialogContainerBase');
+ if(ownerExports.length!==1)throw Error('actual base export binding differs');
+ if(Function.prototype.toString.call(Owner)!==text)throw Error('runtime owner and actual top-level class differ');
  let helperName;const properties=fields.map(record=>{
   const matches=cls.members.filter(n=>ts.isPropertyDeclaration(n)&&n.name?.getText(clsFile)===record.field&&n.initializer);if(matches.length!==1)throw Error('owned dialog ambient field missing/ambiguous');
   const value=matches[0].initializer;
   if(!ts.isCallExpression(value)||!ts.isIdentifier(value.expression)||value.arguments.length!==1||!ts.isIdentifier(value.arguments[0]))throw Error('owned dialog ambient field call differs');
   if(helperName&&helperName!==value.expression.text)throw Error('owned dialog ambient helper identities differ');helperName=value.expression.text;
   if(!isDeepStrictEqual(imports.get(value.arguments[0].text),{name:record.name,spec:record.spec}))throw Error('owned dialog ambient token is not the exact public import');
-  return {...record,scope:located(file,source,[[start+value.getStart(clsFile)-1,start+value.end-1]])};
+  return {...record,scope:located(file,source,[[value.getStart(clsFile),value.end]])};
  });
  const helpers=parsed.statements.filter(n=>ts.isFunctionDeclaration(n)&&n.name?.text===helperName);if(helpers.length!==1)throw Error('owned dialog ambient helper absent/ambiguous');
  const helper=helpers[0],statements=helper.body?.statements;
@@ -65,7 +70,7 @@ function scopes(file,Owner){
   proof:{file,sha256:sha(source),owner_text_sha256:sha(text),helper_text_sha256:sha(helper.getText(parsed))}};
 }
 
-export async function partitionOwnedDialogFocus(requests,core,owned,Type,symbol,file,runFactory,injector,value,importModule){
+export async function partitionOwnedDialogFocus(requests,core,owned,Type,symbol,file,runFactory,injector,value,importModule,fixture,tracing){
  const profile=ownedDialogFocusProfile(symbol.symbol_id);if(!profile)throw Error('unknown owned dialog focus caller');
  const original=originalCompilerFactoryContext(symbol.shape.originalFactory);
  if(!isDeepStrictEqual(original,symbol.shape.originalFactoryContext)||original.factory_parameters.length!==profile.arity)throw Error('original dialog focus constructor context differs');
@@ -74,8 +79,8 @@ export async function partitionOwnedDialogFocus(requests,core,owned,Type,symbol,
  const retained=[],classified=[];
  for(const request of requests){const calls=frames(request.stack),at=calls.findIndex(frame=>inside(frame,source.helper)),property=at>=0?source.properties.find(field=>inside(calls[at+1],field.scope)):null;if(property)classified.push({request,field:property.field});else retained.push(request);}
  const control=runFactory(()=>tokens.map(token=>core.inject(token,{optional:true})),core.Injector,core.runInInjectionContext,{injector,captureStack:true});
- if(control.outcome!=='returned'||control.requests.length!==4||classified.length!==4)throw Error('owned dialog focus actual/control count differs');
- for(let index=0;index<4;index++){
+ if(control.outcome!=='returned'||control.requests.length!==6||classified.length!==6)throw Error('owned dialog focus actual/control count differs');
+ for(let index=0;index<6;index++){
   const request=classified[index].request,want=control.requests[index];
   if(classified[index].field!==fields[index].field||request.token!==tokens[index]||want.token!==tokens[index]||request.unresolved||want.unresolved
    ||flags.some(flag=>Boolean(request[flag])!==(flag==='optional')||Boolean(want[flag])!==(flag==='optional')))
@@ -84,14 +89,16 @@ export async function partitionOwnedDialogFocus(requests,core,owned,Type,symbol,
   // Angular's real ViewRef implements this public protocol without extending
   // the exported abstract ChangeDetectorRef class. Its concrete view is proved
   // by the later public destruction challenge, not an instanceof shortcut.
-  if(index===0){if(typeof actual?.destroy!=='function'||typeof actual.markForCheck!=='function'||typeof actual.detectChanges!=='function'||actual.destroyed!==false)throw Error('owned dialog focus detector public protocol is incomplete');}
-  else if(actual!==control.value[index])throw Error('owned dialog focus service value differs from actual caller control');
+  if(index===2){if(typeof actual?.destroy!=='function'||typeof actual.markForCheck!=='function'||typeof actual.detectChanges!=='function'||actual.destroyed!==false)throw Error('owned dialog focus detector public protocol is incomplete');}
+  else if(index!==0&&actual!==control.value[index])throw Error('owned dialog focus service value differs from actual caller control '+index);
  }
+ if(typeof value._legacyRenderInjector?.get!=='function' || value._legacyRenderInjector.get(fixture.scopeToken,null,{self:true})!==fixture.childValue || value._legacyRenderInjector.get(fixture.scopeToken,null,{skipSelf:true})!==fixture.parentValue || control.value[0].get(fixture.scopeToken,null,{self:true})!==fixture.childValue || control.value[0].get(fixture.scopeToken,null,{skipSelf:true})!==fixture.parentValue || value._legacyRenderInjector.get(core.ApplicationRef)!==value._legacyApplicationRef || value._legacyRenderInjector.get(core.ElementRef)?.nativeElement!==fixture.element.element.nativeElement || value._legacyApplicationRef!==fixture.element.injector.get(core.ApplicationRef) || !(value._legacyApplicationRef instanceof core.ApplicationRef) || fixture.environment.destroyed || fixture.element.destroyed) throw Error('actual node injector/application scope or lifetime differs');
+
  return {requests:retained,observation:{symbol_id:symbol.symbol_id,role:'Exact owned ambient helper/constructor source plus independently resolved public optional services;original expectations unchanged',
   constructor_owner:{public_export:ownerExport,depth:profile.depth,owned_class_identity_matched:true},source:source.proof,
-  total_requests:requests.length,retained_requests:retained.length,classified_requests:4,verified:true,
-  requests:classified.map(({request},index)=>({field:fields[index].field,ident:fields[index].name,spec:fields[index].spec,identity_matched:true,value_matched:true,unresolved:false,...Object.fromEntries(flags.map(flag=>[flag,Boolean(request[flag])]))})),
-  public_control_outcome:'returned',detector_scope_verified:false}};
+  total_requests:requests.length,retained_requests:retained.length,classified_requests:6,verified:true,
+  requests:classified.map(({request},index)=>({field:fields[index].field,ident:fields[index].name,spec:fields[index].spec,identity_matched:true,value_matched:index===0?'same-node-scope':true,unresolved:false,...Object.fromEntries(flags.map(flag=>[flag,Boolean(request[flag])]))})),
+  public_control_outcome:'returned',render_node_scope_verified:true,manual_constructor_verified:false,detector_scope_verified:false}};
 }
 
 /** Destroy only the diagnostic borrowed view after the owned instance's lifetime checks. */
@@ -105,11 +112,12 @@ export function challengeOwnedDialogFocusDetector(value,fixture,observation){
 export function ownedDialogFocusObservationProblems(row){
  const profile=ownedDialogFocusProfile(row?.symbol?.symbol_id);if(!profile||row.factory_outcome!=='returned')return [];
  const x=row.factory_owned_dialog_focus_context;
- if(!x||x.symbol_id!==row.symbol.symbol_id||x.verified!==true||x.public_control_outcome!=='returned'||x.detector_scope_verified!==true||x.borrowed_context_alive_after_owned_teardown!==true
+ if(!x||!isDeepStrictEqual(x.actual_negative_controls,['wrong-token','wrong-flags','forged-owner','copied-node-scope','wrong-artifact'])||x.symbol_id!==row.symbol.symbol_id||x.verified!==true||x.public_control_outcome!=='returned'||x.render_node_scope_verified!==true||x.manual_constructor_verified!==true||x.detector_scope_verified!==true||x.borrowed_context_alive_after_owned_teardown!==true
   ||!isDeepStrictEqual(x.constructor_owner,{public_export:ownerExport,depth:profile.depth,owned_class_identity_matched:true})
-  ||!Number.isInteger(x.total_requests)||!Number.isInteger(x.retained_requests)||x.retained_requests<0||x.classified_requests!==4||x.retained_requests+4!==x.total_requests
+  ||!Number.isInteger(x.total_requests)||!Number.isInteger(x.retained_requests)||x.retained_requests<0||x.classified_requests!==6||x.retained_requests+6!==x.total_requests
+  ||x.source?.sha256!=='35b0726ed573b6e785dfc45274279d5b81d7bdd4e1164f90154e1c75692bea5f' || x.source?.owner_text_sha256!=='2899d04727fdef3bb6cca71e0d378023ba188cd289db279cb8f42840848760d8' || x.source?.helper_text_sha256!=='cf7f29ed7fd36f81c9a157298a160302ae2810a70222e1feb8356111a89d069b'
   ||!x.source?.file?.endsWith('/fesm2022/ngx-compat-material-legacy-legacy-dialog.mjs')||['sha256','owner_text_sha256','helper_text_sha256'].some(key=>!/^([a-f0-9]{64})$/.test(x.source?.[key]||''))
-  ||!Array.isArray(x.requests)||x.requests.length!==4||x.requests.some((r,index)=>!isDeepStrictEqual(r,{field:fields[index].field,ident:fields[index].name,spec:fields[index].spec,identity_matched:true,value_matched:true,unresolved:false,optional:true,self:false,skipSelf:false,host:false})))
+  ||!Array.isArray(x.requests)||x.requests.length!==6||x.requests.some((r,index)=>!isDeepStrictEqual(r,{field:fields[index].field,ident:fields[index].name,spec:fields[index].spec,identity_matched:true,value_matched:index===0?'same-node-scope':true,unresolved:false,optional:true,self:false,skipSelf:false,host:false})))
   return ['owned dialog focus source/identity/options/lifetime evidence incomplete'];
  return [];
 }
