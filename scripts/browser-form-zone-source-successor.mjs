@@ -11,6 +11,7 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {readCheckerOwnerMember} from './checker-owner-source.mjs';
+import {browserSandboxSourceSuccessor} from './browser-sandbox-source-successor.mjs';
 const SELF='scripts/browser-form-zone-source-successor.mjs';
 const PACKET='compatibility/rc/parent-zone-form-successor-v1.json';
 const PACKET_HASH='a900cfaad6fd64bbb77b2fa5ab2326d99191de8af9dd4e410d4ba22f28c9e63f';
@@ -33,10 +34,11 @@ export function browserFormZoneSourceSuccessor({root,read,line}){
  const packagePath='projects/ngx-material-legacy/package.json',packageRaw=physical(packagePath),version=JSON.parse(packageRaw).version;assert.equal(version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null,line,'browser form package line mismatch');assert.equal(hash(packageRaw),line==='21.x'?'757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d':'ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c','browser form package identity changed');
  const oldPacket=physical(row.reference_packet.path);assert.equal(hash(oldPacket),row.reference_packet.sha256);const prior=JSON.parse(oldPacket);assert.equal(prior.line,line);assert.deepEqual(prior.transitions[row.reference_packet.transition_index].after,row.before);
  const old=original(root,row.before_commit,row.path);assert.equal(hash(old),row.before.sha256);assert.equal(old.length,row.before.bytes);
- const bound=[{path:packagePath,sha256:hash(packageRaw),bytes:packageRaw.length},{path:SELF,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:packetRaw.length},{path:row.reference_packet.path,sha256:row.reference_packet.sha256,bytes:oldPacket.length},{...row.after}];
+ const sandbox=line==='main'?browserSandboxSourceSuccessor({root,read,line}):null,terminal=sandbox?sandbox.qualify(row.after):row.after;
+ const bound=[{path:packagePath,sha256:hash(packageRaw),bytes:packageRaw.length},{path:SELF,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:packetRaw.length},{path:row.reference_packet.path,sha256:row.reference_packet.sha256,bytes:oldPacket.length},{...terminal},...(sandbox?.bound??[])];
  const physicalSweep=()=>{for(const ref of bound){const raw=physical(ref.path);assert.equal(hash(raw),ref.sha256,'changed physical browser form zone successor '+ref.path);assert.equal(raw.length,ref.bytes);}assert.ok(same(physical(SELF),image),'changed loaded browser form zone successor');};
- physicalSweep();let cursor=0;const parts=[];for(const edit of row.edits){const before=Buffer.from(edit.before),after=Buffer.from(edit.after);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=old.length);assert.ok(same(old.subarray(edit.offset,edit.offset+before.length),before));parts.push(old.subarray(cursor,edit.offset),after);cursor=edit.offset+before.length;}parts.push(old.subarray(cursor));assert.ok(same(Buffer.concat(parts),physical(row.path)),'browser form literal successor differs');
+ physicalSweep();let cursor=0;const parts=[];for(const edit of row.edits){const before=Buffer.from(edit.before),after=Buffer.from(edit.after);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=old.length);assert.ok(same(old.subarray(edit.offset,edit.offset+before.length),before));parts.push(old.subarray(cursor,edit.offset),after);cursor=edit.offset+before.length;}parts.push(old.subarray(cursor));assert.ok(same(Buffer.concat(parts),sandbox?sandbox.comparisonBytes(row.after):physical(row.path)),'browser form literal successor differs');
  const assertCurrent=()=>{physicalSweep();for(const ref of bound){const raw=current(ref.path);assert.equal(hash(raw),ref.sha256,'changed browser form zone successor '+ref.path);assert.equal(raw.length,ref.bytes);}physicalSweep();};
- const qualify=ref=>ref?.path===row.before.path&&ref?.sha256===row.before.sha256&&ref?.bytes===row.before.bytes?{...row.after}:null;
- assertCurrent();return {before:{...row.before},after:{...row.after},bound:structuredClone(bound),qualify,assertCurrent,assertPhysical:physicalSweep};
+ const qualify=ref=>{if(ref?.path!==row.before.path)return null;const found=[row.before,row.after,terminal].find(r=>r.sha256===ref.sha256&&(ref.bytes===undefined||ref.bytes===r.bytes));assert.ok(found,'unknown browser form predecessor');return {...ref,sha256:terminal.sha256,...(ref.bytes===undefined?{}:{bytes:terminal.bytes})};};
+ assertCurrent();return {before:{...row.before},after:{...terminal},bound:structuredClone(bound),qualify,assertCurrent,assertPhysical:physicalSweep};
 }

@@ -12,6 +12,7 @@ import {createRequire} from 'node:module';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {sassWrapperNoticeSubject} from './sass-wrapper-notice-subject.mjs';
 import {dialogTitleProductSubject,dialogTitleReaderSubject} from './dialog-title-source-context.mjs';
+import {autocompleteCurrentSpecSourceSuccessor} from './autocomplete-current-spec-source-successor.mjs';
 
 export const AUTOCOMPLETE_SELECTION_SPEC='projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts';
 export const AUTOCOMPLETE_SELECTION_SPEC_PACKET='compatibility/rc/autocomplete-selection-spec-successor.json';
@@ -62,17 +63,23 @@ export function autocompleteSelectionSpecSubject({root,read=p=>readEvidenceMembe
   assert.equal(after.length,packet.after.bytes);assert.equal(hash(after),packet.after.sha256);
   // Enforce regular current source paths even when a test supplies a read callback.
   readEvidenceMember(root,AUTOCOMPLETE_SELECTION_SPEC);readEvidenceMember(root,AUTOCOMPLETE_SELECTION_SPEC_PACKET);
-  assert.equal(hash(read(AUTOCOMPLETE_SELECTION_SPEC)),packet.after.sha256,'unqualified autocomplete native test source');
+  const successor=line==='main'?autocompleteCurrentSpecSourceSuccessor({root,read,line}):null;
+  if(successor)assert.deepEqual(successor.before,{path:packet.path,...packet.after});
+  const currentAfter=successor?.after??{path:packet.path,...packet.after},currentSource=read(AUTOCOMPLETE_SELECTION_SPEC);
+  assert.equal(hash(currentSource),currentAfter.sha256,'unqualified autocomplete native test source');
   const configPath='projects/ngx-material-legacy/tsconfig.lib.json',configRaw=read(configPath);
+  assert.ok(Buffer.isBuffer(configRaw)&&configRaw.equals(readEvidenceMember(root,configPath)),'nonphysical native test compilation config');
   const config=ts.parseConfigFileTextToJson(configPath,configRaw.toString());assert.equal(config.error,undefined);
   assert.ok(config.config.exclude.includes('**/*.spec.ts'));
   const bound=[{path:AUTOCOMPLETE_SELECTION_SPEC_PACKET,sha256:hash(raw),bytes:raw.length},
-    {path:AUTOCOMPLETE_SELECTION_SPEC,sha256:packet.after.sha256,bytes:packet.after.bytes},
-    {path:configPath,sha256:hash(configRaw),bytes:configRaw.length}];
-  const assertCurrent=()=>{for(const ref of bound){const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'late native test source change '+ref.path);assert.equal(bytes.length,ref.bytes);}};
-  assertCurrent();return {line,path:AUTOCOMPLETE_SELECTION_SPEC,before:{...packet.before},after:{...packet.after},
+    {...currentAfter},
+    {path:configPath,sha256:hash(configRaw),bytes:configRaw.length},...(successor?.bound??[])];
+  const assertCurrent=()=>{successor?.assertCurrent();for(const ref of bound){const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'late native test source change '+ref.path);assert.equal(bytes.length,ref.bytes);}successor?.assertCurrent();};
+  // before/after describe the unchanged historical additive packet, consumed
+  // by retained report metadata. current_after/current_source bind live bytes.
+  assertCurrent();return {line,path:AUTOCOMPLETE_SELECTION_SPEC,before:{...packet.before},after:{...packet.after},current_after:{...currentAfter},
     packet:structuredClone(packet),bound:structuredClone(bound),assertCurrent,
-    original_source:Buffer.from(before),current_source:Buffer.from(after),native_or_full_source_admission_credit:false};
+    original_source:Buffer.from(before),current_source:Buffer.from(currentSource),native_or_full_source_admission_credit:false};
 }
 
 /** Exact code hooks only. No source bytes from the before-image are exposed
@@ -106,9 +113,9 @@ export function autocompleteSelectionReaderSubject({root,read=p=>readEvidenceMem
   const qualify=ref=>{
     const product=title.qualify(ref);if(product)return product;
     if(ref.path===spec.path){
-      assert.ok([spec.before.sha256,spec.after.sha256].includes(ref.sha256));
-      if(ref.bytes!==undefined)assert.equal(ref.bytes,ref.sha256===spec.before.sha256?spec.before.bytes:spec.after.bytes);
-      return {path:ref.path,...spec.after};
+      const found=[spec.before,spec.after,spec.current_after].find(r=>r.sha256===ref.sha256);assert.ok(found);
+      if(ref.bytes!==undefined)assert.equal(ref.bytes,found.bytes);
+      return {...spec.current_after};
     }
     const row=packet.code_subjects.find(row=>row.path===ref.path);if(!row)return notices.qualify(ref)??titleReaders.qualify(ref);
     const notice=notices.qualify({path:row.path,...row.after})??titleReaders.qualify({path:row.path,...row.after});
@@ -120,7 +127,7 @@ export function autocompleteSelectionReaderSubject({root,read=p=>readEvidenceMem
     return notice??{path:ref.path,...row.after};
   };
   const assertCurrent=()=>{spec.assertCurrent();title.assertCurrent();titleReaders.assertCurrent();notices.assertCurrent();for(const ref of bound){const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'late native source-reader change');assert.equal(bytes.length,ref.bytes);}};
-  const publicSpec={...spec,before:{...spec.before},after:{...spec.after},packet:structuredClone(spec.packet),bound:structuredClone(spec.bound)};
+  const publicSpec={...spec,before:{...spec.before},after:{...spec.after},current_after:{...spec.current_after},packet:structuredClone(spec.packet),bound:structuredClone(spec.bound)};
   // Reconstruct immutable prior report metadata only; never return old code bytes.
   const historicalMetadataReference=path=>{assertCurrent();const row=packet.code_subjects.find(row=>row.path===path);assert.ok(row);return {path,sha256:row.before.sha256};};
   assertCurrent();return {spec:publicSpec,bound:structuredClone(bound),qualify,assertCurrent,historicalMetadataReference,titleSource:title,titleReaders,native_or_full_source_admission_credit:false};

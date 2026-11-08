@@ -327,6 +327,26 @@ class CurrentSassToolReferences:
         assert packet['historical_reports_rewritten'] == 0 and packet['artifact_or_audit_admission_granted'] is False
         assert self._read(package_path) == package_image
         domain_overlays = {}
+        retained_reader_paths=set();retained_reader_images={}
+        if self.line=='main':
+            retained_packet=json.loads(self._member(dict(path='compatibility/rc/main-retained-current-reader-source-successors-v1.json',sha256='1c0ccfdd33c5f264960cb598c74f4a4f7aea3ffb8779570b47182ea660dd589d',bytes=8704)))
+            assert retained_packet['schema_version']==1 and retained_packet['role']=='main-retained-current-reader-source-successors' and retained_packet['base_head']=='a796c018da3023e916b37088917f6adca56fbc9d'
+            assert retained_packet['source_scope_only'] is True and retained_packet['historical_programs_executed'] is False and retained_packet['artifact_or_audit_admission_granted'] is False and retained_packet['g11_claim']=='not-passed'
+            retained_paths=['scripts/historical-repair-live-source-successor.mjs','scripts/autocomplete-selection-spec-subject.mjs'];assert [row['path'] for row in retained_packet['updates']]==retained_paths
+            assert retained_packet['new_helpers']==[dict(path='scripts/current-authored-tab-source-successor.mjs',sha256='1be9161f5b5b6c5999f951f7c1eacf62d532587b1f6824a417e3b9a741baee93',bytes=6807),dict(path='scripts/autocomplete-current-spec-source-successor.mjs',sha256='1679a61ffc4ec0ce385a689574be5b997037ab87a61d735bf42a0e0304375225',bytes=4028)]
+            assert retained_packet['support']==[dict(path='compatibility/rc/main-autocomplete-current-spec-source-successor-v1.json',sha256='507db85b892cb051ebbaee3214a48b275bae5be1a03234f53692966f47b1607d',bytes=4231)]
+            for ref in retained_packet['new_helpers']+retained_packet['support']: self._member(ref)
+            retained_env=dict(PATH=os.environ['PATH'],GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0');subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',retained_packet['base_head'],'HEAD'],cwd=self.root,env=retained_env)
+            retained_originals=_git_images(self.root,[dict(commit=retained_packet['base_head'],path=path) for path in retained_paths])
+            for retained_update in retained_packet['updates']:
+                assert retained_update['before']['path']==retained_update['after']['path']==retained_update['path']
+                before=retained_originals[(retained_packet['base_head'],retained_update['path'])];_matches(before,retained_update['before']);after=_edited(before,retained_update['edits']);_matches(after,retained_update['after']);assert self._member(retained_update['after'])==after and retained_update['path'] not in domain_overlays
+                retained_overlay=(retained_update,[(retained_update['before'],before),(retained_update['after'],after)]);domain_overlays[retained_update['path']]=retained_overlay;retained_reader_images[retained_update['path']]=retained_overlay;retained_reader_paths.add(retained_update['path'])
+        def retained_reader_comparison(ref):
+            overlay=retained_reader_images.get(ref['path'])
+            if overlay is None:return self._member(ref)
+            update,identities=overlay;meta=_metadata(ref);matches=[raw for identity,raw in identities if identity==meta];assert len(matches)==1,'unknown retained reader comparison'
+            self._member(update['after']);return bytes(matches[0])
         self._matrix_owner = None
         if self.line == 'main':
             owner_raw = _physical(self.root, MATRIX_OWNER['path']); _matches(owner_raw, MATRIX_OWNER)
@@ -509,7 +529,7 @@ class CurrentSassToolReferences:
             assert self._member(repair_composition['archive'])==final_repair; self._member(repair_composition['focus_patch']); self._member(repair_composition['independent_review'])
             focused_repair=_edited(final_repair,repair_composition['focus_edits']); _matches(focused_repair,repair_composition['intermediate']); composed_repair=_edited(focused_repair,repair_composition['composition_edits']); _matches(composed_repair,repair_composition['after']); assert self._member(repair_composition['after'])==composed_repair
             for ref in repair_composition['supports']:
-                if ref['path'] != 'compatibility/f10/authored-dependency-current-dispositions.json': self._member(ref); continue
+                if ref['path'] != 'compatibility/f10/authored-dependency-current-dispositions.json': retained_reader_comparison(ref); continue
                 assert ref==dict(path=ref['path'],sha256='460262e16c118c495e37b56c5218f0c2eadfd7bad0a71cf62fddccba05b130f4',bytes=718774)
                 parent='0feac873886782da408d5894bbf1bb26862ec45c'; commit='a796c018da3023e916b37088917f6adca56fbc9d'
                 assert subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',commit],cwd=self.root,env=env,text=True).strip()==commit+' '+parent
@@ -564,8 +584,38 @@ class CurrentSassToolReferences:
             guard_images = _git_images(self.root,[dict(commit=guard['source_parent'],path=x['path']) for x in guard['transitions']])
             for update in guard['transitions']:
                 assert update['before']['path'] == update['after']['path'] == update['path'] and update['path'] not in domain_overlays
-                before=guard_images[(guard['source_parent'],update['path'])]; after=_edited(before,update['edits']); _matches(before,update['before']); _matches(after,update['after']); assert self._member(update['after']) == after
-                domain_overlays[update['path']] = (update,[(update['before'],before),(update['after'],after)])
+                before=guard_images[(guard['source_parent'],update['path'])]; after=_edited(before,update['edits']); _matches(before,update['before']); _matches(after,update['after'])
+                if update['path']=='scripts/inventory-finite-tool-successor.mjs':
+                    tool_successor=json.loads(self._member(dict(path='compatibility/rc/main-retained-ci-tool-source-successor-v1.json',sha256='04a71083f8185094f496ffe6f110298177a7a1515d6e77c5d922212d96733d49',bytes=3133)))
+                    assert tool_successor['schema_version']==1 and tool_successor['role']=='main-retained-ci-tool-source-successor' and tool_successor['source_scope_only'] is True and tool_successor['historical_programs_executed'] is False and tool_successor['full_Actions_execution_qualified'] is False and tool_successor['g11_claim']=='not-passed' and tool_successor['base_head']=='a796c018da3023e916b37088917f6adca56fbc9d' and tool_successor['before']==update['after']
+                    subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',tool_successor['base_head'],'HEAD'],cwd=self.root,env=env);next_tool=_edited(after,tool_successor['edits']);_matches(next_tool,tool_successor['after']);assert self._member(tool_successor['after'])==next_tool
+                    domain_overlays[update['path']] = ({**update,'after':tool_successor['after']},[(update['before'],before),(update['after'],after),(tool_successor['after'],next_tool)])
+                else:
+                    assert self._member(update['after']) == after; domain_overlays[update['path']] = (update,[(update['before'],before),(update['after'],after)])
+        if self.line=='main':
+            owner=json.loads(self._member(dict(path='compatibility/rc/main-inventory-owner-verify-lite-source-successor-v1.json',sha256='b802918f6d264ea0f85e132a36830f2ea706d4e1e6036346e01ab87276baa20c',bytes=3256)))
+            assert owner['schema_version']==1 and owner['role']=='main-inventory-owner-verify-lite-source-successor' and owner['source_scope_only'] is True and owner['historical_programs_executed'] is False and owner['full_Actions_execution_qualified'] is False and owner['g11_claim']=='not-passed' and owner['base_head']=='a796c018da3023e916b37088917f6adca56fbc9d'
+            subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',owner['base_head'],'HEAD'],cwd=self.root,env=env);owner_old=_git_images(self.root,[dict(commit=owner['base_head'],path=owner['before']['path'])])[(owner['base_head'],owner['before']['path'])];_matches(owner_old,owner['before']);owner_new=_edited(owner_old,owner['edits']);_matches(owner_new,owner['after']);assert self._member(owner['after'])==owner_new and owner['before']['path'] not in domain_overlays
+            domain_overlays[owner['before']['path']]=(dict(path=owner['before']['path'],before=owner['before'],after=owner['after']),[(owner['before'],owner_old),(owner['after'],owner_new)])
+        checker_source_anchor=json.loads(self._member(dict(path='compatibility/rc/c04-checker-reference-proposal.json',sha256='fe1a877f6d427b0eb598391ee11502b49c65d0242c55956f25bd5284314d71db',bytes=16215))) if self.line=='main' else None
+        if self.line=='main':
+            authored=json.loads(self._member(dict(path='compatibility/rc/historical-repair-live-authored-v1.json',sha256='e0b1e0c866e73f4f4c9913a9bfe6c464570fa3e59baa4de64b6bb8d2f0bd6dfe',bytes=1350)))
+            assert authored['schema_version']==1 and authored['role']=='historical-repair-live-authored-use-source-successor' and authored['source_parent']=='4c29be143432bcb5b2ca99d4f83ca6ff162b4554' and authored['source_commit']=='547abe83d86c4682a173a6e01d2c783b6bb1d855' and authored['source_only'] is True and authored['historical_programs_executed'] is False and authored['artifact_or_audit_admission_granted'] is False
+            authored_images=_git_images(self.root,[dict(commit=authored['source_parent'],path=authored['before']['path']),dict(commit=authored['source_commit'],path=authored['after']['path'])]);authored_before=authored_images[(authored['source_parent'],authored['before']['path'])];authored_committed=authored_images[(authored['source_commit'],authored['after']['path'])];_matches(authored_before,authored['before']);authored_after=_edited(authored_before,authored['edits']);_matches(authored_after,authored['after']);assert authored_committed==authored_after and self._member(authored['after'])==authored_after and authored['before']['path'] not in domain_overlays
+            domain_overlays[authored['before']['path']]=(dict(path=authored['before']['path'],before=authored['before'],after=authored['after']),[(authored['before'],authored_before),(authored['after'],authored_after)])
+        if self.line=='main':
+            zone_packet=json.loads(self._member(dict(path='compatibility/rc/main-retained-browser-source-successors-v2.json',sha256='b3e41ad092991cd6270e98a0efac58514d5f3cf779081363165eda046ff6f475',bytes=24658)))
+            assert zone_packet['schema_version']==1 and zone_packet['role']=='main-retained-browser-source-successors' and zone_packet['base_head']=='a796c018da3023e916b37088917f6adca56fbc9d'
+            assert zone_packet['source_scope_only'] is True and zone_packet['historical_programs_executed'] is False and zone_packet['artifact_or_audit_admission_granted'] is False and zone_packet['g11_claim']=='not-passed'
+            zone_paths=['scripts/browser-zone-source-successor.mjs','scripts/browser-form-zone-source-successor.mjs','scripts/browser-peer-zone-source-successor.mjs'];assert [u['path'] for u in zone_packet['updates']]==zone_paths
+            assert zone_packet['new_helper']==dict(path='scripts/browser-sandbox-source-successor.mjs',sha256='e24f607fa2f559eee1209d9ec8dcb845feb8c2a8db61b21821c08aeb54179999',bytes=4017)
+            self._member(zone_packet['new_helper']);self._member(zone_packet['support'])
+            lineage_env=dict(PATH=os.environ['PATH'],GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0');subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',zone_packet['base_head'],'HEAD'],cwd=self.root,env=lineage_env)
+            zone_images=_git_images(self.root,[dict(commit=zone_packet['base_head'],path=p) for p in zone_paths])
+            for update in zone_packet['updates']:
+                assert update['before']['path']==update['path']==update['after']['path']
+                before=zone_images[(zone_packet['base_head'],update['path'])];_matches(before,update['before']);after=_edited(before,update['edits']);_matches(after,update['after']);assert self._member(update['after'])==after and update['path'] not in domain_overlays
+                domain_overlays[update['path']]=(update,[(update['before'],before),(update['after'],after)])
         inventory_prior = dict(path='testing/legacy-runner/historical-inventory.json', sha256='a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403', bytes=106309)
         inventory_current = dict(path=inventory_prior['path'], sha256='912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15', bytes=113388)
         def current_comparison(ref):
@@ -917,7 +967,7 @@ class CurrentSassToolReferences:
             path=update['path']; row=self._rows.get(path)
             if row is not None: assert dict(path=path,**row['after']) == update['before'], 'domain successor must follow previous frame'
             else:
-                assert update['before'] in next_branch['additional_inputs'], 'domain predecessor is not an existing input'
+                assert path in retained_reader_paths or update['before'] in next_branch['additional_inputs'] or (path=='scripts/authored-current-use-inventory.mjs' and checker_source_anchor is not None and update['before'] in checker_source_anchor['source_members']), 'domain predecessor is not an existing input'
                 row=dict(path=path,before=dict(sha256=update['before']['sha256'],bytes=update['before']['bytes']),identities={}); self._rows[path]=row
             for ref, raw in identities: self._add(row,ref,raw)
             row['after']=dict(sha256=update['after']['sha256'],bytes=update['after']['bytes'])

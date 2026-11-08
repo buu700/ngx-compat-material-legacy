@@ -35,7 +35,22 @@ export function browserZoneSourceSuccessor({root,read,line}){
  assert.equal(packet.schema_version,1);assert.equal(packet.role,'proposed-exact-browser-zone-and-source-binding-successor');
  assert.equal(packet.historical_packets_rewritten,false);assert.equal(packet.old_programs_executed,false);assert.equal(packet.native_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');
  const row=packet.browser[line],path='scripts/browser-required-cells.mjs';assert.equal(row.path,path);assert.equal(row.before.path,path);assert.equal(row.after.path,path);
- const bound=[{path:SELF,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:packetRaw.length},{...row.after}];
+ // The later main launcher fix removes exactly one sandbox-disabling flag.
+ // Retain the zone transition as historical data and authenticate its successor.
+ let terminal={...row.after};
+ if(line==='main'){
+  const parent='fdcdadee28c4552e3500b5099de9f42e456adb5c',commit='8e9e7316806fe9266373865b0784e9917659e5e8';
+  const env={PATH:process.env.PATH,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1',GIT_TERMINAL_PROMPT:'0'};
+  assert.equal(execFileSync('git',['--no-replace-objects','rev-list','--parents','-n','1',commit],{cwd:root,env,encoding:'utf8'}).trim(),commit+' '+parent);
+  execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',commit,'HEAD'],{cwd:root,env});
+  const prior=git(root,parent,path),next=git(root,commit,path);
+  assert.equal(hash(prior),row.after.sha256);assert.equal(prior.length,row.after.bytes);
+  const text=prior.toString('utf8'),needle="    '--no-sandbox',\n";
+  assert.equal(text.split(needle).length,2);assert.ok(equal(Buffer.from(text.replace(needle,'')),next));
+  assert.equal(hash(next),'1ff46b8442f8b66fa92d3b8340c0169950007e8e9a19bfc5630bc36bf806e0b2');assert.equal(next.length,64913);
+  terminal={path,sha256:hash(next),bytes:next.length};
+ }
+ const bound=[{path:SELF,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:packetRaw.length},terminal];
  const physicalSweep=()=>{for(const ref of bound){const raw=physical(ref.path);assert.equal(hash(raw),ref.sha256,'changed physical browser zone successor '+ref.path);assert.equal(raw.length,ref.bytes);}assert.ok(equal(physical(SELF),image),'changed loaded browser zone successor');};
  physicalSweep();
  const before=git(root,row.old_commit,path),committed=git(root,row.new_commit,path);
@@ -45,5 +60,5 @@ export function browserZoneSourceSuccessor({root,read,line}){
  for(const edit of row.edits){const offset=edit.offset,old=Buffer.from(edit.before),replacement=Buffer.from(edit.after);assert.ok(Number.isSafeInteger(offset)&&offset>=cursor);assert.ok(equal(before.subarray(offset,offset+old.length),old));parts.push(before.subarray(cursor,offset),replacement);cursor=offset+old.length;}
  parts.push(before.subarray(cursor));assert.ok(equal(Buffer.concat(parts),committed),'browser zone literal successor differs');
  const assertCurrent=()=>{physicalSweep();for(const ref of bound){const raw=current(ref.path);assert.equal(hash(raw),ref.sha256,'changed browser zone successor '+ref.path);assert.equal(raw.length,ref.bytes);}physicalSweep();};
- assertCurrent();return {before:{...row.before},after:{...row.after},bound:structuredClone(bound),assertCurrent,assertPhysical:physicalSweep};
+ assertCurrent();return {before:{...row.before},after:{...terminal},bound:structuredClone(bound),assertCurrent,assertPhysical:physicalSweep};
 }

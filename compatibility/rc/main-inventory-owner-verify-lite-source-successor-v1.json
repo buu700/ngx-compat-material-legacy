@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "role": "main-inventory-owner-verify-lite-source-successor",
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "full_Actions_execution_qualified": false,
+  "g11_claim": "not-passed",
+  "base_head": "a796c018da3023e916b37088917f6adca56fbc9d",
+  "before": {
+    "path": "scripts/inventory-reference-owner.mjs",
+    "sha256": "531a7a6df67299e66b8502b9e5da1ca287b1247ac71bcaaa741455e293812b78",
+    "bytes": 20838
+  },
+  "after": {
+    "path": "scripts/inventory-reference-owner.mjs",
+    "sha256": "9edbc8bd75f797605dd51b9f8eb14d0f0eacb096157bb6511bb05c0b9aa66d39",
+    "bytes": 23040
+  },
+  "edits": [
+    {
+      "offset": 9493,
+      "before": "",
+      "after": "// Finite main-only verify-lite successor: one newly added artifact test.\n const liteBefore={path:'scripts/rc-verify-lite.py',sha256:'90c2c418accbebd3ad287c664b6ba3d7914669f47c6063f6c07dedc5e87f78c2',bytes:15859};\n const liteAfter={path:liteBefore.path,sha256:'f1368a97055e94ee653ae0f3cbf6ab8a12b851fefa9db41379149d0ddef3c01c',bytes:15922};\n if(line==='main'){\n  const parent='8470b8661cf134588e30e4c4c7c79ffff6a15a14',commit='c72d88c74944463d1fea960ae718fb30944818c9';\n  const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1',GIT_TERMINAL_PROMPT:'0'};for(const key of Object.keys(env))if(key.startsWith('GIT_')&&!['GIT_NO_LAZY_FETCH','GIT_NO_REPLACE_OBJECTS','GIT_TERMINAL_PROMPT'].includes(key))delete env[key];\n  assert.equal(execFileSync('git',['--no-replace-objects','rev-list','--parents','-n','1',commit],{cwd:root,env,encoding:'utf8'}).trim(),commit+' '+parent);\n  execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',commit,'HEAD'],{cwd:root,env});\n  const before=original(root,parent,liteBefore.path),after=original(root,commit,liteAfter.path),needle='    [\\\"node\\\", \\\"scripts/fresh-artifact-negative-tests.mjs\\\"],\\n',insert='    [\\\"node\\\", \\\"tests/legacy_external_artifact_resolution.mjs\\\"],\\n';\n  assert.equal(hash(before),liteBefore.sha256);assert.equal(before.length,liteBefore.bytes);assert.equal(hash(after),liteAfter.sha256);assert.equal(after.length,liteAfter.bytes);const text=before.toString('utf8');assert.equal(text.split(needle).length,2);assert.ok(Buffer.from(text.replace(needle,insert+needle)).equals(after));\n  const testPath='tests/legacy_external_artifact_resolution.mjs',test=original(root,commit,testPath);assert.equal(hash(test),'1fbe88d13b8c71789156186a4f4fa5b3836441108900939ae0adf1a753cbf85a');assert.equal(test.length,3732);assert.ok(test.equals(readEvidenceMember(root,testPath)));\n }\n const qualifyLite=ref=>line==='main'&&ref.path===liteBefore.path&&ref.sha256===liteBefore.sha256?(assert.equal(ref.bytes??liteBefore.bytes,liteBefore.bytes),liteAfter):ref;\n "
+    },
+    {
+      "offset": 9630,
+      "before": "",
+      "after": "qualifyLite"
+    },
+    {
+      "offset": 10265,
+      "before": "",
+      "after": ";\n if(line==='main')member('tests/legacy_external_artifact_resolution.mjs','1fbe88d13b8c71789156186a4f4fa5b3836441108900939ae0adf1a753cbf85a')"
+    },
+    {
+      "offset": 11671,
+      "before": "",
+      "after": "qualifyLite("
+    },
+    {
+      "offset": 11697,
+      "before": "",
+      "after": ")"
+    }
+  ]
+}

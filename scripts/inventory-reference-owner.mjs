@@ -128,13 +128,27 @@ export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwner
  const tool=inventoryFiniteToolSuccessor({root,line,read});
  const bound=new Map([...rc.bound,...tool.bound].map(ref=>[ref.path,{...ref}]));
  let active=false;const idle=()=>assert.equal(active,false,'reentrant inventory owner consumption');
+ // Finite main-only verify-lite successor: one newly added artifact test.
+ const liteBefore={path:'scripts/rc-verify-lite.py',sha256:'90c2c418accbebd3ad287c664b6ba3d7914669f47c6063f6c07dedc5e87f78c2',bytes:15859};
+ const liteAfter={path:liteBefore.path,sha256:'f1368a97055e94ee653ae0f3cbf6ab8a12b851fefa9db41379149d0ddef3c01c',bytes:15922};
+ if(line==='main'){
+  const parent='8470b8661cf134588e30e4c4c7c79ffff6a15a14',commit='c72d88c74944463d1fea960ae718fb30944818c9';
+  const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1',GIT_TERMINAL_PROMPT:'0'};for(const key of Object.keys(env))if(key.startsWith('GIT_')&&!['GIT_NO_LAZY_FETCH','GIT_NO_REPLACE_OBJECTS','GIT_TERMINAL_PROMPT'].includes(key))delete env[key];
+  assert.equal(execFileSync('git',['--no-replace-objects','rev-list','--parents','-n','1',commit],{cwd:root,env,encoding:'utf8'}).trim(),commit+' '+parent);
+  execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',commit,'HEAD'],{cwd:root,env});
+  const before=original(root,parent,liteBefore.path),after=original(root,commit,liteAfter.path),needle='    [\"node\", \"scripts/fresh-artifact-negative-tests.mjs\"],\n',insert='    [\"node\", \"tests/legacy_external_artifact_resolution.mjs\"],\n';
+  assert.equal(hash(before),liteBefore.sha256);assert.equal(before.length,liteBefore.bytes);assert.equal(hash(after),liteAfter.sha256);assert.equal(after.length,liteAfter.bytes);const text=before.toString('utf8');assert.equal(text.split(needle).length,2);assert.ok(Buffer.from(text.replace(needle,insert+needle)).equals(after));
+  const testPath='tests/legacy_external_artifact_resolution.mjs',test=original(root,commit,testPath);assert.equal(hash(test),'1fbe88d13b8c71789156186a4f4fa5b3836441108900939ae0adf1a753cbf85a');assert.equal(test.length,3732);assert.ok(test.equals(readEvidenceMember(root,testPath)));
+ }
+ const qualifyLite=ref=>line==='main'&&ref.path===liteBefore.path&&ref.sha256===liteBefore.sha256?(assert.equal(ref.bytes??liteBefore.bytes,liteBefore.bytes),liteAfter):ref;
  const member=(path,expected)=>{
   idle();
-  if(expected){const first=rc.qualify({path,sha256:expected})??{path,sha256:expected};expected=(tool.qualify(first)??first).sha256;}
+  if(expected){const first=rc.qualify({path,sha256:expected})??{path,sha256:expected};expected=qualifyLite(tool.qualify(first)??first).sha256;}
   const physical=readHistoricalContractRepairOwnerMember(root,path),raw=read(path);assert.ok(Buffer.isBuffer(raw)&&physical.equals(raw),'nonphysical inventory owner input '+path);assert.ok(physical.equals(readHistoricalContractRepairOwnerMember(root,path)),'inventory owner input changed during callback '+path);
   if(expected)assert.equal(hash(raw),expected,'changed inventory owner input '+path);
   const ref={path,sha256:hash(raw),bytes:raw.length},prior=bound.get(path);if(prior)assert.deepEqual(ref,prior,'changed repeated inventory owner input '+path);else bound.set(path,ref);return raw;
  };
+ if(line==='main')member('tests/legacy_external_artifact_resolution.mjs','1fbe88d13b8c71789156186a4f4fa5b3836441108900939ae0adf1a753cbf85a');
  const packetRaw=member(PACKET,PINS[line]),packet=JSON.parse(packetRaw);assert.equal(packet.line,line);assert.equal(packet.schema_version,1);
  assert.equal(packet.old_functions_executed_as_current_compiled_code,true);assert.equal(packet.old_program_execution,false);
  for(const key of ['source_admissions_changed','canonical_dispositions_changed','product_changes'])assert.equal(packet[key],0);
@@ -146,7 +160,7 @@ export function inventoryReferenceOwnerContext({root,read=path=>readCheckerOwner
  assert.equal(hash(ownerExpected),packet.after_owner.sha256);assert.equal(Buffer.byteLength(ownerExpected),packet.after_owner.bytes);
  const owner=member(OWNER,packet.after_owner.sha256);assert.equal(owner.toString(),ownerExpected);
  assert.equal(hash(readEvidenceMember(root,OWNER)),packet.after_owner.sha256,'actual loaded owner path differs from qualified code');
- for(const prior of packet.source_members){const first=rc.qualify(prior)??prior,ref=tool.qualify(first)??first,raw=member(ref.path,ref.sha256);assert.equal(raw.length,ref.bytes);}
+ for(const prior of packet.source_members){const first=rc.qualify(prior)??prior,ref=qualifyLite(tool.qualify(first)??first),raw=member(ref.path,ref.sha256);assert.equal(raw.length,ref.bytes);}
  const historicalHandlers=new Map();
  for(const transition of packet.historical_handler_metadata){
   assert.equal(line,'21.x');assert.ok(['scripts/upstream-dialog-title-admission.cjs','scripts/upstream-dialog-title-native-evidence.mjs'].includes(transition.after.path));
