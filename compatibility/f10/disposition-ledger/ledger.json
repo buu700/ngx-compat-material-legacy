@@ -60473,18 +60473,85 @@
         "tools/public_api_guard/material/card.md"
       ],
       "diff_sha256": "50f476e6d0bfe10688b91e5949f50b9cd809c169099311512b03b4e3f6534738",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/af42dd6be9b094865ffcb3e7ad4aa03135ed6322.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-owned-metadata-main-v1/af42dd6be9b094865ffcb3e7ad4aa03135ed6322.json",
+      "batch_id": "c04-owned-metadata-main-v1",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/card/card.spec.ts changes `imports: [MatCardModule],`. That line is not in the legacy sources. @angular/material/card is exercised by projects/ngx-material-legacy/legacy-card/testing/card-harness.spec.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/card imported by projects/ngx-material-legacy/legacy-card/testing/card-harness.spec.ts"
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "do-not-adopt",
+      "reason": "Modern MDC card declarations acquire standalone metadata and move from declarations to imports/exports; fixtures and public guard follow. Retain the owned historical card declarations, selectors and module, rather than importing the modern card component. The modern card harness in a test does not make the owned renderer inherited.",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-card/card-module.ts",
+            "sha256": "61b34db8fc65cb49592fb5a5960a92cf78b9227ff493e6d99fed1d60e32a2c77",
+            "bytes": 1581
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-card/card.ts",
+            "sha256": "2e2c16ba865b712214e0d51a739fd01e20af819e65065e2b99b55cc1433208ad",
+            "bytes": 5279
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-card/index.ts",
+            "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+            "bytes": 233
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-card/internal/common-behaviors/color.ts",
+            "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+            "bytes": 1888
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-card/internal/common-behaviors/constructor.ts",
+            "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+            "bytes": 450
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-card/internal/common-behaviors/disable-ripple.ts",
+            "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+            "bytes": 1211
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-card/internal/common-behaviors/disabled.ts",
+            "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+            "bytes": 1073
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-card/internal/common-behaviors/error-state.ts",
+            "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+            "bytes": 2623
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-card/internal/common-behaviors/index.ts",
+            "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+            "bytes": 625
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-card/internal/common-behaviors/initialized.ts",
+            "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+            "bytes": 3061
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-card/internal/common-behaviors/tabindex.ts",
+            "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+            "bytes": 1503
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-card/public-api.ts",
+            "sha256": "fbac5b639299be4e5f50fad108597972860c0193a6c79edd2091c15241319d46",
+            "bytes": 606
+          }
+        ],
+        "diff_sha256": "5df29988d410d6ef4b20efcdf9059ec2d7ac7d1e0b38a3fb967ef10fb05578d9",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Modern MDC card declarations acquire standalone metadata and move from declarations to imports/exports; fixtures and public guard follow. Retain the owned historical card declarations, selectors and module, rather than importing the modern card component. The modern card harness in a test does not make the owned renderer inherited."
       }
     },
     {
@@ -60500,18 +60567,100 @@
         "tools/public_api_guard/material/checkbox.md"
       ],
       "diff_sha256": "187a63f1d4a6c7921c214b89cbbd9831f3471810321e5bef4efca54777325c58",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/824e035e64eeab825c24c7e74e05702fbe2fe8fa.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-owned-metadata-main-v1/824e035e64eeab825c24c7e74e05702fbe2fe8fa.json",
+      "batch_id": "c04-owned-metadata-main-v1",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/checkbox/checkbox-required-validator.ts changes `standalone: true,`. That line is not in the legacy sources. @angular/material/checkbox is exercised by projects/ngx-material-legacy/legacy-checkbox/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/checkbox imported by projects/ngx-material-legacy/legacy-checkbox/public-api.ts"
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "do-not-adopt",
+      "reason": "The modern checkbox and its required validator become standalone, ripple and module metadata move, and fixtures and public guard change; the TODO is non-operative. Retain the owned checkbox and local required-validator directive with its NG_VALIDATORS multi provider, selector and aliases. That directive extends the public Forms CheckboxRequiredValidator; checkbox option types and default token are peer public exports, not the modern component metadata.",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox-module.ts",
+            "sha256": "a1dfbaa86342a3876d3d22dcd4380d8379e85a4e046a8b2be156b6a7b48ce6d5",
+            "bytes": 907
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.ts",
+            "sha256": "774db12b55590d631d0a69c68a9aa7289adf600ac3fe62e288dd22fcf3c86766",
+            "bytes": 5525
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/index.ts",
+            "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+            "bytes": 233
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/internal/checkbox-base.ts",
+            "sha256": "e4e3aaa653750e7d9ce901e76c3ee0b9fe3f242439bbf0850ad1594503dd1437",
+            "bytes": 16642
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/internal/checkbox-required-validator.ts",
+            "sha256": "88f2ea043de50069c4abb38c9e53c884d9f3973a71766ba27d0695897734f019",
+            "bytes": 1071
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/internal/common-behaviors/color.ts",
+            "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+            "bytes": 1888
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/internal/common-behaviors/constructor.ts",
+            "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+            "bytes": 450
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/internal/common-behaviors/disable-ripple.ts",
+            "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+            "bytes": 1211
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/internal/common-behaviors/disabled.ts",
+            "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+            "bytes": 1073
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/internal/common-behaviors/error-state.ts",
+            "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+            "bytes": 2623
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/internal/common-behaviors/index.ts",
+            "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+            "bytes": 625
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/internal/common-behaviors/initialized.ts",
+            "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+            "bytes": 3061
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/internal/common-behaviors/tabindex.ts",
+            "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+            "bytes": 1503
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/owned-transition-state.ts",
+            "sha256": "ffa33cd647c3cede4b576c6fdc77bc4177a2fdfca0e28f67d96301e95965607a",
+            "bytes": 739
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/public-api.ts",
+            "sha256": "ee7d7028843ce1ea3da51a5253501a2fe7304d6ea51cfde777c97d9eb69b823b",
+            "bytes": 1269
+          }
+        ],
+        "diff_sha256": "4f594c9ad29ff217bffcaf4c82b9af4f54e558b1289de6a7e661ff14624683fc",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The modern checkbox and its required validator become standalone, ripple and module metadata move, and fixtures and public guard change; the TODO is non-operative. Retain the owned checkbox and local required-validator directive with its NG_VALIDATORS multi provider, selector and aliases. That directive extends the public Forms CheckboxRequiredValidator; checkbox option types and default token are peer public exports, not the modern component metadata."
       }
     },
     {
@@ -60782,18 +60931,90 @@
         "tools/public_api_guard/material/list.md"
       ],
       "diff_sha256": "6402aced091f9fd1883807294b488ac9b3512a22f77183174f9df0a2eebacfc0",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/6f1e66f762a3807c67eb377f35ff0b096f769822.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-owned-metadata-main-v1/6f1e66f762a3807c67eb377f35ff0b096f769822.json",
+      "batch_id": "c04-owned-metadata-main-v1",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/list/action-list.ts changes `standalone: true,`. That line is not in the legacy sources. @angular/material/list is exercised by projects/ngx-material-legacy/legacy-list/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/list imported by projects/ngx-material-legacy/legacy-list/public-api.ts"
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "do-not-adopt",
+      "reason": "Modern list, action/nav, selection, section and subheader declarations acquire standalone imports and module changes, with fixtures and public guard following. Retain the owned historical list declarations and topology. The public MAT_LIST and MAT_NAV_LIST tokens and peer divider module/harness remain specific peer dependencies; they do not make modern list component metadata the owned implementation.",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/index.ts",
+            "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+            "bytes": 233
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/color.ts",
+            "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+            "bytes": 1888
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/constructor.ts",
+            "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+            "bytes": 450
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/disable-ripple.ts",
+            "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+            "bytes": 1211
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/disabled.ts",
+            "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+            "bytes": 1073
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/error-state.ts",
+            "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+            "bytes": 2623
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/index.ts",
+            "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+            "bytes": 625
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/initialized.ts",
+            "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+            "bytes": 3061
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/tabindex.ts",
+            "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+            "bytes": 1503
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+            "sha256": "572b01d580e4a9c12c72278bbe11d111faafbd6a5534c1fafec0cd77a9ab5208",
+            "bytes": 1679
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/list.ts",
+            "sha256": "6c358d9985e677d5ba8037f3b9aa471d35f657a172ab789f754f41952ebd0d7e",
+            "bytes": 6980
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/public-api.ts",
+            "sha256": "8d41a1301df99bcb8b54ef437322431d3910136cf554f90550426d1b80889b00",
+            "bytes": 795
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/selection-list.ts",
+            "sha256": "e408bbc42e122dcb9197d2fb850740a9cf769d650ec70442b595428ce747c206",
+            "bytes": 24059
+          }
+        ],
+        "diff_sha256": "5b1903fe480c855aedf9e1468a718a093b7800fb10bce978b97e8f96227434d0",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Modern list, action/nav, selection, section and subheader declarations acquire standalone imports and module changes, with fixtures and public guard following. Retain the owned historical list declarations and topology. The public MAT_LIST and MAT_NAV_LIST tokens and peer divider module/harness remain specific peer dependencies; they do not make modern list component metadata the owned implementation."
       }
     },
     {
@@ -60808,18 +61029,95 @@
         "tools/public_api_guard/material/paginator.md"
       ],
       "diff_sha256": "dd3b33475ea5c534c9bdd13c10ac71b5fdf876947675cb1f27d5c937553d47af",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/367f868c829ef0a31f2b816b1d2401d979e15415.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-owned-metadata-main-v1/367f868c829ef0a31f2b816b1d2401d979e15415.json",
+      "batch_id": "c04-owned-metadata-main-v1",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/paginator/module.ts changes `imports: [MatButtonModule, MatSelectModule, MatTooltipModule],`. That line is not in the legacy sources. @angular/material/paginator is exercised by projects/ngx-material-legacy/legacy-paginator/paginator.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/paginator imported by projects/ngx-material-legacy/legacy-paginator/paginator.ts"
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "do-not-adopt",
+      "reason": "Modern paginator gains standalone template imports and module/test/guard updates. Retain the owned non-standalone paginator, owned base and legacy module dependencies. MatPaginatorIntl, PageEvent and select configuration are public peer dependencies; adopting modern paginator metadata is a separate change to the owned declaration.",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/index.ts",
+            "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+            "bytes": 233
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/internal/common-behaviors/color.ts",
+            "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+            "bytes": 1888
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/internal/common-behaviors/constructor.ts",
+            "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+            "bytes": 450
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/internal/common-behaviors/disable-ripple.ts",
+            "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+            "bytes": 1211
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/internal/common-behaviors/disabled.ts",
+            "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+            "bytes": 1073
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/internal/common-behaviors/error-state.ts",
+            "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+            "bytes": 2623
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/internal/common-behaviors/index.ts",
+            "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+            "bytes": 625
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/internal/common-behaviors/initialized.ts",
+            "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+            "bytes": 3061
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/internal/common-behaviors/tabindex.ts",
+            "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+            "bytes": 1503
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/internal/page-size-options.ts",
+            "sha256": "98655d3cd43b0bdc307bf41a5259ddefc823b37a5df931a36e318d3fa3ef4a60",
+            "bytes": 1634
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/internal/paginator-base.ts",
+            "sha256": "e4d141cb81e6133ce23446afb3a74f13a3f827684517b224e1426796ed5a97e7",
+            "bytes": 9453
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/paginator-module.ts",
+            "sha256": "7c10265d272674af8810e006964be36da6732b2af073ba22545ebfbc5a95b610",
+            "bytes": 1199
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/paginator.ts",
+            "sha256": "4f050bc5f5818f13d33c7428bdd9d7a8a36b4bf70dbb77ac12e088002bbd9540",
+            "bytes": 4639
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/public-api.ts",
+            "sha256": "de4896e1ea794f2b0a9e4928e52343b13abb3ace1525e55b7ded779a94a0ce87",
+            "bytes": 867
+          }
+        ],
+        "diff_sha256": "39654a73b1e720bb4ce45692e68812854678426254a0d774067c86f30cc78fb2",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Modern paginator gains standalone template imports and module/test/guard updates. Retain the owned non-standalone paginator, owned base and legacy module dependencies. MatPaginatorIntl, PageEvent and select configuration are public peer dependencies; adopting modern paginator metadata is a separate change to the owned declaration."
       }
     },
     {
@@ -60834,18 +61132,95 @@
         "tools/public_api_guard/material/progress-bar.md"
       ],
       "diff_sha256": "32d91cae875f37f8ce343c28f722f04f94c77ac724d53c0dd618186feb847baf",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/8bc38ae9d49ec8839629f161521563d34acaacb6.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-owned-metadata-main-v1/8bc38ae9d49ec8839629f161521563d34acaacb6.json",
+      "batch_id": "c04-owned-metadata-main-v1",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/progress-bar/module.ts changes `imports: [MatProgressBar],`. That line is not in the legacy sources. @angular/material/progress-bar is exercised by projects/ngx-material-legacy/legacy-progress-bar/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/progress-bar imported by projects/ngx-material-legacy/legacy-progress-bar/public-api.ts"
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "do-not-adopt",
+      "reason": "The modern progress bar standalone conversion changes component/module metadata, fixtures and public guard. Retain the distinct owned bar and local location token; its local options export aliases the public peer default-options token, and peer public animation-end and mode types do not supply the owned renderer. No animation or style equivalence is asserted.",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-bar/index.ts",
+            "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+            "bytes": 233
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/color.ts",
+            "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+            "bytes": 1888
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/constructor.ts",
+            "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+            "bytes": 450
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/disable-ripple.ts",
+            "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+            "bytes": 1211
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/disabled.ts",
+            "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+            "bytes": 1073
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/error-state.ts",
+            "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+            "bytes": 2623
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/index.ts",
+            "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+            "bytes": 625
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/initialized.ts",
+            "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+            "bytes": 3061
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/tabindex.ts",
+            "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+            "bytes": 1503
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/progress-bar-defaults.ts",
+            "sha256": "4d4b8301985a5fc14e8b71d05b51616d4791960f05dc5d8d1f7cf8dba2245297",
+            "bytes": 1011
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/progress-bar-location.ts",
+            "sha256": "5a4c922b79216263125ce5dca54cee8fbcc07a8950f42aad51883c35383288cf",
+            "bytes": 1304
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar-module.ts",
+            "sha256": "5ec2fbe0ae38f8b5c86ae7ca476abb471dc0aeb86f198dd1962d1f6c6459760b",
+            "bytes": 671
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts",
+            "sha256": "815ce6bcc47f7218ee8cc175c84327829c7778ab429fc8b5e137a783e5d7aa3b",
+            "bytes": 7572
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-bar/public-api.ts",
+            "sha256": "1410e0ce79d9a9ea765dc2f5da373c32ff422eec680be3494cb5a52050fd8841",
+            "bytes": 964
+          }
+        ],
+        "diff_sha256": "93db7285ba3a27b4ddce2b372d3c593dd5273e2ae1f2f1955ca8ea1a070f2c16",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The modern progress bar standalone conversion changes component/module metadata, fixtures and public guard. Retain the distinct owned bar and local location token; its local options export aliases the public peer default-options token, and peer public animation-end and mode types do not supply the owned renderer. No animation or style equivalence is asserted."
       }
     },
     {
@@ -60860,18 +61235,90 @@
         "tools/public_api_guard/material/progress-spinner.md"
       ],
       "diff_sha256": "dcf0a4ba68ed71106c298bb25d0c84b8683ead4cdd9b4418bd5b79edca9a0a4e",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/36b4f18dd7ebe5e7d4efb661a9cdf99f30ceb852.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-owned-metadata-main-v1/36b4f18dd7ebe5e7d4efb661a9cdf99f30ceb852.json",
+      "batch_id": "c04-owned-metadata-main-v1",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/progress-spinner/module.ts changes `imports: [CommonModule],`. That line is not in the legacy sources. @angular/material/progress-spinner is exercised by projects/ngx-material-legacy/legacy-progress-spinner/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/progress-spinner imported by projects/ngx-material-legacy/legacy-progress-spinner/public-api.ts"
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "do-not-adopt",
+      "reason": "The modern spinner standalone conversion adds NgTemplateOutlet and changes module, fixture and guard metadata. Retain the owned spinner declaration, two selectors and same-class alias. The public peer options token and types remain delegated while the defaults factory is locally owned; this does not establish modern component inheritance.",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-spinner/index.ts",
+            "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+            "bytes": 233
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/color.ts",
+            "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+            "bytes": 1888
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/constructor.ts",
+            "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+            "bytes": 450
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/disable-ripple.ts",
+            "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+            "bytes": 1211
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/disabled.ts",
+            "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+            "bytes": 1073
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/error-state.ts",
+            "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+            "bytes": 2623
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/index.ts",
+            "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+            "bytes": 625
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/initialized.ts",
+            "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+            "bytes": 3061
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/tabindex.ts",
+            "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+            "bytes": 1503
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/progress-spinner-defaults.ts",
+            "sha256": "790fe17044a5ea62cbc0a931bd932efcb2e8f71c51a02111840789f544ef5a5c",
+            "bytes": 691
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner-module.ts",
+            "sha256": "dd534b997529760f2682c06c6bd8b9055013aaafbb6335ddbf185ef2753fd36a",
+            "bytes": 690
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts",
+            "sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+            "bytes": 12785
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-progress-spinner/public-api.ts",
+            "sha256": "65b6f439754da93a72a67de0bd544a33c23075c1429b26baa54fb78dc33a03a3",
+            "bytes": 1076
+          }
+        ],
+        "diff_sha256": "f9df226ca40b35f19995b89758bffdd6b507100760fcd28854337a05c9c08add",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The modern spinner standalone conversion adds NgTemplateOutlet and changes module, fixture and guard metadata. Retain the owned spinner declaration, two selectors and same-class alias. The public peer options token and types remain delegated while the defaults factory is locally owned; this does not establish modern component inheritance."
       }
     },
     {

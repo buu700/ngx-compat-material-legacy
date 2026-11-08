@@ -1,0 +1,137 @@
+{
+  "sha": "824e035e64eeab825c24c7e74e05702fbe2fe8fa",
+  "status": "reviewed",
+  "diff": "diff --git a/src/material/checkbox/checkbox-required-validator.ts b/src/material/checkbox/checkbox-required-validator.ts\nindex c567302aee7460d5d2ca48c37439afb5444fb193..9b2fc07be65228d566a1ddee6ec9fced18cefce0 100644\n--- a/src/material/checkbox/checkbox-required-validator.ts\n+++ b/src/material/checkbox/checkbox-required-validator.ts\n@@ -15,6 +15,8 @@ export const MAT_CHECKBOX_REQUIRED_VALIDATOR: Provider = {\n   multi: true,\n };\n \n+// TODO(crisbeto): this should be deprecated and moved into `MatCheckbox`.\n+\n /**\n  * Validator for Material checkbox's required attribute in template-driven checkbox.\n  * Current CheckboxRequiredValidator only work with `input type=checkbox` and does not\n@@ -24,5 +26,6 @@ export const MAT_CHECKBOX_REQUIRED_VALIDATOR: Provider = {\n   selector: `mat-checkbox[required][formControlName],\n              mat-checkbox[required][formControl], mat-checkbox[required][ngModel]`,\n   providers: [MAT_CHECKBOX_REQUIRED_VALIDATOR],\n+  standalone: true,\n })\n export class MatCheckboxRequiredValidator extends CheckboxRequiredValidator {}\ndiff --git a/src/material/checkbox/checkbox.spec.ts b/src/material/checkbox/checkbox.spec.ts\nindex ebb3a432124838389c1886d831d8294b03e2dfcd..930aa98a05255a5110c6b007844c8bfa77c1f718 100644\n--- a/src/material/checkbox/checkbox.spec.ts\n+++ b/src/material/checkbox/checkbox.spec.ts\n@@ -1,4 +1,4 @@\n-import {dispatchFakeEvent} from '../../cdk/testing/private';\n+import {dispatchFakeEvent} from '@angular/cdk/testing/private';\n import {ChangeDetectionStrategy, Component, DebugElement, Type} from '@angular/core';\n import {ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed} from '@angular/core/testing';\n import {ThemePalette} from '@angular/material/core';\n@@ -10,15 +10,15 @@ import {\n   MatCheckbox,\n   MatCheckboxChange,\n   MatCheckboxModule,\n+  MatCheckboxRequiredValidator,\n } from './index';\n \n describe('MDC-based MatCheckbox', () => {\n   let fixture: ComponentFixture<any>;\n \n-  function createComponent<T>(componentType: Type<T>, extraDeclarations: Type<any>[] = []) {\n+  function createComponent<T>(componentType: Type<T>) {\n     TestBed.configureTestingModule({\n-      imports: [MatCheckboxModule, FormsModule, ReactiveFormsModule],\n-      declarations: [componentType, ...extraDeclarations],\n+      imports: [MatCheckboxModule, FormsModule, ReactiveFormsModule, componentType],\n     }).compileComponents();\n \n     return TestBed.createComponent<T>(componentType);\n@@ -526,8 +526,7 @@ describe('MDC-based MatCheckbox', () => {\n       beforeEach(() => {\n         TestBed.resetTestingModule();\n         TestBed.configureTestingModule({\n-          imports: [MatCheckboxModule, FormsModule, ReactiveFormsModule],\n-          declarations: [SingleCheckbox],\n+          imports: [MatCheckboxModule, FormsModule, ReactiveFormsModule, SingleCheckbox],\n           providers: [{provide: MAT_CHECKBOX_DEFAULT_OPTIONS, useValue: {clickAction: 'check'}}],\n         });\n \n@@ -558,8 +557,7 @@ describe('MDC-based MatCheckbox', () => {\n       beforeEach(() => {\n         TestBed.resetTestingModule();\n         TestBed.configureTestingModule({\n-          imports: [MatCheckboxModule, FormsModule, ReactiveFormsModule],\n-          declarations: [SingleCheckbox],\n+          imports: [MatCheckboxModule, FormsModule, ReactiveFormsModule, SingleCheckbox],\n           providers: [{provide: MAT_CHECKBOX_DEFAULT_OPTIONS, useValue: {clickAction: 'noop'}}],\n         });\n \n@@ -1022,8 +1020,7 @@ describe('MatCheckboxDefaultOptions', () => {\n   describe('when MAT_CHECKBOX_DEFAULT_OPTIONS overridden', () => {\n     function configure(defaults: MatCheckboxDefaultOptions) {\n       TestBed.configureTestingModule({\n-        imports: [MatCheckboxModule, FormsModule],\n-        declarations: [SingleCheckbox, SingleCheckbox],\n+        imports: [MatCheckboxModule, FormsModule, SingleCheckbox, SingleCheckbox],\n         providers: [{provide: MAT_CHECKBOX_DEFAULT_OPTIONS, useValue: defaults}],\n       });\n \n@@ -1078,6 +1075,8 @@ describe('MatCheckboxDefaultOptions', () => {\n       Simple checkbox\n     </mat-checkbox>\n   </div>`,\n+  standalone: true,\n+  imports: [MatCheckbox],\n })\n class SingleCheckbox {\n   labelPos: 'before' | 'after' = 'after';\n@@ -1100,6 +1099,8 @@ class SingleCheckbox {\n @Component({\n   template: `<mat-checkbox [required]=\"isRequired\" [(ngModel)]=\"isGood\"\n                            [disabled]=\"isDisabled\">Be good</mat-checkbox>`,\n+  standalone: true,\n+  imports: [MatCheckbox, MatCheckboxRequiredValidator, FormsModule],\n })\n class CheckboxWithNgModel {\n   isGood: boolean = false;\n@@ -1110,6 +1111,8 @@ class CheckboxWithNgModel {\n @Component({\n   template: `<mat-checkbox [required]=\"isRequired\" [(ngModel)]=\"isGood\">Be good</mat-checkbox>`,\n   changeDetection: ChangeDetectionStrategy.OnPush,\n+  standalone: true,\n+  imports: [MatCheckbox, FormsModule],\n })\n class CheckboxWithNgModelAndOnPush extends CheckboxWithNgModel {}\n \n@@ -1119,6 +1122,8 @@ class CheckboxWithNgModelAndOnPush extends CheckboxWithNgModel {}\n     <mat-checkbox>Option 1</mat-checkbox>\n     <mat-checkbox>Option 2</mat-checkbox>\n   `,\n+  standalone: true,\n+  imports: [MatCheckbox],\n })\n class MultipleCheckboxes {}\n \n@@ -1129,6 +1134,8 @@ class MultipleCheckboxes {}\n         [tabIndex]=\"customTabIndex\"\n         [disabled]=\"isDisabled\">\n     </mat-checkbox>`,\n+  standalone: true,\n+  imports: [MatCheckbox],\n })\n class CheckboxWithTabIndex {\n   customTabIndex: number = 7;\n@@ -1136,46 +1143,78 @@ class CheckboxWithTabIndex {\n }\n \n /** Simple test component with an aria-label set. */\n-@Component({template: `<mat-checkbox aria-label=\"Super effective\"></mat-checkbox>`})\n+@Component({\n+  template: `<mat-checkbox aria-label=\"Super effective\"></mat-checkbox>`,\n+  standalone: true,\n+  imports: [MatCheckbox],\n+})\n class CheckboxWithAriaLabel {}\n \n /** Simple test component with an aria-label set. */\n-@Component({template: `<mat-checkbox aria-labelledby=\"some-id\"></mat-checkbox>`})\n+@Component({\n+  template: `<mat-checkbox aria-labelledby=\"some-id\"></mat-checkbox>`,\n+  standalone: true,\n+  imports: [MatCheckbox],\n+})\n class CheckboxWithAriaLabelledby {}\n \n /** Simple test component with an aria-describedby set. */\n @Component({\n   template: `<mat-checkbox aria-describedby=\"some-id\"></mat-checkbox>`,\n+  standalone: true,\n+  imports: [MatCheckbox],\n })\n class CheckboxWithAriaDescribedby {}\n \n /** Simple test component with name attribute */\n-@Component({template: `<mat-checkbox name=\"test-name\"></mat-checkbox>`})\n+@Component({\n+  template: `<mat-checkbox name=\"test-name\"></mat-checkbox>`,\n+  standalone: true,\n+  imports: [MatCheckbox],\n+})\n class CheckboxWithNameAttribute {}\n \n /** Simple test component with change event */\n-@Component({template: `<mat-checkbox (change)=\"lastEvent = $event\"></mat-checkbox>`})\n+@Component({\n+  template: `<mat-checkbox (change)=\"lastEvent = $event\"></mat-checkbox>`,\n+  standalone: true,\n+  imports: [MatCheckbox],\n+})\n class CheckboxWithChangeEvent {\n   lastEvent: MatCheckboxChange;\n }\n \n /** Test component with reactive forms */\n-@Component({template: `<mat-checkbox [formControl]=\"formControl\"></mat-checkbox>`})\n+@Component({\n+  template: `<mat-checkbox [formControl]=\"formControl\"></mat-checkbox>`,\n+  standalone: true,\n+  imports: [MatCheckbox, ReactiveFormsModule],\n+})\n class CheckboxWithFormControl {\n   formControl = new FormControl(false);\n }\n \n /** Test component without label */\n-@Component({template: `<mat-checkbox>{{ label }}</mat-checkbox>`})\n+@Component({\n+  template: `<mat-checkbox>{{ label }}</mat-checkbox>`,\n+  standalone: true,\n+  imports: [MatCheckbox],\n+})\n class CheckboxWithoutLabel {\n   label: string;\n }\n \n /** Test component with the native tabindex attribute. */\n-@Component({template: `<mat-checkbox tabindex=\"5\"></mat-checkbox>`})\n+@Component({\n+  template: `<mat-checkbox tabindex=\"5\"></mat-checkbox>`,\n+  standalone: true,\n+  imports: [MatCheckbox],\n+})\n class CheckboxWithTabindexAttr {}\n \n @Component({\n   template: `<mat-checkbox aria-label=\"Checkbox\" aria-labelledby=\"something\"></mat-checkbox>`,\n+  standalone: true,\n+  imports: [MatCheckbox],\n })\n class CheckboxWithStaticAriaAttributes {}\ndiff --git a/src/material/checkbox/checkbox.ts b/src/material/checkbox/checkbox.ts\nindex 44836988ec230c8a8029f5347495a6b095ed3a9e..6e9eb06ea7a0a9290f5eed728373394315ceff90 100644\n--- a/src/material/checkbox/checkbox.ts\n+++ b/src/material/checkbox/checkbox.ts\n@@ -91,6 +91,8 @@ const defaults = MAT_CHECKBOX_DEFAULT_OPTIONS_FACTORY();\n   exportAs: 'matCheckbox',\n   encapsulation: ViewEncapsulation.None,\n   changeDetection: ChangeDetectionStrategy.OnPush,\n+  standalone: true,\n+  imports: [MatRipple],\n })\n export class MatCheckbox implements AfterViewInit, ControlValueAccessor, FocusableOption {\n   /** Focuses the checkbox. */\ndiff --git a/src/material/checkbox/module.ts b/src/material/checkbox/module.ts\nindex 9c4247f17c1c88f32b2b3b26674a68f561b77f0d..6c74980833b3b83474e06c716a72d8778fd4159f 100644\n--- a/src/material/checkbox/module.ts\n+++ b/src/material/checkbox/module.ts\n@@ -13,14 +13,13 @@ import {MatCheckboxRequiredValidator} from './checkbox-required-validator';\n \n /** This module is used by both original and MDC-based checkbox implementations. */\n @NgModule({\n+  imports: [MatCheckboxRequiredValidator],\n   exports: [MatCheckboxRequiredValidator],\n-  declarations: [MatCheckboxRequiredValidator],\n })\n export class _MatCheckboxRequiredValidatorModule {}\n \n @NgModule({\n-  imports: [MatCommonModule, MatRippleModule, _MatCheckboxRequiredValidatorModule],\n+  imports: [MatCommonModule, MatRippleModule, _MatCheckboxRequiredValidatorModule, MatCheckbox],\n   exports: [MatCheckbox, MatCommonModule, _MatCheckboxRequiredValidatorModule],\n-  declarations: [MatCheckbox],\n })\n export class MatCheckboxModule {}\ndiff --git a/src/material/checkbox/testing/checkbox-harness.spec.ts b/src/material/checkbox/testing/checkbox-harness.spec.ts\nindex b0f1dc4edf72ef6d68a535e278313b29a43650aa..9875ebd07721be922fa47e5d43669fdf92acbb0d 100644\n--- a/src/material/checkbox/testing/checkbox-harness.spec.ts\n+++ b/src/material/checkbox/testing/checkbox-harness.spec.ts\n@@ -12,8 +12,7 @@ describe('MatCheckboxHarness', () => {\n \n   beforeEach(async () => {\n     await TestBed.configureTestingModule({\n-      imports: [MatCheckboxModule, ReactiveFormsModule],\n-      declarations: [CheckboxHarnessTest],\n+      imports: [MatCheckboxModule, ReactiveFormsModule, CheckboxHarnessTest],\n     }).compileComponents();\n \n     fixture = TestBed.createComponent(CheckboxHarnessTest);\n@@ -68,9 +67,8 @@ describe('MatCheckboxHarness', () => {\n   });\n \n   it('should get indeterminate state', async () => {\n-    const [checkedCheckbox, indeterminateCheckbox] = await loader.getAllHarnesses(\n-      MatCheckboxHarness,\n-    );\n+    const [checkedCheckbox, indeterminateCheckbox] =\n+      await loader.getAllHarnesses(MatCheckboxHarness);\n     expect(await checkedCheckbox.isIndeterminate()).toBe(false);\n     expect(await indeterminateCheckbox.isIndeterminate()).toBe(true);\n   });\n@@ -186,6 +184,8 @@ describe('MatCheckboxHarness', () => {\n     </mat-checkbox>\n     <span id=\"second-label\">Second checkbox</span>\n   `,\n+  standalone: true,\n+  imports: [MatCheckboxModule, ReactiveFormsModule],\n })\n class CheckboxHarnessTest {\n   ctrl = new FormControl(true);\ndiff --git a/tools/public_api_guard/material/checkbox.md b/tools/public_api_guard/material/checkbox.md\nindex 8d28873758d5cb0a28fc2302df4f4e9396ee8ef9..5f2fb0ed6a123d8dfbc46ec4f385b3c62d50015e 100644\n--- a/tools/public_api_guard/material/checkbox.md\n+++ b/tools/public_api_guard/material/checkbox.md\n@@ -12,7 +12,7 @@ import { ElementRef } from '@angular/core';\n import { EventEmitter } from '@angular/core';\n import { FocusableOption } from '@angular/cdk/a11y';\n import * as i0 from '@angular/core';\n-import * as i3 from '@angular/material/core';\n+import * as i2 from '@angular/material/core';\n import { InjectionToken } from '@angular/core';\n import { MatRipple } from '@angular/material/core';\n import { NgZone } from '@angular/core';\n@@ -112,7 +112,7 @@ export class MatCheckbox implements AfterViewInit, ControlValueAccessor, Focusab\n     // (undocumented)\n     writeValue(value: any): void;\n     // (undocumented)\n-    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatCheckbox, \"mat-checkbox\", [\"matCheckbox\"], { \"ariaLabel\": { \"alias\": \"aria-label\"; \"required\": false; }; \"ariaLabelledby\": { \"alias\": \"aria-labelledby\"; \"required\": false; }; \"ariaDescribedby\": { \"alias\": \"aria-describedby\"; \"required\": false; }; \"id\": { \"alias\": \"id\"; \"required\": false; }; \"required\": { \"alias\": \"required\"; \"required\": false; }; \"labelPosition\": { \"alias\": \"labelPosition\"; \"required\": false; }; \"name\": { \"alias\": \"name\"; \"required\": false; }; \"value\": { \"alias\": \"value\"; \"required\": false; }; \"disableRipple\": { \"alias\": \"disableRipple\"; \"required\": false; }; \"tabIndex\": { \"alias\": \"tabIndex\"; \"required\": false; }; \"color\": { \"alias\": \"color\"; \"required\": false; }; \"checked\": { \"alias\": \"checked\"; \"required\": false; }; \"disabled\": { \"alias\": \"disabled\"; \"required\": false; }; \"indeterminate\": { \"alias\": \"indeterminate\"; \"required\": false; }; }, { \"change\": \"change\"; \"indeterminateChange\": \"indeterminateChange\"; }, never, [\"*\"], false, never>;\n+    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatCheckbox, \"mat-checkbox\", [\"matCheckbox\"], { \"ariaLabel\": { \"alias\": \"aria-label\"; \"required\": false; }; \"ariaLabelledby\": { \"alias\": \"aria-labelledby\"; \"required\": false; }; \"ariaDescribedby\": { \"alias\": \"aria-describedby\"; \"required\": false; }; \"id\": { \"alias\": \"id\"; \"required\": false; }; \"required\": { \"alias\": \"required\"; \"required\": false; }; \"labelPosition\": { \"alias\": \"labelPosition\"; \"required\": false; }; \"name\": { \"alias\": \"name\"; \"required\": false; }; \"value\": { \"alias\": \"value\"; \"required\": false; }; \"disableRipple\": { \"alias\": \"disableRipple\"; \"required\": false; }; \"tabIndex\": { \"alias\": \"tabIndex\"; \"required\": false; }; \"color\": { \"alias\": \"color\"; \"required\": false; }; \"checked\": { \"alias\": \"checked\"; \"required\": false; }; \"disabled\": { \"alias\": \"disabled\"; \"required\": false; }; \"indeterminate\": { \"alias\": \"indeterminate\"; \"required\": false; }; }, { \"change\": \"change\"; \"indeterminateChange\": \"indeterminateChange\"; }, never, [\"*\"], true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCheckbox, [null, null, null, { attribute: \"tabindex\"; }, { optional: true; }, { optional: true; }]>;\n }\n@@ -139,13 +139,13 @@ export class MatCheckboxModule {\n     // (undocumented)\n     static \u0275inj: i0.\u0275\u0275InjectorDeclaration<MatCheckboxModule>;\n     // (undocumented)\n-    static \u0275mod: i0.\u0275\u0275NgModuleDeclaration<MatCheckboxModule, [typeof i2.MatCheckbox], [typeof i3.MatCommonModule, typeof i3.MatRippleModule, typeof _MatCheckboxRequiredValidatorModule], [typeof i2.MatCheckbox, typeof i3.MatCommonModule, typeof _MatCheckboxRequiredValidatorModule]>;\n+    static \u0275mod: i0.\u0275\u0275NgModuleDeclaration<MatCheckboxModule, never, [typeof i2.MatCommonModule, typeof i2.MatRippleModule, typeof _MatCheckboxRequiredValidatorModule, typeof i3.MatCheckbox], [typeof i3.MatCheckbox, typeof i2.MatCommonModule, typeof _MatCheckboxRequiredValidatorModule]>;\n }\n \n // @public\n export class MatCheckboxRequiredValidator extends CheckboxRequiredValidator {\n     // (undocumented)\n-    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCheckboxRequiredValidator, \"mat-checkbox[required][formControlName],             mat-checkbox[required][formControl], mat-checkbox[required][ngModel]\", never, {}, {}, never, never, false, never>;\n+    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCheckboxRequiredValidator, \"mat-checkbox[required][formControlName],             mat-checkbox[required][formControl], mat-checkbox[required][ngModel]\", never, {}, {}, never, never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCheckboxRequiredValidator, never>;\n }\n@@ -157,7 +157,7 @@ export class _MatCheckboxRequiredValidatorModule {\n     // (undocumented)\n     static \u0275inj: i0.\u0275\u0275InjectorDeclaration<_MatCheckboxRequiredValidatorModule>;\n     // (undocumented)\n-    static \u0275mod: i0.\u0275\u0275NgModuleDeclaration<_MatCheckboxRequiredValidatorModule, [typeof i1.MatCheckboxRequiredValidator], never, [typeof i1.MatCheckboxRequiredValidator]>;\n+    static \u0275mod: i0.\u0275\u0275NgModuleDeclaration<_MatCheckboxRequiredValidatorModule, never, [typeof i1.MatCheckboxRequiredValidator], [typeof i1.MatCheckboxRequiredValidator]>;\n }\n \n // @public\n",
+  "diff_sha256": "4f594c9ad29ff217bffcaf4c82b9af4f54e558b1289de6a7e661ff14624683fc",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox-module.ts",
+      "sha256": "a1dfbaa86342a3876d3d22dcd4380d8379e85a4e046a8b2be156b6a7b48ce6d5",
+      "bytes": 907
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.ts",
+      "sha256": "774db12b55590d631d0a69c68a9aa7289adf600ac3fe62e288dd22fcf3c86766",
+      "bytes": 5525
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/index.ts",
+      "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+      "bytes": 233
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/internal/checkbox-base.ts",
+      "sha256": "e4e3aaa653750e7d9ce901e76c3ee0b9fe3f242439bbf0850ad1594503dd1437",
+      "bytes": 16642
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/internal/checkbox-required-validator.ts",
+      "sha256": "88f2ea043de50069c4abb38c9e53c884d9f3973a71766ba27d0695897734f019",
+      "bytes": 1071
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/internal/common-behaviors/color.ts",
+      "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+      "bytes": 1888
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/internal/common-behaviors/constructor.ts",
+      "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+      "bytes": 450
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/internal/common-behaviors/disable-ripple.ts",
+      "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+      "bytes": 1211
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/internal/common-behaviors/disabled.ts",
+      "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+      "bytes": 1073
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/internal/common-behaviors/error-state.ts",
+      "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+      "bytes": 2623
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/internal/common-behaviors/index.ts",
+      "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+      "bytes": 625
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/internal/common-behaviors/initialized.ts",
+      "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+      "bytes": 3061
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/internal/common-behaviors/tabindex.ts",
+      "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+      "bytes": 1503
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/owned-transition-state.ts",
+      "sha256": "ffa33cd647c3cede4b576c6fdc77bc4177a2fdfca0e28f67d96301e95965607a",
+      "bytes": 739
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/public-api.ts",
+      "sha256": "ee7d7028843ce1ea3da51a5253501a2fe7304d6ea51cfde777c97d9eb69b823b",
+      "bytes": 1269
+    }
+  ],
+  "decision": "The modern checkbox and its required validator become standalone, ripple and module metadata move, and fixtures and public guard change; the TODO is non-operative. Retain the owned checkbox and local required-validator directive with its NG_VALIDATORS multi provider, selector and aliases. That directive extends the public Forms CheckboxRequiredValidator; checkbox option types and default token are peer public exports, not the modern component metadata.",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "do-not-adopt",
+  "previous_ledger_entry_complete": {
+    "sha": "824e035e64eeab825c24c7e74e05702fbe2fe8fa",
+    "bucket": "needs-triage",
+    "subject": "refactor(material/checkbox): convert to standalone",
+    "files": [
+      "src/material/checkbox/checkbox-required-validator.ts",
+      "src/material/checkbox/checkbox.spec.ts",
+      "src/material/checkbox/checkbox.ts",
+      "src/material/checkbox/module.ts",
+      "src/material/checkbox/testing/checkbox-harness.spec.ts",
+      "tools/public_api_guard/material/checkbox.md"
+    ],
+    "diff_sha256": "187a63f1d4a6c7921c214b89cbbd9831f3471810321e5bef4efca54777325c58",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/824e035e64eeab825c24c7e74e05702fbe2fe8fa.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/material/checkbox/checkbox-required-validator.ts changes `standalone: true,`. That line is not in the legacy sources. @angular/material/checkbox is exercised by projects/ngx-material-legacy/legacy-checkbox/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/checkbox imported by projects/ngx-material-legacy/legacy-checkbox/public-api.ts"
+    }
+  },
+  "review_basis": "Complete fresh full-index original patch authenticated against the prior census and independent source review; includes production, fixtures and public API guard hunks. Source members bind current owned code.",
+  "minimum_peer": "Main advertised and installed Angular/Material/CDK 22.1.7; public peer return roles were inspected in original review inventories, not assumed from ancestry.",
+  "reference_packets": [
+    "c04-first-eight-individual-v2",
+    "c04-first-eight-independent-review-v1"
+  ],
+  "limitations": "Source conclusion only. Native/AOT, public API interactions, historical visual and motion, peer range, full C04, security and release gates are separate; no runtime equivalence or execution claim.",
+  "prior_individual_review": {
+    "sha": "824e035e64eeab825c24c7e74e05702fbe2fe8fa",
+    "subject": "refactor(material/checkbox): convert to standalone",
+    "complete_diff_sha256": "4f594c9ad29ff217bffcaf4c82b9af4f54e558b1289de6a7e661ff14624683fc",
+    "full_hunk_count": 22,
+    "disposition": "do-not-adopt-modern-standalone; local-owned-validator",
+    "targeted_evidence": "checkbox-validator.log",
+    "peer_floor": "22.1.7",
+    "remaining_runtime": "packed Angular forms binding and native interaction",
+    "claims_full_runtime_pass": false,
+    "proposal_only": true,
+    "report_section_index": 7
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "sha": "8bc38ae9d49ec8839629f161521563d34acaacb6",
+  "status": "reviewed",
+  "diff": "diff --git a/src/material/progress-bar/module.ts b/src/material/progress-bar/module.ts\nindex 7ae0b60a14aceb6c64384b7a74084565b71342fa..9503e34ea866fa2b189c6008a7a867760732bec2 100644\n--- a/src/material/progress-bar/module.ts\n+++ b/src/material/progress-bar/module.ts\n@@ -11,7 +11,7 @@ import {MatCommonModule} from '@angular/material/core';\n import {MatProgressBar} from './progress-bar';\n \n @NgModule({\n+  imports: [MatProgressBar],\n   exports: [MatProgressBar, MatCommonModule],\n-  declarations: [MatProgressBar],\n })\n export class MatProgressBarModule {}\ndiff --git a/src/material/progress-bar/progress-bar.spec.ts b/src/material/progress-bar/progress-bar.spec.ts\nindex 22c9681160358ba3180521641d179c776f90b062..028fc6be2848f65a66b7d280ebc206c54308236a 100644\n--- a/src/material/progress-bar/progress-bar.spec.ts\n+++ b/src/material/progress-bar/progress-bar.spec.ts\n@@ -1,7 +1,7 @@\n import {TestBed, ComponentFixture} from '@angular/core/testing';\n import {ApplicationRef, Component, DebugElement, Provider, Type} from '@angular/core';\n import {By} from '@angular/platform-browser';\n-import {dispatchFakeEvent} from '../../cdk/testing/private';\n+import {dispatchFakeEvent} from '@angular/cdk/testing/private';\n import {MatProgressBarModule, MAT_PROGRESS_BAR_DEFAULT_OPTIONS} from './index';\n import {MatProgressBar} from './progress-bar';\n \n@@ -11,8 +11,7 @@ describe('MDC-based MatProgressBar', () => {\n     providers: Provider[] = [],\n   ): ComponentFixture<T> {\n     TestBed.configureTestingModule({\n-      imports: [MatProgressBarModule],\n-      declarations: [componentType],\n+      imports: [MatProgressBarModule, componentType],\n       providers,\n     }).compileComponents();\n \n@@ -329,8 +328,16 @@ describe('MDC-based MatProgressBar', () => {\n   });\n });\n \n-@Component({template: '<mat-progress-bar></mat-progress-bar>'})\n+@Component({\n+  template: '<mat-progress-bar></mat-progress-bar>',\n+  standalone: true,\n+  imports: [MatProgressBar],\n+})\n class BasicProgressBar {}\n \n-@Component({template: '<mat-progress-bar mode=\"buffer\"></mat-progress-bar>'})\n+@Component({\n+  template: '<mat-progress-bar mode=\"buffer\"></mat-progress-bar>',\n+  standalone: true,\n+  imports: [MatProgressBar],\n+})\n class BufferProgressBar {}\ndiff --git a/src/material/progress-bar/progress-bar.ts b/src/material/progress-bar/progress-bar.ts\nindex 33f6c563cc5f5d081f123a5a792f37859a6f4565..a5635371a4aa6f20105ff98a9681e57a294c0e32 100644\n--- a/src/material/progress-bar/progress-bar.ts\n+++ b/src/material/progress-bar/progress-bar.ts\n@@ -101,6 +101,7 @@ export type ProgressBarMode = 'determinate' | 'indeterminate' | 'buffer' | 'quer\n   styleUrls: ['progress-bar.css'],\n   changeDetection: ChangeDetectionStrategy.OnPush,\n   encapsulation: ViewEncapsulation.None,\n+  standalone: true,\n })\n export class MatProgressBar implements AfterViewInit, OnDestroy {\n   constructor(\ndiff --git a/src/material/progress-bar/testing/progress-bar-harness.spec.ts b/src/material/progress-bar/testing/progress-bar-harness.spec.ts\nindex 32b60030ee11be22d22ca098823b7db375f7ff73..a4ba868d48daa03b803384668301f7c15f78366c 100644\n--- a/src/material/progress-bar/testing/progress-bar-harness.spec.ts\n+++ b/src/material/progress-bar/testing/progress-bar-harness.spec.ts\n@@ -11,8 +11,7 @@ describe('MatProgressBarHarness', () => {\n \n   beforeEach(async () => {\n     await TestBed.configureTestingModule({\n-      imports: [MatProgressBarModule],\n-      declarations: [ProgressBarHarnessTest],\n+      imports: [MatProgressBarModule, ProgressBarHarnessTest],\n     }).compileComponents();\n \n     fixture = TestBed.createComponent(ProgressBarHarnessTest);\n@@ -45,6 +44,8 @@ describe('MatProgressBarHarness', () => {\n     <mat-progress-bar mode=\"determinate\" [value]=\"value\"></mat-progress-bar>\n     <mat-progress-bar mode=\"indeterminate\"></mat-progress-bar>\n   `,\n+  standalone: true,\n+  imports: [MatProgressBarModule],\n })\n class ProgressBarHarnessTest {\n   value: number;\ndiff --git a/tools/public_api_guard/material/progress-bar.md b/tools/public_api_guard/material/progress-bar.md\nindex 9ebf1bbe1c4c5895b16ddddc7d40611a4d74aa59..7cb34a64da1e6d12e98d3e32ca8fa754675d9d1e 100644\n--- a/tools/public_api_guard/material/progress-bar.md\n+++ b/tools/public_api_guard/material/progress-bar.md\n@@ -53,7 +53,7 @@ export class MatProgressBar implements AfterViewInit, OnDestroy {\n     get value(): number;\n     set value(v: number);\n     // (undocumented)\n-    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatProgressBar, \"mat-progress-bar\", [\"matProgressBar\"], { \"color\": { \"alias\": \"color\"; \"required\": false; }; \"value\": { \"alias\": \"value\"; \"required\": false; }; \"bufferValue\": { \"alias\": \"bufferValue\"; \"required\": false; }; \"mode\": { \"alias\": \"mode\"; \"required\": false; }; }, { \"animationEnd\": \"animationEnd\"; }, never, never, false, never>;\n+    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatProgressBar, \"mat-progress-bar\", [\"matProgressBar\"], { \"color\": { \"alias\": \"color\"; \"required\": false; }; \"value\": { \"alias\": \"value\"; \"required\": false; }; \"bufferValue\": { \"alias\": \"bufferValue\"; \"required\": false; }; \"mode\": { \"alias\": \"mode\"; \"required\": false; }; }, { \"animationEnd\": \"animationEnd\"; }, never, never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatProgressBar, [null, null, null, { optional: true; }, { optional: true; }]>;\n }\n@@ -77,7 +77,7 @@ export class MatProgressBarModule {\n     // (undocumented)\n     static \u0275inj: i0.\u0275\u0275InjectorDeclaration<MatProgressBarModule>;\n     // (undocumented)\n-    static \u0275mod: i0.\u0275\u0275NgModuleDeclaration<MatProgressBarModule, [typeof i1.MatProgressBar], never, [typeof i1.MatProgressBar, typeof i2.MatCommonModule]>;\n+    static \u0275mod: i0.\u0275\u0275NgModuleDeclaration<MatProgressBarModule, never, [typeof i1.MatProgressBar], [typeof i1.MatProgressBar, typeof i2.MatCommonModule]>;\n }\n \n // @public\n",
+  "diff_sha256": "93db7285ba3a27b4ddce2b372d3c593dd5273e2ae1f2f1955ca8ea1a070f2c16",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/index.ts",
+      "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+      "bytes": 233
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/color.ts",
+      "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+      "bytes": 1888
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/constructor.ts",
+      "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+      "bytes": 450
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/disable-ripple.ts",
+      "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+      "bytes": 1211
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/disabled.ts",
+      "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+      "bytes": 1073
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/error-state.ts",
+      "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+      "bytes": 2623
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/index.ts",
+      "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+      "bytes": 625
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/initialized.ts",
+      "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+      "bytes": 3061
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/tabindex.ts",
+      "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+      "bytes": 1503
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/progress-bar-defaults.ts",
+      "sha256": "4d4b8301985a5fc14e8b71d05b51616d4791960f05dc5d8d1f7cf8dba2245297",
+      "bytes": 1011
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/progress-bar-location.ts",
+      "sha256": "5a4c922b79216263125ce5dca54cee8fbcc07a8950f42aad51883c35383288cf",
+      "bytes": 1304
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar-module.ts",
+      "sha256": "5ec2fbe0ae38f8b5c86ae7ca476abb471dc0aeb86f198dd1962d1f6c6459760b",
+      "bytes": 671
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts",
+      "sha256": "815ce6bcc47f7218ee8cc175c84327829c7778ab429fc8b5e137a783e5d7aa3b",
+      "bytes": 7572
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/public-api.ts",
+      "sha256": "1410e0ce79d9a9ea765dc2f5da373c32ff422eec680be3494cb5a52050fd8841",
+      "bytes": 964
+    }
+  ],
+  "decision": "The modern progress bar standalone conversion changes component/module metadata, fixtures and public guard. Retain the distinct owned bar and local location token; its local options export aliases the public peer default-options token, and peer public animation-end and mode types do not supply the owned renderer. No animation or style equivalence is asserted.",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "do-not-adopt",
+  "previous_ledger_entry_complete": {
+    "sha": "8bc38ae9d49ec8839629f161521563d34acaacb6",
+    "bucket": "needs-triage",
+    "subject": "refactor(material/progress-bar): convert to standalone",
+    "files": [
+      "src/material/progress-bar/module.ts",
+      "src/material/progress-bar/progress-bar.spec.ts",
+      "src/material/progress-bar/progress-bar.ts",
+      "src/material/progress-bar/testing/progress-bar-harness.spec.ts",
+      "tools/public_api_guard/material/progress-bar.md"
+    ],
+    "diff_sha256": "32d91cae875f37f8ce343c28f722f04f94c77ac724d53c0dd618186feb847baf",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/8bc38ae9d49ec8839629f161521563d34acaacb6.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/material/progress-bar/module.ts changes `imports: [MatProgressBar],`. That line is not in the legacy sources. @angular/material/progress-bar is exercised by projects/ngx-material-legacy/legacy-progress-bar/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/progress-bar imported by projects/ngx-material-legacy/legacy-progress-bar/public-api.ts"
+    }
+  },
+  "review_basis": "Complete fresh full-index original patch authenticated against the prior census and independent source review; includes production, fixtures and public API guard hunks. Source members bind current owned code.",
+  "minimum_peer": "Main advertised and installed Angular/Material/CDK 22.1.7; public peer return roles were inspected in original review inventories, not assumed from ancestry.",
+  "reference_packets": [
+    "c04-standalone-8-review-v1",
+    "c04-standalone-8-independent-review-v1"
+  ],
+  "limitations": "Source conclusion only. Native/AOT, public API interactions, historical visual and motion, peer range, full C04, security and release gates are separate; no runtime equivalence or execution claim.",
+  "prior_individual_review": {
+    "classification_proposal": "modern standalone progress bar does not replace owned legacy bar; current default options token/types are shared separately",
+    "full_hunk_analysis": "5 files/9 hunks: modern component standalone, modern module imports/exports it, two fixture hosts import it, harness host migrates; private testing helper import moves and API guard records metadata. No source change to mode, value, lifecycle, animation or styles in the reviewed diff.",
+    "current_floor_and_legacy_impact": "Owned MatLegacyProgressBar remains standalone:false and declared/exported by a legacy module importing CommonModule and legacy common; its legacy selector, SVG template, SCSS and AfterViewInit/OnDestroy listener implementation remain owned. Its default-options binding is an alias to the current public token and mode/event types are peer types. Packed JIT verifies actual component/module metadata, legacy token equality and the distinct standalone current peer component. A style block existing in metadata is not style equivalence.",
+    "proof_gaps_and_next": "For motion qualification independently review SVG/SCSS and test each mode/value transition, animationEnd timing and cleanup, no-op behavior and detach/destroy in real browser, alongside packed AOT/module test. Nothing here upgrades a motion or visual gate.",
+    "sha": "8bc38ae9d49ec8839629f161521563d34acaacb6",
+    "subject": "refactor(material/progress-bar): convert to standalone",
+    "full_diff": {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-inherited-392-v2/diffs/8bc38ae9d49ec8839629f161521563d34acaacb6.patch",
+      "bytes": 5837,
+      "sha256": "93db7285ba3a27b4ddce2b372d3c593dd5273e2ae1f2f1955ca8ea1a070f2c16"
+    },
+    "full_diff_path_count": 5,
+    "full_hunks": 9,
+    "review_state": "individual source review and finite JIT metadata observation complete; proposal only, no ledger admission",
+    "source_evidence": "inventory.json",
+    "minimum_peer_version": "22.1.7",
+    "runtime_metadata_probe": "runtime-probe.log"
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "sha": "367f868c829ef0a31f2b816b1d2401d979e15415",
+  "status": "reviewed",
+  "diff": "diff --git a/src/material/paginator/module.ts b/src/material/paginator/module.ts\nindex 37e21c85c09179b25d742e305d34b145c660bb35..3f4635d488a86a0312072d908b6e797fa5a834e3 100644\n--- a/src/material/paginator/module.ts\n+++ b/src/material/paginator/module.ts\n@@ -14,9 +14,8 @@ import {MatTooltipModule} from '@angular/material/tooltip';\n import {MatPaginator} from './paginator';\n \n @NgModule({\n-  imports: [MatButtonModule, MatSelectModule, MatTooltipModule],\n+  imports: [MatButtonModule, MatSelectModule, MatTooltipModule, MatPaginator],\n   exports: [MatPaginator],\n-  declarations: [MatPaginator],\n   providers: [MAT_PAGINATOR_INTL_PROVIDER],\n })\n export class MatPaginatorModule {}\ndiff --git a/src/material/paginator/paginator.spec.ts b/src/material/paginator/paginator.spec.ts\nindex 889d5d8b3d00f2e0199d11a5e0e3488d4a05ab97..b8d37397d942b7fcb3d8310d5c7d7db215cfdb7b 100644\n--- a/src/material/paginator/paginator.spec.ts\n+++ b/src/material/paginator/paginator.spec.ts\n@@ -17,8 +17,8 @@ describe('MDC-based MatPaginator', () => {\n   function createComponent<T>(type: Type<T>, providers: Provider[] = []): ComponentFixture<T> {\n     TestBed.configureTestingModule({\n       imports: [MatPaginatorModule, NoopAnimationsModule],\n-      declarations: [type],\n       providers: [MatPaginatorIntl, ...providers],\n+      declarations: [type],\n     }).compileComponents();\n \n     const fixture = TestBed.createComponent(type);\ndiff --git a/src/material/paginator/paginator.ts b/src/material/paginator/paginator.ts\nindex 403b080cf89f7037959adde699bb45f2cf003ce1..914da7564f277f1bdffc9fb290e89de1ae15a237 100644\n--- a/src/material/paginator/paginator.ts\n+++ b/src/material/paginator/paginator.ts\n@@ -22,8 +22,11 @@ import {\n   booleanAttribute,\n   numberAttribute,\n } from '@angular/core';\n-import {MatFormFieldAppearance} from '@angular/material/form-field';\n-import {HasInitialized, mixinInitialized, ThemePalette} from '@angular/material/core';\n+import {MatFormField, MatFormFieldAppearance} from '@angular/material/form-field';\n+import {HasInitialized, MatOption, mixinInitialized, ThemePalette} from '@angular/material/core';\n+import {MatSelect} from '@angular/material/select';\n+import {MatIconButton} from '@angular/material/button';\n+import {MatTooltip} from '@angular/material/tooltip';\n import {Subscription} from 'rxjs';\n import {MatPaginatorIntl} from './paginator-intl';\n \n@@ -109,6 +112,8 @@ let nextUniqueId = 0;\n   },\n   changeDetection: ChangeDetectionStrategy.OnPush,\n   encapsulation: ViewEncapsulation.None,\n+  standalone: true,\n+  imports: [MatFormField, MatSelect, MatOption, MatIconButton, MatTooltip],\n })\n export class MatPaginator\n   extends _MatPaginatorMixinBase\ndiff --git a/src/material/paginator/testing/paginator-harness.spec.ts b/src/material/paginator/testing/paginator-harness.spec.ts\nindex fa5c25959402c59a9b8ec6d2d06a867f994ac13b..bfe7c2676ba7a176cb989324a056e3ea35e1c864 100644\n--- a/src/material/paginator/testing/paginator-harness.spec.ts\n+++ b/src/material/paginator/testing/paginator-harness.spec.ts\n@@ -13,8 +13,7 @@ describe('MatPaginatorHarness', () => {\n \n   beforeEach(async () => {\n     await TestBed.configureTestingModule({\n-      imports: [MatPaginatorModule, NoopAnimationsModule],\n-      declarations: [PaginatorHarnessTest],\n+      imports: [MatPaginatorModule, NoopAnimationsModule, PaginatorHarnessTest],\n     }).compileComponents();\n \n     fixture = TestBed.createComponent(PaginatorHarnessTest);\n@@ -138,6 +137,8 @@ describe('MatPaginatorHarness', () => {\n       [pageIndex]=\"pageIndex\">\n     </mat-paginator>\n   `,\n+  standalone: true,\n+  imports: [MatPaginatorModule],\n })\n class PaginatorHarnessTest {\n   length = 500;\ndiff --git a/tools/public_api_guard/material/paginator.md b/tools/public_api_guard/material/paginator.md\nindex e53d9ae093c1f7954715dcba0a04b8d544d0cf97..41d346f2fce4d9759d08e654abc998e4a0e24a4c 100644\n--- a/tools/public_api_guard/material/paginator.md\n+++ b/tools/public_api_guard/material/paginator.md\n@@ -8,9 +8,9 @@ import { ChangeDetectorRef } from '@angular/core';\n import { EventEmitter } from '@angular/core';\n import { HasInitialized } from '@angular/material/core';\n import * as i0 from '@angular/core';\n-import * as i2 from '@angular/material/button';\n-import * as i3 from '@angular/material/select';\n-import * as i4 from '@angular/material/tooltip';\n+import * as i1 from '@angular/material/button';\n+import * as i2 from '@angular/material/select';\n+import * as i3 from '@angular/material/tooltip';\n import { InjectionToken } from '@angular/core';\n import { MatFormFieldAppearance } from '@angular/material/form-field';\n import { OnDestroy } from '@angular/core';\n@@ -81,7 +81,7 @@ export class MatPaginator extends _MatPaginatorMixinBase implements OnInit, OnDe\n     selectConfig: MatPaginatorSelectConfig;\n     showFirstLastButtons: boolean;\n     // (undocumented)\n-    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatPaginator, \"mat-paginator\", [\"matPaginator\"], { \"color\": { \"alias\": \"color\"; \"required\": false; }; \"pageIndex\": { \"alias\": \"pageIndex\"; \"required\": false; }; \"length\": { \"alias\": \"length\"; \"required\": false; }; \"pageSize\": { \"alias\": \"pageSize\"; \"required\": false; }; \"pageSizeOptions\": { \"alias\": \"pageSizeOptions\"; \"required\": false; }; \"hidePageSize\": { \"alias\": \"hidePageSize\"; \"required\": false; }; \"showFirstLastButtons\": { \"alias\": \"showFirstLastButtons\"; \"required\": false; }; \"selectConfig\": { \"alias\": \"selectConfig\"; \"required\": false; }; \"disabled\": { \"alias\": \"disabled\"; \"required\": false; }; }, { \"page\": \"page\"; }, never, never, false, never>;\n+    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatPaginator, \"mat-paginator\", [\"matPaginator\"], { \"color\": { \"alias\": \"color\"; \"required\": false; }; \"pageIndex\": { \"alias\": \"pageIndex\"; \"required\": false; }; \"length\": { \"alias\": \"length\"; \"required\": false; }; \"pageSize\": { \"alias\": \"pageSize\"; \"required\": false; }; \"pageSizeOptions\": { \"alias\": \"pageSizeOptions\"; \"required\": false; }; \"hidePageSize\": { \"alias\": \"hidePageSize\"; \"required\": false; }; \"showFirstLastButtons\": { \"alias\": \"showFirstLastButtons\"; \"required\": false; }; \"selectConfig\": { \"alias\": \"selectConfig\"; \"required\": false; }; \"disabled\": { \"alias\": \"disabled\"; \"required\": false; }; }, { \"page\": \"page\"; }, never, never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatPaginator, [null, null, { optional: true; }]>;\n }\n@@ -117,7 +117,7 @@ export class MatPaginatorModule {\n     // (undocumented)\n     static \u0275inj: i0.\u0275\u0275InjectorDeclaration<MatPaginatorModule>;\n     // (undocumented)\n-    static \u0275mod: i0.\u0275\u0275NgModuleDeclaration<MatPaginatorModule, [typeof i1.MatPaginator], [typeof i2.MatButtonModule, typeof i3.MatSelectModule, typeof i4.MatTooltipModule], [typeof i1.MatPaginator]>;\n+    static \u0275mod: i0.\u0275\u0275NgModuleDeclaration<MatPaginatorModule, never, [typeof i1.MatButtonModule, typeof i2.MatSelectModule, typeof i3.MatTooltipModule, typeof i4.MatPaginator], [typeof i4.MatPaginator]>;\n }\n \n // @public\n",
+  "diff_sha256": "39654a73b1e720bb4ce45692e68812854678426254a0d774067c86f30cc78fb2",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/index.ts",
+      "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+      "bytes": 233
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/internal/common-behaviors/color.ts",
+      "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+      "bytes": 1888
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/internal/common-behaviors/constructor.ts",
+      "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+      "bytes": 450
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/internal/common-behaviors/disable-ripple.ts",
+      "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+      "bytes": 1211
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/internal/common-behaviors/disabled.ts",
+      "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+      "bytes": 1073
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/internal/common-behaviors/error-state.ts",
+      "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+      "bytes": 2623
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/internal/common-behaviors/index.ts",
+      "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+      "bytes": 625
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/internal/common-behaviors/initialized.ts",
+      "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+      "bytes": 3061
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/internal/common-behaviors/tabindex.ts",
+      "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+      "bytes": 1503
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/internal/page-size-options.ts",
+      "sha256": "98655d3cd43b0bdc307bf41a5259ddefc823b37a5df931a36e318d3fa3ef4a60",
+      "bytes": 1634
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/internal/paginator-base.ts",
+      "sha256": "e4d141cb81e6133ce23446afb3a74f13a3f827684517b224e1426796ed5a97e7",
+      "bytes": 9453
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/paginator-module.ts",
+      "sha256": "7c10265d272674af8810e006964be36da6732b2af073ba22545ebfbc5a95b610",
+      "bytes": 1199
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/paginator.ts",
+      "sha256": "4f050bc5f5818f13d33c7428bdd9d7a8a36b4bf70dbb77ac12e088002bbd9540",
+      "bytes": 4639
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/public-api.ts",
+      "sha256": "de4896e1ea794f2b0a9e4928e52343b13abb3ace1525e55b7ded779a94a0ce87",
+      "bytes": 867
+    }
+  ],
+  "decision": "Modern paginator gains standalone template imports and module/test/guard updates. Retain the owned non-standalone paginator, owned base and legacy module dependencies. MatPaginatorIntl, PageEvent and select configuration are public peer dependencies; adopting modern paginator metadata is a separate change to the owned declaration.",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "do-not-adopt",
+  "previous_ledger_entry_complete": {
+    "sha": "367f868c829ef0a31f2b816b1d2401d979e15415",
+    "bucket": "needs-triage",
+    "subject": "refactor(material/paginator): convert to standalone",
+    "files": [
+      "src/material/paginator/module.ts",
+      "src/material/paginator/paginator.spec.ts",
+      "src/material/paginator/paginator.ts",
+      "src/material/paginator/testing/paginator-harness.spec.ts",
+      "tools/public_api_guard/material/paginator.md"
+    ],
+    "diff_sha256": "dd3b33475ea5c534c9bdd13c10ac71b5fdf876947675cb1f27d5c937553d47af",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/367f868c829ef0a31f2b816b1d2401d979e15415.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/material/paginator/module.ts changes `imports: [MatButtonModule, MatSelectModule, MatTooltipModule],`. That line is not in the legacy sources. @angular/material/paginator is exercised by projects/ngx-material-legacy/legacy-paginator/paginator.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/paginator imported by projects/ngx-material-legacy/legacy-paginator/paginator.ts"
+    }
+  },
+  "review_basis": "Complete fresh full-index original patch authenticated against the prior census and independent source review; includes production, fixtures and public API guard hunks. Source members bind current owned code.",
+  "minimum_peer": "Main advertised and installed Angular/Material/CDK 22.1.7; public peer return roles were inspected in original review inventories, not assumed from ancestry.",
+  "reference_packets": [
+    "c04-standalone-8-review-v1",
+    "c04-standalone-8-independent-review-v1"
+  ],
+  "limitations": "Source conclusion only. Native/AOT, public API interactions, historical visual and motion, peer range, full C04, security and release gates are separate; no runtime equivalence or execution claim.",
+  "prior_individual_review": {
+    "classification_proposal": "not applicable to owned paginator component standalone migration; peer paginator service/types remain delegated",
+    "full_hunk_analysis": "5 files/9 hunks: current paginator becomes standalone with explicit modern form-field, select, option, icon-button and tooltip dependencies; module imports rather than declares it and retains intl provider; harness test host becomes standalone, generated Angular metadata changes, one test metadata order changes. No template/style/lifecycle method hunk.",
+    "current_floor_and_legacy_impact": "MatLegacyPaginator is a standalone:false owned component, declared/exported by its own module which imports legacy button/select/tooltip and legacy common, and provides the owned wrapper for current MatPaginatorIntl. Its parent _MatPaginatorBase is owned; PageEvent, config and intl are peer contracts, not the modern component or its standalone dependencies. Packed JIT checks owned component/module and current modern MatPaginator standalone, while source and 22.1.7 maps bind the separate implementations.",
+    "proof_gaps_and_next": "Native packed paginator test must cover page events, labels/intl updates and teardown, pagination boundaries, select/form-field and pointer target in actual browser, plus AOT and existing legacy style; current metadata does not demonstrate interaction or schedule. Keep existing pointer-handler review separate.",
+    "sha": "367f868c829ef0a31f2b816b1d2401d979e15415",
+    "subject": "refactor(material/paginator): convert to standalone",
+    "full_diff": {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-inherited-392-v2/diffs/367f868c829ef0a31f2b816b1d2401d979e15415.patch",
+      "bytes": 6982,
+      "sha256": "39654a73b1e720bb4ce45692e68812854678426254a0d774067c86f30cc78fb2"
+    },
+    "full_diff_path_count": 5,
+    "full_hunks": 9,
+    "review_state": "individual source review and finite JIT metadata observation complete; proposal only, no ledger admission",
+    "source_evidence": "inventory.json",
+    "minimum_peer_version": "22.1.7",
+    "runtime_metadata_probe": "runtime-probe.log"
+  }
+}

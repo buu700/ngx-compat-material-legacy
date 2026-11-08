@@ -1,0 +1,121 @@
+{
+  "sha": "af42dd6be9b094865ffcb3e7ad4aa03135ed6322",
+  "status": "reviewed",
+  "diff": "diff --git a/src/material/card/card.spec.ts b/src/material/card/card.spec.ts\nindex 9005a03831b62f2f869d2d0615fd8c1cb4641e8f..33c1e548c060795a93c9706089d780fd2380c4ba 100644\n--- a/src/material/card/card.spec.ts\n+++ b/src/material/card/card.spec.ts\n@@ -6,8 +6,7 @@ import {MatCard, MAT_CARD_CONFIG} from './card';\n describe('MDC-based MatCard', () => {\n   function createComponent<T>(component: Type<T>, providers: Provider[] = []): ComponentFixture<T> {\n     TestBed.configureTestingModule({\n-      imports: [MatCardModule],\n-      declarations: [component],\n+      imports: [MatCardModule, component],\n       providers,\n     }).compileComponents();\n \n@@ -49,6 +48,8 @@ describe('MDC-based MatCard', () => {\n \n @Component({\n   template: '<mat-card></mat-card>',\n+  standalone: true,\n+  imports: [MatCard],\n })\n class BasicCard {\n   @ViewChild(MatCard) card: MatCard;\ndiff --git a/src/material/card/card.ts b/src/material/card/card.ts\nindex 15afe8e991679dff8de2bd0e1e99f1de08023e1c..f615d77fd94ef079268dc65c408b6e08a27e1be6 100644\n--- a/src/material/card/card.ts\n+++ b/src/material/card/card.ts\n@@ -46,6 +46,7 @@ export const MAT_CARD_CONFIG = new InjectionToken<MatCardConfig>('MAT_CARD_CONFI\n   exportAs: 'matCard',\n   encapsulation: ViewEncapsulation.None,\n   changeDetection: ChangeDetectionStrategy.OnPush,\n+  standalone: true,\n })\n export class MatCard {\n   @Input() appearance: MatCardAppearance;\n@@ -67,6 +68,7 @@ export class MatCard {\n @Directive({\n   selector: `mat-card-title, [mat-card-title], [matCardTitle]`,\n   host: {'class': 'mat-mdc-card-title'},\n+  standalone: true,\n })\n export class MatCardTitle {}\n \n@@ -81,6 +83,7 @@ export class MatCardTitle {}\n   encapsulation: ViewEncapsulation.None,\n   changeDetection: ChangeDetectionStrategy.OnPush,\n   host: {'class': 'mat-mdc-card-title-group'},\n+  standalone: true,\n })\n export class MatCardTitleGroup {}\n \n@@ -94,6 +97,7 @@ export class MatCardTitleGroup {}\n @Directive({\n   selector: 'mat-card-content',\n   host: {'class': 'mat-mdc-card-content'},\n+  standalone: true,\n })\n export class MatCardContent {}\n \n@@ -107,6 +111,7 @@ export class MatCardContent {}\n @Directive({\n   selector: `mat-card-subtitle, [mat-card-subtitle], [matCardSubtitle]`,\n   host: {'class': 'mat-mdc-card-subtitle'},\n+  standalone: true,\n })\n export class MatCardSubtitle {}\n \n@@ -124,6 +129,7 @@ export class MatCardSubtitle {}\n     'class': 'mat-mdc-card-actions mdc-card__actions',\n     '[class.mat-mdc-card-actions-align-end]': 'align === \"end\"',\n   },\n+  standalone: true,\n })\n export class MatCardActions {\n   // TODO(jelbourn): deprecate `align` in favor of `actionPosition` or `actionAlignment`\n@@ -155,6 +161,7 @@ export class MatCardActions {\n   encapsulation: ViewEncapsulation.None,\n   changeDetection: ChangeDetectionStrategy.OnPush,\n   host: {'class': 'mat-mdc-card-header'},\n+  standalone: true,\n })\n export class MatCardHeader {}\n \n@@ -168,6 +175,7 @@ export class MatCardHeader {}\n @Directive({\n   selector: 'mat-card-footer',\n   host: {'class': 'mat-mdc-card-footer'},\n+  standalone: true,\n })\n export class MatCardFooter {}\n \n@@ -187,6 +195,7 @@ export class MatCardFooter {}\n @Directive({\n   selector: '[mat-card-image], [matCardImage]',\n   host: {'class': 'mat-mdc-card-image mdc-card__media'},\n+  standalone: true,\n })\n export class MatCardImage {\n   // TODO(jelbourn): support `.mdc-card__media--square` and `.mdc-card__media--16-9`.\n@@ -196,6 +205,7 @@ export class MatCardImage {\n @Directive({\n   selector: '[mat-card-sm-image], [matCardImageSmall]',\n   host: {'class': 'mat-mdc-card-sm-image mdc-card__media'},\n+  standalone: true,\n })\n export class MatCardSmImage {}\n \n@@ -203,6 +213,7 @@ export class MatCardSmImage {}\n @Directive({\n   selector: '[mat-card-md-image], [matCardImageMedium]',\n   host: {'class': 'mat-mdc-card-md-image mdc-card__media'},\n+  standalone: true,\n })\n export class MatCardMdImage {}\n \n@@ -210,6 +221,7 @@ export class MatCardMdImage {}\n @Directive({\n   selector: '[mat-card-lg-image], [matCardImageLarge]',\n   host: {'class': 'mat-mdc-card-lg-image mdc-card__media'},\n+  standalone: true,\n })\n export class MatCardLgImage {}\n \n@@ -217,6 +229,7 @@ export class MatCardLgImage {}\n @Directive({\n   selector: '[mat-card-xl-image], [matCardImageXLarge]',\n   host: {'class': 'mat-mdc-card-xl-image mdc-card__media'},\n+  standalone: true,\n })\n export class MatCardXlImage {}\n \n@@ -232,5 +245,6 @@ export class MatCardXlImage {}\n @Directive({\n   selector: '[mat-card-avatar], [matCardAvatar]',\n   host: {'class': 'mat-mdc-card-avatar'},\n+  standalone: true,\n })\n export class MatCardAvatar {}\ndiff --git a/src/material/card/module.ts b/src/material/card/module.ts\nindex d968275de0ebebcfa0f65fcba059baa46a53fe8d..23a3c2fddae08d164c24266d6d8dbbc3dc6a8733 100644\n--- a/src/material/card/module.ts\n+++ b/src/material/card/module.ts\n@@ -44,8 +44,7 @@ const CARD_DIRECTIVES = [\n ];\n \n @NgModule({\n-  imports: [MatCommonModule, CommonModule],\n+  imports: [MatCommonModule, CommonModule, ...CARD_DIRECTIVES],\n   exports: [CARD_DIRECTIVES, MatCommonModule],\n-  declarations: CARD_DIRECTIVES,\n })\n export class MatCardModule {}\ndiff --git a/src/material/card/testing/card-harness.spec.ts b/src/material/card/testing/card-harness.spec.ts\nindex fb935a8518f535028cb4fd2f8b53c7362ad3d3b9..3ce6d2b7cf1cf537e789ff41a60caa4434b25e09 100644\n--- a/src/material/card/testing/card-harness.spec.ts\n+++ b/src/material/card/testing/card-harness.spec.ts\n@@ -11,8 +11,7 @@ describe('MatCardHarness', () => {\n \n   beforeEach(async () => {\n     await TestBed.configureTestingModule({\n-      imports: [MatCardModule],\n-      declarations: [CardHarnessTest],\n+      imports: [MatCardModule, CardHarnessTest],\n     }).compileComponents();\n \n     fixture = TestBed.createComponent(CardHarnessTest);\n@@ -124,6 +123,8 @@ describe('MatCardHarness', () => {\n         </mat-card-footer>\n       </mat-card>\n   `,\n+  standalone: true,\n+  imports: [MatCardModule],\n })\n class CardHarnessTest {}\n \ndiff --git a/tools/public_api_guard/material/card.md b/tools/public_api_guard/material/card.md\nindex 816a72fc971f07fd8a74b8dac32f0d94d611c53b..7015d29fa8edba032ff78bf6a2e5ff2529a34637 100644\n--- a/tools/public_api_guard/material/card.md\n+++ b/tools/public_api_guard/material/card.md\n@@ -5,8 +5,8 @@\n ```ts\n \n import * as i0 from '@angular/core';\n-import * as i2 from '@angular/material/core';\n-import * as i3 from '@angular/common';\n+import * as i1 from '@angular/material/core';\n+import * as i2 from '@angular/common';\n import { InjectionToken } from '@angular/core';\n \n // @public\n@@ -18,7 +18,7 @@ export class MatCard {\n     // (undocumented)\n     appearance: MatCardAppearance;\n     // (undocumented)\n-    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatCard, \"mat-card\", [\"matCard\"], { \"appearance\": { \"alias\": \"appearance\"; \"required\": false; }; }, {}, never, [\"*\"], false, never>;\n+    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatCard, \"mat-card\", [\"matCard\"], { \"appearance\": { \"alias\": \"appearance\"; \"required\": false; }; }, {}, never, [\"*\"], true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCard, [{ optional: true; }]>;\n }\n@@ -27,7 +27,7 @@ export class MatCard {\n export class MatCardActions {\n     align: 'start' | 'end';\n     // (undocumented)\n-    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardActions, \"mat-card-actions\", [\"matCardActions\"], { \"align\": { \"alias\": \"align\"; \"required\": false; }; }, {}, never, never, false, never>;\n+    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardActions, \"mat-card-actions\", [\"matCardActions\"], { \"align\": { \"alias\": \"align\"; \"required\": false; }; }, {}, never, never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCardActions, never>;\n }\n@@ -38,7 +38,7 @@ export type MatCardAppearance = 'outlined' | 'raised';\n // @public\n export class MatCardAvatar {\n     // (undocumented)\n-    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardAvatar, \"[mat-card-avatar], [matCardAvatar]\", never, {}, {}, never, never, false, never>;\n+    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardAvatar, \"[mat-card-avatar], [matCardAvatar]\", never, {}, {}, never, never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCardAvatar, never>;\n }\n@@ -51,7 +51,7 @@ export interface MatCardConfig {\n // @public\n export class MatCardContent {\n     // (undocumented)\n-    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardContent, \"mat-card-content\", never, {}, {}, never, never, false, never>;\n+    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardContent, \"mat-card-content\", never, {}, {}, never, never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCardContent, never>;\n }\n@@ -59,7 +59,7 @@ export class MatCardContent {\n // @public\n export class MatCardFooter {\n     // (undocumented)\n-    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardFooter, \"mat-card-footer\", never, {}, {}, never, never, false, never>;\n+    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardFooter, \"mat-card-footer\", never, {}, {}, never, never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCardFooter, never>;\n }\n@@ -67,7 +67,7 @@ export class MatCardFooter {\n // @public\n export class MatCardHeader {\n     // (undocumented)\n-    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatCardHeader, \"mat-card-header\", never, {}, {}, never, [\"[mat-card-avatar], [matCardAvatar]\", \"mat-card-title, mat-card-subtitle,\\n      [mat-card-title], [mat-card-subtitle],\\n      [matCardTitle], [matCardSubtitle]\", \"*\"], false, never>;\n+    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatCardHeader, \"mat-card-header\", never, {}, {}, never, [\"[mat-card-avatar], [matCardAvatar]\", \"mat-card-title, mat-card-subtitle,\\n      [mat-card-title], [mat-card-subtitle],\\n      [matCardTitle], [matCardSubtitle]\", \"*\"], true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCardHeader, never>;\n }\n@@ -75,7 +75,7 @@ export class MatCardHeader {\n // @public\n export class MatCardImage {\n     // (undocumented)\n-    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardImage, \"[mat-card-image], [matCardImage]\", never, {}, {}, never, never, false, never>;\n+    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardImage, \"[mat-card-image], [matCardImage]\", never, {}, {}, never, never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCardImage, never>;\n }\n@@ -83,7 +83,7 @@ export class MatCardImage {\n // @public\n export class MatCardLgImage {\n     // (undocumented)\n-    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardLgImage, \"[mat-card-lg-image], [matCardImageLarge]\", never, {}, {}, never, never, false, never>;\n+    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardLgImage, \"[mat-card-lg-image], [matCardImageLarge]\", never, {}, {}, never, never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCardLgImage, never>;\n }\n@@ -91,7 +91,7 @@ export class MatCardLgImage {\n // @public\n export class MatCardMdImage {\n     // (undocumented)\n-    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardMdImage, \"[mat-card-md-image], [matCardImageMedium]\", never, {}, {}, never, never, false, never>;\n+    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardMdImage, \"[mat-card-md-image], [matCardImageMedium]\", never, {}, {}, never, never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCardMdImage, never>;\n }\n@@ -103,13 +103,13 @@ export class MatCardModule {\n     // (undocumented)\n     static \u0275inj: i0.\u0275\u0275InjectorDeclaration<MatCardModule>;\n     // (undocumented)\n-    static \u0275mod: i0.\u0275\u0275NgModuleDeclaration<MatCardModule, [typeof i1.MatCard, typeof i1.MatCardActions, typeof i1.MatCardAvatar, typeof i1.MatCardContent, typeof i1.MatCardFooter, typeof i1.MatCardHeader, typeof i1.MatCardImage, typeof i1.MatCardLgImage, typeof i1.MatCardMdImage, typeof i1.MatCardSmImage, typeof i1.MatCardSubtitle, typeof i1.MatCardTitle, typeof i1.MatCardTitleGroup, typeof i1.MatCardXlImage], [typeof i2.MatCommonModule, typeof i3.CommonModule], [typeof i1.MatCard, typeof i1.MatCardActions, typeof i1.MatCardAvatar, typeof i1.MatCardContent, typeof i1.MatCardFooter, typeof i1.MatCardHeader, typeof i1.MatCardImage, typeof i1.MatCardLgImage, typeof i1.MatCardMdImage, typeof i1.MatCardSmImage, typeof i1.MatCardSubtitle, typeof i1.MatCardTitle, typeof i1.MatCardTitleGroup, typeof i1.MatCardXlImage, typeof i2.MatCommonModule]>;\n+    static \u0275mod: i0.\u0275\u0275NgModuleDeclaration<MatCardModule, never, [typeof i1.MatCommonModule, typeof i2.CommonModule, typeof i3.MatCard, typeof i3.MatCardActions, typeof i3.MatCardAvatar, typeof i3.MatCardContent, typeof i3.MatCardFooter, typeof i3.MatCardHeader, typeof i3.MatCardImage, typeof i3.MatCardLgImage, typeof i3.MatCardMdImage, typeof i3.MatCardSmImage, typeof i3.MatCardSubtitle, typeof i3.MatCardTitle, typeof i3.MatCardTitleGroup, typeof i3.MatCardXlImage], [typeof i3.MatCard, typeof i3.MatCardActions, typeof i3.MatCardAvatar, typeof i3.MatCardContent, typeof i3.MatCardFooter, typeof i3.MatCardHeader, typeof i3.MatCardImage, typeof i3.MatCardLgImage, typeof i3.MatCardMdImage, typeof i3.MatCardSmImage, typeof i3.MatCardSubtitle, typeof i3.MatCardTitle, typeof i3.MatCardTitleGroup, typeof i3.MatCardXlImage, typeof i1.MatCommonModule]>;\n }\n \n // @public\n export class MatCardSmImage {\n     // (undocumented)\n-    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardSmImage, \"[mat-card-sm-image], [matCardImageSmall]\", never, {}, {}, never, never, false, never>;\n+    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardSmImage, \"[mat-card-sm-image], [matCardImageSmall]\", never, {}, {}, never, never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCardSmImage, never>;\n }\n@@ -117,7 +117,7 @@ export class MatCardSmImage {\n // @public\n export class MatCardSubtitle {\n     // (undocumented)\n-    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardSubtitle, \"mat-card-subtitle, [mat-card-subtitle], [matCardSubtitle]\", never, {}, {}, never, never, false, never>;\n+    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardSubtitle, \"mat-card-subtitle, [mat-card-subtitle], [matCardSubtitle]\", never, {}, {}, never, never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCardSubtitle, never>;\n }\n@@ -125,7 +125,7 @@ export class MatCardSubtitle {\n // @public\n export class MatCardTitle {\n     // (undocumented)\n-    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardTitle, \"mat-card-title, [mat-card-title], [matCardTitle]\", never, {}, {}, never, never, false, never>;\n+    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardTitle, \"mat-card-title, [mat-card-title], [matCardTitle]\", never, {}, {}, never, never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCardTitle, never>;\n }\n@@ -133,7 +133,7 @@ export class MatCardTitle {\n // @public\n export class MatCardTitleGroup {\n     // (undocumented)\n-    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatCardTitleGroup, \"mat-card-title-group\", never, {}, {}, never, [\"mat-card-title, mat-card-subtitle,\\n      [mat-card-title], [mat-card-subtitle],\\n      [matCardTitle], [matCardSubtitle]\", \"[mat-card-image], [matCardImage],\\n                    [mat-card-sm-image], [matCardImageSmall],\\n                    [mat-card-md-image], [matCardImageMedium],\\n                    [mat-card-lg-image], [matCardImageLarge],\\n                    [mat-card-xl-image], [matCardImageXLarge]\", \"*\"], false, never>;\n+    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatCardTitleGroup, \"mat-card-title-group\", never, {}, {}, never, [\"mat-card-title, mat-card-subtitle,\\n      [mat-card-title], [mat-card-subtitle],\\n      [matCardTitle], [matCardSubtitle]\", \"[mat-card-image], [matCardImage],\\n                    [mat-card-sm-image], [matCardImageSmall],\\n                    [mat-card-md-image], [matCardImageMedium],\\n                    [mat-card-lg-image], [matCardImageLarge],\\n                    [mat-card-xl-image], [matCardImageXLarge]\", \"*\"], true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCardTitleGroup, never>;\n }\n@@ -141,7 +141,7 @@ export class MatCardTitleGroup {\n // @public\n export class MatCardXlImage {\n     // (undocumented)\n-    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardXlImage, \"[mat-card-xl-image], [matCardImageXLarge]\", never, {}, {}, never, never, false, never>;\n+    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatCardXlImage, \"[mat-card-xl-image], [matCardImageXLarge]\", never, {}, {}, never, never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatCardXlImage, never>;\n }\n",
+  "diff_sha256": "5df29988d410d6ef4b20efcdf9059ec2d7ac7d1e0b38a3fb967ef10fb05578d9",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-card/card-module.ts",
+      "sha256": "61b34db8fc65cb49592fb5a5960a92cf78b9227ff493e6d99fed1d60e32a2c77",
+      "bytes": 1581
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-card/card.ts",
+      "sha256": "2e2c16ba865b712214e0d51a739fd01e20af819e65065e2b99b55cc1433208ad",
+      "bytes": 5279
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-card/index.ts",
+      "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+      "bytes": 233
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-card/internal/common-behaviors/color.ts",
+      "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+      "bytes": 1888
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-card/internal/common-behaviors/constructor.ts",
+      "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+      "bytes": 450
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-card/internal/common-behaviors/disable-ripple.ts",
+      "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+      "bytes": 1211
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-card/internal/common-behaviors/disabled.ts",
+      "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+      "bytes": 1073
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-card/internal/common-behaviors/error-state.ts",
+      "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+      "bytes": 2623
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-card/internal/common-behaviors/index.ts",
+      "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+      "bytes": 625
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-card/internal/common-behaviors/initialized.ts",
+      "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+      "bytes": 3061
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-card/internal/common-behaviors/tabindex.ts",
+      "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+      "bytes": 1503
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-card/public-api.ts",
+      "sha256": "fbac5b639299be4e5f50fad108597972860c0193a6c79edd2091c15241319d46",
+      "bytes": 606
+    }
+  ],
+  "decision": "Modern MDC card declarations acquire standalone metadata and move from declarations to imports/exports; fixtures and public guard follow. Retain the owned historical card declarations, selectors and module, rather than importing the modern card component. The modern card harness in a test does not make the owned renderer inherited.",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "do-not-adopt",
+  "previous_ledger_entry_complete": {
+    "sha": "af42dd6be9b094865ffcb3e7ad4aa03135ed6322",
+    "bucket": "needs-triage",
+    "subject": "refactor(material/card): convert to standalone",
+    "files": [
+      "src/material/card/card.spec.ts",
+      "src/material/card/card.ts",
+      "src/material/card/module.ts",
+      "src/material/card/testing/card-harness.spec.ts",
+      "tools/public_api_guard/material/card.md"
+    ],
+    "diff_sha256": "50f476e6d0bfe10688b91e5949f50b9cd809c169099311512b03b4e3f6534738",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/af42dd6be9b094865ffcb3e7ad4aa03135ed6322.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/material/card/card.spec.ts changes `imports: [MatCardModule],`. That line is not in the legacy sources. @angular/material/card is exercised by projects/ngx-material-legacy/legacy-card/testing/card-harness.spec.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/card imported by projects/ngx-material-legacy/legacy-card/testing/card-harness.spec.ts"
+    }
+  },
+  "review_basis": "Complete fresh full-index original patch authenticated against the prior census and independent source review; includes production, fixtures and public API guard hunks. Source members bind current owned code.",
+  "minimum_peer": "Main advertised and installed Angular/Material/CDK 22.1.7; public peer return roles were inspected in original review inventories, not assumed from ancestry.",
+  "reference_packets": [
+    "c04-first-eight-individual-v2",
+    "c04-first-eight-independent-review-v1"
+  ],
+  "limitations": "Source conclusion only. Native/AOT, public API interactions, historical visual and motion, peer range, full C04, security and release gates are separate; no runtime equivalence or execution claim.",
+  "prior_individual_review": {
+    "sha": "af42dd6be9b094865ffcb3e7ad4aa03135ed6322",
+    "subject": "refactor(material/card): convert to standalone",
+    "complete_diff_sha256": "5df29988d410d6ef4b20efcdf9059ec2d7ac7d1e0b38a3fb967ef10fb05578d9",
+    "full_hunk_count": 34,
+    "disposition": "do-not-adopt-modern-standalone",
+    "targeted_evidence": "REPORT.md",
+    "peer_floor": "22.1.7",
+    "remaining_runtime": "packed projection and visual regressions",
+    "claims_full_runtime_pass": false,
+    "proposal_only": true,
+    "report_section_index": 6
+  }
+}

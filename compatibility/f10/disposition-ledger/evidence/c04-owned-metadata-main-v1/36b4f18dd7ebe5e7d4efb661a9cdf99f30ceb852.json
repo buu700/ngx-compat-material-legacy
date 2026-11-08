@@ -1,0 +1,132 @@
+{
+  "sha": "36b4f18dd7ebe5e7d4efb661a9cdf99f30ceb852",
+  "status": "reviewed",
+  "diff": "diff --git a/src/material/progress-spinner/module.ts b/src/material/progress-spinner/module.ts\nindex 704bd25b9518a2399b874c6a44f20b74c0e957a2..dd8577ffdb701baf73b44036080593c4c9547570 100644\n--- a/src/material/progress-spinner/module.ts\n+++ b/src/material/progress-spinner/module.ts\n@@ -12,8 +12,7 @@ import {MatProgressSpinner, MatSpinner} from './progress-spinner';\n import {CommonModule} from '@angular/common';\n \n @NgModule({\n-  imports: [CommonModule],\n+  imports: [CommonModule, MatProgressSpinner, MatSpinner],\n   exports: [MatProgressSpinner, MatSpinner, MatCommonModule],\n-  declarations: [MatProgressSpinner, MatSpinner],\n })\n export class MatProgressSpinnerModule {}\ndiff --git a/src/material/progress-spinner/progress-spinner.spec.ts b/src/material/progress-spinner/progress-spinner.spec.ts\nindex 6b93ca5d7f5f3ff1f37c32c289b734b562d7ce62..446dbe5d13f9006b363d9b87e388488709e94ab8 100644\n--- a/src/material/progress-spinner/progress-spinner.spec.ts\n+++ b/src/material/progress-spinner/progress-spinner.spec.ts\n@@ -8,8 +8,9 @@ import {MatProgressSpinner, MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS} from './progre\n describe('MDC-based MatProgressSpinner', () => {\n   beforeEach(waitForAsync(() => {\n     TestBed.configureTestingModule({\n-      imports: [MatProgressSpinnerModule, CommonModule],\n-      declarations: [\n+      imports: [\n+        MatProgressSpinnerModule,\n+        CommonModule,\n         BasicProgressSpinner,\n         IndeterminateProgressSpinner,\n         ProgressSpinnerWithValueAndBoundMode,\n@@ -297,8 +298,7 @@ describe('MDC-based MatProgressSpinner', () => {\n   it('should be able to set a default diameter', () => {\n     TestBed.resetTestingModule()\n       .configureTestingModule({\n-        imports: [MatProgressSpinnerModule],\n-        declarations: [BasicProgressSpinner],\n+        imports: [MatProgressSpinnerModule, BasicProgressSpinner],\n         providers: [\n           {\n             provide: MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,\n@@ -318,8 +318,7 @@ describe('MDC-based MatProgressSpinner', () => {\n   it('should be able to set a default stroke width', () => {\n     TestBed.resetTestingModule()\n       .configureTestingModule({\n-        imports: [MatProgressSpinnerModule],\n-        declarations: [BasicProgressSpinner],\n+        imports: [MatProgressSpinnerModule, BasicProgressSpinner],\n         providers: [\n           {\n             provide: MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,\n@@ -339,8 +338,7 @@ describe('MDC-based MatProgressSpinner', () => {\n   it('should be able to set a default color', () => {\n     TestBed.resetTestingModule()\n       .configureTestingModule({\n-        imports: [MatProgressSpinnerModule],\n-        declarations: [BasicProgressSpinner],\n+        imports: [MatProgressSpinnerModule, BasicProgressSpinner],\n         providers: [\n           {\n             provide: MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,\n@@ -403,24 +401,42 @@ describe('MDC-based MatProgressSpinner', () => {\n   });\n });\n \n-@Component({template: '<mat-progress-spinner></mat-progress-spinner>'})\n+@Component({\n+  template: '<mat-progress-spinner></mat-progress-spinner>',\n+  standalone: true,\n+  imports: [MatProgressSpinnerModule, CommonModule],\n+})\n class BasicProgressSpinner {}\n \n-@Component({template: '<mat-progress-spinner [strokeWidth]=\"strokeWidth\"></mat-progress-spinner>'})\n+@Component({\n+  template: '<mat-progress-spinner [strokeWidth]=\"strokeWidth\"></mat-progress-spinner>',\n+  standalone: true,\n+  imports: [MatProgressSpinnerModule, CommonModule],\n+})\n class ProgressSpinnerCustomStrokeWidth {\n   strokeWidth: number;\n }\n \n-@Component({template: '<mat-progress-spinner [diameter]=\"diameter\"></mat-progress-spinner>'})\n+@Component({\n+  template: '<mat-progress-spinner [diameter]=\"diameter\"></mat-progress-spinner>',\n+  standalone: true,\n+  imports: [MatProgressSpinnerModule, CommonModule],\n+})\n class ProgressSpinnerCustomDiameter {\n   diameter: number;\n }\n \n-@Component({template: '<mat-progress-spinner mode=\"indeterminate\"></mat-progress-spinner>'})\n+@Component({\n+  template: '<mat-progress-spinner mode=\"indeterminate\"></mat-progress-spinner>',\n+  standalone: true,\n+  imports: [MatProgressSpinnerModule, CommonModule],\n+})\n class IndeterminateProgressSpinner {}\n \n @Component({\n   template: '<mat-progress-spinner [value]=\"value\" [mode]=\"mode\"></mat-progress-spinner>',\n+  standalone: true,\n+  imports: [MatProgressSpinnerModule, CommonModule],\n })\n class ProgressSpinnerWithValueAndBoundMode {\n   mode = 'indeterminate';\n@@ -430,6 +446,8 @@ class ProgressSpinnerWithValueAndBoundMode {\n @Component({\n   template: `\n     <mat-spinner [color]=\"color\"></mat-spinner>`,\n+  standalone: true,\n+  imports: [MatProgressSpinnerModule, CommonModule],\n })\n class SpinnerWithColor {\n   color: string = 'primary';\n@@ -438,6 +456,8 @@ class SpinnerWithColor {\n @Component({\n   template: `\n     <mat-progress-spinner value=\"50\" [color]=\"color\"></mat-progress-spinner>`,\n+  standalone: true,\n+  imports: [MatProgressSpinnerModule, CommonModule],\n })\n class ProgressSpinnerWithColor {\n   color: string = 'primary';\n@@ -447,6 +467,8 @@ class ProgressSpinnerWithColor {\n   template: `\n     <mat-progress-spinner value=\"25\" diameter=\"37\" strokeWidth=\"11\"></mat-progress-spinner>\n   `,\n+  standalone: true,\n+  imports: [MatProgressSpinnerModule, CommonModule],\n })\n class ProgressSpinnerWithStringValues {}\n \n@@ -455,6 +477,8 @@ class ProgressSpinnerWithStringValues {}\n     <mat-progress-spinner mode=\"indeterminate\" [diameter]=\"diameter\"></mat-progress-spinner>\n   `,\n   encapsulation: ViewEncapsulation.ShadowDom,\n+  standalone: true,\n+  imports: [MatProgressSpinnerModule, CommonModule],\n })\n class IndeterminateSpinnerInShadowDom {\n   diameter: number;\n@@ -469,6 +493,8 @@ class IndeterminateSpinnerInShadowDom {\n     }\n   `,\n   encapsulation: ViewEncapsulation.ShadowDom,\n+  standalone: true,\n+  imports: [MatProgressSpinnerModule, CommonModule],\n })\n class IndeterminateSpinnerInShadowDomWithNgIf {\n   @ViewChild(MatProgressSpinner, {read: ElementRef})\n@@ -477,5 +503,9 @@ class IndeterminateSpinnerInShadowDomWithNgIf {\n   diameter: number;\n }\n \n-@Component({template: '<mat-spinner mode=\"determinate\"></mat-spinner>'})\n+@Component({\n+  template: '<mat-spinner mode=\"determinate\"></mat-spinner>',\n+  standalone: true,\n+  imports: [MatProgressSpinnerModule, CommonModule],\n+})\n class SpinnerWithMode {}\ndiff --git a/src/material/progress-spinner/progress-spinner.ts b/src/material/progress-spinner/progress-spinner.ts\nindex 4066fb9e04c626f9b2c82502b26647eac078589b..acefa3c5099f9a8fa9bd6be6e1171a75a999de36 100644\n--- a/src/material/progress-spinner/progress-spinner.ts\n+++ b/src/material/progress-spinner/progress-spinner.ts\n@@ -20,6 +20,7 @@ import {\n } from '@angular/core';\n import {ThemePalette} from '@angular/material/core';\n import {ANIMATION_MODULE_TYPE} from '@angular/platform-browser/animations';\n+import {NgTemplateOutlet} from '@angular/common';\n \n /** Possible mode for a progress spinner. */\n export type ProgressSpinnerMode = 'determinate' | 'indeterminate';\n@@ -86,6 +87,8 @@ const BASE_STROKE_WIDTH = 10;\n   styleUrls: ['progress-spinner.css'],\n   changeDetection: ChangeDetectionStrategy.OnPush,\n   encapsulation: ViewEncapsulation.None,\n+  standalone: true,\n+  imports: [NgTemplateOutlet],\n })\n export class MatProgressSpinner {\n   /** Whether the _mat-animation-noopable class should be applied, disabling animations.  */\ndiff --git a/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts b/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts\nindex 13f3e72c4fcfe07be051e8531558070443f955f6..7d1ff3f9a16c179d2ecd74f2820ef8719f2a667f 100644\n--- a/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts\n+++ b/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts\n@@ -11,8 +11,7 @@ describe('MatProgressSpinnerHarness', () => {\n \n   beforeEach(async () => {\n     await TestBed.configureTestingModule({\n-      imports: [MatProgressSpinnerModule],\n-      declarations: [ProgressSpinnerHarnessTest],\n+      imports: [MatProgressSpinnerModule, ProgressSpinnerHarnessTest],\n     }).compileComponents();\n \n     fixture = TestBed.createComponent(ProgressSpinnerHarnessTest);\n@@ -27,18 +26,16 @@ describe('MatProgressSpinnerHarness', () => {\n \n   it('should get the value', async () => {\n     fixture.componentInstance.value = 50;\n-    const [determinate, indeterminate, impliedIndeterminate] = await loader.getAllHarnesses(\n-      MatProgressSpinnerHarness,\n-    );\n+    const [determinate, indeterminate, impliedIndeterminate] =\n+      await loader.getAllHarnesses(MatProgressSpinnerHarness);\n     expect(await determinate.getValue()).toBe(50);\n     expect(await indeterminate.getValue()).toBe(null);\n     expect(await impliedIndeterminate.getValue()).toBe(null);\n   });\n \n   it('should get the mode', async () => {\n-    const [determinate, indeterminate, impliedIndeterminate] = await loader.getAllHarnesses(\n-      MatProgressSpinnerHarness,\n-    );\n+    const [determinate, indeterminate, impliedIndeterminate] =\n+      await loader.getAllHarnesses(MatProgressSpinnerHarness);\n     expect(await determinate.getMode()).toBe('determinate');\n     expect(await indeterminate.getMode()).toBe('indeterminate');\n     expect(await impliedIndeterminate.getMode()).toBe('indeterminate');\n@@ -51,6 +48,8 @@ describe('MatProgressSpinnerHarness', () => {\n     <mat-progress-spinner mode=\"indeterminate\"></mat-progress-spinner>\n     <mat-spinner></mat-spinner>\n   `,\n+  standalone: true,\n+  imports: [MatProgressSpinnerModule],\n })\n class ProgressSpinnerHarnessTest {\n   value: number;\ndiff --git a/tools/public_api_guard/material/progress-spinner.md b/tools/public_api_guard/material/progress-spinner.md\nindex cdceb68974261b7ce28392d3f7f54aef900f082a..18dc439c601d9d4ef900950a9182827f8dc0a057 100644\n--- a/tools/public_api_guard/material/progress-spinner.md\n+++ b/tools/public_api_guard/material/progress-spinner.md\n@@ -6,7 +6,7 @@\n \n import { ElementRef } from '@angular/core';\n import * as i0 from '@angular/core';\n-import * as i2 from '@angular/common';\n+import * as i1 from '@angular/common';\n import * as i3 from '@angular/material/core';\n import { InjectionToken } from '@angular/core';\n import { ThemePalette } from '@angular/material/core';\n@@ -45,7 +45,7 @@ export class MatProgressSpinner {\n     set value(v: number);\n     _viewBox(): string;\n     // (undocumented)\n-    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatProgressSpinner, \"mat-progress-spinner, mat-spinner\", [\"matProgressSpinner\"], { \"color\": { \"alias\": \"color\"; \"required\": false; }; \"mode\": { \"alias\": \"mode\"; \"required\": false; }; \"value\": { \"alias\": \"value\"; \"required\": false; }; \"diameter\": { \"alias\": \"diameter\"; \"required\": false; }; \"strokeWidth\": { \"alias\": \"strokeWidth\"; \"required\": false; }; }, {}, never, never, false, never>;\n+    static \u0275cmp: i0.\u0275\u0275ComponentDeclaration<MatProgressSpinner, \"mat-progress-spinner, mat-spinner\", [\"matProgressSpinner\"], { \"color\": { \"alias\": \"color\"; \"required\": false; }; \"mode\": { \"alias\": \"mode\"; \"required\": false; }; \"value\": { \"alias\": \"value\"; \"required\": false; }; \"diameter\": { \"alias\": \"diameter\"; \"required\": false; }; \"strokeWidth\": { \"alias\": \"strokeWidth\"; \"required\": false; }; }, {}, never, never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatProgressSpinner, [null, { optional: true; }, null]>;\n }\n@@ -65,7 +65,7 @@ export class MatProgressSpinnerModule {\n     // (undocumented)\n     static \u0275inj: i0.\u0275\u0275InjectorDeclaration<MatProgressSpinnerModule>;\n     // (undocumented)\n-    static \u0275mod: i0.\u0275\u0275NgModuleDeclaration<MatProgressSpinnerModule, [typeof i1.MatProgressSpinner, typeof i1.MatProgressSpinner], [typeof i2.CommonModule], [typeof i1.MatProgressSpinner, typeof i1.MatProgressSpinner, typeof i3.MatCommonModule]>;\n+    static \u0275mod: i0.\u0275\u0275NgModuleDeclaration<MatProgressSpinnerModule, never, [typeof i1.CommonModule, typeof i2.MatProgressSpinner, typeof i2.MatProgressSpinner], [typeof i2.MatProgressSpinner, typeof i2.MatProgressSpinner, typeof i3.MatCommonModule]>;\n }\n \n // @public @deprecated (undocumented)\n",
+  "diff_sha256": "f9df226ca40b35f19995b89758bffdd6b507100760fcd28854337a05c9c08add",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/index.ts",
+      "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+      "bytes": 233
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/color.ts",
+      "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+      "bytes": 1888
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/constructor.ts",
+      "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+      "bytes": 450
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/disable-ripple.ts",
+      "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+      "bytes": 1211
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/disabled.ts",
+      "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+      "bytes": 1073
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/error-state.ts",
+      "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+      "bytes": 2623
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/index.ts",
+      "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+      "bytes": 625
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/initialized.ts",
+      "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+      "bytes": 3061
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/tabindex.ts",
+      "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+      "bytes": 1503
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/progress-spinner-defaults.ts",
+      "sha256": "790fe17044a5ea62cbc0a931bd932efcb2e8f71c51a02111840789f544ef5a5c",
+      "bytes": 691
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner-module.ts",
+      "sha256": "dd534b997529760f2682c06c6bd8b9055013aaafbb6335ddbf185ef2753fd36a",
+      "bytes": 690
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts",
+      "sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+      "bytes": 12785
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/public-api.ts",
+      "sha256": "65b6f439754da93a72a67de0bd544a33c23075c1429b26baa54fb78dc33a03a3",
+      "bytes": 1076
+    }
+  ],
+  "decision": "The modern spinner standalone conversion adds NgTemplateOutlet and changes module, fixture and guard metadata. Retain the owned spinner declaration, two selectors and same-class alias. The public peer options token and types remain delegated while the defaults factory is locally owned; this does not establish modern component inheritance.",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "do-not-adopt",
+  "previous_ledger_entry_complete": {
+    "sha": "36b4f18dd7ebe5e7d4efb661a9cdf99f30ceb852",
+    "bucket": "needs-triage",
+    "subject": "refactor(material/progress-spinner): convert to standalone",
+    "files": [
+      "src/material/progress-spinner/module.ts",
+      "src/material/progress-spinner/progress-spinner.spec.ts",
+      "src/material/progress-spinner/progress-spinner.ts",
+      "src/material/progress-spinner/testing/progress-spinner-harness.spec.ts",
+      "tools/public_api_guard/material/progress-spinner.md"
+    ],
+    "diff_sha256": "dcf0a4ba68ed71106c298bb25d0c84b8683ead4cdd9b4418bd5b79edca9a0a4e",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/36b4f18dd7ebe5e7d4efb661a9cdf99f30ceb852.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/material/progress-spinner/module.ts changes `imports: [CommonModule],`. That line is not in the legacy sources. @angular/material/progress-spinner is exercised by projects/ngx-material-legacy/legacy-progress-spinner/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/progress-spinner imported by projects/ngx-material-legacy/legacy-progress-spinner/public-api.ts"
+    }
+  },
+  "review_basis": "Complete fresh full-index original patch authenticated against the prior census and independent source review; includes production, fixtures and public API guard hunks. Source members bind current owned code.",
+  "minimum_peer": "Main advertised and installed Angular/Material/CDK 22.1.7; public peer return roles were inspected in original review inventories, not assumed from ancestry.",
+  "reference_packets": [
+    "c04-standalone-8-review-v1",
+    "c04-standalone-8-independent-review-v1"
+  ],
+  "limitations": "Source conclusion only. Native/AOT, public API interactions, historical visual and motion, peer range, full C04, security and release gates are separate; no runtime equivalence or execution claim.",
+  "prior_individual_review": {
+    "classification_proposal": "modern standalone progress spinner does not replace owned legacy spinner; current options token/types are shared separately",
+    "full_hunk_analysis": "5 files/20 hunks: modern MatProgressSpinner becomes standalone with NgTemplateOutlet import; module imports both spinner aliases; component/harness fixture hosts migrate; generated metadata updates; two test statements are formatting changes. No template, selector, animation implementation or stylesheet hunk in the original change.",
+    "current_floor_and_legacy_impact": "MatLegacyProgressSpinner is its own standalone:false component; legacy module declares and exports it and imports CommonModule plus legacy common. MatLegacySpinner is the same owned class object and both historical selectors remain; its SVG circle template and keyframe lifecycle are owned, not current modern spinner template. Public legacy options token aliases the current 22.1.7 token; local historical defaults factory remains owned. Packed JIT verifies module, alias, selectors, token identity and modern peer standalone metadata.",
+    "proof_gaps_and_next": "Separate native AOT/browser motion+style work must test determinate/indeterminate switching, SVG circle, style insertion/removal, diameter/stroke changes, noop mode and destruction; the current metadata probe cannot certify animation lifecycle, style equivalence, CSP behavior or rendering.",
+    "sha": "36b4f18dd7ebe5e7d4efb661a9cdf99f30ceb852",
+    "subject": "refactor(material/progress-spinner): convert to standalone",
+    "full_diff": {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/c04-inherited-392-v2/diffs/36b4f18dd7ebe5e7d4efb661a9cdf99f30ceb852.patch",
+      "bytes": 12111,
+      "sha256": "f9df226ca40b35f19995b89758bffdd6b507100760fcd28854337a05c9c08add"
+    },
+    "full_diff_path_count": 5,
+    "full_hunks": 20,
+    "review_state": "individual source review and finite JIT metadata observation complete; proposal only, no ledger admission",
+    "source_evidence": "inventory.json",
+    "minimum_peer_version": "22.1.7",
+    "runtime_metadata_probe": "runtime-probe.log"
+  }
+}
