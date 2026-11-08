@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import {spinnerViewportObservationProblems} from './api-spinner-viewport-contract.mjs';
 /**
  * Packed primary/testing export completeness vs authentic Material 16.2.14
  * legacy public-api barrels, plus structural member-name signature evidence.
@@ -518,7 +519,7 @@ if (isMain) {
 }
 
 export function settleDi(row, records) {
-  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...ownedDialogFocusObservationProblems(row),...menuContentObservationProblems(row),...simpleSnackObservationProblems(row),...dialogOpenerObservationProblems(row),...autocompleteObservationProblems(row),...tabBodyObservationProblems(row),...tabHeaderObservationProblems(row),...tabPortalObservationProblems(row),...tableDefinitionObservationProblems(row),...inputObservationProblems(row),...menuTriggerObservationProblems(row)]};
+  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...ownedDialogFocusObservationProblems(row),...menuContentObservationProblems(row),...simpleSnackObservationProblems(row),...dialogOpenerObservationProblems(row),...autocompleteObservationProblems(row),...tabBodyObservationProblems(row),...tabHeaderObservationProblems(row),...tabPortalObservationProblems(row),...tableDefinitionObservationProblems(row),...inputObservationProblems(row),...menuTriggerObservationProblems(row),...spinnerViewportObservationProblems(row)]};
   if(row.symbol.symbol_id===RIPPLE_SYMBOL){
     const contract=approvedRippleContract(row.symbol),problems=[...row.problems,...rippleFactoryObservationProblems(row,contract)];
     return {...row,problems,result:problems.length?'fail':'pass',status:problems.length?'mismatch':'intentional-legacy-difference',
@@ -551,6 +552,7 @@ export function settleDi(row, records) {
         : (row.symbol.shape.diParams || []).filter(param=>!param.attribute))
         .map(param => `${param.ident}${param.optional ? '?' : ''}`).join('|');
   const owned = row.observed.join('|');
+  if(row.symbol.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'&&!row.problems.length)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'The owned docs-private viewport is a distinct injection token; exact artifact, source, actual node, historical provider negative, and manual type evidence are bounded to the recorded minimum peer.'};
   if (row.symbol.symbol_id===TABLE_SYMBOL) {
     const contract=approvedTableContract(row.symbol);
     if (!tableConstructionObservationComplete(row.approved_construction,contract,row))

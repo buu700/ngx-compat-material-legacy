@@ -1,0 +1,24 @@
+import '@angular/compiler';
+import * as core from '@angular/core';
+import {ViewportRuler} from '@angular/cdk/scrolling';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {pathToFileURL} from 'node:url';
+import {deriveSurface} from '../scripts/api-surface.mjs';
+import {observePublicNodeFactory,loadRuntimeModule} from '../scripts/api-di-observe.mjs';
+import {captureFactoryConstructorInputs} from '../scripts/api-factory-constructor-inputs.mjs';
+const sha=p=>createHash('sha256').update(readFileSync(p)).digest('hex');
+assert.equal(sha(process.argv[4]),'a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7');
+assert.equal(sha(process.argv[5]+'/fesm2022/scrolling.mjs'),'7656a68cba9c315d54e834f26a36e4f465e1b76b65418ad3ee9dffc3ac6431d6');
+assert.equal(sha(process.argv[5]+'/package.json'),'b7794ad784818253dec6b2aeea7d0b3b5ac7fa6ac0f8d2e440bf9e581fc2bf15');
+const {ViewportRuler:HistoricalViewport}=await import(pathToFileURL(process.argv[5]+'/fesm2022/scrolling.mjs').href);
+const packageRoot=process.argv[2],loaded=await loadRuntimeModule(packageRoot,'legacy-progress-spinner','primary'),owned=await loadRuntimeModule(packageRoot,'legacy-core','primary');
+const surface=deriveSurface(process.argv[3]);
+const symbol=surface.symbols.find(x=>x.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner');
+const Type=loaded.MatLegacyProgressSpinner, old={kind:'historical16'},minimum={kind:'minimum22'},candidate={kind:'owned'};
+assert.notEqual(ViewportRuler,owned._LegacyViewport);assert.notEqual(HistoricalViewport,owned._LegacyViewport);assert.notEqual(HistoricalViewport,ViewportRuler);
+async function probe(providers){let captured;let result=await observePublicNodeFactory(Type,core,packageRoot,symbol,surface.symbols,s=>import(s),{providers,constructorFactory:()=>{captured=captureFactoryConstructorInputs(Type,Type.ɵfac);return captured.value;}});assert.equal(result.outcome,'returned',result.error);assert.equal(captured.constructor_calls,1);assert.equal(captured.inputs.length,9);return captured.inputs[6];}
+assert.equal(Type.ctorParameters()[6].type,owned._LegacyViewport); const a=await probe([{provide:HistoricalViewport,useValue:old},{provide:ViewportRuler,useValue:minimum}]);assert.notEqual(a,old);assert.notEqual(a,minimum);assert.ok(a instanceof owned._LegacyViewport);
+const b=await probe([{provide:HistoricalViewport,useValue:old},{provide:ViewportRuler,useValue:minimum},{provide:owned._LegacyViewport,useValue:candidate}]);assert.equal(b,candidate);assert.notEqual(b,old);assert.notEqual(b,minimum);
+console.log(JSON.stringify({actual_node_factories:2,constructor_arity:9,viewport_index:6,historical16_provider_selected:false,minimum22_provider_selected:false,owned_provider_selected:true,scope:'actual Angular node under synthetic server renderer; no stable private-token customization guarantee, native browser, or supported version-range claim'}));

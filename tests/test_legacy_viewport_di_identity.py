@@ -14,10 +14,10 @@ import {ownedViewportIdentity} from './scripts/api-di-observe.mjs';
 class Owned {} class SameName {}
 const param={ident:'ViewportRuler',imported:'ViewportRuler',spec:'@angular/cdk/scrolling'};
 for(const family of ['legacy-autocomplete','legacy-progress-spinner','legacy-select','legacy-tabs']) {
- assert.equal(ownedViewportIdentity(family,param,{_LegacyViewport:Owned},Owned),true);
- assert.equal(ownedViewportIdentity(family,param,{_LegacyViewport:Owned},SameName),false);
- assert.equal(ownedViewportIdentity(family,param,{},Owned),false);
- assert.equal(ownedViewportIdentity(family,param,{_LegacyViewport:undefined},undefined),false);
+ assert.equal(ownedViewportIdentity(family,param,{_LegacyViewport:Owned},Owned),null);
+ assert.equal(ownedViewportIdentity(family,param,{_LegacyViewport:Owned},SameName),null);
+ assert.equal(ownedViewportIdentity(family,param,{},Owned),null);
+ assert.equal(ownedViewportIdentity(family,param,{_LegacyViewport:undefined},undefined),null);
  for(const changed of [{...param,ident:'Other'},{...param,imported:'Other'},{...param,spec:'foreign'},
   {...param,spec:'@angular/cdk/overlay'}])assert.equal(ownedViewportIdentity(family,changed,{_LegacyViewport:Owned},Owned),null);
 }

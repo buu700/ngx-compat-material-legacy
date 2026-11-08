@@ -1,4 +1,5 @@
 import {menuTriggerOwnedToken} from './api-menu-trigger-token.mjs';
+import {spinnerViewportProof} from './api-spinner-viewport-contract.mjs';
 import {existsSync,readFileSync} from 'node:fs';
 import {createRequire} from 'node:module';
 import {pathToFileURL} from 'node:url';
@@ -83,7 +84,7 @@ function isOriginalModule(symbol){
     ||factory.declaration_kind==='published-jit-decorators'&&/\bNgModule\(/.test(factory.declaration)));
 }
 
-export async function observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule,{providers=[],constructorFactory,tableParentKind='legacy',inputParentKind='legacy',inputArtifactContext=null}={}){
+export async function observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule,{providers=[],constructorFactory,tableParentKind='legacy',inputParentKind='legacy',inputArtifactContext=null,spinnerProof=null}={}){
   let fixture,factory,parentExecution,requiredParent,requiredParentType,requiredParentToken,requiredParentCapture;
   let requiredParentDestroyed=false,parentLifetimeSubscription;
   let callerConfig,menuContentState,simpleSnack,dialogOpener,autocompleteCapture,tabPortalParent,tabPortalState,tableDefinitionCapture,inputLifetime,inputBehavior;
@@ -241,13 +242,19 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
       parentLifetimeSubscription=fixture.parentNode.owner.destroyed.subscribe(()=>{requiredParentDestroyed=true;});
     if(!attributeContract){
       const injector=(usesTemplate?fixture.template:fixture.element).injector;
+      const spinnerCapture=Boolean(spinnerProof&&symbol.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner');
       const captureMotionMode=ownedMotionProfile(symbol.symbol_id)?.constructorAnimationIndex!==undefined;
       if(constructorFactory!==undefined&&typeof constructorFactory!=='function')throw Error('diagnostic constructor factory must be callable');
-      factory=runFactory(requiredParent||callerConfig||captureMotionMode||menuContent||simpleSnack||dialogOpener||autocompleteCapture||tabBody||tabHeader||tabPortal||tableDefinition||input?()=>captureFactoryConstructorInputs(value,constructorFactory||value.ɵfac,{beforeConstructor:autocompleteCapture?.beforeConstructor||tableDefinitionCapture?.beforeConstructor}):constructorFactory||value.ɵfac,
+      factory=runFactory(requiredParent||callerConfig||captureMotionMode||menuContent||simpleSnack||dialogOpener||autocompleteCapture||tabBody||tabHeader||tabPortal||tableDefinition||input||spinnerCapture?()=>captureFactoryConstructorInputs(value,constructorFactory||value.ɵfac,{beforeConstructor:autocompleteCapture?.beforeConstructor||tableDefinitionCapture?.beforeConstructor}):constructorFactory||value.ɵfac,
         core.Injector,core.runInInjectionContext,{injector,captureStack:true});
       autocompleteCapture?.restore();
-      if((requiredParent||callerConfig||captureMotionMode||menuContent||simpleSnack||dialogOpener||autocompleteCapture||tabBody||tabHeader||tabPortal||tableDefinition||input)&&factory.outcome==='returned'){
+      if((requiredParent||callerConfig||captureMotionMode||menuContent||simpleSnack||dialogOpener||autocompleteCapture||tabBody||tabHeader||tabPortal||tableDefinition||input||spinnerCapture)&&factory.outcome==='returned'){
         requiredParentCapture=factory.value;factory.value=requiredParentCapture.value;
+        if(spinnerCapture){
+          const owned=await loadRuntimeModule(packageRoot,'legacy-core','primary'),input=requiredParentCapture.inputs[6],metadata=value.ctorParameters?.();
+          if(requiredParentCapture.constructor_calls!==1||requiredParentCapture.inputs.length!==9||metadata?.[6]?.type!==owned?._LegacyViewport||input!==injector.get(owned._LegacyViewport)||requiredParentCapture.inputs[0]?.nativeElement!==fixture.element.element.nativeElement)throw Error('spinner viewport actual node/constructor identity differs');
+          factory.spinnerViewportContext={constructor_calls:1,constructor_arity:9,viewport_index:6,actual_node_element:true,owned_input_matches_node_provider:true,owned_metadata_token:true};
+        }
         if(requiredParent)factory.requiredParentContext=observeRequiredParentInputs(requiredParent,requiredParentCapture,
           fixture,requiredParentType,requiredParentToken,core);
         if(callerConfig)factory.callerConfigContext=observeCallerConfigInputs(callerConfig,requiredParentCapture,fixture,core);
@@ -486,13 +493,11 @@ export function ownedTokenIdentity(family, param, loaded, observedToken) {
   return Object.hasOwn(loaded, exported) && loaded[exported] === observedToken;
 }
 
-/** Only these legacy consumers replace the original private viewport helper. */
-export function ownedViewportIdentity(family, param, coreExports, observedToken) {
-  if (!['legacy-autocomplete','legacy-progress-spinner','legacy-select','legacy-tabs'].includes(family)
-      || param.ident !== 'ViewportRuler' || param.imported !== 'ViewportRuler'
-      || param.spec !== '@angular/cdk/scrolling') return null;
-  return Object.hasOwn(coreExports, '_LegacyViewport') && typeof coreExports._LegacyViewport === 'function'
-    && coreExports._LegacyViewport === observedToken;
+/** An owned replacement is not historical token identity. */
+export function ownedViewportIdentity(_family, _param, _coreExports, _observedToken) { return null; }
+// Header-only candidate; the header receipt separately checks the actual node and source.
+function ownedHeaderViewportCandidate(family,param,coreExports,observedToken) {
+ return family==='legacy-tabs' && param.ident==='ViewportRuler' && param.imported==='ViewportRuler' && param.spec==='@angular/cdk/scrolling' && typeof coreExports._LegacyViewport==='function' && coreExports._LegacyViewport===observedToken;
 }
 
 // Alias identities come from the original barrels/source before loading the
@@ -603,11 +608,16 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
     }
     const construction = approvedMenuItemContract(symbol) || approvedTableContract(symbol) || approvedRippleContract(symbol);
     const originalKind = symbol.shape.originalFactoryContext?.effective_factory_kind || symbol.shape.originalFactory?.deps_kind;
+    let spinnerProof=null;
+    if(symbol.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'&&inputArtifactContext){
+      const path=resolve(packageRoot,'types/ngx-compat-material-legacy-legacy-progress-spinner.d.ts');
+      try{spinnerProof=spinnerViewportProof(symbol,{fileName:path,text:readFileSync(path,'utf8')},{...inputArtifactContext,packageRoot});}catch{}
+    }
     const factory = construction ? symbol.symbol_id === TABLE_SYMBOL
       ? await observeTableFactory(value, loaded, importModule) : symbol.symbol_id===RIPPLE_SYMBOL
       ? await observeRippleFactory(value,loaded,importModule,runFactory) : await observeMenuItemFactory(value, loaded, importModule)
       : originalKind==='invalid' ? runFactory(value.ɵfac,Injector,runInInjectionContext)
-      : await observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule,{inputArtifactContext});
+      : await observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule,{inputArtifactContext,spinnerProof});
     const observed = factory.requests;
     const publicNodeRequests=[];
     const runtimeRequests=[];
@@ -632,7 +642,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         const coreExports = param.ident === 'ViewportRuler'
           ? await loadRuntimeModule(packageRoot, 'legacy-core', 'primary') : null;
         const ownedViewport = ownedViewportIdentity(symbol.family, param, coreExports || {}, got.token);
-        const tabReplacement = tabHeaderProfile(symbol) && ownedViewport === true;
+        const tabReplacement = Boolean(tabHeaderProfile(symbol) && ownedHeaderViewportCandidate(symbol.family,param,coreExports || {},got.token));
         const historicalViewport = tabReplacement ? (await importModule('@angular/cdk/scrolling')).ViewportRuler : null;
         if(tabReplacement){
           if(typeof historicalViewport !== 'function' || historicalViewport === got.token)
@@ -648,9 +658,10 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         }
         const same = tabReplacement ? false : ownedViewport !== null ? ownedViewport : await runtimeTokenIdentity(symbol.family, param, exports,
           originalRuntimeAliases(symbols, symbol.family), got.token, importModule,packageRoot,symbol);
+        const replacement=Boolean(spinnerProof&&symbol.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'&&index===6&&!same&&factory.spinnerViewportContext?.owned_input_matches_node_provider&&got.token===coreExports?._LegacyViewport&&param.ident==='ViewportRuler'&&param.imported==='ViewportRuler'&&param.spec==='@angular/cdk/scrolling'&&!got.unresolved&&['optional','self','skipSelf','host'].every(f=>!got[f]&&!param[f]));
         const menuReplacement=symbol.symbol_id==='legacy-menu/primary/MatLegacyMenuTrigger'&&param.ident==='MatMenuItem'
           ? await menuTriggerOwnedToken(symbol,param,exports,await importModule('@angular/material/menu'),got.token,packageRoot,{artifactContext:inputArtifactContext}) : null;
-        runtimeRequests.push({expected_ident:param.ident,expected_spec:param.spec,identity_matched:same,...(menuReplacement?{owned_menu_item_replacement:menuReplacement}:{}),
+        runtimeRequests.push({...(replacement?{intentional_token_difference:{historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',historical_provider_selects_actual:false,minimum_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee',proof:spinnerProof,node:factory.spinnerViewportContext}}:{}),expected_ident:param.ident,expected_spec:param.spec,identity_matched:same,...(menuReplacement?{owned_menu_item_replacement:menuReplacement}:{}),
           ...(tabReplacement ? {intentional_token_difference:{historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',classification:'owned replacement for upstream docs-private helper',historical_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee'}} : {}),
           expected_optional:Boolean(param.optional),expected_self:Boolean(param.self),
           expected_skipSelf:Boolean(param.skipSelf),expected_host:Boolean(param.host),
@@ -659,7 +670,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         if (symbol.symbol_id===TABLE_SYMBOL) publicNodeRequests.push({ident:param.ident,spec:param.spec,
           observed_label:got.label+(got.optional?'?':''),identity_matched:same,
           optional:Boolean(got.optional),self:Boolean(got.self),skipSelf:Boolean(got.skipSelf),host:Boolean(got.host)});
-        if (!same && !tabReplacement && !menuReplacement) problems.push(`token ${symbol.symbol_id}[${index}] expected ${param.ident} observed ${got.label}`);
+        if (!same && !tabReplacement && !menuReplacement && !replacement) problems.push(`token ${symbol.symbol_id}[${index}] expected ${param.ident} observed ${got.label}`);
         for (const flag of ['self','skipSelf','host']) if (Boolean(param[flag])!==Boolean(got[flag]))
           problems.push(`injection flag ${symbol.symbol_id}[${index}] ${flag} differs`);
         if (Boolean(param.optional) !== Boolean(got.optional)) {
