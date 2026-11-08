@@ -34,7 +34,46 @@ $handset-margin: 24px;
   padding-right: $handset-horizontal-padding;
 }
 
-.mat-tooltip-panel.mat-tooltip-panel-non-interactive {
+// TODO: Investigate non-interactive tooltip panes when CDK overlay styles load later.
+//
+// Preserve this single-class selector from Material 16.2.14. The pane also has
+// cdk-overlay-pane, whose structural styles set pointer-events: auto. Both rules
+// have specificity 0-1-0, so a later CDK rule wins over this pointer-events: none.
+// The CDK 16 stylesheet already contained that competing rule: the underlying
+// sensitivity to stylesheet order is historical. However, our untouched Material
+// 16 two-application reference did not automatically inject a later CDK rule.
+// Do not describe the entire newer-runtime failure as a reproduced Material 16 bug.
+//
+// With CDK 22.1.7, we reproduced a later structural stylesheet being injected by
+// another Angular application in the same document, after the first application's
+// tooltip styles. With the original selector, an already displayed non-interactive
+// legacy tooltip then computes pointer-events: auto and can intercept clicks.
+// Ordinary same-application ordering passed. Separate documents, including iframe
+// documents, do not share this CSS cascade. This rule is used only when tooltip
+// defaults opt into disableTooltipInteractivity; the default factory does not
+// enable that option. The class name alone does not make every tooltip affected.
+//
+// Using .mat-tooltip-panel.mat-tooltip-panel-non-interactive kept pointer-events:
+// none in both tested orders, but raised specificity to 0-2-0. A later consumer
+// single-class override that worked with Material 16 then stopped winning. Keep
+// the historical selector and record the narrow load-order limitation instead of
+// silently changing that consumer CSS contract. Inline styles and !important also
+// change override precedence; removing the CDK pane class changes structural DOM
+// behavior. Reordering or duplicating application styles needs its own lifecycle
+// and cascade justification. No conservative public-API remedy preserving both
+// observed behaviors has yet been established.
+//
+// A future fix must preserve the historical pane/classes and consumer overrides,
+// use supported public APIs at the advertised minimum peer version, and explain
+// repeated attachment, teardown, and independently bootstrapped applications.
+// Verify actual pointer targeting with CDK styles before and after tooltip styles,
+// one and two applications, legacy/current tooltip coexistence, interactive and
+// non-interactive configuration, disabled/show/hide/destroy, and a later consumer
+// override. Keep the tagged CSS oracle unchanged; do not normalize its selector
+// into the candidate or weaken the corresponding negative control to obtain a pass.
+// See tests/overlay_resource_css_probe.mjs and
+// compatibility/rc/parent-main-untouched-tooltip-css-oracle-v1.json for context.
+.mat-tooltip-panel-non-interactive {
   pointer-events: none;
 }
 

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "role": "maintainer-authorized historical tooltip selector restoration and detailed non-emitting TODO",
+  "base_head": "8d7903126c07b90df0cb2bb12aba4020d38324fd",
+  "authorization": "After recommending the original Material16 selector with a documented narrow load-order limitation, the maintainer replied: Sounds good to me, let's add a long/detailed TODO comment that properly documents the issue for future reference.",
+  "source": {
+    "path": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/projects/ngx-material-legacy/legacy-tooltip/tooltip.scss",
+    "bytes": 4129,
+    "sha256": "b737238c2f356a3672c21dc03864e06beb4451053b71e02202b4509cd1503bee"
+  },
+  "probe": {
+    "path": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/tests/overlay_resource_css_probe.mjs",
+    "bytes": 7733,
+    "sha256": "2a274dbe18ab47d7a4f84e071c534d8ad163808585640e3989c81d7baa1ccd9d"
+  },
+  "prior_source_sha256": "692e27d01ea6a8deb1502c3f6d143f7ca868368655126d4ac8f6958eb6179458",
+  "selector_before": ".mat-tooltip-panel.mat-tooltip-panel-non-interactive",
+  "selector_after": ".mat-tooltip-panel-non-interactive",
+  "decision": "Preserve the Material16 CSS cascade and document the narrow unresolved current-CDK late-style case. The SCSS TODO uses line comments, which emit no CSS. It explains the inherited cascade sensitivity, modern trigger, stronger-selector tradeoff and required future tests.",
+  "historical_distinction": "CDK16.2.14 also shipped the equal-specificity overlay-pane pointer-events:auto rule. Its stylesheet-order sensitivity is historical; the untouched16 two-app experiment did not automatically inject the later competing stylesheet. The entire current automatic trigger is not claimed to be an old16 defect.",
+  "accepted_limitation": "When disableTooltipInteractivity is explicitly enabled and another Angular application in the same document injects CDK structural styles after the legacy tooltip styles, the original selector can lose and the pane can intercept clicks. This case is documented, not marked fixed or passed.",
+  "root_executed": {
+    "command": "Pinned Node24.21.0 tests/overlay_resource_css_probe.mjs with authenticated16 inputs, pinned PostCSS8.5.28, installed22.1.7 and retained21.2.14 peers, unique external report",
+    "exit_code": 0,
+    "whole_style_comparisons": 4,
+    "negative_controls_rejected": 12,
+    "result": "All complete historical CSS partitions equal untouched tagged oracle; independent public-native high-contrast partitions equal their separate expectations. Specificity-increase mutation rejects.",
+    "report": {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/root-tooltip-original-selector-todo-v1/report.json",
+      "bytes": 21438,
+      "sha256": "e66bcefd626b8fef08f099bec3316f78277d0acc8aa4f3ac146a10efaba73dca"
+    },
+    "log": {
+      "path": "/home/parallels/.codex/closeout-state/2026-11-07-recovery/root-tooltip-original-selector-todo-v1/probe.log",
+      "bytes": 56,
+      "sha256": "ae230ae5a7834f61113ee34642d486bd6735bcf10f6acf69fe10e9960ce3360e"
+    }
+  },
+  "test_correction": "The specificity mutation now targets the actual rule at a source-line boundary. An unanchored string replacement could otherwise alter only the doubled selector mentioned in the new TODO and become a no-op. The unchanged historical oracle and all controls are retained.",
+  "cyph_source_sanity": "Read-only shared-source checks found no disableTooltipInteractivity/default-options provider or pane pointer-events override. Normal browser entry points each bootstrap one app; SDK uses server platform. No Cyph build or exhaustive production/runtime/style audit is claimed.",
+  "limits": [
+    "Source CSS comparison only; no fresh packed build or native browser run in this change. Existing native two-app counterexample remains a known accepted limitation.",
+    "The earlier adapted CSS report remains historical and is not a new pass.",
+    "Upstream ledger row68b267dd59f3addf92a3b9f8ce9e8baa479df7f4 still references the old tooltip source. It requires separate evidence/decision requalification before G11; no blind hash update or current artifact claim.",
+    "No Sass seal, current-head product matrix, 21.x release, G11, final audit or publication approval."
+  ]
+}

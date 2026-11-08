@@ -79,7 +79,8 @@ for (const key of ['--main-root', '--maintenance-root']) {
   for (const [id, file, changed] of [
     ['tooltip-line-height-reset', tooltip, read(tooltip) + '\n.mat-tooltip-panel {line-height:normal;}'],
     ['tooltip-gap-change', tooltip, read(tooltip).replace('$margin: 14px;', '$margin: 10px;')],
-    ['tooltip-pointer-specificity-increase', tooltip, read(tooltip).replace(originalPointerSelector, adaptedPointerSelector)],
+    // Change the actual rule, not a selector mentioned in a maintenance comment.
+    ['tooltip-pointer-specificity-increase', tooltip, read(tooltip).replace(/^[ \t]*\.mat-tooltip-panel-non-interactive[ \t]*\{/m, adaptedPointerSelector + ' {')],
     ['tooltip-native-addition', tooltip, read(tooltip) + '\n@media (forced-colors:active) {.mat-tooltip {height:40px;}}'],
     ['autocomplete-child-pointer-copy', autocomplete, read(autocomplete) + '\n.mat-autocomplete-panel.mat-autocomplete-hidden {pointer-events:none;}'],
     ['autocomplete-height-change', autocomplete, read(autocomplete).replace('$panel-max-height: 256px', '$panel-max-height: 300px')],
