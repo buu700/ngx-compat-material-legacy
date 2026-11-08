@@ -61,7 +61,18 @@ export function packedCvaMetadataToolingEpoch({root = process.cwd(), read = disk
   }
   assert.equal(hash(after), delta.sha256);
   const expected = hash(read(delta.path));
-  assert.ok(expected === delta.before_sha256 || expected === delta.sha256, 'changed retired-role type proof adapter');
+  if (expected !== delta.before_sha256 && expected !== delta.sha256) {
+    // The main-line current-dialog continuation changed this adapter after the
+    // original type receipt. Authenticate that exact committed successor; the
+    // projection below still supplies only the receipt's original bytes.
+    assert.equal(inputs.line, 'main', 'changed retired-role type proof adapter');
+    const predecessor = '3b9f3d37d73f3731e09fd4a04fdb53419d560933';
+    const successor = '547abe83d86c4682a173a6e01d2c783b6bb1d855';
+    assert.equal(hash(original(root, predecessor, delta.path)), delta.sha256);
+    const current = original(root, successor, delta.path);
+    assert.equal(hash(current), '34250fbc33217cd572fcb0380221f057b56117aa832e05aa3cb22cf8cc3afb66');
+    assert.ok(current.equals(read(delta.path)), 'changed retired-role type proof adapter');
+  }
   const assertCurrent = () => assert.equal(hash(read(delta.path)), expected, 'late retired-role proof adapter mutation');
   return {path: delta.path, before, read: path => {
     if (path !== delta.path) return read(path);
