@@ -1,0 +1,143 @@
+diff --git a/projects/ngx-material-legacy/legacy-form-field/form-field.ts b/projects/ngx-material-legacy/legacy-form-field/form-field.ts
+index dda4b47f4..c7d43a56f 100644
+--- a/projects/ngx-material-legacy/legacy-form-field/form-field.ts
++++ b/projects/ngx-material-legacy/legacy-form-field/form-field.ts
+@@ -14,7 +14,7 @@ import {
+   AfterContentChecked,
+   AfterContentInit,
+   AfterViewInit,
+-  AfterViewChecked,
++  assertInInjectionContext,
+   ChangeDetectionStrategy,
+   ChangeDetectorRef,
+   Component,
+@@ -22,6 +22,7 @@ import {
+   ContentChildren,
+   ElementRef,
+   Inject,
++  inject,
+   Injector,
+   Input,
+   NgZone,
+@@ -35,7 +36,7 @@ import {
+ import {ThemePalette} from '@angular/material/core';
+ import {CanColor, mixinColor} from './internal/common-behaviors';
+ import {fromEvent, merge, Subject, Subscription} from 'rxjs';
+-import {filter, map, pairwise, startWith, take, takeUntil} from 'rxjs/operators';
++import {startWith, take, takeUntil} from 'rxjs/operators';
+ import {MatLegacyError} from './error';
+ import {_MAT_LEGACY_HINT, MatLegacyHint} from './hint';
+ import {MatLegacyLabel} from './label';
+@@ -62,6 +63,16 @@ let nextUniqueId = 0;
+ const floatingLabelScale = 0.75;
+ const outlineGapPadding = 5;
+ 
++/** Captures the active host injector when a legacy subclass omits the optional argument. */
++function legacyFormFieldInjector(): Injector | undefined {
++  try {
++    assertInInjectionContext(legacyFormFieldInjector);
++  } catch {
++    return undefined;
++  }
++  return inject(Injector);
++}
++
+ /**
+  * Boilerplate for applying mixins to MatFormField.
+  * @docs-private
+@@ -158,7 +169,7 @@ export const MAT_LEGACY_FORM_FIELD_DEFAULT_OPTIONS =
+ })
+ export class MatLegacyFormField
+   extends _MatFormFieldBase
+-  implements AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked, OnDestroy, CanColor
++  implements AfterContentInit, AfterContentChecked, AfterViewInit, OnDestroy, CanColor
+ {
+   /**
+    * Whether the outline gap needs to be calculated
+@@ -281,9 +292,8 @@ export class MatLegacyFormField
+   private _previousControlValidatorFn: ValidatorFn | null = null;
+   private _stateChanges: Subscription | undefined;
+   private _valueChanges: Subscription | undefined;
+-  private _describedByChanges: Subscription | undefined;
+   /** Hint/error IDs last assigned by `_syncDescribedByIds`. */
+-  private _describedByIds: string[] | undefined;
++  private readonly _describedByIds = new WeakMap<MatFormFieldControl<unknown>, string[]>();
+ 
+   @ContentChild(MatLegacyLabel) _labelChildNonStatic: MatLegacyLabel;
+   @ContentChild(MatLegacyLabel, {static: true}) _labelChildStatic: MatLegacyLabel;
+@@ -310,6 +320,9 @@ export class MatLegacyFormField
+   ) {
+     super(elementRef);
+ 
++    if (this._injector === undefined) {
++      this._injector = legacyFormFieldInjector();
++    }
+     this.floatLabel = this._getDefaultFloatLabelState();
+     this._legacyAnimationsDisabled = legacyAnimationsDisabled();
+     this._animationsEnabled =
+@@ -354,6 +367,7 @@ export class MatLegacyFormField
+           if (this._outlineGapCalculationNeededOnStable) {
+             this.updateOutlineGap();
+           }
++          this.#updateSubscriptMotion();
+         });
+     });
+ 
+@@ -427,7 +441,7 @@ export class MatLegacyFormField
+     }
+   }
+ 
+-  ngAfterViewChecked() {
++  #updateSubscriptMotion() {
+     const messageKind = this._getDisplayedMessages();
+     const changed = this._previousMessageKind !== undefined && this._previousMessageKind !== messageKind;
+     if (changed) {
+@@ -470,7 +484,6 @@ export class MatLegacyFormField
+     this._directionFrames.clear();
+     this._stateChanges?.unsubscribe();
+     this._valueChanges?.unsubscribe();
+-    this._describedByChanges?.unsubscribe();
+     this._destroyed.next();
+     this._destroyed.complete();
+   }
+@@ -630,14 +643,14 @@ export class MatLegacyFormField
+ 
+       // Preserve aria-describedby IDs assigned outside the form field (e.g. AriaDescriber).
+       if (existingDescribedBy) {
+-        const exclude = this._describedByIds || ids;
++        const exclude = this._describedByIds.get(this._control) || ids;
+         toAssign = ids.concat(existingDescribedBy.filter(id => id && !exclude.includes(id)));
+       } else {
+         toAssign = ids;
+       }
+ 
+       this._control.setDescribedByIds(toAssign);
+-      this._describedByIds = ids;
++      this._describedByIds.set(this._control, ids);
+     }
+   }
+ 
+@@ -659,22 +672,11 @@ export class MatLegacyFormField
+     this._stateChanges?.unsubscribe();
+     this._stateChanges = control.stateChanges.subscribe(() => {
+       this._validatePlaceholders();
++      this._syncDescribedByIds();
+       this._changeDetectorRef.markForCheck();
+     });
+     this._validatePlaceholders();
+ 
+-    // Updating aria-describedby touches the DOM. Only do it when error/user ids change.
+-    this._describedByChanges?.unsubscribe();
+-    this._describedByChanges = control.stateChanges
+-      .pipe(
+-        startWith([undefined, undefined] as const),
+-        map(() => [control.errorState, control.userAriaDescribedBy] as const),
+-        pairwise(),
+-        filter(([[prevErrorState, prevDescribedBy], [currentErrorState, currentDescribedBy]]) => {
+-          return prevErrorState !== currentErrorState || prevDescribedBy !== currentDescribedBy;
+-        }),
+-      )
+-      .subscribe(() => this._syncDescribedByIds());
+     this._syncDescribedByIds();
+ 
+     this._valueChanges?.unsubscribe();
