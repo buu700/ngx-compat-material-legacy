@@ -11,6 +11,7 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync,lstatSync,realpathSync} from 'node:fs';
 import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {createRequire} from 'node:module';
 import {types} from 'node:util';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {authoredUseReviewEvidence} from './authored-use-inventory.mjs';
@@ -22,6 +23,7 @@ import {dialogFocusFiniteSourceSuccessor} from './dialog-focus-finite-source-suc
 const SELF='scripts/historical-contract-repair-source.mjs',INPUTS='compatibility/rc/historical-contract-repair-source-inputs.json';
 const PINS={'21.x':'c1d7a8762cad7913a5d4ad60863afb506c56c61d27a78c17a3f5372c51cc9303',main:'cee92383ce1cb2c82b135e2e3b8be0131a46b114d60a521f7e11e4d0bb017191'};
 const image=readFileSync(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex'),originals=new Map();
+const requireLocal=createRequire(import.meta.url);
 export const historicalContractRepairLoadedImage=Object.freeze({path:SELF,sha256:hash(image),bytes:image.length});
 const SOURCE_PATHS=Object.freeze([
  'projects/ngx-material-legacy/legacy-form-field/testing/error-harness.ts',
@@ -100,6 +102,21 @@ export function historicalRepairTableSourceProof({root=process.cwd()}={}){
   return Object.freeze({before:Object.freeze({...packet.before}),after:Object.freeze({...packet.after}),review:Object.freeze({...packet.review}),qualify,assertImage});
 }
 
+/** Select the already reviewed source owner for this physical package line. */
+export function historicalRepairSelectSourceOwner({root=process.cwd(),read,line}={}){
+ root=resolve(root);assert.ok(line==='21.x'||line==='main');const physical=path=>readEvidenceMember(root,path);if(read===undefined)read=physical;assert.equal(typeof read,'function');let select;
+ if(line==='main'){
+  // The reviewed V7 owner composes the retained V1–V6 source identities and
+  // exact current select/menu source epoch. The old owner remains 21.x-only.
+  const source={path:'scripts/select-dialog-finite-source-v7.mjs',sha256:'87155482dbaa488a0e72ae0ba75c3edfe370bc11fcfc2ddd1ce3f0190a5609a6',bytes:17719};
+  const raw=physical(source.path);exact(raw,source);const module=requireLocal('./select-dialog-finite-source-v7.mjs');
+  assert.ok(Object.isFrozen(module.selectDialogFiniteLoadedImage));assert.deepEqual(module.selectDialogFiniteLoadedImage,source);
+  assert.equal(hash(functionToString.call(module.selectDialogFiniteSuccessor)),'e6ab419874774e5d1878257c001d4bc24ea298d28072de22134ad0831895eef1','unauthenticated current select source successor');
+  select=module.selectDialogFiniteSuccessor({root,read:read,line:line});
+ }else select=selectDialogFiniteSuccessor({root,read,line});
+ return select;
+}
+
 
 const producerIdentityTransitions=Object.freeze([{"path":"scripts/upstream-base-class-removal-source.mjs","after":{"path":"scripts/upstream-base-class-removal-source.mjs","sha256":"2a225cd654fe4940aec34987c7b46453fa624b70743ae5fa63d73ce2341358e2","bytes":12610},"edits":[{"offset":1382,"before":"","after":"export const baseClassRemovalOriginalLoadedImage=Object.freeze({path:SELF,sha256:hash(image),bytes:image.length});\n"}],"before":{"path":"scripts/upstream-base-class-removal-source.mjs","sha256":"1c127473aac8050d206b38c531eb8386492bbc4114acabd7d4a42dd80c30b17b","bytes":12495,"git_blob":"ef9a77b0941e2c257ae8f9c89709b6f3907c39d0"}},{"path":"compatibility/rc/21x-base-class-removal-source-final-review.mjs","after":{"path":"compatibility/rc/21x-base-class-removal-source-final-review.mjs","sha256":"9fb47887c2389e0e40a8ba1fa4e2086e844d96940d82387d8b69c12b739839f0","bytes":22459},"edits":[{"offset":1023,"before":"","after":"export const baseClassRemovalReviewLoadedImage = Object.freeze({path: SELF, sha256: hash(image), bytes: image.length});\n"}],"before":{"path":"compatibility/rc/21x-base-class-removal-source-final-review.mjs","sha256":"67fbedb4ac7310218123d4248f8f93519a9d9c7a03d5ecfccae398f78543084b","bytes":22339,"git_blob":"d9491b9a8cecc5b85ecb23bff81a4887193f3e5e"}}]);
 function currentProducerReference(root,line,ref){
@@ -165,7 +182,7 @@ export function historicalContractRepairSourceSubject({root=process.cwd(),read:p
  const physicalVersion=JSON.parse(physical('projects/ngx-material-legacy/package.json')).version;
  const physicalLine=physicalVersion.startsWith('21.')?'21.x':physicalVersion.startsWith('22.')?'main':null;assert.ok(physicalLine);
  const tabs=tabsFiniteSourceSuccessor({root,read:providedRead??physical,line:physicalLine});
- const select=selectDialogFiniteSuccessor({root,read:providedRead??physical,line:physicalLine});
+ const select=historicalRepairSelectSourceOwner({root,read:providedRead??physical,line:physicalLine});
  const focus=dialogFocusFiniteSourceSuccessor({root,read:providedRead??physical,line:physicalLine});
  for(const ref of [...tabs.bound,...select.bound,...focus.bound]){const previous=bound.get(ref.path);if(previous)assert.deepEqual(previous,ref,'conflicting finite historical-repair input '+ref.path);else bound.set(ref.path,{...ref});}
  let tableTransition=null;
