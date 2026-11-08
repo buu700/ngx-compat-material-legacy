@@ -10,12 +10,16 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {spawnSync} from 'node:child_process';
-import {posix} from 'node:path';
+import {posix,dirname,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {gunzipSync} from 'node:zlib';
+import {readFileSync} from 'node:fs';
+import {retainedCurrentContextIdentity} from './retained-current-context-identity.mjs';
+import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 
 const ts = createRequire(import.meta.url)('typescript');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+const SELF='scripts/upstream-bazel-build-scope.mjs',loadedSource=readFileSync(fileURLToPath(import.meta.url)),sourceRoot=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const gitHash = (kind, text) => createHash('sha1').update(`${kind} ${Buffer.byteLength(text)}\0`).update(text).digest('hex');
 export const BAZEL_BUILD_ROLE = 'C04 two individual upstream build-only scope reviews';
 export const BAZEL_BUILD_KIND = 'complete-upstream-build-only-source-exclusion';
@@ -175,13 +179,49 @@ export function reviewBazelBuildContext(readMember, productPaths, line) {
     packing: 'npm pack of local ng-packagr dist; no upstream Bazel execution', actual_build_pack_or_floor_executed: false};
 }
 
+function retainedMainBazelContext(body,analysis,observed,read,productPaths){
+  const source=retainedCurrentContextIdentity({root:sourceRoot,read});
+  const reviewPath='compatibility/rc/main-retained-bazel-current-review-v1.json',reviewSha='c5c646996bbd9ebf6e78fcc8046509daafaf8e9f30cba899edf80b25080cfd6c';
+  const physical=path=>readEvidenceMember(sourceRoot,path);
+  const checked=(path,digest)=>{const raw=physical(path);assert.equal(hash(raw),digest,path);assert.ok(raw.equals(read(path)),'nonphysical current Bazel input '+path);assert.ok(raw.equals(physical(path)));return raw;};
+  const review=JSON.parse(checked(reviewPath,reviewSha));
+  assert.equal(review.schema_version,1);assert.equal(review.role,'finite main current-context revalidation of two retained Bazel source exclusions');
+  assert.equal(review.source_context_commit,'4e6f608402e99da9fb550bb46040aa68a648440a');
+  for(const field of ['original_dispositions_changed','historical_reports_rewritten','runtime_artifact_floor_or_security_qualification'])assert.equal(review[field],false);
+  assert.equal(review.g11_claim,'not-passed');assert.deepEqual(review.individual_revalidation.map(row=>row.sha),BAZEL_BUILD_SHAS);
+  for(const row of review.individual_revalidation)assert.ok(row.reason.length>150);
+  const profile=source.beforeContexts.find(row=>row.report.path===review.original_report);assert.ok(profile);
+  assert.deepEqual(JSON.parse(checked(profile.report.path,profile.report.sha256)),body);
+  const {files:oldFiles,product_paths:oldPaths,product_members:oldMembers,product_population_sha256:oldPopulation,...oldContext}=body.candidate_context;
+  const {files,product_paths,product_members,product_population_sha256,...currentContext}=observed;
+  assert.deepEqual(currentContext,oldContext);
+  assert.deepEqual(files,oldFiles.map(ref=>{const selected=source.resolveReference(ref);assert.equal(selected?.kind,'current');return selected.reference;}));
+  assert.deepEqual(product_members,source.products);assert.deepEqual(product_paths,source.products.map(ref=>ref.path));
+  assert.equal(product_population_sha256,hash(JSON.stringify(source.products)));
+  assert.equal(oldPaths.length,1142);assert.equal(oldMembers.length,1142);assert.equal(hash(JSON.stringify(oldMembers)),oldPopulation);
+  const {producers:oldProducers,...oldFacts}=body.source_analysis,{producers,...currentFacts}=analysis;assert.deepEqual(currentFacts,oldFacts);
+  assert.deepEqual(oldProducers,[{path:SELF,sha256:'0f49844cb731a91d589a8f573c74f56fdbb33d397ba75462aa2087b760bc1c2b'},
+    {path:'scripts/upstream_bazel_source_analysis.py',sha256:'e4f4392e2705b62cb67801a5e140950f35afb001f6190f753c92057b42baad42'}]);
+  assert.deepEqual(producers,[{path:SELF,sha256:hash(loadedSource)},oldProducers[1]]);
+  const close=()=>{
+    checked(SELF,hash(loadedSource));checked(reviewPath,reviewSha);checked(oldProducers[1].path,oldProducers[1].sha256);
+    assert.deepEqual([...productPaths()].sort(),source.products.map(ref=>ref.path));source.assertCurrent();
+    assert.ok(physical(SELF).equals(loadedSource));assert.equal(hash(physical(reviewPath)),reviewSha);
+    assert.equal(hash(physical(oldProducers[1].path)),oldProducers[1].sha256);
+  };
+  close();return close;
+}
+
 export function bazelBuildEvidenceOk(body, entry, readMember, productPaths, line) {
   try {
     const index = BAZEL_BUILD_SHAS.indexOf(entry.sha); assert.ok(index >= 0);
     assert.equal(body.role, BAZEL_BUILD_ROLE); assert.equal(body.status, 'reviewed'); assert.equal(body.line, line);
     assert.equal(body.g11_claim, 'not-passed'); assert.deepEqual(body.scope_sha_ids, BAZEL_BUILD_SHAS);
-    const source = analyzeBazelBuildSubjects(readMember); assert.deepEqual(body.source_analysis, source);
-    assert.deepEqual(body.candidate_context, reviewBazelBuildContext(readMember, productPaths, line));
+    const source = analyzeBazelBuildSubjects(readMember),context=reviewBazelBuildContext(readMember, productPaths, line);
+    let closeCurrent=null;
+    if(line==='main'&&entry.evidence_report==='compatibility/rc/packed-upstream-source-bazel.json')
+      closeCurrent=retainedMainBazelContext(body,source,context,readMember,productPaths);
+    else {assert.deepEqual(body.source_analysis,source);assert.deepEqual(body.candidate_context,context);}
     assert.deepEqual(body.reviews.map(r => r.sha), BAZEL_BUILD_SHAS);
     const review = body.reviews[index], actual = source.reviews[index];
     for (const key of ['sha', 'diff', 'diff_sha256', 'paths', 'hunks', 'members']) assert.deepEqual(review[key], actual[key]);
@@ -193,6 +233,7 @@ export function bazelBuildEvidenceOk(body, entry, readMember, productPaths, line
       review_depth: 'individual-compatibility', affected_branches: [line], decision: review.decision});
     assert.equal(entry.reason, review.decision); assert.deepEqual(entry.prior_dispositions.at(-1), review.prior_entry);
     assert.equal(hash(JSON.stringify(review.prior_entry)), review.prior_entry_sha256);
+    closeCurrent?.();
     return true;
   } catch {return false;}
 }
