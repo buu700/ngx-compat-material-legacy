@@ -1,0 +1,303 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "scope": "Five exact helper peer roles and current caller only; prior executions remain historical. No constructor/DI, current packed, browser floor, security or G11 qualification.",
+  "reviews": [
+    {
+      "file": "legacy-form-field/internal/after-form-field-render.ts",
+      "module": "@angular/core",
+      "symbol": "AfterRenderRef",
+      "candidate_source_sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex independent source-use reviewer",
+      "decision": "This type-only public handle holds the registration returned by afterEveryRender; observable teardown calls its public destroy method. The helper does not destroy the application or injector. Existing replay and type evidence cover registration and teardown; actual legacy node DI, packed execution and complete timing remain separate.",
+      "independent_evidence": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+          "sha256": "e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657"
+        },
+        {
+          "path": "compatibility/rc/final-product-evidence-v1/angular-core-package.json",
+          "sha256": "fd7e79e557a78aa4ac6617a6056dbb461b07286ee5915bceec9af9e07742acbf"
+        },
+        {
+          "path": "compatibility/rc/final-product-evidence-v1/angular-core-public.d.ts",
+          "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+        },
+        {
+          "path": "compatibility/rc/final-product-evidence-v1/angular-core-debug-node.d.ts",
+          "sha256": "359fdc800f92be1be371c69aa3a01c902976e8de13520eaf03dd5c85160e628b"
+        },
+        {
+          "path": "compatibility/rc/injector-public-source-proof.json",
+          "sha256": "d42cf60ac5b119449da260839da6e1d91ed6fc10d49a1b10d1d74329dab0e923"
+        },
+        {
+          "path": "compatibility/rc/render-registration-public-source-proof.json",
+          "sha256": "823a1a32abaec2725f9f3cb4eada906b7017bd4099a901bfb8a20d28215a4b3c"
+        },
+        {
+          "path": "compatibility/rc/form-field-render-source-proof.json",
+          "sha256": "213f946de9945151e12937dd405bc43966eb5a0f72ca0ba4649ccc5203e16f4a"
+        },
+        {
+          "path": "compatibility/rc/parent-main-form-field-render-subclass-v2.json",
+          "sha256": "24fd486804e95e8201f158573fa259c59560a9f5420fd826c45bd545c8b31b79"
+        },
+        {
+          "path": "tests/form_field_render_runtime_probe.mjs",
+          "sha256": "c908c15f85722e0f92d76a929fe25000b3e8f4cca095c09d15f4cbd45486034c"
+        },
+        {
+          "path": "tests/form-field-subscript-motion/manual-probe.mjs",
+          "sha256": "9b72a9a6d88938b346b62f301fa8927c631fbe0153ec591bed047193c591692f"
+        },
+        {
+          "path": "tests/form-field-subscript-motion/subclass-probe.mjs",
+          "sha256": "09927afeb0de61ee888bf14d2d0f88b1eea7b8e782f8c7006021657d4f69cc0e"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/current-render-registration-boundary.json",
+          "sha256": "a9949ef6a5ec8bb7cf2456dd35726c2c12bf4de54e6e33d2d936fa5c0fab9906"
+        }
+      ]
+    },
+    {
+      "file": "legacy-form-field/internal/after-form-field-render.ts",
+      "module": "@angular/core",
+      "symbol": "ApplicationRef",
+      "candidate_source_sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex independent source-use reviewer",
+      "decision": "The public ApplicationRef class is used only as an Injector.get token with a null fallback; no application is constructed or its methods invoked. A missing application keeps the continuous zone path, while a present application enables render registration. Existing tests exercise this limited decision; actual legacy node DI and packed execution remain separate.",
+      "independent_evidence": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+          "sha256": "e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657"
+        },
+        {
+          "path": "compatibility/rc/final-product-evidence-v1/angular-core-package.json",
+          "sha256": "fd7e79e557a78aa4ac6617a6056dbb461b07286ee5915bceec9af9e07742acbf"
+        },
+        {
+          "path": "compatibility/rc/final-product-evidence-v1/angular-core-public.d.ts",
+          "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+        },
+        {
+          "path": "compatibility/rc/final-product-evidence-v1/angular-core-debug-node.d.ts",
+          "sha256": "359fdc800f92be1be371c69aa3a01c902976e8de13520eaf03dd5c85160e628b"
+        },
+        {
+          "path": "compatibility/rc/injector-public-source-proof.json",
+          "sha256": "d42cf60ac5b119449da260839da6e1d91ed6fc10d49a1b10d1d74329dab0e923"
+        },
+        {
+          "path": "compatibility/rc/render-registration-public-source-proof.json",
+          "sha256": "823a1a32abaec2725f9f3cb4eada906b7017bd4099a901bfb8a20d28215a4b3c"
+        },
+        {
+          "path": "compatibility/rc/form-field-render-source-proof.json",
+          "sha256": "213f946de9945151e12937dd405bc43966eb5a0f72ca0ba4649ccc5203e16f4a"
+        },
+        {
+          "path": "compatibility/rc/parent-main-form-field-render-subclass-v2.json",
+          "sha256": "24fd486804e95e8201f158573fa259c59560a9f5420fd826c45bd545c8b31b79"
+        },
+        {
+          "path": "tests/form_field_render_runtime_probe.mjs",
+          "sha256": "c908c15f85722e0f92d76a929fe25000b3e8f4cca095c09d15f4cbd45486034c"
+        },
+        {
+          "path": "tests/form-field-subscript-motion/manual-probe.mjs",
+          "sha256": "9b72a9a6d88938b346b62f301fa8927c631fbe0153ec591bed047193c591692f"
+        },
+        {
+          "path": "tests/form-field-subscript-motion/subclass-probe.mjs",
+          "sha256": "09927afeb0de61ee888bf14d2d0f88b1eea7b8e782f8c7006021657d4f69cc0e"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/current-render-registration-boundary.json",
+          "sha256": "a9949ef6a5ec8bb7cf2456dd35726c2c12bf4de54e6e33d2d936fa5c0fab9906"
+        }
+      ]
+    },
+    {
+      "file": "legacy-form-field/internal/after-form-field-render.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex independent source-use reviewer",
+      "decision": "This type-only optional public Injector parameter supplies the application-token lookup and the injector option for afterEveryRender. The caller passes its stored injector, and a null or absent injector leaves the zone path intact. The held constructor and form/select DI assessment, actual legacy factories and complete consumer floors remain separate.",
+      "independent_evidence": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+          "sha256": "e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657"
+        },
+        {
+          "path": "compatibility/rc/final-product-evidence-v1/angular-core-package.json",
+          "sha256": "fd7e79e557a78aa4ac6617a6056dbb461b07286ee5915bceec9af9e07742acbf"
+        },
+        {
+          "path": "compatibility/rc/final-product-evidence-v1/angular-core-public.d.ts",
+          "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+        },
+        {
+          "path": "compatibility/rc/final-product-evidence-v1/angular-core-debug-node.d.ts",
+          "sha256": "359fdc800f92be1be371c69aa3a01c902976e8de13520eaf03dd5c85160e628b"
+        },
+        {
+          "path": "compatibility/rc/injector-public-source-proof.json",
+          "sha256": "d42cf60ac5b119449da260839da6e1d91ed6fc10d49a1b10d1d74329dab0e923"
+        },
+        {
+          "path": "compatibility/rc/render-registration-public-source-proof.json",
+          "sha256": "823a1a32abaec2725f9f3cb4eada906b7017bd4099a901bfb8a20d28215a4b3c"
+        },
+        {
+          "path": "compatibility/rc/form-field-render-source-proof.json",
+          "sha256": "213f946de9945151e12937dd405bc43966eb5a0f72ca0ba4649ccc5203e16f4a"
+        },
+        {
+          "path": "compatibility/rc/parent-main-form-field-render-subclass-v2.json",
+          "sha256": "24fd486804e95e8201f158573fa259c59560a9f5420fd826c45bd545c8b31b79"
+        },
+        {
+          "path": "tests/form_field_render_runtime_probe.mjs",
+          "sha256": "c908c15f85722e0f92d76a929fe25000b3e8f4cca095c09d15f4cbd45486034c"
+        },
+        {
+          "path": "tests/form-field-subscript-motion/manual-probe.mjs",
+          "sha256": "9b72a9a6d88938b346b62f301fa8927c631fbe0153ec591bed047193c591692f"
+        },
+        {
+          "path": "tests/form-field-subscript-motion/subclass-probe.mjs",
+          "sha256": "09927afeb0de61ee888bf14d2d0f88b1eea7b8e782f8c7006021657d4f69cc0e"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/current-render-registration-boundary.json",
+          "sha256": "a9949ef6a5ec8bb7cf2456dd35726c2c12bf4de54e6e33d2d936fa5c0fab9906"
+        }
+      ]
+    },
+    {
+      "file": "legacy-form-field/internal/after-form-field-render.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "candidate_source_sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex independent source-use reviewer",
+      "decision": "This type-only public NgZone parameter supplies the continuous onStable subscription and readonly isStable gate for render callbacks. The caller subscribes outside the zone and stops on destruction. Existing current zoneful and zoneless replays exercise these routes with a protocol field, but do not establish all scheduler, actual legacy view or native paint behavior.",
+      "independent_evidence": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+          "sha256": "e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657"
+        },
+        {
+          "path": "compatibility/rc/final-product-evidence-v1/angular-core-package.json",
+          "sha256": "fd7e79e557a78aa4ac6617a6056dbb461b07286ee5915bceec9af9e07742acbf"
+        },
+        {
+          "path": "compatibility/rc/final-product-evidence-v1/angular-core-public.d.ts",
+          "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+        },
+        {
+          "path": "compatibility/rc/final-product-evidence-v1/angular-core-debug-node.d.ts",
+          "sha256": "359fdc800f92be1be371c69aa3a01c902976e8de13520eaf03dd5c85160e628b"
+        },
+        {
+          "path": "compatibility/rc/injector-public-source-proof.json",
+          "sha256": "d42cf60ac5b119449da260839da6e1d91ed6fc10d49a1b10d1d74329dab0e923"
+        },
+        {
+          "path": "compatibility/rc/render-registration-public-source-proof.json",
+          "sha256": "823a1a32abaec2725f9f3cb4eada906b7017bd4099a901bfb8a20d28215a4b3c"
+        },
+        {
+          "path": "compatibility/rc/form-field-render-source-proof.json",
+          "sha256": "213f946de9945151e12937dd405bc43966eb5a0f72ca0ba4649ccc5203e16f4a"
+        },
+        {
+          "path": "compatibility/rc/parent-main-form-field-render-subclass-v2.json",
+          "sha256": "24fd486804e95e8201f158573fa259c59560a9f5420fd826c45bd545c8b31b79"
+        },
+        {
+          "path": "tests/form_field_render_runtime_probe.mjs",
+          "sha256": "c908c15f85722e0f92d76a929fe25000b3e8f4cca095c09d15f4cbd45486034c"
+        },
+        {
+          "path": "tests/form-field-subscript-motion/manual-probe.mjs",
+          "sha256": "9b72a9a6d88938b346b62f301fa8927c631fbe0153ec591bed047193c591692f"
+        },
+        {
+          "path": "tests/form-field-subscript-motion/subclass-probe.mjs",
+          "sha256": "09927afeb0de61ee888bf14d2d0f88b1eea7b8e782f8c7006021657d4f69cc0e"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/current-render-registration-boundary.json",
+          "sha256": "a9949ef6a5ec8bb7cf2456dd35726c2c12bf4de54e6e33d2d936fa5c0fab9906"
+        }
+      ]
+    },
+    {
+      "file": "legacy-form-field/internal/after-form-field-render.ts",
+      "module": "@angular/core",
+      "symbol": "afterEveryRender",
+      "candidate_source_sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex independent source-use reviewer",
+      "decision": "This stable public callback overload registers a recurring browser render callback using the provided injector; each callback emits only when the public zone reports stable. The handle is destroyed on teardown, and failed registration unsubscribes the existing stability subscription. Mixed read/write phase and hydration limits remain; no packed or complete timing claim follows.",
+      "independent_evidence": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+          "sha256": "e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657"
+        },
+        {
+          "path": "compatibility/rc/final-product-evidence-v1/angular-core-package.json",
+          "sha256": "fd7e79e557a78aa4ac6617a6056dbb461b07286ee5915bceec9af9e07742acbf"
+        },
+        {
+          "path": "compatibility/rc/final-product-evidence-v1/angular-core-public.d.ts",
+          "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+        },
+        {
+          "path": "compatibility/rc/final-product-evidence-v1/angular-core-debug-node.d.ts",
+          "sha256": "359fdc800f92be1be371c69aa3a01c902976e8de13520eaf03dd5c85160e628b"
+        },
+        {
+          "path": "compatibility/rc/injector-public-source-proof.json",
+          "sha256": "d42cf60ac5b119449da260839da6e1d91ed6fc10d49a1b10d1d74329dab0e923"
+        },
+        {
+          "path": "compatibility/rc/render-registration-public-source-proof.json",
+          "sha256": "823a1a32abaec2725f9f3cb4eada906b7017bd4099a901bfb8a20d28215a4b3c"
+        },
+        {
+          "path": "compatibility/rc/form-field-render-source-proof.json",
+          "sha256": "213f946de9945151e12937dd405bc43966eb5a0f72ca0ba4649ccc5203e16f4a"
+        },
+        {
+          "path": "compatibility/rc/parent-main-form-field-render-subclass-v2.json",
+          "sha256": "24fd486804e95e8201f158573fa259c59560a9f5420fd826c45bd545c8b31b79"
+        },
+        {
+          "path": "tests/form_field_render_runtime_probe.mjs",
+          "sha256": "c908c15f85722e0f92d76a929fe25000b3e8f4cca095c09d15f4cbd45486034c"
+        },
+        {
+          "path": "tests/form-field-subscript-motion/manual-probe.mjs",
+          "sha256": "9b72a9a6d88938b346b62f301fa8927c631fbe0153ec591bed047193c591692f"
+        },
+        {
+          "path": "tests/form-field-subscript-motion/subclass-probe.mjs",
+          "sha256": "09927afeb0de61ee888bf14d2d0f88b1eea7b8e782f8c7006021657d4f69cc0e"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/current-render-registration-boundary.json",
+          "sha256": "a9949ef6a5ec8bb7cf2456dd35726c2c12bf4de54e6e33d2d936fa5c0fab9906"
+        }
+      ]
+    }
+  ]
+}

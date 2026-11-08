@@ -16,6 +16,8 @@ import {DIALOG_CONFIG_RETIRED_ROLE} from './dialog-caller-config-boundary.mjs';
 import {inspectDialogOwnedContracts} from './dialog-caller-owned-contract-boundary.mjs';
 import {qualifiedMenuContentTypeBoundary,MENU_CONTENT_PANEL_SOURCE,MENU_CONTENT_PANEL_BEFORE,MENU_CONTENT_PANEL_AFTER} from './menu-panel-content-boundary.mjs';
 import {packedRepairTypeEvidenceRead} from './snack-dom-source-context.mjs';
+import {qualifyCurrentMenuRetirementReceipt} from './current-menu-retirement-receipt.mjs';
+import {qualifyFormFieldRetiredUse,formFieldRetirementHistory,FORM_FIELD_RETIRED_ROLE} from './form-field-retired-use.mjs';
 import {qualifyCurrentDialogRetiredUse} from './current-dialog-retired-use-source.mjs';
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex'),key=r=>JSON.stringify([r?.file,r?.module,r?.symbol]);
 const originPath='compatibility/rc/menu-caller-prior.json.gz',pins={main:'a6cf639de2151c32bc80b82be63ae4390453dc8c92a309801c1c153de9a82a00','21.x':'2da547a58102ec0a5715ebfdc91a86085d9728a6b6f747e35bf15cf8d0f8fe8e'};
@@ -32,20 +34,33 @@ export function additionalUseBaseline({root=resolve(dirname(fileURLToPath(import
   assert.equal(digest,MENU_CONTENT_PANEL_AFTER,'unqualified menu panel source');assert.ok(pins[line]);
   const captured=readMember(originPath);assert.equal(hash(captured),pins[line],'changed original additional obligation capsule');const prior=JSON.parse(gunzipSync(captured));assert.equal(prior.line,line);
   const ledger=prior.ledgers.find(m=>m.path==='compatibility/f10/authored-dependency-current-dispositions.json');assert.ok(ledger);assert.equal(hash(ledger.text),ledger.sha256);const rows=JSON.parse(ledger.text).symbol_uses;assert.equal(rows.length,315);assert.equal(new Set(rows.map(key)).size,315);result.entries=rows;result.mode='owned-menu-content-type-removal';
-  const live=new Set(additions.map(key)),missing=rows.filter(r=>!live.has(key(r)));const dialogRemoved=missing.some(row=>key(row)===key(DIALOG_CONFIG_RETIRED_ROLE));assert.deepEqual(missing.map(key).sort(),[key(target),...(dialogRemoved?[key(DIALOG_CONFIG_RETIRED_ROLE)]:[])].sort(),'unqualified removed additional route');
+  const live=new Set(additions.map(key));
+  const fieldSource=current.source_files.find(m=>m.path==='projects/ngx-material-legacy/legacy-form-field/form-field.ts');
+  const historical=line==='main'&&!live.has(key(FORM_FIELD_RETIRED_ROLE))?formFieldRetirementHistory({root}):null;
+  let field=null;
+  if(historical){assert.ok(!rows.some(r=>key(r)===key(historical)));result.entries=[...rows,historical];
+   // The obligation remains expected even when the unknown source epoch is rejected.
+   result.retired.push({...FORM_FIELD_RETIRED_ROLE,candidate_source_sha256:fieldSource?.sha256,occurrences:[]});
+   assert.equal(fieldSource?.sha256,'e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657','unqualified form-field retirement source epoch');
+   field=qualifyFormFieldRetiredUse({root,current,readMember});assert.deepEqual(field.original,historical);result.retired=[];
+  }
+  const missing=rows.filter(r=>!live.has(key(r)));const dialogRemoved=missing.some(row=>key(row)===key(DIALOG_CONFIG_RETIRED_ROLE));assert.deepEqual(missing.map(key).sort(),[key(target),...(dialogRemoved?[key(DIALOG_CONFIG_RETIRED_ROLE)]:[])].sort(),'unqualified removed additional route');
   // Keep this expected snapshot even if the qualification/metadata is invalid:
   // the original315 keys must remain in the expected inventory either way.
   result.retired=[{...target,candidate_source_sha256:MENU_CONTENT_PANEL_AFTER,occurrences:[]}];
   // These original type receipts retain their exact source epoch. The current
   // graph above and all current source-use evidence below stay on raw bytes.
-  const proofRead=packedRepairTypeEvidenceRead({read:readMember});
-  const qualification=qualifiedMenuContentTypeBoundary({line,readMember:proofRead});result.qualification=qualification.ref;
+  const currentMain=line==='main'&&current.source_files.find(m=>m.path==='projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts')?.sha256==='c63b9af0076ce1ae261c0e8529b4c0f496c2b42b3b6edf1e270b3217fdea44e1';
+  const proofRead=currentMain?null:packedRepairTypeEvidenceRead({root,read:readMember});
+  const qualification=currentMain?qualifyCurrentMenuRetirementReceipt({root,readMember,current}):qualifiedMenuContentTypeBoundary({line,readMember:proofRead});result.qualification=qualification.ref;
   const expected=[{...target,qualification:qualification.ref}];
   if(dialogRemoved){const path='projects/ngx-material-legacy/'+DIALOG_CONFIG_RETIRED_ROLE.file,source=current.source_files.find(m=>m.path===path);let dialogQualification;
    if(line==='main'&&source?.sha256==='c63b9af0076ce1ae261c0e8529b4c0f496c2b42b3b6edf1e270b3217fdea44e1'){
     const continuation=qualifyCurrentDialogRetiredUse({root,readMember,current});assert.deepEqual(continuation.role,DIALOG_CONFIG_RETIRED_ROLE);result.retired.push({...continuation.role,candidate_source_sha256:continuation.candidate_source_sha256,occurrences:continuation.occurrences});dialogQualification=continuation.qualification;
    }else{result.retired.push({...DIALOG_CONFIG_RETIRED_ROLE,candidate_source_sha256:'994576f436b45a1d3d1f132db793a2b3668e581637f06279e2200065cea319a5',occurrences:[]});const boundary=inspectDialogOwnedContracts({read:proofRead,requireApplied:true}).defaults.configuration;assert.equal(boundary.line,line);const member=boundary.targets.find(m=>m.path===path);assert.equal(member.sha256,result.retired.at(-1).candidate_source_sha256);assert.equal(source?.sha256,member.sha256,'mixed dialog source graph and historical reader');dialogQualification=boundary.qualification;}
-   expected.push({...DIALOG_CONFIG_RETIRED_ROLE,qualification:dialogQualification});result.mode='owned-menu-and-dialog-config-type-removals';result.qualification=[qualification.ref,dialogQualification];}assert.ok(isDeepStrictEqual(candidate?.retained_removed_additional_uses,expected),'missing or changed retained-removed obligation qualification');
+   expected.push({...DIALOG_CONFIG_RETIRED_ROLE,qualification:dialogQualification});result.mode='owned-menu-and-dialog-config-type-removals';result.qualification=[qualification.ref,dialogQualification];}
+  if(field){assert.ok(!live.has(key(field.original)));result.retired.push(field.retired);expected.push({file:field.original.file,module:field.original.module,symbol:field.original.symbol,qualification:field.qualification});result.mode='owned-menu-dialog-and-form-field-removals';result.qualification=[qualification.ref,...(dialogRemoved?[expected[1].qualification]:[]),field.qualification];}
+  assert.ok(isDeepStrictEqual(candidate?.retained_removed_additional_uses,expected),'missing or changed retained-removed obligation qualification');
   return {...result,valid:true};
  }catch(error){return {...result,error:String(error?.message??error).split('\n')[0]};}
 }
