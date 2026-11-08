@@ -1,5 +1,6 @@
 import {tablinkViewportProof} from './api-tablink-viewport-contract.mjs';
 import {autocompleteViewportProof} from './api-autocomplete-viewport-contract.mjs';
+import {selectViewportProof,selectViewportTokenCandidate} from './api-select-viewport-contract.mjs';
 import {menuTriggerOwnedToken} from './api-menu-trigger-token.mjs';
 import {spinnerViewportProof} from './api-spinner-viewport-contract.mjs';
 import {existsSync,readFileSync} from 'node:fs';
@@ -15,6 +16,7 @@ import {observeRippleFactory} from './api-ripple-factory.mjs';
 import {originalContextDi} from './api-original-factory-contexts.mjs';
 import {createPublicFactoryContext} from './api-public-node-context.mjs';
 import {attributeFactoryContract,executeAttributeFactory,challengeAttributeDetectorScopes} from './api-attribute-factory.mjs';
+import {ownedNodeInjectorProfile,finishOwnedNodeInjector,originalOwnedNodeInjectorCapture} from './api-owned-node-injector-context.mjs';
 import {partitionPublicConstructorRequests} from './api-public-constructor-internals.mjs';
 import {ownedMotionProfile,partitionOwnedSelectMotion} from './api-owned-motion-context.mjs';
 import {originalPublicParentTokenRole} from './api-public-parent-token-role.mjs';
@@ -86,7 +88,7 @@ function isOriginalModule(symbol){
     ||factory.declaration_kind==='published-jit-decorators'&&/\bNgModule\(/.test(factory.declaration)));
 }
 
-export async function observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule,{providers=[],constructorFactory,tableParentKind='legacy',inputParentKind='legacy',inputArtifactContext=null,spinnerProof=null,autocompleteProof=null}={}){
+export async function observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule,{providers=[],constructorFactory,tableParentKind='legacy',inputParentKind='legacy',inputArtifactContext=null,spinnerProof=null,autocompleteProof=null,selectProof=null}={}){
   let fixture,factory,parentExecution,requiredParent,requiredParentType,requiredParentToken,requiredParentCapture;
   let requiredParentDestroyed=false,parentLifetimeSubscription;
   let callerConfig,menuContentState,simpleSnack,dialogOpener,autocompleteCapture,tabPortalParent,tabPortalState,tableDefinitionCapture,inputLifetime,inputBehavior;
@@ -184,7 +186,7 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
     const autocomplete=autocompleteProfile(symbol);
     if(autocomplete)autocompleteCapture=createAutocompleteCapture(autocomplete,core,value,await loadRuntimeModule(packageRoot,'legacy-autocomplete','primary'),resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-autocomplete.mjs'),await importModule('@angular/cdk/layout'));
     let attributeContract,parentContract,parentType,parentAlias,parentSymbol,parentViewportProof;
-    if(attributes.length){
+    if(attributes.length||ownedNodeInjectorProfile(symbol)){
       if(usesTemplate)throw Error('attribute/template combination remains unsupported');
       const primary=await loadRuntimeModule(packageRoot,symbol.family,'primary');
       const loaded=await loadRuntimeModule(packageRoot,symbol.family,symbol.kind);
@@ -193,10 +195,11 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
         ?`ngx-compat-material-legacy-${symbol.family}.mjs`:`ngx-compat-material-legacy-${symbol.family}-testing.mjs`),'utf8');
       attributeContract=await attributeFactoryContract(value,core,source,parameters,async(param,token)=>{
         const owned=param.ident==='ViewportRuler'?await loadRuntimeModule(packageRoot,'legacy-core','primary'):null;
+        if(selectViewportTokenCandidate(symbol,param,owned,token,selectProof))return true;
         const viewport=ownedViewportIdentity(symbol.family,param,owned||{},token);
         return viewport!==null?viewport:runtimeTokenIdentity(symbol.family,param,exports,
-          originalRuntimeAliases(symbols,symbol.family),token,importModule,packageRoot);
-      });
+          originalRuntimeAliases(symbols,symbol.family),token,importModule,packageRoot,ownedNodeInjectorProfile(symbol)?symbol:undefined);
+      },ownedNodeInjectorProfile(symbol)?{symbol,context:{...inputArtifactContext,packageRoot}}:undefined);
       if(['legacy-tabs/primary/MatLegacyTabLink','legacy-tabs/primary/_MatLegacyTabLinkBase'].includes(symbol.symbol_id)){
         parentSymbol=symbols.find(s=>s.symbol_id==='legacy-tabs/primary/MatLegacyTabNav');
         if(!parentSymbol)throw Error('original tab-nav caller context missing');
@@ -229,6 +232,17 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
          return parentExecution.value;
        }},{provide:parentAlias,useExisting:parentType}]}:{}),
        ...(attributeContract?{nodeFactory:node=>{factory=executeAttributeFactory(value,core,attributeContract,node,runFactory);return factory.value;}}:{})});
+    if(attributeContract&&factory?.outcome==='returned'){
+      requiredParentCapture=factory.constructorCapture;
+      finishOwnedNodeInjector(factory,fixture,core);
+      if(selectProof){
+        const owned=await loadRuntimeModule(packageRoot,'legacy-core','primary'),capture=factory.constructorCapture,input=capture.inputs[0];
+        if(capture.constructor_calls!==1||capture.inputs.length!==15||Object.getPrototypeOf(value).ctorParameters?.()[0]?.type!==owned._LegacyViewport
+          ||input!==fixture.element.injector.get(owned._LegacyViewport)||factory.value._viewportRuler!==input
+          ||capture.inputs[4]?.nativeElement!==fixture.element.element.nativeElement)throw Error('select viewport actual node/constructor identity differs');
+        factory.selectViewportContext={constructor_calls:1,constructor_arity:15,viewport_index:0,actual_node_element:true,owned_input_matches_node_provider:true,owned_metadata_token:true,stored_input_matches:true};
+      }
+    }
     if(tabPortalParent){
       const parent=fixture.parentNode.owner;
       if(!(parent instanceof tabPortalParent.MatLegacyTabBody)
@@ -327,7 +341,9 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
         {core:resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-core.mjs'),
          caller:resolve(packageRoot,'fesm2022',`ngx-compat-material-legacy-${ownedMotionProfile(symbol.symbol_id).family}.mjs`)},
         runFactory,fixture.element.injector,factory.value,symbol.symbol_id,
-        {familyExports:await loadRuntimeModule(packageRoot,symbol.family,'primary'),originalSymbol:symbol,constructorCapture:requiredParentCapture});
+        {familyExports:await loadRuntimeModule(packageRoot,symbol.family,'primary'),originalSymbol:symbol,
+         constructorCapture:factory.ownedNodeInjectorContext&&ownedMotionProfile(symbol.symbol_id).constructorAnimationIndex!==undefined
+          ?originalOwnedNodeInjectorCapture(symbol.symbol_id,factory.ownedNodeInjectorContext,requiredParentCapture):requiredParentCapture});
       factory.requests=partition.requests;factory.ownedMotionContext=partition.observation;
     }
     if(tabPortal&&factory.outcome==='returned'){
@@ -647,11 +663,15 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
     if(symbol.symbol_id==='legacy-autocomplete/primary/MatLegacyAutocompleteTrigger'&&inputArtifactContext){
       try{autocompleteProof=autocompleteViewportProof(symbol,symbols.find(s=>s.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'),{...inputArtifactContext,packageRoot});}catch{}
     }
+    let selectProof=null;
+    if(symbol.symbol_id==='legacy-select/primary/MatLegacySelect'&&inputArtifactContext){
+      try{selectProof=selectViewportProof(symbol,symbols.find(s=>s.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'),symbols.find(s=>s.symbol_id==='legacy-select/primary/MAT_LEGACY_SELECT_SCROLL_STRATEGY'),{...inputArtifactContext,packageRoot});}catch{}
+    }
     const factory = construction ? symbol.symbol_id === TABLE_SYMBOL
       ? await observeTableFactory(value, loaded, importModule) : symbol.symbol_id===RIPPLE_SYMBOL
       ? await observeRippleFactory(value,loaded,importModule,runFactory) : await observeMenuItemFactory(value, loaded, importModule)
       : originalKind==='invalid' ? runFactory(value.ɵfac,Injector,runInInjectionContext)
-      : await observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule,{inputArtifactContext,spinnerProof,autocompleteProof});
+      : await observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule,{inputArtifactContext,spinnerProof,autocompleteProof,selectProof});
     const observed = factory.requests;
     const publicNodeRequests=[];
     const runtimeRequests=[];
@@ -696,6 +716,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         const menuReplacement=symbol.symbol_id==='legacy-menu/primary/MatLegacyMenuTrigger'&&param.ident==='MatMenuItem'
           ? await menuTriggerOwnedToken(symbol,param,exports,await importModule('@angular/material/menu'),got.token,packageRoot,{artifactContext:inputArtifactContext}) : null;
         const autocompleteReplacement=Boolean(autocompleteProof&&symbol.symbol_id==='legacy-autocomplete/primary/MatLegacyAutocompleteTrigger'&&index===9&&!same&&factory.autocompleteViewportContext?.owned_input_matches_node_provider&&got.token===coreExports?._LegacyViewport&&param.ident==='ViewportRuler'&&param.imported==='ViewportRuler'&&param.spec==='@angular/cdk/scrolling'&&!got.unresolved&&['optional','self','skipSelf','host'].every(f=>!got[f]&&!param[f]));
+        const selectReplacement=Boolean(selectProof&&index===0&&!same&&factory.selectViewportContext?.owned_input_matches_node_provider&&selectViewportTokenCandidate(symbol,param,coreExports,got.token,selectProof)&&!got.unresolved&&['optional','self','skipSelf','host'].every(flag=>!got[flag]));
         runtimeRequests.push({...(autocompleteReplacement?{intentional_token_difference:{historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee',proof:autocompleteProof,node:factory.autocompleteViewportContext}}:{}),...(replacement?{intentional_token_difference:{historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',historical_provider_selects_actual:false,minimum_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee',proof:spinnerProof,node:factory.spinnerViewportContext}}:{}),expected_ident:param.ident,expected_spec:param.spec,identity_matched:same,...(menuReplacement?{owned_menu_item_replacement:menuReplacement}:{}),
           ...(tabReplacement ? {intentional_token_difference:{historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',classification:'owned replacement for upstream docs-private helper',historical_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee'}} : {}),
           expected_optional:Boolean(param.optional),expected_self:Boolean(param.self),
@@ -705,7 +726,8 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         if (symbol.symbol_id===TABLE_SYMBOL) publicNodeRequests.push({ident:param.ident,spec:param.spec,
           observed_label:got.label+(got.optional?'?':''),identity_matched:same,
           optional:Boolean(got.optional),self:Boolean(got.self),skipSelf:Boolean(got.skipSelf),host:Boolean(got.host)});
-        if (!same && !tabReplacement && !menuReplacement && !replacement && !autocompleteReplacement) problems.push(`token ${symbol.symbol_id}[${index}] expected ${param.ident} observed ${got.label}`);
+        if(selectReplacement)runtimeRequests.at(-1).intentional_token_difference={historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee',proof:selectProof,node:factory.selectViewportContext};
+        if (!same && !tabReplacement && !menuReplacement && !replacement && !autocompleteReplacement && !selectReplacement) problems.push(`token ${symbol.symbol_id}[${index}] expected ${param.ident} observed ${got.label}`);
         for (const flag of ['self','skipSelf','host']) if (Boolean(param[flag])!==Boolean(got[flag]))
           problems.push(`injection flag ${symbol.symbol_id}[${index}] ${flag} differs`);
         if (Boolean(param.optional) !== Boolean(got.optional)) {
@@ -713,7 +735,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         }
       }
     }
-    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, factory_error_stack:factory.errorStack||null, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, effective_original_factory_kind:originalKind ?? null, factory_context:factory.context, factory_context_modules:factory.callerModules || [], factory_node_kind:factory.nodeKind || null, factory_constructor_evidence:factory.constructorEvidence || [], factory_compiler_observation:factory.compilerObservation || null, factory_peer_constructor_partition:factory.peerConstructorPartition || null, factory_parent_construction:factory.parentConstruction || null, factory_required_parent_context:factory.requiredParentContext || null, factory_caller_config_context:factory.callerConfigContext || null, factory_owned_dialog_focus_context:factory.ownedDialogFocusContext || null, factory_menu_content_context:factory.menuContentContext || null, factory_simple_snack_context:factory.simpleSnackContext || null, factory_dialog_opener_context:factory.dialogOpenerContext || null, factory_autocomplete_context:factory.autocompleteContext || null, factory_tab_body_context:factory.tabBodyContext || null, factory_tab_header_context:factory.tabHeaderContext || null, factory_tab_portal_parent_context:factory.tabPortalParentContext || null, factory_tab_portal_context:factory.tabPortalContext || null, factory_table_definition_context:factory.tableDefinitionContext || null, factory_input_context:factory.inputContext || null, factory_owned_motion_context:factory.ownedMotionContext || null, runtime_requests:observed.map((request,index)=>({...runtimeRequests[index],observation_evidence:request.evidence || 'public Injector request trace',observed_label:request.label,optional:Boolean(request.optional),self:Boolean(request.self),skipSelf:Boolean(request.skipSelf),host:Boolean(request.host),unresolved:Boolean(request.unresolved)})).concat(factory.inputContext?.owned_element_ref?[{observation_evidence:'separately qualified owned field request',observed_label:'ElementRef',token_role:'owned native element',...factory.inputContext.owned_element_ref}]:[]), factory_returned_owned_instance:factory.outcome==='returned' && (construction ? factory.behaviorProblems.length===0 : factory.value instanceof value), constructor_attributes:[...new Set(symbol.shape.originalFactoryContext ? symbol.shape.originalFactoryContext.factory_parameters?.filter(param=>param.attribute).map(param=>param.attribute) || [] : [...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: [...observed.map(item => `${item.label}${item.optional ? '?' : ''}`),...(factory.inputContext?.owned_element_ref?['ElementRef']:[])],
+    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, factory_error_stack:factory.errorStack||null, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, effective_original_factory_kind:originalKind ?? null, factory_context:factory.context, factory_context_modules:factory.callerModules || [], factory_node_kind:factory.nodeKind || null, factory_constructor_evidence:factory.constructorEvidence || [], factory_compiler_observation:factory.compilerObservation || null, factory_peer_constructor_partition:factory.peerConstructorPartition || null, factory_parent_construction:factory.parentConstruction || null, factory_required_parent_context:factory.requiredParentContext || null, factory_caller_config_context:factory.callerConfigContext || null, factory_owned_dialog_focus_context:factory.ownedDialogFocusContext || null, factory_menu_content_context:factory.menuContentContext || null, factory_simple_snack_context:factory.simpleSnackContext || null, factory_dialog_opener_context:factory.dialogOpenerContext || null, factory_autocomplete_context:factory.autocompleteContext || null, factory_tab_body_context:factory.tabBodyContext || null, factory_tab_header_context:factory.tabHeaderContext || null, factory_tab_portal_parent_context:factory.tabPortalParentContext || null, factory_tab_portal_context:factory.tabPortalContext || null, factory_table_definition_context:factory.tableDefinitionContext || null, factory_input_context:factory.inputContext || null, factory_owned_motion_context:factory.ownedMotionContext || null, factory_owned_node_injector_context:factory.ownedNodeInjectorContext || null, runtime_requests:observed.map((request,index)=>({...runtimeRequests[index],observation_evidence:request.evidence || 'public Injector request trace',observed_label:request.label,optional:Boolean(request.optional),self:Boolean(request.self),skipSelf:Boolean(request.skipSelf),host:Boolean(request.host),unresolved:Boolean(request.unresolved)})).concat(factory.inputContext?.owned_element_ref?[{observation_evidence:'separately qualified owned field request',observed_label:'ElementRef',token_role:'owned native element',...factory.inputContext.owned_element_ref}]:[]), factory_returned_owned_instance:factory.outcome==='returned' && (construction ? factory.behaviorProblems.length===0 : factory.value instanceof value), constructor_attributes:[...new Set(symbol.shape.originalFactoryContext ? symbol.shape.originalFactoryContext.factory_parameters?.filter(param=>param.attribute).map(param=>param.attribute) || [] : [...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: [...observed.map(item => `${item.label}${item.optional ? '?' : ''}`),...(factory.inputContext?.owned_element_ref?['ElementRef']:[])],
       ...(construction ? {approved_construction: {profile_id: construction.profile_id,
         contract_sha256: construction.contract_sha256, context: factory.context,
         behavior_problems: factory.behaviorProblems, counts: factory.counts,

@@ -9,11 +9,13 @@
 import {compilerConstructorContract} from './api-compiler-constructor-contract.mjs';
 import {captureFactoryConstructorInputs} from './api-factory-constructor-inputs.mjs';
 import {partitionPublicConstructorRequests,publicConstructorPartitionProblems} from './api-public-constructor-internals.mjs';
+import {ownedNodeInjectorProfile,qualifyOwnedNodeInjector,captureOwnedNodeInjector,ownedNodeInjectorObservationProblems} from './api-owned-node-injector-context.mjs';
+import {selectViewportObservationProblems} from './api-select-viewport-contract.mjs';
 
 const flags=['optional','self','skipSelf','host'];
 
 /** Candidate compiler observations must agree with original expectations and actual token objects. */
-export async function attributeFactoryContract(Type,core,source,originalParameters,matchToken){
+export async function attributeFactoryContract(Type,core,source,originalParameters,matchToken,ownedContext){
  const compiler=compilerConstructorContract(source,Type.name,{resolveInherited:true});
  let parameterType=Type;
  for(const [index,name]of compiler.inheritance.entries()){
@@ -27,10 +29,13 @@ export async function attributeFactoryContract(Type,core,source,originalParamete
  if(!Object.hasOwn(parameterType,'ctorParameters')||typeof parameterType.ctorParameters!=='function')
   throw Error('explicit owned constructor reflection metadata required');
  const metadata=parameterType.ctorParameters();
- if(!Array.isArray(metadata)||metadata.length!==originalParameters.length||compiler.parameters.length!==metadata.length)
+ let ownedNodeInjector;
+ if(Array.isArray(metadata)&&metadata.length===originalParameters.length+1&&ownedContext)
+  ownedNodeInjector=qualifyOwnedNodeInjector({...ownedContext,Type,parameterType,core,source,compiler,metadata,originalParameters});
+ if(!Array.isArray(metadata)||metadata.length!==originalParameters.length+(ownedNodeInjector?1:0)||compiler.parameters.length!==metadata.length)
   throw Error('original/compiler/runtime constructor parameter counts differ');
  const parameters=[];
- for(let index=0;index<metadata.length;index++){
+ for(let index=0;index<originalParameters.length;index++){
   const reflected=metadata[index],original=originalParameters[index],declared=compiler.parameters[index];
   let token=reflected.type,attribute=null;
   const options=Object.fromEntries(flags.map(flag=>[flag,false])),seen=new Set();
@@ -53,7 +58,7 @@ export async function attributeFactoryContract(Type,core,source,originalParamete
   if(attribute===null&&!(await matchToken(original,token)))throw Error('actual constructor token identity differs at parameter '+index);
   parameters.push({index,token,attribute,...options});
  }
- return {compiler,parameters};
+ return {compiler,parameters,...(ownedNodeInjector?{ownedNodeInjector}:{})};
 }
 
 /** Run unchanged factory in an active public node; capture inputs through its compiler type override. */
@@ -64,7 +69,8 @@ export function executeAttributeFactory(Type,core,contract,node,runFactory,attri
    captureStack:true,onRequest:request=>{request.constructor_phase=entered?'body':'parameters';}});
  if(factory.outcome!=='returned')return {...factory,constructorEvidence:[],detectors:[]};
  const captured=factory.value;
- if(captured.inputs.length!==contract.parameters.length)throw Error('actual constructor input count differs');
+ if(captured.inputs.length!==contract.compiler.parameters.length)throw Error('actual constructor input count differs');
+ const owned=contract.ownedNodeInjector?captureOwnedNodeInjector(contract.ownedNodeInjector,captured,core,node):null;
  // Directive factories resolve parameters through the active node, outside the
  // tracing Injector. A pre-constructor traced request is unsupported; do not
  // silently discard it or infer identity from a name/count list.
@@ -97,7 +103,8 @@ export function executeAttributeFactory(Type,core,contract,node,runFactory,attri
   constructorEvidence.push({index:parameter.index,attribute:null,input_verified:true,
    scope_challenge:parameter.token===core.ChangeDetectorRef?'pending-public-view-destruction':null});
  }
- return {...factory,value:captured.value,capturedInputs:captured.inputs,requests:[...requests,...partition.requests],constructorEvidence,detectors,
+ return {...factory,value:captured.value,capturedInputs:captured.inputs,constructorCapture:captured,requests:[...requests,...partition.requests],constructorEvidence,detectors,
+  ...(owned?{ownedNodeInjectorInput:owned.input,ownedNodeInjectorContext:owned.observation}:{}),
   peerConstructorPartition:partition.observation,
   compilerObservation:{...contract.compiler,runtime_inheritance_verified:true}};
 }
@@ -116,10 +123,11 @@ export function challengeAttributeDetectorScopes(factory,fixture){
 /** Serialized execution evidence is required by settlement, as well as producer success. */
 export function attributeConstructorObservationProblems(row,{force=false}={}){
  const parameters=row.symbol.shape.originalFactoryContext?.factory_parameters||row.symbol.shape.diParams||[];
- if(!force&&!parameters.some(p=>p.attribute))return [];
+ const ownedProfile=ownedNodeInjectorProfile(row.symbol);
+ if(!force&&!parameters.some(p=>p.attribute)&&!ownedProfile)return [];
  const evidence=row.factory_constructor_evidence,compiler=row.factory_compiler_observation;
  if(!Array.isArray(evidence)||evidence.length!==parameters.length||!compiler
-  ||!Array.isArray(compiler.parameters)||compiler.parameters.length!==parameters.length)
+  ||!Array.isArray(compiler.parameters)||compiler.parameters.length!==parameters.length+(ownedProfile?1:0))
   return ['attribute constructor execution/correlation evidence incomplete'];
  if(compiler.runtime_inheritance_verified!==true||!Array.isArray(compiler.inheritance)||!compiler.inheritance.length
   ||compiler.inheritance.some(name=>typeof name!=='string'||!name)
@@ -128,6 +136,20 @@ export function attributeConstructorObservationProblems(row,{force=false}={}){
   ||compiler.inheritance.at(-1)!==compiler.parameter_class_name)
   return ['attribute constructor inheritance evidence incomplete'];
  const problems=[];
+ if(ownedProfile){
+  problems.push(...ownedNodeInjectorObservationProblems(row));
+  if(JSON.stringify(compiler.parameters.at(-1))!==JSON.stringify(row.factory_owned_node_injector_context?.parameter))
+   problems.push('owned trailing Injector compiler observation differs');
+  const expected=parameters.filter(parameter=>!parameter.attribute),requests=row.runtime_requests;
+  const viewportProblems=ownedProfile.family==='legacy-select'?selectViewportObservationProblems(row):[];problems.push(...viewportProblems);
+  const selectViewport=ownedProfile.family==='legacy-select'&&viewportProblems.length===0;
+  if(!Array.isArray(requests)||requests.length!==expected.length||expected.some((parameter,index)=>{
+   const request=requests[index];
+   return !request||request.expected_ident!==parameter.ident||request.expected_spec!==parameter.spec
+    ||request.identity_matched!==(selectViewport&&index===0?false:true)||request.unresolved!==false||request.observation_evidence!=='actual compiler metadata token identity and captured constructor input'
+    ||flags.some(flag=>request[flag]!==Boolean(parameter[flag])||request['expected_'+flag]!==Boolean(parameter[flag]));
+  }))problems.push('owned original constructor request identity/options evidence incomplete');
+ }
  problems.push(...publicConstructorPartitionProblems(row.factory_peer_constructor_partition));
  for(let index=0;index<parameters.length;index++){
   const original=parameters[index],observed=evidence[index],declared=compiler.parameters[index];
