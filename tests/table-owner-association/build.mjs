@@ -5,11 +5,11 @@
  * Use of this source code is governed by the MIT license in LICENSE.
  */
 import {createRequire} from 'node:module';
-import {readFileSync, writeFileSync} from 'node:fs';
+import {readFileSync, realpathSync, writeFileSync} from 'node:fs';
 import {join} from 'node:path';
 const [root, workspace, peerRoot] = process.argv.slice(2);
 const esbuild = createRequire(join(workspace, 'package.json'))('esbuild');
-const req = createRequire(join(peerRoot, '@angular/compiler-cli/package.json'));
+const req = createRequire(realpathSync(join(peerRoot, '@angular/compiler-cli/package.json')));
 const {transformSync} = req('@babel/core');
 const linkerPlugin = req('@angular/compiler-cli/linker/babel').default;
 const {needsLinking} = req('@angular/compiler-cli/linker');
