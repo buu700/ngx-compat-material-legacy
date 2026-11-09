@@ -18,6 +18,7 @@ const raw = root => path => readFileSync(join(root, path));
 const decisionsPath = 'compatibility/rc/a11y-caller-decisions.json';
 const decisionsPin = '3a12e863aa818b7ab2036b71d1d9eda9cf7f9a279656156da6bee99286a11cac';
 export const A11Y_CALLER_REVIEW = 'compatibility/f10/authored-use-reviews/a11y-callers.json';
+export const A11Y_CALLER_CURRENT_REVIEW = 'compatibility/rc/a11y-caller-current-source-review-main-v1.json';
 export {a11yCallerPrior};
 
 export function prepareA11yCallerReview({root = process.cwd(), read = raw(root)} = {}) {
@@ -26,7 +27,7 @@ export function prepareA11yCallerReview({root = process.cwd(), read = raw(root)}
   const decisions = JSON.parse(bytes).decisions;
   assert.equal(Object.keys(decisions).length, 16);
   const ref = path => ({path, sha256: hash(read(path))});
-  const evidence = [ref(A11Y_CALLER_PRIOR), qualified.types.ref, qualified.ref,
+  const evidence = [ref(A11Y_CALLER_PRIOR), ref(A11Y_CALLER_REVIEW), qualified.types.ref, qualified.ref,
     ...['compatibility/rc/a11y-caller-public-subjects.json', decisionsPath,
       'scripts/a11y-caller-contracts.mjs', 'scripts/a11y-caller-public-subjects.mjs',
       'scripts/a11y-caller-type-evidence.mjs', 'scripts/a11y-caller-runtime-evidence.mjs',
@@ -51,7 +52,9 @@ export function prepareA11yCallerReview({root = process.cwd(), read = raw(root)}
 
 export function inspectA11yCallerReview({root = process.cwd(), read = raw(root)} = {}) {
   const body = prepareA11yCallerReview({root, read});
-  assert.equal(hash(read(A11Y_CALLER_REVIEW)), hash(JSON.stringify(body, null, 2) + '\n'),
+  const path = body.line === 'main' ? A11Y_CALLER_CURRENT_REVIEW : A11Y_CALLER_REVIEW;
+  assert.equal(hash(read(path)), hash(JSON.stringify(body, null, 2) + '\n'),
     'changed prepared individual accessibility review');
+  body.review_ref = {path, sha256: hash(read(path))};
   return body;
 }

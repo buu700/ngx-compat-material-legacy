@@ -15,7 +15,7 @@ import {qualifiedA11yCallerTypes} from './a11y-caller-type-evidence.mjs';
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const raw = root => path => readFileSync(join(root, path));
 const pins = {
-  main: {path: 'compatibility/rc/a11y-caller-runtime-main.json', sha256: '32ec7f4538c0d1c060388c327cac6b2df8a1122177cb493ed94239d049091e9b'},
+  main: {path: 'compatibility/rc/a11y-caller-runtime-current-main-v1.json', sha256: '707beb805dda965e43d29aa49fd01af6904398e362b3c936cc5ae1461f0221b5'},
   '21.x': {path: 'compatibility/rc/a11y-caller-runtime-21.json', sha256: '824adccb87c998cd1399e38b2809688ed37bb77dba81f706e23253bafd6ebfb3'},
 };
 const publicCases = [
@@ -55,11 +55,14 @@ export function qualifiedA11yCallerRuntime({root = process.cwd(), read = raw(roo
   assert.equal(proof.line, line);
   assert.deepEqual(proof.typed_boundary, types.ref);
   assert.equal(proof.prototype_only, false);
+  if (line === 'main') {
+    assert.equal(proof.current_source_continuation, 'compatibility/rc/a11y-caller-current-source-continuation-main-v1.json');
+  }
   assert.equal(proof.SDK_source_rewrites, false);
   assert.equal(proof.source_closures, 0);
   assert.equal(proof.actual_native_packed_AOT_or_full_floor_qualified, false);
   assert.equal(proof.g11_claim, 'not-passed');
-  assert.equal(proof.node, 'v22.23.3'); // Diagnostic host, not the pinned private toolchain.
+  assert.equal(proof.node, line === 'main' ? 'v22.23.4' : 'v22.23.3'); // Diagnostic host, not the pinned private toolchain.
   assert.equal(proof.typescript, line === 'main' ? '6.0.3' : '5.9.2');
 
   const inputs = new Map();
@@ -69,6 +72,7 @@ export function qualifiedA11yCallerRuntime({root = process.cwd(), read = raw(roo
     assert.equal(hash(read(member.path)), member.sha256, 'changed a11y runtime input ' + member.path);
     assert.ok(!member.path.includes('snack-dom-source-context'), 'mutable shared-owner runtime dependency');
   }
+  if (line === 'main') assert.ok(inputs.has(proof.current_source_continuation), 'runtime proof lacks current source continuation');
   for (const member of [...types.proof.inputs, types.ref]) {
     assert.equal(inputs.get(member.path), member.sha256, 'missing typed runtime dependency ' + member.path);
   }
