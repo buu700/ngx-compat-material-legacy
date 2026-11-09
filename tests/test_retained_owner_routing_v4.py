@@ -22,7 +22,7 @@ class RetainedOwnerRoutingV4Tests(unittest.TestCase):
             for child in children:self.assertEqual(child.returncode,0,child.stdout+child.stderr)
             rows=[json.loads(path.read_text()) for path in paths]
             for row in rows:
-                self.assertEqual((len(row['bound']),len(row['transitions'])),(523,108))
+                self.assertEqual((len(row['bound']),len(row['transitions'])),(525,109))
                 self.assertEqual((row['cold_rejections'],row['late_rejections'],row['recoveries']),(17,17,17))
                 self.assertEqual(row['owner_images_preserved'],6)
                 self.assertEqual(row['wrapper_images_preserved'],4)
@@ -31,4 +31,4 @@ class RetainedOwnerRoutingV4Tests(unittest.TestCase):
             own={'scripts/current-sass-tool-references.mjs','scripts/current_sass_tool_references.py',
                  'scripts/current-tool-matrix-source.mjs','scripts/current_tool_matrix_source.py'}
             shared=[{ref['path']:ref for ref in row['bound'] if ref['path'] not in own}for row in rows]
-            self.assertEqual(len(shared[0]),521);self.assertEqual(shared[0],shared[1])
+            self.assertEqual(len(shared[0]),523);self.assertEqual(shared[0],shared[1])

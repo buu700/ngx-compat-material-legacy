@@ -13,9 +13,11 @@ import {readFileSync,realpathSync} from 'node:fs';
 import {join,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
+import {types} from 'node:util';
 const PATH='scripts/checker-owner-source.mjs',INPUTS='compatibility/rc/c04-checker-owner-inputs.json';
 const PINS={"main":"f909f0a47fa49c1c3ba9e84718ad7ba461216cb7da12b61b972be87aa3ba7afc","21.x":"3ae63a5b436eab901a7ff22cb8ecc9043a5aea8d2fb89ebd9e7f396ea3105bf3"};
 const image=readFileSync(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex');
+const bufferEquals=Buffer.prototype.equals,equalBytes=(actual,supplied)=>Buffer.isBuffer(supplied)&&Reflect.apply(bufferEquals,actual,[supplied]);
 export function readCheckerOwnerMember(root,path){
  if(['node_modules/typescript/lib/typescript.js','node_modules/typescript/package.json'].includes(path)){
   const base=realpathSync(join(root,'node_modules/typescript')),file=realpathSync(join(base,path.slice('node_modules/typescript/'.length)));
@@ -58,9 +60,30 @@ export function checkerOwnerSourceSubject({root,read=path=>readCheckerOwnerMembe
   assert.ok(prior,'unqualified tool reference '+ref.path);if(ref.bytes!==undefined)assert.equal(ref.bytes,prior.bytes);
   return tools.qualifyReference({...ref,sha256:row.after.sha256,bytes:row.after.bytes});
  };
- const assertCurrent=()=>{tools.assertCurrent();for(const ref of bound.values()){
-  const raw=read(ref.path),physical=readCheckerOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'late checker owner tool '+ref.path);assert.equal(raw.length,ref.bytes);assert.ok(raw.equals(physical));
- }};
- assertCurrent();return {line,packet:structuredClone(packet),bound:structuredClone([...bound.values()]),qualifyReference,assertCurrent,
+ const physicalMember=ref=>{const raw=readCheckerOwnerMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'physical checker owner tool '+ref.path);assert.equal(raw.length,ref.bytes);return raw;};
+ const assertPhysical=()=>{for(const ref of bound.values())physicalMember(ref);};
+ const assertCurrent=()=>{assertPhysical();tools.assertCurrent();for(const ref of bound.values()){
+  const physical=physicalMember(ref),raw=read(ref.path);assert.ok(equalBytes(physical,raw),'nonphysical checker owner tool '+ref.path);assert.ok(equalBytes(physical,readCheckerOwnerMember(root,ref.path)),'checker owner tool changed during callback '+ref.path);
+ }assertPhysical();};
+ // This is the one checker image already authenticated by this actual owner's
+ // packet. The actual private browser subject supplies its comparison data;
+ // callers cannot provide another subject or acquire a source reader here.
+ const checkerReferences=packet.source_members.filter(ref=>ref.path==='scripts/check-upstream-audit-disposition.mjs');assert.equal(checkerReferences.length,1);const checkerReference={...checkerReferences[0]};
+ const captureReference=ref=>{
+  assert.ok(ref&&typeof ref==='object'&&!types.isProxy(ref));assert.equal(Object.getPrototypeOf(ref),Object.prototype);
+  const descriptors=Object.getOwnPropertyDescriptors(ref);assert.deepEqual(Reflect.ownKeys(descriptors).sort(),Object.hasOwn(descriptors,'bytes')?['bytes','path','sha256']:['path','sha256']);
+  for(const d of Object.values(descriptors))assert.ok(Object.hasOwn(d,'value')&&d.enumerable,'checker comparison reference accessor');
+  const value=Object.fromEntries(Object.entries(descriptors).map(([key,d])=>[key,d.value]));assert.equal(value.path,checkerReference.path);assert.equal(value.sha256,checkerReference.sha256);if(Object.hasOwn(value,'bytes'))assert.equal(value.bytes,checkerReference.bytes);
+  return {value,descriptors};
+ };
+ let comparing=false,nestedComparison=false;
+ const historicalCheckerBytes=ref=>{
+  if(comparing){nestedComparison=true;assert.fail('reentrant checker comparison');}
+  const snapshot=captureReference(ref);comparing=true;nestedComparison=false;
+  try{assertCurrent();const result=tools.comparisonBytes(Object.freeze({...snapshot.value}));assert.ok(Buffer.isBuffer(result));assert.equal(hash(result),checkerReference.sha256);assert.equal(result.length,checkerReference.bytes);
+   assertCurrent();assert.deepEqual(captureReference(ref),snapshot,'checker comparison reference changed');assert.equal(nestedComparison,false,'caught checker comparison reentry');return Buffer.from(result);
+  }finally{comparing=false;}
+ };
+ assertCurrent();return {line,packet:structuredClone(packet),bound:structuredClone([...bound.values()]),qualifyReference,assertCurrent,historicalCheckerBytes,
   old_program_executed:false,current_native_or_full_audit_credit:false};
 }

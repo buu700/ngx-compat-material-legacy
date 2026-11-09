@@ -342,6 +342,50 @@ class CurrentSassToolReferences:
         stage_programs = {}
         retained_stage_before = {}
         guard_test_programs = {}
+        checker_comparison_programs = {}
+        checker_owner_before = {}
+        if self.line == 'main':
+            p = json.loads(self._member(dict(path='compatibility/rc/main-checker-owned-comparison-source-routing-v11.json',
+                sha256='38ccf3df4541a68bf931b3d07be9ebb203d25031436a79ac94488c2e6b02cd30', bytes=8860)))
+            assert p['schema_version'] == 1 and p['role'] == 'main-checker-owned-comparison-source-routing'
+            assert p['base_head'] == '4dd0eb3f25e4b769664e054179c93d3b8bfef67d'
+            assert p['previous_packet'] == dict(path='compatibility/rc/main-current-tool-guard-test-source-routing-v10.json',
+                sha256='58d00dcfa4fa2c008534a7b3a4450767633f7f1040a5b4c71f1c29eadbd23bf9', bytes=13938)
+            assert p['support'] == [] and p['product_paths'] == []
+            paths = ['scripts/checker-reference-proposal.mjs', 'tests/checker_reference_source_probe.mjs',
+                     'tests/test_retained_landscape_tool_replay.py']
+            assert [row['path'] for row in p['updates']] == paths
+            owner = p['source_owner_update']; assert owner['path'] == 'scripts/checker-owner-source.mjs'
+            for key, value in dict(source_owner_is_metadata_alias=True, source_scope_only=True,
+                                  root_transaction_policy_changed=False, historical_programs_executed=False,
+                                  historical_packets_rewritten=False, original_ledger_metadata_recipe_changed=False,
+                                  source_judgments_changed=0, css_or_artifact_admission_granted=False,
+                                  artifact_or_audit_admission_granted=False, g11_claim='not-passed').items():
+                assert p[key] == value
+            comparison_env = dict(PATH=os.environ['PATH'], GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null',
+                                  GIT_NO_LAZY_FETCH='1', GIT_NO_REPLACE_OBJECTS='1', GIT_TERMINAL_PROMPT='0')
+            subprocess.check_call(['git', '--no-replace-objects', 'merge-base', '--is-ancestor', p['base_head'], 'HEAD'], cwd=self.root, env=comparison_env)
+            originals = _git_images(self.root, [dict(commit=p['base_head'], path=path) for path in paths + [owner['path']]])
+            anchor = dict(packet=dict(path='compatibility/rc/c04-browser-owner-inputs.json',
+                sha256='d22d4c657197ee2640dd1079861e54fde35e55b9091b7d44f4e024d4b37b46cb', bytes=15192), code_transition_index=1)
+            assert p['source_owner_anchor'] == anchor
+            anchor_raw = _git_images(self.root, [dict(commit=p['base_head'], path=anchor['packet']['path'])])[(p['base_head'], anchor['packet']['path'])]
+            _matches(anchor_raw, anchor['packet'])
+            assert json.loads(anchor_raw)['code_transitions'][anchor['code_transition_index']]['after'] == owner['before']
+            checker_owner_before[owner['path']] = owner['before']
+            for update in p['updates'] + [owner]:
+                assert update['before']['path'] == update['after']['path'] == update['path']
+                before = originals[(p['base_head'], update['path'])]; _matches(before, update['before'])
+                after = _edited(before, update['edits']); _matches(after, update['after'])
+                assert self._member(update['after']) == after
+                checker_comparison_programs[update['path']] = (update, [(update['before'], before), (update['after'], after)])
+        def checker_comparison_data(ref):
+            overlay = checker_comparison_programs.get(ref['path'])
+            if overlay is None: return self._member(ref)
+            update, identities = overlay; meta = _metadata(ref)
+            found = [raw for identity, raw in identities if identity == meta]
+            assert len(found) == 1, 'unknown checker comparison program'
+            self._member(update['after']); return bytes(found[0])
         if self.line == 'main':
             p = json.loads(self._member(dict(path='compatibility/rc/main-current-tool-guard-test-source-routing-v10.json',
                 sha256='58d00dcfa4fa2c008534a7b3a4450767633f7f1040a5b4c71f1c29eadbd23bf9', bytes=13938)))
@@ -368,15 +412,15 @@ class CurrentSassToolReferences:
                 assert update['before']['path'] == update['after']['path'] == update['path']
                 before = originals[(p['base_head'], update['path'])]; _matches(before, update['before'])
                 after = _edited(before, update['edits']); _matches(after, update['after'])
-                assert self._member(update['after']) == after
+                assert checker_comparison_data(update['after']) == after
                 guard_test_programs[update['path']] = (update, [(update['before'], before), (update['after'], after)])
         def guard_test_comparison(ref):
             overlay = guard_test_programs.get(ref['path'])
-            if overlay is None: return self._member(ref)
+            if overlay is None: return checker_comparison_data(ref)
             update, identities = overlay; meta = _metadata(ref)
             found = [raw for identity, raw in identities if identity == meta]
             assert len(found) == 1, 'unknown guard test program comparison'
-            self._member(update['after']); return bytes(found[0])
+            checker_comparison_data(update['after']); return bytes(found[0])
         if self.line == 'main':
             p = json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v9.json',
                 sha256='2573413b3ecc56dd465cf0139fb8e150e206990982246e967aad630a230b85ca', bytes=26489)))
@@ -588,7 +632,7 @@ class CurrentSassToolReferences:
             assert routing_packet['schema_version']==1 and routing_packet['role']=='main-current-inventory-source-routing' and routing_packet['base_head']=='54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0'
             assert routing_packet['source_scope_only'] is True and routing_packet['historical_programs_executed'] is False and routing_packet['historical_packets_rewritten'] is False and routing_packet['artifact_or_audit_admission_granted'] is False and routing_packet['g11_claim']=='not-passed'
             routing_paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];assert [row['path'] for row in routing_packet['updates']]==routing_paths
-            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='989f01791c499931a5b5acd8732e7b87aa0b15f23a08e592f45a7a37cb4083b0',bytes=27824))
+            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='69767d8ac632406e94d98f399f13f188c9e9ef033af76b3afb18d01edf04c9b7',bytes=30476))
             routing_env=dict(PATH=os.environ['PATH'],GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0');subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',routing_packet['base_head'],'HEAD'],cwd=self.root,env=routing_env)
             routing_originals=_git_images(self.root,[dict(commit=routing_packet['base_head'],path=routing_path) for routing_path in routing_paths])
             routing_next=json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v3.json',sha256='d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b',bytes=13219)))
@@ -993,6 +1037,12 @@ class CurrentSassToolReferences:
                 assert prior[0]['after'] == update['before'], 'guard test program must follow exact source frame'
                 domain_overlays[path] = ({**prior[0], 'after': update['after']}, prior[1] + identities)
             else: domain_overlays[path] = (update, identities)
+        for path, (update, identities) in checker_comparison_programs.items():
+            prior = domain_overlays.get(path)
+            if prior is not None:
+                assert prior[0]['after'] == update['before'], 'checker comparison program must follow exact source frame'
+                domain_overlays[path] = ({**prior[0], 'after': update['after']}, prior[1] + identities)
+            else: domain_overlays[path] = (update, identities)
         inventory_prior = dict(path='testing/legacy-runner/historical-inventory.json', sha256='a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403', bytes=106309)
         inventory_current = dict(path=inventory_prior['path'], sha256='912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15', bytes=113388)
         def current_comparison(ref):
@@ -1346,7 +1396,8 @@ class CurrentSassToolReferences:
             else:
                 if path in retained_test_before: assert update['before'] == retained_test_before[path]
                 if path in retained_stage_before: assert update['before'] == retained_stage_before[path]
-                assert (self.line=='main' and (path==retained_rules_js_path or path in retained_landscape_paths)) or path in retained_test_before or path in retained_stage_before or path in retained_reader_paths or path in routing_images or update['before'] in next_branch['additional_inputs'] or (path=='scripts/authored-current-use-inventory.mjs' and checker_source_anchor is not None and update['before'] in checker_source_anchor['source_members']), 'domain predecessor is not an existing input: ' + path
+                if path in checker_owner_before: assert update['before'] == checker_owner_before[path]
+                assert (self.line=='main' and (path==retained_rules_js_path or path in retained_landscape_paths)) or path in retained_test_before or path in retained_stage_before or path in checker_owner_before or path in retained_reader_paths or path in routing_images or update['before'] in next_branch['additional_inputs'] or (path=='scripts/authored-current-use-inventory.mjs' and checker_source_anchor is not None and update['before'] in checker_source_anchor['source_members']), 'domain predecessor is not an existing input: ' + path
                 row=dict(path=path,before=dict(sha256=update['before']['sha256'],bytes=update['before']['bytes']),identities={}); self._rows[path]=row
             for ref, raw in identities: self._add(row,ref,raw)
             row['after']=dict(sha256=update['after']['sha256'],bytes=update['after']['bytes'])

@@ -7,7 +7,6 @@
 /** Complete source transition proof only;never executes the historical checker. */
 import assert from 'node:assert/strict';
 import {checkerOwnerSourceSubject} from '../scripts/checker-owner-source.mjs';
-import {browserOwnerSourceSubject} from '../scripts/browser-owner-source.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {readFileSync,writeFileSync,mkdtempSync,mkdirSync,symlinkSync,rmSync,lstatSync} from 'node:fs';
@@ -41,7 +40,7 @@ export async function inspectCheckerSourceMetadata({read=disk}={}){
  assert.equal(packet.g11_claim,'not-passed');member(SELF,hash(image));
  for(const ref of packet.source_members)member(ref.path,ref.sha256,ref.bytes);
  const physicalCurrent=member(CHECKER,packet.current_checker.sha256,packet.current_checker.bytes);
- const current=line==='main'?browserOwnerSourceSubject({root:ROOT,read}).comparisonBytes(packet.current_checker):physicalCurrent;
+ const current=line==='main'?tools.historicalCheckerBytes(packet.current_checker):physicalCurrent;
  const cohortRaw=original(packet.source_parent,LEDGER);assert.equal(hash(cohortRaw),packet.protected_ledger.sha256);assert.equal(cohortRaw.length,packet.protected_ledger.bytes);
  const cohort=JSON.parse(cohortRaw),ledgerRaw=member(LEDGER),ledger=JSON.parse(ledgerRaw);
  const assertCurrent=()=>{tools.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late checker source input '+ref.path);assert.equal(raw.length,ref.bytes);assert.equal(hash(disk(ref.path)),ref.sha256,'late physical source '+ref.path);}};
