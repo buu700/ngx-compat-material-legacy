@@ -1,0 +1,12 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license in LICENSE.
+ */
+/** Exact select-program source proof; no CSS or artifact admission. */
+import {createHash} from 'node:crypto';import {execFileSync} from 'node:child_process';import {isDeepStrictEqual} from 'node:util';
+const sha=b=>createHash('sha256').update(b).digest('hex');
+export function verifySelectProgramSource(root,read){
+ const path='compatibility/rc/current-main-select-density-program-v1.json',raw=read(path);if(sha(raw)!=='1c1417392d8086499e1f7b480c0f9c5e25721ffbed13e769be9dc6a56cbe6e7a'||raw.length!==5000)throw Error('select continuation packet');const p=JSON.parse(raw),names=['scripts/select-program-transition-source.mjs','scripts/select_program_transition_source.py'];if(p.schema_version!==1||p.role!=='main-select-program-density-resource-continuation'||p.line!=='main'||p.source_parent!=='c2c58388e0777e580fd76234b57c271de0cb4115'||p.source_scope_only!==true||p.artifact_or_audit_admission_granted!==false||!isDeepStrictEqual(p.updates.map(x=>x.path),names))throw Error('select continuation scope');const env={PATH:process.env.PATH,LANG:'C',LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1'};execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',p.source_parent,'HEAD'],{cwd:root,env});for(const r of p.updates){const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',p.source_parent+':'+r.path],{cwd:root,env});if(r.before.path!==r.path||sha(before)!==r.before.sha256||before.length!==r.before.bytes)throw Error('select continuation preimage');let at=0,parts=[];for(const e of r.edits){if(!isDeepStrictEqual(Object.keys(e).sort(),['after','before','offset'])||!Number.isSafeInteger(e.offset)||e.offset<at||e.offset>before.length)throw Error('select continuation edit');const old=Buffer.from(e.before);if(!before.subarray(e.offset,e.offset+old.length).equals(old))throw Error('select continuation literal');parts.push(before.subarray(at,e.offset),Buffer.from(e.after));at=e.offset+old.length;}const after=Buffer.concat([...parts,before.subarray(at)]);if(r.after.path!==r.path||sha(after)!==r.after.sha256||after.length!==r.after.bytes||!read(r.path).equals(after))throw Error('select continuation physical');}
+}

@@ -2,8 +2,68 @@
 # Copyright (c) 2026 Ryan Lester.
 # Use of this source code is governed by the MIT license in LICENSE.
 """One private-card CSS comparison with historical and current source binding."""
-import hashlib,json,re,weakref,subprocess,shutil
+import os as _owner_os, shutil as _owner_shutil, select as _owner_select, time as _owner_time, types as _owner_types
+_owner_path=_owner_os.environ.get('PATH','')
+_owner_node=_owner_shutil.which('node',path=_owner_path)
+if not _owner_node or not _owner_os.path.isabs(_owner_node):raise RuntimeError('pinned Node not found')
+_owner_node=_owner_os.path.realpath(_owner_node)
+_owner_primitives=(_owner_os.posix_spawn,_owner_os.pipe,_owner_os.close,_owner_os.read,_owner_os.waitpid,_owner_os.kill,_owner_select.select,_owner_time.monotonic)
+if any(type(f) is not _owner_types.BuiltinFunctionType for f in _owner_primitives):raise RuntimeError('native owner primitives required')
+_owner_spawn,_owner_pipe,_owner_close,_owner_read,_owner_waitpid,_owner_kill,_owner_poll,_owner_clock=_owner_primitives
+_owner_dup2=_owner_os.POSIX_SPAWN_DUP2;_owner_close_action=_owner_os.POSIX_SPAWN_CLOSE;_owner_nohang=_owner_os.WNOHANG
+_OWNER_LAUNCHER="import {readFileSync,lstatSync} from 'node:fs';import{join,resolve}from'node:path';import{createHash}from'node:crypto';const root=resolve(process.argv[1]),name=process.argv[2],pin=process.argv[3];if(process.version!=='v24.21.0'||!/^scripts\\/[a-z0-9-]+\\.mjs$/.test(name))throw Error('owner launcher');let p=root;for(const x of name.split('/')){p=join(p,x);if(lstatSync(p).isSymbolicLink())throw Error('linked owner')}const raw=readFileSync(p);if(createHash('sha256').update(raw).digest('hex')!==pin)throw Error('owner pin');const extra=process.argv.slice(4);process.argv=[process.argv[0],'owner',root,...extra];await import('data:text/javascript;base64,'+raw.toString('base64'));if(!readFileSync(p).equals(raw))throw Error('owner changed');"
+
+def _native_owner(root,name,pin,extra=(),*,spawn=_owner_spawn,pipe=_owner_pipe,close=_owner_close,read=_owner_read,waitpid=_owner_waitpid,kill=_owner_kill,poll=_owner_poll,clock=_owner_clock,node=_owner_node,path=_owner_path,dup2=_owner_dup2,close_action=_owner_close_action,nohang=_owner_nohang,launcher=_OWNER_LAUNCHER):
+    rfd,wfd=pipe();pid=None;waited=False
+    try:
+        argv=[node,'--input-type=module','--eval',launcher,str(root),name,pin,*extra]
+        env={'PATH':path,'LANG':'C','LC_ALL':'C','NODE_OPTIONS':''}
+        pid=spawn(node,argv,env,file_actions=[(dup2,wfd,1),(close_action,rfd),(close_action,wfd)])
+        close(wfd);wfd=None;output=b'';deadline=clock()+120
+        while True:
+            remaining=deadline-clock()
+            if remaining<=0:raise TimeoutError('owner timeout')
+            ready,_,_=poll([rfd],[],[],remaining)
+            if not ready:raise TimeoutError('owner timeout')
+            part=read(rfd,3)
+            if not part:break
+            output+=part
+            if len(output)>2:raise ValueError('owner protocol')
+        while True:
+            child,status=waitpid(pid,nohang)
+            if child==pid:waited=True;break
+            remaining=deadline-clock()
+            if remaining<=0:raise TimeoutError('owner timeout')
+            poll([],[],[],min(remaining,0.01))
+        if status!=0 or output!=b'ok':raise ValueError('owner failed')
+    finally:
+        if wfd is not None:close(wfd)
+        close(rfd)
+        if pid is not None and not waited:
+            try:kill(pid,9)
+            except ProcessLookupError:pass
+            waitpid(pid,0)
+
+def _guarded(function,name,own_name=None):
+    code=function.__code__;defaults=function.__defaults__;mapping=function.__kwdefaults__;items=tuple(mapping.items()) if mapping else ()
+    def check():
+        current=function.__kwdefaults__
+        if globals().get(name) is not function or function.__code__ is not code or function.__defaults__ is not defaults or current is not mapping or (current is not None and (len(current)!=len(items) or any(k not in current or current[k] is not v for k,v in items))):raise ValueError('changed owner callable')
+        if own_name is not None and globals().get(own_name) is not guarded:raise ValueError('changed owner binding')
+    def guarded(*args,**kwargs):
+        check();result=function(*args,**kwargs);check();return result
+    return guarded
+_OWNER_NATIVE=(_native_owner,_native_owner.__code__,_native_owner.__defaults__,_native_owner.__kwdefaults__,tuple(_native_owner.__kwdefaults__.items()),_native_owner.__closure__,_owner_spawn,_owner_pipe,_owner_close,_owner_read,_owner_waitpid,_owner_kill,_owner_poll,_owner_clock,_owner_node,_owner_path,_owner_dup2,_owner_close_action,_owner_nohang,_OWNER_LAUNCHER)
+
+def _run_select_owner(root,read,*,native=_OWNER_NATIVE):
+    for path in ('compatibility/rc/current-main-select-density-program-v1.json','scripts/select-program-transition-source.mjs','scripts/select_program_transition_source.py'):read(path)
+    launch,code,defaults,mapping,items,closure,spawn,pipe,close,native_read,waitpid,kill,poll,clock,node,path,dup2,close_action,nohang,launcher=native;current=launch.__kwdefaults__
+    if globals().get('_native_owner') is not launch or launch.__code__ is not code or launch.__defaults__ is not defaults or current is not mapping or tuple(current.items())!=items or launch.__closure__ is not closure:raise ValueError('changed native owner')
+    launch(root,'scripts/main-select-program-owner.mjs','55718e8697a51fb0b087c9f2f7d15508917c61001667bd0a3d75b534d6a53ccc',(),spawn=spawn,pipe=pipe,close=close,read=native_read,waitpid=waitpid,kill=kill,poll=poll,clock=clock,node=node,path=path,dup2=dup2,close_action=close_action,nohang=nohang,launcher=launcher)
+
+import hashlib,json,re,weakref,subprocess,shutil,os
 from pathlib import Path
+
 from current_sass_spinner_snack_admission import CurrentSpinnerSnackContract
 from select_program_transition_source import select_program_transitions
 _ROOT=Path(__file__).resolve().parents[1];_IMAGE=Path(__file__).read_bytes();_CONTEXTS=weakref.WeakKeyDictionary()
@@ -44,9 +104,27 @@ def _isolated_expected_computation(root,line,operation,value):
     if path.read_bytes()!=raw:raise ValueError('bootstrap changed during evaluation')
     return out
 
+def _verify_private_js_owner(root):
+    path='compatibility/rc/current-main-private-card-select-owner-v2.json';raw=_read(root,path);assert (_hash(raw),len(raw))==('62ec4d7ab837c520899b47c8809c767cacb79c233b6145e915086918256d6f8a',5107);p=json.loads(raw);name='scripts/sass-private-card-gate.mjs';assert p['schema_version']==1 and p['role']=='main-private-card-select-owner-continuation' and p['line']=='main' and p['source_parent']=='c2c58388e0777e580fd76234b57c271de0cb4115' and p['source_scope_only'] is True and p['artifact_or_audit_admission_granted'] is False and [x['path'] for x in p['updates']]==[name]
+    step_path='compatibility/rc/current-sass-stepper-private-gate-executable-v1.json';step_raw=_read(root,step_path);assert _hash(step_raw)=='efedf94e02295045ed681484aef77661c858fa5a8e7612f5931eeb7a3bfcb6eb';step=json.loads(step_raw);assert step['schema_version']==1 and step['role']=='main-stepper-private-gate-executable-successor' and step['line']=='main' and step['source_parent']=='42d02491648097656ccb3c590dbaaea066c3e603' and step['source_scope_only'] is True and step['artifact_or_audit_admission_granted'] is False and [x['path'] for x in step['updates']]==[name]
+    prior_raw=_read(root,'compatibility/rc/current-sass-select-private-gate-executable-v2.json');assert _hash(prior_raw)=='f0a8f5b76ce7b6aeca446247488d4621171ab155c3215d61fd826730d2111e80';prior=json.loads(prior_raw);r=p['updates'][0];assert prior['schema_version']==2 and prior['role']=='main-select-private-gate-executable-successor' and prior['line']=='main' and prior['previous_packet']==dict(path=step_path,sha256=_hash(step_raw),bytes=len(step_raw)) and prior['source_scope_only'] is True and prior['artifact_or_audit_admission_granted'] is False and [x['path'] for x in prior['updates']]==[name] and prior['updates'][0]['after']==r['before']
+    env=dict(PATH=os.environ.get('PATH',''),LANG='C',LC_ALL='C',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_SYSTEM='/dev/null',GIT_TERMINAL_PROMPT='0',GIT_NO_REPLACE_OBJECTS='1',GIT_NO_LAZY_FETCH='1');git=lambda commit:subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',commit+':'+name],cwd=root,env=env);subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',p['source_parent'],'HEAD'],cwd=root,env=env)
+    original=git(step['source_parent']);step_row=step['updates'][0];assert (_hash(original),len(original))==(step_row['before']['sha256'],step_row['before']['bytes']);at=0;parts=[]
+    for e in step_row['edits']:
+        assert set(e)=={'offset','before','after'} and type(e['offset']) is int and at<=e['offset']<=len(original);before=e['before'].encode();assert original[e['offset']:e['offset']+len(before)]==before;parts.extend((original[at:e['offset']],e['after'].encode()));at=e['offset']+len(before)
+    middle=b''.join([*parts,original[at:]]);assert dict(path=name,sha256=_hash(middle),bytes=len(middle))==step_row['after'] and prior['updates'][0]['before']==step_row['after'];at=0;parts=[]
+    for e in prior['updates'][0]['edits']:
+        assert set(e)=={'offset','before','after'} and type(e['offset']) is int and at<=e['offset']<=len(middle);before=e['before'].encode();assert middle[e['offset']:e['offset']+len(before)]==before;parts.extend((middle[at:e['offset']],e['after'].encode()));at=e['offset']+len(before)
+    old=b''.join([*parts,middle[at:]]);assert dict(path=name,sha256=_hash(old),bytes=len(old))==r['before'] and git(p['source_parent'])==old;at=0;parts=[]
+    for e in r['edits']:
+        assert set(e)=={'offset','before','after'} and type(e['offset']) is int and at<=e['offset']<=len(old);before=e['before'].encode();assert old[e['offset']:e['offset']+len(before)]==before;parts.extend((old[at:e['offset']],e['after'].encode()));at=e['offset']+len(before)
+    result=b''.join([*parts,old[at:]]);assert r['after']['path']==name and (_hash(result),len(result))==(r['after']['sha256'],r['after']['bytes']) and _read(root,name)==result
+    return r['after']['sha256']
 class PrivateCardGateContext:
     __slots__=('__weakref__',)
     def __init__(self,root):
+        select_checked=_guarded(_run_select_owner,'_run_select_owner')
+        transition_checked=_guarded(select_program_transitions,'select_program_transitions')
         if not __debug__:raise RuntimeError('optimized mode cannot authenticate source')
         root=Path(root).absolute();source=CurrentSpinnerSnackContract(root);line=source.line;sets=list(source.source_sets.values())
         if len(sets)!=1:raise ValueError('source closure')
@@ -55,13 +133,15 @@ class PrivateCardGateContext:
         oracle=json.loads(_read(root,'compatibility/rc/oracles/material-16.2.14-sass-api.json'));cases=json.loads(_read(root,'compatibility/rc/oracles/material-16.2.14-sass-argument-cases.json'));call=cases['mixins']['private-check-duplicate-theme-styles']['call'];program="@use '__entry__' as m;\n"+oracle['standard_theme']+'\n'+call+'\n'
         if _hash(program)!=_PROGRAM or oracle['members']['mixins']['private-check-duplicate-theme-styles']['invocation']['css_sha256']!=_ORIGINAL:raise ValueError('plan')
         prov=json.loads(_read(root,'reference/material-16.2.14/PROVENANCE.json'))['isolated_environment'];lock=json.loads(_read(root,'reference/material-16.2.14/environment-package-lock.json'));pins=json.loads(_read(root,'fixtures/sass/private-card-peer-pins.json'));branch=pins['branches']['21' if line=='21.x' else 'main'];info=branch['sass_info'];identity=dict(material_version='16.2.14',material_manifest_sha256=prov['material_manifest_sha256'],lock_sha256=prov['package_lock_sha256'],material_integrity=lock['packages']['node_modules/@angular/material']['integrity'],catalog='compatibility/rc/oracles/material-16.2.14-sass-api.json',catalog_sha256=_PINS['compatibility/rc/oracles/material-16.2.14-sass-api.json'],sass_version=info,expected_source='untouched-installed-material16',candidate_source='packed-facade')
-        if line=='main' and _hash(_read(root,'scripts/select_program_transition_source.py'))!='a34b878e5ba2f15e5da293c7db48d019032b47192a82147648d0b1f5fc52ea59':raise ValueError('changed Stepper transition helper')
-        successor,successor_current=select_program_transitions(root,line,lambda path:_read(root,path),private=True)
-        _CONTEXTS[self]=dict(successor=successor,successor_current=successor_current,root=root,source=source,line=line,sources=_plain(sets[0]),original_sources=_plain(orig[0]),descriptor=_plain(dict(contract=_CONTRACT,source=source.descriptor)),identity=identity,call=call,info=info)
+        if line=='main':
+            assert _hash(_read(root,'scripts/main_select_program_proof.py'))=='b107f2f2f59d783721409eb673cab3fb7e534353ba68fbb1aca5afebbc3a45a2';select_checked(root,lambda p:_read(root,p))
+        successor,successor_current=transition_checked(root,line,private=False)
+        if line=='main':successor['scripts/sass-private-card-gate.mjs']=_verify_private_js_owner(root)
+        _CONTEXTS[self]=dict(select_checked=select_checked,successor=successor,successor_current=successor_current,root=root,source=source,line=line,sources=_plain(sets[0]),original_sources=_plain(orig[0]),descriptor=_plain(dict(contract=_CONTRACT,source=source.descriptor)),identity=identity,call=call,info=info)
         self.assert_current()
     def assert_current(self):
         if not __debug__:raise RuntimeError('optimized mode cannot authenticate source')
-        s=_CONTEXTS[self];s['source'].assert_current();s['successor_current']()
+        s=_CONTEXTS[self];s['source'].assert_current();_verify_private_js_owner(s['root']) if s['line']=='main' else None;(_hash(_read(s['root'],'scripts/main_select_program_proof.py'))=='b107f2f2f59d783721409eb673cab3fb7e534353ba68fbb1aca5afebbc3a45a2' or (_ for _ in ()).throw(ValueError('select proof helper changed'))) if s['line']=='main' else None;s['select_checked'](s['root'],lambda p:_read(s['root'],p)) if s['line']=='main' else None;s['successor_current']()
         if Path(__file__).read_bytes()!=_IMAGE:raise ValueError('gate changed')
         for path,digest in _PINS.items():
             if _hash(_read(s['root'],path))!=s['successor'].get(path,digest):raise ValueError('proof input changed')

@@ -2,9 +2,69 @@
 # Copyright (c) 2026 Ryan Lester.
 # Use of this source code is governed by the MIT license in LICENSE.
 """Finite current source/metadata composition after unchanged historical models."""
+import os as _owner_os, shutil as _owner_shutil, select as _owner_select, time as _owner_time, types as _owner_types
+_owner_path=_owner_os.environ.get('PATH','')
+_owner_node=_owner_shutil.which('node',path=_owner_path)
+if not _owner_node or not _owner_os.path.isabs(_owner_node):raise RuntimeError('pinned Node not found')
+_owner_node=_owner_os.path.realpath(_owner_node)
+_owner_primitives=(_owner_os.posix_spawn,_owner_os.pipe,_owner_os.close,_owner_os.read,_owner_os.waitpid,_owner_os.kill,_owner_select.select,_owner_time.monotonic)
+if any(type(f) is not _owner_types.BuiltinFunctionType for f in _owner_primitives):raise RuntimeError('native owner primitives required')
+_owner_spawn,_owner_pipe,_owner_close,_owner_read,_owner_waitpid,_owner_kill,_owner_poll,_owner_clock=_owner_primitives
+_owner_dup2=_owner_os.POSIX_SPAWN_DUP2;_owner_close_action=_owner_os.POSIX_SPAWN_CLOSE;_owner_nohang=_owner_os.WNOHANG
+_OWNER_LAUNCHER="import {readFileSync,lstatSync} from 'node:fs';import{join,resolve}from'node:path';import{createHash}from'node:crypto';const root=resolve(process.argv[1]),name=process.argv[2],pin=process.argv[3];if(process.version!=='v24.21.0'||!/^scripts\\/[a-z0-9-]+\\.mjs$/.test(name))throw Error('owner launcher');let p=root;for(const x of name.split('/')){p=join(p,x);if(lstatSync(p).isSymbolicLink())throw Error('linked owner')}const raw=readFileSync(p);if(createHash('sha256').update(raw).digest('hex')!==pin)throw Error('owner pin');const extra=process.argv.slice(4);process.argv=[process.argv[0],'owner',root,...extra];await import('data:text/javascript;base64,'+raw.toString('base64'));if(!readFileSync(p).equals(raw))throw Error('owner changed');"
+
+def _native_owner(root,name,pin,extra=(),*,spawn=_owner_spawn,pipe=_owner_pipe,close=_owner_close,read=_owner_read,waitpid=_owner_waitpid,kill=_owner_kill,poll=_owner_poll,clock=_owner_clock,node=_owner_node,path=_owner_path,dup2=_owner_dup2,close_action=_owner_close_action,nohang=_owner_nohang,launcher=_OWNER_LAUNCHER):
+    rfd,wfd=pipe();pid=None;waited=False
+    try:
+        argv=[node,'--input-type=module','--eval',launcher,str(root),name,pin,*extra]
+        env={'PATH':path,'LANG':'C','LC_ALL':'C','NODE_OPTIONS':''}
+        pid=spawn(node,argv,env,file_actions=[(dup2,wfd,1),(close_action,rfd),(close_action,wfd)])
+        close(wfd);wfd=None;output=b'';deadline=clock()+120
+        while True:
+            remaining=deadline-clock()
+            if remaining<=0:raise TimeoutError('owner timeout')
+            ready,_,_=poll([rfd],[],[],remaining)
+            if not ready:raise TimeoutError('owner timeout')
+            part=read(rfd,3)
+            if not part:break
+            output+=part
+            if len(output)>2:raise ValueError('owner protocol')
+        while True:
+            child,status=waitpid(pid,nohang)
+            if child==pid:waited=True;break
+            remaining=deadline-clock()
+            if remaining<=0:raise TimeoutError('owner timeout')
+            poll([],[],[],min(remaining,0.01))
+        if status!=0 or output!=b'ok':raise ValueError('owner failed')
+    finally:
+        if wfd is not None:close(wfd)
+        close(rfd)
+        if pid is not None and not waited:
+            try:kill(pid,9)
+            except ProcessLookupError:pass
+            waitpid(pid,0)
+
+def _guarded(function,name,own_name=None):
+    code=function.__code__;defaults=function.__defaults__;mapping=function.__kwdefaults__;items=tuple(mapping.items()) if mapping else ()
+    def check():
+        current=function.__kwdefaults__
+        if globals().get(name) is not function or function.__code__ is not code or function.__defaults__ is not defaults or current is not mapping or (current is not None and (len(current)!=len(items) or any(k not in current or current[k] is not v for k,v in items))):raise ValueError('changed owner callable')
+        if own_name is not None and globals().get(own_name) is not guarded:raise ValueError('changed owner binding')
+    def guarded(*args,**kwargs):
+        check();result=function(*args,**kwargs);check();return result
+    return guarded
+_OWNER_NATIVE=(_native_owner,_native_owner.__code__,_native_owner.__defaults__,_native_owner.__kwdefaults__,tuple(_native_owner.__kwdefaults__.items()),_native_owner.__closure__,_owner_spawn,_owner_pipe,_owner_close,_owner_read,_owner_waitpid,_owner_kill,_owner_poll,_owner_clock,_owner_node,_owner_path,_owner_dup2,_owner_close_action,_owner_nohang,_OWNER_LAUNCHER)
+
+def _run_select_owner(root,read,*,native=_OWNER_NATIVE):
+    for path in ('compatibility/rc/current-main-select-density-program-v1.json','scripts/select-program-transition-source.mjs','scripts/select_program_transition_source.py'):read(path)
+    launch,code,defaults,mapping,items,closure,spawn,pipe,close,native_read,waitpid,kill,poll,clock,node,path,dup2,close_action,nohang,launcher=native;current=launch.__kwdefaults__
+    if globals().get('_native_owner') is not launch or launch.__code__ is not code or launch.__defaults__ is not defaults or current is not mapping or tuple(current.items())!=items or launch.__closure__ is not closure:raise ValueError('changed native owner')
+    launch(root,'scripts/main-select-program-owner.mjs','55718e8697a51fb0b087c9f2f7d15508917c61001667bd0a3d75b534d6a53ccc',(),spawn=spawn,pipe=pipe,close=close,read=native_read,waitpid=waitpid,kill=kill,poll=poll,clock=clock,node=node,path=path,dup2=dup2,close_action=close_action,nohang=nohang,launcher=launcher)
+
 import hashlib
 import json
 from pathlib import Path
+
 import re
 import weakref
 from select_program_transition_source import select_program_transitions
@@ -92,23 +152,37 @@ def _physical(root,path):
     assert json.loads(regular(base,['package.json']))['name']==peer[1]
     return regular(base,peer[2].split('/'))
 
+_active_physical_callbacks={}
 def _physical_boundary(root,provided_read):
-    # Existing frozen guards authenticate retained first images against exact pins.
-    # This closes supplied callbacks, not concurrent filesystem mutation.
+    active=_active_physical_callbacks.get(root)
+    if active is not None:
+        active['poisoned']=True
+        raise ValueError('reentrant physical boundary')
     assert not root.is_symlink() and root.is_dir()
     retained={}
+    def reject_reentry():
+        active=_active_physical_callbacks.get(root)
+        if active is not None:
+            active['poisoned']=True
+            raise ValueError('reentrant physical read')
     def read(path):
+        reject_reentry()
         actual=_physical(root,path)
         if path in retained:assert actual==retained[path]
         else:retained[path]=actual
         if provided_read is not None:
-            provided=provided_read(path)
-            assert type(provided) is bytes and actual==provided
+            state={'poisoned':False};_active_physical_callbacks[root]=state
+            try:
+                provided=provided_read(path)
+                assert not state['poisoned'],'caught physical read reentry'
+                assert type(provided) is bytes and actual==provided
+            finally:del _active_physical_callbacks[root]
         assert _physical(root,path)==actual,'physical input changed during supplied read'
         return actual
     def assert_physical():
+        reject_reentry()
         for path,before in retained.items():assert _physical(root,path)==before,'changed final physical input'
-    return read,assert_physical
+    return read,assert_physical,reject_reentry
 
 def _tool(root,path,read):return read(path)
 
@@ -128,19 +202,25 @@ def _plan(case,oracle,catalog):
 class OrdinaryControlGateContext:
     __slots__=('__weakref__',)
     def __init__(self,root=ROOT,*,read=None):
+        if read is not None:raise ValueError('supplied source readers are not authoritative')
+        select_checked=_guarded(_run_select_owner,'_run_select_owner')
+        transition_checked=_guarded(select_program_transitions,'select_program_transitions')
         root=Path(root).absolute()
-        read,assert_physical=_physical_boundary(root,read)
+        read,assert_physical,reject_reentry=_physical_boundary(root,read)
         source=CurrentSpinnerSnackContract(root,read=read)
         line=source.line
-        if line=='main':assert _hash(read('scripts/select_program_transition_source.py'))=='a34b878e5ba2f15e5da293c7db48d019032b47192a82147648d0b1f5fc52ea59'
-        successor,successor_current=select_program_transitions(root,line,read)
+        if line=='main':
+            assert _hash(read('scripts/main_select_program_proof.py'))=='b107f2f2f59d783721409eb673cab3fb7e534353ba68fbb1aca5afebbc3a45a2';select_checked(root,read)
+        successor,successor_current=transition_checked(root,line)
         branch=_PACKET['branches'][line]
         oracle=json.loads((root/_PACKET['oracle']['path']).read_bytes())
         catalog=json.loads((root/_PACKET['catalog']['path']).read_bytes())
         provenance=json.loads((root/_PACKET['provenance']['path']).read_bytes())
         lock=json.loads((root/_PACKET['reference_lock']['path']).read_bytes())
         def assert_current():
+            reject_reentry()
             source.assert_current()
+            if line=='main':assert _hash(read('scripts/main_select_program_proof.py'))=='b107f2f2f59d783721409eb673cab3fb7e534353ba68fbb1aca5afebbc3a45a2';select_checked(root,read)
             successor_current()
             assert _tool(root,SELF,read)==_IMAGE
             for path,sha in _DEPENDENCIES.items():assert _hash(_tool(root,path,read))==successor.get(path,sha)

@@ -4,6 +4,14 @@
  * Copyright (c) 2026 Ryan Lester.
  * Use of this source code is governed by the MIT license in LICENSE.
  */
+const ownerRuntime=process.execPath,ownerPath=process.env.PATH;
+const ownerJSONParse=JSON.parse,ownerJSONStringify=JSON.stringify,ownerBufferFrom=Buffer.from,ownerBufferToString=Buffer.prototype.toString;
+function runDensityResourceOwner(root,path,initial,initialRef,read){
+ for(const name of ['compatibility/rc/current-main-density-input-successor-v2.json','compatibility/rc/current-main-density-input-successor-v3.json','compatibility/rc/main-tooltip-resource-source-programs-v1.json','compatibility/rc/main-sass-graph-resource-source-programs-v2.json','compatibility/rc/main-sass-resource-contract-programs-v1.json'])read(name);
+ if(JSON.parse!==ownerJSONParse||JSON.stringify!==ownerJSONStringify||Buffer.from!==ownerBufferFrom||Buffer.prototype.toString!==ownerBufferToString)throw Error('density owner operations changed');
+ const raw=execFileSync(ownerRuntime,['--input-type=module','--eval',"import {readFileSync,lstatSync} from 'node:fs';import{join,resolve}from'node:path';import{createHash}from'node:crypto';const root=resolve(process.argv[1]),name=process.argv[2],pin=process.argv[3];if(process.version!=='v24.21.0'||!/^scripts\\/[a-z0-9-]+\\.mjs$/.test(name))throw Error('owner launcher');let p=root;for(const x of name.split('/')){p=join(p,x);if(lstatSync(p).isSymbolicLink())throw Error('linked owner')}const raw=readFileSync(p);if(createHash('sha256').update(raw).digest('hex')!==pin)throw Error('owner pin');process.argv=[process.argv[0],'owner',root];await import('data:text/javascript;base64,'+raw.toString('base64'));if(!readFileSync(p).equals(raw))throw Error('owner changed');",root,'scripts/main-density-resource-owner.mjs',"d7c2b25b253f9414a7806f39fe84daa75b087cf895f72bd3fed6cf1b42da200c"],{cwd:root,env:{PATH:ownerPath,LANG:'C',LC_ALL:'C',NODE_OPTIONS:''},input:ownerJSONStringify({path,initial:ownerBufferToString.call(initial,'base64'),initialRef}),encoding:'utf8',timeout:120000,maxBuffer:8*1024*1024});const out=ownerJSONParse(raw);if(!out||typeof out.current!=='string'||!out.expected)throw Error('density owner result');return {current:ownerBufferFrom(out.current,'base64'),expected:out.expected};
+}
+
 /** Finite gate composition. Candidate CSS is always compared in its original form. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
@@ -67,13 +75,16 @@ function physical(root,path){
 }
 /** Frozen source guards authenticate each retained first image against their pins.
  * This private boundary closes supplied callbacks; it is not an atomic FS snapshot. */
+const activePhysicalCallbacks=new Map();
 function physicalBoundary(root,providedRead){
+ const nested=activePhysicalCallbacks.get(root);if(nested){nested.poisoned=true;throw Error('reentrant physical boundary');}
  assert.equal(lstatSync(root).isSymbolicLink(),false);assert.ok(lstatSync(root).isDirectory());const retained=new Map();
- const read=path=>{const actual=physical(root,path),prior=retained.get(path);if(prior)assert.ok(equalBytes(actual,prior),'changed retained physical input '+path);else retained.set(path,Buffer.from(actual));
-  if(providedRead!==undefined){assert.equal(typeof providedRead,'function');const supplied=providedRead(path);assert.ok(equalBytes(actual,supplied),'nonphysical supplied input '+path);}
+ const rejectReentry=()=>{const current=activePhysicalCallbacks.get(root);if(current){current.poisoned=true;throw Error('reentrant physical read');}};
+ const read=path=>{rejectReentry();const actual=physical(root,path),prior=retained.get(path);if(prior)assert.ok(equalBytes(actual,prior),'changed retained physical input '+path);else retained.set(path,Buffer.from(actual));
+  if(providedRead!==undefined){assert.equal(typeof providedRead,'function');const state={poisoned:false};activePhysicalCallbacks.set(root,state);try{const supplied=providedRead(path);assert.ok(!state.poisoned,'caught physical read reentry');assert.ok(equalBytes(actual,supplied),'nonphysical supplied input '+path);}finally{activePhysicalCallbacks.delete(root);}}
   assert.ok(equalBytes(physical(root,path),actual),'physical input changed during supplied read '+path);return actual;};
- const assertPhysical=()=>{for(const[path,before]of retained)assert.ok(equalBytes(physical(root,path),before),'changed final physical input '+path);};
- return {read,assertPhysical};
+ const assertPhysical=()=>{rejectReentry();for(const[path,before]of retained)assert.ok(equalBytes(physical(root,path),before),'changed final physical input '+path);};
+ return {read,assertPhysical,rejectReentry};
 }
 function tool(root,path,read){return read(path);}
 function state(context){const value=contexts.get(context);assert.ok(value,'unregistered gate context');return value;}
@@ -92,8 +103,9 @@ function guarded(args,fields,operation,defaults={}){
 export function createSpinnerSnackGateContext(args={}){
  const captured=captureArgs(args,['root','read']);let {root=process.cwd(),read}=captured.values;
  root=resolve(root);const boundary=physicalBoundary(root,read);read=boundary.read;const source=createCurrentSpinnerSnackContract({root,read}),line=source.line,branch=packet.branches[line];
- let ownerSuccessor=null,selectOwnerSuccessor=null;
+ let ownerSuccessor=null,selectOwnerSuccessor=null;const resourceRefs=new Map();
  if(line==='main'){
+  assert.equal(hash(read('scripts/main-sass-resource-continuation.mjs')),'e023340b48171bd0a865899969eacc35f6489a4a2c0b820dc4dce082b6f39c7c');
   const raw=read('compatibility/rc/current-sass-stepper-spinner-executables-v1.json');assert.equal(hash(raw),'2b2440b6f1b870e456d8585129e99270dffd90fc03842ab0944d555908b7b760');ownerSuccessor=JSON.parse(raw);
   assert.equal(ownerSuccessor.schema_version,1);assert.equal(ownerSuccessor.role,'main-stepper-spinner-source-executable-successor');assert.equal(ownerSuccessor.line,'main');assert.equal(ownerSuccessor.source_parent,'42d02491648097656ccb3c590dbaaea066c3e603');assert.equal(ownerSuccessor.source_scope_only,true);assert.equal(ownerSuccessor.artifact_or_audit_admission_granted,false);
   assert.deepEqual(ownerSuccessor.updates.map(r=>r.path),['scripts/current-sass-spinner-snack-contract.mjs','scripts/current_sass_spinner_snack_admission.py']);
@@ -108,10 +120,10 @@ export function createSpinnerSnackGateContext(args={}){
    const after=Buffer.concat([...parts,before.subarray(at)]);assert.deepEqual({path:row.path,sha256:hash(after),bytes:after.length},row.after);
    const next=selectOwnerSuccessor.updates.find(r=>r.path===row.path);assert.deepEqual(next.before,row.after);let cursor=0;const nextParts=[];
    for(const edit of next.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor);const old=Buffer.from(edit.before),value=Buffer.from(edit.after);assert.ok(after.subarray(edit.offset,edit.offset+old.length).equals(old));nextParts.push(after.subarray(cursor,edit.offset),value);cursor=edit.offset+old.length;}
-   const physicalAfter=Buffer.concat([...nextParts,after.subarray(cursor)]);assert.deepEqual({path:row.path,sha256:hash(physicalAfter),bytes:physicalAfter.length},next.after);assert.ok(read(row.path).equals(physicalAfter));
+   const physicalAfter=Buffer.concat([...nextParts,after.subarray(cursor)]);assert.deepEqual({path:row.path,sha256:hash(physicalAfter),bytes:physicalAfter.length},next.after);const git=(commit,path)=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',commit+':'+path],{cwd:root,env});for(const commit of ['19ee6343365c391deb97362caec413b113665e1b','8fe95564c981a9dd73605d27beaa0496824e8444','ecc1051cfb829f0b67ba9cb50e4b733d6684ebff','b94f169d4fe57d571e6a7c3f911a9395f6a60c4d'])execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',commit,'HEAD'],{cwd:root,env});const final=runDensityResourceOwner(root,row.path,physicalAfter,next.after,read);assert.ok(read(row.path).equals(final.current));resourceRefs.set(row.path,final.expected.sha256);
   }
  }
- const assertCurrent=()=>{source.assertCurrent();assert.ok(tool(root,SELF,read).equals(image));for(const[path,sha256]of dependencies){const next=selectOwnerSuccessor?.updates.find(row=>row.path===path);assert.equal(hash(tool(root,path,read)),next?next.after.sha256:sha256);}source.assertCurrent();boundary.assertPhysical();};
+ const assertCurrent=()=>{boundary.rejectReentry();source.assertCurrent();assert.ok(tool(root,SELF,read).equals(image));for(const[path,sha256]of dependencies){const next=selectOwnerSuccessor?.updates.find(row=>row.path===path);assert.equal(hash(tool(root,path,read)),resourceRefs.get(path)??(next?next.after.sha256:sha256));}source.assertCurrent();boundary.assertPhysical();};
  const oracle=JSON.parse(readFileSync(join(root,packet.oracle.path))),catalog=JSON.parse(readFileSync(join(root,packet.catalog.path))),provenance=JSON.parse(readFileSync(join(root,packet.provenance.path))),lock=JSON.parse(readFileSync(join(root,packet.reference_lock.path)));
  const sets=Object.values(source.source_sets);assert.equal(sets.length,1);const currentSources=plain(sets[0]);
  const descriptor=plain(source.descriptor);

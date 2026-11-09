@@ -31,6 +31,28 @@ def _read(root,path):
         if cur.is_symlink():raise ValueError('linked input')
     if not cur.is_file():raise ValueError('not file')
     return cur.read_bytes()
+_V3={'path': 'compatibility/rc/current-main-density-input-successor-v3.json', 'sha256': 'b0feea9a089fea3c671927c548f3c4d6b07923ee9f7574d17d0630fbc6444ffc', 'bytes': 1667}
+_CONTINUATIONS=[{'path': 'compatibility/rc/main-tooltip-resource-source-programs-v1.json', 'sha256': 'b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211', 'bytes': 15324, 'role': 'main-tooltip-resource-source-program-continuation', 'base_head': '8fe95564c981a9dd73605d27beaa0496824e8444'}, {'path': 'compatibility/rc/main-sass-graph-resource-source-programs-v2.json', 'sha256': 'e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98', 'bytes': 6928, 'role': 'main-sass-graph-resource-source-program-continuation', 'base_head': 'ecc1051cfb829f0b67ba9cb50e4b733d6684ebff'}, {'path': 'compatibility/rc/main-sass-resource-contract-programs-v1.json', 'sha256': 'e8db18d114f9a32c946caaf72b0f3ea1ed8377c3bba6b518f5162ab947673d2a', 'bytes': 14946, 'role': 'main-sass-resource-contract-program-continuation', 'base_head': 'ecc1051cfb829f0b67ba9cb50e4b733d6684ebff'}]
+_DENSITY_PATHS=['scripts/current-sass-source.mjs', 'scripts/current-sass-spinner-snack-contract.mjs', 'scripts/current_sass_source.py', 'scripts/current_sass_spinner_snack_admission.py']
+def _checked_density_continuations(root):
+    raw=_read(root,_V3['path']);assert (_hash(raw),len(raw))==(_V3['sha256'],_V3['bytes']);v=json.loads(raw)
+    assert v['schema_version']==1 and v['role']=='main-ordinary-density-resource-continuation' and v['line']=='main' and v['source_scope_only'] is True and v['artifact_or_audit_admission_granted'] is False and v['source_end_commit']=='b94f169d4fe57d571e6a7c3f911a9395f6a60c4d' and v['previous_packet']=={'path': 'compatibility/rc/current-main-density-input-successor-v2.json', 'sha256': 'e6e385dde92ed1cdcc65998bdb6c9433458ed275572e528973e67a195b8c545f', 'bytes': 92667} and v['continuations']==_CONTINUATIONS and v['paths']==_DENSITY_PATHS
+    out=[]
+    for ref in _CONTINUATIONS:
+        b=_read(root,ref['path']);assert (_hash(b),len(b))==(ref['sha256'],ref['bytes']);p=json.loads(b)
+        assert p['schema_version']==1 and p['role']==ref['role'] and p['base_head']==ref['base_head'] and p['source_scope_only'] is True and p['historical_programs_executed'] is False and p['historical_packets_rewritten'] is False and p['theme_module_contract_changed'] is False and p['css_or_artifact_admission_granted'] is False and p['g11_claim']=='not-passed';out.append(p)
+    return out
+def _continue_density_input(path,initial,initial_ref,packets,git):
+    current=initial;expected=initial_ref
+    for packet in packets:
+        rows=[r for r in packet['updates'] if r['path']==path];assert len(rows)<=1
+        if not rows:continue
+        row=rows[0];assert row['before']==expected and git(packet['base_head'],path)==current;cursor=0;parts=[]
+        for e in row['edits']:
+            assert set(e)=={'offset','before','after'} and type(e['offset']) is int and cursor<=e['offset']<=len(current);before=e['before'].encode();assert current[e['offset']:e['offset']+len(before)]==before;parts.extend((current[cursor:e['offset']],e['after'].encode()));cursor=e['offset']+len(before)
+        current=b''.join([*parts,current[cursor:]]);expected=row['after'];assert expected['path']==path and (_hash(current),len(current))==(expected['sha256'],expected['bytes'])
+    assert git('b94f169d4fe57d571e6a7c3f911a9395f6a60c4d',path)==current
+    return current,expected
 def _density_successors(root,line,files):
     if line!='main':return {}
     path='compatibility/rc/current-main-density-input-successor-v1.json';raw=_read(root,path)
@@ -41,7 +63,8 @@ def _density_successors(root,line,files):
     assert v2['schema_version']==1 and v2['role']=='main-ordinary-density-current-source-successor' and v2['line']=='main' and v2['source_scope_only'] is True and v2['artifact_or_audit_admission_granted'] is False and v2['previous_packet']==dict(path=path,sha256=_hash(raw),bytes=len(raw)) and [r['path'] for r in v2['updates']]==names[1:]
     env=dict(PATH=os.environ.get('PATH',''),LANG='C',LC_ALL='C',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_SYSTEM='/dev/null',GIT_TERMINAL_PROMPT='0',GIT_NO_REPLACE_OBJECTS='1',GIT_NO_LAZY_FETCH='1')
     def git(commit,path):return subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',commit+':'+path],cwd=root,env=env)
-    refs={}
+    refs={};continuations=_checked_density_continuations(root)
+    for commit in ['19ee6343365c391deb97362caec413b113665e1b','b94f169d4fe57d571e6a7c3f911a9395f6a60c4d',*[x['base_head'] for x in continuations]]:subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',commit,'HEAD'],cwd=root,env=env)
     for row in p['updates']:
         old=git(p['source_parent'],row['path']);manifest=next(r for r in files if r['path']==row['path']);assert manifest==row['before'] and _hash(old)==row['before']['sha256'] and len(old)==row['before']['bytes'];cursor=0;parts=[]
         for edit in row['edits']:
@@ -54,6 +77,7 @@ def _density_successors(root,line,files):
             for edit in update['edits']:
                 assert set(edit)=={'offset','before','after'} and type(edit['offset']) is int and edit['offset']>=at;old=edit['before'].encode();assert after[edit['offset']:edit['offset']+len(old)]==old;parts.extend((after[at:edit['offset']],edit['after'].encode()));at=edit['offset']+len(old)
             final=b''.join([*parts,after[at:]]);final_ref=update['after'];assert _hash(final)==final_ref['sha256'] and len(final)==final_ref['bytes']
+        if row['path'] in _DENSITY_PATHS:final,final_ref=_continue_density_input(row['path'],final,final_ref,continuations,git)
         assert _read(root,row['path'])==final;refs[row['path']]=final_ref
     return refs
 
@@ -89,6 +113,7 @@ class OrdinaryDensityGateContext:
             packet=_read(root,'compatibility/rc/current-main-density-input-successor-v1.json');assert _hash(packet)=='d85c0dca28dbc166e3566eb3b173917c1524c68f5116a490826748ce4876ab2a' and len(packet)==34446;v=_read(root,'compatibility/rc/current-main-density-input-successor-v2.json');assert (_hash(v),len(v))==('e6e385dde92ed1cdcc65998bdb6c9433458ed275572e528973e67a195b8c545f',92667)
         successors=state['successors']
         for _ in range(2):
+            if line=='main':_checked_density_continuations(root)
             for r in rows:
                 expected=successors.get(r['path'],r);b=_read(root,r['path'])
                 if _hash(b)!=expected['sha256'] or len(b)!=expected['bytes']:raise ValueError('dependency changed')

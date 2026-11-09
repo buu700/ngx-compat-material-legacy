@@ -36,6 +36,23 @@ def candidate_fixture(destination):
     paths.update(row['path'] for row in CurrentSassSource(ROOT).bound)
     paths.update(('scripts/upstream-packed-run-evidence.mjs', 'scripts/dialog-focus-finite-source-successor.mjs', 'scripts/stepper-sixth-source.mjs'))
     if line == 'main':
+        # The shared fixture serves both source and spinner/control gate readers.
+        # Copy the spinner contract's actual authenticated physical dependency set;
+        # it includes the domain and resource continuations absent from the older fixture.
+        from current_sass_spinner_snack_admission import CurrentSpinnerSnackContract
+        paths.update(row['path'] for row in CurrentSpinnerSnackContract(ROOT).bound)
+        paths.update((
+            'scripts/main-sass-resource-continuation.mjs', 'scripts/main_sass_resource_continuation.py',
+            'scripts/main-select-program-proof.mjs', 'scripts/main_select_program_proof.py',
+            'scripts/main-select-program-owner.mjs', 'scripts/main-density-resource-owner.mjs',
+            'scripts/main-density-native-owner.mjs',
+            'compatibility/rc/current-main-density-input-successor-v2.json',
+            'compatibility/rc/current-main-density-input-successor-v3.json',
+            'compatibility/rc/current-main-select-density-program-v1.json',
+            'compatibility/rc/current-main-private-card-select-owner-v2.json',
+            'compatibility/rc/main-sass-resource-contract-programs-v1.json',
+            'fixtures/sass/ordered-aggregate-density-resource-successor-v2.json',
+        ))
         paths.update(('scripts/select-dialog-finite-source-v7.mjs','scripts/dialog-focus-finite-source-v6.mjs','scripts/main-sass-graph-successor.mjs','scripts/select_dialog_finite_source_successor_v6.py'))
         paths.update(('compatibility/rc/current-sass-stepper-source-executables-v1.json','compatibility/rc/current-sass-stepper-spinner-executables-v1.json','scripts/stepper-program-transition-source.mjs','scripts/stepper_program_transition_source.py','compatibility/rc/current-sass-stepper-private-gate-executable-v1.json','compatibility/rc/current-sass-select-source-executables-v2.json','compatibility/rc/current-sass-select-spinner-executables-v2.json','compatibility/rc/current-sass-select-private-gate-executable-v2.json','scripts/select-program-transition-source.mjs','scripts/select_program_transition_source.py'))
     paths.add(PRODUCT_SUCCESSOR)

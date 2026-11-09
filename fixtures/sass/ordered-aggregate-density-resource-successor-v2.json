@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "role": "main-ordered-density-resource-source-continuation",
+  "line": "main",
+  "source_parent": "c2c58388e0777e580fd76234b57c271de0cb4115",
+  "source_scope_only": true,
+  "artifact_or_audit_admission_granted": false,
+  "previous_packet": {
+    "path": "fixtures/sass/ordered-aggregate-density-source-successor.json",
+    "sha256": "c2dcadcd39eb9e97cfb42d39043aa43b68ba8ef440f6621e23cf9a7a94fe09f6",
+    "bytes": 22536
+  },
+  "updates": [
+    {
+      "path": "scripts/sass-ordinary-density-gate.mjs",
+      "before": {
+        "path": "scripts/sass-ordinary-density-gate.mjs",
+        "sha256": "44278eae893aaa1e32cb4b0fac1171193963b2ea700836a0fcbf177be4a84fc2",
+        "bytes": 12493
+      },
+      "after": {
+        "path": "scripts/sass-ordinary-density-gate.mjs",
+        "sha256": "d3785f8bc26a6ddd9bbf49076db25ae40b6f766350d7f745b7b64edce698bc41",
+        "bytes": 16797
+      },
+      "edits": [
+        {
+          "offset": 2100,
+          "before": "",
+          "after": "const densityV3={path:'compatibility/rc/current-main-density-input-successor-v3.json',sha256:'b0feea9a089fea3c671927c548f3c4d6b07923ee9f7574d17d0630fbc6444ffc',bytes:1667};\nconst densityContinuations=[{\"path\":\"compatibility/rc/main-tooltip-resource-source-programs-v1.json\",\"sha256\":\"b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211\",\"bytes\":15324,\"role\":\"main-tooltip-resource-source-program-continuation\",\"base_head\":\"8fe95564c981a9dd73605d27beaa0496824e8444\"},{\"path\":\"compatibility/rc/main-sass-graph-resource-source-programs-v2.json\",\"sha256\":\"e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98\",\"bytes\":6928,\"role\":\"main-sass-graph-resource-source-program-continuation\",\"base_head\":\"ecc1051cfb829f0b67ba9cb50e4b733d6684ebff\"},{\"path\":\"compatibility/rc/main-sass-resource-contract-programs-v1.json\",\"sha256\":\"e8db18d114f9a32c946caaf72b0f3ea1ed8377c3bba6b518f5162ab947673d2a\",\"bytes\":14946,\"role\":\"main-sass-resource-contract-program-continuation\",\"base_head\":\"ecc1051cfb829f0b67ba9cb50e4b733d6684ebff\"}];\nconst densityPaths=[\"scripts/current-sass-source.mjs\",\"scripts/current-sass-spinner-snack-contract.mjs\",\"scripts/current_sass_source.py\",\"scripts/current_sass_spinner_snack_admission.py\"];\nfunction checkedDensityContinuations(read){\n const bytes=read(densityV3.path);if(sha(bytes)!==densityV3.sha256||bytes.length!==densityV3.bytes)throw Error('density v3 packet');const v=JSON.parse(bytes);\n if(v.schema_version!==1||v.role!=='main-ordinary-density-resource-continuation'||v.line!=='main'||v.source_scope_only!==true||v.artifact_or_audit_admission_granted!==false||v.source_end_commit!=='b94f169d4fe57d571e6a7c3f911a9395f6a60c4d'||!isDeepStrictEqual(v.previous_packet,{path:'compatibility/rc/current-main-density-input-successor-v2.json',sha256:'e6e385dde92ed1cdcc65998bdb6c9433458ed275572e528973e67a195b8c545f',bytes:92667})||!isDeepStrictEqual(v.continuations,densityContinuations)||!isDeepStrictEqual(v.paths,densityPaths))throw Error('density v3 scope');\n return densityContinuations.map(r=>{const b=read(r.path);if(sha(b)!==r.sha256||b.length!==r.bytes)throw Error('density continuation packet');const p=JSON.parse(b);if(p.schema_version!==1||p.role!==r.role||p.base_head!==r.base_head||p.source_scope_only!==true||p.historical_programs_executed!==false||p.historical_packets_rewritten!==false||p.theme_module_contract_changed!==false||p.css_or_artifact_admission_granted!==false||p.g11_claim!=='not-passed')throw Error('density continuation scope');return p;});\n}\nfunction continueDensityInput(path,initial,initialRef,packets,git){\n let current=initial,expected=initialRef;\n for(const packet of packets){const rows=packet.updates.filter(r=>r.path===path);if(rows.length>1)throw Error('duplicate density continuation');if(!rows.length)continue;const row=rows[0];if(!isDeepStrictEqual(row.before,expected)||!git(packet.base_head,path).equals(current))throw Error('density continuation predecessor');let cursor=0;const parts=[];for(const e of row.edits){if(!isDeepStrictEqual(Object.keys(e).sort(),['after','before','offset'])||!Number.isSafeInteger(e.offset)||e.offset<cursor||e.offset>current.length)throw Error('density continuation edit');const before=Buffer.from(e.before);if(!current.subarray(e.offset,e.offset+before.length).equals(before))throw Error('density continuation literal');parts.push(current.subarray(cursor,e.offset),Buffer.from(e.after));cursor=e.offset+before.length;}current=Buffer.concat([...parts,current.subarray(cursor)]);expected=row.after;if(expected.path!==path||sha(current)!==expected.sha256||current.length!==expected.bytes)throw Error('density continuation afterimage');}\n if(!git('b94f169d4fe57d571e6a7c3f911a9395f6a60c4d',path).equals(current))throw Error('density continuation commit');return {current,expected};\n}\n"
+        },
+        {
+          "offset": 3974,
+          "before": "",
+          "after": "const continuations=checkedDensityContinuations(read);for(const commit of ['19ee6343365c391deb97362caec413b113665e1b','b94f169d4fe57d571e6a7c3f911a9395f6a60c4d',...continuations.map(x=>x.base_head)])execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',commit,'HEAD'],{cwd:root,env});\n "
+        },
+        {
+          "offset": 5670,
+          "before": "",
+          "after": ";}if(densityPaths.includes(r.path)){const next=continueDensityInput(r.path,final,finalRef,continuations,git);final=next.current;finalRef=next.expected"
+        },
+        {
+          "offset": 8737,
+          "before": "",
+          "after": "if(line==='main')checkedDensityContinuations(safeRead);"
+        }
+      ]
+    },
+    {
+      "path": "scripts/sass_ordinary_density_gate.py",
+      "before": {
+        "path": "scripts/sass_ordinary_density_gate.py",
+        "sha256": "97d0c2fbdccef64f9399b934c3a6d5cb090b97a9d6c6c6c50d89ec2577922fba",
+        "bytes": 11098
+      },
+      "after": {
+        "path": "scripts/sass_ordinary_density_gate.py",
+        "sha256": "c42be5be420692e2209d493e0ebe2bbffffd745aed018a2690158874f4293507",
+        "bytes": 15050
+      },
+      "edits": [
+        {
+          "offset": 1980,
+          "before": "",
+          "after": "_V3={'path': 'compatibility/rc/current-main-density-input-successor-v3.json', 'sha256': 'b0feea9a089fea3c671927c548f3c4d6b07923ee9f7574d17d0630fbc6444ffc', 'bytes': 1667}\n_CONTINUATIONS=[{'path': 'compatibility/rc/main-tooltip-resource-source-programs-v1.json', 'sha256': 'b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211', 'bytes': 15324, 'role': 'main-tooltip-resource-source-program-continuation', 'base_head': '8fe95564c981a9dd73605d27beaa0496824e8444'}, {'path': 'compatibility/rc/main-sass-graph-resource-source-programs-v2.json', 'sha256': 'e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98', 'bytes': 6928, 'role': 'main-sass-graph-resource-source-program-continuation', 'base_head': 'ecc1051cfb829f0b67ba9cb50e4b733d6684ebff'}, {'path': 'compatibility/rc/main-sass-resource-contract-programs-v1.json', 'sha256': 'e8db18d114f9a32c946caaf72b0f3ea1ed8377c3bba6b518f5162ab947673d2a', 'bytes': 14946, 'role': 'main-sass-resource-contract-program-continuation', 'base_head': 'ecc1051cfb829f0b67ba9cb50e4b733d6684ebff'}]\n_DENSITY_PATHS=['scripts/current-sass-source.mjs', 'scripts/current-sass-spinner-snack-contract.mjs', 'scripts/current_sass_source.py', 'scripts/current_sass_spinner_snack_admission.py']\ndef _checked_density_continuations(root):\n    raw=_read(root,_V3['path']);assert (_hash(raw),len(raw))==(_V3['sha256'],_V3['bytes']);v=json.loads(raw)\n    assert v['schema_version']==1 and v['role']=='main-ordinary-density-resource-continuation' and v['line']=='main' and v['source_scope_only'] is True and v['artifact_or_audit_admission_granted'] is False and v['source_end_commit']=='b94f169d4fe57d571e6a7c3f911a9395f6a60c4d' and v['previous_packet']=={'path': 'compatibility/rc/current-main-density-input-successor-v2.json', 'sha256': 'e6e385dde92ed1cdcc65998bdb6c9433458ed275572e528973e67a195b8c545f', 'bytes': 92667} and v['continuations']==_CONTINUATIONS and v['paths']==_DENSITY_PATHS\n    out=[]\n    for ref in _CONTINUATIONS:\n        b=_read(root,ref['path']);assert (_hash(b),len(b))==(ref['sha256'],ref['bytes']);p=json.loads(b)\n        assert p['schema_version']==1 and p['role']==ref['role'] and p['base_head']==ref['base_head'] and p['source_scope_only'] is True and p['historical_programs_executed'] is False and p['historical_packets_rewritten'] is False and p['theme_module_contract_changed'] is False and p['css_or_artifact_admission_granted'] is False and p['g11_claim']=='not-passed';out.append(p)\n    return out\ndef _continue_density_input(path,initial,initial_ref,packets,git):\n    current=initial;expected=initial_ref\n    for packet in packets:\n        rows=[r for r in packet['updates'] if r['path']==path];assert len(rows)<=1\n        if not rows:continue\n        row=rows[0];assert row['before']==expected and git(packet['base_head'],path)==current;cursor=0;parts=[]\n        for e in row['edits']:\n            assert set(e)=={'offset','before','after'} and type(e['offset']) is int and cursor<=e['offset']<=len(current);before=e['before'].encode();assert current[e['offset']:e['offset']+len(before)]==before;parts.extend((current[cursor:e['offset']],e['after'].encode()));cursor=e['offset']+len(before)\n        current=b''.join([*parts,current[cursor:]]);expected=row['after'];assert expected['path']==path and (_hash(current),len(current))==(expected['sha256'],expected['bytes'])\n    assert git('b94f169d4fe57d571e6a7c3f911a9395f6a60c4d',path)==current\n    return current,expected\n"
+        },
+        {
+          "offset": 3738,
+          "before": "",
+          "after": ";continuations=_checked_density_continuations(root)\n    for commit in ['19ee6343365c391deb97362caec413b113665e1b','b94f169d4fe57d571e6a7c3f911a9395f6a60c4d',*[x['base_head'] for x in continuations]]:subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',commit,'HEAD'],cwd=root,env=env)"
+        },
+        {
+          "offset": 5286,
+          "before": "",
+          "after": "\n        if row['path'] in _DENSITY_PATHS:final,final_ref=_continue_density_input(row['path'],final,final_ref,continuations,git)"
+        },
+        {
+          "offset": 8004,
+          "before": "",
+          "after": "\n            if line=='main':_checked_density_continuations(root)"
+        }
+      ]
+    }
+  ]
+}

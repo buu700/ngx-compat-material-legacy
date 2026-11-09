@@ -48,6 +48,26 @@ def _successors(line,rows):
         after=b''.join([*parts,before[at:]])
         if hashlib.sha256(after).hexdigest()!=row['after']['sha256'] or len(after)!=row['after']['bytes']:raise ValueError('density afterimage')
         result[row['path']]=row['after']
+    wpath=_ROOT/'fixtures/sass/ordered-aggregate-density-resource-successor-v2.json'
+    if wpath.is_symlink():raise ValueError('linked resource successor')
+    wraw=wpath.read_bytes()
+    if hashlib.sha256(wraw).hexdigest()!='9e50df5f927dcdd529f3868a4a98a331d66afb380f4ab4e9d59d777954ff0bd0' or len(wraw)!=10530:raise ValueError('resource successor packet')
+    w=json.loads(wraw)
+    if w['schema_version']!=1 or w['role']!='main-ordered-density-resource-source-continuation' or w['line']!='main' or w['source_parent']!='c2c58388e0777e580fd76234b57c271de0cb4115' or w['source_scope_only'] is not True or w['artifact_or_audit_admission_granted'] is not False or w['previous_packet']!=dict(path='fixtures/sass/ordered-aggregate-density-source-successor.json',sha256=hashlib.sha256(vraw).hexdigest(),bytes=len(vraw)) or [r['path'] for r in w['updates']]!=names[2:]:raise ValueError('resource successor scope')
+    subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',w['source_parent'],'HEAD'],cwd=_ROOT,env=env)
+    for row in w['updates']:
+        if result[row['path']]!=row['before']:raise ValueError('resource predecessor')
+        before=subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',w['source_parent']+':'+row['path']],cwd=_ROOT,env=env)
+        if (hashlib.sha256(before).hexdigest(),len(before))!=(row['before']['sha256'],row['before']['bytes']):raise ValueError('resource predecessor image')
+        at=0;parts=[]
+        for e in row['edits']:
+            if set(e)!={'offset','before','after'} or type(e['offset']) is not int or not at<=e['offset']<=len(before):raise ValueError('resource successor edit')
+            old=e['before'].encode()
+            if before[e['offset']:e['offset']+len(old)]!=old:raise ValueError('resource successor literal')
+            parts.extend((before[at:e['offset']],e['after'].encode()));at=e['offset']+len(old)
+        after=b''.join([*parts,before[at:]])
+        if row['after']['path']!=row['path'] or (hashlib.sha256(after).hexdigest(),len(after))!=(row['after']['sha256'],row['after']['bytes']):raise ValueError('resource successor afterimage')
+        result[row['path']]=row['after']
     if (_ROOT/'scripts').is_symlink() or (_ROOT/'scripts/sass-aggregate-source-successor.mjs').is_symlink():raise ValueError('linked successor helper')
     if hashlib.sha256((_ROOT/'scripts/sass-aggregate-source-successor.mjs').read_bytes()).hexdigest()!='7a8d81b439bf0c3677e8be8fbfc710c68b449fdee717c38dba9cf67905f99c0c':raise ValueError('successor helper changed')
     return result

@@ -33,12 +33,7 @@ class OrdinaryControlGateTests(unittest.TestCase):
         for match in re.finditer(r"\['([^']+)','[0-9a-f]{64}'\]",(ROOT/'scripts/sass-ordinary-control-gate.mjs').read_text()):paths.add(match[1])
         for path in paths:
             dest=cls.root/path;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes((ROOT/path).read_bytes())
-        cls.hook=None
-        def read(path):
-            if cls.hook is not None:
-                fn,cls.hook=cls.hook,None;fn()
-            return (cls.root/path).read_bytes()
-        cls.context=gate.OrdinaryControlGateContext(cls.root,read=read);cls.state=gate._CONTEXTS[cls.context]
+        cls.context=gate.OrdinaryControlGateContext(cls.root);cls.state=gate._CONTEXTS[cls.context]
         cls.descriptor=gate.ordinary_control_gate_descriptor(cls.context)
         manifest=dict(run_id='ordinary-modeled-run',source=dict(line=cls.line,commit='a'*40,git_tree_sha='b'*40,content_sha256='c'*64),artifacts=[dict(id='library',sha256='d'*64)])
         binding=dict(run_id=manifest['run_id'],source_line=cls.line,source_commit='a'*40,source_tree='b'*40,source_content_sha256='c'*64,artifacts_sha256=hashlib.sha256(json.dumps(manifest['artifacts'],sort_keys=True,separators=(',',':')).encode()).hexdigest())
@@ -112,8 +107,9 @@ class OrdinaryControlGateTests(unittest.TestCase):
             bad=copy.deepcopy(self.bodies[1]);bad['case_id']=case;self.assertFalse(self.accepts(bad))
 
     def test_live_nested_payload_and_private_context(self):
-        body=copy.deepcopy(self.bodies[1]);self.__class__.hook=lambda:body['current_ordinary_controls']['case_ids'].pop()
-        self.assertFalse(self.accepts(body));self.assertIsNone(self.__class__.hook)
+        body=copy.deepcopy(self.bodies[1]);body['current_ordinary_controls']['case_ids'].pop()
+        self.assertFalse(self.accepts(body))
+        with self.assertRaises(ValueError):gate.OrdinaryControlGateContext(self.root,read=lambda path:(self.root/path).read_bytes())
         self.assertFalse(gate.ordinary_control_gate_assertion_ok(self.root,self.active,self.bodies[1],self.invocation,context=SimpleNamespace(line=self.line)))
 
     def test_javascript_actual_context_and_inventory_routes(self):

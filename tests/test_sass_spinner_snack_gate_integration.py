@@ -32,6 +32,7 @@ class SpinnerSnackGateIntegrationTests(unittest.TestCase):
         cls.temp=tempfile.TemporaryDirectory(prefix='ngx-current-sass-source-test-');cls.root=Path(cls.temp.name)
         cls.line=candidate_fixture(cls.root)
         paths=['scripts/sass-spinner-snack-gate-integration.mjs','scripts/sass_spinner_snack_gate_integration.py',
+            'scripts/main-density-native-owner.mjs',
             'scripts/current-sass-spinner-snack-contract.mjs','scripts/current_sass_spinner_snack_admission.py',
             'scripts/sass-spinner-snack-bridge-contract.mjs','scripts/sass_spinner_snack_bridge_admission.py',
             'scripts/sass-spinner-snack-aggregate-contract.mjs','scripts/sass-default-aggregate-contract.mjs',
@@ -40,12 +41,8 @@ class SpinnerSnackGateIntegrationTests(unittest.TestCase):
             'scripts/sass-aggregate-color-theme-contract.mjs','scripts/sass-aggregate-typography-contract.mjs','scripts/sass-ripple-color-contract.mjs',*gate._DEPENDENCIES]
         for path in set(paths):
             dest=cls.root/path;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes((ROOT/path).read_bytes())
-        cls.controls=dict(hook=None);cls.checks=[];cls.js_result=None
-        def read(path):
-            if cls.controls['hook'] is not None:
-                hook,cls.controls['hook']=cls.controls['hook'],None;hook()
-            return (cls.root/path).read_bytes()
-        cls.context=gate.SpinnerSnackGateContext(cls.root,read=read)
+        cls.checks=[];cls.js_result=None
+        cls.context=gate.SpinnerSnackGateContext(cls.root)
         packet=json.loads((ROOT/'compatibility/rc/parallel-spinner-snack-css-contract-inputs-v1.json').read_bytes());branch=packet['branches'][cls.line]
         direct=json.loads((ROOT/branch['observation']['path']).read_bytes());aggregate=json.loads((ROOT/('compatibility/rc/parent-spinner-snack-aggregate-integration-'+('21' if cls.line=='21.x' else 'main')+'-v1.json')).read_bytes())
         owner=direct_fixture.CurrentDirectTests();owner.context=CurrentSpinnerSnackContract(cls.root);owner.packet=packet;owner.line=cls.line;owner.branch=branch
@@ -103,10 +100,26 @@ class SpinnerSnackGateIntegrationTests(unittest.TestCase):
         for key,value in [('line','foreign'),('sass_version','foreign compiler')]:
             bad=copy.deepcopy(body);bad['actual'][key]=value;bad['actual_measurement'][key]=value
             self.assertFalse(self.accepts(bad));self.checks.append('direct contradictory '+key+' rejects')
-        live=copy.deepcopy(body);self.controls['hook']=lambda:live.__setitem__('current_spinner_snack_bridge',{})
+        live=copy.deepcopy(body);live['current_spinner_snack_bridge']={}
         self.assertFalse(self.accepts(live));self.checks.append('live descriptor mutation rejects')
         fake=object.__new__(gate.SpinnerSnackGateContext)
         self.assertFalse(gate.spinner_snack_gate_assertion_ok(self.root,self.active,body,self.invocation,context=fake));self.checks.append('unregistered gate context rejects')
+
+    def test_continuation_owner_integrity_and_recovery(self):
+        # The fixture is disposable; every mutation is restored before recovery.
+        owner=self.root/'scripts/main-density-native-owner.mjs'
+        packet=self.root/'compatibility/rc/main-tooltip-resource-source-programs-v1.json'
+        for path in (owner,packet):
+            original=path.read_bytes()
+            try:
+                path.write_bytes(original+b'\nforeign')
+                with self.assertRaises(Exception):gate.SpinnerSnackGateContext(self.root)
+            finally:path.write_bytes(original)
+            gate.SpinnerSnackGateContext(self.root).assert_current()
+        with self.assertRaises(ValueError):gate.SpinnerSnackGateContext(self.root,read=lambda path:(self.root/path).read_bytes())
+        result=subprocess.run([NODE,str(ROOT/'tests/c02-continuation-owner-regression.mjs'),str(self.root),str(ROOT)],cwd=ROOT,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIn('recovery passed',result.stdout)
 
     def test_javascript_current_context_and_descriptor_parity(self):
         completed=subprocess.run([NODE,str(ROOT/'tests/sass_spinner_snack_gate_probe.mjs')],cwd=ROOT,input=json.dumps(dict(line=self.line,bodies=self.bodies,candidate_root=str(self.root),focused_current_context=True)),capture_output=True,text=True)
