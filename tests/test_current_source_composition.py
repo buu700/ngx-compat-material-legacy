@@ -35,7 +35,9 @@ class CurrentSourceCompositionTest(unittest.TestCase):
                               'tests/current_source_composed_probe.mjs',
                               'tests/current_source_composed_probe.py',
                               'tests/current_source_identity_probe.mjs',
-                              'tests/current_source_identity_probe.py'))
+                              'tests/current_source_identity_probe.py',
+                              'tests/current_frozen38_source_probe.mjs',
+                              'tests/current_frozen38_source_probe.py'))
                 expected = {ref['path']: ref for ref in baseline.bound}
                 for path in sorted(paths):
                     src, dst = ROOT / path, fixture / path
@@ -53,10 +55,11 @@ class CurrentSourceCompositionTest(unittest.TestCase):
                 fixture, runtime = pair
                 env = dict(os.environ, PYTHONPATH=str(fixture))
                 outputs = []
-                for probe in ('composed', 'identity'):
+                for probe in ('composed', 'identity', 'frozen38'):
                     ext = 'mjs' if runtime == 'node' else 'py'
                     proc = subprocess.run(
-                        [runtime, f'tests/current_source_{probe}_probe.{ext}'],
+                        [runtime, (f'tests/current_frozen38_source_probe.{ext}' if probe == 'frozen38'
+                                   else f'tests/current_source_{probe}_probe.{ext}')],
                         cwd=fixture, env=env, capture_output=True, text=True,
                         timeout=PROBE_TIMEOUT_SECONDS)
                     if proc.returncode:
@@ -66,7 +69,7 @@ class CurrentSourceCompositionTest(unittest.TestCase):
 
             with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
                 javascript, python = list(pool.map(run, zip(fixtures, ('node', 'python3'))))
-            for composed, identity in (javascript, python):
+            for composed, identity, frozen38 in (javascript, python):
                 self.assertEqual(composed['result'], 'pass')
                 self.assertEqual(composed['paths'], 45)
                 self.assertEqual(composed['cold_late_physical'], 45)
@@ -79,6 +82,12 @@ class CurrentSourceCompositionTest(unittest.TestCase):
                 self.assertTrue(identity['owner_self_physical'])
                 self.assertTrue(identity['owner_self_callback'])
                 self.assertTrue(identity['recovery'])
+                self.assertEqual(frozen38['result'], 'pass')
+                self.assertEqual(frozen38['paths'], 8)
+                self.assertEqual(frozen38['cold_late_physical'], 8)
+                self.assertEqual(frozen38['cold_late_callback'], 8)
+                self.assertTrue(frozen38['old_roster_rejected'])
+                self.assertTrue(frozen38['recovery'])
 
 
 if __name__ == '__main__':
