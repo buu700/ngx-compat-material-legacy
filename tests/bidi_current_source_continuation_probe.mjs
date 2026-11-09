@@ -1,0 +1,17 @@
+/** @license Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester. Use of this source code is governed by the MIT license in LICENSE. */
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
+import {resolve} from 'node:path';
+import {currentInventorySourceSubject as make} from '../scripts/current-inventory-source-subject.mjs';
+const root=process.cwd(),packetPath='compatibility/rc/main-bidi-current-inventory-source-routing-v16.json';
+const physical=p=>readFileSync(resolve(root,p)),packet=JSON.parse(physical(packetPath)),subject=make({root});
+const refs=[packetPath,...packet.updates.map(r=>r.path),packet.roster.after.path,...packet.support.map(r=>r.path)];
+for(const path of refs){const file=resolve(root,path),raw=physical(path);try{writeFileSync(file,Buffer.concat([raw,Buffer.from('\n')]));assert.throws(()=>make({root}),undefined,'cold physical '+path);assert.throws(()=>subject.assertCurrent(),undefined,'late physical '+path);}finally{writeFileSync(file,raw);}subject.assertCurrent();}
+for(const path of refs){let armed=false;const read=p=>{const raw=physical(p);return armed&&p===path?Buffer.concat([raw,Buffer.from(' ')]):raw;};const live=make({root,read});armed=true;assert.throws(()=>live.assertCurrent(),undefined,'late callback '+path);assert.throws(()=>make({root,read}),undefined,'cold callback '+path);armed=false;live.assertCurrent();}
+for(const row of packet.updates){const old=execFileSync('git',['--no-replace-objects','show',packet.source_parent+':'+row.path],{cwd:root});assert.throws(()=>make({root,read:p=>p===row.path?old:physical(p)}));assert.deepEqual(subject.qualify(row.before),row.after);assert.equal(subject.comparisonBytes(row.before).toString(),old.toString());assert.throws(()=>subject.qualify({...row.before,sha256:'0'.repeat(64)}));}
+const priorRoster=execFileSync('git',['--no-replace-objects','show',packet.source_parent+':'+packet.roster.before.path],{cwd:root,maxBuffer:8*1024*1024});assert.throws(()=>make({root,read:p=>p===packet.roster.after.path?priorRoster:physical(p)}));
+let armed=false,nested=false,live;live=make({root,read:p=>{const raw=physical(p);if(armed&&!nested){nested=true;try{live.assertCurrent();}catch{}}return raw;}});armed=true;assert.throws(()=>live.assertCurrent(),/reentr/);assert.equal(nested,true);armed=false;live.assertCurrent();
+let calls=0;assert.throws(()=>subject.qualify({get path(){calls++;throw Error('getter')},sha256:'0'.repeat(64)}));assert.equal(calls,0);subject.assertCurrent();
+console.log(JSON.stringify({result:'pass',new_paths:refs.length,cold_and_late_physical:refs.length,cold_and_late_callback:refs.length,old_program_callbacks_rejected:2,old_roster_callback_rejected:true,known_and_unknown_program_identities:true,accessor_not_invoked:true,reentrant:true,g11_claim:'not-passed'}));
