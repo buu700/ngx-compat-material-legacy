@@ -1,0 +1,308 @@
+{
+  "schema_version": 1,
+  "role": "individual inherited CDK window scrollable SSR review",
+  "sha": "5c75bbecb24f49779baf86203a7e626d34e39f8c",
+  "status": "reviewed",
+  "final_disposition": "inherited",
+  "diff": "diff --git a/src/cdk/scrolling/virtual-scrollable-window.ts b/src/cdk/scrolling/virtual-scrollable-window.ts\nindex 3b6b805499b6b69d55339715084504263ccb825f..f7daf14f1d96bb8c2495d4bf1560111b258a662a 100644\n--- a/src/cdk/scrolling/virtual-scrollable-window.ts\n+++ b/src/cdk/scrolling/virtual-scrollable-window.ts\n@@ -6,7 +6,8 @@\n  * found in the LICENSE file at https://angular.dev/license\n  */\n \n-import {Directive, ElementRef} from '@angular/core';\n+import {Directive, ElementRef, inject} from '@angular/core';\n+import {DOCUMENT} from '@angular/common';\n import {CdkVirtualScrollable, VIRTUAL_SCROLLABLE} from './virtual-scrollable';\n \n /**\n@@ -21,6 +22,7 @@ export class CdkVirtualScrollableWindow extends CdkVirtualScrollable {\n \n   constructor() {\n     super();\n+    const document = inject(DOCUMENT);\n     this.elementRef = new ElementRef(document.documentElement);\n     this._scrollElement = document;\n   }\n",
+  "diff_sha256": "2b31e6ee1fdc01542447af016839614bf703cd142d165b96f80727ea98425c40",
+  "decision": "The public CDK window scrollable is consumer supplied rather than exported by this add-on, yet an explicitly composed consumer viewport can contain a legacy table. For the main minimum peer, require an artifact-bound real server render selecting the window scrollable and injected document, plus the source-bound original-global negative. This is scoped to the native table composition and does not claim general SSR, hydration or browser parity.",
+  "affected_branches": [
+    "main"
+  ],
+  "individual_proof": {
+    "proof_kind": "main-window-table-ssr-inherited",
+    "diff_sha256": "2b31e6ee1fdc01542447af016839614bf703cd142d165b96f80727ea98425c40",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The public CDK window scrollable is consumer supplied rather than exported by this add-on, yet an explicitly composed consumer viewport can contain a legacy table. For the main minimum peer, require an artifact-bound real server render selecting the window scrollable and injected document, plus the source-bound original-global negative. This is scoped to the native table composition and does not claim general SSR, hydration or browser parity.",
+    "reachable_behavior": {
+      "kind": "executed-delegation",
+      "id": "csp-ssr/main/server/dom-free-server-and-leaks/render/table-window-scroll"
+    },
+    "source_members": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/animation/animation-constants.ts",
+        "sha256": "9c5b272e2ac9bc44fbe6cfa2d2741e3a11a8d0fe786e54ddfdb9d1dfacb7133e",
+        "bytes": 817
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/coercion/number-property.ts",
+        "sha256": "d2aabb3342afa87eeb9a032597404a7009347668f73baca8cd65b66a8d7401ef",
+        "bytes": 689
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/color.ts",
+        "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+        "bytes": 1888
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/disable-ripple.ts",
+        "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+        "bytes": 1211
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/disabled.ts",
+        "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+        "bytes": 1073
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/error-state.ts",
+        "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+        "bytes": 2623
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/index.ts",
+        "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+        "bytes": 625
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/initialized.ts",
+        "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+        "bytes": 3061
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/tabindex.ts",
+        "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+        "bytes": 1503
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+        "sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+        "bytes": 4603
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/date-locale.ts",
+        "sha256": "82e40a57157919c44fe1bdc46bbe45758565a8c889fd256c87079ec70d99d837",
+        "bytes": 492
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-adapter.ts",
+        "sha256": "b69f5c2bbc12deb6ff4c420252733f51742616e016b2a6193de066cf4eecade5",
+        "bytes": 8524
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-module.ts",
+        "sha256": "ea7b50c1618c5631f6dddb395461a144fb2d9448d2e1cb05222664ade19b23c1",
+        "bytes": 871
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/dom/shadow-dom.ts",
+        "sha256": "39a8a95c574620b4aa4ef50a30b86eba359c793d69d504b53fb98d4962c4119e",
+        "bytes": 2182
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+        "sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+        "bytes": 3438
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+        "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0",
+        "bytes": 3744
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/line/line.ts",
+        "sha256": "dce137354958eb1710088a405c12816777d6f2f1949c67061929aef29230a115",
+        "bytes": 1460
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/motion-event.ts",
+        "sha256": "8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667",
+        "bytes": 896
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/sanity-checks.ts",
+        "sha256": "8756b0495ab4f02518887dff55ab844ff433a267c5e899a9b6abfe005863e9d7",
+        "bytes": 960
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/test-environment.ts",
+        "sha256": "83f0fb37e81c2e5294719bac3b337f1fa7983152ae9693ff8c9d4459e66b0408",
+        "bytes": 985
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/option/index.ts",
+        "sha256": "8401473eb98adbdbdda06e00a47720894812c29e91f43a2faeccdef702ac5616",
+        "bytes": 1562
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/option/optgroup-base.ts",
+        "sha256": "e3a31d60c8ab4215bd4ee8db280fc1c3b1c2820444102664f70019f4b51f0519",
+        "bytes": 3622
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/option/optgroup.html",
+        "sha256": "5dce84152c4e6abf4141c8505be4d8950cea5725cad06e1da673fdd73718fa8b",
+        "bytes": 174
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/option/optgroup.ts",
+        "sha256": "f9a203ff1766b9ef0e4f67a68e3cd7c92d55b980066e0aab761d1de590f72727",
+        "bytes": 1125
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/option/option-base.ts",
+        "sha256": "ec787fa20e331afb90856d2f413ca3551396f3f6954b30cc6de762a6864c931c",
+        "bytes": 8353
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/option/option-helpers.ts",
+        "sha256": "3c7a654a4f14e5ec3157efcc4dde4bf94825c14f8c150a6b8b2285c54269e568",
+        "bytes": 1488
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/option/option-parent.ts",
+        "sha256": "66b28658db553b2acab126ee730e688ef926abb09a74e79364a0cd5f081671e0",
+        "bytes": 756
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/option/option.html",
+        "sha256": "3fcdf934481ed432bbb7555ba58f58cdd6295dc682925a2d0ebfe852468d279d",
+        "bytes": 555
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/option/option.ts",
+        "sha256": "fc4bb9db4bbfb5ede0680b572cab060ad23b6f91d84791f69c09706dfd57db31",
+        "bytes": 1783
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/index.ts",
+        "sha256": "d99fa8684192aefe15472cd683390d9d4677fe84ec03fde4b2d00beaf07d496c",
+        "bytes": 371
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox-module.ts",
+        "sha256": "11512cc4728417252cb1d24b98be7e9e11992d90817e2f9da64cf54f20b2e48b",
+        "bytes": 510
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.ts",
+        "sha256": "7c6cbffc3f95b6f30b0f599f781d2fcb882b75c308f5cadbffa8107a9fd20758",
+        "bytes": 2747
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+        "sha256": "3d56b9e01f502995bd25dea21be8bee5713596655f5d159899858b58b4ffccf2",
+        "bytes": 3442
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/ripple/index.ts",
+        "sha256": "bb1177a1a13bc75224e27d6f41cecb9f82b80db8bcf05c3577eecf9458641e0c",
+        "bytes": 449
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-event-manager.ts",
+        "sha256": "2cb38621b0481e8745d306422dca5eba1ad4dce31f3e86931680feaf4f2fe0be",
+        "bytes": 2270
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-ref.ts",
+        "sha256": "4821492afe8b8f13782032fee0e16886fe002d8c79f33bc1332fd4813d91edd2",
+        "bytes": 1391
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-renderer.ts",
+        "sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b",
+        "bytes": 12100
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/cell.ts",
+        "sha256": "28359f7f5b9f4145e809340e8b0b441507d7c08323cea13cde6dea86b3dd1dbb",
+        "bytes": 6510
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/internal/column-classes.ts",
+        "sha256": "58ad7e5915fd944328fa3442ad0a5c02f09623694219dbdb04fa1b11907d5f64",
+        "bytes": 1370
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/internal/definition-owner.ts",
+        "sha256": "6a115eb4ae6c5d50814d1460fd4ba7c2a6cab2eab6d213af5964ab1e3aa6b5dc",
+        "bytes": 1422
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+        "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+        "bytes": 1410
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts",
+        "sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+        "bytes": 1816
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+        "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374",
+        "bytes": 16475
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/internal/table-outlet.ts",
+        "sha256": "522c2133fd03d68e669c521a029e060754d1c2de92cf1a500b33993f7cd31a8e",
+        "bytes": 1216
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/public-api.ts",
+        "sha256": "047a14920397974564d8d61976bb3fdd7088dff2465b24325fecf2546c9902e9",
+        "bytes": 1328
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/row.ts",
+        "sha256": "b57c2be6361b4caf802e9e13759f3bdebab413cd0a903f37ebf6e6443cf4f37d",
+        "bytes": 6940
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table-data-source.ts",
+        "sha256": "b8c35487e4234549a48563b64665b9d38e0ac0f90310d3957b7f31e8084f7904",
+        "bytes": 1231
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table-module.ts",
+        "sha256": "435daec2cf8013ea58b59f5542d8e4b89ca3ea1c03d587e867a04bf6f29186e3",
+        "bytes": 1911
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+        "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+        "bytes": 3818
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/text-column.ts",
+        "sha256": "157c01cc18f67ff7e499442e6f16a7a23ec08284d069b2318a5d8bae11dc4431",
+        "bytes": 2578
+      }
+    ]
+  },
+  "previous_ledger_entry_complete": {
+    "sha": "5c75bbecb24f49779baf86203a7e626d34e39f8c",
+    "bucket": "behavior-semantic",
+    "subject": "fix(cdk/scrolling): avoid SSR error in CdkVirtualScrollableWindow (#30259)",
+    "final_disposition": "inherited",
+    "reason": "The patch reads the document through Angular's DOCUMENT token so CdkVirtualScrollableWindow does not touch the global document during server rendering. This package does not define CdkVirtualScrollableWindow. That constructor was not changed. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+    "read_note_disposition": "not-owned",
+    "files": [
+      "src/cdk/scrolling/virtual-scrollable-window.ts"
+    ],
+    "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+    "peer_floor": {
+      "package": "@angular/cdk",
+      "advertised_range": "^22.1.7",
+      "installed_version": "22.1.7",
+      "contains_fix_tag": "v22.1.7",
+      "sha_is_ancestor_of_tag": true,
+      "cdk_modules": [
+        "scrolling"
+      ],
+      "owned_import_intersection": [
+        "scrolling"
+      ]
+    },
+    "batch_id": "cdk-inherited-not-owned-retain-2026-10-01-d",
+    "recorded_at_utc": "2026-10-01T16:49:17Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+  },
+  "limits": "Pending live coordinator-bound replay; existing older artifact observations are diagnostic only. No general SSR, hydration or release claim."
+}

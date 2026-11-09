@@ -69,7 +69,7 @@ function packageJson() {
   }, null, 2);
 }
 
-async function installConsumer(tarball) {
+export async function installConsumer(tarball) {
   const consumer = mkdtempSync(join(tmpdir(), 'ngx-csp-ssr-'));
   writeFileSync(join(consumer, 'library.tgz'), readFileSync(tarball));
   writeFileSync(join(consumer, 'package.json'), packageJson().replace('file:library.tgz', `file:${join(consumer, 'library.tgz')}`));
@@ -83,7 +83,7 @@ async function installConsumer(tarball) {
   return {consumer, env};
 }
 
-function compile(consumer, env, files, outDir) {
+export function compile(consumer, env, files, outDir) {
   writeFileSync(join(consumer, 'tsconfig.json'), JSON.stringify({
     compilerOptions: {
       target: 'ES2022', module: 'ES2022', moduleResolution: 'bundler', experimentalDecorators: true,
@@ -478,6 +478,11 @@ function writeServerSources(consumer) {
     }
   }
   for (const family of RENDER_FAMILIES) {
+    if (family === 'table-window-scroll') {
+      writeFileSync(join(consumer, 'src/render-table-window-scroll.ts'), readFileSync(join(root, 'testing/csp-ssr/window-table.ts')));
+      files.push('src/render-table-window-scroll.ts');
+      continue;
+    }
     const spec = RENDER[family];
     if (!spec) throw new Error(`missing render template ${family}`);
     const name = `render-${family}.ts`;

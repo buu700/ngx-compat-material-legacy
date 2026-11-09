@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {createHash} from 'node:crypto';
+import {readFileSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
 import {validateTestingApi21xInheritedExecution} from './upstream-testing-api-21x-admission.mjs';
 import {isDeepStrictEqual} from 'node:util';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
@@ -17,6 +19,7 @@ import {typeaheadBehaviorRequirements, validateTypeaheadBehavior} from './upstre
 import {inheritedHelperRequirements, validateInheritedHelperExecution} from './upstream-inherited-helper-evidence.mjs';
 import {overlayInheritedRequirements, validateOverlayInherited} from './upstream-overlay-inherited-evidence.mjs';
 import {tableInheritedRequirements, validateTableInherited} from './upstream-table-inherited-evidence.mjs';
+import {windowSsrRequirements, validateWindowSsr} from './upstream-window-ssr-evidence.mjs';
 
 // Independently authenticated minimum-peer bytes, rather than a ledger-selected
 // digest. Other registered native validators already pin and rehash their peers.
@@ -26,6 +29,7 @@ const tablePeers = new Map([
 ]);
 const demand = (value, message) => {if (!value) throw new Error(message);};
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+const WINDOW_DISPATCH_IMAGE=readFileSync(fileURLToPath(import.meta.url));
 
 /** Finite per-SHA execution contracts. A proof kind, digest or report label is
  * never an execution contract. Source-only helper reviews may be registered
@@ -34,6 +38,12 @@ export function validateInheritedExecution({root, entry, proof, request, line}) 
   try {
     demand(tablePeers.has(line), 'unknown inherited execution branch');
     demand(!request || request.line === line, 'wrong inherited execution branch');
+    if (windowSsrRequirements(entry?.sha, line)) {
+      demand(readEvidenceMember(root,'scripts/upstream-inherited-execution-evidence.mjs').equals(WINDOW_DISPATCH_IMAGE),'loaded window dispatch changed');
+      const result=validateWindowSsr({root, entry, proof, request, line});
+      demand(readEvidenceMember(root,'scripts/upstream-inherited-execution-evidence.mjs').equals(WINDOW_DISPATCH_IMAGE),'loaded window dispatch changed');
+      return result;
+    }
     if (overlayInheritedRequirements(entry?.sha, line)) return validateOverlayInherited({root, entry, proof, request, line});
     if (tableInheritedRequirements(entry?.sha, line)) return validateTableInherited({root, entry, proof, request, line});
     if (typeaheadBehaviorRequirements(entry?.sha, line)) return validateTypeaheadBehavior({root, entry, proof, request, line});

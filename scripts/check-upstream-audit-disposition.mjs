@@ -446,7 +446,7 @@ if (request && request.line === 'main') {
     fail(2, 'upstream-audit-disposition: coordinated main requires the live ledger');
   try {
     const {prepareInventoryReferenceLiveSourceEpoch} = await import('./inventory-reference-live-source-epoch.mjs');
-    sourceEpoch = prepareInventoryReferenceLiveSourceEpoch({root, additionalPaths: ['scripts/check-upstream-audit-disposition.mjs']});
+    sourceEpoch = prepareInventoryReferenceLiveSourceEpoch({root, additionalPaths: ['scripts/check-upstream-audit-disposition.mjs', 'scripts/upstream-inherited-execution-evidence.mjs', 'scripts/upstream-window-ssr-evidence.mjs']});
     ledgerBytes = readFileSync(ledgerPath);
     if (!ledgerBytes.equals(sourceEpoch.liveLedger)) throw new Error('authenticated live ledger changed');
   } catch (error) {

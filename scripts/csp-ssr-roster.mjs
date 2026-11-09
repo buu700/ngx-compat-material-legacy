@@ -55,6 +55,7 @@ export const RENDER_FAMILIES = [
   'card',
   'paginator',
   'progress-bar',
+  'table-window-scroll',
 ];
 
 const HOST_FAMILIES = new Set(['dialog-host', 'menu-host', 'tooltip-host', 'snack-host']);
@@ -167,6 +168,10 @@ function serverProblem(kind, family, obs) {
   if (kind === 'render') {
     if (obs.renderedOnServer !== true || obs.clientOnly !== false) return 'client-only render presented as SSR';
     if (obs.marker !== true) return 'server render did not include the component';
+    if (family === 'table-window-scroll' && (obs.windowScrollable !== true || obs.injectedDocument !== true
+      || obs.rowMarkers !== 2 || !Array.isArray(obs.cellMarkup) || obs.cellMarkup.length !== 2
+      || !/^<td\b[^>]*class="[^"]*mat-cell[^"]*"[^>]*>SSR-WINDOW-ROW-A<\/td>$/.test(obs.cellMarkup[0])
+      || !/^<td\b[^>]*class="[^"]*mat-cell[^"]*"[^>]*>SSR-WINDOW-ROW-B<\/td>$/.test(obs.cellMarkup[1]))) return 'window table composition invalid';
     if (HOST_FAMILIES.has(family) && obs.overlayOpened !== false) return 'overlay was reported open without a browser';
     return null;
   }
@@ -220,6 +225,7 @@ export function samplePass(caseId) {
     timers: 0, exitCode: 0, threw: false, clientOnly: false, hydration: false,
   };
   if (kind === 'render') {
+    if (family === 'table-window-scroll') return {...base, renderedOnServer:true, marker:true, windowScrollable:true, injectedDocument:true, rowMarkers:2, cellMarkup:['<td class="mat-cell">SSR-WINDOW-ROW-A</td>','<td class="mat-cell">SSR-WINDOW-ROW-B</td>']};
     return {...base, renderedOnServer: true, marker: true, overlayOpened: HOST_FAMILIES.has(family) ? false : undefined};
   }
   return {...base, renderedOnServer: false, serverImport: true};

@@ -80,6 +80,7 @@ const KNOWN_INDIVIDUAL_PROOF_KINDS = new Set([
   "individual-source-scope",
   "main-overlay-inherited-native",
   "main-table-inherited-native",
+  "main-window-table-ssr-inherited",
   "native-required-individual-tab-completion",
   "owned-source-and-executed-lifecycle-protocol",
   "packed-required-individual-generated-identity",
