@@ -9,13 +9,17 @@ import os
 from pathlib import Path
 import subprocess
 import unittest
+from remaining_core_current_route import remaining_core_route
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class RemainingCoreCallerRoles(unittest.TestCase):
     def test_current_callers_and_reused_public_evidence(self):
-        command = ['node', 'tests/remaining_core_caller_roles_probe.mjs', '--integrated']
+        line, probe = remaining_core_route()
+        command = ['node', probe]
+        if line == '21.x':
+            command.append('--integrated')
         if os.environ.get('NGX_REMAINING_CORE_DIAGNOSTIC'):
             command.extend(['--out', os.environ['NGX_REMAINING_CORE_DIAGNOSTIC']])
         child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=60)
@@ -23,19 +27,25 @@ class RemainingCoreCallerRoles(unittest.TestCase):
         report = json.loads(child.stdout)
         self.assertEqual(report['individual_caller_roles'], 16)
         self.assertEqual(report['source_files'], 14)
-        self.assertEqual(report['complete_context_members'], 28)
-        self.assertEqual(report['actual_inject_expressions'], 9)
+        self.assertEqual(report['complete_context_members'], 31 if line == 'main' else 28)
+        self.assertEqual(report['actual_inject_expressions'], 10 if line == 'main' else 9)
         self.assertEqual(report['strict_public_namespace_models'], 3)
         self.assertEqual(report['negative_type_controls'], 6)
-        self.assertEqual(report['finite_runtime_cases'], 162)
-        self.assertEqual(report['runtime_fault_controls_rejected'], 15)
+        self.assertEqual(report['finite_runtime_cases'], 168 if line == 'main' else 162)
+        self.assertEqual(report['runtime_fault_controls_rejected'], 18 if line == 'main' else 15)
         self.assertFalse(report['prior_whole_inventory_counts_admitted'])
         self.assertEqual(report['current_test_only_reviews'], 2)
         self.assertGreater(report['source_and_evidence_corruptions_rejected'], 35)
         self.assertEqual(report['late_source_and_inventory_changes_rejected'], 2)
         self.assertEqual(report['canonical_row_corruptions_rejected'], 2)
-        self.assertEqual(report['canonical_closures_integrated'], 16)
-        self.assertFalse(report['all_canonical_ledger_bytes_preserved'])
+        if line == 'main':
+            self.assertEqual(report['historical_prepared_roles'], 16)
+            self.assertEqual(report['current_reviewed'] + report['current_insufficient'], 16)
+            self.assertEqual(report['prior_valid_lost'], 0)
+            self.assertTrue(report['required_element_ref_identity_and_missing_executed'])
+        else:
+            self.assertEqual(report['canonical_closures_integrated'], 16)
+            self.assertFalse(report['all_canonical_ledger_bytes_preserved'])
         self.assertFalse(report['default_nonce_root_factory_or_CSP_security_qualified'])
         self.assertFalse(report['actual_native_packed_or_full_floor_qualified'])
 

@@ -9,13 +9,17 @@ import os
 from pathlib import Path
 import subprocess
 import unittest
+from core_token_current_route import core_token_route
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class CoreTokenCallerRoles(unittest.TestCase):
     def test_current_callers_and_authenticated_evidence(self):
-        command = ['node', 'tests/core_token_caller_roles_probe.mjs', '--integrated']
+        line, probe = core_token_route()
+        command = ['node', probe]
+        if line == '21.x':
+            command.append('--integrated')
         if os.environ.get('NGX_CORE_TOKEN_CALLERS_DIAGNOSTIC'):
             command.extend(['--out', os.environ['NGX_CORE_TOKEN_CALLERS_DIAGNOSTIC']])
         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=60)
@@ -32,8 +36,12 @@ class CoreTokenCallerRoles(unittest.TestCase):
         self.assertGreater(report['source_and_evidence_corruptions_rejected'], 30)
         self.assertTrue(report['late_source_change_rejected'])
         self.assertTrue(report['canonical_row_corruption_rejected'])
-        self.assertEqual(report['canonical_closures_integrated'], 5)
-        self.assertFalse(report['all_canonical_ledger_bytes_preserved'])
+        if line == 'main':
+            self.assertEqual(report['historical_prepared_roles'], 5)
+            self.assertEqual(report['current_valid_roles'], 5)
+        else:
+            self.assertEqual(report['canonical_closures_integrated'], 5)
+            self.assertFalse(report['all_canonical_ledger_bytes_preserved'])
         self.assertFalse(report['full_Material_dialog_menu_declaration_closures_compiled'])
         self.assertFalse(report['actual_native_packed_or_full_floor_qualified'])
 
