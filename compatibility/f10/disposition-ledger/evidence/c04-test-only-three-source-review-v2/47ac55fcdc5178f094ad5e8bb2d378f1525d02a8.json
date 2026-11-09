@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "47ac55fcdc5178f094ad5e8bb2d378f1525d02a8",
+  "subject": "build: fix lint failure (#27876)",
+  "status": "reviewed",
+  "final_disposition": "not-applicable",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "The full patch removes only a local `panelId` binding from the upstream modern autocomplete modal-ownership spec; it leaves the production implementation untouched. This is a test-only upstream cleanup, not a package source change. The add-on has its own legacy autocomplete implementation and tests; its trigger still performs the aria-owns reads and removes/sets them as appropriate. Do not treat deletion of this upstream test statement as proof that the read is generally side-effect-free, or as a behavioral/accessibility qualification.",
+  "diff": "diff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts\nindex 4ec0c3470218da6b01001d94f2cbbb6fba15edc2..801d808702bde01dd3fbba3f5ad0a5dfbb1efed5 100644\n--- a/src/material/autocomplete/autocomplete.spec.ts\n+++ b/src/material/autocomplete/autocomplete.spec.ts\n@@ -3735,7 +3735,6 @@ describe('MDC-based MatAutocomplete', () => {\n       fixture.componentInstance.trigger.closePanel();\n       fixture.detectChanges();\n \n-      const panelId = fixture.componentInstance.autocomplete.id;\n       const modalElement = fixture.componentInstance.modal.nativeElement;\n \n       expect(modalElement.getAttribute('aria-owns')).toBeFalsy();\n",
+  "diff_sha256": "f942b23d2a8ff96cf8271e6ab2fcf532f75ffd32d7313002343bf9df2bec1279",
+  "raw_commit_sha256": "b45b150ebb628d7cc66d7b881e91bec65611c4315a4bf28834b12a0fdb6fa9b5",
+  "parent": "f6c5ea4c5d41a25ea4500999250d8e5f60fd2c20",
+  "changed_files": [
+    "src/material/autocomplete/autocomplete.spec.ts"
+  ],
+  "original_file_count": 1,
+  "original_hunk_count": 1,
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/ng-package.json",
+      "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33",
+      "bytes": 492
+    },
+    {
+      "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+      "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863",
+      "bytes": 1585
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "b831b4d3ac6f17f0a9de9d0cd5594f6154ab5fe2b479e9a3b5289dbc1aeed1b6",
+      "bytes": 168183
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "803e95c96c22e5a6863a5f353f0485ec5a0431d04c9fe0b987031083ed7afaa9",
+      "bytes": 43131
+    }
+  ],
+  "review_scope": "Only this complete upstream test-only SHA is in scope. No runtime/test/peer/compiler claim.",
+  "prior_evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-wide-fixture-adapter-47ac55fcdc5178f094ad5e8bb2d378f1525d02a8.json",
+  "prior_evidence_sha256": "687365d62e3f9fbb50237b4275c2082d2c154f8c77a3f1654078c17f1f66a9cd",
+  "prior_individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "f942b23d2a8ff96cf8271e6ab2fcf532f75ffd32d7313002343bf9df2bec1279",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The complete original patch removes one unused panelId local from a modern autocomplete modal ownership test. Its initializer reads a property, so this is not classified as a type-only change or as generally free of getter effects. The complete retained legacy autocomplete spec has no corresponding panelId local or modalElement block. Its production trigger still uses panelId to maintain modal aria-owns relationships; those live reads remain unchanged. This particular private modern test cleanup has no owned statement to remove. No autocomplete accessibility or modal behavior is approved by this source exclusion.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-small-source-review.mjs",
+        "sha256": "a3f8c6ea65db0588648675819751fc76df41001b0ac160099b87de6ae00e3b16"
+      },
+      {
+        "path": "tests/spec_small_source_probe.mjs",
+        "sha256": "385b82de643416a5c54c82016a79367cd4b84c2f3ec548d0bdb19b2056f36f62"
+      },
+      {
+        "path": "compatibility/rc/spec-small-source-subjects.json.gz",
+        "sha256": "055c40ba3907191e258676b4ebff84ea5d233fb5c00bb877eac0f525dcf5ccfd"
+      },
+      {
+        "path": "compatibility/rc/spec-small-source-acquisition.json.gz",
+        "sha256": "f71a905296710e45c15a2e6bfb3766a741061aebb39b8d55e7aa7d48fa6a8200"
+      },
+      {
+        "path": "compatibility/rc/spec-small-fixture-prior.json.gz",
+        "sha256": "da83db9d7a07c2cc3f1dcf89a5fd312f433966b3486ceebf5b05d9d45bf1c9fc"
+      },
+      {
+        "path": "compatibility/rc/spec-small-source-controls.json",
+        "sha256": "b81aa3d32cbce32f51164dcc63776ada5c1e7e63537ae150c8693783b6d666ba"
+      },
+      {
+        "path": "compatibility/rc/spec-small-context-proof.json",
+        "sha256": "835ff94c0a8ffdd4c49f6e3816bb908c35f6464c8a5017c76b9e4fcaeca91888"
+      },
+      {
+        "path": "compatibility/rc/spec-small-context-checkpoint.json",
+        "sha256": "686dc5ec22f4fc6e2cb557c65d8c206f33ee605b30fbd87476598932322d85fa"
+      },
+      {
+        "path": "compatibility/rc/historical-source-replay-fixture-context-checkpoint.json",
+        "sha256": "c5ef2627c3f93f029af03036f3a8f9b2c9f453cdf610332ea935885f0271c4cd"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+        "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+        "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+        "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+        "sha256": "d9fcc264e69075865049a010a7a7bb2f6f5adf46af5a2580f64371fb748590a0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-list/testing/list-harness-base.ts",
+        "sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+        "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863"
+      },
+      {
+        "path": "projects/ngx-material-legacy/ng-package.json",
+        "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33"
+      },
+      {
+        "path": "testing/legacy-runner/adapt-spec.mjs",
+        "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-small-individual-source-proof.json",
+      "sha256": "ca245ae0e159e9e089203c79978a620fe1bb0e402a1940061fab79d28cc4ab23"
+    },
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "current_source_context": {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "801e41c8f24f71a98f5cfb10a8c9f27a315573197856a5d4ab0c03eb42a5e450"
+    },
+    "adapter_source_context": {
+      "path": "compatibility/rc/spec-wide-fixture-source-adapter-proof.json",
+      "sha256": "0cec5e2cf1b3a762218be1d53d1bb7692405772f7b3f275333e432092fd277be"
+    }
+  },
+  "prior_entry_sha256": "7d68041599f6e8331712567bb17c65927aee1a0ccfaf20ced0fd48913690e176",
+  "source_context": "The full patch removes only a local `panelId` binding from the upstream modern autocomplete modal-ownership spec; it leaves the production implementation untouched. This is a test-only upstream cleanup, not a package source change. The add-on has its own legacy autocomplete implementation and tests; its trigger still performs the aria-owns reads and removes/sets them as appropriate. Do not treat deletion of this upstream test statement as proof that the read is generally side-effect-free, or as a behavioral/accessibility qualification.",
+  "limitations": [
+    "source-only disposition",
+    "no upstream test run",
+    "no package runtime or compiler-floor qualification",
+    "no full C04/G11/security/release admission"
+  ]
+}
