@@ -41,7 +41,7 @@ export function additionalUseBaseline({root=resolve(dirname(fileURLToPath(import
   if(historical){assert.ok(!rows.some(r=>key(r)===key(historical)));result.entries=[...rows,historical];
    // The obligation remains expected even when the unknown source epoch is rejected.
    result.retired.push({...FORM_FIELD_RETIRED_ROLE,candidate_source_sha256:fieldSource?.sha256,occurrences:[]});
-   assert.equal(fieldSource?.sha256,'e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657','unqualified form-field retirement source epoch');
+   assert.equal(fieldSource?.sha256,'e645f8b92ccb57518eb9fac6ab3a20c35db6bd9f19a301fcb659ffe58911cfb6','unqualified form-field retirement source epoch');
    field=qualifyFormFieldRetiredUse({root,current,readMember});assert.deepEqual(field.original,historical);result.retired=[];
   }
   const missing=rows.filter(r=>!live.has(key(r)));const dialogRemoved=missing.some(row=>key(row)===key(DIALOG_CONFIG_RETIRED_ROLE));assert.deepEqual(missing.map(key).sort(),[key(target),...(dialogRemoved?[key(DIALOG_CONFIG_RETIRED_ROLE)]:[])].sort(),'unqualified removed additional route');
