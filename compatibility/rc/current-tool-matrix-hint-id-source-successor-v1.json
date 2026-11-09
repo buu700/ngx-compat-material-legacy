@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "role": "current-tool-matrix-hint-id-source-successor",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "source_parent": "11767b00a96caa175a206388551c9f014c7513fb",
+  "source_commit": "7e9ecb0a8fe31d44c1f37b8a509fc58c6ab705ad",
+  "transitions": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "prior_exists": true,
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+        "sha256": "e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657",
+        "bytes": 28485
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+        "sha256": "e645f8b92ccb57518eb9fac6ab3a20c35db6bd9f19a301fcb659ffe58911cfb6",
+        "bytes": 28628
+      },
+      "edits": [
+        {
+          "offset": 1408,
+          "before": "",
+          "after": "';\nimport {nextLegacyHintId} from './internal/hint-id"
+        },
+        {
+          "offset": 8185,
+          "before": "",
+          "after": "// Reserve the historical field counter position used by the separate label ID.\n  "
+        },
+        {
+          "offset": 8217,
+          "before": "`mat-hint-${",
+          "after": "("
+        },
+        {
+          "offset": 8243,
+          "before": "}`",
+          "after": ", nextLegacyHintId())"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/hint.ts",
+      "prior_exists": true,
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-form-field/hint.ts",
+        "sha256": "c129fc51d60d9a7f2c273da3c8ee195719df230c9c7a1925abf1dc969f581b05",
+        "bytes": 1524
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-form-field/hint.ts",
+        "sha256": "7685890918a25081de81d83f6a9c1396274c2b936e239f713c44bc67151fed49",
+        "bytes": 1544
+      },
+      "edits": [
+        {
+          "offset": 302,
+          "before": "\nle",
+          "after": "impor"
+        },
+        {
+          "offset": 307,
+          "before": "",
+          "after": "{"
+        },
+        {
+          "offset": 311,
+          "before": "U",
+          "after": "LegacyHi"
+        },
+        {
+          "offset": 313,
+          "before": "ique",
+          "after": "t"
+        },
+        {
+          "offset": 319,
+          "before": "",
+          "after": "}"
+        },
+        {
+          "offset": 320,
+          "before": "=",
+          "after": "from"
+        },
+        {
+          "offset": 322,
+          "before": "0",
+          "after": "'./internal/hint-id'"
+        },
+        {
+          "offset": 1492,
+          "before": "`mat-hint-${",
+          "after": ""
+        },
+        {
+          "offset": 1508,
+          "before": "U",
+          "after": "LegacyHi"
+        },
+        {
+          "offset": 1510,
+          "before": "ique",
+          "after": "t"
+        },
+        {
+          "offset": 1516,
+          "before": "++}`",
+          "after": "()"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/internal/hint-id.ts",
+      "prior_exists": false,
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-form-field/internal/hint-id.ts",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-form-field/internal/hint-id.ts",
+        "sha256": "160c30388347d5bf00f075de3423e969e6e4ce8f7fe32c7d4dafe4e17dcc4028",
+        "bytes": 465
+      },
+      "edits": [
+        {
+          "offset": 0,
+          "before": "",
+          "after": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\n// Projected hints and hintLabel elements share a DOM ID prefix.\nlet nextHintId = 0;\n\n/** Internal allocator for generated legacy hint IDs. */\nexport function nextLegacyHintId(): string {\n  return `mat-hint-${nextHintId++}`;\n}\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/form-field-subscript-motion/manual-probe.mjs",
+      "prior_exists": true,
+      "before": {
+        "path": "tests/form-field-subscript-motion/manual-probe.mjs",
+        "sha256": "9b72a9a6d88938b346b62f301fa8927c631fbe0153ec591bed047193c591692f",
+        "bytes": 5507
+      },
+      "after": {
+        "path": "tests/form-field-subscript-motion/manual-probe.mjs",
+        "sha256": "0a45401d053aec66eea149484f2f1acb974423d394d354907d8df9e700800ac9",
+        "bytes": 6816
+      },
+      "edits": [
+        {
+          "offset": 1290,
+          "before": "",
+          "after": "\n // Both hintLabel and mat-hint IDs share one DOM namespace. Exercise the\n // actual compiler-constructed field, historical seven-argument fields, and\n // manually constructed hints in a fresh packed-module process.\n {\n  const seven=fixture.element.execution.inputs.slice(0,7);\n  const fields=[fixture.element.execution.value];\n  for(let i=0;i<8;i++)fields.push(new Type(...seven));\n  try{\n   const hints=Array.from({length:32},()=>new family.MatLegacyHint());\n   const generated=[...fields.map(field=>field._hintLabelId),...hints.map(hint=>hint.id)];\n   assert.equal(new Set(generated).size,generated.length,'generated hint IDs must be unique across field labels and projected hints');\n   const labelNumbers=fields.map(field=>{\n    const match=/^mat-form-field-label-(\\d+)$/.exec(field._labelId);\n    assert.ok(match,'historical field label ID prefix');return Number(match[1]);\n   });\n   for(let i=1;i<labelNumbers.length;i++)assert.equal(labelNumbers[i]-labelNumbers[i-1],2,'field label ID sequence');\n   hints[0].id='consumer-authored-hint';assert.equal(hints[0].id,'consumer-authored-hint');\n   results.push({crossClassGeneratedIdsUnique:true,manualSevenArguments:true,fieldLabelSequencePreserved:true,authoredHintIdPreserved:true});\n  }finally{for(const field of fields.slice(1))field.ngOnDestroy();}\n }"
+        }
+      ]
+    }
+  ],
+  "source_review": {
+    "path": "compatibility/rc/worksheets/legacy-hint-id-uniqueness-integration-v1.md",
+    "sha256": "079b0e6dec2255ca9df0cf5f6c740ef5f7f11766c510390fd76f77b130d6ea16",
+    "bytes": 2839
+  },
+  "packed_evidence": {
+    "artifact_sha256": "877c8b62e1ea9b134d838043dda436abb4ccf9515041640fdb05dc6113727b0b",
+    "regular_members": 512,
+    "changed_members": 3,
+    "scope": "external artifact review only; source owner grants no artifact admission"
+  }
+}

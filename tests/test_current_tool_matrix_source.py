@@ -29,6 +29,8 @@ class CurrentToolMatrixSourceTest(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='matrix-source-',dir=os.environ.get('TMPDIR')) as temp:
             root=Path(temp);packet=json.loads((ROOT/PACKET).read_bytes());input_packet=json.loads((ROOT/INPUT).read_bytes())
             final=json.loads((ROOT/'compatibility/rc/current-tool-matrix-final-product-v1.json').read_bytes()); extra={'compatibility/rc/current-tool-matrix-final-product-v1.json', final['predecessor_registry']['path'],final['current_registry']['path'],*[x['archive']['path'] for x in final['source_transitions']+final['structural_transitions']],*[x['after']['path'] for x in final['source_transitions']]}; files=extra | {'projects/ngx-material-legacy/package.json',PACKET,INPUT,PRIOR,MATRIX,SPEC,INPUT_SPEC,FORM,*[r['path'] for r in input_packet['reviews']],'scripts/current-tool-matrix-source.mjs','scripts/current_tool_matrix_source.py',*[r['path'] for r in packet['reviews']],'scripts/upstream-historical-behavior-evidence.mjs','testing/legacy-runner/historical-inventory.json'}
+            # Include every physically bound current matrix input in the isolated frame.
+            files.update(ref['path'] for ref in CurrentToolMatrixSource(ROOT).bound)
             for path in files:
                 dest=root/path;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(ROOT/path,dest)
             gitdir=subprocess.check_output(['git','rev-parse','--absolute-git-dir'],cwd=ROOT,text=True).strip();(root/'.git').write_text('gitdir: '+gitdir+'\n')

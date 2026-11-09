@@ -75,10 +75,11 @@ class CaptureV5Tests(unittest.TestCase):
             js = json.loads(child.stdout)
             self.assertEqual(js['epoch'], source.epoch)
             self.assertEqual(js['transitions'], source.transitions)
-            self.assertEqual(next(r for r in source.bound if r['path'] == MATRIX_OWNER['path']), MATRIX_OWNER)
-            self.assertEqual(next(r for r in js['bound'] if r['path'] == 'scripts/current-tool-matrix-source.mjs'), dict(path='scripts/current-tool-matrix-source.mjs', sha256='42d5d1251e8cacf69f0d1519bd6ba9a356c9c9eaac0bf5c5af1eb8aba5b20f1c', bytes=24939))
-            js_bound = {r['path']: r for r in js['bound'] if r['path'] not in ('scripts/current-sass-tool-references.mjs', 'scripts/current-tool-matrix-source.mjs')}
-            py_bound = {r['path']: r for r in source.bound if r['path'] not in ('scripts/current_sass_tool_references.py', 'scripts/current_tool_matrix_source.py')}
+            matrix = json.loads((ROOT / 'compatibility/rc/current-tool-matrix-hint-id-owner-successor-v1.json').read_bytes())
+            self.assertEqual(next(r for r in source.bound if r['path'] == MATRIX_OWNER['path']), matrix['transitions'][1]['after'])
+            self.assertEqual(next(r for r in js['bound'] if r['path'] == 'scripts/current-tool-matrix-source.mjs'), matrix['transitions'][0]['after'])
+            js_bound = {r['path']: r for r in js['bound'] if r['path'] not in ('scripts/current-sass-tool-references.mjs',)}
+            py_bound = {r['path']: r for r in source.bound if r['path'] not in ('scripts/current_sass_tool_references.py',)}
             self.assertEqual(js_bound, py_bound)
             self.assertEqual((js['cold'], js['late'], js['callback']), (4, 4, 4))
 

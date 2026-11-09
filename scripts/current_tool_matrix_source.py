@@ -90,13 +90,32 @@ class CurrentToolMatrixSource:
         if not (read is None or callable(read)):
             raise AssertionError()
         self._provided, self._bound = (read, {})
+        hint_ref = dict(path='compatibility/rc/current-tool-matrix-hint-id-source-successor-v1.json',sha256='1a5a6a9d5650a848ea8df8a9f3efa9715447df1f39b9672327f79f1fd0a86efc',bytes=6743)
+        hint_raw=_physical(self.root,hint_ref['path']); _match(hint_raw,hint_ref); hint=json.loads(hint_raw)
+        _require(hint['schema_version']==1 and hint['role']=='current-tool-matrix-hint-id-source-successor' and hint['source_only'] is True and hint['historical_programs_executed'] is False and hint['artifact_or_audit_admission_granted'] is False and hint['g11_claim']=='not-passed' and hint['source_parent']=='11767b00a96caa175a206388551c9f014c7513fb' and hint['source_commit']=='7e9ecb0a8fe31d44c1f37b8a509fc58c6ab705ad')
+        hint_paths=['projects/ngx-material-legacy/legacy-form-field/form-field.ts','projects/ngx-material-legacy/legacy-form-field/hint.ts','projects/ngx-material-legacy/legacy-form-field/internal/hint-id.ts','tests/form-field-subscript-motion/manual-probe.mjs']
+        _require([x['path'] for x in hint['transitions']]==hint_paths and [x['prior_exists'] for x in hint['transitions']]==[True,True,False,True])
+        hint_env=dict(PATH=_GIT_PATH,LANG='C',LC_ALL='C',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_SYSTEM='/dev/null',GIT_TERMINAL_PROMPT='0',GIT_NO_REPLACE_OBJECTS='1',GIT_NO_LAZY_FETCH='1')
+        def hint_git(*args): return subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',*args],cwd=self.root,env=hint_env)
+        _require(hint_git('rev-list','--parents','-n','1',hint['source_commit']).decode().strip()==hint['source_commit']+' '+hint['source_parent']);hint_git('merge-base','--is-ancestor',hint['source_commit'],'HEAD')
+        for t in hint['transitions']:
+            _require(t['before']['path']==t['after']['path']==t['path']);before=hint_git('show',hint['source_parent']+':'+t['path']) if t['prior_exists'] else b''
+            if not t['prior_exists']: _require(hint_git('ls-tree',hint['source_parent'],'--',t['path'])==b'')
+            after=hint_git('show',hint['source_commit']+':'+t['path']);_match(before,t['before']);_match(after,t['after']);_require(_replay(before,t['edits'])==after and _physical(self.root,t['path'])==after)
+        _require(hint['packed_evidence']['artifact_sha256']=='877c8b62e1ea9b134d838043dda436abb4ccf9515041640fdb05dc6113727b0b' and hint['packed_evidence']['regular_members']==512 and hint['packed_evidence']['changed_members']==3)
+        def current_ref(ref):
+            transition=next((x for x in hint['transitions'] if x['path']==ref['path']),None)
+            if transition is None: return ref
+            _require(ref==transition['before']);return transition['after']
         # Prebind the whole named frame before the first supplied callback.
         roster_ref = dict(path='compatibility/rc/current-tool-matrix-live-frame-roster-v1.json', sha256='a96a3921bbf2e553cdf94f0cc4c9a66390ccd537fcb80b8255e3afc0ceea5ba4', bytes=7180)
         roster_raw = _physical(self.root, roster_ref['path']); _match(roster_raw, roster_ref); roster = json.loads(roster_raw)
         _require(roster['schema_version'] == 1 and roster['role'] == 'current-tool-matrix-live-frame-roster' and roster['source_only'] is True and len(roster['refs']) == 35 and len({x['path'] for x in roster['refs']}) == 35)
         self_ref = dict(path=SELF, sha256=_hash(_IMAGE), bytes=len(_IMAGE))
-        for ref in [self_ref, LIVE_PACKET, roster_ref, *roster['refs']]:
+        for ref in [self_ref, LIVE_PACKET, roster_ref, hint_ref, hint['source_review'], *[current_ref(x) for x in roster['refs']], *[t['after'] for t in hint['transitions'] if not any(r['path']==t['path'] for r in roster['refs'])]]:
             _require(ref['path'] not in self._bound); _match(_physical(self.root,ref['path']),ref); self._bound[ref['path']] = dict(ref)
+        self._member(hint_ref); self._member(hint['source_review'])
+        for t in hint['transitions']: self._member(t['after'])
         if not json.loads(self._read('projects/ngx-material-legacy/package.json'))['version'].startswith('22.'):
             raise AssertionError()
         if not self._read(SELF) == _IMAGE:
@@ -120,12 +139,12 @@ class CurrentToolMatrixSource:
         form = live['form_field']; _require(form['path'] == 'projects/ngx-material-legacy/legacy-form-field/form-field.ts' and form['parent'] == 'd0b99b5b6975859ca4eff8aa55dd97e4dfeb4749' and form['commit'] == 'a798ff9c58cdd539f115eda00b7cdd898d035353' and form['before']['path'] == form['after']['path'] == form['path'])
         _require(git('rev-list','--parents','-n','1',form['commit']).decode().strip() == form['commit'] + ' ' + form['parent'])
         git('merge-base','--is-ancestor',form['commit'],'HEAD')
-        old_form,new_form = git('show',form['parent']+':'+form['path']),git('show',form['commit']+':'+form['path']); _match(old_form,form['before']); _match(new_form,form['after']); _require(_replay(old_form,form['edits']) == new_form and self._member(form['after']) == new_form)
+        old_form,new_form = git('show',form['parent']+':'+form['path']),git('show',form['commit']+':'+form['path']); _match(old_form,form['before']); _match(new_form,form['after']); _require(_replay(old_form,form['edits']) == new_form and form['after']==hint['transitions'][0]['before']); self._member(current_ref(form['after']))
         receipt=json.loads(self._member(live['receipt'])); _require(receipt['base_head'] == form['parent'] and receipt['root_executed']['source_replay_exit_code'] == 0 and receipt['root_executed']['mutation_rejections'] == 120 and receipt['reviewed_native_and_ssr_evidence']['candidate_motion_cells'] == 11 and receipt['reviewed_native_and_ssr_evidence']['ssr_four_states_equal_to_a488'] is True and receipt['reviewed_native_and_ssr_evidence']['root_repeated_native_suite'] is False)
         _require(len(live['support']) == 9 and len({x['path'] for x in live['support']}) == 9)
         _require(len(receipt['changes']) == 9)
         for ref in live['support']:
-            rows=[row for row in receipt['changes'] if row['path'].endswith('/'+ref['path'])]; _require(len(rows) == 1 and rows[0]['sha256'] == ref['sha256'] and rows[0]['bytes'] == ref['bytes']); self._member(ref)
+            rows=[row for row in receipt['changes'] if row['path'].endswith('/'+ref['path'])]; _require(len(rows) == 1 and rows[0]['sha256'] == ref['sha256'] and rows[0]['bytes'] == ref['bytes']); self._member(current_ref(ref))
         _require(next(x for x in live['support'] if x['path'] == form['path']) == form['after'])
         def historical_member(ref):
             if ref['path'] == form['path'] and ref['sha256'] == form['before']['sha256']:

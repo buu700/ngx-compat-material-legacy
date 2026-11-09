@@ -883,12 +883,20 @@ class CurrentSassToolReferences:
             routing_comparison(update['after']);return bytes(matches[0])
         self._matrix_owner = None
         if self.line == 'main':
-            owner_raw = _physical(self.root, MATRIX_OWNER['path']); _matches(owner_raw, MATRIX_OWNER)
-            local_path = Path(__file__).with_name('current_tool_matrix_source.py'); local_raw = local_path.read_bytes(); _matches(local_raw, MATRIX_OWNER)
+            matrix_next=json.loads(self._member(dict(path='compatibility/rc/current-tool-matrix-hint-id-owner-successor-v1.json',sha256='03cb5530b3dc59ea244f087c6f37bb7e405605e4c5eb9466abf16078d5fd9b17',bytes=10198)))
+            assert matrix_next['schema_version']==1 and matrix_next['role']=='hint-id-current-matrix-owner-source-successor' and matrix_next['source_only'] is True and matrix_next['historical_programs_executed'] is False and matrix_next['artifact_or_audit_admission_granted'] is False and matrix_next['g11_claim']=='not-passed' and matrix_next['source_base']=='7e9ecb0a8fe31d44c1f37b8a509fc58c6ab705ad' and matrix_next['factory_sha256']=='cf4a5d8f52d76b64dea8e4ac5ffb7a5bbe4b6b4b634561f6b2b828a1a1b8cdc1'
+            assert [x['path'] for x in matrix_next['transitions']]==['scripts/current-tool-matrix-source.mjs','scripts/current_tool_matrix_source.py']; self._member(matrix_next['hint_source_packet'])
+            matrix_env=dict(PATH=os.environ.get('PATH'),GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0');subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',matrix_next['source_base'],'HEAD'],cwd=self.root,env=matrix_env)
+            matrix_images=_git_images(self.root,[dict(commit=matrix_next['source_base'],path=t['path']) for t in matrix_next['transitions']])
+            for t in matrix_next['transitions']:
+                before=matrix_images[(matrix_next['source_base'],t['path'])];_matches(before,t['before']);after=_edited(before,t['edits']);_matches(after,t['after']);assert self._member(t['after'])==after
+            matrix_current=matrix_next['transitions'][1];assert matrix_current['before']==MATRIX_OWNER
+            owner_raw = _physical(self.root, MATRIX_OWNER['path']); _matches(owner_raw, matrix_current['after'])
+            local_path = Path(__file__).with_name('current_tool_matrix_source.py'); local_raw = local_path.read_bytes(); _matches(local_raw, matrix_current['after'])
             spec = importlib.util.spec_from_file_location('_current_tool_matrix_source_guard', local_path)
             if spec is None or spec.loader is None: raise RuntimeError('missing current matrix source loader')
             module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
-            assert module._IMAGE == local_raw and self._member(MATRIX_OWNER) == owner_raw
+            assert module._IMAGE == local_raw and self._member(matrix_current['after']) == owner_raw
             self._matrix_owner = module.CurrentToolMatrixSource(self.root, read=self._read)
             domain = json.loads(self._member(DOMAIN_PACKET))
             assert domain['schema_version'] == 1 and domain['role'] == 'current-tool-domain-source-successor' and domain['line'] == 'main'
@@ -1025,10 +1033,12 @@ class CurrentSassToolReferences:
             assert live_tests['schema_version'] == 1 and live_tests['role'] == 'current-tool-live-matrix-test-source-successor' and live_tests['source_only'] is True and live_tests['historical_programs_executed'] is False and live_tests['artifact_or_audit_admission_granted'] is False
             assert live_tests['matrix_owner'] == dict(path='scripts/current-tool-matrix-source.mjs',sha256='42d5d1251e8cacf69f0d1519bd6ba9a356c9c9eaac0bf5c5af1eb8aba5b20f1c',bytes=24939)
             assert [x['path'] for x in live_tests['updates']] == ['tests/test_current_sass_tool_reference_v5.py','tests/test_current_tool_planner_successor.py']
+            hint_tests=json.loads(self._member(dict(path='compatibility/rc/current-tool-matrix-hint-id-test-successor-v1.json',sha256='e9840c20968c9e1a405c228c04ab51371e1a8162907a32e60178b443dd893dfc',bytes=4608)))
+            assert hint_tests['schema_version']==1 and hint_tests['role']=='hint-id-current-matrix-test-source-successor' and hint_tests['source_only'] is True and hint_tests['historical_programs_executed'] is False and hint_tests['artifact_or_audit_admission_granted'] is False and hint_tests['g11_claim']=='not-passed' and hint_tests['source_base']=='7e9ecb0a8fe31d44c1f37b8a509fc58c6ab705ad' and [x['path'] for x in hint_tests['transitions']]==[x['path'] for x in live_tests['updates']]
             def test_member(update, next_image):
                 live = next((x for x in live_tests['updates'] if x['path'] == update['path']),None)
                 if live is None: assert self._member(update['after']) == next_image; return
-                assert live['before'] == update['after']; final = _edited(next_image,live['edits']); _matches(final,live['after']); assert self._member(live['after']) == final
+                assert live['before'] == update['after']; final = _edited(next_image,live['edits']); _matches(final,live['after']);current=next(x for x in hint_tests['transitions'] if x['path']==update['path']);assert current['before']==live['after'];latest=_edited(final,current['edits']);_matches(latest,current['after']);assert self._member(current['after'])==latest
             v5_tests = json.loads(self._member(dict(path='compatibility/rc/current-tool-maintained-v5-tests-source-successor-v1.json', sha256='61b144081fd0aa72065962b283110951c4f9af54a359c4887191938b4513d444', bytes=6833)))
             assert v5_tests['schema_version'] == 1 and v5_tests['role'] == 'current-tool-maintained-v5-tests-source-successor' and v5_tests['source_parent'] == test_packet['source_parent'] and v5_tests['historical_programs_executed'] is False and v5_tests['artifact_or_audit_admission_granted'] is False
             assert [update['path'] for update in v5_tests['updates']] == ['tests/test_current_sass_tool_reference_v5.py','tests/current_sass_tool_reference_v5_probe.mjs']

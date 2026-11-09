@@ -118,8 +118,9 @@ class PlannerSuccessorTest(unittest.TestCase):
             self.assertEqual(child.returncode, 0, child.stderr)
             js = json.loads(child.stdout)
             self.assertEqual(js['result'], 'pass')
-            self.assertEqual(next(x for x in subject.bound if x['path'] == tool_module.MATRIX_OWNER['path']), tool_module.MATRIX_OWNER)
-            self.assertEqual(next(x for x in js['bound'] if x['path'] == 'scripts/current-tool-matrix-source.mjs'), dict(path='scripts/current-tool-matrix-source.mjs', sha256='42d5d1251e8cacf69f0d1519bd6ba9a356c9c9eaac0bf5c5af1eb8aba5b20f1c', bytes=24939))
-            py_bound = {x['path']: x for x in subject.bound if x['path'] not in ('scripts/current_sass_tool_references.py', 'scripts/current_tool_matrix_source.py')}
-            js_bound = {x['path']: x for x in js['bound'] if x['path'] not in ('scripts/current-sass-tool-references.mjs', 'scripts/current-tool-matrix-source.mjs')}
+            matrix = json.loads((ROOT / 'compatibility/rc/current-tool-matrix-hint-id-owner-successor-v1.json').read_bytes())
+            self.assertEqual(next(x for x in subject.bound if x['path'] == tool_module.MATRIX_OWNER['path']), matrix['transitions'][1]['after'])
+            self.assertEqual(next(x for x in js['bound'] if x['path'] == 'scripts/current-tool-matrix-source.mjs'), matrix['transitions'][0]['after'])
+            py_bound = {x['path']: x for x in subject.bound if x['path'] not in ('scripts/current_sass_tool_references.py',)}
+            js_bound = {x['path']: x for x in js['bound'] if x['path'] not in ('scripts/current-sass-tool-references.mjs',)}
             self.assertEqual(py_bound, js_bound)
