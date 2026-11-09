@@ -11,18 +11,21 @@ import {inputHarnessClosureFingerprint} from './api-input-harness-contract.mjs';
 import {compilerConstructorContract} from './api-compiler-constructor-contract.mjs';
 import {spinnerViewportProof} from './api-spinner-viewport-contract.mjs';
 import {selectScrollTokenProof} from './api-select-scroll-token-contract.mjs';
-import {qualifyApiV8Archive} from './api-v8-artifact-successor.mjs';
+import {qualifyApiV8Archive as qualifyOldApiV8Archive} from './api-v8-artifact-successor.mjs';
+import {qualifyApiHintIdArchive,API_HINT_ID_ARTIFACT_SHA,API_HINT_ID_FORM_BUNDLE_SHA,API_HINT_ID_FORM_MAP_SHA,API_HINT_ID_FORM_SOURCE_SHA} from './api-hint-id-artifact-successor.mjs';
+const qualifyApiV8Archive = archive => qualifyOldApiV8Archive(archive) || qualifyApiHintIdArchive(archive);
 import {exactMenuArtifact} from './api-menu-artifact.mjs';
 const require=createRequire(import.meta.url),ROOT=join(dirname(fileURLToPath(import.meta.url)),'..');
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const ID='legacy-select/primary/MatLegacySelect';
 const SHAPE='a62d7b852bf0191139f73f1de649118c5e6ba80808894a30ab978435bf3c551b';
 const D='8631a9313db5c51f3197ba1dc5cd0aafcca40fcee92ff277621799f3758c5015',B='ef9694e8e3aae5ec2170be660c71a322e2240dfd8b62a6ba66a9d89f43e61979';
-const COMMON='024a5038754a3beb5ebad9a34cec9aa7e07b2aaf1b2aa9fad2fec7064e41e725';
+const COMMON='024a5038754a3beb5ebad9a34cec9aa7e07b2aaf1b2aa9fad2fec7064e41e725',HINT_COMMON='81d851bb284d0210df9e9576c022d0e7235a04b3fa9c482e7b76d298d419af41';
+function contextCommon(context){try{if(!context?.tarball)return COMMON;const archive=readFileSync(context.tarball);return qualifyApiHintIdArchive(archive)?HINT_COMMON:qualifyOldApiV8Archive(archive)?COMMON:null;}catch{return null;}}
 // Same complete declaration closure already independently owned by the select
 // scroll-token contract. The new fixture must reach precisely that old closure.
 const PROGRAM={sources:322,sha256:'db4bc7ab37ceb69301a8d32d628cf40be7f003143444f449211215ea75e6d761'};
-const expectedProof=()=>({common:COMMON,declaration_sha256:D,bundle_sha256:B,program_sources:PROGRAM.sources,program_closure_sha256:PROGRAM.sha256,historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee'});
+const expectedProof=(common=COMMON)=>({common,declaration_sha256:D,bundle_sha256:B,program_sources:PROGRAM.sources,program_closure_sha256:PROGRAM.sha256,historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee'});
 
 function closure(program,fixture){
  return program.getSourceFiles().filter(file=>file.fileName!==fixture).map(file=>{
@@ -59,24 +62,25 @@ export function inspectSelectViewportProgram(context){
 export function selectViewportProof(symbol,spinner,scrollToken,context){try{
  if(symbol?.symbol_id!==ID||symbol.family!=='legacy-select'||symbol.kind!=='primary'||symbol.name!=='MatLegacySelect'||hash(JSON.stringify(symbol.shape))!==SHAPE)return null;
  const file=join(context.packageRoot,'types/ngx-compat-material-legacy-legacy-progress-spinner.d.ts');
- const common=spinnerViewportProof(spinner,{fileName:file,text:readFileSync(file,'utf8')},context);if(!common||hash(JSON.stringify(common))!==COMMON)return null;
+ const common=spinnerViewportProof(spinner,{fileName:file,text:readFileSync(file,'utf8')},context);const commonHash=contextCommon(context);if(!common||!commonHash||hash(JSON.stringify(common))!==commonHash)return null;
  const declaration=join(context.packageRoot,'types/ngx-compat-material-legacy-legacy-select.d.ts');
  const scroll=selectScrollTokenProof(scrollToken,{fileName:declaration,text:readFileSync(declaration,'utf8')},context);
  if(!scroll||scroll.tarball_sha256!==common.artifact_sha256||scroll.program_sources!==PROGRAM.sources||scroll.program_closure_sha256!==PROGRAM.sha256)return null;
  const result=inspectSelectViewportProgram(context);if(result.program_sources!==PROGRAM.sources||result.program_closure_sha256!==PROGRAM.sha256)return null;
- return expectedProof();
+ return expectedProof(commonHash);
 }catch{return null;}}
 
-export function selectViewportTokenCandidate(symbol,param,owned,token,proof){
- return symbol?.symbol_id===ID&&hash(JSON.stringify(symbol.shape))===SHAPE&&isDeepStrictEqual(proof,expectedProof())
+export function selectViewportTokenCandidate(symbol,param,owned,token,proof,context){
+ const common=contextCommon(context);
+ return symbol?.symbol_id===ID&&hash(JSON.stringify(symbol.shape))===SHAPE&&common&&isDeepStrictEqual(proof,expectedProof(common))
   &&param.ident==='ViewportRuler'&&param.imported==='ViewportRuler'&&param.spec==='@angular/cdk/scrolling'
   &&['optional','self','skipSelf','host'].every(flag=>!param[flag])
   &&typeof owned?._LegacyViewport==='function'&&token===owned._LegacyViewport;
 }
 
-export function selectViewportObservationProblems(row){
+export function selectViewportObservationProblems(row,context){
  if(row?.symbol?.symbol_id!==ID)return [];
- const proof=expectedProof();
+ const common=contextCommon(context);if(!common)return ['select viewport artifact evidence incomplete'];const proof=expectedProof(common);
  const expected={historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee',proof,node:{constructor_calls:1,constructor_arity:15,viewport_index:0,actual_node_element:true,owned_input_matches_node_provider:true,owned_metadata_token:true,stored_input_matches:true}};
  return hash(JSON.stringify(row.symbol.shape))===SHAPE&&row.factory_outcome==='returned'&&row.factory_returned_owned_instance===true
   &&row.factory_node_kind==='element'&&isDeepStrictEqual(row.factory_context_modules,['legacy-select/primary/MatLegacySelectModule'])

@@ -5,7 +5,9 @@ import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {isDeepStrictEqual} from 'node:util';
-import {qualifyApiV8Archive,API_V8_ARTIFACT_SHA} from './api-v8-artifact-successor.mjs';
+import {qualifyApiV8Archive as qualifyOldApiV8Archive,API_V8_ARTIFACT_SHA} from './api-v8-artifact-successor.mjs';
+import {qualifyApiHintIdArchive,API_HINT_ID_ARTIFACT_SHA,API_HINT_ID_FORM_BUNDLE_SHA,API_HINT_ID_FORM_MAP_SHA,API_HINT_ID_FORM_SOURCE_SHA} from './api-hint-id-artifact-successor.mjs';
+const qualifyApiV8Archive = archive => qualifyOldApiV8Archive(archive) || qualifyApiHintIdArchive(archive);
 import {exactMenuArtifact} from './api-menu-artifact.mjs';
 
 const profiles=Object.freeze({
@@ -21,10 +23,10 @@ export function qualifyOwnedNodeInjector({symbol,Type,parameterType,core,source,
  const profile=ownedNodeInjectorProfile(symbol);assert.ok(profile,'unknown owned node Injector profile');
  assert.equal(symbol.family,profile.family);assert.equal(symbol.name,profile.public_name);
  assert.equal(hash(JSON.stringify(symbol.shape)),shapes[symbol.symbol_id]);
- assert.ok(context?.tarball&&context.packageRoot);assert.ok(qualifyApiV8Archive(readFileSync(context.tarball)));
+ assert.ok(context?.tarball&&context.packageRoot);const archive=readFileSync(context.tarball),isHint=qualifyApiHintIdArchive(archive);assert.ok(isHint||qualifyOldApiV8Archive(archive));const artifact=isHint?API_HINT_ID_ARTIFACT_SHA:API_V8_ARTIFACT_SHA,bundle=isHint&&symbol.symbol_id==='legacy-form-field/primary/MatLegacyFormField'?API_HINT_ID_FORM_BUNDLE_SHA:profile.bundle_sha256;
  assert.ok(exactMenuArtifact(context,context.packageRoot));
  const file='fesm2022/ngx-compat-material-legacy-'+profile.family+'.mjs',raw=readFileSync(join(context.packageRoot,file));
- assert.equal(hash(raw),profile.bundle_sha256);assert.equal(raw.toString(),source);
+ assert.equal(hash(raw),bundle);assert.equal(raw.toString(),source);
  assert.equal(Type.name,profile.public_name);assert.equal(parameterType.name,profile.parameter_owner);
  for(const selected of new Set([Type,parameterType])){
   const text=Function.prototype.toString.call(selected);assert.ok(source.includes(text));assert.equal(source.split(text).length,2,'ambiguous loaded constructor source');
@@ -32,7 +34,7 @@ export function qualifyOwnedNodeInjector({symbol,Type,parameterType,core,source,
  assert.equal(originalParameters.length,profile.original_arity);assert.equal(metadata.length,profile.original_arity+1);assert.equal(compiler.parameters.length,metadata.length);
  assert.equal(compiler.parameter_class_name,profile.parameter_owner);assert.deepEqual(compiler.parameters.at(-1),parameter(profile));
  const reflected=metadata.at(-1);assert.equal(reflected.type,core.Injector);assert.ok(reflected.decorators===undefined||Array.isArray(reflected.decorators)&&reflected.decorators.length===0);
- return {symbol_id:symbol.symbol_id,artifact_sha256:API_V8_ARTIFACT_SHA,bundle_sha256:profile.bundle_sha256,parameter:parameter(profile)};
+ return {symbol_id:symbol.symbol_id,artifact_sha256:artifact,bundle_sha256:bundle,parameter:parameter(profile)};
 }
 
 export function captureOwnedNodeInjector(proof,captured,core,node){
@@ -55,20 +57,22 @@ export function finishOwnedNodeInjector(factory,fixture,core){
  context.child_scope_matched=true;context.parent_scope_distinct=true;
 }
 
-function expectedContext(symbolId){
- const profile=profiles[symbolId];assert.ok(profile);
- return {symbol_id:symbolId,artifact_sha256:API_V8_ARTIFACT_SHA,bundle_sha256:profile.bundle_sha256,parameter:parameter(profile),original_arity:profile.original_arity,current_arity:profile.original_arity+1,constructor_calls:1,stored_input_identical:true,node_element_matched:true,application_matched:true,child_scope_matched:true,parent_scope_distinct:true};
+function expectedContext(symbolId,artifact=API_V8_ARTIFACT_SHA){
+ const profile=profiles[symbolId];assert.ok(profile);assert.ok([API_V8_ARTIFACT_SHA,API_HINT_ID_ARTIFACT_SHA].includes(artifact));const bundle=artifact===API_HINT_ID_ARTIFACT_SHA&&symbolId==='legacy-form-field/primary/MatLegacyFormField'?API_HINT_ID_FORM_BUNDLE_SHA:profile.bundle_sha256;
+ return {symbol_id:symbolId,artifact_sha256:artifact,bundle_sha256:bundle,parameter:parameter(profile),original_arity:profile.original_arity,current_arity:profile.original_arity+1,constructor_calls:1,stored_input_identical:true,node_element_matched:true,application_matched:true,child_scope_matched:true,parent_scope_distinct:true};
 }
-export function ownedNodeInjectorObservationProblems(row){
- const profile=ownedNodeInjectorProfile(row.symbol);if(!profile)return [];
+export function ownedNodeInjectorObservationProblems(row,{tarball}={}){
+ const profile=ownedNodeInjectorProfile(row.symbol);if(!profile)return [];let artifact=API_V8_ARTIFACT_SHA;
+ if(tarball){try{const bytes=readFileSync(tarball);artifact=qualifyApiHintIdArchive(bytes)?API_HINT_ID_ARTIFACT_SHA:qualifyOldApiV8Archive(bytes)?API_V8_ARTIFACT_SHA:null;}catch{artifact=null;}}
+ if(!artifact)return ['owned trailing Injector artifact evidence incomplete'];
  return row.factory_outcome==='returned'&&row.factory_returned_owned_instance===true&&row.factory_node_kind==='element'
   &&isDeepStrictEqual(row.factory_context_modules,[profile.family+'/primary/'+profile.public_name+'Module'])
   &&row.factory_context==='actual Angular element/template nodes and public application providers with synthetic Renderer2/server DOM and public MockPlatformLocation URL backend; native/browser/AOT/packed/floors separate'
-  &&row.symbol.shape&&hash(JSON.stringify(row.symbol.shape))===shapes[row.symbol.symbol_id]&&isDeepStrictEqual(row.factory_owned_node_injector_context,expectedContext(row.symbol.symbol_id))?[]:['owned trailing Injector source/input/node-scope evidence incomplete'];
+  &&row.symbol.shape&&hash(JSON.stringify(row.symbol.shape))===shapes[row.symbol.symbol_id]&&isDeepStrictEqual(row.factory_owned_node_injector_context,expectedContext(row.symbol.symbol_id,artifact))?[]:['owned trailing Injector source/input/node-scope evidence incomplete'];
 }
 
 export function assertOwnedNodeInjectorContext(context,symbolId){
- assert.deepEqual(context,expectedContext(symbolId));
+ assert.deepEqual(context,expectedContext(symbolId,context?.artifact_sha256));
 }
 
 /** Data view for the unchanged original-parameter motion check. The current

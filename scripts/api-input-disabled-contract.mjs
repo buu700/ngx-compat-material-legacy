@@ -6,7 +6,9 @@
  * Finite qualification of the reviewed native-disabled input repair.
  */
 import {createHash} from 'node:crypto';
-import {qualifyApiV8Archive} from './api-v8-artifact-successor.mjs';
+import {qualifyApiV8Archive as qualifyOldApiV8Archive} from './api-v8-artifact-successor.mjs';
+import {qualifyApiHintIdArchive,API_HINT_ID_ARTIFACT_SHA,API_HINT_ID_FORM_BUNDLE_SHA,API_HINT_ID_FORM_MAP_SHA,API_HINT_ID_FORM_SOURCE_SHA} from './api-hint-id-artifact-successor.mjs';
+const qualifyApiV8Archive = archive => qualifyOldApiV8Archive(archive) || qualifyApiHintIdArchive(archive);
 import {createRequire} from 'node:module';
 import {gunzipSync} from 'node:zlib';
 import {existsSync,readFileSync,realpathSync,readdirSync,lstatSync} from 'node:fs';

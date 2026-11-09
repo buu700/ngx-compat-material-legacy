@@ -9,6 +9,7 @@
 export {settleInputDisabled} from './api-input-disabled-contract.mjs';
 import {inputDisabledProof} from './api-input-disabled-contract.mjs';
 import {API_V8_ARTIFACT_SHA} from './api-v8-artifact-successor.mjs';
+import {API_HINT_ID_ARTIFACT_SHA,receiptArchiveMatches} from './api-hint-id-artifact-successor.mjs';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {readFileSync,readdirSync} from 'node:fs';
@@ -192,7 +193,7 @@ export function finishInputBehavior(state,value,fixture,lifetime,evidence){
  assert.ok(!fixture.element.destroyed&&!fixture.template.destroyed&&!fixture.parentNode.destroyed&&!fixture.component.hostView.destroyed&&!fixture.environment.destroyed,'input destroyed borrowed caller context');
  return {...evidence,behavior_checks:state.checks.map(id=>({id,result:'pass'})),state_changes_completed:true,borrowed_autofill_destroy_calls:0,borrowed_parent_destroy_calls:0,borrowed_context_alive:true};
 }
-export function inputObservationProblems(row){
+export function inputObservationProblems(row,context){
  if(row?.symbol?.symbol_id!==INPUT_SYMBOL)return [];
  const contract=inputContract(row.symbol),x=row.factory_input_context;
  const exactKeys=(value,keys)=>Boolean(value&&typeof value==='object'&&!Array.isArray(value)&&isDeepStrictEqual(Object.keys(value).sort(),[...keys].sort()));
@@ -205,7 +206,7 @@ export function inputObservationProblems(row){
   ||x.parent_requests.some((r,index)=>!exactKeys(r,['index','identity_matched','unresolved',...flags])||!exactKeys(x.control_requests[index],['index',...flags])||r.index!==index||r.identity_matched!==true||r.unresolved!==false||x.control_requests[index].index!==index||flags.some(f=>typeof r[f]!=='boolean'||r[f]!==x.control_requests[index][f]))
   ||(owned&&(x.sources?.parent?.sha256!=='8310dfca1200ffd7e426ff64641e1794a2af9a4f1c1860a44a51ac8c6d638b69'||x.sources?.parent?.class_text_sha256!=='ee7f5ec23a123c1fbf0a90e6a44ff5b1ce82e42d4e2617ed5defdbe5737cdc69'))
   ||(owned&&(x.sources?.owned?.sha256!=='9d1ccb5328d4e8c430874b0547717bc57c8cc069d461e274e7a2f74f6cb573c1'||x.sources?.owned?.class_text_sha256!=='3be742f8ab06b844294554e93ab3af355d5628a6979c9b3e18638efe47d881ca'))
-  ||(owned&&(!exactKeys(owned,['token','identity_matched','optional','self','skipSelf','host','unresolved','owned_field_origin','native_node_identical','artifact_sha256','owned_source_sha256','helper_collision_risk'])||owned.helper_collision_risk!=='Exact protected helper additions can break subclasses declaring incompatible private members; accepted only for these two names and types.'||owned.token!=='@angular/core:ElementRef'||!['a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2','66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca',API_V8_ARTIFACT_SHA].includes(owned.artifact_sha256)||owned.owned_source_sha256!=='aaa55d58b06ef58c6dfca26053854696526e3529e7ed15ba3ef382ec323e8532'||['identity_matched','owned_field_origin','native_node_identical'].some(k=>owned[k]!==true)||['optional','self','skipSelf','host','unresolved'].some(k=>owned[k]!==false)))
+  ||(owned&&(!exactKeys(owned,['token','identity_matched','optional','self','skipSelf','host','unresolved','owned_field_origin','native_node_identical','artifact_sha256','owned_source_sha256','helper_collision_risk'])||owned.helper_collision_risk!=='Exact protected helper additions can break subclasses declaring incompatible private members; accepted only for these two names and types.'||owned.token!=='@angular/core:ElementRef'||!['a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2','66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca',API_V8_ARTIFACT_SHA,API_HINT_ID_ARTIFACT_SHA].includes(owned.artifact_sha256)||!receiptArchiveMatches(context,owned.artifact_sha256)||owned.owned_source_sha256!=='aaa55d58b06ef58c6dfca26053854696526e3529e7ed15ba3ef382ec323e8532'||['identity_matched','owned_field_origin','native_node_identical'].some(k=>owned[k]!==true)||['optional','self','skipSelf','host','unresolved'].some(k=>owned[k]!==false)))
   ||!exactKeys(x.sources,['parent','owned'])||Object.values(x.sources).some(s=>!exactKeys(s,['file','sha256','class_text_sha256']))
   ||!x.sources?.parent?.file?.match(/\/fesm2022\/(?:input|_input[-\w]*chunk)\.mjs$/)||!x.sources?.owned?.file?.endsWith('/fesm2022/ngx-compat-material-legacy-legacy-input.mjs')||Object.values(x.sources||{}).some(s=>['sha256','class_text_sha256'].some(k=>!/^([a-f0-9]{64})$/.test(s[k]||'')))
   ||['public_parent_identity_matched','owned_field_ast_verified','original_native_node_identical','borrowed_services_identical','legacy_token_distinct','legacy_field_value_identical','state_changes_completed','borrowed_context_alive'].some(k=>x[k]!==true)||x.borrowed_autofill_destroy_calls!==0||x.borrowed_parent_destroy_calls!==0||x.caller_kind!=='legacy'||x.genuine_legacy_parent_control_scope!==true

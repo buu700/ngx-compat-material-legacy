@@ -457,7 +457,7 @@ if (isMain) {
     {tarball, packageRoot: extracted.packageRoot, referenceRoot: refRoot});
   const diRows = await observeRuntimeDi(extracted.packageRoot, surface.symbols, [], undefined, {tarball, packageRoot: extracted.packageRoot, referenceRoot: refRoot});
   const diRecords = JSON.parse(readFileSync(join(root, 'compatibility/rc/api/di-differences.json'), 'utf8')).differences || [];
-  const diSettled = diRows.map(row => settleDi(row, diRecords));
+  const diSettled = diRows.map(row => settleDi(row, diRecords, {tarball}));
   const summary = summarizeDiscrepancies(declared.observations);
   const exportFails = [
     ...declared.entryResults.filter(item => item.result !== 'pass'),
@@ -520,8 +520,8 @@ if (isMain) {
   }
 }
 
-export function settleDi(row, records) {
-  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...ownedDialogFocusObservationProblems(row),...menuContentObservationProblems(row),...simpleSnackObservationProblems(row),...dialogOpenerObservationProblems(row),...autocompleteObservationProblems(row),...tabBodyObservationProblems(row),...tabHeaderObservationProblems(row),...tabPortalObservationProblems(row),...tableDefinitionObservationProblems(row),...inputObservationProblems(row),...menuTriggerObservationProblems(row),...spinnerViewportObservationProblems(row),...autocompleteViewportObservationProblems(row),...tablinkViewportObservationProblems(row)]};
+export function settleDi(row, records, artifactContext = null) {
+  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...ownedDialogFocusObservationProblems(row),...menuContentObservationProblems(row),...simpleSnackObservationProblems(row),...dialogOpenerObservationProblems(row),...autocompleteObservationProblems(row),...tabBodyObservationProblems(row),...tabHeaderObservationProblems(row),...tabPortalObservationProblems(row),...tableDefinitionObservationProblems(row),...inputObservationProblems(row,artifactContext),...menuTriggerObservationProblems(row),...spinnerViewportObservationProblems(row,artifactContext),...autocompleteViewportObservationProblems(row,artifactContext),...tablinkViewportObservationProblems(row,artifactContext)]};
   if(row.symbol.symbol_id===RIPPLE_SYMBOL){
     const contract=approvedRippleContract(row.symbol),problems=[...row.problems,...rippleFactoryObservationProblems(row,contract)];
     return {...row,problems,result:problems.length?'fail':'pass',status:problems.length?'mismatch':'intentional-legacy-difference',
@@ -542,7 +542,7 @@ export function settleDi(row, records) {
     row={...row,problems:[...row.problems,...problems]};
   }
   if (!approvedMenuItemContract(row.symbol) && row.symbol.symbol_id!==TABLE_SYMBOL)
-    row={...row,problems:[...row.problems,...attributeConstructorObservationProblems(row)]};
+    row={...row,problems:[...row.problems,...attributeConstructorObservationProblems(row,{artifactContext})]};
   if(!approvedMenuItemContract(row.symbol)&&row.symbol.symbol_id!==TABLE_SYMBOL
     &&row.factory_context?.startsWith('actual Angular')&&row.factory_outcome==='returned')
     row={...row,problems:[...row.problems,...publicConstructorPartitionProblems(row.factory_peer_constructor_partition)]};

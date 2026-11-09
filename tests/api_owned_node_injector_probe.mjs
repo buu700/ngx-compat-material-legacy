@@ -21,7 +21,7 @@ const records=JSON.parse(readFileSync('compatibility/rc/api/di-differences.json'
 writeFileSync(report,JSON.stringify({role:'Actual current selected-factory observations; mutation controls follow',rows},null,2)+'\n',{flag:'wx'});
 let rejected=0,producerRejected=0;
 for(const row of rows){
- const settled=settleDi(row,records);assert.equal(settled.result,'pass',JSON.stringify({symbol:row.symbol.symbol_id,problems:settled.problems,error:row.factory_error,stack:row.factory_error_stack}));
+ const settled=settleDi(row,records,{tarball});assert.equal(settled.result,'pass',JSON.stringify({symbol:row.symbol.symbol_id,problems:settled.problems,error:row.factory_error,stack:row.factory_error_stack}));
  const extra=row.factory_owned_node_injector_context,arity=ownedNodeInjectorProfile(row.symbol).original_arity;
  assert.equal(extra.original_arity,arity);assert.equal(extra.current_arity,arity+1);
  assert.equal(row.runtime_requests.length,arity-(row.symbol.family==='legacy-select'?1:0));
@@ -92,8 +92,8 @@ for(const row of rows){
  else mutations.push(['factory_owned_motion_context.constructor_animation_mode.original_constructor_arity',8],['factory_owned_motion_context.constructor_animation_mode.original_parameter_index',7]);
  for(const [path,value] of mutations){
   const changed=structuredClone(row),parts=path.split('.'),last=parts.pop(),parent=parts.reduce((object,key)=>object[key],changed);parent[last]=value;
-  if(path==='symbol.shape.originalFactoryContext.factory_parameters.0.ident')assert.throws(()=>settleDi(changed,records),/original factory context changed/);
-  else assert.notEqual(settleDi(changed,records).result,'pass',row.symbol.symbol_id+': '+path);
+  if(path==='symbol.shape.originalFactoryContext.factory_parameters.0.ident')assert.throws(()=>settleDi(changed,records,{tarball}),/original factory context changed/);
+  else assert.notEqual(settleDi(changed,records,{tarball}).result,'pass',row.symbol.symbol_id+': '+path);
   rejected++;
  }
 }

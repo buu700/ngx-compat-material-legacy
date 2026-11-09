@@ -8,7 +8,9 @@
  */
 import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
-import {qualifyApiV8Archive,API_V8_ARTIFACT_SHA} from './api-v8-artifact-successor.mjs';
+import {qualifyApiV8Archive as qualifyOldApiV8Archive,API_V8_ARTIFACT_SHA} from './api-v8-artifact-successor.mjs';
+import {qualifyApiHintIdArchive,API_HINT_ID_ARTIFACT_SHA,API_HINT_ID_FORM_BUNDLE_SHA,API_HINT_ID_FORM_MAP_SHA,API_HINT_ID_FORM_SOURCE_SHA,receiptArchiveMatches} from './api-hint-id-artifact-successor.mjs';
+const qualifyApiV8Archive = archive => qualifyOldApiV8Archive(archive) || qualifyApiHintIdArchive(archive);
 import {readFileSync,existsSync,realpathSync,readdirSync,lstatSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
 import {compilerConstructorContract} from './api-compiler-constructor-contract.mjs';
@@ -91,14 +93,14 @@ export function spinnerViewportProof(symbol,file,context){try{
  return {artifact_sha256:hash(archive),declaration_sha256:D,bundle_sha256:B,program_sources:sources.length,program_closure_sha256:fingerprint,identity:'distinct owned replacement',manual_type:'historical and minimum CDK arguments accepted one way',provider:'historical 16 and minimum 22 providers do not select owned token; private token has no stable customization guarantee'};
 }catch{return null;}}
 export function settleSpinnerViewport(symbol,file,signature,context){const proof=spinnerViewportProof(symbol,file,context);if(!proof)return signature;const pairs=[[OLD,null],[null,NEW]],rows=(signature.rows||[]).filter(r=>r.status==='mismatch'&&pairs.some(p=>JSON.stringify(p)===JSON.stringify([r.historical,r.owned])));if(rows.length!==2||new Set(rows.map(r=>JSON.stringify([r.historical,r.owned]))).size!==2||signature.blocking.length!==2||!signature.blocking.includes(OLD)||!signature.blocking.includes(NEW))return signature;return {...signature,blocking:[],rows:signature.rows.map(r=>rows.includes(r)?{...r,status:'intentional-legacy-difference',rationale:'Owned docs-private viewport replaces the historical docs-private token; manual arguments remain structurally accepted but DI token identity differs.',proof}:r),spinner_viewport_proof:proof};}
-export function spinnerViewportObservationProblems(row){
+export function spinnerViewportObservationProblems(row,context){
  if(row?.symbol?.symbol_id!==ID)return [];
  const bad=['spinner viewport replacement receipt incomplete'];
  if(hash(JSON.stringify(row.symbol.shape))!=='050d8d4a0bfd373fc45705e8170172241593edd6eed409add8b5662a13c2dc5f'||row.factory_outcome!=='returned'||row.factory_returned_owned_instance!==true||row.factory_node_kind!=='element'||JSON.stringify(row.factory_context_modules)!==JSON.stringify(['legacy-progress-spinner/primary/MatLegacyProgressSpinnerModule'])||row.factory_context!=='actual Angular element/template nodes and public application providers with synthetic Renderer2/server DOM and public MockPlatformLocation URL backend; native/browser/AOT/packed/floors separate')return bad;
  const req=row.runtime_requests,labels=['ElementRef','Platform','DocumentToken','AnimationModuleType','mat-progress-spinner-default-options','ChangeDetectorRef','_LegacyViewport','NgZone','CSP nonce'];
  const ps=row.symbol.shape.originalFactoryContext?.factory_parameters;if(!Array.isArray(req)||req.length!==9||!Array.isArray(ps)||ps.length!==9)return bad;
  for(let i=0;i<9;i++){const r=req[i],p=ps[i];if(r.expected_ident!==p.ident||r.expected_spec!==p.spec||r.observed_label!==labels[i]||r.identity_matched!==(i!==6)||r.unresolved!==false||r.observation_evidence!=='public Injector request trace'||['optional','self','skipSelf','host'].some(f=>r[f]!==Boolean(p[f])||r['expected_'+f]!==Boolean(p[f])))return bad;}
- const artifact=req[6]?.intentional_token_difference?.proof?.artifact_sha256;if(!['a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2','66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca',API_V8_ARTIFACT_SHA].includes(artifact))return bad;
+ const artifact=req[6]?.intentional_token_difference?.proof?.artifact_sha256;if(!['a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2','66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca',API_V8_ARTIFACT_SHA,API_HINT_ID_ARTIFACT_SHA].includes(artifact)||!receiptArchiveMatches(context,artifact))return bad;
  const expectedProof={artifact_sha256:artifact,declaration_sha256:D,bundle_sha256:B,program_sources:309,program_closure_sha256:'cce5ea0cfb917ec87bb9a750f0f428b080739af35c0d8a3884939ec0901680be',identity:'distinct owned replacement',manual_type:'historical and minimum CDK arguments accepted one way',provider:'historical 16 and minimum 22 providers do not select owned token; private token has no stable customization guarantee'};
  const expected={historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',historical_provider_selects_actual:false,minimum_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee',proof:expectedProof,node:{constructor_calls:1,constructor_arity:9,viewport_index:6,actual_node_element:true,owned_input_matches_node_provider:true,owned_metadata_token:true}};
  if(JSON.stringify(req[6].intentional_token_difference)!==JSON.stringify(expected))return bad;

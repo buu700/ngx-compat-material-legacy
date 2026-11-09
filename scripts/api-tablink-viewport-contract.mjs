@@ -12,6 +12,7 @@ import {fileURLToPath} from 'node:url';
 import {isDeepStrictEqual} from 'node:util';
 import {inputHarnessClosureFingerprint} from './api-input-harness-contract.mjs';
 import {compilerConstructorContract} from './api-compiler-constructor-contract.mjs';
+import {receiptArchiveMatches} from './api-hint-id-artifact-successor.mjs';
 import {spinnerViewportProof} from './api-spinner-viewport-contract.mjs';
 import {tabHeaderSourceScopes} from './api-tab-header-context.mjs';
 const require=createRequire(import.meta.url),hash=x=>createHash('sha256').update(x).digest('hex'),sha=hash,ROOT=join(dirname(fileURLToPath(import.meta.url)),'..');
@@ -32,7 +33,8 @@ const versions={
  '66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca':{bundle:'ab6891ffa20dfd036d6f5ff7d81925df754bed95fc0ca3953a04fec0e3c098ac',navSource:'daf7d6f4c83292e7d3bf24eaf675b5cfc6c3fe341b779c5e801c23ef49d30f7f',common:'89cd46c3a6936097b9425d41ceb3905f2cc7e23730c71bf6ab36a93edb0a1fb5',offset:8},
  // spinnerViewportProof authenticates v8 before this exact profile is selected.
  // Its receipt retains the actual v8 archive identity; executable tabs are equal.
- 'fd5b57f85aaa7b61f82f15a0dfb9ef12e65e6c80bdc47984d6917f0a517c3ce5':{bundle:'ab6891ffa20dfd036d6f5ff7d81925df754bed95fc0ca3953a04fec0e3c098ac',navSource:'daf7d6f4c83292e7d3bf24eaf675b5cfc6c3fe341b779c5e801c23ef49d30f7f',common:'024a5038754a3beb5ebad9a34cec9aa7e07b2aaf1b2aa9fad2fec7064e41e725',offset:8}
+ 'fd5b57f85aaa7b61f82f15a0dfb9ef12e65e6c80bdc47984d6917f0a517c3ce5':{bundle:'ab6891ffa20dfd036d6f5ff7d81925df754bed95fc0ca3953a04fec0e3c098ac',navSource:'daf7d6f4c83292e7d3bf24eaf675b5cfc6c3fe341b779c5e801c23ef49d30f7f',common:'024a5038754a3beb5ebad9a34cec9aa7e07b2aaf1b2aa9fad2fec7064e41e725',offset:8},
+ '877c8b62e1ea9b134d838043dda436abb4ccf9515041640fdb05dc6113727b0b':{bundle:'ab6891ffa20dfd036d6f5ff7d81925df754bed95fc0ca3953a04fec0e3c098ac',navSource:'daf7d6f4c83292e7d3bf24eaf675b5cfc6c3fe341b779c5e801c23ef49d30f7f',common:'81d851bb284d0210df9e9576c022d0e7235a04b3fa9c482e7b76d298d419af41',offset:8}
 };
 function sourceScope(profile){const n=profile.offset;return {file:'fesm2022/ngx-compat-material-legacy-legacy-tabs.mjs',sha256:profile.bundle,owner_text_sha256:'5e9b4f6e16a70d3385259a45b6c1a587435f5e5d09dce244867e1bbfbbf81b19',helper_text_sha256:'240504b1d61cc7feee5cf56873f53f4c6f8132f4b49282c73508ca51fe7f06d4',owner_export:'MatLegacyPaginatedTabHeader',owner_local:'MatPaginatedTabHeader',selected_export:'MatLegacyTabNav',selected_local:'MatLegacyTabNav',owner_start:83493+n,owner_end:109635+n,field_start:83664+n,field_end:83689+n};}
 
@@ -54,14 +56,14 @@ export function tablinkViewportProof(symbol,parent,spinner,context,owned,parentT
  const sources=closure(positive.program,fixture),fingerprint=inputHarnessClosureFingerprint(sources);if(sources.length!==310||fingerprint!=='d2b49458be7423211f05d1f95ff12acf6b96891a13d589324fd63cbfb557498f'||hash(JSON.stringify(common))!==profile.common)return null;
  return {common:hash(JSON.stringify(common)),declaration_sha256:D,bundle_sha256:B,program_sources:sources.length,program_closure_sha256:fingerprint,source:scope,historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee'};
 }catch{return null;}}
-export function tablinkViewportObservationProblems(row){
+export function tablinkViewportObservationProblems(row,context){
  if(!Object.hasOwn(profiles,row?.symbol?.symbol_id))return [];const bad=['tab-link parent viewport replacement receipt incomplete'];
  if(hash(JSON.stringify(row.symbol.shape))!==profiles[row.symbol.symbol_id]||row.factory_outcome!=='returned'||row.factory_returned_owned_instance!==true||row.factory_node_kind!=='element'||!isDeepStrictEqual(row.factory_context_modules,['legacy-tabs/primary/MatLegacyTabsModule'])||row.factory_context!=='actual Angular element/template nodes and public application providers with synthetic Renderer2/server DOM and public MockPlatformLocation URL backend; native/browser/AOT/packed/floors separate')return bad;
  const parent=row.factory_parent_construction;if(parent?.symbol_id!=='legacy-tabs/primary/MatLegacyTabNav'||parent.returned_owned_instance!==true||parent.parent_node!=='actual parent Angular element'||parent.constructor_evidence?.length!==7||!isDeepStrictEqual(parent.constructor_evidence[4],{index:4,attribute:null,input_verified:true,scope_challenge:null}))return bad;
  const compiler=parent.compiler_observation;if(compiler?.parameters?.length!==7||!isDeepStrictEqual(compiler.parameters[4],{index:4,token_expression:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',attribute:null,optional:false,self:false,skipSelf:false,host:false}))return bad;
  const req=row.runtime_requests,ps=row.symbol.shape.originalFactoryContext?.factory_parameters?.filter(p=>!p.attribute),labels=row.symbol.name==='MatLegacyTabLink'?['MatLegacyTabNav','ElementRef','NgZone','Platform','mat-ripple-global-options','FocusMonitor','AnimationModuleType']:['_MatTabNavBase','ElementRef','mat-ripple-global-options','FocusMonitor','AnimationModuleType'];if(!Array.isArray(req)||!Array.isArray(ps)||req.length!==labels.length||ps.length!==labels.length)return bad;
  for(let i=0;i<req.length;i++){const r=req[i],p=ps[i];if(r.expected_ident!==p.ident||r.expected_spec!==p.spec||r.observed_label!==labels[i]||r.identity_matched!==true||r.unresolved!==false||r.observation_evidence!=='actual compiler metadata token identity and captured constructor input'||['optional','self','skipSelf','host'].some(f=>r[f]!==Boolean(p[f])||r['expected_'+f]!==Boolean(p[f])))return bad;}
- const observedProof=parent.viewport_replacement?.proof,profile=Object.values(versions).find(v=>v.bundle===observedProof?.bundle_sha256&&v.common===observedProof?.common);if(!profile)return bad;
+ const observedProof=parent.viewport_replacement?.proof,entry=Object.entries(versions).find(([,v])=>v.bundle===observedProof?.bundle_sha256&&v.common===observedProof?.common);if(!entry||!receiptArchiveMatches(context,entry[0]))return bad;const profile=entry[1];
  const proof={common:profile.common,declaration_sha256:D,bundle_sha256:profile.bundle,program_sources:310,program_closure_sha256:'d2b49458be7423211f05d1f95ff12acf6b96891a13d589324fd63cbfb557498f',source:sourceScope(profile),historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee'};
  const expected={identity_matched:false,historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,proof,node:{constructor_arity:7,viewport_index:4,parent_node:true,owned_input_matches_parent_provider:true,owned_metadata_token:true,stored_input_matches:true}};
  return isDeepStrictEqual(parent.viewport_replacement,expected)?[]:bad;

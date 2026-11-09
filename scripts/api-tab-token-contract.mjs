@@ -8,7 +8,9 @@
  */
 import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
-import {qualifyApiV8Archive} from './api-v8-artifact-successor.mjs';
+import {qualifyApiV8Archive as qualifyOldApiV8Archive} from './api-v8-artifact-successor.mjs';
+import {qualifyApiHintIdArchive,API_HINT_ID_ARTIFACT_SHA,API_HINT_ID_FORM_BUNDLE_SHA,API_HINT_ID_FORM_MAP_SHA,API_HINT_ID_FORM_SOURCE_SHA} from './api-hint-id-artifact-successor.mjs';
+const qualifyApiV8Archive = archive => qualifyOldApiV8Archive(archive) || qualifyApiHintIdArchive(archive);
 import {readFileSync,existsSync,realpathSync,readdirSync,lstatSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
 import {inputHarnessClosureFingerprint} from './api-input-harness-contract.mjs';

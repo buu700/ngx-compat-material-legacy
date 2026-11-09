@@ -121,7 +121,7 @@ export function challengeAttributeDetectorScopes(factory,fixture){
 }
 
 /** Serialized execution evidence is required by settlement, as well as producer success. */
-export function attributeConstructorObservationProblems(row,{force=false}={}){
+export function attributeConstructorObservationProblems(row,{force=false,artifactContext=null}={}){
  const parameters=row.symbol.shape.originalFactoryContext?.factory_parameters||row.symbol.shape.diParams||[];
  const ownedProfile=ownedNodeInjectorProfile(row.symbol);
  if(!force&&!parameters.some(p=>p.attribute)&&!ownedProfile)return [];
@@ -137,11 +137,11 @@ export function attributeConstructorObservationProblems(row,{force=false}={}){
   return ['attribute constructor inheritance evidence incomplete'];
  const problems=[];
  if(ownedProfile){
-  problems.push(...ownedNodeInjectorObservationProblems(row));
+  problems.push(...ownedNodeInjectorObservationProblems(row,artifactContext||{}));
   if(JSON.stringify(compiler.parameters.at(-1))!==JSON.stringify(row.factory_owned_node_injector_context?.parameter))
    problems.push('owned trailing Injector compiler observation differs');
   const expected=parameters.filter(parameter=>!parameter.attribute),requests=row.runtime_requests;
-  const viewportProblems=ownedProfile.family==='legacy-select'?selectViewportObservationProblems(row):[];problems.push(...viewportProblems);
+  const viewportProblems=ownedProfile.family==='legacy-select'?selectViewportObservationProblems(row,artifactContext):[];problems.push(...viewportProblems);
   const selectViewport=ownedProfile.family==='legacy-select'&&viewportProblems.length===0;
   if(!Array.isArray(requests)||requests.length!==expected.length||expected.some((parameter,index)=>{
    const request=requests[index];
