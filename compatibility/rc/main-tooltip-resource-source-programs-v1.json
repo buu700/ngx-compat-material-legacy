@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "role": "main-tooltip-resource-source-program-continuation",
+  "base_head": "8fe95564c981a9dd73605d27beaa0496824e8444",
+  "updates": [
+    {
+      "path": "scripts/current-sass-source.mjs",
+      "before": {
+        "path": "scripts/current-sass-source.mjs",
+        "sha256": "7bb757ac9558bceb3280fa439d43c382c603540f4c5a534c4043db9d6c071192",
+        "bytes": 25182
+      },
+      "after": {
+        "path": "scripts/current-sass-source.mjs",
+        "sha256": "39b22e0fa057899769cbe3895a67b2b77c2ab543d770c5f72c4ef657da6f7ea6",
+        "bytes": 28397
+      },
+      "edits": [
+        {
+          "offset": 1405,
+          "before": "",
+          "after": "const TOOLTIP_RESOURCE_PACKET = Object.freeze({path: 'compatibility/rc/current-main-tooltip-resource-source-v1.json',\n  sha256: '05abc16cda2e5a3fea79f4b054f34586de88b57febc9569185fe9ce00102747e', bytes: 1246});\n"
+        },
+        {
+          "offset": 12762,
+          "before": "  let focusStyle=null,gitStyleBefore=null;\n",
+          "after": "  let focusStyle=null,gitStyleBefore=null,tooltipResource=null,gitTooltipBefore=null;\n"
+        },
+        {
+          "offset": 12831,
+          "before": "    const projected=focusStyle && row.path===focusStyle.before.path && row.sha256===focusStyle.before.sha256;\n    if(projected)assert.equal(row.bytes,focusStyle.before.bytes);\n    const expected = projected ? focusStyle.after : sixth.qualify(row) ?? focus.qualify(row) ?? product.qualify(row) ?? graphSuccessor?.qualify(row) ?? row;\n",
+          "after": "    const projected = [focusStyle, tooltipResource].find(style => style &&\n      row.path === style.before.path && row.sha256 === style.before.sha256);\n    if(projected)assert.equal(row.bytes,projected.before.bytes);\n    const expected = projected ? projected.after : sixth.qualify(row) ?? focus.qualify(row) ?? product.qualify(row) ?? graphSuccessor?.qualify(row) ?? row;\n"
+        },
+        {
+          "offset": 15564,
+          "before": "",
+          "after": "  }\n  if (initialLine === 'main') {\n    const resourceRaw = read(TOOLTIP_RESOURCE_PACKET.path);\n    assert.deepEqual(reference(TOOLTIP_RESOURCE_PACKET.path, resourceRaw), TOOLTIP_RESOURCE_PACKET);\n    const resource = JSON.parse(resourceRaw);\n    assert.equal(resource.schema_version, 1);\n    assert.equal(resource.role, 'finite-current-main-tooltip-resource-source');\n    assert.equal(resource.line, 'main');\n    for (const [key, expected] of Object.entries({source_scope_only: true, historical_programs_executed: false,\n      historical_packets_rewritten: false, loaded_theme_source_sets_changed: false,\n      css_or_artifact_admission_granted: false, g11_claim: 'not-passed'})) assert.equal(resource[key], expected);\n    assert.equal(resource.parent, '8d7903126c07b90df0cb2bb12aba4020d38324fd');\n    assert.equal(resource.commit, 'c394ef616bfae381e0676c8f84af01e0553cad1d');\n    assert.equal(resource.before.path, 'projects/ngx-material-legacy/legacy-tooltip/tooltip.scss');\n    assert.equal(resource.after.path, resource.before.path);\n    const env = {PATH: process.env.PATH, LANG: 'C', LC_ALL: 'C', GIT_CONFIG_GLOBAL: '/dev/null',\n      GIT_CONFIG_SYSTEM: '/dev/null', GIT_TERMINAL_PROMPT: '0', GIT_NO_REPLACE_OBJECTS: '1', GIT_NO_LAZY_FETCH: '1'};\n    const git = (...args) => execFileSync('git', ['--no-replace-objects', '-c', 'gc.auto=0',\n      '-c', 'maintenance.auto=0', ...args], {cwd: root, env});\n    assert.equal(git('rev-list', '--parents', '-n', '1', resource.commit).toString().trim(),\n      resource.commit + ' ' + resource.parent);\n    git('merge-base', '--is-ancestor', resource.commit, 'HEAD');\n    gitTooltipBefore = git('show', resource.parent + ':' + resource.before.path);\n    const after = git('show', resource.commit + ':' + resource.after.path);\n    assert.deepEqual(reference(resource.before.path, gitTooltipBefore), resource.before);\n    assert.deepEqual(reference(resource.after.path, after), resource.after);\n    assert.ok(equalBytes(read(resource.after.path), after));\n    for (const review of resource.reviews) assert.deepEqual(reference(review.path, read(review.path)), review);\n    tooltipResource = resource;\n"
+        },
+        {
+          "offset": 17861,
+          "before": "",
+          "after": "  if (tooltipResource) {\n    assert.equal(historical.has(tooltipResource.before.path), false);\n    historical.set(tooltipResource.before.path, Buffer.from(gitTooltipBefore));\n  }\n"
+        },
+        {
+          "offset": 20612,
+          "before": "",
+          "after": "  // Component resources are outside the finite theme module/source-set contract.\n  const resourceTransitions = tooltipResource ? [{path: tooltipResource.before.path,\n    before: tooltipResource.before, current: tooltipResource.after}] : [];\n  const allTransitions = [...transitions, ...resourceTransitions];\n"
+        },
+        {
+          "offset": 20868,
+          "before": "",
+          "after": "    for (const resource of resourceTransitions) assert.equal(rows.some(row => row.root === 0 &&\n      'projects/ngx-material-legacy/' + row.path === resource.path), false, 'resource entered loaded theme source set');\n"
+        },
+        {
+          "offset": 22850,
+          "before": "    const original = metadata(incoming), row = transitions.find(row => row.path === original.path);\n",
+          "after": "    const original = metadata(incoming), row = allTransitions.find(row => row.path === original.path);\n"
+        },
+        {
+          "offset": 23686,
+          "before": "    const row = transitions.find(row => row.path === safe(path));\n",
+          "after": "    const row = allTransitions.find(row => row.path === safe(path));\n"
+        },
+        {
+          "offset": 24464,
+          "before": "    transitions: structuredClone(transitions), source_sets: structuredClone(sourceSets), source_set_successors: structuredClone(sourceSetSuccessors),\n",
+          "after": "    transitions: structuredClone(transitions), resource_transitions: structuredClone(resourceTransitions),\n    source_sets: structuredClone(sourceSets), source_set_successors: structuredClone(sourceSetSuccessors),\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/current_sass_source.py",
+      "before": {
+        "path": "scripts/current_sass_source.py",
+        "sha256": "e45ed249e2db66ab1ff4f01ea7c2e84251e356d539b031799a7a7e29c446035e",
+        "bytes": 22233
+      },
+      "after": {
+        "path": "scripts/current_sass_source.py",
+        "sha256": "304c0779f4d495445a6d00f5170c81c1d8129ec95fe381a8eaf512ffaf93fa2a",
+        "bytes": 25998
+      },
+      "edits": [
+        {
+          "offset": 505,
+          "before": "",
+          "after": "TOOLTIP_RESOURCE_PACKET = dict(path='compatibility/rc/current-main-tooltip-resource-source-v1.json',\n                              sha256='05abc16cda2e5a3fea79f4b054f34586de88b57febc9569185fe9ce00102747e', bytes=1246)\n"
+        },
+        {
+          "offset": 823,
+          "before": "SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='7bb757ac9558bceb3280fa439d43c382c603540f4c5a534c4043db9d6c071192', bytes=25182)\n",
+          "after": "SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='39b22e0fa057899769cbe3895a67b2b77c2ab543d770c5f72c4ef657da6f7ea6', bytes=28397)\n"
+        },
+        {
+          "offset": 6656,
+          "before": "        focus_style=None;git_style_before=None\n",
+          "after": "        focus_style=None;git_style_before=None;tooltip_resource=None;git_tooltip_before=None\n"
+        },
+        {
+          "offset": 6728,
+          "before": "            projected=focus_style is not None and row['path']==focus_style['before']['path'] and row['sha256']==focus_style['before']['sha256']\n            if projected:assert row['bytes']==focus_style['before']['bytes']\n            row = focus_style['after'] if projected else sixth.qualify(row) or focus.qualify(row) or product.qualify(row) or (graph_successor.qualify(row) if graph_successor is not None else None) or row\n",
+          "after": "            projected = next((style for style in (focus_style, tooltip_resource) if style is not None and\n                              row['path'] == style['before']['path'] and row['sha256'] == style['before']['sha256']), None)\n            if projected is not None: assert row['bytes'] == projected['before']['bytes']\n            row = projected['after'] if projected is not None else sixth.qualify(row) or focus.qualify(row) or product.qualify(row) or (graph_successor.qualify(row) if graph_successor is not None else None) or row\n"
+        },
+        {
+          "offset": 12172,
+          "before": "",
+          "after": "        if initial_line == 'main':\n            resource_raw = current(TOOLTIP_RESOURCE_PACKET['path'])\n            assert _ref(TOOLTIP_RESOURCE_PACKET['path'], resource_raw) == TOOLTIP_RESOURCE_PACKET\n            resource = json.loads(resource_raw)\n            assert resource['schema_version'] == 1 and resource['role'] == 'finite-current-main-tooltip-resource-source'\n            assert resource['line'] == 'main'\n            for key, expected in dict(source_scope_only=True, historical_programs_executed=False,\n                                      historical_packets_rewritten=False, loaded_theme_source_sets_changed=False,\n                                      css_or_artifact_admission_granted=False, g11_claim='not-passed').items():\n                assert resource[key] == expected\n            assert resource['parent'] == '8d7903126c07b90df0cb2bb12aba4020d38324fd'\n            assert resource['commit'] == 'c394ef616bfae381e0676c8f84af01e0553cad1d'\n            assert resource['before']['path'] == 'projects/ngx-material-legacy/legacy-tooltip/tooltip.scss'\n            assert resource['after']['path'] == resource['before']['path']\n            env = dict(PATH=os.environ.get('PATH', ''), LANG='C', LC_ALL='C', GIT_CONFIG_GLOBAL='/dev/null',\n                       GIT_CONFIG_SYSTEM='/dev/null', GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')\n            def resource_git(*args):\n                return subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0',\n                                                '-c', 'maintenance.auto=0', *args], cwd=root, env=env)\n            assert resource_git('rev-list', '--parents', '-n', '1', resource['commit']).decode().strip() == resource['commit'] + ' ' + resource['parent']\n            resource_git('merge-base', '--is-ancestor', resource['commit'], 'HEAD')\n            git_tooltip_before = resource_git('show', resource['parent'] + ':' + resource['before']['path'])\n            after = resource_git('show', resource['commit'] + ':' + resource['after']['path'])\n            assert _ref(resource['before']['path'], git_tooltip_before) == resource['before']\n            assert _ref(resource['after']['path'], after) == resource['after']\n            assert current(resource['after']['path']) == after\n            for review in resource['reviews']: assert _ref(review['path'], current(review['path'])) == review\n            tooltip_resource = resource\n"
+        },
+        {
+          "offset": 14481,
+          "before": "",
+          "after": "        if tooltip_resource is not None:\n            assert tooltip_resource['before']['path'] not in historical\n            historical[tooltip_resource['before']['path']] = git_tooltip_before\n"
+        },
+        {
+          "offset": 17381,
+          "before": "",
+          "after": "        # Component resources do not change the finite theme/source-set contract.\n        resource_transitions = ([dict(path=tooltip_resource['before']['path'], before=tooltip_resource['before'],\n                                      current=tooltip_resource['after'])] if tooltip_resource else [])\n"
+        },
+        {
+          "offset": 17653,
+          "before": "",
+          "after": "            for resource in resource_transitions:\n                assert not any(row['root'] == 0 and 'projects/ngx-material-legacy/' + row['path'] == resource['path'] for row in rows), 'resource entered loaded theme source set'\n"
+        },
+        {
+          "offset": 19569,
+          "before": "        _STATES[self] = dict(root=root, line=line, bound=bound, transitions=transitions, source_sets=source_sets, source_set_successors=source_set_successors,\n",
+          "after": "        _STATES[self] = dict(root=root, line=line, bound=bound, transitions=transitions, resource_transitions=resource_transitions, source_sets=source_sets, source_set_successors=source_set_successors,\n"
+        },
+        {
+          "offset": 20182,
+          "before": "",
+          "after": "\n    @property\n    def resource_transitions(self):\n        return copy.deepcopy(_STATES[self]['resource_transitions'])\n"
+        },
+        {
+          "offset": 20679,
+          "before": "        row = next((row for row in state['transitions'] if row['path'] == original['path']), None)\n",
+          "after": "        row = next((row for row in state['transitions'] + state['resource_transitions'] if row['path'] == original['path']), None)\n"
+        },
+        {
+          "offset": 21668,
+          "before": "        row = next(row for row in state['transitions'] if row['path'] == _safe(path))\n",
+          "after": "        row = next(row for row in state['transitions'] + state['resource_transitions'] if row['path'] == _safe(path))\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/sass-spinner-snack-c04-source.mjs",
+      "before": {
+        "path": "scripts/sass-spinner-snack-c04-source.mjs",
+        "sha256": "71e9674b22c3c02cf78ec359ec5a75672162b0ee78b8843cf0d26e7e86e10a13",
+        "bytes": 18402
+      },
+      "after": {
+        "path": "scripts/sass-spinner-snack-c04-source.mjs",
+        "sha256": "d0793233da72bb415a3b065f8744a579f95a4b392d39b2b69ea9c5c63596c274",
+        "bytes": 18452
+      },
+      "edits": [
+        {
+          "offset": 7995,
+          "before": " const ownedToolPaths=new Set(tools.transitions.map(row=>row.path)),ownedPaths=new Set([...bridge.transitions.map(row=>row.path),...ownedToolPaths]);\n",
+          "after": " const ownedToolPaths=new Set(tools.transitions.map(row=>row.path)),ownedPaths=new Set([...bridge.transitions.map(row=>row.path),...bridge.resource_transitions.map(row=>row.path),...ownedToolPaths]);\n"
+        }
+      ]
+    }
+  ],
+  "support": [
+    {
+      "path": "compatibility/rc/current-main-tooltip-resource-source-v1.json",
+      "sha256": "05abc16cda2e5a3fea79f4b054f34586de88b57febc9569185fe9ce00102747e",
+      "bytes": 1246
+    },
+    {
+      "path": "compatibility/rc/parent-main-tooltip-original-selector-todo-v1.json",
+      "sha256": "7b4d6b6ab858f8baaa3a14c6e4da2e3f34fb2bb4c209452efce032d699a59d0f",
+      "bytes": 4354
+    },
+    {
+      "path": "compatibility/rc/parent-main-untouched-tooltip-css-oracle-v1.json",
+      "sha256": "cc5bf568d170acbe468ab4c2dd5aae649ea91817c07b01d2bd2d8ddcdc225850",
+      "bytes": 3586
+    }
+  ],
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "theme_module_contract_changed": false,
+  "css_or_artifact_admission_granted": false,
+  "g11_claim": "not-passed"
+}

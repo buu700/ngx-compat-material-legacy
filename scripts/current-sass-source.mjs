@@ -21,6 +21,8 @@ import {dialogFocusFiniteSourceSuccessor as dialogFocusV6,dialogFocusFiniteLoade
 import {mainSassGraphSuccessor} from './main-sass-graph-successor.mjs';
 
 const SELF = 'scripts/current-sass-source.mjs';
+const TOOLTIP_RESOURCE_PACKET = Object.freeze({path: 'compatibility/rc/current-main-tooltip-resource-source-v1.json',
+  sha256: '05abc16cda2e5a3fea79f4b054f34586de88b57febc9569185fe9ce00102747e', bytes: 1246});
 const FOCUS_STYLE_PACKET=Object.freeze({path:'compatibility/rc/current-main-strong-focus-source-v1.json',sha256:'e4f6c47d595edc21f102a756e3a827d077c0f717f1968b8672c691d4fb336ccb',bytes:1030});
 const SIXTH_HELPER = Object.freeze({path: 'scripts/stepper-sixth-source.mjs',
   sha256: 'e14efe828ea074fb1aa61bab093add26e836f238d2f869e49206baf890175657'});
@@ -212,11 +214,12 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
     else bound.set(ref.path, {...ref});
   }
   if(initialLine==='main'){assert.equal(hash(physical(root,'scripts/main-sass-graph-successor.mjs')),'cd00dd3ea8af9f0ef5a62d6ed3e5190147aaa9a6206693e9cebc72c0040016b5');read('scripts/main-sass-graph-successor.mjs');graphSuccessor=mainSassGraphSuccessor({root,read:providedRead});for(const r of graphSuccessor.bound){if(bound.has(r.path))assert.deepEqual(bound.get(r.path),r);else bound.set(r.path,r);}}
-  let focusStyle=null,gitStyleBefore=null;
+  let focusStyle=null,gitStyleBefore=null,tooltipResource=null,gitTooltipBefore=null;
   const member = row => {
-    const projected=focusStyle && row.path===focusStyle.before.path && row.sha256===focusStyle.before.sha256;
-    if(projected)assert.equal(row.bytes,focusStyle.before.bytes);
-    const expected = projected ? focusStyle.after : sixth.qualify(row) ?? focus.qualify(row) ?? product.qualify(row) ?? graphSuccessor?.qualify(row) ?? row;
+    const projected = [focusStyle, tooltipResource].find(style => style &&
+      row.path === style.before.path && row.sha256 === style.before.sha256);
+    if(projected)assert.equal(row.bytes,projected.before.bytes);
+    const expected = projected ? projected.after : sixth.qualify(row) ?? focus.qualify(row) ?? product.qualify(row) ?? graphSuccessor?.qualify(row) ?? row;
     const bytes = read(row.path);
     assert.equal(hash(bytes), expected.sha256, 'changed current Sass source ' + row.path);
     assert.equal(bytes.length, expected.bytes);
@@ -240,6 +243,35 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
     const before=git('show',fp.parent+':'+fp.before.path),after=git('show',fp.commit+':'+fp.after.path);
     assert.deepEqual(reference(fp.before.path,before),fp.before);gitStyleBefore=before;assert.deepEqual(reference(fp.after.path,after),fp.after);assert.ok(equalBytes(read(fp.after.path),after));
     assert.deepEqual(reference(fp.review.path,read(fp.review.path)),fp.review);focusStyle=fp;
+  }
+  if (initialLine === 'main') {
+    const resourceRaw = read(TOOLTIP_RESOURCE_PACKET.path);
+    assert.deepEqual(reference(TOOLTIP_RESOURCE_PACKET.path, resourceRaw), TOOLTIP_RESOURCE_PACKET);
+    const resource = JSON.parse(resourceRaw);
+    assert.equal(resource.schema_version, 1);
+    assert.equal(resource.role, 'finite-current-main-tooltip-resource-source');
+    assert.equal(resource.line, 'main');
+    for (const [key, expected] of Object.entries({source_scope_only: true, historical_programs_executed: false,
+      historical_packets_rewritten: false, loaded_theme_source_sets_changed: false,
+      css_or_artifact_admission_granted: false, g11_claim: 'not-passed'})) assert.equal(resource[key], expected);
+    assert.equal(resource.parent, '8d7903126c07b90df0cb2bb12aba4020d38324fd');
+    assert.equal(resource.commit, 'c394ef616bfae381e0676c8f84af01e0553cad1d');
+    assert.equal(resource.before.path, 'projects/ngx-material-legacy/legacy-tooltip/tooltip.scss');
+    assert.equal(resource.after.path, resource.before.path);
+    const env = {PATH: process.env.PATH, LANG: 'C', LC_ALL: 'C', GIT_CONFIG_GLOBAL: '/dev/null',
+      GIT_CONFIG_SYSTEM: '/dev/null', GIT_TERMINAL_PROMPT: '0', GIT_NO_REPLACE_OBJECTS: '1', GIT_NO_LAZY_FETCH: '1'};
+    const git = (...args) => execFileSync('git', ['--no-replace-objects', '-c', 'gc.auto=0',
+      '-c', 'maintenance.auto=0', ...args], {cwd: root, env});
+    assert.equal(git('rev-list', '--parents', '-n', '1', resource.commit).toString().trim(),
+      resource.commit + ' ' + resource.parent);
+    git('merge-base', '--is-ancestor', resource.commit, 'HEAD');
+    gitTooltipBefore = git('show', resource.parent + ':' + resource.before.path);
+    const after = git('show', resource.commit + ':' + resource.after.path);
+    assert.deepEqual(reference(resource.before.path, gitTooltipBefore), resource.before);
+    assert.deepEqual(reference(resource.after.path, after), resource.after);
+    assert.ok(equalBytes(read(resource.after.path), after));
+    for (const review of resource.reviews) assert.deepEqual(reference(review.path, read(review.path)), review);
+    tooltipResource = resource;
   }
   member(plannerReference);
   assert.ok(equalBytes(read(SELF), image));
@@ -276,6 +308,10 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   assert.deepEqual(packet.product_paths, [...source.modules.map(row => row.path), ...ADDITIONAL]);
   assert.equal(branch.current_unchanged_owned_before_count, source.unchanged_owned_sass_before_inputs.length - ADDITIONAL.length);
   const historical = historicalBlobs(root, source, priorProfile.branches[line]);
+  if (tooltipResource) {
+    assert.equal(historical.has(tooltipResource.before.path), false);
+    historical.set(tooltipResource.before.path, Buffer.from(gitTooltipBefore));
+  }
   const changes = new Map(packet.additional_modules.map(row => [row.path, row]));
   for (const row of changes.values()) {
     const before = historical.get(row.path);
@@ -313,10 +349,16 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   for (const row of graph.non_target_owned_style_template_graph) member(row.path === CARD ? changes.get(CARD).current : row);
   const transitions = [...source.modules.map(row => ({path: row.path, before: row.before, current: row.current})),
     ...packet.additional_modules.map(row => ({path: row.path, before: row.before, current: row.current})), sixth.transition,...(focusStyle?[{path:focusStyle.before.path,before:focusStyle.before,current:focusStyle.after}]:[])];
+  // Component resources are outside the finite theme module/source-set contract.
+  const resourceTransitions = tooltipResource ? [{path: tooltipResource.before.path,
+    before: tooltipResource.before, current: tooltipResource.after}] : [];
+  const allTransitions = [...transitions, ...resourceTransitions];
   for (const row of transitions) member(row.current);
   const sourceSets = {}, sourceSetSuccessors = [];
   for (const [historicalHash, rows] of Object.entries(css.branches[line].source_sets)) {
     assert.equal(hash(JSON.stringify(rows)), historicalHash);
+    for (const resource of resourceTransitions) assert.equal(rows.some(row => row.root === 0 &&
+      'projects/ngx-material-legacy/' + row.path === resource.path), false, 'resource entered loaded theme source set');
     const current = rows.map(row => {
     const path='projects/ngx-material-legacy/' + row.path;
     const changed = row.root === 0 && path!==focusStyle?.before.path && changes.get(path);
@@ -347,7 +389,7 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   const guardPlan = Object.freeze({assertCurrent, node: guardNode});
   const qualify = incoming => {
     idle();
-    const original = metadata(incoming), row = transitions.find(row => row.path === original.path);
+    const original = metadata(incoming), row = allTransitions.find(row => row.path === original.path);
     if (!row) return null;
     const sixthMatch = row.path===sixth.transition.path ? sixth.qualify(original) : null;
     const selected = sixthMatch ?? [row.before, row.current].find(value => value.sha256 === original.sha256);
@@ -361,7 +403,7 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   };
   const assertHistoricalSource = (path, expected) => {
     idle();
-    const row = transitions.find(row => row.path === safe(path));
+    const row = allTransitions.find(row => row.path === safe(path));
     assert.ok(row && (typeof expected === 'string' || Buffer.isBuffer(expected)));
     const copy = Buffer.from(expected);
     assert.ok(equalBytes(copy, historical.get(path)));
@@ -372,7 +414,8 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
     return {path, before_sha256: row.before.sha256, current_sha256: row.current.sha256, exact_historical_comparison: true, current_physical_source_guarded: true};
   };
   const result = {root, line, assertCurrent, guardNode, guardPlan, qualify, assertHistoricalSource, bound: structuredClone([...bound.values()]),
-    transitions: structuredClone(transitions), source_sets: structuredClone(sourceSets), source_set_successors: structuredClone(sourceSetSuccessors),
+    transitions: structuredClone(transitions), resource_transitions: structuredClone(resourceTransitions),
+    source_sets: structuredClone(sourceSets), source_set_successors: structuredClone(sourceSetSuccessors),
     descriptor: structuredClone({source_subject: reference(SELF, image), source_packet: reference(INPUTS, raw), source_modules: transitions.map(row => row.current)}),
     source_scope_only: true, metadata_refs_qualified: 6, current_source_reads_are_physical: true,
     historical_source_bytes_exposed: false, historical_constructor_executed: false, fresh_sass_compilation_this_call: false,

@@ -215,7 +215,43 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
  assert.equal(previous.schema_version,1);assert.equal(previous.role,packet.role);
  assert.deepEqual(packet.product_paths,[]);assert.equal(packet.historical_programs_executed,false);assert.equal(packet.historical_reports_rewritten,0);assert.equal(packet.artifact_or_audit_admission_granted,false);
  assert.ok(equalBytes(read(packagePath),packageImage),'package line changed');
- let matrixOwner;const domainOverlays=new Map();
+ let matrixOwner;const domainOverlays=new Map(),tooltipPrograms=new Map();
+ if (line === 'main') {
+  const continuation = JSON.parse(member({path: 'compatibility/rc/main-tooltip-resource-source-programs-v1.json',
+   sha256: 'b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211', bytes: 15324}));
+  assert.equal(continuation.schema_version, 1);
+  assert.equal(continuation.role, 'main-tooltip-resource-source-program-continuation');
+  assert.equal(continuation.base_head, '8fe95564c981a9dd73605d27beaa0496824e8444');
+  for (const [key, value] of Object.entries({source_scope_only: true, historical_programs_executed: false,
+   historical_packets_rewritten: false, theme_module_contract_changed: false,
+   css_or_artifact_admission_granted: false, g11_claim: 'not-passed'})) assert.equal(continuation[key], value);
+  assert.deepEqual(continuation.updates.map(row => row.path), ['scripts/current-sass-source.mjs',
+   'scripts/current_sass_source.py', 'scripts/sass-spinner-snack-c04-source.mjs']);
+  assert.deepEqual(continuation.support.map(row => row.path), ['compatibility/rc/current-main-tooltip-resource-source-v1.json',
+   'compatibility/rc/parent-main-tooltip-original-selector-todo-v1.json',
+   'compatibility/rc/parent-main-untouched-tooltip-css-oracle-v1.json']);
+  const env = {PATH: process.env.PATH, GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_SYSTEM: '/dev/null',
+   GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_TERMINAL_PROMPT: '0'};
+  execFileSync('git', ['--no-replace-objects', 'merge-base', '--is-ancestor', continuation.base_head, 'HEAD'], {cwd: root, env});
+  const originals = gitImages(root, continuation.updates.map(row => ({commit: continuation.base_head, path: row.path})));
+  for (const ref of continuation.support) member(ref);
+  for (const update of continuation.updates) {
+   assert.equal(update.before.path, update.path); assert.equal(update.after.path, update.path);
+   const before = originals.get(continuation.base_head + ':' + update.path); matches(before, update.before);
+   const after = edited(before, update.edits); matches(after, update.after);
+   assert.ok(equalBytes(member(update.after), after));
+   tooltipPrograms.set(update.path, {update, identities: [{ref: update.before, bytes: before}, {ref: update.after, bytes: after}]});
+  }
+ }
+ // Only immutable program-comparison data is returned here. Physical reads
+ // remain bound to the exact current image above and during every later guard.
+ const tooltipProgramComparison = ref => {
+  const overlay = tooltipPrograms.get(ref.path); if (!overlay) return member(ref);
+  const meta = metadata(ref), identity = overlay.identities.find(row => row.ref.path === meta.path &&
+   row.ref.sha256 === meta.sha256 && row.ref.bytes === meta.bytes);
+  assert.ok(identity, 'unknown tooltip source program comparison'); member(overlay.update.after);
+  return Buffer.from(identity.bytes);
+ };
  const routingImages=new Map(),retainedRulesJsPath='scripts/upstream-rules-js-build-admission.mjs';
  const retainedLandscapePaths=['scripts/autocomplete-landscape-source-judgment.mjs','tests/autocomplete_landscape_probe.mjs'];
  if(line==='main'){
@@ -341,7 +377,7 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
    assert.ok(toolPath(row.path));assert.equal(row.before.path,row.path);assert.equal(row.after.path,row.path);assert.ok(Array.isArray(row.steps)&&row.steps.length>=1&&row.steps.length<=2);
    let expected=row.before,priorBytes;const identities=[];
    for(const step of row.steps){assert.equal(allowedParents.get(step.commit),step.parent);assert.deepEqual(step.before,{sha256:expected.sha256,bytes:expected.bytes});const old=images.get(step.parent+':'+row.path),after=edited(old,step.edits);matches(old,step.before);matches(after,step.after);assert.ok(equalBytes(after,images.get(step.commit+':'+row.path)));if(priorBytes)assert.ok(equalBytes(priorBytes,old));identities.push({ref:{path:row.path,...step.before},bytes:old},{ref:{path:row.path,...step.after},bytes:after});priorBytes=after;expected={path:row.path,...step.after};if(step.commit==='8baa761eca624c9d71293c3d31750a2b3fdeebf0')assert.ok(sassReview.patch.paths.includes(row.path));}
-   assert.deepEqual(expected,row.after);assert.ok(equalBytes(member(row.after),priorBytes));
+   assert.deepEqual(expected,row.after);assert.ok(equalBytes(tooltipProgramComparison(row.after),priorBytes));
    if(row.domain==='Sass graph, focus infrastructure and seal frame'){const e=domainReview.afterimages_verified.find(x=>x.path===row.path);assert.ok(e);assert.equal(e.sha256,row.after.sha256);assert.equal(e.bytes,row.after.bytes);}
    else if(row.domain==='Sass gate and source-authentication frame')assert.ok(sassReview.patch.paths.includes(row.path));
    else if(row.domain==='sandboxed browser launcher cells'){const e=browserReview.sources.find(x=>x.path===row.path);assert.ok(e);assert.equal(e.before_sha256,row.before.sha256);assert.equal(e.after_sha256,row.after.sha256);}
@@ -457,6 +493,14 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
   for(const update of packet.updates){assert.equal(update.before.path,update.path);assert.equal(update.after.path,update.path);const before=originals.get(packet.base_head+':'+update.path);matches(before,update.before);const after=edited(before,update.edits);matches(after,update.after);assert.ok(equalBytes(member(update.after),after));assert.ok(!domainOverlays.has(update.path));domainOverlays.set(update.path,{update,identities:[{ref:update.before,bytes:before},{ref:update.after,bytes:after}]});}
  }
  for(const [path,routing]of routingImages){const prior=domainOverlays.get(path);if(prior){assert.deepEqual(prior.update.after,routing.update.before,'routing successor must follow the exact previous source');domainOverlays.set(path,{update:{...prior.update,after:routing.update.after},identities:[...prior.identities,...routing.identities]});}else domainOverlays.set(path,routing);}
+ for (const [path, continuation] of tooltipPrograms) {
+  const prior = domainOverlays.get(path);
+  if (prior) {
+   assert.deepEqual(prior.update.after, continuation.update.before, 'tooltip program must follow exact source frame');
+   domainOverlays.set(path, {update: {...prior.update, after: continuation.update.after},
+    identities: [...prior.identities, ...continuation.identities]});
+  } else domainOverlays.set(path, continuation);
+ }
  const inventoryPrior=Object.freeze({path:'testing/legacy-runner/historical-inventory.json',sha256:'a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403',bytes:106309});
  const inventoryCurrent=Object.freeze({path:inventoryPrior.path,sha256:'912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15',bytes:113388});
  const currentComparison=ref=>{

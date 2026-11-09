@@ -83,7 +83,7 @@ export function spinnerSnackC04Source(args){
  const assertCardInputs=()=>{for(const ref of CARD_EXPECTATION_INPUTS){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}};assertCardInputs();
  const bridge=createCurrentSassSource({root,read});
  const tools=currentSassToolReferenceSubject({root,read});assert.equal(tools.line,bridge.line);
- const ownedToolPaths=new Set(tools.transitions.map(row=>row.path)),ownedPaths=new Set([...bridge.transitions.map(row=>row.path),...ownedToolPaths]);
+ const ownedToolPaths=new Set(tools.transitions.map(row=>row.path)),ownedPaths=new Set([...bridge.transitions.map(row=>row.path),...bridge.resource_transitions.map(row=>row.path),...ownedToolPaths]);
  const reports=new Map(),reportRefs=tools.line==='21.x'?Object.values(REPORTS):[];
  for(const ref of reportRefs){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);reports.set(ref.path,JSON.parse(ref.path.endsWith('.gz')?gunzipSync(raw):raw));}
  const qualifyInternal=ref=>{

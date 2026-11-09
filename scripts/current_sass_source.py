@@ -14,10 +14,12 @@ from select_dialog_finite_source_successor_v4 import SelectDialogFiniteSourceV4
 
 ROOT = Path(__file__).resolve().parents[1]
 SELF = 'scripts/current_sass_source.py'
+TOOLTIP_RESOURCE_PACKET = dict(path='compatibility/rc/current-main-tooltip-resource-source-v1.json',
+                              sha256='05abc16cda2e5a3fea79f4b054f34586de88b57febc9569185fe9ce00102747e', bytes=1246)
 FOCUS_STYLE_PACKET=dict(path='compatibility/rc/current-main-strong-focus-source-v1.json',sha256='e4f6c47d595edc21f102a756e3a827d077c0f717f1968b8672c691d4fb336ccb',bytes=1030)
 INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json'
 INPUTS_SHA = '46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9'
-SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='7bb757ac9558bceb3280fa439d43c382c603540f4c5a534c4043db9d6c071192', bytes=25182)
+SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='39b22e0fa057899769cbe3895a67b2b77c2ab543d770c5f72c4ef657da6f7ea6', bytes=28397)
 ADDITIONAL = ['projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss',
               'projects/ngx-material-legacy/styles/button/_button-theme.scss',
               'projects/ngx-material-legacy/styles/card/_card-theme.scss']
@@ -139,11 +141,12 @@ class CurrentSassSource:
                 assert type(supplied) is bytes and actual == supplied, 'nonphysical current source ' + path
             assert _physical(root, path) == actual, 'source changed during read ' + path
             return actual
-        focus_style=None;git_style_before=None
+        focus_style=None;git_style_before=None;tooltip_resource=None;git_tooltip_before=None
         def member(row):
-            projected=focus_style is not None and row['path']==focus_style['before']['path'] and row['sha256']==focus_style['before']['sha256']
-            if projected:assert row['bytes']==focus_style['before']['bytes']
-            row = focus_style['after'] if projected else sixth.qualify(row) or focus.qualify(row) or product.qualify(row) or (graph_successor.qualify(row) if graph_successor is not None else None) or row
+            projected = next((style for style in (focus_style, tooltip_resource) if style is not None and
+                              row['path'] == style['before']['path'] and row['sha256'] == style['before']['sha256']), None)
+            if projected is not None: assert row['bytes'] == projected['before']['bytes']
+            row = projected['after'] if projected is not None else sixth.qualify(row) or focus.qualify(row) or product.qualify(row) or (graph_successor.qualify(row) if graph_successor is not None else None) or row
             raw = current(row['path'])
             assert _hash(raw) == row['sha256'] and len(raw) == row['bytes'], 'changed current Sass source ' + row['path']
             return raw
@@ -191,6 +194,34 @@ class CurrentSassSource:
             git_style_before=git('show',focus_style['parent']+':'+focus_style['before']['path']);after=git('show',focus_style['commit']+':'+focus_style['after']['path'])
             assert _ref(focus_style['before']['path'],git_style_before)==focus_style['before'] and _ref(focus_style['after']['path'],after)==focus_style['after'] and current(focus_style['after']['path'])==after
             assert _ref(focus_style['review']['path'],current(focus_style['review']['path']))==focus_style['review']
+        if initial_line == 'main':
+            resource_raw = current(TOOLTIP_RESOURCE_PACKET['path'])
+            assert _ref(TOOLTIP_RESOURCE_PACKET['path'], resource_raw) == TOOLTIP_RESOURCE_PACKET
+            resource = json.loads(resource_raw)
+            assert resource['schema_version'] == 1 and resource['role'] == 'finite-current-main-tooltip-resource-source'
+            assert resource['line'] == 'main'
+            for key, expected in dict(source_scope_only=True, historical_programs_executed=False,
+                                      historical_packets_rewritten=False, loaded_theme_source_sets_changed=False,
+                                      css_or_artifact_admission_granted=False, g11_claim='not-passed').items():
+                assert resource[key] == expected
+            assert resource['parent'] == '8d7903126c07b90df0cb2bb12aba4020d38324fd'
+            assert resource['commit'] == 'c394ef616bfae381e0676c8f84af01e0553cad1d'
+            assert resource['before']['path'] == 'projects/ngx-material-legacy/legacy-tooltip/tooltip.scss'
+            assert resource['after']['path'] == resource['before']['path']
+            env = dict(PATH=os.environ.get('PATH', ''), LANG='C', LC_ALL='C', GIT_CONFIG_GLOBAL='/dev/null',
+                       GIT_CONFIG_SYSTEM='/dev/null', GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')
+            def resource_git(*args):
+                return subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0',
+                                                '-c', 'maintenance.auto=0', *args], cwd=root, env=env)
+            assert resource_git('rev-list', '--parents', '-n', '1', resource['commit']).decode().strip() == resource['commit'] + ' ' + resource['parent']
+            resource_git('merge-base', '--is-ancestor', resource['commit'], 'HEAD')
+            git_tooltip_before = resource_git('show', resource['parent'] + ':' + resource['before']['path'])
+            after = resource_git('show', resource['commit'] + ':' + resource['after']['path'])
+            assert _ref(resource['before']['path'], git_tooltip_before) == resource['before']
+            assert _ref(resource['after']['path'], after) == resource['after']
+            assert current(resource['after']['path']) == after
+            for review in resource['reviews']: assert _ref(review['path'], current(review['path'])) == review
+            tooltip_resource = resource
         assert current(SELF) == _IMAGE
         member(SOURCE_JS)
         raw = current(INPUTS)
@@ -226,6 +257,9 @@ class CurrentSassSource:
         assert packet['product_paths'] == [row['path'] for row in source['modules']] + ADDITIONAL
         assert branch['current_unchanged_owned_before_count'] == len(source['unchanged_owned_sass_before_inputs']) - len(ADDITIONAL)
         historical = _historical_blobs(root, source, prior_profile['branches'][line])
+        if tooltip_resource is not None:
+            assert tooltip_resource['before']['path'] not in historical
+            historical[tooltip_resource['before']['path']] = git_tooltip_before
         changes = {row['path']: row for row in packet['additional_modules']}
         for row in changes.values():
             before = historical[row['path']]
@@ -263,11 +297,16 @@ class CurrentSassSource:
         for row in graph['non_target_owned_style_template_graph']:
             member(changes[CARD]['current'] if row['path'] == CARD else row)
         transitions = [dict(path=row['path'], before=row['before'], current=row['current']) for row in source['modules'] + packet['additional_modules']] + [sixth_transition] + ([dict(path=focus_style['before']['path'],before=focus_style['before'],current=focus_style['after'])] if focus_style else [])
+        # Component resources do not change the finite theme/source-set contract.
+        resource_transitions = ([dict(path=tooltip_resource['before']['path'], before=tooltip_resource['before'],
+                                      current=tooltip_resource['after'])] if tooltip_resource else [])
         for row in transitions:
             member(row['current'])
         source_sets, source_set_successors = {}, []
         for key, rows in css['branches'][line]['source_sets'].items():
             assert _hash(json.dumps(rows, separators=(',', ':')).encode()) == key
+            for resource in resource_transitions:
+                assert not any(row['root'] == 0 and 'projects/ngx-material-legacy/' + row['path'] == resource['path'] for row in rows), 'resource entered loaded theme source set'
             current_rows = []
             for row in rows:
                 path='projects/ngx-material-legacy/' + row['path']
@@ -292,7 +331,7 @@ class CurrentSassSource:
                 member(row)
             assert_physical()
         descriptor = dict(source_subject=dict(SOURCE_JS), source_packet=_ref(INPUTS, raw), source_modules=[row['current'] for row in transitions])
-        _STATES[self] = dict(root=root, line=line, bound=bound, transitions=transitions, source_sets=source_sets, source_set_successors=source_set_successors,
+        _STATES[self] = dict(root=root, line=line, bound=bound, transitions=transitions, resource_transitions=resource_transitions, source_sets=source_sets, source_set_successors=source_set_successors,
                              descriptor=descriptor, historical=historical, sixth=sixth, assert_current=assert_current, assert_physical=assert_physical)
         assert_current()
 
@@ -307,6 +346,10 @@ class CurrentSassSource:
     @property
     def transitions(self):
         return copy.deepcopy(_STATES[self]['transitions'])
+
+    @property
+    def resource_transitions(self):
+        return copy.deepcopy(_STATES[self]['resource_transitions'])
 
     @property
     def source_sets(self):
@@ -326,7 +369,7 @@ class CurrentSassSource:
     def qualify(self, incoming):
         original = _metadata(incoming)
         state = _STATES[self]
-        row = next((row for row in state['transitions'] if row['path'] == original['path']), None)
+        row = next((row for row in state['transitions'] + state['resource_transitions'] if row['path'] == original['path']), None)
         if row is None:
             return None
         sixth_match = state['sixth'].qualify(original) if row['path'] == state['sixth'].transition['path'] else None
@@ -343,7 +386,7 @@ class CurrentSassSource:
 
     def assert_historical_source(self, path, expected):
         state = _STATES[self]
-        row = next(row for row in state['transitions'] if row['path'] == _safe(path))
+        row = next(row for row in state['transitions'] + state['resource_transitions'] if row['path'] == _safe(path))
         assert type(expected) in (str, bytes)
         raw = expected.encode() if type(expected) is str else expected
         assert raw == state['historical'][path] and _hash(raw) == row['before']['sha256']

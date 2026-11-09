@@ -327,6 +327,41 @@ class CurrentSassToolReferences:
         assert packet['historical_reports_rewritten'] == 0 and packet['artifact_or_audit_admission_granted'] is False
         assert self._read(package_path) == package_image
         domain_overlays = {}
+        tooltip_programs = {}
+        if self.line == 'main':
+            continuation = json.loads(self._member(dict(path='compatibility/rc/main-tooltip-resource-source-programs-v1.json',
+                sha256='b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211', bytes=15324)))
+            assert continuation['schema_version'] == 1 and continuation['role'] == 'main-tooltip-resource-source-program-continuation'
+            assert continuation['base_head'] == '8fe95564c981a9dd73605d27beaa0496824e8444'
+            for key, value in dict(source_scope_only=True, historical_programs_executed=False,
+                                   historical_packets_rewritten=False, theme_module_contract_changed=False,
+                                   css_or_artifact_admission_granted=False, g11_claim='not-passed').items():
+                assert continuation[key] == value
+            assert [row['path'] for row in continuation['updates']] == ['scripts/current-sass-source.mjs',
+                'scripts/current_sass_source.py', 'scripts/sass-spinner-snack-c04-source.mjs']
+            assert [row['path'] for row in continuation['support']] == ['compatibility/rc/current-main-tooltip-resource-source-v1.json',
+                'compatibility/rc/parent-main-tooltip-original-selector-todo-v1.json',
+                'compatibility/rc/parent-main-untouched-tooltip-css-oracle-v1.json']
+            tooltip_env = dict(PATH=os.environ['PATH'], GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null',
+                               GIT_NO_LAZY_FETCH='1', GIT_NO_REPLACE_OBJECTS='1', GIT_TERMINAL_PROMPT='0')
+            subprocess.check_call(['git', '--no-replace-objects', 'merge-base', '--is-ancestor', continuation['base_head'], 'HEAD'], cwd=self.root, env=tooltip_env)
+            originals = _git_images(self.root, [dict(commit=continuation['base_head'], path=row['path']) for row in continuation['updates']])
+            for ref in continuation['support']: self._member(ref)
+            for update in continuation['updates']:
+                assert update['before']['path'] == update['after']['path'] == update['path']
+                before = originals[(continuation['base_head'], update['path'])]; _matches(before, update['before'])
+                after = _edited(before, update['edits']); _matches(after, update['after'])
+                assert self._member(update['after']) == after
+                tooltip_programs[update['path']] = (update, [(update['before'], before), (update['after'], after)])
+        # Historical program bytes are comparison data; every physical read
+        # stays bound to the exact current program and the existing guards.
+        def tooltip_program_comparison(ref):
+            overlay = tooltip_programs.get(ref['path'])
+            if overlay is None: return self._member(ref)
+            update, identities = overlay; meta = _metadata(ref)
+            found = [raw for identity, raw in identities if identity == meta]
+            assert len(found) == 1, 'unknown tooltip source program comparison'
+            self._member(update['after']); return bytes(found[0])
         routing_images={}
         retained_rules_js_path='scripts/upstream-rules-js-build-admission.mjs'
         retained_landscape_paths=['scripts/autocomplete-landscape-source-judgment.mjs','tests/autocomplete_landscape_probe.mjs']
@@ -507,7 +542,7 @@ class CurrentSassToolReferences:
                     identities.extend([(dict(path=path,**step['before']),old),(dict(path=path,**step['after']),after)])
                     prior, expected = after, dict(path=path,**step['after'])
                     if step['commit'] == '8baa761eca624c9d71293c3d31750a2b3fdeebf0': assert path in sass_review['patch']['paths']
-                assert expected == row['after'] and self._member(row['after']) == prior
+                assert expected == row['after'] and tooltip_program_comparison(row['after']) == prior
                 if row['domain'] == 'Sass graph, focus infrastructure and seal frame':
                     found = [x for x in domain_review['afterimages_verified'] if x['path'] == path]; assert len(found) == 1 and found[0]['sha256'] == row['after']['sha256'] and found[0]['bytes'] == row['after']['bytes']
                 elif row['domain'] == 'Sass gate and source-authentication frame': assert path in sass_review['patch']['paths']
@@ -747,6 +782,12 @@ class CurrentSassToolReferences:
                 assert routing_prior[0]['after']==routing_update['before'],'routing successor must follow the exact previous source'
                 domain_overlays[routing_path]=({**routing_prior[0],'after':routing_update['after']},routing_prior[1]+routing_identities)
             else:domain_overlays[routing_path]=(routing_update,routing_identities)
+        for path, (update, identities) in tooltip_programs.items():
+            prior = domain_overlays.get(path)
+            if prior is not None:
+                assert prior[0]['after'] == update['before'], 'tooltip program must follow exact source frame'
+                domain_overlays[path] = ({**prior[0], 'after': update['after']}, prior[1] + identities)
+            else: domain_overlays[path] = (update, identities)
         inventory_prior = dict(path='testing/legacy-runner/historical-inventory.json', sha256='a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403', bytes=106309)
         inventory_current = dict(path=inventory_prior['path'], sha256='912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15', bytes=113388)
         def current_comparison(ref):
