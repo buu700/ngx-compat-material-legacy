@@ -9,13 +9,15 @@ import os
 from pathlib import Path
 import subprocess
 import unittest
+from component_config_route import component_config_line, probe_for
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class ComponentConfigCallerPublicRuntime(unittest.TestCase):
     def test_public_sdk_observations_and_raw_input_guards(self):
-        command = ['node', 'tests/component_config_caller_public_runtime_evidence_probe.mjs']
+        line = component_config_line()
+        command = ['node', probe_for(line, 'public_runtime')]
         if os.environ.get('NGX_COMPONENT_CONFIG_PUBLIC_RUNTIME_DIAGNOSTIC'):
             command.append(os.environ['NGX_COMPONENT_CONFIG_PUBLIC_RUNTIME_DIAGNOSTIC'])
         child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=120)

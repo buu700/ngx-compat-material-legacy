@@ -9,20 +9,22 @@ import os
 from pathlib import Path
 import subprocess
 import unittest
+from component_config_route import component_config_line, probe_for
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class ComponentConfigCallerTypes(unittest.TestCase):
     def test_genuine_minimum_types_and_raw_input_guards(self):
-        command = ['node', 'tests/component_config_caller_type_evidence_probe.mjs']
+        line = component_config_line()
+        command = ['node', probe_for(line, 'types')]
         if os.environ.get('NGX_COMPONENT_CONFIG_TYPE_DIAGNOSTIC'):
             command.append(os.environ['NGX_COMPONENT_CONFIG_TYPE_DIAGNOSTIC'])
         child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=120)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-7000:])
         report = json.loads(child.stdout)
         self.assertEqual(report['selected_roles'], 73)
-        self.assertEqual(report['current_graph_files'], 200)
+        self.assertEqual(report['current_graph_files'], 189 if line == 'main' else 200)
         self.assertEqual(report['actual_bindings'], 73)
         self.assertEqual(report['live_peer_bindings'], 68)
         self.assertEqual(report['retained_owned_bindings'], 5)
