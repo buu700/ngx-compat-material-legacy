@@ -10,6 +10,7 @@ import assert from 'node:assert/strict';
 import {readFileSync, writeFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
+import {createRequire} from 'node:module';
 import {join} from 'node:path';
 import {dialogCallerHistoryInputs, selectDialogCallerHistory, DIALOG_CALLER_HISTORY_INPUTS} from '../scripts/dialog-caller-history-inputs.mjs';
 const root = process.cwd(), read = path => readFileSync(join(root, path));
@@ -49,7 +50,34 @@ for (const path of frameSources) {
   const original = execFileSync('git', ['--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',
     'show', data.frame.commit + ':' + path], {cwd: root, maxBuffer: 1024 * 1024, env: {...process.env, GIT_NO_LAZY_FETCH: '1'}});
   assert.equal(hash(original), member.before.sha256);
-  assert.equal(hash(read(path)), member.after.sha256, 'current product lost its applied fix');
+  assert.equal(hash(member.after.text), member.after.sha256, 'changed recorded applied fix');
+  if (data.line !== 'main') {
+    assert.equal(hash(read(path)), member.after.sha256, 'current product lost its applied fix');
+    continue;
+  }
+  // The reviewed focus-readiness successor changes the two focus files after
+  // the original owned-config fix. Keep its exact committed afterimage guarded
+  // while proving the original fix-bearing declaration remains intact.
+  const reviewed = execFileSync('git', ['--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',
+    'show', '65015ae59f87127708e2be3c20e54a8738dd7307:' + path], {cwd: root, maxBuffer: 1024 * 1024, env: {...process.env, GIT_NO_LAZY_FETCH: '1'}});
+  assert.equal(hash(read(path)), hash(reviewed), 'current product differs from reviewed successor');
+  if (path.endsWith('dialog-config.ts')) assert.equal(hash(reviewed), member.after.sha256);
+  else {
+    const ts = createRequire(join(root, 'package.json'))('typescript');
+    const source = text => ts.createSourceFile(path, text, ts.ScriptTarget.Latest, true);
+    const fixDeclaration = text => {
+      const file = source(text);
+      if (path.endsWith('dialog-initial-focus.ts')) {
+        const imports = file.statements.filter(node => ts.isImportDeclaration(node) && node.moduleSpecifier.text === '../dialog-config');
+        assert.equal(imports.length, 1); return imports[0].getText(file);
+      }
+      const cls = file.statements.find(node => ts.isClassDeclaration(node) && node.name?.text === '_MatDialogContainerBase');
+      assert.ok(cls); const ctor = cls.members.find(ts.isConstructorDeclaration); assert.ok(ctor);
+      const param = ctor.parameters.find(node => node.name.getText(file) === '_config'); assert.ok(param);
+      return param.getText(file);
+    };
+    assert.equal(fixDeclaration(reviewed.toString()), fixDeclaration(member.after.text), 'original owned config declaration changed');
+  }
 }
 const report = {schema_version: 1, line: data.line, registered_modules: 3, original_cases: 3,
   separate_current_applied_test_programs: 2, current_product_still_applied: true,

@@ -22,7 +22,16 @@ class DialogOwnedContractDiagnostics(unittest.TestCase):
         self.assertEqual(report['tagged_broadcast_successor_cases'], 1)
         self.assertTrue(report['nine_source_mutation_programs_unchanged'])
         self.assertTrue(report['python_case_and_skip_condition_unchanged'])
-        self.assertTrue(report['previous_API_signature_records_unchanged'])
+        if report['line'] == 'main':
+            self.assertFalse(report['previous_API_signature_records_unchanged'])
+            self.assertEqual(report['historical_API_records_retained'], 112)
+            self.assertEqual(report['historical_API_records_restored'], 1)
+            self.assertEqual(report['reviewed_successor_API_records'], 12)
+        else:
+            self.assertTrue(report['previous_API_signature_records_unchanged'])
+            self.assertEqual(report['historical_API_records_restored'], 0)
+            self.assertEqual(report['reviewed_successor_API_records'], 1)
+        self.assertEqual(report['targeted_componentRef_records'], 1)
         self.assertTrue(report['unlisted_componentRef_type_rejected'])
 
 
