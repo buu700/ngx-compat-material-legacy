@@ -341,6 +341,42 @@ class CurrentSassToolReferences:
         inspection_programs = {}
         stage_programs = {}
         retained_stage_before = {}
+        guard_test_programs = {}
+        if self.line == 'main':
+            p = json.loads(self._member(dict(path='compatibility/rc/main-current-tool-guard-test-source-routing-v10.json',
+                sha256='58d00dcfa4fa2c008534a7b3a4450767633f7f1040a5b4c71f1c29eadbd23bf9', bytes=13938)))
+            assert p['schema_version'] == 1 and p['role'] == 'main-current-tool-guard-test-source-routing'
+            assert p['base_head'] == '3dd2288fd9fa8b663921953e2950e423346bccb0'
+            assert p['previous_packet'] == dict(path='compatibility/rc/main-current-inventory-source-routing-v9.json',
+                sha256='2573413b3ecc56dd465cf0139fb8e150e206990982246e967aad630a230b85ca', bytes=26489)
+            assert p['support'] == [] and p['product_paths'] == []
+            paths = ['tests/finite_reference_batch_probe.mjs', 'tests/test_finite_reference_batch.py',
+                     'tests/current_tool_guard_graph_probe.mjs', 'tests/test_current_tool_guard_graph.py',
+                     'tests/test_retained_landscape_tool_replay.py']
+            assert [row['path'] for row in p['updates']] == paths
+            for key, value in dict(source_scope_only=True, root_transaction_policy_changed=False,
+                                  historical_programs_executed=False, historical_packets_rewritten=False,
+                                  original_ledger_metadata_recipe_changed=False, source_judgments_changed=0,
+                                  css_or_artifact_admission_granted=False, artifact_or_audit_admission_granted=False,
+                                  g11_claim='not-passed').items():
+                assert p[key] == value
+            guard_env = dict(PATH=os.environ['PATH'], GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null',
+                             GIT_NO_LAZY_FETCH='1', GIT_NO_REPLACE_OBJECTS='1', GIT_TERMINAL_PROMPT='0')
+            subprocess.check_call(['git', '--no-replace-objects', 'merge-base', '--is-ancestor', p['base_head'], 'HEAD'], cwd=self.root, env=guard_env)
+            originals = _git_images(self.root, [dict(commit=p['base_head'], path=path) for path in paths])
+            for update in p['updates']:
+                assert update['before']['path'] == update['after']['path'] == update['path']
+                before = originals[(p['base_head'], update['path'])]; _matches(before, update['before'])
+                after = _edited(before, update['edits']); _matches(after, update['after'])
+                assert self._member(update['after']) == after
+                guard_test_programs[update['path']] = (update, [(update['before'], before), (update['after'], after)])
+        def guard_test_comparison(ref):
+            overlay = guard_test_programs.get(ref['path'])
+            if overlay is None: return self._member(ref)
+            update, identities = overlay; meta = _metadata(ref)
+            found = [raw for identity, raw in identities if identity == meta]
+            assert len(found) == 1, 'unknown guard test program comparison'
+            self._member(update['after']); return bytes(found[0])
         if self.line == 'main':
             p = json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v9.json',
                 sha256='2573413b3ecc56dd465cf0139fb8e150e206990982246e967aad630a230b85ca', bytes=26489)))
@@ -366,7 +402,7 @@ class CurrentSassToolReferences:
                 assert update['before']['path'] == update['after']['path'] == update['path']
                 before = originals[(p['base_head'], update['path'])]; _matches(before, update['before'])
                 after = _edited(before, update['edits']); _matches(after, update['after'])
-                assert self._member(update['after']) == after
+                assert guard_test_comparison(update['after']) == after
                 stage_programs[update['path']] = (update, [(update['before'], before), (update['after'], after)])
             anchor = dict(path='compatibility/rc/dialog-title-current-source-reader-successors.json',
                           sha256='8ec37f431f8da2aee653a62fb4676cd86e67f3fea233b530cf440e15cbf44d71', bytes=36762)
@@ -377,11 +413,11 @@ class CurrentSassToolReferences:
             retained_stage_before[row['path']] = before
         def stage_comparison(ref):
             overlay = stage_programs.get(ref['path'])
-            if overlay is None: return self._member(ref)
+            if overlay is None: return guard_test_comparison(ref)
             update, identities = overlay; meta = _metadata(ref)
             found = [raw for identity, raw in identities if identity == meta]
             assert len(found) == 1, 'unknown Sass stage program comparison'
-            self._member(update['after']); return bytes(found[0])
+            guard_test_comparison(update['after']); return bytes(found[0])
         if self.line == 'main':
             p = json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v8.json',
                 sha256='b45853d028402964a7b08c79b38c80991a65d623e84aae7d1ae0121cc9d8bd9c', bytes=24734)))
@@ -552,7 +588,7 @@ class CurrentSassToolReferences:
             assert routing_packet['schema_version']==1 and routing_packet['role']=='main-current-inventory-source-routing' and routing_packet['base_head']=='54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0'
             assert routing_packet['source_scope_only'] is True and routing_packet['historical_programs_executed'] is False and routing_packet['historical_packets_rewritten'] is False and routing_packet['artifact_or_audit_admission_granted'] is False and routing_packet['g11_claim']=='not-passed'
             routing_paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];assert [row['path'] for row in routing_packet['updates']]==routing_paths
-            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='83469fa6f5cad7a0316e3750bfa6fd0397e43ff530bb43fdbb8763dc282dfbe3',bytes=25275))
+            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='989f01791c499931a5b5acd8732e7b87aa0b15f23a08e592f45a7a37cb4083b0',bytes=27824))
             routing_env=dict(PATH=os.environ['PATH'],GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0');subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',routing_packet['base_head'],'HEAD'],cwd=self.root,env=routing_env)
             routing_originals=_git_images(self.root,[dict(commit=routing_packet['base_head'],path=routing_path) for routing_path in routing_paths])
             routing_next=json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v3.json',sha256='d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b',bytes=13219)))
@@ -949,6 +985,12 @@ class CurrentSassToolReferences:
             prior = domain_overlays.get(path)
             if prior is not None:
                 assert prior[0]['after'] == update['before'], 'Sass stage program must follow exact source frame'
+                domain_overlays[path] = ({**prior[0], 'after': update['after']}, prior[1] + identities)
+            else: domain_overlays[path] = (update, identities)
+        for path, (update, identities) in guard_test_programs.items():
+            prior = domain_overlays.get(path)
+            if prior is not None:
+                assert prior[0]['after'] == update['before'], 'guard test program must follow exact source frame'
                 domain_overlays[path] = ({**prior[0], 'after': update['after']}, prior[1] + identities)
             else: domain_overlays[path] = (update, identities)
         inventory_prior = dict(path='testing/legacy-runner/historical-inventory.json', sha256='a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403', bytes=106309)

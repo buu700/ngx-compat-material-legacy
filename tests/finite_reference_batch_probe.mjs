@@ -164,15 +164,14 @@ if(group==='semantics'){
   assert.ok(lastReached>0,'last request callback was not reached');
   inputs[0].reference.extra.value='before';reset();source.assertCurrent();reset();
 
-  // Both batch reentry and reentry into the same actual whole guard fail before
-  // nested callbacks. The outer batch then succeeds and releases its lock.
+  // Every same-root public entry rejects before nested callbacks. Caught
+  // reentry poisons the enclosing batch too; a separate clean retry recovers.
   const req=[{kind:'comparison',reference:before(first)}];
   const alternate=composeCanonicalSourceGuards(Object.freeze([source.guardNode]));
-  const nestedErrors=[];let ownsInsideBatch=false,nestedDelta=null,inside=false,entered=false;
+  const nestedErrors=[];let nestedDelta=null,inside=false,entered=false;
   onCallback=path=>{
     if(path===first.path&&!inside){
-      entered=true;inside=true;const beforeCalls=callbackCount;
-      const incoming=before(first);
+      entered=true;inside=true;const beforeCalls=callbackCount,incoming=before(first);
       for(const operation of [
         ()=>source.referenceBatch(req),
         ()=>source.qualify(incoming),
@@ -180,21 +179,18 @@ if(group==='semantics'){
         ()=>source.comparisonBytes(incoming),
         ()=>source.assertCurrent(),
         ()=>alternate(),
+        ()=>source.ownsReference(incoming),
       ])try{operation();nestedErrors.push(null);}catch(error){nestedErrors.push(error);}
-      ownsInsideBatch=source.ownsReference(incoming);
       nestedDelta=callbackCount-beforeCalls;inside=false;
     }
   };
-  source.referenceBatch(req);
-  assert.ok(entered);assert.equal(nestedErrors.length,6);
-  assert.ok(nestedErrors.every(Boolean),'a public entry or alternate whole guard escaped the batch lock');
-  assert.ok(nestedErrors[0].message.includes('reentrant current tool reference batch'));
-  assert.ok(nestedErrors[1].message.includes('reentrant current tool reference batch'));
-  assert.ok(nestedErrors[2].message.includes('reentrant current tool reference batch'));
-  assert.ok(nestedErrors[3].message.includes('reentrant current tool reference batch'));
+  assert.throws(()=>source.referenceBatch(req),/reentrant current tool root transaction/);
+  assert.ok(entered);assert.equal(nestedErrors.length,7);
+  assert.ok(nestedErrors.every(error=>error&&/reentrant current tool root transaction/.test(error.message)),
+    'a same-root public entry escaped the active transaction');
   assert.equal(nestedDelta,0,'nested work invoked another supplied callback');
-  assert.equal(ownsInsideBatch,true,'pure ownsReference should remain available during a batch');
-  reset();source.assertCurrent();assert.deepEqual(source.referenceBatch(req),[source.comparisonBytes(before(first))]);
+  reset();source.assertCurrent();assert.equal(source.ownsReference(before(first)),true);
+  assert.deepEqual(source.referenceBatch(req),[source.comparisonBytes(before(first))]);
 
   // A provided reader exception retains identity; finally clears the batch lock.
   const sentinel=new Error('reference batch reader sentinel');let exceptionReached=false;
@@ -203,7 +199,7 @@ if(group==='semantics'){
   assert.ok(exceptionReached);reset();source.assertCurrent();
   assert.deepEqual(source.referenceBatch(req),[source.comparisonBytes(before(first))]);
   console.log(JSON.stringify({result:'pass',group,actual_tool_reference_subject:true,
-    input_mutation_rechecked_after_last_callback:true,batch_and_public_operation_reentry_before_nested_callbacks:6,
-    pure_owns_reference_available_during_batch:true,provided_exception_identity_and_clean_retry:true,
+    input_mutation_rechecked_after_last_callback:true,batch_and_public_operation_reentry_before_nested_callbacks:7,
+    same_root_queries_rejected_during_batch:true,caught_reentry_poisoned_outer_batch:true,independent_owns_reference_available:true,provided_exception_identity_and_clean_retry:true,
     product_owner_or_admission_claim:false,g11_claim:'not-passed'}));
 }

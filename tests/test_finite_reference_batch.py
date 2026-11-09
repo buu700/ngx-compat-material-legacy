@@ -73,8 +73,10 @@ class FiniteReferenceBatchTests(unittest.TestCase):
         line, report = self.run_group('reentry')
         self.assertIn(line, ('21.x', 'main'))
         self.assertTrue(report['input_mutation_rechecked_after_last_callback'])
-        self.assertEqual(report['batch_and_public_operation_reentry_before_nested_callbacks'], 6)
-        self.assertTrue(report['pure_owns_reference_available_during_batch'])
+        self.assertEqual(report['batch_and_public_operation_reentry_before_nested_callbacks'], 7)
+        self.assertTrue(report['same_root_queries_rejected_during_batch'])
+        self.assertTrue(report['caught_reentry_poisoned_outer_batch'])
+        self.assertTrue(report['independent_owns_reference_available'])
         self.assertTrue(report['provided_exception_identity_and_clean_retry'])
 
 

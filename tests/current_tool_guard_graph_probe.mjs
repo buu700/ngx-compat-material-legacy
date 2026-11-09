@@ -19,11 +19,14 @@ let calls=0,onRead=()=>{},override=null,rejected=0;
 const read=path=>{const raw=disk(path);calls++;onRead(path);return override?override(path,raw):raw;};
 const reset=()=>{calls=0;onRead=()=>{};override=null;};
 const reject=(fn,match=()=>true)=>{assert.throws(fn,error=>error?.code==='ERR_ASSERTION'&&match(error));rejected++;};
+const rejectReentry=fn=>{assert.throws(fn,/reentrant current tool root transaction/);rejected++;};
 write(helper,Buffer.concat([helperBefore,suffix]));
 try{
  onRead=()=>write(helper,helperBefore);reject(()=>currentSassToolReferenceSubject({root,read}));assert.equal(calls,0);
 }finally{write(helper,helperBefore);reset();}
 const source=currentSassToolReferenceSubject({root,read});reset();
+source.guardNode.preflight();assert.equal(calls,0,'tool preflight invoked supplied callbacks');
+source.guardNode.final();assert.equal(calls,0,'tool final invoked supplied callbacks');
 assert.ok(Object.isFrozen(source.guardNode)&&Object.isFrozen(source.guardPlan));
 assert.equal(source.guardPlan.node,source.guardNode);assert.equal(source.guardPlan.assertCurrent,source.assertCurrent);
 const target='scripts/rc-verify.py',before=disk(target);
@@ -57,8 +60,8 @@ source.assertCurrent();reset();
 const alternate=composeCanonicalSourceGuards(Object.freeze([source.guardNode]));
 for(const [outer,inner]of [[alternate,source.assertCurrent],[source.assertCurrent,alternate]]){
  let nested=false;
- onRead=path=>{if(path===target&&!nested){nested=true;reject(inner);}};
- try{outer();assert.equal(nested,true);}finally{reset();}
+ onRead=path=>{if(path===target&&!nested){nested=true;assert.throws(inner,/reentrant current tool root transaction/);}};
+ try{rejectReentry(outer);assert.equal(nested,true);}finally{reset();}
  source.assertCurrent();reset();
 }
 const row=source.transitions[0],ref={path:row.path,...row.before},after={path:row.path,...row.after};
@@ -67,14 +70,15 @@ const operations=[()=>assert.deepEqual(source.qualify(ref),after),
  ()=>assert.equal(createHash('sha256').update(source.comparisonBytes(ref)).digest('hex'),ref.sha256)];
 for(const operation of operations){
  let nested=false;
- onRead=path=>{if(path===target&&!nested){nested=true;operation();}};
- try{source.assertCurrent();assert.equal(nested,true);}finally{reset();}
+ onRead=path=>{if(path===target&&!nested){nested=true;assert.throws(operation,/reentrant current tool root transaction/);}};
+ try{rejectReentry(source.assertCurrent);assert.equal(nested,true);}finally{reset();}
+ source.assertCurrent();operation();reset();
  override=(path,raw)=>path===row.path?Buffer.concat([raw,suffix]):raw;
  try{reject(operation);}finally{reset();}
  operation();source.assertCurrent();reset();
 }
-assert.equal(rejected,12);assert.ok(disk(helper).equals(helperBefore));assert.ok(disk(target).equals(before));
+assert.equal(rejected,15);assert.ok(disk(helper).equals(helperBefore));assert.ok(disk(target).equals(before));
 console.log(JSON.stringify({result:'pass',line:source.line,rejected_faults:rejected,
- actual_factory_node:true,alternate_scheduler_reentry_controls:2,independent_nested_side_operations:3,
+ actual_factory_node:true,callback_free_preflight_and_final:true,alternate_scheduler_reentry_controls:2,same_root_nested_side_operations_rejected:3,independent_side_operations:3,
  side_operation_forged_reader_controls:3,source_bound:source.bound.length,restoration_passed:true,
  product_owner_or_compiler_executed:false,g11_claim:'not-passed'}));

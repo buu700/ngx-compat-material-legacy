@@ -14,7 +14,7 @@ class RetainedWrapperFrameTests(unittest.TestCase):
                                capture_output=True, text=True, timeout=60)
         self.assertEqual(child.returncode, 0, child.stdout + child.stderr)
         report = json.loads(child.stdout)
-        self.assertEqual((report['bound'], report['transitions']), (124, 7))
+        self.assertEqual((report['bound'], report['transitions']), (125, 7))
         for field in ['old_source_reader_rejected', 'late_old_source_reader_rejected',
                       'warm_cold_restore_before_callback_rejected', 'caught_reentry_rejected',
                       'changed_input_metadata_rejected']:

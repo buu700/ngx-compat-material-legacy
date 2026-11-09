@@ -34,16 +34,18 @@ try {
   const inspection = JSON.parse(read(inspectionPath));
   const stagePath = 'compatibility/rc/main-current-inventory-source-routing-v9.json';
   const stage = JSON.parse(read(stagePath));
-  const updates = [...packet.updates, ...graph.updates, ...contracts.updates, ...test.updates, ...inspection.updates, ...stage.updates];
+  const guardTestPath = 'compatibility/rc/main-current-tool-guard-test-source-routing-v10.json';
+  const guardTests = JSON.parse(read(guardTestPath));
+  const updates = [...packet.updates, ...graph.updates, ...contracts.updates, ...test.updates, ...inspection.updates, ...stage.updates, ...guardTests.updates];
   const latest = new Map(updates.map(row => [row.path, row.after]));
-  assert.equal(scope.bound.length, 522); assert.equal(scope.transitions.length, 104);
+  assert.equal(scope.bound.length, 523); assert.equal(scope.transitions.length, 108);
   for (const update of updates) for (const ref of [update.before, update.after]) {
     assert.deepEqual(scope.qualify(ref), latest.get(update.path));
     assert.equal(hash(scope.comparisonBytes(ref)), ref.sha256);
     assert.equal(scope.qualify({...ref, sha256: '0'.repeat(64)}), null);
     assert.throws(() => scope.qualify({...ref, bytes: ref.bytes + 1}));
   }
-  const targets = [...new Set([packetPath, graphPath, contractPath, testPath, inspectionPath, stagePath, test.source_anchor.packet.path, ...updates.map(row => row.path),
+  const targets = [...new Set([packetPath, graphPath, contractPath, testPath, inspectionPath, stagePath, guardTestPath, test.source_anchor.packet.path, ...updates.map(row => row.path),
     ...packet.support.map(row => row.path), ...graph.support.map(row => row.path)])];
   for (const path of targets) {
     const file = join(root, path), saved = read(path);
