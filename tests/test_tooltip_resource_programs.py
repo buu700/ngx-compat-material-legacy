@@ -23,16 +23,16 @@ class TooltipResourceProgramTests(unittest.TestCase):
         for child in children:
             self.assertEqual(child.returncode, 0, child.stdout + child.stderr)
             report = json.loads(child.stdout); reports.append(report)
-            self.assertEqual((len(report['bound']), len(report['transitions'])), (518, 99))
-            self.assertEqual(report['program_reference_checks'], 14)
-            self.assertEqual(report['unique_program_images'], 12)
-            self.assertEqual(report['physical_cold_late_recovery_targets'], 12)
-            self.assertEqual(report['bad_supplied_program_readers_rejected'], 5)
+            self.assertEqual((len(report['bound']), len(report['transitions'])), (519, 100))
+            self.assertEqual(report['program_reference_checks'], 16)
+            self.assertEqual(report['unique_program_images'], 14)
+            self.assertEqual(report['physical_cold_late_recovery_targets'], 15)
+            self.assertEqual(report['bad_supplied_program_readers_rejected'], 6)
             self.assertFalse(report['historical_programs_executed'])
             self.assertFalse(report['artifact_or_audit_admission_granted'])
         self.assertEqual(reports[0]['transitions'], reports[1]['transitions'])
         own = {'scripts/current-sass-tool-references.mjs', 'scripts/current_sass_tool_references.py',
                'scripts/current-tool-matrix-source.mjs', 'scripts/current_tool_matrix_source.py'}
         shared = [{row['path']: row for row in report['bound'] if row['path'] not in own} for report in reports]
-        self.assertEqual(len(shared[0]), 516)
+        self.assertEqual(len(shared[0]), 517)
         self.assertEqual(shared[0], shared[1])

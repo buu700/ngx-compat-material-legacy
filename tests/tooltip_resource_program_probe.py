@@ -29,9 +29,11 @@ with TemporaryDirectory(prefix='tooltip-source-program-py-') as temporary:
     graph_path = 'compatibility/rc/main-sass-graph-resource-source-programs-v2.json'
     contract_path = 'compatibility/rc/main-sass-resource-contract-programs-v1.json'
     graph, contracts = json.loads(read(graph_path)), json.loads(read(contract_path))
-    updates = packet['updates'] + graph['updates'] + contracts['updates']
+    test_path = 'compatibility/rc/main-current-inventory-source-routing-v7.json'
+    test = json.loads(read(test_path))
+    updates = packet['updates'] + graph['updates'] + contracts['updates'] + test['updates']
     latest = {row['path']: row['after'] for row in updates}
-    assert (len(scope.bound), len(scope.transitions)) == (518, 99)
+    assert (len(scope.bound), len(scope.transitions)) == (519, 100)
     for update in updates:
         for ref in (update['before'], update['after']):
             assert scope.qualify(ref) == latest[update['path']]
@@ -40,7 +42,7 @@ with TemporaryDirectory(prefix='tooltip-source-program-py-') as temporary:
             try: scope.qualify(dict(ref, bytes=ref['bytes'] + 1))
             except AssertionError: pass
             else: raise AssertionError('wrong program length accepted')
-    targets = list(dict.fromkeys([packet_path, graph_path, contract_path, *[row['path'] for row in updates],
+    targets = list(dict.fromkeys([packet_path, graph_path, contract_path, test_path, test['source_anchor']['packet']['path'], *[row['path'] for row in updates],
         *[row['path'] for row in packet['support']], *[row['path'] for row in graph['support']]]))
     for path in targets:
         target = root / path; saved = read(path)

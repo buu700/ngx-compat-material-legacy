@@ -215,7 +215,7 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
  assert.equal(previous.schema_version,1);assert.equal(previous.role,packet.role);
  assert.deepEqual(packet.product_paths,[]);assert.equal(packet.historical_programs_executed,false);assert.equal(packet.historical_reports_rewritten,0);assert.equal(packet.artifact_or_audit_admission_granted,false);
  assert.ok(equalBytes(read(packagePath),packageImage),'package line changed');
- let matrixOwner;const domainOverlays=new Map(),tooltipPrograms=new Map(),lateResourcePrograms=new Map();
+ let matrixOwner;const domainOverlays=new Map(),tooltipPrograms=new Map(),lateResourcePrograms=new Map(),retainedTestBefore=new Map();
  const graphProgramPacket = {path: 'compatibility/rc/main-sass-graph-resource-source-programs-v2.json',
   sha256: 'e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98', bytes: 6928};
  if (line === 'main') {
@@ -224,12 +224,16 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
    [{path: 'compatibility/rc/main-sass-resource-contract-programs-v1.json',
     sha256: 'e8db18d114f9a32c946caaf72b0f3ea1ed8377c3bba6b518f5162ab947673d2a', bytes: 14946},
     'main-sass-resource-contract-program-continuation',
-    ['scripts/current-sass-spinner-snack-contract.mjs', 'scripts/current_sass_spinner_snack_admission.py']]];
+    ['scripts/current-sass-spinner-snack-contract.mjs', 'scripts/current_sass_spinner_snack_admission.py']],
+   [{path: 'compatibility/rc/main-current-inventory-source-routing-v7.json',
+    sha256: '6988117f3e1da0fcd53c5993b2402d997464775155b2310462ecd1dab3148f9a', bytes: 2037},
+    'main-current-inventory-test-source-routing', ['tests/test_retained_landscape_tool_replay.py']]];
   const env = {PATH: process.env.PATH, GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_SYSTEM: '/dev/null',
    GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_TERMINAL_PROMPT: '0'};
   for (const [packetRef, role, paths] of definitions) {
    const p = JSON.parse(member(packetRef)); assert.equal(p.schema_version, 1); assert.equal(p.role, role);
-   assert.equal(p.base_head, 'ecc1051cfb829f0b67ba9cb50e4b733d6684ebff');
+   assert.equal(p.base_head, role === 'main-current-inventory-test-source-routing' ?
+    'c2ae34b7664907b3add5951f357a922b9fed0d8e' : 'ecc1051cfb829f0b67ba9cb50e4b733d6684ebff');
    assert.deepEqual(p.updates.map(row => row.path), paths);
    for (const [key, value] of Object.entries({source_scope_only: true, historical_programs_executed: false,
     historical_packets_rewritten: false, theme_module_contract_changed: false,
@@ -239,7 +243,17 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
      sha256: 'b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211', bytes: 15324});
     assert.deepEqual(p.support.map(row => row.path), ['compatibility/rc/parent-main-sass-domain-source-successor-v1.json']);
     for (const ref of p.support) member(ref);
-   } else assert.deepEqual(p.source_program_packet, graphProgramPacket);
+   } else if (role === 'main-sass-resource-contract-program-continuation') assert.deepEqual(p.source_program_packet, graphProgramPacket);
+   else {
+    assert.deepEqual(p.previous_packet, {path: 'compatibility/rc/main-current-inventory-source-routing-v6.json',
+     sha256: '233fa6a574a7124c0e1cc41bec2b307ae5d7517ae1e6e3f09e1b614e9c05f9a1', bytes: 8161});
+    assert.deepEqual(p.source_anchor, {packet: {path: 'compatibility/rc/main-current-inventory-source-routing-v4.json',
+     sha256: 'b4d4fc742323ec0bb6858a5b6165dc0c1307d0d0a1d4c3f49b6ef017df97ab1c', bytes: 32578}, support_index: 80});
+    assert.deepEqual(p.support, []); assert.equal(p.original_ledger_metadata_recipe_changed, false);
+    assert.equal(p.source_judgments_changed, 0); assert.equal(p.artifact_or_audit_admission_granted, false);
+    const anchor = JSON.parse(member(p.source_anchor.packet)).support[80];
+    assert.deepEqual(p.updates[0].before, anchor); retainedTestBefore.set(paths[0], anchor);
+   }
    execFileSync('git', ['--no-replace-objects', 'merge-base', '--is-ancestor', p.base_head, 'HEAD'], {cwd: root, env});
    const originals = gitImages(root, paths.map(path => ({commit: p.base_head, path})));
    for (const update of p.updates) {
@@ -333,7 +347,7 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
   const routing=JSON.parse(member({path:'compatibility/rc/main-current-inventory-source-routing-v2.json',sha256:'3815beb1e21779e54deaee5da2bf7bb316732e98a3dc9938ef6d2fdf18707280',bytes:24306}));
   assert.equal(routing.schema_version,1);assert.equal(routing.role,'main-current-inventory-source-routing');assert.equal(routing.base_head,'54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0');assert.equal(routing.source_scope_only,true);assert.equal(routing.historical_programs_executed,false);assert.equal(routing.historical_packets_rewritten,false);assert.equal(routing.artifact_or_audit_admission_granted,false);assert.equal(routing.g11_claim,'not-passed');
   const paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];assert.deepEqual(routing.updates.map(row=>row.path),paths);
-  member({path:'scripts/current-inventory-source-subject.mjs',sha256:'30be6c61df2253756dbf0cc66641ecf6fa8414bbbfc20f0257f67ddef2a7f1b9',bytes:16520});
+  member({path:'scripts/current-inventory-source-subject.mjs',sha256:'8372ec6b0ca27c3f7cd730fc6237bdc8bb8fd286aa03f22a4355d4b64bdff7fe',bytes:20148});
   const env={PATH:process.env.PATH,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1',GIT_TERMINAL_PROMPT:'0'};execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',routing.base_head,'HEAD'],{cwd:root,env});const originals=gitImages(root,paths.map(path=>({commit:routing.base_head,path})));
   const next=JSON.parse(member({path:'compatibility/rc/main-current-inventory-source-routing-v3.json',sha256:'d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b',bytes:13219}));
   assert.equal(next.schema_version,1);assert.equal(next.role,'main-current-inventory-retained-source-routing');assert.equal(next.base_head,'b7ad00c881420e8621f23d77ab2feba7a3475e78');assert.equal(next.support_commit,next.base_head);
@@ -348,7 +362,7 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
   for(const[key,value]of Object.entries({source_scope_only:true,historical_programs_executed:false,historical_packets_rewritten:false,original_ledger_metadata_recipe_changed:false,source_judgments_changed:0,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(late[key],value);
   assert.deepEqual(late.updates.map(row=>row.path),[paths[0]]);assert.equal(late.support.length,84);execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',late.base_head,'HEAD'],{cwd:root,env});
   const lateImages=gitImages(root,[...late.updates.map(row=>({commit:late.base_head,path:row.path})),...late.support.map(ref=>({commit:late.support_commit,path:ref.path}))]);
-  for(const ref of late.support){const committed=lateImages.get(late.support_commit+':'+ref.path);matches(committed,ref);assert.ok(equalBytes(member(ref),committed));}
+  for(const ref of late.support){const committed=lateImages.get(late.support_commit+':'+ref.path);matches(committed,ref);assert.ok(equalBytes(lateResourceComparison(ref),committed));}
   const identity=JSON.parse(member({path:'compatibility/rc/main-current-inventory-source-routing-v5.json',sha256:'47061b1a2794efe6c735d5bf7805ae79f00e96eb1454918bbf27555d4202616c',bytes:3548}));
   assert.equal(identity.schema_version,1);assert.equal(identity.role,'main-current-inventory-retained-source-routing');assert.equal(identity.base_head,'97e568a761396b22efb63630b8c50a62fe2be8db');assert.equal(identity.support_commit,identity.base_head);
   assert.deepEqual(identity.previous_packet,{path:'compatibility/rc/main-current-inventory-source-routing-v4.json',sha256:'b4d4fc742323ec0bb6858a5b6165dc0c1307d0d0a1d4c3f49b6ef017df97ab1c',bytes:32578});
@@ -755,7 +769,7 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
  }
  for(const {update,before,after} of rcSuccessors.values()){const row=rows.get(update.before.path);assert.ok(row);assert.deepEqual({path:row.path,...row.after},update.before,'source successor must follow V5');addIdentity(row,update.before,before);addIdentity(row,update.after,after);row.after={sha256:update.after.sha256,bytes:update.after.bytes};}
  if(matrixOwner){const row=rows.get(matrixOwner.after.path);assert.ok(row);assert.deepEqual({path:row.path,...row.after},matrixOwner.before);addIdentity(row,matrixOwner.before,matrixOwner.comparisonBytes(matrixOwner.before));addIdentity(row,matrixOwner.intermediate,matrixOwner.comparisonBytes(matrixOwner.intermediate));addIdentity(row,matrixOwner.after,member(matrixOwner.after));row.after={sha256:matrixOwner.after.sha256,bytes:matrixOwner.after.bytes};}
- for(const {update,identities} of domainOverlays.values()){let row=rows.get(update.path);if(row)assert.deepEqual({path:row.path,...row.after},update.before,'domain successor must follow previous frame');else{assert.ok((line==='main'&&(update.path===retainedRulesJsPath||retainedLandscapePaths.includes(update.path)))||retainedReaderPaths.has(update.path)||routingImages.has(update.path)||nextBranch.additional_inputs.some(ref=>JSON.stringify(ref)===JSON.stringify(update.before))||(update.path==='scripts/authored-current-use-inventory.mjs'&&checkerSourceAnchor?.source_members.some(ref=>JSON.stringify(ref)===JSON.stringify(update.before))),'domain predecessor is not an existing input');row={path:update.path,before:{sha256:update.before.sha256,bytes:update.before.bytes},identities:new Map()};rows.set(update.path,row);}for(const identity of identities)addIdentity(row,identity.ref,identity.bytes);row.after={sha256:update.after.sha256,bytes:update.after.bytes};}
+ for(const {update,identities} of domainOverlays.values()){let row=rows.get(update.path);if(row)assert.deepEqual({path:row.path,...row.after},update.before,'domain successor must follow previous frame');else{if(retainedTestBefore.has(update.path))assert.deepEqual(update.before,retainedTestBefore.get(update.path));assert.ok((line==='main'&&(update.path===retainedRulesJsPath||retainedLandscapePaths.includes(update.path)))||retainedTestBefore.has(update.path)||retainedReaderPaths.has(update.path)||routingImages.has(update.path)||nextBranch.additional_inputs.some(ref=>JSON.stringify(ref)===JSON.stringify(update.before))||(update.path==='scripts/authored-current-use-inventory.mjs'&&checkerSourceAnchor?.source_members.some(ref=>JSON.stringify(ref)===JSON.stringify(update.before))),'domain predecessor is not an existing input');row={path:update.path,before:{sha256:update.before.sha256,bytes:update.before.bytes},identities:new Map()};rows.set(update.path,row);}for(const identity of identities)addIdentity(row,identity.ref,identity.bytes);row.after={sha256:update.after.sha256,bytes:update.after.bytes};}
  for(const row of rows.values())member({path:row.path,...row.after});
  assert.deepEqual(bound.get(GUARD_PLAN.path),activePlanner,'current tool guard planner missing from finite bound');
  let consuming=false,batching=false;

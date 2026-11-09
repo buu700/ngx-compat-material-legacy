@@ -329,6 +329,7 @@ class CurrentSassToolReferences:
         domain_overlays = {}
         tooltip_programs = {}
         late_resource_programs = {}
+        retained_test_before = {}
         graph_program_packet = dict(path='compatibility/rc/main-sass-graph-resource-source-programs-v2.json',
             sha256='e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98', bytes=6928)
         if self.line == 'main':
@@ -337,13 +338,16 @@ class CurrentSassToolReferences:
                 (dict(path='compatibility/rc/main-sass-resource-contract-programs-v1.json',
                       sha256='e8db18d114f9a32c946caaf72b0f3ea1ed8377c3bba6b518f5162ab947673d2a', bytes=14946),
                  'main-sass-resource-contract-program-continuation',
-                 ['scripts/current-sass-spinner-snack-contract.mjs', 'scripts/current_sass_spinner_snack_admission.py'])]
+                 ['scripts/current-sass-spinner-snack-contract.mjs', 'scripts/current_sass_spinner_snack_admission.py']),
+                (dict(path='compatibility/rc/main-current-inventory-source-routing-v7.json',
+                      sha256='6988117f3e1da0fcd53c5993b2402d997464775155b2310462ecd1dab3148f9a', bytes=2037),
+                 'main-current-inventory-test-source-routing', ['tests/test_retained_landscape_tool_replay.py'])]
             late_env = dict(PATH=os.environ['PATH'], GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null',
                             GIT_NO_LAZY_FETCH='1', GIT_NO_REPLACE_OBJECTS='1', GIT_TERMINAL_PROMPT='0')
             for packet_ref, role, paths in definitions:
                 p = json.loads(self._member(packet_ref))
                 assert p['schema_version'] == 1 and p['role'] == role
-                assert p['base_head'] == 'ecc1051cfb829f0b67ba9cb50e4b733d6684ebff'
+                assert p['base_head'] == ('c2ae34b7664907b3add5951f357a922b9fed0d8e' if role == 'main-current-inventory-test-source-routing' else 'ecc1051cfb829f0b67ba9cb50e4b733d6684ebff')
                 assert [row['path'] for row in p['updates']] == paths
                 for key, value in dict(source_scope_only=True, historical_programs_executed=False,
                                        historical_packets_rewritten=False, theme_module_contract_changed=False,
@@ -354,7 +358,17 @@ class CurrentSassToolReferences:
                         sha256='b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211', bytes=15324)
                     assert [row['path'] for row in p['support']] == ['compatibility/rc/parent-main-sass-domain-source-successor-v1.json']
                     for ref in p['support']: self._member(ref)
-                else: assert p['source_program_packet'] == graph_program_packet
+                elif role == 'main-sass-resource-contract-program-continuation': assert p['source_program_packet'] == graph_program_packet
+                else:
+                    assert p['previous_packet'] == dict(path='compatibility/rc/main-current-inventory-source-routing-v6.json',
+                        sha256='233fa6a574a7124c0e1cc41bec2b307ae5d7517ae1e6e3f09e1b614e9c05f9a1', bytes=8161)
+                    assert p['source_anchor'] == dict(packet=dict(path='compatibility/rc/main-current-inventory-source-routing-v4.json',
+                        sha256='b4d4fc742323ec0bb6858a5b6165dc0c1307d0d0a1d4c3f49b6ef017df97ab1c', bytes=32578), support_index=80)
+                    assert p['support'] == [] and p['original_ledger_metadata_recipe_changed'] is False
+                    assert p['source_judgments_changed'] == 0 and p['artifact_or_audit_admission_granted'] is False
+                    anchor = json.loads(self._member(p['source_anchor']['packet']))['support'][80]
+                    assert p['updates'][0]['before'] == anchor
+                    retained_test_before[paths[0]] = anchor
                 subprocess.check_call(['git', '--no-replace-objects', 'merge-base', '--is-ancestor', p['base_head'], 'HEAD'], cwd=self.root, env=late_env)
                 originals = _git_images(self.root, [dict(commit=p['base_head'], path=path) for path in paths])
                 for update in p['updates']:
@@ -449,7 +463,7 @@ class CurrentSassToolReferences:
             assert routing_packet['schema_version']==1 and routing_packet['role']=='main-current-inventory-source-routing' and routing_packet['base_head']=='54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0'
             assert routing_packet['source_scope_only'] is True and routing_packet['historical_programs_executed'] is False and routing_packet['historical_packets_rewritten'] is False and routing_packet['artifact_or_audit_admission_granted'] is False and routing_packet['g11_claim']=='not-passed'
             routing_paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];assert [row['path'] for row in routing_packet['updates']]==routing_paths
-            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='30be6c61df2253756dbf0cc66641ecf6fa8414bbbfc20f0257f67ddef2a7f1b9',bytes=16520))
+            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='8372ec6b0ca27c3f7cd730fc6237bdc8bb8fd286aa03f22a4355d4b64bdff7fe',bytes=20148))
             routing_env=dict(PATH=os.environ['PATH'],GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0');subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',routing_packet['base_head'],'HEAD'],cwd=self.root,env=routing_env)
             routing_originals=_git_images(self.root,[dict(commit=routing_packet['base_head'],path=routing_path) for routing_path in routing_paths])
             routing_next=json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v3.json',sha256='d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b',bytes=13219)))
@@ -470,7 +484,7 @@ class CurrentSassToolReferences:
             subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',routing_late['base_head'],'HEAD'],cwd=self.root,env=routing_env)
             late_images=_git_images(self.root,[dict(commit=routing_late['base_head'],path=row['path']) for row in routing_late['updates']]+[dict(commit=routing_late['support_commit'],path=ref['path']) for ref in routing_late['support']])
             for ref in routing_late['support']:
-                committed=late_images[(routing_late['support_commit'],ref['path'])];_matches(committed,ref);assert self._member(ref)==committed
+                committed=late_images[(routing_late['support_commit'],ref['path'])];_matches(committed,ref);assert late_resource_comparison(ref)==committed
             routing_identity=json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v5.json',sha256='47061b1a2794efe6c735d5bf7805ae79f00e96eb1454918bbf27555d4202616c',bytes=3548)))
             assert routing_identity['schema_version']==1 and routing_identity['role']=='main-current-inventory-retained-source-routing' and routing_identity['base_head']=='97e568a761396b22efb63630b8c50a62fe2be8db' and routing_identity['support_commit']==routing_identity['base_head']
             assert routing_identity['previous_packet']==dict(path='compatibility/rc/main-current-inventory-source-routing-v4.json',sha256='b4d4fc742323ec0bb6858a5b6165dc0c1307d0d0a1d4c3f49b6ef017df97ab1c',bytes=32578)
@@ -1187,7 +1201,8 @@ class CurrentSassToolReferences:
             path=update['path']; row=self._rows.get(path)
             if row is not None: assert dict(path=path,**row['after']) == update['before'], 'domain successor must follow previous frame'
             else:
-                assert (self.line=='main' and (path==retained_rules_js_path or path in retained_landscape_paths)) or path in retained_reader_paths or path in routing_images or update['before'] in next_branch['additional_inputs'] or (path=='scripts/authored-current-use-inventory.mjs' and checker_source_anchor is not None and update['before'] in checker_source_anchor['source_members']), 'domain predecessor is not an existing input'
+                if path in retained_test_before: assert update['before'] == retained_test_before[path]
+                assert (self.line=='main' and (path==retained_rules_js_path or path in retained_landscape_paths)) or path in retained_test_before or path in retained_reader_paths or path in routing_images or update['before'] in next_branch['additional_inputs'] or (path=='scripts/authored-current-use-inventory.mjs' and checker_source_anchor is not None and update['before'] in checker_source_anchor['source_members']), 'domain predecessor is not an existing input'
                 row=dict(path=path,before=dict(sha256=update['before']['sha256'],bytes=update['before']['bytes']),identities={}); self._rows[path]=row
             for ref, raw in identities: self._add(row,ref,raw)
             row['after']=dict(sha256=update['after']['sha256'],bytes=update['after']['bytes'])
