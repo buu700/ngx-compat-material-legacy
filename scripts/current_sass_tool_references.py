@@ -335,6 +335,40 @@ class CurrentSassToolReferences:
         assert packet['historical_reports_rewritten'] == 0 and packet['artifact_or_audit_admission_granted'] is False
         assert self._read(package_path) == package_image
         domain_overlays = {}
+        bidi_owner=bidi_checker=bidi_helper=None; bidi_programs={}
+        if self.line=='main':
+            bidi_owner=json.loads(self._member(dict(path='compatibility/rc/main-bidi-current-inventory-owner-source-v2.json',sha256='33979b1cbf7f7fcf86004ac808d79960d263b91e16e99df948119d8528642daa',bytes=14334)))
+            assert bidi_owner['schema_version']==1 and bidi_owner['role']=='main-bidi-current-inventory-owner-source-successor' and bidi_owner['source_scope_only'] is True and bidi_owner['historical_programs_executed'] is False and bidi_owner['artifact_or_audit_admission_granted'] is False and bidi_owner['g11_claim']=='not-passed' and bidi_owner['source_base']=='39192f29e224da08cc0f883401208fc8ac88d7c9' and bidi_owner['before']['path']==bidi_owner['after']['path']=='scripts/current-inventory-source-subject.mjs'
+            bidi_env=dict(PATH=os.environ.get('PATH'),LANG='C',LC_ALL='C',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_SYSTEM='/dev/null',GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0');subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',bidi_owner['source_base'],'HEAD'],cwd=self.root,env=bidi_env)
+            bidi_owner_before=_git_images(self.root,[dict(commit=bidi_owner['source_base'],path=bidi_owner['before']['path'])])[(bidi_owner['source_base'],bidi_owner['before']['path'])];_matches(bidi_owner_before,bidi_owner['before']);bidi_owner_after=_edited(bidi_owner_before,bidi_owner['edits']);_matches(bidi_owner_after,bidi_owner['after']);assert self._member(bidi_owner['after'])==bidi_owner_after
+            bidi=json.loads(self._member(bidi_owner['bidi_packet']));assert bidi['schema_version']==1 and bidi['role']=='main-bidi-current-inventory-source-routing' and bidi['source_scope_only'] is True and bidi['historical_programs_executed'] is False and bidi['historical_packets_rewritten'] is False and bidi['artifact_or_audit_admission_granted'] is False and bidi['g11_claim']=='not-passed'
+            assert subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',bidi['source_commit']],cwd=self.root,env=bidi_env,text=True).strip()==bidi['source_commit']+' '+bidi['source_parent'];subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',bidi['source_commit'],'HEAD'],cwd=self.root,env=bidi_env)
+            assert [x['path'] for x in bidi['updates']]==['scripts/check-upstream-audit-disposition.mjs','scripts/authored-use-inventory.mjs'];bidi_checker,bidi_helper=bidi['updates']
+            for update in bidi['updates']:
+                ims=_git_images(self.root,[dict(commit=bidi['source_parent'],path=update['path']),dict(commit=bidi['source_commit'],path=update['path'])]);old=ims[(bidi['source_parent'],update['path'])];committed=ims[(bidi['source_commit'],update['path'])];_matches(old,update['before']);_matches(committed,update['after']);assert _edited(old,update['edits'])==committed and self._member(update['after'])==committed;bidi_programs[update['path']]=(update,old,committed)
+            assert bidi['roster']['before']['path']==bidi['roster']['after']['path']=='compatibility/f10/authored-dependency-dispositions.json';roster_path=bidi['roster']['before']['path'];roster_images=_git_images(self.root,[dict(commit=bidi['source_parent'],path=roster_path),dict(commit=bidi['source_commit'],path=roster_path)]);roster_old=roster_images[(bidi['source_parent'],roster_path)];roster_new=roster_images[(bidi['source_commit'],roster_path)];_matches(roster_old,bidi['roster']['before']);_matches(roster_new,bidi['roster']['after'])
+            roster_a=json.loads(roster_old);roster_b=json.loads(roster_new);assert len(roster_a['symbol_uses'])==len(roster_b['symbol_uses'])==1736;changed=[]
+            for old,now in zip(roster_a['symbol_uses'],roster_b['symbol_uses']):
+                if old==now:continue
+                normalized={**now,'source_review':old['source_review']};assert normalized==old and old['module']=='@angular/cdk/bidi' and old['symbol']=='BidiModule' and old['source_review']==dict(path='compatibility/f10/authored-use-reviews/public-bidi-module-boundary.json',sha256='63b2265f6296d54dec0d8f7d76aedece8821348682a46e86158acdce9fe297fc') and now['source_review']==dict(path='compatibility/f10/authored-use-reviews/frozen-public-bidi-retired-source-v1.json',sha256='7a2f68a993197d6df546f1007d81c6fa0baeb65b5d8872a407ae5c6c9ad0be4b');changed.append([old['file'],old['module'],old['symbol']])
+            assert len(changed)==len({tuple(x) for x in changed})==23 and changed==bidi['roster']['changed_keys'] and {**roster_b,'symbol_uses':roster_a['symbol_uses']}==roster_a
+            radio_parent='0babfed50b9462daf46eee855082beefc653e37a';radio_commit='69f3b50c4f2352a9cf886023c9d8f9384dac75d7';assert subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',radio_commit],cwd=self.root,env=bidi_env,text=True).strip()==radio_commit+' '+radio_parent;subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',radio_commit,'HEAD'],cwd=self.root,env=bidi_env)
+            radio_images=_git_images(self.root,[dict(commit=c,path=roster_path) for c in (radio_parent,radio_commit)]);assert radio_images[(radio_parent,roster_path)]==roster_new;radio_after=radio_images[(radio_commit,roster_path)];radio_ref=dict(path=roster_path,sha256='b68685f4754d323af1b8c9b8c74d29434d195ee3605f16744511069229156f43',bytes=3072157);_matches(radio_after,radio_ref);assert self._member(radio_ref)==radio_after;ra=json.loads(roster_new);rb=json.loads(radio_after);radio_changed=[];assert len(ra['symbol_uses'])==len(rb['symbol_uses'])==1736
+            for old,now in zip(ra['symbol_uses'],rb['symbol_uses']):
+                if old==now:continue
+                assert [old['file'],old['module'],old['symbol']]==['legacy-radio/internal/radio-base.ts','@angular/cdk/a11y','FocusOrigin'] and {**now,'source_review':old['source_review']}==old and old['source_review']==dict(path='compatibility/f10/authored-use-reviews/radio-boundary-main-28-v3.json',sha256='cb471605d8fcd578624cbde36cd308f701c9acb49226b4ea7c7e3fbccb5d3244') and now['source_review']==dict(path='compatibility/f10/authored-use-reviews/radio-focus-origin-current-source-v1.json',sha256='fa16cd9637a3e63c0f61631345a61d0343ac22ef5f81e387f9a0689629bd1827',bytes=59645);radio_changed.append(old)
+            assert len(radio_changed)==1 and {**rb,'symbol_uses':ra['symbol_uses']}==ra
+            radio_support=[dict(path='compatibility/f10/authored-use-reviews/radio-focus-origin-current-source-v1.json',sha256='fa16cd9637a3e63c0f61631345a61d0343ac22ef5f81e387f9a0689629bd1827',bytes=59645),dict(path='compatibility/rc/radio-focus-origin-current-source-proof-v1.json',sha256='75b847678b793231aadae8aefd08e0d5b0caacc75b6da624aabc48e7a7880525',bytes=4043)];radio_support_images=_git_images(self.root,[dict(commit=radio_commit,path=x['path']) for x in radio_support])
+            for ref in radio_support:
+                data=radio_support_images[(radio_commit,ref['path'])];_matches(data,ref);assert self._member(ref)==data
+            assert [r['path'] for r in bidi['support']]==['scripts/bidi-physical-pins.json','compatibility/f10/authored-dependency-inventory-seed.json','compatibility/f10/authored-use-reviews/public-bidi-module-boundary.json','compatibility/f10/authored-use-reviews/frozen-public-bidi-retired-source-v1.json','compatibility/rc/qualification/frozen-public-bidi-source-v2/reviewed-per-use.json']
+            bidi_support_images=_git_images(self.root,[dict(commit=bidi['source_commit'],path=r['path']) for r in bidi['support']])
+            for ref in bidi['support']:
+                data=bidi_support_images[(bidi['source_commit'],ref['path'])];_matches(data,ref);assert self._member(ref)==data
+            next_review=json.loads(self._member(bidi['support'][3]));independent=json.loads(self._member(bidi['support'][4]));assert next_review['schema_version']==1 and next_review['line']=='main' and next_review['status']=='reviewed' and len(next_review['reviews'])==23 and independent['line']=='main' and independent['status']=='reviewed-finite-source-dispositions' and len(independent['reviews'])==25
+            for key in changed:
+                old=next(r for r in roster_a['symbol_uses'] if [r['file'],r['module'],r['symbol']]==key);rr=[r for r in next_review['reviews'] if [r['file'],r['module'],r['symbol']]==key];proof=[r for r in independent['reviews'] if [r['file'],r['module'],r['symbol']]==key];assert len(rr)==len(proof)==1 and rr[0]['conclusion']==proof[0]['conclusion']=='removed-use' and proof[0]['prior_row']==old and rr[0]['candidate_source_sha256']==proof[0]['historical_source']['sha256'] and all(rr[0][f]==proof[0][f] for f in ('file','module','symbol','conclusion','reviewer','decision'))
+            domain_overlays[bidi_helper['path']]=(bidi_helper,[(bidi_helper['before'],bidi_programs[bidi_helper['path']][1]),(bidi_helper['after'],bidi_programs[bidi_helper['path']][2])]);domain_overlays[bidi_owner['before']['path']]=(dict(path=bidi_owner['before']['path'],before=bidi_owner['before'],after=bidi_owner['after']),[(bidi_owner['before'],bidi_owner_before),(bidi_owner['after'],bidi_owner_after)])
         tooltip_programs = {}
         late_resource_programs = {}
         retained_test_before = {}
@@ -378,7 +412,27 @@ class CurrentSassToolReferences:
                 after = _edited(before, update['edits']); _matches(after, update['after'])
                 assert self._member(update['after']) == after
                 cold_programs[update['path']] = (update, [(update['before'], before), (update['after'], after)])
+        c02_images={};hint_images={};de40_images={}
+        if self.line=='main':
+            def committed_packet(ref,role,parent,commit,updates_key,target):
+                packet=json.loads(self._member(ref));assert packet['schema_version']==1 and packet['role']==role and packet['source_parent']==parent and packet['source_commit']==commit and packet.get('source_only',packet.get('source_scope_only')) is True and packet['historical_programs_executed'] is False and packet['artifact_or_audit_admission_granted'] is False and packet['g11_claim']=='not-passed'
+                assert subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',commit],cwd=self.root,env=bidi_env,text=True).strip()==commit+' '+parent;subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',commit,'HEAD'],cwd=self.root,env=bidi_env)
+                updates=packet[updates_key];ims=_git_images(self.root,[dict(commit=c,path=x['path']) for x in updates for c in (parent,commit)])
+                for update in updates:
+                    old=ims[(parent,update['path'])];after=_edited(old,update['edits']);_matches(old,update['before']);_matches(after,update['after']);assert after==ims[(commit,update['path'])] and self._member(update['after'])==after;target[update['path']]=(update,old,after)
+                for member in packet.get('new_committed_inputs',packet.get('support',[])):
+                    raw=_git_images(self.root,[dict(commit=commit,path=member['path'])])[(commit,member['path'])];_matches(raw,member);assert self._member(member)==raw
+                return packet
+            d=committed_packet(dict(path='compatibility/rc/main-current-inventory-de40-helper-source-v1.json',sha256='2137114a9bb60a19e3c1537f5709180349bde7a635fff1408d0ff2cb06da427e',bytes=3254),'main-current-inventory-de40-helper-source-successor','69f3b50c4f2352a9cf886023c9d8f9384dac75d7','16d813c667e6e0a40462a95cf5550feddb9dbc1f','updates',de40_images);assert [x['path'] for x in d['updates']]==['scripts/upstream-candidate-source-evidence.mjs','scripts/upstream-individual-evidence-scope.mjs']
+            c=committed_packet(dict(path='compatibility/rc/current-sass-c02-source-successor-v1.json',sha256='c04e7b8045118269356d8459107b48aada152bf466cea85f226ebccb2e2d8319',bytes=86474),'current-sass-c02-source-successor','b266037512764956bf88ad508756bc90373bd7f2','c8be86cbda8f21c9aa3a73caa4c11e786994d77f','transitions',c02_images);assert len(c['transitions'])==12
+            h=committed_packet(dict(path='compatibility/rc/current-sass-authored-hint-source-v1.json',sha256='c3b6d4d2a671ce3155995cffbfbca7ae9fea211a4bbd5367fb571559cc06db26',bytes=16631),'current-sass-authored-hint-source-successor','2f67cf16620b7a91cd25c029f814f9744d187a88','5d366f7a97e96dffa390d3b4da102e7d113066bf','updates',hint_images);assert [x['path'] for x in h['updates']]==['scripts/authored-additional-use-baseline.mjs','scripts/form-field-retired-use.mjs','compatibility/f10/authored-dependency-current-dispositions.json']
+            _,old,new=hint_images['compatibility/f10/authored-dependency-current-dispositions.json'];a=json.loads(old);b=json.loads(new);assert len(a['symbol_uses'])==len(b['symbol_uses'])==336 and sum(x!=y for x,y in zip(a['symbol_uses'],b['symbol_uses']))==13 and {**b,'symbol_uses':a['symbol_uses'],'current_source_population_sha256':a['current_source_population_sha256'],'current_source_files':a['current_source_files'],'source_snapshot_history':a['source_snapshot_history']}==a
         def cold_data(ref):
+            found=c02_images.get(ref['path']) or de40_images.get(ref['path'])
+            if found is not None:
+                update,old,after=found
+                if ref==update['before']: self._member(update['after']); return old
+                assert ref==update['after']; return self._member(ref)
             overlay = cold_programs.get(ref['path'])
             if overlay is None: return self._member(ref)
             update, identities = overlay; meta = _metadata(ref)
@@ -696,6 +750,8 @@ class CurrentSassToolReferences:
                     assert inspection_comparison(update['after']) == after and update['path'] not in late_resource_programs
                     late_resource_programs[update['path']] = (update, [(update['before'], before), (update['after'], after)])
         def late_resource_comparison(ref):
+            if bidi_checker is not None and ref['path']==bidi_checker['path'] and ref['sha256'] in (bidi_checker['before']['sha256'],bidi_checker['after']['sha256']):
+                prior=bidi_checker['before'] if ref['sha256']==bidi_checker['before']['sha256'] else bidi_checker['after'];assert _metadata(ref)==prior;self._member(bidi_checker['after']);return bytes(bidi_programs[ref['path']][1 if prior==bidi_checker['before'] else 2])
             overlay = late_resource_programs.get(ref['path'])
             if overlay is None: return inspection_comparison(ref)
             update, identities = overlay; meta = _metadata(ref)
@@ -781,7 +837,7 @@ class CurrentSassToolReferences:
             assert routing_packet['schema_version']==1 and routing_packet['role']=='main-current-inventory-source-routing' and routing_packet['base_head']=='54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0'
             assert routing_packet['source_scope_only'] is True and routing_packet['historical_programs_executed'] is False and routing_packet['historical_packets_rewritten'] is False and routing_packet['artifact_or_audit_admission_granted'] is False and routing_packet['g11_claim']=='not-passed'
             routing_paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];assert [row['path'] for row in routing_packet['updates']]==routing_paths
-            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='fb1de02c5736bf53ff3d6293b2157c897c2c6cdafe8e43fe255e07f4c6b7aea4',bytes=41205))
+            self._member(bidi_owner['after'])
             routing_env=dict(PATH=os.environ['PATH'],GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0');subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',routing_packet['base_head'],'HEAD'],cwd=self.root,env=routing_env)
             routing_originals=_git_images(self.root,[dict(commit=routing_packet['base_head'],path=routing_path) for routing_path in routing_paths])
             routing_next=json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v3.json',sha256='d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b',bytes=13219)))
@@ -877,6 +933,9 @@ class CurrentSassToolReferences:
                 before=retained_originals[(retained_packet['base_head'],retained_update['path'])];_matches(before,retained_update['before']);after=_edited(before,retained_update['edits']);_matches(after,retained_update['after']);assert routing_comparison(retained_update['after'])==after and retained_update['path'] not in domain_overlays
                 retained_overlay=(retained_update,[(retained_update['before'],before),(retained_update['after'],after)]);domain_overlays[retained_update['path']]=retained_overlay;retained_reader_images[retained_update['path']]=retained_overlay;retained_reader_paths.add(retained_update['path'])
         def retained_reader_comparison(ref):
+            hint=hint_images.get(ref['path'])
+            if hint is not None:
+                update,old,after=hint;assert ref==update['before'];self._member(update['after']);return old
             overlay=retained_reader_images.get(ref['path'])
             if overlay is None:return self._member(ref)
             update,identities=overlay;meta=_metadata(ref);matches=[raw for identity,raw in identities if identity==meta];assert len(matches)==1,'unknown retained reader comparison'
@@ -962,8 +1021,12 @@ class CurrentSassToolReferences:
             assert epoch22['base_head']=='a796c018da3023e916b37088917f6adca56fbc9d' and epoch22['source_commit']=='0feac873886782da408d5894bbf1bb26862ec45c' and epoch22['source_parent']=='f569667b366b23b36280c5c2a10e9f87351472bd'
             assert subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',epoch22['source_commit']],cwd=self.root,env=env,text=True).strip()==epoch22['source_commit']+' '+epoch22['source_parent']
             subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',epoch22['base_head'],'HEAD'],cwd=self.root,env=env)
-            epoch22_bytes=_edited(new_epoch,epoch22['edits']); _matches(epoch22_bytes,epoch22['after']); assert self._member(epoch22['after'])==epoch22_bytes and epoch22['ledger_before']==epoch['ledger_after']
-            epoch22_images=_git_images(self.root,[dict(commit=epoch22['source_parent'],path=epoch22['ledger_before']['path']),dict(commit=epoch22['source_commit'],path=epoch22['ledger_after']['path'])]); _matches(epoch22_images[(epoch22['source_parent'],epoch22['ledger_before']['path'])],epoch22['ledger_before']); _matches(epoch22_images[(epoch22['source_commit'],epoch22['ledger_after']['path'])],epoch22['ledger_after']); assert self._member(epoch22['ledger_after'])==epoch22_images[(epoch22['source_commit'],epoch22['ledger_after']['path'])]; self._member(epoch22['receipt'])
+            epoch22_bytes=_edited(new_epoch,epoch22['edits']); _matches(epoch22_bytes,epoch22['after']); assert epoch22['ledger_before']==epoch['ledger_after']
+            epoch22_images=_git_images(self.root,[dict(commit=epoch22['source_parent'],path=epoch22['ledger_before']['path']),dict(commit=epoch22['source_commit'],path=epoch22['ledger_after']['path'])]); _matches(epoch22_images[(epoch22['source_parent'],epoch22['ledger_before']['path'])],epoch22['ledger_before']); _matches(epoch22_images[(epoch22['source_commit'],epoch22['ledger_after']['path'])],epoch22['ledger_after']); self._member(epoch22['receipt'])
+            epoch23=json.loads(self._member(dict(path='compatibility/rc/current-tool-ledger-source-epoch-23-successor-v1.json',sha256='58f0762acdd7643a59820a5647598918e3408032859c3cb1f799d9044a591f02',bytes=8116)));epoch24=json.loads(self._member(dict(path='compatibility/rc/current-tool-ledger-source-epoch-24-successor-v1.json',sha256='0172350986a5616adf4a3c2dd552c0ca466d3d0228c654cc08be54b1903e6b6a',bytes=5508)));assert epoch23['before']==epoch22['after'] and epoch23['ledger_before']==epoch22['ledger_after'] and epoch24['before']==epoch23['after'] and epoch24['ledger_before']==epoch23['ledger_after'];epoch_current=epoch22_bytes
+            for step,parent,commit in [(epoch23,'39192f29e224da08cc0f883401208fc8ac88d7c9','b266037512764956bf88ad508756bc90373bd7f2'),(epoch24,'16d813c667e6e0a40462a95cf5550feddb9dbc1f','2f67cf16620b7a91cd25c029f814f9744d187a88')]:
+                assert step['source_parent']==parent and step['source_commit']==commit and step['source_only'] is True and step['historical_programs_executed'] is False and step['artifact_or_audit_admission_granted'] is False and step['g11_claim']=='not-passed';assert subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',commit],cwd=self.root,env=env,text=True).strip()==commit+' '+parent;subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',commit,'HEAD'],cwd=self.root,env=env);epoch_current=_edited(epoch_current,step['edits']);_matches(epoch_current,step['after']);ims=_git_images(self.root,[dict(commit=parent,path=step['ledger_before']['path']),dict(commit=commit,path=step['ledger_after']['path'])]);_matches(ims[(parent,step['ledger_before']['path'])],step['ledger_before']);_matches(ims[(commit,step['ledger_after']['path'])],step['ledger_after'])
+            assert self._member(epoch24['after'])==epoch_current;self._member(epoch23['receipt']);self._member(epoch24['ledger_after'])
             assert epoch['source_commit']=='252689f364aee65c5d755d4b16e91987f6e305a5' and epoch['source_parent']=='862f511840c7bbeb81236ac6d74ba1a8a2d5f7a7'
             assert subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',epoch['source_commit']],cwd=self.root,env=env,text=True).strip()==epoch['source_commit']+' '+epoch['source_parent']
             subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',epoch['source_commit'],'HEAD'],cwd=self.root,env=env)
@@ -972,9 +1035,9 @@ class CurrentSassToolReferences:
             for ref in epoch['receipts']: self._member(ref)
             def epoch_member(ref):
                 if ref['path']==epoch['before']['path']:
-                    assert ref==epoch['before']; return self._member(epoch22['after'])
+                    assert ref==epoch['before']; return self._member(epoch24['after'])
                 if ref['path']==epoch['ledger_before']['path']:
-                    assert ref==epoch['ledger_before']; return self._member(epoch22['ledger_after'])
+                    assert ref==epoch['ledger_before']; return self._member(epoch24['ledger_after'])
                 return self._member(ref)
             live_checker = json.loads(self._member(dict(path='compatibility/rc/current-tool-live-checker-source-successor-v1.json',sha256='639574a3836d851ba8917db3091cc62e819951f80b1f92190cd6002c39bfc4a1',bytes=2481)))
             assert expected == checker['after'] == live_checker['before']
@@ -982,9 +1045,9 @@ class CurrentSassToolReferences:
             assert live_checker['source_only'] is True and live_checker['historical_programs_executed'] is False and live_checker['artifact_or_audit_admission_granted'] is False and live_checker['g11_claim'] == 'not-passed'
             subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',live_checker['base_head'],'HEAD'],cwd=self.root,env=env)
             assert _git_images(self.root,[dict(commit=live_checker['base_head'],path=checker_path)])[(live_checker['base_head'],checker_path)] == prior
-            live_bytes = _edited(prior,live_checker['edits']); _matches(live_bytes,live_checker['after']); assert self._member(live_checker['after']) == live_bytes
-            epoch_member(live_checker['helper']); identities.append((live_checker['after'],live_bytes))
-            domain_overlays[checker_path] = ({**checker,'after':live_checker['after'],'path':checker_path,'domain':'reviewed checker dispatch source'}, identities)
+            live_bytes = _edited(prior,live_checker['edits']); _matches(live_bytes,live_checker['after']);assert live_checker['after']==bidi_checker['before'] and live_bytes==bidi_programs[checker_path][1];bidi_checker_bytes=bidi_programs[checker_path][2];assert self._member(bidi_checker['after'])==bidi_checker_bytes
+            epoch_member(live_checker['helper']); identities.extend([(live_checker['after'],live_bytes),(bidi_checker['after'],bidi_checker_bytes)])
+            domain_overlays[checker_path] = ({**checker,'after':bidi_checker['after'],'path':checker_path,'domain':'reviewed checker dispatch source'}, identities)
             cva_path = 'scripts/packed-cva-source-requalification.mjs'
             cva_before = dict(path=cva_path, sha256='be8c26049e58848d0b7b0ac1e1dba78151d3d8e867ec49b9dc523f28cb304e33', bytes=27417)
             cva_after = dict(path=cva_path, sha256='ac955ef53f1c530572d82d6b58f2e736787b04757a72a498a3a77bbcdcad3ad5', bytes=27422)
@@ -1078,7 +1141,7 @@ class CurrentSassToolReferences:
                 parent='0feac873886782da408d5894bbf1bb26862ec45c'; commit='a796c018da3023e916b37088917f6adca56fbc9d'
                 assert subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',commit],cwd=self.root,env=env,text=True).strip()==commit+' '+parent
                 roster_images=_git_images(self.root,[dict(commit=c,path=ref['path']) for c in (parent,commit)]); roster_old=roster_images[(parent,ref['path'])]; next_bytes=roster_images[(commit,ref['path'])]; _matches(roster_old,ref)
-                current=dict(path=ref['path'],sha256='dede4ab944da8fee8881644e27c0b2224c70e4120246c54e99976c48084ab2a5',bytes=720149); _matches(next_bytes,current); assert self._member(current)==next_bytes
+                current=dict(path=ref['path'],sha256='dede4ab944da8fee8881644e27c0b2224c70e4120246c54e99976c48084ab2a5',bytes=720149); _matches(next_bytes,current); hint_roster=hint_images[ref['path']]; assert hint_roster[0]['before']==current and hint_roster[1]==next_bytes;self._member(hint_roster[0]['after'])
                 a=json.loads(roster_old); b=json.loads(next_bytes); changed=[]; assert len(a['symbol_uses'])==len(b['symbol_uses'])==336
                 for x,y in zip(a['symbol_uses'],b['symbol_uses']):
                     assert [x[k] for k in ('file','module','symbol')]==[y[k] for k in ('file','module','symbol')]
@@ -1242,11 +1305,11 @@ class CurrentSassToolReferences:
                 if meta == self._matrix_owner.after: return self._member(self._matrix_owner.after)
                 return self._matrix_owner.comparison_bytes(meta)
             overlay = domain_overlays.get(ref['path'])
-            if overlay is None: return self._member(ref)
+            if overlay is None: return cold_data(ref)
             row, identities = overlay; meta = _metadata(ref)
             matches = [data for identity, data in identities if identity == meta]
             assert matches and all(data == matches[0] for data in matches), 'unknown current domain comparison'
-            self._member(row['after']); return bytes(matches[0])
+            cold_data(row['after']); return bytes(matches[0])
         rc_successors = {}
         if self.line == 'main':
             rc_packet = dict(path='compatibility/rc/current-tool-rc-verify-source-successor-v1.json', sha256='35834cc2d98bb4a05e4bae35f3a1f51199ab81e86027858214a0144e911d2826', bytes=6911)
@@ -1581,10 +1644,16 @@ class CurrentSassToolReferences:
                 if path in retained_stage_before: assert update['before'] == retained_stage_before[path]
                 if path in checker_owner_before: assert update['before'] == checker_owner_before[path]
                 if path in checker_context_before: assert update['before'] == checker_context_before[path]
-                assert (self.line=='main' and (path==retained_rules_js_path or path in retained_landscape_paths)) or path in retained_test_before or path in retained_stage_before or path in checker_owner_before or path in checker_context_before or path in retained_reader_paths or path in routing_images or update['before'] in next_branch['additional_inputs'] or (path=='scripts/authored-current-use-inventory.mjs' and checker_source_anchor is not None and update['before'] in checker_source_anchor['source_members']), 'domain predecessor is not an existing input: ' + path
+                assert (self.line=='main' and (path==retained_rules_js_path or path in retained_landscape_paths)) or path in retained_test_before or path in retained_stage_before or path in checker_owner_before or path in checker_context_before or path in retained_reader_paths or path in routing_images or update['before'] in next_branch['additional_inputs'] or (path=='scripts/authored-current-use-inventory.mjs' and checker_source_anchor is not None and update['before'] in checker_source_anchor['source_members']) or (self.line=='main' and ((path==bidi_helper['path'] and update['before']==bidi_helper['before']) or (path==bidi_owner['before']['path'] and update['before']==bidi_owner['before']))), 'domain predecessor is not an existing input: ' + path
                 row=dict(path=path,before=dict(sha256=update['before']['sha256'],bytes=update['before']['bytes']),identities={}); self._rows[path]=row
             for ref, raw in identities: self._add(row,ref,raw)
             row['after']=dict(sha256=update['after']['sha256'],bytes=update['after']['bytes'])
+        for update,old,after in c02_images.values():
+            row=self._rows.get(update['path']);assert row is not None and dict(path=row['path'],**row['after'])==update['before'];self._add(row,update['before'],old);self._add(row,update['after'],after);row['after']=dict(sha256=update['after']['sha256'],bytes=update['after']['bytes'])
+        for update,old,after in hint_images.values():
+            row=self._rows.get(update['path'])
+            if row is None:continue
+            assert dict(path=row['path'],**row['after'])==update['before'];self._add(row,update['before'],old);self._add(row,update['after'],after);row['after']=dict(sha256=update['after']['sha256'],bytes=update['after']['bytes'])
         for row in self._rows.values():
             self._member(dict(path=row['path'], **row['after']))
         self.epoch = 7 if self.line == 'main' else 3

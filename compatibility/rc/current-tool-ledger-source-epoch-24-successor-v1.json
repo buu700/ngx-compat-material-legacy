@@ -1,0 +1,46 @@
+{
+  "status": "unfrozen draft; current-use hint v2 pending",
+  "source_parent": "16d813c667e6e0a40462a95cf5550feddb9dbc1f",
+  "source_commit": "2f67cf16620b7a91cd25c029f814f9744d187a88",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "before": {
+    "path": "scripts/inventory-reference-live-source-epoch.mjs",
+    "sha256": "c68ef11f7215f74d8dc051b8922be57c4f541300603d435d77bec3e574411ca0",
+    "bytes": 31063
+  },
+  "after": {
+    "path": "scripts/inventory-reference-live-source-epoch.mjs",
+    "sha256": "a536de4519b66bf18c59ad8b1a40888a11655d6aa54fa93b07666e8acb15d801",
+    "bytes": 32929
+  },
+  "edits": [
+    {
+      "offset": 25471,
+      "before": "",
+      "after": "function validateDe40Successor(root,prior,live){\n const commit='2f67cf16620b7a91cd25c029f814f9744d187a88',parent='16d813c667e6e0a40462a95cf5550feddb9dbc1f',id='de40f2eec4c0eeadfa40fba040f5c9dcbb1ea8c4';assert.equal(git(root,['rev-parse',commit+'^']).toString().trim(),parent);git(root,['merge-base','--is-ancestor','b266037512764956bf88ad508756bc90373bd7f2',parent]);git(root,['merge-base','--is-ancestor',commit,'HEAD']);const before=git(root,['show',parent+':'+LEDGER]),after=git(root,['show',commit+':'+LEDGER]);assert.equal(hash(before),SELECTOR_LIVE);assert.equal(hash(after),'1d8f77efd3e8e2e2b4149db1fdb6255403864371c87ce7dc794b124221186035');assert.ok(before.equals(prior));assert.ok(after.equals(live));const a=decode(before),b=decode(after),changed=[],rawOnly=[];assert.deepEqual([...a.entries.keys()],[...b.entries.keys()]);const meta=x=>Object.fromEntries(Object.entries(x).filter(([key])=>key!=='entries'));assert.deepEqual(meta(a.data),meta(b.data));for(const [sha,row] of a.entries){if(!isDeepStrictEqual(row,b.entries.get(sha)))changed.push(sha);else if(a.rawEntries.get(sha)!==b.rawEntries.get(sha))rawOnly.push(sha);}assert.deepEqual(changed,[id]);assert.deepEqual(rawOnly,[]);const raw=before.toString('utf8'),old=a.rawEntries.get(id),next=b.rawEntries.get(id),at=raw.indexOf(old);assert.ok(at>=0);assert.equal(raw.indexOf(old,at+old.length),-1);assert.ok(Buffer.from(raw.slice(0,at)+next+raw.slice(at+old.length)).equals(after));return {transitions:24,changed_entry_identities:168,tooltip_source_only:true,dialog_source_only:true,exclusion_source_only:true,owned_metadata_source_only:true,owned_selector_source_only:true,de40_source_only:true};\n}\n\n"
+    },
+    {
+      "offset": 28198,
+      "before": "  {path:LEDGER,sha256:SELECTOR_LIVE,bytes:initialLedger.length},\n",
+      "after": "  {path:LEDGER,sha256:'1d8f77efd3e8e2e2b4149db1fdb6255403864371c87ce7dc794b124221186035',bytes:initialLedger.length},\n"
+    },
+    {
+      "offset": 29431,
+      "before": " const check=()=>{source.assertCurrent();checkInputs();const prior=validateLineage(root,packet,source.after,receiptBytes);const tooltipImage=git(root,['show','e28364f10bc9c1f9219c9a18f0dbf9cffb267f57:'+LEDGER]);validateTooltipSuccessor(root,next,prior.prior,tooltipImage,tooltipReceipt,tooltipReport,tooltipStyle);const dialogImage=git(root,['show','64f87978200b2f9e75da7dd6eafc2c81e0f2ff49:'+LEDGER]);validateDialogSuccessor(root,tooltipImage,dialogImage,physical(DIALOG_RECEIPT));const exclusionImage=git(root,['show','252689f364aee65c5d755d4b16e91987f6e305a5:'+LEDGER]);validateExclusionSuccessor(root,dialogImage,exclusionImage,physical(EXCLUSION_RECEIPT),physical(EXCLUSION_PRIOR));const ownedImage=git(root,['show','0feac873886782da408d5894bbf1bb26862ec45c:'+LEDGER]);validateOwnedMetadataSuccessor(root,exclusionImage,ownedImage,physical(OWNED_RECEIPT));const terminal=validateSelectorSuccessor(root,ownedImage,initialLedger,physical(SELECTOR_RECEIPT));checkInputs();source.assertCurrent();checkPhysical();return {...terminal,raw_only_formatting:prior.summary.raw_only_formatting};};\n",
+      "after": " const check=()=>{source.assertCurrent();checkInputs();const prior=validateLineage(root,packet,source.after,receiptBytes);const tooltipImage=git(root,['show','e28364f10bc9c1f9219c9a18f0dbf9cffb267f57:'+LEDGER]);validateTooltipSuccessor(root,next,prior.prior,tooltipImage,tooltipReceipt,tooltipReport,tooltipStyle);const dialogImage=git(root,['show','64f87978200b2f9e75da7dd6eafc2c81e0f2ff49:'+LEDGER]);validateDialogSuccessor(root,tooltipImage,dialogImage,physical(DIALOG_RECEIPT));const exclusionImage=git(root,['show','252689f364aee65c5d755d4b16e91987f6e305a5:'+LEDGER]);validateExclusionSuccessor(root,dialogImage,exclusionImage,physical(EXCLUSION_RECEIPT),physical(EXCLUSION_PRIOR));const ownedImage=git(root,['show','0feac873886782da408d5894bbf1bb26862ec45c:'+LEDGER]);validateOwnedMetadataSuccessor(root,exclusionImage,ownedImage,physical(OWNED_RECEIPT));const selectorImage=git(root,['show','b266037512764956bf88ad508756bc90373bd7f2:'+LEDGER]);validateSelectorSuccessor(root,ownedImage,selectorImage,physical(SELECTOR_RECEIPT));const terminal=validateDe40Successor(root,selectorImage,initialLedger);checkInputs();source.assertCurrent();checkPhysical();return {...terminal,raw_only_formatting:prior.summary.raw_only_formatting};};\n"
+    }
+  ],
+  "ledger_before": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "80b1e11b5cdb9dc6b03cdf3a61f49df022d1726544ac810bdae589b8372604cd",
+    "bytes": 5133735
+  },
+  "ledger_after": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "1d8f77efd3e8e2e2b4149db1fdb6255403864371c87ce7dc794b124221186035",
+    "bytes": 5371309
+  }
+}

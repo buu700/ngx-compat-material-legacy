@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "role": "main-current-inventory-de40-helper-source-successor",
+  "source_parent": "69f3b50c4f2352a9cf886023c9d8f9384dac75d7",
+  "source_commit": "16d813c667e6e0a40462a95cf5550feddb9dbc1f",
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "updates": [
+    {
+      "path": "scripts/upstream-candidate-source-evidence.mjs",
+      "before": {
+        "path": "scripts/upstream-candidate-source-evidence.mjs",
+        "sha256": "128d26d6c5a4e485abac1dd6589e14976ef2691d256d9f3896167b071a9a01de",
+        "bytes": 5382
+      },
+      "after": {
+        "path": "scripts/upstream-candidate-source-evidence.mjs",
+        "sha256": "d2d4295aa4f85a9b153d1a897602e869eb9216d7f02aeae488a2f590a4f808ab",
+        "bytes": 6110
+      },
+      "edits": [
+        {
+          "offset": 3253,
+          "before": "",
+          "after": "    // Optional closed current-source population: all paths and all bytes are\n    // bound by source_members; a new, removed, or renamed file fails closed.\n    if (Object.hasOwn(proof, 'source_population')) {\n      if (proof.proof_kind !== 'individual-contextual-source-review' ||\n          proof.source_population !== 'all-candidate-product-sources') return false;\n      const paths = productPaths();\n      if (!Array.isArray(paths) || !paths.length || new Set(paths).size !== paths.length) return false;\n      const bound = proof.source_members.map(ref => ref.path).sort();\n      const current = [...paths].sort();\n      if (bound.length !== current.length || bound.some((path, i) => path !== current[i])) return false;\n    }\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/upstream-individual-evidence-scope.mjs",
+      "before": {
+        "path": "scripts/upstream-individual-evidence-scope.mjs",
+        "sha256": "aedc1ad2fce5320e868d7271f1af9ff107c849af4ad005c2eb9b8ac630d91eb0",
+        "bytes": 9228
+      },
+      "after": {
+        "path": "scripts/upstream-individual-evidence-scope.mjs",
+        "sha256": "ad0be590edc1fa0a3536d0df8772b4a15ac0d1c7584bc8b1b0c338400c52873e",
+        "bytes": 9514
+      },
+      "edits": [
+        {
+          "offset": 7435,
+          "before": "  if(Object.keys(proof).some(k=>!['proof_kind','source_conclusion_only','execution_claim','source_members','diff_sha256','review_depth','affected_branches','decision'].includes(k)))return false;\n",
+          "after": "  if(Object.keys(proof).some(k=>!['proof_kind','source_conclusion_only','execution_claim','source_members','source_population','diff_sha256','review_depth','affected_branches','decision'].includes(k)))return false;\n"
+        },
+        {
+          "offset": 8175,
+          "before": "    ||!isDeepStrictEqual(review.source_members,proof.source_members))return false;\n",
+          "after": "    ||!isDeepStrictEqual(review.source_members,proof.source_members)\n    ||(Object.hasOwn(proof,'source_population') && (proof.source_population!=='all-candidate-product-sources'\n      ||review.source_population!==proof.source_population))\n    ||(!Object.hasOwn(proof,'source_population') && Object.hasOwn(review,'source_population')))return false;\n"
+        }
+      ]
+    }
+  ]
+}

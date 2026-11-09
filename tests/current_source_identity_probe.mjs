@@ -1,0 +1,10 @@
+/** @license Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester. Use of this source code is governed by the MIT license in LICENSE. */
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {resolve} from 'node:path';
+import {currentSassToolReferenceSubject as make} from '../scripts/current-sass-tool-references.mjs';
+const root=process.cwd(),read=p=>readFileSync(resolve(root,p)),c02=JSON.parse(read('compatibility/rc/current-sass-c02-source-successor-v1.json')),hint=JSON.parse(read('compatibility/rc/current-sass-authored-hint-source-v1.json')),de40=JSON.parse(read('compatibility/rc/main-current-inventory-de40-helper-source-v1.json'));const subject=make({root});
+for(const row of c02.transitions){assert.deepEqual(subject.qualify(row.before),row.after);assert.equal(subject.qualify({...row.before,sha256:'0'.repeat(64)}),null);}
+for(const row of [...hint.updates.filter(x=>x.path.endsWith('.mjs')),...de40.updates])assert.equal(subject.qualify(row.before),null);
+let active=false,nested=false,guard;guard=make({root,read:p=>{const b=read(p);if(active&&!nested){nested=true;try{guard.assertCurrent();}catch{}}return b;}});active=true;assert.throws(()=>guard.assertCurrent());assert.ok(nested);active=false;guard.assertCurrent();const file=resolve(root,'scripts/current-sass-tool-references.mjs'),raw=readFileSync(file);try{writeFileSync(file,Buffer.concat([raw,Buffer.from(' ')]));assert.throws(()=>make({root}));assert.throws(()=>subject.assertCurrent());}finally{writeFileSync(file,raw);}subject.assertCurrent();let bad=false;const callback=p=>{const raw=read(p);return bad&&p==='scripts/current-sass-tool-references.mjs'?Buffer.concat([raw,Buffer.from(' ')]):raw;};const bound=make({root,read:callback});bad=true;assert.throws(()=>bound.assertCurrent());assert.throws(()=>make({root,read:callback}));bad=false;bound.assertCurrent();console.log(JSON.stringify({result:'pass',c02_identities:c02.transitions.length,support_identities_null:4,reentry:true,owner_self_physical:true,owner_self_callback:true,recovery:true,g11_claim:'not-passed'}));

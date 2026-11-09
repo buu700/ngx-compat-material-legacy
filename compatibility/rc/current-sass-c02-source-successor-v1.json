@@ -1,0 +1,609 @@
+{
+  "source_parent": "b266037512764956bf88ad508756bc90373bd7f2",
+  "source_commit": "c8be86cbda8f21c9aa3a73caa4c11e786994d77f",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "transitions": [
+    {
+      "path": "scripts/sass-ordinary-density-gate.mjs",
+      "before": {
+        "path": "scripts/sass-ordinary-density-gate.mjs",
+        "sha256": "44278eae893aaa1e32cb4b0fac1171193963b2ea700836a0fcbf177be4a84fc2",
+        "bytes": 12493
+      },
+      "after": {
+        "path": "scripts/sass-ordinary-density-gate.mjs",
+        "sha256": "d3785f8bc26a6ddd9bbf49076db25ae40b6f766350d7f745b7b64edce698bc41",
+        "bytes": 16797
+      },
+      "edits": [
+        {
+          "offset": 2100,
+          "before": "",
+          "after": "const densityV3={path:'compatibility/rc/current-main-density-input-successor-v3.json',sha256:'b0feea9a089fea3c671927c548f3c4d6b07923ee9f7574d17d0630fbc6444ffc',bytes:1667};\nconst densityContinuations=[{\"path\":\"compatibility/rc/main-tooltip-resource-source-programs-v1.json\",\"sha256\":\"b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211\",\"bytes\":15324,\"role\":\"main-tooltip-resource-source-program-continuation\",\"base_head\":\"8fe95564c981a9dd73605d27beaa0496824e8444\"},{\"path\":\"compatibility/rc/main-sass-graph-resource-source-programs-v2.json\",\"sha256\":\"e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98\",\"bytes\":6928,\"role\":\"main-sass-graph-resource-source-program-continuation\",\"base_head\":\"ecc1051cfb829f0b67ba9cb50e4b733d6684ebff\"},{\"path\":\"compatibility/rc/main-sass-resource-contract-programs-v1.json\",\"sha256\":\"e8db18d114f9a32c946caaf72b0f3ea1ed8377c3bba6b518f5162ab947673d2a\",\"bytes\":14946,\"role\":\"main-sass-resource-contract-program-continuation\",\"base_head\":\"ecc1051cfb829f0b67ba9cb50e4b733d6684ebff\"}];\nconst densityPaths=[\"scripts/current-sass-source.mjs\",\"scripts/current-sass-spinner-snack-contract.mjs\",\"scripts/current_sass_source.py\",\"scripts/current_sass_spinner_snack_admission.py\"];\nfunction checkedDensityContinuations(read){\n const bytes=read(densityV3.path);if(sha(bytes)!==densityV3.sha256||bytes.length!==densityV3.bytes)throw Error('density v3 packet');const v=JSON.parse(bytes);\n if(v.schema_version!==1||v.role!=='main-ordinary-density-resource-continuation'||v.line!=='main'||v.source_scope_only!==true||v.artifact_or_audit_admission_granted!==false||v.source_end_commit!=='b94f169d4fe57d571e6a7c3f911a9395f6a60c4d'||!isDeepStrictEqual(v.previous_packet,{path:'compatibility/rc/current-main-density-input-successor-v2.json',sha256:'e6e385dde92ed1cdcc65998bdb6c9433458ed275572e528973e67a195b8c545f',bytes:92667})||!isDeepStrictEqual(v.continuations,densityContinuations)||!isDeepStrictEqual(v.paths,densityPaths))throw Error('density v3 scope');\n return densityContinuations.map(r=>{const b=read(r.path);if(sha(b)!==r.sha256||b.length!==r.bytes)throw Error('density continuation packet');const p=JSON.parse(b);if(p.schema_version!==1||p.role!==r.role||p.base_head!==r.base_head||p.source_scope_only!==true||p.historical_programs_executed!==false||p.historical_packets_rewritten!==false||p.theme_module_contract_changed!==false||p.css_or_artifact_admission_granted!==false||p.g11_claim!=='not-passed')throw Error('density continuation scope');return p;});\n}\nfunction continueDensityInput(path,initial,initialRef,packets,git){\n let current=initial,expected=initialRef;\n for(const packet of packets){const rows=packet.updates.filter(r=>r.path===path);if(rows.length>1)throw Error('duplicate density continuation');if(!rows.length)continue;const row=rows[0];if(!isDeepStrictEqual(row.before,expected)||!git(packet.base_head,path).equals(current))throw Error('density continuation predecessor');let cursor=0;const parts=[];for(const e of row.edits){if(!isDeepStrictEqual(Object.keys(e).sort(),['after','before','offset'])||!Number.isSafeInteger(e.offset)||e.offset<cursor||e.offset>current.length)throw Error('density continuation edit');const before=Buffer.from(e.before);if(!current.subarray(e.offset,e.offset+before.length).equals(before))throw Error('density continuation literal');parts.push(current.subarray(cursor,e.offset),Buffer.from(e.after));cursor=e.offset+before.length;}current=Buffer.concat([...parts,current.subarray(cursor)]);expected=row.after;if(expected.path!==path||sha(current)!==expected.sha256||current.length!==expected.bytes)throw Error('density continuation afterimage');}\n if(!git('b94f169d4fe57d571e6a7c3f911a9395f6a60c4d',path).equals(current))throw Error('density continuation commit');return {current,expected};\n}\n"
+        },
+        {
+          "offset": 3973,
+          "before": " for(const r of p.updates){const old=git(p.source_parent,r.path),manifest=files.find(x=>x.path===r.path);if(!manifest||!isDeepStrictEqual(manifest,r.before)||sha(old)!==r.before.sha256||old.length!==r.before.bytes)throw Error('density predecessor');let at=0;const parts=[];for(const e of r.edits){if(!isDeepStrictEqual(Object.keys(e).sort(),['after','before','offset'])||!Number.isSafeInteger(e.offset)||e.offset<at)throw Error('density edit');const a=Buffer.from(e.before),b=Buffer.from(e.after);if(!old.subarray(e.offset,e.offset+a.length).equals(a))throw Error('density literal');parts.push(old.subarray(at,e.offset),b);at=e.offset+a.length;}const after=Buffer.concat([...parts,old.subarray(at)]);if(sha(after)!==r.after.sha256||after.length!==r.after.bytes||r.after.path!==r.path)throw Error('density afterimage');if(r.path===names[0]&&!git(p.oracle_commit,r.path).equals(after))throw Error('density oracle commit');const update=v2.updates.find(x=>x.path===r.path);let final=after,finalRef=r.after;if(update){if(!isDeepStrictEqual(update.before,r.after))throw Error('density current predecessor');let at=0;const out=[];for(const e of update.edits){if(!isDeepStrictEqual(Object.keys(e).sort(),['after','before','offset'])||!Number.isSafeInteger(e.offset)||e.offset<at)throw Error('density current edit');const old=Buffer.from(e.before);if(!after.subarray(e.offset,e.offset+old.length).equals(old))throw Error('density current literal');out.push(after.subarray(at,e.offset),Buffer.from(e.after));at=e.offset+old.length;}final=Buffer.concat([...out,after.subarray(at)]);finalRef=update.after;if(sha(final)!==finalRef.sha256||final.length!==finalRef.bytes)throw Error('density current afterimage');}if(!read(r.path).equals(final))throw Error('density current physical');refs.set(r.path,finalRef);}\n",
+          "after": " const continuations=checkedDensityContinuations(read);for(const commit of ['19ee6343365c391deb97362caec413b113665e1b','b94f169d4fe57d571e6a7c3f911a9395f6a60c4d',...continuations.map(x=>x.base_head)])execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',commit,'HEAD'],{cwd:root,env});\n for(const r of p.updates){const old=git(p.source_parent,r.path),manifest=files.find(x=>x.path===r.path);if(!manifest||!isDeepStrictEqual(manifest,r.before)||sha(old)!==r.before.sha256||old.length!==r.before.bytes)throw Error('density predecessor');let at=0;const parts=[];for(const e of r.edits){if(!isDeepStrictEqual(Object.keys(e).sort(),['after','before','offset'])||!Number.isSafeInteger(e.offset)||e.offset<at)throw Error('density edit');const a=Buffer.from(e.before),b=Buffer.from(e.after);if(!old.subarray(e.offset,e.offset+a.length).equals(a))throw Error('density literal');parts.push(old.subarray(at,e.offset),b);at=e.offset+a.length;}const after=Buffer.concat([...parts,old.subarray(at)]);if(sha(after)!==r.after.sha256||after.length!==r.after.bytes||r.after.path!==r.path)throw Error('density afterimage');if(r.path===names[0]&&!git(p.oracle_commit,r.path).equals(after))throw Error('density oracle commit');const update=v2.updates.find(x=>x.path===r.path);let final=after,finalRef=r.after;if(update){if(!isDeepStrictEqual(update.before,r.after))throw Error('density current predecessor');let at=0;const out=[];for(const e of update.edits){if(!isDeepStrictEqual(Object.keys(e).sort(),['after','before','offset'])||!Number.isSafeInteger(e.offset)||e.offset<at)throw Error('density current edit');const old=Buffer.from(e.before);if(!after.subarray(e.offset,e.offset+old.length).equals(old))throw Error('density current literal');out.push(after.subarray(at,e.offset),Buffer.from(e.after));at=e.offset+old.length;}final=Buffer.concat([...out,after.subarray(at)]);finalRef=update.after;if(sha(final)!==finalRef.sha256||final.length!==finalRef.bytes)throw Error('density current afterimage');}if(densityPaths.includes(r.path)){const next=continueDensityInput(r.path,final,finalRef,continuations,git);final=next.current;finalRef=next.expected;}if(!read(r.path).equals(final))throw Error('density current physical');refs.set(r.path,finalRef);}\n"
+        },
+        {
+          "offset": 7331,
+          "before": " const safeRead=p=>{if(typeof p!=='string'||!p||p.startsWith('/')||p.includes('\\\\')||p.split('/').some(x=>!x||x==='.'||x==='..'))throw Error('invalid input path');let at=root;for(const part of p.split('/')){at=join(at,part);if(lstatSync(at).isSymbolicLink())throw Error('linked input')}return readFileSync(at)};const manifestPath='fixtures/sass/ordinary-density-proof-inputs.json';let densityRefs=null;const assertCurrent=()=>{source.assertCurrent();if(!readFileSync(new URL(import.meta.url)).equals(image))throw Error('gate changed');const raw=safeRead(manifestPath);if(sha(raw)!==manifestHashes[line])throw Error('proof manifest changed');const m=JSON.parse(raw);if(m.schema_version!==1||!Array.isArray(m.files)||!m.files.length||new Set(m.files.map(r=>r.path)).size!==m.files.length)throw Error('invalid proof manifest');if(densityRefs===null)densityRefs=densitySuccessors(root,line,safeRead,m.files);else if(line==='main'){const p=safeRead('compatibility/rc/current-main-density-input-successor-v1.json');if(sha(p)!=='d85c0dca28dbc166e3566eb3b173917c1524c68f5116a490826748ce4876ab2a'||p.length!==34446)throw Error('density successor changed');const v=safeRead('compatibility/rc/current-main-density-input-successor-v2.json');if(sha(v)!=='e6e385dde92ed1cdcc65998bdb6c9433458ed275572e528973e67a195b8c545f'||v.length!==92667)throw Error('density current successor changed');}for(let pass=0;pass<2;pass++){for(const r of m.files){const expected=densityRefs.get(r.path)??r,b=safeRead(r.path);if(sha(b)!==expected.sha256||b.length!==expected.bytes)throw Error('dependency changed '+r.path)}if(line==='main'){const p=safeRead('compatibility/rc/current-main-density-input-successor-v1.json');if(sha(p)!=='d85c0dca28dbc166e3566eb3b173917c1524c68f5116a490826748ce4876ab2a'||p.length!==34446)throw Error('density successor changed');const v=safeRead('compatibility/rc/current-main-density-input-successor-v2.json');if(sha(v)!=='e6e385dde92ed1cdcc65998bdb6c9433458ed275572e528973e67a195b8c545f'||v.length!==92667)throw Error('density current successor changed');}}source.assertCurrent()};assertCurrent();const ctx=Object.freeze({line,assertCurrent});contexts.set(ctx,{source,line,expectedSources,expectedOriginalSources,plans,assertCurrent,oracle});return ctx;}\n",
+          "after": " const safeRead=p=>{if(typeof p!=='string'||!p||p.startsWith('/')||p.includes('\\\\')||p.split('/').some(x=>!x||x==='.'||x==='..'))throw Error('invalid input path');let at=root;for(const part of p.split('/')){at=join(at,part);if(lstatSync(at).isSymbolicLink())throw Error('linked input')}return readFileSync(at)};const manifestPath='fixtures/sass/ordinary-density-proof-inputs.json';let densityRefs=null;const assertCurrent=()=>{source.assertCurrent();if(!readFileSync(new URL(import.meta.url)).equals(image))throw Error('gate changed');const raw=safeRead(manifestPath);if(sha(raw)!==manifestHashes[line])throw Error('proof manifest changed');const m=JSON.parse(raw);if(m.schema_version!==1||!Array.isArray(m.files)||!m.files.length||new Set(m.files.map(r=>r.path)).size!==m.files.length)throw Error('invalid proof manifest');if(densityRefs===null)densityRefs=densitySuccessors(root,line,safeRead,m.files);else if(line==='main'){const p=safeRead('compatibility/rc/current-main-density-input-successor-v1.json');if(sha(p)!=='d85c0dca28dbc166e3566eb3b173917c1524c68f5116a490826748ce4876ab2a'||p.length!==34446)throw Error('density successor changed');const v=safeRead('compatibility/rc/current-main-density-input-successor-v2.json');if(sha(v)!=='e6e385dde92ed1cdcc65998bdb6c9433458ed275572e528973e67a195b8c545f'||v.length!==92667)throw Error('density current successor changed');}for(let pass=0;pass<2;pass++){if(line==='main')checkedDensityContinuations(safeRead);for(const r of m.files){const expected=densityRefs.get(r.path)??r,b=safeRead(r.path);if(sha(b)!==expected.sha256||b.length!==expected.bytes)throw Error('dependency changed '+r.path)}if(line==='main'){const p=safeRead('compatibility/rc/current-main-density-input-successor-v1.json');if(sha(p)!=='d85c0dca28dbc166e3566eb3b173917c1524c68f5116a490826748ce4876ab2a'||p.length!==34446)throw Error('density successor changed');const v=safeRead('compatibility/rc/current-main-density-input-successor-v2.json');if(sha(v)!=='e6e385dde92ed1cdcc65998bdb6c9433458ed275572e528973e67a195b8c545f'||v.length!==92667)throw Error('density current successor changed');}}source.assertCurrent()};assertCurrent();const ctx=Object.freeze({line,assertCurrent});contexts.set(ctx,{source,line,expectedSources,expectedOriginalSources,plans,assertCurrent,oracle});return ctx;}\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/sass_ordinary_density_gate.py",
+      "before": {
+        "path": "scripts/sass_ordinary_density_gate.py",
+        "sha256": "97d0c2fbdccef64f9399b934c3a6d5cb090b97a9d6c6c6c50d89ec2577922fba",
+        "bytes": 11098
+      },
+      "after": {
+        "path": "scripts/sass_ordinary_density_gate.py",
+        "sha256": "c42be5be420692e2209d493e0ebe2bbffffd745aed018a2690158874f4293507",
+        "bytes": 15050
+      },
+      "edits": [
+        {
+          "offset": 1980,
+          "before": "",
+          "after": "_V3={'path': 'compatibility/rc/current-main-density-input-successor-v3.json', 'sha256': 'b0feea9a089fea3c671927c548f3c4d6b07923ee9f7574d17d0630fbc6444ffc', 'bytes': 1667}\n_CONTINUATIONS=[{'path': 'compatibility/rc/main-tooltip-resource-source-programs-v1.json', 'sha256': 'b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211', 'bytes': 15324, 'role': 'main-tooltip-resource-source-program-continuation', 'base_head': '8fe95564c981a9dd73605d27beaa0496824e8444'}, {'path': 'compatibility/rc/main-sass-graph-resource-source-programs-v2.json', 'sha256': 'e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98', 'bytes': 6928, 'role': 'main-sass-graph-resource-source-program-continuation', 'base_head': 'ecc1051cfb829f0b67ba9cb50e4b733d6684ebff'}, {'path': 'compatibility/rc/main-sass-resource-contract-programs-v1.json', 'sha256': 'e8db18d114f9a32c946caaf72b0f3ea1ed8377c3bba6b518f5162ab947673d2a', 'bytes': 14946, 'role': 'main-sass-resource-contract-program-continuation', 'base_head': 'ecc1051cfb829f0b67ba9cb50e4b733d6684ebff'}]\n_DENSITY_PATHS=['scripts/current-sass-source.mjs', 'scripts/current-sass-spinner-snack-contract.mjs', 'scripts/current_sass_source.py', 'scripts/current_sass_spinner_snack_admission.py']\ndef _checked_density_continuations(root):\n    raw=_read(root,_V3['path']);assert (_hash(raw),len(raw))==(_V3['sha256'],_V3['bytes']);v=json.loads(raw)\n    assert v['schema_version']==1 and v['role']=='main-ordinary-density-resource-continuation' and v['line']=='main' and v['source_scope_only'] is True and v['artifact_or_audit_admission_granted'] is False and v['source_end_commit']=='b94f169d4fe57d571e6a7c3f911a9395f6a60c4d' and v['previous_packet']=={'path': 'compatibility/rc/current-main-density-input-successor-v2.json', 'sha256': 'e6e385dde92ed1cdcc65998bdb6c9433458ed275572e528973e67a195b8c545f', 'bytes': 92667} and v['continuations']==_CONTINUATIONS and v['paths']==_DENSITY_PATHS\n    out=[]\n    for ref in _CONTINUATIONS:\n        b=_read(root,ref['path']);assert (_hash(b),len(b))==(ref['sha256'],ref['bytes']);p=json.loads(b)\n        assert p['schema_version']==1 and p['role']==ref['role'] and p['base_head']==ref['base_head'] and p['source_scope_only'] is True and p['historical_programs_executed'] is False and p['historical_packets_rewritten'] is False and p['theme_module_contract_changed'] is False and p['css_or_artifact_admission_granted'] is False and p['g11_claim']=='not-passed';out.append(p)\n    return out\ndef _continue_density_input(path,initial,initial_ref,packets,git):\n    current=initial;expected=initial_ref\n    for packet in packets:\n        rows=[r for r in packet['updates'] if r['path']==path];assert len(rows)<=1\n        if not rows:continue\n        row=rows[0];assert row['before']==expected and git(packet['base_head'],path)==current;cursor=0;parts=[]\n        for e in row['edits']:\n            assert set(e)=={'offset','before','after'} and type(e['offset']) is int and cursor<=e['offset']<=len(current);before=e['before'].encode();assert current[e['offset']:e['offset']+len(before)]==before;parts.extend((current[cursor:e['offset']],e['after'].encode()));cursor=e['offset']+len(before)\n        current=b''.join([*parts,current[cursor:]]);expected=row['after'];assert expected['path']==path and (_hash(current),len(current))==(expected['sha256'],expected['bytes'])\n    assert git('b94f169d4fe57d571e6a7c3f911a9395f6a60c4d',path)==current\n    return current,expected\n"
+        },
+        {
+          "offset": 3727,
+          "before": "    refs={}\n",
+          "after": "    refs={};continuations=_checked_density_continuations(root)\n    for commit in ['19ee6343365c391deb97362caec413b113665e1b','b94f169d4fe57d571e6a7c3f911a9395f6a60c4d',*[x['base_head'] for x in continuations]]:subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',commit,'HEAD'],cwd=root,env=env)\n"
+        },
+        {
+          "offset": 5287,
+          "before": "",
+          "after": "        if row['path'] in _DENSITY_PATHS:final,final_ref=_continue_density_input(row['path'],final,final_ref,continuations,git)\n"
+        },
+        {
+          "offset": 8005,
+          "before": "",
+          "after": "            if line=='main':_checked_density_continuations(root)\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/sass-private-card-gate.mjs",
+      "before": {
+        "path": "scripts/sass-private-card-gate.mjs",
+        "sha256": "547963c2718641e7181441933531a641c9f3c10ecfbc7195e3fe51c81a9fa12c",
+        "bytes": 14540
+      },
+      "after": {
+        "path": "scripts/sass-private-card-gate.mjs",
+        "sha256": "66a73c2c481508f6e68d797bce08d1213db67505bfdf69ecceaba41f9ba62473",
+        "bytes": 16228
+      },
+      "edits": [
+        {
+          "offset": 0,
+          "before": "",
+          "after": "\n"
+        },
+        {
+          "offset": 170,
+          "before": "",
+          "after": "import {execFileSync as selectOwnerExec} from 'node:child_process';\nconst selectOwnerRuntime=process.execPath,selectOwnerPath=process.env.PATH;\nfunction runSelectOwner(root,read){\n for(const path of ['compatibility/rc/current-main-select-density-program-v1.json','scripts/select-program-transition-source.mjs','scripts/select_program_transition_source.py'])read(path);\n const out=selectOwnerExec(selectOwnerRuntime,['--input-type=module','--eval',\"import {readFileSync,lstatSync} from 'node:fs';import{join,resolve}from'node:path';import{createHash}from'node:crypto';const root=resolve(process.argv[1]),name=process.argv[2],pin=process.argv[3];if(process.version!=='v24.21.0'||!/^scripts\\\\/[a-z0-9-]+\\\\.mjs$/.test(name))throw Error('owner launcher');let p=root;for(const x of name.split('/')){p=join(p,x);if(lstatSync(p).isSymbolicLink())throw Error('linked owner')}const raw=readFileSync(p);if(createHash('sha256').update(raw).digest('hex')!==pin)throw Error('owner pin');process.argv=[process.argv[0],'owner',root];await import('data:text/javascript;base64,'+raw.toString('base64'));if(!readFileSync(p).equals(raw))throw Error('owner changed');\",root,'scripts/main-select-program-owner.mjs',\"55718e8697a51fb0b087c9f2f7d15508917c61001667bd0a3d75b534d6a53ccc\"],{cwd:root,env:{PATH:selectOwnerPath,LANG:'C',LC_ALL:'C',NODE_OPTIONS:''},encoding:'utf8',timeout:120000});if(out!=='ok')throw Error('select owner result');\n}\n\n"
+        },
+        {
+          "offset": 5884,
+          "before": "export function createPrivateCardGateContext(args){if(!args||typeof args!=='object'||types.isProxy(args)||Object.getPrototypeOf(args)!==Object.prototype)throw Error('context arguments');const ds=Object.getOwnPropertyDescriptors(args);if(!isDeepStrictEqual(Reflect.ownKeys(ds),['root'])||!Object.hasOwn(ds.root,'value')||!ds.root.enumerable||typeof ds.root.value!=='string')throw Error('context arguments');let root=resolve(ds.root.value);const source=createCurrentSpinnerSnackContract({root}),line=source.line,sets=Object.values(source.source_sets);if(sets.length!==1)throw Error('source closure');const expectedSources=plain(sets[0]),historical=JSON.parse(read(root,'compatibility/rc/original16-sass-source-diagnostic-identity.json')),origSets=Object.values(historical.loaded_source_sets);if(origSets.length!==1||origSets[0].length!==286)throw Error('original closure');const originalSources=plain(origSets[0]),oracle=JSON.parse(read(root,'compatibility/rc/oracles/material-16.2.14-sass-api.json')),cases=JSON.parse(read(root,'compatibility/rc/oracles/material-16.2.14-sass-argument-cases.json')),call=cases.mixins['private-check-duplicate-theme-styles'].call,program=\"@use '__entry__' as m;\\n\"+oracle.standard_theme+'\\n'+call+'\\n';if(sha(program)!==programHash||oracle.members.mixins['private-check-duplicate-theme-styles'].invocation.css_sha256!==originalHash)throw Error('plan changed');const compiler=createRequire(join(root,'package.json'))('sass'),compilerInfo=compiler.info,compile=compiler.compileString,descriptor=plain({contract,source:source.descriptor}),prov=JSON.parse(read(root,'reference/material-16.2.14/PROVENANCE.json')).isolated_environment,lock=JSON.parse(read(root,'reference/material-16.2.14/environment-package-lock.json')),expectedIdentity={material_version:'16.2.14',material_manifest_sha256:prov.material_manifest_sha256,lock_sha256:prov.package_lock_sha256,material_integrity:lock.packages['node_modules/@angular/material'].integrity,catalog:'compatibility/rc/oracles/material-16.2.14-sass-api.json',catalog_sha256:pins['compatibility/rc/oracles/material-16.2.14-sass-api.json'],sass_version:compilerInfo,expected_source:'untouched-installed-material16',candidate_source:'packed-facade'};if(line==='main'&&sha(read(root,'scripts/select-program-transition-source.mjs'))!=='4ea2edb6e3b55ec7ec3faa781097e76cbe029470d62f07d9bf8747468f4fa873')throw Error('changed Stepper transition helper');const successor=selectProgramTransitions({root,line,read:path=>read(root,path)});const check=()=>{source.assertCurrent();successor.assertCurrent();if(!readFileSync(new URL(import.meta.url)).equals(image))throw Error('gate changed');for(const [path,hash]of Object.entries(pins))if(sha(read(root,path))!==(successor.refs.get(path)??hash))throw Error('changed proof input '+path);if(compiler.info!==compilerInfo||compiler.compileString!==compile)throw Error('compiler changed');source.assertCurrent()};check();const ctx=Object.freeze({line});contexts.set(ctx,{root,line,source,expectedSources,originalSources,program,call,compiler,compile,compilerInfo,expectedIdentity,descriptor,check});return ctx;}\n",
+          "after": "export function createPrivateCardGateContext(args){if(!args||typeof args!=='object'||types.isProxy(args)||Object.getPrototypeOf(args)!==Object.prototype)throw Error('context arguments');const ds=Object.getOwnPropertyDescriptors(args);if(!isDeepStrictEqual(Reflect.ownKeys(ds),['root'])||!Object.hasOwn(ds.root,'value')||!ds.root.enumerable||typeof ds.root.value!=='string')throw Error('context arguments');let root=resolve(ds.root.value);const source=createCurrentSpinnerSnackContract({root}),line=source.line,sets=Object.values(source.source_sets);if(sets.length!==1)throw Error('source closure');const expectedSources=plain(sets[0]),historical=JSON.parse(read(root,'compatibility/rc/original16-sass-source-diagnostic-identity.json')),origSets=Object.values(historical.loaded_source_sets);if(origSets.length!==1||origSets[0].length!==286)throw Error('original closure');const originalSources=plain(origSets[0]),oracle=JSON.parse(read(root,'compatibility/rc/oracles/material-16.2.14-sass-api.json')),cases=JSON.parse(read(root,'compatibility/rc/oracles/material-16.2.14-sass-argument-cases.json')),call=cases.mixins['private-check-duplicate-theme-styles'].call,program=\"@use '__entry__' as m;\\n\"+oracle.standard_theme+'\\n'+call+'\\n';if(sha(program)!==programHash||oracle.members.mixins['private-check-duplicate-theme-styles'].invocation.css_sha256!==originalHash)throw Error('plan changed');const compiler=createRequire(join(root,'package.json'))('sass'),compilerInfo=compiler.info,compile=compiler.compileString,descriptor=plain({contract,source:source.descriptor}),prov=JSON.parse(read(root,'reference/material-16.2.14/PROVENANCE.json')).isolated_environment,lock=JSON.parse(read(root,'reference/material-16.2.14/environment-package-lock.json')),expectedIdentity={material_version:'16.2.14',material_manifest_sha256:prov.material_manifest_sha256,lock_sha256:prov.package_lock_sha256,material_integrity:lock.packages['node_modules/@angular/material'].integrity,catalog:'compatibility/rc/oracles/material-16.2.14-sass-api.json',catalog_sha256:pins['compatibility/rc/oracles/material-16.2.14-sass-api.json'],sass_version:compilerInfo,expected_source:'untouched-installed-material16',candidate_source:'packed-facade'};if(line==='main'){if(sha(read(root,'scripts/main-select-program-proof.mjs'))!=='ae495586f3584e26a1e324b810b4f6b0e0fa42773857495f9f9ce8bf8246dd29')throw Error('select proof helper changed');runSelectOwner(root,path=>read(root,path));}const successor=selectProgramTransitions({root,line,read:path=>read(root,path)});const check=()=>{source.assertCurrent();if(line==='main'){if(sha(read(root,'scripts/main-select-program-proof.mjs'))!=='ae495586f3584e26a1e324b810b4f6b0e0fa42773857495f9f9ce8bf8246dd29')throw Error('select proof helper changed');runSelectOwner(root,path=>read(root,path));}successor.assertCurrent();if(!readFileSync(new URL(import.meta.url)).equals(image))throw Error('gate changed');for(const [path,hash]of Object.entries(pins))if(sha(read(root,path))!==(successor.refs.get(path)??hash))throw Error('changed proof input '+path);if(compiler.info!==compilerInfo||compiler.compileString!==compile)throw Error('compiler changed');source.assertCurrent()};check();const ctx=Object.freeze({line});contexts.set(ctx,{root,line,source,expectedSources,originalSources,program,call,compiler,compile,compilerInfo,expectedIdentity,descriptor,check});return ctx;}\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/sass_private_card_gate.py",
+      "before": {
+        "path": "scripts/sass_private_card_gate.py",
+        "sha256": "768c272e96ec496b276405d1d7eb73ef9f1634b3f092a80c3a960f9fd2ea2760",
+        "bytes": 11767
+      },
+      "after": {
+        "path": "scripts/sass_private_card_gate.py",
+        "sha256": "5e6c97a9f8b6f3aecb60f4178563c26acd4a9b22000f51e5d2a9971f66001b80",
+        "bytes": 21862
+      },
+      "edits": [
+        {
+          "offset": 229,
+          "before": "import hashlib,json,re,weakref,subprocess,shutil\n",
+          "after": "import os as _owner_os, shutil as _owner_shutil, select as _owner_select, time as _owner_time, types as _owner_types\n_owner_path=_owner_os.environ.get('PATH','')\n_owner_node=_owner_shutil.which('node',path=_owner_path)\nif not _owner_node or not _owner_os.path.isabs(_owner_node):raise RuntimeError('pinned Node not found')\n_owner_node=_owner_os.path.realpath(_owner_node)\n_owner_primitives=(_owner_os.posix_spawn,_owner_os.pipe,_owner_os.close,_owner_os.read,_owner_os.waitpid,_owner_os.kill,_owner_select.select,_owner_time.monotonic)\nif any(type(f) is not _owner_types.BuiltinFunctionType for f in _owner_primitives):raise RuntimeError('native owner primitives required')\n_owner_spawn,_owner_pipe,_owner_close,_owner_read,_owner_waitpid,_owner_kill,_owner_poll,_owner_clock=_owner_primitives\n_owner_dup2=_owner_os.POSIX_SPAWN_DUP2;_owner_close_action=_owner_os.POSIX_SPAWN_CLOSE;_owner_nohang=_owner_os.WNOHANG\n_OWNER_LAUNCHER=\"import {readFileSync,lstatSync} from 'node:fs';import{join,resolve}from'node:path';import{createHash}from'node:crypto';const root=resolve(process.argv[1]),name=process.argv[2],pin=process.argv[3];if(process.version!=='v24.21.0'||!/^scripts\\\\/[a-z0-9-]+\\\\.mjs$/.test(name))throw Error('owner launcher');let p=root;for(const x of name.split('/')){p=join(p,x);if(lstatSync(p).isSymbolicLink())throw Error('linked owner')}const raw=readFileSync(p);if(createHash('sha256').update(raw).digest('hex')!==pin)throw Error('owner pin');const extra=process.argv.slice(4);process.argv=[process.argv[0],'owner',root,...extra];await import('data:text/javascript;base64,'+raw.toString('base64'));if(!readFileSync(p).equals(raw))throw Error('owner changed');\"\n\ndef _native_owner(root,name,pin,extra=(),*,spawn=_owner_spawn,pipe=_owner_pipe,close=_owner_close,read=_owner_read,waitpid=_owner_waitpid,kill=_owner_kill,poll=_owner_poll,clock=_owner_clock,node=_owner_node,path=_owner_path,dup2=_owner_dup2,close_action=_owner_close_action,nohang=_owner_nohang,launcher=_OWNER_LAUNCHER):\n    rfd,wfd=pipe();pid=None;waited=False\n    try:\n        argv=[node,'--input-type=module','--eval',launcher,str(root),name,pin,*extra]\n        env={'PATH':path,'LANG':'C','LC_ALL':'C','NODE_OPTIONS':''}\n        pid=spawn(node,argv,env,file_actions=[(dup2,wfd,1),(close_action,rfd),(close_action,wfd)])\n        close(wfd);wfd=None;output=b'';deadline=clock()+120\n        while True:\n            remaining=deadline-clock()\n            if remaining<=0:raise TimeoutError('owner timeout')\n            ready,_,_=poll([rfd],[],[],remaining)\n            if not ready:raise TimeoutError('owner timeout')\n            part=read(rfd,3)\n            if not part:break\n            output+=part\n            if len(output)>2:raise ValueError('owner protocol')\n        while True:\n            child,status=waitpid(pid,nohang)\n            if child==pid:waited=True;break\n            remaining=deadline-clock()\n            if remaining<=0:raise TimeoutError('owner timeout')\n            poll([],[],[],min(remaining,0.01))\n        if status!=0 or output!=b'ok':raise ValueError('owner failed')\n    finally:\n        if wfd is not None:close(wfd)\n        close(rfd)\n        if pid is not None and not waited:\n            try:kill(pid,9)\n            except ProcessLookupError:pass\n            waitpid(pid,0)\n\ndef _guarded(function,name,own_name=None):\n    code=function.__code__;defaults=function.__defaults__;mapping=function.__kwdefaults__;items=tuple(mapping.items()) if mapping else ()\n    def check():\n        current=function.__kwdefaults__\n        if globals().get(name) is not function or function.__code__ is not code or function.__defaults__ is not defaults or current is not mapping or (current is not None and (len(current)!=len(items) or any(k not in current or current[k] is not v for k,v in items))):raise ValueError('changed owner callable')\n        if own_name is not None and globals().get(own_name) is not guarded:raise ValueError('changed owner binding')\n    def guarded(*args,**kwargs):\n        check();result=function(*args,**kwargs);check();return result\n    return guarded\n_OWNER_NATIVE=(_native_owner,_native_owner.__code__,_native_owner.__defaults__,_native_owner.__kwdefaults__,tuple(_native_owner.__kwdefaults__.items()),_native_owner.__closure__,_owner_spawn,_owner_pipe,_owner_close,_owner_read,_owner_waitpid,_owner_kill,_owner_poll,_owner_clock,_owner_node,_owner_path,_owner_dup2,_owner_close_action,_owner_nohang,_OWNER_LAUNCHER)\n\ndef _run_select_owner(root,read,*,native=_OWNER_NATIVE):\n    for path in ('compatibility/rc/current-main-select-density-program-v1.json','scripts/select-program-transition-source.mjs','scripts/select_program_transition_source.py'):read(path)\n    launch,code,defaults,mapping,items,closure,spawn,pipe,close,native_read,waitpid,kill,poll,clock,node,path,dup2,close_action,nohang,launcher=native;current=launch.__kwdefaults__\n    if globals().get('_native_owner') is not launch or launch.__code__ is not code or launch.__defaults__ is not defaults or current is not mapping or tuple(current.items())!=items or launch.__closure__ is not closure:raise ValueError('changed native owner')\n    launch(root,'scripts/main-select-program-owner.mjs','55718e8697a51fb0b087c9f2f7d15508917c61001667bd0a3d75b534d6a53ccc',(),spawn=spawn,pipe=pipe,close=close,read=native_read,waitpid=waitpid,kill=kill,poll=poll,clock=clock,node=node,path=path,dup2=dup2,close_action=close_action,nohang=nohang,launcher=launcher)\n\nimport hashlib,json,re,weakref,subprocess,shutil,os\n"
+        },
+        {
+          "offset": 303,
+          "before": "",
+          "after": "\n"
+        },
+        {
+          "offset": 4878,
+          "before": "",
+          "after": "def _verify_private_js_owner(root):\n    path='compatibility/rc/current-main-private-card-select-owner-v2.json';raw=_read(root,path);assert (_hash(raw),len(raw))==('62ec4d7ab837c520899b47c8809c767cacb79c233b6145e915086918256d6f8a',5107);p=json.loads(raw);name='scripts/sass-private-card-gate.mjs';assert p['schema_version']==1 and p['role']=='main-private-card-select-owner-continuation' and p['line']=='main' and p['source_parent']=='c2c58388e0777e580fd76234b57c271de0cb4115' and p['source_scope_only'] is True and p['artifact_or_audit_admission_granted'] is False and [x['path'] for x in p['updates']]==[name]\n    step_path='compatibility/rc/current-sass-stepper-private-gate-executable-v1.json';step_raw=_read(root,step_path);assert _hash(step_raw)=='efedf94e02295045ed681484aef77661c858fa5a8e7612f5931eeb7a3bfcb6eb';step=json.loads(step_raw);assert step['schema_version']==1 and step['role']=='main-stepper-private-gate-executable-successor' and step['line']=='main' and step['source_parent']=='42d02491648097656ccb3c590dbaaea066c3e603' and step['source_scope_only'] is True and step['artifact_or_audit_admission_granted'] is False and [x['path'] for x in step['updates']]==[name]\n    prior_raw=_read(root,'compatibility/rc/current-sass-select-private-gate-executable-v2.json');assert _hash(prior_raw)=='f0a8f5b76ce7b6aeca446247488d4621171ab155c3215d61fd826730d2111e80';prior=json.loads(prior_raw);r=p['updates'][0];assert prior['schema_version']==2 and prior['role']=='main-select-private-gate-executable-successor' and prior['line']=='main' and prior['previous_packet']==dict(path=step_path,sha256=_hash(step_raw),bytes=len(step_raw)) and prior['source_scope_only'] is True and prior['artifact_or_audit_admission_granted'] is False and [x['path'] for x in prior['updates']]==[name] and prior['updates'][0]['after']==r['before']\n    env=dict(PATH=os.environ.get('PATH',''),LANG='C',LC_ALL='C',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_SYSTEM='/dev/null',GIT_TERMINAL_PROMPT='0',GIT_NO_REPLACE_OBJECTS='1',GIT_NO_LAZY_FETCH='1');git=lambda commit:subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',commit+':'+name],cwd=root,env=env);subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',p['source_parent'],'HEAD'],cwd=root,env=env)\n    original=git(step['source_parent']);step_row=step['updates'][0];assert (_hash(original),len(original))==(step_row['before']['sha256'],step_row['before']['bytes']);at=0;parts=[]\n    for e in step_row['edits']:\n        assert set(e)=={'offset','before','after'} and type(e['offset']) is int and at<=e['offset']<=len(original);before=e['before'].encode();assert original[e['offset']:e['offset']+len(before)]==before;parts.extend((original[at:e['offset']],e['after'].encode()));at=e['offset']+len(before)\n    middle=b''.join([*parts,original[at:]]);assert dict(path=name,sha256=_hash(middle),bytes=len(middle))==step_row['after'] and prior['updates'][0]['before']==step_row['after'];at=0;parts=[]\n    for e in prior['updates'][0]['edits']:\n        assert set(e)=={'offset','before','after'} and type(e['offset']) is int and at<=e['offset']<=len(middle);before=e['before'].encode();assert middle[e['offset']:e['offset']+len(before)]==before;parts.extend((middle[at:e['offset']],e['after'].encode()));at=e['offset']+len(before)\n    old=b''.join([*parts,middle[at:]]);assert dict(path=name,sha256=_hash(old),bytes=len(old))==r['before'] and git(p['source_parent'])==old;at=0;parts=[]\n    for e in r['edits']:\n        assert set(e)=={'offset','before','after'} and type(e['offset']) is int and at<=e['offset']<=len(old);before=e['before'].encode();assert old[e['offset']:e['offset']+len(before)]==before;parts.extend((old[at:e['offset']],e['after'].encode()));at=e['offset']+len(before)\n    result=b''.join([*parts,old[at:]]);assert r['after']['path']==name and (_hash(result),len(result))==(r['after']['sha256'],r['after']['bytes']) and _read(root,name)==result\n    return r['after']['sha256']\n"
+        },
+        {
+          "offset": 4968,
+          "before": "",
+          "after": "        select_checked=_guarded(_run_select_owner,'_run_select_owner')\n        transition_checked=_guarded(select_program_transitions,'select_program_transitions')\n"
+        },
+        {
+          "offset": 6823,
+          "before": "        if line=='main' and _hash(_read(root,'scripts/select_program_transition_source.py'))!='a34b878e5ba2f15e5da293c7db48d019032b47192a82147648d0b1f5fc52ea59':raise ValueError('changed Stepper transition helper')\n        successor,successor_current=select_program_transitions(root,line,lambda path:_read(root,path),private=True)\n        _CONTEXTS[self]=dict(successor=successor,successor_current=successor_current,root=root,source=source,line=line,sources=_plain(sets[0]),original_sources=_plain(orig[0]),descriptor=_plain(dict(contract=_CONTRACT,source=source.descriptor)),identity=identity,call=call,info=info)\n",
+          "after": "        if line=='main':\n            assert _hash(_read(root,'scripts/main_select_program_proof.py'))=='b107f2f2f59d783721409eb673cab3fb7e534353ba68fbb1aca5afebbc3a45a2';select_checked(root,lambda p:_read(root,p))\n        successor,successor_current=transition_checked(root,line,private=False)\n        if line=='main':successor['scripts/sass-private-card-gate.mjs']=_verify_private_js_owner(root)\n        _CONTEXTS[self]=dict(select_checked=select_checked,successor=successor,successor_current=successor_current,root=root,source=source,line=line,sources=_plain(sets[0]),original_sources=_plain(orig[0]),descriptor=_plain(dict(contract=_CONTRACT,source=source.descriptor)),identity=identity,call=call,info=info)\n"
+        },
+        {
+          "offset": 7587,
+          "before": "        s=_CONTEXTS[self];s['source'].assert_current();s['successor_current']()\n",
+          "after": "        s=_CONTEXTS[self];s['source'].assert_current();_verify_private_js_owner(s['root']) if s['line']=='main' else None;(_hash(_read(s['root'],'scripts/main_select_program_proof.py'))=='b107f2f2f59d783721409eb673cab3fb7e534353ba68fbb1aca5afebbc3a45a2' or (_ for _ in ()).throw(ValueError('select proof helper changed'))) if s['line']=='main' else None;s['select_checked'](s['root'],lambda p:_read(s['root'],p)) if s['line']=='main' else None;s['successor_current']()\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/sass-ordinary-control-gate.mjs",
+      "before": {
+        "path": "scripts/sass-ordinary-control-gate.mjs",
+        "sha256": "b691cc5e10518d11478a4ae8d1d8823c2bbc392c21b31e51d8890f5f2062496d",
+        "bytes": 24352
+      },
+      "after": {
+        "path": "scripts/sass-ordinary-control-gate.mjs",
+        "sha256": "bc2be28f4de4f56e6c3a36884a6fc96e69f8394ecd9a1cf7eb6785a809994b81",
+        "bytes": 26538
+      },
+      "edits": [
+        {
+          "offset": 0,
+          "before": "",
+          "after": "\n"
+        },
+        {
+          "offset": 170,
+          "before": "",
+          "after": "import {execFileSync as selectOwnerExec} from 'node:child_process';\nconst selectOwnerRuntime=process.execPath,selectOwnerPath=process.env.PATH;\nfunction runSelectOwner(root,read){\n for(const path of ['compatibility/rc/current-main-select-density-program-v1.json','scripts/select-program-transition-source.mjs','scripts/select_program_transition_source.py'])read(path);\n const out=selectOwnerExec(selectOwnerRuntime,['--input-type=module','--eval',\"import {readFileSync,lstatSync} from 'node:fs';import{join,resolve}from'node:path';import{createHash}from'node:crypto';const root=resolve(process.argv[1]),name=process.argv[2],pin=process.argv[3];if(process.version!=='v24.21.0'||!/^scripts\\\\/[a-z0-9-]+\\\\.mjs$/.test(name))throw Error('owner launcher');let p=root;for(const x of name.split('/')){p=join(p,x);if(lstatSync(p).isSymbolicLink())throw Error('linked owner')}const raw=readFileSync(p);if(createHash('sha256').update(raw).digest('hex')!==pin)throw Error('owner pin');process.argv=[process.argv[0],'owner',root];await import('data:text/javascript;base64,'+raw.toString('base64'));if(!readFileSync(p).equals(raw))throw Error('owner changed');\",root,'scripts/main-select-program-owner.mjs',\"55718e8697a51fb0b087c9f2f7d15508917c61001667bd0a3d75b534d6a53ccc\"],{cwd:root,env:{PATH:selectOwnerPath,LANG:'C',LC_ALL:'C',NODE_OPTIONS:''},encoding:'utf8',timeout:120000});if(out!=='ok')throw Error('select owner result');\n}\n\n"
+        },
+        {
+          "offset": 8776,
+          "before": "",
+          "after": "const activePhysicalCallbacks=new Map();\n"
+        },
+        {
+          "offset": 8822,
+          "before": "",
+          "after": " const nested=activePhysicalCallbacks.get(root);if(nested){nested.poisoned=true;throw Error('reentrant physical boundary');}\n"
+        },
+        {
+          "offset": 8943,
+          "before": " const read=path=>{const actual=physical(root,path),prior=retained.get(path);if(prior)assert.ok(equalBytes(actual,prior),'changed retained physical input '+path);else retained.set(path,Buffer.from(actual));\n  if(providedRead!==undefined){assert.equal(typeof providedRead,'function');const supplied=providedRead(path);assert.ok(equalBytes(actual,supplied),'nonphysical supplied input '+path);}\n",
+          "after": " const rejectReentry=()=>{const current=activePhysicalCallbacks.get(root);if(current){current.poisoned=true;throw Error('reentrant physical read');}};\n const read=path=>{rejectReentry();const actual=physical(root,path),prior=retained.get(path);if(prior)assert.ok(equalBytes(actual,prior),'changed retained physical input '+path);else retained.set(path,Buffer.from(actual));\n  if(providedRead!==undefined){assert.equal(typeof providedRead,'function');const state={poisoned:false};activePhysicalCallbacks.set(root,state);try{const supplied=providedRead(path);assert.ok(!state.poisoned,'caught physical read reentry');assert.ok(equalBytes(actual,supplied),'nonphysical supplied input '+path);}finally{activePhysicalCallbacks.delete(root);}}\n"
+        },
+        {
+          "offset": 9457,
+          "before": " const assertPhysical=()=>{for(const[path,before]of retained)assert.ok(equalBytes(physical(root,path),before),'changed final physical input '+path);};\n return {read,assertPhysical};\n",
+          "after": " const assertPhysical=()=>{rejectReentry();for(const[path,before]of retained)assert.ok(equalBytes(physical(root,path),before),'changed final physical input '+path);};\n return {read,assertPhysical,rejectReentry};\n"
+        },
+        {
+          "offset": 12640,
+          "before": " if(line==='main')assert.equal(hash(read('scripts/select-program-transition-source.mjs')),'4ea2edb6e3b55ec7ec3faa781097e76cbe029470d62f07d9bf8747468f4fa873');\n",
+          "after": " if(line==='main'){assert.equal(hash(read('scripts/main-select-program-proof.mjs')),'ae495586f3584e26a1e324b810b4f6b0e0fa42773857495f9f9ce8bf8246dd29');runSelectOwner(root,read);}\n"
+        },
+        {
+          "offset": 12860,
+          "before": " const assertCurrent=()=>{source.assertCurrent();successor.assertCurrent();assert.ok(tool(root,SELF,read).equals(image));for(const[path,sha256]of dependencies)assert.equal(hash(tool(root,path,read)),successor.refs.get(path)??sha256);source.assertCurrent();boundary.assertPhysical();};\n",
+          "after": " const assertCurrent=()=>{boundary.rejectReentry();source.assertCurrent();if(line==='main'){assert.equal(hash(read('scripts/main-select-program-proof.mjs')),'ae495586f3584e26a1e324b810b4f6b0e0fa42773857495f9f9ce8bf8246dd29');runSelectOwner(root,read);}successor.assertCurrent();assert.ok(tool(root,SELF,read).equals(image));for(const[path,sha256]of dependencies)assert.equal(hash(tool(root,path,read)),successor.refs.get(path)??sha256);source.assertCurrent();boundary.assertPhysical();};\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/sass_ordinary_control_gate.py",
+      "before": {
+        "path": "scripts/sass_ordinary_control_gate.py",
+        "sha256": "76e058962a7b730167e813b08b28965f9c09b5b302711d51dea3dc2f29e7c49f",
+        "bytes": 19369
+      },
+      "after": {
+        "path": "scripts/sass_ordinary_control_gate.py",
+        "sha256": "4df48208b632acd676756fa456aa740879fb5f3e59d651e087e869b8f9bd1d45",
+        "bytes": 25844
+      },
+      "edits": [
+        {
+          "offset": 231,
+          "before": "",
+          "after": "import os as _owner_os, shutil as _owner_shutil, select as _owner_select, time as _owner_time, types as _owner_types\n_owner_path=_owner_os.environ.get('PATH','')\n_owner_node=_owner_shutil.which('node',path=_owner_path)\nif not _owner_node or not _owner_os.path.isabs(_owner_node):raise RuntimeError('pinned Node not found')\n_owner_node=_owner_os.path.realpath(_owner_node)\n_owner_primitives=(_owner_os.posix_spawn,_owner_os.pipe,_owner_os.close,_owner_os.read,_owner_os.waitpid,_owner_os.kill,_owner_select.select,_owner_time.monotonic)\nif any(type(f) is not _owner_types.BuiltinFunctionType for f in _owner_primitives):raise RuntimeError('native owner primitives required')\n_owner_spawn,_owner_pipe,_owner_close,_owner_read,_owner_waitpid,_owner_kill,_owner_poll,_owner_clock=_owner_primitives\n_owner_dup2=_owner_os.POSIX_SPAWN_DUP2;_owner_close_action=_owner_os.POSIX_SPAWN_CLOSE;_owner_nohang=_owner_os.WNOHANG\n_OWNER_LAUNCHER=\"import {readFileSync,lstatSync} from 'node:fs';import{join,resolve}from'node:path';import{createHash}from'node:crypto';const root=resolve(process.argv[1]),name=process.argv[2],pin=process.argv[3];if(process.version!=='v24.21.0'||!/^scripts\\\\/[a-z0-9-]+\\\\.mjs$/.test(name))throw Error('owner launcher');let p=root;for(const x of name.split('/')){p=join(p,x);if(lstatSync(p).isSymbolicLink())throw Error('linked owner')}const raw=readFileSync(p);if(createHash('sha256').update(raw).digest('hex')!==pin)throw Error('owner pin');const extra=process.argv.slice(4);process.argv=[process.argv[0],'owner',root,...extra];await import('data:text/javascript;base64,'+raw.toString('base64'));if(!readFileSync(p).equals(raw))throw Error('owner changed');\"\n\ndef _native_owner(root,name,pin,extra=(),*,spawn=_owner_spawn,pipe=_owner_pipe,close=_owner_close,read=_owner_read,waitpid=_owner_waitpid,kill=_owner_kill,poll=_owner_poll,clock=_owner_clock,node=_owner_node,path=_owner_path,dup2=_owner_dup2,close_action=_owner_close_action,nohang=_owner_nohang,launcher=_OWNER_LAUNCHER):\n    rfd,wfd=pipe();pid=None;waited=False\n    try:\n        argv=[node,'--input-type=module','--eval',launcher,str(root),name,pin,*extra]\n        env={'PATH':path,'LANG':'C','LC_ALL':'C','NODE_OPTIONS':''}\n        pid=spawn(node,argv,env,file_actions=[(dup2,wfd,1),(close_action,rfd),(close_action,wfd)])\n        close(wfd);wfd=None;output=b'';deadline=clock()+120\n        while True:\n            remaining=deadline-clock()\n            if remaining<=0:raise TimeoutError('owner timeout')\n            ready,_,_=poll([rfd],[],[],remaining)\n            if not ready:raise TimeoutError('owner timeout')\n            part=read(rfd,3)\n            if not part:break\n            output+=part\n            if len(output)>2:raise ValueError('owner protocol')\n        while True:\n            child,status=waitpid(pid,nohang)\n            if child==pid:waited=True;break\n            remaining=deadline-clock()\n            if remaining<=0:raise TimeoutError('owner timeout')\n            poll([],[],[],min(remaining,0.01))\n        if status!=0 or output!=b'ok':raise ValueError('owner failed')\n    finally:\n        if wfd is not None:close(wfd)\n        close(rfd)\n        if pid is not None and not waited:\n            try:kill(pid,9)\n            except ProcessLookupError:pass\n            waitpid(pid,0)\n\ndef _guarded(function,name,own_name=None):\n    code=function.__code__;defaults=function.__defaults__;mapping=function.__kwdefaults__;items=tuple(mapping.items()) if mapping else ()\n    def check():\n        current=function.__kwdefaults__\n        if globals().get(name) is not function or function.__code__ is not code or function.__defaults__ is not defaults or current is not mapping or (current is not None and (len(current)!=len(items) or any(k not in current or current[k] is not v for k,v in items))):raise ValueError('changed owner callable')\n        if own_name is not None and globals().get(own_name) is not guarded:raise ValueError('changed owner binding')\n    def guarded(*args,**kwargs):\n        check();result=function(*args,**kwargs);check();return result\n    return guarded\n_OWNER_NATIVE=(_native_owner,_native_owner.__code__,_native_owner.__defaults__,_native_owner.__kwdefaults__,tuple(_native_owner.__kwdefaults__.items()),_native_owner.__closure__,_owner_spawn,_owner_pipe,_owner_close,_owner_read,_owner_waitpid,_owner_kill,_owner_poll,_owner_clock,_owner_node,_owner_path,_owner_dup2,_owner_close_action,_owner_nohang,_OWNER_LAUNCHER)\n\ndef _run_select_owner(root,read,*,native=_OWNER_NATIVE):\n    for path in ('compatibility/rc/current-main-select-density-program-v1.json','scripts/select-program-transition-source.mjs','scripts/select_program_transition_source.py'):read(path)\n    launch,code,defaults,mapping,items,closure,spawn,pipe,close,native_read,waitpid,kill,poll,clock,node,path,dup2,close_action,nohang,launcher=native;current=launch.__kwdefaults__\n    if globals().get('_native_owner') is not launch or launch.__code__ is not code or launch.__defaults__ is not defaults or current is not mapping or tuple(current.items())!=items or launch.__closure__ is not closure:raise ValueError('changed native owner')\n    launch(root,'scripts/main-select-program-owner.mjs','55718e8697a51fb0b087c9f2f7d15508917c61001667bd0a3d75b534d6a53ccc',(),spawn=spawn,pipe=pipe,close=close,read=native_read,waitpid=waitpid,kill=kill,poll=poll,clock=clock,node=node,path=path,dup2=dup2,close_action=close_action,nohang=nohang,launcher=launcher)\n\n"
+        },
+        {
+          "offset": 283,
+          "before": "",
+          "after": "\n"
+        },
+        {
+          "offset": 6257,
+          "before": "",
+          "after": "_active_physical_callbacks={}\n"
+        },
+        {
+          "offset": 6301,
+          "before": "    # Existing frozen guards authenticate retained first images against exact pins.\n    # This closes supplied callbacks, not concurrent filesystem mutation.\n",
+          "after": "    active=_active_physical_callbacks.get(root)\n    if active is not None:\n        active['poisoned']=True\n        raise ValueError('reentrant physical boundary')\n"
+        },
+        {
+          "offset": 6526,
+          "before": "",
+          "after": "    def reject_reentry():\n        active=_active_physical_callbacks.get(root)\n        if active is not None:\n            active['poisoned']=True\n            raise ValueError('reentrant physical read')\n"
+        },
+        {
+          "offset": 6546,
+          "before": "",
+          "after": "        reject_reentry()\n"
+        },
+        {
+          "offset": 6713,
+          "before": "            provided=provided_read(path)\n            assert type(provided) is bytes and actual==provided\n",
+          "after": "            state={'poisoned':False};_active_physical_callbacks[root]=state\n            try:\n                provided=provided_read(path)\n                assert not state['poisoned'],'caught physical read reentry'\n                assert type(provided) is bytes and actual==provided\n            finally:del _active_physical_callbacks[root]\n"
+        },
+        {
+          "offset": 6957,
+          "before": "",
+          "after": "        reject_reentry()\n"
+        },
+        {
+          "offset": 7068,
+          "before": "    return read,assert_physical\n",
+          "after": "    return read,assert_physical,reject_reentry\n"
+        },
+        {
+          "offset": 8324,
+          "before": "",
+          "after": "        if read is not None:raise ValueError('supplied source readers are not authoritative')\n        select_checked=_guarded(_run_select_owner,'_run_select_owner')\n        transition_checked=_guarded(select_program_transitions,'select_program_transitions')\n"
+        },
+        {
+          "offset": 8359,
+          "before": "        read,assert_physical=_physical_boundary(root,read)\n",
+          "after": "        read,assert_physical,reject_reentry=_physical_boundary(root,read)\n"
+        },
+        {
+          "offset": 8502,
+          "before": "        if line=='main':assert _hash(read('scripts/select_program_transition_source.py'))=='a34b878e5ba2f15e5da293c7db48d019032b47192a82147648d0b1f5fc52ea59'\n        successor,successor_current=select_program_transitions(root,line,read)\n",
+          "after": "        if line=='main':\n            assert _hash(read('scripts/main_select_program_proof.py'))=='b107f2f2f59d783721409eb673cab3fb7e534353ba68fbb1aca5afebbc3a45a2';select_checked(root,read)\n        successor,successor_current=transition_checked(root,line)\n"
+        },
+        {
+          "offset": 9118,
+          "before": "",
+          "after": "            reject_reentry()\n"
+        },
+        {
+          "offset": 9154,
+          "before": "",
+          "after": "            if line=='main':assert _hash(read('scripts/main_select_program_proof.py'))=='b107f2f2f59d783721409eb673cab3fb7e534353ba68fbb1aca5afebbc3a45a2';select_checked(root,read)\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/sass-spinner-snack-gate-integration.mjs",
+      "before": {
+        "path": "scripts/sass-spinner-snack-gate-integration.mjs",
+        "sha256": "4bd4fcb0aa9a76f82e740dd5755757a41e79a1f61eb7cf92ac5c806c1c3649e9",
+        "bytes": 24874
+      },
+      "after": {
+        "path": "scripts/sass-spinner-snack-gate-integration.mjs",
+        "sha256": "1bde510362f23d72cd835c756ccf937d00b1316a4f5fd5a8f0e3a0bc2bd14406",
+        "bytes": 28348
+      },
+      "edits": [
+        {
+          "offset": 170,
+          "before": "",
+          "after": "const ownerRuntime=process.execPath,ownerPath=process.env.PATH;\nconst ownerJSONParse=JSON.parse,ownerJSONStringify=JSON.stringify,ownerBufferFrom=Buffer.from,ownerBufferToString=Buffer.prototype.toString;\nfunction runDensityResourceOwner(root,path,initial,initialRef,read){\n for(const name of ['compatibility/rc/current-main-density-input-successor-v2.json','compatibility/rc/current-main-density-input-successor-v3.json','compatibility/rc/main-tooltip-resource-source-programs-v1.json','compatibility/rc/main-sass-graph-resource-source-programs-v2.json','compatibility/rc/main-sass-resource-contract-programs-v1.json'])read(name);\n if(JSON.parse!==ownerJSONParse||JSON.stringify!==ownerJSONStringify||Buffer.from!==ownerBufferFrom||Buffer.prototype.toString!==ownerBufferToString)throw Error('density owner operations changed');\n const raw=execFileSync(ownerRuntime,['--input-type=module','--eval',\"import {readFileSync,lstatSync} from 'node:fs';import{join,resolve}from'node:path';import{createHash}from'node:crypto';const root=resolve(process.argv[1]),name=process.argv[2],pin=process.argv[3];if(process.version!=='v24.21.0'||!/^scripts\\\\/[a-z0-9-]+\\\\.mjs$/.test(name))throw Error('owner launcher');let p=root;for(const x of name.split('/')){p=join(p,x);if(lstatSync(p).isSymbolicLink())throw Error('linked owner')}const raw=readFileSync(p);if(createHash('sha256').update(raw).digest('hex')!==pin)throw Error('owner pin');process.argv=[process.argv[0],'owner',root];await import('data:text/javascript;base64,'+raw.toString('base64'));if(!readFileSync(p).equals(raw))throw Error('owner changed');\",root,'scripts/main-density-resource-owner.mjs',\"d7c2b25b253f9414a7806f39fe84daa75b087cf895f72bd3fed6cf1b42da200c\"],{cwd:root,env:{PATH:ownerPath,LANG:'C',LC_ALL:'C',NODE_OPTIONS:''},input:ownerJSONStringify({path,initial:ownerBufferToString.call(initial,'base64'),initialRef}),encoding:'utf8',timeout:120000,maxBuffer:8*1024*1024});const out=ownerJSONParse(raw);if(!out||typeof out.current!=='string'||!out.expected)throw Error('density owner result');return {current:ownerBufferFrom(out.current,'base64'),expected:out.expected};\n}\n\n"
+        },
+        {
+          "offset": 6850,
+          "before": "",
+          "after": "const activePhysicalCallbacks=new Map();\n"
+        },
+        {
+          "offset": 6896,
+          "before": "",
+          "after": " const nested=activePhysicalCallbacks.get(root);if(nested){nested.poisoned=true;throw Error('reentrant physical boundary');}\n"
+        },
+        {
+          "offset": 7017,
+          "before": " const read=path=>{const actual=physical(root,path),prior=retained.get(path);if(prior)assert.ok(equalBytes(actual,prior),'changed retained physical input '+path);else retained.set(path,Buffer.from(actual));\n  if(providedRead!==undefined){assert.equal(typeof providedRead,'function');const supplied=providedRead(path);assert.ok(equalBytes(actual,supplied),'nonphysical supplied input '+path);}\n",
+          "after": " const rejectReentry=()=>{const current=activePhysicalCallbacks.get(root);if(current){current.poisoned=true;throw Error('reentrant physical read');}};\n const read=path=>{rejectReentry();const actual=physical(root,path),prior=retained.get(path);if(prior)assert.ok(equalBytes(actual,prior),'changed retained physical input '+path);else retained.set(path,Buffer.from(actual));\n  if(providedRead!==undefined){assert.equal(typeof providedRead,'function');const state={poisoned:false};activePhysicalCallbacks.set(root,state);try{const supplied=providedRead(path);assert.ok(!state.poisoned,'caught physical read reentry');assert.ok(equalBytes(actual,supplied),'nonphysical supplied input '+path);}finally{activePhysicalCallbacks.delete(root);}}\n"
+        },
+        {
+          "offset": 7531,
+          "before": " const assertPhysical=()=>{for(const[path,before]of retained)assert.ok(equalBytes(physical(root,path),before),'changed final physical input '+path);};\n return {read,assertPhysical};\n",
+          "after": " const assertPhysical=()=>{rejectReentry();for(const[path,before]of retained)assert.ok(equalBytes(physical(root,path),before),'changed final physical input '+path);};\n return {read,assertPhysical,rejectReentry};\n"
+        },
+        {
+          "offset": 10699,
+          "before": " let ownerSuccessor=null,selectOwnerSuccessor=null;\n",
+          "after": " let ownerSuccessor=null,selectOwnerSuccessor=null;const resourceRefs=new Map();\n"
+        },
+        {
+          "offset": 10771,
+          "before": "",
+          "after": "  assert.equal(hash(read('scripts/main-sass-resource-continuation.mjs')),'e023340b48171bd0a865899969eacc35f6489a4a2c0b820dc4dce082b6f39c7c');\n"
+        },
+        {
+          "offset": 13925,
+          "before": "   const physicalAfter=Buffer.concat([...nextParts,after.subarray(cursor)]);assert.deepEqual({path:row.path,sha256:hash(physicalAfter),bytes:physicalAfter.length},next.after);assert.ok(read(row.path).equals(physicalAfter));\n",
+          "after": "   const physicalAfter=Buffer.concat([...nextParts,after.subarray(cursor)]);assert.deepEqual({path:row.path,sha256:hash(physicalAfter),bytes:physicalAfter.length},next.after);const git=(commit,path)=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',commit+':'+path],{cwd:root,env});for(const commit of ['19ee6343365c391deb97362caec413b113665e1b','8fe95564c981a9dd73605d27beaa0496824e8444','ecc1051cfb829f0b67ba9cb50e4b733d6684ebff','b94f169d4fe57d571e6a7c3f911a9395f6a60c4d'])execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',commit,'HEAD'],{cwd:root,env});const final=runDensityResourceOwner(root,row.path,physicalAfter,next.after,read);assert.ok(read(row.path).equals(final.current));resourceRefs.set(row.path,final.expected.sha256);\n"
+        },
+        {
+          "offset": 14156,
+          "before": " const assertCurrent=()=>{source.assertCurrent();assert.ok(tool(root,SELF,read).equals(image));for(const[path,sha256]of dependencies){const next=selectOwnerSuccessor?.updates.find(row=>row.path===path);assert.equal(hash(tool(root,path,read)),next?next.after.sha256:sha256);}source.assertCurrent();boundary.assertPhysical();};\n",
+          "after": " const assertCurrent=()=>{boundary.rejectReentry();source.assertCurrent();assert.ok(tool(root,SELF,read).equals(image));for(const[path,sha256]of dependencies){const next=selectOwnerSuccessor?.updates.find(row=>row.path===path);assert.equal(hash(tool(root,path,read)),resourceRefs.get(path)??(next?next.after.sha256:sha256));}source.assertCurrent();boundary.assertPhysical();};\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/sass_spinner_snack_gate_integration.py",
+      "before": {
+        "path": "scripts/sass_spinner_snack_gate_integration.py",
+        "sha256": "64952d89f2d6f17eaa18b5878299cf91642df2f3ae2c81506c7fffc1caf85cc3",
+        "bytes": 20128
+      },
+      "after": {
+        "path": "scripts/sass_spinner_snack_gate_integration.py",
+        "sha256": "64167d5996e0eca2b919545c52fa48d9085bb93b6bde0c38b630a5633ac02422",
+        "bytes": 28736
+      },
+      "edits": [
+        {
+          "offset": 231,
+          "before": "",
+          "after": "import os as _owner_os, shutil as _owner_shutil, select as _owner_select, time as _owner_time, types as _owner_types\n_owner_path=_owner_os.environ.get('PATH','')\n_owner_node=_owner_shutil.which('node',path=_owner_path)\nif not _owner_node or not _owner_os.path.isabs(_owner_node):raise RuntimeError('pinned Node not found')\n_owner_node=_owner_os.path.realpath(_owner_node)\n_owner_primitives=(_owner_os.posix_spawn,_owner_os.pipe,_owner_os.close,_owner_os.read,_owner_os.waitpid,_owner_os.kill,_owner_select.select,_owner_time.monotonic)\nif any(type(f) is not _owner_types.BuiltinFunctionType for f in _owner_primitives):raise RuntimeError('native owner primitives required')\n_owner_spawn,_owner_pipe,_owner_close,_owner_read,_owner_waitpid,_owner_kill,_owner_poll,_owner_clock=_owner_primitives\n_owner_dup2=_owner_os.POSIX_SPAWN_DUP2;_owner_close_action=_owner_os.POSIX_SPAWN_CLOSE;_owner_nohang=_owner_os.WNOHANG\n_OWNER_LAUNCHER=\"import {readFileSync,lstatSync} from 'node:fs';import{join,resolve}from'node:path';import{createHash}from'node:crypto';const root=resolve(process.argv[1]),name=process.argv[2],pin=process.argv[3];if(process.version!=='v24.21.0'||!/^scripts\\\\/[a-z0-9-]+\\\\.mjs$/.test(name))throw Error('owner launcher');let p=root;for(const x of name.split('/')){p=join(p,x);if(lstatSync(p).isSymbolicLink())throw Error('linked owner')}const raw=readFileSync(p);if(createHash('sha256').update(raw).digest('hex')!==pin)throw Error('owner pin');const extra=process.argv.slice(4);process.argv=[process.argv[0],'owner',root,...extra];await import('data:text/javascript;base64,'+raw.toString('base64'));if(!readFileSync(p).equals(raw))throw Error('owner changed');\"\n\ndef _native_owner(root,name,pin,extra=(),*,spawn=_owner_spawn,pipe=_owner_pipe,close=_owner_close,read=_owner_read,waitpid=_owner_waitpid,kill=_owner_kill,poll=_owner_poll,clock=_owner_clock,node=_owner_node,path=_owner_path,dup2=_owner_dup2,close_action=_owner_close_action,nohang=_owner_nohang,launcher=_OWNER_LAUNCHER):\n    rfd,wfd=pipe();pid=None;waited=False\n    try:\n        argv=[node,'--input-type=module','--eval',launcher,str(root),name,pin,*extra]\n        env={'PATH':path,'LANG':'C','LC_ALL':'C','NODE_OPTIONS':''}\n        pid=spawn(node,argv,env,file_actions=[(dup2,wfd,1),(close_action,rfd),(close_action,wfd)])\n        close(wfd);wfd=None;output=b'';deadline=clock()+120\n        while True:\n            remaining=deadline-clock()\n            if remaining<=0:raise TimeoutError('owner timeout')\n            ready,_,_=poll([rfd],[],[],remaining)\n            if not ready:raise TimeoutError('owner timeout')\n            part=read(rfd,3)\n            if not part:break\n            output+=part\n            if len(output)>2:raise ValueError('owner protocol')\n        while True:\n            child,status=waitpid(pid,nohang)\n            if child==pid:waited=True;break\n            remaining=deadline-clock()\n            if remaining<=0:raise TimeoutError('owner timeout')\n            poll([],[],[],min(remaining,0.01))\n        if status!=0 or output!=b'ok':raise ValueError('owner failed')\n    finally:\n        if wfd is not None:close(wfd)\n        close(rfd)\n        if pid is not None and not waited:\n            try:kill(pid,9)\n            except ProcessLookupError:pass\n            waitpid(pid,0)\n\ndef _guarded(function,name,own_name=None):\n    code=function.__code__;defaults=function.__defaults__;mapping=function.__kwdefaults__;items=tuple(mapping.items()) if mapping else ()\n    def check():\n        current=function.__kwdefaults__\n        if globals().get(name) is not function or function.__code__ is not code or function.__defaults__ is not defaults or current is not mapping or (current is not None and (len(current)!=len(items) or any(k not in current or current[k] is not v for k,v in items))):raise ValueError('changed owner callable')\n        if own_name is not None and globals().get(own_name) is not guarded:raise ValueError('changed owner binding')\n    def guarded(*args,**kwargs):\n        check();result=function(*args,**kwargs);check();return result\n    return guarded\n_OWNER_NATIVE=(_native_owner,_native_owner.__code__,_native_owner.__defaults__,_native_owner.__kwdefaults__,tuple(_native_owner.__kwdefaults__.items()),_native_owner.__closure__,_owner_spawn,_owner_pipe,_owner_close,_owner_read,_owner_waitpid,_owner_kill,_owner_poll,_owner_clock,_owner_node,_owner_path,_owner_dup2,_owner_close_action,_owner_nohang,_OWNER_LAUNCHER)\n\nimport binascii as _owner_binascii\n_owner_b2a=_owner_binascii.b2a_base64\nif type(_owner_b2a) is not _owner_types.BuiltinFunctionType:raise RuntimeError('native base64 required')\ndef _run_density_resource_owner(root,path,initial,initial_ref,read,*,native=_OWNER_NATIVE,b2a=_owner_b2a,rows=(\n ('scripts/current-sass-source.mjs','357a76daa5221d9dc9da095e23f11be4d7a627ed102a2078eb079f25ec7fccf8',23987,'f173497d4a16acb5c7e248363f214343f7c76f456212839b0da815064d09b4d9'),\n ('scripts/current-sass-spinner-snack-contract.mjs','21b211398260e1801cf02a72b139f5c9371482872763ca6168915377a5ea39c4',20042,'98d54a01132d1c8e4c14331b1902efa1f019988e9264c256e0622c97b5e33020'),\n ('scripts/current_sass_source.py','dc9e9a681d4bc67df377111ce8d119d82d8101c3c3657b037282fc68098adc8a',21241,'fca2a1ebdc8828e38b98ef73f16e36be3c60e8af95ee44644ef96333326e3a9e'),\n ('scripts/current_sass_spinner_snack_admission.py','ea27e7956065d5be34a5306f55a8a4a891af70ecb21a145f4b20cc818493f15b',18382,'77754a29a76781c956dab7e7af88382ab83290c66c0c9f00d7b1b73a89f9d938'))):\n    matches=[row for row in rows if row[0]==path]\n    if len(matches)!=1:raise ValueError('density path')\n    row=matches[0]\n    if initial_ref!={'path':path,'sha256':row[1],'bytes':row[2]}:raise ValueError('density predecessor')\n    for name in ['compatibility/rc/current-main-density-input-successor-v2.json','compatibility/rc/current-main-density-input-successor-v3.json','compatibility/rc/main-tooltip-resource-source-programs-v1.json','compatibility/rc/main-sass-graph-resource-source-programs-v2.json','compatibility/rc/main-sass-resource-contract-programs-v1.json']:read(name)\n    current=read(path)\n    launch,code,defaults,mapping,items,closure,spawn,pipe,close,native_read,waitpid,kill,poll,clock,node,node_path,dup2,close_action,nohang,launcher=native;current_defaults=launch.__kwdefaults__\n    if globals().get('_native_owner') is not launch or launch.__code__ is not code or launch.__defaults__ is not defaults or current_defaults is not mapping or tuple(current_defaults.items())!=items or launch.__closure__ is not closure:raise ValueError('changed native owner')\n    launch(root,'scripts/main-density-native-owner.mjs','5c9e38edd4a4373a9d962a8c81f04d22dce88896ace254a880ae6c523d87eb52',(path,b2a(initial,newline=False).decode('ascii')),spawn=spawn,pipe=pipe,close=close,read=native_read,waitpid=waitpid,kill=kill,poll=poll,clock=clock,node=node,path=node_path,dup2=dup2,close_action=close_action,nohang=nohang,launcher=launcher)\n    return current,{'path':path,'sha256':row[3],'bytes':len(current)}\n\n"
+        },
+        {
+          "offset": 311,
+          "before": "",
+          "after": "\n"
+        },
+        {
+          "offset": 5421,
+          "before": "",
+          "after": "_active_physical_callbacks={}\n"
+        },
+        {
+          "offset": 5465,
+          "before": "    # Existing frozen guards authenticate retained first images against exact pins.\n    # This closes supplied callbacks, not concurrent filesystem mutation.\n",
+          "after": "    active=_active_physical_callbacks.get(root)\n    if active is not None:\n        active['poisoned']=True\n        raise ValueError('reentrant physical boundary')\n"
+        },
+        {
+          "offset": 5690,
+          "before": "",
+          "after": "    def reject_reentry():\n        active=_active_physical_callbacks.get(root)\n        if active is not None:\n            active['poisoned']=True\n            raise ValueError('reentrant physical read')\n"
+        },
+        {
+          "offset": 5710,
+          "before": "",
+          "after": "        reject_reentry()\n"
+        },
+        {
+          "offset": 5877,
+          "before": "            provided=provided_read(path)\n            assert type(provided) is bytes and actual==provided\n",
+          "after": "            state={'poisoned':False};_active_physical_callbacks[root]=state\n            try:\n                provided=provided_read(path)\n                assert not state['poisoned'],'caught physical read reentry'\n                assert type(provided) is bytes and actual==provided\n            finally:del _active_physical_callbacks[root]\n"
+        },
+        {
+          "offset": 6121,
+          "before": "",
+          "after": "        reject_reentry()\n"
+        },
+        {
+          "offset": 6232,
+          "before": "    return read,assert_physical\n",
+          "after": "    return read,assert_physical,reject_reentry\n"
+        },
+        {
+          "offset": 6418,
+          "before": "",
+          "after": "        if read is not None:raise ValueError('supplied source readers are not authoritative')\n        density_checked=_guarded(_run_density_resource_owner,'_run_density_resource_owner')\n"
+        },
+        {
+          "offset": 6453,
+          "before": "        read,assert_physical=_physical_boundary(root,read)\n",
+          "after": "        read,assert_physical,reject_reentry=_physical_boundary(root,read)\n"
+        },
+        {
+          "offset": 6596,
+          "before": "        owner_successor=None;select_owner_successor=None\n",
+          "after": "        owner_successor=None;select_owner_successor=None;resource_refs={}\n"
+        },
+        {
+          "offset": 6678,
+          "before": "",
+          "after": "            assert _hash(read('scripts/main_sass_resource_continuation.py'))=='31c9db56ebaab0fa3500cca4e80c289341bee0868f03fa4c6dbbbabd3db6ae20'\n"
+        },
+        {
+          "offset": 10081,
+          "before": "                assert dict(path=row['path'],sha256=_hash(physical_after),bytes=len(physical_after))==next_update['after'] and read(row['path'])==physical_after\n",
+          "after": "                assert dict(path=row['path'],sha256=_hash(physical_after),bytes=len(physical_after))==next_update['after']\n                def git(commit,path):return subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',commit+':'+path],cwd=root,env=env)\n                for commit in ('19ee6343365c391deb97362caec413b113665e1b','8fe95564c981a9dd73605d27beaa0496824e8444','ecc1051cfb829f0b67ba9cb50e4b733d6684ebff','b94f169d4fe57d571e6a7c3f911a9395f6a60c4d'):subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',commit,'HEAD'],cwd=root,env=env)\n                physical_after,final_ref=density_checked(root,row['path'],physical_after,next_update['after'],read);assert read(row['path'])==physical_after;resource_refs[row['path']]=final_ref['sha256']\n"
+        },
+        {
+          "offset": 10621,
+          "before": "",
+          "after": "            reject_reentry()\n"
+        },
+        {
+          "offset": 10893,
+          "before": "                assert _hash(_tool(root,path,read))==(update['after']['sha256'] if update else sha)\n",
+          "after": "                assert _hash(_tool(root,path,read))==resource_refs.get(path,update['after']['sha256'] if update else sha)\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/sass-ordered-button-source-guard.mjs",
+      "before": {
+        "path": "scripts/sass-ordered-button-source-guard.mjs",
+        "sha256": "aa6263aa251a9561136e7ee5e6851b20671b653241cf63e40d4afaf39dbb4481",
+        "bytes": 9503
+      },
+      "after": {
+        "path": "scripts/sass-ordered-button-source-guard.mjs",
+        "sha256": "ff360710f7b4fcbd4d2443ffb4a017360b547316aad9e06d0fc38fb338f802df",
+        "bytes": 11530
+      },
+      "edits": [
+        {
+          "offset": 4615,
+          "before": "",
+          "after": " const wpath=join(root,'fixtures/sass/ordered-aggregate-density-resource-successor-v2.json');if(lstatSync(wpath).isSymbolicLink())throw Error('linked resource successor');const wraw=readFileSync(wpath);if(sha(wraw)!=='9e50df5f927dcdd529f3868a4a98a331d66afb380f4ab4e9d59d777954ff0bd0'||wraw.length!==10530)throw Error('resource successor packet');const w=JSON.parse(wraw);if(w.schema_version!==1||w.role!=='main-ordered-density-resource-source-continuation'||w.line!=='main'||w.source_parent!=='c2c58388e0777e580fd76234b57c271de0cb4115'||w.source_scope_only!==true||w.artifact_or_audit_admission_granted!==false||!isDeepStrictEqual(w.previous_packet,{path:'fixtures/sass/ordered-aggregate-density-source-successor.json',sha256:sha(vraw),bytes:vraw.length})||!isDeepStrictEqual(w.updates.map(r=>r.path),names.slice(2)))throw Error('resource successor scope');execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',w.source_parent,'HEAD'],{cwd:root,env});for(const row of w.updates){if(!isDeepStrictEqual(result.get(row.path),row.before))throw Error('resource predecessor');const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',w.source_parent+':'+row.path],{cwd:root,env});if(sha(before)!==row.before.sha256||before.length!==row.before.bytes)throw Error('resource predecessor image');let at=0,parts=[];for(const e of row.edits){if(!isDeepStrictEqual(Object.keys(e).sort(),['after','before','offset'])||!Number.isSafeInteger(e.offset)||e.offset<at||e.offset>before.length)throw Error('resource successor edit');const old=Buffer.from(e.before);if(!before.subarray(e.offset,e.offset+old.length).equals(old))throw Error('resource successor literal');parts.push(before.subarray(at,e.offset),Buffer.from(e.after));at=e.offset+old.length;}const after=Buffer.concat([...parts,before.subarray(at)]);if(row.after.path!==row.path||sha(after)!==row.after.sha256||after.length!==row.after.bytes)throw Error('resource successor afterimage');result.set(row.path,row.after);}\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/sass_ordered_button_source_guard.py",
+      "before": {
+        "path": "scripts/sass_ordered_button_source_guard.py",
+        "sha256": "cd4ee56a6f7ef97054e01a68c0588a71b056af030ad9cc063b07f435cc5dac3e",
+        "bytes": 9440
+      },
+      "after": {
+        "path": "scripts/sass_ordered_button_source_guard.py",
+        "sha256": "922289b34e3da76962ebb8ae952f54d3a31b6f96acb953853c969f134754fbfb",
+        "bytes": 11662
+      },
+      "edits": [
+        {
+          "offset": 4639,
+          "before": "",
+          "after": "        result[row['path']]=row['after']\n    wpath=_ROOT/'fixtures/sass/ordered-aggregate-density-resource-successor-v2.json'\n    if wpath.is_symlink():raise ValueError('linked resource successor')\n    wraw=wpath.read_bytes()\n    if hashlib.sha256(wraw).hexdigest()!='9e50df5f927dcdd529f3868a4a98a331d66afb380f4ab4e9d59d777954ff0bd0' or len(wraw)!=10530:raise ValueError('resource successor packet')\n    w=json.loads(wraw)\n    if w['schema_version']!=1 or w['role']!='main-ordered-density-resource-source-continuation' or w['line']!='main' or w['source_parent']!='c2c58388e0777e580fd76234b57c271de0cb4115' or w['source_scope_only'] is not True or w['artifact_or_audit_admission_granted'] is not False or w['previous_packet']!=dict(path='fixtures/sass/ordered-aggregate-density-source-successor.json',sha256=hashlib.sha256(vraw).hexdigest(),bytes=len(vraw)) or [r['path'] for r in w['updates']]!=names[2:]:raise ValueError('resource successor scope')\n    subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',w['source_parent'],'HEAD'],cwd=_ROOT,env=env)\n    for row in w['updates']:\n        if result[row['path']]!=row['before']:raise ValueError('resource predecessor')\n        before=subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',w['source_parent']+':'+row['path']],cwd=_ROOT,env=env)\n        if (hashlib.sha256(before).hexdigest(),len(before))!=(row['before']['sha256'],row['before']['bytes']):raise ValueError('resource predecessor image')\n        at=0;parts=[]\n        for e in row['edits']:\n            if set(e)!={'offset','before','after'} or type(e['offset']) is not int or not at<=e['offset']<=len(before):raise ValueError('resource successor edit')\n            old=e['before'].encode()\n            if before[e['offset']:e['offset']+len(old)]!=old:raise ValueError('resource successor literal')\n            parts.extend((before[at:e['offset']],e['after'].encode()));at=e['offset']+len(old)\n        after=b''.join([*parts,before[at:]])\n        if row['after']['path']!=row['path'] or (hashlib.sha256(after).hexdigest(),len(after))!=(row['after']['sha256'],row['after']['bytes']):raise ValueError('resource successor afterimage')\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_current_sass_source.py",
+      "before": {
+        "path": "tests/test_current_sass_source.py",
+        "sha256": "8f361832afc6785c06a8367b21d68437053e57aa037090d6bc579cc27a84291d",
+        "bytes": 16222
+      },
+      "after": {
+        "path": "tests/test_current_sass_source.py",
+        "sha256": "dfce9f6384c3ad4ec72e50d6807e67e0fb06aa79d7d87e2e6eae05ee57dd5dca",
+        "bytes": 17498
+      },
+      "edits": [
+        {
+          "offset": 2006,
+          "before": "",
+          "after": "        # The shared fixture serves both source and spinner/control gate readers.\n        # Copy the spinner contract's actual authenticated physical dependency set;\n        # it includes the domain and resource continuations absent from the older fixture.\n        from current_sass_spinner_snack_admission import CurrentSpinnerSnackContract\n        paths.update(row['path'] for row in CurrentSpinnerSnackContract(ROOT).bound)\n        paths.update((\n            'scripts/main-sass-resource-continuation.mjs', 'scripts/main_sass_resource_continuation.py',\n            'scripts/main-select-program-proof.mjs', 'scripts/main_select_program_proof.py',\n            'scripts/main-select-program-owner.mjs', 'scripts/main-density-resource-owner.mjs',\n            'scripts/main-density-native-owner.mjs',\n            'compatibility/rc/current-main-density-input-successor-v2.json',\n            'compatibility/rc/current-main-density-input-successor-v3.json',\n            'compatibility/rc/current-main-select-density-program-v1.json',\n            'compatibility/rc/current-main-private-card-select-owner-v2.json',\n            'compatibility/rc/main-sass-resource-contract-programs-v1.json',\n            'fixtures/sass/ordered-aggregate-density-resource-successor-v2.json',\n        ))\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_sass_spinner_snack_gate_integration.py",
+      "before": {
+        "path": "tests/test_sass_spinner_snack_gate_integration.py",
+        "sha256": "75ae269536e42185b5790473f9c611d2793d23b1dffc3eb306f0998acea57618",
+        "bytes": 9337
+      },
+      "after": {
+        "path": "tests/test_sass_spinner_snack_gate_integration.py",
+        "sha256": "0c7ec50fb511d8b82f6c6af1bba3599aee056b6008ba899baf71a8bed443efa7",
+        "bytes": 10169
+      },
+      "edits": [
+        {
+          "offset": 1541,
+          "before": "",
+          "after": "            'scripts/main-density-native-owner.mjs',\n"
+        },
+        {
+          "offset": 2454,
+          "before": "        cls.controls=dict(hook=None);cls.checks=[];cls.js_result=None\n        def read(path):\n            if cls.controls['hook'] is not None:\n                hook,cls.controls['hook']=cls.controls['hook'],None;hook()\n            return (cls.root/path).read_bytes()\n        cls.context=gate.SpinnerSnackGateContext(cls.root,read=read)\n",
+          "after": "        cls.checks=[];cls.js_result=None\n        cls.context=gate.SpinnerSnackGateContext(cls.root)\n"
+        },
+        {
+          "offset": 8144,
+          "before": "        live=copy.deepcopy(body);self.controls['hook']=lambda:live.__setitem__('current_spinner_snack_bridge',{})\n",
+          "after": "        live=copy.deepcopy(body);live['current_spinner_snack_bridge']={}\n"
+        },
+        {
+          "offset": 8592,
+          "before": "",
+          "after": "\n    def test_continuation_owner_integrity_and_recovery(self):\n        # The fixture is disposable; every mutation is restored before recovery.\n        owner=self.root/'scripts/main-density-native-owner.mjs'\n        packet=self.root/'compatibility/rc/main-tooltip-resource-source-programs-v1.json'\n        for path in (owner,packet):\n            original=path.read_bytes()\n            try:\n                path.write_bytes(original+b'\\nforeign')\n                with self.assertRaises(Exception):gate.SpinnerSnackGateContext(self.root)\n            finally:path.write_bytes(original)\n            gate.SpinnerSnackGateContext(self.root).assert_current()\n        with self.assertRaises(ValueError):gate.SpinnerSnackGateContext(self.root,read=lambda path:(self.root/path).read_bytes())\n        result=subprocess.run([NODE,str(ROOT/'tests/c02-continuation-owner-regression.mjs'),str(self.root),str(ROOT)],cwd=ROOT,capture_output=True,text=True)\n        self.assertEqual(result.returncode,0,result.stderr)\n        self.assertIn('recovery passed',result.stdout)\n"
+        }
+      ]
+    }
+  ],
+  "new_committed_inputs": [
+    {
+      "path": "compatibility/rc/current-main-density-input-successor-v3.json",
+      "sha256": "b0feea9a089fea3c671927c548f3c4d6b07923ee9f7574d17d0630fbc6444ffc",
+      "bytes": 1667
+    },
+    {
+      "path": "compatibility/rc/current-main-private-card-select-owner-v2.json",
+      "sha256": "62ec4d7ab837c520899b47c8809c767cacb79c233b6145e915086918256d6f8a",
+      "bytes": 5107
+    },
+    {
+      "path": "compatibility/rc/current-main-select-density-program-v1.json",
+      "sha256": "b924cc88007ac6f84d1a0a32e5bc7533e60e8a9e6b651a2680a8fb833d6f0f65",
+      "bytes": 18679
+    },
+    {
+      "path": "fixtures/sass/ordered-aggregate-density-resource-successor-v2.json",
+      "sha256": "9e50df5f927dcdd529f3868a4a98a331d66afb380f4ab4e9d59d777954ff0bd0",
+      "bytes": 10530
+    },
+    {
+      "path": "scripts/main-density-native-owner.mjs",
+      "sha256": "5c9e38edd4a4373a9d962a8c81f04d22dce88896ace254a880ae6c523d87eb52",
+      "bytes": 8740
+    },
+    {
+      "path": "scripts/main-density-resource-owner.mjs",
+      "sha256": "d7c2b25b253f9414a7806f39fe84daa75b087cf895f72bd3fed6cf1b42da200c",
+      "bytes": 8107
+    },
+    {
+      "path": "scripts/main-sass-resource-continuation.mjs",
+      "sha256": "e023340b48171bd0a865899969eacc35f6489a4a2c0b820dc4dce082b6f39c7c",
+      "bytes": 5888
+    },
+    {
+      "path": "scripts/main-select-program-owner.mjs",
+      "sha256": "55718e8697a51fb0b087c9f2f7d15508917c61001667bd0a3d75b534d6a53ccc",
+      "bytes": 3837
+    },
+    {
+      "path": "scripts/main-select-program-proof.mjs",
+      "sha256": "ae495586f3584e26a1e324b810b4f6b0e0fa42773857495f9f9ce8bf8246dd29",
+      "bytes": 2457
+    },
+    {
+      "path": "scripts/main_sass_resource_continuation.py",
+      "sha256": "31c9db56ebaab0fa3500cca4e80c289341bee0868f03fa4c6dbbbabd3db6ae20",
+      "bytes": 5898
+    },
+    {
+      "path": "scripts/main_select_program_proof.py",
+      "sha256": "b107f2f2f59d783721409eb673cab3fb7e534353ba68fbb1aca5afebbc3a45a2",
+      "bytes": 2148
+    },
+    {
+      "path": "scripts/select-program-transition-source.mjs",
+      "sha256": "7deb011415a992bcf8164480615ca5b3a3b487bb1b76602f51c8a328560dc7a4",
+      "bytes": 7917
+    },
+    {
+      "path": "scripts/select_program_transition_source.py",
+      "sha256": "65f25b31f643bb85d29052dce1e308afa0803c9409438c46dc9bdd75e1659b88",
+      "bytes": 14297
+    }
+  ],
+  "schema_version": 1,
+  "role": "current-sass-c02-source-successor"
+}

@@ -1,0 +1,66 @@
+{
+  "status": "unfrozen draft; later reviewed ledger transitions pending",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "source_parent": "39192f29e224da08cc0f883401208fc8ac88d7c9",
+  "source_commit": "b266037512764956bf88ad508756bc90373bd7f2",
+  "before": {
+    "path": "scripts/inventory-reference-live-source-epoch.mjs",
+    "sha256": "dd0d4350b46a1540f4426e1121f1327e02763b23b2e89e2af4f3001ad538990c",
+    "bytes": 27639
+  },
+  "after": {
+    "path": "scripts/inventory-reference-live-source-epoch.mjs",
+    "sha256": "c68ef11f7215f74d8dc051b8922be57c4f541300603d435d77bec3e574411ca0",
+    "bytes": 31063
+  },
+  "edits": [
+    {
+      "offset": 1788,
+      "before": "",
+      "after": "const SELECTOR_LIVE='80b1e11b5cdb9dc6b03cdf3a61f49df022d1726544ac810bdae589b8372604cd';\nconst SELECTOR_RECEIPT='compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/INTEGRATION.json',SELECTOR_RECEIPT_SHA='a9a41adac5ee7757e55bce642c7183b8fe5de45247cb5f0f1ef79415c79c6b2e';\n"
+    },
+    {
+      "offset": 22345,
+      "before": "",
+      "after": "function validateSelectorSuccessor(root,prior,live,receiptBytes){\n const commit='b266037512764956bf88ad508756bc90373bd7f2',parent='39192f29e224da08cc0f883401208fc8ac88d7c9';\n const ids=['5142268c7d2ef3d09f2cf9349a0b8ad25bf466d9','e4388c6f2594d81c3a95543482a2edeaa34bccff','1b3c42e074988dc953198ac071fad1d90298efae','6bd31f978613bfdf49ca4f811708dd9893de6585','6ff9c9f3d6410a9d04c6f93635c4d2fe3101b334','283f11039203ae23016d1ed52313025489b2a7cf'];\n assert.equal(git(root,['rev-parse',commit+'^']).toString().trim(),parent);git(root,['merge-base','--is-ancestor','0feac873886782da408d5894bbf1bb26862ec45c',parent]);git(root,['merge-base','--is-ancestor',commit,'HEAD']);\n const before=git(root,['show',parent+':'+LEDGER]),after=git(root,['show',commit+':'+LEDGER]);assert.equal(hash(before),CURRENT_LIVE);assert.equal(hash(after),SELECTOR_LIVE);assert.ok(before.equals(prior));assert.ok(after.equals(live));assert.equal(hash(receiptBytes),SELECTOR_RECEIPT_SHA);assert.ok(git(root,['show',commit+':'+SELECTOR_RECEIPT]).equals(receiptBytes));\n const a=decode(before),b=decode(after),receipt=JSON.parse(receiptBytes),changed=[],rawOnly=[];assert.deepEqual([...a.entries.keys()],[...b.entries.keys()]);const meta=x=>Object.fromEntries(Object.entries(x).filter(([key])=>key!=='entries'));assert.deepEqual(meta(a.data),meta(b.data));\n for(const [sha,row] of a.entries){if(!isDeepStrictEqual(row,b.entries.get(sha)))changed.push(sha);else if(a.rawEntries.get(sha)!==b.rawEntries.get(sha))rawOnly.push(sha);}assert.deepEqual(changed.sort(),[...ids].sort());assert.deepEqual(rawOnly,[]);\n let reconstructed=before.toString('utf8');for(const id of ids){const old=a.rawEntries.get(id),replacement=b.rawEntries.get(id),index=reconstructed.indexOf(old);assert.ok(index>=0);assert.equal(reconstructed.indexOf(old,index+old.length),-1);reconstructed=reconstructed.slice(0,index)+replacement+reconstructed.slice(index+old.length);const entry=receipt.selected_entries.filter(row=>row.sha===id);assert.equal(entry.length,1);assert.deepEqual(entry[0].before,a.entries.get(id));assert.deepEqual(entry[0].after,b.entries.get(id));}\n assert.ok(Buffer.from(reconstructed).equals(after),'bytes outside six raw selector rows changed');assert.equal(receipt.canonical_head,parent);assert.equal(receipt.canonical_ledger_sha256,CURRENT_LIVE);assert.equal(receipt.candidate_ledger_sha256,SELECTOR_LIVE);assert.deepEqual(receipt.selected_sha_tuple,ids);assert.equal(receipt.selected_entry_count,6);assert.equal(receipt.unselected_entry_count,1691);assert.equal(receipt.unselected_entries_deep_equal,true);assert.equal(receipt.source_member_drift_count,0);\n return {transitions:23,changed_entry_identities:167,tooltip_source_only:true,dialog_source_only:true,exclusion_source_only:true,owned_metadata_source_only:true,owned_selector_source_only:true};\n}\n\n"
+    },
+    {
+      "offset": 22981,
+      "before": " assert.ok(additionalPaths.every(path=>![SELF,PACKET,NEXT,RECEIPT,TOOLTIP_RECEIPT,TOOLTIP_REPORT,TOOLTIP_STYLE,DIALOG_RECEIPT,EXCLUSION_RECEIPT,EXCLUSION_PRIOR,OWNED_RECEIPT,LEDGER].includes(path)));\n",
+      "after": " assert.ok(additionalPaths.every(path=>![SELF,PACKET,NEXT,RECEIPT,TOOLTIP_RECEIPT,TOOLTIP_REPORT,TOOLTIP_STYLE,DIALOG_RECEIPT,EXCLUSION_RECEIPT,EXCLUSION_PRIOR,OWNED_RECEIPT,SELECTOR_RECEIPT,LEDGER].includes(path)));\n"
+    },
+    {
+      "offset": 23677,
+      "before": " const source=prepareSource({root,read,prebindPaths:[SELF,PACKET,NEXT,RECEIPT,TOOLTIP_RECEIPT,TOOLTIP_REPORT,TOOLTIP_STYLE,DIALOG_RECEIPT,EXCLUSION_RECEIPT,EXCLUSION_PRIOR,OWNED_RECEIPT,LEDGER,...additionalPaths]});assert.equal(source.line,'main');\n",
+      "after": " const source=prepareSource({root,read,prebindPaths:[SELF,PACKET,NEXT,RECEIPT,TOOLTIP_RECEIPT,TOOLTIP_REPORT,TOOLTIP_STYLE,DIALOG_RECEIPT,EXCLUSION_RECEIPT,EXCLUSION_PRIOR,OWNED_RECEIPT,SELECTOR_RECEIPT,LEDGER,...additionalPaths]});assert.equal(source.line,'main');\n"
+    },
+    {
+      "offset": 24943,
+      "before": "  {path:LEDGER,sha256:CURRENT_LIVE,bytes:initialLedger.length},\n",
+      "after": "  {path:SELECTOR_RECEIPT,sha256:SELECTOR_RECEIPT_SHA,bytes:physical(SELECTOR_RECEIPT).length},\n  {path:LEDGER,sha256:SELECTOR_LIVE,bytes:initialLedger.length},\n"
+    },
+    {
+      "offset": 26175,
+      "before": " const check=()=>{source.assertCurrent();checkInputs();const prior=validateLineage(root,packet,source.after,receiptBytes);const tooltipImage=git(root,['show','e28364f10bc9c1f9219c9a18f0dbf9cffb267f57:'+LEDGER]);validateTooltipSuccessor(root,next,prior.prior,tooltipImage,tooltipReceipt,tooltipReport,tooltipStyle);const dialogImage=git(root,['show','64f87978200b2f9e75da7dd6eafc2c81e0f2ff49:'+LEDGER]);validateDialogSuccessor(root,tooltipImage,dialogImage,physical(DIALOG_RECEIPT));const exclusionImage=git(root,['show','252689f364aee65c5d755d4b16e91987f6e305a5:'+LEDGER]);validateExclusionSuccessor(root,dialogImage,exclusionImage,physical(EXCLUSION_RECEIPT),physical(EXCLUSION_PRIOR));const terminal=validateOwnedMetadataSuccessor(root,exclusionImage,initialLedger,physical(OWNED_RECEIPT));checkInputs();source.assertCurrent();checkPhysical();return {...terminal,raw_only_formatting:prior.summary.raw_only_formatting};};\n",
+      "after": " const check=()=>{source.assertCurrent();checkInputs();const prior=validateLineage(root,packet,source.after,receiptBytes);const tooltipImage=git(root,['show','e28364f10bc9c1f9219c9a18f0dbf9cffb267f57:'+LEDGER]);validateTooltipSuccessor(root,next,prior.prior,tooltipImage,tooltipReceipt,tooltipReport,tooltipStyle);const dialogImage=git(root,['show','64f87978200b2f9e75da7dd6eafc2c81e0f2ff49:'+LEDGER]);validateDialogSuccessor(root,tooltipImage,dialogImage,physical(DIALOG_RECEIPT));const exclusionImage=git(root,['show','252689f364aee65c5d755d4b16e91987f6e305a5:'+LEDGER]);validateExclusionSuccessor(root,dialogImage,exclusionImage,physical(EXCLUSION_RECEIPT),physical(EXCLUSION_PRIOR));const ownedImage=git(root,['show','0feac873886782da408d5894bbf1bb26862ec45c:'+LEDGER]);validateOwnedMetadataSuccessor(root,exclusionImage,ownedImage,physical(OWNED_RECEIPT));const terminal=validateSelectorSuccessor(root,ownedImage,initialLedger,physical(SELECTOR_RECEIPT));checkInputs();source.assertCurrent();checkPhysical();return {...terminal,raw_only_formatting:prior.summary.raw_only_formatting};};\n"
+    }
+  ],
+  "ledger_before": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "a68b0f204ce42e475162f629d85e728436d6a2300920d47f2641fb75b3804e21",
+    "bytes": 5102892
+  },
+  "ledger_after": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "80b1e11b5cdb9dc6b03cdf3a61f49df022d1726544ac810bdae589b8372604cd",
+    "bytes": 5133735
+  },
+  "receipt": {
+    "path": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/INTEGRATION.json",
+    "sha256": "a9a41adac5ee7757e55bce642c7183b8fe5de45247cb5f0f1ef79415c79c6b2e",
+    "bytes": 55840
+  }
+}

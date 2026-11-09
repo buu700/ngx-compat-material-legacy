@@ -1,0 +1,15 @@
+/** @license Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester. Use of this source code is governed by the MIT license in LICENSE. */
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {resolve} from 'node:path';
+import {currentSassToolReferenceSubject as make} from '../scripts/current-sass-tool-references.mjs';
+const root=process.cwd(),read=p=>readFileSync(resolve(root,p));
+const c02path='compatibility/rc/current-sass-c02-source-successor-v1.json',hintpath='compatibility/rc/current-sass-authored-hint-source-v1.json',dpath='compatibility/rc/main-current-inventory-de40-helper-source-v1.json';
+const c02=JSON.parse(read(c02path)),hint=JSON.parse(read(hintpath)),de40=JSON.parse(read(dpath));
+const paths=[...new Set([c02path,hintpath,dpath,'compatibility/rc/current-tool-ledger-source-epoch-23-successor-v1.json','compatibility/rc/current-tool-ledger-source-epoch-24-successor-v1.json','compatibility/rc/main-bidi-current-inventory-owner-source-v2.json','scripts/current-inventory-source-subject.mjs','scripts/inventory-reference-live-source-epoch.mjs','compatibility/f10/disposition-ledger/ledger.json','compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/INTEGRATION.json','compatibility/f10/authored-dependency-dispositions.json','compatibility/f10/authored-use-reviews/radio-focus-origin-current-source-v1.json','compatibility/rc/radio-focus-origin-current-source-proof-v1.json',...c02.transitions.map(x=>x.path),...c02.new_committed_inputs.map(x=>x.path),...hint.updates.map(x=>x.path),...hint.support.map(x=>x.path),...de40.updates.map(x=>x.path)])];
+let bad=null;const supplied=p=>p===bad?Buffer.concat([read(p),Buffer.from(' ')]):read(p);const subject=make({root,read:supplied});
+for(const path of paths){bad=path;assert.throws(()=>subject.assertCurrent(),undefined,'late callback '+path);assert.throws(()=>make({root,read:supplied}),undefined,'cold callback '+path);bad=null;subject.assertCurrent();const file=resolve(root,path),raw=read(path);try{writeFileSync(file,Buffer.concat([raw,Buffer.from(' ')]));assert.throws(()=>subject.assertCurrent(),undefined,'late physical '+path);assert.throws(()=>make({root}),undefined,'cold physical '+path);}finally{writeFileSync(file,raw);}subject.assertCurrent();}
+for(const row of c02.transitions){const q=subject.qualify(row.before);assert.deepEqual(q,row.after);assert.equal(subject.qualify({...row.before,sha256:'0'.repeat(64)}),null);}for(const row of [...hint.updates.filter(x=>x.path.endsWith('.mjs')),...de40.updates])assert.equal(subject.qualify(row.before),null);
+let active=false,nested=false,reentrant;reentrant=make({root,read:p=>{const b=read(p);if(active&&!nested){nested=true;try{reentrant.assertCurrent();}catch{}}return b;}});active=true;assert.throws(()=>reentrant.assertCurrent());assert.ok(nested);active=false;reentrant.assertCurrent();
+console.log(JSON.stringify({result:'pass',paths:paths.length,cold_late_physical:paths.length,cold_late_callback:paths.length,identity_reentry_recovery:true,g11_claim:'not-passed'}));
