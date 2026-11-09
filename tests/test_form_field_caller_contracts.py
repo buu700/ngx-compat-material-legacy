@@ -9,13 +9,15 @@ import os
 from pathlib import Path
 import subprocess
 import unittest
+from form_field_caller_route import form_field_caller_line, probe_for
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class FormFieldCallerContracts(unittest.TestCase):
     def test_individual_roles_and_current_evidence(self):
-        command = ['node', 'tests/form_field_caller_probe.mjs']
+        line = form_field_caller_line()
+        command = ['node', probe_for(line, 'contracts')]
         if os.environ.get('NGX_FORM_FIELD_CALLER_DIAGNOSTIC'):
             command.append(os.environ['NGX_FORM_FIELD_CALLER_DIAGNOSTIC'])
         child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=120)
@@ -32,9 +34,18 @@ class FormFieldCallerContracts(unittest.TestCase):
         self.assertGreaterEqual(report['input_corruptions_rejected'], 20)
         self.assertEqual(report['late_changes_rejected'], 2)
         self.assertEqual(report['review_row_corruptions_rejected'], 3)
-        self.assertTrue(report['alias_allowlist_bytes_preserved'])
-        self.assertTrue(report['all1697_1736_315_obligations_and_six_packed_CVA_rows_retained'])
-        self.assertIn(report['canonical_closures_integrated'], [0, 18])
+        if line == 'main':
+            self.assertFalse(report['historical_allowlist_bytes_preserved'])
+            self.assertTrue(report['current_allowlist_source_bound'])
+            self.assertTrue(report['original1697_1736_315_and_six_packed_CVA_obligations_retained'])
+            self.assertEqual(report['historical_integration']['closures'], 18)
+            self.assertEqual(report['selected_current_reviewed'], 18)
+            self.assertEqual(report['selected_current_insufficient'], 0)
+            self.assertEqual(report['old_source_projection_rejected'], 2)
+        else:
+            self.assertTrue(report['alias_allowlist_bytes_preserved'])
+            self.assertTrue(report['all1697_1736_315_obligations_and_six_packed_CVA_rows_retained'])
+            self.assertIn(report['canonical_closures_integrated'], [0, 18])
         self.assertFalse(report['actual_native_packed_AOT_or_full_floor_qualified'])
 
 
