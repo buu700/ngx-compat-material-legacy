@@ -22,7 +22,7 @@ import {createHash} from 'node:crypto';
 import {existsSync, lstatSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
-import {authoredUseInventory, authoredUseReviewEvidence} from './authored-use-inventory.mjs';
+import {authoredUseInventory, authoredUseReviewEvidence, authoredUseReviewEvidencePhysical} from './authored-use-inventory.mjs';
 import {scanCurrentAuthoredUses, currentAuthoredUseAdmission} from './authored-current-use-inventory.mjs';
 import {validateCurrentAdvisories} from './upstream-advisory-admission.mjs';
 import {spawnSync} from 'node:child_process';
@@ -516,12 +516,20 @@ let symbolInventory = authoredUseInventory(authoredReference.symbol_uses, null);
 let symbolReviewEvidence = {reviewed:0,insufficient:0,insufficient_uses:[]};
 const reviewLine = line || (JSON.parse(readFileSync(join(root,'package.json'),'utf8')).devDependencies['@angular/core'].startsWith('21.') ? '21.x' : 'main');
 if (existsSync(symbolsPath)) {
-  const symbolBytes = readFileSync(symbolsPath);
-  symbolDispositionsSha256 = createHash('sha256').update(symbolBytes).digest('hex');
-  const symbols = JSON.parse(symbolBytes.toString('utf8'));
-  symbolStatus = symbols.status || 'missing';
-  symbolInventory = authoredUseInventory(authoredReference.symbol_uses, symbols);
-  symbolReviewEvidence = authoredUseReviewEvidence(symbols,reviewLine,rel=>{const file=regularRepoMember(rel);return file?readFileSync(file):null;},bytes=>createHash('sha256').update(bytes).digest('hex'));
+  if (reviewLine === 'main' && !process.argv.includes('--symbols')) {
+    const physical = authoredUseReviewEvidencePhysical();
+    symbolStatus = physical.status;
+    symbolDispositionsSha256 = physical.sha256;
+    symbolInventory = physical.inventory;
+    symbolReviewEvidence = physical.review_evidence;
+  } else {
+    const symbolBytes = readFileSync(symbolsPath);
+    symbolDispositionsSha256 = createHash('sha256').update(symbolBytes).digest('hex');
+    const symbols = JSON.parse(symbolBytes.toString('utf8'));
+    symbolStatus = symbols.status || 'missing';
+    symbolInventory = authoredUseInventory(authoredReference.symbol_uses, symbols);
+    symbolReviewEvidence = authoredUseReviewEvidence(symbols,reviewLine,rel=>{const file=regularRepoMember(rel);return file?readFileSync(file):null;},bytes=>createHash('sha256').update(bytes).digest('hex'));
+  }
   symbolUsesOpen = symbolInventory.open + symbolInventory.missing + symbolInventory.duplicates
     + symbolInventory.outside + symbolInventory.invalid;
 } 
