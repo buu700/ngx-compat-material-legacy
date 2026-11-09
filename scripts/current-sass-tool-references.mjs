@@ -154,15 +154,17 @@ assert.ok(typeof toolTransaction==='function'&&Object.isFrozen(toolTransaction)&
 export function currentSassToolReferenceSubject(options={}){
  return toolTransaction(options.root??process.cwd(),()=>{
   if(options.read===undefined)return constructToolSubject(options);
-  let frame;constructToolSubject({...options,read:undefined},undefined,refs=>{frame=refs;});
-  return constructToolSubject(options,frame);
+  let activate;
+  const subject=constructToolSubject({...options,read:undefined},undefined,undefined,fn=>{activate=fn;});
+  activate(options.read);return subject;
  });
 }
-function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound,captureBound){
+function constructToolSubject({root=process.cwd(),read:initialRead}={},prebound,captureBound,captureReader){
+ let providedRead=initialRead,sealed=prebound!==undefined;
  root=resolve(root);assert.ok(lstatSync(root).isDirectory()&&!lstatSync(root).isSymbolicLink());assert.ok(providedRead===undefined||typeof providedRead==='function');const bound=new Map(prebound?.bound??[]),images=new Map(prebound?.images??[]);let scratch=Buffer.allocUnsafe(1);
  const read=path=>{
   const actual=readEvidenceMember(root,path),ref=reference(path,actual);
-  if(bound.has(path)){assert.deepEqual(ref,bound.get(path));assert.ok(equalBytes(actual,images.get(path)),'changed current tool image '+path);}else{assert.equal(prebound,undefined,'unbound current tool input '+path);bound.set(path,ref);images.set(path,Buffer.from(actual));}
+  if(bound.has(path)){assert.deepEqual(ref,bound.get(path));assert.ok(equalBytes(actual,images.get(path)),'changed current tool image '+path);}else{assert.equal(sealed,false,'unbound current tool input '+path);bound.set(path,ref);images.set(path,Buffer.from(actual));}
   if(providedRead!==undefined){assertPhysical();assert.ok(equalBytes(actual,providedRead(path)),'nonphysical current tool input '+path);toolTransaction.check(root);assertPhysical();}
   assert.ok(equalBytes(actual,readEvidenceMember(root,path)),'current tool changed during callback '+path);return actual;
  };
@@ -828,5 +830,7 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
  const transitions=[...rows.values()].map(r=>({path:r.path,before:{...r.before},after:{...r.after}}));
  const result=Object.freeze({line,epoch:line==='main'?7:3,get bound(){return transact(()=>structuredClone([...bound.values()]));},get transitions(){return transact(()=>structuredClone(transitions));},ownsReference:ref=>transact(()=>ownsReference(ref)),qualify:ref=>transact(()=>side(ref,'after')),predecessorReference:ref=>transact(()=>side(ref,'before')),comparisonBytes:ref=>transact(()=>comparisonBytes(ref)),referenceBatch:refs=>transact(()=>referenceBatch(refs)),assertCurrent,guardNode,guardPlan,
   old_code_executed:false,old_product_bytes_exposed:false,old_tool_bytes_exposed_as_current:false,current_read_route_returned:false,canonical_admission_granted:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'});
- assertCurrentCore();if(captureBound)captureBound({bound:[...bound.entries()],images:[...images.entries()]});return result;
+ assertCurrentCore();if(captureBound)captureBound({bound:[...bound.entries()],images:[...images.entries()]});
+ if(captureReader)captureReader(read=>{assert.equal(providedRead,undefined);assert.equal(typeof read,'function');sealed=true;providedRead=read;assertCurrentCore();});
+ return result;
 }

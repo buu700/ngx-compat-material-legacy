@@ -224,8 +224,10 @@ class CurrentSassToolReferences:
                 self._construct(root)
             else:
                 self._construct(root)
-                frame = self._snapshot_frame()
-                self._construct(root, read=read, prebound=frame)
+                assert callable(read)
+                self._provided = read
+                self._prebound = True
+                self._assert_current_core()
 
     def _construct(self, root, *, read=None, prebound=None):
         if not __debug__:
