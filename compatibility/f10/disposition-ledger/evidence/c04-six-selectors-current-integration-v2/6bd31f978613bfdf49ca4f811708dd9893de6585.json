@@ -1,0 +1,165 @@
+{
+  "sha": "6bd31f978613bfdf49ca4f811708dd9893de6585",
+  "status": "reviewed",
+  "diff": "diff --git a/src/material/radio/_radio-common.scss b/src/material/radio/_radio-common.scss\nindex 21688edc116f6a9fbb290bec0293c13c58f89293..20ce689452987f2e79befb31495b3bc5562d809b 100644\n--- a/src/material/radio/_radio-common.scss\n+++ b/src/material/radio/_radio-common.scss\n@@ -35,41 +35,41 @@ $_icon-size: 20px;\n \n     @if ($is-interactive) {\n       // MDC's hover indication comes from their ripple which we don't use.\n-      &:hover .mdc-radio__native-control:not([disabled]):not(:focus) {\n+      &:hover > .mdc-radio__native-control:not([disabled]):not(:focus) {\n         & ~ .mdc-radio__background::before {\n           opacity: 0.04;\n           transform: scale(1);\n         }\n       }\n \n-      &:hover .mdc-radio__native-control:not([disabled]) ~ .mdc-radio__background {\n-        .mdc-radio__outer-circle {\n+      &:hover > .mdc-radio__native-control:not([disabled]) ~ .mdc-radio__background {\n+        > .mdc-radio__outer-circle {\n           @include token-utils.use-tokens($tokens...) {\n             @include token-utils.create-token-slot(border-color, unselected-hover-icon-color);\n           }\n         }\n       }\n \n-      &:hover .mdc-radio__native-control:enabled:checked + .mdc-radio__background {\n-        .mdc-radio__outer-circle,\n-        .mdc-radio__inner-circle {\n+      &:hover > .mdc-radio__native-control:enabled:checked + .mdc-radio__background {\n+        > .mdc-radio__outer-circle,\n+        > .mdc-radio__inner-circle {\n           @include token-utils.use-tokens($tokens...) {\n             @include token-utils.create-token-slot(border-color, selected-hover-icon-color);\n           }\n         }\n       }\n \n-      &:active .mdc-radio__native-control:enabled:not(:checked) + .mdc-radio__background {\n-        .mdc-radio__outer-circle {\n+      &:active > .mdc-radio__native-control:enabled:not(:checked) + .mdc-radio__background {\n+        > .mdc-radio__outer-circle {\n           @include token-utils.use-tokens($tokens...) {\n             @include token-utils.create-token-slot(border-color, unselected-pressed-icon-color);\n           }\n         }\n       }\n \n-      &:active .mdc-radio__native-control:enabled:checked + .mdc-radio__background {\n-        .mdc-radio__outer-circle,\n-        .mdc-radio__inner-circle {\n+      &:active > .mdc-radio__native-control:enabled:checked + .mdc-radio__background {\n+        > .mdc-radio__outer-circle,\n+        > .mdc-radio__inner-circle {\n           @include token-utils.use-tokens($tokens...) {\n             @include token-utils.create-token-slot(border-color, selected-pressed-icon-color);\n           }\n@@ -152,11 +152,11 @@ $_icon-size: 20px;\n       + .mdc-radio__background {\n         transition: _enter-transition(opacity), _enter-transition(transform);\n \n-        .mdc-radio__outer-circle {\n+        > .mdc-radio__outer-circle {\n           transition: _enter-transition(border-color);\n         }\n \n-        .mdc-radio__inner-circle {\n+        > .mdc-radio__inner-circle {\n           transition: _enter-transition(transform), _enter-transition(border-color);\n         }\n       }\n@@ -172,7 +172,7 @@ $_icon-size: 20px;\n \n     &:disabled {\n       @include token-utils.use-tokens($tokens...) {\n-        &:not(:checked) + .mdc-radio__background .mdc-radio__outer-circle {\n+        &:not(:checked) + .mdc-radio__background > .mdc-radio__outer-circle {\n           @include token-utils.create-token-slot(border-color, disabled-unselected-icon-color);\n           @include token-utils.create-token-slot(opacity, disabled-unselected-icon-opacity);\n         }\n@@ -180,8 +180,8 @@ $_icon-size: 20px;\n         + .mdc-radio__background {\n           cursor: default;\n \n-          .mdc-radio__inner-circle,\n-          .mdc-radio__outer-circle {\n+          > .mdc-radio__inner-circle,\n+          > .mdc-radio__outer-circle {\n             @include token-utils.create-token-slot(border-color, disabled-selected-icon-color);\n             @include token-utils.create-token-slot(opacity, disabled-selected-icon-opacity);\n           }\n@@ -191,21 +191,21 @@ $_icon-size: 20px;\n \n     &:enabled {\n       @include token-utils.use-tokens($tokens...) {\n-        &:not(:checked) + .mdc-radio__background .mdc-radio__outer-circle {\n+        &:not(:checked) + .mdc-radio__background > .mdc-radio__outer-circle {\n           @include token-utils.create-token-slot(border-color, unselected-icon-color);\n         }\n \n         &:checked + .mdc-radio__background {\n-          .mdc-radio__outer-circle,\n-          .mdc-radio__inner-circle {\n+          > .mdc-radio__outer-circle,\n+          > .mdc-radio__inner-circle {\n             @include token-utils.create-token-slot(border-color, selected-icon-color);\n           }\n         }\n \n         @if ($is-interactive) {\n           &:focus:checked + .mdc-radio__background {\n-            .mdc-radio__inner-circle,\n-            .mdc-radio__outer-circle {\n+            > .mdc-radio__inner-circle,\n+            > .mdc-radio__outer-circle {\n               @include token-utils.create-token-slot(border-color, selected-focus-icon-color);\n             }\n           }\n@@ -213,7 +213,7 @@ $_icon-size: 20px;\n       }\n     }\n \n-    &:checked + .mdc-radio__background .mdc-radio__inner-circle {\n+    &:checked + .mdc-radio__background > .mdc-radio__inner-circle {\n       transform: scale(0.5);\n       transition: _enter-transition(transform), _enter-transition(border-color);\n     }\n@@ -224,16 +224,19 @@ $_icon-size: 20px;\n       pointer-events: auto;\n \n       @include token-utils.use-tokens($tokens...) {\n-        .mdc-radio__native-control:not(:checked) + .mdc-radio__background .mdc-radio__outer-circle {\n+        // stylelint-disable selector-combinator-space-before\n+        .mdc-radio__native-control:not(:checked) + .mdc-radio__background\n+            > .mdc-radio__outer-circle {\n           @include token-utils.create-token-slot(border-color, disabled-unselected-icon-color);\n           @include token-utils.create-token-slot(opacity, disabled-unselected-icon-opacity);\n         }\n+        // stylelint-enable selector-combinator-space-before\n \n         &:hover .mdc-radio__native-control:checked + .mdc-radio__background,\n         .mdc-radio__native-control:checked:focus + .mdc-radio__background,\n         .mdc-radio__native-control + .mdc-radio__background {\n-          .mdc-radio__inner-circle,\n-          .mdc-radio__outer-circle {\n+          > .mdc-radio__inner-circle,\n+          > .mdc-radio__outer-circle {\n             @include token-utils.create-token-slot(border-color, disabled-selected-icon-color);\n             @include token-utils.create-token-slot(opacity, disabled-selected-icon-opacity);\n           }\ndiff --git a/src/material/radio/radio.scss b/src/material/radio/radio.scss\nindex a30c07154999c7978b05fbd983cb7b16b9d03bff..0c8416fba55aeb8e45435f4d9cb367a3bae403e5 100644\n--- a/src/material/radio/radio.scss\n+++ b/src/material/radio/radio.scss\n@@ -50,7 +50,7 @@\n     pointer-events: none;\n     border-radius: 50%;\n \n-    .mat-ripple-element {\n+    > .mat-ripple-element {\n       opacity: 0.14;\n     }\n \n@@ -62,8 +62,8 @@\n   // We don't inherit the border focus style from MDC since we don't use their ripple.\n   // Instead we need to replicate it here.\n   @include token-utils.use-tokens(tokens-mdc-radio.$prefix, tokens-mdc-radio.get-token-slots()) {\n-    .mdc-radio .mdc-radio__native-control:focus:enabled:not(:checked) {\n-      & ~ .mdc-radio__background .mdc-radio__outer-circle {\n+    .mdc-radio > .mdc-radio__native-control:focus:enabled:not(:checked) {\n+      & ~ .mdc-radio__background > .mdc-radio__outer-circle {\n         @include token-utils.create-token-slot(border-color, unselected-focus-icon-color);\n       }\n     }\n",
+  "diff_sha256": "fb585897672e9430e7f6d2da6ca16a4517ed5134a66e8a907b6596fd08e90ea2",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/_index.scss",
+      "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+      "bytes": 14151
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/_radio-legacy-index.scss",
+      "sha256": "99359dc40a46215397a96da68109e3ec0b72486210978db222161b0ba4a2083f",
+      "bytes": 154
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/_radio-theme.import.scss",
+      "sha256": "bb09408755f8e964f40676d3e30cf169d747ad18adb6a4069a5b4c325729cb2a",
+      "bytes": 391
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/_radio-theme.scss",
+      "sha256": "63c5ba554e0e4c07ba47da69554e9898e4ada8bb2c32b070955531bc963fe969",
+      "bytes": 3414
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/index.ts",
+      "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+      "bytes": 233
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/public-api.ts",
+      "sha256": "c261135ebae4b5cf7e38a7a26ad31aa7b8fa43fb3134dcb0b2e2b121b9deeece",
+      "bytes": 858
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/radio-module.ts",
+      "sha256": "f90f9b9d3b70e742b3bc0a68f9664729c2afd762f661d990ba0e3ee2128f9c76",
+      "bytes": 734
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/radio.html",
+      "sha256": "61b57e78e7c25bdae14c33027de26348f7238cc413405f65afdce84e2b5d6bbe",
+      "bytes": 1697
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/radio.scss",
+      "sha256": "54e67218650eec5eb13b866d19bdbd9c1067204bea58fb5e4e1cfeb20d4eb718",
+      "bytes": 6022
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/radio.ts",
+      "sha256": "dffd3e4daf0d50d915303b2e3d13d26e8c97fb77756ccf8c618e34022f548f1e",
+      "bytes": 3762
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+      "sha256": "3bd939280b1d80fd10f6c0ece8c434cfe2f0f369746cca7b2b3e9f8c153755ee",
+      "bytes": 35009
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss",
+      "sha256": "c953a6c0df04dd73b443548f4872f62fa0704881590ccb508bd7db7741f391fc",
+      "bytes": 975
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/bridges/_m2-system.scss",
+      "sha256": "6c9da785ea2449d2629af75e3078fde08631c59db87a3f423198444dc5b8b84d",
+      "bytes": 8191
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-radio/_radio-theme.scss",
+      "sha256": "30ba737c4ff96a975884ed4ea574577d45de8a887c79e7c4319cdd11eed50387",
+      "bytes": 3393
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/radio/_radio-theme.scss",
+      "sha256": "2d51f1d4eefc08228b284aea6f19f153772317434911cf79350924358eb21833",
+      "bytes": 3104
+    }
+  ],
+  "decision": "The upstream patch narrows current MDC radio state/icon/ripple selectors. The owned Material-16 legacy radio CSS uses historical `.mat-radio-*` roles. The package also exports a `radio-theme` historical M2 module, but radio is absent from the thirteen-family current-companion roster and its implementation does not call `mat.radio-overrides`; the separate `legacy-radio-theme` is the owned legacy theme. Do not port modern MDC selectors into legacy radio CSS. No supported current-peer M2 radio bridge is claimed.",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "do-not-adopt",
+  "peer_coexistence_scope": "unqualified-beyond-sampled-cases",
+  "peer_coexistence_unresolved": "No thirteen-family current-peer radio bridge is declared; the exported radio-theme is a historical M2 Sass API and is not a mat.radio-overrides bridge. Do not treat unsupported theme use on current peer as an outstanding package qualification obligation.",
+  "previous_ledger_entry_complete": {
+    "sha": "6bd31f978613bfdf49ca4f811708dd9893de6585",
+    "bucket": "needs-triage",
+    "subject": "perf(material/radio): Optimize costly css selectors. (#30470)",
+    "files": [
+      "src/material/radio/_radio-common.scss",
+      "src/material/radio/radio.scss"
+    ],
+    "diff_sha256": "b0b39ec0a71ba40c3bcbc74f149583a9b624adc0565d5d2a62e6fcc8aab67eca",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/6bd31f978613bfdf49ca4f811708dd9893de6585.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/material/radio/_radio-common.scss changes `&:hover .mdc-radio__native-control:not([disabled]):not(:focus) {`. That line is not in the legacy sources. @angular/material/radio is exercised by projects/ngx-material-legacy/legacy-radio/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/radio imported by projects/ngx-material-legacy/legacy-radio/public-api.ts"
+    }
+  },
+  "original_reason_verbatim": "The diff in src/material/radio/_radio-common.scss changes `&:hover .mdc-radio__native-control:not([disabled]):not(:focus) {`. That line is not in the legacy sources. @angular/material/radio is exercised by projects/ngx-material-legacy/legacy-radio/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+  "minimum_peer_source": "@angular/material 22.1.7 at e950f29dcfbda93c13bff0d1a632465364488249",
+  "tagged16_source": "Material 16.2.14 at df60e733c60e572ba538f6ad0ceff3e63e527b53",
+  "review_scope": "Complete full-index upstream patch and path census; current owned source member hashes; current minimum peer source and Material-16.2.14 source; current companion Sass bridge role. Decision applies only to the local Material-16 legacy CSS/SCSS adoption question.",
+  "coexistence_sample": {
+    "packet": "c04-owned-selectors-coexistence-v2",
+    "artifact_sha256": "877c8b62e1ea9b134d838043dda436abb4ccf9515041640fdb05dc6113727b0b",
+    "versions": {
+      "core": "22.1.7",
+      "cdk": "22.1.7",
+      "material": "22.1.7",
+      "rxjs": "7.8.2",
+      "typescript": "6.0.3",
+      "zone": "0.16.3",
+      "tslib": "2.8.1"
+    },
+    "result_sha256": "4d41e73eda42da7eeff0d2866a84f3d5a6ff9d393b5c344e783879627d153f46",
+    "scope": "sampled actual packed legacy M2 plus independent peer M3 in both style orders; does not cover all states or full G07"
+  },
+  "limitations": "Does not close current-peer CSS/state behavior, global M2/M3 coexistence, C04/G11, security or release. No complete inherited-execution claim.",
+  "sass_role_summary": {
+    "public_theme_exports": [
+      "checkbox-theme",
+      "table-theme",
+      "radio-theme",
+      "list-theme",
+      "slide-toggle-theme"
+    ],
+    "contract_roster_13": [
+      "badge",
+      "bottom-sheet",
+      "button-toggle",
+      "datepicker",
+      "divider",
+      "expansion",
+      "grid-list",
+      "icon",
+      "sidenav",
+      "stepper",
+      "sort",
+      "toolbar",
+      "tree"
+    ],
+    "checkbox_current_peer_bridge": "styles/checkbox/_checkbox-theme.scss calls @angular/material public mat.checkbox-overrides; appended beyond roster; actual bridge API retained",
+    "table_role": "styles/table/_table-theme.scss emits M2 table token values only; no mat.table-overrides; not in roster",
+    "radio_role": "radio-theme historical M2 export; no mat.radio-overrides; not in roster; legacy-radio-theme separate",
+    "list_role": "list-theme historical M2 export; no mat.list-overrides; not in roster; legacy-list-theme separate",
+    "slide_toggle_role": "slide-toggle-theme historical M2 export; no mat.slide-toggle-overrides; not in roster; legacy-slide-toggle-theme separate",
+    "bridge_aggregator": "all-current-companion-bridges contains exactly the thirteen roster entries; all-owned-component-themes calls legacy themes for these families"
+  }
+}

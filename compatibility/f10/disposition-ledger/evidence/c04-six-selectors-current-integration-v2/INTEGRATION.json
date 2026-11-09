@@ -1,0 +1,1002 @@
+{
+  "packet": "c04-six-selectors-integration-v1",
+  "canonical_head": "39192f29e224da08cc0f883401208fc8ac88d7c9",
+  "canonical_worktree_clean": true,
+  "canonical_ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+  "canonical_ledger_sha256": "a68b0f204ce42e475162f629d85e728436d6a2300920d47f2641fb75b3804e21",
+  "candidate_ledger_sha256": "80b1e11b5cdb9dc6b03cdf3a61f49df022d1726544ac810bdae589b8372604cd",
+  "production_checker_sha256": "aeda0ed38202185d6ad01ed8f5a8c2a76d750796a135d9158923790b3aa14b40",
+  "production_checker_functions_revalidated": [
+    "individualProofOk",
+    "individualPatchBound",
+    "evidenceClass"
+  ],
+  "source_member_hashes_rechecked": true,
+  "source_member_count_unique": 68,
+  "source_member_drift_count": 0,
+  "source_fingerprint_file": "source-fingerprint-check.json",
+  "current_checker_function_proof_file": "current-checker-proof.json",
+  "selected_entry_count": 6,
+  "unselected_entry_count": 1691,
+  "unselected_entries_deep_equal": true,
+  "selected_sha_tuple": [
+    "5142268c7d2ef3d09f2cf9349a0b8ad25bf466d9",
+    "e4388c6f2594d81c3a95543482a2edeaa34bccff",
+    "1b3c42e074988dc953198ac071fad1d90298efae",
+    "6bd31f978613bfdf49ca4f811708dd9893de6585",
+    "6ff9c9f3d6410a9d04c6f93635c4d2fe3101b334",
+    "283f11039203ae23016d1ed52313025489b2a7cf"
+  ],
+  "selected_entries": [
+    {
+      "sha": "5142268c7d2ef3d09f2cf9349a0b8ad25bf466d9",
+      "before": {
+        "sha": "5142268c7d2ef3d09f2cf9349a0b8ad25bf466d9",
+        "bucket": "needs-triage",
+        "subject": "perf(material/table): Optimize expensive css selector (#30305)",
+        "files": [
+          "src/material/table/table.scss"
+        ],
+        "diff_sha256": "ed8cb2c5a5ff5c39e2497c7491464faadab850bfa8c6743dd5b9234247beb3dc",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/5142268c7d2ef3d09f2cf9349a0b8ad25bf466d9.json",
+        "batch_id": "unread-seed-content-review-2026-10-02",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "inherited",
+        "read_note_disposition": "inherited",
+        "reason": "The diff in src/material/table/table.scss changes `.mdc-data-table__row:last-child & {`. That line is not in the legacy sources. @angular/material/table is exercised by projects/ngx-material-legacy/legacy-table/testing/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+        "peer_floor": {
+          "package": "@angular/material",
+          "installed": "22.1.7",
+          "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+          "delegation": "@angular/material/table imported by projects/ngx-material-legacy/legacy-table/testing/public-api.ts"
+        }
+      },
+      "after": {
+        "sha": "5142268c7d2ef3d09f2cf9349a0b8ad25bf466d9",
+        "bucket": "needs-triage",
+        "subject": "perf(material/table): Optimize expensive css selector (#30305)",
+        "files": [
+          "src/material/table/table.scss"
+        ],
+        "diff_sha256": "ed8cb2c5a5ff5c39e2497c7491464faadab850bfa8c6743dd5b9234247beb3dc",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/5142268c7d2ef3d09f2cf9349a0b8ad25bf466d9.json",
+        "batch_id": "c04-six-selectors-current-integration-v1",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "do-not-adopt",
+        "read_note_disposition": "do-not-adopt",
+        "reason": "The upstream patch narrows the peer MDC table row-to-cell last-child selector. The owned Material-16 table markup and CSS have their historical `.mat-table` role. The exported `table-theme` is the retained M2 table-token emitter; it does not call `mat.table-overrides` and table is absent from the thirteen-family current-companion contract. Do not port this modern selector into the owned legacy table CSS. This does not claim current peer table CSS behavior as part of this package.",
+        "individual_proof": {
+          "proof_kind": "individual-contextual-source-review",
+          "source_conclusion_only": true,
+          "execution_claim": "not-claimed",
+          "source_members": [
+            {
+              "path": "projects/ngx-material-legacy/_index.scss",
+              "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+              "bytes": 14151
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/_table-legacy-index.scss",
+              "sha256": "eb6fb4789f3bc652cccb73a989b09fc54aa6799742658ba147fcf2e9b54bd8eb",
+              "bytes": 178
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/_table-theme.import.scss",
+              "sha256": "cad851af3ec90604d9010eeb817624289e79762706ee95a8206671a88c25449b",
+              "bytes": 367
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/_table-theme.scss",
+              "sha256": "aedf3dd8efef2e070a12d1feb78b4cd9559a496a0a536b70f64d859cf0113160",
+              "bytes": 2560
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/cell.ts",
+              "sha256": "28359f7f5b9f4145e809340e8b0b441507d7c08323cea13cde6dea86b3dd1dbb",
+              "bytes": 6510
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/index.ts",
+              "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+              "bytes": 233
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/public-api.ts",
+              "sha256": "047a14920397974564d8d61976bb3fdd7088dff2465b24325fecf2546c9902e9",
+              "bytes": 1328
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/row.ts",
+              "sha256": "b57c2be6361b4caf802e9e13759f3bdebab413cd0a903f37ebf6e6443cf4f37d",
+              "bytes": 6940
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/table-data-source.ts",
+              "sha256": "b8c35487e4234549a48563b64665b9d38e0ac0f90310d3957b7f31e8084f7904",
+              "bytes": 1231
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/table-module.ts",
+              "sha256": "435daec2cf8013ea58b59f5542d8e4b89ca3ea1c03d587e867a04bf6f29186e3",
+              "bytes": 1911
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/table.scss",
+              "sha256": "b44bf2db4265779e8f39ce8f2a1a61d8d527da2343655ba32af4b84bf7061b76",
+              "bytes": 1499
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+              "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+              "bytes": 3818
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/text-column.ts",
+              "sha256": "157c01cc18f67ff7e499442e6f16a7a23ec08284d069b2318a5d8bae11dc4431",
+              "bytes": 2578
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+              "sha256": "3bd939280b1d80fd10f6c0ece8c434cfe2f0f369746cca7b2b3e9f8c153755ee",
+              "bytes": 35009
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss",
+              "sha256": "c953a6c0df04dd73b443548f4872f62fa0704881590ccb508bd7db7741f391fc",
+              "bytes": 975
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_m2-system.scss",
+              "sha256": "6c9da785ea2449d2629af75e3078fde08631c59db87a3f423198444dc5b8b84d",
+              "bytes": 8191
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/legacy-table/_table-theme.scss",
+              "sha256": "552ccc74c5b38664d766fe13ea95af1109c5395ffae7b7eef9894bb9ef271fe3",
+              "bytes": 2539
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/table/_table-flex-styles.scss",
+              "sha256": "959938ccf97e710edbd3b604cc707a4f0d58f6d9226a0cef07c808373a9caf4d",
+              "bytes": 1507
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/table/_table-theme.scss",
+              "sha256": "0a8515d8dba4512748151f6c8bb047d706df6fb1af98c6f407f5f87683c83690",
+              "bytes": 1641
+            }
+          ],
+          "diff_sha256": "e0cb7e7aab508d36f6b60be104c93fac831eabf99e952b876d8f0f382f80420f",
+          "review_depth": "individual-compatibility",
+          "affected_branches": [
+            "main"
+          ],
+          "decision": "The upstream patch narrows the peer MDC table row-to-cell last-child selector. The owned Material-16 table markup and CSS have their historical `.mat-table` role. The exported `table-theme` is the retained M2 table-token emitter; it does not call `mat.table-overrides` and table is absent from the thirteen-family current-companion contract. Do not port this modern selector into the owned legacy table CSS. This does not claim current peer table CSS behavior as part of this package."
+        }
+      }
+    },
+    {
+      "sha": "e4388c6f2594d81c3a95543482a2edeaa34bccff",
+      "before": {
+        "sha": "e4388c6f2594d81c3a95543482a2edeaa34bccff",
+        "bucket": "needs-triage",
+        "subject": "perf(material/checkbox): Optimize css selectors (#30386)",
+        "files": [
+          "src/material/checkbox/_checkbox-common.scss"
+        ],
+        "diff_sha256": "474bc20ef0b5583820ff0a96c45a3eb08134d8846eefe7ac782d74970b126915",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/e4388c6f2594d81c3a95543482a2edeaa34bccff.json",
+        "batch_id": "unread-seed-content-review-2026-10-02",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "inherited",
+        "read_note_disposition": "inherited",
+        "reason": "The diff in src/material/checkbox/_checkbox-common.scss changes `.mdc-checkbox__ripple {`. That line is not in the legacy sources. @angular/material/checkbox is exercised by projects/ngx-material-legacy/legacy-checkbox/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+        "peer_floor": {
+          "package": "@angular/material",
+          "installed": "22.1.7",
+          "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+          "delegation": "@angular/material/checkbox imported by projects/ngx-material-legacy/legacy-checkbox/public-api.ts"
+        }
+      },
+      "after": {
+        "sha": "e4388c6f2594d81c3a95543482a2edeaa34bccff",
+        "bucket": "needs-triage",
+        "subject": "perf(material/checkbox): Optimize css selectors (#30386)",
+        "files": [
+          "src/material/checkbox/_checkbox-common.scss"
+        ],
+        "diff_sha256": "474bc20ef0b5583820ff0a96c45a3eb08134d8846eefe7ac782d74970b126915",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/e4388c6f2594d81c3a95543482a2edeaa34bccff.json",
+        "batch_id": "c04-six-selectors-current-integration-v1",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "do-not-adopt",
+        "read_note_disposition": "do-not-adopt",
+        "reason": "The upstream patch narrows current MDC checkbox state and ripple selector relationships. The owned Material-16 legacy checkbox CSS uses its historical markup. Separately, this package exports `checkbox-theme`, which calls public `mat.checkbox-overrides`; that is an appended current-peer bridge outside the thirteen-family roster and remains an actual public Sass API. Do not port the modern selectors into legacy checkbox CSS. The coexistence sample used `legacy-checkbox-theme`, not this current checkbox bridge, so it does not qualify that bridge’s current-peer output.",
+        "individual_proof": {
+          "proof_kind": "individual-contextual-source-review",
+          "source_conclusion_only": true,
+          "execution_claim": "not-claimed",
+          "source_members": [
+            {
+              "path": "projects/ngx-material-legacy/_index.scss",
+              "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+              "bytes": 14151
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/_checkbox-legacy-index.scss",
+              "sha256": "cbeb8655a2a268ec76486ff6ffe63fa16cb26278f502437ed19f0bb4709e2765",
+              "bytes": 142
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/_checkbox-theme.import.scss",
+              "sha256": "0556d545fda906610767a1a519e16fec8d6fdce721b80d31a8661de76e992a66",
+              "bytes": 337
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/_checkbox-theme.scss",
+              "sha256": "9eed531b2fd66dc8960f99efdbf3542b50581b5897e2c717473510ba136aeb7f",
+              "bytes": 4517
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox-module.ts",
+              "sha256": "a1dfbaa86342a3876d3d22dcd4380d8379e85a4e046a8b2be156b6a7b48ce6d5",
+              "bytes": 907
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.html",
+              "sha256": "f630375b769dac8ba62c05c74d8f6abbb640bb9d6a9539ce01f220220f7b93b5",
+              "bytes": 2202
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.scss",
+              "sha256": "5bb880767ff062ead6604140938cd5d23136a135494e817291a81b13fc20d7b1",
+              "bytes": 13687
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.ts",
+              "sha256": "774db12b55590d631d0a69c68a9aa7289adf600ac3fe62e288dd22fcf3c86766",
+              "bytes": 5525
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/index.ts",
+              "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+              "bytes": 233
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/owned-transition-state.ts",
+              "sha256": "ffa33cd647c3cede4b576c6fdc77bc4177a2fdfca0e28f67d96301e95965607a",
+              "bytes": 739
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/public-api.ts",
+              "sha256": "ee7d7028843ce1ea3da51a5253501a2fe7304d6ea51cfde777c97d9eb69b823b",
+              "bytes": 1269
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+              "sha256": "3bd939280b1d80fd10f6c0ece8c434cfe2f0f369746cca7b2b3e9f8c153755ee",
+              "bytes": 35009
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss",
+              "sha256": "c953a6c0df04dd73b443548f4872f62fa0704881590ccb508bd7db7741f391fc",
+              "bytes": 975
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_m2-system.scss",
+              "sha256": "6c9da785ea2449d2629af75e3078fde08631c59db87a3f423198444dc5b8b84d",
+              "bytes": 8191
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss",
+              "sha256": "97d4de28beacfa9229c148463b16436f5fdbf5e8905d9dc6c463c5e534da17a9",
+              "bytes": 7155
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/legacy-checkbox/_checkbox-theme.scss",
+              "sha256": "f50e3f7ec838c204e1ef92c4ceed4b6b4f4aae38602fc3a69b58e5e5c796d3f1",
+              "bytes": 4496
+            }
+          ],
+          "diff_sha256": "b41cfd3aaae2dfa491f6d0478705b41d8395ce5c6b1142ab4b268e442e8109e4",
+          "review_depth": "individual-compatibility",
+          "affected_branches": [
+            "main"
+          ],
+          "decision": "The upstream patch narrows current MDC checkbox state and ripple selector relationships. The owned Material-16 legacy checkbox CSS uses its historical markup. Separately, this package exports `checkbox-theme`, which calls public `mat.checkbox-overrides`; that is an appended current-peer bridge outside the thirteen-family roster and remains an actual public Sass API. Do not port the modern selectors into legacy checkbox CSS. The coexistence sample used `legacy-checkbox-theme`, not this current checkbox bridge, so it does not qualify that bridge’s current-peer output."
+        }
+      }
+    },
+    {
+      "sha": "1b3c42e074988dc953198ac071fad1d90298efae",
+      "before": {
+        "sha": "1b3c42e074988dc953198ac071fad1d90298efae",
+        "bucket": "needs-triage",
+        "subject": "perf(material/checkbox): Optimize more expensive selectors (#30409)",
+        "files": [
+          "src/material/checkbox/_checkbox-common.scss",
+          "src/material/list/list-option.scss"
+        ],
+        "diff_sha256": "3bb6b6630960690fcad76296cd1a9244af23a5db00957b61f518fe4d8caae698",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/1b3c42e074988dc953198ac071fad1d90298efae.json",
+        "batch_id": "unread-seed-content-review-2026-10-02",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "inherited",
+        "read_note_disposition": "inherited",
+        "reason": "The diff in src/material/checkbox/_checkbox-common.scss changes `.mdc-checkbox:hover .mdc-checkbox__native-control:not(:checked) ~ .mdc-checkbox__background,`. That line is not in the legacy sources. @angular/material/checkbox is exercised by projects/ngx-material-legacy/legacy-checkbox/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+        "peer_floor": {
+          "package": "@angular/material",
+          "installed": "22.1.7",
+          "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+          "delegation": "@angular/material/checkbox imported by projects/ngx-material-legacy/legacy-checkbox/public-api.ts"
+        }
+      },
+      "after": {
+        "sha": "1b3c42e074988dc953198ac071fad1d90298efae",
+        "bucket": "needs-triage",
+        "subject": "perf(material/checkbox): Optimize more expensive selectors (#30409)",
+        "files": [
+          "src/material/checkbox/_checkbox-common.scss",
+          "src/material/list/list-option.scss"
+        ],
+        "diff_sha256": "3bb6b6630960690fcad76296cd1a9244af23a5db00957b61f518fe4d8caae698",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/1b3c42e074988dc953198ac071fad1d90298efae.json",
+        "batch_id": "c04-six-selectors-current-integration-v1",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "do-not-adopt",
+        "read_note_disposition": "do-not-adopt",
+        "reason": "The upstream patch narrows current MDC checkbox icon/hover selectors, replaces broad checkbox noop-animation CSS with a finite helper, and uses the helper from the peer list-option stylesheet. The owned Material-16 checkbox and list use historical markup/styles. `checkbox-theme` is an actual separate appended public current-peer bridge via `mat.checkbox-overrides`; it remains unqualified by the sample, which used `legacy-checkbox-theme`. The exported `list-theme` is a historical M2 Sass module, not in the thirteen-family contract and not a `mat.list-overrides` bridge. Do not port peer selector/helper changes into legacy CSS; no current-M2 list bridge qualification is claimed.",
+        "individual_proof": {
+          "proof_kind": "individual-contextual-source-review",
+          "source_conclusion_only": true,
+          "execution_claim": "not-claimed",
+          "source_members": [
+            {
+              "path": "projects/ngx-material-legacy/_index.scss",
+              "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+              "bytes": 14151
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/_checkbox-legacy-index.scss",
+              "sha256": "cbeb8655a2a268ec76486ff6ffe63fa16cb26278f502437ed19f0bb4709e2765",
+              "bytes": 142
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/_checkbox-theme.import.scss",
+              "sha256": "0556d545fda906610767a1a519e16fec8d6fdce721b80d31a8661de76e992a66",
+              "bytes": 337
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/_checkbox-theme.scss",
+              "sha256": "9eed531b2fd66dc8960f99efdbf3542b50581b5897e2c717473510ba136aeb7f",
+              "bytes": 4517
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox-module.ts",
+              "sha256": "a1dfbaa86342a3876d3d22dcd4380d8379e85a4e046a8b2be156b6a7b48ce6d5",
+              "bytes": 907
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.html",
+              "sha256": "f630375b769dac8ba62c05c74d8f6abbb640bb9d6a9539ce01f220220f7b93b5",
+              "bytes": 2202
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.scss",
+              "sha256": "5bb880767ff062ead6604140938cd5d23136a135494e817291a81b13fc20d7b1",
+              "bytes": 13687
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.ts",
+              "sha256": "774db12b55590d631d0a69c68a9aa7289adf600ac3fe62e288dd22fcf3c86766",
+              "bytes": 5525
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/index.ts",
+              "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+              "bytes": 233
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/owned-transition-state.ts",
+              "sha256": "ffa33cd647c3cede4b576c6fdc77bc4177a2fdfca0e28f67d96301e95965607a",
+              "bytes": 739
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-checkbox/public-api.ts",
+              "sha256": "ee7d7028843ce1ea3da51a5253501a2fe7304d6ea51cfde777c97d9eb69b823b",
+              "bytes": 1269
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-list/_list-legacy-index.scss",
+              "sha256": "485496c0fa166356a22abddc578341169d695b85c74e2dd95b7d1b1de527d04b",
+              "bytes": 126
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-list/_list-theme.import.scss",
+              "sha256": "06e4658abda1f8d299fdc081ae2c7ed6abd4a4abc621ffbe8a41262f08efa202",
+              "bytes": 438
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-list/_list-theme.scss",
+              "sha256": "a690b04f13e970b9b2da3a151f3f948ea2a68c25a589476f82bded6d2a9817fc",
+              "bytes": 3820
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-list/index.ts",
+              "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+              "bytes": 233
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-list/list-item.html",
+              "sha256": "2105cd61534fde43eccfd78c8928f322822984b0b8c8c8cc4acce521d05971c1",
+              "bytes": 431
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+              "sha256": "572b01d580e4a9c12c72278bbe11d111faafbd6a5534c1fafec0cd77a9ab5208",
+              "bytes": 1679
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-list/list-option.html",
+              "sha256": "338ba98c19aa54346cff4efdfa91de0a091b367ac454a5fc8b50d5062a767341",
+              "bytes": 603
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-list/list.html",
+              "sha256": "690d120c9e53da33cc3cdc95af9e6b013fcfb6caf1b99f12d754db045820ff08",
+              "bytes": 27
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-list/list.scss",
+              "sha256": "c3c4e1ee2d36547d323c661dd2737e65d5150d414223e75a620a389a7a0b8168",
+              "bytes": 8834
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-list/list.ts",
+              "sha256": "6c358d9985e677d5ba8037f3b9aa471d35f657a172ab789f754f41952ebd0d7e",
+              "bytes": 6980
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-list/public-api.ts",
+              "sha256": "8d41a1301df99bcb8b54ef437322431d3910136cf554f90550426d1b80889b00",
+              "bytes": 795
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-list/selection-list.ts",
+              "sha256": "e408bbc42e122dcb9197d2fb850740a9cf769d650ec70442b595428ce747c206",
+              "bytes": 24059
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+              "sha256": "3bd939280b1d80fd10f6c0ece8c434cfe2f0f369746cca7b2b3e9f8c153755ee",
+              "bytes": 35009
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss",
+              "sha256": "c953a6c0df04dd73b443548f4872f62fa0704881590ccb508bd7db7741f391fc",
+              "bytes": 975
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_m2-system.scss",
+              "sha256": "6c9da785ea2449d2629af75e3078fde08631c59db87a3f423198444dc5b8b84d",
+              "bytes": 8191
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss",
+              "sha256": "97d4de28beacfa9229c148463b16436f5fdbf5e8905d9dc6c463c5e534da17a9",
+              "bytes": 7155
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/legacy-checkbox/_checkbox-theme.scss",
+              "sha256": "f50e3f7ec838c204e1ef92c4ceed4b6b4f4aae38602fc3a69b58e5e5c796d3f1",
+              "bytes": 4496
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/legacy-list/_list-theme.scss",
+              "sha256": "f77bb9e621f938d24bdfdbb70f6a135164e24997acfa729bce4933cbe92f8d93",
+              "bytes": 3792
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/list/_list-theme.scss",
+              "sha256": "d46fdf03a1ad4a374e5b47215dc0dee386078298b198255de4efbea8a627321e",
+              "bytes": 5085
+            }
+          ],
+          "diff_sha256": "0d04eccf18e895496a1c2e12fb22a26c19c1cdc5c449b1df34e314f1fe72d09e",
+          "review_depth": "individual-compatibility",
+          "affected_branches": [
+            "main"
+          ],
+          "decision": "The upstream patch narrows current MDC checkbox icon/hover selectors, replaces broad checkbox noop-animation CSS with a finite helper, and uses the helper from the peer list-option stylesheet. The owned Material-16 checkbox and list use historical markup/styles. `checkbox-theme` is an actual separate appended public current-peer bridge via `mat.checkbox-overrides`; it remains unqualified by the sample, which used `legacy-checkbox-theme`. The exported `list-theme` is a historical M2 Sass module, not in the thirteen-family contract and not a `mat.list-overrides` bridge. Do not port peer selector/helper changes into legacy CSS; no current-M2 list bridge qualification is claimed."
+        }
+      }
+    },
+    {
+      "sha": "6bd31f978613bfdf49ca4f811708dd9893de6585",
+      "before": {
+        "sha": "6bd31f978613bfdf49ca4f811708dd9893de6585",
+        "bucket": "needs-triage",
+        "subject": "perf(material/radio): Optimize costly css selectors. (#30470)",
+        "files": [
+          "src/material/radio/_radio-common.scss",
+          "src/material/radio/radio.scss"
+        ],
+        "diff_sha256": "b0b39ec0a71ba40c3bcbc74f149583a9b624adc0565d5d2a62e6fcc8aab67eca",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/6bd31f978613bfdf49ca4f811708dd9893de6585.json",
+        "batch_id": "unread-seed-content-review-2026-10-02",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "inherited",
+        "read_note_disposition": "inherited",
+        "reason": "The diff in src/material/radio/_radio-common.scss changes `&:hover .mdc-radio__native-control:not([disabled]):not(:focus) {`. That line is not in the legacy sources. @angular/material/radio is exercised by projects/ngx-material-legacy/legacy-radio/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+        "peer_floor": {
+          "package": "@angular/material",
+          "installed": "22.1.7",
+          "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+          "delegation": "@angular/material/radio imported by projects/ngx-material-legacy/legacy-radio/public-api.ts"
+        }
+      },
+      "after": {
+        "sha": "6bd31f978613bfdf49ca4f811708dd9893de6585",
+        "bucket": "needs-triage",
+        "subject": "perf(material/radio): Optimize costly css selectors. (#30470)",
+        "files": [
+          "src/material/radio/_radio-common.scss",
+          "src/material/radio/radio.scss"
+        ],
+        "diff_sha256": "b0b39ec0a71ba40c3bcbc74f149583a9b624adc0565d5d2a62e6fcc8aab67eca",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/6bd31f978613bfdf49ca4f811708dd9893de6585.json",
+        "batch_id": "c04-six-selectors-current-integration-v1",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "do-not-adopt",
+        "read_note_disposition": "do-not-adopt",
+        "reason": "The upstream patch narrows current MDC radio state/icon/ripple selectors. The owned Material-16 legacy radio CSS uses historical `.mat-radio-*` roles. The package also exports a `radio-theme` historical M2 module, but radio is absent from the thirteen-family current-companion roster and its implementation does not call `mat.radio-overrides`; the separate `legacy-radio-theme` is the owned legacy theme. Do not port modern MDC selectors into legacy radio CSS. No supported current-peer M2 radio bridge is claimed.",
+        "individual_proof": {
+          "proof_kind": "individual-contextual-source-review",
+          "source_conclusion_only": true,
+          "execution_claim": "not-claimed",
+          "source_members": [
+            {
+              "path": "projects/ngx-material-legacy/_index.scss",
+              "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+              "bytes": 14151
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-radio/_radio-legacy-index.scss",
+              "sha256": "99359dc40a46215397a96da68109e3ec0b72486210978db222161b0ba4a2083f",
+              "bytes": 154
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-radio/_radio-theme.import.scss",
+              "sha256": "bb09408755f8e964f40676d3e30cf169d747ad18adb6a4069a5b4c325729cb2a",
+              "bytes": 391
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-radio/_radio-theme.scss",
+              "sha256": "63c5ba554e0e4c07ba47da69554e9898e4ada8bb2c32b070955531bc963fe969",
+              "bytes": 3414
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-radio/index.ts",
+              "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+              "bytes": 233
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-radio/public-api.ts",
+              "sha256": "c261135ebae4b5cf7e38a7a26ad31aa7b8fa43fb3134dcb0b2e2b121b9deeece",
+              "bytes": 858
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-radio/radio-module.ts",
+              "sha256": "f90f9b9d3b70e742b3bc0a68f9664729c2afd762f661d990ba0e3ee2128f9c76",
+              "bytes": 734
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-radio/radio.html",
+              "sha256": "61b57e78e7c25bdae14c33027de26348f7238cc413405f65afdce84e2b5d6bbe",
+              "bytes": 1697
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-radio/radio.scss",
+              "sha256": "54e67218650eec5eb13b866d19bdbd9c1067204bea58fb5e4e1cfeb20d4eb718",
+              "bytes": 6022
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-radio/radio.ts",
+              "sha256": "dffd3e4daf0d50d915303b2e3d13d26e8c97fb77756ccf8c618e34022f548f1e",
+              "bytes": 3762
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+              "sha256": "3bd939280b1d80fd10f6c0ece8c434cfe2f0f369746cca7b2b3e9f8c153755ee",
+              "bytes": 35009
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss",
+              "sha256": "c953a6c0df04dd73b443548f4872f62fa0704881590ccb508bd7db7741f391fc",
+              "bytes": 975
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_m2-system.scss",
+              "sha256": "6c9da785ea2449d2629af75e3078fde08631c59db87a3f423198444dc5b8b84d",
+              "bytes": 8191
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/legacy-radio/_radio-theme.scss",
+              "sha256": "30ba737c4ff96a975884ed4ea574577d45de8a887c79e7c4319cdd11eed50387",
+              "bytes": 3393
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/radio/_radio-theme.scss",
+              "sha256": "2d51f1d4eefc08228b284aea6f19f153772317434911cf79350924358eb21833",
+              "bytes": 3104
+            }
+          ],
+          "diff_sha256": "fb585897672e9430e7f6d2da6ca16a4517ed5134a66e8a907b6596fd08e90ea2",
+          "review_depth": "individual-compatibility",
+          "affected_branches": [
+            "main"
+          ],
+          "decision": "The upstream patch narrows current MDC radio state/icon/ripple selectors. The owned Material-16 legacy radio CSS uses historical `.mat-radio-*` roles. The package also exports a `radio-theme` historical M2 module, but radio is absent from the thirteen-family current-companion roster and its implementation does not call `mat.radio-overrides`; the separate `legacy-radio-theme` is the owned legacy theme. Do not port modern MDC selectors into legacy radio CSS. No supported current-peer M2 radio bridge is claimed."
+        }
+      }
+    },
+    {
+      "sha": "6ff9c9f3d6410a9d04c6f93635c4d2fe3101b334",
+      "before": {
+        "sha": "6ff9c9f3d6410a9d04c6f93635c4d2fe3101b334",
+        "bucket": "needs-triage",
+        "subject": "perf(material/slide-toggle): Optimize :state descendant selectors (#30521)",
+        "files": [
+          "src/material/slide-toggle/slide-toggle.scss"
+        ],
+        "diff_sha256": "f6a77db35e2d05d23e300fa3e61e9ad5df3a9234c26a7e395dd4b69916ad4544",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/6ff9c9f3d6410a9d04c6f93635c4d2fe3101b334.json",
+        "batch_id": "unread-seed-content-review-2026-10-02",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "inherited",
+        "read_note_disposition": "inherited",
+        "reason": "The diff in src/material/slide-toggle/slide-toggle.scss changes `.mdc-switch:enabled:hover:not(:focus):not(:active) & {`. That line is not in the legacy sources. @angular/material/slide-toggle is exercised by projects/ngx-material-legacy/legacy-slide-toggle/testing/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+        "peer_floor": {
+          "package": "@angular/material",
+          "installed": "22.1.7",
+          "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+          "delegation": "@angular/material/slide-toggle imported by projects/ngx-material-legacy/legacy-slide-toggle/testing/public-api.ts"
+        }
+      },
+      "after": {
+        "sha": "6ff9c9f3d6410a9d04c6f93635c4d2fe3101b334",
+        "bucket": "needs-triage",
+        "subject": "perf(material/slide-toggle): Optimize :state descendant selectors (#30521)",
+        "files": [
+          "src/material/slide-toggle/slide-toggle.scss"
+        ],
+        "diff_sha256": "f6a77db35e2d05d23e300fa3e61e9ad5df3a9234c26a7e395dd4b69916ad4544",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/6ff9c9f3d6410a9d04c6f93635c4d2fe3101b334.json",
+        "batch_id": "c04-six-selectors-current-integration-v1",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "do-not-adopt",
+        "read_note_disposition": "do-not-adopt",
+        "reason": "The upstream patch experiments with direct MDC switch handle paths. The owned Material-16 slide-toggle CSS uses historical `.mat-slide-toggle-*` roles. The package exports a historical M2 `slide-toggle-theme`, but slide-toggle is outside the thirteen-family current-companion roster and the module has no `mat.slide-toggle-overrides` call; `legacy-slide-toggle-theme` is the owned legacy theme. The selector experiment is reverted before v22.1.7, so its intermediate state is absent at the minimum. Do not port it to legacy CSS; no current-peer behavior for the intermediate selector is claimed.",
+        "individual_proof": {
+          "proof_kind": "individual-contextual-source-review",
+          "source_conclusion_only": true,
+          "execution_claim": "not-claimed",
+          "source_members": [
+            {
+              "path": "projects/ngx-material-legacy/_index.scss",
+              "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+              "bytes": 14151
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/_slide-toggle-legacy-index.scss",
+              "sha256": "768410daf0722c0975c563661f32c79bd11324639464d53c19a6226c5dbcb14a",
+              "bytes": 191
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/_slide-toggle-theme.import.scss",
+              "sha256": "d71a803a5767dc67c642998aea2063930b1ac6408b7fbd9b33de32f808ab83e6",
+              "bytes": 509
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/_slide-toggle-theme.scss",
+              "sha256": "394431d47c92d56d2e0769a46797d0c44877e50f6233e963352729b3423ccba2",
+              "bytes": 4261
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/index.ts",
+              "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+              "bytes": 233
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/public-api.ts",
+              "sha256": "b6c96f9c4fdfc31b72ee8a4b652d5b2fdab84337a3ad7e79e2cd82ac1da221af",
+              "bytes": 929
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle-config.ts",
+              "sha256": "a49eb76f4b1e58c1b696038d628a54b8469d09dd4f40b411bda062f73433f55c",
+              "bytes": 957
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle-module.ts",
+              "sha256": "f37d9867dee837fe7599b855498f9014ff56fee7f2f6e32ead62770188a115a0",
+              "bytes": 957
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.html",
+              "sha256": "aa441ced1917ab6b29a83948533f85c8ceb62c373866460d56e59cfca5a2fabd",
+              "bytes": 1596
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.scss",
+              "sha256": "265d77ab1edc213deb0bc64307bed30ef1cce761efa09faeaf826bc3b73c5b18",
+              "bytes": 6572
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.ts",
+              "sha256": "2e0a9754b883f36fd8a8d146515c76fc3883d643794ccb524c9226b309bbbc74",
+              "bytes": 5716
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+              "sha256": "3bd939280b1d80fd10f6c0ece8c434cfe2f0f369746cca7b2b3e9f8c153755ee",
+              "bytes": 35009
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss",
+              "sha256": "c953a6c0df04dd73b443548f4872f62fa0704881590ccb508bd7db7741f391fc",
+              "bytes": 975
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_m2-system.scss",
+              "sha256": "6c9da785ea2449d2629af75e3078fde08631c59db87a3f423198444dc5b8b84d",
+              "bytes": 8191
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/legacy-slide-toggle/_slide-toggle-theme.scss",
+              "sha256": "6ba26ba5cf2851a8c7f5f2dd32ba7813bee90bfcf60ddd6aba0e5db87e01f71f",
+              "bytes": 4226
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/slide-toggle/_slide-toggle-theme.scss",
+              "sha256": "aedceb0a0165c296ad00e875a3fe8313c08936e468a67d8acc812832cc5f507e",
+              "bytes": 3205
+            }
+          ],
+          "diff_sha256": "fa6a95b8ef1663a2f900f7db70b117127d6b02b5651d94de2a9f52e255d8756a",
+          "review_depth": "individual-compatibility",
+          "affected_branches": [
+            "main"
+          ],
+          "decision": "The upstream patch experiments with direct MDC switch handle paths. The owned Material-16 slide-toggle CSS uses historical `.mat-slide-toggle-*` roles. The package exports a historical M2 `slide-toggle-theme`, but slide-toggle is outside the thirteen-family current-companion roster and the module has no `mat.slide-toggle-overrides` call; `legacy-slide-toggle-theme` is the owned legacy theme. The selector experiment is reverted before v22.1.7, so its intermediate state is absent at the minimum. Do not port it to legacy CSS; no current-peer behavior for the intermediate selector is claimed."
+        }
+      }
+    },
+    {
+      "sha": "283f11039203ae23016d1ed52313025489b2a7cf",
+      "before": {
+        "sha": "283f11039203ae23016d1ed52313025489b2a7cf",
+        "bucket": "needs-triage",
+        "subject": "Revert \"perf(material/slide-toggle): Optimize :state descendant selectors\" (#30530)",
+        "files": [
+          "src/material/slide-toggle/slide-toggle.scss"
+        ],
+        "diff_sha256": "5f7100d583202f220a6568a2901f90a086a618d6fc1e0f3b13fb5e551ca7362d",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/283f11039203ae23016d1ed52313025489b2a7cf.json",
+        "batch_id": "unread-seed-content-review-2026-10-02",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "inherited",
+        "read_note_disposition": "inherited",
+        "reason": "The diff in src/material/slide-toggle/slide-toggle.scss changes `.mdc-switch:enabled:hover:not(:focus):not(:active) > & {`. That line is not in the legacy sources. @angular/material/slide-toggle is exercised by projects/ngx-material-legacy/legacy-slide-toggle/testing/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+        "peer_floor": {
+          "package": "@angular/material",
+          "installed": "22.1.7",
+          "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+          "delegation": "@angular/material/slide-toggle imported by projects/ngx-material-legacy/legacy-slide-toggle/testing/public-api.ts"
+        }
+      },
+      "after": {
+        "sha": "283f11039203ae23016d1ed52313025489b2a7cf",
+        "bucket": "needs-triage",
+        "subject": "Revert \"perf(material/slide-toggle): Optimize :state descendant selectors\" (#30530)",
+        "files": [
+          "src/material/slide-toggle/slide-toggle.scss"
+        ],
+        "diff_sha256": "5f7100d583202f220a6568a2901f90a086a618d6fc1e0f3b13fb5e551ca7362d",
+        "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/283f11039203ae23016d1ed52313025489b2a7cf.json",
+        "batch_id": "c04-six-selectors-current-integration-v1",
+        "recorded_at_utc": "2026-10-02T18:49:16Z",
+        "g11_claim": "not-passed",
+        "final_disposition": "do-not-adopt",
+        "read_note_disposition": "do-not-adopt",
+        "reason": "This upstream patch reverts the direct MDC switch handle-path experiment to descendant selectors. The owned Material-16 slide-toggle CSS uses historical `.mat-slide-toggle-*` roles. The package exports a historical M2 `slide-toggle-theme`, but slide-toggle is outside the thirteen-family current-companion roster and the module has no `mat.slide-toggle-overrides` call; `legacy-slide-toggle-theme` is the owned legacy theme. Do not port the peer selector revert into legacy CSS; no current-peer M2 slide-toggle bridge qualification is claimed.",
+        "individual_proof": {
+          "proof_kind": "individual-contextual-source-review",
+          "source_conclusion_only": true,
+          "execution_claim": "not-claimed",
+          "source_members": [
+            {
+              "path": "projects/ngx-material-legacy/_index.scss",
+              "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+              "bytes": 14151
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/_slide-toggle-legacy-index.scss",
+              "sha256": "768410daf0722c0975c563661f32c79bd11324639464d53c19a6226c5dbcb14a",
+              "bytes": 191
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/_slide-toggle-theme.import.scss",
+              "sha256": "d71a803a5767dc67c642998aea2063930b1ac6408b7fbd9b33de32f808ab83e6",
+              "bytes": 509
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/_slide-toggle-theme.scss",
+              "sha256": "394431d47c92d56d2e0769a46797d0c44877e50f6233e963352729b3423ccba2",
+              "bytes": 4261
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/index.ts",
+              "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+              "bytes": 233
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/public-api.ts",
+              "sha256": "b6c96f9c4fdfc31b72ee8a4b652d5b2fdab84337a3ad7e79e2cd82ac1da221af",
+              "bytes": 929
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle-config.ts",
+              "sha256": "a49eb76f4b1e58c1b696038d628a54b8469d09dd4f40b411bda062f73433f55c",
+              "bytes": 957
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle-module.ts",
+              "sha256": "f37d9867dee837fe7599b855498f9014ff56fee7f2f6e32ead62770188a115a0",
+              "bytes": 957
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.html",
+              "sha256": "aa441ced1917ab6b29a83948533f85c8ceb62c373866460d56e59cfca5a2fabd",
+              "bytes": 1596
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.scss",
+              "sha256": "265d77ab1edc213deb0bc64307bed30ef1cce761efa09faeaf826bc3b73c5b18",
+              "bytes": 6572
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.ts",
+              "sha256": "2e0a9754b883f36fd8a8d146515c76fc3883d643794ccb524c9226b309bbbc74",
+              "bytes": 5716
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+              "sha256": "3bd939280b1d80fd10f6c0ece8c434cfe2f0f369746cca7b2b3e9f8c153755ee",
+              "bytes": 35009
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss",
+              "sha256": "c953a6c0df04dd73b443548f4872f62fa0704881590ccb508bd7db7741f391fc",
+              "bytes": 975
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/bridges/_m2-system.scss",
+              "sha256": "6c9da785ea2449d2629af75e3078fde08631c59db87a3f423198444dc5b8b84d",
+              "bytes": 8191
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/legacy-slide-toggle/_slide-toggle-theme.scss",
+              "sha256": "6ba26ba5cf2851a8c7f5f2dd32ba7813bee90bfcf60ddd6aba0e5db87e01f71f",
+              "bytes": 4226
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/slide-toggle/_slide-toggle-theme.scss",
+              "sha256": "aedceb0a0165c296ad00e875a3fe8313c08936e468a67d8acc812832cc5f507e",
+              "bytes": 3205
+            }
+          ],
+          "diff_sha256": "2a0fb67cce5d21638c57eb266768bd8170934a020ed8c1278d78cd8e6c7c4cbf",
+          "review_depth": "individual-compatibility",
+          "affected_branches": [
+            "main"
+          ],
+          "decision": "This upstream patch reverts the direct MDC switch handle-path experiment to descendant selectors. The owned Material-16 slide-toggle CSS uses historical `.mat-slide-toggle-*` roles. The package exports a historical M2 `slide-toggle-theme`, but slide-toggle is outside the thirteen-family current-companion roster and the module has no `mat.slide-toggle-overrides` call; `legacy-slide-toggle-theme` is the owned legacy theme. Do not port the peer selector revert into legacy CSS; no current-peer M2 slide-toggle bridge qualification is claimed."
+        }
+      }
+    }
+  ],
+  "evidence_files": [
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/5142268c7d2ef3d09f2cf9349a0b8ad25bf466d9.json",
+      "bytes": 9672,
+      "sha256": "ce94d1690d1b943bfa948f72010e8e823d087d9d4caf817b3e8bb7ad104eca01"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/e4388c6f2594d81c3a95543482a2edeaa34bccff.json",
+      "bytes": 12259,
+      "sha256": "9f7eb67cc900a2657c0313cf1178c9155fd901f5cda1d339d52f554c68f0ecbd"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/1b3c42e074988dc953198ac071fad1d90298efae.json",
+      "bytes": 17876,
+      "sha256": "447431e3cbcce765ba5be51d78a0956be90c6b02211e8b11b85b21e0b9a4fe2f"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/6bd31f978613bfdf49ca4f811708dd9893de6585.json",
+      "bytes": 16355,
+      "sha256": "8f785fe90e305db4e537fda24e097fc8cea699f4e69ba92754cef2c337fa7ff3"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/6ff9c9f3d6410a9d04c6f93635c4d2fe3101b334.json",
+      "bytes": 20875,
+      "sha256": "40bbc3c10beca40b31819421b1b09fa7e60787572381284fa22d6a1027d01d0b"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/283f11039203ae23016d1ed52313025489b2a7cf.json",
+      "bytes": 20840,
+      "sha256": "440096b2a0916f78cba48f8f82cbe52d9210f289db447396667f10e55832e158"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/REPORT.md",
+      "bytes": 8009,
+      "sha256": "6025fd5b97ff794e29bcb2b7111b8f826b11df727d4f83489967c39cad3931f8"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/INDEPENDENT-REVIEW.md",
+      "bytes": 5443,
+      "sha256": "fa5b0960823eb493c8b04a474026867ab4944a7d4a507e17606f04f88ad5d63b"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/V2-MANIFEST.json",
+      "bytes": 19638,
+      "sha256": "1353ee24868d36d14f08e16e31db666f1ac267b8fd542e0948901fa961ca30fd"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/production-probe.json",
+      "bytes": 3447,
+      "sha256": "01422d9f287e294b30fc0112438458c43e80dfbf27d1592477358763446e4f59"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/source-fingerprint-check.json",
+      "bytes": 24140,
+      "sha256": "1b2a28708e6c3a8990b26e20a93023f8ba09cb1e7012392b006b5b7119533186"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/current-checker-proof.json",
+      "bytes": 864,
+      "sha256": "10800d57432807f8d95501ba8b5b830961e6e686217194f55991105844a905d3"
+    }
+  ],
+  "independent_review": {
+    "path": "compatibility/f10/disposition-ledger/evidence/c04-six-selectors-current-integration-v2/INDEPENDENT-REVIEW.md",
+    "sha256": "fa5b0960823eb493c8b04a474026867ab4944a7d4a507e17606f04f88ad5d63b",
+    "manifest_sha256": "7407510bd00b74ce3a090bce6e9c3e2ee6a84b039f21fcbbf689350a349df373"
+  },
+  "production_probe": {
+    "result_file": "production-probe.json",
+    "positive_count": 6,
+    "negative_controls_rejected": 42,
+    "negative_control_count_per_row": 7,
+    "scope": "isolated production individual proof only; no coordinator/full admission"
+  },
+  "validation": {
+    "ledger_parse": "pass",
+    "exact_beforeimages": "pass",
+    "selected_tuple_exact": "pass",
+    "unselected_entries_deep_equal": "pass",
+    "counts": "1697 total / 6 selected / 1691 unselected",
+    "native_patch_applied_to_external_candidate": "pending"
+  }
+}

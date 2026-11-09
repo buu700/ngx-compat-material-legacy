@@ -1,0 +1,240 @@
+{
+  "sha": "1b3c42e074988dc953198ac071fad1d90298efae",
+  "status": "reviewed",
+  "diff": "diff --git a/src/material/checkbox/_checkbox-common.scss b/src/material/checkbox/_checkbox-common.scss\nindex 55be454fb01aedc8b4b147f700ae45fd369d9831..2a2392a9697640420b32f3d106d824b88f85c750 100644\n--- a/src/material/checkbox/_checkbox-common.scss\n+++ b/src/material/checkbox/_checkbox-common.scss\n@@ -119,15 +119,17 @@ $_fallback-size: 40px;\n       border-color: transparent;\n     }\n \n-    .mdc-checkbox:hover .mdc-checkbox__native-control:not(:checked) ~ .mdc-checkbox__background,\n+    // stylelint-disable selector-combinator-space-before\n+    .mdc-checkbox:hover > .mdc-checkbox__native-control:not(:checked) ~ .mdc-checkbox__background,\n     .mdc-checkbox:hover\n-      .mdc-checkbox__native-control:not(:indeterminate) ~ .mdc-checkbox__background {\n+      > .mdc-checkbox__native-control:not(:indeterminate) ~ .mdc-checkbox__background {\n       @include token-utils.create-token-slot(border-color, unselected-hover-icon-color);\n       background-color: transparent;\n     }\n+    // stylelint-enable selector-combinator-space-before\n \n-    .mdc-checkbox:hover .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background,\n-    .mdc-checkbox:hover .mdc-checkbox__native-control:indeterminate ~ .mdc-checkbox__background {\n+    .mdc-checkbox:hover > .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background,\n+    .mdc-checkbox:hover > .mdc-checkbox__native-control:indeterminate ~ .mdc-checkbox__background {\n       @include token-utils.create-token-slot(border-color, selected-hover-icon-color);\n       @include token-utils.create-token-slot(background-color, selected-hover-icon-color);\n     }\n@@ -147,7 +149,7 @@ $_fallback-size: 40px;\n \n     // Needs extra specificity to override the focus, hover, active states.\n     .mdc-checkbox--disabled.mat-mdc-checkbox-disabled-interactive {\n-      .mdc-checkbox:hover .mdc-checkbox__native-control ~ .mdc-checkbox__background,\n+      .mdc-checkbox:hover > .mdc-checkbox__native-control ~ .mdc-checkbox__background,\n       .mdc-checkbox .mdc-checkbox__native-control:focus ~ .mdc-checkbox__background,\n       .mdc-checkbox__background {\n         @include token-utils.create-token-slot(border-color, disabled-unselected-icon-color);\n@@ -306,31 +308,31 @@ $_fallback-size: 40px;\n     transition: border-color $_transition-duration $_enter-curve,\n                 background-color $_transition-duration $_enter-curve;\n \n-    .mdc-checkbox__checkmark-path {\n+    > .mdc-checkbox__checkmark > .mdc-checkbox__checkmark-path {\n       stroke-dashoffset: 0;\n     }\n   }\n \n   .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background {\n-    .mdc-checkbox__checkmark {\n+    > .mdc-checkbox__checkmark {\n       transition: opacity $_transition-duration * 2 $_enter-curve,\n                   transform $_transition-duration * 2 $_enter-curve;\n       opacity: 1;\n     }\n \n-    .mdc-checkbox__mixedmark {\n+    > .mdc-checkbox__mixedmark {\n       transform: scaleX(1) rotate(-45deg);\n     }\n   }\n   .mdc-checkbox__native-control:indeterminate ~ .mdc-checkbox__background {\n-    .mdc-checkbox__checkmark {\n+    > .mdc-checkbox__checkmark {\n       transform: rotate(45deg);\n       opacity: 0;\n       transition: opacity $_transition-duration $_exit-curve,\n                   transform $_transition-duration $_exit-curve;\n     }\n \n-    .mdc-checkbox__mixedmark {\n+    > .mdc-checkbox__mixedmark {\n       transform: scaleX(1) rotate(0deg);\n       opacity: 1;\n     }\n@@ -445,11 +447,22 @@ $_fallback-size: 40px;\n \n // Conditionally disables the animations of the checkbox.\n @mixin checkbox-noop-animations() {\n-  &._mat-animation-noopable .mdc-checkbox {\n-    *, *::before {\n-      transition: none !important;\n-      animation: none !important;\n-    }\n+  &._mat-animation-noopable > .mat-internal-form-field > .mdc-checkbox {\n+    @include checkbox-noop-animations-internal;\n+  }\n+}\n+\n+@mixin checkbox-noop-animations-internal() {\n+  > .mat-mdc-checkbox-touch-target,\n+  > .mdc-checkbox__native-control,\n+  > .mdc-checkbox__ripple,\n+  > .mat-mdc-checkbox-ripple::before,\n+  > .mdc-checkbox__background,\n+  > .mdc-checkbox__background > .mdc-checkbox__checkmark,\n+  > .mdc-checkbox__background > .mdc-checkbox__checkmark > .mdc-checkbox__checkmark-path,\n+  > .mdc-checkbox__background > .mdc-checkbox__mixedmark {\n+    transition: none !important;\n+    animation: none !important;\n   }\n }\n \n@@ -465,7 +478,7 @@ $_fallback-size: 40px;\n       );\n     }\n \n-    > .mat-mdc-checkbox-ripple .mat-ripple-element {\n+    > .mat-mdc-checkbox-ripple > .mat-ripple-element {\n       @include token-utils.create-token-slot(\n         background-color,\n         unselected-hover-state-layer-color\ndiff --git a/src/material/list/list-option.scss b/src/material/list/list-option.scss\nindex 5c193ce768b24683ea0fdb09109892630cf54021..fcf3bff9b09233e79f13243c1e196d94722e7f0a 100644\n--- a/src/material/list/list-option.scss\n+++ b/src/material/list/list-option.scss\n@@ -63,10 +63,14 @@\n   // We can't use the MDC checkbox here directly, because this checkbox is purely\n   // decorative and including the MDC one will bring in unnecessary JS.\n   @include checkbox-common.checkbox-structure(false);\n-  @include checkbox-common.checkbox-noop-animations;\n   @include radio-common.radio-structure(false);\n   @include radio-common.radio-noop-animations;\n \n+  &._mat-animation-noopable > .mdc-list-item__start > .mdc-checkbox,\n+  &._mat-animation-noopable > .mdc-list-item__end > .mdc-checkbox {\n+    @include checkbox-common.checkbox-noop-animations-internal;\n+  }\n+\n   // The internal checkbox/radio is purely decorative, but because it's an `input`, the user can\n   // still focus it by tabbing or clicking. Furthermore, `mat-list-option` has the `option` role\n   // which doesn't allow a nested `input`. We use `display: none` both to remove it from the tab\n",
+  "diff_sha256": "0d04eccf18e895496a1c2e12fb22a26c19c1cdc5c449b1df34e314f1fe72d09e",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/_index.scss",
+      "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+      "bytes": 14151
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/_checkbox-legacy-index.scss",
+      "sha256": "cbeb8655a2a268ec76486ff6ffe63fa16cb26278f502437ed19f0bb4709e2765",
+      "bytes": 142
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/_checkbox-theme.import.scss",
+      "sha256": "0556d545fda906610767a1a519e16fec8d6fdce721b80d31a8661de76e992a66",
+      "bytes": 337
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/_checkbox-theme.scss",
+      "sha256": "9eed531b2fd66dc8960f99efdbf3542b50581b5897e2c717473510ba136aeb7f",
+      "bytes": 4517
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox-module.ts",
+      "sha256": "a1dfbaa86342a3876d3d22dcd4380d8379e85a4e046a8b2be156b6a7b48ce6d5",
+      "bytes": 907
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.html",
+      "sha256": "f630375b769dac8ba62c05c74d8f6abbb640bb9d6a9539ce01f220220f7b93b5",
+      "bytes": 2202
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.scss",
+      "sha256": "5bb880767ff062ead6604140938cd5d23136a135494e817291a81b13fc20d7b1",
+      "bytes": 13687
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.ts",
+      "sha256": "774db12b55590d631d0a69c68a9aa7289adf600ac3fe62e288dd22fcf3c86766",
+      "bytes": 5525
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/index.ts",
+      "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+      "bytes": 233
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/owned-transition-state.ts",
+      "sha256": "ffa33cd647c3cede4b576c6fdc77bc4177a2fdfca0e28f67d96301e95965607a",
+      "bytes": 739
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/public-api.ts",
+      "sha256": "ee7d7028843ce1ea3da51a5253501a2fe7304d6ea51cfde777c97d9eb69b823b",
+      "bytes": 1269
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/_list-legacy-index.scss",
+      "sha256": "485496c0fa166356a22abddc578341169d695b85c74e2dd95b7d1b1de527d04b",
+      "bytes": 126
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/_list-theme.import.scss",
+      "sha256": "06e4658abda1f8d299fdc081ae2c7ed6abd4a4abc621ffbe8a41262f08efa202",
+      "bytes": 438
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/_list-theme.scss",
+      "sha256": "a690b04f13e970b9b2da3a151f3f948ea2a68c25a589476f82bded6d2a9817fc",
+      "bytes": 3820
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/index.ts",
+      "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+      "bytes": 233
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list-item.html",
+      "sha256": "2105cd61534fde43eccfd78c8928f322822984b0b8c8c8cc4acce521d05971c1",
+      "bytes": 431
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+      "sha256": "572b01d580e4a9c12c72278bbe11d111faafbd6a5534c1fafec0cd77a9ab5208",
+      "bytes": 1679
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list-option.html",
+      "sha256": "338ba98c19aa54346cff4efdfa91de0a091b367ac454a5fc8b50d5062a767341",
+      "bytes": 603
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list.html",
+      "sha256": "690d120c9e53da33cc3cdc95af9e6b013fcfb6caf1b99f12d754db045820ff08",
+      "bytes": 27
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list.scss",
+      "sha256": "c3c4e1ee2d36547d323c661dd2737e65d5150d414223e75a620a389a7a0b8168",
+      "bytes": 8834
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list.ts",
+      "sha256": "6c358d9985e677d5ba8037f3b9aa471d35f657a172ab789f754f41952ebd0d7e",
+      "bytes": 6980
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/public-api.ts",
+      "sha256": "8d41a1301df99bcb8b54ef437322431d3910136cf554f90550426d1b80889b00",
+      "bytes": 795
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/selection-list.ts",
+      "sha256": "e408bbc42e122dcb9197d2fb850740a9cf769d650ec70442b595428ce747c206",
+      "bytes": 24059
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+      "sha256": "3bd939280b1d80fd10f6c0ece8c434cfe2f0f369746cca7b2b3e9f8c153755ee",
+      "bytes": 35009
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss",
+      "sha256": "c953a6c0df04dd73b443548f4872f62fa0704881590ccb508bd7db7741f391fc",
+      "bytes": 975
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/bridges/_m2-system.scss",
+      "sha256": "6c9da785ea2449d2629af75e3078fde08631c59db87a3f423198444dc5b8b84d",
+      "bytes": 8191
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss",
+      "sha256": "97d4de28beacfa9229c148463b16436f5fdbf5e8905d9dc6c463c5e534da17a9",
+      "bytes": 7155
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-checkbox/_checkbox-theme.scss",
+      "sha256": "f50e3f7ec838c204e1ef92c4ceed4b6b4f4aae38602fc3a69b58e5e5c796d3f1",
+      "bytes": 4496
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-list/_list-theme.scss",
+      "sha256": "f77bb9e621f938d24bdfdbb70f6a135164e24997acfa729bce4933cbe92f8d93",
+      "bytes": 3792
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/list/_list-theme.scss",
+      "sha256": "d46fdf03a1ad4a374e5b47215dc0dee386078298b198255de4efbea8a627321e",
+      "bytes": 5085
+    }
+  ],
+  "decision": "The upstream patch narrows current MDC checkbox icon/hover selectors, replaces broad checkbox noop-animation CSS with a finite helper, and uses the helper from the peer list-option stylesheet. The owned Material-16 checkbox and list use historical markup/styles. `checkbox-theme` is an actual separate appended public current-peer bridge via `mat.checkbox-overrides`; it remains unqualified by the sample, which used `legacy-checkbox-theme`. The exported `list-theme` is a historical M2 Sass module, not in the thirteen-family contract and not a `mat.list-overrides` bridge. Do not port peer selector/helper changes into legacy CSS; no current-M2 list bridge qualification is claimed.",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "do-not-adopt",
+  "peer_coexistence_scope": "unqualified-beyond-sampled-cases",
+  "peer_coexistence_unresolved": "The actual appended public checkbox bridge was not exercised: the sample invokes legacy-checkbox-theme. If claiming its current-peer behavior, test that bridge with the min peer plus M3 in both orders across checked/indeterminate transitions and disabled/animation states. The peer list-option noop helper is source-level upstream behavior; list-theme is outside the thirteen-family bridge roster, so no legacy-list to current-list bridge obligation is asserted.",
+  "previous_ledger_entry_complete": {
+    "sha": "1b3c42e074988dc953198ac071fad1d90298efae",
+    "bucket": "needs-triage",
+    "subject": "perf(material/checkbox): Optimize more expensive selectors (#30409)",
+    "files": [
+      "src/material/checkbox/_checkbox-common.scss",
+      "src/material/list/list-option.scss"
+    ],
+    "diff_sha256": "3bb6b6630960690fcad76296cd1a9244af23a5db00957b61f518fe4d8caae698",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/1b3c42e074988dc953198ac071fad1d90298efae.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/material/checkbox/_checkbox-common.scss changes `.mdc-checkbox:hover .mdc-checkbox__native-control:not(:checked) ~ .mdc-checkbox__background,`. That line is not in the legacy sources. @angular/material/checkbox is exercised by projects/ngx-material-legacy/legacy-checkbox/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/checkbox imported by projects/ngx-material-legacy/legacy-checkbox/public-api.ts"
+    }
+  },
+  "original_reason_verbatim": "The diff in src/material/checkbox/_checkbox-common.scss changes `.mdc-checkbox:hover .mdc-checkbox__native-control:not(:checked) ~ .mdc-checkbox__background,`. That line is not in the legacy sources. @angular/material/checkbox is exercised by projects/ngx-material-legacy/legacy-checkbox/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+  "minimum_peer_source": "@angular/material 22.1.7 at e950f29dcfbda93c13bff0d1a632465364488249",
+  "tagged16_source": "Material 16.2.14 at df60e733c60e572ba538f6ad0ceff3e63e527b53",
+  "review_scope": "Complete full-index upstream patch and path census; current owned source member hashes; current minimum peer source and Material-16.2.14 source; current companion Sass bridge role. Decision applies only to the local Material-16 legacy CSS/SCSS adoption question.",
+  "coexistence_sample": {
+    "packet": "c04-owned-selectors-coexistence-v2",
+    "artifact_sha256": "877c8b62e1ea9b134d838043dda436abb4ccf9515041640fdb05dc6113727b0b",
+    "versions": {
+      "core": "22.1.7",
+      "cdk": "22.1.7",
+      "material": "22.1.7",
+      "rxjs": "7.8.2",
+      "typescript": "6.0.3",
+      "zone": "0.16.3",
+      "tslib": "2.8.1"
+    },
+    "result_sha256": "4d41e73eda42da7eeff0d2866a84f3d5a6ff9d393b5c344e783879627d153f46",
+    "scope": "sampled actual packed legacy M2 plus independent peer M3 in both style orders; does not cover all states or full G07"
+  },
+  "limitations": "Does not close current-peer CSS/state behavior, global M2/M3 coexistence, C04/G11, security or release. No complete inherited-execution claim.",
+  "sass_role_summary": {
+    "public_theme_exports": [
+      "checkbox-theme",
+      "table-theme",
+      "radio-theme",
+      "list-theme",
+      "slide-toggle-theme"
+    ],
+    "contract_roster_13": [
+      "badge",
+      "bottom-sheet",
+      "button-toggle",
+      "datepicker",
+      "divider",
+      "expansion",
+      "grid-list",
+      "icon",
+      "sidenav",
+      "stepper",
+      "sort",
+      "toolbar",
+      "tree"
+    ],
+    "checkbox_current_peer_bridge": "styles/checkbox/_checkbox-theme.scss calls @angular/material public mat.checkbox-overrides; appended beyond roster; actual bridge API retained",
+    "table_role": "styles/table/_table-theme.scss emits M2 table token values only; no mat.table-overrides; not in roster",
+    "radio_role": "radio-theme historical M2 export; no mat.radio-overrides; not in roster; legacy-radio-theme separate",
+    "list_role": "list-theme historical M2 export; no mat.list-overrides; not in roster; legacy-list-theme separate",
+    "slide_toggle_role": "slide-toggle-theme historical M2 export; no mat.slide-toggle-overrides; not in roster; legacy-slide-toggle-theme separate",
+    "bridge_aggregator": "all-current-companion-bridges contains exactly the thirteen roster entries; all-owned-component-themes calls legacy themes for these families"
+  }
+}

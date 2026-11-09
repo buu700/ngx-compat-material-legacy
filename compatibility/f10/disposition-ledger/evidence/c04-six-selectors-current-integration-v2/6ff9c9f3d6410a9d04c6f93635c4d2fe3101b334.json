@@ -1,0 +1,169 @@
+{
+  "sha": "6ff9c9f3d6410a9d04c6f93635c4d2fe3101b334",
+  "status": "reviewed",
+  "diff": "diff --git a/src/material/slide-toggle/slide-toggle.scss b/src/material/slide-toggle/slide-toggle.scss\nindex 161a2f7c4d983c97659aa0fa3006bb307bdf133a..640aad6ce4b92d61eece05cfb2dceed31e035100 100644\n--- a/src/material/slide-toggle/slide-toggle.scss\n+++ b/src/material/slide-toggle/slide-toggle.scss\n@@ -113,22 +113,22 @@ $_interactive-disabled-selector: '.mat-mdc-slide-toggle-disabled-interactive.mdc\n     }\n \n     @include token-utils.use-tokens($_mdc-slots...) {\n-      .mdc-switch:enabled:hover:not(:focus):not(:active) & {\n+      .mdc-switch:enabled:hover:not(:focus):not(:active) > & {\n         @include token-utils.create-token-slot(background, unselected-hover-track-color);\n       }\n \n-      .mdc-switch:enabled:focus:not(:active) & {\n+      .mdc-switch:enabled:focus:not(:active) > & {\n         @include token-utils.create-token-slot(background, unselected-focus-track-color);\n       }\n \n-      .mdc-switch:enabled:active & {\n+      .mdc-switch:enabled:active > & {\n         @include token-utils.create-token-slot(background, unselected-pressed-track-color);\n       }\n \n-      #{$_interactive-disabled-selector}:hover:not(:focus):not(:active) &,\n-      #{$_interactive-disabled-selector}:focus:not(:active) &,\n-      #{$_interactive-disabled-selector}:active &,\n-      .mdc-switch.mdc-switch--disabled & {\n+      #{$_interactive-disabled-selector}:hover:not(:focus):not(:active) > &,\n+      #{$_interactive-disabled-selector}:focus:not(:active) > &,\n+      #{$_interactive-disabled-selector}:active > &,\n+      .mdc-switch.mdc-switch--disabled > & {\n         @include token-utils.create-token-slot(background, disabled-unselected-track-color);\n       }\n     }\n@@ -162,22 +162,22 @@ $_interactive-disabled-selector: '.mat-mdc-slide-toggle-disabled-interactive.mdc\n     }\n \n     @include token-utils.use-tokens($_mdc-slots...) {\n-      .mdc-switch:enabled:hover:not(:focus):not(:active) & {\n+      .mdc-switch:enabled:hover:not(:focus):not(:active) > & {\n         @include token-utils.create-token-slot(background, selected-hover-track-color);\n       }\n \n-      .mdc-switch:enabled:focus:not(:active) & {\n+      .mdc-switch:enabled:focus:not(:active) > & {\n         @include token-utils.create-token-slot(background, selected-focus-track-color);\n       }\n \n-      .mdc-switch:enabled:active & {\n+      .mdc-switch:enabled:active > & {\n         @include token-utils.create-token-slot(background, selected-pressed-track-color);\n       }\n \n-      #{$_interactive-disabled-selector}:hover:not(:focus):not(:active) &,\n-      #{$_interactive-disabled-selector}:focus:not(:active) &,\n-      #{$_interactive-disabled-selector}:active &,\n-      .mdc-switch.mdc-switch--disabled & {\n+      #{$_interactive-disabled-selector}:hover:not(:focus):not(:active) > &,\n+      #{$_interactive-disabled-selector}:focus:not(:active) > &,\n+      #{$_interactive-disabled-selector}:active > &,\n+      .mdc-switch.mdc-switch--disabled > & {\n         @include token-utils.create-token-slot(background, disabled-selected-track-color);\n       }\n     }\n@@ -266,16 +266,19 @@ $_interactive-disabled-selector: '.mat-mdc-slide-toggle-disabled-interactive.mdc\n       @include token-utils.create-token-slot(height, with-icon-handle-size);\n     }\n \n-    .mat-mdc-slide-toggle .mdc-switch:active:not(.mdc-switch--disabled) & {\n+    // stylelint-disable-next-line max-line-length\n+    .mat-mdc-slide-toggle .mdc-switch:active:not(.mdc-switch--disabled) > .mdc-switch__handle-track > & {\n       @include token-utils.create-token-slot(width, pressed-handle-size);\n       @include token-utils.create-token-slot(height, pressed-handle-size);\n     }\n \n-    .mat-mdc-slide-toggle .mdc-switch--selected:active:not(.mdc-switch--disabled) & {\n+    // stylelint-disable-next-line max-line-length\n+    .mat-mdc-slide-toggle .mdc-switch--selected:active:not(.mdc-switch--disabled) > .mdc-switch__handle-track > & {\n       @include token-utils.create-token-slot(margin, selected-pressed-handle-horizontal-margin);\n     }\n \n-    .mat-mdc-slide-toggle .mdc-switch--unselected:active:not(.mdc-switch--disabled) & {\n+    // stylelint-disable-next-line max-line-length\n+    .mat-mdc-slide-toggle .mdc-switch--unselected:active:not(.mdc-switch--disabled) > .mdc-switch__handle-track > & {\n       @include token-utils.create-token-slot(margin, unselected-pressed-handle-horizontal-margin);\n     }\n \n@@ -310,46 +313,49 @@ $_interactive-disabled-selector: '.mat-mdc-slide-toggle-disabled-interactive.mdc\n \n   @include token-utils.use-tokens($_mdc-slots...) {\n     &::after {\n-      .mdc-switch--selected:enabled & {\n+      .mdc-switch--selected:enabled > .mdc-switch__handle-track > & {\n         @include token-utils.create-token-slot(background, selected-handle-color);\n       }\n \n-      .mdc-switch--selected:enabled:hover:not(:focus):not(:active) & {\n+      .mdc-switch--selected:enabled:hover:not(:focus):not(:active) > .mdc-switch__handle-track > & {\n         @include token-utils.create-token-slot(background, selected-hover-handle-color);\n       }\n \n-      .mdc-switch--selected:enabled:focus:not(:active) & {\n+      .mdc-switch--selected:enabled:focus:not(:active) > .mdc-switch__handle-track > & {\n         @include token-utils.create-token-slot(background, selected-focus-handle-color);\n       }\n \n-      .mdc-switch--selected:enabled:active & {\n+      .mdc-switch--selected:enabled:active > .mdc-switch__handle-track > & {\n         @include token-utils.create-token-slot(background, selected-pressed-handle-color);\n       }\n \n-      #{$_interactive-disabled-selector}.mdc-switch--selected:hover:not(:focus):not(:active) &,\n-      #{$_interactive-disabled-selector}.mdc-switch--selected:focus:not(:active) &,\n-      #{$_interactive-disabled-selector}.mdc-switch--selected:active &,\n-      .mdc-switch--selected.mdc-switch--disabled & {\n-        @include token-utils.create-token-slot(background, disabled-selected-handle-color);\n+      #{$_interactive-disabled-selector}.mdc-switch--selected:hover:not(:focus):not(:active),\n+      #{$_interactive-disabled-selector}.mdc-switch--selected:focus:not(:active),\n+      #{$_interactive-disabled-selector}.mdc-switch--selected:active,\n+      .mdc-switch--selected.mdc-switch--disabled {\n+        > .mdc-switch__handle-track > & {\n+          @include token-utils.create-token-slot(background, disabled-selected-handle-color);\n+        }\n       }\n \n-      .mdc-switch--unselected:enabled & {\n+      .mdc-switch--unselected:enabled > .mdc-switch__handle-track > & {\n         @include token-utils.create-token-slot(background, unselected-handle-color);\n       }\n \n-      .mdc-switch--unselected:enabled:hover:not(:focus):not(:active) & {\n+      // stylelint-disable-next-line max-line-length\n+      .mdc-switch--unselected:enabled:hover:not(:focus):not(:active) > .mdc-switch__handle-track > & {\n         @include token-utils.create-token-slot(background, unselected-hover-handle-color);\n       }\n \n-      .mdc-switch--unselected:enabled:focus:not(:active) & {\n+      .mdc-switch--unselected:enabled:focus:not(:active) > .mdc-switch__handle-track > & {\n         @include token-utils.create-token-slot(background, unselected-focus-handle-color);\n       }\n \n-      .mdc-switch--unselected:enabled:active & {\n+      .mdc-switch--unselected:enabled:active > .mdc-switch__handle-track > & {\n         @include token-utils.create-token-slot(background, unselected-pressed-handle-color);\n       }\n \n-      .mdc-switch--unselected.mdc-switch--disabled & {\n+      .mdc-switch--unselected.mdc-switch--disabled > .mdc-switch__handle-track > & {\n         @include token-utils.create-token-slot(background, disabled-unselected-handle-color);\n       }\n     }\n@@ -369,15 +375,17 @@ $_interactive-disabled-selector: '.mat-mdc-slide-toggle-disabled-interactive.mdc\n   top: 0;\n \n   @include token-utils.use-tokens($_mdc-slots...) {\n-    .mdc-switch:enabled & {\n+    .mdc-switch:enabled > .mdc-switch__handle-track > .mdc-switch__handle > & {\n       @include token-utils.create-token-slot(box-shadow, handle-elevation-shadow);\n     }\n \n-    #{$_interactive-disabled-selector}:hover:not(:focus):not(:active) &,\n-    #{$_interactive-disabled-selector}:focus:not(:active) &,\n-    #{$_interactive-disabled-selector}:active &,\n-    .mdc-switch.mdc-switch--disabled & {\n-      @include token-utils.create-token-slot(box-shadow, disabled-handle-elevation-shadow);\n+    #{$_interactive-disabled-selector}:hover:not(:focus):not(:active),\n+    #{$_interactive-disabled-selector}:focus:not(:active),\n+    #{$_interactive-disabled-selector}:active,\n+    .mdc-switch.mdc-switch--disabled {\n+      > .mdc-switch__handle-track > .mdc-switch__handle > & {\n+        @include token-utils.create-token-slot(box-shadow, disabled-handle-elevation-shadow);\n+      }\n     }\n   }\n }\n@@ -406,7 +414,7 @@ $_interactive-disabled-selector: '.mat-mdc-slide-toggle-disabled-interactive.mdc\n       display: block;\n     }\n \n-    .mdc-switch:hover & {\n+    .mdc-switch:hover > .mdc-switch__handle-track > .mdc-switch__handle > & {\n       opacity: 0.04;\n       transition: 75ms opacity cubic-bezier(0, 0, 0.2, 1);\n     }\n@@ -417,32 +425,35 @@ $_interactive-disabled-selector: '.mat-mdc-slide-toggle-disabled-interactive.mdc\n     }\n \n     @include token-utils.use-tokens($_mdc-slots...) {\n-      #{$_interactive-disabled-selector}:enabled:focus &,\n-      #{$_interactive-disabled-selector}:enabled:active &,\n-      #{$_interactive-disabled-selector}:enabled:hover:not(:focus) &,\n-      .mdc-switch--unselected:enabled:hover:not(:focus) & {\n-        @include token-utils.create-token-slot(background, unselected-hover-state-layer-color);\n+      #{$_interactive-disabled-selector}:enabled:focus,\n+      #{$_interactive-disabled-selector}:enabled:active,\n+      #{$_interactive-disabled-selector}:enabled:hover:not(:focus),\n+      .mdc-switch--unselected:enabled:hover:not(:focus) {\n+        > .mdc-switch__handle-track > .mdc-switch__handle > & {\n+          @include token-utils.create-token-slot(background, unselected-hover-state-layer-color);\n+        }\n       }\n \n-      .mdc-switch--unselected:enabled:focus & {\n+      .mdc-switch--unselected:enabled:focus > .mdc-switch__handle-track > .mdc-switch__handle > & {\n         @include token-utils.create-token-slot(background, unselected-focus-state-layer-color);\n       }\n \n-      .mdc-switch--unselected:enabled:active & {\n+      .mdc-switch--unselected:enabled:active > .mdc-switch__handle-track > .mdc-switch__handle > & {\n         @include token-utils.create-token-slot(background, unselected-pressed-state-layer-color);\n         @include token-utils.create-token-slot(opacity, unselected-pressed-state-layer-opacity);\n         transition: opacity 75ms linear;\n       }\n \n-      .mdc-switch--selected:enabled:hover:not(:focus) & {\n+      // stylelint-disable-next-line max-line-length\n+      .mdc-switch--selected:enabled:hover:not(:focus) > .mdc-switch__handle-track > .mdc-switch__handle > & {\n         @include token-utils.create-token-slot(background, selected-hover-state-layer-color);\n       }\n \n-      .mdc-switch--selected:enabled:focus & {\n+      .mdc-switch--selected:enabled:focus > .mdc-switch__handle-track > .mdc-switch__handle > & {\n         @include token-utils.create-token-slot(background, selected-focus-state-layer-color);\n       }\n \n-      .mdc-switch--selected:enabled:active & {\n+      .mdc-switch--selected:enabled:active > .mdc-switch__handle-track > .mdc-switch__handle > & {\n         @include token-utils.create-token-slot(background, selected-pressed-state-layer-color);\n         @include token-utils.create-token-slot(opacity, selected-pressed-state-layer-opacity);\n         transition: opacity 75ms linear;\n",
+  "diff_sha256": "fa6a95b8ef1663a2f900f7db70b117127d6b02b5651d94de2a9f52e255d8756a",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/_index.scss",
+      "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+      "bytes": 14151
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/_slide-toggle-legacy-index.scss",
+      "sha256": "768410daf0722c0975c563661f32c79bd11324639464d53c19a6226c5dbcb14a",
+      "bytes": 191
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/_slide-toggle-theme.import.scss",
+      "sha256": "d71a803a5767dc67c642998aea2063930b1ac6408b7fbd9b33de32f808ab83e6",
+      "bytes": 509
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/_slide-toggle-theme.scss",
+      "sha256": "394431d47c92d56d2e0769a46797d0c44877e50f6233e963352729b3423ccba2",
+      "bytes": 4261
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/index.ts",
+      "sha256": "6d5bb470a16548906aa11ad61ef9424e6b5d8f241df971d7860d5c540c3c83e7",
+      "bytes": 233
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/public-api.ts",
+      "sha256": "b6c96f9c4fdfc31b72ee8a4b652d5b2fdab84337a3ad7e79e2cd82ac1da221af",
+      "bytes": 929
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle-config.ts",
+      "sha256": "a49eb76f4b1e58c1b696038d628a54b8469d09dd4f40b411bda062f73433f55c",
+      "bytes": 957
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle-module.ts",
+      "sha256": "f37d9867dee837fe7599b855498f9014ff56fee7f2f6e32ead62770188a115a0",
+      "bytes": 957
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.html",
+      "sha256": "aa441ced1917ab6b29a83948533f85c8ceb62c373866460d56e59cfca5a2fabd",
+      "bytes": 1596
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.scss",
+      "sha256": "265d77ab1edc213deb0bc64307bed30ef1cce761efa09faeaf826bc3b73c5b18",
+      "bytes": 6572
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.ts",
+      "sha256": "2e0a9754b883f36fd8a8d146515c76fc3883d643794ccb524c9226b309bbbc74",
+      "bytes": 5716
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+      "sha256": "3bd939280b1d80fd10f6c0ece8c434cfe2f0f369746cca7b2b3e9f8c153755ee",
+      "bytes": 35009
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss",
+      "sha256": "c953a6c0df04dd73b443548f4872f62fa0704881590ccb508bd7db7741f391fc",
+      "bytes": 975
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/bridges/_m2-system.scss",
+      "sha256": "6c9da785ea2449d2629af75e3078fde08631c59db87a3f423198444dc5b8b84d",
+      "bytes": 8191
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-slide-toggle/_slide-toggle-theme.scss",
+      "sha256": "6ba26ba5cf2851a8c7f5f2dd32ba7813bee90bfcf60ddd6aba0e5db87e01f71f",
+      "bytes": 4226
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/slide-toggle/_slide-toggle-theme.scss",
+      "sha256": "aedceb0a0165c296ad00e875a3fe8313c08936e468a67d8acc812832cc5f507e",
+      "bytes": 3205
+    }
+  ],
+  "decision": "The upstream patch experiments with direct MDC switch handle paths. The owned Material-16 slide-toggle CSS uses historical `.mat-slide-toggle-*` roles. The package exports a historical M2 `slide-toggle-theme`, but slide-toggle is outside the thirteen-family current-companion roster and the module has no `mat.slide-toggle-overrides` call; `legacy-slide-toggle-theme` is the owned legacy theme. The selector experiment is reverted before v22.1.7, so its intermediate state is absent at the minimum. Do not port it to legacy CSS; no current-peer behavior for the intermediate selector is claimed.",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "do-not-adopt",
+  "peer_coexistence_scope": "unqualified-beyond-sampled-cases",
+  "peer_coexistence_unresolved": "The exact selector experiment is absent from minimum peer source after the recorded revert. `slide-toggle-theme` is a historical M2 export, not a supported current-peer companion; no current-peer state test for that intermediate source is claimed.",
+  "previous_ledger_entry_complete": {
+    "sha": "6ff9c9f3d6410a9d04c6f93635c4d2fe3101b334",
+    "bucket": "needs-triage",
+    "subject": "perf(material/slide-toggle): Optimize :state descendant selectors (#30521)",
+    "files": [
+      "src/material/slide-toggle/slide-toggle.scss"
+    ],
+    "diff_sha256": "f6a77db35e2d05d23e300fa3e61e9ad5df3a9234c26a7e395dd4b69916ad4544",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/6ff9c9f3d6410a9d04c6f93635c4d2fe3101b334.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/material/slide-toggle/slide-toggle.scss changes `.mdc-switch:enabled:hover:not(:focus):not(:active) & {`. That line is not in the legacy sources. @angular/material/slide-toggle is exercised by projects/ngx-material-legacy/legacy-slide-toggle/testing/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/slide-toggle imported by projects/ngx-material-legacy/legacy-slide-toggle/testing/public-api.ts"
+    }
+  },
+  "original_reason_verbatim": "The diff in src/material/slide-toggle/slide-toggle.scss changes `.mdc-switch:enabled:hover:not(:focus):not(:active) & {`. That line is not in the legacy sources. @angular/material/slide-toggle is exercised by projects/ngx-material-legacy/legacy-slide-toggle/testing/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+  "minimum_peer_source": "@angular/material 22.1.7 at e950f29dcfbda93c13bff0d1a632465364488249",
+  "tagged16_source": "Material 16.2.14 at df60e733c60e572ba538f6ad0ceff3e63e527b53",
+  "review_scope": "Complete full-index upstream patch and path census; current owned source member hashes; current minimum peer source and Material-16.2.14 source; current companion Sass bridge role. Decision applies only to the local Material-16 legacy CSS/SCSS adoption question.",
+  "coexistence_sample": {
+    "packet": "c04-owned-selectors-coexistence-v2",
+    "artifact_sha256": "877c8b62e1ea9b134d838043dda436abb4ccf9515041640fdb05dc6113727b0b",
+    "versions": {
+      "core": "22.1.7",
+      "cdk": "22.1.7",
+      "material": "22.1.7",
+      "rxjs": "7.8.2",
+      "typescript": "6.0.3",
+      "zone": "0.16.3",
+      "tslib": "2.8.1"
+    },
+    "result_sha256": "4d41e73eda42da7eeff0d2866a84f3d5a6ff9d393b5c344e783879627d153f46",
+    "scope": "sampled actual packed legacy M2 plus independent peer M3 in both style orders; does not cover all states or full G07"
+  },
+  "limitations": "Does not close current-peer CSS/state behavior, global M2/M3 coexistence, C04/G11, security or release. No complete inherited-execution claim.",
+  "sass_role_summary": {
+    "public_theme_exports": [
+      "checkbox-theme",
+      "table-theme",
+      "radio-theme",
+      "list-theme",
+      "slide-toggle-theme"
+    ],
+    "contract_roster_13": [
+      "badge",
+      "bottom-sheet",
+      "button-toggle",
+      "datepicker",
+      "divider",
+      "expansion",
+      "grid-list",
+      "icon",
+      "sidenav",
+      "stepper",
+      "sort",
+      "toolbar",
+      "tree"
+    ],
+    "checkbox_current_peer_bridge": "styles/checkbox/_checkbox-theme.scss calls @angular/material public mat.checkbox-overrides; appended beyond roster; actual bridge API retained",
+    "table_role": "styles/table/_table-theme.scss emits M2 table token values only; no mat.table-overrides; not in roster",
+    "radio_role": "radio-theme historical M2 export; no mat.radio-overrides; not in roster; legacy-radio-theme separate",
+    "list_role": "list-theme historical M2 export; no mat.list-overrides; not in roster; legacy-list-theme separate",
+    "slide_toggle_role": "slide-toggle-theme historical M2 export; no mat.slide-toggle-overrides; not in roster; legacy-slide-toggle-theme separate",
+    "bridge_aggregator": "all-current-companion-bridges contains exactly the thirteen roster entries; all-owned-component-themes calls legacy themes for these families"
+  }
+}
