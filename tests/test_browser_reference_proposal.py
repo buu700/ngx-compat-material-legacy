@@ -4,10 +4,11 @@
 """Independent full-image derivation and real source/proposal failure controls."""
 from pathlib import Path
 import hashlib,json,os,subprocess,unittest
+from browser_reference_owned_process import run_owned
 ROOT=Path(__file__).resolve().parents[1]
 class BrowserReferenceProposalTests(unittest.TestCase):
     def test_independent_python_token_splice_and_protected_canonical(self):
-        child=subprocess.run(['python3','-B','tests/browser_reference_independent.py','--metadata'],cwd=ROOT,capture_output=True,text=True,timeout=300)
+        child=run_owned(['python3','-B','tests/browser_reference_independent.py','--metadata'],cwd=ROOT,timeout=300)
         self.assertEqual(child.returncode,0,(child.stdout+child.stderr)[-8000:]);report=json.loads(child.stdout)
         packet=json.loads((ROOT/'compatibility/rc/c04-browser-reference-proposal.json').read_bytes())
         self.assertEqual(report['independent_after_sha256'],packet['after_ledger']['sha256'])
@@ -24,7 +25,7 @@ class BrowserReferenceProposalTests(unittest.TestCase):
     def test_actual_verifier_and_exact_complete_proposal_controls(self):
         command=['node','tests/browser_reference_proposal_probe.mjs']
         if os.environ.get('BROWSER_REFERENCE_PROPOSAL_REPORT'):command.append(os.environ['BROWSER_REFERENCE_PROPOSAL_REPORT'])
-        child=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=180)
+        child=run_owned(command,cwd=ROOT,timeout=180)
         self.assertEqual(child.returncode,0,(child.stdout+child.stderr)[-8000:]);report=json.loads(child.stdout)
         self.assertEqual(report['result'],'pass');self.assertEqual(report['partial_updates_rejected'],report['metadata_reference_updates'])
         self.assertEqual(report['preserved_reference_mutants_rejected'],8)

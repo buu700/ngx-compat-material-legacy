@@ -45,9 +45,11 @@ with TemporaryDirectory(prefix='tooltip-source-program-py-') as temporary:
     browser = json.loads(read(browser_path))
     independent_path = 'compatibility/rc/main-browser-independent-terminal-source-routing-v14.json'
     independent = json.loads(read(independent_path))
-    updates = packet['updates'] + graph['updates'] + contracts['updates'] + test['updates'] + inspection['updates'] + stage['updates'] + guard_tests['updates'] + comparison['updates'] + [comparison['source_owner_update']] + context['updates'] + [context['source_owner_update']] + browser['updates'] + independent['updates']
+    cold_path = 'compatibility/rc/main-browser-cold-fault-source-routing-v15.json'
+    cold = json.loads(read(cold_path))
+    updates = packet['updates'] + graph['updates'] + contracts['updates'] + test['updates'] + inspection['updates'] + stage['updates'] + guard_tests['updates'] + comparison['updates'] + [comparison['source_owner_update']] + context['updates'] + [context['source_owner_update']] + browser['updates'] + independent['updates'] + cold['updates']
     latest = {row['path']: row['after'] for row in updates}
-    assert (len(scope.bound), len(scope.transitions)) == (529, 112)
+    assert (len(scope.bound), len(scope.transitions)) == (534, 112)
     for update in updates:
         for ref in (update['before'], update['after']):
             assert scope.qualify(ref) == latest[update['path']]
@@ -56,8 +58,8 @@ with TemporaryDirectory(prefix='tooltip-source-program-py-') as temporary:
             try: scope.qualify(dict(ref, bytes=ref['bytes'] + 1))
             except AssertionError: pass
             else: raise AssertionError('wrong program length accepted')
-    targets = list(dict.fromkeys([packet_path, graph_path, contract_path, test_path, inspection_path, stage_path, guard_test_path, comparison_path, context_path, browser_path, independent_path, test['source_anchor']['packet']['path'], *[row['path'] for row in updates],
-        *[row['path'] for row in packet['support']], *[row['path'] for row in graph['support']]]))
+    targets = list(dict.fromkeys([packet_path, graph_path, contract_path, test_path, inspection_path, stage_path, guard_test_path, comparison_path, context_path, browser_path, independent_path, cold_path, test['source_anchor']['packet']['path'], *[row['path'] for row in updates],
+        *[row['path'] for row in packet['support']], *[row['path'] for row in graph['support']], *[row['path'] for row in cold['support']]]))
     for path in targets:
         target = root / path; saved = read(path)
         try:
@@ -68,12 +70,13 @@ with TemporaryDirectory(prefix='tooltip-source-program-py-') as temporary:
                 else: raise AssertionError('changed physical program input accepted: ' + path)
         finally: target.write_bytes(saved)
         scope.assert_current()
-    for program_path in latest:
+    reader_targets = list(dict.fromkeys([*latest, *[row['path'] for row in cold['support']]]))
+    for program_path in reader_targets:
         try: CurrentSassToolReferences(root, read=lambda path: b'not the physical source' if path == program_path else read(path))
         except AssertionError: pass
         else: raise AssertionError('nonphysical supplied program input accepted')
     print(json.dumps(dict(result='pass', bound=scope.bound, transitions=scope.transitions,
         program_reference_checks=len(updates) * 2, unique_program_images=len({ref['sha256'] for row in updates for ref in (row['before'], row['after'])}),
         physical_cold_late_recovery_targets=len(targets),
-        bad_supplied_program_readers_rejected=len(latest), historical_programs_executed=False,
+        bad_supplied_program_readers_rejected=len(reader_targets), historical_programs_executed=False,
         artifact_or_audit_admission_granted=False)))

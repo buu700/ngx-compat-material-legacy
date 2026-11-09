@@ -348,6 +348,43 @@ class CurrentSassToolReferences:
         checker_context_before = {}
         browser_owner_programs = {}
         independent_programs = {}
+        cold_programs = {}
+        if self.line == 'main':
+            p = json.loads(self._member(dict(path='compatibility/rc/main-browser-cold-fault-source-routing-v15.json', sha256='18cd12cfc56e47cc5ea4d7d93363a972c1af691423408fb45637619e99b564e6', bytes=12895)))
+            assert p['schema_version'] == 1 and p['role'] == 'main-browser-cold-fault-source-routing'
+            assert p['base_head'] == 'fe7bbe6cdb1fea0f7b574a680726b5d677b2749f'
+            assert p['previous_packet'] == dict(path='compatibility/rc/main-browser-independent-terminal-source-routing-v14.json', sha256='5d81b11b54001f750889df5bc4c4d7cdb3723eaf9c483a3c027a9b8969286caf', bytes=15493)
+            assert p['product_paths'] == []
+            paths = ['tests/browser_reference_source_probe.mjs', 'tests/test_browser_reference_source.py', 'tests/test_browser_reference_proposal.py', 'tests/test_retained_landscape_tool_replay.py']
+            assert [row['path'] for row in p['updates']] == paths
+            assert [row['path'] for row in p['support']] == ['tests/browser_reference_owned_process.py', 'tests/test_browser_reference_owned_process.py', 'tests/browser_reference_cold_partition_protocol.mjs', 'tests/browser_reference_cold_lifecycle.mjs']
+            for support in p['support']: self._member(support)
+            for key, value in dict(source_scope_only=True, cold_worker_count=4,
+                                  cold_constructions_parallelized=True, ordered_same_subject_late_loop_preserved=True,
+                                  full_fault_lifetimes_preserved=True, own_process_groups_only=True,
+                                  original_deadlines_preserved=True, root_transaction_policy_changed=False,
+                                  historical_programs_executed=False, historical_packets_rewritten=False,
+                                  original_ledger_metadata_recipe_changed=False, source_judgments_changed=0,
+                                  css_or_artifact_admission_granted=False, artifact_or_audit_admission_granted=False,
+                                  g11_claim='not-passed').items():
+                assert p[key] == value
+            comparison_env = dict(PATH=os.environ['PATH'], GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null',
+                                  GIT_NO_LAZY_FETCH='1', GIT_NO_REPLACE_OBJECTS='1', GIT_TERMINAL_PROMPT='0')
+            subprocess.check_call(['git', '--no-replace-objects', 'merge-base', '--is-ancestor', p['base_head'], 'HEAD'], cwd=self.root, env=comparison_env)
+            originals = _git_images(self.root, [dict(commit=p['base_head'], path=path) for path in paths])
+            for update in p['updates']:
+                assert update['before']['path'] == update['after']['path'] == update['path']
+                before = originals[(p['base_head'], update['path'])]; _matches(before, update['before'])
+                after = _edited(before, update['edits']); _matches(after, update['after'])
+                assert self._member(update['after']) == after
+                cold_programs[update['path']] = (update, [(update['before'], before), (update['after'], after)])
+        def cold_data(ref):
+            overlay = cold_programs.get(ref['path'])
+            if overlay is None: return self._member(ref)
+            update, identities = overlay; meta = _metadata(ref)
+            found = [raw for identity, raw in identities if identity == meta]
+            assert len(found) == 1, 'unknown cold fault program'
+            self._member(update['after']); return bytes(found[0])
         if self.line == 'main':
             p = json.loads(self._member(dict(path='compatibility/rc/main-browser-independent-terminal-source-routing-v14.json',
                 sha256='5d81b11b54001f750889df5bc4c4d7cdb3723eaf9c483a3c027a9b8969286caf', bytes=15493)))
@@ -373,15 +410,15 @@ class CurrentSassToolReferences:
                 assert update['before']['path'] == update['after']['path'] == update['path']
                 before = originals[(p['base_head'], update['path'])]; _matches(before, update['before'])
                 after = _edited(before, update['edits']); _matches(after, update['after'])
-                assert self._member(update['after']) == after
+                assert cold_data(update['after']) == after
                 independent_programs[update['path']] = (update, [(update['before'], before), (update['after'], after)])
         def independent_data(ref):
             overlay = independent_programs.get(ref['path'])
-            if overlay is None: return self._member(ref)
+            if overlay is None: return cold_data(ref)
             update, identities = overlay; meta = _metadata(ref)
             found = [raw for identity, raw in identities if identity == meta]
             assert len(found) == 1, 'unknown independent checker program'
-            self._member(update['after']); return bytes(found[0])
+            cold_data(update['after']); return bytes(found[0])
         if self.line == 'main':
             p = json.loads(self._member(dict(path='compatibility/rc/main-browser-private-owner-source-routing-v13.json',
                 sha256='e93f90dbb4bf9c546b9c411398037dd98e381b88069714f047d2cfa9db9bbcda', bytes=45174)))
@@ -744,7 +781,7 @@ class CurrentSassToolReferences:
             assert routing_packet['schema_version']==1 and routing_packet['role']=='main-current-inventory-source-routing' and routing_packet['base_head']=='54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0'
             assert routing_packet['source_scope_only'] is True and routing_packet['historical_programs_executed'] is False and routing_packet['historical_packets_rewritten'] is False and routing_packet['artifact_or_audit_admission_granted'] is False and routing_packet['g11_claim']=='not-passed'
             routing_paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];assert [row['path'] for row in routing_packet['updates']]==routing_paths
-            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='4b8eda614e9c90aef6242c9a85961e6d58a42fc376e503737967db2b28104dd0',bytes=38456))
+            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='fb1de02c5736bf53ff3d6293b2157c897c2c6cdafe8e43fe255e07f4c6b7aea4',bytes=41205))
             routing_env=dict(PATH=os.environ['PATH'],GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0');subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',routing_packet['base_head'],'HEAD'],cwd=self.root,env=routing_env)
             routing_originals=_git_images(self.root,[dict(commit=routing_packet['base_head'],path=routing_path) for routing_path in routing_paths])
             routing_next=json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v3.json',sha256='d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b',bytes=13219)))
@@ -1171,6 +1208,12 @@ class CurrentSassToolReferences:
             prior = domain_overlays.get(path)
             if prior is not None:
                 assert prior[0]['after'] == update['before'], 'independent checker program must follow exact source frame'
+                domain_overlays[path] = ({**prior[0], 'after': update['after']}, prior[1] + identities)
+            else: domain_overlays[path] = (update, identities)
+        for path, (update, identities) in cold_programs.items():
+            prior = domain_overlays.get(path)
+            if prior is not None:
+                assert prior[0]['after'] == update['before'], 'cold fault program must follow exact source frame'
                 domain_overlays[path] = ({**prior[0], 'after': update['after']}, prior[1] + identities)
             else: domain_overlays[path] = (update, identities)
         inventory_prior = dict(path='testing/legacy-runner/historical-inventory.json', sha256='a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403', bytes=106309)

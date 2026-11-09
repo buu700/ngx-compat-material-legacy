@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "role": "main-browser-cold-fault-source-routing",
+  "base_head": "fe7bbe6cdb1fea0f7b574a680726b5d677b2749f",
+  "previous_packet": {
+    "path": "compatibility/rc/main-browser-independent-terminal-source-routing-v14.json",
+    "sha256": "5d81b11b54001f750889df5bc4c4d7cdb3723eaf9c483a3c027a9b8969286caf",
+    "bytes": 15493
+  },
+  "updates": [
+    {
+      "path": "tests/browser_reference_source_probe.mjs",
+      "before": {
+        "path": "tests/browser_reference_source_probe.mjs",
+        "sha256": "66fd7d05b55ab8ad1a36f951e3689923645b3561dcc7733fee1eed962f589a92",
+        "bytes": 8252
+      },
+      "after": {
+        "path": "tests/browser_reference_source_probe.mjs",
+        "sha256": "e45e5ae83e6030f0cb63944daf5e4897d75485ef51e998c18bc34de1d4ddd4dd",
+        "bytes": 13350
+      },
+      "edits": [
+        {
+          "offset": 382,
+          "before": "",
+          "after": "import {spawn} from 'node:child_process';\n"
+        },
+        {
+          "offset": 1116,
+          "before": "",
+          "after": "// The child protocol is deliberately not the public report schema.\nconst WORKERS=4,MAX_OUTPUT=4*1024*1024;\nfunction partitionIndices(length,part){\n assert.ok(Number.isSafeInteger(length)&&length>=0);assert.ok(Number.isSafeInteger(part)&&part>=0&&part<WORKERS);\n return Array.from({length},(_,index)=>index).filter(index=>index%WORKERS===part);\n}\nfunction validateColdPartition(result,part,roster,report){\n assert.equal(result.error,null);assert.equal(result.code,0);assert.equal(result.signal,null);assert.equal(result.stderr,'');\n const parsed=JSON.parse(result.stdout);assert.equal(result.stdout,JSON.stringify(parsed)+'\\n','unexpected child output');\n assert.deepEqual(Object.keys(parsed).sort(),['indices','kind','line','report','roster'].sort());\n assert.equal(parsed.kind,'private-cold-partition-v1');assert.equal(parsed.line,report.line);\n assert.deepEqual(parsed.roster,roster);assert.deepEqual(parsed.report,report);\n assert.deepEqual(parsed.indices,partitionIndices(roster.length,part));\n return parsed.indices;\n}\nfunction startColdPool(){\n const workers=[];\n for(let part=0;part<WORKERS;part++){\n  const child=spawn(process.execPath,[fileURLToPath(import.meta.url),'--internal-cold-partition',String(part)],{cwd:root,stdio:['ignore','pipe','pipe','ipc']});\n  let stdout='',stderr='',error=null,bytes=0;\n  const collect=(stream,isError)=>stream.on('data',chunk=>{\n   bytes+=chunk.length;if(bytes>MAX_OUTPUT){error='child output exceeds limit';child.kill();return;}\n   if(isError)stderr+=chunk.toString('utf8');else stdout+=chunk.toString('utf8');\n  });\n  collect(child.stdout,false);collect(child.stderr,true);\n  const finished=new Promise(resolve=>{\n   child.on('error',failure=>{error=String(failure);});\n   child.on('close',(code,signal)=>resolve({code,signal,stdout,stderr,error}));\n  });\n  workers.push({child,finished});\n }\n return workers;\n}\nasync function stopColdPool(workers){\n for(const {child} of workers)if(child.exitCode===null&&child.signalCode===null)child.kill('SIGTERM');\n const all=Promise.all(workers.map(({finished})=>finished));\n let timer;\n const timeout=new Promise(resolve=>{timer=setTimeout(()=>resolve(false),250);});\n const complete=await Promise.race([all.then(()=>true),timeout]);clearTimeout(timer);\n if(!complete){\n  for(const {child} of workers)if(child.exitCode===null&&child.signalCode===null)child.kill('SIGKILL');\n  await all;\n }\n}\nfunction requireWorkerParent(){\n assert.equal(typeof process.send,'function','worker requires parent IPC');\n assert.equal(process.connected,true,'worker requires live parent IPC');\n const lostParent=()=>process.exit(1);process.once('disconnect',lostParent);return lostParent;\n}\nconst args=process.argv.slice(2);\nconst worker=args[0]==='--internal-cold-partition';\nif(worker){\n const lostParent=requireWorkerParent();\n assert.equal(args.length,2);assert.match(args[1],/^[0-3]$/);const part=Number(args[1]);\n let tamper=null;const read=path=>{const raw=readCheckerOwnerMember(root,path);return path===tamper?Buffer.concat([raw,Buffer.from(' ')]):raw;};\n const before=read('compatibility/f10/disposition-ledger/ledger.json'),subject=inspectBrowserReferenceSource({root,read});\n const roster=structuredClone(subject.bound),report=structuredClone(subject.report);\n assert.equal(new Set(roster.map(ref=>ref.path)).size,roster.length);subject.assertCurrent();\n const indices=partitionIndices(roster.length,part);\n for(const index of indices){const ref=roster[index];try{tamper=ref.path;assert.throws(()=>inspectBrowserReferenceSource({root,read}),undefined,'cold '+ref.path);}finally{tamper=null;}await new Promise(resolve=>setImmediate(resolve));}\n subject.assertCurrent();assert.ok(before.equals(read('compatibility/f10/disposition-ledger/ledger.json')));\n await new Promise((resolve,reject)=>process.stdout.write(JSON.stringify({kind:'private-cold-partition-v1',line:report.line,roster,report,indices})+'\\n',error=>error?reject(error):resolve()));\n process.removeListener('disconnect',lostParent);process.disconnect();\n}else{\n"
+        },
+        {
+          "offset": 1171,
+          "before": "const args=process.argv.slice(2),sourceOnly=args[0]==='--source-metadata';if(sourceOnly)args.shift();\n",
+          "after": "const sourceOnly=args[0]==='--source-metadata';if(sourceOnly)args.shift();\n"
+        },
+        {
+          "offset": 1750,
+          "before": "  for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+ref.path);late++;latePaths.push(ref.path);tamper=null;}\n  for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>inspectBrowserReferenceSource({root,read}),undefined,'cold '+ref.path);cold++;coldPaths.push(ref.path);tamper=null;}\n  assert.deepEqual(latePaths,subject.bound.map(ref=>ref.path));assert.deepEqual(coldPaths,subject.bound.map(ref=>ref.path));\n",
+          "after": "  const roster=structuredClone(subject.bound),semantic=structuredClone(subject.report);\n  assert.equal(new Set(roster.map(ref=>ref.path)).size,roster.length);\n  const workers=startColdPool();\n  const onExit=()=>{for(const {child} of workers)if(child.exitCode===null&&child.signalCode===null)child.kill();};\n  const onInterrupt=async signal=>{await stopColdPool(workers);process.exit(signal==='SIGINT'?130:143);};\n  const onInt=()=>{void onInterrupt('SIGINT');},onTerm=()=>{void onInterrupt('SIGTERM');};\n  process.once('exit',onExit);process.once('SIGINT',onInt);process.once('SIGTERM',onTerm);\n  try{\n   for(const ref of subject.bound){try{tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+ref.path);late++;latePaths.push(ref.path);}finally{tamper=null;}}\n   const seen=new Set();\n   await Promise.all(workers.map(async ({finished},part)=>{\n    const result=await finished;\n    for(const index of validateColdPartition(result,part,roster,semantic)){\n     assert.ok(Number.isSafeInteger(index)&&index>=0&&index<roster.length&&!seen.has(index));seen.add(index);\n    }\n   }));\n   assert.equal(seen.size,roster.length);\n   for(let index=0;index<roster.length;index++){assert.ok(seen.has(index));cold++;coldPaths.push(roster[index].path);}\n   assert.deepEqual(latePaths,subject.bound.map(ref=>ref.path));assert.deepEqual(coldPaths,subject.bound.map(ref=>ref.path));\n  }finally{\n   await stopColdPool(workers);process.removeListener('exit',onExit);process.removeListener('SIGINT',onInt);process.removeListener('SIGTERM',onTerm);\n  }\n"
+        },
+        {
+          "offset": 8252,
+          "before": "",
+          "after": "\n}\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_browser_reference_source.py",
+      "before": {
+        "path": "tests/test_browser_reference_source.py",
+        "sha256": "798f7a2f0754aa05afabc629b4762632118713992f384f4e8232920824ac30ae",
+        "bytes": 3264
+      },
+      "after": {
+        "path": "tests/test_browser_reference_source.py",
+        "sha256": "a32e9e7ad33a8e13ff7639ea96d529f4d9f4c520c796e709a72c0d76531e8a07",
+        "bytes": 3909
+      },
+      "edits": [
+        {
+          "offset": 299,
+          "before": "",
+          "after": "from browser_reference_owned_process import run_owned\n"
+        },
+        {
+          "offset": 665,
+          "before": "        child=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=300)\n",
+          "after": "        child=run_owned(command,cwd=ROOT,timeout=300)\n"
+        },
+        {
+          "offset": 2122,
+          "before": "",
+          "after": "    def test_cold_partition_protocol_controls(self):\n        child=subprocess.run(['node','tests/browser_reference_cold_partition_protocol.mjs'],cwd=ROOT,capture_output=True,text=True,timeout=10)\n        self.assertEqual(child.returncode,0,child.stdout+child.stderr)\n        self.assertEqual(json.loads(child.stdout)['result'],'pass')\n\n    def test_cold_worker_lifecycle_controls(self):\n        child=run_owned(['node','tests/browser_reference_cold_lifecycle.mjs'],cwd=ROOT,timeout=10)\n        self.assertEqual(child.returncode,0,child.stdout+child.stderr)\n        self.assertEqual(json.loads(child.stdout)['result'],'pass')\n\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_browser_reference_proposal.py",
+      "before": {
+        "path": "tests/test_browser_reference_proposal.py",
+        "sha256": "269e66d49932df04570bf5e255aa11d77690a077f950ff356a6af944ac5c006d",
+        "bytes": 3869
+      },
+      "after": {
+        "path": "tests/test_browser_reference_proposal.py",
+        "sha256": "bf54b6b118e7939b35da8625a7b19cfe8b6438c007d491088e90c02f6bc9a099",
+        "bytes": 3853
+      },
+      "edits": [
+        {
+          "offset": 298,
+          "before": "",
+          "after": "from browser_reference_owned_process import run_owned\n"
+        },
+        {
+          "offset": 471,
+          "before": "        child=subprocess.run(['python3','-B','tests/browser_reference_independent.py','--metadata'],cwd=ROOT,capture_output=True,text=True,timeout=300)\n",
+          "after": "        child=run_owned(['python3','-B','tests/browser_reference_independent.py','--metadata'],cwd=ROOT,timeout=300)\n"
+        },
+        {
+          "offset": 2606,
+          "before": "        child=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=180)\n",
+          "after": "        child=run_owned(command,cwd=ROOT,timeout=180)\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_retained_landscape_tool_replay.py",
+      "before": {
+        "path": "tests/test_retained_landscape_tool_replay.py",
+        "sha256": "2f9f87dbb143c681254c39dd5f13271cfdbbb82cf18f032d5a428f7ce89b9df3",
+        "bytes": 2060
+      },
+      "after": {
+        "path": "tests/test_retained_landscape_tool_replay.py",
+        "sha256": "bb800e44bf36974ef10d16c6ffc61d471f4f2e1dba2c8b23c2434007d3740104",
+        "bytes": 2060
+      },
+      "edits": [
+        {
+          "offset": 1245,
+          "before": "                self.assertEqual((len(row['bound']),len(row['transitions'])),(529,112))\n",
+          "after": "                self.assertEqual((len(row['bound']),len(row['transitions'])),(534,112))\n"
+        },
+        {
+          "offset": 1973,
+          "before": "            self.assertEqual(len(shared[0]),527);self.assertEqual(shared[0],shared[1])\n",
+          "after": "            self.assertEqual(len(shared[0]),532);self.assertEqual(shared[0],shared[1])\n"
+        }
+      ]
+    }
+  ],
+  "support": [
+    {
+      "path": "tests/browser_reference_owned_process.py",
+      "sha256": "02c1aec73680f02c0f25e7fb2237f883197a171dbbd0dcfaf0e0e4c443ba3f0f",
+      "bytes": 3884
+    },
+    {
+      "path": "tests/test_browser_reference_owned_process.py",
+      "sha256": "b8f098e67e323b5d9e8bcb3d8a5f2e70f4655150cee62dc7d8dbd6a76d37ee36",
+      "bytes": 14026
+    },
+    {
+      "path": "tests/browser_reference_cold_partition_protocol.mjs",
+      "sha256": "d22e63a127b73e38a8943fd2537c7689b33a67d66077d1989799a8ed5cd5fed8",
+      "bytes": 1998
+    },
+    {
+      "path": "tests/browser_reference_cold_lifecycle.mjs",
+      "sha256": "946f264cc1f951e1e9ebdbb6cc4b527d26fd87173c26b95e1ec71529244ccb3f",
+      "bytes": 4019
+    }
+  ],
+  "product_paths": [],
+  "source_scope_only": true,
+  "cold_worker_count": 4,
+  "cold_constructions_parallelized": true,
+  "ordered_same_subject_late_loop_preserved": true,
+  "full_fault_lifetimes_preserved": true,
+  "own_process_groups_only": true,
+  "original_deadlines_preserved": true,
+  "root_transaction_policy_changed": false,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "original_ledger_metadata_recipe_changed": false,
+  "source_judgments_changed": 0,
+  "css_or_artifact_admission_granted": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed"
+}

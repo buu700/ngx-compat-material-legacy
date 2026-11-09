@@ -8,6 +8,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
+import {spawn} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -18,17 +19,100 @@ import {requiredProbeSource,candidateInstallSpec} from '../scripts/browser-requi
 import {browserPeerVersions} from '../scripts/browser-peer-versions.mjs';
 import {legacyDialogTitleLifetimeNativeOkay as okay} from '../scripts/dialog-title-lifetime-fixture.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),hash=raw=>createHash('sha256').update(raw).digest('hex');
+// The child protocol is deliberately not the public report schema.
+const WORKERS=4,MAX_OUTPUT=4*1024*1024;
+function partitionIndices(length,part){
+ assert.ok(Number.isSafeInteger(length)&&length>=0);assert.ok(Number.isSafeInteger(part)&&part>=0&&part<WORKERS);
+ return Array.from({length},(_,index)=>index).filter(index=>index%WORKERS===part);
+}
+function validateColdPartition(result,part,roster,report){
+ assert.equal(result.error,null);assert.equal(result.code,0);assert.equal(result.signal,null);assert.equal(result.stderr,'');
+ const parsed=JSON.parse(result.stdout);assert.equal(result.stdout,JSON.stringify(parsed)+'\n','unexpected child output');
+ assert.deepEqual(Object.keys(parsed).sort(),['indices','kind','line','report','roster'].sort());
+ assert.equal(parsed.kind,'private-cold-partition-v1');assert.equal(parsed.line,report.line);
+ assert.deepEqual(parsed.roster,roster);assert.deepEqual(parsed.report,report);
+ assert.deepEqual(parsed.indices,partitionIndices(roster.length,part));
+ return parsed.indices;
+}
+function startColdPool(){
+ const workers=[];
+ for(let part=0;part<WORKERS;part++){
+  const child=spawn(process.execPath,[fileURLToPath(import.meta.url),'--internal-cold-partition',String(part)],{cwd:root,stdio:['ignore','pipe','pipe','ipc']});
+  let stdout='',stderr='',error=null,bytes=0;
+  const collect=(stream,isError)=>stream.on('data',chunk=>{
+   bytes+=chunk.length;if(bytes>MAX_OUTPUT){error='child output exceeds limit';child.kill();return;}
+   if(isError)stderr+=chunk.toString('utf8');else stdout+=chunk.toString('utf8');
+  });
+  collect(child.stdout,false);collect(child.stderr,true);
+  const finished=new Promise(resolve=>{
+   child.on('error',failure=>{error=String(failure);});
+   child.on('close',(code,signal)=>resolve({code,signal,stdout,stderr,error}));
+  });
+  workers.push({child,finished});
+ }
+ return workers;
+}
+async function stopColdPool(workers){
+ for(const {child} of workers)if(child.exitCode===null&&child.signalCode===null)child.kill('SIGTERM');
+ const all=Promise.all(workers.map(({finished})=>finished));
+ let timer;
+ const timeout=new Promise(resolve=>{timer=setTimeout(()=>resolve(false),250);});
+ const complete=await Promise.race([all.then(()=>true),timeout]);clearTimeout(timer);
+ if(!complete){
+  for(const {child} of workers)if(child.exitCode===null&&child.signalCode===null)child.kill('SIGKILL');
+  await all;
+ }
+}
+function requireWorkerParent(){
+ assert.equal(typeof process.send,'function','worker requires parent IPC');
+ assert.equal(process.connected,true,'worker requires live parent IPC');
+ const lostParent=()=>process.exit(1);process.once('disconnect',lostParent);return lostParent;
+}
+const args=process.argv.slice(2);
+const worker=args[0]==='--internal-cold-partition';
+if(worker){
+ const lostParent=requireWorkerParent();
+ assert.equal(args.length,2);assert.match(args[1],/^[0-3]$/);const part=Number(args[1]);
+ let tamper=null;const read=path=>{const raw=readCheckerOwnerMember(root,path);return path===tamper?Buffer.concat([raw,Buffer.from(' ')]):raw;};
+ const before=read('compatibility/f10/disposition-ledger/ledger.json'),subject=inspectBrowserReferenceSource({root,read});
+ const roster=structuredClone(subject.bound),report=structuredClone(subject.report);
+ assert.equal(new Set(roster.map(ref=>ref.path)).size,roster.length);subject.assertCurrent();
+ const indices=partitionIndices(roster.length,part);
+ for(const index of indices){const ref=roster[index];try{tamper=ref.path;assert.throws(()=>inspectBrowserReferenceSource({root,read}),undefined,'cold '+ref.path);}finally{tamper=null;}await new Promise(resolve=>setImmediate(resolve));}
+ subject.assertCurrent();assert.ok(before.equals(read('compatibility/f10/disposition-ledger/ledger.json')));
+ await new Promise((resolve,reject)=>process.stdout.write(JSON.stringify({kind:'private-cold-partition-v1',line:report.line,roster,report,indices})+'\n',error=>error?reject(error):resolve()));
+ process.removeListener('disconnect',lostParent);process.disconnect();
+}else{
 const ts=createRequire(import.meta.url)('typescript');
-const args=process.argv.slice(2),sourceOnly=args[0]==='--source-metadata';if(sourceOnly)args.shift();
+const sourceOnly=args[0]==='--source-metadata';if(sourceOnly)args.shift();
  assert.ok(args.length<=1,'expected at most one report output path');
  if(args[0]?.startsWith('-'))assert.fail('unknown option '+args[0]);
  let tamper=null;const read=path=>{const raw=readCheckerOwnerMember(root,path);return path===tamper?Buffer.concat([raw,Buffer.from(' ')]):raw;};
  const before=read('compatibility/f10/disposition-ledger/ledger.json'),subject=inspectBrowserReferenceSource({root,read});
  let cold=0,late=0;const coldPaths=[],latePaths=[];
  if(!sourceOnly){
-  for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+ref.path);late++;latePaths.push(ref.path);tamper=null;}
-  for(const ref of subject.bound){tamper=ref.path;assert.throws(()=>inspectBrowserReferenceSource({root,read}),undefined,'cold '+ref.path);cold++;coldPaths.push(ref.path);tamper=null;}
-  assert.deepEqual(latePaths,subject.bound.map(ref=>ref.path));assert.deepEqual(coldPaths,subject.bound.map(ref=>ref.path));
+  const roster=structuredClone(subject.bound),semantic=structuredClone(subject.report);
+  assert.equal(new Set(roster.map(ref=>ref.path)).size,roster.length);
+  const workers=startColdPool();
+  const onExit=()=>{for(const {child} of workers)if(child.exitCode===null&&child.signalCode===null)child.kill();};
+  const onInterrupt=async signal=>{await stopColdPool(workers);process.exit(signal==='SIGINT'?130:143);};
+  const onInt=()=>{void onInterrupt('SIGINT');},onTerm=()=>{void onInterrupt('SIGTERM');};
+  process.once('exit',onExit);process.once('SIGINT',onInt);process.once('SIGTERM',onTerm);
+  try{
+   for(const ref of subject.bound){try{tamper=ref.path;assert.throws(()=>subject.assertCurrent(),undefined,'late '+ref.path);late++;latePaths.push(ref.path);}finally{tamper=null;}}
+   const seen=new Set();
+   await Promise.all(workers.map(async ({finished},part)=>{
+    const result=await finished;
+    for(const index of validateColdPartition(result,part,roster,semantic)){
+     assert.ok(Number.isSafeInteger(index)&&index>=0&&index<roster.length&&!seen.has(index));seen.add(index);
+    }
+   }));
+   assert.equal(seen.size,roster.length);
+   for(let index=0;index<roster.length;index++){assert.ok(seen.has(index));cold++;coldPaths.push(roster[index].path);}
+   assert.deepEqual(latePaths,subject.bound.map(ref=>ref.path));assert.deepEqual(coldPaths,subject.bound.map(ref=>ref.path));
+  }finally{
+   await stopColdPool(workers);process.removeListener('exit',onExit);process.removeListener('SIGINT',onInt);process.removeListener('SIGTERM',onTerm);
+  }
  }
 
 const versions=browserPeerVersions(JSON.parse(read('projects/ngx-material-legacy/package.json'))),generated=[];
@@ -93,3 +177,5 @@ const report={...subject.report,source_execution_mode:sourceOnly?'source-metadat
  ...(sourceOnly?{}:{cold_source_faults_rejected:cold,late_source_faults_rejected:late,cold_source_fault_paths_rejected:coldPaths,late_source_fault_paths_rejected:latePaths}),
  generated_current_lab_sources:generated,title_contract_negative_controls:predicateControls,whole_current_dialog_probe_collaborator_runs:runs,actual_angular_DOM_browser_or_packed_execution:false};
 if(args[0])writeFileSync(args[0],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));
+
+}

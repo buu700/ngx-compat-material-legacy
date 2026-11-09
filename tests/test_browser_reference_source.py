@@ -4,6 +4,7 @@
 """Exact browser helper transitions and whole current dialog callback ownership."""
 from pathlib import Path
 import hashlib,json,os,subprocess,unittest
+from browser_reference_owned_process import run_owned
 ROOT=Path(__file__).resolve().parents[1]
 
 class BrowserReferenceSourceTests(unittest.TestCase):
@@ -11,7 +12,7 @@ class BrowserReferenceSourceTests(unittest.TestCase):
         command=['node','tests/browser_reference_source_probe.mjs']
         if os.environ.get('BROWSER_REFERENCE_SOURCE_REPORT'):
             command.append(os.environ['BROWSER_REFERENCE_SOURCE_REPORT'])
-        child=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=300)
+        child=run_owned(command,cwd=ROOT,timeout=300)
         self.assertEqual(child.returncode,0,child.stdout+child.stderr)
         report=json.loads(child.stdout)
         self.assertEqual(report['complete_source_transitions'],4)
@@ -28,6 +29,16 @@ class BrowserReferenceSourceTests(unittest.TestCase):
         self.assertEqual(report['current_physical_ledger_sha256'],hashlib.sha256(live).hexdigest())
         self.assertFalse(report['canonical_frame_admission_granted'])
         self.assertFalse(report['actual_native_packed_browser_floor_or_full_audit_qualified'])
+
+    def test_cold_partition_protocol_controls(self):
+        child=subprocess.run(['node','tests/browser_reference_cold_partition_protocol.mjs'],cwd=ROOT,capture_output=True,text=True,timeout=10)
+        self.assertEqual(child.returncode,0,child.stdout+child.stderr)
+        self.assertEqual(json.loads(child.stdout)['result'],'pass')
+
+    def test_cold_worker_lifecycle_controls(self):
+        child=run_owned(['node','tests/browser_reference_cold_lifecycle.mjs'],cwd=ROOT,timeout=10)
+        self.assertEqual(child.returncode,0,child.stdout+child.stderr)
+        self.assertEqual(json.loads(child.stdout)['result'],'pass')
 
     def test_protected_ledger_and_browser_helpers_remain_exact(self):
         packet=json.loads((ROOT/'compatibility/rc/c04-browser-reference-source-inputs.json').read_bytes())
