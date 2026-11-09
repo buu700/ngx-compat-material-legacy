@@ -129,6 +129,8 @@ class CurrentSpinnerSnackContract:
         successor = None
         select_successor = None
         domain_successor = None
+        resource_source_successor = None
+        source_image_successor = None
         if main:
             path = 'compatibility/rc/current-sass-stepper-source-executables-v1.json'
             raw = current(path)
@@ -150,7 +152,31 @@ class CurrentSpinnerSnackContract:
             assert [r['path'] for r in domain_successor['updates']]==[r['path'] for r in successor['updates']]
             assert [r['path'] for r in domain_successor['authored_support']]==['scripts/select-dialog-finite-source-v7.mjs','scripts/select_dialog_finite_source_successor_v7.py','scripts/dialog-focus-finite-source-v6.mjs','scripts/dialog_focus_finite_source_successor_v6.py','scripts/main-sass-graph-successor.mjs','scripts/main_sass_graph_successor.py','compatibility/rc/parent-main-select-menu-sass-source-v7.json','compatibility/rc/parent-main-dialog-focus-sass-source-v6.json','compatibility/rc/parent-main-sass-domain-source-successor-v1.json']
             for support in domain_successor['authored_support']:assert _ref(support['path'],current(support['path']))==support
+            resource_raw = member(dict(path='compatibility/rc/main-tooltip-resource-source-programs-v1.json',
+                                      sha256='b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211', bytes=15324))
+            resource_source_successor = json.loads(resource_raw)
+            assert resource_source_successor['schema_version'] == 1 and resource_source_successor['role'] == 'main-tooltip-resource-source-program-continuation'
+            assert resource_source_successor['base_head'] == '8fe95564c981a9dd73605d27beaa0496824e8444'
+            for key, value in dict(source_scope_only=True, historical_programs_executed=False,
+                                   historical_packets_rewritten=False, theme_module_contract_changed=False,
+                                   css_or_artifact_admission_granted=False, g11_claim='not-passed').items():
+                assert resource_source_successor[key] == value
+            assert [row['path'] for row in resource_source_successor['updates']] == [row['path'] for row in successor['updates']] + ['scripts/sass-spinner-snack-c04-source.mjs']
+            for support in resource_source_successor['support']: member(support)
+            source_image_successor = json.loads(member(dict(path='compatibility/rc/main-sass-graph-resource-source-programs-v2.json',
+                sha256='e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98', bytes=6928)))
+            assert source_image_successor['schema_version'] == 1 and source_image_successor['role'] == 'main-sass-graph-resource-source-program-continuation'
+            assert source_image_successor['base_head'] == 'ecc1051cfb829f0b67ba9cb50e4b733d6684ebff'
+            assert source_image_successor['previous_packet'] == _ref('compatibility/rc/main-tooltip-resource-source-programs-v1.json', resource_raw)
+            assert [row['path'] for row in source_image_successor['updates']] == [row['path'] for row in successor['updates']]
+            for key, value in dict(source_scope_only=True, historical_programs_executed=False,
+                                   historical_packets_rewritten=False, theme_module_contract_changed=False,
+                                   css_or_artifact_admission_granted=False, g11_claim='not-passed').items():
+                assert source_image_successor[key] == value
+            for support in source_image_successor['support']: member(support)
             env = dict(PATH=os.environ.get('PATH',''), LANG='C', LC_ALL='C', GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null', GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')
+            subprocess.check_call(['git', '--no-replace-objects', 'merge-base', '--is-ancestor', resource_source_successor['base_head'], 'HEAD'], cwd=root, env=env)
+            subprocess.check_call(['git', '--no-replace-objects', 'merge-base', '--is-ancestor', source_image_successor['base_head'], 'HEAD'], cwd=root, env=env)
             for row in successor['updates']:
                 before = subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',successor['source_parent']+':'+row['path']],cwd=root,env=env)
                 assert _ref(row['path'],before)==row['before']
@@ -172,9 +198,24 @@ class CurrentSpinnerSnackContract:
                 for edit in end['edits']:
                     assert set(edit)=={'offset','before','after'} and type(edit['offset']) is int and edit['offset']>=at
                     old=edit['before'].encode();assert physical_after[edit['offset']:edit['offset']+len(old)]==old;parts.extend((physical_after[at:edit['offset']],edit['after'].encode()));at=edit['offset']+len(old)
-                final=b''.join([*parts,physical_after[at:]]);assert _ref(row['path'],final)==end['after'] and current(row['path'])==final
+                final=b''.join([*parts,physical_after[at:]]);assert _ref(row['path'],final)==end['after']
+                updated, expected = final, end['after']
+                for continuation in (resource_source_successor, source_image_successor):
+                    resource = next(item for item in continuation['updates'] if item['path'] == row['path'])
+                    assert resource['before'] == expected; cursor_resource = 0; resource_parts = []
+                    committed = subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',
+                                                         'show', continuation['base_head'] + ':' + row['path']], cwd=root, env=env)
+                    assert committed == updated
+                    for edit in resource['edits']:
+                        assert set(edit) == {'offset', 'before', 'after'}
+                        assert type(edit['offset']) is int and cursor_resource <= edit['offset'] <= len(updated)
+                        old = edit['before'].encode(); assert updated[edit['offset']:edit['offset'] + len(old)] == old
+                        resource_parts.extend((updated[cursor_resource:edit['offset']], edit['after'].encode())); cursor_resource = edit['offset'] + len(old)
+                    updated = b''.join([*resource_parts, updated[cursor_resource:]])
+                    assert _ref(row['path'], updated) == resource['after']; expected = resource['after']
+                assert current(row['path']) == updated
         for path, sha256, size in PINS:
-            update = next((row for row in domain_successor['updates'] if row['path']==path),None) if domain_successor else None
+            update = next((row for row in source_image_successor['updates'] if row['path']==path),None) if source_image_successor else None
             member(update['after'] if update else dict(path=path, sha256=sha256, bytes=size))
         packet, current_packet = json.loads(current(INPUTS)), json.loads(current(SOURCE_INPUTS))
         source_context = CurrentSassSource(root, read=current)
@@ -187,7 +228,7 @@ class CurrentSpinnerSnackContract:
         member(branch['observation'])
         base = json.loads(current(packet['source_packet']['path']))
         sixth = json.loads(current(SIXTH_PACKET))
-        canonical_source = dict(source_subject=domain_successor['updates'][0]['after'] if main else dict(path=PINS[0][0], sha256=PINS[0][1], bytes=PINS[0][2]),
+        canonical_source = dict(source_subject=source_image_successor['updates'][0]['after'] if main else dict(path=PINS[0][0], sha256=PINS[0][1], bytes=PINS[0][2]),
             source_packet=dict(path=SOURCE_INPUTS, sha256=PINS[2][1], bytes=PINS[2][2]),
             source_modules=[r['current'] for r in base['branches'][line]['modules'] + current_packet['additional_modules']] + [json.loads(current('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json'))['transition']['after'] if main else sixth['branches'][line]['reviewed_after']] + ([json.loads(current('compatibility/rc/current-main-strong-focus-source-v1.json'))['after']] if main else []))
         assert source_context.descriptor == canonical_source

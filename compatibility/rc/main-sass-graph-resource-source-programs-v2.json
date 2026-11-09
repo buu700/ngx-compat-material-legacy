@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "role": "main-sass-graph-resource-source-program-continuation",
+  "base_head": "ecc1051cfb829f0b67ba9cb50e4b733d6684ebff",
+  "previous_packet": {
+    "path": "compatibility/rc/main-tooltip-resource-source-programs-v1.json",
+    "sha256": "b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211",
+    "bytes": 15324
+  },
+  "updates": [
+    {
+      "path": "scripts/current-sass-source.mjs",
+      "before": {
+        "path": "scripts/current-sass-source.mjs",
+        "sha256": "39b22e0fa057899769cbe3895a67b2b77c2ab543d770c5f72c4ef657da6f7ea6",
+        "bytes": 28397
+      },
+      "after": {
+        "path": "scripts/current-sass-source.mjs",
+        "sha256": "f173497d4a16acb5c7e248363f214343f7c76f456212839b0da815064d09b4d9",
+        "bytes": 29970
+      },
+      "edits": [
+        {
+          "offset": 1405,
+          "before": "",
+          "after": "const MAIN_GRAPH_PACKET = Object.freeze({path: 'compatibility/rc/parent-main-sass-domain-source-successor-v1.json',\n  sha256: '7b58ac738ab37f636daf1b7a1212a59dcb81f658263b993e6c9a0eed13308a9f', bytes: 17886});\n"
+        },
+        {
+          "offset": 10301,
+          "before": "  let graphSuccessor=null;\n",
+          "after": "  let graphSuccessor=null,graphResourceTransitions=[];\n"
+        },
+        {
+          "offset": 12973,
+          "before": "",
+          "after": "  if (initialLine === 'main') {\n    const graphRaw = read(MAIN_GRAPH_PACKET.path);\n    assert.deepEqual(reference(MAIN_GRAPH_PACKET.path, graphRaw), MAIN_GRAPH_PACKET);\n    const graph = JSON.parse(graphRaw);\n    const resources = graph.transitions.filter(row => /\\.(?:html|scss)$/.test(row.path));\n    assert.deepEqual(resources.map(row => row.path), ['projects/ngx-material-legacy/legacy-form-field/form-field.html',\n      'projects/ngx-material-legacy/legacy-form-field/form-field.scss', 'projects/ngx-material-legacy/legacy-menu/menu.scss']);\n    graphResourceTransitions = resources.map(row => ({path: row.path,\n      before: metadata(row.before), current: metadata(row.after)}));\n  }\n"
+        },
+        {
+          "offset": 20480,
+          "before": "",
+          "after": "  for (const row of graphResourceTransitions) {\n    assert.equal(historical.has(row.path), false);\n    const env = {PATH: process.env.PATH, GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_SYSTEM: '/dev/null',\n      GIT_NO_REPLACE_OBJECTS: '1', GIT_NO_LAZY_FETCH: '1', GIT_TERMINAL_PROMPT: '0'};\n    const before = execFileSync('git', ['--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',\n      'show', '8baa761eca624c9d71293c3d31750a2b3fdeebf0:' + row.path], {cwd: root, env});\n    assert.deepEqual(reference(row.path, before), row.before);\n    historical.set(row.path, Buffer.from(before));\n  }\n"
+        },
+        {
+          "offset": 23313,
+          "before": "  const resourceTransitions = tooltipResource ? [{path: tooltipResource.before.path,\n    before: tooltipResource.before, current: tooltipResource.after}] : [];\n",
+          "after": "  const resourceTransitions = [...(tooltipResource ? [{path: tooltipResource.before.path,\n    before: tooltipResource.before, current: tooltipResource.after}] : []), ...graphResourceTransitions];\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/current_sass_source.py",
+      "before": {
+        "path": "scripts/current_sass_source.py",
+        "sha256": "304c0779f4d495445a6d00f5170c81c1d8129ec95fe381a8eaf512ffaf93fa2a",
+        "bytes": 25998
+      },
+      "after": {
+        "path": "scripts/current_sass_source.py",
+        "sha256": "fca2a1ebdc8828e38b98ef73f16e36be3c60e8af95ee44644ef96333326e3a9e",
+        "bytes": 27664
+      },
+      "edits": [
+        {
+          "offset": 505,
+          "before": "",
+          "after": "MAIN_GRAPH_PACKET = dict(path='compatibility/rc/parent-main-sass-domain-source-successor-v1.json',\n                         sha256='7b58ac738ab37f636daf1b7a1212a59dcb81f658263b993e6c9a0eed13308a9f', bytes=17886)\n"
+        },
+        {
+          "offset": 1041,
+          "before": "SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='39b22e0fa057899769cbe3895a67b2b77c2ab543d770c5f72c4ef657da6f7ea6', bytes=28397)\n",
+          "after": "SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='f173497d4a16acb5c7e248363f214343f7c76f456212839b0da815064d09b4d9', bytes=29970)\n"
+        },
+        {
+          "offset": 5965,
+          "before": "",
+          "after": "        graph_resource_transitions = []\n"
+        },
+        {
+          "offset": 9974,
+          "before": "",
+          "after": "        if initial_line == 'main':\n            graph_raw = current(MAIN_GRAPH_PACKET['path'])\n            assert _ref(MAIN_GRAPH_PACKET['path'], graph_raw) == MAIN_GRAPH_PACKET\n            graph = json.loads(graph_raw)\n            resources = [row for row in graph['transitions'] if row['path'].endswith(('.html', '.scss'))]\n            assert [row['path'] for row in resources] == ['projects/ngx-material-legacy/legacy-form-field/form-field.html',\n                'projects/ngx-material-legacy/legacy-form-field/form-field.scss', 'projects/ngx-material-legacy/legacy-menu/menu.scss']\n            graph_resource_transitions = [dict(path=row['path'], before=_metadata(row['before']), current=_metadata(row['after'])) for row in resources]\n"
+        },
+        {
+          "offset": 17492,
+          "before": "",
+          "after": "        for row in graph_resource_transitions:\n            assert row['path'] not in historical\n            env = dict(PATH=os.environ.get('PATH', ''), GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null',\n                       GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1', GIT_TERMINAL_PROMPT='0')\n            before = subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',\n                'show', '8baa761eca624c9d71293c3d31750a2b3fdeebf0:' + row['path']], cwd=root, env=env)\n            assert _ref(row['path'], before) == row['before']\n            historical[row['path']] = before\n"
+        },
+        {
+          "offset": 20588,
+          "before": "                                      current=tooltip_resource['after'])] if tooltip_resource else [])\n",
+          "after": "                                      current=tooltip_resource['after'])] if tooltip_resource else []) + graph_resource_transitions\n"
+        }
+      ]
+    }
+  ],
+  "support": [
+    {
+      "path": "compatibility/rc/parent-main-sass-domain-source-successor-v1.json",
+      "sha256": "7b58ac738ab37f636daf1b7a1212a59dcb81f658263b993e6c9a0eed13308a9f",
+      "bytes": 17886
+    }
+  ],
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "theme_module_contract_changed": false,
+  "css_or_artifact_admission_granted": false,
+  "g11_claim": "not-passed"
+}

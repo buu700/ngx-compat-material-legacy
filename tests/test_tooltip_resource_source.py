@@ -33,12 +33,16 @@ class TooltipResourceSourceTests(unittest.TestCase):
         source = CurrentSassSource(self.root)
         packet = self.packet
         self.assertEqual(len(source.transitions), 7)
-        self.assertEqual(source.resource_transitions, [dict(path=packet['before']['path'], before=packet['before'], current=packet['after'])])
-        for ref in (packet['before'], packet['after']):
-            self.assertEqual(source.qualify(ref), packet['after'])
-            no_length = {key: value for key, value in ref.items() if key != 'bytes'}
-            self.assertEqual(source.qualify(no_length), {key: value for key, value in packet['after'].items() if key != 'bytes'})
-            with self.assertRaises(AssertionError): source.qualify(dict(ref, bytes=ref['bytes'] + 1))
+        self.assertEqual([row['path'] for row in source.resource_transitions], [packet['before']['path'],
+            'projects/ngx-material-legacy/legacy-form-field/form-field.html',
+            'projects/ngx-material-legacy/legacy-form-field/form-field.scss', 'projects/ngx-material-legacy/legacy-menu/menu.scss'])
+        self.assertEqual(source.resource_transitions[0], dict(path=packet['before']['path'], before=packet['before'], current=packet['after']))
+        for row in source.resource_transitions:
+            for ref in (row['before'], row['current']):
+                self.assertEqual(source.qualify(ref), row['current'])
+                no_length = {key: value for key, value in ref.items() if key != 'bytes'}
+                self.assertEqual(source.qualify(no_length), {key: value for key, value in row['current'].items() if key != 'bytes'})
+                with self.assertRaises(AssertionError): source.qualify(dict(ref, bytes=ref['bytes'] + 1))
         with self.assertRaises(AssertionError): source.qualify(dict(packet['before'], sha256='0' * 64))
         self.assertNotIn(packet['before']['path'], [row['path'] for row in source.descriptor['source_modules']])
         inputs = json.loads((self.root / 'compatibility/rc/current-sass-source-inputs-v2.json').read_bytes())
@@ -60,7 +64,7 @@ class TooltipResourceSourceTests(unittest.TestCase):
         with self.assertRaises(AssertionError): source.assert_historical_source(packet['before']['path'], original + b' ')
         with self.assertRaises(AssertionError):
             CurrentSassSource(self.root, read=lambda path: original if path == packet['before']['path'] else (self.root / path).read_bytes())
-        for path in [packet['before']['path'], self.packet_path, *[row['path'] for row in packet['reviews']]]:
+        for path in [*[row['path'] for row in source.resource_transitions], self.packet_path, *[row['path'] for row in packet['reviews']]]:
             target = self.root / path
             saved = target.read_bytes()
             try:
@@ -89,7 +93,7 @@ class TooltipResourceSourceTests(unittest.TestCase):
         self.assertEqual(report['resource_transitions'], source.resource_transitions)
         self.assertEqual(report['source_sets'], source.source_sets)
         self.assertEqual(report['descriptor'], source.descriptor)
-        self.assertEqual(report['physical_mutations_rejected'], 4)
+        self.assertEqual(report['physical_mutations_rejected'], 7)
         self.assertTrue(report['cold_historical_bytes_rejected'])
         self.assertTrue(report['late_callback_mutation_rejected'])
         self.assertEqual(report['accessor_calls'], 0)

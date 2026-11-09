@@ -26,16 +26,22 @@ with TemporaryDirectory(prefix='tooltip-source-program-py-') as temporary:
     scope = CurrentSassToolReferences(root)
     packet_path = 'compatibility/rc/main-tooltip-resource-source-programs-v1.json'
     packet = json.loads(read(packet_path))
-    assert (len(scope.bound), len(scope.transitions)) == (515, 99)
-    for update in packet['updates']:
+    graph_path = 'compatibility/rc/main-sass-graph-resource-source-programs-v2.json'
+    contract_path = 'compatibility/rc/main-sass-resource-contract-programs-v1.json'
+    graph, contracts = json.loads(read(graph_path)), json.loads(read(contract_path))
+    updates = packet['updates'] + graph['updates'] + contracts['updates']
+    latest = {row['path']: row['after'] for row in updates}
+    assert (len(scope.bound), len(scope.transitions)) == (518, 99)
+    for update in updates:
         for ref in (update['before'], update['after']):
-            assert scope.qualify(ref) == update['after']
+            assert scope.qualify(ref) == latest[update['path']]
             assert hashlib.sha256(scope.comparison_bytes(ref)).hexdigest() == ref['sha256']
             assert scope.qualify(dict(ref, sha256='0' * 64)) is None
             try: scope.qualify(dict(ref, bytes=ref['bytes'] + 1))
             except AssertionError: pass
             else: raise AssertionError('wrong program length accepted')
-    targets = [packet_path, *[row['path'] for row in packet['updates']], *[row['path'] for row in packet['support']]]
+    targets = list(dict.fromkeys([packet_path, graph_path, contract_path, *[row['path'] for row in updates],
+        *[row['path'] for row in packet['support']], *[row['path'] for row in graph['support']]]))
     for path in targets:
         target = root / path; saved = read(path)
         try:
@@ -46,11 +52,12 @@ with TemporaryDirectory(prefix='tooltip-source-program-py-') as temporary:
                 else: raise AssertionError('changed physical program input accepted: ' + path)
         finally: target.write_bytes(saved)
         scope.assert_current()
-    for update in packet['updates']:
-        try: CurrentSassToolReferences(root, read=lambda path: b'not the physical source' if path == update['path'] else read(path))
+    for program_path in latest:
+        try: CurrentSassToolReferences(root, read=lambda path: b'not the physical source' if path == program_path else read(path))
         except AssertionError: pass
         else: raise AssertionError('nonphysical supplied program input accepted')
     print(json.dumps(dict(result='pass', bound=scope.bound, transitions=scope.transitions,
-        program_images_preserved=6, physical_cold_late_recovery_targets=len(targets),
-        bad_supplied_program_readers_rejected=3, historical_programs_executed=False,
+        program_reference_checks=len(updates) * 2, unique_program_images=len({ref['sha256'] for row in updates for ref in (row['before'], row['after'])}),
+        physical_cold_late_recovery_targets=len(targets),
+        bad_supplied_program_readers_rejected=len(latest), historical_programs_executed=False,
         artifact_or_audit_admission_granted=False)))

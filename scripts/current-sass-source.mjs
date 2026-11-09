@@ -21,6 +21,8 @@ import {dialogFocusFiniteSourceSuccessor as dialogFocusV6,dialogFocusFiniteLoade
 import {mainSassGraphSuccessor} from './main-sass-graph-successor.mjs';
 
 const SELF = 'scripts/current-sass-source.mjs';
+const MAIN_GRAPH_PACKET = Object.freeze({path: 'compatibility/rc/parent-main-sass-domain-source-successor-v1.json',
+  sha256: '7b58ac738ab37f636daf1b7a1212a59dcb81f658263b993e6c9a0eed13308a9f', bytes: 17886});
 const TOOLTIP_RESOURCE_PACKET = Object.freeze({path: 'compatibility/rc/current-main-tooltip-resource-source-v1.json',
   sha256: '05abc16cda2e5a3fea79f4b054f34586de88b57febc9569185fe9ce00102747e', bytes: 1246});
 const FOCUS_STYLE_PACKET=Object.freeze({path:'compatibility/rc/current-main-strong-focus-source-v1.json',sha256:'e4f6c47d595edc21f102a756e3a827d077c0f717f1968b8672c691d4fb336ccb',bytes:1030});
@@ -179,7 +181,7 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   };
   // Authenticate executable policy before the first supplied callback.
   assertPlanner();
-  let graphSuccessor=null;
+  let graphSuccessor=null,graphResourceTransitions=[];
   const assertPhysical = () => {
     for (const row of bound.values()) assert.deepEqual(reference(row.path, physical(root, row.path)), row, 'changed final physical source ' + row.path);
     product.assertPhysical();
@@ -214,6 +216,16 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
     else bound.set(ref.path, {...ref});
   }
   if(initialLine==='main'){assert.equal(hash(physical(root,'scripts/main-sass-graph-successor.mjs')),'cd00dd3ea8af9f0ef5a62d6ed3e5190147aaa9a6206693e9cebc72c0040016b5');read('scripts/main-sass-graph-successor.mjs');graphSuccessor=mainSassGraphSuccessor({root,read:providedRead});for(const r of graphSuccessor.bound){if(bound.has(r.path))assert.deepEqual(bound.get(r.path),r);else bound.set(r.path,r);}}
+  if (initialLine === 'main') {
+    const graphRaw = read(MAIN_GRAPH_PACKET.path);
+    assert.deepEqual(reference(MAIN_GRAPH_PACKET.path, graphRaw), MAIN_GRAPH_PACKET);
+    const graph = JSON.parse(graphRaw);
+    const resources = graph.transitions.filter(row => /\.(?:html|scss)$/.test(row.path));
+    assert.deepEqual(resources.map(row => row.path), ['projects/ngx-material-legacy/legacy-form-field/form-field.html',
+      'projects/ngx-material-legacy/legacy-form-field/form-field.scss', 'projects/ngx-material-legacy/legacy-menu/menu.scss']);
+    graphResourceTransitions = resources.map(row => ({path: row.path,
+      before: metadata(row.before), current: metadata(row.after)}));
+  }
   let focusStyle=null,gitStyleBefore=null,tooltipResource=null,gitTooltipBefore=null;
   const member = row => {
     const projected = [focusStyle, tooltipResource].find(style => style &&
@@ -312,6 +324,15 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
     assert.equal(historical.has(tooltipResource.before.path), false);
     historical.set(tooltipResource.before.path, Buffer.from(gitTooltipBefore));
   }
+  for (const row of graphResourceTransitions) {
+    assert.equal(historical.has(row.path), false);
+    const env = {PATH: process.env.PATH, GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_SYSTEM: '/dev/null',
+      GIT_NO_REPLACE_OBJECTS: '1', GIT_NO_LAZY_FETCH: '1', GIT_TERMINAL_PROMPT: '0'};
+    const before = execFileSync('git', ['--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',
+      'show', '8baa761eca624c9d71293c3d31750a2b3fdeebf0:' + row.path], {cwd: root, env});
+    assert.deepEqual(reference(row.path, before), row.before);
+    historical.set(row.path, Buffer.from(before));
+  }
   const changes = new Map(packet.additional_modules.map(row => [row.path, row]));
   for (const row of changes.values()) {
     const before = historical.get(row.path);
@@ -350,8 +371,8 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   const transitions = [...source.modules.map(row => ({path: row.path, before: row.before, current: row.current})),
     ...packet.additional_modules.map(row => ({path: row.path, before: row.before, current: row.current})), sixth.transition,...(focusStyle?[{path:focusStyle.before.path,before:focusStyle.before,current:focusStyle.after}]:[])];
   // Component resources are outside the finite theme module/source-set contract.
-  const resourceTransitions = tooltipResource ? [{path: tooltipResource.before.path,
-    before: tooltipResource.before, current: tooltipResource.after}] : [];
+  const resourceTransitions = [...(tooltipResource ? [{path: tooltipResource.before.path,
+    before: tooltipResource.before, current: tooltipResource.after}] : []), ...graphResourceTransitions];
   const allTransitions = [...transitions, ...resourceTransitions];
   for (const row of transitions) member(row.current);
   const sourceSets = {}, sourceSetSuccessors = [];

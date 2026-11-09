@@ -17,11 +17,15 @@ const packetPath = 'compatibility/rc/current-main-tooltip-resource-source-v1.jso
 const packet = JSON.parse(read(packetPath));
 const context = createCurrentSassSource({root});
 assert.equal(context.transitions.length, 7);
-assert.deepEqual(context.resource_transitions, [{path: packet.before.path, before: packet.before, current: packet.after}]);
-for (const ref of [packet.before, packet.after]) {
-  assert.deepEqual(context.qualify(ref), packet.after);
+assert.deepEqual(context.resource_transitions.map(row => row.path), [packet.before.path,
+  'projects/ngx-material-legacy/legacy-form-field/form-field.html',
+  'projects/ngx-material-legacy/legacy-form-field/form-field.scss', 'projects/ngx-material-legacy/legacy-menu/menu.scss']);
+assert.deepEqual(context.resource_transitions[0], {path: packet.before.path, before: packet.before, current: packet.after});
+const resources = structuredClone(context.resource_transitions);
+for (const row of resources) for (const ref of [row.before, row.current]) {
+  assert.deepEqual(context.qualify(ref), row.current);
   const {bytes, ...noLength} = ref;
-  const {bytes: currentBytes, ...currentNoLength} = packet.after;
+  const {bytes: currentBytes, ...currentNoLength} = row.current;
   assert.deepEqual(context.qualify(noLength), currentNoLength);
   assert.throws(() => context.qualify({...ref, bytes: bytes + 1}));
 }
@@ -38,7 +42,7 @@ const original = execFileSync('git', ['--no-replace-objects', '-c', 'gc.auto=0',
 assert.equal(context.assertHistoricalSource(packet.before.path, original).current_sha256, packet.after.sha256);
 assert.throws(() => context.assertHistoricalSource(packet.before.path, Buffer.concat([original, Buffer.from(' ')])));
 assert.throws(() => createCurrentSassSource({root, read: path => path === packet.before.path ? original : read(path)}));
-const targets = [packet.before.path, packetPath, ...packet.reviews.map(row => row.path)];
+const targets = [...resources.map(row => row.path), packetPath, ...packet.reviews.map(row => row.path)];
 for (const path of targets) {
   const file = join(root, path), saved = read(path);
   try {
@@ -67,7 +71,7 @@ const exposed = context.resource_transitions[0];
 exposed.current.sha256 = '0'.repeat(64);
 assert.deepEqual(context.qualify(packet.before), packet.after);
 console.log(JSON.stringify({result: 'pass', bound: context.bound.length, transitions: context.transitions,
-  resource_transitions: [{path: packet.before.path, before: packet.before, current: packet.after}],
+  resource_transitions: resources,
   source_sets: context.source_sets, descriptor: context.descriptor, physical_mutations_rejected: targets.length,
   cold_historical_bytes_rejected: true, late_callback_mutation_rejected: true, accessor_calls: getters,
   css_or_artifact_admission_granted: false}));

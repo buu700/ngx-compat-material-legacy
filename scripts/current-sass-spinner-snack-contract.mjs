@@ -116,7 +116,7 @@ export function createCurrentSpinnerSnackContract(args = {}) {
   const assertPhysical = () => {for (const expected of bound.values()) assert.deepEqual(ref(expected.path, physical(root, expected.path)), expected);};
   assert.ok(equalBytes(read(SELF), image));
   const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version, main=version.startsWith('22.');
-  let successor=null,selectSuccessor=null,domainSuccessor=null;
+  let successor=null,selectSuccessor=null,domainSuccessor=null,resourceSourceSuccessor=null,sourceImageSuccessor=null;
   if(main){
    const path='compatibility/rc/current-sass-stepper-source-executables-v1.json',raw=read(path);
    assert.equal(hash(raw),'577ca8a935a6f431ed282769be29d84686c109a94faef9174de0091754e59d61');successor=JSON.parse(raw);
@@ -128,7 +128,31 @@ export function createCurrentSpinnerSnackContract(args = {}) {
    for(const refValue of selectSuccessor.authored_support)assert.deepEqual(ref(refValue.path,read(refValue.path)),refValue);
 
    const domainPath='compatibility/rc/current-sass-domain-source-executables-v1.json',domainRaw=read(domainPath);assert.equal(hash(domainRaw),'0567094315d8816f0d9205ce62a200a5dd0ac18ac10f335f5837a6441054092c');assert.equal(domainRaw.length,70524);domainSuccessor=JSON.parse(domainRaw);assert.equal(domainSuccessor.schema_version,1);assert.equal(domainSuccessor.role,'main-current-sass-domain-executable-successor');assert.equal(domainSuccessor.line,'main');assert.equal(domainSuccessor.source_scope_only,true);assert.equal(domainSuccessor.artifact_or_audit_admission_granted,false);assert.deepEqual(domainSuccessor.previous_packet,ref('compatibility/rc/current-sass-select-source-executables-v2.json',nextRaw));assert.deepEqual(domainSuccessor.updates.map(r=>r.path),successor.updates.map(r=>r.path));assert.deepEqual(domainSuccessor.authored_support.map(r=>r.path),['scripts/select-dialog-finite-source-v7.mjs','scripts/select_dialog_finite_source_successor_v7.py','scripts/dialog-focus-finite-source-v6.mjs','scripts/dialog_focus_finite_source_successor_v6.py','scripts/main-sass-graph-successor.mjs','scripts/main_sass_graph_successor.py','compatibility/rc/parent-main-select-menu-sass-source-v7.json','compatibility/rc/parent-main-dialog-focus-sass-source-v6.json','compatibility/rc/parent-main-sass-domain-source-successor-v1.json']);for(const r of domainSuccessor.authored_support)assert.deepEqual(ref(r.path,read(r.path)),r);
+   const resourceRaw = member({path: 'compatibility/rc/main-tooltip-resource-source-programs-v1.json',
+    sha256: 'b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211', bytes: 15324});
+   resourceSourceSuccessor = JSON.parse(resourceRaw);
+   assert.equal(resourceSourceSuccessor.schema_version, 1);
+   assert.equal(resourceSourceSuccessor.role, 'main-tooltip-resource-source-program-continuation');
+   assert.equal(resourceSourceSuccessor.base_head, '8fe95564c981a9dd73605d27beaa0496824e8444');
+   for (const [key, value] of Object.entries({source_scope_only: true, historical_programs_executed: false,
+    historical_packets_rewritten: false, theme_module_contract_changed: false,
+    css_or_artifact_admission_granted: false, g11_claim: 'not-passed'})) assert.equal(resourceSourceSuccessor[key], value);
+   assert.deepEqual(resourceSourceSuccessor.updates.map(row => row.path), [...successor.updates.map(row => row.path), 'scripts/sass-spinner-snack-c04-source.mjs']);
+   for (const support of resourceSourceSuccessor.support) member(support);
+   sourceImageSuccessor = JSON.parse(member({path: 'compatibility/rc/main-sass-graph-resource-source-programs-v2.json',
+    sha256: 'e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98', bytes: 6928}));
+   assert.equal(sourceImageSuccessor.schema_version, 1);
+   assert.equal(sourceImageSuccessor.role, 'main-sass-graph-resource-source-program-continuation');
+   assert.equal(sourceImageSuccessor.base_head, 'ecc1051cfb829f0b67ba9cb50e4b733d6684ebff');
+   assert.deepEqual(sourceImageSuccessor.previous_packet, ref('compatibility/rc/main-tooltip-resource-source-programs-v1.json', resourceRaw));
+   assert.deepEqual(sourceImageSuccessor.updates.map(row => row.path), successor.updates.map(row => row.path));
+   for (const [key, value] of Object.entries({source_scope_only: true, historical_programs_executed: false,
+    historical_packets_rewritten: false, theme_module_contract_changed: false,
+    css_or_artifact_admission_granted: false, g11_claim: 'not-passed'})) assert.equal(sourceImageSuccessor[key], value);
+   for (const support of sourceImageSuccessor.support) member(support);
    const env={PATH:process.env.PATH,LANG:'C',LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1'};
+   execFileSync('git', ['--no-replace-objects', 'merge-base', '--is-ancestor', resourceSourceSuccessor.base_head, 'HEAD'], {cwd: root, env});
+   execFileSync('git', ['--no-replace-objects', 'merge-base', '--is-ancestor', sourceImageSuccessor.base_head, 'HEAD'], {cwd: root, env});
    for(const row of successor.updates){
     const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',successor.source_parent+':'+row.path],{cwd:root,env});
     assert.deepEqual(ref(row.path,before),row.before);let cursor=0;const parts=[];
@@ -136,10 +160,27 @@ export function createCurrentSpinnerSnackContract(args = {}) {
     const after=Buffer.concat([...parts,before.subarray(cursor)]);assert.deepEqual(ref(row.path,after),row.after);
     const next=selectSuccessor.updates.find(item=>item.path===row.path);assert.deepEqual(next.before,row.after);let nextCursor=0;const nextParts=[];
     for(const edit of next.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=nextCursor);const old=Buffer.from(edit.before),value=Buffer.from(edit.after);assert.ok(equalBytes(after.subarray(edit.offset,edit.offset+old.length),old));nextParts.push(after.subarray(nextCursor,edit.offset),value);nextCursor=edit.offset+old.length;}
-    const physicalAfter=Buffer.concat([...nextParts,after.subarray(nextCursor)]);assert.deepEqual(ref(row.path,physicalAfter),next.after);const end=domainSuccessor.updates.find(item=>item.path===row.path);assert.deepEqual(end.before,next.after);let at=0;const finalParts=[];for(const e of end.edits){assert.deepEqual(Object.keys(e).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(e.offset)&&e.offset>=at);const old=Buffer.from(e.before);assert.ok(equalBytes(physicalAfter.subarray(e.offset,e.offset+old.length),old));finalParts.push(physicalAfter.subarray(at,e.offset),Buffer.from(e.after));at=e.offset+old.length;}const final=Buffer.concat([...finalParts,physicalAfter.subarray(at)]);assert.deepEqual(ref(row.path,final),end.after);assert.ok(equalBytes(read(row.path),final));
+    const physicalAfter=Buffer.concat([...nextParts,after.subarray(nextCursor)]);assert.deepEqual(ref(row.path,physicalAfter),next.after);const end=domainSuccessor.updates.find(item=>item.path===row.path);assert.deepEqual(end.before,next.after);let at=0;const finalParts=[];for(const e of end.edits){assert.deepEqual(Object.keys(e).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(e.offset)&&e.offset>=at);const old=Buffer.from(e.before);assert.ok(equalBytes(physicalAfter.subarray(e.offset,e.offset+old.length),old));finalParts.push(physicalAfter.subarray(at,e.offset),Buffer.from(e.after));at=e.offset+old.length;}const final=Buffer.concat([...finalParts,physicalAfter.subarray(at)]);assert.deepEqual(ref(row.path,final),end.after);
+    let current = final, expected = end.after;
+    for (const continuation of [resourceSourceSuccessor, sourceImageSuccessor]) {
+     const resource = continuation.updates.find(item => item.path === row.path);
+     assert.deepEqual(resource.before, expected); let cursorResource = 0; const resourceParts = [];
+     const committed = execFileSync('git', ['--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',
+      'show', continuation.base_head + ':' + row.path], {cwd: root, env});
+     assert.ok(equalBytes(committed, current));
+     for (const edit of resource.edits) {
+      assert.deepEqual(Object.keys(edit).sort(), ['after', 'before', 'offset']);
+      assert.ok(Number.isSafeInteger(edit.offset) && edit.offset >= cursorResource && edit.offset <= current.length);
+      const old = Buffer.from(edit.before); assert.ok(equalBytes(current.subarray(edit.offset, edit.offset + old.length), old));
+      resourceParts.push(current.subarray(cursorResource, edit.offset), Buffer.from(edit.after)); cursorResource = edit.offset + old.length;
+     }
+     current = Buffer.concat([...resourceParts, current.subarray(cursorResource)]);
+     assert.deepEqual(ref(row.path, current), resource.after); expected = resource.after;
+    }
+    assert.ok(equalBytes(read(row.path), current));
    }
   }
-  for (const [path, sha256, bytes] of PINS) {const update=domainSuccessor?.updates.find(row=>row.path===path);member(update?update.after:{path, sha256, bytes});}
+  for (const [path, sha256, bytes] of PINS) {const update=sourceImageSuccessor?.updates.find(row=>row.path===path);member(update?update.after:{path, sha256, bytes});}
 
   assert.equal(hash(Reflect.apply(functionText, spinnerSnackBridgeResultsMatch, [])), '3007197d9ad6a38056a79ea56cb375a3e44db830af95fa34e6d70c1bd2855538');
   const packet = JSON.parse(read(INPUTS)), currentPacket = JSON.parse(read(SOURCE_INPUTS));
@@ -149,7 +190,7 @@ export function createCurrentSpinnerSnackContract(args = {}) {
   for (const r of packet.compiler_inputs) member(r); member(branch.observation);
   const base = JSON.parse(read(packet.source_packet.path));
   const sixth = JSON.parse(read(SIXTH_PACKET));
-  const expectedDescriptor = {source_subject: main?domainSuccessor.updates[0].after:{path: PINS[0][0], sha256: PINS[0][1], bytes: PINS[0][2]}, source_packet: {path: SOURCE_INPUTS, sha256: PINS[1][1], bytes: PINS[1][2]}, source_modules: [...base.branches[line].modules.map(r => r.current), ...currentPacket.additional_modules.map(r => r.current), main?JSON.parse(read('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json')).transition.after:sixth.branches[line].reviewed_after,...(main?[JSON.parse(read('compatibility/rc/current-main-strong-focus-source-v1.json')).after]:[])]};
+  const expectedDescriptor = {source_subject: main?sourceImageSuccessor.updates[0].after:{path: PINS[0][0], sha256: PINS[0][1], bytes: PINS[0][2]}, source_packet: {path: SOURCE_INPUTS, sha256: PINS[1][1], bytes: PINS[1][2]}, source_modules: [...base.branches[line].modules.map(r => r.current), ...currentPacket.additional_modules.map(r => r.current), main?JSON.parse(read('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json')).transition.after:sixth.branches[line].reviewed_after,...(main?[JSON.parse(read('compatibility/rc/current-main-strong-focus-source-v1.json')).after]:[])]};
   assert.deepEqual(source_context.descriptor, expectedDescriptor);
   const oracle = JSON.parse(read(packet.oracle.path)), catalog = JSON.parse(read(packet.catalog.path)), provenance = JSON.parse(read(packet.provenance.path)), lock = JSON.parse(read(packet.reference_lock.path));
   assert.equal(branch.compiler, provenance.sass_info); assert.deepEqual(branch.cases.map(r => r.case_id), SPINNER_SNACK_BRIDGE_CASES);

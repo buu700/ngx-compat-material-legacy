@@ -328,6 +328,48 @@ class CurrentSassToolReferences:
         assert self._read(package_path) == package_image
         domain_overlays = {}
         tooltip_programs = {}
+        late_resource_programs = {}
+        graph_program_packet = dict(path='compatibility/rc/main-sass-graph-resource-source-programs-v2.json',
+            sha256='e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98', bytes=6928)
+        if self.line == 'main':
+            definitions = [(graph_program_packet, 'main-sass-graph-resource-source-program-continuation',
+                ['scripts/current-sass-source.mjs', 'scripts/current_sass_source.py']),
+                (dict(path='compatibility/rc/main-sass-resource-contract-programs-v1.json',
+                      sha256='e8db18d114f9a32c946caaf72b0f3ea1ed8377c3bba6b518f5162ab947673d2a', bytes=14946),
+                 'main-sass-resource-contract-program-continuation',
+                 ['scripts/current-sass-spinner-snack-contract.mjs', 'scripts/current_sass_spinner_snack_admission.py'])]
+            late_env = dict(PATH=os.environ['PATH'], GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null',
+                            GIT_NO_LAZY_FETCH='1', GIT_NO_REPLACE_OBJECTS='1', GIT_TERMINAL_PROMPT='0')
+            for packet_ref, role, paths in definitions:
+                p = json.loads(self._member(packet_ref))
+                assert p['schema_version'] == 1 and p['role'] == role
+                assert p['base_head'] == 'ecc1051cfb829f0b67ba9cb50e4b733d6684ebff'
+                assert [row['path'] for row in p['updates']] == paths
+                for key, value in dict(source_scope_only=True, historical_programs_executed=False,
+                                       historical_packets_rewritten=False, theme_module_contract_changed=False,
+                                       css_or_artifact_admission_granted=False, g11_claim='not-passed').items():
+                    assert p[key] == value
+                if packet_ref['path'] == graph_program_packet['path']:
+                    assert p['previous_packet'] == dict(path='compatibility/rc/main-tooltip-resource-source-programs-v1.json',
+                        sha256='b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211', bytes=15324)
+                    assert [row['path'] for row in p['support']] == ['compatibility/rc/parent-main-sass-domain-source-successor-v1.json']
+                    for ref in p['support']: self._member(ref)
+                else: assert p['source_program_packet'] == graph_program_packet
+                subprocess.check_call(['git', '--no-replace-objects', 'merge-base', '--is-ancestor', p['base_head'], 'HEAD'], cwd=self.root, env=late_env)
+                originals = _git_images(self.root, [dict(commit=p['base_head'], path=path) for path in paths])
+                for update in p['updates']:
+                    assert update['before']['path'] == update['after']['path'] == update['path']
+                    before = originals[(p['base_head'], update['path'])]; _matches(before, update['before'])
+                    after = _edited(before, update['edits']); _matches(after, update['after'])
+                    assert self._member(update['after']) == after and update['path'] not in late_resource_programs
+                    late_resource_programs[update['path']] = (update, [(update['before'], before), (update['after'], after)])
+        def late_resource_comparison(ref):
+            overlay = late_resource_programs.get(ref['path'])
+            if overlay is None: return self._member(ref)
+            update, identities = overlay; meta = _metadata(ref)
+            found = [raw for identity, raw in identities if identity == meta]
+            assert len(found) == 1, 'unknown late resource program comparison'
+            self._member(update['after']); return bytes(found[0])
         if self.line == 'main':
             continuation = json.loads(self._member(dict(path='compatibility/rc/main-tooltip-resource-source-programs-v1.json',
                 sha256='b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211', bytes=15324)))
@@ -351,17 +393,17 @@ class CurrentSassToolReferences:
                 assert update['before']['path'] == update['after']['path'] == update['path']
                 before = originals[(continuation['base_head'], update['path'])]; _matches(before, update['before'])
                 after = _edited(before, update['edits']); _matches(after, update['after'])
-                assert self._member(update['after']) == after
+                assert late_resource_comparison(update['after']) == after
                 tooltip_programs[update['path']] = (update, [(update['before'], before), (update['after'], after)])
         # Historical program bytes are comparison data; every physical read
         # stays bound to the exact current program and the existing guards.
         def tooltip_program_comparison(ref):
             overlay = tooltip_programs.get(ref['path'])
-            if overlay is None: return self._member(ref)
+            if overlay is None: return late_resource_comparison(ref)
             update, identities = overlay; meta = _metadata(ref)
             found = [raw for identity, raw in identities if identity == meta]
             assert len(found) == 1, 'unknown tooltip source program comparison'
-            self._member(update['after']); return bytes(found[0])
+            late_resource_comparison(update['after']); return bytes(found[0])
         routing_images={}
         retained_rules_js_path='scripts/upstream-rules-js-build-admission.mjs'
         retained_landscape_paths=['scripts/autocomplete-landscape-source-judgment.mjs','tests/autocomplete_landscape_probe.mjs']
@@ -786,6 +828,12 @@ class CurrentSassToolReferences:
             prior = domain_overlays.get(path)
             if prior is not None:
                 assert prior[0]['after'] == update['before'], 'tooltip program must follow exact source frame'
+                domain_overlays[path] = ({**prior[0], 'after': update['after']}, prior[1] + identities)
+            else: domain_overlays[path] = (update, identities)
+        for path, (update, identities) in late_resource_programs.items():
+            prior = domain_overlays.get(path)
+            if prior is not None:
+                assert prior[0]['after'] == update['before'], 'late resource program must follow exact source frame'
                 domain_overlays[path] = ({**prior[0], 'after': update['after']}, prior[1] + identities)
             else: domain_overlays[path] = (update, identities)
         inventory_prior = dict(path='testing/legacy-runner/historical-inventory.json', sha256='a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403', bytes=106309)

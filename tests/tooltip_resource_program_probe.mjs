@@ -25,14 +25,20 @@ try {
   const scope = make({root});
   const packetPath = 'compatibility/rc/main-tooltip-resource-source-programs-v1.json';
   const packet = JSON.parse(read(packetPath));
-  assert.equal(scope.bound.length, 515); assert.equal(scope.transitions.length, 99);
-  for (const update of packet.updates) for (const ref of [update.before, update.after]) {
-    assert.deepEqual(scope.qualify(ref), update.after);
+  const graphPath = 'compatibility/rc/main-sass-graph-resource-source-programs-v2.json';
+  const contractPath = 'compatibility/rc/main-sass-resource-contract-programs-v1.json';
+  const graph = JSON.parse(read(graphPath)), contracts = JSON.parse(read(contractPath));
+  const updates = [...packet.updates, ...graph.updates, ...contracts.updates];
+  const latest = new Map(updates.map(row => [row.path, row.after]));
+  assert.equal(scope.bound.length, 518); assert.equal(scope.transitions.length, 99);
+  for (const update of updates) for (const ref of [update.before, update.after]) {
+    assert.deepEqual(scope.qualify(ref), latest.get(update.path));
     assert.equal(hash(scope.comparisonBytes(ref)), ref.sha256);
     assert.equal(scope.qualify({...ref, sha256: '0'.repeat(64)}), null);
     assert.throws(() => scope.qualify({...ref, bytes: ref.bytes + 1}));
   }
-  const targets = [packetPath, ...packet.updates.map(row => row.path), ...packet.support.map(row => row.path)];
+  const targets = [...new Set([packetPath, graphPath, contractPath, ...updates.map(row => row.path),
+    ...packet.support.map(row => row.path), ...graph.support.map(row => row.path)])];
   for (const path of targets) {
     const file = join(root, path), saved = read(path);
     try {
@@ -42,10 +48,11 @@ try {
     } finally {writeFileSync(file, saved);}
     scope.assertCurrent();
   }
-  for (const update of packet.updates) assert.throws(() => make({root,
-    read: path => path === update.path ? Buffer.from('not the physical source') : read(path)}));
+  for (const target of latest.keys()) assert.throws(() => make({root,
+    read: path => path === target ? Buffer.from('not the physical source') : read(path)}));
   console.log(JSON.stringify({result: 'pass', bound: scope.bound, transitions: scope.transitions,
-    program_images_preserved: 6, physical_cold_late_recovery_targets: targets.length,
-    bad_supplied_program_readers_rejected: 3, historical_programs_executed: false,
+    program_reference_checks: updates.length * 2, unique_program_images: new Set(updates.flatMap(row => [row.before.sha256, row.after.sha256])).size,
+    physical_cold_late_recovery_targets: targets.length,
+    bad_supplied_program_readers_rejected: latest.size, historical_programs_executed: false,
     artifact_or_audit_admission_granted: false}));
 } finally {rmSync(root, {recursive: true, force: true});}

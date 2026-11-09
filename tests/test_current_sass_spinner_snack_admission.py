@@ -30,7 +30,7 @@ class CurrentDirectTests(unittest.TestCase):
         cls.temp = tempfile.TemporaryDirectory(prefix='ngx-current-sass-source-test-')
         cls.root = Path(cls.temp.name)
         cls.line = candidate_fixture(cls.root)
-        for path in ['scripts/current-sass-spinner-snack-contract.mjs', 'scripts/current_sass_spinner_snack_admission.py', 'scripts/sass-spinner-snack-bridge-contract.mjs', 'scripts/sass_spinner_snack_bridge_admission.py']:
+        for path in ['scripts/current-sass-spinner-snack-contract.mjs', 'scripts/current_sass_spinner_snack_admission.py', 'scripts/sass-spinner-snack-bridge-contract.mjs', 'scripts/sass_spinner_snack_bridge_admission.py', 'compatibility/rc/current-sass-domain-source-executables-v1.json', 'compatibility/rc/main-tooltip-resource-source-programs-v1.json', 'compatibility/rc/main-sass-graph-resource-source-programs-v2.json']:
             target = cls.root / path
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes((ROOT / path).read_bytes())

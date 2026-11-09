@@ -215,7 +215,48 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
  assert.equal(previous.schema_version,1);assert.equal(previous.role,packet.role);
  assert.deepEqual(packet.product_paths,[]);assert.equal(packet.historical_programs_executed,false);assert.equal(packet.historical_reports_rewritten,0);assert.equal(packet.artifact_or_audit_admission_granted,false);
  assert.ok(equalBytes(read(packagePath),packageImage),'package line changed');
- let matrixOwner;const domainOverlays=new Map(),tooltipPrograms=new Map();
+ let matrixOwner;const domainOverlays=new Map(),tooltipPrograms=new Map(),lateResourcePrograms=new Map();
+ const graphProgramPacket = {path: 'compatibility/rc/main-sass-graph-resource-source-programs-v2.json',
+  sha256: 'e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98', bytes: 6928};
+ if (line === 'main') {
+  const definitions = [[graphProgramPacket, 'main-sass-graph-resource-source-program-continuation',
+   ['scripts/current-sass-source.mjs', 'scripts/current_sass_source.py']],
+   [{path: 'compatibility/rc/main-sass-resource-contract-programs-v1.json',
+    sha256: 'e8db18d114f9a32c946caaf72b0f3ea1ed8377c3bba6b518f5162ab947673d2a', bytes: 14946},
+    'main-sass-resource-contract-program-continuation',
+    ['scripts/current-sass-spinner-snack-contract.mjs', 'scripts/current_sass_spinner_snack_admission.py']]];
+  const env = {PATH: process.env.PATH, GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_SYSTEM: '/dev/null',
+   GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_TERMINAL_PROMPT: '0'};
+  for (const [packetRef, role, paths] of definitions) {
+   const p = JSON.parse(member(packetRef)); assert.equal(p.schema_version, 1); assert.equal(p.role, role);
+   assert.equal(p.base_head, 'ecc1051cfb829f0b67ba9cb50e4b733d6684ebff');
+   assert.deepEqual(p.updates.map(row => row.path), paths);
+   for (const [key, value] of Object.entries({source_scope_only: true, historical_programs_executed: false,
+    historical_packets_rewritten: false, theme_module_contract_changed: false,
+    css_or_artifact_admission_granted: false, g11_claim: 'not-passed'})) assert.equal(p[key], value);
+   if (packetRef.path === graphProgramPacket.path) {
+    assert.deepEqual(p.previous_packet, {path: 'compatibility/rc/main-tooltip-resource-source-programs-v1.json',
+     sha256: 'b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211', bytes: 15324});
+    assert.deepEqual(p.support.map(row => row.path), ['compatibility/rc/parent-main-sass-domain-source-successor-v1.json']);
+    for (const ref of p.support) member(ref);
+   } else assert.deepEqual(p.source_program_packet, graphProgramPacket);
+   execFileSync('git', ['--no-replace-objects', 'merge-base', '--is-ancestor', p.base_head, 'HEAD'], {cwd: root, env});
+   const originals = gitImages(root, paths.map(path => ({commit: p.base_head, path})));
+   for (const update of p.updates) {
+    assert.equal(update.before.path, update.path); assert.equal(update.after.path, update.path);
+    const before = originals.get(p.base_head + ':' + update.path); matches(before, update.before);
+    const after = edited(before, update.edits); matches(after, update.after); assert.ok(equalBytes(member(update.after), after));
+    assert.equal(lateResourcePrograms.has(update.path), false);
+    lateResourcePrograms.set(update.path, {update, identities: [{ref: update.before, bytes: before}, {ref: update.after, bytes: after}]});
+   }
+  }
+ }
+ const lateResourceComparison = ref => {
+  const overlay = lateResourcePrograms.get(ref.path); if (!overlay) return member(ref);
+  const meta = metadata(ref), identity = overlay.identities.find(row => row.ref.path === meta.path &&
+   row.ref.sha256 === meta.sha256 && row.ref.bytes === meta.bytes);
+  assert.ok(identity, 'unknown late resource program comparison'); member(overlay.update.after); return Buffer.from(identity.bytes);
+ };
  if (line === 'main') {
   const continuation = JSON.parse(member({path: 'compatibility/rc/main-tooltip-resource-source-programs-v1.json',
    sha256: 'b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211', bytes: 15324}));
@@ -239,17 +280,17 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
    assert.equal(update.before.path, update.path); assert.equal(update.after.path, update.path);
    const before = originals.get(continuation.base_head + ':' + update.path); matches(before, update.before);
    const after = edited(before, update.edits); matches(after, update.after);
-   assert.ok(equalBytes(member(update.after), after));
+   assert.ok(equalBytes(lateResourceComparison(update.after), after));
    tooltipPrograms.set(update.path, {update, identities: [{ref: update.before, bytes: before}, {ref: update.after, bytes: after}]});
   }
  }
  // Only immutable program-comparison data is returned here. Physical reads
  // remain bound to the exact current image above and during every later guard.
  const tooltipProgramComparison = ref => {
-  const overlay = tooltipPrograms.get(ref.path); if (!overlay) return member(ref);
+  const overlay = tooltipPrograms.get(ref.path); if (!overlay) return lateResourceComparison(ref);
   const meta = metadata(ref), identity = overlay.identities.find(row => row.ref.path === meta.path &&
    row.ref.sha256 === meta.sha256 && row.ref.bytes === meta.bytes);
-  assert.ok(identity, 'unknown tooltip source program comparison'); member(overlay.update.after);
+  assert.ok(identity, 'unknown tooltip source program comparison'); lateResourceComparison(overlay.update.after);
   return Buffer.from(identity.bytes);
  };
  const routingImages=new Map(),retainedRulesJsPath='scripts/upstream-rules-js-build-admission.mjs';
@@ -497,6 +538,14 @@ function constructToolSubject({root=process.cwd(),read:providedRead}={},prebound
   const prior = domainOverlays.get(path);
   if (prior) {
    assert.deepEqual(prior.update.after, continuation.update.before, 'tooltip program must follow exact source frame');
+   domainOverlays.set(path, {update: {...prior.update, after: continuation.update.after},
+    identities: [...prior.identities, ...continuation.identities]});
+  } else domainOverlays.set(path, continuation);
+ }
+ for (const [path, continuation] of lateResourcePrograms) {
+  const prior = domainOverlays.get(path);
+  if (prior) {
+   assert.deepEqual(prior.update.after, continuation.update.before, 'late resource program must follow exact source frame');
    domainOverlays.set(path, {update: {...prior.update, after: continuation.update.after},
     identities: [...prior.identities, ...continuation.identities]});
   } else domainOverlays.set(path, continuation);

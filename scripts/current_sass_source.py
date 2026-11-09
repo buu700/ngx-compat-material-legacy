@@ -14,12 +14,14 @@ from select_dialog_finite_source_successor_v4 import SelectDialogFiniteSourceV4
 
 ROOT = Path(__file__).resolve().parents[1]
 SELF = 'scripts/current_sass_source.py'
+MAIN_GRAPH_PACKET = dict(path='compatibility/rc/parent-main-sass-domain-source-successor-v1.json',
+                         sha256='7b58ac738ab37f636daf1b7a1212a59dcb81f658263b993e6c9a0eed13308a9f', bytes=17886)
 TOOLTIP_RESOURCE_PACKET = dict(path='compatibility/rc/current-main-tooltip-resource-source-v1.json',
                               sha256='05abc16cda2e5a3fea79f4b054f34586de88b57febc9569185fe9ce00102747e', bytes=1246)
 FOCUS_STYLE_PACKET=dict(path='compatibility/rc/current-main-strong-focus-source-v1.json',sha256='e4f6c47d595edc21f102a756e3a827d077c0f717f1968b8672c691d4fb336ccb',bytes=1030)
 INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json'
 INPUTS_SHA = '46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9'
-SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='39b22e0fa057899769cbe3895a67b2b77c2ab543d770c5f72c4ef657da6f7ea6', bytes=28397)
+SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='f173497d4a16acb5c7e248363f214343f7c76f456212839b0da815064d09b4d9', bytes=29970)
 ADDITIONAL = ['projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss',
               'projects/ngx-material-legacy/styles/button/_button-theme.scss',
               'projects/ngx-material-legacy/styles/card/_card-theme.scss']
@@ -122,6 +124,7 @@ class CurrentSassSource:
         assert read is None or callable(read)
         bound = {}
         graph_successor = None
+        graph_resource_transitions = []
         def assert_physical():
             for row in bound.values():
                 assert _ref(row['path'], _physical(root, row['path'])) == row, 'changed final physical source ' + row['path']
@@ -176,6 +179,14 @@ class CurrentSassSource:
             for row in graph_successor.bound.values():
                 if row['path'] in bound: assert bound[row['path']]==row
                 else: bound[row['path']]=dict(row)
+        if initial_line == 'main':
+            graph_raw = current(MAIN_GRAPH_PACKET['path'])
+            assert _ref(MAIN_GRAPH_PACKET['path'], graph_raw) == MAIN_GRAPH_PACKET
+            graph = json.loads(graph_raw)
+            resources = [row for row in graph['transitions'] if row['path'].endswith(('.html', '.scss'))]
+            assert [row['path'] for row in resources] == ['projects/ngx-material-legacy/legacy-form-field/form-field.html',
+                'projects/ngx-material-legacy/legacy-form-field/form-field.scss', 'projects/ngx-material-legacy/legacy-menu/menu.scss']
+            graph_resource_transitions = [dict(path=row['path'], before=_metadata(row['before']), current=_metadata(row['after'])) for row in resources]
         if initial_line == 'main':
             for path,digest,size in [('scripts/select-dialog-finite-source-v6.mjs','4bd50817e745cf5c1e410a1a4c2b28726d95529f6d9df7a4d2bf953fddc8560a',15483),('scripts/select-dialog-finite-source-successor.mjs','1f58566ca39877ed180af58172aa040851a1f992f039f16ec9de7ea10809d929',12305)]:
                 helper_bytes=current(path);assert _hash(helper_bytes)==digest and len(helper_bytes)==size
@@ -260,6 +271,14 @@ class CurrentSassSource:
         if tooltip_resource is not None:
             assert tooltip_resource['before']['path'] not in historical
             historical[tooltip_resource['before']['path']] = git_tooltip_before
+        for row in graph_resource_transitions:
+            assert row['path'] not in historical
+            env = dict(PATH=os.environ.get('PATH', ''), GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null',
+                       GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1', GIT_TERMINAL_PROMPT='0')
+            before = subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',
+                'show', '8baa761eca624c9d71293c3d31750a2b3fdeebf0:' + row['path']], cwd=root, env=env)
+            assert _ref(row['path'], before) == row['before']
+            historical[row['path']] = before
         changes = {row['path']: row for row in packet['additional_modules']}
         for row in changes.values():
             before = historical[row['path']]
@@ -299,7 +318,7 @@ class CurrentSassSource:
         transitions = [dict(path=row['path'], before=row['before'], current=row['current']) for row in source['modules'] + packet['additional_modules']] + [sixth_transition] + ([dict(path=focus_style['before']['path'],before=focus_style['before'],current=focus_style['after'])] if focus_style else [])
         # Component resources do not change the finite theme/source-set contract.
         resource_transitions = ([dict(path=tooltip_resource['before']['path'], before=tooltip_resource['before'],
-                                      current=tooltip_resource['after'])] if tooltip_resource else [])
+                                      current=tooltip_resource['after'])] if tooltip_resource else []) + graph_resource_transitions
         for row in transitions:
             member(row['current'])
         source_sets, source_set_successors = {}, []

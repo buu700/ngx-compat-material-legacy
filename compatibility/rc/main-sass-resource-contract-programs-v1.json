@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "role": "main-sass-resource-contract-program-continuation",
+  "base_head": "ecc1051cfb829f0b67ba9cb50e4b733d6684ebff",
+  "source_program_packet": {
+    "path": "compatibility/rc/main-sass-graph-resource-source-programs-v2.json",
+    "sha256": "e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98",
+    "bytes": 6928
+  },
+  "updates": [
+    {
+      "path": "scripts/current-sass-spinner-snack-contract.mjs",
+      "before": {
+        "path": "scripts/current-sass-spinner-snack-contract.mjs",
+        "sha256": "b60b6b68f0ebbf7cd4b2877d9bd7b9433f97c03fb76e1b030080825f48b3248e",
+        "bytes": 22102
+      },
+      "after": {
+        "path": "scripts/current-sass-spinner-snack-contract.mjs",
+        "sha256": "98d54a01132d1c8e4c14331b1902efa1f019988e9264c256e0622c97b5e33020",
+        "bytes": 25863
+      },
+      "edits": [
+        {
+          "offset": 7658,
+          "before": "  let successor=null,selectSuccessor=null,domainSuccessor=null;\n",
+          "after": "  let successor=null,selectSuccessor=null,domainSuccessor=null,resourceSourceSuccessor=null,sourceImageSuccessor=null;\n"
+        },
+        {
+          "offset": 10931,
+          "before": "",
+          "after": "   const resourceRaw = member({path: 'compatibility/rc/main-tooltip-resource-source-programs-v1.json',\n    sha256: 'b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211', bytes: 15324});\n   resourceSourceSuccessor = JSON.parse(resourceRaw);\n   assert.equal(resourceSourceSuccessor.schema_version, 1);\n   assert.equal(resourceSourceSuccessor.role, 'main-tooltip-resource-source-program-continuation');\n   assert.equal(resourceSourceSuccessor.base_head, '8fe95564c981a9dd73605d27beaa0496824e8444');\n   for (const [key, value] of Object.entries({source_scope_only: true, historical_programs_executed: false,\n    historical_packets_rewritten: false, theme_module_contract_changed: false,\n    css_or_artifact_admission_granted: false, g11_claim: 'not-passed'})) assert.equal(resourceSourceSuccessor[key], value);\n   assert.deepEqual(resourceSourceSuccessor.updates.map(row => row.path), [...successor.updates.map(row => row.path), 'scripts/sass-spinner-snack-c04-source.mjs']);\n   for (const support of resourceSourceSuccessor.support) member(support);\n   sourceImageSuccessor = JSON.parse(member({path: 'compatibility/rc/main-sass-graph-resource-source-programs-v2.json',\n    sha256: 'e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98', bytes: 6928}));\n   assert.equal(sourceImageSuccessor.schema_version, 1);\n   assert.equal(sourceImageSuccessor.role, 'main-sass-graph-resource-source-program-continuation');\n   assert.equal(sourceImageSuccessor.base_head, 'ecc1051cfb829f0b67ba9cb50e4b733d6684ebff');\n   assert.deepEqual(sourceImageSuccessor.previous_packet, ref('compatibility/rc/main-tooltip-resource-source-programs-v1.json', resourceRaw));\n   assert.deepEqual(sourceImageSuccessor.updates.map(row => row.path), successor.updates.map(row => row.path));\n   for (const [key, value] of Object.entries({source_scope_only: true, historical_programs_executed: false,\n    historical_packets_rewritten: false, theme_module_contract_changed: false,\n    css_or_artifact_admission_granted: false, g11_claim: 'not-passed'})) assert.equal(sourceImageSuccessor[key], value);\n   for (const support of sourceImageSuccessor.support) member(support);\n"
+        },
+        {
+          "offset": 11122,
+          "before": "",
+          "after": "   execFileSync('git', ['--no-replace-objects', 'merge-base', '--is-ancestor', resourceSourceSuccessor.base_head, 'HEAD'], {cwd: root, env});\n   execFileSync('git', ['--no-replace-objects', 'merge-base', '--is-ancestor', sourceImageSuccessor.base_head, 'HEAD'], {cwd: root, env});\n"
+        },
+        {
+          "offset": 12489,
+          "before": "    const physicalAfter=Buffer.concat([...nextParts,after.subarray(nextCursor)]);assert.deepEqual(ref(row.path,physicalAfter),next.after);const end=domainSuccessor.updates.find(item=>item.path===row.path);assert.deepEqual(end.before,next.after);let at=0;const finalParts=[];for(const e of end.edits){assert.deepEqual(Object.keys(e).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(e.offset)&&e.offset>=at);const old=Buffer.from(e.before);assert.ok(equalBytes(physicalAfter.subarray(e.offset,e.offset+old.length),old));finalParts.push(physicalAfter.subarray(at,e.offset),Buffer.from(e.after));at=e.offset+old.length;}const final=Buffer.concat([...finalParts,physicalAfter.subarray(at)]);assert.deepEqual(ref(row.path,final),end.after);assert.ok(equalBytes(read(row.path),final));\n",
+          "after": "    const physicalAfter=Buffer.concat([...nextParts,after.subarray(nextCursor)]);assert.deepEqual(ref(row.path,physicalAfter),next.after);const end=domainSuccessor.updates.find(item=>item.path===row.path);assert.deepEqual(end.before,next.after);let at=0;const finalParts=[];for(const e of end.edits){assert.deepEqual(Object.keys(e).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(e.offset)&&e.offset>=at);const old=Buffer.from(e.before);assert.ok(equalBytes(physicalAfter.subarray(e.offset,e.offset+old.length),old));finalParts.push(physicalAfter.subarray(at,e.offset),Buffer.from(e.after));at=e.offset+old.length;}const final=Buffer.concat([...finalParts,physicalAfter.subarray(at)]);assert.deepEqual(ref(row.path,final),end.after);\n    let current = final, expected = end.after;\n    for (const continuation of [resourceSourceSuccessor, sourceImageSuccessor]) {\n     const resource = continuation.updates.find(item => item.path === row.path);\n     assert.deepEqual(resource.before, expected); let cursorResource = 0; const resourceParts = [];\n     const committed = execFileSync('git', ['--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',\n      'show', continuation.base_head + ':' + row.path], {cwd: root, env});\n     assert.ok(equalBytes(committed, current));\n     for (const edit of resource.edits) {\n      assert.deepEqual(Object.keys(edit).sort(), ['after', 'before', 'offset']);\n      assert.ok(Number.isSafeInteger(edit.offset) && edit.offset >= cursorResource && edit.offset <= current.length);\n      const old = Buffer.from(edit.before); assert.ok(equalBytes(current.subarray(edit.offset, edit.offset + old.length), old));\n      resourceParts.push(current.subarray(cursorResource, edit.offset), Buffer.from(edit.after)); cursorResource = edit.offset + old.length;\n     }\n     current = Buffer.concat([...resourceParts, current.subarray(cursorResource)]);\n     assert.deepEqual(ref(row.path, current), resource.after); expected = resource.after;\n    }\n    assert.ok(equalBytes(read(row.path), current));\n"
+        },
+        {
+          "offset": 13295,
+          "before": "  for (const [path, sha256, bytes] of PINS) {const update=domainSuccessor?.updates.find(row=>row.path===path);member(update?update.after:{path, sha256, bytes});}\n",
+          "after": "  for (const [path, sha256, bytes] of PINS) {const update=sourceImageSuccessor?.updates.find(row=>row.path===path);member(update?update.after:{path, sha256, bytes});}\n"
+        },
+        {
+          "offset": 14209,
+          "before": "  const expectedDescriptor = {source_subject: main?domainSuccessor.updates[0].after:{path: PINS[0][0], sha256: PINS[0][1], bytes: PINS[0][2]}, source_packet: {path: SOURCE_INPUTS, sha256: PINS[1][1], bytes: PINS[1][2]}, source_modules: [...base.branches[line].modules.map(r => r.current), ...currentPacket.additional_modules.map(r => r.current), main?JSON.parse(read('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json')).transition.after:sixth.branches[line].reviewed_after,...(main?[JSON.parse(read('compatibility/rc/current-main-strong-focus-source-v1.json')).after]:[])]};\n",
+          "after": "  const expectedDescriptor = {source_subject: main?sourceImageSuccessor.updates[0].after:{path: PINS[0][0], sha256: PINS[0][1], bytes: PINS[0][2]}, source_packet: {path: SOURCE_INPUTS, sha256: PINS[1][1], bytes: PINS[1][2]}, source_modules: [...base.branches[line].modules.map(r => r.current), ...currentPacket.additional_modules.map(r => r.current), main?JSON.parse(read('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json')).transition.after:sixth.branches[line].reviewed_after,...(main?[JSON.parse(read('compatibility/rc/current-main-strong-focus-source-v1.json')).after]:[])]};\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/current_sass_spinner_snack_admission.py",
+      "before": {
+        "path": "scripts/current_sass_spinner_snack_admission.py",
+        "sha256": "06b9d62e95c59809d4b0366193346e3088adc1f7fc0aeb0d5160654384751f61",
+        "bytes": 20501
+      },
+      "after": {
+        "path": "scripts/current_sass_spinner_snack_admission.py",
+        "sha256": "77754a29a76781c956dab7e7af88382ab83290c66c0c9f00d7b1b73a89f9d938",
+        "bytes": 24747
+      },
+      "edits": [
+        {
+          "offset": 5258,
+          "before": "",
+          "after": "        resource_source_successor = None\n        source_image_successor = None\n"
+        },
+        {
+          "offset": 8565,
+          "before": "",
+          "after": "            resource_raw = member(dict(path='compatibility/rc/main-tooltip-resource-source-programs-v1.json',\n                                      sha256='b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211', bytes=15324))\n            resource_source_successor = json.loads(resource_raw)\n            assert resource_source_successor['schema_version'] == 1 and resource_source_successor['role'] == 'main-tooltip-resource-source-program-continuation'\n            assert resource_source_successor['base_head'] == '8fe95564c981a9dd73605d27beaa0496824e8444'\n            for key, value in dict(source_scope_only=True, historical_programs_executed=False,\n                                   historical_packets_rewritten=False, theme_module_contract_changed=False,\n                                   css_or_artifact_admission_granted=False, g11_claim='not-passed').items():\n                assert resource_source_successor[key] == value\n            assert [row['path'] for row in resource_source_successor['updates']] == [row['path'] for row in successor['updates']] + ['scripts/sass-spinner-snack-c04-source.mjs']\n            for support in resource_source_successor['support']: member(support)\n            source_image_successor = json.loads(member(dict(path='compatibility/rc/main-sass-graph-resource-source-programs-v2.json',\n                sha256='e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98', bytes=6928)))\n            assert source_image_successor['schema_version'] == 1 and source_image_successor['role'] == 'main-sass-graph-resource-source-program-continuation'\n            assert source_image_successor['base_head'] == 'ecc1051cfb829f0b67ba9cb50e4b733d6684ebff'\n            assert source_image_successor['previous_packet'] == _ref('compatibility/rc/main-tooltip-resource-source-programs-v1.json', resource_raw)\n            assert [row['path'] for row in source_image_successor['updates']] == [row['path'] for row in successor['updates']]\n            for key, value in dict(source_scope_only=True, historical_programs_executed=False,\n                                   historical_packets_rewritten=False, theme_module_contract_changed=False,\n                                   css_or_artifact_admission_granted=False, g11_claim='not-passed').items():\n                assert source_image_successor[key] == value\n            for support in source_image_successor['support']: member(support)\n"
+        },
+        {
+          "offset": 8780,
+          "before": "",
+          "after": "            subprocess.check_call(['git', '--no-replace-objects', 'merge-base', '--is-ancestor', resource_source_successor['base_head'], 'HEAD'], cwd=root, env=env)\n            subprocess.check_call(['git', '--no-replace-objects', 'merge-base', '--is-ancestor', source_image_successor['base_head'], 'HEAD'], cwd=root, env=env)\n"
+        },
+        {
+          "offset": 10891,
+          "before": "                final=b''.join([*parts,physical_after[at:]]);assert _ref(row['path'],final)==end['after'] and current(row['path'])==final\n",
+          "after": "                final=b''.join([*parts,physical_after[at:]]);assert _ref(row['path'],final)==end['after']\n                updated, expected = final, end['after']\n                for continuation in (resource_source_successor, source_image_successor):\n                    resource = next(item for item in continuation['updates'] if item['path'] == row['path'])\n                    assert resource['before'] == expected; cursor_resource = 0; resource_parts = []\n                    committed = subprocess.check_output(['git', '--no-replace-objects', '-c', 'gc.auto=0', '-c', 'maintenance.auto=0',\n                                                         'show', continuation['base_head'] + ':' + row['path']], cwd=root, env=env)\n                    assert committed == updated\n                    for edit in resource['edits']:\n                        assert set(edit) == {'offset', 'before', 'after'}\n                        assert type(edit['offset']) is int and cursor_resource <= edit['offset'] <= len(updated)\n                        old = edit['before'].encode(); assert updated[edit['offset']:edit['offset'] + len(old)] == old\n                        resource_parts.extend((updated[cursor_resource:edit['offset']], edit['after'].encode())); cursor_resource = edit['offset'] + len(old)\n                    updated = b''.join([*resource_parts, updated[cursor_resource:]])\n                    assert _ref(row['path'], updated) == resource['after']; expected = resource['after']\n                assert current(row['path']) == updated\n"
+        },
+        {
+          "offset": 11069,
+          "before": "            update = next((row for row in domain_successor['updates'] if row['path']==path),None) if domain_successor else None\n",
+          "after": "            update = next((row for row in source_image_successor['updates'] if row['path']==path),None) if source_image_successor else None\n"
+        },
+        {
+          "offset": 11938,
+          "before": "        canonical_source = dict(source_subject=domain_successor['updates'][0]['after'] if main else dict(path=PINS[0][0], sha256=PINS[0][1], bytes=PINS[0][2]),\n",
+          "after": "        canonical_source = dict(source_subject=source_image_successor['updates'][0]['after'] if main else dict(path=PINS[0][0], sha256=PINS[0][1], bytes=PINS[0][2]),\n"
+        }
+      ]
+    }
+  ],
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "theme_module_contract_changed": false,
+  "css_or_artifact_admission_granted": false,
+  "g11_claim": "not-passed"
+}
