@@ -30,6 +30,23 @@ const BOUNDARIES = [
   'styles/card/_card-theme.scss',
 ].sort();
 const COMPANION_BRIDGE = 'projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss';
+const FOCUS_SOURCE = 'projects/ngx-material-legacy/styles/core/focus-indicators/_focus-indicators.scss';
+// A separate, finite companion contract; keep the generic override inspector.
+function inspectCurrentBoundary(source, path, raw) {
+  if (source.line !== 'main' || path !== FOCUS_SOURCE) return inspectOwnedMaterialBoundary(path, raw);
+  const row = source.transitions.find(row => row.path === path); assert.ok(row);
+  assert.equal(hash(raw), row.current.sha256); assert.equal(raw.length, row.current.bytes);
+  const text = raw.toString().replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  assert.deepEqual([...text.matchAll(/@(use|forward)\s+(['"])(@angular\/material[^'"]*)\2([^;]*);/g)]
+    .map(match => [match[1], match[3], match[4].trim()]), [['use', '@angular/material', 'as mat']]);
+  assert.deepEqual([...text.matchAll(/\bmat\.([\w-]+)\s*\(/g)].map(match => match[1]), ['strong-focus-indicators']);
+  assert.deepEqual([...text.matchAll(/@include\s+mat\.([\w-]+)\s*\(/g)].map(match => match[1]), ['strong-focus-indicators']);
+  assert.equal(/\$module\s*:/.test(text), false);
+  return {path, sha256: hash(raw), bytes: raw.length, peer_url: '@angular/material',
+    public_mixin_calls: ['strong-focus-indicators'], local_function_lookups: []};
+}
+const currentBoundaryNames = line => [...BOUNDARIES, ...(line === 'main' ?
+  ['styles/core/focus-indicators/_focus-indicators.scss'] : [])].sort();
 const HISTORICAL_SCOPE = 'compatibility/rc/upstream-sass-inspection-current-scope.json.gz';
 const HISTORICAL_PINS = {
   '21.x': {sha256: 'b0a8f0d0d2ce8cb41943a0585ccdcc25fd6bb0d30c9339f80501ef86c65726f4', bytes: 61597},
@@ -176,7 +193,7 @@ export function assertCurrentSassInspectionScopeSuccessor({root = process.cwd(),
   assert.equal(historical.line, source.line); assert.equal(historical.owned_scss_population.length, 409);
   assert.equal(historical.boundaries.length, 4); assert.equal(historical.public_override_mixins.length, 16);
   assert.equal(historical.candidate.functions.length, 25); assert.equal(historical.entry_override_used, false);
-  const transitions = new Map(source.transitions.map(row => [row.path, row]));
+  const transitions = new Map([...source.transitions, ...source.resource_transitions].map(row => [row.path, row]));
   const qualify = (ref, prefix = '') => {
     const row = transitions.get(prefix + ref.path); if (!row) return structuredClone(ref);
     const before = [row.before, row.current].find(value => value.sha256 === ref.sha256);
@@ -185,31 +202,34 @@ export function assertCurrentSassInspectionScopeSuccessor({root = process.cwd(),
     return {...ref, sha256: row.current.sha256, ...(Object.hasOwn(ref, 'bytes') ? {bytes: row.current.bytes} : {})};
   };
   const census = historical.owned_scss_population.map(row => qualify(row));
-  assert.equal(source.transitions.length, 6);
+  assert.equal(source.transitions.length, source.line === 'main' ? 7 : 6);
   assert.equal(source.transitions.filter(row => row.path === COMPANION_BRIDGE).length, 1);
   assert.equal(historical.boundaries.filter(row => row.path === COMPANION_BRIDGE).length, 1);
   const currentBoundaries = source.transitions.map(row => {
     const raw = readFileSync(join(root, row.path)); assert.equal(hash(raw), row.current.sha256); assert.equal(raw.length, row.current.bytes);
-    return inspectOwnedMaterialBoundary(row.path, raw);
+    return inspectCurrentBoundary(source, row.path, raw);
   });
+  assert.equal(currentBoundaries.length, source.line === 'main' ? 7 : 6);
   const newBoundaries = currentBoundaries.filter(row => row.path !== COMPANION_BRIDGE);
-  assert.equal(newBoundaries.length, 5);
+  assert.equal(newBoundaries.length, source.line === 'main' ? 6 : 5);
   assert.ok(newBoundaries.every(row => !historical.boundaries.some(old => old.path === row.path)));
   const bridge = currentBoundaries.find(row => row.path === COMPANION_BRIDGE);
   const boundaries = [...structuredClone(historical.boundaries).map(row => row.path === COMPANION_BRIDGE ? bridge : row),
     ...newBoundaries].sort((a, b) => a.path.localeCompare(b.path));
   assert.ok(boundaries.every(Boolean));
-  assert.deepEqual(boundaries.map(row => row.path.replace('projects/ngx-material-legacy/', '')).sort(), BOUNDARIES);
-  const mixins = [...new Set(boundaries.flatMap(row => row.public_mixin_calls))].sort(); assert.equal(mixins.length, 21);
+  assert.deepEqual(boundaries.map(row => row.path.replace('projects/ngx-material-legacy/', '')).sort(), currentBoundaryNames(source.line));
+  const mixins = [...new Set(boundaries.flatMap(row => row.public_mixin_calls).filter(name => name.endsWith('-overrides')))].sort(); assert.equal(mixins.length, 21);
+  const companions = source.line === 'main' ? ['strong-focus-indicators'] : [];
+  assert.deepEqual([...new Set(boundaries.flatMap(row => row.public_mixin_calls).filter(name => !name.endsWith('-overrides')))].sort(), companions);
   const candidate = structuredClone(historical.candidate), peer = structuredClone(historical.current);
   candidate.program = scopeProgram('projects/ngx-material-legacy', 'legacy'); candidate.program_sha256 = hash(candidate.program);
   candidate.loaded_sources = candidate.loaded_sources.map(row => row.root === 0 ? qualify(row, 'projects/ngx-material-legacy/') : row);
-  peer.program = scopeProgram('@angular/material', 'peer', mixins); peer.program_sha256 = hash(peer.program);
-  peer.messages = [...INSPECTION.map(name => 'inspection/' + name + '/true'), ...mixins.map(name => 'override/' + name + '/true')];
-  const expected = {schema_version: 1, line: source.line, result: 'pass',
+  peer.program = scopeProgram('@angular/material', 'peer', [...mixins, ...companions]); peer.program_sha256 = hash(peer.program);
+  peer.messages = [...INSPECTION.map(name => 'inspection/' + name + '/true'), ...[...mixins, ...companions].map(name => 'override/' + name + '/true')];
+  const expected = {schema_version: source.line === 'main' ? 2 : 1, line: source.line, result: 'pass',
     role: 'Five-module current compiler visibility only; historical receipts remain unchanged',
     owned_scss_population: census, owned_population_sha256: hash(JSON.stringify(census)), boundaries,
-    public_override_mixins: mixins, candidate, current: peer, inspection_names: INSPECTION,
+    public_override_mixins: mixins, ...(source.line === 'main' ? {public_companion_mixins: companions} : {}), candidate, current: peer, inspection_names: INSPECTION,
     current_source: source.descriptor, compiler: historical.sass, compile_calls: 2,
     historical_physical_constructor_executed: false, css_or_artifact_admission_granted: false,
     producer: {path: SELF, sha256: hash(image)}, g11_claim: 'not-passed'};
@@ -217,7 +237,7 @@ export function assertCurrentSassInspectionScopeSuccessor({root = process.cwd(),
   source.assertCurrent(); readHistorical();notices.assertCurrent();
   assert.deepEqual(captureCurrentSassMetadata(liveHistorical), originalHistorical); assert.deepEqual(captureCurrentSassMetadata(liveCurrent), current);
   assert.ok(readFileSync(join(root, SELF)).equals(image)); source.assertCurrent();
-  return {historical_owned_rows: 409, current_owned_rows: 409, historical_boundaries: 4, current_boundaries: 9,
+  return {historical_owned_rows: 409, current_owned_rows: 409, historical_boundaries: 4, current_boundaries: source.line === 'main' ? 10 : 9,
     historical_override_mixins: 16, current_override_mixins: 21, historical_functions: 25,
     independently_qualified_notice_prefixes:notices.count,
     fresh_compiler_execution_by_comparator: false, css_or_artifact_admission_granted: false};
@@ -231,10 +251,12 @@ export function measureCurrentSassInspectionScope({root = process.cwd(), entryOv
   assert.ok(readFileSync(join(root, LEGACY_INSPECTOR)).equals(inspectorImage));
   const census = sourcePopulation(root);
   assert.equal(census.length, 409);
-  const boundaries = census.map(row => inspectOwnedMaterialBoundary(row.path, readFileSync(join(root, row.path)))).filter(Boolean);
-  assert.deepEqual(boundaries.map(row => row.path.replace('projects/ngx-material-legacy/', '')).sort(), BOUNDARIES);
-  const publicMixins = [...new Set(boundaries.flatMap(row => row.public_mixin_calls))].sort();
+  const boundaries = census.map(row => inspectCurrentBoundary(source, row.path, readFileSync(join(root, row.path)))).filter(Boolean);
+  assert.deepEqual(boundaries.map(row => row.path.replace('projects/ngx-material-legacy/', '')).sort(), currentBoundaryNames(source.line));
+  const publicMixins = [...new Set(boundaries.flatMap(row => row.public_mixin_calls).filter(name => name.endsWith('-overrides')))].sort();
   assert.equal(publicMixins.length, 21);
+  const companions = source.line === 'main' ? ['strong-focus-indicators'] : [];
+  assert.deepEqual([...new Set(boundaries.flatMap(row => row.public_mixin_calls).filter(name => !name.endsWith('-overrides')))].sort(), companions);
   const oracle = JSON.parse(readFileSync(join(root, 'compatibility/rc/oracles/material-16.2.14-sass-api.json')));
   const material = realpathSync(join(root, 'node_modules/@angular/material'));
   const cdk = realpathSync(join(root, 'node_modules/@angular/cdk'));
@@ -243,20 +265,20 @@ export function measureCurrentSassInspectionScope({root = process.cwd(), entryOv
   const candidate = compileScope(sass, root, 'projects/ngx-material-legacy', 'legacy', [owned, material, cdk]);
   assert.deepEqual(candidate.functions, Object.keys(oracle.members.functions).sort());
   assert.equal(candidate.functions.length, 25);
-  const current = compileScope(sass, root, '@angular/material', 'peer', [material, cdk], publicMixins);
+  const current = compileScope(sass, root, '@angular/material', 'peer', [material, cdk], [...publicMixins, ...companions]);
   for (const name of INSPECTION) {
     assert.equal(candidate.functions.includes(name), false);
     assert.ok(current.messages.includes('inspection/' + name + '/true'));
   }
-  for (const name of publicMixins) assert.ok(current.messages.includes('override/' + name + '/true'));
+  for (const name of [...publicMixins, ...companions]) assert.ok(current.messages.includes('override/' + name + '/true'));
   source.assertCurrent();
   assert.deepEqual(sourcePopulation(root), census, 'inspection population changed');
   assert.ok(readFileSync(join(root, SELF)).equals(image));
   assert.ok(readFileSync(join(root, LEGACY_INSPECTOR)).equals(inspectorImage));
-  return {schema_version: 1, line: source.line, result: 'pass',
+  return {schema_version: source.line === 'main' ? 2 : 1, line: source.line, result: 'pass',
     role: 'Five-module current compiler visibility only; historical receipts remain unchanged',
     owned_scss_population: census, owned_population_sha256: hash(JSON.stringify(census)), boundaries,
-    public_override_mixins: publicMixins, candidate, current, inspection_names: INSPECTION,
+    public_override_mixins: publicMixins, ...(source.line === 'main' ? {public_companion_mixins: companions} : {}), candidate, current, inspection_names: INSPECTION,
     current_source: source.descriptor, compiler: sass.info, compile_calls: 2,
     historical_physical_constructor_executed: false, css_or_artifact_admission_granted: false,
     producer: {path: SELF, sha256: hash(image)}, g11_claim: 'not-passed'};

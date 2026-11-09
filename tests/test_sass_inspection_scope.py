@@ -9,11 +9,15 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+import sys
 import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+# Dynamic current-source helpers import sibling modules from this owned tree.
+sys.path.insert(0, str(ROOT / 'scripts'))
 from historical_contract_repair_source import qualify_tool_reference, qualify_spinner_snack_source_reference
 from sass_wrapper_notice_refs import qualified_notice_reference
 
-ROOT = Path(__file__).resolve().parents[1]
 SHA = lambda raw: hashlib.sha256(raw).hexdigest()
 
 
@@ -23,7 +27,7 @@ class SassInspectionScopeTests(unittest.TestCase):
                                 capture_output=True, text=True, timeout=90)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)
-        self.assertEqual(len(report['positive']), 10)
+        self.assertEqual(len(report['positive']), 12 if report['line'] == 'main' else 11)
         self.assertEqual(len(report['rejected']), 12)
         self.assertEqual(report['compiler_observation_mutants_rejected'], 2)
         self.assertEqual(report['unsupported_entry_overrides_rejected'], 2)
@@ -33,12 +37,13 @@ class SassInspectionScopeTests(unittest.TestCase):
         self.assertEqual(report['owned_scss_members'], 409)
         self.assertEqual(report['historical_functions'], 25)
         self.assertEqual(report['public_override_mixins'], 21)
-        self.assertEqual(report['direct_peer_boundaries'], 9)
+        self.assertEqual(report['direct_peer_boundaries'], 10 if report['line'] == 'main' else 9)
+        self.assertEqual(report['public_companion_mixins'], ['strong-focus-indicators'] if report['line'] == 'main' else [])
         self.assertEqual(report['historical_owned_scss_members'], 409)
         self.assertEqual(report['historical_peer_boundaries'], 4)
         self.assertEqual(report['historical_public_override_mixins'], 16)
         self.assertTrue(report['historical_receipt_unchanged'])
-        self.assertEqual(report['comparison']['current_boundaries'], 9)
+        self.assertEqual(report['comparison']['current_boundaries'], 10 if report['line'] == 'main' else 9)
         self.assertEqual(report['comparison']['current_override_mixins'], 21)
         self.assertFalse(report['comparison']['fresh_compiler_execution_by_comparator'])
         self.assertFalse(report['old_physical_constructor_executed'])

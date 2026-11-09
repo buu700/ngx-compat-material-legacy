@@ -19,11 +19,13 @@ try {
   const physical = path => readFileSync(join(root, path));
   const packet = JSON.parse(physical('compatibility/rc/main-current-inventory-source-routing-v7.json'));
   const update = packet.updates[0], source = make({root});
-  assert.equal(source.bound.length, 122); assert.equal(source.transitions.length, 7);
-  assert.deepEqual(source.qualify(update.before), update.after);
-  assert.deepEqual(source.qualify(update.after), update.after);
+  const latest = JSON.parse(physical('compatibility/rc/main-current-inventory-source-routing-v8.json')).updates.find(row => row.path === update.path).after;
+  assert.equal(source.bound.length, 123); assert.equal(source.transitions.length, 7);
+  assert.deepEqual(source.qualify(update.before), latest);
+  assert.deepEqual(source.qualify(update.after), latest);
+  assert.deepEqual(source.qualify(latest), latest);
   const old = source.comparisonBytes(update.before), current = physical(update.path);
-  assert.equal(hash(old), update.before.sha256); assert.equal(hash(current), update.after.sha256);
+  assert.equal(hash(old), update.before.sha256); assert.equal(hash(current), latest.sha256);
   assert.equal(old.equals(current), false);
   assert.throws(() => source.qualify({...update.before, bytes: update.before.bytes + 1}));
   assert.throws(() => source.qualify({...update.before, sha256: '0'.repeat(64)}));
@@ -60,7 +62,7 @@ try {
   mutate = true; let changedMetadataRejected = false;
   try {metadata.qualify(incoming);} catch {changedMetadataRejected = true;}
   metadata.assertCurrent(); incoming.sha256 = update.before.sha256;
-  assert.deepEqual(metadata.qualify(incoming), update.after);
+  assert.deepEqual(metadata.qualify(incoming), latest);
   const passed = warmColdRestoreRejected && caughtReentryRejected && changedMetadataRejected;
   const result = {result: passed ? 'pass' : 'fail', bound: source.bound.length,
     transitions: source.transitions.length, old_source_reader_rejected: true,

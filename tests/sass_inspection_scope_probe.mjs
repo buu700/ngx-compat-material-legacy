@@ -26,14 +26,21 @@ positive.push('exact-current-scope-successor-of-authenticated-historical-receipt
 assert.equal(actual.result,'pass');assert.equal(actual.historical_physical_constructor_executed,false);
 assert.equal(actual.css_or_artifact_admission_granted,false);assert.equal(actual.g11_claim,'not-passed');
 assert.equal(actual.owned_scss_population.length,409);assert.equal(actual.candidate.functions.length,25);
-assert.equal(actual.public_override_mixins.length,21);assert.equal(actual.boundaries.length,9);
+assert.equal(actual.public_override_mixins.length,21);assert.equal(actual.boundaries.length,actual.line==='main'?10:9);
+assert.deepEqual(actual.public_companion_mixins??[],actual.line==='main'?['strong-focus-indicators']:[]);
 assert.equal(actual.compile_calls,2);assert.equal(historical.entry_override_used,false);
 assert.equal(historical.owned_scss_population.length,409);assert.equal(historical.boundaries.length,4);
 assert.equal(historical.public_override_mixins.length,16);assert.equal(historical.candidate.functions.length,25);
 assert.ok(actual.current.loaded_sources.some(row=>row.root===0&&row.path==='core/theming/_inspection.scss'));
 assert.ok(actual.candidate.loaded_sources.some(row=>row.root===1&&row.path==='core/theming/_inspection.scss'));
 for(const boundary of actual.boundaries){
- assert.deepEqual(inspectOwnedMaterialBoundary(boundary.path,read(boundary.path)),boundary);
+ const raw=read(boundary.path);
+ if(actual.line==='main'&&boundary.path==='projects/ngx-material-legacy/styles/core/focus-indicators/_focus-indicators.scss'){
+  assert.deepEqual(boundary,{path:boundary.path,sha256:hash(raw),bytes:raw.length,peer_url:'@angular/material',
+   public_mixin_calls:['strong-focus-indicators'],local_function_lookups:[]});
+  // A separate current focus contract must not relax the generic inspector.
+  assert.throws(()=>inspectOwnedMaterialBoundary(boundary.path,raw));
+ }else assert.deepEqual(inspectOwnedMaterialBoundary(boundary.path,raw),boundary);
  positive.push('actual-owned-boundary/'+boundary.path);
 }
 const rejected=[];
@@ -67,7 +74,7 @@ for(const [id,name]of [['public-inspection-export','get-theme-color'],['private-
 }
 assert.ok(read(historicalPath).equals(historicalBytes),'historical receipt changed');
 const summary={line:actual.line,result:'pass',positive,rejected,owned_scss_members:409,historical_functions:25,
- public_override_mixins:21,direct_peer_boundaries:9,compiler_observation_mutants_rejected:2,
+ public_override_mixins:21,direct_peer_boundaries:actual.boundaries.length,public_companion_mixins:actual.public_companion_mixins??[],compiler_observation_mutants_rejected:2,
  unsupported_entry_overrides_rejected:2,compiler_mutants_executed:0,actual_compiler_calls:actual.compile_calls,
  historical_receipt_sha256:hash(historicalBytes),historical_receipt_unchanged:true,
  historical_owned_scss_members:409,historical_peer_boundaries:4,historical_public_override_mixins:16,comparison,

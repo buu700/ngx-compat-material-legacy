@@ -18,7 +18,7 @@ const root=resolve(process.argv[2]);assert.ok(root.includes('ngx-current-sass-so
 const hash=v=>createHash('sha256').update(v).digest('hex'),read=p=>readFileSync(join(root,p));
 const source=createCurrentSassSource({root});
 const historical=JSON.parse(gunzipSync(read('compatibility/rc/upstream-sass-inspection-current-scope.json.gz'))).actual;
-const rows=new Map(source.transitions.map(r=>[r.path,r]));
+const rows=new Map([...source.transitions,...source.resource_transitions].map(r=>[r.path,r]));
 const noticeBytes=source.line==='main'?read('compatibility/rc/sass-wrapper-notice-successor.json'):null;
 if(noticeBytes)assert.equal(hash(noticeBytes),'5be99f3d9441057f9007868ffc7f1c9efe7d7b766b56fa0e640ba80e4cff7493');
 const notices=new Map(noticeBytes?JSON.parse(noticeBytes).subjects.map(row=>[row.path,row]):[]);
@@ -30,23 +30,38 @@ const census=historical.owned_scss_population.map(r=>qualify(r));
 const bridgePath='projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss';
 assert.equal(historical.boundaries.filter(r=>r.path===bridgePath).length,1);
 assert.equal(source.transitions.filter(r=>r.path===bridgePath).length,1);
-const changed=source.transitions.map(r=>inspectOwnedMaterialBoundary(r.path,read(r.path)));
-assert.equal(changed.length,6);assert.equal(changed.filter(r=>r.path!==bridgePath).length,5);
+assert.equal(source.transitions.length, source.line === 'main' ? 7 : 6);
+const focusPath='projects/ngx-material-legacy/styles/core/focus-indicators/_focus-indicators.scss';
+const changed=source.transitions.map(r=>{
+ if(source.line!=='main'||r.path!==focusPath)return inspectOwnedMaterialBoundary(r.path,read(r.path));
+ const raw=read(r.path);assert.equal(hash(raw),r.current.sha256);
+ return {path:focusPath,sha256:hash(raw),bytes:raw.length,peer_url:'@angular/material',
+  public_mixin_calls:['strong-focus-indicators'],local_function_lookups:[]};
+});
+assert.equal(changed.length,source.line==='main'?7:6);assert.equal(changed.filter(r=>r.path!==bridgePath).length,source.line==='main'?6:5);
 const boundaries=[...structuredClone(historical.boundaries).map(r=>r.path===bridgePath?changed.find(row=>row.path===bridgePath):r),
  ...changed.filter(r=>r.path!==bridgePath)].sort((a,b)=>a.path.localeCompare(b.path));
 const mixins=[...historical.public_override_mixins,'progress-spinner-overrides','snack-bar-overrides','checkbox-overrides','button-overrides','card-overrides'].sort();
+const companions=source.line==='main'?['strong-focus-indicators']:[];
 const candidate=structuredClone(historical.candidate),peer=structuredClone(historical.current);
 candidate.program=candidate.program.replace('owned-material16-inspection-scope','projects/ngx-material-legacy');candidate.program_sha256=hash(candidate.program);
 candidate.loaded_sources=candidate.loaded_sources.map(r=>r.root===0?qualify(r,'projects/ngx-material-legacy/'):r);
-peer.program=peer.program.slice(0,peer.program.indexOf("@debug 'override/"))+mixins.map(n=>`@debug 'override/${n}/#{meta.mixin-exists('${n}',peer)}';`).join('\n');peer.program_sha256=hash(peer.program);
-peer.messages=[...historical.inspection_names.map(n=>'inspection/'+n+'/true'),...mixins.map(n=>'override/'+n+'/true')];
-const current={schema_version:1,line:source.line,result:'pass',role:'Five-module current compiler visibility only; historical receipts remain unchanged',
- owned_scss_population:census,owned_population_sha256:hash(JSON.stringify(census)),boundaries,public_override_mixins:mixins,
+peer.program=peer.program.slice(0,peer.program.indexOf("@debug 'override/"))+[...mixins,...companions].map(n=>`@debug 'override/${n}/#{meta.mixin-exists('${n}',peer)}';`).join('\n');peer.program_sha256=hash(peer.program);
+peer.messages=[...historical.inspection_names.map(n=>'inspection/'+n+'/true'),...[...mixins,...companions].map(n=>'override/'+n+'/true')];
+const current={schema_version:source.line==='main'?2:1,line:source.line,result:'pass',role:'Five-module current compiler visibility only; historical receipts remain unchanged',
+ owned_scss_population:census,owned_population_sha256:hash(JSON.stringify(census)),boundaries,public_override_mixins:mixins,...(source.line==='main'?{public_companion_mixins:companions}:{}),
  candidate,current:peer,inspection_names:historical.inspection_names,current_source:source.descriptor,compiler:historical.sass,compile_calls:2,
  historical_physical_constructor_executed:false,css_or_artifact_admission_granted:false,
  producer:{path:'scripts/current-sass-inspection-scope.mjs',sha256:hash(read('scripts/current-sass-inspection-scope.mjs'))},g11_claim:'not-passed'};
-const checks=[],check=(name,operation)=>{operation();checks.push(name);};
-check('exact independently assembled five-module scope model',()=>assert.equal(assertCurrentSassInspectionScopeSuccessor({root,historical,current}).current_boundaries,9));
+const group=process.argv[3]??'all';assert.ok(['all','base','focus'].includes(group));
+const focusChecks=new Set(['reject missing_focus_boundary','reject changed_focus_mixin','reject missing_focus_visibility',
+ 'reject arbitrary_companion','reject focus_labeled_as_override']);
+const checks=[],check=(name,operation)=>{
+ if(group==='base'&&focusChecks.has(name))return;
+ if(group==='focus'&&!focusChecks.has(name)&&!name.startsWith('exact independently assembled'))return;
+ operation();checks.push(name);
+};
+check('exact independently assembled scope with separate focus companion',()=>assert.equal(assertCurrentSassInspectionScopeSuccessor({root,historical,current}).current_boundaries,source.line==='main'?10:9));
 const mutants={
  old_boundary_count:v=>v.boundaries.splice(4),old_override_count:v=>v.public_override_mixins.pop(),
  historical_bridge_afterimage:v=>v.boundaries.find(r=>r.path===bridgePath).sha256=historical.boundaries.find(r=>r.path===bridgePath).sha256,
@@ -61,6 +76,13 @@ const mutants={
  old_constructor:v=>v.historical_physical_constructor_executed=true,artifact_claim:v=>v.css_or_artifact_admission_granted=true,
  extra:v=>v.approved=true,
 };
+if(source.line==='main')Object.assign(mutants,{
+ missing_focus_boundary:v=>v.boundaries=v.boundaries.filter(row=>row.path!==focusPath),
+ changed_focus_mixin:v=>v.boundaries.find(row=>row.path===focusPath).public_mixin_calls=['unowned'],
+ missing_focus_visibility:v=>v.public_companion_mixins=[],
+ arbitrary_companion:v=>v.public_companion_mixins.push('unowned'),
+ focus_labeled_as_override:v=>v.public_override_mixins.push('strong-focus-indicators'),
+});
 for(const[name,mutate]of Object.entries(mutants)){const value=structuredClone(current);mutate(value);check('reject '+name,()=>assert.throws(()=>assertCurrentSassInspectionScopeSuccessor({root,historical,current:value})));}
 if(source.line==='main'){
  check('value-identical raw historical key order remains irrelevant',()=>assert.equal(assertCurrentSassInspectionScopeSuccessor({root,historical:Object.fromEntries(Object.entries(historical).reverse()),current}).independently_qualified_notice_prefixes,7));
@@ -76,6 +98,6 @@ check('proxy rejected without traps',()=>assert.throws(()=>captureCurrentSassMet
 check('array subclass rejected',()=>{class Foreign extends Array{}assert.throws(()=>captureCurrentSassMetadata(new Foreign()));});
 check('data __proto__ cannot change clone prototype',()=>{const value=JSON.parse('{"__proto__":{"x":1}}'),copy=captureCurrentSassMetadata(value);assert.equal(Object.getPrototypeOf(copy),Object.prototype);assert.ok(Object.hasOwn(copy,'__proto__'));});
 check('no metadata getters',()=>assert.equal(getters,0));
-console.log(JSON.stringify({line:source.line,checks,checks_passed:checks.length,owned_rows:409,boundaries:9,public_mixins:21,historical_functions:25,
+console.log(JSON.stringify({line:source.line,group,checks,checks_passed:checks.length,owned_rows:409,boundaries:source.line==='main'?10:9,public_mixins:21,companion_mixins:companions,historical_functions:25,
  modeled_measurement_only:true,fresh_compiles:0,old_physical_constructor_executed:false,full_C04_tool_constructor_executed:false,
  full_C04_tool_constructor_pending:'parent finite current tool manifest is not finalized',getter_calls:getters}));

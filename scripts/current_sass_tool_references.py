@@ -332,6 +332,44 @@ class CurrentSassToolReferences:
         tooltip_programs = {}
         late_resource_programs = {}
         retained_test_before = {}
+        inspection_programs = {}
+        if self.line == 'main':
+            p = json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v8.json',
+                sha256='b45853d028402964a7b08c79b38c80991a65d623e84aae7d1ae0121cc9d8bd9c', bytes=24734)))
+            assert p['schema_version'] == 1 and p['role'] == 'main-current-inventory-sass-source-routing'
+            assert p['base_head'] == '94f7fdf857ef3472001091e0e443cd64718f3810'
+            assert p['previous_packet'] == dict(path='compatibility/rc/main-current-inventory-source-routing-v7.json',
+                sha256='6988117f3e1da0fcd53c5993b2402d997464775155b2310462ecd1dab3148f9a', bytes=2037)
+            assert p['support'] == []
+            paths = ['scripts/current-sass-inspection-scope.mjs', 'tests/current_sass_c04_scope_probe.mjs',
+                     'tests/current_sass_c04_fresh_probe.mjs', 'tests/test_current_sass_c04_scope.py',
+                     'tests/sass_inspection_scope_probe.mjs', 'tests/test_sass_inspection_scope.py',
+                     'tests/test_retained_landscape_tool_replay.py']
+            assert [row['path'] for row in p['updates']] == paths
+            for key, value in dict(source_scope_only=True, historical_programs_executed=False,
+                                  historical_packets_rewritten=False, original_ledger_metadata_recipe_changed=False,
+                                  source_judgments_changed=0, theme_module_contract_changed=False,
+                                  css_or_artifact_admission_granted=False, artifact_or_audit_admission_granted=False,
+                                  g11_claim='not-passed').items():
+                assert p[key] == value
+            inspection_env = dict(PATH=os.environ['PATH'], GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null',
+                                  GIT_NO_LAZY_FETCH='1', GIT_NO_REPLACE_OBJECTS='1', GIT_TERMINAL_PROMPT='0')
+            subprocess.check_call(['git', '--no-replace-objects', 'merge-base', '--is-ancestor', p['base_head'], 'HEAD'], cwd=self.root, env=inspection_env)
+            originals = _git_images(self.root, [dict(commit=p['base_head'], path=path) for path in paths])
+            for update in p['updates']:
+                assert update['before']['path'] == update['after']['path'] == update['path']
+                before = originals[(p['base_head'], update['path'])]; _matches(before, update['before'])
+                after = _edited(before, update['edits']); _matches(after, update['after'])
+                assert self._member(update['after']) == after
+                inspection_programs[update['path']] = (update, [(update['before'], before), (update['after'], after)])
+        # Historical program data remains private; reads and guards bind afterimages.
+        def inspection_comparison(ref):
+            overlay = inspection_programs.get(ref['path'])
+            if overlay is None: return self._member(ref)
+            update, identities = overlay; meta = _metadata(ref)
+            found = [raw for identity, raw in identities if identity == meta]
+            assert len(found) == 1, 'unknown inspection program comparison'
+            self._member(update['after']); return bytes(found[0])
         graph_program_packet = dict(path='compatibility/rc/main-sass-graph-resource-source-programs-v2.json',
             sha256='e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98', bytes=6928)
         if self.line == 'main':
@@ -377,15 +415,15 @@ class CurrentSassToolReferences:
                     assert update['before']['path'] == update['after']['path'] == update['path']
                     before = originals[(p['base_head'], update['path'])]; _matches(before, update['before'])
                     after = _edited(before, update['edits']); _matches(after, update['after'])
-                    assert self._member(update['after']) == after and update['path'] not in late_resource_programs
+                    assert inspection_comparison(update['after']) == after and update['path'] not in late_resource_programs
                     late_resource_programs[update['path']] = (update, [(update['before'], before), (update['after'], after)])
         def late_resource_comparison(ref):
             overlay = late_resource_programs.get(ref['path'])
-            if overlay is None: return self._member(ref)
+            if overlay is None: return inspection_comparison(ref)
             update, identities = overlay; meta = _metadata(ref)
             found = [raw for identity, raw in identities if identity == meta]
             assert len(found) == 1, 'unknown late resource program comparison'
-            self._member(update['after']); return bytes(found[0])
+            inspection_comparison(update['after']); return bytes(found[0])
         if self.line == 'main':
             continuation = json.loads(self._member(dict(path='compatibility/rc/main-tooltip-resource-source-programs-v1.json',
                 sha256='b7c7ef0e2a3a7b0f8d471983751e87155b7880b61a097c5f9254cf17fa0ec211', bytes=15324)))
@@ -465,7 +503,7 @@ class CurrentSassToolReferences:
             assert routing_packet['schema_version']==1 and routing_packet['role']=='main-current-inventory-source-routing' and routing_packet['base_head']=='54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0'
             assert routing_packet['source_scope_only'] is True and routing_packet['historical_programs_executed'] is False and routing_packet['historical_packets_rewritten'] is False and routing_packet['artifact_or_audit_admission_granted'] is False and routing_packet['g11_claim']=='not-passed'
             routing_paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];assert [row['path'] for row in routing_packet['updates']]==routing_paths
-            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='8372ec6b0ca27c3f7cd730fc6237bdc8bb8fd286aa03f22a4355d4b64bdff7fe',bytes=20148))
+            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='0c1f1bc178c632dfa5c2cc4706fea7e1f0bdaaed60ce02cd31d898e337718228',bytes=22492))
             routing_env=dict(PATH=os.environ['PATH'],GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0');subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',routing_packet['base_head'],'HEAD'],cwd=self.root,env=routing_env)
             routing_originals=_git_images(self.root,[dict(commit=routing_packet['base_head'],path=routing_path) for routing_path in routing_paths])
             routing_next=json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v3.json',sha256='d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b',bytes=13219)))
@@ -850,6 +888,12 @@ class CurrentSassToolReferences:
             prior = domain_overlays.get(path)
             if prior is not None:
                 assert prior[0]['after'] == update['before'], 'late resource program must follow exact source frame'
+                domain_overlays[path] = ({**prior[0], 'after': update['after']}, prior[1] + identities)
+            else: domain_overlays[path] = (update, identities)
+        for path, (update, identities) in inspection_programs.items():
+            prior = domain_overlays.get(path)
+            if prior is not None:
+                assert prior[0]['after'] == update['before'], 'inspection program must follow exact source frame'
                 domain_overlays[path] = ({**prior[0], 'after': update['after']}, prior[1] + identities)
             else: domain_overlays[path] = (update, identities)
         inventory_prior = dict(path='testing/legacy-runner/historical-inventory.json', sha256='a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403', bytes=106309)

@@ -19,6 +19,7 @@ const LATE_CONTINUATION={path:'compatibility/rc/main-current-inventory-source-ro
 const IDENTITY_CONTINUATION={path:'compatibility/rc/main-current-inventory-source-routing-v5.json',sha256:'47061b1a2794efe6c735d5bf7805ae79f00e96eb1454918bbf27555d4202616c',bytes:3548};
 const WRAPPER_CONTINUATION={path:'compatibility/rc/main-current-inventory-source-routing-v6.json',sha256:'233fa6a574a7124c0e1cc41bec2b307ae5d7517ae1e6e3f09e1b614e9c05f9a1',bytes:8161};
 const TEST_CONTINUATION={path:'compatibility/rc/main-current-inventory-source-routing-v7.json',sha256:'6988117f3e1da0fcd53c5993b2402d997464775155b2310462ecd1dab3148f9a',bytes:2037};
+const SASS_CONTINUATION={path:'compatibility/rc/main-current-inventory-source-routing-v8.json',sha256:'b45853d028402964a7b08c79b38c80991a65d623e84aae7d1ae0121cc9d8bd9c',bytes:24734};
 const wrapperBefore=[{path:'scripts/sass-wrapper-notice-metadata.mjs',sha256:'624093a294bbfaf06b66eeb54a81fb10c71140624d80e82620c1210586aa89aa',bytes:8020},{path:'scripts/historical-chip-wrapper-metadata.mjs',sha256:'f9e5fa9808a1553c216a95de42d6a3d251aac01d0066b87c8e630cb2d7d34a0e',bytes:11824}];
 const wrapperAnchors=[{path:wrapperBefore[0].path,packet:{path:'compatibility/rc/sass-wrapper-notice-ledger-successor.json',sha256:'7f5f042a3c45b96c3f128c454d71acc9bc059d96be8d5cc927b99296ed5d565e',bytes:144768}},{path:wrapperBefore[1].path,packet:{path:'compatibility/rc/historical-chip-source-wrapper-ledger-successor.json',sha256:'3e8a3e66ae603768d60d22f646b19ec283e6c599b0df5274363533a7d70efd30',bytes:57256}}];
 const paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];
@@ -40,11 +41,19 @@ export function currentInventorySourceSubject({root,read=p=>readEvidenceMember(r
  const testBefore=git(['show',test.base_head+':'+testUpdate.path]);check(testBefore,testUpdate.before);
  let testCursor=0;const testParts=[];assert.equal(testUpdate.edits.length,2);
  for(const edit of testUpdate.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=testCursor&&edit.offset<=testBefore.length);const old=Buffer.from(edit.before);assert.ok(testBefore.subarray(edit.offset,edit.offset+old.length).equals(old));testParts.push(testBefore.subarray(testCursor,edit.offset),Buffer.from(edit.after));testCursor=edit.offset+old.length;}
- const testAfter=Buffer.concat([...testParts,testBefore.subarray(testCursor)]);check(testAfter,testUpdate.after);assert.ok(testAfter.equals(physical(testUpdate.path)));
+ const testAfter=Buffer.concat([...testParts,testBefore.subarray(testCursor)]);check(testAfter,testUpdate.after);
+ const sassRaw=physical(SASS_CONTINUATION.path);check(sassRaw,SASS_CONTINUATION);const sass=JSON.parse(sassRaw);
+ assert.equal(sass.schema_version,1);assert.equal(sass.role,'main-current-inventory-sass-source-routing');assert.equal(sass.base_head,'94f7fdf857ef3472001091e0e443cd64718f3810');assert.deepEqual(sass.previous_packet,TEST_CONTINUATION);assert.deepEqual(sass.support,[]);
+ assert.deepEqual(sass.updates.map(row=>row.path),['scripts/current-sass-inspection-scope.mjs','tests/current_sass_c04_scope_probe.mjs','tests/current_sass_c04_fresh_probe.mjs','tests/test_current_sass_c04_scope.py','tests/sass_inspection_scope_probe.mjs','tests/test_sass_inspection_scope.py',testUpdate.path]);
+ for(const[key,value]of Object.entries({source_scope_only:true,historical_programs_executed:false,historical_packets_rewritten:false,original_ledger_metadata_recipe_changed:false,source_judgments_changed:0,theme_module_contract_changed:false,css_or_artifact_admission_granted:false,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(sass[key],value);
+ git(['merge-base','--is-ancestor',sass.base_head,'HEAD']);const latestTest=sass.updates.at(-1);assert.deepEqual(latestTest.before,testUpdate.after);assert.equal(latestTest.path,testUpdate.path);assert.equal(latestTest.after.path,testUpdate.path);
+ assert.ok(git(['show',sass.base_head+':'+testUpdate.path]).equals(testAfter));let latestCursor=0;const latestParts=[];assert.equal(latestTest.edits.length,2);
+ for(const edit of latestTest.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=latestCursor&&edit.offset<=testAfter.length);const old=Buffer.from(edit.before);assert.ok(testAfter.subarray(edit.offset,edit.offset+old.length).equals(old));latestParts.push(testAfter.subarray(latestCursor,edit.offset),Buffer.from(edit.after));latestCursor=edit.offset+old.length;}
+ const testLatest=Buffer.concat([...latestParts,testAfter.subarray(latestCursor)]);check(testLatest,latestTest.after);assert.ok(testLatest.equals(physical(testUpdate.path)));
  // The old support remains Git comparison DATA. Current guards below bind the
  // actual afterimage, and no old wrapper bytes are supplied as current source.
- const supportComparison=ref=>{if(ref.path!==testUpdate.path)return physical(ref.path);assert.deepEqual(ref,testUpdate.before);assert.ok(physical(ref.path).equals(testAfter));return Buffer.from(testBefore);};
- const currentSupport=ref=>{if(ref.path!==testUpdate.path)return ref;assert.deepEqual(ref,testUpdate.before);return testUpdate.after;};
+ const supportComparison=ref=>{if(ref.path!==testUpdate.path)return physical(ref.path);assert.deepEqual(ref,testUpdate.before);assert.ok(physical(ref.path).equals(testLatest));return Buffer.from(testBefore);};
+ const currentSupport=ref=>{if(ref.path!==testUpdate.path)return ref;assert.deepEqual(ref,testUpdate.before);return latestTest.after;};
  const rows=new Map();
  for(const row of packet.updates){
   assert.equal(row.before.path,row.path);assert.equal(row.after.path,row.path);const before=git(['show',packet.base_head+':'+row.path]);check(before,row.before);
@@ -109,9 +118,9 @@ export function currentInventorySourceSubject({root,read=p=>readEvidenceMember(r
   for(const edit of update.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=before.length);const old=Buffer.from(edit.before);assert.ok(before.subarray(edit.offset,edit.offset+old.length).equals(old));parts.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+old.length;}
   parts.push(before.subarray(cursor));const after=Buffer.concat(parts);check(after,update.after);assert.ok(after.equals(physical(update.path)));row.after={...update.after};row.images.set(update.after.sha256,{ref:{...update.after},bytes:Buffer.from(after)});
  }
- assert.equal(rows.has(testUpdate.path),false);rows.set(testUpdate.path,{before:{...testUpdate.before},after:{...testUpdate.after},images:new Map([[testUpdate.before.sha256,{ref:{...testUpdate.before},bytes:Buffer.from(testBefore)}],[testUpdate.after.sha256,{ref:{...testUpdate.after},bytes:Buffer.from(testAfter)}]])});
+ assert.equal(rows.has(testUpdate.path),false);rows.set(testUpdate.path,{before:{...testUpdate.before},after:{...latestTest.after},images:new Map([[testUpdate.before.sha256,{ref:{...testUpdate.before},bytes:Buffer.from(testBefore)}],[testUpdate.after.sha256,{ref:{...testUpdate.after},bytes:Buffer.from(testAfter)}],[latestTest.after.sha256,{ref:{...latestTest.after},bytes:Buffer.from(testLatest)}]])});
  const unique=new Map();
- for(const ref of [{path:SELF,sha256:hash(image),bytes:image.length},{...PACKET},{...CONTINUATION},{...LATE_CONTINUATION},{...IDENTITY_CONTINUATION},{...WRAPPER_CONTINUATION},{...TEST_CONTINUATION},...[...rows.values()].map(row=>({...row.after})),...next.support,...late.support.map(currentSupport),...identity.support]){
+ for(const ref of [{path:SELF,sha256:hash(image),bytes:image.length},{...PACKET},{...CONTINUATION},{...LATE_CONTINUATION},{...IDENTITY_CONTINUATION},{...WRAPPER_CONTINUATION},{...TEST_CONTINUATION},{...SASS_CONTINUATION},...[...rows.values()].map(row=>({...row.after})),...next.support,...late.support.map(currentSupport),...identity.support]){
   const prior=unique.get(ref.path);if(prior)assert.deepEqual(prior,ref);else unique.set(ref.path,{...ref});
  }
  const bound=[...unique.values()];

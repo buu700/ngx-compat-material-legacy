@@ -1,0 +1,342 @@
+{
+  "schema_version": 1,
+  "role": "main-current-inventory-sass-source-routing",
+  "base_head": "94f7fdf857ef3472001091e0e443cd64718f3810",
+  "previous_packet": {
+    "path": "compatibility/rc/main-current-inventory-source-routing-v7.json",
+    "sha256": "6988117f3e1da0fcd53c5993b2402d997464775155b2310462ecd1dab3148f9a",
+    "bytes": 2037
+  },
+  "updates": [
+    {
+      "path": "scripts/current-sass-inspection-scope.mjs",
+      "before": {
+        "path": "scripts/current-sass-inspection-scope.mjs",
+        "sha256": "25c0bd56988719d7f223ea5029dc7a455382e5f717bf1557651660f16d63a791",
+        "bytes": 18197
+      },
+      "after": {
+        "path": "scripts/current-sass-inspection-scope.mjs",
+        "sha256": "08a74d565210fc1f722a72371a5ebfc58fcc78956eceb30c9bf616fdd525473c",
+        "bytes": 20697
+      },
+      "edits": [
+        {
+          "offset": 1837,
+          "before": "",
+          "after": "const FOCUS_SOURCE = 'projects/ngx-material-legacy/styles/core/focus-indicators/_focus-indicators.scss';\n// A separate, finite companion contract; keep the generic override inspector.\nfunction inspectCurrentBoundary(source, path, raw) {\n  if (source.line !== 'main' || path !== FOCUS_SOURCE) return inspectOwnedMaterialBoundary(path, raw);\n  const row = source.transitions.find(row => row.path === path); assert.ok(row);\n  assert.equal(hash(raw), row.current.sha256); assert.equal(raw.length, row.current.bytes);\n  const text = raw.toString().replace(/\\/\\*[\\s\\S]*?\\*\\//g, '').replace(/^\\s*\\/\\/.*$/gm, '');\n  assert.deepEqual([...text.matchAll(/@(use|forward)\\s+(['\"])(@angular\\/material[^'\"]*)\\2([^;]*);/g)]\n    .map(match => [match[1], match[3], match[4].trim()]), [['use', '@angular/material', 'as mat']]);\n  assert.deepEqual([...text.matchAll(/\\bmat\\.([\\w-]+)\\s*\\(/g)].map(match => match[1]), ['strong-focus-indicators']);\n  assert.deepEqual([...text.matchAll(/@include\\s+mat\\.([\\w-]+)\\s*\\(/g)].map(match => match[1]), ['strong-focus-indicators']);\n  assert.equal(/\\$module\\s*:/.test(text), false);\n  return {path, sha256: hash(raw), bytes: raw.length, peer_url: '@angular/material',\n    public_mixin_calls: ['strong-focus-indicators'], local_function_lookups: []};\n}\nconst currentBoundaryNames = line => [...BOUNDARIES, ...(line === 'main' ?\n  ['styles/core/focus-indicators/_focus-indicators.scss'] : [])].sort();\n"
+        },
+        {
+          "offset": 11490,
+          "before": "  const transitions = new Map(source.transitions.map(row => [row.path, row]));\n",
+          "after": "  const transitions = new Map([...source.transitions, ...source.resource_transitions].map(row => [row.path, row]));\n"
+        },
+        {
+          "offset": 12130,
+          "before": "  assert.equal(source.transitions.length, 6);\n",
+          "after": "  assert.equal(source.transitions.length, source.line === 'main' ? 7 : 6);\n"
+        },
+        {
+          "offset": 12563,
+          "before": "    return inspectOwnedMaterialBoundary(row.path, raw);\n",
+          "after": "    return inspectCurrentBoundary(source, row.path, raw);\n"
+        },
+        {
+          "offset": 12625,
+          "before": "",
+          "after": "  assert.equal(currentBoundaries.length, source.line === 'main' ? 7 : 6);\n"
+        },
+        {
+          "offset": 12713,
+          "before": "  assert.equal(newBoundaries.length, 5);\n",
+          "after": "  assert.equal(newBoundaries.length, source.line === 'main' ? 6 : 5);\n"
+        },
+        {
+          "offset": 13163,
+          "before": "  assert.deepEqual(boundaries.map(row => row.path.replace('projects/ngx-material-legacy/', '')).sort(), BOUNDARIES);\n  const mixins = [...new Set(boundaries.flatMap(row => row.public_mixin_calls))].sort(); assert.equal(mixins.length, 21);\n",
+          "after": "  assert.deepEqual(boundaries.map(row => row.path.replace('projects/ngx-material-legacy/', '')).sort(), currentBoundaryNames(source.line));\n  const mixins = [...new Set(boundaries.flatMap(row => row.public_mixin_calls).filter(name => name.endsWith('-overrides')))].sort(); assert.equal(mixins.length, 21);\n  const companions = source.line === 'main' ? ['strong-focus-indicators'] : [];\n  assert.deepEqual([...new Set(boundaries.flatMap(row => row.public_mixin_calls).filter(name => !name.endsWith('-overrides')))].sort(), companions);\n"
+        },
+        {
+          "offset": 13771,
+          "before": "  peer.program = scopeProgram('@angular/material', 'peer', mixins); peer.program_sha256 = hash(peer.program);\n  peer.messages = [...INSPECTION.map(name => 'inspection/' + name + '/true'), ...mixins.map(name => 'override/' + name + '/true')];\n  const expected = {schema_version: 1, line: source.line, result: 'pass',\n",
+          "after": "  peer.program = scopeProgram('@angular/material', 'peer', [...mixins, ...companions]); peer.program_sha256 = hash(peer.program);\n  peer.messages = [...INSPECTION.map(name => 'inspection/' + name + '/true'), ...[...mixins, ...companions].map(name => 'override/' + name + '/true')];\n  const expected = {schema_version: source.line === 'main' ? 2 : 1, line: source.line, result: 'pass',\n"
+        },
+        {
+          "offset": 14285,
+          "before": "    public_override_mixins: mixins, candidate, current: peer, inspection_names: INSPECTION,\n",
+          "after": "    public_override_mixins: mixins, ...(source.line === 'main' ? {public_companion_mixins: companions} : {}), candidate, current: peer, inspection_names: INSPECTION,\n"
+        },
+        {
+          "offset": 15048,
+          "before": "  return {historical_owned_rows: 409, current_owned_rows: 409, historical_boundaries: 4, current_boundaries: 9,\n",
+          "after": "  return {historical_owned_rows: 409, current_owned_rows: 409, historical_boundaries: 4, current_boundaries: source.line === 'main' ? 10 : 9,\n"
+        },
+        {
+          "offset": 15928,
+          "before": "  const boundaries = census.map(row => inspectOwnedMaterialBoundary(row.path, readFileSync(join(root, row.path)))).filter(Boolean);\n  assert.deepEqual(boundaries.map(row => row.path.replace('projects/ngx-material-legacy/', '')).sort(), BOUNDARIES);\n  const publicMixins = [...new Set(boundaries.flatMap(row => row.public_mixin_calls))].sort();\n",
+          "after": "  const boundaries = census.map(row => inspectCurrentBoundary(source, row.path, readFileSync(join(root, row.path)))).filter(Boolean);\n  assert.deepEqual(boundaries.map(row => row.path.replace('projects/ngx-material-legacy/', '')).sort(), currentBoundaryNames(source.line));\n  const publicMixins = [...new Set(boundaries.flatMap(row => row.public_mixin_calls).filter(name => name.endsWith('-overrides')))].sort();\n"
+        },
+        {
+          "offset": 16313,
+          "before": "",
+          "after": "  const companions = source.line === 'main' ? ['strong-focus-indicators'] : [];\n  assert.deepEqual([...new Set(boundaries.flatMap(row => row.public_mixin_calls).filter(name => !name.endsWith('-overrides')))].sort(), companions);\n"
+        },
+        {
+          "offset": 16962,
+          "before": "  const current = compileScope(sass, root, '@angular/material', 'peer', [material, cdk], publicMixins);\n",
+          "after": "  const current = compileScope(sass, root, '@angular/material', 'peer', [material, cdk], [...publicMixins, ...companions]);\n"
+        },
+        {
+          "offset": 17240,
+          "before": "  for (const name of publicMixins) assert.ok(current.messages.includes('override/' + name + '/true'));\n",
+          "after": "  for (const name of [...publicMixins, ...companions]) assert.ok(current.messages.includes('override/' + name + '/true'));\n"
+        },
+        {
+          "offset": 17593,
+          "before": "  return {schema_version: 1, line: source.line, result: 'pass',\n",
+          "after": "  return {schema_version: source.line === 'main' ? 2 : 1, line: source.line, result: 'pass',\n"
+        },
+        {
+          "offset": 17855,
+          "before": "    public_override_mixins: publicMixins, candidate, current, inspection_names: INSPECTION,\n",
+          "after": "    public_override_mixins: publicMixins, ...(source.line === 'main' ? {public_companion_mixins: companions} : {}), candidate, current, inspection_names: INSPECTION,\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/current_sass_c04_scope_probe.mjs",
+      "before": {
+        "path": "tests/current_sass_c04_scope_probe.mjs",
+        "sha256": "2e5670ee1b6032907e260f8c5b36a7dccfb97f4484e2185d775a3f76e84bf79f",
+        "bytes": 8587
+      },
+      "after": {
+        "path": "tests/current_sass_c04_scope_probe.mjs",
+        "sha256": "762821c4c83014132b74df15e7730120f41a9c5e41b9274adfb630b2c782c079",
+        "bytes": 10309
+      },
+      "edits": [
+        {
+          "offset": 1124,
+          "before": "const rows=new Map(source.transitions.map(r=>[r.path,r]));\n",
+          "after": "const rows=new Map([...source.transitions,...source.resource_transitions].map(r=>[r.path,r]));\n"
+        },
+        {
+          "offset": 2176,
+          "before": "const changed=source.transitions.map(r=>inspectOwnedMaterialBoundary(r.path,read(r.path)));\nassert.equal(changed.length,6);assert.equal(changed.filter(r=>r.path!==bridgePath).length,5);\n",
+          "after": "assert.equal(source.transitions.length, source.line === 'main' ? 7 : 6);\nconst focusPath='projects/ngx-material-legacy/styles/core/focus-indicators/_focus-indicators.scss';\nconst changed=source.transitions.map(r=>{\n if(source.line!=='main'||r.path!==focusPath)return inspectOwnedMaterialBoundary(r.path,read(r.path));\n const raw=read(r.path);assert.equal(hash(raw),r.current.sha256);\n return {path:focusPath,sha256:hash(raw),bytes:raw.length,peer_url:'@angular/material',\n  public_mixin_calls:['strong-focus-indicators'],local_function_lookups:[]};\n});\nassert.equal(changed.length,source.line==='main'?7:6);assert.equal(changed.filter(r=>r.path!==bridgePath).length,source.line==='main'?6:5);\n"
+        },
+        {
+          "offset": 2749,
+          "before": "",
+          "after": "const companions=source.line==='main'?['strong-focus-indicators']:[];\n"
+        },
+        {
+          "offset": 3122,
+          "before": "peer.program=peer.program.slice(0,peer.program.indexOf(\"@debug 'override/\"))+mixins.map(n=>`@debug 'override/${n}/#{meta.mixin-exists('${n}',peer)}';`).join('\\n');peer.program_sha256=hash(peer.program);\npeer.messages=[...historical.inspection_names.map(n=>'inspection/'+n+'/true'),...mixins.map(n=>'override/'+n+'/true')];\nconst current={schema_version:1,line:source.line,result:'pass',role:'Five-module current compiler visibility only; historical receipts remain unchanged',\n owned_scss_population:census,owned_population_sha256:hash(JSON.stringify(census)),boundaries,public_override_mixins:mixins,\n",
+          "after": "peer.program=peer.program.slice(0,peer.program.indexOf(\"@debug 'override/\"))+[...mixins,...companions].map(n=>`@debug 'override/${n}/#{meta.mixin-exists('${n}',peer)}';`).join('\\n');peer.program_sha256=hash(peer.program);\npeer.messages=[...historical.inspection_names.map(n=>'inspection/'+n+'/true'),...[...mixins,...companions].map(n=>'override/'+n+'/true')];\nconst current={schema_version:source.line==='main'?2:1,line:source.line,result:'pass',role:'Five-module current compiler visibility only; historical receipts remain unchanged',\n owned_scss_population:census,owned_population_sha256:hash(JSON.stringify(census)),boundaries,public_override_mixins:mixins,...(source.line==='main'?{public_companion_mixins:companions}:{}),\n"
+        },
+        {
+          "offset": 4106,
+          "before": "const checks=[],check=(name,operation)=>{operation();checks.push(name);};\ncheck('exact independently assembled five-module scope model',()=>assert.equal(assertCurrentSassInspectionScopeSuccessor({root,historical,current}).current_boundaries,9));\n",
+          "after": "const group=process.argv[3]??'all';assert.ok(['all','base','focus'].includes(group));\nconst focusChecks=new Set(['reject missing_focus_boundary','reject changed_focus_mixin','reject missing_focus_visibility',\n 'reject arbitrary_companion','reject focus_labeled_as_override']);\nconst checks=[],check=(name,operation)=>{\n if(group==='base'&&focusChecks.has(name))return;\n if(group==='focus'&&!focusChecks.has(name)&&!name.startsWith('exact independently assembled'))return;\n operation();checks.push(name);\n};\ncheck('exact independently assembled scope with separate focus companion',()=>assert.equal(assertCurrentSassInspectionScopeSuccessor({root,historical,current}).current_boundaries,source.line==='main'?10:9));\n"
+        },
+        {
+          "offset": 5699,
+          "before": "",
+          "after": "if(source.line==='main')Object.assign(mutants,{\n missing_focus_boundary:v=>v.boundaries=v.boundaries.filter(row=>row.path!==focusPath),\n changed_focus_mixin:v=>v.boundaries.find(row=>row.path===focusPath).public_mixin_calls=['unowned'],\n missing_focus_visibility:v=>v.public_companion_mixins=[],\n arbitrary_companion:v=>v.public_companion_mixins.push('unowned'),\n focus_labeled_as_override:v=>v.public_override_mixins.push('strong-focus-indicators'),\n});\n"
+        },
+        {
+          "offset": 8192,
+          "before": "console.log(JSON.stringify({line:source.line,checks,checks_passed:checks.length,owned_rows:409,boundaries:9,public_mixins:21,historical_functions:25,\n",
+          "after": "console.log(JSON.stringify({line:source.line,group,checks,checks_passed:checks.length,owned_rows:409,boundaries:source.line==='main'?10:9,public_mixins:21,companion_mixins:companions,historical_functions:25,\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/current_sass_c04_fresh_probe.mjs",
+      "before": {
+        "path": "tests/current_sass_c04_fresh_probe.mjs",
+        "sha256": "157d5b51b3b79c147f26bcfeadb3719d8984928710087350b5a7f39626aab75f",
+        "bytes": 1692
+      },
+      "after": {
+        "path": "tests/current_sass_c04_fresh_probe.mjs",
+        "sha256": "b6ae84218172378b22caaca24fe5a74370aeed9aec97069dd4698a753c0fb8f2",
+        "bytes": 2471
+      },
+      "edits": [
+        {
+          "offset": 370,
+          "before": "import {measureCurrentSassInspectionScope} from '../scripts/current-sass-inspection-scope.mjs';\n",
+          "after": "import {gunzipSync} from 'node:zlib';\nimport {measureCurrentSassInspectionScope,assertCurrentSassInspectionScopeSuccessor} from '../scripts/current-sass-inspection-scope.mjs';\n"
+        },
+        {
+          "offset": 701,
+          "before": "assert.equal(result.boundaries.length,9);\n",
+          "after": "assert.equal(result.boundaries.length,result.line==='main'?10:9);\n"
+        },
+        {
+          "offset": 836,
+          "before": "assert.equal(result.current_source.source_modules.length,6);\n",
+          "after": "assert.equal(result.current_source.source_modules.length,result.line==='main'?7:6);\nif(result.line==='main')assert.deepEqual(result.public_companion_mixins,['strong-focus-indicators']);\nconst historical=JSON.parse(gunzipSync(readFileSync(join(root,'compatibility/rc/upstream-sass-inspection-current-scope.json.gz')))).actual;\nconst comparison=assertCurrentSassInspectionScopeSuccessor({root,historical,current:result});\nassert.equal(comparison.current_boundaries,result.boundaries.length);\n"
+        },
+        {
+          "offset": 1321,
+          "before": "",
+          "after": " ['projects/ngx-material-legacy/styles/core/focus-indicators/_focus-indicators.scss',\"\\n@include mat.unowned-overrides(());\\n\"],\n"
+        },
+        {
+          "offset": 1567,
+          "before": "console.log(JSON.stringify({line:result.line,rows:409,boundaries:9,mixins:21,compile_calls:2,physical_mutants_rejected:2}));\n",
+          "after": "console.log(JSON.stringify({line:result.line,rows:409,boundaries:result.boundaries.length,mixins:21,companion_mixins:result.public_companion_mixins??[],compile_calls:2,actual_measurement_compared_to_model:true,physical_mutants_rejected:3}));\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_current_sass_c04_scope.py",
+      "before": {
+        "path": "tests/test_current_sass_c04_scope.py",
+        "sha256": "57470ac499c785c56cde5fcc6b407b4e56880eef681960e222c4e852b522d46d",
+        "bytes": 2611
+      },
+      "after": {
+        "path": "tests/test_current_sass_c04_scope.py",
+        "sha256": "da82d35015cfd8f28aec8d787308bdbd326b206e12fbd3c15af668e0e20e3ba3",
+        "bytes": 4253
+      },
+      "edits": [
+        {
+          "offset": 1227,
+          "before": "            child = subprocess.run([NODE, str(ROOT / 'tests/current_sass_c04_scope_probe.mjs'), str(root)],\n",
+          "after": "            child = subprocess.run([NODE, str(ROOT / 'tests/current_sass_c04_scope_probe.mjs'), str(root), 'base'],\n"
+        },
+        {
+          "offset": 1641,
+          "before": "            self.assertEqual(result['boundaries'], 9)\n",
+          "after": "            self.assertEqual(result['boundaries'], 10 if line == 'main' else 9)\n"
+        },
+        {
+          "offset": 1818,
+          "before": "            self.assertGreaterEqual(result['checks_passed'], 25)\n",
+          "after": "            self.assertEqual(result['checks_passed'], 30 if line == 'main' else 28)\n"
+        },
+        {
+          "offset": 2381,
+          "before": "            self.assertEqual(measured, dict(line=line, rows=409, boundaries=9, mixins=21,\n                                            compile_calls=2, physical_mutants_rejected=2))\n",
+          "after": "            self.assertEqual(measured, dict(line=line, rows=409, boundaries=10 if line == 'main' else 9,\n                                            mixins=21, companion_mixins=['strong-focus-indicators'] if line == 'main' else [],\n                                            compile_calls=2, actual_measurement_compared_to_model=True,\n                                            physical_mutants_rejected=3))\n\n    def test_separate_focus_companion_controls(self):\n        with tempfile.TemporaryDirectory(prefix='ngx-current-sass-source-test-') as directory:\n            root = Path(directory)\n            line = candidate_fixture(root)\n            if line != 'main':\n                self.skipTest('The separate focus successor is main-only.')\n            for path in ['scripts/current-sass-inspection-scope.mjs', 'scripts/measure-sass-inspection-scope.mjs',\n                         'compatibility/rc/upstream-sass-inspection-current-scope.json.gz',\n                         'compatibility/rc/sass-wrapper-notice-successor.json']:\n                target = root / path\n                target.parent.mkdir(parents=True, exist_ok=True)\n                target.write_bytes((ROOT / path).read_bytes())\n            child = subprocess.run([NODE, str(ROOT / 'tests/current_sass_c04_scope_probe.mjs'), str(root), 'focus'],\n                                   cwd=ROOT, text=True, capture_output=True, timeout=30)\n            self.assertEqual(child.returncode, 0, child.stderr)\n            result = json.loads(child.stdout)\n            self.assertEqual(result['checks_passed'], 6)\n            self.assertEqual(result['boundaries'], 10)\n            self.assertEqual(result['companion_mixins'], ['strong-focus-indicators'])\n            self.assertEqual(result['fresh_compiles'], 0)\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/sass_inspection_scope_probe.mjs",
+      "before": {
+        "path": "tests/sass_inspection_scope_probe.mjs",
+        "sha256": "a5fdcde182556786958393f8e4bdc4a42e161ecb72a92a67307d51bec49b8b87",
+        "bytes": 5817
+      },
+      "after": {
+        "path": "tests/sass_inspection_scope_probe.mjs",
+        "sha256": "457d88edcf1bec7e3248a3d8e0a30027055b48a43c03a74f34c7f925ebf740fc",
+        "bytes": 6516
+      },
+      "edits": [
+        {
+          "offset": 1855,
+          "before": "assert.equal(actual.public_override_mixins.length,21);assert.equal(actual.boundaries.length,9);\n",
+          "after": "assert.equal(actual.public_override_mixins.length,21);assert.equal(actual.boundaries.length,actual.line==='main'?10:9);\nassert.deepEqual(actual.public_companion_mixins??[],actual.line==='main'?['strong-focus-indicators']:[]);\n"
+        },
+        {
+          "offset": 2522,
+          "before": " assert.deepEqual(inspectOwnedMaterialBoundary(boundary.path,read(boundary.path)),boundary);\n",
+          "after": " const raw=read(boundary.path);\n if(actual.line==='main'&&boundary.path==='projects/ngx-material-legacy/styles/core/focus-indicators/_focus-indicators.scss'){\n  assert.deepEqual(boundary,{path:boundary.path,sha256:hash(raw),bytes:raw.length,peer_url:'@angular/material',\n   public_mixin_calls:['strong-focus-indicators'],local_function_lookups:[]});\n  // A separate current focus contract must not relax the generic inspector.\n  assert.throws(()=>inspectOwnedMaterialBoundary(boundary.path,raw));\n }else assert.deepEqual(inspectOwnedMaterialBoundary(boundary.path,raw),boundary);\n"
+        },
+        {
+          "offset": 4953,
+          "before": " public_override_mixins:21,direct_peer_boundaries:9,compiler_observation_mutants_rejected:2,\n",
+          "after": " public_override_mixins:21,direct_peer_boundaries:actual.boundaries.length,public_companion_mixins:actual.public_companion_mixins??[],compiler_observation_mutants_rejected:2,\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_sass_inspection_scope.py",
+      "before": {
+        "path": "tests/test_sass_inspection_scope.py",
+        "sha256": "66a84c6d92dc5e515ad97b25ff8baff2656fade634e9bd69451d2405a26b3c55",
+        "bytes": 11508
+      },
+      "after": {
+        "path": "tests/test_sass_inspection_scope.py",
+        "sha256": "c749699064e6ef5beb05bb5f2d4214c54fdeacb430b140cc653142381c3a279b",
+        "bytes": 11873
+      },
+      "edits": [
+        {
+          "offset": 388,
+          "before": "",
+          "after": "import sys\n"
+        },
+        {
+          "offset": 404,
+          "before": "",
+          "after": "\nROOT = Path(__file__).resolve().parents[1]\n# Dynamic current-source helpers import sibling modules from this owned tree.\nsys.path.insert(0, str(ROOT / 'scripts'))\n"
+        },
+        {
+          "offset": 578,
+          "before": "ROOT = Path(__file__).resolve().parents[1]\n",
+          "after": ""
+        },
+        {
+          "offset": 1082,
+          "before": "        self.assertEqual(len(report['positive']), 10)\n",
+          "after": "        self.assertEqual(len(report['positive']), 12 if report['line'] == 'main' else 11)\n"
+        },
+        {
+          "offset": 1727,
+          "before": "        self.assertEqual(report['direct_peer_boundaries'], 9)\n",
+          "after": "        self.assertEqual(report['direct_peer_boundaries'], 10 if report['line'] == 'main' else 9)\n        self.assertEqual(report['public_companion_mixins'], ['strong-focus-indicators'] if report['line'] == 'main' else [])\n"
+        },
+        {
+          "offset": 2064,
+          "before": "        self.assertEqual(report['comparison']['current_boundaries'], 9)\n",
+          "after": "        self.assertEqual(report['comparison']['current_boundaries'], 10 if report['line'] == 'main' else 9)\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_retained_landscape_tool_replay.py",
+      "before": {
+        "path": "tests/test_retained_landscape_tool_replay.py",
+        "sha256": "e1ed3f5b61d7568ffed1aede2658174ad10c7baa52348edadfa191b785860fc2",
+        "bytes": 2060
+      },
+      "after": {
+        "path": "tests/test_retained_landscape_tool_replay.py",
+        "sha256": "3b9aee29e774516b50d599a7a28e71765bc048a17430a04c991da6ea2d139ab3",
+        "bytes": 2060
+      },
+      "edits": [
+        {
+          "offset": 1245,
+          "before": "                self.assertEqual((len(row['bound']),len(row['transitions'])),(519,100))\n",
+          "after": "                self.assertEqual((len(row['bound']),len(row['transitions'])),(520,103))\n"
+        },
+        {
+          "offset": 1973,
+          "before": "            self.assertEqual(len(shared[0]),517);self.assertEqual(shared[0],shared[1])\n",
+          "after": "            self.assertEqual(len(shared[0]),518);self.assertEqual(shared[0],shared[1])\n"
+        }
+      ]
+    }
+  ],
+  "support": [],
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "original_ledger_metadata_recipe_changed": false,
+  "source_judgments_changed": 0,
+  "theme_module_contract_changed": false,
+  "css_or_artifact_admission_granted": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed"
+}

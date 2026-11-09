@@ -33,7 +33,8 @@ console.log(JSON.stringify({comparison, line: value.line, result: value.result, 
   public_mixins: value.public_override_mixins, functions: value.candidate.functions,
   inspection_names: value.inspection_names, peer_messages: value.current.messages,
   owned_sources: value.owned_scss_population.length, compile_calls: value.compile_calls,
-  source_modules: value.current_source.source_modules, css_or_artifact_admission_granted: value.css_or_artifact_admission_granted}));
+  source_modules: value.current_source.source_modules, companion_mixins: value.public_companion_mixins ?? [],
+  schema_version: value.schema_version, css_or_artifact_admission_granted: value.css_or_artifact_admission_granted}));
 """
             child = subprocess.run([NODE, '--input-type=module', '-', str(root)], input=code,
                                    cwd=ROOT, text=True, capture_output=True, timeout=30)
@@ -42,12 +43,14 @@ console.log(JSON.stringify({comparison, line: value.line, result: value.result, 
             self.assertEqual(result['line'], line)
             self.assertEqual(result['result'], 'pass')
             self.assertEqual(result['owned_sources'], 409)
-            self.assertEqual(len(result['boundaries']), 9)
+            self.assertEqual(len(result['boundaries']), 10 if line == 'main' else 9)
             self.assertEqual(len(result['public_mixins']), 21)
             self.assertEqual(len(result['functions']), 25)
-            self.assertEqual(len(result['source_modules']), 5)
+            self.assertEqual(len(result['source_modules']), 7 if line == 'main' else 6)
+            self.assertEqual(result['schema_version'], 2 if line == 'main' else 1)
+            self.assertEqual(result['companion_mixins'], ['strong-focus-indicators'] if line == 'main' else [])
             self.assertEqual(result['compile_calls'], 2)
-            self.assertEqual(result['comparison']['current_boundaries'], 9)
+            self.assertEqual(result['comparison']['current_boundaries'], 10 if line == 'main' else 9)
             self.assertFalse(result['css_or_artifact_admission_granted'])
             for name in result['inspection_names']:
                 self.assertNotIn(name, result['functions'])

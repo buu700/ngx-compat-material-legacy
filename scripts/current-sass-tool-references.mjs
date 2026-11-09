@@ -217,7 +217,20 @@ function constructToolSubject({root=process.cwd(),read:initialRead}={},prebound,
  assert.equal(previous.schema_version,1);assert.equal(previous.role,packet.role);
  assert.deepEqual(packet.product_paths,[]);assert.equal(packet.historical_programs_executed,false);assert.equal(packet.historical_reports_rewritten,0);assert.equal(packet.artifact_or_audit_admission_granted,false);
  assert.ok(equalBytes(read(packagePath),packageImage),'package line changed');
- let matrixOwner;const domainOverlays=new Map(),tooltipPrograms=new Map(),lateResourcePrograms=new Map(),retainedTestBefore=new Map();
+ let matrixOwner;const domainOverlays=new Map(),tooltipPrograms=new Map(),lateResourcePrograms=new Map(),retainedTestBefore=new Map(),inspectionPrograms=new Map();
+ if(line==='main'){
+  const p=JSON.parse(member({path:'compatibility/rc/main-current-inventory-source-routing-v8.json',sha256:'b45853d028402964a7b08c79b38c80991a65d623e84aae7d1ae0121cc9d8bd9c',bytes:24734}));
+  assert.equal(p.schema_version,1);assert.equal(p.role,'main-current-inventory-sass-source-routing');assert.equal(p.base_head,'94f7fdf857ef3472001091e0e443cd64718f3810');
+  assert.deepEqual(p.previous_packet,{path:'compatibility/rc/main-current-inventory-source-routing-v7.json',sha256:'6988117f3e1da0fcd53c5993b2402d997464775155b2310462ecd1dab3148f9a',bytes:2037});assert.deepEqual(p.support,[]);
+  const paths=['scripts/current-sass-inspection-scope.mjs','tests/current_sass_c04_scope_probe.mjs','tests/current_sass_c04_fresh_probe.mjs','tests/test_current_sass_c04_scope.py','tests/sass_inspection_scope_probe.mjs','tests/test_sass_inspection_scope.py','tests/test_retained_landscape_tool_replay.py'];assert.deepEqual(p.updates.map(row=>row.path),paths);
+  for(const[key,value]of Object.entries({source_scope_only:true,historical_programs_executed:false,historical_packets_rewritten:false,original_ledger_metadata_recipe_changed:false,source_judgments_changed:0,theme_module_contract_changed:false,css_or_artifact_admission_granted:false,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(p[key],value);
+  const env={PATH:process.env.PATH,GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1',GIT_TERMINAL_PROMPT:'0'};execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',p.base_head,'HEAD'],{cwd:root,env});
+  const originals=gitImages(root,paths.map(path=>({commit:p.base_head,path})));
+  for(const update of p.updates){assert.equal(update.before.path,update.path);assert.equal(update.after.path,update.path);const before=originals.get(p.base_head+':'+update.path);matches(before,update.before);const after=edited(before,update.edits);matches(after,update.after);assert.ok(equalBytes(member(update.after),after));inspectionPrograms.set(update.path,{update,identities:[{ref:update.before,bytes:before},{ref:update.after,bytes:after}]});}
+ }
+ // Private historical program comparison only; every physical member and
+ // supplied callback stays bound to the authenticated current afterimage.
+ const inspectionComparison=ref=>{const overlay=inspectionPrograms.get(ref.path);if(!overlay)return member(ref);const meta=metadata(ref),identity=overlay.identities.find(row=>row.ref.path===meta.path&&row.ref.sha256===meta.sha256&&row.ref.bytes===meta.bytes);assert.ok(identity,'unknown inspection program comparison');member(overlay.update.after);return Buffer.from(identity.bytes);};
  const graphProgramPacket = {path: 'compatibility/rc/main-sass-graph-resource-source-programs-v2.json',
   sha256: 'e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98', bytes: 6928};
  if (line === 'main') {
@@ -261,17 +274,17 @@ function constructToolSubject({root=process.cwd(),read:initialRead}={},prebound,
    for (const update of p.updates) {
     assert.equal(update.before.path, update.path); assert.equal(update.after.path, update.path);
     const before = originals.get(p.base_head + ':' + update.path); matches(before, update.before);
-    const after = edited(before, update.edits); matches(after, update.after); assert.ok(equalBytes(member(update.after), after));
+    const after = edited(before, update.edits); matches(after, update.after); assert.ok(equalBytes(inspectionComparison(update.after), after));
     assert.equal(lateResourcePrograms.has(update.path), false);
     lateResourcePrograms.set(update.path, {update, identities: [{ref: update.before, bytes: before}, {ref: update.after, bytes: after}]});
    }
   }
  }
  const lateResourceComparison = ref => {
-  const overlay = lateResourcePrograms.get(ref.path); if (!overlay) return member(ref);
+  const overlay = lateResourcePrograms.get(ref.path); if (!overlay) return inspectionComparison(ref);
   const meta = metadata(ref), identity = overlay.identities.find(row => row.ref.path === meta.path &&
    row.ref.sha256 === meta.sha256 && row.ref.bytes === meta.bytes);
-  assert.ok(identity, 'unknown late resource program comparison'); member(overlay.update.after); return Buffer.from(identity.bytes);
+  assert.ok(identity, 'unknown late resource program comparison'); inspectionComparison(overlay.update.after); return Buffer.from(identity.bytes);
  };
  if (line === 'main') {
   const continuation = JSON.parse(member({path: 'compatibility/rc/main-tooltip-resource-source-programs-v1.json',
@@ -349,7 +362,7 @@ function constructToolSubject({root=process.cwd(),read:initialRead}={},prebound,
   const routing=JSON.parse(member({path:'compatibility/rc/main-current-inventory-source-routing-v2.json',sha256:'3815beb1e21779e54deaee5da2bf7bb316732e98a3dc9938ef6d2fdf18707280',bytes:24306}));
   assert.equal(routing.schema_version,1);assert.equal(routing.role,'main-current-inventory-source-routing');assert.equal(routing.base_head,'54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0');assert.equal(routing.source_scope_only,true);assert.equal(routing.historical_programs_executed,false);assert.equal(routing.historical_packets_rewritten,false);assert.equal(routing.artifact_or_audit_admission_granted,false);assert.equal(routing.g11_claim,'not-passed');
   const paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];assert.deepEqual(routing.updates.map(row=>row.path),paths);
-  member({path:'scripts/current-inventory-source-subject.mjs',sha256:'8372ec6b0ca27c3f7cd730fc6237bdc8bb8fd286aa03f22a4355d4b64bdff7fe',bytes:20148});
+  member({path:'scripts/current-inventory-source-subject.mjs',sha256:'0c1f1bc178c632dfa5c2cc4706fea7e1f0bdaaed60ce02cd31d898e337718228',bytes:22492});
   const env={PATH:process.env.PATH,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1',GIT_TERMINAL_PROMPT:'0'};execFileSync('git',['--no-replace-objects','merge-base','--is-ancestor',routing.base_head,'HEAD'],{cwd:root,env});const originals=gitImages(root,paths.map(path=>({commit:routing.base_head,path})));
   const next=JSON.parse(member({path:'compatibility/rc/main-current-inventory-source-routing-v3.json',sha256:'d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b',bytes:13219}));
   assert.equal(next.schema_version,1);assert.equal(next.role,'main-current-inventory-retained-source-routing');assert.equal(next.base_head,'b7ad00c881420e8621f23d77ab2feba7a3475e78');assert.equal(next.support_commit,next.base_head);
@@ -566,6 +579,7 @@ function constructToolSubject({root=process.cwd(),read:initialRead}={},prebound,
     identities: [...prior.identities, ...continuation.identities]});
   } else domainOverlays.set(path, continuation);
  }
+ for(const[path,continuation]of inspectionPrograms){const prior=domainOverlays.get(path);if(prior){assert.deepEqual(prior.update.after,continuation.update.before,'inspection program must follow exact source frame');domainOverlays.set(path,{update:{...prior.update,after:continuation.update.after},identities:[...prior.identities,...continuation.identities]});}else domainOverlays.set(path,continuation);}
  const inventoryPrior=Object.freeze({path:'testing/legacy-runner/historical-inventory.json',sha256:'a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403',bytes:106309});
  const inventoryCurrent=Object.freeze({path:inventoryPrior.path,sha256:'912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15',bytes:113388});
  const currentComparison=ref=>{
