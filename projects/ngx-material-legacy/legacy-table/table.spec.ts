@@ -15,7 +15,7 @@ import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-module
 import {BehaviorSubject, Observable} from 'rxjs';
 import {MatLegacyPaginator, MatLegacyPaginatorModule} from '../legacy-paginator/index';
 import {MatSort, MatSortHeader, MatSortModule} from '../sort/index';
-import {MatLegacyTableModule} from './index';
+import {MatLegacyTableModule, MatLegacyColumnDef, MatLegacyHeaderRowDef, MatLegacyFooterRowDef, MatLegacyRowDef} from './index';
 import {MatLegacyTable} from './table';
 import {MatLegacyTableDataSource} from './table-data-source';
 import {_LegacyTableDefinitionOwner} from './internal/definition-owner';
@@ -1321,4 +1321,39 @@ describe('legacy tables within a consumer viewport', () => {
     }
     fixture.destroy();
   });
+});
+
+@Component({standalone:false,template:`<table mat-table id="owned-outer" [dataSource]="data"><ng-container matColumnDef="value"><th mat-header-cell *matHeaderCellDef>Outer header</th><td mat-cell *matCellDef="let row">Outer {{row.value}}<table mat-table id="owned-inner" [dataSource]="inner"><ng-container matColumnDef="value"><th mat-header-cell *matHeaderCellDef>Inner header</th><td mat-cell *matCellDef="let row">Inner {{row.value}}</td><td mat-footer-cell *matFooterCellDef>Inner footer</td></ng-container><tr mat-header-row *matHeaderRowDef="['value']"></tr><tr mat-row *matRowDef="let row; columns:['value']"></tr><tr mat-footer-row *matFooterRowDef="['value']"></tr></table></td><td mat-footer-cell *matFooterCellDef>Outer footer</td></ng-container><tr mat-header-row *matHeaderRowDef="['value']"></tr><tr mat-row *matRowDef="let row; columns:['value']"></tr><tr mat-footer-row *matFooterRowDef="['value']"></tr><tr *matNoDataRow><td>No data</td></tr></table>`})
+class OwnedNestedNativeFixture {data=[{value:'one'}];inner=[{value:'two'}];
+ @ViewChildren(MatLegacyColumnDef) ownedColumns!: QueryList<MatLegacyColumnDef>;
+ @ViewChildren(MatLegacyHeaderRowDef) ownedHeaders!: QueryList<MatLegacyHeaderRowDef>;
+ @ViewChildren(MatLegacyFooterRowDef) ownedFooters!: QueryList<MatLegacyFooterRowDef>;
+ @ViewChildren(MatLegacyRowDef) ownedRows!: QueryList<MatLegacyRowDef<unknown>>;
+}
+
+@Component({standalone:false,template:`<mat-table id="owned-outer" [dataSource]="data"><ng-container matColumnDef="value"><mat-header-cell mat-header-cell *matHeaderCellDef>Outer header</mat-header-cell><mat-cell mat-cell *matCellDef="let row">Outer {{row.value}}<mat-table id="owned-inner" [dataSource]="inner"><ng-container matColumnDef="value"><mat-header-cell mat-header-cell *matHeaderCellDef>Inner header</mat-header-cell><mat-cell mat-cell *matCellDef="let row">Inner {{row.value}}</mat-cell><mat-footer-cell mat-footer-cell *matFooterCellDef>Inner footer</mat-footer-cell></ng-container><mat-header-row mat-header-row *matHeaderRowDef="['value']"></mat-header-row><mat-row mat-row *matRowDef="let row; columns:['value']"></mat-row><mat-footer-row mat-footer-row *matFooterRowDef="['value']"></mat-footer-row></mat-table></mat-cell><mat-footer-cell mat-footer-cell *matFooterCellDef>Outer footer</mat-footer-cell></ng-container><mat-header-row mat-header-row *matHeaderRowDef="['value']"></mat-header-row><mat-row mat-row *matRowDef="let row; columns:['value']"></mat-row><mat-footer-row mat-footer-row *matFooterRowDef="['value']"></mat-footer-row><div *matNoDataRow>No data</div></mat-table>`})
+class OwnedNestedFlexFixture {data=[{value:'one'}];inner=[{value:'two'}];
+ @ViewChildren(MatLegacyColumnDef) ownedColumns!: QueryList<MatLegacyColumnDef>;
+ @ViewChildren(MatLegacyHeaderRowDef) ownedHeaders!: QueryList<MatLegacyHeaderRowDef>;
+ @ViewChildren(MatLegacyFooterRowDef) ownedFooters!: QueryList<MatLegacyFooterRowDef>;
+ @ViewChildren(MatLegacyRowDef) ownedRows!: QueryList<MatLegacyRowDef<unknown>>;
+}
+
+
+describe('packed owned table definition identities',()=>{
+ beforeEach(waitForAsync(()=>TestBed.configureTestingModule({imports:[MatLegacyTableModule],declarations:[OwnedNestedNativeFixture,OwnedNestedFlexFixture],providers:[LEGACY_NOOP_ANIMATIONS]}).compileComponents()));
+ for(const [label,host] of [['native',OwnedNestedNativeFixture],['flex',OwnedNestedFlexFixture]] as const){
+  it('isolates all four definitions and their lifecycle in nested '+label+' tables',()=>{
+   const fixture=TestBed.createComponent(host);fixture.detectChanges();
+   const outer=fixture.debugElement.query(By.css('#owned-outer')).injector.get(CdkTable);
+   let inner=fixture.debugElement.query(By.css('#owned-inner')).injector.get(CdkTable);
+   const kinds=[MatLegacyColumnDef,MatLegacyHeaderRowDef,MatLegacyFooterRowDef,MatLegacyRowDef];
+   const definitions=(kind:any)=>{const h=fixture.componentInstance; return (kind===MatLegacyColumnDef?h.ownedColumns:kind===MatLegacyHeaderRowDef?h.ownedHeaders:kind===MatLegacyFooterRowDef?h.ownedFooters:h.ownedRows).toArray() as any[];};
+   function checkBoth(){for(const kind of kinds){const values=definitions(kind);expect(values.length).withContext(kind.name).toBe(2);expect(values.filter(x=>x._table===outer).length).withContext(kind.name+' outer').toBe(1);expect(values.filter(x=>x._table===inner).length).withContext(kind.name+' inner').toBe(1);}}
+   checkBoth();const element=fixture.nativeElement as HTMLElement;expect(element.querySelector('#owned-inner')!.textContent).toContain('Inner two');expect(element.textContent).toContain('Outer one');
+   const oldInner=inner;fixture.componentInstance.data=[];fixture.detectChanges();expect(element.querySelector('#owned-inner')).toBeNull();expect(element.textContent).toContain('No data');
+   for(const kind of kinds){const values=definitions(kind);expect(values.length).withContext(kind.name+' after removal').toBe(1);expect(values[0]._table).toBe(outer);expect(values.some(x=>x._table===oldInner)).toBeFalse();}
+   fixture.componentInstance.data=[{value:'again'}];fixture.detectChanges();inner=fixture.debugElement.query(By.css('#owned-inner')).injector.get(CdkTable);expect(inner).not.toBe(oldInner);checkBoth();expect(element.textContent).toContain('Outer again');fixture.destroy();
+  });
+ }
 });
