@@ -100,7 +100,7 @@ export function deriveCheckerReferenceMetadata({before,packet,checker}={}){
   unselected_entry_bytes_preserved:1697-pin.count,native_or_full_audit_credit:false};
 }
 /** Fresh fixed source verification;no verifier/compiler/result callback or cache. */
-export function prepareCheckerReferenceSourceMetadata({root,read=path=>currentFile(root,path)}={}){
+function constructCheckerReferenceSourceMetadata({root,read=path=>currentFile(root,path)}={}){
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version;
  const line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);const pin=pins[line],tools=checkerOwnerSourceSubject({root,read}),bound=new Map(tools.bound.map(ref=>[ref.path,{...ref}]));
  const member=(path,digest,bytes)=>{
@@ -133,9 +133,40 @@ export function prepareCheckerReferenceSourceMetadata({root,read=path=>currentFi
   const raw=read(ref.path),physical=currentFile(root,ref.path);assert.equal(hash(raw),ref.sha256,'late proposal input '+ref.path);assert.equal(raw.length,ref.bytes);assert.equal(hash(physical),ref.sha256,'late physical proposal input '+ref.path);
  }};
  const verifyAfter=candidate=>{assertCurrent();assert.ok(Buffer.isBuffer(candidate)&&candidate.equals(result.after),'not the exact checker-reference after-image');assertCurrent();return {metadata_only:true,native_or_full_audit_credit:false};};
- assertCurrent();return {line,before:Buffer.from(result.before),after:Buffer.from(result.after),updates:structuredClone(result.updates),preserved:structuredClone(result.preserved),
+ assertCurrent();const source={line,before:Buffer.from(result.before),after:Buffer.from(result.after),updates:structuredClone(result.updates),preserved:structuredClone(result.preserved),
   metadata_reference_updates:pin.count,unselected_entry_bytes_preserved:1697-pin.count,bound:structuredClone([...bound.values()]),verifier:structuredClone(verifier),assertCurrent,verifyAfter,
   canonical_owner_integration_complete:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+ // Context assembly stays inside this actual producer. No caller can supply a
+ // subject or recover the private owner used by its source guards.
+ const finishOwner=()=>{
+  const LEDGER=CHECKER_REFERENCE_LEDGER;
+ assert.equal(tools.line,source.line);assert.equal(hash(source.before),tools.packet.before_ledger.sha256);assert.equal(hash(source.after),tools.packet.after_ledger.sha256);
+ const raw=read(LEDGER),current={path:LEDGER,sha256:hash(raw),bytes:raw.length};
+ const bound=new Map([...tools.bound,...source.bound,current].map(ref=>[ref.path,{...ref}]));
+ const applied=raw.equals(source.after);
+ const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'late checker metadata input '+ref.path);assert.equal(value.length,ref.bytes);}};
+ const wrapPrepared=prior=>{
+  assertCurrent();assert.ok(prior.canonical_after.equals(source.before),'checker stage does not succeed the exact inventory after-image');
+  const currentBound=new Map(prior.bound);for(const ref of bound.values())currentBound.set(ref.path,ref.sha256);
+  const assertPrior=()=>{assertCurrent();prior.assertCurrent?.();prior.prior_metadata_assert_current?.();assertCurrent();};
+  const stage={before:Buffer.from(source.before),after:Buffer.from(source.after),metadata_entries:source.metadata_reference_updates,
+   source_reference_updates:source.metadata_reference_updates,individual_decisions:0,assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false};
+  assertPrior();return {...prior,canonical_after:Buffer.from(source.after),bound:currentBound,checker_reference_stage:stage,
+   assertCurrent:assertPrior,prior_metadata_assert_current:assertPrior};
+ };
+ assertCurrent();return {line:source.line,before:Buffer.from(source.before),after:Buffer.from(source.after),applied,
+  metadata_entries:source.metadata_reference_updates,bound:structuredClone([...bound.values()]),assertCurrent,wrapPrepared,
+  canonical_frame_admission_granted:false,current_native_packed_or_floor_or_g11_credit:false};
+ };
+ return {source,finishOwner};
+}
+/** Fresh source-only construction; the internal owner never escapes. */
+export function prepareCheckerReferenceSourceMetadata(options){
+ return constructCheckerReferenceSourceMetadata(options).source;
+}
+/** Fresh metadata context assembled with the producer's actual private owner. */
+export function prepareCheckerReferenceOwnerMetadata(options){
+ return constructCheckerReferenceSourceMetadata(options).finishOwner();
 }
 /** The public proposal API admits only its exact complete before/after images.
  * This is no substitute for the canonical owner's complete historical-frame gate. */

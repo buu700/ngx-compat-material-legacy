@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "role": "main-checker-context-source-routing",
+  "base_head": "ca20a693b0b3e07cfea1a58c5faad97bbc12c5a4",
+  "previous_packet": {
+    "path": "compatibility/rc/main-checker-owned-comparison-source-routing-v11.json",
+    "sha256": "38ccf3df4541a68bf931b3d07be9ebb203d25031436a79ac94488c2e6b02cd30",
+    "bytes": 8860
+  },
+  "updates": [
+    {
+      "path": "scripts/checker-reference-proposal.mjs",
+      "before": {
+        "path": "scripts/checker-reference-proposal.mjs",
+        "sha256": "a9cd97d53d5235e4420ce7487c1f1b799b931813eea67169cbbcb51351e239ac",
+        "bytes": 13666
+      },
+      "after": {
+        "path": "scripts/checker-reference-proposal.mjs",
+        "sha256": "b409befda6fe472ce74046916879b35285bdc873db5b263c5a984e5159a84a03",
+        "bytes": 16225
+      },
+      "edits": [
+        {
+          "offset": 7691,
+          "before": "export ",
+          "after": ""
+        },
+        {
+          "offset": 7707,
+          "before": "p",
+          "after": "const"
+        },
+        {
+          "offset": 7709,
+          "before": "epare",
+          "after": "uct"
+        },
+        {
+          "offset": 12087,
+          "before": "re",
+          "after": "cons"
+        },
+        {
+          "offset": 12090,
+          "before": "",
+          "after": " so"
+        },
+        {
+          "offset": 12092,
+          "before": "n ",
+          "after": "ce="
+        },
+        {
+          "offset": 12577,
+          "before": "",
+          "after": ";\n // Context assembly stays inside this actual producer. No caller can supply a\n // subject or recover the private owner used by its source guards.\n const finishOwner=()=>{\n  const LEDGER=CHECKER_REFERENCE_LEDGER;\n assert.equal(tools.line,source.line);assert.equal(hash(source.before),tools.packet.before_ledger.sha256);assert.equal(hash(source.after),tools.packet.after_ledger.sha256);\n const raw=read(LEDGER),current={path:LEDGER,sha256:hash(raw),bytes:raw.length};\n const bound=new Map([...tools.bound,...source.bound,current].map(ref=>[ref.path,{...ref}]));\n const applied=raw.equals(source.after);\n const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'late checker metadata input '+ref.path);assert.equal(value.length,ref.bytes);}};\n const wrapPrepared=prior=>{\n  assertCurrent();assert.ok(prior.canonical_after.equals(source.before),'checker stage does not succeed the exact inventory after-image');\n  const currentBound=new Map(prior.bound);for(const ref of bound.values())currentBound.set(ref.path,ref.sha256);\n  const assertPrior=()=>{assertCurrent();prior.assertCurrent?.();prior.prior_metadata_assert_current?.();assertCurrent();};\n  const stage={before:Buffer.from(source.before),after:Buffer.from(source.after),metadata_entries:source.metadata_reference_updates,\n   source_reference_updates:source.metadata_reference_updates,individual_decisions:0,assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false};\n  assertPrior();return {...prior,canonical_after:Buffer.from(source.after),bound:currentBound,checker_reference_stage:stage,\n   assertCurrent:assertPrior,prior_metadata_assert_current:assertPrior};\n };\n assertCurrent();return {line:source.line,before:Buffer.from(source.before),after:Buffer.from(source.after),applied,\n  metadata_entries:source.metadata_reference_updates,bound:structuredClone([...bound.values()]),assertCurrent,wrapPrepared,\n  canonical_frame_admission_granted:false,current_native_packed_or_floor_or_g11_credit:false};\n };\n return {source,finishOwner};\n}\n/** Fresh source-only construction; the internal owner never escapes. */\nexport function prepareCheckerReferenceSourceMetadata(options){\n return constructCheckerReferenceSourceMetadata(options).source;\n}\n/** Fresh metadata context assembled with the producer's actual private owner. */\nexport function prepareCheckerReferenceOwnerMetadata(options){\n return constructCheckerReferenceSourceMetadata(options).finishOwner()"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_retained_landscape_tool_replay.py",
+      "before": {
+        "path": "tests/test_retained_landscape_tool_replay.py",
+        "sha256": "b664699fa6ef1143260b74d21ea681a9b63fc9ed053622d86a94009f54405d6a",
+        "bytes": 2060
+      },
+      "after": {
+        "path": "tests/test_retained_landscape_tool_replay.py",
+        "sha256": "6de1f14d64d541c7d230b8b330ab06ef721fb9e1dc474eac04f3ddcc7cd0329e",
+        "bytes": 2060
+      },
+      "edits": [
+        {
+          "offset": 1325,
+          "before": "5",
+          "after": "7"
+        },
+        {
+          "offset": 1328,
+          "before": "",
+          "after": "1"
+        },
+        {
+          "offset": 1329,
+          "before": "9",
+          "after": ""
+        },
+        {
+          "offset": 2019,
+          "before": "3",
+          "after": "5"
+        }
+      ]
+    }
+  ],
+  "source_owner_update": {
+    "path": "scripts/checker-reference-owner.mjs",
+    "before": {
+      "path": "scripts/checker-reference-owner.mjs",
+      "sha256": "ea36612e6a0fe731a88b0ee5d35d8324ab6e4e4a70e7a970db042267de34800e",
+      "bytes": 2712
+    },
+    "after": {
+      "path": "scripts/checker-reference-owner.mjs",
+      "sha256": "c468363271c8e07800795ba84a99318f145888a3f8a753a8049ddd0571cf8aa9",
+      "bytes": 563
+    },
+    "edits": [
+      {
+        "offset": 201,
+        "before": ";",
+        "after": " assembled by its actu"
+      },
+      {
+        "offset": 204,
+        "before": "l",
+        "after": ""
+      },
+      {
+        "offset": 206,
+        "before": "",
+        "after": "sourc"
+      },
+      {
+        "offset": 207,
+        "before": "a",
+        "after": " p"
+      },
+      {
+        "offset": 209,
+        "before": "li",
+        "after": "oduc"
+      },
+      {
+        "offset": 213,
+        "before": " owner functions remain in use",
+        "after": ""
+      },
+      {
+        "offset": 255,
+        "before": "assert from 'node:assert/strict';\nimport ",
+        "after": ""
+      },
+      {
+        "offset": 297,
+        "before": "createHash} from 'node:crypto';\nimport {checkerOwnerSourceSubject,",
+        "after": ""
+      },
+      {
+        "offset": 453,
+        "before": "Sou",
+        "after": "Owne"
+      },
+      {
+        "offset": 457,
+        "before": "ce",
+        "after": ""
+      },
+      {
+        "offset": 467,
+        "before": ",CHECKER_REFERENCE_LEDGER as LEDGER",
+        "after": ""
+      },
+      {
+        "offset": 543,
+        "before": ";\nconst hash=raw=>createHash('sha256').update(raw).digest('hex')",
+        "after": ""
+      },
+      {
+        "offset": 712,
+        "before": "cons",
+        "after": "re"
+      },
+      {
+        "offset": 717,
+        "before": " tools=checkerOwnerSo",
+        "after": ""
+      },
+      {
+        "offset": 740,
+        "before": "ceSubject({root,read}),source=",
+        "after": "n "
+      },
+      {
+        "offset": 793,
+        "before": "Sou",
+        "after": "Owne"
+      },
+      {
+        "offset": 797,
+        "before": "ce",
+        "after": ""
+      },
+      {
+        "offset": 822,
+        "before": " assert.equal(tools.line,source.line);assert.equal(hash(source.before),tools.packet.before_ledger.sha256);assert.equal(hash(source.after),tools.packet.after_ledger.sha256);\n const raw=read(LEDGER),current={path:LEDGER,sha256:hash(raw),bytes:raw.length};\n const bound=new Map([...tools.bound,...source.bound,current].map(ref=>[ref.path,{...ref}]));\n const applied=raw.equals(source.after);\n const assertCurrent=()=>{tools.assertCurrent();source.assertCurrent();for(const ref of bound.values()){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'late checker metadata input '+ref.path);assert.equal(value.length,ref.bytes);}};\n const wrapPrepared=prior=>{\n  assertCurrent();assert.ok(prior.canonical_after.equals(source.before),'checker stage does not succeed the exact inventory after-image');\n  const currentBound=new Map(prior.bound);for(const ref of bound.values())currentBound.set(ref.path,ref.sha256);\n  const assertPrior=()=>{assertCurrent();prior.assertCurrent?.();prior.prior_metadata_assert_current?.();assertCurrent();};\n  const stage={before:Buffer.from(source.before),after:Buffer.from(source.after),metadata_entries:source.metadata_reference_updates,\n   source_reference_updates:source.metadata_reference_updates,individual_decisions:0,assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false};\n  assertPrior();return {...prior,canonical_after:Buffer.from(source.after),bound:currentBound,checker_reference_stage:stage,\n   assertCurrent:assertPrior,prior_metadata_assert_current:assertPrior};\n };\n assertCurrent();return {line:source.line,before:Buffer.from(source.before),after:Buffer.from(source.after),applied,\n  metadata_entries:source.metadata_reference_updates,bound:structuredClone([...bound.values()]),assertCurrent,wrapPrepared,\n  canonical_frame_admission_granted:false,current_native_packed_or_floor_or_g11_credit:false};\n",
+        "after": ""
+      }
+    ]
+  },
+  "source_owner_is_metadata_alias": true,
+  "source_owner_anchor": {
+    "packet": {
+      "path": "compatibility/rc/c04-checker-owner-inputs.json",
+      "sha256": "f909f0a47fa49c1c3ba9e84718ad7ba461216cb7da12b61b972be87aa3ba7afc",
+      "bytes": 12073
+    },
+    "source_member_index": 0
+  },
+  "support": [],
+  "product_paths": [],
+  "source_scope_only": true,
+  "root_transaction_policy_changed": false,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "original_ledger_metadata_recipe_changed": false,
+  "source_judgments_changed": 0,
+  "css_or_artifact_admission_granted": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed"
+}
