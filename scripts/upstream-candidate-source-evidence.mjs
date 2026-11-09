@@ -58,6 +58,17 @@ export function candidateSourceEvidenceOk(proof, readMember, productPaths) {
     }
     if (proof.proof_kind === 'individual-contextual-source-review' &&
         (!Array.isArray(proof.source_members) || !proof.source_members.length)) return false;
+    // Optional closed current-source population: all paths and all bytes are
+    // bound by source_members; a new, removed, or renamed file fails closed.
+    if (Object.hasOwn(proof, 'source_population')) {
+      if (proof.proof_kind !== 'individual-contextual-source-review' ||
+          proof.source_population !== 'all-candidate-product-sources') return false;
+      const paths = productPaths();
+      if (!Array.isArray(paths) || !paths.length || new Set(paths).size !== paths.length) return false;
+      const bound = proof.source_members.map(ref => ref.path).sort();
+      const current = [...paths].sort();
+      if (bound.length !== current.length || bound.some((path, i) => path !== current[i])) return false;
+    }
   } catch { return false; }
   if (requiresTestingApi21xProof(proof, readMember)) return testingApi21xSourceEvidenceOk(proof, readMember, productPaths);
   if (!sourceKinds.has(proof?.proof_kind)) {

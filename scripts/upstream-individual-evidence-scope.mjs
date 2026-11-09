@@ -130,14 +130,17 @@ export function individualReviewScopeOk({entry,proof,body,review,requiresIndivid
  if((requiresIndividual||claimsBehavior)&&sourcePresenceKinds.has(proof.proof_kind))return false;
  if(proof.proof_kind==='individual-contextual-source-review'){
   // A finite schema forbids unvalidated extra and nested source assertions.
-  if(Object.keys(proof).some(k=>!['proof_kind','source_conclusion_only','execution_claim','source_members','diff_sha256','review_depth','affected_branches','decision'].includes(k)))return false;
+  if(Object.keys(proof).some(k=>!['proof_kind','source_conclusion_only','execution_claim','source_members','source_population','diff_sha256','review_depth','affected_branches','decision'].includes(k)))return false;
   // Source judgment is not a runtime or inherited-peer execution proof.
   if(entry.final_disposition==='inherited'||proof.source_conclusion_only!==true||proof.execution_claim!=='not-claimed'
     ||review.source_conclusion_only!==true||review.execution_claim!=='not-claimed'
     ||entry.reason!==proof.decision||review.decision!==proof.decision||!isDeepStrictEqual(review.affected_branches,proof.affected_branches)
     ||review.final_disposition!==entry.final_disposition
     ||!Array.isArray(proof.source_members)||!proof.source_members.length
-    ||!isDeepStrictEqual(review.source_members,proof.source_members))return false;
+    ||!isDeepStrictEqual(review.source_members,proof.source_members)
+    ||(Object.hasOwn(proof,'source_population') && (proof.source_population!=='all-candidate-product-sources'
+      ||review.source_population!==proof.source_population))
+    ||(!Object.hasOwn(proof,'source_population') && Object.hasOwn(review,'source_population')))return false;
  }else if(proof.proof_kind&&!sourcePresenceKinds.has(proof.proof_kind)&&!specialized){
   // Unrecognized assertions are not part of this bounded current-source schema.
   if(Object.keys(proof).some(k=>!['proof_kind','source_conclusion_only','execution_claim','source_evidence','source_evidence_scope','diff_sha256','review_depth','affected_branches','decision'].includes(k)))return false;
