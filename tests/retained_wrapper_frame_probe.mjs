@@ -19,11 +19,13 @@ try {
   const physical = path => readFileSync(join(root, path));
   const packet = JSON.parse(physical('compatibility/rc/main-current-inventory-source-routing-v7.json'));
   const update = packet.updates[0], source = make({root});
-  const latest = JSON.parse(physical('compatibility/rc/main-current-inventory-source-routing-v8.json')).updates.find(row => row.path === update.path).after;
-  assert.equal(source.bound.length, 123); assert.equal(source.transitions.length, 7);
+  const prior = JSON.parse(physical('compatibility/rc/main-current-inventory-source-routing-v8.json')).updates.find(row => row.path === update.path).after;
+  const latest = JSON.parse(physical('compatibility/rc/main-current-inventory-source-routing-v9.json')).updates.find(row => row.path === update.path).after;
+  assert.equal(source.bound.length, 124); assert.equal(source.transitions.length, 7);
   assert.deepEqual(source.qualify(update.before), latest);
   assert.deepEqual(source.qualify(update.after), latest);
   assert.deepEqual(source.qualify(latest), latest);
+  assert.deepEqual(source.qualify(prior), latest);
   const old = source.comparisonBytes(update.before), current = physical(update.path);
   assert.equal(hash(old), update.before.sha256); assert.equal(hash(current), latest.sha256);
   assert.equal(old.equals(current), false);

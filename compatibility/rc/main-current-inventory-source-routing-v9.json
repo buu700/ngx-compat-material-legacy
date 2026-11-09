@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "role": "main-current-inventory-sass-stage-routing",
+  "base_head": "3fe0132d7e4e4132de684f780750881040c3d78e",
+  "previous_packet": {
+    "path": "compatibility/rc/main-current-inventory-source-routing-v8.json",
+    "sha256": "b45853d028402964a7b08c79b38c80991a65d623e84aae7d1ae0121cc9d8bd9c",
+    "bytes": 24734
+  },
+  "updates": [
+    {
+      "path": "scripts/packed-upstream-ledger-epoch.mjs",
+      "before": {
+        "path": "scripts/packed-upstream-ledger-epoch.mjs",
+        "sha256": "a4c89ec1730feb09977f6c681b646113be9c21cf3e73e5ce4c92db6ed74b0e5c",
+        "bytes": 92356
+      },
+      "after": {
+        "path": "scripts/packed-upstream-ledger-epoch.mjs",
+        "sha256": "2ba6a54660c824cc87f9a99905e4af32a96c00420ffa131d39509ee5906f09f1",
+        "bytes": 92722
+      },
+      "edits": [
+        {
+          "offset": 814,
+          "before": "import {sassInspectionEntrySourceOk} from './upstream-sass-inspection-admission.mjs';\n",
+          "after": "import {sassInspectionSourceBatch} from './upstream-sass-inspection-admission.mjs';\n"
+        },
+        {
+          "offset": 28489,
+          "before": "  const notices=sassWrapperNoticeSubject({root,read:currentSourceRead(root,read),line});\n  const scope=notices.qualifySassScope(JSON.parse(gunzipSync(member(review.current_compiler_scope))).actual);member(scope.producer);member(scope.oracle);\n",
+          "after": "  const historicalScope=JSON.parse(gunzipSync(member(review.current_compiler_scope))).actual;member(historicalScope.producer);member(historicalScope.oracle);\n  const sourceBatch=sassInspectionSourceBatch({root,read:currentSourceRead(root,read),line,entries:packet.entries.map(row=>row.after_entry),body:review});\n  const scope=sourceBatch.scope;\n"
+        },
+        {
+          "offset": 29246,
+          "before": "  const assertExternal=()=>{\n",
+          "after": "  const assertPhysicalExternal=()=>{\n"
+        },
+        {
+          "offset": 29579,
+          "before": "  assertExternal();\n",
+          "after": "  // The batch has just closed all source guards; no supplied callback runs\n  // between it and this original physical peer check. Later checks reenter\n  // the same actual subjects and close over all their source inputs again.\n  assertPhysicalExternal();const assertExternal=()=>{sourceBatch.assertCurrent();assertPhysicalExternal();};\n"
+        },
+        {
+          "offset": 30745,
+          "before": "    assert.equal(sassInspectionEntrySourceOk({root,read:currentSourceRead(root,read),entry:current,body:review,line}),true,'unqualified individual Sass source decision');\n",
+          "after": "    assert.ok(sourceBatch.validated_shas.includes(current.sha),'unqualified individual Sass source decision');\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/sass-wrapper-notice-subject.mjs",
+      "before": {
+        "path": "scripts/sass-wrapper-notice-subject.mjs",
+        "sha256": "0316375e213bbbac066bca4e5c644c668b6361a82bdbdd8da2de427661e8c856",
+        "bytes": 7937
+      },
+      "after": {
+        "path": "scripts/sass-wrapper-notice-subject.mjs",
+        "sha256": "3df691a7a4c677335a72c6e52b923b66957f006c0483a09b8f901dbf233adddc",
+        "bytes": 12875
+      },
+      "edits": [
+        {
+          "offset": 526,
+          "before": "",
+          "after": "import {readFileSync,lstatSync,realpathSync} from 'node:fs';\nimport {join,isAbsolute} from 'node:path';\nimport {captureCurrentSassMetadata as capture} from './current-sass-inspection-scope.mjs';\nimport {types} from 'node:util';\n\nconst SELF='scripts/sass-wrapper-notice-subject.mjs',image=readFileSync(new URL(import.meta.url));\n"
+        },
+        {
+          "offset": 2202,
+          "before": "export function sassWrapperNoticeSubject({root,read=p=>readEvidenceMember(root,p),line}={}){\n",
+          "after": "export function sassWrapperNoticeSubject(options={}){\n  assert.ok(options&&typeof options==='object'&&!types.isProxy(options));assert.equal(Object.getPrototypeOf(options),Object.prototype);\n  const values={};for(const key of ['root','read','line']){const d=Object.getOwnPropertyDescriptor(options,key);if(d){assert.ok(Object.hasOwn(d,'value')&&d.enumerable,'Sass notice option accessor');values[key]=d.value;}}\n  let activate;const subject=constructNoticeSubject({...values,read:undefined},fn=>{activate=fn;});\n  if(values.read!==undefined)activate(values.read);return subject;\n}\nfunction constructNoticeSubject({root,read:initialRead,line}={},captureReader){\n  let providedRead=initialRead;\n  const peerRoots=new Map();\n  const physical=path=>{\n    if(!/^node_modules\\/(@angular\\/(?:core|material|cdk|compiler)|sass|rxjs)\\//.test(path))return readEvidenceMember(root,path);\n    assert.ok(!isAbsolute(path)&&!path.includes('\\\\')&&!path.includes('\\0')&&path.split('/').every(p=>p&&p!=='.'&&p!=='..'));\n    const peer=/^node_modules\\/(@angular\\/(?:core|material|cdk|compiler)|sass|rxjs)\\/(.+)$/.exec(path);assert.ok(peer,'unapproved Sass notice peer input '+path);\n    if(['@angular/compiler','rxjs'].includes(peer[1]))assert.equal(peer[2],'package.json');\n    for(const dir of ['node_modules',...(peer[1].startsWith('@angular/')?['node_modules/@angular']:[])]){const st=lstatSync(join(root,dir));assert.ok(st.isDirectory()&&!st.isSymbolicLink());}\n    const base=realpathSync(join(root,'node_modules',peer[1]));if(peerRoots.has(peer[1]))assert.equal(base,peerRoots.get(peer[1]),'Sass notice peer resolution changed');else peerRoots.set(peer[1],base);\n    const regular=relative=>{let cursor=base;for(const part of relative.split('/')){cursor=join(cursor,part);assert.equal(lstatSync(cursor).isSymbolicLink(),false,'linked Sass notice peer descendant');}assert.ok(lstatSync(cursor).isFile());return readFileSync(cursor);};\n    assert.equal(JSON.parse(regular('package.json')).name,peer[1]);if(peer[1]==='sass')assert.ok(['package.json','sass.node.js','sass.dart.js'].includes(peer[2]));return regular(peer[2]);\n  };\n  const read=path=>{const actual=physical(path);if(providedRead!==undefined){const supplied=providedRead(path);assert.ok(Buffer.isBuffer(supplied)&&actual.equals(supplied),'nonphysical Sass notice input '+path);}assert.ok(physical(path).equals(actual),'Sass notice input changed during supplied read');return actual;};\n  assert.ok(readEvidenceMember(root,SELF).equals(image),'loaded Sass notice owner differs');\n"
+        },
+        {
+          "offset": 2533,
+          "before": "  if(line==='21.x')return {line,bound:[],qualify:()=>null,historicalReference:ref=>({...ref}),\n    qualifySassScope:scope=>structuredClone(scope),assertCurrent:()=>{},native_or_full_gate_credit:false};\n",
+          "after": "  if(line==='21.x'){\n    captureReader?.(fn=>{assert.equal(typeof fn,'function');providedRead=fn;read('projects/ngx-material-legacy/package.json');});\n    return {line,bound:[],qualify:()=>null,historicalReference:ref=>({...ref}),qualifySassScope:scope=>structuredClone(scope),assertCurrent:()=>{},native_or_full_gate_credit:false};\n  }\n"
+        },
+        {
+          "offset": 5892,
+          "before": "  const assertCurrent=()=>{titleReaders.assertCurrent();for(const ref of bound.values()){\n    const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'late Sass notice subject '+ref.path);assert.equal(bytes.length,ref.bytes);\n",
+          "after": "  const frame=new Map();for(const ref of [...titleReaders.bound,...bound.values()]){const prior=frame.get(ref.path);if(prior)assert.deepEqual(prior,ref);else frame.set(ref.path,{...ref});}\n  const assertPhysical=()=>{assert.ok(readEvidenceMember(root,SELF).equals(image),'changed loaded Sass notice owner');for(const ref of frame.values()){\n    const raw=physical(ref.path);assert.equal(hash(raw),ref.sha256,'physical Sass notice frame '+ref.path);assert.equal(raw.length,ref.bytes);\n"
+        },
+        {
+          "offset": 6131,
+          "before": "  const qualify=ref=>{\n",
+          "after": "  let active=false,nested=false;\n  const idle=()=>{if(active){nested=true;assert.fail('reentrant Sass notice operation');}};\n  const transact=fn=>{idle();active=true;nested=false;try{assertPhysical();const result=fn();assertPhysical();assert.equal(nested,false,'caught Sass notice reentry');return result;}finally{active=false;}};\n  const assertCurrentCore=()=>{assertPhysical();titleReaders.assertCurrent();for(const ref of bound.values()){\n    const actual=readEvidenceMember(root,ref.path),bytes=read(ref.path);assert.ok(Buffer.isBuffer(bytes)&&actual.equals(bytes),'nonphysical Sass notice input '+ref.path);assert.equal(hash(bytes),ref.sha256,'late Sass notice subject '+ref.path);assert.equal(bytes.length,ref.bytes);assert.ok(readEvidenceMember(root,ref.path).equals(actual),'Sass notice input changed during callback');\n  }assertPhysical();};\n  const assertCurrent=()=>transact(assertCurrentCore);\n  const qualifyCaptured=ref=>{\n"
+        },
+        {
+          "offset": 6208,
+          "before": "    const successor=titleReaders.qualify({path:row.path,...row.after});\n    if(successor?.sha256===ref.sha256){if(ref.bytes!==undefined)assert.equal(ref.bytes,successor.bytes);assertCurrent();return successor;}\n    assert.ok([row.before.sha256,row.after.sha256].includes(ref.sha256),'unqualified earlier Sass notice metadata '+ref.path);\n    if(ref.bytes!==undefined)assert.equal(ref.bytes,ref.sha256===row.before.sha256?row.before.bytes:row.after.bytes);\n    assertCurrent();return successor??{path:ref.path,...row.after};\n",
+          "after": "    const current=bound.get(ref.path),selected=[row.before,row.after,current].find(side=>side.sha256===ref.sha256);\n    assert.ok(selected,'unqualified earlier Sass notice metadata '+ref.path);\n    if(ref.bytes!==undefined)assert.equal(ref.bytes,selected.bytes);\n    return {...current};\n"
+        },
+        {
+          "offset": 6737,
+          "before": "",
+          "after": "  const qualify=ref=>{idle();const snapshot=capture(ref);if(!rows.has(snapshot.path))return null;return transact(()=>{\n    const row=rows.get(snapshot.path),successor=titleReaders.qualify({path:row.path,...row.after});assert.deepEqual(successor??{path:row.path,...row.after},bound.get(row.path));\n    const result=qualifyCaptured(snapshot);assertCurrentCore();assert.deepEqual(capture(ref),snapshot,'Sass notice reference changed');return result;\n  });};\n"
+        },
+        {
+          "offset": 6822,
+          "before": "  const historicalReference=ref=>{const row=rows.get(ref.path);if(!row)return {...ref};qualify(ref);\n    return {...ref,sha256:row.before.sha256,...(ref.bytes===undefined?{}:{bytes:row.before.bytes})};};\n  const qualifySassScope=scope=>{\n    assert.equal(scope.line,line);const current=structuredClone(scope);\n    current.owned_scss_population=current.owned_scss_population.map(ref=>qualify(ref)??ref);\n    assert.equal(scope.owned_population_sha256,hash(JSON.stringify(scope.owned_scss_population)));\n",
+          "after": "  const historicalReference=ref=>{idle();const snapshot=capture(ref),row=rows.get(snapshot.path);if(!row)return snapshot;return transact(()=>{\n    const successor=titleReaders.qualify({path:row.path,...row.after});assert.deepEqual(successor??{path:row.path,...row.after},bound.get(row.path));\n    qualifyCaptured(snapshot);assertCurrentCore();assert.deepEqual(capture(ref),snapshot,'historical Sass notice reference changed');\n    return {...snapshot,sha256:row.before.sha256,...(snapshot.bytes===undefined?{}:{bytes:row.before.bytes})};\n  });};\n  const qualifySassScope=scope=>transact(()=>{\n    const snapshot=capture(scope);assert.equal(snapshot.line,line);const current=structuredClone(snapshot);\n    assert.equal(snapshot.owned_population_sha256,hash(JSON.stringify(snapshot.owned_scss_population)));\n    assertCurrentCore();\n    current.owned_scss_population=current.owned_scss_population.map(ref=>qualifyCaptured(ref)??ref);\n"
+        },
+        {
+          "offset": 7528,
+          "before": "      const qualified=qualify({...ref,path:prefix+ref.path});return qualified?{...ref,sha256:qualified.sha256,bytes:qualified.bytes}:ref;\n",
+          "after": "      const qualified=qualifyCaptured({...ref,path:prefix+ref.path});return qualified?{...ref,sha256:qualified.sha256,bytes:qualified.bytes}:ref;\n"
+        },
+        {
+          "offset": 7674,
+          "before": "    assertCurrent();return current;\n  };\n  assertCurrent();return {line,bound:structuredClone([...bound.values()]),qualify,historicalReference,qualifySassScope,assertCurrent,\n",
+          "after": "    assertCurrentCore();assert.deepEqual(capture(scope),snapshot,'Sass scope changed during notice guards');return current;\n  });\n  assertCurrent();captureReader?.(fn=>{assert.equal(typeof fn,'function');assert.equal(providedRead,undefined);providedRead=fn;assertCurrent();});\n  return {line,bound:structuredClone([...bound.values()]),qualify,historicalReference,qualifySassScope,assertCurrent,\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/upstream-sass-inspection-admission.mjs",
+      "before": {
+        "path": "scripts/upstream-sass-inspection-admission.mjs",
+        "sha256": "a02e24098f4e8d355d33ca9ee34e9c85b9c59cc8bb4e9e77c5adb77ccc7f0901",
+        "bytes": 9685
+      },
+      "after": {
+        "path": "scripts/upstream-sass-inspection-admission.mjs",
+        "sha256": "2053eba146a7cf65fd2a22e231dcf9bb749f72608be828bc996a2ded445a62a4",
+        "bytes": 16192
+      },
+      "edits": [
+        {
+          "offset": 616,
+          "before": "import {measureCurrentSassInspectionScope,assertCurrentSassInspectionScopeSuccessor} from './current-sass-inspection-scope.mjs';\n",
+          "after": "import {measureCurrentSassInspectionScope,assertCurrentSassInspectionScopeSuccessor,captureCurrentSassMetadata as capture} from './current-sass-inspection-scope.mjs';\n"
+        },
+        {
+          "offset": 927,
+          "before": "",
+          "after": "import {types} from 'node:util';\nimport {readEvidenceMember} from './upstream-packed-run-evidence.mjs';\n\nconst SELF='scripts/upstream-sass-inspection-admission.mjs',image=readFileSync(new URL(import.meta.url));\n// Only live-operation reentry state is shared across module instances. No\n// reader, source bytes, parsed inputs, result or verdict is stored here.\nconst transactionKey=Symbol.for('ngx-compat-material-legacy.sass-inspection-transaction.v1');\nif(!Object.hasOwn(globalThis,transactionKey)){\n const active=new Map();\n const run=(root,operation)=>{const key=realpathSync(root),prior=active.get(key);if(prior){prior.nested=true;assert.fail('reentrant Sass inspection');}const state={nested:false};active.set(key,state);\n  try{const result=operation();assert.equal(state.nested,false,'caught Sass inspection reentry');return result;}finally{active.delete(key);}};\n Object.defineProperty(globalThis,transactionKey,{value:Object.freeze(run),writable:false,configurable:false});\n}\nconst transaction=globalThis[transactionKey];assert.equal(typeof transaction,'function');assert.ok(Object.isFrozen(transaction));\nconst assertLoaded=root=>assert.ok(readEvidenceMember(root,SELF).equals(image),'loaded Sass inspection owner differs');\nfunction readerDescriptor(args){assert.ok(args&&typeof args==='object'&&!types.isProxy(args));assert.equal(Object.getPrototypeOf(args),Object.prototype);const d=Object.getOwnPropertyDescriptor(args,'read');assert.ok(d&&Object.hasOwn(d,'value')&&d.enumerable&&typeof d.value==='function','Sass inspection reader accessor or missing reader');return d;}\n"
+        },
+        {
+          "offset": 2774,
+          "before": "function member(read,ref,c04){ref=c04?c04.qualify(ref):ref;const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed Sass review input '+ref.path);return raw;}\n",
+          "after": "function member(root,read,ref,c04,bound){ref=c04?c04.qualify(ref):ref;const actual=readEvidenceMember(root,ref.path);assert.equal(hash(actual),ref.sha256,'changed physical Sass review input '+ref.path);const raw=read(ref.path);assert.ok(Buffer.isBuffer(raw)&&actual.equals(raw),'nonphysical Sass review input '+ref.path);assert.ok(readEvidenceMember(root,ref.path).equals(actual),'Sass review input changed during supplied read');bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:actual.length});return raw;}\n"
+        },
+        {
+          "offset": 3118,
+          "before": "function inspect({root,read,line}){\n assert.ok(Object.hasOwn(pins,line));const c04=spinnerSnackC04Source({root,read}),memberRead=ref=>member(read,ref,c04);\n",
+          "after": "function inspect({root,read,line},finish=true){\n assert.ok(Object.hasOwn(pins,line));const c04=spinnerSnackC04Source({root,read}),inputs=new Map(),memberRead=ref=>member(root,read,ref,c04,inputs);\n"
+        },
+        {
+          "offset": 6676,
+          "before": " for(const ref of scope.owned_scss_population){safe(ref.path);const current=c04.qualify(ref);assert.equal(memberRead(current).length,current.bytes);}\n",
+          "after": " const currentOwned=[];\n for(const ref of scope.owned_scss_population){safe(ref.path);const current=c04.qualify(ref);assert.equal(memberRead(current).length,current.bytes);currentOwned.push({...current});}\n"
+        },
+        {
+          "offset": 7157,
+          "before": "",
+          "after": " const currentScope=structuredClone(scope);currentScope.owned_scss_population=currentOwned;currentScope.owned_population_sha256=hash(JSON.stringify(currentOwned));const loaded=new Map();\n"
+        },
+        {
+          "offset": 7310,
+          "before": "",
+          "after": "  const currentLoaded=[];\n"
+        },
+        {
+          "offset": 7575,
+          "before": "   const raw=readFileSync(join(roots[ref.root],ref.path));assert.equal(hash(raw),qualified.sha256,'changed loaded Sass input '+ref.path);assert.equal(raw.length,qualified.bytes);}\n",
+          "after": "   const path=join(roots[ref.root],ref.path),raw=readFileSync(path);assert.equal(hash(raw),qualified.sha256,'changed loaded Sass input '+ref.path);assert.equal(raw.length,qualified.bytes);const current={sha256:qualified.sha256,bytes:qualified.bytes};if(loaded.has(path))assert.deepEqual(loaded.get(path),current);loaded.set(path,current);currentLoaded.push({...ref,sha256:qualified.sha256,bytes:qualified.bytes});}\n  currentScope[program===scope.candidate?'candidate':'current'].loaded_sources=currentLoaded;\n"
+        },
+        {
+          "offset": 7758,
+          "before": " notices.assertCurrent();c04.assertCurrent();return {body,scope,c04,notices,scopeHash:hash(packetBytes)};\n",
+          "after": " const assertPhysicalScope=()=>{assert.deepEqual([realpathSync(join(root,'node_modules/@angular/material')),realpathSync(join(root,'node_modules/@angular/cdk'))],[material,cdk],'Sass peer resolution changed');assert.equal(hash(readFileSync(join(material,'package.json'))),scope.peer.package_json_sha256);\n  for(const ref of currentOwned){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}\n  for(const[path,ref]of loaded){const raw=readFileSync(path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}};\n const assertInputPhysical=()=>{for(const ref of inputs.values()){const raw=readEvidenceMember(root,ref.path);assert.equal(hash(raw),ref.sha256,'late physical Sass review input '+ref.path);assert.equal(raw.length,ref.bytes);}};\n const assertInputs=()=>{assertInputPhysical();for(const ref of [...inputs.values()])member(root,read,ref,null,inputs);assertInputPhysical();};\n if(finish){assertInputs();notices.assertCurrent();c04.assertCurrent();assertPhysicalScope();assertInputPhysical();}\n return {body,scope,currentScope,c04,notices,assertInputs,assertInputPhysical,assertPhysicalScope,scopeHash:hash(packetBytes)};\n}\nfunction validateMetadata(entry,body,line,reviewed){\n const row=reviewed.reviews.find(item=>item.sha===entry.sha);assert.ok(row);\n assert.deepEqual(body,reviewed);assert.equal(entry.evidence_report,reviewPath);\n assert.equal(entry.final_disposition,'do-not-adopt');assert.equal(entry.reason,row.decision);\n assert.equal(entry.review_depth,row.review_depth);assert.deepEqual(entry.affected_branches,[line]);\n assert.deepEqual(entry.files,row.frozen_seed_paths);assert.equal(entry.g11_claim,'not-passed');\n if(Object.hasOwn(entry,'patch_sha256'))assert.equal(entry.patch_sha256,row.diff_sha256);\n assert.deepEqual(entry.individual_proof,sassInspectionProof(row,line));\n}\n// Reject invalid metadata before invoking a supplied reader. This is a local\n// precondition only: every positive still constructs the complete actual\n// inspection below and closes all of its current source guards.\nfunction precheckMetadata(root,line,body,entries){\n assert.ok(Object.hasOwn(pins,line));const raw=readEvidenceMember(root,reviewPath);assert.equal(hash(raw),pins[line]);const reviewed=JSON.parse(raw);\n for(const entry of entries)validateMetadata(entry,body,line,reviewed);\n for(const ref of [reviewed.upstream_originals,reviewed.source_census,reviewed.current_compiler_scope])assert.equal(hash(readEvidenceMember(root,ref.path)),ref.sha256,'changed physical Sass review input '+ref.path);\n"
+        },
+        {
+          "offset": 8018,
+          "before": "  const {root,read,line}=args;const {entry,body}=snapshot;\n  const inspected=inspect({root,read,line}),reviewed=inspected.body,row=reviewed.reviews.find(item=>item.sha===entry.sha);assert.ok(row);\n  assert.deepEqual(body,reviewed);assert.equal(entry.evidence_report,reviewPath);\n  assert.equal(entry.final_disposition,'do-not-adopt');assert.equal(entry.reason,row.decision);\n  assert.equal(entry.review_depth,row.review_depth);assert.deepEqual(entry.affected_branches,[line]);\n  assert.deepEqual(entry.files,row.frozen_seed_paths);assert.equal(entry.g11_claim,'not-passed');\n  if(Object.hasOwn(entry,'patch_sha256'))assert.equal(entry.patch_sha256,row.diff_sha256);\n  assert.deepEqual(entry.individual_proof,sassInspectionProof(row,line));\n",
+          "after": "  const descriptor=readerDescriptor(args),{root,line,entry,body}=snapshot,read=descriptor.value;\n  return transaction(root,()=>{\n  assertLoaded(root);precheckMetadata(root,line,body,[entry]);const inspected=inspect({root,read,line});validateMetadata(entry,body,line,inspected.body);\n"
+        },
+        {
+          "offset": 9138,
+          "before": "  inspected.notices.assertCurrent();inspected.c04.assertCurrent();assert.deepEqual(metadata(),snapshot);return true;\n",
+          "after": "  inspected.assertInputs();inspected.notices.assertCurrent();inspected.c04.assertCurrent();inspected.assertPhysicalScope();inspected.assertInputPhysical();assert.deepEqual(metadata(),snapshot);assert.deepEqual(readerDescriptor(args),descriptor);assertLoaded(root);return true;\n  });\n"
+        },
+        {
+          "offset": 9278,
+          "before": "",
+          "after": "}\n\n/** One complete six-decision source operation on the actual inspected subjects.\n * Returned metadata remains guarded by those subjects; it is no reader grant,\n * independently supplied context, fresh compiler result or cached verdict. */\nexport function sassInspectionSourceBatch(args){\n const descriptor=readerDescriptor(args),metadata=()=>captureSpinnerSnackC04Metadata(args,['entries','body','line','root']),snapshot=metadata();\n const {root,line,entries,body}=snapshot,read=descriptor.value;\n assert.ok(Array.isArray(entries));assert.equal(entries.length,SASS_INSPECTION_SHAS.length);\n assert.deepEqual(entries.map(row=>row.sha).sort(),[...SASS_INSPECTION_SHAS].sort());\n return transaction(root,()=>{\n  assertLoaded(root);precheckMetadata(root,line,body,entries);const inspected=inspect({root,read,line},false);\n  for(const entry of entries)validateMetadata(entry,body,line,inspected.body);\n  const scopeSnapshot=capture(inspected.currentScope),scope=structuredClone(scopeSnapshot);\n  const guard=()=>{assertLoaded(root);inspected.assertInputs();inspected.notices.assertCurrent();inspected.c04.assertCurrent();inspected.assertPhysicalScope();inspected.assertInputPhysical();\n   assert.deepEqual(metadata(),snapshot,'Sass batch arguments changed');assert.deepEqual(readerDescriptor(args),descriptor,'Sass batch reader changed');\n   assert.deepEqual(capture(scope),scopeSnapshot,'Sass batch scope changed');assertLoaded(root);};\n  guard();return Object.freeze({line,scope,assertCurrent:()=>transaction(root,guard),\n   validated_shas:Object.freeze(entries.map(row=>row.sha)),source_scope_only:true,\n   fresh_compiler_execution:false,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'});\n });\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_retained_landscape_tool_replay.py",
+      "before": {
+        "path": "tests/test_retained_landscape_tool_replay.py",
+        "sha256": "3b9aee29e774516b50d599a7a28e71765bc048a17430a04c991da6ea2d139ab3",
+        "bytes": 2060
+      },
+      "after": {
+        "path": "tests/test_retained_landscape_tool_replay.py",
+        "sha256": "4ddb2217ec318ed32e0b158aac368773e524a1ba0bf7325f79d925fbaea0920e",
+        "bytes": 2060
+      },
+      "edits": [
+        {
+          "offset": 1245,
+          "before": "                self.assertEqual((len(row['bound']),len(row['transitions'])),(520,103))\n",
+          "after": "                self.assertEqual((len(row['bound']),len(row['transitions'])),(522,104))\n"
+        },
+        {
+          "offset": 1973,
+          "before": "            self.assertEqual(len(shared[0]),518);self.assertEqual(shared[0],shared[1])\n",
+          "after": "            self.assertEqual(len(shared[0]),520);self.assertEqual(shared[0],shared[1])\n"
+        }
+      ]
+    }
+  ],
+  "support": [],
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "original_ledger_metadata_recipe_changed": false,
+  "source_judgments_changed": 0,
+  "theme_module_contract_changed": false,
+  "css_or_artifact_admission_granted": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "notice_before_anchor": {
+    "source_commit": "3fe0132d7e4e4132de684f780750881040c3d78e",
+    "packet": {
+      "path": "compatibility/rc/dialog-title-current-source-reader-successors.json",
+      "sha256": "8ec37f431f8da2aee653a62fb4676cd86e67f3fea233b530cf440e15cbf44d71",
+      "bytes": 36762
+    },
+    "code_subject_index": 7
+  }
+}

@@ -16,7 +16,7 @@ import {gunzipSync} from 'node:zlib';
 import {join} from 'node:path';
 import {types} from 'node:util';
 import {testingApi21xEntryEvidenceOk} from './upstream-testing-api-21x-admission.mjs';
-import {sassInspectionEntrySourceOk} from './upstream-sass-inspection-admission.mjs';
+import {sassInspectionSourceBatch} from './upstream-sass-inspection-admission.mjs';
 import {rulesJsBuildEntrySourceOk,rulesJsBuildBoundInputs} from './upstream-rules-js-build-admission.mjs';
 import {autocompleteLandscapeSourceJudgment,AUTOCOMPLETE_LANDSCAPE_SHA,AUTOCOMPLETE_LANDSCAPE_REVIEW} from './autocomplete-landscape-source-judgment.mjs';
 import {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';
@@ -386,19 +386,23 @@ function prepareSassStage({root,read,line,before,bound}){
   for(const ref of packet.code_subjects)member(ref);
   const review=JSON.parse(member(packet.review));assert.equal(review.line,line);assert.equal(review.reviews.length,6);
   for(const ref of [review.upstream_originals,review.source_census,review.current_compiler_scope])member(ref);
-  const notices=sassWrapperNoticeSubject({root,read:currentSourceRead(root,read),line});
-  const scope=notices.qualifySassScope(JSON.parse(gunzipSync(member(review.current_compiler_scope))).actual);member(scope.producer);member(scope.oracle);
+  const historicalScope=JSON.parse(gunzipSync(member(review.current_compiler_scope))).actual;member(historicalScope.producer);member(historicalScope.oracle);
+  const sourceBatch=sassInspectionSourceBatch({root,read:currentSourceRead(root,read),line,entries:packet.entries.map(row=>row.after_entry),body:review});
+  const scope=sourceBatch.scope;
   const peerRoots=[realpathSync(join(root,'node_modules/@angular/material')),realpathSync(join(root,'node_modules/@angular/cdk'))];
   const external=new Map();
   for(const [program,roots]of [[scope.candidate,[realpathSync(join(root,'projects/ngx-material-legacy')),...peerRoots]],[scope.current,peerRoots]]){
     for(const ref of program.loaded_sources){const path=join(roots[ref.root],ref.path);external.set(path,ref.sha256);}
   }
   external.set(join(peerRoots[0],'package.json'),scope.peer.package_json_sha256);
-  const assertExternal=()=>{
+  const assertPhysicalExternal=()=>{
     assert.deepEqual([realpathSync(join(root,'node_modules/@angular/material')),realpathSync(join(root,'node_modules/@angular/cdk'))],peerRoots,'changed Sass peer resolution');
     for(const [path,digest]of external)assert.equal(hash(readFileSync(path)),digest,'changed current Sass source '+path);
   };
-  assertExternal();
+  // The batch has just closed all source guards; no supplied callback runs
+  // between it and this original physical peer check. Later checks reenter
+  // the same actual subjects and close over all their source inputs again.
+  assertPhysicalExternal();const assertExternal=()=>{sourceBatch.assertCurrent();assertPhysicalExternal();};
   const text=before.toString(),source=ledgerSyntax('sass-ledger.json',text);assert.equal(source.parseDiagnostics.length,0);
   const nodes=property(source.statements[0].expression,'entries');assert.equal(nodes.elements.length,1697);
   const bySha=new Map(nodes.elements.map(node=>[JSON.parse(property(node,'sha').getText(source)),node]));
@@ -411,7 +415,7 @@ function prepareSassStage({root,read,line,before,bound}){
     const allowedFields=new Set(['final_disposition','reason','review_depth','affected_branches','evidence_report','individual_proof','patch_sha256']);
     for(const key of new Set([...Object.keys(previous),...Object.keys(current)]))
       if(!allowedFields.has(key))assert.deepEqual(current[key],previous[key],'changed unrelated Sass entry field '+key);
-    assert.equal(sassInspectionEntrySourceOk({root,read:currentSourceRead(root,read),entry:current,body:review,line}),true,'unqualified individual Sass source decision');
+    assert.ok(sourceBatch.validated_shas.includes(current.sha),'unqualified individual Sass source decision');
     const node=bySha.get(change.sha);edits.push({start:node.getStart(source),end:node.end,text:JSON.stringify(current,null,2).replace(/\n/g,'\n    ')});
     expected.entries[index]=current;
   }

@@ -20,6 +20,7 @@ const IDENTITY_CONTINUATION={path:'compatibility/rc/main-current-inventory-sourc
 const WRAPPER_CONTINUATION={path:'compatibility/rc/main-current-inventory-source-routing-v6.json',sha256:'233fa6a574a7124c0e1cc41bec2b307ae5d7517ae1e6e3f09e1b614e9c05f9a1',bytes:8161};
 const TEST_CONTINUATION={path:'compatibility/rc/main-current-inventory-source-routing-v7.json',sha256:'6988117f3e1da0fcd53c5993b2402d997464775155b2310462ecd1dab3148f9a',bytes:2037};
 const SASS_CONTINUATION={path:'compatibility/rc/main-current-inventory-source-routing-v8.json',sha256:'b45853d028402964a7b08c79b38c80991a65d623e84aae7d1ae0121cc9d8bd9c',bytes:24734};
+const STAGE_CONTINUATION={path:'compatibility/rc/main-current-inventory-source-routing-v9.json',sha256:'2573413b3ecc56dd465cf0139fb8e150e206990982246e967aad630a230b85ca',bytes:26489};
 const wrapperBefore=[{path:'scripts/sass-wrapper-notice-metadata.mjs',sha256:'624093a294bbfaf06b66eeb54a81fb10c71140624d80e82620c1210586aa89aa',bytes:8020},{path:'scripts/historical-chip-wrapper-metadata.mjs',sha256:'f9e5fa9808a1553c216a95de42d6a3d251aac01d0066b87c8e630cb2d7d34a0e',bytes:11824}];
 const wrapperAnchors=[{path:wrapperBefore[0].path,packet:{path:'compatibility/rc/sass-wrapper-notice-ledger-successor.json',sha256:'7f5f042a3c45b96c3f128c454d71acc9bc059d96be8d5cc927b99296ed5d565e',bytes:144768}},{path:wrapperBefore[1].path,packet:{path:'compatibility/rc/historical-chip-source-wrapper-ledger-successor.json',sha256:'3e8a3e66ae603768d60d22f646b19ec283e6c599b0df5274363533a7d70efd30',bytes:57256}}];
 const paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];
@@ -31,6 +32,16 @@ export function currentInventorySourceSubject({root,read=p=>readEvidenceMember(r
  assert.equal(packet.schema_version,1);assert.equal(packet.role,'main-current-inventory-source-routing');assert.equal(packet.base_head,'54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0');assert.equal(packet.source_scope_only,true);assert.equal(packet.historical_programs_executed,false);assert.equal(packet.historical_packets_rewritten,false);assert.equal(packet.artifact_or_audit_admission_granted,false);assert.equal(packet.g11_claim,'not-passed');assert.deepEqual(packet.updates.map(row=>row.path),paths);
  const env={PATH:process.env.PATH,LANG:'C',LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1',GIT_TERMINAL_PROMPT:'0'};
  const git=args=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd:root,env,maxBuffer:2*1024*1024});git(['merge-base','--is-ancestor',packet.base_head,'HEAD']);
+ const stageRaw=physical(STAGE_CONTINUATION.path);check(stageRaw,STAGE_CONTINUATION);const stage=JSON.parse(stageRaw);
+ assert.equal(stage.schema_version,1);assert.equal(stage.role,'main-current-inventory-sass-stage-routing');assert.equal(stage.base_head,'3fe0132d7e4e4132de684f780750881040c3d78e');assert.deepEqual(stage.previous_packet,SASS_CONTINUATION);assert.deepEqual(stage.support,[]);
+ assert.deepEqual(stage.updates.map(row=>row.path),[paths[0],'scripts/sass-wrapper-notice-subject.mjs','scripts/upstream-sass-inspection-admission.mjs','tests/test_retained_landscape_tool_replay.py']);
+ for(const[key,value]of Object.entries({source_scope_only:true,historical_programs_executed:false,historical_packets_rewritten:false,original_ledger_metadata_recipe_changed:false,source_judgments_changed:0,theme_module_contract_changed:false,css_or_artifact_admission_granted:false,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(stage[key],value);
+ git(['merge-base','--is-ancestor',stage.base_head,'HEAD']);const stageImages=new Map();
+ for(const update of stage.updates.filter(row=>[paths[0],'tests/test_retained_landscape_tool_replay.py'].includes(row.path))){
+  assert.equal(update.before.path,update.path);assert.equal(update.after.path,update.path);const before=git(['show',stage.base_head+':'+update.path]);check(before,update.before);let cursor=0;const parts=[];
+  for(const edit of update.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=before.length);const old=Buffer.from(edit.before);assert.ok(before.subarray(edit.offset,edit.offset+old.length).equals(old));parts.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+old.length;}
+  const after=Buffer.concat([...parts,before.subarray(cursor)]);check(after,update.after);assert.ok(after.equals(physical(update.path)));stageImages.set(update.path,{update,before,after});
+ }
  const testRaw=physical(TEST_CONTINUATION.path);check(testRaw,TEST_CONTINUATION);const test=JSON.parse(testRaw);
  assert.equal(test.schema_version,1);assert.equal(test.role,'main-current-inventory-test-source-routing');assert.equal(test.base_head,'c2ae34b7664907b3add5951f357a922b9fed0d8e');assert.deepEqual(test.previous_packet,WRAPPER_CONTINUATION);
  assert.deepEqual(test.source_anchor,{packet:LATE_CONTINUATION,support_index:80});assert.deepEqual(test.support,[]);
@@ -49,11 +60,11 @@ export function currentInventorySourceSubject({root,read=p=>readEvidenceMember(r
  git(['merge-base','--is-ancestor',sass.base_head,'HEAD']);const latestTest=sass.updates.at(-1);assert.deepEqual(latestTest.before,testUpdate.after);assert.equal(latestTest.path,testUpdate.path);assert.equal(latestTest.after.path,testUpdate.path);
  assert.ok(git(['show',sass.base_head+':'+testUpdate.path]).equals(testAfter));let latestCursor=0;const latestParts=[];assert.equal(latestTest.edits.length,2);
  for(const edit of latestTest.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=latestCursor&&edit.offset<=testAfter.length);const old=Buffer.from(edit.before);assert.ok(testAfter.subarray(edit.offset,edit.offset+old.length).equals(old));latestParts.push(testAfter.subarray(latestCursor,edit.offset),Buffer.from(edit.after));latestCursor=edit.offset+old.length;}
- const testLatest=Buffer.concat([...latestParts,testAfter.subarray(latestCursor)]);check(testLatest,latestTest.after);assert.ok(testLatest.equals(physical(testUpdate.path)));
+ const testLatest=Buffer.concat([...latestParts,testAfter.subarray(latestCursor)]);check(testLatest,latestTest.after);const stageTest=stageImages.get(testUpdate.path);assert.deepEqual(stageTest.update.before,latestTest.after);assert.ok(testLatest.equals(stageTest.before));
  // The old support remains Git comparison DATA. Current guards below bind the
  // actual afterimage, and no old wrapper bytes are supplied as current source.
- const supportComparison=ref=>{if(ref.path!==testUpdate.path)return physical(ref.path);assert.deepEqual(ref,testUpdate.before);assert.ok(physical(ref.path).equals(testLatest));return Buffer.from(testBefore);};
- const currentSupport=ref=>{if(ref.path!==testUpdate.path)return ref;assert.deepEqual(ref,testUpdate.before);return latestTest.after;};
+ const supportComparison=ref=>{if(ref.path!==testUpdate.path)return physical(ref.path);assert.deepEqual(ref,testUpdate.before);assert.ok(physical(ref.path).equals(stageTest.after));return Buffer.from(testBefore);};
+ const currentSupport=ref=>{if(ref.path!==testUpdate.path)return ref;assert.deepEqual(ref,testUpdate.before);return stageTest.update.after;};
  const rows=new Map();
  for(const row of packet.updates){
   assert.equal(row.before.path,row.path);assert.equal(row.after.path,row.path);const before=git(['show',packet.base_head+':'+row.path]);check(before,row.before);
@@ -116,11 +127,12 @@ export function currentInventorySourceSubject({root,read=p=>readEvidenceMember(r
   else row.images.set(update.before.sha256,{ref:{...update.before},bytes:Buffer.from(before)});
   let cursor=0;const parts=[];assert.ok(update.edits.length>0);
   for(const edit of update.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor&&edit.offset<=before.length);const old=Buffer.from(edit.before);assert.ok(before.subarray(edit.offset,edit.offset+old.length).equals(old));parts.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+old.length;}
-  parts.push(before.subarray(cursor));const after=Buffer.concat(parts);check(after,update.after);assert.ok(after.equals(physical(update.path)));row.after={...update.after};row.images.set(update.after.sha256,{ref:{...update.after},bytes:Buffer.from(after)});
+  parts.push(before.subarray(cursor));const after=Buffer.concat(parts);check(after,update.after);assert.ok(after.equals(update.path===paths[0]?stageImages.get(paths[0]).before:physical(update.path)));row.after={...update.after};row.images.set(update.after.sha256,{ref:{...update.after},bytes:Buffer.from(after)});
  }
- assert.equal(rows.has(testUpdate.path),false);rows.set(testUpdate.path,{before:{...testUpdate.before},after:{...latestTest.after},images:new Map([[testUpdate.before.sha256,{ref:{...testUpdate.before},bytes:Buffer.from(testBefore)}],[testUpdate.after.sha256,{ref:{...testUpdate.after},bytes:Buffer.from(testAfter)}],[latestTest.after.sha256,{ref:{...latestTest.after},bytes:Buffer.from(testLatest)}]])});
+ const stageOwner=stageImages.get(paths[0]),ownerRow=rows.get(paths[0]);assert.deepEqual(ownerRow.after,stageOwner.update.before);ownerRow.after={...stageOwner.update.after};ownerRow.images.set(stageOwner.update.after.sha256,{ref:{...stageOwner.update.after},bytes:Buffer.from(stageOwner.after)});
+ assert.equal(rows.has(testUpdate.path),false);rows.set(testUpdate.path,{before:{...testUpdate.before},after:{...stageTest.update.after},images:new Map([[testUpdate.before.sha256,{ref:{...testUpdate.before},bytes:Buffer.from(testBefore)}],[testUpdate.after.sha256,{ref:{...testUpdate.after},bytes:Buffer.from(testAfter)}],[latestTest.after.sha256,{ref:{...latestTest.after},bytes:Buffer.from(testLatest)}],[stageTest.update.after.sha256,{ref:{...stageTest.update.after},bytes:Buffer.from(stageTest.after)}]])});
  const unique=new Map();
- for(const ref of [{path:SELF,sha256:hash(image),bytes:image.length},{...PACKET},{...CONTINUATION},{...LATE_CONTINUATION},{...IDENTITY_CONTINUATION},{...WRAPPER_CONTINUATION},{...TEST_CONTINUATION},{...SASS_CONTINUATION},...[...rows.values()].map(row=>({...row.after})),...next.support,...late.support.map(currentSupport),...identity.support]){
+ for(const ref of [{path:SELF,sha256:hash(image),bytes:image.length},{...PACKET},{...CONTINUATION},{...LATE_CONTINUATION},{...IDENTITY_CONTINUATION},{...WRAPPER_CONTINUATION},{...TEST_CONTINUATION},{...SASS_CONTINUATION},{...STAGE_CONTINUATION},...[...rows.values()].map(row=>({...row.after})),...next.support,...late.support.map(currentSupport),...identity.support]){
   const prior=unique.get(ref.path);if(prior)assert.deepEqual(prior,ref);else unique.set(ref.path,{...ref});
  }
  const bound=[...unique.values()];

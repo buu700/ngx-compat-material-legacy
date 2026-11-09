@@ -227,7 +227,11 @@ class CurrentSassToolReferences:
                 assert callable(read)
                 self._provided = read
                 self._prebound = True
-                self._assert_current_core()
+                self._strict_callbacks = True
+                try:
+                    self._assert_current_core()
+                finally:
+                    self._strict_callbacks = False
 
     def _construct(self, root, *, read=None, prebound=None):
         if not __debug__:
@@ -237,6 +241,8 @@ class CurrentSassToolReferences:
         assert read is None or callable(read)
         self._provided, self._bound, self._rows = read, ({} if prebound is None else prebound[0]), {}
         self._prebound = prebound is not None
+        self._consuming = False
+        self._strict_callbacks = False
         frame_images = {} if prebound is None else prebound[1]
         scratch = bytearray(1)
         def bind_image(path, raw):
@@ -333,6 +339,49 @@ class CurrentSassToolReferences:
         late_resource_programs = {}
         retained_test_before = {}
         inspection_programs = {}
+        stage_programs = {}
+        retained_stage_before = {}
+        if self.line == 'main':
+            p = json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v9.json',
+                sha256='2573413b3ecc56dd465cf0139fb8e150e206990982246e967aad630a230b85ca', bytes=26489)))
+            assert p['schema_version'] == 1 and p['role'] == 'main-current-inventory-sass-stage-routing'
+            assert p['base_head'] == '3fe0132d7e4e4132de684f780750881040c3d78e'
+            assert p['previous_packet'] == dict(path='compatibility/rc/main-current-inventory-source-routing-v8.json',
+                sha256='b45853d028402964a7b08c79b38c80991a65d623e84aae7d1ae0121cc9d8bd9c', bytes=24734)
+            assert p['support'] == []
+            paths = ['scripts/packed-upstream-ledger-epoch.mjs', 'scripts/sass-wrapper-notice-subject.mjs',
+                     'scripts/upstream-sass-inspection-admission.mjs', 'tests/test_retained_landscape_tool_replay.py']
+            assert [row['path'] for row in p['updates']] == paths
+            for key, value in dict(source_scope_only=True, historical_programs_executed=False,
+                                  historical_packets_rewritten=False, original_ledger_metadata_recipe_changed=False,
+                                  source_judgments_changed=0, theme_module_contract_changed=False,
+                                  css_or_artifact_admission_granted=False, artifact_or_audit_admission_granted=False,
+                                  g11_claim='not-passed').items():
+                assert p[key] == value
+            stage_env = dict(PATH=os.environ['PATH'], GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null',
+                             GIT_NO_LAZY_FETCH='1', GIT_NO_REPLACE_OBJECTS='1', GIT_TERMINAL_PROMPT='0')
+            subprocess.check_call(['git', '--no-replace-objects', 'merge-base', '--is-ancestor', p['base_head'], 'HEAD'], cwd=self.root, env=stage_env)
+            originals = _git_images(self.root, [dict(commit=p['base_head'], path=path) for path in paths])
+            for update in p['updates']:
+                assert update['before']['path'] == update['after']['path'] == update['path']
+                before = originals[(p['base_head'], update['path'])]; _matches(before, update['before'])
+                after = _edited(before, update['edits']); _matches(after, update['after'])
+                assert self._member(update['after']) == after
+                stage_programs[update['path']] = (update, [(update['before'], before), (update['after'], after)])
+            anchor = dict(path='compatibility/rc/dialog-title-current-source-reader-successors.json',
+                          sha256='8ec37f431f8da2aee653a62fb4676cd86e67f3fea233b530cf440e15cbf44d71', bytes=36762)
+            raw = _git_images(self.root, [dict(commit=p['base_head'], path=anchor['path'])])[(p['base_head'], anchor['path'])]
+            _matches(raw, anchor); row = json.loads(raw)['code_subjects'][7]
+            assert row['path'] == 'scripts/sass-wrapper-notice-subject.mjs'
+            before = dict(path=row['path'], **row['after']); assert stage_programs[row['path']][0]['before'] == before
+            retained_stage_before[row['path']] = before
+        def stage_comparison(ref):
+            overlay = stage_programs.get(ref['path'])
+            if overlay is None: return self._member(ref)
+            update, identities = overlay; meta = _metadata(ref)
+            found = [raw for identity, raw in identities if identity == meta]
+            assert len(found) == 1, 'unknown Sass stage program comparison'
+            self._member(update['after']); return bytes(found[0])
         if self.line == 'main':
             p = json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v8.json',
                 sha256='b45853d028402964a7b08c79b38c80991a65d623e84aae7d1ae0121cc9d8bd9c', bytes=24734)))
@@ -360,16 +409,16 @@ class CurrentSassToolReferences:
                 assert update['before']['path'] == update['after']['path'] == update['path']
                 before = originals[(p['base_head'], update['path'])]; _matches(before, update['before'])
                 after = _edited(before, update['edits']); _matches(after, update['after'])
-                assert self._member(update['after']) == after
+                assert stage_comparison(update['after']) == after
                 inspection_programs[update['path']] = (update, [(update['before'], before), (update['after'], after)])
         # Historical program data remains private; reads and guards bind afterimages.
         def inspection_comparison(ref):
             overlay = inspection_programs.get(ref['path'])
-            if overlay is None: return self._member(ref)
+            if overlay is None: return stage_comparison(ref)
             update, identities = overlay; meta = _metadata(ref)
             found = [raw for identity, raw in identities if identity == meta]
             assert len(found) == 1, 'unknown inspection program comparison'
-            self._member(update['after']); return bytes(found[0])
+            stage_comparison(update['after']); return bytes(found[0])
         graph_program_packet = dict(path='compatibility/rc/main-sass-graph-resource-source-programs-v2.json',
             sha256='e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98', bytes=6928)
         if self.line == 'main':
@@ -503,7 +552,7 @@ class CurrentSassToolReferences:
             assert routing_packet['schema_version']==1 and routing_packet['role']=='main-current-inventory-source-routing' and routing_packet['base_head']=='54aa9b85bdd38c1ebb93ce2eeaeee34f39161cc0'
             assert routing_packet['source_scope_only'] is True and routing_packet['historical_programs_executed'] is False and routing_packet['historical_packets_rewritten'] is False and routing_packet['artifact_or_audit_admission_granted'] is False and routing_packet['g11_claim']=='not-passed'
             routing_paths=['scripts/packed-upstream-ledger-epoch.mjs','scripts/inventory-reference-owner.mjs','scripts/inventory-finite-tool-successor.mjs','scripts/historical-repair-live-source-successor.mjs'];assert [row['path'] for row in routing_packet['updates']]==routing_paths
-            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='0c1f1bc178c632dfa5c2cc4706fea7e1f0bdaaed60ce02cd31d898e337718228',bytes=22492))
+            self._member(dict(path='scripts/current-inventory-source-subject.mjs',sha256='83469fa6f5cad7a0316e3750bfa6fd0397e43ff530bb43fdbb8763dc282dfbe3',bytes=25275))
             routing_env=dict(PATH=os.environ['PATH'],GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0');subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',routing_packet['base_head'],'HEAD'],cwd=self.root,env=routing_env)
             routing_originals=_git_images(self.root,[dict(commit=routing_packet['base_head'],path=routing_path) for routing_path in routing_paths])
             routing_next=json.loads(self._member(dict(path='compatibility/rc/main-current-inventory-source-routing-v3.json',sha256='d533e0e694d406ec9968b4748fb9da4a846a88df413fa800bae384403ea3402b',bytes=13219)))
@@ -571,7 +620,7 @@ class CurrentSassToolReferences:
                     assert finalized['before']==current['after'] and finalized['after']['path']==routing_update['path']
                     assert wrapper_images[(routing_wrapper['base_head'],routing_update['path'])]==actual
                     actual=_edited(actual,finalized['edits']);_matches(actual,finalized['after']);identities.append((finalized['after'],actual));current={**routing_update,'after':finalized['after']}
-                assert self._member(current['after'])==actual
+                assert stage_comparison(current['after'])==actual
                 routing_images[routing_update['path']]=(current,identities)
             for index,update in enumerate(routing_wrapper['updates'][1:]):
                 assert update['before']==wrapper_before[index] and update['path']==update['before']['path']==update['after']['path']
@@ -580,9 +629,9 @@ class CurrentSassToolReferences:
                 routing_images[update['path']]=(update,[(update['before'],before),(update['after'],after)])
         def routing_comparison(ref):
             overlay=routing_images.get(ref['path'])
-            if overlay is None:return self._member(ref)
+            if overlay is None:return stage_comparison(ref)
             update,identities=overlay;meta=_metadata(ref);matches=[raw for identity,raw in identities if identity==meta];assert len(matches)==1,'unknown current inventory routing comparison'
-            self._member(update['after']);return bytes(matches[0])
+            stage_comparison(update['after']);return bytes(matches[0])
         retained_reader_paths=set();retained_reader_images={}
         if self.line=='main':
             retained_packet=json.loads(self._member(dict(path='compatibility/rc/main-retained-current-reader-source-successors-v1.json',sha256='1c0ccfdd33c5f264960cb598c74f4a4f7aea3ffb8779570b47182ea660dd589d',bytes=8704)))
@@ -894,6 +943,12 @@ class CurrentSassToolReferences:
             prior = domain_overlays.get(path)
             if prior is not None:
                 assert prior[0]['after'] == update['before'], 'inspection program must follow exact source frame'
+                domain_overlays[path] = ({**prior[0], 'after': update['after']}, prior[1] + identities)
+            else: domain_overlays[path] = (update, identities)
+        for path, (update, identities) in stage_programs.items():
+            prior = domain_overlays.get(path)
+            if prior is not None:
+                assert prior[0]['after'] == update['before'], 'Sass stage program must follow exact source frame'
                 domain_overlays[path] = ({**prior[0], 'after': update['after']}, prior[1] + identities)
             else: domain_overlays[path] = (update, identities)
         inventory_prior = dict(path='testing/legacy-runner/historical-inventory.json', sha256='a3ebe782d8757db92b392c9c5ced70de7f25cca550a705363ccab825037d6403', bytes=106309)
@@ -1248,7 +1303,8 @@ class CurrentSassToolReferences:
             if row is not None: assert dict(path=path,**row['after']) == update['before'], 'domain successor must follow previous frame'
             else:
                 if path in retained_test_before: assert update['before'] == retained_test_before[path]
-                assert (self.line=='main' and (path==retained_rules_js_path or path in retained_landscape_paths)) or path in retained_test_before or path in retained_reader_paths or path in routing_images or update['before'] in next_branch['additional_inputs'] or (path=='scripts/authored-current-use-inventory.mjs' and checker_source_anchor is not None and update['before'] in checker_source_anchor['source_members']), 'domain predecessor is not an existing input'
+                if path in retained_stage_before: assert update['before'] == retained_stage_before[path]
+                assert (self.line=='main' and (path==retained_rules_js_path or path in retained_landscape_paths)) or path in retained_test_before or path in retained_stage_before or path in retained_reader_paths or path in routing_images or update['before'] in next_branch['additional_inputs'] or (path=='scripts/authored-current-use-inventory.mjs' and checker_source_anchor is not None and update['before'] in checker_source_anchor['source_members']), 'domain predecessor is not an existing input: ' + path
                 row=dict(path=path,before=dict(sha256=update['before']['sha256'],bytes=update['before']['bytes']),identities={}); self._rows[path]=row
             for ref, raw in identities: self._add(row,ref,raw)
             row['after']=dict(sha256=update['after']['sha256'],bytes=update['after']['bytes'])
@@ -1273,11 +1329,11 @@ class CurrentSassToolReferences:
             self._bound[path] = ref
         self._bind_image(path, raw)
         if self._provided is not None:
-            self._assert_physical()
+            if self._strict_callbacks or not self._consuming: self._assert_physical()
             provided = self._provided(path)
             _check_tool_transaction(self.root)
             assert type(provided) is bytes and provided == raw
-            self._assert_physical()
+            if self._strict_callbacks or not self._consuming: self._assert_physical()
         assert _physical(self.root, path) == raw
         return raw
 
@@ -1304,11 +1360,18 @@ class CurrentSassToolReferences:
         return self._assert_current_core()
 
     def _assert_current_core(self):
-        if self._matrix_owner: self._matrix_owner.assert_current()
-        for ref in list(self._bound.values()):
-            self._member(ref)
+        assert not self._consuming, 'reentrant current tool guard consumption'
         self._assert_physical()
-        if self._matrix_owner: self._matrix_owner.assert_current()
+        self._consuming = True
+        try:
+            if self._matrix_owner: self._matrix_owner.assert_current()
+            for ref in list(self._bound.values()):
+                self._member(ref)
+            self._assert_physical()
+            if self._matrix_owner: self._matrix_owner.assert_current()
+            self._assert_physical()
+        finally:
+            self._consuming = False
 
     @_public_tool_method
     def owns_reference(self, incoming):

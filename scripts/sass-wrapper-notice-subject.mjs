@@ -10,6 +10,12 @@ import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {dialogTitleReaderSubject} from './dialog-title-source-context.mjs';
+import {readFileSync,lstatSync,realpathSync} from 'node:fs';
+import {join,isAbsolute} from 'node:path';
+import {captureCurrentSassMetadata as capture} from './current-sass-inspection-scope.mjs';
+import {types} from 'node:util';
+
+const SELF='scripts/sass-wrapper-notice-subject.mjs',image=readFileSync(new URL(import.meta.url));
 
 export const SASS_NOTICE_PACKET='compatibility/rc/sass-wrapper-notice-successor.json';
 export const SASS_NOTICE_READERS='compatibility/rc/sass-wrapper-notice-reader-successors.json';
@@ -34,12 +40,34 @@ function original(root,path){
   return Buffer.from(objects.get(key));
 }
 
-export function sassWrapperNoticeSubject({root,read=p=>readEvidenceMember(root,p),line}={}){
+export function sassWrapperNoticeSubject(options={}){
+  assert.ok(options&&typeof options==='object'&&!types.isProxy(options));assert.equal(Object.getPrototypeOf(options),Object.prototype);
+  const values={};for(const key of ['root','read','line']){const d=Object.getOwnPropertyDescriptor(options,key);if(d){assert.ok(Object.hasOwn(d,'value')&&d.enumerable,'Sass notice option accessor');values[key]=d.value;}}
+  let activate;const subject=constructNoticeSubject({...values,read:undefined},fn=>{activate=fn;});
+  if(values.read!==undefined)activate(values.read);return subject;
+}
+function constructNoticeSubject({root,read:initialRead,line}={},captureReader){
+  let providedRead=initialRead;
+  const peerRoots=new Map();
+  const physical=path=>{
+    if(!/^node_modules\/(@angular\/(?:core|material|cdk|compiler)|sass|rxjs)\//.test(path))return readEvidenceMember(root,path);
+    assert.ok(!isAbsolute(path)&&!path.includes('\\')&&!path.includes('\0')&&path.split('/').every(p=>p&&p!=='.'&&p!=='..'));
+    const peer=/^node_modules\/(@angular\/(?:core|material|cdk|compiler)|sass|rxjs)\/(.+)$/.exec(path);assert.ok(peer,'unapproved Sass notice peer input '+path);
+    if(['@angular/compiler','rxjs'].includes(peer[1]))assert.equal(peer[2],'package.json');
+    for(const dir of ['node_modules',...(peer[1].startsWith('@angular/')?['node_modules/@angular']:[])]){const st=lstatSync(join(root,dir));assert.ok(st.isDirectory()&&!st.isSymbolicLink());}
+    const base=realpathSync(join(root,'node_modules',peer[1]));if(peerRoots.has(peer[1]))assert.equal(base,peerRoots.get(peer[1]),'Sass notice peer resolution changed');else peerRoots.set(peer[1],base);
+    const regular=relative=>{let cursor=base;for(const part of relative.split('/')){cursor=join(cursor,part);assert.equal(lstatSync(cursor).isSymbolicLink(),false,'linked Sass notice peer descendant');}assert.ok(lstatSync(cursor).isFile());return readFileSync(cursor);};
+    assert.equal(JSON.parse(regular('package.json')).name,peer[1]);if(peer[1]==='sass')assert.ok(['package.json','sass.node.js','sass.dart.js'].includes(peer[2]));return regular(peer[2]);
+  };
+  const read=path=>{const actual=physical(path);if(providedRead!==undefined){const supplied=providedRead(path);assert.ok(Buffer.isBuffer(supplied)&&actual.equals(supplied),'nonphysical Sass notice input '+path);}assert.ok(physical(path).equals(actual),'Sass notice input changed during supplied read');return actual;};
+  assert.ok(readEvidenceMember(root,SELF).equals(image),'loaded Sass notice owner differs');
   const actual=JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main';
   line??=actual;assert.equal(line,actual);
   // The21.x sources already carry these notices and have no successor here.
-  if(line==='21.x')return {line,bound:[],qualify:()=>null,historicalReference:ref=>({...ref}),
-    qualifySassScope:scope=>structuredClone(scope),assertCurrent:()=>{},native_or_full_gate_credit:false};
+  if(line==='21.x'){
+    captureReader?.(fn=>{assert.equal(typeof fn,'function');providedRead=fn;read('projects/ngx-material-legacy/package.json');});
+    return {line,bound:[],qualify:()=>null,historicalReference:ref=>({...ref}),qualifySassScope:scope=>structuredClone(scope),assertCurrent:()=>{},native_or_full_gate_credit:false};
+  }
   assert.equal(line,'main');
   const titleReaders=dialogTitleReaderSubject({root,read,line});
   const bound=new Map(),rows=new Map();
@@ -78,31 +106,47 @@ export function sassWrapperNoticeSubject({root,read=p=>readEvidenceMember(root,p
     else assert.equal(current.toString(),after,'source hook exceeds its finite delta');
     rows.set(row.path,structuredClone(row));
   }
-  const assertCurrent=()=>{titleReaders.assertCurrent();for(const ref of bound.values()){
-    const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'late Sass notice subject '+ref.path);assert.equal(bytes.length,ref.bytes);
+  const frame=new Map();for(const ref of [...titleReaders.bound,...bound.values()]){const prior=frame.get(ref.path);if(prior)assert.deepEqual(prior,ref);else frame.set(ref.path,{...ref});}
+  const assertPhysical=()=>{assert.ok(readEvidenceMember(root,SELF).equals(image),'changed loaded Sass notice owner');for(const ref of frame.values()){
+    const raw=physical(ref.path);assert.equal(hash(raw),ref.sha256,'physical Sass notice frame '+ref.path);assert.equal(raw.length,ref.bytes);
   }};
-  const qualify=ref=>{
+  let active=false,nested=false;
+  const idle=()=>{if(active){nested=true;assert.fail('reentrant Sass notice operation');}};
+  const transact=fn=>{idle();active=true;nested=false;try{assertPhysical();const result=fn();assertPhysical();assert.equal(nested,false,'caught Sass notice reentry');return result;}finally{active=false;}};
+  const assertCurrentCore=()=>{assertPhysical();titleReaders.assertCurrent();for(const ref of bound.values()){
+    const actual=readEvidenceMember(root,ref.path),bytes=read(ref.path);assert.ok(Buffer.isBuffer(bytes)&&actual.equals(bytes),'nonphysical Sass notice input '+ref.path);assert.equal(hash(bytes),ref.sha256,'late Sass notice subject '+ref.path);assert.equal(bytes.length,ref.bytes);assert.ok(readEvidenceMember(root,ref.path).equals(actual),'Sass notice input changed during callback');
+  }assertPhysical();};
+  const assertCurrent=()=>transact(assertCurrentCore);
+  const qualifyCaptured=ref=>{
     const row=rows.get(ref.path);if(!row)return null;
-    const successor=titleReaders.qualify({path:row.path,...row.after});
-    if(successor?.sha256===ref.sha256){if(ref.bytes!==undefined)assert.equal(ref.bytes,successor.bytes);assertCurrent();return successor;}
-    assert.ok([row.before.sha256,row.after.sha256].includes(ref.sha256),'unqualified earlier Sass notice metadata '+ref.path);
-    if(ref.bytes!==undefined)assert.equal(ref.bytes,ref.sha256===row.before.sha256?row.before.bytes:row.after.bytes);
-    assertCurrent();return successor??{path:ref.path,...row.after};
+    const current=bound.get(ref.path),selected=[row.before,row.after,current].find(side=>side.sha256===ref.sha256);
+    assert.ok(selected,'unqualified earlier Sass notice metadata '+ref.path);
+    if(ref.bytes!==undefined)assert.equal(ref.bytes,selected.bytes);
+    return {...current};
   };
+  const qualify=ref=>{idle();const snapshot=capture(ref);if(!rows.has(snapshot.path))return null;return transact(()=>{
+    const row=rows.get(snapshot.path),successor=titleReaders.qualify({path:row.path,...row.after});assert.deepEqual(successor??{path:row.path,...row.after},bound.get(row.path));
+    const result=qualifyCaptured(snapshot);assertCurrentCore();assert.deepEqual(capture(ref),snapshot,'Sass notice reference changed');return result;
+  });};
   // Old reference metadata only. Source reads always return the real current bytes.
-  const historicalReference=ref=>{const row=rows.get(ref.path);if(!row)return {...ref};qualify(ref);
-    return {...ref,sha256:row.before.sha256,...(ref.bytes===undefined?{}:{bytes:row.before.bytes})};};
-  const qualifySassScope=scope=>{
-    assert.equal(scope.line,line);const current=structuredClone(scope);
-    current.owned_scss_population=current.owned_scss_population.map(ref=>qualify(ref)??ref);
-    assert.equal(scope.owned_population_sha256,hash(JSON.stringify(scope.owned_scss_population)));
+  const historicalReference=ref=>{idle();const snapshot=capture(ref),row=rows.get(snapshot.path);if(!row)return snapshot;return transact(()=>{
+    const successor=titleReaders.qualify({path:row.path,...row.after});assert.deepEqual(successor??{path:row.path,...row.after},bound.get(row.path));
+    qualifyCaptured(snapshot);assertCurrentCore();assert.deepEqual(capture(ref),snapshot,'historical Sass notice reference changed');
+    return {...snapshot,sha256:row.before.sha256,...(snapshot.bytes===undefined?{}:{bytes:row.before.bytes})};
+  });};
+  const qualifySassScope=scope=>transact(()=>{
+    const snapshot=capture(scope);assert.equal(snapshot.line,line);const current=structuredClone(snapshot);
+    assert.equal(snapshot.owned_population_sha256,hash(JSON.stringify(snapshot.owned_scss_population)));
+    assertCurrentCore();
+    current.owned_scss_population=current.owned_scss_population.map(ref=>qualifyCaptured(ref)??ref);
     current.owned_population_sha256=hash(JSON.stringify(current.owned_scss_population));
     current.candidate.loaded_sources=current.candidate.loaded_sources.map(ref=>{
       if(ref.root!==0)return ref;
-      const qualified=qualify({...ref,path:prefix+ref.path});return qualified?{...ref,sha256:qualified.sha256,bytes:qualified.bytes}:ref;
+      const qualified=qualifyCaptured({...ref,path:prefix+ref.path});return qualified?{...ref,sha256:qualified.sha256,bytes:qualified.bytes}:ref;
     });
-    assertCurrent();return current;
-  };
-  assertCurrent();return {line,bound:structuredClone([...bound.values()]),qualify,historicalReference,qualifySassScope,assertCurrent,
+    assertCurrentCore();assert.deepEqual(capture(scope),snapshot,'Sass scope changed during notice guards');return current;
+  });
+  assertCurrent();captureReader?.(fn=>{assert.equal(typeof fn,'function');assert.equal(providedRead,undefined);providedRead=fn;assertCurrent();});
+  return {line,bound:structuredClone([...bound.values()]),qualify,historicalReference,qualifySassScope,assertCurrent,
     exact_silent_prefixes:7,current_reader_hooks:6,native_or_full_gate_credit:false};
 }
