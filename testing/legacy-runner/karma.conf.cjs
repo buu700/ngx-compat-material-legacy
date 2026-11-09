@@ -12,6 +12,7 @@ module.exports = function (config) {
     plugins: [
       require('karma-jasmine'),
       require('karma-chrome-launcher'),
+      require('./owned-chrome-launcher.cjs'),
       require('./karma-legacy-json-reporter.cjs'),
     ],
     legacyJsonReporter: {
@@ -34,11 +35,13 @@ module.exports = function (config) {
     browsers: ['ChromeHeadlessSandboxed'],
     customLaunchers: {
       ChromeHeadlessSandboxed: {
-        base: 'ChromeHeadless',
+        base: 'LegacyOwnedChromeHeadless',
+        chromeDataDir: process.env.LEGACY_BROWSER_PROFILE,
         flags: [
           '--disable-gpu',
           '--disable-dev-shm-usage',
           '--remote-debugging-port=0',
+          '--legacy-runner-nonce=' + process.env.LEGACY_BROWSER_NONCE,
           // Historical layout specs place a 500px trigger and read the tooltip
           // below it. The default headless viewport clips that trigger.
           '--window-size=1400,1200',
