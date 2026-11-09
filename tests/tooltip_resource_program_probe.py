@@ -43,9 +43,11 @@ with TemporaryDirectory(prefix='tooltip-source-program-py-') as temporary:
     context = json.loads(read(context_path))
     browser_path = 'compatibility/rc/main-browser-private-owner-source-routing-v13.json'
     browser = json.loads(read(browser_path))
-    updates = packet['updates'] + graph['updates'] + contracts['updates'] + test['updates'] + inspection['updates'] + stage['updates'] + guard_tests['updates'] + comparison['updates'] + [comparison['source_owner_update']] + context['updates'] + [context['source_owner_update']] + browser['updates']
+    independent_path = 'compatibility/rc/main-browser-independent-terminal-source-routing-v14.json'
+    independent = json.loads(read(independent_path))
+    updates = packet['updates'] + graph['updates'] + contracts['updates'] + test['updates'] + inspection['updates'] + stage['updates'] + guard_tests['updates'] + comparison['updates'] + [comparison['source_owner_update']] + context['updates'] + [context['source_owner_update']] + browser['updates'] + independent['updates']
     latest = {row['path']: row['after'] for row in updates}
-    assert (len(scope.bound), len(scope.transitions)) == (528, 110)
+    assert (len(scope.bound), len(scope.transitions)) == (529, 112)
     for update in updates:
         for ref in (update['before'], update['after']):
             assert scope.qualify(ref) == latest[update['path']]
@@ -54,7 +56,7 @@ with TemporaryDirectory(prefix='tooltip-source-program-py-') as temporary:
             try: scope.qualify(dict(ref, bytes=ref['bytes'] + 1))
             except AssertionError: pass
             else: raise AssertionError('wrong program length accepted')
-    targets = list(dict.fromkeys([packet_path, graph_path, contract_path, test_path, inspection_path, stage_path, guard_test_path, comparison_path, context_path, browser_path, test['source_anchor']['packet']['path'], *[row['path'] for row in updates],
+    targets = list(dict.fromkeys([packet_path, graph_path, contract_path, test_path, inspection_path, stage_path, guard_test_path, comparison_path, context_path, browser_path, independent_path, test['source_anchor']['packet']['path'], *[row['path'] for row in updates],
         *[row['path'] for row in packet['support']], *[row['path'] for row in graph['support']]]))
     for path in targets:
         target = root / path; saved = read(path)

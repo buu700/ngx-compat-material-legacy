@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "role": "main-browser-independent-terminal-source-routing",
+  "base_head": "fca2e66cb4fcfdc24c960640e8a7237978f3a0c8",
+  "previous_packet": {
+    "path": "compatibility/rc/main-browser-private-owner-source-routing-v13.json",
+    "sha256": "e93f90dbb4bf9c546b9c411398037dd98e381b88069714f047d2cfa9db9bbcda",
+    "bytes": 45174
+  },
+  "updates": [
+    {
+      "path": "tests/browser_reference_independent_support.py",
+      "before": {
+        "path": "tests/browser_reference_independent_support.py",
+        "sha256": "940cc5a7f6ab6f59c2dfcae1c98bd8084d9e4df725364bd6b60dd09d79f292f5",
+        "bytes": 5084
+      },
+      "after": {
+        "path": "tests/browser_reference_independent_support.py",
+        "sha256": "1cfdaf825e0e7285958ec14ecf6e767e3801595cef0a32df36d853f26817da8c",
+        "bytes": 11411
+      },
+      "edits": [
+        {
+          "offset": 1095,
+          "before": "def verify_zone_data(packet_raw,line,historical_after,old,new,physical):\n",
+          "after": "def _verify_zone_history(packet_raw,line,historical_after,old,new):\n"
+        },
+        {
+          "offset": 1853,
+          "before": "",
+          "after": "    return row\n\ndef verify_zone_data(packet_raw,line,historical_after,old,new,physical):\n    row=_verify_zone_history(packet_raw,line,historical_after,old,new)\n"
+        },
+        {
+          "offset": 2335,
+          "before": "",
+          "after": "def _verify_main_terminal(root,row):\n    # This is the sole later main image: Git establishes the exact lineage and\n    # bytes; the separately read live file must match that same terminal image.\n    parent='fdcdadee28c4552e3500b5099de9f42e456adb5c'\n    commit='8e9e7316806fe9266373865b0784e9917659e5e8'\n    env={k:v for k,v in os.environ.items() if not k.startswith('GIT_')}\n    env.update(GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0')\n    parents=subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',commit],cwd=root,env=env).decode().strip()\n    assert parents==commit+' '+parent\n    subprocess.check_output(['git','--no-replace-objects','merge-base','--is-ancestor',commit,'HEAD'],cwd=root,env=env)\n    previous=git_data(root,parent,ZONE_PATH);terminal=git_data(root,commit,ZONE_PATH)\n    match(previous,row['after'])\n    needle=b\"    '--no-sandbox',\\n\"\n    assert previous.count(needle)==1 and previous.replace(needle,b'')==terminal\n    match(terminal,{'sha256':'1ff46b8442f8b66fa92d3b8340c0169950007e8e9a19bfc5630bc36bf806e0b2','bytes':64913})\n    physical=(root/ZONE_PATH).read_bytes()\n    match(physical,{'sha256':'1ff46b8442f8b66fa92d3b8340c0169950007e8e9a19bfc5630bc36bf806e0b2','bytes':64913})\n    assert physical==terminal\n\nSURFACE_PATH='scripts/browser-surface-families.mjs'\nFORM_PATH='scripts/browser-form-families.mjs'\nSURFACE_PACKET='compatibility/rc/parent-browser-surface-finite-successor-v1.json'\nFORM_PACKET='compatibility/rc/parent-zone-form-successor-v1.json'\n\ndef _git_helper_data(root,commit,path):\n    assert re.fullmatch(r'[0-9a-f]{40}',commit) and path in (SURFACE_PATH,FORM_PATH)\n    env={k:v for k,v in os.environ.items() if not k.startswith('GIT_')}\n    env.update(GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0')\n    return subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',commit+':'+path],cwd=root,env=env)\n\ndef _verify_main_surface(root,historical_after):\n    raw=(root/SURFACE_PACKET).read_bytes()\n    assert digest(raw)=='e4f5c029f3c2b88359920ac3aad5d344e86e163fcc323b407d413e7e35d08e4e'\n    packet=json.loads(raw)\n    assert packet['schema_version']==1 and packet['role']=='finite-browser-surface-source-successor'\n    assert packet['old_programs_executed'] is False and packet['historical_packets_rewritten'] is False\n    assert packet['source_scope_only'] is True and packet['actual_native_packed_browser_floor_or_full_audit_qualified'] is False and packet['g11_claim']=='not-passed'\n    branch=packet['branches']['main'];rows=branch['transitions']\n    assert [r['path'] for r in rows]==[SURFACE_PATH,'scripts/legacy-core-high-contrast-contract.mjs']\n    row=rows[0]\n    assert all(row[k]['path']==SURFACE_PATH for k in ('before','intermediate','after'))\n    assert row['before']=={'path':SURFACE_PATH,**historical_after}\n    before=_git_helper_data(root,branch['source_parent'],SURFACE_PATH)\n    middle=_git_helper_data(root,branch['intermediate_commit'],SURFACE_PATH)\n    match(before,row['before']);match(middle,row['intermediate'])\n    assert replay(before,row['before_to_intermediate'])==middle\n    after=replay(middle,row['intermediate_to_after']);match(after,row['after'])\n    physical=(root/SURFACE_PATH).read_bytes();match(physical,row['after']);assert physical==after\n\ndef _verify_main_form(root,historical_after):\n    raw=(root/FORM_PACKET).read_bytes()\n    assert digest(raw)=='a900cfaad6fd64bbb77b2fa5ab2326d99191de8af9dd4e410d4ba22f28c9e63f'\n    packet=json.loads(raw)\n    assert packet['schema_version']==1 and packet['role']=='finite-browser-form-zone-runtime-successor'\n    assert packet['historical_packets_rewritten'] is False and packet['old_programs_executed'] is False\n    assert packet['native_or_full_audit_qualified'] is False and packet['g11_claim']=='not-passed'\n    row=packet['lines']['main'];assert row['path']==FORM_PATH and row['before']['path']==FORM_PATH and row['after']['path']==FORM_PATH\n    assert row['before']=={'path':FORM_PATH,**historical_after}\n    reference=row['reference_packet'];prior_raw=(root/reference['path']).read_bytes();assert digest(prior_raw)==reference['sha256']\n    prior=json.loads(prior_raw);assert prior['line']=='main' and prior['transitions'][reference['transition_index']]['after']==row['before']\n    before=_git_helper_data(root,row['before_commit'],FORM_PATH);match(before,row['before'])\n    reconstructed=replay(before,row['edits']);match(reconstructed,row['after'])\n    parent='fdcdadee28c4552e3500b5099de9f42e456adb5c';commit='8e9e7316806fe9266373865b0784e9917659e5e8'\n    env={k:v for k,v in os.environ.items() if not k.startswith('GIT_')}\n    env.update(GIT_NO_LAZY_FETCH='1',GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0')\n    parents=subprocess.check_output(['git','--no-replace-objects','rev-list','--parents','-n','1',commit],cwd=root,env=env).decode().strip()\n    assert parents==commit+' '+parent\n    subprocess.check_output(['git','--no-replace-objects','merge-base','--is-ancestor',commit,'HEAD'],cwd=root,env=env)\n    previous=_git_helper_data(root,parent,FORM_PATH);terminal=_git_helper_data(root,commit,FORM_PATH)\n    match(previous,row['after']);assert reconstructed==previous\n    needle=b\"  '--no-sandbox',\\n\"\n    assert previous.count(needle)==1 and previous.replace(needle,b'')==terminal\n    terminal_ref={'sha256':'afee71948187d5aebcd2a42fa3f1bb16e0e2241edbce8aaa3421c3110c874a04','bytes':21567}\n    match(terminal,terminal_ref)\n    physical=(root/FORM_PATH).read_bytes();match(physical,terminal_ref);assert physical==terminal\n\n"
+        },
+        {
+          "offset": 2661,
+          "before": "    verify_zone_data(raw,line,transitions[ZONE_PATH]['after'],old,new,(root/ZONE_PATH).read_bytes())\n    verify_other_helpers(root,transitions)\n",
+          "after": "    if line=='main':\n        checked=_verify_zone_history(raw,line,transitions[ZONE_PATH]['after'],old,new)\n        _verify_main_terminal(root,checked)\n    else:\n        verify_zone_data(raw,line,transitions[ZONE_PATH]['after'],old,new,(root/ZONE_PATH).read_bytes())\n    if line=='main':\n        assert SURFACE_PATH in transitions and FORM_PATH in transitions\n        _verify_main_surface(root,transitions[SURFACE_PATH]['after'])\n        _verify_main_form(root,transitions[FORM_PATH]['after'])\n        for path,transition in transitions.items():\n            if path not in (ZONE_PATH,SURFACE_PATH,FORM_PATH):match((root/path).read_bytes(),transition['after'])\n    else:\n        verify_other_helpers(root,transitions)\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_browser_reference_independent_metadata.py",
+      "before": {
+        "path": "tests/test_browser_reference_independent_metadata.py",
+        "sha256": "5a9697ad0e2ebb663c7f05024914db96713d69ef2d9cd529b69639f829aa0826",
+        "bytes": 5839
+      },
+      "after": {
+        "path": "tests/test_browser_reference_independent_metadata.py",
+        "sha256": "a562836807fe53a0c355c371f80d1d0ee09ba438618a5225a7be5e40f2f43b9b",
+        "bytes": 10833
+      },
+      "edits": [
+        {
+          "offset": 314,
+          "before": "",
+          "after": "from unittest import mock\n"
+        },
+        {
+          "offset": 2111,
+          "before": "",
+          "after": " def test_main_terminal_git_lineage_and_physical_mutants(self):\n  if 'main' not in ROOTS:self.skipTest('main-only terminal transition')\n  root=ROOTS['main'];packet=json.loads((root/h.ZONE_PACKET).read_bytes());row=packet['browser']['main']\n  parent='fdcdadee28c4552e3500b5099de9f42e456adb5c';commit='8e9e7316806fe9266373865b0784e9917659e5e8'\n  previous=h.git_data(root,parent,h.ZONE_PATH);terminal=h.git_data(root,commit,h.ZONE_PATH)\n  with tempfile.TemporaryDirectory() as temp:\n   fixture=Path(temp);(fixture/'scripts').mkdir();target=fixture/h.ZONE_PATH\n   gitdir=subprocess.check_output(['git','rev-parse','--absolute-git-dir'],cwd=root,text=True).strip()\n   (fixture/'.git').write_text('gitdir: '+gitdir+'\\n');target.write_bytes(terminal)\n   h._verify_main_terminal(fixture,row)\n   for bad in (previous,terminal+b' ',terminal.replace(b\"'--no-sandbox'\",b\"'--other'\"),terminal.replace(b\"    '--disable-dev-shm-usage',\\n\",b'')):\n    # The last case must really differ, independently of the launcher's contents.\n    if bad==terminal:bad=terminal[:-1]\n    target.write_bytes(bad)\n    with self.assertRaises(AssertionError):h._verify_main_terminal(fixture,row)\n   target.write_bytes(terminal)\n   original=h.subprocess.check_output\n   def wrong_parent(args,**kwargs):\n    if 'rev-list' in args:return (commit+' '+'0'*40+'\\n').encode()\n    return original(args,**kwargs)\n   with mock.patch.object(h.subprocess,'check_output',side_effect=wrong_parent):\n    with self.assertRaises(AssertionError):h._verify_main_terminal(fixture,row)\n   def non_ancestor(args,**kwargs):\n    if 'merge-base' in args:raise subprocess.CalledProcessError(1,args)\n    return original(args,**kwargs)\n   with mock.patch.object(h.subprocess,'check_output',side_effect=non_ancestor):\n    with self.assertRaises(subprocess.CalledProcessError):h._verify_main_terminal(fixture,row)\n   actual_git=h.git_data\n   for corrupt_commit in (parent,commit):\n    def corrupted_git(where,sha,path):\n     raw=actual_git(where,sha,path)\n     return raw+b' ' if sha==corrupt_commit else raw\n    with mock.patch.object(h,'git_data',side_effect=corrupted_git):\n     with self.assertRaises(AssertionError):h._verify_main_terminal(fixture,row)\n   bad=copy.deepcopy(row);bad['after']['sha256']='0'*64\n   with self.assertRaises(AssertionError):h._verify_main_terminal(fixture,bad)\n   h._verify_main_terminal(fixture,row)\n def test_main_surface_and_form_successors_and_mutants(self):\n  if 'main' not in ROOTS:self.skipTest('main-only successor transitions')\n  root=ROOTS['main'];source=json.loads((root/'compatibility/rc/c04-browser-reference-source-inputs.json').read_bytes())\n  transitions={row['path']:row for row in source['transitions']}\n  gitdir=subprocess.check_output(['git','rev-parse','--absolute-git-dir'],cwd=root,text=True).strip()\n  with tempfile.TemporaryDirectory() as temp:\n   fixture=Path(temp);(fixture/'.git').write_text('gitdir: '+gitdir+'\\n')\n   for path in (h.SURFACE_PACKET,h.FORM_PACKET,'compatibility/rc/c04-browser-reference-source-inputs.json',h.SURFACE_PATH,h.FORM_PATH):\n    dest=fixture/path;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes((root/path).read_bytes())\n   for name,fn,path,packet in (('surface',h._verify_main_surface,h.SURFACE_PATH,h.SURFACE_PACKET),('form',h._verify_main_form,h.FORM_PATH,h.FORM_PACKET)):\n    with self.subTest(helper=name):\n     historical=transitions[path]['after'];fn(fixture,historical)\n     physical=fixture/path;original=physical.read_bytes();old=h._git_helper_data(root,source['source_parent'],path)\n     for bad in (old,original+b' ',original[:-1]):\n      physical.write_bytes(bad)\n      with self.assertRaises(AssertionError):fn(fixture,historical)\n     physical.write_bytes(original)\n     packet_path=fixture/packet;packet_raw=packet_path.read_bytes();packet_path.write_bytes(packet_raw+b' ')\n     with self.assertRaises(AssertionError):fn(fixture,historical)\n     packet_path.write_bytes(packet_raw)\n     wrong=copy.deepcopy(historical);wrong['sha256']='0'*64\n     with self.assertRaises(AssertionError):fn(fixture,wrong)\n     real_git=h._git_helper_data\n     def corrupt_git(where,commit,member):return real_git(where,commit,member)+b' '\n     with mock.patch.object(h,'_git_helper_data',side_effect=corrupt_git):\n      with self.assertRaises(AssertionError):fn(fixture,historical)\n     fn(fixture,historical)\n   form=transitions[h.FORM_PATH]['after'];original=h.subprocess.check_output\n   def wrong_parent(args,**kwargs):\n    if 'rev-list' in args:return b'incorrect lineage\\n'\n    return original(args,**kwargs)\n   with mock.patch.object(h.subprocess,'check_output',side_effect=wrong_parent):\n    with self.assertRaises(AssertionError):h._verify_main_form(fixture,form)\n   ref=fixture/'compatibility/rc/c04-browser-reference-source-inputs.json';saved=ref.read_bytes();ref.write_bytes(saved+b' ')\n   with self.assertRaises(AssertionError):h._verify_main_form(fixture,form)\n   ref.write_bytes(saved);h._verify_main_form(fixture,form)\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_retained_landscape_tool_replay.py",
+      "before": {
+        "path": "tests/test_retained_landscape_tool_replay.py",
+        "sha256": "d50d23d8c50e2ad1cc2fb3475fb2478067eb275e63983cb4bc5bcc179e795583",
+        "bytes": 2060
+      },
+      "after": {
+        "path": "tests/test_retained_landscape_tool_replay.py",
+        "sha256": "2f9f87dbb143c681254c39dd5f13271cfdbbb82cf18f032d5a428f7ce89b9df3",
+        "bytes": 2060
+      },
+      "edits": [
+        {
+          "offset": 1245,
+          "before": "                self.assertEqual((len(row['bound']),len(row['transitions'])),(528,110))\n",
+          "after": "                self.assertEqual((len(row['bound']),len(row['transitions'])),(529,112))\n"
+        },
+        {
+          "offset": 1973,
+          "before": "            self.assertEqual(len(shared[0]),526);self.assertEqual(shared[0],shared[1])\n",
+          "after": "            self.assertEqual(len(shared[0]),527);self.assertEqual(shared[0],shared[1])\n"
+        }
+      ]
+    }
+  ],
+  "support": [],
+  "product_paths": [],
+  "source_scope_only": true,
+  "independent_helper_terminal_validation_extended": true,
+  "historical_physical_contracts_preserved": true,
+  "full_fault_lifetimes_preserved": true,
+  "root_transaction_policy_changed": false,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "original_ledger_metadata_recipe_changed": false,
+  "source_judgments_changed": 0,
+  "css_or_artifact_admission_granted": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed"
+}
