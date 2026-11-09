@@ -40,16 +40,18 @@ try {
   const comparison = JSON.parse(read(comparisonPath));
   const contextPath = 'compatibility/rc/main-checker-context-source-routing-v12.json';
   const context = JSON.parse(read(contextPath));
-  const updates = [...packet.updates, ...graph.updates, ...contracts.updates, ...test.updates, ...inspection.updates, ...stage.updates, ...guardTests.updates, ...comparison.updates, comparison.source_owner_update, ...context.updates, context.source_owner_update];
+  const browserPath = 'compatibility/rc/main-browser-private-owner-source-routing-v13.json';
+  const browser = JSON.parse(read(browserPath));
+  const updates = [...packet.updates, ...graph.updates, ...contracts.updates, ...test.updates, ...inspection.updates, ...stage.updates, ...guardTests.updates, ...comparison.updates, comparison.source_owner_update, ...context.updates, context.source_owner_update, ...browser.updates];
   const latest = new Map(updates.map(row => [row.path, row.after]));
-  assert.equal(scope.bound.length, 527); assert.equal(scope.transitions.length, 110);
+  assert.equal(scope.bound.length, 528); assert.equal(scope.transitions.length, 110);
   for (const update of updates) for (const ref of [update.before, update.after]) {
     assert.deepEqual(scope.qualify(ref), latest.get(update.path));
     assert.equal(hash(scope.comparisonBytes(ref)), ref.sha256);
     assert.equal(scope.qualify({...ref, sha256: '0'.repeat(64)}), null);
     assert.throws(() => scope.qualify({...ref, bytes: ref.bytes + 1}));
   }
-  const targets = [...new Set([packetPath, graphPath, contractPath, testPath, inspectionPath, stagePath, guardTestPath, comparisonPath, contextPath, test.source_anchor.packet.path, ...updates.map(row => row.path),
+  const targets = [...new Set([packetPath, graphPath, contractPath, testPath, inspectionPath, stagePath, guardTestPath, comparisonPath, contextPath, browserPath, test.source_anchor.packet.path, ...updates.map(row => row.path),
     ...packet.support.map(row => row.path), ...graph.support.map(row => row.path)])];
   for (const path of targets) {
     const file = join(root, path), saved = read(path);

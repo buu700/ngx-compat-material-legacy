@@ -35,7 +35,7 @@ class RetainedRulesJsAdmissionCurrentTests(unittest.TestCase):
                 self.assertEqual(child.returncode, 0, child.stdout + child.stderr)
             rows = [json.loads(path.read_text()) for path in paths]
             for row in rows:
-                self.assertEqual((len(row['bound']), len(row['transitions'])), (527, 110))
+                self.assertEqual((len(row['bound']), len(row['transitions'])), (528, 110))
                 self.assertEqual((row['cold_rejections'], row['late_rejections'], row['recoveries']), (12, 12, 12))
                 self.assertFalse(row['historical_programs_executed'])
                 self.assertFalse(row['artifact_or_audit_admission_granted'])
@@ -43,5 +43,5 @@ class RetainedRulesJsAdmissionCurrentTests(unittest.TestCase):
             own = {'scripts/current-sass-tool-references.mjs', 'scripts/current_sass_tool_references.py',
                    'scripts/current-tool-matrix-source.mjs', 'scripts/current_tool_matrix_source.py'}
             shared = [{ref['path']: ref for ref in row['bound'] if ref['path'] not in own} for row in rows]
-            self.assertEqual(len(shared[0]), 525)
+            self.assertEqual(len(shared[0]), 526)
             self.assertEqual(shared[0], shared[1])

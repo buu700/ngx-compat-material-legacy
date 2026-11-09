@@ -23,10 +23,13 @@ try {
   const stage = JSON.parse(physical('compatibility/rc/main-current-inventory-source-routing-v9.json')).updates.find(row => row.path === update.path).after;
   const guard = JSON.parse(physical('compatibility/rc/main-current-tool-guard-test-source-routing-v10.json')).updates.find(row => row.path === update.path).after;
   const comparison = JSON.parse(physical('compatibility/rc/main-checker-owned-comparison-source-routing-v11.json')).updates.find(row => row.path === update.path).after;
-  const latest = JSON.parse(physical('compatibility/rc/main-checker-context-source-routing-v12.json')).updates.find(row => row.path === update.path).after;
+  const context = JSON.parse(physical('compatibility/rc/main-checker-context-source-routing-v12.json')).updates.find(row => row.path === update.path).after;
+  const latest = JSON.parse(physical('compatibility/rc/main-browser-private-owner-source-routing-v13.json')).updates.find(row => row.path === update.path).after;
+  assert.deepEqual(source.qualify(context), latest);
+  assert.equal(hash(source.comparisonBytes(context)), context.sha256);
   assert.deepEqual(source.qualify(comparison), latest);
   assert.equal(hash(source.comparisonBytes(comparison)), comparison.sha256);
-  assert.equal(source.bound.length, 127); assert.equal(source.transitions.length, 7);
+  assert.equal(source.bound.length, 128); assert.equal(source.transitions.length, 7);
   assert.deepEqual(source.qualify(update.before), latest);
   assert.deepEqual(source.qualify(update.after), latest);
   assert.deepEqual(source.qualify(latest), latest);
