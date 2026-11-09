@@ -45,6 +45,7 @@ import {MatLegacyPrefix} from './prefix';
 import {MatLegacySuffix} from './suffix';
 import {Platform} from '@angular/cdk/platform';
 import {afterFormFieldRender} from './internal/after-form-field-render';
+import {nextLegacyHintId} from './internal/hint-id';
 import {AbstractControlDirective, ValidatorFn} from '@angular/forms';
 import {ANIMATION_MODULE_TYPE} from '@angular/core';
 import {MatFormFieldControl} from '@angular/material/form-field';
@@ -242,7 +243,8 @@ export class MatLegacyFormField
   private _hintLabel = '';
 
   // Unique id for the hint label.
-  readonly _hintLabelId: string = `mat-hint-${nextUniqueId++}`;
+  // Reserve the historical field counter position used by the separate label ID.
+  readonly _hintLabelId: string = (nextUniqueId++, nextLegacyHintId());
 
   // Unique id for the label element.
   readonly _labelId = `mat-form-field-label-${nextUniqueId++}`;

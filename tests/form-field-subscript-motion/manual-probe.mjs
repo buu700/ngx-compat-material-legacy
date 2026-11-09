@@ -14,6 +14,26 @@ const family=await loadRuntimeModule(packageRoot,'legacy-form-field','primary'),
 const fixture=await createPublicFactoryContext(core,load,{providers:[core.importProvidersFrom(family.MatLegacyFormFieldModule)],nodeFactory:()=>captureFactoryConstructorInputs(Type)});
 const results=[];
 try{
+ // Both hintLabel and mat-hint IDs share one DOM namespace. Exercise the
+ // actual compiler-constructed field, historical seven-argument fields, and
+ // manually constructed hints in a fresh packed-module process.
+ {
+  const seven=fixture.element.execution.inputs.slice(0,7);
+  const fields=[fixture.element.execution.value];
+  for(let i=0;i<8;i++)fields.push(new Type(...seven));
+  try{
+   const hints=Array.from({length:32},()=>new family.MatLegacyHint());
+   const generated=[...fields.map(field=>field._hintLabelId),...hints.map(hint=>hint.id)];
+   assert.equal(new Set(generated).size,generated.length,'generated hint IDs must be unique across field labels and projected hints');
+   const labelNumbers=fields.map(field=>{
+    const match=/^mat-form-field-label-(\d+)$/.exec(field._labelId);
+    assert.ok(match,'historical field label ID prefix');return Number(match[1]);
+   });
+   for(let i=1;i<labelNumbers.length;i++)assert.equal(labelNumbers[i]-labelNumbers[i-1],2,'field label ID sequence');
+   hints[0].id='consumer-authored-hint';assert.equal(hints[0].id,'consumer-authored-hint');
+   results.push({crossClassGeneratedIdsUnique:true,manualSevenArguments:true,fieldLabelSequencePreserved:true,authoredHintIdPreserved:true});
+  }finally{for(const field of fields.slice(1))field.ngOnDestroy();}
+ }
  for(const noop of [false,true]){
   const inputs=[...fixture.element.execution.inputs.slice(0,7)];inputs[6]=noop?'NoopAnimations':'BrowserAnimations';
   const field=new Type(...inputs);assert.equal(field._injector,undefined);assert.equal(field._animationsEnabled,!noop);

@@ -8,8 +8,7 @@
  */
 
 import {Directive, InjectionToken, Input} from '@angular/core';
-
-let nextUniqueId = 0;
+import {nextLegacyHintId} from './internal/hint-id';
 
 /**
  * Injection token that can be used to reference instances of `MatHint`. It serves as
@@ -42,5 +41,5 @@ export class MatLegacyHint {
   @Input() align: 'start' | 'end' = 'start';
 
   /** Unique ID for the hint. Used for the aria-describedby on the form field control. */
-  @Input() id: string = `mat-hint-${nextUniqueId++}`;
+  @Input() id: string = nextLegacyHintId();
 }
