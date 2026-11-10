@@ -16,7 +16,7 @@ import {join} from 'node:path';
 import {currentCoreRoleOccurrences} from './core-view-use-current-roles.mjs';
 export const PLATFORM_CALLER_PRIOR='compatibility/rc/platform-caller-roles-prior.json.gz';
 export const PLATFORM_CALLER_REVIEW='compatibility/f10/authored-use-reviews/platform-callers.json';
-const priorPins={main:'f6f74df5b6a014536f95f2e7b3bb255913b8747cea9f4421a48699e86ef148d6','21.x':'695782eb6d78e2d509791d4c36d4e23c1b865d52a7cb3f98e57b61a2e8c09b78'};
+const priorPins={main:'5a1cd300a549c3364189b1c3bf1fb35eac8e6da40c8473657312c577dc5e7218','21.x':'695782eb6d78e2d509791d4c36d4e23c1b865d52a7cb3f98e57b61a2e8c09b78'};
 const publicPins={"main":{"path":"compatibility/rc/platform-caller-roles-public-main.json","sha256":"c4209a9a66340fc7b94006f4e001b9e53d7359d8788b39d7e309c1d99e66fa17"},"21.x":{"path":"compatibility/rc/platform-caller-roles-public-21.json","sha256":"9bef11547931b289ab8e8e5d595b67308f764b3cae36fd482e05f171c8512797"}};
 const edgePath='compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-observation.json',edgePins={main:'f9c0a6c9717d731ab263d4c8d39ad2d1292b7b479f666fad00dd7a4abdfcfc44','21.x':'84ad6569fddf6674ca61db313d1feb8c41ae556ef0ee11469a91864ca971e650'};
 const ts=createRequire(import.meta.url)('typescript'),hash=b=>createHash('sha256').update(b).digest('hex'),raw=root=>p=>readFileSync(join(root,p)),decoded=new Map(),authenticated=new Set();

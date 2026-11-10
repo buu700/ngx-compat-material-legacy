@@ -15,7 +15,7 @@ import {createRequire} from 'node:module';
 import {join} from 'node:path';
 export const LAYOUT_SERVICE_PRIOR='compatibility/rc/layout-service-caller-roles-prior.json.gz';
 export const LAYOUT_SERVICE_REVIEW='compatibility/f10/authored-use-reviews/layout-service-callers.json';
-const pins={"main":"98a341f6c051a2ff6f90c6dacc17bf846dc1dea39ac184d0c781f969fe2c62d6","21.x":"457392802cbe864e04afa34807fff849f7928382c5a5da83de58382b57263d99"};
+const pins={"main":"82c7dd32f667f05c4e529896e77363a80efe45657294356752a1d24b7f0e0693","21.x":"457392802cbe864e04afa34807fff849f7928382c5a5da83de58382b57263d99"};
 const ts=createRequire(import.meta.url)('typescript'),hash=b=>createHash('sha256').update(b).digest('hex'),raw=root=>p=>readFileSync(join(root,p)),decoded=new Map(),authenticated=new Set(),programs=new Map(),id=r=>JSON.stringify([r.file,r.module,r.symbol]);
 function freeze(v){if(v&&typeof v==='object'){for(const x of Object.values(v))freeze(x);Object.freeze(v);}return v;}
 function original(root,commit,m){assert.equal(hash(m.text),m.sha256);const key=JSON.stringify([root,commit,m.path,m.sha256]);if(authenticated.has(key))return;const b=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','show',commit+':'+m.path],{cwd:root,maxBuffer:24*1024*1024,env:{...process.env,GIT_NO_LAZY_FETCH:'1'}});assert.equal(hash(b),m.sha256);authenticated.add(key);}
@@ -48,7 +48,7 @@ export function layoutServiceSnippets(options={}) {
  return {queries,location_parameter:parameter.getText(source),ignored_location_body_reads:reads,preferred_motion_query:'(prefers-reduced-motion)',consumed_calls:[...calls.values()]};
 }
 
-const publicPins={main:{path:'compatibility/rc/layout-service-caller-roles-public-main.json',sha256:'c2383daa41d69efd107ea3b300b0fef97f15694de2a3735e6e3e0872113b8f35'},'21.x':{path:'compatibility/rc/layout-service-caller-roles-public-21.json',sha256:'e03b1b365cd7592c497e880b1b7fa32bc845ee78f83452d1b0710e26dfa1bc6e'}};
+const publicPins={main:{path:'compatibility/rc/layout-service-caller-roles-public-current.json',sha256:'8c3059f467a536877ae61f1cc370bc9cb5ba8efbc2c9acecaac27134bf169525'},'21.x':{path:'compatibility/rc/layout-service-caller-roles-public-21.json',sha256:'e03b1b365cd7592c497e880b1b7fa32bc845ee78f83452d1b0710e26dfa1bc6e'}};
 export function qualifiedLayoutServiceEvidence({root=process.cwd(),read=raw(root)}={}) {
  const {prior}=layoutServiceFacts({root,read}),ref=publicPins[prior.line],bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'changed layout-service public proof');const proof=JSON.parse(bytes);assert.equal(proof.line,prior.line);assert.equal(proof.type_subjects.length,3);assert.equal(proof.runtime_subjects.length,10);assert.equal(proof.runtime_fault_controls.length,12);for(const m of proof.inputs)assert.equal(hash(read(m.path)),m.sha256,'changed layout-service proof input '+m.path);
  const versions={original:['16.2.12','16.2.14'],main:['22.1.7','22.1.7'],'21.x':['21.2.23','21.2.14']};

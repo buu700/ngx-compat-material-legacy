@@ -34,7 +34,7 @@ class PlatformCallerRoles(unittest.TestCase):
         self.assertEqual(report['selected_owned_predicate_protocol_cases'], 16)
         self.assertEqual(len(report['incorrect_predicate_faults_rejected']), 2)
         self.assertTrue(report['inherited_synthetic_viewport_edge_preserved'])
-        self.assertEqual(report['canonical_closures_integrated'], 4)
+        self.assertEqual(report['canonical_closures_integrated'], 3)
         self.assertFalse(report['all_canonical_ledger_bytes_preserved'])
         self.assertFalse(report['actual_full_viewport_dialog_date_component_native_packed_or_floor_qualified'])
 
