@@ -1,0 +1,44 @@
+{
+  "source_commit": "65015ae59f87127708e2be3c20e54a8738dd7307",
+  "source_sha256": "4926702c9f5aaafa17c7489692da5b67dcdde261d79cafd0628f95a4134ea61a",
+  "node": "v24.21.0",
+  "typescript": "6.0.3",
+  "strict": true,
+  "skipLibCheck": false,
+  "source_files": 48,
+  "diagnostics": 0,
+  "call": "this._dialog.open<R, D, T>(componentOrTemplateRef, {\n      ...config,\n      ...(this._animationsDisabled(config) ? {disableAnimations: true} : {}),\n      positionStrategy: this._overlay.position().global().centerHorizontally().centerVertically(),\n      // Disable closing since we need to sync it up to the animation ourselves.\n      disableClose: true,\n      closePredicate: undefined,\n      // Disable closing on destroy, because this service cleans up its open dialogs as well.\n      closeOnDestroy: false,\n      // Disable closing on detachments so that we can sync up the animation.\n      closeOnOverlayDetachments: false,\n      container: {\n        type: this._dialogContainerType,\n        providers: () => [\n          {provide: this.dialogConfigClass, useValue: config},\n          {provide: MatDialogConfig, useValue: config},\n          {provide: DialogConfig, useValue: config},\n        ],\n      },\n      templateContext: () => ({dialogRef}),\n      providers: (ref, cdkConfig, dialogContainer) => {\n        dialogRef = new this._dialogRefConstructor(ref, config!, dialogContainer);\n        dialogRef.updatePosition(config?.position);\n        return [\n          {provide: this._dialogContainerType, useValue: dialogContainer},\n          {provide: this._dialogDataToken, useValue: cdkConfig.data},\n          {provide: this._dialogRefConstructor, useValue: dialogRef},\n        ];\n      },\n    })",
+  "return_type": "DialogRef<R, T>",
+  "return_symbol": "DialogRef",
+  "public_identity_exact": true,
+  "signature_declarations": [
+    {
+      "file": "<model>/node_modules/@angular/cdk/types/dialog.d.ts",
+      "sha256": "0d39e9b3bd51c6fdb9bb9f9fbe58ea7b16492c743641ae89766ffc786b8ac67c"
+    }
+  ],
+  "used": [
+    {
+      "member": "componentRef",
+      "tags": [],
+      "declarations": [
+        {
+          "file": "<model>/node_modules/@angular/cdk/types/dialog.d.ts",
+          "sha256": "5fbbd04384e95fbb0ae7cc4159d3a25353bce1b82b2ba079ec3e2e1ddf9b61d9"
+        }
+      ]
+    },
+    {
+      "member": "componentInstance",
+      "tags": [],
+      "declarations": [
+        {
+          "file": "<model>/node_modules/@angular/cdk/types/dialog.d.ts",
+          "sha256": "404b4f916583b689d37994859ae79b9bba0ef2422a1d96855937ec2e2207eb8a"
+        }
+      ]
+    }
+  ],
+  "bad": [],
+  "scope": "Direct import retired; actual current Dialog.open return is inferred genuine public peer DialogRef. This is type identity/member evidence, not DI or full lifecycle."
+}

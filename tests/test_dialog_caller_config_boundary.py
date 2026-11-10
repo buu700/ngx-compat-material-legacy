@@ -8,13 +8,14 @@ import json
 from pathlib import Path
 import subprocess
 import unittest
+from tests.dialog_caller_current_epoch import dialog_command
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class DialogConfigSourceBoundary(unittest.TestCase):
     def test_complete_current_consumers_and_exact_source_context(self):
-        child = subprocess.run(['node', 'tests/dialog_caller_config_boundary_probe.mjs'],
+        child = subprocess.run(dialog_command('tests/dialog_caller_config_boundary_probe.mjs', 'config'),
                                cwd=ROOT, capture_output=True, text=True, timeout=180)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-7000:])
         report = json.loads(child.stdout)

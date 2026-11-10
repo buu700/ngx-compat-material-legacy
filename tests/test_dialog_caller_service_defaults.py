@@ -7,13 +7,14 @@ import json
 from pathlib import Path
 import subprocess
 import unittest
+from tests.dialog_caller_current_epoch import dialog_command
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class DialogCallerServiceDefaults(unittest.TestCase):
     def test_exact_generic_default_source_and_evidence_boundary(self):
-        result = subprocess.run(['node', 'tests/dialog_caller_service_default_boundary_probe.mjs'],
+        result = subprocess.run(dialog_command('tests/dialog_caller_service_default_boundary_probe.mjs', 'default'),
                                 cwd=ROOT, capture_output=True, text=True, timeout=45)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)
@@ -27,7 +28,7 @@ class DialogCallerServiceDefaults(unittest.TestCase):
         self.assertFalse(report['actual_native_packed_AOT_or_full_floor_qualified'])
 
     def test_all_prior_source_cases_and_unchanged_api_are_preserved(self):
-        result = subprocess.run(['node', 'tests/dialog_caller_service_default_source_rebinding_probe.mjs'],
+        result = subprocess.run(dialog_command('tests/dialog_caller_service_default_source_rebinding_probe.mjs', 'rebind-default'),
                                 cwd=ROOT, capture_output=True, text=True, timeout=45)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)
