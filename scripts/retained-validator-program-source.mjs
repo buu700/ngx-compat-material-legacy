@@ -10,6 +10,7 @@ import {types} from 'node:util';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 const SELF='scripts/retained-validator-program-source.mjs',image=readFileSync(fileURLToPath(import.meta.url));
 const PACKET={path:'compatibility/rc/main-retained-validator-programs-v1.json',sha256:'e26a11ac20146aa41e5b2a540606cf659c627b5235ae09687a0bb3cea4b2780d',bytes:6968};
+const CONTEXT_SUCCESSOR={path:'compatibility/rc/retained-validator-context-successor-4015.json',sha256:'55543fe7a1c7621e516b0ddde32711445b463ba47dcdeda0f2fa51bd33d0e1eb',bytes:2286};
 const AUTHORITY='1c4ace0fa7a0e7cc4d3e919f415e05ca5e46f3c0',INTERMEDIATE='4e6f608402e99da9fb550bb46040aa68a648440a',CURRENT='1b81670bc1390da94e7928c0fb24f361e1af08e8';
 const PATHS=['scripts/upstream-build-scope-evidence.mjs','scripts/upstream-test-consolidation-evidence.mjs','scripts/upstream-bazel-build-scope.mjs'];
 const sha=raw=>createHash('sha256').update(raw).digest('hex'),clean=ref=>({path:ref.path,sha256:ref.sha256,bytes:ref.bytes});
@@ -35,6 +36,20 @@ export function retainedValidatorProgramSource({root=process.cwd(),read}={}){
  verifyGit(AUTHORITY,[packet.source_input,...packet.programs.map(row=>row.before)]);
  verifyGit(INTERMEDIATE,packet.programs.map(row=>row.intermediate));
  verifyGit(CURRENT,[...packet.programs.map(row=>row.current),...packet.support]);
+ // Preserve the original support identities as Git-authenticated history. The
+ // physical guard consumes only the two exact, committed successor images.
+ const successorRaw=physical(CONTEXT_SUCCESSOR.path);exact(successorRaw,CONTEXT_SUCCESSOR);
+ const successor=JSON.parse(successorRaw),parent='011db05858d10a4f9725b4ad8f9fbe148b90ed52',commit='4015b7002997bb18d20d0b2fb2d6a99c223dab3c';
+ assert.equal(successor.schema_version,1);assert.equal(successor.role,'retained-validator-retained-context-source-successor');
+ assert.equal(successor.source_parent,parent);assert.equal(successor.source_commit,commit);
+ for(const [key,value]of Object.entries({source_only:true,historical_programs_executed:false,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(successor[key],value,key);
+ const successorPaths=['scripts/retained-current-context-identity.mjs','tests/retained_current_context_identity_probe.mjs'];
+ assert.deepEqual(successor.transitions.map(row=>row.path),successorPaths);
+ assert.equal(git(['rev-parse',commit+'^']).toString().trim(),parent);git(['merge-base','--is-ancestor',CURRENT,parent]);git(['merge-base','--is-ancestor',commit,'HEAD']);
+ assert.deepEqual(git(['diff','--name-only','--no-renames',parent,commit]).toString().trim().split('\n'),successorPaths);
+ for(const row of successor.transitions)for(const side of ['before','after'])assert.equal(row[side].path,row.path);
+ assert.deepEqual(packet.support.find(row=>row.path===successorPaths[0]),successor.transitions[0].before);
+ verifyGit(parent,successor.transitions.map(row=>row.before));verifyGit(commit,successor.transitions.map(row=>row.after));
  const bound=new Map(),identities=new Map();
  const add=ref=>{const normalized=clean(ref),prior=bound.get(ref.path);if(prior)assert.deepEqual(prior,normalized);else bound.set(ref.path,normalized);};
  add({path:SELF,sha256:sha(image),bytes:image.length});add(PACKET);add(packet.source_input);
@@ -45,8 +60,13 @@ export function retainedValidatorProgramSource({root=process.cwd(),read}={}){
   const known=new Map();for(const ref of [row.before,row.intermediate,row.current]){const prior=known.get(ref.sha256);if(prior)assert.deepEqual(prior,clean(ref));else known.set(ref.sha256,clean(ref));}
   identities.set(row.path,{known,current:clean(row.current)});add(row.current);
  }
- for(const ref of packet.support)add(ref);
+ for(const ref of packet.support)add(ref.path===successorPaths[0]?successor.transitions[0].after:ref);
+ add(CONTEXT_SUCCESSOR);add(successor.transitions[1].after);
+ let checking=false,reentered=false;
  const assertCurrent=()=>{
+  if(checking){reentered=true;throw new Error('retained validator program reentry');}
+  checking=true;reentered=false;
+  try{
   for(const ref of bound.values()){
    const raw=physical(ref.path);exact(raw,ref);const supplied=read(ref.path);
    assert.ok(Buffer.isBuffer(supplied)&&raw.equals(supplied),'nonphysical retained validator program '+ref.path);
@@ -54,6 +74,8 @@ export function retainedValidatorProgramSource({root=process.cwd(),read}={}){
   }
   // No callback may leave an earlier source or receipt changed at settlement.
   for(const ref of bound.values())exact(physical(ref.path),ref);
+  assert.equal(reentered,false,'retained validator program reentry');
+  }finally{checking=false;}
  };
  const qualifyMetadata=value=>{
   assert.ok(value&&typeof value==='object'&&!types.isProxy(value)&&Object.getPrototypeOf(value)===Object.prototype);
