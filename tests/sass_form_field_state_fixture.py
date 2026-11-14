@@ -16,6 +16,10 @@ def form_field_state_receipt(active, case, invocation):
     m['sources'] = copy.deepcopy(f['source_sets'][line])
     peer = copy.deepcopy(f['peers'][line][case])
     peer['sources'] = copy.deepcopy(c['peer_inputs'][line])
+    # Synthetic receipt, assembled from the immutable historical projection.
+    from sass_form_field_state_admission import form_field_state_expected_css
+    css = form_field_state_expected_css(case, e['original'], peer, line)
+    m.update(css=css, css_sha256=hashlib.sha256(css.encode()).hexdigest(), css_bytes=len(css.encode()))
     body = dict(case_id=case, result='pass', kind='assertion', check_id='sass-seal', group='sass-api-and-values',
                 exit_code=0, line=line, run_id=active.manifest['run_id'], invocation_id=invocation, binding=active.binding,
                 tarball_sha256=next(a['sha256'] for a in active.manifest['artifacts'] if a['id'] == 'library'),

@@ -6,6 +6,9 @@
 // found in the LICENSE file at https://angular.io/license
 
 @use '@angular/material' as mat;
+@use 'sass:map';
+@use '../core/tokens/m2/mdc/filled-text-field' as filled;
+@use '../core/tokens/m2/mdc/outlined-text-field' as outlined;
 @use '../vendor/mdc/ripple/functions' as ripple;
 @use '../core/style/sass-utils';
 
@@ -20,5 +23,37 @@
       hover-state-layer-opacity: ripple.states-opacity($ink-color, hover),
       focus-state-layer-opacity: ripple.states-opacity($ink-color, focus),
     ));
+  }
+}
+
+// Bridge only the historical color slots. The two maps are owned copies of the
+// Material 16 model; passing them to the public override API does not mutate a
+// consumer theme. Current Material has additional hover-label slots which
+// historically fell back to the normal and error label values.
+@function _color-overrides($filled, $outlined, $hover-fallbacks: false) {
+  $result: ();
+  @each $appearance, $values in (filled: $filled, outlined: $outlined) {
+    @each $name, $value in $values {
+      $result: map.set($result, '#{$appearance}-#{$name}', $value);
+    }
+    @if $hover-fallbacks {
+      $result: map.set($result, '#{$appearance}-hover-label-text-color', map.get($values, label-text-color));
+      $result: map.set($result, '#{$appearance}-error-hover-label-text-color', map.get($values, error-label-text-color));
+    }
+  }
+  @return $result;
+}
+
+@mixin ordinary-color($config) {
+  @include sass-utils.current-selector-or-root() {
+    @include mat.form-field-overrides(_color-overrides(
+      filled.get-color-tokens($config), outlined.get-color-tokens($config), true));
+  }
+  @each $palette in (accent, warn) {
+    .mat-mdc-form-field.mat-#{$palette} {
+      @include mat.form-field-overrides(_color-overrides(
+        filled.private-get-color-palette-color-tokens($config, $palette),
+        outlined.private-get-color-palette-color-tokens($config, $palette)));
+    }
   }
 }

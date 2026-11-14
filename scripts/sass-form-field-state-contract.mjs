@@ -68,6 +68,41 @@ export function measureFormFieldStatePeer(options) {
   if (program === null) throw Error('unknown form-field state case');
   return measureM2PeerProgram({...options, program});
 }
+// Build the complete ordered public-token blocks from the untouched v16 CSS.
+// Match whole rules and exact finite membership; never strip candidate CSS.
+function ordinaryColorBlocks(e) {
+  const blocks = e.color.css.split('\n\n');
+  const normal = blocks[0];
+  const palette = ['accent', 'warn'].map(name => {
+    const selector = `${e.scope} .mat-mdc-form-field.mat-${name} {`;
+    return e.color.css.split('\n').reduce((found, line, i, lines) => {
+      if (line !== selector) return found;
+      const end = lines.indexOf('}', i);
+      return [...found, lines.slice(i, end + 1).join('\n')];
+    }, []);
+  });
+  if (palette.some(b => b.length !== 1)) return null;
+  function convert(block, fallback) {
+    const lines = block.split('\n'), result = [lines[0]];
+    for (const appearance of ['filled', 'outlined']) {
+      const prefix = `  --mdc-${appearance}-text-field-`;
+      const decls = lines.filter(line => line.startsWith(prefix));
+      if (decls.length !== (fallback ? (appearance === 'filled' ? 19 : 17) : 3)) return null;
+      for (const line of decls) result.push(line.replace(prefix, `  --mat-form-field-${appearance}-`));
+      if (fallback) {
+        for (const [to, from] of [['hover-label-text-color','label-text-color'], ['error-hover-label-text-color','error-label-text-color']]) {
+          const original = decls.filter(line => line.startsWith(prefix + from + ': '));
+          if (original.length !== 1) return null;
+          result.push(original[0].replace(prefix + from, `  --mat-form-field-${appearance}-${to}`));
+        }
+      }
+    }
+    result.push('}');
+    return result.join('\n');
+  }
+  const converted = [convert(normal, true), ...palette.map(b => convert(b[0], false))];
+  return converted.some(x => x === null) ? null : converted[0] + '\n\n' + converted[1] + '\n' + converted[2];
+}
 export function formFieldStateExpectedCss(id, original, peer) {
   const e = Object.hasOwn(catalog.cases, id) ? catalog.cases[id] : null;
   const floor = e?.peers[peer?.line], sourceSet = Object.hasOwn(peerSourceSets, peer?.line) ? peerSourceSets[peer.line] : null;
@@ -77,7 +112,8 @@ export function formFieldStateExpectedCss(id, original, peer) {
       || peer.css !== floor.css || peer.css_sha256 !== floor.css_sha256 || peer.css_bytes !== floor.css_bytes
       || peer.sources.length !== sourceSet.size
       || peer.sources.some(s => !sourceSet.has(JSON.stringify([s.root, s.path, s.sha256, s.bytes])))) return null;
-  return e.color.css + e.separator + peer.css + e.after_separator + original.css.slice(e.color.css.length);
+  const blocks = ordinaryColorBlocks(e);
+  return blocks === null ? null : e.color.css + e.separator + peer.css + '\n\n' + blocks + original.css.slice(e.color.css.length);
 }
 export function formFieldStateArgumentResultsMatch(id, original, actual, peer) {
   if (!Object.hasOwn(FORM_FIELD_STATE_ARGUMENT_CASES, id)) return false;
@@ -132,5 +168,6 @@ export function insertFormFieldStateInAggregate(id, css, peer) {
   }));
   if (!peerMeasurementMatches(peer, peer.program, required) || css.split(e.color.css).length !== 2) return null;
   const at = css.indexOf(e.color.css) + e.color.css.length, suffix = css.slice(at);
-  return css.slice(0, at) + e.separator + floor.css + (suffix ? '\n' : '') + suffix;
+  const blocks = ordinaryColorBlocks(e);
+  return blocks === null ? null : css.slice(0, at) + e.separator + floor.css + '\n\n' + blocks + suffix;
 }

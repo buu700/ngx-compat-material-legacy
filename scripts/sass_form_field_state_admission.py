@@ -64,6 +64,38 @@ _SOURCESETS = {line: {(s['root'], s['path'], s['sha256'], s['bytes']) for s in s
                for line, sources in _CATALOG['peer_inputs'].items()}
 
 
+def _ordinary_color_blocks(e):
+    lines = e['color']['css'].split('\n')
+    normal = e['color']['css'].split('\n\n')[0].split('\n')
+    palettes = []
+    for name in ('accent', 'warn'):
+        selector = e['scope'] + ' .mat-mdc-form-field.mat-' + name + ' {'
+        positions = [i for i, line in enumerate(lines) if line == selector]
+        if len(positions) != 1:
+            return None
+        i = positions[0]
+        palettes.append(lines[i:lines.index('}', i) + 1])
+    def convert(block, fallback):
+        out = [block[0]]
+        for appearance in ('filled', 'outlined'):
+            prefix = '  --mdc-' + appearance + '-text-field-'
+            decls = [line for line in block if line.startswith(prefix)]
+            if len(decls) != ((19 if appearance == 'filled' else 17) if fallback else 3):
+                return None
+            out.extend(line.replace(prefix, '  --mat-form-field-' + appearance + '-', 1) for line in decls)
+            if fallback:
+                for to, source in (('hover-label-text-color', 'label-text-color'), ('error-hover-label-text-color', 'error-label-text-color')):
+                    original = [line for line in decls if line.startswith(prefix + source + ': ')]
+                    if len(original) != 1:
+                        return None
+                    out.append(original[0].replace(prefix + source, '  --mat-form-field-' + appearance + '-' + to, 1))
+        return '\n'.join(out + ['}'])
+    converted = [convert(normal, True)] + [convert(block, False) for block in palettes]
+    if any(block is None for block in converted):
+        return None
+    return converted[0] + '\n\n' + converted[1] + '\n' + converted[2]
+
+
 def form_field_state_expected_css(case, original, peer, line):
     try:
         e = _CATALOG['cases'][case]
@@ -74,7 +106,8 @@ def form_field_state_expected_css(case, original, peer, line):
                 or len(peer['sources']) != len(_SOURCESETS[line])
                 or {(s['root'], s['path'], s['sha256'], s['bytes']) for s in peer['sources']} != _SOURCESETS[line]):
             return None
-        return e['color']['css'] + e['separator'] + peer['css'] + e['after_separator'] + original['css'][len(e['color']['css']):]
+        blocks = _ordinary_color_blocks(e)
+        return None if blocks is None else e['color']['css'] + e['separator'] + peer['css'] + '\n\n' + blocks + original['css'][len(e['color']['css']):]
     except (KeyError, TypeError, ValueError, AttributeError):
         return None
 
@@ -159,6 +192,7 @@ def insert_form_field_state_in_aggregate(case, css, peer):
             return None
         at = css.index(e['color']['css']) + len(e['color']['css'])
         suffix = css[at:]
-        return css[:at] + e['separator'] + floor['css'] + ('\n' if suffix else '') + suffix
+        blocks = _ordinary_color_blocks(e)
+        return None if blocks is None else css[:at] + e['separator'] + floor['css'] + '\n\n' + blocks + suffix
     except (KeyError, TypeError, ValueError, AttributeError):
         return None

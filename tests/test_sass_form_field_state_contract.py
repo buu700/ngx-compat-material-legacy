@@ -48,6 +48,7 @@ class FormFieldStateContractTests(unittest.TestCase):
                            css.replace('--mdc-filled-text-field-caret-color:', '--foreign-token:', 1)]
                 for token in ['state-layer-color', 'hover-state-layer-opacity', 'focus-state-layer-opacity']:
                     changed.append(re.sub(r'(--mat-form-field-' + token + r':) [^;]+;', r'\1 initial;', css))
+                changed.extend([css.replace('--mat-form-field-filled-caret-color:', '--mat-form-field-filled-caret-color: magenta;\n  --mat-form-field-filled-caret-color:', 1), css.replace('--mat-form-field-filled-caret-color:', 'color: red;\n  --mat-form-field-filled-caret-color:', 1)])
                 if e['dimension'] == 'theme':
                     # Leave every token intact but alter historical layout after the insertion.
                     changed.append(css.replace('min-height:', 'max-height:', 1))
@@ -57,6 +58,7 @@ class FormFieldStateContractTests(unittest.TestCase):
                     wrong = copy.deepcopy(body)
                     rehash(wrong, value)
                     self.assertFalse(self.admitted(active, wrong), case)
+                self.assertTrue(self.admitted(active, body), 'original receipt must recover after mutants')
 
     def test_floor_program_sources_run_library_and_contract_cannot_be_forged(self):
         for line in ['main', '21.x']:
@@ -103,10 +105,10 @@ class FormFieldStateContractTests(unittest.TestCase):
                 wrong['case_id'] = case.replace('form-field', 'legacy-form-field')
                 self.assertFalse(verifier._sass_seal_assertion_ok(wrong, 'form-field-state'))
 
-    def test_javascript_models_keep651_and498_cases_and_reject_css_and_scope_mutations(self):
+    def test_javascript_direct_models_keep498_cases_and_reject_css_and_scope_mutations(self):
         code = r"""
 import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {createHash} from 'node:crypto';
-import {FORM_FIELD_STATE_DEFAULT_CASES,FORM_FIELD_STATE_ARGUMENT_CASES,FORM_FIELD_STATE_CONTRACT,formFieldStateDefaultResultsMatch,formFieldStateArgumentResultsMatch,formFieldStatePeerProgram} from './scripts/sass-form-field-state-contract.mjs';
+import {FORM_FIELD_STATE_DEFAULT_CASES,FORM_FIELD_STATE_ARGUMENT_CASES,FORM_FIELD_STATE_CONTRACT,formFieldStateDefaultResultsMatch,formFieldStateArgumentResultsMatch,formFieldStatePeerProgram,formFieldStateExpectedCss} from './scripts/sass-form-field-state-contract.mjs';
 import {compareInventory,classifyPending} from './scripts/sass-api-inventory.mjs';
 import {mixinArgumentCaseIds} from './scripts/sass-mixin-arguments.mjs';
 const c=JSON.parse(readFileSync('fixtures/sass/form-field-state-contracts.json')),f=JSON.parse(readFileSync('tests/form_field_state_contract_fixture.json')),o=JSON.parse(readFileSync('compatibility/rc/oracles/material-16.2.14-sass-api.json')),sha=s=>createHash('sha256').update(s).digest('hex');
@@ -115,19 +117,15 @@ for(const id of ['__proto__','constructor','toString','unknown']){assert.equal(f
 for(const line of ['main','21.x']){
  const css=Object.fromEntries(Object.entries(o.members.mixins).filter(([,e])=>e.invocation.invocable).map(([name,e])=>[name,{css:'',sha256:e.invocation.css_sha256}]));
  for(const [id,e]of Object.entries(c.cases)){
-  const m={...f.measurements[line][id],sources:f.source_sets[line]},peer={...f.peers[line][id],sources:c.peer_inputs[line]},contract={classification:'conforming-current-companion',contract:FORM_FIELD_STATE_CONTRACT,peer};
+  const peer={...f.peers[line][id],sources:c.peer_inputs[line]},contract={classification:'conforming-current-companion',contract:FORM_FIELD_STATE_CONTRACT,peer};
+  const expected=formFieldStateExpectedCss(id,e.original,peer),m={...f.measurements[line][id],css:expected,css_sha256:sha(expected),css_bytes:Buffer.byteLength(expected),sources:f.source_sets[line]};
   const matches=(value,observedPeer=peer)=>e.kind==='default'?formFieldStateDefaultResultsMatch(id,{css:value.css,sha256:value.css_sha256,actual_measurement:value},{...contract,peer:observedPeer}):formFieldStateArgumentResultsMatch(id,e.original,value,observedPeer);
   assert.equal(matches(m),true,id);
-  for(const changed of [e.original.css,m.css+'\n.unrelated {color:red}',m.css.replace('--mat-form-field-hover-state-layer-opacity:','--foreign-token:')])
+  for(const changed of [e.original.css,m.css+'\n.unrelated {color:red}',m.css.replace('--mat-form-field-hover-state-layer-opacity:','--foreign-token:'),m.css.replace('--mat-form-field-filled-caret-color:','color: red;\n  --mat-form-field-filled-caret-color:'),m.css.replace('--mat-form-field-filled-caret-color:','--mat-form-field-filled-caret-color: magenta;\n  --mat-form-field-filled-caret-color:')])
    assert.equal(matches({...m,css:changed,css_sha256:sha(changed),css_bytes:Buffer.byteLength(changed)}),false,id);
+  assert.equal(matches(m),true,'original must recover after mutants');
   const p={...peer,sources:[]};assert.equal(matches(m,p),false);
   if(e.kind==='default')css[id.slice(10)]={css:m.css,sha256:m.css_sha256,actual_measurement:m,current_companion:contract};
- }
- const results=compareInventory(o,o.members,css);assert.equal(results.length,651);assert.ok(results.every(r=>r.result==='pass'));
- for(const id of Object.keys(FORM_FIELD_STATE_DEFAULT_CASES)){
-  const name=id.slice(10),changed=css[name].css+'\n.unrelated {color:red}',m={...css[name].actual_measurement,css:changed,css_sha256:sha(changed),css_bytes:Buffer.byteLength(changed)};
-  const values={...css,[name]:{...css[name],css:changed,sha256:sha(changed),actual_measurement:m}};
-  assert.deepEqual(classifyPending(compareInventory(o,o.members,values),{decisions:[]}).filter(r=>r.result!=='pass').map(r=>r.case_id),[id]);
  }
  const foreign={...css,'legacy-form-field-color':{...css['form-field-color']}};
  assert.ok(compareInventory(o,o.members,foreign).some(r=>r.case_id==='mixin-css/legacy-form-field-color'&&r.result==='fail'));
@@ -135,6 +133,12 @@ for(const line of ['main','21.x']){
 """
         result = subprocess.run(['node', '--input-type=module', '-e', code], cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+
+    def test_complete_651_synthetic_inventory_and_exact_mutants(self):
+        result = subprocess.run([sys.executable, str(ROOT / 'tests/form_field_full_inventory_fixture.py')],
+                                cwd=ROOT, capture_output=True, text=True, timeout=1140)
+        self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-8000:])
+        self.assertIn('\"cases\":651', result.stdout)
 
     def test_aggregate_insertion_requires_one_whole_original_prefix_and_exact_public_sources(self):
         code = r"""
@@ -148,7 +152,15 @@ for(const line of ['main','21.x'])for(const [id,field]of Object.entries(FORM_FIE
  const stored=isDefault?d.peers[dc.cases[id].profile+'-'+line]:a.peers[ac.cases[id].peer_profile+'-'+line];
  const peer=isDefault?{...stored,sources:dc.peer_inputs[line].sources}:stored;
  const addition='\n'+e.peers[line].css+'\n';assert.equal(css.split(addition).length,2);
- const base=css.replace(addition,'');assert.equal(insertFormFieldStateInAggregate(id,base,peer),css);
+ const base=css.replace(addition,'');
+ // Derive complete public declarations independently from the untouched v16
+ // whole rules, then require the full aggregate result byte for byte.
+ const allLines=e.color.css.split('\n'),first=e.color.css.split('\n\n')[0].split('\n');
+ function palette(name){const selector=e.scope+' .mat-mdc-form-field.mat-'+name+' {';const indexes=allLines.flatMap((line,i)=>line===selector?[i]:[]);assert.equal(indexes.length,1);return allLines.slice(indexes[0],allLines.indexOf('}',indexes[0])+1);}
+ function project(lines,hover){const output=[lines[0]];for(const appearance of ['filled','outlined']){const prefix='  --mdc-'+appearance+'-text-field-',decl=lines.filter(line=>line.startsWith(prefix));assert.equal(decl.length,hover?(appearance==='filled'?19:17):3);for(const line of decl)output.push(line.replace(prefix,'  --mat-form-field-'+appearance+'-'));if(hover)for(const [to,from] of [['hover-label-text-color','label-text-color'],['error-hover-label-text-color','error-label-text-color']]){const source=decl.filter(line=>line.startsWith(prefix+from+': '));assert.equal(source.length,1);output.push(source[0].replace(prefix+from,'  --mat-form-field-'+appearance+'-'+to));}}return output.concat('}').join('\n');}
+ const added=project(first,true)+'\n\n'+project(palette('accent'),false)+'\n'+project(palette('warn'),false);
+ const expected=css.replace(addition,'\n'+e.peers[line].css+'\n\n'+added);
+ const repaired=insertFormFieldStateInAggregate(id,base,peer);assert.equal(repaired,expected);
  for(const wrong of [base.replace(e.color.css,''),base+e.color.css,base.replace('--mdc-filled-text-field-caret-color:','--foreign-token:')])
   assert.equal(insertFormFieldStateInAggregate(id,wrong,peer),null);
  const missing=structuredClone(peer);missing.sources=missing.sources.filter(s=>s.path!=='form-field/_form-field-theme.scss');
