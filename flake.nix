@@ -77,6 +77,8 @@
               pkgs.curl
               pkgs.cacert
               pkgs.which
+              # The owned browser lifecycle checker verifies listening sockets.
+              pkgs.iproute2
             ];
             shellHook = ''
               export PNPM_HOME="$PWD/.cache/pnpm/bin"
