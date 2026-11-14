@@ -73,6 +73,7 @@ for (const name of ['passiveEventListenerOptions','HEADER_SCROLL_DELAY','HEADER_
 }
 const changed = (text, from, to) => {const value = text.replace(from, to); assert.notEqual(value, text); return value;};
 const mutations = {
+  fivePixelThreshold: bodyProgram(changed(candidate, 'const isEnabled = scrollWidth > containerWidth;', 'const isEnabled = scrollWidth - containerWidth >= 5;')),
   priorWait: bodyProgram(changed(candidate, 'afterTabHeaderRender(this._ngZone, this._renderInjector)', 'this._ngZone.onStable.pipe(take(1))')),
   noCapture: bodyProgram(changed(candidate, '_renderInjector = tabHeaderRenderInjector();', '_renderInjector = null;')),
   noDestroy: bodyProgram(changed(candidate, '.pipe(takeUntil(this._destroyed)).subscribe(realign)', '.subscribe(realign)')),

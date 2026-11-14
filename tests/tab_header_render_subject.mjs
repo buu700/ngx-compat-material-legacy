@@ -105,6 +105,21 @@ async function cancel(js, helperJs = payload.helper) {
   assert.equal(renders,before,'destroy-cancels-render-hook');
   return {ink:f.ink.length,renderHookCanceled:true};
 }
+// Compare the whole source methods against the untouched 16 header at the
+// small-overflow boundary. Geometry is a protocol, not a native browser layout.
+async function paginationBoundary(js, expected) {
+  const f = fixture(js);
+  try {
+    const result = [];
+    for (const width of [220, 221, 224, 225, 224]) {
+      f.instance._tabListInner.nativeElement.scrollWidth = width;
+      f.instance._checkPaginationEnabled();
+      result.push(f.instance._showPaginationControls);
+    }
+    assert.deepEqual(result, expected, 'tagged-small-overflow-pagination');
+    return result;
+  } finally {f.instance.ngOnDestroy();}
+}
 async function errorCleanup(helperJs) {
   let active = 0;
   const emitter = zone.onStable, subscribe = emitter.subscribe;
@@ -118,6 +133,8 @@ async function errorCleanup(helperJs) {
   } finally {emitter.subscribe=subscribe;failing.destroy();}
 }
 try {
+  const boundaryReference = await paginationBoundary(payload.original, [false, true, true, true, true]);
+  const boundaryCandidate = await paginationBoundary(payload.candidate, boundaryReference);
   const old = await align(payload.original,payload.helper,true,mode === 'zoneful');
   const candidate = await align(payload.candidate);
   if (mode === 'zoneful') assert.deepEqual(candidate,old);
@@ -129,6 +146,7 @@ try {
     await assert.rejects(operation,error => error.code === 'ERR_ASSERTION' && error.message.startsWith(message));
     mutations.push({id,rejected:true});
   };
+  await reject('five-pixel-threshold', () => paginationBoundary(payload.mutations.fivePixelThreshold, boundaryReference), 'tagged-small-overflow-pagination');
   if (line !== 'original') {
     if (mode === 'zoneless') {
       await reject('prior-zone-only-wait',() => align(payload.mutations.priorWait),'initial-render-aligns-selected-label');
@@ -141,7 +159,7 @@ try {
     }
     await reject('lookup-error-leaks-subscription',() => errorCleanup(payload.mutations.noErrorCleanup),'lookup-error-cleans-zone-subscription');
   }
-  console.log(JSON.stringify({old,candidate,manualResult,canceled,mutations,registrations,renders,
+  console.log(JSON.stringify({old,candidate,boundaryReference,boundaryCandidate,manualResult,canceled,mutations,registrations,renders,
     genuine_public_key_manager:true,genuine_public_zone:true,genuine_public_application:!!app,
     whole_constructor_executed:true,angular_decorators_or_node_DI_executed:false,native_executed:false}));
 } finally {app?.destroy();manual?.destroy();core.destroyPlatform();}

@@ -588,9 +588,10 @@ export abstract class MatPaginatedTabHeader
     } else {
       const scrollWidth = this._tabListInner.nativeElement.scrollWidth;
       const containerWidth = this._elementRef.nativeElement.offsetWidth;
-      // Safari can round scrollWidth inconsistently when pagination toggles, causing an
-      // infinite show/hide loop. Require a small threshold before enabling pagination.
-      const isEnabled = scrollWidth - containerWidth >= 5;
+      // Preserve reachability for any positive overflow, including custom label content
+      // at the edge. Safari can round scrollWidth inconsistently when pagination toggles;
+      // any future mitigation must retain small-overflow reachability.
+      const isEnabled = scrollWidth > containerWidth;
 
       if (!isEnabled) {
         this.scrollDistance = 0;

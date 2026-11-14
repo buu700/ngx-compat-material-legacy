@@ -336,6 +336,38 @@ describe('MatTabHeader', () => {
         expect(appComponent.tabHeader._showPaginationControls).toBe(true);
       });
 
+      it('keeps a small overflow reachable by keyboard', fakeAsync(() => {
+        appComponent.tabs = [{label: 'first'}, {label: 'last'}];
+        fixture.detectChanges();
+        const header = appComponent.tabHeader;
+        const host = fixture.nativeElement.querySelector('mat-tab-header') as HTMLElement;
+        host.style.width = '317px';
+        const labels = Array.from(host.querySelectorAll('.label-content')) as HTMLElement[];
+        labels.forEach(label => { label.style.width = '160px'; label.style.minWidth = '160px'; label.tabIndex = -1; });
+        const edge = document.createElement('span');
+        edge.textContent = 'edge';
+        Object.assign(edge.style, {position: 'absolute', right: '0px'});
+        labels[1].style.position = 'relative';
+        labels[1].appendChild(edge);
+        header.updatePagination();
+        fixture.detectChanges();
+        expect(header._tabListInner.nativeElement.scrollWidth - host.offsetWidth).toBe(3);
+        expect(header._showPaginationControls).toBeTrue();
+        header.focusIndex = 0;
+        const list = header._tabListContainer.nativeElement;
+        const clippedRight = edge.getBoundingClientRect().right;
+        const viewportRight = list.getBoundingClientRect().right;
+        expect(clippedRight).toBeGreaterThan(viewportRight);
+        dispatchKeyboardEvent(list, 'keydown', RIGHT_ARROW);
+        fixture.detectChanges();
+        expect(header.focusIndex).toBe(1);
+        expect(document.activeElement).toBe(labels[1]);
+        expect(header.scrollDistance).toBeGreaterThan(0);
+        expect(clippedRight - header.scrollDistance).toBeLessThanOrEqual(viewportRight);
+        expect(header._tabList.nativeElement.style.transform).toContain(`-${header.scrollDistance}px`);
+        tick(150);
+      }));
+
       it('should scroll to show the focused tab label', () => {
         appComponent.addTabsForScrolling();
         fixture.detectChanges();
