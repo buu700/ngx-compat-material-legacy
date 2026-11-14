@@ -12,7 +12,7 @@ import {
   A,
   ESCAPE,
 } from '@angular/cdk/keycodes';
-import {CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG, OverlayContainer} from '@angular/cdk/overlay';
+import {CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG, CdkConnectedOverlay, OverlayContainer} from '@angular/cdk/overlay';
 import {Location} from '@angular/common';
 import {SpyLocation} from '@angular/common/testing';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
@@ -118,6 +118,134 @@ describe('MatSelect', () => {
 
     overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();
   }
+
+  describe('overlay Escape lifecycle', () => {
+    beforeEach(waitForAsync(() => {
+      configureMatSelectTestingModule([BasicSelect], [LEGACY_ENABLED_ANIMATIONS]);
+    }));
+
+    it('keeps an interrupted exit attached and detaches only after a completed close', fakeAsync(() => {
+      const fixture = TestBed.createComponent(BasicSelect);
+      fixture.detectChanges();
+      const select = fixture.componentInstance.select;
+      const host = fixture.nativeElement.querySelector('mat-select') as HTMLElement;
+      const overlay = fixture.debugElement.queryAllNodes(node =>
+        !!node.injector.get(CdkConnectedOverlay, null),
+      ).map(node => node.injector.get(CdkConnectedOverlay)).find(Boolean)!;
+      expect(overlay.disableClose).toBe(true);
+      select.ngAfterViewInit(); // A repeated lifecycle call must not add a second listener.
+      select.open();
+      fixture.detectChanges();
+      expect(overlay.overlayRef.hasAttached()).toBe(true);
+      const panel = overlayContainerElement.querySelector('.mat-select-panel')!;
+      const modified = dispatchKeyboardEvent(host, 'keydown', ESCAPE, undefined, {alt: true});
+      expect(modified.defaultPrevented).toBe(false);
+      expect(select.panelOpen).toBe(true);
+      const close = spyOn(select, 'close').and.callThrough();
+      const escape = dispatchKeyboardEvent(host, 'keydown', ESCAPE);
+      expect(close).toHaveBeenCalledTimes(1);
+      expect(escape.defaultPrevented).toBe(true);
+      expect(select.panelOpen).toBe(false);
+      expect(overlay.overlayRef.hasAttached()).toBe(true);
+      select.open();
+      fixture.detectChanges();
+      tick(250);
+      fixture.detectChanges();
+      expect(select.panelOpen).toBe(true);
+      expect(overlay.overlayRef.hasAttached()).toBe(true);
+      expect(panel.isConnected).toBe(true);
+      dispatchKeyboardEvent(host, 'keydown', ESCAPE);
+      fixture.detectChanges();
+      tick(250);
+      fixture.detectChanges();
+      expect(select.panelOpen).toBe(false);
+      expect(overlay.overlayRef.hasAttached()).toBe(false);
+      select.open();
+      fixture.detectChanges();
+      expect(overlay.overlayRef.hasAttached()).toBe(true);
+      fixture.destroy();
+      flush();
+    }));
+
+    it('handles synchronous destruction by the touched callback during Escape', fakeAsync(() => {
+      const fixture = TestBed.createComponent(BasicSelect);
+      fixture.detectChanges();
+      const select = fixture.componentInstance.select;
+      const host = fixture.nativeElement.querySelector('mat-select') as HTMLElement;
+      const overlay = fixture.debugElement.queryAllNodes(node =>
+        !!node.injector.get(CdkConnectedOverlay, null),
+      ).map(node => node.injector.get(CdkConnectedOverlay)).find(Boolean)!;
+      select.open();
+      fixture.detectChanges();
+      const ref = overlay.overlayRef;
+      select.registerOnTouched(() => fixture.destroy());
+      expect(() => dispatchKeyboardEvent(host, 'keydown', ESCAPE)).not.toThrow();
+      tick(250);
+      expect(fixture.componentRef.hostView.destroyed).toBe(true);
+      expect(select.panelOpen).toBe(false);
+      expect(ref.hasAttached()).toBe(false);
+      flush();
+    }));
+
+    it('cancels an exit and unsubscribes from overlay keys on destroy', fakeAsync(() => {
+      const fixture = TestBed.createComponent(BasicSelect);
+      fixture.detectChanges();
+      const select = fixture.componentInstance.select;
+      const host = fixture.nativeElement.querySelector('mat-select') as HTMLElement;
+      const overlay = fixture.debugElement.queryAllNodes(node =>
+        !!node.injector.get(CdkConnectedOverlay, null),
+      ).map(node => node.injector.get(CdkConnectedOverlay)).find(Boolean)!;
+      select.open();
+      fixture.detectChanges();
+      dispatchKeyboardEvent(host, 'keydown', ESCAPE);
+      const close = spyOn(select, 'close').and.callThrough();
+      fixture.destroy();
+      close.calls.reset();
+      select.ngAfterViewInit();
+      overlay.overlayKeydown.next(createKeyboardEvent('keydown', ESCAPE));
+      tick(250);
+      expect(close).not.toHaveBeenCalled();
+      expect(overlay.overlayRef.hasAttached()).toBe(false);
+      flush();
+    }));
+  });
+
+  describe('overlay with disabled motion', () => {
+    beforeEach(waitForAsync(() => configureMatSelectTestingModule([BasicSelect])));
+
+    it('closes once on backdrop or Escape and reopens after each close', fakeAsync(() => {
+      const fixture = TestBed.createComponent(BasicSelect);
+      fixture.detectChanges();
+      const select = fixture.componentInstance.select;
+      const host = fixture.nativeElement.querySelector('mat-select') as HTMLElement;
+      const events: boolean[] = [];
+      select.openedChange.subscribe(value => events.push(value));
+      select.open();
+      fixture.detectChanges();
+      flush();
+      fixture.detectChanges();
+      (overlayContainerElement.querySelector('.cdk-overlay-backdrop') as HTMLElement).click();
+      fixture.detectChanges();
+      flush();
+      fixture.detectChanges();
+      expect(select.panelOpen).toBe(false);
+      expect(overlayContainerElement.querySelector('.mat-select-panel')).toBeNull();
+      select.open();
+      fixture.detectChanges();
+      flush();
+      fixture.detectChanges();
+      expect(overlayContainerElement.querySelector('.mat-select-panel')).not.toBeNull();
+      select.disabled = true;
+      dispatchKeyboardEvent(host, 'keydown', ESCAPE);
+      fixture.detectChanges();
+      flush();
+      fixture.detectChanges();
+      expect(select.panelOpen).toBe(false);
+      expect(overlayContainerElement.querySelector('.mat-select-panel')).toBeNull();
+      expect(events).toEqual([true, false, true, false]);
+      fixture.destroy();
+    }));
+  });
 
   describe('core', () => {
     beforeEach(waitForAsync(() => {

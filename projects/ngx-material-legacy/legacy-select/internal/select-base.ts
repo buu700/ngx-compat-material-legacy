@@ -22,6 +22,7 @@ import {
   A,
   DOWN_ARROW,
   ENTER,
+  ESCAPE,
   hasModifierKey,
   LEFT_ARROW,
   RIGHT_ARROW,
@@ -39,6 +40,7 @@ import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/lega
 import {MAT_SELECT_CONFIG} from '@angular/material/select';
 import {
   AfterContentInit,
+  AfterViewInit,
   Attribute,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -219,6 +221,7 @@ export abstract class _MatSelectBase<C>
   extends _MatSelectReactiveMixinBase
   implements
     AfterContentInit,
+    AfterViewInit,
     OnChanges,
     OnDestroy,
     OnInit,
@@ -347,6 +350,7 @@ export abstract class _MatSelectBase<C>
   /** Overlay pane containing the options. */
   @ViewChild(CdkConnectedOverlay)
   protected _overlayDir: CdkConnectedOverlay;
+  private _overlayKeydownBound = false;
 
   /** Classes to be passed to the select panel. Supports the same syntax as `ngClass`. */
   @Input() panelClass: string | string[] | Set<string> | {[key: string]: any};
@@ -582,6 +586,23 @@ export abstract class _MatSelectBase<C>
 
     this._initialized.next();
     this._initialized.complete();
+  }
+
+  ngAfterViewInit() {
+    if (this._motionDestroyed || this._overlayKeydownBound || !this._overlayDir) {
+      return;
+    }
+    this._overlayKeydownBound = true;
+    // Let the select own Escape so the CDK does not detach the panel before
+    // the select's exit lifecycle has finished. This also keeps an interrupted
+    // exit attached when the user immediately reopens the panel.
+    this._overlayDir.disableClose = true;
+    this._overlayDir.overlayKeydown.pipe(takeUntil(this._destroy)).subscribe(event => {
+      if (event.keyCode === ESCAPE && !hasModifierKey(event)) {
+        event.preventDefault();
+        this.close();
+      }
+    });
   }
 
   ngDoCheck() {
