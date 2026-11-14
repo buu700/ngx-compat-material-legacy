@@ -1,0 +1,40 @@
+{
+  "typescript": "6.0.3",
+  "core": "22.1.7",
+  "material": "22.1.7",
+  "options": {
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": false,
+    "experimentalDecorators": true,
+    "target": 9,
+    "module": 199,
+    "moduleResolution": 99,
+    "types": []
+  },
+  "positive": [],
+  "negative": [
+    {
+      "code": 2769,
+      "file": "<root>/residual-public-probe.mts",
+      "message": "No overload matches this call.   Overload 1 of 6, '(token: ProviderToken<unknown>): unknown', gave the following error.     Argument of type 'number' is not assignable to parameter of type 'ProviderToken<unknown>'.   Overload 2 of 6, '(token: HostAttributeToken): string', gave the following error.     Argument of type 'number' is not assignable to parameter of type 'HostAttributeToken'."
+    },
+    {
+      "code": 2339,
+      "file": "<root>/residual-public-probe.mts",
+      "message": "Property 'Nonexistent' does not exist on type 'typeof ChangeDetectionStrategy'."
+    },
+    {
+      "code": 2339,
+      "file": "<root>/residual-public-probe.mts",
+      "message": "Property 'Nonexistent' does not exist on type 'typeof ViewEncapsulation'."
+    },
+    {
+      "code": 2339,
+      "file": "<root>/residual-public-probe.mts",
+      "message": "Property 'notAMethod' does not exist on type 'Subject<void>'."
+    }
+  ],
+  "positive_source": "import {Directive, inject, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, InjectionToken, Optional, ViewEncapsulation} from '@angular/core';\nimport {MatPaginatorIntl} from '@angular/material/paginator';\nconst token = new InjectionToken<string>('option');\n@Directive({selector:'[x]', standalone:false}) class X { field=inject(ElementRef); optional=inject(token,{optional:true}); }\n@Component({selector:'test-x', template:'', standalone:false, changeDetection: ChangeDetectionStrategy.OnPush, encapsulation: ViewEncapsulation.None}) class Y {constructor(public intl: MatPaginatorIntl, public ref: ChangeDetectorRef, @Optional() @Inject(token) public opt: string | null) {intl.changes.subscribe(()=>ref.markForCheck());}}\n",
+  "negative_faults": "\ninject(42); ChangeDetectionStrategy.Nonexistent; ViewEncapsulation.Nonexistent; new MatPaginatorIntl().changes.notAMethod();\n"
+}

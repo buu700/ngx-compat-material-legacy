@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "head": "4015b7002997bb18d20d0b2fb2d6a99c223dab3c",
+  "role": "Exact recovered preimage and source transition only; no execution or behavioral equivalence of common modules",
+  "transitions": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "prior_git_revision": "7e9ecb0a8fe31d44c1f37b8a509fc58c6ab705ad^",
+      "prior_sha256": "e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657",
+      "recovered_prior": {
+        "path": "compatibility/rc/residual-eleven/prior/form-field-prior.ts.txt",
+        "sha256": "e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657"
+      },
+      "current": {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+        "sha256": "e645f8b92ccb57518eb9fac6ab3a20c35db6bd9f19a301fcb659ffe58911cfb6"
+      },
+      "diff": "diff --git a/projects/ngx-material-legacy/legacy-form-field/form-field.ts b/projects/ngx-material-legacy/legacy-form-field/form-field.ts\nindex c7d43a56f..aff83b932 100644\n--- a/projects/ngx-material-legacy/legacy-form-field/form-field.ts\n+++ b/projects/ngx-material-legacy/legacy-form-field/form-field.ts\n@@ -45,6 +45,7 @@ import {MatLegacyPrefix} from './prefix';\n import {MatLegacySuffix} from './suffix';\n import {Platform} from '@angular/cdk/platform';\n import {afterFormFieldRender} from './internal/after-form-field-render';\n+import {nextLegacyHintId} from './internal/hint-id';\n import {AbstractControlDirective, ValidatorFn} from '@angular/forms';\n import {ANIMATION_MODULE_TYPE} from '@angular/core';\n import {MatFormFieldControl} from '@angular/material/form-field';\n@@ -242,7 +243,8 @@ export class MatLegacyFormField\n   private _hintLabel = '';\n \n   // Unique id for the hint label.\n-  readonly _hintLabelId: string = `mat-hint-${nextUniqueId++}`;\n+  // Reserve the historical field counter position used by the separate label ID.\n+  readonly _hintLabelId: string = (nextUniqueId++, nextLegacyHintId());\n \n   // Unique id for the label element.\n   readonly _labelId = `mat-form-field-label-${nextUniqueId++}`;\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/paginator-module.ts",
+      "prior_git_revision": "cd716775d7a61d434413b4b7671b27237ceff38c^",
+      "prior_sha256": "a4949d489650df6936a2c0d9ea649b9ebe343da2d12b0b40bd5b0f66ca18ddd7",
+      "recovered_prior": {
+        "path": "compatibility/rc/residual-eleven/prior/paginator-module-prior.ts.txt",
+        "sha256": "a4949d489650df6936a2c0d9ea649b9ebe343da2d12b0b40bd5b0f66ca18ddd7"
+      },
+      "current": {
+        "path": "projects/ngx-material-legacy/legacy-paginator/paginator-module.ts",
+        "sha256": "7c10265d272674af8810e006964be36da6732b2af073ba22545ebfbc5a95b610"
+      },
+      "diff": "diff --git a/projects/ngx-material-legacy/legacy-paginator/paginator-module.ts b/projects/ngx-material-legacy/legacy-paginator/paginator-module.ts\nindex 77df3204b..2b5db4ba4 100644\n--- a/projects/ngx-material-legacy/legacy-paginator/paginator-module.ts\n+++ b/projects/ngx-material-legacy/legacy-paginator/paginator-module.ts\n@@ -9,7 +9,7 @@\n \n import {CommonModule} from '@angular/common';\n import {NgModule} from '@angular/core';\n-import {MatCommonModule} from './internal/common-module';\n+import {MatLegacyCommonModule as MatCommonModule} from '@ngx-compat/material-legacy/legacy-core';\n import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';\n import {MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';\n import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/public-api.ts",
+      "prior_git_revision": "cd716775d7a61d434413b4b7671b27237ceff38c^",
+      "prior_sha256": "0e26b61e581ed4953c582e4563e6e04911ef1ea57d460718b61025c15c0ba08e",
+      "recovered_prior": {
+        "path": "compatibility/rc/residual-eleven/prior/paginator-public-api-prior.ts.txt",
+        "sha256": "0e26b61e581ed4953c582e4563e6e04911ef1ea57d460718b61025c15c0ba08e"
+      },
+      "current": {
+        "path": "projects/ngx-material-legacy/legacy-paginator/public-api.ts",
+        "sha256": "de4896e1ea794f2b0a9e4928e52343b13abb3ace1525e55b7ded779a94a0ce87"
+      },
+      "diff": "diff --git a/projects/ngx-material-legacy/legacy-paginator/public-api.ts b/projects/ngx-material-legacy/legacy-paginator/public-api.ts\nindex 20e397fd1..7319c4aca 100644\n--- a/projects/ngx-material-legacy/legacy-paginator/public-api.ts\n+++ b/projects/ngx-material-legacy/legacy-paginator/public-api.ts\n@@ -28,4 +28,3 @@ export {\n \n   MatPaginatorSelectConfig as MatLegacyPaginatorSelectConfig,\n } from '@angular/material/paginator';\n-export {MatCommonModule} from './internal/common-module';\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "prior_git_revision": "fdcdadee28c4552e3500b5099de9f42e456adb5c^",
+      "prior_sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d",
+      "recovered_prior": {
+        "path": "compatibility/rc/residual-eleven/prior/legacy-core-public-api-prior.ts.txt",
+        "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d"
+      },
+      "current": {
+        "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+        "sha256": "3d56b9e01f502995bd25dea21be8bee5713596655f5d159899858b58b4ffccf2"
+      },
+      "diff": "diff --git a/projects/ngx-material-legacy/legacy-core/public-api.ts b/projects/ngx-material-legacy/legacy-core/public-api.ts\nindex f6f53a872..6769ca58e 100644\n--- a/projects/ngx-material-legacy/legacy-core/public-api.ts\n+++ b/projects/ngx-material-legacy/legacy-core/public-api.ts\n@@ -7,7 +7,7 @@\n  */\n \n export * from './option/index';\n-export {MatCommonModule, MatCommonModule as MatLegacyCommonModule} from './internal/common-module';\n+export {MatCommonModule as MatLegacyCommonModule} from './internal/common-module';\n \n export {\n   MATERIAL_ANIMATIONS,\n"
+    }
+  ],
+  "analysis": [
+    "7e9ecb adds shared nextLegacyHintId import and replaces field hint ID initializer while advancing former field counter; input Directive and inject bindings remain unchanged.",
+    "cd716 moves paginator module from family-local common module to shared legacy-core common module; fdcd aliases the same shared export to MatLegacyCommonModule and removes accidental bare exports. The family-local and shared module classes are distinct, and source evidence alone does not establish runtime equivalence.",
+    "fdcd removes only unaliased MatCommonModule from legacy-core public API; the _LegacyViewport export and spinner owned alias survive."
+  ],
+  "limits": "Prior family/packed/runtime records retain their original subjects and scope; no fresh native, packed, DI, floor, security, G11 or release qualification."
+}
