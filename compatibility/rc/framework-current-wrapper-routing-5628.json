@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "role": "Current wrapper routing successor for three versioned framework source probes; no artifact or G11 qualification",
+  "previous_commit": "cdee8672eb721a4e9c9b72caabb3ddcc6b41bab2",
+  "node": "v24.21.0",
+  "git": "git version 2.55.0",
+  "prior_current_source_failures": {
+    "path": "compatibility/rc/framework-current-wrapper-old-failures-5628.json",
+    "sha256": "d450be63199800f6924e61e4c94365a284635f06c7f8dd9a91ea91bc848a2b62"
+  },
+  "wrappers": [
+    {
+      "path": "tests/test_property_decorator_uses.py",
+      "previous_commit": "cdee8672eb721a4e9c9b72caabb3ddcc6b41bab2",
+      "previous_sha256": "9fcd3c0307b90b1273b619fa0588a1f5221f13bfd04bb8027892e970cd740907",
+      "current_sha256": "70412f4bedb3b8edbf96d1836ea421f0af6046e1ce8d768ec1898eb3baaf4e32",
+      "full_diff_sha256": "8fd2616497f02fc95473a162815b9470ea6a38c8b8927ea74a441c0f54355af1",
+      "full_diff": "diff --git a/tests/test_property_decorator_uses.py b/tests/test_property_decorator_uses.py\nindex 48414008b..a0c264f77 100644\n--- a/tests/test_property_decorator_uses.py\n+++ b/tests/test_property_decorator_uses.py\n@@ -7,18 +7,18 @@ import unittest\n ROOT = Path(__file__).resolve().parents[1]\n class PropertyDecoratorUseTests(unittest.TestCase):\n     def test_exact_property_query_annotations_and_deprecated_option_guard(self):\n-        command = ['node', '--max-old-space-size=512', 'tests/property_decorator_use_probe.mjs']\n+        command = ['node', '--max-old-space-size=512', 'tests/property_decorator_current_5628_probe.mjs']\n         if os.environ.get('CLOSEOUT_PROPERTY_DECORATOR_REPORT'):\n             command.extend(['--report', os.environ['CLOSEOUT_PROPERTY_DECORATOR_REPORT']])\n         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=120)\n         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)\n         report = json.loads(result.stdout)\n         self.assertEqual(report['frozen_uses'], 99)\n-        self.assertEqual(report['current_uses'], 102)\n-        self.assertEqual(report['current_delta_uses'], 3)\n-        self.assertEqual(report['references'], 322)\n-        self.assertEqual(report['annotation_shapes_per_subject'], 322)\n+        self.assertEqual(report['current_uses'], 104)\n+        self.assertEqual(report['current_delta_uses'], 5)\n+        self.assertEqual(report['references'], 324)\n+        self.assertEqual(report['annotation_shapes_per_subject'], 324)\n         self.assertEqual(report['unused_imports'], 9)\n         self.assertEqual(report['controls_per_subject'], 14)\n-        self.assertEqual(report['mutations'], 23)\n+        self.assertEqual(report['mutations'], 25)\n         self.assertFalse(report['native_executed'])\n",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_property_decorator_uses.py"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 13.021s\n\nOK\n"
+    },
+    {
+      "path": "tests/test_parameter_decorator_uses.py",
+      "previous_commit": "cdee8672eb721a4e9c9b72caabb3ddcc6b41bab2",
+      "previous_sha256": "d73068bc161312ba1f216961270cf4eda097fba4a633886e6147245676dd1e37",
+      "current_sha256": "fb83271de6f809b4e33143f0eab9914350799a2579e3e2525911664882799fa3",
+      "full_diff_sha256": "7e6506a4ebf8d8a42d4a786fbcb81e7cbe8d76f4fd21e685524c45b6d2ada83e",
+      "full_diff": "diff --git a/tests/test_parameter_decorator_uses.py b/tests/test_parameter_decorator_uses.py\nindex 8df777ead..871547259 100644\n--- a/tests/test_parameter_decorator_uses.py\n+++ b/tests/test_parameter_decorator_uses.py\n@@ -7,19 +7,19 @@ import unittest\n ROOT = Path(__file__).resolve().parents[1]\n class ParameterDecoratorUseTests(unittest.TestCase):\n     def test_annotations_exact_callers_and_provider_flags(self):\n-        command = ['node', '--max-old-space-size=512', 'tests/parameter_decorator_use_probe.mjs']\n+        command = ['node', '--max-old-space-size=512', 'tests/parameter_decorator_current_5628_probe.mjs']\n         if os.environ.get('CLOSEOUT_PARAMETER_DECORATOR_REPORT'):\n             command.extend(['--report', os.environ['CLOSEOUT_PARAMETER_DECORATOR_REPORT']])\n         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=120)\n         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)\n         report = json.loads(result.stdout)\n         self.assertEqual(report['frozen_uses'], 89)\n-        self.assertEqual(report['current_uses'], 114)\n-        self.assertEqual(report['current_delta_uses'], 25)\n-        self.assertEqual(report['references'], 211)\n-        self.assertEqual(report['annotation_shapes_per_subject'], 209)\n+        self.assertEqual(report['current_uses'], 116)\n+        self.assertEqual(report['current_delta_uses'], 27)\n+        self.assertEqual(report['references'], 215)\n+        self.assertEqual(report['annotation_shapes_per_subject'], 213)\n         self.assertEqual(report['factory_metadata_objects'], 2)\n         self.assertEqual(report['unused_imports'], 5)\n         self.assertEqual(report['controls_per_subject'], 15)\n-        self.assertEqual(report['mutations'], 23)\n+        self.assertEqual(report['mutations'], 25)\n         self.assertFalse(report['native_host_boundary_executed'])\n",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_parameter_decorator_uses.py"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 14.497s\n\nOK\n"
+    },
+    {
+      "path": "tests/test_element_ref_uses.py",
+      "previous_commit": "cdee8672eb721a4e9c9b72caabb3ddcc6b41bab2",
+      "previous_sha256": "90b4935236cdd2bd497ca5949c015a401c738f7e53b6406f68516bd41d15a869",
+      "current_sha256": "dc9c2c9a8e8a55a3a624de432d518366b29f77d16e3df577d84bc73b29d68937",
+      "full_diff_sha256": "b8675a2737c482279dedcad19470b43b06fa6aa543d59cf1928fd251414bf04a",
+      "full_diff": "diff --git a/tests/test_element_ref_uses.py b/tests/test_element_ref_uses.py\nindex ca1b96ff8..c5fe42539 100644\n--- a/tests/test_element_ref_uses.py\n+++ b/tests/test_element_ref_uses.py\n@@ -6,15 +6,15 @@ import unittest\n ROOT = Path(__file__).resolve().parents[1]\n class ElementRefUseTests(unittest.TestCase):\n     def test_public_modules_fields_tokens_and_current_delta(self):\n-        result = subprocess.run(['node', '--max-old-space-size=512', 'tests/element_ref_use_probe.mjs'],\n+        result = subprocess.run(['node', '--max-old-space-size=512', 'tests/element_ref_current_5628_probe.mjs'],\n                                 cwd=ROOT, capture_output=True, text=True, timeout=120)\n         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)\n         report = json.loads(result.stdout)\n         self.assertEqual(report['frozen_uses'], 67)\n-        self.assertEqual(report['current_uses'], 72)\n-        self.assertEqual(report['current_delta_uses'], 5)\n+        self.assertEqual(report['current_uses'], 75)\n+        self.assertEqual(report['current_delta_uses'], 8)\n         self.assertEqual(report['subjects'], 3)\n         self.assertEqual(report['protocol_cases_per_subject'], 10)\n-        self.assertEqual(report['mutations'], 21)\n+        self.assertEqual(report['mutations'], 25)\n         self.assertGreater(report['angular_constructor_input_references'], 0)\n         self.assertFalse(report['native_executed'])\n",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_element_ref_uses.py"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 7.681s\n\nOK\n"
+    }
+  ],
+  "current_evidence": [
+    {
+      "path": "scripts/property-decorator-current-5628.mjs",
+      "sha256": "56b11c1d36cfca6364edb32a9fdc144e2757a0f4a3755f1c1940c8dc8081010b"
+    },
+    {
+      "path": "scripts/parameter-decorator-current-5628.mjs",
+      "sha256": "c1bf05ef29422f1d97c7d2ddcc4766293e562b3efcce6d988a5d35c8b3cd954f"
+    },
+    {
+      "path": "scripts/element-ref-current-5628.mjs",
+      "sha256": "eb358692382469d77235d3e3ec2cd0f26165f4c1924692c2cb94eaff19fd01e3"
+    },
+    {
+      "path": "tests/property_decorator_current_5628_probe.mjs",
+      "sha256": "5437fbdc1961652e04fdce670c1a937211e03e0ef48fa597fbf3edc02c4b9549"
+    },
+    {
+      "path": "tests/parameter_decorator_current_5628_probe.mjs",
+      "sha256": "d7950161b3f1a835b20f8049838eb3152387268632d9302c573d3c259bfb1e6a"
+    },
+    {
+      "path": "tests/element_ref_current_5628_probe.mjs",
+      "sha256": "b1b6b7f3d1bd9b66cdb8d581f3bf3fd8f54463a750b4e8f9abddd944e2fb8347"
+    },
+    {
+      "path": "compatibility/rc/property-decorator-current-5628-diagnostic-v3.json",
+      "sha256": "bf741e5cdc89297d5e183460c3a71ac6311a0cf93455c91efe7e038e5c47e989"
+    },
+    {
+      "path": "compatibility/rc/parameter-decorator-current-5628-diagnostic-v2.json",
+      "sha256": "9a31ed773b5cc8458cb3b4b69cf554e06b6531e1ca219d595ae73417da1a7e9f"
+    },
+    {
+      "path": "compatibility/rc/element-ref-current-5628-diagnostic-v3.json",
+      "sha256": "b5a2da0acd0c51e11329a6e432d9062d274956aadea6969f970fee831a869803"
+    }
+  ],
+  "limits": [
+    "Prior source proofs and CI distribution profiles remain historical; they have not been restamped.",
+    "Fresh profile/coordinator binding and full helper CI remain separately required.",
+    "These tests cover metadata/source and public protocol boundaries, not native/AOT/packed/runtime floors or G11."
+  ]
+}
