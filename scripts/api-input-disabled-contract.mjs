@@ -11,6 +11,7 @@ import {qualifyApiV8Archive as qualifyOldApiV8Archive} from './api-v8-artifact-s
 import {qualifyApiHintIdArchive,API_HINT_ID_ARTIFACT_SHA,API_HINT_ID_FORM_BUNDLE_SHA,API_HINT_ID_FORM_MAP_SHA,API_HINT_ID_FORM_SOURCE_SHA} from './api-hint-id-artifact-successor.mjs';
 
 import {qualifyInputCombinedClosure} from './api-input-combined-closure-successor.mjs';
+import {qualifyInputFirstCheckTransition,qualifyInputFirstCheckClosure,INPUT_FIRSTCHECK_SOURCE,INPUT_FIRSTCHECK_DTS,INPUT_FIRSTCHECK_CLOSURE,INPUT_FIRSTCHECK_COLLISION} from './api-input-firstcheck-f31-successor.mjs';
 const qualifyApiV8Archive = archive => qualifyOldApiV8Archive(archive) || qualifyApiHintIdArchive(archive) || qualifyCombinedArtifactSubject(archive);
 import {createRequire} from 'node:module';
 import {gunzipSync} from 'node:zlib';
@@ -69,10 +70,13 @@ export function inputDisabledProof(symbol,sourceFile,context){
   const archive=readFileSync(context.tarball);
   const TAR=sha(archive),combined=qualifyCombinedArtifactSubject(archive,context.packageRoot),v8=qualifyApiV8Archive(archive);if((![OLD,NEW].includes(TAR)&&!v8)||sha(readFileSync(join(ROOT,'compatibility/rc/parent-main-native-disabled-input-repair-v1.json')))!=='837337ed99743946ccecffd57fd4453a0455694ed8235f882bf9b62e4f201d9e')return null;
   if(!exactExtractedImage(archive,context.packageRoot))return null;
-  if(realpathSync(sourceFile.fileName)!==realpathSync(join(context.packageRoot,Object.keys(IMAGES)[0]))||sha(sourceFile.text)!==IMAGES[Object.keys(IMAGES)[0]])return null;
-  if(sha(readFileSync(join(ROOT,'projects/ngx-material-legacy/legacy-input/input.ts')))!==SOURCE||sha(readFileSync(join(context.referenceRoot,'legacy-input/input.ts')))!=='cd42800ed6494be21256031f724f8059894be709ffa798bcf97103a7bcd90b90'||sha(readFileSync(join(context.referenceRoot,'input/input.ts')))!=='42b930c769cf58cdaf03e76f58ac7d6a2837cc63a56905ade099a9ac1646a116')return null;
+  const firstcheck=combined?.profile==='combined-input-firstcheck'?qualifyInputFirstCheckTransition(context.packageRoot,combined):null;
+  if(combined?.profile==='combined-input-firstcheck'&&!firstcheck)return null;
+  const expectedSource=firstcheck?INPUT_FIRSTCHECK_SOURCE:SOURCE,expectedDts=firstcheck?INPUT_FIRSTCHECK_DTS:IMAGES[Object.keys(IMAGES)[0]];
+  if(realpathSync(sourceFile.fileName)!==realpathSync(join(context.packageRoot,Object.keys(IMAGES)[0]))||sha(sourceFile.text)!==expectedDts)return null;
+  if(sha(readFileSync(join(ROOT,'projects/ngx-material-legacy/legacy-input/input.ts')))!==expectedSource||sha(readFileSync(join(context.referenceRoot,'legacy-input/input.ts')))!=='cd42800ed6494be21256031f724f8059894be709ffa798bcf97103a7bcd90b90'||sha(readFileSync(join(context.referenceRoot,'input/input.ts')))!=='42b930c769cf58cdaf03e76f58ac7d6a2837cc63a56905ade099a9ac1646a116')return null;
   const map=JSON.parse(readFileSync(join(context.packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-input.mjs.map'),'utf8'));
-  if(!map.sourcesContent?.some(s=>typeof s==='string'&&sha(s)===SOURCE))return null;
+  if(!map.sourcesContent?.some(s=>typeof s==='string'&&sha(s)===expectedSource))return null;
   if(sha(JSON.stringify(symbol.shape))!=='7bdd174df430876726634e53250bb1482ad7a5c0df78cd069afd520dd6a9aac5'
    ||!symbol.shape.signatures.includes('public method ngDoCheck():*')||(symbol.shape.ownSignatures||[]).some(x=>ROWS.includes(x))||symbol.shape.ownConstructor!==false)return null;
   const ts=require('typescript'),workspace=JSON.parse(readFileSync(join(ROOT,'package.json'))),policy=JSON.parse(readFileSync(join(ROOT,'projects/ngx-material-legacy/package.json'))),toolchain=JSON.parse(readFileSync(join(ROOT,'toolchain-lock.json')));
@@ -83,7 +87,7 @@ export function inputDisabledProof(symbol,sourceFile,context){
   const host=ts.createCompilerHost(options),get=host.getSourceFile.bind(host),exists=host.fileExists.bind(host),read=host.readFile.bind(host);
   host.fileExists=f=>f===virtual||exists(f);host.readFile=f=>f===virtual?text:read(f);host.getSourceFile=(f,v,...args)=>f===virtual?ts.createSourceFile(f,text,v,true):get(f,v,...args);
   const program=ts.createProgram([virtual],options,host);if(ts.getPreEmitDiagnostics(program).length)return null;
-  const sources=closure(program,virtual),CLOSURE=combined?'8c8759feed634fa8a08f3d73b9b7f49604f74d4c412d063c9db2aeefc3ccffa5':CLOSURES[v8?NEW:TAR];if(sources.length!==312||(combined?!qualifyInputCombinedClosure(sources):inputHarnessClosureFingerprint(sources)!==CLOSURE))return null;
+  const sources=closure(program,virtual),CLOSURE=firstcheck?INPUT_FIRSTCHECK_CLOSURE:combined?'8c8759feed634fa8a08f3d73b9b7f49604f74d4c412d063c9db2aeefc3ccffa5':CLOSURES[v8?NEW:TAR];if(sources.length!==312||(firstcheck?!qualifyInputFirstCheckClosure(sources):combined?!qualifyInputCombinedClosure(sources):inputHarnessClosureFingerprint(sources)!==CLOSURE))return null;
   const checker=program.getTypeChecker(),file=program.getSourceFile(sourceFile.fileName),cls=file?.statements.find(n=>ts.isClassDeclaration(n)&&n.name?.text==='MatLegacyInput');
   const base=cls?.heritageClauses?.flatMap(h=>[...h.types]);if(base?.length!==1||!ts.isIdentifier(base[0].expression))return null;
   const alias=checker.getSymbolAtLocation(base[0].expression),parent=alias&&(alias.flags&ts.SymbolFlags.Alias)&&checker.getAliasedSymbol(alias);
@@ -94,7 +98,7 @@ export function inputDisabledProof(symbol,sourceFile,context){
   if(!publicMember(ts,method)||!publicMember(ts,disabled)||checker.typeToString(checker.getTypeOfSymbolAtLocation(disabled,cls))!=='boolean')return null;
   const calls=checker.getSignaturesOfType(checker.getTypeOfSymbolAtLocation(method,cls),ts.SignatureKind.Call);
   if(calls.length!==1||calls[0].parameters.length||calls[0].typeParameters?.length||checker.typeToString(calls[0].getReturnType())!=='void')return null;
-  return {artifact_sha256:TAR,owned_source_sha256:SOURCE,peer:'@angular/material/input:MatInput@22.1.7',strict_skip_lib_check:false,program_sources:sources.length,program_closure_sha256:CLOSURE,historical_lifecycle:'public inherited ngDoCheck():void',collision_risk:'Exact protected helper additions can break subclasses declaring incompatible private members; accepted only for these two names and types.',behavior_evidence:'compatibility/rc/parent-main-native-disabled-input-repair-v1.json',limits:'No full API, peer-range, SSR hydration, subclass or release qualification.'};
+  return {...(firstcheck?{firstcheck_transition:firstcheck}:{}),artifact_sha256:TAR,owned_source_sha256:expectedSource,peer:'@angular/material/input:MatInput@22.1.7',strict_skip_lib_check:false,program_sources:sources.length,program_closure_sha256:CLOSURE,historical_lifecycle:'public inherited ngDoCheck():void',collision_risk:firstcheck?INPUT_FIRSTCHECK_COLLISION:'Exact protected helper additions can break subclasses declaring incompatible private members; accepted only for these two names and types.',behavior_evidence:'compatibility/rc/parent-main-native-disabled-input-repair-v1.json',limits:'No full API, peer-range, SSR hydration, subclass or release qualification.'};
  }catch{return null;}
 }
 /** Settle only these three extra rows after the complete finite proof. */
