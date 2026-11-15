@@ -12,6 +12,7 @@ import {qualifyApiHintIdArchive,API_HINT_ID_ARTIFACT_SHA,API_HINT_ID_FORM_BUNDLE
 
 import {qualifyInputCombinedClosure} from './api-input-combined-closure-successor.mjs';
 import {qualifyInputFirstCheckTransition,qualifyInputFirstCheckClosure,INPUT_FIRSTCHECK_SOURCE,INPUT_FIRSTCHECK_DTS,INPUT_FIRSTCHECK_CLOSURE,INPUT_FIRSTCHECK_COLLISION} from './api-input-firstcheck-f31-successor.mjs';
+import {qualifyInputPseudoDisabledTransition,qualifyInputPseudoDisabledClosure,INPUT_PSEUDO_CLOSURE} from './api-input-pseudo-disabled-successor.mjs';
 const qualifyApiV8Archive = archive => qualifyOldApiV8Archive(archive) || qualifyApiHintIdArchive(archive) || qualifyCombinedArtifactSubject(archive);
 import {createRequire} from 'node:module';
 import {gunzipSync} from 'node:zlib';
@@ -70,7 +71,9 @@ export function inputDisabledProof(symbol,sourceFile,context){
   const archive=readFileSync(context.tarball);
   const TAR=sha(archive),combined=qualifyCombinedArtifactSubject(archive,context.packageRoot),v8=qualifyApiV8Archive(archive);if((![OLD,NEW].includes(TAR)&&!v8)||sha(readFileSync(join(ROOT,'compatibility/rc/parent-main-native-disabled-input-repair-v1.json')))!=='837337ed99743946ccecffd57fd4453a0455694ed8235f882bf9b62e4f201d9e')return null;
   if(!exactExtractedImage(archive,context.packageRoot))return null;
-  const firstcheck=combined?.profile==='combined-input-firstcheck'?qualifyInputFirstCheckTransition(context.packageRoot,combined):null;
+  const pseudo=combined?.profile==='combined-pseudo-disabled'?qualifyInputPseudoDisabledTransition(context.packageRoot,combined,context.referenceRoot):null;
+  if(combined?.profile==='combined-pseudo-disabled'&&!pseudo)return null;
+  const firstcheck=pseudo||(combined?.profile==='combined-input-firstcheck'?qualifyInputFirstCheckTransition(context.packageRoot,combined):null);
   if(combined?.profile==='combined-input-firstcheck'&&!firstcheck)return null;
   const expectedSource=firstcheck?INPUT_FIRSTCHECK_SOURCE:SOURCE,expectedDts=firstcheck?INPUT_FIRSTCHECK_DTS:IMAGES[Object.keys(IMAGES)[0]];
   if(realpathSync(sourceFile.fileName)!==realpathSync(join(context.packageRoot,Object.keys(IMAGES)[0]))||sha(sourceFile.text)!==expectedDts)return null;
@@ -87,7 +90,7 @@ export function inputDisabledProof(symbol,sourceFile,context){
   const host=ts.createCompilerHost(options),get=host.getSourceFile.bind(host),exists=host.fileExists.bind(host),read=host.readFile.bind(host);
   host.fileExists=f=>f===virtual||exists(f);host.readFile=f=>f===virtual?text:read(f);host.getSourceFile=(f,v,...args)=>f===virtual?ts.createSourceFile(f,text,v,true):get(f,v,...args);
   const program=ts.createProgram([virtual],options,host);if(ts.getPreEmitDiagnostics(program).length)return null;
-  const sources=closure(program,virtual),CLOSURE=firstcheck?INPUT_FIRSTCHECK_CLOSURE:combined?'8c8759feed634fa8a08f3d73b9b7f49604f74d4c412d063c9db2aeefc3ccffa5':CLOSURES[v8?NEW:TAR];if(sources.length!==312||(firstcheck?!qualifyInputFirstCheckClosure(sources):combined?!qualifyInputCombinedClosure(sources):inputHarnessClosureFingerprint(sources)!==CLOSURE))return null;
+  const sources=closure(program,virtual),CLOSURE=pseudo?INPUT_PSEUDO_CLOSURE:firstcheck?INPUT_FIRSTCHECK_CLOSURE:combined?'8c8759feed634fa8a08f3d73b9b7f49604f74d4c412d063c9db2aeefc3ccffa5':CLOSURES[v8?NEW:TAR];if(sources.length!==312||(pseudo?!qualifyInputPseudoDisabledClosure(sources):firstcheck?!qualifyInputFirstCheckClosure(sources):combined?!qualifyInputCombinedClosure(sources):inputHarnessClosureFingerprint(sources)!==CLOSURE))return null;
   const checker=program.getTypeChecker(),file=program.getSourceFile(sourceFile.fileName),cls=file?.statements.find(n=>ts.isClassDeclaration(n)&&n.name?.text==='MatLegacyInput');
   const base=cls?.heritageClauses?.flatMap(h=>[...h.types]);if(base?.length!==1||!ts.isIdentifier(base[0].expression))return null;
   const alias=checker.getSymbolAtLocation(base[0].expression),parent=alias&&(alias.flags&ts.SymbolFlags.Alias)&&checker.getAliasedSymbol(alias);
