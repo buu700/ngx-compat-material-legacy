@@ -1,7 +1,8 @@
 import {FocusMonitor} from '@angular/cdk/a11y';
 import {Direction, Directionality} from '@angular/cdk/bidi';
 import {ESCAPE} from '@angular/cdk/keycodes';
-import {CdkScrollable, OverlayContainer, OverlayModule} from '@angular/cdk/overlay';
+import {CdkScrollable, Overlay, OverlayContainer, OverlayModule} from '@angular/cdk/overlay';
+import {ComponentPortal} from '@angular/cdk/portal';
 import {Platform} from '@angular/cdk/platform';
 import {
   createFakeEvent,
@@ -785,6 +786,48 @@ describe('MatTooltip', () => {
 
       expect(tooltipDirective._isTooltipVisible()).toBe(false);
       expect(overlayContainerElement.textContent).toBe('');
+    }));
+
+    it('routes unrelated keyboard events to the underlying overlay and preserves pointer routing', fakeAsync(() => {
+      const underlying = TestBed.inject(Overlay).create();
+      underlying.attach(new ComponentPortal(BasicTooltipDemo));
+      const keys: number[] = [];
+      underlying.keydownEvents().subscribe(event => keys.push(event.keyCode));
+      tooltipDirective.show(0);
+      tick(0);
+      fixture.detectChanges();
+      expect(tooltipDirective._isTooltipVisible()).toBe(true);
+      const tooltipOverlay = (tooltipDirective as any)._overlayRef;
+      let outside = 0;
+      tooltipOverlay.outsidePointerEvents().subscribe(() => outside++);
+      dispatchKeyboardEvent(document.body, 'keydown', 65);
+      dispatchEvent(document.body, createKeyboardEvent('keydown', ESCAPE, undefined, {alt: true}));
+      expect(keys).toEqual([65, ESCAPE]);
+      dispatchMouseEvent(document.body, 'pointerdown');
+      dispatchMouseEvent(document.body, 'click');
+      expect(outside).toBeGreaterThan(0);
+      // Re-open after the outside interaction and verify Escape stays with the tooltip.
+      tooltipDirective.show(0);
+      tick(0);
+      fixture.detectChanges();
+      dispatchKeyboardEvent(document.body, 'keydown', ESCAPE);
+      tick(0);
+      fixture.detectChanges();
+      expect(keys).toEqual([65, ESCAPE]);
+      expect(tooltipDirective._isTooltipVisible()).toBe(false);
+      finishCurrentTooltipAnimation(overlayContainerElement, false);
+      dispatchKeyboardEvent(document.body, 'keydown', 66);
+      expect(keys).toEqual([65, ESCAPE, 66]);
+      tooltipDirective.show(0);
+      tick(0);
+      fixture.detectChanges();
+      dispatchKeyboardEvent(document.body, 'keydown', 67);
+      expect(keys).toEqual([65, ESCAPE, 66, 67]);
+      fixture.destroy();
+      dispatchKeyboardEvent(document.body, 'keydown', 68);
+      expect(keys).toEqual([65, ESCAPE, 66, 67, 68]);
+      underlying.dispose();
+      flush();
     }));
 
     it('should not throw when pressing ESCAPE', fakeAsync(() => {

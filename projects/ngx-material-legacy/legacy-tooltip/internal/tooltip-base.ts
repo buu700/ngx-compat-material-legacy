@@ -463,6 +463,13 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase>
       positionStrategy: strategy,
       panelClass: `${this._cssClassPrefix}-${PANEL_CLASS}`,
       scrollStrategy: this._scrollStrategy(),
+      // Let unrelated keys reach overlays beneath the tooltip. Pointer events must retain
+      // the existing outside-interaction behavior.
+      eventPredicate: event => event.type !== 'keydown' || (
+        this._isTooltipVisible() &&
+        (event as KeyboardEvent).keyCode === ESCAPE &&
+        !hasModifierKey(event as KeyboardEvent)
+      ),
     });
 
     this._updatePosition(this._overlayRef);
