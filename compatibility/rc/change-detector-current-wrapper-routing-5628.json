@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "role": "Current ChangeDetectorRef wrapper and source census successor; actual legacy scheduling remains separate",
+  "node": "v24.21.0",
+  "git": "git version 2.55.0",
+  "wrapper": {
+    "path": "tests/test_change_detector_uses.py",
+    "previous_commit": "cdee8672eb721a4e9c9b72caabb3ddcc6b41bab2",
+    "previous_sha256": "12494c763c445435751c0571e5afbc5be36ea6160e04417ddaca39a4b5d5f00f",
+    "current_sha256": "5b91f86a9dc0d080a39dae5e4b501f63a46d46b51afa774559934cdd0e92f7ea",
+    "full_diff_sha256": "8f7fe30f7a1f5b16e36514caf97532e39036bef49e164ec2071435282dc1d35b",
+    "full_diff": "diff --git a/tests/test_change_detector_uses.py b/tests/test_change_detector_uses.py\nindex 8517fd1b8..520466e43 100644\n--- a/tests/test_change_detector_uses.py\n+++ b/tests/test_change_detector_uses.py\n@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]\n \n class ChangeDetectorUseTests(unittest.TestCase):\n     def test_public_source_binding_and_onpush_component(self):\n-        command = ['node', '--max-old-space-size=512', 'tests/change_detector_use_probe.mjs']\n+        command = ['node', '--max-old-space-size=512', 'tests/change_detector_current_5628_probe.mjs']\n         if os.environ.get('CLOSEOUT_CHANGE_DETECTOR_REPORT'):\n             command.append(os.environ['CLOSEOUT_CHANGE_DETECTOR_REPORT'])\n         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=180)\n@@ -23,10 +23,10 @@ class ChangeDetectorUseTests(unittest.TestCase):\n         report = json.loads(result.stdout)\n         self.assertEqual(report['frozen_uses'], 38)\n         self.assertEqual(report['supplementary_uses'], 4)\n-        self.assertEqual(report['bound_calls'], 96)\n+        self.assertEqual(report['bound_calls'], 100)\n         self.assertEqual(report['runtime_subjects'], 6)\n         self.assertEqual(report['states_per_subject'], 7)\n-        self.assertEqual(report['source_mutations'], 8)\n+        self.assertEqual(report['source_mutations'], 9)\n         self.assertEqual(report['runtime_mutations'], 8)\n         self.assertTrue(report['unrelated_same_name_receiver_excluded'])\n         self.assertFalse(report['actual_legacy_native_or_scheduler_qualified'])\n",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 10.361s\n\nOK\n"
+  },
+  "helper_transition": {
+    "prior": "scripts/change-detector-use-review.mjs",
+    "current": "scripts/change-detector-current-5628.mjs",
+    "full_diff_sha256": "81f6787ed86e49cc538a0b618bc3a8d71d08f3ff616e0729bc578a25fc5dd290",
+    "full_diff": "diff --git a/scripts/change-detector-use-review.mjs b/scripts/change-detector-current-5628.mjs\nindex 70a66b9d8..c58da21c7 100644\n--- a/scripts/change-detector-use-review.mjs\n+++ b/scripts/change-detector-current-5628.mjs\n@@ -100,8 +100,8 @@ export function scanChangeDetectorUses({root = rootDefault, readSource} = {}) {\n   }\n   assert.deepEqual(cases.filter(row => row.supplementary).map(row => row.file).sort(), supplements);\n   assert.deepEqual(cases.filter(row => !row.supplementary).map(row => row.file).sort(), frozen.map(row => row.file).sort());\n-  assert.equal(cases.length, 42); assert.equal(cases.flatMap(row => row.references).length, 49);\n-  assert.equal(receivers.size, 49);\n+  assert.equal(cases.length, 42); assert.equal(cases.flatMap(row => row.references).length, 50);\n+  assert.equal(receivers.size, 50);\n   const calls = [];\n   for (const path of paths) {\n     const source = program.getSourceFile(join(root, path));\n@@ -125,7 +125,7 @@ export function scanChangeDetectorUses({root = rootDefault, readSource} = {}) {\n     }\n     visit(source);\n   }\n-  assert.equal(calls.length, 96); assert.equal(calls.filter(row => row.method === 'markForCheck').length, 87);\n+  assert.equal(calls.length, 100); assert.equal(calls.filter(row => row.method === 'markForCheck').length, 91);\n   assert.equal(calls.filter(row => row.method === 'detectChanges').length, 9);\n   return {frozen_uses: 38, current_uses: 42, supplementary_uses: 4, cases,\n     receiver_declarations: receiverRecords, calls, binding_parser: ts.version,\n"
+  },
+  "evidence": [
+    {
+      "path": "scripts/change-detector-use-review.mjs",
+      "sha256": "55437b3d7a6639697a6d8a879496a0c173d0273c7d167062a13d588811a461f8"
+    },
+    {
+      "path": "scripts/change-detector-current-5628.mjs",
+      "sha256": "10bf33f1c305deedd34d31c1181ce1584fd484b9447da13ae2ecad99fc684305"
+    },
+    {
+      "path": "tests/change_detector_current_5628_probe.mjs",
+      "sha256": "9f5fcf9f08890386d52326ca56687f984ec8c500affc1d457661bf4108d3dee2"
+    },
+    {
+      "path": "compatibility/rc/change-detector-current-5628-diagnostic-v3.json",
+      "sha256": "2c9f1909243384702d89d0040ff1b48a9b7e7f720d84339d4775f04fbfbf8cda"
+    },
+    {
+      "path": "compatibility/rc/change-detector-old-wrapper-failure-5628.json",
+      "sha256": "5f9b5370babfc2d2e0a4b949e2093a63aaf471a1be4caa3d8e0b28bafcd3534d"
+    }
+  ],
+  "limits": [
+    "Source and method count reconciliation does not execute actual legacy scheduling.",
+    "Historical profiles remain historical; fresh coordinator/CI binding, packed artifacts, floors and G11 remain separate."
+  ]
+}

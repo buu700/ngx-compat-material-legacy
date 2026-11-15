@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class ChangeDetectorUseTests(unittest.TestCase):
     def test_public_source_binding_and_onpush_component(self):
-        command = ['node', '--max-old-space-size=512', 'tests/change_detector_use_probe.mjs']
+        command = ['node', '--max-old-space-size=512', 'tests/change_detector_current_5628_probe.mjs']
         if os.environ.get('CLOSEOUT_CHANGE_DETECTOR_REPORT'):
             command.append(os.environ['CLOSEOUT_CHANGE_DETECTOR_REPORT'])
         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=180)
@@ -23,10 +23,10 @@ class ChangeDetectorUseTests(unittest.TestCase):
         report = json.loads(result.stdout)
         self.assertEqual(report['frozen_uses'], 38)
         self.assertEqual(report['supplementary_uses'], 4)
-        self.assertEqual(report['bound_calls'], 96)
+        self.assertEqual(report['bound_calls'], 100)
         self.assertEqual(report['runtime_subjects'], 6)
         self.assertEqual(report['states_per_subject'], 7)
-        self.assertEqual(report['source_mutations'], 8)
+        self.assertEqual(report['source_mutations'], 9)
         self.assertEqual(report['runtime_mutations'], 8)
         self.assertTrue(report['unrelated_same_name_receiver_excluded'])
         self.assertFalse(report['actual_legacy_native_or_scheduler_qualified'])
