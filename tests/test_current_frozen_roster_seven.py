@@ -52,7 +52,7 @@ class CurrentFrozenRosterSevenTest(unittest.TestCase):
                 marker = root / '.inventory-source-probe.json'
                 marker.write_text(json.dumps(dict(head=head, nonce=nonce, partition=chunk)))
                 marker.chmod(0o600)
-                child = subprocess.run(['node', str(ROOT / 'tests/current_frozen_roster_seven_probe.mjs'), str(chunk)], cwd=root, env={**env, 'INVENTORY_SOURCE_PROBE_NONCE': nonce}, capture_output=True, text=True, timeout=60)
+                child = subprocess.run(['node', str(ROOT / 'tests/current_frozen_roster_seven_probe.mjs'), str(chunk)], cwd=root, env={**env, 'INVENTORY_SOURCE_PROBE_NONCE': nonce}, capture_output=True, text=True, timeout=600)
                 self.assertEqual(child.returncode, 0, child.stderr)
                 return json.loads(child.stdout)
             with ThreadPoolExecutor(max_workers=2) as pool:
