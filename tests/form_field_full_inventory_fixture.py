@@ -6,11 +6,9 @@
 import hashlib
 import json
 import os
-import shutil
 import stat
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
@@ -21,10 +19,6 @@ import test_current_sass_source as source_fixture
 from test_sass_ordinary_control_gate import OrdinaryControlGateTests as Control
 from test_sass_spinner_snack_gate_integration import SpinnerSnackGateIntegrationTests as Spinner
 from test_ordinary_card_entry import OrdinaryCardEntryTests as Card
-
-
-def git(*args, cwd=ROOT):
-    return subprocess.check_output(['git', *args], cwd=cwd, text=True).strip()
 
 
 def physical_inventory(root):
@@ -57,72 +51,90 @@ def physical_inventory(root):
     return records
 
 
+HISTORICAL_DATA = (
+    'compatibility/rc/oracles/material-16.2.14-sass-api.json',
+    'reference/material-16.2.14/PROVENANCE.json',
+    'reference/material-16.2.14/environment-package-lock.json',
+    'fixtures/sass/form-field-state-contracts.json',
+    'tests/form_field_state_contract_fixture.json',
+    'compatibility/rc/ordinary-control-css-python-vectors-v1.json',
+    'compatibility/rc/ordinary-card-public-bridge-original-cases-v1.json',
+    'compatibility/rc/parallel-spinner-snack-css-contract-inputs-v1.json',
+    'compatibility/rc/original16-sass-source-diagnostic-identity.json',
+    'fixtures/sass/default-aggregate-contracts.json',
+    'tests/sass_default_aggregate_fixture.json',
+    'fixtures/sass/function-contracts.json',
+)
+
+
+def historical_data():
+    """Authenticate comparison DATA; never load or execute historical programs."""
+    env = dict(PATH=os.environ.get('PATH',''), LANG='C', LC_ALL='C',
+               GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null',
+               GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1', GIT_TERMINAL_PROMPT='0')
+    def read_git(*args):
+        return subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0',
+                                        '-c','maintenance.auto=0',*args],cwd=ROOT,env=env)
+    assert read_git('rev-parse',SUBJECT+'^{commit}').decode().strip()==SUBJECT
+    read_git('merge-base','--is-ancestor',SUBJECT,'HEAD')
+    rows=[]
+    for path in HISTORICAL_DATA:
+        cursor=ROOT
+        for part in path.split('/'):
+            cursor=cursor/part
+            assert not cursor.is_symlink()
+        assert cursor.is_file()
+        actual=cursor.read_bytes();historical=read_git('show',SUBJECT+':'+path)
+        assert actual==historical, 'historical comparison data changed: '+path
+        assert cursor.read_bytes()==actual, 'historical comparison data changed during read: '+path
+        rows.append(dict(path=path,sha256=hashlib.sha256(actual).hexdigest(),bytes=len(actual)))
+    return rows
+
+
 def main():
-    if git('rev-parse', SUBJECT + '^{commit}') != SUBJECT:
-        raise ValueError('historical fixture commit does not resolve exactly')
-    old_root = source_fixture.ROOT
-    initialized = []
-    temp = Path(tempfile.mkdtemp(prefix='form-color-full-inventory-'))
-    baseline = temp / 'baseline'
-    registered = False
-    snapshot = None
-    tree = None
+    # Current constructors authenticate only current physical source.  The old
+    # commit is used exclusively as an immutable comparison-data source.
+    data_before=historical_data()
+    source=source_fixture.CurrentSassSource(ROOT)
+    source.assert_current()
+    if os.environ.get('FORM_COLOR_FIXTURE_SMOKE') == '1':
+        with patch('os.scandir', side_effect=PermissionError('injected scan failure')):
+            try:
+                physical_inventory(ROOT)
+            except PermissionError:
+                pass
+            else:
+                raise AssertionError('physical inventory ignored a scan failure')
+        assert historical_data()==data_before
+        source.assert_current()
+        print(json.dumps(dict(result='smoke',historical_data_commit=SUBJECT,
+                              historical_data_count=len(data_before),
+                              current_source_bound_count=len(source.bound),scan_error_rejected=True,
+                              historical_programs_executed=False,fixture_only=True)))
+        return
+    initialized=[]
     try:
-        subprocess.run(['git', 'worktree', 'add', '--detach', str(baseline), SUBJECT],
-                       cwd=ROOT, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
-        registered = True
-        if baseline.resolve() == ROOT.resolve():
-            raise ValueError('fixture resolved to the source checkout')
-        head = git('rev-parse', 'HEAD', cwd=baseline)
-        tree = git('rev-parse', 'HEAD^{tree}', cwd=baseline)
-        index_tree = git('write-tree', cwd=baseline)
-        if head != SUBJECT or tree != git('rev-parse', SUBJECT + '^{tree}') or index_tree != tree:
-            raise ValueError('fixture HEAD or index does not match historical subject')
-        if git('status', '--porcelain', '--untracked-files=all', cwd=baseline):
-            raise ValueError('new historical fixture is dirty')
-        entries = git('worktree', 'list', '--porcelain').splitlines()
-        if 'worktree ' + str(baseline.resolve()) not in entries:
-            raise ValueError('historical fixture is not registered')
-        for package in ('@angular/core', '@angular/material', '@angular/cdk', 'sass'):
-            dest = baseline / 'node_modules' / package
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copytree((ROOT / 'node_modules' / package).resolve(), dest)
-        sass_siblings = (ROOT / 'node_modules/sass').resolve().parent
-        for package in ('immutable', 'chokidar', 'source-map-js'):
-            shutil.copytree((sass_siblings / package).resolve(), baseline / 'node_modules' / package)
-        snapshot = physical_inventory(baseline)
-        source = source_fixture.CurrentSassSource(baseline)
-        bound_count = len(source.bound)
-        if bound_count != 835:
-            raise ValueError('historical source closure size differs')
-        if os.environ.get('FORM_COLOR_FIXTURE_SMOKE') == '1':
-            with patch('os.scandir', side_effect=PermissionError('injected scan failure')):
-                try:
-                    physical_inventory(baseline)
-                except PermissionError:
-                    pass
-                else:
-                    raise AssertionError('physical inventory ignored a scan failure')
-            print(json.dumps(dict(result='smoke', head=head, tree=tree, index_tree=index_tree,
-                                  source_bound_count=bound_count, registered=True, scan_error_rejected=True)))
-            return
-        source_fixture.ROOT = baseline
         for cls in (Control, Spinner, Card):
             cls.setUpClass()
             initialized.append(cls)
         card = Card()
         cards = [card.model(row)['body'] for row in Card.rows if row['case_id'].startswith('mixin-css/')]
-        # The spinner fixture is the synthetic source root for density and
-        # private-card contexts as well. Add missing historical inputs only;
-        # never replace an already authenticated fixture file.
-        for name in ('scripts', 'fixtures', 'compatibility/rc'):
-            for path in (baseline / name).rglob('*'):
-                if not path.is_file() or path.is_symlink() or '/reports/' in str(path):
-                    continue
-                dest = Spinner.root / path.relative_to(baseline)
-                if not dest.exists():
-                    dest.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copyfile(path, dest)
+        # Copy only missing current fixture inputs. Existing authenticated files
+        # are never replaced; no historical executable enters a current reader.
+        tracked = subprocess.check_output(['git','--no-replace-objects','ls-files','-z','--',
+                                           'scripts','fixtures','compatibility/rc'],cwd=ROOT).decode().split('\0')
+        candidates=set(tracked) | {row['path'] for row in source.bound}
+        for relative in sorted(candidates):
+            if not relative or not relative.startswith(('scripts/','fixtures/','compatibility/rc/')) or '/reports/' in relative:
+                continue
+            path=ROOT/relative
+            if not path.is_file() or path.is_symlink():
+                continue
+            dest=Spinner.root/relative
+            if not dest.exists():
+                dest.parent.mkdir(parents=True,exist_ok=True)
+                raw=path.read_bytes();dest.write_bytes(raw)
+                assert path.read_bytes()==raw and dest.read_bytes()==raw
         data = dict(controlRoot=str(Control.root), spinnerRoot=str(Spinner.root), cardRoot=str(Card.root),
                     control=Control.bodies, spinner=Spinner.bodies, card=cards)
         result = subprocess.run(['node', str(ROOT / 'tests/form-field-full-inventory-probe.mjs')],
@@ -130,37 +142,14 @@ def main():
         if result.returncode:
             raise RuntimeError((result.stderr or result.stdout)[-10000:])
         report = json.loads(result.stdout)
-        report['historical_fixture'] = dict(head=head, tree=tree, index_tree=index_tree,
-                                            source_bound_count=bound_count, registered=True)
+        assert historical_data()==data_before
+        source.assert_current()
+        report['historical_data'] = dict(commit=SUBJECT,files=data_before,historical_programs_executed=False)
+        report['current_source'] = dict(bound_count=len(source.bound),physical=True,fixture_only=True)
         print(json.dumps(report, separators=(',', ':')))
     finally:
-        cleanup_error = None
         for cls in reversed(initialized):
-            try:
-                cls.tearDownClass()
-            except Exception as exc:
-                cleanup_error = exc
-        source_fixture.ROOT = old_root
-        if registered:
-            try:
-                entries = git('worktree', 'list', '--porcelain').splitlines()
-                if (snapshot is None or tree is None or git('rev-parse', 'HEAD', cwd=baseline) != SUBJECT
-                        or git('write-tree', cwd=baseline) != tree
-                        or 'worktree ' + str(baseline.resolve()) not in entries
-                        or git('status', '--porcelain', '--untracked-files=all', cwd=baseline)
-                        or physical_inventory(baseline) != snapshot):
-                    raise RuntimeError('historical worktree identity or complete physical inventory changed')
-                subprocess.run(['git', 'worktree', 'remove', str(baseline)], cwd=ROOT, check=True,
-                               stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
-            except Exception as exc:
-                cleanup_error = RuntimeError(f'historical worktree preserved at {baseline}: {exc}')
-        if not baseline.exists():
-            try:
-                temp.rmdir()
-            except OSError as exc:
-                cleanup_error = RuntimeError(f'fixture parent preserved at {temp}: {exc}')
-        if cleanup_error is not None:
-            raise cleanup_error
+            cls.tearDownClass()
 
 
 if __name__ == '__main__':

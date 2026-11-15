@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Ryan Lester.
  * Use of this source code is governed by an MIT-style license in LICENSE.
  */
-// Synthetic source-bound fixture on a physical 4015 historical source image.
+// Synthetic current-source fixture with independently authenticated historical data.
 // It is not an artifact or current-source qualification.
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';import {createHash} from 'node:crypto';import {createRequire} from 'node:module';
@@ -47,4 +47,4 @@ for(const formLine of ['main','21.x']){
  }
  assert.deepEqual(compare(lane).filter(r=>r.result!=='pass').map(r=>r.case_id),[]);
 }
-console.log(JSON.stringify({result:'pass',cases:651,synthetic_form_lanes:['main','21.x'],mutants_per_lane:2,recovered:true,scope:'historical main gate fixtures; 21.x form lane is mixed synthetic transport, not peer or artifact qualification'}));
+console.log(JSON.stringify({result:'pass',cases:651,synthetic_form_lanes:['main','21.x'],mutants_per_lane:2,recovered:true,scope:'current physical source fixtures with historical comparison data; 21.x form lane is mixed synthetic transport, not peer or artifact qualification'}));
