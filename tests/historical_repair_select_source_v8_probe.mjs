@@ -24,7 +24,14 @@ try {
   const before=execFileSync('git',['show',receipt.source_parent+':'+row.path],{cwd:root,maxBuffer:2*1024*1024});
   assert.deepEqual({path:row.path,sha256:hash(before),bytes:before.length},row.before);
   let cursor=0;const parts=[];for(const edit of row.edits){const old=Buffer.from(edit.before);assert.ok(edit.offset>=cursor);assert.deepEqual(before.subarray(edit.offset,edit.offset+old.length),old);parts.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+old.length;}parts.push(before.subarray(cursor));
-  const after=Buffer.concat(parts);assert.deepEqual({path:row.path,sha256:hash(after),bytes:after.length},row.after);assert.deepEqual(after,read(root,row.path));
+  const after=Buffer.concat(parts);assert.deepEqual({path:row.path,sha256:hash(after),bytes:after.length},row.after);
+  const committed=execFileSync('git',['show','5959376779dd1fcce209c6077c0afb3b7e466865:'+row.path],{cwd:root,maxBuffer:2*1024*1024});assert.deepEqual(after,committed);
+  if(row.path==='scripts/inventory-reference-proposal.mjs'){
+   const parent='13801025c266396ff0129fe90a751bea7848ab98',commit='ecbb2126f24aab9eed97ba9082085c9c494787e9';
+   assert.equal(execFileSync('git',['rev-list','--parents','-n','1',commit],{cwd:root,encoding:'utf8'}).trim(),commit+' '+parent);
+   assert.deepEqual(committed,execFileSync('git',['show',parent+':'+row.path],{cwd:root,maxBuffer:2*1024*1024}));
+   assert.deepEqual(read(root,row.path),execFileSync('git',['show',commit+':'+row.path],{cwd:root,maxBuffer:2*1024*1024}));
+  }else assert.deepEqual(after,read(root,row.path));
  }
  const main=historicalRepairSelectSourceOwner({root,line:'main'});
  assert.equal(main.bound.length,27);
