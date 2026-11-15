@@ -1,0 +1,329 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "role": "Exact EventEmitter and QueryList source transitions; method behavior remains separate",
+  "git_version": "git version 2.55.0",
+  "transitions": [
+    {
+      "file": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "prior_commit": "7e9ecb0a8fe31d44c1f37b8a509fc58c6ab705ad",
+      "prior_sha256": "e645f8b92ccb57518eb9fac6ab3a20c35db6bd9f19a301fcb659ffe58911cfb6",
+      "current_commit": "38ee8359c688c039c6ae1db858f11282241d53ff",
+      "current_sha256": "e0fe0631a6adde57f515b82b43156d5da0ab0c2730872df5b792fc27dab14931",
+      "full_diff_sha256": "332b17cdfed9610889061dd34c36df979d6e98ed0a382f1412e31771a05962b5",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-form-field/form-field.ts b/projects/ngx-material-legacy/legacy-form-field/form-field.ts\nindex aff83b932..ed01890da 100644\n--- a/projects/ngx-material-legacy/legacy-form-field/form-field.ts\n+++ b/projects/ngx-material-legacy/legacy-form-field/form-field.ts\n@@ -7,6 +7,8 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {Directionality} from '@angular/cdk/bidi';\n import {coerceBooleanProperty} from '@angular/cdk/coercion';\n type BooleanInput = string | boolean | null | undefined;\n@@ -47,7 +49,7 @@ import {Platform} from '@angular/cdk/platform';\n import {afterFormFieldRender} from './internal/after-form-field-render';\n import {nextLegacyHintId} from './internal/hint-id';\n import {AbstractControlDirective, ValidatorFn} from '@angular/forms';\n-import {ANIMATION_MODULE_TYPE} from '@angular/core';\n+\n import {MatFormFieldControl} from '@angular/material/form-field';\n import {\n   MAT_LEGACY_ERROR as MAT_ERROR,\n@@ -317,7 +319,7 @@ export class MatLegacyFormField\n     private _defaults: MatLegacyFormFieldDefaultOptions,\n     private _platform: Platform,\n     private _ngZone: NgZone,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) _animationMode: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) _animationMode: string,\n     private _injector?: Injector,\n   ) {\n     super(elementRef);\n",
+      "uses": [
+        {
+          "file": "legacy-form-field/form-field.ts",
+          "module": "@angular/core",
+          "symbol": "QueryList",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/frozen-form-hint-roles-v1.json",
+            "sha256": "dd468d6f448e70cfb9d290634faff83768b153d87f1ebe58f33709bbb26d8057",
+            "bytes": 372636
+          }
+        }
+      ]
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+      "prior_commit": "b6ade2e9d8b441a67ec6f7f52d7d75807db7300c",
+      "prior_sha256": "73aea18bc4f77958bc69229ea4954a688d92913bbc59fb52e28f342c2d42a5ae",
+      "current_commit": "38ee8359c688c039c6ae1db858f11282241d53ff",
+      "current_sha256": "04c8cdd43261f67be762c8938c1d901ccc64ac6414f03c9eeb8161ffc64b2a26",
+      "full_diff_sha256": "5e24b79bf5416049c5f1e11e64b988150cebaea88668254b4f5d8a734bc20a55",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-chips/chip.ts b/projects/ngx-material-legacy/legacy-chips/chip.ts\nindex 9c7bb1edb..522bc8970 100644\n--- a/projects/ngx-material-legacy/legacy-chips/chip.ts\n+++ b/projects/ngx-material-legacy/legacy-chips/chip.ts\n@@ -7,6 +7,8 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {FocusableOption} from '@angular/cdk/a11y';\n import {coerceBooleanProperty} from '@angular/cdk/coercion';\n type BooleanInput = string | boolean | null | undefined;\n@@ -14,7 +16,6 @@ import {BACKSPACE, DELETE, SPACE} from '@angular/cdk/keycodes';\n import {Platform} from '@angular/cdk/platform';\n import {DOCUMENT} from '@angular/common';\n import {\n-  ANIMATION_MODULE_TYPE,\n   Attribute,\n   ChangeDetectorRef,\n   ContentChild,\n@@ -313,7 +314,7 @@ export class MatLegacyChip\n     globalRippleOptions: RippleGlobalOptions | null,\n     private _changeDetectorRef: ChangeDetectorRef,\n     @Inject(DOCUMENT) _document: any,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n     @Attribute('tabindex') tabIndex?: string,\n   ) {\n     super(elementRef);\n@@ -330,7 +331,7 @@ export class MatLegacyChip\n     this._chipRipple.setupTriggerEvents(elementRef);\n \n     this.rippleConfig = globalRippleOptions || {};\n-    this._animationsDisabled = animationMode === 'NoopAnimations';\n+    this._animationsDisabled = resolveLegacyAnimationMode(animationMode) === 'NoopAnimations';\n     this.tabIndex = tabIndex != null ? parseInt(tabIndex) || -1 : -1;\n   }\n \n",
+      "uses": [
+        {
+          "file": "legacy-chips/chip.ts",
+          "module": "@angular/core",
+          "symbol": "EventEmitter",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/chip-focus-role-requalification.json",
+            "sha256": "7d55c20b3cb15628dd68ad6ce608249df25f9329d0deac52d3dedaccc8030ee4"
+          }
+        }
+      ]
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts",
+      "prior_commit": "58093db5f98ca98d8d8489fd2c0fbc5e8151c844",
+      "prior_sha256": "815ce6bcc47f7218ee8cc175c84327829c7778ab429fc8b5e137a783e5d7aa3b",
+      "current_commit": "38ee8359c688c039c6ae1db858f11282241d53ff",
+      "current_sha256": "3afb3707feec6143378e060d1e2b9501d7d0512984919d1f237702340ca4a6b7",
+      "full_diff_sha256": "738c0afd277ef831c297021e889af186f9d786dc3abe7fa67368b55c96de14d8",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts b/projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts\nindex 9efea8b53..c6495938f 100644\n--- a/projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts\n+++ b/projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts\n@@ -6,10 +6,11 @@\n  * Use of this source code is governed by an MIT-style license that can be\n  * found in the LICENSE file at https://angular.io/license\n  */\n+\n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n import {coerceNumberProperty} from '@angular/cdk/coercion';\n type NumberInput = string | number | null | undefined;\n import {\n-  ANIMATION_MODULE_TYPE,\n   AfterViewInit,\n   ChangeDetectionStrategy,\n   Component,\n@@ -81,7 +82,7 @@ export class MatLegacyProgressBar\n   constructor(\n     elementRef: ElementRef,\n     private _ngZone: NgZone,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string,\n     /**\n      * @deprecated `location` parameter to be made required.\n      * @breaking-change 8.0.0\n@@ -97,6 +98,7 @@ export class MatLegacyProgressBar\n     private _changeDetectorRef?: ChangeDetectorRef,\n   ) {\n     super(elementRef);\n+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);\n \n     // We need to prefix the SVG reference with the current path, otherwise they won't work\n     // in Safari if the page has a `<base>` tag. Note that we need quotes inside the `url()`,\n@@ -106,7 +108,7 @@ export class MatLegacyProgressBar\n     // the same thing.\n     const path = location ? location.getPathname().split('#')[0] : '';\n     this._rectangleFillValue = `url('${path}#${this.progressbarId}')`;\n-    this._isNoopAnimation = _animationMode === 'NoopAnimations';\n+    this._isNoopAnimation = this._animationMode === 'NoopAnimations';\n \n     if (defaults) {\n       if (defaults.color) {\n",
+      "uses": [
+        {
+          "file": "legacy-progress-bar/progress-bar.ts",
+          "module": "@angular/core",
+          "symbol": "EventEmitter",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/public-event-emitter-boundary.json",
+            "sha256": "d8614a627b645540772986858aead5e7ab05b865d2fb2dbf6e6ed3e35eed8e36"
+          }
+        }
+      ]
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-radio/radio.ts",
+      "prior_commit": "58093db5f98ca98d8d8489fd2c0fbc5e8151c844",
+      "prior_sha256": "dffd3e4daf0d50d915303b2e3d13d26e8c97fb77756ccf8c618e34022f548f1e",
+      "current_commit": "38ee8359c688c039c6ae1db858f11282241d53ff",
+      "current_sha256": "0b749baf2f25dcacad39803d51f809f2cca02ed4add03c3199513cdf60b9fb15",
+      "full_diff_sha256": "104ced4d066368294e17c90a4d3ee61eb678b68ad4ae5ae25f7fadbbfcadde38",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-radio/radio.ts b/projects/ngx-material-legacy/legacy-radio/radio.ts\nindex 26e4f3e0c..48ee777dd 100644\n--- a/projects/ngx-material-legacy/legacy-radio/radio.ts\n+++ b/projects/ngx-material-legacy/legacy-radio/radio.ts\n@@ -7,10 +7,11 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {FocusMonitor} from '@angular/cdk/a11y';\n import {UniqueSelectionDispatcher} from '@angular/cdk/collections';\n import {\n-  ANIMATION_MODULE_TYPE,\n   Attribute,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n@@ -103,7 +104,7 @@ export class MatLegacyRadioButton extends _MatRadioButtonBase {\n     changeDetector: ChangeDetectorRef,\n     focusMonitor: FocusMonitor,\n     radioDispatcher: UniqueSelectionDispatcher,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n     @Optional()\n     @Inject(MAT_RADIO_DEFAULT_OPTIONS)\n     providerOverride?: MatRadioDefaultOptions,\n@@ -115,7 +116,7 @@ export class MatLegacyRadioButton extends _MatRadioButtonBase {\n       changeDetector,\n       focusMonitor,\n       radioDispatcher,\n-      animationMode,\n+      resolveLegacyAnimationMode(animationMode),\n       providerOverride,\n       tabIndex,\n     );\n",
+      "uses": [
+        {
+          "file": "legacy-radio/radio.ts",
+          "module": "@angular/core",
+          "symbol": "QueryList",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/public-query-list-boundary.json",
+            "sha256": "d8db0d03fc6fda9012a5df360d630896220c188258c7a27606cbd042e17bb253"
+          }
+        }
+      ]
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-tabs/tab-header.ts",
+      "prior_commit": "6145f010441ca001be29a9a6b58ccb7423edcf8c",
+      "prior_sha256": "650d50f3007c67c0c4aa9fa6e63b0fe6f246d7443fcb9967d5943c1fd7e90f9a",
+      "current_commit": "38ee8359c688c039c6ae1db858f11282241d53ff",
+      "current_sha256": "552b26686c0ae1bfc41345c45507e6b7d040f4d1983daa94888b13c0d2423d88",
+      "full_diff_sha256": "fcac282f9af114b4ff20d6f61b7ddf0f3eedb19e507598361bd93212c8fbc516",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/tab-header.ts b/projects/ngx-material-legacy/legacy-tabs/tab-header.ts\nindex f2783a692..1f66cfa06 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/tab-header.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/tab-header.ts\n@@ -7,10 +7,11 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {Directionality} from '@angular/cdk/bidi';\n import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';\n import {\n-  ANIMATION_MODULE_TYPE,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n   Component,\n@@ -68,7 +69,7 @@ export class MatLegacyTabHeader extends _MatTabHeaderBase {\n     @Optional() dir: Directionality,\n     ngZone: NgZone,\n     platform: Platform,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);\n   }\n",
+      "uses": [
+        {
+          "file": "legacy-tabs/tab-header.ts",
+          "module": "@angular/core",
+          "symbol": "QueryList",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/public-query-list-boundary.json",
+            "sha256": "d8db0d03fc6fda9012a5df360d630896220c188258c7a27606cbd042e17bb253"
+          }
+        }
+      ]
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-tabs/tab-group.ts",
+      "prior_commit": "6145f010441ca001be29a9a6b58ccb7423edcf8c",
+      "prior_sha256": "f4bf197d8dd5f7048e75b8c91655423fe6ed6b6d180866b152100cfb5a04da69",
+      "current_commit": "38ee8359c688c039c6ae1db858f11282241d53ff",
+      "current_sha256": "7ed0657a77371df891557fef7df4b2e9d5276ff121983eb6fd6918fb10015f82",
+      "full_diff_sha256": "dee0ede2fad1b3a5dce734cf97578633ceffa47ead46efb903295fd07d1cbd12",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/tab-group.ts b/projects/ngx-material-legacy/legacy-tabs/tab-group.ts\nindex f38f1386d..4c5fcc428 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/tab-group.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/tab-group.ts\n@@ -7,8 +7,9 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {\n-  ANIMATION_MODULE_TYPE,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n   Component,\n@@ -65,7 +66,7 @@ export class MatLegacyTabGroup extends _MatTabGroupBase {\n     elementRef: ElementRef,\n     changeDetectorRef: ChangeDetectorRef,\n     @Inject(MAT_TABS_CONFIG) @Optional() defaultConfig?: MatTabsConfig,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(elementRef, changeDetectorRef, defaultConfig, animationMode);\n   }\n",
+      "uses": [
+        {
+          "file": "legacy-tabs/tab-group.ts",
+          "module": "@angular/core",
+          "symbol": "QueryList",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/public-query-list-boundary.json",
+            "sha256": "d8db0d03fc6fda9012a5df360d630896220c188258c7a27606cbd042e17bb253"
+          }
+        }
+      ]
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+      "prior_commit": "42b55b2f3f9fe9c5d543e7206325c1d1c3d7ab65",
+      "prior_sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d",
+      "current_commit": "38ee8359c688c039c6ae1db858f11282241d53ff",
+      "current_sha256": "584d648acc358a46e0ceaf2ffd48d528eedd9536eb3e6ab7c3b30b485ae70aad",
+      "full_diff_sha256": "6982f7e397a67329636f7cbd9f665649d43cd96014eb42dd7110da5798ff7824",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-slider/slider.ts b/projects/ngx-material-legacy/legacy-slider/slider.ts\nindex d46f61ffa..4a6f9e78d 100644\n--- a/projects/ngx-material-legacy/legacy-slider/slider.ts\n+++ b/projects/ngx-material-legacy/legacy-slider/slider.ts\n@@ -7,6 +7,8 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';\n import {Directionality} from '@angular/cdk/bidi';\n import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion';\n@@ -24,7 +26,6 @@ import {\n   hasModifierKey,\n } from '@angular/cdk/keycodes';\n import {\n-  ANIMATION_MODULE_TYPE,\n   Attribute,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n@@ -528,9 +529,10 @@ export class MatLegacySlider\n     @Attribute('tabindex') tabIndex: string,\n     private _ngZone: NgZone,\n     @Inject(DOCUMENT) _document: any,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string,\n   ) {\n     super(elementRef);\n+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);\n     this._document = _document;\n     this.tabIndex = parseInt(tabIndex) || 0;\n \n",
+      "uses": [
+        {
+          "file": "legacy-slider/slider.ts",
+          "module": "@angular/core",
+          "symbol": "EventEmitter",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/public-event-emitter-boundary.json",
+            "sha256": "d8614a627b645540772986858aead5e7ab05b865d2fb2dbf6e6ed3e35eed8e36"
+          }
+        }
+      ]
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts",
+      "prior_commit": "7e1b3f7d463c6d0955540c770009383735834507",
+      "prior_sha256": "2c05a1f269d5c56d9e354b81ea0baff88d77602e920911df215bb8d1641b1ac6",
+      "current_commit": "38ee8359c688c039c6ae1db858f11282241d53ff",
+      "current_sha256": "e117a32b9e5a70780e143504cc0e7cae34442cdebe111ccdfc05253e90721667",
+      "full_diff_sha256": "d7f59775ed6fa1ae4cebb678ef86a8740febd6104bd58c97c64ea42dac0ef9a8",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts b/projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts\nindex 35be7a43d..01f754bb1 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts\n@@ -9,8 +9,9 @@\n  * Owned Material-16 `MatPaginatedTabHeader` (M22 version is inject()-only).\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {\n-  ANIMATION_MODULE_TYPE,\n   ChangeDetectorRef,\n   ElementRef,\n   NgZone,\n@@ -180,8 +181,9 @@ export abstract class MatPaginatedTabHeader\n     @Optional() private _dir: Directionality,\n     private _ngZone: NgZone,\n     private _platform: Platform,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string,\n   ) {\n+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);\n     // Bind the `mouseleave` event on the outside since it doesn't change anything in the view.\n     _ngZone.runOutsideAngular(() => {\n       fromEvent(_elementRef.nativeElement, 'mouseleave')\n@@ -588,9 +590,10 @@ export abstract class MatPaginatedTabHeader\n     } else {\n       const scrollWidth = this._tabListInner.nativeElement.scrollWidth;\n       const containerWidth = this._elementRef.nativeElement.offsetWidth;\n-      // Safari can round scrollWidth inconsistently when pagination toggles, causing an\n-      // infinite show/hide loop. Require a small threshold before enabling pagination.\n-      const isEnabled = scrollWidth - containerWidth >= 5;\n+      // Preserve reachability for any positive overflow, including custom label content\n+      // at the edge. Safari can round scrollWidth inconsistently when pagination toggles;\n+      // any future mitigation must retain small-overflow reachability.\n+      const isEnabled = scrollWidth > containerWidth;\n \n       if (!isEnabled) {\n         this.scrollDistance = 0;\n",
+      "uses": [
+        {
+          "file": "legacy-tabs/internal/paginated-tab-header.ts",
+          "module": "@angular/core",
+          "symbol": "QueryList",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/tabs-paginated-tab-header-review.json",
+            "sha256": "edf891446cc4de60d2e05828f7dc9dcab774dd1681dbef6d7f2cca912b4fffc2"
+          }
+        },
+        {
+          "file": "legacy-tabs/internal/paginated-tab-header.ts",
+          "module": "@angular/core",
+          "symbol": "EventEmitter",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/tabs-paginated-tab-header-review.json",
+            "sha256": "edf891446cc4de60d2e05828f7dc9dcab774dd1681dbef6d7f2cca912b4fffc2"
+          }
+        }
+      ]
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+      "prior_commit": "a4cf004d315099dedae7d11f3bf9bb8af2e43409",
+      "prior_sha256": "9205bb2a5b3573e8f21161b03baa04e4b3e868e72d70e06c5dcdf96d2439af36",
+      "current_commit": "38ee8359c688c039c6ae1db858f11282241d53ff",
+      "current_sha256": "008255ffdda75f44728754803a78fb032f8491acb1c7976f64d7a15f97d65295",
+      "full_diff_sha256": "e87742c736feb83b2df97608836df90e54f5404bd695be49527bc810313d8c84",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts b/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts\nindex 985eab29a..a8ee32efb 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts\n@@ -8,8 +8,9 @@\n  *\n  * Owned Material-16 tab-nav bases.\n  */\n+\n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n import {\n-  ANIMATION_MODULE_TYPE,\n   AfterContentChecked,\n   AfterContentInit,\n   AfterViewInit,\n@@ -25,6 +26,8 @@ import {\n   OnDestroy,\n   Optional,\n   QueryList,\n+  signal,\n+  WritableSignal,\n   ViewChild,\n } from '@angular/core';\n import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions, ThemePalette} from '@angular/material/core';\n@@ -47,6 +50,17 @@ import {ENTER, SPACE} from '@angular/cdk/keycodes';\n import {MAT_TABS_CONFIG, MatTabsConfig} from '@angular/material/tabs';\n import {MatPaginatedTabHeader, MatPaginatedTabHeaderItem} from './paginated-tab-header';\n \n+// Focus state stays local to the owned implementation and does not add a public API.\n+const focusedItems = new WeakMap<_MatTabNavBase, WritableSignal<MatPaginatedTabHeaderItem | null>>();\n+function focusedItemFor(nav: _MatTabNavBase): WritableSignal<MatPaginatedTabHeaderItem | null> {\n+  let value = focusedItems.get(nav);\n+  if (!value) {\n+    value = signal<MatPaginatedTabHeaderItem | null>(null);\n+    focusedItems.set(nav, value);\n+  }\n+  return value;\n+}\n+\n // Increasing integer for generating unique ids for tab nav components.\n let nextUniqueId = 0;\n \n@@ -110,7 +124,7 @@ export abstract class _MatTabNavBase\n     changeDetectorRef: ChangeDetectorRef,\n     viewportRuler: ViewportRuler,\n     platform: Platform,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);\n   }\n@@ -127,6 +141,9 @@ export abstract class _MatTabNavBase\n     });\n \n     super.ngAfterContentInit();\n+    this.indexFocused.pipe(startWith(null), takeUntil(this._destroyed)).subscribe(() => {\n+      focusedItemFor(this).set(this._items?.get(this.focusIndex) || null);\n+    });\n   }\n \n   /** Notifies the component that the active link has been changed. */\n@@ -140,6 +157,7 @@ export abstract class _MatTabNavBase\n     for (let i = 0; i < items.length; i++) {\n       if (items[i].active) {\n         this.selectedIndex = i;\n+        focusedItemFor(this).set(items[i]);\n         this._changeDetectorRef.markForCheck();\n \n         if (this.tabPanel) {\n@@ -151,6 +169,12 @@ export abstract class _MatTabNavBase\n     }\n \n     this.selectedIndex = -1;\n+    if (this.tabPanel) {\n+      // Provide an entry point only when an enabled link is available.\n+      const firstEnabled = items.find(item => !item.disabled);\n+      focusedItemFor(this).set(firstEnabled || null);\n+      this._changeDetectorRef.markForCheck();\n+    }\n     this._inkBar.hide();\n   }\n \n@@ -223,15 +247,15 @@ export class _MatTabLinkBase\n     @Optional() @Inject(MAT_RIPPLE_GLOBAL_OPTIONS) globalRippleOptions: RippleGlobalOptions | null,\n     @Attribute('tabindex') tabIndex: string,\n     private _focusMonitor: FocusMonitor,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super();\n \n     this.rippleConfig = globalRippleOptions || {};\n     this.tabIndex = parseInt(tabIndex) || 0;\n \n-    if (animationMode === 'NoopAnimations') {\n-      this.rippleConfig.animation = {enterDuration: 0, exitDuration: 0};\n+    if (resolveLegacyAnimationMode(animationMode) === 'NoopAnimations') {\n+      this.rippleConfig = {...this.rippleConfig, animation: {enterDuration: 0, exitDuration: 0}};\n     }\n   }\n \n@@ -259,12 +283,6 @@ export class _MatTabLinkBase\n       if (this.disabled) {\n         event.preventDefault();\n       } else if (this._tabNavBar.tabPanel) {\n-        // Only prevent the default action on space since it can scroll the page.\n-        // Don't prevent enter since it can break link navigation.\n-        if (event.keyCode === SPACE) {\n-          event.preventDefault();\n-        }\n-\n         this.elementRef.nativeElement.click();\n       }\n     }\n@@ -294,7 +312,14 @@ export class _MatTabLinkBase\n \n   _getTabIndex(): number {\n     if (this._tabNavBar.tabPanel) {\n-      return this._isActive && !this.disabled ? 0 : -1;\n+      if (this.disabled) {\n+        return -1;\n+      }\n+      const focused = focusedItemFor(this._tabNavBar)();\n+      const target = focused && !focused.disabled\n+        ? focused\n+        : this._tabNavBar._items?.find(item => !item.disabled);\n+      return target === this ? 0 : -1;\n     } else {\n       return this.tabIndex;\n     }\n",
+      "uses": [
+        {
+          "file": "legacy-tabs/internal/tab-nav-bar-base.ts",
+          "module": "@angular/core",
+          "symbol": "QueryList",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/current-repaired-source-integration-v2.json",
+            "sha256": "457f1eea2951b86a49dec994fda8a0842657d080b8ec76e25835d42f872882d1",
+            "bytes": 2076179
+          }
+        }
+      ]
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+      "prior_commit": "1566f7d792d1e4e091a5c3b14ac883fbf92f0fa2",
+      "prior_sha256": "339cd7dee4e6431d4a603b215bf5a78fb654b23dfb49bfe50246cb44af17515e",
+      "current_commit": "38ee8359c688c039c6ae1db858f11282241d53ff",
+      "current_sha256": "7943cc105951aade5bcae9fb8763cbac0e9413b9ea739d381b6aea30831d3ab6",
+      "full_diff_sha256": "b0b62049b237a0e7df78ef177e8cb5b8e7d4db7a7814356543da2c05967e48de",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts b/projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts\nindex ce4b225d6..ccaffba40 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts\n@@ -9,8 +9,9 @@\n  * Owned Material-16 `_MatTabGroupBase`.\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {\n-  ANIMATION_MODULE_TYPE,\n   AfterContentChecked,\n   AfterContentInit,\n   ChangeDetectionStrategy,\n@@ -233,9 +234,10 @@ export abstract class _MatTabGroupBase\n     elementRef: ElementRef,\n     protected _changeDetectorRef: ChangeDetectorRef,\n     @Inject(MAT_TABS_CONFIG) @Optional() defaultConfig?: MatTabsConfig,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string,\n   ) {\n     super(elementRef);\n+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);\n     this._groupId = nextId++;\n     this.animationDuration =\n       defaultConfig && defaultConfig.animationDuration ? defaultConfig.animationDuration : '500ms';\n",
+      "uses": [
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "EventEmitter",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/tabs-tab-group-base-review.json",
+            "sha256": "2cded35d2e8368771f9a83afd7e7fe386179b1295944853f9c259e1aa4d8ff10"
+          }
+        },
+        {
+          "file": "legacy-tabs/internal/tab-group-base.ts",
+          "module": "@angular/core",
+          "symbol": "QueryList",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/tabs-tab-group-base-review.json",
+            "sha256": "2cded35d2e8368771f9a83afd7e7fe386179b1295944853f9c259e1aa4d8ff10"
+          }
+        }
+      ]
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+      "prior_commit": "06506ea39cca715aca53272f8ab70eaa94e62e0c",
+      "prior_sha256": "89e91390739e518a2a3e9dbdd8d75ff09dfcaa94bfe4bccc73d86f1e577c206c",
+      "current_commit": "38ee8359c688c039c6ae1db858f11282241d53ff",
+      "current_sha256": "4613064c4a0b05cc3551407512252d9f4f485f1ee0db4334b4f2c3e549ecf2fb",
+      "full_diff_sha256": "3e4489d8155c9e771485dae00a5b72eedcb50147cf2c999fced199901cce1f55",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts b/projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts\nindex 6e6d07336..ddede6910 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts\n@@ -6,12 +6,13 @@\n  * Use of this source code is governed by an MIT-style license that can be\n  * found in the LICENSE file at https://angular.io/license\n  */\n+\n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n import {FocusMonitor} from '@angular/cdk/a11y';\n import {Directionality} from '@angular/cdk/bidi';\n import {Platform} from '@angular/cdk/platform';\n import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';\n import {\n-  ANIMATION_MODULE_TYPE,\n   Attribute,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n@@ -78,7 +79,7 @@ export class MatLegacyTabNav extends _MatTabNavBase {\n     changeDetectorRef: ChangeDetectorRef,\n     viewportRuler: ViewportRuler,\n     platform: Platform,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(elementRef, dir, ngZone, changeDetectorRef, viewportRuler, platform, animationMode);\n   }\n@@ -119,7 +120,7 @@ export class MatLegacyTabLink extends _MatTabLinkBase implements OnDestroy {\n     @Optional() @Inject(MAT_RIPPLE_GLOBAL_OPTIONS) globalRippleOptions: RippleGlobalOptions | null,\n     @Attribute('tabindex') tabIndex: string,\n     focusMonitor: FocusMonitor,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(tabNavBar, elementRef, globalRippleOptions, tabIndex, focusMonitor, animationMode);\n     this._tabLinkRipple = new RippleRenderer(this, ngZone, elementRef, platform);\n",
+      "uses": [
+        {
+          "file": "legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+          "module": "@angular/core",
+          "symbol": "QueryList",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+            "sha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295"
+          }
+        }
+      ]
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts",
+      "prior_commit": "107ccae1864dc4cbc56c4af1b8e70983a1fe947f",
+      "prior_sha256": "8cdd88d202dce54dcde31ac0f9bda0f3e73726b8b611cab4fbcf7cbf4375a147",
+      "current_commit": "38ee8359c688c039c6ae1db858f11282241d53ff",
+      "current_sha256": "8cdd88d202dce54dcde31ac0f9bda0f3e73726b8b611cab4fbcf7cbf4375a147",
+      "full_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "full_diff": "",
+      "uses": [
+        {
+          "file": "legacy-radio/internal/radio-base.ts",
+          "module": "@angular/core",
+          "symbol": "EventEmitter",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/frozen-radio-option-roles-v1.json",
+            "sha256": "1755e41b5419c587035d272b2ea994b08588f0d9deaed98a93cc6e3c74c8961f",
+            "bytes": 262970
+          }
+        },
+        {
+          "file": "legacy-radio/internal/radio-base.ts",
+          "module": "@angular/core",
+          "symbol": "QueryList",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/frozen-radio-option-roles-v1.json",
+            "sha256": "1755e41b5419c587035d272b2ea994b08588f0d9deaed98a93cc6e3c74c8961f",
+            "bytes": 262970
+          }
+        }
+      ]
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "prior_commit": "4e605d28d6cbb0a321bc42e97a326f0d8b745649",
+      "prior_sha256": "120ab123d79e58ea256211cafa50268dba3ce26524426e88b0347a8624aee68d",
+      "current_commit": "38ee8359c688c039c6ae1db858f11282241d53ff",
+      "current_sha256": "66e8e28ad78a5bf18cb2563f95fe8df48be821dddc9e124d13fe821ef0734c00",
+      "full_diff_sha256": "5c1606d596ccd2f2db6881d8610689e144af0eb88683a328d94d22d6865fa8e4",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-select/internal/select-base.ts b/projects/ngx-material-legacy/legacy-select/internal/select-base.ts\nindex 9b0918811..dfa3c4f10 100644\n--- a/projects/ngx-material-legacy/legacy-select/internal/select-base.ts\n+++ b/projects/ngx-material-legacy/legacy-select/internal/select-base.ts\n@@ -22,6 +22,7 @@ import {\n   A,\n   DOWN_ARROW,\n   ENTER,\n+  ESCAPE,\n   hasModifierKey,\n   LEFT_ARROW,\n   RIGHT_ARROW,\n@@ -39,6 +40,7 @@ import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/lega\n import {MAT_SELECT_CONFIG} from '@angular/material/select';\n import {\n   AfterContentInit,\n+  AfterViewInit,\n   Attribute,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n@@ -219,6 +221,7 @@ export abstract class _MatSelectBase<C>\n   extends _MatSelectReactiveMixinBase\n   implements\n     AfterContentInit,\n+    AfterViewInit,\n     OnChanges,\n     OnDestroy,\n     OnInit,\n@@ -347,6 +350,7 @@ export abstract class _MatSelectBase<C>\n   /** Overlay pane containing the options. */\n   @ViewChild(CdkConnectedOverlay)\n   protected _overlayDir: CdkConnectedOverlay;\n+  private _overlayKeydownBound = false;\n \n   /** Classes to be passed to the select panel. Supports the same syntax as `ngClass`. */\n   @Input() panelClass: string | string[] | Set<string> | {[key: string]: any};\n@@ -584,6 +588,23 @@ export abstract class _MatSelectBase<C>\n     this._initialized.complete();\n   }\n \n+  ngAfterViewInit() {\n+    if (this._motionDestroyed || this._overlayKeydownBound || !this._overlayDir) {\n+      return;\n+    }\n+    this._overlayKeydownBound = true;\n+    // Let the select own Escape so the CDK does not detach the panel before\n+    // the select's exit lifecycle has finished. This also keeps an interrupted\n+    // exit attached when the user immediately reopens the panel.\n+    this._overlayDir.disableClose = true;\n+    this._overlayDir.overlayKeydown.pipe(takeUntil(this._destroy)).subscribe(event => {\n+      if (event.keyCode === ESCAPE && !hasModifierKey(event)) {\n+        event.preventDefault();\n+        this.close();\n+      }\n+    });\n+  }\n+\n   ngDoCheck() {\n     const newAriaLabelledby = this._getTriggerAriaLabelledby();\n     const ngControl = this.ngControl;\n",
+      "uses": [
+        {
+          "file": "legacy-select/internal/select-base.ts",
+          "module": "@angular/core",
+          "symbol": "EventEmitter",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/select-main-59-v1.json",
+            "sha256": "7bda6cc6f106fda15196b9ee473b73cb89cdd8b159feffb37407abc446213729"
+          }
+        },
+        {
+          "file": "legacy-select/internal/select-base.ts",
+          "module": "@angular/core",
+          "symbol": "QueryList",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/select-main-59-v1.json",
+            "sha256": "7bda6cc6f106fda15196b9ee473b73cb89cdd8b159feffb37407abc446213729"
+          }
+        }
+      ]
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+      "prior_commit": "30d1c0f647321896e01b6694d4860da1401cbee2",
+      "prior_sha256": "5f9b5fbe09d5bdc50bcb937e458ffb83bd49dddca1b0c0c64fadb5d267cfe6a3",
+      "current_commit": "38ee8359c688c039c6ae1db858f11282241d53ff",
+      "current_sha256": "5f9b5fbe09d5bdc50bcb937e458ffb83bd49dddca1b0c0c64fadb5d267cfe6a3",
+      "full_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "full_diff": "",
+      "uses": [
+        {
+          "file": "legacy-menu/internal/menu-trigger-base.ts",
+          "module": "@angular/core",
+          "symbol": "EventEmitter",
+          "prior_review": {
+            "path": "compatibility/f10/authored-use-reviews/frozen-menu-source-roles-v1.json",
+            "sha256": "c192cde269592cc19075896f121a15c93c4c380996334e4e6a7067496adbae48",
+            "bytes": 1102212
+          }
+        }
+      ]
+    }
+  ]
+}
