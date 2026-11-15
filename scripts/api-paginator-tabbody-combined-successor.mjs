@@ -1,0 +1,19 @@
+/** @license Copyright Google LLC All Rights Reserved. Copyright (c) 2026 Ryan Lester. MIT. */
+/** Finite 877c predecessor to 0409 packed source and strict-program transition. */
+import {qualifyCombinedArtifactSubject} from './api-combined-d70-image.mjs';
+import {readFileSync} from 'node:fs';import {join,dirname} from 'node:path';import {fileURLToPath} from 'node:url';import {gunzipSync} from 'node:zlib';import {createHash} from 'node:crypto';import {isDeepStrictEqual} from 'node:util';
+import {inputHarnessClosureFingerprint} from './api-input-harness-contract.mjs';
+const sha=x=>createHash('sha256').update(x).digest('hex'),root=join(dirname(fileURLToPath(import.meta.url)),'..');
+const base={package:'@ngx-compat/material-legacy',version:'22.0.0-rc.0',package_sha256:'252144295470393ba5cd56ee0fc3ead5d63e84a49e15139fad7bf4d8fbe8ff93'};
+const delta={core:[36343,'8fe7acf0ab671aa9155edc40f54b4a9ea435575565b23c01c5a95196c8b2abcf',36758,'40e2cd4aed9132372fc88482a6fc7eea709c1176e7e7f8527e7548d173f1861c'],select:[28926,'8631a9313db5c51f3197ba1dc5cd0aafcca40fcee92ff277621799f3758c5015',29019,'646adf43142b70f5625220e421bc73ea9b0f1ddfe03be8b8b8646ec00e30c5b3'],tooltip:[16803,'d8c090d267b10f104f569c27fe4e4fa46eb9ffda7ed378b8b60722b9df755440',16172,'fdfa061d76a242816565bf2b98569232d4456b84e8277528e9ae267376c78dbc'],tabs:[50037,'1bfc9ca71821299ca40ecff4fe35faeabb18e2569a6d2e3d2fd13c9a9141b334',48484,'0b2cc570aba5b6f7ee39f0f7c14748741f8ea048f0f3941a5b870b43764b64ca']};
+const profiles={'legacy-paginator':{names:['core','select','tooltip'],count:331,prior:'10fa39b3929b84428138697106da94aa203bade0912e4208faaa0ef23acc51a1'},'legacy-tabs':{names:['core','tabs'],count:307,prior:'f445d9c82890f13bb412f77e24605478ae6ca3e53766af0583e8a94f54a3d1f6'}};
+export function qualifyPaginatorTabBodyClosure(rows,family){try{const p=profiles[family];if(!p||!Array.isArray(rows)||rows.length!==p.count)return false;const priorRows=rows.slice();for(const name of p.names){const [ob,oh,nb,nh]=delta[name],path='types/ngx-compat-material-legacy-legacy-'+name+'.d.ts',indexes=rows.flatMap((r,i)=>r.package===base.package&&r.path===path?[i]:[]);if(indexes.length!==1||!isDeepStrictEqual(rows[indexes[0]],{...base,path,bytes:nb,sha256:nh}))return false;priorRows[indexes[0]]={...base,path,bytes:ob,sha256:oh};}return inputHarnessClosureFingerprint(priorRows)===p.prior;}catch{return false;}}
+function apply(prior,transitions){let result='',offset=0;for(const [start,end,oldText,newText] of transitions){if(start<offset||prior.slice(start,end)!==oldText)throw Error('transition differs');result+=prior.slice(offset,start)+newText;offset=end;}return result+prior.slice(offset);}
+export function qualifyPaginatorTabBodyCombined(context,family){try{
+ if(!profiles[family]||!qualifyCombinedArtifactSubject(readFileSync(context.tarball),context.packageRoot))return false;
+ const dataBytes=readFileSync(join(root,'compatibility/rc/qualification/api-paginator-tabbody-combined-v1/transitions.json.gz'));if(sha(dataBytes)!=='089262767279149e07bff45695d3a90b00457ce4a677d040490126a3d28ad4de')return false;const data=JSON.parse(gunzipSync(dataBytes)),x=data[family],bundle=join(context.packageRoot,'fesm2022/ngx-compat-material-legacy-'+family+'.mjs'),mapBytes=readFileSync(bundle+'.map'),map=JSON.parse(mapBytes);
+ if(sha(readFileSync(bundle))!==x.current_bundle||sha(mapBytes)!==x.current_map||!isDeepStrictEqual(map.sources,x.sources)||map.sourcesContent.length!==x.prior.length)return false;
+ for(let i=0;i<x.sources.length;i++)if(apply(x.prior[i],x.transitions[x.sources[i]]||[])!==map.sourcesContent[i])return false;
+ for(const name of profiles[family].names){const d=data[name+'-declaration'],current=readFileSync(join(context.packageRoot,'types/ngx-compat-material-legacy-legacy-'+name+'.d.ts'));if(sha(d.prior)!==d.prior_sha||sha(current)!==d.current_sha||apply(d.prior,d.transitions)!==current.toString())return false;}
+ return true;
+}catch{return false;}}

@@ -1,3 +1,4 @@
+import {combinedFullViewportObservationProblems} from './api-full-combined-viewport-successor.mjs';
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -10,12 +11,13 @@ import {compilerConstructorContract} from './api-compiler-constructor-contract.m
 import {captureFactoryConstructorInputs} from './api-factory-constructor-inputs.mjs';
 import {partitionPublicConstructorRequests,publicConstructorPartitionProblems} from './api-public-constructor-internals.mjs';
 import {ownedNodeInjectorProfile,qualifyOwnedNodeInjector,captureOwnedNodeInjector,ownedNodeInjectorObservationProblems} from './api-owned-node-injector-context.mjs';
+import {qualifyAttributeOwnedMode,attributeOwnedModeProfile,captureAttributeOwnedMode,attributeOwnedModeReceiptProblems} from './api-attribute-owned-mode-successor.mjs';
 import {selectViewportObservationProblems} from './api-select-viewport-contract.mjs';
 
 const flags=['optional','self','skipSelf','host'];
 
 /** Candidate compiler observations must agree with original expectations and actual token objects. */
-export async function attributeFactoryContract(Type,core,source,originalParameters,matchToken,ownedContext){
+export async function attributeFactoryContract(Type,core,source,originalParameters,matchToken,ownedContext,ownedModeContext){
  const compiler=compilerConstructorContract(source,Type.name,{resolveInherited:true});
  let parameterType=Type;
  for(const [index,name]of compiler.inheritance.entries()){
@@ -34,6 +36,7 @@ export async function attributeFactoryContract(Type,core,source,originalParamete
   ownedNodeInjector=qualifyOwnedNodeInjector({...ownedContext,Type,parameterType,core,source,compiler,metadata,originalParameters});
  if(!Array.isArray(metadata)||metadata.length!==originalParameters.length+(ownedNodeInjector?1:0)||compiler.parameters.length!==metadata.length)
   throw Error('original/compiler/runtime constructor parameter counts differ');
+ const ownedMode=ownedModeContext&&attributeOwnedModeProfile(ownedModeContext.symbol)?qualifyAttributeOwnedMode({...ownedModeContext,Type,parameterType,core,source,compiler,metadata,originalParameters}):null;
  const parameters=[];
  for(let index=0;index<originalParameters.length;index++){
   const reflected=metadata[index],original=originalParameters[index],declared=compiler.parameters[index];
@@ -55,10 +58,10 @@ export async function attributeFactoryContract(Type,core,source,originalParamete
   if(attribute!==declared.attribute||attribute!==(original.attribute??null))throw Error('original/compiler/runtime attribute names differ');
   for(const flag of flags)if(options[flag]!==Boolean(declared[flag])||options[flag]!==Boolean(original[flag]))
    throw Error('original/compiler/runtime '+flag+' differs at parameter '+index);
-  if(attribute===null&&!(await matchToken(original,token)))throw Error('actual constructor token identity differs at parameter '+index);
+  if(attribute===null&&!(ownedMode&&index===ownedMode.constructor_index)&&!(await matchToken(original,token)))throw Error('actual constructor token identity differs at parameter '+index);
   parameters.push({index,token,attribute,...options});
  }
- return {compiler,parameters,...(ownedNodeInjector?{ownedNodeInjector}:{})};
+ return {compiler,parameters,...(ownedMode?{ownedMode,ownedModeCore:core,ownedModeToken:ownedModeContext.owned,ownedModeLayout:ownedModeContext.layout}:{}),...(ownedNodeInjector?{ownedNodeInjector}:{})};
 }
 
 /** Run unchanged factory in an active public node; capture inputs through its compiler type override. */
@@ -103,7 +106,8 @@ export function executeAttributeFactory(Type,core,contract,node,runFactory,attri
   constructorEvidence.push({index:parameter.index,attribute:null,input_verified:true,
    scope_challenge:parameter.token===core.ChangeDetectorRef?'pending-public-view-destruction':null});
  }
- return {...factory,value:captured.value,capturedInputs:captured.inputs,constructorCapture:captured,requests:[...requests,...partition.requests],constructorEvidence,detectors,
+ const ownedMode=contract.ownedMode?captureAttributeOwnedMode(contract.ownedMode,captured,core,contract.ownedModeToken,contract.ownedModeLayout,node,factory.requests,runFactory):null;
+ return {...factory,...(ownedMode?{ownedModeContext:ownedMode}:{}),value:captured.value,capturedInputs:captured.inputs,constructorCapture:captured,requests:[...requests,...partition.requests],constructorEvidence,detectors,
   ...(owned?{ownedNodeInjectorInput:owned.input,ownedNodeInjectorContext:owned.observation}:{}),
   peerConstructorPartition:partition.observation,
   compilerObservation:{...contract.compiler,runtime_inheritance_verified:true}};
@@ -141,12 +145,12 @@ export function attributeConstructorObservationProblems(row,{force=false,artifac
   if(JSON.stringify(compiler.parameters.at(-1))!==JSON.stringify(row.factory_owned_node_injector_context?.parameter))
    problems.push('owned trailing Injector compiler observation differs');
   const expected=parameters.filter(parameter=>!parameter.attribute),requests=row.runtime_requests;
-  const viewportProblems=ownedProfile.family==='legacy-select'?selectViewportObservationProblems(row,artifactContext):[];problems.push(...viewportProblems);
-  const selectViewport=ownedProfile.family==='legacy-select'&&viewportProblems.length===0;
+  const viewportProblems=ownedProfile.family==='legacy-select'?(row.runtime_requests?.[0]?.intentional_token_difference?.proof?.kind==='combined-full-viewport-v1'?combinedFullViewportObservationProblems(row,artifactContext):selectViewportObservationProblems(row,artifactContext)):[];problems.push(...viewportProblems);
+  const selectViewport=ownedProfile.family==='legacy-select'&&viewportProblems.length===0;const mode=row.factory_attribute_owned_mode_context;const modeOkay=mode&&!attributeOwnedModeReceiptProblems(mode,row.symbol,artifactContext||{}).length;
   if(!Array.isArray(requests)||requests.length!==expected.length||expected.some((parameter,index)=>{
    const request=requests[index];
    return !request||request.expected_ident!==parameter.ident||request.expected_spec!==parameter.spec
-    ||request.identity_matched!==(selectViewport&&index===0?false:true)||request.unresolved!==false||request.observation_evidence!=='actual compiler metadata token identity and captured constructor input'
+    ||request.identity_matched!==((selectViewport&&index===0)||(modeOkay&&index===mode.di_index)?false:true)||request.unresolved!==false||request.observation_evidence!=='actual compiler metadata token identity and captured constructor input'
     ||flags.some(flag=>request[flag]!==Boolean(parameter[flag])||request['expected_'+flag]!==Boolean(parameter[flag]));
   }))problems.push('owned original constructor request identity/options evidence incomplete');
  }

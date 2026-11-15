@@ -1,3 +1,4 @@
+import {combinedTokenSignatureProof} from './api-combined-token-signatures.mjs';
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -107,7 +108,7 @@ export function tabTokenProof(symbol,file,context){
  }catch{return null;}
 }
 export function settleTabToken(symbol,file,signature,context){
- const proof=tabTokenProof(symbol,file,context);if(!proof)return signature;
+ const proof=tabTokenProof(symbol,file,context)||combinedTokenSignatureProof(symbol,file,context);if(!proof)return signature;
  const expected=new Set([JSON.stringify(["token MAT_TAB 'MAT_TAB'",null]),JSON.stringify([null,'const MAT_LEGACY_TAB:InjectionToken<any>'])]);
  const rows=(signature.rows||[]).filter(r=>r.status==='mismatch'&&expected.has(JSON.stringify([r.historical,r.owned])));
  if(rows.length!==2||new Set(rows.map(r=>JSON.stringify([r.historical,r.owned]))).size!==2||signature.blocking.length!==2||!signature.blocking.includes("token MAT_TAB 'MAT_TAB'")||!signature.blocking.includes('const MAT_LEGACY_TAB:InjectionToken<any>'))return signature;

@@ -5,6 +5,7 @@
  *
  * Complete image identity for the finite reviewed menu artifact.
  */
+import {qualifyCombinedArtifactSubject} from './api-combined-d70-image.mjs';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
 import {readFileSync,readdirSync,lstatSync,realpathSync} from 'node:fs';
@@ -12,7 +13,8 @@ import {join} from 'node:path';
 import {createRequire} from 'node:module';
 import {qualifyApiV8Archive as qualifyOldApiV8Archive} from './api-v8-artifact-successor.mjs';
 import {qualifyApiHintIdArchive,API_HINT_ID_ARTIFACT_SHA,API_HINT_ID_FORM_BUNDLE_SHA,API_HINT_ID_FORM_MAP_SHA,API_HINT_ID_FORM_SOURCE_SHA} from './api-hint-id-artifact-successor.mjs';
-const qualifyApiV8Archive = archive => qualifyOldApiV8Archive(archive) || qualifyApiHintIdArchive(archive);
+
+const qualifyApiV8Archive = archive => qualifyOldApiV8Archive(archive) || qualifyApiHintIdArchive(archive) || qualifyCombinedArtifactSubject(archive);
 const sha=x=>createHash('sha256').update(x).digest('hex');
 // Preserve earlier profiles; the v8 successor separately proves its exact image.
 export const MENU_TAR_SHA='a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2';

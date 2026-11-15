@@ -1,5 +1,6 @@
 /** @license Copyright Google LLC All Rights Reserved. Copyright (c) 2026 Ryan Lester. MIT. */
 /** Two exact current constructor additions, separate from historical DI inputs. */
+import {qualifyCombinedArtifactSubject,API_COMBINED_D70_SHA} from './api-combined-d70-image.mjs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
@@ -9,6 +10,7 @@ import {qualifyApiV8Archive as qualifyOldApiV8Archive,API_V8_ARTIFACT_SHA} from 
 import {qualifyApiHintIdArchive,API_HINT_ID_ARTIFACT_SHA,API_HINT_ID_FORM_BUNDLE_SHA,API_HINT_ID_FORM_MAP_SHA,API_HINT_ID_FORM_SOURCE_SHA} from './api-hint-id-artifact-successor.mjs';
 const qualifyApiV8Archive = archive => qualifyOldApiV8Archive(archive) || qualifyApiHintIdArchive(archive);
 import {exactMenuArtifact} from './api-menu-artifact.mjs';
+import {API_NODE_COMBINED_SHA,API_NODE_COMBINED_BUNDLES} from './api-node-combined-artifact-successor.mjs';
 
 const profiles=Object.freeze({
  'legacy-form-field/primary/MatLegacyFormField':Object.freeze({family:'legacy-form-field',public_name:'MatLegacyFormField',parameter_owner:'MatLegacyFormField',original_arity:7,bundle_sha256:'d77d13c903ecb0f982e76ad2e082a46e2bfd9c5e61b291d65a919adefb489eee'}),
@@ -23,8 +25,8 @@ export function qualifyOwnedNodeInjector({symbol,Type,parameterType,core,source,
  const profile=ownedNodeInjectorProfile(symbol);assert.ok(profile,'unknown owned node Injector profile');
  assert.equal(symbol.family,profile.family);assert.equal(symbol.name,profile.public_name);
  assert.equal(hash(JSON.stringify(symbol.shape)),shapes[symbol.symbol_id]);
- assert.ok(context?.tarball&&context.packageRoot);const archive=readFileSync(context.tarball),isHint=qualifyApiHintIdArchive(archive);assert.ok(isHint||qualifyOldApiV8Archive(archive));const artifact=isHint?API_HINT_ID_ARTIFACT_SHA:API_V8_ARTIFACT_SHA,bundle=isHint&&symbol.symbol_id==='legacy-form-field/primary/MatLegacyFormField'?API_HINT_ID_FORM_BUNDLE_SHA:profile.bundle_sha256;
- assert.ok(exactMenuArtifact(context,context.packageRoot));
+ assert.ok(context?.tarball&&context.packageRoot);const archive=readFileSync(context.tarball),isCombined=qualifyCombinedArtifactSubject(archive,context.packageRoot),isHint=!isCombined&&qualifyApiHintIdArchive(archive);assert.ok(isCombined||isHint||qualifyOldApiV8Archive(archive));const artifact=isCombined?isCombined.artifact_sha256:isHint?API_HINT_ID_ARTIFACT_SHA:API_V8_ARTIFACT_SHA,bundle=isCombined?API_NODE_COMBINED_BUNDLES[profile.family]:isHint&&symbol.symbol_id==='legacy-form-field/primary/MatLegacyFormField'?API_HINT_ID_FORM_BUNDLE_SHA:profile.bundle_sha256;
+ assert.ok(isCombined||exactMenuArtifact(context,context.packageRoot));
  const file='fesm2022/ngx-compat-material-legacy-'+profile.family+'.mjs',raw=readFileSync(join(context.packageRoot,file));
  assert.equal(hash(raw),bundle);assert.equal(raw.toString(),source);
  assert.equal(Type.name,profile.public_name);assert.equal(parameterType.name,profile.parameter_owner);
@@ -40,7 +42,7 @@ export function qualifyOwnedNodeInjector({symbol,Type,parameterType,core,source,
 export function captureOwnedNodeInjector(proof,captured,core,node){
  const profile=profiles[proof?.symbol_id];assert.ok(profile);
  assert.equal(captured.constructor_calls,1);assert.equal(captured.inputs.length,profile.original_arity+1);
- const input=captured.inputs[profile.original_arity];assert.equal(typeof input?.get,'function');assert.equal(captured.value._injector,input);
+ const input=captured.inputs[profile.original_arity];assert.equal(typeof input?.get,'function');assert.ok(captured.value._injector===input);
  const element=node.element.nativeElement;
  assert.equal(input.get(core.ElementRef).nativeElement,element);assert.equal(node.injector.get(core.ElementRef).nativeElement,element);
  assert.equal(input.get(core.ApplicationRef),node.injector.get(core.ApplicationRef));
@@ -50,7 +52,7 @@ export function captureOwnedNodeInjector(proof,captured,core,node){
 export function finishOwnedNodeInjector(factory,fixture,core){
  if(!factory.ownedNodeInjectorContext)return;
  const input=factory.ownedNodeInjectorInput,context=factory.ownedNodeInjectorContext;
- assert.equal(input,factory.value._injector);assert.equal(input.get(core.ElementRef).nativeElement,fixture.element.element.nativeElement);
+ assert.ok(input===factory.value._injector);assert.equal(input.get(core.ElementRef).nativeElement,fixture.element.element.nativeElement);
  assert.equal(input.get(core.ApplicationRef),fixture.element.injector.get(core.ApplicationRef));
  assert.equal(input.get(fixture.scopeToken),fixture.childValue);assert.equal(fixture.element.injector.get(fixture.scopeToken),fixture.childValue);
  assert.equal(fixture.parentNode.injector.get(fixture.scopeToken),fixture.parentValue);assert.notEqual(fixture.childValue,fixture.parentValue);
@@ -58,12 +60,12 @@ export function finishOwnedNodeInjector(factory,fixture,core){
 }
 
 function expectedContext(symbolId,artifact=API_V8_ARTIFACT_SHA){
- const profile=profiles[symbolId];assert.ok(profile);assert.ok([API_V8_ARTIFACT_SHA,API_HINT_ID_ARTIFACT_SHA].includes(artifact));const bundle=artifact===API_HINT_ID_ARTIFACT_SHA&&symbolId==='legacy-form-field/primary/MatLegacyFormField'?API_HINT_ID_FORM_BUNDLE_SHA:profile.bundle_sha256;
+ const profile=profiles[symbolId];assert.ok(profile);assert.ok([API_V8_ARTIFACT_SHA,API_HINT_ID_ARTIFACT_SHA,API_NODE_COMBINED_SHA,API_COMBINED_D70_SHA].includes(artifact));const bundle=[API_NODE_COMBINED_SHA,API_COMBINED_D70_SHA].includes(artifact)?API_NODE_COMBINED_BUNDLES[profile.family]:artifact===API_HINT_ID_ARTIFACT_SHA&&symbolId==='legacy-form-field/primary/MatLegacyFormField'?API_HINT_ID_FORM_BUNDLE_SHA:profile.bundle_sha256;
  return {symbol_id:symbolId,artifact_sha256:artifact,bundle_sha256:bundle,parameter:parameter(profile),original_arity:profile.original_arity,current_arity:profile.original_arity+1,constructor_calls:1,stored_input_identical:true,node_element_matched:true,application_matched:true,child_scope_matched:true,parent_scope_distinct:true};
 }
 export function ownedNodeInjectorObservationProblems(row,{tarball}={}){
  const profile=ownedNodeInjectorProfile(row.symbol);if(!profile)return [];let artifact=API_V8_ARTIFACT_SHA;
- if(tarball){try{const bytes=readFileSync(tarball);artifact=qualifyApiHintIdArchive(bytes)?API_HINT_ID_ARTIFACT_SHA:qualifyOldApiV8Archive(bytes)?API_V8_ARTIFACT_SHA:null;}catch{artifact=null;}}
+ if(tarball){try{const bytes=readFileSync(tarball);artifact=qualifyCombinedArtifactSubject(bytes)?.artifact_sha256||(qualifyApiHintIdArchive(bytes)?API_HINT_ID_ARTIFACT_SHA:qualifyOldApiV8Archive(bytes)?API_V8_ARTIFACT_SHA:null);}catch{artifact=null;}}
  if(!artifact)return ['owned trailing Injector artifact evidence incomplete'];
  return row.factory_outcome==='returned'&&row.factory_returned_owned_instance===true&&row.factory_node_kind==='element'
   &&isDeepStrictEqual(row.factory_context_modules,[profile.family+'/primary/'+profile.public_name+'Module'])

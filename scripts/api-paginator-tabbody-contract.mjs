@@ -13,6 +13,7 @@ const qualifyApiV8Archive = archive => qualifyOldApiV8Archive(archive) || qualif
 import {readFileSync,existsSync,realpathSync,readdirSync,lstatSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
 import {inputHarnessClosureFingerprint} from './api-input-harness-contract.mjs';
+import {qualifyPaginatorTabBodyCombined,qualifyPaginatorTabBodyClosure} from './api-paginator-tabbody-combined-successor.mjs';
 import {dirname,join,relative,isAbsolute} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const require=createRequire(import.meta.url),ROOT=join(dirname(fileURLToPath(import.meta.url)),'..');
@@ -54,7 +55,7 @@ function peerImage(req,name){
 }
 
 const OLD='a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2', V7='66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca';
-function strictDeclaration(ts,file,p,image){
+function strictDeclaration(ts,file,p,image,combined){
  const texts={
   'legacy-paginator':"import {MatLegacyPaginator} from './ngx-compat-material-legacy-legacy-paginator'; abstract class P extends MatLegacyPaginator { test(e: MouseEvent): void { this._handlePageSizeTargetClick(e); } } void P;",
   'legacy-tabs':"import {_MatLegacyTabBodyBase} from './ngx-compat-material-legacy-legacy-tabs'; abstract class T extends _MatLegacyTabBodyBase { test(): boolean { super.ngAfterViewInit(); return this._contentIsVisible; } } void T;"};
@@ -63,8 +64,9 @@ function strictDeclaration(ts,file,p,image){
  const program=ts.createProgram([file.fileName,fixture],options,host);if(ts.getPreEmitDiagnostics(program).length)return null;
  const sources=program.getSourceFiles().filter(f=>f.fileName!==fixture).map(f=>{const real=realpathSync(f.fileName);let dir=dirname(real);while(dir!==dirname(dir)&&!existsSync(join(dir,'package.json')))dir=dirname(dir);const pb=readFileSync(join(dir,'package.json')),pkg=JSON.parse(pb),path=relative(dir,real).split('\\').join('/'),bytes=readFileSync(real);if(!pkg.name||!pkg.version||!path||path.startsWith('../')||isAbsolute(path)||!bytes.equals(Buffer.from(f.text,'utf8')))throw Error('unbound source');return {package:pkg.name,version:pkg.version,package_sha256:hash(pb),path,bytes:bytes.length,sha256:hash(bytes)};});
  const expected=p.family==='legacy-tabs'?'f445d9c82890f13bb412f77e24605478ae6ca3e53766af0583e8a94f54a3d1f6':image===OLD?'bf8117fe8e8685ff6733c1fabfab995ab03f3206ca37c5754b3e0fa9f7d46805':'10fa39b3929b84428138697106da94aa203bade0912e4208faaa0ef23acc51a1';
- if(sources.length!==(p.family==='legacy-tabs'?307:331)||inputHarnessClosureFingerprint(sources)!==expected||program.getSourceFile(file.fileName)?.text!==file.text)return null;
- return {sources:sources.length,closure_sha256:expected,strict:true,skipLibCheck:false};
+ const fingerprint=inputHarnessClosureFingerprint(sources);
+ if(sources.length!==(p.family==='legacy-tabs'?307:331)||(combined?!qualifyPaginatorTabBodyClosure(sources,p.family):fingerprint!==expected)||program.getSourceFile(file.fileName)?.text!==file.text)return null;
+ return {sources:sources.length,closure_sha256:fingerprint,strict:true,skipLibCheck:false};
 }
 const profiles={
  'legacy-paginator/primary/MatLegacyPaginator':{signature:'fb88a43b8fb8b7fb28c3e3f025bc8a05ed78fd6aee74de53033ae4b6df411712',family:'legacy-paginator',name:'MatLegacyPaginator',cls:'MatLegacyPaginator',shape:'1a345b500d21a5b20509f593b266f6769f4194a2a80892f7cd3b3171cb8ea9e0',source:'legacy-paginator/paginator.ts',sourceHash:'4f050bc5f5818f13d33c7428bdd9d7a8a36b4bf70dbb77ac12e088002bbd9540',bundle:'7a153b0a728a95853e60b0e173fd5e30d3a9abd4cb527f4842f14d671bd674cc',map:'335863bcbab446a3006b219dd094f56b2fcd608d5a1bb87cf4f12f57025b74bc',dts:'471d2a6277533e6403b8c8c08551f07f3fbfad913a912c738807af5d93cf9157',rows:['protected method _handlePageSizeTargetClick(MouseEvent):void'],members:['_handlePageSizeTargetClick']},
@@ -77,20 +79,21 @@ export function paginatorTabBodyProof(symbol,file,context){
   const ts=require('typescript'),p=profiles[symbol?.symbol_id];if(!p||symbol.family!==p.family||symbol.kind!=='primary'||symbol.name!==p.name||hash(JSON.stringify(symbol.shape))!==p.shape||process.versions.node!=='24.21.0'||ts.version!=='6.0.3'||!file?.fileName||!context?.tarball||!context?.packageRoot||!context?.referenceRoot)return null;
   if(hash(readFileSync(join(ROOT,'scripts/api-paginator-tabbody-evidence.json')))!=='f674dd6a96e055c7c1b0e74b8450faa781c62a67700fbc668174fdd8590b3ebc')return null;
   const evidence=JSON.parse(readFileSync(join(ROOT,'scripts/api-paginator-tabbody-evidence.json')));for(const [name,sha] of Object.entries(evidence.artifacts)){if(!/^[a-zA-Z0-9_.-]+$/.test(name)||hash(readFileSync(join(ROOT,'compatibility/rc/paginator-tabbody-evidence-v1',name)))!==sha)return null;}
-  const tar=readFileSync(context.tarball),image=hash(tar),v8=qualifyApiV8Archive(tar),v7Profile=image===V7||v8;if((![OLD,V7].includes(image)&&!v8)||!exactExtractedImage(tar,context.packageRoot))return null;
+  const tar=readFileSync(context.tarball),image=hash(tar),v8=qualifyApiV8Archive(tar),v7Profile=image===V7||v8,combined=qualifyPaginatorTabBodyCombined(context,p.family);if((![OLD,V7].includes(image)&&!v8&&!combined)||!exactExtractedImage(tar,context.packageRoot))return null;
   const tabMap=v8?'ce099ab085e59d48108c8259c7f4a576d6f50f4a11e6db4ebdd78d79a4a292c4':'45bfae6e4d4c7d48035347b2a43e65ea3256338f3d95382f8432059c1e272194';
-  const dts=join(context.packageRoot,`types/ngx-compat-material-legacy-${p.family}.d.ts`),bundle=join(context.packageRoot,`fesm2022/ngx-compat-material-legacy-${p.family}.mjs`),mapfile=bundle+'.map';if(realpathSync(file.fileName)!==realpathSync(dts)||hash(file.text)!==p.dts||hash(readFileSync(dts))!==p.dts||hash(readFileSync(bundle))!==(v7Profile&&p.family==='legacy-tabs'?'ab6891ffa20dfd036d6f5ff7d81925df754bed95fc0ca3953a04fec0e3c098ac':p.bundle)||hash(readFileSync(mapfile))!==(v7Profile&&p.family==='legacy-tabs'?tabMap:p.map))return null;
+  const dts=join(context.packageRoot,`types/ngx-compat-material-legacy-${p.family}.d.ts`),bundle=join(context.packageRoot,`fesm2022/ngx-compat-material-legacy-${p.family}.mjs`),mapfile=bundle+'.map',dtsHash=combined&&p.family==='legacy-tabs'?'0b2cc570aba5b6f7ee39f0f7c14748741f8ea048f0f3941a5b870b43764b64ca':p.dts;if(realpathSync(file.fileName)!==realpathSync(dts)||hash(file.text)!==dtsHash||hash(readFileSync(dts))!==dtsHash||!combined&&(hash(readFileSync(bundle))!==(v7Profile&&p.family==='legacy-tabs'?'ab6891ffa20dfd036d6f5ff7d81925df754bed95fc0ca3953a04fec0e3c098ac':p.bundle)||hash(readFileSync(mapfile))!==(v7Profile&&p.family==='legacy-tabs'?tabMap:p.map)))return null;
   for(const [path,sha] of Object.entries(refs))if(hash(readFileSync(join(context.referenceRoot,path)))!==sha)return null;
   for(const [path,sha] of Object.entries(owned))if(hash(readFileSync(join(ROOT,'projects/ngx-material-legacy',path)))!==sha)return null;
   const source=readFileSync(join(ROOT,'projects/ngx-material-legacy',p.source));if(hash(source)!==p.sourceHash)return null;
   const map=JSON.parse(readFileSync(mapfile)),indexes=map.sources.flatMap((x,i)=>x.endsWith('/'+p.source)?[i]:[]);if(indexes.length!==1||hash(map.sourcesContent[indexes[0]])!==p.sourceHash)return null;
   const sf=ts.createSourceFile(bundle,readFileSync(bundle,'utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.JS),classes=sf.statements.filter(n=>ts.isClassDeclaration(n)&&n.name?.text===p.cls);if(sf.parseDiagnostics.length||classes.length!==1)return null;const cls=classes[0];
+  if(combined&&hash(cls.getText(sf))!==(p.family==='legacy-tabs'?'5eedd6151512a05505b1a15836354bd748942660541201e5c3c361d01df0671d':'fb913cba0b9d00bb2ac778cd314df51627c4b8a423f118f64fd88ac5b2094e1e'))return null;
   if(p.members.some(name=>cls.members.filter(m=>m.name?.getText(sf)===name).length!==1))return null;
   const exports=sf.statements.flatMap(n=>ts.isExportDeclaration(n)&&!n.moduleSpecifier&&n.exportClause&&ts.isNamedExports(n.exportClause)?[...n.exportClause.elements]:[]).filter(e=>e.name.text===p.name&&(e.propertyName||e.name).text===p.cls);if(exports.length!==1)return null;
   if(p.family==='legacy-paginator'&&!cls.members.find(m=>m.name?.getText(sf)==='ɵcmp')?.getText(sf).includes('"click": "_handlePageSizeTargetClick($event)"'))return null;
   const req=createRequire(bundle);for(const [name,expected] of Object.entries(peers))if(peerImage(req,name)!==expected)return null;
-  const declaration=strictDeclaration(ts,file,p,image);if(!declaration)return null;
-  return {artifact_sha256:image,source_sha256:p.sourceHash,bundle_sha256:hash(readFileSync(bundle)),declaration,dts_sha256:p.dts,shape_sha256:p.shape,proof:'exact image, tagged source, minimum-peer images and direct FESM AST export',evidence_sha256:'f674dd6a96e055c7c1b0e74b8450faa781c62a67700fbc668174fdd8590b3ebc'};
+  const declaration=strictDeclaration(ts,file,p,image,combined);if(!declaration)return null;
+  return {artifact_sha256:image,source_sha256:p.sourceHash,bundle_sha256:hash(readFileSync(bundle)),declaration,dts_sha256:dtsHash,shape_sha256:p.shape,proof:'exact image, tagged source, minimum-peer images and direct FESM AST export',evidence_sha256:'f674dd6a96e055c7c1b0e74b8450faa781c62a67700fbc668174fdd8590b3ebc'};
  }catch{return null;}
 }
 export function settlePaginatorTabBody(symbol,file,signature,context){

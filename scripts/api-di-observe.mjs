@@ -1,9 +1,15 @@
+import {qualifyCombinedFullViewport,combinedFullViewportCandidate,captureCombinedFullViewport} from './api-full-combined-viewport-successor.mjs';
+import {DIALOG_SERVICE_MODE_SYMBOL,observeDialogServiceMode,challengeDialogServiceMode} from './api-dialog-service-mode-context.mjs';
+import {partitionAttributeMode} from './api-attribute-mode-partition.mjs';
+import {qualifyCombinedTablinkViewport} from './api-tablink-combined-viewport-successor.mjs';
 import {tablinkViewportProof} from './api-tablink-viewport-contract.mjs';
 import {autocompleteViewportProof} from './api-autocomplete-viewport-contract.mjs';
 import {selectViewportProof,selectViewportTokenCandidate} from './api-select-viewport-contract.mjs';
 import {menuTriggerOwnedToken} from './api-menu-trigger-token.mjs';
 import {spinnerViewportProof} from './api-spinner-viewport-contract.mjs';
+import {qualifyCombinedSpinnerViewport,captureCombinedSpinnerViewport} from './api-spinner-combined-viewport-successor.mjs';
 import {existsSync,readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {pathToFileURL} from 'node:url';
 import {join,resolve} from 'node:path';
@@ -16,14 +22,18 @@ import {observeRippleFactory} from './api-ripple-factory.mjs';
 import {originalContextDi} from './api-original-factory-contexts.mjs';
 import {createPublicFactoryContext} from './api-public-node-context.mjs';
 import {attributeFactoryContract,executeAttributeFactory,challengeAttributeDetectorScopes} from './api-attribute-factory.mjs';
+import {attributeOwnedModeProfile,attributeOwnedModeReceiptProblems} from './api-attribute-owned-mode-successor.mjs';
+import {qualifyCombinedArtifactSubject} from './api-combined-d70-image.mjs';
 import {ownedNodeInjectorProfile,finishOwnedNodeInjector,originalOwnedNodeInjectorCapture} from './api-owned-node-injector-context.mjs';
 import {partitionPublicConstructorRequests} from './api-public-constructor-internals.mjs';
-import {ownedMotionProfile,partitionOwnedSelectMotion} from './api-owned-motion-context.mjs';
+import {ownedMotionProfile,partitionOwnedSelectMotion,partitionHeaderOwnedMotion} from './api-owned-motion-context.mjs';
+import {directOwnedModeProfile,directOwnedModeCandidate,partitionDirectOwnedMode,qualifiedExistingOwnedMode,directOwnedModeProblems} from './api-direct-owned-mode-context.mjs';
 import {originalPublicParentTokenRole} from './api-public-parent-token-role.mjs';
 import {captureFactoryConstructorInputs} from './api-factory-constructor-inputs.mjs';
 import {requiredParentFactoryProfile,observeRequiredParentInputs} from './api-required-parent-context.mjs';
 import {callerConfigProfile,createCallerConfigContext,observeCallerConfigInputs,callerConfigLifetimeEvidence} from './api-caller-config-context.mjs';
 import {ownedDialogFocusProfile,partitionOwnedDialogFocus,challengeOwnedDialogFocusDetector} from './api-owned-dialog-focus-context.mjs';
+import {partitionSourceDialogFocus,challengeSourceDialogFocusDetector} from './api-source-dialog-focus-context.mjs';
 import {menuContentContract,observeMenuContentContext,finishMenuContentContext} from './api-menu-content-context.mjs';
 import {simpleSnackProfile,createSimpleSnackContext,observeSimpleSnackInputs,finishSimpleSnackContext} from './api-simple-snack-context.mjs';
 import {dialogOpenerProfile,createDialogOpenerContext,observeDialogOpenerContext,finishDialogOpenerContext} from './api-dialog-opener-context.mjs';
@@ -88,7 +98,7 @@ function isOriginalModule(symbol){
     ||factory.declaration_kind==='published-jit-decorators'&&/\bNgModule\(/.test(factory.declaration)));
 }
 
-export async function observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule,{providers=[],constructorFactory,tableParentKind='legacy',inputParentKind='legacy',inputArtifactContext=null,spinnerProof=null,autocompleteProof=null,selectProof=null}={}){
+export async function observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule,{providers=[],constructorFactory,tableParentKind='legacy',inputParentKind='legacy',inputArtifactContext=null,spinnerProof=null,combinedSpinnerProof=null,autocompleteProof=null,selectProof=null,sourceDialogFocus=false}={}){
   let fixture,factory,parentExecution,requiredParent,requiredParentType,requiredParentToken,requiredParentCapture;
   let requiredParentDestroyed=false,parentLifetimeSubscription;
   let callerConfig,menuContentState,simpleSnack,dialogOpener,autocompleteCapture,tabPortalParent,tabPortalState,tableDefinitionCapture,inputLifetime,inputBehavior;
@@ -111,6 +121,8 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
     // Reauthenticate the original context before using its constructor parameters.
     expectedFactoryDi(symbol.shape,{devMode:core.isDevMode()});
     const attributes=parameters.filter(p=>p.attribute);
+    const combinedOwnedMode = Boolean(attributeOwnedModeProfile(symbol) && inputArtifactContext?.tarball
+      && qualifyCombinedArtifactSubject(readFileSync(inputArtifactContext.tarball),packageRoot));
     const usesTemplate=parameters.some(p=>p.spec==='@angular/core'&&p.imported==='TemplateRef') || Boolean(tabPortal);
     nodeKind=usesTemplate?'template':'element';
     requiredParent=requiredParentFactoryProfile(symbol);
@@ -185,7 +197,7 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
     if(openerProfile)dialogOpener=createDialogOpenerContext(openerProfile,value,await loadRuntimeModule(packageRoot,'legacy-dialog','primary'),core);
     const autocomplete=autocompleteProfile(symbol);
     if(autocomplete)autocompleteCapture=createAutocompleteCapture(autocomplete,core,value,await loadRuntimeModule(packageRoot,'legacy-autocomplete','primary'),resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-autocomplete.mjs'),await importModule('@angular/cdk/layout'));
-    let attributeContract,parentContract,parentType,parentAlias,parentSymbol,parentViewportProof;
+    let attributeContract,parentContract,parentType,parentAlias,parentSymbol,parentViewportProof,combinedParentProof;
     if(attributes.length||ownedNodeInjectorProfile(symbol)){
       if(usesTemplate)throw Error('attribute/template combination remains unsupported');
       const primary=await loadRuntimeModule(packageRoot,symbol.family,'primary');
@@ -195,11 +207,13 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
         ?`ngx-compat-material-legacy-${symbol.family}.mjs`:`ngx-compat-material-legacy-${symbol.family}-testing.mjs`),'utf8');
       attributeContract=await attributeFactoryContract(value,core,source,parameters,async(param,token)=>{
         const owned=param.ident==='ViewportRuler'?await loadRuntimeModule(packageRoot,'legacy-core','primary'):null;
-        if(selectViewportTokenCandidate(symbol,param,owned,token,selectProof,inputArtifactContext))return true;
+        if(selectViewportTokenCandidate(symbol,param,owned,token,selectProof,inputArtifactContext)||combinedFullViewportCandidate(symbol,param,owned,token,selectProof))return true;
         const viewport=ownedViewportIdentity(symbol.family,param,owned||{},token);
         return viewport!==null?viewport:runtimeTokenIdentity(symbol.family,param,exports,
           originalRuntimeAliases(symbols,symbol.family),token,importModule,packageRoot,ownedNodeInjectorProfile(symbol)?symbol:undefined);
-      },ownedNodeInjectorProfile(symbol)?{symbol,context:{...inputArtifactContext,packageRoot}}:undefined);
+      },ownedNodeInjectorProfile(symbol)?{symbol,context:{...inputArtifactContext,packageRoot}}:undefined,
+      combinedOwnedMode?{symbol,owned:await loadRuntimeModule(packageRoot,'legacy-core','primary'),
+        layout:await importModule('@angular/cdk/layout'),exports,context:{...inputArtifactContext,packageRoot}}:undefined);
       if(['legacy-tabs/primary/MatLegacyTabLink','legacy-tabs/primary/_MatLegacyTabLinkBase'].includes(symbol.symbol_id)){
         parentSymbol=symbols.find(s=>s.symbol_id==='legacy-tabs/primary/MatLegacyTabNav');
         if(!parentSymbol)throw Error('original tab-nav caller context missing');
@@ -207,15 +221,27 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
         parentType=exports.MatLegacyTabNav;parentAlias=exports._MatLegacyTabNavBase;
         if(typeof parentType!=='function'||typeof parentAlias!=='function'
           ||!(parentType.prototype instanceof parentAlias))throw Error('owned tab-nav parent identities missing');
-        if(inputArtifactContext)parentViewportProof=tablinkViewportProof(symbol,parentSymbol,symbols.find(s=>s.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'),{...inputArtifactContext,packageRoot},exports,parentType,value);
+        if(combinedOwnedMode){combinedParentProof=qualifyCombinedTablinkViewport({symbol,parent:parentSymbol,owned:exports,parentType,selectedType:value,context:{...inputArtifactContext,packageRoot}});}else if(inputArtifactContext)parentViewportProof=tablinkViewportProof(symbol,parentSymbol,symbols.find(s=>s.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'),{...inputArtifactContext,packageRoot},exports,parentType,value);
         parentContract=await attributeFactoryContract(parentType,core,source,parentSymbol.shape.originalFactoryContext.factory_parameters,async(param,token)=>{
           const owned=param.ident==='ViewportRuler'?await loadRuntimeModule(packageRoot,'legacy-core','primary'):null;
-          if(parentViewportProof&&param.ident==='ViewportRuler'&&param.imported==='ViewportRuler'&&param.spec==='@angular/cdk/scrolling'&&!param.optional&&!param.self&&!param.skipSelf&&!param.host&&token===owned?._LegacyViewport)return true;
+          if((parentViewportProof||combinedParentProof)&&param.ident==='ViewportRuler'&&param.imported==='ViewportRuler'&&param.spec==='@angular/cdk/scrolling'&&!param.optional&&!param.self&&!param.skipSelf&&!param.host&&token===owned?._LegacyViewport)return true;
+          if(combinedParentProof&&param.ident==='ANIMATION_MODULE_TYPE'&&param.imported==='ANIMATION_MODULE_TYPE'&&param.spec==='@angular/platform-browser/animations'&&param.optional&&!param.self&&!param.skipSelf&&!param.host&&token===(await loadRuntimeModule(packageRoot,'legacy-core','primary')).LEGACY_ANIMATION_MODE&&token!==core.ANIMATION_MODULE_TYPE)return true;
           const viewport=ownedViewportIdentity(symbol.family,param,owned||{},token);
           return viewport!==null?viewport:runtimeTokenIdentity(symbol.family,param,exports,
             originalRuntimeAliases(symbols,symbol.family),token,importModule,packageRoot);
         });
       }
+    }
+    let historicalSpinnerViewport,minimumSpinnerViewport,historicalSpinnerMarker,minimumSpinnerMarker;
+    if(combinedSpinnerProof||autocompleteProof?.kind==='combined-full-viewport-v1'||selectProof?.kind==='combined-full-viewport-v1'){
+      const historicalRoot=inputArtifactContext?.historicalCdk16Root,historicalArchive=inputArtifactContext?.historicalCdk16Tarball;
+      if(!historicalRoot||!historicalArchive||createHash('sha256').update(readFileSync(historicalArchive)).digest('hex')!=='a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7'
+        ||createHash('sha256').update(readFileSync(resolve(historicalRoot,'fesm2022/scrolling.mjs'))).digest('hex')!=='7656a68cba9c315d54e834f26a36e4f465e1b76b65418ad3ee9dffc3ac6431d6'
+        ||createHash('sha256').update(readFileSync(resolve(historicalRoot,'package.json'))).digest('hex')!=='b7794ad784818253dec6b2aeea7d0b3b5ac7fa6ac0f8d2e440bf9e581fc2bf15')throw Error('historical CDK 16 viewport image is unbound');
+      historicalSpinnerViewport=(await import(pathToFileURL(resolve(historicalRoot,'fesm2022/scrolling.mjs')).href)).ViewportRuler;
+      minimumSpinnerViewport=(await importModule('@angular/cdk/scrolling')).ViewportRuler;
+      historicalSpinnerMarker={role:'historical16'};minimumSpinnerMarker={role:'minimum22'};
+      providers=[...providers,{provide:historicalSpinnerViewport,useValue:historicalSpinnerMarker},{provide:minimumSpinnerViewport,useValue:minimumSpinnerMarker}];
     }
     fixture=await createPublicFactoryContext(core,importModule,
       {providers:[...(modules.length?[core.importProvidersFrom(...modules.map(m=>m.value))]:[]),...providers,...(simpleSnack?.providers||[])],
@@ -240,7 +266,7 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
         if(capture.constructor_calls!==1||capture.inputs.length!==15||Object.getPrototypeOf(value).ctorParameters?.()[0]?.type!==owned._LegacyViewport
           ||input!==fixture.element.injector.get(owned._LegacyViewport)||factory.value._viewportRuler!==input
           ||capture.inputs[4]?.nativeElement!==fixture.element.element.nativeElement)throw Error('select viewport actual node/constructor identity differs');
-        factory.selectViewportContext={constructor_calls:1,constructor_arity:15,viewport_index:0,actual_node_element:true,owned_input_matches_node_provider:true,owned_metadata_token:true,stored_input_matches:true};
+        factory.selectViewportContext=selectProof.kind==='combined-full-viewport-v1'?captureCombinedFullViewport(selectProof,{capture,node:fixture.element,value:factory.value,owned,historical:historicalSpinnerViewport,minimum:minimumSpinnerViewport,markerHistorical:historicalSpinnerMarker,markerMinimum:minimumSpinnerMarker}):{constructor_calls:1,constructor_arity:15,viewport_index:0,actual_node_element:true,owned_input_matches_node_provider:true,owned_metadata_token:true,stored_input_matches:true};
       }
     }
     if(tabPortalParent){
@@ -260,8 +286,8 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
       parentLifetimeSubscription=fixture.parentNode.owner.destroyed.subscribe(()=>{requiredParentDestroyed=true;});
     if(!attributeContract){
       const injector=(usesTemplate?fixture.template:fixture.element).injector;
-      const spinnerCapture=Boolean(spinnerProof&&symbol.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner');
-      const captureMotionMode=ownedMotionProfile(symbol.symbol_id)?.constructorAnimationIndex!==undefined;
+      const spinnerCapture=Boolean((spinnerProof||combinedSpinnerProof)&&symbol.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner');
+      const captureMotionMode=ownedMotionProfile(symbol.symbol_id)?.constructorAnimationIndex!==undefined||directOwnedModeCandidate(symbol,packageRoot,{...inputArtifactContext,packageRoot})||symbol.symbol_id===DIALOG_SERVICE_MODE_SYMBOL;
       if(constructorFactory!==undefined&&typeof constructorFactory!=='function')throw Error('diagnostic constructor factory must be callable');
       factory=runFactory(requiredParent||callerConfig||captureMotionMode||menuContent||simpleSnack||dialogOpener||autocompleteCapture||tabBody||tabHeader||tabPortal||tableDefinition||input||spinnerCapture?()=>captureFactoryConstructorInputs(value,constructorFactory||value.ɵfac,{beforeConstructor:autocompleteCapture?.beforeConstructor||tableDefinitionCapture?.beforeConstructor}):constructorFactory||value.ɵfac,
         core.Injector,core.runInInjectionContext,{injector,captureStack:true});
@@ -271,7 +297,11 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
         if(spinnerCapture){
           const owned=await loadRuntimeModule(packageRoot,'legacy-core','primary'),input=requiredParentCapture.inputs[6],metadata=value.ctorParameters?.();
           if(requiredParentCapture.constructor_calls!==1||requiredParentCapture.inputs.length!==9||metadata?.[6]?.type!==owned?._LegacyViewport||input!==injector.get(owned._LegacyViewport)||requiredParentCapture.inputs[0]?.nativeElement!==fixture.element.element.nativeElement)throw Error('spinner viewport actual node/constructor identity differs');
-          factory.spinnerViewportContext={constructor_calls:1,constructor_arity:9,viewport_index:6,actual_node_element:true,owned_input_matches_node_provider:true,owned_metadata_token:true};
+          if(combinedSpinnerProof){
+            if(injector.get(historicalSpinnerViewport)!==historicalSpinnerMarker||injector.get(minimumSpinnerViewport)!==minimumSpinnerMarker)throw Error('spinner historical/minimum marker providers missing');
+            factory.combinedSpinnerViewportContext=captureCombinedSpinnerViewport(combinedSpinnerProof,{capture:requiredParentCapture,node:fixture.element,owned,historical:historicalSpinnerViewport,minimum:minimumSpinnerViewport});
+          }else factory.spinnerViewportContext={constructor_calls:1,constructor_arity:9,viewport_index:6,actual_node_element:true,owned_input_matches_node_provider:true,owned_metadata_token:true};
+
         }
         if(requiredParent)factory.requiredParentContext=observeRequiredParentInputs(requiredParent,requiredParentCapture,
           fixture,requiredParentType,requiredParentToken,core);
@@ -279,6 +309,12 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
         if(tableDefinition)factory.tableDefinitionContext=observeTableDefinitionInputs(tableDefinitionCapture,requiredParentCapture,value);
         if(simpleSnack)factory.simpleSnackContext=observeSimpleSnackInputs(simpleSnack,requiredParentCapture,fixture);
       }
+      if(symbol.symbol_id===DIALOG_SERVICE_MODE_SYMBOL&&factory.outcome==='returned'){
+        const owned={core:await loadRuntimeModule(packageRoot,'legacy-core','primary'),dialog:await loadRuntimeModule(packageRoot,'legacy-dialog','primary')};
+        const evidence=observeDialogServiceMode(symbol,value,owned,core,await importModule('@angular/material/core'),requiredParentCapture,factory.requests,fixture,packageRoot,inputArtifactContext);
+        factory.dialogServiceModeContext=challengeDialogServiceMode(evidence,factory.value,value,requiredParentCapture,fixture,core,owned);
+      }
+      if((tabHeader||directOwnedModeCandidate(symbol,packageRoot,{...inputArtifactContext,packageRoot}))&&factory.outcome==='returned'&&factory.requests.some(request=>request.token===core.ANIMATION_MODULE_TYPE))throw Error('owned motion caller requested old engine token before request partitioning');
       if(factory.outcome==='returned'){
         const partition=partitionPublicConstructorRequests(factory.requests,core,runFactory,injector);
         factory.requests=partition.requests;factory.peerConstructorPartition=partition.observation;
@@ -288,6 +324,9 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
       const partition=partitionTabHeaderInjector(factory.requests,core,await loadRuntimeModule(packageRoot,'legacy-tabs','primary'),value,symbol,
         resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-tabs.mjs'),runFactory,fixture.element.injector,factory.value,requiredParentCapture,fixture,await loadRuntimeModule(packageRoot,'legacy-core','primary'),createRequire(resolve(packageRoot,'package.json'))('@angular/cdk/package.json').version);
       factory.requests=partition.requests;factory.tabHeaderContext=partition.observation;
+      const tabs=await loadRuntimeModule(packageRoot,'legacy-tabs','primary'),motion=await loadRuntimeModule(packageRoot,'legacy-core','primary');
+      const motionPartition=partitionHeaderOwnedMotion(factory.requests,core,motion,await importModule('@angular/cdk/layout'),await importModule('@angular/material/core'),value,{core:resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-core.mjs'),caller:resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-tabs.mjs'),owner:tabs.MatLegacyPaginatedTabHeader},runFactory,fixture.element.injector,factory.value,requiredParentCapture);
+      factory.requests=motionPartition.requests;factory.tabHeaderContext.owned_motion=motionPartition.observation;
     }
     if(tabBody&&factory.outcome==='returned'){
       const partition=partitionTabBodyZone(factory.requests,core,await loadRuntimeModule(packageRoot,'legacy-tabs','primary'),value,symbol,
@@ -314,7 +353,7 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
     if(ownedDialogFocusProfile(symbol.symbol_id)&&factory.outcome==='returned'){
       const dialogOwned=await loadRuntimeModule(packageRoot,'legacy-dialog','primary');
       const dialogFile=resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-dialog.mjs');
-      const invoke=(requests=factory.requests,owner=dialogOwned,node=fixture,file=dialogFile)=>partitionOwnedDialogFocus(requests,core,owner,value,symbol,file,runFactory,fixture.element.injector,factory.value,importModule,node,factory.tracing);
+      const invoke=(requests=factory.requests,owner=dialogOwned,node=fixture,file=dialogFile)=>(sourceDialogFocus?partitionSourceDialogFocus:partitionOwnedDialogFocus)(requests,core,owner,value,symbol,file,runFactory,fixture.element.injector,factory.value,importModule,node,factory.tracing);
       const snapshot=factory.requests.map(r=>({...r}));
       const appIndex=snapshot.findIndex(r=>r.token===core.ApplicationRef&&r.optional);
       if(appIndex<0)throw Error('actual optional ApplicationRef request missing from control');
@@ -346,6 +385,20 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
           ?originalOwnedNodeInjectorCapture(symbol.symbol_id,factory.ownedNodeInjectorContext,requiredParentCapture):requiredParentCapture});
       factory.requests=partition.requests;factory.ownedMotionContext=partition.observation;
     }
+    if(factory.ownedModeContext && !ownedMotionProfile(symbol.symbol_id) && factory.outcome==='returned'){
+      const partition=partitionAttributeMode({requests:factory.requests,core,owned:await loadRuntimeModule(packageRoot,'legacy-core','primary'),layout:await importModule('@angular/cdk/layout'),material:await importModule('@angular/material/core'),Type:value,files:{core:resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-core.mjs'),caller:resolve(packageRoot,'fesm2022',`ngx-compat-material-legacy-${symbol.family}.mjs`)},runFactory,injector:fixture.element.injector,receipt:factory.ownedModeContext});factory.requests=partition.requests;factory.attributeModePartition=partition.observation;
+    }
+    if(directOwnedModeCandidate(symbol,packageRoot,{...inputArtifactContext,packageRoot})&&factory.outcome==='returned'){
+      const owned=await loadRuntimeModule(packageRoot,'legacy-core','primary'),family=await loadRuntimeModule(packageRoot,symbol.family,'primary'),material=await importModule('@angular/material/core');
+      const files={core:resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-core.mjs'),caller:resolve(packageRoot,'fesm2022',`ngx-compat-material-legacy-${symbol.family}.mjs`)};
+      const args={symbol,Type:value,exports:family,owned,core,material,injector:fixture.element.injector,capture:requiredParentCapture,artifactContext:{...inputArtifactContext,packageRoot}};
+      if(['legacy-core/primary/MatLegacyPseudoCheckbox','legacy-tooltip/primary/LegacyTooltipComponent'].includes(symbol.symbol_id))
+        factory.directOwnedModeContext=qualifiedExistingOwnedMode({...args,motion:factory.ownedMotionContext,file:files.caller,requests:factory.requests});
+      else{
+        const partition=partitionDirectOwnedMode({...args,files,layout:await importModule('@angular/cdk/layout'),runFactory,value:factory.value,requests:factory.requests});
+        factory.requests=partition.requests;factory.directOwnedModeContext=partition.observation;
+      }
+    }
     if(tabPortal&&factory.outcome==='returned'){
       const observed=observeTabPortalContext(tabPortal,{...requiredParentCapture,requests:factory.requests},fixture,value,
         await loadRuntimeModule(packageRoot,'legacy-tabs','primary'),await importModule('@angular/cdk/portal'),core,runFactory,resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-tabs.mjs'));
@@ -357,7 +410,7 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
       factory.autocompleteContext=observeAutocompleteInputs(autocompleteCapture,requiredParentCapture,fixture);
       if(autocompleteProof){const owned=await loadRuntimeModule(packageRoot,'legacy-core','primary'),owner=await loadRuntimeModule(packageRoot,'legacy-autocomplete','primary'),input=requiredParentCapture.inputs[9],injector=fixture.element.injector;
         if(!(factory.value instanceof owner.MatLegacyAutocompleteTrigger)||Object.getPrototypeOf(owner.MatLegacyAutocompleteTrigger)!==owner._MatLegacyAutocompleteTriggerBase||owner._MatLegacyAutocompleteTriggerBase.ctorParameters?.()[9]?.type!==owned._LegacyViewport||requiredParentCapture.constructor_calls!==1||requiredParentCapture.inputs.length!==11||input!==injector.get(owned._LegacyViewport)||factory.value._viewportRuler!==input||requiredParentCapture.inputs[0]?.nativeElement!==fixture.element.element.nativeElement)throw Error('autocomplete viewport actual node/constructor identity differs');
-        factory.autocompleteViewportContext={constructor_calls:1,constructor_arity:11,viewport_index:9,actual_node_element:true,owned_input_matches_node_provider:true,owned_metadata_token:true,stored_input_matches:true};
+        factory.autocompleteViewportContext=autocompleteProof.kind==='combined-full-viewport-v1'?captureCombinedFullViewport(autocompleteProof,{capture:requiredParentCapture,node:fixture.element,value:factory.value,owned,historical:historicalSpinnerViewport,minimum:minimumSpinnerViewport,markerHistorical:historicalSpinnerMarker,markerMinimum:minimumSpinnerMarker}):{constructor_calls:1,constructor_arity:11,viewport_index:9,actual_node_element:true,owned_input_matches_node_provider:true,owned_metadata_token:true,stored_input_matches:true};
       }
     }
     if(tabPortalParent&&factory.outcome==='returned'){
@@ -367,6 +420,9 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
     factory.context=fixture.context;
     if(factory.outcome==='returned'&&typeof factory.value?.ngOnDestroy==='function'){
       try{factory.value.ngOnDestroy();}catch(error){behaviorProblems.push('owned instance teardown: '+String(error?.message||error));}
+    }
+    if(factory.dialogServiceModeContext&&factory.outcome==='returned'){
+      factory.dialogServiceModeContext.behavior.borrowed_alive_after_service_teardown=!fixture.component.hostView.destroyed&&!fixture.element.destroyed&&!fixture.template.destroyed&&!fixture.environment.destroyed;
     }
     if(fixture.component.hostView.destroyed)behaviorProblems.push('owned factory destroyed the borrowed fixture view');
     if(fixture.element.destroyed||fixture.template.destroyed)behaviorProblems.push('owned factory destroyed borrowed Angular node probes');
@@ -405,14 +461,21 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
         if(parentType.ctorParameters?.()[4]?.type!==owned._LegacyViewport||parentExecution.capturedInputs.length!==7||viewport!==fixture.parentNode.injector.get(owned._LegacyViewport)||parentExecution.value._viewportRuler!==viewport)throw Error('tab-link parent viewport input or provider differs');
         factory.tablinkParentViewportValue=viewport;
       }
-      factory.parentConstruction={...(parentViewportProof?{viewport_replacement:{identity_matched:false,historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,proof:parentViewportProof,node:{constructor_arity:7,viewport_index:4,parent_node:true,owned_input_matches_parent_provider:true,owned_metadata_token:true,stored_input_matches:true}}}:{}),symbol_id:parentSymbol.symbol_id,returned_owned_instance:true,
+      let combinedParent;
+      if(combinedParentProof){
+        const owned=await loadRuntimeModule(packageRoot,'legacy-core','primary'),layout=await importModule('@angular/cdk/layout'),material=await importModule('@angular/material/core'),minimum=(await importModule('@angular/cdk/scrolling')).ViewportRuler,injector=fixture.parentNode.injector,capture=parentExecution.constructorCapture,viewport=capture.inputs[4];
+        if(parentType.ctorParameters?.()[4]?.type!==owned._LegacyViewport||parentType.ctorParameters?.()[6]?.decorators?.find(d=>d.type===core.Inject)?.args?.[0]!==owned.LEGACY_ANIMATION_MODE||owned.LEGACY_ANIMATION_MODE===core.ANIMATION_MODULE_TYPE||owned._LegacyViewport===minimum||viewport!==injector.get(owned._LegacyViewport)||parentExecution.value._viewportRuler!==viewport||capture.inputs[6]!==injector.get(owned.LEGACY_ANIMATION_MODE,null,{optional:true}))throw Error('combined tab-nav parent token/input identity differs');
+        const mode=partitionHeaderOwnedMotion(parentExecution.requests,core,owned,layout,material,parentType,{core:resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-core.mjs'),caller:resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-tabs.mjs'),owner:(await loadRuntimeModule(packageRoot,'legacy-tabs','primary')).MatLegacyPaginatedTabHeader},runFactory,injector,parentExecution.value,capture);
+        combinedParent={proof:combinedParentProof,constructor_calls:1,parent_node:true,parent_element_matched:true,owned_viewport_metadata:true,viewport_input_matched:true,viewport_stored:true,minimum_token_distinct:true,owned_mode_metadata:true,mode_input_matched:true,mode_input:capture.inputs[6]??null,old_mode_token_distinct:true,mode:mode.observation};
+      }
+      factory.parentConstruction={...(combinedParent?{combined_viewport:combinedParent}:{}),...(parentViewportProof?{viewport_replacement:{identity_matched:false,historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,proof:parentViewportProof,node:{constructor_arity:7,viewport_index:4,parent_node:true,owned_input_matches_parent_provider:true,owned_metadata_token:true,stored_input_matches:true}}}:{}),symbol_id:parentSymbol.symbol_id,returned_owned_instance:true,
         parent_node:'actual parent Angular element',constructor_evidence:parentExecution.constructorEvidence,
         compiler_observation:parentExecution.compilerObservation,public_constructor_partition:parentExecution.peerConstructorPartition};
     }
     if(attributeContract&&factory.outcome==='returned'&&!behaviorProblems.length)
       challengeAttributeDetectorScopes(factory,fixture);
     if(factory.ownedDialogFocusContext&&factory.outcome==='returned'&&!behaviorProblems.length)
-      challengeOwnedDialogFocusDetector(factory.value,fixture,factory.ownedDialogFocusContext);
+      (sourceDialogFocus?challengeSourceDialogFocusDetector:challengeOwnedDialogFocusDetector)(factory.value,fixture,factory.ownedDialogFocusContext);
     if(inputBehavior&&factory.outcome==='returned'&&!behaviorProblems.length)
       factory.inputContext=finishInputBehavior(inputBehavior,factory.value,fixture,inputLifetime,factory.inputContext);
     if(tableDefinitionCapture&&factory.outcome==='returned'&&!behaviorProblems.length)
@@ -623,7 +686,7 @@ export function injectionTokenMatches(value, InjectionToken, expectedDescription
   return value instanceof InjectionToken && String(value) === `InjectionToken ${expectedDescription}`;
 }
 
-export async function observeRuntimeDi(packageRoot, symbols, differences = [], importModule = spec => import(spec), inputArtifactContext = null) {
+export async function observeRuntimeDi(packageRoot, symbols, differences = [], importModule = spec => import(spec), inputArtifactContext = null, {sourceDialogFocus=false} = {}) {
   const core=await importModule('@angular/core');
   const {Injector, InjectionToken, runInInjectionContext, isDevMode}=core;
   await importModule('@angular/compiler');
@@ -654,24 +717,27 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
     }
     const construction = approvedMenuItemContract(symbol) || approvedTableContract(symbol) || approvedRippleContract(symbol);
     const originalKind = symbol.shape.originalFactoryContext?.effective_factory_kind || symbol.shape.originalFactory?.deps_kind;
-    let spinnerProof=null;
+    let spinnerProof=null,combinedSpinnerProof=null;
     if(symbol.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'&&inputArtifactContext){
       const path=resolve(packageRoot,'types/ngx-compat-material-legacy-legacy-progress-spinner.d.ts');
       try{spinnerProof=spinnerViewportProof(symbol,{fileName:path,text:readFileSync(path,'utf8')},{...inputArtifactContext,packageRoot});}catch{}
+      if(!spinnerProof){try{combinedSpinnerProof=qualifyCombinedSpinnerViewport({symbol,Type:value,core,owned:await loadRuntimeModule(packageRoot,'legacy-core','primary'),exports:loaded,context:{...inputArtifactContext,packageRoot}});}catch{}}
     }
     let autocompleteProof=null;
     if(symbol.symbol_id==='legacy-autocomplete/primary/MatLegacyAutocompleteTrigger'&&inputArtifactContext){
       try{autocompleteProof=autocompleteViewportProof(symbol,symbols.find(s=>s.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'),{...inputArtifactContext,packageRoot});}catch{}
+      if(!autocompleteProof){try{autocompleteProof=qualifyCombinedFullViewport({symbol,Type:value,owned:await loadRuntimeModule(packageRoot,'legacy-core','primary'),core,spinnerSymbol:symbols.find(s=>s.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'),spinnerExports:await loadRuntimeModule(packageRoot,'legacy-progress-spinner','primary'),context:{...inputArtifactContext,packageRoot}});}catch{}}
     }
     let selectProof=null;
     if(symbol.symbol_id==='legacy-select/primary/MatLegacySelect'&&inputArtifactContext){
       try{selectProof=selectViewportProof(symbol,symbols.find(s=>s.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'),symbols.find(s=>s.symbol_id==='legacy-select/primary/MAT_LEGACY_SELECT_SCROLL_STRATEGY'),{...inputArtifactContext,packageRoot});}catch{}
+      if(!selectProof){try{selectProof=qualifyCombinedFullViewport({symbol,Type:value,owned:await loadRuntimeModule(packageRoot,'legacy-core','primary'),core,spinnerSymbol:symbols.find(s=>s.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'),spinnerExports:await loadRuntimeModule(packageRoot,'legacy-progress-spinner','primary'),context:{...inputArtifactContext,packageRoot}});}catch{}}
     }
     const factory = construction ? symbol.symbol_id === TABLE_SYMBOL
       ? await observeTableFactory(value, loaded, importModule) : symbol.symbol_id===RIPPLE_SYMBOL
       ? await observeRippleFactory(value,loaded,importModule,runFactory) : await observeMenuItemFactory(value, loaded, importModule)
       : originalKind==='invalid' ? runFactory(value.ɵfac,Injector,runInInjectionContext)
-      : await observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule,{inputArtifactContext,spinnerProof,autocompleteProof,selectProof});
+      : await observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule,{inputArtifactContext,spinnerProof,combinedSpinnerProof,autocompleteProof,selectProof,sourceDialogFocus});
     const observed = factory.requests;
     const publicNodeRequests=[];
     const runtimeRequests=[];
@@ -693,7 +759,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         const got = observed[index];
         const primary = symbol.kind === 'primary' ? loaded : await loadRuntimeModule(packageRoot, symbol.family, 'primary');
         const exports = {...(primary || {}),...loaded};
-        const coreExports = param.ident === 'ViewportRuler'
+        const coreExports = param.ident === 'ViewportRuler' || ((tabHeaderProfile(symbol)||factory.directOwnedModeContext||factory.ownedModeContext||symbol.symbol_id===DIALOG_SERVICE_MODE_SYMBOL) && param.ident === 'ANIMATION_MODULE_TYPE')
           ? await loadRuntimeModule(packageRoot, 'legacy-core', 'primary') : null;
         const ownedViewport = ownedViewportIdentity(symbol.family, param, coreExports || {}, got.token);
         const tabReplacement = Boolean(tabHeaderProfile(symbol) && ownedHeaderViewportCandidate(symbol.family,param,coreExports || {},got.token));
@@ -710,14 +776,19 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
               throw Error('tab header viewport provider separation control failed');
           } finally {ownedControl.destroy();providerControl.destroy();}
         }
-        const same = tabReplacement ? false : ownedViewport !== null ? ownedViewport : await runtimeTokenIdentity(symbol.family, param, exports,
+        const tabMotionReplacement=Boolean(tabHeaderProfile(symbol)&&param.ident==='ANIMATION_MODULE_TYPE'&&param.imported==='ANIMATION_MODULE_TYPE'&&param.spec==='@angular/platform-browser/animations'&&param.optional===true&&coreExports?.LEGACY_ANIMATION_MODE===got.token&&got.token!==(await importModule('@angular/core')).ANIMATION_MODULE_TYPE&&factory.tabHeaderContext?.owned_motion?.owned_token_distinct===true&&factory.tabHeaderContext.owned_motion.old_token_requested===false);
+        const directMotionReplacement=Boolean(factory.directOwnedModeContext&&directOwnedModeProfile(symbol.symbol_id)&&index===directOwnedModeProfile(symbol.symbol_id)[2]&&param.ident==='ANIMATION_MODULE_TYPE'&&param.imported==='ANIMATION_MODULE_TYPE'&&param.spec==='@angular/platform-browser/animations'&&param.optional===true&&coreExports?.LEGACY_ANIMATION_MODE===got.token&&got.token!==(await importModule('@angular/core')).ANIMATION_MODULE_TYPE&&!directOwnedModeProblems(factory.directOwnedModeContext,symbol.symbol_id,{...inputArtifactContext,packageRoot}).length);
+        const attributeMotionReplacement=Boolean(factory.ownedModeContext && index===factory.ownedModeContext.di_index && param.ident==='ANIMATION_MODULE_TYPE' && param.imported==='ANIMATION_MODULE_TYPE' && param.spec==='@angular/platform-browser/animations' && param.optional===true && coreExports?.LEGACY_ANIMATION_MODE===got.token && got.token!==core.ANIMATION_MODULE_TYPE && !attributeOwnedModeReceiptProblems(factory.ownedModeContext,symbol,{tarball:inputArtifactContext?.tarball}).length);
+        const dialogModeReplacement=Boolean(symbol.symbol_id===DIALOG_SERVICE_MODE_SYMBOL&&index===7&&param.ident==='ANIMATION_MODULE_TYPE'&&param.spec==='@angular/platform-browser/animations'&&param.optional===true&&got.token===coreExports?.LEGACY_ANIMATION_MODE&&got.token!==core.ANIMATION_MODULE_TYPE&&factory.dialogServiceModeContext?.owned_token_distinct===true&&factory.dialogServiceModeContext.old_token_requested===false);
+        const same = tabReplacement || tabMotionReplacement || directMotionReplacement || attributeMotionReplacement || dialogModeReplacement ? false : ownedViewport !== null ? ownedViewport : await runtimeTokenIdentity(symbol.family, param, exports,
           originalRuntimeAliases(symbols, symbol.family), got.token, importModule,packageRoot,symbol);
-        const replacement=Boolean(spinnerProof&&symbol.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'&&index===6&&!same&&factory.spinnerViewportContext?.owned_input_matches_node_provider&&got.token===coreExports?._LegacyViewport&&param.ident==='ViewportRuler'&&param.imported==='ViewportRuler'&&param.spec==='@angular/cdk/scrolling'&&!got.unresolved&&['optional','self','skipSelf','host'].every(f=>!got[f]&&!param[f]));
+        const replacement=Boolean((spinnerProof||combinedSpinnerProof)&&symbol.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'&&index===6&&!same&&(factory.spinnerViewportContext?.owned_input_matches_node_provider||factory.combinedSpinnerViewportContext?.owned_input_matches_node_provider)&&got.token===coreExports?._LegacyViewport&&param.ident==='ViewportRuler'&&param.imported==='ViewportRuler'&&param.spec==='@angular/cdk/scrolling'&&!got.unresolved&&['optional','self','skipSelf','host'].every(f=>!got[f]&&!param[f]));
         const menuReplacement=symbol.symbol_id==='legacy-menu/primary/MatLegacyMenuTrigger'&&param.ident==='MatMenuItem'
           ? await menuTriggerOwnedToken(symbol,param,exports,await importModule('@angular/material/menu'),got.token,packageRoot,{artifactContext:inputArtifactContext}) : null;
         const autocompleteReplacement=Boolean(autocompleteProof&&symbol.symbol_id==='legacy-autocomplete/primary/MatLegacyAutocompleteTrigger'&&index===9&&!same&&factory.autocompleteViewportContext?.owned_input_matches_node_provider&&got.token===coreExports?._LegacyViewport&&param.ident==='ViewportRuler'&&param.imported==='ViewportRuler'&&param.spec==='@angular/cdk/scrolling'&&!got.unresolved&&['optional','self','skipSelf','host'].every(f=>!got[f]&&!param[f]));
-        const selectReplacement=Boolean(selectProof&&index===0&&!same&&factory.selectViewportContext?.owned_input_matches_node_provider&&selectViewportTokenCandidate(symbol,param,coreExports,got.token,selectProof,inputArtifactContext)&&!got.unresolved&&['optional','self','skipSelf','host'].every(flag=>!got[flag]));
-        runtimeRequests.push({...(autocompleteReplacement?{intentional_token_difference:{historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee',proof:autocompleteProof,node:factory.autocompleteViewportContext}}:{}),...(replacement?{intentional_token_difference:{historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',historical_provider_selects_actual:false,minimum_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee',proof:spinnerProof,node:factory.spinnerViewportContext}}:{}),expected_ident:param.ident,expected_spec:param.spec,identity_matched:same,...(menuReplacement?{owned_menu_item_replacement:menuReplacement}:{}),
+        const selectReplacement=Boolean(selectProof&&index===0&&!same&&factory.selectViewportContext?.owned_input_matches_node_provider&&(selectViewportTokenCandidate(symbol,param,coreExports,got.token,selectProof,inputArtifactContext)||combinedFullViewportCandidate(symbol,param,coreExports,got.token,selectProof))&&!got.unresolved&&['optional','self','skipSelf','host'].every(flag=>!got[flag]));
+        runtimeRequests.push({...(autocompleteReplacement?{intentional_token_difference:{historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee',proof:autocompleteProof,node:factory.autocompleteViewportContext}}:{}),...(replacement?{intentional_token_difference:combinedSpinnerProof?{historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee',proof:combinedSpinnerProof,node:factory.combinedSpinnerViewportContext}:{historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',historical_provider_selects_actual:false,minimum_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee',proof:spinnerProof,node:factory.spinnerViewportContext}}:{}),expected_ident:param.ident,expected_spec:param.spec,identity_matched:same,...(menuReplacement?{owned_menu_item_replacement:menuReplacement}:{}),
+          ...(tabMotionReplacement || directMotionReplacement || attributeMotionReplacement || dialogModeReplacement ? {intentional_token_difference:{historical:'@angular/core#ANIMATION_MODULE_TYPE',actual:'@ngx-compat/material-legacy/legacy-core#LEGACY_ANIMATION_MODE',historical_provider_selects_actual:false,classification:'distinct owned legacy motion configuration'}} : {}),
           ...(tabReplacement ? {intentional_token_difference:{historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',classification:'owned replacement for upstream docs-private helper',historical_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee'}} : {}),
           expected_optional:Boolean(param.optional),expected_self:Boolean(param.self),
           expected_skipSelf:Boolean(param.skipSelf),expected_host:Boolean(param.host),
@@ -727,7 +798,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
           observed_label:got.label+(got.optional?'?':''),identity_matched:same,
           optional:Boolean(got.optional),self:Boolean(got.self),skipSelf:Boolean(got.skipSelf),host:Boolean(got.host)});
         if(selectReplacement)runtimeRequests.at(-1).intentional_token_difference={historical:'@angular/cdk/scrolling#ViewportRuler',actual:'@ngx-compat/material-legacy/legacy-core#_LegacyViewport',historical16_provider_selects_actual:false,minimum22_provider_selects_actual:false,customization:'docs-private; no stable customization guarantee',proof:selectProof,node:factory.selectViewportContext};
-        if (!same && !tabReplacement && !menuReplacement && !replacement && !autocompleteReplacement && !selectReplacement) problems.push(`token ${symbol.symbol_id}[${index}] expected ${param.ident} observed ${got.label}`);
+        if (!same && !tabReplacement && !tabMotionReplacement && !directMotionReplacement && !attributeMotionReplacement && !dialogModeReplacement && !menuReplacement && !replacement && !autocompleteReplacement && !selectReplacement) problems.push(`token ${symbol.symbol_id}[${index}] expected ${param.ident} observed ${got.label}`);
         for (const flag of ['self','skipSelf','host']) if (Boolean(param[flag])!==Boolean(got[flag]))
           problems.push(`injection flag ${symbol.symbol_id}[${index}] ${flag} differs`);
         if (Boolean(param.optional) !== Boolean(got.optional)) {
@@ -735,7 +806,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         }
       }
     }
-    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, factory_error_stack:factory.errorStack||null, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, effective_original_factory_kind:originalKind ?? null, factory_context:factory.context, factory_context_modules:factory.callerModules || [], factory_node_kind:factory.nodeKind || null, factory_constructor_evidence:factory.constructorEvidence || [], factory_compiler_observation:factory.compilerObservation || null, factory_peer_constructor_partition:factory.peerConstructorPartition || null, factory_parent_construction:factory.parentConstruction || null, factory_required_parent_context:factory.requiredParentContext || null, factory_caller_config_context:factory.callerConfigContext || null, factory_owned_dialog_focus_context:factory.ownedDialogFocusContext || null, factory_menu_content_context:factory.menuContentContext || null, factory_simple_snack_context:factory.simpleSnackContext || null, factory_dialog_opener_context:factory.dialogOpenerContext || null, factory_autocomplete_context:factory.autocompleteContext || null, factory_tab_body_context:factory.tabBodyContext || null, factory_tab_header_context:factory.tabHeaderContext || null, factory_tab_portal_parent_context:factory.tabPortalParentContext || null, factory_tab_portal_context:factory.tabPortalContext || null, factory_table_definition_context:factory.tableDefinitionContext || null, factory_input_context:factory.inputContext || null, factory_owned_motion_context:factory.ownedMotionContext || null, factory_owned_node_injector_context:factory.ownedNodeInjectorContext || null, runtime_requests:observed.map((request,index)=>({...runtimeRequests[index],observation_evidence:request.evidence || 'public Injector request trace',observed_label:request.label,optional:Boolean(request.optional),self:Boolean(request.self),skipSelf:Boolean(request.skipSelf),host:Boolean(request.host),unresolved:Boolean(request.unresolved)})).concat(factory.inputContext?.owned_element_ref?[{observation_evidence:'separately qualified owned field request',observed_label:'ElementRef',token_role:'owned native element',...factory.inputContext.owned_element_ref}]:[]), factory_returned_owned_instance:factory.outcome==='returned' && (construction ? factory.behaviorProblems.length===0 : factory.value instanceof value), constructor_attributes:[...new Set(symbol.shape.originalFactoryContext ? symbol.shape.originalFactoryContext.factory_parameters?.filter(param=>param.attribute).map(param=>param.attribute) || [] : [...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: [...observed.map(item => `${item.label}${item.optional ? '?' : ''}`),...(factory.inputContext?.owned_element_ref?['ElementRef']:[])],
+    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, factory_error_stack:factory.errorStack||null, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, effective_original_factory_kind:originalKind ?? null, factory_context:factory.context, factory_context_modules:factory.callerModules || [], factory_node_kind:factory.nodeKind || null, factory_constructor_evidence:factory.constructorEvidence || [], factory_compiler_observation:factory.compilerObservation || null, factory_peer_constructor_partition:factory.peerConstructorPartition || null, factory_parent_construction:factory.parentConstruction || null, factory_required_parent_context:factory.requiredParentContext || null, factory_caller_config_context:factory.callerConfigContext || null, factory_owned_dialog_focus_context:factory.ownedDialogFocusContext || null, factory_menu_content_context:factory.menuContentContext || null, factory_simple_snack_context:factory.simpleSnackContext || null, factory_dialog_opener_context:factory.dialogOpenerContext || null, factory_autocomplete_context:factory.autocompleteContext || null, factory_tab_body_context:factory.tabBodyContext || null, factory_tab_header_context:factory.tabHeaderContext || null, factory_tab_portal_parent_context:factory.tabPortalParentContext || null, factory_tab_portal_context:factory.tabPortalContext || null, factory_table_definition_context:factory.tableDefinitionContext || null, factory_input_context:factory.inputContext || null, factory_owned_motion_context:factory.ownedMotionContext || null, factory_direct_owned_mode_context:factory.directOwnedModeContext || null, factory_dialog_service_mode_context:factory.dialogServiceModeContext || null, factory_attribute_owned_mode_context:factory.ownedModeContext || null, factory_combined_spinner_viewport_context:factory.combinedSpinnerViewportContext || null, factory_attribute_mode_partition:factory.attributeModePartition || null, factory_owned_node_injector_context:factory.ownedNodeInjectorContext || null, runtime_requests:observed.map((request,index)=>({...runtimeRequests[index],observation_evidence:request.evidence || 'public Injector request trace',observed_label:request.label,optional:Boolean(request.optional),self:Boolean(request.self),skipSelf:Boolean(request.skipSelf),host:Boolean(request.host),unresolved:Boolean(request.unresolved)})).concat(factory.inputContext?.owned_element_ref?[{observation_evidence:'separately qualified owned field request',observed_label:'ElementRef',token_role:'owned native element',...factory.inputContext.owned_element_ref}]:[]), factory_returned_owned_instance:factory.outcome==='returned' && (construction ? factory.behaviorProblems.length===0 : factory.value instanceof value), constructor_attributes:[...new Set(symbol.shape.originalFactoryContext ? symbol.shape.originalFactoryContext.factory_parameters?.filter(param=>param.attribute).map(param=>param.attribute) || [] : [...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: [...observed.map(item => `${item.label}${item.optional ? '?' : ''}`),...(factory.inputContext?.owned_element_ref?['ElementRef']:[])],
       ...(construction ? {approved_construction: {profile_id: construction.profile_id,
         contract_sha256: construction.contract_sha256, context: factory.context,
         behavior_problems: factory.behaviorProblems, counts: factory.counts,

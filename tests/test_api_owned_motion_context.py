@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class OwnedMotionEvidenceTests(unittest.TestCase):
     def test_owned_constructor_roles_preserve_original_noop_and_reject_forged_or_missing_evidence(self):
         script = r"""
-import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {createHash} from 'node:crypto';
+import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {createHash} from 'node:crypto';import {execFileSync} from 'node:child_process';
 import {ownedSelectMotionProblems} from './scripts/api-owned-motion-context.mjs';
 const proof=JSON.parse(readFileSync('compatibility/rc/constructor-motion-context-source-proof.json'));
 const menuSuccessor=JSON.parse(readFileSync('compatibility/rc/menu-motion-packed-successor-v2.json'));
@@ -21,7 +21,8 @@ const integration=JSON.parse(integrationBytes);assert.ok(Object.values(integrati
 assert.equal(menuSuccessor.prior_f4_receipt.sha256,'83d0b7798b9d849a931c8a356fadb84324d8ac6f0a5da31d1001922752f27438');
 assert.equal(sha(JSON.stringify(menuSuccessor.prior_f4_receipt.body_complete,null,2)+'\n'),menuSuccessor.prior_f4_receipt.sha256);
 assert.equal(sha(readFileSync(menuSuccessor.historical_proof.path)),menuSuccessor.historical_proof.sha256);
-for(const source of menuSuccessor.source_members)assert.equal(sha(readFileSync(source.path)),source.sha256);
+assert.equal(menuSuccessor.source_commit,'fdcdadee28c4552e3500b5099de9f42e456adb5c');
+for(const source of menuSuccessor.source_members)assert.equal(sha(execFileSync('git',['show',menuSuccessor.source_commit+':'+source.path])),source.sha256);
 assert.equal(sha(menuSuccessor.producer.exact_source),menuSuccessor.producer.source_sha256);
 assert.equal(sha(menuSuccessor.producer.exact_raw_output),menuSuccessor.producer.raw_observation_sha256);
 assert.deepEqual(JSON.parse(menuSuccessor.producer.exact_raw_output).observation,menuSuccessor.observation);

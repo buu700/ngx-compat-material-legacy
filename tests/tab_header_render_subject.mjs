@@ -14,7 +14,15 @@ if (mode === 'zoneful') await import('zone.js/node');
 await import('@angular/compiler');
 const core = await import('@angular/core'), a11y = await import('@angular/cdk/a11y');
 const rx = await import('rxjs'), ops = await import('rxjs/operators');
+const material = await import('@angular/material/core'), layout = await import('@angular/cdk/layout');
 const payload = JSON.parse(readFileSync(new URL('./tab-header-render-payload.json', import.meta.url)));
+const materialToken=material.MATERIAL_ANIMATIONS || new core.InjectionToken('original-model-no-material-motion-token');
+const motion={};
+new Function('exports','MediaMatcher','InjectionToken','assertInInjectionContext','inject','MATERIAL_ANIMATIONS',payload.motion)
+  (motion,layout.MediaMatcher,core.InjectionToken,core.assertInInjectionContext,core.inject,materialToken);
+assert.notEqual(motion.LEGACY_ANIMATION_MODE,materialToken);
+assert.notEqual(motion.LEGACY_ANIMATION_MODE,core.ANIMATION_MODULE_TYPE);
+
 // No ResizeObserver callbacks or incidental viewport/direction emissions can mask the initial wait.
 globalThis.ResizeObserver = undefined;
 let app, zone, manual;
@@ -45,15 +53,15 @@ function replay(js, helperJs) {
   const names = ['Subject','EMPTY','Observable','merge','observableOf','timer','fromEvent',
     'debounceTime','take','switchMap','startWith','skip','takeUntil','filter',
     'EventEmitter','FocusKeyManager','ownedHeaderResize','afterTabHeaderRender','tabHeaderRenderInjector',
-    'passiveEventListenerOptions','HEADER_SCROLL_DELAY','HEADER_SCROLL_INTERVAL','coerceBooleanProperty','coerceNumberProperty'];
+    'passiveEventListenerOptions','HEADER_SCROLL_DELAY','HEADER_SCROLL_INTERVAL','coerceBooleanProperty','coerceNumberProperty','resolveLegacyAnimationMode'];
   const values = [rx.Subject,rx.EMPTY,rx.Observable,rx.merge,rx.of,rx.timer,rx.fromEvent,
     ops.debounceTime,ops.take,ops.switchMap,ops.startWith,ops.skip,ops.takeUntil,ops.filter,
     core.EventEmitter,a11y.FocusKeyManager,() => rx.EMPTY,hooks.afterTabHeaderRender,hooks.tabHeaderRenderInjector,
-    {passive:true},650,100,value => value != null && String(value) !== 'false',value => Number(value)];
+    {passive:true},650,100,value => value != null && String(value) !== 'false',value => Number(value),motion.resolveLegacyAnimationMode];
   new Function('exports', ...names, js)(exports, ...values);
   return exports.Replay;
 }
-function fixture(js, helperJs = payload.helper, context = true) {
+function fixture(js, helperJs = payload.helper, context = true, animationMode = undefined, injectionScope = app?.injector) {
   const Type = replay(js, helperJs), ink = [], marks = [], writes = [];
   assert.equal(Type.length, 7, 'historical-constructor-arity');
   function node(name, width = 90) {
@@ -64,8 +72,8 @@ function fixture(js, helperJs = payload.helper, context = true) {
   }
   const create = () => new Type(new core.ElementRef(node('host',220)), {markForCheck() {marks.push('mark');}},
     {change(delay) {assert.equal(delay,150); return rx.EMPTY;}}, {value:'ltr',change:rx.EMPTY}, zone,
-    {isBrowser:true,TRIDENT:false,EDGE:false}, undefined);
-  const instance = context && app ? core.runInInjectionContext(app.injector,create) : create();
+    {isBrowser:true,TRIDENT:false,EDGE:false}, animationMode);
+  const instance = context && app ? core.runInInjectionContext(injectionScope,create) : create();
   instance._items = new core.QueryList();
   instance._items.reset([0,1,2].map(index => ({disabled:false,elementRef:new core.ElementRef(node('item'+index)),focus(){}})));
   instance._inkBar = {alignToElement(element){ink.push(element.name);},hide(){ink.push('hide');}};
@@ -132,7 +140,28 @@ async function errorCleanup(helperJs) {
     assert.equal(active,0,'lookup-error-cleans-zone-subscription');
   } finally {emitter.subscribe=subscribe;failing.destroy();}
 }
+async function modePolicy(js) {
+  const manualNoop=fixture(js,payload.helper,false,'NoopAnimations'),manualBrowser=fixture(js,payload.helper,false,'BrowserAnimations');
+  try {
+    assert.equal(manualNoop.instance._animationMode,'NoopAnimations','manual-noop-mode');
+    assert.equal(manualBrowser.instance._animationMode,'BrowserAnimations','manual-browser-mode');
+  } finally {manualNoop.instance.ngOnDestroy();manualBrowser.instance.ngOnDestroy();}
+  if(!app)return {manualNoop:true,manualBrowser:true,ambientQualified:false};
+  const matcher={matchMedia:()=>({matches:false})};
+  for(const [kind,providers] of [
+    ['owned',[{provide:motion.LEGACY_ANIMATION_MODE,useValue:'NoopAnimations'}]],
+    ['material',[{provide:materialToken,useValue:{animationsDisabled:true}}]],
+    ['reduced',[{provide:layout.MediaMatcher,useValue:{matchMedia:()=>({matches:true})}}]],
+  ]) {
+    const scope=core.Injector.create({parent:app.injector,providers:[{provide:layout.MediaMatcher,useValue:matcher},...providers]});
+    const current=fixture(js,payload.helper,true,'BrowserAnimations',scope);
+    try {assert.equal(current.instance._animationMode,'NoopAnimations','ambient-mode-'+kind);}
+    finally {current.instance.ngOnDestroy();scope.destroy();}
+  }
+  return {manualNoop:true,manualBrowser:true,ambientQualified:true,owned:true,material:true,reduced:true};
+}
 try {
+  const modes=await modePolicy(payload.candidate);
   const boundaryReference = await paginationBoundary(payload.original, [false, true, true, true, true]);
   const boundaryCandidate = await paginationBoundary(payload.candidate, boundaryReference);
   const old = await align(payload.original,payload.helper,true,mode === 'zoneful');
@@ -148,6 +177,7 @@ try {
   };
   await reject('five-pixel-threshold', () => paginationBoundary(payload.mutations.fivePixelThreshold, boundaryReference), 'tagged-small-overflow-pagination');
   if (line !== 'original') {
+    await reject('missing-owned-mode-resolution',() => modePolicy(payload.mutations.missingModeResolution),'ambient-mode-');
     if (mode === 'zoneless') {
       await reject('prior-zone-only-wait',() => align(payload.mutations.priorWait),'initial-render-aligns-selected-label');
       await reject('missing-injection-context-capture',() => align(payload.mutations.noCapture),'initial-render-aligns-selected-label');

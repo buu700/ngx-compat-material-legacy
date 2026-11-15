@@ -1,7 +1,14 @@
 #!/usr/bin/env node
+import {prepareHistoricalCdk16Reference} from './api-historical-cdk-reference.mjs';
+import {qualifyCombinedArtifactSubject} from './api-combined-d70-image.mjs';
+import {combinedFullViewportObservationProblems} from './api-full-combined-viewport-successor.mjs';
+import {DIALOG_SERVICE_MODE_SYMBOL,dialogServiceModeProblems} from './api-dialog-service-mode-context.mjs';
+import {attributeOwnedModeProfile,attributeOwnedModeReceiptProblems} from './api-attribute-owned-mode-successor.mjs';
+import {attributeModePartitionProblems,combinedTablinkParentProblems} from './api-attribute-mode-partition.mjs';
 import {tablinkViewportObservationProblems} from './api-tablink-viewport-contract.mjs';
 import {autocompleteViewportObservationProblems} from './api-autocomplete-viewport-contract.mjs';
 import {spinnerViewportObservationProblems} from './api-spinner-viewport-contract.mjs';
+import {combinedSpinnerViewportObservationProblems} from './api-spinner-combined-row.mjs';
 /**
  * Packed primary/testing export completeness vs authentic Material 16.2.14
  * legacy public-api barrels, plus structural member-name signature evidence.
@@ -42,6 +49,7 @@ import {TAB_PORTAL_SYMBOL,tabPortalObservationProblems} from './api-tab-portal-c
 import {tabBodyObservationProblems} from './api-tab-body-context.mjs';
 import {tabHeaderProfile,tabHeaderObservationProblems} from './api-tab-header-context.mjs';
 import {ownedMotionProfile,ownedSelectMotionProblems} from './api-owned-motion-context.mjs';
+import {directOwnedModeProfile,directOwnedModeRowProblems} from './api-direct-owned-mode-context.mjs';
 import {MENU_ITEM_SYMBOL, approvedMenuItemContract} from './menu-item-construction-contract.mjs';
 import {TABLE_SYMBOL, approvedTableContract, tableConstructionObservationComplete} from './table-construction-contract.mjs';
 import {RIPPLE_SYMBOL,approvedRippleContract} from './ripple-construction-contract.mjs';
@@ -455,9 +463,16 @@ if (isMain) {
   const allowlist = JSON.parse(readFileSync(allowlistPath, 'utf8'));
   const declared = observeDeclarations(surface, readDts(extracted.packageRoot), differences, allowlist,
     {tarball, packageRoot: extracted.packageRoot, referenceRoot: refRoot});
-  const diRows = await observeRuntimeDi(extracted.packageRoot, surface.symbols, [], undefined, {tarball, packageRoot: extracted.packageRoot, referenceRoot: refRoot});
-  const diRecords = JSON.parse(readFileSync(join(root, 'compatibility/rc/api/di-differences.json'), 'utf8')).differences || [];
-  const diSettled = diRows.map(row => settleDi(row, diRecords, {tarball}));
+  const historical = qualifyCombinedArtifactSubject(readFileSync(tarball), extracted.packageRoot) ? await prepareHistoricalCdk16Reference() : null;
+  const artifactContext = {tarball, packageRoot: extracted.packageRoot, referenceRoot: refRoot, ...historical};
+  let diRows, diSettled;
+  try {
+    diRows = await observeRuntimeDi(extracted.packageRoot, surface.symbols, [], undefined, artifactContext);
+    const diRecords = JSON.parse(readFileSync(join(root, 'compatibility/rc/api/di-differences.json'), 'utf8')).differences || [];
+    diSettled = diRows.map(row => settleDi(row, diRecords, artifactContext));
+  } finally {
+    historical?.cleanup();
+  }
   const summary = summarizeDiscrepancies(declared.observations);
   const exportFails = [
     ...declared.entryResults.filter(item => item.result !== 'pass'),
@@ -520,8 +535,16 @@ if (isMain) {
   }
 }
 
-export function settleDi(row, records, artifactContext = null) {
-  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...ownedDialogFocusObservationProblems(row),...menuContentObservationProblems(row),...simpleSnackObservationProblems(row),...dialogOpenerObservationProblems(row),...autocompleteObservationProblems(row),...tabBodyObservationProblems(row),...tabHeaderObservationProblems(row),...tabPortalObservationProblems(row),...tableDefinitionObservationProblems(row),...inputObservationProblems(row,artifactContext),...menuTriggerObservationProblems(row),...spinnerViewportObservationProblems(row,artifactContext),...autocompleteViewportObservationProblems(row,artifactContext),...tablinkViewportObservationProblems(row,artifactContext)]};
+export function settleDi(row, records, artifactContext = null, dialogFocusProblems = ownedDialogFocusObservationProblems) {
+  row={...row,problems:[...row.problems,...directOwnedModeRowProblems(row,artifactContext),...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...dialogFocusProblems(row,artifactContext),...menuContentObservationProblems(row),...simpleSnackObservationProblems(row),...dialogOpenerObservationProblems(row),...autocompleteObservationProblems(row),...tabBodyObservationProblems(row),...tabHeaderObservationProblems(row),...tabPortalObservationProblems(row,artifactContext),...tableDefinitionObservationProblems(row),...inputObservationProblems(row,artifactContext),...menuTriggerObservationProblems(row),...(row.factory_combined_spinner_viewport_context?combinedSpinnerViewportObservationProblems(row,artifactContext):spinnerViewportObservationProblems(row,artifactContext)),...(row.runtime_requests?.[9]?.intentional_token_difference?.proof?.kind==='combined-full-viewport-v1'?combinedFullViewportObservationProblems(row,artifactContext):autocompleteViewportObservationProblems(row,artifactContext)),...(row.factory_parent_construction?.combined_viewport?combinedTablinkParentProblems(row,artifactContext||{}):tablinkViewportObservationProblems(row,artifactContext))]};
+  if(row.symbol.symbol_id===DIALOG_SERVICE_MODE_SYMBOL)row={...row,problems:[...row.problems,...dialogServiceModeProblems(row,artifactContext)]};
+  const attributeMode=row.factory_attribute_owned_mode_context;
+  if(!attributeMode && attributeOwnedModeProfile(row.symbol) && row.runtime_requests?.some(r=>r.intentional_token_difference?.actual==='@ngx-compat/material-legacy/legacy-core#LEGACY_ANIMATION_MODE'))row={...row,problems:[...row.problems,'attribute owned-mode receipt missing']};
+  if(attributeMode){
+    const profile=attributeOwnedModeProfile(row.symbol),requests=row.runtime_requests,params=row.symbol.shape.originalFactoryContext.factory_parameters.filter(p=>!p.attribute),difference={historical:'@angular/core#ANIMATION_MODULE_TYPE',actual:'@ngx-compat/material-legacy/legacy-core#LEGACY_ANIMATION_MODE',historical_provider_selects_actual:false,classification:'distinct owned legacy motion configuration'};
+    const valid=profile&&!attributeOwnedModeReceiptProblems(attributeMode,row.symbol,artifactContext||{}).length&&row.factory_outcome==='returned'&&row.factory_returned_owned_instance===true&&row.factory_node_kind==='element'&&Array.isArray(requests)&&requests.length===params.length&&params.every((p,i)=>{const r=requests[i],mode=i===attributeMode.di_index;return r&&r.expected_ident===p.ident&&r.expected_spec===p.spec&&r.unresolved===false&&r.identity_matched===!mode&&(!mode||r.observed_label==='LEGACY_ANIMATION_MODE'&&JSON.stringify(r.intentional_token_difference)===JSON.stringify(difference))&&['optional','self','skipSelf','host'].every(f=>r[f]===Boolean(p[f])&&r['expected_'+f]===Boolean(p[f]));});
+    row={...row,problems:[...row.problems,...attributeModePartitionProblems(row),...(!valid?['attribute owned-mode row identity/execution evidence incomplete']:[])]};
+  }
   if(row.symbol.symbol_id===RIPPLE_SYMBOL){
     const contract=approvedRippleContract(row.symbol),problems=[...row.problems,...rippleFactoryObservationProblems(row,contract)];
     return {...row,problems,result:problems.length?'fail':'pass',status:problems.length?'mismatch':'intentional-legacy-difference',
@@ -557,7 +580,7 @@ export function settleDi(row, records, artifactContext = null) {
   if(['legacy-tabs/primary/MatLegacyTabLink','legacy-tabs/primary/_MatLegacyTabLinkBase'].includes(row.symbol.symbol_id)&&!row.problems.length)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'The actual parent node receives a distinct owned docs-private viewport token, not the historical or minimum peer token; artifact, parent binding, source and provider evidence apply only to the two recorded link contexts.'};
   if(row.symbol.symbol_id==='legacy-autocomplete/primary/MatLegacyAutocompleteTrigger'&&!row.problems.length)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'The actual node uses an independently owned docs-private viewport token, distinct from the historical and minimum-peer tokens; exact source, artifact, type and provider evidence are bounded to the recorded images.'};
   if(row.symbol.symbol_id==='legacy-select/primary/MatLegacySelect'&&!row.problems.length)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'The original fourteen constructor inputs remain correlated. The current trailing public node Injector is separately proved, and the owned viewport is intentionally distinct from the historical/minimum peer token, with exact artifact, constructor typing, source and actual node/provider evidence.'};
-  if(row.symbol.symbol_id==='legacy-form-field/primary/MatLegacyFormField'&&!row.problems.length)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'The original seven constructor inputs, tokens, flags and animation mode remain correlated. The separately reported trailing public node Injector is an additional current dependency with actual stored input, node, application and child/parent scope proof.'};
+  if(row.symbol.symbol_id==='legacy-form-field/primary/MatLegacyFormField'&&!row.problems.length)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'The original seven constructor positions and flags remain correlated; the animation mode token is a separately proved distinct owned replacement. The separately reported trailing public node Injector is an additional current dependency with actual stored input, node, application and child/parent scope proof.'};
   if(row.symbol.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'&&!row.problems.length)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'The owned docs-private viewport is a distinct injection token; exact artifact, source, actual node, historical provider negative, and manual type evidence are bounded to the recorded minimum peer.'};
   if (row.symbol.symbol_id===TABLE_SYMBOL) {
     const contract=approvedTableContract(row.symbol);
@@ -592,8 +615,10 @@ export function settleDi(row, records, artifactContext = null) {
       rationale: 'Owner explicitly approved the historical item implementation and current-parent subtype change. Original one/five-argument manual construction and inherited five-service factory execute without an application; exact public/owned token objects, flags, missing required providers, optional panel, behavior, subclassing and borrowed lifetime remain enforced. Native/AOT/packed and unchanged Material16 markup/styles are separate gates.'};
   }
   if (!row.problems.length) {
+    if(row.symbol.symbol_id===DIALOG_SERVICE_MODE_SYMBOL)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'The eighth optional constructor token is the distinct owned mode token; actual factory input and stored raw mode, per-open injector selection and manual construction are qualified separately.'};
+    if(directOwnedModeProfile(row.symbol.symbol_id)&&row.factory_direct_owned_mode_context)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'The historical animation token is replaced by a distinct owned legacy configuration token. Exact constructor positions, node inputs, helper source and the retained ambient requests are checked; the historical provider does not select the owned token.'};
     if(row.symbol.symbol_id==='legacy-menu/primary/MatLegacyMenuTrigger')return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'The authenticated historical optional self MatMenuItem token is replaced by the approved owned item base token. Runtime token objects and flags remain separately recorded; exact packed source binds both item providers. Nested menu node behavior is qualified independently.'};
-    if(tabHeaderProfile(row.symbol))return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'The original seven constructor inputs remain; the upstream docs-private viewport token is replaced with the owned docs-private helper, so historical ViewportRuler providers do not select it. One source-scoped Injector request supports owned render scheduling. Node scope and token controls execute under a synthetic server renderer; native rendering and packed lifecycle remain separate.'};
+    if(tabHeaderProfile(row.symbol))return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:row.factory_tab_header_context?.owned_motion?.protocol==='header-owned-mode-v1'?'The seven historical constructor positions are retained for comparison. The docs-private viewport and animation-mode DI tokens are distinct owned replacements; the original providers do not select them. Actual node, ambient motion and render injector controls run under a synthetic server renderer; native rendering and packed lifecycle remain separate.':'The original seven constructor inputs remain; the upstream docs-private viewport token is replaced with the owned docs-private helper, so historical ViewportRuler providers do not select it. One source-scoped Injector request supports owned render scheduling. Node scope and token controls execute under a synthetic server renderer; native rendering and packed lifecycle remain separate.'};
     if(row.symbol.symbol_id===MENU_CONTENT_SYMBOL)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'Maintainer delegated conservative TypeScript changes with unchanged required consumer styles and Cyph sanity. Only the authenticated unused resolver slot is removed; all other token objects/options remain checked. Actual public template/outlet identities, contexts, reattachment, movement, detach, owned teardown and borrowed caller view/lifetime execute. Original seven dependencies remain visible.'};
     if(row.symbol.symbol_id===INPUT_SYMBOL)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:row.factory_input_context?.owned_element_ref ? 'The current public parent requests are replayed by object, flags and source identity. The original owned legacy token remains distinct; the separately reported owned ElementRef is an additional required public-core request for the reviewed native-disabled repair, bound to the actual native node and exact artifact. Historical manual construction is retired; native browser/AOT and broader API/peer qualification remain separate.' : 'The historical inherited ten-argument dependency path is retired in favor of the genuine current public MatInput parent. Every parent request is independently replayed by object/flag/source identity, the original owned legacy token stays distinct and checked, and native-node behavior/teardown execute. No stylesheet changes; complete signatures/native/packed/floors remain separate.'};
     if(tableDefinitionContract(row.symbol))return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'Only the authenticated optional private table token is replaced with the exact public CdkTable object. Original constructor arguments, manual/subclass construction, genuine parent scope, definition behavior and borrowed lifetime are proved; styles/signatures are unchanged and native/packed/minimum checks remain separate.'};

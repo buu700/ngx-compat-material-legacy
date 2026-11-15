@@ -12,6 +12,7 @@ import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import {isDeepStrictEqual} from 'node:util';
 import {originalCompilerFactoryContext} from './api-original-factory-contexts.mjs';
+import {qualifyFocusPortalCombinedImage} from './api-focus-portal-combined-image.mjs';
 const require=createRequire(import.meta.url),flags=['optional','self','skipSelf','host'];
 const profiles={
  'legacy-dialog/primary/MatLegacyDialogContainer':{depth:1,arity:9},
@@ -109,13 +110,13 @@ export function challengeOwnedDialogFocusDetector(value,fixture,observation){
  observation.detector_scope_verified=true;observation.borrowed_context_alive_after_owned_teardown=true;
 }
 
-export function ownedDialogFocusObservationProblems(row){
+export function ownedDialogFocusObservationProblems(row,artifactContext){
  const profile=ownedDialogFocusProfile(row?.symbol?.symbol_id);if(!profile||row.factory_outcome!=='returned')return [];
  const x=row.factory_owned_dialog_focus_context;
  if(!x||!isDeepStrictEqual(x.actual_negative_controls,['wrong-token','wrong-flags','forged-owner','copied-node-scope','wrong-artifact'])||x.symbol_id!==row.symbol.symbol_id||x.verified!==true||x.public_control_outcome!=='returned'||x.render_node_scope_verified!==true||x.manual_constructor_verified!==true||x.detector_scope_verified!==true||x.borrowed_context_alive_after_owned_teardown!==true
   ||!isDeepStrictEqual(x.constructor_owner,{public_export:ownerExport,depth:profile.depth,owned_class_identity_matched:true})
   ||!Number.isInteger(x.total_requests)||!Number.isInteger(x.retained_requests)||x.retained_requests<0||x.classified_requests!==6||x.retained_requests+6!==x.total_requests
-  ||x.source?.sha256!=='35b0726ed573b6e785dfc45274279d5b81d7bdd4e1164f90154e1c75692bea5f' || x.source?.owner_text_sha256!=='2899d04727fdef3bb6cca71e0d378023ba188cd289db279cb8f42840848760d8' || x.source?.helper_text_sha256!=='cf7f29ed7fd36f81c9a157298a160302ae2810a70222e1feb8356111a89d069b'
+  ||!(x.source?.sha256==='35b0726ed573b6e785dfc45274279d5b81d7bdd4e1164f90154e1c75692bea5f'||x.source?.sha256==='02cbd08f4d1e656cbbfb08e80fa6dd9606222ace6e600b0f7b777642f17b03ac'&&qualifyFocusPortalCombinedImage(artifactContext,'dialog')) || x.source?.owner_text_sha256!=='2899d04727fdef3bb6cca71e0d378023ba188cd289db279cb8f42840848760d8' || x.source?.helper_text_sha256!=='cf7f29ed7fd36f81c9a157298a160302ae2810a70222e1feb8356111a89d069b'
   ||!x.source?.file?.endsWith('/fesm2022/ngx-compat-material-legacy-legacy-dialog.mjs')||['sha256','owner_text_sha256','helper_text_sha256'].some(key=>!/^([a-f0-9]{64})$/.test(x.source?.[key]||''))
   ||!Array.isArray(x.requests)||x.requests.length!==6||x.requests.some((r,index)=>!isDeepStrictEqual(r,{field:fields[index].field,ident:fields[index].name,spec:fields[index].spec,identity_matched:true,value_matched:index===0?'same-node-scope':true,unresolved:false,optional:true,self:false,skipSelf:false,host:false})))
   return ['owned dialog focus source/identity/options/lifetime evidence incomplete'];

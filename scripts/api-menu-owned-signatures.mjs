@@ -5,16 +5,41 @@
  *
  * Finite owned menu declaration proof, bound to reviewed tagged and packed images.
  */
+import {qualifyCombinedArtifactSubject} from './api-combined-d70-image.mjs';
 import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
 import {readFileSync,realpathSync,existsSync} from 'node:fs';
 import {dirname,join,relative,isAbsolute,resolve} from 'node:path';
 import {menuHarnessClosureFingerprint} from './api-menu-harness-contract.mjs';
 import {exactMenuArtifact} from './api-menu-artifact.mjs';
+
+import {qualifyMenuCombinedClosure} from './api-menu-combined-signature-successor.mjs';
 const req=createRequire(import.meta.url), hash=b=>createHash('sha256').update(b).digest('hex');
 const shapes={MAT_LEGACY_MENU_PANEL:'77d92fd00fb9a61a62310681d60a71f9ce7de6a40582e350943d98ed746a8f37',MatLegacyMenuPanel:'3bc100b697506f99f090575f7ebd6a2d4d642f92c0df3461760a8667ad4107be',MatLegacyMenuItem:'11b1e50dfdb99bbd00cc61a067f9d0b262edd43fec64452bdfc04defedd0056a'};
 const cases={MAT_LEGACY_MENU_PANEL:[["token MAT_MENU_PANEL 'MAT_MENU_PANEL'",null],[null,'const MAT_LEGACY_MENU_PANEL:InjectionToken<MatMenuPanel<any>>']],MatLegacyMenuPanel:[['public prop lazyContent:MatMenuContent?',null],[null,'public prop lazyContent:MatLegacyMenuContent?']],MatLegacyMenuItem:[[null,'public prop disableRipple:boolean'],[null,'public prop disabled:boolean']]};
 function closure(program){return program.getSourceFiles().map(file=>{const real=realpathSync(file.fileName);let dir=dirname(real);while(dir!==dirname(dir)&&!existsSync(join(dir,'package.json')))dir=dirname(dir);const meta=readFileSync(join(dir,'package.json')),pkg=JSON.parse(meta),path=relative(dir,real).split('\\').join('/'),bytes=readFileSync(real);if(!pkg.name||!pkg.version||!path||path==='..'||path.startsWith('../')||isAbsolute(path)||!bytes.equals(Buffer.from(file.text)))throw Error('unbound declaration closure');return {package:pkg.name,version:pkg.version,package_sha256:hash(meta),path,bytes:bytes.length,sha256:hash(bytes)};});}
+function menuStrictConsumer(ts,file,options,expected){
+ const virtual=join(dirname(file.fileName),'menu-owned-signature-consumer.ts');
+ const text=`import {MAT_LEGACY_MENU_PANEL,MatLegacyMenuPanel,MatLegacyMenuContent,MatLegacyMenuItem} from './ngx-compat-material-legacy-legacy-menu';
+import {ElementRef,InjectionToken} from '@angular/core';
+declare const node: ElementRef<HTMLElement>; declare const panel: MatLegacyMenuPanel;
+const item = new MatLegacyMenuItem(node); item.disabled = true; item.disableRipple = false;
+const disabled: boolean = item.disabled; const ripple: boolean = item.disableRipple;
+const content: MatLegacyMenuContent | undefined = panel.lazyContent;
+const token: InjectionToken<MatLegacyMenuPanel<any>> = MAT_LEGACY_MENU_PANEL;
+type Equal<A,B> = (<T>()=>T extends A ? 1 : 2) extends (<T>()=>T extends B ? 1 : 2) ? true : false;
+type Assert<T extends true> = T;
+type Disabled = Assert<Equal<MatLegacyMenuItem['disabled'],boolean>>;
+type Ripple = Assert<Equal<MatLegacyMenuItem['disableRipple'],boolean>>;
+type Lazy = Assert<Equal<MatLegacyMenuPanel['lazyContent'],MatLegacyMenuContent | undefined>>;
+type Token = Assert<Equal<typeof MAT_LEGACY_MENU_PANEL,InjectionToken<MatLegacyMenuPanel<any>>>>;
+void [disabled,ripple,content,token];`;
+ const host=ts.createCompilerHost(options),old=host.getSourceFile.bind(host),exists=host.fileExists.bind(host),read=host.readFile.bind(host);
+ host.fileExists=n=>n===virtual||exists(n);host.readFile=n=>n===virtual?text:read(n);host.getSourceFile=(n,v,...args)=>n===virtual?ts.createSourceFile(n,text,v,true):old(n,v,...args);
+ const program=ts.createProgram([virtual],options,host);if(ts.getPreEmitDiagnostics(program).length)return false;
+ const sources=closure({getSourceFiles:()=>program.getSourceFiles().filter(f=>f.fileName!==virtual)});
+ return qualifyMenuCombinedClosure(sources)&&menuHarnessClosureFingerprint(sources)===menuHarnessClosureFingerprint(expected);
+}
 export function menuOwnedDeclarationProof(symbol,file,context,{transformSource}={}){
  try{
   if(!context?.referenceRoot||!exactMenuArtifact(context,context.packageRoot)||realpathSync(file.fileName)!==realpathSync(resolve(context.packageRoot,'types/ngx-compat-material-legacy-legacy-menu.d.ts'))||!readFileSync(file.fileName).equals(Buffer.from(file.text,'utf8')))return null;
@@ -24,7 +49,8 @@ export function menuOwnedDeclarationProof(symbol,file,context,{transformSource}=
   const options={strict:true,skipLibCheck:false,noEmit:true,module:ts.ModuleKind.ESNext,moduleResolution:ts.ModuleResolutionKind.Bundler,target:ts.ScriptTarget.ES2022,types:[]},host=ts.createCompilerHost(options),old=host.getSourceFile.bind(host);
   host.getSourceFile=(name,...args)=>{const source=name===file.fileName?file:old(name,...args);if(!source||!transformSource)return source;const text=transformSource(name,source.text);return text===source.text?source:ts.createSourceFile(name,text,ts.ScriptTarget.Latest,true);};
   const program=ts.createProgram([file.fileName],options,host);if(ts.getPreEmitDiagnostics(program).length)return null;
-  const sources=closure(program),digest=menuHarnessClosureFingerprint(sources);if(sources.length!==312||digest!=='d1b38ebece42f6e11e89723071fac699f3ce268105134b26cf43709652522b68')return null;
+  const sources=closure(program),digest=menuHarnessClosureFingerprint(sources),combined=qualifyCombinedArtifactSubject(readFileSync(context.tarball),context.packageRoot);if(sources.length!==312||(combined?!qualifyMenuCombinedClosure(sources):digest!=='d1b38ebece42f6e11e89723071fac699f3ce268105134b26cf43709652522b68'))return null;
+  if(combined&&!menuStrictConsumer(ts,file,options,sources))return null;
   const checker=program.getTypeChecker(),actual=program.getSourceFile(file.fileName),one=(pred)=>{const found=actual.statements.filter(pred);if(found.length!==1)throw Error('ambiguous declaration');return found[0];};
   const panel=one(n=>ts.isInterfaceDeclaration(n)&&n.name.text==='MatMenuPanel'),content=one(n=>ts.isClassDeclaration(n)&&n.name?.text==='MatLegacyMenuContent'),base=one(n=>ts.isClassDeclaration(n)&&n.name?.text==='_LegacyMenuItemBase'),item=one(n=>ts.isClassDeclaration(n)&&n.name?.text==='MatLegacyMenuItem');
   const lazy=panel.members.filter(n=>ts.isPropertySignature(n)&&n.name.getText(actual)==='lazyContent');if(lazy.length!==1||!lazy[0].questionToken||!ts.isTypeReferenceNode(lazy[0].type)||checker.getSymbolAtLocation(lazy[0].type.typeName)!==checker.getSymbolAtLocation(content.name))return null;

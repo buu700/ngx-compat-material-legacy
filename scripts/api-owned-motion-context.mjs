@@ -97,12 +97,14 @@ function wrapperScope(file,name,coreFile){
  const lineStarts=[0];for(let at=source.indexOf('\n');at>=0;at=source.indexOf('\n',at+1))lineStarts.push(at+1);
  return {file,ranges:[[fn.getStart(parsed),fn.end]],lineStarts,proof:{file,sha256:sha(source),function_text_sha256:sha(fn.getText(parsed))}};
 }
-function helperOrigin(request,stateScope,disabledScope,callerScope,manualWrapper){
+function helperOrigin(request,stateScope,disabledScope,callerScope,manualWrapper,resolverScope){
  const calls=frames(request.stack),index=calls.findIndex(frame=>inside(frame,stateScope));
  if(index<0)return null;
  if(disabledScope&&!inside(calls[index+1],disabledScope))return null;
  let caller=calls[index+(disabledScope?2:1)];
- if(manualWrapper){if(!inside(caller,manualWrapper))return null;caller=calls[index+(disabledScope?3:2)];}
+ let next=index+(disabledScope?2:1);
+ if(manualWrapper){if(!inside(caller,manualWrapper))return null;caller=calls[++next];}
+ if(resolverScope&&inside(caller,resolverScope))caller=calls[++next];
  return callerScope&&!inside(caller,callerScope)?null:caller;
 }
 function assertRequests(requests,expected,{allowUnresolved=false}={}){
@@ -125,6 +127,7 @@ export function partitionOwnedSelectMotion(requests,core,owned,layout,material,T
  if(!profile)throw Error('unknown owned motion caller');
  const stateScope=sourceScope(files.core,owned.getLegacyAnimationsState);
  const disabledScope=sourceScope(files.core,owned.legacyAnimationsDisabled);
+ const resolverScope=sourceScope(files.core,owned.resolveLegacyAnimationMode);
  let callerType=Type,constructorOwner,constructorAnimationMode;
  if(profile.constructorOwnerExport){
   const exported=familyExports?.[profile.constructorOwnerExport];
@@ -151,29 +154,30 @@ export function partitionOwnedSelectMotion(requests,core,owned,layout,material,T
   if(constructorCapture?.constructor_calls!==1||constructorCapture.inputs?.length!==profile.constructorArity)
    throw Error('actual original motion-mode constructor input capture missing');
   const mode=constructorCapture.inputs[profile.constructorAnimationIndex];
-  if(mode!==injector.get(core.ANIMATION_MODULE_TYPE,null,{optional:true}))throw Error('constructor motion-mode input differs from actual caller provider');
+  if(owned.LEGACY_ANIMATION_MODE===core.ANIMATION_MODULE_TYPE || owned.LEGACY_ANIMATION_MODE===material.MATERIAL_ANIMATIONS || mode!==injector.get(owned.LEGACY_ANIMATION_MODE,null,{optional:true}) || requests.some(request=>request.token===core.ANIMATION_MODULE_TYPE))throw Error('owned constructor token identity or old-token exclusion differs');
   constructorAnimationMode={original_parameter_index:profile.constructorAnimationIndex,original_constructor_arity:profile.constructorArity,
-   ident:param.ident,spec:param.spec,optional:true,actual_input_identical:true,constructor_calls:1,mode_was_noop:mode==='NoopAnimations'};
+   ident:param.ident,spec:param.spec,optional:true,actual_input_identical:true,constructor_calls:1,mode_was_noop:mode==='NoopAnimations',owned_token_distinct:true,old_engine_token_requested:false};
  }
  const callerScope=sourceScope(files.caller,callerType,{classConstructor:true});
  const manualWrapper=profile.wrapper?wrapperScope(files.caller,profile.wrapper,files.core):null;
  const expected=[
   {ident:'LEGACY_ANIMATIONS_TEST_OVERRIDE',token:owned.LEGACY_ANIMATIONS_TEST_OVERRIDE,optional:true},
   {ident:'MATERIAL_ANIMATIONS',token:material.MATERIAL_ANIMATIONS,optional:true},
-  {ident:'ANIMATION_MODULE_TYPE',token:core.ANIMATION_MODULE_TYPE,optional:true},
+  {ident:'LEGACY_ANIMATION_MODE',token:owned.LEGACY_ANIMATION_MODE,optional:true},
   {ident:'MediaMatcher',token:layout.MediaMatcher,optional:false},
  ];
- if(expected.some(item=>!item.token)||owned.MATERIAL_ANIMATIONS!==material.MATERIAL_ANIMATIONS)
+ if(expected.some(item=>!item.token)||owned.MATERIAL_ANIMATIONS!==material.MATERIAL_ANIMATIONS || owned.LEGACY_ANIMATION_MODE===core.ANIMATION_MODULE_TYPE || owned.LEGACY_ANIMATION_MODE===material.MATERIAL_ANIMATIONS || requests.some(request=>request.token===core.ANIMATION_MODULE_TYPE))
   throw Error('owned motion public token identities missing');
  const retained=[],classified=[];
  for(const request of requests){
-  if(helperOrigin(request,stateScope,disabledScope,callerScope,manualWrapper))classified.push(request);else retained.push(request);
+  if(helperOrigin(request,stateScope,disabledScope,callerScope,manualWrapper,resolverScope))classified.push(request);else retained.push(request);
  }
  const control=runFactory(owned.getLegacyAnimationsState,core.Injector,core.runInInjectionContext,{injector,captureStack:true});
  if(control.outcome!=='returned'||!['enabled','di-disabled','reduced-motion'].includes(control.value)
   ||control.requests.some(request=>!helperOrigin(request,stateScope)))throw Error('owned motion independent control incomplete');
  assertRequests(control.requests,expected.slice(0,control.requests.length));
- assertRequests(classified,expected.slice(0,control.requests.length));
+ if(!control.requests.length || classified.length % control.requests.length)throw Error('owned motion helper invocation count differs');
+ for(let i=0;i<classified.length;i+=control.requests.length)assertRequests(classified.slice(i,i+control.requests.length),expected.slice(0,control.requests.length));
  const componentState=value[profile.property],componentEnabled=control.value==='enabled'&&!constructorAnimationMode?.mode_was_noop;
  const expectedState=profile.enabled?componentEnabled:!componentEnabled;
  if(!classified.length||componentState!==expectedState)throw Error('owned component motion state differs from control');
@@ -202,18 +206,63 @@ export function partitionOwnedSelectMotion(requests,core,owned,layout,material,T
     disabled_queries:[...queries],requests:serialized(observed.requests,expected),disabled_requests:serialized(disabled.requests,expected)});
   }finally{child.destroy();parent.destroy();}
  }
- return {requests:retained,observation:{symbol_id:symbolId,
-  role:'Owned helper source/caller, independent same-node control and finite state matrix; original constructor expectations unchanged',
+ return {requests:retained,observation:{protocol:'owned-mode-v1',symbol_id:symbolId,
+  role:'Owned helper source/caller and finite state matrix; historical constructor is retained for comparison and the owned token is distinct',
   total_requests:requests.length,retained_requests:retained.length,classified_requests:classified.length,
   sources:{state:stateScope.proof,disabled:disabledScope.proof,caller:callerScope.proof,...(manualWrapper?{manual_wrapper:manualWrapper.proof}:{})},
-  caller:helperOrigin(classified[0],stateScope,disabledScope,callerScope,manualWrapper),
+  caller:helperOrigin(classified[0],stateScope,disabledScope,callerScope,manualWrapper,resolverScope),
   state:control.value,component_enabled:profile.enabled?componentState:!componentState,verified:true,
   ...(constructorOwner?{constructor_owner:constructorOwner}:{}),
   ...(constructorAnimationMode?{constructor_animation_mode:constructorAnimationMode}:{}),
-  requests:serialized(classified,expected),control_requests:serialized(control.requests,expected),cases}};
+  requests:classified.flatMap((_,i)=>i%control.requests.length===0?serialized(classified.slice(i,i+control.requests.length),expected):[]),control_requests:serialized(control.requests,expected),cases}};
 }
 
-export function ownedSelectMotionProblems(observation,symbolId=SELECT_MOTION_SYMBOL){
+function ownedModeMotionProblems(observation,symbolId=SELECT_MOTION_SYMBOL){
+ const x=observation,problems=[],profile=ownedMotionProfile(symbolId);
+ if(profile?.constructorOwnerExport){
+  if(!isDeepStrictEqual(x?.constructor_owner,{...(profile.constructorOwnerViaPublicSubclass?{public_subclass_export:profile.constructorOwnerExport}:{public_export:profile.constructorOwnerExport}),depth:profile.constructorOwnerDepth,owned_class_identity_matched:true}))
+   problems.push('owned motion constructor owner identity evidence incomplete');
+  if(x?.caller?.file!==x?.sources?.caller?.file
+   ||!x?.sources?.caller?.file?.endsWith('/fesm2022/ngx-compat-material-legacy-'+profile.family+'.mjs'))
+   problems.push('owned motion constructor caller belongs to a different public entry');
+ }
+ const mode=x?.constructor_animation_mode;
+ if(profile?.wrapper&&(!x?.sources?.manual_wrapper?.file||x.sources.manual_wrapper.file!==x.sources?.caller?.file
+  ||!/^([a-f0-9]{64})$/.test(x.sources.manual_wrapper.sha256||'')||!/^([a-f0-9]{64})$/.test(x.sources.manual_wrapper.function_text_sha256||'')))
+  problems.push('owned motion manual wrapper source correlation incomplete');
+ if(profile?.constructorAnimationIndex!==undefined&&(!mode||typeof mode.mode_was_noop!=='boolean'
+  ||!isDeepStrictEqual(mode,{original_parameter_index:profile.constructorAnimationIndex,original_constructor_arity:profile.constructorArity,
+   ident:'ANIMATION_MODULE_TYPE',spec:'@angular/platform-browser/animations',optional:true,actual_input_identical:true,constructor_calls:1,mode_was_noop:mode.mode_was_noop,owned_token_distinct:true,old_engine_token_requested:false})))
+  problems.push('owned motion original constructor-mode evidence incomplete');
+ if(!ownedMotionProfile(symbolId)||!x||x.symbol_id!==symbolId||x.role!=='Owned helper source/caller and finite state matrix; historical constructor is retained for comparison and the owned token is distinct'||x.verified!==true
+  ||!Number.isInteger(x.total_requests)||!Number.isInteger(x.retained_requests)||!Number.isInteger(x.classified_requests)
+  ||x.retained_requests<0||x.classified_requests<1||x.retained_requests+x.classified_requests!==x.total_requests
+  ||!['enabled','di-disabled','reduced-motion'].includes(x.state)||x.component_enabled!==(x.state==='enabled'&&!(profile?.constructorAnimationIndex!==undefined&&mode?.mode_was_noop))
+  ||!x.caller?.file||!Number.isInteger(x.caller.line)||!Number.isInteger(x.caller.column))
+  return ['owned select motion execution/control evidence incomplete'];
+ if(['state','disabled','caller'].some(name=>!x.sources?.[name]?.file
+  ||!/^([a-f0-9]{64})$/.test(x.sources[name].sha256)||!/^([a-f0-9]{64})$/.test(x.sources[name].function_text_sha256)))
+  problems.push('owned motion source/caller correlation incomplete');
+ if(symbolId===SNACK_MOTION_SYMBOL&&(x.caller?.file!==x.sources?.caller?.file
+  ||!x.sources?.caller?.file?.endsWith('/fesm2022/ngx-compat-material-legacy-legacy-snack-bar.mjs')))
+  problems.push('owned snack-bar motion caller belongs to a different public entry');
+ const names=['LEGACY_ANIMATIONS_TEST_OVERRIDE','MATERIAL_ANIMATIONS','LEGACY_ANIMATION_MODE','MediaMatcher'];
+ const check=(requests,count,unresolved=false)=>Array.isArray(requests)&&requests.length===count&&requests.every((r,index)=>
+  r.ident===names[index]&&r.identity_matched===true&&r.optional===(index<3)
+  &&r.self===false&&r.skipSelf===false&&r.host===false&&r.unresolved===(unresolved&&index===count-1));
+ if(!Array.isArray(x.control_requests)||!x.control_requests.length||x.classified_requests%x.control_requests.length||!check(x.control_requests,x.control_requests.length)||!Array.isArray(x.requests)||x.requests.length!==x.classified_requests||Array.from({length:x.classified_requests/x.control_requests.length},(_,i)=>x.requests.slice(i*x.control_requests.length,(i+1)*x.control_requests.length)).some(group=>!check(group,x.control_requests.length)))
+  problems.push('owned motion actual/control identity/options differ');
+ if(!Array.isArray(x.cases)||x.cases.length!==matrix.length||matrix.some((cell,index)=>{
+  const actual=x.cases[index];return actual?.id!==cell.id||actual.result!=='pass'||actual.state!==cell.state||actual.disabled!==(cell.state!=='enabled')
+   ||!Array.isArray(actual.queries)||actual.queries.length!==(cell.queries||0)
+   ||actual.queries.some(query=>query!=='(prefers-reduced-motion)')||!check(actual.requests,cell.count,Boolean(cell.unresolved))
+   ||!Array.isArray(actual.disabled_queries)||actual.disabled_queries.length!==(cell.queries||0)
+   ||actual.disabled_queries.some(query=>query!=='(prefers-reduced-motion)')||!check(actual.disabled_requests,cell.count,Boolean(cell.unresolved));
+ }))problems.push('owned motion state/query matrix incomplete');
+ return problems;
+}
+
+function legacyOwnedSelectMotionProblems(observation,symbolId=SELECT_MOTION_SYMBOL){
  const x=observation,problems=[],profile=ownedMotionProfile(symbolId);
  if(profile?.constructorOwnerExport){
   if(!isDeepStrictEqual(x?.constructor_owner,{...(profile.constructorOwnerViaPublicSubclass?{public_subclass_export:profile.constructorOwnerExport}:{public_export:profile.constructorOwnerExport}),depth:profile.constructorOwnerDepth,owned_class_identity_matched:true}))
@@ -257,3 +306,33 @@ export function ownedSelectMotionProblems(observation,symbolId=SELECT_MOTION_SYM
  }))problems.push('owned motion state/query matrix incomplete');
  return problems;
 }
+
+export function ownedSelectMotionProblems(observation,symbolId=SELECT_MOTION_SYMBOL){
+ return observation?.protocol==='owned-mode-v1' ? ownedModeMotionProblems(observation,symbolId) : legacyOwnedSelectMotionProblems(observation,symbolId);
+}
+
+/** Qualify additional motion-policy requests made by an actual tab-header constructor. */
+export function partitionHeaderOwnedMotion(requests,core,owned,layout,material,Type,file,runFactory,injector,value,capture){
+ const stateScope=sourceScope(file.core,owned.getLegacyAnimationsState),disabledScope=sourceScope(file.core,owned.legacyAnimationsDisabled),resolverScope=sourceScope(file.core,owned.resolveLegacyAnimationMode);
+ if(!owned.LEGACY_ANIMATION_MODE || owned.LEGACY_ANIMATION_MODE===core.ANIMATION_MODULE_TYPE || owned.LEGACY_ANIMATION_MODE===material.MATERIAL_ANIMATIONS || requests.some(r=>r.token===core.ANIMATION_MODULE_TYPE))throw Error('header old/owned motion token identity differs');
+ if(capture?.constructor_calls!==1||capture.inputs?.length!==7||capture.inputs[6]!==injector.get(owned.LEGACY_ANIMATION_MODE,null,{optional:true}))throw Error('header owned constructor input differs');
+ const callers=[];for(let t=Type;typeof t==='function'&&t!==Function.prototype;t=Object.getPrototypeOf(t)){
+  try{callers.push(sourceScope(file.caller,t,{classConstructor:true}));}catch{break;}
+  if(t===file.owner)break;
+ }
+ if(!callers.length||!callers.some(s=>s.proof.function_text_sha256===sha(Function.prototype.toString.call(file.owner))))throw Error('header constructor hierarchy unproven');
+ const retained=[],classified=[];
+ for(const request of requests){if(callers.some(c=>helperOrigin(request,stateScope,disabledScope,c,null,resolverScope)))classified.push(request);else retained.push(request);}
+ const expected=[{ident:'LEGACY_ANIMATIONS_TEST_OVERRIDE',token:owned.LEGACY_ANIMATIONS_TEST_OVERRIDE,optional:true},{ident:'MATERIAL_ANIMATIONS',token:material.MATERIAL_ANIMATIONS,optional:true},{ident:'LEGACY_ANIMATION_MODE',token:owned.LEGACY_ANIMATION_MODE,optional:true},{ident:'MediaMatcher',token:layout.MediaMatcher,optional:false}];
+ const control=runFactory(owned.getLegacyAnimationsState,core.Injector,core.runInInjectionContext,{injector,captureStack:true});
+ if(control.outcome!=='returned'||!control.requests.length||(!classified.length&&capture.inputs[6]!=='NoopAnimations')||classified.length%control.requests.length)throw Error('header motion control count differs');
+ assertRequests(control.requests,expected.slice(0,control.requests.length));
+ for(let i=0;i<classified.length;i+=control.requests.length)assertRequests(classified.slice(i,i+control.requests.length),expected.slice(0,control.requests.length));
+ const mode=capture.inputs[6],expectedMode=mode==='NoopAnimations'||control.value!=='enabled'?'NoopAnimations':mode;
+ if(value._animationMode!==expectedMode)throw Error('header effective animation mode differs');
+ return {requests:retained,observation:{protocol:'header-owned-mode-v1',old_token_requested:false,owned_token_distinct:true,constructor_arity:7,constructor_mode_matched:true,constructor_mode_noop:mode==='NoopAnimations',ambient_state:control.value,effective_mode:expectedMode??null,helper_calls:classified.length/control.requests.length,classified_requests:classified.length,control_requests:serialized(control.requests,expected),source:{state:stateScope.proof,disabled:disabledScope.proof,resolver:resolverScope.proof,callers:callers.map(s=>s.proof)}}};
+}
+
+// Shared mechanics for the separately bounded direct-constructor successor.
+export {sourceScope as ownedMotionSourceScope, helperOrigin as ownedMotionHelperOrigin,
+ assertRequests as assertOwnedMotionRequests, serialized as serializeOwnedMotionRequests};
