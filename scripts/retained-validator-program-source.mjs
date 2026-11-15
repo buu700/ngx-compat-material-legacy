@@ -12,6 +12,7 @@ const SELF='scripts/retained-validator-program-source.mjs',image=readFileSync(fi
 const PACKET={path:'compatibility/rc/main-retained-validator-programs-v1.json',sha256:'e26a11ac20146aa41e5b2a540606cf659c627b5235ae09687a0bb3cea4b2780d',bytes:6968};
 const CONTEXT_SUCCESSOR={path:'compatibility/rc/retained-validator-context-successor-4015.json',sha256:'55543fe7a1c7621e516b0ddde32711445b463ba47dcdeda0f2fa51bd33d0e1eb',bytes:2286};
 const CONTEXT_CONTINUATION={path:'compatibility/rc/retained-validator-context-successor-149de.json',sha256:'ed55cab51218c54b292a1f33adef1d84edd68941e59b6fdfecd977546a8b9575',bytes:2591};
+const METADATA_CONTINUATION={path:'compatibility/rc/retained-validator-context-successor-a0b77.json',sha256:'3b212875082485079b0def1efbb881bf0cbab2de6a4302ea69f3f6c2074d13fa',bytes:2524};
 const AUTHORITY='1c4ace0fa7a0e7cc4d3e919f415e05ca5e46f3c0',INTERMEDIATE='4e6f608402e99da9fb550bb46040aa68a648440a',CURRENT='1b81670bc1390da94e7928c0fb24f361e1af08e8';
 const PATHS=['scripts/upstream-build-scope-evidence.mjs','scripts/upstream-test-consolidation-evidence.mjs','scripts/upstream-bazel-build-scope.mjs'];
 const sha=raw=>createHash('sha256').update(raw).digest('hex'),clean=ref=>({path:ref.path,sha256:ref.sha256,bytes:ref.bytes});
@@ -66,6 +67,10 @@ export function retainedValidatorProgramSource({root=process.cwd(),read}={}){
  for(const row of continuation.transitions)for(const side of ['before','after'])assert.equal(row[side].path,row.path);
  for(let i=0;i<successorPaths.length;i++)assert.deepEqual(continuation.transitions[i].before,successor.transitions[i].after);
  verifyGit(continuationParent,continuation.transitions.map(row=>row.before));verifyGit(continuationCommit,continuation.transitions.map(row=>row.after));
+ // Authenticate the committed metadata context source and its exact test cut.
+ const metadataRaw=physical(METADATA_CONTINUATION.path);exact(metadataRaw,METADATA_CONTINUATION);const metadata=JSON.parse(metadataRaw),metadataParent='42d16b15d9e852a9c959506f67046cf531faa6f4',metadataCommit='a0b778d5b3268bb6cb218f0487b7ce5e28d6ac1f';
+ assert.equal(metadata.schema_version,1);assert.equal(metadata.role,'retained-validator-metadata-context-source-continuation');assert.equal(metadata.source_parent,metadataParent);assert.equal(metadata.source_commit,metadataCommit);for(const [key,value]of Object.entries({source_only:true,historical_programs_executed:false,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(metadata[key],value,key);
+ assert.equal(git(['rev-list','--parents','-n','1',metadataCommit]).toString().trim(),metadataCommit+' '+metadataParent);git(['merge-base','--is-ancestor',continuationCommit,metadataParent]);git(['merge-base','--is-ancestor',metadataCommit,'HEAD']);assert.deepEqual(metadata.transitions.map(row=>row.path),continuationPaths);assert.deepEqual(git(['diff','--name-status','--no-renames',metadataParent,metadataCommit]).toString().trim().split('\n'),continuationPaths.map(path=>'M\t'+path));for(let i=0;i<continuationPaths.length;i++){const row=metadata.transitions[i];assert.equal(row.before.path,row.path);assert.equal(row.after.path,row.path);assert.deepEqual(row.before,continuation.transitions[i].after);}verifyGit(metadataParent,metadata.transitions.map(row=>row.before));verifyGit(metadataCommit,metadata.transitions.map(row=>row.after));
  const bound=new Map(),identities=new Map();
  const add=ref=>{const normalized=clean(ref),prior=bound.get(ref.path);if(prior)assert.deepEqual(prior,normalized);else bound.set(ref.path,normalized);};
  add({path:SELF,sha256:sha(image),bytes:image.length});add(PACKET);add(packet.source_input);
@@ -76,8 +81,8 @@ export function retainedValidatorProgramSource({root=process.cwd(),read}={}){
   const known=new Map();for(const ref of [row.before,row.intermediate,row.current]){const prior=known.get(ref.sha256);if(prior)assert.deepEqual(prior,clean(ref));else known.set(ref.sha256,clean(ref));}
   identities.set(row.path,{known,current:clean(row.current)});add(row.current);
  }
- for(const ref of packet.support)add(ref.path===successorPaths[0]?continuation.transitions[0].after:ref);
- add(CONTEXT_SUCCESSOR);add(CONTEXT_CONTINUATION);for(const row of continuation.transitions.slice(1))add(row.after);
+ for(const ref of packet.support)add(ref.path===successorPaths[0]?metadata.transitions[0].after:ref);
+ add(CONTEXT_SUCCESSOR);add(CONTEXT_CONTINUATION);add(METADATA_CONTINUATION);for(const row of metadata.transitions.slice(1))add(row.after);
  let checking=false,reentered=false;
  const assertCurrent=()=>{
   if(checking){reentered=true;throw new Error('retained validator program reentry');}

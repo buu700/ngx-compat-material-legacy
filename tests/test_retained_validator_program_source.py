@@ -15,7 +15,7 @@ class RetainedValidatorProgramSourceTests(unittest.TestCase):
         self.assertEqual(child.returncode, 0, child.stdout + child.stderr)
         report = json.loads(child.stdout)
         self.assertEqual(report['programs'], 3)
-        self.assertEqual((report['cold_rejections'], report['late_rejections'], report['recoveries']), (24, 24, 24))
+        self.assertEqual((report['cold_rejections'], report['late_rejections'], report['recoveries']), (25, 25, 25))
         for field in ['unknown_hash_rejected', 'wrong_length_rejected', 'accessor_not_invoked',
                       'public_metadata_isolated', 'physical_cross_member_mutation_rejected',
                       'caught_reentry_rejected_and_recovered', 'whole_predecessor_bodies_rejected_and_recovered',
