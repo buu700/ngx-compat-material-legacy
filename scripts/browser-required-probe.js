@@ -402,7 +402,7 @@
       waitFor(() => {
         const observation = readLegacySelectFontNative(query('#p-select .mat-select-trigger'));
         return legacySelectFontNativeOkay(observation) ? observation : null;
-      }, 1500, observation => finish(!!observation, 'mat-select-panel; font inheritance ' + JSON.stringify(observation)));
+      }, 1500, observation => {if (!observation) {finish(false, 'mat-select-panel; font inheritance missing'); return;} runKeycode('select', 'mat-select-panel; font inheritance ' + JSON.stringify(observation));});
       return;
     }
     if (family === 'autocomplete') {
@@ -431,11 +431,14 @@
     }
     if (family === 'tooltip') {
       const button = query('#p-tooltip'), sequence = [];
-      if (button) {
-        button.scrollIntoView({block: 'center'});
-        button.focus();
-        button.dispatchEvent(new MouseEvent('mouseenter', {bubbles: true}));
-      }
+      if (!button) {finish(false, 'tooltip host missing'); return;}
+      button.scrollIntoView({block: 'center'});
+      const bounds = button.getBoundingClientRect();
+      const room = {center: bounds.left + bounds.width / 2, bottom: bounds.bottom,
+        viewportWidth: innerWidth, viewportHeight: innerHeight};
+      if (!tooltipFixtureRoomOkay(room)) {finish(false, 'tooltip fixture insufficient below/center room ' + JSON.stringify(room)); return;}
+      button.focus();
+      button.dispatchEvent(new MouseEvent('mouseenter', {bubbles: true}));
       waitFor(() => {
         const observation = readLegacyTooltipNative(button);
         return legacyTooltipNativeOkay(observation, 'Hello tip') ? observation : null;
@@ -444,7 +447,8 @@
         sequence.push(first);
         const change = query('#p-tooltip-change');
         if (!change) {finish(false, 'tooltip message change fixture missing'); return;}
-        change.click();
+        change.value = 'A longer tooltip message for repositioning';
+        change.dispatchEvent(new Event('input', {bubbles: true}));
         waitFor(() => {
           const observation = readLegacyTooltipNative(button);
           return legacyTooltipNativeOkay(observation, 'A longer tooltip message for repositioning') ? observation : null;
@@ -461,8 +465,8 @@
           const timeout = setTimeout(() => complete(false, 'tooltip ARIA fixture timed out'), 1500);
           Promise.resolve().then(() => lab.runTooltipAriaLifetime()).then(observation => {
             clearTimeout(timeout);
-            complete(legacyTooltipMessageSequenceOkay(sequence) && legacyTooltipAriaLifetimeNativeOkay(observation),
-              'mat-tooltip; message geometry ' + JSON.stringify(sequence) + '; ARIA destruction ' + JSON.stringify(observation));
+            if (!legacyTooltipMessageSequenceOkay(sequence) || !legacyTooltipAriaLifetimeNativeOkay(observation)) {complete(false, 'tooltip geometry or ARIA failed'); return;}
+            if (window.__status === request) runKeycode('tooltip', 'mat-tooltip; fixture room ' + JSON.stringify(room) + '; message geometry ' + JSON.stringify(sequence) + '; ARIA destruction ' + JSON.stringify(observation));
           }, error => {
             clearTimeout(timeout);
             complete(false, 'tooltip ARIA fixture ' + String(error));
@@ -556,6 +560,17 @@
     });
   }
 
+  // Supplemental key checks remain inside the existing artifact-bound default cells.
+  function runKeycode(kind, priorEvidence) {
+    const lab = window.__lab;
+    if (!lab || typeof lab.runKeycode !== 'function') {finish(false, 'keycode fixture API missing'); return;}
+    const owner = window.__status;
+    Promise.resolve().then(() => lab.runKeycode(kind)).then(observation => {
+      if (window.__status === owner) finish(browserKeycodeObservationOkay(kind, observation),
+        priorEvidence + '; synthetic keyboard, navigation cancelled, animations disabled ' + JSON.stringify(observation));
+    }, error => {if (window.__status === owner) finish(false, 'keycode fixture ' + String(error));});
+  }
+
   function runPagination(inkSequence) {
     const group = query('#p-pagination-tabs');
     waitFor(() => {
@@ -587,8 +602,7 @@
               disabled_click_inert: !!inert, pointer_focus_retained: end.focus_retained,
               scroll_before: initial.scroll, scroll_after: end.scroll};
             return trustedClicks === 1 && tabPaginationNativeOkay(observation) ? observation : null;
-          }, 1500, observation => finish(!!observation,
-            'tabs; ink-bar sequence ' + JSON.stringify(inkSequence) + '; trusted pagination ' + JSON.stringify(observation))));
+          }, 1500, observation => {if (!observation) {finish(false, 'tabs pagination observation missing'); return;} runKeycode('tabs', 'tabs; ink-bar sequence ' + JSON.stringify(inkSequence) + '; trusted pagination ' + JSON.stringify(observation));}));
         });
       }));
     });

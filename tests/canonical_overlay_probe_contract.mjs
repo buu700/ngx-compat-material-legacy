@@ -21,7 +21,7 @@ const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 function fixture({observation = good, api = true, reject = false, show = true, source = raw,
     family = 'tooltip', automaticFocus = true, selectionApi = true, selectionEvent = true,
     selectionValue = true, selectionCloses = true, optionPresent = true,
-    wrongTooltipPosition = false, noWidthGrowth = false, staleMessage = false} = {}) {
+    wrongTooltipPosition = false, noWidthGrowth = false, staleMessage = false, insufficientRoom = false} = {}) {
   let now = 0, next = 0, visible = false, calls = 0;
   const jobs = new Map(), surface = {className: '', setAttribute() {}}, window = {};
   window.__lab = {closeTransient() {visible = false; wider = false;}};
@@ -30,6 +30,8 @@ function fixture({observation = good, api = true, reject = false, show = true, s
     if (reject) return Promise.reject(new Error('fixture operation failed'));
     return observation;
   };
+  const modified = Object.fromEntries(['alt','ctrl','shift','meta'].map(name => [name, {prevented:false, open:true}]));
+  window.__lab.runKeycode = () => ({opened:true,modified,prevented:true,closed:true,reopened:true,destroyed:true,keysBeforeDestroy:[65,27,27,27,27],keysAfterDestroy:[65,27,27,27,27,66]});
   let menuVisible = false, autoVisible = false, selected = null;
   const item = {contains: node => node === item, focus() {throw new Error('manual focus would mask initialization');}};
   const input = {value: '', focus() {}, dispatchEvent() {autoVisible = true;}};
@@ -41,7 +43,7 @@ function fixture({observation = good, api = true, reject = false, show = true, s
   const menuTrigger = {click() {menuVisible = true; if (automaticFocus) document.activeElement = item;}};
   let wider = false;
   const host = {focus() {}, scrollIntoView() {}, dispatchEvent() {visible = show;},
-    getBoundingClientRect: () => ({left: 190, width: 20, bottom: 40})};
+    getBoundingClientRect: () => ({left: insufficientRoom ? 10 : 190, width: 20, bottom: 40})};
   const tip = {classList: {contains: name => name === 'mat-tooltip'},
     get textContent() {return wider && !staleMessage ? 'A longer tooltip message for repositioning' : 'Hello tip';},
     getBoundingClientRect: () => ({left: wider && !noWidthGrowth ? 100 : 175,
@@ -57,12 +59,12 @@ function fixture({observation = good, api = true, reject = false, show = true, s
       if (selector === '.mat-autocomplete-panel .mat-option') return autoVisible && optionPresent ? option : null;
       if (selector === '.mat-autocomplete-panel') return autoVisible ? {} : null;
       if (selector === '#p-tooltip') return host;
-      if (selector === '#p-tooltip-change') return {click() {wider = true;}};
+      if (selector === '#p-tooltip-change') return {value:'', dispatchEvent() {wider = true;}};
       if (selector === '.mat-tooltip') return visible ? tip : null;
       return null;
     }, querySelectorAll: selector => selector === '.mat-tooltip' && visible ? [tip] : []};
   const context = {window, document, Promise, JSON, String, MouseEvent: class MouseEvent {},
-    innerWidth: 800, innerHeight: 600, getComputedStyle: () => ({visibility: 'visible', display: 'block'}),
+    innerWidth: 800, innerHeight: 600, Event: class Event {}, getComputedStyle: () => ({visibility: 'visible', display: 'block'}),
     FocusEvent: class FocusEvent {}, InputEvent: class InputEvent {}, KeyboardEvent: class KeyboardEvent {},
     Date: {now: () => now},
     setTimeout(callback, delay = 0) {const id = ++next; jobs.set(id, {callback, due: now + delay}); return id;},
@@ -114,6 +116,10 @@ await check('unresolved-operation-cannot-credit-visible-tooltip', async () => {
   assert.equal(f.status().done, true); assert.equal(f.status().ok, false);
   assert.ok(f.status().evidence.includes('timed out'));
 });
+await check('tooltip-rejects-insufficient-fixture-room', async () => {
+  const f = fixture({insufficientRoom: true}); f.begin(); await f.advance(0);
+  assert.equal(f.status().ok, false); assert.ok(f.status().evidence.includes('insufficient below/center room')); assert.equal(f.calls, 0);
+});
 await check('missing-visible-tooltip-does-not-run-lifetime-operation', async () => {
   const f = fixture({show: false}); f.begin(); await f.advance(1600);
   assert.equal(f.status().ok, false); assert.equal(f.calls, 0);
@@ -156,11 +162,11 @@ for (const flag of ['selectionEvent', 'selectionValue', 'selectionCloses', 'sele
     assert.equal(f.status().ok, false);
   });
 }
-const guardless = raw.replace('if (window.__status === request) finish(ok, evidence);', 'finish(ok, evidence);');
+const guardless = raw.replace("if (window.__status === request) runKeycode('tooltip',", "runKeycode('tooltip',");
 assert.notEqual(guardless, raw);
 await assert.rejects(() => replaced(guardless), error => error.code === 'ERR_ASSERTION' &&
   error.message.startsWith('prior-tooltip-operation-cannot-credit-replacement'));
-const bypass = raw.replace('legacyTooltipAriaLifetimeNativeOkay(observation),', 'true,');
+const bypass = raw.replace('!legacyTooltipAriaLifetimeNativeOkay(observation)', 'false');
 assert.notEqual(bypass, raw);
 const bypassed = fixture({source: bypass, observation: {...good, pending_cleanup_clear: false}});
 bypassed.begin(); await bypassed.advance(0); assert.equal(bypassed.status().ok, true,
@@ -171,7 +177,7 @@ for (const zoneless of [false, true]) {
     rxjs: '7.8.2', typescript: ts.version, zone: '0.16.3', tslib: '2.8.1', sass: '1.104.1'}, zoneless);
   assert.equal(spec.labSource.split(tooltipAriaLifetimeFixture).length - 1, 1, 'one shared native fixture owner');
   assert.ok(spec.labSource.includes('runTooltipAriaLifetime()'));
-  assert.ok(spec.labSource.includes('declarations: [LabRoot, DialogBody, LabForceInvalid, SnackMotionLab, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime]'));
+  for (const name of ['BrowserKeycodeLab', 'LabRoot', 'DialogBody', 'LabForceInvalid', 'SnackMotionLab', 'TooltipAriaLifetimeLab', 'CaptureTooltipForAriaLifetime']) assert.match(spec.labSource, new RegExp('declarations: \\[[^\\]]*\\b' + name + '\\b'));
   const source = ts.createSourceFile('main.ts', spec.labSource, ts.ScriptTarget.Latest, true);
   assert.equal(source.parseDiagnostics.length, 0);
   const result = ts.transpileModule(spec.labSource, {compilerOptions: {target: ts.ScriptTarget.ES2022,

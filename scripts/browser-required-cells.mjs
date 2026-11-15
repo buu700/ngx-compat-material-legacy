@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import {browserKeycodeFixture} from './browser-keycode-fixture.mjs';
+import {browserKeycodeObservationOkay, tooltipFixtureRoomOkay} from './browser-keycode-contract.mjs';
 /**
  * Execute every declared required browser-matrix cell against packed artifacts.
  *
@@ -67,7 +69,7 @@ function firefoxBin() {
 
 /** The browser executes this exact contract and probe, without npm imports. */
 export function requiredProbeSource() {
-  return [legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTooltipMessageSequenceOkay, readLegacyTooltipNative, legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay,
+  return [browserKeycodeObservationOkay, tooltipFixtureRoomOkay, legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTooltipMessageSequenceOkay, readLegacyTooltipNative, legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay,
     readLegacyInkBarNative, legacySelectFontNativeOkay, readLegacySelectFontNative, legacyChipBlurNativeOkay, chipFocusLifecycleNativeOkay,
     legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative, legacyFormFieldOutlineBoundaryNativeOkay, readLegacyFormFieldOutlineBoundaryNative, legacyFormFieldNoLabelNativeOkay, readLegacyFormFieldNoLabelNative,
     legacyFormFieldDirectionLifetimeNativeOkay, legacyCheckboxTimerLifetimeNativeOkay, legacyRippleDelegationLifetimeNativeOkay,
@@ -184,6 +186,7 @@ function labHtml() {
     '<mat-radio-button id="p-radio-disabled" disabled>Off</mat-radio-button>',
     '<mat-radio-button id="p-radio-invalid" name="lab-req" required value="req">Req</mat-radio-button>',
     '</div>',
+    '<lab-keycode-fixture *ngIf="!cspOnly"></lab-keycode-fixture>',
     '<div id="wrap-select" *ngIf="!cspOnly">',
     '<mat-form-field><mat-select id="p-select" style="font-size:20px" [errorStateMatcher]="matcher"><mat-option value="a">A</mat-option></mat-select></mat-form-field>',
     '<mat-form-field><mat-select id="p-select-disabled" disabled><mat-option value="b">B</mat-option></mat-select></mat-form-field>',
@@ -206,10 +209,11 @@ function labHtml() {
     '<tr mat-header-row *matHeaderRowDef="cols"></tr><tr mat-row *matRowDef="let row; columns: cols"></tr>',
     '</table></div>',
     '<div id="wrap-tabs" *ngIf="!cspOnly"><mat-tab-group id="p-tabs"><mat-tab label="One">One</mat-tab><mat-tab label="Two">Two</mat-tab><mat-tab label="Off" disabled>Off</mat-tab></mat-tab-group><mat-tab-group *ngFor="let instance of [paginationEpoch()]" id="p-pagination-tabs" style="width:220px"><mat-tab *ngFor="let label of paginationLabels" [label]="label">Narrow tab</mat-tab></mat-tab-group></div>',
-    '<div id="wrap-tooltip" *ngIf="!cspOnly">',
+    // Give the below/center geometry scenario room even near the document end.
+    '<div id="wrap-tooltip" *ngIf="!cspOnly" style="display:flex;flex-direction:column;align-items:center;padding-bottom:60vh">',
     '<button id="p-tooltip" type="button" #tip="matTooltip" [matTooltip]="tipMessage()">Tip</button>',
     '<button id="p-tooltip-off" type="button" #tipOff="matTooltip" matTooltip="Nope" matTooltipDisabled>Off</button>',
-    '<button id="p-tooltip-change" type="button" (click)="tipMessage.set(\'A longer tooltip message for repositioning\')">Change tooltip</button>',
+    '<input id="p-tooltip-change" (input)="tipMessage.set($any($event.target).value)" aria-label="Change tooltip message">',
     '<lab-tooltip-aria-lifetime></lab-tooltip-aria-lifetime>',
     '</div>',
     '</div>',
@@ -225,7 +229,8 @@ function labSource(zoneless) {
 import {BrowserModule} from '@angular/platform-browser';
 import {BidiModule, Dir, Directionality} from '@angular/cdk/bidi';
 import {Platform} from '@angular/cdk/platform';
-import {TemplatePortal} from '@angular/cdk/portal';
+import {TemplatePortal, DomPortal} from '@angular/cdk/portal';
+import {Overlay} from '@angular/cdk/overlay';
 import {MatSnackBarConfig} from '@angular/material/snack-bar';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {AbstractControl, FormControl, FormsModule, NG_VALIDATORS, ReactiveFormsModule, ValidationErrors, Validator} from '@angular/forms';
@@ -255,6 +260,7 @@ import {MatLegacyTableModule} from '@ngx-compat/material-legacy/legacy-table';
 import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
 import {MatLegacyTooltip, MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
 
+${browserKeycodeFixture}
 ${tooltipAriaLifetimeFixture}
 ${formFieldDirectionLifetimeFixture}
 ${checkboxTimerLifetimeFixture}
@@ -317,6 +323,7 @@ ${chipFocusLifecycleFixtureMembers()}
   @ViewChild('tipOff') tipOff!: any;
   @ViewChild('chipList') chipList?: MatLegacyChipList;
   @ViewChild(DialogTitleLifetimeLab) titleLifetimeLab?: DialogTitleLifetimeLab;
+  @ViewChild(BrowserKeycodeLab) keycodeLab?: BrowserKeycodeLab;
   @ViewChild(TooltipAriaLifetimeLab) ariaLifetimeLab?: TooltipAriaLifetimeLab;
   @ViewChild(RippleDelegationLab) rippleDelegationLab?: RippleDelegationLab;
   @ViewChild(RippleDelegationFrameLab) rippleFrameLab?: RippleDelegationFrameLab;
@@ -371,6 +378,17 @@ ${chipFocusLifecycleFixtureMembers()}
       },
       openMenu() { lab.openMenu(); },
       openSnack() { lab.openSnack(); },
+      async runKeycode(kind: string) {
+        if (!lab.keycodeLab) throw new Error('keycode fixture missing');
+        if (kind === 'select') lab.selects.first?.close();
+        if (kind === 'tooltip') lab.tip?.hide(0);
+        const selector = kind === 'select' ? '.mat-select-panel' : kind === 'tooltip' ? '.mat-tooltip' : '';
+        if (selector) {
+          for (let i = 0; i < 30 && document.querySelector(selector); i++) await new Promise(resolve => setTimeout(resolve, 50));
+          if (document.querySelector(selector)) throw new Error('prior overlay still present before keycode fixture');
+        }
+        return lab.keycodeLab.run(kind);
+      },
       runTooltipAriaLifetime() {
         if (!lab.ariaLifetimeLab) return Promise.reject(new Error('tooltip ARIA fixture missing'));
         return lab.ariaLifetimeLab.run();
@@ -455,7 +473,7 @@ ${chipFocusLifecycleFixtureMembers()}
     MatLegacyTabsModule,
     MatLegacyTooltipModule,
   ],
-  declarations: [DialogTitleLifetimeLab, DialogTitleLifetimeBody, RippleDelegationLab, RippleDelegationFrameLab, CheckboxTimerLifetimeLab, CaptureCheckboxTimerLifetime, LabRoot, DialogBody, LabForceInvalid, SnackMotionLab, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime, FormFieldDirectionLifetimeLab, CaptureFieldDirectionLifetime, SnackAnnouncementLifetimeLab, CaptureSnackAnnouncementLifetime],
+  declarations: [BrowserKeycodeLab, DialogTitleLifetimeLab, DialogTitleLifetimeBody, RippleDelegationLab, RippleDelegationFrameLab, CheckboxTimerLifetimeLab, CaptureCheckboxTimerLifetime, LabRoot, DialogBody, LabForceInvalid, SnackMotionLab, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime, FormFieldDirectionLifetimeLab, CaptureFieldDirectionLifetime, SnackAnnouncementLifetimeLab, CaptureSnackAnnouncementLifetime],
   bootstrap: [LabRoot],
   providers: [
     ...((window as unknown as {__cspNonce?: string}).__cspNonce ? [{provide: CSP_NONCE, useValue: (window as unknown as {__cspNonce: string}).__cspNonce}] : []),
@@ -601,7 +619,7 @@ export async function buildConsumer(tarball, zoneless) {
       tsconfig: spec.tsconfig,
       labSource: spec.labSource,
       themeSource: spec.themeSource,
-      probe: readFileSync(probePath, 'utf8'),
+      probe: requiredProbeSource(),
       npmProfile: readFileSync(join(root, 'scripts/npm-tooling-options.mjs'), 'utf8'),
       zoneless,
     }))
