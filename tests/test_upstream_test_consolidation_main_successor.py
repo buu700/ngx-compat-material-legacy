@@ -18,6 +18,6 @@ class ConsolidationMainSuccessorTests(unittest.TestCase):
         observed = json.loads(result.stdout)
         self.assertEqual(observed['positive_entries'], 32)
         self.assertEqual(observed['negative_controls'], 22)
-        self.assertEqual(observed['current_product_paths'], 1120)
+        self.assertEqual(observed['current_product_paths'], 1121)
         self.assertEqual(observed['historical_testing_files_retained'], 163)
         self.assertFalse(observed['execution_claims_changed'])

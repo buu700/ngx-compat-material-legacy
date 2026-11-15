@@ -22,7 +22,7 @@ function verifyChild(mode,script){
  const marker=JSON.parse(readFileSync(markerPath));assert.deepEqual(Object.keys(marker).sort(),['head','mode','nonce','script']);assert.equal(marker.nonce,nonce);assert.equal(marker.mode,mode);assert.equal(marker.script,script);assert.match(marker.head,/^[a-f0-9]{40}$/);
  const env=cleanEnvironment(),args=['--git-dir',gitDir,'--work-tree',root,'rev-parse'];assert.equal(execFileSync('git',[...args,'HEAD'],{cwd:root,env,encoding:'utf8'}).trim(),marker.head);assert.equal(realpathSync(execFileSync('git',[...args,'--git-common-dir'],{cwd:root,env,encoding:'utf8'}).trim()),gitDir);
 }
-export function runInIsolatedCheckout(mode,script){
+export function runInIsolatedCheckout(mode,script,additionalDiscover){
  if(process.argv.includes('--isolated-retained-child')){verifyChild(mode,script);return false;}
  const root=process.cwd(),seen=new Set(),read=p=>{seen.add(p);return readFileSync(join(root,p));},env=cleanEnvironment();
  const git=(args,opts={})=>execFileSync('git',args,{cwd:root,env,encoding:'utf8',...opts}).trim();
@@ -39,6 +39,7 @@ export function runInIsolatedCheckout(mode,script){
    const entry=ledger.entries.find(e=>e.sha==='ff4f9a093715b9552f2c2dfa1cb69656c70db182');scope.assertEntry(entry.sha,entry);
   }else throw new Error('unknown isolated retained probe '+mode);
  }
+ if(additionalDiscover!==undefined){assert.equal(typeof additionalDiscover,'function');additionalDiscover(read);}
  if(git(['rev-parse','HEAD'])!==head)throw new Error('source HEAD changed during fixture discovery');
  const scratch=mkdtempSync(join(realpathSync(tmpdir()),'retained-source-probe-'));
  try{

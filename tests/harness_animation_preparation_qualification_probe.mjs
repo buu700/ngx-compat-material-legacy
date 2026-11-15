@@ -14,7 +14,7 @@ import {dirname,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {inspectHarnessPreparation,qualifiedCurrentConsolidationSources,HARNESS_PREPARATION_INPUTS,HARNESS_PREPARATION_QUALIFICATION} from '../scripts/harness-animation-preparation-evidence.mjs';
 import {retainedConsolidationSources,HISTORICAL_CONSOLIDATION_CAPSULE,individualConsolidationScope} from '../scripts/upstream-test-consolidation-historical.mjs';
-import {testConsolidationBatchOk,testConsolidationEntryOk} from '../scripts/upstream-test-consolidation-evidence.mjs';
+import {testConsolidationBatchOk,testConsolidationEntryOk,qualifyRetainedF10ConsolidationMain} from '../scripts/upstream-test-consolidation-evidence.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),read=p=>readFileSync(resolve(root,p)),hash=b=>createHash('sha256').update(b).digest('hex'),report=inspectHarnessPreparation(read),controls=[];
 const reference={path:HARNESS_PREPARATION_QUALIFICATION,sha256:hash(read(HARNESS_PREPARATION_QUALIFICATION))};
 assert.deepEqual(qualifiedCurrentConsolidationSources(read,reference),report.current_facts);
@@ -38,15 +38,22 @@ for(const [path,before,after]of[
  ['testing/legacy-runner/shims/harness/checkbox/shared.spec.ts','        First','        Changed'],
 ]){const original=read(path).toString(),changed=Buffer.from(original.replace(before,after));assert.notEqual(changed.toString(),original);reject('unchanged-tagged-member-'+path,()=>qualifiedCurrentConsolidationSources(p=>p===path?changed:read(p),reference));}
 const path='compatibility/f10/disposition-ledger/evidence/harness-animation-preparation-test-consolidation.json',body=JSON.parse(read(path)),ledger=JSON.parse(read('compatibility/f10/disposition-ledger/ledger.json'));
-const productPaths=execFileSync('git',['-c','gc.auto=0','-c','maintenance.auto=0','ls-files','projects/ngx-material-legacy'],{cwd:root,encoding:'utf8'}).trim().split('\n');assert.equal(testConsolidationBatchOk(body,read,productPaths),true);
-const entries=ledger.entries.filter(n=>n.evidence_report===path);assert.equal(entries.length,32);for(const entry of entries)assert.equal(testConsolidationEntryOk(body,entry,read,true),true);
+const productPaths=execFileSync('git',['-c','gc.auto=0','-c','maintenance.auto=0','ls-files','projects/ngx-material-legacy'],{cwd:root,encoding:'utf8'}).trim().split('\n');
+const mainOnly=report.line==='main',mainPath='compatibility/rc/c04-main32-consolidation-source-v1.json',entryBody=mainOnly?JSON.parse(read(mainPath)):body;
+const currentScope=mainOnly?qualifyRetainedF10ConsolidationMain(body,read,productPaths):null;
+if(mainOnly){assert.equal(testConsolidationBatchOk(body,read,productPaths),false,'historical both-line predicate must stay closed');assert.equal(currentScope?.line,'main');assert.equal(currentScope.historical_entry_bindings,32);assert.equal(currentScope.current_entry_bindings,32);}
+else assert.equal(testConsolidationBatchOk(body,read,productPaths),true);
+const entries=ledger.entries.filter(n=>n.evidence_report===(mainOnly?mainPath:path));assert.equal(entries.length,32);
+// In main mode the scoped source owner checks all 32 historical entries and
+// all 32 exact current delta rows under one physical closing transaction.
+if(!mainOnly)for(const entry of entries)assert.equal(testConsolidationEntryOk(body,entry,read,true),true);
 for(const [id,change]of[
  ['missing-qualification',n=>{delete n.current_harness_preparation;}],
  ['foreign-qualification-path',n=>{n.current_harness_preparation={path:'AGENTS.md',sha256:hash(read('AGENTS.md'))};}],
  ['historical-facts-used-as-current',n=>{for(const row of n.reviews)if(row.individual_source_review)row.individual_source_review=individualConsolidationScope(row.sha,report.historical_origin.facts);}],
  ['wrong-original-scope',n=>{n.reviews.pop();}],
  ['wrong-current-line',n=>{n.line=n.line==='main'?'21.x':'main';}],
-]){const changed=structuredClone(body);change(changed);assert.equal(testConsolidationBatchOk(changed,read,productPaths),false,id);controls.push({id,result:'rejected'});}
-for(const [id,change]of [['row-rehash-bypass',n=>{n.source_check.evidence_report_sha256='0'.repeat(64);}],['terminal-label-bypass',n=>{n.final_disposition='inherited';}]]){const changed=structuredClone(entries[0]);change(changed);assert.equal(testConsolidationEntryOk(body,changed,read,true),false,id);controls.push({id,result:'rejected'});}
+]){const changed=structuredClone(body);change(changed);assert.equal(mainOnly?qualifyRetainedF10ConsolidationMain(changed,read,productPaths):testConsolidationBatchOk(changed,read,productPaths),mainOnly?null:false,id);controls.push({id,result:'rejected'});}
+for(const [id,change]of [['row-rehash-bypass',n=>{n.source_check.evidence_report_sha256='0'.repeat(64);}],['terminal-label-bypass',n=>{n.final_disposition='inherited';}]]){const changed=structuredClone(entries[0]);change(changed);assert.equal(testConsolidationEntryOk(entryBody,changed,read,true),false,id);controls.push({id,result:'rejected'});}
 const result={schema_version:1,line:report.line,files:12,configurations:13,unchanged_case_callbacks:165,unchanged_fixture_classes:15,positive_current_entry_bindings:32,explicit_current_tagged_members:report.current_facts.filter(n=>n.current_preparation_inputs).length,original_tagged_validator_unchanged:true,controls:controls.length,cases:controls,current_qualification:reference,producer_sha256:hash(read('tests/harness_animation_preparation_qualification_probe.mjs')),validator_sha256:hash(read('scripts/harness-animation-preparation-evidence.mjs')),actual_browser_native_or_floor_qualified:false,g11_claim:'not-passed'};
 const out=process.argv.indexOf('--out');if(out>=0)writeFileSync(process.argv[out+1],JSON.stringify(result,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({...result,cases:undefined}));

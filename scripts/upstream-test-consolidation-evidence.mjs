@@ -8,10 +8,13 @@
 import assert from 'node:assert/strict';
 import {qualifyIndependentSnackProductDelta} from './snack-dom-source-context.mjs';
 import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {dirname,resolve} from 'node:path';
 import {retainedCurrentConsolidationContext} from './retained-current-consolidation-context.mjs';
+import {retainedF10BuildSourceContext} from './retained-f10-build-source-context.mjs';
+import {retainedF10InventorySourceContext} from './retained-f10-inventory-source-context.mjs';
 import {gunzipSync} from 'node:zlib';
 import {analyzeSharedTestMove,bazelProductionCalls} from './upstream-test-consolidation-analysis.mjs';
 import {buildScopeEvidenceOk,ciCaptureReader} from './upstream-build-scope-evidence.mjs';
@@ -218,6 +221,48 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
     }
     return true;
   }catch{return false;}
+}
+
+// Explicitly main-only successor for the historical f10 caller. The old
+// both-line report and old inventory are verified as historical data; no old
+// source bytes or both-line result are served as a current qualification.
+let f10MainActive=false,f10MainReentered=false;
+export function qualifyRetainedF10ConsolidationMain(body,readRepo,currentProductPaths){
+ if(f10MainActive){f10MainReentered=true;throw new Error('f10 main consolidation reentry');}f10MainActive=true;f10MainReentered=false;
+ try{
+  const captured=ciCaptureReader(readRepo),read=captured.read,oldPath='compatibility/f10/disposition-ledger/evidence/harness-animation-preparation-test-consolidation.json';
+  const oldBytes=read(oldPath);assert.deepEqual(body,JSON.parse(oldBytes));assert.equal(body.line,'main');
+  const mainBytes=read(MAIN_REPORT);assert.equal(hash(mainBytes),MAIN_REPORT_SHA);const main=JSON.parse(mainBytes);
+  const {candidate_context:oldBuild,historical_suite_context:oldSuite,...oldRest}=body;
+  const {candidate_context:newBuild,historical_suite_context:newSuite,chip_source_scope_requalification,main_current_context,...newRest}=main;
+  assert.deepEqual(oldRest,newRest);assert.ok(chip_source_scope_requalification);assert.equal(main_current_context.line,'main');assert.equal(main_current_context.source_only,true);
+  const oldBuildBytes=read(oldBuild.path);assert.equal(hash(oldBuildBytes),oldBuild.sha256);const oldBuildBody=JSON.parse(oldBuildBytes);
+  const build=retainedF10BuildSourceContext({root:sourceRoot,read,body:oldBuildBody,currentProductPaths});
+  const inventory=retainedF10InventorySourceContext({root:sourceRoot,read});assert.equal(inventory.historical_candidates,57);assert.equal(inventory.changed_candidates,16);assert.equal(inventory.changed_shims,12);
+  for(const ref of oldSuite){const current=inventory.select(ref),raw=read(current.path);assert.equal(hash(raw),current.sha256);assert.equal(raw.length,current.bytes);}
+  // The f10 bridge has already compared all fourteen old and current rows.
+  // The unchanged current batch predicate independently reruns all fourteen
+  // build-scope decisions against the actual current source.
+  assert.equal(build.reviewed_shas,14);
+  assert.equal(testConsolidationBatchOk(main,read,currentProductPaths),true,'current main consolidation rejected');
+  // Compare each of the 32 historical ledger rows as historical data, then
+  // independently compare each current row with the authenticated main delta.
+  // The original both-line batch remains closed for current main evidence.
+  const receiptBytes=read('compatibility/rc/retained-f10-build-source-context-696.json');assert.equal(hash(receiptBytes),'5584f69863a38d665e612f5d626e37c876d1395d14e6ae61c547e7a54e5f04e0');const receipt=JSON.parse(receiptBytes);
+  const env={PATH:process.env.PATH,LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1',GIT_TERMINAL_PROMPT:'0'},git=args=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd:sourceRoot,env,maxBuffer:16*1024*1024});
+  const oldLedgerRef=receipt.original_ledger;assert.equal(oldLedgerRef.path,'compatibility/f10/disposition-ledger/ledger.json');assert.equal(git(['rev-parse',receipt.historical_report_commit+':'+oldLedgerRef.path]).toString().trim(),oldLedgerRef.blob_oid);
+  const oldLedgerBytes=git(['show',receipt.historical_report_commit+':'+oldLedgerRef.path]);assert.equal(hash(oldLedgerBytes),oldLedgerRef.sha256);assert.equal(oldLedgerBytes.length,oldLedgerRef.bytes);
+  const oldLedger=JSON.parse(oldLedgerBytes),oldEntries=oldLedger.entries.filter(row=>row.evidence_report===oldPath),currentLedger=JSON.parse(read('compatibility/f10/disposition-ledger/ledger.json')),currentEntries=currentLedger.entries.filter(row=>row.evidence_report===MAIN_REPORT),delta=JSON.parse(read(MAIN_DELTA));
+  assert.equal(oldEntries.length,32);assert.equal(currentEntries.length,32);assert.equal(delta.rows.length,32);
+  assert.deepEqual(oldEntries.map(row=>row.sha).sort(),[...body.scope_sha_ids].sort());assert.deepEqual(currentEntries.map(row=>row.sha).sort(),[...main.scope_sha_ids].sort());
+  for(const entry of oldEntries)assert.equal(testConsolidationEntryOk(body,entry,read,true),true,'historical f10 row mismatch '+entry.sha);
+  for(const entry of currentEntries){
+   const matches=delta.rows.filter(row=>row.sha===entry.sha);assert.equal(matches.length,1);assert.deepEqual(entry,matches[0]);
+   const row=main.reviews.find(r=>r.sha===entry.sha);assert.ok(row);assert.equal(entry.source_check.evidence_report_sha256,MAIN_REPORT_SHA);assert.equal(entry.final_disposition,row.final_disposition);assert.equal(entry.reason,row.decision);assert.deepEqual(entry.files,row.patch_paths);assert.deepEqual(entry.affected_branches,['main']);assert.equal(entry.review_depth,row.review_depth);assert.equal(entry.source_check.diff_sha256,row.diff_sha256);assert.equal(entry.source_check.patch_path,row.patch_file);assert.equal(entry.source_check.review_membership,row.sha);
+  }
+  build.assertCurrent();inventory.assertCurrent();assert.deepEqual(read('scripts/upstream-test-consolidation-evidence.mjs'),loadedConsolidationSource);captured.close();assert.equal(f10MainReentered,false,'f10 main consolidation reentry');
+  return Object.freeze({line:'main',source_only:true,reviewed_shas:32,historical_entry_bindings:32,current_entry_bindings:32,historical_execution_reattributed:false,runtime_or_floor_qualified:false,g11_claim:'not-passed'});
+ }catch{return null;}finally{f10MainActive=false;}
 }
 
 /** Row labels cannot bypass immutable scope or pending residuals. */
