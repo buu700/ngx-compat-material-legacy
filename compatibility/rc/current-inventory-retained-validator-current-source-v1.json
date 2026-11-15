@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "role": "current-inventory-retained-validator-current-source-successor",
+  "source_parent": "149de9c37bdf99050e4b5e8b9096ce7892c22ef1",
+  "source_commit": "2c51dc4e31c4dd08d2ec15af0c360bfdddd676ce",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "transitions": [
+    {
+      "path": "scripts/retained-validator-program-source.mjs",
+      "before": {
+        "path": "scripts/retained-validator-program-source.mjs",
+        "sha256": "2615e3ab8e672b7d14d5c6fcd31cde3cefef6e036144c4f324f8c9693e8107ea",
+        "bytes": 9528
+      },
+      "after": {
+        "path": "scripts/retained-validator-program-source.mjs",
+        "sha256": "d5c1b9a53475dff2127c0c3c3287d4a06699b9394fe2bc896df21971fa38fa36",
+        "bytes": 11628
+      },
+      "edits": [
+        {
+          "offset": 983,
+          "before": "",
+          "after": "const CONTEXT_CONTINUATION={path:'compatibility/rc/retained-validator-context-successor-149de.json',sha256:'ed55cab51218c54b292a1f33adef1d84edd68941e59b6fdfecd977546a8b9575',bytes:2591};\n"
+        },
+        {
+          "offset": 6047,
+          "before": "",
+          "after": " // Authenticate the complete committed follow-on, including the Python test\n // harness, as Git data. Neither historical body is a current reader.\n const continuationRaw=physical(CONTEXT_CONTINUATION.path);exact(continuationRaw,CONTEXT_CONTINUATION);\n const continuation=JSON.parse(continuationRaw),continuationParent='d443a7671cb7c5bbbd20211e5806a5de61b4af9e',continuationCommit='149de9c37bdf99050e4b5e8b9096ce7892c22ef1';\n const continuationPaths=[...successorPaths,'tests/test_current_reader_source_successors.py'];\n assert.equal(continuation.schema_version,1);assert.equal(continuation.role,'retained-validator-current-context-source-continuation');\n assert.equal(continuation.source_parent,continuationParent);assert.equal(continuation.source_commit,continuationCommit);\n for(const [key,value]of Object.entries({source_only:true,historical_programs_executed:false,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(continuation[key],value,key);\n assert.equal(git(['rev-parse',continuationCommit+'^']).toString().trim(),continuationParent);\n git(['merge-base','--is-ancestor',commit,continuationParent]);git(['merge-base','--is-ancestor',continuationCommit,'HEAD']);\n assert.deepEqual(continuation.transitions.map(row=>row.path),continuationPaths);\n assert.deepEqual(git(['diff','--name-status','--no-renames',continuationParent,continuationCommit]).toString().trim().split('\\n'),continuationPaths.map(path=>'M\\t'+path));\n for(const row of continuation.transitions)for(const side of ['before','after'])assert.equal(row[side].path,row.path);\n for(let i=0;i<successorPaths.length;i++)assert.deepEqual(continuation.transitions[i].before,successor.transitions[i].after);\n verifyGit(continuationParent,continuation.transitions.map(row=>row.before));verifyGit(continuationCommit,continuation.transitions.map(row=>row.after));\n"
+        },
+        {
+          "offset": 7060,
+          "before": " for(const ref of packet.support)add(ref.path===successorPaths[0]?successor.transitions[0].after:ref);\n add(CONTEXT_SUCCESSOR);add(successor.transitions[1].after);\n",
+          "after": " for(const ref of packet.support)add(ref.path===successorPaths[0]?continuation.transitions[0].after:ref);\n add(CONTEXT_SUCCESSOR);add(CONTEXT_CONTINUATION);for(const row of continuation.transitions.slice(1))add(row.after);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/retained_validator_program_source_probe.mjs",
+      "before": {
+        "path": "tests/retained_validator_program_source_probe.mjs",
+        "sha256": "44f57b7f21f0060ebe97aecc348f9e215b31c77abc027eee640bd7020e167e4e",
+        "bytes": 4356
+      },
+      "after": {
+        "path": "tests/retained_validator_program_source_probe.mjs",
+        "sha256": "b59cb3bc98fc5ee255d24b4257690261ee9fb8d11db1db53297fa91c241d9a0b",
+        "bytes": 6591
+      },
+      "edits": [
+        {
+          "offset": 559,
+          "before": "assert.equal(live.transitions.length,3);assert.equal(live.bound.length,22);\n",
+          "after": "assert.equal(live.transitions.length,3);assert.equal(live.bound.length,24);\nconst receipt=JSON.parse(physical('compatibility/rc/retained-validator-context-successor-149de.json'));\nconst originalPacket=JSON.parse(physical('compatibility/rc/main-retained-validator-programs-v1.json'));\nconst expectedPaths=new Set(['scripts/retained-validator-program-source.mjs','compatibility/rc/main-retained-validator-programs-v1.json',originalPacket.source_input.path,...originalPacket.programs.map(row=>row.path),...originalPacket.support.map(row=>row.path),'compatibility/rc/retained-validator-context-successor-4015.json','compatibility/rc/retained-validator-context-successor-149de.json',...receipt.transitions.map(row=>row.path)]);\nassert.deepEqual(new Set(live.bound.map(row=>row.path)),expectedPaths);\n"
+        },
+        {
+          "offset": 1576,
+          "before": "for(const target of ['scripts/retained-validator-program-source.mjs','compatibility/rc/main-retained-validator-programs-v1.json','tests/retained_current_context_identity_probe.mjs']){\n",
+          "after": "for(const target of ['scripts/retained-validator-program-source.mjs','compatibility/rc/main-retained-validator-programs-v1.json','tests/retained_current_context_identity_probe.mjs','tests/test_current_reader_source_successors.py','compatibility/rc/retained-validator-context-successor-149de.json']){\n"
+        },
+        {
+          "offset": 3231,
+          "before": "",
+          "after": " // The loaded validator image must match the physical source both on entry\n // and in the existing guard; recovery uses the same confined image.\n const selfPath=join(scratch,'scripts/retained-validator-program-source.mjs'),selfRaw=readFileSync(selfPath);\n const selfScope=make({root:scratch,read:path=>readFileSync(join(scratch,path))});\n writeFileSync(selfPath,Buffer.concat([selfRaw,Buffer.from(' ')]));\n assert.throws(()=>selfScope.assertCurrent());assert.throws(()=>make({root:scratch,read:path=>readFileSync(join(scratch,path))}));\n writeFileSync(selfPath,selfRaw);selfScope.assertCurrent();\n // Genuine whole predecessor bodies must fail cold and late and recover.\n const scratchRead=path=>readFileSync(join(scratch,path)),physicalScope=make({root:scratch,read:scratchRead});\n for(const row of receipt.transitions){\n  const path=join(scratch,row.path),current=scratchRead(row.path);\n  const before=execFileSync('git',['show',`${receipt.source_parent}:${row.path}`],{cwd:root});\n  writeFileSync(path,before);assert.throws(()=>physicalScope.assertCurrent(),undefined,'late predecessor '+row.path);\n  assert.throws(()=>make({root:scratch,read:scratchRead}),undefined,'cold predecessor '+row.path);\n  writeFileSync(path,current);physicalScope.assertCurrent();\n }\n"
+        },
+        {
+          "offset": 3950,
+          "before": "console.log(JSON.stringify({result:'pass',programs:3,bound:22,cold_rejections:22,late_rejections:22,recoveries:22,\n",
+          "after": "console.log(JSON.stringify({result:'pass',programs:3,bound:24,cold_rejections:24,late_rejections:24,recoveries:24,whole_predecessor_bodies_rejected_and_recovered:true,exact_program_source_union:true,self_source_physical_rejected_and_recovered:true,\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_retained_validator_program_source.py",
+      "before": {
+        "path": "tests/test_retained_validator_program_source.py",
+        "sha256": "9c96a24f119c3a3f9244b239e0f738c78baa7c1acd50f988af96cd1ecc986df7",
+        "bytes": 1309
+      },
+      "after": {
+        "path": "tests/test_retained_validator_program_source.py",
+        "sha256": "353990634ea5d45fef1de2609cee7faa5288039358f9dc4185b8ae84e4106376",
+        "bytes": 1459
+      },
+      "edits": [
+        {
+          "offset": 745,
+          "before": "        self.assertEqual((report['cold_rejections'], report['late_rejections'], report['recoveries']), (22, 22, 22))\n",
+          "after": "        self.assertEqual((report['cold_rejections'], report['late_rejections'], report['recoveries']), (24, 24, 24))\n"
+        },
+        {
+          "offset": 1051,
+          "before": "                      'caught_reentry_rejected_and_recovered']:\n",
+          "after": "                      'caught_reentry_rejected_and_recovered', 'whole_predecessor_bodies_rejected_and_recovered',\n                      'exact_program_source_union', 'self_source_physical_rejected_and_recovered']:\n"
+        }
+      ]
+    }
+  ],
+  "support": [
+    {
+      "path": "compatibility/rc/retained-validator-context-successor-149de.json",
+      "sha256": "ed55cab51218c54b292a1f33adef1d84edd68941e59b6fdfecd977546a8b9575",
+      "bytes": 2591
+    }
+  ]
+}
