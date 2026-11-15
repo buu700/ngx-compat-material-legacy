@@ -1,0 +1,80 @@
+{
+  "sha": "c7cc0be0a0c65ccd1e00c02faafa54b2854a3d63",
+  "role": "C04 bounded individual contextual source review",
+  "line": "main",
+  "diff_sha256": "307e83dfce48c504f3d425ba04aa5a0355cef1b7a1320dd56ef06b9e2bcbf95a",
+  "diff": "diff --git a/src/cdk/drag-drop/directives/drop-list-shared.spec.ts b/src/cdk/drag-drop/directives/drop-list-shared.spec.ts\nindex dda1b75b1..0a1fce1ec 100644\n--- a/src/cdk/drag-drop/directives/drop-list-shared.spec.ts\n+++ b/src/cdk/drag-drop/directives/drop-list-shared.spec.ts\n@@ -31,7 +31,7 @@ import {DragRef, Point, PreviewContainer} from '../drag-ref';\n import {moveItemInArray} from '../drag-utils';\n \n import {provideFakeDirectionality} from '@angular/cdk/testing/private/fake-directionality';\n-import {NgClass, NgFor, NgIf, NgTemplateOutlet} from '@angular/common';\n+import {NgFor, NgIf, NgTemplateOutlet} from '@angular/common';\n import {CDK_DRAG_CONFIG, DragAxis, DragDropConfig, DropListOrientation} from './config';\n import {CdkDrag} from './drag';\n import {CdkDragPlaceholder} from './drag-placeholder';\n@@ -5402,7 +5402,7 @@ class DraggableInDropZoneWithCustomMultiNodePreview {\n           @if (renderPlaceholder) {\n             <div\n               class=\"custom-placeholder\"\n-              [ngClass]=\"extraPlaceholderClass\"\n+              [class]=\"extraPlaceholderClass\"\n               *cdkDragPlaceholder>Custom placeholder</div>\n           }\n         </div>\n@@ -5414,7 +5414,7 @@ class DraggableInDropZoneWithCustomMultiNodePreview {\n       height: ${ITEM_HEIGHT * 3}px;\n     }\n   `,\n-  imports: [CdkDropList, CdkDrag, CdkDragPlaceholder, NgClass],\n+  imports: [CdkDropList, CdkDrag, CdkDragPlaceholder],\n })\n class DraggableInDropZoneWithCustomPlaceholder {\n   @ViewChildren(CdkDrag) dragItems!: QueryList<CdkDrag>;\ndiff --git a/src/cdk/table/BUILD.bazel b/src/cdk/table/BUILD.bazel\nindex 99d3ea1a0..8dc9a1d7b 100644\n--- a/src/cdk/table/BUILD.bazel\n+++ b/src/cdk/table/BUILD.bazel\n@@ -16,7 +16,6 @@ ng_project(\n     ),\n     assets = [\":table.css\"],\n     deps = [\n-        \"//:node_modules/@angular/common\",\n         \"//:node_modules/@angular/core\",\n         \"//:node_modules/rxjs\",\n         \"//src:dev_mode_types\",\n@@ -42,7 +41,6 @@ ng_project(\n     ),\n     deps = [\n         \":table\",\n-        \"//:node_modules/@angular/common\",\n         \"//:node_modules/@angular/core\",\n         \"//:node_modules/@angular/platform-browser\",\n         \"//:node_modules/rxjs\",\ndiff --git a/src/cdk/table/table.spec.ts b/src/cdk/table/table.spec.ts\nindex 2bc5582ba..7c87c32b0 100644\n--- a/src/cdk/table/table.spec.ts\n+++ b/src/cdk/table/table.spec.ts\n@@ -43,7 +43,6 @@ import {\n   getTableUnknownColumnError,\n   getTableUnknownDataSourceError,\n } from './table-errors';\n-import {NgClass} from '@angular/common';\n import {CdkVirtualScrollViewport, ScrollingModule} from '../scrolling';\n import {dispatchFakeEvent} from '../testing/private';\n \n@@ -2977,7 +2976,7 @@ class UndefinedColumnsCdkTableApp {\n         <cdk-header-cell *cdkHeaderCellDef> Column A</cdk-header-cell>\n         <cdk-cell *cdkCellDef=\"let row; let first = first;\n                                let last = last; let even = even; let odd = odd\"\n-                  [ngClass]=\"{\n+                  [class]=\"{\n                     'custom-cell-class-first': enableCellContextClasses && first,\n                     'custom-cell-class-last': enableCellContextClasses && last,\n                     'custom-cell-class-even': enableCellContextClasses && even,\n@@ -2989,7 +2988,7 @@ class UndefinedColumnsCdkTableApp {\n       <cdk-header-row *cdkHeaderRowDef=\"columnsToRender\"></cdk-header-row>\n       <cdk-row *cdkRowDef=\"let row; columns: columnsToRender;\n                            let first = first; let last = last; let even = even; let odd = odd\"\n-               [ngClass]=\"{\n+               [class]=\"{\n                  'custom-row-class-first': enableRowContextClasses && first,\n                  'custom-row-class-last': enableRowContextClasses && last,\n                  'custom-row-class-even': enableRowContextClasses && even,\n@@ -2998,7 +2997,7 @@ class UndefinedColumnsCdkTableApp {\n       </cdk-row>\n     </cdk-table>\n   `,\n-  imports: [CdkTableModule, NgClass],\n+  imports: [CdkTableModule],\n })\n class RowContextCdkTableApp {\n   dataSource = new FakeDataSource();\n",
+  "final_disposition": "not-applicable",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+      "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+      "bytes": 3818
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+      "sha256": "a6d1f377085d4a05c2283e80f123fe1068beeec8f720310f30d4f149403c1424",
+      "bytes": 53676
+    }
+  ],
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "The entire upstream change replaces NgClass in two upstream test fixtures with class bindings and removes Angular common from upstream CDK table Bazel dependencies; it changes no CDK production source. The add-on owns separate legacy table sources and tests and does not own those upstream test fixtures or Bazel targets. No production source transplant is indicated. This conclusion does not qualify the installed CDK table build, consumer-authored class behavior, or legacy table runtime tests.",
+  "prior_entry": {
+    "sha": "c7cc0be0a0c65ccd1e00c02faafa54b2854a3d63",
+    "bucket": "needs-triage",
+    "subject": "refactor: remove remaining NgClass usages (#32873)",
+    "final_disposition": "inherited",
+    "reason": "Inspected upstream patch content (sha256=307e83dfce48c504f3d425ba04aa5a0355cef1b7a1320dd56ef06b9e2bcbf95a, bytes=4039). Changed paths: src/cdk/drag-drop/directives/drop-list-shared.spec.ts, src/cdk/table/BUILD.bazel, src/cdk/table/table.spec.ts. CDK-only change. Legacy surfaces that consume CDK import the installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7) and do not reimplement the CDK module. Inherited via peer. Delegation: @angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+    "batch_id": "needs-triage-surface-m3-nonshipped-cdk-2026-10-01",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "peer_floor": {
+      "package": "@angular/cdk",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts"
+    },
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/c7cc0be0a0c65ccd1e00c02faafa54b2854a3d63.json"
+  },
+  "review_context": {
+    "parent": "85c16fe4bb68d89d1f304350ecf965aeceea4662",
+    "changed_paths": [
+      "src/cdk/drag-drop/directives/drop-list-shared.spec.ts",
+      "src/cdk/table/BUILD.bazel",
+      "src/cdk/table/table.spec.ts"
+    ],
+    "prior_reason": "Inspected upstream patch content (sha256=307e83dfce48c504f3d425ba04aa5a0355cef1b7a1320dd56ef06b9e2bcbf95a, bytes=4039). Changed paths: src/cdk/drag-drop/directives/drop-list-shared.spec.ts, src/cdk/table/BUILD.bazel, src/cdk/table/table.spec.ts. CDK-only change. Legacy surfaces that consume CDK import the installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7) and do not reimplement the CDK module. Inherited via peer. Delegation: @angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+    "reference_16_2_14": {
+      "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "root": "/home/parallels/tmp/material16-reference-verified/src/material",
+      "files": [
+        {
+          "path": "legacy-table/table.ts",
+          "sha256": "de77a136b68213f97954d8696cc3bb5364f55be3fa295e59cc92211911a12bf3",
+          "bytes": 2809
+        },
+        {
+          "path": "legacy-table/table.spec.ts",
+          "sha256": "33b475b1c51bcdcdc47d026abc0efc9ed3658e24ddd4512477d55dc3cf1605cc",
+          "bytes": 37431
+        }
+      ]
+    },
+    "peer_files": [
+      {
+        "path": "node_modules/@angular/cdk/package.json",
+        "sha256": "ec60a5803a214c9b9d8bcdc2de0b0c294ecdd420d680d0e95e686f7aa4d46933",
+        "bytes": 5084
+      },
+      {
+        "path": "node_modules/@angular/cdk/fesm2022/table.mjs",
+        "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4",
+        "bytes": 77604
+      }
+    ],
+    "runtime_obligations": "No additional product test required; normal table/drag-drop peer tests are independent."
+  }
+}

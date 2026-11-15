@@ -1,0 +1,110 @@
+{
+  "sha": "6315e790893d2efdfc802fb072feb165d37b9e25",
+  "role": "C04 bounded individual contextual source review",
+  "line": "main",
+  "diff_sha256": "e4d49425598472bf444c84d4bc64852489cbc19353ca863789abece1863c2ee2",
+  "diff": "diff --git a/src/dev-app/theme.scss b/src/dev-app/theme.scss\nindex 9a4eb8c6e..908d228b9 100644\n--- a/src/dev-app/theme.scss\n+++ b/src/dev-app/theme.scss\n@@ -25,6 +25,8 @@ $candy-app-theme: mat.m2-define-light-theme((\n // have to load a single css file for Angular Material in your app.\n // **Be sure that you only ever include this mixin once!**\n @include mat.core();\n+@include mat.app-background();\n+@include mat.elevation-classes();\n \n // Include the default theme styles.\n @include mat.all-component-themes($candy-app-theme);\ndiff --git a/src/material/_index.scss b/src/material/_index.scss\nindex b00dcc599..36f1d45b1 100644\n--- a/src/material/_index.scss\n+++ b/src/material/_index.scss\n@@ -36,7 +36,7 @@\n @forward './core/style/validation' as private-*;\n \n // Structural\n-@forward './core/core' show core;\n+@forward './core/core' show core, app-background, elevation-classes;\n @forward './core/ripple/ripple' show ripple;\n @forward './core/focus-indicators/private' show strong-focus-indicators,\n   strong-focus-indicators-color, strong-focus-indicators-theme;\ndiff --git a/src/material/core/_core.scss b/src/material/core/_core.scss\nindex f0080ea54..34484bdac 100644\n--- a/src/material/core/_core.scss\n+++ b/src/material/core/_core.scss\n@@ -42,3 +42,9 @@\n     }\n   }\n }\n+\n+// Mixin that provides the .mat-app-background class.\n+@mixin app-background() {}\n+\n+// Mixin that provides the .mat-elevation-* classes.\n+@mixin elevation-classes() {}\ndiff --git a/src/universal-app/styles.scss b/src/universal-app/styles.scss\nindex 9e1af4470..a043f31c8 100644\n--- a/src/universal-app/styles.scss\n+++ b/src/universal-app/styles.scss\n@@ -1,6 +1,7 @@\n @use '@angular/material' as mat;\n \n @include mat.core();\n+@include mat.app-background();\n \n $theme: mat.define-theme((\n   color: (\n",
+  "final_disposition": "do-not-adopt",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/_index.scss",
+      "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+      "bytes": 14151
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/_core.scss",
+      "sha256": "c5142f46aeb68a2235bf8ed9358388b9b7594d082d4dee2bd44363202273b870",
+      "bytes": 524
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/_core-theme.scss",
+      "sha256": "cc4b4bec96a081d0e60d30985e0d821e007d531d764055a572e7ad4e7b62e8cf",
+      "bytes": 3454
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-core/_core-theme.scss",
+      "sha256": "e62c14f065ad25e7b18a8e6ee8ccbb01d4d8d2186c9feb26035b6e3d2bbc45ff",
+      "bytes": 2621
+    }
+  ],
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "This patch adds app-background and elevation-classes as empty mixins in its then-current modern core and invokes them in two upstream applications. The owned facade retains core-theme and legacy-core-theme, and those historical theme files emit background and elevation classes as in the Material 16 reference. Do not insert the empty placeholder mixins into the historical facade. The installed 22.1.7 implementations are now nonempty, a distinct current peer behavior; compiled historical default and custom themes and mixed M2/M3 coexistence remain unverified.",
+  "prior_entry": {
+    "sha": "6315e790893d2efdfc802fb072feb165d37b9e25",
+    "bucket": "needs-triage",
+    "subject": "refactor: create mixins for core classes (#29786)",
+    "files": [
+      "src/dev-app/theme.scss",
+      "src/material/_index.scss",
+      "src/material/core/_core.scss",
+      "src/universal-app/styles.scss"
+    ],
+    "diff_sha256": "52936b61375fee1e99188eaf8376473a1fd80db4142e172233cfa28029b24607",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/6315e790893d2efdfc802fb072feb165d37b9e25.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/dev-app/theme.scss changes `@include mat.app-background();`. That line is not in the legacy sources. @angular/material/core is exercised by projects/ngx-material-legacy/legacy-menu/menu-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/core imported by projects/ngx-material-legacy/legacy-menu/menu-module.ts"
+    }
+  },
+  "review_context": {
+    "parent": "49af49bb019b93e48a1f6386a1b0b9ab20989a23",
+    "changed_paths": [
+      "src/dev-app/theme.scss",
+      "src/material/_index.scss",
+      "src/material/core/_core.scss",
+      "src/universal-app/styles.scss"
+    ],
+    "prior_reason": "The diff in src/dev-app/theme.scss changes `@include mat.app-background();`. That line is not in the legacy sources. @angular/material/core is exercised by projects/ngx-material-legacy/legacy-menu/menu-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "reference_16_2_14": {
+      "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "root": "/home/parallels/tmp/material16-reference-verified/src/material",
+      "files": [
+        {
+          "path": "core/_core.scss",
+          "sha256": "c5142f46aeb68a2235bf8ed9358388b9b7594d082d4dee2bd44363202273b870",
+          "bytes": 524
+        },
+        {
+          "path": "core/_core-theme.scss",
+          "sha256": "cc4b4bec96a081d0e60d30985e0d821e007d531d764055a572e7ad4e7b62e8cf",
+          "bytes": 3454
+        },
+        {
+          "path": "legacy-core/_core-theme.scss",
+          "sha256": "e62c14f065ad25e7b18a8e6ee8ccbb01d4d8d2186c9feb26035b6e3d2bbc45ff",
+          "bytes": 2621
+        }
+      ]
+    },
+    "peer_files": [
+      {
+        "path": "node_modules/@angular/material/_index.scss",
+        "sha256": "e3ad831c2e7679767b0c76d51cf37c455e8d14bf60c5920e53d95bcb762eb08b",
+        "bytes": 9712
+      },
+      {
+        "path": "node_modules/@angular/material/core/_core.scss",
+        "sha256": "5d0ac8ef4b5333308a3297b26924a62d747efea49b90b6bbea4775bc04b69bbb",
+        "bytes": 2012
+      },
+      {
+        "path": "node_modules/@angular/material/package.json",
+        "sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+        "bytes": 11420
+      }
+    ],
+    "runtime_obligations": "Compare historical core/elevation/background compiled CSS with reference."
+  }
+}

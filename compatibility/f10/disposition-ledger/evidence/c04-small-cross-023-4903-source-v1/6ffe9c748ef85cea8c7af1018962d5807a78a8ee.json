@@ -1,0 +1,105 @@
+{
+  "sha": "6ffe9c748ef85cea8c7af1018962d5807a78a8ee",
+  "role": "C04 bounded individual contextual source review",
+  "line": "main",
+  "diff_sha256": "2221199b3904dbef38a151b3efe85082d472209ef559b8cdd15ad21d7d0adfd5",
+  "diff": "diff --git a/goldens/cdk/table/index.api.md b/goldens/cdk/table/index.api.md\nindex 51e26ef82..99f2d3d3d 100644\n--- a/goldens/cdk/table/index.api.md\n+++ b/goldens/cdk/table/index.api.md\n@@ -13,7 +13,6 @@ import { ElementRef } from '@angular/core';\n import { EventEmitter } from '@angular/core';\n import * as i0 from '@angular/core';\n import { InjectionToken } from '@angular/core';\n-import { Injector } from '@angular/core';\n import { IterableChangeRecord } from '@angular/core';\n import { IterableChanges } from '@angular/core';\n import { IterableDiffer } from '@angular/core';\n@@ -56,22 +55,12 @@ export abstract class BaseRowDef implements OnChanges {\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<BaseRowDef, never>;\n }\n \n-// @public\n-export interface CanStick {\n-    hasStickyChanged(): boolean;\n-    resetStickyChanged(): void;\n-    sticky: boolean;\n-}\n-\n // @public\n export const CDK_ROW_TEMPLATE = \"<ng-container cdkCellOutlet></ng-container>\";\n \n // @public\n export const CDK_TABLE: InjectionToken<any>;\n \n-// @public\n-export const CDK_TABLE_TEMPLATE = \"\\n  <ng-content select=\\\"caption\\\"/>\\n  <ng-content select=\\\"colgroup, col\\\"/>\\n\\n  <!--\\n    Unprojected content throws a hydration error so we need this to capture it.\\n    It gets removed on the client so it doesn't affect the layout.\\n  -->\\n  @if (_isServer) {\\n    <ng-content/>\\n  }\\n\\n  @if (_isNativeHtmlTable) {\\n    <thead role=\\\"rowgroup\\\">\\n      <ng-container headerRowOutlet/>\\n    </thead>\\n    <tbody role=\\\"rowgroup\\\">\\n      <ng-container rowOutlet/>\\n      <ng-container noDataRowOutlet/>\\n    </tbody>\\n    <tfoot role=\\\"rowgroup\\\">\\n      <ng-container footerRowOutlet/>\\n    </tfoot>\\n  } @else {\\n    <ng-container headerRowOutlet/>\\n    <ng-container rowOutlet/>\\n    <ng-container noDataRowOutlet/>\\n    <ng-container footerRowOutlet/>\\n  }\\n\";\n-\n // @public\n export class CdkCell extends BaseCdkCell {\n     constructor(...args: unknown[]);\n@@ -525,15 +514,9 @@ export class _Schedule {\n     tasks: (() => unknown)[];\n }\n \n-// @public\n-export const STICKY_DIRECTIONS: StickyDirection[];\n-\n // @public\n export const STICKY_POSITIONING_LISTENER: InjectionToken<StickyPositioningListener>;\n \n-// @public\n-export type StickyDirection = 'top' | 'bottom' | 'left' | 'right';\n-\n // @public (undocumented)\n export type StickyOffset = number | null | undefined;\n \n@@ -548,24 +531,6 @@ export interface StickyPositioningListener {\n // @public (undocumented)\n export type StickySize = number | null | undefined;\n \n-// @public\n-export class StickyStyler {\n-    constructor(_isNativeHtmlTable: boolean, _stickCellCss: string, direction: Direction, _coalescedStyleScheduler: _CoalescedStyleScheduler, _isBrowser?: boolean, _needsPositionStickyOnElement?: boolean, _positionListener?: StickyPositioningListener | undefined, _tableInjector?: Injector | undefined);\n-    _addStickyStyle(element: HTMLElement, dir: StickyDirection, dirValue: number, isBorderElement: boolean): void;\n-    clearStickyPositioning(rows: HTMLElement[], stickyDirections: StickyDirection[]): void;\n-    destroy(): void;\n-    // (undocumented)\n-    direction: Direction;\n-    _getCalculatedZIndex(element: HTMLElement): string;\n-    _getCellWidths(row: HTMLElement, recalculateCellWidths?: boolean): number[];\n-    _getStickyEndColumnPositions(widths: number[], stickyStates: boolean[]): number[];\n-    _getStickyStartColumnPositions(widths: number[], stickyStates: boolean[]): number[];\n-    _removeStickyStyle(element: HTMLElement, stickyDirections: StickyDirection[]): void;\n-    stickRows(rowsToStick: HTMLElement[], stickyStates: boolean[], position: 'top' | 'bottom'): void;\n-    updateStickyColumns(rows: HTMLElement[], stickyStartStates: boolean[], stickyEndStates: boolean[], recalculateCellWidths?: boolean, replay?: boolean): void;\n-    updateStickyFooterContainer(tableElement: Element, stickyStates: boolean[]): void;\n-}\n-\n // @public (undocumented)\n export interface StickyUpdate {\n     // (undocumented)\ndiff --git a/src/cdk/table/public-api.ts b/src/cdk/table/public-api.ts\nindex 699c79cec..84219808d 100644\n--- a/src/cdk/table/public-api.ts\n+++ b/src/cdk/table/public-api.ts\n@@ -11,9 +11,7 @@ export * from './cell';\n export * from './coalesced-style-scheduler';\n export * from './row';\n export * from './table-module';\n-export * from './sticky-styler';\n export * from './sticky-position-listener';\n-export * from './can-stick';\n export * from './text-column';\n export * from './tokens';\n \ndiff --git a/src/cdk/table/table.ts b/src/cdk/table/table.ts\nindex bc4cde2a0..fa01e73d2 100644\n--- a/src/cdk/table/table.ts\n+++ b/src/cdk/table/table.ts\n@@ -184,45 +184,6 @@ export class NoDataRowOutlet implements RowOutlet {\n   }\n }\n \n-/**\n- * The table template that can be used by the mat-table. Should not be used outside of the\n- * material library.\n- * @docs-private\n- */\n-export const CDK_TABLE_TEMPLATE =\n-  // Note that according to MDN, the `caption` element has to be projected as the **first**\n-  // element in the table. See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/caption\n-  `\n-  <ng-content select=\"caption\"/>\n-  <ng-content select=\"colgroup, col\"/>\n-\n-  <!--\n-    Unprojected content throws a hydration error so we need this to capture it.\n-    It gets removed on the client so it doesn't affect the layout.\n-  -->\n-  @if (_isServer) {\n-    <ng-content/>\n-  }\n-\n-  @if (_isNativeHtmlTable) {\n-    <thead role=\"rowgroup\">\n-      <ng-container headerRowOutlet/>\n-    </thead>\n-    <tbody role=\"rowgroup\">\n-      <ng-container rowOutlet/>\n-      <ng-container noDataRowOutlet/>\n-    </tbody>\n-    <tfoot role=\"rowgroup\">\n-      <ng-container footerRowOutlet/>\n-    </tfoot>\n-  } @else {\n-    <ng-container headerRowOutlet/>\n-    <ng-container rowOutlet/>\n-    <ng-container noDataRowOutlet/>\n-    <ng-container footerRowOutlet/>\n-  }\n-`;\n-\n /**\n  * Interface used to conveniently type the possible context interfaces for the render row.\n  * @docs-private\n@@ -265,7 +226,36 @@ export interface RenderRow<T> {\n @Component({\n   selector: 'cdk-table, table[cdk-table]',\n   exportAs: 'cdkTable',\n-  template: CDK_TABLE_TEMPLATE,\n+  template: `\n+    <ng-content select=\"caption\"/>\n+    <ng-content select=\"colgroup, col\"/>\n+\n+    <!--\n+      Unprojected content throws a hydration error so we need this to capture it.\n+      It gets removed on the client so it doesn't affect the layout.\n+    -->\n+    @if (_isServer) {\n+      <ng-content/>\n+    }\n+\n+    @if (_isNativeHtmlTable) {\n+      <thead role=\"rowgroup\">\n+        <ng-container headerRowOutlet/>\n+      </thead>\n+      <tbody role=\"rowgroup\">\n+        <ng-container rowOutlet/>\n+        <ng-container noDataRowOutlet/>\n+      </tbody>\n+      <tfoot role=\"rowgroup\">\n+        <ng-container footerRowOutlet/>\n+      </tfoot>\n+    } @else {\n+      <ng-container headerRowOutlet/>\n+      <ng-container rowOutlet/>\n+      <ng-container noDataRowOutlet/>\n+      <ng-container footerRowOutlet/>\n+    }\n+  `,\n   styleUrl: 'table.css',\n   host: {\n     'class': 'cdk-table',\ndiff --git a/src/material/table/table.ts b/src/material/table/table.ts\nindex 49685bf90..931b3f122 100644\n--- a/src/material/table/table.ts\n+++ b/src/material/table/table.ts\n@@ -39,7 +39,6 @@ export class MatRecycleRows {}\n   exportAs: 'matTable',\n   // Note that according to MDN, the `caption` element has to be projected as the **first**\n   // element in the table. See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/caption\n-  // We can't reuse `CDK_TABLE_TEMPLATE` because it's incompatible with local compilation mode.\n   template: `\n     <ng-content select=\"caption\"/>\n     <ng-content select=\"colgroup, col\"/>\n",
+  "final_disposition": "do-not-adopt",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+      "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+      "bytes": 3818
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/table-outlet.ts",
+      "sha256": "522c2133fd03d68e669c521a029e060754d1c2de92cf1a500b33993f7cd31a8e",
+      "bytes": 1216
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+      "sha256": "a6d1f377085d4a05c2283e80f123fe1068beeec8f720310f30d4f149403c1424",
+      "bytes": 53676
+    }
+  ],
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "The patch removes CDK_TABLE_TEMPLATE, CanStick and sticky-styler exports, inlines the CDK table template and deletes a modern Material comment. Material 16 legacy table used CDK_TABLE_TEMPLATE; the current owned legacy table instead supplies its own caption, column, native/flex and server template and the owned outlet bridge. Do not reintroduce the removed template or sticky internals as peer imports. This decision does not qualify inherited CdkTable rendering or its private outlet hooks. The authorized November 8 table exception covers only the enumerated outlet bridge hooks and requires peer-bound lifecycle, nested, native/flex and no-data testing. Packed AOT, caption/colgroup projection, outlet ownership, server and hydration behavior remain open.",
+  "prior_entry": {
+    "sha": "6ffe9c748ef85cea8c7af1018962d5807a78a8ee",
+    "bucket": "behavior-semantic",
+    "subject": "fix(cdk/table): remove private symbols from public API (#30956)",
+    "final_disposition": "inherited",
+    "reason": "The patch stops exporting CDK table sticky helpers and CDK_TABLE_TEMPLATE. This package does not define the CDK table public API. Those exports were not removed. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+    "read_note_disposition": "not-owned",
+    "files": [
+      "src/cdk/table/public-api.ts"
+    ],
+    "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+    "peer_floor": {
+      "package": "@angular/cdk",
+      "advertised_range": "^22.1.7",
+      "installed_version": "22.1.7",
+      "contains_fix_tag": "v22.1.7",
+      "sha_is_ancestor_of_tag": true,
+      "cdk_modules": [
+        "table"
+      ],
+      "owned_import_intersection": [
+        "table"
+      ]
+    },
+    "batch_id": "cdk-inherited-not-owned-retain-2026-10-01-d",
+    "recorded_at_utc": "2026-10-01T16:49:17Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+  },
+  "review_context": {
+    "parent": "897bcff943e5d695ffe927deec354770b4720926",
+    "changed_paths": [
+      "goldens/cdk/table/index.api.md",
+      "src/cdk/table/public-api.ts",
+      "src/cdk/table/table.ts",
+      "src/material/table/table.ts"
+    ],
+    "prior_reason": "The patch stops exporting CDK table sticky helpers and CDK_TABLE_TEMPLATE. This package does not define the CDK table public API. Those exports were not removed. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+    "reference_16_2_14": {
+      "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "root": "/home/parallels/tmp/material16-reference-verified/src/material",
+      "files": [
+        {
+          "path": "legacy-table/table.ts",
+          "sha256": "de77a136b68213f97954d8696cc3bb5364f55be3fa295e59cc92211911a12bf3",
+          "bytes": 2809
+        },
+        {
+          "path": "legacy-table/table.spec.ts",
+          "sha256": "33b475b1c51bcdcdc47d026abc0efc9ed3658e24ddd4512477d55dc3cf1605cc",
+          "bytes": 37431
+        }
+      ]
+    },
+    "peer_files": [
+      {
+        "path": "node_modules/@angular/cdk/types/table.d.ts",
+        "sha256": "f1981ed3da13cccefbc8ad12a197d27fdbbe1d1712de3a00007224518fb841b5",
+        "bytes": 48156
+      },
+      {
+        "path": "node_modules/@angular/cdk/fesm2022/table.mjs",
+        "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4",
+        "bytes": 77604
+      },
+      {
+        "path": "node_modules/@angular/cdk/package.json",
+        "sha256": "ec60a5803a214c9b9d8bcdc2de0b0c294ecdd420d680d0e95e686f7aa4d46933",
+        "bytes": 5084
+      }
+    ],
+    "runtime_obligations": "Packed AOT and native/flex caption, colgroup, header/body/footer and hydration projection tests.",
+    "exception": "AGENTS.md maintainer-authorized table exception 2026-11-08; this is not a test, audit, release or publication pass"
+  }
+}

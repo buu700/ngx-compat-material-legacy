@@ -46298,13 +46298,13 @@
       "sha": "6ffe9c748ef85cea8c7af1018962d5807a78a8ee",
       "bucket": "behavior-semantic",
       "subject": "fix(cdk/table): remove private symbols from public API (#30956)",
-      "final_disposition": "inherited",
-      "reason": "The patch stops exporting CDK table sticky helpers and CDK_TABLE_TEMPLATE. This package does not define the CDK table public API. Those exports were not removed. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
-      "read_note_disposition": "not-owned",
+      "final_disposition": "do-not-adopt",
+      "reason": "The patch removes CDK_TABLE_TEMPLATE, CanStick and sticky-styler exports, inlines the CDK table template and deletes a modern Material comment. Material 16 legacy table used CDK_TABLE_TEMPLATE; the current owned legacy table instead supplies its own caption, column, native/flex and server template and the owned outlet bridge. Do not reintroduce the removed template or sticky internals as peer imports. This decision does not qualify inherited CdkTable rendering or its private outlet hooks. The authorized November 8 table exception covers only the enumerated outlet bridge hooks and requires peer-bound lifecycle, nested, native/flex and no-data testing. Packed AOT, caption/colgroup projection, outlet ownership, server and hydration behavior remain open.",
+      "read_note_disposition": "source-reviewed",
       "files": [
         "src/cdk/table/public-api.ts"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-small-cross-023-4903-source-v1/6ffe9c748ef85cea8c7af1018962d5807a78a8ee.json",
       "peer_floor": {
         "package": "@angular/cdk",
         "advertised_range": "^22.1.7",
@@ -46318,10 +46318,38 @@
           "table"
         ]
       },
-      "batch_id": "cdk-inherited-not-owned-retain-2026-10-01-d",
+      "batch_id": "c04-small-cross-023-4903-source-v1",
       "recorded_at_utc": "2026-10-01T16:49:17Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+            "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+            "bytes": 3818
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/internal/table-outlet.ts",
+            "sha256": "522c2133fd03d68e669c521a029e060754d1c2de92cf1a500b33993f7cd31a8e",
+            "bytes": 1216
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+            "sha256": "a6d1f377085d4a05c2283e80f123fe1068beeec8f720310f30d4f149403c1424",
+            "bytes": 53676
+          }
+        ],
+        "diff_sha256": "2221199b3904dbef38a151b3efe85082d472209ef559b8cdd15ad21d7d0adfd5",
+        "review_depth": "complete-first-parent-patch-and-owned-boundary",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The patch removes CDK_TABLE_TEMPLATE, CanStick and sticky-styler exports, inlines the CDK table template and deletes a modern Material comment. Material 16 legacy table used CDK_TABLE_TEMPLATE; the current owned legacy table instead supplies its own caption, column, native/flex and server template and the owned outlet bridge. Do not reintroduce the removed template or sticky internals as peer imports. This decision does not qualify inherited CdkTable rendering or its private outlet hooks. The authorized November 8 table exception covers only the enumerated outlet bridge hooks and requires peer-bound lifecycle, nested, native/flex and no-data testing. Packed AOT, caption/colgroup projection, outlet ownership, server and hydration behavior remain open."
+      }
     },
     {
       "sha": "0f48b04dd340461811f974d112c05374a5fb1a4a",
@@ -91005,9 +91033,9 @@
       "sha": "f260aa04c919d2906604fa7b66a3852e4d19a5ff",
       "bucket": "needs-triage",
       "subject": "refactor(cdk/table): remove mixin function usages",
-      "final_disposition": "inherited",
-      "reason": "Inspected upstream patch content (sha256=ac2e1a482ff2493fd887b9c4869dfc44a1975b7b11e9658c7a97318724a043c3, bytes=15800). Changed paths: src/cdk/table/can-stick.ts, src/cdk/table/cell.ts, src/cdk/table/row.ts, src/material/table/cell.ts, src/material/table/row.ts, tools/public_api_guard/cdk/table.md, tools/public_api_guard/material/table.md. removes TypeScript mixin helpers on CDK peer table APIs. This package does not redefine those CDK mixins. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7). Fail-closed: not deferred=pass; g11_claim remains not-passed.",
-      "batch_id": "needs-triage-experimental-m3-build-docs-harness-input-transform-2026-10-01",
+      "final_disposition": "do-not-adopt",
+      "reason": "The upstream patch replaces the CDK sticky mixin with transformed inputs and explicit changed-state tracking and updates modern Material metadata. Material 16 legacy row and column directives exposed historical sticky inputs; its CDK mixin and stickyEnd setters coerce on each assignment and reset the change flag to whether that assignment changed the value. Current owned legacy directives retain the historical input metadata and wrap peer setters with coerceBooleanProperty and resetStickyChanged. Retain these local adaptations rather than substitute the modern Material metadata. The peer still owns the underlying setters and sticky rendering; neither exact input/change-state behavior nor native/flex updates has been executed here. Test empty and false strings, direct and template writes, unchanged and successive sticky/stickyEnd writes, reset/read behavior, and rendered sticky updates.",
+      "batch_id": "c04-small-cross-023-4903-source-v1",
       "files": [
         "src/cdk/table/can-stick.ts",
         "src/cdk/table/cell.ts",
@@ -91018,8 +91046,8 @@
         "tools/public_api_guard/material/table.md"
       ],
       "patch_sha256": "ac2e1a482ff2493fd887b9c4869dfc44a1975b7b11e9658c7a97318724a043c3",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/f260aa04c919d2906604fa7b66a3852e4d19a5ff.json",
-      "read_note_disposition": "inherited",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-small-cross-023-4903-source-v1/f260aa04c919d2906604fa7b66a3852e4d19a5ff.json",
+      "read_note_disposition": "source-reviewed",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
       "peer_floor": {
@@ -91027,6 +91055,34 @@
         "installed": "22.1.7",
         "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
         "delegation": "@angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/row.ts",
+            "sha256": "b57c2be6361b4caf802e9e13759f3bdebab413cd0a903f37ebf6e6443cf4f37d",
+            "bytes": 6940
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/cell.ts",
+            "sha256": "28359f7f5b9f4145e809340e8b0b441507d7c08323cea13cde6dea86b3dd1dbb",
+            "bytes": 6510
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+            "sha256": "a6d1f377085d4a05c2283e80f123fe1068beeec8f720310f30d4f149403c1424",
+            "bytes": 53676
+          }
+        ],
+        "diff_sha256": "ac2e1a482ff2493fd887b9c4869dfc44a1975b7b11e9658c7a97318724a043c3",
+        "review_depth": "complete-first-parent-patch-and-owned-boundary",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream patch replaces the CDK sticky mixin with transformed inputs and explicit changed-state tracking and updates modern Material metadata. Material 16 legacy row and column directives exposed historical sticky inputs; its CDK mixin and stickyEnd setters coerce on each assignment and reset the change flag to whether that assignment changed the value. Current owned legacy directives retain the historical input metadata and wrap peer setters with coerceBooleanProperty and resetStickyChanged. Retain these local adaptations rather than substitute the modern Material metadata. The peer still owns the underlying setters and sticky rendering; neither exact input/change-state behavior nor native/flex updates has been executed here. Test empty and false strings, direct and template writes, unchanged and successive sticky/stickyEnd writes, reset/read behavior, and rendered sticky updates."
       }
     },
     {
@@ -105178,9 +105234,9 @@
       "sha": "c7cc0be0a0c65ccd1e00c02faafa54b2854a3d63",
       "bucket": "needs-triage",
       "subject": "refactor: remove remaining NgClass usages (#32873)",
-      "final_disposition": "inherited",
-      "reason": "Inspected upstream patch content (sha256=307e83dfce48c504f3d425ba04aa5a0355cef1b7a1320dd56ef06b9e2bcbf95a, bytes=4039). Changed paths: src/cdk/drag-drop/directives/drop-list-shared.spec.ts, src/cdk/table/BUILD.bazel, src/cdk/table/table.spec.ts. CDK-only change. Legacy surfaces that consume CDK import the installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7) and do not reimplement the CDK module. Inherited via peer. Delegation: @angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
-      "batch_id": "needs-triage-surface-m3-nonshipped-cdk-2026-10-01",
+      "final_disposition": "not-applicable",
+      "reason": "The entire upstream change replaces NgClass in two upstream test fixtures with class bindings and removes Angular common from upstream CDK table Bazel dependencies; it changes no CDK production source. The add-on owns separate legacy table sources and tests and does not own those upstream test fixtures or Bazel targets. No production source transplant is indicated. This conclusion does not qualify the installed CDK table build, consumer-authored class behavior, or legacy table runtime tests.",
+      "batch_id": "c04-small-cross-023-source-2026-11-15",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
       "peer_floor": {
         "package": "@angular/cdk",
@@ -105188,7 +105244,31 @@
         "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
         "delegation": "@angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts"
       },
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/c7cc0be0a0c65ccd1e00c02faafa54b2854a3d63.json"
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-small-cross-023-source-2026-11-15/c7cc0be0a0c65ccd1e00c02faafa54b2854a3d63.json",
+      "read_note_disposition": "source-reviewed",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+            "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+            "bytes": 3818
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+            "sha256": "a6d1f377085d4a05c2283e80f123fe1068beeec8f720310f30d4f149403c1424",
+            "bytes": 53676
+          }
+        ],
+        "diff_sha256": "307e83dfce48c504f3d425ba04aa5a0355cef1b7a1320dd56ef06b9e2bcbf95a",
+        "review_depth": "complete-first-parent-patch-and-owned-boundary",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The entire upstream change replaces NgClass in two upstream test fixtures with class bindings and removes Angular common from upstream CDK table Bazel dependencies; it changes no CDK production source. The add-on owns separate legacy table sources and tests and does not own those upstream test fixtures or Bazel targets. No production source transplant is indicated. This conclusion does not qualify the installed CDK table build, consumer-authored class behavior, or legacy table runtime tests."
+      }
     },
     {
       "sha": "867ba993b3baf35868d7c898e77289870316bbb9",
@@ -118361,18 +118441,51 @@
         "src/universal-app/styles.scss"
       ],
       "diff_sha256": "52936b61375fee1e99188eaf8376473a1fd80db4142e172233cfa28029b24607",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/6315e790893d2efdfc802fb072feb165d37b9e25.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-small-cross-023-source-2026-11-15/6315e790893d2efdfc802fb072feb165d37b9e25.json",
+      "batch_id": "c04-small-cross-023-source-2026-11-15",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/dev-app/theme.scss changes `@include mat.app-background();`. That line is not in the legacy sources. @angular/material/core is exercised by projects/ngx-material-legacy/legacy-menu/menu-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "source-reviewed",
+      "reason": "This patch adds app-background and elevation-classes as empty mixins in its then-current modern core and invokes them in two upstream applications. The owned facade retains core-theme and legacy-core-theme, and those historical theme files emit background and elevation classes as in the Material 16 reference. Do not insert the empty placeholder mixins into the historical facade. The installed 22.1.7 implementations are now nonempty, a distinct current peer behavior; compiled historical default and custom themes and mixed M2/M3 coexistence remain unverified.",
       "peer_floor": {
         "package": "@angular/material",
         "installed": "22.1.7",
         "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
         "delegation": "@angular/material/core imported by projects/ngx-material-legacy/legacy-menu/menu-module.ts"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/_index.scss",
+            "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+            "bytes": 14151
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/_core.scss",
+            "sha256": "c5142f46aeb68a2235bf8ed9358388b9b7594d082d4dee2bd44363202273b870",
+            "bytes": 524
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/_core-theme.scss",
+            "sha256": "cc4b4bec96a081d0e60d30985e0d821e007d531d764055a572e7ad4e7b62e8cf",
+            "bytes": 3454
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/legacy-core/_core-theme.scss",
+            "sha256": "e62c14f065ad25e7b18a8e6ee8ccbb01d4d8d2186c9feb26035b6e3d2bbc45ff",
+            "bytes": 2621
+          }
+        ],
+        "diff_sha256": "e4d49425598472bf444c84d4bc64852489cbc19353ca863789abece1863c2ee2",
+        "review_depth": "complete-first-parent-patch-and-owned-boundary",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "This patch adds app-background and elevation-classes as empty mixins in its then-current modern core and invokes them in two upstream applications. The owned facade retains core-theme and legacy-core-theme, and those historical theme files emit background and elevation classes as in the Material 16 reference. Do not insert the empty placeholder mixins into the historical facade. The installed 22.1.7 implementations are now nonempty, a distinct current peer behavior; compiled historical default and custom themes and mixed M2/M3 coexistence remain unverified."
       }
     },
     {
@@ -135615,18 +135728,51 @@
         "src/material/core/tokens/_classes.scss"
       ],
       "diff_sha256": "b7ee473677e56c0f63182e7add294e8d8dc258f0cf0430d283e0f22e53545a72",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/605e2c9f6557b41f03ad3f9268d6c536433e1555.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-small-cross-023-source-2026-11-15/605e2c9f6557b41f03ad3f9268d6c536433e1555.json",
+      "batch_id": "c04-small-cross-023-source-2026-11-15",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/dev-app/dev-app/dev-app-layout.ts changes `{name: 'System classes', route: '/system-classes'},`. That line is not in the legacy sources. @angular/material/core is exercised by projects/ngx-material-legacy/legacy-menu/menu-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "source-reviewed",
+      "reason": "The product hunk renames the modern system-token class mixin and typography, corner, border and shadow selectors, while the other hunks update upstream demos and build files. The finite historical facade exports its owned core and core themes, not the newer system-classes entry; the Material 16 core/theme sources implement historical styling. Do not copy this modern API into the legacy facade. Verify historical core CSS and mixed M2/M3 inclusion in rendered consumer cases; no compiled or rendered equivalence is claimed.",
       "peer_floor": {
         "package": "@angular/material",
         "installed": "22.1.7",
         "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
         "delegation": "@angular/material/core imported by projects/ngx-material-legacy/legacy-menu/menu-module.ts"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/_index.scss",
+            "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+            "bytes": 14151
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/_core.scss",
+            "sha256": "c5142f46aeb68a2235bf8ed9358388b9b7594d082d4dee2bd44363202273b870",
+            "bytes": 524
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/_core-theme.scss",
+            "sha256": "cc4b4bec96a081d0e60d30985e0d821e007d531d764055a572e7ad4e7b62e8cf",
+            "bytes": 3454
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/legacy-core/_core-theme.scss",
+            "sha256": "e62c14f065ad25e7b18a8e6ee8ccbb01d4d8d2186c9feb26035b6e3d2bbc45ff",
+            "bytes": 2621
+          }
+        ],
+        "diff_sha256": "701130abaa69ecb286b401ad12cec22c97856f80d42c3b57742b669c365067d4",
+        "review_depth": "complete-first-parent-patch-and-owned-boundary",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The product hunk renames the modern system-token class mixin and typography, corner, border and shadow selectors, while the other hunks update upstream demos and build files. The finite historical facade exports its owned core and core themes, not the newer system-classes entry; the Material 16 core/theme sources implement historical styling. Do not copy this modern API into the legacy facade. Verify historical core CSS and mixed M2/M3 inclusion in rendered consumer cases; no compiled or rendered equivalence is claimed."
       }
     },
     {
@@ -137105,18 +137251,56 @@
         "src/material/table/testing/row-harness.ts"
       ],
       "diff_sha256": "4bd3224fc2f41c66ce9b4cdb206d9eb2b7d2a9e0b23ff43e8c3a212d90621bc4",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/b6d81939c822684a4084b3081a2a42d885e1907d.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-small-cross-023-4903-source-v1/b6d81939c822684a4084b3081a2a42d885e1907d.json",
+      "batch_id": "c04-small-cross-023-4903-source-v1",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/cdk/table/row.ts changes `_contentClassName = 'cdk-no-data-row';`. That line is not in the legacy sources. @angular/cdk/table is exercised by projects/ngx-material-legacy/legacy-table/table.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/cdk@22.1.7 supplies the change.",
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "source-reviewed",
+      "reason": "The upstream patch changes CDK no-data row and cell class application, adds modern Material MDC classes, and excludes the modern no-data row and cells from harness selectors. Material 16 legacy row specifies mat-no-data-row; the owned adapter sets that row class, suppresses extra cell classes and uses legacy row/cell harness selectors. Retain that historical styling rather than copy the modern MDC classes. The current CDK still performs row creation and class application; the November 8 table exception specifically permits the existing no-data adapter fields but does not qualify their behavior. Native and flex transitions, exact class attributes including consumer-authored classes, and harness exclusion remain unexecuted and open.",
       "peer_floor": {
         "package": "@angular/cdk",
         "installed": "22.1.7",
         "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
         "delegation": "@angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/row.ts",
+            "sha256": "b57c2be6361b4caf802e9e13759f3bdebab413cd0a903f37ebf6e6443cf4f37d",
+            "bytes": 6940
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+            "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+            "bytes": 3818
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+            "sha256": "a6d1f377085d4a05c2283e80f123fe1068beeec8f720310f30d4f149403c1424",
+            "bytes": 53676
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/testing/row-harness.ts",
+            "sha256": "9a3a71945411443c023d33f46ee0ee7a228e2c1308be0f5940d9bcc107e17b0f",
+            "bytes": 1992
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/testing/cell-harness.ts",
+            "sha256": "5b60ba3ce6a7b814fdf26334bd8791dccaccf9499cb0b206f9fc9a3a3207658f",
+            "bytes": 1553
+          }
+        ],
+        "diff_sha256": "4d2b2e56eb1c9d9e6da1ed173a4e6058a26242ae8e7ba262fa4fbc15891adbb7",
+        "review_depth": "complete-first-parent-patch-and-owned-boundary",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream patch changes CDK no-data row and cell class application, adds modern Material MDC classes, and excludes the modern no-data row and cells from harness selectors. Material 16 legacy row specifies mat-no-data-row; the owned adapter sets that row class, suppresses extra cell classes and uses legacy row/cell harness selectors. Retain that historical styling rather than copy the modern MDC classes. The current CDK still performs row creation and class application; the November 8 table exception specifically permits the existing no-data adapter fields but does not qualify their behavior. Native and flex transitions, exact class attributes including consumer-authored classes, and harness exclusion remain unexecuted and open."
       }
     },
     {

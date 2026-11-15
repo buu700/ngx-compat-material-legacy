@@ -1,0 +1,117 @@
+{
+  "sha": "f260aa04c919d2906604fa7b66a3852e4d19a5ff",
+  "role": "C04 bounded individual contextual source review",
+  "line": "main",
+  "diff_sha256": "ac2e1a482ff2493fd887b9c4869dfc44a1975b7b11e9658c7a97318724a043c3",
+  "diff": "diff --git a/src/cdk/table/can-stick.ts b/src/cdk/table/can-stick.ts\nindex 1d59286ba..0e2333a62 100644\n--- a/src/cdk/table/can-stick.ts\n+++ b/src/cdk/table/can-stick.ts\n@@ -21,9 +21,6 @@ export interface CanStick {\n   /** Whether sticky positioning should be applied. */\n   sticky: boolean;\n \n-  /** Whether the sticky input has changed since it was last checked. */\n-  _hasStickyChanged: boolean;\n-\n   /** Whether the sticky value has changed since this was last called. */\n   hasStickyChanged(): boolean;\n \ndiff --git a/src/cdk/table/cell.ts b/src/cdk/table/cell.ts\nindex 918178616..19dd24f52 100644\n--- a/src/cdk/table/cell.ts\n+++ b/src/cdk/table/cell.ts\n@@ -16,7 +16,7 @@ import {\n   TemplateRef,\n   booleanAttribute,\n } from '@angular/core';\n-import {CanStick, CanStickCtor, mixinHasStickyInput} from './can-stick';\n+import {CanStick} from './can-stick';\n import {CDK_TABLE} from './tokens';\n \n /** Base interface for a cell definition. Captures a column's cell template definition. */\n@@ -60,23 +60,18 @@ export class CdkFooterCellDef implements CellDef {\n   constructor(/** @docs-private */ public template: TemplateRef<any>) {}\n }\n \n-// Boilerplate for applying mixins to CdkColumnDef.\n-/** @docs-private */\n-class CdkColumnDefBase {}\n-const _CdkColumnDefBase: CanStickCtor & typeof CdkColumnDefBase =\n-  mixinHasStickyInput(CdkColumnDefBase);\n-\n /**\n  * Column definition for the CDK table.\n  * Defines a set of cells available for a table column.\n  */\n @Directive({\n   selector: '[cdkColumnDef]',\n-  inputs: ['sticky'],\n   providers: [{provide: 'MAT_SORT_HEADER_COLUMN_DEF', useExisting: CdkColumnDef}],\n   standalone: true,\n })\n-export class CdkColumnDef extends _CdkColumnDefBase implements CanStick {\n+export class CdkColumnDef implements CanStick {\n+  private _hasStickyChanged = false;\n+\n   /** Unique name for this column. */\n   @Input('cdkColumnDef')\n   get name(): string {\n@@ -87,6 +82,19 @@ export class CdkColumnDef extends _CdkColumnDefBase implements CanStick {\n   }\n   protected _name: string;\n \n+  /** Whether the cell is sticky. */\n+  @Input({transform: booleanAttribute})\n+  get sticky(): boolean {\n+    return this._sticky;\n+  }\n+  set sticky(value: boolean) {\n+    if (value !== this._sticky) {\n+      this._sticky = value;\n+      this._hasStickyChanged = true;\n+    }\n+  }\n+  private _sticky = false;\n+\n   /**\n    * Whether this column should be sticky positioned on the end of the row. Should make sure\n    * that it mimics the `CanStick` mixin such that `_hasStickyChanged` is set to true if the value\n@@ -126,8 +134,18 @@ export class CdkColumnDef extends _CdkColumnDefBase implements CanStick {\n    */\n   _columnCssClassName: string[];\n \n-  constructor(@Inject(CDK_TABLE) @Optional() public _table?: any) {\n-    super();\n+  constructor(@Inject(CDK_TABLE) @Optional() public _table?: any) {}\n+\n+  /** Whether the sticky state has changed. */\n+  hasStickyChanged(): boolean {\n+    const hasStickyChanged = this._hasStickyChanged;\n+    this.resetStickyChanged();\n+    return hasStickyChanged;\n+  }\n+\n+  /** Resets the sticky changed state. */\n+  resetStickyChanged(): void {\n+    this._hasStickyChanged = false;\n   }\n \n   /**\ndiff --git a/src/cdk/table/row.ts b/src/cdk/table/row.ts\nindex 780868a18..017e88b7b 100644\n--- a/src/cdk/table/row.ts\n+++ b/src/cdk/table/row.ts\n@@ -21,8 +21,10 @@ import {\n   ViewEncapsulation,\n   Inject,\n   Optional,\n+  Input,\n+  booleanAttribute,\n } from '@angular/core';\n-import {CanStick, CanStickCtor, mixinHasStickyInput} from './can-stick';\n+import {CanStick} from './can-stick';\n import {CdkCellDef, CdkColumnDef} from './cell';\n import {CDK_TABLE} from './tokens';\n \n@@ -80,22 +82,31 @@ export abstract class BaseRowDef implements OnChanges {\n   }\n }\n \n-// Boilerplate for applying mixins to CdkHeaderRowDef.\n-/** @docs-private */\n-class CdkHeaderRowDefBase extends BaseRowDef {}\n-const _CdkHeaderRowDefBase: CanStickCtor & typeof CdkHeaderRowDefBase =\n-  mixinHasStickyInput(CdkHeaderRowDefBase);\n-\n /**\n  * Header row definition for the CDK table.\n  * Captures the header row's template and other header properties such as the columns to display.\n  */\n @Directive({\n   selector: '[cdkHeaderRowDef]',\n-  inputs: ['columns: cdkHeaderRowDef', 'sticky: cdkHeaderRowDefSticky'],\n+  inputs: [{name: 'columns', alias: 'cdkHeaderRowDef'}],\n   standalone: true,\n })\n-export class CdkHeaderRowDef extends _CdkHeaderRowDefBase implements CanStick, OnChanges {\n+export class CdkHeaderRowDef extends BaseRowDef implements CanStick, OnChanges {\n+  private _hasStickyChanged = false;\n+\n+  /** Whether the row is sticky. */\n+  @Input({alias: 'cdkHeaderRowDefSticky', transform: booleanAttribute})\n+  get sticky(): boolean {\n+    return this._sticky;\n+  }\n+  set sticky(value: boolean) {\n+    if (value !== this._sticky) {\n+      this._sticky = value;\n+      this._hasStickyChanged = true;\n+    }\n+  }\n+  private _sticky = false;\n+\n   constructor(\n     template: TemplateRef<any>,\n     _differs: IterableDiffers,\n@@ -109,13 +120,19 @@ export class CdkHeaderRowDef extends _CdkHeaderRowDefBase implements CanStick, O\n   override ngOnChanges(changes: SimpleChanges): void {\n     super.ngOnChanges(changes);\n   }\n-}\n \n-// Boilerplate for applying mixins to CdkFooterRowDef.\n-/** @docs-private */\n-class CdkFooterRowDefBase extends BaseRowDef {}\n-const _CdkFooterRowDefBase: CanStickCtor & typeof CdkFooterRowDefBase =\n-  mixinHasStickyInput(CdkFooterRowDefBase);\n+  /** Whether the sticky state has changed. */\n+  hasStickyChanged(): boolean {\n+    const hasStickyChanged = this._hasStickyChanged;\n+    this.resetStickyChanged();\n+    return hasStickyChanged;\n+  }\n+\n+  /** Resets the sticky changed state. */\n+  resetStickyChanged(): void {\n+    this._hasStickyChanged = false;\n+  }\n+}\n \n /**\n  * Footer row definition for the CDK table.\n@@ -123,10 +140,25 @@ const _CdkFooterRowDefBase: CanStickCtor & typeof CdkFooterRowDefBase =\n  */\n @Directive({\n   selector: '[cdkFooterRowDef]',\n-  inputs: ['columns: cdkFooterRowDef', 'sticky: cdkFooterRowDefSticky'],\n+  inputs: [{name: 'columns', alias: 'cdkFooterRowDef'}],\n   standalone: true,\n })\n-export class CdkFooterRowDef extends _CdkFooterRowDefBase implements CanStick, OnChanges {\n+export class CdkFooterRowDef extends BaseRowDef implements CanStick, OnChanges {\n+  private _hasStickyChanged = false;\n+\n+  /** Whether the row is sticky. */\n+  @Input({alias: 'cdkFooterRowDefSticky', transform: booleanAttribute})\n+  get sticky(): boolean {\n+    return this._sticky;\n+  }\n+  set sticky(value: boolean) {\n+    if (value !== this._sticky) {\n+      this._sticky = value;\n+      this._hasStickyChanged = true;\n+    }\n+  }\n+  private _sticky = false;\n+\n   constructor(\n     template: TemplateRef<any>,\n     _differs: IterableDiffers,\n@@ -140,6 +172,18 @@ export class CdkFooterRowDef extends _CdkFooterRowDefBase implements CanStick, O\n   override ngOnChanges(changes: SimpleChanges): void {\n     super.ngOnChanges(changes);\n   }\n+\n+  /** Whether the sticky state has changed. */\n+  hasStickyChanged(): boolean {\n+    const hasStickyChanged = this._hasStickyChanged;\n+    this.resetStickyChanged();\n+    return hasStickyChanged;\n+  }\n+\n+  /** Resets the sticky changed state. */\n+  resetStickyChanged(): void {\n+    this._hasStickyChanged = false;\n+  }\n }\n \n /**\n@@ -149,7 +193,10 @@ export class CdkFooterRowDef extends _CdkFooterRowDefBase implements CanStick, O\n  */\n @Directive({\n   selector: '[cdkRowDef]',\n-  inputs: ['columns: cdkRowDefColumns', 'when: cdkRowDefWhen'],\n+  inputs: [\n+    {name: 'columns', alias: 'cdkRowDefColumns'},\n+    {name: 'when', alias: 'cdkRowDefWhen'},\n+  ],\n   standalone: true,\n })\n export class CdkRowDef<T> extends BaseRowDef {\ndiff --git a/src/material/table/cell.ts b/src/material/table/cell.ts\nindex bd34dbe5b..dd327a625 100644\n--- a/src/material/table/cell.ts\n+++ b/src/material/table/cell.ts\n@@ -56,7 +56,6 @@ export class MatFooterCellDef extends CdkFooterCellDef {}\n  */\n @Directive({\n   selector: '[matColumnDef]',\n-  inputs: ['sticky'],\n   providers: [\n     {provide: CdkColumnDef, useExisting: MatColumnDef},\n     {provide: 'MAT_SORT_HEADER_COLUMN_DEF', useExisting: MatColumnDef},\ndiff --git a/src/material/table/row.ts b/src/material/table/row.ts\nindex c08bee41a..7a26f1256 100644\n--- a/src/material/table/row.ts\n+++ b/src/material/table/row.ts\n@@ -16,7 +16,13 @@ import {\n   CdkNoDataRow,\n   CdkCellOutlet,\n } from '@angular/cdk/table';\n-import {ChangeDetectionStrategy, Component, Directive, ViewEncapsulation} from '@angular/core';\n+import {\n+  ChangeDetectionStrategy,\n+  Component,\n+  Directive,\n+  ViewEncapsulation,\n+  booleanAttribute,\n+} from '@angular/core';\n \n // We can't reuse `CDK_ROW_TEMPLATE` because it's incompatible with local compilation mode.\n const ROW_TEMPLATE = `<ng-container cdkCellOutlet></ng-container>`;\n@@ -28,7 +34,10 @@ const ROW_TEMPLATE = `<ng-container cdkCellOutlet></ng-container>`;\n @Directive({\n   selector: '[matHeaderRowDef]',\n   providers: [{provide: CdkHeaderRowDef, useExisting: MatHeaderRowDef}],\n-  inputs: ['columns: matHeaderRowDef', 'sticky: matHeaderRowDefSticky'],\n+  inputs: [\n+    {name: 'columns', alias: 'matHeaderRowDef'},\n+    {name: 'sticky', alias: 'matHeaderRowDefSticky', transform: booleanAttribute},\n+  ],\n   standalone: true,\n })\n export class MatHeaderRowDef extends CdkHeaderRowDef {}\n@@ -40,7 +49,10 @@ export class MatHeaderRowDef extends CdkHeaderRowDef {}\n @Directive({\n   selector: '[matFooterRowDef]',\n   providers: [{provide: CdkFooterRowDef, useExisting: MatFooterRowDef}],\n-  inputs: ['columns: matFooterRowDef', 'sticky: matFooterRowDefSticky'],\n+  inputs: [\n+    {name: 'columns', alias: 'matFooterRowDef'},\n+    {name: 'sticky', alias: 'matFooterRowDefSticky', transform: booleanAttribute},\n+  ],\n   standalone: true,\n })\n export class MatFooterRowDef extends CdkFooterRowDef {}\n@@ -53,7 +65,10 @@ export class MatFooterRowDef extends CdkFooterRowDef {}\n @Directive({\n   selector: '[matRowDef]',\n   providers: [{provide: CdkRowDef, useExisting: MatRowDef}],\n-  inputs: ['columns: matRowDefColumns', 'when: matRowDefWhen'],\n+  inputs: [\n+    {name: 'columns', alias: 'matRowDefColumns'},\n+    {name: 'when', alias: 'matRowDefWhen'},\n+  ],\n   standalone: true,\n })\n export class MatRowDef<T> extends CdkRowDef<T> {}\ndiff --git a/tools/public_api_guard/cdk/table.md b/tools/public_api_guard/cdk/table.md\nindex 42f989d87..eeb39e1f5 100644\n--- a/tools/public_api_guard/cdk/table.md\n+++ b/tools/public_api_guard/cdk/table.md\n@@ -61,7 +61,6 @@ export abstract class BaseRowDef implements OnChanges {\n // @public\n export interface CanStick {\n     hasStickyChanged(): boolean;\n-    _hasStickyChanged: boolean;\n     resetStickyChanged(): void;\n     sticky: boolean;\n }\n@@ -138,20 +137,26 @@ export interface CdkCellOutletRowContext<T> {\n }\n \n // @public\n-export class CdkColumnDef extends _CdkColumnDefBase implements CanStick {\n+export class CdkColumnDef implements CanStick {\n     constructor(_table?: any);\n     cell: CdkCellDef;\n     _columnCssClassName: string[];\n     cssClassFriendlyName: string;\n     footerCell: CdkFooterCellDef;\n+    hasStickyChanged(): boolean;\n     headerCell: CdkHeaderCellDef;\n     get name(): string;\n     set name(name: string);\n     // (undocumented)\n     protected _name: string;\n     // (undocumented)\n+    static ngAcceptInputType_sticky: unknown;\n+    // (undocumented)\n     static ngAcceptInputType_stickyEnd: unknown;\n+    resetStickyChanged(): void;\n     protected _setNameInput(value: string): void;\n+    get sticky(): boolean;\n+    set sticky(value: boolean);\n     get stickyEnd(): boolean;\n     set stickyEnd(value: boolean);\n     // (undocumented)\n@@ -160,7 +165,7 @@ export class CdkColumnDef extends _CdkColumnDefBase implements CanStick {\n     _table?: any;\n     protected _updateColumnCssClassName(): void;\n     // (undocumented)\n-    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<CdkColumnDef, \"[cdkColumnDef]\", never, { \"sticky\": { \"alias\": \"sticky\"; \"required\": false; }; \"name\": { \"alias\": \"cdkColumnDef\"; \"required\": false; }; \"stickyEnd\": { \"alias\": \"stickyEnd\"; \"required\": false; }; }, {}, [\"cell\", \"headerCell\", \"footerCell\"], never, true, never>;\n+    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<CdkColumnDef, \"[cdkColumnDef]\", never, { \"name\": { \"alias\": \"cdkColumnDef\"; \"required\": false; }; \"sticky\": { \"alias\": \"sticky\"; \"required\": false; }; \"stickyEnd\": { \"alias\": \"stickyEnd\"; \"required\": false; }; }, {}, [\"cell\", \"headerCell\", \"footerCell\"], never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<CdkColumnDef, [{ optional: true; }]>;\n }\n@@ -194,10 +199,16 @@ export class CdkFooterRow {\n }\n \n // @public\n-export class CdkFooterRowDef extends _CdkFooterRowDefBase implements CanStick, OnChanges {\n+export class CdkFooterRowDef extends BaseRowDef implements CanStick, OnChanges {\n     constructor(template: TemplateRef<any>, _differs: IterableDiffers, _table?: any);\n+    hasStickyChanged(): boolean;\n+    // (undocumented)\n+    static ngAcceptInputType_sticky: unknown;\n     // (undocumented)\n     ngOnChanges(changes: SimpleChanges): void;\n+    resetStickyChanged(): void;\n+    get sticky(): boolean;\n+    set sticky(value: boolean);\n     // (undocumented)\n     _table?: any;\n     // (undocumented)\n@@ -235,10 +246,16 @@ export class CdkHeaderRow {\n }\n \n // @public\n-export class CdkHeaderRowDef extends _CdkHeaderRowDefBase implements CanStick, OnChanges {\n+export class CdkHeaderRowDef extends BaseRowDef implements CanStick, OnChanges {\n     constructor(template: TemplateRef<any>, _differs: IterableDiffers, _table?: any);\n+    hasStickyChanged(): boolean;\n+    // (undocumented)\n+    static ngAcceptInputType_sticky: unknown;\n     // (undocumented)\n     ngOnChanges(changes: SimpleChanges): void;\n+    resetStickyChanged(): void;\n+    get sticky(): boolean;\n+    set sticky(value: boolean);\n     // (undocumented)\n     _table?: any;\n     // (undocumented)\ndiff --git a/tools/public_api_guard/material/table.md b/tools/public_api_guard/material/table.md\nindex 0d489310c..df5d004e5 100644\n--- a/tools/public_api_guard/material/table.md\n+++ b/tools/public_api_guard/material/table.md\n@@ -51,7 +51,7 @@ export class MatColumnDef extends CdkColumnDef {\n     set name(name: string);\n     protected _updateColumnCssClassName(): void;\n     // (undocumented)\n-    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatColumnDef, \"[matColumnDef]\", never, { \"sticky\": { \"alias\": \"sticky\"; \"required\": false; }; \"name\": { \"alias\": \"matColumnDef\"; \"required\": false; }; }, {}, never, never, true, never>;\n+    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatColumnDef, \"[matColumnDef]\", never, { \"name\": { \"alias\": \"matColumnDef\"; \"required\": false; }; }, {}, never, never, true, never>;\n     // (undocumented)\n     static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatColumnDef, never>;\n }\n@@ -82,6 +82,8 @@ export class MatFooterRow extends CdkFooterRow {\n \n // @public\n export class MatFooterRowDef extends CdkFooterRowDef {\n+    // (undocumented)\n+    static ngAcceptInputType_sticky: unknown;\n     // (undocumented)\n     static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatFooterRowDef, \"[matFooterRowDef]\", never, { \"columns\": { \"alias\": \"matFooterRowDef\"; \"required\": false; }; \"sticky\": { \"alias\": \"matFooterRowDefSticky\"; \"required\": false; }; }, {}, never, never, true, never>;\n     // (undocumented)\n@@ -114,6 +116,8 @@ export class MatHeaderRow extends CdkHeaderRow {\n \n // @public\n export class MatHeaderRowDef extends CdkHeaderRowDef {\n+    // (undocumented)\n+    static ngAcceptInputType_sticky: unknown;\n     // (undocumented)\n     static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatHeaderRowDef, \"[matHeaderRowDef]\", never, { \"columns\": { \"alias\": \"matHeaderRowDef\"; \"required\": false; }; \"sticky\": { \"alias\": \"matHeaderRowDefSticky\"; \"required\": false; }; }, {}, never, never, true, never>;\n     // (undocumented)\n",
+  "final_disposition": "do-not-adopt",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/row.ts",
+      "sha256": "b57c2be6361b4caf802e9e13759f3bdebab413cd0a903f37ebf6e6443cf4f37d",
+      "bytes": 6940
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/cell.ts",
+      "sha256": "28359f7f5b9f4145e809340e8b0b441507d7c08323cea13cde6dea86b3dd1dbb",
+      "bytes": 6510
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+      "sha256": "a6d1f377085d4a05c2283e80f123fe1068beeec8f720310f30d4f149403c1424",
+      "bytes": 53676
+    }
+  ],
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "The upstream patch replaces the CDK sticky mixin with transformed inputs and explicit changed-state tracking and updates modern Material metadata. Material 16 legacy row and column directives exposed historical sticky inputs; its CDK mixin and stickyEnd setters coerce on each assignment and reset the change flag to whether that assignment changed the value. Current owned legacy directives retain the historical input metadata and wrap peer setters with coerceBooleanProperty and resetStickyChanged. Retain these local adaptations rather than substitute the modern Material metadata. The peer still owns the underlying setters and sticky rendering; neither exact input/change-state behavior nor native/flex updates has been executed here. Test empty and false strings, direct and template writes, unchanged and successive sticky/stickyEnd writes, reset/read behavior, and rendered sticky updates.",
+  "prior_entry": {
+    "sha": "f260aa04c919d2906604fa7b66a3852e4d19a5ff",
+    "bucket": "needs-triage",
+    "subject": "refactor(cdk/table): remove mixin function usages",
+    "final_disposition": "inherited",
+    "reason": "Inspected upstream patch content (sha256=ac2e1a482ff2493fd887b9c4869dfc44a1975b7b11e9658c7a97318724a043c3, bytes=15800). Changed paths: src/cdk/table/can-stick.ts, src/cdk/table/cell.ts, src/cdk/table/row.ts, src/material/table/cell.ts, src/material/table/row.ts, tools/public_api_guard/cdk/table.md, tools/public_api_guard/material/table.md. removes TypeScript mixin helpers on CDK peer table APIs. This package does not redefine those CDK mixins. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7). Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+    "batch_id": "needs-triage-experimental-m3-build-docs-harness-input-transform-2026-10-01",
+    "files": [
+      "src/cdk/table/can-stick.ts",
+      "src/cdk/table/cell.ts",
+      "src/cdk/table/row.ts",
+      "src/material/table/cell.ts",
+      "src/material/table/row.ts",
+      "tools/public_api_guard/cdk/table.md",
+      "tools/public_api_guard/material/table.md"
+    ],
+    "patch_sha256": "ac2e1a482ff2493fd887b9c4869dfc44a1975b7b11e9658c7a97318724a043c3",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/f260aa04c919d2906604fa7b66a3852e4d19a5ff.json",
+    "read_note_disposition": "inherited",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "peer_floor": {
+      "package": "@angular/cdk",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts"
+    }
+  },
+  "review_context": {
+    "parent": "d361f79095b89cc207945b0b7c91bab04c720e19",
+    "changed_paths": [
+      "src/cdk/table/can-stick.ts",
+      "src/cdk/table/cell.ts",
+      "src/cdk/table/row.ts",
+      "src/material/table/cell.ts",
+      "src/material/table/row.ts",
+      "tools/public_api_guard/cdk/table.md",
+      "tools/public_api_guard/material/table.md"
+    ],
+    "prior_reason": "Inspected upstream patch content (sha256=ac2e1a482ff2493fd887b9c4869dfc44a1975b7b11e9658c7a97318724a043c3, bytes=15800). Changed paths: src/cdk/table/can-stick.ts, src/cdk/table/cell.ts, src/cdk/table/row.ts, src/material/table/cell.ts, src/material/table/row.ts, tools/public_api_guard/cdk/table.md, tools/public_api_guard/material/table.md. removes TypeScript mixin helpers on CDK peer table APIs. This package does not redefine those CDK mixins. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7). Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+    "reference_16_2_14": {
+      "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "root": "/home/parallels/tmp/material16-reference-verified/src/material",
+      "files": [
+        {
+          "path": "legacy-table/row.ts",
+          "sha256": "265fcf16aea55c41b1968456ebb4ebeace0b0d5ff519f4995aca8946d6ec9992",
+          "bytes": 5286
+        },
+        {
+          "path": "legacy-table/cell.ts",
+          "sha256": "6c2d435d3a7acb05246daf325c8eba682c33d6c98b56daab8d61b4c047d8bd03",
+          "bytes": 4468
+        }
+      ]
+    },
+    "peer_files": [
+      {
+        "path": "node_modules/@angular/cdk/types/table.d.ts",
+        "sha256": "f1981ed3da13cccefbc8ad12a197d27fdbbe1d1712de3a00007224518fb841b5",
+        "bytes": 48156
+      },
+      {
+        "path": "node_modules/@angular/cdk/fesm2022/table.mjs",
+        "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4",
+        "bytes": 77604
+      },
+      {
+        "path": "node_modules/@angular/cdk/package.json",
+        "sha256": "ec60a5803a214c9b9d8bcdc2de0b0c294ecdd420d680d0e95e686f7aa4d46933",
+        "bytes": 5084
+      }
+    ],
+    "runtime_obligations": "Test static/empty/false-string and dynamic sticky inputs, stickyEnd and reset/change tracking in native and flex tables against M16.",
+    "exception": "AGENTS.md maintainer-authorized table exception 2026-11-08; this is not a test, audit, release or publication pass",
+    "tagged_cdk_sources": [
+      {
+        "path": "src/cdk/table/can-stick.ts",
+        "sha256": "08c963fe6824838122e61aacdebc005b62ff15d9274c792bb83d06f54e83d576"
+      },
+      {
+        "path": "src/cdk/table/cell.ts",
+        "sha256": "2ce052e47388baaa1cadcd8cb0846a37c8f9312f0ed68bde435c7e51a32feda1"
+      }
+    ]
+  }
+}

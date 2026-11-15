@@ -1,0 +1,132 @@
+{
+  "sha": "b6d81939c822684a4084b3081a2a42d885e1907d",
+  "role": "C04 bounded individual contextual source review",
+  "line": "main",
+  "diff_sha256": "4d2b2e56eb1c9d9e6da1ed173a4e6058a26242ae8e7ba262fa4fbc15891adbb7",
+  "diff": "diff --git a/goldens/cdk/table/index.api.md b/goldens/cdk/table/index.api.md\nindex f6c06e122..93a9abaaf 100644\n--- a/goldens/cdk/table/index.api.md\n+++ b/goldens/cdk/table/index.api.md\n@@ -249,7 +249,11 @@ export class CdkHeaderRowDef extends BaseRowDef implements CanStick, OnChanges {\n export class CdkNoDataRow {\n     constructor(...args: unknown[]);\n     // (undocumented)\n-    _contentClassName: string;\n+    _cellClassNames: string[];\n+    // (undocumented)\n+    _cellSelector: string;\n+    // (undocumented)\n+    _contentClassNames: string[];\n     // (undocumented)\n     templateRef: TemplateRef<any>;\n     // (undocumented)\ndiff --git a/goldens/material/table/index.api.md b/goldens/material/table/index.api.md\nindex 030ed9715..a019f4778 100644\n--- a/goldens/material/table/index.api.md\n+++ b/goldens/material/table/index.api.md\n@@ -130,8 +130,9 @@ export class MatHeaderRowDef extends CdkHeaderRowDef {\n \n // @public\n export class MatNoDataRow extends CdkNoDataRow {\n+    constructor();\n     // (undocumented)\n-    _contentClassName: string;\n+    _cellSelector: string;\n     // (undocumented)\n     static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatNoDataRow, \"ng-template[matNoDataRow]\", never, {}, {}, never, never, true, never>;\n     // (undocumented)\ndiff --git a/src/cdk/table/row.ts b/src/cdk/table/row.ts\nindex 9d89438e0..588c83eaf 100644\n--- a/src/cdk/table/row.ts\n+++ b/src/cdk/table/row.ts\n@@ -366,7 +366,9 @@ export class CdkRow {}\n export class CdkNoDataRow {\n   templateRef = inject<TemplateRef<any>>(TemplateRef);\n \n-  _contentClassName = 'cdk-no-data-row';\n+  _contentClassNames = ['cdk-no-data-row', 'cdk-row'];\n+  _cellClassNames = ['cdk-cell', 'cdk-no-data-cell'];\n+  _cellSelector = 'td, cdk-cell, [cdk-cell], .cdk-cell';\n \n   constructor(...args: unknown[]);\n   constructor() {}\ndiff --git a/src/cdk/table/table.ts b/src/cdk/table/table.ts\nindex a8ffcfabc..c704690e1 100644\n--- a/src/cdk/table/table.ts\n+++ b/src/cdk/table/table.ts\n@@ -1419,7 +1419,13 @@ export class CdkTable<T>\n       // to figure out which one to add it to when there are multiple.\n       if (view.rootNodes.length === 1 && rootNode?.nodeType === this._document.ELEMENT_NODE) {\n         rootNode.setAttribute('role', 'row');\n-        rootNode.classList.add(noDataRow._contentClassName);\n+        rootNode.classList.add(...noDataRow._contentClassNames);\n+\n+        const cells = rootNode.querySelectorAll(noDataRow._cellSelector);\n+\n+        for (let i = 0; i < cells.length; i++) {\n+          cells[i].classList.add(...noDataRow._cellClassNames);\n+        }\n       }\n     } else {\n       container.clear();\ndiff --git a/src/material/table/row.ts b/src/material/table/row.ts\nindex 1f5a3042d..1c0ac4b23 100644\n--- a/src/material/table/row.ts\n+++ b/src/material/table/row.ts\n@@ -130,5 +130,11 @@ export class MatRow extends CdkRow {}\n   providers: [{provide: CdkNoDataRow, useExisting: MatNoDataRow}],\n })\n export class MatNoDataRow extends CdkNoDataRow {\n-  override _contentClassName = 'mat-mdc-no-data-row';\n+  override _cellSelector = 'td, mat-cell, [mat-cell], .mat-cell';\n+\n+  constructor() {\n+    super();\n+    this._contentClassNames.push('mat-mdc-no-data-row', 'mat-mdc-row', 'mdc-data-table__row');\n+    this._cellClassNames.push('mat-mdc-cell', 'mdc-data-table__cell', 'mat-no-data-cell');\n+  }\n }\ndiff --git a/src/material/table/testing/cell-harness.ts b/src/material/table/testing/cell-harness.ts\nindex 420244fa3..47fa5ccc9 100644\n--- a/src/material/table/testing/cell-harness.ts\n+++ b/src/material/table/testing/cell-harness.ts\n@@ -56,7 +56,7 @@ export abstract class _MatCellHarnessBase extends ContentContainerComponentHarne\n /** Harness for interacting with an Angular Material table cell. */\n export class MatCellHarness extends _MatCellHarnessBase {\n   /** The selector for the host element of a `MatCellHarness` instance. */\n-  static hostSelector = '.mat-mdc-cell';\n+  static hostSelector = '.mat-mdc-cell:not(.mat-no-data-cell)';\n \n   /**\n    * Gets a `HarnessPredicate` that can be used to search for a table cell with specific attributes.\ndiff --git a/src/material/table/testing/row-harness.ts b/src/material/table/testing/row-harness.ts\nindex 70ad44a3c..5db30792c 100644\n--- a/src/material/table/testing/row-harness.ts\n+++ b/src/material/table/testing/row-harness.ts\n@@ -61,7 +61,7 @@ export abstract class _MatRowHarnessBase<\n /** Harness for interacting with an Angular Material table row. */\n export class MatRowHarness extends _MatRowHarnessBase<typeof MatCellHarness, MatCellHarness> {\n   /** The selector for the host element of a `MatRowHarness` instance. */\n-  static hostSelector = '.mat-mdc-row';\n+  static hostSelector = '.mat-mdc-row:not(.mat-mdc-no-data-row)';\n   protected _cellHarness = MatCellHarness;\n \n   /**\n",
+  "final_disposition": "do-not-adopt",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/row.ts",
+      "sha256": "b57c2be6361b4caf802e9e13759f3bdebab413cd0a903f37ebf6e6443cf4f37d",
+      "bytes": 6940
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+      "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+      "bytes": 3818
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+      "sha256": "a6d1f377085d4a05c2283e80f123fe1068beeec8f720310f30d4f149403c1424",
+      "bytes": 53676
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/testing/row-harness.ts",
+      "sha256": "9a3a71945411443c023d33f46ee0ee7a228e2c1308be0f5940d9bcc107e17b0f",
+      "bytes": 1992
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/testing/cell-harness.ts",
+      "sha256": "5b60ba3ce6a7b814fdf26334bd8791dccaccf9499cb0b206f9fc9a3a3207658f",
+      "bytes": 1553
+    }
+  ],
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "The upstream patch changes CDK no-data row and cell class application, adds modern Material MDC classes, and excludes the modern no-data row and cells from harness selectors. Material 16 legacy row specifies mat-no-data-row; the owned adapter sets that row class, suppresses extra cell classes and uses legacy row/cell harness selectors. Retain that historical styling rather than copy the modern MDC classes. The current CDK still performs row creation and class application; the November 8 table exception specifically permits the existing no-data adapter fields but does not qualify their behavior. Native and flex transitions, exact class attributes including consumer-authored classes, and harness exclusion remain unexecuted and open.",
+  "prior_entry": {
+    "sha": "b6d81939c822684a4084b3081a2a42d885e1907d",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/table): style no data row properly (#31895)",
+    "files": [
+      "goldens/cdk/table/index.api.md",
+      "goldens/material/table/index.api.md",
+      "src/cdk/table/row.ts",
+      "src/cdk/table/table.ts",
+      "src/material/table/row.ts",
+      "src/material/table/testing/cell-harness.ts",
+      "src/material/table/testing/row-harness.ts"
+    ],
+    "diff_sha256": "4bd3224fc2f41c66ce9b4cdb206d9eb2b7d2a9e0b23ff43e8c3a212d90621bc4",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/b6d81939c822684a4084b3081a2a42d885e1907d.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/cdk/table/row.ts changes `_contentClassName = 'cdk-no-data-row';`. That line is not in the legacy sources. @angular/cdk/table is exercised by projects/ngx-material-legacy/legacy-table/table.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/cdk@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/cdk",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts"
+    }
+  },
+  "review_context": {
+    "parent": "977f46fe61c9e77d0b3706a94016c14cd0cdbe90",
+    "changed_paths": [
+      "goldens/cdk/table/index.api.md",
+      "goldens/material/table/index.api.md",
+      "src/cdk/table/row.ts",
+      "src/cdk/table/table.ts",
+      "src/material/table/row.ts",
+      "src/material/table/testing/cell-harness.ts",
+      "src/material/table/testing/row-harness.ts"
+    ],
+    "prior_reason": "The diff in src/cdk/table/row.ts changes `_contentClassName = 'cdk-no-data-row';`. That line is not in the legacy sources. @angular/cdk/table is exercised by projects/ngx-material-legacy/legacy-table/table.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/cdk@22.1.7 supplies the change.",
+    "reference_16_2_14": {
+      "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "root": "/home/parallels/tmp/material16-reference-verified/src/material",
+      "files": [
+        {
+          "path": "legacy-table/row.ts",
+          "sha256": "265fcf16aea55c41b1968456ebb4ebeace0b0d5ff519f4995aca8946d6ec9992",
+          "bytes": 5286
+        },
+        {
+          "path": "legacy-table/table.spec.ts",
+          "sha256": "33b475b1c51bcdcdc47d026abc0efc9ed3658e24ddd4512477d55dc3cf1605cc",
+          "bytes": 37431
+        },
+        {
+          "path": "legacy-table/testing/row-harness.ts",
+          "sha256": "8221401568398e3f9994d2a3d1ae730ff2dcd1bf1abe2293abc8cdeeb9928d16",
+          "bytes": 3451
+        },
+        {
+          "path": "legacy-table/testing/cell-harness.ts",
+          "sha256": "f0797d535b1cb42c1b38b46aa2f49de79507fa2e82c9ea17db561cf95ec09621",
+          "bytes": 2997
+        }
+      ]
+    },
+    "peer_files": [
+      {
+        "path": "node_modules/@angular/cdk/types/table.d.ts",
+        "sha256": "f1981ed3da13cccefbc8ad12a197d27fdbbe1d1712de3a00007224518fb841b5",
+        "bytes": 48156
+      },
+      {
+        "path": "node_modules/@angular/cdk/fesm2022/table.mjs",
+        "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4",
+        "bytes": 77604
+      },
+      {
+        "path": "node_modules/@angular/cdk/package.json",
+        "sha256": "ec60a5803a214c9b9d8bcdc2de0b0c294ecdd420d680d0e95e686f7aa4d46933",
+        "bytes": 5084
+      },
+      {
+        "path": "node_modules/@angular/material/fesm2022/table.mjs",
+        "sha256": "21ee1e121c3767bc7d7e11ad280992f4dd2617ec4259fafaab23231aedc8832a",
+        "bytes": 42805
+      }
+    ],
+    "runtime_obligations": "Run native/flex no-data creation/removal, exact row/cell class attributes and legacy row/cell harness exclusion vs M16.",
+    "exception": "AGENTS.md maintainer-authorized table exception 2026-11-08; this is not a test, audit, release or publication pass"
+  }
+}
