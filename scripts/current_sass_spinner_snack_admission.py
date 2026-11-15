@@ -131,6 +131,7 @@ class CurrentSpinnerSnackContract:
         domain_successor = None
         resource_source_successor = None
         source_image_successor = None
+        form_source_successor = None
         if main:
             path = 'compatibility/rc/current-sass-stepper-source-executables-v1.json'
             raw = current(path)
@@ -174,7 +175,16 @@ class CurrentSpinnerSnackContract:
                                    css_or_artifact_admission_granted=False, g11_claim='not-passed').items():
                 assert source_image_successor[key] == value
             for support in source_image_successor['support']: member(support)
+            form_path='compatibility/rc/current-main-sass-form-field-executable-source-v1.json';form_raw=current(form_path);assert (_hash(form_raw),len(form_raw))==('647204a1fa07e975e4a5548e1fa375f510743665cc6724203bc46d5555ba5604',22092);form_source_successor=json.loads(form_raw)
+            assert form_source_successor['schema_version']==1 and form_source_successor['role']=='main-sass-form-field-executable-source-continuation' and form_source_successor['source_scope_only'] is True and form_source_successor['historical_programs_executed'] is False and form_source_successor['historical_packets_rewritten'] is False and form_source_successor['css_or_artifact_admission_granted'] is False and form_source_successor['g11_claim']=='not-passed'
+            assert form_source_successor['parent']=='e819975bc28c4d3a7d05beb81f2eb1202448384f' and form_source_successor['commit']=='48e2448cc5ce3e6c7b1d6b53a3681bca655f7cd1'
+            assert form_source_successor['previous_packet']==dict(path='compatibility/rc/main-sass-graph-resource-source-programs-v2.json',sha256='e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98',bytes=6928) and [r['path'] for r in form_source_successor['updates']]==[r['path'] for r in successor['updates']]
+            assert [r['path'] for r in form_source_successor['support']]==['scripts/select-dialog-finite-source-v8.mjs','scripts/select_dialog_finite_source_successor_v8.py','compatibility/rc/parent-main-menu-animation-mode-source-v8.json','compatibility/rc/parent-main-select-escape-lifecycle-source-v8.json','scripts/main-sass-graph-successor-v2.mjs','scripts/main_sass_graph_successor_v2.py','scripts/stepper-current-peer-source-v6.mjs','scripts/stepper_current_peer_source_v6.py','compatibility/rc/current-main-form-field-source-successor-v1.json','compatibility/rc/current-main-sass-core-animation-export-v1.json','compatibility/rc/current-main-sass-protected-product-v1.json']
             env = dict(PATH=os.environ.get('PATH',''), LANG='C', LC_ALL='C', GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null', GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')
+            def git_form(*args):return subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',*args],cwd=root,env=env)
+            assert git_form('rev-list','--parents','-n','1',form_source_successor['commit']).decode().strip()==form_source_successor['commit']+' '+form_source_successor['parent'];git_form('merge-base','--is-ancestor',form_source_successor['commit'],'HEAD')
+            for support in form_source_successor['support']:
+                committed=git_form('show',form_source_successor['commit']+':'+support['path']);assert _ref(support['path'],committed)==support and current(support['path'])==committed
             subprocess.check_call(['git', '--no-replace-objects', 'merge-base', '--is-ancestor', resource_source_successor['base_head'], 'HEAD'], cwd=root, env=env)
             subprocess.check_call(['git', '--no-replace-objects', 'merge-base', '--is-ancestor', source_image_successor['base_head'], 'HEAD'], cwd=root, env=env)
             for row in successor['updates']:
@@ -213,9 +223,13 @@ class CurrentSpinnerSnackContract:
                         resource_parts.extend((updated[cursor_resource:edit['offset']], edit['after'].encode())); cursor_resource = edit['offset'] + len(old)
                     updated = b''.join([*resource_parts, updated[cursor_resource:]])
                     assert _ref(row['path'], updated) == resource['after']; expected = resource['after']
+                form=next(item for item in form_source_successor['updates'] if item['path']==row['path']);assert form['before']==expected and git_form('show',form_source_successor['parent']+':'+row['path'])==updated;at=0;parts=[]
+                for edit in form['edits']:
+                    assert set(edit)=={'offset','before','after'} and type(edit['offset']) is int and at<=edit['offset']<=len(updated);old=edit['before'].encode();assert updated[edit['offset']:edit['offset']+len(old)]==old;parts.extend((updated[at:edit['offset']],edit['after'].encode()));at=edit['offset']+len(old)
+                updated=b''.join(parts+[updated[at:]]);assert _ref(row['path'],updated)==form['after'] and git_form('show',form_source_successor['commit']+':'+row['path'])==updated
                 assert current(row['path']) == updated
         for path, sha256, size in PINS:
-            update = next((row for row in source_image_successor['updates'] if row['path']==path),None) if source_image_successor else None
+            update = next((row for row in form_source_successor['updates'] if row['path']==path),None) if form_source_successor else None
             member(update['after'] if update else dict(path=path, sha256=sha256, bytes=size))
         packet, current_packet = json.loads(current(INPUTS)), json.loads(current(SOURCE_INPUTS))
         source_context = CurrentSassSource(root, read=current)
@@ -228,9 +242,9 @@ class CurrentSpinnerSnackContract:
         member(branch['observation'])
         base = json.loads(current(packet['source_packet']['path']))
         sixth = json.loads(current(SIXTH_PACKET))
-        canonical_source = dict(source_subject=source_image_successor['updates'][0]['after'] if main else dict(path=PINS[0][0], sha256=PINS[0][1], bytes=PINS[0][2]),
+        canonical_source = dict(source_subject=form_source_successor['updates'][0]['after'] if main else dict(path=PINS[0][0], sha256=PINS[0][1], bytes=PINS[0][2]),
             source_packet=dict(path=SOURCE_INPUTS, sha256=PINS[2][1], bytes=PINS[2][2]),
-            source_modules=[r['current'] for r in base['branches'][line]['modules'] + current_packet['additional_modules']] + [json.loads(current('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json'))['transition']['after'] if main else sixth['branches'][line]['reviewed_after']] + ([json.loads(current('compatibility/rc/current-main-strong-focus-source-v1.json'))['after']] if main else []))
+            source_modules=[r['current'] for r in base['branches'][line]['modules'] + current_packet['additional_modules']] + [json.loads(current('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json'))['transition']['after'] if main else sixth['branches'][line]['reviewed_after']] + ([json.loads(current('compatibility/rc/current-main-strong-focus-source-v1.json'))['after']] + [dict(path=r['path'],sha256=r['after']['sha256'],bytes=r['after']['bytes']) for r in json.loads(current('compatibility/rc/current-main-form-field-source-successor-v1.json'))['transitions']] if main else []))
         assert source_context.descriptor == canonical_source
         oracle, catalog, provenance, lock = [json.loads(current(packet[k]['path'])) for k in ('oracle', 'catalog', 'provenance', 'reference_lock')]
         assert branch['compiler'] == provenance['sass_info']
@@ -265,11 +279,20 @@ class CurrentSpinnerSnackContract:
                 p = next(p for p in catalog['cases'] if p['case_id'] == r['case_id'])
                 assert all(p[k] == r[k] for k in ('mixin', 'variant', 'call'))
             assert r['source_set_sha256'] in set_keys
+        guard = dict(active=False, nested=False)
         def assert_current():
-            source_context.assert_current()
-            for r in list(bound.values()):
-                member(r)
-            assert_physical()
+            if guard['active']:
+                guard['nested']=True
+                raise AssertionError('reentrant spinner/snack source guard')
+            guard['active']=True;guard['nested']=False
+            try:
+                source_context.assert_current()
+                for r in list(bound.values()):
+                    member(r)
+                assert not guard['nested'], 'nested spinner/snack source attempt'
+                assert_physical()
+            finally:
+                guard['active']=False
         descriptor = _plain(dict(contract=SPINNER_SNACK_BRIDGE_CONTRACT, source_line=line, **canonical_source, compiler_inputs=packet['compiler_inputs']))
         _STATES[self] = dict(root=root, source_context=source_context, line=line, packet=packet, branch=branch,
             set_keys=set_keys, current_sets=current_sets, successors=successors, bound=bound, descriptor=descriptor,

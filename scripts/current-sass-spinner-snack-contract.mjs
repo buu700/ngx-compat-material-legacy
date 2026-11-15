@@ -116,7 +116,7 @@ export function createCurrentSpinnerSnackContract(args = {}) {
   const assertPhysical = () => {for (const expected of bound.values()) assert.deepEqual(ref(expected.path, physical(root, expected.path)), expected);};
   assert.ok(equalBytes(read(SELF), image));
   const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version, main=version.startsWith('22.');
-  let successor=null,selectSuccessor=null,domainSuccessor=null,resourceSourceSuccessor=null,sourceImageSuccessor=null;
+  let successor=null,selectSuccessor=null,domainSuccessor=null,resourceSourceSuccessor=null,sourceImageSuccessor=null,formSourceSuccessor=null;
   if(main){
    const path='compatibility/rc/current-sass-stepper-source-executables-v1.json',raw=read(path);
    assert.equal(hash(raw),'577ca8a935a6f431ed282769be29d84686c109a94faef9174de0091754e59d61');successor=JSON.parse(raw);
@@ -150,7 +150,14 @@ export function createCurrentSpinnerSnackContract(args = {}) {
     historical_packets_rewritten: false, theme_module_contract_changed: false,
     css_or_artifact_admission_granted: false, g11_claim: 'not-passed'})) assert.equal(sourceImageSuccessor[key], value);
    for (const support of sourceImageSuccessor.support) member(support);
+   const formPath='compatibility/rc/current-main-sass-form-field-executable-source-v1.json',formRaw=read(formPath);assert.equal(hash(formRaw),'647204a1fa07e975e4a5548e1fa375f510743665cc6724203bc46d5555ba5604');assert.equal(formRaw.length,22092);formSourceSuccessor=JSON.parse(formRaw);
+   assert.equal(formSourceSuccessor.schema_version,1);assert.equal(formSourceSuccessor.role,'main-sass-form-field-executable-source-continuation');assert.equal(formSourceSuccessor.source_scope_only,true);assert.equal(formSourceSuccessor.historical_programs_executed,false);assert.equal(formSourceSuccessor.historical_packets_rewritten,false);assert.equal(formSourceSuccessor.css_or_artifact_admission_granted,false);assert.equal(formSourceSuccessor.g11_claim,'not-passed');
+   assert.equal(formSourceSuccessor.parent,'e819975bc28c4d3a7d05beb81f2eb1202448384f');assert.equal(formSourceSuccessor.commit,'48e2448cc5ce3e6c7b1d6b53a3681bca655f7cd1');assert.deepEqual(formSourceSuccessor.previous_packet,{path:'compatibility/rc/main-sass-graph-resource-source-programs-v2.json',sha256:'e5a02ae6f0f4532dbc550e9e8e436fce69b9592dd81eb06a28ed1e8a689f1a98',bytes:6928});assert.deepEqual(formSourceSuccessor.updates.map(r=>r.path),successor.updates.map(r=>r.path));
+   assert.deepEqual(formSourceSuccessor.support.map(r=>r.path),['scripts/select-dialog-finite-source-v8.mjs','scripts/select_dialog_finite_source_successor_v8.py','compatibility/rc/parent-main-menu-animation-mode-source-v8.json','compatibility/rc/parent-main-select-escape-lifecycle-source-v8.json','scripts/main-sass-graph-successor-v2.mjs','scripts/main_sass_graph_successor_v2.py','scripts/stepper-current-peer-source-v6.mjs','scripts/stepper_current_peer_source_v6.py','compatibility/rc/current-main-form-field-source-successor-v1.json','compatibility/rc/current-main-sass-core-animation-export-v1.json','compatibility/rc/current-main-sass-protected-product-v1.json']);
    const env={PATH:process.env.PATH,LANG:'C',LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1'};
+   const git=(...args)=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd:root,env});
+   assert.equal(git('rev-list','--parents','-n','1',formSourceSuccessor.commit).toString().trim(),formSourceSuccessor.commit+' '+formSourceSuccessor.parent);git('merge-base','--is-ancestor',formSourceSuccessor.commit,'HEAD');
+   for(const support of formSourceSuccessor.support){const committed=git('show',formSourceSuccessor.commit+':'+support.path);assert.deepEqual(ref(support.path,committed),support);assert.ok(equalBytes(read(support.path),committed));}
    execFileSync('git', ['--no-replace-objects', 'merge-base', '--is-ancestor', resourceSourceSuccessor.base_head, 'HEAD'], {cwd: root, env});
    execFileSync('git', ['--no-replace-objects', 'merge-base', '--is-ancestor', sourceImageSuccessor.base_head, 'HEAD'], {cwd: root, env});
    for(const row of successor.updates){
@@ -177,10 +184,13 @@ export function createCurrentSpinnerSnackContract(args = {}) {
      current = Buffer.concat([...resourceParts, current.subarray(cursorResource)]);
      assert.deepEqual(ref(row.path, current), resource.after); expected = resource.after;
     }
+    const form=formSourceSuccessor.updates.find(item=>item.path===row.path);assert.deepEqual(form.before,expected);assert.ok(equalBytes(git('show',formSourceSuccessor.parent+':'+row.path),current));let formAt=0;const formParts=[];
+    for(const edit of form.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&formAt<=edit.offset&&edit.offset<=current.length);const old=Buffer.from(edit.before);assert.ok(equalBytes(current.subarray(edit.offset,edit.offset+old.length),old));formParts.push(current.subarray(formAt,edit.offset),Buffer.from(edit.after));formAt=edit.offset+old.length;}
+    const updated=Buffer.concat([...formParts,current.subarray(formAt)]);assert.deepEqual(ref(row.path,updated),form.after);assert.ok(equalBytes(git('show',formSourceSuccessor.commit+':'+row.path),updated));current=updated;
     assert.ok(equalBytes(read(row.path), current));
    }
   }
-  for (const [path, sha256, bytes] of PINS) {const update=sourceImageSuccessor?.updates.find(row=>row.path===path);member(update?update.after:{path, sha256, bytes});}
+  for (const [path, sha256, bytes] of PINS) {const update=formSourceSuccessor?.updates.find(row=>row.path===path);member(update?update.after:{path, sha256, bytes});}
 
   assert.equal(hash(Reflect.apply(functionText, spinnerSnackBridgeResultsMatch, [])), '3007197d9ad6a38056a79ea56cb375a3e44db830af95fa34e6d70c1bd2855538');
   const packet = JSON.parse(read(INPUTS)), currentPacket = JSON.parse(read(SOURCE_INPUTS));
@@ -190,7 +200,7 @@ export function createCurrentSpinnerSnackContract(args = {}) {
   for (const r of packet.compiler_inputs) member(r); member(branch.observation);
   const base = JSON.parse(read(packet.source_packet.path));
   const sixth = JSON.parse(read(SIXTH_PACKET));
-  const expectedDescriptor = {source_subject: main?sourceImageSuccessor.updates[0].after:{path: PINS[0][0], sha256: PINS[0][1], bytes: PINS[0][2]}, source_packet: {path: SOURCE_INPUTS, sha256: PINS[1][1], bytes: PINS[1][2]}, source_modules: [...base.branches[line].modules.map(r => r.current), ...currentPacket.additional_modules.map(r => r.current), main?JSON.parse(read('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json')).transition.after:sixth.branches[line].reviewed_after,...(main?[JSON.parse(read('compatibility/rc/current-main-strong-focus-source-v1.json')).after]:[])]};
+  const expectedDescriptor = {source_subject: main?formSourceSuccessor.updates[0].after:{path: PINS[0][0], sha256: PINS[0][1], bytes: PINS[0][2]}, source_packet: {path: SOURCE_INPUTS, sha256: PINS[1][1], bytes: PINS[1][2]}, source_modules: [...base.branches[line].modules.map(r => r.current), ...currentPacket.additional_modules.map(r => r.current), main?JSON.parse(read('compatibility/rc/current-sass-stepper-current-peer-source-inputs-v4.json')).transition.after:sixth.branches[line].reviewed_after,...(main?[JSON.parse(read('compatibility/rc/current-main-strong-focus-source-v1.json')).after,...JSON.parse(read('compatibility/rc/current-main-form-field-source-successor-v1.json')).transitions.map(row=>({path:row.path,sha256:row.after.sha256,bytes:row.after.bytes}))]:[])]};
   assert.deepEqual(source_context.descriptor, expectedDescriptor);
   const oracle = JSON.parse(read(packet.oracle.path)), catalog = JSON.parse(read(packet.catalog.path)), provenance = JSON.parse(read(packet.provenance.path)), lock = JSON.parse(read(packet.reference_lock.path));
   assert.equal(branch.compiler, provenance.sass_info); assert.deepEqual(branch.cases.map(r => r.case_id), SPINNER_SNACK_BRIDGE_CASES);
@@ -214,7 +224,13 @@ export function createCurrentSpinnerSnackContract(args = {}) {
     else {const p = catalog.cases.find(p => p.case_id === r.case_id); assert.ok(p); assert.deepEqual({mixin: p.mixin, variant: p.variant, call: p.call}, {mixin: r.mixin, variant: r.variant, call: r.call});}
     assert.ok(setKeys.has(r.source_set_sha256));
   }
-  const assertCurrent = () => {source_context.assertCurrent(); for (const r of [...bound.values()]) member(r); assertPhysical();};
+  let active=false,nested=false;
+  const assertCurrent = () => {
+    if(active){nested=true;assert.fail('reentrant spinner/snack source guard');}
+    active=true;nested=false;
+    try {source_context.assertCurrent();for (const r of [...bound.values()]) member(r);assert.equal(nested,false,'nested spinner/snack source attempt');assertPhysical();}
+    finally {active=false;}
+  };
   const descriptor = plain({contract: SPINNER_SNACK_BRIDGE_CONTRACT, source_line: line, ...expectedDescriptor, compiler_inputs: packet.compiler_inputs});
   const context = Object.freeze({root, line, assertCurrent, get bound() {return structuredClone([...bound.values()]);}, get descriptor() {return structuredClone(descriptor);}, get source_sets() {return structuredClone(currentSets);}, get source_set_successors() {return structuredClone(successors);}, source_scope_only: true, gate_or_artifact_admission_granted: false});
   states.set(context, {source_context, packet, line, branch, setKeys, currentSets, descriptor, oracle, catalog, provenance, lock, assertCurrent, assertPhysical});

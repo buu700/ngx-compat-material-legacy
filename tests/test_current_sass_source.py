@@ -18,6 +18,7 @@ from current_sass_source import CurrentSassSource
 from select_dialog_finite_source_successor_v4 import PACKETS, PATHS, LATEST, SELF as PRODUCT_SUCCESSOR, SelectDialogFiniteSourceV4
 from select_dialog_finite_source_successor_v6 import SelectDialogFiniteSourceV6
 from select_dialog_finite_source_successor_v7 import SelectDialogFiniteSourceV7
+from select_dialog_finite_source_successor_v8 import SelectDialogFiniteSourceV8
 
 NODE = 'node'
 INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json'
@@ -131,9 +132,10 @@ class CurrentSassSourceTests(unittest.TestCase):
     def test_v4_product_predecessors_and_physical_controls(self):
         if self.line == 'main':
             with self.assertRaises(AssertionError):SelectDialogFiniteSourceV4(self.root, line=self.line)
-        successor_type = SelectDialogFiniteSourceV7 if self.line == 'main' else SelectDialogFiniteSourceV4
+        successor_type = SelectDialogFiniteSourceV8 if self.line == 'main' else SelectDialogFiniteSourceV4
         if self.line == 'main':
             with self.assertRaises(AssertionError): SelectDialogFiniteSourceV6(self.root, line=self.line)
+            with self.assertRaises(AssertionError): SelectDialogFiniteSourceV7(self.root, line=self.line)
         successor = successor_type(self.root, line=self.line)
         packet = json.loads((self.root / PACKETS[-1][0]).read_bytes())
         branch = packet['branches'][self.line]
@@ -184,7 +186,7 @@ class CurrentSassSourceTests(unittest.TestCase):
                 armed = False
                 target.write_bytes(original + b'\n<!-- changed -->\n')
             return raw
-        successor_type = SelectDialogFiniteSourceV7 if self.line == 'main' else SelectDialogFiniteSourceV4
+        successor_type = SelectDialogFiniteSourceV8 if self.line == 'main' else SelectDialogFiniteSourceV4
         successor = successor_type(self.root, read=callback, line=self.line)
         try:
             armed = True
