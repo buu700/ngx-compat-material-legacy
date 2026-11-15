@@ -27,7 +27,7 @@ export const directOwnedModeProfile=id=>profiles[id]||null;
 function imageProfile(id,context){
  const prior=profiles[id];if(!prior)return null;
  if(!['legacy-progress-bar/primary/MatLegacyProgressBar','legacy-tooltip/primary/LegacyTooltipComponent'].includes(id)||!context?.tarball||!context?.packageRoot)return {profile:prior,subject:null};
- try{const subject=qualifyCombinedArtifactSubject(readFileSync(context.tarball),context.packageRoot);if(subject?.profile!=='combined-d70')return {profile:prior,subject:null};
+ try{const subject=qualifyCombinedArtifactSubject(readFileSync(context.tarball),context.packageRoot);if(!['combined-d70','combined-input-firstcheck'].includes(subject?.profile))return {profile:prior,subject:null};
  const profile=[...prior];profile[4]=id.includes('progress-bar')?'b4a371702f8745fea9d3c7f1a1794e6eb240d6e8ab61426673771d0cbdae68ad':'4cf49b3c2774efd82ae4093e13d6ad535c5eea0a7b0e9210b405ce331bddb334';if(id.includes('progress-bar'))profile[5]=['068b8c3f09f60f1578255118201cbacee4ff6805f6373a758f5ca1c34c9bbcf3'];return {profile,subject};
  }catch{return {profile:prior,subject:null};}}
 export function directOwnedModeCandidate(symbol,packageRoot,artifactContext){const image=imageProfile(symbol?.symbol_id,artifactContext),p=image?.profile;if(!p)return false;try{return hash(JSON.stringify(symbol.shape))===p[3]&&hash(readFileSync(join(packageRoot,'fesm2022',`ngx-compat-material-legacy-${symbol.family}.mjs`)))===p[4]&&(!image.subject||packageRoot===artifactContext.packageRoot);}catch{return false;}}

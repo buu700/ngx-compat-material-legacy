@@ -22,7 +22,7 @@ export function combinedTablinkParentProblems(row,{tarball,packageRoot}={}){
  if(!Object.hasOwn(hashes,row.symbol.symbol_id))return [];
  try{const subject=tarball&&qualifyCombinedArtifactSubject(readFileSync(tarball),packageRoot);if(!subject)return bad;
   if(subject.profile==='combined-040'){if(sha(JSON.stringify(proof))!==hashes[row.symbol.symbol_id])return bad;}
-  else if(subject.profile==='combined-d70'){
+  else if(['combined-d70','combined-input-firstcheck'].includes(subject.profile)){
    const expected={symbol_id:row.symbol.symbol_id,artifact_sha256:subject.artifact_sha256,bundle_sha256:'d272c01799c1cb542e95f819b90b71fb68e89ee4b713b136c59629e8de8f8ed4',parent_symbol_id:'legacy-tabs/primary/MatLegacyTabNav',viewport_index:4,parent_arity:7,source_scope:{file:'fesm2022/ngx-compat-material-legacy-legacy-tabs.mjs',sha256:'d272c01799c1cb542e95f819b90b71fb68e89ee4b713b136c59629e8de8f8ed4',owner_text_sha256:'0655edb7e653b7b62f4e57319aace071bd5d91dcd3cf47521d81a8ea1f1b941d',helper_text_sha256:'240504b1d61cc7feee5cf56873f53f4c6f8132f4b49282c73508ca51fe7f06d4',owner_export:'MatLegacyPaginatedTabHeader',owner_local:'MatPaginatedTabHeader',selected_export:'MatLegacyTabNav',selected_local:'MatLegacyTabNav',owner_start:83687,owner_end:109984,field_start:83858,field_end:83883},viewport_subimages_equal:true,declaration_structural_controls:true};
    if(!isDeepStrictEqual(proof,expected))return bad;
   }else return bad;

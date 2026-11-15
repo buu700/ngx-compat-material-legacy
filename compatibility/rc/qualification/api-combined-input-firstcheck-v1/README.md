@@ -1,0 +1,5 @@
+# Input first-check packed image successor
+
+This finite identity transition records the packed candidate `f31f87a06321fdd10c16c4d65b433e2c4f1ea3c7dc82fb2a79bf75bd40b71efc` and its authenticated `d70b977c254d8f06823527def187769dbaf408060b02ec8c0e0bcb68ff01c895` predecessor. A complete 512-member census has four changed input members and 508 unchanged members. The stored compressed bytes are the four predecessor members; the transition manifest binds both sides and exact source-map mapping edits.
+
+The qualifier reconstructs the predecessor member population and runs the existing d70 source and census checks. It separately checks the exact input source and bundle edits, declaration addition, unchanged source-map metadata and sources, mapping replay, and parsed source structure. Extracted package bytes must match the archive. This grants finite artifact identity only; input lifecycle, DI, declaration compatibility, peer behavior, native execution and release acceptance remain separately qualified.
