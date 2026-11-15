@@ -16,7 +16,6 @@ import {
   Component,
   Input,
   ViewEncapsulation,
-  booleanAttribute,
 
   Inject,
   Optional,
@@ -53,7 +52,7 @@ export class MatLegacyPseudoCheckbox {
   @Input() state: MatLegacyPseudoCheckboxState = 'unchecked';
 
   /** Whether the checkbox is disabled. */
-  @Input({transform: booleanAttribute}) disabled: boolean = false;
+  @Input() disabled: boolean = false;
 
   /**
    * Appearance of the pseudo checkbox. Default appearance of 'full' renders a checkmark/mixedmark

@@ -317,3 +317,52 @@ describe('owned pseudo-checkbox construction and motion', () => {
     fixture.destroy();
   });
 });
+
+// Material 16's pseudo-checkbox stores disabled input values without coercion.
+@Component({
+  standalone: true,
+  imports: [MatLegacyPseudoCheckbox],
+  template: `
+    <mat-pseudo-checkbox [disabled]="$any(value)"></mat-pseudo-checkbox>
+    <mat-pseudo-checkbox id="empty" disabled></mat-pseudo-checkbox>
+    <mat-pseudo-checkbox id="string-false" disabled="false"></mat-pseudo-checkbox>
+  `,
+})
+class PseudoCheckboxInputHost {
+  value: unknown = false;
+}
+
+describe('MatLegacyPseudoCheckbox disabled input', () => {
+  const cases: Array<[unknown, boolean]> = [
+    [false, false], [true, true], ['false', true], ['', false], [0, false], [null, false],
+  ];
+
+  it('retains the historical raw values for template bindings and setInput', () => {
+    const host = TestBed.createComponent(PseudoCheckboxInputHost);
+    host.detectChanges();
+    const bound = host.debugElement.query(By.directive(MatLegacyPseudoCheckbox));
+    const direct = TestBed.createComponent(MatLegacyPseudoCheckbox);
+    for (const [value, disabledClass] of cases) {
+      host.componentInstance.value = value;
+      host.detectChanges();
+      expect(bound.componentInstance.disabled).toBe(value);
+      expect(bound.nativeElement.classList.contains('mat-pseudo-checkbox-disabled')).toBe(disabledClass);
+      direct.componentRef.setInput('disabled', value);
+      direct.detectChanges();
+      expect(direct.componentInstance.disabled as unknown).toBe(value);
+      expect(direct.nativeElement.classList.contains('mat-pseudo-checkbox-disabled')).toBe(disabledClass);
+    }
+  });
+
+  it('retains the historical raw values of static attributes', () => {
+    const host = TestBed.createComponent(PseudoCheckboxInputHost);
+    host.detectChanges();
+    for (const [id, value, disabledClass] of [
+      ['empty', '', false], ['string-false', 'false', true],
+    ] as const) {
+      const node = host.debugElement.query(By.css(`#${id}`));
+      expect(node.componentInstance.disabled).toBe(value);
+      expect(node.nativeElement.classList.contains('mat-pseudo-checkbox-disabled')).toBe(disabledClass);
+    }
+  });
+});
