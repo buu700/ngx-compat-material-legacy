@@ -16,9 +16,9 @@ import {composeCanonicalSourceGuards} from './canonical-source-guard-plan.mjs';
 import {selectDialogFiniteSuccessor} from './select-dialog-finite-source-successor.mjs';
 import {selectDialogFiniteSuccessor as selectDialogV6,selectDialogFiniteLoadedImage as selectV6Image} from './select-dialog-finite-source-v6.mjs';
 import {dialogFocusFiniteSourceSuccessor} from './dialog-focus-finite-source-successor.mjs';
-import {selectDialogFiniteSuccessor as selectDialogV7,selectDialogFiniteLoadedImage as selectV7Image} from './select-dialog-finite-source-v7.mjs';
+import {selectDialogFiniteSuccessor as selectDialogV8,selectDialogFiniteLoadedImage as selectV8Image} from './select-dialog-finite-source-v8.mjs';
 import {dialogFocusFiniteSourceSuccessor as dialogFocusV6,dialogFocusFiniteLoadedImage as focusV6Image} from './dialog-focus-finite-source-v6.mjs';
-import {mainSassGraphSuccessor} from './main-sass-graph-successor.mjs';
+import {mainSassGraphSuccessor} from './main-sass-graph-successor-v2.mjs';
 
 const SELF = 'scripts/current-sass-source.mjs';
 const MAIN_GRAPH_PACKET = Object.freeze({path: 'compatibility/rc/parent-main-sass-domain-source-successor-v1.json',
@@ -28,7 +28,7 @@ const TOOLTIP_RESOURCE_PACKET = Object.freeze({path: 'compatibility/rc/current-m
 const FOCUS_STYLE_PACKET=Object.freeze({path:'compatibility/rc/current-main-strong-focus-source-v1.json',sha256:'e4f6c47d595edc21f102a756e3a827d077c0f717f1968b8672c691d4fb336ccb',bytes:1030});
 const SIXTH_HELPER = Object.freeze({path: 'scripts/stepper-sixth-source.mjs',
   sha256: 'e14efe828ea074fb1aa61bab093add26e836f238d2f869e49206baf890175657'});
-const MAIN_SIXTH_HELPER = Object.freeze({path:'scripts/stepper-current-peer-source-v5.mjs',sha256:'ed58eb7eabd2039a48321ec1c3037f42031dd68880795929a440283c5fbf659a'});
+const MAIN_SIXTH_HELPER = Object.freeze({path:'scripts/stepper-current-peer-source-v6.mjs',sha256:'efbe775f61a089259dcefb1160991909f57bedefab816b2c43f8c9fc704c6905'});
 const FOCUS_HELPER = Object.freeze({path: 'scripts/dialog-focus-finite-source-successor.mjs',
   sha256: 'd45ce542f0d8a546d77e1a43fc0385f01ff51f908987871803a3a9fd8cc384d7'});
 const compileVerifiedHelper = Function;
@@ -203,9 +203,9 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   const productRead=providedRead ?? (path => physical(root,path));
   let product;
   if(initialLine==='main'){
-    assert.deepEqual(selectV7Image,{path:'scripts/select-dialog-finite-source-v7.mjs',sha256:'87155482dbaa488a0e72ae0ba75c3edfe370bc11fcfc2ddd1ce3f0190a5609a6',bytes:17719});
-    assert.deepEqual(reference(selectV7Image.path,physical(root,selectV7Image.path)),selectV7Image);
-    product=selectDialogV7({root,read:productRead,line:initialLine});
+    assert.deepEqual(selectV8Image,{path:'scripts/select-dialog-finite-source-v8.mjs',sha256:'7b61b26fb9a07d38c99100193e1b9a918a2ca952608c01ca7c81eed32ed30004',bytes:21123});
+    assert.deepEqual(reference(selectV8Image.path,physical(root,selectV8Image.path)),selectV8Image);
+    product=selectDialogV8({root,read:productRead,line:initialLine});
   }else product=selectDialogFiniteSuccessor({root,read:productRead,line:initialLine});
   assert.equal(hash(physical(root, FOCUS_HELPER.path)), FOCUS_HELPER.sha256);
   if(initialLine==='main')assert.deepEqual(focusV6Image,{path:'scripts/dialog-focus-finite-source-v6.mjs',sha256:'c40a155191130898771839bf761183f850d3582fa2298fe2d9b197567c672f56',bytes:13030});
@@ -215,7 +215,7 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
     if (bound.has(ref.path)) assert.deepEqual(bound.get(ref.path), ref);
     else bound.set(ref.path, {...ref});
   }
-  if(initialLine==='main'){assert.equal(hash(physical(root,'scripts/main-sass-graph-successor.mjs')),'cd00dd3ea8af9f0ef5a62d6ed3e5190147aaa9a6206693e9cebc72c0040016b5');read('scripts/main-sass-graph-successor.mjs');graphSuccessor=mainSassGraphSuccessor({root,read:providedRead});for(const r of graphSuccessor.bound){if(bound.has(r.path))assert.deepEqual(bound.get(r.path),r);else bound.set(r.path,r);}}
+  if(initialLine==='main'){assert.equal(hash(physical(root,'scripts/main-sass-graph-successor-v2.mjs')),'52bbbb7a8ff78dcb3c10c6315910f81b130e1d5fab197d6e0eef69db70a1784e');read('scripts/main-sass-graph-successor-v2.mjs');graphSuccessor=mainSassGraphSuccessor({root,read:providedRead});for(const r of graphSuccessor.bound){if(bound.has(r.path))assert.deepEqual(bound.get(r.path),r);else bound.set(r.path,r);}}
   if (initialLine === 'main') {
     const graphRaw = read(MAIN_GRAPH_PACKET.path);
     assert.deepEqual(reference(MAIN_GRAPH_PACKET.path, graphRaw), MAIN_GRAPH_PACKET);
@@ -226,12 +226,23 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
     graphResourceTransitions = resources.map(row => ({path: row.path,
       before: metadata(row.before), current: metadata(row.after)}));
   }
-  let focusStyle=null,gitStyleBefore=null,tooltipResource=null,gitTooltipBefore=null;
+  let focusStyle=null,gitStyleBefore=null,tooltipResource=null,gitTooltipBefore=null,formField=[],protectedTransitions=[];
+  if(initialLine==='main'){const path='compatibility/rc/current-main-form-field-source-successor-v1.json',raw=read(path);assert.equal(hash(raw),'5fc17325433fbc76a15993fa33fa14958d04362eb1e7093bde3466b709996e1c');assert.equal(raw.length,3868);formField=JSON.parse(raw).transitions.map(row=>({path:row.path,before:metadata(row.before),current:metadata(row.after)}));assert.equal(formField.length,2);}
+  if(initialLine==='main'){
+    const path='compatibility/rc/current-main-sass-protected-product-v1.json',raw=read(path);assert.equal(hash(raw),'870d7bec6c0c786275edb4a0dbb16a53cad2466b62a462066693b09a5338686a');assert.equal(raw.length,9253);const packet=JSON.parse(raw);
+    assert.equal(packet.schema_version,1);assert.equal(packet.role,'finite-main-sass-protected-product-source-successor');assert.equal(packet.source_scope_only,true);assert.equal(packet.historical_programs_executed,false);assert.equal(packet.css_or_artifact_admission_granted,false);
+    assert.deepEqual(packet.transitions.map(r=>r.path),['projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts','projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts','projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts','projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts']);
+    const env={PATH:process.env.PATH,LANG:'C',LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1'};const git=(...args)=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd:root,env});
+    for(const t of packet.transitions){assert.ok([['c72d0ed6b9bbb918eb08b4c4efb37bcf89894707','ceb5ab6ff0b910436768384a622299f4b01d2da3'],['ed2cb5f984f67d60febcefa3a032899038e000a1','d7d9eb02c1eabae1b14ad1e7ce331c58ee333286']].some(pair=>pair[0]===t.parent&&pair[1]===t.commit));assert.equal(git('rev-list','--parents','-n','1',t.commit).toString().trim(),t.commit+' '+t.parent);git('merge-base','--is-ancestor',t.commit,'HEAD');const before=git('show',t.parent+':'+t.path),after=git('show',t.commit+':'+t.path);for(const [raw,ref] of [[before,t.before],[after,t.after]]){assert.deepEqual(reference(t.path,raw),metadata(ref));assert.equal(blobHash(raw),ref.git_blob);}let at=0,parts=[];for(const e of t.edits){assert.deepEqual(Object.keys(e).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(e.offset)&&at<=e.offset&&e.offset<=before.length);const old=Buffer.from(e.before);assert.ok(equalBytes(before.subarray(e.offset,e.offset+old.length),old));parts.push(before.subarray(at,e.offset),Buffer.from(e.after));at=e.offset+old.length;}assert.ok(equalBytes(Buffer.concat([...parts,before.subarray(at)]),after));assert.ok(equalBytes(read(t.path),after));protectedTransitions.push({path:t.path,before:metadata(t.before),current:metadata(t.after)});}
+  }
   const member = row => {
+    const protectedRow=protectedTransitions.find(item=>item.path===row.path && item.before.sha256===row.sha256);if(protectedRow)assert.equal(row.bytes,protectedRow.before.bytes);
+    const ff = formField.find(item => item.path===row.path && item.before.sha256===row.sha256);
+    if(ff)assert.equal(row.bytes,ff.before.bytes);
     const projected = [focusStyle, tooltipResource].find(style => style &&
       row.path === style.before.path && row.sha256 === style.before.sha256);
     if(projected)assert.equal(row.bytes,projected.before.bytes);
-    const expected = projected ? projected.after : sixth.qualify(row) ?? focus.qualify(row) ?? product.qualify(row) ?? graphSuccessor?.qualify(row) ?? row;
+    const expected = protectedRow ? protectedRow.current : ff ? ff.current : projected ? projected.after : sixth.qualify(row) ?? focus.qualify(row) ?? product.qualify(row) ?? graphSuccessor?.qualify(row) ?? row;
     const bytes = read(row.path);
     assert.equal(hash(bytes), expected.sha256, 'changed current Sass source ' + row.path);
     assert.equal(bytes.length, expected.bytes);
@@ -240,8 +251,8 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   if(initialLine==='main'){
     member({path:'scripts/select_dialog_finite_source_successor_v6.py',sha256:'f93437e3315e03f8ae60944625f4ad46f60874f345d72b7f70afc3b195d85b31',bytes:18527});
     member({path:'scripts/select_dialog_finite_source_successor_v4.py',sha256:'ddaaada77d28cdcfe7482770adf8eec3f1e47413de70b08ee8d98201768d6855',bytes:13849});
-    member({path:MAIN_SIXTH_HELPER.path,sha256:MAIN_SIXTH_HELPER.sha256,bytes:16963});
-    member({path:'scripts/stepper_current_peer_source_v5.py',sha256:'f03cab7c899f19bb0f58189ea5355871c47cbe8773b4d6a9466204ca997273c7',bytes:17569});
+    member({path:MAIN_SIXTH_HELPER.path,sha256:MAIN_SIXTH_HELPER.sha256,bytes:19519});
+    member({path:'scripts/stepper_current_peer_source_v6.py',sha256:'3947f31b4fc9c2f129ca3492bb9c8f79ac63316ea475631f9648669014057ed1',bytes:20149});
     member({path:'scripts/stepper_current_peer_source_v4.py',sha256:'e94a50ceae847413bb80538bd19dd5afcd3f2fa212cd8c1c4e296236f625b1fa',bytes:15375});
   }
   if(initialLine==='main'){
@@ -358,7 +369,8 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   member(source.semantic_receipt);
   for (const row of source.unchanged_owned_sass_before_inputs) {
     const actual = member(changes.get(row.path)?.current ?? row);
-    if (!changes.has(row.path)) assert.ok(equalBytes(actual, historical.get(row.path)));
+    if (!changes.has(row.path) && !formField.some(item=>item.path===row.path)) assert.ok(equalBytes(actual, historical.get(row.path)));
+    if(formField.some(item=>item.path===row.path)) assert.deepEqual(reference(row.path,historical.get(row.path)),formField.find(item=>item.path===row.path).before);
   }
   for (const row of protectedPacket.branches[line].protected_inputs) if(!graphSuccessor?.removed.includes(row.path)) member(row);
   const graph = census.lines.find(row => row.line === line);
@@ -369,7 +381,7 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
   assert.deepEqual(graph.non_target_owned_style_template_graph.filter(row => row.path === CARD), [changes.get(CARD).before]);
   for (const row of graph.non_target_owned_style_template_graph) member(row.path === CARD ? changes.get(CARD).current : row);
   const transitions = [...source.modules.map(row => ({path: row.path, before: row.before, current: row.current})),
-    ...packet.additional_modules.map(row => ({path: row.path, before: row.before, current: row.current})), sixth.transition,...(focusStyle?[{path:focusStyle.before.path,before:focusStyle.before,current:focusStyle.after}]:[])];
+    ...packet.additional_modules.map(row => ({path: row.path, before: row.before, current: row.current})), sixth.transition,...(focusStyle?[{path:focusStyle.before.path,before:focusStyle.before,current:focusStyle.after}]:[]),...formField];
   // Component resources are outside the finite theme module/source-set contract.
   const resourceTransitions = [...(tooltipResource ? [{path: tooltipResource.before.path,
     before: tooltipResource.before, current: tooltipResource.after}] : []), ...graphResourceTransitions];
@@ -391,6 +403,7 @@ export function createCurrentSassSource({root = process.cwd(), read: providedRea
     assert.deepEqual(current, sixth.source_set.rows);
     let finalRows=current,finalHash=currentHash;
     if(focusStyle){assert.equal(currentHash,focusStyle.source_set_before);let seen=0;finalRows=current.map(row=>{if(row.root===0&&'projects/ngx-material-legacy/'+row.path===focusStyle.before.path){seen++;assert.equal(row.sha256,focusStyle.before.sha256);assert.equal(row.bytes,focusStyle.before.bytes);return {...row,sha256:focusStyle.after.sha256,bytes:focusStyle.after.bytes};}return row;});assert.equal(seen,1);finalHash=hash(JSON.stringify(finalRows));assert.equal(finalHash,focusStyle.source_set_after);}
+    if(formField.length){assert.equal(finalHash,'107fbea0ce4c8529c98cd243232ba833787e18cfc99b22300083d5a9f6b62eb0');for(const t of formField){let seen=0;finalRows=finalRows.map(row=>{if(row.root===0&&'projects/ngx-material-legacy/'+row.path===t.path){seen++;assert.equal(row.sha256,t.before.sha256);assert.equal(row.bytes,t.before.bytes);return {...row,sha256:t.current.sha256,bytes:t.current.bytes};}return row;});assert.equal(seen,1);}finalHash=hash(JSON.stringify(finalRows));assert.equal(finalHash,'9e9644112b2451b42b1f91d84fc00c963714e433d5b0c03fe3c1a9f2c6c2b56f');}
     sourceSets[finalHash] = finalRows;
     sourceSetSuccessors.push({historical_sha256: historicalHash, current_sha256: finalHash});
   }

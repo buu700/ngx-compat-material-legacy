@@ -103,7 +103,7 @@ class CurrentSassSourceTests(unittest.TestCase):
 
     def test_exact_six_modules_and_before_comparisons(self):
         self.assertEqual(self.context.line, self.line)
-        self.assertEqual(len(self.context.transitions), 7 if self.line == 'main' else 6)
+        self.assertEqual(len(self.context.transitions), 9 if self.line == 'main' else 6)
         for row in self.context.transitions:
             with self.subTest(path=row['path']):
                 self.assertEqual(self.context.qualify(row['current']), {key: row['current'][key] for key in ('path', 'sha256', 'bytes')})

@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "role": "finite-main-sass-protected-product-source-successor",
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "css_or_artifact_admission_granted": false,
+  "transitions": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts",
+      "parent": "c72d0ed6b9bbb918eb08b4c4efb37bcf89894707",
+      "commit": "ceb5ab6ff0b910436768384a622299f4b01d2da3",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts",
+        "sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+        "bytes": 12785,
+        "git_blob": "e97dbd0988c77d42a5793c8501051ffcc73ced0a"
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts",
+        "sha256": "2b9b0ef22f95d54e1d4f4b1baf8cffe626f7552b40025935cb448006cb790275",
+        "bytes": 12896,
+        "git_blob": "a4a21d1b7577e51e51371df77ef23df1a7414735"
+      },
+      "edits": [
+        {
+          "offset": 238,
+          "before": "",
+          "after": "import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n\n"
+        },
+        {
+          "offset": 619,
+          "before": "  ANIMATION_MODULE_TYPE,\n",
+          "after": ""
+        },
+        {
+          "offset": 6615,
+          "before": "    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode: string,\n",
+          "after": "    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode: string,\n"
+        },
+        {
+          "offset": 7588,
+          "before": "      animationMode === 'NoopAnimations' && !!defaults && !defaults._forceAnimations;\n",
+          "after": "      resolveLegacyAnimationMode(animationMode) === 'NoopAnimations' && !!defaults && !defaults._forceAnimations;\n"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+      "parent": "ed2cb5f984f67d60febcefa3a032899038e000a1",
+      "commit": "d7d9eb02c1eabae1b14ad1e7ce331c58ee333286",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+        "sha256": "293baf9806cc7bc0c53ab5a68c745536d79e40e3e2a82928b9515361dbdf302f",
+        "bytes": 11168,
+        "git_blob": "0720d48ce26a3e408f4a4a8ae59ba02629e09482"
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+        "sha256": "2064e816539a77a2749ab9d2141721a40ab27e3dfbf4edafa1f5b9afedfc453b",
+        "bytes": 11168,
+        "git_blob": "ffc030e3530abf873e5edce6bdadf056421013fb"
+      },
+      "edits": [
+        {
+          "offset": 8562,
+          "before": "    // Subscribe before enter() so noop-animation sync _onEnter still arms duration.\n",
+          "after": "    // Subscribe before enter() so the opening notification arms the duration timer.\n"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+      "parent": "ed2cb5f984f67d60febcefa3a032899038e000a1",
+      "commit": "d7d9eb02c1eabae1b14ad1e7ce331c58ee333286",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+        "sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5",
+        "bytes": 4650,
+        "git_blob": "80c5bc255ca477299b3852da074757e04d00ff3c"
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+        "sha256": "a35d7e06fb778203478236024a6137e34624f0ed7f10fabcc7ac3bd9aaf4a510",
+        "bytes": 4960,
+        "git_blob": "cd0cff189e3a69689e62b143eb95112bbe485b3b"
+      },
+      "edits": [
+        {
+          "offset": 1982,
+          "before": "",
+          "after": "  private _legacyMotionDestroyed = false;\n"
+        },
+        {
+          "offset": 2216,
+          "before": "      this._notifyEnter();\n",
+          "after": "      // Let callers subscribe after open() returns, as with the historical no-op animation.\n      queueMicrotask(() => {\n        if (!this._legacyMotionDestroyed && this._animationState === 'visible') {\n          this._notifyEnter();\n        }\n      });\n"
+        },
+        {
+          "offset": 4078,
+          "before": "",
+          "after": "    this._legacyMotionDestroyed = true;\n"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+      "parent": "ed2cb5f984f67d60febcefa3a032899038e000a1",
+      "commit": "d7d9eb02c1eabae1b14ad1e7ce331c58ee333286",
+      "before": {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+        "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3",
+        "bytes": 45763,
+        "git_blob": "d532ca11d2f6a679581b05a7b934b9888715db20"
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+        "sha256": "92425afa5ddcb406c75b4af69ea9dd795f3b3d10ef8898b909a7bd1ad69f7230",
+        "bytes": 49266,
+        "git_blob": "ccfad7a95a4a27682be77a2af23c4556b8cfeba2"
+      },
+      "edits": [
+        {
+          "offset": 24526,
+          "before": "    // Spy before open so noop-animation sync afterOpened still records the capped timer\n",
+          "after": "    // Spy before open to observe the capped duration timer.\n"
+        },
+        {
+          "offset": 45763,
+          "before": "",
+          "after": "\n\ndescribe('legacy snack bar no-op open notification', () => {\n  beforeEach(() => {\n    TestBed.configureTestingModule({\n      imports: [MatLegacySnackBarModule],\n      providers: [LEGACY_NOOP_ANIMATIONS],\n    });\n  });\n\n  it('notifies a caller who subscribes immediately after open returns', fakeAsync(() => {\n    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n    let notifications = 0;\n    let completed = false;\n    ref.afterOpened().subscribe({next: () => notifications++, complete: () => completed = true});\n    expect(notifications).toBe(0);\n    expect(completed).toBeFalse();\n    tick();\n    expect(notifications).toBe(1);\n    expect(completed).toBeTrue();\n    ref.dismiss();\n    tick();\n  }));\n\n  it('does not notify a snack bar dismissed before its enter completes', fakeAsync(() => {\n    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n    let notifications = 0;\n    ref.afterOpened().subscribe(() => notifications++);\n    ref.dismiss();\n    tick();\n    expect(notifications).toBe(0);\n  }));\n\n  it('only notifies the replacement when replaced before enter completes', fakeAsync(() => {\n    const snackBar = TestBed.inject(MatLegacySnackBar);\n    const previous = snackBar.open('previous');\n    let previousNotifications = 0;\n    previous.afterOpened().subscribe(() => previousNotifications++);\n    const next = snackBar.open('next');\n    let nextNotifications = 0;\n    next.afterOpened().subscribe(() => nextNotifications++);\n    tick();\n    expect(previousNotifications).toBe(0);\n    expect(nextNotifications).toBe(1);\n    next.dismiss();\n    tick();\n  }));\n\n  it('does not notify after the container is destroyed', fakeAsync(() => {\n    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n    let notifications = 0;\n    ref.afterOpened().subscribe(() => notifications++);\n    ref.containerInstance.ngOnDestroy();\n    tick();\n    expect(notifications).toBe(0);\n  }));\n\n  it('still starts the duration timer when opening completes', fakeAsync(() => {\n    const ref = TestBed.inject(MatLegacySnackBar).open('message', '', {duration: 100});\n    let opened = 0;\n    let dismissed = 0;\n    ref.afterOpened().subscribe(() => opened++);\n    ref.afterDismissed().subscribe(() => dismissed++);\n    tick();\n    expect(opened).toBe(1);\n    tick(100);\n    expect(dismissed).toBe(1);\n  }));\n});\n\n\ndescribe('legacy snack bar reentrant no-op notification', () => {\n  beforeEach(() => TestBed.configureTestingModule({\n    imports: [MatLegacySnackBarModule],\n    providers: [LEGACY_NOOP_ANIMATIONS],\n  }));\n\n  it('allows an afterOpened subscriber to dismiss immediately', fakeAsync(() => {\n    const ref = TestBed.inject(MatLegacySnackBar).open('message');\n    let opened = 0;\n    let dismissed = 0;\n    ref.afterDismissed().subscribe(() => dismissed++);\n    ref.afterOpened().subscribe(() => { opened++; ref.dismiss(); });\n    tick();\n    expect(opened).toBe(1);\n    expect(dismissed).toBe(1);\n  }));\n\n  it('allows an afterOpened subscriber to replace the snack bar', fakeAsync(() => {\n    const snackBar = TestBed.inject(MatLegacySnackBar);\n    const previous = snackBar.open('previous');\n    let previousOpened = 0;\n    let nextOpened = 0;\n    let next: MatLegacySnackBarRef<LegacySimpleSnackBar>;\n    previous.afterOpened().subscribe(() => {\n      previousOpened++;\n      next = snackBar.open('next');\n      next.afterOpened().subscribe(() => nextOpened++);\n    });\n    tick();\n    expect(previousOpened).toBe(1);\n    expect(nextOpened).toBe(1);\n    next!.dismiss();\n    tick();\n  }));\n});\n"
+        }
+      ]
+    }
+  ]
+}

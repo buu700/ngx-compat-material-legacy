@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "role": "finite-main-form-field-sass-source-successor",
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "css_or_artifact_admission_granted": false,
+  "parent": "1be59db586c17b30d1953dbd081f39a0559b7911",
+  "commit": "a5ddb3296c103aa2d0745348e6c7446490576b5a",
+  "source_set_before": "107fbea0ce4c8529c98cd243232ba833787e18cfc99b22300083d5a9f6b62eb0",
+  "source_set_after": "9e9644112b2451b42b1f91d84fc00c963714e433d5b0c03fe3c1a9f2c6c2b56f",
+  "source_set_rows": 472,
+  "transitions": [
+    {
+      "path": "projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss",
+      "before": {
+        "path": "projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss",
+        "sha256": "c953a6c0df04dd73b443548f4872f62fa0704881590ccb508bd7db7741f391fc",
+        "bytes": 975,
+        "git_blob": "4be63d5aa05d71d32f96080c481fce30485c2cb6"
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss",
+        "sha256": "da629f9de4d104f8645a5e55f4afbdb5b22697d68541c1a8e3e1f579f82c5042",
+        "bytes": 2505,
+        "git_blob": "c138791bbec35f674fa39260163b237a85347c00"
+      },
+      "edits": [
+        {
+          "offset": 261,
+          "before": "",
+          "after": ";\n@use 'sass:map';\n@use '../core/tokens/m2/mdc/filled-text-field' as filled;\n@use '../core/tokens/m2/mdc/outlined-text-field' as outlined"
+        },
+        {
+          "offset": 975,
+          "before": "",
+          "after": "\n// Bridge only the historical color slots. The two maps are owned copies of the\n// Material 16 model; passing them to the public override API does not mutate a\n// consumer theme. Current Material has additional hover-label slots which\n// historically fell back to the normal and error label values.\n@function _color-overrides($filled, $outlined, $hover-fallbacks: false) {\n  $result: ();\n  @each $appearance, $values in (filled: $filled, outlined: $outlined) {\n    @each $name, $value in $values {\n      $result: map.set($result, '#{$appearance}-#{$name}', $value);\n    }\n    @if $hover-fallbacks {\n      $result: map.set($result, '#{$appearance}-hover-label-text-color', map.get($values, label-text-color));\n      $result: map.set($result, '#{$appearance}-error-hover-label-text-color', map.get($values, error-label-text-color));\n    }\n  }\n  @return $result;\n}\n\n@mixin ordinary-color($config) {\n  @include sass-utils.current-selector-or-root() {\n    @include mat.form-field-overrides(_color-overrides(\n      filled.get-color-tokens($config), outlined.get-color-tokens($config), true));\n  }\n  @each $palette in (accent, warn) {\n    .mat-mdc-form-field.mat-#{$palette} {\n      @include mat.form-field-overrides(_color-overrides(\n        filled.private-get-color-palette-color-tokens($config, $palette),\n        outlined.private-get-color-palette-color-tokens($config, $palette)));\n    }\n  }\n}\n"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/form-field/_form-field-theme.scss",
+      "before": {
+        "path": "projects/ngx-material-legacy/styles/form-field/_form-field-theme.scss",
+        "sha256": "c9ecd831e3a2f771b82a86626875e0f4638e832c231b672e554b994d1e0dc623",
+        "bytes": 5119,
+        "git_blob": "9a371f750e7866dbbdd3d683713a918b6afdc2a5"
+      },
+      "after": {
+        "path": "projects/ngx-material-legacy/styles/form-field/_form-field-theme.scss",
+        "sha256": "5bdb28f2eeb29e4decc288cfb53d95dd6aa77dcc4bde1265f10adf2bae951bf5",
+        "bytes": 5183,
+        "git_blob": "ea6cd6f775cecb97016e3030c9c80f670645aa95"
+      },
+      "edits": [
+        {
+          "offset": 3803,
+          "before": "",
+          "after": "\n  @include form-field-state-overrides.ordinary-color($config);\n"
+        }
+      ]
+    }
+  ]
+}

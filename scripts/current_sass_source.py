@@ -21,7 +21,7 @@ TOOLTIP_RESOURCE_PACKET = dict(path='compatibility/rc/current-main-tooltip-resou
 FOCUS_STYLE_PACKET=dict(path='compatibility/rc/current-main-strong-focus-source-v1.json',sha256='e4f6c47d595edc21f102a756e3a827d077c0f717f1968b8672c691d4fb336ccb',bytes=1030)
 INPUTS = 'compatibility/rc/current-sass-source-inputs-v2.json'
 INPUTS_SHA = '46e1c8e8657880c1168010c8ec1b5967cbb4aa4c289a4d9b9ae29e3b2182b0a9'
-SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='f173497d4a16acb5c7e248363f214343f7c76f456212839b0da815064d09b4d9', bytes=29970)
+SOURCE_JS = dict(path='scripts/current-sass-source.mjs', sha256='0680f631a015cfb79038ece298e1f1c03598fcfc38e47303830a0d58422975c4', bytes=34086)
 ADDITIONAL = ['projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss',
               'projects/ngx-material-legacy/styles/button/_button-theme.scss',
               'projects/ngx-material-legacy/styles/card/_card-theme.scss']
@@ -144,24 +144,28 @@ class CurrentSassSource:
                 assert type(supplied) is bytes and actual == supplied, 'nonphysical current source ' + path
             assert _physical(root, path) == actual, 'source changed during read ' + path
             return actual
-        focus_style=None;git_style_before=None;tooltip_resource=None;git_tooltip_before=None
+        focus_style=None;git_style_before=None;tooltip_resource=None;git_tooltip_before=None;form_field=[];protected_transitions=[]
         def member(row):
+            protected_row=next((item for item in protected_transitions if item['path']==row['path'] and item['before']['sha256']==row['sha256']),None)
+            if protected_row is not None: assert row['bytes']==protected_row['before']['bytes']
+            ff=next((item for item in form_field if item['path']==row['path'] and item['before']['sha256']==row['sha256']),None)
+            if ff is not None: assert row['bytes']==ff['before']['bytes']
             projected = next((style for style in (focus_style, tooltip_resource) if style is not None and
                               row['path'] == style['before']['path'] and row['sha256'] == style['before']['sha256']), None)
             if projected is not None: assert row['bytes'] == projected['before']['bytes']
-            row = projected['after'] if projected is not None else sixth.qualify(row) or focus.qualify(row) or product.qualify(row) or (graph_successor.qualify(row) if graph_successor is not None else None) or row
+            row = protected_row['current'] if protected_row is not None else ff['current'] if ff is not None else projected['after'] if projected is not None else sixth.qualify(row) or focus.qualify(row) or product.qualify(row) or (graph_successor.qualify(row) if graph_successor is not None else None) or row
             raw = current(row['path'])
             assert _hash(raw) == row['sha256'] and len(raw) == row['bytes'], 'changed current Sass source ' + row['path']
             return raw
         initial_version = json.loads(_physical(root, 'projects/ngx-material-legacy/package.json'))['version']
         initial_line = '21.x' if initial_version.startswith('21.') else 'main' if initial_version.startswith('22.') else None
-        Product = (_verified_helper(root,'scripts/select_dialog_finite_source_successor_v7.py',
-                    'a2c48f99f36b027c9a90ae1fdd8348f507c98b538df8f9426b096de1d5d16ae4','SelectDialogFiniteSourceV7')
+        Product = (_verified_helper(root,'scripts/select_dialog_finite_source_successor_v8.py',
+                    '27ab3f920af2b5ecb6f628d707ace41d0baa5c5252ee92771a398428c21e500d','SelectDialogFiniteSourceV8')
                    if initial_line=='main' else SelectDialogFiniteSourceV4)
         product = Product(root, read=read, line=initial_line)
         Focus = (_verified_helper(root, 'scripts/dialog_focus_finite_source_successor_v6.py', '9fad0c4fe637b283fa7dee92335271b1e06a393573ab634995b408807e3bf45a', 'DialogFocusFiniteSourceV6') if initial_line=='main' else _verified_helper(root, 'scripts/dialog_focus_finite_source_successor_v5.py', '75b912981d5ea107b1b56736b26543601574cbf549bec19e667d4987afce5778', 'DialogFocusFiniteSourceV5'))
-        Sixth = (_verified_helper(root, 'scripts/stepper_current_peer_source_v5.py',
-                                  'f03cab7c899f19bb0f58189ea5355871c47cbe8773b4d6a9466204ca997273c7', 'StepperCurrentPeerSourceV4')
+        Sixth = (_verified_helper(root, 'scripts/stepper_current_peer_source_v6.py',
+                                  '3947f31b4fc9c2f129ca3492bb9c8f79ac63316ea475631f9648669014057ed1', 'StepperCurrentPeerSourceV4')
                  if initial_line == 'main' else _verified_helper(root, 'scripts/stepper_sixth_source.py',
                                   '3b6408d97f09d887686952600844c306ad434d1f626cc6a4b74701b536ce79d7', 'StepperSixthSource'))
         focus = Focus(root, read=read, line=initial_line)
@@ -173,12 +177,30 @@ class CurrentSassSource:
                 else:
                     bound[row['path']] = dict(row)
         if initial_line=='main':
-            Graph=_verified_helper(root,'scripts/main_sass_graph_successor.py','164986a1d3bb0d3f753b7e8102dcb718811d74684cb298d23b3ae0f12a67ee4e','MainSassGraphSuccessor')
-            current('scripts/main_sass_graph_successor.py')
+            Graph=_verified_helper(root,'scripts/main_sass_graph_successor_v2.py','e19bfd3b870220466c9e147c01b23391421c42d9dab1c707ef0658e84153c2d9','MainSassGraphSuccessor')
+            current('scripts/main_sass_graph_successor_v2.py')
             graph_successor=Graph(root,read)
             for row in graph_successor.bound.values():
                 if row['path'] in bound: assert bound[row['path']]==row
                 else: bound[row['path']]=dict(row)
+        if initial_line=='main':
+            ff_raw=current('compatibility/rc/current-main-form-field-source-successor-v1.json');assert _hash(ff_raw)=='5fc17325433fbc76a15993fa33fa14958d04362eb1e7093bde3466b709996e1c' and len(ff_raw)==3868
+            form_field=[dict(path=row['path'],before=_metadata(row['before']),current=_metadata(row['after'])) for row in json.loads(ff_raw)['transitions']];assert len(form_field)==2
+        if initial_line=='main':
+            pp_raw=current('compatibility/rc/current-main-sass-protected-product-v1.json');assert _hash(pp_raw)=='870d7bec6c0c786275edb4a0dbb16a53cad2466b62a462066693b09a5338686a' and len(pp_raw)==9253;pp=json.loads(pp_raw)
+            assert pp['schema_version']==1 and pp['role']=='finite-main-sass-protected-product-source-successor' and pp['source_scope_only'] is True and pp['historical_programs_executed'] is False and pp['css_or_artifact_admission_granted'] is False
+            assert [t['path'] for t in pp['transitions']]==['projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts','projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts','projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts','projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts']
+            env=dict(PATH=os.environ.get('PATH',''),LANG='C',LC_ALL='C',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_SYSTEM='/dev/null',GIT_TERMINAL_PROMPT='0',GIT_NO_REPLACE_OBJECTS='1',GIT_NO_LAZY_FETCH='1')
+            def git_protected(*args): return subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',*args],cwd=root,env=env)
+            for t in pp['transitions']:
+                assert (t['parent'],t['commit']) in (('c72d0ed6b9bbb918eb08b4c4efb37bcf89894707','ceb5ab6ff0b910436768384a622299f4b01d2da3'),('ed2cb5f984f67d60febcefa3a032899038e000a1','d7d9eb02c1eabae1b14ad1e7ce331c58ee333286'))
+                assert git_protected('rev-list','--parents','-n','1',t['commit']).decode().strip()==t['commit']+' '+t['parent'];git_protected('merge-base','--is-ancestor',t['commit'],'HEAD')
+                before=git_protected('show',t['parent']+':'+t['path']);after=git_protected('show',t['commit']+':'+t['path'])
+                for raw,ref in ((before,t['before']),(after,t['after'])): assert _ref(t['path'],raw)==_metadata(ref) and hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()==ref['git_blob']
+                at=0;parts=[]
+                for e in t['edits']:
+                    assert sorted(e)==['after','before','offset'] and type(e['offset']) is int and at<=e['offset']<=len(before);old=e['before'].encode();assert before[e['offset']:e['offset']+len(old)]==old;parts.extend((before[at:e['offset']],e['after'].encode()));at=e['offset']+len(old)
+                assert b''.join(parts+[before[at:]])==after and current(t['path'])==after;protected_transitions.append(dict(path=t['path'],before=_metadata(t['before']),current=_metadata(t['after'])))
         if initial_line == 'main':
             graph_raw = current(MAIN_GRAPH_PACKET['path'])
             assert _ref(MAIN_GRAPH_PACKET['path'], graph_raw) == MAIN_GRAPH_PACKET
@@ -190,9 +212,9 @@ class CurrentSassSource:
         if initial_line == 'main':
             for path,digest,size in [('scripts/select-dialog-finite-source-v6.mjs','4bd50817e745cf5c1e410a1a4c2b28726d95529f6d9df7a4d2bf953fddc8560a',15483),('scripts/select-dialog-finite-source-successor.mjs','1f58566ca39877ed180af58172aa040851a1f992f039f16ec9de7ea10809d929',12305)]:
                 helper_bytes=current(path);assert _hash(helper_bytes)==digest and len(helper_bytes)==size
-            helper = 'scripts/stepper-current-peer-source-v5.mjs'
+            helper = 'scripts/stepper-current-peer-source-v6.mjs'
             helper_raw = current(helper)
-            assert _hash(helper_raw) == 'ed58eb7eabd2039a48321ec1c3037f42031dd68880795929a440283c5fbf659a' and len(helper_raw)==16963
+            assert _hash(helper_raw) == 'efbe775f61a089259dcefb1160991909f57bedefab816b2c43f8c9fc704c6905' and len(helper_raw)==19519
             old_js=current('scripts/stepper-current-peer-source-v4.mjs');assert _hash(old_js)=='9ed4857d9f5235f36d652284a3bf435dc8cf545500f314e3189f5f743c08d6a1' and len(old_js)==14887
         if initial_line=='main':
             packet_raw=current(FOCUS_STYLE_PACKET['path']);assert _ref(FOCUS_STYLE_PACKET['path'],packet_raw)==FOCUS_STYLE_PACKET;focus_style=json.loads(packet_raw)
@@ -304,8 +326,10 @@ class CurrentSassSource:
         member(source['semantic_receipt'])
         for row in source['unchanged_owned_sass_before_inputs']:
             actual = member(changes[row['path']]['current'] if row['path'] in changes else row)
-            if row['path'] not in changes:
+            if row['path'] not in changes and not any(item['path']==row['path'] for item in form_field):
                 assert actual == historical[row['path']]
+            for item in form_field:
+                if item['path']==row['path']: assert _ref(row['path'],historical[row['path']])==item['before']
         for row in protected_packet['branches'][line]['protected_inputs']:
             if graph_successor is None or row['path'] not in graph_successor.removed: member(row)
         graph = next(row for row in census['lines'] if row['line'] == line)
@@ -315,7 +339,7 @@ class CurrentSassSource:
         assert [row for row in graph['non_target_owned_style_template_graph'] if row['path'] == CARD] == [changes[CARD]['before']]
         for row in graph['non_target_owned_style_template_graph']:
             member(changes[CARD]['current'] if row['path'] == CARD else row)
-        transitions = [dict(path=row['path'], before=row['before'], current=row['current']) for row in source['modules'] + packet['additional_modules']] + [sixth_transition] + ([dict(path=focus_style['before']['path'],before=focus_style['before'],current=focus_style['after'])] if focus_style else [])
+        transitions = [dict(path=row['path'], before=row['before'], current=row['current']) for row in source['modules'] + packet['additional_modules']] + [sixth_transition] + ([dict(path=focus_style['before']['path'],before=focus_style['before'],current=focus_style['after'])] if focus_style else []) + form_field
         # Component resources do not change the finite theme/source-set contract.
         resource_transitions = ([dict(path=tooltip_resource['before']['path'], before=tooltip_resource['before'],
                                       current=tooltip_resource['after'])] if tooltip_resource else []) + graph_resource_transitions
@@ -343,6 +367,16 @@ class CurrentSassSource:
                         seen+=1;assert row['sha256']==focus_style['before']['sha256'] and row['bytes']==focus_style['before']['bytes'];row=dict(row,sha256=focus_style['after']['sha256'],bytes=focus_style['after']['bytes'])
                     final_rows.append(row)
                 assert seen==1;final_hash=_hash(json.dumps(final_rows,separators=(',',':')).encode());assert final_hash==focus_style['source_set_after']
+            if form_field:
+                assert final_hash=='107fbea0ce4c8529c98cd243232ba833787e18cfc99b22300083d5a9f6b62eb0'
+                for item in form_field:
+                    seen=0;next_rows=[]
+                    for row in final_rows:
+                        if row['root']==0 and 'projects/ngx-material-legacy/'+row['path']==item['path']:
+                            seen+=1;assert row['sha256']==item['before']['sha256'] and row['bytes']==item['before']['bytes'];row=dict(row,sha256=item['current']['sha256'],bytes=item['current']['bytes'])
+                        next_rows.append(row)
+                    assert seen==1;final_rows=next_rows
+                final_hash=_hash(json.dumps(final_rows,separators=(',',':')).encode());assert final_hash=='9e9644112b2451b42b1f91d84fc00c963714e433d5b0c03fe3c1a9f2c6c2b56f'
             source_sets[final_hash] = final_rows
             source_set_successors.append(dict(historical_sha256=key, current_sha256=final_hash))
         def assert_current():
