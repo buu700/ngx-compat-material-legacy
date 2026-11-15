@@ -57,6 +57,8 @@ _OWNER_NATIVE=(_native_owner,_native_owner.__code__,_native_owner.__defaults__,_
 
 def _run_select_owner(root,read,*,native=_OWNER_NATIVE):
     for path in ('compatibility/rc/current-main-select-density-program-v1.json','scripts/select-program-transition-source.mjs','scripts/select_program_transition_source.py'):read(path)
+    for path,pin in (('scripts/select-program-transition-source-v2.mjs','57547362588551377bd6b644bf15237943019144e44a7962eacab51cc6685560'),('scripts/select_program_transition_source_v2.py','58dda9df6faf52876bc8c65f5c3037b5b5b56c05e2f7d2470cfa65bb1bd1f9f0')):
+        if hashlib.sha256(read(path)).hexdigest()!=pin:raise ValueError('changed current select successor')
     launch,code,defaults,mapping,items,closure,spawn,pipe,close,native_read,waitpid,kill,poll,clock,node,path,dup2,close_action,nohang,launcher=native;current=launch.__kwdefaults__
     if globals().get('_native_owner') is not launch or launch.__code__ is not code or launch.__defaults__ is not defaults or current is not mapping or tuple(current.items())!=items or launch.__closure__ is not closure:raise ValueError('changed native owner')
     launch(root,'scripts/main-select-program-owner.mjs','55718e8697a51fb0b087c9f2f7d15508917c61001667bd0a3d75b534d6a53ccc',(),spawn=spawn,pipe=pipe,close=close,read=native_read,waitpid=waitpid,kill=kill,poll=poll,clock=clock,node=node,path=path,dup2=dup2,close_action=close_action,nohang=nohang,launcher=launcher)
@@ -67,7 +69,7 @@ from pathlib import Path
 
 import re
 import weakref
-from select_program_transition_source import select_program_transitions
+from select_program_transition_source_v2 import select_program_transitions
 from current_sass_spinner_snack_admission import CurrentSpinnerSnackContract
 from sass_ordinary_control_css import (ORDINARY_CHECKBOX_BUTTON_CASES, LEGACY_DATEPICKER_BUTTON_CASES,
     ordinary_checkbox_button_expected_css, legacy_datepicker_button_expected_css)

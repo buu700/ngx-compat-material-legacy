@@ -53,6 +53,23 @@ def _continue_density_input(path,initial,initial_ref,packets,git):
         current=b''.join([*parts,current[cursor:]]);expected=row['after'];assert expected['path']==path and (_hash(current),len(current))==(expected['sha256'],expected['bytes'])
     assert git('b94f169d4fe57d571e6a7c3f911a9395f6a60c4d',path)==current
     return current,expected
+def _current_density_successor(root,path,initial,initial_ref,git,env):
+    raw=_read(root,'compatibility/rc/current-main-density-source-ae9-successor-v1.json');assert (_hash(raw),len(raw))==('131257b8e6861e23d77aaf9a347bbccb4ad571a00039f98d8b4300fe91d52790',35487);p=json.loads(raw)
+    assert p['schema_version']==1 and p['role']=='main-density-current-source-ae9-successor' and p['source_scope_only'] is True and p['historical_programs_executed'] is False and p['historical_packets_rewritten'] is False and p['css_or_artifact_admission_granted'] is False and p['g11_claim']=='not-passed'
+    assert p['base_commit']=='b94f169d4fe57d571e6a7c3f911a9395f6a60c4d' and p['source_commit']=='48e2448cc5ce3e6c7b1d6b53a3681bca655f7cd1' and p['source_parent']=='e819975bc28c4d3a7d05beb81f2eb1202448384f' and p['spinner_commit']=='ae9e395e2fa36afcabfd9461ddf42bcff4d79071' and p['spinner_parent']==p['source_commit'] and [r['path'] for r in p['updates']]==_DENSITY_PATHS
+    def cmd(*args):return subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',*args],cwd=root,env=env)
+    for commit,parent in ((p['source_commit'],p['source_parent']),(p['spinner_commit'],p['spinner_parent'])):assert cmd('rev-list','--parents','-n','1',commit).decode().strip()==commit+' '+parent
+    cmd('merge-base','--is-ancestor',p['base_commit'],p['source_parent']);cmd('merge-base','--is-ancestor',p['spinner_commit'],'HEAD')
+    supports=['compatibility/rc/current-main-sass-form-field-executable-source-v1.json','compatibility/rc/current-main-form-field-source-successor-v1.json','compatibility/rc/current-main-sass-core-animation-export-v1.json','compatibility/rc/current-main-sass-protected-product-v1.json'];assert [r['path'] for r in p['support']]==supports
+    for r in p['support']:
+        b=git(p['spinner_commit'],r['path']);assert (_hash(b),len(b))==(r['sha256'],r['bytes']) and _read(root,r['path'])==b
+    r=next(x for x in p['updates'] if x['path']==path);is_source=path in ('scripts/current-sass-source.mjs','scripts/current_sass_source.py')
+    assert r['before']==initial_ref and r['parent']==(p['source_parent'] if is_source else p['spinner_parent']) and r['commit']==(p['source_commit'] if is_source else p['spinner_commit']) and git(p['base_commit'],path)==git(r['parent'],path)==initial
+    at=0;parts=[]
+    for e in r['edits']:
+        assert set(e)=={'offset','before','after'} and type(e['offset']) is int and at<=e['offset']<=len(initial);old=e['before'].encode();assert initial[e['offset']:e['offset']+len(old)]==old;parts.extend((initial[at:e['offset']],e['after'].encode()));at=e['offset']+len(old)
+    current=b''.join(parts+[initial[at:]]);assert r['after']['path']==path and (_hash(current),len(current))==(r['after']['sha256'],r['after']['bytes']) and git(r['commit'],path)==git(p['spinner_commit'],path)==current
+    return current,r['after']
 def _density_successors(root,line,files):
     if line!='main':return {}
     path='compatibility/rc/current-main-density-input-successor-v1.json';raw=_read(root,path)
@@ -77,8 +94,19 @@ def _density_successors(root,line,files):
             for edit in update['edits']:
                 assert set(edit)=={'offset','before','after'} and type(edit['offset']) is int and edit['offset']>=at;old=edit['before'].encode();assert after[edit['offset']:edit['offset']+len(old)]==old;parts.extend((after[at:edit['offset']],edit['after'].encode()));at=edit['offset']+len(old)
             final=b''.join([*parts,after[at:]]);final_ref=update['after'];assert _hash(final)==final_ref['sha256'] and len(final)==final_ref['bytes']
-        if row['path'] in _DENSITY_PATHS:final,final_ref=_continue_density_input(row['path'],final,final_ref,continuations,git)
+        if row['path'] in _DENSITY_PATHS:
+            final,final_ref=_continue_density_input(row['path'],final,final_ref,continuations,git)
+            final,final_ref=_current_density_successor(root,row['path'],final,final_ref,git,env)
         assert _read(root,row['path'])==final;refs[row['path']]=final_ref
+    helper_raw=_read(root,'compatibility/rc/current-main-density-form-helper-a5-v1.json');assert (_hash(helper_raw),len(helper_raw))==('26f90e73ca4ff6ed8409a60edd081f4b1f352081027cd6028c1a3920ee069f56',6573);helper=json.loads(helper_raw)
+    helper_paths=['scripts/sass-form-field-state-contract.mjs','scripts/sass_form_field_state_admission.py'];assert helper['schema_version']==1 and helper['role']=='main-density-form-field-helper-source-successor' and helper['source_scope_only'] is True and helper['historical_programs_executed'] is False and helper['css_or_artifact_admission_granted'] is False and helper['parent']=='1be59db586c17b30d1953dbd081f39a0559b7911' and helper['commit']=='a5ddb3296c103aa2d0745348e6c7446490576b5a' and [r['path'] for r in helper['updates']]==helper_paths
+    def command(*args):return subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',*args],cwd=root,env=env)
+    assert command('rev-list','--parents','-n','1',helper['commit']).decode().strip()==helper['commit']+' '+helper['parent'];command('merge-base','--is-ancestor',helper['commit'],'HEAD')
+    for r in helper['updates']:
+        before=git(helper['parent'],r['path']);after=git(helper['commit'],r['path']);manifest=next(x for x in files if x['path']==r['path']);assert manifest==r['before'] and (_hash(before),len(before))==(r['before']['sha256'],r['before']['bytes']);at=0;parts=[]
+        for e in r['edits']:
+            assert set(e)=={'offset','before','after'} and type(e['offset']) is int and at<=e['offset']<=len(before);old=e['before'].encode();assert before[e['offset']:e['offset']+len(old)]==old;parts.extend((before[at:e['offset']],e['after'].encode()));at=e['offset']+len(old)
+        current=b''.join(parts+[before[at:]]);assert r['after']['path']==r['path'] and (_hash(current),len(current))==(r['after']['sha256'],r['after']['bytes']) and after==current==_read(root,r['path']);refs[r['path']]=r['after']
     return refs
 
 class OrdinaryDensityGateContext:
@@ -113,7 +141,10 @@ class OrdinaryDensityGateContext:
             packet=_read(root,'compatibility/rc/current-main-density-input-successor-v1.json');assert _hash(packet)=='d85c0dca28dbc166e3566eb3b173917c1524c68f5116a490826748ce4876ab2a' and len(packet)==34446;v=_read(root,'compatibility/rc/current-main-density-input-successor-v2.json');assert (_hash(v),len(v))==('e6e385dde92ed1cdcc65998bdb6c9433458ed275572e528973e67a195b8c545f',92667)
         successors=state['successors']
         for _ in range(2):
-            if line=='main':_checked_density_continuations(root)
+            if line=='main':
+                _checked_density_continuations(root)
+                packet=_read(root,'compatibility/rc/current-main-density-source-ae9-successor-v1.json');assert (_hash(packet),len(packet))==('131257b8e6861e23d77aaf9a347bbccb4ad571a00039f98d8b4300fe91d52790',35487)
+                helper=_read(root,'compatibility/rc/current-main-density-form-helper-a5-v1.json');assert (_hash(helper),len(helper))==('26f90e73ca4ff6ed8409a60edd081f4b1f352081027cd6028c1a3920ee069f56',6573)
             for r in rows:
                 expected=successors.get(r['path'],r);b=_read(root,r['path'])
                 if _hash(b)!=expected['sha256'] or len(b)!=expected['bytes']:raise ValueError('dependency changed')

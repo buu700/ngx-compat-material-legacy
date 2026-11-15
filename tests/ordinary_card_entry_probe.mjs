@@ -19,7 +19,7 @@ const line=JSON.parse(read('projects/ngx-material-legacy/package.json')).version
 const oracle=JSON.parse(read(packet.oracle.path)),catalog=JSON.parse(read(packet.catalog.path)),provenance=JSON.parse(read(packet.provenance.path)),lock=JSON.parse(read(packet.reference_lock.path));
 let hook,target;const callback=p=>{if(hook){const action=hook;hook=null;action();}return p===target?Buffer.from('wrong'):read(p);};
 const context=createOrdinaryCardGateContext({root,read:callback}),descriptor=ordinaryCardGateDescriptor(context),modules=new Map(descriptor.source.source_modules.map(r=>[r.path,r]));
-assert.equal(modules.size,5);assert.equal(Object.hasOwn(context,'source_context'),false);
+assert.equal(modules.size,line==='main'?9:6);assert.equal(Object.hasOwn(context,'source_context'),false);
 const sources=Object.values(branch.source_sets)[0].map(r=>{const c=r.root===0&&modules.get('projects/ngx-material-legacy/'+r.path);return c?{...r,sha256:c.sha256,bytes:c.bytes}:{...r};});
 function model(row){
  const def=row.case_id.startsWith('mixin-css/'),spec=def?{mixin:row.mixin,variant:'default',call:row.call}:catalog.cases.find(r=>r.case_id===row.case_id);

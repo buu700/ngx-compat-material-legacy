@@ -55,6 +55,7 @@ def candidate_fixture(destination):
             'fixtures/sass/ordered-aggregate-density-resource-successor-v2.json',
         ))
         paths.update(('scripts/select-dialog-finite-source-v7.mjs','scripts/dialog-focus-finite-source-v6.mjs','scripts/main-sass-graph-successor.mjs','scripts/select_dialog_finite_source_successor_v6.py'))
+        paths.update(('scripts/main-density-native-owner-v2.mjs','scripts/main-density-resource-owner-v2.mjs','scripts/select-program-transition-source-v2.mjs','scripts/select_program_transition_source_v2.py','compatibility/rc/current-main-density-source-ae9-successor-v1.json','compatibility/rc/current-main-density-form-helper-a5-v1.json'))
         paths.update(('compatibility/rc/current-sass-stepper-source-executables-v1.json','compatibility/rc/current-sass-stepper-spinner-executables-v1.json','scripts/stepper-program-transition-source.mjs','scripts/stepper_program_transition_source.py','compatibility/rc/current-sass-stepper-private-gate-executable-v1.json','compatibility/rc/current-sass-select-source-executables-v2.json','compatibility/rc/current-sass-select-spinner-executables-v2.json','compatibility/rc/current-sass-select-private-gate-executable-v2.json','scripts/select-program-transition-source.mjs','scripts/select_program_transition_source.py'))
     paths.add(PRODUCT_SUCCESSOR)
     paths.update(row[0] for row in PACKETS)

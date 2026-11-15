@@ -94,10 +94,13 @@ class OrdinaryCardGateTests(unittest.TestCase):
         return dict(root=self.root, context=self.context, body=body, active=SimpleNamespace(manifest=manifest, binding=binding), invocation=invocation)
 
     def test_01_all_twelve_actual_context_modeled_envelopes(self):
-        self.assertEqual(len(self.descriptor['source']['source_modules']), 7 if self.line == 'main' else 6)
+        self.assertEqual(len(self.descriptor['source']['source_modules']), 9 if self.line == 'main' else 6)
         if self.line == 'main':
             focus=json.loads((self.root/'compatibility/rc/current-main-strong-focus-source-v1.json').read_bytes())
             self.assertIn(focus['after'],self.descriptor['source']['source_modules'])
+            form=json.loads((self.root/'compatibility/rc/current-main-form-field-source-successor-v1.json').read_bytes())
+            for row in form['transitions']:
+                self.assertIn({key:row['after'][key] for key in ('path','sha256','bytes')},self.descriptor['source']['source_modules'])
         self.assertEqual(len(self.rows), 12)
         self.assertEqual(sum(row['dimension'] in ('color', 'theme') for row in self.rows), 6)
         for row in self.rows:
@@ -110,6 +113,24 @@ class OrdinaryCardGateTests(unittest.TestCase):
         descriptor['source']['source_modules'].clear()
         self.assertTrue(gate.ordinary_card_gate_assertion_ok(**self.model(self.rows[0])))
         self.checks.append('public-metadata-copied')
+
+    def test_form_field_source_members_remain_guarded(self):
+        if self.line != 'main':self.skipTest('main-only form-field successor')
+        packet='compatibility/rc/current-main-form-field-source-successor-v1.json'
+        rows=json.loads((self.root/packet).read_bytes())['transitions']
+        for path in [packet]+[row['path'] for row in rows]:
+            with self.subTest(path=path):
+                self.controls['target']=path
+                try:
+                    with self.assertRaises(AssertionError):self.context.assert_current()
+                finally:self.controls['target']=None
+                self.context.assert_current()
+                target=self.root/path;before=target.read_bytes()
+                try:
+                    target.write_bytes(before+b' foreign')
+                    with self.assertRaises(AssertionError):self.context.assert_current()
+                finally:target.write_bytes(before)
+                self.context.assert_current()
 
     def test_02_strict_whole_css_and_scope(self):
         for row in self.rows:

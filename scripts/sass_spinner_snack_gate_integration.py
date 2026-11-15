@@ -59,20 +59,21 @@ import binascii as _owner_binascii
 _owner_b2a=_owner_binascii.b2a_base64
 if type(_owner_b2a) is not _owner_types.BuiltinFunctionType:raise RuntimeError('native base64 required')
 def _run_density_resource_owner(root,path,initial,initial_ref,read,*,native=_OWNER_NATIVE,b2a=_owner_b2a,rows=(
- ('scripts/current-sass-source.mjs','357a76daa5221d9dc9da095e23f11be4d7a627ed102a2078eb079f25ec7fccf8',23987,'f173497d4a16acb5c7e248363f214343f7c76f456212839b0da815064d09b4d9'),
- ('scripts/current-sass-spinner-snack-contract.mjs','21b211398260e1801cf02a72b139f5c9371482872763ca6168915377a5ea39c4',20042,'98d54a01132d1c8e4c14331b1902efa1f019988e9264c256e0622c97b5e33020'),
- ('scripts/current_sass_source.py','dc9e9a681d4bc67df377111ce8d119d82d8101c3c3657b037282fc68098adc8a',21241,'fca2a1ebdc8828e38b98ef73f16e36be3c60e8af95ee44644ef96333326e3a9e'),
- ('scripts/current_sass_spinner_snack_admission.py','ea27e7956065d5be34a5306f55a8a4a891af70ecb21a145f4b20cc818493f15b',18382,'77754a29a76781c956dab7e7af88382ab83290c66c0c9f00d7b1b73a89f9d938'))):
+ ('scripts/current-sass-source.mjs','357a76daa5221d9dc9da095e23f11be4d7a627ed102a2078eb079f25ec7fccf8',23987,'f173497d4a16acb5c7e248363f214343f7c76f456212839b0da815064d09b4d9','0680f631a015cfb79038ece298e1f1c03598fcfc38e47303830a0d58422975c4'),
+ ('scripts/current-sass-spinner-snack-contract.mjs','21b211398260e1801cf02a72b139f5c9371482872763ca6168915377a5ea39c4',20042,'98d54a01132d1c8e4c14331b1902efa1f019988e9264c256e0622c97b5e33020','25625a90345337f2ae8af4e61edb92492a323a3783469baddf96df9b6d614211'),
+ ('scripts/current_sass_source.py','dc9e9a681d4bc67df377111ce8d119d82d8101c3c3657b037282fc68098adc8a',21241,'fca2a1ebdc8828e38b98ef73f16e36be3c60e8af95ee44644ef96333326e3a9e','5e2806d33fc6a0187091d22388e367e797490729c311aa4b5db4ed638172b905'),
+ ('scripts/current_sass_spinner_snack_admission.py','ea27e7956065d5be34a5306f55a8a4a891af70ecb21a145f4b20cc818493f15b',18382,'77754a29a76781c956dab7e7af88382ab83290c66c0c9f00d7b1b73a89f9d938','5f83d0cb41374baa10e44172c6b74d293385343663a2ac3bbd0f13d682937963'))):
     matches=[row for row in rows if row[0]==path]
     if len(matches)!=1:raise ValueError('density path')
     row=matches[0]
     if initial_ref!={'path':path,'sha256':row[1],'bytes':row[2]}:raise ValueError('density predecessor')
-    for name in ['compatibility/rc/current-main-density-input-successor-v2.json','compatibility/rc/current-main-density-input-successor-v3.json','compatibility/rc/main-tooltip-resource-source-programs-v1.json','compatibility/rc/main-sass-graph-resource-source-programs-v2.json','compatibility/rc/main-sass-resource-contract-programs-v1.json']:read(name)
+    for name in ['compatibility/rc/current-main-density-input-successor-v2.json','compatibility/rc/current-main-density-input-successor-v3.json','compatibility/rc/main-tooltip-resource-source-programs-v1.json','compatibility/rc/main-sass-graph-resource-source-programs-v2.json','compatibility/rc/main-sass-resource-contract-programs-v1.json','compatibility/rc/current-main-density-source-ae9-successor-v1.json','compatibility/rc/current-main-sass-form-field-executable-source-v1.json','compatibility/rc/current-main-form-field-source-successor-v1.json','compatibility/rc/current-main-sass-core-animation-export-v1.json','compatibility/rc/current-main-sass-protected-product-v1.json','scripts/main-density-native-owner-v2.mjs','scripts/main-density-resource-owner-v2.mjs']:read(name)
     current=read(path)
     launch,code,defaults,mapping,items,closure,spawn,pipe,close,native_read,waitpid,kill,poll,clock,node,node_path,dup2,close_action,nohang,launcher=native;current_defaults=launch.__kwdefaults__
     if globals().get('_native_owner') is not launch or launch.__code__ is not code or launch.__defaults__ is not defaults or current_defaults is not mapping or tuple(current_defaults.items())!=items or launch.__closure__ is not closure:raise ValueError('changed native owner')
-    launch(root,'scripts/main-density-native-owner.mjs','5c9e38edd4a4373a9d962a8c81f04d22dce88896ace254a880ae6c523d87eb52',(path,b2a(initial,newline=False).decode('ascii')),spawn=spawn,pipe=pipe,close=close,read=native_read,waitpid=waitpid,kill=kill,poll=poll,clock=clock,node=node,path=node_path,dup2=dup2,close_action=close_action,nohang=nohang,launcher=launcher)
-    return current,{'path':path,'sha256':row[3],'bytes':len(current)}
+    launch(root,'scripts/main-density-native-owner-v2.mjs','214564813adad1839112f31b84be8477d05258c3960814aefdf7b408af213d07',(path,b2a(initial,newline=False).decode('ascii')),spawn=spawn,pipe=pipe,close=close,read=native_read,waitpid=waitpid,kill=kill,poll=poll,clock=clock,node=node,path=node_path,dup2=dup2,close_action=close_action,nohang=nohang,launcher=launcher)
+    if _hash(current)!=row[4]:raise ValueError('density current image')
+    return current,{'path':path,'sha256':row[4],'bytes':len(current)}
 
 import hashlib
 import json

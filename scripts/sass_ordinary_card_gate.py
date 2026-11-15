@@ -123,10 +123,19 @@ class OrdinaryCardGateContext:
         sd=_plain(source.descriptor)
         assert sd['source_subject']['path']=='scripts/current-sass-source.mjs' and sd['source_packet']['path']=='compatibility/rc/current-sass-source-inputs-v2.json'
         member(sd['source_subject']);member(sd['source_packet'])
-        modules=sd['source_modules'];focus_path='projects/ngx-material-legacy/styles/core/focus-indicators/_focus-indicators.scss';assert len(modules)==len({r['path'] for r in modules})==(7 if line=='main' else 6)
-        assert sorted(r['path'] for r in modules)==sorted([*('projects/ngx-material-legacy/styles/'+f+'/_'+f+'-theme.scss' for f in ('progress-spinner','snack-bar','checkbox','button','card')),'projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss',*([focus_path] if line=='main' else [])])
+        modules=sd['source_modules'];focus_path='projects/ngx-material-legacy/styles/core/focus-indicators/_focus-indicators.scss'
+        form_paths=['projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss','projects/ngx-material-legacy/styles/form-field/_form-field-theme.scss'] if line=='main' else []
+        assert len(modules)==len({r['path'] for r in modules})==(9 if line=='main' else 6)
+        old_modules=[r for r in modules if r['path'] not in form_paths]
+        assert len(old_modules)==(7 if line=='main' else 6)
+        assert sorted(r['path'] for r in old_modules)==sorted([*('projects/ngx-material-legacy/styles/'+f+'/_'+f+'-theme.scss' for f in ('progress-spinner','snack-bar','checkbox','button','card')),'projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss',*([focus_path] if line=='main' else [])])
         if line=='main':
             fp=json.loads(read('compatibility/rc/current-main-strong-focus-source-v1.json'));assert next(r for r in modules if r['path']==focus_path)==fp['after']
+            ff_raw=read('compatibility/rc/current-main-form-field-source-successor-v1.json');assert _hash(ff_raw)=='5fc17325433fbc76a15993fa33fa14958d04362eb1e7093bde3466b709996e1c' and len(ff_raw)==3868;ff=json.loads(ff_raw)
+            assert ff['schema_version']==1 and ff['role']=='finite-main-form-field-sass-source-successor' and ff['commit']=='a5ddb3296c103aa2d0745348e6c7446490576b5a' and [r['path'] for r in ff['transitions']]==form_paths
+            for row in ff['transitions']:
+                expected={k:row['after'][k] for k in ('path','sha256','bytes')}
+                assert next(r for r in modules if r['path']==row['path'])==expected;member(expected)
         assert next(r for r in modules if r['path'].endswith('/card/_card-theme.scss'))==dict(path='projects/ngx-material-legacy/styles/card/_card-theme.scss',sha256='dc5e055d95aabf5c8a8ae4ba70acee8a9a1315e6f46715e8846c932f79d51fbf',bytes=5349)
         current_by_path={r['path']:r for r in modules};sets=_plain(source.source_sets);successors=_plain(source.source_set_successors)
         assert len(sets)==len(successors)==1

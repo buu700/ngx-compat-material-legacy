@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "role": "main-density-form-field-helper-source-successor",
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "css_or_artifact_admission_granted": false,
+  "parent": "1be59db586c17b30d1953dbd081f39a0559b7911",
+  "commit": "a5ddb3296c103aa2d0745348e6c7446490576b5a",
+  "updates": [
+    {
+      "path": "scripts/sass-form-field-state-contract.mjs",
+      "before": {
+        "path": "scripts/sass-form-field-state-contract.mjs",
+        "sha256": "d1de0c7df16d21aaa4eefc54a2ea61662665f41b9134f80bf7f92b9359bf8134",
+        "bytes": 10361
+      },
+      "after": {
+        "path": "scripts/sass-form-field-state-contract.mjs",
+        "sha256": "a26e579b457624f67cd0d79704740730a869adf79e5bd49daa170a4105a67d65",
+        "bytes": 12313
+      },
+      "edits": [
+        {
+          "offset": 5106,
+          "before": "",
+          "after": "// Build the complete ordered public-token blocks from the untouched v16 CSS.\n// Match whole rules and exact finite membership; never strip candidate CSS.\nfunction ordinaryColorBlocks(e) {\n  const blocks = e.color.css.split('\\n\\n');\n  const normal = blocks[0];\n  const palette = ['accent', 'warn'].map(name => {\n    const selector = `${e.scope} .mat-mdc-form-field.mat-${name} {`;\n    return e.color.css.split('\\n').reduce((found, line, i, lines) => {\n      if (line !== selector) return found;\n      const end = lines.indexOf('}', i);\n      return [...found, lines.slice(i, end + 1).join('\\n')];\n    }, []);\n  });\n  if (palette.some(b => b.length !== 1)) return null;\n  function convert(block, fallback) {\n    const lines = block.split('\\n'), result = [lines[0]];\n    for (const appearance of ['filled', 'outlined']) {\n      const prefix = `  --mdc-${appearance}-text-field-`;\n      const decls = lines.filter(line => line.startsWith(prefix));\n      if (decls.length !== (fallback ? (appearance === 'filled' ? 19 : 17) : 3)) return null;\n      for (const line of decls) result.push(line.replace(prefix, `  --mat-form-field-${appearance}-`));\n      if (fallback) {\n        for (const [to, from] of [['hover-label-text-color','label-text-color'], ['error-hover-label-text-color','error-label-text-color']]) {\n          const original = decls.filter(line => line.startsWith(prefix + from + ': '));\n          if (original.length !== 1) return null;\n          result.push(original[0].replace(prefix + from, `  --mat-form-field-${appearance}-${to}`));\n        }\n      }\n    }\n    result.push('}');\n    return result.join('\\n');\n  }\n  const converted = [convert(normal, true), ...palette.map(b => convert(b[0], false))];\n  return converted.some(x => x === null) ? null : converted[0] + '\\n\\n' + converted[1] + '\\n' + converted[2];\n}\n"
+        },
+        {
+          "offset": 5919,
+          "before": "  return e.color.css + e.separator + peer.css + e.after_separator + original.css.slice(e.color.css.length);\n",
+          "after": "  const blocks = ordinaryColorBlocks(e);\n  return blocks === null ? null : e.color.css + e.separator + peer.css + '\\n\\n' + blocks + original.css.slice(e.color.css.length);\n"
+        },
+        {
+          "offset": 10274,
+          "before": "  return css.slice(0, at) + e.separator + floor.css + (suffix ? '\\n' : '') + suffix;\n",
+          "after": "  const blocks = ordinaryColorBlocks(e);\n  return blocks === null ? null : css.slice(0, at) + e.separator + floor.css + '\\n\\n' + blocks + suffix;\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/sass_form_field_state_admission.py",
+      "before": {
+        "path": "scripts/sass_form_field_state_admission.py",
+        "sha256": "f964e7ffa7a3d99883cf8ac9f14518349d817c4622adfff3f6e70d3aa92e13e0",
+        "bytes": 10933
+      },
+      "after": {
+        "path": "scripts/sass_form_field_state_admission.py",
+        "sha256": "fc6a53f7d18f8b99890bd09b9af184b8ca31efd5bb697cced10146dcbed22f69",
+        "bytes": 12740
+      },
+      "edits": [
+        {
+          "offset": 4494,
+          "before": "",
+          "after": "def _ordinary_color_blocks(e):\n    lines = e['color']['css'].split('\\n')\n    normal = e['color']['css'].split('\\n\\n')[0].split('\\n')\n    palettes = []\n    for name in ('accent', 'warn'):\n        selector = e['scope'] + ' .mat-mdc-form-field.mat-' + name + ' {'\n        positions = [i for i, line in enumerate(lines) if line == selector]\n        if len(positions) != 1:\n            return None\n        i = positions[0]\n        palettes.append(lines[i:lines.index('}', i) + 1])\n    def convert(block, fallback):\n        out = [block[0]]\n        for appearance in ('filled', 'outlined'):\n            prefix = '  --mdc-' + appearance + '-text-field-'\n            decls = [line for line in block if line.startswith(prefix)]\n            if len(decls) != ((19 if appearance == 'filled' else 17) if fallback else 3):\n                return None\n            out.extend(line.replace(prefix, '  --mat-form-field-' + appearance + '-', 1) for line in decls)\n            if fallback:\n                for to, source in (('hover-label-text-color', 'label-text-color'), ('error-hover-label-text-color', 'error-label-text-color')):\n                    original = [line for line in decls if line.startswith(prefix + source + ': ')]\n                    if len(original) != 1:\n                        return None\n                    out.append(original[0].replace(prefix + source, '  --mat-form-field-' + appearance + '-' + to, 1))\n        return '\\n'.join(out + ['}'])\n    converted = [convert(normal, True)] + [convert(block, False) for block in palettes]\n    if any(block is None for block in converted):\n        return None\n    return converted[0] + '\\n\\n' + converted[1] + '\\n' + converted[2]\n\n\n"
+        },
+        {
+          "offset": 5145,
+          "before": "        return e['color']['css'] + e['separator'] + peer['css'] + e['after_separator'] + original['css'][len(e['color']['css']):]\n",
+          "after": "        blocks = _ordinary_color_blocks(e)\n        return None if blocks is None else e['color']['css'] + e['separator'] + peer['css'] + '\\n\\n' + blocks + original['css'][len(e['color']['css']):]\n"
+        },
+        {
+          "offset": 10759,
+          "before": "        return css[:at] + e['separator'] + floor['css'] + ('\\n' if suffix else '') + suffix\n",
+          "after": "        blocks = _ordinary_color_blocks(e)\n        return None if blocks is None else css[:at] + e['separator'] + floor['css'] + '\\n\\n' + blocks + suffix\n"
+        }
+      ]
+    }
+  ]
+}

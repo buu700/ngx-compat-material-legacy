@@ -23,6 +23,7 @@ from sass_default_aggregate_fixture import default_aggregate_receipt
 from sass_mixin_fixture import mixin_receipt
 from sass_ordinary_aggregate_admission import insert_ordinary_checkbox_button_into_aggregate_model
 from current_sass_card_aggregate import insert_card_into_aggregate_model
+from sass_form_field_state_admission import FORM_FIELD_STATE_AGGREGATE_CASES, _ordinary_color_blocks
 
 def measured(css):return dict(css=css,css_sha256=hashlib.sha256(css.encode()).hexdigest(),css_bytes=len(css.encode()))
 
@@ -56,7 +57,18 @@ class SpinnerSnackGateIntegrationTests(unittest.TestCase):
             cls.bodies.append(body)
         for row in aggregate['rows']:
             case=row['case_id'];body=default_aggregate_receipt(cls.active,case,cls.invocation) if case.startswith('mixin-css/') else mixin_receipt(ROOT,cls.active,case,cls.invocation)
-            ordinary_css=insert_ordinary_checkbox_button_into_aggregate_model(case_id=case,css=row['current']['css']);assert ordinary_css is not None
+            # Reuse the complete historical aggregate row and apply only the
+            # authenticated a5 form-field color-block continuation. The exact
+            # old peer boundary must occur once; no golden is rewritten.
+            current_css=row['current']['css']
+            if cls.line=='main' and case in FORM_FIELD_STATE_AGGREGATE_CASES:
+                form=json.loads((ROOT/'fixtures/sass/form-field-state-contracts.json').read_bytes())
+                item=form['cases'][FORM_FIELD_STATE_AGGREGATE_CASES[case]]
+                old=item['color']['css']+item['separator']+item['peers']['main']['css']+'\n'
+                added=_ordinary_color_blocks(item)
+                assert added is not None and current_css.count(old)==1
+                current_css=current_css.replace(old,old[:-1]+'\n\n'+added,1)
+            ordinary_css=insert_ordinary_checkbox_button_into_aggregate_model(case_id=case,css=current_css);assert ordinary_css is not None
             current_css=insert_card_into_aggregate_model(case_id=case,css=ordinary_css);assert current_css is not None
             actual={**measured(current_css),'program_sha256':row['current']['logical_program_sha256'],'line':cls.line,'sass_version':branch['compiler'],'sources':copy.deepcopy(current_sources)}
             body.update(current_spinner_snack_bridge=copy.deepcopy(descriptor),error=None)
@@ -107,7 +119,7 @@ class SpinnerSnackGateIntegrationTests(unittest.TestCase):
 
     def test_continuation_owner_integrity_and_recovery(self):
         # The fixture is disposable; every mutation is restored before recovery.
-        owner=self.root/'scripts/main-density-native-owner.mjs'
+        owner=self.root/'scripts/main-density-native-owner-v2.mjs'
         packet=self.root/'compatibility/rc/main-tooltip-resource-source-programs-v1.json'
         for path in (owner,packet):
             original=path.read_bytes()

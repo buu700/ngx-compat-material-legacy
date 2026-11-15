@@ -9,13 +9,14 @@ import {execFileSync as selectOwnerExec} from 'node:child_process';
 const selectOwnerRuntime=process.execPath,selectOwnerPath=process.env.PATH;
 function runSelectOwner(root,read){
  for(const path of ['compatibility/rc/current-main-select-density-program-v1.json','scripts/select-program-transition-source.mjs','scripts/select_program_transition_source.py'])read(path);
+ for(const [path,pin] of [['scripts/select-program-transition-source-v2.mjs','57547362588551377bd6b644bf15237943019144e44a7962eacab51cc6685560'],['scripts/select_program_transition_source_v2.py','58dda9df6faf52876bc8c65f5c3037b5b5b56c05e2f7d2470cfa65bb1bd1f9f0']])if(createHash('sha256').update(read(path)).digest('hex')!==pin)throw Error('changed current select successor');
  const out=selectOwnerExec(selectOwnerRuntime,['--input-type=module','--eval',"import {readFileSync,lstatSync} from 'node:fs';import{join,resolve}from'node:path';import{createHash}from'node:crypto';const root=resolve(process.argv[1]),name=process.argv[2],pin=process.argv[3];if(process.version!=='v24.21.0'||!/^scripts\\/[a-z0-9-]+\\.mjs$/.test(name))throw Error('owner launcher');let p=root;for(const x of name.split('/')){p=join(p,x);if(lstatSync(p).isSymbolicLink())throw Error('linked owner')}const raw=readFileSync(p);if(createHash('sha256').update(raw).digest('hex')!==pin)throw Error('owner pin');process.argv=[process.argv[0],'owner',root];await import('data:text/javascript;base64,'+raw.toString('base64'));if(!readFileSync(p).equals(raw))throw Error('owner changed');",root,'scripts/main-select-program-owner.mjs',"55718e8697a51fb0b087c9f2f7d15508917c61001667bd0a3d75b534d6a53ccc"],{cwd:root,env:{PATH:selectOwnerPath,LANG:'C',LC_ALL:'C',NODE_OPTIONS:''},encoding:'utf8',timeout:120000});if(out!=='ok')throw Error('select owner result');
 }
 
 /** Finite gate composition. Candidate CSS is always compared in its original form. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {selectProgramTransitions} from './select-program-transition-source.mjs';
+import {selectProgramTransitions} from './select-program-transition-source-v2.mjs';
 import {createRequire} from 'node:module';
 import {readFileSync,lstatSync,realpathSync} from 'node:fs';
 import {isAbsolute,join,relative,resolve} from 'node:path';
