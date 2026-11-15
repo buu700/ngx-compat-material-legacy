@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "role": "Current token census wrapper successor; explicitly reconciled token identities, no native qualification",
+  "node": "v24.21.0",
+  "git": "git version 2.55.0",
+  "wrapper": {
+    "path": "tests/test_injection_token_uses.py",
+    "previous_commit": "3962f7d302f63666b14ffab9d8c3b854eff776ce",
+    "previous_sha256": "42728eeb67160094703a3d7dd0658cb53abcbeb40b8d737526338c0487830b76",
+    "current_sha256": "c8012fadeb7444b80430a3ca237c51fdc520dd8acf356fea926549a9cbd0e316",
+    "full_diff_sha256": "b7c75a3ef4883d576b2f71bba6496e355ed7647ac160d4ca4558db98a104d534",
+    "full_diff": "diff --git a/tests/test_injection_token_uses.py b/tests/test_injection_token_uses.py\nindex d146485b9..fd6e499c6 100644\n--- a/tests/test_injection_token_uses.py\n+++ b/tests/test_injection_token_uses.py\n@@ -6,7 +6,7 @@ import unittest\n ROOT = Path(__file__).resolve().parents[1]\n class InjectionTokenUseTests(unittest.TestCase):\n     def test_public_tokens_overloads_factories_and_current_delta(self):\n-        result = subprocess.run(['node', '--max-old-space-size=512', 'tests/injection_token_use_probe.mjs'],\n+        result = subprocess.run(['node', '--max-old-space-size=512', 'tests/injection_token_current_3dd_probe.mjs'],\n                                 cwd=ROOT, capture_output=True, text=True, timeout=120)\n         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)\n         report = json.loads(result.stdout)\n",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 7.057s\n\nOK\n"
+  },
+  "helper_transition": {
+    "prior": "scripts/injection-token-use-review.mjs",
+    "current": "scripts/injection-token-current-3dd.mjs",
+    "full_diff_sha256": "989a7822380cf3eab54d418e712c1e659e6960e164dce7e73e0faa0d8ec0b775",
+    "full_diff": "diff --git a/scripts/injection-token-use-review.mjs b/scripts/injection-token-current-3dd.mjs\nindex b48e177cd..29c379fee 100644\n--- a/scripts/injection-token-use-review.mjs\n+++ b/scripts/injection-token-current-3dd.mjs\n@@ -321,7 +321,7 @@ export async function reviewInjectionTokenUses({ root = defaultRoot, readSource,\n         }\n         assert.equal(declarations.length, 27);\n         assert.equal(cases.filter(c => c.unused_import_erasure).length, 5);\n-        assert.equal(cases.flatMap(c => c.references).filter(r => r.kind === 'token-type').length, 1);\n+        assert.equal(cases.flatMap(c => c.references).filter(r => r.kind === 'token-type').length, 2);\n         const authored = [];\n         if (!skipDiagnostics)\n             for (const model of models) {\n@@ -353,7 +353,7 @@ export async function reviewInjectionTokenUses({ root = defaultRoot, readSource,\n         return { schema_version: 1, line, node: process.version, binding_parser: ts.version, frozen_uses: 20, current_uses: 25, current_delta_uses: 5, cases, authored_tokens: authored, rxjs, source_override_used: !!readSource,\n             behaviors: skipDiagnostics ? [] : models.map(m => ({ line: m.subject.line, ...exerciseInjectionToken(m.runtime) })), type_compilation: skipDiagnostics ? null : compileTokenTypes(models, compilerRoot),\n             subjects: models.map(({ runtime, sources, package_root, token_contract, ...m }) => ({ ...m, token_contract: { ...token_contract, constructor_sha256: hash(JSON.stringify(token_contract.constructor)), methods_sha256: hash(JSON.stringify(token_contract.methods)), definition_helper_sha256: hash(JSON.stringify(token_contract.define_injectable)), constructor: undefined, methods: undefined, define_injectable: undefined } })),\n-            limits: ['Exact20 frozen and5 supplementary imports/27owned token declarations. Five unused imports erased under actual no-metadata transpile profile. No product source change.',\n+            limits: ['Exact20 frozen and5 supplementary imports/27 current owned token declarations. Progress defaults uses the peer public token alias; the distinct owned LEGACY_ANIMATION_MODE token is a separately named current declaration. Five unused imports erased under actual no-metadata transpile profile. No product source change.',\n                 'Deprecated numeric/internal or any/NgModule scope paths are inspected but not admitted. Whole public modules use borrowed RxJS7.8.2. Explicit-provider factories are not automatic application-root resolution.',\n                 'Owned factory snippets run only for token callback/cache boundaries;DOCUMENT is a protocol token. Complete owned factory/consumer/native/Node/RxJS/floor/upstream SHA obligations remain separate.'], g11_claim: 'not-passed' };\n     }\n"
+  },
+  "evidence": [
+    {
+      "path": "scripts/injection-token-use-review.mjs",
+      "sha256": "a4927256206634527eddcc0969da912dd889711eebd10b3e1210c6c5b162028e"
+    },
+    {
+      "path": "scripts/injection-token-current-3dd.mjs",
+      "sha256": "b1eb4b1e7d7ebdc399102b8e0beb10185425bc16ce07e61c787588f112167bd7"
+    },
+    {
+      "path": "tests/injection_token_current_3dd_probe.mjs",
+      "sha256": "9e9dd97f4e0d8b2b0751a5dd0eebe192415d9d12bd3b8c998b62c5f275a0c3bd"
+    },
+    {
+      "path": "tests/progress_token_identity_proof.mjs",
+      "sha256": "42b979c08be2212aca214b930314b0aeae192c43f3bf881535202e2ec977437c"
+    },
+    {
+      "path": "scripts/verify_progress_token_reference.py",
+      "sha256": "1a673807f2a065264fe117df3f6b999262ef0da8f43c3f51199a2c11fc56d1e8"
+    },
+    {
+      "path": "compatibility/rc/injection-token-current-3962-diagnostic.json",
+      "sha256": "a87776e5965eafa6b517119e0317feed603fe2ff1239a68e87c778d23f223563"
+    },
+    {
+      "path": "compatibility/rc/injection-token-current-3dd-expected-deltas.json",
+      "sha256": "2170c22f58f3966f75b11001413c9680c5563342f30a934bb290e0a38e5e644e"
+    },
+    {
+      "path": "compatibility/rc/progress-token-original-minimum-subjects.json",
+      "sha256": "633cbc38b7665949f04ee26d244d362c035014718f541b64799458cb5eb9521f"
+    },
+    {
+      "path": "compatibility/rc/progress-token-reference-authentication.json",
+      "sha256": "2930eeda317a8b7684b5c06feb075e9ad758b289acc650bfc2674dfe2d396457"
+    },
+    {
+      "path": "compatibility/rc/progress-token-identity-proof-3962.json",
+      "sha256": "5b118274561fe2cba6fd4f2f61d0c847070a773af0c94ca61874582707420719"
+    },
+    {
+      "path": "compatibility/rc/injection-token-old-wrapper-failure-3dd.json",
+      "sha256": "279cef2aecf9bc8ee23ecfd8a55d93cbdd16c64838033c10a1415c3c9979d9d1"
+    }
+  ],
+  "limits": [
+    "The original progress token re-export and current Injector aliases are proven; packed producer/artifact reports are not reattributed.",
+    "The animation tokens are distinct; actual ambient motion policy, component behavior, native/AOT, runtime floor matrix, security and G11 remain separate."
+  ]
+}

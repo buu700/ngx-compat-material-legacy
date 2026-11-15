@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "role": "Exact token source transitions; motion and dialog behavior remain separate",
+  "git_version": "git version 2.55.0",
+  "transitions": [
+    {
+      "file": "projects/ngx-material-legacy/legacy-dialog/dialog.ts",
+      "prior_commit": "58093db5f98ca98d8d8489fd2c0fbc5e8151c844",
+      "prior_sha256": "7f7250274cdd11c1e71474553fc7387843262265f8b44c49339b2467abd68f5d",
+      "current_commit": "3dd03808bc6a5162eb7b64fef1e68ba0485f385d",
+      "current_sha256": "f61dfeed66de6b3f52507fa6876fa6d7cf32f1786b3cf45486586d5bb18391a0",
+      "full_diff_sha256": "ae04547b4ddba66a831e0f40ea5b6ca46306843817cffa623eb7ded55cb98282",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-dialog/dialog.ts b/projects/ngx-material-legacy/legacy-dialog/dialog.ts\nindex 8f2a7e6b4..f51715ce5 100644\n--- a/projects/ngx-material-legacy/legacy-dialog/dialog.ts\n+++ b/projects/ngx-material-legacy/legacy-dialog/dialog.ts\n@@ -7,10 +7,11 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {Overlay, OverlayContainer, ScrollStrategy} from '@angular/cdk/overlay';\n import {Location} from '@angular/common';\n import {\n-  ANIMATION_MODULE_TYPE,\n   Inject,\n   Injectable,\n   InjectionToken,\n@@ -88,7 +89,7 @@ export class MatLegacyDialog extends _MatDialogBase<MatLegacyDialogContainer> {\n      * @breaking-change 14.0.0\n      */\n     @Optional()\n-    @Inject(ANIMATION_MODULE_TYPE)\n+    @Inject(LEGACY_ANIMATION_MODE)\n     animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n   ) {\n     super(\n"
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+      "prior_commit": "8a8187a13369b67de9090e74d3134f923a7b16e8",
+      "prior_sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+      "current_commit": "3dd03808bc6a5162eb7b64fef1e68ba0485f385d",
+      "current_sha256": "97a730e6ecbc37b34e526cd202162049b4c2639a8f7c0dc4f3250d028f7e7b8b",
+      "full_diff_sha256": "f576b2c4d8a7313633c8c9cc7b1fe492378e4fa7f72c87cb38034587777fda1f",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts b/projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts\nindex 6bbea620d..474024a0c 100644\n--- a/projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts\n+++ b/projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts\n@@ -7,24 +7,29 @@\n  * found in the LICENSE file at https://angular.io/license\n  *\n  * Owned legacy motion helper. Reads the public MATERIAL_ANIMATIONS token and\n- * public ANIMATION_MODULE_TYPE. Does not call private Material helpers\n+ * an owned legacy mode token. Does not call private Material helpers\n  * (_getAnimationsState / _animationsDisabled).\n  */\n \n import {MediaMatcher} from '@angular/cdk/layout';\n-import {ANIMATION_MODULE_TYPE, InjectionToken, assertInInjectionContext, inject} from '@angular/core';\n+import {InjectionToken, assertInInjectionContext, inject} from '@angular/core';\n import {MATERIAL_ANIMATIONS} from '@angular/material/core';\n \n /** Public re-export for consumers/docs that prefer the legacy-core entry. */\n export {MATERIAL_ANIMATIONS};\n \n+/** Legacy-only animation policy. It is distinct from Material's token. */\n+export const LEGACY_ANIMATION_MODE = new InjectionToken<'NoopAnimations' | 'BrowserAnimations'>(\n+  'LEGACY_ANIMATION_MODE',\n+);\n+\n /** Owned state labels for lifecycle/tests (mirrors Material public semantics). */\n export type LegacyAnimationsState = 'enabled' | 'di-disabled' | 'reduced-motion';\n \n /**\n  * Optional override token for unit tests that cannot construct Material's\n  * MATERIAL_ANIMATIONS provider graph. Production code should prefer\n- * MATERIAL_ANIMATIONS / ANIMATION_MODULE_TYPE.\n+ * MATERIAL_ANIMATIONS / LEGACY_ANIMATION_MODE.\n  */\n export const LEGACY_ANIMATIONS_TEST_OVERRIDE = new InjectionToken<LegacyAnimationsState | null>(\n   'LEGACY_ANIMATIONS_TEST_OVERRIDE',\n@@ -45,7 +50,7 @@ export function getLegacyAnimationsState(): LegacyAnimationsState {\n     return 'di-disabled';\n   }\n \n-  if (inject(ANIMATION_MODULE_TYPE, {optional: true}) === 'NoopAnimations') {\n+  if (inject(LEGACY_ANIMATION_MODE, {optional: true}) === 'NoopAnimations') {\n     return 'di-disabled';\n   }\n \n@@ -72,6 +77,11 @@ export function legacyAnimationsDisabled(): boolean {\n   return getLegacyAnimationsState() !== 'enabled';\n }\n \n+/** Preserve explicit historical constructor modes while applying ambient policy. */\n+export function resolveLegacyAnimationMode<T extends string | null | undefined>(mode: T): T | 'NoopAnimations' {\n+  return mode === 'NoopAnimations' || legacyAnimationsDisabled() ? 'NoopAnimations' : mode;\n+}\n+\n /** Zero-duration params used when dialog (and similar) should noop motion. */\n export const LEGACY_ZERO_ANIMATION_PARAMS = {\n   enterAnimationDuration: '0ms',\n"
+    }
+  ],
+  "review": "Dialog changes animation token wiring; its three owned InjectionToken constructions remain exact. Legacy animation source adds LEGACY_ANIMATION_MODE as a distinct constructed token and replaces old animation-mode lookup with it; ambient motion semantics remain a separate obligation."
+}

@@ -6,7 +6,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 class InjectionTokenUseTests(unittest.TestCase):
     def test_public_tokens_overloads_factories_and_current_delta(self):
-        result = subprocess.run(['node', '--max-old-space-size=512', 'tests/injection_token_use_probe.mjs'],
+        result = subprocess.run(['node', '--max-old-space-size=512', 'tests/injection_token_current_3dd_probe.mjs'],
                                 cwd=ROOT, capture_output=True, text=True, timeout=120)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)
