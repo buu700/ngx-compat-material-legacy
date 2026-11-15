@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "role": "field-erased-palette-and-three-owned-errors",
+  "line": "main",
+  "source_only": true,
+  "head": "105e605b5af64f1226202b6e0c9c08d3757cfe5b",
+  "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+  "tag_members": [
+    {
+      "path": "src/material/form-field/form-field-errors.ts",
+      "sha256": "43dcfdbc17bb67ef20bdf2ee7f4372c4d889b90c53abcfd58accb68082cc625c",
+      "bytes": 699
+    },
+    {
+      "path": "src/material/legacy-form-field/form-field.ts",
+      "sha256": "c32e86f1be87568387a09abcd7e6c47e6cb33fd63ea0cff8b224e98073dd1726",
+      "bytes": 23910
+    }
+  ],
+  "peer": {
+    "version": "22.1.7",
+    "package_sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+    "palette_decl_sha256": "9b81bb792ae111bfe0e15bea0c137743ab5aca49ebb60575690e2dbc8c6142a9",
+    "core_index_sha256": "06e2cf0c67ba3d8555edb38626bd7264e7c0871e3f1fa4d517725935589aa880",
+    "theme_palette": "'primary' | 'accent' | 'warn' | undefined"
+  },
+  "source": {
+    "field_sha256": "e0fe0631a6adde57f515b82b43156d5da0ab0c2730872df5b792fc27dab14931",
+    "owned_errors_sha256": "1b5e334abf67a07d38af317254a19368989d6abda1475ef75eddfc618b73a735",
+    "complete_function_signatures_and_bodies": {
+      "getMatFormFieldPlaceholderConflictError": {
+        "parameters": [],
+        "returns": "Error",
+        "body": "{\n  return Error('Placeholder attribute and child element were both specified.');\n}"
+      },
+      "getMatFormFieldDuplicatedHintError": {
+        "parameters": [
+          "align: string"
+        ],
+        "returns": "Error",
+        "body": "{\n  return Error(`A hint was already declared for 'align=\"${align}\"'.`);\n}"
+      },
+      "getMatFormFieldMissingControlError": {
+        "parameters": [],
+        "returns": "Error",
+        "body": "{\n  return Error('mat-form-field must contain a MatFormFieldControl.');\n}"
+      }
+    }
+  },
+  "input_evidence_transitions": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/input.ts",
+      "before_commit": "6b88db228f",
+      "before_sha256": "aaa55d58b06ef58c6dfca26053854696526e3529e7ed15ba3ef382ec323e8532",
+      "after_sha256": "73732c15c8e968f6e13138cc3b045114035cce5ef13f2eabded100f267c02dd7",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-input/input.ts b/projects/ngx-material-legacy/legacy-input/input.ts\nindex 53f1b65dd..54fb9430e 100644\n--- a/projects/ngx-material-legacy/legacy-input/input.ts\n+++ b/projects/ngx-material-legacy/legacy-input/input.ts\n@@ -52,6 +52,7 @@ import {\n export class MatLegacyInput extends BaseMatInput {\n   private _legacyFormField = inject<MatLegacyFormField>(MAT_LEGACY_FORM_FIELD, {optional: true});\n   private readonly _legacyElement = inject<ElementRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>>(ElementRef);\n+  private _legacyPlaceholderChecked = false;\n   /** @docs-private Host binding preserves the consumer-supplied aria-disabled value. */\n   protected _legacyAriaDisabled: string | null = null;\n \n@@ -59,6 +60,14 @@ export class MatLegacyInput extends BaseMatInput {\n     // The frozen legacy control has always been natively disabled.\n     this.disabledInteractive = false;\n     super.ngDoCheck();\n+    // The peer initializes its placeholder cache to null. The historical peer's\n+    // first check also removed an authored placeholder promoted to a label.\n+    if (!this._legacyPlaceholderChecked) {\n+      this._legacyPlaceholderChecked = true;\n+      if (this._legacyFormField?.appearance === 'legacy' && !this._legacyFormField._hasLabel?.()) {\n+        this._legacyElement.nativeElement.removeAttribute('placeholder');\n+      }\n+    }\n     this._legacyAriaDisabled = this._legacyElement.nativeElement.getAttribute('aria-disabled');\n   }\n \n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "before_commit": "6b88db228f",
+      "before_sha256": "b6698d0bc2d680b0d2732736d2386199b1c499693fbc1c645350ab29d5036a33",
+      "after_sha256": "ac11641c4ad5e51374df2e4e0d41d96b616378cef33054be5b0f2ec7c065311a",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-input/input.spec.ts b/projects/ngx-material-legacy/legacy-input/input.spec.ts\nindex 80c24cd66..863290f19 100644\n--- a/projects/ngx-material-legacy/legacy-input/input.spec.ts\n+++ b/projects/ngx-material-legacy/legacy-input/input.spec.ts\n@@ -403,6 +403,31 @@ describe('MatInput without forms', () => {\n     expect(labelEl.nativeElement.textContent).toContain('Enter a name');\n   }));\n \n+  it('removes a static native placeholder promoted to a legacy label on first check', () => {\n+    const fixture = createComponent(MatInputStaticPromotedPlaceholder);\n+    fixture.detectChanges();\n+    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;\n+    expect(input.hasAttribute('placeholder')).toBe(false);\n+    expect(input.getAttribute('data-placeholder')).toBe('Static hint');\n+    expect(fixture.nativeElement.querySelector('label').textContent).toContain('Static hint');\n+  });\n+\n+  it('keeps bound promoted placeholders out of the native attribute through changes', () => {\n+    const fixture = createComponent(MatInputPlaceholderAttrTestComponent);\n+    fixture.componentInstance.placeholder = 'First hint';\n+    fixture.detectChanges();\n+    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;\n+    for (const value of ['First hint', 'Next hint', '', 'Restored hint']) {\n+      fixture.componentInstance.placeholder = value;\n+      fixture.detectChanges();\n+      expect(input.hasAttribute('placeholder')).toBe(false);\n+      expect(input.getAttribute('data-placeholder')).toBe(value);\n+    }\n+    input.setAttribute('placeholder', 'Consumer write');\n+    fixture.detectChanges();\n+    expect(input.getAttribute('placeholder')).toBe('Consumer write');\n+  });\n+\n   it('supports placeholder element', fakeAsync(() => {\n     const fixture = createComponent(MatInputPlaceholderElementTestComponent);\n     fixture.detectChanges();\n@@ -1961,6 +1986,11 @@ class MatInputWithFormControl {\n   formControl = new FormControl('');\n }\n \n+@Component({\n+  template: `<mat-form-field appearance=\"legacy\"><input matInput placeholder=\"Static hint\"></mat-form-field>`,\n+})\n+class MatInputStaticPromotedPlaceholder {}\n+\n @Component({\n   template: `<mat-form-field><input matInput [placeholder]=\"placeholder\"></mat-form-field>`,\n })\n"
+    }
+  ],
+  "judgment": "Historical docs-private error helpers are now locally owned; their full signatures and bodies match the tagged reference. ThemePalette is a public erased peer type. Input changes first-check placeholder behavior and adds tests; neither changes the unchanged named field source roles, but their behavior is not validated by this review.",
+  "holds": [
+    "input first-check and placeholder runtime behavior",
+    "field lifecycle and error conditions",
+    "current/minimum behavior, AOT and browser",
+    "G02 and G11"
+  ]
+}

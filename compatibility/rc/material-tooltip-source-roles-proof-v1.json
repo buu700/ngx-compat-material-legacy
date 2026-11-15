@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "role": "tooltip-eight-source-roles",
+  "line": "main",
+  "source_only": true,
+  "head": "105e605b5af64f1226202b6e0c9c08d3757cfe5b",
+  "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+  "tag_members": [
+    {
+      "path": "src/material/legacy-tooltip/public-api.ts",
+      "sha256": "df576330d40b6862cd066c6e3efe7b0372451ef4a049cf13319115bfe8324dde",
+      "bytes": 3606
+    },
+    {
+      "path": "src/material/tooltip/tooltip.ts",
+      "sha256": "14d7821fe83cdfdc8ac9d6f2f8e095a24178ad286a8f9d4eea4245e879d5501c",
+      "bytes": 39115
+    }
+  ],
+  "peer": {
+    "version": "22.1.7",
+    "package_sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+    "declaration_sha256": "8676988aa9048ec8d64e401044f780a639f028ad0d6d232161539b5eb1d5f409"
+  },
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+      "before_commit": "58093db5f9",
+      "before_sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29",
+      "current_sha256": "f3913888f304ef75667d307ec8b085db02890bd7c67313098da60b9b3a655911",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-tooltip/tooltip.ts b/projects/ngx-material-legacy/legacy-tooltip/tooltip.ts\nindex 8c916880f..e3af3d9fa 100644\n--- a/projects/ngx-material-legacy/legacy-tooltip/tooltip.ts\n+++ b/projects/ngx-material-legacy/legacy-tooltip/tooltip.ts\n@@ -6,6 +6,8 @@\n  * Use of this source code is governed by an MIT-style license that can be\n  * found in the LICENSE file at https://angular.io/license\n  */\n+\n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n import {AriaDescriber, FocusMonitor} from '@angular/cdk/a11y';\n import {Directionality} from '@angular/cdk/bidi';\n import {BreakpointObserver, Breakpoints, BreakpointState} from '@angular/cdk/layout';\n@@ -13,7 +15,6 @@ import {Overlay} from '@angular/cdk/overlay';\n import {Platform} from '@angular/cdk/platform';\n import {ScrollDispatcher} from '@angular/cdk/scrolling';\n import {\n-  ANIMATION_MODULE_TYPE,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n   Component,\n@@ -123,7 +124,7 @@ export class LegacyTooltipComponent extends _TooltipComponentBase {\n   constructor(\n     changeDetectorRef: ChangeDetectorRef,\n     breakpointObserver: BreakpointObserver,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(changeDetectorRef, animationMode);\n     this._isHandset = breakpointObserver.observe(Breakpoints.Handset);\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+      "before_commit": "ea976240e4",
+      "before_sha256": "fc29490be443cdb544e553f762be572fb4e6635216ad47dbb492a5dffa113aad",
+      "current_sha256": "da877c1342fb1f8b73e8c33750d94bfac9629ca07dd57c44c92751e674e1b8ed",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts b/projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts\nindex 9de37584a..614a2afc5 100644\n--- a/projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts\n+++ b/projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts\n@@ -10,6 +10,8 @@\n  * factory provider (removed from Angular Material 22 public API).\n  */\n \n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {AriaDescriber, FocusMonitor} from '@angular/cdk/a11y';\n import {Directionality} from '@angular/cdk/bidi';\n import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion';\n@@ -37,7 +39,7 @@ import {ScrollDispatcher} from '@angular/cdk/scrolling';\n import {DOCUMENT} from '@angular/common';\n import {\n   AfterViewInit,\n-  ANIMATION_MODULE_TYPE,\n+\n   ChangeDetectorRef,\n   Directive,\n   ElementRef,\n@@ -461,6 +463,13 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase>\n       positionStrategy: strategy,\n       panelClass: `${this._cssClassPrefix}-${PANEL_CLASS}`,\n       scrollStrategy: this._scrollStrategy(),\n+      // Let unrelated keys reach overlays beneath the tooltip. Pointer events must retain\n+      // the existing outside-interaction behavior.\n+      eventPredicate: event => event.type !== 'keydown' || (\n+        this._isTooltipVisible() &&\n+        (event as KeyboardEvent).keyCode === ESCAPE &&\n+        !hasModifierKey(event as KeyboardEvent)\n+      ),\n     });\n \n     this._updatePosition(this._overlayRef);\n@@ -865,7 +874,7 @@ export abstract class _TooltipComponentBase implements OnDestroy {\n \n   constructor(\n     private _changeDetectorRef: ChangeDetectorRef,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     this._animationsDisabled =\n       legacyAnimationsDisabled() || animationMode === 'NoopAnimations';\n"
+    }
+  ],
+  "named_contexts_before": {
+    "leaf": {
+      "MAT_TOOLTIP_DEFAULT_OPTIONS": [
+        "CallExpression: Inject(MAT_TOOLTIP_DEFAULT_OPTIONS)"
+      ],
+      "MAT_TOOLTIP_SCROLL_STRATEGY": [
+        "CallExpression: Inject(MAT_TOOLTIP_SCROLL_STRATEGY)"
+      ],
+      "MatTooltipDefaultOptions": [
+        "TypeReference: MatTooltipDefaultOptions"
+      ],
+      "SCROLL_THROTTLE_MS": [],
+      "getMatTooltipInvalidPositionError": []
+    },
+    "base": {
+      "MAT_TOOLTIP_DEFAULT_OPTIONS": [],
+      "MAT_TOOLTIP_SCROLL_STRATEGY": [
+        "PropertyAssignment: provide: MAT_TOOLTIP_SCROLL_STRATEGY"
+      ],
+      "MatTooltipDefaultOptions": [
+        "TypeReference: MatTooltipDefaultOptions",
+        "TypeReference: MatTooltipDefaultOptions"
+      ],
+      "SCROLL_THROTTLE_MS": [
+        "PropertyAssignment: scrollThrottle: SCROLL_THROTTLE_MS"
+      ],
+      "getMatTooltipInvalidPositionError": [
+        "CallExpression: getMatTooltipInvalidPositionError(position)",
+        "CallExpression: getMatTooltipInvalidPositionError(position)"
+      ]
+    }
+  },
+  "named_contexts_current": {
+    "leaf": {
+      "MAT_TOOLTIP_DEFAULT_OPTIONS": [
+        "CallExpression: Inject(MAT_TOOLTIP_DEFAULT_OPTIONS)"
+      ],
+      "MAT_TOOLTIP_SCROLL_STRATEGY": [
+        "CallExpression: Inject(MAT_TOOLTIP_SCROLL_STRATEGY)"
+      ],
+      "MatTooltipDefaultOptions": [
+        "TypeReference: MatTooltipDefaultOptions"
+      ],
+      "SCROLL_THROTTLE_MS": [],
+      "getMatTooltipInvalidPositionError": []
+    },
+    "base": {
+      "MAT_TOOLTIP_DEFAULT_OPTIONS": [],
+      "MAT_TOOLTIP_SCROLL_STRATEGY": [
+        "PropertyAssignment: provide: MAT_TOOLTIP_SCROLL_STRATEGY"
+      ],
+      "MatTooltipDefaultOptions": [
+        "TypeReference: MatTooltipDefaultOptions",
+        "TypeReference: MatTooltipDefaultOptions"
+      ],
+      "SCROLL_THROTTLE_MS": [
+        "PropertyAssignment: scrollThrottle: SCROLL_THROTTLE_MS"
+      ],
+      "getMatTooltipInvalidPositionError": [
+        "CallExpression: getMatTooltipInvalidPositionError(position)",
+        "CallExpression: getMatTooltipInvalidPositionError(position)"
+      ]
+    }
+  },
+  "owned_error": {
+    "sha256": "d5cb12aa8572b75c4a233ebc694187655cb7b557d7d72665ce1f1373ed88cdf8",
+    "signature_and_body": {
+      "params": [
+        "position: string"
+      ],
+      "body": "{\n  return Error(`Tooltip position \"${position}\" is invalid.`);\n}"
+    }
+  },
+  "judgment": "Historical legacy public API aliases peer defaults/scroll and 20ms throttle. Current named source contexts match previous; base defaults-token import is unused, local error body matches tag, installed peer declares matching token protocols and throttle. Changed tooltip overlay keyboard predicate and animation DI remain separate runtime obligations.",
+  "holds": [
+    "provider and constructor identity",
+    "overlay key routing and motion",
+    "lifecycle and error paths",
+    "G02 and G11"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "role": "autocomplete-four-source-roles",
+  "line": "main",
+  "source_only": true,
+  "head": "105e605b5af64f1226202b6e0c9c08d3757cfe5b",
+  "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+  "tag_members": [
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "sha256": "b69decaf81ef29dd665a0b267f3a121837212157b31ddd02c3b617fa958844f2",
+      "bytes": 39222
+    },
+    {
+      "path": "src/material/legacy-autocomplete/public-api.ts",
+      "sha256": "7a5d27cce0019a36d57af541ea1301331d3d4909cd91fc112ed89ad007eeba42",
+      "bytes": 3412
+    }
+  ],
+  "peer": {
+    "version": "22.1.7",
+    "package_sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+    "declaration_sha256": "53d1c8e518c3a2254feb4c3427da70863255caa94da42ce1d99b6363777291e3"
+  },
+  "source": {
+    "trigger_sha256": "803e95c96c22e5a6863a5f353f0485ec5a0431d04c9fe0b987031083ed7afaa9",
+    "owned_error_sha256": "b6c6e226b4d5a6e8a5a307b108d74656f38eb7cd8dabbe08cb20befe21e28d09",
+    "owned_error_full_signature_and_body": {
+      "parameters": [],
+      "returns": "Error",
+      "body": "{\n  return Error(\n    'Attempting to open an undefined instance of `mat-autocomplete`. ' +\n      'Make sure that the id passed to the `matAutocomplete` is correct and that ' +\n      \"you're attempting to open it after the ngAfterContentInit hook.\",\n  );\n}"
+    }
+  },
+  "field_transition": {
+    "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+    "before_commit": "7e9ecb0a8f",
+    "before_sha256": "e645f8b92ccb57518eb9fac6ab3a20c35db6bd9f19a301fcb659ffe58911cfb6",
+    "after_sha256": "e0fe0631a6adde57f515b82b43156d5da0ab0c2730872df5b792fc27dab14931",
+    "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-form-field/form-field.ts b/projects/ngx-material-legacy/legacy-form-field/form-field.ts\nindex aff83b932..ed01890da 100644\n--- a/projects/ngx-material-legacy/legacy-form-field/form-field.ts\n+++ b/projects/ngx-material-legacy/legacy-form-field/form-field.ts\n@@ -7,6 +7,8 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {Directionality} from '@angular/cdk/bidi';\n import {coerceBooleanProperty} from '@angular/cdk/coercion';\n type BooleanInput = string | boolean | null | undefined;\n@@ -47,7 +49,7 @@ import {Platform} from '@angular/cdk/platform';\n import {afterFormFieldRender} from './internal/after-form-field-render';\n import {nextLegacyHintId} from './internal/hint-id';\n import {AbstractControlDirective, ValidatorFn} from '@angular/forms';\n-import {ANIMATION_MODULE_TYPE} from '@angular/core';\n+\n import {MatFormFieldControl} from '@angular/material/form-field';\n import {\n   MAT_LEGACY_ERROR as MAT_ERROR,\n@@ -317,7 +319,7 @@ export class MatLegacyFormField\n     private _defaults: MatLegacyFormFieldDefaultOptions,\n     private _platform: Platform,\n     private _ngZone: NgZone,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) _animationMode: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) _animationMode: string,\n     private _injector?: Injector,\n   ) {\n     super(elementRef);\n"
+  },
+  "judgment": "The historical legacy API aliases the then-peer default and scroll tokens. Current trigger retains peer injection names and a typed option; owned error signature/body matches tag. The field context switched animation injection. This proves source roles only, not runtime provider/Injector identity, animation, field interaction, opening, or error paths.",
+  "holds": [
+    "provider and injector identity",
+    "field interaction and motion",
+    "opening/error runtime behavior and AOT",
+    "G02 and G11"
+  ]
+}

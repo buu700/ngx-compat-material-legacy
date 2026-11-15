@@ -1,0 +1,663 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "reviews": [
+    {
+      "file": "legacy-radio/radio.ts",
+      "module": "@angular/material/radio",
+      "symbol": "MAT_RADIO_GROUP",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "0b749baf2f25dcacad39803d51f809f2cca02ed4add03c3199513cdf60b9fb15",
+      "current_peer_use": true,
+      "current_module": "@angular/material/radio",
+      "binding": {
+        "local_name": "MAT_RADIO_GROUP",
+        "kind": "ImportSpecifier",
+        "line": 29,
+        "text": "import {\n  MAT_RADIO_GROUP,\n  MAT_RADIO_DEFAULT_OPTIONS,\n  MatRadioDefaultOptions,\n} from '@angular/material/radio';"
+      },
+      "occurrences": [
+        {
+          "line": 55,
+          "parent_kind": "PropertyAssignment",
+          "expression": "provide: MAT_RADIO_GROUP"
+        },
+        {
+          "line": 101,
+          "parent_kind": "CallExpression",
+          "expression": "Inject(MAT_RADIO_GROUP)"
+        }
+      ],
+      "public_reexport": false,
+      "complete_context_members": [
+        {
+          "kind": "SourceFile",
+          "line": 1,
+          "sha256": "dffd3e4daf0d50d915303b2e3d13d26e8c97fb77756ccf8c618e34022f548f1e",
+          "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {FocusMonitor} from '@angular/cdk/a11y';\nimport {UniqueSelectionDispatcher} from '@angular/cdk/collections';\nimport {\n  ANIMATION_MODULE_TYPE,\n  Attribute,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ContentChildren,\n  Directive,\n  ElementRef,\n  forwardRef,\n  Inject,\n  Optional,\n  QueryList,\n  ViewEncapsulation,\n} from '@angular/core';\nimport {NG_VALUE_ACCESSOR} from '@angular/forms';\nimport {\n  MAT_RADIO_GROUP,\n  MAT_RADIO_DEFAULT_OPTIONS,\n  MatRadioDefaultOptions,\n} from '@angular/material/radio';\nimport {_MatRadioGroupBase, _MatRadioButtonBase} from './internal/radio-base';\n\n/**\n * Provider Expression that allows mat-radio-group to register as a ControlValueAccessor. This\n * allows it to support [(ngModel)] and ngControl.\n * @docs-private\n */\nexport const MAT_LEGACY_RADIO_GROUP_CONTROL_VALUE_ACCESSOR: any = {\n  provide: NG_VALUE_ACCESSOR,\n  useExisting: forwardRef(() => MatLegacyRadioGroup),\n  multi: true,\n};\n\n/**\n * A group of radio buttons. May contain one or more `<mat-radio-button>` elements.\n */\n@Directive({\n  standalone: false,\n  selector: 'mat-radio-group',\n  exportAs: 'matRadioGroup',\n  providers: [\n    MAT_LEGACY_RADIO_GROUP_CONTROL_VALUE_ACCESSOR,\n    {provide: MAT_RADIO_GROUP, useExisting: MatLegacyRadioGroup},\n  ],\n  host: {\n    'role': 'radiogroup',\n    'class': 'mat-radio-group',\n  },\n})\nexport class MatLegacyRadioGroup extends _MatRadioGroupBase<MatLegacyRadioButton> {\n  @ContentChildren(forwardRef(() => MatLegacyRadioButton), {descendants: true})\n  _radios: QueryList<MatLegacyRadioButton>;\n}\n\n/**\n * A Material design radio-button. Typically placed inside of `<mat-radio-group>` elements.\n */\n@Component({\n  standalone: false,\n  selector: 'mat-radio-button',\n  templateUrl: 'radio.html',\n  styleUrls: ['radio.scss'],\n  inputs: ['disableRipple', 'tabIndex'],\n  encapsulation: ViewEncapsulation.None,\n  exportAs: 'matRadioButton',\n  host: {\n    'class': 'mat-radio-button',\n    '[class.mat-radio-checked]': 'checked',\n    '[class.mat-radio-disabled]': 'disabled',\n    '[class._mat-animation-noopable]': '_noopAnimations',\n    '[class.mat-primary]': 'color === \"primary\"',\n    '[class.mat-accent]': 'color === \"accent\"',\n    '[class.mat-warn]': 'color === \"warn\"',\n    // Needs to be removed since it causes some a11y issues (see #21266).\n    '[attr.tabindex]': 'null',\n    '[attr.id]': 'id',\n    '[attr.aria-label]': 'null',\n    '[attr.aria-labelledby]': 'null',\n    '[attr.aria-describedby]': 'null',\n    // Note: under normal conditions focus shouldn't land on this element, however it may be\n    // programmatically set, for example inside of a focus trap, in this case we want to forward\n    // the focus to the native element.\n    '(focus)': '_inputElement.nativeElement.focus()',\n  },\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class MatLegacyRadioButton extends _MatRadioButtonBase {\n  constructor(\n    @Optional() @Inject(MAT_RADIO_GROUP) radioGroup: MatLegacyRadioGroup,\n    elementRef: ElementRef,\n    changeDetector: ChangeDetectorRef,\n    focusMonitor: FocusMonitor,\n    radioDispatcher: UniqueSelectionDispatcher,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n    @Optional()\n    @Inject(MAT_RADIO_DEFAULT_OPTIONS)\n    providerOverride?: MatRadioDefaultOptions,\n    @Attribute('tabindex') tabIndex?: string,\n  ) {\n    super(\n      radioGroup,\n      elementRef,\n      changeDetector,\n      focusMonitor,\n      radioDispatcher,\n      animationMode,\n      providerOverride,\n      tabIndex,\n    );\n  }\n}\n"
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "decision": "The owned group provides this exact public token as its own useExisting identity. The concrete radio-button constructor injects an owned group using the same token and forwards it to its owned base; the evaluated alias is exercised.\n\nThe stable public group token has genuine singleton identity at both minima. The evaluated owned group decorator supplies useExisting MatLegacyRadioGroup and public Injector resolves the exact owner payload; a wrong provider is rejected. Radio button types remain the owned group/base types rather than current component instances. This is a token/provider/constructor dependency judgment; generated parent-node DI, group queries and radio interactions remain separate. Independent tag/current/minimum review confirms historical peer aliases and named current roles, including unused base token imports. Full leaf animation resolver transition is recorded; constructor, provider/DI, lifecycle and motion remain unqualified.",
+      "unused_header_binding": false,
+      "reviewer": "Codex primary implementer; individual complete current configuration source/API review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/component-config-caller-prior.json.gz",
+          "sha256": "3c12b3538e4d5d1fc307f1f58f911fce7d2045763c0518b6233fc61d01a6e0f6"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-types-main.json",
+          "sha256": "24057005a19fd9f639feb4ed4a7e4ee107b2ff59630582c3ed905fe9dade6714"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-runtime-main.json",
+          "sha256": "aebc3b7c9b146200d761da5e47eace1047cac0a487c3ed07afda1a1323b1d527"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-owned-main.json",
+          "sha256": "f24684ee15990aa8d5cec972c978a10bb14aca8815b95f123e20ee6d397ef4af"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-sources/ab00bf4f37c343fa516ead009546ea2f5f30745620af80b76ce7d415d3bfed5a.gz",
+          "sha256": "61f8de1428fb2533a2b23e0f839800608e694636243ce59b7b46a40c11eb303d"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-sources/12d8745da0f0ba02e805a2a4347ef6dabfabb3df7939b8d36c5b8f2bbaa88af8.gz",
+          "sha256": "f93969005e8e4dcbaab2a07adb3467cefa0cbb9b9862c37fc26ddf20e7643fdf"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-sources/ce22e2ce1c934f83ed3275539b5d834be2e4ce9aa6635e0cf6e9cc448b177a0f.gz",
+          "sha256": "4310243619279ce0c3348d4cf33b012710863b84ddc87b8aa7767b999a2c01e8"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-subjects.json",
+          "sha256": "abf510bc05ae9609e350aeb776c8c05c890ce790c83916fa8542fb96f378b686"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-decisions.json",
+          "sha256": "5e6bff4ef0937b34ed6450e5bf8b651c9fd64ca0ee964f0bbf1091a6140a4553"
+        },
+        {
+          "path": "scripts/component-config-caller-contracts.mjs",
+          "sha256": "24be3a147f30287364f771f40d3df5b9f2e2f3ba427969cf2c6665bf0b3067d8"
+        },
+        {
+          "path": "scripts/component-config-caller-public-subjects.mjs",
+          "sha256": "510c44e0273d3cbb1ec6e7c308c9fcceff252cb908736233196bbfe187bc2cc1"
+        },
+        {
+          "path": "scripts/component-config-caller-type-evidence.mjs",
+          "sha256": "94fe0caa3fd17923b1ffe376acd7f661a19d43bc6d2e69d2f4edfced3320abc0"
+        },
+        {
+          "path": "scripts/component-config-caller-public-runtime-evidence.mjs",
+          "sha256": "56a8aa1abb8f70419147023ea61c6cb0520244aa1775c968841b903bd13384cb"
+        },
+        {
+          "path": "scripts/component-config-caller-owned-evidence.mjs",
+          "sha256": "0f27648cfdf25b0eb1c5d860968bb4774448e36247d23ae016a0fd9b8fd40944"
+        },
+        {
+          "path": "scripts/component-config-caller-owned-helpers.mjs",
+          "sha256": "74919896a59d8209cfc895ed5495746dbaa7cb1d0a42e7e216ea215a6d9aa1eb"
+        },
+        {
+          "path": "scripts/component-config-caller-reviews.mjs",
+          "sha256": "829de1c3996e95774f0b044610fd6daa5abd47a58019b01966d501c48df56ab2"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/component-config-callers.json",
+          "sha256": "24cb5555d22af0f57332d6c1eb236c6afb30aaaf12dfe884d54009b5c5ee097e"
+        },
+        {
+          "path": "compatibility/rc/material-radio-source-roles-proof-v1.json",
+          "sha256": "49ec91d46a8e99173a9ad4e301a1e3a8631f754bdecfc3f6c4e45b314b3295c7"
+        }
+      ],
+      "scope_limit": "Named source/API role only. Genuine32-symbol tagged/minimum declarations and complete current200-file types support73 contexts. Public SDK snapshots retain all upstream differences. Actual owned/tagged constructors and evaluated provider/factory expressions use explicit node,decorator-metadata and owner/service payload protocols;generated Angular module/factory/template/query execution is not inferred. Tagged/current source oracles are independent and no current owned implementation runs on tagged16 or the other current peer line. No whole-family/HTML/CSS/geometry/focus/scroll timing/motion,CSP,SSR,packed/AOT,full consumer/toolchain/peer floor or G01-G13 pass."
+    },
+    {
+      "file": "legacy-radio/radio.ts",
+      "module": "@angular/material/radio",
+      "symbol": "MAT_RADIO_DEFAULT_OPTIONS",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "0b749baf2f25dcacad39803d51f809f2cca02ed4add03c3199513cdf60b9fb15",
+      "current_peer_use": true,
+      "current_module": "@angular/material/radio",
+      "binding": {
+        "local_name": "MAT_RADIO_DEFAULT_OPTIONS",
+        "kind": "ImportSpecifier",
+        "line": 30,
+        "text": "import {\n  MAT_RADIO_GROUP,\n  MAT_RADIO_DEFAULT_OPTIONS,\n  MatRadioDefaultOptions,\n} from '@angular/material/radio';"
+      },
+      "occurrences": [
+        {
+          "line": 108,
+          "parent_kind": "CallExpression",
+          "expression": "Inject(MAT_RADIO_DEFAULT_OPTIONS)"
+        }
+      ],
+      "public_reexport": false,
+      "complete_context_members": [
+        {
+          "kind": "SourceFile",
+          "line": 1,
+          "sha256": "dffd3e4daf0d50d915303b2e3d13d26e8c97fb77756ccf8c618e34022f548f1e",
+          "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {FocusMonitor} from '@angular/cdk/a11y';\nimport {UniqueSelectionDispatcher} from '@angular/cdk/collections';\nimport {\n  ANIMATION_MODULE_TYPE,\n  Attribute,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ContentChildren,\n  Directive,\n  ElementRef,\n  forwardRef,\n  Inject,\n  Optional,\n  QueryList,\n  ViewEncapsulation,\n} from '@angular/core';\nimport {NG_VALUE_ACCESSOR} from '@angular/forms';\nimport {\n  MAT_RADIO_GROUP,\n  MAT_RADIO_DEFAULT_OPTIONS,\n  MatRadioDefaultOptions,\n} from '@angular/material/radio';\nimport {_MatRadioGroupBase, _MatRadioButtonBase} from './internal/radio-base';\n\n/**\n * Provider Expression that allows mat-radio-group to register as a ControlValueAccessor. This\n * allows it to support [(ngModel)] and ngControl.\n * @docs-private\n */\nexport const MAT_LEGACY_RADIO_GROUP_CONTROL_VALUE_ACCESSOR: any = {\n  provide: NG_VALUE_ACCESSOR,\n  useExisting: forwardRef(() => MatLegacyRadioGroup),\n  multi: true,\n};\n\n/**\n * A group of radio buttons. May contain one or more `<mat-radio-button>` elements.\n */\n@Directive({\n  standalone: false,\n  selector: 'mat-radio-group',\n  exportAs: 'matRadioGroup',\n  providers: [\n    MAT_LEGACY_RADIO_GROUP_CONTROL_VALUE_ACCESSOR,\n    {provide: MAT_RADIO_GROUP, useExisting: MatLegacyRadioGroup},\n  ],\n  host: {\n    'role': 'radiogroup',\n    'class': 'mat-radio-group',\n  },\n})\nexport class MatLegacyRadioGroup extends _MatRadioGroupBase<MatLegacyRadioButton> {\n  @ContentChildren(forwardRef(() => MatLegacyRadioButton), {descendants: true})\n  _radios: QueryList<MatLegacyRadioButton>;\n}\n\n/**\n * A Material design radio-button. Typically placed inside of `<mat-radio-group>` elements.\n */\n@Component({\n  standalone: false,\n  selector: 'mat-radio-button',\n  templateUrl: 'radio.html',\n  styleUrls: ['radio.scss'],\n  inputs: ['disableRipple', 'tabIndex'],\n  encapsulation: ViewEncapsulation.None,\n  exportAs: 'matRadioButton',\n  host: {\n    'class': 'mat-radio-button',\n    '[class.mat-radio-checked]': 'checked',\n    '[class.mat-radio-disabled]': 'disabled',\n    '[class._mat-animation-noopable]': '_noopAnimations',\n    '[class.mat-primary]': 'color === \"primary\"',\n    '[class.mat-accent]': 'color === \"accent\"',\n    '[class.mat-warn]': 'color === \"warn\"',\n    // Needs to be removed since it causes some a11y issues (see #21266).\n    '[attr.tabindex]': 'null',\n    '[attr.id]': 'id',\n    '[attr.aria-label]': 'null',\n    '[attr.aria-labelledby]': 'null',\n    '[attr.aria-describedby]': 'null',\n    // Note: under normal conditions focus shouldn't land on this element, however it may be\n    // programmatically set, for example inside of a focus trap, in this case we want to forward\n    // the focus to the native element.\n    '(focus)': '_inputElement.nativeElement.focus()',\n  },\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class MatLegacyRadioButton extends _MatRadioButtonBase {\n  constructor(\n    @Optional() @Inject(MAT_RADIO_GROUP) radioGroup: MatLegacyRadioGroup,\n    elementRef: ElementRef,\n    changeDetector: ChangeDetectorRef,\n    focusMonitor: FocusMonitor,\n    radioDispatcher: UniqueSelectionDispatcher,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n    @Optional()\n    @Inject(MAT_RADIO_DEFAULT_OPTIONS)\n    providerOverride?: MatRadioDefaultOptions,\n    @Attribute('tabindex') tabIndex?: string,\n  ) {\n    super(\n      radioGroup,\n      elementRef,\n      changeDetector,\n      focusMonitor,\n      radioDispatcher,\n      animationMode,\n      providerOverride,\n      tabIndex,\n    );\n  }\n}\n"
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "decision": "The concrete button optionally injects providerOverride using this public token and forwards that object unchanged to the owned base. It does not forward the current extra disabledInteractive option into a new legacy behavior.\n\nThe genuine public options token retains the historical accent default. Current SDKs additionally expose disabledInteractive:false, which is retained in the observation and is not read by the owned radio base. The leaf forwards the injected option object, and the base color getter preserves individual, group, provider and accent precedence. Stable token/value and actual complete-source typing are established without importing the current radio implementation. Independent tag/current/minimum review confirms historical peer aliases and named current roles, including unused base token imports. Full leaf animation resolver transition is recorded; constructor, provider/DI, lifecycle and motion remain unqualified.",
+      "unused_header_binding": false,
+      "reviewer": "Codex primary implementer; individual complete current configuration source/API review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/component-config-caller-prior.json.gz",
+          "sha256": "3c12b3538e4d5d1fc307f1f58f911fce7d2045763c0518b6233fc61d01a6e0f6"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-types-main.json",
+          "sha256": "24057005a19fd9f639feb4ed4a7e4ee107b2ff59630582c3ed905fe9dade6714"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-runtime-main.json",
+          "sha256": "aebc3b7c9b146200d761da5e47eace1047cac0a487c3ed07afda1a1323b1d527"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-owned-main.json",
+          "sha256": "f24684ee15990aa8d5cec972c978a10bb14aca8815b95f123e20ee6d397ef4af"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-sources/ab00bf4f37c343fa516ead009546ea2f5f30745620af80b76ce7d415d3bfed5a.gz",
+          "sha256": "61f8de1428fb2533a2b23e0f839800608e694636243ce59b7b46a40c11eb303d"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-sources/12d8745da0f0ba02e805a2a4347ef6dabfabb3df7939b8d36c5b8f2bbaa88af8.gz",
+          "sha256": "f93969005e8e4dcbaab2a07adb3467cefa0cbb9b9862c37fc26ddf20e7643fdf"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-sources/ce22e2ce1c934f83ed3275539b5d834be2e4ce9aa6635e0cf6e9cc448b177a0f.gz",
+          "sha256": "4310243619279ce0c3348d4cf33b012710863b84ddc87b8aa7767b999a2c01e8"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-subjects.json",
+          "sha256": "abf510bc05ae9609e350aeb776c8c05c890ce790c83916fa8542fb96f378b686"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-decisions.json",
+          "sha256": "5e6bff4ef0937b34ed6450e5bf8b651c9fd64ca0ee964f0bbf1091a6140a4553"
+        },
+        {
+          "path": "scripts/component-config-caller-contracts.mjs",
+          "sha256": "24be3a147f30287364f771f40d3df5b9f2e2f3ba427969cf2c6665bf0b3067d8"
+        },
+        {
+          "path": "scripts/component-config-caller-public-subjects.mjs",
+          "sha256": "510c44e0273d3cbb1ec6e7c308c9fcceff252cb908736233196bbfe187bc2cc1"
+        },
+        {
+          "path": "scripts/component-config-caller-type-evidence.mjs",
+          "sha256": "94fe0caa3fd17923b1ffe376acd7f661a19d43bc6d2e69d2f4edfced3320abc0"
+        },
+        {
+          "path": "scripts/component-config-caller-public-runtime-evidence.mjs",
+          "sha256": "56a8aa1abb8f70419147023ea61c6cb0520244aa1775c968841b903bd13384cb"
+        },
+        {
+          "path": "scripts/component-config-caller-owned-evidence.mjs",
+          "sha256": "0f27648cfdf25b0eb1c5d860968bb4774448e36247d23ae016a0fd9b8fd40944"
+        },
+        {
+          "path": "scripts/component-config-caller-owned-helpers.mjs",
+          "sha256": "74919896a59d8209cfc895ed5495746dbaa7cb1d0a42e7e216ea215a6d9aa1eb"
+        },
+        {
+          "path": "scripts/component-config-caller-reviews.mjs",
+          "sha256": "829de1c3996e95774f0b044610fd6daa5abd47a58019b01966d501c48df56ab2"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/component-config-callers.json",
+          "sha256": "24cb5555d22af0f57332d6c1eb236c6afb30aaaf12dfe884d54009b5c5ee097e"
+        },
+        {
+          "path": "compatibility/rc/material-radio-source-roles-proof-v1.json",
+          "sha256": "49ec91d46a8e99173a9ad4e301a1e3a8631f754bdecfc3f6c4e45b314b3295c7"
+        }
+      ],
+      "scope_limit": "Named source/API role only. Genuine32-symbol tagged/minimum declarations and complete current200-file types support73 contexts. Public SDK snapshots retain all upstream differences. Actual owned/tagged constructors and evaluated provider/factory expressions use explicit node,decorator-metadata and owner/service payload protocols;generated Angular module/factory/template/query execution is not inferred. Tagged/current source oracles are independent and no current owned implementation runs on tagged16 or the other current peer line. No whole-family/HTML/CSS/geometry/focus/scroll timing/motion,CSP,SSR,packed/AOT,full consumer/toolchain/peer floor or G01-G13 pass."
+    },
+    {
+      "file": "legacy-radio/radio.ts",
+      "module": "@angular/material/radio",
+      "symbol": "MatRadioDefaultOptions",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "0b749baf2f25dcacad39803d51f809f2cca02ed4add03c3199513cdf60b9fb15",
+      "current_peer_use": true,
+      "current_module": "@angular/material/radio",
+      "binding": {
+        "local_name": "MatRadioDefaultOptions",
+        "kind": "ImportSpecifier",
+        "line": 31,
+        "text": "import {\n  MAT_RADIO_GROUP,\n  MAT_RADIO_DEFAULT_OPTIONS,\n  MatRadioDefaultOptions,\n} from '@angular/material/radio';"
+      },
+      "occurrences": [
+        {
+          "line": 109,
+          "parent_kind": "TypeReference",
+          "expression": "MatRadioDefaultOptions"
+        }
+      ],
+      "public_reexport": false,
+      "complete_context_members": [
+        {
+          "kind": "SourceFile",
+          "line": 1,
+          "sha256": "dffd3e4daf0d50d915303b2e3d13d26e8c97fb77756ccf8c618e34022f548f1e",
+          "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {FocusMonitor} from '@angular/cdk/a11y';\nimport {UniqueSelectionDispatcher} from '@angular/cdk/collections';\nimport {\n  ANIMATION_MODULE_TYPE,\n  Attribute,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ContentChildren,\n  Directive,\n  ElementRef,\n  forwardRef,\n  Inject,\n  Optional,\n  QueryList,\n  ViewEncapsulation,\n} from '@angular/core';\nimport {NG_VALUE_ACCESSOR} from '@angular/forms';\nimport {\n  MAT_RADIO_GROUP,\n  MAT_RADIO_DEFAULT_OPTIONS,\n  MatRadioDefaultOptions,\n} from '@angular/material/radio';\nimport {_MatRadioGroupBase, _MatRadioButtonBase} from './internal/radio-base';\n\n/**\n * Provider Expression that allows mat-radio-group to register as a ControlValueAccessor. This\n * allows it to support [(ngModel)] and ngControl.\n * @docs-private\n */\nexport const MAT_LEGACY_RADIO_GROUP_CONTROL_VALUE_ACCESSOR: any = {\n  provide: NG_VALUE_ACCESSOR,\n  useExisting: forwardRef(() => MatLegacyRadioGroup),\n  multi: true,\n};\n\n/**\n * A group of radio buttons. May contain one or more `<mat-radio-button>` elements.\n */\n@Directive({\n  standalone: false,\n  selector: 'mat-radio-group',\n  exportAs: 'matRadioGroup',\n  providers: [\n    MAT_LEGACY_RADIO_GROUP_CONTROL_VALUE_ACCESSOR,\n    {provide: MAT_RADIO_GROUP, useExisting: MatLegacyRadioGroup},\n  ],\n  host: {\n    'role': 'radiogroup',\n    'class': 'mat-radio-group',\n  },\n})\nexport class MatLegacyRadioGroup extends _MatRadioGroupBase<MatLegacyRadioButton> {\n  @ContentChildren(forwardRef(() => MatLegacyRadioButton), {descendants: true})\n  _radios: QueryList<MatLegacyRadioButton>;\n}\n\n/**\n * A Material design radio-button. Typically placed inside of `<mat-radio-group>` elements.\n */\n@Component({\n  standalone: false,\n  selector: 'mat-radio-button',\n  templateUrl: 'radio.html',\n  styleUrls: ['radio.scss'],\n  inputs: ['disableRipple', 'tabIndex'],\n  encapsulation: ViewEncapsulation.None,\n  exportAs: 'matRadioButton',\n  host: {\n    'class': 'mat-radio-button',\n    '[class.mat-radio-checked]': 'checked',\n    '[class.mat-radio-disabled]': 'disabled',\n    '[class._mat-animation-noopable]': '_noopAnimations',\n    '[class.mat-primary]': 'color === \"primary\"',\n    '[class.mat-accent]': 'color === \"accent\"',\n    '[class.mat-warn]': 'color === \"warn\"',\n    // Needs to be removed since it causes some a11y issues (see #21266).\n    '[attr.tabindex]': 'null',\n    '[attr.id]': 'id',\n    '[attr.aria-label]': 'null',\n    '[attr.aria-labelledby]': 'null',\n    '[attr.aria-describedby]': 'null',\n    // Note: under normal conditions focus shouldn't land on this element, however it may be\n    // programmatically set, for example inside of a focus trap, in this case we want to forward\n    // the focus to the native element.\n    '(focus)': '_inputElement.nativeElement.focus()',\n  },\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class MatLegacyRadioButton extends _MatRadioButtonBase {\n  constructor(\n    @Optional() @Inject(MAT_RADIO_GROUP) radioGroup: MatLegacyRadioGroup,\n    elementRef: ElementRef,\n    changeDetector: ChangeDetectorRef,\n    focusMonitor: FocusMonitor,\n    radioDispatcher: UniqueSelectionDispatcher,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n    @Optional()\n    @Inject(MAT_RADIO_DEFAULT_OPTIONS)\n    providerOverride?: MatRadioDefaultOptions,\n    @Attribute('tabindex') tabIndex?: string,\n  ) {\n    super(\n      radioGroup,\n      elementRef,\n      changeDetector,\n      focusMonitor,\n      radioDispatcher,\n      animationMode,\n      providerOverride,\n      tabIndex,\n    );\n  }\n}\n"
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "decision": "The optional providerOverride parameter uses this public interface and is passed to the owned constructor without a selected-interface cast. The owned base consumes color according to its existing individual/group/provider fallback order.\n\nThe current unmarked public options interface supports the color field actually consumed by the owned radio getter and returned by its finite accent factory. All current uses compile strictly at the exact minima. The extra current disabledInteractive field is not consumed by this owned implementation. The judgment preserves the named type/configuration boundary; it does not claim that current radio behavior, generated forms providers or a native radio family has been executed. Independent tag/current/minimum review confirms historical peer aliases and named current roles, including unused base token imports. Full leaf animation resolver transition is recorded; constructor, provider/DI, lifecycle and motion remain unqualified.",
+      "unused_header_binding": false,
+      "reviewer": "Codex primary implementer; individual complete current configuration source/API review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/component-config-caller-prior.json.gz",
+          "sha256": "3c12b3538e4d5d1fc307f1f58f911fce7d2045763c0518b6233fc61d01a6e0f6"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-types-main.json",
+          "sha256": "24057005a19fd9f639feb4ed4a7e4ee107b2ff59630582c3ed905fe9dade6714"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-runtime-main.json",
+          "sha256": "aebc3b7c9b146200d761da5e47eace1047cac0a487c3ed07afda1a1323b1d527"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-owned-main.json",
+          "sha256": "f24684ee15990aa8d5cec972c978a10bb14aca8815b95f123e20ee6d397ef4af"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-sources/ab00bf4f37c343fa516ead009546ea2f5f30745620af80b76ce7d415d3bfed5a.gz",
+          "sha256": "61f8de1428fb2533a2b23e0f839800608e694636243ce59b7b46a40c11eb303d"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-sources/12d8745da0f0ba02e805a2a4347ef6dabfabb3df7939b8d36c5b8f2bbaa88af8.gz",
+          "sha256": "f93969005e8e4dcbaab2a07adb3467cefa0cbb9b9862c37fc26ddf20e7643fdf"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-sources/ce22e2ce1c934f83ed3275539b5d834be2e4ce9aa6635e0cf6e9cc448b177a0f.gz",
+          "sha256": "4310243619279ce0c3348d4cf33b012710863b84ddc87b8aa7767b999a2c01e8"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-subjects.json",
+          "sha256": "abf510bc05ae9609e350aeb776c8c05c890ce790c83916fa8542fb96f378b686"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-decisions.json",
+          "sha256": "5e6bff4ef0937b34ed6450e5bf8b651c9fd64ca0ee964f0bbf1091a6140a4553"
+        },
+        {
+          "path": "scripts/component-config-caller-contracts.mjs",
+          "sha256": "24be3a147f30287364f771f40d3df5b9f2e2f3ba427969cf2c6665bf0b3067d8"
+        },
+        {
+          "path": "scripts/component-config-caller-public-subjects.mjs",
+          "sha256": "510c44e0273d3cbb1ec6e7c308c9fcceff252cb908736233196bbfe187bc2cc1"
+        },
+        {
+          "path": "scripts/component-config-caller-type-evidence.mjs",
+          "sha256": "94fe0caa3fd17923b1ffe376acd7f661a19d43bc6d2e69d2f4edfced3320abc0"
+        },
+        {
+          "path": "scripts/component-config-caller-public-runtime-evidence.mjs",
+          "sha256": "56a8aa1abb8f70419147023ea61c6cb0520244aa1775c968841b903bd13384cb"
+        },
+        {
+          "path": "scripts/component-config-caller-owned-evidence.mjs",
+          "sha256": "0f27648cfdf25b0eb1c5d860968bb4774448e36247d23ae016a0fd9b8fd40944"
+        },
+        {
+          "path": "scripts/component-config-caller-owned-helpers.mjs",
+          "sha256": "74919896a59d8209cfc895ed5495746dbaa7cb1d0a42e7e216ea215a6d9aa1eb"
+        },
+        {
+          "path": "scripts/component-config-caller-reviews.mjs",
+          "sha256": "829de1c3996e95774f0b044610fd6daa5abd47a58019b01966d501c48df56ab2"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/component-config-callers.json",
+          "sha256": "24cb5555d22af0f57332d6c1eb236c6afb30aaaf12dfe884d54009b5c5ee097e"
+        },
+        {
+          "path": "compatibility/rc/material-radio-source-roles-proof-v1.json",
+          "sha256": "49ec91d46a8e99173a9ad4e301a1e3a8631f754bdecfc3f6c4e45b314b3295c7"
+        }
+      ],
+      "scope_limit": "Named source/API role only. Genuine32-symbol tagged/minimum declarations and complete current200-file types support73 contexts. Public SDK snapshots retain all upstream differences. Actual owned/tagged constructors and evaluated provider/factory expressions use explicit node,decorator-metadata and owner/service payload protocols;generated Angular module/factory/template/query execution is not inferred. Tagged/current source oracles are independent and no current owned implementation runs on tagged16 or the other current peer line. No whole-family/HTML/CSS/geometry/focus/scroll timing/motion,CSP,SSR,packed/AOT,full consumer/toolchain/peer floor or G01-G13 pass."
+    },
+    {
+      "file": "legacy-radio/internal/radio-base.ts",
+      "module": "@angular/material/radio",
+      "symbol": "MAT_RADIO_GROUP",
+      "candidate_source_sha256": "8cdd88d202dce54dcde31ac0f9bda0f3e73726b8b611cab4fbcf7cbf4375a147",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex finite radio and option source-role reviewer",
+      "decision": "The named public MAT_RADIO_GROUP import remains present but has no checker-bound references in this file; it carries no runtime, DI or behavior credit. The exact prior and current identifier-bound contexts match; the current strict program and public declaration checks pass. The option disabled-signal change and radio public-barrel/documentation changes are limited to the separately recorded source deltas. Prior observations retain their historical scope; no new behavior, security, DI, native, lifecycle, peer-floor, packed or G11 qualification is claimed. Independent tag/current/minimum review confirms historical peer aliases and named current roles, including unused base token imports. Full leaf animation resolver transition is recorded; constructor, provider/DI, lifecycle and motion remain unqualified.",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/radio-boundary-main-28-v3.json",
+        "sha256": "cb471605d8fcd578624cbde36cd308f701c9acb49226b4ea7c7e3fbccb5d3244"
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/frozen-radio-option-role-source-v1.json",
+          "sha256": "c3466165017344c394434c10d414664decbc37e4867362f65a2e2b7abd4573bb"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/radio-boundary-main-28-v3.json",
+          "sha256": "cb471605d8fcd578624cbde36cd308f701c9acb49226b4ea7c7e3fbccb5d3244"
+        },
+        {
+          "path": "compatibility/rc/radio-focus-origin-current-source-proof-v1.json",
+          "sha256": "75b847678b793231aadae8aefd08e0d5b0caacc75b6da624aabc48e7a7880525"
+        },
+        {
+          "path": "compatibility/rc/option-identity-tagged-subject.json",
+          "sha256": "9bca59abfe42d35af3525acdab9ab6b923f47f0e541d566720d3443f644d3a51"
+        },
+        {
+          "path": "compatibility/rc/parent-main-radio-required-integration-review-v1.json",
+          "sha256": "16b734ad6f203d073701a8ea19b12bc4e3178cf8b40fe5df60d02f10d56ce59c"
+        },
+        {
+          "path": "compatibility/rc/parent-main-radio-nullable-aria-review-v1.json",
+          "sha256": "73b7be8e180f65b30b5219876a9b747b0ffc96f93a3dcfb9e09012979b639132"
+        },
+        {
+          "path": "compatibility/rc/parent-main-radio-public-observer-review-v1.json",
+          "sha256": "1105863b090588e8d6f87cc8b6cbe978991dd8aa3655ef5c9a81eb9fdd5bdd47"
+        },
+        {
+          "path": "compatibility/rc/parent-main-radio-boundary-integration-review-v1.json",
+          "sha256": "5563955ea49bb98673b6f9884a364a9f262c8e591cff97329e19d5b3a42ee2da"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/radio-boundary-main-28-v2.json",
+          "sha256": "89178a07384104b91b9504742f05a7f41e843fd9d144a21522f45c927708a319"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-radio/radio.spec.ts",
+          "sha256": "09f3b544934597caa7954eb922aaa7871d5e435786a99f199b50f1662a575bef"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-radio/radio.ts",
+          "sha256": "0b749baf2f25dcacad39803d51f809f2cca02ed4add03c3199513cdf60b9fb15"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-radio/public-api.ts",
+          "sha256": "c261135ebae4b5cf7e38a7a26ad31aa7b8fa43fb3134dcb0b2e2b121b9deeece"
+        },
+        {
+          "path": "README.md",
+          "sha256": "0989f13d06c9442f95399cbaf48dc66be0dcb1caf4e91cc8cf457164a1b35b22"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/required-candidate.json",
+          "sha256": "aba0f8c0f08c78de31e85af283524a3f6e3766a9d4bdb8fcff27e20c3c92cfa8"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/required-negative.json",
+          "sha256": "3d1210ebe98404802c8aaaca7e6c5914f31ed88ed45587705d25350698ee9799"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/aria-candidate.json",
+          "sha256": "05685b9d0ff1a14c74b088f9a8bdcee86bcf500906909f481fcbfcb28266d66e"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/aria-baseline.json",
+          "sha256": "542c318ed445fcef5fd685bebb15ef7fbb794ba4ea7efd476c502fd0de9f38a8"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/observer-candidate.json",
+          "sha256": "d1289492b7495ecbffb3b08ad5b425b60740dd3fa0868a357edd149bb0108e88"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/observer-negative.json",
+          "sha256": "97c149503ce60f0fbe898f970ee208e1f7cbb3a762c4ef16efe939a9e5a38264"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/capsule.json",
+          "sha256": "3d19ac197445f303bd036c60003aed39dbf575072027b284d9213b5bc013ccf4"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/declarations/e5566d2e63f8663a1838f1f956f87b6d818481936ee263bfaaeb929182002102.d.ts.gz",
+          "sha256": "45581da4002a4bf99559e5fcba0e34cec62937106f4627def7a974eba0eef9fa"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/frozen-radio-option-roles-v1.json",
+          "sha256": "1755e41b5419c587035d272b2ea994b08588f0d9deaed98a93cc6e3c74c8961f"
+        },
+        {
+          "path": "compatibility/rc/material-radio-source-roles-proof-v1.json",
+          "sha256": "49ec91d46a8e99173a9ad4e301a1e3a8631f754bdecfc3f6c4e45b314b3295c7"
+        }
+      ]
+    },
+    {
+      "file": "legacy-radio/internal/radio-base.ts",
+      "module": "@angular/material/radio",
+      "symbol": "MAT_RADIO_DEFAULT_OPTIONS",
+      "candidate_source_sha256": "8cdd88d202dce54dcde31ac0f9bda0f3e73726b8b611cab4fbcf7cbf4375a147",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex finite radio and option source-role reviewer",
+      "decision": "The named public MAT_RADIO_DEFAULT_OPTIONS import remains present but has no checker-bound references in this file; it carries no runtime, DI or behavior credit. The exact prior and current identifier-bound contexts match; the current strict program and public declaration checks pass. The option disabled-signal change and radio public-barrel/documentation changes are limited to the separately recorded source deltas. Prior observations retain their historical scope; no new behavior, security, DI, native, lifecycle, peer-floor, packed or G11 qualification is claimed. Independent tag/current/minimum review confirms historical peer aliases and named current roles, including unused base token imports. Full leaf animation resolver transition is recorded; constructor, provider/DI, lifecycle and motion remain unqualified.",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/radio-boundary-main-28-v3.json",
+        "sha256": "cb471605d8fcd578624cbde36cd308f701c9acb49226b4ea7c7e3fbccb5d3244"
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/frozen-radio-option-role-source-v1.json",
+          "sha256": "c3466165017344c394434c10d414664decbc37e4867362f65a2e2b7abd4573bb"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/radio-boundary-main-28-v3.json",
+          "sha256": "cb471605d8fcd578624cbde36cd308f701c9acb49226b4ea7c7e3fbccb5d3244"
+        },
+        {
+          "path": "compatibility/rc/radio-focus-origin-current-source-proof-v1.json",
+          "sha256": "75b847678b793231aadae8aefd08e0d5b0caacc75b6da624aabc48e7a7880525"
+        },
+        {
+          "path": "compatibility/rc/option-identity-tagged-subject.json",
+          "sha256": "9bca59abfe42d35af3525acdab9ab6b923f47f0e541d566720d3443f644d3a51"
+        },
+        {
+          "path": "compatibility/rc/parent-main-radio-required-integration-review-v1.json",
+          "sha256": "16b734ad6f203d073701a8ea19b12bc4e3178cf8b40fe5df60d02f10d56ce59c"
+        },
+        {
+          "path": "compatibility/rc/parent-main-radio-nullable-aria-review-v1.json",
+          "sha256": "73b7be8e180f65b30b5219876a9b747b0ffc96f93a3dcfb9e09012979b639132"
+        },
+        {
+          "path": "compatibility/rc/parent-main-radio-public-observer-review-v1.json",
+          "sha256": "1105863b090588e8d6f87cc8b6cbe978991dd8aa3655ef5c9a81eb9fdd5bdd47"
+        },
+        {
+          "path": "compatibility/rc/parent-main-radio-boundary-integration-review-v1.json",
+          "sha256": "5563955ea49bb98673b6f9884a364a9f262c8e591cff97329e19d5b3a42ee2da"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/radio-boundary-main-28-v2.json",
+          "sha256": "89178a07384104b91b9504742f05a7f41e843fd9d144a21522f45c927708a319"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-radio/radio.spec.ts",
+          "sha256": "09f3b544934597caa7954eb922aaa7871d5e435786a99f199b50f1662a575bef"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-radio/radio.ts",
+          "sha256": "0b749baf2f25dcacad39803d51f809f2cca02ed4add03c3199513cdf60b9fb15"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-radio/public-api.ts",
+          "sha256": "c261135ebae4b5cf7e38a7a26ad31aa7b8fa43fb3134dcb0b2e2b121b9deeece"
+        },
+        {
+          "path": "README.md",
+          "sha256": "0989f13d06c9442f95399cbaf48dc66be0dcb1caf4e91cc8cf457164a1b35b22"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/required-candidate.json",
+          "sha256": "aba0f8c0f08c78de31e85af283524a3f6e3766a9d4bdb8fcff27e20c3c92cfa8"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/required-negative.json",
+          "sha256": "3d1210ebe98404802c8aaaca7e6c5914f31ed88ed45587705d25350698ee9799"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/aria-candidate.json",
+          "sha256": "05685b9d0ff1a14c74b088f9a8bdcee86bcf500906909f481fcbfcb28266d66e"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/aria-baseline.json",
+          "sha256": "542c318ed445fcef5fd685bebb15ef7fbb794ba4ea7efd476c502fd0de9f38a8"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/observer-candidate.json",
+          "sha256": "d1289492b7495ecbffb3b08ad5b425b60740dd3fa0868a357edd149bb0108e88"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/observer-negative.json",
+          "sha256": "97c149503ce60f0fbe898f970ee208e1f7cbb3a762c4ef16efe939a9e5a38264"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/capsule.json",
+          "sha256": "3d19ac197445f303bd036c60003aed39dbf575072027b284d9213b5bc013ccf4"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/declarations/e5566d2e63f8663a1838f1f956f87b6d818481936ee263bfaaeb929182002102.d.ts.gz",
+          "sha256": "45581da4002a4bf99559e5fcba0e34cec62937106f4627def7a974eba0eef9fa"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/frozen-radio-option-roles-v1.json",
+          "sha256": "1755e41b5419c587035d272b2ea994b08588f0d9deaed98a93cc6e3c74c8961f"
+        },
+        {
+          "path": "compatibility/rc/material-radio-source-roles-proof-v1.json",
+          "sha256": "49ec91d46a8e99173a9ad4e301a1e3a8631f754bdecfc3f6c4e45b314b3295c7"
+        }
+      ]
+    },
+    {
+      "file": "legacy-radio/internal/radio-base.ts",
+      "module": "@angular/material/radio",
+      "symbol": "MatRadioDefaultOptions",
+      "candidate_source_sha256": "8cdd88d202dce54dcde31ac0f9bda0f3e73726b8b611cab4fbcf7cbf4375a147",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex finite radio and option source-role reviewer",
+      "decision": "The public MatRadioDefaultOptions interface remains on the defaults factory return and optional constructor parameter. The exact prior and current identifier-bound contexts match; the current strict program and public declaration checks pass. The option disabled-signal change and radio public-barrel/documentation changes are limited to the separately recorded source deltas. Prior observations retain their historical scope; no new behavior, security, DI, native, lifecycle, peer-floor, packed or G11 qualification is claimed. Independent tag/current/minimum review confirms historical peer aliases and named current roles, including unused base token imports. Full leaf animation resolver transition is recorded; constructor, provider/DI, lifecycle and motion remain unqualified.",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/radio-boundary-main-28-v3.json",
+        "sha256": "cb471605d8fcd578624cbde36cd308f701c9acb49226b4ea7c7e3fbccb5d3244"
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/frozen-radio-option-role-source-v1.json",
+          "sha256": "c3466165017344c394434c10d414664decbc37e4867362f65a2e2b7abd4573bb"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/radio-boundary-main-28-v3.json",
+          "sha256": "cb471605d8fcd578624cbde36cd308f701c9acb49226b4ea7c7e3fbccb5d3244"
+        },
+        {
+          "path": "compatibility/rc/radio-focus-origin-current-source-proof-v1.json",
+          "sha256": "75b847678b793231aadae8aefd08e0d5b0caacc75b6da624aabc48e7a7880525"
+        },
+        {
+          "path": "compatibility/rc/option-identity-tagged-subject.json",
+          "sha256": "9bca59abfe42d35af3525acdab9ab6b923f47f0e541d566720d3443f644d3a51"
+        },
+        {
+          "path": "compatibility/rc/parent-main-radio-required-integration-review-v1.json",
+          "sha256": "16b734ad6f203d073701a8ea19b12bc4e3178cf8b40fe5df60d02f10d56ce59c"
+        },
+        {
+          "path": "compatibility/rc/parent-main-radio-nullable-aria-review-v1.json",
+          "sha256": "73b7be8e180f65b30b5219876a9b747b0ffc96f93a3dcfb9e09012979b639132"
+        },
+        {
+          "path": "compatibility/rc/parent-main-radio-public-observer-review-v1.json",
+          "sha256": "1105863b090588e8d6f87cc8b6cbe978991dd8aa3655ef5c9a81eb9fdd5bdd47"
+        },
+        {
+          "path": "compatibility/rc/parent-main-radio-boundary-integration-review-v1.json",
+          "sha256": "5563955ea49bb98673b6f9884a364a9f262c8e591cff97329e19d5b3a42ee2da"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/radio-boundary-main-28-v2.json",
+          "sha256": "89178a07384104b91b9504742f05a7f41e843fd9d144a21522f45c927708a319"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-radio/radio.spec.ts",
+          "sha256": "09f3b544934597caa7954eb922aaa7871d5e435786a99f199b50f1662a575bef"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-radio/radio.ts",
+          "sha256": "0b749baf2f25dcacad39803d51f809f2cca02ed4add03c3199513cdf60b9fb15"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-radio/public-api.ts",
+          "sha256": "c261135ebae4b5cf7e38a7a26ad31aa7b8fa43fb3134dcb0b2e2b121b9deeece"
+        },
+        {
+          "path": "README.md",
+          "sha256": "0989f13d06c9442f95399cbaf48dc66be0dcb1caf4e91cc8cf457164a1b35b22"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/required-candidate.json",
+          "sha256": "aba0f8c0f08c78de31e85af283524a3f6e3766a9d4bdb8fcff27e20c3c92cfa8"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/required-negative.json",
+          "sha256": "3d1210ebe98404802c8aaaca7e6c5914f31ed88ed45587705d25350698ee9799"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/aria-candidate.json",
+          "sha256": "05685b9d0ff1a14c74b088f9a8bdcee86bcf500906909f481fcbfcb28266d66e"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/aria-baseline.json",
+          "sha256": "542c318ed445fcef5fd685bebb15ef7fbb794ba4ea7efd476c502fd0de9f38a8"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/observer-candidate.json",
+          "sha256": "d1289492b7495ecbffb3b08ad5b425b60740dd3fa0868a357edd149bb0108e88"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/observer-negative.json",
+          "sha256": "97c149503ce60f0fbe898f970ee208e1f7cbb3a762c4ef16efe939a9e5a38264"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/capsule.json",
+          "sha256": "3d19ac197445f303bd036c60003aed39dbf575072027b284d9213b5bc013ccf4"
+        },
+        {
+          "path": "compatibility/rc/qualification/radio-boundary-main-28-v3/declarations/e5566d2e63f8663a1838f1f956f87b6d818481936ee263bfaaeb929182002102.d.ts.gz",
+          "sha256": "45581da4002a4bf99559e5fcba0e34cec62937106f4627def7a974eba0eef9fa"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/frozen-radio-option-roles-v1.json",
+          "sha256": "1755e41b5419c587035d272b2ea994b08588f0d9deaed98a93cc6e3c74c8961f"
+        },
+        {
+          "path": "compatibility/rc/material-radio-source-roles-proof-v1.json",
+          "sha256": "49ec91d46a8e99173a9ad4e301a1e3a8631f754bdecfc3f6c4e45b314b3295c7"
+        }
+      ]
+    }
+  ]
+}

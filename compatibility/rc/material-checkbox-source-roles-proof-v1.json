@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "role": "checkbox-two-source-roles",
+  "line": "main",
+  "source_only": true,
+  "head": "105e605b5af64f1226202b6e0c9c08d3757cfe5b",
+  "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+  "tag_members": [
+    {
+      "path": "src/material/legacy-checkbox/public-api.ts",
+      "sha256": "79c3692399c72035380222607f63196d256303560cac810dc4f7667b83805867",
+      "bytes": 2774
+    },
+    {
+      "path": "src/material/legacy-checkbox/checkbox.ts",
+      "sha256": "072551993542bffeacc517777d2144cab604e174b0c38988811a3c94ab45b908",
+      "bytes": 6040
+    }
+  ],
+  "peer": {
+    "version": "22.1.7",
+    "package_sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+    "declaration_sha256": "86ce49e7157ea4d6e4ada91e25e7e5967bb4068a9d718c3b2edcdff40799e554"
+  },
+  "source": {
+    "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.ts",
+    "before_commit": "85dbd48cce",
+    "before_sha256": "774db12b55590d631d0a69c68a9aa7289adf600ac3fe62e288dd22fcf3c86766",
+    "current_sha256": "072e0061972bde4529ba5151444f6ec3f69de326ee9f56941b229fe06366807f",
+    "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-checkbox/checkbox.ts b/projects/ngx-material-legacy/legacy-checkbox/checkbox.ts\nindex fb57b56a0..502712b1c 100644\n--- a/projects/ngx-material-legacy/legacy-checkbox/checkbox.ts\n+++ b/projects/ngx-material-legacy/legacy-checkbox/checkbox.ts\n@@ -7,9 +7,10 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';\n import {\n-  ANIMATION_MODULE_TYPE,\n   AfterViewInit,\n   Attribute,\n   ChangeDetectionStrategy,\n@@ -100,12 +101,12 @@ export class MatLegacyCheckbox\n     private _focusMonitor: FocusMonitor,\n     ngZone: NgZone,\n     @Attribute('tabindex') tabIndex: string,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n     @Optional()\n     @Inject(MAT_CHECKBOX_DEFAULT_OPTIONS)\n     options?: MatCheckboxDefaultOptions,\n   ) {\n-    super('mat-checkbox-', elementRef, changeDetectorRef, ngZone, tabIndex, animationMode, options);\n+    super('mat-checkbox-', elementRef, changeDetectorRef, ngZone, tabIndex, resolveLegacyAnimationMode(animationMode), options);\n   }\n \n   protected _createChangeEvent(isChecked: boolean) {\n"
+  },
+  "judgment": "Historical legacy public API aliases the then-peer default token and options type; historical checkbox injects it. Current leaf retains the peer injection and option forwarding but changes animation mode DI/resolver. Source roles do not establish current constructor, timer, DI or motion behavior.",
+  "holds": [
+    "provider/constructor and timer behavior",
+    "animation resolver and motion",
+    "current/minimum runtime and AOT",
+    "G02 and G11"
+  ]
+}

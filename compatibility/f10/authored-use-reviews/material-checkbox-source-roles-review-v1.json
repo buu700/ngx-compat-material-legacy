@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "reviews": [
+    {
+      "file": "legacy-checkbox/checkbox.ts",
+      "module": "@angular/material/checkbox",
+      "symbol": "MAT_CHECKBOX_DEFAULT_OPTIONS",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "072e0061972bde4529ba5151444f6ec3f69de326ee9f56941b229fe06366807f",
+      "current_peer_use": true,
+      "current_module": "@angular/material/checkbox",
+      "binding": {
+        "local_name": "MAT_CHECKBOX_DEFAULT_OPTIONS",
+        "kind": "ImportSpecifier",
+        "line": 28,
+        "text": "import {\n  MAT_CHECKBOX_DEFAULT_OPTIONS,\n  MatCheckboxDefaultOptions,\n} from '@angular/material/checkbox';"
+      },
+      "occurrences": [
+        {
+          "line": 105,
+          "parent_kind": "CallExpression",
+          "expression": "Inject(MAT_CHECKBOX_DEFAULT_OPTIONS)"
+        }
+      ],
+      "public_reexport": false,
+      "complete_context_members": [
+        {
+          "kind": "SourceFile",
+          "line": 1,
+          "sha256": "774db12b55590d631d0a69c68a9aa7289adf600ac3fe62e288dd22fcf3c86766",
+          "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';\nimport {\n  ANIMATION_MODULE_TYPE,\n  AfterViewInit,\n  Attribute,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  forwardRef,\n  Inject,\n  NgZone,\n  OnDestroy,\n  Optional,\n  ViewEncapsulation,\n} from '@angular/core';\nimport {NG_VALUE_ACCESSOR} from '@angular/forms';\nimport {\n  MAT_CHECKBOX_DEFAULT_OPTIONS,\n  MatCheckboxDefaultOptions,\n} from '@angular/material/checkbox';\nimport {_MatCheckboxBase} from './internal/checkbox-base';\n\n/**\n * Change event object emitted by a checkbox.\n */\nexport class MatLegacyCheckboxChange {\n  /** The source checkbox of the event. */\n  source: MatLegacyCheckbox;\n  /** The new `checked` value of the checkbox. */\n  checked: boolean;\n}\n/**\n * Provider Expression that allows mat-checkbox to register as a ControlValueAccessor.\n * This allows it to support [(ngModel)].\n * @docs-private\n */\nexport const MAT_LEGACY_CHECKBOX_CONTROL_VALUE_ACCESSOR: any = {\n  provide: NG_VALUE_ACCESSOR,\n  useExisting: forwardRef(() => MatLegacyCheckbox),\n  multi: true,\n};\n\n/**\n * A material design checkbox component. Supports all of the functionality of an HTML5 checkbox,\n * and exposes a similar API. A checkbox can be either checked, unchecked, indeterminate, or\n * disabled. Note that all additional accessibility attributes are taken care of by the component,\n * so there is no need to provide them yourself. However, if you want to omit a label and still\n * have the checkbox be accessible, you may supply an [aria-label] input.\n * See: https://material.io/design/components/selection-controls.html\n */\n@Component({\n  standalone: false,\n  selector: 'mat-checkbox',\n  templateUrl: 'checkbox.html',\n  styleUrls: ['checkbox.scss'],\n  exportAs: 'matCheckbox',\n  host: {\n    'class': 'mat-checkbox',\n    '[id]': 'id',\n    '[attr.tabindex]': 'null',\n    '[attr.aria-label]': 'null',\n    '[attr.aria-labelledby]': 'null',\n    '[class.mat-checkbox-indeterminate]': 'indeterminate',\n    '[class.mat-checkbox-checked]': 'checked',\n    '[class.mat-checkbox-disabled]': 'disabled',\n    '[class.mat-checkbox-label-before]': 'labelPosition == \"before\"',\n    '[class._mat-animation-noopable]': `_animationMode === 'NoopAnimations'`,\n  },\n  providers: [MAT_LEGACY_CHECKBOX_CONTROL_VALUE_ACCESSOR],\n  inputs: ['disableRipple', 'color', 'tabIndex'],\n  encapsulation: ViewEncapsulation.None,\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class MatLegacyCheckbox\n  extends _MatCheckboxBase<MatLegacyCheckboxChange>\n  implements AfterViewInit, OnDestroy\n{\n  protected _animationClasses = {\n    uncheckedToChecked: 'mat-checkbox-anim-unchecked-checked',\n    uncheckedToIndeterminate: 'mat-checkbox-anim-unchecked-indeterminate',\n    checkedToUnchecked: 'mat-checkbox-anim-checked-unchecked',\n    checkedToIndeterminate: 'mat-checkbox-anim-checked-indeterminate',\n    indeterminateToChecked: 'mat-checkbox-anim-indeterminate-checked',\n    indeterminateToUnchecked: 'mat-checkbox-anim-indeterminate-unchecked',\n  };\n\n  constructor(\n    elementRef: ElementRef<HTMLElement>,\n    changeDetectorRef: ChangeDetectorRef,\n    private _focusMonitor: FocusMonitor,\n    ngZone: NgZone,\n    @Attribute('tabindex') tabIndex: string,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n    @Optional()\n    @Inject(MAT_CHECKBOX_DEFAULT_OPTIONS)\n    options?: MatCheckboxDefaultOptions,\n  ) {\n    super('mat-checkbox-', elementRef, changeDetectorRef, ngZone, tabIndex, animationMode, options);\n  }\n\n  protected _createChangeEvent(isChecked: boolean) {\n    const event = new MatLegacyCheckboxChange();\n    event.source = this;\n    event.checked = isChecked;\n    return event;\n  }\n\n  protected _getAnimationTargetElement() {\n    return this._elementRef.nativeElement;\n  }\n\n  override ngAfterViewInit() {\n    super.ngAfterViewInit();\n\n    this._focusMonitor.monitor(this._elementRef, true).subscribe(focusOrigin => {\n      if (!focusOrigin) {\n        this._onBlur();\n      }\n    });\n  }\n\n  override ngOnDestroy() {\n    super.ngOnDestroy();\n    this._focusMonitor.stopMonitoring(this._elementRef);\n  }\n\n  /**\n   * Event handler for checkbox input element.\n   * Toggles checked state if element is not disabled.\n   * Do not toggle on (change) event since IE doesn't fire change event when\n   *   indeterminate checkbox is clicked.\n   * @param event\n   */\n  _onInputClick(event: Event) {\n    // We have to stop propagation for click events on the visual hidden input element.\n    // By default, when a user clicks on a label element, a generated click event will be\n    // dispatched on the associated input element. Since we are using a label element as our\n    // root container, the click event on the `checkbox` will be executed twice.\n    // The real click event will bubble up, and the generated click event also tries to bubble up.\n    // This will lead to multiple click events.\n    // Preventing bubbling for the second event will solve that issue.\n    event.stopPropagation();\n    super._handleInputClick();\n  }\n\n  /** Focuses the checkbox. */\n  focus(origin?: FocusOrigin, options?: FocusOptions): void {\n    if (origin) {\n      this._focusMonitor.focusVia(this._inputElement, origin, options);\n    } else {\n      this._inputElement.nativeElement.focus(options);\n    }\n  }\n}\n"
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "decision": "The concrete checkbox optionally injects this public defaults token and forwards options unchanged to the existing owned base alongside the historical id prefix and constructor arguments. It neither constructs nor extends the current checkbox implementation.\n\nThe stable public options token still provides accent and check-indeterminate at both minima. The additional current disabledInteractive:false is recorded and not read by the owned checkbox base. The concrete constructor forwards this token value to its own base, whose fallback and clickAction branches remain owned. Genuine token/default observations and complete-source types support this source role; checkbox input/CVA and animation lifecycle gates remain independent. Independent tag/current/minimum review confirms historical peer alias and current injection/type roles. Full leaf animation resolver transition is recorded; constructor, provider/DI, timer and motion remain unqualified.",
+      "unused_header_binding": false,
+      "reviewer": "Codex primary implementer; individual complete current configuration source/API review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/component-config-caller-prior.json.gz",
+          "sha256": "3c12b3538e4d5d1fc307f1f58f911fce7d2045763c0518b6233fc61d01a6e0f6"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-types-main.json",
+          "sha256": "24057005a19fd9f639feb4ed4a7e4ee107b2ff59630582c3ed905fe9dade6714"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-runtime-main.json",
+          "sha256": "aebc3b7c9b146200d761da5e47eace1047cac0a487c3ed07afda1a1323b1d527"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-owned-main.json",
+          "sha256": "f24684ee15990aa8d5cec972c978a10bb14aca8815b95f123e20ee6d397ef4af"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-sources/ab00bf4f37c343fa516ead009546ea2f5f30745620af80b76ce7d415d3bfed5a.gz",
+          "sha256": "61f8de1428fb2533a2b23e0f839800608e694636243ce59b7b46a40c11eb303d"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-sources/12d8745da0f0ba02e805a2a4347ef6dabfabb3df7939b8d36c5b8f2bbaa88af8.gz",
+          "sha256": "f93969005e8e4dcbaab2a07adb3467cefa0cbb9b9862c37fc26ddf20e7643fdf"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-sources/ce22e2ce1c934f83ed3275539b5d834be2e4ce9aa6635e0cf6e9cc448b177a0f.gz",
+          "sha256": "4310243619279ce0c3348d4cf33b012710863b84ddc87b8aa7767b999a2c01e8"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-subjects.json",
+          "sha256": "abf510bc05ae9609e350aeb776c8c05c890ce790c83916fa8542fb96f378b686"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-decisions.json",
+          "sha256": "5e6bff4ef0937b34ed6450e5bf8b651c9fd64ca0ee964f0bbf1091a6140a4553"
+        },
+        {
+          "path": "scripts/component-config-caller-contracts.mjs",
+          "sha256": "24be3a147f30287364f771f40d3df5b9f2e2f3ba427969cf2c6665bf0b3067d8"
+        },
+        {
+          "path": "scripts/component-config-caller-public-subjects.mjs",
+          "sha256": "510c44e0273d3cbb1ec6e7c308c9fcceff252cb908736233196bbfe187bc2cc1"
+        },
+        {
+          "path": "scripts/component-config-caller-type-evidence.mjs",
+          "sha256": "94fe0caa3fd17923b1ffe376acd7f661a19d43bc6d2e69d2f4edfced3320abc0"
+        },
+        {
+          "path": "scripts/component-config-caller-public-runtime-evidence.mjs",
+          "sha256": "56a8aa1abb8f70419147023ea61c6cb0520244aa1775c968841b903bd13384cb"
+        },
+        {
+          "path": "scripts/component-config-caller-owned-evidence.mjs",
+          "sha256": "0f27648cfdf25b0eb1c5d860968bb4774448e36247d23ae016a0fd9b8fd40944"
+        },
+        {
+          "path": "scripts/component-config-caller-owned-helpers.mjs",
+          "sha256": "74919896a59d8209cfc895ed5495746dbaa7cb1d0a42e7e216ea215a6d9aa1eb"
+        },
+        {
+          "path": "scripts/component-config-caller-reviews.mjs",
+          "sha256": "829de1c3996e95774f0b044610fd6daa5abd47a58019b01966d501c48df56ab2"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/component-config-callers.json",
+          "sha256": "24cb5555d22af0f57332d6c1eb236c6afb30aaaf12dfe884d54009b5c5ee097e"
+        },
+        {
+          "path": "compatibility/rc/material-checkbox-source-roles-proof-v1.json",
+          "sha256": "0cd38a8b4262eb7a560fb47f5b63a33d66234c0e3d5b7084d2a5fd5f9b119f67"
+        }
+      ],
+      "scope_limit": "Named source/API role only. Genuine32-symbol tagged/minimum declarations and complete current200-file types support73 contexts. Public SDK snapshots retain all upstream differences. Actual owned/tagged constructors and evaluated provider/factory expressions use explicit node,decorator-metadata and owner/service payload protocols;generated Angular module/factory/template/query execution is not inferred. Tagged/current source oracles are independent and no current owned implementation runs on tagged16 or the other current peer line. No whole-family/HTML/CSS/geometry/focus/scroll timing/motion,CSP,SSR,packed/AOT,full consumer/toolchain/peer floor or G01-G13 pass."
+    },
+    {
+      "file": "legacy-checkbox/checkbox.ts",
+      "module": "@angular/material/checkbox",
+      "symbol": "MatCheckboxDefaultOptions",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "072e0061972bde4529ba5151444f6ec3f69de326ee9f56941b229fe06366807f",
+      "current_peer_use": true,
+      "current_module": "@angular/material/checkbox",
+      "binding": {
+        "local_name": "MatCheckboxDefaultOptions",
+        "kind": "ImportSpecifier",
+        "line": 29,
+        "text": "import {\n  MAT_CHECKBOX_DEFAULT_OPTIONS,\n  MatCheckboxDefaultOptions,\n} from '@angular/material/checkbox';"
+      },
+      "occurrences": [
+        {
+          "line": 106,
+          "parent_kind": "TypeReference",
+          "expression": "MatCheckboxDefaultOptions"
+        }
+      ],
+      "public_reexport": false,
+      "complete_context_members": [
+        {
+          "kind": "SourceFile",
+          "line": 1,
+          "sha256": "774db12b55590d631d0a69c68a9aa7289adf600ac3fe62e288dd22fcf3c86766",
+          "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';\nimport {\n  ANIMATION_MODULE_TYPE,\n  AfterViewInit,\n  Attribute,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  forwardRef,\n  Inject,\n  NgZone,\n  OnDestroy,\n  Optional,\n  ViewEncapsulation,\n} from '@angular/core';\nimport {NG_VALUE_ACCESSOR} from '@angular/forms';\nimport {\n  MAT_CHECKBOX_DEFAULT_OPTIONS,\n  MatCheckboxDefaultOptions,\n} from '@angular/material/checkbox';\nimport {_MatCheckboxBase} from './internal/checkbox-base';\n\n/**\n * Change event object emitted by a checkbox.\n */\nexport class MatLegacyCheckboxChange {\n  /** The source checkbox of the event. */\n  source: MatLegacyCheckbox;\n  /** The new `checked` value of the checkbox. */\n  checked: boolean;\n}\n/**\n * Provider Expression that allows mat-checkbox to register as a ControlValueAccessor.\n * This allows it to support [(ngModel)].\n * @docs-private\n */\nexport const MAT_LEGACY_CHECKBOX_CONTROL_VALUE_ACCESSOR: any = {\n  provide: NG_VALUE_ACCESSOR,\n  useExisting: forwardRef(() => MatLegacyCheckbox),\n  multi: true,\n};\n\n/**\n * A material design checkbox component. Supports all of the functionality of an HTML5 checkbox,\n * and exposes a similar API. A checkbox can be either checked, unchecked, indeterminate, or\n * disabled. Note that all additional accessibility attributes are taken care of by the component,\n * so there is no need to provide them yourself. However, if you want to omit a label and still\n * have the checkbox be accessible, you may supply an [aria-label] input.\n * See: https://material.io/design/components/selection-controls.html\n */\n@Component({\n  standalone: false,\n  selector: 'mat-checkbox',\n  templateUrl: 'checkbox.html',\n  styleUrls: ['checkbox.scss'],\n  exportAs: 'matCheckbox',\n  host: {\n    'class': 'mat-checkbox',\n    '[id]': 'id',\n    '[attr.tabindex]': 'null',\n    '[attr.aria-label]': 'null',\n    '[attr.aria-labelledby]': 'null',\n    '[class.mat-checkbox-indeterminate]': 'indeterminate',\n    '[class.mat-checkbox-checked]': 'checked',\n    '[class.mat-checkbox-disabled]': 'disabled',\n    '[class.mat-checkbox-label-before]': 'labelPosition == \"before\"',\n    '[class._mat-animation-noopable]': `_animationMode === 'NoopAnimations'`,\n  },\n  providers: [MAT_LEGACY_CHECKBOX_CONTROL_VALUE_ACCESSOR],\n  inputs: ['disableRipple', 'color', 'tabIndex'],\n  encapsulation: ViewEncapsulation.None,\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class MatLegacyCheckbox\n  extends _MatCheckboxBase<MatLegacyCheckboxChange>\n  implements AfterViewInit, OnDestroy\n{\n  protected _animationClasses = {\n    uncheckedToChecked: 'mat-checkbox-anim-unchecked-checked',\n    uncheckedToIndeterminate: 'mat-checkbox-anim-unchecked-indeterminate',\n    checkedToUnchecked: 'mat-checkbox-anim-checked-unchecked',\n    checkedToIndeterminate: 'mat-checkbox-anim-checked-indeterminate',\n    indeterminateToChecked: 'mat-checkbox-anim-indeterminate-checked',\n    indeterminateToUnchecked: 'mat-checkbox-anim-indeterminate-unchecked',\n  };\n\n  constructor(\n    elementRef: ElementRef<HTMLElement>,\n    changeDetectorRef: ChangeDetectorRef,\n    private _focusMonitor: FocusMonitor,\n    ngZone: NgZone,\n    @Attribute('tabindex') tabIndex: string,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n    @Optional()\n    @Inject(MAT_CHECKBOX_DEFAULT_OPTIONS)\n    options?: MatCheckboxDefaultOptions,\n  ) {\n    super('mat-checkbox-', elementRef, changeDetectorRef, ngZone, tabIndex, animationMode, options);\n  }\n\n  protected _createChangeEvent(isChecked: boolean) {\n    const event = new MatLegacyCheckboxChange();\n    event.source = this;\n    event.checked = isChecked;\n    return event;\n  }\n\n  protected _getAnimationTargetElement() {\n    return this._elementRef.nativeElement;\n  }\n\n  override ngAfterViewInit() {\n    super.ngAfterViewInit();\n\n    this._focusMonitor.monitor(this._elementRef, true).subscribe(focusOrigin => {\n      if (!focusOrigin) {\n        this._onBlur();\n      }\n    });\n  }\n\n  override ngOnDestroy() {\n    super.ngOnDestroy();\n    this._focusMonitor.stopMonitoring(this._elementRef);\n  }\n\n  /**\n   * Event handler for checkbox input element.\n   * Toggles checked state if element is not disabled.\n   * Do not toggle on (change) event since IE doesn't fire change event when\n   *   indeterminate checkbox is clicked.\n   * @param event\n   */\n  _onInputClick(event: Event) {\n    // We have to stop propagation for click events on the visual hidden input element.\n    // By default, when a user clicks on a label element, a generated click event will be\n    // dispatched on the associated input element. Since we are using a label element as our\n    // root container, the click event on the `checkbox` will be executed twice.\n    // The real click event will bubble up, and the generated click event also tries to bubble up.\n    // This will lead to multiple click events.\n    // Preventing bubbling for the second event will solve that issue.\n    event.stopPropagation();\n    super._handleInputClick();\n  }\n\n  /** Focuses the checkbox. */\n  focus(origin?: FocusOrigin, options?: FocusOptions): void {\n    if (origin) {\n      this._focusMonitor.focusVia(this._inputElement, origin, options);\n    } else {\n      this._inputElement.nativeElement.focus(options);\n    }\n  }\n}\n"
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "decision": "The constructor options parameter uses the genuine public options type. The own base retains its historical fallback factory and interprets color/clickAction; the current disabledInteractive addition is not consumed here.\n\nThe unmarked public interface retains the color and clickAction fields consumed by the owned implementation. The finite owned defaults factory returns accent/check-indeterminate and the base preserves check, noop and reset-indeterminate branches. Invalid clickAction fixtures are rejected by all three genuine type models; the current extra disabledInteractive default adds no owned read. This type/default boundary does not stand in for complete checkbox click, forms or motion execution. Independent tag/current/minimum review confirms historical peer alias and current injection/type roles. Full leaf animation resolver transition is recorded; constructor, provider/DI, timer and motion remain unqualified.",
+      "unused_header_binding": false,
+      "reviewer": "Codex primary implementer; individual complete current configuration source/API review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/component-config-caller-prior.json.gz",
+          "sha256": "3c12b3538e4d5d1fc307f1f58f911fce7d2045763c0518b6233fc61d01a6e0f6"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-types-main.json",
+          "sha256": "24057005a19fd9f639feb4ed4a7e4ee107b2ff59630582c3ed905fe9dade6714"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-runtime-main.json",
+          "sha256": "aebc3b7c9b146200d761da5e47eace1047cac0a487c3ed07afda1a1323b1d527"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-owned-main.json",
+          "sha256": "f24684ee15990aa8d5cec972c978a10bb14aca8815b95f123e20ee6d397ef4af"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-sources/ab00bf4f37c343fa516ead009546ea2f5f30745620af80b76ce7d415d3bfed5a.gz",
+          "sha256": "61f8de1428fb2533a2b23e0f839800608e694636243ce59b7b46a40c11eb303d"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-sources/12d8745da0f0ba02e805a2a4347ef6dabfabb3df7939b8d36c5b8f2bbaa88af8.gz",
+          "sha256": "f93969005e8e4dcbaab2a07adb3467cefa0cbb9b9862c37fc26ddf20e7643fdf"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-sources/ce22e2ce1c934f83ed3275539b5d834be2e4ce9aa6635e0cf6e9cc448b177a0f.gz",
+          "sha256": "4310243619279ce0c3348d4cf33b012710863b84ddc87b8aa7767b999a2c01e8"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-public-subjects.json",
+          "sha256": "abf510bc05ae9609e350aeb776c8c05c890ce790c83916fa8542fb96f378b686"
+        },
+        {
+          "path": "compatibility/rc/component-config-caller-decisions.json",
+          "sha256": "5e6bff4ef0937b34ed6450e5bf8b651c9fd64ca0ee964f0bbf1091a6140a4553"
+        },
+        {
+          "path": "scripts/component-config-caller-contracts.mjs",
+          "sha256": "24be3a147f30287364f771f40d3df5b9f2e2f3ba427969cf2c6665bf0b3067d8"
+        },
+        {
+          "path": "scripts/component-config-caller-public-subjects.mjs",
+          "sha256": "510c44e0273d3cbb1ec6e7c308c9fcceff252cb908736233196bbfe187bc2cc1"
+        },
+        {
+          "path": "scripts/component-config-caller-type-evidence.mjs",
+          "sha256": "94fe0caa3fd17923b1ffe376acd7f661a19d43bc6d2e69d2f4edfced3320abc0"
+        },
+        {
+          "path": "scripts/component-config-caller-public-runtime-evidence.mjs",
+          "sha256": "56a8aa1abb8f70419147023ea61c6cb0520244aa1775c968841b903bd13384cb"
+        },
+        {
+          "path": "scripts/component-config-caller-owned-evidence.mjs",
+          "sha256": "0f27648cfdf25b0eb1c5d860968bb4774448e36247d23ae016a0fd9b8fd40944"
+        },
+        {
+          "path": "scripts/component-config-caller-owned-helpers.mjs",
+          "sha256": "74919896a59d8209cfc895ed5495746dbaa7cb1d0a42e7e216ea215a6d9aa1eb"
+        },
+        {
+          "path": "scripts/component-config-caller-reviews.mjs",
+          "sha256": "829de1c3996e95774f0b044610fd6daa5abd47a58019b01966d501c48df56ab2"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/component-config-callers.json",
+          "sha256": "24cb5555d22af0f57332d6c1eb236c6afb30aaaf12dfe884d54009b5c5ee097e"
+        },
+        {
+          "path": "compatibility/rc/material-checkbox-source-roles-proof-v1.json",
+          "sha256": "0cd38a8b4262eb7a560fb47f5b63a33d66234c0e3d5b7084d2a5fd5f9b119f67"
+        }
+      ],
+      "scope_limit": "Named source/API role only. Genuine32-symbol tagged/minimum declarations and complete current200-file types support73 contexts. Public SDK snapshots retain all upstream differences. Actual owned/tagged constructors and evaluated provider/factory expressions use explicit node,decorator-metadata and owner/service payload protocols;generated Angular module/factory/template/query execution is not inferred. Tagged/current source oracles are independent and no current owned implementation runs on tagged16 or the other current peer line. No whole-family/HTML/CSS/geometry/focus/scroll timing/motion,CSP,SSR,packed/AOT,full consumer/toolchain/peer floor or G01-G13 pass."
+    }
+  ]
+}

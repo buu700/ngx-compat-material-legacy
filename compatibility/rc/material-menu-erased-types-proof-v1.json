@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "role": "menu-three-erased-public-type-roles",
+  "line": "main",
+  "source_only": true,
+  "head": "105e605b5af64f1226202b6e0c9c08d3757cfe5b",
+  "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+  "tag_members": {
+    "src/material/menu/menu-trigger.ts": {
+      "sha256": "9d63af3639404dcfde6550810de47b624ed6f8930660709214a552cdaf33ee06",
+      "bytes": 23206
+    },
+    "src/material/menu/menu-positions.ts": {
+      "sha256": "6221d7ed66ed1cc8b6f8874a33f949becd481bd55cbc62552d36ee4ac0e952de",
+      "bytes": 299
+    },
+    "src/material/menu/menu.ts": {
+      "sha256": "6331b83ef79611313f58650d4813eb0de44c2710deec830a292674328afc2bef",
+      "bytes": 19315
+    },
+    "src/material/legacy-menu/menu-trigger.ts": {
+      "sha256": "a5dd88054c5c6336acae2aa400dfba72011f510f895372381b9bc1d0773a7186",
+      "bytes": 880
+    },
+    "src/material/menu/public-api.ts": {
+      "sha256": "7e2bbb35b463b49f5bed805e7d65a7cabb5481b25c572430f39867b027e11307",
+      "bytes": 688
+    }
+  },
+  "peer": {
+    "version": "22.1.7",
+    "package_sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+    "declaration_sha256": "42055c30ec251b3a272b68958fd7b877b347ed964f8f7e4236b1e5deaaf4fa1b",
+    "unions": {
+      "MenuPositionX": "'before' | 'after'",
+      "MenuPositionY": "'above' | 'below'",
+      "MenuCloseReason": "void | 'click' | 'keydown' | 'tab'"
+    }
+  },
+  "source": {
+    "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+    "sha256": "5f9b5fbe09d5bdc50bcb937e458ffb83bd49dddca1b0c0c64fadb5d267cfe6a3",
+    "references": {
+      "MenuCloseReason": [
+        "TypeReference: MenuCloseReason",
+        "TypeReference: MenuCloseReason",
+        "TypeReference: MenuCloseReason"
+      ],
+      "MenuPositionX": [
+        "TypeReference: MenuPositionX"
+      ],
+      "MenuPositionY": [
+        "TypeReference: MenuPositionY"
+      ]
+    }
+  },
+  "spec_transition": {
+    "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+    "before_commit": "ad1630024f",
+    "before_sha256": "1f6c9025f1b04dc994e5e77247399546a2464c2281a01a46adeb50c828322321",
+    "after_sha256": "1618f102fbd28b4d8c8eeb1b2d71e10e409f2ad103ebf8082e2b0d27517d6d65",
+    "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-menu/menu.spec.ts b/projects/ngx-material-legacy/legacy-menu/menu.spec.ts\nindex 02ea2dead..dc2a79a31 100644\n--- a/projects/ngx-material-legacy/legacy-menu/menu.spec.ts\n+++ b/projects/ngx-material-legacy/legacy-menu/menu.spec.ts\n@@ -1,3 +1,4 @@\n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n import {FocusMonitor} from '@angular/cdk/a11y';\n import {Direction, Directionality} from '@angular/cdk/bidi';\n import {\n@@ -24,7 +25,6 @@ import {\n   patchElementFocus,\n } from '../internal/testing/owned-test-events';\n import {\n-  ANIMATION_MODULE_TYPE,\n   ChangeDetectionStrategy,\n   Component,\n   Directive,\n@@ -2112,7 +2112,7 @@ describe('MatMenu', () => {\n       {\n         name: 'enabled animations',\n         providers: [\n-          {provide: ANIMATION_MODULE_TYPE, useValue: 'BrowserAnimations'},\n+          {provide: LEGACY_ANIMATION_MODE, useValue: 'BrowserAnimations'},\n           {provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'},\n         ],\n         noop: false,\n@@ -2120,20 +2120,20 @@ describe('MatMenu', () => {\n       {\n         name: 'disabled Material animations',\n         providers: [\n-          {provide: ANIMATION_MODULE_TYPE, useValue: 'BrowserAnimations'},\n+          {provide: LEGACY_ANIMATION_MODE, useValue: 'BrowserAnimations'},\n           {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},\n         ],\n         noop: true,\n       },\n       {\n         name: 'Noop animations',\n-        providers: [{provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations'}],\n+        providers: [{provide: LEGACY_ANIMATION_MODE, useValue: 'NoopAnimations'}],\n         noop: true,\n       },\n       {\n         name: 'reduced motion',\n         providers: [\n-          {provide: ANIMATION_MODULE_TYPE, useValue: 'BrowserAnimations'},\n+          {provide: LEGACY_ANIMATION_MODE, useValue: 'BrowserAnimations'},\n           {provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'reduced-motion'},\n         ],\n         noop: true,\n@@ -2177,7 +2177,7 @@ describe('MatMenu', () => {\n \n   it('keeps peer backdrop defaults for a custom menu panel', fakeAsync(() => {\n     const fixture = createComponent(CustomMenu, [\n-      {provide: ANIMATION_MODULE_TYPE, useValue: 'BrowserAnimations'},\n+      {provide: LEGACY_ANIMATION_MODE, useValue: 'BrowserAnimations'},\n       {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},\n     ], [CustomMenuPanel]);\n     fixture.detectChanges();\n",
+    "judgment": "Fixture switches animation mode token in setup and custom-panel test. This does not change the erased type imports or union values. This review does not reuse motion or DI execution as present runtime evidence."
+  },
+  "judgment": "Material 16 legacy trigger extended the then-peer base, whose source uses these historical type unions. Current owned source uses the installed peer exports as types only; literal union declarations match the tag. No runtime trigger, overlay, DI or animation equivalence follows.",
+  "holds": [
+    "current/minimum runtime behavior",
+    "overlay, focus and menu lifecycle",
+    "DI and motion",
+    "G02 and G11"
+  ]
+}

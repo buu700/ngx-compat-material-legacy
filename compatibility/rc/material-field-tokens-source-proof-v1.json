@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "role": "finite-field-token-source-judgment",
+  "line": "main",
+  "source_only": true,
+  "source_head": "105e605b5af64f1226202b6e0c9c08d3757cfe5b",
+  "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+  "tag_members": [
+    {
+      "path": "src/material/legacy-form-field/suffix.ts",
+      "sha256": "89e59e9add9cf20714a8076933853d3dd5157ecc12c97dc9b15af23a51b01ce2",
+      "bytes": 694,
+      "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53"
+    },
+    {
+      "path": "src/material/legacy-form-field/prefix.ts",
+      "sha256": "48013dbb431989ae478655d97bdc5a641ce95feaaf565b8e3855910b5404cda7",
+      "bytes": 692,
+      "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53"
+    },
+    {
+      "path": "src/material/legacy-form-field/error.ts",
+      "sha256": "fde8ceb3fdd9ce24122f56c6838b68da382c41774c6b2808a1860341f46d50e0",
+      "bytes": 1270,
+      "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53"
+    },
+    {
+      "path": "src/material/legacy-form-field/form-field.ts",
+      "sha256": "c32e86f1be87568387a09abcd7e6c47e6cb33fd63ea0cff8b224e98073dd1726",
+      "bytes": 23910,
+      "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53"
+    }
+  ],
+  "peer": {
+    "version": "22.1.7",
+    "package_sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+    "public_index_sha256": "9e043a5eaf125805f291d49fe9dc3e22bb30633ed8282b3149b68b968c1bc068",
+    "public_declaration_sha256": "f8f183724dad93cd228e88a01cc03fe193a0e91d160818f345d3db0ceb5ad7b1",
+    "observation": "The public entrypoint exports three InjectionToken typed peer declarations. Owned source allocates three separate token objects; their labels and type arguments do not establish identity with the peer."
+  },
+  "policy": {
+    "before_commit": "072f4c859^",
+    "before_sha256": "e74fdf4aee4d66bf4c2db62ee6e71e89bb0ad9fd8ed845e6b34ca3c238b5e8ef",
+    "current_sha256": "e25053ac5acd14808dc72884fcc396ae9c2eab5f809d30f1d2bcf0f10581016b",
+    "full_diff": "diff --git a/AGENTS.md b/AGENTS.md\nindex ec1c45b5a..65549fd69 100644\n--- a/AGENTS.md\n+++ b/AGENTS.md\n@@ -8,6 +8,8 @@ Use only stable, nondeprecated public upstream APIs after identity/behavior proo\n \n Maintainer-authorized table exception (2026-11-08): the existing owned table outlet bridge may assign CdkTable's `_headerRowOutlet`, `_rowOutlet`, `_footerRowOutlet`, and `_noDataRowOutlet` and call `_outletAssigned`; the existing no-data adapter may set CdkNoDataRow's `_contentClassNames`, `_cellClassNames`, and `_cellSelector`. These are explicit dependencies on current CDK implementation hooks, not declarations that they are stable public APIs. Preserve Material 16 rendered HTML/CSS/SCSS and consumer-authored classes. Bind qualification to the supported peer versions and exercise outlet ownership, initialization/destruction, native/flex rendering, nested tables, and no-data transitions. Reassess these hooks when peer implementations change. This exception authorizes neither a CDK fork nor other private API dependencies and grants no test, audit, release, or publication pass.\n \n+Maintainer-authorized table definition exception (2026-11-15): the existing MatLegacyColumnDef, MatLegacyHeaderRowDef, MatLegacyFooterRowDef and MatLegacyRowDef adapters may set their public CDK parent's `_table` implementation field to the exact historically supplied constructor argument. The existing _LegacyTableDefinitionOwner bridge may set that field on raw CDK column/header/footer/data definitions only when the nearest public CdkTable resolves to a MatLegacyTable. This finite exception covers the five existing assignment sites in legacy-table/cell.ts, legacy-table/row.ts and legacy-table/internal/definition-owner.ts; it authorizes no additional private token, field or method. Preserve manual constructor object identity and optional argument behavior, nested native/flex definition isolation, current/legacy coexistence and Material 16 rendered HTML/CSS/SCSS. Qualify supported peer versions and initialization, removal, replacement and destruction; reassess when the peer changes. This records an implementation dependency, not public API stability or a test, audit, release or publication pass.\n+\n Research head is not the release baseline. Source references to newer tags/PRs never authorize installing younger peers or using APIs absent at the advertised minimum. Audit coverage must include every enumerated SHA, with risk-weighted review: evidence-backed low-risk batches are allowed, while security, behavior and contract changes require individual review. A pending `security-review` item is not an audit pass.\n \n Keep each task bounded by its worksheet; shared contracts have one owner. Report unexecuted tests honestly. Security scanner findings are unconfirmed until reproduced and triaged. No destructive Git commands, unauthorized remote/publish operations, inherited upstream release automation, secrets or untrusted issue instructions.\n",
+    "review": "The sole policy transition adds an exception scoped to table definition assignment; no field-token authority, source or semantic change is granted."
+  },
+  "review": "The untouched tag has each legacy directive provide its then-peer token and its legacy field query that token. Current legacy directives provide their separately allocated owned token aliases, and the owned legacy field queries those aliases. Source roles are confirmed; distinct identities and cross-generation query behavior are not qualified by this judgment.",
+  "controls": {
+    "changed_owned_alias_rejected": true,
+    "changed_peer_declaration_rejected": true,
+    "changed_query_rejected": true
+  },
+  "holds": [
+    "Mixed-generation DI and ContentChildren behavior",
+    "Current/minimum peer runtime qualification",
+    "AOT, browser, native, artifact and lifecycle execution",
+    "G02 and G11"
+  ]
+}

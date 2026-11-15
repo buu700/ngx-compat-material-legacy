@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "role": "divider-datepicker-five-source-roles",
+  "line": "main",
+  "source_only": true,
+  "head": "105e605b5af64f1226202b6e0c9c08d3757cfe5b",
+  "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+  "tag_members": [
+    {
+      "path": "src/material/legacy-list/list-module.ts",
+      "sha256": "88d14bb5c88f7bbec8f6e85d05d9a056c381a65a8c82189d47755d63f0261b1c",
+      "bytes": 1678
+    },
+    {
+      "path": "src/material/legacy-list/testing/list-harness-base.ts",
+      "sha256": "cf73bce3906a2ceac8a2e725b67f1323d608107b6d46a37c18fbf33e58b3f1be",
+      "bytes": 7297
+    },
+    {
+      "path": "src/material/legacy-form-field/testing/form-field-harness.ts",
+      "sha256": "1a0cd88999418731b78f4793d14db01538f9274daf2fa41260c1479463cccb8c",
+      "bytes": 4572
+    }
+  ],
+  "peer": {
+    "version": "22.1.7",
+    "package_sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+    "declarations": [
+      {
+        "path": "divider.d.ts",
+        "sha256": "defbb557528db59de45c1e5c90fa47e5de5e6b04aab3b478ee88cb45076a6165"
+      },
+      {
+        "path": "divider-testing.d.ts",
+        "sha256": "a36792709fa8bf35630bdea8a58c311e11a849bed065744054d46f6f04102fd5"
+      },
+      {
+        "path": "datepicker-testing.d.ts",
+        "sha256": "5869d85346e91bb92734f02e78ae3a8ba4a8525b59b9f6a73290eec166f24c5e"
+      },
+      {
+        "path": "_date-range-input-harness-chunk.d.ts",
+        "sha256": "60dec28c236caa9e804314f9a5a84710794e030468888ba35faa9dd9429944a7"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+      "sha256": "572b01d580e4a9c12c72278bbe11d111faafbd6a5534c1fafec0cd77a9ab5208"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/testing/list-harness-base.ts",
+      "sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/testing/form-field-harness.ts",
+      "sha256": "cf3c8465eb017702809eaa5fa33af7636dd81f395912fb2fe3f64fcaddad2cb9"
+    }
+  ],
+  "evidence_transitions": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/input.ts",
+      "before_commit": "6b88db228feff1f1598b50fbc00bc17e45d6c899",
+      "before_sha256": "aaa55d58b06ef58c6dfca26053854696526e3529e7ed15ba3ef382ec323e8532",
+      "current_sha256": "73732c15c8e968f6e13138cc3b045114035cce5ef13f2eabded100f267c02dd7",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-input/input.ts b/projects/ngx-material-legacy/legacy-input/input.ts\nindex 53f1b65dd..54fb9430e 100644\n--- a/projects/ngx-material-legacy/legacy-input/input.ts\n+++ b/projects/ngx-material-legacy/legacy-input/input.ts\n@@ -52,6 +52,7 @@ import {\n export class MatLegacyInput extends BaseMatInput {\n   private _legacyFormField = inject<MatLegacyFormField>(MAT_LEGACY_FORM_FIELD, {optional: true});\n   private readonly _legacyElement = inject<ElementRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>>(ElementRef);\n+  private _legacyPlaceholderChecked = false;\n   /** @docs-private Host binding preserves the consumer-supplied aria-disabled value. */\n   protected _legacyAriaDisabled: string | null = null;\n \n@@ -59,6 +60,14 @@ export class MatLegacyInput extends BaseMatInput {\n     // The frozen legacy control has always been natively disabled.\n     this.disabledInteractive = false;\n     super.ngDoCheck();\n+    // The peer initializes its placeholder cache to null. The historical peer's\n+    // first check also removed an authored placeholder promoted to a label.\n+    if (!this._legacyPlaceholderChecked) {\n+      this._legacyPlaceholderChecked = true;\n+      if (this._legacyFormField?.appearance === 'legacy' && !this._legacyFormField._hasLabel?.()) {\n+        this._legacyElement.nativeElement.removeAttribute('placeholder');\n+      }\n+    }\n     this._legacyAriaDisabled = this._legacyElement.nativeElement.getAttribute('aria-disabled');\n   }\n \n"
+    },
+    {
+      "path": "compatibility/rc/api/export-name-allowlist.json",
+      "before_commit": "fdcdadee28c4552e3500b5099de9f42e456adb5c",
+      "before_sha256": "abec8f2e624ba5ce54d24746821755c9b9fb8d7af5cafc6012e159ed08935967",
+      "current_sha256": "a3d65f337510311015da2b121dd876a938c2ea243002fc70d03c2308cd19c7ad",
+      "full_diff": "diff --git a/compatibility/rc/api/export-name-allowlist.json b/compatibility/rc/api/export-name-allowlist.json\nindex 3fa791d84..e6a14c12b 100644\n--- a/compatibility/rc/api/export-name-allowlist.json\n+++ b/compatibility/rc/api/export-name-allowlist.json\n@@ -124,6 +124,22 @@\n         \"legacy-chips/testing\"\n       ]\n     },\n+    {\n+      \"name\": \"LEGACY_ANIMATION_MODE\",\n+      \"category\": \"engine-free-motion\",\n+      \"reason\": \"Owned legacy-only motion policy token; distinct from public MATERIAL_ANIMATIONS and absent from the Material 16 legacy barrel.\",\n+      \"entries\": [\n+        \"legacy-core/primary\"\n+      ]\n+    },\n+    {\n+      \"name\": \"resolveLegacyAnimationMode\",\n+      \"category\": \"engine-free-motion\",\n+      \"reason\": \"Owned constructor-mode resolver shared by separate legacy entry points; preserves explicit manual mode strings while combining the ambient policy.\",\n+      \"entries\": [\n+        \"legacy-core/primary\"\n+      ]\n+    },\n     {\n       \"name\": \"LEGACY_ANIMATIONS_TEST_OVERRIDE\",\n       \"category\": \"engine-free-motion\",\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+      "before_commit": "8a8187a13369b67de9090e74d3134f923a7b16e8",
+      "before_sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+      "current_sha256": "97a730e6ecbc37b34e526cd202162049b4c2639a8f7c0dc4f3250d028f7e7b8b",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts b/projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts\nindex 6bbea620d..474024a0c 100644\n--- a/projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts\n+++ b/projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts\n@@ -7,24 +7,29 @@\n  * found in the LICENSE file at https://angular.io/license\n  *\n  * Owned legacy motion helper. Reads the public MATERIAL_ANIMATIONS token and\n- * public ANIMATION_MODULE_TYPE. Does not call private Material helpers\n+ * an owned legacy mode token. Does not call private Material helpers\n  * (_getAnimationsState / _animationsDisabled).\n  */\n \n import {MediaMatcher} from '@angular/cdk/layout';\n-import {ANIMATION_MODULE_TYPE, InjectionToken, assertInInjectionContext, inject} from '@angular/core';\n+import {InjectionToken, assertInInjectionContext, inject} from '@angular/core';\n import {MATERIAL_ANIMATIONS} from '@angular/material/core';\n \n /** Public re-export for consumers/docs that prefer the legacy-core entry. */\n export {MATERIAL_ANIMATIONS};\n \n+/** Legacy-only animation policy. It is distinct from Material's token. */\n+export const LEGACY_ANIMATION_MODE = new InjectionToken<'NoopAnimations' | 'BrowserAnimations'>(\n+  'LEGACY_ANIMATION_MODE',\n+);\n+\n /** Owned state labels for lifecycle/tests (mirrors Material public semantics). */\n export type LegacyAnimationsState = 'enabled' | 'di-disabled' | 'reduced-motion';\n \n /**\n  * Optional override token for unit tests that cannot construct Material's\n  * MATERIAL_ANIMATIONS provider graph. Production code should prefer\n- * MATERIAL_ANIMATIONS / ANIMATION_MODULE_TYPE.\n+ * MATERIAL_ANIMATIONS / LEGACY_ANIMATION_MODE.\n  */\n export const LEGACY_ANIMATIONS_TEST_OVERRIDE = new InjectionToken<LegacyAnimationsState | null>(\n   'LEGACY_ANIMATIONS_TEST_OVERRIDE',\n@@ -45,7 +50,7 @@ export function getLegacyAnimationsState(): LegacyAnimationsState {\n     return 'di-disabled';\n   }\n \n-  if (inject(ANIMATION_MODULE_TYPE, {optional: true}) === 'NoopAnimations') {\n+  if (inject(LEGACY_ANIMATION_MODE, {optional: true}) === 'NoopAnimations') {\n     return 'di-disabled';\n   }\n \n@@ -72,6 +77,11 @@ export function legacyAnimationsDisabled(): boolean {\n   return getLegacyAnimationsState() !== 'enabled';\n }\n \n+/** Preserve explicit historical constructor modes while applying ambient policy. */\n+export function resolveLegacyAnimationMode<T extends string | null | undefined>(mode: T): T | 'NoopAnimations' {\n+  return mode === 'NoopAnimations' || legacyAnimationsDisabled() ? 'NoopAnimations' : mode;\n+}\n+\n /** Zero-duration params used when dialog (and similar) should noop motion. */\n export const LEGACY_ZERO_ANIMATION_PARAMS = {\n   enterAnimationDuration: '0ms',\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.ts",
+      "before_commit": "0c13be12266af3f72960fc220e56ad95a0bfd7fd",
+      "before_sha256": "7c6cbffc3f95b6f30b0f599f781d2fcb882b75c308f5cadbffa8107a9fd20758",
+      "current_sha256": "4f6b201964ddbc12dd4f8ac4cf56125884d6711bdb4e6a44831c5c0cb1db16c2",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.ts b/projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.ts\nindex ce27255a0..29f2f54d0 100644\n--- a/projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.ts\n+++ b/projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.ts\n@@ -9,13 +9,14 @@\n  * Owned legacy pseudo-checkbox (S22). Current MatPseudoCheckbox is @docs-private (S20).\n  */\n \n+import {LEGACY_ANIMATION_MODE} from '../internal/legacy-animations';\n+\n import {\n   ChangeDetectionStrategy,\n   Component,\n   Input,\n   ViewEncapsulation,\n-  booleanAttribute,\n-  ANIMATION_MODULE_TYPE,\n+\n   Inject,\n   Optional,\n   assertInInjectionContext,\n@@ -51,7 +52,7 @@ export class MatLegacyPseudoCheckbox {\n   @Input() state: MatLegacyPseudoCheckboxState = 'unchecked';\n \n   /** Whether the checkbox is disabled. */\n-  @Input({transform: booleanAttribute}) disabled: boolean = false;\n+  @Input() disabled: boolean = false;\n \n   /**\n    * Appearance of the pseudo checkbox. Default appearance of 'full' renders a checkmark/mixedmark\n@@ -61,7 +62,7 @@ export class MatLegacyPseudoCheckbox {\n \n   private _diAnimationsDisabled = false;\n \n-  constructor(@Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string) {\n+  constructor(@Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string) {\n     // Historical callers can construct this decorative control outside Angular.\n     let inContext = true;\n     try {\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "before_commit": "fdcdadee28c4552e3500b5099de9f42e456adb5c",
+      "before_sha256": "3d56b9e01f502995bd25dea21be8bee5713596655f5d159899858b58b4ffccf2",
+      "current_sha256": "f78b50ea144140825dc7bcb175b533ddce2f33925ff24c929bdd31dcf339f5bd",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-core/public-api.ts b/projects/ngx-material-legacy/legacy-core/public-api.ts\nindex 6769ca58e..fb59d0d3d 100644\n--- a/projects/ngx-material-legacy/legacy-core/public-api.ts\n+++ b/projects/ngx-material-legacy/legacy-core/public-api.ts\n@@ -11,6 +11,8 @@ export {MatCommonModule as MatLegacyCommonModule} from './internal/common-module\n \n export {\n   MATERIAL_ANIMATIONS,\n+  LEGACY_ANIMATION_MODE,\n+  resolveLegacyAnimationMode,\n   LEGACY_ANIMATIONS_TEST_OVERRIDE,\n   LEGACY_ZERO_ANIMATION_PARAMS,\n   getLegacyAnimationsState,\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "before_commit": "7e9ecb0a8fe31d44c1f37b8a509fc58c6ab705ad",
+      "before_sha256": "e645f8b92ccb57518eb9fac6ab3a20c35db6bd9f19a301fcb659ffe58911cfb6",
+      "current_sha256": "e0fe0631a6adde57f515b82b43156d5da0ab0c2730872df5b792fc27dab14931",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-form-field/form-field.ts b/projects/ngx-material-legacy/legacy-form-field/form-field.ts\nindex aff83b932..ed01890da 100644\n--- a/projects/ngx-material-legacy/legacy-form-field/form-field.ts\n+++ b/projects/ngx-material-legacy/legacy-form-field/form-field.ts\n@@ -7,6 +7,8 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {Directionality} from '@angular/cdk/bidi';\n import {coerceBooleanProperty} from '@angular/cdk/coercion';\n type BooleanInput = string | boolean | null | undefined;\n@@ -47,7 +49,7 @@ import {Platform} from '@angular/cdk/platform';\n import {afterFormFieldRender} from './internal/after-form-field-render';\n import {nextLegacyHintId} from './internal/hint-id';\n import {AbstractControlDirective, ValidatorFn} from '@angular/forms';\n-import {ANIMATION_MODULE_TYPE} from '@angular/core';\n+\n import {MatFormFieldControl} from '@angular/material/form-field';\n import {\n   MAT_LEGACY_ERROR as MAT_ERROR,\n@@ -317,7 +319,7 @@ export class MatLegacyFormField\n     private _defaults: MatLegacyFormFieldDefaultOptions,\n     private _platform: Platform,\n     private _ngZone: NgZone,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) _animationMode: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) _animationMode: string,\n     private _injector?: Injector,\n   ) {\n     super(elementRef);\n"
+    }
+  ],
+  "judgment": "Tagged legacy files used the named divider module, divider harness and datepicker harnesses. Current unchanged source keeps those public peer import/locator/filter roles; minimum declarations expose those named classes and protocols. Six changed cross-component files are recorded in full. No harness execution, rendered behavior, changed motion/placeholder behavior or peer-floor test is established.",
+  "holds": [
+    "divider module rendering",
+    "datepicker/divider harness behavior and identity",
+    "cross-component motion and placeholder transitions",
+    "G02 and G11"
+  ]
+}
