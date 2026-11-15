@@ -34,9 +34,11 @@ class FrameworkEnumCurrentReview(unittest.TestCase):
             self.assertTrue(all(row['rejected'] for row in report['mutations']))
 
     def test_source_admission_and_transitions(self):
-        report = self.run_probe('tests/framework_enum_f0_admission_probe.mjs')
+        report = self.run_probe('tests/framework_enum_f0_historical_f9_admission_probe.mjs')
         self.assertEqual(report['selected'], 24)
         self.assertEqual(report['transitions'], 12)
+        self.assertTrue(report['historical_subject'])
+        self.assertEqual(report['live_reviewed'], 24)
         self.assertTrue(report['source_only_result'])
         self.assertTrue(report['semantic_review_required'])
 

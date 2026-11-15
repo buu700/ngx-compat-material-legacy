@@ -19,15 +19,24 @@ class PropertyDecoratorCurrentReview(unittest.TestCase):
         return json.loads(result.stdout.strip().splitlines()[-1])
 
     def test_full_current_metadata_census(self):
-        report = self.run_probe('tests/property_decorator_current_5628_probe.mjs')
+        report = self.run_probe('tests/property_decorator_current_f9_probe.mjs')
         self.assertEqual((report['frozen_uses'], report['current_uses'],
                           report['current_delta_uses'], report['references']), (99, 104, 5, 324))
-        self.assertEqual(report['mutations'], 25)
+        self.assertEqual(report['mutations'], 26)
         self.assertFalse(report['native_executed'])
 
+    def test_original_and_packed_plain_disabled_input(self):
+        report = self.run_probe('tests/pseudo_checkbox_plain_input_f9_probe.mjs')
+        self.assertEqual(len(report['mutants']), 4)
+        self.assertEqual(report['original_source_sha256'],
+                         'a9c76e44bd88bf920b5fd77f309e3a841995193c8f2d5fead49b35e33a40ee37')
+
     def test_source_admission_and_transitions(self):
-        report = self.run_probe('tests/property_decorator_current_5628_admission_probe.mjs')
-        self.assertEqual((report['selected'], report['transitions']), (19, 14))
+        report = self.run_probe('tests/property_decorator_f9_admission_probe.mjs')
+        self.assertEqual((report['selected'], report['transitions']), (4, 14))
+        self.assertEqual(report['historical_reviewed'], 19)
+        self.assertEqual(report['live_reviewed'], 19)
+        self.assertTrue(report['independent_change_accepted'])
         self.assertTrue(report['source_only_result'])
         self.assertTrue(report['semantic_review_required'])
 
