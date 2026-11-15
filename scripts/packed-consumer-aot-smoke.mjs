@@ -997,7 +997,7 @@ import {observePackedNativeDateManual,observePackedNativeDateProviders} from './
 import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from './native-date-contract.mjs';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
 import {MatTabContent,MatTabLabel} from '@angular/material/tabs';
-import {_LegacyViewport} from '@ngx-compat/material-legacy/legacy-core';
+import {_LegacyViewport,LEGACY_ANIMATION_MODE,LEGACY_ANIMATIONS_TEST_OVERRIDE} from '@ngx-compat/material-legacy/legacy-core';
 import {CdkPortal,ComponentPortal} from '@angular/cdk/portal';
 import {BreakpointObserver, BreakpointState} from '@angular/cdk/layout';
 import {AriaDescriber, FocusMonitor, HighContrastMode, HighContrastModeDetector} from '@angular/cdk/a11y';
@@ -2057,7 +2057,7 @@ async function main() {
   try {
     checkboxProbeInstance=checkboxProbeInjector.get(CHECKBOX_NODE_FACTORY_PROBE);
     const emitterBaseline=checkboxProbeInjector.get(CHECKBOX_EMITTER_BASELINE);
-    const expected=[FocusMonitor,NgZone,ANIMATION_MODULE_TYPE,MAT_LEGACY_CHECKBOX_DEFAULT_OPTIONS];
+    const expected=[FocusMonitor,NgZone,LEGACY_ANIMATION_MODE,MAT_LEGACY_CHECKBOX_DEFAULT_OPTIONS,LEGACY_ANIMATIONS_TEST_OVERRIDE,MATERIAL_ANIMATIONS];
     const directRequests=nodeRequests.slice(0,expected.length),bodyRequests=nodeRequests.slice(expected.length);
     checkboxNodeFactoryContext=checkboxProbeInstance instanceof MatLegacyCheckbox&&checkboxProbeInstance.tabIndex===7
       &&emitterBaseline.length===2&&emitterBaseline.every(emitter=>emitter instanceof EventEmitter)

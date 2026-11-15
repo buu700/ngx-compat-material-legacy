@@ -476,11 +476,17 @@ try {
       background_color:style?.backgroundColor??null,state_layer_color:token('state-layer-color'),
       hover_token:token('hover-state-layer-opacity'),focus_token:token('focus-state-layer-opacity')};
   })()`);
+  const hoverTargetPoint = (id, selector) => evaluate(`(() => {
+    const target=document.querySelector('#'+${JSON.stringify(id)}+' '+${JSON.stringify(selector)});
+    target?.scrollIntoView({block:'center'});
+    const rect=target?.getBoundingClientRect();
+    return rect&&{x:rect.x+rect.width/2,y:rect.y+rect.height/2,width:rect.width,height:rect.height};
+  })()`);
   await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:0,y:0});
   await sleep(200);
   peerFormHover={baseline:await hoverOpacity(),hover_media:await evaluate('matchMedia("(hover: hover)").matches')};
   for(const [name,selector] of [['wrapper','.mat-mdc-text-field-wrapper'],['hint','.mat-mdc-form-field-subscript-wrapper']]){
-    const point=await evaluate(`(() => {const rect=document.querySelector('#peer-form-hover '+${JSON.stringify(selector)})?.getBoundingClientRect();return rect&&{x:rect.x+rect.width/2,y:rect.y+rect.height/2,width:rect.width,height:rect.height};})()`);
+    const point=await hoverTargetPoint('peer-form-hover',selector);
     if(point&&point.width>0&&point.height>0){
       await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:point.x,y:point.y});
       await sleep(200);
@@ -500,7 +506,7 @@ try {
     const row={id,baseline:await hoverOpacity(id)};
     let wrapperPoint;
     for(const [name,selector] of [['wrapper','.mat-mdc-text-field-wrapper'],['hint','.mat-mdc-form-field-subscript-wrapper']]){
-      const point=await evaluate(`(() => {const rect=document.querySelector('#'+${JSON.stringify(id)}+' '+${JSON.stringify(selector)})?.getBoundingClientRect();return rect&&{x:rect.x+rect.width/2,y:rect.y+rect.height/2,width:rect.width,height:rect.height};})()`);
+      const point=await hoverTargetPoint(id,selector);
       if(point&&point.width>0&&point.height>0){
         await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:point.x,y:point.y});
         await sleep(200);
@@ -514,6 +520,7 @@ try {
     row.focus=await hoverOpacity(id);
     await evaluate(`document.querySelector('#'+${JSON.stringify(id)}+' input').blur()`);
     if(wrapperPoint){
+      wrapperPoint=await hoverTargetPoint(id,'.mat-mdc-text-field-wrapper');
       await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:wrapperPoint.x,y:wrapperPoint.y});
       await evaluate(`document.getElementById(${JSON.stringify(id)}).style.setProperty('--mat-form-field-hover-state-layer-opacity','0.73')`);
       await sleep(200);
