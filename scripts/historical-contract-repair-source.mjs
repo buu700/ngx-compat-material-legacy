@@ -107,13 +107,21 @@ export function historicalRepairTableSourceProof({root=process.cwd(),live=histor
 export function historicalRepairSelectSourceOwner({root=process.cwd(),read,line}={}){
  root=resolve(root);assert.ok(line==='21.x'||line==='main');const physical=path=>readEvidenceMember(root,path);if(read===undefined)read=physical;assert.equal(typeof read,'function');let select;
  if(line==='main'){
-  // The reviewed V7 owner composes the retained V1–V6 source identities and
-  // exact current select/menu source epoch. The old owner remains 21.x-only.
+  // Retain the reviewed V7 identity and select the finite V8 continuation.
+  // The original successor remains the 21.x route.
   const source={path:'scripts/select-dialog-finite-source-v7.mjs',sha256:'87155482dbaa488a0e72ae0ba75c3edfe370bc11fcfc2ddd1ce3f0190a5609a6',bytes:17719};
   const raw=physical(source.path);exact(raw,source);const module=requireLocal('./select-dialog-finite-source-v7.mjs');
   assert.ok(Object.isFrozen(module.selectDialogFiniteLoadedImage));assert.deepEqual(module.selectDialogFiniteLoadedImage,source);
   assert.equal(hash(functionToString.call(module.selectDialogFiniteSuccessor)),'e6ab419874774e5d1878257c001d4bc24ea298d28072de22134ad0831895eef1','unauthenticated current select source successor');
-  select=module.selectDialogFiniteSuccessor({root,read:read,line:line});
+  const current={path:'scripts/select-dialog-finite-source-v8.mjs',sha256:'7b61b26fb9a07d38c99100193e1b9a918a2ca952608c01ca7c81eed32ed30004',bytes:21123};
+  const currentRaw=physical(current.path);exact(currentRaw,current);const next=requireLocal('./select-dialog-finite-source-v8.mjs');
+  assert.ok(Object.isFrozen(next.selectDialogFiniteLoadedImage));assert.deepEqual(next.selectDialogFiniteLoadedImage,current);
+  assert.equal(hash(functionToString.call(next.selectDialogFiniteSuccessor)),'a96a3c38e6ab001b457b846a87952a9e11e85fd4f9dd8138260e83f312712856','unauthenticated current select source successor');
+  const sweepV7=()=>exact(physical(source.path),source);
+  const guardedRead=path=>{sweepV7();const value=read(path);sweepV7();return value;};
+  const selected=next.selectDialogFiniteSuccessor({root,read:guardedRead,line});
+  const wrap=fn=>(...args)=>{sweepV7();const value=fn(...args);sweepV7();return value;};
+  select={...selected,bound:[...selected.bound,{...source}],qualify:wrap(selected.qualify),historicalReference:wrap(selected.historicalReference),assertCurrent:wrap(selected.assertCurrent),assertPhysical:wrap(selected.assertPhysical)};
  }else select=selectDialogFiniteSuccessor({root,read,line});
  return select;
 }

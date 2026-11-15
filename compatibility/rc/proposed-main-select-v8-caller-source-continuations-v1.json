@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "role": "proposed-main-select-v8-caller-source-continuations",
+  "source_parent": "e819975bc28c4d3a7d05beb81f2eb1202448384f",
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "transitions": [
+    {
+      "path": "scripts/historical-contract-repair-source.mjs",
+      "before": {
+        "path": "scripts/historical-contract-repair-source.mjs",
+        "sha256": "b63c419933c0015c8ac7b9fb6238ad3c14a43a384af29a4f346954ac75900855",
+        "bytes": 37024
+      },
+      "after": {
+        "path": "scripts/historical-contract-repair-source.mjs",
+        "sha256": "a6b5aa00c19386260a8394ceb062f6dbe95dcd9f9176400cf965d36e6eaa5b38",
+        "bytes": 38082
+      },
+      "edits": [
+        {
+          "offset": 12921,
+          "before": "  // The reviewed V7 owner composes the retained V1\u2013V6 source identities and\n  // exact current select/menu source epoch. The old owner remains 21.x-only.\n",
+          "after": "  // Retain the reviewed V7 identity and select the finite V8 continuation.\n  // The original successor remains the 21.x route.\n"
+        },
+        {
+          "offset": 13679,
+          "before": "  select=module.selectDialogFiniteSuccessor({root,read:read,line:line});\n",
+          "after": "  const current={path:'scripts/select-dialog-finite-source-v8.mjs',sha256:'7b61b26fb9a07d38c99100193e1b9a918a2ca952608c01ca7c81eed32ed30004',bytes:21123};\n  const currentRaw=physical(current.path);exact(currentRaw,current);const next=requireLocal('./select-dialog-finite-source-v8.mjs');\n  assert.ok(Object.isFrozen(next.selectDialogFiniteLoadedImage));assert.deepEqual(next.selectDialogFiniteLoadedImage,current);\n  assert.equal(hash(functionToString.call(next.selectDialogFiniteSuccessor)),'a96a3c38e6ab001b457b846a87952a9e11e85fd4f9dd8138260e83f312712856','unauthenticated current select source successor');\n  const sweepV7=()=>exact(physical(source.path),source);\n  const guardedRead=path=>{sweepV7();const value=read(path);sweepV7();return value;};\n  const selected=next.selectDialogFiniteSuccessor({root,read:guardedRead,line});\n  const wrap=fn=>(...args)=>{sweepV7();const value=fn(...args);sweepV7();return value;};\n  select={...selected,bound:[...selected.bound,{...source}],qualify:wrap(selected.qualify),historicalReference:wrap(selected.historicalReference),assertCurrent:wrap(selected.assertCurrent),assertPhysical:wrap(selected.assertPhysical)};\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/inventory-reference-proposal.mjs",
+      "before": {
+        "path": "scripts/inventory-reference-proposal.mjs",
+        "sha256": "9d460ad966ad9d9aa46ee8057c2ca85ab14d9ecdef6b2437b0f38a924a3876d6",
+        "bytes": 23989
+      },
+      "after": {
+        "path": "scripts/inventory-reference-proposal.mjs",
+        "sha256": "9b919e1e28c0581a02ccea741247e00e72408cefcb34be5747fc197a292e090a",
+        "bytes": 25380
+      },
+      "edits": [
+        {
+          "offset": 14108,
+          "before": "  product=loaded.selectDialogFiniteSuccessor({root,line,read:physical});\n",
+          "after": "  const current={path:'scripts/select-dialog-finite-source-v8.mjs',sha256:'7b61b26fb9a07d38c99100193e1b9a918a2ca952608c01ca7c81eed32ed30004',bytes:21123};\n  const currentPhysical=physical(current.path),currentLoaded=readFileSync(fileURLToPath(new URL('./select-dialog-finite-source-v8.mjs',import.meta.url)));assert.equal(hash(currentPhysical),current.sha256);assert.equal(currentPhysical.length,current.bytes);assert.equal(hash(currentLoaded),current.sha256);assert.equal(currentLoaded.length,current.bytes);\n  const next=require('./select-dialog-finite-source-v8.mjs');assert.ok(Object.isFrozen(next.selectDialogFiniteLoadedImage));assert.deepEqual(next.selectDialogFiniteLoadedImage,current);assert.equal(hash(apply(functionToString,next.selectDialogFiniteSuccessor,[])),'a96a3c38e6ab001b457b846a87952a9e11e85fd4f9dd8138260e83f312712856');\n  const sweepV7=()=>{const raw=physical(owner.path);assert.equal(hash(raw),owner.sha256);assert.equal(raw.length,owner.bytes);};\n  const guardedRead=path=>{sweepV7();const raw=physical(path);sweepV7();return raw;};\n  const selected=next.selectDialogFiniteSuccessor({root,line,read:guardedRead});\n  const wrap=fn=>(...args)=>{sweepV7();const value=fn(...args);sweepV7();return value;};\n  product={...selected,bound:[...selected.bound,{...owner}],qualify:wrap(selected.qualify),historicalReference:wrap(selected.historicalReference),assertCurrent:wrap(selected.assertCurrent),assertPhysical:wrap(selected.assertPhysical)};\n"
+        }
+      ]
+    }
+  ]
+}

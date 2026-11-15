@@ -8,7 +8,7 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
-import {readFileSync} from 'node:fs';
+import {readFileSync,realpathSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {types} from 'node:util';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
@@ -24,7 +24,9 @@ const support=[
  {path:'projects/ngx-material-legacy/legacy-tabs/tab-label.ts',sha256:'db06eed7f8ceb42cecfcd9242d44a9cff315a59285c262cbdc2e101a339969ad',bytes:1514},
  {path:'projects/ngx-material-legacy/legacy-tabs/internal/tab-base.ts',sha256:'880575b7a0c3a6b30bfb363c68e3a574fcb585e11e4b10d362eeea5731785639',bytes:4870},
 ];
-export function currentAuthoredTabSourceSuccessor({root,read=p=>readEvidenceMember(root,p)}){
+const activeRoots=new Map();
+function transaction(root,operation){const key=realpathSync(root),prior=activeRoots.get(key);if(prior){prior.violation=true;throw Error('reentrant authored tab source');}const state={violation:false};activeRoots.set(key,state);try{const value=operation();assert.equal(state.violation,false,'swallowed reentrant authored tab source');return value;}finally{activeRoots.delete(key);}}
+export function currentAuthoredTabSourceSuccessor({root,read=p=>readEvidenceMember(root,p)}){return transaction(root,()=>{
  const physical=p=>readEvidenceMember(root,p),check=(bytes,ref)=>{assert.equal(hash(bytes),ref.sha256,ref.path);assert.equal(bytes.length,ref.bytes,ref.path);};
  assert.ok(JSON.parse(physical('projects/ngx-material-legacy/package.json')).version.startsWith('22.'));
  assert.ok(physical(SELF).equals(image));
@@ -32,7 +34,20 @@ export function currentAuthoredTabSourceSuccessor({root,read=p=>readEvidenceMemb
  const git=args=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd:root,env,maxBuffer:2*1024*1024});
  const parent='0feac873886782da408d5894bbf1bb26862ec45c',commit='a796c018da3023e916b37088917f6adca56fbc9d';
  assert.equal(git(['rev-list','--parents','-n','1',commit]).toString().trim(),commit+' '+parent);git(['merge-base','--is-ancestor',commit,'HEAD']);
- const old=git(['show',parent+':'+path]),next=git(['show',commit+':'+path]);check(old,BEFORE);check(next,AFTER);assert.ok(physical(path).equals(next));
+ const old=git(['show',parent+':'+path]),next=git(['show',commit+':'+path]);check(old,BEFORE);check(next,AFTER);
+ const CONTINUATION={path:'compatibility/rc/current-authored-tab-dispositions-continuation-v1.json',sha256:'0666702e1aa2e0129cd2269d9736218954914823bd37a4d0d33c7227caf79bef',bytes:16482};
+ const continuationRaw=physical(CONTINUATION.path);check(continuationRaw,CONTINUATION);const continuation=JSON.parse(continuationRaw);
+ assert.equal(continuation.schema_version,1);assert.equal(continuation.role,'finite-current-authored-tab-dispositions-continuation');assert.equal(continuation.source_only,true);assert.equal(continuation.historical_programs_executed,false);assert.equal(continuation.artifact_or_audit_admission_granted,false);assert.equal(continuation.g11_claim,'not-passed');
+ const commits=[['2f67cf16620b7a91cd25c029f814f9744d187a88','5d366f7a97e96dffa390d3b4da102e7d113066bf'],['f689fec16f012cac75909849d957390c438efc27','5699d6e556b2f248f80eae9460d41fd24d0fc371'],['5847a7b9da9dc19c3953c258d5dd446b9ab55d87','011db05858d10a4f9725b4ad8f9fbe148b90ed52']];
+ assert.equal(continuation.transitions.length,commits.length);let previous=next,previousCommit=commit;
+ for(const [index,row] of continuation.transitions.entries()){
+  assert.equal(row.path,path);assert.deepEqual([row.parent,row.commit],commits[index]);assert.equal(row.before.path,path);assert.equal(row.after.path,path);
+  assert.equal(git(['rev-list','--parents','-n','1',row.commit]).toString().trim(),row.commit+' '+row.parent);git(['merge-base','--is-ancestor',previousCommit,row.parent]);
+  const before=git(['show',row.parent+':'+path]),after=git(['show',row.commit+':'+path]);check(before,row.before);check(after,row.after);assert.ok(before.equals(previous));
+  let cursor=0;const pieces=[];for(const edit of row.edits){assert.deepEqual(Object.keys(edit).sort(),['after','before','offset']);assert.ok(Number.isSafeInteger(edit.offset)&&edit.offset>=cursor);assert.equal(typeof edit.before,'string');assert.equal(typeof edit.after,'string');assert.notEqual(edit.before,edit.after);const prior=Buffer.from(edit.before);assert.ok(before.subarray(edit.offset,edit.offset+prior.length).equals(prior));pieces.push(before.subarray(cursor,edit.offset),Buffer.from(edit.after));cursor=edit.offset+prior.length;}pieces.push(before.subarray(cursor));assert.ok(Buffer.concat(pieces).equals(after));previous=after;previousCommit=row.commit;
+ }
+ git(['merge-base','--is-ancestor',previousCommit,'HEAD']);assert.ok(physical(path).equals(previous));const CURRENT=continuation.transitions.at(-1).after;
+
  const a=JSON.parse(old),b=JSON.parse(next),changed=[];assert.equal(a.symbol_uses.length,336);assert.equal(b.symbol_uses.length,336);
  for(let i=0;i<336;i++){
   const x=a.symbol_uses[i],y=b.symbol_uses[i];assert.deepEqual([x.file,x.module,x.symbol],[y.file,y.module,y.symbol]);
@@ -51,12 +66,13 @@ export function currentAuthoredTabSourceSuccessor({root,read=p=>readEvidenceMemb
   ['projects/ngx-material-legacy/legacy-tabs/internal/tab-base.ts','c2c5c4a69762261f8e8241e1325f381d6ad2c431a2734d354c85c84244d3291a',support[4].sha256,'value && value._closestTab === this','value && (value as MatTabLabel & {_closestTab?: unknown})._closestTab === this'],
  ];
  for(const [file,beforeSha,afterSha,beforeText,afterText]of edits){const before=git(['show',typeParent+':'+file]),after=git(['show',typeCommit+':'+file]);assert.equal(hash(before),beforeSha);assert.equal(hash(after),afterSha);const text=before.toString();assert.equal(text.split(beforeText).length,2);assert.ok(Buffer.from(text.replace(beforeText,afterText)).equals(after));assert.ok(physical(file).equals(after));}
- const bound=[{path:SELF,sha256:hash(image),bytes:image.length},{...AFTER},...support.map(ref=>({...ref}))];
- const assertCurrent=()=>{assert.ok(physical(SELF).equals(image));for(const ref of bound){const before=physical(ref.path),supplied=read(ref.path);check(before,ref);assert.ok(Buffer.isBuffer(supplied)&&before.equals(supplied),'nonphysical current authored tab source '+ref.path);assert.ok(before.equals(physical(ref.path)));}assert.ok(physical(SELF).equals(image));};
- const qualify=ref=>{
+ const bound=[{path:SELF,sha256:hash(image),bytes:image.length},{...CURRENT},{...CONTINUATION},...support.map(ref=>({...ref}))];
+ const consume=()=>{assert.ok(physical(SELF).equals(image));for(const ref of bound){const before=physical(ref.path),supplied=read(ref.path);check(before,ref);assert.ok(Buffer.isBuffer(supplied)&&before.equals(supplied),'nonphysical current authored tab source '+ref.path);assert.ok(before.equals(physical(ref.path)));}assert.ok(physical(SELF).equals(image));};
+ const assertCurrent=()=>transaction(root,consume);
+ const qualify=ref=>transaction(root,()=>{
   assert.ok(ref&&typeof ref==='object'&&!types.isProxy(ref)&&Object.getPrototypeOf(ref)===Object.prototype);
   const fields=Object.getOwnPropertyDescriptors(ref),keys=Reflect.ownKeys(fields);assert.ok(keys.every(k=>typeof k==='string'));assert.deepEqual(keys.sort(),Object.hasOwn(fields,'bytes')?['bytes','path','sha256']:['path','sha256']);for(const field of Object.values(fields))assert.ok(Object.hasOwn(field,'value')&&field.enumerable);
-  if(fields.path.value!==path)return null;const prior=[BEFORE,AFTER].find(r=>r.sha256===fields.sha256.value);assert.ok(prior,'unknown authored tab source identity');if(fields.bytes)assert.equal(fields.bytes.value,prior.bytes);assertCurrent();return {path,sha256:AFTER.sha256,...(fields.bytes?{bytes:AFTER.bytes}:{})};
- };
- assertCurrent();return {before:{...BEFORE},after:{...AFTER},bound:structuredClone(bound),assertCurrent,qualify,historical_bytes_exposed:false,audit_credit:false};
-}
+  if(fields.path.value!==path)return null;const prior=[BEFORE,AFTER,...continuation.transitions.map(row=>row.after)].find(r=>r.sha256===fields.sha256.value);assert.ok(prior,'unknown authored tab source identity');if(fields.bytes)assert.equal(fields.bytes.value,prior.bytes);consume();assert.deepEqual(Object.getOwnPropertyDescriptors(ref),fields,'authored tab reference changed during callback');return {path,sha256:CURRENT.sha256,...(fields.bytes?{bytes:CURRENT.bytes}:{})};
+ });
+ consume();return {before:{...BEFORE},after:{...CURRENT},bound:structuredClone(bound),assertCurrent,qualify,historical_bytes_exposed:false,audit_credit:false};
+});}

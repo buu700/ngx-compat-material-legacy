@@ -1,0 +1,271 @@
+{
+  "schema_version": 1,
+  "role": "finite-historical-repair-live-physical-continuation",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "groups": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+      "steps": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+          "parent": "eefb6234dc797c240954de5bc12ec4a7d52e9dbb",
+          "commit": "89c5be9ff19f10760112dedf15b11273dcdb3f33",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+            "sha256": "daf7d6f4c83292e7d3bf24eaf675b5cfc6c3fe341b779c5e801c23ef49d30f7f",
+            "bytes": 10233
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+            "sha256": "8649def821d9362552cebad62c22855f3b225d828e246d48df3be51822e891ed",
+            "bytes": 10000
+          },
+          "edits": [
+            {
+              "offset": 8608,
+              "before": "        // Only prevent the default action on space since it can scroll the page.\n        // Don't prevent enter since it can break link navigation.\n        if (event.keyCode === SPACE) {\n          event.preventDefault();\n        }\n\n",
+              "after": ""
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+          "parent": "c72d0ed6b9bbb918eb08b4c4efb37bcf89894707",
+          "commit": "ceb5ab6ff0b910436768384a622299f4b01d2da3",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+            "sha256": "8649def821d9362552cebad62c22855f3b225d828e246d48df3be51822e891ed",
+            "bytes": 10000
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+            "sha256": "008255ffdda75f44728754803a78fb032f8491acb1c7976f64d7a15f97d65295",
+            "bytes": 10136
+          },
+          "edits": [
+            {
+              "offset": 276,
+              "before": "",
+              "after": "\nimport {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n"
+            },
+            {
+              "offset": 285,
+              "before": "  ANIMATION_MODULE_TYPE,\n",
+              "after": ""
+            },
+            {
+              "offset": 4069,
+              "before": "    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n",
+              "after": "    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n"
+            },
+            {
+              "offset": 7590,
+              "before": "    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n",
+              "after": "    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n"
+            },
+            {
+              "offset": 7778,
+              "before": "    if (animationMode === 'NoopAnimations') {\n      this.rippleConfig.animation = {enterDuration: 0, exitDuration: 0};\n",
+              "after": "    if (resolveLegacyAnimationMode(animationMode) === 'NoopAnimations') {\n      this.rippleConfig = {...this.rippleConfig, animation: {enterDuration: 0, exitDuration: 0}};\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "steps": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+          "parent": "11767b00a96caa175a206388551c9f014c7513fb",
+          "commit": "7e9ecb0a8fe31d44c1f37b8a509fc58c6ab705ad",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+            "sha256": "e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657",
+            "bytes": 28485
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+            "sha256": "e645f8b92ccb57518eb9fac6ab3a20c35db6bd9f19a301fcb659ffe58911cfb6",
+            "bytes": 28628
+          },
+          "edits": [
+            {
+              "offset": 1411,
+              "before": "",
+              "after": "import {nextLegacyHintId} from './internal/hint-id';\n"
+            },
+            {
+              "offset": 8183,
+              "before": "  readonly _hintLabelId: string = `mat-hint-${nextUniqueId++}`;\n",
+              "after": "  // Reserve the historical field counter position used by the separate label ID.\n  readonly _hintLabelId: string = (nextUniqueId++, nextLegacyHintId());\n"
+            }
+          ]
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+          "parent": "c72d0ed6b9bbb918eb08b4c4efb37bcf89894707",
+          "commit": "ceb5ab6ff0b910436768384a622299f4b01d2da3",
+          "before": {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+            "sha256": "e645f8b92ccb57518eb9fac6ab3a20c35db6bd9f19a301fcb659ffe58911cfb6",
+            "bytes": 28628
+          },
+          "after": {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+            "sha256": "e0fe0631a6adde57f515b82b43156d5da0ab0c2730872df5b792fc27dab14931",
+            "bytes": 28656
+          },
+          "edits": [
+            {
+              "offset": 237,
+              "before": "",
+              "after": "\nimport {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n"
+            },
+            {
+              "offset": 1534,
+              "before": "import {ANIMATION_MODULE_TYPE} from '@angular/core';\n",
+              "after": "\n"
+            },
+            {
+              "offset": 11767,
+              "before": "    @Optional() @Inject(ANIMATION_MODULE_TYPE) _animationMode: string,\n",
+              "after": "    @Optional() @Inject(LEGACY_ANIMATION_MODE) _animationMode: string,\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/form-field-subscript-motion/manual-probe.mjs",
+      "steps": [
+        {
+          "path": "tests/form-field-subscript-motion/manual-probe.mjs",
+          "parent": "11767b00a96caa175a206388551c9f014c7513fb",
+          "commit": "7e9ecb0a8fe31d44c1f37b8a509fc58c6ab705ad",
+          "before": {
+            "path": "tests/form-field-subscript-motion/manual-probe.mjs",
+            "sha256": "9b72a9a6d88938b346b62f301fa8927c631fbe0153ec591bed047193c591692f",
+            "bytes": 5507
+          },
+          "after": {
+            "path": "tests/form-field-subscript-motion/manual-probe.mjs",
+            "sha256": "0a45401d053aec66eea149484f2f1acb974423d394d354907d8df9e700800ac9",
+            "bytes": 6816
+          },
+          "edits": [
+            {
+              "offset": 1291,
+              "before": "",
+              "after": " // Both hintLabel and mat-hint IDs share one DOM namespace. Exercise the\n // actual compiler-constructed field, historical seven-argument fields, and\n // manually constructed hints in a fresh packed-module process.\n {\n  const seven=fixture.element.execution.inputs.slice(0,7);\n  const fields=[fixture.element.execution.value];\n  for(let i=0;i<8;i++)fields.push(new Type(...seven));\n  try{\n   const hints=Array.from({length:32},()=>new family.MatLegacyHint());\n   const generated=[...fields.map(field=>field._hintLabelId),...hints.map(hint=>hint.id)];\n   assert.equal(new Set(generated).size,generated.length,'generated hint IDs must be unique across field labels and projected hints');\n   const labelNumbers=fields.map(field=>{\n    const match=/^mat-form-field-label-(\\d+)$/.exec(field._labelId);\n    assert.ok(match,'historical field label ID prefix');return Number(match[1]);\n   });\n   for(let i=1;i<labelNumbers.length;i++)assert.equal(labelNumbers[i]-labelNumbers[i-1],2,'field label ID sequence');\n   hints[0].id='consumer-authored-hint';assert.equal(hints[0].id,'consumer-authored-hint');\n   results.push({crossClassGeneratedIdsUnique:true,manualSevenArguments:true,fieldLabelSequencePreserved:true,authoredHintIdPreserved:true});\n  }finally{for(const field of fields.slice(1))field.ngOnDestroy();}\n }\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "scripts/authored-additional-use-baseline.mjs",
+      "steps": [
+        {
+          "path": "scripts/authored-additional-use-baseline.mjs",
+          "parent": "2f67cf16620b7a91cd25c029f814f9744d187a88",
+          "commit": "5d366f7a97e96dffa390d3b4da102e7d113066bf",
+          "before": {
+            "path": "scripts/authored-additional-use-baseline.mjs",
+            "sha256": "aebb00f26d2cdc77b0e0d23814fc59d5ce7ad5616f88992cc60c1da7996de325",
+            "bytes": 8149
+          },
+          "after": {
+            "path": "scripts/authored-additional-use-baseline.mjs",
+            "sha256": "2d5cce4d4c21c636c08d85ae391385a7c302e3352a1643e0ee802ee88101afe1",
+            "bytes": 8149
+          },
+          "edits": [
+            {
+              "offset": 4534,
+              "before": "   assert.equal(fieldSource?.sha256,'e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657','unqualified form-field retirement source epoch');\n",
+              "after": "   assert.equal(fieldSource?.sha256,'e645f8b92ccb57518eb9fac6ab3a20c35db6bd9f19a301fcb659ffe58911cfb6','unqualified form-field retirement source epoch');\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "scripts/form-field-retired-use.mjs",
+      "steps": [
+        {
+          "path": "scripts/form-field-retired-use.mjs",
+          "parent": "2f67cf16620b7a91cd25c029f814f9744d187a88",
+          "commit": "5d366f7a97e96dffa390d3b4da102e7d113066bf",
+          "before": {
+            "path": "scripts/form-field-retired-use.mjs",
+            "sha256": "0ecd8632e541baeec296d649505e816e2910db85b2ebf1b6740260df4210f916",
+            "bytes": 5627
+          },
+          "after": {
+            "path": "scripts/form-field-retired-use.mjs",
+            "sha256": "e7d259f94de927659a1a4d5c1d597cf97a1f15eaae30316366d872224184ebec",
+            "bytes": 6698
+          },
+          "edits": [
+            {
+              "offset": 821,
+              "before": "",
+              "after": "const currentEpoch='7e9ecb0a8fe31d44c1f37b8a509fc58c6ab705ad', currentParent='11767b00a96caa175a206388551c9f014c7513fb';\nconst currentHash='e645f8b92ccb57518eb9fac6ab3a20c35db6bd9f19a301fcb659ffe58911cfb6';\n"
+            },
+            {
+              "offset": 2097,
+              "before": " const sweep=()=>{assert.equal(realpathSync(root),root);assert.equal(hash(physical(path)),'e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657','changed form-field source frame');assert.equal(hash(physical(proof.path)),proof.sha256,'changed form-field review frame');};\n",
+              "after": " const sweep=()=>{assert.equal(realpathSync(root),root);assert.equal(hash(physical(path)),currentHash,'changed form-field source frame');assert.equal(hash(physical(proof.path)),proof.sha256,'changed form-field review frame');};\n"
+            },
+            {
+              "offset": 3391,
+              "before": "",
+              "after": " assert.equal(git('rev-parse',currentEpoch+'^').toString().trim(),currentParent);git('merge-base','--is-ancestor',currentEpoch,'HEAD');\n const currentBefore=git('show',currentParent+':'+path),currentAfter=git('show',currentEpoch+':'+path);\n assert.ok(currentBefore.equals(after));assert.equal(hash(currentAfter),currentHash);\n const expected=currentBefore.toString().replace(\"import {afterFormFieldRender} from './internal/after-form-field-render';\", \"import {afterFormFieldRender} from './internal/after-form-field-render';\\nimport {nextLegacyHintId} from './internal/hint-id';\").replace('  readonly _hintLabelId: string = `mat-hint-${nextUniqueId++}`;', '  // Reserve the historical field counter position used by the separate label ID.\\n  readonly _hintLabelId: string = (nextUniqueId++, nextLegacyHintId());');\n assert.equal(currentAfter.toString(),expected,'unreviewed form-field retirement source delta');\n"
+            },
+            {
+              "offset": 3821,
+              "before": " const actual=checked(path,hash(after));assert.ok(actual.equals(after));\n const validateCurrent=()=>{assert.equal(current.source_files.filter(m=>m.path===path&&m.sha256===hash(after)).length,1);assert.equal(current.symbol_uses.filter(equalRole).length,0);};validateCurrent();\n",
+              "after": " const actual=checked(path,currentHash);assert.ok(actual.equals(currentAfter));\n const validateCurrent=()=>{assert.equal(current.source_files.filter(m=>m.path===path&&m.sha256===currentHash).length,1);assert.equal(current.symbol_uses.filter(equalRole).length,0);};validateCurrent();\n"
+            },
+            {
+              "offset": 4348,
+              "before": " checked(path,hash(after));checked(proof.path,proof.sha256);sweep();validateCurrent();\n return {original:original[0],retired:{...FORM_FIELD_RETIRED_ROLE,candidate_source_sha256:hash(after),occurrences:[]},qualification:proof};\n",
+              "after": " checked(path,currentHash);checked(proof.path,proof.sha256);sweep();validateCurrent();\n return {original:original[0],retired:{...FORM_FIELD_RETIRED_ROLE,candidate_source_sha256:currentHash,occurrences:[]},qualification:proof};\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "compatibility/rc/api/export-name-allowlist.json",
+      "steps": [
+        {
+          "path": "compatibility/rc/api/export-name-allowlist.json",
+          "parent": "c72d0ed6b9bbb918eb08b4c4efb37bcf89894707",
+          "commit": "ceb5ab6ff0b910436768384a622299f4b01d2da3",
+          "before": {
+            "path": "compatibility/rc/api/export-name-allowlist.json",
+            "sha256": "abec8f2e624ba5ce54d24746821755c9b9fb8d7af5cafc6012e159ed08935967",
+            "bytes": 11038
+          },
+          "after": {
+            "path": "compatibility/rc/api/export-name-allowlist.json",
+            "sha256": "a3d65f337510311015da2b121dd876a938c2ea243002fc70d03c2308cd19c7ad",
+            "bytes": 11653
+          },
+          "edits": [
+            {
+              "offset": 4018,
+              "before": "",
+              "after": "      ]\n    },\n    {\n      \"name\": \"LEGACY_ANIMATION_MODE\",\n      \"category\": \"engine-free-motion\",\n      \"reason\": \"Owned legacy-only motion policy token; distinct from public MATERIAL_ANIMATIONS and absent from the Material 16 legacy barrel.\",\n      \"entries\": [\n        \"legacy-core/primary\"\n      ]\n    },\n    {\n      \"name\": \"resolveLegacyAnimationMode\",\n      \"category\": \"engine-free-motion\",\n      \"reason\": \"Owned constructor-mode resolver shared by separate legacy entry points; preserves explicit manual mode strings while combining the ambient policy.\",\n      \"entries\": [\n        \"legacy-core/primary\"\n"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

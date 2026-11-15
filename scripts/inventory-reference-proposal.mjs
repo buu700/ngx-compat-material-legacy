@@ -191,7 +191,14 @@ function buildInventoryReferenceSourceMetadata({root,read:suppliedRead=path=>rea
   const owner={path:'scripts/select-dialog-finite-source-v7.mjs',sha256:'87155482dbaa488a0e72ae0ba75c3edfe370bc11fcfc2ddd1ce3f0190a5609a6',bytes:17719};
   const physicalOwner=readEvidenceMember(root,owner.path),loadedPath=readFileSync(fileURLToPath(new URL('./select-dialog-finite-source-v7.mjs',import.meta.url)));assert.equal(hash(physicalOwner),owner.sha256);assert.equal(physicalOwner.length,owner.bytes);assert.equal(hash(loadedPath),owner.sha256);assert.equal(loadedPath.length,owner.bytes);
   const loaded=require('./select-dialog-finite-source-v7.mjs');assert.ok(Object.isFrozen(loaded.selectDialogFiniteLoadedImage));assert.deepEqual(loaded.selectDialogFiniteLoadedImage,owner);assert.equal(hash(apply(functionToString,loaded.selectDialogFiniteSuccessor,[])),'e6ab419874774e5d1878257c001d4bc24ea298d28072de22134ad0831895eef1');
-  product=loaded.selectDialogFiniteSuccessor({root,line,read:physical});
+  const current={path:'scripts/select-dialog-finite-source-v8.mjs',sha256:'7b61b26fb9a07d38c99100193e1b9a918a2ca952608c01ca7c81eed32ed30004',bytes:21123};
+  const currentPhysical=physical(current.path),currentLoaded=readFileSync(fileURLToPath(new URL('./select-dialog-finite-source-v8.mjs',import.meta.url)));assert.equal(hash(currentPhysical),current.sha256);assert.equal(currentPhysical.length,current.bytes);assert.equal(hash(currentLoaded),current.sha256);assert.equal(currentLoaded.length,current.bytes);
+  const next=require('./select-dialog-finite-source-v8.mjs');assert.ok(Object.isFrozen(next.selectDialogFiniteLoadedImage));assert.deepEqual(next.selectDialogFiniteLoadedImage,current);assert.equal(hash(apply(functionToString,next.selectDialogFiniteSuccessor,[])),'a96a3c38e6ab001b457b846a87952a9e11e85fd4f9dd8138260e83f312712856');
+  const sweepV7=()=>{const raw=physical(owner.path);assert.equal(hash(raw),owner.sha256);assert.equal(raw.length,owner.bytes);};
+  const guardedRead=path=>{sweepV7();const raw=physical(path);sweepV7();return raw;};
+  const selected=next.selectDialogFiniteSuccessor({root,line,read:guardedRead});
+  const wrap=fn=>(...args)=>{sweepV7();const value=fn(...args);sweepV7();return value;};
+  product={...selected,bound:[...selected.bound,{...owner}],qualify:wrap(selected.qualify),historicalReference:wrap(selected.historicalReference),assertCurrent:wrap(selected.assertCurrent),assertPhysical:wrap(selected.assertPhysical)};
  }else product=selectDialogFiniteSuccessor({root,line,read:physical});
  const tool=inventoryFiniteToolSuccessor({root,line,read:physical}),pin=pins[line],bound=new Map();
  const matrixOwner=line==='main'?require('./current-tool-matrix-source.mjs').currentToolMatrixSource({root,read:physical}):null;
