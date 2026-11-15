@@ -131,6 +131,11 @@ function transaction(root,operation){
  try{const result=operation();assert.equal(state.violation,false,'swallowed inventory reference reentry');return result;}
  finally{activeRoots.delete(key);}
 }
+/** Resolve the existing historical inventory binding through both live source owners. */
+export function resolveCurrentInventoryReference(tool,matrixOwner){
+ const current=tool.qualify({path:INVENTORY_REFERENCE_PATH,sha256:nextInventoryHash});assert.ok(current);assert.equal(current.path,INVENTORY_REFERENCE_PATH);
+ const matrixRef=matrixOwner.bound.find(ref=>ref.path===INVENTORY_REFERENCE_PATH);assert.ok(matrixRef);assert.equal(current.sha256,matrixRef.sha256);matrixOwner.assertCurrent();tool.assertCurrent();return {...current};
+}
 /** Recomputes the real finite source verifier; no caller-supplied verifier or persistent success cache. */
 export function prepareInventoryReferenceSourceMetadata(options={}){
  return transaction(options.root,()=>buildInventoryReferenceSourceMetadata(options));
@@ -206,7 +211,8 @@ function buildInventoryReferenceSourceMetadata({root,read:suppliedRead=path=>rea
  for(const ref of [...product.bound,...tool.bound,...(matrixOwner?matrixOwner.bound:[])]){prebind(ref.path,ref);const prior=bound.get(ref.path);if(prior)assert.deepEqual(prior,ref);else bound.set(ref.path,{...ref});}
  // Assemble the complete finite callback frame before the first supplied read.
  const packetPre=prebind(INVENTORY_REFERENCE_PACKET);assert.equal(hash(packetPre),pin.packet);
- const inventoryPre=prebind(INVENTORY_REFERENCE_PATH);assert.equal(hash(inventoryPre),line==='main'?nextInventoryHash:pin.inventory);
+ const currentInventoryRef=line==='main'?resolveCurrentInventoryReference(tool,matrixOwner):{path:INVENTORY_REFERENCE_PATH,sha256:pin.inventory};
+ const inventoryPre=prebind(INVENTORY_REFERENCE_PATH);assert.equal(hash(inventoryPre),currentInventoryRef.sha256);
  const packetData=JSON.parse(packetPre),inventoryPreData=JSON.parse(inventoryPre);
  expectedShimPaths=inventoryPreData.shared_suite_shims.map(row=>row.path).sort();assert.equal(expectedShimPaths.length,21);assert.equal(new Set(expectedShimPaths).size,21);sweepShimNamespace();
  if(line==='main'){assert.equal(hash(apply(functionToString,readEvidenceMember,[])),readerImageHash,'loaded physical reader changed');
@@ -218,7 +224,7 @@ function buildInventoryReferenceSourceMetadata({root,read:suppliedRead=path=>rea
  assert.ok(read(packagePath).equals(packageBytes));
  const member=(path,expected)=>{
   const actual=readEvidenceMember(root,path),raw=read(path);assert.ok(Buffer.isBuffer(raw));assert.ok(actual.equals(raw),'nonphysical inventory proposal input '+path);assert.ok(actual.equals(readEvidenceMember(root,path)),'inventory proposal input changed during callback '+path);
-  if(expected){const ref={path,sha256:expected};const selected=line==='main' && path===INVENTORY_REFERENCE_PATH && expected===pin.inventory ? {...ref,sha256:nextInventoryHash} : tool.qualify(product.qualify(ref)??ref)??product.qualify(ref)??ref;assert.equal(hash(raw),selected.sha256,'unqualified inventory proposal input '+path);}
+  if(expected){const ref={path,sha256:expected};const selected=line==='main' && path===INVENTORY_REFERENCE_PATH && expected===pin.inventory ? currentInventoryRef : tool.qualify(product.qualify(ref)??ref)??product.qualify(ref)??ref;assert.equal(hash(raw),selected.sha256,'unqualified inventory proposal input '+path);}
   const current={path,sha256:hash(raw),bytes:raw.length},prior=bound.get(path);if(prior)assert.deepEqual(current,prior,'changed repeated inventory proposal input '+path);else bound.set(path,current);return raw;
  };
  const packetRaw=member(INVENTORY_REFERENCE_PACKET,pin.packet),packet=JSON.parse(packetRaw);
