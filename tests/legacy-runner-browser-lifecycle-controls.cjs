@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict');
 const {EventEmitter}=require('node:events');
 const fs=require('node:fs');const os=require('node:os');const path=require('node:path');
-const {closeOwned,validReceipt,deliberateFailOutcome}=require('../testing/legacy-runner/owned-chrome-lifecycle.cjs');
+const {closeOwned,validReceipt,deliberateFailOutcome,browserProcesses,isBrowserProcessName,checkApprovedCatalog,checkNixProfile}=require('../testing/legacy-runner/owned-chrome-lifecycle.cjs');
 const launcher=require('../testing/legacy-runner/owned-chrome-launcher.cjs');const {decorate}=launcher;
 const profile='/owned/unique/profile',nonce='a'.repeat(32),profileArg='--user-data-dir='+profile,nonceArg='--legacy-runner-nonce='+nonce;
 function makeIo(change={}){
@@ -11,15 +11,39 @@ function makeIo(change={}){
  rpc:async(_ws,_id,method)=>{if(method==='Browser.getBrowserCommandLine')return {arguments:[profileArg,nonceArg]};if(method==='SystemInfo.getProcessInfo')return {processInfo:[{type:'browser',id:91},{type:'renderer',id:92}]};if(method==='Browser.close'){closed=true;closeCount++;return {}; }throw Error('unknown RPC');},
  processInfo:()=>{reads++;return owner;},listener:()=>true,listenerGone:()=>closed,snapshotTree:()=>[{pid:91,starttime:42},{pid:92,starttime:43}],profileProcesses:()=>closed?[]:[{pid:91,starttime:42}],browserProcesses:()=>closed?[]:[{pid:91,starttime:42}],sameAlive:()=>!closed,pause:async()=>{},...change};return {io,counts:()=>({closeCount,reads})};
 }
-async function proof(name,change,expected,options={}){const f=makeIo(change),events=options.events||[],r=await closeOwned({profile,nonce,launcherPid:options.launcherPid===undefined?90:options.launcherPid,baseline:options.baseline===undefined?[]:options.baseline,events},f.io);assert.equal(r.status,expected,name+': '+r.error);if(expected==='fail'&&!r.close_issued)assert.equal(f.counts().closeCount,0,name+' closed a foreign browser');return r;}
+async function proof(name,change,expected,options={}){const f=makeIo(change),events=options.events||[],r=await closeOwned({profile,nonce,launcherPid:options.launcherPid===undefined?90:options.launcherPid,baseline:options.baseline===undefined?[]:options.baseline,launcherIdentity:options.launcherIdentity,events},f.io);assert.equal(r.status,expected,name+': '+r.error);if(expected==='fail'&&!r.close_issued)assert.equal(f.counts().closeCount,0,name+' closed a foreign browser');return r;}
 async function decorated(mode){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'legacy-lifecycle-unit-')),receipt=path.join(dir,'receipt.json'),emitter=new EventEmitter();let originalKills=0;const i={id:'test',STATE_BEING_KILLED:'BEING_KILLED',STATE_FINISHED:'FINISHED',_process:null,_start(){this._process={pid:90};},_onProcessExit(){this._process=null;},forceKill:async()=>{originalKills++;}};
- decorate(i,{emitter,profile,nonce,receipt,baseline:[],delay:async()=>{},close:async o=>{if(mode==='early-exit'){i._onProcessExit(0,null,'early');o.onCloseIssued();}else{o.onCloseIssued();i._onProcessExit(mode==='crash'?1:0,mode==='crash'?'SIGABRT':null,mode==='launcher-stderr'?'Permission denied accessing the binary /usr/bin/chromium-browser':mode==='benign-stderr'?'DevTools listening on ws://127.0.0.1:1234/devtools/browser/abc':'');}return {status:'pass',close_issued:true};}});i._start('url');if(mode==='browser-error')emitter.emit('browser_error',{id:'test'},'failure after last spec');if(mode==='launcher-event')emitter.emit('browser_process_failure',{id:'test',error:'launcher crash'});await i.forceKill();const code=await new Promise(resolve=>emitter.emit('exit',resolve));const actual=JSON.parse(fs.readFileSync(receipt,'utf8'));fs.rmSync(dir,{recursive:true});return {actual,code,originalKills};}
+ const captured={pid:90,starttime:42,pgrp:70};decorate(i,{emitter,profile,nonce,receipt,baseline:[],readProcess:pid=>{assert.equal(pid,90);return captured;},delay:async()=>{},close:async o=>{assert.equal(o.launcherPid,90);assert.deepEqual(o.launcherIdentity,captured);if(mode==='early-exit'){i._onProcessExit(0,null,'early');o.onCloseIssued();}else{o.onCloseIssued();i._onProcessExit(mode==='crash'?1:0,mode==='crash'?'SIGABRT':null,mode==='launcher-stderr'?'Permission denied accessing the binary /usr/bin/chromium-browser':mode==='benign-stderr'?'DevTools listening on ws://127.0.0.1:1234/devtools/browser/abc':'');}return {status:'pass',close_issued:true};}});i._start('url');if(mode==='browser-error')emitter.emit('browser_error',{id:'test'},'failure after last spec');if(mode==='launcher-event')emitter.emit('browser_process_failure',{id:'test',error:'launcher crash'});await i.forceKill();const code=await new Promise(resolve=>emitter.emit('exit',resolve));const actual=JSON.parse(fs.readFileSync(receipt,'utf8'));fs.rmSync(dir,{recursive:true});return {actual,code,originalKills};}
 (async()=>{
+ const catalog=fs.readFileSync(path.join(__dirname,'../compatibility/rc/inherited-native-profiles.json'));
+ checkApprovedCatalog(catalog);assert.throws(()=>checkApprovedCatalog(Buffer.concat([catalog,Buffer.from(' ')])),/catalog mismatch/);
+ checkNixProfile({id:'linux-arm64-nix',arch:'arm64'},'arm64');
+ checkNixProfile({id:'linux-x64-nix-predicted-inputs',arch:'x64'},'x64');
+ for(const [selected,arch] of [[{id:'linux-arm64-nix',arch:'arm64'},'x64'],[{id:'linux-x64-nix-predicted-inputs',arch:'x64'},'arm64'],[{id:'unknown',arch:'arm64'},'arm64'],[{id:'linux-arm64-local-legacy',arch:'arm64'},'arm64'],[{id:'linux-arm64-nix',arch:'arm64'},'other']])assert.throws(()=>checkNixProfile(selected,arch));
+ assert.equal(isBrowserProcessName('.chrome-wrapped'),true);assert.equal(isBrowserProcessName('.foreign-wrapped'),false);
+ const proc=fs.mkdtempSync(path.join(os.tmpdir(),'legacy-proc-census-'));
+ const put=(pid,name,start)=>{const dir=path.join(proc,String(pid));fs.mkdirSync(dir);const parts=Array(20).fill('0');parts[0]='S';parts[19]=String(start);fs.writeFileSync(path.join(dir,'stat'),`${pid} (${name}) ${parts.join(' ')}\n`);fs.writeFileSync(path.join(dir,'status'),`Uid:\t${process.getuid()}\t${process.getuid()}\t${process.getuid()}\t${process.getuid()}\n`);};
+ put(8,'.chrome-wrapped',8);const baseCensus=browserProcesses(proc);assert.deepEqual(baseCensus,[{pid:8,starttime:8}]);put(94,'.chrome-wrapped',44);assert.deepEqual(browserProcesses(proc),[{pid:8,starttime:8},{pid:94,starttime:44}]);
+ let censusClosed=false;const wrappedCensus={rpc:async(_w,_i,m)=>{if(m==='Browser.getBrowserCommandLine')return {arguments:[profileArg,nonceArg]};if(m==='SystemInfo.getProcessInfo')return {processInfo:[{type:'browser',id:91}]};censusClosed=true;return {};},profileProcesses:()=>censusClosed?[]:[{pid:91,starttime:42}],browserProcesses:()=>censusClosed?browserProcesses(proc):[{pid:91,starttime:42},...baseCensus],sameAlive:()=>false,listenerGone:()=>true};
+ await proof('new wrapped browser after close',wrappedCensus,'fail',{baseline:baseCensus});
+ censusClosed=false;await proof('preexisting wrapped browser preserved',{...wrappedCensus,browserProcesses:()=>censusClosed?baseCensus:[{pid:91,starttime:42},...baseCensus]},'pass',{baseline:baseCensus});
+ fs.rmSync(proc,{recursive:true});
  assert.equal((await proof('clean native/snap identity',{},'pass')).close_issued,true);
  await proof('missing launcher handle',{},'fail',{launcherPid:null});
  await proof('missing baseline',{},'fail',{baseline:null});
  await proof('foreign profile', {rpc:async(_w,_i,m)=>m==='Browser.getBrowserCommandLine'?{arguments:['--user-data-dir=/foreign',nonceArg]}:{processInfo:[{type:'browser',id:91}]}},'fail');
  await proof('foreign listener',{listener:()=>false},'fail');
+ const wrapped={pid:91,ppid:90,pgrp:70,uid:process.getuid(),starttime:42,exe:'/nix/approved/.chrome-wrapped',state:'S',cmd:profileArg+'\0'+nonceArg+'\0'};
+ const identity={pid:91,starttime:42,pgrp:70},nix=()=>({binary:wrapped.exe,profile:'linux-arm64-nix',check(){}}),nixOpts={launcherPid:91,launcherIdentity:identity};
+ await proof('authenticated nix wrapper',{processInfo:()=>wrapped,approvedNixBinary:nix},'pass',nixOpts);
+ await proof('foreign dot-wrapped executable',{processInfo:()=>({...wrapped,exe:'/tmp/.chrome-wrapped'}),approvedNixBinary:nix},'fail',nixOpts);
+ await proof('unauthenticated launcher',{processInfo:()=>wrapped,approvedNixBinary:async()=>{throw Error('launcher hash mismatch')}},'fail',nixOpts);
+ await proof('wrapped wrong listener owner',{processInfo:()=>wrapped,approvedNixBinary:nix,listener:()=>false},'fail',nixOpts);
+ await proof('wrapped wrong launcher PID',{processInfo:()=>wrapped,approvedNixBinary:nix},'fail',{...nixOpts,launcherPid:90});
+ await proof('wrapped reused launcher PID',{processInfo:()=>wrapped,approvedNixBinary:nix},'fail',{...nixOpts,launcherIdentity:{...identity,starttime:41}});
+ await proof('wrapped changed process group',{processInfo:()=>wrapped,approvedNixBinary:nix},'fail',{...nixOpts,launcherIdentity:{...identity,pgrp:71}});
+ let ownerReads=0;await proof('wrapped owner lost before close',{processInfo:()=>++ownerReads===1?wrapped:null,approvedNixBinary:nix},'fail',nixOpts);
+ await proof('wrapped launcher changed before close',{processInfo:()=>wrapped,approvedNixBinary:async()=>({binary:wrapped.exe,profile:'linux-arm64-nix',check(){throw Error('launcher changed')}})},'fail',nixOpts);
  await proof('foreign executable',{processInfo:()=>({pid:91,uid:process.getuid(),starttime:42,cmd:profileArg+' '+nonceArg,exe:'/tmp/impostor'})},'fail');
  await proof('snap process identity',{processInfo:()=>({pid:91,uid:process.getuid(),starttime:42,cmd:profileArg+' '+nonceArg,exe:'/snap/chromium/123/usr/lib/chromium-browser/chrome'})},'pass');
  let read=0;await proof('stale/reused PID',{processInfo:()=>({pid:91,uid:process.getuid(),starttime:++read===1?42:999,cmd:profileArg+' '+nonceArg,exe:'/usr/bin/chromium'} )},'fail');

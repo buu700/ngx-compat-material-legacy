@@ -3,11 +3,11 @@
 const fs=require('node:fs');
 const path=require('node:path');
 const chrome=require('karma-chrome-launcher')['launcher:ChromeHeadless'][1];
-const {closeOwned}=require('./owned-chrome-lifecycle.cjs');
-function decorate(instance,{emitter,profile,nonce,receipt,baseline,close=closeOwned,delay=ms=>new Promise(r=>setTimeout(r,ms))}){
- const events=[],state={launcher_pid:null,close_started:false,close_issued:false,proof:null};let finished;
+const {closeOwned,processInfo}=require('./owned-chrome-lifecycle.cjs');
+function decorate(instance,{emitter,profile,nonce,receipt,baseline,close=closeOwned,readProcess=processInfo,delay=ms=>new Promise(r=>setTimeout(r,ms))}){
+ const events=[],state={launcher_pid:null,launcher_identity:null,close_started:false,close_issued:false,proof:null};let finished;
  const originalStart=instance._start.bind(instance),originalExit=instance._onProcessExit.bind(instance),originalForceKill=instance.forceKill.bind(instance);
- instance._start=function(url){originalStart(url);state.launcher_pid=instance._process?.pid??null;if(!state.launcher_pid)events.push({kind:'launcher-failure',detail:'launcher PID missing'});};
+ instance._start=function(url){originalStart(url);state.launcher_pid=instance._process?.pid??null;if(state.launcher_pid)state.launcher_identity=readProcess(state.launcher_pid);if(!state.launcher_pid)events.push({kind:'launcher-failure',detail:'launcher PID missing'});};
  instance._onProcessExit=function(code,signal,output){
   const detail=String(output||'');events.push({kind:state.close_issued&&code===0&&!signal?'expected-exit':'unexpected-exit',code,signal,detail:detail.slice(0,2000)});
   // These are launcher/startup or OS resource failure signals, not arbitrary Chrome diagnostics.
@@ -20,7 +20,7 @@ function decorate(instance,{emitter,profile,nonce,receipt,baseline,close=closeOw
   if(finished)return finished;
   instance.state=instance.STATE_BEING_KILLED;state.close_started=true;
   finished=(async()=>{
-   state.proof=await close({profile,nonce,launcherPid:state.launcher_pid,events,baseline,onCloseIssued:()=>{state.close_issued=true;}});
+   state.proof=await close({profile,nonce,launcherPid:state.launcher_pid,launcherIdentity:state.launcher_identity,events,baseline,onCloseIssued:()=>{state.close_issued=true;}});
    for(let i=0;i<30&&instance._process;i++)await delay(100);
    if(instance._process)events.push({kind:'launcher-failure',detail:'spawned launcher did not exit after browser close'});
    const exit=events.filter(e=>e.kind==='expected-exit');if(exit.length!==1)events.push({kind:'launcher-failure',detail:'expected clean launcher process exit missing or ambiguous'});
