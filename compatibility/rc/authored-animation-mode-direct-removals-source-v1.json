@@ -1,0 +1,1812 @@
+{
+  "schema_version": 1,
+  "role": "finite source-only direct ANIMATION_MODULE_TYPE binding retirement; no behavior qualification",
+  "line": "main",
+  "snapshot_sha256": "5664ca2e2d2df830aab55e667a53264cb05890c6fce2ff6eae785423aba00ba3",
+  "head": "38ee8359c688c039c6ae1db858f11282241d53ff",
+  "parent": "c72d0ed6b9bbb918eb08b4c4efb37bcf89894707",
+  "transition": "ceb5ab6ff0b910436768384a622299f4b01d2da3",
+  "peer": {
+    "core": "22.1.7",
+    "core_dts_sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84",
+    "declaration": "/**\n * A [DI token](api/core/InjectionToken) that indicates which animations\n * module has been loaded.\n * @publicApi\n */\ndeclare const ANIMATION_MODULE_TYPE: InjectionToken<\"BrowserAnimations\" | \"NoopAnimations\">;",
+    "jsdoc_tags": [
+      "publicApi"
+    ],
+    "runtime_injection_token_identity": true,
+    "runtime_token_description": "InjectionToken AnimationModuleType",
+    "token_deprecated_marker": false,
+    "platform_browser_animations_dts_sha256": "bd61d6d88e5468dad38ea3598bac5bbf91610d7fd40a56ead8bcc469a5c311d7",
+    "deprecated_related_modules": [
+      {
+        "name": "BrowserAnimationsModule",
+        "tags": [
+          {
+            "tag": "publicApi",
+            "text": ""
+          },
+          {
+            "tag": "deprecated",
+            "text": "20.2 Use `animate.enter` or `animate.leave` instead. Intent to remove in v23"
+          }
+        ]
+      },
+      {
+        "name": "NoopAnimationsModule",
+        "tags": [
+          {
+            "tag": "publicApi",
+            "text": ""
+          },
+          {
+            "tag": "deprecated",
+            "text": "20.2 Use `animate.enter` or `animate.leave` instead. Intent to remove in v23"
+          }
+        ]
+      }
+    ],
+    "interpretation": "The core token is public and has no deprecation tag in the minimum declaration; related animation modules are deprecated and planned for removal. Identity does not establish behavior."
+  },
+  "rows": [
+    {
+      "key": {
+        "file": "legacy-dialog/dialog.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog.ts",
+      "before_sha256": "7f7250274cdd11c1e71474553fc7387843262265f8b44c49339b2467abd68f5d",
+      "transition_sha256": "f61dfeed66de6b3f52507fa6876fa6d7cf32f1786b3cf45486586d5bb18391a0",
+      "current_sha256": "f61dfeed66de6b3f52507fa6876fa6d7cf32f1786b3cf45486586d5bb18391a0",
+      "before_git_blob": "8f2a7e6b42015f72840fcedf51965cdb9d6c2e62",
+      "transition_git_blob": "f51715ce57b9141d84234021c07eefdb6640e20b",
+      "current_git_blob": "f51715ce57b9141d84234021c07eefdb6640e20b",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  Inject,\n  Injectable,\n  InjectionToken,\n  Injector,\n  Optional,\n  SkipSelf,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-dialog/dialog.ts b/projects/ngx-material-legacy/legacy-dialog/dialog.ts\nindex 8f2a7e6b4..f51715ce5 100644\n--- a/projects/ngx-material-legacy/legacy-dialog/dialog.ts\n+++ b/projects/ngx-material-legacy/legacy-dialog/dialog.ts\n@@ -7,10 +7,11 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {Overlay, OverlayContainer, ScrollStrategy} from '@angular/cdk/overlay';\n import {Location} from '@angular/common';\n import {\n-  ANIMATION_MODULE_TYPE,\n   Inject,\n   Injectable,\n   InjectionToken,\n@@ -88,7 +89,7 @@ export class MatLegacyDialog extends _MatDialogBase<MatLegacyDialogContainer> {\n      * @breaking-change 14.0.0\n      */\n     @Optional()\n-    @Inject(ANIMATION_MODULE_TYPE)\n+    @Inject(LEGACY_ANIMATION_MODE)\n     animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n   ) {\n     super(\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+        "sha256": "277c426af47f734939311b74911f441ddc47fafa6d04111ec1919aed89e872b3"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-form-field/form-field.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "before_sha256": "e645f8b92ccb57518eb9fac6ab3a20c35db6bd9f19a301fcb659ffe58911cfb6",
+      "transition_sha256": "e0fe0631a6adde57f515b82b43156d5da0ab0c2730872df5b792fc27dab14931",
+      "current_sha256": "e0fe0631a6adde57f515b82b43156d5da0ab0c2730872df5b792fc27dab14931",
+      "before_git_blob": "aff83b932a55e778cfa1d74dccfb1810e1fbf764",
+      "transition_git_blob": "ed01890da5686a6a5e7503b64e33352264fd752c",
+      "current_git_blob": "ed01890da5686a6a5e7503b64e33352264fd752c",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {ANIMATION_MODULE_TYPE} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-form-field/form-field.ts b/projects/ngx-material-legacy/legacy-form-field/form-field.ts\nindex aff83b932..ed01890da 100644\n--- a/projects/ngx-material-legacy/legacy-form-field/form-field.ts\n+++ b/projects/ngx-material-legacy/legacy-form-field/form-field.ts\n@@ -7,6 +7,8 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {Directionality} from '@angular/cdk/bidi';\n import {coerceBooleanProperty} from '@angular/cdk/coercion';\n type BooleanInput = string | boolean | null | undefined;\n@@ -47,7 +49,7 @@ import {Platform} from '@angular/cdk/platform';\n import {afterFormFieldRender} from './internal/after-form-field-render';\n import {nextLegacyHintId} from './internal/hint-id';\n import {AbstractControlDirective, ValidatorFn} from '@angular/forms';\n-import {ANIMATION_MODULE_TYPE} from '@angular/core';\n+\n import {MatFormFieldControl} from '@angular/material/form-field';\n import {\n   MAT_LEGACY_ERROR as MAT_ERROR,\n@@ -317,7 +319,7 @@ export class MatLegacyFormField\n     private _defaults: MatLegacyFormFieldDefaultOptions,\n     private _platform: Platform,\n     private _ngZone: NgZone,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) _animationMode: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) _animationMode: string,\n     private _injector?: Injector,\n   ) {\n     super(elementRef);\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/frozen-form-hint-roles-v1.json",
+        "sha256": "dd468d6f448e70cfb9d290634faff83768b153d87f1ebe58f33709bbb26d8057",
+        "bytes": 372636
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-chips/chip.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+      "before_sha256": "73aea18bc4f77958bc69229ea4954a688d92913bbc59fb52e28f342c2d42a5ae",
+      "transition_sha256": "04c8cdd43261f67be762c8938c1d901ccc64ac6414f03c9eeb8161ffc64b2a26",
+      "current_sha256": "04c8cdd43261f67be762c8938c1d901ccc64ac6414f03c9eeb8161ffc64b2a26",
+      "before_git_blob": "9c7bb1edbc65c9730bf9cdb14bc41b79f9ef20a8",
+      "transition_git_blob": "522bc8970d2ac7167273cc4dafd193ca347c08b4",
+      "current_git_blob": "522bc8970d2ac7167273cc4dafd193ca347c08b4",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  Attribute,\n  ChangeDetectorRef,\n  ContentChild,\n  Directive,\n  ElementRef,\n  EventEmitter,\n  Inject,\n  InjectionToken,\n  Input,\n  NgZone,\n  OnDestroy,\n  Optional,\n  Output,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-chips/chip.ts b/projects/ngx-material-legacy/legacy-chips/chip.ts\nindex 9c7bb1edb..522bc8970 100644\n--- a/projects/ngx-material-legacy/legacy-chips/chip.ts\n+++ b/projects/ngx-material-legacy/legacy-chips/chip.ts\n@@ -7,6 +7,8 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {FocusableOption} from '@angular/cdk/a11y';\n import {coerceBooleanProperty} from '@angular/cdk/coercion';\n type BooleanInput = string | boolean | null | undefined;\n@@ -14,7 +16,6 @@ import {BACKSPACE, DELETE, SPACE} from '@angular/cdk/keycodes';\n import {Platform} from '@angular/cdk/platform';\n import {DOCUMENT} from '@angular/common';\n import {\n-  ANIMATION_MODULE_TYPE,\n   Attribute,\n   ChangeDetectorRef,\n   ContentChild,\n@@ -313,7 +314,7 @@ export class MatLegacyChip\n     globalRippleOptions: RippleGlobalOptions | null,\n     private _changeDetectorRef: ChangeDetectorRef,\n     @Inject(DOCUMENT) _document: any,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n     @Attribute('tabindex') tabIndex?: string,\n   ) {\n     super(elementRef);\n@@ -330,7 +331,7 @@ export class MatLegacyChip\n     this._chipRipple.setupTriggerEvents(elementRef);\n \n     this.rippleConfig = globalRippleOptions || {};\n-    this._animationsDisabled = animationMode === 'NoopAnimations';\n+    this._animationsDisabled = resolveLegacyAnimationMode(animationMode) === 'NoopAnimations';\n     this.tabIndex = tabIndex != null ? parseInt(tabIndex) || -1 : -1;\n   }\n \n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/chip-focus-role-requalification.json",
+        "sha256": "7d55c20b3cb15628dd68ad6ce608249df25f9329d0deac52d3dedaccc8030ee4"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-slide-toggle/slide-toggle.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.ts",
+      "before_sha256": "2e0a9754b883f36fd8a8d146515c76fc3883d643794ccb524c9226b309bbbc74",
+      "transition_sha256": "f1c46a44a217caf01fe995fc49e1ec7dc1966b1963d45b7234ba7bcbb431314a",
+      "current_sha256": "f1c46a44a217caf01fe995fc49e1ec7dc1966b1963d45b7234ba7bcbb431314a",
+      "before_git_blob": "e1ec9dba39bbb52b672b397003cf7a943d9dfaec",
+      "transition_git_blob": "53f5f8355dd478d68f923a26e48b08a5d11cc7d7",
+      "current_git_blob": "53f5f8355dd478d68f923a26e48b08a5d11cc7d7",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  Attribute,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  forwardRef,\n  Inject,\n  Optional,\n  ViewChild,\n  ViewEncapsulation,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.ts b/projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.ts\nindex e1ec9dba3..53f5f8355 100644\n--- a/projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.ts\n+++ b/projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.ts\n@@ -7,9 +7,10 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';\n import {\n-  ANIMATION_MODULE_TYPE,\n   Attribute,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n@@ -87,7 +88,7 @@ export class MatLegacySlideToggle extends _MatSlideToggleBase<MatLegacySlideTogg\n     @Attribute('tabindex') tabIndex: string,\n     @Inject(MAT_LEGACY_SLIDE_TOGGLE_DEFAULT_OPTIONS)\n     defaults: MatLegacySlideToggleDefaultOptions,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(\n       elementRef,\n@@ -95,7 +96,7 @@ export class MatLegacySlideToggle extends _MatSlideToggleBase<MatLegacySlideTogg\n       changeDetectorRef,\n       tabIndex,\n       defaults,\n-      animationMode,\n+      resolveLegacyAnimationMode(animationMode),\n       'mat-slide-toggle-',\n     );\n   }\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+        "sha256": "277c426af47f734939311b74911f441ddc47fafa6d04111ec1919aed89e872b3"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-progress-bar/progress-bar.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts",
+      "before_sha256": "815ce6bcc47f7218ee8cc175c84327829c7778ab429fc8b5e137a783e5d7aa3b",
+      "transition_sha256": "9d1672f615ab47a87c54996cbd44986148cca30ba4d1660bf034ee9ec809753e",
+      "current_sha256": "3afb3707feec6143378e060d1e2b9501d7d0512984919d1f237702340ca4a6b7",
+      "before_git_blob": "9efea8b534ef02f9a0c4ba0502610ad0e4157e06",
+      "transition_git_blob": "0afc269ea45265f18cbb57a78ffcdd7095e5bda3",
+      "current_git_blob": "c6495938f49cc5641034cc19f85aed48a62414ff",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  Component,\n  ElementRef,\n  EventEmitter,\n  Inject,\n  Input,\n  NgZone,\n  OnDestroy,\n  Optional,\n  Output,\n  ViewChild,\n  ViewEncapsulation,\n  ChangeDetectorRef,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts b/projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts\nindex 9efea8b53..0afc269ea 100644\n--- a/projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts\n+++ b/projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts\n@@ -6,10 +6,11 @@\n  * Use of this source code is governed by an MIT-style license that can be\n  * found in the LICENSE file at https://angular.io/license\n  */\n+\n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n import {coerceNumberProperty} from '@angular/cdk/coercion';\n type NumberInput = string | number | null | undefined;\n import {\n-  ANIMATION_MODULE_TYPE,\n   AfterViewInit,\n   ChangeDetectionStrategy,\n   Component,\n@@ -81,7 +82,7 @@ export class MatLegacyProgressBar\n   constructor(\n     elementRef: ElementRef,\n     private _ngZone: NgZone,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string,\n     /**\n      * @deprecated `location` parameter to be made required.\n      * @breaking-change 8.0.0\n@@ -97,6 +98,7 @@ export class MatLegacyProgressBar\n     private _changeDetectorRef?: ChangeDetectorRef,\n   ) {\n     super(elementRef);\n+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);\n \n     // We need to prefix the SVG reference with the current path, otherwise they won't work\n     // in Safari if the page has a `<base>` tag. Note that we need quotes inside the `url()`,\n",
+      "full_subsequent_diff": "diff --git a/projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts b/projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts\nindex 0afc269ea..c6495938f 100644\n--- a/projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts\n+++ b/projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts\n@@ -108,7 +108,7 @@ export class MatLegacyProgressBar\n     // the same thing.\n     const path = location ? location.getPathname().split('#')[0] : '';\n     this._rectangleFillValue = `url('${path}#${this.progressbarId}')`;\n-    this._isNoopAnimation = _animationMode === 'NoopAnimations';\n+    this._isNoopAnimation = this._animationMode === 'NoopAnimations';\n \n     if (defaults) {\n       if (defaults.color) {\n",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+        "sha256": "277c426af47f734939311b74911f441ddc47fafa6d04111ec1919aed89e872b3"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-radio/radio.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-radio/radio.ts",
+      "before_sha256": "dffd3e4daf0d50d915303b2e3d13d26e8c97fb77756ccf8c618e34022f548f1e",
+      "transition_sha256": "0b749baf2f25dcacad39803d51f809f2cca02ed4add03c3199513cdf60b9fb15",
+      "current_sha256": "0b749baf2f25dcacad39803d51f809f2cca02ed4add03c3199513cdf60b9fb15",
+      "before_git_blob": "26e4f3e0c1a7fe2f78fc461c8db1709429eea4ad",
+      "transition_git_blob": "48ee777ddc0a45924f0a69cf784b832b95ecad27",
+      "current_git_blob": "48ee777ddc0a45924f0a69cf784b832b95ecad27",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  Attribute,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ContentChildren,\n  Directive,\n  ElementRef,\n  forwardRef,\n  Inject,\n  Optional,\n  QueryList,\n  ViewEncapsulation,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-radio/radio.ts b/projects/ngx-material-legacy/legacy-radio/radio.ts\nindex 26e4f3e0c..48ee777dd 100644\n--- a/projects/ngx-material-legacy/legacy-radio/radio.ts\n+++ b/projects/ngx-material-legacy/legacy-radio/radio.ts\n@@ -7,10 +7,11 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {FocusMonitor} from '@angular/cdk/a11y';\n import {UniqueSelectionDispatcher} from '@angular/cdk/collections';\n import {\n-  ANIMATION_MODULE_TYPE,\n   Attribute,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n@@ -103,7 +104,7 @@ export class MatLegacyRadioButton extends _MatRadioButtonBase {\n     changeDetector: ChangeDetectorRef,\n     focusMonitor: FocusMonitor,\n     radioDispatcher: UniqueSelectionDispatcher,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n     @Optional()\n     @Inject(MAT_RADIO_DEFAULT_OPTIONS)\n     providerOverride?: MatRadioDefaultOptions,\n@@ -115,7 +116,7 @@ export class MatLegacyRadioButton extends _MatRadioButtonBase {\n       changeDetector,\n       focusMonitor,\n       radioDispatcher,\n-      animationMode,\n+      resolveLegacyAnimationMode(animationMode),\n       providerOverride,\n       tabIndex,\n     );\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+        "sha256": "277c426af47f734939311b74911f441ddc47fafa6d04111ec1919aed89e872b3"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-checkbox/checkbox.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.ts",
+      "before_sha256": "774db12b55590d631d0a69c68a9aa7289adf600ac3fe62e288dd22fcf3c86766",
+      "transition_sha256": "072e0061972bde4529ba5151444f6ec3f69de326ee9f56941b229fe06366807f",
+      "current_sha256": "072e0061972bde4529ba5151444f6ec3f69de326ee9f56941b229fe06366807f",
+      "before_git_blob": "fb57b56a002b4536d38eba6db4b465a418a663af",
+      "transition_git_blob": "502712b1c5b4fb09d62b021257f07d3121e03299",
+      "current_git_blob": "502712b1c5b4fb09d62b021257f07d3121e03299",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  AfterViewInit,\n  Attribute,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  forwardRef,\n  Inject,\n  NgZone,\n  OnDestroy,\n  Optional,\n  ViewEncapsulation,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-checkbox/checkbox.ts b/projects/ngx-material-legacy/legacy-checkbox/checkbox.ts\nindex fb57b56a0..502712b1c 100644\n--- a/projects/ngx-material-legacy/legacy-checkbox/checkbox.ts\n+++ b/projects/ngx-material-legacy/legacy-checkbox/checkbox.ts\n@@ -7,9 +7,10 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';\n import {\n-  ANIMATION_MODULE_TYPE,\n   AfterViewInit,\n   Attribute,\n   ChangeDetectionStrategy,\n@@ -100,12 +101,12 @@ export class MatLegacyCheckbox\n     private _focusMonitor: FocusMonitor,\n     ngZone: NgZone,\n     @Attribute('tabindex') tabIndex: string,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n     @Optional()\n     @Inject(MAT_CHECKBOX_DEFAULT_OPTIONS)\n     options?: MatCheckboxDefaultOptions,\n   ) {\n-    super('mat-checkbox-', elementRef, changeDetectorRef, ngZone, tabIndex, animationMode, options);\n+    super('mat-checkbox-', elementRef, changeDetectorRef, ngZone, tabIndex, resolveLegacyAnimationMode(animationMode), options);\n   }\n \n   protected _createChangeEvent(isChecked: boolean) {\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+        "sha256": "277c426af47f734939311b74911f441ddc47fafa6d04111ec1919aed89e872b3"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-tabs/tab-header.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.ts",
+      "before_sha256": "650d50f3007c67c0c4aa9fa6e63b0fe6f246d7443fcb9967d5943c1fd7e90f9a",
+      "transition_sha256": "552b26686c0ae1bfc41345c45507e6b7d040f4d1983daa94888b13c0d2423d88",
+      "current_sha256": "552b26686c0ae1bfc41345c45507e6b7d040f4d1983daa94888b13c0d2423d88",
+      "before_git_blob": "f2783a69211ab548ef414fde27c7323c054355a8",
+      "transition_git_blob": "1f66cfa06c4d2401bb370d843bbd121f43f829aa",
+      "current_git_blob": "1f66cfa06c4d2401bb370d843bbd121f43f829aa",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ContentChildren,\n  ElementRef,\n  Inject,\n  NgZone,\n  Optional,\n  QueryList,\n  ViewChild,\n  ViewEncapsulation,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/tab-header.ts b/projects/ngx-material-legacy/legacy-tabs/tab-header.ts\nindex f2783a692..1f66cfa06 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/tab-header.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/tab-header.ts\n@@ -7,10 +7,11 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {Directionality} from '@angular/cdk/bidi';\n import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';\n import {\n-  ANIMATION_MODULE_TYPE,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n   Component,\n@@ -68,7 +69,7 @@ export class MatLegacyTabHeader extends _MatTabHeaderBase {\n     @Optional() dir: Directionality,\n     ngZone: NgZone,\n     platform: Platform,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);\n   }\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+        "sha256": "277c426af47f734939311b74911f441ddc47fafa6d04111ec1919aed89e872b3"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-tabs/tab-group.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.ts",
+      "before_sha256": "f4bf197d8dd5f7048e75b8c91655423fe6ed6b6d180866b152100cfb5a04da69",
+      "transition_sha256": "7ed0657a77371df891557fef7df4b2e9d5276ff121983eb6fd6918fb10015f82",
+      "current_sha256": "7ed0657a77371df891557fef7df4b2e9d5276ff121983eb6fd6918fb10015f82",
+      "before_git_blob": "f38f1386df0e0a31082431d1b695c3eacbf92dc8",
+      "transition_git_blob": "4c5fcc4287a50de14d4bb27f9a5a8caade7b848d",
+      "current_git_blob": "4c5fcc4287a50de14d4bb27f9a5a8caade7b848d",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ContentChildren,\n  ElementRef,\n  Inject,\n  Optional,\n  QueryList,\n  ViewChild,\n  ViewEncapsulation,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/tab-group.ts b/projects/ngx-material-legacy/legacy-tabs/tab-group.ts\nindex f38f1386d..4c5fcc428 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/tab-group.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/tab-group.ts\n@@ -7,8 +7,9 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {\n-  ANIMATION_MODULE_TYPE,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n   Component,\n@@ -65,7 +66,7 @@ export class MatLegacyTabGroup extends _MatTabGroupBase {\n     elementRef: ElementRef,\n     changeDetectorRef: ChangeDetectorRef,\n     @Inject(MAT_TABS_CONFIG) @Optional() defaultConfig?: MatTabsConfig,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(elementRef, changeDetectorRef, defaultConfig, animationMode);\n   }\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+        "sha256": "277c426af47f734939311b74911f441ddc47fafa6d04111ec1919aed89e872b3"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-tabs/ink-bar.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-tabs/ink-bar.ts",
+      "before_sha256": "739dd3b4acb9c0d9eba8039d47c0d8e7f07d045c6880cfecda4df5168ec28ff3",
+      "transition_sha256": "a36663578ea357161c7678c591416c1cc43dd15dae9f9226bd94c9b37073902b",
+      "current_sha256": "a36663578ea357161c7678c591416c1cc43dd15dae9f9226bd94c9b37073902b",
+      "before_git_blob": "4c7581367506b832b10ea253ddad94c44449b1ab",
+      "transition_git_blob": "871cdc95eb9d5ce8f6184052852fd1b6c232f749",
+      "current_git_blob": "871cdc95eb9d5ce8f6184052852fd1b6c232f749",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  Directive,\n  ElementRef,\n  Inject,\n  NgZone,\n  Optional,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/ink-bar.ts b/projects/ngx-material-legacy/legacy-tabs/ink-bar.ts\nindex 4c7581367..871cdc95e 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/ink-bar.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/ink-bar.ts\n@@ -7,8 +7,9 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {\n-  ANIMATION_MODULE_TYPE,\n   Directive,\n   ElementRef,\n   Inject,\n@@ -35,8 +36,10 @@ export class MatLegacyInkBar {\n     private _elementRef: ElementRef<HTMLElement>,\n     private _ngZone: NgZone,\n     @Inject(_MAT_INK_BAR_POSITIONER) private _inkBarPositioner: _MatInkBarPositioner,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,\n-  ) {}\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string,\n+  ) {\n+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);\n+  }\n \n   /**\n    * Calculates the styles from the provided element in order to align the ink-bar to that element.\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+        "sha256": "277c426af47f734939311b74911f441ddc47fafa6d04111ec1919aed89e872b3"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-button/button.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-button/button.ts",
+      "before_sha256": "6d37f01619672b62496d5ffb8bec6df6dfe32214893191644d46012424ff5bb4",
+      "transition_sha256": "ea16775994ad396442d6c3a62cc7b0eba2c08bc51e999e56597c666b81a49964",
+      "current_sha256": "ea16775994ad396442d6c3a62cc7b0eba2c08bc51e999e56597c666b81a49964",
+      "before_git_blob": "fc27014ff51c6157af4fe807dffc82fc7ce2b8f4",
+      "transition_git_blob": "506af2f5f8edcbc8fc40c293b6e77d95f8145041",
+      "current_git_blob": "506af2f5f8edcbc8fc40c293b6e77d95f8145041",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  Component,\n  ElementRef,\n  Inject,\n  Input,\n  NgZone,\n  OnDestroy,\n  Optional,\n  ViewChild,\n  ViewEncapsulation,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-button/button.ts b/projects/ngx-material-legacy/legacy-button/button.ts\nindex fc27014ff..506af2f5f 100644\n--- a/projects/ngx-material-legacy/legacy-button/button.ts\n+++ b/projects/ngx-material-legacy/legacy-button/button.ts\n@@ -7,9 +7,10 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {FocusMonitor, FocusableOption, FocusOrigin} from '@angular/cdk/a11y';\n import {\n-  ANIMATION_MODULE_TYPE,\n   AfterViewInit,\n   ChangeDetectionStrategy,\n   Component,\n@@ -100,9 +101,10 @@ export class MatLegacyButton\n   constructor(\n     elementRef: ElementRef,\n     private _focusMonitor: FocusMonitor,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode: string,\n   ) {\n     super(elementRef);\n+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);\n \n     // For each of the variant selectors that is present in the button's host\n     // attributes, add the correct corresponding class.\n@@ -185,7 +187,7 @@ export class MatLegacyAnchor extends MatLegacyButton implements AfterViewInit, O\n   constructor(\n     focusMonitor: FocusMonitor,\n     elementRef: ElementRef,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode: string,\n     /** @breaking-change 14.0.0 _ngZone will be required. */\n     @Optional() private _ngZone?: NgZone,\n   ) {\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+        "sha256": "277c426af47f734939311b74911f441ddc47fafa6d04111ec1919aed89e872b3"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-slider/slider.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+      "before_sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d",
+      "transition_sha256": "584d648acc358a46e0ceaf2ffd48d528eedd9536eb3e6ab7c3b30b485ae70aad",
+      "current_sha256": "584d648acc358a46e0ceaf2ffd48d528eedd9536eb3e6ab7c3b30b485ae70aad",
+      "before_git_blob": "d46f61ffa59654971420e70896f94443d16ad577",
+      "transition_git_blob": "4a6f9e78df806ad6021a7f50e4305aa070cdcdbd",
+      "current_git_blob": "4a6f9e78df806ad6021a7f50e4305aa070cdcdbd",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  Attribute,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  EventEmitter,\n  forwardRef,\n  Inject,\n  Input,\n  OnDestroy,\n  Optional,\n  Output,\n  ViewChild,\n  ViewEncapsulation,\n  NgZone,\n  AfterViewInit,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-slider/slider.ts b/projects/ngx-material-legacy/legacy-slider/slider.ts\nindex d46f61ffa..4a6f9e78d 100644\n--- a/projects/ngx-material-legacy/legacy-slider/slider.ts\n+++ b/projects/ngx-material-legacy/legacy-slider/slider.ts\n@@ -7,6 +7,8 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';\n import {Directionality} from '@angular/cdk/bidi';\n import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion';\n@@ -24,7 +26,6 @@ import {\n   hasModifierKey,\n } from '@angular/cdk/keycodes';\n import {\n-  ANIMATION_MODULE_TYPE,\n   Attribute,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n@@ -528,9 +529,10 @@ export class MatLegacySlider\n     @Attribute('tabindex') tabIndex: string,\n     private _ngZone: NgZone,\n     @Inject(DOCUMENT) _document: any,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string,\n   ) {\n     super(elementRef);\n+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);\n     this._document = _document;\n     this.tabIndex = parseInt(tabIndex) || 0;\n \n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+        "sha256": "277c426af47f734939311b74911f441ddc47fafa6d04111ec1919aed89e872b3"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-progress-spinner/progress-spinner.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts",
+      "before_sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+      "transition_sha256": "2b9b0ef22f95d54e1d4f4b1baf8cffe626f7552b40025935cb448006cb790275",
+      "current_sha256": "2b9b0ef22f95d54e1d4f4b1baf8cffe626f7552b40025935cb448006cb790275",
+      "before_git_blob": "e97dbd0988c77d42a5793c8501051ffcc73ced0a",
+      "transition_git_blob": "a4a21d1b7577e51e51371df77ef23df1a7414735",
+      "current_git_blob": "a4a21d1b7577e51e51371df77ef23df1a7414735",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  ChangeDetectionStrategy,\n  Component,\n  ElementRef,\n  Inject,\n  Input,\n  Optional,\n  ViewEncapsulation,\n  OnInit,\n  ChangeDetectorRef,\n  OnDestroy,\n  NgZone,\n  CSP_NONCE,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts b/projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts\nindex e97dbd098..a4a21d1b7 100644\n--- a/projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts\n+++ b/projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts\n@@ -7,6 +7,8 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {coerceNumberProperty} from '@angular/cdk/coercion';\n type NumberInput = string | number | null | undefined;\n import {Platform} from '@angular/cdk/platform';\n@@ -14,7 +16,6 @@ import {legacyGetShadowRoot} from '@ngx-compat/material-legacy/legacy-core';\n import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';\n import {DOCUMENT} from '@angular/common';\n import {\n-  ANIMATION_MODULE_TYPE,\n   ChangeDetectionStrategy,\n   Component,\n   ElementRef,\n@@ -183,7 +184,7 @@ export class MatLegacyProgressSpinner\n     elementRef: ElementRef<HTMLElement>,\n     _platform: Platform,\n     @Optional() @Inject(DOCUMENT) private _document: any,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode: string,\n     @Inject(MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS)\n     defaults?: MatProgressSpinnerDefaultOptions,\n     /**\n@@ -208,7 +209,7 @@ export class MatLegacyProgressSpinner\n     }\n \n     this._noopAnimations =\n-      animationMode === 'NoopAnimations' && !!defaults && !defaults._forceAnimations;\n+      resolveLegacyAnimationMode(animationMode) === 'NoopAnimations' && !!defaults && !defaults._forceAnimations;\n \n     if (elementRef.nativeElement.nodeName.toLowerCase() === 'mat-spinner') {\n       this.mode = 'indeterminate';\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+        "sha256": "277c426af47f734939311b74911f441ddc47fafa6d04111ec1919aed89e872b3"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-tooltip/tooltip.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+      "before_sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29",
+      "transition_sha256": "f3913888f304ef75667d307ec8b085db02890bd7c67313098da60b9b3a655911",
+      "current_sha256": "f3913888f304ef75667d307ec8b085db02890bd7c67313098da60b9b3a655911",
+      "before_git_blob": "8c916880f6aaf86972948b0e4d4944ce85fae027",
+      "transition_git_blob": "e3af3d9faa2b1b4cb79896da8dc3a5c2c9ff967c",
+      "current_git_blob": "e3af3d9faa2b1b4cb79896da8dc3a5c2c9ff967c",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  Directive,\n  ElementRef,\n  Inject,\n  NgZone,\n  Optional,\n  ViewChild,\n  ViewContainerRef,\n  ViewEncapsulation,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-tooltip/tooltip.ts b/projects/ngx-material-legacy/legacy-tooltip/tooltip.ts\nindex 8c916880f..e3af3d9fa 100644\n--- a/projects/ngx-material-legacy/legacy-tooltip/tooltip.ts\n+++ b/projects/ngx-material-legacy/legacy-tooltip/tooltip.ts\n@@ -6,6 +6,8 @@\n  * Use of this source code is governed by an MIT-style license that can be\n  * found in the LICENSE file at https://angular.io/license\n  */\n+\n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n import {AriaDescriber, FocusMonitor} from '@angular/cdk/a11y';\n import {Directionality} from '@angular/cdk/bidi';\n import {BreakpointObserver, Breakpoints, BreakpointState} from '@angular/cdk/layout';\n@@ -13,7 +15,6 @@ import {Overlay} from '@angular/cdk/overlay';\n import {Platform} from '@angular/cdk/platform';\n import {ScrollDispatcher} from '@angular/cdk/scrolling';\n import {\n-  ANIMATION_MODULE_TYPE,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n   Component,\n@@ -123,7 +124,7 @@ export class LegacyTooltipComponent extends _TooltipComponentBase {\n   constructor(\n     changeDetectorRef: ChangeDetectorRef,\n     breakpointObserver: BreakpointObserver,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(changeDetectorRef, animationMode);\n     this._isHandset = breakpointObserver.observe(Breakpoints.Handset);\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+        "sha256": "277c426af47f734939311b74911f441ddc47fafa6d04111ec1919aed89e872b3"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-card/card.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-card/card.ts",
+      "before_sha256": "2e2c16ba865b712214e0d51a739fd01e20af819e65065e2b99b55cc1433208ad",
+      "transition_sha256": "258d12086d1bd119c120182f7cdad01888405ad2fddd027333761657a04f6214",
+      "current_sha256": "258d12086d1bd119c120182f7cdad01888405ad2fddd027333761657a04f6214",
+      "before_git_blob": "98283a2766717c25809da27edcad28fe9f19c76b",
+      "transition_git_blob": "d103fc0302a9c9c1e15017ba87251cc8e455ec33",
+      "current_git_blob": "d103fc0302a9c9c1e15017ba87251cc8e455ec33",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  Component,\n  ViewEncapsulation,\n  ChangeDetectionStrategy,\n  Directive,\n  Input,\n  Optional,\n  Inject,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-card/card.ts b/projects/ngx-material-legacy/legacy-card/card.ts\nindex 98283a276..d103fc030 100644\n--- a/projects/ngx-material-legacy/legacy-card/card.ts\n+++ b/projects/ngx-material-legacy/legacy-card/card.ts\n@@ -7,8 +7,9 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {\n-  ANIMATION_MODULE_TYPE,\n   Component,\n   ViewEncapsulation,\n   ChangeDetectionStrategy,\n@@ -177,7 +178,9 @@ export class MatLegacyCardAvatar {}\n })\n export class MatLegacyCard {\n   // @breaking-change 9.0.0 `_animationMode` parameter to be made required.\n-  constructor(@Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string) {}\n+  constructor(@Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string) {\n+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);\n+  }\n }\n \n /**\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+        "sha256": "277c426af47f734939311b74911f441ddc47fafa6d04111ec1919aed89e872b3"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-tooltip/internal/tooltip-base.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+      "before_sha256": "fc29490be443cdb544e553f762be572fb4e6635216ad47dbb492a5dffa113aad",
+      "transition_sha256": "129840095601268daff0ef401a35841ff2cf84ba4cc89c676bbaeee46048abe9",
+      "current_sha256": "da877c1342fb1f8b73e8c33750d94bfac9629ca07dd57c44c92751e674e1b8ed",
+      "before_git_blob": "9de37584a46e0073f14bf80643e3df03934bda59",
+      "transition_git_blob": "93aad55db3b9ca00cf85ee72c2be6e516f36d71f",
+      "current_git_blob": "614a2afc50afbafa279e04912361dd2c7ae68be4",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  AfterViewInit,\n  ANIMATION_MODULE_TYPE,\n  ChangeDetectorRef,\n  Directive,\n  ElementRef,\n  Inject,\n  InjectionToken,\n  Input,\n  NgZone,\n  OnDestroy,\n  Optional,\n  ViewContainerRef,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts b/projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts\nindex 9de37584a..93aad55db 100644\n--- a/projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts\n+++ b/projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts\n@@ -10,6 +10,8 @@\n  * factory provider (removed from Angular Material 22 public API).\n  */\n \n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {AriaDescriber, FocusMonitor} from '@angular/cdk/a11y';\n import {Directionality} from '@angular/cdk/bidi';\n import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion';\n@@ -37,7 +39,7 @@ import {ScrollDispatcher} from '@angular/cdk/scrolling';\n import {DOCUMENT} from '@angular/common';\n import {\n   AfterViewInit,\n-  ANIMATION_MODULE_TYPE,\n+\n   ChangeDetectorRef,\n   Directive,\n   ElementRef,\n@@ -865,7 +867,7 @@ export abstract class _TooltipComponentBase implements OnDestroy {\n \n   constructor(\n     private _changeDetectorRef: ChangeDetectorRef,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     this._animationsDisabled =\n       legacyAnimationsDisabled() || animationMode === 'NoopAnimations';\n",
+      "full_subsequent_diff": "diff --git a/projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts b/projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts\nindex 93aad55db..614a2afc5 100644\n--- a/projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts\n+++ b/projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts\n@@ -463,6 +463,13 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase>\n       positionStrategy: strategy,\n       panelClass: `${this._cssClassPrefix}-${PANEL_CLASS}`,\n       scrollStrategy: this._scrollStrategy(),\n+      // Let unrelated keys reach overlays beneath the tooltip. Pointer events must retain\n+      // the existing outside-interaction behavior.\n+      eventPredicate: event => event.type !== 'keydown' || (\n+        this._isTooltipVisible() &&\n+        (event as KeyboardEvent).keyCode === ESCAPE &&\n+        !hasModifierKey(event as KeyboardEvent)\n+      ),\n     });\n \n     this._updatePosition(this._overlayRef);\n",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/dialog-config-inherited-source-context.json",
+        "sha256": "cd481f4d57213bda5c9413dfc9d3f0c0a269194681194fd8934e143857df306b"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-tabs/internal/paginated-tab-header.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts",
+      "before_sha256": "0a4ed71681ab98f871d9242cce46935a3bfce3add6c7324b7fee2fb94dee608e",
+      "transition_sha256": "e117a32b9e5a70780e143504cc0e7cae34442cdebe111ccdfc05253e90721667",
+      "current_sha256": "e117a32b9e5a70780e143504cc0e7cae34442cdebe111ccdfc05253e90721667",
+      "before_git_blob": "e3f13d5f0fb383d6a8665a95c48f0d3e4cb663ef",
+      "transition_git_blob": "01f754bb19c45bae16f1b8f1011f9444d3f50953",
+      "current_git_blob": "01f754bb19c45bae16f1b8f1011f9444d3f50953",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  ChangeDetectorRef,\n  ElementRef,\n  NgZone,\n  Optional,\n  QueryList,\n  EventEmitter,\n  AfterContentChecked,\n  AfterContentInit,\n  AfterViewInit,\n  OnDestroy,\n  Directive,\n  Inject,\n  Input,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts b/projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts\nindex e3f13d5f0..01f754bb1 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts\n@@ -9,8 +9,9 @@\n  * Owned Material-16 `MatPaginatedTabHeader` (M22 version is inject()-only).\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {\n-  ANIMATION_MODULE_TYPE,\n   ChangeDetectorRef,\n   ElementRef,\n   NgZone,\n@@ -180,8 +181,9 @@ export abstract class MatPaginatedTabHeader\n     @Optional() private _dir: Directionality,\n     private _ngZone: NgZone,\n     private _platform: Platform,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string,\n   ) {\n+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);\n     // Bind the `mouseleave` event on the outside since it doesn't change anything in the view.\n     _ngZone.runOutsideAngular(() => {\n       fromEvent(_elementRef.nativeElement, 'mouseleave')\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/tabs-paginated-tab-header-review.json",
+        "sha256": "edf891446cc4de60d2e05828f7dc9dcab774dd1681dbef6d7f2cca912b4fffc2"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-tabs/internal/tab-nav-bar-base.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+      "before_sha256": "8649def821d9362552cebad62c22855f3b225d828e246d48df3be51822e891ed",
+      "transition_sha256": "008255ffdda75f44728754803a78fb032f8491acb1c7976f64d7a15f97d65295",
+      "current_sha256": "008255ffdda75f44728754803a78fb032f8491acb1c7976f64d7a15f97d65295",
+      "before_git_blob": "9b2c7eebdb6da209a07f48a0e017363c049ba14d",
+      "transition_git_blob": "a8ee32efba5098c14c232f02730b5365d9bf3d87",
+      "current_git_blob": "a8ee32efba5098c14c232f02730b5365d9bf3d87",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  AfterContentChecked,\n  AfterContentInit,\n  AfterViewInit,\n  Attribute,\n  ChangeDetectorRef,\n  ContentChildren,\n  Directive,\n  ElementRef,\n  forwardRef,\n  Inject,\n  Input,\n  NgZone,\n  OnDestroy,\n  Optional,\n  QueryList,\n  signal,\n  WritableSignal,\n  ViewChild,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts b/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts\nindex 9b2c7eebd..a8ee32efb 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts\n@@ -8,8 +8,9 @@\n  *\n  * Owned Material-16 tab-nav bases.\n  */\n+\n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n import {\n-  ANIMATION_MODULE_TYPE,\n   AfterContentChecked,\n   AfterContentInit,\n   AfterViewInit,\n@@ -123,7 +124,7 @@ export abstract class _MatTabNavBase\n     changeDetectorRef: ChangeDetectorRef,\n     viewportRuler: ViewportRuler,\n     platform: Platform,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);\n   }\n@@ -246,15 +247,15 @@ export class _MatTabLinkBase\n     @Optional() @Inject(MAT_RIPPLE_GLOBAL_OPTIONS) globalRippleOptions: RippleGlobalOptions | null,\n     @Attribute('tabindex') tabIndex: string,\n     private _focusMonitor: FocusMonitor,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super();\n \n     this.rippleConfig = globalRippleOptions || {};\n     this.tabIndex = parseInt(tabIndex) || 0;\n \n-    if (animationMode === 'NoopAnimations') {\n-      this.rippleConfig.animation = {enterDuration: 0, exitDuration: 0};\n+    if (resolveLegacyAnimationMode(animationMode) === 'NoopAnimations') {\n+      this.rippleConfig = {...this.rippleConfig, animation: {enterDuration: 0, exitDuration: 0}};\n     }\n   }\n \n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/current-repaired-source-integration-v2.json",
+        "sha256": "457f1eea2951b86a49dec994fda8a0842657d080b8ec76e25835d42f872882d1",
+        "bytes": 2076179
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-tabs/internal/tab-group-base.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+      "before_sha256": "339cd7dee4e6431d4a603b215bf5a78fb654b23dfb49bfe50246cb44af17515e",
+      "transition_sha256": "7943cc105951aade5bcae9fb8763cbac0e9413b9ea739d381b6aea30831d3ab6",
+      "current_sha256": "7943cc105951aade5bcae9fb8763cbac0e9413b9ea739d381b6aea30831d3ab6",
+      "before_git_blob": "ce4b225d6a8da845d41a21de8954a92b6f44c256",
+      "transition_git_blob": "ccaffba4050abf77d4ed8dc15655895f9434b305",
+      "current_git_blob": "ccaffba4050abf77d4ed8dc15655895f9434b305",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  AfterContentChecked,\n  AfterContentInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ContentChildren,\n  Directive,\n  ElementRef,\n  EventEmitter,\n  Inject,\n  Input,\n  OnDestroy,\n  Optional,\n  Output,\n  QueryList,\n  ViewChild,\n  ViewEncapsulation,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts b/projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts\nindex ce4b225d6..ccaffba40 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts\n@@ -9,8 +9,9 @@\n  * Owned Material-16 `_MatTabGroupBase`.\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {\n-  ANIMATION_MODULE_TYPE,\n   AfterContentChecked,\n   AfterContentInit,\n   ChangeDetectionStrategy,\n@@ -233,9 +234,10 @@ export abstract class _MatTabGroupBase\n     elementRef: ElementRef,\n     protected _changeDetectorRef: ChangeDetectorRef,\n     @Inject(MAT_TABS_CONFIG) @Optional() defaultConfig?: MatTabsConfig,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string,\n   ) {\n     super(elementRef);\n+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);\n     this._groupId = nextId++;\n     this.animationDuration =\n       defaultConfig && defaultConfig.animationDuration ? defaultConfig.animationDuration : '500ms';\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/tabs-tab-group-base-review.json",
+        "sha256": "2cded35d2e8368771f9a83afd7e7fe386179b1295944853f9c259e1aa4d8ff10"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-tabs/internal/tab-header-base.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-header-base.ts",
+      "before_sha256": "eb75b2bf760e70744c3c85fee76dd2164cbb6b3242cb47f023300ebad0ce2b7e",
+      "transition_sha256": "c6c5e4da287d930bd14a86643152894c7a1d960fe617def6ad01e2a440d98e50",
+      "current_sha256": "c6c5e4da287d930bd14a86643152894c7a1d960fe617def6ad01e2a440d98e50",
+      "before_git_blob": "1fc0e42cf590d321521e8a083bca41b06471105d",
+      "transition_git_blob": "48aa18354811ff74a590c9dd3faf3f70c2a6b355",
+      "current_git_blob": "48aa18354811ff74a590c9dd3faf3f70c2a6b355",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  AfterContentChecked,\n  AfterContentInit,\n  AfterViewInit,\n  ANIMATION_MODULE_TYPE,\n  ChangeDetectorRef,\n  Directive,\n  ElementRef,\n  Inject,\n  Input,\n  NgZone,\n  OnDestroy,\n  Optional,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/internal/tab-header-base.ts b/projects/ngx-material-legacy/legacy-tabs/internal/tab-header-base.ts\nindex 1fc0e42cf..48aa18354 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/internal/tab-header-base.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/internal/tab-header-base.ts\n@@ -9,11 +9,13 @@\n  * Owned Material-16 `_MatTabHeaderBase`.\n  */\n \n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {\n   AfterContentChecked,\n   AfterContentInit,\n   AfterViewInit,\n-  ANIMATION_MODULE_TYPE,\n+\n   ChangeDetectorRef,\n   Directive,\n   ElementRef,\n@@ -54,7 +56,7 @@ export abstract class _MatTabHeaderBase\n     @Optional() dir: Directionality,\n     ngZone: NgZone,\n     platform: Platform,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);\n   }\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+        "sha256": "277c426af47f734939311b74911f441ddc47fafa6d04111ec1919aed89e872b3"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+      "before_sha256": "89e91390739e518a2a3e9dbdd8d75ff09dfcaa94bfe4bccc73d86f1e577c206c",
+      "transition_sha256": "4613064c4a0b05cc3551407512252d9f4f485f1ee0db4334b4f2c3e549ecf2fb",
+      "current_sha256": "4613064c4a0b05cc3551407512252d9f4f485f1ee0db4334b4f2c3e549ecf2fb",
+      "before_git_blob": "6e6d07336c53bbd8b55e9f740852447abcd5e4ed",
+      "transition_git_blob": "ddede69102bb899db51ff4c7a1e960c611d007d5",
+      "current_git_blob": "ddede69102bb899db51ff4c7a1e960c611d007d5",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {\n  ANIMATION_MODULE_TYPE,\n  Attribute,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ContentChildren,\n  Directive,\n  ElementRef,\n  forwardRef,\n  Inject,\n  Input,\n  NgZone,\n  OnDestroy,\n  Optional,\n  QueryList,\n  ViewChild,\n  ViewEncapsulation,\n} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(ANIMATION_MODULE_TYPE)"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "LEGACY_ANIMATION_MODE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "Inject(LEGACY_ANIMATION_MODE)"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts b/projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts\nindex 6e6d07336..ddede6910 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts\n@@ -6,12 +6,13 @@\n  * Use of this source code is governed by an MIT-style license that can be\n  * found in the LICENSE file at https://angular.io/license\n  */\n+\n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n import {FocusMonitor} from '@angular/cdk/a11y';\n import {Directionality} from '@angular/cdk/bidi';\n import {Platform} from '@angular/cdk/platform';\n import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';\n import {\n-  ANIMATION_MODULE_TYPE,\n   Attribute,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n@@ -78,7 +79,7 @@ export class MatLegacyTabNav extends _MatTabNavBase {\n     changeDetectorRef: ChangeDetectorRef,\n     viewportRuler: ViewportRuler,\n     platform: Platform,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(elementRef, dir, ngZone, changeDetectorRef, viewportRuler, platform, animationMode);\n   }\n@@ -119,7 +120,7 @@ export class MatLegacyTabLink extends _MatTabLinkBase implements OnDestroy {\n     @Optional() @Inject(MAT_RIPPLE_GLOBAL_OPTIONS) globalRippleOptions: RippleGlobalOptions | null,\n     @Attribute('tabindex') tabIndex: string,\n     focusMonitor: FocusMonitor,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(tabNavBar, elementRef, globalRippleOptions, tabIndex, focusMonitor, animationMode);\n     this._tabLinkRipple = new RippleRenderer(this, ngZone, elementRef, platform);\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json",
+        "sha256": "84f609ff5cec53d6ce94da5dffd365df09aeea79f59776378d277574d0191295"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    },
+    {
+      "key": {
+        "file": "legacy-core/internal/legacy-animations.ts",
+        "module": "@angular/core",
+        "symbol": "ANIMATION_MODULE_TYPE"
+      },
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+      "before_sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+      "transition_sha256": "97a730e6ecbc37b34e526cd202162049b4c2639a8f7c0dc4f3250d028f7e7b8b",
+      "current_sha256": "97a730e6ecbc37b34e526cd202162049b4c2639a8f7c0dc4f3250d028f7e7b8b",
+      "before_git_blob": "6bbea620d2db8160c91987c7773d5c84191e6d71",
+      "transition_git_blob": "474024a0c92ee89b6e04db883935d1eeed8a180c",
+      "current_git_blob": "474024a0c92ee89b6e04db883935d1eeed8a180c",
+      "before_scan": {
+        "imports": [
+          {
+            "local": "ANIMATION_MODULE_TYPE",
+            "clause": "import {ANIMATION_MODULE_TYPE, InjectionToken, assertInInjectionContext, inject} from '@angular/core';"
+          }
+        ],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [
+          {
+            "parent": "ImportSpecifier",
+            "text": "ANIMATION_MODULE_TYPE"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "inject(ANIMATION_MODULE_TYPE, {optional: true})"
+          }
+        ],
+        "owned": []
+      },
+      "transition_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "VariableDeclaration",
+            "text": "LEGACY_ANIMATION_MODE = new InjectionToken<'NoopAnimations' | 'BrowserAnimations'>(\n  'LEGACY_ANIMATION_MODE',\n)"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "inject(LEGACY_ANIMATION_MODE, {optional: true})"
+          }
+        ]
+      },
+      "current_scan": {
+        "imports": [],
+        "namespaces": [],
+        "exports": [],
+        "dynamic": [],
+        "identifiers": [],
+        "owned": [
+          {
+            "parent": "VariableDeclaration",
+            "text": "LEGACY_ANIMATION_MODE = new InjectionToken<'NoopAnimations' | 'BrowserAnimations'>(\n  'LEGACY_ANIMATION_MODE',\n)"
+          },
+          {
+            "parent": "CallExpression",
+            "text": "inject(LEGACY_ANIMATION_MODE, {optional: true})"
+          }
+        ]
+      },
+      "full_transition_diff": "diff --git a/projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts b/projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts\nindex 6bbea620d..474024a0c 100644\n--- a/projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts\n+++ b/projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts\n@@ -7,24 +7,29 @@\n  * found in the LICENSE file at https://angular.io/license\n  *\n  * Owned legacy motion helper. Reads the public MATERIAL_ANIMATIONS token and\n- * public ANIMATION_MODULE_TYPE. Does not call private Material helpers\n+ * an owned legacy mode token. Does not call private Material helpers\n  * (_getAnimationsState / _animationsDisabled).\n  */\n \n import {MediaMatcher} from '@angular/cdk/layout';\n-import {ANIMATION_MODULE_TYPE, InjectionToken, assertInInjectionContext, inject} from '@angular/core';\n+import {InjectionToken, assertInInjectionContext, inject} from '@angular/core';\n import {MATERIAL_ANIMATIONS} from '@angular/material/core';\n \n /** Public re-export for consumers/docs that prefer the legacy-core entry. */\n export {MATERIAL_ANIMATIONS};\n \n+/** Legacy-only animation policy. It is distinct from Material's token. */\n+export const LEGACY_ANIMATION_MODE = new InjectionToken<'NoopAnimations' | 'BrowserAnimations'>(\n+  'LEGACY_ANIMATION_MODE',\n+);\n+\n /** Owned state labels for lifecycle/tests (mirrors Material public semantics). */\n export type LegacyAnimationsState = 'enabled' | 'di-disabled' | 'reduced-motion';\n \n /**\n  * Optional override token for unit tests that cannot construct Material's\n  * MATERIAL_ANIMATIONS provider graph. Production code should prefer\n- * MATERIAL_ANIMATIONS / ANIMATION_MODULE_TYPE.\n+ * MATERIAL_ANIMATIONS / LEGACY_ANIMATION_MODE.\n  */\n export const LEGACY_ANIMATIONS_TEST_OVERRIDE = new InjectionToken<LegacyAnimationsState | null>(\n   'LEGACY_ANIMATIONS_TEST_OVERRIDE',\n@@ -45,7 +50,7 @@ export function getLegacyAnimationsState(): LegacyAnimationsState {\n     return 'di-disabled';\n   }\n \n-  if (inject(ANIMATION_MODULE_TYPE, {optional: true}) === 'NoopAnimations') {\n+  if (inject(LEGACY_ANIMATION_MODE, {optional: true}) === 'NoopAnimations') {\n     return 'di-disabled';\n   }\n \n@@ -72,6 +77,11 @@ export function legacyAnimationsDisabled(): boolean {\n   return getLegacyAnimationsState() !== 'enabled';\n }\n \n+/** Preserve explicit historical constructor modes while applying ambient policy. */\n+export function resolveLegacyAnimationMode<T extends string | null | undefined>(mode: T): T | 'NoopAnimations' {\n+  return mode === 'NoopAnimations' || legacyAnimationsDisabled() ? 'NoopAnimations' : mode;\n+}\n+\n /** Zero-duration params used when dialog (and similar) should noop motion. */\n export const LEGACY_ZERO_ANIMATION_PARAMS = {\n   enterAnimationDuration: '0ms',\n",
+      "full_subsequent_diff": "",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/historical-menu-requalified-animation-token-boundaries.json",
+        "sha256": "277c426af47f734939311b74911f441ddc47fafa6d04111ec1919aed89e872b3"
+      },
+      "prior_conclusion": "stable-public-peer",
+      "scope": "direct token binding removed; replacement behavior and transitive imports unqualified"
+    }
+  ],
+  "limits": [
+    "source only: no qualification of owned replacement ambient policy, motion, lifecycle, constructor or DI behavior",
+    "no transitive dependency, engine-free graph, browser, packed, peer-range, coordinator or G11 pass",
+    "no treatment of non-target uses or security"
+  ],
+  "g11_claim": "not-passed"
+}
