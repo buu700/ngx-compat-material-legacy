@@ -45,11 +45,12 @@ try{
  if(line==='main'){
   const inventoryFrame=JSON.parse(tempRead('compatibility/rc/parent-main-inventory-reference-current-source-v1.json'));
   const finalInventory=JSON.parse(tempRead('compatibility/rc/current-tool-matrix-final-product-v1.json')).structural_transitions[1];
-  assert.deepEqual(finalInventory.before,inventoryFrame.inventory_transitions.at(-1).after);
+  assert.deepEqual(finalInventory.before,inventoryFrame.inventory_transitions.at(-1).after);const currentInventory=isolated.qualify(finalInventory.after);assert.equal(currentInventory.sha256,'c15f9b3b21f0ae6001246243e85be4e61155e60af50c86c9272dd6289514504b');
   for(const transition of inventoryFrame.inventory_transitions){
    const old=isolated.inventoryHistoricalBytes(transition.before);assert.equal(sha(old),transition.before.sha256);assert.equal(old.length,transition.before.bytes);
-   assert.deepEqual(isolated.qualify(transition.before),finalInventory.after);
+   assert.deepEqual(isolated.qualify(transition.before),currentInventory);
   }
+  assert.deepEqual(isolated.qualify(finalInventory.after),currentInventory);
   const historicalRef=inventoryFrame.inventory_transitions[0].before;
   assert.throws(()=>isolated.inventoryHistoricalBytes({...historicalRef,bytes:historicalRef.bytes+1}));
   let getterCalled=false;const forged={path:historicalRef.path,bytes:historicalRef.bytes,get sha256(){getterCalled=true;return historicalRef.sha256;}};
@@ -57,7 +58,9 @@ try{
   const inventoryPath=join(temp,historicalRef.path),inventoryBytes=readFileSync(inventoryPath);
   try{writeFileSync(inventoryPath,Buffer.concat([inventoryBytes,Buffer.from('\n')]));assert.throws(()=>inventoryFiniteToolSuccessor({root:temp,line,read:tempRead}));assert.throws(()=>isolated.inventoryHistoricalBytes(historicalRef));}
   finally{writeFileSync(inventoryPath,inventoryBytes);}isolated.assertCurrent();
-  let reentered=false;assert.throws(()=>inventoryFiniteToolSuccessor({root:temp,line,read:path=>{if(!reentered){reentered=true;try{inventoryFiniteToolSuccessor({root:temp,line,read:tempRead});}catch{}}return tempRead(path);}}));assert.equal(reentered,true);
+  let reentered=false;assert.throws(()=>inventoryFiniteToolSuccessor({root:temp,line,read:path=>{if(!reentered){reentered=true;try{inventoryFiniteToolSuccessor({root:temp,line,read:tempRead});}catch{}}return tempRead(path);}}),/reentrant/);assert.equal(reentered,true);isolated.assertCurrent();
+  let armed=false,nested=false;const guardedRead=path=>{const raw=tempRead(path);if(armed&&!nested){nested=true;try{liveGuard.assertCurrent();}catch{}}return raw;};const liveGuard=inventoryFiniteToolSuccessor({root:temp,line,read:guardedRead});armed=true;assert.throws(()=>liveGuard.assertCurrent(),/reentrant/);assert.equal(nested,true);armed=false;liveGuard.assertCurrent();
+  const recovered=inventoryFiniteToolSuccessor({root:temp,line,read:tempRead});recovered.assertCurrent();
   let mutated=false;try{assert.throws(()=>inventoryFiniteToolSuccessor({root:temp,line,read:path=>{if(!mutated){mutated=true;writeFileSync(inventoryPath,Buffer.concat([inventoryBytes,Buffer.from('\n')]));}return tempRead(path);}}));assert.equal(mutated,true);}finally{writeFileSync(inventoryPath,inventoryBytes);}isolated.assertCurrent();
   assert.throws(()=>inventoryFiniteToolSuccessor({root:temp,line:'21.x',read:tempRead}));
   for(const [path,change] of [

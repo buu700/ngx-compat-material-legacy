@@ -17,7 +17,7 @@ class InventoryCurrentWorkflowSuccessorTest(unittest.TestCase):
         result = json.loads(done.stdout)
         self.assertEqual(result['workflow_current']['path'], '.github/workflows/ci.yml')
         self.assertEqual([(x['cases'], x['mutants_rejected']) for x in result['source_regressions']],
-                         [(30, 7), (20, 6)])
+                         ([(48, 17), (20, 6)] if result['line'] == 'main' else [(30, 7), (20, 6)]))
         self.assertTrue(result['unknown_sha_rejected'])
         self.assertTrue(result['late_physical_and_callback_mutations_rejected'])
         self.assertTrue(result['loaded_image_and_packet_mutations_rejected'])
